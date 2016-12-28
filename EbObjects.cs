@@ -4,87 +4,85 @@ using System.ComponentModel;
 namespace ExpressBase.UI
 {
     [ProtoBuf.ProtoContract]
-    [ProtoBuf.ProtoInclude(1000, typeof(EbButton))]
-    [ProtoBuf.ProtoInclude(1001, typeof(EbTableLayout))]
-    [ProtoBuf.ProtoInclude(1002, typeof(EbChart))]
-    [ProtoBuf.ProtoInclude(1003, typeof(EbDataGridView))]
+    public enum EbObjectType
+    {
+        Form,
+        View,
+        DataSource,
+    }
+
+    [ProtoBuf.ProtoContract]
+    [ProtoBuf.ProtoInclude(1000, typeof(EbControl))]
+    [ProtoBuf.ProtoInclude(1001, typeof(EbDataSource))]
     public class EbObject
     {
         [Browsable(false)]
-        public virtual int Id { get; set; }
+        public int Id { get; set; }
 
         [ProtoBuf.ProtoMember(1)]
-        public virtual List<EbObject> Controls { get; set; }
+        [Browsable(false)]
+        public EbObjectType EbObjectType { get; set; }
 
         [ProtoBuf.ProtoMember(2)]
         [Browsable(false)]
-        public virtual string TargetType { get; set; }
+        public string TargetType { get; set; }
 
         [ProtoBuf.ProtoMember(3)]
         public virtual string Name { get; set; }
 
+        public EbObject() { }
+    }
+
+    [ProtoBuf.ProtoContract]
+    [ProtoBuf.ProtoInclude(2000, typeof(EbButton))]
+    [ProtoBuf.ProtoInclude(2001, typeof(EbTableLayout))]
+    [ProtoBuf.ProtoInclude(2002, typeof(EbChart))]
+    [ProtoBuf.ProtoInclude(2003, typeof(EbDataGridView))]
+    public class EbControl : EbObject
+    {
         [ProtoBuf.ProtoMember(4)]
-        public virtual string Label { get; set; }
+        public List<EbControl> Controls { get; set; }
 
         [ProtoBuf.ProtoMember(5)]
-        public virtual string HelpText { get; set; }
+        public virtual string Label { get; set; }
 
         [ProtoBuf.ProtoMember(6)]
-        public virtual string ToolTipText { get; set; }
-
-        //[ProtoBuf.ProtoMember(5)]
-        //[Browsable(false)]
-        //public DockStyle Dock { get; set; }
+        public virtual string HelpText { get; set; }
 
         [ProtoBuf.ProtoMember(7)]
-        public virtual int CellPositionRow { get; set; }
+        public virtual string ToolTipText { get; set; }
 
         [ProtoBuf.ProtoMember(8)]
+        public virtual int CellPositionRow { get; set; }
+
+        [ProtoBuf.ProtoMember(9)]
         public virtual int CellPositionColumn { get; set; }
 
-        //[Browsable(false)]
-        //public Size Size { get; set; }
-
-        //[ProtoBuf.ProtoMember(8)]
-        //[Browsable(false)]
-        //public string SizeSerialized
-        //{
-        //    get { return Size.ToString(); }
-        //    set
-        //    {
-        //        string[] coords = value.Replace("{Width=", string.Empty).Replace("Height=", string.Empty).Replace("}", string.Empty).Split(',');
-        //        Size = new Size(int.Parse(coords[0]), int.Parse(coords[1]));
-        //    }
-        //}
-
-        //[Browsable(false)]
-        //public Point Location { get; set; }
-
-        //[ProtoBuf.ProtoMember(9)]
-        //[Browsable(false)]
-        //public string LocationSerialized
-        //{
-        //    get { return Location.ToString(); }
-        //    set
-        //    {
-        //        string[] coords = value.Replace("{X=", string.Empty).Replace("Y=", string.Empty).Replace("}", string.Empty).Split(',');
-        //        Location = new Point(int.Parse(coords[0]), int.Parse(coords[1]));
-        //    }
-        //}
-
-        public EbObject() { }
+        public EbControl() { }
 
         public virtual string GetHtml() { return string.Empty; }
     }
 
     [ProtoBuf.ProtoContract]
-    public class EbButton : EbObject
+    public class EbForm : EbControl
+    {
+        [Browsable(false)]
+        public override int CellPositionRow { get; set; }
+
+        [Browsable(false)]
+        public override int CellPositionColumn { get; set; }
+
+        public EbForm() { }
+    }
+
+    [ProtoBuf.ProtoContract]
+    public class EbButton : EbControl
     {
         public EbButton() { }
     }
 
     [ProtoBuf.ProtoContract]
-    public class EbTableLayout : EbObject
+    public class EbTableLayout : EbControl
     {
         [ProtoBuf.ProtoMember(1)]
         public int RowCount { get; set; }
@@ -96,15 +94,12 @@ namespace ExpressBase.UI
     }
 
     [ProtoBuf.ProtoContract]
-    public class EbChart : EbObject
+    public class EbChart : EbControl
     {
         [ProtoBuf.ProtoMember(1)]
-        public int Id { get; set; }
-
-        [ProtoBuf.ProtoMember(2)]
         public string ChartType { get; set; }
 
-        [ProtoBuf.ProtoMember(3)]
+        [ProtoBuf.ProtoMember(2)]
         public int DataSourceId { get; set; }
 
         public EbChart() { }
@@ -206,7 +201,7 @@ function(jqXHR, textStatus, errorThrown) {
     }
 
     [ProtoBuf.ProtoContract]
-    public class EbDataGridView : EbObject
+    public class EbDataGridView : EbControl
     {
         [ProtoBuf.ProtoMember(1)]
         public int DataSourceId { get; set; }
@@ -242,5 +237,12 @@ $.get('/ds/columns/#######?format=json', function (data)
 </script>
 ".Replace("#######", this.DataSourceId.ToString().Trim());
         }
+    }
+
+    [ProtoBuf.ProtoContract]
+    public class EbDataSource : EbObject
+    {
+        [ProtoBuf.ProtoMember(1)]
+        public string Sql { get; set; }
     }
 }
