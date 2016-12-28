@@ -91,6 +91,35 @@ namespace ExpressBase.UI
         public int ColumnCount { get; set; }
 
         public EbTableLayout() { }
+
+        public override string GetHtml()
+        {
+            string html = GetTable(ColumnCount, RowCount);
+
+            foreach (EbControl ec in base.Controls)
+            {
+                html = html.Replace(string.Format("td_{0}_{1}", ec.CellPositionColumn, ec.CellPositionRow), ec.GetHtml());
+            }
+
+            return html;
+        }
+
+        private string GetTable(int col, int row)
+        {
+            HtmlTable ht = new HtmlTable();
+
+            for (int r = 0; r < row; r++)
+            {
+                HtmlRow hr = new HtmlRow(r);
+
+                for (int c = 0; c < col; c++)
+                    hr.Cells.Add(new HtmlCell(c, r));
+
+                ht.Rows.Add(hr);
+            }
+
+            return ht.GetHtml();
+        }
     }
 
     [ProtoBuf.ProtoContract]
@@ -107,10 +136,10 @@ namespace ExpressBase.UI
         public override string GetHtml()
         {
             return @"
-<div style='height: auto; width: 50%; display: inline-block;'>
-    <div id='loadingdiv' style='height: auto; width: auto; display: none;'>
+<div style='margin-top: 25px; margin-bottom: 25px; margin-right: 25px; margin-left: 25px;'>
+<!--    <div id='loadingdiv' style='height: auto; width: auto; display: none;'>
         <img id='loading-image' src='/images/ajax-loader.gif' alt='Loading...' />
-    </div>
+    </div> -->
     <div>
         <select id='ctype'>
             <option value='line'>Line</option>
@@ -118,7 +147,7 @@ namespace ExpressBase.UI
             <option value='line'>Doughnut</option>
         </select>
     </div>
-    <canvas id='chartContainer'></canvas>
+    <canvas id='$$$$$$$'></canvas>
 </div>
 <style>
 #loadingdiv {
@@ -151,7 +180,7 @@ $.get('/ds/data/#######?format=json', function(data)
         Xdatapoints.push(value[1]);
         Ydatapoints.push(value[2]);
     });
-    var ctx = document.getElementById('chartContainer');
+    var ctx = document.getElementById('$$$$$$$');
     Chart.defaults.global.hover.mode = 'nearest';
     var myChart = new Chart(ctx, {
         type: '@@@@@@@',
@@ -188,7 +217,10 @@ $.get('/ds/data/#######?format=json', function(data)
     });
 });
 </script>
-".Replace("@@@@@@@", ((string.IsNullOrEmpty(this.ChartType)) ? "bar" : this.ChartType)).Replace("#######", this.DataSourceId.ToString());
+"
+.Replace("@@@@@@@", ((string.IsNullOrEmpty(this.ChartType)) ? "bar" : this.ChartType))
+.Replace("#######", this.DataSourceId.ToString())
+.Replace("$$$$$$$", this.Name);
         }
     }
 
@@ -202,7 +234,7 @@ $.get('/ds/data/#######?format=json', function(data)
         {
             return @"
 <div>
-<table id='example' style='width:100%'></table>
+<table id='example' style='width:100%' class='display'></table>
 </div>
 <script>
 var cols = [];
@@ -215,8 +247,10 @@ $.get('/ds/columns/#######?format=json', function (data)
 
     $('#example').dataTable(
     {
+        lengthMenu: [[100, 500, 1000, 2500, 5000, -1], [100, 500, 1000, 2500, 5000, 'All']],
         serverSide: true,
         processing: true,
+        language: { processing: '<div></div><div></div><div></div><div></div><div></div><div></div><div></div>', },
         columns: cols,
         order: [],
         ajax: {
@@ -224,6 +258,12 @@ $.get('/ds/columns/#######?format=json', function (data)
             data: function(dq) { delete dq.columns; },
             dataSrc: function(dd) { return dd.data; }
         },
+    });
+    $('#example_filter input').unbind();
+    $('#example_filter input').bind('keyup', function(e) {
+        if(e.keyCode == 13) {
+            $('#example').dataTable().fnFilter(this.value);
+        }
     });
 });
 </script>
