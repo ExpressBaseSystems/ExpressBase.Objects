@@ -107,21 +107,21 @@ namespace ExpressBase.UI
         public override string GetHtml()
         {
             return @"
-<div style='height: auto; width: 50%; display: inline-block; '>
-    <div id='loading'>
+<div style='height: auto; width: 50%; display: inline-block;'>
+    <div id='loadingdiv' style='height: auto; width: auto; display: none;'>
         <img id='loading-image' src='/images/ajax-loader.gif' alt='Loading...' />
-    </div >
-    < div>
+    </div>
+    <div>
         <select id='ctype'>
             <option value='line'>Line</option>
-            <option value='line'>Pie</option >
-            <option value='line'>Doughnut</option >
+            <option value='line'>Pie</option>
+            <option value='line'>Doughnut</option>
         </select>
     </div>
     <canvas id='chartContainer'></canvas>
 </div>
 <style>
-#loading {
+#loadingdiv {
    width: 100%;
    height: 100%;
    top: 0;
@@ -142,7 +142,7 @@ namespace ExpressBase.UI
 }
 </style>
 <script>
-$('#loadingdiv').show();
+//$('#loadingdiv').show();
 $.get('/ds/data/#######?format=json', function(data) 
 {
     var Ydatapoints = [];
@@ -186,17 +186,9 @@ $.get('/ds/data/#######?format=json', function(data)
             scales: { yAxes: [{ responsive: true, ticks: { beginAtZero: true } }] }
         }
     });
-},
-function(jqXHR, textStatus, errorThrown) {
-    $('#loadingdiv').hide();
-  if (textStatus == 'timeout')
-    console.log('The server is not responding');
-
-  if (textStatus == 'error')
-    console.log(errorThrown);
 });
 </script>
-".Replace("@@@@@@@", this.ChartType).Replace("#######", this.DataSourceId.ToString());
+".Replace("@@@@@@@", ((string.IsNullOrEmpty(this.ChartType)) ? "bar" : this.ChartType)).Replace("#######", this.DataSourceId.ToString());
         }
     }
 
