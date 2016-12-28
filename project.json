@@ -2,9 +2,10 @@
   "version": "1.0.0",
 
   "dependencies": {
+    "CoreCompat.System.ComponentModel.Attributes": "4.2.3-rg",
     "NETStandard.Library": "1.6.1",
     "protobuf-net": "2.1.0",
-    "System.Runtime.WindowsRuntime": "4.0.10"
+    "System.Runtime.WindowsRuntime": "4.3.0"
   },
 
   "frameworks": {

@@ -10,35 +10,37 @@ namespace ExpressBase.UI
     [ProtoBuf.ProtoInclude(1003, typeof(EbDataGridView))]
     public class EbObject
     {
+        [Browsable(false)]
+        public virtual int Id { get; set; }
+
         [ProtoBuf.ProtoMember(1)]
-        //[Browsable(false)]
         public virtual List<EbObject> Controls { get; set; }
 
         [ProtoBuf.ProtoMember(2)]
-        //[Browsable(false)]
-        public string TargetType { get; set; }
+        [Browsable(false)]
+        public virtual string TargetType { get; set; }
 
         [ProtoBuf.ProtoMember(3)]
-        public string Name { get; set; }
+        public virtual string Name { get; set; }
 
         [ProtoBuf.ProtoMember(4)]
-        public string Label { get; set; }
+        public virtual string Label { get; set; }
 
         [ProtoBuf.ProtoMember(5)]
-        public string HelpText { get; set; }
+        public virtual string HelpText { get; set; }
 
         [ProtoBuf.ProtoMember(6)]
-        public string ToolTipText { get; set; }
+        public virtual string ToolTipText { get; set; }
 
         //[ProtoBuf.ProtoMember(5)]
         //[Browsable(false)]
         //public DockStyle Dock { get; set; }
 
         [ProtoBuf.ProtoMember(7)]
-        public int CellPositionRow { get; set; }
+        public virtual int CellPositionRow { get; set; }
 
         [ProtoBuf.ProtoMember(8)]
-        public int CellPositionColumn { get; set; }
+        public virtual int CellPositionColumn { get; set; }
 
         //[Browsable(false)]
         //public Size Size { get; set; }
@@ -70,18 +72,7 @@ namespace ExpressBase.UI
         //    }
         //}
 
-        //[Browsable(false)]
-        //public IEbControl IEbControl { get; set; }
-
-        public EbObject()
-        {
-            //this.Dock = DockStyle.Fill;
-        }
-
-        //public EbObject(IEbControl parent)
-        //{
-        //    this.IEbControl = parent;
-        //}
+        public EbObject() { }
 
         public virtual string GetHtml() { return string.Empty; }
     }
@@ -90,7 +81,6 @@ namespace ExpressBase.UI
     public class EbButton : EbObject
     {
         public EbButton() { }
-        //public EbButton(IEbControl parent) : base(parent) { }
     }
 
     [ProtoBuf.ProtoContract]
@@ -103,7 +93,6 @@ namespace ExpressBase.UI
         public int ColumnCount { get; set; }
 
         public EbTableLayout() { }
-        //public EbTableLayout(IEbControl parent) : base(parent) { }
     }
 
     [ProtoBuf.ProtoContract]
@@ -119,7 +108,6 @@ namespace ExpressBase.UI
         public int DataSourceId { get; set; }
 
         public EbChart() { }
-        //public EbChart(IEbControl parent) : base(parent) { }
 
         public override string GetHtml()
         {
