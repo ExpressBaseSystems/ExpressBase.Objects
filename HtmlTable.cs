@@ -18,7 +18,7 @@ namespace ExpressBase.UI
 
         public string GetHtml()
         {
-            string html = "<table border='1'>";
+            string html = "<table border='1' width='100%' height='100%'>";
             foreach (HtmlRow r in Rows)
                 html += r.GetHtml();
 
