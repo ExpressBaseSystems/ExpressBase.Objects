@@ -18,7 +18,7 @@ namespace ExpressBase.UI
 
         public string GetHtml()
         {
-            string html = "<table border='1' width='100%' height='100%'>";
+            string html = "<table border='1' width='100%' height='auto'>";
             foreach (HtmlRow r in Rows)
                 html += r.GetHtml();
 
@@ -52,19 +52,21 @@ namespace ExpressBase.UI
     public class HtmlCell
     {
         public string Name { get; set; }
-        private int Column { get; set; }
+        private int ColumnIndex { get; set; }
+        private int ColumnWidth { get; set; }
         private int Row { get; set; }
 
-        public HtmlCell(string name, int c, int r)
+        public HtmlCell(string name, EbTableColumn c, int r)
         {
             this.Name = name;
-            this.Column = c;
+            this.ColumnIndex = c.Index;
+            this.ColumnWidth = c.Width;
             this.Row = r;
         }
 
         public string GetHtml()
         {
-            return @"<td>" + string.Format("{0}_{1}_{2}", this.Name, this.Column, this.Row) + "</td>";
+            return string.Format("<td width='{0}%'>", this.ColumnWidth) + string.Format("{0}_{1}_{2}", this.Name, this.ColumnIndex, this.Row) + "</td>";
         }
     }
 }

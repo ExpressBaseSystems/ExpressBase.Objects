@@ -93,11 +93,15 @@ namespace ExpressBase.UI
         [Description("Size")]
         public int ColumnCount { get; set; }
 
+        [ProtoBuf.ProtoMember(3)]
+        [Browsable(false)]
+        public List<EbTableColumn> Columns { get; set; }
+
         public EbTableLayout() { }
 
         public override string GetHtml()
         {
-            string html = GetTable(ColumnCount, RowCount);
+            string html = GetTable(Columns, RowCount);
 
             if (base.Controls != null)
             {
@@ -108,7 +112,7 @@ namespace ExpressBase.UI
             return html;
         }
 
-        private string GetTable(int col, int row)
+        private string GetTable(List<EbTableColumn> columns, int row)
         {
             HtmlTable ht = new HtmlTable(this.Name);
 
@@ -116,14 +120,25 @@ namespace ExpressBase.UI
             {
                 HtmlRow hr = new HtmlRow(this.Name, r);
 
-                for (int c = 0; c < col; c++)
-                    hr.Cells.Add(new HtmlCell(this.Name, c, r));
+                //for (int c = 0; c < col; c++)
+                foreach (EbTableColumn col in columns)
+                    hr.Cells.Add(new HtmlCell(this.Name, col, r));
 
                 ht.Rows.Add(hr);
             }
 
             return ht.GetHtml();
         }
+    }
+
+    [ProtoBuf.ProtoContract]
+    public class EbTableColumn 
+    {
+        [ProtoBuf.ProtoMember(1)]
+        public int Index { get; set; }
+
+        [ProtoBuf.ProtoMember(2)]
+        public int Width { get; set; }
     }
 
     [ProtoBuf.ProtoContract]
@@ -287,8 +302,18 @@ $.get('/ds/data/#######?format=json', function(data)
         public override string GetHtml()
         {
             return @"
-<div>
-<table id='example' style='width:100%' class='display'></table>
+<style>
+.tablecontainer {
+    width:100%;
+    height:auto;
+    border:solid 1px;
+    display:inline-block;
+    overflow-x:scroll;
+    overflow-y:scroll;
+}
+</style>
+<div class='tablecontainer'>
+    <table id='example' style='width:100%' class='display'></table>
 </div>
 <script>
 var cols = [];
