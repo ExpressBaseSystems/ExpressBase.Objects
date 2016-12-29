@@ -140,39 +140,35 @@ namespace ExpressBase.UI
         public override string GetHtml()
         {
             return @"
-<div style='margin-top: 25px; margin-bottom: 25px; margin-right: 25px; margin-left: 25px;'>
-<!--    <div id='loadingdiv' style='height: auto; width: auto; display: none;'>
-        <img id='loading-image' src='/images/ajax-loader.gif' alt='Loading...' />
-    </div> -->
-    <div>
-        <select id='ctype'>
-            <option value='line'>Line</option>
-            <option value='line'>Pie</option>
-            <option value='line'>Doughnut</option>
-        </select>
-    </div>
-    <div id='chart-container' style='width:100%; border: solid 1px; height:50%;'>
-        <button id='GoptBtn' style='float:right;'> &#9776 </button>
-        <div style='float:right;margin-left:-20px;'>
-            <div id='optBox'>
-                   <div id='Gopen' class='opt'>Open..</div>
-                    <div id='Gsave' class='opt'></div>
-            </div>
-        </div>
-        <div id='loadingdiv'>
-            <img id='loading-image' src='/images/ajax-loader.gif' alt='Loading...' />
-        </div>
-        <canvas id='$$$$$$$'></canvas>
-    </div>
+<div>
+    <select id='$$$$$$$_ctype'>
+        <option value='line'>Line</option>
+        <option value='line'>Pie</option>
+        <option value='line'>Doughnut</option>
+    </select>
 </div>
+<div id='$$$$$$$_container' style='width:100%; border: solid 1px; height:50%;'>
+    <button id='$$$$$$$_GoptBtn' style='float:right;'>&#9776</button>
+    <div style='float:right;margin-left:-20px;'>
+        <div id='$$$$$$$_optBox' class='optBox'>
+                <div id='$$$$$$$_Gopen' class='opt'>Open..</div>
+                <div id='$$$$$$$_Gsave' class='opt'></div>
+        </div>
+    </div>
+    <div id='$$$$$$$_loadingdiv' class='loadingdiv'>
+        <img id='loading-image' src='/images/ajax-loader.gif' alt='Loading...' />
+    </div>
+    <canvas id='$$$$$$$_canvas'></canvas>
+</div>
+
 <style>
-#loadingdiv {
+.loadingdiv {
     //border: solid 1px;
     vertical-align:middle;
     margin-left: 50%;
     display: none;
 }
-#optBox{
+.optBox{
     border: solid 1px #cef;
     background-color:#dff;
     display:inline-block;
@@ -192,46 +188,38 @@ a.opt{
     border-top: solid 1px #ddd;
     padding:3px;
 }
-
-#loading-image {
-  //position: absolute;
-  //top: 100px;
-  //left: 240px;
-  //z-index: 100;
-}
 </style>
+
 <script>
-$('#optBox').hide();
+$('#$$$$$$$_optBox').hide();
  
 var link = document.createElement('a');
 link.innerHTML = 'Save..';
 link.addEventListener('click', function(ev) {
-    var can = document.getElementById('chartCanvas');
+    var can = document.getElementById('$$$$$$$_canvas');
     link.href = can.toDataURL();
-    link.id='savelink';
     link.class='opt';
     link.download = 'Chart.png';
 }, false);
-$('#Gsave').append(link);
+$('#$$$$$$$_Gsave').append(link);
 
-$('#GoptBtn').on('click',function() {
-    alert('saddasdasdasd');
-    $('#optBox').toggle(20, 'swing', 'show');
+$('#$$$$$$$_GoptBtn').on('click',function() {
+    $('#$$$$$$$_optBox').toggle(20, 'swing', 'show');
 });
 
-$('#Gsave').on('click',function() {
+$('#$$$$$$$_Gsave').on('click',function() {
     $('a').trigger('click');
-    $('#optBox').hide();
+    $('#$$$$$$$_optBox').hide();
 });
 
-$('#Gopen').on('click',function() {
+$('#$$$$$$$_Gopen').on('click',function() {
     var wi = window.open();
-    var html = $('#chart-container').html();
+    var html = $('#$$$$$$$_container').html();
     $(wi.document.body).html(html);
-    $('#optBox').hide();
+    $('#$$$$$$$_optBox').hide();
 });
 
-$('#loadingdiv').show();
+$('#$$$$$$$_loadingdiv').show();
 $.get('/ds/data/#######?format=json', function(data) 
 {
     var Ydatapoints = [];
@@ -240,7 +228,7 @@ $.get('/ds/data/#######?format=json', function(data)
         Xdatapoints.push(value[1]);
         Ydatapoints.push(value[2]);
     });
-    var ctx = document.getElementById('$$$$$$$');
+    var ctx = document.getElementById('$$$$$$$_canvas');
     Chart.defaults.global.hover.mode = 'nearest';
     var myChart = new Chart(ctx, {
         type: '@@@@@@@',
@@ -280,7 +268,7 @@ $.get('/ds/data/#######?format=json', function(data)
             scales: { xAxes: [{ responsive: true, ticks: { beginAtZero: true} }] }
         }
     });
-    $('#loadingdiv').hide();
+    $('#$$$$$$$_loadingdiv').hide();
 });
 </script>
 "
