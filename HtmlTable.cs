@@ -7,16 +7,18 @@ namespace ExpressBase.UI
 {
     public class HtmlTable
     {
+        public string Name { get; set; }
         public List<HtmlRow> Rows { get; set; }
 
-        public HtmlTable()
+        public HtmlTable(string name)
         {
+            this.Name = name;
             this.Rows = new List<HtmlRow>();
         }
 
         public string GetHtml()
         {
-            string html = "<table border='1' style='margin-top: 10px;'>";
+            string html = "<table border='1'>";
             foreach (HtmlRow r in Rows)
                 html += r.GetHtml();
 
@@ -26,11 +28,13 @@ namespace ExpressBase.UI
 
     public class HtmlRow
     {
+        public string Name { get; set; }
         private int Row { get; set; }
         public List<HtmlCell> Cells { get; set; }
 
-        public HtmlRow(int r)
+        public HtmlRow(string name, int r)
         {
+            this.Name = name;
             this.Row = r;
             this.Cells = new List<HtmlCell>();
         }
@@ -47,18 +51,20 @@ namespace ExpressBase.UI
 
     public class HtmlCell
     {
+        public string Name { get; set; }
         private int Column { get; set; }
         private int Row { get; set; }
 
-        public HtmlCell(int c, int r)
+        public HtmlCell(string name, int c, int r)
         {
+            this.Name = name;
             this.Column = c;
             this.Row = r;
         }
 
         public string GetHtml()
         {
-            return @"<td>" + string.Format("td_{0}_{1}", this.Column, this.Row) + "</td>";
+            return @"<td>" + string.Format("{0}_{1}_{2}", this.Name, this.Column, this.Row) + "</td>";
         }
     }
 }

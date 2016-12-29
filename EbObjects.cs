@@ -96,9 +96,10 @@ namespace ExpressBase.UI
         {
             string html = GetTable(ColumnCount, RowCount);
 
-            foreach (EbControl ec in base.Controls)
+            if (base.Controls != null)
             {
-                html = html.Replace(string.Format("td_{0}_{1}", ec.CellPositionColumn, ec.CellPositionRow), ec.GetHtml());
+                foreach (EbControl ec in base.Controls)
+                    html = html.Replace(string.Format("{0}_{1}_{2}", this.Name, ec.CellPositionColumn, ec.CellPositionRow), ec.GetHtml());
             }
 
             return html;
@@ -106,14 +107,14 @@ namespace ExpressBase.UI
 
         private string GetTable(int col, int row)
         {
-            HtmlTable ht = new HtmlTable();
+            HtmlTable ht = new HtmlTable(this.Name);
 
             for (int r = 0; r < row; r++)
             {
-                HtmlRow hr = new HtmlRow(r);
+                HtmlRow hr = new HtmlRow(this.Name, r);
 
                 for (int c = 0; c < col; c++)
-                    hr.Cells.Add(new HtmlCell(c, r));
+                    hr.Cells.Add(new HtmlCell(this.Name, c, r));
 
                 ht.Rows.Add(hr);
             }
