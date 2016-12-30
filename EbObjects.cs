@@ -222,7 +222,7 @@ link.addEventListener('click', function(ev) {
     link.download = 'Chart.png';
 }, false);
 $('#$$$$$$$_Gsave').append(link);
-$('#Gopen').on('click',function() {
+$('#$$$$$$$_Gopen').on('click',function() {
     var wi = window.open();
     var html = $('#$$$$$$$_container').html();
     $(wi.document.body).html(html);
