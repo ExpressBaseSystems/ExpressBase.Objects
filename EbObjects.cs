@@ -86,22 +86,18 @@ namespace ExpressBase.UI
     public class EbTableLayout : EbControl
     {
         [ProtoBuf.ProtoMember(1)]
-        [Description("Size")]
-        public int RowCount { get; set; }
-
-        [ProtoBuf.ProtoMember(2)]
-        [Description("Size")]
-        public int ColumnCount { get; set; }
-
-        [ProtoBuf.ProtoMember(3)]
         [Browsable(false)]
         public List<EbTableColumn> Columns { get; set; }
+
+        [ProtoBuf.ProtoMember(2)]
+        [Browsable(false)]
+        public List<EbTableRow> Rows { get; set; }
 
         public EbTableLayout() { }
 
         public override string GetHtml()
         {
-            string html = GetTable(Columns, RowCount);
+            string html = GetTable();
 
             if (base.Controls != null)
             {
@@ -112,17 +108,16 @@ namespace ExpressBase.UI
             return html;
         }
 
-        private string GetTable(List<EbTableColumn> columns, int row)
+        private string GetTable()
         {
             HtmlTable ht = new HtmlTable(this.Name);
 
-            for (int r = 0; r < row; r++)
+            foreach (EbTableRow row in this.Rows)
             {
-                HtmlRow hr = new HtmlRow(this.Name, r);
+                HtmlRow hr = new HtmlRow(this.Name, row);
 
-                //for (int c = 0; c < col; c++)
-                foreach (EbTableColumn col in columns)
-                    hr.Cells.Add(new HtmlCell(this.Name, col, r));
+                foreach (EbTableColumn col in this.Columns)
+                    hr.Cells.Add(new HtmlCell(this.Name, col, row));
 
                 ht.Rows.Add(hr);
             }
@@ -139,6 +134,16 @@ namespace ExpressBase.UI
 
         [ProtoBuf.ProtoMember(2)]
         public int Width { get; set; }
+    }
+
+    [ProtoBuf.ProtoContract]
+    public class EbTableRow
+    {
+        [ProtoBuf.ProtoMember(1)]
+        public int Index { get; set; }
+
+        [ProtoBuf.ProtoMember(2)]
+        public int Height { get; set; }
     }
 
     [ProtoBuf.ProtoContract]
@@ -308,12 +313,11 @@ $.get('/ds/data/#######?format=json', function(data)
     height:auto;
     border:solid 1px;
     display:inline-block;
-    overflow-x:scroll;
-    overflow-y:scroll;
+    overflow-x:auto;
 }
 </style>
 <div class='tablecontainer'>
-    <table id='example' style='width:100%' class='display'></table>
+    <table id='$$$$$$$_tbl' style='width:100%' class='display compact'></table>
 </div>
 <script>
 var cols = [];
@@ -324,7 +328,7 @@ $.get('/ds/columns/#######?format=json', function (data)
             function(i, value) { 
                 cols.push({ 'data': value.columnIndex.toString(), 'title': value.columnName }); });
 
-    $('#example').dataTable(
+    $('#$$$$$$$_tbl').dataTable(
     {
         lengthMenu: [[100, 500, 1000, 2500, 5000, -1], [100, 500, 1000, 2500, 5000, 'All']],
         serverSide: true,
@@ -338,15 +342,16 @@ $.get('/ds/columns/#######?format=json', function (data)
             dataSrc: function(dd) { return dd.data; }
         },
     });
-    $('#example_filter input').unbind();
-    $('#example_filter input').bind('keyup', function(e) {
+    $('#$$$$$$$_tbl_filter input').unbind();
+    $('#$$$$$$$_tbl_filter input').bind('keyup', function(e) {
         if(e.keyCode == 13) {
-            $('#example').dataTable().fnFilter(this.value);
+            $('#$$$$$$$_tbl').dataTable().fnFilter(this.value);
         }
     });
 });
 </script>
-".Replace("#######", this.DataSourceId.ToString().Trim());
+".Replace("#######", this.DataSourceId.ToString().Trim())
+.Replace("$$$$$$$", this.Name); 
         }
     }
 

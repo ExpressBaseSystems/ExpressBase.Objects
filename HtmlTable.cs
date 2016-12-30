@@ -29,19 +29,19 @@ namespace ExpressBase.UI
     public class HtmlRow
     {
         public string Name { get; set; }
-        private int Row { get; set; }
+        private EbTableRow Row { get; set; }
         public List<HtmlCell> Cells { get; set; }
 
-        public HtmlRow(string name, int r)
+        public HtmlRow(string name, EbTableRow row)
         {
             this.Name = name;
-            this.Row = r;
+            this.Row = row;
             this.Cells = new List<HtmlCell>();
         }
 
         public string GetHtml()
         {
-            string html = "<tr>";
+            string html = string.Format("<tr height='{0}'>", (this.Row.Height > 0) ? this.Row.Height.ToString() : "auto");
             foreach (HtmlCell c in Cells)
                 html += c.GetHtml();
 
@@ -52,21 +52,19 @@ namespace ExpressBase.UI
     public class HtmlCell
     {
         public string Name { get; set; }
-        private int ColumnIndex { get; set; }
-        private int ColumnWidth { get; set; }
-        private int Row { get; set; }
+        private EbTableColumn Column { get; set; }
+        private EbTableRow Row { get; set; }
 
-        public HtmlCell(string name, EbTableColumn c, int r)
+        public HtmlCell(string name, EbTableColumn c, EbTableRow r)
         {
             this.Name = name;
-            this.ColumnIndex = c.Index;
-            this.ColumnWidth = c.Width;
+            this.Column = c;
             this.Row = r;
         }
 
         public string GetHtml()
         {
-            return string.Format("<td width='{0}%'>", this.ColumnWidth) + string.Format("{0}_{1}_{2}", this.Name, this.ColumnIndex, this.Row) + "</td>";
+            return string.Format("<td width='{0}%'>", this.Column.Width) + string.Format("{0}_{1}_{2}", this.Name, this.Column.Index, this.Row.Index) + "</td>";
         }
     }
 }
