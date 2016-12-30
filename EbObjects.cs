@@ -185,7 +185,7 @@ namespace ExpressBase.UI
 .loadingdiv {
     //border: solid 1px;
     vertical-align:middle;
-    margin-left: 50%;
+    margin:auto;
     display: none;
 }
 .optBox{
@@ -280,7 +280,7 @@ $.get('/ds/data/#######?format=json', function(data)
         zoom: { enabled: true },
         options: {
             fixedStepSize:50,
-            title: { display: true, text: 'Chart Title', fontSize:30, },
+            title: { display: true, text: 'Chart Title', },
             hover: { mode: 'index' },
             pan: { enabled: true, mode: 'x' },
             responsive: true,
@@ -317,7 +317,7 @@ $.get('/ds/data/#######?format=json', function(data)
 }
 </style>
 <div class='tablecontainer'>
-    <table id='$$$$$$$_tbl' style='width:100%' class='display compact'></table>
+    <table id='$$$$$$$_tbl' style='width:100%;' class='display compact'></table>
 </div>
 <script>
 var cols = [];
