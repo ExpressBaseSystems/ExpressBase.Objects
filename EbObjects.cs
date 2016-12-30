@@ -160,103 +160,94 @@ namespace ExpressBase.UI
         public override string GetHtml()
         {
             return @"
-<div>
-    <select id='$$$$$$$_ctype'>
-        <option value='line'>Line</option>
-        <option value='line'>Pie</option>
-        <option value='line'>Doughnut</option>
-    </select>
-</div>
-<div id='$$$$$$$_container' style='width:100%; border: solid 1px; height:50%;'>
-    <button id='$$$$$$$_GoptBtn' style='float:right;'>&#9776</button>
-    <div style='float:right;margin-left:-20px;'>
-        <div id='$$$$$$$_optBox' class='optBox'>
-                <div id='$$$$$$$_Gopen' class='opt'>Open..</div>
-                <div id='$$$$$$$_Gsave' class='opt'></div>
+<div class='contnr'>
+    <div id='$$$$$$$_chartMenuDiv' class='optBox'>
+        <div style=' display:inline-block;'>
+            <select id='$$$$$$$_ctype'>
+                <option value='line'>Line</option>
+                <option value='pie'>Pie</option>
+                <option value='doughnut'>Doughnut</option>
+            </select>
+        </div>
+        <div style='display:inline-block; margin-left:'> CHART HEADING </div>
+        <div style='float:right;margin-left:-20px; display:inline-block;'>
+            <div id='$$$$$$$_Gopen' class='opt'>Open..</div>
+            <div id='$$$$$$$_Gsave' class='opt'></div>
         </div>
     </div>
-    <div id='$$$$$$$_loadingdiv' class='loadingdiv'>
-        <img id='loading-image' src='/images/ajax-loader.gif' alt='Loading...' />
+    <div id='$$$$$$$_container' class='contnr' style='overflow-x:auto;  overflow-y:auto;'>
+        <div id='$$$$$$$_loadingdiv'>
+            <img id='$$$$$$$_loading-image' src='/images/ajax-loader.gif' alt='Loading...' />
+        </div>
+        <div id='$$$$$$$_canvasDiv' style=' margin:5px; border: solid 1px #faa;'>
+            <canvas id='$$$$$$$_chartCanvas' style='min-width:100%;'></canvas>
+        </div>  
     </div>
-    <canvas id='$$$$$$$_canvas'></canvas>
 </div>
-
 <style>
+.contnr {
+    width:100%;margin:5px;
+    border: solid 1px;
+}
 .loadingdiv {
-    //border: solid 1px;
     vertical-align:middle;
-    margin:auto;
+    margin-left: 50%;
+    margin-top: 50%;
     display: none;
 }
-.optBox{
-    border: solid 1px #cef;
-    background-color:#dff;
+.optBox {
+    border: solid 1px #037;
+    background-color:#00EE7F;
+}
+.opt {
     display:inline-block;
-    width:75px;
-    position: fixed;
-    margin-left: -44px;
-    padding-left: 5px;
-    font-size: 13px;
-}
-
-.opt{
     border-top: solid 1px #ddd;
-    padding:3px;
+    border: solid 1px #aad;
+    background-color:#0ff;
 }
-a.opt{
+a.opt {
     color: black;
     border-top: solid 1px #ddd;
     padding:3px;
 }
 </style>
-
 <script>
-$('#$$$$$$$_optBox').hide();
- 
 var link = document.createElement('a');
 link.innerHTML = 'Save..';
 link.addEventListener('click', function(ev) {
-    var can = document.getElementById('$$$$$$$_canvas');
+    var can = document.getElementById('$$$$$$$_chartCanvas');
     link.href = can.toDataURL();
+    link.id='$$$$$$$_savelink';
     link.class='opt';
     link.download = 'Chart.png';
 }, false);
 $('#$$$$$$$_Gsave').append(link);
-
-$('#$$$$$$$_GoptBtn').on('click',function() {
-    $('#$$$$$$$_optBox').toggle(20, 'swing', 'show');
-});
-
-$('#$$$$$$$_Gsave').on('click',function() {
-    $('a').trigger('click');
-    $('#$$$$$$$_optBox').hide();
-});
-
-$('#$$$$$$$_Gopen').on('click',function() {
+$('#Gopen').on('click',function() {
     var wi = window.open();
     var html = $('#$$$$$$$_container').html();
     $(wi.document.body).html(html);
-    $('#$$$$$$$_optBox').hide();
 });
-
 $('#$$$$$$$_loadingdiv').show();
 $.get('/ds/data/#######?format=json', function(data) 
 {
     var Ydatapoints = [];
     var Xdatapoints = [];
-    $.each(data.data, function(i, value) {
-        Xdatapoints.push(value[1]);
-        Ydatapoints.push(value[2]);
-    });
-    var ctx = document.getElementById('$$$$$$$_canvas');
+    $.each(data.data, function(i, value) { Xdatapoints.push(value[1]); Ydatapoints.push(value[2]); });
+    if('@@@@@@@'!=='pie')
+    {
+        var canWidth=data.data.length*3;
+        $('#$$$$$$$_canvasDiv').css('width', canWidth + '%');
+        $('#$$$$$$$_container').scrollTop(0);
+    }
+    var ctx = document.getElementById('$$$$$$$_chartCanvas');
     Chart.defaults.global.hover.mode = 'nearest';
     var myChart = new Chart(ctx, {
         type: '@@@@@@@',
         data: {
             labels: Xdatapoints,
             datasets: [{
-                label: '@@@@@@@',
-                xLabels:['one', 'two'],
+                label:'Bar Graph',
+                xLabels:['one'],
                 data: Ydatapoints,
                 backgroundColor: [
                     'rgba(255, 99, 132, 0.8)',
@@ -264,34 +255,30 @@ $.get('/ds/data/#######?format=json', function(data)
                     'rgba(255, 206, 86, 0.8)',
                     'rgba(75, 192, 192, 0.8)',
                     'rgba(153, 102, 255, 0.8)',
+                    'rgba(255, 159, 64, 0.8)',
+                    'rgba(255, 99, 132, 0.8)',
+                    'rgba(54, 162, 235, 0.8)',
+                    'rgba(255, 206, 86, 0.8)',
+                    'rgba(75, 192, 192, 0.8)',
+                    'rgba(153, 102, 255, 0.8)',
                     'rgba(255, 159, 64, 0.8)'
-                ],
-                borderColor: [
-                    'rgba(255,99,132,1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(255, 159, 64, 1)'
-                ],
-                borderWidth: 4
+                ]
             }]
         },
         zoom: { enabled: true },
         options: {
             fixedStepSize:50,
-            title: { display: true, text: 'Chart Title', },
+            title: { display: true, text: 'Chart Title', fontSize:30, },
             hover: { mode: 'index' },
             pan: { enabled: true, mode: 'x' },
             responsive: true,
-			zoom: { enabled: true, mode: 'x', limits: { max: 10, min: 5 } },
-            scales: { xAxes: [{ responsive: true, ticks: { beginAtZero: true} }] }
+            zoom: { enabled: true, mode: 'x', limits: { max: 10, min: 5 } },
+            scales: { xAxes: [{ responsive:false , ticks: { beginAtZero: true} }] }
         }
     });
-    $('#$$$$$$$_loadingdiv').hide();
+$('#$$$$$$$_loadingdiv').hide();
 });
-</script>
-"
+</script>"
 .Replace("@@@@@@@", ((string.IsNullOrEmpty(this.ChartType)) ? "bar" : this.ChartType))
 .Replace("#######", this.DataSourceId.ToString())
 .Replace("$$$$$$$", this.Name);
