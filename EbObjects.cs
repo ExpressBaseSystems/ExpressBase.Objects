@@ -160,34 +160,32 @@ namespace ExpressBase.UI
         public override string GetHtml()
         {
             return @"
-<div class='contnr'>
+<div id='$$$$$$$_contnr' style=' border:solid 1px #79e; margin:1px;' >
     <div id='$$$$$$$_chartMenuDiv' class='optBox'>
-        <div style=' display:inline-block;'>
-            <select id='$$$$$$$_ctype'>
-                <option value='line'>Line</option>
-                <option value='pie'>Pie</option>
-                <option value='doughnut'>Doughnut</option>
-            </select>
-        </div>
-        <div style='display:inline-block; margin-left:'> CHART HEADING </div>
-        <div style='float:right;margin-left:-20px; display:inline-block;'>
-            <div id='$$$$$$$_Gopen' class='opt'>Open..</div>
-            <div id='$$$$$$$_Gsave' class='opt'></div>
-        </div>
+            <div style='display:inline-block; margin-left:15%'> CHART HEADING </div>
+            <div style='float:right;margin-left:-20px; display:inline-block;'>
+                <select id='$$$$$$$_ctype'>
+                    <option value='line'>Line</option>
+                    <option value='pie'>Pie</option>
+                    <option value='doughnut'>Doughnut</option>
+                </select>
+                <div id='$$$$$$$_Gopen' class='opt'>Open..</div>
+                <div id='$$$$$$$_Gsave' class='opt'> </div>
+            </div>
     </div>
-    <div id='$$$$$$$_container' class='contnr' style='overflow-x:auto;  overflow-y:auto;'>
-        <div id='$$$$$$$_loadingdiv'>
+
+    <div id='$$$$$$$_container' class='contnr' style='overflow-x:auto; height:45em; overflow-y:auto;'>
+        <div id='$$$$$$$_loadingdiv' class='loadingdiv'>
             <img id='$$$$$$$_loading-image' src='/images/ajax-loader.gif' alt='Loading...' />
         </div>
-        <div id='$$$$$$$_canvasDiv' style=' margin:5px; border: solid 1px #faa;'>
-            <canvas id='$$$$$$$_chartCanvas' style='min-width:100%;'></canvas>
+        <div id='$$$$$$$_canvasDiv' style=' min-width:100%;'>
+            <canvas id='$$$$$$$_chartCanvas' style='min-width:100%;  max-height:43em;'></canvas>
         </div>  
     </div>
 </div>
 <style>
 .contnr {
-    width:100%;margin:5px;
-    border: solid 1px;
+    width:100%;
 }
 .loadingdiv {
     vertical-align:middle;
@@ -196,32 +194,28 @@ namespace ExpressBase.UI
     display: none;
 }
 .optBox {
-    border: solid 1px #037;
-    background-color:#00EE7F;
+    background-color:#79e;
 }
 .opt {
+    border:solid 1px #DDD;
     display:inline-block;
-    border-top: solid 1px #ddd;
-    border: solid 1px #aad;
-    background-color:#0ff;
+    background-color:#fff;
 }
-a.opt {
-    color: black;
-    border-top: solid 1px #ddd;
-    padding:3px;
-}
+
 </style>
 <script>
+
 var link = document.createElement('a');
-link.innerHTML = 'Save..';
+link.innerHTML = '<img id=\'$$$$$$$_saveIcon\' src=\'http://localhost:53125/images/Save-16.png \' /> ';
 link.addEventListener('click', function(ev) {
     var can = document.getElementById('$$$$$$$_chartCanvas');
     link.href = can.toDataURL();
-    link.id='$$$$$$$_savelink';
+    link.id='$$$$$$$_saveLink';
     link.class='opt';
     link.download = 'Chart.png';
 }, false);
 $('#$$$$$$$_Gsave').append(link);
+
 $('#$$$$$$$_Gopen').on('click',function() {
     var wi = window.open();
     var html = $('#$$$$$$$_container').html();
@@ -233,11 +227,11 @@ $.get('/ds/data/#######?format=json', function(data)
     var Ydatapoints = [];
     var Xdatapoints = [];
     $.each(data.data, function(i, value) { Xdatapoints.push(value[1]); Ydatapoints.push(value[2]); });
-    if('@@@@@@@'!=='pie')
+    if( ('@@@@@@@'!=='pie') && ('@@@@@@@'!=='doughnut') )
     {
-        var canWidth=data.data.length*3;
-        $('#$$$$$$$_canvasDiv').css('width', canWidth + '%');
-        $('#$$$$$$$_container').scrollTop(0);
+        var canWidth=data.data.length*5;
+        $('#$$$$$$$_canvasDiv').css('width', canWidth + '%');// canvasDiv zooming(height fixed)
+        $('#$$$$$$$_chartCanvas').css('min-height', 42+'em');// to fit small graph into container height
     }
     var ctx = document.getElementById('$$$$$$$_chartCanvas');
     Chart.defaults.global.hover.mode = 'nearest';
@@ -246,7 +240,7 @@ $.get('/ds/data/#######?format=json', function(data)
         data: {
             labels: Xdatapoints,
             datasets: [{
-                label:'Bar Graph',
+                label:'Graph',
                 xLabels:['one'],
                 data: Ydatapoints,
                 backgroundColor: [
@@ -268,7 +262,6 @@ $.get('/ds/data/#######?format=json', function(data)
         zoom: { enabled: true },
         options: {
             fixedStepSize:50,
-            title: { display: true, text: 'Chart Title', fontSize:30, },
             hover: { mode: 'index' },
             pan: { enabled: true, mode: 'x' },
             responsive: true,
