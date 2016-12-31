@@ -308,6 +308,8 @@ $('#$$$$$$$_loadingdiv').hide();
 </div>
 <script>
 var cols = [];
+var colname='';
+var searchText='';
 $.get('/ds/columns/#######?format=json', function (data)
 {
     if (data != null)
@@ -325,7 +327,13 @@ $.get('/ds/columns/#######?format=json', function (data)
         order: [],
         ajax: {
             url: '/ds/data/#######?format=json',
-            data: function(dq) { delete dq.columns; },
+            data: function(dq) { 
+                    delete dq.columns; 
+                    if(colname!=='')
+                        dq.col=colname; 
+                    if(searchText!=='')
+                        dq.searchtext=searchText;
+                },
             dataSrc: function(dd) { return dd.data; }
         },
     });
@@ -335,6 +343,19 @@ $.get('/ds/columns/#######?format=json', function (data)
             $('#$$$$$$$_tbl').dataTable().fnFilter(this.value);
         }
     });
+    $('#$$$$$$$_tbl thead tr th').each( function () {
+        var title = $(this).text();
+        $(this).html( title+'<br/><input/>' );
+    } );
+    $('#$$$$$$$_tbl').on('click','thead th',function(event) {
+        var headtitle = $(this).text();
+        colname=headtitle;
+        });
+    $('#$$$$$$$_tbl thead tr th input').keypress(function (e) {
+        if(e.which == 13){
+            searchText=$(this).val();
+        }
+     });
 });
 </script>
 ".Replace("#######", this.DataSourceId.ToString().Trim())
