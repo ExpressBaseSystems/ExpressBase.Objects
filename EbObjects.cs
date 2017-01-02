@@ -297,14 +297,15 @@ $('#$$$$$$$_loadingdiv').hide();
 }
 </style>
 <div class='tablecontainer'>
+    <h3>@@@@@@@</h3>
     <table id='$$$$$$$_tbl' style='width:100%;' class='display compact'></table>
 </div>
 <script>
-var cols = [];
-var colname='';
-var searchText='';
 $.get('/ds/columns/#######?format=json', function (data)
 {
+    var cols = [];
+    var colname='';
+    var searchText='';
     if (data != null)
         $.each(data.columns, 
             function(i, value) { 
@@ -352,7 +353,8 @@ $.get('/ds/columns/#######?format=json', function (data)
 });
 </script>
 ".Replace("#######", this.DataSourceId.ToString().Trim())
-.Replace("$$$$$$$", this.Name); 
+.Replace("$$$$$$$", this.Name)
+.Replace("@@@@@@@", this.Label); 
         }
     }
 
