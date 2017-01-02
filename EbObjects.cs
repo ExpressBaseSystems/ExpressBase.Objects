@@ -185,7 +185,7 @@ namespace ExpressBase.UI
             <img id='$$$$$$$_loading-image' src='/images/ajax-loader.gif' alt='Loading...' />
         </div>
         <div id='$$$$$$$_canvasDiv' style=' min-width:100%;'>
-            <canvas id='$$$$$$$_chartCanvas' style='min-width:100%;  max-height:43em;'></canvas>
+            <canvas id='$$$$$$$_chartCanvas' style='min-width:100%;  '></canvas>
         </div>  
     </div>
 </div>
@@ -235,7 +235,7 @@ $.get('/ds/data/#######?format=json', function(data)
     $.each(data.data, function(i, value) { Xdatapoints.push(value[1]); Ydatapoints.push(value[2]); });
     if( ('@@@@@@@'!=='pie') && ('@@@@@@@'!=='doughnut') )
     {
-        var canWidth=data.data.length*5;
+        var canWidth=data.data.length*3;
         $('#$$$$$$$_canvasDiv').css('width', canWidth + '%');// canvasDiv zooming(height fixed)
         $('#$$$$$$$_chartCanvas').css('min-height', 42+'em');// to fit small graph into container height
     }
