@@ -162,7 +162,7 @@ namespace ExpressBase.UI
             return @"
 <div id='$$$$$$$_contnr' style=' border:solid 1px #79e; margin:1px;' >
     <div id='$$$$$$$_chartMenuDiv' class='optBox'>
-            <div style='display:inline-block; margin-left:18%'> <h7>CHART HEADING</h7> </div>
+            <div style='display:inline-block; margin-left:18%'> <h7>^^^^^^^</h7> </div>
             <div style='float:right;margin-left:-20px; display:inline-block;'>
                 <select id='$$$$$$$_ctype'>
                     <option value='bar'>            Bar             </option>
@@ -283,7 +283,8 @@ $('#$$$$$$$_loadingdiv').hide();
 </script>"
 .Replace("@@@@@@@", ((string.IsNullOrEmpty(this.ChartType)) ? "bar" : this.ChartType))
 .Replace("#######", this.DataSourceId.ToString())
-.Replace("$$$$$$$", this.Name);
+.Replace("$$$$$$$", this.Name)
+.Replace("^^^^^^^", this.Label);
         }
     }
 
