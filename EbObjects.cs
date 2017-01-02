@@ -284,6 +284,26 @@ $('#$$$$$$$_loadingdiv').hide();
         [ProtoBuf.ProtoMember(1)]
         public int DataSourceId { get; set; }
 
+        [ProtoBuf.ProtoMember(2)]
+        public int PageSize { get; set; }
+
+        //[[100, 500, 1000, 2500, 5000, -1], [100, 500, 1000, 2500, 5000, 'All']]
+        private string GetLengthMenu()
+        {
+            string sLengthMenu = "paging: false";
+
+            if (this.PageSize > 0)
+            {
+                int[] ia = new int[10];
+                for (int i = 0; i < 10; i++)
+                    ia[i] = (this.PageSize * (i + 1));
+
+                sLengthMenu = "lengthMenu: " + string.Format("[[{0}, -1], [{0}, 'All']]", string.Join(", ", ia));
+            }
+
+            return sLengthMenu;
+        }
+
         public override string GetHtml()
         {
             return @"
@@ -295,12 +315,21 @@ $('#$$$$$$$_loadingdiv').hide();
     display:inline-block;
     overflow-x:auto;
 }
+.loadingdiv {
+    vertical-align:middle;
+    margin: 5% 50%;
+    display: none;
+}
 </style>
 <div class='tablecontainer'>
     <h3>@@@@@@@</h3>
+    <div id='$$$$$$$_loadingdiv' class='loadingdiv'>
+        <img id='$$$$$$$_loading-image' src='/images/ajax-loader.gif' alt='Loading...' />
+    </div>
     <table id='$$$$$$$_tbl' style='width:100%;' class='display compact'></table>
 </div>
 <script>
+$('#$$$$$$$_loadingdiv').show();
 $.get('/ds/columns/#######?format=json', function (data)
 {
     var cols = [];
@@ -313,12 +342,13 @@ $.get('/ds/columns/#######?format=json', function (data)
 
     $('#$$$$$$$_tbl').dataTable(
     {
-        lengthMenu: [[100, 500, 1000, 2500, 5000, -1], [100, 500, 1000, 2500, 5000, 'All']],
+        &&&&&&&,
         serverSide: true,
         processing: true,
         language: { processing: '<div></div><div></div><div></div><div></div><div></div><div></div><div></div>', },
         columns: cols,
         order: [],
+        deferRender: true,
         ajax: {
             url: '/ds/data/#######?format=json',
             data: function(dq) { 
@@ -331,6 +361,7 @@ $.get('/ds/columns/#######?format=json', function (data)
             dataSrc: function(dd) { return dd.data; }
         },
     });
+    $('#$$$$$$$_loadingdiv').hide();
     $('#$$$$$$$_tbl_filter input').unbind();
     $('#$$$$$$$_tbl_filter input').bind('keyup', function(e) {
         if(e.keyCode == 13) {
@@ -354,7 +385,8 @@ $.get('/ds/columns/#######?format=json', function (data)
 </script>
 ".Replace("#######", this.DataSourceId.ToString().Trim())
 .Replace("$$$$$$$", this.Name)
-.Replace("@@@@@@@", this.Label); 
+.Replace("@@@@@@@", this.Label)
+.Replace("&&&&&&&", this.GetLengthMenu()); 
         }
     }
 
