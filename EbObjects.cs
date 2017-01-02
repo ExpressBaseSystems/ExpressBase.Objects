@@ -162,15 +162,21 @@ namespace ExpressBase.UI
             return @"
 <div id='$$$$$$$_contnr' style=' border:solid 1px #79e; margin:1px;' >
     <div id='$$$$$$$_chartMenuDiv' class='optBox'>
-            <div style='display:inline-block; margin-left:15%'> CHART HEADING </div>
+            <div style='display:inline-block; margin-left:18%'> <h7>CHART HEADING</h7> </div>
             <div style='float:right;margin-left:-20px; display:inline-block;'>
                 <select id='$$$$$$$_ctype'>
-                    <option value='line'>Line</option>
-                    <option value='pie'>Pie</option>
-                    <option value='doughnut'>Doughnut</option>
+                    <option value='bar'>            Bar             </option>
+                    <option value='line'>           Line            </option>
+                    <option value='pie'>            Pie             </option>
+                    <option value='doughnut'>       Doughnut        </option>
+                    <option value='radar'>          Radar           </option>
+                    <option value='polarArea'>      Polar Area      </option>
+                    <option value='bubble'>         Bubble          </option>
+                    <option value='scatter'>        Scatter         </option>
+                    <option value='horizontalBar'>  Horizontal Bar  </option>
                 </select>
-                <div id='$$$$$$$_Gopen' class='opt'>Open..</div>
                 <div id='$$$$$$$_Gsave' class='opt'> </div>
+                <button id='$$$$$$$_expand'><img id='$$$$$$$_expandIcon' src='http://localhost:53125/images/Expand-16.png' /></button>
             </div>
     </div>
 
@@ -216,7 +222,7 @@ link.addEventListener('click', function(ev) {
 }, false);
 $('#$$$$$$$_Gsave').append(link);
 
-$('#$$$$$$$_Gopen').on('click',function() {
+$('#$$$$$$$_expand').on('click',function() {
     var wi = window.open();
     var html = $('#$$$$$$$_container').html();
     $(wi.document.body).html(html);
@@ -266,7 +272,10 @@ $.get('/ds/data/#######?format=json', function(data)
             pan: { enabled: true, mode: 'x' },
             responsive: true,
             zoom: { enabled: true, mode: 'x', limits: { max: 10, min: 5 } },
-            scales: { xAxes: [{ responsive:false , ticks: { beginAtZero: true} }] }
+            scales: { xAxes: [{ responsive:false , ticks: { beginAtZero: true} }],
+            yAxes: [{
+                type: 'logarithmic',
+            }] }
         }
     });
 $('#$$$$$$$_loadingdiv').hide();
