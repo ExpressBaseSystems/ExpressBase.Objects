@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 
 namespace ExpressBase.UI
@@ -9,6 +10,16 @@ namespace ExpressBase.UI
         Form,
         View,
         DataSource,
+    }
+
+    [ProtoBuf.ProtoContract]
+    public enum EbDataGridViewColumnType
+    {
+        Boolean,
+        DateTime,
+        Image,
+        Numeric,
+        Text,
     }
 
     [ProtoBuf.ProtoContract]
@@ -39,6 +50,7 @@ namespace ExpressBase.UI
     [ProtoBuf.ProtoInclude(2001, typeof(EbTableLayout))]
     [ProtoBuf.ProtoInclude(2002, typeof(EbChart))]
     [ProtoBuf.ProtoInclude(2003, typeof(EbDataGridView))]
+    [ProtoBuf.ProtoInclude(2004, typeof(EbDataGridViewColumn))]
     public class EbControl : EbObject
     {
         [ProtoBuf.ProtoMember(4)]
@@ -162,7 +174,7 @@ namespace ExpressBase.UI
             return @"
 <div id='$$$$$$$_contnr' style=' border:solid 1px #79e; margin:1px;' >
     <div id='$$$$$$$_chartMenuDiv' class='optBox'>
-            <div style='display:inline-block; margin-left:18%'> <h7>^^^^^^^</h7> </div>
+            <div style='display:inline-block; margin-left:5%'> <h5>^^^^^^^</h5> </div>
             <div style='float:right;margin-left:-20px; display:inline-block;'>
                 <select id='$$$$$$$_ctype'>
                     <option value='bar'>            Bar             </option>
@@ -210,7 +222,8 @@ namespace ExpressBase.UI
 
 </style>
 <script>
-
+var myChart = null;
+var chartConfig = null;
 var link = document.createElement('a');
 link.innerHTML = '<img id=\'$$$$$$$_saveIcon\' src=\'http://localhost:53125/images/Save-16.png \' /> ';
 link.addEventListener('click', function(ev) {
@@ -227,6 +240,8 @@ $('#$$$$$$$_expand').on('click',function() {
     var html = $('#$$$$$$$_container').html();
     $(wi.document.body).html(html);
 });
+
+$('#$$$$$$$_ctype').on('change', function() { chartConfig.type=$('#$$$$$$$_ctype').val(); myChart.update(); });
 $('#$$$$$$$_loadingdiv').show();
 $.get('/ds/data/#######?format=json', function(data) 
 {
@@ -241,7 +256,7 @@ $.get('/ds/data/#######?format=json', function(data)
     }
     var ctx = document.getElementById('$$$$$$$_chartCanvas');
     Chart.defaults.global.hover.mode = 'nearest';
-    var myChart = new Chart(ctx, {
+    chartConfig = {
         type: '@@@@@@@',
         data: {
             labels: Xdatapoints,
@@ -277,7 +292,8 @@ $.get('/ds/data/#######?format=json', function(data)
                 type: 'logarithmic',
             }] }
         }
-    });
+    };
+    myChart = new Chart(ctx, chartConfig);
 $('#$$$$$$$_loadingdiv').hide();
 });
 </script>"
@@ -296,6 +312,23 @@ $('#$$$$$$$_loadingdiv').hide();
 
         [ProtoBuf.ProtoMember(2)]
         public int PageSize { get; set; }
+
+        [ProtoBuf.ProtoMember(3)]
+        public EbDataGridViewColumnCollection Columns { get; set; }
+
+        public EbDataGridView()
+        {
+            this.Columns = new EbDataGridViewColumnCollection();
+            this.Columns.CollectionChanged += Columns_CollectionChanged;
+        }
+
+        public delegate void ColumnsChangedHandler(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e);
+        public event ColumnsChangedHandler ColumnsChanged;
+        private void Columns_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if (ColumnsChanged != null)
+                ColumnsChanged(sender, e);
+        }
 
         //[[100, 500, 1000, 2500, 5000, -1], [100, 500, 1000, 2500, 5000, 'All']]
         private string GetLengthMenu()
@@ -405,5 +438,26 @@ $.get('/ds/columns/#######?format=json', function (data)
     {
         [ProtoBuf.ProtoMember(1)]
         public string Sql { get; set; }
+    }
+
+    [ProtoBuf.ProtoContract]
+    public class EbDataGridViewColumn : EbControl
+    {
+        [ProtoBuf.ProtoMember(1)]
+        public int Width { get; set; }
+
+        [ProtoBuf.ProtoMember(2)]
+        public EbDataGridViewColumnType ColumnType { get; set; }
+
+        public EbDataGridViewColumn()
+        {
+            this.Width = 100;
+            this.ColumnType = EbDataGridViewColumnType.Text;
+        }
+    }
+
+    [ProtoBuf.ProtoContract]
+    public class EbDataGridViewColumnCollection : ObservableCollection<EbDataGridViewColumn>
+    {
     }
 }
