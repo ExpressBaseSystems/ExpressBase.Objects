@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ExpressBase.UI
+namespace ExpressBase.Objects
 {
     public class HtmlTable
     {
