@@ -19,10 +19,10 @@ namespace ExpressBase.Objects
         public override string GetHtml()
         {
             return @"
-<div id='$$$$$$$_contnr' style=' border:solid 1px #79e; margin:1px;' >
-    <div id='$$$$$$$_chartMenuDiv' class='optBox'>
-            <div style='display:inline-block; margin-left:5%'> <h5>^^^^^^^</h5> </div>
-            <div style='float:right;margin-left:-20px; display:inline-block;'>
+<div id='$$$$$$$_contnr' class='graph-container'>
+    <div id='$$$$$$$_chartMenuDiv' class='graph-headBox'>
+            <div class='graph-head'>  ^^^^^^^ </div>
+            <div class='graph-optBox'>
                 <select id='$$$$$$$_ctype'>
                     <option value='bar'>            Bar             </option>
                     <option value='line'>           Line            </option>
@@ -34,48 +34,26 @@ namespace ExpressBase.Objects
                     <option value='scatter'>        Scatter         </option>
                     <option value='horizontalBar'>  Horizontal Bar  </option>
                 </select>
-                <div id='$$$$$$$_Gsave' class='opt'> </div>
+                <div id='$$$$$$$_Gsave' class='graph-opt'> </div>
                 <button id='$$$$$$$_expand'><img id='$$$$$$$_expandIcon' src='http://localhost:53125/images/Expand-16.png' /></button>
             </div>
     </div>
-
-    <div id='$$$$$$$_container' class='contnr' style='overflow-x:auto; height:45em; overflow-y:auto;'>
-        <div id='$$$$$$$_loadingdiv' class='loadingdiv'>
+    <div id='$$$$$$$_container' class='dygraph-divContainer'>
+        <div id='$$$$$$$_loadingdiv' class='graph-loadingdiv'>
             <img id='$$$$$$$_loading-image' src='/images/ajax-loader.gif' alt='Loading...' />
         </div>
-        <div id='$$$$$$$_canvasDiv' style=' min-width:100%;'>
-            <canvas id='$$$$$$$_chartCanvas' style='min-width:100%;  '></canvas>
+        <div id='$$$$$$$_canvasDiv' class='dygraph-Wrapper'>
+            <div id='$$$$$$$_graphdiv' style='width:100%; margin-top:11px;'></div>
         </div>  
     </div>
 </div>
-<style>
-.contnr {
-    width:100%;
-}
-.loadingdiv {
-    vertical-align:middle;
-    margin-left: 50%;
-    margin-top: 50%;
-    display: none;
-}
-.optBox {
-    background-color:#79e;
-}
-.opt {
-    border:solid 1px #DDD;
-    display:inline-block;
-    background-color:#fff;
-}
 
-</style>
 <script>
-var myChart = null;
-var chartConfig = null;
 var link = document.createElement('a');
 link.innerHTML = '<img id=\'$$$$$$$_saveIcon\' src=\'http://localhost:53125/images/Save-16.png \' /> ';
 link.addEventListener('click', function(ev) {
-    var can = document.getElementById('$$$$$$$_chartCanvas');
-    link.href = can.toDataURL();
+    Dygraph.Export.asPNG(graph, img);
+    link.href = img.src.replace('image/png','image/octet-stream');
     link.id='$$$$$$$_saveLink';
     link.class='opt';
     link.download = 'Chart.png';
@@ -87,60 +65,82 @@ $('#$$$$$$$_expand').on('click',function() {
     var html = $('#$$$$$$$_container').html();
     $(wi.document.body).html(html);
 });
-
-$('#$$$$$$$_ctype').on('change', function() { chartConfig.type=$('#$$$$$$$_ctype').val(); myChart.update(); });
 $('#$$$$$$$_loadingdiv').show();
 $.get('/ds/data/#######?format=json', function(data) 
 {
-    var Ydatapoints = [];
-    var Xdatapoints = [];
-    $.each(data.data, function(i, value) { Xdatapoints.push(value[1]); Ydatapoints.push(value[2]); });
+    var Y2datapoints = [];
+    var dta='';
+    var barX=0;  
+    var test = 100;
+     
+     dta ='X,Y1,Y2,Y3\n';
+     $.each(data.data, function(i, value) { 
+        dta += i;
+        for(k=2;k<value.length;k++)
+            dta += ','+ value[k];
+        dta += '\n';
+     });
     if( ('@@@@@@@'!=='pie') && ('@@@@@@@'!=='doughnut') )
     {
         var canWidth=data.data.length*3;
         $('#$$$$$$$_canvasDiv').css('width', canWidth + '%');// canvasDiv zooming(height fixed)
         $('#$$$$$$$_chartCanvas').css('min-height', 42+'em');// to fit small graph into container height
-    }
+    }   
+
+    colorCollection.push(getRandomColor());
     var ctx = document.getElementById('$$$$$$$_chartCanvas');
-    Chart.defaults.global.hover.mode = 'nearest';
-    chartConfig = {
-        type: '@@@@@@@',
-        data: {
-            labels: Xdatapoints,
-            datasets: [{
-                label:'Graph',
-                xLabels:['one'],
-                data: Ydatapoints,
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.8)',
-                    'rgba(54, 162, 235, 0.8)',
-                    'rgba(255, 206, 86, 0.8)',
-                    'rgba(75, 192, 192, 0.8)',
-                    'rgba(153, 102, 255, 0.8)',
-                    'rgba(255, 159, 64, 0.8)',
-                    'rgba(255, 99, 132, 0.8)',
-                    'rgba(54, 162, 235, 0.8)',
-                    'rgba(255, 206, 86, 0.8)',
-                    'rgba(75, 192, 192, 0.8)',
-                    'rgba(153, 102, 255, 0.8)',
-                    'rgba(255, 159, 64, 0.8)'
-                ]
-            }]
-        },
-        zoom: { enabled: true },
-        options: {
-            fixedStepSize:50,
-            hover: { mode: 'index' },
-            pan: { enabled: true, mode: 'x' },
-            responsive: true,
-            zoom: { enabled: true, mode: 'x', limits: { max: 10, min: 5 } },
-            scales: { xAxes: [{ responsive:false , ticks: { beginAtZero: true} }],
-            yAxes: [{
-                type: 'logarithmic',
-            }] }
-        }
-    };
-    myChart = new Chart(ctx, chartConfig);
+    g = new Dygraph(
+                document.getElementById('$$$$$$$_graphdiv'),
+                dta,
+                {
+                    ylabel: 'Y Label',
+                    xlabel: 'X Label',
+                    legend: 'always',
+                    animatedZooms: true,
+                    'Y1': {
+                        plotter: dy_plotters.barChartPlotter
+                     },
+    				'Y2': {
+                        plotter: dy_plotters.barChartPlotter
+                    },
+                    'Y3': {
+                        plotter: dy_plotters.barChartPlotter
+                    },
+                    'Y4': {
+                        plotter: dy_plotters.barChartPlotter
+                    },
+                    'Y5': {
+                        plotter: dy_plotters.barChartPlotter
+                    },
+                    axes: {
+                        x: {
+                            valueFormatter: function(x) {
+                                    return (x < data.data.length) ? data.data[x][1].toString() : '';
+                                },
+                            axisLabelFormatter: function (x) {
+                                return (x < data.data.length) ? data.data[x][1].toString() : '';
+                            },
+                        },
+                        y: {
+                            valueFormatter: function(y) {
+                                    return y;
+                                },
+                            axisLabelFormatter: function (y) {
+                                y=y.toString();
+
+                                if(y.slice(-6)==='000000')
+                                    return y.slice(0, -6)+'M';
+                                
+                                else if(y.slice(-3)==='000')
+                                    return y.slice(0, -3)+'K';
+                                else 
+                                    return y;
+                            },
+                        },
+                    },
+                    logscale: true
+                } 
+            );
 $('#$$$$$$$_loadingdiv').hide();
 });
 </script>"
