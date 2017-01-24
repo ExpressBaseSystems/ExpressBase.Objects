@@ -12,6 +12,7 @@ namespace ExpressBase.Objects
     [ProtoBuf.ProtoInclude(2002, typeof(EbChart))]
     [ProtoBuf.ProtoInclude(2003, typeof(EbDataGridView))]
     [ProtoBuf.ProtoInclude(2004, typeof(EbDataGridViewColumn))]
+    [ProtoBuf.ProtoInclude(2005, typeof(EbTextBox))]
     public class EbControl : EbObject
     {
         [ProtoBuf.ProtoMember(4)]
@@ -37,6 +38,22 @@ namespace ExpressBase.Objects
         [ProtoBuf.ProtoMember(9)]
         [Browsable(false)]
         public virtual int CellPositionColumn { get; set; }
+
+        [ProtoBuf.ProtoMember(10)]
+        [Browsable(false)]
+        public virtual int Left { get; set; }
+
+        [ProtoBuf.ProtoMember(11)]
+        [Browsable(false)]
+        public virtual int Top { get; set; }
+
+        [ProtoBuf.ProtoMember(12)]
+        [Browsable(false)]
+        public virtual int Height { get; set; }
+
+        [ProtoBuf.ProtoMember(13)]
+        [Browsable(false)]
+        public virtual int Width { get; set; }
 
         public EbControl() { }
 
