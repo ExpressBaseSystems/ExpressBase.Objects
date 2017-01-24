@@ -7,51 +7,46 @@ using System.Threading.Tasks;
 namespace ExpressBase.Objects
 {
     [ProtoBuf.ProtoContract]
-    [ProtoBuf.ProtoInclude(2000, typeof(EbButton))]
-    [ProtoBuf.ProtoInclude(2001, typeof(EbTableLayout))]
+    [ProtoBuf.ProtoInclude(2000, typeof(EbControlContainer))]
+    [ProtoBuf.ProtoInclude(2001, typeof(EbButton))]
     [ProtoBuf.ProtoInclude(2002, typeof(EbChart))]
-    [ProtoBuf.ProtoInclude(2003, typeof(EbDataGridView))]
-    [ProtoBuf.ProtoInclude(2004, typeof(EbDataGridViewColumn))]
-    [ProtoBuf.ProtoInclude(2005, typeof(EbTextBox))]
+    [ProtoBuf.ProtoInclude(2003, typeof(EbDataGridViewColumn))]
+    [ProtoBuf.ProtoInclude(2004, typeof(EbTextBox))]
     public class EbControl : EbObject
     {
-        [ProtoBuf.ProtoMember(4)]
-        [Browsable(false)]
-        public List<EbControl> Controls { get; set; }
-
-        [ProtoBuf.ProtoMember(5)]
+        [ProtoBuf.ProtoMember(10)]
         [Description("Labels")]
         public virtual string Label { get; set; }
 
-        [ProtoBuf.ProtoMember(6)]
+        [ProtoBuf.ProtoMember(11)]
         [Description("Labels")]
         public virtual string HelpText { get; set; }
 
-        [ProtoBuf.ProtoMember(7)]
+        [ProtoBuf.ProtoMember(12)]
         [Description("Labels")]
         public virtual string ToolTipText { get; set; }
 
-        [ProtoBuf.ProtoMember(8)]
+        [ProtoBuf.ProtoMember(13)]
         [Browsable(false)]
         public virtual int CellPositionRow { get; set; }
 
-        [ProtoBuf.ProtoMember(9)]
+        [ProtoBuf.ProtoMember(14)]
         [Browsable(false)]
         public virtual int CellPositionColumn { get; set; }
 
-        [ProtoBuf.ProtoMember(10)]
+        [ProtoBuf.ProtoMember(15)]
         [Browsable(false)]
         public virtual int Left { get; set; }
 
-        [ProtoBuf.ProtoMember(11)]
+        [ProtoBuf.ProtoMember(16)]
         [Browsable(false)]
         public virtual int Top { get; set; }
 
-        [ProtoBuf.ProtoMember(12)]
+        [ProtoBuf.ProtoMember(17)]
         [Browsable(false)]
         public virtual int Height { get; set; }
 
-        [ProtoBuf.ProtoMember(13)]
+        [ProtoBuf.ProtoMember(18)]
         [Browsable(false)]
         public virtual int Width { get; set; }
 
