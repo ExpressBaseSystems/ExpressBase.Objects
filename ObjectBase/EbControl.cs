@@ -12,6 +12,9 @@ namespace ExpressBase.Objects
     [ProtoBuf.ProtoInclude(2002, typeof(EbChart))]
     [ProtoBuf.ProtoInclude(2003, typeof(EbDataGridViewColumn))]
     [ProtoBuf.ProtoInclude(2004, typeof(EbTextBox))]
+#if NET462
+    [System.Serializable]
+#endif
     public class EbControl : EbObject
     {
         [ProtoBuf.ProtoMember(10)]
@@ -49,6 +52,12 @@ namespace ExpressBase.Objects
         [ProtoBuf.ProtoMember(18)]
         [Browsable(false)]
         public virtual int Width { get; set; }
+
+        [ProtoBuf.ProtoMember(19)]
+        public virtual bool Required { get; set; }
+
+        [ProtoBuf.ProtoMember(20)]
+        public virtual bool Unique { get; set; }
 
         public EbControl() { }
 
