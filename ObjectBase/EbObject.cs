@@ -9,6 +9,7 @@ namespace ExpressBase.Objects
     [ProtoBuf.ProtoContract]
     [ProtoBuf.ProtoInclude(1000, typeof(EbControl))]
     [ProtoBuf.ProtoInclude(1001, typeof(EbDataSource))]
+    [ProtoBuf.ProtoInclude(1002, typeof(EbReportDefinition))]
     public class EbObject
     {
         [Browsable(false)]

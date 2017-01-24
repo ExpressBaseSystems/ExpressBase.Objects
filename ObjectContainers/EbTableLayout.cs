@@ -6,6 +6,12 @@ using System.Threading.Tasks;
 
 namespace ExpressBase.Objects
 {
+    public enum TableLayOutType
+    {
+        Table,
+        GridStack
+    }
+
     [ProtoBuf.ProtoContract]
     public class EbTableLayout : EbControl
     {
@@ -21,7 +27,8 @@ namespace ExpressBase.Objects
 
         public override string GetHtml()
         {
-            string html = GetTable();
+            //string html = (type == TableLayOutType.Table) ? GetTable() : GetGridStack();
+            string html = GetGridStack();
 
             if (base.Controls != null)
             {
@@ -47,6 +54,35 @@ namespace ExpressBase.Objects
             }
 
             return ht.GetHtml();
+        }
+
+        private string GetGridStack()
+        {
+            GridStack gs = new GridStack(this.Name);
+
+            foreach (EbTableRow row in this.Rows)
+            {
+                GridStackRow hr = new GridStackRow(this.Name, row);
+
+                foreach (EbTableColumn col in this.Columns)
+                    hr.Cells.Add(new GridStackCell(this.Name, col, row, hr));
+
+                gs.Rows.Add(hr);
+            }
+
+            string script = @"<script>
+$(function () {
+    var options = {
+        cell_height: 180,
+        animate: true,
+        placeholderclass: 'Mygrid-stack-placeholder',
+        vertical_margin: 10
+    };
+    $('#grid-stack-@@@@@@@').gridstack(options);
+});
+</script>".Replace("@@@@@@@", this.Name);
+
+            return gs.GetHtml() + script;
         }
     }
 
