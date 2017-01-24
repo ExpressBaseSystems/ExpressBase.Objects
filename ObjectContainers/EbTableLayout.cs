@@ -13,7 +13,7 @@ namespace ExpressBase.Objects
     }
 
     [ProtoBuf.ProtoContract]
-    public class EbTableLayout : EbControl
+    public class EbTableLayout : EbControlContainer
     {
         [ProtoBuf.ProtoMember(1)]
         [Browsable(false)]

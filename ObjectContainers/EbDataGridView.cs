@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace ExpressBase.Objects
 {
     [ProtoBuf.ProtoContract]
-    public class EbDataGridView : EbControl
+    public class EbDataGridView : EbControlContainer
     {
         [ProtoBuf.ProtoMember(1)]
         public int DataSourceId { get; set; }
