@@ -61,6 +61,7 @@ namespace ExpressBase.Objects
 
         public EbControl() { }
 
+        public virtual string GetHead() { return string.Empty; }
         public virtual string GetHtml() { return string.Empty; }
     }
 }
