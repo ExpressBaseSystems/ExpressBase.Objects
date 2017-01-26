@@ -59,9 +59,37 @@ namespace ExpressBase.Objects
         [ProtoBuf.ProtoMember(20)]
         public virtual bool Unique { get; set; }
 
+        [ProtoBuf.ProtoMember(21)]
+        public virtual bool ReadOnly { get; set; }
+
+        [ProtoBuf.ProtoMember(22)]
+        public virtual bool Visible { get; set; }
+
+        [ProtoBuf.ProtoMember(23)]
+        public virtual bool SkipPersist { get; set; }
+
+        [ProtoBuf.ProtoMember(24)]
+#if NET462
+        [Editor(typeof(System.ComponentModel.Design.MultilineStringEditor), typeof(System.Drawing.Design.UITypeEditor))]
+#endif
+        public virtual string RequiredExpression { get; set; }
+
+        [ProtoBuf.ProtoMember(25)]
+        public virtual string UniqueExpression { get; set; }
+
+        [ProtoBuf.ProtoMember(26)]
+        public virtual string ReadOnlyExpression { get; set; }
+
+        [ProtoBuf.ProtoMember(27)]
+        public virtual string VisibleExpression { get; set; }
+
+        [ProtoBuf.ProtoMember(28)]
+        public virtual int TabIndex { get; set; }
+
         public EbControl() { }
 
         public virtual string GetHead() { return string.Empty; }
+
         public virtual string GetHtml() { return string.Empty; }
     }
 }
