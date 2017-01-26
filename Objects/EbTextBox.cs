@@ -15,7 +15,6 @@ namespace ExpressBase.Objects
     public enum TextMode
     {
         SingleLine,
-        MultiLine,
         Email,
         Password,
         Color
@@ -25,10 +24,16 @@ namespace ExpressBase.Objects
     public class EbTextBox : EbControl
     {
         [ProtoBuf.ProtoMember(1)]
+        [System.ComponentModel.Category("Behavior")]
         public int MaxLength { get; set; }
 
         [ProtoBuf.ProtoMember(2)]
+        [System.ComponentModel.Category("Behavior")]
         public TextTransform TextTransform { get; set; }
+
+        [ProtoBuf.ProtoMember(3)]
+        [System.ComponentModel.Category("Behavior")]
+        public TextMode TextMode { get; set; }
 
         public EbTextBox() { }
 
@@ -42,10 +47,10 @@ namespace ExpressBase.Objects
             return string.Format(@"
 <div style='position:absolute; left:{1}px; top:{2}px;'>
 <div>{5}</div>
-<input type='text' name='{0}' id='{0}' {6} style='width:{3}px; height:{4}px; display:inline-block;' />
+<input type='{7}' name='{0}' id='{0}' {6} style='width:{3}px; height:{4}px; visibility: {8}; display:inline-block;' />
 <div style='display: inline-block;'></div>
 </div>",
-this.Name, this.Left, this.Top, this.Width, this.Height, this.Label, this.MaxLengthString);
+this.Name, this.Left, this.Top, this.Width, this.Height, this.Label, this.MaxLengthString, this.TextModeString);
         }
 
         private string RequiredString
@@ -70,6 +75,32 @@ this.Name, this.Left, this.Top, this.Width, this.Height, this.Label, this.MaxLen
         private string MaxLengthString
         {  
             get { return (this.MaxLength > 0) ? string.Format("maxlength='{0}'", this.MaxLength) : string.Empty; }
+        }
+
+         private string TextModeString
+        {  
+            get {
+
+                string returnval = string.Empty;
+
+                switch (this.TextMode)
+                {
+                    case TextMode.Email:
+                        returnval = "email";
+                        break;
+                    case TextMode.Password:
+                        returnval = "password";
+                        break;
+                    case TextMode.Color:
+                        returnval = "color";
+                        break;
+                    case TextMode.SingleLine:
+                        returnval = "text";
+                        break;
+                }
+
+                return returnval;
+            }
         }
     }
 }
