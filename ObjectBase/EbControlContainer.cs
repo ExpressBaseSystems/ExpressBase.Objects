@@ -16,51 +16,69 @@ namespace ExpressBase.Objects
         [Browsable(false)]
         public List<EbControl> Controls { get; set; }
 
+        private List<EbControl> _flattenedControls;
+        private List<EbControl> FlattenedControls
+        {
+            get
+            {
+                if (_flattenedControls == null)
+                    _flattenedControls = new List<EbControl>();
+                return _flattenedControls;
+            }
+        }
+
         public EbControlContainer() { }
+
+        public override void Init4Redis()
+        {
+            this.FlattenControls();
+        }
 
         public List<EbControl> GetControls<T>()
         {
             List<EbControl> collection = new List<EbControl>();
-            this.GetControls<T>(this.Controls, ref collection);
+
+            foreach (EbControl control in this.FlattenedControls)
+            {
+                if (control is T)
+                    collection.Add(control);
+            }
+
             return collection;
         }
 
         public EbControl GetControl(string name)
         {
             EbControl _ctrl = null;
-            this.GetRecursive(this.Controls, ref _ctrl, name);
+
+            foreach (EbControl control in this.FlattenedControls)
+            {
+                if (control.Name == name)
+                {
+                    _ctrl = control;
+                    break;
+                }
+            }
+
             return _ctrl;
         }
 
         #region PRIVATE METHODS
 
-        private void GetControls<T>(List<EbControl> sourcecollection, ref List<EbControl> resultcollection)
+        private void FlattenControls()
         {
-            foreach (EbControl _control in sourcecollection)
-            {
-                if (_control is T)
-                    resultcollection.Add(_control);
-                if (_control is EbControlContainer)
-                    this.GetControls<T>((_control as EbControlContainer).Controls, ref resultcollection);
-            }
+            this.FlattenedControls.Clear();
+            this.FlattenControlsInner(this.Controls);
         }
 
-        private EbControl GetRecursive(List<EbControl> controls, ref EbControl _ctrl, string name)
+        private void FlattenControlsInner(List<EbControl> controls)
         {
             foreach (EbControl control in controls)
             {
+                FlattenedControls.Add(control);
                 if (control is EbControlContainer)
-                    GetRecursive((control as EbControlContainer).Controls, ref _ctrl, name);
-                else
-                {
-                    if (control.Name == name)
-                        _ctrl = control;
-                }
-
-                if (_ctrl != null) break;
+                    this.FlattenControlsInner((control as EbControlContainer).Controls);
             }
-
-            return _ctrl;
         }
 
         #endregion PRIVATE METHODS

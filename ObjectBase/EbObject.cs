@@ -31,5 +31,7 @@ namespace ExpressBase.Objects
         public virtual string Name { get; set; }
 
         public EbObject() { }
+
+        public virtual void Init4Redis() { }
     }
 }

@@ -91,5 +91,7 @@ namespace ExpressBase.Objects
         public virtual string GetHead() { return string.Empty; }
 
         public virtual string GetHtml() { return string.Empty; }
+
+        public override void Init4Redis() { }
     }
 }
