@@ -16,16 +16,7 @@ namespace ExpressBase.Objects
         [Browsable(false)]
         public List<EbControl> Controls { get; set; }
 
-        private List<EbControl> _flattenedControls;
-        private List<EbControl> FlattenedControls
-        {
-            get
-            {
-                if (_flattenedControls == null)
-                    _flattenedControls = new List<EbControl>();
-                return _flattenedControls;
-            }
-        }
+        public List<EbControl> FlattenedControls { get; set; }
 
         public EbControlContainer() { }
 
@@ -67,7 +58,12 @@ namespace ExpressBase.Objects
 
         private void FlattenControls()
         {
-            this.FlattenedControls.Clear();
+            if (this.FlattenedControls == null)
+                this.FlattenedControls = new List<EbControl>();
+
+            if (this.FlattenedControls.Count > 0)
+                this.FlattenedControls.Clear();
+
             this.FlattenControlsInner(this.Controls);
         }
 
