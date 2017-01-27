@@ -39,23 +39,29 @@ namespace ExpressBase.Objects
 
         public override string GetHead()
         {
-            return this.UniqueString + this.RequiredString + this.TextTransformString;
+            return ((!this.Hidden) ? this.UniqueString + this.RequiredString : string.Empty) + this.TextTransformString;
         }
 
         public override string GetHtml()
         {
             return string.Format(@"
-<div style='position:absolute; left:{1}px; top:{2}px;'>
+<div style='position:absolute; left:{1}px; top:{2}px; {8}'>
 <div>{5}</div>
-<input type='{7}' name='{0}' id='{0}' {6} style='width:{3}px; height:{4}px; visibility: {8}; display:inline-block;' />
+<input type='{7}' name='{10}{0}' id='{0}' {6} style='width:{3}px; height:{4}px;  display:inline-block;' {9}/>
 <div style='display: inline-block;'></div>
 </div>",
-this.Name, this.Left, this.Top, this.Width, this.Height, this.Label, this.MaxLengthString, this.TextModeString);
+this.Name, this.Left, this.Top, this.Width, this.Height, 
+this.Label, this.MaxLengthString, this.TextModeString, this.HiddenString, (this.Required && !this.Hidden ? "required" : string.Empty),this.SkipPersistString);
         }
 
         private string RequiredString
         {
             get { return (base.Required ? "$('#{0}').focusout(function() { isRequired(this); });".Replace("{0}", this.Name) : string.Empty); }
+        }
+
+        private string HiddenString
+        {
+            get { return (base.Hidden ? "visibility: hidden;" : string.Empty); }
         }
 
         private string TextTransformString
@@ -76,8 +82,12 @@ this.Name, this.Left, this.Top, this.Width, this.Height, this.Label, this.MaxLen
         {  
             get { return (this.MaxLength > 0) ? string.Format("maxlength='{0}'", this.MaxLength) : string.Empty; }
         }
+        private string SkipPersistString
+        {
+            get { return (base.SkipPersist ? "@Skip$" : string.Empty); }
+        }
 
-         private string TextModeString
+        private string TextModeString
         {  
             get {
 

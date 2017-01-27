@@ -63,7 +63,7 @@ namespace ExpressBase.Objects
         public virtual bool ReadOnly { get; set; }
 
         [ProtoBuf.ProtoMember(22)]
-        public virtual bool Visible { get; set; }
+        public virtual bool Hidden { get; set; }
 
         [ProtoBuf.ProtoMember(23)]
         public virtual bool SkipPersist { get; set; }
