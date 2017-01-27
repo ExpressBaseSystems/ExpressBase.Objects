@@ -52,10 +52,10 @@ namespace ExpressBase.Objects
     public class HtmlCell
     {
         public string Name { get; set; }
-        private EbTableColumn Column { get; set; }
+        private EbTableLayoutColumn Column { get; set; }
         private EbTableRow Row { get; set; }
 
-        public HtmlCell(string name, EbTableColumn c, EbTableRow r)
+        public HtmlCell(string name, EbTableLayoutColumn c, EbTableRow r)
         {
             this.Name = name;
             this.Column = c;

@@ -17,7 +17,7 @@ namespace ExpressBase.Objects
     {
         [ProtoBuf.ProtoMember(1)]
         [Browsable(false)]
-        public List<EbTableColumn> Columns { get; set; }
+        public List<EbTableLayoutColumn> Columns { get; set; }
 
         [ProtoBuf.ProtoMember(2)]
         [Browsable(false)]
@@ -47,7 +47,7 @@ namespace ExpressBase.Objects
             {
                 HtmlRow hr = new HtmlRow(this.Name, row);
 
-                foreach (EbTableColumn col in this.Columns)
+                foreach (EbTableLayoutColumn col in this.Columns)
                     hr.Cells.Add(new HtmlCell(this.Name, col, row));
 
                 ht.Rows.Add(hr);
@@ -64,7 +64,7 @@ namespace ExpressBase.Objects
             {
                 GridStackRow hr = new GridStackRow(this.Name, row);
 
-                foreach (EbTableColumn col in this.Columns)
+                foreach (EbTableLayoutColumn col in this.Columns)
                     hr.Cells.Add(new GridStackCell(this.Name, col, row, hr));
 
                 gs.Rows.Add(hr);
@@ -87,7 +87,7 @@ $(function () {
     }
 
     [ProtoBuf.ProtoContract]
-    public class EbTableColumn
+    public class EbTableLayoutColumn
     {
         [ProtoBuf.ProtoMember(1)]
         public int Index { get; set; }
