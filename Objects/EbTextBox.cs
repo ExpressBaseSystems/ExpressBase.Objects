@@ -39,18 +39,7 @@ namespace ExpressBase.Objects
 
         public override string GetHead()
         {
-            return this.UniqueString + this.RequiredString + this.TextTransformString;
-        }
-
-        public override string GetHtml()
-        {
-            return string.Format(@"
-<div style='position:absolute; left:{1}px; top:{2}px;'>
-<div>{5}</div>
-<input type='{7}' name='{0}' id='{0}' {6} style='width:{3}px; height:{4}px; visibility: {8}; display:inline-block;' />
-<div style='display: inline-block;'></div>
-</div>",
-this.Name, this.Left, this.Top, this.Width, this.Height, this.Label, this.MaxLengthString, this.TextModeString);
+            return ((!this.Hidden) ? this.UniqueString + this.RequiredString : string.Empty) + this.TextTransformString;
         }
 
         private string RequiredString
@@ -58,13 +47,14 @@ this.Name, this.Left, this.Top, this.Width, this.Height, this.Label, this.MaxLen
             get { return (base.Required ? "$('#{0}').focusout(function() { isRequired(this); });".Replace("{0}", this.Name) : string.Empty); }
         }
 
+        private string HiddenString
+        {
+            get { return (base.Hidden ? "visibility: hidden;" : string.Empty); }
+        }
+
         private string TextTransformString
         {
-            get {
-                return (((int)this.TextTransform > 0) ? "$('#{0}').keydown(function(event) { textTransform(this, {1}); }); $('#{0}').on('paste', function(event) { textTransform(this, {1}); });"
-                    .Replace("{0}", this.Name)
-                    .Replace("{1}", ((int)this.TextTransform).ToString()) : string.Empty);
-            }
+            get { return (((int)this.TextTransform > 0) ? "$('#{0}').keydown(function(event) { textTransform(this, {1}); }); $('#{0}').on('paste', function(event) { textTransform(this, {1}); });"  .Replace("{0}", this.Name) .Replace("{1}", ((int)this.TextTransform).ToString()) : string.Empty); }
         }
 
         private string UniqueString
@@ -77,30 +67,26 @@ this.Name, this.Left, this.Top, this.Width, this.Height, this.Label, this.MaxLen
             get { return (this.MaxLength > 0) ? string.Format("maxlength='{0}'", this.MaxLength) : string.Empty; }
         }
 
-         private string TextModeString
+        private string TextModeString
         {  
-            get {
+            get { string returnval = string.Empty; switch (this.TextMode) { case TextMode.Email: returnval = "email"; break; case TextMode.Password: returnval = "password"; break; case TextMode.Color: returnval = "color"; break; case TextMode.SingleLine: returnval = "text"; break; } return returnval; }
+        }
 
-                string returnval = string.Empty;
+        private string ReadOnlyString
+        {
+            get { return (base.ReadOnly ? "readonly" : string.Empty); }
+        }
 
-                switch (this.TextMode)
-                {
-                    case TextMode.Email:
-                        returnval = "email";
-                        break;
-                    case TextMode.Password:
-                        returnval = "password";
-                        break;
-                    case TextMode.Color:
-                        returnval = "color";
-                        break;
-                    case TextMode.SingleLine:
-                        returnval = "text";
-                        break;
-                }
-
-                return returnval;
-            }
+        public override string GetHtml()
+        {
+            return string.Format(@"
+<div style='position:absolute; left:{1}px; top:{2}px; {8}'>
+<div>{5}</div>
+<input type='{7}' name='{0}' id='{0}' {6} style='width:{3}px; height:{4}px;  display:inline-block;' {9} {10} />
+<div style='display: inline-block;'></div>
+</div>",
+this.Name, this.Left, this.Top, this.Width, this.Height,
+this.Label, this.MaxLengthString, this.TextModeString, this.HiddenString, (this.Required && !this.Hidden ? "required" : string.Empty), this.ReadOnlyString);
         }
     }
 }
