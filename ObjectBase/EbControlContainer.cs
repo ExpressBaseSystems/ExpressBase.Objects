@@ -16,6 +16,7 @@ namespace ExpressBase.Objects
         [Browsable(false)]
         public List<EbControl> Controls { get; set; }
 
+        [Browsable(false)]
         public List<EbControl> FlattenedControls { get; set; }
 
         public EbControlContainer() { }
