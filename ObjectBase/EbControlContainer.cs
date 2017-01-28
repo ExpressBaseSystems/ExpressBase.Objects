@@ -2,10 +2,23 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace ExpressBase.Objects
 {
+    public enum EnumOperator
+    {
+        Equal,
+        NotEqual,
+        StartsWith,
+        Contains,
+        GreaterThan,
+        GreaterThanOrEqual,
+        LessThan,
+        LessThanOrEqual
+    }
+
     [ProtoBuf.ProtoContract]
     [ProtoBuf.ProtoInclude(3000, typeof(EbForm))]
     [ProtoBuf.ProtoInclude(3001, typeof(EbDataGridView))]
@@ -55,6 +68,51 @@ namespace ExpressBase.Objects
             return _ctrl;
         }
 
+        public List<EbControl> GetControlsByPropertyValue(string propertyName, object value, EnumOperator operatorType)
+        {
+            List<EbControl> collection = new List<EbControl>();
+
+            foreach (EbControl control in this.FlattenedControls)
+            {
+                PropertyInfo pi = control.GetType().GetProperty(propertyName);
+                var propValue = pi.GetValue(control, null);
+
+                bool checkFlag = false;
+                switch (operatorType)
+                {
+                    case EnumOperator.Equal:
+                        checkFlag = (propValue == value);
+                        break;
+                    case EnumOperator.NotEqual:
+                        checkFlag = (propValue != value);
+                        break;
+                    case EnumOperator.StartsWith:
+                        checkFlag = (propValue != null) ? propValue.ToString().StartsWith(value.ToString()) : false;
+                        break;
+                    case EnumOperator.Contains:
+                        checkFlag = (propValue != null) ? propValue.ToString().Contains(value.ToString()) : false;
+                        break;
+                    //case EnumOperator.GreaterThan:
+                    //    checkFlag = (propValue > value);
+                    //    break;
+                    //case EnumOperator.GreaterThanOrEqual:
+                    //    checkFlag = (propValue >= value);
+                    //    break;
+                    //case EnumOperator.LessThan:
+                    //    checkFlag = (propValue < value);
+                    //    break;
+                    //case EnumOperator.LessThanOrEqual:
+                    //    checkFlag = (propValue <= value);
+                    //    break;
+                }
+
+                if (checkFlag)
+                    collection.Add(control);
+            }
+
+            return collection;
+        }
+
         #region PRIVATE METHODS
 
         private void FlattenControls()
@@ -74,7 +132,10 @@ namespace ExpressBase.Objects
             {
                 FlattenedControls.Add(control);
                 if (control is EbControlContainer)
-                    this.FlattenControlsInner((control as EbControlContainer).Controls);
+                {
+                    if ((control as EbControlContainer).Controls != null)
+                        this.FlattenControlsInner((control as EbControlContainer).Controls);
+                }
             }
         }
 
