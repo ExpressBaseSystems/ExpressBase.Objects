@@ -35,6 +35,18 @@ namespace ExpressBase.Objects
         [System.ComponentModel.Category("Behavior")]
         public TextMode TextMode { get; set; }
 
+        [ProtoBuf.ProtoMember(4)]
+        public string PlaceHolder { get; set; }
+
+        [ProtoBuf.ProtoMember(6)]
+        [System.ComponentModel.Category("Behavior")]
+        public bool AutoCompleteOff { get; set; }
+
+        [ProtoBuf.ProtoMember(5)]
+        [System.ComponentModel.Category("Appearance")]
+        public string Text { get; set; }
+
+
         public EbTextBox() { }
 
         public override string GetHead()
@@ -74,7 +86,7 @@ namespace ExpressBase.Objects
 
         private string ReadOnlyString
         {
-            get { return (base.ReadOnly ? "readonly" : string.Empty); }
+            get { return (base.ReadOnly ? "background-color: #f0f0f0; border: solid 1px #bbb;' readonly" : "'"); }
         }
 
         public override string GetHtml()
@@ -82,11 +94,15 @@ namespace ExpressBase.Objects
             return string.Format(@"
 <div style='position:absolute; left:{1}px; top:{2}px; {8}'>
 <div>{5}</div>
-<input type='{7}' name='{0}' id='{0}' {6} style='width:{3}px; height:{4}px;  display:inline-block;' {9} {10} />
-<div style='display: inline-block;'></div>
+<div  class='tooltp'><input type='{7}'  name='{0}' id='{0}' {6} style='width:{3}px; height:{4}px; {17} display:inline-block;{10} {9} {13} {14} {15} {16}  />
+<div style='display: inline-block;'></div> {11}</div>
+<div class='helpText'> {12} </div>
 </div>",
-this.Name, this.Left, this.Top, this.Width, this.Height,
-this.Label, this.MaxLengthString, this.TextModeString, this.HiddenString, (this.Required && !this.Hidden ? "required" : string.Empty), this.ReadOnlyString);
+this.Name, this.Left, this.Top, this.Width, this.Height, this.Label, this.MaxLengthString, this.TextModeString,
+this.HiddenString, (this.Required && !this.Hidden ? " required" : string.Empty), this.ReadOnlyString, 
+((this.ToolTipText == null) ? string.Empty : ( (this.ToolTipText.Trim().Length == 0) ? string.Empty : ("<span class='tooltiptext'>" + this.ToolTipText + "</span>") ) ),
+this.HelpText, "placeholder='"+ this.PlaceHolder +"'", "value='"+ this.Text +"'", "tabindex='" + this.TabIndex + "'",
+this.AutoCompleteOff ? "autocomplete='off'": string.Empty, "background-color:"+ this.BackColorSerialized +";");
         }
     }
 }

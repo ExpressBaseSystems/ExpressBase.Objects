@@ -19,13 +19,16 @@ namespace ExpressBase.Objects
     {
         [ProtoBuf.ProtoMember(10)]
         [Description("Labels")]
+        [System.ComponentModel.Category("Behavior")]
         public virtual string Label { get; set; }
 
         [ProtoBuf.ProtoMember(11)]
+        [System.ComponentModel.Category("Behavior")]
         [Description("Labels")]
         public virtual string HelpText { get; set; }
 
         [ProtoBuf.ProtoMember(12)]
+        [System.ComponentModel.Category("Behavior")]
         [Description("Labels")]
         public virtual string ToolTipText { get; set; }
 
@@ -46,23 +49,27 @@ namespace ExpressBase.Objects
         public virtual int Top { get; set; }
 
         [ProtoBuf.ProtoMember(17)]
-        [Browsable(false)]
+        [System.ComponentModel.Category("Layout")]
         public virtual int Height { get; set; }
 
         [ProtoBuf.ProtoMember(18)]
-        [Browsable(false)]
+        [System.ComponentModel.Category("Layout")]
         public virtual int Width { get; set; }
 
         [ProtoBuf.ProtoMember(19)]
+        [System.ComponentModel.Category("Behavior")]
         public virtual bool Required { get; set; }
 
         [ProtoBuf.ProtoMember(20)]
+        [System.ComponentModel.Category("Behavior")]
         public virtual bool Unique { get; set; }
 
         [ProtoBuf.ProtoMember(21)]
+        [System.ComponentModel.Category("Behavior")]
         public virtual bool ReadOnly { get; set; }
 
         [ProtoBuf.ProtoMember(22)]
+        [System.ComponentModel.Category("Behavior")]
         public virtual bool Hidden { get; set; }
 
         [ProtoBuf.ProtoMember(23)]
@@ -84,7 +91,36 @@ namespace ExpressBase.Objects
         public virtual string VisibleExpression { get; set; }
 
         [ProtoBuf.ProtoMember(28)]
+        [System.ComponentModel.Category("Accessibility")]
         public virtual int TabIndex { get; set; }
+
+#if NET462
+        [System.ComponentModel.Category("Appearance")]
+        public System.Drawing.Color BackColor { get; set; }
+#endif
+
+        private string _backColorSerialized = null;
+        [ProtoBuf.ProtoMember(29)]
+        [Browsable(false)]
+        public string BackColorSerialized
+        {
+            get
+            {
+#if NET462
+                return String.Format("#{0:X6}", this.BackColor.ToArgb() & 0x00FFFFFF);
+#else
+                return _backColorSerialized;
+#endif
+            }
+            set
+            {
+#if NET462
+                this.BackColor = System.Drawing.ColorTranslator.FromHtml(value);
+#else
+                _backColorSerialized = value;
+#endif
+            }
+        }
 
         public EbControl() { }
 
