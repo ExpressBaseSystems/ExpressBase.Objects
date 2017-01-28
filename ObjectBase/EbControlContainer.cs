@@ -76,16 +76,19 @@ namespace ExpressBase.Objects
             {
                 PropertyInfo pi = control.GetType().GetProperty(propertyName);
                 T propValue = (T)pi.GetValue(control, null);
-                T tvalue = (T)value;
+                T tValue = (T)value;
+
+                IComparable icPropValue = (IComparable)propValue;
+                IComparable icValue = (IComparable)value;
 
                 bool checkFlag = false;
                 switch (operatorType)
                 {
                     case EnumOperator.Equal:
-                        checkFlag = (propValue.Equals(tvalue));
+                        checkFlag = (propValue.Equals(tValue));
                         break;
                     case EnumOperator.NotEqual:
-                        checkFlag = (!propValue.Equals(tvalue));
+                        checkFlag = (!propValue.Equals(tValue));
                         break;
                     case EnumOperator.StartsWith:
                         checkFlag = (propValue != null) ? propValue.ToString().StartsWith(value.ToString()) : false;
@@ -93,18 +96,18 @@ namespace ExpressBase.Objects
                     case EnumOperator.Contains:
                         checkFlag = (propValue != null) ? propValue.ToString().Contains(value.ToString()) : false;
                         break;
-                    //case EnumOperator.GreaterThan:
-                    //    checkFlag = (propValue > value);
-                    //    break;
-                    //case EnumOperator.GreaterThanOrEqual:
-                    //    checkFlag = (propValue >= value);
-                    //    break;
-                    //case EnumOperator.LessThan:
-                    //    checkFlag = (propValue < value);
-                    //    break;
-                    //case EnumOperator.LessThanOrEqual:
-                    //    checkFlag = (propValue <= value);
-                    //    break;
+                    case EnumOperator.GreaterThan:
+                        checkFlag = (icPropValue.CompareTo(icValue) > 0);
+                        break;
+                    case EnumOperator.GreaterThanOrEqual:
+                        checkFlag = (icPropValue.CompareTo(icValue) >= 0);
+                        break;
+                    case EnumOperator.LessThan:
+                        checkFlag = (icPropValue.CompareTo(icValue) < 0);
+                        break;
+                    case EnumOperator.LessThanOrEqual:
+                        checkFlag = (icPropValue.CompareTo(icValue) <= 0);
+                        break;
                 }
 
                 if (checkFlag)
