@@ -68,23 +68,24 @@ namespace ExpressBase.Objects
             return _ctrl;
         }
 
-        public List<EbControl> GetControlsByPropertyValue(string propertyName, object value, EnumOperator operatorType)
+        public List<EbControl> GetControlsByPropertyValue<T>(string propertyName, object value, EnumOperator operatorType)
         {
             List<EbControl> collection = new List<EbControl>();
 
             foreach (EbControl control in this.FlattenedControls)
             {
                 PropertyInfo pi = control.GetType().GetProperty(propertyName);
-                var propValue = pi.GetValue(control, null);
+                T propValue = (T)pi.GetValue(control, null);
+                T tvalue = (T)value;
 
                 bool checkFlag = false;
                 switch (operatorType)
                 {
                     case EnumOperator.Equal:
-                        checkFlag = (propValue == value);
+                        checkFlag = (propValue.Equals(tvalue));
                         break;
                     case EnumOperator.NotEqual:
-                        checkFlag = (propValue != value);
+                        checkFlag = (!propValue.Equals(tvalue));
                         break;
                     case EnumOperator.StartsWith:
                         checkFlag = (propValue != null) ? propValue.ToString().StartsWith(value.ToString()) : false;
