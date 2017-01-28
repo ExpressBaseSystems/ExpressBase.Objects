@@ -12,6 +12,7 @@ namespace ExpressBase.Objects
         View,
         DataSource,
         Report,
+        Table
     }
 
     [ProtoBuf.ProtoContract]

@@ -52,13 +52,13 @@ namespace ExpressBase.Objects
     public class GridStackCell
     {
         public string Name { get; set; }
-        private EbTableColumn Column { get; set; }
+        private EbTableLayoutColumn Column { get; set; }
         private EbTableRow Row { get; set; }
         private GridStackRow GridStackRow { get; set; }
         private int Width { get; set; }
         private int Height { get; set; }
 
-        public GridStackCell(string name, EbTableColumn c, EbTableRow r, GridStackRow gsr)
+        public GridStackCell(string name, EbTableLayoutColumn c, EbTableRow r, GridStackRow gsr)
         {
             this.Name = name;
             this.Column = c;

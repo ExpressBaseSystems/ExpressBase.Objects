@@ -2,10 +2,23 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace ExpressBase.Objects
 {
+    public enum EnumOperator
+    {
+        Equal,
+        NotEqual,
+        StartsWith,
+        Contains,
+        GreaterThan,
+        GreaterThanOrEqual,
+        LessThan,
+        LessThanOrEqual
+    }
+
     [ProtoBuf.ProtoContract]
     [ProtoBuf.ProtoInclude(3000, typeof(EbForm))]
     [ProtoBuf.ProtoInclude(3001, typeof(EbDataGridView))]
@@ -16,16 +29,8 @@ namespace ExpressBase.Objects
         [Browsable(false)]
         public List<EbControl> Controls { get; set; }
 
-        private List<EbControl> _flattenedControls;
-        private List<EbControl> FlattenedControls
-        {
-            get
-            {
-                if (_flattenedControls == null)
-                    _flattenedControls = new List<EbControl>();
-                return _flattenedControls;
-            }
-        }
+        [Browsable(false)]
+        public List<EbControl> FlattenedControls { get; set; }
 
         public EbControlContainer() { }
 
@@ -63,11 +68,65 @@ namespace ExpressBase.Objects
             return _ctrl;
         }
 
+        public List<EbControl> GetControlsByPropertyValue<T>(string propertyName, object value, EnumOperator operatorType)
+        {
+            List<EbControl> collection = new List<EbControl>();
+
+            foreach (EbControl control in this.FlattenedControls)
+            {
+                PropertyInfo pi = control.GetType().GetProperty(propertyName);
+                T propValue = (T)pi.GetValue(control, null);
+                T tValue = (T)value;
+
+                IComparable icPropValue = (IComparable)propValue;
+                IComparable icValue = (IComparable)value;
+
+                bool checkFlag = false;
+                switch (operatorType)
+                {
+                    case EnumOperator.Equal:
+                        checkFlag = (propValue.Equals(tValue));
+                        break;
+                    case EnumOperator.NotEqual:
+                        checkFlag = (!propValue.Equals(tValue));
+                        break;
+                    case EnumOperator.StartsWith:
+                        checkFlag = (propValue != null) ? propValue.ToString().StartsWith(value.ToString()) : false;
+                        break;
+                    case EnumOperator.Contains:
+                        checkFlag = (propValue != null) ? propValue.ToString().Contains(value.ToString()) : false;
+                        break;
+                    case EnumOperator.GreaterThan:
+                        checkFlag = (icPropValue.CompareTo(icValue) > 0);
+                        break;
+                    case EnumOperator.GreaterThanOrEqual:
+                        checkFlag = (icPropValue.CompareTo(icValue) >= 0);
+                        break;
+                    case EnumOperator.LessThan:
+                        checkFlag = (icPropValue.CompareTo(icValue) < 0);
+                        break;
+                    case EnumOperator.LessThanOrEqual:
+                        checkFlag = (icPropValue.CompareTo(icValue) <= 0);
+                        break;
+                }
+
+                if (checkFlag)
+                    collection.Add(control);
+            }
+
+            return collection;
+        }
+
         #region PRIVATE METHODS
 
         private void FlattenControls()
         {
-            this.FlattenedControls.Clear();
+            if (this.FlattenedControls == null)
+                this.FlattenedControls = new List<EbControl>();
+
+            if (this.FlattenedControls.Count > 0)
+                this.FlattenedControls.Clear();
+
             this.FlattenControlsInner(this.Controls);
         }
 
@@ -77,7 +136,10 @@ namespace ExpressBase.Objects
             {
                 FlattenedControls.Add(control);
                 if (control is EbControlContainer)
-                    this.FlattenControlsInner((control as EbControlContainer).Controls);
+                {
+                    if ((control as EbControlContainer).Controls != null)
+                        this.FlattenControlsInner((control as EbControlContainer).Controls);
+                }
             }
         }
 
