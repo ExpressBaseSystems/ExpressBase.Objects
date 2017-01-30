@@ -210,6 +210,8 @@ namespace ExpressBase.Objects
 
         public override void Init4Redis() { }
 
+        public virtual void SetData(object value) { }
+
 #if NET462
         private string HexConverter(System.Drawing.Color c)
         {

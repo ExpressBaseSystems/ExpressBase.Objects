@@ -89,6 +89,11 @@ namespace ExpressBase.Objects
             get { return (base.ReadOnly ? "background-color: #f0f0f0; border: solid 1px #bbb;' readonly" : "'"); }
         }
 
+        public override void SetData(object value)
+        {
+            this.Text = value.ToString();
+        }
+
         public override string GetHtml()
         {
             return string.Format(@"
