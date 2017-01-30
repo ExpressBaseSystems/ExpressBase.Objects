@@ -93,8 +93,8 @@ namespace ExpressBase.Objects
         {
             return string.Format(@"
 <div style='position:absolute; left:{1}px; top:{2}px; {8}'>
-<div>{5}</div>
-<div  class='tooltp'><input type='{7}'  name='{0}' id='{0}' {6} style='width:{3}px; height:{4}px; {17} display:inline-block;{10} {9} {13} {14} {15} {16}  />
+<div style='{19} {20}'>{5}</div>
+<div  class='tooltp'><input type='{7}'  name='{0}' id='{0}' {6} style='width:{3}px; height:{4}px; {17} {18} display:inline-block;{10} {9} {13} {14} {15} {16} />
 <div style='display: inline-block;'></div> {11}</div>
 <div class='helpText'> {12} </div>
 </div>",
@@ -102,7 +102,7 @@ this.Name, this.Left, this.Top, this.Width, this.Height, this.Label, this.MaxLen
 this.HiddenString, (this.Required && !this.Hidden ? " required" : string.Empty), this.ReadOnlyString, 
 ((this.ToolTipText == null) ? string.Empty : ( (this.ToolTipText.Trim().Length == 0) ? string.Empty : ("<span class='tooltiptext'>" + this.ToolTipText + "</span>") ) ),
 this.HelpText, "placeholder='"+ this.PlaceHolder +"'", "value='"+ this.Text +"'", "tabindex='" + this.TabIndex + "'",
-this.AutoCompleteOff ? "autocomplete='off'": string.Empty, "background-color:"+ this.BackColorSerialized +";");
+this.AutoCompleteOff ? "autocomplete='off'": string.Empty, "background-color:"+ this.BackColorSerialized +";", "color:" + this.ForeColorSerialized + ";", "background-color:" + this.LabelBackColorSerialized + ";", "color:" + this.LabelForeColorSerialized + ";");
         }
     }
 }

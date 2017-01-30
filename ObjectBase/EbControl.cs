@@ -107,18 +107,98 @@ namespace ExpressBase.Objects
             get
             {
 #if NET462
-                return String.Format("#{0:X6}", this.BackColor.ToArgb() & 0x00FFFFFF);
-#else
-                return _backColorSerialized;
+                _backColorSerialized = this.HexConverter(this.BackColor);
 #endif
+                return _backColorSerialized;
             }
             set
             {
 #if NET462
                 this.BackColor = System.Drawing.ColorTranslator.FromHtml(value);
-#else
-                _backColorSerialized = value;
 #endif
+                _backColorSerialized = value;
+            }
+        }
+
+        //
+#if NET462
+        [System.ComponentModel.Category("Appearance")]
+        public System.Drawing.Color ForeColor { get; set; }
+#endif
+
+        private string _foreColorSerialized = null;
+        [ProtoBuf.ProtoMember(30)]
+        [Browsable(false)]
+        public string ForeColorSerialized
+        {
+            get
+            {
+#if NET462
+                _foreColorSerialized = this.HexConverter(this.ForeColor);
+#endif
+                return _foreColorSerialized;
+            }
+            set
+            {
+#if NET462
+                this.ForeColor = System.Drawing.ColorTranslator.FromHtml(value);
+#endif
+                _foreColorSerialized = value;
+            }
+        }
+        //
+
+
+#if NET462
+        [System.ComponentModel.Category("Appearance")]
+        public System.Drawing.Color LabelBackColor { get; set; }
+#endif
+
+        private string _labelBackColorSerialized = null;
+        [ProtoBuf.ProtoMember(31)]
+        [Browsable(false)]
+        public string LabelBackColorSerialized
+        {
+            get
+            {
+#if NET462
+                _labelBackColorSerialized = this.HexConverter(this.LabelBackColor);
+#endif
+                return _labelBackColorSerialized;
+            }
+            set
+            {
+#if NET462
+                this.LabelBackColor = System.Drawing.ColorTranslator.FromHtml(value);
+#endif
+                _labelBackColorSerialized = value;
+            }
+        }
+        //
+
+#if NET462
+        [System.ComponentModel.Category("Appearance")]
+        public System.Drawing.Color LabelForeColor { get; set; }
+#endif
+
+        private string _labelforeColorSerialized = null;
+        [ProtoBuf.ProtoMember(32)]
+        [Browsable(false)]
+        public string LabelForeColorSerialized
+        {
+            get
+            {
+#if NET462
+                _labelforeColorSerialized = this.HexConverter(this.LabelForeColor);
+#endif
+                return _labelforeColorSerialized;
+            }
+            set
+            {
+#if NET462
+                this.LabelForeColor = System.Drawing.ColorTranslator.FromHtml(value);
+#endif
+                _labelforeColorSerialized = value;
             }
         }
 
@@ -129,5 +209,12 @@ namespace ExpressBase.Objects
         public virtual string GetHtml() { return string.Empty; }
 
         public override void Init4Redis() { }
+
+#if NET462
+        private string HexConverter(System.Drawing.Color c)
+        {
+            return "#" + c.R.ToString("X2") + c.G.ToString("X2") + c.B.ToString("X2");
+        }
+#endif
     }
 }
