@@ -80,6 +80,11 @@ namespace ExpressBase.Objects
             this.Text = (value != null) ? value.ToString() : string.Empty;
         }
 
+        public override object GetData()
+        {
+            return this.Text;
+        }
+
         public override string GetHtml()
         {
             return string.Format(@"

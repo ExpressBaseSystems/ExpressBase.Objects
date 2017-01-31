@@ -230,6 +230,8 @@ namespace ExpressBase.Objects
 
         public virtual void SetData(object value) { }
 
+        public virtual object GetData() { return null; }
+
 #if NET462
         private string HexConverter(System.Drawing.Color c)
         {
