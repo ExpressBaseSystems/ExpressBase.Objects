@@ -9,5 +9,10 @@ namespace ExpressBase.Objects
     public class EbNumeric : EbControl
     {
         public EbNumeric() { }
+
+        public override string GetHtml()
+        {
+            return string.Format(@"");
+        }
     }
 }

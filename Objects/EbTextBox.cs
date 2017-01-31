@@ -54,16 +54,6 @@ namespace ExpressBase.Objects
             return ((!this.Hidden) ? this.UniqueString + this.RequiredString : string.Empty) + this.TextTransformString;
         }
 
-        private string RequiredString
-        {
-            get { return (base.Required ? "$('#{0}').focusout(function() { isRequired(this); });".Replace("{0}", this.Name) : string.Empty); }
-        }
-
-        private string HiddenString
-        {
-            get { return (base.Hidden ? "visibility: hidden;" : string.Empty); }
-        }
-
         private string TextTransformString
         {
             get { return (((int)this.TextTransform > 0) ? "$('#{0}').keydown(function(event) { textTransform(this, {1}); }); $('#{0}').on('paste', function(event) { textTransform(this, {1}); });"  .Replace("{0}", this.Name) .Replace("{1}", ((int)this.TextTransform).ToString()) : string.Empty); }
@@ -84,10 +74,6 @@ namespace ExpressBase.Objects
             get { string returnval = string.Empty; switch (this.TextMode) { case TextMode.Email: returnval = "email"; break; case TextMode.Password: returnval = "password"; break; case TextMode.Color: returnval = "color"; break; case TextMode.SingleLine: returnval = "text"; break; } return returnval; }
         }
 
-        private string ReadOnlyString
-        {
-            get { return (base.ReadOnly ? "background-color: #f0f0f0; border: solid 1px #bbb;' readonly" : "'"); }
-        }
 
         public override void SetData(object value)
         {
@@ -105,9 +91,10 @@ namespace ExpressBase.Objects
 </div>",
 this.Name, this.Left, this.Top, this.Width, this.Height, this.Label, this.MaxLengthString, this.TextModeString,
 this.HiddenString, (this.Required && !this.Hidden ? " required" : string.Empty), this.ReadOnlyString, 
-((this.ToolTipText == null) ? string.Empty : ( (this.ToolTipText.Trim().Length == 0) ? string.Empty : ("<span class='tooltiptext'>" + this.ToolTipText + "</span>") ) ),
+((this.ToolTipText == null) ? string.Empty : ( (this.ToolTipText.Trim().Length == 0) ? string.Empty : ("<span class='tooltptext'>" + this.ToolTipText + "</span>") ) ),
 this.HelpText, "placeholder='"+ this.PlaceHolder +"'", "value='"+ this.Text +"'", "tabindex='" + this.TabIndex + "'",
-this.AutoCompleteOff ? "autocomplete='off'": string.Empty, "background-color:"+ this.BackColorSerialized +";", "color:" + this.ForeColorSerialized + ";", "background-color:" + this.LabelBackColorSerialized + ";", "color:" + this.LabelForeColorSerialized + ";");
+this.AutoCompleteOff ? "autocomplete='off'": string.Empty, "background-color:"+ this.BackColorSerialized +";",
+"color:" + this.ForeColorSerialized + ";", "background-color:" + this.LabelBackColorSerialized + ";", "color:" + this.LabelForeColorSerialized + ";");
         }
     }
 }
