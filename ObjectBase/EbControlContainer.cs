@@ -49,13 +49,11 @@ namespace ExpressBase.Objects
 #if !NET462
         public void SetData(EbDataTable dt)
         {
-            var allControls = this.GetControls<EbControl>();
-            foreach (EbControl control in allControls)
-            {
-                foreach (EbDataRow dr in dt.Rows)
-                {
+            var allControls = this.Controls; //this.GetControls<EbControl>();
+            foreach (EbDataRow dr in dt.Rows)
+            { 
+                foreach (EbControl control in allControls)
                     control.SetData(dr[control.Name]);
-                }
             }
         }
 #endif

@@ -20,6 +20,10 @@ namespace ExpressBase.Objects
         [Browsable(false)]
         public int VersionId { get; set; }
 
+        [Browsable(false)]
+        public bool IsEdited { get; set; }
+       
+        
         //[ProtoBuf.ProtoMember(1)]
         //[TypeConverter(typeof(EbTableConverter))]
         //public EbTable Table { get; set; }
@@ -30,11 +34,12 @@ namespace ExpressBase.Objects
         public void SetData(EbDataSet ds)
         {
             var allContainers = this.GetControls<EbControlContainer>();
+            allContainers.Add(this);
             foreach (EbControlContainer container in allContainers)
             {
                 foreach (EbDataTable dt in ds.Tables)
                 {
-                    if (dt.TableName == container.Table.Name)
+                    //if (dt.TableName == container.Table.Name)
                         container.SetData(dt);
                 }
             }

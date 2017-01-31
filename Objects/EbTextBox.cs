@@ -91,7 +91,7 @@ namespace ExpressBase.Objects
 
         public override void SetData(object value)
         {
-            this.Text = value.ToString();
+            this.Text = (value != null) ? value.ToString() : string.Empty;
         }
 
         public override string GetHtml()
