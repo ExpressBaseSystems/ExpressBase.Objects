@@ -60,6 +60,11 @@ namespace ExpressBase.Objects
         [System.ComponentModel.Category("Behavior")]
         public virtual bool Required { get; set; }
 
+        protected string RequiredString
+        {
+            get { return (this.Required ? "$('#{0}').focusout(function() { isRequired(this); });".Replace("{0}", this.Name) : string.Empty); }
+        }
+
         [ProtoBuf.ProtoMember(20)]
         [System.ComponentModel.Category("Behavior")]
         public virtual bool Unique { get; set; }
@@ -68,9 +73,19 @@ namespace ExpressBase.Objects
         [System.ComponentModel.Category("Behavior")]
         public virtual bool ReadOnly { get; set; }
 
+        protected string ReadOnlyString
+        {
+            get { return (this.ReadOnly ? "background-color: #f0f0f0; border: solid 1px #bbb;' readonly" : "'"); }
+        }
+
         [ProtoBuf.ProtoMember(22)]
         [System.ComponentModel.Category("Behavior")]
         public virtual bool Hidden { get; set; }
+
+        protected string HiddenString
+        {
+            get { return (this.Hidden ? "visibility: hidden;" : string.Empty); }
+        }
 
         [ProtoBuf.ProtoMember(23)]
         public virtual bool SkipPersist { get; set; }
@@ -106,7 +121,7 @@ namespace ExpressBase.Objects
         {
             get
             {
-#if NET462
+#if NET462      
                 _backColorSerialized = this.HexConverter(this.BackColor);
 #endif
                 return _backColorSerialized;
