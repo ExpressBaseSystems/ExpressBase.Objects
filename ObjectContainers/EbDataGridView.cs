@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -17,6 +18,53 @@ namespace ExpressBase.Objects
 
         [ProtoBuf.ProtoMember(3)]
         public EbDataGridViewColumnCollection Columns { get; set; }
+
+        public string GetCols()
+        {
+            string script = "[";
+
+            foreach (EbDataGridViewColumn column in this.Columns)
+            {
+                script += "{";
+
+                script += "'data': " + "(_.find(data.columns, {'columnName': '{0}'})).columnIndex".Replace("{0}", column.Name);
+                script += ",'title': '" + column.Label + "'";
+                script += ",'className': '" + this.GetClassName(column) + "'";
+                script += ",'visible': " + (!column.Hidden).ToString().ToLower();
+                script += ",'render': function( data, type, full ) { {0} }".Replace("{0}", this.GetRenderFunc(column));
+
+                script += "},";
+            }
+
+            return script + "]";
+        }
+
+        private string GetClassName(EbDataGridViewColumn column)
+        {
+            string _c = string.Empty;
+
+            if (column.ColumnType == EbDataGridViewColumnType.Text)
+                _c = "dt-left";
+            else if (column.ColumnType == EbDataGridViewColumnType.Numeric)
+                _c = "dt-right";
+            else
+                _c = "dt-left";
+
+            return _c;
+        }
+
+        private string GetRenderFunc(EbDataGridViewColumn column)
+        {
+            string _r = string.Empty;
+
+            if (column.ColumnType == EbDataGridViewColumnType.Numeric)
+                _r = string.Format("return parseFloat(data).toFixed({0});",
+                    (column.ExtendedProperties as EbDataGridViewNumericColumnProperties).DecimalPlaces);
+            else
+                _r = "return data;";
+
+            return _r;
+        }
 
         public EbDataGridView()
         {
@@ -94,6 +142,7 @@ tr.details td.details-control {
 $('#$$$$$$$_tbl').append( $('<tfoot/>') );
 $('#$$$$$$$_loadingdiv').show();
 var pageTotal=0;   
+var dcolumns = [];
 $.get('/ds/columns/#######?format=json', function (data)
 {
     var ids=[];
@@ -104,44 +153,8 @@ $.get('/ds/columns/#######?format=json', function (data)
     var searchText='';
     var select_collection=[];
     var j=1;
-    if (data != null){
-        $.each(data.columns,
-            function(i, value) { 
-                _d = value.columnIndex.toString();
-                _t = value.columnName;
-                _c='dt-left';
-                _v=true;
-                if(value.columnName=='id')
-                    _v=false;
-                switch(value.type){
-                    case 'System.Int32, System.Private.CoreLib': _c='dt-right'; break;
-                    case 'System.Decimal, System.Private.CoreLib':_c='dt-right'; break;
-                    case 'System.Int16, System.Private.CoreLib': _c='dt-right'; break;
-                    case 'System.DateTime, System.Private.CoreLib':_c='dt-center'; break;
-                    case 'System.Boolean, System.Private.CoreLib':_c='dt-center'; break;
-                }
-                if(value.columnIndex==0){    
-                    cols.push({'className': 'details-control','orderable': false,'data': null,'defaultContent': ' '});                               
-                    cols.push({'data':null, 'render': function ( data, type, row ) {return '<input type=\'checkbox\' id='+ 'chk'+j++ +' class=\'select - checkbox\'>'}});                
-                }
-                cols.push({ 'data': _d, 'title': _t, 'className': _c,'visible': _v ,
-                            'render': function ( data, type, full ) {
-                                if(value.columnName==='sys_cancelled'){  
-                                    if(data==false) return data;
-                                    else return '<img id=\'cancel\' src=\'D:\\ExpressBase.Core\\ExpressBase.ServiceStack\\wwwroot\\images\\cancel-button-no-line-md.png\' style=\'width: 25px; \'/>';
-                                }
-                                 if(value.columnName=='sys_locked'){  
-                                    if(data==false) return data;
-                                    else return '<img id=\'lock\' src=\'D:\\ExpressBase.Core\\ExpressBase.ServiceStack\\wwwroot\\images\\Austin-Locksmith.png\' style=\'width: 25px; \'/>';
-                                }
-                                if(value.type=='System.Decimal, System.Private.CoreLib'){
-                                      return parseFloat(data).toFixed(2);
-                                }
-                               return data;
-                            }
-               }); 
-        });
-    }
+    dcolumns = data.columns;
+    
     $('#$$$$$$$_tbl').dataTable(
     {
         dom: 'l <\'toolbar\'> Bfrtip',
@@ -151,7 +164,7 @@ $.get('/ds/columns/#######?format=json', function (data)
         serverSide: true,
         processing: true,
         language: { processing: '<div></div><div></div><div></div><div></div><div></div><div></div><div></div>'},
-        columns:cols, 
+        columns:@columnsRender, 
         order: [],
         deferRender: true,
         select: {
@@ -555,21 +568,55 @@ $.get('/ds/columns/#######?format=json', function (data)
 ".Replace("#######", this.DataSourceId.ToString().Trim())
 .Replace("$$$$$$$", this.Name)
 .Replace("@@@@@@@", this.Label)
-.Replace("&&&&&&&", this.GetLengthMenu());
+.Replace("&&&&&&&", this.GetLengthMenu())
+.Replace("@columnsRender", this.GetCols());
         }
     }
 
     [ProtoBuf.ProtoContract]
     public class EbDataGridViewColumn : EbControl
     {
+        private EbDataGridViewColumnType _columnType = EbDataGridViewColumnType.Text;
+
         [ProtoBuf.ProtoMember(1)]
-        public EbDataGridViewColumnType ColumnType { get; set; }
+        public EbDataGridViewColumnType ColumnType
+        {
+            get { return _columnType; }
+            set
+            {
+                if (value == EbDataGridViewColumnType.Numeric)
+                    this.ExtendedProperties = new EbDataGridViewNumericColumnProperties();
+                else
+                    this.ExtendedProperties = new EbDataGridViewColumnProperties();
+
+                _columnType = value;
+            }
+        }
+
+        [ProtoBuf.ProtoMember(2)]
+#if NET462
+        [TypeConverter(typeof(ExpandableObjectConverter))]
+#endif
+        public EbDataGridViewColumnProperties ExtendedProperties { get; set; }
 
         public EbDataGridViewColumn()
         {
             this.Width = 100;
-            this.ColumnType = EbDataGridViewColumnType.Text;
         }
+    }
+
+    [ProtoBuf.ProtoContract]
+    [ProtoBuf.ProtoInclude(1, typeof(EbDataGridViewNumericColumnProperties))]
+    public class EbDataGridViewColumnProperties
+    {
+
+    }
+
+    [ProtoBuf.ProtoContract]
+    public class EbDataGridViewNumericColumnProperties : EbDataGridViewColumnProperties
+    {
+        [ProtoBuf.ProtoMember(1)]
+        public int DecimalPlaces { get; set; }
     }
 
     [ProtoBuf.ProtoContract]
