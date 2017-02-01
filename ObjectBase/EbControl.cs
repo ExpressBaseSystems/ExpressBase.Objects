@@ -15,6 +15,7 @@ namespace ExpressBase.Objects
    // [ProtoBuf.ProtoInclude(2005, typeof(EbNumeric))]
   //  [ProtoBuf.ProtoInclude(2006, typeof(EbDate))]
     [ProtoBuf.ProtoInclude(2007, typeof(EbComboBox))]
+    [ProtoBuf.ProtoInclude(2008, typeof(EbRadioGroup))]
 #if NET462
     [System.Serializable]
 #endif
