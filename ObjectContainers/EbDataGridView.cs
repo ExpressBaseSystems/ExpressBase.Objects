@@ -563,9 +563,6 @@ $.get('/ds/columns/#######?format=json', function (data)
     public class EbDataGridViewColumn : EbControl
     {
         [ProtoBuf.ProtoMember(1)]
-        public int Width { get; set; }
-
-        [ProtoBuf.ProtoMember(2)]
         public EbDataGridViewColumnType ColumnType { get; set; }
 
         public EbDataGridViewColumn()
