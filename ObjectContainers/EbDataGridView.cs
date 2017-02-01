@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -17,6 +18,53 @@ namespace ExpressBase.Objects
 
         [ProtoBuf.ProtoMember(3)]
         public EbDataGridViewColumnCollection Columns { get; set; }
+
+        public string GetCols()
+        {
+            string script = "[";
+
+            foreach (EbDataGridViewColumn column in this.Columns)
+            {
+                script += "{";
+
+                script += "'data': " + "(_.find(data.columns, {'columnName': '{0}'})).columnIndex".Replace("{0}", column.Name);
+                script += ",'title': '" + column.Label + "'";
+                script += ",'className': '" + this.GetClassName(column) + "'";
+                script += ",'visible': " + (!column.Hidden).ToString().ToLower();
+                script += ",'render': function( data, type, full ) { {0} }".Replace("{0}", this.GetRenderFunc(column));
+
+                script += "},";
+            }
+
+            return script + "]";
+        }
+
+        private string GetClassName(EbDataGridViewColumn column)
+        {
+            string _c = string.Empty;
+
+            if (column.ColumnType == EbDataGridViewColumnType.Text)
+                _c = "dt-left";
+            else if (column.ColumnType == EbDataGridViewColumnType.Numeric)
+                _c = "dt-right";
+            else
+                _c = "dt-left";
+
+            return _c;
+        }
+
+        private string GetRenderFunc(EbDataGridViewColumn column)
+        {
+            string _r = string.Empty;
+
+            if (column.ColumnType == EbDataGridViewColumnType.Numeric)
+                _r = string.Format("return parseFloat(data).toFixed({0});",
+                    (column.ExtendedProperties as EbDataGridViewNumericColumnProperties).DecimalPlaces);
+            else
+                _r = "return data;";
+
+            return _r;
+        }
 
         public EbDataGridView()
         {
@@ -69,17 +117,20 @@ namespace ExpressBase.Objects
 .numericcol{
     float:right;
 }
-.dataTables_filter {
-     display: none;
+.toolbar {
+    float:left;
 }
-
+td.details-control {
+    background:  url('http://cdn.mysitemyway.com/etc-mysitemyway/icons/legacy-previews/icons-256/simple-black-square-icons-alphanumeric/126293-simple-black-square-icon-alphanumeric-plus-sign-simple.png') no-repeat center center;
+    cursor: pointer;
+}
+tr.details td.details-control {
+    background: url('http://findicons.com/files/icons/2583/sweetieplus/24/badge_square_minus_24_ns.png') no-repeat center center;
+}
 </style>
     <div class='tablecontainer'>
         <div style='width:auto; border:solid 1px yellow;'>
-              <div  style=' height:40px; border:solid 1px blue;'>
-                <input id='$$$$$$$_btnfilter' type='button' value='Filter' />
-                <input id='$$$$$$$_btntotalpage' type='button' value='Total Page' />
-              </div>
+              
                     <h3>@@@@@@@</h3>
                <div id='$$$$$$$_loadingdiv' class='loadingdiv'>
                     <img id='$$$$$$$_loading-image' src='/images/ajax-loader.gif' alt='Loading...' />
@@ -91,6 +142,7 @@ namespace ExpressBase.Objects
 $('#$$$$$$$_tbl').append( $('<tfoot/>') );
 $('#$$$$$$$_loadingdiv').show();
 var pageTotal=0;   
+var dcolumns = [];
 $.get('/ds/columns/#######?format=json', function (data)
 {
     var ids=[];
@@ -101,51 +153,18 @@ $.get('/ds/columns/#######?format=json', function (data)
     var searchText='';
     var select_collection=[];
     var j=1;
-    if (data != null){
-        $.each(data.columns,
-            function(i, value) { 
-                _d = value.columnIndex.toString();
-                _t = value.columnName;
-                _c='dt-left';
-                _v=true;
-                if(value.columnName=='id')
-                    _v=false;
-                switch(value.type){
-                    case 'System.Int32, System.Private.CoreLib': _c='dt-right'; break;
-                    case 'System.Decimal, System.Private.CoreLib':_c='dt-right'; break;
-                    case 'System.Int16, System.Private.CoreLib': _c='dt-right'; break;
-                    case 'System.DateTime, System.Private.CoreLib':_c='dt-center'; break;
-                    case 'System.Boolean, System.Private.CoreLib':_c='dt-center'; break;
-                }
-                if(value.columnIndex==0)                   
-                    cols.push({'data':null, 'render': function ( data, type, row ) {return '<input type=\'checkbox\' id='+ 'chk'+j++ +' class=\'select - checkbox\'>'}});                
-                cols.push({ 'data': _d, 'title': _t, 'className': _c,'visible': _v ,
-                            'render': function ( data, type, full ) {
-                                if(value.columnName==='sys_cancelled'){  
-                                    if(data==false) return data;
-                                    else return '<img id=\'cancel\' src=\'D:\\ExpressBase.Core\\ExpressBase.ServiceStack\\wwwroot\\images\\cancel-button-no-line-md.png\' style=\'width: 25px; \'/>';
-                                }
-                                 if(value.columnName=='sys_locked'){  
-                                    if(data==false) return data;
-                                    else return '<img id=\'lock\' src=\'D:\\ExpressBase.Core\\ExpressBase.ServiceStack\\wwwroot\\images\\Austin-Locksmith.png\' style=\'width: 25px; \'/>';
-                                }
-                                if(value.type=='System.Decimal, System.Private.CoreLib'){
-                                      return parseFloat(data).toFixed(2);
-                                }
-                               return data;
-                            }
-               }); 
-        });
-    }
+    dcolumns = data.columns;
+    
     $('#$$$$$$$_tbl').dataTable(
     {
-       
+        dom: 'l <\'toolbar\'> Bfrtip',
+        buttons: ['copy', 'excel', 'pdf'],
         autoWidth: false,
         &&&&&&&,
         serverSide: true,
         processing: true,
         language: { processing: '<div></div><div></div><div></div><div></div><div></div><div></div><div></div>'},
-        columns:cols, 
+        columns:@columnsRender, 
         order: [],
         deferRender: true,
         select: {
@@ -235,7 +254,7 @@ $.get('/ds/columns/#######?format=json', function (data)
 				            return typeof i === 'number' ? i : 0;
 			            };
 			            pageTotal = api
-				            .column( j+1, { page: 'current'} )
+				            .column( j+2, { page: 'current'} )
 				            .data()
 				            .reduce( function (a, b) {
 					            return intVal(a) + intVal(b);
@@ -247,50 +266,70 @@ $.get('/ds/columns/#######?format=json', function (data)
 				            return typeof i === 'number' ? i : 0;
 			            };
 			            pageTotal =api
-				            .column( j+1, { page: 'current'} )
+				            .column( j+2, { page: 'current'} )
 				            .data()
 				            .reduce( function (a, b) {
 					            return intVal(a) + intVal(b);
 				            }, 0 );
                         pageTotal=pageTotal / api
-				            .column( j+1, { page: 'current'} )
+				            .column( j+2, { page: 'current'} )
 				            .data().length;
                      }
-                    var idd= 'footer1_txt' + value.columnName;                
-                    if ($('#$$$$$$$_tbl tfoot tr:eq(0) th:eq('+j+')').children().length ==2)
-                        ($('#$$$$$$$_tbl tfoot tr:eq(0) th:eq('+j+')').children('input')[0]).value=pageTotal.toFixed(2);
+                    var idd= 'footer1_txt' + value.columnName;   
+                    var k=j+1;              
+                    if ($('#$$$$$$$_tbl tfoot tr:eq(1) th:eq('+k+')').children().length ==2)
+                        ($('#$$$$$$$_tbl tfoot tr:eq(1) th:eq('+k+')').children('input')[0]).value=pageTotal.toFixed(2);
                     else
-                        $('#$$$$$$$_tbl tfoot tr:eq(0) th:eq('+j+')').append('<input type=\'text\' value='+pageTotal.toFixed(2)+' id='+idd+' style=\'text-align:right;width: 100px;\'>');               
+                        $('#$$$$$$$_tbl tfoot tr:eq(1) th:eq('+k+')').append('<input type=\'text\' value='+pageTotal.toFixed(2)+' id='+idd+' style=\'text-align:right;width: 100px;\'>');               
                 }
                 else
-                    $('#$$$$$$$_tbl tfoot tr:eq(0) th:eq('+j+')').html('');
+                    $('#$$$$$$$_tbl tfoot tr:eq(1) th:eq('+k+')').html('');
             });
         },
    });
 
+   $('div.toolbar').append('<div><button type=\'button\' id=\'$$$$$$$_btnfilter\' style=\'height: 32px;\'>Click Me!</button><button type=\'button\' id=\'$$$$$$$_btntotalpage\' style=\'height: 32px;\'>Page Total!</button></div>');
+    
     $('#$$$$$$$_tbl tfoot').append( $('#$$$$$$$_tbl thead tr').clone());  
   
     $('#$$$$$$$_tbl tfoot tr:eq(0) th').each( function (idx) {
         var title = $(this).text();
+        if(idx!=0 && idx!=1){                 
+            $(this).html(title);
+        }
+    } );
+    
+    $('#$$$$$$$_tbl tfoot').append( $('#$$$$$$$_tbl thead tr').clone()); 
+
+    $('#$$$$$$$_tbl tfoot tr:eq(1) th').each( function (idx) {
+        var title = $(this).text();
         var idd='footer1_select'+title;
-        if(idx!=0){                 
-            $(this).html('<select id='+idd+' width=\'60\'><option value=\'Sum\' selected=\'selected\'>Sum</option><option value=\'Avg\'> Avg </option></select>');
+        if(idx!=0 && idx!=1){    
+            if(data.columns[idx-1].type=='System.Int32, System.Private.CoreLib'|| data.columns[idx-1].type=='System.Int16, System.Private.CoreLib'){             
+                $(this).html('<select id='+idd+' width=\'60\'><option value=\'Sum\' selected=\'selected\'>Sum</option><option value=\'Avg\'> Avg </option></select>');
+            }
+            else if(data.columns[idx-1].type=='System.Decimal, System.Private.CoreLib'){   
+                $(this).html('<select id='+idd+' width=\'60\'><option value=\'Sum\' selected=\'selected\'>Sum</option><option value=\'Avg\'> Avg </option></select>');
+            }
+            else
+                $(this).html('');
         }
     } );
 
     var tfoot = $('#$$$$$$$_tbl tfoot');
     $(tfoot).append($('#$$$$$$$_tbl thead tr').clone());  
+    $('#$$$$$$$_tbl tfoot tr:eq(2)').hide();
 
-    $('#$$$$$$$_tbl tfoot tr:eq(1) th').each( function (idx) {
+    $('#$$$$$$$_tbl tfoot tr:eq(2) th').each( function (idx) {
         var idd= 'footer2_txt' + $(this).text();
         var idds= 'footer2_select' + $(this).text();
         var t='<span hidden>'+$(this).text()+'</span>'
-        if(idx!=0){
-            if(data.columns[idx].type=='System.Int32, System.Private.CoreLib'|| data.columns[idx].type=='System.Int16, System.Private.CoreLib'){
+        if(idx!=0 && idx!=1){
+            if(data.columns[idx-1].type=='System.Int32, System.Private.CoreLib'|| data.columns[idx-1].type=='System.Int16, System.Private.CoreLib'){
                 $(this).html(t+'<select id='+idds+' width=\'60\' style=\'display:none;\'><option value=\'Sum\' selected=\'selected\'>Sum</option><option value=\'Avg\'> Avg </option></select><input type=\'text\' id='+idd+' style=\'width: 100px;display:none;\' />');
                 //alert($(this).text());
             }
-            else if(data.columns[idx].type=='System.Decimal, System.Private.CoreLib'){                
+            else if(data.columns[idx-1].type=='System.Decimal, System.Private.CoreLib'){                
                 $(this).html(t+'<select id='+idds+' width=\'60\' style=\'display:none;\'><option value=\'Sum\' selected=\'selected\'>Sum</option><option value=\'Avg\'> Avg </option></select><input type=\'text\' id='+idd+' style=\'width: 100px;display:none;\' />');               
             }
             else
@@ -303,27 +342,42 @@ $.get('/ds/columns/#######?format=json', function (data)
     var rgb='';
     var fl='';
 
-    $('#$$$$$$$_tbl thead tr th').each( function (idx) {
+    $('#$$$$$$$_tbl thead tr:eq(0) th').each( function (idx) {
         var title = $(this).text();
         var idd= 'header_txt1' + title;  
         var idds='header_select'+title;
-        if(idx!=0){
+        if(idx!=0 && idx!=1){
             var t = '<span>' + title + '</span>';
-            if(data.columns[idx].type=='System.Int32, System.Private.CoreLib'|| data.columns[idx].type=='System.Int16, System.Private.CoreLib'){                
-                $(this).html(t+'<br/><select id='+idds+' width=\'30\' style=\' padding-left:5px;display:none;\'><option value=\'<\'> < </option><option value=\' > \'> > </option><option value=\'=\' selected=\'selected\'> = </option><option value=\'<=\'> <= </option><option value=\'>=\'> >= </option><option value=\'B\'> B </option></select><input type=\'number\' id='+idd+' width=\'100\' style=\'display:none;\'/>');                
+            $(this).html(t);                           
+        }            
+    });
+
+    $('#$$$$$$$_tbl thead').append( $('#$$$$$$$_tbl thead tr').clone().show());  
+    $('#$$$$$$$_tbl thead tr:eq(1)').hide();
+
+    $('#$$$$$$$_tbl thead tr:eq(1) th').each( function (idx) {
+        var title = $(this).text();
+        var idd= 'header_txt1' + title;  
+        var idds='header_select'+title;
+        if(idx!=0 && idx!=1){
+            var t = '<span hidden>' + title + '</span>';
+            if(data.columns[idx-1].type=='System.Int32, System.Private.CoreLib'|| data.columns[idx-1].type=='System.Int16, System.Private.CoreLib'){                
+                $(this).html(t+'<select id='+idds+' width=\'30\' style=\' padding-left:5px;display:none;\'><option value=\'<\'> < </option><option value=\' > \'> > </option><option value=\'=\' selected=\'selected\'> = </option><option value=\'<=\'> <= </option><option value=\'>=\'> >= </option><option value=\'B\'> B </option></select><input type=\'number\' id='+idd+' width=\'100\' style=\'display:none;\'/>');                
             }
-            else if(data.columns[idx].type=='System.String, System.Private.CoreLib')
-                $(this).html(t+'<br/><input type=\'text\' id='+idd+' style=\'min-width: 160px;display:none;\'/>');
-            else if(data.columns[idx].type=='System.DateTime, System.Private.CoreLib'){
-                $(this).html(t+'<br/><select id='+idds+' width=\'30\' style=\'display:none;\'><option value=\'<\'> < </option><option value=\' > \'> > </option><option value=\' = \' selected=\'selected\'> = </option><option value=\'<=\'> <= </option><option value=\'>=\'> >= </option><option value=\'B\'> B </option></select><input type=\'date\' id='+idd+' width=\'100\' style=\'display:none;\'/>');                
+            else if(data.columns[idx-1].type=='System.String, System.Private.CoreLib')
+                $(this).html(t+'<input type=\'text\' id='+idd+' style=\'min-width: 160px;display:none;\'/>');
+            else if(data.columns[idx-1].type=='System.DateTime, System.Private.CoreLib'){
+                $(this).html(t+'<select id='+idds+' width=\'30\' style=\'display:none;\'><option value=\'<\'> < </option><option value=\' > \'> > </option><option value=\' = \' selected=\'selected\'> = </option><option value=\'<=\'> <= </option><option value=\'>=\'> >= </option><option value=\'B\'> B </option></select><input type=\'date\' id='+idd+' width=\'100\' style=\'display:none;\'/>');                
             }
-            else if(data.columns[idx].type=='System.Decimal, System.Private.CoreLib'){                
-                $(this).html(t+'<br/><select id='+idds+' width=\'30\' style=\'display:none;\'><option value=\'<\'> < </option><option value=\' > \'> > </option><option value=\' = \' selected=\'selected\'> = </option><option value=\'<=\'> <= </option><option value=\'>=\'> >= </option><option value=\'B\'> B </option></select><input type=\'number\' id='+idd+' width=\'100\' style=\'display:none;\'/>');               
+            else if(data.columns[idx-1].type=='System.Decimal, System.Private.CoreLib'){                
+                $(this).html(t+'<select id='+idds+' width=\'30\' style=\'display:none;\'><option value=\'<\'> < </option><option value=\' > \'> > </option><option value=\' = \' selected=\'selected\'> = </option><option value=\'<=\'> <= </option><option value=\'>=\'> >= </option><option value=\'B\'> B </option></select><input type=\'number\' id='+idd+' width=\'100\' style=\'display:none;\'/>');               
             }
+            else
+                $(this).html(t+'');
         }            
     });
     
-    $('#$$$$$$$_tbl thead').on( 'click', 'th', function(event) {
+    $('#$$$$$$$_tbl thead tr:eq(0)').on( 'click', 'th', function(event) {
         if($(this).children().length==0)
             var headtitle=$(this).text();
         else
@@ -331,15 +385,15 @@ $.get('/ds/columns/#######?format=json', function (data)
         order_colname=headtitle;
      });
 
-     $('#$$$$$$$_tbl thead tr th').on('click','input',function(event) {
+     $('#$$$$$$$_tbl thead tr:eq(1) th').on('click','input',function(event) {
         event.stopPropagation();
      }); 
 
-    $('#$$$$$$$_tbl thead tr th').on('click','select',function(event) {
+    $('#$$$$$$$_tbl thead tr:eq(1) th').on('click','select',function(event) {
         event.stopPropagation();
      }); 
 
-    $('#$$$$$$$_tbl thead tr th input').keypress(function (e) {
+    $('#$$$$$$$_tbl thead tr:eq(1) th input').keypress(function (e) {
         //alert($(this).siblings('span').text());
         searchTextCollection=[];
         search_colnameCollection=[];
@@ -367,7 +421,7 @@ $.get('/ds/columns/#######?format=json', function (data)
         }
      });
 
-    $('#$$$$$$$_tbl thead th select').on('change',function(e){
+    $('#$$$$$$$_tbl thead tr:eq(1) th select').on('change',function(e){
         var idd='header_txt2'+$(this).siblings('span').text();
         if($(this).val()=='B'){
            if($(this).next('input').attr('type') == 'date')
@@ -393,7 +447,7 @@ $.get('/ds/columns/#######?format=json', function (data)
         }        
     });
 
-    $('#$$$$$$$_tbl tfoot tr:eq(0) th select').on('change',function(e){
+    $('#$$$$$$$_tbl tfoot tr:eq(1) th select').on('change',function(e){
         $.each(data.columns,function(j, value) {
             if(e.target.id=='footer1_select'+value.columnName){
                 var p=e.target.value;                                
@@ -403,7 +457,7 @@ $.get('/ds/columns/#######?format=json', function (data)
 				        return typeof i === 'number' ? i : 0;
 			        };
 			        pageTotal =api
-				        .column( j+1, { page: 'current'} )
+				        .column( j+2, { page: 'current'} )
                         .data()
 				        .reduce( function (a, b) {
 					        return intVal(a) + intVal(b);
@@ -415,21 +469,22 @@ $.get('/ds/columns/#######?format=json', function (data)
 				        return typeof i === 'number' ? i : 0;
 			        };
 			        pageTotal =api
-				        .column( j+1, { page: 'current'} )
+				        .column( j+2, { page: 'current'} )
 				        .data()
 				        .reduce( function (a, b) {
 					        return intVal(a) + intVal(b);
 				        }, 0 );
                     pageTotal=pageTotal / api
-				        .column( j+1, { page: 'current'} )
+				        .column( j+2, { page: 'current'} )
 				        .data().length;
-                }               
-                ($('#$$$$$$$_tbl tfoot tr:eq(0) th:eq('+j+')').children('input')[0]).value=pageTotal.toFixed(2);                
+                }   
+                var k=j+1;            
+                ($('#$$$$$$$_tbl tfoot tr:eq(1) th:eq('+k+')').children('input')[0]).value=pageTotal.toFixed(2);                
             }
         });
      }); 
 
-    $('#$$$$$$$_tbl tfoot tr:eq(1) th select').on('change',function(e){
+    $('#$$$$$$$_tbl tfoot tr:eq(2) th select').on('change',function(e){alert('haa');
         $.each(data.columns,function(j, value) {
             if(e.target.id=='footer2_select'+value.columnName){             
             }
@@ -437,7 +492,11 @@ $.get('/ds/columns/#######?format=json', function (data)
      }); 
 
     $('#$$$$$$$_btnfilter').click(function(obj){
-        $('#$$$$$$$_tbl thead tr th').each( function (idx) {
+        if ($('#$$$$$$$_tbl thead tr:eq(1)').is(':visible'))
+            $('#$$$$$$$_tbl thead tr:eq(1)').hide();
+        else
+            $('#$$$$$$$_tbl thead tr:eq(1)').show();
+        $('#$$$$$$$_tbl thead tr:eq(1) th').each( function (idx) {
             var title = $(this).children('span').text();
             var idd1='header_txt1' + title; 
             var idd2='header_txt2' + title; 
@@ -448,8 +507,12 @@ $.get('/ds/columns/#######?format=json', function (data)
         });   
     });
 
-    $('#$$$$$$$_btntotalpage').click(function(obj){alert('haaa');
-        $('#$$$$$$$_tbl tfoot tr:eq(1) th').each( function (idx) {
+    $('#$$$$$$$_btntotalpage').click(function(obj){
+        if ($('#$$$$$$$_tbl tfoot tr:eq(2)').is(':visible'))
+            $('#$$$$$$$_tbl tfoot tr:eq(2)').hide();
+        else
+            $('#$$$$$$$_tbl tfoot tr:eq(2)').show();
+        $('#$$$$$$$_tbl tfoot tr:eq(2) th').each( function (idx) {
             var title = $(this).children('span').text();
             var idd= 'footer2_txt' + title;
             var idds= 'footer2_select' + title;
@@ -457,30 +520,103 @@ $.get('/ds/columns/#######?format=json', function (data)
             $('#'+idds).toggle();           
         });   
     });
+
+    function format ( d ) {
+        var tbl='';
+        $.each(data.columns,function(j, value) {
+            if(value.columnName=='xid')
+                tbl+='XID:'+d[value.columnIndex]+'</br>'
+        });
+        return tbl;
+    }
+    // Array to track the ids of the details displayed rows
+    var detailRows = [];
+ 
+    $('#$$$$$$$_tbl tbody').on( 'click', 'tr td.details-control', function () {
+        var tr = $(this).closest('tr');
+        var row = $('#$$$$$$$_tbl').DataTable().row( tr );
+        var idx = $.inArray( tr.attr('id'), detailRows );
+ 
+        if ( row.child.isShown() ) {
+            tr.removeClass( 'details' );
+            row.child.hide();
+ 
+            // Remove from the 'open' array
+            detailRows.splice( idx, 1 );
+        }
+        else {
+            tr.addClass( 'details' );
+            row.child( format( row.data() ) ).show();
+ 
+            // Add to the 'open' array
+            if ( idx === -1 ) {
+                detailRows.push( tr.attr('id') );
+            }
+        }
+    } );
+ 
+    // On each draw, loop over the `detailRows` array and show any child rows
+    $('#$$$$$$$_tbl').DataTable().on( 'draw', function () {
+        $.each( detailRows, function ( i, id ) {
+            $('#'+id+' td.details-control').trigger( 'click' );
+        } );
+    } );
+
 });
-      
+
 </script>
 ".Replace("#######", this.DataSourceId.ToString().Trim())
 .Replace("$$$$$$$", this.Name)
 .Replace("@@@@@@@", this.Label)
-.Replace("&&&&&&&", this.GetLengthMenu());
+.Replace("&&&&&&&", this.GetLengthMenu())
+.Replace("@columnsRender", this.GetCols());
         }
     }
 
     [ProtoBuf.ProtoContract]
     public class EbDataGridViewColumn : EbControl
     {
+        private EbDataGridViewColumnType _columnType = EbDataGridViewColumnType.Text;
+
         [ProtoBuf.ProtoMember(1)]
-        public int Width { get; set; }
+        public EbDataGridViewColumnType ColumnType
+        {
+            get { return _columnType; }
+            set
+            {
+                if (value == EbDataGridViewColumnType.Numeric)
+                    this.ExtendedProperties = new EbDataGridViewNumericColumnProperties();
+                else
+                    this.ExtendedProperties = new EbDataGridViewColumnProperties();
+
+                _columnType = value;
+            }
+        }
 
         [ProtoBuf.ProtoMember(2)]
-        public EbDataGridViewColumnType ColumnType { get; set; }
+#if NET462
+        [TypeConverter(typeof(ExpandableObjectConverter))]
+#endif
+        public EbDataGridViewColumnProperties ExtendedProperties { get; set; }
 
         public EbDataGridViewColumn()
         {
             this.Width = 100;
-            this.ColumnType = EbDataGridViewColumnType.Text;
         }
+    }
+
+    [ProtoBuf.ProtoContract]
+    [ProtoBuf.ProtoInclude(1, typeof(EbDataGridViewNumericColumnProperties))]
+    public class EbDataGridViewColumnProperties
+    {
+
+    }
+
+    [ProtoBuf.ProtoContract]
+    public class EbDataGridViewNumericColumnProperties : EbDataGridViewColumnProperties
+    {
+        [ProtoBuf.ProtoMember(1)]
+        public int DecimalPlaces { get; set; }
     }
 
     [ProtoBuf.ProtoContract]

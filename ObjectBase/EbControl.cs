@@ -12,9 +12,10 @@ namespace ExpressBase.Objects
     [ProtoBuf.ProtoInclude(2002, typeof(EbChart))]
     [ProtoBuf.ProtoInclude(2003, typeof(EbDataGridViewColumn))]
     [ProtoBuf.ProtoInclude(2004, typeof(EbTextBox))]
-    [ProtoBuf.ProtoInclude(2005, typeof(EbNumeric))]
-    [ProtoBuf.ProtoInclude(2006, typeof(EbDate))]
+   // [ProtoBuf.ProtoInclude(2005, typeof(EbNumeric))]
+  //  [ProtoBuf.ProtoInclude(2006, typeof(EbDate))]
     [ProtoBuf.ProtoInclude(2007, typeof(EbComboBox))]
+    [ProtoBuf.ProtoInclude(2008, typeof(EbRadioGroup))]
 #if NET462
     [System.Serializable]
 #endif
@@ -235,6 +236,8 @@ namespace ExpressBase.Objects
         public override void Init4Redis() { }
 
         public virtual void SetData(object value) { }
+
+        public virtual object GetData() { return null; }
 
 #if NET462
         private string HexConverter(System.Drawing.Color c)
