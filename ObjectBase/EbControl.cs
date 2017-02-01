@@ -72,6 +72,12 @@ namespace ExpressBase.Objects
         [System.ComponentModel.Category("Behavior")]
         public virtual bool Unique { get; set; }
 
+        protected string UniqueString
+        {
+            get { return (this.Unique ? "$('#{0}').focusout(function() { isUnique(this); });".Replace("{0}", this.Name) : string.Empty); }
+        }
+
+
         [ProtoBuf.ProtoMember(21)]
         [System.ComponentModel.Category("Behavior")]
         public virtual bool ReadOnly { get; set; }
