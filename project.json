@@ -3,6 +3,7 @@
 
   "dependencies": {
     "CoreCompat.System.ComponentModel.Attributes": "4.2.3-rg",
+    "ExpressBase.Data": "1.0.0",
     "NETStandard.Library": "1.6.1",
     "protobuf-net": "2.1.0",
     "ServiceStack.Redis.Core": "1.0.32",

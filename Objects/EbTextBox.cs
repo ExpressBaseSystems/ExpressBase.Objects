@@ -35,21 +35,23 @@ namespace ExpressBase.Objects
         [System.ComponentModel.Category("Behavior")]
         public TextMode TextMode { get; set; }
 
+        [ProtoBuf.ProtoMember(4)]
+        public string PlaceHolder { get; set; }
+
+        [ProtoBuf.ProtoMember(6)]
+        [System.ComponentModel.Category("Behavior")]
+        public bool AutoCompleteOff { get; set; }
+
+        [ProtoBuf.ProtoMember(5)]
+        [System.ComponentModel.Category("Appearance")]
+        public string Text { get; set; }
+
+
         public EbTextBox() { }
 
         public override string GetHead()
         {
             return ((!this.Hidden) ? this.UniqueString + this.RequiredString : string.Empty) + this.TextTransformString;
-        }
-
-        private string RequiredString
-        {
-            get { return (base.Required ? "$('#{0}').focusout(function() { isRequired(this); });".Replace("{0}", this.Name) : string.Empty); }
-        }
-
-        private string HiddenString
-        {
-            get { return (base.Hidden ? "visibility: hidden;" : string.Empty); }
         }
 
         private string TextTransformString
@@ -72,21 +74,32 @@ namespace ExpressBase.Objects
             get { string returnval = string.Empty; switch (this.TextMode) { case TextMode.Email: returnval = "email"; break; case TextMode.Password: returnval = "password"; break; case TextMode.Color: returnval = "color"; break; case TextMode.SingleLine: returnval = "text"; break; } return returnval; }
         }
 
-        private string ReadOnlyString
+
+        public override void SetData(object value)
         {
-            get { return (base.ReadOnly ? "readonly" : string.Empty); }
+            this.Text = (value != null) ? value.ToString() : string.Empty;
+        }
+
+        public override object GetData()
+        {
+            return this.Text;
         }
 
         public override string GetHtml()
         {
             return string.Format(@"
 <div style='position:absolute; left:{1}px; top:{2}px; {8}'>
-<div>{5}</div>
-<input type='{7}' name='{0}' id='{0}' {6} style='width:{3}px; height:{4}px;  display:inline-block;' {9} {10} />
-<div style='display: inline-block;'></div>
+<div style='{19} {20}'>{5}</div>
+<div  class='tooltp'><input type='{7}'  name='{0}' id='{0}' {6} style='width:{3}px; height:{4}px; {17} {18} display:inline-block;{10} {9} {13} {14} {15} {16} />
+<div style='display: inline-block;'></div> {11}</div>
+<div class='helpText'> {12} </div>
 </div>",
-this.Name, this.Left, this.Top, this.Width, this.Height,
-this.Label, this.MaxLengthString, this.TextModeString, this.HiddenString, (this.Required && !this.Hidden ? "required" : string.Empty), this.ReadOnlyString);
+this.Name, this.Left, this.Top, this.Width, this.Height, this.Label, this.MaxLengthString, this.TextModeString,
+this.HiddenString, (this.Required && !this.Hidden ? " required" : string.Empty), this.ReadOnlyString, 
+((this.ToolTipText == null) ? string.Empty : ( (this.ToolTipText.Trim().Length == 0) ? string.Empty : ("<span class='tooltptext'>" + this.ToolTipText + "</span>") ) ),
+this.HelpText, "placeholder='"+ this.PlaceHolder +"'", "value='"+ this.Text +"'", "tabindex='" + this.TabIndex + "'",
+this.AutoCompleteOff ? "autocomplete='off'": string.Empty, "background-color:"+ this.BackColorSerialized +";",
+"color:" + this.ForeColorSerialized + ";", "background-color:" + this.LabelBackColorSerialized + ";", "color:" + this.LabelForeColorSerialized + ";");
         }
     }
 }

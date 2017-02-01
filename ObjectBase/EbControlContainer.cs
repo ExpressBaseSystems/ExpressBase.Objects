@@ -1,4 +1,7 @@
-﻿using System;
+﻿#if !NET462
+using ExpressBase.Data;
+#endif
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -32,12 +35,28 @@ namespace ExpressBase.Objects
         [Browsable(false)]
         public List<EbControl> FlattenedControls { get; set; }
 
+        [ProtoBuf.ProtoMember(2)]
+        [TypeConverter(typeof(EbTableConverter))]
+        public EbTable Table { get; set; }
+
         public EbControlContainer() { }
 
         public override void Init4Redis()
         {
             this.FlattenControls();
         }
+
+#if !NET462
+        public void SetData(EbDataTable dt)
+        {
+            var allControls = this.Controls; //this.GetControls<EbControl>();
+            foreach (EbDataRow dr in dt.Rows)
+            { 
+                foreach (EbControl control in allControls)
+                    control.SetData(dr[control.Name]);
+            }
+        }
+#endif
 
         public List<EbControl> GetControls<T>()
         {
@@ -117,7 +136,7 @@ namespace ExpressBase.Objects
             return collection;
         }
 
-        #region PRIVATE METHODS
+#region PRIVATE METHODS
 
         private void FlattenControls()
         {
@@ -143,6 +162,6 @@ namespace ExpressBase.Objects
             }
         }
 
-        #endregion PRIVATE METHODS
+#endregion PRIVATE METHODS
     }
 }
