@@ -21,7 +21,7 @@ namespace ExpressBase.Objects
         public int VersionId { get; set; }
 
         [Browsable(false)]
-        public bool IsEdited { get; set; }
+        public bool IsUpdate { get; set; }
        
         
         //[ProtoBuf.ProtoMember(1)]
