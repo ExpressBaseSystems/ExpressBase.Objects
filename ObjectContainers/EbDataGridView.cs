@@ -54,13 +54,25 @@ namespace ExpressBase.Objects
             return _c;
         }
 
+        // NEED WORK - Currency from current row, Also Locale en-US
         private string GetRenderFunc(EbDataGridViewColumn column)
         {
             string _r = string.Empty;
 
             if (column.ColumnType == EbDataGridViewColumnType.Numeric)
-                _r = string.Format("return parseFloat(data).toFixed({0});",
-                    (column.ExtendedProperties as EbDataGridViewNumericColumnProperties).DecimalPlaces);
+            {
+                var ext = column.ExtendedProperties as EbDataGridViewNumericColumnProperties;
+
+                if (!ext.Localize)
+                    _r = string.Format("return parseFloat(data).toFixed({0});", ext.DecimalPlaces);
+                else
+                {
+                    if (!ext.IsCurrency)
+                        _r = "return parseFloat(data).toLocaleString('en-US', { maximumSignificantDigits: {0} });".Replace("{0}", ext.DecimalPlaces.ToString());
+                    else
+                        _r = "return parseFloat(data).toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumSignificantDigits: {0} });".Replace("{0}", ext.DecimalPlaces.ToString());
+                }
+            }
             else
                 _r = "return data;";
 
@@ -583,6 +595,8 @@ $.get('/ds/columns/#######?format=json', function (data)
             {
                 if (value == EbDataGridViewColumnType.Numeric)
                     this.ExtendedProperties = new EbDataGridViewNumericColumnProperties();
+                if (value == EbDataGridViewColumnType.DateTime)
+                    this.ExtendedProperties = new EbDataGridViewDateTimeColumnProperties();
                 else
                     this.ExtendedProperties = new EbDataGridViewColumnProperties();
 
@@ -604,6 +618,7 @@ $.get('/ds/columns/#######?format=json', function (data)
 
     [ProtoBuf.ProtoContract]
     [ProtoBuf.ProtoInclude(1, typeof(EbDataGridViewNumericColumnProperties))]
+    [ProtoBuf.ProtoInclude(2, typeof(EbDataGridViewDateTimeColumnProperties))]
     public class EbDataGridViewColumnProperties
     {
 
@@ -614,6 +629,30 @@ $.get('/ds/columns/#######?format=json', function (data)
     {
         [ProtoBuf.ProtoMember(1)]
         public int DecimalPlaces { get; set; }
+
+        [ProtoBuf.ProtoMember(2)]
+        [Description("Comma/delimeter separated localized display of number/value.")]
+        public bool Localize { get; set; }
+
+        [ProtoBuf.ProtoMember(3)]
+        public bool IsCurrency { get; set; }
+
+        [ProtoBuf.ProtoMember(4)]
+        public bool Sum { get; set; }
+
+        [ProtoBuf.ProtoMember(5)]
+        public bool Average { get; set; }
+
+        [ProtoBuf.ProtoMember(6)]
+        public bool Max { get; set; }
+
+        [ProtoBuf.ProtoMember(7)]
+        public bool Min { get; set; }
+    }
+
+    [ProtoBuf.ProtoContract]
+    public class EbDataGridViewDateTimeColumnProperties : EbDataGridViewColumnProperties
+    {
     }
 
     [ProtoBuf.ProtoContract]
