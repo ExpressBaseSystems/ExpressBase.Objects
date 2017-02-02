@@ -121,6 +121,49 @@ namespace ExpressBase.Objects
             return Newtonsoft.Json.JsonConvert.SerializeObject(_ls);
         }
 
+        public string GetAggregateControls()
+        {
+            List<string> _ls = new List<string>();
+
+            foreach (EbDataGridViewColumn column in this.Columns)
+            {
+                var ext = column.ExtendedProperties as EbDataGridViewNumericColumnProperties;
+
+                if (column.ColumnType == EbDataGridViewColumnType.Numeric)
+                {
+                    if (ext.Sum || ext.Average)
+                    {
+                        _ls.Add(string.Format(@"<div><select id='{0}' style='width: 38px'>{1}{2}</select>
+                             <input type='text' id='{3}' style='text-align:right;width: 100px;'></div>",
+                            "footer1_select" + column.Name,
+                            (ext.Sum ? "<option value='Sum' selected='selected'>Sum</option>" : string.Empty),
+                            (ext.Average ? "<option value='Avg'>Avg</option>" : string.Empty), "footer1_txt" + column.Name));
+                    }
+                    else
+                        _ls.Add("&nbsp;");
+                }
+                else
+                    _ls.Add("&nbsp;");
+            }
+
+            return Newtonsoft.Json.JsonConvert.SerializeObject(_ls);
+        }
+
+        public string GetAggregateInfo()
+        {
+            List<AggregateInfo> _ls = new List<AggregateInfo>();
+
+            foreach (EbDataGridViewColumn column in this.Columns)
+            {
+                var ext = column.ExtendedProperties as EbDataGridViewNumericColumnProperties;
+
+                if (column.ColumnType == EbDataGridViewColumnType.Numeric && (ext.Sum || ext.Average))
+                    _ls.Add(new AggregateInfo { colname = column.Name, coltype = "N" });
+            }
+
+            return Newtonsoft.Json.JsonConvert.SerializeObject(_ls);
+        }
+
         public EbDataGridView()
         {
             this.Columns = new EbDataGridViewColumnCollection();
@@ -209,6 +252,8 @@ $.get('/ds/columns/#######?format=json', function (data)
     var select_collection=[];
     var j=1;
     var eb_filter_controls = @eb_filter_controls;
+    var eb_footer1 = @eb_footer1;
+    var eb_agginfo = @eb_agginfo;
     dcolumns = data.columns;
     
     $('#$$$$$$$_tbl').dataTable(
@@ -300,46 +345,15 @@ $.get('/ds/columns/#######?format=json', function (data)
                 }
             });
          },
-       fnFooterCallback: function ( nRow, aaData, iStart, iEnd, aiDisplay ) {
-            $.each(data.columns,function(j, value) { 
-               if(value.columnName!='id' && (value.type==='System.Decimal, System.Private.CoreLib' || value.type==='System.Int32, System.Private.CoreLib' || value.type==='System.Int16, System.Private.CoreLib')){               
-                    var p=$('#footer1_select'+value.columnName).val();
-                    if(p=='Sum'){
-                        var api = $('#$$$$$$$_tbl').dataTable().api(), data;
-			            var intVal = function ( i ) {
-				            return typeof i === 'number' ? i : 0;
-			            };
-			            pageTotal = api
-				            .column( j+2, { page: 'current'} )
-				            .data()
-				            .reduce( function (a, b) {
-					            return intVal(a) + intVal(b);
-				            }, 0 );
-                    }
-                    if(p=='Avg'){                             
-                        var api = $('#$$$$$$$_tbl').dataTable().api();
-			            var intVal = function ( i ) {
-				            return typeof i === 'number' ? i : 0;
-			            };
-			            pageTotal =api
-				            .column( j+2, { page: 'current'} )
-				            .data()
-				            .reduce( function (a, b) {
-					            return intVal(a) + intVal(b);
-				            }, 0 );
-                        pageTotal=pageTotal / api
-				            .column( j+2, { page: 'current'} )
-				            .data().length;
-                     }
-                    var idd= 'footer1_txt' + value.columnName;   
-                    var k=j+1;              
-                    if ($('#$$$$$$$_tbl tfoot tr:eq(1) th:eq('+k+')').children().length ==2)
-                        ($('#$$$$$$$_tbl tfoot tr:eq(1) th:eq('+k+')').children('input')[0]).value=pageTotal.toFixed(2);
-                    else
-                        $('#$$$$$$$_tbl tfoot tr:eq(1) th:eq('+k+')').append('<input type=\'text\' value='+pageTotal.toFixed(2)+' id='+idd+' style=\'text-align:right;width: 100px;\'>');               
+        fnFooterCallback: function ( nRow, aaData, iStart, iEnd, aiDisplay ) {
+            var api = $('#$$$$$$$_tbl').dataTable().api();
+            $.each(eb_agginfo, function (index,agginfo) {
+                
+                 var p = $('#footer1_select' + agginfo.colname).val();
+                 if (p === 'Sum') {
+                    pageTotal = api.column(5, { page: 'current'} ).data().reduce( function (a, b) { return a + b; }, 0 );
                 }
-                else
-                    $('#$$$$$$$_tbl tfoot tr:eq(1) th:eq('+k+')').html('');
+                alert(pageTotal);
             });
         },
    });
@@ -350,22 +364,8 @@ $.get('/ds/columns/#######?format=json', function (data)
     $('#$$$$$$$_tbl tfoot').append( $('#$$$$$$$_tbl thead tr').clone());  
     $('#$$$$$$$_tbl tfoot tr:eq(0) th').each( function (idx) { $(this).children().eq(0).children().remove(); } );
     
-    $('#$$$$$$$_tbl tfoot').append( $('#$$$$$$$_tbl thead tr').clone()); 
-
-    $('#$$$$$$$_tbl tfoot tr:eq(1) th').each( function (idx) {
-        var title = $(this).text();
-        var idd='footer1_select'+title;
-        if(idx!=0 && idx!=1){    
-            if(data.columns[idx-1].type=='System.Int32, System.Private.CoreLib'|| data.columns[idx-1].type=='System.Int16, System.Private.CoreLib'){             
-                $(this).html('<select id='+idd+' width=\'60\'><option value=\'Sum\' selected=\'selected\'>Sum</option><option value=\'Avg\'> Avg </option></select>');
-            }
-            else if(data.columns[idx-1].type=='System.Decimal, System.Private.CoreLib'){   
-                $(this).html('<select id='+idd+' width=\'60\'><option value=\'Sum\' selected=\'selected\'>Sum</option><option value=\'Avg\'> Avg </option></select>');
-            }
-            else
-                $(this).html('');
-        }
-    } );
+    $('#$$$$$$$_tbl tfoot').append( $('#$$$$$$$_tbl thead tr').clone());
+    $('#$$$$$$$_tbl tfoot tr:eq(1) th').each( function (idx) { $(this).children().remove(); $(this).removeClass('sorting'); $(this).append(eb_footer1[idx]); } );
 
     var tfoot = $('#$$$$$$$_tbl tfoot');
     $(tfoot).append($('#$$$$$$$_tbl thead tr').clone());  
@@ -578,8 +578,16 @@ $.get('/ds/columns/#######?format=json', function (data)
 .Replace("@@@@@@@", this.Label)
 .Replace("&&&&&&&", this.GetLengthMenu())
 .Replace("@columnsRender", this.GetCols())
-.Replace("@eb_filter_controls", this.GetFilterControls());
+.Replace("@eb_filter_controls", this.GetFilterControls())
+.Replace("@eb_footer1", this.GetAggregateControls())
+.Replace("@eb_agginfo", this.GetAggregateInfo());
         }
+    }
+
+    public class AggregateInfo
+    {
+        public string colname { get; set; }
+        public string coltype { get; set; }
     }
 
     [ProtoBuf.ProtoContract]
