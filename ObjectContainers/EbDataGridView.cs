@@ -28,9 +28,10 @@ namespace ExpressBase.Objects
                 script += "{";
 
                 script += "'data': " + "(_.find(data.columns, {'columnName': '{0}'})).columnIndex".Replace("{0}", column.Name);
-                script += ",'title': '" + column.Label + "'";
-                script += ",'className': '" + this.GetClassName(column) + "'";
+                script += string.Format(",'title': '{0}<span hidden>{1}</span>'", column.Label, column.Name);
+                script += ",'className': '" + this.GetClassName(column) + "'" ;
                 script += ",'visible': " + (!column.Hidden).ToString().ToLower();
+                script += ",'width': " + column.Width.ToString();
                 script += ",'render': function( data, type, full ) { {0} }".Replace("{0}", this.GetRenderFunc(column));
 
                 script += "},";
@@ -64,6 +65,48 @@ namespace ExpressBase.Objects
                 _r = "return data;";
 
             return _r;
+        }
+
+        public string GetFilterControls()
+        {
+            List<string> _ls = new List<string>();
+
+            foreach (EbDataGridViewColumn column in this.Columns)
+            {
+                var span = string.Format("<span hidden>{0}</span>", column.Name);
+
+                if (column.ColumnType == EbDataGridViewColumnType.Numeric)
+                    _ls.Add(span + string.Format(@"
+<div>
+<select id='{0}' style='width: 38px'>
+    <option value='&lt;'> &lt; </option>
+    <option value='&gt;'> &gt; </option>
+    <option value='=' selected='selected'> = </option>
+    <option value='<='> <= </option>
+    <option value='>='> >= </option>
+    <option value='B'> B </option>
+</select>
+<input type='number' id='{1}' style='width: {2}px; display:inline;' /></div>", "header_select" + column.Name, "header_txt1" + column.Name, column.Width - 38));
+                else if (column.ColumnType == EbDataGridViewColumnType.Text)
+                    _ls.Add(span + string.Format(@"
+<input type='text' id='{0}' style='width: 100%' />", "header_txt1" + column.Name));
+                else if (column.ColumnType == EbDataGridViewColumnType.DateTime)
+                    _ls.Add(span + string.Format(@"
+<div>
+<span style='width: 38px'><select id='{0}' style='width: 100%'>
+    <option value='&lt;'> &lt; </option>
+    <option value='&gt;'> &gt; </option>
+    <option value='=' selected='selected'> = </option>
+    <option value='<='> <= </option>
+    <option value='>='> >= </option>
+    <option value='B'> B </option>
+</select></span>
+<span><input type='date' id='{1}' style='width: 100%' /></span></div>", "header_select" + column.Name, "header_txt1" + column.Name));
+                else
+                    _ls.Add(span);
+            }
+
+            return Newtonsoft.Json.JsonConvert.SerializeObject(_ls);
         }
 
         public EbDataGridView()
@@ -153,6 +196,7 @@ $.get('/ds/columns/#######?format=json', function (data)
     var searchText='';
     var select_collection=[];
     var j=1;
+    var eb_filter_controls = @eb_filter_controls;
     dcolumns = data.columns;
     
     $('#$$$$$$$_tbl').dataTable(
@@ -290,14 +334,9 @@ $.get('/ds/columns/#######?format=json', function (data)
 
    $('div.toolbar').append('<div><button type=\'button\' id=\'$$$$$$$_btnfilter\' style=\'height: 32px;\'>Click Me!</button><button type=\'button\' id=\'$$$$$$$_btntotalpage\' style=\'height: 32px;\'>Page Total!</button></div>');
     
+    // CLONE HEADER to FOOTER AND REMOVE SORT ICONS AND HIDDEN column Name SPAN
     $('#$$$$$$$_tbl tfoot').append( $('#$$$$$$$_tbl thead tr').clone());  
-  
-    $('#$$$$$$$_tbl tfoot tr:eq(0) th').each( function (idx) {
-        var title = $(this).text();
-        if(idx!=0 && idx!=1){                 
-            $(this).html(title);
-        }
-    } );
+    $('#$$$$$$$_tbl tfoot tr:eq(0) th').each( function (idx) { $(this).children().eq(0).children().remove(); } );
     
     $('#$$$$$$$_tbl tfoot').append( $('#$$$$$$$_tbl thead tr').clone()); 
 
@@ -342,47 +381,13 @@ $.get('/ds/columns/#######?format=json', function (data)
     var rgb='';
     var fl='';
 
-    $('#$$$$$$$_tbl thead tr:eq(0) th').each( function (idx) {
-        var title = $(this).text();
-        var idd= 'header_txt1' + title;  
-        var idds='header_select'+title;
-        if(idx!=0 && idx!=1){
-            var t = '<span>' + title + '</span>';
-            $(this).html(t);                           
-        }            
-    });
-
-    $('#$$$$$$$_tbl thead').append( $('#$$$$$$$_tbl thead tr').clone().show());  
+    // FILTER ROW ON HEADER
+    $('#$$$$$$$_tbl thead').append( $('#$$$$$$$_tbl thead tr').clone());  
     $('#$$$$$$$_tbl thead tr:eq(1)').hide();
-
-    $('#$$$$$$$_tbl thead tr:eq(1) th').each( function (idx) {
-        var title = $(this).text();
-        var idd= 'header_txt1' + title;  
-        var idds='header_select'+title;
-        if(idx!=0 && idx!=1){
-            var t = '<span hidden>' + title + '</span>';
-            if(data.columns[idx-1].type=='System.Int32, System.Private.CoreLib'|| data.columns[idx-1].type=='System.Int16, System.Private.CoreLib'){                
-                $(this).html(t+'<select id='+idds+' width=\'30\' style=\' padding-left:5px;display:none;\'><option value=\'<\'> < </option><option value=\' > \'> > </option><option value=\'=\' selected=\'selected\'> = </option><option value=\'<=\'> <= </option><option value=\'>=\'> >= </option><option value=\'B\'> B </option></select><input type=\'number\' id='+idd+' width=\'100\' style=\'display:none;\'/>');                
-            }
-            else if(data.columns[idx-1].type=='System.String, System.Private.CoreLib')
-                $(this).html(t+'<input type=\'text\' id='+idd+' style=\'min-width: 160px;display:none;\'/>');
-            else if(data.columns[idx-1].type=='System.DateTime, System.Private.CoreLib'){
-                $(this).html(t+'<select id='+idds+' width=\'30\' style=\'display:none;\'><option value=\'<\'> < </option><option value=\' > \'> > </option><option value=\' = \' selected=\'selected\'> = </option><option value=\'<=\'> <= </option><option value=\'>=\'> >= </option><option value=\'B\'> B </option></select><input type=\'date\' id='+idd+' width=\'100\' style=\'display:none;\'/>');                
-            }
-            else if(data.columns[idx-1].type=='System.Decimal, System.Private.CoreLib'){                
-                $(this).html(t+'<select id='+idds+' width=\'30\' style=\'display:none;\'><option value=\'<\'> < </option><option value=\' > \'> > </option><option value=\' = \' selected=\'selected\'> = </option><option value=\'<=\'> <= </option><option value=\'>=\'> >= </option><option value=\'B\'> B </option></select><input type=\'number\' id='+idd+' width=\'100\' style=\'display:none;\'/>');               
-            }
-            else
-                $(this).html(t+'');
-        }            
-    });
+    $('#$$$$$$$_tbl thead tr:eq(1) th').each( function (idx) { $(this).children().remove(); $(this).removeClass('sorting'); $(this).append(eb_filter_controls[idx]); });
     
     $('#$$$$$$$_tbl thead tr:eq(0)').on( 'click', 'th', function(event) {
-        if($(this).children().length==0)
-            var headtitle=$(this).text();
-        else
-            var headtitle = $(this).children().eq(0).text();
-        order_colname=headtitle;
+        order_colname = $(this).children().eq(0).children().eq(0).text();
      });
 
      $('#$$$$$$$_tbl thead tr:eq(1) th').on('click','input',function(event) {
@@ -496,15 +501,6 @@ $.get('/ds/columns/#######?format=json', function (data)
             $('#$$$$$$$_tbl thead tr:eq(1)').hide();
         else
             $('#$$$$$$$_tbl thead tr:eq(1)').show();
-        $('#$$$$$$$_tbl thead tr:eq(1) th').each( function (idx) {
-            var title = $(this).children('span').text();
-            var idd1='header_txt1' + title; 
-            var idd2='header_txt2' + title; 
-            var idds='header_select'+title;
-            $('#'+idd1).toggle();  
-            $('#'+idd2).toggle();
-            $('#'+idds).toggle();           
-        });   
     });
 
     $('#$$$$$$$_btntotalpage').click(function(obj){
@@ -569,7 +565,8 @@ $.get('/ds/columns/#######?format=json', function (data)
 .Replace("$$$$$$$", this.Name)
 .Replace("@@@@@@@", this.Label)
 .Replace("&&&&&&&", this.GetLengthMenu())
-.Replace("@columnsRender", this.GetCols());
+.Replace("@columnsRender", this.GetCols())
+.Replace("@eb_filter_controls", this.GetFilterControls());
         }
     }
 
