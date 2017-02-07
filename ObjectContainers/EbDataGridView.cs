@@ -28,9 +28,10 @@ namespace ExpressBase.Objects
                 script += "{";
 
                 script += "'data': " + "(_.find(data.columns, {'columnName': '{0}'})).columnIndex".Replace("{0}", column.Name);
-                script += ",'title': '" + column.Label + "'";
-                script += ",'className': '" + this.GetClassName(column) + "'";
+                script += string.Format(",'title': '{0}<span hidden>{1}</span>'", column.Label, column.Name);
+                script += ",'className': '" + this.GetClassName(column) + "'" ;
                 script += ",'visible': " + (!column.Hidden).ToString().ToLower();
+                script += ",'width': " + column.Width.ToString();
                 script += ",'render': function( data, type, full ) { {0} }".Replace("{0}", this.GetRenderFunc(column));
 
                 script += "},";
@@ -53,17 +54,114 @@ namespace ExpressBase.Objects
             return _c;
         }
 
+        // NEED WORK - Currency from current row, Also Locale en-US
         private string GetRenderFunc(EbDataGridViewColumn column)
         {
             string _r = string.Empty;
 
             if (column.ColumnType == EbDataGridViewColumnType.Numeric)
-                _r = string.Format("return parseFloat(data).toFixed({0});",
-                    (column.ExtendedProperties as EbDataGridViewNumericColumnProperties).DecimalPlaces);
+            {
+                var ext = column.ExtendedProperties as EbDataGridViewNumericColumnProperties;
+
+                if (!ext.Localize)
+                    _r = string.Format("return parseFloat(data).toFixed({0});", ext.DecimalPlaces);
+                else
+                {
+                    if (!ext.IsCurrency)
+                        _r = "return parseFloat(data).toLocaleString('en-US', { maximumSignificantDigits: {0} });".Replace("{0}", ext.DecimalPlaces.ToString());
+                    else
+                        _r = "return parseFloat(data).toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumSignificantDigits: {0} });".Replace("{0}", ext.DecimalPlaces.ToString());
+                }
+            }
             else
                 _r = "return data;";
 
             return _r;
+        }
+
+        public string GetFilterControls()
+        {
+            List<string> _ls = new List<string>();
+
+            foreach (EbDataGridViewColumn column in this.Columns)
+            {
+                var span = string.Format("<span hidden>{0}</span>", column.Name);
+
+                if (column.ColumnType == EbDataGridViewColumnType.Numeric)
+                    _ls.Add(span + string.Format(@"
+<div>
+<select id='{0}' style='width: 38px'>
+    <option value='&lt;'> &lt; </option>
+    <option value='&gt;'> &gt; </option>
+    <option value='=' selected='selected'> = </option>
+    <option value='<='> <= </option>
+    <option value='>='> >= </option>
+    <option value='B'> B </option>
+</select>
+<input type='number' id='{1}' style='width: {2}px; display:inline;' /></div>", "header_select" + column.Name, "header_txt1" + column.Name, column.Width - 38));
+                else if (column.ColumnType == EbDataGridViewColumnType.Text)
+                    _ls.Add(span + string.Format(@"
+<input type='text' id='{0}' style='width: 100%' />", "header_txt1" + column.Name));
+                else if (column.ColumnType == EbDataGridViewColumnType.DateTime)
+                    _ls.Add(span + string.Format(@"
+<div>
+<span style='width: 38px'><select id='{0}' style='width: 100%'>
+    <option value='&lt;'> &lt; </option>
+    <option value='&gt;'> &gt; </option>
+    <option value='=' selected='selected'> = </option>
+    <option value='<='> <= </option>
+    <option value='>='> >= </option>
+    <option value='B'> B </option>
+</select></span>
+<span><input type='date' id='{1}' style='width: 100%' /></span></div>", "header_select" + column.Name, "header_txt1" + column.Name));
+                else
+                    _ls.Add(span);
+            }
+
+            return Newtonsoft.Json.JsonConvert.SerializeObject(_ls);
+        }
+
+        public string GetAggregateControls()
+        {
+            List<string> _ls = new List<string>();
+
+            foreach (EbDataGridViewColumn column in this.Columns)
+            {
+                var ext = column.ExtendedProperties as EbDataGridViewNumericColumnProperties;
+
+                if (column.ColumnType == EbDataGridViewColumnType.Numeric)
+                {
+                    if (ext.Sum || ext.Average)
+                    {
+                        _ls.Add(string.Format(@"<div><select id='{0}' style='width: 38px'>{1}{2}</select>
+                             <input type='text' id='{3}' style='text-align:right;width: 100px;'></div>",
+                            "footer1_select" + column.Name,
+                            (ext.Sum ? "<option value='Sum' selected='selected'>Sum</option>" : string.Empty),
+                            (ext.Average ? "<option value='Avg'>Avg</option>" : string.Empty), "footer1_txt" + column.Name));
+                    }
+                    else
+                        _ls.Add("&nbsp;");
+                }
+                else
+                    _ls.Add("&nbsp;");
+            }
+
+            return Newtonsoft.Json.JsonConvert.SerializeObject(_ls);
+        }
+
+        public string GetAggregateInfo()
+        {
+            List<AggregateInfo> _ls = new List<AggregateInfo>();
+
+            foreach (EbDataGridViewColumn column in this.Columns)
+            {
+                var ext = column.ExtendedProperties as EbDataGridViewNumericColumnProperties;
+
+                if (column.ColumnType == EbDataGridViewColumnType.Numeric && (ext.Sum || ext.Average))
+                    _ls.Add(new AggregateInfo { colname = column.Name, coltype = "N" });
+            }
+
+            return Newtonsoft.Json.JsonConvert.SerializeObject(_ls);
         }
 
         public EbDataGridView()
@@ -153,6 +251,9 @@ $.get('/ds/columns/#######?format=json', function (data)
     var searchText='';
     var select_collection=[];
     var j=1;
+    var eb_filter_controls = @eb_filter_controls;
+    var eb_footer1 = @eb_footer1;
+    var eb_agginfo = @eb_agginfo;
     dcolumns = data.columns;
     
     $('#$$$$$$$_tbl').dataTable(
@@ -244,77 +345,27 @@ $.get('/ds/columns/#######?format=json', function (data)
                 }
             });
          },
-       fnFooterCallback: function ( nRow, aaData, iStart, iEnd, aiDisplay ) {
-            $.each(data.columns,function(j, value) { 
-               if(value.columnName!='id' && (value.type==='System.Decimal, System.Private.CoreLib' || value.type==='System.Int32, System.Private.CoreLib' || value.type==='System.Int16, System.Private.CoreLib')){               
-                    var p=$('#footer1_select'+value.columnName).val();
-                    if(p=='Sum'){
-                        var api = $('#$$$$$$$_tbl').dataTable().api(), data;
-			            var intVal = function ( i ) {
-				            return typeof i === 'number' ? i : 0;
-			            };
-			            pageTotal = api
-				            .column( j+2, { page: 'current'} )
-				            .data()
-				            .reduce( function (a, b) {
-					            return intVal(a) + intVal(b);
-				            }, 0 );
-                    }
-                    if(p=='Avg'){                             
-                        var api = $('#$$$$$$$_tbl').dataTable().api();
-			            var intVal = function ( i ) {
-				            return typeof i === 'number' ? i : 0;
-			            };
-			            pageTotal =api
-				            .column( j+2, { page: 'current'} )
-				            .data()
-				            .reduce( function (a, b) {
-					            return intVal(a) + intVal(b);
-				            }, 0 );
-                        pageTotal=pageTotal / api
-				            .column( j+2, { page: 'current'} )
-				            .data().length;
-                     }
-                    var idd= 'footer1_txt' + value.columnName;   
-                    var k=j+1;              
-                    if ($('#$$$$$$$_tbl tfoot tr:eq(1) th:eq('+k+')').children().length ==2)
-                        ($('#$$$$$$$_tbl tfoot tr:eq(1) th:eq('+k+')').children('input')[0]).value=pageTotal.toFixed(2);
-                    else
-                        $('#$$$$$$$_tbl tfoot tr:eq(1) th:eq('+k+')').append('<input type=\'text\' value='+pageTotal.toFixed(2)+' id='+idd+' style=\'text-align:right;width: 100px;\'>');               
+        fnFooterCallback: function ( nRow, aaData, iStart, iEnd, aiDisplay ) {
+            var api = $('#$$$$$$$_tbl').dataTable().api();
+            $.each(eb_agginfo, function (index,agginfo) {
+                
+                 var p = $('#footer1_select' + agginfo.colname).val();
+                 if (p === 'Sum') {
+                    pageTotal = api.column(5, { page: 'current'} ).data().reduce( function (a, b) { return a + b; }, 0 );
                 }
-                else
-                    $('#$$$$$$$_tbl tfoot tr:eq(1) th:eq('+k+')').html('');
+                alert(pageTotal);
             });
         },
    });
 
    $('div.toolbar').append('<div><button type=\'button\' id=\'$$$$$$$_btnfilter\' style=\'height: 32px;\'>Click Me!</button><button type=\'button\' id=\'$$$$$$$_btntotalpage\' style=\'height: 32px;\'>Page Total!</button></div>');
     
+    // CLONE HEADER to FOOTER AND REMOVE SORT ICONS AND HIDDEN column Name SPAN
     $('#$$$$$$$_tbl tfoot').append( $('#$$$$$$$_tbl thead tr').clone());  
-  
-    $('#$$$$$$$_tbl tfoot tr:eq(0) th').each( function (idx) {
-        var title = $(this).text();
-        if(idx!=0 && idx!=1){                 
-            $(this).html(title);
-        }
-    } );
+    $('#$$$$$$$_tbl tfoot tr:eq(0) th').each( function (idx) { $(this).children().eq(0).children().remove(); } );
     
-    $('#$$$$$$$_tbl tfoot').append( $('#$$$$$$$_tbl thead tr').clone()); 
-
-    $('#$$$$$$$_tbl tfoot tr:eq(1) th').each( function (idx) {
-        var title = $(this).text();
-        var idd='footer1_select'+title;
-        if(idx!=0 && idx!=1){    
-            if(data.columns[idx-1].type=='System.Int32, System.Private.CoreLib'|| data.columns[idx-1].type=='System.Int16, System.Private.CoreLib'){             
-                $(this).html('<select id='+idd+' width=\'60\'><option value=\'Sum\' selected=\'selected\'>Sum</option><option value=\'Avg\'> Avg </option></select>');
-            }
-            else if(data.columns[idx-1].type=='System.Decimal, System.Private.CoreLib'){   
-                $(this).html('<select id='+idd+' width=\'60\'><option value=\'Sum\' selected=\'selected\'>Sum</option><option value=\'Avg\'> Avg </option></select>');
-            }
-            else
-                $(this).html('');
-        }
-    } );
+    $('#$$$$$$$_tbl tfoot').append( $('#$$$$$$$_tbl thead tr').clone());
+    $('#$$$$$$$_tbl tfoot tr:eq(1) th').each( function (idx) { $(this).children().remove(); $(this).removeClass('sorting'); $(this).append(eb_footer1[idx]); } );
 
     var tfoot = $('#$$$$$$$_tbl tfoot');
     $(tfoot).append($('#$$$$$$$_tbl thead tr').clone());  
@@ -342,47 +393,13 @@ $.get('/ds/columns/#######?format=json', function (data)
     var rgb='';
     var fl='';
 
-    $('#$$$$$$$_tbl thead tr:eq(0) th').each( function (idx) {
-        var title = $(this).text();
-        var idd= 'header_txt1' + title;  
-        var idds='header_select'+title;
-        if(idx!=0 && idx!=1){
-            var t = '<span>' + title + '</span>';
-            $(this).html(t);                           
-        }            
-    });
-
-    $('#$$$$$$$_tbl thead').append( $('#$$$$$$$_tbl thead tr').clone().show());  
+    // FILTER ROW ON HEADER
+    $('#$$$$$$$_tbl thead').append( $('#$$$$$$$_tbl thead tr').clone());  
     $('#$$$$$$$_tbl thead tr:eq(1)').hide();
-
-    $('#$$$$$$$_tbl thead tr:eq(1) th').each( function (idx) {
-        var title = $(this).text();
-        var idd= 'header_txt1' + title;  
-        var idds='header_select'+title;
-        if(idx!=0 && idx!=1){
-            var t = '<span hidden>' + title + '</span>';
-            if(data.columns[idx-1].type=='System.Int32, System.Private.CoreLib'|| data.columns[idx-1].type=='System.Int16, System.Private.CoreLib'){                
-                $(this).html(t+'<select id='+idds+' width=\'30\' style=\' padding-left:5px;display:none;\'><option value=\'<\'> < </option><option value=\' > \'> > </option><option value=\'=\' selected=\'selected\'> = </option><option value=\'<=\'> <= </option><option value=\'>=\'> >= </option><option value=\'B\'> B </option></select><input type=\'number\' id='+idd+' width=\'100\' style=\'display:none;\'/>');                
-            }
-            else if(data.columns[idx-1].type=='System.String, System.Private.CoreLib')
-                $(this).html(t+'<input type=\'text\' id='+idd+' style=\'min-width: 160px;display:none;\'/>');
-            else if(data.columns[idx-1].type=='System.DateTime, System.Private.CoreLib'){
-                $(this).html(t+'<select id='+idds+' width=\'30\' style=\'display:none;\'><option value=\'<\'> < </option><option value=\' > \'> > </option><option value=\' = \' selected=\'selected\'> = </option><option value=\'<=\'> <= </option><option value=\'>=\'> >= </option><option value=\'B\'> B </option></select><input type=\'date\' id='+idd+' width=\'100\' style=\'display:none;\'/>');                
-            }
-            else if(data.columns[idx-1].type=='System.Decimal, System.Private.CoreLib'){                
-                $(this).html(t+'<select id='+idds+' width=\'30\' style=\'display:none;\'><option value=\'<\'> < </option><option value=\' > \'> > </option><option value=\' = \' selected=\'selected\'> = </option><option value=\'<=\'> <= </option><option value=\'>=\'> >= </option><option value=\'B\'> B </option></select><input type=\'number\' id='+idd+' width=\'100\' style=\'display:none;\'/>');               
-            }
-            else
-                $(this).html(t+'');
-        }            
-    });
+    $('#$$$$$$$_tbl thead tr:eq(1) th').each( function (idx) { $(this).children().remove(); $(this).removeClass('sorting'); $(this).append(eb_filter_controls[idx]); });
     
     $('#$$$$$$$_tbl thead tr:eq(0)').on( 'click', 'th', function(event) {
-        if($(this).children().length==0)
-            var headtitle=$(this).text();
-        else
-            var headtitle = $(this).children().eq(0).text();
-        order_colname=headtitle;
+        order_colname = $(this).children().eq(0).children().eq(0).text();
      });
 
      $('#$$$$$$$_tbl thead tr:eq(1) th').on('click','input',function(event) {
@@ -496,15 +513,6 @@ $.get('/ds/columns/#######?format=json', function (data)
             $('#$$$$$$$_tbl thead tr:eq(1)').hide();
         else
             $('#$$$$$$$_tbl thead tr:eq(1)').show();
-        $('#$$$$$$$_tbl thead tr:eq(1) th').each( function (idx) {
-            var title = $(this).children('span').text();
-            var idd1='header_txt1' + title; 
-            var idd2='header_txt2' + title; 
-            var idds='header_select'+title;
-            $('#'+idd1).toggle();  
-            $('#'+idd2).toggle();
-            $('#'+idds).toggle();           
-        });   
     });
 
     $('#$$$$$$$_btntotalpage').click(function(obj){
@@ -569,8 +577,17 @@ $.get('/ds/columns/#######?format=json', function (data)
 .Replace("$$$$$$$", this.Name)
 .Replace("@@@@@@@", this.Label)
 .Replace("&&&&&&&", this.GetLengthMenu())
-.Replace("@columnsRender", this.GetCols());
+.Replace("@columnsRender", this.GetCols())
+.Replace("@eb_filter_controls", this.GetFilterControls())
+.Replace("@eb_footer1", this.GetAggregateControls())
+.Replace("@eb_agginfo", this.GetAggregateInfo());
         }
+    }
+
+    public class AggregateInfo
+    {
+        public string colname { get; set; }
+        public string coltype { get; set; }
     }
 
     [ProtoBuf.ProtoContract]
@@ -586,6 +603,8 @@ $.get('/ds/columns/#######?format=json', function (data)
             {
                 if (value == EbDataGridViewColumnType.Numeric)
                     this.ExtendedProperties = new EbDataGridViewNumericColumnProperties();
+                if (value == EbDataGridViewColumnType.DateTime)
+                    this.ExtendedProperties = new EbDataGridViewDateTimeColumnProperties();
                 else
                     this.ExtendedProperties = new EbDataGridViewColumnProperties();
 
@@ -607,6 +626,7 @@ $.get('/ds/columns/#######?format=json', function (data)
 
     [ProtoBuf.ProtoContract]
     [ProtoBuf.ProtoInclude(1, typeof(EbDataGridViewNumericColumnProperties))]
+    [ProtoBuf.ProtoInclude(2, typeof(EbDataGridViewDateTimeColumnProperties))]
     public class EbDataGridViewColumnProperties
     {
 
@@ -617,6 +637,30 @@ $.get('/ds/columns/#######?format=json', function (data)
     {
         [ProtoBuf.ProtoMember(1)]
         public int DecimalPlaces { get; set; }
+
+        [ProtoBuf.ProtoMember(2)]
+        [Description("Comma/delimeter separated localized display of number/value.")]
+        public bool Localize { get; set; }
+
+        [ProtoBuf.ProtoMember(3)]
+        public bool IsCurrency { get; set; }
+
+        [ProtoBuf.ProtoMember(4)]
+        public bool Sum { get; set; }
+
+        [ProtoBuf.ProtoMember(5)]
+        public bool Average { get; set; }
+
+        [ProtoBuf.ProtoMember(6)]
+        public bool Max { get; set; }
+
+        [ProtoBuf.ProtoMember(7)]
+        public bool Min { get; set; }
+    }
+
+    [ProtoBuf.ProtoContract]
+    public class EbDataGridViewDateTimeColumnProperties : EbDataGridViewColumnProperties
+    {
     }
 
     [ProtoBuf.ProtoContract]
