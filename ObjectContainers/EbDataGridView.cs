@@ -603,7 +603,7 @@ $.get('/ds/columns/#######?format=json', function (data)
             {
                 if (value == EbDataGridViewColumnType.Numeric)
                     this.ExtendedProperties = new EbDataGridViewNumericColumnProperties();
-                if (value == EbDataGridViewColumnType.DateTime)
+                else if (value == EbDataGridViewColumnType.DateTime)
                     this.ExtendedProperties = new EbDataGridViewDateTimeColumnProperties();
                 else
                     this.ExtendedProperties = new EbDataGridViewColumnProperties();
