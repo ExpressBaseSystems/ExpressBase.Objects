@@ -199,7 +199,6 @@ namespace ExpressBase.Objects
                 _labelBackColorSerialized = value;
             }
         }
-        //
 
 #if NET462
         [System.ComponentModel.Category("Appearance")]
@@ -227,6 +226,38 @@ namespace ExpressBase.Objects
             }
         }
 
+#if NET462
+        [System.ComponentModel.Category("Layout")]
+        public System.Drawing.Font Font { get; set; }
+#endif
+
+        private ProtoFont _fontSerialized = null;
+        [ProtoBuf.ProtoMember(33)]
+        [Browsable(false)]
+        public ProtoFont FontSerialized
+        {
+            get
+            {
+#if NET462
+                if (this.Font != null)
+                    _fontSerialized = new ProtoFont {
+                        FontFamily = this.Font.FontFamily.Name,
+                        SizeInPoints = this.Font.SizeInPoints,
+                        Style = this.Font.Style.ToString()
+                    };
+#endif
+                return _fontSerialized;
+            }
+            set
+            {
+#if NET462
+                if (_fontSerialized != null)
+                    this.Font = new System.Drawing.Font(_fontSerialized.FontFamily, _fontSerialized.SizeInPoints, _fontSerialized.FontStyle);
+#endif
+                _fontSerialized = value;
+            }
+        }
+
         public EbControl() { }
 
         public virtual string GetHead() { return string.Empty; }
@@ -243,6 +274,36 @@ namespace ExpressBase.Objects
         private string HexConverter(System.Drawing.Color c)
         {
             return "#" + c.R.ToString("X2") + c.G.ToString("X2") + c.B.ToString("X2");
+        }
+#endif
+    }
+
+    [ProtoBuf.ProtoContract()]
+    public class ProtoFont
+    {
+        [ProtoBuf.ProtoMember(1)]
+        public string FontFamily;
+
+        [ProtoBuf.ProtoMember(2)]
+        public float SizeInPoints;
+
+        [ProtoBuf.ProtoMember(3)]
+        public string Style;
+
+#if NET462
+        public System.Drawing.FontStyle FontStyle
+        {
+            get
+            {
+                if (Style == System.Drawing.FontStyle.Bold.ToString())
+                    return System.Drawing.FontStyle.Bold;
+                if (Style == System.Drawing.FontStyle.Italic.ToString())
+                    return System.Drawing.FontStyle.Italic;
+                if (Style == System.Drawing.FontStyle.Underline.ToString())
+                    return System.Drawing.FontStyle.Underline;
+                else
+                    return System.Drawing.FontStyle.Regular;
+            }
         }
 #endif
     }
