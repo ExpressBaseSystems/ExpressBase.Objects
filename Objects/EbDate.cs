@@ -23,7 +23,8 @@ namespace ExpressBase.Objects
 
         private string EbDateTypeString
         {
-            get {
+            get
+            {
                 string returnval = string.Empty;
                 switch (this.EbDateType)
                 {
@@ -36,7 +37,8 @@ namespace ExpressBase.Objects
                     case EbDateType.DateTime:
                         returnval = "datetime";
                         break;
-                } return returnval;
+                }
+                return returnval;
             }
         }
 
@@ -50,7 +52,7 @@ $('#datetimepicker').$$$$$$$picker({
 	stepHour: 1,
 	stepMinute: 1,
 	stepSecond: 1
-});".Replace("$$$$$$$",this.EbDateTypeString);
+});".Replace("$$$$$$$", this.EbDateTypeString);
         }
 
         public override string GetHtml()
