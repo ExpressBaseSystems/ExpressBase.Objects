@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ExpressBase.Data;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -41,6 +42,11 @@ namespace ExpressBase.Objects
 
         [ProtoBuf.ProtoMember(8)]
         public EbReportSectionCollection Details { get; set; }
+
+        [ProtoBuf.ProtoMember(9)]
+        public int EbDataSourceId { get; set; }
+
+        public ColumnColletion ColumnColletion { get; set; }
 
         public EbReportDefinition()
         {
