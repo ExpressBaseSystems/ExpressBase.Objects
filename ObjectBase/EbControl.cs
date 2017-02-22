@@ -66,7 +66,7 @@ namespace ExpressBase.Objects
 
         protected string RequiredString
         {
-            get { return (this.Required ? "$('#{0}').focusout(function() { isRequired(this); });".Replace("{0}", this.Name) : string.Empty); }
+            get { return (this.Required ? "$('#{0}').focusout(function() { isRequired(this); }); $('#{0}Lbl').html( $('#{0}Lbl').text() + '<sup style=\"color: red\">*</sup>') ".Replace("{0}", this.Name) : string.Empty); }
         }
 
         [ProtoBuf.ProtoMember(20)]
@@ -77,6 +77,16 @@ namespace ExpressBase.Objects
         {
             get { return (this.Unique ? "$('#{0}').focusout(function() { isUnique(this); });".Replace("{0}", this.Name) : string.Empty); }
         }
+
+        public static string AttachedLblAddingJS = @"
+$('<div id=\'{0}AttaLbl\' class=\'attachedlabel atchdLblL\'>$</div>').insertBefore($('#{0}').parent()); $('#{0}').addClass('numinputL') 
+$('#{0}AttaLbl').css({'padding':   ( $('#{0}').parent().height()/5 + 1) + 'px' });
+$('#{0}AttaLbl').css({'font-size': ($('#{0}').css('font-size')) });
+if( $('#{0}').css('font-size').replace('px','') < 10 )
+    $('#{0}AttaLbl').css({'height':   ( $('#{0}').parent().height() - ( 10.5 - $('#{0}').css('font-size').replace('px','')) ) + 'px' });  
+else
+    $('#{0}AttaLbl').css({'height':   ( $('#{0}').parent().height()) + 'px' });  
+";
 
 
         [ProtoBuf.ProtoMember(21)]

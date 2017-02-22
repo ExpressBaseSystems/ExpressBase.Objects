@@ -51,7 +51,8 @@ namespace ExpressBase.Objects
 
         public override string GetHead()
         {
-            return ((!this.Hidden) ? this.UniqueString + this.RequiredString : string.Empty) + this.TextTransformString;
+            return (((!this.Hidden) ? this.UniqueString + this.RequiredString : string.Empty) +  @"".Replace("{0}", this.Name)
+        );
         }
 
         private string TextTransformString
@@ -84,10 +85,12 @@ namespace ExpressBase.Objects
         {
             return string.Format(@"
 <div style='position:absolute; left:{1}px; top:{2}px; {8}'>
-<div style='{19} {20}'>{5}</div>
-<div  class='tooltp'><input type='{7}'  name='{0}' id='{0}' {6} style='width:{3}px; height:{4}px; {17} {18} display:inline-block; {21} {10} {9} {13} {14} {15} {16} />
-<div style='display: inline-block;'></div> {11}</div>
-<div class='helpText'> {12} </div>
+    <div style='{19} {20}'>{5}</div>
+    <div  class='tooltp'>
+        <input type='{7}'  name='{0}' id='{0}' {6} style='width:{3}px; height:{4}px; {17} {18} display:inline-block; {21} {10} {9} {13} {14} {15} {16} />
+        <div style='display: inline-block;'></div> {11}
+    </div>
+    <div class='helpText'> {12} </div>
 </div>",
 this.Name, this.Left, this.Top, this.Width, this.Height, this.Label, this.MaxLengthString, this.TextModeString,//7
 this.HiddenString, (this.Required && !this.Hidden ? " required" : string.Empty), this.ReadOnlyString,//10 
