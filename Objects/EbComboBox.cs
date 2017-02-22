@@ -21,6 +21,12 @@ namespace ExpressBase.Objects
         [System.ComponentModel.Category("Layout")]
         public int DropdownHeight { get; set; }
 
+        [ProtoBuf.ProtoMember(5)]
+        public int Value { get; set; }
+
+        [ProtoBuf.ProtoMember(6)]
+        public string Text{ get; set; }
+
         public EbComboBox() { }
 
         public override string GetHead()
@@ -77,13 +83,18 @@ $.get('/ds/columns/#######?format=json', function (data)
     Vobj{0}.toggleDD();
     });
 
-    $('#{0}tbl tbody').on('click', 'td', function(e){
+    $('#{0}tbl tbody').on('dblclick', 'td', function(e){
         var item = $('#{0}tbl').DataTable().cell(this).data();
         if( !(Vobj{0}.options.contains(item)) )
             Vobj{0}.options.push( item );
         else
             Vobj{0}.options.splice(Vobj{0}.options.indexOf(item),1);
     }); 
+
+    $('#{0}tbl tbody').on('dblclick', 'td', function(e){
+        
+    });
+
     
 });
 
@@ -145,9 +156,7 @@ $(document).mouseup(function (e)
         placeholder = 'Search...'>
     </v-select>
     <div v-show='DDstate' class='DDdiv'> 
-        <table id='{0}tbl' class='display'>
-
-        </table>
+        <table id='{0}tbl' class='display'></table>
     </div>
 </div>",
 this.Name, this.Left, this.Top)
