@@ -19,19 +19,40 @@ namespace ExpressBase.Objects
 
         [ProtoBuf.ProtoMember(1)]
         [System.ComponentModel.Category("Behavior")]
-        public EbDateType Type { get; set; }
+        public EbDateType EbDateType { get; set; }
+
+        private string EbDateTypeString
+        {
+            get
+            {
+                string returnval = string.Empty;
+                switch (this.EbDateType)
+                {
+                    case EbDateType.Time:
+                        returnval = "time";
+                        break;
+                    case EbDateType.Date:
+                        returnval = "date";
+                        break;
+                    case EbDateType.DateTime:
+                        returnval = "datetime";
+                        break;
+                }
+                return returnval;
+            }
+        }
 
         public override string GetHead()
         {
             return @"
-$('.date').mask('00/00/0000'); 
-$('#datetimepicker').datepicker({
+$('.date').mask('00:00:00'); 
+$('#datetimepicker').$$$$$$$picker({
     dateFormat: 'y/MM/DD',
-	timeFormat: 'HH:mm:ss:tt',
-	stepHour: 2,
-	stepMinute: 10,
-	stepSecond: 10
-});";
+	timeFormat: 'hh:mm:ss:tt',
+	stepHour: 1,
+	stepMinute: 1,
+	stepSecond: 1
+});".Replace("$$$$$$$", this.EbDateTypeString);
         }
 
         public override string GetHtml()

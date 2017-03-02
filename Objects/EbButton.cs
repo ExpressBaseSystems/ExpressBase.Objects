@@ -16,7 +16,7 @@ namespace ExpressBase.Objects
 
         public override string GetHtml()
         {
-            return string.Format(@"<button id={}>{2}</button>",this.Name, this.Text);
+            return string.Format(@"<button id={0}>{1}</button>",this.Name, this.Text);
         }
     }
 }

@@ -12,8 +12,8 @@ namespace ExpressBase.Objects
     [ProtoBuf.ProtoInclude(2002, typeof(EbChart))]
     [ProtoBuf.ProtoInclude(2003, typeof(EbDataGridViewColumn))]
     [ProtoBuf.ProtoInclude(2004, typeof(EbTextBox))]
-   // [ProtoBuf.ProtoInclude(2005, typeof(EbNumeric))]
-  //  [ProtoBuf.ProtoInclude(2006, typeof(EbDate))]
+    [ProtoBuf.ProtoInclude(2005, typeof(EbNumeric))]
+    [ProtoBuf.ProtoInclude(2006, typeof(EbDate))]
     [ProtoBuf.ProtoInclude(2007, typeof(EbComboBox))]
     [ProtoBuf.ProtoInclude(2008, typeof(EbRadioGroup))]
 #if NET462
@@ -66,7 +66,7 @@ namespace ExpressBase.Objects
 
         protected string RequiredString
         {
-            get { return (this.Required ? "$('#{0}').focusout(function() { isRequired(this); });".Replace("{0}", this.Name) : string.Empty); }
+            get { return (this.Required ? "$('#{0}').focusout(function() { isRequired(this); }); $('#{0}Lbl').html( $('#{0}Lbl').text() + '<sup style=\"color: red\">*</sup>') ".Replace("{0}", this.Name) : string.Empty); }
         }
 
         [ProtoBuf.ProtoMember(20)]
@@ -77,6 +77,16 @@ namespace ExpressBase.Objects
         {
             get { return (this.Unique ? "$('#{0}').focusout(function() { isUnique(this); });".Replace("{0}", this.Name) : string.Empty); }
         }
+
+        public static string AttachedLblAddingJS = @"
+$('<div id=\'{0}AttaLbl\' class=\'attachedlabel atchdLblL\'>$</div>').insertBefore($('#{0}').parent()); $('#{0}').addClass('numinputL') 
+$('#{0}AttaLbl').css({'padding':   ( $('#{0}').parent().height()/5 + 1) + 'px' });
+$('#{0}AttaLbl').css({'font-size': ($('#{0}').css('font-size')) });
+if( $('#{0}').css('font-size').replace('px','') < 10 )
+    $('#{0}AttaLbl').css({'height':   ( $('#{0}').parent().height() - ( 10.5 - $('#{0}').css('font-size').replace('px','')) ) + 'px' });  
+else
+    $('#{0}AttaLbl').css({'height':   ( $('#{0}').parent().height()) + 'px' });  
+";
 
 
         [ProtoBuf.ProtoMember(21)]
@@ -199,7 +209,6 @@ namespace ExpressBase.Objects
                 _labelBackColorSerialized = value;
             }
         }
-        //
 
 #if NET462
         [System.ComponentModel.Category("Appearance")]
@@ -227,6 +236,38 @@ namespace ExpressBase.Objects
             }
         }
 
+#if NET462
+        [System.ComponentModel.Category("Layout")]
+        public System.Drawing.Font Font { get; set; }
+#endif
+
+        private ProtoFont _fontSerialized = null;
+        [ProtoBuf.ProtoMember(33)]
+        [Browsable(false)]
+        public ProtoFont FontSerialized
+        {
+            get
+            {
+#if NET462
+                if (this.Font != null)
+                    _fontSerialized = new ProtoFont {
+                        FontFamily = this.Font.FontFamily.Name,
+                        SizeInPoints = this.Font.SizeInPoints,
+                        Style = this.Font.Style.ToString()
+                    };
+#endif
+                return _fontSerialized;
+            }
+            set
+            {
+#if NET462
+                if (_fontSerialized != null)
+                    this.Font = new System.Drawing.Font(_fontSerialized.FontFamily, _fontSerialized.SizeInPoints, _fontSerialized.FontStyle);
+#endif
+                _fontSerialized = value;
+            }
+        }
+
         public EbControl() { }
 
         public virtual string GetHead() { return string.Empty; }
@@ -243,6 +284,36 @@ namespace ExpressBase.Objects
         private string HexConverter(System.Drawing.Color c)
         {
             return "#" + c.R.ToString("X2") + c.G.ToString("X2") + c.B.ToString("X2");
+        }
+#endif
+    }
+
+    [ProtoBuf.ProtoContract()]
+    public class ProtoFont
+    {
+        [ProtoBuf.ProtoMember(1)]
+        public string FontFamily;
+
+        [ProtoBuf.ProtoMember(2)]
+        public float SizeInPoints;
+
+        [ProtoBuf.ProtoMember(3)]
+        public string Style;
+
+#if NET462
+        public System.Drawing.FontStyle FontStyle
+        {
+            get
+            {
+                if (Style == System.Drawing.FontStyle.Bold.ToString())
+                    return System.Drawing.FontStyle.Bold;
+                if (Style == System.Drawing.FontStyle.Italic.ToString())
+                    return System.Drawing.FontStyle.Italic;
+                if (Style == System.Drawing.FontStyle.Underline.ToString())
+                    return System.Drawing.FontStyle.Underline;
+                else
+                    return System.Drawing.FontStyle.Regular;
+            }
         }
 #endif
     }
