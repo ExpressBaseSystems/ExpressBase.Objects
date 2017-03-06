@@ -25,6 +25,19 @@ namespace ExpressBase.Objects
 
         public EbTableLayout() { }
 
+        public override string GetHead()
+        {
+            string head = string.Empty;
+
+            if (base.Controls != null)
+            {
+                foreach (EbControl ec in base.Controls)
+                    head += ec.GetHead();
+            }
+
+            return head;
+        }
+
         public override string GetHtml()
         {
             //string html = (type == TableLayOutType.Table) ? GetTable() : GetGridStack();

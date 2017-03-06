@@ -19,24 +19,75 @@ namespace ExpressBase.Objects
         [ProtoBuf.ProtoMember(3)]
         public EbDataGridViewColumnCollection Columns { get; set; }
 
+        [ProtoBuf.ProtoMember(4)]
+        public bool HideCheckbox { get; set; }
+
+        [ProtoBuf.ProtoMember(5)]
+        public bool ShowSerial { get; set; }
+
+        [ProtoBuf.ProtoMember(6)]
+        public int ScrollY { get; set; }
+
+        //string script = "[";
+        bool fl = false;
+        bool serial = false;
+
+        public string  GetJclGrip()
+        {
+            string grip = string.Empty;
+            int col = 10;
+            grip = "<div class='JCLRgrips' style='width: 1300px; '>";
+            foreach (EbDataGridViewColumn column in this.Columns)
+            {
+                col =col+column.Width + 1;
+                grip += "<div class='JCLRgrip' style='left: "+col+"px; height: 200px; '><div class='JColResizer'></div></div>";
+               
+            }
+            grip += "<div class='JCLRgrip JCLRLastGrip' style='left: 1301px; height: 81px; '></div></div>";
+            return grip;
+        }
+
         public string GetCols()
         {
             string script = "[";
+            if (this.ShowSerial)
+            {
+                serial = true;
+                script += "{";
+                script += "searchable: false";
+                script += ",orderable: false";
+                script += ",targets: 0";
+                script += "},";
+            }
+            if (!this.HideCheckbox)
+            {
+                //$("input[name='EbDataGridViewControl1_id']:checked")
+                var idd = this.Name + "_select-all";
+                string __chk = string.Format("<input type='checkbox' name='{0}_id' value='@value' data-table='{0}' onclick='updateAlSlct(this)'>", this.Name);
+                fl = true;
+                script += "{";
+                script += "data: null";
+                script += string.Format(",title: \"<input  id='{0}' type='checkbox' onclick='clickAlSlct(event,this);' data-table='{1}'/>\"", idd, this.Name);
+                script += ",width: 10";
+                script += ",render: function( data2, type, row, meta ) { var idpos=(_.find(data.columns, {'columnName': 'id'})).columnIndex; return \"@chk\".replace('@value', row[idpos]); }".Replace("@chk", __chk);
+                script += ",orderable: false";
+                script += "},";
+            }
 
             foreach (EbDataGridViewColumn column in this.Columns)
             {
                 script += "{";
-
-                script += "'data': " + "(_.find(data.columns, {'columnName': '{0}'})).columnIndex".Replace("{0}", column.Name);
-                script += string.Format(",'title': '{0}<span hidden>{1}</span>'", column.Label, column.Name);
-                script += ",'className': '" + this.GetClassName(column) + "'" ;
-                script += ",'visible': " + (!column.Hidden).ToString().ToLower();
-                script += ",'width': " + column.Width.ToString();
-                script += ",'render': function( data, type, full ) { {0} }".Replace("{0}", this.GetRenderFunc(column));
-
+                script += "data: " + "(_.find(data.columns, {'columnName': '{0}'})).columnIndex".Replace("{0}", column.Name);
+                script += string.Format(",title: '{0}<span hidden>{1}</span>'", column.Label, column.Name);
+                script += ",className: '" + this.GetClassName(column) + "'" ;
+                script += ",visible: " + (!column.Hidden).ToString().ToLower();
+                script += ",width: " + column.Width.ToString();
+                script += ",render: function( data, type, row, meta ) { {0} }".Replace("{0}", this.GetRenderFunc(column));
+                script += ",name: '" + column.Name + "'";
                 script += "},";
             }
 
+            //script = script.Insert(1, chkbox);
             return script + "]";
         }
 
@@ -45,11 +96,11 @@ namespace ExpressBase.Objects
             string _c = string.Empty;
 
             if (column.ColumnType == EbDataGridViewColumnType.Text)
-                _c = "dt-left";
+                _c = "dt-body-left";
             else if (column.ColumnType == EbDataGridViewColumnType.Numeric)
-                _c = "dt-right";
+                _c = "dt-body-right";
             else
-                _c = "dt-left";
+                _c = "dt-body-left";
 
             return _c;
         }
@@ -63,15 +114,20 @@ namespace ExpressBase.Objects
             {
                 var ext = column.ExtendedProperties as EbDataGridViewNumericColumnProperties;
 
-                if (!ext.Localize)
-                    _r = string.Format("return parseFloat(data).toFixed({0});", ext.DecimalPlaces);
-                else
+                if (ext != null)
                 {
-                    if (!ext.IsCurrency)
-                        _r = "return parseFloat(data).toLocaleString('en-US', { maximumSignificantDigits: {0} });".Replace("{0}", ext.DecimalPlaces.ToString());
+                    if (!ext.Localize)
+                        _r = string.Format("return parseFloat(data).toFixed({0});", ext.DecimalPlaces);
                     else
-                        _r = "return parseFloat(data).toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumSignificantDigits: {0} });".Replace("{0}", ext.DecimalPlaces.ToString());
+                    {
+                        if (!ext.IsCurrency)
+                            _r = "return parseFloat(data).toLocaleString('en-US', { maximumSignificantDigits: {0} });".Replace("{0}", ext.DecimalPlaces.ToString());
+                        else
+                            _r = "return parseFloat(data).toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumSignificantDigits: {0} });".Replace("{0}", ext.DecimalPlaces.ToString());
+                    }
                 }
+                else
+                    _r = "return data;";
             }
             else
                 _r = "return data;";
@@ -82,15 +138,28 @@ namespace ExpressBase.Objects
         public string GetFilterControls()
         {
             List<string> _ls = new List<string>();
-
+            if(fl==true)
+             _ls.Add("&nbsp;");
+            if (serial == true)
+                _ls.Add("&nbsp;");
             foreach (EbDataGridViewColumn column in this.Columns)
             {
                 var span = string.Format("<span hidden>{0}</span>", column.Name);
 
+                string htext_class = string.Format("{0}_htext", this.Name);
+
+                string data_colum = string.Format("data-colum='{0}'", column.Name);
+                string data_table = string.Format("data-table='{0}'", this.Name);
+
+                string header_select = string.Format("{0}_{1}_hdr_sel", this.Name, column.Name);
+                string header_text1 = string.Format("{0}_{1}_hdr_txt1", this.Name, column.Name);
+                string header_text2 = string.Format("{0}_{1}_hdr_txt2", this.Name, column.Name);
+
                 if (column.ColumnType == EbDataGridViewColumnType.Numeric)
+                {
                     _ls.Add(span + string.Format(@"
 <div>
-<select id='{0}' style='width: 38px'>
+<select id='{0}' style='width: 38px' onchange='call_filter_selchange(event,this);'>
     <option value='&lt;'> &lt; </option>
     <option value='&gt;'> &gt; </option>
     <option value='=' selected='selected'> = </option>
@@ -98,22 +167,27 @@ namespace ExpressBase.Objects
     <option value='>='> >= </option>
     <option value='B'> B </option>
 </select>
-<input type='number' id='{1}' style='width: {2}px; display:inline;' /></div>", "header_select" + column.Name, "header_txt1" + column.Name, column.Width - 38));
+<input type='number' id='{1}' style='width: {2}px; display:inline;' onkeypress='call_filter(event, this);' class='{3}' {4} {5}/>
+<input type='number' id='{6}' style='width: {2}px; display:inline; visibility: hidden' onkeypress='call_filter(event, this);' class='{3}' {4} {5}/></div>", 
+header_select, header_text1, column.Width - 38, htext_class, data_colum, data_table, header_text2));
+                }
                 else if (column.ColumnType == EbDataGridViewColumnType.Text)
                     _ls.Add(span + string.Format(@"
-<input type='text' id='{0}' style='width: 100%' />", "header_txt1" + column.Name));
+<div><input type='text' id='{0}' style='width: 100%' onKeyPress='filter_func()' /></div>", header_text1));
                 else if (column.ColumnType == EbDataGridViewColumnType.DateTime)
                     _ls.Add(span + string.Format(@"
 <div>
-<span style='width: 38px'><select id='{0}' style='width: 100%'>
+<select id='{0}' style='width: 38px' onchange='call_filter_selchange(event,this);'>
     <option value='&lt;'> &lt; </option>
     <option value='&gt;'> &gt; </option>
     <option value='=' selected='selected'> = </option>
     <option value='<='> <= </option>
     <option value='>='> >= </option>
     <option value='B'> B </option>
-</select></span>
-<span><input type='date' id='{1}' style='width: 100%' /></span></div>", "header_select" + column.Name, "header_txt1" + column.Name));
+</select>
+<input type='date' id='{1}' style='width: {2}px; display:inline;' onkeypress='call_filter(event, this);' class='{3}' {4} {5} />
+<input type='date' id='{6}' style='width: {2}px; display:inline; visibility: hidden' onkeypress='call_filter(event, this);' class='{3}' {4} {5} /></div>", 
+header_select, header_text1, column.Width - 38, htext_class, data_colum, data_table, header_text2));
                 else
                     _ls.Add(span);
             }
@@ -121,23 +195,42 @@ namespace ExpressBase.Objects
             return Newtonsoft.Json.JsonConvert.SerializeObject(_ls);
         }
 
-        public string GetAggregateControls()
+        public string GetAggregateControls(int footer_id)
         {
             List<string> _ls = new List<string>();
-
+            if (fl == true)
+                _ls.Add("&nbsp;");
+            if(serial==true)
+                _ls.Add("&nbsp;");
             foreach (EbDataGridViewColumn column in this.Columns)
             {
                 var ext = column.ExtendedProperties as EbDataGridViewNumericColumnProperties;
 
-                if (column.ColumnType == EbDataGridViewColumnType.Numeric)
+                string footer_select_id = string.Format("{0}_{1}_ftr_sel{2}", this.Name, column.Name, footer_id);
+                string fselect_class = string.Format("{0}_fselect", this.Name);
+
+                string data_colum = string.Format("data-column='{0}'", column.Name);
+                string data_table = string.Format("data-table='{0}'", this.Name);
+                string data_decip = string.Format("data-decip={0}", (ext != null) ? ext.DecimalPlaces : 0);
+
+                string footer_txt = string.Format("{0}_{1}_ftr_txt{2}", this.Name, column.Name, footer_id);
+
+                if (ext != null)
                 {
-                    if (ext.Sum || ext.Average)
+                    if (column.ColumnType == EbDataGridViewColumnType.Numeric)
                     {
-                        _ls.Add(string.Format(@"<div><select id='{0}' style='width: 38px'>{1}{2}</select>
-                             <input type='text' id='{3}' style='text-align:right;width: 100px;'></div>",
-                            "footer1_select" + column.Name,
-                            (ext.Sum ? "<option value='Sum' selected='selected'>Sum</option>" : string.Empty),
-                            (ext.Average ? "<option value='Avg'>Avg</option>" : string.Empty), "footer1_txt" + column.Name));
+                        if (ext.Sum || ext.Average)
+                        {
+                            _ls.Add(string.Format(@"<div><input type='text' id='{0}' style='text-align:right;float: right;width: 100px;' disabled>
+                                <select id='{1}' class='{4}' {5} {6} {7} onchange='fselect_func(this);' style='width: 38px;'>{2}{3}</select></div>",
+                                footer_txt, footer_select_id,
+                                (ext.Sum ? "<option value='Sum' selected='selected'>Sum</option>" : string.Empty),
+                                (ext.Average ? "<option value='Avg'>Avg</option>" : string.Empty), 
+                                fselect_class, 
+                                data_table, data_colum, data_decip));
+                        }
+                        else
+                            _ls.Add("&nbsp;");
                     }
                     else
                         _ls.Add("&nbsp;");
@@ -148,7 +241,7 @@ namespace ExpressBase.Objects
 
             return Newtonsoft.Json.JsonConvert.SerializeObject(_ls);
         }
-
+        
         public string GetAggregateInfo()
         {
             List<AggregateInfo> _ls = new List<AggregateInfo>();
@@ -157,12 +250,38 @@ namespace ExpressBase.Objects
             {
                 var ext = column.ExtendedProperties as EbDataGridViewNumericColumnProperties;
 
-                if (column.ColumnType == EbDataGridViewColumnType.Numeric && (ext.Sum || ext.Average))
-                    _ls.Add(new AggregateInfo { colname = column.Name, coltype = "N" });
+                if (ext != null)
+                {
+                    if (column.ColumnType == EbDataGridViewColumnType.Numeric && (ext.Sum || ext.Average))
+                        _ls.Add(new AggregateInfo { colname = column.Name, coltype = "N" , deci_val=ext.DecimalPlaces });
+                }
             }
 
             return Newtonsoft.Json.JsonConvert.SerializeObject(_ls);
         }
+
+        //public List<string> GetDecimal()
+        //{
+        //    List<string> _ls = new List<string>();
+        //    //string[] str = new string[];
+        //    foreach (EbDataGridViewColumn column in this.Columns)
+        //    {
+        //        var ext = column.ExtendedProperties as EbDataGridViewNumericColumnProperties;
+        //        if (ext != null)
+        //        {
+        //            if (column.ColumnType == EbDataGridViewColumnType.Numeric)
+        //            {
+        //                if (ext.DecimalPlaces > 0)
+        //                    _ls.Add(ext.DecimalPlaces.ToString());
+        //                else
+        //                    _ls.Add("&nbsp;");
+        //            }
+        //        }
+
+        //    }
+        //    return _ls;
+        //}
+
 
         public EbDataGridView()
         {
@@ -195,6 +314,19 @@ namespace ExpressBase.Objects
             return sLengthMenu;
         }
 
+        private string GetScrollYOption()
+        {
+            return (this.ScrollY > 0) ? string.Format("scrollY: '{0}'", this.ScrollY) : "fixedHeader: { footer: true }";
+        }
+
+        public override string GetHead()
+        {
+            return @"
+$('#@tableId_tbl').append( $('<tfoot/>') );"
+.Replace("@tableId", this.Name);
+             
+        }
+
         public override string GetHtml()
         {
             return @"
@@ -204,7 +336,6 @@ namespace ExpressBase.Objects
     height:auto;
     border:solid 1px;
     display:inline-block;
-    overflow-x:auto;
     padding:1px;
 }
 .loadingdiv {
@@ -225,362 +356,161 @@ td.details-control {
 tr.details td.details-control {
     background: url('http://findicons.com/files/icons/2583/sweetieplus/24/badge_square_minus_24_ns.png') no-repeat center center;
 }
+table.dataTable.stripe tbody > tr.odd.selected, table.dataTable.stripe tbody > tr.odd > .selected, table.dataTable.display tbody > tr.odd.selected, table.dataTable.display tbody > tr.odd > .selected {
+    background-color: #fbfbfb!important;
+}
+table.dataTable.stripe tbody > tr.even.selected, table.dataTable.stripe tbody > tr.even > .selected, table.dataTable.display tbody > tr.even.selected, table.dataTable.display tbody > tr.even > .selected {
+    background-color: #ffffff!important;
+}
+#@tableId_tbl th.resizing {
+    cursor: e-resize;
+}
+.dataTables_scrollBody
+{
+ overflow-x:hidden !important;
+}
+td.resizer {
+  position: absolute;
+  top: 0;
+  right: -8px;
+  bottom: 0;
+  left: auto;
+  width: 16px;    
+  cursor: e-resize;   
+    background-color:red;    
+}
+
 </style>
-    <div class='tablecontainer'>
-        <div style='width:auto; border:solid 1px yellow;'>
+    <div class='tablecontainer' id='@tableId_container'>
+        <div>
+            <button type='button' id='@tableId_btnfilter' style='height: 32px;' onclick='showOrHideFilter(this,@scrolly);' data-table='@tableId'>Click Me!</button>
+            <button type='button' id='@tableId_btntotalpage' style='height: 32px;display: none;' onClick='showOrHideAggrControl(this,@scrolly);' data-table='@tableId'>Page Total!</button>
+        </div>
+        <div style='width:auto;'>
               
-                    <h3>@@@@@@@</h3>
-               <div id='$$$$$$$_loadingdiv' class='loadingdiv'>
-                    <img id='$$$$$$$_loading-image' src='/images/ajax-loader.gif' alt='Loading...' />
+                    <h3>@tableViewName</h3>
+               <div id='@tableId_loadingdiv' class='loadingdiv'>
+                    <img id='@tableId_loading-image' src='/images/ajax-loader.gif' alt='Loading...' />
                </div>
-               <table id='$$$$$$$_tbl' style=' border:solid 1px red;' class='display compact'></table>
+               
+               <table id='@tableId_tbl' class='display nowrap'></table>
           </div>
      </div>
+
 <script>
-$('#$$$$$$$_tbl').append( $('<tfoot/>') );
-$('#$$$$$$$_loadingdiv').show();
-var pageTotal=0;   
-var dcolumns = [];
-$.get('/ds/columns/#######?format=json', function (data)
+
+$('#@tableId_loadingdiv').show();
+$.get('/ds/columns/@dataSourceId?format=json', function (data)
 {
-    var ids=[];
-    var cols = [];
-    var searchTextCollection=[];
-    var search_colnameCollection=[];
-    var order_colname='';
-    var searchText='';
-    var select_collection=[];
-    var j=1;
-    var eb_filter_controls = @eb_filter_controls;
-    var eb_footer1 = @eb_footer1;
-    var eb_agginfo = @eb_agginfo;
-    dcolumns = data.columns;
-    
-    $('#$$$$$$$_tbl').dataTable(
+    var @tableId_ids=[];
+    var @tableId_filter_objcol = [];
+    var @tableId_order_colname='';
+    var @tableId__datacolumns = data.columns;
+    $('#@tableId_tbl').DataTable(
     {
-        dom: 'l <\'toolbar\'> Bfrtip',
-        buttons: ['copy', 'excel', 'pdf'],
+        dom:'Blftrip',
+        @scrollYOption,
+        keys: true,
         autoWidth: false,
-        &&&&&&&,
+        @lengthMenu,
         serverSide: true,
-        processing: true,
+        processing:true,
         language: { processing: '<div></div><div></div><div></div><div></div><div></div><div></div><div></div>'},
         columns:@columnsRender, 
         order: [],
         deferRender: true,
-        select: {
-            style: 'os',
-            selector: 'td:not(:last-child)' // no row selection on last column
-        },
+        filter: true,
+        select: { style: 'os', selector: 'td:first-child' },
+        buttons: ['colvis'],
         ajax: {
-            url: '/ds/data/#######?format=json',
+            url: '/ds/data/@dataSourceId?format=json',
             data: function(dq) { 
-                    delete dq.columns; 
-                    if(search_colnameCollection.length!==0){
-                        dq.search_col='';
-                        $.each(search_colnameCollection,function(i, value) {
-                            if(dq.search_col=='')
-                                dq.search_col=value;
-                            else
-                                dq.search_col=dq.search_col+','+value;
-                        });
-                    }   
-                    if(order_colname!=='')
-                        dq.order_col=order_colname; 
-                    if(searchTextCollection.length!=0){
-                        dq.searchtext='';
-                        $.each(searchTextCollection,function(i, value) {
-                            if(dq.searchtext=='')
-                                dq.searchtext=value;
-                            else
-                                dq.searchtext=dq.searchtext+','+value;
-                        });              
-                    }
-                    if(select_collection.length!=0){
-                        dq.selectedvalue='';
-                        $.each(select_collection,function(i, value) {
-                            if(dq.selectedvalue=='')
-                                dq.selectedvalue=value;
-                            else
-                                dq.selectedvalue=dq.selectedvalue+','+value;
-                        });              
-                    }
+                    delete dq.columns;
+                    @tableId_filter_objcol = repopulate_filter_arr('@tableId');
+                    if (@tableId_filter_objcol.length !== 0)
+                    {
+                        dq.search_col = @tableId_filter_objcol.map(function(a) {return a.column;}).join(',');
+                        dq.selectedvalue = @tableId_filter_objcol.map(function(a) {return a.operator;}).join(',');
+                        dq.searchtext = @tableId_filter_objcol.map(function(a) {return a.value;}).join(',');
+                    }  
+
+                    if(@tableId_order_colname!=='')
+                        dq.order_col=@tableId_order_colname; 
                 },
             dataSrc: function(dd) {return dd.data; }
         },
-        fnRowCallback: function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
-             $.each(data.columns,function(i, value) { 
-                if(value.columnName==='sys_row_color'){
-                    rgb=(aData[value.columnIndex]).toString();
-                    var r=rgb.slice(0,-6);
-                    r=parseInt(r);
-                    if(r<=9)
-                        fl='0';
-                    r=r.toString(16);
-                    if(fl==='0')
-                        r='0'+r;
-
-                    var g=rgb.slice(3,-3);
-                    g=parseInt(g);
-                    if(g<=9)
-                        fl='0';
-                    g=g.toString(16);
-                    if(fl==='0')
-                        g='0'+g;
-                    var b=rgb.slice(6,9);
-                    b=parseInt(b);
-                    if(b<=9)
-                        fl='0';
-                    b=b.toString(16);
-                    if(fl==='0')
-                        b='0'+b;
-                    rgb=r+g+b;
-                    //alert(rgb);
-                     $(nRow).css('background-color', '#' + rgb);
-                }
-                if(value.columnName==='sys_cancelled'){
-                    var tr=aData[value.columnIndex];
-                    if(tr==true)
-                        $(nRow).css('color', '#f00');
-                }
-            });
-         },
-        fnFooterCallback: function ( nRow, aaData, iStart, iEnd, aiDisplay ) {
-            var api = $('#$$$$$$$_tbl').dataTable().api();
-            $.each(eb_agginfo, function (index,agginfo) {
-                
-                 var p = $('#footer1_select' + agginfo.colname).val();
-                 if (p === 'Sum') {
-                    pageTotal = api.column(5, { page: 'current'} ).data().reduce( function (a, b) { return a + b; }, 0 );
-                }
-                alert(pageTotal);
-            });
-        },
-   });
-
-   $('div.toolbar').append('<div><button type=\'button\' id=\'$$$$$$$_btnfilter\' style=\'height: 32px;\'>Click Me!</button><button type=\'button\' id=\'$$$$$$$_btntotalpage\' style=\'height: 32px;\'>Page Total!</button></div>');
-    
-    // CLONE HEADER to FOOTER AND REMOVE SORT ICONS AND HIDDEN column Name SPAN
-    $('#$$$$$$$_tbl tfoot').append( $('#$$$$$$$_tbl thead tr').clone());  
-    $('#$$$$$$$_tbl tfoot tr:eq(0) th').each( function (idx) { $(this).children().eq(0).children().remove(); } );
-    
-    $('#$$$$$$$_tbl tfoot').append( $('#$$$$$$$_tbl thead tr').clone());
-    $('#$$$$$$$_tbl tfoot tr:eq(1) th').each( function (idx) { $(this).children().remove(); $(this).removeClass('sorting'); $(this).append(eb_footer1[idx]); } );
-
-    var tfoot = $('#$$$$$$$_tbl tfoot');
-    $(tfoot).append($('#$$$$$$$_tbl thead tr').clone());  
-    $('#$$$$$$$_tbl tfoot tr:eq(2)').hide();
-
-    $('#$$$$$$$_tbl tfoot tr:eq(2) th').each( function (idx) {
-        var idd= 'footer2_txt' + $(this).text();
-        var idds= 'footer2_select' + $(this).text();
-        var t='<span hidden>'+$(this).text()+'</span>'
-        if(idx!=0 && idx!=1){
-            if(data.columns[idx-1].type=='System.Int32, System.Private.CoreLib'|| data.columns[idx-1].type=='System.Int16, System.Private.CoreLib'){
-                $(this).html(t+'<select id='+idds+' width=\'60\' style=\'display:none;\'><option value=\'Sum\' selected=\'selected\'>Sum</option><option value=\'Avg\'> Avg </option></select><input type=\'text\' id='+idd+' style=\'width: 100px;display:none;\' />');
-                //alert($(this).text());
-            }
-            else if(data.columns[idx-1].type=='System.Decimal, System.Private.CoreLib'){                
-                $(this).html(t+'<select id='+idds+' width=\'60\' style=\'display:none;\'><option value=\'Sum\' selected=\'selected\'>Sum</option><option value=\'Avg\'> Avg </option></select><input type=\'text\' id='+idd+' style=\'width: 100px;display:none;\' />');               
-            }
-            else
-                $(this).html('');
-        }
-    } );
         
-    $('#$$$$$$$_loadingdiv').hide();
+        fnRowCallback: function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
+            colorRow(nRow, aData, iDisplayIndex, iDisplayIndexFull, data.columns);
+        },
 
-    var rgb='';
-    var fl='';
+        fnFooterCallback: function ( nRow, aaData, iStart, iEnd, aiDisplay ) {
+            summarize2(nRow, aaData, iStart, iEnd, aiDisplay, '@tableId', @eb_agginfo);
+        },
+       
+        //drawCallback: function ( settings ) {
+        //    var api = this.api();
+        //    var rows = api.rows( { page: 'current'} ).nodes();
+        //    var last = null;
+            
+        //    api.column(3, { page: 'current'} ).data().each(function(group, i) {
+        //        if (last !== group)
+        //        {
+        //            $(rows).eq(i).before(
+        //                '<tr class=\'group\'><td colspan=\'8\'>' + group + '</td></tr>'
+        //            );
 
-    // FILTER ROW ON HEADER
-    $('#$$$$$$$_tbl thead').append( $('#$$$$$$$_tbl thead tr').clone());  
-    $('#$$$$$$$_tbl thead tr:eq(1)').hide();
-    $('#$$$$$$$_tbl thead tr:eq(1) th').each( function (idx) { $(this).children().remove(); $(this).removeClass('sorting'); $(this).append(eb_filter_controls[idx]); });
-    
-    $('#$$$$$$$_tbl thead tr:eq(0)').on( 'click', 'th', function(event) {
-        order_colname = $(this).children().eq(0).children().eq(0).text();
-     });
-
-     $('#$$$$$$$_tbl thead tr:eq(1) th').on('click','input',function(event) {
-        event.stopPropagation();
-     }); 
-
-    $('#$$$$$$$_tbl thead tr:eq(1) th').on('click','select',function(event) {
-        event.stopPropagation();
-     }); 
-
-    $('#$$$$$$$_tbl thead tr:eq(1) th input').keypress(function (e) {
-        //alert($(this).siblings('span').text());
-        searchTextCollection=[];
-        search_colnameCollection=[];
-        select_collection=[];
-         if(e.which == 13){            
-            $('#$$$$$$$_tbl thead tr th input').each( function (idx) {
-                if($(this).val()!=''){
-                    if($.inArray($(this).siblings('span').text(), search_colnameCollection) == -1){
-                        searchTextCollection.push($(this).val());
-                        search_colnameCollection.push($(this).siblings('span').text());
-                        if($(this).prev('select').length==1){
-                            if($(this).prev('select').val()=='B'){
-                                if($(this).next().val()!=''){
-                                    searchTextCollection.splice( $.inArray($(this).val(),searchTextCollection) ,1 );
-                                    searchTextCollection.push($(this).val()+'@'+$(this).next().val());
-                                }
-                            }
-                            select_collection.push($(this).prev('select').val());
-                        }
-                        else
-                            select_collection.push('null');
-                    }
-                }
-            });
-        }
-     });
-
-    $('#$$$$$$$_tbl thead tr:eq(1) th select').on('change',function(e){
-        var idd='header_txt2'+$(this).siblings('span').text();
-        if($(this).val()=='B'){
-           if($(this).next('input').attr('type') == 'date')
-                $(this).next().after($('<input type=\'date\'id='+idd+' style=\'min-width: 160px;\'/>'));
-           else
-                $(this).next().after($('<input type=\'number\'id='+idd+' style=\'min-width: 160px;\'/>'));
-        }
-        else
-           $(this).next().next().remove();
+        //            last = group;
+        //        }
+        //    } );
+        //}
     });
 
+    $.fn.dataTable.Api.register( 'column().data().sum()', function () {
+        return this.reduce( function (a, b) { return a + b; } );
+    } );
 
-    $('#$$$$$$$_tbl tbody').on('click', '.checkbox', function(event){        
-       if (document.getElementById(event.target.id).checked) {           
-            var row = $(this).closest('tr');
-            var data = $('#$$$$$$$_tbl').dataTable().fnGetData(row);
-            ids.push(data[0]);
-        }
-        else {
-            var row = $(this).closest('tr');
-            var data = $('#$$$$$$$_tbl').dataTable().fnGetData(row);
-            ids.splice(ids.indexOf(data[0]),1);
-        }        
-    });
+    $.fn.dataTable.Api.register( 'column().data().average()', function () {
+        var sum= this.reduce( function (a, b) { return a + b; } );
+        return sum/this.length;
+    } );
 
-    $('#$$$$$$$_tbl tfoot tr:eq(1) th select').on('change',function(e){
-        $.each(data.columns,function(j, value) {
-            if(e.target.id=='footer1_select'+value.columnName){
-                var p=e.target.value;                                
-                if(p=='Sum'){
-                    var api = $('#$$$$$$$_tbl').dataTable().api();
-			        var intVal = function ( i ) {
-				        return typeof i === 'number' ? i : 0;
-			        };
-			        pageTotal =api
-				        .column( j+2, { page: 'current'} )
-                        .data()
-				        .reduce( function (a, b) {
-					        return intVal(a) + intVal(b);
-				        }, 0 );                                        
-                }
-                if(p=='Avg'){                                   
-                    var api = $('#$$$$$$$_tbl').dataTable().api();
-			        var intVal = function ( i ) {
-				        return typeof i === 'number' ? i : 0;
-			        };
-			        pageTotal =api
-				        .column( j+2, { page: 'current'} )
-				        .data()
-				        .reduce( function (a, b) {
-					        return intVal(a) + intVal(b);
-				        }, 0 );
-                    pageTotal=pageTotal / api
-				        .column( j+2, { page: 'current'} )
-				        .data().length;
-                }   
-                var k=j+1;            
-                ($('#$$$$$$$_tbl tfoot tr:eq(1) th:eq('+k+')').children('input')[0]).value=pageTotal.toFixed(2);                
-            }
-        });
-     }); 
-
-    $('#$$$$$$$_tbl tfoot tr:eq(2) th select').on('change',function(e){alert('haa');
-        $.each(data.columns,function(j, value) {
-            if(e.target.id=='footer2_select'+value.columnName){             
-            }
-        });
-     }); 
-
-    $('#$$$$$$$_btnfilter').click(function(obj){
-        if ($('#$$$$$$$_tbl thead tr:eq(1)').is(':visible'))
-            $('#$$$$$$$_tbl thead tr:eq(1)').hide();
-        else
-            $('#$$$$$$$_tbl thead tr:eq(1)').show();
-    });
-
-    $('#$$$$$$$_btntotalpage').click(function(obj){
-        if ($('#$$$$$$$_tbl tfoot tr:eq(2)').is(':visible'))
-            $('#$$$$$$$_tbl tfoot tr:eq(2)').hide();
-        else
-            $('#$$$$$$$_tbl tfoot tr:eq(2)').show();
-        $('#$$$$$$$_tbl tfoot tr:eq(2) th').each( function (idx) {
-            var title = $(this).children('span').text();
-            var idd= 'footer2_txt' + title;
-            var idds= 'footer2_select' + title;
-            $('#'+idd).toggle(); 
-            $('#'+idds).toggle();           
-        });   
-    });
-
-    function format ( d ) {
-        var tbl='';
-        $.each(data.columns,function(j, value) {
-            if(value.columnName=='xid')
-                tbl+='XID:'+d[value.columnIndex]+'</br>'
-        });
-        return tbl;
+    if( @eb_agginfo.length>0 ) {
+        createFooter('@tableId', @eb_footer1, @scrolly, 0);
+        createFooter('@tableId', @eb_footer2, @scrolly, 1);
     }
-    // Array to track the ids of the details displayed rows
-    var detailRows = [];
- 
-    $('#$$$$$$$_tbl tbody').on( 'click', 'tr td.details-control', function () {
-        var tr = $(this).closest('tr');
-        var row = $('#$$$$$$$_tbl').DataTable().row( tr );
-        var idx = $.inArray( tr.attr('id'), detailRows );
- 
-        if ( row.child.isShown() ) {
-            tr.removeClass( 'details' );
-            row.child.hide();
- 
-            // Remove from the 'open' array
-            detailRows.splice( idx, 1 );
-        }
-        else {
-            tr.addClass( 'details' );
-            row.child( format( row.data() ) ).show();
- 
-            // Add to the 'open' array
-            if ( idx === -1 ) {
-                detailRows.push( tr.attr('id') );
-            }
-        }
-    } );
- 
-    // On each draw, loop over the `detailRows` array and show any child rows
-    $('#$$$$$$$_tbl').DataTable().on( 'draw', function () {
-        $.each( detailRows, function ( i, id ) {
-            $('#'+id+' td.details-control').trigger( 'click' );
+
+    $('#@tableId_loadingdiv').hide();
+
+    createFilterRowHeader('@tableId', @eb_filter_controls, @scrolly);
+
+    $('#@tableId_container thead').on('click','th',function(){
+        var txt=$(this).children().children('span').text();
+        if(txt !== '')
+            @tableId_order_colname =txt;
+    });
+
+    if(@bserial){
+        $('#@tableId_tbl').DataTable().on( 'draw.dt', function () {
+            $('#@tableId_tbl').DataTable().column(0).nodes().each( function (cell, i) {
+                cell.innerHTML = i+1;
+            } );
         } );
-    } );
-
+    }
 });
-
 </script>
-".Replace("#######", this.DataSourceId.ToString().Trim())
-.Replace("$$$$$$$", this.Name)
-.Replace("@@@@@@@", this.Label)
-.Replace("&&&&&&&", this.GetLengthMenu())
+".Replace("@dataSourceId", this.DataSourceId.ToString().Trim())
+.Replace("@tableId", this.Name)
+.Replace("@tableViewName", this.Label)
+.Replace("@lengthMenu", this.GetLengthMenu())
 .Replace("@columnsRender", this.GetCols())
 .Replace("@eb_filter_controls", this.GetFilterControls())
-.Replace("@eb_footer1", this.GetAggregateControls())
-.Replace("@eb_agginfo", this.GetAggregateInfo());
+.Replace("@eb_footer1", this.GetAggregateControls(1))
+.Replace("@eb_footer2", this.GetAggregateControls(2))
+.Replace("@eb_agginfo", this.GetAggregateInfo())
+.Replace("@bserial", this.serial.ToString().ToLower())
+.Replace("@scrolly", this.ScrollY.ToString())
+.Replace("@scrollYOption", this.GetScrollYOption());
         }
     }
 
@@ -588,6 +518,7 @@ $.get('/ds/columns/#######?format=json', function (data)
     {
         public string colname { get; set; }
         public string coltype { get; set; }
+        public int deci_val{ get; set;}
     }
 
     [ProtoBuf.ProtoContract]
@@ -666,5 +597,18 @@ $.get('/ds/columns/#######?format=json', function (data)
     [ProtoBuf.ProtoContract]
     public class EbDataGridViewColumnCollection : ObservableCollection<EbDataGridViewColumn>
     {
+        public EbDataGridViewColumn this[string columnName]
+        {
+            get
+            {
+                foreach (EbDataGridViewColumn col in this)
+                {
+                    if (col.Name == columnName)
+                        return col;
+                }
+
+                return null;
+            }
+        }
     }
 }
