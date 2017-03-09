@@ -28,9 +28,9 @@ namespace ExpressBase.Objects
         [ProtoBuf.ProtoMember(6)]
         public int ScrollY { get; set; }
 
-        //string script = "[";
         bool fl = false;
         bool serial = false;
+        int colCount=0;
 
         public string  GetJclGrip()
         {
@@ -58,6 +58,7 @@ namespace ExpressBase.Objects
                 script += ",orderable: false";
                 script += ",targets: 0";
                 script += "},";
+                colCount++;
             }
             if (!this.HideCheckbox)
             {
@@ -72,6 +73,7 @@ namespace ExpressBase.Objects
                 script += ",render: function( data2, type, row, meta ) { var idpos=(_.find(data.columns, {'columnName': 'id'})).columnIndex; return \"@chk\".replace('@value', row[idpos]); }".Replace("@chk", __chk);
                 script += ",orderable: false";
                 script += "},";
+                colCount++;
             }
 
             foreach (EbDataGridViewColumn column in this.Columns)
@@ -82,12 +84,12 @@ namespace ExpressBase.Objects
                 script += ",className: '" + this.GetClassName(column) + "'" ;
                 script += ",visible: " + (!column.Hidden).ToString().ToLower();
                 script += ",width: " + column.Width.ToString();
-                script += ",render: function( data, type, row, meta ) { {0} }".Replace("{0}", this.GetRenderFunc(column));
+                script += ",render: " + this.GetRenderFunc(column);
                 script += ",name: '" + column.Name + "'";
                 script += "},";
+                colCount++;
             }
 
-            //script = script.Insert(1, chkbox);
             return script + "]";
         }
 
@@ -109,6 +111,7 @@ namespace ExpressBase.Objects
         private string GetRenderFunc(EbDataGridViewColumn column)
         {
             string _r = string.Empty;
+            string _fwrapper = "function( data, type, row, meta ) { {0} }";
 
             if (column.ColumnType == EbDataGridViewColumnType.Numeric)
             {
@@ -128,9 +131,13 @@ namespace ExpressBase.Objects
                 }
                 else
                     _r = "return data;";
+
+                _r = _fwrapper.Replace("{0}", _r);
             }
+            else if(column.ColumnType == EbDataGridViewColumnType.DateTime)
+                _r = _fwrapper.Replace("{0}", "return moment.unix(data).format('MM/DD/YYYY');");
             else
-                _r = "return data;";
+                _r = _fwrapper.Replace("{0}", "return data;");
 
             return _r;
         }
@@ -166,6 +173,8 @@ namespace ExpressBase.Objects
     <option value='<='> <= </option>
     <option value='>='> >= </option>
     <option value='B'> B </option>
+
+
 </select>
 <input type='number' id='{1}' style='width: {2}px; display:inline;' onkeypress='call_filter(event, this);' class='{3}' {4} {5}/>
 <input type='number' id='{6}' style='width: {2}px; display:inline; visibility: hidden' onkeypress='call_filter(event, this);' class='{3}' {4} {5}/></div>", 
@@ -173,7 +182,7 @@ header_select, header_text1, column.Width - 38, htext_class, data_colum, data_ta
                 }
                 else if (column.ColumnType == EbDataGridViewColumnType.Text)
                     _ls.Add(span + string.Format(@"
-<div><input type='text' id='{0}' style='width: 100%' onKeyPress='filter_func()' /></div>", header_text1));
+<div><input type='text' id='{0}'  onKeyPress='call_filter(event, this);' /></div>", header_text1));
                 else if (column.ColumnType == EbDataGridViewColumnType.DateTime)
                     _ls.Add(span + string.Format(@"
 <div>
@@ -260,29 +269,6 @@ header_select, header_text1, column.Width - 38, htext_class, data_colum, data_ta
             return Newtonsoft.Json.JsonConvert.SerializeObject(_ls);
         }
 
-        //public List<string> GetDecimal()
-        //{
-        //    List<string> _ls = new List<string>();
-        //    //string[] str = new string[];
-        //    foreach (EbDataGridViewColumn column in this.Columns)
-        //    {
-        //        var ext = column.ExtendedProperties as EbDataGridViewNumericColumnProperties;
-        //        if (ext != null)
-        //        {
-        //            if (column.ColumnType == EbDataGridViewColumnType.Numeric)
-        //            {
-        //                if (ext.DecimalPlaces > 0)
-        //                    _ls.Add(ext.DecimalPlaces.ToString());
-        //                else
-        //                    _ls.Add("&nbsp;");
-        //            }
-        //        }
-
-        //    }
-        //    return _ls;
-        //}
-
-
         public EbDataGridView()
         {
             this.Columns = new EbDataGridViewColumnCollection();
@@ -319,12 +305,23 @@ header_select, header_text1, column.Width - 38, htext_class, data_colum, data_ta
             return (this.ScrollY > 0) ? string.Format("scrollY: '{0}'", this.ScrollY) : "fixedHeader: { footer: true }";
         }
 
+        public string GetFooter()
+        {
+            string ftr = string.Empty;
+            ftr = "<tfoot>";
+            for (int i = 0; i < colCount; i++)
+                ftr += "<th></th>";
+            ftr += "<tr>";
+            for (int i = 0; i < colCount; i++)
+                ftr += "<th></th>";
+            ftr += "</tr>";
+            ftr += "</tfoot>";
+            return ftr;
+        }
+
         public override string GetHead()
         {
-            return @"
-$('#@tableId_tbl').append( $('<tfoot/>') );"
-.Replace("@tableId", this.Name);
-             
+            return @"";
         }
 
         public override string GetHtml()
@@ -334,7 +331,6 @@ $('#@tableId_tbl').append( $('<tfoot/>') );"
 .tablecontainer {
     width:100%;
     height:auto;
-    border:solid 1px;
     display:inline-block;
     padding:1px;
 }
@@ -365,10 +361,7 @@ table.dataTable.stripe tbody > tr.even.selected, table.dataTable.stripe tbody > 
 #@tableId_tbl th.resizing {
     cursor: e-resize;
 }
-.dataTables_scrollBody
-{
- overflow-x:hidden !important;
-}
+
 td.resizer {
   position: absolute;
   top: 0;
@@ -379,11 +372,24 @@ td.resizer {
   cursor: e-resize;   
     background-color:red;    
 }
+::-webkit-scrollbar {
+   width: 8px;
+   height:8px;
+}
 
+::-webkit-scrollbar-track {
+   -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+   border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+   border-radius: 8px;
+   -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
+}
 </style>
     <div class='tablecontainer' id='@tableId_container'>
         <div>
-            <button type='button' id='@tableId_btnfilter' style='height: 32px;' onclick='showOrHideFilter(this,@scrolly);' data-table='@tableId'>Click Me!</button>
+            <a class='btn btn-default' onclick='showOrHideFilter(this,@scrolly);' data-table='@tableId' data-toggle='tooltip' title='On\/Off Filter'><i class='fa fa-filter' aria-hidden='true'></i></a>
             <button type='button' id='@tableId_btntotalpage' style='height: 32px;display: none;' onClick='showOrHideAggrControl(this,@scrolly);' data-table='@tableId'>Page Total!</button>
         </div>
         <div style='width:auto;'>
@@ -398,8 +404,8 @@ td.resizer {
      </div>
 
 <script>
-
 $('#@tableId_loadingdiv').show();
+$('#@tableId_tbl').append( $('@tfoot') );
 $.get('/ds/columns/@dataSourceId?format=json', function (data)
 {
     var @tableId_ids=[];
@@ -410,6 +416,7 @@ $.get('/ds/columns/@dataSourceId?format=json', function (data)
     {
         dom:'Blftrip',
         @scrollYOption,
+        scrollX : true,
         keys: true,
         autoWidth: false,
         @lengthMenu,
@@ -447,7 +454,11 @@ $.get('/ds/columns/@dataSourceId?format=json', function (data)
         fnFooterCallback: function ( nRow, aaData, iStart, iEnd, aiDisplay ) {
             summarize2(nRow, aaData, iStart, iEnd, aiDisplay, '@tableId', @eb_agginfo);
         },
-       
+        drawCallback:function ( settings ) {
+            $('.dataTables_scrollHeadInner').css({'width':'100%'})
+            $('.table').css({'width':'100%'});
+            $('#@tableId_tbl').DataTable().columns.adjust();
+        }
         //drawCallback: function ( settings ) {
         //    var api = this.api();
         //    var rows = api.rows( { page: 'current'} ).nodes();
@@ -497,9 +508,13 @@ $.get('/ds/columns/@dataSourceId?format=json', function (data)
             } );
         } );
     }
+
+    $('#@tableId_container [type=search]').on( 'keyup', function () {alert('haa');
+        $('#@tableId_tbl').DataTable().search( 'food' ).draw();
+    } );
 });
-</script>
-".Replace("@dataSourceId", this.DataSourceId.ToString().Trim())
+</script>"
+.Replace("@dataSourceId", this.DataSourceId.ToString().Trim())
 .Replace("@tableId", this.Name)
 .Replace("@tableViewName", this.Label)
 .Replace("@lengthMenu", this.GetLengthMenu())
@@ -510,7 +525,8 @@ $.get('/ds/columns/@dataSourceId?format=json', function (data)
 .Replace("@eb_agginfo", this.GetAggregateInfo())
 .Replace("@bserial", this.serial.ToString().ToLower())
 .Replace("@scrolly", this.ScrollY.ToString())
-.Replace("@scrollYOption", this.GetScrollYOption());
+.Replace("@scrollYOption", this.GetScrollYOption())
+.Replace("@tfoot", this.GetFooter());
         }
     }
 
