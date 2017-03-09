@@ -92,7 +92,6 @@ namespace ExpressBase.Objects
             }
         }
 
-
         public EbComboBox() { }
 
         public override string GetHead()
@@ -123,15 +122,13 @@ function InitDT(){
                     if(value.columnName=='{4}')
                         VMindex = value.columnIndex;
                     $.each(DMembers,function(j, v) {
-				        if(value.columnName== v){
+				        if(value.columnName== v)
                             DMindexes.push(value.columnIndex);
-                        }
 			        });
                     if(value.columnName=='{5}')
                         DMindex = value.columnIndex;
-                    if(value.columnIndex==0){                   
+                    if(value.columnIndex==0)                 
                         cols.push({'data':null, 'render': function ( data, type, row ) {return '<input type=\'checkbox\'>'}});                
-                    }
                     switch(value.type){
                         case 'System.Int32, System.Private.CoreLib': _c='dt-right'; break;
                         case 'System.Decimal, System.Private.CoreLib':_c='dt-right'; break;
@@ -181,20 +178,15 @@ function InitDT(){
 					                dq.searchtext=dq.searchtext+','+value;
 			                });              
 		                }
-
                         if(Msearch_colName!=='')
                             dq.Msearch_colName=Msearch_colName;
 	            },
                 dataSrc: function(dd) {
                                 $('#{0}_loading-image').hide();
-
-                                setTimeout(function(){
-                                     Vobj{0}.updateCk();
-                                },1);
-
-                                return dd.data; }
-                        }
-        
+                                setTimeout(function(){ Vobj{0}.updateCk(); },1);
+                                return dd.data;
+                }
+            } 
        });
       
         //delayed search on combo searchbox
@@ -203,28 +195,21 @@ function InitDT(){
                         var search = $(this).val().toString();
                         if(search.trim()!==''&& DtFlag){
                             if( !search.startsWith('*') && !search.endsWith('*') ){
-                                if('{10}'==='BeginingWithKeyword'){
+                                if('{10}'==='BeginingWithKeyword')
                                     search = search +'%';
-                                }
-                                else if('{10}'==='EndingWithKeyword'){
+                                else if('{10}'==='EndingWithKeyword')
                                     search = '%'+search;
-                                }
-                                else if('{10}'==='ExactMatch'){
+                                else if('{10}'==='ExactMatch')
                                     search = search;
-                                }
-                                else if('{10}'==='Contains'){
+                                else if('{10}'==='Contains')
                                     search = '%'+search+'%';
-                                }
                             }
-                            else if(search.startsWith('*') && !search.endsWith('*')){
+                            else if(search.startsWith('*') && !search.endsWith('*'))
                                 search = '%'+search.slice(1);
-                            }
-                            else if(!search.startsWith('*') && search.endsWith('*')){
+                            else if(!search.startsWith('*') && search.endsWith('*'))
                                 search = search.slice(0, -1)+'%';
-                            }
-                            else if(search.startsWith('*') && search.endsWith('*')){
+                            else if(search.startsWith('*') && search.endsWith('*'))
                                 search = '%'+search.slice(1, -1)+'%';
-                            }
                             Msearch_colName=DMembers[e.target.id.replace('{0}srch','') - 1];
                             $('#{0}tbl').DataTable().search(search).draw();
                             $('#{0}_loading-image').show();
@@ -241,15 +226,11 @@ function InitDT(){
                     Vobj{0}.displayMember.push( Dmember );
                     Vobj{0}.valueMember.push( Vmember );
                     $(this).find('[type=checkbox]').prop('checked', true);
-    
                     $.each(DMindexes,function(i,v){
                             eval( 'Vobj{0}.displayMember'+ (i+1) +'.push( $(\'#{0}tbl\').DataTable().row(self).data()[v] );');
                     });
-
                 }
             });
-
-        
 
         //checkbox click event
              $( '#{0}tbl tbody').on('click', 'input[type=\'checkbox\']', function(event){
@@ -267,18 +248,15 @@ function InitDT(){
                     $.each(DMindexes,function(i,v){
                             eval( 'Vobj{0}.displayMember'+ (i+1) +'.push(datas[v]);');
                     });
-
                 }
                else {
                     Vobj{0}.displayMember.splice(Vobj{0}.displayMember.indexOf(datas[DMindex]),1);
                     Vobj{0}.valueMember.splice(Vobj{0}.valueMember.indexOf(datas[VMindex]),1);
-
                     $.each(DMindexes,function(i,v){
                             eval( 'Vobj{0}.displayMember'+ (i+1) +'.splice(Vobj{0}.displayMember'+ (i+1) +'.indexOf(datas[v]),1);');
                     });
                 }  
             });
-
 
         //hiding v-select native DD
             $( '#{0}container [class=expand]').css('display', 'none');	
@@ -315,11 +293,9 @@ function InitDT(){
                             Vobj{0}.displayMember.push( Dmember );
                             Vobj{0}.valueMember.push( Vmember );
                             $(cellTr).find('[type=checkbox]').prop('checked', true);
-
                             $.each(DMindexes,function(i,v){
                                 eval( 'Vobj{0}.displayMember'+ (i+1) +'.push( $(\'#{0}tbl\').DataTable().row($(cellTr)).data()[v] );');
                             });
-
                         }
                     }
              });
@@ -331,22 +307,18 @@ function InitDT(){
                         $(this).css('outline', 'none');
                         $(this).css('padding', '3px 2px');
                         $(this).css('background-color', '#fafffa');
-
                         var title = $(this).text();
 				        var idd= 'header_txt1' + title;  
 					        var t = '<span hidden>' + title + '</span>';
                             if(idx!==0){
-					            if(data.columns[idx].type=='System.Int32, System.Private.CoreLib'|| data.columns[idx].type=='System.Int16, System.Private.CoreLib'){                
+					            if(data.columns[idx].type=='System.Int32, System.Private.CoreLib'|| data.columns[idx].type=='System.Int16, System.Private.CoreLib')                
 						            $(this).html(t+'<input type=\'number\' id='+idd+' style=\'width: 100%\'/>');                
-					            }
 					            else if(data.columns[idx].type=='System.String, System.Private.CoreLib')
 						            $(this).html(t+'<input type=\'text\' id='+idd+'/>');
-					            else if(data.columns[idx].type=='System.DateTime, System.Private.CoreLib'){
+					            else if(data.columns[idx].type=='System.DateTime, System.Private.CoreLib')
 						            $(this).html(t+'<input type=\'date\' id='+idd+' style=\'width: 100%\'>');                
-					            }
-					            else if(data.columns[idx].type=='System.Decimal, System.Private.CoreLib'){                
+					            else if(data.columns[idx].type=='System.Decimal, System.Private.CoreLib')
 						            $(this).html(t+'<input type=\'number\' id='+idd+' style=\'width: 100%\'/>');               
-					            }
 					            else
 						            $(this).html(t+'');
                             }
@@ -366,9 +338,7 @@ function InitDT(){
                         }
                     });			
                     $('#{0}tbl').DataTable().ajax.reload();
-                                setTimeout(function(){
-                                     Vobj{0}.updateCk();
-                                },1);
+                    setTimeout(function(){ Vobj{0}.updateCk(); },1);
                 }
             });
 
@@ -379,7 +349,6 @@ function InitDT(){
                     order_colname =txt;
                 $('#{0}tbl').DataTable().draw();
             });
-	       
     });
 }
 
@@ -395,56 +364,52 @@ var Vobj{0} = new Vue({
                 },
                 watch: {
                         valueMember: function (val) {
-                            if( {6}===1 && !{8} && val.length >1){
-                                this.valueMember = this.valueMember.splice( 1, 1);
-                                this.displayMember = this.displayMember.splice( 1, 1);
-                            }
-                            else 
-                                if(val.length > {6}){
-                                    this.valueMember = this.valueMember.splice( 0, {6});
-                                    this.displayMember = this.displayMember.splice( 0, {6});
+                            //single select
+                                if({6}===1 && !{8} && val.length >1){
+                                    this.valueMember = this.valueMember.splice( 1, 1);
+                                    $.each(DMindexes,function(i,v){
+                                            eval( 'Vobj{0}.displayMember'+ (i+1) +'= Vobj{0}.displayMember'+ (i+1) +'.splice( 1, 1);');
+                                    });
+                                }
+                            //max limit
+                                else if(val.length > {6}){
+                                    Vobj{0}.valueMember = Vobj{0}.valueMember.splice( 0, {6});
+                                    $.each(DMindexes,function(i,v){
+                                        eval( 'Vobj{0}.displayMember'+ (i+1) +'= Vobj{0}.displayMember'+ (i+1) +'.splice( 0, {6});');
+                                    });
                                 }
                         }
                 },
                 methods: {
                     toggleDD: function(){
                             this.DDstate=!this.DDstate;  
-                            setTimeout(function(){
-                                $('#{0}container table:eq(0)').css('width', $( '#{0}container table:eq(1)').css('width') );
-                            },20);
+                            setTimeout(function(){ $('#{0}container table:eq(0)').css('width', $( '#{0}container table:eq(1)').css('width') ); },20);
                     },
                     showDD: function(){
-                            if(!DtFlag){
-                                   DtFlag = true;
-                                   InitDT();
-                            }
+                            if(!DtFlag){ DtFlag = true; InitDT(); }
                             this.DDstate=true;
-                            setTimeout(function(){
-                                $('#{0}container table:eq(0)').css('width', $( '#{0}container table:eq(1)').css('width') );
-                            },20);
+                            setTimeout(function(){ $('#{0}container table:eq(0)').css('width', $( '#{0}container table:eq(1)').css('width') ); },20);
                     },
-                    hideDD: function(){
-                            this.DDstate=false;  
-                    },
+                    hideDD: function(){ this.DDstate=false; },
                     updateCk: function(){
                             $( '#{0}container table:eq(1) tbody [type=checkbox]').each(function(i) {
                                 var row = $(this).closest('tr');
                                 var datas = $('#{0}tbl').DataTable().row(row).data();
-                                if( Vobj{0}.displayMember.contains(datas[DMindex]) ){
+                                if( Vobj{0}.valueMember.contains(datas[VMindex]) )
                                     $(this).prop('checked', true);
-                                }
-                                else{
+                                else
                                     $(this).prop('checked', false);
-                                }
 			                });  
                             // raise error msg
                             setTimeout(function(){
-                                if(Vobj{0}.valueMember.length!==Vobj{0}.displayMember.length)
+                                if(Vobj{0}.valueMember.length!==Vobj{0}.displayMember1.length){
                                     alert('valueMember and displayMember length miss match found !!!!');
+                                    console.log('valueMember=' + Vobj{0}.valueMember );
+                                    console.log('displayMember1=' + Vobj{0}.displayMember1);
+                                }
                             },30);
                     }
                 }
-
 });
 
 //set id for searchBox
@@ -468,7 +433,6 @@ var Vobj{0} = new Vue({
                 $.each(DMindexes,function(i,v){
                         eval( 'Vobj{0}.displayMember'+ (i+1) +'.pop();');
                 });
-
             }
             if( e.which===40 ){
         	    Vobj{0}.showDD();
@@ -492,11 +456,10 @@ var Vobj{0} = new Vue({
 
 //remove ids when tagclose button clicked
      $( '#{0}container [class= close').live('click', function(){
-                    Vobj{0}.valueMember.splice( delid(), 1);
-                    $.each(DMindexes,function(i,v){
-                            eval( 'Vobj{0}.displayMember'+ (i+1) +'.splice( delid(), 1);');
-                    });
-
+        Vobj{0}.valueMember.splice( delid(), 1);
+        $.each(DMindexes,function(i,v){
+                eval( 'Vobj{0}.displayMember'+ (i+1) +'.splice( delid(), 1);');
+        });
     });
 
 //hide DD when click outside select or DD &  required ( if  not reach minLimit) 
@@ -513,7 +476,6 @@ var Vobj{0} = new Vue({
                         document.getElementById('{0}srch0').setCustomValidity('This field  is required');
                     else
                         document.getElementById('{0}srch0').setCustomValidity('');
-
         }
     });  
 "
@@ -528,12 +490,8 @@ var Vobj{0} = new Vue({
 .Replace("{9}", this.Required.ToString().ToLower())
 .Replace("{10}", this.DefaultSearchFor.ToString())
 .Replace("{11}", "['acmaster1_name', 'tdebit', 'tcredit']")
-.Replace("{12}", this.VueDMcode);
-            
-           
+.Replace("{12}", this.VueDMcode);   
         }
-
-
         public override string GetHtml()
         {
             return @"
@@ -543,12 +501,9 @@ var Vobj{0} = new Vue({
     </script>
                
    <div id='{0}container' style='position:absolute; left:{1}px;  top:{2}px;'>
-
         {5}
-
     <div id='{0}_loadingdiv' class='tbl-loadingdiv'>
-                <i id='{0}_loading-image' class='fa fa-spinner fa-pulse fa-2x fa-fw'></i>
-                <span class='sr-only'>Loading...</span>
+        <i id='{0}_loading-image' class='fa fa-spinner fa-pulse fa-2x fa-fw'></i><span class='sr-only'>Loading...</span>
     </div>
     <center><div id='{0}DDdiv'v-show='DDstate' class='DDdiv'  style='width:{4}px;'> 
         <table id='{0}tbl' tabindex='1000' class='display'></table>
