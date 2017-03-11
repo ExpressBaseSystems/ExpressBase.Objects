@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace ExpressBase.Objects
@@ -32,20 +33,20 @@ namespace ExpressBase.Objects
         bool serial = false;
         int colCount=0;
 
-        public string  GetJclGrip()
-        {
-            string grip = string.Empty;
-            int col = 10;
-            grip = "<div class='JCLRgrips' style='width: 1300px; '>";
-            foreach (EbDataGridViewColumn column in this.Columns)
-            {
-                col =col+column.Width + 1;
-                grip += "<div class='JCLRgrip' style='left: "+col+"px; height: 200px; '><div class='JColResizer'></div></div>";
+        //public string  GetJclGrip()
+        //{
+        //    string grip = string.Empty;
+        //    int col = 10;
+        //    grip = "<div class='JCLRgrips' style='width: 1300px; '>";
+        //    foreach (EbDataGridViewColumn column in this.Columns)
+        //    {
+        //        col =col+column.Width + 1;
+        //        grip += "<div class='JCLRgrip' style='left: "+col+"px; height: 200px; '><div class='JColResizer'></div></div>";
                
-            }
-            grip += "<div class='JCLRgrip JCLRLastGrip' style='left: 1301px; height: 81px; '></div></div>";
-            return grip;
-        }
+        //    }
+        //    grip += "<div class='JCLRgrip JCLRLastGrip' style='left: 1301px; height: 81px; '></div></div>";
+        //    return grip;
+        //}
 
         public string GetCols()
         {
@@ -144,64 +145,53 @@ namespace ExpressBase.Objects
 
         public string GetFilterControls()
         {
-            List<string> _ls = new List<string>();
-            if(fl==true)
-             _ls.Add("&nbsp;");
-            if (serial == true)
-                _ls.Add("&nbsp;");
+            List<string> _lsRet = new List<string>();
+
+            if (fl == true) _lsRet.Add("<th>&nbsp;</th>");
+            if (serial == true) _lsRet.Add("<th>&nbsp;</th>");
+
+            StringBuilder _ls = new StringBuilder();
+
             foreach (EbDataGridViewColumn column in this.Columns)
             {
-                var span = string.Format("<span hidden>{0}</span>", column.Name);
+                _ls.Clear();
 
-                string htext_class = string.Format("{0}_htext", this.Name);
-
-                string data_colum = string.Format("data-colum='{0}'", column.Name);
-                string data_table = string.Format("data-table='{0}'", this.Name);
-
-                string header_select = string.Format("{0}_{1}_hdr_sel", this.Name, column.Name);
-                string header_text1 = string.Format("{0}_{1}_hdr_txt1", this.Name, column.Name);
-                string header_text2 = string.Format("{0}_{1}_hdr_txt2", this.Name, column.Name);
-
-                if (column.ColumnType == EbDataGridViewColumnType.Numeric)
+                if (!column.Hidden)
                 {
-                    _ls.Add(span + string.Format(@"
-<div>
-<select id='{0}' style='width: 38px' onchange='call_filter_selchange(event,this);'>
-    <option value='&lt;'> &lt; </option>
-    <option value='&gt;'> &gt; </option>
-    <option value='=' selected='selected'> = </option>
-    <option value='<='> <= </option>
-    <option value='>='> >= </option>
-    <option value='B'> B </option>
+                    var span = string.Format("<span hidden>{0}</span>", column.Name);
 
+                    string htext_class = string.Format("{0}_htext", this.Name);
 
-</select>
-<input type='number' id='{1}' style='width: {2}px; display:inline;' onkeypress='call_filter(event, this);' class='{3}' {4} {5}/>
-<input type='number' id='{6}' style='width: {2}px; display:inline; visibility: hidden' onkeypress='call_filter(event, this);' class='{3}' {4} {5}/></div>", 
-header_select, header_text1, column.Width - 38, htext_class, data_colum, data_table, header_text2));
+                    string data_colum = string.Format("data-colum='{0}'", column.Name);
+                    string data_table = string.Format("data-table='{0}'", this.Name);
+
+                    string header_select = string.Format("{0}_{1}_hdr_sel", this.Name, column.Name);
+                    string header_text1 = string.Format("{0}_{1}_hdr_txt1", this.Name, column.Name);
+                    string header_text2 = string.Format("{0}_{1}_hdr_txt2", this.Name, column.Name);
+
+                    _ls.Append("<td style='padding: 0px; margin: 0px'>");
+
+                    if (column.ColumnType == EbDataGridViewColumnType.Numeric)
+                        _ls.Append(span + getFilterForNumeric(header_text1, header_select, data_table, htext_class, data_colum, header_text2));
+                    else if (column.ColumnType == EbDataGridViewColumnType.Text)
+                        _ls.Append(span + getFilterForString(header_text1, header_select, data_table, htext_class, data_colum));
+                    else if (column.ColumnType == EbDataGridViewColumnType.DateTime)
+                        _ls.Append(span + getFilterForDateTime(header_text1, header_select, data_table, htext_class, data_colum, header_text2));
+                    else
+                        _ls.Append(span);
+
+                    _ls.Append("</th>");
                 }
-                else if (column.ColumnType == EbDataGridViewColumnType.Text)
-                    _ls.Add(span + string.Format(@"
-<div><input type='text' id='{0}'  onKeyPress='call_filter(event, this);' /></div>", header_text1));
-                else if (column.ColumnType == EbDataGridViewColumnType.DateTime)
-                    _ls.Add(span + string.Format(@"
-<div>
-<select id='{0}' style='width: 38px' onchange='call_filter_selchange(event,this);'>
-    <option value='&lt;'> &lt; </option>
-    <option value='&gt;'> &gt; </option>
-    <option value='=' selected='selected'> = </option>
-    <option value='<='> <= </option>
-    <option value='>='> >= </option>
-    <option value='B'> B </option>
-</select>
-<input type='date' id='{1}' style='width: {2}px; display:inline;' onkeypress='call_filter(event, this);' class='{3}' {4} {5} />
-<input type='date' id='{6}' style='width: {2}px; display:inline; visibility: hidden' onkeypress='call_filter(event, this);' class='{3}' {4} {5} /></div>", 
-header_select, header_text1, column.Width - 38, htext_class, data_colum, data_table, header_text2));
                 else
-                    _ls.Add(span);
+                    _ls.Append("<th style='display:none'>&nbsp;</th>");
+
+                _lsRet.Add(_ls.ToString());
             }
 
-            return Newtonsoft.Json.JsonConvert.SerializeObject(_ls);
+            _ls.Clear();
+            _ls = null;
+
+            return Newtonsoft.Json.JsonConvert.SerializeObject(_lsRet);
         }
 
         public string GetAggregateControls(int footer_id)
@@ -230,13 +220,24 @@ header_select, header_text1, column.Width - 38, htext_class, data_colum, data_ta
                     {
                         if (ext.Sum || ext.Average)
                         {
-                            _ls.Add(string.Format(@"<div><input type='text' id='{0}' style='text-align:right;float: right;width: 100px;' disabled>
-                                <select id='{1}' class='{4}' {5} {6} {7} onchange='fselect_func(this);' style='width: 38px;'>{2}{3}</select></div>",
-                                footer_txt, footer_select_id,
-                                (ext.Sum ? "<option value='Sum' selected='selected'>Sum</option>" : string.Empty),
-                                (ext.Average ? "<option value='Avg'>Avg</option>" : string.Empty), 
-                                fselect_class, 
-                                data_table, data_colum, data_decip));
+                            _ls.Add(string.Format(@"
+<div class='input-group'>
+    <div class='input-group-btn'>
+        <button type='button' class='btn btn-default dropdown-toggle' data-toggle='dropdown' id='{1}'> Sum </button>
+        <ul class='dropdown-menu'>
+          <li ><a href ='#' onclick='fselect_func(this);' {2} {3} {4}>Sum</a></li>
+          <li><a href ='#' onclick='fselect_func(this);' {2} {3} {4}>Avg</a></li>
+        </ul>
+    </div>
+    <input type='text' class='form-control' id='{0}' disabled {2}  {3}>
+</div>", footer_txt, footer_select_id, data_table, data_colum, data_decip));
+                            //_ls.Add(string.Format(@"<div><input type='text' id='{0}' style='text-align:right;float: right;width: 100px;' disabled>
+                            //    <select id='{1}' class='{4}' {5} {6} {7} onchange='fselect_func(this);' style='width: 38px;'>{2}{3}</select></div>",
+                            //    footer_txt, footer_select_id,
+                            //    (ext.Sum ? "<option value='Sum' selected='selected'>Sum</option>" : string.Empty),
+                            //    (ext.Average ? "<option value='Avg'>Avg</option>" : string.Empty), 
+                            //    fselect_class, 
+                            //    data_table, data_colum, data_decip));
                         }
                         else
                             _ls.Add("&nbsp;");
@@ -319,6 +320,73 @@ header_select, header_text1, column.Width - 38, htext_class, data_colum, data_ta
             return ftr;
         }
 
+        public string getFilterForNumeric( string header_text1,string header_select, string data_table,string htext_class,string data_colum,string header_text2)
+        {
+            string drptext = string.Empty;
+            drptext = string.Format(@"
+<div class='input-group'>
+    <div class='input-group-btn'>
+        <button type='button' class='btn btn-default dropdown-toggle' data-toggle='dropdown' id='{4}'> = </button>
+        <ul class='dropdown-menu'>
+          <li ><a href ='#' onclick='setLiValue(this);' {1} {3}>=</a></li>
+          <li><a href ='#' onclick='setLiValue(this);' {1} {3}><</a></li>
+          <li><a href='#' onclick='setLiValue(this);' {1} {3}>></a></li>
+          <li><a href='#' onclick='setLiValue(this);' {1} {3}><=</a></li>
+          <li><a href='#' onclick='setLiValue(this);' {1} {3}>>=</a></li>
+          <li ><a href='#' onclick='setLiValue(this);' {1} {3}>B</a></li>
+        </ul>
+    </div>
+    <input type='number' class='form-control {2}' id='{0}' onkeypress='call_filter(event, this);' {1}  {3}>
+    <span class='input-group-btn'></span>
+    <input type='number' class='form-control {2}' id='{5}' style='visibility: hidden' onkeypress='call_filter(event, this);' {1}  {3}>
+</div> ", header_text1, data_table,htext_class, data_colum, header_select, header_text2)
+;
+            return drptext;
+        }
+
+        public string getFilterForDateTime(string header_text1, string header_select, string data_table, string htext_class, string data_colum, string header_text2)
+        {
+            string filter = string.Format(@"
+<div class='input-group'>
+    <div class='input-group-btn'>
+        <button type='button' class='btn btn-default dropdown-toggle' data-toggle='dropdown' id='{4}'> = </button>
+        <ul class='dropdown-menu'>
+          <li ><a href ='#' onclick='setLiValue(this);' {1} {3}>=</a></li>
+          <li><a href ='#' onclick='setLiValue(this);' {1} {3}><</a></li>
+          <li><a href='#' onclick='setLiValue(this);' {1} {3}>></a></li>
+          <li><a href='#' onclick='setLiValue(this);' {1} {3}><=</a></li>
+          <li><a href='#' onclick='setLiValue(this);' {1} {3}>>=</a></li>
+          <li ><a href='#' onclick='setLiValue(this);' {1} {3}>B</a></li>
+        </ul>
+    </div>
+    <input type='date' class='form-control {2}' id='{0}' onkeypress='call_filter(event, this);' {1}  {3}>
+    <span class='input-group-btn'></span>
+    <input type='date' class='form-control {2}' id='{5}' style='visibility: hidden' onkeypress='call_filter(event, this);' {1}  {3}>
+</div> ", header_text1, data_table, htext_class, data_colum, header_select, header_text2);
+            return filter;
+        }
+
+        public string getFilterForString(string header_text1, string header_select, string data_table, string htext_class, string data_colum)
+        {
+            string drptext = string.Empty;
+            drptext = string.Format(@"
+<div class='input-group'>
+    <div class='input-group-btn'>
+        <button type='button' class='btn btn-default dropdown-toggle' data-toggle='dropdown' id='{4}'>x*</button>
+        <ul class='dropdown-menu'>
+          <li ><a href ='#' onclick='setLiValue(this);' {1} {3}>x*</a></li>
+          <li><a href ='#' onclick='setLiValue(this);' {1} {3}>*x</a></li>
+          <li><a href='#' onclick='setLiValue(this);' {1} {3}>*x*</a></li>
+          <li><a href='#' onclick='setLiValue(this);' {1} {3}>=</a></li>
+        </ul>
+    </div>
+    <input type='text' class='form-control {2}' id='{0}' onkeypress='call_filter(event, this);' {1}  {3}>
+    <span class='input-group-btn'></span>    
+</div> ", header_text1, data_table, htext_class, data_colum, header_select)
+;
+            return drptext;
+        }
+
         public override string GetHead()
         {
             return @"";
@@ -328,6 +396,9 @@ header_select, header_text1, column.Width - 38, htext_class, data_colum, data_ta
         {
             return @"
 <style>
+
+
+
 .tablecontainer {
     width:100%;
     height:auto;
@@ -352,12 +423,12 @@ td.details-control {
 tr.details td.details-control {
     background: url('http://findicons.com/files/icons/2583/sweetieplus/24/badge_square_minus_24_ns.png') no-repeat center center;
 }
-table.dataTable.stripe tbody > tr.odd.selected, table.dataTable.stripe tbody > tr.odd > .selected, table.dataTable.display tbody > tr.odd.selected, table.dataTable.display tbody > tr.odd > .selected {
-    background-color: #fbfbfb!important;
-}
-table.dataTable.stripe tbody > tr.even.selected, table.dataTable.stripe tbody > tr.even > .selected, table.dataTable.display tbody > tr.even.selected, table.dataTable.display tbody > tr.even > .selected {
-    background-color: #ffffff!important;
-}
+//table.dataTable.stripe tbody > tr.odd.selected, table.dataTable.stripe tbody > tr.odd > .selected, table.dataTable.display tbody > tr.odd.selected, table.dataTable.display tbody > tr.odd > .selected {
+//    background-color: #fbfbfb!important;
+//}
+//table.dataTable.stripe tbody > tr.even.selected, table.dataTable.stripe tbody > tr.even > .selected, table.dataTable.display tbody > tr.even.selected, table.dataTable.display tbody > tr.even > .selected {
+//    background-color: #ffffff!important;
+//}
 #@tableId_tbl th.resizing {
     cursor: e-resize;
 }
@@ -372,19 +443,28 @@ td.resizer {
   cursor: e-resize;   
     background-color:red;    
 }
-::-webkit-scrollbar {
-   width: 8px;
-   height:8px;
-}
+//::-webkit-scrollbar {
+//   width: 8px;
+//   height:8px;
+//}
 
-::-webkit-scrollbar-track {
-   -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-   border-radius: 8px;
-}
+//::-webkit-scrollbar-track {
+//   -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+//   border-radius: 8px;
+//}
 
-::-webkit-scrollbar-thumb {
-   border-radius: 8px;
-   -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
+//::-webkit-scrollbar-thumb {
+//   border-radius: 8px;
+//   -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
+//}
+.dataTables_scroll{
+//overflow-x:auto!important;
+}
+.dataTables_scrollHead {
+padding-bottom: 250px; margin-bottom: -250px;
+}
+.dataTables_scrollFoot{
+padding-bottom: 250px; margin-bottom: -250px;
 }
 </style>
     <div class='tablecontainer' id='@tableId_container'>
@@ -399,11 +479,12 @@ td.resizer {
                     <img id='@tableId_loading-image' src='/images/ajax-loader.gif' alt='Loading...' />
                </div>
                
-               <table id='@tableId_tbl' class='display nowrap'></table>
+               <table id='@tableId_tbl' class='table table-striped table-bordered'></table>
           </div>
      </div>
 
 <script>
+
 $('#@tableId_loadingdiv').show();
 $('#@tableId_tbl').append( $('@tfoot') );
 $.get('/ds/columns/@dataSourceId?format=json', function (data)
@@ -417,6 +498,7 @@ $.get('/ds/columns/@dataSourceId?format=json', function (data)
         dom:'Blftrip',
         @scrollYOption,
         scrollX : true,
+        responsive:true,
         keys: true,
         autoWidth: false,
         @lengthMenu,
@@ -452,11 +534,10 @@ $.get('/ds/columns/@dataSourceId?format=json', function (data)
         },
 
         fnFooterCallback: function ( nRow, aaData, iStart, iEnd, aiDisplay ) {
-            summarize2(nRow, aaData, iStart, iEnd, aiDisplay, '@tableId', @eb_agginfo);
+            summarize2('@tableId', @eb_agginfo);
         },
         drawCallback:function ( settings ) {
-            $('.dataTables_scrollHeadInner').css({'width':'100%'})
-            $('.table').css({'width':'100%'});
+            
             $('#@tableId_tbl').DataTable().columns.adjust();
         }
         //drawCallback: function ( settings ) {
@@ -496,7 +577,7 @@ $.get('/ds/columns/@dataSourceId?format=json', function (data)
     createFilterRowHeader('@tableId', @eb_filter_controls, @scrolly);
 
     $('#@tableId_container thead').on('click','th',function(){
-        var txt=$(this).children().children('span').text();
+        var txt=$(this).children('span').text();
         if(txt !== '')
             @tableId_order_colname =txt;
     });
@@ -512,6 +593,8 @@ $.get('/ds/columns/@dataSourceId?format=json', function (data)
     $('#@tableId_container [type=search]').on( 'keyup', function () {alert('haa');
         $('#@tableId_tbl').DataTable().search( 'food' ).draw();
     } );
+
+
 });
 </script>"
 .Replace("@dataSourceId", this.DataSourceId.ToString().Trim())
