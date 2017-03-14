@@ -84,21 +84,28 @@ namespace ExpressBase.Objects
         public override string GetHtml()
         {
             return string.Format(@"
-<div style='position:absolute; left:{1}px; top:{2}px; {8}'>
+<div style='position:absolute; left:200px; top:200px; {8}'>
     <div style='{19} {20}'>{5}</div>
     <div  class='tooltp'>
-        <input type='{7}'  name='{0}' id='{0}' {6} style='width:{3}px; height:{4}px; {17} {18} display:inline-block; {21} {10} {9} {13} {14} {15} {16} />
-        <div style='display: inline-block;'></div> {11}
+        <div  class='input-group'>
+            {22}
+            <input type='{7}' name='{0}' id='{0}' {6} style='width:{3}px; height:{4}px; {17} {18} display:inline-block; {21} {10} {9} {13} {14} {15} {16} />
+            <div style='display: inline-block;'></div> {11}  
+        </div>
     </div>
     <div class='helpText'> {12} </div>
-</div>",
+</div>
+
+",
 this.Name, this.Left, this.Top, this.Width, this.Height, this.Label, this.MaxLengthString, this.TextModeString,//7
 this.HiddenString, (this.Required && !this.Hidden ? " required" : string.Empty), this.ReadOnlyString,//10 
 ((this.ToolTipText == null) ? string.Empty : ( (this.ToolTipText.Trim().Length == 0) ? string.Empty : ("<span class='tooltptext'>" + this.ToolTipText + "</span>") ) ),
 this.HelpText, "placeholder='"+ this.PlaceHolder +"'", "value='"+ this.Text +"'", "tabindex='" + this.TabIndex + "'",//14
 this.AutoCompleteOff ? "autocomplete='off'": string.Empty, "background-color:"+ this.BackColorSerialized +";",//16
 "color:" + this.ForeColorSerialized + ";", "background-color:" + this.LabelBackColorSerialized + ";", "color:" + this.LabelForeColorSerialized + ";",//19
-(this.FontSerialized!=null) ? (" font-family:"+ this.FontSerialized.FontFamily + ";" + "font-style:" + this.FontSerialized.Style +";" + "font-size:" + this.FontSerialized.SizeInPoints + "px;") : string.Empty);//20
+(this.FontSerialized!=null) ? (" font-family:"+ this.FontSerialized.FontFamily + ";" + "font-style:" + this.FontSerialized.Style +";" + "font-size:" + this.FontSerialized.SizeInPoints + "px;") : string.Empty,//21
+(this.TextMode.ToString() != "SingleLine") ? ("<span style='font-family:" + this.FontSerialized.FontFamily + ";" + "font-size:" + this.FontSerialized.SizeInPoints + "px;'" + "class='input-group-addon'>$$$</span>" )
+.Replace("$$$", (this.TextMode.ToString() == "Email") ? ("@") : (this.TextMode.ToString() == "Password") ? "pwd" : ("clr")) : string.Empty);//22
         }
     }
 }
