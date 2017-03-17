@@ -15,6 +15,9 @@ namespace ExpressBase.Objects
     public class EbForm : EbControlContainer
     {
         [Browsable(false)]
+        public object Parent { get; set; }
+
+        [Browsable(false)]
         public int FormId { get; set; }
 
         [Browsable(false)]
@@ -29,6 +32,11 @@ namespace ExpressBase.Objects
         //public EbTable Table { get; set; }
 
         public EbForm() { }
+
+        public EbForm(object parent)
+        {
+            this.Parent = parent;
+        }
 
 #if !NET462
         public void SetData(EbDataSet ds)

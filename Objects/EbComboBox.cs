@@ -76,19 +76,19 @@ namespace ExpressBase.Objects
         {
             get
             {
-                string rs = "<div id='{0}'>";
+                string rs = "<div id='{0}' data-toggle='tooltip' title='$tooltipText'>";
                 for (int i = 1; i <= this.NumberOfFields; i++)
                     rs += @"
 <div style='display:inline-block;'>
-    <div  style='display:inline-block;' id='{0}Lbl'>label</div>
+    <div style='display:inline-block;' id='{0}Lbl'>label</div>
     <v-select id='{0}$$' style='width:{3}px;' 
         multiple
 	    v-model='displayMember$$'
         :on-change='updateCk'
         placeholder = 'Search...'>
     </v-select>
-</div>".Replace("$$", i.ToString());
-                return rs+"</div>";
+</div>".Replace("$$", i.ToString()).Replace("$tooltipText", this.ToolTipText);
+                return rs + "</div>";
             }
         }
 
@@ -98,6 +98,7 @@ namespace ExpressBase.Objects
         {
             return this.RequiredString + @"
 $('#{0}_loading-image').hide();
+clmAdjst = 0 ;
 var VMindex;
 var DMindex;
 var DMembers={11};
@@ -127,7 +128,7 @@ function InitDT(){
 			        });
                     if(value.columnName=='{5}')
                         DMindex = value.columnIndex;
-                    if(value.columnIndex==0)                 
+                    if(value.columnIndex==0 && {8})                 
                         cols.push({'data':null, 'render': function ( data, type, row ) {return '<input type=\'checkbox\'>'}});                
                     switch(value.type){
                         case 'System.Int32, System.Private.CoreLib': _c='dt-right'; break;
@@ -154,7 +155,11 @@ function InitDT(){
             order:[],
             paging:false,
             select:true,
-            ajax: {
+            drawCallback : function( settings ) {
+                //setTimeout(function(){ $('#{0}tbl').DataTable().columns.adjust(); },500);
+                $( '#{0}container table:eq(0) thead th:eq(0)').removeClass('sorting');
+            },
+        ajax: {
                 url: '/ds/data/#######?format=json',
                 data: function(dq) { 
 		                delete dq.columns; 
@@ -183,6 +188,10 @@ function InitDT(){
 	            },
                 dataSrc: function(dd) {
                                 $('#{0}_loading-image').hide();
+                                clmAdjst = clmAdjst + 1;
+                                if(clmAdjst<3)
+                                    setTimeout(function(){ $('#{0}tbl').DataTable().columns.adjust().draw();  
+                    console.log('le().columns.adjust()'); },520);
                                 setTimeout(function(){ Vobj{0}.updateCk(); },1);
                                 return dd.data;
                 }
@@ -210,8 +219,20 @@ function InitDT(){
                                 search = search.slice(0, -1)+'%';
                             else if(search.startsWith('*') && search.endsWith('*'))
                                 search = '%'+search.slice(1, -1)+'%';
-                            Msearch_colName=DMembers[e.target.id.replace('{0}srch','') - 1];
-                            $('#{0}tbl').DataTable().search(search).draw();
+                    //to update filter values   
+                            searchTextCollection=[];
+                            search_colnameCollection=[];
+                            $('#{0}container table:eq(0) thead tr:eq(1) th input').each( function (idx) {
+                                if($(this).val().toString().trim()!==''){
+                                    if($.inArray($(this).siblings().text(), search_colnameCollection) == -1){
+                                        searchTextCollection.push($(this).val());
+                                        search_colnameCollection.push($(this).siblings().text());
+                                    }
+                                }
+                            });			
+                    //
+                            Msearch_colName=DMembers[e.target.id.replace('{0}srch','')];// -1
+                            $('#{0}tbl').DataTable().search(search).draw(); console.log('Msearch_colName');
                             $('#{0}_loading-image').show();
                         }
                     }
@@ -302,15 +323,18 @@ function InitDT(){
 
         //filter textbox adding
             $( '#{0}container table:eq(0) thead').append( $( '#{0}container table:eq(0) thead tr').clone() );
-		        $( '#{0}container table:eq(0) thead tr:eq(1) th').each( function (idx) {
+		        $( '#{0}container table:eq(0) thead tr:eq(1) th').each( function (i) {
                         $(this).removeClass('sorting');
                         $(this).css('outline', 'none');
-                        $(this).css('padding', '3px 2px');
-                        $(this).css('background-color', '#fafffa');
+                        $(this).css('padding', '2px 1px');
+                        //$(this).css('background-color', '#fafaff');
                         var title = $(this).text();
 				        var idd= 'header_txt1' + title;  
 					        var t = '<span hidden>' + title + '</span>';
-                            if(idx!==0){
+                            var idx = i;
+                            if( idx!==0 || !{8} ){
+                                if(!{8})
+                                    idx=i+1;
 					            if(data.columns[idx].type=='System.Int32, System.Private.CoreLib'|| data.columns[idx].type=='System.Int16, System.Private.CoreLib')                
 						            $(this).html(t+'<input type=\'number\' id='+idd+' style=\'width: 100%\'/>');                
 					            else if(data.columns[idx].type=='System.String, System.Private.CoreLib')
@@ -346,7 +370,7 @@ function InitDT(){
 	        $('#{0}container table:eq(0) thead tr:eq(0)').on('click','th',function(){
                 var txt=$(this).text();
                 if(txt !== '')
-                    order_colname =txt;
+                    order_colname =txt;   
                 $('#{0}tbl').DataTable().draw();
             });
     });
@@ -383,12 +407,13 @@ var Vobj{0} = new Vue({
                 methods: {
                     toggleDD: function(){
                             this.DDstate=!this.DDstate;  
-                            setTimeout(function(){ $('#{0}container table:eq(0)').css('width', $( '#{0}container table:eq(1)').css('width') ); },20);
+                            //setTimeout(function(){ $('#{0}container table:eq(0)').css('width', $( '#{0}container table:eq(1)').css('width') ); },500);
                     },
                     showDD: function(){
                             if(!DtFlag){ DtFlag = true; InitDT(); }
                             this.DDstate=true;
-                            setTimeout(function(){ $('#{0}container table:eq(0)').css('width', $( '#{0}container table:eq(1)').css('width') ); },20);
+                            //setTimeout(function(){ $('#{0}container table:eq(0)').css('width', $( '#{0}container table:eq(1)').css('width') ); },520);
+                            setTimeout(function(){ $('#{0}tbl').DataTable().columns.adjust().draw(); console.log('showDD'); },520);
                     },
                     hideDD: function(){ this.DDstate=false; },
                     updateCk: function(){
@@ -423,8 +448,8 @@ var Vobj{0} = new Vue({
             var search = $(this).val().toString();
             if( e.which===13 ){
                     Vobj{0}.showDD();
-                if( search.trim()==='' && !DtFlag ){
-                    $('#{0}tbl').DataTable().search(search).draw();
+                if( search.trim()==='' && !DtFlag ){ // show all if txtbox empty
+                    $('#{0}tbl').DataTable().search(search).draw();                           
                     $('#{0}_loading-image').show();
                 }
             }
@@ -455,7 +480,7 @@ var Vobj{0} = new Vue({
     });
 
 //remove ids when tagclose button clicked
-     $( '#{0}container [class= close').live('click', function(){
+     $( '#{0}container').on('click', '[class= close]' ,function(){
         Vobj{0}.valueMember.splice( delid(), 1);
         $.each(DMindexes,function(i,v){
                 eval( 'Vobj{0}.displayMember'+ (i+1) +'.splice( delid(), 1);');
@@ -484,13 +509,13 @@ var Vobj{0} = new Vue({
 .Replace("{3}", (this.DropdownHeight == 0) ? "400" : this.DropdownHeight.ToString())
 .Replace("{4}", this.ValueMember.ToString())
 .Replace("{5}", this.DisplayMember.ToString())
-.Replace("{6}", ( !this.MultiSelect||this.MaxLimit==0 ) ? "1" : this.MaxLimit.ToString())
+.Replace("{6}", (!this.MultiSelect || this.MaxLimit == 0) ? "1" : this.MaxLimit.ToString())
 .Replace("{7}", this.MinLimit.ToString())
 .Replace("{8}", this.MultiSelect.ToString().ToLower())
 .Replace("{9}", this.Required.ToString().ToLower())
 .Replace("{10}", this.DefaultSearchFor.ToString())
 .Replace("{11}", "['acmaster1_name', 'tdebit', 'tcredit']")
-.Replace("{12}", this.VueDMcode);   
+.Replace("{12}", this.VueDMcode);
         }
         public override string GetHtml()
         {
@@ -506,7 +531,7 @@ var Vobj{0} = new Vue({
         <i id='{0}_loading-image' class='fa fa-spinner fa-pulse fa-2x fa-fw'></i><span class='sr-only'>Loading...</span>
     </div>
     <center><div id='{0}DDdiv'v-show='DDstate' class='DDdiv'  style='width:{4}px;'> 
-        <table id='{0}tbl' tabindex='1000' class='display'></table>
+        <table id='{0}tbl' tabindex='1000' style='width:100%' class='display'></table>
     </div></center>
 </div>"
 .Replace("{5}", this.VueSelectcode)

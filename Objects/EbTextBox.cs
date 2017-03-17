@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -23,6 +24,9 @@ namespace ExpressBase.Objects
     [ProtoBuf.ProtoContract]
     public class EbTextBox : EbControl
     {
+        [Browsable(false)]
+        public object Parent { get; set; }
+
         [ProtoBuf.ProtoMember(1)]
         [System.ComponentModel.Category("Behavior")]
         public int MaxLength { get; set; }
@@ -46,8 +50,12 @@ namespace ExpressBase.Objects
         [System.ComponentModel.Category("Appearance")]
         public string Text { get; set; }
 
-
         public EbTextBox() { }
+
+        public EbTextBox(object parent)
+        {
+            this.Parent = parent;
+        }
 
         public override string GetHead()
         {
@@ -83,22 +91,40 @@ namespace ExpressBase.Objects
 
         public override string GetHtml()
         {
-            return string.Format(@"
-<div style='position:absolute; left:{1}px; top:{2}px; {8}'>
-    <div style='{19} {20}'>{5}</div>
-    <div  class='tooltp'>
-        <input type='{7}'  name='{0}' id='{0}' {6} style='width:{3}px; height:{4}px; {17} {18} display:inline-block; {21} {10} {9} {13} {14} {15} {16} />
-        <div style='display: inline-block;'></div> {11}
-    </div>
-    <div class='helpText'> {12} </div>
-</div>",
-this.Name, this.Left, this.Top, this.Width, this.Height, this.Label, this.MaxLengthString, this.TextModeString,//7
-this.HiddenString, (this.Required && !this.Hidden ? " required" : string.Empty), this.ReadOnlyString,//10 
-((this.ToolTipText == null) ? string.Empty : ( (this.ToolTipText.Trim().Length == 0) ? string.Empty : ("<span class='tooltptext'>" + this.ToolTipText + "</span>") ) ),
-this.HelpText, "placeholder='"+ this.PlaceHolder +"'", "value='"+ this.Text +"'", "tabindex='" + this.TabIndex + "'",//14
-this.AutoCompleteOff ? "autocomplete='off'": string.Empty, "background-color:"+ this.BackColorSerialized +";",//16
-"color:" + this.ForeColorSerialized + ";", "background-color:" + this.LabelBackColorSerialized + ";", "color:" + this.LabelForeColorSerialized + ";",//19
-(this.FontSerialized!=null) ? (" font-family:"+ this.FontSerialized.FontFamily + ";" + "font-style:" + this.FontSerialized.Style +";" + "font-size:" + this.FontSerialized.SizeInPoints + "px;") : string.Empty);//20
+            return @"
+<div style='position:absolute; left:@leftpx; top:@toppx; @hiddenString'>
+    <div id='@nameLbl' style='@lblBackColor @LblForeColor'>@label</div>
+        <div  class='input-group' style='width: 1px;'>
+            @attachedLbl
+            <input type='@textModeString'  id='@name' name='@name' autocomplete = '@autoComplete' data-toggle='tooltip' title='@toolTipText' @maxLengthString style='width:@widthpx; height:@heightpx; @backColor @foreColor display:inline-block; @fontStyle @readOnlyString @required @placeHolder @text @tabIndex  />
+        </div>
+    <div class='helpText'> @helpText </div>
+</div>
+
+".Replace("@name", this.Name)
+.Replace("@left", this.Left.ToString())
+.Replace("@top", this.Top.ToString())
+.Replace("@width", this.Width.ToString())
+.Replace("@height", (this.TextModeString == "color" && this.Height < 24) ? (this.FontSerialized.SizeInPoints + 14).ToString() : this.Height.ToString())
+.Replace("@label", this.Label)
+.Replace("@maxLengthString", this.MaxLengthString)
+.Replace("@textModeString", this.TextModeString)
+.Replace("@hiddenString", this.HiddenString)
+.Replace("@required", (this.Required && !this.Hidden ? " required" : string.Empty))
+.Replace("@readOnlyString", this.ReadOnlyString)
+.Replace("@toolTipText", this.ToolTipText)
+.Replace("@helpText", this.HelpText)
+.Replace("@placeHolder", "placeholder='" + this.PlaceHolder + "'")
+.Replace("@text", "value='" + this.Text + "'")
+.Replace("@tabIndex", "tabindex='" + this.TabIndex + "'")
+.Replace("@autoComplete", (this.AutoCompleteOff || this.TextModeString.ToString() == "password") ? "off" : "on")
+.Replace("@backColor", "background-color:" + this.BackColorSerialized + ";")
+.Replace("@foreColor", "color:" + this.ForeColorSerialized + ";")
+.Replace("@lblBackColor", "background-color:" + this.LabelBackColorSerialized + ";")
+.Replace("@LblForeColor", "color:" + this.LabelForeColorSerialized + ";")
+.Replace("@fontStyle", (this.FontSerialized != null) ? (" font-family:" + this.FontSerialized.FontFamily + ";" + "font-style:" + this.FontSerialized.Style + ";" + "font-size:" + this.FontSerialized.SizeInPoints + "px;") : string.Empty)
+.Replace("@attachedLbl", (this.TextMode.ToString() != "SingleLine") ? ("<i class='fa fa-$class input-group-addon' aria-hidden='true' style='font-size:" + this.FontSerialized.SizeInPoints + "px;'" + "class='input-group-addon'></i>")
+.Replace("$class", (this.TextMode.ToString() == "Email") ? ("envelope") : (this.TextMode.ToString() == "Password") ? "key" : ("eyedropper")) : string.Empty);
         }
     }
 }

@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 namespace ExpressBase.Objects
 {
     [ProtoBuf.ProtoContract]
+    [ProtoBuf.ProtoInclude(1, typeof(EbReportFieldText))]
+    [ProtoBuf.ProtoInclude(1, typeof(EbReportFieldNumeric))]
     public class EbReportField : EbControl
     {
         #region Hidden Inherited Public Properties
@@ -17,10 +19,7 @@ namespace ExpressBase.Objects
         #endregion
 
         [ProtoBuf.ProtoMember(1)]
-        [System.ComponentModel.Category("Behavior")]
-        public TextTransform TextTransform { get; set; }
-
-
+        public override string Name { get; set; }
 
         public EbReportField() { }
     }
