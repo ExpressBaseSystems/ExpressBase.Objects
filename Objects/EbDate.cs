@@ -52,9 +52,9 @@ $('#$idTglBtn').click(function(){
 
 });
 
-$('.date').mask('00:00:00'); 
+$('.date').mask('0000/00/00'); 
 $('#$id').$$$$$$$picker({
-    dateFormat: 'y/MM/DD',
+    dateFormat: 'yy/mm/dd',
 	timeFormat: 'hh:mm:ss:tt',
 	stepHour: 1,
 	stepMinute: 1,
