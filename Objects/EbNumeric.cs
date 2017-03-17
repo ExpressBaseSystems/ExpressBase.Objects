@@ -128,21 +128,21 @@ $('#{0}').keypress(function(e) {
             }
     });
 
+$('#j').mask('00/00/0000');
 
-$('#{0}').mask('SZZZZZZZZZZZ', {
-    //reverse: true,
-    translation: {
-    'S':{
-        pattern: /-/,
-        optional:true
-        },
-    'Z': {
-            pattern: /[0-9.]/,
-            optional: true
-        }
-  }
-
-    }); ").Replace("{0}", this.Name).Replace("{1}", "SZZZZZZZZZZZ").Replace("{2}",this.DecimalPlaces.ToString() ).Replace("{3}", (this.MaxLength-this.DecimalPlaces).ToString() ); 
+//$('#{0}').mask('SZZZZZZZZZZZ', {
+//    //reverse: true,
+//    translation: {
+//        'S':{
+//            pattern: /-/,
+//            optional:true
+//            },
+//        'Z': {
+//                pattern: /[0-9.]/,
+//                optional: true
+//            }
+//    }
+//}); ").Replace("{0}", this.Name).Replace("{1}", "SZZZZZZZZZZZ").Replace("{2}",this.DecimalPlaces.ToString() ).Replace("{3}", (this.MaxLength-this.DecimalPlaces).ToString() ); 
         }
 
         public override string GetHtml()
@@ -154,18 +154,15 @@ $('#{0}').mask('SZZZZZZZZZZZ', {
 
 <div style='position:absolute; left:{1}px; min-height: 12px; top:{2}px; {6}'>
     <div id='{0}Lbl' style='{14} {15}'>{5}</div>
-        <div  class='tooltp'>
             <div  class='input-group'>
                  {19}   
-                 <input type='text'   name='{0}' value={16} placeholder='{18}'   class='numinput' id='{0}' style='width:{3}px; height:{4}px; {12} {13} {17} {1} display:inline-block;{8} {7} {11} />
-                <div style='display: inline-block;'></div> {9}
+                 <input type='text'  class='numinput' name='{0}' value={16} placeholder='{18}'  data-toggle='tooltip' title='{9}' id='{0}' style='width:{3}px; height:{4}px; {12} {13} {17} {1} display:inline-block;{8} {7} {11} />
             </div>
-        </div>
     <div class='helpText'> {10} </div>
 </div>",
 this.Name, this.Left, this.Top, this.Width, this.Height, this.Label, //5
 this.HiddenString, (this.Required && !this.Hidden ? " required" : string.Empty), this.ReadOnlyString,//8
-((this.ToolTipText == null) ? string.Empty : ((this.ToolTipText.Trim().Length == 0) ? string.Empty : ("<span class='tooltptext'>" + this.ToolTipText + "</span>"))),//9
+this.ToolTipText,//9
 this.HelpText, "tabindex='" + this.TabIndex + "'", "background-color:" + this.BackColorSerialized + ";",//12
 "color:" + this.ForeColorSerialized + ";",  "background-color:" + this.LabelBackColorSerialized + ";",//14
 "color:" + this.LabelForeColorSerialized + ";", (this.Value==0) ? "''" : this.Value.ToString() ,//16

@@ -76,19 +76,19 @@ namespace ExpressBase.Objects
         {
             get
             {
-                string rs = "<div id='{0}'>";
+                string rs = "<div id='{0}' data-toggle='tooltip' title='$tooltipText'>";
                 for (int i = 1; i <= this.NumberOfFields; i++)
                     rs += @"
 <div style='display:inline-block;'>
-    <div  style='display:inline-block;' id='{0}Lbl'>label</div>
+    <div style='display:inline-block;' id='{0}Lbl'>label</div>
     <v-select id='{0}$$' style='width:{3}px;' 
         multiple
 	    v-model='displayMember$$'
         :on-change='updateCk'
         placeholder = 'Search...'>
     </v-select>
-</div>".Replace("$$", i.ToString());
-                return rs+"</div>";
+</div>".Replace("$$", i.ToString()).Replace("$tooltipText", this.ToolTipText);
+                return rs + "</div>";
             }
         }
 
@@ -480,7 +480,7 @@ var Vobj{0} = new Vue({
     });
 
 //remove ids when tagclose button clicked
-     $( '#{0}container [class= close').live('click', function(){
+     $( '#{0}container').on('click', '[class= close]' ,function(){
         Vobj{0}.valueMember.splice( delid(), 1);
         $.each(DMindexes,function(i,v){
                 eval( 'Vobj{0}.displayMember'+ (i+1) +'.splice( delid(), 1);');
@@ -509,13 +509,13 @@ var Vobj{0} = new Vue({
 .Replace("{3}", (this.DropdownHeight == 0) ? "400" : this.DropdownHeight.ToString())
 .Replace("{4}", this.ValueMember.ToString())
 .Replace("{5}", this.DisplayMember.ToString())
-.Replace("{6}", ( !this.MultiSelect||this.MaxLimit==0 ) ? "1" : this.MaxLimit.ToString())
+.Replace("{6}", (!this.MultiSelect || this.MaxLimit == 0) ? "1" : this.MaxLimit.ToString())
 .Replace("{7}", this.MinLimit.ToString())
 .Replace("{8}", this.MultiSelect.ToString().ToLower())
 .Replace("{9}", this.Required.ToString().ToLower())
 .Replace("{10}", this.DefaultSearchFor.ToString())
 .Replace("{11}", "['acmaster1_name', 'tdebit', 'tcredit']")
-.Replace("{12}", this.VueDMcode);   
+.Replace("{12}", this.VueDMcode);
         }
         public override string GetHtml()
         {
