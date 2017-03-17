@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -15,11 +16,31 @@ namespace ExpressBase.Objects
     [ProtoBuf.ProtoContract]
     public class EbDate : EbControl
     {
+        [Browsable(false)]
+        public object Parent { get; set; }
+
         public EbDate() { }
+
+        public EbDate(object parent)
+        {
+            this.Parent = parent;
+        }
 
         [ProtoBuf.ProtoMember(1)]
         [System.ComponentModel.Category("Behavior")]
         public EbDateType EbDateType { get; set; }
+
+        [ProtoBuf.ProtoMember(2)]
+        [System.ComponentModel.Category("Data")]
+        public DateTime Min { get; set; }
+
+        [ProtoBuf.ProtoMember(3)]
+        [System.ComponentModel.Category("Data")]
+        public DateTime Max { get; set; }
+
+        [ProtoBuf.ProtoMember(4)]
+        [System.ComponentModel.Category("Data")]
+        public DateTime Value { get; set; }
 
         private string EbDateTypeString
         {
