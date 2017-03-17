@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -23,6 +24,9 @@ namespace ExpressBase.Objects
     [ProtoBuf.ProtoContract]
     public class EbTextBox : EbControl
     {
+        [Browsable(false)]
+        public object Parent { get; set; }
+
         [ProtoBuf.ProtoMember(1)]
         [System.ComponentModel.Category("Behavior")]
         public int MaxLength { get; set; }
@@ -46,8 +50,12 @@ namespace ExpressBase.Objects
         [System.ComponentModel.Category("Appearance")]
         public string Text { get; set; }
 
-
         public EbTextBox() { }
+
+        public EbTextBox(object parent)
+        {
+            this.Parent = parent;
+        }
 
         public override string GetHead()
         {
