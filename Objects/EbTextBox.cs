@@ -83,26 +83,40 @@ namespace ExpressBase.Objects
 
         public override string GetHtml()
         {
-            return string.Format(@"
-<div style='position:absolute; left:200px; top:200px; {8}'>
-    <div style='{19} {20}'>{5}</div>
-        <div  class='input-group'>
-            {22}
-            <input type='{7}' autocomplete = '{16}' data-toggle='tooltip' title='{11}' name='{0}' id='{0}' {6} style='width:{3}px; height:{4}px; {17} {18} display:inline-block; {21} {10} {9} {13} {14} {15}  />
+            return @"
+<div style='position:absolute; left:@leftpx; top:@toppx; @hiddenString'>
+    <div id='@nameLbl' style='@lblBackColor @LblForeColor'>@label</div>
+        <div  class='input-group' style='width: 1px;'>
+            @attachedLbl
+            <input type='@textModeString'  id='@name' name='@name' autocomplete = '@autoComplete' data-toggle='tooltip' title='@toolTipText' @maxLengthString style='width:@widthpx; height:@heightpx; @backColor @foreColor display:inline-block; @fontStyle @readOnlyString @required @placeHolder @text @tabIndex  />
         </div>
-    <div class='helpText'> {12} </div>
+    <div class='helpText'> @helpText </div>
 </div>
 
-",
-this.Name, this.Left, this.Top, this.Width,(this.TextModeString== "color") ? this.FontSerialized.SizeInPoints + 14 : this.Height, this.Label, this.MaxLengthString, this.TextModeString,//7
-this.HiddenString, (this.Required && !this.Hidden ? " required" : string.Empty), this.ReadOnlyString,//10 
-this.ToolTipText,this.HelpText, "placeholder='"+ this.PlaceHolder +"'", "value='"+ this.Text +"'",//14 
-"tabindex='" + this.TabIndex + "'",//15--
-( this.AutoCompleteOff || this.TextModeString.ToString() == "password" ) ? "off": "on", "background-color:"+ this.BackColorSerialized +";",//16
-"color:" + this.ForeColorSerialized + ";", "background-color:" + this.LabelBackColorSerialized + ";", "color:" + this.LabelForeColorSerialized + ";",//19
-(this.FontSerialized!=null) ? (" font-family:"+ this.FontSerialized.FontFamily + ";" + "font-style:" + this.FontSerialized.Style +";" + "font-size:" + this.FontSerialized.SizeInPoints + "px;") : string.Empty,//21
-(this.TextMode.ToString() != "SingleLine") ? ("<i class='fa fa-$$$ input-group-addon' aria-hidden='true' style='font-size:" + this.FontSerialized.SizeInPoints + "px;'" + "class='input-group-addon'></i>")
-.Replace("$$$", (this.TextMode.ToString() == "Email") ? ("envelope") : (this.TextMode.ToString() == "Password") ? "key" : ("eyedropper")) : string.Empty);//22
+".Replace("@name", this.Name)
+.Replace("@left", this.Left.ToString())
+.Replace("@top", this.Top.ToString())
+.Replace("@width", this.Width.ToString())
+.Replace("@height", (this.TextModeString == "color" && this.Height < 24) ? (this.FontSerialized.SizeInPoints + 14).ToString() : this.Height.ToString())
+.Replace("@label", this.Label)
+.Replace("@maxLengthString", this.MaxLengthString)
+.Replace("@textModeString", this.TextModeString)
+.Replace("@hiddenString", this.HiddenString)
+.Replace("@required", (this.Required && !this.Hidden ? " required" : string.Empty))
+.Replace("@readOnlyString", this.ReadOnlyString)
+.Replace("@toolTipText", this.ToolTipText)
+.Replace("@helpText", this.HelpText)
+.Replace("@placeHolder", "placeholder='" + this.PlaceHolder + "'")
+.Replace("@text", "value='" + this.Text + "'")
+.Replace("@tabIndex", "tabindex='" + this.TabIndex + "'")
+.Replace("@autoComplete", (this.AutoCompleteOff || this.TextModeString.ToString() == "password") ? "off" : "on")
+.Replace("@backColor", "background-color:" + this.BackColorSerialized + ";")
+.Replace("@foreColor", "color:" + this.ForeColorSerialized + ";")
+.Replace("@lblBackColor", "background-color:" + this.LabelBackColorSerialized + ";")
+.Replace("@LblForeColor", "color:" + this.LabelForeColorSerialized + ";")
+.Replace("@fontStyle", (this.FontSerialized != null) ? (" font-family:" + this.FontSerialized.FontFamily + ";" + "font-style:" + this.FontSerialized.Style + ";" + "font-size:" + this.FontSerialized.SizeInPoints + "px;") : string.Empty)
+.Replace("@attachedLbl", (this.TextMode.ToString() != "SingleLine") ? ("<i class='fa fa-$class input-group-addon' aria-hidden='true' style='font-size:" + this.FontSerialized.SizeInPoints + "px;'" + "class='input-group-addon'></i>")
+.Replace("$class", (this.TextMode.ToString() == "Email") ? ("envelope") : (this.TextMode.ToString() == "Password") ? "key" : ("eyedropper")) : string.Empty);
         }
     }
 }
