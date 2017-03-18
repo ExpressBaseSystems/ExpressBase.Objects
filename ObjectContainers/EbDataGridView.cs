@@ -459,7 +459,7 @@ function initTable(){
             @lengthMenu,
             serverSide: true,
             processing:true,
-            language: { processing: '<div></div><div></div><div></div><div></div><div></div><div></div><div></div>',
+            language: { processing: '<div class=\'fa fa-spinner fa-pulse  fa-3x fa-fw\'></div>',
                         info:'_START_ to _END_ of _TOTAL_'},
             pagingType:'@pagingType',
             columns:@columnsRender, 
@@ -681,7 +681,7 @@ function initTable(){
             }
             else if (this.ColumnType == EbDataGridViewColumnType.DateTime)
                 _r = _fwrapper.Replace("{0}", "return moment.unix(data).format('MM/DD/YYYY');");
-            else if(this.Name== "data_graph")
+            else if (this.Name == "data_graph")
                 _r = _fwrapper.Replace("{0}", "return lineGraphDiv(data);");
             else
                 _r = _fwrapper.Replace("{0}", "return data;");
