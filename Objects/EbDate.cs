@@ -16,9 +16,6 @@ namespace ExpressBase.Objects
     [ProtoBuf.ProtoContract]
     public class EbDate : EbControl
     {
-        [Browsable(false)]
-        public object Parent { get; set; }
-
         public EbDate() { }
 
         public EbDate(object parent)

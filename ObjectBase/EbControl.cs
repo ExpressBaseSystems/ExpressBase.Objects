@@ -21,6 +21,9 @@ namespace ExpressBase.Objects
 #endif
     public class EbControl : EbObject
     {
+        [Browsable(false)]
+        internal object Parent { get; set; }
+
         [ProtoBuf.ProtoMember(10)]
         [Description("Labels")]
         [System.ComponentModel.Category("Behavior")]
