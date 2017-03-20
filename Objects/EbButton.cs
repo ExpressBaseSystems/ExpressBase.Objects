@@ -9,9 +9,6 @@ namespace ExpressBase.Objects
     [ProtoBuf.ProtoContract]
     public class EbButton : EbControl
     {
-        [Browsable(false)]
-        public object Parent { get; set; }
-
         public EbButton() { }
 
         public EbButton(object parent)

@@ -24,9 +24,6 @@ namespace ExpressBase.Objects
     [ProtoBuf.ProtoContract]
     public class EbTextBox : EbControl
     {
-        [Browsable(false)]
-        public object Parent { get; set; }
-
         [ProtoBuf.ProtoMember(1)]
         [System.ComponentModel.Category("Behavior")]
         public int MaxLength { get; set; }

@@ -9,9 +9,6 @@ namespace ExpressBase.Objects
     [ProtoBuf.ProtoContract]
     public class EbNumeric : EbControl
     {
-        [Browsable(false)]
-        public object Parent { get; set; }
-
         public EbNumeric() { }
 
         public EbNumeric(object parent)
