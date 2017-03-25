@@ -97,6 +97,7 @@ namespace ExpressBase.Objects
             }
             if (this.Columns.EbVoidColumnAdded) _lsRet.Add("<th>&nbsp;</th>");
             if (this.Columns.EbLineGraphColumnAdded) _lsRet.Add("<th>&nbsp;</th>");
+            if (this.Columns.EbLockColumnAdded) _lsRet.Add("<th>&nbsp;</th>");
             _ls.Clear();
             _ls = null;
 
@@ -157,6 +158,7 @@ namespace ExpressBase.Objects
 
             if (this.Columns.EbVoidColumnAdded) _ls.Add("&nbsp;");
             if (this.Columns.EbLineGraphColumnAdded) _ls.Add("&nbsp;");
+            if (this.Columns.EbLockColumnAdded) _ls.Add("&nbsp;");
 
             return Newtonsoft.Json.JsonConvert.SerializeObject(_ls);
         }
@@ -238,7 +240,9 @@ namespace ExpressBase.Objects
                 ftr += "<th style=\"padding: 0px; margin: 0px\"></th>";
             if (this.Columns.EbLineGraphColumnAdded)
                 ftr += "<th style=\"padding: 0px; margin: 0px\"></th>";
-            
+            if (this.Columns.EbLockColumnAdded)
+                ftr += "<th style=\"padding: 0px; margin: 0px\"></th>";
+
             ftr += "<tr>";
             if (this.Columns.CheckBoxColumnAdded)
                 ftr += "<th style=\"padding: 0px; margin: 0px\"></th>";
@@ -255,6 +259,8 @@ namespace ExpressBase.Objects
             if (this.Columns.EbVoidColumnAdded)
                 ftr += "<th style=\"padding: 0px; margin: 0px\"></th>";
             if (this.Columns.EbLineGraphColumnAdded)
+                ftr += "<th style=\"padding: 0px; margin: 0px\"></th>";
+            if (this.Columns.EbLockColumnAdded)
                 ftr += "<th style=\"padding: 0px; margin: 0px\"></th>";
             ftr += "</tr>";
             ftr += "</tfoot>";
@@ -402,7 +408,14 @@ padding:0px!important;
 </style>
     <div class='tablecontainer' id='@tableId_container'>
         <div>
-            <a class='btn btn-default' onclick='showOrHideFilter(this,@scrolly);' data-table='@tableId' data-toggle='tooltip' title='On\/Off Filter'><i class='fa fa-filter' aria-hidden='true'></i></a>
+             <div class='btn-group'>
+                  <a class='btn btn-default' onclick='showOrHideFilter(this,@scrolly);' data-table='@tableId' data-toggle='tooltip' title='On\/Off Filter'><i class='fa fa-filter' aria-hidden='true'></i></a>
+                  <button type='button' class='btn btn-default dropdown-toggle' data-toggle='dropdown'>
+                    <span class='caret'></span>  <!-- caret --></button>
+                  <ul class='dropdown-menu' role='menu'>
+                      <li><a href = '#' onclick= clearFilter('@tableId')> Clear Filter</a></li>
+                       </ul>
+             </div>
             <button type='button' id='@tableId_btntotalpage' style='height: 32px;display: none;' onClick='showOrHideAggrControl(this,@scrolly);' data-table='@tableId'>Page Total!</button>
             <input type='text' id='dateFrom'/>
             <input type='text' id='dateTo'/>
@@ -418,7 +431,27 @@ padding:0px!important;
                <table id='@tableId_tbl' class='table table-striped table-bordered'></table>
           </div>
      </div>
-   
+   <!-- Modal -->
+  <div class='modal fade' id='graphmodal' role='dialog'>
+    <div class='modal-dialog modal-lg'>
+    
+      <!-- Modal content-->
+      <div class='modal-content'>
+        <div class='modal-header'>
+          <button type = 'button' class='close' data-dismiss='modal'>&times;</button>
+          <h4 class='modal-title'><center>Graph</center></h4>
+        </div>
+        <div class='modal-body'>
+        <div id='$$$$$$$_canvasDiv' class='dygraph-Wrapper'>
+            <div id='graphdiv' style='width:100%;height:500px;'></div>
+        </div>  
+            
+        
+
+        </div>
+      </div>
+    </div>
+  </div>
 
 <script>
 
@@ -648,25 +681,20 @@ function initTable(){
             return _c;
         }
 
-        private string GetRenderFunc()
-        {
+        private string GetRenderFunc(){
             string _r = string.Empty;
             string _fwrapper = "function( data, type, row, meta ) { {0} }";
 
-            if (this.ColumnType == EbDataGridViewColumnType.Numeric)
-            {
+            if (this.ColumnType == EbDataGridViewColumnType.Numeric){
                 var ext = this.ExtendedProperties as EbDataGridViewNumericColumnProperties;
 
                 if (this.Name == "netamt")
                     _r = "return renderProgressCol(data);";
-                else
-                {
-                    if (ext != null)
-                    {
+                else{
+                    if (ext != null){
                         if (!ext.Localize)
                             _r = string.Format("return parseFloat(data).toFixed({0});", ext.DecimalPlaces);
-                        else
-                        {
+                        else {
                             if (!ext.IsCurrency)
                                 _r = "return parseFloat(data).toLocaleString('en-US', { maximumSignificantDigits: {0} });".Replace("{0}", ext.DecimalPlaces.ToString());
                             else
@@ -736,6 +764,7 @@ function initTable(){
         internal bool CheckBoxColumnAdded { get; set; }
         internal bool EbVoidColumnAdded { get; set; }
         internal bool EbLineGraphColumnAdded { get; set; }
+        internal bool EbLockColumnAdded { get; set; }
 
         internal int ActualCount
         {
@@ -788,25 +817,22 @@ function initTable(){
                     script += column.GetColumnDefJs();
             }
 
-            //if (!this.Contains("sys_cancelled"))
-            //{
-            //    script += GetEbVoidColumnDefJs();
-            //}
-
+            if (!this.Contains("sys_cancelled"))
+            {
+                script += GetEbVoidColumnDefJs();
+            }
             
-
+            if (!this.Contains("sys_locked"))
+            {
+                script += GetEbLockColumnDefJs();
+            }
             return script + "]";
-            //if (!this.Contains("eb_locked"))
-            //{
-
-            //}
-
         }
 
         private string GetSerialColumnDefJs()
         {
             this.SerialColumnAdded = true;
-            return "{ searchable: false, orderable: false ,targets: 0 },";
+            return "{ width:10, searchable: false, orderable: false ,targets: 0 },";
         }
 
         private string GetCheckBoxColumnDefJs(string tableid)
@@ -818,17 +844,25 @@ function initTable(){
 
         private string GetEbVoidColumnDefJs()
         {
+            //data: (_.find(data.columns, {'columnName': 'sys_cancelled'})).columnIndex,
             this.EbVoidColumnAdded = true;
-            return  "{ data: (_.find(data.columns, {'columnName': 'sys_cancelled'})).columnIndex, title: 'eb_void' "
-             + ", width: 10 , render: function( data2, type, row, meta ) { return renderEbVoidCol(); }, },";
+            return "{ title: \"<input type='checkbox' data-toggle='toggle'>\" "
+             + ", width: 10 , render: function( data2, type, row, meta ) { return renderEbVoidCol(); } },";
             
         }
 
-        private string GetLineGraphColumnDefJs(EbDataGridViewColumn column)
+        private string GetLineGraphColumnDefJs(EbDataGridViewColumn column)//edit
         {
             this.EbLineGraphColumnAdded = true;
             string script = "{ data: " + "(_.find(data.columns, {'columnName': '{0}'})).columnIndex".Replace("{0}", column.Name);
             return script + @", width: 30, render: function(data2, type, row, meta) { return lineGraphDiv(data.columns, data2, meta, '" + column.Name + "'); }, orderable: true, className:'linepadding' }, ";
+        }
+
+        private string GetEbLockColumnDefJs()
+        {
+            this.EbLockColumnAdded = true;
+            return "{ data: (_.find(data.columns, {'columnName': 'sys_locked'})).columnIndex, title: 'Eb_lock'"
+                + ", width: 20, render: function( data, type, row, meta ) { return renderLockCol(data); } },";
         }
     }
 }
