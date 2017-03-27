@@ -44,6 +44,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 5)]
         public EbObject EbObject { get; set; }
 
+        [DataMember(Order = 6)]
+        public string Token { get; set; }
+
         public EbObjectWrapper() { }
         public EbObjectWrapper(int id, EbObjectType type, string name, byte[] bytea)
         {
