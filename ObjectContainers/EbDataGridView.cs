@@ -473,7 +473,7 @@ function initTable(){
      var dict = '{from:' + _from + ',to:' + _to + '}';
 
 
-    $.get('/ds/columns/@dataSourceId?format=json', { 'colvalues': dict }, function (data)
+    $.get('@servicestack_url/ds/columns/@dataSourceId?format=json&Token=' + getToken(), { crossDomain: 'true', colvalues: dict }, function (data)
     {
         var @tableId_ids=[];
         var @tableId_filter_objcol = [];
@@ -608,7 +608,8 @@ function initTable(){
 .Replace("@scrolly", this.ScrollY.ToString())
 .Replace("@scrollYOption", this.GetScrollYOption())
 .Replace("@tfoot", this.GetFooter())
-.Replace("@pagingType",this.PagingType.ToString());
+.Replace("@pagingType",this.PagingType.ToString())
+.Replace("@servicestack_url", "https://expressbaseservicestack.azurewebsites.net");
         }
     }
 
