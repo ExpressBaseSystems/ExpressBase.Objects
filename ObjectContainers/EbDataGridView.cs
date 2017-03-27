@@ -502,7 +502,7 @@ function initTable(){
             select: { style: 'os', selector: 'td:first-child' },
             buttons: ['colvis'],
             ajax: {
-                url: '/ds/data/@dataSourceId?format=json',
+                url: '@servicestack_url/ds/data/@dataSourceId?format=json&Token=' + getToken(),
                 data: function(dq) { 
                         delete dq.columns;
                         @tableId_filter_objcol = repopulate_filter_arr('@tableId');
