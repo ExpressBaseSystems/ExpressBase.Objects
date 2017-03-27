@@ -5,10 +5,10 @@
     "CoreCompat.System.ComponentModel.Attributes": "4.2.3-rg",
     "ExpressBase.Data": "1.0.0",
     "NETStandard.Library": "1.6.1",
-    "Newtonsoft.Json": "9.0.1",
+    "Newtonsoft.Json": "10.0.1",
     "protobuf-net": "2.1.0",
     "ServiceStack.Core": "1.0.38",
-    "ServiceStack.Redis.Core": "1.0.32",
+    "ServiceStack.Redis.Core": "1.0.38",
     "System.Data.Common": "4.3.0",
     "System.Runtime.WindowsRuntime": "4.3.0"
   },
