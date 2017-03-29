@@ -72,6 +72,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 1)]
         public string restype { get; set; }
 
+        [DataMember(Order = 2)]
         public string Token { get; set; }
 
         public string TenantAccountId { get; set; }
