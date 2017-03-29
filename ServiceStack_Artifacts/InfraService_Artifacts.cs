@@ -8,13 +8,18 @@ using System.Threading.Tasks;
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
     [DataContract]
-    public class InfraRequest : IReturn<InfraResponse>
+    public class InfraRequest : IReturn<InfraResponse>,IEbSSRequest
     {
         [DataMember(Order = 0)]
         public Dictionary<string, object> Colvalues { get; set; }
 
         [DataMember(Order = 1)]
         public string ltype { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Token { get; set; }
+
+        public string TenantAccountId { get; set; }
     }
 
     [DataContract]
@@ -26,25 +31,36 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     [DataContract]
     [Route("/unc", "POST")]
-    public class UnRequest : IReturn<bool>
+    public class UnRequest : IReturn<bool>,IEbSSRequest
     {
         [DataMember(Order = 0)]
         public Dictionary<string, object> Colvalues { get; set; }
 
+        [DataMember(Order = 1)]
+        public string Token { get; set; }
+
+        public string TenantAccountId { get; set; }
+
+
     }
 
     [DataContract]
-    public class DbCheckRequest : IReturn<bool>
+    public class DbCheckRequest : IReturn<bool>,IEbSSRequest
     {
         [DataMember(Order = 0)]
         public Dictionary<string, object> DBColvalues { get; set; }
 
         [DataMember(Order = 1)]
         public int CId { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Token { get; set; }
+
+        public string TenantAccountId { get; set; }
     }
 
     [DataContract]
-    public class AccountRequest : IReturn<AccountResponse>
+    public class AccountRequest : IReturn<AccountResponse>,IEbSSRequest
     {
         [DataMember(Order = 0)]
         public Dictionary<string, object> Colvalues { get; set; }
@@ -54,6 +70,11 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 2)]
         public int TId { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Token { get; set; }
+
+        public string TenantAccountId { get; set; }
     }
 
     [DataContract]
