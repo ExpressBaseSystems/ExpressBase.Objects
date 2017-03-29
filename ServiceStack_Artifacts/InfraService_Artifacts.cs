@@ -64,13 +64,17 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class GetAccount : IReturn<GetAccountResponse>
+    public class GetAccount : IReturn<GetAccountResponse>, IEbSSRequest
     {
         [DataMember(Order = 0)]
         public int Uid { get; set; }
 
         [DataMember(Order = 1)]
         public string restype { get; set; }
+
+        public string Token { get; set; }
+
+        public string TenantAccountId { get; set; }
     }
 
     [DataContract]
