@@ -10,11 +10,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
     [Route("/ebo")]
     [Route("/ebo/{Id}")]
-    public class EbObjectRequest : IReturn<EbObjectResponse>
+    public class EbObjectRequest : IReturn<EbObjectResponse>, IEbSSRequest
     {
         public int Id { get; set; }
 
         public string Token { get; set; }
+
+        public string TenantAccountId { get; set; }
     }
 
     [DataContract]
@@ -27,7 +29,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     [DataContract]
     [Route("/ebo", "POST")]
-    public class EbObjectWrapper
+    public class EbObjectWrapper: IEbSSRequest
     {
         [DataMember(Order = 1)]
         public int Id { get; set; }
@@ -47,7 +49,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 6)]
         public string Token { get; set; }
 
+        public string TenantAccountId { get; set; }
+
         public EbObjectWrapper() { }
+
         public EbObjectWrapper(int id, EbObjectType type, string name, byte[] bytea)
         {
             Id = id;
