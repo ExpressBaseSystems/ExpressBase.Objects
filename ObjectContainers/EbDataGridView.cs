@@ -98,6 +98,7 @@ namespace ExpressBase.Objects
             if (this.Columns.EbVoidColumnAdded) _lsRet.Add("<th>&nbsp;</th>");
             if (this.Columns.EbLineGraphColumnAdded) _lsRet.Add("<th>&nbsp;</th>");
             if (this.Columns.EbLockColumnAdded) _lsRet.Add("<th>&nbsp;</th>");
+            if (this.Columns.EbToggleColumnAdded) _lsRet.Add("<th>&nbsp;</th>");
             _ls.Clear();
             _ls = null;
 
@@ -159,7 +160,7 @@ namespace ExpressBase.Objects
             if (this.Columns.EbVoidColumnAdded) _ls.Add("&nbsp;");
             if (this.Columns.EbLineGraphColumnAdded) _ls.Add("&nbsp;");
             if (this.Columns.EbLockColumnAdded) _ls.Add("&nbsp;");
-
+            if (this.Columns.EbToggleColumnAdded) _ls.Add("&nbsp;");
             return Newtonsoft.Json.JsonConvert.SerializeObject(_ls);
         }
         
@@ -242,6 +243,8 @@ namespace ExpressBase.Objects
                 ftr += "<th style=\"padding: 0px; margin: 0px\"></th>";
             if (this.Columns.EbLockColumnAdded)
                 ftr += "<th style=\"padding: 0px; margin: 0px\"></th>";
+            if (this.Columns.EbToggleColumnAdded)
+                ftr += "<th style=\"padding: 0px; margin: 0px\"></th>";
 
             ftr += "<tr>";
             if (this.Columns.CheckBoxColumnAdded)
@@ -261,6 +264,8 @@ namespace ExpressBase.Objects
             if (this.Columns.EbLineGraphColumnAdded)
                 ftr += "<th style=\"padding: 0px; margin: 0px\"></th>";
             if (this.Columns.EbLockColumnAdded)
+                ftr += "<th style=\"padding: 0px; margin: 0px\"></th>";
+            if (this.Columns.EbToggleColumnAdded)
                 ftr += "<th style=\"padding: 0px; margin: 0px\"></th>";
             ftr += "</tr>";
             ftr += "</tfoot>";
@@ -337,7 +342,11 @@ namespace ExpressBase.Objects
 
         public override string GetHead()
         {
-            return @"";
+            //return @"new ResizeSensor(jQuery('#@tableId_container'), function() {
+            //            console.log('myelement has been resized');
+            //            $('#@tableId_tbl').DataTable().columns.adjust();
+            //        });".Replace("@tableId", this.Name);
+            return "";
         }
 
         public override string GetHtml()
@@ -593,6 +602,10 @@ function initTable(){
         } );
 
     });
+    new ResizeSensor(jQuery('#@tableId_container'), function() {
+                        console.log('myelement has been resized');
+                        $('#@tableId_tbl').DataTable().columns.adjust();
+               });
 }    
 </script>"
 .Replace("@dataSourceId", this.DataSourceId.ToString().Trim())
@@ -675,7 +688,7 @@ function initTable(){
             if (this.ColumnType == EbDataGridViewColumnType.Text)
                 _c = "dt-body-left";
             else if (this.ColumnType == EbDataGridViewColumnType.Numeric)
-                _c = "dt-body-right";
+                _c = "dt-right";
             else
                 _c = "dt-body-left";
 
@@ -766,6 +779,7 @@ function initTable(){
         internal bool EbVoidColumnAdded { get; set; }
         internal bool EbLineGraphColumnAdded { get; set; }
         internal bool EbLockColumnAdded { get; set; }
+        internal bool EbToggleColumnAdded { get; set; }
 
         internal int ActualCount
         {
@@ -818,14 +832,19 @@ function initTable(){
                     script += column.GetColumnDefJs();
             }
 
-            if (!this.Contains("sys_cancelled"))
+            if (!this.Contains("sys_cancelled"))//change to eb_void
             {
                 script += GetEbVoidColumnDefJs();
             }
             
-            if (!this.Contains("sys_locked"))
+            if (!this.Contains("sys_locked"))//change to eb_lock
             {
                 script += GetEbLockColumnDefJs();
+            }
+
+            if (!this.Contains("sys_deleted"))//change to eb_lock
+            {
+                script += GetEbToggleColumnDefJs();
             }
             return script + "]";
         }
@@ -847,8 +866,8 @@ function initTable(){
         {
             //data: (_.find(data.columns, {'columnName': 'sys_cancelled'})).columnIndex,
             this.EbVoidColumnAdded = true;
-            return "{ title: \"<input type='checkbox' data-toggle='toggle'>\" "
-             + ", width: 10 , render: function( data2, type, row, meta ) { return renderEbVoidCol(); } },";
+            return "{data: (_.find(data.columns, {'columnName': 'sys_cancelled'})).columnIndex, title: \"<i class='fa fa-ban fa-1x' aria-hidden='true'></i>\" "
+             + ", width: 10 , render: function( data2, type, row, meta ) { return renderEbVoidCol(data2); } },";
             
         }
 
@@ -862,8 +881,15 @@ function initTable(){
         private string GetEbLockColumnDefJs()
         {
             this.EbLockColumnAdded = true;
-            return "{ data: (_.find(data.columns, {'columnName': 'sys_locked'})).columnIndex, title: 'Eb_lock'"
-                + ", width: 20, render: function( data, type, row, meta ) { return renderLockCol(data); } },";
+            return "{ data: (_.find(data.columns, {'columnName': 'sys_locked'})).columnIndex, title: \"<i class='fa fa-lock fa-1x' aria-hidden='true' ></i>\" "
+                + ", width: 10, render: function( data2, type, row, meta ) { return renderLockCol(data2); } },";
+        }
+
+        private string GetEbToggleColumnDefJs()
+        {
+            this.EbToggleColumnAdded = true;
+            return "{ title: \"<div class='checkbox'><input type='checkbox' data-toggle='toggle'></div>\" "
+                + ", width: 10, render: function( data, type, row, meta ) { return renderToggleCol(); } },";
         }
     }
 }
