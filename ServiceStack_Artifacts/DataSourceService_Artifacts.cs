@@ -11,7 +11,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
     [Route("/ds")]
     [Route("/ds/data/{Id}")]
-    public class DataSourceDataRequest : IReturn<DataSourceDataResponse>
+    public class DataSourceDataRequest : IReturn<DataSourceDataResponse>, IEbSSRequest
     {
         public int Id { get; set; }
 
@@ -30,11 +30,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string SearchColumnName { get; set; }
 
         public string Token { get; set; }
+
+        public string TenantAccountId { get; set; }
     }
 
     [Route("/ds")]
     [Route("/ds/columns/{Id}")]
-    public class DataSourceColumnsRequest : IReturn<DataSourceColumnsResponse>
+    public class DataSourceColumnsRequest : IReturn<DataSourceColumnsResponse>, IEbSSRequest
     {
         public int Id { get; set; }
 
@@ -45,6 +47,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string SelectedColumnName { get; set; }
 
         public string Token { get; set; }
+
+        public string TenantAccountId { get; set; }
     }
 
     [DataContract]
