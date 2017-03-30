@@ -44,6 +44,8 @@ namespace ExpressBase.Objects
         [ProtoBuf.ProtoMember(8)]
         public bool LoadOnDemand{ get; set; }
 
+        [ProtoBuf.ProtoMember(9)]
+        public int FilterDialogId { get; set; }
 
 
         public string GetCols()
@@ -547,7 +549,7 @@ function initTable(){
                 summarize2('@tableId', @eb_agginfo,@scrolly);
             },
             drawCallback:function ( settings ) {
-                if(flag)
+                //if(flag)
                     $('[data-toggle=toggle]').bootstrapToggle();
                 flag=false;
                 $('#@tableId_tbl').DataTable().columns.adjust();
@@ -854,10 +856,10 @@ function initTable(){
                 script += GetEbLockColumnDefJs();
             }
 
-            //if (!this.Contains("sys_deleted"))//change to eb_lock
-            //{
-            //    script += GetEbToggleColumnDefJs();
-            //}
+            if (!this.Contains("sys_deleted"))//change to eb_lock
+            {
+                script += GetEbToggleColumnDefJs();
+            }
             return script + "]";
         }
 
@@ -901,7 +903,7 @@ function initTable(){
         {
             //data: (_.find(data.columns, {'columnName': 'sys_deleted'})).columnIndex,
             this.EbToggleColumnAdded = true;
-            return "{ title:\"<input type='checkbox' data-toggle='toggle'><span hidden>sys_deleted</span>\", width: 10, render: function( data2, type, row, meta ) { return renderToggleCol(data2); } },";
+            return "{data: (_.find(data.columns, {'columnName': 'sys_deleted'})).columnIndex, title:\"<input type='checkbox' data-toggle='toggle'><span hidden>sys_deleted</span>\", width: 10, render: function( data2, type, row, meta ) { return renderToggleCol(data2); } },";
         }
     }
 }
