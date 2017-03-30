@@ -97,10 +97,10 @@ namespace ExpressBase.Objects
 
                 _lsRet.Add(_ls.ToString());
             }
-            if (this.Columns.EbVoidColumnAdded) _lsRet.Add("<th style='padding: 0px; margin: 0px'>" + getFilterForBoolean()+ "</th>");
+            if (this.Columns.EbVoidColumnAdded) _lsRet.Add("<th style='padding: 0px; margin: 0px'>" + getFilterForBoolean("sys_cancelled")+ "</th>");
             if (this.Columns.EbLineGraphColumnAdded) _lsRet.Add("<th>&nbsp;</th>");
-            if (this.Columns.EbLockColumnAdded) _lsRet.Add("<th style='padding: 0px; margin: 0px'>" + getFilterForBoolean() + "</th>");
-            if (this.Columns.EbToggleColumnAdded) _lsRet.Add("<th style='padding: 0px; margin: 0px'>" + getFilterForBoolean() + "</th>");
+            if (this.Columns.EbLockColumnAdded) _lsRet.Add("<th style='padding: 0px; margin: 0px'>" + getFilterForBoolean("sys_locked") + "</th>");
+            if (this.Columns.EbToggleColumnAdded) _lsRet.Add("<th style='padding: 0px; margin: 0px'>" + getFilterForBoolean("sys_deleted") + "</th>");
             _ls.Clear();
             _ls = null;
 
@@ -342,20 +342,16 @@ namespace ExpressBase.Objects
             return drptext;
         }
 
-        public string getFilterForBoolean()
+        public string getFilterForBoolean(string colum)
         {
             var filter = string.Empty;
-            filter += "<input type='checkbox' data-toggle='toggle'>";
+            filter = string.Format("<input type='checkbox' data-toggle='toggle' data-colum='{0}' onchange='toggleInFilter(this);'>",colum);
             return filter;
         }
 
         public override string GetHead()
         {
-            //return @"new ResizeSensor(jQuery('#@tableId_container'), function() {
-            //            console.log('myelement has been resized');
-            //            $('#@tableId_tbl').DataTable().columns.adjust();
-            //        });".Replace("@tableId", this.Name);
-            return "";
+             return "";
         }
 
         public override string GetHtml()
@@ -549,13 +545,11 @@ function initTable(){
                 summarize2('@tableId', @eb_agginfo,@scrolly);
             },
             drawCallback:function ( settings ) {
-                //if(flag)
-                    $('[data-toggle=toggle]').bootstrapToggle();
-                flag=false;
+                $('tbody [data-toggle=toggle]').bootstrapToggle();
                 $('#@tableId_tbl').DataTable().columns.adjust();
             },
             initComplete:function ( settings,json ) {
-            
+                $('thead:eq(0) [data-toggle=toggle]').bootstrapToggle();
                 $('#@tableId_tbl').DataTable().columns.adjust();
             }
             //drawCallback: function ( settings ) {
@@ -612,14 +606,17 @@ function initTable(){
         $('#@tableId_container [type=search]').on( 'keyup', function () {alert('haa');
             $('#@tableId_tbl').DataTable().search( 'food' ).draw();
         } );
+        
+
+        //$('thead:eq(0) [data-toggle=toggle]').on('change',function() {
+            
+        //});
+    
 
     });
     new ResizeSensor(jQuery('#@tableId_container'), function() {
-                        console.log('myelement has been resized');
-                        $('#@tableId_tbl').DataTable().columns.adjust();
-               });
-
-
+        $('#@tableId_tbl').DataTable().columns.adjust();
+    });
 }    
 </script>"
 .Replace("@dataSourceId", this.DataSourceId.ToString().Trim())
@@ -903,7 +900,7 @@ function initTable(){
         {
             //data: (_.find(data.columns, {'columnName': 'sys_deleted'})).columnIndex,
             this.EbToggleColumnAdded = true;
-            return "{data: (_.find(data.columns, {'columnName': 'sys_deleted'})).columnIndex, title:\"<input type='checkbox' data-toggle='toggle'><span hidden>sys_deleted</span>\", width: 10, render: function( data2, type, row, meta ) { return renderToggleCol(data2); } },";
+            return "{data: (_.find(data.columns, {'columnName': 'sys_deleted'})).columnIndex, title:\"sys_deleted<span hidden>sys_deleted</span>\", width: 10, render: function( data2, type, row, meta ) { return renderToggleCol(data2); } },";
         }
     }
 }
