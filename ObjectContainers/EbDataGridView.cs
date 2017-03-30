@@ -44,6 +44,8 @@ namespace ExpressBase.Objects
         [ProtoBuf.ProtoMember(8)]
         public bool LoadOnDemand{ get; set; }
 
+        [ProtoBuf.ProtoMember(9)]
+        public int FilterDialogId { get; set; }
 
 
         public string GetCols()
@@ -95,10 +97,10 @@ namespace ExpressBase.Objects
 
                 _lsRet.Add(_ls.ToString());
             }
-            if (this.Columns.EbVoidColumnAdded) _lsRet.Add("<th>&nbsp;</th>");
+            if (this.Columns.EbVoidColumnAdded) _lsRet.Add("<th style='padding: 0px; margin: 0px'>" + getFilterForBoolean()+ "</th>");
             if (this.Columns.EbLineGraphColumnAdded) _lsRet.Add("<th>&nbsp;</th>");
-            if (this.Columns.EbLockColumnAdded) _lsRet.Add("<th>&nbsp;</th>");
-            if (this.Columns.EbToggleColumnAdded) _lsRet.Add("<th>&nbsp;</th>");
+            if (this.Columns.EbLockColumnAdded) _lsRet.Add("<th style='padding: 0px; margin: 0px'>" + getFilterForBoolean() + "</th>");
+            if (this.Columns.EbToggleColumnAdded) _lsRet.Add("<th style='padding: 0px; margin: 0px'>" + getFilterForBoolean() + "</th>");
             _ls.Clear();
             _ls = null;
 
@@ -340,6 +342,13 @@ namespace ExpressBase.Objects
             return drptext;
         }
 
+        public string getFilterForBoolean()
+        {
+            var filter = string.Empty;
+            filter += "<input type='checkbox' data-toggle='toggle'>";
+            return filter;
+        }
+
         public override string GetHead()
         {
             //return @"new ResizeSensor(jQuery('#@tableId_container'), function() {
@@ -466,7 +475,7 @@ padding:0px!important;
 
 var _from = '';
 var _to = '';
-
+var flag=true;
 $('#btnGo').click(function(){
     _from = $('#dateFrom').val().toString();
     _to = $('#dateTo').val().toString();
@@ -540,6 +549,9 @@ function initTable(){
                 summarize2('@tableId', @eb_agginfo,@scrolly);
             },
             drawCallback:function ( settings ) {
+                //if(flag)
+                    $('[data-toggle=toggle]').bootstrapToggle();
+                flag=false;
                 $('#@tableId_tbl').DataTable().columns.adjust();
             },
             initComplete:function ( settings,json ) {
@@ -606,6 +618,8 @@ function initTable(){
                         console.log('myelement has been resized');
                         $('#@tableId_tbl').DataTable().columns.adjust();
                });
+
+
 }    
 </script>"
 .Replace("@dataSourceId", this.DataSourceId.ToString().Trim())
@@ -866,7 +880,7 @@ function initTable(){
         {
             //data: (_.find(data.columns, {'columnName': 'sys_cancelled'})).columnIndex,
             this.EbVoidColumnAdded = true;
-            return "{data: (_.find(data.columns, {'columnName': 'sys_cancelled'})).columnIndex, title: \"<i class='fa fa-ban fa-1x' aria-hidden='true'></i>\" "
+            return "{data: (_.find(data.columns, {'columnName': 'sys_cancelled'})).columnIndex, title: \"<i class='fa fa-ban fa-1x' aria-hidden='true'></i><span hidden>sys_cancelled</span>\" "
              + ", width: 10 , render: function( data2, type, row, meta ) { return renderEbVoidCol(data2); } },";
             
         }
@@ -881,15 +895,15 @@ function initTable(){
         private string GetEbLockColumnDefJs()
         {
             this.EbLockColumnAdded = true;
-            return "{ data: (_.find(data.columns, {'columnName': 'sys_locked'})).columnIndex, title: \"<i class='fa fa-lock fa-1x' aria-hidden='true' ></i>\" "
+            return "{ data: (_.find(data.columns, {'columnName': 'sys_locked'})).columnIndex, title: \"<i class='fa fa-lock fa-1x' aria-hidden='true' ></i><span hidden>sys_locked</span>\" "
                 + ", width: 10, render: function( data2, type, row, meta ) { return renderLockCol(data2); } },";
         }
 
         private string GetEbToggleColumnDefJs()
         {
+            //data: (_.find(data.columns, {'columnName': 'sys_deleted'})).columnIndex,
             this.EbToggleColumnAdded = true;
-            return "{ title: \"<div class='checkbox'><input type='checkbox' data-toggle='toggle'></div>\" "
-                + ", width: 10, render: function( data, type, row, meta ) { return renderToggleCol(); } },";
+            return "{data: (_.find(data.columns, {'columnName': 'sys_deleted'})).columnIndex, title:\"<input type='checkbox' data-toggle='toggle'><span hidden>sys_deleted</span>\", width: 10, render: function( data2, type, row, meta ) { return renderToggleCol(data2); } },";
         }
     }
 }
