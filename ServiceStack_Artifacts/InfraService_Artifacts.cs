@@ -69,10 +69,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string op { get; set; }
 
         [DataMember(Order = 2)]
-        public int TId { get; set; }
+        public int Id { get; set; }
 
-        [DataMember(Order = 2)]
+        [DataMember(Order = 3)]
         public string Token { get; set; }
+
+        [DataMember(Order = 4)]
+        public int TId { get; set; }
 
         public string TenantAccountId { get; set; }
     }
