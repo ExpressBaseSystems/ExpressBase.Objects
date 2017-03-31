@@ -166,7 +166,7 @@ function InitDT(){
                 $( '#{0}container table:eq(0) thead th:eq(0)').removeClass('sorting');
             },
         ajax: {
-                url: '@servicestack_url/ds/data/#######?format=json&Token=' + getToken(), { crossDomain: 'true'},
+                url: '@servicestack_url/ds/data/#######?format=json&Token=' + getToken(), 
                 data: function(dq) { 
 		                delete dq.columns; 
 		                if(search_colnameCollection.length!==0){
