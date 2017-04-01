@@ -134,21 +134,21 @@ $('#{0}').keypress(function(e) {
             }
     });
 
-$('#j').mask('00/00/0000');
+//$('#j').mask('00/00/0000');
 
-//$('#{0}').mask('SZZZZZZZZZZZ', {
-//    //reverse: true,
-//    translation: {
-//        'S':{
-//            pattern: /-/,
-//            optional:true
-//            },
-//        'Z': {
-//                pattern: /[0-9.]/,
-//                optional: true
-//            }
-//    }
-//}); ").Replace("{0}", this.Name).Replace("{1}", "SZZZZZZZZZZZ").Replace("{2}",this.DecimalPlaces.ToString() ).Replace("{3}", (this.MaxLength-this.DecimalPlaces).ToString() ); 
+$('#{0}').mask('SZZZZZZZZZZZ', {
+    //reverse: true,
+    translation: {
+        'S':{
+            pattern: /-/,
+            optional:true
+            },
+        'Z': {
+                pattern: /[0-9.]/,
+                optional: true
+            }
+    }
+}); ").Replace("{0}", this.Name).Replace("{1}", "SZZZZZZZZZZZ").Replace("{2}", this.DecimalPlaces.ToString()).Replace("{3}", (this.MaxLength - this.DecimalPlaces).ToString());
         }
 
         public override string GetHtml()
