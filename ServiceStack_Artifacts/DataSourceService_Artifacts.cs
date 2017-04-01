@@ -32,6 +32,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Token { get; set; }
 
         public string TenantAccountId { get; set; }
+
+        public Dictionary<string, string> colvalues { get; set; }
     }
 
     [Route("/ds")]
@@ -49,6 +51,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Token { get; set; }
 
         public string TenantAccountId { get; set; }
+
+        public Dictionary<string, string> colvalues { get; set; }
     }
 
     [DataContract]

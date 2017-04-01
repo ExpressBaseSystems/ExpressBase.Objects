@@ -10,40 +10,69 @@ namespace ExpressBase.Objects
     {
         public EbRadioGroup() { }
 
+        [ProtoBuf.ProtoMember(1)]
+        [System.ComponentModel.Category("Behavior")]
+        public int NumberOfOptions { get; set; }
+
+        [ProtoBuf.ProtoMember(2)]
+        [System.ComponentModel.Category("Behavior")]
+        public string OnValue { get; set; }
+
+        [ProtoBuf.ProtoMember(3)]
+        [System.ComponentModel.Category("Behavior")]
+        public string OffValue { get; set; }
+
+        [ProtoBuf.ProtoMember(4)]
+        [System.ComponentModel.Category("Behavior")]
+        public string[] Options = { "radio", "TV", "fridge" };
+
+        private string RadioCode
+        {
+            get
+            {
+                string rs = "<div id='@namecontainer' style='position:absolute; left:300px; top:300px;'>";
+
+                if (this.NumberOfOptions <= 2)
+                {
+                    rs += @"
+                        <label > Option two </label >
+                        <input type = 'checkbox' data-toggle = 'toggle' data-on = '@OnValue' data-off = '@OffValue'>"
+                    .Replace("@OnValue", this.OnValue).Replace("@OffValue", this.OffValue);
+                }
+                else
+                {
+                    rs += "<div class='btn-group' data-toggle='buttons'>";
+                    for (int i = 1; i <= this.NumberOfOptions; i++)
+                    {
+                        rs += @"
+                            <label class='btn btn-primary '>
+                                <input type ='radio' name='options' autocomplete='off'>
+                                @option
+                            </label>".Replace("@option", this.Options[i]);
+                    }
+                    rs += "</div>";
+                }
+                return rs + "</div>".Replace("$tooltipText", this.ToolTipText).Replace("@name", this.Name);
+            }
+        }
+
         public override string GetHead()
         {
             return this.RequiredString + @"
-$('#{0}container [type=radio]').on('click', function () {
+$('#@idcontainer [type=checkbox]').bootstrapToggle();
+$('#@idcontainer [type=radio]').on('click', function () {
     $(this).button('toggle')
   })
-".Replace("{0}", this.Name );
+".Replace("@id", this.Name );
         }
 
         public override string GetHtml()
         {
-            return string.Format(@"
-<div id='{0}container' style='position:absolute; left:300px; top:300px; '>
-
-
-
-        <div class='btn-group' data-toggle='buttons'>
-          <label class='btn btn-primary '>
-            <input type ='radio' name='options' id='option1' autocomplete='off'> Radio 1 (preselected)
-          </label>
-          <label class='btn btn-primary'>
-            <input type = 'radio' name='options' id='option2' autocomplete='off'> Radio 2
-          </label>
-          <label class='btn btn-primary'>
-            <input type = 'radio' name='options' id='option3' autocomplete='off' checked> TV 3
-          </label>
-        </div>
-
-            <input type = 'checkbox' id='{0}' data-toggle='toggle'data-on='Enabled' data-off='Disabled' >
-            <label> Option two </label>
-            <input type = 'checkbox' id='{0}' data-toggle='toggle'data-on='Enabled' data-off='Disabled' >
-
-</div
-", this.Name);
+            return @"
+            @RadioCode
+"
+.Replace("@name", this.Name)
+.Replace("@RadioCode", this.RadioCode);
         }
     }
 }
