@@ -1,6 +1,7 @@
 ﻿using ServiceStack;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
@@ -8,6 +9,30 @@ using System.Threading.Tasks;
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
     [DataContract]
+    public class InfraDb_GENERIC_SELECTRequest : IEbSSRequest
+    {
+        [DataMember(Order = 1)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 2)]
+        public string TenantAccountId { get; set; }
+
+        [DataMember(Order = 3)]
+        public string InfraDbSqlQueryKey { get; set; }
+
+        [DataMember(Order = 4)]
+        public Dictionary<string, object> Parameters { get; set; }
+    }
+
+    [DataContract]
+    public class InfraDb_GENERIC_SELECTResponse
+    {
+        [DataMember(Order = 1)]
+        public List<Dictionary<string, object>> Data { get; set; }
+    }
+
+    [DataContract]
+    [Route("/infra", "POST")]
     public class InfraRequest : IReturn<InfraResponse>,IEbSSRequest
     {
         [DataMember(Order = 0)]
@@ -99,14 +124,20 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 2)]
         public string Token { get; set; }
 
+        [DataMember(Order = 3)]
+        public string Uname { get; set; }
+
         public string TenantAccountId { get; set; }
     }
 
     [DataContract]
     public class GetAccountResponse
     {
+       
         [DataMember(Order = 1)]
-        public Dictionary<int, string> dict { get; set; }
+        public List<List<object>> returnlist { get; set; }
+
+
     }
 
     [DataContract]
