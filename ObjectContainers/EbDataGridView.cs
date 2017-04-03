@@ -87,6 +87,8 @@ namespace ExpressBase.Objects
                         _ls.Append(span + getFilterForString(header_text1, header_select, data_table, htext_class, data_colum, header_text2));
                     else if (column.ColumnType == EbDataGridViewColumnType.DateTime)
                         _ls.Append(span + getFilterForDateTime(header_text1, header_select, data_table, htext_class, data_colum, header_text2));
+                    else if (column.ColumnType == EbDataGridViewColumnType.Boolean)
+                        _ls.Append(span + getFilterForBoolean(column.Name));
                     else
                         _ls.Append(span);
 
@@ -100,7 +102,7 @@ namespace ExpressBase.Objects
             if (this.Columns.EbVoidColumnAdded) _lsRet.Add("<th style='padding: 0px; margin: 0px'>" + getFilterForBoolean("sys_cancelled")+ "</th>");
             if (this.Columns.EbLineGraphColumnAdded) _lsRet.Add("<th>&nbsp;</th>");
             if (this.Columns.EbLockColumnAdded) _lsRet.Add("<th style='padding: 0px; margin: 0px'>" + getFilterForBoolean("sys_locked") + "</th>");
-            if (this.Columns.EbToggleColumnAdded) _lsRet.Add("<th style='padding: 0px; margin: 0px'>" + getFilterForBoolean("sys_deleted") + "</th>");
+            //if (this.Columns.EbToggleColumnAdded) _lsRet.Add("<th style='padding: 0px; margin: 0px'>" + getFilterForBoolean("sys_deleted") + "</th>");
             _ls.Clear();
             _ls = null;
 
@@ -143,7 +145,7 @@ namespace ExpressBase.Objects
           <li><a href ='#' onclick='fselect_func(this,{5});' {2} {3} {4}>&mnplus;</a></li>
         </ul>
     </div>
-    <input type='text' class='form-control' id='{0}' disabled >
+    <input type='text' class='form-control' id='{0}' disabled style='text-align: right;'>
 </div>", footer_txt, footer_select_id, data_table, data_colum, data_decip, this.ScrollY));
                             }
                             else
@@ -162,7 +164,7 @@ namespace ExpressBase.Objects
             if (this.Columns.EbVoidColumnAdded) _ls.Add("&nbsp;");
             if (this.Columns.EbLineGraphColumnAdded) _ls.Add("&nbsp;");
             if (this.Columns.EbLockColumnAdded) _ls.Add("&nbsp;");
-            if (this.Columns.EbToggleColumnAdded) _ls.Add("&nbsp;");
+           // if (this.Columns.EbToggleColumnAdded) _ls.Add("&nbsp;");
             return Newtonsoft.Json.JsonConvert.SerializeObject(_ls);
         }
         
@@ -245,8 +247,8 @@ namespace ExpressBase.Objects
                 ftr += "<th style=\"padding: 0px; margin: 0px\"></th>";
             if (this.Columns.EbLockColumnAdded)
                 ftr += "<th style=\"padding: 0px; margin: 0px\"></th>";
-            if (this.Columns.EbToggleColumnAdded)
-                ftr += "<th style=\"padding: 0px; margin: 0px\"></th>";
+            //if (this.Columns.EbToggleColumnAdded)
+            //    ftr += "<th style=\"padding: 0px; margin: 0px\"></th>";
 
             ftr += "<tr>";
             if (this.Columns.CheckBoxColumnAdded)
@@ -267,8 +269,8 @@ namespace ExpressBase.Objects
                 ftr += "<th style=\"padding: 0px; margin: 0px\"></th>";
             if (this.Columns.EbLockColumnAdded)
                 ftr += "<th style=\"padding: 0px; margin: 0px\"></th>";
-            if (this.Columns.EbToggleColumnAdded)
-                ftr += "<th style=\"padding: 0px; margin: 0px\"></th>";
+            //if (this.Columns.EbToggleColumnAdded)
+            //    ftr += "<th style=\"padding: 0px; margin: 0px\"></th>";
             ftr += "</tr>";
             ftr += "</tfoot>";
             return ftr;
@@ -345,13 +347,13 @@ namespace ExpressBase.Objects
         public string getFilterForBoolean(string colum)
         {
             var filter = string.Empty;
-            filter = string.Format("<input type='checkbox' data-toggle='toggle' data-colum='{0}' onchange='toggleInFilter(this);'>",colum);
+            filter = string.Format("<input type='checkbox' data-colum='{0}' onchange='toggleInFilter(this);' value='1'>", colum);
             return filter;
         }
 
         public override string GetHead()
         {
-             return "";
+             return "$('thead:eq(0) tr:eq(1) [type=checkbox]').checkbox().chbxChecked(null); ";
         }
 
         public override string GetHtml()
@@ -393,23 +395,7 @@ td.resizer {
   cursor: e-resize;   
     background-color:red;    
 }
-//::-webkit-scrollbar {
-//   width: 8px;
-//   height:8px;
-//}
 
-//::-webkit-scrollbar-track {
-//   -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-//   border-radius: 8px;
-//}
-
-//::-webkit-scrollbar-thumb {
-//   border-radius: 8px;
-//   -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
-//}
-.dataTables_scroll{
-//overflow-x:auto!important;
-}
 .dataTables_scrollHead {
 padding-bottom: 250px; margin-bottom: -250px;
 }
@@ -419,6 +405,9 @@ padding-bottom: 250px; margin-bottom: -250px;
 .linepadding{
 padding:0px!important;
 }
+td.dt-center { text-align: center; }
+th.dt-center { text-align: right; }
+td.dt-body-right { text-align: right; }
 </style>
     <div class='tablecontainer' id='@tableId_container'>
         <div>
@@ -430,7 +419,7 @@ padding:0px!important;
                       <li><a href = '#' onclick= clearFilter('@tableId')> Clear Filter</a></li>
                        </ul>
              </div>
-            <button type='button' id='@tableId_btntotalpage' style='height: 32px;display: none;' onClick='showOrHideAggrControl(this,@scrolly);' data-table='@tableId'>Page Total!</button>
+            <button type='button' id='@tableId_btntotalpage' class='btn btn-default' style='display: none;' onClick='showOrHideAggrControl(this,@scrolly);' data-table='@tableId'>&sum;</button>
             <input type='text' id='dateFrom'/>
             <input type='text' id='dateTo'/>
             <div id='btnGo' class='btn btn-default' style='display:inline-block'>GO</div>
@@ -495,10 +484,11 @@ function initTable(){
         var @tableId__datacolumns = data.columns;
         $('#@tableId_tbl').DataTable(
         {
-            //dom:'Blftrip',
+            dom:'Bltrip',
             //dom:'Bliptr',
             //dom:'<\'col-sm-2\'l><\'col-sm-4\'i><\'col-sm-6\'p>'+'<\'col-sm-12\'tr>',
-            dom:'<\'col-sm-2\'l><\'col-sm-4\'i><\'col-sm-6\'p>tr',
+            //dom:'<\'col-sm-2\'l><\'col-sm-4\'i><\'col-sm-6\'p>tr',
+            buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
             @scrollYOption,
             responsive:true,
             keys: true,
@@ -514,7 +504,6 @@ function initTable(){
             deferRender: true,
             filter: true,
             select: { style: 'os', selector: 'td:first-child' },
-            buttons: ['colvis'],
             ajax: {
                 url: '@servicestack_url/ds/data/@dataSourceId?format=json&Token=' + getToken(),
                 data: function(dq) { 
@@ -549,7 +538,6 @@ function initTable(){
                 $('#@tableId_tbl').DataTable().columns.adjust();
             },
             initComplete:function ( settings,json ) {
-                $('thead:eq(0) [data-toggle=toggle]').bootstrapToggle();
                 $('#@tableId_tbl').DataTable().columns.adjust();
             }
             //drawCallback: function ( settings ) {
@@ -607,16 +595,13 @@ function initTable(){
             $('#@tableId_tbl').DataTable().search( 'food' ).draw();
         } );
         
-
-        //$('thead:eq(0) [data-toggle=toggle]').on('change',function() {
-            
-        //});
-    
-
+       
     });
     new ResizeSensor(jQuery('#@tableId_container'), function() {
         $('#@tableId_tbl').DataTable().columns.adjust();
     });
+    
+     
 }    
 </script>"
 .Replace("@dataSourceId", this.DataSourceId.ToString().Trim())
@@ -647,7 +632,7 @@ function initTable(){
     [ProtoBuf.ProtoContract]
     public class EbDataGridViewColumn : EbControl
     {
-        private EbDataGridViewColumnType _columnType = EbDataGridViewColumnType.Text;
+        private EbDataGridViewColumnType _columnType = EbDataGridViewColumnType.Null;
 
         [ProtoBuf.ProtoMember(1)]
         public EbDataGridViewColumnType ColumnType
@@ -659,7 +644,9 @@ function initTable(){
                     this.ExtendedProperties = new EbDataGridViewNumericColumnProperties();
                 else if (value == EbDataGridViewColumnType.DateTime)
                     this.ExtendedProperties = new EbDataGridViewDateTimeColumnProperties();
-                else
+                else if (value == EbDataGridViewColumnType.Boolean)
+                    this.ExtendedProperties = new EbDataGridViewBooleanColumnProperties();
+                else if(value == EbDataGridViewColumnType.Text)
                     this.ExtendedProperties = new EbDataGridViewColumnProperties();
 
                 _columnType = value;
@@ -681,7 +668,7 @@ function initTable(){
         {
             string script = "{";
             script += "data: " + "(_.find(data.columns, {'columnName': '{0}'})).columnIndex".Replace("{0}", this.Name);
-            script += string.Format(",title: '{0}<span hidden>{1}</span>'", this.Label, this.Name);
+            script += string.Format(",title: '{0}<span hidden>{1}</span>'", (this.Label != null) ? this.Label : this.Name, this.Name);
             script += ",className: '" + this.GetClassName() + "'";
             script += ",visible: " + (!this.Hidden).ToString().ToLower();
             script += ",width: " + this.Width.ToString();
@@ -696,10 +683,10 @@ function initTable(){
         {
             string _c = string.Empty;
 
-            if (this.ColumnType == EbDataGridViewColumnType.Text)
-                _c = "dt-body-left";
+            if (this.ColumnType == EbDataGridViewColumnType.Boolean)
+                _c = "dt-body-center";
             else if (this.ColumnType == EbDataGridViewColumnType.Numeric)
-                _c = "dt-right";
+                _c = "dt-body-right";
             else
                 _c = "dt-body-left";
 
@@ -710,16 +697,20 @@ function initTable(){
             string _r = string.Empty;
             string _fwrapper = "function( data, type, row, meta ) { {0} }";
 
-            if (this.ColumnType == EbDataGridViewColumnType.Numeric){
+            if (this.ColumnType == EbDataGridViewColumnType.Numeric)
+            {
                 var ext = this.ExtendedProperties as EbDataGridViewNumericColumnProperties;
 
-                if (this.Name == "netamt")
+                if (ext.ShowProgressbar)
                     _r = "return renderProgressCol(data);";
-                else{
-                    if (ext != null){
+                else
+                {
+                    if (ext != null)
+                    {
                         if (!ext.Localize)
                             _r = string.Format("return parseFloat(data).toFixed({0});", ext.DecimalPlaces);
-                        else {
+                        else
+                        {
                             if (!ext.IsCurrency)
                                 _r = "return parseFloat(data).toLocaleString('en-US', { maximumSignificantDigits: {0} });".Replace("{0}", ext.DecimalPlaces.ToString());
                             else
@@ -734,7 +725,12 @@ function initTable(){
             }
             else if (this.ColumnType == EbDataGridViewColumnType.DateTime)
                 _r = _fwrapper.Replace("{0}", "return moment.unix(data).format('MM/DD/YYYY');");
-            else if (this.Name == "data_graph")
+            else if (this.ColumnType == EbDataGridViewColumnType.Null)
+            {
+                var ext = this.ExtendedProperties as EbDataGridViewBooleanColumnProperties;
+                _r = _fwrapper.Replace("{0}", "return renderToggleCol(data,@ext);".Replace("@ext",ext.IsEditable.ToString().ToLower()));
+            }
+            else if (this.ColumnType == EbDataGridViewColumnType.Chart)
                 _r = _fwrapper.Replace("{0}", "return lineGraphDiv(data);");
             else
                 _r = _fwrapper.Replace("{0}", "return data;");
@@ -746,9 +742,17 @@ function initTable(){
     [ProtoBuf.ProtoContract]
     [ProtoBuf.ProtoInclude(1, typeof(EbDataGridViewNumericColumnProperties))]
     [ProtoBuf.ProtoInclude(2, typeof(EbDataGridViewDateTimeColumnProperties))]
+    [ProtoBuf.ProtoInclude(3, typeof(EbDataGridViewBooleanColumnProperties))]
     public class EbDataGridViewColumnProperties
     {
 
+    }
+
+    [ProtoBuf.ProtoContract]
+    public class EbDataGridViewBooleanColumnProperties : EbDataGridViewColumnProperties
+    {
+        [ProtoBuf.ProtoMember(1)]
+        public bool IsEditable { get; set; }
     }
 
     [ProtoBuf.ProtoContract]
@@ -775,6 +779,9 @@ function initTable(){
 
         [ProtoBuf.ProtoMember(7)]
         public bool Min { get; set; }
+
+        [ProtoBuf.ProtoMember(8)]
+        public bool ShowProgressbar { get; set; }
     }
 
     [ProtoBuf.ProtoContract]
@@ -853,10 +860,10 @@ function initTable(){
                 script += GetEbLockColumnDefJs();
             }
 
-            if (!this.Contains("sys_deleted"))//change to eb_lock
-            {
-                script += GetEbToggleColumnDefJs();
-            }
+            //if (!this.Contains("sys_deleted"))//change to eb_lock
+            //{
+            //    script += GetEbToggleColumnDefJs();
+            //}
             return script + "]";
         }
 
@@ -878,7 +885,7 @@ function initTable(){
             //data: (_.find(data.columns, {'columnName': 'sys_cancelled'})).columnIndex,
             this.EbVoidColumnAdded = true;
             return "{data: (_.find(data.columns, {'columnName': 'sys_cancelled'})).columnIndex, title: \"<i class='fa fa-ban fa-1x' aria-hidden='true'></i><span hidden>sys_cancelled</span>\" "
-             + ", width: 10 , render: function( data2, type, row, meta ) { return renderEbVoidCol(data2); } },";
+             + ", width: 10 , className:'dt-center', render: function( data2, type, row, meta ) { return renderEbVoidCol(data2); } },";
             
         }
 
@@ -893,7 +900,7 @@ function initTable(){
         {
             this.EbLockColumnAdded = true;
             return "{ data: (_.find(data.columns, {'columnName': 'sys_locked'})).columnIndex, title: \"<i class='fa fa-lock fa-1x' aria-hidden='true' ></i><span hidden>sys_locked</span>\" "
-                + ", width: 10, render: function( data2, type, row, meta ) { return renderLockCol(data2); } },";
+                + ", width: 10, className:'dt-center', render: function( data2, type, row, meta ) { return renderLockCol(data2); } },";
         }
 
         private string GetEbToggleColumnDefJs()

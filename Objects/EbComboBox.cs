@@ -114,7 +114,7 @@ var cellTr=null;
 var Msearch_colName='';
 function InitDT(){
     $('#{0}_loading-image').show();
-    $.get('/ds/columns/#######?format=json', function (data)
+    $.get('@servicestack_url/ds/columns/#######?format=json&Token=' + getToken(), {crossDomain: 'true'}, function (data)
     {   var searchTextCollection=[];
         var search_colnameCollection=[];
         var order_colname='';
@@ -166,7 +166,7 @@ function InitDT(){
                 $( '#{0}container table:eq(0) thead th:eq(0)').removeClass('sorting');
             },
         ajax: {
-                url: '/ds/data/#######?format=json',
+                url: '@servicestack_url/ds/data/#######?format=json&Token=' + getToken(), 
                 data: function(dq) { 
 		                delete dq.columns; 
 		                if(search_colnameCollection.length!==0){
@@ -521,7 +521,8 @@ var Vobj{0} = new Vue({
 .Replace("{9}", this.Required.ToString().ToLower())
 .Replace("{10}", this.DefaultSearchFor.ToString())
 .Replace("{11}", "['acmaster1_name', 'tdebit', 'tcredit']")
-.Replace("{12}", this.VueDMcode);
+.Replace("{12}", this.VueDMcode)
+.Replace("@servicestack_url", "https://expressbaseservicestack.azurewebsites.net");
         }
         public override string GetHtml()
         {

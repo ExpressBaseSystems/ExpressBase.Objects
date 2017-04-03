@@ -23,5 +23,7 @@ namespace ExpressBase.Objects
         Image,
         Numeric,
         Text,
+        Null,
+        Chart
     }
 }
