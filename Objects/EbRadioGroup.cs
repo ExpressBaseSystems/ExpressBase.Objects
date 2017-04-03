@@ -56,7 +56,7 @@ namespace ExpressBase.Objects
                 if (this.Options.Count == 2)
                 {
                     rs += @"
-                        <input type = 'checkbox' data-toggle = 'toggle' data-on='@OnValue' data-off='@OffValue'>"
+                        <input id='@name' type = 'checkbox' data-toggle = 'toggle' data-on='@OnValue' data-off='@OffValue'>"
                     .Replace("@OnValue", this.Options[0].Label).Replace("@OffValue", this.Options[1].Label);
                 }
                 else
@@ -83,9 +83,13 @@ $('#@idcontainer [type=checkbox]').bootstrapToggle();
 $('#@idcontainer [type=radio]').on('click', function () {
     $(this).button('toggle')
 })
-$('#@idcontainer label').on('click', function () {
-    alert( $(this).text() );
+//$('#@idcontainer label').on('click', function () {
+//    alert( $(this).text() );
+//})
+$('#@id').change(function() {
+      alert('Toggle: ' + $(this).prop('checked'))
 })
+
 
 ".Replace("@id", this.Name );
         }
