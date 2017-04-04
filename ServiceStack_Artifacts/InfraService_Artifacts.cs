@@ -85,7 +85,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class AccountRequest : IReturn<AccountResponse>,IEbSSRequest
+    public class TokenRequiredUploadRequest : IReturn<TokenRequiredUploadResponse>,IEbSSRequest
     {
         [DataMember(Order = 0)]
         public Dictionary<string, object> Colvalues { get; set; }
@@ -106,14 +106,14 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class AccountResponse
+    public class TokenRequiredUploadResponse
     {
         [DataMember(Order = 1)]
         public int id { get; set; }
     }
 
     [DataContract]
-    public class GetAccount : IReturn<GetAccountResponse>, IEbSSRequest
+    public class TokenRequiredSelectRequest : IReturn<TokenRequiredSelectResponse>, IEbSSRequest
     {
         [DataMember(Order = 0)]
         public int Uid { get; set; }
@@ -131,7 +131,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class GetAccountResponse
+    public class TokenRequiredSelectResponse
     {
        
         [DataMember(Order = 1)]
