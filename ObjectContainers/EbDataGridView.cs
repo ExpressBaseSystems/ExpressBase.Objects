@@ -353,7 +353,29 @@ namespace ExpressBase.Objects
 
         public override string GetHead()
         {
-             return "$('thead:eq(0) tr:eq(1) [type=checkbox]').checkbox().chbxChecked(null); ";
+             return @"$('thead:eq(0) tr:eq(1) [type=checkbox]').checkbox().chbxChecked(null); 
+                      $('[data-toggle=\'tooltip\']').tooltip(); ";
+        }
+
+        private EbForm __filterForm;
+        public void SetFilterForm(EbForm filterForm)
+        {
+            this.__filterForm = filterForm;
+        }
+
+        private string filters
+        {
+            get
+            {
+                string rs = "";
+
+                foreach (EbControl c in this.__filterForm.Controls)
+                {
+                    rs += c.GetHtml();
+                }
+
+                return rs;
+            }
         }
 
         public override string GetHtml()
@@ -408,6 +430,7 @@ padding:0px!important;
 td.dt-center { text-align: center; }
 th.dt-center { text-align: right; }
 td.dt-body-right { text-align: right; }
+.dt-buttons {visibility:hidden;}
 </style>
     <div class='tablecontainer' id='@tableId_container'>
         <div>
@@ -422,10 +445,26 @@ td.dt-body-right { text-align: right; }
             <button type='button' id='@tableId_btntotalpage' class='btn btn-default' style='display: none;' onClick='showOrHideAggrControl(this,@scrolly);' data-table='@tableId'>&sum;</button>
             <input type='text' id='dateFrom'/>
             <input type='text' id='dateTo'/>
-            <div id='btnGo' class='btn btn-default' style='display:inline-block'>GO</div>
+            <div id='btnGo' class='btn btn-default' >GO</div>
+                <div id='btnCopy' class='btn btn-default' disabled data-toggle='tooltip' title='Copy to Clipboard'><i class='fa fa-clipboard' aria-hidden='true'></i></div>
+                <div id='btnPrint' class='btn btn-default' disabled data-toggle='tooltip' title='Print'><i class='fa fa-print' aria-hidden='true'></i></div>
+                <div id='btnExcel' class='btn btn-default' disabled data-toggle='tooltip' title='Excel'><i class='fa fa-file-excel-o' aria-hidden='true'></i></div>
+                <div id='btnPdf' class='btn btn-default' disabled data-toggle='tooltip' title='Pdf'><i class='fa fa-file-pdf-o' aria-hidden='true'></i></div>
+                <div id='btnCsv' class='btn btn-default' disabled data-toggle='tooltip' title='Csv'><i class='fa fa-file-text-o' aria-hidden='true'></i></div>
+
+                <div id='@tableId_btnCollapse' class='btn btn-default' data-toggle='collapse' data-target='#filterBox' aria-expanded='false' aria-controls='filterBox'>
+                    <i class='fa fa-chevron-down' aria-hidden='true'></i>
+                </div>
         </div>
         <div style='width:auto;'>
-              
+             
+
+<div class='collapse' id='filterBox'>
+        <div style='background-color:gray; position:relative; height:30px;'>
+            @filters  
+        </div>
+</div>
+
                     <h3>@tableViewName</h3>
                <div id='@tableId_loadingdiv' class='loadingdiv'>
                     <img id='@tableId_loading-image' src='/images/ajax-loader.gif' alt='Loading...' />
@@ -461,12 +500,46 @@ td.dt-body-right { text-align: right; }
 var _from = '';
 var _to = '';
 var flag=true;
+var DtF = true;
 $('#btnGo').click(function(){
     _from = $('#dateFrom').val().toString();
     _to = $('#dateTo').val().toString();
-    initTable();
+    if(DtF)
+        initTable();
+    else
+        $('#@tableId_tbl').DataTable().ajax.reload();
+    DtF = false;
+    $('#filterBox').collapse('hide');
+    $('#btnCopy').removeAttr('disabled');
+    $('#btnPrint').removeAttr('disabled');
+    $('#btnExcel').removeAttr('disabled');
+    $('#btnPdf').removeAttr('disabled');
+    $('#btnCsv').removeAttr('disabled')
+});
+$('#btnCopy').click(function(){
+    $('.buttons-copy').click()
+});
+$('#btnPrint').click(function(){
+    $('.buttons-print').click()
+});
+$('#btnExcel').click(function(){
+    $('.buttons-excel').click()
+});
+$('#btnPdf').click(function(){
+    $('.buttons-pdf').click()
+});
+$('#btnCsv').click(function(){
+    $('.buttons-csv').click()
 });
 
+
+//var collaF = true;
+//$('#@tableId_btnCollapse').click(function(){
+//    console.log('pooyyy');
+//    if(collaF)
+//        $('#filterBox').load('http://localhost:53431/TenantUser/f?fid=37');
+//    collaF = false;
+//});
 
 function initTable(){
 
@@ -484,10 +557,10 @@ function initTable(){
         var @tableId__datacolumns = data.columns;
         $('#@tableId_tbl').DataTable(
         {
-            dom:'Bltrip',
+            //dom:'Bltrip',
             //dom:'Bliptr',
             //dom:'<\'col-sm-2\'l><\'col-sm-4\'i><\'col-sm-6\'p>'+'<\'col-sm-12\'tr>',
-            //dom:'<\'col-sm-2\'l><\'col-sm-4\'i><\'col-sm-6\'p>tr',
+            dom:'<\'well well-lg\'<\'col-sm-2\'l><\'col-sm-2\'i><\'col-sm-3\'B><\'col-sm-5\'p>>tr',
             buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
             @scrollYOption,
             responsive:true,
@@ -497,13 +570,14 @@ function initTable(){
             serverSide: true,
             processing:true,
             language: { processing: '<div class=\'fa fa-spinner fa-pulse  fa-3x fa-fw\'></div>',
-                        info:'_START_ to _END_ of _TOTAL_'},
+                        info:'_START_ - _END_ / _TOTAL_'},
             pagingType:'@pagingType',
             columns:@columnsRender, 
             order: [],
             deferRender: true,
             filter: true,
-            select: { style: 'os', selector: 'td:first-child' },
+            select: { style: 'os', selector: '' },
+            //select:true,
             ajax: {
                 url: '@servicestack_url/ds/data/@dataSourceId?format=json&Token=' + getToken(),
                 data: function(dq) { 
@@ -618,7 +692,8 @@ function initTable(){
 .Replace("@scrollYOption", this.GetScrollYOption())
 .Replace("@tfoot", this.GetFooter())
 .Replace("@pagingType",this.PagingType.ToString())
-.Replace("@servicestack_url", "https://expressbaseservicestack.azurewebsites.net");
+.Replace("@servicestack_url", "https://expressbaseservicestack.azurewebsites.net")
+.Replace("@filters", this.filters);
         }
     }
 
@@ -877,7 +952,7 @@ function initTable(){
         {
             this.CheckBoxColumnAdded = true;
             return "{ data: null, title: \"<input id='{0}_select-all' type='checkbox' onclick='clickAlSlct(event, this);' data-table='{0}'/>\"".Replace("{0}", tableid)
-                + ", width: 10, render: function( data2, type, row, meta ) { return renderCheckBoxCol(data.columns, '{0}', row); }, orderable: false },".Replace("{0}", tableid);
+                + ", width: 10, className:'select-checkbox', render: function( data2, type, row, meta ) { return renderCheckBoxCol(data.columns, '{0}', row); }, orderable: false },".Replace("{0}", tableid);
         }
 
         private string GetEbVoidColumnDefJs()

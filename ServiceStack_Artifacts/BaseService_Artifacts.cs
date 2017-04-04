@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using ServiceStack;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
@@ -10,5 +7,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         string Token { get; set; }
 
         string TenantAccountId { get; set; }
+    }
+
+    public interface IEbSSResponse
+    {
+        ResponseStatus ResponseStatus { get; set; } //Exception gets serialized here
     }
 }
