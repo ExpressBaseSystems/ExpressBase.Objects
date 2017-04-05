@@ -509,6 +509,7 @@ var _to = '';
 var flag=true;
 var DtF = true;
 $('#btnGo').click(function(){
+    //alert( getFilterValues() );
     _from = $('#dateFrom').val().toString();
     _to = $('#dateTo').val().toString();
     if(DtF){
@@ -581,6 +582,7 @@ function initTable(){
                 data: function(dq) { 
                         delete dq.columns;
                         @tableId_filter_objcol = repopulate_filter_arr('@tableId');
+                        dq.params = getFilterValues();
                         if (@tableId_filter_objcol.length !== 0)
                         {
                             dq.search_col = @tableId_filter_objcol.map(function(a) {return a.column;}).join(',');
@@ -590,8 +592,8 @@ function initTable(){
 
                         if(@tableId_order_colname!=='')
                             dq.order_col=@tableId_order_colname; 
-                        if(dict.length !== 0)
-                            dq.colvalues = dict;
+                        //if(dict.length !== 0)
+                            //dq.colvalues = dict;
                     },
                 dataSrc: function(dd) {
                         return dd.data;

@@ -33,7 +33,16 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public string TenantAccountId { get; set; }
 
-        public Dictionary<string, string> colvalues { get; set; }
+        public List<EbParam> Params { get; set; }
+    }
+
+    public class EbParam
+    {
+        public string Type { get; set; }
+
+        public string Name { get; set; }
+
+        public string Value { get; set; }
     }
 
     [Route("/ds")]
@@ -52,7 +61,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public string TenantAccountId { get; set; }
 
-        public Dictionary<string, string> colvalues { get; set; }
+        public List<EbParam> Params { get; set; }
     }
 
     [DataContract]
