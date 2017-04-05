@@ -51,12 +51,19 @@ namespace ExpressBase.Objects
             get
             {
                 string rs = @"<div id='@namecontainer' style='position:absolute; left:@leftpx; top:@toppx; @hiddenString'>
+                                <input id='@namehidden' type ='hidden' name='Ebradio'>
                                 <span id='@nameLbl' style='@lblBackColor @LblForeColor'>@label</span>
                                 <div data-toggle='tooltip' title='@toolTipText'>";
                 if (this.Options.Count == 2)
                 {
                     rs += @"
-                        <input id='@name' type = 'checkbox' data-toggle = 'toggle' data-on='@OnValue' data-off='@OffValue'>"
+                        <input id='@name' type = 'checkbox' data-toggle = 'toggle' data-on='@OnValue' data-off='@OffValue'>
+                        <script>$('#@name').change(function() {
+                            if($(this).prop('checked')===true)
+                                $('#@namehidden').val( '@OnValue' );
+                            else
+                                $('#@namehidden').val( '@OffValue' );
+                        });</script>"
                     .Replace("@OnValue", this.Options[0].Label).Replace("@OffValue", this.Options[1].Label);
                 }
                 else
@@ -70,7 +77,11 @@ namespace ExpressBase.Objects
                                 @option
                             </label>".Replace("@option", this.Options[i].Label).Replace("@idx",i.ToString());
                     }
-                    rs += "</div>";
+                    rs += @"</div>  <script>
+                                        $('#@namecontainer label').on('click', function () {
+                                            $('#@namehidden').val( $(this).text() );
+                                        })
+                                    </script>";
                 }
                 return rs + "</div><span class='helpText'> @helpText </span></div>";
             }
@@ -81,14 +92,10 @@ namespace ExpressBase.Objects
             return this.RequiredString + @"
 $('#@idcontainer [type=checkbox]').bootstrapToggle();
 $('#@idcontainer [type=radio]').on('click', function () {
-    $(this).button('toggle')
+    $(this).button('toggle');
 })
-//$('#@idcontainer label').on('click', function () {
-//    alert( $(this).text() );
-//})
-$('#@id').change(function() {
-      alert('Toggle: ' + $(this).prop('checked'))
-})
+
+
 
 
 ".Replace("@id", this.Name );
