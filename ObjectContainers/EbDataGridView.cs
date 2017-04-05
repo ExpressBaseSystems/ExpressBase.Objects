@@ -546,146 +546,137 @@ function initTable(){
 
      var dict = '{from:' + _from + ',to:' + _to + '}';
 
+    $.get('@servicestack_url/ds/columns/@dataSourceId?format=json&Token=' + getToken() + '&Params=' + encodeURIComponent(JSON.stringify(getFilterValues())), { crossDomain: 'true' }, function (data){
+        var @tableId_ids=[];
+        var @tableId_filter_objcol = [];
+        var @tableId_order_colname='';
+        var @tableId__datacolumns = data.columns;
+        $('#@tableId_tbl').DataTable(
+        {
+            //dom:'Bltrip',
+            //dom:'Bliptr',
+            //dom:'<\'col-sm-2\'l><\'col-sm-4\'i><\'col-sm-6\'p>'+'<\'col-sm-12\'tr>',
+            dom:'<\'col-sm-2\'l><\'col-sm-2\'i><\'col-sm-3\'B><\'col-sm-5\'p>tr',
+            buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+            @scrollYOption,
+            responsive:true,
+            keys: true,
+            autoWidth: false,
+            @lengthMenu,
+            serverSide: true,
+            processing:true,
+            language: { processing: '<div class=\'fa fa-spinner fa-pulse  fa-3x fa-fw\'></div>',
+                        info:'_START_ - _END_ / _TOTAL_'},
+            pagingType:'@pagingType',
+            columns:@columnsRender, 
+            order: [],
+            deferRender: true,
+            filter: true,
+            select: { style: 'os', selector: '' },
+            //select:true,
+            retrieve: true,
+            ajax: {
+                url: '@servicestack_url/ds/data/@dataSourceId?format=json&Token=' + getToken(),
+                data: function(dq) { 
+                        delete dq.columns;
+                        @tableId_filter_objcol = repopulate_filter_arr('@tableId');
+                        dq.params = getFilterValues();
+                        if (@tableId_filter_objcol.length !== 0)
+                        {
+                            dq.search_col = @tableId_filter_objcol.map(function(a) {return a.column;}).join(',');
+                            dq.selectedvalue = @tableId_filter_objcol.map(function(a) {return a.operator;}).join(',');
+                            dq.searchtext = @tableId_filter_objcol.map(function(a) {return a.value;}).join(',');
+                        }  
 
-    //$.get('@servicestack_url/ds/columns/@dataSourceId?format=json&Token=' + getToken(), { crossDomain: 'true', Params: JSON.stringify(getFilterValues()) }, function (data)
-    $.ajax({
-        type: 'GET',
-        url: '@servicestack_url/ds/columns',
-        crossDomain: true,
-        data: { id: @dataSourceId, Token: getToken(), Params: JSON.stringify(getFilterValues()) },
-        dataType: 'jsonp',
-        success: function(data, status, jqXHR) {
-            alert('datap: ' + data);
-            var @tableId_ids=[];
-            var @tableId_filter_objcol = [];
-            var @tableId_order_colname='';
-            var @tableId__datacolumns = data.columns;
-            $('#@tableId_tbl').DataTable(
-            {
-                //dom:'Bltrip',
-                //dom:'Bliptr',
-                //dom:'<\'col-sm-2\'l><\'col-sm-4\'i><\'col-sm-6\'p>'+'<\'col-sm-12\'tr>',
-                dom:'<\'col-sm-2\'l><\'col-sm-2\'i><\'col-sm-3\'B><\'col-sm-5\'p>tr',
-                buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
-                @scrollYOption,
-                responsive:true,
-                keys: true,
-                autoWidth: false,
-                @lengthMenu,
-                serverSide: true,
-                processing:true,
-                language: { processing: '<div class=\'fa fa-spinner fa-pulse  fa-3x fa-fw\'></div>',
-                            info:'_START_ - _END_ / _TOTAL_'},
-                pagingType:'@pagingType',
-                columns:@columnsRender, 
-                order: [],
-                deferRender: true,
-                filter: true,
-                select: { style: 'os', selector: '' },
-                //select:true,
-                retrieve: true,
-                ajax: {
-                    url: '@servicestack_url/ds/data/@dataSourceId?format=json&Token=' + getToken(),
-                    data: function(dq) { 
-                            delete dq.columns;
-                            @tableId_filter_objcol = repopulate_filter_arr('@tableId');
-                            dq.params = getFilterValues();
-                            if (@tableId_filter_objcol.length !== 0)
-                            {
-                                dq.search_col = @tableId_filter_objcol.map(function(a) {return a.column;}).join(',');
-                                dq.selectedvalue = @tableId_filter_objcol.map(function(a) {return a.operator;}).join(',');
-                                dq.searchtext = @tableId_filter_objcol.map(function(a) {return a.value;}).join(',');
-                            }  
-
-                            if(@tableId_order_colname!=='')
-                                dq.order_col=@tableId_order_colname; 
-                            //if(dict.length !== 0)
-                                //dq.colvalues = dict;
-                        },
-                    dataSrc: function(dd) {
-                            return dd.data;
-                    }
-                },
-        
-                fnRowCallback: function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
-                    colorRow(nRow, aData, iDisplayIndex, iDisplayIndexFull, data.columns);
-                },
-
-                fnFooterCallback: function ( nRow, aaData, iStart, iEnd, aiDisplay ) {
-                    summarize2('@tableId', @eb_agginfo,@scrolly);
-                },
-                drawCallback:function ( settings ) {
-                    $('tbody [data-toggle=toggle]').bootstrapToggle();
-                    $('#@tableId_tbl').DataTable().columns.adjust();
-                },
-                initComplete:function ( settings,json ) {
-                    $('#@tableId_tbl').DataTable().columns.adjust();
+                        if(@tableId_order_colname!=='')
+                            dq.order_col=@tableId_order_colname; 
+                        //if(dict.length !== 0)
+                            //dq.colvalues = dict;
+                    },
+                dataSrc: function(dd) {
+                        return dd.data;
                 }
-                //drawCallback: function ( settings ) {
-                //    var api = this.api();
-                //    var rows = api.rows( { page: 'current'} ).nodes();
-                //    var last = null;
+            },
+        
+            fnRowCallback: function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
+                colorRow(nRow, aData, iDisplayIndex, iDisplayIndexFull, data.columns);
+            },
+
+            fnFooterCallback: function ( nRow, aaData, iStart, iEnd, aiDisplay ) {
+                summarize2('@tableId', @eb_agginfo,@scrolly);
+            },
+            drawCallback:function ( settings ) {
+                $('tbody [data-toggle=toggle]').bootstrapToggle();
+                $('#@tableId_tbl').DataTable().columns.adjust();
+            },
+            initComplete:function ( settings,json ) {
+                $('#@tableId_tbl').DataTable().columns.adjust();
+            }
+            //drawCallback: function ( settings ) {
+            //    var api = this.api();
+            //    var rows = api.rows( { page: 'current'} ).nodes();
+            //    var last = null;
             
-                //    api.column(3, { page: 'current'} ).data().each(function(group, i) {
-                //        if (last !== group)
-                //        {
-                //            $(rows).eq(i).before(
-                //                '<tr class=\'group\'><td colspan=\'8\'>' + group + '</td></tr>'
-                //            );
+            //    api.column(3, { page: 'current'} ).data().each(function(group, i) {
+            //        if (last !== group)
+            //        {
+            //            $(rows).eq(i).before(
+            //                '<tr class=\'group\'><td colspan=\'8\'>' + group + '</td></tr>'
+            //            );
 
-                //            last = group;
-                //        }
-                //    } );
-                //}
-            });
+            //            last = group;
+            //        }
+            //    } );
+            //}
+        });
 
-            $.fn.dataTable.Api.register( 'column().data().sum()', function () {
-                return this.reduce( function (a, b) { return a + b; } );
-            } );
+        $.fn.dataTable.Api.register( 'column().data().sum()', function () {
+            return this.reduce( function (a, b) { return a + b; } );
+        } );
 
-            $.fn.dataTable.Api.register( 'column().data().average()', function () {
-                var sum= this.reduce( function (a, b) { return a + b; } );
-                return sum/this.length;
-            } );
+        $.fn.dataTable.Api.register( 'column().data().average()', function () {
+            var sum= this.reduce( function (a, b) { return a + b; } );
+            return sum/this.length;
+        } );
 
-            if( @eb_agginfo.length>0 ) {
-                createFooter('@tableId', @eb_footer1, @scrolly, 0);
-                createFooter('@tableId', @eb_footer2, @scrolly, 1);
-            }
-
-            $('#@tableId_loadingdiv').hide();
-        
-            $('#btnCopy').removeAttr('disabled');
-            $('#btnPrint').removeAttr('disabled');
-            $('#btnExcel').removeAttr('disabled');
-            $('#btnPdf').removeAttr('disabled');
-            $('#btnCsv').removeAttr('disabled');
-   
-            createFilterRowHeader('@tableId', @eb_filter_controls, @scrolly);
-
-            $('#@tableId_container thead').on('click','th',function(){
-                var txt=$(this).children('span').text();
-                if(txt !== '')
-                    @tableId_order_colname =txt;
-            });
-
-            if(@bserial){
-                $('#@tableId_tbl').DataTable().on( 'draw.dt', function () {
-                    $('#@tableId_tbl').DataTable().column(0).nodes().each( function (cell, i) {
-                        cell.innerHTML = i+1;
-                    } );
-                } );
-            }
-
-            $('#@tableId_container [type=search]').on( 'keyup', function () {alert('haa');
-                $('#@tableId_tbl').DataTable().search( 'food' ).draw();
-            } );
-        
-            new ResizeSensor(jQuery('#@tableId_container'), function() {
-                if ( $.fn.dataTable.isDataTable( '#@tableId_tbl' ) )
-                    $('#@tableId_tbl').DataTable().columns.adjust();
-            });
+        if( @eb_agginfo.length>0 ) {
+            createFooter('@tableId', @eb_footer1, @scrolly, 0);
+            createFooter('@tableId', @eb_footer2, @scrolly, 1);
         }
+
+        $('#@tableId_loadingdiv').hide();
+        
+        $('#btnCopy').removeAttr('disabled');
+        $('#btnPrint').removeAttr('disabled');
+        $('#btnExcel').removeAttr('disabled');
+        $('#btnPdf').removeAttr('disabled');
+        $('#btnCsv').removeAttr('disabled');
+   
+        createFilterRowHeader('@tableId', @eb_filter_controls, @scrolly);
+
+        $('#@tableId_container thead').on('click','th',function(){
+            var txt=$(this).children('span').text();
+            if(txt !== '')
+                @tableId_order_colname =txt;
+        });
+
+        if(@bserial){
+            $('#@tableId_tbl').DataTable().on( 'draw.dt', function () {
+                $('#@tableId_tbl').DataTable().column(0).nodes().each( function (cell, i) {
+                    cell.innerHTML = i+1;
+                } );
+            } );
+        }
+
+        $('#@tableId_container [type=search]').on( 'keyup', function () {alert('haa');
+            $('#@tableId_tbl').DataTable().search( 'food' ).draw();
+        });
+
+    });
+        
+    new ResizeSensor(jQuery('#@tableId_container'), function() {
+        if ( $.fn.dataTable.isDataTable( '#@tableId_tbl' ) )
+            $('#@tableId_tbl').DataTable().columns.adjust();
     });
 }    
 </script>"
