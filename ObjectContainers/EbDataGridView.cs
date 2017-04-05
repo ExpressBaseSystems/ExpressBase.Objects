@@ -357,6 +357,8 @@ namespace ExpressBase.Objects
                       $('[data-toggle=\'tooltip\']').tooltip(); ";
         }
 
+        private int FilterBH = 0;
+
         private EbForm __filterForm;
         public void SetFilterForm(EbForm filterForm)
         {
@@ -368,12 +370,17 @@ namespace ExpressBase.Objects
             get
             {
                 string rs = "";
-
+                int max=0;
                 foreach (EbControl c in this.__filterForm.Controls)
                 {
+                    if (c.Top >= max)
+                    {
+                        max = (c.Top + c.Height);
+                    }
+                        c.Top+= 10;
                     rs += c.GetHtml();
                 }
-
+                this.FilterBH += max;
                 return rs;
             }
         }
@@ -452,15 +459,15 @@ td.dt-body-right { text-align: right; }
                 <div id='btnPdf' class='btn btn-default' disabled data-toggle='tooltip' title='Pdf'><i class='fa fa-file-pdf-o' aria-hidden='true'></i></div>
                 <div id='btnCsv' class='btn btn-default' disabled data-toggle='tooltip' title='Csv'><i class='fa fa-file-text-o' aria-hidden='true'></i></div>
 
-                <div id='@tableId_btnCollapse' class='btn btn-default' data-toggle='collapse' data-target='#filterBox' aria-expanded='false' aria-controls='filterBox'>
+                <div id='btnCollapse' class='btn btn-default' data-toggle='collapse' data-target='#filterBox' aria-expanded='true' aria-controls='filterBox'>
                     <i class='fa fa-chevron-down' aria-hidden='true'></i>
                 </div>
         </div>
         <div style='width:auto;'>
              
 
-<div class='collapse' id='filterBox'>
-        <div style='background-color:gray; position:relative; height:30px;'>
+<div class='collapse collapse in' style='margin-top:10px;' id='filterBox'>
+        <div class='well well-sm' style='position:relative; height:@FilterBHpx; padding-top:40px;padding-bottom:40px;'>
             @filters  
         </div>
 </div>
@@ -504,18 +511,15 @@ var DtF = true;
 $('#btnGo').click(function(){
     _from = $('#dateFrom').val().toString();
     _to = $('#dateTo').val().toString();
-    if(DtF)
+    if(DtF){
+        DtF = false;
         initTable();
+        $('#filterBox').collapse('hide');
+    }
     else
         $('#@tableId_tbl').DataTable().ajax.reload();
-    DtF = false;
-    $('#filterBox').collapse('hide');
-    $('#btnCopy').removeAttr('disabled');
-    $('#btnPrint').removeAttr('disabled');
-    $('#btnExcel').removeAttr('disabled');
-    $('#btnPdf').removeAttr('disabled');
-    $('#btnCsv').removeAttr('disabled')
 });
+
 $('#btnCopy').click(function(){
     $('.buttons-copy').click()
 });
@@ -533,13 +537,6 @@ $('#btnCsv').click(function(){
 });
 
 
-//var collaF = true;
-//$('#@tableId_btnCollapse').click(function(){
-//    console.log('pooyyy');
-//    if(collaF)
-//        $('#filterBox').load('http://localhost:53431/TenantUser/f?fid=37');
-//    collaF = false;
-//});
 
 function initTable(){
 
@@ -560,7 +557,7 @@ function initTable(){
             //dom:'Bltrip',
             //dom:'Bliptr',
             //dom:'<\'col-sm-2\'l><\'col-sm-4\'i><\'col-sm-6\'p>'+'<\'col-sm-12\'tr>',
-            dom:'<\'well well-lg\'<\'col-sm-2\'l><\'col-sm-2\'i><\'col-sm-3\'B><\'col-sm-5\'p>>tr',
+            dom:'<\'col-sm-2\'l><\'col-sm-2\'i><\'col-sm-3\'B><\'col-sm-5\'p>tr',
             buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
             @scrollYOption,
             responsive:true,
@@ -578,6 +575,7 @@ function initTable(){
             filter: true,
             select: { style: 'os', selector: '' },
             //select:true,
+            retrieve: true,
             ajax: {
                 url: '@servicestack_url/ds/data/@dataSourceId?format=json&Token=' + getToken(),
                 data: function(dq) { 
@@ -647,7 +645,12 @@ function initTable(){
         }
 
         $('#@tableId_loadingdiv').hide();
-
+        
+        $('#btnCopy').removeAttr('disabled');
+        $('#btnPrint').removeAttr('disabled');
+        $('#btnExcel').removeAttr('disabled');
+        $('#btnPdf').removeAttr('disabled');
+        $('#btnCsv').removeAttr('disabled');
    
         createFilterRowHeader('@tableId', @eb_filter_controls, @scrolly);
 
@@ -672,7 +675,8 @@ function initTable(){
        
     });
     new ResizeSensor(jQuery('#@tableId_container'), function() {
-        $('#@tableId_tbl').DataTable().columns.adjust();
+        if ( $.fn.dataTable.isDataTable( '#@tableId_tbl' ) )
+            $('#@tableId_tbl').DataTable().columns.adjust();
     });
     
      
@@ -693,7 +697,8 @@ function initTable(){
 .Replace("@tfoot", this.GetFooter())
 .Replace("@pagingType",this.PagingType.ToString())
 .Replace("@servicestack_url", "https://expressbaseservicestack.azurewebsites.net")
-.Replace("@filters", this.filters);
+.Replace("@filters", this.filters)
+.Replace("@FilterBH", this.FilterBH.ToString());
         }
     }
 

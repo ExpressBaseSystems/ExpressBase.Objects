@@ -84,10 +84,10 @@ $('#$id').$$$$$$$picker({
         public override string GetHtml()
         {
             return string.Format(@"
-<div id='{0}Container' style='position:absolute; left:400px; top:500px; {6}'>
+<div id='{0}Container' style='position:absolute; left:@leftpx; top:@top; {6}'>
     <div style='{14} {15}'>{5}</div>
     <div  class='input-group' style='width:1px;'>
-        <input id='{0}' data-toggle='tooltip' title='{9}' class='date' type='text'  name='{0}'   style='width:{3}px; height:{4}px; {12} {13} display:inline-block;{8} {7} {11} />
+        <input id='{0}' data-type='@datetype' data-toggle='tooltip' title='{9}' class='date' type='text'  name='{0}'   style='width:{3}px; height:{4}px; {12} {13} display:inline-block;{8} {7} {11} />
         <i id='{0}TglBtn' class='fa fa-calendar input-group-addon' aria-hidden='true'></i>
     </div>
     <div class='helpText'> {10} </div>
@@ -96,7 +96,11 @@ $('#$id').$$$$$$$picker({
 this.Name, this.Left, this.Top, this.Width, this.Height, this.Label, //5
 this.HiddenString, (this.Required && !this.Hidden ? " required" : string.Empty), this.ReadOnlyString,//8
 this.ToolTipText, this.HelpText, "tabindex='" + this.TabIndex + "'",//11
- "background-color:" + this.BackColorSerialized + ";", "color:" + this.ForeColorSerialized + ";", "background-color:" + this.LabelBackColorSerialized + ";", "color:" + this.LabelForeColorSerialized + ";");
+ "background-color:" + this.BackColorSerialized + ";", "color:" + this.ForeColorSerialized + ";", "background-color:" + this.LabelBackColorSerialized + ";", "color:" + this.LabelForeColorSerialized + ";")
+.Replace("@name", this.Name)
+.Replace("@left", this.Left.ToString())
+.Replace("@top", this.Top.ToString())
+.Replace("@datetype", this.EbDateTypeString);
         }
     }
 }

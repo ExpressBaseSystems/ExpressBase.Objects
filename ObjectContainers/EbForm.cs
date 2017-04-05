@@ -53,6 +53,25 @@ namespace ExpressBase.Objects
             }
         }
 #endif
+        public override string GetHead()
+        {
+            string head = string.Empty;
+
+            foreach (EbControl c in this.Controls)
+                head += c.GetHead();
+
+            return head;
+        }
+
+        public override string GetHtml()
+        {
+            string html = string.Empty;
+
+            foreach (EbControl c in this.Controls)
+                html += c.GetHtml();
+
+            return html;
+        }
     }
 
     public class EbTableConverter : TypeConverter
