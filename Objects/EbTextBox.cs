@@ -37,6 +37,7 @@ namespace ExpressBase.Objects
         public TextMode TextMode { get; set; }
 
         [ProtoBuf.ProtoMember(4)]
+        [System.ComponentModel.Category("Behavior")]
         public string PlaceHolder { get; set; }
 
         [ProtoBuf.ProtoMember(6)]
@@ -56,8 +57,7 @@ namespace ExpressBase.Objects
 
         public override string GetHead()
         {
-            return (((!this.Hidden) ? this.UniqueString + this.RequiredString : string.Empty) + @"".Replace("{0}", this.Name)
-        );
+            return ( ((!this.Hidden) ? this.UniqueString + this.RequiredString : string.Empty) + @"".Replace("{0}", this.Name) );
         }
 
         private string TextTransformString
@@ -83,9 +83,9 @@ namespace ExpressBase.Objects
     <span id='@nameLbl' style='@lblBackColor @LblForeColor'>@label</span>
         <div  class='input-group' style='width: 1px;'>
             @attachedLbl
-            <input type='@textMode'  id='@name' name='@name' autocomplete = '@autoComplete' data-toggle='tooltip' title='@toolTipText' @maxLength style='width:@widthpx; height:@heightpx; @backColor @foreColor display:inline-block; @fontStyle @readOnlyString @required @placeHolder @text @tabIndex  />
+            <input type='@textMode'  id='@name' name='@name' autocomplete = '@autoComplete' data-toggle='tooltip' title='@toolTipText' @tabIndex @maxLength style='width:@widthpx; height:@heightpx; @backColor @foreColor display:inline-block; @fontStyle @readOnlyString @required @placeHolder @text @tabIndex  />
         </div>
-    <div class='helpText'> @helpText </div>
+    <span class='helpText'> @helpText </span>
 </div>"
 .Replace("@name", this.Name)
 .Replace("@left", this.Left.ToString())

@@ -77,18 +77,18 @@ namespace ExpressBase.Objects
         {
             get
             {
-                string rs = "<div id='{0}' data-toggle='tooltip' title='$tooltipText'>";
+                string rs = "<div id='@name' data-toggle='tooltip' title='@tooltipText'>";
                 for (int i = 1; i <= this.NumberOfFields; i++)
                     rs += @"
 <div style='display:inline-block;'>
-    <div style='display:inline-block;' id='{0}Lbl'>label</div>
-    <v-select id='{0}$$' style='width:{3}px;' 
+    <div style='display:inline-block;' id='@nameLbl'>label</div>
+    <v-select id='@name$$' style='width:{3}px;' 
         multiple
 	    v-model='displayMember$$'
         :on-change='updateCk'
         placeholder = 'Search...'>
     </v-select>
-</div>".Replace("$$", i.ToString()).Replace("$tooltipText", this.ToolTipText);
+</div>".Replace("$$", i.ToString());
                 return rs + "</div>";
             }
         }
@@ -532,21 +532,22 @@ var Vobj{0} = new Vue({
         Vue.config.devtools = true;
     </script>
                
-   <div id='{0}container' style='position:absolute; left:{1}px;  top:{2}px;'>
-        {5}
-    <div id='{0}_loadingdiv' class='tbl-loadingdiv'>
-        <i id='{0}_loading-image' class='fa fa-spinner fa-pulse fa-2x fa-fw'></i><span class='sr-only'>Loading...</span>
+   <div id='@namecontainer' style='position:absolute; left:@leftpx;  top:@toppx;'>
+        @VueSelectCode
+    <div id='@name_loadingdiv' class='tbl-loadingdiv'>
+        <i id='@name_loading-image' class='fa fa-spinner fa-pulse fa-2x fa-fw'></i><span class='sr-only'>Loading...</span>
     </div>
-    <center><div id='{0}DDdiv'v-show='DDstate' class='DDdiv'  style='width:{4}px;'> 
-        <table id='{0}tbl' tabindex='1000' style='width:100%' class='display'></table>
+    <center><div id='@nameDDdiv'v-show='DDstate' class='DDdiv'  style='width:@DDwidthpx;'> 
+        <table id='@nametbl' tabindex='1000' style='width:100%' class='display'></table>
     </div></center>
 </div>"
-.Replace("{5}", this.VueSelectcode)
-.Replace("{0}", this.Name)
-.Replace("{1}", "150")//this.Left.ToString())
-.Replace("{2}", "200")//this.Top.ToString())
-.Replace("{3}", "200")//this.Width.ToString())
-.Replace("{4}", (this.DropdownWidth == 0) ? "300" : this.DropdownWidth.ToString());
+.Replace("@VueSelectCode", this.VueSelectcode)
+.Replace("@name", this.Name)
+.Replace("@left", this.Left.ToString())
+.Replace("@top", this.Top.ToString())
+.Replace("@width", this.Width.ToString())
+.Replace("@DDwidth", (this.DropdownWidth == 0) ? "300" : this.DropdownWidth.ToString())
+.Replace("@tooltipText", this.ToolTipText);
         }
     }
 }

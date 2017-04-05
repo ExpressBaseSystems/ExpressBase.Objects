@@ -79,7 +79,7 @@ namespace ExpressBase.Objects
                     }
                     rs += @"</div>  <script>
                                         $('#@namecontainer label').on('click', function () {
-                                            $('#@namehidden').val( $(this).text() );
+                                            $('#@namehidden').val( $(this).text().trim() );
                                         })
                                     </script>";
                 }
