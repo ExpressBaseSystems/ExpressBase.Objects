@@ -8,9 +8,9 @@ namespace ExpressBase.Objects
 {
     public enum EbDateType
     {
-        Date,
-        Time,
-        DateTime,
+        Date = (int)System.Data.DbType.Date,
+        Time = (int)System.Data.DbType.Time,
+        DateTime = (int)System.Data.DbType.DateTime,
     }
 
     [ProtoBuf.ProtoContract]
@@ -47,27 +47,6 @@ namespace ExpressBase.Objects
         [System.ComponentModel.Category("Behavior")]
         public bool AutoCompleteOff { get; set; }
 
-        private string EbDateTypeString
-        {
-            get
-            {
-                string returnval = string.Empty;
-                switch (this.EbDateType)
-                {
-                    case EbDateType.Time:
-                        returnval = "time";
-                        break;
-                    case EbDateType.Date:
-                        returnval = "date";
-                        break;
-                    case EbDateType.DateTime:
-                        returnval = "datetime";
-                        break;
-                }
-                return returnval;
-            }
-        }
-
         public override string GetHead()
         {
             return  (((!this.Hidden) ? this.UniqueString + this.RequiredString : string.Empty) + @"".Replace("{0}", this.Name)) + @"
@@ -85,7 +64,7 @@ $('#$id').$$$$$$$picker({
 	stepHour: 1,
 	stepMinute: 1,
 	stepSecond: 1
-});".Replace("$$$$$$$", this.EbDateTypeString)
+});".Replace("$$$$$$$", this.EbDateType.ToString().ToLower())
 .Replace("$id", this.Name);
         }
 
@@ -111,7 +90,7 @@ this.ToolTipText, this.HelpText, "tabindex='" + this.TabIndex + "'",//11
 .Replace("@top", this.Top.ToString())
 .Replace("@width", this.Width.ToString())
 .Replace("@height", this.Height.ToString())
-.Replace("@datetype", this.EbDateTypeString)
+.Replace("@datetype", ((int)this.EbDateType).ToString())
 .Replace("@value", "value='" + this.Value + "'")
 .Replace("@label", this.Label)
 .Replace("@hiddenString", this.HiddenString)
@@ -130,7 +109,7 @@ this.ToolTipText, this.HelpText, "tabindex='" + this.TabIndex + "'",//11
                             (" font-family:" + this.FontSerialized.FontFamily + ";" + "font-style:" + this.FontSerialized.Style
                             + ";" + "font-size:" + this.FontSerialized.SizeInPoints + "px;")
                         : string.Empty)
-.Replace("@atchdLbl", (this.EbDateTypeString=="time") ? "fa-clock-o" : "fa-calendar")
+.Replace("@atchdLbl", (this.EbDateType.ToString().ToLower() == "time") ? "fa-clock-o" : "fa-calendar")
 ;
         }
     }
