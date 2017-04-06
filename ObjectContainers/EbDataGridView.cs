@@ -539,8 +539,6 @@ function initTable(){
     $('#@tableId_loadingdiv').show();
     $('#@tableId_tbl').append( $('@tfoot') );
 
-     var dict = '{from:' + _from + ',to:' + _to + '}';
-
     $.get('@servicestack_url/ds/columns/@dataSourceId?format=json&Token=' + getToken() + '&Params=' + encodeURIComponent(JSON.stringify(getFilterValues())), { crossDomain: 'true' }, function (data){
         var @tableId_ids=[];
         var @tableId_filter_objcol = [];
@@ -548,9 +546,6 @@ function initTable(){
         var @tableId__datacolumns = data.columns;
         $('#@tableId_tbl').DataTable(
         {
-            //dom:'Bltrip',
-            //dom:'Bliptr',
-            //dom:'<\'col-sm-2\'l><\'col-sm-4\'i><\'col-sm-6\'p>'+'<\'col-sm-12\'tr>',
             dom:'<\'col-sm-2\'l><\'col-sm-2\'i><\'col-sm-3\'B><\'col-sm-5\'p>tr',
             buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
             @scrollYOption,
@@ -571,14 +566,14 @@ function initTable(){
             //select:true,
             retrieve: true,
             ajax: {
-                url: '@servicestack_url/ds/data/',
+                url: '@servicestack_url/ds/data/@dataSourceId',
                 type: 'POST',
                 data: function(dq) { 
                         dq.Id = @dataSourceId;
                         dq.Token = getToken();
                         delete dq.columns;
                         @tableId_filter_objcol = repopulate_filter_arr('@tableId');
-                        dq.Params = encodeURIComponent(JSON.stringify(getFilterValues()));
+                        dq.Params = JSON.stringify(getFilterValues()));
                         if (@tableId_filter_objcol.length !== 0)
                         {
                             dq.search_col = @tableId_filter_objcol.map(function(a) {return a.column;}).join(',');
@@ -588,8 +583,6 @@ function initTable(){
 
                         if(@tableId_order_colname!=='')
                             dq.order_col=@tableId_order_colname; 
-                        //if(dict.length !== 0)
-                            //dq.colvalues = dict;
                     },
                 dataSrc: function(dd) {
                         return dd.data;
@@ -627,6 +620,8 @@ function initTable(){
             //    } );
             //}
         });
+
+        $.fn.dataTable.ext.errMode = 'throw';
 
         $.fn.dataTable.Api.register( 'column().data().sum()', function () {
             return this.reduce( function (a, b) { return a + b; } );
