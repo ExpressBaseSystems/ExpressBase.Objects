@@ -371,16 +371,23 @@ namespace ExpressBase.Objects
             {
                 string rs = "";
                 int max=0;
-                foreach (EbControl c in this.__filterForm.Controls)
+                if(this.__filterForm != null)
                 {
-                    if (c.Top >= max)
+                    rs = @"<div class='collapse collapse in' style='margin-top:10px;' id='filterBox'>
+                                <div class='well well-sm' style='position:relative; height:@FilterBHpx; padding-top:40px;padding-bottom:40px;'>";
+                    foreach (EbControl c in this.__filterForm.Controls)
                     {
-                        max = (c.Top + c.Height);
+                        if (c.Top >= max)
+                        {
+                            max = (c.Top + c.Height);
+                        }
+                        c.Top += 10;
+                        rs += c.GetHtml();
                     }
-                        c.Top+= 10;
-                    rs += c.GetHtml();
+                    this.FilterBH += max;
+                    rs += @"</div></div>";
                 }
-                this.FilterBH += max;
+                
                 return rs;
             }
         }
@@ -450,35 +457,26 @@ td.dt-body-right { text-align: right; }
                        </ul>
              </div>
             <button type='button' id='@tableId_btntotalpage' class='btn btn-default' style='display: none;' onClick='showOrHideAggrControl(this,@scrolly);' data-table='@tableId'>&sum;</button>
-            <input type='text' id='dateFrom'/>
-            <input type='text' id='dateTo'/>
             <div id='btnGo' class='btn btn-default' >GO</div>
-                <div id='btnCopy' class='btn btn-default' disabled data-toggle='tooltip' title='Copy to Clipboard'><i class='fa fa-clipboard' aria-hidden='true'></i></div>
-                <div id='btnPrint' class='btn btn-default' disabled data-toggle='tooltip' title='Print'><i class='fa fa-print' aria-hidden='true'></i></div>
-                <div id='btnExcel' class='btn btn-default' disabled data-toggle='tooltip' title='Excel'><i class='fa fa-file-excel-o' aria-hidden='true'></i></div>
-                <div id='btnPdf' class='btn btn-default' disabled data-toggle='tooltip' title='Pdf'><i class='fa fa-file-pdf-o' aria-hidden='true'></i></div>
-                <div id='btnCsv' class='btn btn-default' disabled data-toggle='tooltip' title='Csv'><i class='fa fa-file-text-o' aria-hidden='true'></i></div>
-
-                <div id='btnCollapse' class='btn btn-default' data-toggle='collapse' data-target='#filterBox' aria-expanded='true' aria-controls='filterBox'>
-                    <i class='fa fa-chevron-down' aria-hidden='true'></i>
+                <div id='@tableId_fileBtns' style='display: inline-block;'>
+                    <div id='btnCopy' class='btn btn-default'   name='filebtn' style='display: none;' data-toggle='tooltip' title='Copy to Clipboard'><i class='fa fa-clipboard' aria-hidden='true'></i></div>
+                    <div id='btnPrint' class='btn btn-default'  name='filebtn' style='display: none;'  data-toggle='tooltip' title='Print'><i class='fa fa-print' aria-hidden='true'></i></div>
+                    <div id='btnExcel' class='btn btn-default'  name='filebtn' style='display: none;' data-toggle='tooltip' title='Excel'><i class='fa fa-file-excel-o' aria-hidden='true'></i></div>
+                    <div id='btnPdf' class='btn btn-default'    name='filebtn' style='display: none;'  data-toggle='tooltip' title='Pdf'><i class='fa fa-file-pdf-o' aria-hidden='true'></i></div>
+                    <div id='btnCsv' class='btn btn-default'    name='filebtn' style='display: none;' data-toggle='tooltip' title='Csv'><i class='fa fa-file-text-o' aria-hidden='true'></i></div>
                 </div>
+                @collapsBtn
         </div>
         <div style='width:auto;'>
-             
-
-<div class='collapse collapse in' style='margin-top:10px;' id='filterBox'>
-        <div class='well well-sm' style='position:relative; height:@FilterBHpx; padding-top:40px;padding-bottom:40px;'>
             @filters  
-        </div>
-</div>
 
-                    <h3>@tableViewName</h3>
-               <div id='@tableId_loadingdiv' class='loadingdiv'>
-                    <img id='@tableId_loading-image' src='/images/ajax-loader.gif' alt='Loading...' />
-               </div>
+            <h3>@tableViewName</h3>
+            <div id='@tableId_loadingdiv' class='loadingdiv'>
+                <img id='@tableId_loading-image' src='/images/ajax-loader.gif' alt='Loading...' />
+            </div>
                
-               <table id='@tableId_tbl' class='table table-striped table-bordered'></table>
-          </div>
+            <table id='@tableId_tbl' class='table table-striped table-bordered'></table>
+        </div>
      </div>
    <!-- Modal -->
   <div class='modal fade' id='graphmodal' role='dialog'>
@@ -509,9 +507,6 @@ var _to = '';
 var flag=true;
 var DtF = true;
 $('#btnGo').click(function(){
-    //alert( getFilterValues() );
-    _from = $('#dateFrom').val().toString();
-    _to = $('#dateTo').val().toString();
     if(DtF){
         DtF = false;
         initTable();
@@ -544,8 +539,6 @@ function initTable(){
     $('#@tableId_loadingdiv').show();
     $('#@tableId_tbl').append( $('@tfoot') );
 
-     var dict = '{from:' + _from + ',to:' + _to + '}';
-
     $.get('@servicestack_url/ds/columns/@dataSourceId?format=json&Token=' + getToken() + '&Params=' + encodeURIComponent(JSON.stringify(getFilterValues())), { crossDomain: 'true' }, function (data){
         var @tableId_ids=[];
         var @tableId_filter_objcol = [];
@@ -553,9 +546,6 @@ function initTable(){
         var @tableId__datacolumns = data.columns;
         $('#@tableId_tbl').DataTable(
         {
-            //dom:'Bltrip',
-            //dom:'Bliptr',
-            //dom:'<\'col-sm-2\'l><\'col-sm-4\'i><\'col-sm-6\'p>'+'<\'col-sm-12\'tr>',
             dom:'<\'col-sm-2\'l><\'col-sm-2\'i><\'col-sm-3\'B><\'col-sm-5\'p>tr',
             buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
             @scrollYOption,
@@ -576,11 +566,14 @@ function initTable(){
             //select:true,
             retrieve: true,
             ajax: {
-                url: '@servicestack_url/ds/data/@dataSourceId?format=json&Token=' + getToken() + '&Params=' + encodeURIComponent(JSON.stringify(getFilterValues())),
+                url: '@servicestack_url/ds/data/@dataSourceId',
+                type: 'POST',
                 data: function(dq) { 
+                        dq.Id = @dataSourceId;
+                        dq.Token = getToken();
                         delete dq.columns;
                         @tableId_filter_objcol = repopulate_filter_arr('@tableId');
-                        //dq.Params = encodeURIComponent(JSON.stringify(getFilterValues()));
+                        dq.Params = JSON.stringify(getFilterValues()));
                         if (@tableId_filter_objcol.length !== 0)
                         {
                             dq.search_col = @tableId_filter_objcol.map(function(a) {return a.column;}).join(',');
@@ -590,8 +583,6 @@ function initTable(){
 
                         if(@tableId_order_colname!=='')
                             dq.order_col=@tableId_order_colname; 
-                        //if(dict.length !== 0)
-                            //dq.colvalues = dict;
                     },
                 dataSrc: function(dd) {
                         return dd.data;
@@ -630,6 +621,8 @@ function initTable(){
             //}
         });
 
+        $.fn.dataTable.ext.errMode = 'throw';
+
         $.fn.dataTable.Api.register( 'column().data().sum()', function () {
             return this.reduce( function (a, b) { return a + b; } );
         } );
@@ -646,11 +639,7 @@ function initTable(){
 
         $('#@tableId_loadingdiv').hide();
         
-        $('#btnCopy').removeAttr('disabled');
-        $('#btnPrint').removeAttr('disabled');
-        $('#btnExcel').removeAttr('disabled');
-        $('#btnPdf').removeAttr('disabled');
-        $('#btnCsv').removeAttr('disabled');
+        $('#@tableId_fileBtns [name=filebtn]').css('display', 'inline-block');
    
         createFilterRowHeader('@tableId', @eb_filter_controls, @scrolly);
 
@@ -693,10 +682,13 @@ function initTable(){
 .Replace("@scrolly", this.ScrollY.ToString())
 .Replace("@scrollYOption", this.GetScrollYOption())
 .Replace("@tfoot", this.GetFooter())
-.Replace("@pagingType",this.PagingType.ToString())
+.Replace("@pagingType", this.PagingType.ToString())
 .Replace("@servicestack_url", "https://expressbaseservicestack.azurewebsites.net")
 .Replace("@filters", this.filters)
-.Replace("@FilterBH", this.FilterBH.ToString());
+.Replace("@FilterBH", this.FilterBH.ToString())
+.Replace("@collapsBtn",(this.__filterForm!=null) ?  @"<div id = 'btnCollapse' class='btn btn-default' data-toggle='collapse' data-target='#filterBox' aria-expanded='true' aria-controls='filterBox'>
+                    <i class='fa fa-chevron-down' aria-hidden='true'></i>
+                </div>" : string.Empty );
         }
     }
 
