@@ -72,6 +72,19 @@ namespace ExpressBase.Objects
 
             return html;
         }
+
+        public string GetControlNames()
+        {
+            List<string> _lst = new List<string>();
+
+            foreach (EbControl _c in this.FlattenedControls)
+            {
+                if (!(_c is EbControlContainer))
+                    _lst.Add(_c.Name);
+            }
+
+            return string.Join(",", _lst.ToArray());
+        }
     }
 
     public class EbTableConverter : TypeConverter
