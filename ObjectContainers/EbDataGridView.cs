@@ -546,9 +546,7 @@ function initTable(){
 
      var dict = '{from:' + _from + ',to:' + _to + '}';
 
-
-    $.get('@servicestack_url/ds/columns/@dataSourceId?format=json&Token=' + getToken(), { crossDomain: 'true', colvalues: dict }, function (data)
-    {
+    $.get('@servicestack_url/ds/columns/@dataSourceId?format=json&Token=' + getToken() + '&Params=' + encodeURIComponent(JSON.stringify(getFilterValues())), { crossDomain: 'true' }, function (data){
         var @tableId_ids=[];
         var @tableId_filter_objcol = [];
         var @tableId_order_colname='';
@@ -578,11 +576,11 @@ function initTable(){
             //select:true,
             retrieve: true,
             ajax: {
-                url: '@servicestack_url/ds/data/@dataSourceId?format=json&Token=' + getToken(),
+                url: '@servicestack_url/ds/data/@dataSourceId?format=json&Token=' + getToken() + '&Params=' + encodeURIComponent(JSON.stringify(getFilterValues())),
                 data: function(dq) { 
                         delete dq.columns;
                         @tableId_filter_objcol = repopulate_filter_arr('@tableId');
-                        dq.params = getFilterValues();
+                        //dq.Params = encodeURIComponent(JSON.stringify(getFilterValues()));
                         if (@tableId_filter_objcol.length !== 0)
                         {
                             dq.search_col = @tableId_filter_objcol.map(function(a) {return a.column;}).join(',');
@@ -672,16 +670,14 @@ function initTable(){
 
         $('#@tableId_container [type=search]').on( 'keyup', function () {alert('haa');
             $('#@tableId_tbl').DataTable().search( 'food' ).draw();
-        } );
-        
-       
+        });
+
     });
+        
     new ResizeSensor(jQuery('#@tableId_container'), function() {
         if ( $.fn.dataTable.isDataTable( '#@tableId_tbl' ) )
             $('#@tableId_tbl').DataTable().columns.adjust();
     });
-    
-     
 }    
 </script>"
 .Replace("@dataSourceId", this.DataSourceId.ToString().Trim())
