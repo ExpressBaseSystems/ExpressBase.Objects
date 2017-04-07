@@ -34,19 +34,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public List<Dictionary<string, string>> TFilters { get; set; }
     }
 
-    [DataContract]
-    public class EbParam
-    {
-       [DataMember(Order =1)]
-        public string type { get; set; }
-
-       [DataMember(Order = 2)]
-        public string name { get; set; }
-
-       [DataMember(Order = 3)]
-        public string value { get; set; }
-    }
-
     [Route("/ds")]
     [Route("/ds/columns/{Id}")]
     public class DataSourceColumnsRequest : IReturn<DataSourceColumnsResponse>, IEbSSRequest
@@ -64,6 +51,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string TenantAccountId { get; set; }
 
         public List<Dictionary<string, string>> Params { get; set; }
+
+        public string CrossDomain { get; set; }
     }
 
     [DataContract]
