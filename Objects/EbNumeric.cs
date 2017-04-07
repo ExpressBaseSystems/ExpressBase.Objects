@@ -162,7 +162,7 @@ $('#{0}').mask('SZZZZZZZZZZZ', {
     <div id='{0}Lbl' style='{14} {15}'>{5}</div>
             <div  class='input-group'>
                  {19}   
-                 <input type='text'  class='numinput' name='{0}' value={16} placeholder='{18}'  data-toggle='tooltip' title='{9}' id='{0}' style='width:{3}px; height:{4}px; {12} {13} {17} {1} display:inline-block;{8} {7} {11} />
+                 <input type='text'  class='numinput' name='{0}' value={16} placeholder='{18}'  data-toggle='tooltip' title='{9}' id='{0}' style='width:{3}px; height:{4}px; {12} {13} {17} display:inline-block;{8} {7} {11} />
             </div>
     <div class='helpText'> {10} </div>
 </div>",
