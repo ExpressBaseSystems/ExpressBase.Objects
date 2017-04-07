@@ -40,13 +40,21 @@ namespace ExpressBase.Objects
         [System.ComponentModel.Category("Behavior")]
         public string PlaceHolder { get; set; }
 
+        [ProtoBuf.ProtoMember(5)]
+        [System.ComponentModel.Category("Appearance")]
+        public string Text { get; set; }
+
         [ProtoBuf.ProtoMember(6)]
         [System.ComponentModel.Category("Behavior")]
         public bool AutoCompleteOff { get; set; }
 
-        [ProtoBuf.ProtoMember(5)]
-        [System.ComponentModel.Category("Appearance")]
-        public string Text { get; set; }
+        [ProtoBuf.ProtoMember(7)]
+        [System.ComponentModel.Category("Behavior")]
+        public string MaxDateExpression { get; set; }
+
+        [ProtoBuf.ProtoMember(8)]
+        [System.ComponentModel.Category("Behavior")]
+        public string MinDateExpression { get; set; }
 
         public EbTextBox() { }
 

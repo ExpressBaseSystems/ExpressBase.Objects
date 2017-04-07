@@ -47,25 +47,44 @@ namespace ExpressBase.Objects
         [System.ComponentModel.Category("Behavior")]
         public bool AutoCompleteOff { get; set; }
 
+        [ProtoBuf.ProtoMember(7)]
+        private string maskPattern {
+            get
+            {
+                if(this.EbDateType.ToString() == "Date")
+                    return "0000/00/00";
+                else if(this.EbDateType.ToString() == "Time")
+                    return "00:00";
+                else
+                    return "0000/00/00 00:00";
+
+            }
+            set { }
+        }
+
         public override string GetHead()
         {
             return  (((!this.Hidden) ? this.UniqueString + this.RequiredString : string.Empty) + @"".Replace("{0}", this.Name)) + @"
-$('#$idTglBtn').click(function(){
-    //$('#$idContainer [class=date]').toggle();
-        $('#$id').focus();
-        $('#$id').trigger('click');
+$('#@idTglBtn').click(function(){
+    //$('#@idContainer [class=date]').toggle();
+        $('#@id').focus();
+        $('#@id').trigger('click');
 
 });
 
-$('.date').mask('0000/00/00'); 
-$('#$id').$$$$$$$picker({
-    dateFormat: 'yy/mm/dd',
-	timeFormat: 'hh:mm:ss:tt',
-	stepHour: 1,
-	stepMinute: 1,
-	stepSecond: 1
-});".Replace("$$$$$$$", this.EbDateType.ToString().ToLower())
-.Replace("$id", this.Name);
+$('#@id').mask('@maskPattern'); 
+$('#@id').datetimepicker({
+    format:'@format',
+    minDate:'@maxDate',
+    maxDate:'@minDate',
+    @dateType
+});"
+.Replace("@dateType", (this.EbDateType.ToString()=="Date") ? "timepicker:false" : ((this.EbDateType.ToString() == "Time") ? "datepicker:false" : string.Empty) )
+.Replace("@id", this.Name)
+.Replace("@maskPattern", this.maskPattern)
+.Replace("@format", (this.EbDateType.ToString() == "Date") ? "Y/m/d" : (this.EbDateType.ToString() == "Time") ? "H:i" : "Y/m/d H:i")
+.Replace("@maxDate", this.Max.ToString())
+.Replace("@minDate", this.Min.ToString());
         }
 
         public override string GetHtml()
