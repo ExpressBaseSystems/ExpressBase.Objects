@@ -21,19 +21,17 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public int Draw { get; set; }
 
-        public string SearchText { get; set; }
+        public string OrderByDir { get; set; }
 
-        public string OrderByDirection { get; set; }
-
-        public string OrderColumnName { get; set; }
-
-        public string SearchColumnName { get; set; }
-
+        public string OrderByCol { get; set; }
+        
         public string Token { get; set; }
 
         public string TenantAccountId { get; set; }
 
         public List<Dictionary<string, string>> Params { get; set; }
+
+        public List<Dictionary<string, string>> TFilters { get; set; }
     }
 
     [DataContract]

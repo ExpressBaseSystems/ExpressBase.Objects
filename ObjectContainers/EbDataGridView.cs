@@ -541,7 +541,6 @@ function initTable(){
 
     $.get('@servicestack_url/ds/columns/@dataSourceId?format=json&Token=' + getToken() + '&Params=' + encodeURIComponent(JSON.stringify(getFilterValues())), { crossDomain: 'true' }, function (data){
         var @tableId_ids=[];
-        var @tableId_filter_objcol = [];
         var @tableId_order_colname='';
         var @tableId__datacolumns = data.columns;
         $('#@tableId_tbl').DataTable(
@@ -572,17 +571,10 @@ function initTable(){
                         dq.Id = @dataSourceId;
                         dq.Token = getToken();
                         delete dq.columns;
-                        @tableId_filter_objcol = repopulate_filter_arr('@tableId');
-                        dq.Params = JSON.stringify(getFilterValues()));
-                        if (@tableId_filter_objcol.length !== 0)
-                        {
-                            dq.search_col = @tableId_filter_objcol.map(function(a) {return a.column;}).join(',');
-                            dq.selectedvalue = @tableId_filter_objcol.map(function(a) {return a.operator;}).join(',');
-                            dq.searchtext = @tableId_filter_objcol.map(function(a) {return a.value;}).join(',');
-                        }  
-
+                        dq.TFilters = JSON.stringify(repopulate_filter_arr('@tableId'));
+                        dq.Params = JSON.stringify(getFilterValues());
                         if(@tableId_order_colname!=='')
-                            dq.order_col=@tableId_order_colname; 
+                            dq.OrderByCol=@tableId_order_colname; 
                     },
                 dataSrc: function(dd) {
                         return dd.data;
