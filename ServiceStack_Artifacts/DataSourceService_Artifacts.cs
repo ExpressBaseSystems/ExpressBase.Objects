@@ -21,32 +21,17 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public int Draw { get; set; }
 
-        public string SearchText { get; set; }
+        public int OrderByDir { get; set; }
 
-        public string OrderByDirection { get; set; }
-
-        public string OrderColumnName { get; set; }
-
-        public string SearchColumnName { get; set; }
-
+        public string OrderByCol { get; set; }
+        
         public string Token { get; set; }
 
         public string TenantAccountId { get; set; }
 
         public List<Dictionary<string, string>> Params { get; set; }
-    }
 
-    [DataContract]
-    public class EbParam
-    {
-       [DataMember(Order =1)]
-        public string type { get; set; }
-
-       [DataMember(Order = 2)]
-        public string name { get; set; }
-
-       [DataMember(Order = 3)]
-        public string value { get; set; }
+        public List<Dictionary<string, string>> TFilters { get; set; }
     }
 
     [Route("/ds")]
@@ -66,6 +51,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string TenantAccountId { get; set; }
 
         public List<Dictionary<string, string>> Params { get; set; }
+
+        public string CrossDomain { get; set; }
     }
 
     [DataContract]

@@ -33,7 +33,7 @@ namespace ExpressBase.Objects
         public bool HideCheckbox { get; set; }
 
         [ProtoBuf.ProtoMember(5)]
-        public bool ShowSerial { get; set; }
+        public bool HideSerial { get; set; }
 
         [ProtoBuf.ProtoMember(6)]
         public int ScrollY { get; set; }
@@ -50,7 +50,7 @@ namespace ExpressBase.Objects
 
         public string GetCols()
         {
-            return this.Columns.GetColumnDefJs(this.Name, this.ShowSerial, this.HideCheckbox);
+            return this.Columns.GetColumnDefJs(this.Name, this.HideSerial, this.HideCheckbox);
         }
 
         public string GetFilterControls()
@@ -223,6 +223,18 @@ namespace ExpressBase.Objects
         private string GetScrollYOption()
         {
             return (this.ScrollY > 0) ? string.Format("scrollY: '{0}', scrollX: true ", this.ScrollY) : "fixedHeader: { footer: true }";
+        }
+
+        private string GetSelectOption()
+        {
+            string __select = string.Empty;
+            if (!this.HideCheckbox && !this.HideSerial)
+                __select = "select: { style: 'os', selector: 'td:nth-child(1),td:nth-child(2)'}";
+            else if(!this.HideSerial || !this.HideCheckbox)
+                __select = "select: { style: 'os', selector: 'td:nth-child(1)'}";
+            else 
+                __select = "select: false";
+            return __select;
         }
 
         public string GetFooter()
@@ -448,14 +460,15 @@ td.dt-body-right { text-align: right; }
 </style>
     <div class='tablecontainer' id='@tableId_container'>
         <div>
-             <div class='btn-group'>
-                  <a class='btn btn-default' onclick='showOrHideFilter(this,@scrolly);' data-table='@tableId' data-toggle='tooltip' title='On\/Off Filter'><i class='fa fa-filter' aria-hidden='true'></i></a>
-                  <button type='button' class='btn btn-default dropdown-toggle' data-toggle='dropdown'>
+            <div class='btn-group' id='@tableId_filterdiv'>
+                  <a class='btn btn-default' onclick='showOrHideFilter(this,@scrolly);' name='filterbtn' style='display: none;' data-table='@tableId' data-toggle='tooltip' title='On\/Off Filter'><i class='fa fa-filter' aria-hidden='true'></i></a>
+                  <button type='button' class='btn btn-default dropdown-toggle' data-toggle='dropdown' name='filterbtn' style='display: none;'>
                     <span class='caret'></span>  <!-- caret --></button>
                   <ul class='dropdown-menu' role='menu'>
                       <li><a href = '#' onclick= clearFilter('@tableId')> Clear Filter</a></li>
                        </ul>
              </div>
+             
             <button type='button' id='@tableId_btntotalpage' class='btn btn-default' style='display: none;' onClick='showOrHideAggrControl(this,@scrolly);' data-table='@tableId'>&sum;</button>
             <div id='btnGo' class='btn btn-default' >GO</div>
                 <div id='@tableId_fileBtns' style='display: inline-block;'>
@@ -502,8 +515,6 @@ td.dt-body-right { text-align: right; }
 
 <script>
 
-var _from = '';
-var _to = '';
 var flag=true;
 var DtF = true;
 $('#btnGo').click(function(){
@@ -541,8 +552,8 @@ function initTable(){
 
     $.get('@servicestack_url/ds/columns/@dataSourceId?format=json&Token=' + getToken() + '&Params=' + encodeURIComponent(JSON.stringify(getFilterValues())), { crossDomain: 'true' }, function (data){
         var @tableId_ids=[];
-        var @tableId_filter_objcol = [];
-        var @tableId_order_colname='';
+        var @tableId_order_col = '';
+        var @tableId_order_dir = 0;
         var @tableId__datacolumns = data.columns;
         $('#@tableId_tbl').DataTable(
         {
@@ -562,28 +573,20 @@ function initTable(){
             order: [],
             deferRender: true,
             filter: true,
-            select: { style: 'os', selector: '' },
-            //select:true,
+            @selectOption,
             retrieve: true,
             ajax: {
                 url: '@servicestack_url/ds/data/@dataSourceId',
                 type: 'POST',
                 data: function(dq) { 
-                        dq.Id = @dataSourceId;
-                        dq.Token = getToken();
-                        delete dq.columns;
-                        @tableId_filter_objcol = repopulate_filter_arr('@tableId');
-                        dq.Params = JSON.stringify(getFilterValues()));
-                        if (@tableId_filter_objcol.length !== 0)
-                        {
-                            dq.search_col = @tableId_filter_objcol.map(function(a) {return a.column;}).join(',');
-                            dq.selectedvalue = @tableId_filter_objcol.map(function(a) {return a.operator;}).join(',');
-                            dq.searchtext = @tableId_filter_objcol.map(function(a) {return a.value;}).join(',');
-                        }  
-
-                        if(@tableId_order_colname!=='')
-                            dq.order_col=@tableId_order_colname; 
-                    },
+                    delete dq.columns; delete dq.order; delete dq.search;
+                    dq.Id = @dataSourceId;
+                    dq.Token = getToken();
+                    dq.TFilters = JSON.stringify(repopulate_filter_arr('@tableId'));
+                    dq.Params = JSON.stringify(getFilterValues());
+                    dq.OrderByCol = @tableId_order_col; 
+                    dq.OrderByDir = @tableId_order_dir;
+                },
                 dataSrc: function(dd) {
                         return dd.data;
                 }
@@ -623,14 +626,27 @@ function initTable(){
 
         $.fn.dataTable.ext.errMode = 'throw';
 
-        $.fn.dataTable.Api.register( 'column().data().sum()', function () {
-            return this.reduce( function (a, b) { return a + b; } );
+        jQuery.fn.dataTable.Api.register( 'sum()', function ( ) {
+            return this.flatten().reduce( function ( a, b ) {
+                if ( typeof a === 'string' ) {
+                    a = a.replace(/[^\d.-]/g, '') * 1;
+                }
+                if ( typeof b === 'string' ) {
+                    b = b.replace(/[^\d.-]/g, '') * 1;
+                }
+ 
+                return a + b;
+            }, 0 );
         } );
 
-        $.fn.dataTable.Api.register( 'column().data().average()', function () {
-            var sum= this.reduce( function (a, b) { return a + b; } );
-            return sum/this.length;
-        } );
+        jQuery.fn.dataTable.Api.register( 'average()', function () {
+            var data = this.flatten();
+            var sum = data.reduce( function ( a, b ) {
+                return (a*1) + (b*1); // cast values in-case they are strings
+            }, 0 );
+  
+            return sum / data.length;
+        });
 
         if( @eb_agginfo.length>0 ) {
             createFooter('@tableId', @eb_footer1, @scrolly, 0);
@@ -640,13 +656,17 @@ function initTable(){
         $('#@tableId_loadingdiv').hide();
         
         $('#@tableId_fileBtns [name=filebtn]').css('display', 'inline-block');
+        $('#@tableId_filterdiv [name=filterbtn]').css('display', 'inline-block');
    
         createFilterRowHeader('@tableId', @eb_filter_controls, @scrolly);
 
         $('#@tableId_container thead').on('click','th',function(){
-            var txt=$(this).children('span').text();
-            if(txt !== '')
-                @tableId_order_colname =txt;
+            var col = $(this).children('span').text();
+            var dir = $(this).attr('aria-sort');
+            if(col !== '') {
+                @tableId_order_col = col;
+                @tableId_order_dir = (dir === 'undefined') ? 1 : ((dir === 'ascending') ? 2 : 1);
+            }
         });
 
         if(@bserial){
@@ -688,7 +708,8 @@ function initTable(){
 .Replace("@FilterBH", this.FilterBH.ToString())
 .Replace("@collapsBtn",(this.__filterForm!=null) ?  @"<div id = 'btnCollapse' class='btn btn-default' data-toggle='collapse' data-target='#filterBox' aria-expanded='true' aria-controls='filterBox'>
                     <i class='fa fa-chevron-down' aria-hidden='true'></i>
-                </div>" : string.Empty );
+                </div>" : string.Empty )
+.Replace("@selectOption", this.GetSelectOption());
         }
     }
 
@@ -777,14 +798,16 @@ function initTable(){
                 {
                     if (ext != null)
                     {
+                        var deci_places = (ext.DecimalPlaces > 0) ? ext.DecimalPlaces : 2;
+
                         if (!ext.Localize)
-                            _r = string.Format("return parseFloat(data).toFixed({0});", ext.DecimalPlaces);
+                            _r = string.Format("return parseFloat(data).toFixed({0});", deci_places);
                         else
                         {
                             if (!ext.IsCurrency)
-                                _r = "return parseFloat(data).toLocaleString('en-US', { maximumSignificantDigits: {0} });".Replace("{0}", ext.DecimalPlaces.ToString());
+                                _r = "return parseFloat(data).toLocaleString('en-US', { maximumSignificantDigits: {0} });".Replace("{0}", deci_places.ToString());
                             else
-                                _r = "return parseFloat(data).toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumSignificantDigits: {0} });".Replace("{0}", ext.DecimalPlaces.ToString());
+                                _r = "return parseFloat(data).toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumSignificantDigits: {0} });".Replace("{0}", deci_places.ToString());
                         }
                     }
                     else
@@ -902,11 +925,11 @@ function initTable(){
             return false;
         }
 
-        internal string GetColumnDefJs(string tableid, bool bShowSerial, bool bHideCheckBox)
+        internal string GetColumnDefJs(string tableid, bool bHideSerial, bool bHideCheckBox)
         {
             string script = "[";
 
-            if (bShowSerial)
+            if (!bHideSerial)
                 script += this.GetSerialColumnDefJs();
 
             if (!bHideCheckBox)
