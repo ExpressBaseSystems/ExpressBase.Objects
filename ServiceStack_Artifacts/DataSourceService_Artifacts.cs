@@ -21,7 +21,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public int Draw { get; set; }
 
-        public string OrderByDir { get; set; }
+        public int OrderByDir { get; set; }
 
         public string OrderByCol { get; set; }
         

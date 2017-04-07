@@ -541,7 +541,8 @@ function initTable(){
 
     $.get('@servicestack_url/ds/columns/@dataSourceId?format=json&Token=' + getToken() + '&Params=' + encodeURIComponent(JSON.stringify(getFilterValues())), { crossDomain: 'true' }, function (data){
         var @tableId_ids=[];
-        var @tableId_order_colname='';
+        var @tableId_order_col = '';
+        var @tableId_order_dir = 0;
         var @tableId__datacolumns = data.columns;
         $('#@tableId_tbl').DataTable(
         {
@@ -568,14 +569,14 @@ function initTable(){
                 url: '@servicestack_url/ds/data/@dataSourceId',
                 type: 'POST',
                 data: function(dq) { 
-                        dq.Id = @dataSourceId;
-                        dq.Token = getToken();
-                        delete dq.columns;
-                        dq.TFilters = JSON.stringify(repopulate_filter_arr('@tableId'));
-                        dq.Params = JSON.stringify(getFilterValues());
-                        if(@tableId_order_colname!=='')
-                            dq.OrderByCol=@tableId_order_colname; 
-                    },
+                    delete dq.columns; delete dq.order; delete dq.search;
+                    dq.Id = @dataSourceId;
+                    dq.Token = getToken();
+                    dq.TFilters = JSON.stringify(repopulate_filter_arr('@tableId'));
+                    dq.Params = JSON.stringify(getFilterValues());
+                    dq.OrderByCol = @tableId_order_col; 
+                    dq.OrderByDir = @tableId_order_dir;
+                },
                 dataSrc: function(dd) {
                         return dd.data;
                 }
@@ -636,9 +637,13 @@ function initTable(){
         createFilterRowHeader('@tableId', @eb_filter_controls, @scrolly);
 
         $('#@tableId_container thead').on('click','th',function(){
-            var txt=$(this).children('span').text();
-            if(txt !== '')
-                @tableId_order_colname =txt;
+            var col = $(this).children('span').text();
+            var dir = $(this).attr('aria-sort');
+            alert(dir);
+            if(col !== '') {
+                @tableId_order_col = col;
+                @tableId_order_dir = (dir === 'undefined') ? 1 : ((dir === 'ascending') ? 2 : 1);
+            }
         });
 
         if(@bserial){

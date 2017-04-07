@@ -75,8 +75,8 @@ $('#@idTglBtn').click(function(){
 $('#@id').mask('@maskPattern'); 
 $('#@id').datetimepicker({
     format:'@format',
-    minDate:'@maxDate',
-    maxDate:'@minDate',
+    //minDate:'@maxDate',
+    //maxDate:'@minDate',
     @dateType
 });"
 .Replace("@dateType", (this.EbDateType.ToString()=="Date") ? "timepicker:false" : ((this.EbDateType.ToString() == "Time") ? "datepicker:false" : string.Empty) )
