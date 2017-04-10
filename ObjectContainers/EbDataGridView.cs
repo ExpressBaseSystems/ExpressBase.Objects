@@ -359,14 +359,15 @@ namespace ExpressBase.Objects
         public string getFilterForBoolean(string colum)
         {
             var filter = string.Empty;
-            filter = string.Format("<input type='checkbox' data-colum='{0}' onchange='toggleInFilter(this);' value='1'>", colum);
+            string id = this.Name+"_"+ colum + "_hdr_txt1";
+            string cls = this.Name + "_hchk";
+            filter = string.Format("<input type='checkbox' id='{1}' data-colum='{0}' onchange='toggleInFilter(this);' data-coltyp='boolean' data-table='{2}' class='{3} {2}_htext dt-head-center'>", colum ,id,this.Name,cls);
             return filter;
         }
 
         public override string GetHead()
         {
-             return @"$('thead:eq(0) tr:eq(1) [type=checkbox]').checkbox().chbxChecked(null); 
-                      $('[data-toggle=\'tooltip\']').tooltip(); ";
+             return @"$('[data-toggle=\'tooltip\']').tooltip(); ";
         }
 
         private int FilterBH = 0;
@@ -455,8 +456,10 @@ padding:0px!important;
 }
 td.dt-center { text-align: center; }
 th.dt-center { text-align: right; }
+th { text-align: center!important; }
 td.dt-body-right { text-align: right; }
 .dt-buttons {visibility:hidden;}
+
 </style>
     <div class='tablecontainer' id='@tableId_container'>
         <div>
@@ -472,11 +475,19 @@ td.dt-body-right { text-align: right; }
             <button type='button' id='@tableId_btntotalpage' class='btn btn-default' style='display: none;' onClick='showOrHideAggrControl(this,@scrolly);' data-table='@tableId'>&sum;</button>
             <div id='btnGo' class='btn btn-default' >GO</div>
                 <div id='@tableId_fileBtns' style='display: inline-block;'>
-                    <div id='btnCopy' class='btn btn-default'   name='filebtn' style='display: none;' data-toggle='tooltip' title='Copy to Clipboard'><i class='fa fa-clipboard' aria-hidden='true'></i></div>
-                    <div id='btnPrint' class='btn btn-default'  name='filebtn' style='display: none;'  data-toggle='tooltip' title='Print'><i class='fa fa-print' aria-hidden='true'></i></div>
-                    <div id='btnExcel' class='btn btn-default'  name='filebtn' style='display: none;' data-toggle='tooltip' title='Excel'><i class='fa fa-file-excel-o' aria-hidden='true'></i></div>
-                    <div id='btnPdf' class='btn btn-default'    name='filebtn' style='display: none;'  data-toggle='tooltip' title='Pdf'><i class='fa fa-file-pdf-o' aria-hidden='true'></i></div>
-                    <div id='btnCsv' class='btn btn-default'    name='filebtn' style='display: none;' data-toggle='tooltip' title='Csv'><i class='fa fa-file-text-o' aria-hidden='true'></i></div>
+                    <div id='btnCopy' class='btn btn-default'  name='filebtn' style='display: none;' data-toggle='tooltip' title='Copy to Clipboard' onclick= CopyToClipboard('@tableId') ><i class='fa fa-clipboard' aria-hidden='true'></i></div>
+                    <div class='btn-group'>
+                        <div id='btnPrint' class='btn btn-default'  name='filebtn' style='display: none;'  data-toggle='tooltip' title='Print' onclick= ExportToPrint('@tableId')><i class='fa fa-print' aria-hidden='true'></i></div>
+                        <div class='btn btn-default dropdown-toggle' data-toggle='dropdown' name='filebtn' style='display: none;'>
+                        <span class='caret'></span>  <!-- caret --></div>
+                        <ul class='dropdown-menu' role='menu'>
+                            <li><a href = '#' onclick= printAll('@tableId')> Print All</a></li>
+                            <li><a href = '#' onclick= printSelected('@tableId')> Print Selected</a></li>
+                       </ul>
+                    </div>
+                    <div id='btnExcel' class='btn btn-default'  name='filebtn' style='display: none;' data-toggle='tooltip' title='Excel' onclick= ExportToExcel('@tableId')><i class='fa fa-file-excel-o' aria-hidden='true'></i></div>
+                    <div id='btnPdf' class='btn btn-default'    name='filebtn' style='display: none;'  data-toggle='tooltip' title='Pdf' onclick= ExportToPdf('@tableId')><i class='fa fa-file-pdf-o' aria-hidden='true'></i></div>
+                    <div id='btnCsv' class='btn btn-default'    name='filebtn' style='display: none;' data-toggle='tooltip' title='Csv' onclick= ExportToCsv('@tableId')><i class='fa fa-file-text-o' aria-hidden='true'></i></div>
                 </div>
                 @collapsBtn
         </div>
@@ -505,8 +516,6 @@ td.dt-body-right { text-align: right; }
         <div id='$$$$$$$_canvasDiv' class='dygraph-Wrapper'>
             <div id='graphdiv' style='width:100%;height:500px;'></div>
         </div>  
-            
-        
 
         </div>
       </div>
@@ -527,23 +536,6 @@ $('#btnGo').click(function(){
         $('#@tableId_tbl').DataTable().ajax.reload();
 });
 
-$('#btnCopy').click(function(){
-    $('.buttons-copy').click()
-});
-$('#btnPrint').click(function(){
-    $('.buttons-print').click()
-});
-$('#btnExcel').click(function(){
-    $('.buttons-excel').click()
-});
-$('#btnPdf').click(function(){
-    $('.buttons-pdf').click()
-});
-$('#btnCsv').click(function(){
-    $('.buttons-csv').click()
-});
-
-
 
 function initTable(){
 
@@ -557,8 +549,13 @@ function initTable(){
         var @tableId__datacolumns = data.columns;
         $('#@tableId_tbl').DataTable(
         {
-            dom:'<\'col-sm-2\'l><\'col-sm-2\'i><\'col-sm-3\'B><\'col-sm-5\'p>tr',
-            buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+            dom:'<\'col-sm-2\'l><\'col-sm-2\'i><\'col-sm-4\'B><\'col-sm-4\'p>tr',
+            buttons: ['copy', 'csv', 'excel', 'pdf','print', {
+                            extend: 'print',
+                            exportOptions: {
+                                modifier: {
+                                    selected: true
+                                }}}],
             @scrollYOption,
             responsive:true,
             keys: true,
@@ -573,7 +570,7 @@ function initTable(){
             order: [],
             deferRender: true,
             filter: true,
-            @selectOption,
+            //@selectOption,
             retrieve: true,
             ajax: {
                 url: '@servicestack_url/ds/data/@dataSourceId',
@@ -604,6 +601,7 @@ function initTable(){
                 $('#@tableId_tbl').DataTable().columns.adjust();
             },
             initComplete:function ( settings,json ) {
+                $('thead:eq(0) tr:eq(1) [type=checkbox]').prop('indeterminate',true); 
                 $('#@tableId_tbl').DataTable().columns.adjust();
             }
             //drawCallback: function ( settings ) {
@@ -666,6 +664,13 @@ function initTable(){
             if(col !== '') {
                 @tableId_order_col = col;
                 @tableId_order_dir = (dir === 'undefined') ? 1 : ((dir === 'ascending') ? 2 : 1);
+            }
+        });
+
+        $('#@tableId_container tbody').on('click','td',function(){
+           var rowObj=$(this).closest('tr');
+            if($(rowObj).find('.selected')){
+                $(rowObj)
             }
         });
 
@@ -968,9 +973,10 @@ function initTable(){
 
         private string GetCheckBoxColumnDefJs(string tableid)
         {
+            // className:'select-checkbox',
             this.CheckBoxColumnAdded = true;
             return "{ data: null, title: \"<input id='{0}_select-all' type='checkbox' onclick='clickAlSlct(event, this);' data-table='{0}'/>\"".Replace("{0}", tableid)
-                + ", width: 10, className:'select-checkbox', render: function( data2, type, row, meta ) { return renderCheckBoxCol(data.columns, '{0}', row); }, orderable: false },".Replace("{0}", tableid);
+                + ", width: 10, render: function( data2, type, row, meta ) { return renderCheckBoxCol(data.columns, '{0}', row,meta); }, orderable: false },".Replace("{0}", tableid);
         }
 
         private string GetEbVoidColumnDefJs()
