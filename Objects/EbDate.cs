@@ -13,6 +13,24 @@ namespace ExpressBase.Objects
         DateTime = (int)System.Data.DbType.DateTime,
     }
 
+    public enum TimeShowFormat
+    {
+        Hour_Minute_Second_12hrs,
+        Hour_Minute_Second_24hrs,
+        Hour_Minute_12hrs,       
+        Hour_Minute_24hrs,
+        Hour_12hrs,
+        Hour_24hrs,
+    }
+
+    public enum DateShowFormat
+    {
+        Year_Month_Date,
+        Year_Month,
+        Year,
+    }
+
+
     [ProtoBuf.ProtoContract]
     public class EbDate : EbControl
     {
@@ -62,6 +80,14 @@ namespace ExpressBase.Objects
             set { }
         }
 
+        [ProtoBuf.ProtoMember(8)]
+        [System.ComponentModel.Category("Behavior")]
+        public TimeShowFormat TimeShowFormat { get; set; }
+
+        [ProtoBuf.ProtoMember(9)]
+        [System.ComponentModel.Category("Behavior")]
+        public DateShowFormat DateShowFormat { get; set; }
+
         public override string GetHead()
         {
             return  (((!this.Hidden) ? this.UniqueString + this.RequiredString : string.Empty) + @"".Replace("{0}", this.Name)) + @"
@@ -89,21 +115,16 @@ $('#@id').datetimepicker({
 
         public override string GetHtml()
         {
-            return string.Format(@"
+            return @"
 <div id='@nameContainer' style='position:absolute; left:@leftpx; top:@top; @hiddenString'>
     <span id='@nameLbl' style='@lblBackColor @LblForeColor'>@label</span>
     <div  class='input-group' style='width:1px;'>
-        <input id='@name' data-EbType='@datetype'  data-toggle='tooltip' title='@toolTipText' class='date' type='text'  name='@name'  autocomplete = '@autoComplete' @value @tabIndex style='width:@widthpx; height:@heightpx; @backColor @foreColor display:inline-block; @fontStyle @readOnlyString @required @placeHolder{11} />
+        <input id='@name' data-EbType='@datetype'  data-toggle='tooltip' title='@toolTipText' class='date' type='text'  name='@name'  autocomplete = '@autoComplete' @value @tabIndex style='width:@widthpx; height:@heightpx; @backColor @foreColor display:inline-block; @fontStyle @readOnlyString @required @placeHolder />
         <i id='@nameTglBtn' class='fa  @atchdLbl input-group-addon' aria-hidden='true'></i>
     </div>
     <span class='helpText'> @helpText </span>
 </div>
-",
-this.Name, this.Left, this.Top, this.Width, this.Height, this.Label, //5
-this.HiddenString, (this.Required && !this.Hidden ? " required" : string.Empty), this.ReadOnlyString,//8
-this.ToolTipText, this.HelpText, "tabindex='" + this.TabIndex + "'",//11
- "background-color:" + this.BackColorSerialized + ";", "color:" + this.ForeColorSerialized + ";", "background-color:" + this.LabelBackColorSerialized + ";", "color:" + this.LabelForeColorSerialized + ";")
-
+"
 .Replace("@name", this.Name)
 .Replace("@left", this.Left.ToString())
 .Replace("@top", this.Top.ToString())
