@@ -99,9 +99,9 @@ namespace ExpressBase.Objects
 
                 _lsRet.Add(_ls.ToString());
             }
-            if (this.Columns.EbVoidColumnAdded) _lsRet.Add("<th style='padding: 0px; margin: 0px'>" + getFilterForBoolean("sys_cancelled")+ "</th>");
+            if (this.Columns.EbVoidColumnAdded) _lsRet.Add("<th style='padding: 0px; margin: 0px; text-align:center;'>" + getFilterForBoolean("sys_cancelled")+ "</th>");
             if (this.Columns.EbLineGraphColumnAdded) _lsRet.Add("<th>&nbsp;</th>");
-            if (this.Columns.EbLockColumnAdded) _lsRet.Add("<th style='padding: 0px; margin: 0px'>" + getFilterForBoolean("sys_locked") + "</th>");
+            if (this.Columns.EbLockColumnAdded) _lsRet.Add("<th style='padding: 0px; margin: 0px; text-align:center;'>" + getFilterForBoolean("sys_locked") + "</th>");
             //if (this.Columns.EbToggleColumnAdded) _lsRet.Add("<th style='padding: 0px; margin: 0px'>" + getFilterForBoolean("sys_deleted") + "</th>");
             _ls.Clear();
             _ls = null;
@@ -141,12 +141,12 @@ namespace ExpressBase.Objects
     <div class='input-group-btn'>
         <button type='button' class='btn btn-default dropdown-toggle' data-toggle='dropdown' id='{1}'>&sum;</button>
         <ul class='dropdown-menu'>
-          <li ><a href ='#' onclick='fselect_func(this,{5});' data-sum='Sum' {2} {3} {4}>&sum;</a></li>
-          <li><a href ='#' onclick='fselect_func(this,{5});' {2} {3} {4}>&mnplus;</a></li>
+          <li ><a href ='#' onclick='fselect_func({6}, this,{5});' data-sum='Sum' {2} {3} {4}>&sum;</a></li>
+          <li><a href ='#' onclick='fselect_func({6}, this,{5});' {2} {3} {4}>&mnplus;</a></li>
         </ul>
     </div>
     <input type='text' class='form-control' id='{0}' disabled style='text-align: right;'>
-</div>", footer_txt, footer_select_id, data_table, data_colum, data_decip, this.ScrollY));
+</div>", footer_txt, footer_select_id, data_table, data_colum, data_decip, this.ScrollY, this.Name));
                             }
                             else
                                 _ls.Add("&nbsp;");
@@ -308,7 +308,7 @@ namespace ExpressBase.Objects
     <input type='number' class='form-control {2}' id='{0}' onkeypress='call_filter(event, this);' {1}  {3} {6}>
     <span class='input-group-btn'></span>
     <input type='number' class='form-control {2}' id='{5}' style='visibility: hidden' onkeypress='call_filter(event, this);' {1}  {3} {6}>
-</div> ", header_text1, data_table,htext_class, data_colum, header_select, header_text2, coltype)
+</div> ", header_text1, data_table, htext_class, data_colum, header_select, header_text2, coltype)
 ;
             return drptext;
         }
@@ -361,7 +361,7 @@ namespace ExpressBase.Objects
             var filter = string.Empty;
             string id = this.Name+"_"+ colum + "_hdr_txt1";
             string cls = this.Name + "_hchk";
-            filter = string.Format("<input type='checkbox' id='{1}' data-colum='{0}' onchange='toggleInFilter(this);' data-coltyp='boolean' data-table='{2}' class='{3} {2}_htext dt-head-center'>", colum ,id,this.Name,cls);
+            filter = string.Format("<input type='checkbox' id='{1}' data-colum='{0}' onchange='toggleInFilter(this);' data-coltyp='boolean' data-table='{2}' class='{3} {2}_htext'>", colum, id, this.Name, cls);
             return filter;
         }
 
@@ -430,7 +430,7 @@ namespace ExpressBase.Objects
     float:left;
 }
 
-#@tableId_tbl th.resizing {
+#@tableId th.resizing {
     cursor: e-resize;
 }
 
@@ -456,53 +456,55 @@ padding:0px!important;
 }
 td.dt-center { text-align: center; }
 th.dt-center { text-align: right; }
-th { text-align: center!important; }
 td.dt-body-right { text-align: right; }
 .dt-buttons {visibility:hidden;}
+th { font-size: 14px; }
+td { font-size: 12px; }
+.progress {
+    margin-bottom: 0px !important;
+}
 
 </style>
-    <div class='tablecontainer' id='@tableId_container'>
-        <div>
-            <div class='btn-group' id='@tableId_filterdiv'>
-                  <a class='btn btn-default' onclick='showOrHideFilter(this,@scrolly);' name='filterbtn' style='display: none;' data-table='@tableId' data-toggle='tooltip' title='On\/Off Filter'><i class='fa fa-filter' aria-hidden='true'></i></a>
-                  <button type='button' class='btn btn-default dropdown-toggle' data-toggle='dropdown' name='filterbtn' style='display: none;'>
-                    <span class='caret'></span>  <!-- caret --></button>
-                  <ul class='dropdown-menu' role='menu'>
-                      <li><a href = '#' onclick= clearFilter('@tableId')> Clear Filter</a></li>
-                       </ul>
-             </div>
-             
-            <button type='button' id='@tableId_btntotalpage' class='btn btn-default' style='display: none;' onClick='showOrHideAggrControl(this,@scrolly);' data-table='@tableId'>&sum;</button>
-            <div id='btnGo' class='btn btn-default' >GO</div>
-                <div id='@tableId_fileBtns' style='display: inline-block;'>
-                    <div id='btnCopy' class='btn btn-default'  name='filebtn' style='display: none;' data-toggle='tooltip' title='Copy to Clipboard' onclick= CopyToClipboard('@tableId') ><i class='fa fa-clipboard' aria-hidden='true'></i></div>
-                    <div class='btn-group'>
-                        <div id='btnPrint' class='btn btn-default'  name='filebtn' style='display: none;'  data-toggle='tooltip' title='Print' onclick= ExportToPrint('@tableId')><i class='fa fa-print' aria-hidden='true'></i></div>
-                        <div class='btn btn-default dropdown-toggle' data-toggle='dropdown' name='filebtn' style='display: none;'>
+<div class='tablecontainer' id='@tableId_container'>
+      <div>
+        <div class='btn-group' id='@tableId_filterdiv'>
+            <a class='btn btn-default' onclick='showOrHideFilter(this,@scrolly);' name='filterbtn' style='display: none;' data-table='@tableId' data-toggle='tooltip' title='On\/Off Filter'><i class='fa fa-filter' aria-hidden='true'></i></a>
+            <button type='button' class='btn btn-default dropdown-toggle' data-toggle='dropdown' name='filterbtn' style='display: none;'>
+            <span class='caret'></span>  <!-- caret --></button>
+            <ul class='dropdown-menu' role='menu'>
+                <li><a href = '#' onclick= clearFilter('@tableId')> Clear Filter</a></li>
+            </ul>
+        </div>
+    <button type='button' id='@tableId_btntotalpage' class='btn btn-default' style='display: none;' onClick='showOrHideAggrControl(this,@scrolly);' data-table='@tableId'>&sum;</button>
+        <div id='btnGo' class='btn btn-default' >GO</div>
+        <div id='@tableId_fileBtns' style='display: inline-block;'>
+            <div id='btnCopy' class='btn btn-default'  name='filebtn' style='display: none;' data-toggle='tooltip' title='Copy to Clipboard' onclick= CopyToClipboard('@tableId') ><i class='fa fa-clipboard' aria-hidden='true'></i></div>
+            <div class='btn-group'>
+                <div id='btnPrint' class='btn btn-default'  name='filebtn' style='display: none;'  data-toggle='tooltip' title='Print' onclick= ExportToPrint('@tableId')><i class='fa fa-print' aria-hidden='true'></i></div>
+                    <div class='btn btn-default dropdown-toggle' data-toggle='dropdown' name='filebtn' style='display: none;'>
                         <span class='caret'></span>  <!-- caret --></div>
                         <ul class='dropdown-menu' role='menu'>
                             <li><a href = '#' onclick= printAll('@tableId')> Print All</a></li>
                             <li><a href = '#' onclick= printSelected('@tableId')> Print Selected</a></li>
-                       </ul>
-                    </div>
-                    <div id='btnExcel' class='btn btn-default'  name='filebtn' style='display: none;' data-toggle='tooltip' title='Excel' onclick= ExportToExcel('@tableId')><i class='fa fa-file-excel-o' aria-hidden='true'></i></div>
-                    <div id='btnPdf' class='btn btn-default'    name='filebtn' style='display: none;'  data-toggle='tooltip' title='Pdf' onclick= ExportToPdf('@tableId')><i class='fa fa-file-pdf-o' aria-hidden='true'></i></div>
-                    <div id='btnCsv' class='btn btn-default'    name='filebtn' style='display: none;' data-toggle='tooltip' title='Csv' onclick= ExportToCsv('@tableId')><i class='fa fa-file-text-o' aria-hidden='true'></i></div>
-                </div>
-                @collapsBtn
-        </div>
-        <div style='width:auto;'>
-            @filters  
-
-            <h3>@tableViewName</h3>
-            <div id='@tableId_loadingdiv' class='loadingdiv'>
-                <img id='@tableId_loading-image' src='/images/ajax-loader.gif' alt='Loading...' />
+                        </ul>
             </div>
-               
-            <table id='@tableId_tbl' class='table table-striped table-bordered'></table>
+            <div id='btnExcel' class='btn btn-default'  name='filebtn' style='display: none;' data-toggle='tooltip' title='Excel' onclick= ExportToExcel('@tableId')><i class='fa fa-file-excel-o' aria-hidden='true'></i></div>
+            <div id='btnPdf' class='btn btn-default'    name='filebtn' style='display: none;'  data-toggle='tooltip' title='Pdf' onclick= ExportToPdf('@tableId')><i class='fa fa-file-pdf-o' aria-hidden='true'></i></div>
+            <div id='btnCsv' class='btn btn-default'    name='filebtn' style='display: none;' data-toggle='tooltip' title='Csv' onclick= ExportToCsv('@tableId')><i class='fa fa-file-text-o' aria-hidden='true'></i></div>
+           </div>
+            @collapsBtn
+    </div>
+    <div style='width:auto;'>
+        @filters  
+         <h3>@tableViewName</h3>
+        <div id='@tableId_loadingdiv' class='loadingdiv'>
+            <img id='@tableId_loading-image' src='/images/ajax-loader.gif' alt='Loading...' />
         </div>
-     </div>
-   <!-- Modal -->
+               
+        <table id='@tableId' class='table table-striped table-bordered'></table>
+    </div>
+</div>
+   <!-- Modal for Graph-->
   <div class='modal fade' id='graphmodal' role='dialog'>
     <div class='modal-dialog modal-lg'>
     
@@ -513,41 +515,57 @@ td.dt-body-right { text-align: right; }
           <h4 class='modal-title'><center>Graph</center></h4>
         </div>
         <div class='modal-body'>
-        <div id='$$$$$$$_canvasDiv' class='dygraph-Wrapper'>
-            <div id='graphdiv' style='width:100%;height:500px;'></div>
-        </div>  
-
+            <div id='$$$$$$$_canvasDiv' class='dygraph-Wrapper'>
+                <div id='graphdiv' style='width:100%;height:500px;'></div>
+            </div>  
         </div>
-      </div>
+     </div>
     </div>
-  </div>
+ </div>
+
+<!-- Modal for Settings-->
+  <div class='modal fade' id='settingsmodal' role='dialog'>
+    <div class='modal-dialog modal-lg'>
+    
+      <!-- Modal content-->
+      <div class='modal-content'>
+        <div class='modal-header'>
+          <button type = 'button' class='close' data-dismiss='modal'>&times;</button>
+          <h4 class='modal-title'><center>Settings</center></h4>
+        </div>
+        <div class='modal-body'>
+            
+        </div>
+     </div>
+    </div>
+ </div>
 
 <script>
-
 var flag=true;
 var DtF = true;
+var @tableId;
 $('#btnGo').click(function(){
     if(DtF){
         DtF = false;
-        initTable();
+        initTable_@tableId();
         $('#filterBox').collapse('hide');
     }
     else
-        $('#@tableId_tbl').DataTable().ajax.reload();
+        @tableId.ajax.reload();
 });
 
 
-function initTable(){
+function initTable_@tableId(){
 
     $('#@tableId_loadingdiv').show();
-    $('#@tableId_tbl').append( $('@tfoot') );
+    $('#@tableId').append( $('@tfoot') );
 
     $.get('@servicestack_url/ds/columns/@dataSourceId?format=json&Token=' + getToken() + '&Params=' + encodeURIComponent(JSON.stringify(getFilterValues())), { crossDomain: 'true' }, function (data){
         var @tableId_ids=[];
         var @tableId_order_col = '';
         var @tableId_order_dir = 0;
         var @tableId__datacolumns = data.columns;
-        $('#@tableId_tbl').DataTable(
+        @tableId= $('#@tableId').DataTable(
         {
             dom:'<\'col-sm-2\'l><\'col-sm-2\'i><\'col-sm-4\'B><\'col-sm-4\'p>tr',
             buttons: ['copy', 'csv', 'excel', 'pdf','print', {
@@ -594,15 +612,15 @@ function initTable(){
             },
 
             fnFooterCallback: function ( nRow, aaData, iStart, iEnd, aiDisplay ) {
-                summarize2('@tableId', @eb_agginfo,@scrolly);
+                summarize2(@tableId, '@tableId', @eb_agginfo,@scrolly);
             },
             drawCallback:function ( settings ) {
                 $('tbody [data-toggle=toggle]').bootstrapToggle();
-                $('#@tableId_tbl').DataTable().columns.adjust();
+                @tableId.columns.adjust();
             },
             initComplete:function ( settings,json ) {
                 $('thead:eq(0) tr:eq(1) [type=checkbox]').prop('indeterminate',true); 
-                $('#@tableId_tbl').DataTable().columns.adjust();
+                @tableId.columns.adjust();
             }
             //drawCallback: function ( settings ) {
             //    var api = this.api();
@@ -667,36 +685,25 @@ function initTable(){
             }
         });
 
-        $('#@tableId_container tbody').on('click','td',function(){
-           var rowObj=$(this).closest('tr');
-            if($(rowObj).find('.selected')){
-                $(rowObj)
-            }
-        });
-
         if(@bserial){
-            $('#@tableId_tbl').DataTable().on( 'draw.dt', function () {
-                $('#@tableId_tbl').DataTable().column(0).nodes().each( function (cell, i) {
+            @tableId.on( 'draw.dt', function () {
+                @tableId.column(0).nodes().each( function (cell, i) {
                     cell.innerHTML = i+1;
                 } );
             } );
         }
 
-        $('#@tableId_container [type=search]').on( 'keyup', function () {alert('haa');
-            $('#@tableId_tbl').DataTable().search( 'food' ).draw();
-        });
-
     });
         
     new ResizeSensor(jQuery('#@tableId_container'), function() {
-        if ( $.fn.dataTable.isDataTable( '#@tableId_tbl' ) )
-            $('#@tableId_tbl').DataTable().columns.adjust();
+        if ( $.fn.dataTable.isDataTable( '#@tableId' ) )
+            @tableId.columns.adjust();
     });
 }    
 </script>"
 .Replace("@dataSourceId", this.DataSourceId.ToString().Trim())
 .Replace("@tableId", this.Name)
-.Replace("@tableViewName", this.Label)
+.Replace("@tableViewName", ((string.IsNullOrEmpty(this.Label)) ? "&lt;ReportLabel Undefined&gt;" : this.Label))
 .Replace("@lengthMenu", this.GetLengthMenu())
 .Replace("@columnsRender", this.GetCols())
 .Replace("@eb_filter_controls", this.GetFilterControls())
@@ -976,7 +983,7 @@ function initTable(){
             // className:'select-checkbox',
             this.CheckBoxColumnAdded = true;
             return "{ data: null, title: \"<input id='{0}_select-all' type='checkbox' onclick='clickAlSlct(event, this);' data-table='{0}'/>\"".Replace("{0}", tableid)
-                + ", width: 10, render: function( data2, type, row, meta ) { return renderCheckBoxCol(data.columns, '{0}', row,meta); }, orderable: false },".Replace("{0}", tableid);
+                + ", width: 10, render: function( data2, type, row, meta ) { return renderCheckBoxCol({0}, data.columns, '{0}', row,meta); }, orderable: false },".Replace("{0}", tableid);
         }
 
         private string GetEbVoidColumnDefJs()
