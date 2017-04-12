@@ -98,7 +98,7 @@ $('#@idTglBtn').click(function(){
 });
 
 $('#@id').mask('@maskPattern'); 
-$('#@id').adatetimepicker({
+$('#@id').datetimepicker({
     format:'@format',
     //minDate:'@maxDate',
     //maxDate:'@minDate',
@@ -129,7 +129,7 @@ $('#@id').adatetimepicker({
 .Replace("@top", this.Top.ToString())
 .Replace("@width", this.Width.ToString())
 .Replace("@height", this.Height.ToString())
-.Replace("@datetype", ((int)this.EbDateType).ToString())
+.Replace("@datetype", ( (int)this.EbDateType ).ToString())
 .Replace("@value", "value='" + this.Value + "'")
 .Replace("@label", this.Label)
 .Replace("@hiddenString", this.HiddenString)
