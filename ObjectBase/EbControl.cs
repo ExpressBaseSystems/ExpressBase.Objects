@@ -271,7 +271,12 @@ else
             }
         }
 
-        public EbControl() { }
+        [ProtoBuf.ProtoMember(34)]
+        public EbValidatorCollection Validators { get; set; }
+
+        public EbControl() {
+            this.Validators = new EbValidatorCollection();
+        }
 
         public virtual string GetHead() { return string.Empty; }
 
@@ -291,7 +296,7 @@ else
 #endif
     }
 
-    [ProtoBuf.ProtoContract()]
+    [ProtoBuf.ProtoContract]
     public class ProtoFont
     {
         [ProtoBuf.ProtoMember(1)]
@@ -319,5 +324,27 @@ else
             }
         }
 #endif
+    }
+
+    [ProtoBuf.ProtoContract]
+    public class EbValidator
+    {
+        [ProtoBuf.ProtoMember(1)]
+        public string Name { get; set; }
+
+        [ProtoBuf.ProtoMember(2)]
+        public bool IsDisabled { get; set; }
+
+        [ProtoBuf.ProtoMember(3)]
+        public string JScode { get; set; }
+
+        [ProtoBuf.ProtoMember(4)]
+        public string FailureMSG { get; set; }
+    }
+
+    [ProtoBuf.ProtoContract]
+    public class EbValidatorCollection : List<EbValidator>
+    {
+
     }
 }
