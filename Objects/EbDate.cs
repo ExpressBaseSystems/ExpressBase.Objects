@@ -82,11 +82,11 @@ namespace ExpressBase.Objects
 
         [ProtoBuf.ProtoMember(8)]
         [System.ComponentModel.Category("Behavior")]
-        public TimeShowFormat TimeShowFormat { get; set; }
+        public TimeShowFormat ShowTimeAs_ { get; set; }
 
         [ProtoBuf.ProtoMember(9)]
         [System.ComponentModel.Category("Behavior")]
-        public DateShowFormat DateShowFormat { get; set; }
+        public DateShowFormat ShowDateAs_ { get; set; }
 
         public override string GetHead()
         {
@@ -95,7 +95,6 @@ $('#@idTglBtn').click(function(){
     //$('#@idContainer [class=date]').toggle();
         $('#@id').focus();
         $('#@id').trigger('click');
-
 });
 
 $('#@id').mask('@maskPattern'); 
@@ -130,7 +129,7 @@ $('#@id').datetimepicker({
 .Replace("@top", this.Top.ToString())
 .Replace("@width", this.Width.ToString())
 .Replace("@height", this.Height.ToString())
-.Replace("@datetype", ((int)this.EbDateType).ToString())
+.Replace("@datetype", ( (int)this.EbDateType ).ToString())
 .Replace("@value", "value='" + this.Value + "'")
 .Replace("@label", this.Label)
 .Replace("@hiddenString", this.HiddenString)
