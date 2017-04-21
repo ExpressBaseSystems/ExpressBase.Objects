@@ -32,7 +32,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    [Route("/infra", "POST")]
     public class InfraRequest : IReturn<InfraResponse>,IEbSSRequest
     {
         [DataMember(Order = 0)]
@@ -85,6 +84,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
+    [Route("/infra", "POST")]
     public class TokenRequiredUploadRequest : IReturn<TokenRequiredUploadResponse>,IEbSSRequest
     {
         [DataMember(Order = 0)]
