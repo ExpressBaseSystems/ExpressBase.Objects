@@ -1,4 +1,8 @@
-﻿using System;
+﻿using ExpressBase.Data;
+using ExpressBase.Objects.ServiceStack_Artifacts;
+using ServiceStack;
+using ServiceStack.Redis;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -47,6 +51,7 @@ namespace ExpressBase.Objects
         [ProtoBuf.ProtoMember(9)]
         public int FilterDialogId { get; set; }
 
+        internal ColumnColletion ColumnColletion { get; set; }
 
         public string GetCols()
         {
@@ -451,10 +456,18 @@ $('#@tableId_Pref').DataTable(
                 return rs;
             }
         }
-        
+
+        public override void Init4Redis(IRedisClient redisclient, IServiceClient serviceclient)
+        {
+            base.Redis = redisclient;
+            base.ServiceStackClient = serviceclient;
+        }
 
         public override string GetHtml()
         {
+            this.ColumnColletion = this.Redis.Get<ColumnColletion>(string.Format("{0}_ds_{1}_columns", "eb_roby_dev", this.DataSourceId));
+            this.Columns.ColumnColletion = this.ColumnColletion;
+
             return @"
 <style>
 .tablecontainer {
@@ -647,144 +660,139 @@ $('#Save_btn').click(function(){
 });
 function initTable_@tableId(){
 
-    $('#@tableId_loadingdiv').show();
     $('#@tableId').append( $('@tfoot') );
 
-    $.get('@servicestack_url/ds/columns/@dataSourceId?format=json&Token=' + getToken() + '&Params=' + encodeURIComponent(JSON.stringify(getFilterValues())), { crossDomain: 'true' }, function (data){
-        var @tableId_ids=[];
-        var @tableId_order_col = '';
-        var @tableId_order_dir = 0;
-        var @tableId__datacolumns = data.columns;
-        @tableId= $('#@tableId').DataTable(
-        {
-            dom:'<\'col-sm-2\'l><\'col-sm-2\'i><\'col-sm-4\'B><\'col-sm-4\'p>tr',
-            buttons: ['copy', 'csv', 'excel', 'pdf','print', {
-                            extend: 'print',
-                            exportOptions: {
-                                modifier: {
-                                    selected: true
-                                }}}],
-            @scrollYOption,
-            responsive:true,
-            keys: true,
-            autoWidth: false,
-            @lengthMenu,
-            serverSide: true,
-            processing:true,
-            language: { processing: '<div class=\'fa fa-spinner fa-pulse  fa-3x fa-fw\'></div>',
-                        info:'_START_ - _END_ / _TOTAL_'},
-            pagingType:'@pagingType',
-            columns:@columnsRender, 
-            order: [],
-            deferRender: true,
-            filter: true,
-            //@selectOption,
-            retrieve: true,
-            ajax: {
-                url: '@servicestack_url/ds/data/@dataSourceId',
-                type: 'POST',
-                data: function(dq) { 
-                    delete dq.columns; delete dq.order; delete dq.search;
-                    dq.Id = @dataSourceId;
-                    dq.Token = getToken();
-                    dq.TFilters = JSON.stringify(repopulate_filter_arr('@tableId'));
-                    dq.Params = JSON.stringify(getFilterValues());
-                    dq.OrderByCol = @tableId_order_col; 
-                    dq.OrderByDir = @tableId_order_dir;
-                },
-                dataSrc: function(dd) {
-                        return dd.data;
-                }
+    var @tableId_ids=[];
+    var @tableId_order_col = '';
+    var @tableId_order_dir = 0;
+    var @tableId__datacolumns = @data.columns;
+    @tableId= $('#@tableId').DataTable(
+    {
+        dom:'<\'col-sm-2\'l><\'col-sm-2\'i><\'col-sm-4\'B><\'col-sm-4\'p>tr',
+        buttons: ['copy', 'csv', 'excel', 'pdf','print', {
+                        extend: 'print',
+                        exportOptions: {
+                            modifier: {
+                                selected: true
+                            }}}],
+        @scrollYOption,
+        responsive:true,
+        keys: true,
+        autoWidth: false,
+        @lengthMenu,
+        serverSide: true,
+        processing:true,
+        language: { processing: '<div class=\'fa fa-spinner fa-pulse  fa-3x fa-fw\'></div>',
+                    info:'_START_ - _END_ / _TOTAL_'},
+        pagingType:'@pagingType',
+        columns:@columnsRender, 
+        order: [],
+        deferRender: true,
+        filter: true,
+        //@selectOption,
+        retrieve: true,
+        ajax: {
+            url: '@servicestack_url/ds/data/@dataSourceId',
+            type: 'POST',
+            data: function(dq) { 
+                delete dq.columns; delete dq.order; delete dq.search;
+                dq.Id = @dataSourceId;
+                dq.Token = getToken();
+                dq.TFilters = JSON.stringify(repopulate_filter_arr('@tableId'));
+                dq.Params = JSON.stringify(getFilterValues());
+                dq.OrderByCol = @tableId_order_col; 
+                dq.OrderByDir = @tableId_order_dir;
             },
-        
-            fnRowCallback: function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
-                colorRow(nRow, aData, iDisplayIndex, iDisplayIndexFull, data.columns);
-            },
-
-            fnFooterCallback: function ( nRow, aaData, iStart, iEnd, aiDisplay ) {
-                summarize2(@tableId, '@tableId', @eb_agginfo,@scrolly);
-            },
-            drawCallback:function ( settings ) {
-                $('tbody [data-toggle=toggle]').bootstrapToggle();
-                @tableId.columns.adjust();
-            },
-            initComplete:function ( settings,json ) {
-                $('thead:eq(0) tr:eq(1) [type=checkbox]').prop('indeterminate',true); 
-                @tableId.columns.adjust();
+            dataSrc: function(dd) {
+                    return dd.data;
             }
-            //drawCallback: function ( settings ) {
-            //    var api = this.api();
-            //    var rows = api.rows( { page: 'current'} ).nodes();
-            //    var last = null;
+        },
+        
+        fnRowCallback: function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
+            colorRow(nRow, aData, iDisplayIndex, iDisplayIndexFull, @data.columns);
+        },
+
+        fnFooterCallback: function ( nRow, aaData, iStart, iEnd, aiDisplay ) {
+            summarize2(@tableId, '@tableId', @eb_agginfo,@scrolly);
+        },
+        drawCallback:function ( settings ) {
+            $('tbody [data-toggle=toggle]').bootstrapToggle();
+            @tableId.columns.adjust();
+        },
+        initComplete:function ( settings,json ) {
+            $('thead:eq(0) tr:eq(1) [type=checkbox]').prop('indeterminate',true); 
+            @tableId.columns.adjust();
+        }
+        //drawCallback: function ( settings ) {
+        //    var api = this.api();
+        //    var rows = api.rows( { page: 'current'} ).nodes();
+        //    var last = null;
             
-            //    api.column(3, { page: 'current'} ).data().each(function(group, i) {
-            //        if (last !== group)
-            //        {
-            //            $(rows).eq(i).before(
-            //                '<tr class=\'group\'><td colspan=\'8\'>' + group + '</td></tr>'
-            //            );
+        //    api.column(3, { page: 'current'} ).data().each(function(group, i) {
+        //        if (last !== group)
+        //        {
+        //            $(rows).eq(i).before(
+        //                '<tr class=\'group\'><td colspan=\'8\'>' + group + '</td></tr>'
+        //            );
 
-            //            last = group;
-            //        }
-            //    } );
-            //}
-        });
-
-        $.fn.dataTable.ext.errMode = 'throw';
-
-        jQuery.fn.dataTable.Api.register( 'sum()', function ( ) {
-            return this.flatten().reduce( function ( a, b ) {
-                if ( typeof a === 'string' ) {
-                    a = a.replace(/[^\d.-]/g, '') * 1;
-                }
-                if ( typeof b === 'string' ) {
-                    b = b.replace(/[^\d.-]/g, '') * 1;
-                }
- 
-                return a + b;
-            }, 0 );
-        } );
-
-        jQuery.fn.dataTable.Api.register( 'average()', function () {
-            var data = this.flatten();
-            var sum = data.reduce( function ( a, b ) {
-                return (a*1) + (b*1); // cast values in-case they are strings
-            }, 0 );
-  
-            return sum / data.length;
-        });
-
-        if( @eb_agginfo.length>0 ) {
-            createFooter('@tableId', @eb_footer1, @scrolly, 0);
-            createFooter('@tableId', @eb_footer2, @scrolly, 1);
-        }
-
-        $('#@tableId_loadingdiv').hide();
-        
-        $('#@tableId_fileBtns [name=filebtn]').css('display', 'inline-block');
-        $('#@tableId_filterdiv [name=filterbtn]').css('display', 'inline-block');
-        $('#@tableId_btnSettings').css('display', 'inline-block');
-   
-        createFilterRowHeader('@tableId', @eb_filter_controls, @scrolly);
-
-        $('#@tableId_container thead').on('click','th',function(){
-            var col = $(this).children('span').text();
-            var dir = $(this).attr('aria-sort');
-            if(col !== '') {
-                @tableId_order_col = col;
-                @tableId_order_dir = (dir === 'undefined') ? 1 : ((dir === 'ascending') ? 2 : 1);
-            }
-        });
-
-        if(@bserial){
-            @tableId.on( 'draw.dt', function () {
-                @tableId.column(0).nodes().each( function (cell, i) {
-                    cell.innerHTML = i+1;
-                } );
-            } );
-        }
-
+        //            last = group;
+        //        }
+        //    } );
+        //}
     });
+
+    $.fn.dataTable.ext.errMode = 'throw';
+
+    jQuery.fn.dataTable.Api.register( 'sum()', function ( ) {
+        return this.flatten().reduce( function ( a, b ) {
+            if ( typeof a === 'string' ) {
+                a = a.replace(/[^\d.-]/g, '') * 1;
+            }
+            if ( typeof b === 'string' ) {
+                b = b.replace(/[^\d.-]/g, '') * 1;
+            }
+ 
+            return a + b;
+        }, 0 );
+    } );
+
+    jQuery.fn.dataTable.Api.register( 'average()', function () {
+        var data = this.flatten();
+        var sum = data.reduce( function ( a, b ) {
+            return (a*1) + (b*1); // cast values in-case they are strings
+        }, 0 );
+  
+        return sum / data.length;
+    });
+
+    if( @eb_agginfo.length>0 ) {
+        createFooter('@tableId', @eb_footer1, @scrolly, 0);
+        createFooter('@tableId', @eb_footer2, @scrolly, 1);
+    }
+
+        
+    $('#@tableId_fileBtns [name=filebtn]').css('display', 'inline-block');
+    $('#@tableId_filterdiv [name=filterbtn]').css('display', 'inline-block');
+    $('#@tableId_btnSettings').css('display', 'inline-block');
+   
+    createFilterRowHeader('@tableId', @eb_filter_controls, @scrolly);
+
+    $('#@tableId_container thead').on('click','th',function(){
+        var col = $(this).children('span').text();
+        var dir = $(this).attr('aria-sort');
+        if(col !== '') {
+            @tableId_order_col = col;
+            @tableId_order_dir = (dir === 'undefined') ? 1 : ((dir === 'ascending') ? 2 : 1);
+        }
+    });
+
+    if(@bserial){
+        @tableId.on( 'draw.dt', function () {
+            @tableId.column(0).nodes().each( function (cell, i) {
+                cell.innerHTML = i+1;
+            } );
+        } );
+    }
         
     new ResizeSensor(jQuery('#@tableId_container'), function() {
         if ( $.fn.dataTable.isDataTable( '#@tableId' ) )
@@ -812,7 +820,8 @@ function initTable_@tableId(){
 .Replace("@collapsBtn",(this.__filterForm!=null) ?  @"<div id = 'btnCollapse' class='btn btn-default' data-toggle='collapse' data-target='#filterBox' aria-expanded='true' aria-controls='filterBox'>
                     <i class='fa fa-chevron-down' aria-hidden='true'></i>
                 </div>" : string.Empty )
-.Replace("@selectOption", this.GetSelectOption());
+.Replace("@selectOption", this.GetSelectOption())
+.Replace("@data.columns", this.ColumnColletion.ToJson());
         }
     }
 
@@ -858,15 +867,15 @@ function initTable_@tableId(){
             this.Width = 100;
         }
 
-        public string GetColumnDefJs()
+        public string GetColumnDefJs(ColumnColletion ColumnColletion)
         {
             string script = "{";
-            script += "data: " + "(_.find(data.columns, {'columnName': '{0}'})).columnIndex".Replace("{0}", this.Name);
+            script += "data: " + ColumnColletion[this.Name].ColumnIndex.ToString();
             script += string.Format(",title: '{0}<span hidden>{1}</span>'", (this.Label != null) ? this.Label : this.Name, this.Name);
             script += ",className: '" + this.GetClassName() + "'";
             script += ",visible: " + (!this.Hidden).ToString().ToLower();
             script += ",width: " + this.Width.ToString();
-            script += ",render: " + this.GetRenderFunc();
+            script += this.GetRenderFunc();
             script += ",name: '" + this.Name + "'";
             script += "},";
 
@@ -889,7 +898,7 @@ function initTable_@tableId(){
 
         private string GetRenderFunc(){
             string _r = string.Empty;
-            string _fwrapper = "function( data, type, row, meta ) { {0} }";
+            string _fwrapper = ", render: function( data, type, row, meta ) { {0} }";
 
             if (this.ColumnType == EbDataGridViewColumnType.Numeric)
             {
@@ -924,12 +933,12 @@ function initTable_@tableId(){
             else if (this.ColumnType == EbDataGridViewColumnType.Null)
             {
                 var ext = this.ExtendedProperties as EbDataGridViewBooleanColumnProperties;
-                _r = _fwrapper.Replace("{0}", "return renderToggleCol(data,@ext);".Replace("@ext",ext.IsEditable.ToString().ToLower()));
+                _r = _fwrapper.Replace("{0}", "return renderToggleCol(data,@ext);".Replace("@ext", ext.IsEditable.ToString().ToLower()));
             }
             else if (this.ColumnType == EbDataGridViewColumnType.Chart)
                 _r = _fwrapper.Replace("{0}", "return lineGraphDiv(data);");
             else
-                _r = _fwrapper.Replace("{0}", "return data;");
+                _r = string.Empty; // _fwrapper.Replace("{0}", "return data;");
 
             return _r;
         }
@@ -988,6 +997,8 @@ function initTable_@tableId(){
     [ProtoBuf.ProtoContract]
     public class EbDataGridViewColumnCollection : ObservableCollection<EbDataGridViewColumn>
     {
+        internal ColumnColletion ColumnColletion { get; set; }
+
         internal bool SerialColumnAdded { get; set; }
         internal bool CheckBoxColumnAdded { get; set; }
         internal bool EbVoidColumnAdded { get; set; }
@@ -1043,7 +1054,7 @@ function initTable_@tableId(){
                 //if (column.Name == "data_graph")
                 //    script += GetLineGraphColumnDefJs(column);
                 //else
-                    script += column.GetColumnDefJs();
+                    script += column.GetColumnDefJs(this.ColumnColletion);
             }
 
             if (!this.Contains("sys_cancelled"))//change to eb_void
@@ -1074,37 +1085,40 @@ function initTable_@tableId(){
             // className:'select-checkbox',
             this.CheckBoxColumnAdded = true;
             return "{ data: null, title: \"<input id='{0}_select-all' type='checkbox' onclick='clickAlSlct(event, this);' data-table='{0}'/>\"".Replace("{0}", tableid)
-                + ", width: 10, render: function( data2, type, row, meta ) { return renderCheckBoxCol({0}, data.columns, '{0}', row,meta); }, orderable: false },".Replace("{0}", tableid);
+                + ", width: 10, render: function( data2, type, row, meta ) { return renderCheckBoxCol({0}, {1}, '{0}', row,meta); }, orderable: false },"
+                .Replace("{0}", tableid)
+                .Replace("{1}", ColumnColletion["id"].ColumnIndex.ToString());
         }
 
         private string GetEbVoidColumnDefJs()
         {
-            //data: (_.find(data.columns, {'columnName': 'sys_cancelled'})).columnIndex,
             this.EbVoidColumnAdded = true;
-            return "{data: (_.find(data.columns, {'columnName': 'sys_cancelled'})).columnIndex, title: \"<i class='fa fa-ban fa-1x' aria-hidden='true'></i><span hidden>sys_cancelled</span>\" "
-             + ", width: 10 , className:'dt-center', render: function( data2, type, row, meta ) { return renderEbVoidCol(data2); } },";
+            return ("{data: {0}, title: \"<i class='fa fa-ban fa-1x' aria-hidden='true'></i><span hidden>sys_cancelled</span>\" "
+             + ", width: 10 , className:'dt-center', render: function( data2, type, row, meta ) { return renderEbVoidCol(data2); } },")
+             .Replace("{0}", ColumnColletion["sys_cancelled"].ColumnIndex.ToString());
             
         }
 
         private string GetLineGraphColumnDefJs(EbDataGridViewColumn column)//edit
         {
             this.EbLineGraphColumnAdded = true;
-            string script = "{ data: " + "(_.find(data.columns, {'columnName': '{0}'})).columnIndex".Replace("{0}", column.Name);
-            return script + @", width: 30, render: function(data2, type, row, meta) { return lineGraphDiv(data.columns, data2, meta, '" + column.Name + "'); }, orderable: true, className:'linepadding' }, ";
+            string script = "{ data: " + ColumnColletion[column.Name].ColumnIndex.ToString();
+            return script + @", width: 30, render: function(data2, type, row, meta) { return lineGraphDiv(data2, meta, '" + column.Name + "'); }, orderable: true, className:'linepadding' }, ";
         }
 
         private string GetEbLockColumnDefJs()
         {
             this.EbLockColumnAdded = true;
-            return "{ data: (_.find(data.columns, {'columnName': 'sys_locked'})).columnIndex, title: \"<i class='fa fa-lock fa-1x' aria-hidden='true' ></i><span hidden>sys_locked</span>\" "
-                + ", width: 10, className:'dt-center', render: function( data2, type, row, meta ) { return renderLockCol(data2); } },";
+            return ("{ data: {0}, title: \"<i class='fa fa-lock fa-1x' aria-hidden='true' ></i><span hidden>sys_locked</span>\" "
+                + ", width: 10, className:'dt-center', render: function( data2, type, row, meta ) { return renderLockCol(data2); } },")
+                .Replace("{0}", ColumnColletion["sys_locked"].ColumnIndex.ToString());
         }
 
         private string GetEbToggleColumnDefJs()
         {
-            //data: (_.find(data.columns, {'columnName': 'sys_deleted'})).columnIndex,
             this.EbToggleColumnAdded = true;
-            return "{data: (_.find(data.columns, {'columnName': 'sys_deleted'})).columnIndex, title:\"sys_deleted<span hidden>sys_deleted</span>\", width: 10, render: function( data2, type, row, meta ) { return renderToggleCol(data2); } },";
+            return "{data: {0}, title:\"sys_deleted<span hidden>sys_deleted</span>\", width: 10, render: function( data2, type, row, meta ) { return renderToggleCol(data2); } },"
+                .Replace("{0}", ColumnColletion["sys_deleted"].ColumnIndex.ToString());
         }
 
         //private string GetColumnVisibility()

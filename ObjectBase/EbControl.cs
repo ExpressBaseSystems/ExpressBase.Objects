@@ -1,4 +1,6 @@
-﻿using System;
+﻿using ServiceStack;
+using ServiceStack.Redis;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -282,7 +284,11 @@ else
 
         public virtual string GetHtml() { return string.Empty; }
 
-        public override void Init4Redis() { }
+        public override void Init4Redis(IRedisClient redisclient, IServiceClient serviceclient)
+        {
+            base.Redis = redisclient;
+            base.ServiceStackClient = serviceclient;
+        }
 
         public virtual void SetData(object value) { }
 

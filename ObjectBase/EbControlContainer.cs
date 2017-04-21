@@ -4,9 +4,8 @@ using ExpressBase.Data;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
+using ServiceStack.Redis;
 
 namespace ExpressBase.Objects
 {
@@ -41,9 +40,11 @@ namespace ExpressBase.Objects
 
         public EbControlContainer() { }
 
-        public override void Init4Redis()
+        public override void Init4Redis(IRedisClient redisclient, ServiceStack.IServiceClient serviceclient)
         {
-            this.FlattenControls();
+            base.Redis = redisclient;
+            base.ServiceStackClient = serviceclient;
+            this.FlattenControls(redisclient, serviceclient);
         }
 
 #if !NET462
@@ -138,7 +139,7 @@ namespace ExpressBase.Objects
 
 #region PRIVATE METHODS
 
-        private void FlattenControls()
+        private void FlattenControls(IRedisClient redisclient, ServiceStack.IServiceClient serviceclient)
         {
             if (this.FlattenedControls == null)
                 this.FlattenedControls = new List<EbControl>();
@@ -146,18 +147,19 @@ namespace ExpressBase.Objects
             if (this.FlattenedControls.Count > 0)
                 this.FlattenedControls.Clear();
 
-            this.FlattenControlsInner(this.Controls);
+            this.FlattenControlsInner(this.Controls, redisclient, serviceclient);
         }
 
-        private void FlattenControlsInner(List<EbControl> controls)
+        private void FlattenControlsInner(List<EbControl> controls, IRedisClient redisclient, ServiceStack.IServiceClient serviceclient)
         {
             foreach (EbControl control in controls)
             {
                 FlattenedControls.Add(control);
+                control.Init4Redis(redisclient, serviceclient);
                 if (control is EbControlContainer)
                 {
                     if ((control as EbControlContainer).Controls != null)
-                        this.FlattenControlsInner((control as EbControlContainer).Controls);
+                        this.FlattenControlsInner((control as EbControlContainer).Controls, redisclient, serviceclient);
                 }
             }
         }

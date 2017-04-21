@@ -1,4 +1,6 @@
-﻿using System;
+﻿using ServiceStack;
+using ServiceStack.Redis;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -32,6 +34,10 @@ namespace ExpressBase.Objects
 
         public EbObject() { }
 
-        public virtual void Init4Redis() { }
+        public virtual void Init4Redis(IRedisClient redisclient, IServiceClient serviceclient) { }
+
+        protected IRedisClient Redis { get; set; }
+
+        protected IServiceClient ServiceStackClient { get; set; }
     }
 }
