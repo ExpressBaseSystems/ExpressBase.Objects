@@ -367,7 +367,54 @@ namespace ExpressBase.Objects
 
         public override string GetHead()
         {
-             return @"$('[data-toggle=\'tooltip\']').tooltip(); ";
+             return @"                
+$('#@tableId_Pref').DataTable(
+{
+    columns: @columnRendering,
+    data:@columnsDefRender,
+    paging:false,
+    ordering:false,
+    searching:false,
+    info:false,
+});"
+.Replace("@columnRendering", this.GetColumnRender())
+.Replace("@columnsDefRender", this.GetColumnVisible())
+.Replace("@tableId", this.Name);
+        }
+
+        public string GetColumnVisible()
+        {
+            string json = "[";
+
+            foreach (EbDataGridViewColumn column in this.Columns)
+            {
+                json += "{ name: '@name', label: '@label', visibility: @visibility, width: @width }, "
+                    .Replace("@name",column.Name)
+                    .Replace("@label", (!string.IsNullOrEmpty(column.Label)) ? column.Label : column.Name)
+                    .Replace("@visibility", (!column.Hidden).ToString().ToLower())
+                    .Replace("@width",column.Width.ToString());
+            }
+
+            return json + "]";
+        }
+
+        public string GetColumnRender()
+        {
+            string col=string.Empty;
+            col = "[";
+            col += " {data:'name', title:'Column Name',className:'hideme', render:function( data, type, row, meta ){if(data!='') return \" <input type=\'text\' value=\"+data+\" name=\'name\'>\"; }},";
+            col += " {data:'label', title:'Column Title', className:'xxx', render:function( data, type, row, meta ){if(data!='') return \"<input type=\'text\' value=\"+data+\" name=\'label\'>\"; }},";
+            col += " { data:'visibility', className:'yyy', title:'Visible?', render:function( data, type, row, meta ) { if(data == true) return \"<input type=\'checkbox\' name=\'visible\' checked>\"; else return \"<input type=\'checkbox\' name=\'visible\'>\";}},";
+            col += " {data: 'width', title: 'Width', render:function( data, type, row, meta ){if(data != '') return \"<input type=\'text\' value=\"+data+\" name=\'width\'>\";}}";
+            col += "]";
+            return col;
+        }
+
+        public string GetSeetingsRender()
+        {
+            string render = string.Empty;
+
+            return render;
         }
 
         private int FilterBH = 0;
@@ -404,14 +451,12 @@ namespace ExpressBase.Objects
                 return rs;
             }
         }
+        
 
         public override string GetHtml()
         {
             return @"
 <style>
-
-
-
 .tablecontainer {
     width:100%;
     height:auto;
@@ -463,10 +508,15 @@ td { font-size: 12px; }
 .progress {
     margin-bottom: 0px !important;
 }
-
+.hideme {
+  display:none;
+}
 </style>
 <div class='tablecontainer' id='@tableId_container'>
-      <div>
+    <div>
+        @tableViewName
+    </div>
+    <div>
         <div class='btn-group' id='@tableId_filterdiv'>
             <a class='btn btn-default' onclick='showOrHideFilter(this,@scrolly);' name='filterbtn' style='display: none;' data-table='@tableId' data-toggle='tooltip' title='On\/Off Filter'><i class='fa fa-filter' aria-hidden='true'></i></a>
             <button type='button' class='btn btn-default dropdown-toggle' data-toggle='dropdown' name='filterbtn' style='display: none;'>
@@ -475,7 +525,7 @@ td { font-size: 12px; }
                 <li><a href = '#' onclick= clearFilter('@tableId')> Clear Filter</a></li>
             </ul>
         </div>
-    <button type='button' id='@tableId_btntotalpage' class='btn btn-default' style='display: none;' onClick='showOrHideAggrControl(this,@scrolly);' data-table='@tableId'>&sum;</button>
+        <button type='button' id='@tableId_btntotalpage' class='btn btn-default' style='display: none;' onClick='showOrHideAggrControl(this,@scrolly);' data-table='@tableId'>&sum;</button>
         <div id='btnGo' class='btn btn-default' >GO</div>
         <div id='@tableId_fileBtns' style='display: inline-block;'>
             <div id='btnCopy' class='btn btn-default'  name='filebtn' style='display: none;' data-toggle='tooltip' title='Copy to Clipboard' onclick= CopyToClipboard('@tableId') ><i class='fa fa-clipboard' aria-hidden='true'></i></div>
@@ -491,16 +541,15 @@ td { font-size: 12px; }
             <div id='btnExcel' class='btn btn-default'  name='filebtn' style='display: none;' data-toggle='tooltip' title='Excel' onclick= ExportToExcel('@tableId')><i class='fa fa-file-excel-o' aria-hidden='true'></i></div>
             <div id='btnPdf' class='btn btn-default'    name='filebtn' style='display: none;'  data-toggle='tooltip' title='Pdf' onclick= ExportToPdf('@tableId')><i class='fa fa-file-pdf-o' aria-hidden='true'></i></div>
             <div id='btnCsv' class='btn btn-default'    name='filebtn' style='display: none;' data-toggle='tooltip' title='Csv' onclick= ExportToCsv('@tableId')><i class='fa fa-file-text-o' aria-hidden='true'></i></div>
-           </div>
-            @collapsBtn
+        </div>
+        @collapsBtn
+        <div id='@tableId_btnSettings' class='btn btn-default' style='display: none;' data-toggle='modal' data-target='#settingsmodal'><i class='fa fa-cog' aria-hidden='true'></i></div>
     </div>
     <div style='width:auto;'>
         @filters  
-         <h3>@tableViewName</h3>
         <div id='@tableId_loadingdiv' class='loadingdiv'>
             <img id='@tableId_loading-image' src='/images/ajax-loader.gif' alt='Loading...' />
         </div>
-               
         <table id='@tableId' class='table table-striped table-bordered'></table>
     </div>
 </div>
@@ -534,7 +583,25 @@ td { font-size: 12px; }
           <h4 class='modal-title'><center>Settings</center></h4>
         </div>
         <div class='modal-body'>
-            
+            <ul class='nav nav-tabs' role='tablist'>
+                <li class='nav-item'>
+                    <a class='nav-link' href = '#1a' data-toggle='tab' role='tab'>Columns</a>
+                </li>
+                <li class='nav-item'>
+                    <a class='nav-link' href = '#2a' data-toggle='tab' role='tab'>Link</a>
+                </li>
+            </ul>
+            <div class='tab-content'>
+                <div class='tab-pane' id='1a' role='tabpanel'>
+                    <table id='@tableId_Pref' class='table table-striped table-bordered'></table>
+                </div>
+                 <div class='tab-pane' id='2a' role='tabpanel'>
+                     tab
+                </div>
+            </div>
+        </div>
+         <div class='modal-footer'>
+            <button type = 'button' class='btn btn-primary' id='Save_btn' >Save changes</button>
         </div>
      </div>
     </div>
@@ -555,6 +622,29 @@ $('#btnGo').click(function(){
 });
 
 
+$('#Save_btn').click(function(){
+    var ct=0;
+    var json='[';
+    var api=$('#@tableId_Pref').DataTable();
+    $.each(api.$('input'),function(i,obj){
+        ct++;
+        if( ct == 1)
+            json +='{';
+        if(obj.type=='text' && obj.name=='name')
+            json +='name:'+ obj.value;
+        if(obj.type=='text' && obj.name=='label')
+            json +=',title:'+ obj.value;
+        if(obj.type=='checkbox')
+            json +=(obj.checked) ? ',visible:true': ',visible:false';
+        if(obj.type=='text' && obj.name=='width')
+            json +=',width:'+ obj.value;
+        if(ct == api.columns().count()){
+            json +='},';
+            ct=0;
+        }
+    });
+    alert(json+']');
+});
 function initTable_@tableId(){
 
     $('#@tableId_loadingdiv').show();
@@ -673,6 +763,7 @@ function initTable_@tableId(){
         
         $('#@tableId_fileBtns [name=filebtn]').css('display', 'inline-block');
         $('#@tableId_filterdiv [name=filterbtn]').css('display', 'inline-block');
+        $('#@tableId_btnSettings').css('display', 'inline-block');
    
         createFilterRowHeader('@tableId', @eb_filter_controls, @scrolly);
 
@@ -1015,5 +1106,13 @@ function initTable_@tableId(){
             this.EbToggleColumnAdded = true;
             return "{data: (_.find(data.columns, {'columnName': 'sys_deleted'})).columnIndex, title:\"sys_deleted<span hidden>sys_deleted</span>\", width: 10, render: function( data2, type, row, meta ) { return renderToggleCol(data2); } },";
         }
+
+        //private string GetColumnVisibility()
+        //{
+        //    foreach(EbDataGridViewColumn in this)
+        //    {
+
+        //    }
+        //}
     }
 }
