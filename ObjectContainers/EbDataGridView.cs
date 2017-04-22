@@ -372,7 +372,12 @@ namespace ExpressBase.Objects
 
         public override string GetHead()
         {
-             return @"                
+            return string.Empty;
+        }
+
+        public string GetSettingsTableInit()
+        {
+            return @"                
 $('#@tableId_Pref').DataTable(
 {
     columns: @columnRendering,
@@ -387,14 +392,16 @@ $('#@tableId_Pref').DataTable(
 .Replace("@tableId", this.Name);
         }
 
+        //settings Table
         public string GetColumnVisible()
         {
             string json = "[";
 
             foreach (EbDataGridViewColumn column in this.Columns)
             {
-                json += "{ name: '@name', label: '@label', visibility: @visibility, width: @width }, "
-                    .Replace("@name",column.Name)
+                json += "{ name: '@name', index: @index, label: '@label', visibility: @visibility, width: @width }, "
+                    .Replace("@name", column.Name)
+                    .Replace("@index", this.ColumnColletion[column.Name].ColumnIndex.ToString())
                     .Replace("@label", (!string.IsNullOrEmpty(column.Label)) ? column.Label : column.Name)
                     .Replace("@visibility", (!column.Hidden).ToString().ToLower())
                     .Replace("@width",column.Width.ToString());
@@ -403,11 +410,13 @@ $('#@tableId_Pref').DataTable(
             return json + "]";
         }
 
+        //settings Table
         public string GetColumnRender()
         {
             string col=string.Empty;
             col = "[";
             col += " {data:'name', title:'Column Name',className:'hideme', render:function( data, type, row, meta ){if(data!='') return \" <input type=\'text\' value=\"+data+\" name=\'name\'>\"; }},";
+            col += " {data:'index', title:'Column Index',className:'hideme', render:function( data, type, row, meta ){if(data!='') return \" <input type=\'text\' value=\"+data+\" name=\'index\'>\"; }},";
             col += " {data:'label', title:'Column Title', className:'xxx', render:function( data, type, row, meta ){if(data!='') return \"<input type=\'text\' value=\"+data+\" name=\'label\'>\"; }},";
             col += " { data:'visibility', className:'yyy', title:'Visible?', render:function( data, type, row, meta ) { if(data == true) return \"<input type=\'checkbox\' name=\'visible\' checked>\"; else return \"<input type=\'checkbox\' name=\'visible\'>\";}},";
             col += " {data: 'width', title: 'Width', render:function( data, type, row, meta ){if(data != '') return \"<input type=\'text\' value=\"+data+\" name=\'width\'>\";}}";
@@ -425,6 +434,7 @@ $('#@tableId_Pref').DataTable(
         private int FilterBH = 0;
 
         private EbForm __filterForm;
+
         public void SetFilterForm(EbForm filterForm)
         {
             this.__filterForm = filterForm;
@@ -466,6 +476,7 @@ $('#@tableId_Pref').DataTable(
         public override string GetHtml()
         {
             this.ColumnColletion = this.Redis.Get<ColumnColletion>(string.Format("{0}_ds_{1}_columns", "eb_roby_dev", this.DataSourceId));
+            string tvPref4User = this.Redis.Get<string>(string.Format("{0}_TVPref_{1}_uid_{2}", "eb_roby_dev", this.Id, 1));
             this.Columns.ColumnColletion = this.ColumnColletion;
 
             return @"
@@ -634,29 +645,40 @@ $('#btnGo').click(function(){
         @tableId.ajax.reload();
 });
 
+var coldef = function(n, d, t, v, w)
+{
+    this.name = n;
+    this.data = d;
+    this.title = t;
+    this.visible = v;
+    this.width = w;
+};
 
 $('#Save_btn').click(function(){
-    var ct=0;
-    var json='[';
+    var ct = 0; var objarr = [];
     var api=$('#@tableId_Pref').DataTable();
+    var n, d, t, v, w;
+
     $.each(api.$('input'),function(i,obj){
         ct++;
-        if( ct == 1)
-            json +='{';
         if(obj.type=='text' && obj.name=='name')
-            json +='name:'+ obj.value;
+            n = obj.value;
+        if(obj.type=='text' && obj.name=='index')
+            d = obj.value;
         if(obj.type=='text' && obj.name=='label')
-            json +=',title:'+ obj.value;
+            t = obj.value;
         if(obj.type=='checkbox')
-            json +=(obj.checked) ? ',visible:true': ',visible:false';
+            v = obj.checked;
         if(obj.type=='text' && obj.name=='width')
-            json +=',width:'+ obj.value;
-        if(ct == api.columns().count()){
-            json +='},';
-            ct=0;
-        }
+            w = obj.value;
+        if(ct === api.columns().count()) { ct=0; objarr.push(new coldef(n, d, t, v, w)); }
     });
-    alert(json+']');
+
+    alert(JSON.stringify(objarr));
+    $.post('TVPref4User', {tvid: @tableViewId, json: JSON.stringify(objarr)});
+    $('#settingsmodal').modal('toggle');
+    $('#@tableId').DataTable().destroy();
+    initTable_@tableId();
 });
 function initTable_@tableId(){
 
@@ -666,6 +688,7 @@ function initTable_@tableId(){
     var @tableId_order_col = '';
     var @tableId_order_dir = 0;
     var @tableId__datacolumns = @data.columns;
+    var @tableId__columns = @columnsRender;
     @tableId= $('#@tableId').DataTable(
     {
         dom:'<\'col-sm-2\'l><\'col-sm-2\'i><\'col-sm-4\'B><\'col-sm-4\'p>tr',
@@ -685,7 +708,7 @@ function initTable_@tableId(){
         language: { processing: '<div class=\'fa fa-spinner fa-pulse  fa-3x fa-fw\'></div>',
                     info:'_START_ - _END_ / _TOTAL_'},
         pagingType:'@pagingType',
-        columns:@columnsRender, 
+        columns:@tableId__columns, 
         order: [],
         deferRender: true,
         filter: true,
@@ -798,13 +821,15 @@ function initTable_@tableId(){
         if ( $.fn.dataTable.isDataTable( '#@tableId' ) )
             @tableId.columns.adjust();
     });
+
+    @GetSettingsTableInit
 }    
 </script>"
 .Replace("@dataSourceId", this.DataSourceId.ToString().Trim())
 .Replace("@tableId", this.Name)
 .Replace("@tableViewName", ((string.IsNullOrEmpty(this.Label)) ? "&lt;ReportLabel Undefined&gt;" : this.Label))
 .Replace("@lengthMenu", this.GetLengthMenu())
-.Replace("@columnsRender", this.GetCols())
+.Replace("@columnsRender", (string.IsNullOrEmpty(tvPref4User) ? this.GetCols() : tvPref4User))
 .Replace("@eb_filter_controls", this.GetFilterControls())
 .Replace("@eb_footer1", this.GetAggregateControls(1))
 .Replace("@eb_footer2", this.GetAggregateControls(2))
@@ -821,7 +846,9 @@ function initTable_@tableId(){
                     <i class='fa fa-chevron-down' aria-hidden='true'></i>
                 </div>" : string.Empty )
 .Replace("@selectOption", this.GetSelectOption())
-.Replace("@data.columns", this.ColumnColletion.ToJson());
+.Replace("@data.columns", this.ColumnColletion.ToJson())
+.Replace("@GetSettingsTableInit", this.GetSettingsTableInit())
+.Replace("@tableViewId", this.Id.ToString());
         }
     }
 
