@@ -118,7 +118,7 @@ $('#@id').datetimepicker({
 <div id='@nameContainer' style='position:absolute; left:@leftpx; top:@top; @hiddenString'>
     <span id='@nameLbl' style='@lblBackColor @LblForeColor'>@label</span>
     <div  class='input-group' style='width:1px;'>
-        <input id='@name' data-EbType='@datetype'  data-toggle='tooltip' title='@toolTipText' class='date' type='text'  name='@name'  autocomplete = '@autoComplete' @value @tabIndex style='width:@widthpx; height:@heightpx; @backColor @foreColor display:inline-block; @fontStyle @readOnlyString @required @placeHolder />
+        <input id='@name' data-ebtype='@datetype'  data-toggle='tooltip' title='@toolTipText' class='date' type='text'  name='@name'  autocomplete = '@autoComplete' @value @tabIndex style='width:@widthpx; height:@heightpx; @backColor @foreColor display:inline-block; @fontStyle @readOnlyString @required @placeHolder />
         <i id='@nameTglBtn' class='fa  @atchdLbl input-group-addon' aria-hidden='true'></i>
     </div>
     <span class='helpText'> @helpText </span>
