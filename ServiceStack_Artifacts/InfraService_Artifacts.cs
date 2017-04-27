@@ -110,6 +110,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         [DataMember(Order = 1)]
         public int id { get; set; }
+
+        public ResponseStatus response { get; set; }
     }
 
     [DataContract]
@@ -127,6 +129,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 3)]
         public string Uname { get; set; }
 
+        [DataMember(Order = 4)]
+        public Dictionary<string, object> Colvalues { get; set; }
+
         public string TenantAccountId { get; set; }
     }
 
@@ -136,6 +141,11 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
        
         [DataMember(Order = 1)]
         public List<List<object>> returnlist { get; set; }
+
+        [DataMember(Order = 2)]
+        public List<Dictionary<string, object>> Data { get; set; }
+
+        public ResponseStatus response { get; set; }
 
 
     }
