@@ -84,7 +84,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    [Route("/infra", "POST")]
+    [Route("/infra")]
     public class TokenRequiredUploadRequest : IReturn<TokenRequiredUploadResponse>,IEbSSRequest
     {
         [DataMember(Order = 0)]
@@ -111,10 +111,11 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 1)]
         public int id { get; set; }
 
-        public ResponseStatus response { get; set; }
+        [DataMember(Order = 2)]
+        public Dictionary<string, object> Data { get; set; }
     }
 
-    [DataContract]
+    [DataContract] 
     public class TokenRequiredSelectRequest : IReturn<TokenRequiredSelectResponse>, IEbSSRequest
     {
         [DataMember(Order = 0)]
@@ -130,7 +131,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Uname { get; set; }
 
         [DataMember(Order = 4)]
-        public Dictionary<string, object> Colvalues { get; set; }
+        public int id { get; set; }
 
         public string TenantAccountId { get; set; }
     }
@@ -143,7 +144,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public List<List<object>> returnlist { get; set; }
 
         [DataMember(Order = 2)]
-        public List<Dictionary<string, object>> Data { get; set; }
+        public Dictionary<string, object> Data { get; set; }
 
         public ResponseStatus response { get; set; }
 
