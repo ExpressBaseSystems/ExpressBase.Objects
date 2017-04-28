@@ -374,135 +374,7 @@ namespace ExpressBase.Objects
         {
             return string.Empty;
         }
-
-        public string GetSettingsTableInit()
-        {
-            return @"                
-$('#@tableId_Pref').DataTable(
-{
-    columns: @columnRendering,
-    data:@columnsDefRender,
-    paging:false,
-    ordering:false,
-    searching:false,
-    info:false,
-});"
-.Replace("@columnRendering", this.GetColumnRender())
-.Replace("@columnsDefRender", string.IsNullOrEmpty(tvPref4User) ? this.GetColumnDefRender() : this.getColumnDefRenderFromSeetingsTbl())
-.Replace("@tableId", this.Name);
-        }
-
-        //settings Table
-        public string GetColumnDefRender()
-        {
-            string json = "[";
-
-            foreach (EbDataGridViewColumn column in this.Columns)
-            {
-                json += "{ name: '@name', index: @index, type: '@type', label: '@label', visibility: @visibility, width: @width }, "
-                    .Replace("@name", column.Name)
-                    .Replace("@index", this.ColumnColletion[column.Name].ColumnIndex.ToString())
-                    .Replace("@type",column.ColumnType.ToString())
-                    .Replace("@label", (!string.IsNullOrEmpty(column.Label)) ? column.Label : column.Name)
-                    .Replace("@visibility", (!column.Hidden).ToString().ToLower())
-                    .Replace("@width",column.Width.ToString());
-            }
-
-            return json + "]";
-        }
-
-        //settings Table
-        public string GetColumnRender()
-        {
-            string col=string.Empty;
-            col = "[";
-            col += " {data:'name', title:'Column Name',className:'hideme', render:function( data, type, row, meta ){if(data!='') return \" <input type=\'text\' value=\"+data+\" name=\'name\'>\"; }},";
-            col += " {data:'index', title:'Column Index',className:'hideme', render:function( data, type, row, meta ){if(data!='') return \" <input type=\'text\' value=\"+data+\" name=\'index\'>\"; }},";
-            col += " {data:'type', title:'Column Type',className:'hideme', render:function( data, type, row, meta ){if(data!='') return \" <input type=\'text\' value=\"+data+\" name=\'type\'>\"; }},";
-            col += " {data:'label', title:'Column Title', className:'xxx', render:function( data, type, row, meta ){if(data!='') return \"<input type=\'text\' value=\"+data+\" name=\'label\'>\"; }},";
-            col += " { data:'visibility', className:'yyy', title:'Visible?', render:function( data, type, row, meta ) { if(data == true) return \"<input type=\'checkbox\' name=\'visible\' checked>\"; else return \"<input type=\'checkbox\' name=\'visible\'>\";}},";
-            col += " {data: 'width', title: 'Width', render:function( data, type, row, meta ){if(data != '') return \"<input type=\'text\' value=\"+data+\" name=\'width\'>\";}}";
-            col += "]";
-            return col;
-        }
-
-        public string getColumnDefRenderFromSeetingsTbl()
-        {
-            List<SampleColumn> ObjList = (List<SampleColumn>)Newtonsoft.Json.JsonConvert.DeserializeObject(tvPref4User, typeof(List<SampleColumn>));
-            string json = "[";
-
-            foreach (SampleColumn column in ObjList)
-            {
-                json += "{ name: '@name', index: @index, type: '@type', label: '@label', visibility: @visibility, width: @width }, "
-                    .Replace("@name", column.name)
-                    .Replace("@index", this.ColumnColletion[column.name].ColumnIndex.ToString())
-                    .Replace("@type", column.type.ToString())
-                    .Replace("@label", (!string.IsNullOrEmpty(column.title)) ? column.title : column.name)
-                    .Replace("@visibility", (column.visible).ToString().ToLower())
-                    .Replace("@width", column.width.ToString());
-            }
-
-            return json + "]";
-        }
-
-        public string GetFilterCtrlsFromSettingsTbl()
-        {
-            List<SampleColumn> ObjList = (List<SampleColumn>)Newtonsoft.Json.JsonConvert.DeserializeObject(tvPref4User, typeof(List<SampleColumn>));
-            
-            List<string> _lsRet = new List<string>();
-
-            if (this.Columns.SerialColumnAdded) _lsRet.Add("<th>&nbsp;</th>");
-            if (this.Columns.CheckBoxColumnAdded) _lsRet.Add("<th>&nbsp;</th>");
-
-            StringBuilder _ls = new StringBuilder();
-
-            foreach (SampleColumn col in ObjList)
-            {
-                _ls.Clear();
-
-                if (col.visible == true)
-                {
-                    var span = string.Format("<span hidden>{0}</span>", col.name);
-
-                    string htext_class = string.Format("{0}_htext", this.Name);
-
-                    string data_colum = string.Format("data-colum='{0}'", col.name);
-                    string data_table = string.Format("data-table='{0}'", this.Name);
-
-                    string header_select = string.Format("{0}_{1}_hdr_sel", this.Name, col.name);
-                    string header_text1 = string.Format("{0}_{1}_hdr_txt1", this.Name, col.name);
-                    string header_text2 = string.Format("{0}_{1}_hdr_txt2", this.Name, col.name);
-
-                    _ls.Append("<th style='padding: 0px; margin: 0px'>");
-
-                    if (col.type == EbDataGridViewColumnType.Numeric)
-                        _ls.Append(span + getFilterForNumeric(header_text1, header_select, data_table, htext_class, data_colum, header_text2));
-                    else if (col.type == EbDataGridViewColumnType.Text)
-                        _ls.Append(span + getFilterForString(header_text1, header_select, data_table, htext_class, data_colum, header_text2));
-                    else if (col.type == EbDataGridViewColumnType.DateTime)
-                        _ls.Append(span + getFilterForDateTime(header_text1, header_select, data_table, htext_class, data_colum, header_text2));
-                    else if (col.type == EbDataGridViewColumnType.Boolean)
-                        _ls.Append(span + getFilterForBoolean(col.name));
-                    else
-                        _ls.Append(span);
-
-                    _ls.Append("</th>");
-                }
-                //else
-                //    _ls.Append("<th style='display:none'></th>");
-
-                _lsRet.Add(_ls.ToString());
-            }
-            if (this.Columns.EbVoidColumnAdded) _lsRet.Add("<th style='padding: 0px; margin: 0px; text-align:center;'>" + getFilterForBoolean("sys_cancelled") + "</th>");
-            if (this.Columns.EbLineGraphColumnAdded) _lsRet.Add("<th>&nbsp;</th>");
-            if (this.Columns.EbLockColumnAdded) _lsRet.Add("<th style='padding: 0px; margin: 0px; text-align:center;'>" + getFilterForBoolean("sys_locked") + "</th>");
-            //if (this.Columns.EbToggleColumnAdded) _lsRet.Add("<th style='padding: 0px; margin: 0px'>" + getFilterForBoolean("sys_deleted") + "</th>");
-            _ls.Clear();
-            _ls = null;
-
-            return Newtonsoft.Json.JsonConvert.SerializeObject(_lsRet);
-        }
-
+        
         private int FilterBH = 0;
 
         private EbForm __filterForm;
@@ -547,10 +419,33 @@ $('#@tableId_Pref').DataTable(
 
         string tvPref4User = string.Empty;
 
+        public string GetColumn4DataTable(ColumnColletion  __columnCollection)
+        {
+            string colDef = string.Empty;
+            colDef = "[";
+            foreach(EbDataColumn  column in __columnCollection)
+            {
+                colDef += "{";
+                colDef += "\"data\": " + __columnCollection[column.ColumnName].ColumnIndex.ToString();
+                colDef += string.Format(",\"title\": \"{0}<span hidden>{0}</span>\"", column.ColumnName);
+                colDef += ",\"visible\": " + true.ToString().ToLower();
+                colDef += ",\"width\": " + 100;
+                colDef += ",\"name\": \"" + column.ColumnName + "\"";
+                colDef += ",\"type\": \"" + column.Type.ToString() + "\"";
+                colDef += "},";
+            }
+            return colDef.Substring(0 , colDef.Length - 1) +"]";
+        }
+
         public override string GetHtml()
         {
             this.ColumnColletion = this.Redis.Get<ColumnColletion>(string.Format("{0}_ds_{1}_columns", "eb_roby_dev", this.DataSourceId));
             tvPref4User = this.Redis.Get<string>(string.Format("{0}_TVPref_{1}_uid_{2}", "eb_roby_dev", this.Id, 1));
+            if (string.IsNullOrEmpty(tvPref4User))
+            {
+                tvPref4User = this.GetColumn4DataTable(this.ColumnColletion);
+                this.Redis.Set(string.Format("{0}_TVPref_{1}_uid_{2}", "eb_roby_dev", this.Id, 1), tvPref4User);
+            }
             this.Columns.ColumnColletion = this.ColumnColletion;
 
 
@@ -642,7 +537,7 @@ td { font-size: 12px; }
             <div id='btnCsv' class='btn btn-default'    name='filebtn' style='display: none;' data-toggle='tooltip' title='Csv' onclick= ExportToCsv('@tableId')><i class='fa fa-file-text-o' aria-hidden='true'></i></div>
         </div>
         @collapsBtn
-        <div id='@tableId_btnSettings' class='btn btn-default' style='display: none;' data-toggle='modal' data-target='#settingsmodal'><i class='fa fa-cog' aria-hidden='true'></i></div>
+        <div id='@tableId_btnSettings' class='btn btn-default' style='display: none;' data-toggle='modal' data-target='#settingsmodal' onclick=GetSettingsModal('@tableId',@tableViewId,'@tableViewName')><i class='fa fa-cog' aria-hidden='true'></i></div>
     </div>
     <div style='width:auto;' id='@tableId_divcont'>
         @filters  
@@ -668,41 +563,6 @@ td { font-size: 12px; }
     </div>
  </div>
 
-<!-- Modal for Settings-->
-  <div class='modal fade' id='settingsmodal' role='dialog'>
-    <div class='modal-dialog modal-lg'>
-    
-      <!-- Modal content-->
-      <div class='modal-content'>
-        <div class='modal-header'>
-          <button type = 'button' class='close' data-dismiss='modal'>&times;</button>
-          <h4 class='modal-title'><center>Settings</center></h4>
-        </div>
-        <div class='modal-body'>
-            <ul class='nav nav-tabs' role='tablist'>
-                <li class='nav-item'>
-                    <a class='nav-link' href = '#1a' data-toggle='tab' role='tab'>Columns</a>
-                </li>
-                <li class='nav-item'>
-                    <a class='nav-link' href = '#2a' data-toggle='tab' role='tab'>Link</a>
-                </li>
-            </ul>
-            <div class='tab-content'>
-                <div class='tab-pane' id='1a' role='tabpanel'>
-                    <table id='@tableId_Pref' class='table table-striped table-bordered'></table>
-                </div>
-                 <div class='tab-pane' id='2a' role='tabpanel'>
-                     tab
-                </div>
-            </div>
-        </div>
-         <div class='modal-footer'>
-            <button type = 'button' class='btn btn-primary' id='Save_btn' >Save changes</button>
-        </div>
-     </div>
-    </div>
- </div>
-
 <script>
 var flag=true;
 var DtF = true;
@@ -710,67 +570,24 @@ var @tableId;
 $('#btnGo').click(function(){
     if(DtF){
         DtF = false;
-        initTable_@tableId();
+        initTable_@tableId(@tvPref4User);
         $('#filterBox').collapse('hide');
     }
     else
         @tableId.ajax.reload();
 });
 
-var coldef = function(n, d, ty, t, v, w)
-{
-    this.name = n;
-    this.data = d;
-    this.type = ty;
-    this.title = t;
-    this.visible = v;
-    this.width = w;
-};
+var @tableId_tvPref4User = @tvPref4User; 
+var @tableId__datacolumns = @data.columns;
 
-$('#Save_btn').click(function(){
-    var ct = 0; var objarr = [];
-    var api=$('#@tableId_Pref').DataTable();
-    var n, d, ty, t, v, w;
-
-    $.each(api.$('input'),function(i,obj){
-        ct++;
-        if(obj.type=='text' && obj.name=='name')
-            n = obj.value;
-        if(obj.type=='text' && obj.name=='index')
-            d = obj.value;
-        if(obj.type=='text' && obj.name=='type')
-            ty = obj.value;
-        if(obj.type=='text' && obj.name=='label')
-            t = obj.value;
-        if(obj.type=='checkbox')
-            v = obj.checked;
-        if(obj.type=='text' && obj.name=='width')
-            w = obj.value;
-        if(ct === api.columns().count()) { ct=0; objarr.push(new coldef(n, d, ty, t, v, w)); }
-    });
-
-    @tableId_tvPref4User = objarr;
-    $.post('TVPref4User', {tvid: @tableViewId, json: JSON.stringify(objarr)});
-    $('#settingsmodal').modal('toggle');
-    $('#@tableId_Pref').DataTable().destroy();
-    $('#@tableId').DataTable().destroy();
-    $('#@tableId_divcont').children()[1].remove();
-    var table = $(document.createElement('table')).addClass('table table-striped table-bordered').attr('id', '@tableId');
-    $('#@tableId_divcont').append(table);
-    initTable_@tableId();
-});
-
-var @tableId_tvPref4User = @tvPref4User; alert('@tableId_tvPref4User: ' + @tableId_tvPref4User);
-
-function initTable_@tableId(){
-
-    $('#@tableId').append( $('@tfoot') );
+function initTable_@tableId(@tableId_tvPref4User){
+    $('#@tableId').append( $(getFooterFromSettingsTbl(@tableId_tvPref4User)) );
 
     var @tableId_ids=[];
     var @tableId_order_col = '';
     var @tableId_order_dir = 0;
-    var @tableId__datacolumns = @data.columns;
-    var @tableId__columns = (@tableId_tvPref4User !== null) ? @tableId_tvPref4User : @columnsRender;
+    var @tableId__columns = @tableId_tvPref4User;
+    var @tableId__eb_agginfo = getAgginfo(@tableId_tvPref4User);
     @tableId= $('#@tableId').DataTable(
     {
         dom:'<\'col-sm-2\'l><\'col-sm-2\'i><\'col-sm-4\'B><\'col-sm-4\'p>tr',
@@ -818,7 +635,7 @@ function initTable_@tableId(){
         },
 
         fnFooterCallback: function ( nRow, aaData, iStart, iEnd, aiDisplay ) {
-            summarize2(@tableId, '@tableId', @eb_agginfo,@scrolly);
+            summarize2(@tableId, '@tableId', @tableId__eb_agginfo,@scrolly);
         },
         drawCallback:function ( settings ) {
             $('tbody [data-toggle=toggle]').bootstrapToggle();
@@ -870,18 +687,19 @@ function initTable_@tableId(){
         return sum / data.length;
     });
 
-    if( @eb_agginfo.length>0 ) {
-        createFooter('@tableId', @eb_footer1, @scrolly, 0);
-        createFooter('@tableId', @eb_footer2, @scrolly, 1);
+    if( @tableId__eb_agginfo.length>0 ) {
+        createFooter('@tableId', GetAggregateControls(@tableId_tvPref4User,'@tableId',1,@scrolly,@tableId), @scrolly, 0);
+        createFooter('@tableId', GetAggregateControls(@tableId_tvPref4User,'@tableId',2,@scrolly,@tableId), @scrolly, 1);
     }
 
         
     $('#@tableId_fileBtns [name=filebtn]').css('display', 'inline-block');
     $('#@tableId_filterdiv [name=filterbtn]').css('display', 'inline-block');
     $('#@tableId_btnSettings').css('display', 'inline-block');
-    if(@tableId_tvPref4User === null)
-        createFilterRowHeader('@tableId', @eb_filter_controls, @scrolly);
-    else
+
+    //if(@tableId_tvPref4User === null)
+    //    createFilterRowHeader('@tableId', @eb_filter_controls, @scrolly);
+    //else
         createFilterRowHeader('@tableId', GetFiltersFromSettingsTbl(@tableId_tvPref4User,'@tableId'), @scrolly);
 
     $('#@tableId_container thead').on('click','th',function(){
@@ -906,34 +724,32 @@ function initTable_@tableId(){
             @tableId.columns.adjust();
     });
 
-    @GetSettingsTableInit
 }    
 </script>"
 .Replace("@dataSourceId", this.DataSourceId.ToString().Trim())
 .Replace("@tableId", this.Name)
 .Replace("@tableViewName", ((string.IsNullOrEmpty(this.Label)) ? "&lt;ReportLabel Undefined&gt;" : this.Label))
 .Replace("@lengthMenu", this.GetLengthMenu())
-.Replace("@columnsRender",  this.GetCols())
-.Replace("@eb_filter_controls",  this.GetFilterControls())
-.Replace("@eb_footer1", this.GetAggregateControls(1))
-.Replace("@eb_footer2", this.GetAggregateControls(2))
-.Replace("@eb_agginfo", this.GetAggregateInfo())
+//.Replace("@columnsRender", this.GetCols())
+//.Replace("@eb_filter_controls", this.GetFilterControls())
+//.Replace("@eb_footer1", this.GetAggregateControls(1))
+//.Replace("@eb_footer2", this.GetAggregateControls(2))
+//.Replace("@eb_agginfo", this.GetAggregateInfo())
 .Replace("@bserial", this.Columns.SerialColumnAdded.ToString().ToLower())
 .Replace("@scrolly", this.ScrollY.ToString())
 .Replace("@scrollYOption", this.GetScrollYOption())
-.Replace("@tfoot", this.GetFooter())
+//.Replace("@tfoot", this.GetFooter())
 .Replace("@pagingType", this.PagingType.ToString())
 .Replace("@servicestack_url", "https://expressbaseservicestack.azurewebsites.net")
 .Replace("@filters", this.filters)
 .Replace("@FilterBH", this.FilterBH.ToString())
-.Replace("@collapsBtn",(this.__filterForm!=null) ?  @"<div id = 'btnCollapse' class='btn btn-default' data-toggle='collapse' data-target='#filterBox' aria-expanded='true' aria-controls='filterBox'>
+.Replace("@collapsBtn", (this.__filterForm != null) ? @"<div id = 'btnCollapse' class='btn btn-default' data-toggle='collapse' data-target='#filterBox' aria-expanded='true' aria-controls='filterBox'>
                     <i class='fa fa-chevron-down' aria-hidden='true'></i>
-                </div>" : string.Empty )
+                </div>" : string.Empty)
 .Replace("@selectOption", this.GetSelectOption())
 .Replace("@data.columns", this.ColumnColletion.ToJson())
-.Replace("@GetSettingsTableInit", this.GetSettingsTableInit())
 .Replace("@tableViewId", this.Id.ToString())
-.Replace("@tvPref4User", (string.IsNullOrEmpty(tvPref4User) ? "null" : tvPref4User));
+.Replace("@tvPref4User", tvPref4User);
         }
     }
 
