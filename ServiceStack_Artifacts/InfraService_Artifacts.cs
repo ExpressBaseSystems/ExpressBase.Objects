@@ -50,7 +50,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class InfraResponse
     {
         [DataMember(Order = 1)]
-        public int id { get; set; }
+        public int id { get; set; }       
     }
 
     [DataContract]
@@ -106,13 +106,18 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class TokenRequiredUploadResponse
+    public class TokenRequiredUploadResponse : IHasResponseStatus
     {
         [DataMember(Order = 1)]
         public int id { get; set; }
 
         [DataMember(Order = 2)]
         public Dictionary<string, object> Data { get; set; }
+
+        [DataMember(Order = 3)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+      
     }
 
     [DataContract] 
@@ -146,9 +151,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 2)]
         public Dictionary<string, object> Data { get; set; }
 
-        public ResponseStatus response { get; set; }
-
-
+        [DataMember(Order = 3)]
+        public ResponseStatus ResponseStatus { get; set; }
+        
     }
 
     [DataContract]
