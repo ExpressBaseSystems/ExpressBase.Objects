@@ -423,7 +423,8 @@ namespace ExpressBase.Objects
         {
             string colDef = string.Empty;
             colDef = "[";
-            foreach(EbDataColumn  column in __columnCollection)
+            //colDef += "{ \"width\":10, \"searchable\": false, \"orderable\": false, \"visible\":true, \"name\":serial},";
+            foreach (EbDataColumn  column in __columnCollection)
             {
                 colDef += "{";
                 colDef += "\"data\": " + __columnCollection[column.ColumnName].ColumnIndex.ToString();
@@ -439,6 +440,8 @@ namespace ExpressBase.Objects
 
         public override string GetHtml()
         {
+            //this.Redis.Delete<string>(string.Format("{0}_TVPref_{1}_uid_{2}", "eb_roby_dev", this.Id, 1));
+            //this.Redis.Remove(string.Format("{0}_TVPref_{1}_uid_{2}", "eb_roby_dev", this.Id, 1));
             this.ColumnColletion = this.Redis.Get<ColumnColletion>(string.Format("{0}_ds_{1}_columns", "eb_roby_dev", this.DataSourceId));
             tvPref4User = this.Redis.Get<string>(string.Format("{0}_TVPref_{1}_uid_{2}", "eb_roby_dev", this.Id, 1));
             if (string.IsNullOrEmpty(tvPref4User))
@@ -835,13 +838,13 @@ function initTable_@tableId(@tableId_tvPref4User){
         }
     });
 
-    if(@bserial){
-        @tableId.on( 'draw.dt', function () {
-            @tableId.column(0).nodes().each( function (cell, i) {
-                cell.innerHTML = i+1;
-            } );
-        } );
-    }
+    //if(@bserial){
+        //@tableId.on( 'draw.dt', function () {
+        //    @tableId.column(0).nodes().each( function (cell, i) {
+        //        cell.innerHTML = i+1;
+        //    } );
+        //} );
+    //}
         
     new ResizeSensor(jQuery('#@tableId_container'), function() {
         if ( $.fn.dataTable.isDataTable( '#@tableId' ) )
