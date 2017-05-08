@@ -422,8 +422,8 @@ namespace ExpressBase.Objects
         public string GetColumn4DataTable(ColumnColletion  __columnCollection)
         {
             string colDef = string.Empty;
-            colDef = "[";
-            //colDef += "{ \"width\":10, \"searchable\": false, \"orderable\": false, \"visible\":true, \"name\":serial},";
+            colDef = "{\"hideSerial\": false,\"columns\":[";
+            //colDef += "{ \"width\":10, \"searchable\": false, \"orderable\": false, \"visible\":true, \"name\":\"serial\", \"title\":\"Serial\"},";
             foreach (EbDataColumn  column in __columnCollection)
             {
                 colDef += "{";
@@ -435,13 +435,13 @@ namespace ExpressBase.Objects
                 colDef += ",\"type\": \"" + column.Type.ToString() + "\"";
                 colDef += "},";
             }
-            return colDef.Substring(0 , colDef.Length - 1) +"]";
+            return colDef.Substring(0 , colDef.Length - 1) +"]}";
         }
 
         public override string GetHtml()
         {
             //this.Redis.Delete<string>(string.Format("{0}_TVPref_{1}_uid_{2}", "eb_roby_dev", this.Id, 1));
-            //this.Redis.Remove(string.Format("{0}_TVPref_{1}_uid_{2}", "eb_roby_dev", this.Id, 1));
+            this.Redis.Remove(string.Format("{0}_TVPref_{1}_uid_{2}", "eb_roby_dev", this.Id, 1));
             this.ColumnColletion = this.Redis.Get<ColumnColletion>(string.Format("{0}_ds_{1}_columns", "eb_roby_dev", this.DataSourceId));
             tvPref4User = this.Redis.Get<string>(string.Format("{0}_TVPref_{1}_uid_{2}", "eb_roby_dev", this.Id, 1));
             if (string.IsNullOrEmpty(tvPref4User))
@@ -695,17 +695,21 @@ var @tableId;
 $('#btnGo').click(function(){
     if(DtF){
         DtF = false;
-        initTable_@tableId(@tvPref4User);
+        var tx = @tvPref4User;
+        alert('Go='+ tx.hideSerial);
+        AddSerialColumn(tx);
+        initTable_@tableId(tx.columns);
         $('#filterBox').collapse('hide');
     }
     else
         @tableId.ajax.reload();
 });
 
-var @tableId_tvPref4User = @tvPref4User; 
+//var @tableId_tvPref4User = @tvPref4User; 
 var @tableId__datacolumns = @data.columns;
 
 function initTable_@tableId(@tableId_tvPref4User){
+    alert(@tableId_tvPref4User);
     $('#@tableId').append( $(getFooterFromSettingsTbl(@tableId_tvPref4User)) );
 
     var @tableId_ids=[];
@@ -839,11 +843,11 @@ function initTable_@tableId(@tableId_tvPref4User){
     });
 
     //if(@bserial){
-        //@tableId.on( 'draw.dt', function () {
-        //    @tableId.column(0).nodes().each( function (cell, i) {
-        //        cell.innerHTML = i+1;
-        //    } );
-        //} );
+        @tableId.on( 'draw.dt', function () {
+            @tableId.column(0).nodes().each( function (cell, i) {
+                cell.innerHTML = i+1;
+            } );
+        } );
     //}
         
     new ResizeSensor(jQuery('#@tableId_container'), function() {
@@ -862,7 +866,7 @@ function initTable_@tableId(@tableId_tvPref4User){
 //.Replace("@eb_footer1", this.GetAggregateControls(1))
 //.Replace("@eb_footer2", this.GetAggregateControls(2))
 //.Replace("@eb_agginfo", this.GetAggregateInfo())
-.Replace("@bserial", this.Columns.SerialColumnAdded.ToString().ToLower())
+//.Replace("@bserial", this.Columns.SerialColumnAdded.ToString().ToLower())
 .Replace("@scrolly", this.ScrollY.ToString())
 .Replace("@scrollYOption", this.GetScrollYOption())
 //.Replace("@tfoot", this.GetFooter())
