@@ -422,8 +422,7 @@ namespace ExpressBase.Objects
         public string GetColumn4DataTable(ColumnColletion  __columnCollection)
         {
             string colDef = string.Empty;
-            colDef = "{\"hideSerial\": false,\"columns\":[";
-            //colDef += "{ \"width\":10, \"searchable\": false, \"orderable\": false, \"visible\":true, \"name\":\"serial\", \"title\":\"Serial\"},";
+            colDef = "{\"hideSerial\": false, \"hideCheckbox\": false, \"columns\":[";
             foreach (EbDataColumn  column in __columnCollection)
             {
                 colDef += "{";
@@ -440,8 +439,7 @@ namespace ExpressBase.Objects
 
         public override string GetHtml()
         {
-            //this.Redis.Delete<string>(string.Format("{0}_TVPref_{1}_uid_{2}", "eb_roby_dev", this.Id, 1));
-            this.Redis.Remove(string.Format("{0}_TVPref_{1}_uid_{2}", "eb_roby_dev", this.Id, 1));
+            //this.Redis.Remove(string.Format("{0}_TVPref_{1}_uid_{2}", "eb_roby_dev", this.Id, 1));
             this.ColumnColletion = this.Redis.Get<ColumnColletion>(string.Format("{0}_ds_{1}_columns", "eb_roby_dev", this.DataSourceId));
             tvPref4User = this.Redis.Get<string>(string.Format("{0}_TVPref_{1}_uid_{2}", "eb_roby_dev", this.Id, 1));
             if (string.IsNullOrEmpty(tvPref4User))
@@ -696,20 +694,18 @@ $('#btnGo').click(function(){
     if(DtF){
         DtF = false;
         var tx = @tvPref4User;
-        alert('Go='+ tx.hideSerial);
-        AddSerialColumn(tx);
-        initTable_@tableId(tx.columns);
+        initTable_@tableId(tx);
         $('#filterBox').collapse('hide');
     }
     else
         @tableId.ajax.reload();
 });
 
-//var @tableId_tvPref4User = @tvPref4User; 
 var @tableId__datacolumns = @data.columns;
 
-function initTable_@tableId(@tableId_tvPref4User){
-    alert(@tableId_tvPref4User);
+function initTable_@tableId(tx){
+    AddSerialAndOrCheckBoxColumns(tx, '@tableId', @tableId__datacolumns);
+    @tableId_tvPref4User=tx.columns;
     $('#@tableId').append( $(getFooterFromSettingsTbl(@tableId_tvPref4User)) );
 
     var @tableId_ids=[];
@@ -842,13 +838,13 @@ function initTable_@tableId(@tableId_tvPref4User){
         }
     });
 
-    //if(@bserial){
+    if(!tx.hideSerial){
         @tableId.on( 'draw.dt', function () {
             @tableId.column(0).nodes().each( function (cell, i) {
                 cell.innerHTML = i+1;
             } );
         } );
-    //}
+    }
         
     new ResizeSensor(jQuery('#@tableId_container'), function() {
         if ( $.fn.dataTable.isDataTable( '#@tableId' ) )
