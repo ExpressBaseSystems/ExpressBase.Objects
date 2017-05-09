@@ -422,7 +422,7 @@ namespace ExpressBase.Objects
         public string GetColumn4DataTable(ColumnColletion  __columnCollection)
         {
             string colDef = string.Empty;
-            colDef = "{\"hideSerial\": false, \"hideCheckbox\": false, \"columns\":[";
+            colDef = "{\"hideSerial\": false, \"hideCheckbox\": false, \"lengthMenu\":[ [100, 200, 300, -1], [100, 200, 300, \"All\"] ],\"columns\":[";
             foreach (EbDataColumn  column in __columnCollection)
             {
                 colDef += "{";
@@ -546,10 +546,8 @@ td { font-size: 12px; }
     </div>
 </div>
    <!-- Modal for Graph-->
-  <div class='modal fade' id='graphmodal' role='dialog'>
+  <!-- <div class='modal fade' id='graphmodal' role='dialog'>
     <div class='modal-dialog modal-lg'>
-    
-      <!-- Modal content-->
       <div class='modal-content'>
         <div class='modal-header'>
           <button type = 'button' class='close' data-dismiss='modal'>&times;</button>
@@ -562,7 +560,7 @@ td { font-size: 12px; }
         </div>
      </div>
     </div>
- </div>
+ </div> -->
 
 <script>
 
@@ -727,7 +725,7 @@ function initTable_@tableId(tx){
         responsive:true,
         keys: true,
         autoWidth: false,
-        @lengthMenu,
+        lengthMenu: tx.lengthMenu,
         serverSide: true,
         processing:true,
         language: { processing: '<div class=\'fa fa-spinner fa-pulse  fa-3x fa-fw\'></div>',
@@ -856,7 +854,7 @@ function initTable_@tableId(tx){
 .Replace("@dataSourceId", this.DataSourceId.ToString().Trim())
 .Replace("@tableId", this.Name)
 .Replace("@tableViewName", ((string.IsNullOrEmpty(this.Label)) ? "&lt;ReportLabel Undefined&gt;" : this.Label))
-.Replace("@lengthMenu", this.GetLengthMenu())
+//.Replace("@lengthMenu", this.GetLengthMenu())
 //.Replace("@columnsRender", this.GetCols())
 //.Replace("@eb_filter_controls", this.GetFilterControls())
 //.Replace("@eb_footer1", this.GetAggregateControls(1))
