@@ -422,7 +422,7 @@ namespace ExpressBase.Objects
         public string GetColumn4DataTable(ColumnColletion  __columnCollection)
         {
             string colDef = string.Empty;
-            colDef = "{\"hideSerial\": false, \"hideCheckbox\": false, \"lengthMenu\":[ [100, 200, 300, -1], [100, 200, 300, \"All\"] ],\"columns\":[";
+            colDef = "{\"hideSerial\": false, \"hideCheckbox\": false, \"lengthMenu\":[ [100, 200, 300, -1], [100, 200, 300, \"All\"] ],\"scrollY\":300,\"columns\":[";
             foreach (EbDataColumn  column in __columnCollection)
             {
                 colDef += "{";
@@ -434,7 +434,19 @@ namespace ExpressBase.Objects
                 colDef += ",\"type\": \"" + column.Type.ToString() + "\"";
                 colDef += "},";
             }
-            return colDef.Substring(0 , colDef.Length - 1) +"]}";
+            colDef = colDef.Substring(0 , colDef.Length - 1) +"],";
+            string colext = "\"columnsext\":[";
+            foreach (EbDataColumn column in __columnCollection)
+            {
+                colext += "{";
+                if (column.Type.ToString() == "System.Int32" || column.Type.ToString() == "System.Decimal")
+                    colext += "\"AggInfo\":true,\"DecimalPlace\":2,\"RenderAs\":\"Default\"";
+                //else if (column.Type.ToString() == "System.Boolean")
+                //    colext += "";
+                colext += "},";
+            }
+            colext = colext.Substring(0,colext.Length-1)+"]";
+            return colDef + colext + "}";
         }
 
         public override string GetHtml()
@@ -702,6 +714,7 @@ $('#btnGo').click(function(){
 var @tableId__datacolumns = @data.columns;
 
 function initTable_@tableId(tx){
+    alert(JSON.stringify(tx));
     AddSerialAndOrCheckBoxColumns(tx, '@tableId', @tableId__datacolumns);
     @tableId_tvPref4User=tx.columns;
     $('#@tableId').append( $(getFooterFromSettingsTbl(@tableId_tvPref4User)) );
@@ -720,7 +733,8 @@ function initTable_@tableId(tx){
                             modifier: {
                                 selected: true
                             }}}],
-        @scrollYOption,
+        scrollY: tx.scrollY,
+        //@scrollYOption,
         //scroller:true,
         responsive:true,
         keys: true,
@@ -775,7 +789,7 @@ function initTable_@tableId(tx){
         //    var rows = api.rows( { page: 'current'} ).nodes();
         //    var last = null;
             
-        //    api.column(3, { page: 'current'} ).data().each(function(group, i) {
+        //    api.column(3, { page: 'current'} ).data().each(function(group, i) {//api.columns('netamt:name').indexes()[0]
         //        if (last !== group)
         //        {
         //            $(rows).eq(i).before(
@@ -786,6 +800,7 @@ function initTable_@tableId(tx){
         //        }
         //    } );
         //}
+            
     });
 
     $.fn.dataTable.ext.errMode = 'throw';
