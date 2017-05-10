@@ -422,7 +422,8 @@ namespace ExpressBase.Objects
         public string GetColumn4DataTable(ColumnColletion  __columnCollection)
         {
             string colDef = string.Empty;
-            colDef = "{\"hideSerial\": false, \"hideCheckbox\": false, \"lengthMenu\":[ [100, 200, 300, -1], [100, 200, 300, \"All\"] ],\"scrollY\":300,\"columns\":[";
+            colDef = "{\"hideSerial\": false, \"hideCheckbox\": false, \"lengthMenu\":[ [100, 200, 300, -1], [100, 200, 300, \"All\"] ],";
+            colDef+=" \"scrollY\":300, \"rowGrouping\":\"\",\"leftFixedColumns\":0,\"rightFixedColumns\":0,\"columns\":[";
             foreach (EbDataColumn  column in __columnCollection)
             {
                 colDef += "{";
@@ -451,7 +452,7 @@ namespace ExpressBase.Objects
 
         public override string GetHtml()
         {
-            //this.Redis.Remove(string.Format("{0}_TVPref_{1}_uid_{2}", "eb_roby_dev", this.Id, 1));
+            this.Redis.Remove(string.Format("{0}_TVPref_{1}_uid_{2}", "eb_roby_dev", this.Id, 1));
             this.ColumnColletion = this.Redis.Get<ColumnColletion>(string.Format("{0}_ds_{1}_columns", "eb_roby_dev", this.DataSourceId));
             tvPref4User = this.Redis.Get<string>(string.Format("{0}_TVPref_{1}_uid_{2}", "eb_roby_dev", this.Id, 1));
             if (string.IsNullOrEmpty(tvPref4User))
@@ -734,9 +735,14 @@ function initTable_@tableId(tx){
                                 selected: true
                             }}}],
         scrollY: tx.scrollY,
+        scrollX: true,
+        fixedColumns: {
+            leftColumns: tx.leftFixedColumns,
+            rightColumns:tx.rightFixedColumns
+            },
         //@scrollYOption,
         //scroller:true,
-        responsive:true,
+        //responsive:true,
         keys: true,
         autoWidth: false,
         lengthMenu: tx.lengthMenu,
@@ -778,29 +784,16 @@ function initTable_@tableId(tx){
         },
         drawCallback:function ( settings ) {
             $('tbody [data-toggle=toggle]').bootstrapToggle();
+            if(tx.rowGrouping !== ''){
+                doRowgrouping(@tableId,tx);
+            }
             @tableId.columns.adjust();
         },
         initComplete:function ( settings,json ) {
             $('thead:eq(0) tr:eq(1) [type=checkbox]').prop('indeterminate',true); 
             @tableId.columns.adjust();
-        }
-        //drawCallback: function ( settings ) {
-        //    var api = this.api();
-        //    var rows = api.rows( { page: 'current'} ).nodes();
-        //    var last = null;
-            
-        //    api.column(3, { page: 'current'} ).data().each(function(group, i) {//api.columns('netamt:name').indexes()[0]
-        //        if (last !== group)
-        //        {
-        //            $(rows).eq(i).before(
-        //                '<tr class=\'group\'><td colspan=\'8\'>' + group + '</td></tr>'
-        //            );
-
-        //            last = group;
-        //        }
-        //    } );
-        //}
-            
+        },
+       
     });
 
     $.fn.dataTable.ext.errMode = 'throw';
