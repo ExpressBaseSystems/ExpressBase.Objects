@@ -441,7 +441,7 @@ namespace ExpressBase.Objects
             {
                 colext += "{";
                 if (column.Type.ToString() == "System.Int32" || column.Type.ToString() == "System.Decimal")
-                    colext += "\"AggInfo\":true,\"DecimalPlace\":2,\"RenderAs\":\"Default\"";
+                    colext += "\"name\":\""+ column.ColumnName + "\",\"AggInfo\":true,\"DecimalPlace\":2,\"RenderAs\":\"Default\"";
                 //else if (column.Type.ToString() == "System.Boolean")
                 //    colext += "";
                 colext += "},";
@@ -790,8 +790,8 @@ function initTable_@tableId(tx){
             @tableId.columns.adjust();
         },
         initComplete:function ( settings,json ) {
-            $('thead:eq(0) tr:eq(1) [type=checkbox]').prop('indeterminate',true); 
             createFilterRowHeader('@tableId', GetFiltersFromSettingsTbl(@tableId_tvPref4User,'@tableId'), @scrolly);
+            $('thead:eq(0) tr:eq(1) [type=checkbox]').prop('indeterminate',true);
             @tableId.columns.adjust();
         },
        
@@ -834,7 +834,7 @@ function initTable_@tableId(tx){
     //if(@tableId_tvPref4User === null)
     //    createFilterRowHeader('@tableId', @eb_filter_controls, @scrolly);
     //else
-        //createFilterRowHeader('@tableId', GetFiltersFromSettingsTbl(@tableId_tvPref4User,'@tableId'), @scrolly);
+       // createFilterRowHeader('@tableId', GetFiltersFromSettingsTbl(@tableId_tvPref4User,'@tableId'), @scrolly);
 
     $('#@tableId_container thead').on('click','th',function(){
         var col = $(this).children('span').text();
