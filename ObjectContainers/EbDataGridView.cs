@@ -791,6 +791,7 @@ function initTable_@tableId(tx){
         },
         initComplete:function ( settings,json ) {
             $('thead:eq(0) tr:eq(1) [type=checkbox]').prop('indeterminate',true); 
+            createFilterRowHeader('@tableId', GetFiltersFromSettingsTbl(@tableId_tvPref4User,'@tableId'), @scrolly);
             @tableId.columns.adjust();
         },
        
@@ -833,7 +834,7 @@ function initTable_@tableId(tx){
     //if(@tableId_tvPref4User === null)
     //    createFilterRowHeader('@tableId', @eb_filter_controls, @scrolly);
     //else
-        createFilterRowHeader('@tableId', GetFiltersFromSettingsTbl(@tableId_tvPref4User,'@tableId'), @scrolly);
+        //createFilterRowHeader('@tableId', GetFiltersFromSettingsTbl(@tableId_tvPref4User,'@tableId'), @scrolly);
 
     $('#@tableId_container thead').on('click','th',function(){
         var col = $(this).children('span').text();
