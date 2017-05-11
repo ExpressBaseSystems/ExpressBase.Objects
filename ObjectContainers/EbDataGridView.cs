@@ -433,6 +433,7 @@ namespace ExpressBase.Objects
                 colDef += ",\"width\": " + 100;
                 colDef += ",\"name\": \"" + column.ColumnName + "\"";
                 colDef += ",\"type\": \"" + column.Type.ToString() + "\"";
+                colDef += ",\"className\": \"tdheight\"";
                 colDef += "},";
             }
             colDef = colDef.Substring(0 , colDef.Length - 1) +"],";
@@ -452,7 +453,7 @@ namespace ExpressBase.Objects
 
         public override string GetHtml()
         {
-            //this.Redis.Remove(string.Format("{0}_TVPref_{1}_uid_{2}", "eb_roby_dev", this.Id, 1));
+            this.Redis.Remove(string.Format("{0}_TVPref_{1}_uid_{2}", "eb_roby_dev", this.Id, 1));
             this.ColumnColletion = this.Redis.Get<ColumnColletion>(string.Format("{0}_ds_{1}_columns", "eb_roby_dev", this.DataSourceId));
             tvPref4User = this.Redis.Get<string>(string.Format("{0}_TVPref_{1}_uid_{2}", "eb_roby_dev", this.Id, 1));
             if (string.IsNullOrEmpty(tvPref4User))
@@ -518,6 +519,11 @@ td { font-size: 12px; }
 }
 .hideme {
   display:none;
+}
+ 
+.tdheight{
+height:15px; 
+white-space: nowrap;
 }
 </style>
 <div class='tablecontainer' id='@tableId_container'>
@@ -745,7 +751,7 @@ function initTable_@tableId(tx){
         //scroller:true,
         //responsive:true,
         keys: true,
-        autoWidth: false,
+        //autoWidth: false,
         lengthMenu: tx.lengthMenu,
         serverSide: true,
         processing:true,
@@ -756,6 +762,7 @@ function initTable_@tableId(tx){
         order: [],
         deferRender: true,
         filter: true,
+        select:true,
         //@selectOption,$.fn.dataTable.pipeline(        pages: 5,)
         retrieve: true,
         ajax: {
@@ -788,11 +795,11 @@ function initTable_@tableId(tx){
             if(tx.rowGrouping !== ''){
                 doRowgrouping(@tableId,tx);
             }
-            @tableId.columns.adjust();
+            //@tableId.columns.adjust();
         },
         initComplete:function ( settings,json ) {
-            createFilterRowHeader('@tableId', GetFiltersFromSettingsTbl(@tableId_tvPref4User,'@tableId'), @scrolly, @tableId_order_info);
-            @tableId.columns.adjust();
+            createFilterRowHeader('@tableId', @tableId_tvPref4User, @scrolly, @tableId_order_info,tx);
+            //@tableId.columns.adjust();
         },
        
     });
@@ -853,10 +860,10 @@ function initTable_@tableId(tx){
         } );
     }
         
-    new ResizeSensor(jQuery('#@tableId_container'), function() {
-        if ( $.fn.dataTable.isDataTable( '#@tableId' ) )
-            @tableId.columns.adjust();
-    });
+    //new ResizeSensor(jQuery('#@tableId_container'), function() {
+    //    if ( $.fn.dataTable.isDataTable( '#@tableId' ) )
+    //        @tableId.columns.adjust();
+    //});
 
 }    
 </script>"
