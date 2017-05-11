@@ -442,8 +442,8 @@ namespace ExpressBase.Objects
                 colext += "{";
                 if (column.Type.ToString() == "System.Int32" || column.Type.ToString() == "System.Decimal")
                     colext += "\"name\":\""+ column.ColumnName + "\",\"AggInfo\":true,\"DecimalPlace\":2,\"RenderAs\":\"Default\"";
-                //else if (column.Type.ToString() == "System.Boolean")
-                //    colext += "";
+                else if (column.Type.ToString() == "System.Boolean")
+                    colext += "\"name\":\"" + column.ColumnName + "\",\"RenderAs\":\"Default\"";
                 colext += "},";
             }
             colext = colext.Substring(0,colext.Length-1)+"]";
@@ -452,7 +452,7 @@ namespace ExpressBase.Objects
 
         public override string GetHtml()
         {
-            this.Redis.Remove(string.Format("{0}_TVPref_{1}_uid_{2}", "eb_roby_dev", this.Id, 1));
+            //this.Redis.Remove(string.Format("{0}_TVPref_{1}_uid_{2}", "eb_roby_dev", this.Id, 1));
             this.ColumnColletion = this.Redis.Get<ColumnColletion>(string.Format("{0}_ds_{1}_columns", "eb_roby_dev", this.DataSourceId));
             tvPref4User = this.Redis.Get<string>(string.Format("{0}_TVPref_{1}_uid_{2}", "eb_roby_dev", this.Id, 1));
             if (string.IsNullOrEmpty(tvPref4User))
@@ -721,8 +721,9 @@ function initTable_@tableId(tx){
     $('#@tableId').append( $(getFooterFromSettingsTbl(@tableId_tvPref4User)) );
 
     var @tableId_ids=[];
-    var @tableId_order_col = '';
-    var @tableId_order_dir = 0;
+    var @tableId_order_info = new Object();
+    @tableId_order_info.col = '';
+    @tableId_order_info.dir = 0;
     var @tableId__columns = @tableId_tvPref4User;
     var @tableId__eb_agginfo = getAgginfo(@tableId_tvPref4User);
     @tableId= $('#@tableId').DataTable(
@@ -767,8 +768,8 @@ function initTable_@tableId(tx){
                 dq.Token = getToken();
                 dq.TFilters = JSON.stringify(repopulate_filter_arr('@tableId'));
                 dq.Params = JSON.stringify(getFilterValues());
-                dq.OrderByCol = @tableId_order_col; 
-                dq.OrderByDir = @tableId_order_dir;
+                dq.OrderByCol = @tableId_order_info.col; 
+                dq.OrderByDir = @tableId_order_info.dir;
             },
             dataSrc: function(dd) {
                     return dd.data;
@@ -790,8 +791,7 @@ function initTable_@tableId(tx){
             @tableId.columns.adjust();
         },
         initComplete:function ( settings,json ) {
-            createFilterRowHeader('@tableId', GetFiltersFromSettingsTbl(@tableId_tvPref4User,'@tableId'), @scrolly);
-            $('thead:eq(0) tr:eq(1) [type=checkbox]').prop('indeterminate',true);
+            createFilterRowHeader('@tableId', GetFiltersFromSettingsTbl(@tableId_tvPref4User,'@tableId'), @scrolly, @tableId_order_info);
             @tableId.columns.adjust();
         },
        
@@ -836,14 +836,14 @@ function initTable_@tableId(tx){
     //else
        // createFilterRowHeader('@tableId', GetFiltersFromSettingsTbl(@tableId_tvPref4User,'@tableId'), @scrolly);
 
-    $('#@tableId_container thead').on('click','th',function(){
-        var col = $(this).children('span').text();
-        var dir = $(this).attr('aria-sort');
-        if(col !== '') {
-            @tableId_order_col = col;
-            @tableId_order_dir = (dir === 'undefined') ? 1 : ((dir === 'ascending') ? 2 : 1);
-        }
-    });
+    //$('#@tableId_container thead').on('click','th',function(){
+    //    var col = $(this).children('span').text();
+    //    var dir = $(this).attr('aria-sort');
+    //    if(col !== '') {
+    //        @tableId_order_info.col = col;
+    //        @tableId_order_info.dir = (dir === 'undefined') ? 1 : ((dir === 'ascending') ? 2 : 1);
+    //    }
+    //});
 
     if(!tx.hideSerial){
         @tableId.on( 'draw.dt', function () {
