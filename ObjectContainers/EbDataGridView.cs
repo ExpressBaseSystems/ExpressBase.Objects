@@ -453,7 +453,7 @@ namespace ExpressBase.Objects
 
         public override string GetHtml()
         {
-            this.Redis.Remove(string.Format("{0}_TVPref_{1}_uid_{2}", "eb_roby_dev", this.Id, 1));
+            //this.Redis.Remove(string.Format("{0}_TVPref_{1}_uid_{2}", "eb_roby_dev", this.Id, 1));
             this.ColumnColletion = this.Redis.Get<ColumnColletion>(string.Format("{0}_ds_{1}_columns", "eb_roby_dev", this.DataSourceId));
             tvPref4User = this.Redis.Get<string>(string.Format("{0}_TVPref_{1}_uid_{2}", "eb_roby_dev", this.Id, 1));
             if (string.IsNullOrEmpty(tvPref4User))
@@ -499,12 +499,13 @@ td.resizer {
     background-color:red;    
 }
 
-.dataTables_scrollHead {
-padding-bottom: 250px; margin-bottom: -250px;
-}
-.dataTables_scrollFoot{
-padding-bottom: 250px; margin-bottom: -250px;
-}
+.dataTables_scrollHead {padding-bottom: 250px; margin-bottom: -250px;}
+.dataTables_scrollFoot{padding-bottom: 250px; margin-bottom: -250px;}
+
+.DTFC_LeftHeadWrapper{z-index: 150;}
+.DTFC_LeftBodyWrapper{z-index: 100;}
+.DTFC_RightHeadWrapper{z-index: 150;}
+.DTFC_RightBodyWrapper{z-index: 100;}
 .linepadding{
 padding:0px!important;
 }
