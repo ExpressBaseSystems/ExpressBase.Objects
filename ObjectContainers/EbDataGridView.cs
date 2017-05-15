@@ -429,11 +429,13 @@ namespace ExpressBase.Objects
                 colDef += "{";
                 colDef += "\"data\": " + __columnCollection[column.ColumnName].ColumnIndex.ToString();
                 colDef += string.Format(",\"title\": \"{0}<span hidden>{0}</span>\"", column.ColumnName);
-                colDef += ",\"visible\": " + true.ToString().ToLower();
+                var vis = (column.ColumnName == "id") ? false.ToString().ToLower() : true.ToString().ToLower();
+                colDef += ",\"visible\": " + vis;
                 colDef += ",\"width\": " + 100;
                 colDef += ",\"name\": \"" + column.ColumnName + "\"";
                 colDef += ",\"type\": \"" + column.Type.ToString() + "\"";
-                colDef += ",\"className\": \"tdheight\"";
+                var cls = (column.Type.ToString() == "System.Boolean") ? "dt-center tdheight" : "tdheight";
+                colDef += ",\"className\": \""+cls+"\"";
                 colDef += "},";
             }
             colDef = colDef.Substring(0 , colDef.Length - 1) +"],";
@@ -453,7 +455,7 @@ namespace ExpressBase.Objects
 
         public override string GetHtml()
         {
-            //this.Redis.Remove(string.Format("{0}_TVPref_{1}_uid_{2}", "eb_roby_dev", this.Id, 1));
+            this.Redis.Remove(string.Format("{0}_TVPref_{1}_uid_{2}", "eb_roby_dev", this.Id, 1));
             this.ColumnColletion = this.Redis.Get<ColumnColletion>(string.Format("{0}_ds_{1}_columns", "eb_roby_dev", this.DataSourceId));
             tvPref4User = this.Redis.Get<string>(string.Format("{0}_TVPref_{1}_uid_{2}", "eb_roby_dev", this.Id, 1));
             if (string.IsNullOrEmpty(tvPref4User))
@@ -509,9 +511,8 @@ td.resizer {
 .linepadding{
 padding:0px!important;
 }
-td.dt-center { text-align: center; }
-th.dt-center { text-align: right; }
-td.dt-body-right { text-align: right; }
+
+.dt-center {text-align: center;}
 .dt-buttons {visibility:hidden;}
 th { font-size: 14px; }
 td { font-size: 12px; }
