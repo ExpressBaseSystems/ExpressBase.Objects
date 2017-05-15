@@ -37,7 +37,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 2)]
         public EbObjectType EbObjectType { get; set; }
 
-        [DataMember(Order = 2)]
+        [DataMember(Order = 3)]
         public string Name { get; set; }
 
         [DataMember(Order = 4)]
@@ -49,16 +49,17 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 6)]
         public string Token { get; set; }
 
+        [DataMember(Order = 7)]
         public string TenantAccountId { get; set; }
 
         public EbObjectWrapper() { }
 
-        public EbObjectWrapper(int id, EbObjectType type, string name, byte[] bytea)
-        {
-            Id = id;
-            EbObjectType = type;
-            this.Name = name;
-            this.Bytea = bytea;
-        }
+        //public EbObjectWrapper(int id, EbObjectType type, string name, byte[] bytea)
+        //{
+        //    Id = id;
+        //    EbObjectType = type;
+        //    this.Name = name;
+        //    this.Bytea = bytea;
+        //}
     }
 }
