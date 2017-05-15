@@ -422,23 +422,40 @@ namespace ExpressBase.Objects
         public string GetColumn4DataTable(ColumnColletion  __columnCollection)
         {
             string colDef = string.Empty;
-            colDef = "[";
-            foreach(EbDataColumn  column in __columnCollection)
+            colDef = "{\"hideSerial\": false, \"hideCheckbox\": false, \"lengthMenu\":[ [100, 200, 300, -1], [100, 200, 300, \"All\"] ],";
+            colDef+=" \"scrollY\":300, \"rowGrouping\":\"\",\"leftFixedColumns\":0,\"rightFixedColumns\":0,\"columns\":[";
+            foreach (EbDataColumn  column in __columnCollection)
             {
                 colDef += "{";
                 colDef += "\"data\": " + __columnCollection[column.ColumnName].ColumnIndex.ToString();
                 colDef += string.Format(",\"title\": \"{0}<span hidden>{0}</span>\"", column.ColumnName);
-                colDef += ",\"visible\": " + true.ToString().ToLower();
+                var vis = (column.ColumnName == "id") ? false.ToString().ToLower() : true.ToString().ToLower();
+                colDef += ",\"visible\": " + vis;
                 colDef += ",\"width\": " + 100;
                 colDef += ",\"name\": \"" + column.ColumnName + "\"";
                 colDef += ",\"type\": \"" + column.Type.ToString() + "\"";
+                var cls = (column.Type.ToString() == "System.Boolean") ? "dt-center tdheight" : "tdheight";
+                colDef += ",\"className\": \""+cls+"\"";
                 colDef += "},";
             }
-            return colDef.Substring(0 , colDef.Length - 1) +"]";
+            colDef = colDef.Substring(0 , colDef.Length - 1) +"],";
+            string colext = "\"columnsext\":[";
+            foreach (EbDataColumn column in __columnCollection)
+            {
+                colext += "{";
+                if (column.Type.ToString() == "System.Int32" || column.Type.ToString() == "System.Decimal")
+                    colext += "\"name\":\""+ column.ColumnName + "\",\"AggInfo\":true,\"DecimalPlace\":2,\"RenderAs\":\"Default\"";
+                else if (column.Type.ToString() == "System.Boolean")
+                    colext += "\"name\":\"" + column.ColumnName + "\",\"RenderAs\":\"Default\"";
+                colext += "},";
+            }
+            colext = colext.Substring(0,colext.Length-1)+"]";
+            return colDef + colext + "}";
         }
 
         public override string GetHtml()
         {
+            this.Redis.Remove(string.Format("{0}_TVPref_{1}_uid_{2}", "eb_roby_dev", this.Id, 1));
             this.ColumnColletion = this.Redis.Get<ColumnColletion>(string.Format("{0}_ds_{1}_columns", "eb_roby_dev", this.DataSourceId));
             tvPref4User = this.Redis.Get<string>(string.Format("{0}_TVPref_{1}_uid_{2}", "eb_roby_dev", this.Id, 1));
             if (string.IsNullOrEmpty(tvPref4User))
@@ -484,18 +501,18 @@ td.resizer {
     background-color:red;    
 }
 
-.dataTables_scrollHead {
-padding-bottom: 250px; margin-bottom: -250px;
-}
-.dataTables_scrollFoot{
-padding-bottom: 250px; margin-bottom: -250px;
-}
+.dataTables_scrollHead {padding-bottom: 250px; margin-bottom: -250px;}
+.dataTables_scrollFoot{padding-bottom: 250px; margin-bottom: -250px;}
+
+.DTFC_LeftHeadWrapper{z-index: 150;}
+.DTFC_LeftBodyWrapper{z-index: 100;}
+.DTFC_RightHeadWrapper{z-index: 150;}
+.DTFC_RightBodyWrapper{z-index: 100;}
 .linepadding{
 padding:0px!important;
 }
-td.dt-center { text-align: center; }
-th.dt-center { text-align: right; }
-td.dt-body-right { text-align: right; }
+
+.dt-center {text-align: center;}
 .dt-buttons {visibility:hidden;}
 th { font-size: 14px; }
 td { font-size: 12px; }
@@ -504,6 +521,11 @@ td { font-size: 12px; }
 }
 .hideme {
   display:none;
+}
+ 
+.tdheight{
+height:15px; 
+white-space: nowrap;
 }
 </style>
 <div class='tablecontainer' id='@tableId_container'>
@@ -545,10 +567,8 @@ td { font-size: 12px; }
     </div>
 </div>
    <!-- Modal for Graph-->
-  <div class='modal fade' id='graphmodal' role='dialog'>
+  <!-- <div class='modal fade' id='graphmodal' role='dialog'>
     <div class='modal-dialog modal-lg'>
-    
-      <!-- Modal content-->
       <div class='modal-content'>
         <div class='modal-header'>
           <button type = 'button' class='close' data-dismiss='modal'>&times;</button>
@@ -561,7 +581,7 @@ td { font-size: 12px; }
         </div>
      </div>
     </div>
- </div>
+ </div> -->
 
 <script>
 
@@ -692,22 +712,26 @@ var @tableId;
 $('#btnGo').click(function(){
     if(DtF){
         DtF = false;
-        initTable_@tableId(@tvPref4User);
+        var tx = @tvPref4User;
+        initTable_@tableId(tx);
         $('#filterBox').collapse('hide');
     }
     else
         @tableId.ajax.reload();
 });
 
-var @tableId_tvPref4User = @tvPref4User; 
 var @tableId__datacolumns = @data.columns;
 
-function initTable_@tableId(@tableId_tvPref4User){
+function initTable_@tableId(tx){
+    alert(JSON.stringify(tx));
+    AddSerialAndOrCheckBoxColumns(tx, '@tableId', @tableId__datacolumns);
+    @tableId_tvPref4User=tx.columns;
     $('#@tableId').append( $(getFooterFromSettingsTbl(@tableId_tvPref4User)) );
 
     var @tableId_ids=[];
-    var @tableId_order_col = '';
-    var @tableId_order_dir = 0;
+    var @tableId_order_info = new Object();
+    @tableId_order_info.col = '';
+    @tableId_order_info.dir = 0;
     var @tableId__columns = @tableId_tvPref4User;
     var @tableId__eb_agginfo = getAgginfo(@tableId_tvPref4User);
     @tableId= $('#@tableId').DataTable(
@@ -719,12 +743,18 @@ function initTable_@tableId(@tableId_tvPref4User){
                             modifier: {
                                 selected: true
                             }}}],
-        @scrollYOption,
+        scrollY: tx.scrollY,
+        scrollX: true,
+        fixedColumns: {
+            leftColumns: tx.leftFixedColumns,
+            rightColumns:tx.rightFixedColumns
+            },
+        //@scrollYOption,
         //scroller:true,
-        responsive:true,
+        //responsive:true,
         keys: true,
-        autoWidth: false,
-        @lengthMenu,
+        //autoWidth: false,
+        lengthMenu: tx.lengthMenu,
         serverSide: true,
         processing:true,
         language: { processing: '<div class=\'fa fa-spinner fa-pulse  fa-3x fa-fw\'></div>',
@@ -734,6 +764,7 @@ function initTable_@tableId(@tableId_tvPref4User){
         order: [],
         deferRender: true,
         filter: true,
+        select:true,
         //@selectOption,$.fn.dataTable.pipeline(        pages: 5,)
         retrieve: true,
         ajax: {
@@ -746,8 +777,8 @@ function initTable_@tableId(@tableId_tvPref4User){
                 dq.Token = getToken();
                 dq.TFilters = JSON.stringify(repopulate_filter_arr('@tableId'));
                 dq.Params = JSON.stringify(getFilterValues());
-                dq.OrderByCol = @tableId_order_col; 
-                dq.OrderByDir = @tableId_order_dir;
+                dq.OrderByCol = @tableId_order_info.col; 
+                dq.OrderByDir = @tableId_order_info.dir;
             },
             dataSrc: function(dd) {
                     return dd.data;
@@ -763,28 +794,16 @@ function initTable_@tableId(@tableId_tvPref4User){
         },
         drawCallback:function ( settings ) {
             $('tbody [data-toggle=toggle]').bootstrapToggle();
-            @tableId.columns.adjust();
+            if(tx.rowGrouping !== ''){
+                doRowgrouping(@tableId,tx);
+            }
+            //@tableId.columns.adjust();
         },
         initComplete:function ( settings,json ) {
-            $('thead:eq(0) tr:eq(1) [type=checkbox]').prop('indeterminate',true); 
-            @tableId.columns.adjust();
-        }
-        //drawCallback: function ( settings ) {
-        //    var api = this.api();
-        //    var rows = api.rows( { page: 'current'} ).nodes();
-        //    var last = null;
-            
-        //    api.column(3, { page: 'current'} ).data().each(function(group, i) {
-        //        if (last !== group)
-        //        {
-        //            $(rows).eq(i).before(
-        //                '<tr class=\'group\'><td colspan=\'8\'>' + group + '</td></tr>'
-        //            );
-
-        //            last = group;
-        //        }
-        //    } );
-        //}
+            createFilterRowHeader('@tableId', @tableId_tvPref4User, @scrolly, @tableId_order_info,tx);
+            //@tableId.columns.adjust();
+        },
+       
     });
 
     $.fn.dataTable.ext.errMode = 'throw';
@@ -824,18 +843,18 @@ function initTable_@tableId(@tableId_tvPref4User){
     //if(@tableId_tvPref4User === null)
     //    createFilterRowHeader('@tableId', @eb_filter_controls, @scrolly);
     //else
-        createFilterRowHeader('@tableId', GetFiltersFromSettingsTbl(@tableId_tvPref4User,'@tableId'), @scrolly);
+       // createFilterRowHeader('@tableId', GetFiltersFromSettingsTbl(@tableId_tvPref4User,'@tableId'), @scrolly);
 
-    $('#@tableId_container thead').on('click','th',function(){
-        var col = $(this).children('span').text();
-        var dir = $(this).attr('aria-sort');
-        if(col !== '') {
-            @tableId_order_col = col;
-            @tableId_order_dir = (dir === 'undefined') ? 1 : ((dir === 'ascending') ? 2 : 1);
-        }
-    });
+    //$('#@tableId_container thead').on('click','th',function(){
+    //    var col = $(this).children('span').text();
+    //    var dir = $(this).attr('aria-sort');
+    //    if(col !== '') {
+    //        @tableId_order_info.col = col;
+    //        @tableId_order_info.dir = (dir === 'undefined') ? 1 : ((dir === 'ascending') ? 2 : 1);
+    //    }
+    //});
 
-    if(@bserial){
+    if(!tx.hideSerial){
         @tableId.on( 'draw.dt', function () {
             @tableId.column(0).nodes().each( function (cell, i) {
                 cell.innerHTML = i+1;
@@ -843,23 +862,23 @@ function initTable_@tableId(@tableId_tvPref4User){
         } );
     }
         
-    new ResizeSensor(jQuery('#@tableId_container'), function() {
-        if ( $.fn.dataTable.isDataTable( '#@tableId' ) )
-            @tableId.columns.adjust();
-    });
+    //new ResizeSensor(jQuery('#@tableId_container'), function() {
+    //    if ( $.fn.dataTable.isDataTable( '#@tableId' ) )
+    //        @tableId.columns.adjust();
+    //});
 
 }    
 </script>"
 .Replace("@dataSourceId", this.DataSourceId.ToString().Trim())
 .Replace("@tableId", this.Name)
 .Replace("@tableViewName", ((string.IsNullOrEmpty(this.Label)) ? "&lt;ReportLabel Undefined&gt;" : this.Label))
-.Replace("@lengthMenu", this.GetLengthMenu())
+//.Replace("@lengthMenu", this.GetLengthMenu())
 //.Replace("@columnsRender", this.GetCols())
 //.Replace("@eb_filter_controls", this.GetFilterControls())
 //.Replace("@eb_footer1", this.GetAggregateControls(1))
 //.Replace("@eb_footer2", this.GetAggregateControls(2))
 //.Replace("@eb_agginfo", this.GetAggregateInfo())
-.Replace("@bserial", this.Columns.SerialColumnAdded.ToString().ToLower())
+//.Replace("@bserial", this.Columns.SerialColumnAdded.ToString().ToLower())
 .Replace("@scrolly", this.ScrollY.ToString())
 .Replace("@scrollYOption", this.GetScrollYOption())
 //.Replace("@tfoot", this.GetFooter())
