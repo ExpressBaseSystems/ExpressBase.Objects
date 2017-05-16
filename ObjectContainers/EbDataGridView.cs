@@ -506,8 +506,10 @@ td.resizer {
 
 .DTFC_LeftHeadWrapper{z-index: 150;}
 .DTFC_LeftBodyWrapper{z-index: 100;}
+.DTFC_LeftFootWrapper{z-index: 150;}
 .DTFC_RightHeadWrapper{z-index: 150;}
 .DTFC_RightBodyWrapper{z-index: 100;}
+.DTFC_RightFootWrapper{z-index: 150;}
 .linepadding{
 padding:0px!important;
 }
@@ -752,7 +754,7 @@ function initTable_@tableId(tx){
         //@scrollYOption,
         //scroller:true,
         //responsive:true,
-        keys: true,
+        //keys: true,
         //autoWidth: false,
         lengthMenu: tx.lengthMenu,
         serverSide: true,
@@ -790,7 +792,15 @@ function initTable_@tableId(tx){
         },
 
         fnFooterCallback: function ( nRow, aaData, iStart, iEnd, aiDisplay ) {
-            summarize2(@tableId, '@tableId', @tableId__eb_agginfo,@scrolly);
+            //if( @tableId__eb_agginfo.length>0 ) {
+            //    createFooter('@tableId', GetAggregateControls(@tableId_tvPref4User,'@tableId',1,@scrolly,@tableId), @scrolly, 0,@tableId__eb_agginfo);
+            //    createFooter('@tableId', GetAggregateControls(@tableId_tvPref4User,'@tableId',2,@scrolly,@tableId), @scrolly, 1,@tableId__eb_agginfo);
+            //}
+             if( @tableId__eb_agginfo.length>0 ) {
+                createFooter('@tableId',@tableId_tvPref4User, @scrolly, 0,tx);
+                createFooter('@tableId', @tableId_tvPref4User, @scrolly, 1,tx);
+            }
+            //summarize2(@tableId, '@tableId', @tableId__eb_agginfo,@scrolly);
         },
         drawCallback:function ( settings ) {
             $('tbody [data-toggle=toggle]').bootstrapToggle();
@@ -830,11 +840,15 @@ function initTable_@tableId(tx){
         return sum / data.length;
     });
 
-    if( @tableId__eb_agginfo.length>0 ) {
-        createFooter('@tableId', GetAggregateControls(@tableId_tvPref4User,'@tableId',1,@scrolly,@tableId), @scrolly, 0);
-        createFooter('@tableId', GetAggregateControls(@tableId_tvPref4User,'@tableId',2,@scrolly,@tableId), @scrolly, 1);
-    }
-
+    //if( @tableId__eb_agginfo.length>0 ) {
+    //    createFooter('@tableId', GetAggregateControls(@tableId_tvPref4User,'@tableId',1,@scrolly,@tableId), @scrolly, 0);
+    //    createFooter('@tableId', GetAggregateControls(@tableId_tvPref4User,'@tableId',2,@scrolly,@tableId), @scrolly, 1);
+    //}
+    //if( @tableId__eb_agginfo.length>0 ) {
+    //    createFooter('@tableId',@tableId_tvPref4User, @scrolly, 0,tx);
+    //    createFooter('@tableId', @tableId_tvPref4User, @scrolly, 1,tx);
+    //}
+    
         
     $('#@tableId_fileBtns [name=filebtn]').css('display', 'inline-block');
     $('#@tableId_filterdiv [name=filterbtn]').css('display', 'inline-block');
