@@ -434,8 +434,8 @@ namespace ExpressBase.Objects
                 colDef += ",\"width\": " + 100;
                 colDef += ",\"name\": \"" + column.ColumnName + "\"";
                 colDef += ",\"type\": \"" + column.Type.ToString() + "\"";
-                var cls = (column.Type.ToString() == "System.Boolean") ? "dt-center tdheight" : "tdheight";
-                colDef += ",\"className\": \""+cls+"\"";
+                //var cls = (column.Type.ToString() == "System.Boolean") ? "dt-center tdheight" : "tdheight";
+                colDef += ",\"className\": \"tdheight\"";
                 colDef += "},";
             }
             colDef = colDef.Substring(0 , colDef.Length - 1) +"],";
