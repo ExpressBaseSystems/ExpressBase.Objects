@@ -443,9 +443,13 @@ namespace ExpressBase.Objects
             foreach (EbDataColumn column in __columnCollection)
             {
                 colext += "{";
-                if (column.Type.ToString() == "System.Int32" || column.Type.ToString() == "System.Decimal")
-                    colext += "\"name\":\""+ column.ColumnName + "\",\"AggInfo\":true,\"DecimalPlace\":2,\"RenderAs\":\"Default\"";
+                if (column.Type.ToString() == "System.Int32" || column.Type.ToString() == "System.Decimal" || column.Type.ToString() == "System.Int16" || column.Type.ToString() == "System.Int64")
+                    colext += "\"name\":\"" + column.ColumnName + "\",\"AggInfo\":true,\"DecimalPlace\":2,\"RenderAs\":\"Default\"";
                 else if (column.Type.ToString() == "System.Boolean")
+                    colext += "\"name\":\"" + column.ColumnName + "\",\"RenderAs\":\"Default\"";
+                else if (column.Type.ToString() == "System.DateTime")
+                    colext += "\"name\":\"" + column.ColumnName + "\",\"Format\":\"Date\"";
+                else if (column.Type.ToString() == "System.String")
                     colext += "\"name\":\"" + column.ColumnName + "\",\"RenderAs\":\"Default\"";
                 colext += "},";
             }
