@@ -32,6 +32,10 @@ namespace ExpressBase.Objects
         [Description("Identity")]
         public virtual string Name { get; set; }
 
+        [ProtoBuf.ProtoMember(4)]
+        [Description("Identity")]
+        public virtual string Description { get; set; }
+
         public EbObject() { }
 
         public virtual void Init4Redis(IRedisClient redisclient, IServiceClient serviceclient) { }
