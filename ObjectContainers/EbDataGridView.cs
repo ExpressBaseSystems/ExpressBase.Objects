@@ -422,8 +422,10 @@ namespace ExpressBase.Objects
         public string GetColumn4DataTable(ColumnColletion  __columnCollection)
         {
             string colDef = string.Empty;
-            colDef = "{\"hideSerial\": false, \"hideCheckbox\": false, \"lengthMenu\":[ [100, 200, 300, -1], [100, 200, 300, \"All\"] ],";
+            colDef = "{\"title\": \"<Untitled>\",\"hideSerial\": false, \"hideCheckbox\": false, \"lengthMenu\":[ [100, 200, 300, -1], [100, 200, 300, \"All\"] ],";
             colDef+=" \"scrollY\":300, \"rowGrouping\":\"\",\"leftFixedColumns\":0,\"rightFixedColumns\":0,\"columns\":[";
+            colDef += "{\"width\":10, \"searchable\": false, \"orderable\": false, \"visible\":true, \"name\":\"serial\", \"title\":\"#\"},";
+            colDef += "{\"width\":10, \"searchable\": false, \"orderable\": false, \"visible\":true, \"name\":\"checkbox\"},";
             foreach (EbDataColumn  column in __columnCollection)
             {
                 colDef += "{";
@@ -440,6 +442,8 @@ namespace ExpressBase.Objects
             }
             colDef = colDef.Substring(0 , colDef.Length - 1) +"],";
             string colext = "\"columnsext\":[";
+            colext += "{\"name\":\"serial\"},";
+            colext += "{\"name\":\"checkbox\"},";
             foreach (EbDataColumn column in __columnCollection)
             {
                 colext += "{";
@@ -459,7 +463,7 @@ namespace ExpressBase.Objects
 
         public override string GetHtml()
         {
-            this.Redis.Remove(string.Format("{0}_TVPref_{1}_uid_{2}", "eb_roby_dev", this.Id, 1));
+            //this.Redis.Remove(string.Format("{0}_TVPref_{1}_uid_{2}", "eb_roby_dev", this.Id, 1));
             this.ColumnColletion = this.Redis.Get<ColumnColletion>(string.Format("{0}_ds_{1}_columns", "eb_roby_dev", this.DataSourceId));
             tvPref4User = this.Redis.Get<string>(string.Format("{0}_TVPref_{1}_uid_{2}", "eb_roby_dev", this.Id, 1));
             if (string.IsNullOrEmpty(tvPref4User))
@@ -533,6 +537,10 @@ td { font-size: 12px; }
 height:15px; 
 white-space: nowrap;
 }
+table.dataTable tbody tr.selected, table.dataTable tbody th.selected, table.dataTable tbody td.selected {
+    color: #090808;
+}
+
 </style>
 <div class='tablecontainer' id='@tableId_container'>
     <div>
@@ -540,32 +548,32 @@ white-space: nowrap;
     </div>
     <div>
         <div class='btn-group' id='@tableId_filterdiv'>
-            <a class='btn btn-default' onclick='showOrHideFilter(this,@scrolly);' name='filterbtn' style='display: none;' data-table='@tableId' data-toggle='tooltip' title='On\/Off Filter'><i class='fa fa-filter' aria-hidden='true'></i></a>
+            <a class='btn btn-default'  id='4filterbtn' name='filterbtn' style='display: none;' data-table='@tableId' data-toggle='tooltip' title='On\/Off Filter'><i class='fa fa-filter' aria-hidden='true'></i></a>
             <button type='button' class='btn btn-default dropdown-toggle' data-toggle='dropdown' name='filterbtn' style='display: none;'>
             <span class='caret'></span>  <!-- caret --></button>
             <ul class='dropdown-menu' role='menu'>
-                <li><a href = '#' onclick= clearFilter('@tableId')> Clear Filter</a></li>
+                <li><a href = '#' id='clearfilterbtn'> Clear Filter</a></li>
             </ul>
         </div>
-        <button type='button' id='@tableId_btntotalpage' class='btn btn-default' style='display: none;' onClick='showOrHideAggrControl(this,@scrolly);' data-table='@tableId'>&sum;</button>
+        <button type='button' id='@tableId_btntotalpage' class='btn btn-default' style='display: none;' data-table='@tableId'>&sum;</button>
         <div id='btnGo' class='btn btn-default' >GO</div>
         <div id='@tableId_fileBtns' style='display: inline-block;'>
-            <div id='btnCopy' class='btn btn-default'  name='filebtn' style='display: none;' data-toggle='tooltip' title='Copy to Clipboard' onclick= CopyToClipboard('@tableId') ><i class='fa fa-clipboard' aria-hidden='true'></i></div>
+            <div id='btnCopy' class='btn btn-default'  name='filebtn' style='display: none;' data-toggle='tooltip' title='Copy to Clipboard' ><i class='fa fa-clipboard' aria-hidden='true'></i></div>
             <div class='btn-group'>
-                <div id='btnPrint' class='btn btn-default'  name='filebtn' style='display: none;'  data-toggle='tooltip' title='Print' onclick= ExportToPrint('@tableId')><i class='fa fa-print' aria-hidden='true'></i></div>
+                <div id='btnPrint' class='btn btn-default'  name='filebtn' style='display: none;'  data-toggle='tooltip' title='Print' ><i class='fa fa-print' aria-hidden='true'></i></div>
                     <div class='btn btn-default dropdown-toggle' data-toggle='dropdown' name='filebtn' style='display: none;'>
                         <span class='caret'></span>  <!-- caret --></div>
                         <ul class='dropdown-menu' role='menu'>
-                            <li><a href = '#' onclick= printAll('@tableId')> Print All</a></li>
-                            <li><a href = '#' onclick= printSelected('@tableId')> Print Selected</a></li>
+                            <li><a href = '#' id='btnprintAll'> Print All</a></li>
+                            <li><a href = '#' id='btnprintSelected'> Print Selected</a></li>
                         </ul>
             </div>
-            <div id='btnExcel' class='btn btn-default'  name='filebtn' style='display: none;' data-toggle='tooltip' title='Excel' onclick= ExportToExcel('@tableId')><i class='fa fa-file-excel-o' aria-hidden='true'></i></div>
-            <div id='btnPdf' class='btn btn-default'    name='filebtn' style='display: none;'  data-toggle='tooltip' title='Pdf' onclick= ExportToPdf('@tableId')><i class='fa fa-file-pdf-o' aria-hidden='true'></i></div>
-            <div id='btnCsv' class='btn btn-default'    name='filebtn' style='display: none;' data-toggle='tooltip' title='Csv' onclick= ExportToCsv('@tableId')><i class='fa fa-file-text-o' aria-hidden='true'></i></div>
+            <div id='btnExcel' class='btn btn-default'  name='filebtn' style='display: none;' data-toggle='tooltip' title='Excel' ><i class='fa fa-file-excel-o' aria-hidden='true'></i></div>
+            <div id='btnPdf' class='btn btn-default'    name='filebtn' style='display: none;'  data-toggle='tooltip' title='Pdf' ><i class='fa fa-file-pdf-o' aria-hidden='true'></i></div>
+            <div id='btnCsv' class='btn btn-default'    name='filebtn' style='display: none;' data-toggle='tooltip' title='Csv' ><i class='fa fa-file-text-o' aria-hidden='true'></i></div>
         </div>
         @collapsBtn
-        <div id='@tableId_btnSettings' class='btn btn-default' style='display: none;' data-toggle='modal' data-target='#settingsmodal' onclick=GetSettingsModal('@tableId',@tableViewId,'@tableViewName')><i class='fa fa-cog' aria-hidden='true'></i></div>
+        <div id='@tableId_btnSettings' class='btn btn-default' style='display: none;' data-toggle='modal' data-target='#settingsmodal'><i class='fa fa-cog' aria-hidden='true'></i></div>
     </div>
     <div style='width:auto;' id='@tableId_divcont'>
         @filters  
@@ -712,180 +720,180 @@ white-space: nowrap;
 //} );
 
 
-var flag=true;
-var DtF = true;
-var @tableId;
-$('#btnGo').click(function(){
-    if(DtF){
-        DtF = false;
-        var tx = @tvPref4User;
-        initTable_@tableId(tx);
-        $('#filterBox').collapse('hide');
-    }
-    else
-        @tableId.ajax.reload();
-});
+//var DtF = true;
+//var @tableId;
+//$('#btnGo').click(function(){
+//    if(DtF){
+//        DtF = false;
+//        var tx = @tvPref4User;
+//        initTable_@tableId(tx);
+//        $('#filterBox').collapse('hide');
+//    }
+//    else
+//        @tableId.ajax.reload();
+//});
 
-var @tableId__datacolumns = @data.columns;
+//var @tableId__datacolumns = @data.columns;
 
-function initTable_@tableId(tx){
-    alert(JSON.stringify(tx));
-    AddSerialAndOrCheckBoxColumns(tx, '@tableId', @tableId__datacolumns);
-    @tableId_tvPref4User=tx.columns;
-    $('#@tableId').append( $(getFooterFromSettingsTbl(@tableId_tvPref4User)) );
+//function initTable_@tableId(tx){
+//    //alert(JSON.stringify(tx));
+//    //AddSerialAndOrCheckBoxColumns(tx, '@tableId', @tableId__datacolumns);
+//    @tableId_tvPref4User=tx.columns;
+//    $('#@tableId').append( $(getFooterFromSettingsTbl(@tableId_tvPref4User)) );
 
-    var @tableId_ids=[];
-    var @tableId_order_info = new Object();
-    @tableId_order_info.col = '';
-    @tableId_order_info.dir = 0;
-    var @tableId__columns = @tableId_tvPref4User;
-    var @tableId__eb_agginfo = getAgginfo(@tableId_tvPref4User);
-    @tableId= $('#@tableId').DataTable(
-    {
-        dom:'<\'col-sm-2\'l><\'col-sm-2\'i><\'col-sm-4\'B><\'col-sm-4\'p>tr',
-        buttons: ['copy', 'csv', 'excel', 'pdf','print', {
-                        extend: 'print',
-                        exportOptions: {
-                            modifier: {
-                                selected: true
-                            }}}],
-        scrollY: tx.scrollY,
-        scrollX: true,
-        fixedColumns: {
-            leftColumns: tx.leftFixedColumns,
-            rightColumns:tx.rightFixedColumns
-            },
-        //@scrollYOption,
-        //scroller:true,
-        //responsive:true,
-        //keys: true,
-        //autoWidth: false,
-        lengthMenu: tx.lengthMenu,
-        serverSide: true,
-        processing:true,
-        language: { processing: '<div class=\'fa fa-spinner fa-pulse  fa-3x fa-fw\'></div>',
-                    info:'_START_ - _END_ / _TOTAL_'},
-        pagingType:'@pagingType',
-        columns:@tableId__columns, 
-        order: [],
-        deferRender: true,
-        filter: true,
-        select:true,
-        //@selectOption,$.fn.dataTable.pipeline(        pages: 5,)
-        retrieve: true,
-        ajax: {
-            url: '@servicestack_url/ds/data/@dataSourceId',
-            type: 'POST',
-            timeout: 180000,
-            data: function(dq) { 
-                delete dq.columns; delete dq.order; delete dq.search;
-                dq.Id = @dataSourceId;
-                dq.Token = getToken();
-                dq.TFilters = JSON.stringify(repopulate_filter_arr('@tableId'));
-                dq.Params = JSON.stringify(getFilterValues());
-                dq.OrderByCol = @tableId_order_info.col; 
-                dq.OrderByDir = @tableId_order_info.dir;
-            },
-            dataSrc: function(dd) {
-                    return dd.data;
-            }
-        },
+//    var @tableId_order_info = new Object();
+//    @tableId_order_info.col = '';
+//    @tableId_order_info.dir = 0;
+//    var @tableId__columns = @tableId_tvPref4User;
+//    var @tableId__eb_agginfo = getAgginfo(@tableId_tvPref4User);
+//    @tableId= $('#@tableId').DataTable(
+//    {
+//        dom:'<\'col-sm-2\'l><\'col-sm-2\'i><\'col-sm-4\'B><\'col-sm-4\'p>tr',
+//        buttons: ['copy', 'csv', 'excel', 'pdf','print', {
+//                        extend: 'print',
+//                        exportOptions: {
+//                            modifier: {
+//                                selected: true
+//                            }}}],
+//        scrollY: tx.scrollY,
+//        scrollX: true,
+//        fixedColumns: {
+//            leftColumns: tx.leftFixedColumns,
+//            rightColumns:tx.rightFixedColumns
+//            },
+//        //@scrollYOption,
+//        //scroller:true,
+//        //responsive:true,
+//        //keys: true,
+//        //autoWidth: false,
+//        lengthMenu: tx.lengthMenu,
+//        serverSide: true,
+//        processing:true,
+//        language: { processing: '<div class=\'fa fa-spinner fa-pulse  fa-3x fa-fw\'></div>',
+//                    info:'_START_ - _END_ / _TOTAL_'},
+//        pagingType:'@pagingType',
+//        columns:@tableId__columns, 
+//        order: [],
+//        deferRender: true,
+//        filter: true,
+//        select:true,
+//        //@selectOption,$.fn.dataTable.pipeline(        pages: 5,)
+//        retrieve: true,
+//        ajax: {
+//            url: '@servicestack_url/ds/data/@dataSourceId',
+//            type: 'POST',
+//            timeout: 180000,
+//            data: function(dq) { 
+//                delete dq.columns; delete dq.order; delete dq.search;
+//                dq.Id = @dataSourceId;
+//                dq.Token = getToken();
+//                dq.TFilters = JSON.stringify(repopulate_filter_arr('@tableId'));
+//                dq.Params = JSON.stringify(getFilterValues());
+//                dq.OrderByCol = @tableId_order_info.col; 
+//                dq.OrderByDir = @tableId_order_info.dir;
+//            },
+//            dataSrc: function(dd) {
+//                    return dd.data;
+//            }
+//        },
         
-        fnRowCallback: function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
-            colorRow(nRow, aData, iDisplayIndex, iDisplayIndexFull, @data.columns);
-        },
+//        fnRowCallback: function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
+//            colorRow(nRow, aData, iDisplayIndex, iDisplayIndexFull, @data.columns);
+//        },
 
-        fnFooterCallback: function ( nRow, aaData, iStart, iEnd, aiDisplay ) {
-            //if( @tableId__eb_agginfo.length>0 ) {
-            //    createFooter('@tableId', GetAggregateControls(@tableId_tvPref4User,'@tableId',1,@scrolly,@tableId), @scrolly, 0,@tableId__eb_agginfo);
-            //    createFooter('@tableId', GetAggregateControls(@tableId_tvPref4User,'@tableId',2,@scrolly,@tableId), @scrolly, 1,@tableId__eb_agginfo);
-            //}
-             if( @tableId__eb_agginfo.length>0 ) {
-                createFooter('@tableId',@tableId_tvPref4User, @scrolly, 0,tx);
-                createFooter('@tableId', @tableId_tvPref4User, @scrolly, 1,tx);
-            }
-            //summarize2(@tableId, '@tableId', @tableId__eb_agginfo,@scrolly);
-        },
-        drawCallback:function ( settings ) {
-            $('tbody [data-toggle=toggle]').bootstrapToggle();
-            if(tx.rowGrouping !== ''){
-                doRowgrouping(@tableId,tx);
-            }
-            //@tableId.columns.adjust();
-        },
-        initComplete:function ( settings,json ) {
-            createFilterRowHeader('@tableId', @tableId_tvPref4User, @scrolly, @tableId_order_info,tx);
-            //@tableId.columns.adjust();
-        },
+//        fnFooterCallback: function ( nRow, aaData, iStart, iEnd, aiDisplay ) {
+//            //if( @tableId__eb_agginfo.length>0 ) {
+//            //    createFooter('@tableId', GetAggregateControls(@tableId_tvPref4User,'@tableId',1,@scrolly,@tableId), @scrolly, 0,@tableId__eb_agginfo);
+//            //    createFooter('@tableId', GetAggregateControls(@tableId_tvPref4User,'@tableId',2,@scrolly,@tableId), @scrolly, 1,@tableId__eb_agginfo);
+//            //}
+//             if( @tableId__eb_agginfo.length>0 ) {
+//                createFooter('@tableId',@tableId_tvPref4User, @scrolly, 0,tx);
+//                createFooter('@tableId', @tableId_tvPref4User, @scrolly, 1,tx);
+//            }
+//            //summarize2(@tableId, '@tableId', @tableId__eb_agginfo,@scrolly);
+//        },
+//        drawCallback:function ( settings ) {
+//            $('tbody [data-toggle=toggle]').bootstrapToggle();
+//            if(tx.rowGrouping !== ''){
+//                doRowgrouping(@tableId,tx);
+//            }
+//            //@tableId.columns.adjust();
+//        },
+//        initComplete:function ( settings,json ) {
+//            createFilterRowHeader('@tableId', @tableId_tvPref4User, @scrolly, @tableId_order_info,tx);
+//            //@tableId.columns.adjust();
+//        },
        
-    });
+//    });
 
-    $.fn.dataTable.ext.errMode = 'throw';
+//    $.fn.dataTable.ext.errMode = 'throw';
 
-    jQuery.fn.dataTable.Api.register( 'sum()', function ( ) {
-        return this.flatten().reduce( function ( a, b ) {
-            if ( typeof a === 'string' ) {
-                a = a.replace(/[^\d.-]/g, '') * 1;
-            }
-            if ( typeof b === 'string' ) {
-                b = b.replace(/[^\d.-]/g, '') * 1;
-            }
+//    jQuery.fn.dataTable.Api.register( 'sum()', function ( ) {
+//        return this.flatten().reduce( function ( a, b ) {
+//            if ( typeof a === 'string' ) {
+//                a = a.replace(/[^\d.-]/g, '') * 1;
+//            }
+//            if ( typeof b === 'string' ) {
+//                b = b.replace(/[^\d.-]/g, '') * 1;
+//            }
  
-            return a + b;
-        }, 0 );
-    } );
+//            return a + b;
+//        }, 0 );
+//    } );
 
-    jQuery.fn.dataTable.Api.register( 'average()', function () {
-        var data = this.flatten();
-        var sum = data.reduce( function ( a, b ) {
-            return (a*1) + (b*1); // cast values in-case they are strings
-        }, 0 );
+//    jQuery.fn.dataTable.Api.register( 'average()', function () {
+//        var data = this.flatten();
+//        var sum = data.reduce( function ( a, b ) {
+//            return (a*1) + (b*1); // cast values in-case they are strings
+//        }, 0 );
   
-        return sum / data.length;
-    });
+//        return sum / data.length;
+//    });
 
-    //if( @tableId__eb_agginfo.length>0 ) {
-    //    createFooter('@tableId', GetAggregateControls(@tableId_tvPref4User,'@tableId',1,@scrolly,@tableId), @scrolly, 0);
-    //    createFooter('@tableId', GetAggregateControls(@tableId_tvPref4User,'@tableId',2,@scrolly,@tableId), @scrolly, 1);
-    //}
-    //if( @tableId__eb_agginfo.length>0 ) {
-    //    createFooter('@tableId',@tableId_tvPref4User, @scrolly, 0,tx);
-    //    createFooter('@tableId', @tableId_tvPref4User, @scrolly, 1,tx);
-    //}
+//    //if( @tableId__eb_agginfo.length>0 ) {
+//    //    createFooter('@tableId', GetAggregateControls(@tableId_tvPref4User,'@tableId',1,@scrolly,@tableId), @scrolly, 0);
+//    //    createFooter('@tableId', GetAggregateControls(@tableId_tvPref4User,'@tableId',2,@scrolly,@tableId), @scrolly, 1);
+//    //}
+//    //if( @tableId__eb_agginfo.length>0 ) {
+//    //    createFooter('@tableId',@tableId_tvPref4User, @scrolly, 0,tx);
+//    //    createFooter('@tableId', @tableId_tvPref4User, @scrolly, 1,tx);
+//    //}
     
         
-    $('#@tableId_fileBtns [name=filebtn]').css('display', 'inline-block');
-    $('#@tableId_filterdiv [name=filterbtn]').css('display', 'inline-block');
-    $('#@tableId_btnSettings').css('display', 'inline-block');
+//    $('#@tableId_fileBtns [name=filebtn]').css('display', 'inline-block');
+//    $('#@tableId_filterdiv [name=filterbtn]').css('display', 'inline-block');
+//    $('#@tableId_btnSettings').css('display', 'inline-block');
 
-    //if(@tableId_tvPref4User === null)
-    //    createFilterRowHeader('@tableId', @eb_filter_controls, @scrolly);
-    //else
-       // createFilterRowHeader('@tableId', GetFiltersFromSettingsTbl(@tableId_tvPref4User,'@tableId'), @scrolly);
+//    //if(@tableId_tvPref4User === null)
+//    //    createFilterRowHeader('@tableId', @eb_filter_controls, @scrolly);
+//    //else
+//       // createFilterRowHeader('@tableId', GetFiltersFromSettingsTbl(@tableId_tvPref4User,'@tableId'), @scrolly);
 
-    //$('#@tableId_container thead').on('click','th',function(){
-    //    var col = $(this).children('span').text();
-    //    var dir = $(this).attr('aria-sort');
-    //    if(col !== '') {
-    //        @tableId_order_info.col = col;
-    //        @tableId_order_info.dir = (dir === 'undefined') ? 1 : ((dir === 'ascending') ? 2 : 1);
-    //    }
-    //});
+//    //$('#@tableId_container thead').on('click','th',function(){
+//    //    var col = $(this).children('span').text();
+//    //    var dir = $(this).attr('aria-sort');
+//    //    if(col !== '') {
+//    //        @tableId_order_info.col = col;
+//    //        @tableId_order_info.dir = (dir === 'undefined') ? 1 : ((dir === 'ascending') ? 2 : 1);
+//    //    }
+//    //});
 
-    if(!tx.hideSerial){
-        @tableId.on( 'draw.dt', function () {
-            @tableId.column(0).nodes().each( function (cell, i) {
-                cell.innerHTML = i+1;
-            } );
-        } );
-    }
+//    if(!tx.hideSerial){
+//        @tableId.on( 'draw.dt', function () {
+//            @tableId.column(0).nodes().each( function (cell, i) {
+//                cell.innerHTML = i+1;
+//            } );
+//        } );
+//    }
         
-    //new ResizeSensor(jQuery('#@tableId_container'), function() {
-    //    if ( $.fn.dataTable.isDataTable( '#@tableId' ) )
-    //        @tableId.columns.adjust();
-    //});
+//    //new ResizeSensor(jQuery('#@tableId_container'), function() {
+//    //    if ( $.fn.dataTable.isDataTable( '#@tableId' ) )
+//    //        @tableId.columns.adjust();
+//    //});
 
-}    
+//}    
+
+var EbDataTable_@tableId = new EbDataTable(@dataSourceId, @dvId, '@servicestack_url', '@tableId', @tvPref4User);
 </script>"
 .Replace("@dataSourceId", this.DataSourceId.ToString().Trim())
 .Replace("@tableId", this.Name)
@@ -909,7 +917,7 @@ function initTable_@tableId(tx){
                 </div>" : string.Empty)
 .Replace("@selectOption", this.GetSelectOption())
 .Replace("@data.columns", this.ColumnColletion.ToJson())
-.Replace("@tableViewId", this.Id.ToString())
+.Replace("@dvId", this.Id.ToString())
 .Replace("@tvPref4User", tvPref4User);
         }
     }
