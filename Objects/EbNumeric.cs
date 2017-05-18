@@ -157,27 +157,15 @@ $('#{0}').mask('SZZZZZZZZZZZ', {
 
         public override string GetHtml()
         {
-            return string.Format(@"
-
-
-
-
+            return (@"
 <div style='position:absolute; min-height: 12px; left:@leftpx; top:@toppx; @hiddenString'>
     <span id='@nameLbl' style='@lblBackColor @LblForeColor'>@label</span>
             <div  class='input-group'>
-                 {19}   
-                 <input type='text'  class='numinput' name='@name' value='@value' @placeHolder autocomplete = '@autoComplete' data-toggle='tooltip' title='@toolTipText' id='@name' style='width:@widthpx; height:@heightpx; @backColor @foreColor {17} display:inline-block;@readOnlyString @required @tabIndex />
+                 <span style='font-size: @fontSize' class='input-group-addon'>$</span>   
+                 <input type='text'  class='numinput' name='@name' value='@value' @placeHolder autocomplete = '@autoComplete' data-toggle='tooltip' title='@toolTipText' id='@name' style='width:@widthpx; height:@heightpx; @backColor @foreColor @fontStyle display:inline-block;@readOnlyString @required @tabIndex />
             </div>
     <span class='helpText'> @helpText </span>
-</div>",
-this.Name, this.Left, this.Top, this.Width, this.Height, this.Label, //5
-this.HiddenString, (this.Required && !this.Hidden ? " required" : string.Empty), this.ReadOnlyString,//8
-this.ToolTipText,//9
-this.HelpText, "tabindex='" + this.TabIndex + "'", "background-color:" + this.BackColorSerialized + ";",//12
-"color:" + this.ForeColorSerialized + ";",  "background-color:" + this.LabelBackColorSerialized + ";",//14
-"color:" + this.LabelForeColorSerialized + ";", (this.Value==0) ? "''" : this.Value.ToString() ,//16
-(this.FontSerialized != null) ? (" font-family:" + this.FontSerialized.FontFamily + ";" + "font-style:" + this.FontSerialized.Style + ";" + "font-size:" + this.FontSerialized.SizeInPoints + "px;") : string.Empty,//17
-this.PlaceHolder, (this.IsCurrency) ? ("<span style='font-family:" + this.FontSerialized.FontFamily + ";" + "font-size:" + this.FontSerialized.SizeInPoints + "px;'" +  "class='input-group-addon'>$</span>") : string.Empty)//19
+</div>"
 .Replace("@name", this.Name)
 .Replace("@left", this.Left.ToString())
 .Replace("@top", this.Top.ToString())
@@ -193,32 +181,16 @@ this.PlaceHolder, (this.IsCurrency) ? ("<span style='font-family:" + this.FontSe
 .Replace("@tabIndex", "tabindex='" + this.TabIndex + "'")
 .Replace("@autoComplete", this.AutoCompleteOff  ? "off" : "on")
 .Replace("@backColor", "background-color:" + this.BackColorSerialized + ";")
-.Replace("@foreColor", "color:" + this.ForeColorSerialized + ";")
+.Replace("@foreColor", "color:" + this.ForeColorSerialized + ";")//15
 .Replace("@lblBackColor", "background-color:" + this.LabelBackColorSerialized + ";")
 .Replace("@LblForeColor", "color:" + this.LabelForeColorSerialized + ";")
-.Replace("@value",  (this.Value == 0) ? "''" : this.Value.ToString())
-//.Replace("@fontStyle", (this.FontSerialized != null) ?
-//                            (" font-family:" + this.FontSerialized.FontFamily + ";" + "font-style:" + this.FontSerialized.Style
-//                            + ";" + "font-size:" + this.FontSerialized.SizeInPoints + "px;")
-//                        : string.Empty)
-//.Replace("@attachedLbl", (this.TextMode.ToString() != "SingleLine") ?
-//                                (
-//                                    "<i class='fa fa-$class input-group-addon' aria-hidden='true'"
-//                                    + (
-//                                        (this.FontSerialized != null) ?
-//                                            ("style='font-size:" + this.FontSerialized.SizeInPoints + "px;'")
-//                                        : string.Empty
-//                                      )
-//                                    + "class='input-group-addon'></i>"
-//                                )
-//                                .Replace("$class", (this.TextMode.ToString() == "Email") ?
-//                                                            ("envelope")
-//                                                        : (this.TextMode.ToString() == "Password") ?
-//                                                            "key"
-//                                                        : ("eyedropper")
-//                                )
-//                        : string.Empty)
-;
+.Replace("@value", (this.Value == 0) ? "''" : this.Value.ToString())
+.Replace("@fontStyle", (this.FontSerialized != null) ?
+                            (" font-family:" + this.FontSerialized.FontFamily + ";" + "font-style:" + this.FontSerialized.Style
+                            + ";" + "font-size:" + this.FontSerialized.SizeInPoints + "px;")
+                        : string.Empty)
+.Replace("@fontSize", (this.FontSerialized != null) ? (this.FontSerialized.SizeInPoints + "px;") : string.Empty)
+);
         }
     }
 }
