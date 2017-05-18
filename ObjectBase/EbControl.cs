@@ -12,7 +12,7 @@ namespace ExpressBase.Objects
     [ProtoBuf.ProtoInclude(2000, typeof(EbControlContainer))]
     [ProtoBuf.ProtoInclude(2001, typeof(EbButton))]
     [ProtoBuf.ProtoInclude(2002, typeof(EbChart))]
-    [ProtoBuf.ProtoInclude(2003, typeof(EbDataGridViewColumn))]
+    //[ProtoBuf.ProtoInclude(2003, typeof(EbDataGridViewColumn))]
     [ProtoBuf.ProtoInclude(2004, typeof(EbTextBox))]
     [ProtoBuf.ProtoInclude(2005, typeof(EbNumeric))]
     [ProtoBuf.ProtoInclude(2006, typeof(EbDate))]
