@@ -417,6 +417,8 @@ var Vobj{0} = new Vue({
                                         eval( 'Vobj{0}.displayMember'+ (i+1) +'= Vobj{0}.displayMember'+ (i+1) +'.splice( 0, {6});');
                                     });
                                 }
+                            $('#{0}').val(this.valueMember[0]);
+                            console.log(this.valueMember[0]);
                         }
                 },
                 methods: {
@@ -540,8 +542,9 @@ function(e){
         Vue.component('v-select', VueSelect.VueSelect);
         Vue.config.devtools = true;
     </script>
-              
+         
    <div id='@namecontainer' style='position:absolute; left:@leftpx;  top:@toppx;'>
+    <input type='hidden' name='@nameHidden4val' id='@name'/>
         @VueSelectCode
     <div id='@name_loadingdiv' class='tbl-loadingdiv'>
         <i id='@name_loading-image' class='fa fa-spinner fa-pulse fa-2x fa-fw'></i><span class='sr-only'>Loading...</span>
