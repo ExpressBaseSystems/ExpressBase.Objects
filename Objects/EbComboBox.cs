@@ -78,18 +78,18 @@ namespace ExpressBase.Objects
         {
             get
             {
-                string rs = "<div id='@name' data-toggle='tooltip' title='@tooltipText'>";
+                string rs = "<div id='@name' data-ebtype='@ebtype' data-toggle='tooltip' title='@tooltipText'>";//Need Id Fix
                 for (int i = 1; i <= this.NumberOfFields; i++)
                     rs += @"
 <div style='display:inline-block;'>
-    <div style='display:inline-block;' id='@nameLbl'>label</div>
+    <div style='display:inline-block;' id='@nameLbl'>@label</div>
     <v-select id='@name$$' style='width:{3}px;'
         multiple
     v-model='displayMember$$'
         :on-change='updateCk'
         placeholder = 'Search...'>
     </v-select>
-</div>".Replace("$$", i.ToString());
+</div>".Replace("$$", i.ToString()).Replace("@label", this.Label);
                 return rs + "</div>";
             }
         }
@@ -402,6 +402,8 @@ var Vobj{0} = new Vue({
                 watch: {
                         valueMember: function (val) {
                             //single select
+                                console.log(this.valueMember);
+                                console.log(this.displayMember2);
                                 if({6}===1 && !{8} && val.length >1){
                                     this.valueMember = this.valueMember.splice( 1, 1);
                                     $.each(DMindexes,function(i,v){
@@ -415,6 +417,7 @@ var Vobj{0} = new Vue({
                                         eval( 'Vobj{0}.displayMember'+ (i+1) +'= Vobj{0}.displayMember'+ (i+1) +'.splice( 0, {6});');
                                     });
                                 }
+                            $('#{0}').val(this.valueMember[0]);
                         }
                 },
                 methods: {
@@ -538,8 +541,9 @@ function(e){
         Vue.component('v-select', VueSelect.VueSelect);
         Vue.config.devtools = true;
     </script>
-              
+         
    <div id='@namecontainer' style='position:absolute; left:@leftpx;  top:@toppx;'>
+    <input type='hidden' name='@nameHidden4val' data-ebtype='@ebtype' id='@nameTmp'/>
         @VueSelectCode
     <div id='@name_loadingdiv' class='tbl-loadingdiv'>
         <i id='@name_loading-image' class='fa fa-spinner fa-pulse fa-2x fa-fw'></i><span class='sr-only'>Loading...</span>
@@ -554,7 +558,8 @@ function(e){
 .Replace("@top", this.Top.ToString())
 .Replace("@width", this.Width.ToString())
 .Replace("@DDwidth", (this.DropdownWidth == 0) ? "300" : this.DropdownWidth.ToString())
-.Replace("@tooltipText", this.ToolTipText);
+.Replace("@tooltipText", this.ToolTipText)
+.Replace("@ebtype", 11.ToString());
         }
     }
 }

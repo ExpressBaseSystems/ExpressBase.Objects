@@ -1,4 +1,5 @@
 ﻿using ExpressBase.Data;
+using ExpressBase.Objects.ServiceStack_Artifacts;
 using ServiceStack;
 using ServiceStack.Redis;
 
@@ -12,6 +13,8 @@ namespace ExpressBase.Objects
 
         [ProtoBuf.ProtoMember(9)]
         public int FilterDialogId { get; set; }
+
+        public string Token { get; set; }
 
         internal ColumnColletion ColumnColletion { get; set; }
 
@@ -69,7 +72,7 @@ namespace ExpressBase.Objects
         public string GetColumn4DataTable(ColumnColletion  __columnCollection)
         {
             string colDef = string.Empty;
-            colDef = "{\"title\": \"<Untitled>\",\"hideSerial\": false, \"hideCheckbox\": false, \"lengthMenu\":[ [100, 200, 300, -1], [100, 200, 300, \"All\"] ],";
+            colDef = "{\"dvName\": \"<Untitled>\",\"hideSerial\": false, \"hideCheckbox\": false, \"lengthMenu\":[ [100, 200, 300, -1], [100, 200, 300, \"All\"] ],";
             colDef+=" \"scrollY\":300, \"rowGrouping\":\"\",\"leftFixedColumns\":0,\"rightFixedColumns\":0,\"columns\":[";
             colDef += "{\"width\":10, \"searchable\": false, \"orderable\": false, \"visible\":true, \"name\":\"serial\", \"title\":\"#\"},";
             colDef += "{\"width\":10, \"searchable\": false, \"orderable\": false, \"visible\":true, \"name\":\"checkbox\"},";
@@ -110,15 +113,24 @@ namespace ExpressBase.Objects
 
         public override string GetHtml()
         {
+            //this.Redis.Remove(string.Format("{0}_ds_{1}_columns", "eb_roby_dev", this.DataSourceId));
             //this.Redis.Remove(string.Format("{0}_TVPref_{1}_uid_{2}", "eb_roby_dev", this.DataSourceId, 1));
             this.ColumnColletion = this.Redis.Get<ColumnColletion>(string.Format("{0}_ds_{1}_columns", "eb_roby_dev", this.DataSourceId));
+            if (this.ColumnColletion == null)
+            {
+                var resp = base.ServiceStackClient.Get<DataSourceColumnsResponse>(new DataSourceColumnsRequest { Id = this.DataSourceId, Token = this.Token, TenantAccountId = "eb_roby_dev" });
+                this.ColumnColletion = resp.Columns;
+            }
+
             tvPref4User = this.Redis.Get<string>(string.Format("{0}_TVPref_{1}_uid_{2}", "eb_roby_dev", this.DataSourceId, 1));
             if (string.IsNullOrEmpty(tvPref4User))
             {
                 tvPref4User = this.GetColumn4DataTable(this.ColumnColletion);
                 this.Redis.Set(string.Format("{0}_TVPref_{1}_uid_{2}", "eb_roby_dev", this.DataSourceId, 1), tvPref4User);
             }
+            
 
+            //@tableViewName
             return @"
 <style>
 .tablecontainer {
@@ -189,7 +201,7 @@ table.dataTable tbody tr.selected, table.dataTable tbody th.selected, table.data
 </style>
 <div class='tablecontainer' id='@tableId_container'>
     <div>
-        @tableViewName
+        <label id='dvName_lbl'></label>
     </div>
     <div>
         <div class='btn-group' id='@tableId_filterdiv'>
@@ -351,7 +363,7 @@ var EbDataTable_@tableId = new EbDataTable(@dataSourceId, @dvId, '@servicestack_
 </script>"
 .Replace("@dataSourceId", this.DataSourceId.ToString().Trim())
 .Replace("@tableId", this.Name)
-.Replace("@tableViewName", ((string.IsNullOrEmpty(this.Label)) ? "&lt;ReportLabel Undefined&gt;" : this.Label))
+//.Replace("@tableViewName", ((string.IsNullOrEmpty(this.Label)) ? "&lt;ReportLabel Undefined&gt;" : this.Label))
 .Replace("@servicestack_url", "https://expressbaseservicestack.azurewebsites.net")
 .Replace("@filters", this.filters)
 .Replace("@FilterBH", this.FilterBH.ToString())
