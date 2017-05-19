@@ -82,14 +82,14 @@ namespace ExpressBase.Objects
                 for (int i = 1; i <= this.NumberOfFields; i++)
                     rs += @"
 <div style='display:inline-block;'>
-    <div style='display:inline-block;' id='@nameLbl'>label</div>
+    <div style='display:inline-block;' id='@nameLbl'>@label</div>
     <v-select id='@name$$' style='width:{3}px;'
         multiple
     v-model='displayMember$$'
         :on-change='updateCk'
         placeholder = 'Search...'>
     </v-select>
-</div>".Replace("$$", i.ToString());
+</div>".Replace("$$", i.ToString()).Replace("@label", this.Label);
                 return rs + "</div>";
             }
         }
@@ -402,6 +402,8 @@ var Vobj{0} = new Vue({
                 watch: {
                         valueMember: function (val) {
                             //single select
+                                console.log(this.valueMember);
+                                console.log(this.displayMember2);
                                 if({6}===1 && !{8} && val.length >1){
                                     this.valueMember = this.valueMember.splice( 1, 1);
                                     $.each(DMindexes,function(i,v){
