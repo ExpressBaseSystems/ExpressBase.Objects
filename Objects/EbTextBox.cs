@@ -87,7 +87,7 @@ namespace ExpressBase.Objects
         public override string GetHtml()
         {
             return @"
-<div style='position:absolute; left:@leftpx; top:@toppx; @hiddenString'>
+<div class='Eb-ctrlContainer' style='position:absolute; left:@leftpx; top:@toppx; @hiddenString'>
     <span id='@nameLbl' style='@lblBackColor @LblForeColor'>@label</span>
         <div  class='input-group' style='width: 1px;'>
             @attachedLbl

@@ -158,7 +158,7 @@ $('#{0}').mask('SZZZZZZZZZZZ', {
         public override string GetHtml()
         {
             return (@"
-<div style='position:absolute; min-height: 12px; left:@leftpx; top:@toppx; @hiddenString'>
+<div class='Eb-ctrlContainer' style='position:absolute; min-height: 12px; left:@leftpx; top:@toppx; @hiddenString'>
     <span id='@nameLbl' style='@lblBackColor @LblForeColor'>@label</span>
             <div  class='input-group'>
                  <span style='font-size: @fontSize' class='input-group-addon'>$</span>   
