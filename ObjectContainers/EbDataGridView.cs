@@ -113,7 +113,7 @@ namespace ExpressBase.Objects
 
         public override string GetHtml()
         {
-            //this.Redis.Remove(string.Format("{0}_ds_{1}_columns", "eb_roby_dev", this.DataSourceId));
+            this.Redis.Remove(string.Format("{0}_ds_{1}_columns", "eb_roby_dev", 46));
             //this.Redis.Remove(string.Format("{0}_TVPref_{1}_uid_{2}", "eb_roby_dev", this.DataSourceId, 1));
             this.ColumnColletion = this.Redis.Get<ColumnColletion>(string.Format("{0}_ds_{1}_columns", "eb_roby_dev", this.DataSourceId));
             if (this.ColumnColletion == null)

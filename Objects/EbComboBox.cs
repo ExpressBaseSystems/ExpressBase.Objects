@@ -1,4 +1,6 @@
-﻿using System;
+﻿using ExpressBase.Data;
+using ExpressBase.Objects.ServiceStack_Artifacts;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -125,6 +127,7 @@ var @nameEbCombo = new EbSelect('@name', '@DSid', @DDHeight, '@ValueMember', '@D
 .Replace("@values", "[1000]")//this.values.ToString())
 .Replace("@servicestack_url", "https://expressbaseservicestack.azurewebsites.net");
         }
+
         public override string GetHtml()
         {
             return @"
@@ -134,7 +137,7 @@ var @nameEbCombo = new EbSelect('@name', '@DSid', @DDHeight, '@ValueMember', '@D
     </script>
                
    <div id='@nameContainer' style='position:absolute; left:@leftpx;  top:@toppx;'>
-        <input type='hidden' name='@nameHidden4val' id='@name'/>
+        <input type='hidden' name='@nameHidden4val' data-ebtype='16' id='@name'/>
         @VueSelectCode
     <div id='@name_loadingdiv' class='ebCombo-loader'>
         <i id='@name_loading-image' class='fa fa-spinner fa-pulse fa-2x fa-fw'></i><span class='sr-only'>Loading...</span>
