@@ -50,7 +50,7 @@ namespace ExpressBase.Objects
         {
             get
             {
-                string rs = @"<div id='@namecontainer' style='position:absolute; left:@leftpx; top:@toppx; @hiddenString'>
+                string rs = @"<div id='@namecontainer' class='Eb-ctrlContainer' style='position:absolute; left:@leftpx; top:@toppx; @hiddenString'>
                                 <input id='@namehidden' type ='hidden' name='Ebradio'>
                                 <span id='@nameLbl' style='@lblBackColor @LblForeColor'>@label</span>
                                 <div data-toggle='tooltip' title='@toolTipText'>";

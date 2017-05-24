@@ -12,7 +12,11 @@ namespace ExpressBase.Objects
         View,
         DataSource,
         Report,
-        Table
+        Table,
+        SqlFunctions,
+        SqlValidators,
+        JavascriptFunctions,
+        JavascriptValidators,
     }
 
     [ProtoBuf.ProtoContract]
@@ -25,5 +29,15 @@ namespace ExpressBase.Objects
         Text,
         Null,
         Chart
+    }
+    [ProtoBuf.ProtoContract]
+    public enum ObjectLifeCycleStatus
+    {
+        Development,
+        Test,
+        UAT,
+        Live,
+        Offline,
+        Obsolete
     }
 }

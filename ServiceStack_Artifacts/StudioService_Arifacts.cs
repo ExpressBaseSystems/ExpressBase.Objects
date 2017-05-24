@@ -17,6 +17,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Token { get; set; }
 
         public string TenantAccountId { get; set; }
+
+        public int UserId { get; set; }
     }
 
     [DataContract]
@@ -51,6 +53,14 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 7)]
         public string TenantAccountId { get; set; }
+
+        [DataMember(Order = 8)]
+        public ObjectLifeCycleStatus Status { get; set; }
+
+        [DataMember(Order = 9)]
+        public string ChangeLog { get; set; }
+
+        public int UserId { get; set; }
 
         public EbObjectWrapper() { }
 

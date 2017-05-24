@@ -21,6 +21,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Token { get; set; }
 
         public string TenantAccountId { get; set; }
+
+        public int UserId { get; set; }
     }
     [DataContract]
     [Route("/uc", "POST")]
@@ -36,6 +38,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Token { get; set; }
 
         public string TenantAccountId { get; set; }
+
+        public int UserId { get; set; }
     }
 
     [DataContract]
@@ -55,6 +59,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Token { get; set; }
 
         public string TenantAccountId { get; set; }
+
+        public int UserId { get; set; }
     }
 
     [DataContract]

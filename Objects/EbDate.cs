@@ -115,7 +115,7 @@ $('#@id').datetimepicker({
         public override string GetHtml()
         {
             return @"
-<div id='@nameContainer' class='Eb-control' style='position:absolute; left:@leftpx; top:@top; @hiddenString'>
+<div id='@nameContainer' class='Eb-ctrlContainer' style='position:absolute; left:@leftpx; top:@top; @hiddenString'>
     <span id='@nameLbl' style='@lblBackColor @LblForeColor'>@label</span>
     <div  class='input-group' style='width:1px;'>
         <input id='@name' data-ebtype='@datetype'  data-toggle='tooltip' title='@toolTipText' class='date' type='text'  name='@name'  autocomplete = '@autoComplete' @value @tabIndex style='width:@widthpx; height:@heightpx; @backColor @foreColor display:inline-block; @fontStyle @readOnlyString @required @placeHolder />
