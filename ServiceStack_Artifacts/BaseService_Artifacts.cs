@@ -7,6 +7,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         string Token { get; set; }
 
         string TenantAccountId { get; set; }
+
+        int UserId { get; set; }
     }
 
     public interface IEbSSResponse

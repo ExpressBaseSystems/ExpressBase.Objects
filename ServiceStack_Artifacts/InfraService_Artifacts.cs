@@ -22,6 +22,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 4)]
         public Dictionary<string, object> Parameters { get; set; }
+
+        public int UserId { get; set; }
     }
 
     [DataContract]
@@ -44,6 +46,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Token { get; set; }
 
         public string TenantAccountId { get; set; }
+
+        public int UserId { get; set; }
     }
 
     [DataContract]
@@ -65,6 +69,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public string TenantAccountId { get; set; }
 
+        public int UserId { get; set; }
+
 
     }
 
@@ -81,6 +87,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Token { get; set; }
 
         public string TenantAccountId { get; set; }
+
+        public int UserId { get; set; }
     }
 
     [DataContract]
@@ -103,6 +111,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int TId { get; set; }
 
         public string TenantAccountId { get; set; }
+
+        public int UserId { get; set; }
     }
 
     [DataContract]
@@ -139,6 +149,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int id { get; set; }
 
         public string TenantAccountId { get; set; }
+
+        public int UserId { get; set; }
     }
 
     [DataContract]

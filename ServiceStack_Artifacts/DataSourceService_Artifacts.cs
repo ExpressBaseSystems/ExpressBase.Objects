@@ -29,6 +29,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public string TenantAccountId { get; set; }
 
+        public int UserId { get; set; }
+
         public List<Dictionary<string, string>> Params { get; set; }
 
         public List<Dictionary<string, string>> TFilters { get; set; }
@@ -49,6 +51,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Token { get; set; }
 
         public string TenantAccountId { get; set; }
+
+        public int UserId { get; set; }
 
         public List<Dictionary<string, string>> Params { get; set; }
 
