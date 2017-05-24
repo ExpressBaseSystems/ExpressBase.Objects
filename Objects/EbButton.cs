@@ -29,7 +29,7 @@ namespace ExpressBase.Objects
         public override string GetHtml()
         {
             return string.Format(@"
-<div id='@namecontainer' style='position:absolute; left:@leftpx; top:@toppx; '>
+<div id='@namecontainer' class='Eb-ctrlContainer' style='position:absolute; left:@leftpx; top:@toppx; '>
     <button id='@name' class='btn btn-default'  data-toggle='tooltip' title='@toolTipText' 
         style='width:@widthpx; height:@heightpx; @backColor @foreColor display:inline-block; @fontStyle'>@text</button>
 </div>

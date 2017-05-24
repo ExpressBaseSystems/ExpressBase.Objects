@@ -231,7 +231,7 @@ table.dataTable tbody tr.selected, table.dataTable tbody th.selected, table.data
         </div>
         @collapsBtn
         <div id='@tableId_btnSettings' class='btn btn-default' style='display: none;' data-toggle='modal' data-target='#settingsmodal'><i class='fa fa-cog' aria-hidden='true'></i></div>
-    </div>
+    </div><br/>
     <div style='width:auto;' id='@tableId_divcont'>
         @filters  
         <table id='@tableId' class='table table-striped table-bordered'></table>
