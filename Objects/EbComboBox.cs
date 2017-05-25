@@ -143,7 +143,7 @@ var @nameEbCombo = new EbSelect('@name', '@DSid', @DDHeight, '@ValueMember', '@D
         <i id='@name_loading-image' class='fa fa-spinner fa-pulse fa-2x fa-fw'></i><span class='sr-only'>Loading...</span>
     </div>
     <center><div id='@nameDDdiv' v-show='DDstate' class='DDdiv expand-transition'  style='width:@DDwidthpx;'> 
-        <table id='@nametbl' tabindex='1000' style='width:100%' class='display'></table>
+        <table id='@nametbl' tabindex='1000' style='width:100%' class='table table-striped table-bordered'></table>
     </div></center>
 </div>"
 .Replace("@VueSelectCode", this.VueSelectcode)
