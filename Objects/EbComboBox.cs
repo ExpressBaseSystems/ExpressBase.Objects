@@ -68,33 +68,24 @@ namespace ExpressBase.Objects
         [System.ComponentModel.Category("Behavior")]
         public int[] values { get; set; }
 
-        private string VueDMcode
-        {
-            get
-            {
-                string rs = "";
-                for (int i = 1; i <= this.NumberOfFields; i++)
-                    rs += "displayMembers$$:[],".Replace("$$", i.ToString());
-                return rs;
-            }
-        }
-
         private string VueSelectcode
         {
             get
             {
                 string rs = "<div id='@nameWraper' data-toggle='tooltip' title='@tooltipText'>";
-                for (int i = 1; i <= this.NumberOfFields; i++)
-                    rs += @"
-<div style='display:inline-block;'>
-    <div style='display:inline-block;' id='@nameLbl'>label</div>
+                for (int i = 0; i < this.NumberOfFields; i++)
+                        rs += @"
+<div style='display:inline-block; width:@perWidthpx; margin-right: -4px;'>
+    <div class='input-group'>
         <v-select id='@name$$' style='width:{3}px;' 
             multiple
-	        v-model='displayMembers$$'
+            v-model='displayMembers[$$]'
             :on-change='updateCk'
-            placeholder = 'Search...'>
+            placeholder = 'label$$'>
         </v-select>
-</div>".Replace("$$", i.ToString());
+        <span class='input-group-addon' @border-r$$> <i id='@nameTglBtn' class='fa  fa-search' aria-hidden='true'></i> </span>
+    </div>
+</div>".Replace("$$", i.ToString()).Replace("@border-r"+i, (i!=this.NumberOfFields-1) ? "style='border-radius: 0px;'" :"");
                 return rs + "</div>";
             }
         }
@@ -110,22 +101,19 @@ namespace ExpressBase.Objects
         {
             return this.RequiredString + @"
 $('#@name_loading-image').hide();
-var @nameEbCombo = new EbSelect('@name', '@DSid', @DDHeight, '@ValueMember', '@DisplayMember', @MaxLimit, @MinLimit, @Required, '@DefaultSearchFor', '@MultiSelect', '', '@VueDMcode', '@servicestack_url', @values);
+var @nameEbCombo = new EbSelect('@name', '@DSid', @DDHeight, '@vmName', '', @MaxLimit, @MinLimit, @Required, '@DefaultSearchFor', '@servicestack_url', @values);
 "
 .Replace("@name", this.Name)
 .Replace("@DSid", this.DataSourceId.ToString().Trim())
 .Replace("@DDHeight", (this.DropdownHeight == 0) ? "400" : this.DropdownHeight.ToString())
-.Replace("@ValueMember", this.ValueMember.ToString())
-.Replace("@DisplayMember", this.DisplayMember.ToString())
+.Replace("@vmName", this.ValueMember.ToString())
+.Replace("@dmNames", "['acmaster1_name', 'tdebit', 'tcredit']")
 .Replace("@MaxLimit", (!this.MultiSelect || this.MaxLimit == 0) ? "1" : this.MaxLimit.ToString())
 .Replace("@MinLimit", this.MinLimit.ToString())
-.Replace("@MultiSelect", this.MultiSelect.ToString().ToLower())
 .Replace("@Required", this.Required.ToString().ToLower())
 .Replace("@DefaultSearchFor", this.DefaultSearchFor.ToString())
-.Replace("@DMembers", "['acmaster1_name', 'tdebit', 'tcredit']")
-.Replace("@VueDMcode", this.VueDMcode)
-.Replace("@values", "[1000]")//this.values.ToString())
-.Replace("@servicestack_url", "https://expressbaseservicestack.azurewebsites.net");
+.Replace("@servicestack_url", "https://expressbaseservicestack.azurewebsites.net")
+.Replace("@values", "[1000]");//this.values.ToString());
         }
 
         public override string GetHtml()
@@ -136,21 +124,24 @@ var @nameEbCombo = new EbSelect('@name', '@DSid', @DDHeight, '@ValueMember', '@D
         Vue.config.devtools = true;
     </script>
                
-   <div id='@nameContainer' style='position:absolute; left:@leftpx;  top:@toppx;'>
+   <div id='@nameContainer' style='position:absolute; width:@widthpx; left:@leftpx;  top:@toppx;'>
         <input type='hidden' name='@nameHidden4val' data-ebtype='16' id='@name'/>
+        <div style='display:inline-block;' id='@nameLbl'>@label</div>
         @VueSelectCode
     <div id='@name_loadingdiv' class='ebCombo-loader'>
         <i id='@name_loading-image' class='fa fa-spinner fa-pulse fa-2x fa-fw'></i><span class='sr-only'>Loading...</span>
     </div>
     <center><div id='@nameDDdiv' v-show='DDstate' class='DDdiv expand-transition'  style='width:@DDwidthpx;'> 
-        <table id='@nametbl' tabindex='1000' style='width:100%' class='display'></table>
+        <table id='@nametbl' tabindex='1000' style='width:100%' class='table table-striped table-bordered'></table>
     </div></center>
 </div>"
 .Replace("@VueSelectCode", this.VueSelectcode)
 .Replace("@name", this.Name)
 .Replace("@left", this.Left.ToString())
 .Replace("@top", this.Top.ToString())
-.Replace("@width", this.Width.ToString())
+.Replace("@label", this.Label)
+.Replace("@width", 900.ToString())//this.Width.ToString())
+.Replace("@perWidth", (900/ this.NumberOfFields).ToString())
 .Replace("@DDwidth", (this.DropdownWidth == 0) ? "300" : this.DropdownWidth.ToString())
 .Replace("@tooltipText", this.ToolTipText);
         }

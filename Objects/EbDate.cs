@@ -91,7 +91,7 @@ namespace ExpressBase.Objects
         public override string GetHead()
         {
             return  (((!this.Hidden) ? this.UniqueString + this.RequiredString : string.Empty) + @"".Replace("{0}", this.Name)) + @"
-$('#@idTglBtn').click(function(){
+$('#@idContainer [class=input-group-addon]').click(function(){
     //$('#@idContainer [class=date]').toggle();
         $('#@id').focus();
         $('#@id').trigger('click');
