@@ -16,7 +16,7 @@ namespace ExpressBase.Objects
 
         public string Token { get; set; }
 
-        internal ColumnColletion ColumnColletion { get; set; }
+        //internal ColumnColletion ColumnColletion { get; set; }
 
         public EbDataGridView() { }
 
@@ -67,68 +67,68 @@ namespace ExpressBase.Objects
             base.ServiceStackClient = serviceclient;
         }
 
-        string tvPref4User = string.Empty;
+        //string tvPref4User = string.Empty;
 
-        public string GetColumn4DataTable(ColumnColletion  __columnCollection)
-        {
-            string colDef = string.Empty;
-            colDef = "{\"dvName\": \"<Untitled>\",\"hideSerial\": false, \"hideCheckbox\": false, \"lengthMenu\":[ [100, 200, 300, -1], [100, 200, 300, \"All\"] ],";
-            colDef+=" \"scrollY\":300, \"rowGrouping\":\"\",\"leftFixedColumns\":0,\"rightFixedColumns\":0,\"columns\":[";
-            colDef += "{\"width\":10, \"searchable\": false, \"orderable\": false, \"visible\":true, \"name\":\"serial\", \"title\":\"#\"},";
-            colDef += "{\"width\":10, \"searchable\": false, \"orderable\": false, \"visible\":true, \"name\":\"checkbox\"},";
-            foreach (EbDataColumn  column in __columnCollection)
-            {
-                colDef += "{";
-                colDef += "\"data\": " + __columnCollection[column.ColumnName].ColumnIndex.ToString();
-                colDef += string.Format(",\"title\": \"{0}<span hidden>{0}</span>\"", column.ColumnName);
-                var vis = (column.ColumnName == "id") ? false.ToString().ToLower() : true.ToString().ToLower();
-                colDef += ",\"visible\": " + vis;
-                colDef += ",\"width\": " + 100;
-                colDef += ",\"name\": \"" + column.ColumnName + "\"";
-                colDef += ",\"type\": \"" + column.Type.ToString() + "\"";
-                //var cls = (column.Type.ToString() == "System.Boolean") ? "dt-center tdheight" : "tdheight";
-                colDef += ",\"className\": \"tdheight\"";
-                colDef += "},";
-            }
-            colDef = colDef.Substring(0 , colDef.Length - 1) +"],";
-            string colext = "\"columnsext\":[";
-            colext += "{\"name\":\"serial\"},";
-            colext += "{\"name\":\"checkbox\"},";
-            foreach (EbDataColumn column in __columnCollection)
-            {
-                colext += "{";
-                if (column.Type.ToString() == "System.Int32" || column.Type.ToString() == "System.Decimal" || column.Type.ToString() == "System.Int16" || column.Type.ToString() == "System.Int64")
-                    colext += "\"name\":\"" + column.ColumnName + "\",\"AggInfo\":true,\"DecimalPlace\":2,\"RenderAs\":\"Default\"";
-                else if (column.Type.ToString() == "System.Boolean")
-                    colext += "\"name\":\"" + column.ColumnName + "\",\"IsEditable\":false,\"RenderAs\":\"Default\"";
-                else if (column.Type.ToString() == "System.DateTime")
-                    colext += "\"name\":\"" + column.ColumnName + "\",\"Format\":\"Date\"";
-                else if (column.Type.ToString() == "System.String")
-                    colext += "\"name\":\"" + column.ColumnName + "\",\"RenderAs\":\"Default\"";
-                colext += "},";
-            }
-            colext = colext.Substring(0,colext.Length-1)+"]";
-            return colDef + colext + "}";
-        }
+        //public string GetColumn4DataTable(ColumnColletion  __columnCollection)
+        //{
+        //    string colDef = string.Empty;
+        //    colDef = "{\"dvName\": \"<Untitled>\",\"hideSerial\": false, \"hideCheckbox\": false, \"lengthMenu\":[ [100, 200, 300, -1], [100, 200, 300, \"All\"] ],";
+        //    colDef+=" \"scrollY\":300, \"rowGrouping\":\"\",\"leftFixedColumns\":0,\"rightFixedColumns\":0,\"columns\":[";
+        //    colDef += "{\"width\":10, \"searchable\": false, \"orderable\": false, \"visible\":true, \"name\":\"serial\", \"title\":\"#\"},";
+        //    colDef += "{\"width\":10, \"searchable\": false, \"orderable\": false, \"visible\":true, \"name\":\"checkbox\"},";
+        //    foreach (EbDataColumn  column in __columnCollection)
+        //    {
+        //        colDef += "{";
+        //        colDef += "\"data\": " + __columnCollection[column.ColumnName].ColumnIndex.ToString();
+        //        colDef += string.Format(",\"title\": \"{0}<span hidden>{0}</span>\"", column.ColumnName);
+        //        var vis = (column.ColumnName == "id") ? false.ToString().ToLower() : true.ToString().ToLower();
+        //        colDef += ",\"visible\": " + vis;
+        //        colDef += ",\"width\": " + 100;
+        //        colDef += ",\"name\": \"" + column.ColumnName + "\"";
+        //        colDef += ",\"type\": \"" + column.Type.ToString() + "\"";
+        //        //var cls = (column.Type.ToString() == "System.Boolean") ? "dt-center tdheight" : "tdheight";
+        //        colDef += ",\"className\": \"tdheight\"";
+        //        colDef += "},";
+        //    }
+        //    colDef = colDef.Substring(0 , colDef.Length - 1) +"],";
+        //    string colext = "\"columnsext\":[";
+        //    colext += "{\"name\":\"serial\"},";
+        //    colext += "{\"name\":\"checkbox\"},";
+        //    foreach (EbDataColumn column in __columnCollection)
+        //    {
+        //        colext += "{";
+        //        if (column.Type.ToString() == "System.Int32" || column.Type.ToString() == "System.Decimal" || column.Type.ToString() == "System.Int16" || column.Type.ToString() == "System.Int64")
+        //            colext += "\"name\":\"" + column.ColumnName + "\",\"AggInfo\":true,\"DecimalPlace\":2,\"RenderAs\":\"Default\"";
+        //        else if (column.Type.ToString() == "System.Boolean")
+        //            colext += "\"name\":\"" + column.ColumnName + "\",\"IsEditable\":false,\"RenderAs\":\"Default\"";
+        //        else if (column.Type.ToString() == "System.DateTime")
+        //            colext += "\"name\":\"" + column.ColumnName + "\",\"Format\":\"Date\"";
+        //        else if (column.Type.ToString() == "System.String")
+        //            colext += "\"name\":\"" + column.ColumnName + "\",\"RenderAs\":\"Default\"";
+        //        colext += "},";
+        //    }
+        //    colext = colext.Substring(0,colext.Length-1)+"]";
+        //    return colDef + colext + "}";
+        //}
 
         public override string GetHtml()
         {
-            //this.Redis.Remove(string.Format("{0}_ds_{1}_columns", "eb_roby_dev", this.DataSourceId));
-            //this.Redis.Remove(string.Format("{0}_TVPref_{1}_uid_{2}", "eb_roby_dev", this.DataSourceId, 1));
-            this.ColumnColletion = this.Redis.Get<ColumnColletion>(string.Format("{0}_ds_{1}_columns", "eb_roby_dev", this.DataSourceId));
-            if (this.ColumnColletion == null)
-            {
-                var resp = base.ServiceStackClient.Get<DataSourceColumnsResponse>(new DataSourceColumnsRequest { Id = this.DataSourceId, Token = this.Token, TenantAccountId = "eb_roby_dev" });
-                this.ColumnColletion = resp.Columns;
-            }
+            //this.Redis.Remove(string.Format("{0}_ds_{1}_columns", "eb_roby_dev", 46));
+            ////this.Redis.Remove(string.Format("{0}_TVPref_{1}_uid_{2}", "eb_roby_dev", this.DataSourceId, 1));
+            //this.ColumnColletion = this.Redis.Get<ColumnColletion>(string.Format("{0}_ds_{1}_columns", "eb_roby_dev", this.DataSourceId));
+            //if (this.ColumnColletion == null)
+            //{
+            //    var resp = base.ServiceStackClient.Get<DataSourceColumnsResponse>(new DataSourceColumnsRequest { Id = this.DataSourceId, Token = this.Token, TenantAccountId = "eb_roby_dev" });
+            //    this.ColumnColletion = resp.Columns;
+            //}
 
-            tvPref4User = this.Redis.Get<string>(string.Format("{0}_TVPref_{1}_uid_{2}", "eb_roby_dev", this.DataSourceId, 1));
-            if (string.IsNullOrEmpty(tvPref4User))
-            {
-                tvPref4User = this.GetColumn4DataTable(this.ColumnColletion);
-                this.Redis.Set(string.Format("{0}_TVPref_{1}_uid_{2}", "eb_roby_dev", this.DataSourceId, 1), tvPref4User);
-            }
-            
+            //tvPref4User = this.Redis.Get<string>(string.Format("{0}_TVPref_{1}_uid_{2}", "eb_roby_dev", this.DataSourceId, 1));
+            //if (string.IsNullOrEmpty(tvPref4User))
+            //{
+            //    tvPref4User = this.GetColumn4DataTable(this.ColumnColletion);
+            //    this.Redis.Set(string.Format("{0}_TVPref_{1}_uid_{2}", "eb_roby_dev", this.DataSourceId, 1), tvPref4User);
+            //}
+
 
             //@tableViewName
             return @"
@@ -197,21 +197,12 @@ white-space: nowrap;
 table.dataTable tbody tr.selected, table.dataTable tbody th.selected, table.dataTable tbody td.selected {
     color: #090808;
 }
-
 </style>
 <div class='tablecontainer' id='@tableId_container'>
     <div>
         <label id='dvName_lbl'></label>
     </div>
     <div>
-        <div class='btn-group' id='@tableId_filterdiv'>
-            <a class='btn btn-default'  id='4filterbtn' name='filterbtn' style='display: none;' data-table='@tableId' data-toggle='tooltip' title='On\/Off Filter'><i class='fa fa-filter' aria-hidden='true'></i></a>
-            <button type='button' class='btn btn-default dropdown-toggle' data-toggle='dropdown' name='filterbtn' style='display: none;'>
-            <span class='caret'></span>  <!-- caret --></button>
-            <ul class='dropdown-menu' role='menu'>
-                <li><a href = '#' id='clearfilterbtn'> Clear Filter</a></li>
-            </ul>
-        </div>
         <button type='button' id='@tableId_btntotalpage' class='btn btn-default' style='display: none;' data-table='@tableId'>&sum;</button>
         <div id='btnGo' class='btn btn-default' >GO</div>
         <div id='@tableId_fileBtns' style='display: inline-block;'>
@@ -238,128 +229,16 @@ table.dataTable tbody tr.selected, table.dataTable tbody th.selected, table.data
     </div>
 </div>
 <script>
-
-//
-// Pipelining function for DataTables. To be used to the `ajax` option of DataTables
-//
-//$.fn.dataTable.pipeline = function ( opts ) {
-//    // Configuration options
-//    var conf = $.extend( {
-//        pages: 5,     // number of pages to cache
-//        url: '',      // script url
-//        data: null,   // function or object with parameters to send to the server
-//                      // matching how `ajax.data` works in DataTables
-//        method: 'POST' // Ajax HTTP method
-//    }, opts );
- 
-//    // Private variables for storing the cache
-//    var cacheLower = -1;
-//    var cacheUpper = null;
-//    var cacheLastRequest = null;
-//    var cacheLastJson = null;
- 
-//    return function ( request, drawCallback, settings ) {
-//        var ajax          = false;
-//        var requestStart  = request.start;
-//        var drawStart     = request.start;
-//        var requestLength = request.length;
-//        var requestEnd    = requestStart + requestLength;
-         
-//        if ( settings.clearCache ) {
-//            // API requested that the cache be cleared
-//            ajax = true;
-//            settings.clearCache = false;
-//        }
-//        else if ( cacheLower < 0 || requestStart < cacheLower || requestEnd > cacheUpper ) {
-//            // outside cached data - need to make a request
-//            ajax = true;
-//        }
-//        else if ( JSON.stringify( request.order )   !== JSON.stringify( cacheLastRequest.order ) ||
-//                  JSON.stringify( request.columns ) !== JSON.stringify( cacheLastRequest.columns ) ||
-//                  JSON.stringify( request.search )  !== JSON.stringify( cacheLastRequest.search )
-//        ) {
-//            // properties changed (ordering, columns, searching)
-//            ajax = true;
-//        }
-         
-//        // Store the request for checking next time around
-//        cacheLastRequest = $.extend( true, {}, request );
- 
-//        if ( ajax ) {
-//            // Need data from the server
-//            if ( requestStart < cacheLower ) {
-//                requestStart = requestStart - (requestLength*(conf.pages-1));
- 
-//                if ( requestStart < 0 ) {
-//                    requestStart = 0;
-//                }
-//            }
-             
-//            cacheLower = requestStart;
-//            cacheUpper = requestStart + (requestLength * conf.pages);
- 
-//            request.start = requestStart;
-//            request.length = requestLength*conf.pages;
- 
-//            // Provide the same `data` options as DataTables.
-//            if ( $.isFunction ( conf.data ) ) {
-//                // As a function it is executed with the data object as an arg
-//                // for manipulation. If an object is returned, it is used as the
-//                // data object to submit
-//                var d = conf.data( request );
-//                if ( d ) {
-//                    $.extend( request, d );
-//                }
-//            }
-//            else if ( $.isPlainObject( conf.data ) ) {
-//                // As an object, the data given extends the default
-//                $.extend( request, conf.data );
-//            }
- 
-//            settings.jqXHR = $.ajax( {
-//                'type':     conf.method,
-//                'url':      conf.url,
-//                'data':     request,
-//                'dataType': 'json',
-//                'cache':    false,
-//                'success':  function(json) {
-//                cacheLastJson = $.extend(true, { }, json);
-
-//                if (cacheLower != drawStart)
-//                {
-//                    json.data.splice(0, drawStart - cacheLower);
-//                }
-//                if (requestLength >= -1)
-//                {
-//                    json.data.splice(requestLength, json.data.length);
-//                }
-
-//                drawCallback(json);
-//            }
-//        } );
-//        }
-//        else {
-//            json = $.extend( true, { }, cacheLastJson );
-//            json.draw = request.draw; // Update the echo for each response
-//            json.data.splice( 0, requestStart-cacheLower );
-//            json.data.splice( requestLength, json.data.length );
-
-
-//            drawCallback(json);
-//}
-//    }
-//};
- 
-//// Register an API method that will empty the pipelined data, forcing an Ajax
-//// fetch on the next draw (i.e. `table.clearPipeline().draw()`)
-//$.fn.dataTable.Api.register( 'clearPipeline()', function()
-//{
-//    return this.iterator('table', function(settings) {
-//        settings.clearCache = true;
-//    } );
-//} );
-
-var EbDataTable_@tableId = new EbDataTable(@dataSourceId, @dvId, '@servicestack_url', '@tableId', @tvPref4User);
+//$.post('GetTVPref4User', { dsid: @dataSourceId }, function(data){
+    var EbDataTable_@tableId = new EbDataTable({
+        ds_id: @dataSourceId, 
+        dv_id: @dvId, 
+        ss_url: '@servicestack_url', 
+        tid: '@tableId' 
+        //settings: JSON.parse(data),
+        //fnKeyUpCallback: 
+    });
+//});
 </script>"
 .Replace("@dataSourceId", this.DataSourceId.ToString().Trim())
 .Replace("@tableId", this.Name)
@@ -370,9 +249,9 @@ var EbDataTable_@tableId = new EbDataTable(@dataSourceId, @dvId, '@servicestack_
 .Replace("@collapsBtn", (this.__filterForm != null) ? @"<div id = 'btnCollapse' class='btn btn-default' data-toggle='collapse' data-target='#filterBox' aria-expanded='true' aria-controls='filterBox'>
                     <i class='fa fa-chevron-down' aria-hidden='true'></i>
                 </div>" : string.Empty)
-.Replace("@data.columns", this.ColumnColletion.ToJson())
-.Replace("@dvId", this.Id.ToString())
-.Replace("@tvPref4User", tvPref4User);
+//.Replace("@data.columns", this.ColumnColletion.ToJson())
+.Replace("@dvId", this.Id.ToString());
+//.Replace("@tvPref4User", tvPref4User);
         }
     }
 

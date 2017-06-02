@@ -91,7 +91,7 @@ namespace ExpressBase.Objects
         public override string GetHead()
         {
             return  (((!this.Hidden) ? this.UniqueString + this.RequiredString : string.Empty) + @"".Replace("{0}", this.Name)) + @"
-$('#@idTglBtn').click(function(){
+$('#@idContainer [class=input-group-addon]').click(function(){
     //$('#@idContainer [class=date]').toggle();
         $('#@id').focus();
         $('#@id').trigger('click');
@@ -119,7 +119,7 @@ $('#@id').datetimepicker({
     <span id='@nameLbl' style='@lblBackColor @LblForeColor'>@label</span>
     <div  class='input-group' style='width:1px;'>
         <input id='@name' data-ebtype='@datetype'  data-toggle='tooltip' title='@toolTipText' class='date' type='text'  name='@name'  autocomplete = '@autoComplete' @value @tabIndex style='width:@widthpx; height:@heightpx; @backColor @foreColor display:inline-block; @fontStyle @readOnlyString @required @placeHolder />
-        <i id='@nameTglBtn' class='fa  @atchdLbl input-group-addon' aria-hidden='true'></i>
+        <span class='input-group-addon'> <i id='@nameTglBtn' class='fa  @atchdLbl' aria-hidden='true'></i> </span>
     </div>
     <span class='helpText'> @helpText </span>
 </div>

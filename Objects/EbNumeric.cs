@@ -138,8 +138,6 @@ $('#{0}').keypress(function(e) {
             }
     });
 
-//$('#j').mask('00/00/0000');
-
 $('#{0}').mask('SZZZZZZZZZZZ', {
     //reverse: true,
     translation: {

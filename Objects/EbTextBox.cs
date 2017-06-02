@@ -90,7 +90,7 @@ namespace ExpressBase.Objects
 <div class='Eb-ctrlContainer' style='position:absolute; left:@leftpx; top:@toppx; @hiddenString'>
     <span id='@nameLbl' style='@lblBackColor @LblForeColor'>@label</span>
         <div  class='input-group' style='width: 1px;'>
-            @attachedLbl
+            <span class='input-group-addon'> @attachedLbl </span>
             <input type='@textMode'  id='@name' name='@name' autocomplete = '@autoComplete' data-toggle='tooltip' title='@toolTipText' @tabIndex @maxLength style='width:@widthpx; height:@heightpx; @backColor @foreColor display:inline-block; @fontStyle @readOnlyString @required @placeHolder @text @tabIndex  />
         </div>
     <span class='helpText'> @helpText </span>
@@ -122,7 +122,7 @@ namespace ExpressBase.Objects
                         : string.Empty)
 .Replace("@attachedLbl", (this.TextMode.ToString() != "SingleLine") ?
                                 (
-                                    "<i class='fa fa-$class input-group-addon' aria-hidden='true'" 
+                                    "<i class='fa fa-$class' aria-hidden='true'" 
                                     + ( 
                                         (this.FontSerialized != null) ? 
                                             ("style='font-size:" + this.FontSerialized.SizeInPoints + "px;'")
