@@ -11,4 +11,26 @@ namespace ExpressBase.Objects
         [ProtoBuf.ProtoMember(1)]
         public string Sql { get; set; }
     }
+
+    [ProtoBuf.ProtoContract]
+    public class EbSqlFunction : EbObject
+    {
+        [ProtoBuf.ProtoMember(1)]
+        public string Sql { get; set; }
+    }
+
+    [ProtoBuf.ProtoContract]
+    public class EbJsFunction : EbObject
+    {
+        [ProtoBuf.ProtoMember(1)]
+        public string JsCode { get; set; }
+    }
+
+    [ProtoBuf.ProtoContract]
+    public class EbJsValidator : EbObject
+    {
+        [ProtoBuf.ProtoMember(1)]
+        public string JsCode { get; set; }
+    }
+
 }

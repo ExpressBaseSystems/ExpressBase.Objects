@@ -58,7 +58,16 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ObjectLifeCycleStatus Status { get; set; }
 
         [DataMember(Order = 9)]
+        public string Description { get; set; }
+
+        [DataMember(Order = 10)]
         public string ChangeLog { get; set; }
+
+        [DataMember(Order = 11)]
+        public int VersionNumber { get; set; }
+
+        [DataMember(Order = 12)]
+        public string IsSave { get; set; }
 
         public int UserId { get; set; }
 
