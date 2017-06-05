@@ -197,21 +197,12 @@ white-space: nowrap;
 table.dataTable tbody tr.selected, table.dataTable tbody th.selected, table.dataTable tbody td.selected {
     color: #090808;
 }
-
 </style>
 <div class='tablecontainer' id='@tableId_container'>
     <div>
         <label id='dvName_lbl'></label>
     </div>
     <div>
-        <div class='btn-group' id='@tableId_filterdiv'>
-            <a class='btn btn-default'  id='4filterbtn' name='filterbtn' style='display: none;' data-table='@tableId' data-toggle='tooltip' title='On\/Off Filter'><i class='fa fa-filter' aria-hidden='true'></i></a>
-            <button type='button' class='btn btn-default dropdown-toggle' data-toggle='dropdown' name='filterbtn' style='display: none;'>
-            <span class='caret'></span>  <!-- caret --></button>
-            <ul class='dropdown-menu' role='menu'>
-                <li><a href = '#' id='clearfilterbtn'> Clear Filter</a></li>
-            </ul>
-        </div>
         <button type='button' id='@tableId_btntotalpage' class='btn btn-default' style='display: none;' data-table='@tableId'>&sum;</button>
         <div id='btnGo' class='btn btn-default' >GO</div>
         <div id='@tableId_fileBtns' style='display: inline-block;'>

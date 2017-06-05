@@ -17,6 +17,8 @@ namespace ExpressBase.Objects
         SqlValidators,
         JavascriptFunctions,
         JavascriptValidators,
+        Applications,
+        ApplicationModules
     }
 
     [ProtoBuf.ProtoContract]
