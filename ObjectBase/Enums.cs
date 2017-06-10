@@ -18,7 +18,8 @@ namespace ExpressBase.Objects
         JavascriptFunctions,
         JavascriptValidators,
         Applications,
-        ApplicationModules
+        ApplicationModules,
+        FilterDialog
     }
 
     [ProtoBuf.ProtoContract]

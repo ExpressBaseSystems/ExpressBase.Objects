@@ -199,29 +199,12 @@ table.dataTable tbody tr.selected, table.dataTable tbody th.selected, table.data
 }
 </style>
 <div class='tablecontainer' id='@tableId_container'>
-    <div>
-        <label id='dvName_lbl'></label>
-    </div>
-    <div>
-        <button type='button' id='@tableId_btntotalpage' class='btn btn-default' style='display: none;' data-table='@tableId'>&sum;</button>
-        <div id='btnGo' class='btn btn-default' >GO</div>
-        <div id='@tableId_fileBtns' style='display: inline-block;'>
-            <div id='btnCopy' class='btn btn-default'  name='filebtn' style='display: none;' data-toggle='tooltip' title='Copy to Clipboard' ><i class='fa fa-clipboard' aria-hidden='true'></i></div>
-            <div class='btn-group'>
-                <div id='btnPrint' class='btn btn-default'  name='filebtn' style='display: none;'  data-toggle='tooltip' title='Print' ><i class='fa fa-print' aria-hidden='true'></i></div>
-                    <div class='btn btn-default dropdown-toggle' data-toggle='dropdown' name='filebtn' style='display: none;'>
-                        <span class='caret'></span>  <!-- caret --></div>
-                        <ul class='dropdown-menu' role='menu'>
-                            <li><a href = '#' id='btnprintAll'> Print All</a></li>
-                            <li><a href = '#' id='btnprintSelected'> Print Selected</a></li>
-                        </ul>
-            </div>
-            <div id='btnExcel' class='btn btn-default'  name='filebtn' style='display: none;' data-toggle='tooltip' title='Excel' ><i class='fa fa-file-excel-o' aria-hidden='true'></i></div>
-            <div id='btnPdf' class='btn btn-default'    name='filebtn' style='display: none;'  data-toggle='tooltip' title='Pdf' ><i class='fa fa-file-pdf-o' aria-hidden='true'></i></div>
-            <div id='btnCsv' class='btn btn-default'    name='filebtn' style='display: none;' data-toggle='tooltip' title='Csv' ><i class='fa fa-file-text-o' aria-hidden='true'></i></div>
+    <div id='TableControls'>
+        <div style='display: inline;'>
+           <label id='dvName_lbl'></label>
         </div>
+        <div id='btnGo' class='btn btn-primary' >GO</div>
         @collapsBtn
-        <div id='@tableId_btnSettings' class='btn btn-default' style='display: none;' data-toggle='modal' data-target='#settingsmodal'><i class='fa fa-cog' aria-hidden='true'></i></div>
     </div><br/>
     <div style='width:auto;' id='@tableId_divcont'>
         @filters  
