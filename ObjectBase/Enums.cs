@@ -13,12 +13,13 @@ namespace ExpressBase.Objects
         DataSource,
         Report,
         Table,
-        SqlFunctions,
-        SqlValidators,
-        JavascriptFunctions,
-        JavascriptValidators,
-        Applications,
-        ApplicationModules,
+        SqlFunction,
+        SqlValidator,
+        JavascriptFunction,
+        JavascriptValidator,
+        Application,
+        ApplicationModule,
+        DataVisualization,
         FilterDialog
     }
 
