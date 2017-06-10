@@ -13,13 +13,12 @@ namespace ExpressBase.Objects
         DataSource,
         Report,
         Table,
-        SqlFunction,
-        SqlValidator,
-        JavascriptFunction,
-        JavascriptValidator,
-        Application,
-        ApplicationModule,
-        FilterDialog
+        SqlFunctions,
+        SqlValidators,
+        JavascriptFunctions,
+        JavascriptValidators,
+        Applications,
+        ApplicationModules
     }
 
     [ProtoBuf.ProtoContract]

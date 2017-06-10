@@ -33,11 +33,4 @@ namespace ExpressBase.Objects
         public string JsCode { get; set; }
     }
 
-    [ProtoBuf.ProtoContract]
-    public class EbDataVisualization : EbObject
-    {
-        [ProtoBuf.ProtoMember(1)]
-        public string SettingsJson { get; set; }
-    }
-
 }
