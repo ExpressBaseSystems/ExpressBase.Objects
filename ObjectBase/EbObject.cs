@@ -12,6 +12,10 @@ namespace ExpressBase.Objects
     [ProtoBuf.ProtoInclude(1000, typeof(EbControl))]
     [ProtoBuf.ProtoInclude(1001, typeof(EbDataSource))]
     [ProtoBuf.ProtoInclude(1002, typeof(EbReportDefinition))]
+    [ProtoBuf.ProtoInclude(1003, typeof(EbSqlFunction))]
+    [ProtoBuf.ProtoInclude(1004, typeof(EbJsFunction))]
+    [ProtoBuf.ProtoInclude(1005, typeof(EbJsValidator))]
+    [ProtoBuf.ProtoInclude(1006, typeof(EbDataVisualization))]
 #if NET462
     [System.Serializable]
 #endif
