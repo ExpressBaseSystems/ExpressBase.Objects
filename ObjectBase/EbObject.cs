@@ -16,6 +16,8 @@ namespace ExpressBase.Objects
     [ProtoBuf.ProtoInclude(1004, typeof(EbJsFunction))]
     [ProtoBuf.ProtoInclude(1005, typeof(EbJsValidator))]
     [ProtoBuf.ProtoInclude(1006, typeof(EbDataVisualization))]
+    [ProtoBuf.ProtoInclude(1007, typeof(EbFilterDialog))]
+    
 #if NET462
     [System.Serializable]
 #endif
