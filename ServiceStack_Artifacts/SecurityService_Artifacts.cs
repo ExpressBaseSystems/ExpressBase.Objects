@@ -135,7 +135,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             MyAuthenticateResponse response = null;
            
             
-            if (string.IsNullOrEmpty(request.Meta["cid"]))
+            if (request.Meta["cid"]=="expressbase")
             {
                 string path = Directory.GetParent(System.IO.Directory.GetCurrentDirectory()).FullName;
                 var infraconf = EbSerializers.ProtoBuf_DeSerialize<EbInfraDBConf>(EbFile.Bytea_FromFile(Path.Combine(path, "EbInfra.conn")));
@@ -155,20 +155,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
                 log.Info("#Eb reached 3");
                 var redisClient = (authService as AuthenticateService).Redis;
                 mysession.UserName = _authUser.Uname;
-                mysession.FirstName = _authUser.Fname;
+                //mysession.FirstName = _authUser.Fname;
                 mysession.Uid = _authUser.Id;      
-               if(!string.IsNullOrEmpty(request.Meta["cid"]))
-                {
-                    log.Info("#Eb reached 4");
-                    mysession.CId = request.Meta["cid"];
-                   
-                }
-                else
-                {
-                    log.Info("#Eb reached 5");
-                    mysession.CId= string.Empty;                   
-                }
-              
+                mysession.CId = request.Meta["cid"];
+                
                 response = new MyAuthenticateResponse
                 {                  
                     UserId = _authUser.Id.ToString(),
