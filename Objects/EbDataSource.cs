@@ -40,4 +40,10 @@ namespace ExpressBase.Objects
         public string settingsJson { get; set; }
     }
 
+    public class EbFilterDialog : EbObject
+    {
+        [ProtoBuf.ProtoMember(1)]
+        public string FilterDialogJson { get; set; }
+    }
+
 }
