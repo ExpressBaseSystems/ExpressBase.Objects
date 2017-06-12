@@ -8,8 +8,8 @@
     "NETStandard.Library": "1.6.1",
     "Newtonsoft.Json": "10.0.1",
     "protobuf-net": "2.1.0",
-    "ServiceStack.Core": "1.0.38",
-    "ServiceStack.Redis.Core": "1.0.38",
+    "ServiceStack.Core": "1.0.40",
+    "ServiceStack.Redis.Core": "1.0.40",
     "System.Data.Common": "4.3.0",
     "System.Runtime.WindowsRuntime": "4.3.0"
   },

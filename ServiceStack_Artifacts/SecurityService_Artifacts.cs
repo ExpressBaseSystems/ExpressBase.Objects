@@ -63,19 +63,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public int Uid { get; set; }
 
-        public string AuthProvider
-        {
-             get; set; 
-            //get
-            //{
-            //    throw new NotImplementedException();
-            //}
-
-            //set
-            //{
-            //    throw new NotImplementedException();
-            //}
-        }
+        public string AuthProvider { get; set; }
 
         public CustomUserSession()
         {
@@ -100,10 +88,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public void OnAuthenticated(IServiceBase authService, IAuthSession session, IAuthTokens tokens, Dictionary<string, string> authInfo)
         {
             Dictionary<string, string> dict = authInfo;
-
-           
-
-            // throw new NotImplementedException();
         }
 
         public void OnCreated(IRequest httpReq) { }
@@ -121,8 +105,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     public class MyJwtAuthProvider : JwtAuthProvider
     {
-        User _authUser = null;
-        IAppSettings AppSettings = null;
+        private User _authUser = null;
+        private IAppSettings AppSettings = null;
 
         public MyJwtAuthProvider(IAppSettings settings) : base(settings) { AppSettings = settings; }
 
@@ -131,10 +115,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             ILog log = LogManager.GetLogger(GetType());
             CustomUserSession mysession = session as CustomUserSession;
             EbBaseService bservice = new EbBaseService();
-
             MyAuthenticateResponse response = null;
            
-            
             if (request.Meta["cid"]=="expressbase")
             {
                 string path = Directory.GetParent(System.IO.Directory.GetCurrentDirectory()).FullName;
@@ -148,14 +130,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
                 bservice.ClientID = request.Meta["cid"];
                 _authUser = User.GetDetails(bservice.DatabaseFactory, request.UserName, request.Password);
                 log.Info("#Eb reached 2");
-
             }
+
             if (_authUser != null)
             {
                 log.Info("#Eb reached 3");
                 var redisClient = (authService as AuthenticateService).Redis;
                 mysession.UserName = _authUser.Uname;
-                //mysession.FirstName = _authUser.Fname;
                 mysession.Uid = _authUser.Id;      
                 mysession.CId = request.Meta["cid"];
                 
@@ -165,6 +146,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
                     UserName = _authUser.Uname,
                     ReferrerUrl = string.Empty,
                     BearerToken = base.CreateJwtBearerToken(mysession),
+                    RefreshToken = base.CreateJwtRefreshToken(_authUser.Id.ToString()),
                     User = _authUser ,
                 };
             }
@@ -179,5 +161,4 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             return response;
         }
     }
-   
 }
