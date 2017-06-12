@@ -38,6 +38,9 @@ namespace ExpressBase.Objects
     {
         [ProtoBuf.ProtoMember(1)]
         public string settingsJson { get; set; }
+
+        [ProtoBuf.ProtoMember(2)]
+        public int dsid { get; set; }
     }
 
 }
