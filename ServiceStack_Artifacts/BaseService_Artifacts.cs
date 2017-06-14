@@ -13,6 +13,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     public interface IEbSSResponse
     {
+        string Token { get; set; }
+
         ResponseStatus ResponseStatus { get; set; } //Exception gets serialized here
     }
 }

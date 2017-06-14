@@ -51,10 +51,16 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class InfraResponse
+    public class InfraResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
-        public int id { get; set; }       
+        public int id { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 3)]
+        public ResponseStatus ResponseStatus { get; set; }
     }
 
     [DataContract]
@@ -116,7 +122,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class TokenRequiredUploadResponse : IHasResponseStatus
+    public class TokenRequiredUploadResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
         public int id { get; set; }
@@ -125,9 +131,11 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public Dictionary<string, object> Data { get; set; }
 
         [DataMember(Order = 3)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 4)]
         public ResponseStatus ResponseStatus { get; set; }
 
-      
     }
 
     [DataContract] 
@@ -154,7 +162,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class TokenRequiredSelectResponse
+    public class TokenRequiredSelectResponse: IEbSSResponse
     {
        
         [DataMember(Order = 1)]
@@ -164,8 +172,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public Dictionary<string, object> Data { get; set; }
 
         [DataMember(Order = 3)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 4)]
         public ResponseStatus ResponseStatus { get; set; }
-        
     }
 
     [DataContract]
