@@ -31,7 +31,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     [DataContract]
     [Route("/ebo", "POST")]
-    public class EbObjectWrapper: IEbSSRequest
+    public class EbObjectWrapper: IReturn<EbObjectWrapperResponse>,IEbSSRequest
     {
         [DataMember(Order = 1)]
         public int Id { get; set; }
@@ -80,5 +80,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         //    this.Name = name;
         //    this.Bytea = bytea;
         //}
+    }
+
+    [DataContract]
+    public class EbObjectWrapperResponse
+    {
+        [DataMember(Order = 1)]
+        public int id { get; set; }
     }
 }
