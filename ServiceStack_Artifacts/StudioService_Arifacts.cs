@@ -23,10 +23,16 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     [DataContract]
     [Csv(CsvBehavior.FirstEnumerable)]
-    public class EbObjectResponse
+    public class EbObjectResponse :IEbSSResponse
     {
         [DataMember(Order = 1)]
         public List<EbObjectWrapper> Data { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 3)]
+        public ResponseStatus ResponseStatus { get; set; }
     }
 
     [DataContract]
@@ -83,9 +89,15 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class EbObjectWrapperResponse
+    public class EbObjectWrapperResponse: IEbSSResponse
     {
         [DataMember(Order = 1)]
         public int id { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 3)]
+        public ResponseStatus ResponseStatus { get; set; }
     }
 }

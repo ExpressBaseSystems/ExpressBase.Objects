@@ -64,9 +64,15 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class ViewResponse
+    public class ViewResponse :IEbSSResponse
     {
         [DataMember(Order = 1)]
         public EbForm ebform { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 3)]
+        public ResponseStatus ResponseStatus { get; set; }
     }
 }

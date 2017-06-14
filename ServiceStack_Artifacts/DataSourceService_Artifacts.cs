@@ -61,7 +61,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     [DataContract]
     [Csv(CsvBehavior.FirstEnumerable)]
-    public class DataSourceDataResponse
+    public class DataSourceDataResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
         public int Draw { get; set; }
@@ -74,13 +74,25 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 4)]
         public RowColletion Data { get; set; }
+
+        [DataMember(Order = 5)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 6)]
+        public ResponseStatus ResponseStatus { get; set; }
     }
 
     [DataContract]
     [Csv(CsvBehavior.FirstEnumerable)]
-    public class DataSourceColumnsResponse
+    public class DataSourceColumnsResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
         public ColumnColletion Columns { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 3)]
+        public ResponseStatus ResponseStatus { get; set; }
     }
 }
