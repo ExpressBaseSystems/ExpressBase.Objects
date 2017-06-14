@@ -65,6 +65,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public string AuthProvider { get; set; }
 
+        public string BearerToken { get; set; }
+        public string RefreshToken { get; set; }
+
         public CustomUserSession()
         {
             this.ProviderOAuthAccess = new List<IAuthTokens>();
@@ -139,14 +142,17 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
                 mysession.UserName = _authUser.Uname;
                 mysession.Uid = _authUser.Id;      
                 mysession.CId = request.Meta["cid"];
+                mysession.BearerToken = base.CreateJwtBearerToken(mysession);
+                mysession.RefreshToken = base.CreateJwtRefreshToken(_authUser.Id.ToString());
+                redisClient.As<IUserAuth>().Store(_authUser);
                 
                 response = new MyAuthenticateResponse
                 {                  
                     UserId = _authUser.Id.ToString(),
                     UserName = _authUser.Uname,
                     ReferrerUrl = string.Empty,
-                    BearerToken = base.CreateJwtBearerToken(mysession),
-                    RefreshToken = base.CreateJwtRefreshToken(_authUser.Id.ToString()),
+                    BearerToken = mysession.BearerToken, //base.CreateJwtBearerToken(mysession),
+                    RefreshToken = mysession.RefreshToken, //base.CreateJwtRefreshToken(_authUser.Id.ToString()),
                     User = _authUser ,
                 };
             }
