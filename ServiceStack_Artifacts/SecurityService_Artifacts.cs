@@ -11,6 +11,7 @@ using ExpressBase.Data;
 using ServiceStack.Logging;
 using System.Runtime.Serialization;
 using ExpressBase.Objects.ServiceStack_Artifacts;
+using System.Globalization;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
@@ -21,150 +22,73 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public User User { get; set; }
     }
 
-    public class CustomUserSession : IAuthSession
+    [DataContract]
+    public class CustomUserSession : AuthUserSession
     {
-        public DateTime CreatedAt { get; set; }
-
-        public string DisplayName { get; set; }
-
-        public string Email { get; set; }
-
-        public string FirstName { get; set; }
-
-        public bool FromToken { get; set; }
-
-        public string Id { get; set; }
-
-        public bool IsAuthenticated { get; set; }
-
-        public DateTime LastModified { get; set; }
-
-        public string LastName { get; set; }
-
-        public List<string> Permissions { get; set; }
-
-        public string ProfileUrl { get; set; }
-
-        public List<IAuthTokens> ProviderOAuthAccess { get; set; }
-
-        public string ReferrerUrl { get; set; }
-
-        public List<string> Roles { get; set; }
-
-        public string Sequence { get; set; }
-
-        public string UserAuthId { get; set; }
-
-        public string UserAuthName { get; set; }
-
-        public string UserName { get; set; }
-
+        [DataMember(Order = 1)]
         public string CId { get; set; }
 
+        [DataMember(Order = 2)]
         public int Uid { get; set; }
 
-        public string AuthProvider { get; set; }
-
+        [DataMember(Order = 3)]
         public string BearerToken { get; set; }
+
+        [DataMember(Order = 4)]
         public string RefreshToken { get; set; }
 
-        public CustomUserSession()
-        {
-            this.ProviderOAuthAccess = new List<IAuthTokens>();
-        }
-
-        public bool HasPermission(string permission, IAuthRepository authRepo)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool HasRole(string role, IAuthRepository authRepo)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool IsAuthorized(string provider)
+        public override bool IsAuthorized(string provider)
         {
             return true;
         }
-        
-        public void OnAuthenticated(IServiceBase authService, IAuthSession session, IAuthTokens tokens, Dictionary<string, string> authInfo)
-        {
-            Dictionary<string, string> dict = authInfo;
-        }
-
-        public void OnCreated(IRequest httpReq) { }
-
-        public void OnLogout(IServiceBase authService)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void OnRegistered(IRequest httpReq, IAuthSession session, IServiceBase service)
-        {
-            throw new NotImplementedException();
-        }
     }
 
-    public class MyJwtAuthProvider : JwtAuthProvider
+    public class MyCredentialsAuthProvider: CredentialsAuthProvider
     {
-        private User _authUser = null;
-        private IAppSettings AppSettings = null;
+        public MyCredentialsAuthProvider(IAppSettings settings) : base(settings) { }
 
-        public MyJwtAuthProvider(IAppSettings settings) : base(settings) { AppSettings = settings; }
-
-        public override object Authenticate(IServiceBase authService, IAuthSession session, Authenticate request)
+        public override bool TryAuthenticate(IServiceBase authService, string cidAndUserName, string password)
         {
+            var redisClient = (authService as AuthenticateService).Redis;
+            User _authUser = null;
             ILog log = LogManager.GetLogger(GetType());
-            CustomUserSession mysession = session as CustomUserSession;
+
+            var arrTemp = cidAndUserName.Split('/');
+            var cid = arrTemp[0];
+            var userName = arrTemp[1];
+
             EbBaseService bservice = new EbBaseService();
-            MyAuthenticateResponse response = null;
-           
-            if (request.Meta["cid"]=="expressbase")
+
+            if (cid == "expressbase")
             {
                 string path = Directory.GetParent(System.IO.Directory.GetCurrentDirectory()).FullName;
                 var infraconf = EbSerializers.ProtoBuf_DeSerialize<EbInfraDBConf>(EbFile.Bytea_FromFile(Path.Combine(path, "EbInfra.conn")));
-                var df = new DatabaseFactory(infraconf);   
-                _authUser = InfraUser.GetDetails(df, request.UserName, request.Password);
+                var df = new DatabaseFactory(infraconf);
+                _authUser = InfraUser.GetDetails(df, userName, password);
                 log.Info("#Eb reached 1");
             }
             else
             {
-                bservice.ClientID = request.Meta["cid"];
-                _authUser = User.GetDetails(bservice.DatabaseFactory, request.UserName, request.Password);
+                bservice.ClientID = cid;
+                _authUser = User.GetDetails(bservice.DatabaseFactory, userName, password);
                 log.Info("#Eb reached 2");
             }
 
             if (_authUser != null)
             {
-                log.Info("#Eb reached 3");
-                var redisClient = (authService as AuthenticateService).Redis;
-                mysession.UserName = _authUser.Uname;
-                mysession.Uid = _authUser.Id;      
-                mysession.CId = request.Meta["cid"];
-                mysession.BearerToken = base.CreateJwtBearerToken(mysession);
-                mysession.RefreshToken = base.CreateJwtRefreshToken(_authUser.Id.ToString());
-                redisClient.As<IUserAuth>().Store(_authUser);
-                
-                response = new MyAuthenticateResponse
-                {                  
-                    UserId = _authUser.Id.ToString(),
-                    UserName = _authUser.Uname,
-                    ReferrerUrl = string.Empty,
-                    BearerToken = mysession.BearerToken, //base.CreateJwtBearerToken(mysession),
-                    RefreshToken = mysession.RefreshToken, //base.CreateJwtRefreshToken(_authUser.Id.ToString()),
-                    User = _authUser ,
-                };
-            }
-            else
-            {
-                response = new MyAuthenticateResponse
-                {
-                    ResponseStatus = new ResponseStatus("EbUnauthorized", "Eb Unauthorized Access")
-                };
+                CustomUserSession session = authService.GetSession(false) as CustomUserSession;
+                session.Company = cid;
+                session.UserAuthId = _authUser.Id.ToString();
+                session.UserName = userName;
+                session.IsAuthenticated = true;
             }
 
-            return response;
+            return (_authUser != null);
+        }
+
+        public override object Logout(IServiceBase service, Authenticate request)
+        {
+            return base.Logout(service, request);
         }
     }
 }
