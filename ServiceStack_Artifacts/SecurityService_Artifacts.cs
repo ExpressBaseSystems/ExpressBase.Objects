@@ -32,10 +32,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int Uid { get; set; }
 
         [DataMember(Order = 3)]
-        public string BearerToken { get; set; }
+        public User User { get; set; }
 
-        [DataMember(Order = 4)]
-        public string RefreshToken { get; set; }
+        //[DataMember(Order = 3)]
+        //public string BearerToken { get; set; }
+
+        //[DataMember(Order = 4)]
+        //public string RefreshToken { get; set; }
 
         public override bool IsAuthorized(string provider)
         {
@@ -81,9 +84,31 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
                 session.UserAuthId = _authUser.Id.ToString();
                 session.UserName = userName;
                 session.IsAuthenticated = true;
+                session.User = _authUser;
             }
 
             return (_authUser != null);
+        }
+
+        public override object Authenticate(IServiceBase authService, IAuthSession session, Authenticate request)
+        {
+            AuthenticateResponse authResponse =  base.Authenticate(authService, session, request) as AuthenticateResponse;
+
+            var _customUserSession = authService.GetSession() as CustomUserSession;
+
+            if (!string.IsNullOrEmpty(authResponse.SessionId) && _customUserSession != null)
+            {
+                var x = new MyAuthenticateResponse
+                {
+                    UserId = _customUserSession.UserAuthId,
+                    UserName = _customUserSession.UserName,
+                    User = _customUserSession.User,
+                };
+
+                return x;
+            }
+
+            return authResponse;
         }
 
         public override object Logout(IServiceBase service, Authenticate request)
