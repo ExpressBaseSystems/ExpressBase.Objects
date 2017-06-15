@@ -23,15 +23,21 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     [DataContract]
     [Csv(CsvBehavior.FirstEnumerable)]
-    public class EbObjectResponse
+    public class EbObjectResponse :IEbSSResponse
     {
         [DataMember(Order = 1)]
         public List<EbObjectWrapper> Data { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 3)]
+        public ResponseStatus ResponseStatus { get; set; }
     }
 
     [DataContract]
     [Route("/ebo", "POST")]
-    public class EbObjectWrapper: IEbSSRequest
+    public class EbObjectWrapper: IReturn<EbObjectWrapperResponse>,IEbSSRequest
     {
         [DataMember(Order = 1)]
         public int Id { get; set; }
@@ -80,5 +86,18 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         //    this.Name = name;
         //    this.Bytea = bytea;
         //}
+    }
+
+    [DataContract]
+    public class EbObjectWrapperResponse: IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public int id { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 3)]
+        public ResponseStatus ResponseStatus { get; set; }
     }
 }

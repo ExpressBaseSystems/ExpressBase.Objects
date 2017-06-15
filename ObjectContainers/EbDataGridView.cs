@@ -14,6 +14,9 @@ namespace ExpressBase.Objects
         [ProtoBuf.ProtoMember(9)]
         public int FilterDialogId { get; set; }
 
+        [ProtoBuf.ProtoMember(10)]
+        public int dvId { get; set; }
+
         public string Token { get; set; }
 
         //internal ColumnColletion ColumnColletion { get; set; }
@@ -233,7 +236,7 @@ table.dataTable tbody tr.selected, table.dataTable tbody th.selected, table.data
                     <i class='fa fa-chevron-down' aria-hidden='true'></i>
                 </div>" : string.Empty)
 //.Replace("@data.columns", this.ColumnColletion.ToJson())
-.Replace("@dvId", this.Id.ToString());
+.Replace("@dvId", this.dvId.ToString());
 //.Replace("@tvPref4User", tvPref4User);
         }
     }
