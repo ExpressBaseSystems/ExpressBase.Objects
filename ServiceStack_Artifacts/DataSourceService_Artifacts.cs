@@ -27,6 +27,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         
         public string Token { get; set; }
 
+        public string rToken { get; set; }
+
         public string TenantAccountId { get; set; }
 
         public int UserId { get; set; }
@@ -49,6 +51,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string SelectedColumnName { get; set; }
 
         public string Token { get; set; }
+
+        public string rToken { get; set; }
 
         public string TenantAccountId { get; set; }
 
