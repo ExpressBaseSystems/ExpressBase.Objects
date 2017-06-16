@@ -43,13 +43,14 @@ namespace ExpressBase.Objects
         public int dsid { get; set; }
     }
 
+    [ProtoBuf.ProtoContract]
     public class EbFilterDialog : EbObject
     {
         [ProtoBuf.ProtoMember(1)]
         public string FilterDialogJson { get; set; }
 
         [ProtoBuf.ProtoMember(2)]
-        public string DsId { get; set; }
+        public int DsId { get; set; }
     }
 
 }
