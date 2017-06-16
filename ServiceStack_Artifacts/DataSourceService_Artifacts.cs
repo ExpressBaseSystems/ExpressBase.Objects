@@ -11,51 +11,80 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
     [Route("/ds")]
     [Route("/ds/data/{Id}")]
+    [DataContract]
     public class DataSourceDataRequest : IReturn<DataSourceDataResponse>, IEbSSRequest
     {
+
+        [DataMember(Order = 0)]
         public int Id { get; set; }
 
+        [DataMember(Order = 1)]
         public int Start { get; set; }
 
+        [DataMember(Order = 2)]
         public int Length { get; set; }
 
+        [DataMember(Order = 3)]
         public int Draw { get; set; }
 
+        [DataMember(Order = 4)]
         public int OrderByDir { get; set; }
 
+        [DataMember(Order = 5)]
         public string OrderByCol { get; set; }
-        
+
+        [DataMember(Order = 6)]
         public string Token { get; set; }
 
+        [DataMember(Order = 7)]
+        public string rToken { get; set; }
+
+        [DataMember(Order = 8)]
         public string TenantAccountId { get; set; }
 
+        [DataMember(Order = 9)]
         public int UserId { get; set; }
 
+        [DataMember(Order = 10)]
         public List<Dictionary<string, string>> Params { get; set; }
 
+        [DataMember(Order = 11)]
         public List<Dictionary<string, string>> TFilters { get; set; }
     }
 
     [Route("/ds")]
     [Route("/ds/columns/{Id}")]
+    [DataContract]
     public class DataSourceColumnsRequest : IReturn<DataSourceColumnsResponse>, IEbSSRequest
     {
+        [DataMember(Order = 1)]
         public int Id { get; set; }
 
+        [DataMember(Order = 2)]
         public string SearchText { get; set; }
 
+        [DataMember(Order = 3)]
         public string OrderByDirection { get; set; }
 
+        [DataMember(Order = 4)]
         public string SelectedColumnName { get; set; }
 
+        [DataMember(Order = 5)]
         public string Token { get; set; }
 
+        [DataMember(Order = 6)]
+        public string rToken { get; set; }
+
+        [DataMember(Order = 7)]
         public string TenantAccountId { get; set; }
 
+        [DataMember(Order = 8)]
         public int UserId { get; set; }
 
+        [DataMember(Order = 9)]
         public List<Dictionary<string, string>> Params { get; set; }
 
+        [DataMember(Order = 10)]
         public string CrossDomain { get; set; }
     }
 

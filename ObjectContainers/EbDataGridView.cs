@@ -201,7 +201,7 @@ table.dataTable tbody tr.selected, table.dataTable tbody th.selected, table.data
     color: #090808;
 }
 </style>
-<div class='tablecontainer' id='@tableId_container'>
+<div class='tablecontainer' id='@tableId_container' style='background-color:rgb(260,260,260)'>
     <div id='TableControls'>
         <div style='display: inline;'>
            <label id='dvName_lbl'></label>
