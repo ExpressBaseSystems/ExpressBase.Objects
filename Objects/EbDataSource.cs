@@ -50,7 +50,7 @@ namespace ExpressBase.Objects
         public string FilterDialogJson { get; set; }
 
         [ProtoBuf.ProtoMember(2)]
-        public string DsId { get; set; }
+        public int DsId { get; set; }
     }
 
 }
