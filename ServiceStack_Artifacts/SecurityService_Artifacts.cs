@@ -44,6 +44,66 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         {
             return true;
         }
+
+        private static string CreateGravatarUrl(string email, int size = 64)
+        {
+            var md5 = System.Security.Cryptography.MD5.Create();
+            var md5HadhBytes = md5.ComputeHash(email.ToUtf8Bytes());
+
+            var sb = new System.Text.StringBuilder();
+            for (var i = 0; i < md5HadhBytes.Length; i++)
+                sb.Append(md5HadhBytes[i].ToString("x2"));
+
+            string gravatarUrl = "http://www.gravatar.com/avatar/{0}?d=mm&s={1}".Fmt(sb, size);
+            return gravatarUrl;
+        }
+
+        public override void OnAuthenticated(IServiceBase authService, IAuthSession session, IAuthTokens tokens, Dictionary<string, string> authInfo)
+        {
+            base.OnAuthenticated(authService, session, tokens, authInfo);
+
+            //Populate all matching fields from this session to your own custom User table
+            var user = session.ConvertTo<User>();
+            user.Id = int.Parse(session.UserAuthId);
+            user.Profileimg = !session.Email.IsNullOrEmpty()
+                ? CreateGravatarUrl(session.Email, 64)
+                : null;
+
+            foreach (var authToken in session.ProviderOAuthAccess)
+            {
+                if (authToken.Provider == FacebookAuthProvider.Name)
+                {
+                    user.UserName = authToken.DisplayName;
+                    user.FirstName = authToken.FirstName;
+                    user.LastName = authToken.LastName;
+                    user.Email = authToken.Email;
+                }
+                //else if (authToken.Provider == TwitterAuthProvider.Name)
+                //{
+                //    user.TwitterName = user.DisplayName = authToken.UserName;
+                //}
+                //else if (authToken.Provider == YahooOpenIdOAuthProvider.Name)
+                //{
+                //    user.YahooUserId = authToken.UserId;
+                //    user.YahooFullName = authToken.FullName;
+                //    user.YahooEmail = authToken.Email;
+                //}
+            }
+
+            //var userAuthRepo = authService.TryResolve<IAuthRepository>();
+            //if (AppHost.AppConfig.AdminUserNames.Contains(session.UserAuthName)
+            //    && !session.HasRole(RoleNames.Admin, userAuthRepo))
+            //{
+            //    var userAuth = userAuthRepo.GetUserAuth(session, tokens);
+            //    userAuthRepo.AssignRoles(userAuth, roles: new[] { RoleNames.Admin });
+            //}
+
+            //Resolve the DbFactory from the IOC and persist the user info
+            //using (var db = authService.TryResolve<IDbConnectionFactory>().Open())
+            //{
+            //    db.Save(user);
+            //}
+        }
     }
 
     public class MyCredentialsAuthProvider: CredentialsAuthProvider
