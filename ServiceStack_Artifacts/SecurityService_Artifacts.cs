@@ -34,11 +34,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 3)]
         public User User { get; set; }
 
-        //[DataMember(Order = 3)]
-        //public string BearerToken { get; set; }
-
-        //[DataMember(Order = 4)]
-        //public string RefreshToken { get; set; }
+        [DataMember(Order = 4)]
+        public string WhichConsole { get; set; }
 
         public override bool IsAuthorized(string provider)
         {
@@ -139,6 +136,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
             if (_authUser != null)
             {
+                //string console = 
                 CustomUserSession session = authService.GetSession(false) as CustomUserSession;
                 session.Company = cid;
                 session.UserAuthId = _authUser.Id.ToString();
@@ -155,6 +153,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             AuthenticateResponse authResponse =  base.Authenticate(authService, session, request) as AuthenticateResponse;
 
             var _customUserSession = authService.GetSession() as CustomUserSession;
+            _customUserSession.WhichConsole = request.Meta["wc"];
 
             if (!string.IsNullOrEmpty(authResponse.SessionId) && _customUserSession != null)
             {
