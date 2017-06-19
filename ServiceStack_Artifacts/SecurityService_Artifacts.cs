@@ -74,6 +74,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
                     user.FirstName = authToken.FirstName;
                     user.LastName = authToken.LastName;
                     user.Email = authToken.Email;
+                    //session.bea
                 }
                 //else if (authToken.Provider == TwitterAuthProvider.Name)
                 //{
@@ -136,7 +137,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
             if (_authUser != null)
             {
-                //string console = 
                 CustomUserSession session = authService.GetSession(false) as CustomUserSession;
                 session.Company = cid;
                 session.UserAuthId = _authUser.Id.ToString();
@@ -157,14 +157,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
             if (!string.IsNullOrEmpty(authResponse.SessionId) && _customUserSession != null)
             {
-                var x = new MyAuthenticateResponse
+                return new MyAuthenticateResponse
                 {
                     UserId = _customUserSession.UserAuthId,
                     UserName = _customUserSession.UserName,
                     User = _customUserSession.User,
                 };
-
-                return x;
             }
 
             return authResponse;
