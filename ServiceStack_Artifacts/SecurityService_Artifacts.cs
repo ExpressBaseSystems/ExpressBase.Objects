@@ -117,15 +117,14 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             var arrTemp = cidAndUserName.Split('/');
             var cid = arrTemp[0];
             var userName = arrTemp[1];
+            var socialId = (arrTemp.Length > 2) ? arrTemp[2] : null;
 
             EbBaseService bservice = new EbBaseService();
 
             if (cid == "expressbase")
             {
-                string path = Directory.GetParent(System.IO.Directory.GetCurrentDirectory()).FullName;
-                var infraconf = EbSerializers.ProtoBuf_DeSerialize<EbInfraDBConf>(EbFile.Bytea_FromFile(Path.Combine(path, "EbInfra.conn")));
-                var df = new DatabaseFactory(infraconf);
-                _authUser = InfraUser.GetDetails(df, userName, password);
+                var _InfraDb = authService.TryResolve<DatabaseFactory>().InfraDB as IDatabase;
+                _authUser = (string.IsNullOrEmpty(socialId)) ? User.GetInfraUser(_InfraDb, userName, password) : User.GetInfraUserViaSocial(_InfraDb, userName, socialId);
                 log.Info("#Eb reached 1");
             }
             else
