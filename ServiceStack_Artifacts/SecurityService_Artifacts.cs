@@ -34,11 +34,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 3)]
         public User User { get; set; }
 
-        //[DataMember(Order = 3)]
-        //public string BearerToken { get; set; }
-
-        //[DataMember(Order = 4)]
-        //public string RefreshToken { get; set; }
+        [DataMember(Order = 4)]
+        public string WhichConsole { get; set; }
 
         public override bool IsAuthorized(string provider)
         {
@@ -77,6 +74,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
                     user.FirstName = authToken.FirstName;
                     user.LastName = authToken.LastName;
                     user.Email = authToken.Email;
+                    //session.bea
                 }
                 //else if (authToken.Provider == TwitterAuthProvider.Name)
                 //{
@@ -104,76 +102,83 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             //    db.Save(user);
             //}
         }
-    }
 
-    public class MyCredentialsAuthProvider: CredentialsAuthProvider
-    {
-        public MyCredentialsAuthProvider(IAppSettings settings) : base(settings) { }
-
-        public override bool TryAuthenticate(IServiceBase authService, string cidAndUserName, string password)
+        public class MyCredentialsAuthProvider: CredentialsAuthProvider
         {
-            var redisClient = (authService as AuthenticateService).Redis;
-            User _authUser = null;
-            ILog log = LogManager.GetLogger(GetType());
+            public MyCredentialsAuthProvider(IAppSettings settings) : base(settings) { }
 
-            var arrTemp = cidAndUserName.Split('/');
-            var cid = arrTemp[0];
-            var userName = arrTemp[1];
-
-            EbBaseService bservice = new EbBaseService();
-
-            if (cid == "expressbase")
+            public override bool TryAuthenticate(IServiceBase authService, string UserName, string password)
             {
-                string path = Directory.GetParent(System.IO.Directory.GetCurrentDirectory()).FullName;
-                var infraconf = EbSerializers.ProtoBuf_DeSerialize<EbInfraDBConf>(EbFile.Bytea_FromFile(Path.Combine(path, "EbInfra.conn")));
-                var df = new DatabaseFactory(infraconf);
-                _authUser = InfraUser.GetDetails(df, userName, password);
-                log.Info("#Eb reached 1");
-            }
-            else
-            {
-                bservice.ClientID = cid;
-                _authUser = User.GetDetails(bservice.DatabaseFactory, userName, password);
-                log.Info("#Eb reached 2");
-            }
+                User _authUser = null;
+                ILog log = LogManager.GetLogger(GetType());
+                var request = authService.Request.Dto as Authenticate;
 
-            if (_authUser != null)
-            {
-                CustomUserSession session = authService.GetSession(false) as CustomUserSession;
-                session.Company = cid;
-                session.UserAuthId = _authUser.Id.ToString();
-                session.UserName = userName;
-                session.IsAuthenticated = true;
-                session.User = _authUser;
-            }
 
-            return (_authUser != null);
-        }
+                var cid = request.Meta.ContainsKey("cid") ?  request.Meta["cid"] : string.Empty;
+                var socialId = request.Meta.ContainsKey("socialId") ? request.Meta["socialId"] : string.Empty;                      
 
-        public override object Authenticate(IServiceBase authService, IAuthSession session, Authenticate request)
-        {
-            AuthenticateResponse authResponse =  base.Authenticate(authService, session, request) as AuthenticateResponse;
+                EbBaseService bservice = new EbBaseService();
 
-            var _customUserSession = authService.GetSession() as CustomUserSession;
-
-            if (!string.IsNullOrEmpty(authResponse.SessionId) && _customUserSession != null)
-            {
-                var x = new MyAuthenticateResponse
+                if (request.Meta.ContainsKey("signup_tok"))
                 {
-                    UserId = _customUserSession.UserAuthId,
-                    UserName = _customUserSession.UserName,
-                    User = _customUserSession.User,
-                };
+                    cid = "expressbase";
+                    var _InfraDb = authService.TryResolve<DatabaseFactory>().InfraDB as IDatabase;
+                    _authUser = User.GetInfraVerifiedUser(_InfraDb, UserName, request.Meta["signup_tok"]);
+                }
+                else
+                {
+                    if (cid == "expressbase")
+                    {
+                        var _InfraDb = authService.TryResolve<DatabaseFactory>().InfraDB as IDatabase;
+                        _authUser = (string.IsNullOrEmpty(socialId)) ? User.GetInfraUser(_InfraDb, UserName, password) : User.GetInfraUserViaSocial(_InfraDb, UserName, socialId);
+                        log.Info("#Eb reached 1");
+                    }
+                    else
+                    {
+                        bservice.ClientID = cid;
+                        _authUser = User.GetDetails(bservice.DatabaseFactory, UserName, password);
+                        log.Info("#Eb reached 2");
+                    }
+                }
 
-                return x;
+                if (_authUser != null)
+                {
+                    CustomUserSession session = authService.GetSession(false) as CustomUserSession;
+
+                    session.Company =cid;
+                    session.UserAuthId = _authUser.Id.ToString();
+                    session.UserName = UserName;
+                    session.IsAuthenticated = true;
+                    session.User = _authUser;
+                }
+
+                return (_authUser != null);
             }
 
-            return authResponse;
-        }
+            public override object Authenticate(IServiceBase authService, IAuthSession session, Authenticate request)
+            {
+                AuthenticateResponse authResponse = base.Authenticate(authService, session, request) as AuthenticateResponse;
 
-        public override object Logout(IServiceBase service, Authenticate request)
-        {
-            return base.Logout(service, request);
+                var _customUserSession = authService.GetSession() as CustomUserSession;
+                _customUserSession.WhichConsole = request.Meta.ContainsKey("wc") ? request.Meta["wc"] : string.Empty;
+
+                if (!string.IsNullOrEmpty(authResponse.SessionId) && _customUserSession != null)
+                {
+                    return new MyAuthenticateResponse
+                    {
+                        UserId = _customUserSession.UserAuthId,
+                        UserName = _customUserSession.UserName,
+                        User = _customUserSession.User,
+                    };
+                }
+
+                return authResponse;
+            }
+
+            public override object Logout(IServiceBase service, Authenticate request)
+            {
+                return base.Logout(service, request);
+            }
         }
     }
 }

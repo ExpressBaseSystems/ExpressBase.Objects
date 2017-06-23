@@ -19,6 +19,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string TenantAccountId { get; set; }
 
         public int UserId { get; set; }
+
+        public bool GetAllVer { get; set; }
     }
 
     [DataContract]
@@ -74,6 +76,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 12)]
         public string IsSave { get; set; }
+
+        [DataMember(Order = 13)]
+        public int CommitUid { get; set; }
+
+        [DataMember(Order = 14)]
+        public DateTime CommitTs { get; set; }
 
         public int UserId { get; set; }
 
