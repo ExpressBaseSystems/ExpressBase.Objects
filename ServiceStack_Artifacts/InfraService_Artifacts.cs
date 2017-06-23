@@ -61,6 +61,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 3)]
         public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 4)]
+        public string u_token { get; set; }
     }
 
     [DataContract]
