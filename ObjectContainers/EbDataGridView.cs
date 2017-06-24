@@ -201,17 +201,30 @@ table.dataTable tbody tr.selected, table.dataTable tbody th.selected, table.data
     color: #090808;
 }
 </style>
-<div class='tablecontainer' id='@tableId_container' style='background-color:rgb(260,260,260)'>
-    <div id='TableControls'>
-        <div style='display: inline;'>
-           <label id='dvName_lbl'></label>
-        </div>
-        <div id='btnGo' class='btn btn-primary' >GO</div>
-        @collapsBtn
-    </div><br/>
-    <div style='width:auto;' id='@tableId_divcont'>
-        @filters  
-        <table id='@tableId' class='table table-striped table-bordered'></table>
+<div class='tablecontainer' id='@tableId_1container' style='background-color:rgb(260,260,260)'>
+   
+        
+    
+         <ul class='nav nav-tabs' id='table_tabs'>
+                <li class='nav-item active'>
+                    <a class='nav-link' href='#@tableId_tab_1' data-toggle='tab'>General</a>
+                </li>
+         </ul>
+         <div class='tab-content' id='table_tabcontent'>
+             <div id='@tableId_tab_1' class='tab-pane active'>
+                 <div id='TableControls_@tableId_1'>
+                    <div style='display: inline;'>
+                        <label id='dvName_lbl@tableId_1'></label>
+                    </div>
+                    <div id='btnGo' class='btn btn-primary' >GO</div>
+                    @collapsBtn
+                    <br/>
+                </div>
+                @filters  
+                <div style='width:auto;' id='@tableId_1divcont'>
+                    <table id='@tableId_1' class='table table-striped table-bordered'></table>
+                </div>
+             </div>
     </div>
 </div>
 <script>
@@ -220,7 +233,7 @@ table.dataTable tbody tr.selected, table.dataTable tbody th.selected, table.data
         ds_id: @dataSourceId, 
         dv_id: @dvId, 
         ss_url: '@servicestack_url', 
-        tid: '@tableId' 
+        tid: '@tableId_1' 
         //settings: JSON.parse(data),
         //fnKeyUpCallback: 
     });

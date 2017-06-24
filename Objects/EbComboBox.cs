@@ -124,7 +124,7 @@ var @nameEbCombo = new EbSelect('@name', '@DSid', @DDHeight, '@vmName', '', @Max
         Vue.config.devtools = true;
     </script>
                
-   <div id='@nameContainer' style='position:absolute; width:@widthpx; left:@leftpx;  top:@toppx;'>
+   <div id='@nameContainer'  role='form' data-toggle='validator' style='position:absolute; width:@widthpx; left:@leftpx;  top:@toppx;'>
         <input type='hidden' name='@nameHidden4val' data-ebtype='16' id='@name'/>
         <div style='display:inline-block;' id='@nameLbl'>@label</div>
         @VueSelectCode
