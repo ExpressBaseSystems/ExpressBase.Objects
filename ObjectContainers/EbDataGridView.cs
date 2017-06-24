@@ -17,6 +17,9 @@ namespace ExpressBase.Objects
         [ProtoBuf.ProtoMember(10)]
         public int dvId { get; set; }
 
+        [ProtoBuf.ProtoMember(11)]
+        public string dvname { get; set; }
+
         public string Token { get; set; }
 
         //internal ColumnColletion ColumnColletion { get; set; }
@@ -204,28 +207,24 @@ table.dataTable tbody tr.selected, table.dataTable tbody th.selected, table.data
 <div class='tablecontainer' id='@tableId_1container' style='background-color:rgb(260,260,260)'>
    
         
-    
+        <label><i class='fa fa-table' aria-hidden='true'></i> &nbsp;&nbsp; @dvname </label>
          <ul class='nav nav-tabs' id='table_tabs'>
                 <li class='nav-item active'>
-                    <a class='nav-link' href='#@tableId_tab_1' data-toggle='tab'>General</a>
+                    <a class='nav-link' href='#@tableId_tab_1' data-toggle='tab'><i class='fa fa-home' aria-hidden='true'></i></a>
                 </li>
          </ul>
          <div class='tab-content' id='table_tabcontent'>
              <div id='@tableId_tab_1' class='tab-pane active'>
-                 <div id='TableControls_@tableId_1'>
-                    <div style='display: inline;'>
-                        <label id='dvName_lbl@tableId_1'></label>
-                    </div>
+                 <div id='TableControls_@tableId_1' class = 'well well-sm'>
                     <div id='btnGo' class='btn btn-primary' >GO</div>
                     @collapsBtn
-                    <br/>
                 </div>
                 @filters  
                 <div style='width:auto;' id='@tableId_1divcont'>
                     <table id='@tableId_1' class='table table-striped table-bordered'></table>
                 </div>
              </div>
-    </div>
+        </div>
 </div>
 <script>
 //$.post('GetTVPref4User', { dsid: @dataSourceId }, function(data){
@@ -241,6 +240,7 @@ table.dataTable tbody tr.selected, table.dataTable tbody th.selected, table.data
 </script>"
 .Replace("@dataSourceId", this.DataSourceId.ToString().Trim())
 .Replace("@tableId", this.Name)
+.Replace("@dvname", this.dvname)
 //.Replace("@tableViewName", ((string.IsNullOrEmpty(this.Label)) ? "&lt;ReportLabel Undefined&gt;" : this.Label))
 .Replace("@servicestack_url", "https://expressbaseservicestack.azurewebsites.net")
 .Replace("@filters", this.filters)
