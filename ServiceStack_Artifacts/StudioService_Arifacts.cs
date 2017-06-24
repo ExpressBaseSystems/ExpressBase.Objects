@@ -21,6 +21,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int UserId { get; set; }
 
         public bool GetAllVer { get; set; }
+
+        public bool GetParticularVer { get; set; }
     }
 
     [DataContract]
@@ -78,7 +80,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string IsSave { get; set; }
 
         [DataMember(Order = 13)]
-        public int CommitUid { get; set; }
+        public string CommitUname { get; set; }
 
         [DataMember(Order = 14)]
         public DateTime CommitTs { get; set; }
