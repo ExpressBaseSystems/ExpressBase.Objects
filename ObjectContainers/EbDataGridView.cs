@@ -174,7 +174,9 @@ td.resizer {
 
 .dataTables_scrollHead {padding-bottom: 250px; margin-bottom: -250px;}
 .dataTables_scrollFoot{padding-bottom: 250px; margin-bottom: -250px;}
-
+.dataTables_processing {margin-top: 30%!important;
+    z-index: 1!important;
+}
 .DTFC_LeftHeadWrapper{z-index: 150;}
 .DTFC_LeftBodyWrapper{z-index: 100;}
 .DTFC_LeftFootWrapper{z-index: 150;}
@@ -210,9 +212,9 @@ table.dataTable tbody tr.selected, table.dataTable tbody th.selected, table.data
         <label><i class='fa fa-table' aria-hidden='true'></i> &nbsp;&nbsp; @dvname </label>
          <ul class='nav nav-tabs' id='table_tabs'>
                 <li class='nav-item active'>
-                    <a class='nav-link' href='#@tableId_tab_1' data-toggle='tab'><i class='fa fa-home' aria-hidden='true'></i></a>
+                    <a class='nav-link' href='#@tableId_tab_1' data-toggle='tab'><i class='fa fa-home' aria-hidden='true'></i>&nbsp; Home</a>
                 </li>
-         </ul>
+         </ul></br>
          <div class='tab-content' id='table_tabcontent'>
              <div id='@tableId_tab_1' class='tab-pane active'>
                  <div id='TableControls_@tableId_1' class = 'well well-sm'>
