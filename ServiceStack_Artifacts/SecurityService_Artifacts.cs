@@ -143,13 +143,21 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
                 if (_authUser != null)
                 {
+
                     CustomUserSession session = authService.GetSession(false) as CustomUserSession;
 
                     session.Company =cid;
                     session.UserAuthId = _authUser.Id.ToString();
-                    session.UserName = UserName;
+                    session.Email = UserName;
                     session.IsAuthenticated = true;
                     session.User = _authUser;
+
+                    var authRepo = HostContext.AppHost.GetAuthRepository(authService.Request);
+                    var existingUser = authRepo.GetUserAuth(_authUser.Id.ToString());
+                    if (existingUser == null)
+                        authRepo.CreateUserAuth(_authUser, password);
+                    else
+                        authRepo.UpdateUserAuth(existingUser, _authUser, password);
                 }
 
                 return (_authUser != null);
