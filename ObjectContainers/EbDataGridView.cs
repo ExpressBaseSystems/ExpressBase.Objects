@@ -138,78 +138,15 @@ namespace ExpressBase.Objects
 
             //@tableViewName
             return @"
-<style>
-.tablecontainer {
-    width:100%;
-    height:auto;
-    display:inline-block;
-    padding:1px;
-}
-.loadingdiv {
-    vertical-align:middle;
-    margin: 5% 50%;
-    display: none;
-}
-.numericcol{
-    float:right;
-}
-.toolbar {
-    float:left;
-}
-
-#@tableId th.resizing {
-    cursor: e-resize;
-}
-
-td.resizer {
-  position: absolute;
-  top: 0;
-  right: -8px;
-  bottom: 0;
-  left: auto;
-  width: 16px;    
-  cursor: e-resize;   
-    background-color:red;    
-}
-
-.dataTables_scrollHead {padding-bottom: 250px; margin-bottom: -250px;}
-.dataTables_scrollFoot{padding-bottom: 250px; margin-bottom: -250px;}
-.dataTables_processing {margin-top: 30%!important;
-    z-index: 1!important;
-}
-.DTFC_LeftHeadWrapper{z-index: 150;}
-.DTFC_LeftBodyWrapper{z-index: 100;}
-.DTFC_LeftFootWrapper{z-index: 150;}
-.DTFC_RightHeadWrapper{z-index: 150;}
-.DTFC_RightBodyWrapper{z-index: 100;}
-.DTFC_RightFootWrapper{z-index: 150;}
-.linepadding{
-padding:0px!important;
-}
-
-.dt-center {text-align: center;}
-.dt-buttons {visibility:hidden;}
-th { font-size: 14px; }
-td { font-size: 12px; }
-.progress {
-    margin-bottom: 0px !important;
-}
-.hideme {
-  display:none;
-}
- 
-.tdheight{
-height:15px; 
-white-space: nowrap;
-}
-table.dataTable tbody tr.selected, table.dataTable tbody th.selected, table.dataTable tbody td.selected {
-    color: #090808;
-}
-</style>
 <div class='tablecontainer' id='@tableId_1container' style='background-color:rgb(260,260,260)'>
    
         
-        <label><i class='fa fa-table' aria-hidden='true'></i> &nbsp;&nbsp; @dvname </label>
+        <label> <span class='icon-stack fa-3x'>
+                    <i class='fa fa-area-chart icon-stack-3x'></i>
+                    <i class='fa fa-table icon-stack-2x'></i>
+                </span> &nbsp;&nbsp; 
+                @dvname
+        </label>
          <ul class='nav nav-tabs' id='table_tabs'>
                 <li class='nav-item active'>
                     <a class='nav-link' href='#@tableId_tab_1' data-toggle='tab'><i class='fa fa-home' aria-hidden='true'></i>&nbsp; Home</a>
