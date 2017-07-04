@@ -180,6 +180,8 @@ namespace ExpressBase.Objects
                 </div>
              </div>
         </div>
+
+<div id='divgraph' style='width:100%;height:500px;'></div>
 </div>
 <script>
 //$.post('GetTVPref4User', { dsid: @dataSourceId }, function(data){
