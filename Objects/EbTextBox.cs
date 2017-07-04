@@ -56,6 +56,14 @@ namespace ExpressBase.Objects
         [System.ComponentModel.Category("Behavior")]
         public string MinDateExpression { get; set; }
 
+        //[ProtoBuf.ProtoMember(9)]
+        //[Description("Identity")]
+        //public override string Name { get; set; }
+
+        //[ProtoBuf.ProtoMember(10)]
+        //[Description("Identity")]
+        //public override string Label { get; set; }
+
         public EbTextBox() { }
 
         public EbTextBox(object parent)
@@ -87,18 +95,18 @@ namespace ExpressBase.Objects
         public override string GetHtml()
         {
             return @"
-<div class='Eb-ctrlContainer' style='position:absolute; left:@leftpx; top:@toppx; @hiddenString'>
-    <span id='@nameLbl' style='@lblBackColor @LblForeColor'>@label</span>
-        <div  class='input-group' style='width: 1px;'>
-            <span class='input-group-addon'> @attachedLbl </span>
-            <input type='@textMode'  id='@name' name='@name' autocomplete = '@autoComplete' data-toggle='tooltip' title='@toolTipText' @tabIndex @maxLength style='width:@widthpx; height:@heightpx; @backColor @foreColor display:inline-block; @fontStyle @readOnlyString @required @placeHolder @text @tabIndex  />
+<div class='Eb-ctrlContainer' style='@hiddenString'>
+    <span id='@nameLbl' style='@lblBackColor @LblForeColor'> @label </span>
+        <div  class='input-group' style='width: 100%;'>
+            <span class='input-group-addon'><i class='fa fa-envelope' aria-hidden='true' class='input-group-addon'></i> @attachedLbl </span>
+            <input type='@textMode'  id='@name' name='@name' autocomplete = '@autoComplete' data-toggle='tooltip' title='@toolTipText' @tabIndex @maxLength style='width:@width; height:@heightpx; @backColor @foreColor display:inline-block; @fontStyle @readOnlyString @required @placeHolder @text @tabIndex  />
         </div>
     <span class='helpText'> @helpText </span>
 </div>"
 .Replace("@name", this.Name)
 .Replace("@left", this.Left.ToString())
 .Replace("@top", this.Top.ToString())
-.Replace("@width", this.Width.ToString())
+.Replace("@width", "100%")
 .Replace("@height", (this.TextMode.ToString().ToLower() == "color" && this.Height < 24) ? (this.FontSerialized.SizeInPoints + 14).ToString() : this.Height.ToString())
 .Replace("@label", this.Label)
 .Replace("@maxLength", (this.MaxLength > 0) ? string.Format("maxlength='{0}'", this.MaxLength) : string.Empty)

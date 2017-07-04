@@ -2,6 +2,7 @@
 using ExpressBase.Objects.ServiceStack_Artifacts;
 using ServiceStack;
 using ServiceStack.Redis;
+using System.Collections.Generic;
 
 namespace ExpressBase.Objects
 {
@@ -33,39 +34,54 @@ namespace ExpressBase.Objects
         
         private int FilterBH = 0;
 
-        private EbForm __filterForm;
+        private EbForm __filterForm;   
 
-        public void SetFilterForm(EbForm filterForm)
+        public void SetFilterForm(EbFilterDialog filterForm)    
         {
-            this.__filterForm = filterForm;
-        }
-
-        private string filters
-        {
-            get
+            var ControlColl = filterForm.FilterDialogJson.FromJson<List<EbTextBox>>();
+            string rs = "";
+            if (filterForm != null)
             {
-                string rs = "";
-                int max=0;
-                if(this.__filterForm != null)
+                rs = @"<div class='collapse collapse in' style='margin-top:10px;' id='filterBox'>
+                                <div class='well well-sm'>";
+                foreach (EbControl c in ControlColl)
                 {
-                    rs = @"<div class='collapse collapse in' style='margin-top:10px;' id='filterBox'>
-                                <div class='well well-sm' style='position:relative; height:@FilterBHpx; padding-top:40px;padding-bottom:40px;'>";
-                    foreach (EbControl c in this.__filterForm.Controls)
-                    {
-                        if (c.Top >= max)
-                        {
-                            max = (c.Top + c.Height);
-                        }
-                        c.Top += 10;
-                        rs += c.GetHtml();
-                    }
-                    this.FilterBH += max;
-                    rs += @"</div></div>";
+                    rs += c.GetHtml();
                 }
-                
-                return rs;
+                rs += @"</div></div>";
             }
+            this.filters = rs;
+
+
         }
+
+        private string filters;
+    //    {
+    //        get
+    //        {
+    //            string rs = "";
+    //    int max = 0;
+    //            if(this.__filterForm != null)
+    //            {
+    //                rs = @"<div class='collapse collapse in' style='margin-top:10px;' id='filterBox'>
+    //                            <div class='well well-sm' style='position:relative; height:@FilterBHpx; padding-top:40px;padding-bottom:40px;'>";
+    //                foreach (EbControl c in this.__filterForm.Controls)
+    //                {
+    //                    if (c.Top >= max)
+    //                    {
+    //                        max = (c.Top + c.Height);
+    //                    }
+    //c.Top += 10;
+    //                    rs += c.GetHtml();
+    //                }
+    //                this.FilterBH += max;
+    //                rs += @"</div></div>";
+    //            }
+                
+    //            return rs;
+    //        } 
+            
+    //    }
 
         public override void Init4Redis(IRedisClient redisclient, IServiceClient serviceclient)
         {
