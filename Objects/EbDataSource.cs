@@ -10,6 +10,9 @@ namespace ExpressBase.Objects
     {
         [ProtoBuf.ProtoMember(1)]
         public string Sql { get; set; }
+
+        [ProtoBuf.ProtoMember(2)]
+        public int FilterDialogId { get; set; }
     }
 
     [ProtoBuf.ProtoContract]
@@ -47,10 +50,7 @@ namespace ExpressBase.Objects
     public class EbFilterDialog : EbObject
     {
         [ProtoBuf.ProtoMember(1)]
-        public string FilterDialogJson { get; set; }
-
-        [ProtoBuf.ProtoMember(2)]
-        public int DsId { get; set; }
+        public string FilterDialogJson { get; set; }        
     }
 
 }
