@@ -41,7 +41,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     [DataContract]
     [Route("/ebo", "POST")]
-    public class EbObjectSaveOrCommitRequest : IReturn<EbObjectWrapperResponse>, IEbSSRequest
+    public class EbObjectSaveOrCommitRequest : IReturn<EbObjectSaveOrCommitResponse>, IEbSSRequest
     {
         public bool IsSave { get; set; } // If (IsSave == true) Save else Commit
 
