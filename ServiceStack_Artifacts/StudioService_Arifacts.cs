@@ -12,17 +12,17 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     [Route("/ebo/{Id}")]
     public class EbObjectRequest : IReturn<EbObjectResponse>, IEbSSRequest
     {
-        public int Id { get; set; }
+        public int Id { get; set; } // (Id > 0) Fetch all version without bytea / Fetch latest version with bytea 
+
+        public int VersionId { get; set; } // (VersionId > 0 and VersionId != Int32.MaxValue) Fetch particular version with Bytea
+
+        public EbObjectType EbObjectType { get; set; } // Get All latest of this Object Type without Bytea
 
         public string Token { get; set; }
 
         public string TenantAccountId { get; set; }
 
         public int UserId { get; set; }
-
-        public bool GetAllVer { get; set; }
-
-        public bool GetParticularVer { get; set; }
     }
 
     [DataContract]
