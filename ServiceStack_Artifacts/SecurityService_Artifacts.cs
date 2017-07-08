@@ -145,7 +145,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
                 {
 
                     CustomUserSession session = authService.GetSession(false) as CustomUserSession;
-
+                    var redisClient = bservice.Redis;
                     session.Company =cid;
                     session.UserAuthId = _authUser.Id.ToString();
                     session.Email = UserName;
@@ -154,10 +154,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
                     var authRepo = HostContext.AppHost.GetAuthRepository(authService.Request);
                     var existingUser = authRepo.GetUserAuth(_authUser.Id.ToString());
-                    if (existingUser == null)
-                        authRepo.CreateUserAuth(_authUser, password);
-                    else
-                        authRepo.UpdateUserAuth(existingUser, _authUser, password);
+                    if (existingUser != null)
+                        redisClient.Set<IUserAuth>(string.Format("{0}_{1}", _authUser.Email, cid), _authUser);
+                   
                 }
 
                 return (_authUser != null);
