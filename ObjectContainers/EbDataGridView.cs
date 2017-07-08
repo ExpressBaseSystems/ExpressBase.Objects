@@ -180,8 +180,10 @@ namespace ExpressBase.Objects
                 </div>
              </div>
         </div>
-
-<div id='divgraph' style='width:100%;height:500px;'></div>
+    <div id='graphcontainer' style='border:1px solid; padding-top:5px'>
+        <div style='height: 36px; border: 1px solid;'></div>
+          <canvas id='myChart' width='auto' height='auto'></canvas>
+    </div>
 </div>
 <script>
 //$.post('GetTVPref4User', { dsid: @dataSourceId }, function(data){
