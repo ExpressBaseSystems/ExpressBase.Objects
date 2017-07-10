@@ -16,7 +16,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public int VersionId { get; set; } // (VersionId > 0 and VersionId != Int32.MaxValue) Fetch particular version with Bytea
 
-        public EbObjectType EbObjectType { get; set; } // Get All latest of this Object Type without Bytea
+        public int EbObjectType { get; set; } // Get All latest of this Object Type without Bytea
 
         public string Token { get; set; }
 
