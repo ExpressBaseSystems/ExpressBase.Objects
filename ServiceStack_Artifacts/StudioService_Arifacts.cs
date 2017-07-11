@@ -38,31 +38,30 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 3)]
         public ResponseStatus ResponseStatus { get; set; }
     }
-
-    [DataContract]
+  
     [Route("/ebo", "POST")]
     public class EbObjectSaveOrCommitRequest : IReturn<EbObjectSaveOrCommitResponse>, IEbSSRequest
-    {
+    {      
         public bool IsSave { get; set; } // If (IsSave == true) Save else Commit
-
+        
         public int Id { get; set; } // (Id == 0) First Commit else Subsequent Commit
-
-        public EbObjectType EbObjectType { get; set; }
-
+      
+        public int EbObjectType { get; set; }
+       
         public string Name { get; set; }
-
+        
         public string Description { get; set; }
-
+     
         public byte[] Bytea { get; set; }
-
+       
         public ObjectLifeCycleStatus Status { get; set; }
-
+      
         public string ChangeLog { get; set; }
-
+       
         public string Token { get; set; }
-
+      
         public string TenantAccountId { get; set; }
-
+       
         public int UserId { get; set; }
     }
 
