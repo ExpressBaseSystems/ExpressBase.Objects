@@ -156,11 +156,11 @@ $('#{0}').mask('SZZZZZZZZZZZ', {
         public override string GetHtml()
         {
             return (@"
-<div class='Eb-ctrlContainer' style='position:absolute; min-height: 12px; left:@leftpx; top:@toppx; @hiddenString'>
+<div class='Eb-ctrlContainer' style='@hiddenString'>
     <span id='@nameLbl' style='@lblBackColor @LblForeColor'>@label</span>
             <div  class='input-group'>
                  <span style='font-size: @fontSize' class='input-group-addon'>$</span>   
-                 <input type='text'  class='numinput' name='@name' value='@value' @placeHolder autocomplete = '@autoComplete' data-toggle='tooltip' title='@toolTipText' id='@name' style='width:@widthpx; height:@heightpx; @backColor @foreColor @fontStyle display:inline-block;@readOnlyString @required @tabIndex />
+                 <input type='text'  class='numinput' name='@name' value='@value' @placeHolder autocomplete = '@autoComplete' data-toggle='tooltip' title='@toolTipText' id='@name' style='width:100%; height:@heightpx; @backColor @foreColor @fontStyle display:inline-block;@readOnlyString @required @tabIndex />
             </div>
     <span class='helpText'> @helpText </span>
 </div>"

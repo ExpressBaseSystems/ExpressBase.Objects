@@ -1,4 +1,6 @@
-﻿using ServiceStack;
+﻿using ExpressBase.Objects.ObjectBase;
+using Newtonsoft.Json;
+using ServiceStack;
 using ServiceStack.Redis;
 using System;
 using System.Collections.Generic;
@@ -18,6 +20,12 @@ namespace ExpressBase.Objects
     [ProtoBuf.ProtoInclude(2006, typeof(EbDate))]
     [ProtoBuf.ProtoInclude(2007, typeof(EbComboBox))]
     [ProtoBuf.ProtoInclude(2008, typeof(EbRadioGroup))]
+
+    [JsonConverter(typeof(JsonSubtypes), "SubTypeType")]
+    [JsonSubtypes.KnownSubType(typeof(EbNumeric), SubType.WithDecimalPlaces)]
+    [JsonSubtypes.KnownSubType(typeof(EbTextBox), SubType.WithTextTransform)]
+    [JsonSubtypes.KnownSubType(typeof(EbDate), SubType.WithEbDateType)]
+
 #if NET462
     [System.Serializable]
 #endif
@@ -352,5 +360,12 @@ else
     public class EbValidatorCollection : List<EbValidator>
     {
 
+    }
+
+    public enum SubType
+    {
+        WithDecimalPlaces,
+        WithTextTransform,
+        WithEbDateType
     }
 }
