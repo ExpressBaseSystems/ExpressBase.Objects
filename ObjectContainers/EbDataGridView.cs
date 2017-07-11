@@ -56,32 +56,32 @@ namespace ExpressBase.Objects
         }
 
         private string filters;
-    //    {
-    //        get
-    //        {
-    //            string rs = "";
-    //    int max = 0;
-    //            if(this.__filterForm != null)
-    //            {
-    //                rs = @"<div class='collapse collapse in' style='margin-top:10px;' id='filterBox'>
-    //                            <div class='well well-sm' style='position:relative; height:@FilterBHpx; padding-top:40px;padding-bottom:40px;'>";
-    //                foreach (EbControl c in this.__filterForm.Controls)
-    //                {
-    //                    if (c.Top >= max)
-    //                    {
-    //                        max = (c.Top + c.Height);
-    //                    }
-    //c.Top += 10;
-    //                    rs += c.GetHtml();
-    //                }
-    //                this.FilterBH += max;
-    //                rs += @"</div></div>";
-    //            }
-                
-    //            return rs;
-    //        } 
-            
-    //    }
+       // {
+            //get
+            //{
+            //    string rs = "";
+            //    int max = 0;
+            //    if (this.__filterForm != null)
+            //    {
+            //        rs = @"<div class='collapse collapse in' style='margin-top:10px;' id='filterBox'>
+            //                    <div class='well well-sm' style='position:relative; height:@FilterBHpx; padding-top:40px;padding-bottom:40px;'>";
+            //        foreach (EbControl c in this.__filterForm.Controls)
+            //        {
+            //            if (c.Top >= max)
+            //            {
+            //                max = (c.Top + c.Height);
+            //            }
+            //            c.Top += 10;
+            //            rs += c.GetHtml();
+            //        }
+            //        this.FilterBH += max;
+            //        rs += @"</div></div>";
+            //    }
+
+            //    return rs;
+            //}
+
+       // }
 
         public override void Init4Redis(IRedisClient redisclient, IServiceClient serviceclient)
         {
@@ -157,10 +157,7 @@ namespace ExpressBase.Objects
 <div class='tablecontainer' id='@tableId_1container' style='background-color:rgb(260,260,260)'>
    
         
-        <label> <span class='icon-stack fa-3x'>
-                    <i class='fa fa-area-chart icon-stack-3x'></i>
-                    <i class='fa fa-table icon-stack-2x'></i>
-                </span> &nbsp;&nbsp; 
+        <label>
                 @dvname
         </label>
          <ul class='nav nav-tabs' id='table_tabs'>
@@ -180,9 +177,35 @@ namespace ExpressBase.Objects
                 </div>
              </div>
         </div>
-    <div id='graphcontainer' style='border:1px solid; padding-top:5px'>
-        <div style='height: 36px; border: 1px solid;'></div>
-          <canvas id='myChart' width='auto' height='auto'></canvas>
+    <div id='graphcontainer' style='border:1px solid;display: none;'>
+        <div style='height: 38px; border: 1px solid;'>
+             <div class='dropdown' id='graphDropdown' style='display: inline-block;padding-top: 1px;'>
+                     <button class='btn btn-primary dropdown-toggle' type='button' data-toggle='dropdown'>
+                   <span class='caret'></span></button>
+                  <ul class='dropdown-menu'>
+                        <li><a href='#'>Line</a></li>
+                        <li><a href = '#'> Bar </a ></li>
+                        <li><a href = '#'> AreaFilled </a></li>
+                        <li><a href = '#'> pie </a></li>
+                        <li><a href = '#'> doughnut </a></li>
+                        </ul>
+              </div>
+              <button id='reset_zoom' class='btn btn-primary'>Reset zoom</button>
+              <div id = 'btnColumnCollapse' class='btn btn-default'>
+                    <i class='fa fa-chevron-down' aria-hidden='true'></i>
+              </div>
+        </div>
+        <div id = 'columns4Drag' style='display:none;'>
+            <div style='display: inline-block;'>
+                <ul class='list-group'  style='height: 300px; overflow-x: scroll;'>
+                </ul>  
+            </div>
+            <div style='display: inline-block;vertical-align: top;width: 859px;'>
+                <b>Columns (X-Axis) </b><div style='padding: 4px;border:solid 1px grey;height:33px' id ='X_col_name'></div>
+                <b>Rows (Y-Axis)</b><div style='padding: 4px;border:solid 1px grey;height:33px' id ='Y_col_name'></div>
+            </div>
+        </div>
+        <canvas id='myChart' width='auto' height='auto'></canvas>
     </div>
 </div>
 <script>
