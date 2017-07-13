@@ -1,4 +1,5 @@
-﻿using ServiceStack;
+﻿using ExpressBase.Objects.Objects;
+using ServiceStack;
 using ServiceStack.Redis;
 using System;
 using System.Collections.Generic;
@@ -9,6 +10,7 @@ using System.Threading.Tasks;
 namespace ExpressBase.Objects
 {
     [ProtoBuf.ProtoContract]
+   
     [ProtoBuf.ProtoInclude(1000, typeof(EbControl))]
     [ProtoBuf.ProtoInclude(1001, typeof(EbDataSource))]
     [ProtoBuf.ProtoInclude(1002, typeof(EbReportDefinition))]
@@ -17,7 +19,9 @@ namespace ExpressBase.Objects
     [ProtoBuf.ProtoInclude(1005, typeof(EbJsValidator))]
     [ProtoBuf.ProtoInclude(1006, typeof(EbDataVisualization))]
     [ProtoBuf.ProtoInclude(1007, typeof(EbFilterDialog))]
-    
+    [ProtoBuf.ProtoInclude(1008, typeof(EbApplication))]
+    [ProtoBuf.ProtoInclude(1009, typeof(EbApplicationModules))]
+
 #if NET462
     [System.Serializable]
 #endif

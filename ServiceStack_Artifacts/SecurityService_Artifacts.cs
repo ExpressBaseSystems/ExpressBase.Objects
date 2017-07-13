@@ -58,7 +58,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public override void OnAuthenticated(IServiceBase authService, IAuthSession session, IAuthTokens tokens, Dictionary<string, string> authInfo)
         {
             base.OnAuthenticated(authService, session, tokens, authInfo);
+            ILog log = LogManager.GetLogger(GetType());
 
+            log.Info("In OnAuthenticated method");
             //Populate all matching fields from this session to your own custom User table
             var user = session.ConvertTo<User>();
             user.Id = int.Parse(session.UserAuthId);
@@ -109,8 +111,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
             public override bool TryAuthenticate(IServiceBase authService, string UserName, string password)
             {
-                User _authUser = null;
                 ILog log = LogManager.GetLogger(GetType());
+
+                log.Info("In TryAuthenticate method");
+
+                User _authUser = null;
+               
                 var request = authService.Request.Dto as Authenticate;
 
 
@@ -129,12 +135,14 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
                 {
                     if (cid == "expressbase")
                     {
+                        log.Info("for tenant login");
                         var _InfraDb = authService.TryResolve<DatabaseFactory>().InfraDB as IDatabase;
                         _authUser = (string.IsNullOrEmpty(socialId)) ? User.GetInfraUser(_InfraDb, UserName, password) : User.GetInfraUserViaSocial(_InfraDb, UserName, socialId);
                         log.Info("#Eb reached 1");
                     }
                     else
                     {
+                        log.Info("for user login");
                         bservice.ClientID = cid;
                         _authUser = User.GetDetails(bservice.DatabaseFactory, UserName, password);
                         log.Info("#Eb reached 2");
