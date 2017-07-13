@@ -38,7 +38,6 @@ namespace ExpressBase.Objects
            CSVExport,
            CopyToClipboard,
            Print 
-
         }
 
         public string Token { get; set; }
@@ -49,66 +48,42 @@ namespace ExpressBase.Objects
 
         public override string GetHead()
         {
-            return string.Empty;
+            return this.script;
         }
         
         private int FilterBH = 0;
 
-        private EbForm __filterForm;   
+        private EbForm __filterForm;
+
+        private string script;
+
+        private string filters;
 
         public void SetFilterForm(EbFilterDialog filterForm)    
         {
             string xjson = "{\"$type\": \"System.Collections.Generic.List`1[[ExpressBase.Objects.EbControl, ExpressBase.Objects]], mscorlib\", \"$values\": " +
                 filterForm.FilterDialogJson + "}";
             //var ControlColl = filterForm.FilterDialogJson.FromJson<List<EbControl>>();
-            JsonTextReader reader = new JsonTextReader(new StringReader(filterForm.FilterDialogJson));
             var ControlColl = JsonConvert.DeserializeObject(xjson, new JsonSerializerSettings
             {
                 TypeNameHandling = TypeNameHandling.All 
             }) as List<EbControl>;
-            string rs = "";
+            string _html = "";
+            string _head = "";
             if (filterForm != null)
             {
-                rs = @"<div class='collapse collapse in' style='margin-top:10px;' id='filterBox'>
+                _html = @"<div class='collapse collapse in' style='margin-top:10px;' id='filterBox'>
                                 <div class='well well-sm'>";
                 foreach (EbControl c in ControlColl)
                 {
-                    rs += c.GetHtml();
+                    _html += c.GetHtml();
+                    _head += c.GetHead();
                 }
-                rs += @"</div></div>";
+                _html += @"</div></div>";
             }
-            this.filters = rs;
-
-
+            this.script = _head;
+            this.filters = _html;
         }
-
-        private string filters;
-       // {
-            //get
-            //{
-            //    string rs = "";
-            //    int max = 0;
-            //    if (this.__filterForm != null)
-            //    {
-            //        rs = @"<div class='collapse collapse in' style='margin-top:10px;' id='filterBox'>
-            //                    <div class='well well-sm' style='position:relative; height:@FilterBHpx; padding-top:40px;padding-bottom:40px;'>";
-            //        foreach (EbControl c in this.__filterForm.Controls)
-            //        {
-            //            if (c.Top >= max)
-            //            {
-            //                max = (c.Top + c.Height);
-            //            }
-            //            c.Top += 10;
-            //            rs += c.GetHtml();
-            //        }
-            //        this.FilterBH += max;
-            //        rs += @"</div></div>";
-            //    }
-
-            //    return rs;
-            //}
-
-       // }
 
         public override void Init4Redis(IRedisClient redisclient, IServiceClient serviceclient)
         {
@@ -159,6 +134,7 @@ namespace ExpressBase.Objects
         //    colext = colext.Substring(0,colext.Length-1)+"]";
         //    return colDef + colext + "}";
         //}
+
 
         public override string GetHtml()
         {
@@ -254,7 +230,7 @@ namespace ExpressBase.Objects
 .Replace("@servicestack_url", "https://expressbaseservicestack.azurewebsites.net")
 .Replace("@filters", this.filters)
 .Replace("@FilterBH", this.FilterBH.ToString())
-.Replace("@collapsBtn", (this.__filterForm != null) ? @"<div id = 'btnCollapse' class='btn btn-default' data-toggle='collapse' data-target='#filterBox' aria-expanded='true' aria-controls='filterBox'>
+.Replace("@collapsBtn", (this.filters != null) ? @"<div id = 'btnCollapse' class='btn btn-default' data-toggle='collapse' data-target='#filterBox' aria-expanded='true' aria-controls='filterBox'>
                     <i class='fa fa-chevron-down' aria-hidden='true'></i>
                 </div>" : string.Empty)
 //.Replace("@data.columns", this.ColumnColletion.ToJson())
