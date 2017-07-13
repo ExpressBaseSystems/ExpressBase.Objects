@@ -1,8 +1,10 @@
 ﻿using ExpressBase.Data;
 using ExpressBase.Objects.ServiceStack_Artifacts;
+using Newtonsoft.Json;
 using ServiceStack;
 using ServiceStack.Redis;
 using System.Collections.Generic;
+using System.IO;
 
 namespace ExpressBase.Objects
 {
@@ -56,7 +58,14 @@ namespace ExpressBase.Objects
 
         public void SetFilterForm(EbFilterDialog filterForm)    
         {
-            var ControlColl = filterForm.FilterDialogJson.FromJson<List<EbTextBox>>();
+            string xjson = "{\"$type\": \"System.Collections.Generic.List`1[[ExpressBase.Objects.EbControl, ExpressBase.Objects]], mscorlib\", \"$values\": " +
+                filterForm.FilterDialogJson + "}";
+            //var ControlColl = filterForm.FilterDialogJson.FromJson<List<EbControl>>();
+            JsonTextReader reader = new JsonTextReader(new StringReader(filterForm.FilterDialogJson));
+            var ControlColl = JsonConvert.DeserializeObject(xjson, new JsonSerializerSettings
+            {
+                TypeNameHandling = TypeNameHandling.All 
+            }) as List<EbControl>;
             string rs = "";
             if (filterForm != null)
             {
