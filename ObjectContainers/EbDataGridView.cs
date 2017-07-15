@@ -158,8 +158,6 @@ namespace ExpressBase.Objects
             //@tableViewName
             return @"
 <div class='tablecontainer' id='@tableId_1container' style='background-color:rgb(260,260,260)'>
-   
-        
         <label>
                 @dvname
         </label>
@@ -178,38 +176,38 @@ namespace ExpressBase.Objects
                 <div style='width:auto;' id='@tableId_1divcont'>
                     <table id='@tableId_1' class='table table-striped table-bordered'></table>
                 </div>
-             </div>
-        </div>
-    <div id='graphcontainer' style='border:1px solid;display: none;'>
-        <div style='height: 38px; border: 1px solid;'>
-             <div class='dropdown' id='graphDropdown' style='display: inline-block;padding-top: 1px;'>
-                     <button class='btn btn-primary dropdown-toggle' type='button' data-toggle='dropdown'>
-                   <span class='caret'></span></button>
-                  <ul class='dropdown-menu'>
-                        <li><a href='#'>Line</a></li>
-                        <li><a href = '#'> Bar </a ></li>
-                        <li><a href = '#'> AreaFilled </a></li>
-                        <li><a href = '#'> pie </a></li>
-                        <li><a href = '#'> doughnut </a></li>
-                        </ul>
-              </div>
-              <button id='reset_zoom' class='btn btn-primary'>Reset zoom</button>
-              <div id = 'btnColumnCollapse' class='btn btn-default'>
-                    <i class='fa fa-chevron-down' aria-hidden='true'></i>
-              </div>
-        </div>
-        <div id = 'columns4Drag' style='display:none;'>
-            <div style='display: inline-block;'>
-                <ul class='list-group'  style='height: 300px; overflow-x: scroll;'>
-                </ul>  
+                <div id='graphcontainer_tab@tableId_1' style='border:1px solid;display: none;'>
+                <div style='height: 38px; border: 1px solid;'>
+                     <div class='dropdown' id='graphDropdown_tab@tableId_1' style='display: inline-block;padding-top: 1px;'>
+                             <button class='btn btn-primary dropdown-toggle' type='button' data-toggle='dropdown'>
+                           <span class='caret'></span></button>
+                          <ul class='dropdown-menu'>
+                                <li><a href='#'>Line</a></li>
+                                <li><a href = '#'> Bar </a ></li>
+                                <li><a href = '#'> AreaFilled </a></li>
+                                <li><a href = '#'> pie </a></li>
+                                <li><a href = '#'> doughnut </a></li>
+                                </ul>
+                      </div>
+                      <button id='reset_zoom@tableId_1' class='btn btn-primary'>Reset zoom</button>
+                      <div id = 'btnColumnCollapse@tableId_1' class='btn btn-default'>
+                            <i class='fa fa-chevron-down' aria-hidden='true'></i>
+                      </div>
+                </div>
+                <div id ='columns4Drag@tableId_1' style='display:none;'>
+                    <div style='display: inline-block;'>
+                        <ul class='list-group'  style='height: 470px; overflow-x: scroll;'>
+                        </ul>  
+                    </div>
+                    <div style='display: inline-block;vertical-align: top;width: 794px;'>
+                        <b>Columns (X-Axis) </b><div style='padding: 4px;border:solid 1px grey;height:33px' id ='X_col_name@tableId_1'></div>
+                        <b>Rows (Y-Axis)</b><div style='padding: 4px;border:solid 1px grey;height:33px' id ='Y_col_name@tableId_1'></div>
+                    </div>
+                </div>
+                <canvas id='myChart@tableId_1' width='auto' height='auto'></canvas>
             </div>
-            <div style='display: inline-block;vertical-align: top;width: 859px;'>
-                <b>Columns (X-Axis) </b><div style='padding: 4px;border:solid 1px grey;height:33px' id ='X_col_name'></div>
-                <b>Rows (Y-Axis)</b><div style='padding: 4px;border:solid 1px grey;height:33px' id ='Y_col_name'></div>
-            </div>
+          </div>
         </div>
-        <canvas id='myChart' width='auto' height='auto'></canvas>
-    </div>
 </div>
 <script>
 //$.post('GetTVPref4User', { dsid: @dataSourceId }, function(data){
