@@ -116,10 +116,11 @@ $('#@idcontainer [type=radio]').on('click', function () {
 .Replace("@hiddenString", this.HiddenString)
 .Replace("@toolTipText", this.ToolTipText)
 .Replace("@helpText", this.HelpText)
-.Replace("@backColor", "background-color:" + this.BackColorSerialized + ";")
-.Replace("@foreColor", "color:" + this.ForeColorSerialized + ";")
-.Replace("@lblBackColor", "background-color:" + this.LabelBackColorSerialized + ";")
-.Replace("@LblForeColor", "color:" + this.LabelForeColorSerialized + ";");
+//.Replace("@backColor", "background-color:" + this.BackColorSerialized + ";")
+//.Replace("@foreColor", "color:" + this.ForeColorSerialized + ";")
+//.Replace("@lblBackColor", "background-color:" + this.LabelBackColorSerialized + ";")
+//.Replace("@LblForeColor", "color:" + this.LabelForeColorSerialized + ";")
+;
         }
     }
 

@@ -64,10 +64,8 @@ namespace ExpressBase.Objects
             string xjson = "{\"$type\": \"System.Collections.Generic.List`1[[ExpressBase.Objects.EbControl, ExpressBase.Objects]], mscorlib\", \"$values\": " +
                 filterForm.FilterDialogJson + "}";
             //var ControlColl = filterForm.FilterDialogJson.FromJson<List<EbControl>>();
-            var ControlColl = JsonConvert.DeserializeObject(xjson, new JsonSerializerSettings
-            {
-                TypeNameHandling = TypeNameHandling.All 
-            }) as List<EbControl>;
+            var ControlColl = JsonConvert.DeserializeObject(xjson,
+                new JsonSerializerSettings{ TypeNameHandling = TypeNameHandling.All }) as List<EbControl>;
             string _html = "";
             string _head = "";
             if (filterForm != null)
@@ -170,8 +168,8 @@ namespace ExpressBase.Objects
          </ul></br>
          <div class='tab-content' id='table_tabcontent'>
              <div id='@tableId_tab_1' class='tab-pane active'>
-                 <div id='TableControls_@tableId_1' class = 'well well-sm'>
-                    <div id='btnGo' class='btn btn-primary' >GO</div>
+                    <div id='TableControls_@tableId_1' class = 'well well-sm'>
+                    <button id='btnGo' class='btn btn-primary' >GO</button>
                     @collapsBtn
                 </div>
                 @filters  
