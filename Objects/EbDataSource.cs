@@ -20,6 +20,9 @@ namespace ExpressBase.Objects
     {
         [ProtoBuf.ProtoMember(1)]
         public string Sql { get; set; }
+
+        [ProtoBuf.ProtoMember(2)]
+        public int FilterDialogId { get; set; }
     }
 
     [ProtoBuf.ProtoContract]
