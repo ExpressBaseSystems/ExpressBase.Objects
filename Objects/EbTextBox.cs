@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Reflection;
+using Newtonsoft.Json;
 
 namespace ExpressBase.Objects
 {
@@ -26,8 +27,7 @@ namespace ExpressBase.Objects
     public class EbTextBox : EbControl
     {
         [ProtoBuf.ProtoMember(1)]
-        [EnableInBuilder(BuilderType.FormBuilder)]
-        [EnableInBuilder(BuilderType.FilterDialogBuilder)]
+        [EnableInBuilder(BuilderType.FormBuilder, BuilderType.FilterDialogBuilder)]
         [PropertyGroup("Behavior")]
         public int MaxLength { get; set; }
 
@@ -95,6 +95,9 @@ namespace ExpressBase.Objects
             return this.Text;
         }
 
+        
+        public static string test = JsObject(BuilderType.FormBuilder);
+
         public override string GetHtml()
         {
             return @"
@@ -126,46 +129,60 @@ namespace ExpressBase.Objects
 .Replace("@backColor", "background-color:" + this.BackColor + ";")
 .Replace("@foreColor", "color:" + this.ForeColor + ";")
 .Replace("@lblBackColor", "background-color:" + this.LabelBackColor + ";")
-.Replace("@LblForeColor", "color:" + this.LabelForeColor + "; js string = " +JsObject);
+.Replace("@LblForeColor", "color:" + this.LabelForeColor + ";" + test);
 
         }
 
-        public static string JsObject
+
+        public static string JsObject(BuilderType _builderType)
         {
-            get
+            string _props = string.Empty;
+            var me = new EbTextBox();
+
+            var props = me.GetType().GetProperties();
+
+            List<Meta> MetaCollection = new List<Meta>();
+
+            foreach (var prop in props)
             {
-                var me = new EbTextBox();
+                _props += JsVarDecl(prop);
 
-                string s = string.Format(@"var TextBoxObj = function (id) {
-                                this.$type = '{0}',
-                                this.Id = id,
-                                this.Name = id,", me.GetType().FullName);
+                var propattrs = prop.GetCustomAttributes();
 
-                var props = me.GetType().GetProperties();
-
-                foreach (var prop in props)
+                if (prop.IsDefined(typeof(EnableInBuilder)) 
+                    && prop.GetCustomAttribute<EnableInBuilder>().BuilderTypes.Contains(_builderType))
                 {
-                    s += JsVarDecl(prop);
+                    var meta = new Meta { Name = prop.Name };
 
-                    //foreach (Attribute attr in prop.GetCustomAttributes())
-                    //{
-                    //    if (attr is EnableInBuilder)
-                    //    {
-                    //        if ((attr as EnableInBuilder).BuilderType == BuilderType.FormBuilder)
-                    //        {
+                    foreach (Attribute attr in propattrs)
+                    {
+                        if (attr is PropertyGroup)
+                            meta.Group = (attr as PropertyGroup).Name;
+                        else if (attr is PropertyEditor)
+                            meta.Editor = (attr as PropertyEditor).PropertyEditorType;
+                    }
 
-                    //        }
-                    //    }
-                    //}
+                    MetaCollection.Add(meta);
                 }
-                System.Console.WriteLine(s);
-                return s;
             }
+
+            return @"
+var TextBoxObj = function (id) {
+    this.$type = '@Type',
+    this.Id = id,
+    this.Name = id,
+    @Props
+    this.Meta=@Meta
+}"
+.Replace("@Type", me.GetType().FullName)
+.Replace("@Props", _props)
+.Replace("@Meta", JsonConvert.SerializeObject(MetaCollection));
         }
 
         private static string JsVarDecl(PropertyInfo prop)
         {
-            string s = "this.{0} = {1},";
+            string s = @"
+                    this.{0} = {1},";
 
             if (prop.PropertyType == typeof(string))
             {
@@ -181,7 +198,7 @@ namespace ExpressBase.Objects
                 return string.Format(s, prop.Name, "false");
 
             else if (prop.PropertyType.GetTypeInfo().IsEnum)
-                return string.Format(s, prop.Name, "--select--");
+                return string.Format(s, prop.Name, "'--select--'");
 
             else 
                 return string.Format(s, prop.Name, "null");
@@ -196,14 +213,14 @@ namespace ExpressBase.Objects
         ReportBuilder,
     }
 
-    [AttributeUsage(AttributeTargets.All, Inherited = false, AllowMultiple = true)]
+    [AttributeUsage(AttributeTargets.Property, Inherited = false)]
     public class EnableInBuilder : Attribute
     {
-        public BuilderType BuilderType { get; set; }
+        public BuilderType[] BuilderTypes { get; set; }
 
-        public EnableInBuilder(BuilderType type)
+        public EnableInBuilder(params BuilderType[] types)
         {
-            this.BuilderType = type;
+            this.BuilderTypes = types;
         }
     }
 
@@ -215,7 +232,6 @@ namespace ExpressBase.Objects
         Color
     }
 
-    [AttributeUsage(AttributeTargets.All, Inherited = false)]
     public class PropertyEditor : Attribute
     {
         public PropertyEditorType PropertyEditorType { get; set; }
@@ -234,5 +250,14 @@ namespace ExpressBase.Objects
         {
             this.Name = groupName;
         }
+    }
+
+    public class Meta
+    {
+        public string Name { get; set; }
+
+        public string Group { get; set; }
+
+        public PropertyEditorType Editor { get; set; }
     }
 }
