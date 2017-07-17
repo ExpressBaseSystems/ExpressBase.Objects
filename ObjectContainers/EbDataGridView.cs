@@ -23,22 +23,7 @@ namespace ExpressBase.Objects
         [ProtoBuf.ProtoMember(11)]
         public string dvname { get; set; }
 
-        [ProtoBuf.ProtoContract]
-        public enum EbDvOperations
-        {
-           Create,
-           Edit,
-           PageSummary,
-           TotalSummary,
-           Filtering,
-           Zooming,
-           Graph,
-           PDFExport,
-           ExcelExport,
-           CSVExport,
-           CopyToClipboard,
-           Print 
-        }
+      
 
         public string Token { get; set; }
 
