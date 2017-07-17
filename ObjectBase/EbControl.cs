@@ -142,144 +142,21 @@ else
         [System.ComponentModel.Category("Accessibility")]
         public virtual int TabIndex { get; set; }
 
-#if NET462
-        [System.ComponentModel.Category("Appearance")]
-        public System.Drawing.Color BackColor { get; set; }
-#endif
-
-        private string _backColorSerialized = null;
         [ProtoBuf.ProtoMember(29)]
-        [Browsable(false)]
-        public string BackColorSerialized
-        {
-            get
-            {
-#if NET462      
-                _backColorSerialized = this.HexConverter(this.BackColor);
-#endif
-                return _backColorSerialized;
-            }
-            set
-            {
-#if NET462
-                this.BackColor = System.Drawing.ColorTranslator.FromHtml(value);
-#endif
-                _backColorSerialized = value;
-            }
-        }
+        [System.ComponentModel.Category("Accessibility")]
+        public virtual string BackColor { get; set; }
 
-        //
-#if NET462
-        [System.ComponentModel.Category("Appearance")]
-        public System.Drawing.Color ForeColor { get; set; }
-#endif
-
-        private string _foreColorSerialized = null;
         [ProtoBuf.ProtoMember(30)]
-        [Browsable(false)]
-        public string ForeColorSerialized
-        {
-            get
-            {
-#if NET462
-                _foreColorSerialized = this.HexConverter(this.ForeColor);
-#endif
-                return _foreColorSerialized;
-            }
-            set
-            {
-#if NET462
-                this.ForeColor = System.Drawing.ColorTranslator.FromHtml(value);
-#endif
-                _foreColorSerialized = value;
-            }
-        }
-        //
+        [System.ComponentModel.Category("Accessibility")]
+        public virtual string ForeColor { get; set; }
 
-
-#if NET462
-        [System.ComponentModel.Category("Appearance")]
-        public System.Drawing.Color LabelBackColor { get; set; }
-#endif
-
-        private string _labelBackColorSerialized = null;
         [ProtoBuf.ProtoMember(31)]
-        [Browsable(false)]
-        public string LabelBackColorSerialized
-        {
-            get
-            {
-#if NET462
-                _labelBackColorSerialized = this.HexConverter(this.LabelBackColor);
-#endif
-                return _labelBackColorSerialized;
-            }
-            set
-            {
-#if NET462
-                this.LabelBackColor = System.Drawing.ColorTranslator.FromHtml(value);
-#endif
-                _labelBackColorSerialized = value;
-            }
-        }
+        [System.ComponentModel.Category("Accessibility")]
+        public virtual string LabelBackColor { get; set; }
 
-#if NET462
-        [System.ComponentModel.Category("Appearance")]
-        public System.Drawing.Color LabelForeColor { get; set; }
-#endif
-
-        private string _labelforeColorSerialized = null;
         [ProtoBuf.ProtoMember(32)]
-        [Browsable(false)]
-        public string LabelForeColorSerialized
-        {
-            get
-            {
-#if NET462
-                _labelforeColorSerialized = this.HexConverter(this.LabelForeColor);
-#endif
-                return _labelforeColorSerialized;
-            }
-            set
-            {
-#if NET462
-                this.LabelForeColor = System.Drawing.ColorTranslator.FromHtml(value);
-#endif
-                _labelforeColorSerialized = value;
-            }
-        }
-
-#if NET462
-        [System.ComponentModel.Category("Layout")]
-        public System.Drawing.Font Font { get; set; }
-#endif
-
-        private ProtoFont _fontSerialized = null;
-        [ProtoBuf.ProtoMember(33)]
-        [Browsable(false)]
-        public ProtoFont FontSerialized
-        {
-            get
-            {
-#if NET462
-                if (this.Font != null)
-                    _fontSerialized = new ProtoFont {
-                        FontFamily = this.Font.FontFamily.Name,
-                        SizeInPoints = this.Font.SizeInPoints,
-                        Style = this.Font.Style.ToString()
-                    };
-#endif
-                return _fontSerialized;
-            }
-            set
-            {
-#if NET462
-                if (_fontSerialized != null)
-                    this.Font = new System.Drawing.Font(_fontSerialized.FontFamily, _fontSerialized.SizeInPoints, _fontSerialized.FontStyle);
-#endif
-                _fontSerialized = value;
-            }
-        }
+        [System.ComponentModel.Category("Accessibility")]
+        public virtual string LabelForeColor { get; set; }
 
         [ProtoBuf.ProtoMember(34)]
         public EbValidatorCollection Validators { get; set; }
@@ -302,43 +179,8 @@ else
 
         public virtual object GetData() { return null; }
 
-#if NET462
-        private string HexConverter(System.Drawing.Color c)
-        {
-            return "#" + c.R.ToString("X2") + c.G.ToString("X2") + c.B.ToString("X2");
-        }
-#endif
     }
 
-    [ProtoBuf.ProtoContract]
-    public class ProtoFont
-    {
-        [ProtoBuf.ProtoMember(1)]
-        public string FontFamily;
-
-        [ProtoBuf.ProtoMember(2)]
-        public float SizeInPoints;
-
-        [ProtoBuf.ProtoMember(3)]
-        public string Style;
-
-#if NET462
-        public System.Drawing.FontStyle FontStyle
-        {
-            get
-            {
-                if (Style == System.Drawing.FontStyle.Bold.ToString())
-                    return System.Drawing.FontStyle.Bold;
-                if (Style == System.Drawing.FontStyle.Italic.ToString())
-                    return System.Drawing.FontStyle.Italic;
-                if (Style == System.Drawing.FontStyle.Underline.ToString())
-                    return System.Drawing.FontStyle.Underline;
-                else
-                    return System.Drawing.FontStyle.Regular;
-            }
-        }
-#endif
-    }
 
     [ProtoBuf.ProtoContract]
     public class EbValidator

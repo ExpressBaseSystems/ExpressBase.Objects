@@ -178,16 +178,16 @@ $('#{0}').mask('SZZZZZZZZZZZ', {
 .Replace("@placeHolder", "placeholder='" + this.PlaceHolder + "'")
 .Replace("@tabIndex", "tabindex='" + this.TabIndex + "'")
 .Replace("@autoComplete", this.AutoCompleteOff  ? "off" : "on")
-.Replace("@backColor", "background-color:" + this.BackColorSerialized + ";")
-.Replace("@foreColor", "color:" + this.ForeColorSerialized + ";")//15
-.Replace("@lblBackColor", "background-color:" + this.LabelBackColorSerialized + ";")
-.Replace("@LblForeColor", "color:" + this.LabelForeColorSerialized + ";")
-.Replace("@value", (this.Value == 0) ? "''" : this.Value.ToString())
-.Replace("@fontStyle", (this.FontSerialized != null) ?
-                            (" font-family:" + this.FontSerialized.FontFamily + ";" + "font-style:" + this.FontSerialized.Style
-                            + ";" + "font-size:" + this.FontSerialized.SizeInPoints + "px;")
-                        : string.Empty)
-.Replace("@fontSize", (this.FontSerialized != null) ? (this.FontSerialized.SizeInPoints + "px;") : string.Empty)
+//.Replace("@backColor", "background-color:" + this.BackColorSerialized + ";")
+//.Replace("@foreColor", "color:" + this.ForeColorSerialized + ";")//15
+//.Replace("@lblBackColor", "background-color:" + this.LabelBackColorSerialized + ";")
+//.Replace("@LblForeColor", "color:" + this.LabelForeColorSerialized + ";")
+//.Replace("@value", (this.Value == 0) ? "''" : this.Value.ToString())
+//.Replace("@fontStyle", (this.FontSerialized != null) ?
+//                            (" font-family:" + this.FontSerialized.FontFamily + ";" + "font-style:" + this.FontSerialized.Style
+//                            + ";" + "font-size:" + this.FontSerialized.SizeInPoints + "px;")
+//                        : string.Empty)
+//.Replace("@fontSize", (this.FontSerialized != null) ? (this.FontSerialized.SizeInPoints + "px;") : string.Empty)
 );
         }
     }
