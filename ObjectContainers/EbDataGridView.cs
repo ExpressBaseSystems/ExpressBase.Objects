@@ -72,14 +72,13 @@ namespace ExpressBase.Objects
             string _head = "";
             if (filterForm != null)
             {
-                _html = @"<div class='collapse collapse in' style='margin-top:10px;' id='filterBox'>
-                                <div class='well well-sm'>";
+                _html = @"<div style='margin-top:10px;' id='filterBox'>";
                 foreach (EbControl c in ControlColl)
                 {
                     _html += c.GetHtml();
                     _head += c.GetHead();
                 }
-                _html += @"</div></div>";
+                _html += @"</div>";
             }
             this.script = _head;
             this.filters = _html;
@@ -169,17 +168,16 @@ namespace ExpressBase.Objects
          <div class='tab-content' id='table_tabcontent'>
              <div id='@tableId_tab_1' class='tab-pane active'>
                  <div id='TableControls_@tableId_1' class = 'well well-sm'>
-                    <div id='btnGo' class='btn btn-primary' >GO</div>
-                    @collapsBtn
+                    <button id='btnGo' class='btn btn-primary' >GO</button>
+                    @filters  
                 </div>
-                @filters  
                 <div style='width:auto;' id='@tableId_1divcont'>
                     <table id='@tableId_1' class='table table-striped table-bordered'></table>
                 </div>
                 <div id='graphcontainer_tab@tableId_1' style='border:1px solid;display: none;'>
-                <div style='height: 38px; border: 1px solid;'>
-                     <div class='dropdown' id='graphDropdown_tab@tableId_1' style='display: inline-block;padding-top: 1px;'>
-                             <button class='btn btn-primary dropdown-toggle' type='button' data-toggle='dropdown'>
+                <div style='height: 50px;' class= 'well well-sm'>
+                     <div class='dropdown' id='graphDropdown_tab@tableId_1' style='display: inline-block;padding-top: 1px;float:right'>
+                             <button class='btn btn-default dropdown-toggle' type='button' data-toggle='dropdown'>
                            <span class='caret'></span></button>
                           <ul class='dropdown-menu'>
                                 <li><a href='#'>Line</a></li>
@@ -189,7 +187,7 @@ namespace ExpressBase.Objects
                                 <li><a href = '#'> doughnut </a></li>
                                 </ul>
                       </div>
-                      <button id='reset_zoom@tableId_1' class='btn btn-primary'>Reset zoom</button>
+                      <button id='reset_zoom@tableId_1' class='btn btn-default'>Reset zoom</button>
                       <div id = 'btnColumnCollapse@tableId_1' class='btn btn-default'>
                             <i class='fa fa-chevron-down' aria-hidden='true'></i>
                       </div>
@@ -199,9 +197,15 @@ namespace ExpressBase.Objects
                         <ul class='list-group'  style='height: 470px; overflow-x: scroll;'>
                         </ul>  
                     </div>
-                    <div style='display: inline-block;vertical-align: top;width: 794px;'>
-                        <b>Columns (X-Axis) </b><div style='padding: 4px;border:solid 1px grey;height:33px' id ='X_col_name@tableId_1'></div>
-                        <b>Rows (Y-Axis)</b><div style='padding: 4px;border:solid 1px grey;height:33px' id ='Y_col_name@tableId_1'></div>
+                    <div style='display: inline-block;vertical-align: top;width: 806px;'>
+                        <div class='input-group'>
+                          <span class='input-group-addon' id='basic-addon3'>X-Axis</span>
+                          <div class='form-control' style='padding: 4px;height:33px' id ='X_col_name@tableId_1'></div>
+                        </div>
+                        <div class='input-group' style='padding-top: 1px;'>
+                          <span class='input-group-addon' id='basic-addon3'>Y-Axis</span>
+                          <div class='form-control' style='padding: 4px;height:33px' id ='Y_col_name@tableId_1'></div>
+                        </div>
                     </div>
                 </div>
                 <canvas id='myChart@tableId_1' width='auto' height='auto'></canvas>
