@@ -150,8 +150,8 @@ namespace ExpressBase.Objects
          </ul></br>
          <div class='tab-content' id='table_tabcontent'>
              <div id='@tableId_tab_1' class='tab-pane active'>
-                 <div id='TableControls_@tableId_1' class = 'well well-sm'>
-                    <button id='btnGo' class='btn btn-primary' >GO</button>
+                 <div id='TableControls_@tableId_1' class = 'well well-sm' style='margin-bottom:5px!important;'>
+                    <button id='btnGo' class='btn btn-primary' >Run</button>
                     @filters  
                 </div>
                 <div style='width:auto;' id='@tableId_1divcont'>
