@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Reflection;
+using Newtonsoft.Json;
 
 namespace ExpressBase.Objects
 {
@@ -25,35 +27,36 @@ namespace ExpressBase.Objects
     public class EbTextBox : EbControl
     {
         [ProtoBuf.ProtoMember(1)]
-        [System.ComponentModel.Category("Behavior")]
+        [EnableInBuilder(BuilderType.FormBuilder, BuilderType.FilterDialogBuilder)]
+        [PropertyGroup("Behavior")]
         public int MaxLength { get; set; }
 
         [ProtoBuf.ProtoMember(2)]
-        [System.ComponentModel.Category("Behavior")]
+        [PropertyGroup("Behavior")]
         public TextTransform TextTransform { get; set; }
 
         [ProtoBuf.ProtoMember(3)]
-        [System.ComponentModel.Category("Behavior")]
+        [PropertyGroup("Behavior")]
         public TextMode TextMode { get; set; }
 
         [ProtoBuf.ProtoMember(4)]
-        [System.ComponentModel.Category("Behavior")]
+        [PropertyGroup("Behavior")]
         public string PlaceHolder { get; set; }
 
         [ProtoBuf.ProtoMember(5)]
-        [System.ComponentModel.Category("Appearance")]
+        [PropertyGroup("Appearance")]
         public string Text { get; set; }
 
         [ProtoBuf.ProtoMember(6)]
-        [System.ComponentModel.Category("Behavior")]
+        [PropertyGroup("Behavior")]
         public bool AutoCompleteOff { get; set; }
 
         [ProtoBuf.ProtoMember(7)]
-        [System.ComponentModel.Category("Behavior")]
+        [PropertyGroup("Behavior")]
         public string MaxDateExpression { get; set; }
 
         [ProtoBuf.ProtoMember(8)]
-        [System.ComponentModel.Category("Behavior")]
+        [PropertyGroup("Behavior")]
         public string MinDateExpression { get; set; }
 
         //[ProtoBuf.ProtoMember(9)]
@@ -73,7 +76,7 @@ namespace ExpressBase.Objects
 
         public override string GetHead()
         {
-            return ( ((!this.Hidden) ? this.UniqueString + this.RequiredString : string.Empty) + @"".Replace("{0}", this.Name) );
+            return (((!this.Hidden) ? this.UniqueString + this.RequiredString : string.Empty) + @"".Replace("{0}", this.Name));
         }
 
         private string TextTransformString
@@ -92,6 +95,9 @@ namespace ExpressBase.Objects
             return this.Text;
         }
 
+        
+        public static string test = JsObject(BuilderType.FormBuilder);
+
         public override string GetHtml()
         {
             return @"
@@ -107,7 +113,7 @@ namespace ExpressBase.Objects
 .Replace("@left", this.Left.ToString())
 .Replace("@top", this.Top.ToString())
 .Replace("@width", "100%")
-.Replace("@height", (this.TextMode.ToString().ToLower() == "color" && this.Height < 24) ? (this.FontSerialized.SizeInPoints + 14).ToString() : this.Height.ToString())
+.Replace("@height", this.Height.ToString())
 .Replace("@label", this.Label)
 .Replace("@maxLength", (this.MaxLength > 0) ? string.Format("maxlength='{0}'", this.MaxLength) : string.Empty)
 .Replace("@textMode", this.TextMode.ToString().ToLower())
@@ -120,31 +126,138 @@ namespace ExpressBase.Objects
 .Replace("@text", "value='" + this.Text + "'")
 .Replace("@tabIndex", "tabindex='" + this.TabIndex + "'")
 .Replace("@autoComplete", (this.AutoCompleteOff || this.TextMode.ToString().ToLower() == "password") ? "off" : "on")
-.Replace("@backColor", "background-color:" + this.BackColorSerialized + ";")
-.Replace("@foreColor", "color:" + this.ForeColorSerialized + ";")
-.Replace("@lblBackColor", "background-color:" + this.LabelBackColorSerialized + ";")
-.Replace("@LblForeColor", "color:" + this.LabelForeColorSerialized + ";")
-.Replace("@fontStyle", (this.FontSerialized != null) ?
-                            (" font-family:" + this.FontSerialized.FontFamily + ";" + "font-style:" + this.FontSerialized.Style 
-                            + ";" + "font-size:" + this.FontSerialized.SizeInPoints + "px;")
-                        : string.Empty)
-.Replace("@attachedLbl", (this.TextMode.ToString() != "SingleLine") ?
-                                (
-                                    "<i class='fa fa-$class' aria-hidden='true'" 
-                                    + ( 
-                                        (this.FontSerialized != null) ? 
-                                            ("style='font-size:" + this.FontSerialized.SizeInPoints + "px;'")
-                                        : string.Empty
-                                      )
-                                    + "class='input-group-addon'></i>"
-                                )
-                                .Replace("$class", (this.TextMode.ToString() == "Email") ?
-                                                            ("envelope")
-                                                        : (this.TextMode.ToString() == "Password") ?
-                                                            "key"
-                                                        : ("eyedropper")
-                                )
-                        : string.Empty);
+.Replace("@backColor", "background-color:" + this.BackColor + ";")
+.Replace("@foreColor", "color:" + this.ForeColor + ";")
+.Replace("@lblBackColor", "background-color:" + this.LabelBackColor + ";")
+.Replace("@LblForeColor", "color:" + this.LabelForeColor + ";" + test);
+
         }
+
+
+        public static string JsObject(BuilderType _builderType)
+        {
+            string _props = string.Empty;
+            var me = new EbTextBox();
+
+            var props = me.GetType().GetProperties();
+
+            List<Meta> MetaCollection = new List<Meta>();
+
+            foreach (var prop in props)
+            {
+                _props += JsVarDecl(prop);
+
+                var propattrs = prop.GetCustomAttributes();
+
+                if (prop.IsDefined(typeof(EnableInBuilder)) 
+                    && prop.GetCustomAttribute<EnableInBuilder>().BuilderTypes.Contains(_builderType))
+                {
+                    var meta = new Meta { Name = prop.Name };
+
+                    foreach (Attribute attr in propattrs)
+                    {
+                        if (attr is PropertyGroup)
+                            meta.Group = (attr as PropertyGroup).Name;
+                        else if (attr is PropertyEditor)
+                            meta.Editor = (attr as PropertyEditor).PropertyEditorType;
+                    }
+
+                    MetaCollection.Add(meta);
+                }
+            }
+
+            return @"
+var TextBoxObj = function (id) {
+    this.$type = '@Type',
+    this.Id = id,
+    this.Name = id,
+    @Props
+    this.Meta=@Meta
+}"
+.Replace("@Type", me.GetType().FullName)
+.Replace("@Props", _props)
+.Replace("@Meta", JsonConvert.SerializeObject(MetaCollection));
+        }
+
+        private static string JsVarDecl(PropertyInfo prop)
+        {
+            string s = @"
+                    this.{0} = {1},";
+
+            if (prop.PropertyType == typeof(string))
+            {
+                if (prop.Name.EndsWith("Color"))
+                    return string.Format(s, prop.Name, "'#FFFFFF'");
+                else
+                    return string.Format(s, prop.Name, "''");
+            }
+            else if (prop.PropertyType == typeof(int))
+                return string.Format(s, prop.Name, "0");
+
+            else if (prop.PropertyType == typeof(bool))
+                return string.Format(s, prop.Name, "false");
+
+            else if (prop.PropertyType.GetTypeInfo().IsEnum)
+                return string.Format(s, prop.Name, "'--select--'");
+
+            else 
+                return string.Format(s, prop.Name, "null");
+        }
+    }
+
+    public enum BuilderType
+    {
+        DisplayBlockBuilder,
+        FilterDialogBuilder,
+        FormBuilder,
+        ReportBuilder,
+    }
+
+    [AttributeUsage(AttributeTargets.Property, Inherited = false)]
+    public class EnableInBuilder : Attribute
+    {
+        public BuilderType[] BuilderTypes { get; set; }
+
+        public EnableInBuilder(params BuilderType[] types)
+        {
+            this.BuilderTypes = types;
+        }
+    }
+
+    public enum PropertyEditorType
+    {
+        DropDown,
+        Collection,
+        Columns,
+        Color
+    }
+
+    public class PropertyEditor : Attribute
+    {
+        public PropertyEditorType PropertyEditorType { get; set; }
+
+        public PropertyEditor(PropertyEditorType type)
+        {
+            this.PropertyEditorType = type;
+        }
+    }
+
+    public class PropertyGroup : Attribute
+    {
+        public string Name { get; set; }
+
+        public PropertyGroup(string groupName)
+        {
+            this.Name = groupName;
+        }
+    }
+
+    public class Meta
+    {
+        public string Name { get; set; }
+
+        public string Group { get; set; }
+
+        public PropertyEditorType Editor { get; set; }
     }
 }

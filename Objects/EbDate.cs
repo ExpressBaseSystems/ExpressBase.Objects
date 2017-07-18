@@ -130,25 +130,25 @@ $('#@id').datetimepicker({
 .Replace("@width", this.Width.ToString())
 .Replace("@height", this.Height.ToString())
 .Replace("@datetype", "6")//( (int)this.EbDateType ).ToString())
-.Replace("@value", "value='" + this.Value + "'")
+.Replace("@value", "")//"value='" + this.Value + "'")
 .Replace("@label", this.Label)
 .Replace("@hiddenString", this.HiddenString)
-.Replace("@required", (this.Required && !this.Hidden ? " required" : string.Empty))
+.Replace("@required", " required")//(this.Required && !this.Hidden ? " required" : string.Empty))
 .Replace("@readOnlyString", this.ReadOnlyString)
 .Replace("@toolTipText", this.ToolTipText)
 .Replace("@helpText", this.HelpText)
 .Replace("@placeHolder", "placeholder='" + this.PlaceHolder + "'")
 .Replace("@tabIndex", "tabindex='" + this.TabIndex + "'")
 .Replace("@autoComplete", this.AutoCompleteOff ? "off" : "on")
-.Replace("@backColor", "background-color:" + this.BackColorSerialized + ";")
-.Replace("@foreColor", "color:" + this.ForeColorSerialized + ";")
-.Replace("@lblBackColor", "background-color:" + this.LabelBackColorSerialized + ";")
-.Replace("@LblForeColor", "color:" + this.LabelForeColorSerialized + ";")
-.Replace("@fontStyle", (this.FontSerialized != null) ?
-                            (" font-family:" + this.FontSerialized.FontFamily + ";" + "font-style:" + this.FontSerialized.Style
-                            + ";" + "font-size:" + this.FontSerialized.SizeInPoints + "px;")
-                        : string.Empty)
-.Replace("@atchdLbl", (this.EbDateType.ToString().ToLower() == "time") ? "fa-clock-o" : "fa-calendar")
+//.Replace("@backColor", "background-color:" + this.BackColorSerialized + ";")
+//.Replace("@foreColor", "color:" + this.ForeColorSerialized + ";")
+//.Replace("@lblBackColor", "background-color:" + this.LabelBackColorSerialized + ";")
+//.Replace("@LblForeColor", "color:" + this.LabelForeColorSerialized + ";")
+//.Replace("@fontStyle", (this.FontSerialized != null) ?
+//                            (" font-family:" + this.FontSerialized.FontFamily + ";" + "font-style:" + this.FontSerialized.Style
+//                            + ";" + "font-size:" + this.FontSerialized.SizeInPoints + "px;")
+//                        : string.Empty)
+//.Replace("@atchdLbl", (this.EbDateType.ToString().ToLower() == "time") ? "fa-clock-o" : "fa-calendar")
 ;
         }
     }

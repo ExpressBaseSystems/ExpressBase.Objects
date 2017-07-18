@@ -23,22 +23,7 @@ namespace ExpressBase.Objects
         [ProtoBuf.ProtoMember(11)]
         public string dvname { get; set; }
 
-        [ProtoBuf.ProtoContract]
-        public enum EbDvOperations
-        {
-           Create,
-           Edit,
-           PageSummary,
-           TotalSummary,
-           Filtering,
-           Zooming,
-           Graph,
-           PDFExport,
-           ExcelExport,
-           CSVExport,
-           CopyToClipboard,
-           Print 
-        }
+      
 
         public string Token { get; set; }
 
@@ -64,10 +49,8 @@ namespace ExpressBase.Objects
             string xjson = "{\"$type\": \"System.Collections.Generic.List`1[[ExpressBase.Objects.EbControl, ExpressBase.Objects]], mscorlib\", \"$values\": " +
                 filterForm.FilterDialogJson + "}";
             //var ControlColl = filterForm.FilterDialogJson.FromJson<List<EbControl>>();
-            var ControlColl = JsonConvert.DeserializeObject(xjson, new JsonSerializerSettings
-            {
-                TypeNameHandling = TypeNameHandling.All 
-            }) as List<EbControl>;
+            var ControlColl = JsonConvert.DeserializeObject(xjson,
+                new JsonSerializerSettings{ TypeNameHandling = TypeNameHandling.All }) as List<EbControl>;
             string _html = "";
             string _head = "";
             if (filterForm != null)

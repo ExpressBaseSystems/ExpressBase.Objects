@@ -43,12 +43,13 @@ namespace ExpressBase.Objects
 .Replace("@toolTipText", this.ToolTipText)
 .Replace("@text", this.Text )
 .Replace("@tabIndex", "tabindex='" + this.TabIndex + "'")
-.Replace("@backColor", "background-color:" + this.BackColorSerialized + ";")
-.Replace("@foreColor", "color:" + this.ForeColorSerialized + ";")
-.Replace("@fontStyle", (this.FontSerialized != null) ?
-                            (" font-family:" + this.FontSerialized.FontFamily + ";" + "font-style:" + this.FontSerialized.Style
-                            + ";" + "font-size:" + this.FontSerialized.SizeInPoints + "px;")
-                        : string.Empty));
+//.Replace("@backColor", "background-color:" + this.BackColorSerialized + ";")
+//.Replace("@foreColor", "color:" + this.ForeColorSerialized + ";")
+//.Replace("@fontStyle", (this.FontSerialized != null) ?
+//                            (" font-family:" + this.FontSerialized.FontFamily + ";" + "font-style:" + this.FontSerialized.Style
+//                            + ";" + "font-size:" + this.FontSerialized.SizeInPoints + "px;")
+//                        : string.Empty)
+);
         }
     }
 }

@@ -57,7 +57,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ObjectLifeCycleStatus Status { get; set; }
       
         public string ChangeLog { get; set; }
-       
+
+        public string Relations { get; set; }
+
         public string Token { get; set; }
       
         public string TenantAccountId { get; set; }
