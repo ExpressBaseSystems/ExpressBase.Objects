@@ -63,7 +63,6 @@ namespace ExpressBase.Objects
                 }
                 _html += @"</div>";
             }
-            this.script = _head;
             this.filters = _html;
         }
 

@@ -29,26 +29,33 @@ namespace ExpressBase.Objects
         [ProtoBuf.ProtoMember(1)]
         [EnableInBuilder(BuilderType.FormBuilder, BuilderType.FilterDialogBuilder)]
         [PropertyGroup("Behavior")]
+        [PropertyEditor(PropertyEditorType.Number)]
         public int MaxLength { get; set; }
 
         [ProtoBuf.ProtoMember(2)]
+        [EnableInBuilder(BuilderType.FormBuilder)]
         [PropertyGroup("Behavior")]
+        [PropertyEditor(PropertyEditorType.DropDown)]
         public TextTransform TextTransform { get; set; }
 
         [ProtoBuf.ProtoMember(3)]
+        [EnableInBuilder(BuilderType.FormBuilder)]
         [PropertyGroup("Behavior")]
         public TextMode TextMode { get; set; }
 
         [ProtoBuf.ProtoMember(4)]
+        [EnableInBuilder(BuilderType.FormBuilder)]
         [PropertyGroup("Behavior")]
         public string PlaceHolder { get; set; }
 
         [ProtoBuf.ProtoMember(5)]
+        [EnableInBuilder(BuilderType.FormBuilder)]
         [PropertyGroup("Appearance")]
         public string Text { get; set; }
 
         [ProtoBuf.ProtoMember(6)]
         [PropertyGroup("Behavior")]
+        [EnableInBuilder(BuilderType.FormBuilder)]
         public bool AutoCompleteOff { get; set; }
 
         [ProtoBuf.ProtoMember(7)]
@@ -95,7 +102,7 @@ namespace ExpressBase.Objects
             return this.Text;
         }
 
-        
+
         public static string test = JsObject(BuilderType.FormBuilder);
 
         public override string GetHtml()
@@ -145,22 +152,40 @@ namespace ExpressBase.Objects
 
             foreach (var prop in props)
             {
-                _props += JsVarDecl(prop);
-
                 var propattrs = prop.GetCustomAttributes();
 
-                if (prop.IsDefined(typeof(EnableInBuilder)) 
-                    && prop.GetCustomAttribute<EnableInBuilder>().BuilderTypes.Contains(_builderType))
+                if (prop.IsDefined(typeof(EnableInBuilder))
+                     && prop.GetCustomAttribute<EnableInBuilder>().BuilderTypes.Contains(_builderType))
                 {
-                    var meta = new Meta { Name = prop.Name };
+                    _props += JsVarDecl(prop);
+
+                    var meta = new Meta { name = prop.Name };
+                    //Type = (prop.PropertyType.GetTypeInfo().IsEnum) ?  "select" : (prop.PropertyType.Name).Contains("Int") ? "number" : prop.PropertyType.Name
 
                     foreach (Attribute attr in propattrs)
                     {
                         if (attr is PropertyGroup)
-                            meta.Group = (attr as PropertyGroup).Name;
+                            meta.group = (attr as PropertyGroup).Name;
+
+                        //set corresponding editor
                         else if (attr is PropertyEditor)
-                            meta.Editor = (attr as PropertyEditor).PropertyEditorType;
+                        {
+                            meta.editor = (attr as PropertyEditor).PropertyEditorType;
+                            if (prop.PropertyType.GetTypeInfo().IsEnum)
+                                meta.options = Enum.GetNames(prop.PropertyType);
+                        }
                     }
+
+                    //if prop is of enum type set DD editor
+                    if (prop.PropertyType.GetTypeInfo().IsEnum)
+                    {
+                        meta.editor = PropertyEditorType.DropDown;
+                        meta.options = Enum.GetNames(prop.PropertyType);
+                    }
+
+                    //if prop is of premitive type set corresponding editor
+                    if (!prop.IsDefined(typeof(PropertyEditor)) && !prop.PropertyType.GetTypeInfo().IsEnum)
+                        meta.editor = GetTypeOf(prop);
 
                     MetaCollection.Add(meta);
                 }
@@ -168,21 +193,20 @@ namespace ExpressBase.Objects
 
             return @"
 var TextBoxObj = function (id) {
-    this.$type = '@Type',
-    this.Id = id,
-    this.Name = id,
-    @Props
-    this.Meta=@Meta
-}"
+    this.$type = '@Type';
+    this.Id = id;
+    this.Name = id;@Props
+    this.Metas=@meta
+};"
 .Replace("@Type", me.GetType().FullName)
 .Replace("@Props", _props)
-.Replace("@Meta", JsonConvert.SerializeObject(MetaCollection));
+.Replace("@meta", JsonConvert.SerializeObject(MetaCollection));
         }
 
         private static string JsVarDecl(PropertyInfo prop)
         {
             string s = @"
-                    this.{0} = {1},";
+    this.{0} = {1};";
 
             if (prop.PropertyType == typeof(string))
             {
@@ -200,8 +224,25 @@ var TextBoxObj = function (id) {
             else if (prop.PropertyType.GetTypeInfo().IsEnum)
                 return string.Format(s, prop.Name, "'--select--'");
 
-            else 
+            else
                 return string.Format(s, prop.Name, "null");
+        }
+
+        private static PropertyEditorType GetTypeOf(PropertyInfo prop)
+        {
+            var typeName = prop.PropertyType.Name;
+
+            if (typeName.Contains("Int") || typeName.Contains("Decimal") ||
+                    typeName.Contains("Double") || typeName.Contains("Single"))
+                return PropertyEditorType.Number;
+
+            else if (typeName == "String")
+                return PropertyEditorType.Text;
+
+            else if (typeName == "Boolean")
+                return PropertyEditorType.Boolean;
+
+            return PropertyEditorType.Text;
         }
     }
 
@@ -226,10 +267,15 @@ var TextBoxObj = function (id) {
 
     public enum PropertyEditorType
     {
+
+        Boolean,
         DropDown,
+        Number,
+        Color,
+        Label,
+        Text,
         Collection,
         Columns,
-        Color
     }
 
     public class PropertyEditor : Attribute
@@ -254,10 +300,14 @@ var TextBoxObj = function (id) {
 
     public class Meta
     {
-        public string Name { get; set; }
+        public string name { get; set; }
 
-        public string Group { get; set; }
+        public string group { get; set; }
 
-        public PropertyEditorType Editor { get; set; }
+        //public string Type { get; set; }
+
+        public PropertyEditorType editor { get; set; }
+
+        public string[] options { get; set; }
     }
 }
