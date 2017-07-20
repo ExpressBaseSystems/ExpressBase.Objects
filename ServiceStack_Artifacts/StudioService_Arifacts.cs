@@ -14,6 +14,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         public int Id { get; set; } // (Id > 0) Fetch all version without bytea / Fetch latest version with bytea 
 
+        public int DominantId { get; set; }
+
         public int VersionId { get; set; } // (VersionId > 0 and VersionId != Int32.MaxValue) Fetch particular version with Bytea
 
         public int EbObjectType { get; set; } // Get All latest of this Object Type without Bytea
@@ -112,6 +114,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 10)]
         public DateTime CommitTs { get; set; }
+        
 
         public EbObjectWrapper() { }
     }
