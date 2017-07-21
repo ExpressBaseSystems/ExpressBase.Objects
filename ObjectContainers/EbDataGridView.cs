@@ -162,10 +162,10 @@ namespace ExpressBase.Objects
                              <button class='btn btn-default dropdown-toggle' type='button' data-toggle='dropdown'>
                            <span class='caret'></span></button>
                           <ul class='dropdown-menu'>
-                                <li><a href='#'>Line</a></li>
-                                <li><a href = '#'> Bar </a ></li>
-                                <li><a href = '#'> AreaFilled </a></li>
-                                <li><a href = '#'> pie </a></li>
+                                <li><a href =  '#'><i class='fa fa-line-chart custom'></i> Line</a></li>
+                                <li><a href = '#'><i class='fa fa-bar-chart custom'></i> Bar </a></li>
+                                <li><a href = '#'><i class='fa fa-area-chart custom'></i> AreaFilled </a></li>
+                                <li><a href = '#'><i class='fa fa-pie-chart custom'></i> pie </a></li>
                                 <li><a href = '#'> doughnut </a></li>
                                 </ul>
                       </div>
