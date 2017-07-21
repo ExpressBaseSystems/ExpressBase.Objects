@@ -11,8 +11,8 @@ namespace ExpressBase.Objects
     public enum TextTransform
     {
         Normal,
-        LowerCase,
-        UpperCase,
+        lowercase,
+        UPPERCASE,
     }
 
     public enum TextMode
@@ -160,7 +160,6 @@ namespace ExpressBase.Objects
                     _props += JsVarDecl(prop);
 
                     var meta = new Meta { name = prop.Name };
-                    //Type = (prop.PropertyType.GetTypeInfo().IsEnum) ?  "select" : (prop.PropertyType.Name).Contains("Int") ? "number" : prop.PropertyType.Name
 
                     foreach (Attribute attr in propattrs)
                     {
