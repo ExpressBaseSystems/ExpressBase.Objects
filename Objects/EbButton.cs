@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 namespace ExpressBase.Objects
 {
     [ProtoBuf.ProtoContract]
+    [EnableInBuilder(BuilderType.FormBuilder, BuilderType.FilterDialogBuilder)]
     public class EbButton : EbControl
     {
         public EbButton() { }

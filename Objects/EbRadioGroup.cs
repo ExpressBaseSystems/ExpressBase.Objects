@@ -15,6 +15,7 @@ namespace ExpressBase.Objects
     }
 
     [ProtoBuf.ProtoContract]
+    [EnableInBuilder(BuilderType.FormBuilder, BuilderType.FilterDialogBuilder)]
     public class EbRadioGroup : EbControl
     {
         public EbRadioGroup()

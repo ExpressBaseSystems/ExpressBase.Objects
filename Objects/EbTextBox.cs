@@ -11,8 +11,8 @@ namespace ExpressBase.Objects
     public enum TextTransform
     {
         Normal,
-        LowerCase,
-        UpperCase,
+        lowercase,
+        UPPERCASE,
     }
 
     public enum TextMode
@@ -24,6 +24,7 @@ namespace ExpressBase.Objects
     }
 
     [ProtoBuf.ProtoContract]
+    [EnableInBuilder(BuilderType.FormBuilder, BuilderType.FilterDialogBuilder)]
     public class EbTextBox : EbControl
     {
         [ProtoBuf.ProtoMember(1)]
@@ -103,7 +104,7 @@ namespace ExpressBase.Objects
         }
 
 
-        public static string test = JsObject(BuilderType.FormBuilder);
+        public static string test = GetJsObject(BuilderType.FormBuilder);
 
         public override string GetHtml()
         {
@@ -136,12 +137,12 @@ namespace ExpressBase.Objects
 .Replace("@backColor", "background-color:" + this.BackColor + ";")
 .Replace("@foreColor", "color:" + this.ForeColor + ";")
 .Replace("@lblBackColor", "background-color:" + this.LabelBackColor + ";")
-.Replace("@LblForeColor", "color:" + this.LabelForeColor + ";" + test);
+.Replace("@LblForeColor", "color:" + this.LabelForeColor + ";" + test );
 
         }
 
 
-        public static string JsObject(BuilderType _builderType)
+        public static string GetJsObject(BuilderType _builderType)
         {
             string _props = string.Empty;
             var me = new EbTextBox();
@@ -160,17 +161,29 @@ namespace ExpressBase.Objects
                     _props += JsVarDecl(prop);
 
                     var meta = new Meta { name = prop.Name };
-                    //Type = (prop.PropertyType.GetTypeInfo().IsEnum) ?  "select" : (prop.PropertyType.Name).Contains("Int") ? "number" : prop.PropertyType.Name
 
                     foreach (Attribute attr in propattrs)
                     {
                         if (attr is PropertyGroup)
                             meta.group = (attr as PropertyGroup).Name;
+
+                        //set corresponding editor
                         else if (attr is PropertyEditor)
+                        {
                             meta.editor = (attr as PropertyEditor).PropertyEditorType;
+                            if (prop.PropertyType.GetTypeInfo().IsEnum)
+                                meta.options = Enum.GetNames(prop.PropertyType);
+                        }
                     }
 
+                    //if prop is of enum type set DD editor
+                    if (prop.PropertyType.GetTypeInfo().IsEnum)
+                    {
+                        meta.editor = PropertyEditorType.DropDown;
+                        meta.options = Enum.GetNames(prop.PropertyType);
+                    }
 
+                    //if prop is of premitive type set corresponding editor
                     if (!prop.IsDefined(typeof(PropertyEditor)) && !prop.PropertyType.GetTypeInfo().IsEnum)
                         meta.editor = GetTypeOf(prop);
 
@@ -183,7 +196,7 @@ var TextBoxObj = function (id) {
     this.$type = '@Type';
     this.Id = id;
     this.Name = id;@Props
-    this.Meta=@meta
+    this.Metas=@meta
 };"
 .Replace("@Type", me.GetType().FullName)
 .Replace("@Props", _props)
@@ -227,7 +240,7 @@ var TextBoxObj = function (id) {
                 return PropertyEditorType.Text;
 
             else if (typeName == "Boolean")
-                return PropertyEditorType.boolean;
+                return PropertyEditorType.Boolean;
 
             return PropertyEditorType.Text;
         }
@@ -241,7 +254,7 @@ var TextBoxObj = function (id) {
         ReportBuilder,
     }
 
-    [AttributeUsage(AttributeTargets.Property, Inherited = false)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property, Inherited = false)]
     public class EnableInBuilder : Attribute
     {
         public BuilderType[] BuilderTypes { get; set; }
@@ -254,13 +267,15 @@ var TextBoxObj = function (id) {
 
     public enum PropertyEditorType
     {
+
+        Boolean,
         DropDown,
+        Number,
+        Color,
+        Label,
+        Text,
         Collection,
         Columns,
-        Color,
-        Number,
-        Text,
-        boolean
     }
 
     public class PropertyEditor : Attribute
@@ -292,5 +307,7 @@ var TextBoxObj = function (id) {
         //public string Type { get; set; }
 
         public PropertyEditorType editor { get; set; }
+
+        public string[] options { get; set; }
     }
 }

@@ -143,10 +143,16 @@ else
         public virtual int TabIndex { get; set; }
 
         [ProtoBuf.ProtoMember(29)]
+        [EnableInBuilder(BuilderType.FormBuilder)]
+        [PropertyGroup("Appearance")]
+        [PropertyEditor(PropertyEditorType.Color)]
         [System.ComponentModel.Category("Accessibility")]
         public virtual string BackColor { get; set; }
 
         [ProtoBuf.ProtoMember(30)]
+        [EnableInBuilder(BuilderType.FormBuilder)]
+        [PropertyGroup("Appearance")]
+        [PropertyEditor(PropertyEditorType.Color)]
         [System.ComponentModel.Category("Accessibility")]
         public virtual string ForeColor { get; set; }
 
