@@ -24,6 +24,7 @@ namespace ExpressBase.Objects
     }
 
     [ProtoBuf.ProtoContract]
+    [EnableInBuilder(BuilderType.FormBuilder, BuilderType.FilterDialogBuilder)]
     public class EbTextBox : EbControl
     {
         [ProtoBuf.ProtoMember(1)]
@@ -103,7 +104,7 @@ namespace ExpressBase.Objects
         }
 
 
-        public static string test = JsObject(BuilderType.FormBuilder);
+        public static string test = GetJsObject(BuilderType.FormBuilder);
 
         public override string GetHtml()
         {
@@ -136,12 +137,12 @@ namespace ExpressBase.Objects
 .Replace("@backColor", "background-color:" + this.BackColor + ";")
 .Replace("@foreColor", "color:" + this.ForeColor + ";")
 .Replace("@lblBackColor", "background-color:" + this.LabelBackColor + ";")
-.Replace("@LblForeColor", "color:" + this.LabelForeColor + ";" + test);
+.Replace("@LblForeColor", "color:" + this.LabelForeColor + ";" + test );
 
         }
 
 
-        public static string JsObject(BuilderType _builderType)
+        public static string GetJsObject(BuilderType _builderType)
         {
             string _props = string.Empty;
             var me = new EbTextBox();
@@ -253,7 +254,7 @@ var TextBoxObj = function (id) {
         ReportBuilder,
     }
 
-    [AttributeUsage(AttributeTargets.Property, Inherited = false)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property, Inherited = false)]
     public class EnableInBuilder : Attribute
     {
         public BuilderType[] BuilderTypes { get; set; }

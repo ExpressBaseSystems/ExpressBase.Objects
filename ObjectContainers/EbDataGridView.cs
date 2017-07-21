@@ -64,6 +64,7 @@ namespace ExpressBase.Objects
                 _html += @"</div>";
             }
             this.filters = _html;
+            this.script = _head;
         }
 
         public override void Init4Redis(IRedisClient redisclient, IServiceClient serviceclient)
