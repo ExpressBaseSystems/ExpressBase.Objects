@@ -152,7 +152,7 @@ else
         [ProtoBuf.ProtoMember(30)]
         [EnableInBuilder(BuilderType.FormBuilder)]
         [PropertyGroup("Appearance")]
-        [PropertyEditor(PropertyEditorType.Collection)]
+        [PropertyEditor(PropertyEditorType.Color)]
         [System.ComponentModel.Category("Accessibility")]
         public virtual string ForeColor { get; set; }
 

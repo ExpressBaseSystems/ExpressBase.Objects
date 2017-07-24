@@ -64,6 +64,7 @@ namespace ExpressBase.Objects
                 _html += @"</div>";
             }
             this.filters = _html;
+            this.script = _head;
         }
 
         public override void Init4Redis(IRedisClient redisclient, IServiceClient serviceclient)
@@ -157,15 +158,15 @@ namespace ExpressBase.Objects
                     <table id='@tableId_1' class='table table-striped table-bordered'></table>
                 </div>
                 <div id='graphcontainer_tab@tableId_1' style='border:1px solid;display: none;'>
-                <div style='height: 50px;' class= 'well well-sm'>
+                <div style='height: 50px;margin-bottom: 1px!important;' class= 'well well-sm'>
                      <div class='dropdown' id='graphDropdown_tab@tableId_1' style='display: inline-block;padding-top: 1px;float:right'>
                              <button class='btn btn-default dropdown-toggle' type='button' data-toggle='dropdown'>
                            <span class='caret'></span></button>
                           <ul class='dropdown-menu'>
-                                <li><a href='#'>Line</a></li>
-                                <li><a href = '#'> Bar </a ></li>
-                                <li><a href = '#'> AreaFilled </a></li>
-                                <li><a href = '#'> pie </a></li>
+                                <li><a href =  '#'><i class='fa fa-line-chart custom'></i> Line</a></li>
+                                <li><a href = '#'><i class='fa fa-bar-chart custom'></i> Bar </a></li>
+                                <li><a href = '#'><i class='fa fa-area-chart custom'></i> AreaFilled </a></li>
+                                <li><a href = '#'><i class='fa fa-pie-chart custom'></i> pie </a></li>
                                 <li><a href = '#'> doughnut </a></li>
                                 </ul>
                       </div>
@@ -176,8 +177,10 @@ namespace ExpressBase.Objects
                 </div>
                 <div id ='columns4Drag@tableId_1' style='display:none;'>
                     <div style='display: inline-block;'>
-                        <ul class='list-group'  style='height: 470px; overflow-x: scroll;'>
-                        </ul>  
+                        <label class='nav-header disabled'><center><strong>Columns</strong></center><center><font size='1'>Darg n Drop to X or Y Axis</font></center></label>
+                        <input id='searchColumn@tableId_1' type='text' class ='form-control' placeholder='search for column'/>
+                        <ul class='list-group' style='height: 450px; overflow-y: auto;'>
+                         </ul>  
                     </div>
                     <div style='display: inline-block;vertical-align: top;width: 806px;'>
                         <div class='input-group'>

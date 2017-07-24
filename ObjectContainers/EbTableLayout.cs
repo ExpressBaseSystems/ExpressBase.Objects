@@ -13,6 +13,7 @@ namespace ExpressBase.Objects
     }
 
     [ProtoBuf.ProtoContract]
+    [EnableInBuilder(BuilderType.FormBuilder, BuilderType.FilterDialogBuilder)]
     public class EbTableLayout : EbControlContainer
     {
         [ProtoBuf.ProtoMember(1)]

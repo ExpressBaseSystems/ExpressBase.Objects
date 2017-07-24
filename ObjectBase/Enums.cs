@@ -8,19 +8,31 @@ namespace ExpressBase.Objects
     [ProtoBuf.ProtoContract]
     public enum EbObjectType
     {
-        Form,
-        View,
-        DataSource,
-        Report,
-        Table,
-        SqlFunction,
-        SqlValidator,
-        JavascriptFunction,
-        JavascriptValidator,
-        Application,
-        ApplicationModule,
-        DataVisualization,
-        FilterDialog
+        Form = 0,
+        View = 1,
+        DataSource = 2,
+        Report = 3,
+        Table = 4,
+        SqlFunction = 5,
+        SqlValidator = 6,
+        JavascriptFunction = 7,
+        JavascriptValidator = 8,
+        Application = 9,
+        ApplicationModule = 10,
+        DataVisualization = 11,
+        FilterDialog = 12
+    }
+
+    [ProtoBuf.ProtoContract]
+    public enum EbObjectTypesUI
+    {
+        Form = 0,
+        Report = 3,
+        Table = 4,
+        Application = 9,
+        ApplicationModule = 10,
+        DataVisualization = 11,
+        FilterDialog = 12
     }
 
     [ProtoBuf.ProtoContract]
