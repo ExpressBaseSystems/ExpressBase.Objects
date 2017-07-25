@@ -32,7 +32,7 @@ namespace ExpressBase.Objects
 
 
     [ProtoBuf.ProtoContract]
-    [EnableInBuilder(BuilderType.FormBuilder, BuilderType.FilterDialogBuilder)]
+    [EnableInBuilder(BuilderType.WebFormBuilder, BuilderType.FilterDialogBuilder)]
     public class EbDate : EbControl
     {
         public EbDate() { }

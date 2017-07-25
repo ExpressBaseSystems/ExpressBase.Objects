@@ -17,7 +17,7 @@ namespace ExpressBase.Objects
     }
 
     [ProtoBuf.ProtoContract]
-    [EnableInBuilder(BuilderType.FormBuilder, BuilderType.FilterDialogBuilder)]
+    [EnableInBuilder(BuilderType.WebFormBuilder, BuilderType.FilterDialogBuilder)]
     public class EbComboBox : EbControl
     {
         [ProtoBuf.ProtoMember(1)]

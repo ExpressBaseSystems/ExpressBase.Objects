@@ -27,7 +27,7 @@ namespace ExpressBase.Objects
 #endif
     public class EbObject
     {
-        [Browsable(false)]
+        [EnableInBuilder(BuilderType.WebFormBuilder, BuilderType.FilterDialogBuilder)]
         public int Id { get; set; }
 
         [ProtoBuf.ProtoMember(1)]
@@ -40,6 +40,7 @@ namespace ExpressBase.Objects
 
         [ProtoBuf.ProtoMember(3)]
         [Description("Identity")]
+        [EnableInBuilder(BuilderType.WebFormBuilder, BuilderType.FilterDialogBuilder)]
         public virtual string Name { get; set; }
 
         [ProtoBuf.ProtoMember(4)]

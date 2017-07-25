@@ -24,39 +24,39 @@ namespace ExpressBase.Objects
     }
 
     [ProtoBuf.ProtoContract]
-    [EnableInBuilder(BuilderType.FormBuilder, BuilderType.FilterDialogBuilder)]
+    [EnableInBuilder(BuilderType.WebFormBuilder, BuilderType.FilterDialogBuilder)]
     public class EbTextBox : EbControl
     {
         [ProtoBuf.ProtoMember(1)]
-        [EnableInBuilder(BuilderType.FormBuilder, BuilderType.FilterDialogBuilder)]
+        [EnableInBuilder(BuilderType.WebFormBuilder, BuilderType.FilterDialogBuilder)]
         [PropertyGroup("Behavior")]
         [PropertyEditor(PropertyEditorType.Number)]
         public int MaxLength { get; set; }
 
         [ProtoBuf.ProtoMember(2)]
-        [EnableInBuilder(BuilderType.FormBuilder)]
+        [EnableInBuilder(BuilderType.WebFormBuilder)]
         [PropertyGroup("Behavior")]
         [PropertyEditor(PropertyEditorType.DropDown)]
         public TextTransform TextTransform { get; set; }
 
         [ProtoBuf.ProtoMember(3)]
-        [EnableInBuilder(BuilderType.FormBuilder)]
+        [EnableInBuilder(BuilderType.WebFormBuilder)]
         [PropertyGroup("Behavior")]
         public TextMode TextMode { get; set; }
 
         [ProtoBuf.ProtoMember(4)]
-        [EnableInBuilder(BuilderType.FormBuilder)]
+        [EnableInBuilder(BuilderType.WebFormBuilder)]
         [PropertyGroup("Behavior")]
         public string PlaceHolder { get; set; }
 
         [ProtoBuf.ProtoMember(5)]
-        [EnableInBuilder(BuilderType.FormBuilder)]
+        [EnableInBuilder(BuilderType.WebFormBuilder)]
         [PropertyGroup("Appearance")]
         public string Text { get; set; }
 
         [ProtoBuf.ProtoMember(6)]
         [PropertyGroup("Behavior")]
-        [EnableInBuilder(BuilderType.FormBuilder)]
+        [EnableInBuilder(BuilderType.WebFormBuilder)]
         public bool AutoCompleteOff { get; set; }
 
         [ProtoBuf.ProtoMember(7)]
@@ -103,9 +103,6 @@ namespace ExpressBase.Objects
             return this.Text;
         }
 
-
-        //public static string test = (new EbToolbox()).GetToolboxHtml(BuilderType.FormBuilder);
-
         public override string GetHtml()
         {
             return @"
@@ -146,7 +143,7 @@ namespace ExpressBase.Objects
     {
         DisplayBlockBuilder,
         FilterDialogBuilder,
-        FormBuilder,
+        WebFormBuilder,
         ReportBuilder,
     }
 
@@ -196,17 +193,4 @@ namespace ExpressBase.Objects
             this.Name = groupName;
         }
     }
-
-    //public class Meta
-    //{
-    //    public string name { get; set; }
-
-    //    public string group { get; set; }
-
-    //    //public string Type { get; set; }
-
-    //    public PropertyEditorType editor { get; set; }
-
-    //    public string[] options { get; set; }
-    //}
 }

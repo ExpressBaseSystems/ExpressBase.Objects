@@ -34,19 +34,25 @@ namespace ExpressBase.Objects
         [Browsable(false)]
         internal object Parent { get; set; }
 
+        //[EnableInBuilder(BuilderType.WebFormBuilder, BuilderType.FilterDialogBuilder)]
+        //public override string Name { get; set; }
+
         [ProtoBuf.ProtoMember(10)]
         [Description("Labels")]
         [System.ComponentModel.Category("Behavior")]
+        [EnableInBuilder(BuilderType.WebFormBuilder, BuilderType.FilterDialogBuilder)]
         public virtual string Label { get; set; }
 
         [ProtoBuf.ProtoMember(11)]
         [System.ComponentModel.Category("Behavior")]
         [Description("Labels")]
+        [EnableInBuilder(BuilderType.WebFormBuilder, BuilderType.FilterDialogBuilder)]
         public virtual string HelpText { get; set; }
 
         [ProtoBuf.ProtoMember(12)]
         [System.ComponentModel.Category("Behavior")]
         [Description("Labels")]
+        [EnableInBuilder(BuilderType.WebFormBuilder, BuilderType.FilterDialogBuilder)]
         public virtual string ToolTipText { get; set; }
 
         [ProtoBuf.ProtoMember(13)]
@@ -143,14 +149,14 @@ else
         public virtual int TabIndex { get; set; }
 
         [ProtoBuf.ProtoMember(29)]
-        [EnableInBuilder(BuilderType.FormBuilder)]
+        [EnableInBuilder(BuilderType.WebFormBuilder)]
         [PropertyGroup("Appearance")]
         [PropertyEditor(PropertyEditorType.Color)]
         [System.ComponentModel.Category("Accessibility")]
         public virtual string BackColor { get; set; }
 
         [ProtoBuf.ProtoMember(30)]
-        [EnableInBuilder(BuilderType.FormBuilder)]
+        [EnableInBuilder(BuilderType.WebFormBuilder)]
         [PropertyGroup("Appearance")]
         [PropertyEditor(PropertyEditorType.Color)]
         [System.ComponentModel.Category("Accessibility")]

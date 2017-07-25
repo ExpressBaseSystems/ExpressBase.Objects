@@ -13,10 +13,14 @@ namespace ExpressBase.Objects
     }
 
     [ProtoBuf.ProtoContract]
-    [EnableInBuilder(BuilderType.FormBuilder, BuilderType.FilterDialogBuilder)]
+    [EnableInBuilder(BuilderType.WebFormBuilder, BuilderType.FilterDialogBuilder)]
     [Container()]
     public class EbTableLayout : EbControlContainer
     {
+        public override string BackColor { get; set; }
+
+        public override string ForeColor { get; set; }
+
         [ProtoBuf.ProtoMember(1)]
         [Browsable(false)]
         public List<EbTableLayoutColumn> Columns { get; set; }
@@ -59,8 +63,8 @@ namespace ExpressBase.Objects
         public override string getAdditionalProps()
         {
             return @"
-this.Controls.Append(new TableTdObj(id + '_Td0'));
-this.Controls.Append(new TableTdObj(id + '_Td1'));
+this.Controls.Append(new EbObjects.EbTableTdObj(id + '_Td0'));
+this.Controls.Append(new EbObjects.EbTableTdObj(id + '_Td1'));
             ";
         }
 
