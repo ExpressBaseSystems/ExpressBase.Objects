@@ -140,110 +140,6 @@ namespace ExpressBase.Objects
 .Replace("@LblForeColor", "color:" + this.LabelForeColor + ";" );
 
         }
-
-
-        //        public static string GetJsObject(BuilderType _builderType)
-        //        {
-        //            string _props = string.Empty;
-        //            var me = new EbTextBox();
-
-        //            var props = me.GetType().GetProperties();
-
-        //            List<Meta> MetaCollection = new List<Meta>();
-
-        //            foreach (var prop in props)
-        //            {
-        //                var propattrs = prop.GetCustomAttributes();
-
-        //                if (prop.IsDefined(typeof(EnableInBuilder))
-        //                     && prop.GetCustomAttribute<EnableInBuilder>().BuilderTypes.Contains(_builderType))
-        //                {
-        //                    _props += JsVarDecl(prop);
-
-        //                    var meta = new Meta { name = prop.Name };
-
-        //                    foreach (Attribute attr in propattrs)
-        //                    {
-        //                        if (attr is PropertyGroup)
-        //                            meta.group = (attr as PropertyGroup).Name;
-
-        //                        //set corresponding editor
-        //                        else if (attr is PropertyEditor)
-        //                        {
-        //                            meta.editor = (attr as PropertyEditor).PropertyEditorType;
-        //                            if (prop.PropertyType.GetTypeInfo().IsEnum)
-        //                                meta.options = Enum.GetNames(prop.PropertyType);
-        //                        }
-        //                    }
-
-        //                    //if prop is of enum type set DD editor
-        //                    if (prop.PropertyType.GetTypeInfo().IsEnum)
-        //                    {
-        //                        meta.editor = PropertyEditorType.DropDown;
-        //                        meta.options = Enum.GetNames(prop.PropertyType);
-        //                    }
-
-        //                    //if prop is of premitive type set corresponding editor
-        //                    if (!prop.IsDefined(typeof(PropertyEditor)) && !prop.PropertyType.GetTypeInfo().IsEnum)
-        //                        meta.editor = GetTypeOf(prop);
-
-        //                    MetaCollection.Add(meta);
-        //                }
-        //            }
-
-        //            return @"
-        //var TextBoxObj = function (id) {
-        //    this.$type = '@Type';
-        //    this.Id = id;
-        //    this.Name = id;@Props
-        //    this.Metas=@meta
-        //};"
-        //.Replace("@Type", me.GetType().FullName)
-        //.Replace("@Props", _props)
-        //.Replace("@meta", JsonConvert.SerializeObject(MetaCollection));
-        //        }
-
-    //    private static string JsVarDecl(PropertyInfo prop)
-    //    {
-    //        string s = @"
-    //this.{0} = {1};";
-
-    //        if (prop.PropertyType == typeof(string))
-    //        {
-    //            if (prop.Name.EndsWith("Color"))
-    //                return string.Format(s, prop.Name, "'#FFFFFF'");
-    //            else
-    //                return string.Format(s, prop.Name, "''");
-    //        }
-    //        else if (prop.PropertyType == typeof(int))
-    //            return string.Format(s, prop.Name, "0");
-
-    //        else if (prop.PropertyType == typeof(bool))
-    //            return string.Format(s, prop.Name, "false");
-
-    //        else if (prop.PropertyType.GetTypeInfo().IsEnum)
-    //            return string.Format(s, prop.Name, "'--select--'");
-
-    //        else
-    //            return string.Format(s, prop.Name, "null");
-    //    }
-
-        //private static PropertyEditorType GetTypeOf(PropertyInfo prop)
-        //{
-        //    var typeName = prop.PropertyType.Name;
-
-        //    if (typeName.Contains("Int") || typeName.Contains("Decimal") ||
-        //            typeName.Contains("Double") || typeName.Contains("Single"))
-        //        return PropertyEditorType.Number;
-
-        //    else if (typeName == "String")
-        //        return PropertyEditorType.Text;
-
-        //    else if (typeName == "Boolean")
-        //        return PropertyEditorType.Boolean;
-
-        //    return PropertyEditorType.Text;
-        //}
     }
 
     public enum BuilderType
@@ -264,6 +160,9 @@ namespace ExpressBase.Objects
             this.BuilderTypes = types;
         }
     }
+
+    [AttributeUsage(AttributeTargets.Class , Inherited = false)]
+    public class Container : Attribute { }
 
     public enum PropertyEditorType
     {

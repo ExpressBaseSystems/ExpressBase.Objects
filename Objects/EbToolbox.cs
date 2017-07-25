@@ -24,7 +24,7 @@ namespace ExpressBase.Objects
 
             this.AllMetas = "AllMetas = {";
 
-            this.AllControlls = "";
+            this.AllControlls = "var EbObjects = {};";
 
             var types = this.GetType().GetTypeInfo().Assembly.GetTypes();
 
@@ -37,7 +37,6 @@ namespace ExpressBase.Objects
                     {
                         _toolsHtml += GetToolHtml(tool.Name.Substring(2));
                         this.GetJsObject(tool, _builderType);
-
                     }
                 }
             }
@@ -59,13 +58,19 @@ namespace ExpressBase.Objects
         {
             string _props = string.Empty;
 
-            //var me = new EbTextBox();
-
             var me = Activator.CreateInstance(tool);
 
             var props = me.GetType().GetProperties();
 
             List<Meta> MetaCollection = new List<Meta>();
+
+            if(tool.GetTypeInfo().IsSubclassOf(typeof (EbControlContainer)))
+                    {
+                        _props += @"
+this.IsContainer = true,
+this.Controls = new EbControlCollection();";
+                        _props += (me as EbControlContainer).getAdditionalProps();
+                    }
 
             foreach (var prop in props)
             {
@@ -74,7 +79,6 @@ namespace ExpressBase.Objects
                 if (prop.IsDefined(typeof(EnableInBuilder))
                              && prop.GetCustomAttribute<EnableInBuilder>().BuilderTypes.Contains(_builderType))
                 {
-
                     _props += JsVarDecl(prop);
 
                     var meta = new Meta { name = prop.Name };
@@ -115,7 +119,7 @@ namespace ExpressBase.Objects
 .Replace("@MetaCollection", JsonConvert.SerializeObject(MetaCollection));
 
             this.AllControlls += @"
-var @NameObj = function (id) {
+EbObjects.@NameObj = function @NameObj(id) {
     this.$type = '@Type';
     this.Id = id;
     this.Name = id;@Props
@@ -170,7 +174,7 @@ var @NameObj = function (id) {
 
         private static string GetToolHtml(string tool_name)
         {
-            return @"<div class='well well-sm'>
+            return @"<div eb-type='@toolName' class='well well-sm'>
                             @toolName
                     </div>".Replace("@toolName", tool_name);
         }

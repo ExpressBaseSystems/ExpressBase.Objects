@@ -47,6 +47,11 @@ namespace ExpressBase.Objects
             this.FlattenControls(redisclient, serviceclient);
         }
 
+        virtual public string getAdditionalProps()
+        {
+            return "";
+        }
+
 #if !NET462
         public void SetData(EbDataTable dt)
         {
@@ -166,4 +171,5 @@ namespace ExpressBase.Objects
 
 #endregion PRIVATE METHODS
     }
+
 }

@@ -14,6 +14,7 @@ namespace ExpressBase.Objects
 
     [ProtoBuf.ProtoContract]
     [EnableInBuilder(BuilderType.FormBuilder, BuilderType.FilterDialogBuilder)]
+    [Container()]
     public class EbTableLayout : EbControlContainer
     {
         [ProtoBuf.ProtoMember(1)]
@@ -23,6 +24,8 @@ namespace ExpressBase.Objects
         [ProtoBuf.ProtoMember(2)]
         [Browsable(false)]
         public List<EbTableRow> Rows { get; set; }
+
+        public  bool IsContainer = true;
 
         public EbTableLayout() { }
 
@@ -51,6 +54,14 @@ namespace ExpressBase.Objects
             }
 
             return html;
+        }
+
+        public override string getAdditionalProps()
+        {
+            return @"
+this.Controls.Append(new TableTdObj(id + '_Td0'));
+this.Controls.Append(new TableTdObj(id + '_Td1'));
+            ";
         }
 
         private string GetTable()
