@@ -34,7 +34,8 @@ namespace ExpressBase.Objects
                     if (tool.GetTypeInfo().IsDefined(typeof(EnableInBuilder))
                          && tool.GetTypeInfo().GetCustomAttribute<EnableInBuilder>().BuilderTypes.Contains(_builderType))
                     {
-                        _toolsHtml += GetToolHtml(tool.Name.Substring(2));
+                        if (!tool.GetTypeInfo().IsDefined(typeof(HideInToolBox)))
+                            _toolsHtml += GetToolHtml(tool.Name.Substring(2));
                         this.GetJsObject(tool, _builderType);
                     }
                 }
@@ -62,13 +63,13 @@ namespace ExpressBase.Objects
 
             List<Meta> MetaCollection = new List<Meta>();
 
-            if(tool.GetTypeInfo().IsSubclassOf(typeof (EbControlContainer)))
-                    {
-                        _props += @"
+            if (tool.GetTypeInfo().IsSubclassOf(typeof(EbControlContainer)))
+            {
+                _props += @"
 this.IsContainer = true,
 this.Controls = new EbControlCollection();";
-                        _props += (me as EbControlContainer).getAdditionalProps();
-                    }
+                _props += (me as EbControlContainer).getAdditionalProps();
+            }
 
             foreach (var prop in props)
             {
@@ -188,4 +189,6 @@ EbObjects.@NameObj = function @NameObj(id) {
 
         public string[] options { get; set; }
     }
+
+    public class HideInToolBox : Attribute { }
 }
