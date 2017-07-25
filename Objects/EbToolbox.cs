@@ -9,7 +9,6 @@ namespace ExpressBase.Objects
 {
     public class EbToolbox
     {
-
         public string AllControlls { get; set; }
 
         public string AllMetas { get; set; }
@@ -47,7 +46,6 @@ namespace ExpressBase.Objects
 
             this.html = _toolsHtml;
         }
-
 
         public string getHead()
         {
@@ -185,8 +183,6 @@ EbObjects.@NameObj = function @NameObj(id) {
         public string name { get; set; }
 
         public string group { get; set; }
-
-        //public string Type { get; set; }
 
         public PropertyEditorType editor { get; set; }
 
