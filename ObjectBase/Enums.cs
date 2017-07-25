@@ -8,8 +8,8 @@ namespace ExpressBase.Objects
     [ProtoBuf.ProtoContract]
     public enum EbObjectType
     {
-        Form = 0,
-        View = 1,
+        WebForm = 0,
+        DisplayBlock = 1,
         DataSource = 2,
         Report = 3,
         Table = 4,
