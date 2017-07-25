@@ -120,8 +120,7 @@ this.Controls = new EbControlCollection();";
             this.AllControlls += @"
 EbObjects.@NameObj = function @NameObj(id) {
     this.$type = '@Type';
-    this.Id = id;
-    this.Name = id;@Props
+    @Props
 };"
 .Replace("@Name", tool.Name)
 .Replace("@Type", me.GetType().FullName)
@@ -148,32 +147,28 @@ EbObjects.@NameObj = function @NameObj(id) {
 
         private static string JsVarDecl(PropertyInfo prop)
         {
-            string s = @"
-    this.{0} = {1};";
+            string s = @"this.{0} = {1};";
 
             if (prop.PropertyType == typeof(string))
             {
                 if (prop.Name.EndsWith("Color"))
                     return string.Format(s, prop.Name, "'#FFFFFF'");
                 else
-                    return string.Format(s, prop.Name, "''");
+                    return string.Format(s, prop.Name, (prop.Name == "Name") ? "id" : "null");
             }
             else if (prop.PropertyType == typeof(int))
-                return string.Format(s, prop.Name, "0");
-
+                return string.Format(s, prop.Name, ((prop.Name == "Id") ? "id" : "0"));
             else if (prop.PropertyType == typeof(bool))
                 return string.Format(s, prop.Name, "false");
-
             else if (prop.PropertyType.GetTypeInfo().IsEnum)
                 return string.Format(s, prop.Name, "'--select--'");
-
             else
                 return string.Format(s, prop.Name, "null");
         }
 
         private static string GetToolHtml(string tool_name)
         {
-            return @"<div eb-type='@toolName' class='well well-sm'>
+            return @"<div eb-type='@toolName' class='tool'>
                             @toolName
                     </div>".Replace("@toolName", tool_name);
         }
