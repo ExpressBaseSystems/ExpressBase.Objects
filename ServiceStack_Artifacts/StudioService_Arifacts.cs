@@ -14,6 +14,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         public int Id { get; set; } // (Id > 0) Fetch all version without bytea / Fetch latest version with bytea 
 
+        public bool IsTest { get; set; } // If (IsTest == true) test the function
+
         public int DominantId { get; set; }
 
         public int VersionId { get; set; } // (VersionId > 0 and VersionId != Int32.MaxValue) Fetch particular version with Bytea
@@ -45,7 +47,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class EbObjectSaveOrCommitRequest : IReturn<EbObjectSaveOrCommitResponse>, IEbSSRequest
     {      
         public bool IsSave { get; set; } // If (IsSave == true) Save else Commit
-        
+
+        public bool NeedRun { get; set; } // If (NeedRun == true) Save and Run else save Only
+
         public int Id { get; set; } // (Id == 0) First Commit else Subsequent Commit
       
         public int EbObjectType { get; set; }

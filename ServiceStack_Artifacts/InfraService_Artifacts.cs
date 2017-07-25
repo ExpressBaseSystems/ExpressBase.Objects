@@ -167,17 +167,19 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     [DataContract]
     public class TokenRequiredSelectResponse: IEbSSResponse
     {
-       
         [DataMember(Order = 1)]
         public List<List<object>> returnlist { get; set; }
 
         [DataMember(Order = 2)]
-        public Dictionary<string, object> Data { get; set; }
+        public List<string> Permissions { get; set; }
 
         [DataMember(Order = 3)]
-        public string Token { get; set; }
+        public Dictionary<string, object> Data { get; set; }
 
         [DataMember(Order = 4)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 5)]
         public ResponseStatus ResponseStatus { get; set; }
     }
 

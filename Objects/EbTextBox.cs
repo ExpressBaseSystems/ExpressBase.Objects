@@ -24,6 +24,7 @@ namespace ExpressBase.Objects
     }
 
     [ProtoBuf.ProtoContract]
+    [EnableInBuilder(BuilderType.FormBuilder, BuilderType.FilterDialogBuilder)]
     public class EbTextBox : EbControl
     {
         [ProtoBuf.ProtoMember(1)]
@@ -103,7 +104,7 @@ namespace ExpressBase.Objects
         }
 
 
-        public static string test = JsObject(BuilderType.FormBuilder);
+        //public static string test = (new EbToolbox()).GetToolboxHtml(BuilderType.FormBuilder);
 
         public override string GetHtml()
         {
@@ -136,113 +137,113 @@ namespace ExpressBase.Objects
 .Replace("@backColor", "background-color:" + this.BackColor + ";")
 .Replace("@foreColor", "color:" + this.ForeColor + ";")
 .Replace("@lblBackColor", "background-color:" + this.LabelBackColor + ";")
-.Replace("@LblForeColor", "color:" + this.LabelForeColor + ";" + test);
+.Replace("@LblForeColor", "color:" + this.LabelForeColor + ";" );
 
         }
 
 
-        public static string JsObject(BuilderType _builderType)
-        {
-            string _props = string.Empty;
-            var me = new EbTextBox();
+        //        public static string GetJsObject(BuilderType _builderType)
+        //        {
+        //            string _props = string.Empty;
+        //            var me = new EbTextBox();
 
-            var props = me.GetType().GetProperties();
+        //            var props = me.GetType().GetProperties();
 
-            List<Meta> MetaCollection = new List<Meta>();
+        //            List<Meta> MetaCollection = new List<Meta>();
 
-            foreach (var prop in props)
-            {
-                var propattrs = prop.GetCustomAttributes();
+        //            foreach (var prop in props)
+        //            {
+        //                var propattrs = prop.GetCustomAttributes();
 
-                if (prop.IsDefined(typeof(EnableInBuilder))
-                     && prop.GetCustomAttribute<EnableInBuilder>().BuilderTypes.Contains(_builderType))
-                {
-                    _props += JsVarDecl(prop);
+        //                if (prop.IsDefined(typeof(EnableInBuilder))
+        //                     && prop.GetCustomAttribute<EnableInBuilder>().BuilderTypes.Contains(_builderType))
+        //                {
+        //                    _props += JsVarDecl(prop);
 
-                    var meta = new Meta { name = prop.Name };
+        //                    var meta = new Meta { name = prop.Name };
 
-                    foreach (Attribute attr in propattrs)
-                    {
-                        if (attr is PropertyGroup)
-                            meta.group = (attr as PropertyGroup).Name;
+        //                    foreach (Attribute attr in propattrs)
+        //                    {
+        //                        if (attr is PropertyGroup)
+        //                            meta.group = (attr as PropertyGroup).Name;
 
-                        //set corresponding editor
-                        else if (attr is PropertyEditor)
-                        {
-                            meta.editor = (attr as PropertyEditor).PropertyEditorType;
-                            if (prop.PropertyType.GetTypeInfo().IsEnum)
-                                meta.options = Enum.GetNames(prop.PropertyType);
-                        }
-                    }
+        //                        //set corresponding editor
+        //                        else if (attr is PropertyEditor)
+        //                        {
+        //                            meta.editor = (attr as PropertyEditor).PropertyEditorType;
+        //                            if (prop.PropertyType.GetTypeInfo().IsEnum)
+        //                                meta.options = Enum.GetNames(prop.PropertyType);
+        //                        }
+        //                    }
 
-                    //if prop is of enum type set DD editor
-                    if (prop.PropertyType.GetTypeInfo().IsEnum)
-                    {
-                        meta.editor = PropertyEditorType.DropDown;
-                        meta.options = Enum.GetNames(prop.PropertyType);
-                    }
+        //                    //if prop is of enum type set DD editor
+        //                    if (prop.PropertyType.GetTypeInfo().IsEnum)
+        //                    {
+        //                        meta.editor = PropertyEditorType.DropDown;
+        //                        meta.options = Enum.GetNames(prop.PropertyType);
+        //                    }
 
-                    //if prop is of premitive type set corresponding editor
-                    if (!prop.IsDefined(typeof(PropertyEditor)) && !prop.PropertyType.GetTypeInfo().IsEnum)
-                        meta.editor = GetTypeOf(prop);
+        //                    //if prop is of premitive type set corresponding editor
+        //                    if (!prop.IsDefined(typeof(PropertyEditor)) && !prop.PropertyType.GetTypeInfo().IsEnum)
+        //                        meta.editor = GetTypeOf(prop);
 
-                    MetaCollection.Add(meta);
-                }
-            }
+        //                    MetaCollection.Add(meta);
+        //                }
+        //            }
 
-            return @"
-var TextBoxObj = function (id) {
-    this.$type = '@Type';
-    this.Id = id;
-    this.Name = id;@Props
-    this.Metas=@meta
-};"
-.Replace("@Type", me.GetType().FullName)
-.Replace("@Props", _props)
-.Replace("@meta", JsonConvert.SerializeObject(MetaCollection));
-        }
+        //            return @"
+        //var TextBoxObj = function (id) {
+        //    this.$type = '@Type';
+        //    this.Id = id;
+        //    this.Name = id;@Props
+        //    this.Metas=@meta
+        //};"
+        //.Replace("@Type", me.GetType().FullName)
+        //.Replace("@Props", _props)
+        //.Replace("@meta", JsonConvert.SerializeObject(MetaCollection));
+        //        }
 
-        private static string JsVarDecl(PropertyInfo prop)
-        {
-            string s = @"
-    this.{0} = {1};";
+    //    private static string JsVarDecl(PropertyInfo prop)
+    //    {
+    //        string s = @"
+    //this.{0} = {1};";
 
-            if (prop.PropertyType == typeof(string))
-            {
-                if (prop.Name.EndsWith("Color"))
-                    return string.Format(s, prop.Name, "'#FFFFFF'");
-                else
-                    return string.Format(s, prop.Name, "''");
-            }
-            else if (prop.PropertyType == typeof(int))
-                return string.Format(s, prop.Name, "0");
+    //        if (prop.PropertyType == typeof(string))
+    //        {
+    //            if (prop.Name.EndsWith("Color"))
+    //                return string.Format(s, prop.Name, "'#FFFFFF'");
+    //            else
+    //                return string.Format(s, prop.Name, "''");
+    //        }
+    //        else if (prop.PropertyType == typeof(int))
+    //            return string.Format(s, prop.Name, "0");
 
-            else if (prop.PropertyType == typeof(bool))
-                return string.Format(s, prop.Name, "false");
+    //        else if (prop.PropertyType == typeof(bool))
+    //            return string.Format(s, prop.Name, "false");
 
-            else if (prop.PropertyType.GetTypeInfo().IsEnum)
-                return string.Format(s, prop.Name, "'--select--'");
+    //        else if (prop.PropertyType.GetTypeInfo().IsEnum)
+    //            return string.Format(s, prop.Name, "'--select--'");
 
-            else
-                return string.Format(s, prop.Name, "null");
-        }
+    //        else
+    //            return string.Format(s, prop.Name, "null");
+    //    }
 
-        private static PropertyEditorType GetTypeOf(PropertyInfo prop)
-        {
-            var typeName = prop.PropertyType.Name;
+        //private static PropertyEditorType GetTypeOf(PropertyInfo prop)
+        //{
+        //    var typeName = prop.PropertyType.Name;
 
-            if (typeName.Contains("Int") || typeName.Contains("Decimal") ||
-                    typeName.Contains("Double") || typeName.Contains("Single"))
-                return PropertyEditorType.Number;
+        //    if (typeName.Contains("Int") || typeName.Contains("Decimal") ||
+        //            typeName.Contains("Double") || typeName.Contains("Single"))
+        //        return PropertyEditorType.Number;
 
-            else if (typeName == "String")
-                return PropertyEditorType.Text;
+        //    else if (typeName == "String")
+        //        return PropertyEditorType.Text;
 
-            else if (typeName == "Boolean")
-                return PropertyEditorType.Boolean;
+        //    else if (typeName == "Boolean")
+        //        return PropertyEditorType.Boolean;
 
-            return PropertyEditorType.Text;
-        }
+        //    return PropertyEditorType.Text;
+        //}
     }
 
     public enum BuilderType
@@ -253,7 +254,7 @@ var TextBoxObj = function (id) {
         ReportBuilder,
     }
 
-    [AttributeUsage(AttributeTargets.Property, Inherited = false)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property, Inherited = false)]
     public class EnableInBuilder : Attribute
     {
         public BuilderType[] BuilderTypes { get; set; }
@@ -297,16 +298,16 @@ var TextBoxObj = function (id) {
         }
     }
 
-    public class Meta
-    {
-        public string name { get; set; }
+    //public class Meta
+    //{
+    //    public string name { get; set; }
 
-        public string group { get; set; }
+    //    public string group { get; set; }
 
-        //public string Type { get; set; }
+    //    //public string Type { get; set; }
 
-        public PropertyEditorType editor { get; set; }
+    //    public PropertyEditorType editor { get; set; }
 
-        public string[] options { get; set; }
-    }
+    //    public string[] options { get; set; }
+    //}
 }
