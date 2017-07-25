@@ -139,10 +139,7 @@ namespace ExpressBase.Objects
 
             //@tableViewName
             return @"
-<div class='tablecontainer' id='@tableId_1container' style='background-color:rgb(260,260,260)'>
-        <label>
-                @dvname
-        </label>
+<div class='tablecontainer' id='@tableId_1container' style='background-color:rgb(260,260,260)'>        
          <ul class='nav nav-tabs' id='table_tabs'>
                 <li class='nav-item active'>
                     <a class='nav-link' href='#@tableId_tab_1' data-toggle='tab'><i class='fa fa-home' aria-hidden='true'></i>&nbsp; Home</a>
@@ -151,14 +148,19 @@ namespace ExpressBase.Objects
          <div class='tab-content' id='table_tabcontent'>
              <div id='@tableId_tab_1' class='tab-pane active'>
                  <div id='TableControls_@tableId_1' class = 'well well-sm' style='margin-bottom:5px!important;'>
-                    <button id='btnGo' class='btn btn-primary' >Run</button>
+                    <label>@dvname</label>
+                    <button id='btnGo' class='btn btn-primary' style='float: right;'>Run</button>
                     @filters  
                 </div>
                 <div style='width:auto;' id='@tableId_1divcont'>
                     <table id='@tableId_1' class='table table-striped table-bordered'></table>
                 </div>
-                <div id='graphcontainer_tab@tableId_1' style='border:1px solid;display: none;'>
-                <div style='height: 50px;margin-bottom: 1px!important;' class= 'well well-sm'>
+                <div id='graphcontainer_tab@tableId_1' style='display: none;'>
+                <div style='height: 50px;margin-bottom: 5px!important;' class='well well-sm'>
+                    <label>@dvname</label>
+                    <div id = 'btnColumnCollapse@tableId_1' class='btn btn-default' style='float: right;'>
+                        <i class='fa fa-cog' aria-hidden='true'></i>
+                     </div>
                      <div class='dropdown' id='graphDropdown_tab@tableId_1' style='display: inline-block;padding-top: 1px;float:right'>
                              <button class='btn btn-default dropdown-toggle' type='button' data-toggle='dropdown'>
                            <span class='caret'></span></button>
@@ -170,10 +172,8 @@ namespace ExpressBase.Objects
                                 <li><a href = '#'> doughnut </a></li>
                                 </ul>
                       </div>
-                      <button id='reset_zoom@tableId_1' class='btn btn-default'>Reset zoom</button>
-                      <div id = 'btnColumnCollapse@tableId_1' class='btn btn-default'>
-                            <i class='fa fa-chevron-down' aria-hidden='true'></i>
-                      </div>
+                      <button id='reset_zoom@tableId_1' class='btn btn-default' style='float: right;'>Reset zoom</button>
+                       
                 </div>
                 <div id ='columns4Drag@tableId_1' style='display:none;'>
                     <div style='display: inline-block;'>
