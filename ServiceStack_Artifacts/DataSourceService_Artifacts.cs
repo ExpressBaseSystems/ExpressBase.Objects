@@ -122,6 +122,17 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Token { get; set; }
 
         [DataMember(Order = 3)]
+        public bool IsPaged { get; set; }
+
+        [DataMember(Order = 4)]
         public ResponseStatus ResponseStatus { get; set; }
+
+        public bool IsNull
+        {
+            get
+            {
+                return (this.Columns == null || this.Columns.Count == 0);
+            }
+        }
     }
 }
