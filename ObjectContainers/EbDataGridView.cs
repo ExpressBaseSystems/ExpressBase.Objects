@@ -91,15 +91,15 @@ namespace ExpressBase.Objects
                     @filters  
                 </div>
                 <div id='@tableId_1container'>
-                    <div id='@tableId_1TableColumns4Drag' style='border:1px solid;display:inline-block'>
+                    <div id='@tableId_1TableColumns4Drag' style='border:1px solid;display:none'>
                     </div>         
-                    <div style='width:auto;display:inline-block' id='@tableId_1divcont'>
-                        <div class = >
-                            <div id ='@tableId_1ColumnsDispaly' style='border:1px solid;'></div>
+                    <div style='width:auto;' id='@tableId_1divcont'>
+                        <div id ='@tableId_1ColumnsDispalyCont' style = 'display:none;width: 100%;'>
+                            <div id ='@tableId_1ColumnsDispaly' style='border:1px solid;width: 100%;height:auto;'></div>
                         </div>
                         <table id='@tableId_1' class='table table-striped table-bordered'></table>
                     </div>
-                    <div id='@tableId_1TableColumnsPPGrid' class='property-grid-cont'></div>
+                    <div id='@tableId_1TableColumnsPPGrid' style='display:none'></div>
                 </div>
                 <div id='graphcontainer_tab@tableId_1' style='display: none;'>
                 <div style='height: 50px;margin-bottom: 5px!important;' class='well well-sm'>
@@ -172,3 +172,4 @@ namespace ExpressBase.Objects
         }
     }
 }
+//var PGobj = new Eb_PropertyGrid('dv336_1TableColumnsPPGrid',  , AllMetas.EbTextBox);
