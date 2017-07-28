@@ -119,7 +119,7 @@ this.Controls = new EbControlCollection();";
 
             this.AllControlls += @"
 EbObjects.@NameObj = function @NameObj(id) {
-    this.$type = '@Type';
+    this.$type = '@Type, ExpressBase.Objects';
     @Props
 };"
 .Replace("@Name", tool.Name)
