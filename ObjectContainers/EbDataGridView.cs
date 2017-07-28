@@ -95,11 +95,11 @@ namespace ExpressBase.Objects
                     </div>         
                     <div style='width:auto;' id='@tableId_1divcont'>
                         <div id ='@tableId_1ColumnsDispalyCont' style = 'display:none;width: 100%;'>
-                            <div id ='@tableId_1ColumnsDispaly' style='border:1px solid;width: 100%;height:auto;'></div>
+                            <div id ='@tableId_1ColumnsDispaly' style='border:1px solid;width: 100%;height:100%;min-height: 400px;overflow-y: auto;'></div>
                         </div>
                         <table id='@tableId_1' class='table table-striped table-bordered'></table>
                     </div>
-                    <div id='@tableId_1TableColumnsPPGrid' style='display:none'></div>
+                    <div id='@tableId_1TableColumnsPPGrid' style='display:none;height:100%;min-height: 400px;overflow-y: auto;'></div>
                 </div>
                 <div id='graphcontainer_tab@tableId_1' style='display: none;'>
                 <div style='height: 50px;margin-bottom: 5px!important;' class='well well-sm'>
