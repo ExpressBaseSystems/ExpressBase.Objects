@@ -77,7 +77,7 @@ namespace ExpressBase.Objects
         public override string GetHtml()
         {
             return @"
-<div class='tablecontainer' id='@tableId_1container' style='background-color:rgb(260,260,260)'>        
+<div class='tablecontainer' style='background-color:rgb(260,260,260)'>        
          <ul class='nav nav-tabs' id='table_tabs'>
                 <li class='nav-item active'>
                     <a class='nav-link' href='#@tableId_tab_1' data-toggle='tab'><i class='fa fa-home' aria-hidden='true'></i>&nbsp; Home</a>
@@ -90,8 +90,16 @@ namespace ExpressBase.Objects
                     <button id='btnGo' class='btn btn-primary' style='float: right;'>Run</button>
                     @filters  
                 </div>
-                <div style='width:auto;' id='@tableId_1divcont'>
-                    <table id='@tableId_1' class='table table-striped table-bordered'></table>
+                <div id='@tableId_1container'>
+                    <div id='@tableId_1TableColumns4Drag' style='border:1px solid;display:none'>
+                    </div>         
+                    <div style='width:auto;' id='@tableId_1divcont'>
+                        <div id ='@tableId_1ColumnsDispalyCont' style = 'display:none;width: 100%;'>
+                            <div id ='@tableId_1ColumnsDispaly' style='border:1px solid;width: 100%;height:auto;'></div>
+                        </div>
+                        <table id='@tableId_1' class='table table-striped table-bordered'></table>
+                    </div>
+                    <div id='@tableId_1TableColumnsPPGrid' style='display:none'></div>
                 </div>
                 <div id='graphcontainer_tab@tableId_1' style='display: none;'>
                 <div style='height: 50px;margin-bottom: 5px!important;' class='well well-sm'>
@@ -164,3 +172,4 @@ namespace ExpressBase.Objects
         }
     }
 }
+//var PGobj = new Eb_PropertyGrid('dv336_1TableColumnsPPGrid',  , AllMetas.EbTextBox);
