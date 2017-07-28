@@ -106,7 +106,7 @@ $('#@id').datetimepicker({
     @dateType
 });"
 .Replace("@dateType", (this.EbDateType.ToString()=="Date") ? "timepicker:false" : ((this.EbDateType.ToString() == "Time") ? "datepicker:false" : string.Empty) )
-.Replace("@id", (this.Name == "Date0") ? "datefrom" : "dateto")
+.Replace("@id", this.Name)
 .Replace("@maskPattern", this.maskPattern)
 .Replace("@format", (this.EbDateType.ToString() == "Date") ? "Y/m/d" : (this.EbDateType.ToString() == "Time") ? "H:i" : "Y/m/d H:i")
 .Replace("@maxDate", this.Max.ToString())
@@ -125,7 +125,7 @@ $('#@id').datetimepicker({
     <span class='helpText'> @helpText </span>
 </div>
 "
-.Replace("@name", (this.Name == "Date0") ? "datefrom" : "dateto")
+.Replace("@name", this.Name)
 .Replace("@left", this.Left.ToString())
 .Replace("@top", this.Top.ToString())
 .Replace("@width", this.Width.ToString())
@@ -149,7 +149,7 @@ $('#@id').datetimepicker({
 //                            (" font-family:" + this.FontSerialized.FontFamily + ";" + "font-style:" + this.FontSerialized.Style
 //                            + ";" + "font-size:" + this.FontSerialized.SizeInPoints + "px;")
 //                        : string.Empty)
-//.Replace("@atchdLbl", (this.EbDateType.ToString().ToLower() == "time") ? "fa-clock-o" : "fa-calendar")
+.Replace("@atchdLbl", (this.EbDateType.ToString().ToLower() == "time") ? "fa-clock-o" : "fa-calendar")
 ;
         }
     }
