@@ -154,7 +154,7 @@ EbObjects.@NameObj = function @NameObj(id) {
                 if (prop.Name.EndsWith("Color"))
                     return string.Format(s, prop.Name, "'#FFFFFF'");
                 else
-                    return string.Format(s, prop.Name, (prop.Name == "Name") ? "id" : "null");
+                    return string.Format(s, prop.Name, (prop.Name == "Name") ? "id" : "''");
             }
             else if (prop.PropertyType == typeof(int))
                 return string.Format(s, prop.Name, ((prop.Name == "Id") ? "id" : "0"));
