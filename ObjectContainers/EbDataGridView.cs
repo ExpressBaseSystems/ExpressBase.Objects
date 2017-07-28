@@ -91,12 +91,10 @@ namespace ExpressBase.Objects
                     @filters  
                 </div>
                 <div id='@tableId_1container'>
-                    <div id='@tableId_1TableColumns4Drag' style='border:1px solid;display:none'>
+                    <div id='@tableId_1TableColumns4Drag' style='border:1px solid;display:none;height:100%;min-height: 400px;overflow-y: auto;'>
                     </div>         
                     <div style='width:auto;' id='@tableId_1divcont'>
-                        <div id ='@tableId_1ColumnsDispalyCont' style = 'display:none;width: 100%;'>
-                            <div id ='@tableId_1ColumnsDispaly' style='border:1px solid;width: 100%;height:100%;min-height: 400px;overflow-y: auto;'></div>
-                        </div>
+                        <div id ='@tableId_1ColumnsDispaly' style= 'display:none;'class ='colCont'></div>
                         <table id='@tableId_1' class='table table-striped table-bordered'></table>
                     </div>
                     <div id='@tableId_1TableColumnsPPGrid' style='display:none;height:100%;min-height: 400px;overflow-y: auto;'></div>
@@ -173,3 +171,4 @@ namespace ExpressBase.Objects
     }
 }
 //var PGobj = new Eb_PropertyGrid('dv336_1TableColumnsPPGrid',  , AllMetas.EbTextBox);
+//https://localhost:44377/
