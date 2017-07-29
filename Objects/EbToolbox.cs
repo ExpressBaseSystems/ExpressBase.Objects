@@ -120,6 +120,8 @@ this.Controls = new EbControlCollection();";
             this.AllControlls += @"
 EbObjects.@NameObj = function @NameObj(id) {
     this.$type = '@Type, ExpressBase.Objects';
+    this.Id = id;
+    this.EbSid = id;
     @Props
 };"
 .Replace("@Name", tool.Name)
@@ -154,7 +156,7 @@ EbObjects.@NameObj = function @NameObj(id) {
                 if (prop.Name.EndsWith("Color"))
                     return string.Format(s, prop.Name, "'#FFFFFF'");
                 else
-                    return string.Format(s, prop.Name, (prop.Name == "Name") ? "id" : "''");
+                    return string.Format(s, prop.Name, (prop.Name == "Name" || prop.Name == "EbSid") ? "id" : "''");
             }
             else if (prop.PropertyType == typeof(int))
                 return string.Format(s, prop.Name, ((prop.Name == "Id") ? "id" : "0"));

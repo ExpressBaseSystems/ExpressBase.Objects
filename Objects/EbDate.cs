@@ -141,10 +141,10 @@ $('#@id').datetimepicker({
 .Replace("@placeHolder", "placeholder='" + this.PlaceHolder + "'")
 .Replace("@tabIndex", "tabindex='" + this.TabIndex + "'")
 .Replace("@autoComplete", this.AutoCompleteOff ? "off" : "on")
-//.Replace("@backColor", "background-color:" + this.BackColorSerialized + ";")
-//.Replace("@foreColor", "color:" + this.ForeColorSerialized + ";")
-//.Replace("@lblBackColor", "background-color:" + this.LabelBackColorSerialized + ";")
-//.Replace("@LblForeColor", "color:" + this.LabelForeColorSerialized + ";")
+.Replace("@backColor", "background-color:" + this.BackColor+ ";")
+.Replace("@foreColor", "color:" + this.ForeColor+ ";")
+.Replace("@lblBackColor", "background-color:" + this.LabelBackColor+ ";")
+.Replace("@LblForeColor", "color:" + this.LabelForeColor+ ";")
 //.Replace("@fontStyle", (this.FontSerialized != null) ?
 //                            (" font-family:" + this.FontSerialized.FontFamily + ";" + "font-style:" + this.FontSerialized.Style
 //                            + ";" + "font-size:" + this.FontSerialized.SizeInPoints + "px;")
