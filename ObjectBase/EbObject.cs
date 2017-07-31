@@ -1,4 +1,5 @@
-﻿using ExpressBase.Objects.Objects;
+﻿using ExpressBase.Objects.Attributes;
+using ExpressBase.Objects.Objects;
 using ServiceStack;
 using ServiceStack.Redis;
 using System;

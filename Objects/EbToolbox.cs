@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using ExpressBase.Objects.Attributes;
 
 namespace ExpressBase.Objects
 {
@@ -21,9 +22,9 @@ namespace ExpressBase.Objects
         {
             string _toolsHtml = string.Empty;
 
-            this.AllMetas = "AllMetas = {";
+            string _metaStr = "AllMetas = {";
 
-            this.AllControlls = "var EbObjects = {};";
+            string _controlsStr = "var EbObjects = {};";
 
             var types = this.GetType().GetTypeInfo().Assembly.GetTypes();
 
@@ -36,14 +37,19 @@ namespace ExpressBase.Objects
                     {
                         if (!tool.GetTypeInfo().IsDefined(typeof(HideInToolBox)))
                             _toolsHtml += GetToolHtml(tool.Name.Substring(2));
-                        this.GetJsObject(tool, _builderType);
+
+                        (Activator.CreateInstance(tool) as EbControl).GetJsObject(_builderType, ref _metaStr, ref _controlsStr);
                     }
                 }
             }
 
-            this.AllMetas += "}";
+            _metaStr += "}";
 
-            this.AllControlls += "";
+            _controlsStr += "";
+
+            this.AllMetas = _metaStr;
+
+            this.AllControlls = _controlsStr;
 
             this.html = _toolsHtml;
         }
@@ -51,121 +57,6 @@ namespace ExpressBase.Objects
         public string getHead()
         {
             return this.AllControlls + this.AllMetas;
-        }
-
-        public void GetJsObject(System.Type tool, BuilderType _builderType)
-        {
-            string _props = string.Empty;
-
-            var me = Activator.CreateInstance(tool);
-
-            var props = me.GetType().GetProperties();
-
-            List<Meta> MetaCollection = new List<Meta>();
-
-            if (tool.GetTypeInfo().IsSubclassOf(typeof(EbControlContainer)))
-            {
-                _props += @"
-this.IsContainer = true,
-this.Controls = new EbControlCollection();";
-                _props += (me as EbControlContainer).getAdditionalProps();
-            }
-
-            foreach (var prop in props)
-            {
-                var propattrs = prop.GetCustomAttributes();
-
-                if (prop.IsDefined(typeof(EnableInBuilder))
-                             && prop.GetCustomAttribute<EnableInBuilder>().BuilderTypes.Contains(_builderType))
-                {
-                    _props += JsVarDecl(prop);
-
-                    var meta = new Meta { name = prop.Name };
-
-                    foreach (Attribute attr in propattrs)
-                    {
-                        if (attr is PropertyGroup)
-                            meta.group = (attr as PropertyGroup).Name;
-
-                        //set corresponding editor
-                        else if (attr is PropertyEditor)
-                        {
-                            meta.editor = (attr as PropertyEditor).PropertyEditorType;
-                            if (prop.PropertyType.GetTypeInfo().IsEnum)
-                                meta.options = Enum.GetNames(prop.PropertyType);
-                        }
-                    }
-
-                    //if prop is of enum type set DD editor
-                    if (prop.PropertyType.GetTypeInfo().IsEnum)
-                    {
-                        meta.editor = PropertyEditorType.DropDown;
-                        meta.options = Enum.GetNames(prop.PropertyType);
-                    }
-
-                    //if prop is of premitive type set corresponding editor
-                    if (!prop.IsDefined(typeof(PropertyEditor)) && !prop.PropertyType.GetTypeInfo().IsEnum)
-                        meta.editor = GetTypeOf(prop);
-
-                    MetaCollection.Add(meta);
-                }
-
-            }
-
-            this.AllMetas += @"
-'@Name'  : @MetaCollection,"
-.Replace("@Name", tool.Name)
-.Replace("@MetaCollection", JsonConvert.SerializeObject(MetaCollection));
-
-            this.AllControlls += @"
-EbObjects.@NameObj = function @NameObj(id) {
-    this.$type = '@Type, ExpressBase.Objects';
-    this.Id = id;
-    this.EbSid = id;
-    @Props
-};"
-.Replace("@Name", tool.Name)
-.Replace("@Type", me.GetType().FullName)
-.Replace("@Props", _props);
-
-        }
-
-        private static PropertyEditorType GetTypeOf(PropertyInfo prop)
-        {
-            var typeName = prop.PropertyType.Name;
-
-            if (typeName.Contains("Int") || typeName.Contains("Decimal") ||
-                    typeName.Contains("Double") || typeName.Contains("Single"))
-                return PropertyEditorType.Number;
-
-            else if (typeName == "String")
-                return PropertyEditorType.Text;
-
-            else if (typeName == "Boolean")
-                return PropertyEditorType.Boolean;
-
-            return PropertyEditorType.Text;
-        }
-
-        private static string JsVarDecl(PropertyInfo prop)
-        {
-            string s = @"this.{0} = {1};";
-
-            if (prop.PropertyType == typeof(string))
-            {
-                if (prop.Name.EndsWith("Color"))
-                    return string.Format(s, prop.Name, "'#FFFFFF'");
-                else
-                    return string.Format(s, prop.Name, (prop.Name == "Name" || prop.Name == "EbSid") ? "id" : "''");
-            }
-            else if (prop.PropertyType == typeof(int))
-                return string.Format(s, prop.Name, ((prop.Name == "Id") ? "id" : "0"));
-            else if (prop.PropertyType == typeof(bool))
-                return string.Format(s, prop.Name, "false");
-            else if (prop.PropertyType.GetTypeInfo().IsEnum)
-                return string.Format(s, prop.Name, "'--select--'");
-            else
-                return string.Format(s, prop.Name, "null");
         }
 
         private static string GetToolHtml(string tool_name)
@@ -186,6 +77,4 @@ EbObjects.@NameObj = function @NameObj(id) {
 
         public string[] options { get; set; }
     }
-
-    public class HideInToolBox : Attribute { }
 }
