@@ -46,17 +46,17 @@ namespace ExpressBase.Objects
 
         public void SetFilterForm(EbFilterDialog filterForm)    
         {
-            string xjson = "{\"$type\": \"System.Collections.Generic.List`1[[ExpressBase.Objects.EbControl, ExpressBase.Objects]], mscorlib\", \"$values\": " +
-                filterForm.FilterDialogJson + "}";
+            //string xjson = "{\"$type\": \"System.Collections.Generic.List`1[[ExpressBase.Objects.EbControl, ExpressBase.Objects]], mscorlib\", \"$values\": " +
+            //    filterForm.FilterDialogJson + "}";
 
-            var ControlColl = JsonConvert.DeserializeObject(xjson,
-                new JsonSerializerSettings{ TypeNameHandling = TypeNameHandling.All }) as List<EbControl>;
+            var _form = JsonConvert.DeserializeObject(filterForm.FilterDialogJson,
+                new JsonSerializerSettings{ TypeNameHandling = TypeNameHandling.All }) as EbForm;
             string _html = "";
             string _head = "";
             if (filterForm != null)
             {
                 _html = @"<div style='margin-top:10px;' id='filterBox'>";
-                foreach (EbControl c in ControlColl)
+                foreach (EbControl c in _form.Controls)
                 {
                     _html += c.GetHtml();
                     _head += c.GetHead();

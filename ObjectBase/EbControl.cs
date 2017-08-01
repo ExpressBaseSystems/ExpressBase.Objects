@@ -253,7 +253,6 @@ else
             ControlsStr += @"
 EbObjects.@NameObj = function @NameObj(id) {
     this.$type = '@Type, ExpressBase.Objects';
-    this.Id = id;
     this.EbSid = id;
     @Props
     @InitFunc

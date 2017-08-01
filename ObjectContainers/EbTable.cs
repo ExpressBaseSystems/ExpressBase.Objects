@@ -13,7 +13,7 @@ namespace ExpressBase.Objects
     public class EbTableLayout : EbControlContainer
     {
         [EnableInBuilder(BuilderType.WebFormBuilder, BuilderType.FilterDialogBuilder)]
-        public string Columns5 { get; set; }
+        public string Columns { get; set; }
 
         public EbTableLayout() { }
 
@@ -43,9 +43,12 @@ this.Init(id);";
 
         public override string GetHtml()
         {
-            string html = "";
+            string html = "<table><tr>";
 
-            return html;
+            foreach (EbControl ec in base.Controls)
+                html += ec.GetHtml();
+
+            return html + "</tr></table>";
         }
     }
 
@@ -55,5 +58,28 @@ this.Init(id);";
     public class EbTableTd : EbControlContainer
     {
         public EbTableTd() { }
+
+        public override string GetHead()
+        {
+            string head = string.Empty;
+
+            if (base.Controls != null)
+            {
+                foreach (EbControl ec in base.Controls)
+                    head += ec.GetHead();
+            }
+
+            return head;
+        }
+
+        public override string GetHtml()
+        {
+            string html = "<td>";
+
+            foreach (EbControl ec in base.Controls)
+                html += ec.GetHtml();
+
+            return html + "</td>";
+        }
     }
 }
