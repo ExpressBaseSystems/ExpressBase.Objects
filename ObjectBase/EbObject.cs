@@ -1,4 +1,5 @@
-﻿using ExpressBase.Objects.Objects;
+﻿using ExpressBase.Objects.Attributes;
+using ExpressBase.Objects.Objects;
 using ServiceStack;
 using ServiceStack.Redis;
 using System;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 namespace ExpressBase.Objects
 {
     [ProtoBuf.ProtoContract]
-   
+
     [ProtoBuf.ProtoInclude(1000, typeof(EbControl))]
     [ProtoBuf.ProtoInclude(1001, typeof(EbDataSource))]
     [ProtoBuf.ProtoInclude(1002, typeof(EbReportDefinition))]
@@ -27,7 +28,6 @@ namespace ExpressBase.Objects
 #endif
     public class EbObject
     {
-        [EnableInBuilder(BuilderType.WebFormBuilder, BuilderType.FilterDialogBuilder)]
         public int Id { get; set; }
 
         [ProtoBuf.ProtoMember(1)]

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Reflection;
 using Newtonsoft.Json;
+using ExpressBase.Objects.Attributes;
 
 namespace ExpressBase.Objects
 {
@@ -136,61 +137,6 @@ namespace ExpressBase.Objects
 .Replace("@lblBackColor", "background-color:" + this.LabelBackColor + ";")
 .Replace("@LblForeColor", "color:" + this.LabelForeColor + ";" );
 
-        }
-    }
-
-    public enum BuilderType
-    {
-        DisplayBlockBuilder,
-        FilterDialogBuilder,
-        WebFormBuilder,
-        ReportBuilder,
-    }
-
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property, Inherited = false)]
-    public class EnableInBuilder : Attribute
-    {
-        public BuilderType[] BuilderTypes { get; set; }
-
-        public EnableInBuilder(params BuilderType[] types)
-        {
-            this.BuilderTypes = types;
-        }
-    }
-
-    [AttributeUsage(AttributeTargets.Class , Inherited = false)]
-    public class Container : Attribute { }
-
-    public enum PropertyEditorType
-    {
-
-        Boolean,
-        DropDown,
-        Number,
-        Color,
-        Label,
-        Text,
-        Collection,
-        Columns,
-    }
-
-    public class PropertyEditor : Attribute
-    {
-        public PropertyEditorType PropertyEditorType { get; set; }
-
-        public PropertyEditor(PropertyEditorType type)
-        {
-            this.PropertyEditorType = type;
-        }
-    }
-
-    public class PropertyGroup : Attribute
-    {
-        public string Name { get; set; }
-
-        public PropertyGroup(string groupName)
-        {
-            this.Name = groupName;
         }
     }
 }
