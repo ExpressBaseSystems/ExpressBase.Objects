@@ -141,7 +141,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     }
 
-    [DataContract] 
+    [DataContract]  
     public class TokenRequiredSelectRequest : IReturn<TokenRequiredSelectResponse>, IEbSSRequest
     {
         [DataMember(Order = 0)]
@@ -158,6 +158,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 4)]
         public int id { get; set; }
+
+        [DataMember(Order = 5)]
+        public Dictionary<string,object> Colvalues { get; set; }
 
         public string TenantAccountId { get; set; }
 
