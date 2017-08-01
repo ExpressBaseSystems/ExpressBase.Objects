@@ -18,12 +18,22 @@ namespace ExpressBase.Objects
         public int FilterDialogId { get; set; }
 
         [ProtoBuf.ProtoMember(10)]
-        public int dvId { get; set; }
+        public int DvId { get; set; }
 
         [ProtoBuf.ProtoMember(11)]
-        public string dvname { get; set; }
+        public string Dvname { get; set; }
 
-      
+        [ProtoBuf.ProtoMember(12)]
+        public string Login { get; set; }
+
+        [ProtoBuf.ProtoMember(13)]
+        public string Dvlist { get; set; }
+        [ProtoBuf.ProtoMember(14)]
+        public string Dslist { get; set; }
+        [ProtoBuf.ProtoMember(15)]
+        public string DslistAll { get; set; }
+
+
 
         public string Token { get; set; }
 
@@ -46,25 +56,28 @@ namespace ExpressBase.Objects
 
         public void SetFilterForm(EbFilterDialog filterForm)    
         {
-            string xjson = "{\"$type\": \"System.Collections.Generic.List`1[[ExpressBase.Objects.EbControl, ExpressBase.Objects]], mscorlib\", \"$values\": " +
-                filterForm.FilterDialogJson + "}";
+            if (filterForm != null) {
+                string xjson = "{\"$type\": \"System.Collections.Generic.List`1[[ExpressBase.Objects.EbControl, ExpressBase.Objects]], mscorlib\", \"$values\": " +
+                    filterForm.FilterDialogJson + "}";
 
-            var ControlColl = JsonConvert.DeserializeObject(xjson,
-                new JsonSerializerSettings{ TypeNameHandling = TypeNameHandling.All }) as List<EbControl>;
-            string _html = "";
-            string _head = "";
-            if (filterForm != null)
-            {
-                _html = @"<div style='margin-top:10px;' id='filterBox'>";
-                foreach (EbControl c in ControlColl)
+                var ControlColl = JsonConvert.DeserializeObject(xjson,
+                    new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All }) as List<EbControl>;
+                string _html = "";
+                string _head = "";
+                if (filterForm != null)
                 {
-                    _html += c.GetHtml();
-                    _head += c.GetHead();
+                    _html = @"<div style='margin-top:10px;' id='filterBox'>";
+                    foreach (EbControl c in ControlColl)
+                    {
+                        _html += c.GetHtml();
+                        _head += c.GetHead();
+                    }
+                    _html += @"</div>";
                 }
-                _html += @"</div>";
+                this.filters = _html;
+                this.script = _head;
             }
-            this.filters = _html;
-            this.script = _head;
+
         }
 
         public override void Init4Redis(IRedisClient redisclient, IServiceClient serviceclient)
@@ -77,7 +90,7 @@ namespace ExpressBase.Objects
         public override string GetHtml()
         {
             return @"
-<div class='tablecontainer' style='background-color:rgb(260,260,260)'>        
+    <div class='tablecontainer' style='background-color:rgb(260,260,260);'>        
          <ul class='nav nav-tabs' id='table_tabs'>
                 <li class='nav-item active'>
                     <a class='nav-link' href='#@tableId_tab_1' data-toggle='tab'><i class='fa fa-home' aria-hidden='true'></i>&nbsp; Home</a>
@@ -85,7 +98,8 @@ namespace ExpressBase.Objects
          </ul></br>
          <div class='tab-content' id='table_tabcontent'>
              <div id='@tableId_tab_1' class='tab-pane active'>
-                 <div id='TableControls_@tableId_1' class = 'well well-sm' style='margin-bottom:5px!important;'>
+
+                 <div id='TableControls_@tableId_1' class = 'well well-sm' style='margin-bottom:5px!important;display:none'>
                     <label>@dvname</label>
                     <button id='btnGo' class='btn btn-primary' style='float: right;'>Run</button>
                     @filters  
@@ -148,7 +162,8 @@ namespace ExpressBase.Objects
         ds_id: @dataSourceId, 
         dv_id: @dvId, 
         ss_url: '@servicestack_url', 
-        tid: '@tableId_1' 
+        tid: '@tableId_1' ,
+        login:'@login'
         //settings: JSON.parse(data),
         //fnKeyUpCallback: 
     });
@@ -156,7 +171,8 @@ namespace ExpressBase.Objects
 </script>"
 .Replace("@dataSourceId", this.DataSourceId.ToString().Trim())
 .Replace("@tableId", this.Name)
-.Replace("@dvname", this.dvname)
+.Replace("@dvname", this.Dvname)
+.Replace("@login", this.Login)
 //.Replace("@tableViewName", ((string.IsNullOrEmpty(this.Label)) ? "&lt;ReportLabel Undefined&gt;" : this.Label))
 .Replace("@servicestack_url", "https://expressbaseservicestack.azurewebsites.net")
 .Replace("@filters", this.filters)
@@ -165,7 +181,7 @@ namespace ExpressBase.Objects
                     <i class='fa fa-chevron-down' aria-hidden='true'></i>
                 </div>" : string.Empty)
 //.Replace("@data.columns", this.ColumnColletion.ToJson())
-.Replace("@dvId", this.dvId.ToString());
+.Replace("@dvId", this.DvId.ToString());
 //.Replace("@tvPref4User", tvPref4User);
         }
     }
