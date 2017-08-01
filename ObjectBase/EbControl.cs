@@ -1,4 +1,5 @@
-﻿using ExpressBase.Objects.ObjectBase;
+﻿using ExpressBase.Objects.Attributes;
+using ExpressBase.Objects.ObjectBase;
 using Newtonsoft.Json;
 using ServiceStack;
 using ServiceStack.Redis;
@@ -7,6 +8,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Reflection;
 
 namespace ExpressBase.Objects
 {
@@ -26,9 +28,6 @@ namespace ExpressBase.Objects
     [JsonSubtypes.KnownSubType(typeof(EbTextBox), SubType.WithTextTransform)]
     [JsonSubtypes.KnownSubType(typeof(EbDate), SubType.WithEbDateType)]
 
-#if NET462
-    [System.Serializable]
-#endif
     public class EbControl : EbObject
     {
         [Browsable(false)]
@@ -190,6 +189,124 @@ else
         public virtual void SetData(object value) { }
 
         public virtual object GetData() { return null; }
+
+        public virtual string GetJsInitFunc() { return null; }
+
+        public void GetJsObject(BuilderType _builderType, ref string MetaStr, ref string ControlsStr)
+        {
+            string _props = string.Empty;
+
+            var props = this.GetType().GetAllProperties();
+
+            List<Meta> MetaCollection = new List<Meta>();
+
+            if (this is EbControlContainer)
+                _props += @"this.IsContainer = true;";
+
+            foreach (var prop in props)
+            {
+                var propattrs = prop.GetCustomAttributes();
+
+                if (prop.IsDefined(typeof(EnableInBuilder))
+                             && prop.GetCustomAttribute<EnableInBuilder>().BuilderTypes.Contains(_builderType))
+                {
+                    _props += JsVarDecl(prop);
+
+                    var meta = new Meta { name = prop.Name };
+
+                    foreach (Attribute attr in propattrs)
+                    {
+                        if (attr is PropertyGroup)
+                            meta.group = (attr as PropertyGroup).Name;
+
+                        //set corresponding editor
+                        else if (attr is PropertyEditor)
+                        {
+                            meta.editor = (attr as PropertyEditor).PropertyEditorType;
+                            if (prop.PropertyType.GetTypeInfo().IsEnum)
+                                meta.options = Enum.GetNames(prop.PropertyType);
+                        }
+                    }
+
+                    //if prop is of enum type set DD editor
+                    if (prop.PropertyType.GetTypeInfo().IsEnum)
+                    {
+                        meta.editor = PropertyEditorType.DropDown;
+                        meta.options = Enum.GetNames(prop.PropertyType);
+                    }
+
+                    //if prop is of premitive type set corresponding editor
+                    if (!prop.IsDefined(typeof(PropertyEditor)) && !prop.PropertyType.GetTypeInfo().IsEnum)
+                        meta.editor = GetTypeOf(prop);
+
+                    if (!prop.IsDefined(typeof(HideInPropertyGrid)))
+                        MetaCollection.Add(meta);
+                }
+
+            }
+
+            MetaStr += @"
+'@Name'  : @MetaCollection,"
+.Replace("@Name", this.GetType().Name)
+.Replace("@MetaCollection", JsonConvert.SerializeObject(MetaCollection));
+
+            ControlsStr += @"
+EbObjects.@NameObj = function @NameObj(id) {
+    this.$type = '@Type, ExpressBase.Objects';
+    this.EbSid = id;
+    @Props
+    @InitFunc
+};"
+.Replace("@Name", this.GetType().Name)
+.Replace("@Type", this.GetType().FullName)
+.Replace("@Props", _props)
+.Replace("@InitFunc", this.GetJsInitFunc());
+
+        }
+
+        private string JsVarDecl(PropertyInfo prop)
+        {
+            string s = @"this.{0} = {1};";
+            string _c = @"this.Controls = new EbControlCollection(JSON.parse('{0}'));";
+
+            if (prop.PropertyType == typeof(string))
+            {
+                if (prop.Name.EndsWith("Color"))
+                    return string.Format(s, prop.Name, "'#FFFFFF'");
+                else
+                    return string.Format(s, prop.Name, (prop.Name == "Name" || prop.Name == "EbSid") ? "id" : "''");
+            }
+            else if (prop.PropertyType == typeof(int))
+                return string.Format(s, prop.Name, ((prop.Name == "Id") ? "id" : "0"));
+            else if (prop.PropertyType == typeof(bool))
+                return string.Format(s, prop.Name, "false");
+            else if (prop.PropertyType.GetTypeInfo().IsEnum)
+                return string.Format(s, prop.Name, "'--select--'");
+            else
+            {
+                if (prop.Name == "Controls")
+                    return string.Format(_c, JsonConvert.SerializeObject((this as EbControlContainer).Controls, new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All }));
+
+                return string.Format(s, prop.Name, "null");
+            }
+        }
+
+        private PropertyEditorType GetTypeOf(PropertyInfo prop)
+        {
+            var typeName = prop.PropertyType.Name;
+
+            if (typeName.Contains("Int") || typeName.Contains("Decimal") ||
+                    typeName.Contains("Double") || typeName.Contains("Single"))
+                return PropertyEditorType.Number;
+
+            else if (typeName == "String")
+                return PropertyEditorType.Text;
+
+            else if (typeName == "Boolean")
+                return PropertyEditorType.Boolean;
+
+            return PropertyEditorType.Text;
+        }
 
     }
 

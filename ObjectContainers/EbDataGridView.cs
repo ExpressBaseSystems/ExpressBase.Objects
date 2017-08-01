@@ -56,27 +56,26 @@ namespace ExpressBase.Objects
 
         public void SetFilterForm(EbFilterDialog filterForm)    
         {
-            if (filterForm != null) {
-                string xjson = "{\"$type\": \"System.Collections.Generic.List`1[[ExpressBase.Objects.EbControl, ExpressBase.Objects]], mscorlib\", \"$values\": " +
-                    filterForm.FilterDialogJson + "}";
+            //string xjson = "{\"$type\": \"System.Collections.Generic.List`1[[ExpressBase.Objects.EbControl, ExpressBase.Objects]], mscorlib\", \"$values\": " +
+            //    filterForm.FilterDialogJson + "}";
 
-                var ControlColl = JsonConvert.DeserializeObject(xjson,
-                    new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All }) as List<EbControl>;
-                string _html = "";
-                string _head = "";
-                if (filterForm != null)
+            var _form = JsonConvert.DeserializeObject(filterForm.FilterDialogJson,
+                new JsonSerializerSettings{ TypeNameHandling = TypeNameHandling.All }) as EbForm;
+            string _html = "";
+            string _head = "";
+            if (filterForm != null)
+            {
+                _html = @"<div style='margin-top:10px;' id='filterBox'>";
+                foreach (EbControl c in _form.Controls)
                 {
-                    _html = @"<div style='margin-top:10px;' id='filterBox'>";
-                    foreach (EbControl c in ControlColl)
-                    {
-                        _html += c.GetHtml();
-                        _head += c.GetHead();
-                    }
-                    _html += @"</div>";
+                    _html += c.GetHtml();
+                    _head += c.GetHead();
                 }
-                this.filters = _html;
-                this.script = _head;
+                _html += @"</div>";
             }
+            this.filters = _html;
+            this.script = _head;
+        }
 
         }
 

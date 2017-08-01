@@ -1,4 +1,5 @@
-﻿using ProtoBuf;
+﻿using ExpressBase.Objects.Attributes;
+using ProtoBuf;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
