@@ -31,7 +31,7 @@ namespace ExpressBase.Objects
         [ProtoBuf.ProtoMember(14)]
         public string Dslist { get; set; }
         [ProtoBuf.ProtoMember(15)]
-        public string DslistAll { get; set; }
+        public Dictionary<int, EbObjectWrapper> DslistAll { get; set; }
 
 
 
@@ -77,7 +77,6 @@ namespace ExpressBase.Objects
             this.script = _head;
         }
 
-        }
 
         public override void Init4Redis(IRedisClient redisclient, IServiceClient serviceclient)
         {
@@ -172,6 +171,7 @@ namespace ExpressBase.Objects
 .Replace("@tableId", this.Name)
 .Replace("@dvname", this.Dvname)
 .Replace("@login", this.Login)
+.Replace("@datasourcedd", this.getdropdownColumn())
 //.Replace("@tableViewName", ((string.IsNullOrEmpty(this.Label)) ? "&lt;ReportLabel Undefined&gt;" : this.Label))
 .Replace("@servicestack_url", "https://expressbaseservicestack.azurewebsites.net")
 .Replace("@filters", this.filters)
@@ -183,7 +183,25 @@ namespace ExpressBase.Objects
 .Replace("@dvId", this.DvId.ToString());
 //.Replace("@tvPref4User", tvPref4User);
         }
+
+        public string getdropdownColumn()
+        {
+            string dd = string.Empty;
+            dd += @"<div class='dropdown' id='datatSourceDropdown' style='display: inline-block;'>
+                <button class='btn btn-primary dropdown-toggle' type='button' data-toggle='dropdown'>Select DataSource
+                    <span class='caret'></span>
+                </button>
+                <ul class='dropdown-menu scrollable-menu'>";
+            foreach(var element in this.DslistAll)
+            {
+                dd += "<li data-dsid=" + element.Key + ">";
+                dd += "<a href = '#'>" + element.Value.Name + "</a>";
+                dd += "</li>";
+            }
+
+            dd += "</ul>";
+            dd += "</div>";
+            return dd;
+        }
     }
 }
-//var PGobj = new Eb_PropertyGrid('dv336_1TableColumnsPPGrid',  , AllMetas.EbTextBox);
-//https://localhost:44377/
