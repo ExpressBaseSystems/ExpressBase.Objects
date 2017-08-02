@@ -160,8 +160,8 @@ $('#{0}').mask('SZZZZZZZZZZZ', {
             return (@"
 <div class='Eb-ctrlContainer' style='@hiddenString'>
     <span id='@nameLbl' style='@lblBackColor @LblForeColor'>@label</span>
-            <div  class='input-group'>
-                 <span style='font-size: @fontSize' class='input-group-addon'>$</span>   
+            <div  class='input-group' style='width:100%;'>
+                             <span style='font-size: @fontSize' class='input-group-addon'>$</span>   
                  <input type='text'  class='numinput' name='@name' value='@value' @placeHolder autocomplete = '@autoComplete' data-toggle='tooltip' title='@toolTipText' id='@name' style='width:100%; height:@heightpx; @backColor @foreColor @fontStyle display:inline-block;@readOnlyString @required @tabIndex />
             </div>
     <span class='helpText'> @helpText </span>

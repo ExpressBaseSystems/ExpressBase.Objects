@@ -30,6 +30,7 @@ namespace ExpressBase.Objects
     {
         [ProtoBuf.ProtoMember(1)]
         [EnableInBuilder(BuilderType.WebFormBuilder, BuilderType.FilterDialogBuilder)]
+        [HelpText("To limit number of charecters")]
         [PropertyGroup("Behavior")]
         [PropertyEditor(PropertyEditorType.Number)]
         public int MaxLength { get; set; }
@@ -102,6 +103,11 @@ namespace ExpressBase.Objects
         public override object GetData()
         {
             return this.Text;
+        }
+
+        public override string GetDesignHtml()
+        {
+            return "<input type='text' readonly style='width:100%' />";
         }
 
         public override string GetHtml()
