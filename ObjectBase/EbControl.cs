@@ -192,7 +192,12 @@ else
 
         public virtual string GetJsInitFunc() { return null; }
 
-        public virtual string GetDesignHtml() { return "<div class='btn btn-default'>Button</div>"; }
+        public virtual string GetDesignHtml() { return "<div class='btn btn-default'> GetDesignHtml() not implemented </div>".RemoveCR().DoubleQuoted(); }
+
+        protected string WrapWithDblQuotes(string input)
+        {
+            return "\"" + input + "\"";
+        }
 
         public void GetJsObject(BuilderType _builderType, ref string MetaStr, ref string ControlsStr)
         {
@@ -266,7 +271,7 @@ EbObjects.@NameObj = function @NameObj(id) {
     this.EbSid = id;
     @Props
     @InitFunc
-    this.getHtml = function() { return  @html; };
+    this.getHtml = function() { return  @html.replace(/@id/g, id); };
 };"
 .Replace("@Name", this.GetType().Name)
 .Replace("@Type", this.GetType().FullName)

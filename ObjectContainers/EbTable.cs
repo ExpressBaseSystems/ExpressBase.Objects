@@ -17,6 +17,11 @@ namespace ExpressBase.Objects
 
         public EbTableLayout() { }
 
+        public override string GetDesignHtml()
+        {
+            return "<table style='width:100%'><tr><td id='@id_Td0' class='tdDropable' ></td> <td id='@id_Td1' class='tdDropable'></td style='min-height:20px;'> </tr></table>".RemoveCR().DoubleQuoted();
+        }
+
         public override string GetJsInitFunc()
         {
             return @"

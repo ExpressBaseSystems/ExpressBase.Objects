@@ -155,7 +155,17 @@ $('#{0}').mask('SZZZZZZZZZZZ', {
 }); ").Replace("{0}", this.Name).Replace("{1}", "SZZZZZZZZZZZ").Replace("{2}", this.DecimalPlaces.ToString()).Replace("{3}", (this.MaxLength - this.DecimalPlaces).ToString());
         }
 
+        public override string GetDesignHtml()
+        {
+            return GetHtmlHelper(RenderMode.Developer).RemoveCR().DoubleQuoted();
+        }
+
         public override string GetHtml()
+        {
+            return GetHtmlHelper(RenderMode.User);
+        }
+
+        private string GetHtmlHelper(RenderMode mode)
         {
             return (@"
 <div class='Eb-ctrlContainer' style='@hiddenString'>
@@ -179,7 +189,7 @@ $('#{0}').mask('SZZZZZZZZZZZ', {
 .Replace("@helpText", this.HelpText)//10
 .Replace("@placeHolder", "placeholder='" + this.PlaceHolder + "'")
 .Replace("@tabIndex", "tabindex='" + this.TabIndex + "'")
-.Replace("@autoComplete", this.AutoCompleteOff  ? "off" : "on")
+.Replace("@autoComplete", this.AutoCompleteOff ? "off" : "on")
 //.Replace("@backColor", "background-color:" + this.BackColorSerialized + ";")
 //.Replace("@foreColor", "color:" + this.ForeColorSerialized + ";")//15
 //.Replace("@lblBackColor", "background-color:" + this.LabelBackColorSerialized + ";")

@@ -45,7 +45,7 @@ namespace ExpressBase.Objects
         {
             return this.script;
         }
-        
+
         private int FilterBH = 0;
 
         private EbForm __filterForm;
@@ -54,17 +54,17 @@ namespace ExpressBase.Objects
 
         private string filters;
 
-        public void SetFilterForm(EbFilterDialog filterForm)    
+        public void SetFilterForm(EbFilterDialog filterForm)
         {
             //string xjson = "{\"$type\": \"System.Collections.Generic.List`1[[ExpressBase.Objects.EbControl, ExpressBase.Objects]], mscorlib\", \"$values\": " +
             //    filterForm.FilterDialogJson + "}";
-
-            var _form = JsonConvert.DeserializeObject(filterForm.FilterDialogJson,
-                new JsonSerializerSettings{ TypeNameHandling = TypeNameHandling.All }) as EbForm;
-            string _html = "";
-            string _head = "";
             if (filterForm != null)
             {
+                var _form = JsonConvert.DeserializeObject(filterForm.FilterDialogJson,
+                new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All }) as EbForm;
+                string _html = "";
+                string _head = "";
+
                 _html = @"<div style='margin-top:10px;' id='filterBox'>";
                 foreach (EbControl c in _form.Controls)
                 {
@@ -72,12 +72,12 @@ namespace ExpressBase.Objects
                     _head += c.GetHead();
                 }
                 _html += @"</div>";
+
+                this.filters = _html;
+                this.script = _head;
             }
-            this.filters = _html;
-            this.script = _head;
         }
 
-        }
 
         public override void Init4Redis(IRedisClient redisclient, IServiceClient serviceclient)
         {
@@ -181,7 +181,7 @@ namespace ExpressBase.Objects
                 </div>" : string.Empty)
 //.Replace("@data.columns", this.ColumnColletion.ToJson())
 .Replace("@dvId", this.DvId.ToString());
-//.Replace("@tvPref4User", tvPref4User);
+            //.Replace("@tvPref4User", tvPref4User);
         }
     }
 }

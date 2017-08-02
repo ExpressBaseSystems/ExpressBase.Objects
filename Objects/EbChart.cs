@@ -18,7 +18,17 @@ namespace ExpressBase.Objects
 
         public EbChart() { }
 
+        public override string GetDesignHtml()
+        {
+            return base.GetDesignHtml();//GetHtmlHelper(RenderMode.Developer).RemoveCR().DoubleQuoted();
+        }
+
         public override string GetHtml()
+        {
+            return GetHtmlHelper(RenderMode.User);
+        }
+
+        private string GetHtmlHelper(RenderMode mode)
         {
             return @"
 <div id='$$$$$$$_contnr' class='graph-container'>
@@ -151,5 +161,6 @@ $('#$$$$$$$_loadingdiv').hide();
 .Replace("$$$$$$$", this.Name)
 .Replace("^^^^^^^", this.Label);
         }
+        
     }
 }

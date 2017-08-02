@@ -76,7 +76,7 @@ namespace ExpressBase.Objects
             {
                 string rs = "<div id='@nameWraper' data-toggle='tooltip' title='@tooltipText'>";
                 for (int i = 0; i < this.NumberOfFields; i++)
-                        rs += @"
+                    rs += @"
 <div style='display:inline-block; width:@perWidthpx; margin-right: -4px;'>
     <div class='input-group'>
         <v-select id='@name$$' style='width:{3}px;' 
@@ -87,7 +87,7 @@ namespace ExpressBase.Objects
         </v-select>
         <span class='input-group-addon' @border-r$$> <i id='@nameTglBtn' class='fa  fa-search' aria-hidden='true'></i> </span>
     </div>
-</div>".Replace("$$", i.ToString()).Replace("@border-r"+i, (i!=this.NumberOfFields-1) ? "style='border-radius: 0px;'" :"");
+</div>".Replace("$$", i.ToString()).Replace("@border-r" + i, (i != this.NumberOfFields - 1) ? "style='border-radius: 0px;'" : "");
                 return rs + "</div>";
             }
         }
@@ -102,6 +102,10 @@ namespace ExpressBase.Objects
         public override string GetHead()
         {
             return this.RequiredString + @"
+<script>
+    Vue.component('v-select', VueSelect.VueSelect);
+    Vue.config.devtools = true;
+</script>
 $('#@name_loading-image').hide();
 var @nameEbCombo = new EbSelect('@name', '@DSid', @DDHeight, '@vmName', '', @MaxLimit, @MinLimit, @Required, '@DefaultSearchFor', '@servicestack_url', @values);
 "
@@ -118,14 +122,19 @@ var @nameEbCombo = new EbSelect('@name', '@DSid', @DDHeight, '@vmName', '', @Max
 .Replace("@values", "[1000]");//this.values.ToString());
         }
 
+        public override string GetDesignHtml()
+        {
+            return "<div role='form' data-toggle='validator' style=' width: inherit;'><input type='hidden' name='acmasteridHidden4val' data-ebtype='16' id='acmasterid'> <div id='acmasteridLbl' style='display: inline-block;'></div> <div id='acmasteridWraper' data-toggle='tooltip' title='' data-original-title=''><div style='display: inline-block; width: 33%; margin-right: -4px;'><div class='input-group'><div class='dropdown v-select searchable' id='acmasterid0'><div type='button' class='dropdown-toggle clearfix' style='border-top-left-radius: 5px; border-bottom-left-radius: 5px;'> <input debounce='0' type='search'  readonly  placeholder='label0' class='form-control' id='acmaster1_xid' style='width: 100%; background-color: #fff;'> <i role='presentation' class='open-indicator' style='display: none;'></i> <div class='spinner' style='display: none;'>Loading...</div></div> <!----></div> <span class='input-group-addon' style='border-radius: 0px;'><i id='acmasteridTglBtn' aria-hidden='true' class='fa  fa-search'></i></span></div></div> <div style='display: inline-block; width: 33%; margin-right: -4px;'><div class='input-group'><div class='dropdown v-select searchable' id='acmasterid1'><div type='button' class='dropdown-toggle clearfix'> <input debounce='0' type='search' placeholder='label1' readonly class='form-control' id='acmaster1_name' style='width: 100%; background-color: #fff;'> <i role='presentation' class='open-indicator' style='display: none;'></i> <div class='spinner' style='display: none;'>Loading...</div></div> <!----></div> <span class='input-group-addon' style='border-radius: 0px;'><i id='acmasteridTglBtn' aria-hidden='true' class='fa  fa-search'></i></span></div></div> <div style='display: inline-block; width: 33%; margin-right: -4px;'><div class='input-group'><div class='dropdown v-select searchable' id='acmasterid2'><div type='button' class='dropdown-toggle clearfix'> <input debounce='0' type='search' readonly placeholder='label2' class='form-control' id='tdebit' style='width: 100%; background-color: #fff;'> <i role='presentation' class='open-indicator' style='display: none;'></i> <div class='spinner' style='display: none;'>Loading...</div></div> <!----></div> <span class='input-group-addon'><i id='acmasteridTglBtn' aria-hidden='true' class='fa  fa-search'></i></span></div></div></div> <div id='acmasterid_loadingdiv' class='ebCombo-loader'><i id='acmasterid_loading-image' class='fa fa-spinner fa-pulse fa-2x fa-fw' style='display: none;'></i><span class='sr-only'>Loading...</span></div> <center><div id='acmasteridDDdiv' class='DDdiv expand-transition' style='width: 600px; display: none;'><table id='acmasteridtbl' class='table table-striped table-bordered' style='width: 100%;'></table></div></center></div>".RemoveCR().DoubleQuoted();//GetHtmlHelper(RenderMode.Developer).RemoveCR().DoubleQuoted();
+        }
+
         public override string GetHtml()
         {
+            return GetHtmlHelper(RenderMode.User);
+        }
+
+        private string GetHtmlHelper(RenderMode mode)
+        {
             return @"
-    <script>
-        Vue.component('v-select', VueSelect.VueSelect);
-        Vue.config.devtools = true;
-    </script>
-               
    <div id='@nameContainer'  role='form' data-toggle='validator' style='position:absolute; width:@widthpx; left:@leftpx;  top:@toppx;'>
         <input type='hidden' name='@nameHidden4val' data-ebtype='16' id='@name'/>
         <div style='display:inline-block;' id='@nameLbl'>@label</div>
@@ -143,7 +152,7 @@ var @nameEbCombo = new EbSelect('@name', '@DSid', @DDHeight, '@vmName', '', @Max
 .Replace("@top", this.Top.ToString())
 .Replace("@label", this.Label)
 .Replace("@width", 900.ToString())//this.Width.ToString())
-.Replace("@perWidth", (900/ this.NumberOfFields).ToString())
+.Replace("@perWidth", (this.NumberOfFields != 0) ? (900 / this.NumberOfFields).ToString() : 900.ToString())
 .Replace("@DDwidth", (this.DropdownWidth == 0) ? "300" : this.DropdownWidth.ToString())
 .Replace("@tooltipText", this.ToolTipText);
         }

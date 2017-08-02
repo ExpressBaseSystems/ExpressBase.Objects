@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Reflection;
 using Newtonsoft.Json;
 using ExpressBase.Objects.Attributes;
+using ServiceStack.Pcl;
 
 namespace ExpressBase.Objects
 {
@@ -107,10 +108,15 @@ namespace ExpressBase.Objects
 
         public override string GetDesignHtml()
         {
-            return "<input type='text' readonly style='width:100%' />";
+            return GetHtmlHelper(RenderMode.Developer).RemoveCR().DoubleQuoted();
         }
 
         public override string GetHtml()
+        {
+            return GetHtmlHelper(RenderMode.User);
+        }
+
+        private string GetHtmlHelper(RenderMode mode)
         {
             return @"
 <div class='Eb-ctrlContainer' style='@hiddenString'>
@@ -141,8 +147,13 @@ namespace ExpressBase.Objects
 .Replace("@backColor", "background-color:" + this.BackColor + ";")
 .Replace("@foreColor", "color:" + this.ForeColor + ";")
 .Replace("@lblBackColor", "background-color:" + this.LabelBackColor + ";")
-.Replace("@LblForeColor", "color:" + this.LabelForeColor + ";" );
-
+.Replace("@LblForeColor", "color:" + this.LabelForeColor + ";");
         }
+    }
+
+    public enum RenderMode
+    {
+        Developer,
+        User
     }
 }
