@@ -17,6 +17,11 @@ namespace ExpressBase.Objects
 
         public EbTableLayout() { }
 
+        public override string GetDesignHtml()
+        {
+            return "<table style='width:100%'><tr><td id='@id_Td0' class='tdDropable' ></td> <td id='@id_Td1' class='tdDropable'></td style='min-height:20px;'> </tr></table>".RemoveCR().DoubleQuoted();
+        }
+
         public override string GetJsInitFunc()
         {
             return @"
@@ -43,7 +48,7 @@ this.Init(id);";
 
         public override string GetHtml()
         {
-            string html = "<table><tr>";
+            string html = "<table class='form-render-table' ><tr>";
 
             foreach (EbControl ec in base.Controls)
                 html += ec.GetHtml();
@@ -74,7 +79,7 @@ this.Init(id);";
 
         public override string GetHtml()
         {
-            string html = "<td>";
+            string html = "<td class='form-render-table-Td'>";
 
             foreach (EbControl ec in base.Controls)
                 html += ec.GetHtml();

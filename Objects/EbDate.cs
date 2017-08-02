@@ -114,7 +114,17 @@ $('#@id').datetimepicker({
 .Replace("@minDate", this.Min.ToString());
         }
 
+        public override string GetDesignHtml()
+        {
+            return GetHtmlHelper(RenderMode.Developer).RemoveCR().DoubleQuoted();
+        }
+
         public override string GetHtml()
+        {
+            return GetHtmlHelper(RenderMode.User);
+        }
+
+        private string GetHtmlHelper(RenderMode mode)
         {
             return @"
 <div id='@nameContainer' class='Eb-ctrlContainer' style='@hiddenString'>
@@ -142,10 +152,10 @@ $('#@id').datetimepicker({
 .Replace("@placeHolder", "placeholder='" + this.PlaceHolder + "'")
 .Replace("@tabIndex", "tabindex='" + this.TabIndex + "'")
 .Replace("@autoComplete", this.AutoCompleteOff ? "off" : "on")
-.Replace("@backColor", "background-color:" + this.BackColor+ ";")
-.Replace("@foreColor", "color:" + this.ForeColor+ ";")
-.Replace("@lblBackColor", "background-color:" + this.LabelBackColor+ ";")
-.Replace("@LblForeColor", "color:" + this.LabelForeColor+ ";")
+.Replace("@backColor", "background-color:" + this.BackColor + ";")
+.Replace("@foreColor", "color:" + this.ForeColor + ";")
+.Replace("@lblBackColor", "background-color:" + this.LabelBackColor + ";")
+.Replace("@LblForeColor", "color:" + this.LabelForeColor + ";")
 //.Replace("@fontStyle", (this.FontSerialized != null) ?
 //                            (" font-family:" + this.FontSerialized.FontFamily + ";" + "font-style:" + this.FontSerialized.Style
 //                            + ";" + "font-size:" + this.FontSerialized.SizeInPoints + "px;")

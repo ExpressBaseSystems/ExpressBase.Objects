@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Reflection;
 using Newtonsoft.Json;
 using ExpressBase.Objects.Attributes;
+using ServiceStack.Pcl;
 
 namespace ExpressBase.Objects
 {
@@ -30,6 +31,7 @@ namespace ExpressBase.Objects
     {
         [ProtoBuf.ProtoMember(1)]
         [EnableInBuilder(BuilderType.WebFormBuilder, BuilderType.FilterDialogBuilder)]
+        [HelpText("To limit number of charecters")]
         [PropertyGroup("Behavior")]
         [PropertyEditor(PropertyEditorType.Number)]
         public int MaxLength { get; set; }
@@ -104,7 +106,17 @@ namespace ExpressBase.Objects
             return this.Text;
         }
 
+        public override string GetDesignHtml()
+        {
+            return GetHtmlHelper(RenderMode.Developer).RemoveCR().DoubleQuoted();
+        }
+
         public override string GetHtml()
+        {
+            return GetHtmlHelper(RenderMode.User);
+        }
+
+        private string GetHtmlHelper(RenderMode mode)
         {
             return @"
 <div class='Eb-ctrlContainer' style='@hiddenString'>
@@ -135,8 +147,13 @@ namespace ExpressBase.Objects
 .Replace("@backColor", "background-color:" + this.BackColor + ";")
 .Replace("@foreColor", "color:" + this.ForeColor + ";")
 .Replace("@lblBackColor", "background-color:" + this.LabelBackColor + ";")
-.Replace("@LblForeColor", "color:" + this.LabelForeColor + ";" );
-
+.Replace("@LblForeColor", "color:" + this.LabelForeColor + ";");
         }
+    }
+
+    public enum RenderMode
+    {
+        Developer,
+        User
     }
 }

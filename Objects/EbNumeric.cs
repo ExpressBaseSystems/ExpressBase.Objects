@@ -155,13 +155,23 @@ $('#{0}').mask('SZZZZZZZZZZZ', {
 }); ").Replace("{0}", this.Name).Replace("{1}", "SZZZZZZZZZZZ").Replace("{2}", this.DecimalPlaces.ToString()).Replace("{3}", (this.MaxLength - this.DecimalPlaces).ToString());
         }
 
+        public override string GetDesignHtml()
+        {
+            return GetHtmlHelper(RenderMode.Developer).RemoveCR().DoubleQuoted();
+        }
+
         public override string GetHtml()
+        {
+            return GetHtmlHelper(RenderMode.User);
+        }
+
+        private string GetHtmlHelper(RenderMode mode)
         {
             return (@"
 <div class='Eb-ctrlContainer' style='@hiddenString'>
     <span id='@nameLbl' style='@lblBackColor @LblForeColor'>@label</span>
-            <div  class='input-group'>
-                 <span style='font-size: @fontSize' class='input-group-addon'>$</span>   
+            <div  class='input-group' style='width:100%;'>
+                             <span style='font-size: @fontSize' class='input-group-addon'>$</span>   
                  <input type='text'  class='numinput' name='@name' value='@value' @placeHolder autocomplete = '@autoComplete' data-toggle='tooltip' title='@toolTipText' id='@name' style='width:100%; height:@heightpx; @backColor @foreColor @fontStyle display:inline-block;@readOnlyString @required @tabIndex />
             </div>
     <span class='helpText'> @helpText </span>
@@ -179,7 +189,7 @@ $('#{0}').mask('SZZZZZZZZZZZ', {
 .Replace("@helpText", this.HelpText)//10
 .Replace("@placeHolder", "placeholder='" + this.PlaceHolder + "'")
 .Replace("@tabIndex", "tabindex='" + this.TabIndex + "'")
-.Replace("@autoComplete", this.AutoCompleteOff  ? "off" : "on")
+.Replace("@autoComplete", this.AutoCompleteOff ? "off" : "on")
 //.Replace("@backColor", "background-color:" + this.BackColorSerialized + ";")
 //.Replace("@foreColor", "color:" + this.ForeColorSerialized + ";")//15
 //.Replace("@lblBackColor", "background-color:" + this.LabelBackColorSerialized + ";")

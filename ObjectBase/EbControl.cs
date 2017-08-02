@@ -192,6 +192,13 @@ else
 
         public virtual string GetJsInitFunc() { return null; }
 
+        public virtual string GetDesignHtml() { return "<div class='btn btn-default'> GetDesignHtml() not implemented </div>".RemoveCR().DoubleQuoted(); }
+
+        protected string WrapWithDblQuotes(string input)
+        {
+            return "\"" + input + "\"";
+        }
+
         public void GetJsObject(BuilderType _builderType, ref string MetaStr, ref string ControlsStr)
         {
             string _props = string.Empty;
@@ -212,12 +219,14 @@ else
                 {
                     _props += JsVarDecl(prop);
 
-                    var meta = new Meta { name = prop.Name };
+                    var meta = new Meta { name = prop.Name};
 
                     foreach (Attribute attr in propattrs)
                     {
                         if (attr is PropertyGroup)
                             meta.group = (attr as PropertyGroup).Name;
+                        else if (attr is HelpText)
+                            meta.helpText =(attr as HelpText).value;
 
                         //set corresponding editor
                         else if (attr is PropertyEditor)
@@ -239,8 +248,14 @@ else
                     if (!prop.IsDefined(typeof(PropertyEditor)) && !prop.PropertyType.GetTypeInfo().IsEnum)
                         meta.editor = GetTypeOf(prop);
 
+                    //if no helpText attribut is set, set - ""
+                    if (!prop.IsDefined(typeof(HelpText)))
+                        meta.helpText = "";
+
                     if (!prop.IsDefined(typeof(HideInPropertyGrid)))
                         MetaCollection.Add(meta);
+
+
                 }
 
             }
@@ -256,11 +271,13 @@ EbObjects.@NameObj = function @NameObj(id) {
     this.EbSid = id;
     @Props
     @InitFunc
+    this.getHtml = function() { return  @html.replace(/@id/g, id); };
 };"
 .Replace("@Name", this.GetType().Name)
 .Replace("@Type", this.GetType().FullName)
 .Replace("@Props", _props)
-.Replace("@InitFunc", this.GetJsInitFunc());
+.Replace("@InitFunc", this.GetJsInitFunc())
+.Replace("@html", this.GetDesignHtml());
 
         }
 
@@ -281,7 +298,7 @@ EbObjects.@NameObj = function @NameObj(id) {
             else if (prop.PropertyType == typeof(bool))
                 return string.Format(s, prop.Name, "false");
             else if (prop.PropertyType.GetTypeInfo().IsEnum)
-                return string.Format(s, prop.Name, "'--select--'");
+                return string.Format(s, prop.Name, "''");
             else
             {
                 if (prop.Name == "Controls")

@@ -28,12 +28,21 @@ namespace ExpressBase.Objects
                     ".Replace("@name", this.Id.ToString());
         }
 
+        public override string GetDesignHtml()
+        {
+            return GetHtmlHelper(RenderMode.Developer).RemoveCR().DoubleQuoted();
+        }
+
         public override string GetHtml()
         {
+            return GetHtmlHelper(RenderMode.User);
+        }
+
+        private string GetHtmlHelper(RenderMode mode)
+        {
             return string.Format(@"
-<div id='@namecontainer' class='Eb-ctrlContainer' style='position:absolute; left:@leftpx; top:@toppx; '>
-    <button id='@name' class='btn btn-default'  data-toggle='tooltip' title='@toolTipText' 
-        style='width:@widthpx; height:@heightpx; @backColor @foreColor display:inline-block; @fontStyle'>@text</button>
+<div id='@namecontainer' class='Eb-ctrlContainer'>
+    <button id='@name' class='btn btn-default'  data-toggle='tooltip' title='@toolTipText' style='width:100%; @backColor @foreColor @fontStyle'>@text</button>
 </div>
 "
 .Replace("@name", this.Name)
@@ -43,7 +52,7 @@ namespace ExpressBase.Objects
 .Replace("@height", this.Height.ToString())
 .Replace("@hiddenString", this.HiddenString)
 .Replace("@toolTipText", this.ToolTipText)
-.Replace("@text", this.Text )
+.Replace("@text", this.Text)
 .Replace("@tabIndex", "tabindex='" + this.TabIndex + "'")
 //.Replace("@backColor", "background-color:" + this.BackColorSerialized + ";")
 //.Replace("@foreColor", "color:" + this.ForeColorSerialized + ";")
@@ -53,5 +62,6 @@ namespace ExpressBase.Objects
 //                        : string.Empty)
 );
         }
+       
     }
 }
