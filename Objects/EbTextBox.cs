@@ -105,6 +105,11 @@ namespace ExpressBase.Objects
             return this.Text;
         }
 
+        public override string GetDesignHtml()
+        {
+            return "<input type='text' readonly style='width:100%' />";
+        }
+
         public override string GetHtml()
         {
             return @"

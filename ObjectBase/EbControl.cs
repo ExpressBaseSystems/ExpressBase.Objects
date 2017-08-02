@@ -192,6 +192,8 @@ else
 
         public virtual string GetJsInitFunc() { return null; }
 
+        public virtual string GetDesignHtml() { return "<div class='btn btn-default'>Button</div>"; }
+
         public void GetJsObject(BuilderType _builderType, ref string MetaStr, ref string ControlsStr)
         {
             string _props = string.Empty;
@@ -264,11 +266,13 @@ EbObjects.@NameObj = function @NameObj(id) {
     this.EbSid = id;
     @Props
     @InitFunc
+    this.getHtml = function() { return  @html; };
 };"
 .Replace("@Name", this.GetType().Name)
 .Replace("@Type", this.GetType().FullName)
 .Replace("@Props", _props)
-.Replace("@InitFunc", this.GetJsInitFunc());
+.Replace("@InitFunc", this.GetJsInitFunc())
+.Replace("@html", this.GetDesignHtml());
 
         }
 
