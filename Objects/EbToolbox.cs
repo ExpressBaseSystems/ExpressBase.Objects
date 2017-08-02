@@ -76,5 +76,7 @@ namespace ExpressBase.Objects
         public PropertyEditorType editor { get; set; }
 
         public string[] options { get; set; }
+
+        public string helpText { get; set; }
     }
 }

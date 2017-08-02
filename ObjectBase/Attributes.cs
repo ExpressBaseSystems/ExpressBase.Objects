@@ -59,4 +59,14 @@ namespace ExpressBase.Objects.Attributes
             this.Name = groupName;
         }
     }
+
+    public class HelpText : Attribute
+    {
+        public string value { get; set; }
+
+        public HelpText(string value)
+        {
+            this.value = value;
+        }
+    }
 }

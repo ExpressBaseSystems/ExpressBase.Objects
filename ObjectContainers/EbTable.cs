@@ -43,7 +43,7 @@ this.Init(id);";
 
         public override string GetHtml()
         {
-            string html = "<table><tr>";
+            string html = "<table class='form-render-table' ><tr>";
 
             foreach (EbControl ec in base.Controls)
                 html += ec.GetHtml();
@@ -74,7 +74,7 @@ this.Init(id);";
 
         public override string GetHtml()
         {
-            string html = "<td>";
+            string html = "<td class='form-render-table-Td'>";
 
             foreach (EbControl ec in base.Controls)
                 html += ec.GetHtml();

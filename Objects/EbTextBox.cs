@@ -30,6 +30,7 @@ namespace ExpressBase.Objects
     {
         [ProtoBuf.ProtoMember(1)]
         [EnableInBuilder(BuilderType.WebFormBuilder, BuilderType.FilterDialogBuilder)]
+        [HelpText("To limit number of charecters")]
         [PropertyGroup("Behavior")]
         [PropertyEditor(PropertyEditorType.Number)]
         public int MaxLength { get; set; }
