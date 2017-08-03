@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace ExpressBase.Objects.ObjectContainers
 {
     [ProtoBuf.ProtoContract]
-    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+    [EnableInBuilder(BuilderType.FilterDialog)]
     [HideInToolBox]
     public class EbFilterDialog : EbControlContainer
     {

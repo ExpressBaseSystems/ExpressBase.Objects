@@ -77,6 +77,8 @@ namespace ExpressBase.Objects
 
         public string[] options { get; set; }
 
+        public bool IsUIproperty { get; set; }
+
         public string helpText { get; set; }
     }
 }

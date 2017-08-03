@@ -151,26 +151,40 @@ else
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyGroup("Appearance")]
         [PropertyEditor(PropertyEditorType.Color)]
-        [System.ComponentModel.Category("Accessibility")]
+        [UIproperty]
         public virtual string BackColor { get; set; }
 
         [ProtoBuf.ProtoMember(30)]
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyGroup("Appearance")]
         [PropertyEditor(PropertyEditorType.Color)]
+        [UIproperty]
         [System.ComponentModel.Category("Accessibility")]
         public virtual string ForeColor { get; set; }
 
-        [ProtoBuf.ProtoMember(31)]
-        [System.ComponentModel.Category("Accessibility")]
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyGroup("Appearance")]
+        [PropertyEditor(PropertyEditorType.Color)]
+        [UIproperty]
         public virtual string LabelBackColor { get; set; }
 
-        [ProtoBuf.ProtoMember(32)]
-        [System.ComponentModel.Category("Accessibility")]
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyGroup("Appearance")]
+        [PropertyEditor(PropertyEditorType.Color)]
+        [UIproperty]
         public virtual string LabelForeColor { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyGroup("Appearance")]
+        [UIproperty]
+        [PropertyEditor(PropertyEditorType.Label)]
         public virtual string FontFamily { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyGroup("Appearance")]
+        [UIproperty]
         public virtual float FontSize { get; set; }
 
         [ProtoBuf.ProtoMember(34)]
@@ -252,9 +266,15 @@ else
                     if (!prop.IsDefined(typeof(PropertyEditor)) && !prop.PropertyType.GetTypeInfo().IsEnum)
                         meta.editor = GetTypeOf(prop);
 
-                    //if no helpText attribut is set, set - ""
+                    //if no helpText attribut is set, set as empty string
                     if (!prop.IsDefined(typeof(HelpText)))
                         meta.helpText = "";
+
+                    //if UIproperty attribut is set, set as true
+                    if (prop.IsDefined(typeof(UIproperty)))
+                        meta.IsUIproperty = true;
+                    else
+                        meta.IsUIproperty = false;
 
                     if (!prop.IsDefined(typeof(HideInPropertyGrid)))
                         MetaCollection.Add(meta);
@@ -275,7 +295,20 @@ EbObjects.@NameObj = function @NameObj(id) {
     this.EbSid = id;
     @Props
     @InitFunc
-    this.getHtml = function() { return  @html.replace(/@id/g, id); };
+    this.Html = @html;
+
+    this.RenderMe = function () {
+        var NewHtml = this.Html;
+        var me = this;
+        var metas = AllMetas[this.constructor.name.slice(0, -3)];
+        console.log(this.constructor.name.slice(0, -3));
+        $.each(metas, function (i, meta) {
+            var name = meta.name;
+            if (meta.IsUIproperty) { NewHtml = NewHtml.replace('@' + name, me[name]); }
+        });
+        $('#' + id + ' .Eb-ctrlContainer').html(NewHtml);
+    };
+
 };"
 .Replace("@Name", this.GetType().Name)
 .Replace("@Type", this.GetType().FullName)
