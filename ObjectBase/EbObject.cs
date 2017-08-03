@@ -19,7 +19,6 @@ namespace ExpressBase.Objects
     [ProtoBuf.ProtoInclude(1004, typeof(EbJsFunction))]
     [ProtoBuf.ProtoInclude(1005, typeof(EbJsValidator))]
     [ProtoBuf.ProtoInclude(1006, typeof(EbDataVisualization))]
-    [ProtoBuf.ProtoInclude(1007, typeof(EbFilterDialog))]
     [ProtoBuf.ProtoInclude(1008, typeof(EbApplication))]
     [ProtoBuf.ProtoInclude(1009, typeof(EbApplicationModules))]
 
@@ -40,7 +39,7 @@ namespace ExpressBase.Objects
 
         [ProtoBuf.ProtoMember(3)]
         [Description("Identity")]
-        [EnableInBuilder(BuilderType.WebFormBuilder, BuilderType.FilterDialogBuilder)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
         public virtual string Name { get; set; }
 
         [ProtoBuf.ProtoMember(4)]

@@ -19,10 +19,12 @@ namespace ExpressBase.Objects.Attributes
 
     public enum BuilderType
     {
-        DisplayBlockBuilder,
-        FilterDialogBuilder,
-        WebFormBuilder,
-        ReportBuilder,
+        DisplayBlock = 0,
+        FilterDialog = 1,
+        WebForm = 2,
+        MobileForm = 3,
+        UserControl = 4,
+        Report = 5,
     }
 
     public class HideInToolBox : Attribute { }

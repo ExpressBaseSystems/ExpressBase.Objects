@@ -39,19 +39,19 @@ namespace ExpressBase.Objects
         [ProtoBuf.ProtoMember(10)]
         [Description("Labels")]
         [System.ComponentModel.Category("Behavior")]
-        [EnableInBuilder(BuilderType.WebFormBuilder, BuilderType.FilterDialogBuilder)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
         public virtual string Label { get; set; }
 
         [ProtoBuf.ProtoMember(11)]
         [System.ComponentModel.Category("Behavior")]
         [Description("Labels")]
-        [EnableInBuilder(BuilderType.WebFormBuilder, BuilderType.FilterDialogBuilder)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
         public virtual string HelpText { get; set; }
 
         [ProtoBuf.ProtoMember(12)]
         [System.ComponentModel.Category("Behavior")]
         [Description("Labels")]
-        [EnableInBuilder(BuilderType.WebFormBuilder, BuilderType.FilterDialogBuilder)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
         public virtual string ToolTipText { get; set; }
 
         [ProtoBuf.ProtoMember(13)]
@@ -148,14 +148,14 @@ else
         public virtual int TabIndex { get; set; }
 
         [ProtoBuf.ProtoMember(29)]
-        [EnableInBuilder(BuilderType.WebFormBuilder)]
+        [EnableInBuilder(BuilderType.WebForm)]
         [PropertyGroup("Appearance")]
         [PropertyEditor(PropertyEditorType.Color)]
         [System.ComponentModel.Category("Accessibility")]
         public virtual string BackColor { get; set; }
 
         [ProtoBuf.ProtoMember(30)]
-        [EnableInBuilder(BuilderType.WebFormBuilder)]
+        [EnableInBuilder(BuilderType.WebForm)]
         [PropertyGroup("Appearance")]
         [PropertyEditor(PropertyEditorType.Color)]
         [System.ComponentModel.Category("Accessibility")]
@@ -168,6 +168,10 @@ else
         [ProtoBuf.ProtoMember(32)]
         [System.ComponentModel.Category("Accessibility")]
         public virtual string LabelForeColor { get; set; }
+
+        public virtual string FontFamily { get; set; }
+
+        public virtual float FontSize { get; set; }
 
         [ProtoBuf.ProtoMember(34)]
         public EbValidatorCollection Validators { get; set; }

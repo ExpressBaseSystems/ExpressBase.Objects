@@ -38,14 +38,4 @@ namespace ExpressBase.Objects
         [ProtoBuf.ProtoMember(1)]
         public string JsCode { get; set; }
     }
-
-   
-
-    [ProtoBuf.ProtoContract]
-    public class EbFilterDialog : EbObject
-    {
-        [ProtoBuf.ProtoMember(1)]
-        public string FilterDialogJson { get; set; }        
-    }
-
 }

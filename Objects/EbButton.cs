@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace ExpressBase.Objects
 {
     [ProtoBuf.ProtoContract]
-    [EnableInBuilder(BuilderType.WebFormBuilder, BuilderType.FilterDialogBuilder)]
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
     public class EbButton : EbControl
     {
         public EbButton() { }
@@ -54,8 +54,8 @@ namespace ExpressBase.Objects
 .Replace("@toolTipText", this.ToolTipText)
 .Replace("@text", this.Text)
 .Replace("@tabIndex", "tabindex='" + this.TabIndex + "'")
-//.Replace("@backColor", "background-color:" + this.BackColorSerialized + ";")
-//.Replace("@foreColor", "color:" + this.ForeColorSerialized + ";")
+.Replace("@backColor", "background-color:" + this.BackColor + ";")
+.Replace("@foreColor", "color:" + this.ForeColor + ";")
 //.Replace("@fontStyle", (this.FontSerialized != null) ?
 //                            (" font-family:" + this.FontSerialized.FontFamily + ";" + "font-style:" + this.FontSerialized.Style
 //                            + ";" + "font-size:" + this.FontSerialized.SizeInPoints + "px;")

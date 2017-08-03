@@ -26,40 +26,40 @@ namespace ExpressBase.Objects
     }
 
     [ProtoBuf.ProtoContract]
-    [EnableInBuilder(BuilderType.WebFormBuilder, BuilderType.FilterDialogBuilder)]
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
     public class EbTextBox : EbControl
     {
         [ProtoBuf.ProtoMember(1)]
-        [EnableInBuilder(BuilderType.WebFormBuilder, BuilderType.FilterDialogBuilder)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
         [HelpText("To limit number of charecters")]
         [PropertyGroup("Behavior")]
         [PropertyEditor(PropertyEditorType.Number)]
         public int MaxLength { get; set; }
 
         [ProtoBuf.ProtoMember(2)]
-        [EnableInBuilder(BuilderType.WebFormBuilder)]
+        [EnableInBuilder(BuilderType.WebForm)]
         [PropertyGroup("Behavior")]
         [PropertyEditor(PropertyEditorType.DropDown)]
         public TextTransform TextTransform { get; set; }
 
         [ProtoBuf.ProtoMember(3)]
-        [EnableInBuilder(BuilderType.WebFormBuilder)]
+        [EnableInBuilder(BuilderType.WebForm)]
         [PropertyGroup("Behavior")]
         public TextMode TextMode { get; set; }
 
         [ProtoBuf.ProtoMember(4)]
-        [EnableInBuilder(BuilderType.WebFormBuilder)]
+        [EnableInBuilder(BuilderType.WebForm)]
         [PropertyGroup("Behavior")]
         public string PlaceHolder { get; set; }
 
         [ProtoBuf.ProtoMember(5)]
-        [EnableInBuilder(BuilderType.WebFormBuilder)]
+        [EnableInBuilder(BuilderType.WebForm)]
         [PropertyGroup("Appearance")]
         public string Text { get; set; }
 
         [ProtoBuf.ProtoMember(6)]
         [PropertyGroup("Behavior")]
-        [EnableInBuilder(BuilderType.WebFormBuilder)]
+        [EnableInBuilder(BuilderType.WebForm)]
         public bool AutoCompleteOff { get; set; }
 
         [ProtoBuf.ProtoMember(7)]
@@ -122,7 +122,7 @@ namespace ExpressBase.Objects
 <div class='Eb-ctrlContainer' style='@hiddenString'>
     <span id='@nameLbl' style='@lblBackColor @LblForeColor'> @label </span>
         <div  class='input-group' style='width: 100%;'>
-            <span class='input-group-addon'><i class='fa fa-envelope' aria-hidden='true' class='input-group-addon'></i> @attachedLbl </span>
+            @attachedLbl
             <input type='@textMode'  id='@name' name='@name' autocomplete = '@autoComplete' data-toggle='tooltip' title='@toolTipText' @tabIndex @maxLength style='width:@width; height:@heightpx; @backColor @foreColor display:inline-block; @fontStyle @readOnlyString @required @placeHolder @text @tabIndex  />
         </div>
     <span class='helpText'> @helpText </span>
@@ -147,7 +147,24 @@ namespace ExpressBase.Objects
 .Replace("@backColor", "background-color:" + this.BackColor + ";")
 .Replace("@foreColor", "color:" + this.ForeColor + ";")
 .Replace("@lblBackColor", "background-color:" + this.LabelBackColor + ";")
-.Replace("@LblForeColor", "color:" + this.LabelForeColor + ";");
+.Replace("@LblForeColor", "color:" + this.LabelForeColor + ";")
+.Replace("@attachedLbl", (this.TextMode.ToString() != "SingleLine") ?
+                                (
+                                    "<i class='fa fa-$class input-group-addon' aria-hidden='true'"
+                                    + (
+                                        (this.FontFamily != null) ?
+                                            ("style='font-size:" + this.FontSize + "px;'")
+                                        : string.Empty
+                                      )
+                                    + "class='input-group-addon'></i>"
+                                )
+                                .Replace("$class", (this.TextMode.ToString() == "Email") ?
+                                                            ("envelope")
+                                                        : (this.TextMode.ToString() == "Password") ?
+                                                            "key"
+                                                        : ("eyedropper")
+                                )
+                        : string.Empty); ;
         }
     }
 

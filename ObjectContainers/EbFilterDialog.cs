@@ -1,26 +1,17 @@
-﻿#if !NET462
-using ExpressBase.Data;
-using ExpressBase.Objects.Attributes;
-#endif
-using ServiceStack.Redis;
+﻿using ExpressBase.Objects.Attributes;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ExpressBase.Objects
+namespace ExpressBase.Objects.ObjectContainers
 {
     [ProtoBuf.ProtoContract]
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
     [HideInToolBox]
-    public class EbForm : EbControlContainer
+    public class EbFilterDialog : EbControlContainer
     {
-        [Browsable(false)]
-        public bool IsUpdate { get; set; }
-       
-        public EbForm() { }
+        public EbFilterDialog() { }
 
         public override string GetHead()
         {

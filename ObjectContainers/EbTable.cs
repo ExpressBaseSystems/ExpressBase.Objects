@@ -9,10 +9,10 @@ using System.Threading.Tasks;
 namespace ExpressBase.Objects
 {
     [ProtoBuf.ProtoContract]
-    [EnableInBuilder(BuilderType.WebFormBuilder, BuilderType.FilterDialogBuilder)]
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
     public class EbTableLayout : EbControlContainer
     {
-        [EnableInBuilder(BuilderType.WebFormBuilder, BuilderType.FilterDialogBuilder)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
         public string Columns { get; set; }
 
         public EbTableLayout() { }
@@ -58,7 +58,7 @@ this.Init(id);";
     }
 
     [ProtoBuf.ProtoContract]
-    [EnableInBuilder(BuilderType.WebFormBuilder, BuilderType.FilterDialogBuilder)]
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
     [HideInToolBox]
     public class EbTableTd : EbControlContainer
     {

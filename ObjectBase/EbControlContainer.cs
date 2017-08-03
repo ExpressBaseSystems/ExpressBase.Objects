@@ -30,7 +30,7 @@ namespace ExpressBase.Objects
     public class EbControlContainer : EbControl
     {
         [ProtoBuf.ProtoMember(1)]
-        [EnableInBuilder(BuilderType.WebFormBuilder, BuilderType.FilterDialogBuilder)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
         [HideInPropertyGrid]
         public List<EbControl> Controls { get; set; }
 
