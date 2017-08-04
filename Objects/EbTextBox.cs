@@ -119,17 +119,18 @@ namespace ExpressBase.Objects
         private string GetHtmlHelper(RenderMode mode)
         {
             return @"
+
 <div class='Eb-ctrlContainer' style='@HiddenString '>
     <span id='@nameLbl' style='@LabelBackColor @LabelForeColor '> @Label </span>
         <div  class='input-group' style='width: 100%;'>
             @attachedLbl
             <input type='@TextMode '  id='@name ' name='@name ' autocomplete = '@AutoCompleteOff ' data-toggle='tooltip' title='@ToolTipText ' 
-@tabIndex @MaxLength style='width:@width; height:@heightpx; @BackColor @ForeColor display:inline-block; @fontStyle @ReadOnlyString  @Required  @PlaceHolder  @Text  @TabIndex  />
+@tabIndex @MaxLength  style='width:100%; height:@heightpx; @BackColor @ForeColor display:inline-block; @fontStyle @ReadOnlyString  @Required  @PlaceHolder  @Text  @TabIndex  />
         </div>
     <span class='helpText'> @HelpText </span>
 </div>"
 .Replace("@Name ", (this.Name != null) ? this.Name : "@Name ")
-.Replace("@MaxLength ", "maxlength='" + ( (this.MaxLength > 0) ? this.MaxLength.ToString() : "@MaxLength" ))
+.Replace("@MaxLength ", "maxlength='" + ( (this.MaxLength > 0) ? this.MaxLength.ToString() : "@MaxLength" ) + "'")
 .Replace("@TextMode ", this.TextMode.ToString().ToLower())
 .Replace("@HiddenString ", this.HiddenString)
 .Replace("@Required ", (this.Required && !this.Hidden ? " required" : string.Empty))
