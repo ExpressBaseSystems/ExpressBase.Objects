@@ -119,35 +119,34 @@ namespace ExpressBase.Objects
         private string GetHtmlHelper(RenderMode mode)
         {
             return @"
-<div class='Eb-ctrlContainer' style='@hiddenString'>
-    <span id='@nameLbl' style='@lblBackColor @LblForeColor'> @label </span>
+<div class='Eb-ctrlContainer' style='@HiddenString '>
+    <span id='@nameLbl' style='@LabelBackColor @LabelForeColor '> @Label </span>
         <div  class='input-group' style='width: 100%;'>
             @attachedLbl
-            <input type='@textMode'  id='@name' name='@name' autocomplete = '@autoComplete' data-toggle='tooltip' title='@toolTipText' @tabIndex @maxLength style='width:@width; height:@heightpx; @backColor @foreColor display:inline-block; @fontStyle @readOnlyString @required @placeHolder @text @tabIndex  />
+            <input type='@TextMode '  id='@name ' name='@name ' autocomplete = '@AutoCompleteOff ' data-toggle='tooltip' title='@ToolTipText ' 
+@tabIndex @MaxLength style='width:@width; height:@heightpx; @BackColor @ForeColor display:inline-block; @fontStyle @ReadOnlyString  @Required  @PlaceHolder  @Text  @TabIndex  />
         </div>
-    <span class='helpText'> @helpText </span>
+    <span class='helpText'> @HelpText </span>
 </div>"
-.Replace("@name", this.Name)
-.Replace("@left", this.Left.ToString())
-.Replace("@top", this.Top.ToString())
-.Replace("@width", "100%")
-.Replace("@height", this.Height.ToString())
-.Replace("@label", this.Label)
-.Replace("@maxLength", (this.MaxLength > 0) ? string.Format("maxlength='{0}'", this.MaxLength) : string.Empty)
-.Replace("@textMode", this.TextMode.ToString().ToLower())
-.Replace("@hiddenString", this.HiddenString)
-.Replace("@required", (this.Required && !this.Hidden ? " required" : string.Empty))
-.Replace("@readOnlyString", this.ReadOnlyString)
-.Replace("@toolTipText", this.ToolTipText)
-.Replace("@helpText", this.HelpText)
-.Replace("@placeHolder", "placeholder='" + this.PlaceHolder + "'")
-.Replace("@text", "value='" + this.Text + "'")
-.Replace("@tabIndex", "tabindex='" + this.TabIndex + "'")
-.Replace("@autoComplete", (this.AutoCompleteOff || this.TextMode.ToString().ToLower() == "password") ? "off" : "on")
-.Replace("@backColor", "background-color:" + this.BackColor + ";")
-.Replace("@foreColor", "color:" + this.ForeColor + ";")
-.Replace("@lblBackColor", "background-color:" + this.LabelBackColor + ";")
-.Replace("@LblForeColor", "color:" + this.LabelForeColor + ";")
+.Replace("@Name ", (this.Name != null) ? this.Name : "@Name ")
+.Replace("@MaxLength ", "maxlength='" + ( (this.MaxLength > 0) ? this.MaxLength.ToString() : "@MaxLength" ))
+.Replace("@TextMode ", this.TextMode.ToString().ToLower())
+.Replace("@HiddenString ", this.HiddenString)
+.Replace("@Required ", (this.Required && !this.Hidden ? " required" : string.Empty))
+.Replace("@ReadOnlyString ", this.ReadOnlyString)
+.Replace("@ToolTipText ", this.ToolTipText)
+.Replace("@HelpText ", this.HelpText)
+.Replace("@PlaceHolder ", "placeholder='" + this.PlaceHolder + "'")
+.Replace("@Text ", "value='" + this.Text + "'")
+.Replace("@TabIndex ", "tabindex='" + this.TabIndex + "' ")
+.Replace("@AutoCompleteOff ", (this.AutoCompleteOff || this.TextMode.ToString().ToLower() == "password") ? "off" : "on")
+
+    .Replace("@LabelForeColor ", "color:" + ((this.LabelForeColor != null) ? this.LabelForeColor : "@LabelForeColor ") + ";")
+    .Replace("@LabelBackColor ", "background-color:" + ((this.LabelBackColor != null) ? this.LabelBackColor : "@LabelBackColor ") + ";")
+    .Replace("@BackColor ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor ") + ";"))
+    .Replace("@ForeColor ", "color:" + ((this.ForeColor != null) ? this.ForeColor : "@ForeColor ") + ";")
+    .Replace("@Label ", ((this.Label != null) ? this.Label : "@Label"))
+
 .Replace("@attachedLbl", (this.TextMode.ToString() != "SingleLine") ?
                                 (
                                     "<i class='fa fa-$class input-group-addon' aria-hidden='true'"
@@ -164,7 +163,7 @@ namespace ExpressBase.Objects
                                                             "key"
                                                         : ("eyedropper")
                                 )
-                        : string.Empty); ;
+                        : string.Empty);
         }
     }
 
