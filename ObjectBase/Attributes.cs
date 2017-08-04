@@ -71,4 +71,9 @@ namespace ExpressBase.Objects.Attributes
             this.value = value;
         }
     }
+
+    public class UIproperty : Attribute
+    {
+        public UIproperty() { }
+    }
 }
