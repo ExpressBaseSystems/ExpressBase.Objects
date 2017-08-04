@@ -73,6 +73,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string TenantAccountId { get; set; }
        
         public int UserId { get; set; }
+
+        public Boolean IsVersioned { get; set; }
     }
 
     [DataContract]
