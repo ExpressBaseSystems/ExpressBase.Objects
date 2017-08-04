@@ -36,6 +36,14 @@ namespace ExpressBase.Objects
     }
 
     [ProtoBuf.ProtoContract]
+    public enum EbObjectTypesNonVer
+    {
+        Application = 9,
+        ApplicationModule = 10,
+        DataVisualization = 11
+    }
+
+    [ProtoBuf.ProtoContract]
     public enum EbDataGridViewColumnType
     {
         Boolean,
