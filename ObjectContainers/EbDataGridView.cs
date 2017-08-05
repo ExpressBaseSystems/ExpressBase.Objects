@@ -92,7 +92,7 @@ namespace ExpressBase.Objects
          <div class='tab-content' id='table_tabcontent'>
              <div id='@tableId_tab_1' class='tab-pane active'>
 
-                 <div id='TableControls_@tableId_1' class = 'well well-sm' style='margin-bottom:5px!important;display:none'>
+                 <div id='TableControls_@tableId_1' class = 'well well-sm' style='margin-bottom:5px!important;'>
                     <label>@dvname</label>
                     <button id='btnGo' class='btn btn-primary' style='float: right;'>Run</button>
                     @filters  
@@ -166,9 +166,9 @@ namespace ExpressBase.Objects
 .Replace("@tableId", this.Name)
 .Replace("@dvname", this.Dvname)
 .Replace("@login", this.Login)
-.Replace("@datasourcedd", this.getdropdownColumn())
+//.Replace("@datasourcedd", this.getdropdownColumn())
 //.Replace("@tableViewName", ((string.IsNullOrEmpty(this.Label)) ? "&lt;ReportLabel Undefined&gt;" : this.Label))
-.Replace("@servicestack_url", "https://expressbaseservicestack.azurewebsites.net")
+.Replace("@servicestack_url", "https://localhost:44377/")
 .Replace("@filters", this.filters)
 .Replace("@FilterBH", this.FilterBH.ToString())
 .Replace("@collapsBtn", (this.filters != null) ? @"<div id = 'btnCollapse' class='btn btn-default' data-toggle='collapse' data-target='#filterBox' aria-expanded='true' aria-controls='filterBox'>
@@ -179,24 +179,24 @@ namespace ExpressBase.Objects
             //.Replace("@tvPref4User", tvPref4User);
         }
 
-        public string getdropdownColumn()
-        {
-            string dd = string.Empty;
-            dd += @"<div class='dropdown' id='datatSourceDropdown' style='display: inline-block;'>
-                <button class='btn btn-primary dropdown-toggle' type='button' data-toggle='dropdown'>Select DataSource
-                    <span class='caret'></span>
-                </button>
-                <ul class='dropdown-menu scrollable-menu'>";
-            foreach(var element in this.DslistAll)
-            {
-                dd += "<li data-dsid=" + element.Key + ">";
-                dd += "<a href = '#'>" + element.Value.Name + "</a>";
-                dd += "</li>";
-            }
+        //public string getdropdownColumn()
+        //{
+        //    string dd = string.Empty;
+        //    dd += @"<div class='dropdown' id='datatSourceDropdown' style='display: inline-block;'>
+        //        <button class='btn btn-primary dropdown-toggle' type='button' data-toggle='dropdown'>Select DataSource
+        //            <span class='caret'></span>
+        //        </button>
+        //        <ul class='dropdown-menu scrollable-menu'>";
+        //    foreach(var element in this.DslistAll)
+        //    {
+        //        dd += "<li data-dsid=" + element.Key + ">";
+        //        dd += "<a href = '#'>" + element.Value.Name + "</a>";
+        //        dd += "</li>";
+        //    }
 
-            dd += "</ul>";
-            dd += "</div>";
-            return dd;
-        }
+        //    dd += "</ul>";
+        //    dd += "</div>";
+        //    return dd;
+        //}
     }
 }
