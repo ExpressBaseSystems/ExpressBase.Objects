@@ -124,6 +124,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
        [ DataMember(Order = 11)]
         public string Json { get; set; }
 
+        [DataMember(Order = 12)]
+        public string RefId { get; set; }
+
         public EbObjectWrapper() { }
     }
 }
