@@ -16,7 +16,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public bool IsTest { get; set; } // If (IsTest == true) test the function
 
-        public int DominantId { get; set; }
+        public string DominantId { get; set; }
 
         public int VersionId { get; set; } // (VersionId > 0 and VersionId != Int32.MaxValue) Fetch particular version with Bytea
 
