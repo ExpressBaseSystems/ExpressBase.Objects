@@ -16,7 +16,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public bool IsTest { get; set; } // If (IsTest == true) test the function
 
-        public int DominantId { get; set; }
+        public string DominantId { get; set; }
 
         public int VersionId { get; set; } // (VersionId > 0 and VersionId != Int32.MaxValue) Fetch particular version with Bytea
 
@@ -73,8 +73,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string TenantAccountId { get; set; }
        
         public int UserId { get; set; }
-
-        public Boolean IsVersioned { get; set; }
     }
 
     [DataContract]
@@ -88,6 +86,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 3)]
         public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 4)]
+        public string RefId { get; set; }
     }
 
     [DataContract]
@@ -125,6 +126,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
        [ DataMember(Order = 11)]
         public string Json { get; set; }
+
+        [DataMember(Order = 12)]
+        public string RefId { get; set; }
 
         public EbObjectWrapper() { }
     }
