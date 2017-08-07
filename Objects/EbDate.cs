@@ -18,7 +18,7 @@ namespace ExpressBase.Objects
     {
         Hour_Minute_Second_12hrs,
         Hour_Minute_Second_24hrs,
-        Hour_Minute_12hrs,       
+        Hour_Minute_12hrs,
         Hour_Minute_24hrs,
         Hour_12hrs,
         Hour_24hrs,
@@ -68,12 +68,13 @@ namespace ExpressBase.Objects
         public bool AutoCompleteOff { get; set; }
 
         [ProtoBuf.ProtoMember(7)]
-        private string maskPattern {
+        private string maskPattern
+        {
             get
             {
-                if(this.EbDateType.ToString() == "Date")
+                if (this.EbDateType.ToString() == "Date")
                     return "0000/00/00";
-                else if(this.EbDateType.ToString() == "Time")
+                else if (this.EbDateType.ToString() == "Time")
                     return "00:00";
                 else
                     return "0000/00/00 00:00";
@@ -92,7 +93,7 @@ namespace ExpressBase.Objects
 
         public override string GetHead()
         {
-            return  (((!this.Hidden) ? this.UniqueString + this.RequiredString : string.Empty) + @"".Replace("{0}", this.Name)) + @"
+            return (((!this.Hidden) ? this.UniqueString + this.RequiredString : string.Empty) + @"".Replace("{0}", this.Name)) + @"
 $('#@idContainer [class=input-group-addon]').click(function(){
     //$('#@idContainer [class=date]').toggle();
         $('#@id').focus();
@@ -106,7 +107,7 @@ $('#@id').datetimepicker({
     //maxDate:'@minDate',
     @dateType
 });"
-.Replace("@dateType", (this.EbDateType.ToString()=="Date") ? "timepicker:false" : ((this.EbDateType.ToString() == "Time") ? "datepicker:false" : string.Empty) )
+.Replace("@dateType", (this.EbDateType.ToString() == "Date") ? "timepicker:false" : ((this.EbDateType.ToString() == "Time") ? "datepicker:false" : string.Empty))
 .Replace("@id", this.Name)
 .Replace("@maskPattern", this.maskPattern)
 .Replace("@format", (this.EbDateType.ToString() == "Date") ? "Y/m/d" : (this.EbDateType.ToString() == "Time") ? "H:i" : "Y/m/d H:i")
@@ -114,19 +115,39 @@ $('#@id').datetimepicker({
 .Replace("@minDate", this.Min.ToString());
         }
 
+        public string Wrap4Developer(string EbCtrlHTML)
+        {
+            return @"<div class='controlTile' tabindex='1' onclick='event.stopPropagation();$(this).focus()'>
+                                <div class='ctrlHead' style='display:none;'>
+                                    <i class='fa fa-arrows moveBtn' aria-hidden='true'></i>
+                                    <a href='#' class='close' style='cursor:default' data-dismiss='alert' aria-label='close' title='close'>×</a>
+                                </div>"
+                                    + EbCtrlHTML
+                        + "</div>";
+        }
+
         public override string GetDesignHtml()
         {
-            return GetHtmlHelper(RenderMode.Developer).RemoveCR().DoubleQuoted();
+            string _html = null; 
+            
+            if (this.Name == null) //if in new mode
+                _html = GetHtml();
+
+            else //if edit mode
+                _html = Wrap4Developer(GetHtml());
+
+            return _html.RemoveCR().DoubleQuoted();
+
         }
 
         public override string GetHtml()
         {
-            return GetHtmlHelper(RenderMode.User);
+            return GetHtmlHelper();
         }
 
-        private string GetHtmlHelper(RenderMode mode)
+        private string GetHtmlHelper()
         {
-            return @"
+            string EbCtrlHTML = @"
     <div id='@nameContainer' Ctype='Date' class='Eb-ctrlContainer' style='@hiddenString'>
         <span id='@nameLbl' style='@lblBackColor @LblForeColor'>@label</span>
         <div  class='input-group' style='width:100%;'>
@@ -160,8 +181,9 @@ $('#@id').datetimepicker({
 //                            (" font-family:" + this.FontSerialized.FontFamily + ";" + "font-style:" + this.FontSerialized.Style
 //                            + ";" + "font-size:" + this.FontSerialized.SizeInPoints + "px;")
 //                        : string.Empty)
-.Replace("@atchdLbl", (this.EbDateType.ToString().ToLower() == "time") ? "fa-clock-o" : "fa-calendar")
-;
+.Replace("@atchdLbl", (this.EbDateType.ToString().ToLower() == "time") ? "fa-clock-o" : "fa-calendar");
+
+            return EbCtrlHTML;
         }
     }
 }

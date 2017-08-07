@@ -42,8 +42,6 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
         public virtual string Name { get; set; }
 
-        public virtual string EbSid { get; set; }
-
         [ProtoBuf.ProtoMember(4)]
         [Description("Identity")]
         public virtual string Description { get; set; }
