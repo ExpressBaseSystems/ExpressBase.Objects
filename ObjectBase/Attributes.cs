@@ -17,16 +17,6 @@ namespace ExpressBase.Objects.Attributes
         Columns,
     }
 
-    public enum BuilderType
-    {
-        DisplayBlock = 0,
-        FilterDialog = 1,
-        WebForm = 2,
-        MobileForm = 3,
-        UserControl = 4,
-        Report = 5,
-    }
-
     public class HideInToolBox : Attribute { }
 
     public class HideInPropertyGrid : Attribute { }

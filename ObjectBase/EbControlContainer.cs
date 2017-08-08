@@ -48,5 +48,7 @@ namespace ExpressBase.Objects
             base.Redis = redisclient;
             base.ServiceStackClient = serviceclient;
         }
+
+        public override string GetHtml() { return string.Empty; }
     }
 }

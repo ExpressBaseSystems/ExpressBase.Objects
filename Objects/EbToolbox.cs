@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using ExpressBase.Objects.Attributes;
+using ExpressBase.Common;
 
 namespace ExpressBase.Objects
 {
@@ -16,6 +17,10 @@ namespace ExpressBase.Objects
 
         public string html { get; set; }
 
+        public string TypeRegister { get; set; }
+
+        public string XXXX { get; set; }
+
         EbToolbox() { }
 
         public EbToolbox(BuilderType _builderType)
@@ -25,6 +30,25 @@ namespace ExpressBase.Objects
             string _metaStr = "AllMetas = {";
 
             string _controlsStr = "var EbObjects = {};";
+
+            string xxx = @"
+function Proc(jsonObj, rootContainerObj)
+{
+    ProcRecur(jsonObj.Controls, rootContainerObj.Controls);
+};
+
+function ProcRecur(src_controls, dest_controls)
+{
+    $.each(src_controls.$values, function(i, control) {
+        if (!control.IsContainer)
+            dest_controls.Append(ObjectFactory(control));
+        else
+            ProcRecur(control.Controls, dest_controls.Controls);
+    });
+};
+";
+
+            string _typeInfos = "function ObjectFactory(jsonObj) { ";
 
             var types = this.GetType().GetTypeInfo().Assembly.GetTypes();
 
@@ -38,7 +62,9 @@ namespace ExpressBase.Objects
                         if (!tool.GetTypeInfo().IsDefined(typeof(HideInToolBox)))
                             _toolsHtml += GetToolHtml(tool.Name.Substring(2));
 
-                        (Activator.CreateInstance(tool) as EbControl).GetJsObject(_builderType, ref _metaStr, ref _controlsStr);
+                        var toolObj = Activator.CreateInstance(tool) as EbControl;
+                        _typeInfos += string.Format("if (jsonObj['$type'].includes('{0}')) return new EbObjects.{1}Obj(jsonObj.EbSid, jsonObj); ", toolObj.GetType().FullName, toolObj.GetType().Name);
+                        toolObj.GetJsObject(_builderType, ref _metaStr, ref _controlsStr);
                     }
                 }
             }
@@ -52,11 +78,15 @@ namespace ExpressBase.Objects
             this.AllControlls = _controlsStr;
 
             this.html = _toolsHtml;
+
+            this.TypeRegister = _typeInfos + " };";
+
+            this.XXXX = xxx;
         }
 
         public string getHead()
         {
-            return this.AllControlls + this.AllMetas;
+            return this.AllControlls + this.AllMetas + this.TypeRegister;
         }
 
         private static string GetToolHtml(string tool_name)

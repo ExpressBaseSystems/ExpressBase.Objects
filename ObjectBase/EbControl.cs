@@ -40,12 +40,14 @@ namespace ExpressBase.Objects
         [Description("Labels")]
         [System.ComponentModel.Category("Behavior")]
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        [UIproperty]
         public virtual string Label { get; set; }
 
         [ProtoBuf.ProtoMember(11)]
         [System.ComponentModel.Category("Behavior")]
         [Description("Labels")]
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        [UIproperty]
         public virtual string HelpText { get; set; }
 
         [ProtoBuf.ProtoMember(12)]
@@ -290,25 +292,33 @@ else
 .Replace("@MetaCollection", JsonConvert.SerializeObject(MetaCollection));
 
             ControlsStr += @"
-EbObjects.@NameObj = function @NameObj(id) {
+EbObjects.@NameObj = function @NameObj(id, jsonObj) {
     this.$type = '@Type, ExpressBase.Objects';
     this.EbSid = id;
     @Props
     @InitFunc
-    this.Html = @html;
+    this.Html = function () { return @html.replace(/@id/g, id); };
 
     this.RenderMe = function () {
-        var NewHtml = this.Html;
+        var innerHtml = $('#' + id + ' .Eb-ctrlContainer').html(); console.log(innerHtml);
+        var NewHtml = this.Html();
         var me = this;
         var metas = AllMetas[this.constructor.name.slice(0, -3)];
         console.log(this.constructor.name.slice(0, -3));
         $.each(metas, function (i, meta) {
             var name = meta.name;
-            if (meta.IsUIproperty) { NewHtml = NewHtml.replace('@' + name, me[name]); }
+            if (meta.IsUIproperty) { NewHtml = NewHtml.replace('@' + name + ' ', me[name]); }
         });
-        $('#' + id + ' .Eb-ctrlContainer').html(NewHtml);
+        if(!this.IsContainer)
+            $('#' + id + ' .Eb-ctrlContainer').html($(NewHtml).html());
+        else{
+            $('#' + id + ' .Eb-ctrlContainer').replaceWith(NewHtml);
+            //$('#' + id + ' .Eb-ctrlContainer').html(innerHtml);
+        }
     };
 
+    if (jsonObj)
+        $.extend(this, jsonObj);
 };"
 .Replace("@Name", this.GetType().Name)
 .Replace("@Type", this.GetType().FullName)
@@ -330,7 +340,7 @@ EbObjects.@NameObj = function @NameObj(id) {
                 else
                     return string.Format(s, prop.Name, (prop.Name == "Name" || prop.Name == "EbSid") ? "id" : "''");
             }
-            else if (prop.PropertyType == typeof(int))
+            else if (prop.PropertyType == (typeof(int)) || prop.PropertyType == (typeof(float)))
                 return string.Format(s, prop.Name, ((prop.Name == "Id") ? "id" : "0"));
             else if (prop.PropertyType == typeof(bool))
                 return string.Format(s, prop.Name, "false");
