@@ -1,20 +1,25 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace ExpressBase.Objects
 {
-    [ProtoBuf.ProtoContract]
     public class EbDataVisualization : EbObject
     {
-        [ProtoBuf.ProtoMember(1)]
+        public string DataSourceRefId { get; set; }
+
+        [JsonIgnore]
+        public EbDataSource EbDataSource { get; set; }
+
         public string settingsJson { get; set; }
 
-        [ProtoBuf.ProtoMember(2)]
-        public int dsid { get; set; }
+        public override void AfterRedisGet()
+        {
+            this.EbDataSource = base.Redis.Get<EbDataSource>(this.DataSourceRefId);
+        }
 
-        [ProtoBuf.ProtoContract]
         public enum Operations
         {
             Create,
@@ -31,5 +36,4 @@ namespace ExpressBase.Objects
             Print
         }
     }
-
 }

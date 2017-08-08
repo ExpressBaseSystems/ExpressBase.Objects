@@ -14,6 +14,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         public int Id { get; set; } // (Id > 0) Fetch all version without bytea / Fetch latest version with bytea 
 
+        public string RefId { get; set; }
+
         public bool IsTest { get; set; } // If (IsTest == true) test the function
 
         public string DominantId { get; set; }
@@ -61,6 +63,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public byte[] Bytea { get; set; }
 
         public string Json { get; set; }
+
+        public EbObject EbObject { get; set; }
 
         public ObjectLifeCycleStatus Status { get; set; }
       

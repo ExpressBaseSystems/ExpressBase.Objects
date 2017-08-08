@@ -14,9 +14,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     [DataContract]
     public class DataSourceDataRequest : IReturn<DataSourceDataResponse>, IEbSSRequest
     {
-
         [DataMember(Order = 0)]
-        public int Id { get; set; }
+        public string RefId { get; set; }
 
         [DataMember(Order = 1)]
         public int Start { get; set; }
@@ -58,7 +57,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class DataSourceColumnsRequest : IReturn<DataSourceColumnsResponse>, IEbSSRequest
     {
         [DataMember(Order = 1)]
-        public int Id { get; set; }
+        public string RefId { get; set; }
 
         [DataMember(Order = 2)]
         public string SearchText { get; set; }

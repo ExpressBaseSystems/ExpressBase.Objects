@@ -13,7 +13,7 @@ namespace ExpressBase.Objects
         public string Sql { get; set; }
 
         [ProtoBuf.ProtoMember(2)]
-        public int FilterDialogId { get; set; }
+        public string FilterDialogRefId { get; set; }
 
         public string SqlDecoded()
         {
