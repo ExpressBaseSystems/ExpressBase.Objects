@@ -40,12 +40,14 @@ namespace ExpressBase.Objects
         [Description("Labels")]
         [System.ComponentModel.Category("Behavior")]
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        [UIproperty]
         public virtual string Label { get; set; }
 
         [ProtoBuf.ProtoMember(11)]
         [System.ComponentModel.Category("Behavior")]
         [Description("Labels")]
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        [UIproperty]
         public virtual string HelpText { get; set; }
 
         [ProtoBuf.ProtoMember(12)]
@@ -182,9 +184,9 @@ else
         [PropertyEditor(PropertyEditorType.Label)]
         public virtual string FontFamily { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm)]
-        [PropertyGroup("Appearance")]
-        [UIproperty]
+        //[EnableInBuilder(BuilderType.WebForm)]
+        //[PropertyGroup("Appearance")]
+        //[UIproperty]
         public virtual float FontSize { get; set; }
 
         [ProtoBuf.ProtoMember(34)]
@@ -290,15 +292,15 @@ else
 .Replace("@MetaCollection", JsonConvert.SerializeObject(MetaCollection));
 
             ControlsStr += @"
-EbObjects.@NameObj = function @NameObj(id) {
+EbObjects.@NameObj = function @NameObj(id, jsonObj) {
     this.$type = '@Type, ExpressBase.Objects';
     this.EbSid = id;
     @Props
     @InitFunc
-    this.Html = @html;
+    this.Html = function () { return @html; };
 
     this.RenderMe = function () {
-        var NewHtml = this.Html;
+        var NewHtml = this.Html();
         var me = this;
         var metas = AllMetas[this.constructor.name.slice(0, -3)];
         console.log(this.constructor.name.slice(0, -3));
@@ -309,6 +311,8 @@ EbObjects.@NameObj = function @NameObj(id) {
         $('#' + id + ' .Eb-ctrlContainer').html(NewHtml);
     };
 
+    if (jsonObj)
+        $.extend(this, jsonObj);
 };"
 .Replace("@Name", this.GetType().Name)
 .Replace("@Type", this.GetType().FullName)

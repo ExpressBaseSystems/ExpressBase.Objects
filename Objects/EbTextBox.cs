@@ -120,8 +120,8 @@ namespace ExpressBase.Objects
         {
             return @"
 
-<div class='Eb-ctrlContainer' style='@HiddenString '>
-    <span id='@nameLbl' style='@LabelBackColor @LabelForeColor '> @Label </span>
+<div class='Eb-ctrlContainer' Ctype='TextBox' style='@HiddenString '>
+    <span id='@nameLbl' style='@LabelBackColor @LabelForeColor '> @Label  </span>
         <div  class='input-group' style='width: 100%;'>
             @attachedLbl
             <input type='@TextMode '  id='@name ' name='@name ' autocomplete = '@AutoCompleteOff ' data-toggle='tooltip' title='@ToolTipText ' 
@@ -136,7 +136,6 @@ namespace ExpressBase.Objects
 .Replace("@Required ", (this.Required && !this.Hidden ? " required" : string.Empty))
 .Replace("@ReadOnlyString ", this.ReadOnlyString)
 .Replace("@ToolTipText ", this.ToolTipText)
-.Replace("@HelpText ", this.HelpText)
 .Replace("@PlaceHolder ", "placeholder='" + this.PlaceHolder + "'")
 .Replace("@Text ", "value='" + this.Text + "'")
 .Replace("@TabIndex ", "tabindex='" + this.TabIndex + "' ")
@@ -146,6 +145,7 @@ namespace ExpressBase.Objects
     .Replace("@LabelBackColor ", "background-color:" + ((this.LabelBackColor != null) ? this.LabelBackColor : "@LabelBackColor ") + ";")
     .Replace("@BackColor ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor ") + ";"))
     .Replace("@ForeColor ", "color:" + ((this.ForeColor != null) ? this.ForeColor : "@ForeColor ") + ";")
+    .Replace("@HelpText ", ((this.HelpText != null) ? this.HelpText : "@HelpText"))
     .Replace("@Label ", ((this.Label != null) ? this.Label : "@Label"))
 
 .Replace("@attachedLbl", (this.TextMode.ToString() != "SingleLine") ?

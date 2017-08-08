@@ -20,7 +20,9 @@ namespace ExpressBase.Objects
         Application = 9,
         ApplicationModule = 10,
         DataVisualization = 11,
-        FilterDialog = 12
+        FilterDialog = 12,
+        MobileForm = 13,
+        UserControl = 14
     }
 
     [ProtoBuf.ProtoContract]
@@ -41,6 +43,16 @@ namespace ExpressBase.Objects
         Application = 9,
         ApplicationModule = 10,
         DataVisualization = 11
+    }
+
+    public enum BuilderType
+    {
+        DisplayBlock = 1,
+        FilterDialog = 12,
+        WebForm = 0,
+        MobileForm = 13,
+        UserControl = 14,
+        Report = 3,
     }
 
     [ProtoBuf.ProtoContract]
