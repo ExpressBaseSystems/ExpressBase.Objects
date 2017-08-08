@@ -29,44 +29,37 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
     public class EbTextBox : EbControl
     {
-        [ProtoBuf.ProtoMember(1)]
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
         [HelpText("To limit number of charecters")]
         [PropertyGroup("Behavior")]
         [PropertyEditor(PropertyEditorType.Number)]
         public int MaxLength { get; set; }
-
-        [ProtoBuf.ProtoMember(2)]
+        
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyGroup("Behavior")]
         [PropertyEditor(PropertyEditorType.DropDown)]
         public TextTransform TextTransform { get; set; }
-
-        [ProtoBuf.ProtoMember(3)]
+        
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyGroup("Behavior")]
         public TextMode TextMode { get; set; }
-
-        [ProtoBuf.ProtoMember(4)]
+        
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyGroup("Behavior")]
         public string PlaceHolder { get; set; }
-
-        [ProtoBuf.ProtoMember(5)]
+        
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyGroup("Appearance")]
         public string Text { get; set; }
-
-        [ProtoBuf.ProtoMember(6)]
+        
+        
         [PropertyGroup("Behavior")]
         [EnableInBuilder(BuilderType.WebForm)]
         public bool AutoCompleteOff { get; set; }
-
-        [ProtoBuf.ProtoMember(7)]
+        
         [PropertyGroup("Behavior")]
         public string MaxDateExpression { get; set; }
-
-        [ProtoBuf.ProtoMember(8)]
+        
         [PropertyGroup("Behavior")]
         public string MinDateExpression { get; set; }
 
@@ -137,7 +130,7 @@ namespace ExpressBase.Objects
 .Replace("@ReadOnlyString ", this.ReadOnlyString)
 .Replace("@ToolTipText ", this.ToolTipText)
 .Replace("@PlaceHolder ", "placeholder='" + this.PlaceHolder + "'")
-.Replace("@Text ", "value='" + this.Text + "'")
+.Replace("@Text ", "value='" + this.Text + "' ")
 .Replace("@TabIndex ", "tabindex='" + this.TabIndex + "' ")
 .Replace("@AutoCompleteOff ", (this.AutoCompleteOff || this.TextMode.ToString().ToLower() == "password") ? "off" : "on")
 
@@ -145,8 +138,8 @@ namespace ExpressBase.Objects
     .Replace("@LabelBackColor ", "background-color:" + ((this.LabelBackColor != null) ? this.LabelBackColor : "@LabelBackColor ") + ";")
     .Replace("@BackColor ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor ") + ";"))
     .Replace("@ForeColor ", "color:" + ((this.ForeColor != null) ? this.ForeColor : "@ForeColor ") + ";")
-    .Replace("@HelpText ", ((this.HelpText != null) ? this.HelpText : "@HelpText"))
-    .Replace("@Label ", ((this.Label != null) ? this.Label : "@Label"))
+    .Replace("@HelpText ", ((this.HelpText != null) ? this.HelpText : "@HelpText "))
+    .Replace("@Label ", ((this.Label != null) ? this.Label : "@Label "))
 
 .Replace("@attachedLbl", (this.TextMode.ToString() != "SingleLine") ?
                                 (

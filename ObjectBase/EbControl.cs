@@ -184,9 +184,9 @@ else
         [PropertyEditor(PropertyEditorType.Label)]
         public virtual string FontFamily { get; set; }
 
-        //[EnableInBuilder(BuilderType.WebForm)]
-        //[PropertyGroup("Appearance")]
-        //[UIproperty]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyGroup("Appearance")]
+        [UIproperty]
         public virtual float FontSize { get; set; }
 
         [ProtoBuf.ProtoMember(34)]
@@ -306,7 +306,7 @@ EbObjects.@NameObj = function @NameObj(id, jsonObj) {
         console.log(this.constructor.name.slice(0, -3));
         $.each(metas, function (i, meta) {
             var name = meta.name;
-            if (meta.IsUIproperty) { NewHtml = NewHtml.replace('@' + name, me[name]); }
+            if (meta.IsUIproperty) { NewHtml = NewHtml.replace('@' + name + ' ', me[name]); }
         });
         $('#' + id + ' .Eb-ctrlContainer').html(NewHtml);
     };
@@ -334,7 +334,7 @@ EbObjects.@NameObj = function @NameObj(id, jsonObj) {
                 else
                     return string.Format(s, prop.Name, (prop.Name == "Name" || prop.Name == "EbSid") ? "id" : "''");
             }
-            else if (prop.PropertyType == typeof(int))
+            else if (prop.PropertyType == (typeof(int)) || prop.PropertyType == (typeof(float)))
                 return string.Format(s, prop.Name, ((prop.Name == "Id") ? "id" : "0"));
             else if (prop.PropertyType == typeof(bool))
                 return string.Format(s, prop.Name, "false");
