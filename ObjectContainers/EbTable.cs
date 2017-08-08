@@ -19,7 +19,17 @@ namespace ExpressBase.Objects
 
         public override string GetDesignHtml()
         {
-            return "<table style='width:100%'><tr><td id='@id_Td0' class='tdDropable' ></td> <td id='@id_Td1' class='tdDropable'></td style='min-height:20px;'> </tr></table>".RemoveCR().DoubleQuoted();
+            return @"
+<div class='Eb-ctrlContainer' Ctype='TableLayout' style='@BackColor @ForeColor>
+    <table style='width:100%'>
+        <tr>
+            <td id='@id_Td0' class='tdDropable' ></td>
+            <td id='@id_Td1' class='tdDropable'></td style='min-height:20px;'> 
+        </tr>
+    </table>
+</div>"
+.Replace("@BackColor ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor ") + ";"))
+.Replace("@ForeColor ", "color:" + ((this.ForeColor != null) ? this.ForeColor : "@ForeColor ") + ";").RemoveCR().DoubleQuoted();
         }
 
         public override string GetJsInitFunc()

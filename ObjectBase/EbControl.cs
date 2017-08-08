@@ -297,9 +297,10 @@ EbObjects.@NameObj = function @NameObj(id, jsonObj) {
     this.EbSid = id;
     @Props
     @InitFunc
-    this.Html = function () { return @html; };
+    this.Html = function () { return @html.replace(/@id/g, id); };
 
     this.RenderMe = function () {
+        var innerHtml = $('#' + id + ' .Eb-ctrlContainer').html(); console.log(innerHtml);
         var NewHtml = this.Html();
         var me = this;
         var metas = AllMetas[this.constructor.name.slice(0, -3)];
@@ -308,7 +309,12 @@ EbObjects.@NameObj = function @NameObj(id, jsonObj) {
             var name = meta.name;
             if (meta.IsUIproperty) { NewHtml = NewHtml.replace('@' + name + ' ', me[name]); }
         });
-        $('#' + id + ' .Eb-ctrlContainer').html(NewHtml);
+        if(!this.IsContainer)
+            $('#' + id + ' .Eb-ctrlContainer').html($(NewHtml).html());
+        else{
+            $('#' + id + ' .Eb-ctrlContainer').replaceWith(NewHtml);
+            //$('#' + id + ' .Eb-ctrlContainer').html(innerHtml);
+        }
     };
 
     if (jsonObj)
