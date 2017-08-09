@@ -310,12 +310,6 @@ EbObjects.@NameObj = function @NameObj(id, jsonObj) {
         });
         if(!this.IsContainer)
             $('#' + id + ' .Eb-ctrlContainer').html($(NewHtml).html());
-        else{
-            var innerHtml = $('#' + id + ' .Eb-ctrlContainer').html(); 
-            $('#' + id + ' .Eb-ctrlContainer').replaceWith(NewHtml);
-            $('#' + id + ' .Eb-ctrlContainer').html(innerHtml);
-            console.log(innerHtml);
-        }
     };
 
     if (jsonObj)

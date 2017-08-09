@@ -20,8 +20,8 @@ namespace ExpressBase.Objects
         public override string GetDesignHtml()
         {
             return @"
-<div class='Eb-ctrlContainer' Ctype='TableLayout'  style=' @BackColor  @ForeColor ' >
-    <table style='width:100%'>
+<div class='Eb-ctrlContainer' Ctype='TableLayout'>
+    <table style='width:100%'   style=' @BackColor  @ForeColor ' >
         <tr>
             <td id='@id_Td0' class='tdDropable' ></td>
             <td id='@id_Td1' class='tdDropable'></td style='min-height:20px;'> 

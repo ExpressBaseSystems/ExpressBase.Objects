@@ -130,7 +130,6 @@ namespace ExpressBase.Objects
 .Replace("@ReadOnlyString ", this.ReadOnlyString)
 .Replace("@ToolTipText ", this.ToolTipText)
 .Replace("@PlaceHolder ", "placeholder='" + this.PlaceHolder + "'")
-.Replace("@Text ", "value='" + this.Text + "' ")
 .Replace("@TabIndex ", "tabindex='" + this.TabIndex + "' ")
 .Replace("@AutoCompleteOff ", (this.AutoCompleteOff || this.TextMode.ToString().ToLower() == "password") ? "off" : "on")
 
@@ -140,6 +139,7 @@ namespace ExpressBase.Objects
     .Replace("@ForeColor ", "color:" + ((this.ForeColor != null) ? this.ForeColor : "@ForeColor ") + ";")
     .Replace("@HelpText ", ((this.HelpText != null) ? this.HelpText : "@HelpText "))
     .Replace("@Label ", ((this.Label != null) ? this.Label : "@Label "))
+    .Replace("@Text ", "value='" + ((this.Text != null) ? this.Text : "@Text ") + "' ")
 
 .Replace("@attachedLbl", (this.TextMode.ToString() != "SingleLine") ?
                                 (
