@@ -38,7 +38,7 @@ function Proc(jsonObj, rootContainerObj)
 };
 
 function ProcRecur(src_controls, dest_controls)
-{
+{   alert('src_controls:' + src_controls);
     $.each(src_controls.$values, function(i, control) {
         if (!control.IsContainer)
             dest_controls.Append(ObjectFactory(control));

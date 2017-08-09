@@ -168,7 +168,7 @@ $('#{0}').mask('SZZZZZZZZZZZ', {
         private string GetHtmlHelper(RenderMode mode)
         {
             return (@"
-<div class='Eb-ctrlContainer' style='@hiddenString'>
+<div class='Eb-ctrlContainer' Ctype='Numeric' style='@hiddenString'>
     <span id='@nameLbl' style='@lblBackColor @LblForeColor'>@label</span>
             <div  class='input-group' style='width:100%;'>
                              <span style='font-size: @fontSize' class='input-group-addon'>$</span>   

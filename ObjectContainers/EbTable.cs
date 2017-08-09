@@ -58,12 +58,14 @@ this.Init(id);";
 
         public override string GetHtml()
         {
-            string html = "<table class='form-render-table' ><tr>";
+            string html = @"
+            <div class='Eb-ctrlContainer' Ctype='TableLayout'>
+                <table class='form-render-table' ><tr>";
 
             foreach (EbControl ec in base.Controls)
                 html += ec.GetHtml();
 
-            return html + "</tr></table>";
+            return html + "</tr></table></div>";
         }
     }
 
@@ -89,7 +91,7 @@ this.Init(id);";
 
         public override string GetHtml()
         {
-            string html = "<td class='form-render-table-Td'>";
+            string html = "<td class='form-render-table-Td tdDropable'>";
 
             foreach (EbControl ec in base.Controls)
                 html += ec.GetHtml();
