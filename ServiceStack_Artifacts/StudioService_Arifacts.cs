@@ -52,8 +52,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public bool NeedRun { get; set; } // If (NeedRun == true) Save and Run else save Only
 
-        public int Id { get; set; } // (Id == 0) First Commit else Subsequent Commit
-      
+        public string RefId { get; set; } // (Id == 0) First Commit else Subsequent Commit
+    
         public int EbObjectType { get; set; }
        
         public string Name { get; set; }
