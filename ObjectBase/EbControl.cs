@@ -300,7 +300,6 @@ EbObjects.@NameObj = function @NameObj(id, jsonObj) {
     this.Html = function () { return @html.replace(/@id/g, id); };
 
     this.RenderMe = function () {
-        var innerHtml = $('#' + id + ' .Eb-ctrlContainer').html(); console.log(innerHtml);
         var NewHtml = this.Html();
         var me = this;
         var metas = AllMetas[this.constructor.name.slice(0, -3)];
@@ -312,8 +311,10 @@ EbObjects.@NameObj = function @NameObj(id, jsonObj) {
         if(!this.IsContainer)
             $('#' + id + ' .Eb-ctrlContainer').html($(NewHtml).html());
         else{
+            var innerHtml = $('#' + id + ' .Eb-ctrlContainer').html(); 
             $('#' + id + ' .Eb-ctrlContainer').replaceWith(NewHtml);
-            //$('#' + id + ' .Eb-ctrlContainer').html(innerHtml);
+            $('#' + id + ' .Eb-ctrlContainer').html(innerHtml);
+            console.log(innerHtml);
         }
     };
 

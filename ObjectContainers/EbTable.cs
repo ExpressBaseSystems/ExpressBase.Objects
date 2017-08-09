@@ -20,7 +20,7 @@ namespace ExpressBase.Objects
         public override string GetDesignHtml()
         {
             return @"
-<div class='Eb-ctrlContainer' Ctype='TableLayout' style='@BackColor @ForeColor>
+<div class='Eb-ctrlContainer' Ctype='TableLayout'  style=' @BackColor  @ForeColor ' >
     <table style='width:100%'>
         <tr>
             <td id='@id_Td0' class='tdDropable' ></td>
@@ -28,8 +28,8 @@ namespace ExpressBase.Objects
         </tr>
     </table>
 </div>"
-.Replace("@BackColor ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor ") + ";"))
-.Replace("@ForeColor ", "color:" + ((this.ForeColor != null) ? this.ForeColor : "@ForeColor ") + ";").RemoveCR().DoubleQuoted();
+    .Replace("@BackColor ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor ") + ";"))
+    .Replace("@ForeColor ", "color:" + ((this.ForeColor != null) ? this.ForeColor : "@ForeColor ") + ";").RemoveCR().DoubleQuoted();
         }
 
         public override string GetJsInitFunc()
