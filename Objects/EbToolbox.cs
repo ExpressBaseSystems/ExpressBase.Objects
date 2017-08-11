@@ -32,20 +32,24 @@ namespace ExpressBase.Objects
             string _controlsStr = "var EbObjects = {};";
 
             string xxx = @"
-function Proc(jsonObj, rootContainerObj)
-{
+
+
+function Proc(jsonObj, rootContainerObj) {
     ProcRecur(jsonObj.Controls, rootContainerObj.Controls);
+    setTimeout(function () {
+        console.log(' attached rootContainerObj.Controls :' + JSON.stringify(rootContainerObj.Controls));
+    }, 500);
 };
 
-function ProcRecur(src_controls, dest_controls)
-{   alert('src_controls:' + src_controls);
-    $.each(src_controls.$values, function(i, control) {
-        if (!control.IsContainer)
-            dest_controls.Append(ObjectFactory(control));
-        else
-            ProcRecur(control.Controls, dest_controls.Controls);
+function ProcRecur(src_controls, dest_controls) {
+    $.each(src_controls.$values, function (i, control) {
+        var newObj = ObjectFactory(control);
+        dest_controls.Append(newObj);
+        if (control.IsContainer)
+            ProcRecur(control.Controls, newObj.Controls);
     });
 };
+
 ";
 
             string _typeInfos = "function ObjectFactory(jsonObj) { ";
