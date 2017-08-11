@@ -28,7 +28,7 @@ namespace ExpressBase.Objects
 
         public virtual void BeforeRedisSet() { }
 
-        public virtual void AfterRedisGet() { }
+        public virtual void AfterRedisGet(RedisClient Redis) { }
 
         public virtual void Init4Redis(IRedisClient redisclient, IServiceClient serviceclient) { }
 
