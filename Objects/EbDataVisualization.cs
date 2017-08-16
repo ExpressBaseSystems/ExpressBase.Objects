@@ -29,6 +29,7 @@ namespace ExpressBase.Objects
             try
             {
                 this.EbDataSource = Redis.Get<EbDataSource>(this.DataSourceRefId);
+                this.EbDataSource.AfterRedisGet(Redis);
             }
             catch(Exception e)
             {
