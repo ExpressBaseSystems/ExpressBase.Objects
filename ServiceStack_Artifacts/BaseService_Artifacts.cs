@@ -1,4 +1,7 @@
-﻿using ServiceStack;
+﻿using ExpressBase.Data;
+using ExpressBase.Security;
+using ServiceStack;
+using System.Runtime.Serialization;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
@@ -16,5 +19,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         string Token { get; set; }
 
         ResponseStatus ResponseStatus { get; set; } //Exception gets serialized here
+    }
+
+    [DataContract]
+    public class MyAuthenticateResponse : AuthenticateResponse
+    {
+        [DataMember(Order = 1)]
+        public User User { get; set; }
     }
 }
