@@ -1,4 +1,7 @@
-﻿using System;
+﻿using ExpressBase.Objects.ObjectContainers;
+using Newtonsoft.Json;
+using ServiceStack.Redis;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,9 +18,24 @@ namespace ExpressBase.Objects
         [ProtoBuf.ProtoMember(2)]
         public string FilterDialogRefId { get; set; }
 
+        [JsonIgnore]
+        public EbFilterDialog FilterDialog { get; set; }
+
         public string SqlDecoded()
         {
             return Encoding.UTF8.GetString(Convert.FromBase64String(this.Sql));
+        }
+
+        public override void AfterRedisGet(RedisClient Redis)
+        {
+            try
+            {
+                this.FilterDialog = Redis.Get<EbFilterDialog>(this.FilterDialogRefId);
+            }
+            catch (Exception e)
+            {
+
+            }
         }
     }
 

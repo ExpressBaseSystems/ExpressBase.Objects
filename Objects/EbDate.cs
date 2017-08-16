@@ -149,12 +149,12 @@ $('#@id').datetimepicker({
         {
             string EbCtrlHTML = @"
     <div id='@nameContainer' Ctype='Date' class='Eb-ctrlContainer' style='@hiddenString'>
-        <span id='@nameLbl' style='@lblBackColor @LblForeColor'>@label</span>
+        <span id='@nameLbl' style='@LabelBackColor  @LabelForeColor '> @Label </span>
         <div  class='input-group' style='width:100%;'>
-            <input id='@name' data-ebtype='@datetype'  data-toggle='tooltip' title='@toolTipText' class='date' type='text'  name='@name' autocomplete = '@autoComplete' @value @tabIndex style='width:100%; height:@heightpx; @backColor @foreColor display:inline-block; @fontStyle @readOnlyString @required @placeHolder />
+            <input id='@name' data-ebtype='@datetype'  data-toggle='tooltip' title='@toolTipText' class='date' type='text'  name='@name' autocomplete = '@autoComplete' @value @tabIndex style='width:100%; height:@heightpx; @BackColor @ForeColor display:inline-block; @fontStyle @readOnlyString @required @placeHolder />
             <span class='input-group-addon'> <i id='@nameTglBtn' class='fa  @atchdLbl' aria-hidden='true'></i> </span>
         </div>
-        <span class='helpText'> @helpText </span>
+        <span class='helpText'> @HelpText </span>
     </div>
 "
 .Replace("@name", this.Name)
@@ -164,19 +164,21 @@ $('#@id').datetimepicker({
 .Replace("@height", this.Height.ToString())
 .Replace("@datetype", "6")//( (int)this.EbDateType ).ToString())
 .Replace("@value", "")//"value='" + this.Value + "'")
-.Replace("@label", this.Label)
 .Replace("@hiddenString", this.HiddenString)
 .Replace("@required", " required")//(this.Required && !this.Hidden ? " required" : string.Empty))
 .Replace("@readOnlyString", this.ReadOnlyString)
 .Replace("@toolTipText", this.ToolTipText)
-.Replace("@helpText", this.HelpText)
 .Replace("@placeHolder", "placeholder='" + this.PlaceHolder + "'")
 .Replace("@tabIndex", "tabindex='" + this.TabIndex + "'")
 .Replace("@autoComplete", this.AutoCompleteOff ? "off" : "on")
-.Replace("@backColor", "background-color:" + this.BackColor + ";")
-.Replace("@foreColor", "color:" + this.ForeColor + ";")
-.Replace("@lblBackColor", "background-color:" + this.LabelBackColor + ";")
-.Replace("@LblForeColor", "color:" + this.LabelForeColor + ";")
+
+    .Replace("@LabelForeColor ", "color:" + ((this.LabelForeColor != null) ? this.LabelForeColor : "@LabelForeColor ") + ";")
+    .Replace("@LabelBackColor ", "background-color:" + ((this.LabelBackColor != null) ? this.LabelBackColor : "@LabelBackColor ") + ";")
+    .Replace("@BackColor ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor ") + ";"))
+    .Replace("@ForeColor ", "color:" + ((this.ForeColor != null) ? this.ForeColor : "@ForeColor ") + ";")
+    .Replace("@HelpText ", ((this.HelpText != null) ? this.HelpText : "@HelpText "))
+    .Replace("@Label ", ((this.Label != null) ? this.Label : "@Label "))
+
 //.Replace("@fontStyle", (this.FontSerialized != null) ?
 //                            (" font-family:" + this.FontSerialized.FontFamily + ";" + "font-style:" + this.FontSerialized.Style
 //                            + ";" + "font-size:" + this.FontSerialized.SizeInPoints + "px;")

@@ -135,17 +135,19 @@ var @nameEbCombo = new EbSelect('@name', '@DSid', @DDHeight, '@vmName', '', @Max
         private string GetHtmlHelper(RenderMode mode)
         {
             return @"
-   <div id='@nameContainer'  role='form' data-toggle='validator' style='position:absolute; width:@widthpx; left:@leftpx;  top:@toppx;'>
-        <input type='hidden' name='@nameHidden4val' data-ebtype='16' id='@name'/>
-        <div style='display:inline-block;' id='@nameLbl'>@label</div>
-        @VueSelectCode
-    <div id='@name_loadingdiv' class='ebCombo-loader'>
-        <i id='@name_loading-image' class='fa fa-spinner fa-pulse fa-2x fa-fw'></i><span class='sr-only'>Loading...</span>
-    </div>
-    <center><div id='@nameDDdiv' v-show='DDstate' class='DDdiv expand-transition'  style='width:@DDwidthpx;'> 
-        <table id='@nametbl' tabindex='1000' style='width:100%' class='table table-striped table-bordered'></table>
-    </div></center>
-</div>"
+    <div id='@nameContainer' Ctype='ComboBox' class='Eb-ctrlContainer' style='@hiddenString'>
+       <div id='@nameContainer'  role='form' data-toggle='validator' style='width:100%;'>
+            <input type='hidden' name='@nameHidden4val' data-ebtype='16' id='@name'/>
+            <div style='display:inline-block;' id='@nameLbl'>@label</div>
+            @VueSelectCode
+            <div id='@name_loadingdiv' class='ebCombo-loader'>
+                <i id='@name_loading-image' class='fa fa-spinner fa-pulse fa-2x fa-fw'></i><span class='sr-only'>Loading...</span>
+            </div>
+            <center><div id='@nameDDdiv' v-show='DDstate' class='DDdiv expand-transition'  style='width:@DDwidthpx;'> 
+                <table id='@nametbl' tabindex='1000' style='width:100%' class='table table-striped table-bordered'></table>
+            </div></center>
+        </div>
+    </div>"
 .Replace("@VueSelectCode", this.VueSelectcode)
 .Replace("@name", this.Name)
 .Replace("@left", this.Left.ToString())

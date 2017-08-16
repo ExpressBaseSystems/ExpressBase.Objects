@@ -20,16 +20,16 @@ namespace ExpressBase.Objects
         public override string GetDesignHtml()
         {
             return @"
-<div class='Eb-ctrlContainer' Ctype='TableLayout' style='@BackColor @ForeColor>
-    <table style='width:100%'>
+<div class='Eb-ctrlContainer' Ctype='TableLayout'>
+    <table style='width:100%'   style=' @BackColor  @ForeColor ' >
         <tr>
             <td id='@id_Td0' class='tdDropable' ></td>
             <td id='@id_Td1' class='tdDropable'></td style='min-height:20px;'> 
         </tr>
     </table>
 </div>"
-.Replace("@BackColor ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor ") + ";"))
-.Replace("@ForeColor ", "color:" + ((this.ForeColor != null) ? this.ForeColor : "@ForeColor ") + ";").RemoveCR().DoubleQuoted();
+    .Replace("@BackColor ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor ") + ";"))
+    .Replace("@ForeColor ", "color:" + ((this.ForeColor != null) ? this.ForeColor : "@ForeColor ") + ";").RemoveCR().DoubleQuoted();
         }
 
         public override string GetJsInitFunc()
@@ -58,12 +58,14 @@ this.Init(id);";
 
         public override string GetHtml()
         {
-            string html = "<table class='form-render-table' ><tr>";
+            string html = @"
+            <div class='Eb-ctrlContainer' Ctype='TableLayout'>
+                <table class='form-render-table' ><tr>";
 
             foreach (EbControl ec in base.Controls)
                 html += ec.GetHtml();
 
-            return html + "</tr></table>";
+            return html + "</tr></table></div>";
         }
     }
 
@@ -89,7 +91,7 @@ this.Init(id);";
 
         public override string GetHtml()
         {
-            string html = "<td class='form-render-table-Td'>";
+            string html = "<td class='form-render-table-Td tdDropable'>";
 
             foreach (EbControl ec in base.Controls)
                 html += ec.GetHtml();

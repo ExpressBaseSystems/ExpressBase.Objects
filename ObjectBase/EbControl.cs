@@ -298,27 +298,27 @@ EbObjects.@NameObj = function @NameObj(id, jsonObj) {
     @Props
     @InitFunc
     this.Html = function () { return @html.replace(/@id/g, id); };
-
+    var MyName = this.constructor.name.slice(0, -3);
     this.RenderMe = function () {
-        var innerHtml = $('#' + id + ' .Eb-ctrlContainer').html(); console.log(innerHtml);
         var NewHtml = this.Html();
         var me = this;
-        var metas = AllMetas[this.constructor.name.slice(0, -3)];
-        console.log(this.constructor.name.slice(0, -3));
+        var metas = AllMetas[MyName];
         $.each(metas, function (i, meta) {
             var name = meta.name;
             if (meta.IsUIproperty) { NewHtml = NewHtml.replace('@' + name + ' ', me[name]); }
         });
         if(!this.IsContainer)
             $('#' + id + ' .Eb-ctrlContainer').html($(NewHtml).html());
-        else{
-            $('#' + id + ' .Eb-ctrlContainer').replaceWith(NewHtml);
-            //$('#' + id + ' .Eb-ctrlContainer').html(innerHtml);
-        }
     };
 
-    if (jsonObj)
+    if (jsonObj){
+            jsonObj.Controls  = new EbControlCollection( jsonObj.Controls || {} );
+            jsonObj.RenderMe  = this.RenderMe;
+            jsonObj.Html  = this.Html;
+            jsonObj.Init   = this.Html;
         $.extend(this, jsonObj);
+        jsonObj.Init(id);
+    }
 };"
 .Replace("@Name", this.GetType().Name)
 .Replace("@Type", this.GetType().FullName)

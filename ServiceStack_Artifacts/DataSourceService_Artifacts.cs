@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
     [Route("/ds")]
-    [Route("/ds/data/{Id}")]
+    [Route("/ds/data/{RefId}")]
     [DataContract]
     public class DataSourceDataRequest : IReturn<DataSourceDataResponse>, IEbSSRequest
     {
@@ -52,7 +52,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [Route("/ds")]
-    [Route("/ds/columns/{Id}")]
+    [Route("/ds/columns/{RefId}")]
     [DataContract]
     public class DataSourceColumnsRequest : IReturn<DataSourceColumnsResponse>, IEbSSRequest
     {
