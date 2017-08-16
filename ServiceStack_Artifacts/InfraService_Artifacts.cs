@@ -1,4 +1,5 @@
-﻿using ServiceStack;
+﻿using ExpressBase.Data;
+using ServiceStack;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -34,7 +35,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class InfraRequest : IReturn<InfraResponse>,IEbSSRequest
+    public class InfraRequest : IReturn<InfraResponse>, IEbSSRequest
     {
         [DataMember(Order = 0)]
         public Dictionary<string, object> Colvalues { get; set; }
@@ -79,8 +80,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string TenantAccountId { get; set; }
 
         public int UserId { get; set; }
-
-
     }
 
     [DataContract]
@@ -102,7 +101,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     [DataContract]
     [Route("/infra")]
-    public class TokenRequiredUploadRequest : IReturn<TokenRequiredUploadResponse>,IEbSSRequest
+    public class TokenRequiredUploadRequest : IReturn<TokenRequiredUploadResponse>, IEbSSRequest
     {
         [DataMember(Order = 0)]
         public Dictionary<string, object> Colvalues { get; set; }
@@ -114,14 +113,14 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int Id { get; set; }
 
         [DataMember(Order = 3)]
-        public string Token { get; set; }
+        public string TenantAccountId { get; set; }
 
         [DataMember(Order = 4)]
         public int TId { get; set; }
 
-        public string TenantAccountId { get; set; }
-
         public int UserId { get; set; }
+
+        public string Token { get; set; }
     }
 
     [DataContract]
