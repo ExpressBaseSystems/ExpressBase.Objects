@@ -39,8 +39,7 @@ this.Init = function(id)
 {
     this.Controls.Append(new EbObjects.EbTableTdObj(id + '_Td0'));
     this.Controls.Append(new EbObjects.EbTableTdObj(id + '_Td1'));
-};
-this.Init(id);";
+};";
         }
 
         public override string GetHead()

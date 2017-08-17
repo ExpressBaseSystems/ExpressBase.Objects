@@ -312,12 +312,17 @@ EbObjects.@NameObj = function @NameObj(id, jsonObj) {
     };
 
     if (jsonObj){
-            jsonObj.Controls  = new EbControlCollection( jsonObj.Controls || {} );
-            jsonObj.RenderMe  = this.RenderMe;
-            jsonObj.Html  = this.Html;
-            jsonObj.Init   = this.Html;
+        jsonObj.Controls  = new EbControlCollection( jsonObj.Controls || {} );
+        jsonObj.RenderMe  = this.RenderMe;
+        jsonObj.Html  = this.Html;
+        jsonObj.Init   = this.Init;
         $.extend(this, jsonObj);
-        jsonObj.Init(id);
+        if(this.Init)
+            jsonObj.Init(id);
+    }
+    else{
+        if(this.Init)
+            this.Init(id);
     }
 };"
 .Replace("@Name", this.GetType().Name)
