@@ -13,6 +13,7 @@ namespace ExpressBase.Objects
     public class EbTableLayout : EbControlContainer
     {
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        [PropertyEditor(PropertyEditorType.Columns)]
         public string Columns { get; set; }
 
         public EbTableLayout() { }
@@ -24,7 +25,7 @@ namespace ExpressBase.Objects
     <table style='width:100%'   style=' @BackColor  @ForeColor ' >
         <tr>
             <td id='@id_Td0' class='tdDropable' ></td>
-            <td id='@id_Td1' class='tdDropable'></td style='min-height:20px;'> 
+            <td id='@id_Td1' class='tdDropable'></td style='min-height:20px;'>
         </tr>
     </table>
 </div>"
