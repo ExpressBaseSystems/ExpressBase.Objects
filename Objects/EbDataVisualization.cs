@@ -19,7 +19,7 @@ namespace ExpressBase.Objects
 
         public string Description { get; set; }
 
-        public List<DTColumnDef> DTColumnDef { get; set; }
+        public List<DTColumnDef> columns { get; set; }
 
         public string RenderAs { get; set; }
 
@@ -60,10 +60,13 @@ namespace ExpressBase.Objects
 
         public string title;
 
-        public DTColumnDef(int data, string title)
+        public string type;
+
+        public DTColumnDef(int data, string title, string type)
         {
             this.data = data;
             this.title = title;
+            this.type = type;
         }
     }
 }
