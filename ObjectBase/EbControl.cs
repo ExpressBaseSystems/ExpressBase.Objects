@@ -99,13 +99,13 @@ namespace ExpressBase.Objects
         }
 
         public static string AttachedLblAddingJS = @"
-$('<div id=\'{0}AttaLbl\' class=\'attachedlabel atchdLblL\'>$</div>').insertBefore($('#{0}').parent()); $('#{0}').addClass('numinputL') 
+$('<div id=\'{0}AttaLbl\' class=\'attachedlabel atchdLblL\'>$</div>').insertBefore($('#{0}').parent()); $('#{0}').addClass('numinputL')
 $('#{0}AttaLbl').css({'padding':   ( $('#{0}').parent().height()/5 + 1) + 'px' });
 $('#{0}AttaLbl').css({'font-size': ($('#{0}').css('font-size')) });
 if( $('#{0}').css('font-size').replace('px','') < 10 )
-    $('#{0}AttaLbl').css({'height':   ( $('#{0}').parent().height() - ( 10.5 - $('#{0}').css('font-size').replace('px','')) ) + 'px' });  
+    $('#{0}AttaLbl').css({'height':   ( $('#{0}').parent().height() - ( 10.5 - $('#{0}').css('font-size').replace('px','')) ) + 'px' }); 
 else
-    $('#{0}AttaLbl').css({'height':   ( $('#{0}').parent().height()) + 'px' });  
+    $('#{0}AttaLbl').css({'height':   ( $('#{0}').parent().height()) + 'px' }); 
 ";
 
 
@@ -192,7 +192,8 @@ else
         [ProtoBuf.ProtoMember(34)]
         public EbValidatorCollection Validators { get; set; }
 
-        public EbControl() {
+        public EbControl()
+        {
             this.Validators = new EbValidatorCollection();
         }
 
@@ -239,14 +240,14 @@ else
                 {
                     _props += JsVarDecl(prop);
 
-                    var meta = new Meta { name = prop.Name};
+                    var meta = new Meta { name = prop.Name };
 
                     foreach (Attribute attr in propattrs)
                     {
                         if (attr is PropertyGroup)
                             meta.group = (attr as PropertyGroup).Name;
                         else if (attr is HelpText)
-                            meta.helpText =(attr as HelpText).value;
+                            meta.helpText = (attr as HelpText).value;
 
                         //set corresponding editor
                         else if (attr is PropertyEditor)
@@ -265,8 +266,14 @@ else
                     }
 
                     //if prop is of premitive type set corresponding editor
-                    if (!prop.IsDefined(typeof(PropertyEditor)) && !prop.PropertyType.GetTypeInfo().IsEnum)
+                    if (!prop.IsDefined(typeof(PropertyEditor)) && !prop.PropertyType.GetTypeInfo().IsEnum && prop.PropertyType != typeof(List<EbControl>))
                         meta.editor = GetTypeOf(prop);
+
+                    ////if prop is of List type set collection editor
+                    //if (prop.PropertyType == typeof(List<EbControl>))
+                    //{
+                    //    meta.editor = PropertyEditorType.Columns;
+                    //}
 
                     //if no helpText attribut is set, set as empty string
                     if (!prop.IsDefined(typeof(HelpText)))
@@ -312,12 +319,17 @@ EbObjects.@NameObj = function @NameObj(id, jsonObj) {
     };
 
     if (jsonObj){
-            jsonObj.Controls  = new EbControlCollection( jsonObj.Controls || {} );
-            jsonObj.RenderMe  = this.RenderMe;
-            jsonObj.Html  = this.Html;
-            jsonObj.Init   = this.Html;
+        jsonObj.Controls  = new EbControlCollection( {} );
+        jsonObj.RenderMe  = this.RenderMe;
+        jsonObj.Html  = this.Html;
+        jsonObj.Init   = this.Init;
         $.extend(this, jsonObj);
-        jsonObj.Init(id);
+        //if(this.Init)
+        //    jsonObj.Init(id);
+    }
+    else{
+        if(this.Init)
+            this.Init(id);
     }
 };"
 .Replace("@Name", this.GetType().Name)
@@ -355,6 +367,7 @@ EbObjects.@NameObj = function @NameObj(id, jsonObj) {
             }
         }
 
+        //to get EditorType for premitive dataTypes
         private PropertyEditorType GetTypeOf(PropertyInfo prop)
         {
             var typeName = prop.PropertyType.Name;
