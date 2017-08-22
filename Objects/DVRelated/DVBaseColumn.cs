@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.Data;
 
 namespace ExpressBase.Objects.Objects.DVRelated
@@ -31,18 +32,23 @@ namespace ExpressBase.Objects.Objects.DVRelated
 
     public class DVBaseColumn
     {
+        [JsonProperty(PropertyName = "data")]
         public int Data { get; set; }
 
+        [JsonProperty(PropertyName = "name")]
         public string Name { get; set; }
 
         public DbType Type { get; set; }
 
+        [JsonProperty(PropertyName = "title")]
         public string Title { get; set; }
 
+        [JsonProperty(PropertyName = "visible")]
         public bool Visible { get; set; }
 
         public int Pos { get; set; }
 
+        [JsonProperty(PropertyName = "width")]
         public int Width { get; set; }
     }
 
