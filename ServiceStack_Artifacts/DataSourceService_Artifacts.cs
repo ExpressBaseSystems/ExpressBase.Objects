@@ -117,9 +117,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 1)]
         public ColumnColletion Columns { get; set; }
 
-        [DataMember(Order = 2)]
-        public string Token { get; set; }
-
         [DataMember(Order = 3)]
         public bool IsPaged { get; set; }
 

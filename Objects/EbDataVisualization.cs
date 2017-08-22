@@ -1,4 +1,5 @@
 ﻿using ExpressBase.Data;
+using ExpressBase.Objects.Objects.DVRelated;
 using Newtonsoft.Json;
 using ServiceStack.Redis;
 using System;
@@ -15,13 +16,13 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         public EbDataSource EbDataSource { get; set; }
 
-        public string Name { get; set; }
-
         public string Description { get; set; }
 
-        public List<DTColumnDef> columns { get; set; }
+        public DVColumnCollection Columns { get; set; }
 
-        public List<DTColumnExtPpty> columnsext { get; set; }
+        //public List<DTColumnDef> columns { get; set; }
+
+        //public List<DTColumnExtPpty> columnsext { get; set; }
 
         public string RenderAs { get; set; }
 
@@ -56,59 +57,59 @@ namespace ExpressBase.Objects
         }
     }
 
-    public class DTColumnDef
-    {
-        public int data;
+    //public class DTColumnDef
+    //{
+    //    public int data;
 
-        public string title;
+    //    public string title;
 
-        public string type;
+    //    public string type;
 
-        public bool visible;
+    //    public bool visible;
 
-        public string name;
+    //    public string name;
 
-        public string width;
+    //    public string width;
 
-        public int pos;
+    //    public int pos;
 
-        public DTColumnDef(int data, string title, string type,bool vis, string name, string width, int pos)
-        {
-            this.data = data;
-            this.title = title;
-            this.type = type;
-            this.visible = vis;
-            this.name = name;
-            this.width = width;
-            this.pos = pos;
-        }
-    }
+    //    public DTColumnDef(int data, string title, string type,bool vis, string name, string width, int pos)
+    //    {
+    //        this.data = data;
+    //        this.title = title;
+    //        this.type = type;
+    //        this.visible = vis;
+    //        this.name = name;
+    //        this.width = width;
+    //        this.pos = pos;
+    //    }
+    //}
 
-    public class DTColumnExtPpty
-    {
-        public string name;
+    //public class DTColumnExtPpty
+    //{
+    //    public string name;
 
-        public bool AggInfo;
+    //    public bool AggInfo;
 
-        public int DecimalPlace;
+    //    public int DecimalPlace;
 
-        public string RenderAs;
+    //    public string RenderAs;
 
-        public int pos;
+    //    public int pos;
 
-        public DTColumnExtPpty(string name, bool agginfo, int deci, string renderas, int pos)
-        {
-            this.name = name;
-            this.AggInfo = agginfo;
-            this.DecimalPlace = deci;
-            this.RenderAs = renderas;
-            this.pos = pos;
-        }
+    //    public DTColumnExtPpty(string name, bool agginfo, int deci, string renderas, int pos)
+    //    {
+    //        this.name = name;
+    //        this.AggInfo = agginfo;
+    //        this.DecimalPlace = deci;
+    //        this.RenderAs = renderas;
+    //        this.pos = pos;
+    //    }
 
-        public DTColumnExtPpty(int pos)
-        {
-            this.pos = pos;
-        }
+    //    public DTColumnExtPpty(int pos)
+    //    {
+    //        this.pos = pos;
+    //    }
 
-    }
+    //}
 }
