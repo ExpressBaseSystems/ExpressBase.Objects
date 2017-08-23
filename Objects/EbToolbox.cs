@@ -20,7 +20,7 @@ namespace ExpressBase.Objects
 
         public string TypeRegister { get; set; }
 
-        public string XXXX { get; set; }
+        public string JsonToJsObjectFuncs { get; set; }
 
         EbToolbox() { }
 
@@ -34,7 +34,7 @@ namespace ExpressBase.Objects
             this.AllControlls = _jsResult.JsObjects;
             this.html = _jsResult.ToolBoxHtml;
             this.TypeRegister = _jsResult.TypeRegister;
-            this.XXXX = _jsResult.XXX;
+            this.JsonToJsObjectFuncs = _jsResult.JsonToJsObjectFuncs;
         }
 
         public string getHead()
