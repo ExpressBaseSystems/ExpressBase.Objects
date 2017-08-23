@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using ExpressBase.Common.Objects;
+using ExpressBase.Common.Objects.Attributes;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Data;
 
@@ -30,24 +32,30 @@ namespace ExpressBase.Objects.Objects.DVRelated
         Link
     }
 
-    public class DVBaseColumn
+    [EnableInBuilder(BuilderType.DVBuilder)]
+    public class DVBaseColumn : EbObject
     {
         [JsonProperty(PropertyName = "data")]
         public int Data { get; set; }
 
+        [EnableInBuilder(BuilderType.DVBuilder)]
         [JsonProperty(PropertyName = "name")]
-        public string Name { get; set; }
+        new public string Name { get; set; }
 
+        [EnableInBuilder(BuilderType.DVBuilder)]
         public DbType Type { get; set; }
 
+        [EnableInBuilder(BuilderType.DVBuilder)]
         [JsonProperty(PropertyName = "title")]
         public string Title { get; set; }
 
+        [EnableInBuilder(BuilderType.DVBuilder)]
         [JsonProperty(PropertyName = "visible")]
         public bool Visible { get; set; }
 
         public int Pos { get; set; }
 
+        [EnableInBuilder(BuilderType.DVBuilder)]
         [JsonProperty(PropertyName = "width")]
         public int Width { get; set; }
     }
@@ -57,6 +65,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
 
     }
 
+    [EnableInBuilder(BuilderType.DVBuilder)]
     public class DVStringColumn : DVBaseColumn
     {
         public StringRenderType RenderAs { get; set; }
@@ -64,6 +73,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
         public string LinkRefId { get; set; }
     }
 
+    [EnableInBuilder(BuilderType.DVBuilder)]
     public class DVNumericColumn : DVBaseColumn
     {
         public bool Aggregate { get; set; }
@@ -75,6 +85,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
         public string LinkRefId { get; set; }
     }
 
+    [EnableInBuilder(BuilderType.DVBuilder)]
     public class DVBooleanColumn : DVBaseColumn
     {
         public bool IsEditable { get; set; }
@@ -82,6 +93,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
         public BooleanRenderType RenderAs { get; set; }
     }
 
+    [EnableInBuilder(BuilderType.DVBuilder)]
     public class DVDateTimeColumn : DVBaseColumn
     {
         public string Format { get; set; }
