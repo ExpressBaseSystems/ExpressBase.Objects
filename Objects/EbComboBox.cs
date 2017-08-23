@@ -1,5 +1,6 @@
-﻿using ExpressBase.Data;
-using ExpressBase.Objects.Attributes;
+﻿using ExpressBase.Common.Objects;
+using ExpressBase.Common.Objects.Attributes;
+using ExpressBase.Data;
 using ExpressBase.Objects.ServiceStack_Artifacts;
 using System;
 using System.Collections.Generic;
@@ -93,11 +94,6 @@ namespace ExpressBase.Objects
         }
 
         public EbComboBox() { }
-
-        public EbComboBox(object parent)
-        {
-            this.Parent = parent;
-        }
 
         public override string GetHead()
         {

@@ -1,7 +1,6 @@
-﻿#if !NET462
+﻿using ExpressBase.Common.Objects;
+using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Data;
-using ExpressBase.Objects.Attributes;
-#endif
 using ServiceStack.Redis;
 using System;
 using System.Collections.Generic;

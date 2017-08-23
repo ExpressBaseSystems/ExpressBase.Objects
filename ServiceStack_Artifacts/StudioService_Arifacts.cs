@@ -1,4 +1,5 @@
-﻿using ServiceStack;
+﻿using ExpressBase.Common.Objects;
+using ServiceStack;
 using ServiceStack.Text;
 using System;
 using System.Collections.Generic;

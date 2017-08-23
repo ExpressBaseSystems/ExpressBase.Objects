@@ -5,8 +5,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Reflection;
 using Newtonsoft.Json;
-using ExpressBase.Objects.Attributes;
+using ExpressBase.Common.Objects.Attributes;
 using ServiceStack.Pcl;
+using ExpressBase.Common.Objects;
 
 namespace ExpressBase.Objects
 {
@@ -72,11 +73,6 @@ namespace ExpressBase.Objects
         //public override string Label { get; set; }
 
         public EbTextBox() { }
-
-        public EbTextBox(object parent)
-        {
-            this.Parent = parent;
-        }
 
         public override string GetHead()
         {

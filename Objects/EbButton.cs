@@ -1,4 +1,5 @@
-﻿using ExpressBase.Objects.Attributes;
+﻿using ExpressBase.Common.Objects;
+using ExpressBase.Common.Objects.Attributes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -12,11 +13,6 @@ namespace ExpressBase.Objects
     public class EbButton : EbControl
     {
         public EbButton() { }
-
-        public EbButton(object parent)
-        {
-            this.Parent = parent;
-        }
 
         [ProtoBuf.ProtoMember(1)]
         [System.ComponentModel.Category("Appearance")]
