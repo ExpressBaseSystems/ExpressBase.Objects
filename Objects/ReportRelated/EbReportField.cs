@@ -4,24 +4,23 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ExpressBase.Objects
+namespace ExpressBase.Objects.ReportRelated
 {
-    [ProtoBuf.ProtoContract]
-    [ProtoBuf.ProtoInclude(1, typeof(EbReportFieldText))]
-    [ProtoBuf.ProtoInclude(1, typeof(EbReportFieldNumeric))]
-    public class EbReportField : EbControl
+    public class EbReportField
     {
-        #region Hidden Inherited Public Properties
+        public string Name { get; set; }
+    }
 
-        [Browsable(false)]
-        public override int TabIndex { get; set; }
+    public class EbReportFieldNumeric : EbReportField
+    {
+        public int MaxLength { get; set; }
 
-        #endregion
+        public int DecimalPlaces { get; set; }
+    }
 
-        [ProtoBuf.ProtoMember(1)]
-        public override string Name { get; set; }
-
-        public EbReportField() { }
+    public class EbReportFieldText : EbReportField
+    {
+        public TextTransform TextTransform { get; set; }
     }
 }
 

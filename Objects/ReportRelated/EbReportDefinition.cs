@@ -4,9 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ExpressBase.Objects
+namespace ExpressBase.Objects.ReportRelated
 {
-    [ProtoBuf.ProtoContract]
     public enum EbReportSectionType
     {
         ReportHeader,
@@ -16,39 +15,29 @@ namespace ExpressBase.Objects
         ReportFooter,
     }
 
-    [ProtoBuf.ProtoContract]
-    public class EbReportDefinition
+    public class EbReport
     {
-        [ProtoBuf.ProtoMember(1)]
         public EbReportPaperSize PaperSize { get; set; }
 
-        [ProtoBuf.ProtoMember(2)]
         public EbReportMargins Margins { get; set; }
 
-        [ProtoBuf.ProtoMember(3)]
         public bool IsLandscape { get; set; }
 
-        [ProtoBuf.ProtoMember(4)]
         public EbReportSectionCollection ReportHeaders { get; set; }
 
-        [ProtoBuf.ProtoMember(5)]
         public EbReportSectionCollection ReportFooters { get; set; }
 
-        [ProtoBuf.ProtoMember(6)]
         public EbReportSectionCollection PageHeaders { get; set; }
 
-        [ProtoBuf.ProtoMember(7)]
         public EbReportSectionCollection PageFooters { get; set; }
 
-        [ProtoBuf.ProtoMember(8)]
         public EbReportSectionCollection Details { get; set; }
 
-        [ProtoBuf.ProtoMember(9)]
         public int EbDataSourceId { get; set; }
 
         public ColumnColletion ColumnColletion { get; set; }
 
-        public EbReportDefinition()
+        public EbReport()
         {
             this.ReportHeaders = new EbReportSectionCollection(EbReportSectionType.ReportHeader);
             this.ReportHeaders.AddSection();
@@ -67,32 +56,15 @@ namespace ExpressBase.Objects
         }
     }
 
-    [ProtoBuf.ProtoContract]
     public class EbReportPaperSize
     {
-        [ProtoBuf.ProtoMember(1)]
         public string Name { get; set; }
 
-        [ProtoBuf.ProtoMember(2)]
         public float Width { get; set; }
 
-        [ProtoBuf.ProtoMember(3)]
         public float Height { get; set; }
-
-        public EbReportPaperSize(string name, float w, float h)
-        {
-            this.Name = name;
-            this.Width = w;
-            this.Height = h;
-        }
-
-        public override string ToString()
-        {
-            return this.Name;
-        }
     }
 
-    [ProtoBuf.ProtoContract]
     public class EbReportMargins
     {
         [ProtoBuf.ProtoMember(1)]
@@ -116,7 +88,6 @@ namespace ExpressBase.Objects
         }
     }
 
-    [ProtoBuf.ProtoContract]
     public class EbReportSection : EbControlContainer, IComparable
     {
         public override string Name { get { return this.Prefix + this.Pos.ToString(); } }
@@ -125,12 +96,7 @@ namespace ExpressBase.Objects
 
         internal string Prefix { get; set; }
 
-        [ProtoBuf.ProtoMember(1)]
         public EbReportSectionType Type { get; set; }
-
-#if NET462
-        public System.Windows.Forms.Panel Panel { get; set; }
-#endif
 
         public EbReportSection(EbReportSectionType type)
         {
@@ -154,10 +120,8 @@ namespace ExpressBase.Objects
         }
     }
 
-    [ProtoBuf.ProtoContract]
     public class EbReportSectionCollection : List<EbReportSection>
     {
-        [ProtoBuf.ProtoMember(1)]
         public EbReportSectionType Type { get; set; }
 
         public EbReportSectionCollection(EbReportSectionType type)
