@@ -1,4 +1,5 @@
-﻿using ExpressBase.Objects.Attributes;
+﻿using ExpressBase.Common.Objects;
+using ExpressBase.Common.Objects.Attributes;
 using ProtoBuf;
 using System;
 using System.Collections.Generic;
@@ -33,11 +34,6 @@ namespace ExpressBase.Objects
                 if (this.Options.Count == 3 && this.ValueType == EbRadioValueType.Boolean)
                     this.ValueType = EbRadioValueType.Integer;
             }
-        }
-
-        public EbRadioGroup(object parent)
-        {
-            this.Parent = parent;
         }
 
         [ProtoBuf.ProtoMember(1)]
