@@ -34,7 +34,7 @@ namespace ExpressBase.Objects.ReportRelated
 
         public EbReportSectionCollection Details { get; set; }
 
-        public int EbDataSourceId { get; set; }
+        public string EbDataSourceRefId { get; set; }
 
         public ColumnColletion ColumnColletion { get; set; }
 
@@ -68,16 +68,12 @@ namespace ExpressBase.Objects.ReportRelated
 
     public class EbReportMargins
     {
-        [ProtoBuf.ProtoMember(1)]
         public float Left { get; set; }
 
-        [ProtoBuf.ProtoMember(2)]
         public float Right { get; set; }
 
-        [ProtoBuf.ProtoMember(3)]
         public float Top { get; set; }
 
-        [ProtoBuf.ProtoMember(4)]
         public float Bottom { get; set; }
 
         public EbReportMargins(float l, float r, float t, float b)
@@ -89,15 +85,19 @@ namespace ExpressBase.Objects.ReportRelated
         }
     }
 
-    public class EbReportSection : EbControlContainer, IComparable
+    public class EbReportSection : IComparable
     {
-        public override string Name { get { return this.Prefix + this.Pos.ToString(); } }
+        public string Name { get { return this.Prefix + this.Pos.ToString(); } }
+
+        public List<EbReportField> Fields { get; set; }
 
         internal int Pos { get; set; }
 
         internal string Prefix { get; set; }
 
         public EbReportSectionType Type { get; set; }
+
+        public int Height { get; set; }
 
         public EbReportSection(EbReportSectionType type)
         {
