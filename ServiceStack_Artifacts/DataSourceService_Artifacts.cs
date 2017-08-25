@@ -116,7 +116,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class DataSourceColumnsResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
-        public ColumnColletion Columns { get; set; }
+        public List<ColumnColletion> Columns { get; set; }
 
         [DataMember(Order = 3)]
         public bool IsPaged { get; set; }
