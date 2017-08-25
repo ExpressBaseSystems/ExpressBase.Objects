@@ -68,38 +68,50 @@ namespace ExpressBase.Objects.Objects.DVRelated
     [EnableInBuilder(BuilderType.DVBuilder)]
     public class DVStringColumn : DVBaseColumn
     {
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyGroup("xxxx")]
         public StringRenderType RenderAs { get; set; }
 
+        [EnableInBuilder(BuilderType.DVBuilder)]
         public string LinkRefId { get; set; }
     }
 
     [EnableInBuilder(BuilderType.DVBuilder)]
     public class DVNumericColumn : DVBaseColumn
     {
+        [EnableInBuilder(BuilderType.DVBuilder)]
         public bool Aggregate { get; set; }
 
+        [EnableInBuilder(BuilderType.DVBuilder)]
         public int DecimalPlaces { get; set; }
 
+        [EnableInBuilder(BuilderType.DVBuilder)]
         public NumericRenderType RenderAs { get; set; }
 
+        [EnableInBuilder(BuilderType.DVBuilder)]
         public string LinkRefId { get; set; }
     }
 
     [EnableInBuilder(BuilderType.DVBuilder)]
     public class DVBooleanColumn : DVBaseColumn
     {
+        [EnableInBuilder(BuilderType.DVBuilder)]
         public bool IsEditable { get; set; }
 
+        [EnableInBuilder(BuilderType.DVBuilder)]
         public BooleanRenderType RenderAs { get; set; }
     }
 
     [EnableInBuilder(BuilderType.DVBuilder)]
     public class DVDateTimeColumn : DVBaseColumn
     {
+        [EnableInBuilder(BuilderType.DVBuilder)]
         public string Format { get; set; }
 
+        [EnableInBuilder(BuilderType.DVBuilder)]
         public DateTimeRenderType RenderAs { get; set; }
 
+        [EnableInBuilder(BuilderType.DVBuilder)]
         public string LinkRefId { get; set; }
     }
 }
