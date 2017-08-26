@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ExpressBase.Common\ExpressBase.Common.csproj" />
+    <ProjectReference Include="..\ExpressBase.Security\ExpressBase.Security.csproj" />
+  </ItemGroup>
+
+</Project>
