@@ -58,6 +58,10 @@ namespace ExpressBase.Objects.Objects.DVRelated
         [EnableInBuilder(BuilderType.DVBuilder)]
         [JsonProperty(PropertyName = "width")]
         public int Width { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [JsonProperty(PropertyName = "className")]
+        public string ClassName { get; set; }
     }
 
     public class DVColumnCollection : List<DVBaseColumn>
