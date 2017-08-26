@@ -37,6 +37,7 @@ namespace ExpressBase.Objects
         public int MaxLength { get; set; }
         
         [EnableInBuilder(BuilderType.WebForm)]
+        [Alias("TextTransform-Alias")]
         [PropertyGroup("Behavior")]
         [PropertyEditor(PropertyEditorType.DropDown)]
         public TextTransform TextTransform { get; set; }
