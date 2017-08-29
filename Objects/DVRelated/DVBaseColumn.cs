@@ -46,20 +46,20 @@ namespace ExpressBase.Objects.Objects.DVRelated
         public DbType Type { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
-        [JsonProperty(PropertyName = "title")]
-        public string Title { get; set; }
+        //[JsonProperty(PropertyName = "title")]
+        public string sTitle { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
-        [JsonProperty(PropertyName = "visible")]
-        public bool Visible { get; set; }
+        //[EnableInBuilder(BuilderType.DVBuilder)]
+        //[JsonProperty(PropertyName = "visible")]
+        public bool bVisible { get; set; }
 
         public int Pos { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
-        [JsonProperty(PropertyName = "width")]
-        public int Width { get; set; }
+        //[JsonProperty(PropertyName = "width")]
+        public string sWidth { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        //[EnableInBuilder(BuilderType.DVBuilder)]
         [JsonProperty(PropertyName = "className")]
         public string ClassName { get; set; }
     }
