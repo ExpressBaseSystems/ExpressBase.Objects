@@ -34,6 +34,14 @@ namespace ExpressBase.Objects
         [HelpText("To limit number of charecters")]
         [PropertyGroup("Behavior")]
         [PropertyEditor(PropertyEditorType.Number)]
+        [OnChangeExec(@"
+if (this.MaxLength <= 10 ){
+    pg.MakeReadOnly('PlaceHolder');
+}
+else {
+    pg.MakeReadWrite('PlaceHolder');
+}
+            ")]
         public int MaxLength { get; set; }
         
         [EnableInBuilder(BuilderType.WebForm)]
@@ -47,9 +55,9 @@ namespace ExpressBase.Objects
         public TextMode TextMode { get; set; }
         
         [EnableInBuilder(BuilderType.WebForm)]
-        [PropertyGroup("Behavior")]
+        [PropertyGroup(@"Behavior")]
         public string PlaceHolder { get; set; }
-        
+
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyGroup("Appearance")]
         public string Text { get; set; }
