@@ -29,6 +29,9 @@ namespace ExpressBase.Objects.ReportRelated
         public int Height { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
+        public int TabIndex { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
         public HorizontalAlignment HAlign { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
@@ -58,11 +61,6 @@ namespace ExpressBase.Objects.ReportRelated
 
         //[EnableInBuilder(BuilderType.Report)]
         //public bool Sum { get; set; }
-
-        public override string GetDesignHtml()
-        {
-            return "";
-        }
     }
 
     [EnableInBuilder(BuilderType.Report)]
