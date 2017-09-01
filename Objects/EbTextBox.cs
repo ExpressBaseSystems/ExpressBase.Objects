@@ -48,6 +48,15 @@ else {
         [Alias("TextTransform-Alias")]
         [PropertyGroup("Behavior")]
         [PropertyEditor(PropertyEditorType.DropDown)]
+        [OnChangeExec(@"
+if (this.TextTransform === 'UPPERCASE' ){
+    pg.HideProperty('Text');
+    console.log('HideProperty');
+}
+else {
+    pg.ShowProperty('Text');
+}
+            ")]
         public TextTransform TextTransform { get; set; }
         
         [EnableInBuilder(BuilderType.WebForm)]

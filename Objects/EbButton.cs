@@ -14,6 +14,7 @@ namespace ExpressBase.Objects
     {
         public EbButton() { }
 
+        [EnableInBuilder(BuilderType.WebForm)]
         [ProtoBuf.ProtoMember(1)]
         [System.ComponentModel.Category("Appearance")]
         public string Text { get; set; }
@@ -48,7 +49,9 @@ namespace ExpressBase.Objects
 .Replace("@height", this.Height.ToString())
 .Replace("@hiddenString", this.HiddenString)
 .Replace("@toolTipText", this.ToolTipText)
-.Replace("@text", this.Text)
+
+    .Replace("@Text ", (this.Text != null) ? this.Text : "@Text ")
+
 .Replace("@tabIndex", "tabindex='" + this.TabIndex + "'")
 .Replace("@backColor", "background-color:" + this.BackColor + ";")
 .Replace("@foreColor", "color:" + this.ForeColor + ";")

@@ -39,8 +39,8 @@ namespace ExpressBase.Objects
             return @"
 this.Init = function(id)
 {
-    this.Controls.Append(new EbObjects.EbTableTdObj(id + '_Td0'));
-    this.Controls.Append(new EbObjects.EbTableTdObj(id + '_Td1'));
+    this.Controls.Append(new EbObjects.EbTableTd(id + '_Td0'));
+    this.Controls.Append(new EbObjects.EbTableTd(id + '_Td1'));
 };";
         }
 
