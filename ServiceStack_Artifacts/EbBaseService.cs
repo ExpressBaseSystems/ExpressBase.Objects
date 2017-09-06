@@ -13,13 +13,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
     public class EbBaseService : Service
     {
-        protected MultiTenantDbFactory TenantDbFactory { get; private set; }
+        protected TenantDbFactory TenantDbFactory { get; private set; }
 
         protected InfraDbFactory InfraDatabaseFactory { get; private set; }
 
-        public EbBaseService(IMultiTenantDbFactory _dbf, IDatabaseFactory _idbf)
+        public EbBaseService(ITenantDbFactory _dbf, IInfraDbFactory _idbf)
         {
-            this.TenantDbFactory = _dbf as MultiTenantDbFactory;
+            this.TenantDbFactory = _dbf as TenantDbFactory;
             this.InfraDatabaseFactory = _idbf as InfraDbFactory;
         }
 
