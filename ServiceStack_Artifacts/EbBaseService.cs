@@ -15,12 +15,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         protected TenantDbFactory TenantDbFactory { get; private set; }
 
-        protected InfraDbFactory InfraDatabaseFactory { get; private set; }
-
-        public EbBaseService(ITenantDbFactory _dbf, IInfraDbFactory _idbf)
+        public EbBaseService(ITenantDbFactory _dbf)
         {
             this.TenantDbFactory = _dbf as TenantDbFactory;
-            this.InfraDatabaseFactory = _idbf as InfraDbFactory;
         }
 
         private static Dictionary<string, string> _infraDbSqlQueries;
