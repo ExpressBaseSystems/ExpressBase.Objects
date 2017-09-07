@@ -39,24 +39,20 @@ namespace ExpressBase.Objects.Objects.DVRelated
         public int Data { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
-        [JsonProperty(PropertyName = "name")]
         new public string Name { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
         public DbType Type { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
-        //[JsonProperty(PropertyName = "title")]
+        [Alias("title")]
         public string sTitle { get; set; }
-
-        //[EnableInBuilder(BuilderType.DVBuilder)]
-        //[JsonProperty(PropertyName = "visible")]
+        
         public bool bVisible { get; set; }
 
         public int Pos { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
-        //[JsonProperty(PropertyName = "width")]
+        [Alias("Width")]
         public string sWidth { get; set; }
 
         //[EnableInBuilder(BuilderType.DVBuilder)]
@@ -73,7 +69,6 @@ namespace ExpressBase.Objects.Objects.DVRelated
     public class DVStringColumn : DVBaseColumn
     {
         [EnableInBuilder(BuilderType.DVBuilder)]
-        [PropertyGroup("xxxx")]
         public StringRenderType RenderAs { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
