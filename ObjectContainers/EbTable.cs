@@ -14,10 +14,18 @@ namespace ExpressBase.Objects
     public class EbTableLayout : EbControlContainer
     {
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
-        [PropertyEditor(PropertyEditorType.Columns)]
-        public string Columns { get; set; }
+        [PropertyEditor(PropertyEditorType.Collection)]
+        [Alias("Columns")]
+        public override List<EbControl> Controls { get; set; }
 
-        public EbTableLayout() { }
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        public List<EbTableTd> SampleColl { get; set; }
+
+        public EbTableLayout()
+        {
+            this.Controls = new List<EbControl>();
+        }
 
         public override string GetDesignHtml()
         {
