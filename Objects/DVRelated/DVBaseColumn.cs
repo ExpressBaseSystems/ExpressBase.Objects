@@ -50,12 +50,13 @@ namespace ExpressBase.Objects.Objects.DVRelated
         
         [EnableInBuilder(BuilderType.DVBuilder)]
         [JsonProperty(PropertyName = "name")]
-        new public string Name { get; set; }
+        [Alias("Name")]
+        public override string Name { get; set; }
 
         public DbType Type { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
-        [Alias("title")]
+        [Alias("Title")]
         public string sTitle { get; set; }
         
         public bool bVisible { get; set; }
@@ -71,6 +72,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
         public string ClassName { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
+        [Alias("FontFamily")]
         public FontFamily fontfamily { get; set; }
     }
 
