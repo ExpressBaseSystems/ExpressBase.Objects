@@ -50,6 +50,11 @@ this.Init = function(id)
 {
     this.Controls.Append(new EbObjects.EbTableTd(id + '_Td0'));
     this.Controls.Append(new EbObjects.EbTableTd(id + '_Td1'));
+    this.Controls.Append(new EbObjects.EbTableTd(id + '_Td2'));
+
+    this.SampleColl.push(new EbObjects.EbTableTd(id + '_Td samp0'));
+    this.SampleColl.push(new EbObjects.EbTableTd(id + '_Td samp1'));
+    this.SampleColl.push(new EbObjects.EbTableTd(id + '_Td samp2'));
 };";
         }
 
@@ -85,6 +90,10 @@ this.Init = function(id)
     public class EbTableTd : EbControlContainer
     {
         public EbTableTd() { }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        [HideInPropertyGrid]
+        public override List<EbControl> Controls { get; set; }
 
         public override string GetHead()
         {
