@@ -51,6 +51,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
         [EnableInBuilder(BuilderType.DVBuilder)]
         [JsonProperty(PropertyName = "name")]
         [Alias("Name")]
+        [PropertyEditor(PropertyEditorType.Label)]
         public override string Name { get; set; }
 
         public DbType Type { get; set; }
