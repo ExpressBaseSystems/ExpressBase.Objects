@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using ExpressBase.Common.Objects.Attributes;
 using ServiceStack.Pcl;
 using ExpressBase.Common.Objects;
+using ExpressBase.Common.Extensions;
 
 namespace ExpressBase.Objects
 {
@@ -81,6 +82,11 @@ else {
         
         [PropertyGroup("Behavior")]
         public string MinDateExpression { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyGroup(@"Behavior")]
+        [PropertyEditor(PropertyEditorType.JS)]
+        public string Validation { get; set; }
 
         //[ProtoBuf.ProtoMember(9)]
         //[Description("Identity")]
