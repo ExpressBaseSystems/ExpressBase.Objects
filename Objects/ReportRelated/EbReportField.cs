@@ -1,4 +1,5 @@
-﻿using ExpressBase.Common.Objects;
+﻿using ExpressBase.Common.Extensions;
+using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using System;
 using System.Collections.Generic;
@@ -55,6 +56,7 @@ namespace ExpressBase.Objects.ReportRelated
         public int DecimalPlaces { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
+        [UIproperty]
         public string ColVal { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
@@ -86,14 +88,14 @@ namespace ExpressBase.Objects.ReportRelated
     {
          public override string GetDesignHtml()
         {
-            return "<div class='EbCol dropped' eb-type='ReportCol' id='@id' style='border:1px solid black; width: @Width px;height: @Height px; position: relative; left: @Left px; top: @Top px;'> @ColVal </div>".RemoveCR().DoubleQuoted();
+            return "<div class='EbCol dropped' $type='@type' eb-type='ReportCol' id='@id' style='border:1px solid black; width: @Width px; background-color:@BackColor ; color:@ForeColor; height: @Height px; position: relative; left: @Left px; top: @Top px;'> @ColVal </div>".RemoveCR().DoubleQuoted();
         }
         public override string GetJsInitFunc()
         {
             return @"
     this.Init = function(id)
         {
-    this.Height =30;
+    this.Height =25;
     this.Width= 200;
 };";
         }
