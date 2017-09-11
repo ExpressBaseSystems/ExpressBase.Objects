@@ -90,7 +90,16 @@ namespace ExpressBase.Objects.Objects.DVRelated
 
     public class DVColumnCollection : List<DVBaseColumn>
     {
+        public DVBaseColumn Get(string name)
+        {
+            foreach(DVBaseColumn col in this)
+            {
+                if (col.Name.Equals(name))
+                    return col;
+            }
 
+            return null;
+        }
     }
 
     [EnableInBuilder(BuilderType.DVBuilder)]

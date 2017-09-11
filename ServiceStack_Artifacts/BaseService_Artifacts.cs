@@ -20,6 +20,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 2)]
         public int UserId { get; set; }
+
+        [DataMember(Order = 3)]
+        public string WhichConsole { get; set; }
     }
 
     public interface IEbSSResponse

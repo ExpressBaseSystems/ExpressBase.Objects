@@ -10,8 +10,8 @@ using System.Threading.Tasks;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
-    [Route("/ds")]
-    [Route("/ds/data/{RefId}")]
+    [Route("/dv")]
+    [Route("/dv/data/{RefId}")]
     [DataContract]
     public class DataVisDataRequest : EbServiceStackRequest, IReturn<DataSourceDataResponse>
     {
@@ -40,8 +40,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public List<Dictionary<string, string>> TFilters { get; set; }
     }
 
-    [Route("/ds")]
-    [Route("/ds/columns/{RefId}")]
+    [Route("/dv")]
+    [Route("/dv/columns/{RefId}")]
     [DataContract]
     public class DataVisColumnsRequest : EbServiceStackRequest, IReturn<DataSourceColumnsResponse>
     {
