@@ -17,15 +17,19 @@ namespace ExpressBase.Objects.ReportRelated
         public string Title { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
+        [UIproperty]
         public int Left { get; set; }
 
+        [UIproperty]
         [EnableInBuilder(BuilderType.Report)]
         public int Width { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
+        [UIproperty]
         public int Top { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
+        [UIproperty]
         public int Height { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
@@ -38,13 +42,20 @@ namespace ExpressBase.Objects.ReportRelated
         public VerticalAlignment VAlign { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
+        [UIproperty]
+        [PropertyEditor(PropertyEditorType.Color)]
         public string BackColor { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
+        [UIproperty]
+        [PropertyEditor(PropertyEditorType.Color)]
         public string ForeColor { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         public int DecimalPlaces { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        public string ColVal { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         public bool Sum { get; set; }
@@ -69,5 +80,24 @@ namespace ExpressBase.Objects.ReportRelated
         [EnableInBuilder(BuilderType.Report)]
         public TextTransform TextTransform { get; set; }
     }
+
+    [EnableInBuilder(BuilderType.Report)]
+    public class EbReportCol : EbReportField
+    {
+         public override string GetDesignHtml()
+        {
+            return "<div class='EbCol dropped' eb-type='ReportCol' id='@id' style='border:1px solid black; width: @Width px;height: @Height px; position: relative; left: @Left px; top: @Top px;'> @ColVal </div>".RemoveCR().DoubleQuoted();
+        }
+        public override string GetJsInitFunc()
+        {
+            return @"
+    this.Init = function(id)
+        {
+    this.Height =30;
+    this.Width= 200;
+};";
+        }
+    }
+   
 }
 
