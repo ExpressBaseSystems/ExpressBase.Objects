@@ -1,4 +1,5 @@
-﻿using ExpressBase.Common.Objects;
+﻿using ExpressBase.Common.Extensions;
+using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Objects;
 using System;
@@ -20,7 +21,11 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
         [PropertyEditor(PropertyEditorType.Collection)]
-        public List<EbTableTd> SampleColl { get; set; }
+        public List<EbTableTd> CollEdtProp { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        public List<EbTableTd> ObjectSelectorProp { get; set; }
 
         public EbTableLayout()
         {
@@ -51,9 +56,9 @@ this.Init = function(id)
     this.Controls.Append(new EbObjects.EbTableTd(id + '_Td1'));
     this.Controls.Append(new EbObjects.EbTableTd(id + '_Td2'));
 
-    this.SampleColl.push(new EbObjects.EbTableTd(id + '_Td samp0'));
-    this.SampleColl.push(new EbObjects.EbTableTd(id + '_Td samp1'));
-    this.SampleColl.push(new EbObjects.EbTableTd(id + '_Td samp2'));
+    this.CollEdtProp.push(new EbObjects.EbTableTd(id + '_Td samp0'));
+    this.CollEdtProp.push(new EbObjects.EbTableTd(id + '_Td samp1'));
+    this.CollEdtProp.push(new EbObjects.EbTableTd(id + '_Td samp2'));
 };";
         }
 

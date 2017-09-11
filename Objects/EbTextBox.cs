@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using ExpressBase.Common.Objects.Attributes;
 using ServiceStack.Pcl;
 using ExpressBase.Common.Objects;
+using ExpressBase.Common.Extensions;
 
 namespace ExpressBase.Objects
 {
