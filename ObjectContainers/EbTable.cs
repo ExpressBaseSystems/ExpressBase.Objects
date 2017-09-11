@@ -1,4 +1,5 @@
-﻿using ExpressBase.Common.Objects;
+﻿using ExpressBase.Common.Extensions;
+using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Objects;
 using System;
@@ -14,10 +15,22 @@ namespace ExpressBase.Objects
     public class EbTableLayout : EbControlContainer
     {
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
-        [PropertyEditor(PropertyEditorType.Columns)]
-        public string Columns { get; set; }
+        [PropertyEditor(PropertyEditorType.Collection)]
+        [Alias("Columns")]
+        public override List<EbControl> Controls { get; set; }
 
-        public EbTableLayout() { }
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        public List<EbTableTd> CollEdtProp { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        public List<EbTableTd> ObjectSelectorProp { get; set; }
+
+        public EbTableLayout()
+        {
+            this.Controls = new List<EbControl>();
+        }
 
         public override string GetDesignHtml()
         {
@@ -39,8 +52,13 @@ namespace ExpressBase.Objects
             return @"
 this.Init = function(id)
 {
-    this.Controls.Append(new EbObjects.EbTableTdObj(id + '_Td0'));
-    this.Controls.Append(new EbObjects.EbTableTdObj(id + '_Td1'));
+    this.Controls.Append(new EbObjects.EbTableTd(id + '_Td0'));
+    this.Controls.Append(new EbObjects.EbTableTd(id + '_Td1'));
+    this.Controls.Append(new EbObjects.EbTableTd(id + '_Td2'));
+
+    this.CollEdtProp.push(new EbObjects.EbTableTd(id + '_Td samp0'));
+    this.CollEdtProp.push(new EbObjects.EbTableTd(id + '_Td samp1'));
+    this.CollEdtProp.push(new EbObjects.EbTableTd(id + '_Td samp2'));
 };";
         }
 
@@ -76,6 +94,10 @@ this.Init = function(id)
     public class EbTableTd : EbControlContainer
     {
         public EbTableTd() { }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        [HideInPropertyGrid]
+        public override List<EbControl> Controls { get; set; }
 
         public override string GetHead()
         {
