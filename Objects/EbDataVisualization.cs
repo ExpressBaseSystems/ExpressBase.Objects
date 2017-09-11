@@ -20,10 +20,6 @@ namespace ExpressBase.Objects
 
         public DVColumnCollection Columns { get; set; }
 
-        //public List<DTColumnDef> columns { get; set; }
-
-        //public List<DTColumnExtPpty> columnsext { get; set; }
-
         public string RenderAs { get; set; }
 
         public string IsPaged { get; set; }
