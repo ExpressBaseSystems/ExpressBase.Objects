@@ -42,6 +42,17 @@ namespace ExpressBase.Objects.Objects.DVRelated
         Impact
     }
 
+    public enum DateFormat
+    {
+        Date,
+        Time,
+        TimeWithoutTT,
+        DateTime,
+        DateTimeWithoutTT,
+        DateTimeWithoutSeconds,
+        DateTimeWithoutSecondsAndTT,
+    }
+
     [EnableInBuilder(BuilderType.DVBuilder)]
     public class DVBaseColumn : EbObject
     {
@@ -79,7 +90,16 @@ namespace ExpressBase.Objects.Objects.DVRelated
 
     public class DVColumnCollection : List<DVBaseColumn>
     {
+        public DVBaseColumn Get(string name)
+        {
+            foreach(DVBaseColumn col in this)
+            {
+                if (col.Name.Equals(name))
+                    return col;
+            }
 
+            return null;
+        }
     }
 
     [EnableInBuilder(BuilderType.DVBuilder)]
@@ -133,7 +153,7 @@ else
     public class DVDateTimeColumn : DVBaseColumn
     {
         [EnableInBuilder(BuilderType.DVBuilder)]
-        public string Format { get; set; }
+        public DateFormat Format { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [OnChangeExec(@"
