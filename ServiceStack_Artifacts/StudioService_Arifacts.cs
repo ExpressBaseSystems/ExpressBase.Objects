@@ -357,7 +357,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public byte[] Bytea { get; set; }
 
         [DataMember(Order = 6)]
-        public ObjectLifeCycleStatus Status { get; set; }
+        public string Status { get; set; }
 
         [DataMember(Order = 7)]
         public int VersionNumber { get; set; }
