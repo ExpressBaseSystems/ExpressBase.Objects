@@ -154,6 +154,29 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
+    public class EbObjectObjLisAllVerRequest : IReturn<EbObjectObjListAllVerResponse>, IEbSSRequest
+    {
+        public int EbObjectType { get; set; }
+
+        public string Token { get; set; }
+
+        public string TenantAccountId { get; set; }
+
+        public int UserId { get; set; }
+
+    }
+    public class EbObjectObjListAllVerResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public Dictionary<string, List<EbObjectWrapper>> Data { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 3)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
     [Route("/ebo", "POST")]
     public class EbObjectSaveOrCommitRequest : IReturn<EbObjectSaveOrCommitResponse>, IEbSSRequest
     {

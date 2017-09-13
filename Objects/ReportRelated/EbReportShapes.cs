@@ -10,7 +10,7 @@ namespace ExpressBase.Objects.ReportRelated
 {
     public abstract class EbReportFieldShape : EbReportField
     {
-        
+
     }
 
     [EnableInBuilder(BuilderType.Report)]
@@ -18,46 +18,174 @@ namespace ExpressBase.Objects.ReportRelated
     {
         public override string GetDesignHtml()
         {
-            return "<div class='circle' id='@id' style='border-radius: 50%; border: 1px solid; width: 50px; height: 50px; position: absolute; left: @leftpx; top: @toppx;'></div>".RemoveCR().DoubleQuoted();
+            return "<div class='circle dropped' $type='@type' eb-type='Circle' id='@id' style='border-radius: 50%; background-color:@BackColor ; color:@ForeColor ; border: 1px solid black; width: @Width px; height: @Height px; position: relative; left: @Left px; top: @Top px;'></div>".RemoveCR().DoubleQuoted();
+        }
+
+        public override string GetJsInitFunc()
+        {
+            return @"
+    this.Init = function(id)
+        {
+    this.Height =50;
+    this.Width= 50;
+};";
         }
     }
     [EnableInBuilder(BuilderType.Report)]
     public class EbRect : EbReportFieldShape
     {
-
+        public override string GetDesignHtml()
+        {
+            return "<div class='rectangle dropped' $type='@type' eb-type='Rect' id='@id' style='border: 1px solid black; width: @Width px; height: @Height px; position: relative; left: @Left px; top: @Top px;'></div>".RemoveCR().DoubleQuoted();
+        }
+        public override string GetJsInitFunc()
+        {
+            return @"
+    this.Init = function(id)
+        {
+    this.Height =50;
+    this.Width= 50;
+};";
+        }
     }
     [EnableInBuilder(BuilderType.Report)]
     public class EbArrR : EbReportFieldShape
     {
-
+        public override string GetDesignHtml()
+        {
+            return "<div class='arrow arrow-r-draggable dropped' $type='@type' eb-type='ArrR' id='@id' style='border: 1px solid black; width: @Width px; height: @Height px; position: relative; left: @Left px; top: @Top px;'><div class='arrow-right'></div></div>".RemoveCR().DoubleQuoted();
+        }
+        public override string GetJsInitFunc()
+        {
+            return @"
+    this.Init = function(id)
+        {
+    this.Height =1;
+    this.Width= 50;
+};";
+        }
     }
     [EnableInBuilder(BuilderType.Report)]
     public class EbArrL : EbReportFieldShape
     {
-
+        public override string GetDesignHtml()
+        {
+            return "<div class='arrow arrow-l-draggable dropped' $type='@type' eb-type='ArrL' id='@id' style='border: 1px solid black; width: @Width px; height: @Height px; position: relative; left: @Left px; top: @Top px;'><div class='arrow-left'></div></div>".RemoveCR().DoubleQuoted();
+        }
+        public override string GetJsInitFunc()
+        {
+            return @"
+    this.Init = function(id)
+        {
+     this.Height =1;
+    this.Width= 50;
+};";
+        }
     }
     [EnableInBuilder(BuilderType.Report)]
     public class EbArrD : EbReportFieldShape
     {
-
+        public override string GetDesignHtml()
+        {
+            return "<div class='arrow arrow-d-draggable dropped' $type='@type' eb-type='ArrD' id='@id' style='border: 1px solid black; width: @Width px; height: @Height px; position: relative; left: @Left px; top: @Top px;'><div class='arrow-down'></div></div>".RemoveCR().DoubleQuoted();
+        }
+        public override string GetJsInitFunc()
+        {
+            return @"
+    this.Init = function(id)
+        {
+    this.Height =50;
+    this.Width= 1;
+};";
+        }
     }
     [EnableInBuilder(BuilderType.Report)]
-    public class ByArrH : EbReportFieldShape
+    public class EbArrU : EbReportFieldShape
     {
-
+        public override string GetDesignHtml()
+        {
+            return "<div class='arrow arrow-u-draggable dropped' $type='@type' eb-type='ArrU' id='@id' style='border: 1px solid black; width: @Width px; height: @Height px; 50px; position: relative; left: @Left px; top: @Top px;'><div class='arrow-up'></div></div>".RemoveCR().DoubleQuoted();
+        }
+        public override string GetJsInitFunc()
+        {
+            return @"
+    this.Init = function(id)
+        {
+    this.Height =50;
+    this.Width= 1;
+};";
+        }
     }
 
-    public class ByArrV : EbReportFieldShape
+    [EnableInBuilder(BuilderType.Report)]
+    public class EbByArrH : EbReportFieldShape
     {
-
+        public override string GetDesignHtml()
+        {
+            return "<div class='arrow arrow-by-d-h-draggable dropped' $type='@type' eb-type='ByArrH' id='@id' style='border: 1px solid black; width: @Width px; height: @Height px; position: relative; left: @Left px; top: @Top px;'><div class='arrow-By-dir-h'></div></div>".RemoveCR().DoubleQuoted();
+        }
+        public override string GetJsInitFunc()
+        {
+            return @"
+    this.Init = function(id)
+        {
+    this.Height =1;
+    this.Width= 50;
+};";
+        }
     }
+    [EnableInBuilder(BuilderType.Report)]
+    public class EbByArrV : EbReportFieldShape
+    {
+        public override string GetDesignHtml()
+        {
+            return "<div class='arrow arrow-by-d-v-draggable dropped' $type='@type' eb-type='ByArrV' id='@id' style='border: 1px solid black; width: @Width px; height: @Height px; position: relative; left: @Left px; top: @Top px;'><div class='arrow-By-dir-v-b'></div></div>".RemoveCR().DoubleQuoted();
+        }
+        public override string GetJsInitFunc()
+        {
+            return @"
+    this.Init = function(id)
+        {
+    this.Height =50;
+    this.Width= 1;
+};";
+        }
+    }
+
+    [EnableInBuilder(BuilderType.Report)]
     public class EbHl : EbReportFieldShape
     {
-
+        public override string GetDesignHtml()
+        {
+            return "<div class='h-line h-line-dropped dropped' $type='@type' eb-type='Hl' id='@id' style='border: 1px solid black; width: @Width px; height: @Height px; position: relative; left: @Left px; top: @Top px;'></div>".RemoveCR().DoubleQuoted();
+        }
+        public override string GetJsInitFunc()
+        {
+            return @"
+    this.Init = function(id)
+        {
+    this.Height =1;
+    this.Width= 50;
+};";
+        }
     }
+
+    [EnableInBuilder(BuilderType.Report)]
     public class EbVl : EbReportFieldShape
     {
-
+        public override string GetDesignHtml()
+        {
+            return "<div class='v-line v-line-dropped dropped' $type='@type' eb-type='Vl' id='@id' style='border: 1px solid black; width: @Width px; height: @Height px; position: relative; left: @Left px; top: @Top px;'></div>".RemoveCR().DoubleQuoted();
+        }
+        public override string GetJsInitFunc()
+        {
+            return @"
+    this.Init = function(id)
+        {
+    this.Height =50;
+    this.Width= 1;
+};";
+        }
     }
 
 
