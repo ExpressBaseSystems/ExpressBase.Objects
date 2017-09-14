@@ -30,4 +30,14 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public int UserId { get; set; }
     }
+
+    public class UploadFileControllerResponse
+    {
+        public string Uploaded { get; set; }
+    }
+
+    public class UploadFileControllerError
+    {
+        public string Uploaded { get; set; }
+    }
 }
