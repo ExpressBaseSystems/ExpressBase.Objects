@@ -61,6 +61,7 @@ namespace ExpressBase.Objects.ReportRelated
 
         [EnableInBuilder(BuilderType.Report)]
         public bool Sum { get; set; }
+
     }
 
     [EnableInBuilder(BuilderType.Report)]
