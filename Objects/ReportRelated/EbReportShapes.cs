@@ -11,6 +11,11 @@ namespace ExpressBase.Objects.ReportRelated
     public abstract class EbReportFieldShape : EbReportField
     {
 
+        [EnableInBuilder(BuilderType.Report)]
+        public int ColoumNo { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        public int RowNo { get; set; }
     }
 
     [EnableInBuilder(BuilderType.Report)]
@@ -187,6 +192,22 @@ namespace ExpressBase.Objects.ReportRelated
 };";
         }
     }
-
+    [EnableInBuilder(BuilderType.Report)]
+    public class EbTable : EbReportFieldShape
+    {
+        public override string GetDesignHtml()
+        {
+            return "<table class='table table-bordered dropped' eb-type='Table' id='@id' style='border:1px solid black; width: @Width px; height: @Height px; position: relative; left: @Left px; top: @Top px;'><tr><td></td><td></td></tr></table>".RemoveCR().DoubleQuoted();
+        }
+        public override string GetJsInitFunc()
+        {
+            return @"
+    this.Init = function(id)
+        {
+    this.Height =100;
+    this.Width= 100;
+};";
+        }
+    }
 
 }
