@@ -11,14 +11,47 @@ namespace ExpressBase.Objects
 {
 
     public class EbReportSections : EbReportField
-    {     
+    {
+        [EnableInBuilder(BuilderType.Report)]
+        public List<EbReportField> SubSection { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        public string PageSize { get; set; }
     }
+
+    [EnableInBuilder(BuilderType.Report)]
+    public class EbMultiSplitBox : EbReportSections
+    {
+        public override string GetDesignHtml()
+        {
+            return "<div class='multiSplitHbox' data_val='@data' eb-type='MultiSplitBox' id='@id' style='width: 100%;'></div>".RemoveCR().DoubleQuoted();
+        }
+    }
+
+    [EnableInBuilder(BuilderType.Report)]
+    public class EbMultiSplitBoxSub : EbReportSections
+    {
+        public override string GetDesignHtml()
+        {
+            return "<div class='multiSplitHboxSub' eb-type='MultiSplitBox' id='@id' style='width: 100%;'><p> @SubDivName </p></div>".RemoveCR().DoubleQuoted();
+        }
+    }
+
+    [EnableInBuilder(BuilderType.Report)]
+    public class EbReportPage : EbReportSections
+    {
+        public override string GetDesignHtml()
+        {
+            return "<div class='page' PageSize='@PageSize' eb-type='ReportPage' id='@id' style='width: @Width ;height: @Height '> </div>".RemoveCR().DoubleQuoted();
+        }
+    }
+
     [EnableInBuilder(BuilderType.Report)]
     public class EbReportHeader : EbReportSections
     {
         public override string GetDesignHtml()
         {
-            return "<div class='pageHeaders' eb-type='ReportHeader' $type='@type' id='rpthead' data_val='0' style='width :100%;position: relative'> </div>".RemoveCR().DoubleQuoted();
+            return "<div class='pageHeaders' eb-type='ReportHeader' id='@id' data_val='0' style='width :100%;position: relative'> </div>".RemoveCR().DoubleQuoted();
         }
     }
     [EnableInBuilder(BuilderType.Report)]
@@ -26,7 +59,7 @@ namespace ExpressBase.Objects
     {
         public override string GetDesignHtml()
         {
-            return "<div class='pageHeaders' eb-type='PageHeader' $type='@type' id='pghead' data_val='1' style='width :100%;position: relative'> </div>".RemoveCR().DoubleQuoted();
+            return "<div class='pageHeaders' eb-type='PageHeader' id='@id' data_val='1' style='width :100%;position: relative'> </div>".RemoveCR().DoubleQuoted();
         }
     }
     [EnableInBuilder(BuilderType.Report)]
@@ -34,7 +67,7 @@ namespace ExpressBase.Objects
     {
         public override string GetDesignHtml()
         {
-            return "<div class='pageHeaders' eb-type='Detail' $type='@type' id='pgbody' data_val='2' style='width :100%;position: relative'> </div>".RemoveCR().DoubleQuoted();
+            return "<div class='pageHeaders' eb-type='Detail' id='@id' data_val='2' style='width :100%;position: relative'> </div>".RemoveCR().DoubleQuoted();
         }
     }
     [EnableInBuilder(BuilderType.Report)]
@@ -42,7 +75,7 @@ namespace ExpressBase.Objects
     {
         public override string GetDesignHtml()
         {
-            return "<div class='pageHeaders' eb-type='PageFooter' $type='@type' id='pgfooter' data_val='3' style='width :100%;position: relative'> </div>".RemoveCR().DoubleQuoted();
+            return "<div class='pageHeaders' eb-type='PageFooter' id='@id' data_val='3' style='width :100%;position: relative'> </div>".RemoveCR().DoubleQuoted();
         }
     }
     [EnableInBuilder(BuilderType.Report)]
@@ -50,7 +83,15 @@ namespace ExpressBase.Objects
     {
         public override string GetDesignHtml()
         {
-            return "<div class='pageHeaders' eb-type='ReportFooter' $type='@type' id='rptfooter' data_val='4' style='width :100%;position: relative'> </div>".RemoveCR().DoubleQuoted();
+            return "<div class='pageHeaders' eb-type='ReportFooter' id='@id' data_val='4' style='width :100%;position: relative'> </div>".RemoveCR().DoubleQuoted();
         }
+    }
+    [EnableInBuilder(BuilderType.Report)]
+    public class EbSubSection : EbReportSections
+    {
+        public override string GetDesignHtml()
+        {
+            return "<div class='subdivs' eb-type='SubSection' id='@id' style='width :100%;position: relative; height: @Height ;background-color:@BackColor '></div>".RemoveCR().DoubleQuoted();
+        }       
     }
 }
