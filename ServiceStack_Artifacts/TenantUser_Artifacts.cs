@@ -200,6 +200,29 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string u_token { get; set; }
     }
 
+    [DataContract]
+    public class EditUserPreferenceRequest : IReturn<EditUserPreferenceResponse>, IEbSSRequest
+    {
+        
+        public string TenantAccountId { get; set; }
+
+        public int UserId { get; set; }
+
+        public string Token { get; set; }
+    }
+
+
+    [DataContract]
+    public class EditUserPreferenceResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public Dictionary<string, object> Data { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+      
+    }
 
     [DataContract]
     public class GetSubRolesRequest : IReturn<GetSubRolesResponse>, IEbSSRequest

@@ -165,6 +165,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int UserId { get; set; }
 
     }
+
     public class EbObjectObjListAllVerResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
@@ -309,6 +310,239 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 4)]
         public string RefId { get; set; }        
+    }
+
+    public class EbObject_CommitRequest : IReturn<EbObject_CommitResponse>, IEbSSRequest
+    {
+        public string RefId { get; set; } // (Id == 0) First Commit else Subsequent Commit
+
+        public int EbObjectType { get; set; }
+
+        public string Name { get; set; }
+
+        public string Description { get; set; }
+
+        public string Json { get; set; }
+
+        public string ChangeLog { get; set; }
+
+        public string Relations { get; set; }
+
+        public EbObject EbObject { get; set; }
+
+        public string Token { get; set; }
+
+        public string TenantAccountId { get; set; }
+
+        public int UserId { get; set; }
+    }
+
+    [DataContract]
+    public class EbObject_CommitResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public int Id { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 3)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 4)]
+        public string RefId { get; set; }
+    }
+
+    public class EbObject_SaveRequest : IReturn<EbObject_SaveResponse>, IEbSSRequest
+    {
+        public string RefId { get; set; } // (Id == 0) First Commit else Subsequent Commit
+
+        public int EbObjectType { get; set; }
+
+        public string Name { get; set; }
+
+        public string Description { get; set; }
+
+        public string Json { get; set; }
+
+        public string Relations { get; set; }
+
+        public EbObject EbObject { get; set; }
+
+        public string Token { get; set; }
+
+        public string TenantAccountId { get; set; }
+
+        public int UserId { get; set; }
+    }
+
+    [DataContract]
+    public class EbObject_SaveResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public int Id { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 3)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 4)]
+        public string RefId { get; set; }
+    }
+
+    public class EbObject_Create_Major_VersionRequest : IReturn<EbObject_Create_Major_VersionResponse>, IEbSSRequest
+    {
+        public string RefId { get; set; } // (Id == 0) First Commit else Subsequent Commit
+
+        public int EbObjectType { get; set; }
+
+        public string Relations { get; set; }
+
+        public EbObject EbObject { get; set; }
+
+        public string Token { get; set; }
+
+        public string TenantAccountId { get; set; }
+
+        public int UserId { get; set; }
+    }
+
+    [DataContract]
+    public class EbObject_Create_Major_VersionResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public int Id { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 3)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 4)]
+        public string RefId { get; set; }
+    }
+
+    public class EbObject_Create_Minor_VersionRequest : IReturn<EbObject_Create_Minor_VersionResponse>, IEbSSRequest
+    {
+        public string RefId { get; set; } // (Id == 0) First Commit else Subsequent Commit
+
+        public int EbObjectType { get; set; }
+
+        public string Name { get; set; }
+
+        public string Description { get; set; }
+
+        public ObjectLifeCycleStatus Status { get; set; }
+
+        public string Json { get; set; }
+
+        public string ChangeLog { get; set; }
+
+        public string Relations { get; set; }
+
+        public bool IsSave { get; set; } // If (IsSave == true) Save else Commit
+
+        public EbObject EbObject { get; set; }
+
+        public string Token { get; set; }
+
+        public string TenantAccountId { get; set; }
+
+        public int UserId { get; set; }
+    }
+
+    [DataContract]
+    public class EbObject_Create_Minor_VersionResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public int Id { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 3)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 4)]
+        public string RefId { get; set; }
+    }
+
+
+    public class EbObject_Create_New_ObjectRequest : IReturn<EbObject_Create_New_ObjectResponse>, IEbSSRequest
+    {
+        public string RefId { get; set; } // (Id == 0) First Commit else Subsequent Commit
+
+        public string Name { get; set; }
+
+        public int EbObjectType { get; set; }
+
+        public string Description { get; set; }
+
+        public string Json { get; set; }
+
+        public ObjectLifeCycleStatus Status { get; set; }
+
+        public string Relations { get; set; }
+
+        public EbObject EbObject { get; set; }
+
+        public string Token { get; set; }
+
+        public string TenantAccountId { get; set; }
+
+        public int UserId { get; set; }
+    }
+
+    [DataContract]
+    public class EbObject_Create_New_ObjectResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public int Id { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 3)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 4)]
+        public string RefId { get; set; }
+    }
+
+    public class EbObject_Create_Patch_VersionRequest : IReturn<EbObject_Create_Patch_VersionResponse>, IEbSSRequest
+    {
+        public string RefId { get; set; } // (Id == 0) First Commit else Subsequent Commit
+
+        public int EbObjectType { get; set; }
+
+        public string Relations { get; set; }
+
+        public EbObject EbObject { get; set; }
+
+        public string Token { get; set; }
+
+        public string TenantAccountId { get; set; }
+
+        public int UserId { get; set; }
+    }
+
+    [DataContract]
+    public class EbObject_Create_Patch_VersionResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public int Id { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 3)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 4)]
+        public string RefId { get; set; }
     }
 
     public class EbObjectRunSqlFunctionRequest : IReturn<EbObjectRunSqlFunctionResponse>, IEbSSRequest
