@@ -54,7 +54,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
     }
 
     [EnableInBuilder(BuilderType.DVBuilder)]
-    public class DVBaseColumn : EbObject
+    public class DVBaseColumn : EbDataVisualizationObject
     {
         [JsonProperty(PropertyName = "data")]
         public int Data { get; set; }
