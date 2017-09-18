@@ -29,6 +29,15 @@ namespace ExpressBase.Objects
     }
 
     [EnableInBuilder(BuilderType.Report)]
+    public class EbMultiSplitBoxSub : EbReportSections
+    {
+        public override string GetDesignHtml()
+        {
+            return "<div class='multiSplitHboxSub' eb-type='MultiSplitBox' id='@id' style='width: 100%;'><p> @SubDivName </p></div>".RemoveCR().DoubleQuoted();
+        }
+    }
+
+    [EnableInBuilder(BuilderType.Report)]
     public class EbReportPage : EbReportSections
     {
         public override string GetDesignHtml()

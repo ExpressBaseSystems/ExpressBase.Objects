@@ -1,5 +1,7 @@
 ﻿using ExpressBase.Common;
 using ExpressBase.Common.Data;
+using ExpressBase.Common.Objects;
+using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Data;
 using ExpressBase.Objects.Objects.DVRelated;
 using ExpressBase.Objects.ServiceStack_Artifacts;
@@ -16,22 +18,39 @@ using System.Threading.Tasks;
 
 namespace ExpressBase.Objects
 {
-    public class EbDataVisualization : EbObject
+    public enum ChartType
     {
+        Bar,
+        Line,
+        Pie,
+        doughnut,
+        AreaFilled
+    }
+
+    public class EbDataVisualizationObject : EbObject
+    {
+
+    }
+
+    [EnableInBuilder(BuilderType.DVBuilder)]
+    public class EbDataVisualizationSet : EbDataVisualizationObject
+    {
+        [EnableInBuilder(BuilderType.DVBuilder)]
         public string DataSourceRefId { get; set; }
 
+        [EnableInBuilder(BuilderType.DVBuilder)]
         [JsonIgnore]
         public EbDataSource EbDataSource { get; set; }
 
+        [EnableInBuilder(BuilderType.DVBuilder)]
         public string Description { get; set; }
 
-        public DVColumnCollection Columns { get; set; }
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public List<EbDataVisualization> Visualizations { get; set; }
 
-        public string RenderAs { get; set; }
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public int DeafaultVisualizationIndex { get; set; }
 
-        public string IsPaged { get; set; }
-
-        public GOptions options { get; set; }
         public override void AfterRedisGet(RedisClient Redis)
         {
             try
@@ -39,16 +58,23 @@ namespace ExpressBase.Objects
                 this.EbDataSource = Redis.Get<EbDataSource>(this.DataSourceRefId);
                 this.EbDataSource.AfterRedisGet(Redis);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
 
             }
         }
+    }
 
-        public EbDataSet DoQueries4DataVis(string sql ,ITenantDbFactory df, params DbParameter[] parameters)
+    
+    public abstract class EbDataVisualization : EbDataVisualizationSet
+    {
+        
+        public DVColumnCollection Columns { get; set; }
+
+        public EbDataSet DoQueries4DataVis(string sql, ITenantDbFactory df, params DbParameter[] parameters)
         {
             EbDataSet ds = new EbDataSet();
-            
+
             using (var con = df.DataDBRO.GetNewConnection())
             {
                 try
@@ -92,15 +118,18 @@ namespace ExpressBase.Objects
                     {
                         var _val = reader.IsDBNull(i) ? DateTime.Now : reader.GetDateTime(i);
                         var _dvCol = this.Columns.Get(_coln) as DVDateTimeColumn;
-                        if (_dvCol.Format == DateFormat.Date) {
+                        if (_dvCol.Format == DateFormat.Date)
+                        {
                             dr[i] = _val.ToString("dd-MM-yyyy");
                             continue;
                         }
-                        else if (_dvCol.Format == DateFormat.Time) {
+                        else if (_dvCol.Format == DateFormat.Time)
+                        {
                             dr[i] = _val.ToString("HH:mm:ss tt");
                             continue;
                         }
-                        else if (_dvCol.Format == DateFormat.TimeWithoutTT) {
+                        else if (_dvCol.Format == DateFormat.TimeWithoutTT)
+                        {
                             dr[i] = _val.ToString("HH:mm:ss");
                             continue;
                         }
@@ -186,17 +215,35 @@ namespace ExpressBase.Objects
             CopyToClipboard,
             Print
         }
+
     }
 
-
-    public class GOptions
+    [EnableInBuilder(BuilderType.DVBuilder)]
+    public class EbTableVisualization : EbDataVisualization
     {
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public string RenderAs { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public string IsPaged { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public string rowGrouping { get; set; }
+    }
+
+    [EnableInBuilder(BuilderType.DVBuilder)]
+    public class EbChartVisualization : EbDataVisualization
+    {
+        [EnableInBuilder(BuilderType.DVBuilder)]
         public List<axis> Xaxis { get; set; }
 
+        [EnableInBuilder(BuilderType.DVBuilder)]
         public List<axis> Yaxis { get; set; }
 
-        public string type { get; set; }
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public ChartType type { get; set; }
     }
+
     public class axis
     {
         public string index { get; set; }

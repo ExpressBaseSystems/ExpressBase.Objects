@@ -40,4 +40,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         public string Uploaded { get; set; }
     }
+
+    public class DownloadFileRequest : IEbSSRequest
+    {
+        public string ObjectId { get; set; }
+        
+        public string TenantAccountId { get; set; }
+
+        public int UserId { get; set; }
+    }
 }
