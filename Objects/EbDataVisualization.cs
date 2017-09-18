@@ -44,6 +44,11 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         public int DeafaultVisualizationIndex { get; set; }
+
+        public EbDataVisualizationSet()
+        {
+            this.Visualizations = new List<EbDataVisualization>();
+        }
     }
 
     
