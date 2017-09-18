@@ -197,8 +197,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public string Json { get; set; }
 
-        public EbObject EbObject { get; set; }
-
         public ObjectLifeCycleStatus Status { get; set; }
 
         public string ChangeLog { get; set; }
@@ -241,8 +239,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Json { get; set; }
 
         public string Relations { get; set; }
-
-        public EbObject EbObject { get; set; }
 
         public string Token { get; set; }
 
@@ -287,8 +283,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public bool IsSave { get; set; } // If (IsSave == true) Save else Commit
 
-        public EbObject EbObject { get; set; }
-
         public string Token { get; set; }
 
         public string TenantAccountId { get; set; }
@@ -328,8 +322,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public string Relations { get; set; }
 
-        public EbObject EbObject { get; set; }
-
         public string Token { get; set; }
 
         public string TenantAccountId { get; set; }
@@ -367,8 +359,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public string Relations { get; set; }
 
-        public EbObject EbObject { get; set; }
-
         public string Token { get; set; }
 
         public string TenantAccountId { get; set; }
@@ -399,9 +389,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int EbObjectType { get; set; }
 
         public string Relations { get; set; }
-
-        public EbObject EbObject { get; set; }
-
+        
         public string Token { get; set; }
 
         public string TenantAccountId { get; set; }
@@ -431,21 +419,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public int EbObjectType { get; set; }
 
-        public string Name { get; set; }
-
-        public string Description { get; set; }
-
-        public ObjectLifeCycleStatus Status { get; set; }
-
-        public string Json { get; set; }
-
-        public string ChangeLog { get; set; }
-
         public string Relations { get; set; }
-
-        public bool IsSave { get; set; } // If (IsSave == true) Save else Commit
-
-        public EbObject EbObject { get; set; }
 
         public string Token { get; set; }
 
@@ -487,8 +461,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public string Relations { get; set; }
 
-        public EbObject EbObject { get; set; }
-
         public string Token { get; set; }
 
         public string TenantAccountId { get; set; }
@@ -519,9 +491,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int EbObjectType { get; set; }
 
         public string Relations { get; set; }
-
-        public EbObject EbObject { get; set; }
-
+        
         public string Token { get; set; }
 
         public string TenantAccountId { get; set; }
