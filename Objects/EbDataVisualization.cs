@@ -36,20 +36,34 @@ namespace ExpressBase.Objects
     public class EbDataVisualizationSet : EbDataVisualizationObject
     {
         [EnableInBuilder(BuilderType.DVBuilder)]
-        public string DataSourceRefId { get; set; }
-
-        [EnableInBuilder(BuilderType.DVBuilder)]
-        [JsonIgnore]
-        public EbDataSource EbDataSource { get; set; }
-
-        [EnableInBuilder(BuilderType.DVBuilder)]
         public string Description { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.Collection)]
         public List<EbDataVisualization> Visualizations { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         public int DeafaultVisualizationIndex { get; set; }
+
+        public EbDataVisualizationSet()
+        {
+            this.Visualizations = new List<EbDataVisualization>();
+        }
+    }
+
+    
+    public abstract class EbDataVisualization : EbDataVisualizationObject
+    {
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public string DataSourceRefId { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [JsonIgnore]
+        public EbDataSource EbDataSource { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public DVColumnCollection Columns { get; set; }
 
         public override void AfterRedisGet(RedisClient Redis)
         {
@@ -63,13 +77,6 @@ namespace ExpressBase.Objects
 
             }
         }
-    }
-
-    
-    public abstract class EbDataVisualization : EbDataVisualizationSet
-    {
-        
-        public DVColumnCollection Columns { get; set; }
 
         public EbDataSet DoQueries4DataVis(string sql, ITenantDbFactory df, params DbParameter[] parameters)
         {
@@ -215,15 +222,11 @@ namespace ExpressBase.Objects
             CopyToClipboard,
             Print
         }
-
     }
 
     [EnableInBuilder(BuilderType.DVBuilder)]
     public class EbTableVisualization : EbDataVisualization
     {
-        [EnableInBuilder(BuilderType.DVBuilder)]
-        public string RenderAs { get; set; }
-
         [EnableInBuilder(BuilderType.DVBuilder)]
         public string IsPaged { get; set; }
 

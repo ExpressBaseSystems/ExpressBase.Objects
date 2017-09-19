@@ -25,7 +25,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
-        public List<EbTableTd> ObjectSelectorProp { get; set; }
+        public string ObjectSelectorProp { get; set; }
 
         public EbTableLayout()
         {
@@ -81,7 +81,7 @@ this.Init = function(id)
             <div class='Eb-ctrlContainer' Ctype='TableLayout'>
                 <table class='form-render-table' ><tr>";
 
-            foreach (EbControl ec in base.Controls)
+            foreach (EbControl ec in this.Controls)
                 html += ec.GetHtml();
 
             return html + "</tr></table></div>";
@@ -93,7 +93,10 @@ this.Init = function(id)
     [HideInToolBox]
     public class EbTableTd : EbControlContainer
     {
-        public EbTableTd() { }
+        public EbTableTd()
+        {
+            this.Controls = new List<EbControl>();
+        }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
         [HideInPropertyGrid]
@@ -116,7 +119,7 @@ this.Init = function(id)
         {
             string html = "<td class='form-render-table-Td tdDropable'>";
 
-            foreach (EbControl ec in base.Controls)
+            foreach (EbControl ec in this.Controls)
                 html += ec.GetHtml();
 
             return html + "</td>";
