@@ -91,7 +91,7 @@ namespace ExpressBase.Objects
     {
         public override string GetDesignHtml()
         {
-            return "<div class='subdivs' eb-type='SubSection' id='@id' style='width :100%;position: relative; height: @Height ;background-color:@BackColor '></div>".RemoveCR().DoubleQuoted();
+            return "<div class='subdivs droppable' eb-type='SubSection' id='@id' style='width :100%;position: relative; height: @Height %;background-color:@BackColor '></div>".RemoveCR().DoubleQuoted();
         }       
     }
 }

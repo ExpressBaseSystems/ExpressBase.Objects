@@ -89,7 +89,7 @@ namespace ExpressBase.Objects.ReportRelated
     {
          public override string GetDesignHtml()
         {
-            return "<div class='EbCol dropped' $type='@type' eb-type='ReportCol' id='@id' style='border:1px solid black; width: @Width px; background-color:@BackColor ; color:@ForeColor; height: @Height px; position: relative; left: @Left px; top: @Top px;'> @ColVal </div>".RemoveCR().DoubleQuoted();
+            return "<div class='EbCol dropped' $type='@type' eb-type='ReportCol' id='@id' style='border:1px solid #aaaaaa; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;'> @ColVal </div>".RemoveCR().DoubleQuoted();
         }
         public override string GetJsInitFunc()
         {
@@ -98,6 +98,7 @@ namespace ExpressBase.Objects.ReportRelated
         {
     this.Height =25;
     this.Width= 200;
+    this.ForeColor = '#201c1c';
 };";
         }
     }
