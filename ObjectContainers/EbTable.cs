@@ -24,12 +24,18 @@ namespace ExpressBase.Objects
         public List<EbTableTd> CollEdtProp { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        public List<EbDataVisualization> Visualizations { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [OSE_ObjectTypes(EbObjectType.DataVisualization, EbObjectType.Report, EbObjectType.MobileForm)]
         public string ObjectSelectorProp { get; set; }
 
         public EbTableLayout()
         {
             this.Controls = new List<EbControl>();
+            this.Visualizations = new List<EbDataVisualization>();
         }
 
         public override string GetDesignHtml()
