@@ -13,10 +13,7 @@ namespace ExpressBase.Objects
     public class EbReportSections : EbReportField
     {
         [EnableInBuilder(BuilderType.Report)]
-        public List<EbReportField> SubSection { get; set; }
-
-        [EnableInBuilder(BuilderType.Report)]
-        public string PageSize { get; set; }
+        public List<EbReportField> SubSection { get; set; }       
     }
 
     [EnableInBuilder(BuilderType.Report)]
@@ -40,6 +37,9 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.Report)]
     public class EbReportPage : EbReportSections
     {
+        [EnableInBuilder(BuilderType.Report)]
+        public string PageSize { get; set; }
+
         public override string GetDesignHtml()
         {
             return "<div class='page' PageSize='@PageSize' eb-type='ReportPage' id='@id' style='width: @Width ;height: @Height '> </div>".RemoveCR().DoubleQuoted();
