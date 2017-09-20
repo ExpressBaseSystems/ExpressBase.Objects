@@ -9,13 +9,7 @@ using System.Threading.Tasks;
 namespace ExpressBase.Objects.ReportRelated
 {
     public abstract class EbReportFieldShape : EbReportField
-    {
-
-        [EnableInBuilder(BuilderType.Report)]
-        public int ColoumNo { get; set; }
-
-        [EnableInBuilder(BuilderType.Report)]
-        public int RowNo { get; set; }
+    {       
     }
 
     [EnableInBuilder(BuilderType.Report)]
@@ -23,7 +17,7 @@ namespace ExpressBase.Objects.ReportRelated
     {
         public override string GetDesignHtml()
         {
-            return "<div class='circle dropped' eb-type='Circle' id='@id' style='border-radius: 50%; background-color:@BackColor ; color:@ForeColor ; border: 1px solid black; width: @Width px; height: @Height px; position: relative; left: @Left px; top: @Top px;'></div>".RemoveCR().DoubleQuoted();
+            return "<div class='circle dropped' eb-type='Circle' id='@id' style='border-radius: 50%; background-color:@BackColor ; color:@ForeColor ; border: 1px solid black; width: @Width px; height: @Height px; position: absolute; left: @Left px; top: @Top px;'></div>".RemoveCR().DoubleQuoted();
         }
 
         public override string GetJsInitFunc()
@@ -41,7 +35,7 @@ namespace ExpressBase.Objects.ReportRelated
     {
         public override string GetDesignHtml()
         {
-            return "<div class='rectangle dropped' eb-type='Rect' id='@id' style='border: 1px solid black; width: @Width px; height: @Height px; position: relative; left: @Left px; top: @Top px;'></div>".RemoveCR().DoubleQuoted();
+            return "<div class='rectangle dropped' eb-type='Rect' id='@id' style='border: 1px solid black;background-color:@BackColor ; color:@ForeColor ;width: @Width px; height: @Height px; position: absolute; left: @Left px; top: @Top px;'></div>".RemoveCR().DoubleQuoted();
         }
         public override string GetJsInitFunc()
         {
@@ -58,7 +52,7 @@ namespace ExpressBase.Objects.ReportRelated
     {
         public override string GetDesignHtml()
         {
-            return "<div class='arrow arrow-r-draggable dropped' eb-type='ArrR' id='@id' style='border: 1px solid black; width: @Width px; height: @Height px; position: relative; left: @Left px; top: @Top px;'><div class='arrow-right'></div></div>".RemoveCR().DoubleQuoted();
+            return "<div class='arrow arrow-r-draggable dropped' eb-type='ArrR' id='@id' style='border: 1px solid black;background-color:@BackColor ; color:@ForeColor ;width: @Width px; height: @Height px; position: absolute; left: @Left px; top: @Top px;'><div class='arrow-right'></div></div>".RemoveCR().DoubleQuoted();
         }
         public override string GetJsInitFunc()
         {
@@ -75,7 +69,7 @@ namespace ExpressBase.Objects.ReportRelated
     {
         public override string GetDesignHtml()
         {
-            return "<div class='arrow arrow-l-draggable dropped' eb-type='ArrL' id='@id' style='border: 1px solid black; width: @Width px; height: @Height px; position: relative; left: @Left px; top: @Top px;'><div class='arrow-left'></div></div>".RemoveCR().DoubleQuoted();
+            return "<div class='arrow arrow-l-draggable dropped' eb-type='ArrL' id='@id' style='border: 1px solid black;background-color:@BackColor ; color:@ForeColor ; width: @Width px; height: @Height px; position: absolute; left: @Left px; top: @Top px;'><div class='arrow-left'></div></div>".RemoveCR().DoubleQuoted();
         }
         public override string GetJsInitFunc()
         {
@@ -92,7 +86,7 @@ namespace ExpressBase.Objects.ReportRelated
     {
         public override string GetDesignHtml()
         {
-            return "<div class='arrow arrow-d-draggable dropped' eb-type='ArrD' id='@id' style='border: 1px solid black; width: @Width px; height: @Height px; position: relative; left: @Left px; top: @Top px;'><div class='arrow-down'></div></div>".RemoveCR().DoubleQuoted();
+            return "<div class='arrow arrow-d-draggable dropped' eb-type='ArrD' id='@id' style='border: 1px solid black;background-color:@BackColor ; color:@ForeColor ; width: @Width px; height: @Height px; position: absolute; left: @Left px; top: @Top px;'><div class='arrow-down'></div></div>".RemoveCR().DoubleQuoted();
         }
         public override string GetJsInitFunc()
         {
@@ -109,7 +103,7 @@ namespace ExpressBase.Objects.ReportRelated
     {
         public override string GetDesignHtml()
         {
-            return "<div class='arrow arrow-u-draggable dropped' $type='@type'eb-type='ArrU' id='@id' style='border: 1px solid black; width: @Width px; height: @Height px; 50px; position: relative; left: @Left px; top: @Top px;'><div class='arrow-up'></div></div>".RemoveCR().DoubleQuoted();
+            return "<div class='arrow arrow-u-draggable dropped' $type='@type'eb-type='ArrU' id='@id' style='border: 1px solid black;background-color:@BackColor ; color:@ForeColor ; width: @Width px; height: @Height px; 50px; position: absolute; left: @Left px; top: @Top px;'><div class='arrow-up'></div></div>".RemoveCR().DoubleQuoted();
         }
         public override string GetJsInitFunc()
         {
@@ -127,7 +121,7 @@ namespace ExpressBase.Objects.ReportRelated
     {
         public override string GetDesignHtml()
         {
-            return "<div class='arrow arrow-by-d-h-draggable dropped' eb-type='ByArrH' id='@id' style='border: 1px solid black; width: @Width px; height: @Height px; position: relative; left: @Left px; top: @Top px;'><div class='arrow-By-dir-h'></div></div>".RemoveCR().DoubleQuoted();
+            return "<div class='arrow arrow-by-d-h-draggable dropped' eb-type='ByArrH' id='@id' style='border: 1px solid black;background-color:@BackColor ; color:@ForeColor ; width: @Width px; height: @Height px; absolute: relative; left: @Left px; top: @Top px;'><div class='arrow-By-dir-h'></div></div>".RemoveCR().DoubleQuoted();
         }
         public override string GetJsInitFunc()
         {
@@ -144,7 +138,7 @@ namespace ExpressBase.Objects.ReportRelated
     {
         public override string GetDesignHtml()
         {
-            return "<div class='arrow arrow-by-d-v-draggable dropped' eb-type='ByArrV' id='@id' style='border: 1px solid black; width: @Width px; height: @Height px; position: relative; left: @Left px; top: @Top px;'><div class='arrow-By-dir-v-b'></div></div>".RemoveCR().DoubleQuoted();
+            return "<div class='arrow arrow-by-d-v-draggable dropped' eb-type='ByArrV' id='@id' style='border: 1px solid black;background-color:@BackColor ; color:@ForeColor ; width: @Width px; height: @Height px; absolute: relative; left: @Left px; top: @Top px;'><div class='arrow-By-dir-v-b'></div></div>".RemoveCR().DoubleQuoted();
         }
         public override string GetJsInitFunc()
         {
@@ -162,7 +156,7 @@ namespace ExpressBase.Objects.ReportRelated
     {
         public override string GetDesignHtml()
         {
-            return "<div class='h-line h-line-dropped dropped' eb-type='Hl' id='@id' style='border: 1px solid black; width: @Width px; height: @Height px; position: relative; left: @Left px; top: @Top px;'></div>".RemoveCR().DoubleQuoted();
+            return "<div class='h-line h-line-dropped dropped' eb-type='Hl' id='@id' style='border: 1px solid black;background-color:@BackColor ; color:@ForeColor ; width: @Width px; height: @Height px; position: absolute; left: @Left px; top: @Top px;'></div>".RemoveCR().DoubleQuoted();
         }
         public override string GetJsInitFunc()
         {
@@ -180,7 +174,7 @@ namespace ExpressBase.Objects.ReportRelated
     {
         public override string GetDesignHtml()
         {
-            return "<div class='v-line v-line-dropped dropped' eb-type='Vl' id='@id' style='border: 1px solid black; width: @Width px; height: @Height px; position: relative; left: @Left px; top: @Top px;'></div>".RemoveCR().DoubleQuoted();
+            return "<div class='v-line v-line-dropped dropped' eb-type='Vl' id='@id' style='border: 1px solid black;background-color:@BackColor ; color:@ForeColor ; width: @Width px; height: @Height px; position: absolute; left: @Left px; top: @Top px;'></div>".RemoveCR().DoubleQuoted();
         }
         public override string GetJsInitFunc()
         {
@@ -195,9 +189,19 @@ namespace ExpressBase.Objects.ReportRelated
     [EnableInBuilder(BuilderType.Report)]
     public class EbTable : EbReportFieldShape
     {
+        [EnableInBuilder(BuilderType.Report)]
+        public int ColoumNo { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        public int RowNo { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [UIproperty]
+        public string TableRowCol { get; set; }
+
         public override string GetDesignHtml()
         {
-            return "<table class='table table-bordered dropped' eb-type='Table' id='@id' style='border:1px solid black; width: @Width px; height: @Height px; position: relative; left: @Left px; top: @Top px;'><tr><td></td><td></td></tr></table>".RemoveCR().DoubleQuoted();
+            return "<table class='table table-bordered dropped' eb-type='Table' id='@id' style='border:1px solid black;background-color:@BackColor ; color:@ForeColor ; width: @Width px; height: @Height px; position: absolute; left: @Left px; top: @Top px;'> @TableRowCol </table>".RemoveCR().DoubleQuoted();
         }
         public override string GetJsInitFunc()
         {
@@ -206,8 +210,8 @@ namespace ExpressBase.Objects.ReportRelated
         {
     this.Height =100;
     this.Width= 100;
+    this.TableRowCol= '<tr><td></td><td></td></tr><tr><td></td><td></td></tr>';
 };";
         }
     }
-
 }
