@@ -62,9 +62,9 @@ this.Init = function(id)
     this.Controls.Append(new EbObjects.EbTableTd(id + '_Td1'));
     this.Controls.Append(new EbObjects.EbTableTd(id + '_Td2'));
 
-    this.CollEdtProp.push(new EbObjects.EbTableTd(id + '_Td samp0'));
-    this.CollEdtProp.push(new EbObjects.EbTableTd(id + '_Td samp1'));
-    this.CollEdtProp.push(new EbObjects.EbTableTd(id + '_Td samp2'));
+    this.CollEdtProp.push(new EbObjects.EbTableTd(id + '_Tdsamp0'));
+    this.CollEdtProp.push(new EbObjects.EbTableTd(id + '_Tdsamp1'));
+    this.CollEdtProp.push(new EbObjects.EbTableTd(id + '_Tdsamp2'));
 };";
         }
 
