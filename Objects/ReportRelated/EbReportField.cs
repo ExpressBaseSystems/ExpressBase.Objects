@@ -56,15 +56,17 @@ namespace ExpressBase.Objects.ReportRelated
         public int DecimalPlaces { get; set; }        
 
         [EnableInBuilder(BuilderType.Report)]
-        public bool Sum { get; set; }             
+        public bool Sum { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [UIproperty]
+        public string ColVal { get; set; }
+
     }
 
     [EnableInBuilder(BuilderType.Report)]
     public class EbReportCol : EbReportField
-    {
-        [EnableInBuilder(BuilderType.Report)]
-        [UIproperty]
-        public string ColVal { get; set; }
+    {       
 
         public override string GetDesignHtml()
         {
@@ -118,6 +120,46 @@ namespace ExpressBase.Objects.ReportRelated
         {
      this.Height =25;
     this.Width= 200;
+    this.ForeColor = '#201c1c';
+};";
+        }
+    }
+
+    [EnableInBuilder(BuilderType.Report)]
+    public class EbPageNo : EbReportFieldShape
+    {       
+
+        public override string GetDesignHtml()
+        {
+            return "<div class='page-no dropped' eb-type='PageNo' id='@id' style='border:1px solid #aaaaaa;width: @Width px; height: @Height px; background-color:@BackColor ; color:@ForeColor ; position: absolute; left: @Left px; top: @Top px;'> @ColVal </div>".RemoveCR().DoubleQuoted();
+        }
+        public override string GetJsInitFunc()
+        {
+            return @"
+    this.Init = function(id)
+        {
+     this.Height =25;
+    this.Width= 100;
+    this.ForeColor = '#201c1c';
+};";
+        }
+    }
+
+    [EnableInBuilder(BuilderType.Report)]
+    public class EbPageXY : EbReportFieldShape
+    {
+
+        public override string GetDesignHtml()
+        {
+            return "<div class='page-x/y dropped' eb-type='EbPageXY' id='@id' style='border:1px solid #aaaaaa;width: @Width px; height: @Height px; background-color:@BackColor ; color:@ForeColor ; position: absolute; left: @Left px; top: @Top px;'> @ColVal </div>".RemoveCR().DoubleQuoted();
+        }
+        public override string GetJsInitFunc()
+        {
+            return @"
+    this.Init = function(id)
+        {
+     this.Height =25;
+    this.Width= 100;
     this.ForeColor = '#201c1c';
 };";
         }

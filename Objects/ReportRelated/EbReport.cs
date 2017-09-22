@@ -89,9 +89,15 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.Report)]
     public class EbSubSection : EbReportSections
     {
+
+        [EnableInBuilder(BuilderType.Report)]
+        [UIproperty]
+        public string SectionHeight { get; set; }
+
         public override string GetDesignHtml()
         {
-            return "<div class='subdivs droppable' eb-type='SubSection' id='@id' style='width :100%;position: relative; height: @Height %;background-color:@BackColor '></div>".RemoveCR().DoubleQuoted();
+            return "<div class='subdivs droppable' eb-type='SubSection' id ='@id' style='width :100%; height: @SectionHeight ;position: relative; background-color:@BackColor '></div>".RemoveCR().DoubleQuoted();
+
         }       
     }
 }
