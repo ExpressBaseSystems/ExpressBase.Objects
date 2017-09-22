@@ -22,6 +22,8 @@ namespace ExpressBase.Objects
 
         public string JsonToJsObjectFuncs { get; set; }
 
+        public string EbObjectTypes { get; set; }
+
         EbToolbox() { }
 
         public EbToolbox(BuilderType _builderType)
@@ -35,11 +37,12 @@ namespace ExpressBase.Objects
             this.html = _jsResult.ToolBoxHtml;
             this.TypeRegister = _jsResult.TypeRegister;
             this.JsonToJsObjectFuncs = _jsResult.JsonToJsObjectFuncs;
+            this.EbObjectTypes = _jsResult.EbObjectTypes;
         }
 
         public string getHead()
         {
-            return this.AllControlls + this.AllMetas + this.TypeRegister;
+            return this.EbObjectTypes + this.AllControlls + this.AllMetas + this.TypeRegister;
         }
     }
 }
