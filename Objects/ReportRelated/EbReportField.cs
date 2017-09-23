@@ -62,6 +62,14 @@ namespace ExpressBase.Objects.ReportRelated
         [UIproperty]
         public string ColVal { get; set; }
 
+        [EnableInBuilder(BuilderType.Report)]
+        [UIproperty]
+        public int Border { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [UIproperty]
+        [PropertyEditor(PropertyEditorType.Color)]
+        public string BorderColor { get; set; }
     }
 
     [EnableInBuilder(BuilderType.Report)]
@@ -70,7 +78,7 @@ namespace ExpressBase.Objects.ReportRelated
 
         public override string GetDesignHtml()
         {
-            return "<div class='EbCol dropped' $type='@type' eb-type='ReportCol' id='@id' style='border:1px solid #aaaaaa; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;'> @ColVal </div>".RemoveCR().DoubleQuoted();
+            return "<div class='EbCol dropped' $type='@type' eb-type='ReportCol' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;'> @ColVal </div>".RemoveCR().DoubleQuoted();
         }
         public override string GetJsInitFunc()
         {
@@ -80,6 +88,8 @@ namespace ExpressBase.Objects.ReportRelated
     this.Height =25;
     this.Width= 200;
     this.ForeColor = '#201c1c';
+    this.Border = 1;
+    this.BorderColor = '#aaaaaa'
 };";
         }
     }
@@ -111,7 +121,7 @@ namespace ExpressBase.Objects.ReportRelated
 
         public override string GetDesignHtml()
         {
-            return "<div class='date-time dropped' eb-type='DateTime' id='@id' style='border:1px solid #aaaaaa;width: @Width px; height: @Height px; background-color:@BackColor ; color:@ForeColor ; position: absolute; left: @Left px; top: @Top px;'> @CurrentTime </div>".RemoveCR().DoubleQuoted();
+            return "<div class='date-time dropped' eb-type='DateTime' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; height: @Height px; background-color:@BackColor ; color:@ForeColor ; position: absolute; left: @Left px; top: @Top px;'> @CurrentTime </div>".RemoveCR().DoubleQuoted();
         }
         public override string GetJsInitFunc()
         {
@@ -121,6 +131,8 @@ namespace ExpressBase.Objects.ReportRelated
      this.Height =25;
     this.Width= 200;
     this.ForeColor = '#201c1c';
+    this.Border = 1;
+    this.BorderColor = '#aaaaaa'
 };";
         }
     }
@@ -131,7 +143,7 @@ namespace ExpressBase.Objects.ReportRelated
 
         public override string GetDesignHtml()
         {
-            return "<div class='page-no dropped' eb-type='PageNo' id='@id' style='border:1px solid #aaaaaa;width: @Width px; height: @Height px; background-color:@BackColor ; color:@ForeColor ; position: absolute; left: @Left px; top: @Top px;'> @ColVal </div>".RemoveCR().DoubleQuoted();
+            return "<div class='page-no dropped' eb-type='PageNo' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; height: @Height px; background-color:@BackColor ; color:@ForeColor ; position: absolute; left: @Left px; top: @Top px;'> @ColVal </div>".RemoveCR().DoubleQuoted();
         }
         public override string GetJsInitFunc()
         {
@@ -141,6 +153,8 @@ namespace ExpressBase.Objects.ReportRelated
      this.Height =25;
     this.Width= 100;
     this.ForeColor = '#201c1c';
+    this.Border = 1;
+    this.BorderColor = '#aaaaaa'
 };";
         }
     }
@@ -151,7 +165,7 @@ namespace ExpressBase.Objects.ReportRelated
 
         public override string GetDesignHtml()
         {
-            return "<div class='page-x/y dropped' eb-type='EbPageXY' id='@id' style='border:1px solid #aaaaaa;width: @Width px; height: @Height px; background-color:@BackColor ; color:@ForeColor ; position: absolute; left: @Left px; top: @Top px;'> @ColVal </div>".RemoveCR().DoubleQuoted();
+            return "<div class='page-x/y dropped' eb-type='PageXY' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; height: @Height px; background-color:@BackColor ; color:@ForeColor ; position: absolute; left: @Left px; top: @Top px;'> @ColVal </div>".RemoveCR().DoubleQuoted();
         }
         public override string GetJsInitFunc()
         {
@@ -161,6 +175,30 @@ namespace ExpressBase.Objects.ReportRelated
      this.Height =25;
     this.Width= 100;
     this.ForeColor = '#201c1c';
+    this.Border = 1;
+    this.BorderColor = '#aaaaaa'
+};";
+        }
+    }
+
+    [EnableInBuilder(BuilderType.Report)]
+    public class UserName : EbReportFieldShape
+    {
+
+        public override string GetDesignHtml()
+        {
+            return "<div class='User-name dropped' eb-type='UserName' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; height: @Height px; background-color:@BackColor ; color:@ForeColor ; position: absolute; left: @Left px; top: @Top px;'> @ColVal </div>".RemoveCR().DoubleQuoted();
+        }
+        public override string GetJsInitFunc()
+        {
+            return @"
+    this.Init = function(id)
+        {
+     this.Height =25;
+    this.Width= 100;
+    this.ForeColor = '#201c1c';
+    this.Border = 1;
+    this.BorderColor = '#aaaaaa'
 };";
         }
     }
