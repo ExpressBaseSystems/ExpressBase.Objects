@@ -1,5 +1,6 @@
 ﻿using ExpressBase.Common;
 using ExpressBase.Common.Data;
+using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Data;
@@ -55,10 +56,11 @@ namespace ExpressBase.Objects
     public abstract class EbDataVisualization : EbDataVisualizationObject
     {
         [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [OSE_ObjectTypes(EbObjectType.DataSource)]
         public string DataSourceRefId { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
-        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        public string Ebsid { get; set; }
         [JsonIgnore]
         public EbDataSource EbDataSource { get; set; }
 
@@ -232,6 +234,11 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         public string rowGrouping { get; set; }
+
+        public override string GetDesignHtml()
+        {
+            return "<table class='table table-bordered' eb-type='Table' id='@id'</table>".RemoveCR().DoubleQuoted();
+        }
     }
 
     [EnableInBuilder(BuilderType.DVBuilder)]
