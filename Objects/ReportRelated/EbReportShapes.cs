@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ExpressBase.Objects.ReportRelated
 {
-    public abstract class EbReportFieldShape : EbReportField
+    public abstract class EbReportFieldShape : EbReportObject
     {       
     }
 
