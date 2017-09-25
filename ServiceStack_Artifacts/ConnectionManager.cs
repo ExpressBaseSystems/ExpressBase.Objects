@@ -1,13 +1,22 @@
-﻿using ExpressBase.Objects.ServiceStack_Artifacts;
+﻿using ExpressBase.Common.Data;
 
-namespace ExpressBase.Common.Connections
+namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
-    public class GetConnectionsRequest : IEbSSRequest
+    public class GetConnectionsRequest : EbServiceStackRequest
     {
-        public string TenantAccountId { get; set; }
-
-        public int UserId { get; set; }
-
+        
     }
-    
+
+    public class GetConnectionsResponse
+    {
+        public EbSolutionConnections EBSolutionConnections { get; set; }
+        public string Token { get; set; }
+    }
+
+    public class ChangeConnectionRequest : EbServiceStackRequest
+    {
+        public EbSolutionConnections EBSolutionConnections { get; set; }
+        public string Token { get; set; }
+    }
+
 }
