@@ -45,14 +45,5 @@ namespace ExpressBase.Objects.ReportRelated
         [UIproperty]
         [PropertyEditor(PropertyEditorType.Color)]
         public string ForeColor { get; set; }
-
-        //[EnableInBuilder(BuilderType.Report)]
-        //[UIproperty]
-        //public int Border { get; set; }
-
-        //[EnableInBuilder(BuilderType.Report)]
-        //[UIproperty]
-        //[PropertyEditor(PropertyEditorType.Color)]
-        //public string BorderColor { get; set; }
     }
 }
