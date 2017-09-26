@@ -16,7 +16,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class DataVisDataRequest : EbServiceStackRequest, IReturn<DataSourceDataResponse>
     {
         [DataMember(Order = 0)]
-        public string RefId { get; set; }
+        public EbDataVisualization EbDataVisualization { get; set; }
+        //public string RefId { get; set; }
 
         [DataMember(Order = 1)]
         public int Start { get; set; }
@@ -46,7 +47,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class DataVisColumnsRequest : EbServiceStackRequest, IReturn<DataSourceColumnsResponse>
     {
         [DataMember(Order = 1)]
-        public string RefId { get; set; }
+        public EbDataVisualization EbDataVisualization { get; set; }
 
         [DataMember(Order = 2)]
         public string SearchText { get; set; }

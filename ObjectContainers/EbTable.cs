@@ -24,12 +24,18 @@ namespace ExpressBase.Objects
         public List<EbTableTd> CollEdtProp { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        public List<EbDataVisualization> Visualizations { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
-        public List<EbTableTd> ObjectSelectorProp { get; set; }
+        [OSE_ObjectTypes(EbObjectType.DataVisualization, EbObjectType.Report, EbObjectType.MobileForm)]
+        public string ObjectSelectorProp { get; set; }
 
         public EbTableLayout()
         {
             this.Controls = new List<EbControl>();
+            this.Visualizations = new List<EbDataVisualization>();
         }
 
         public override string GetDesignHtml()
@@ -56,9 +62,9 @@ this.Init = function(id)
     this.Controls.Append(new EbObjects.EbTableTd(id + '_Td1'));
     this.Controls.Append(new EbObjects.EbTableTd(id + '_Td2'));
 
-    this.CollEdtProp.push(new EbObjects.EbTableTd(id + '_Td samp0'));
-    this.CollEdtProp.push(new EbObjects.EbTableTd(id + '_Td samp1'));
-    this.CollEdtProp.push(new EbObjects.EbTableTd(id + '_Td samp2'));
+    this.CollEdtProp.push(new EbObjects.EbTableTd(id + '_Tdsamp0'));
+    this.CollEdtProp.push(new EbObjects.EbTableTd(id + '_Tdsamp1'));
+    this.CollEdtProp.push(new EbObjects.EbTableTd(id + '_Tdsamp2'));
 };";
         }
 
@@ -81,7 +87,7 @@ this.Init = function(id)
             <div class='Eb-ctrlContainer' Ctype='TableLayout'>
                 <table class='form-render-table' ><tr>";
 
-            foreach (EbControl ec in base.Controls)
+            foreach (EbControl ec in this.Controls)
                 html += ec.GetHtml();
 
             return html + "</tr></table></div>";
@@ -93,7 +99,10 @@ this.Init = function(id)
     [HideInToolBox]
     public class EbTableTd : EbControlContainer
     {
-        public EbTableTd() { }
+        public EbTableTd()
+        {
+            this.Controls = new List<EbControl>();
+        }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
         [HideInPropertyGrid]
@@ -116,7 +125,7 @@ this.Init = function(id)
         {
             string html = "<td class='form-render-table-Td tdDropable'>";
 
-            foreach (EbControl ec in base.Controls)
+            foreach (EbControl ec in this.Controls)
                 html += ec.GetHtml();
 
             return html + "</td>";
