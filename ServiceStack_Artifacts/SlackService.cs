@@ -81,9 +81,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Text { get; set; }
 
         [DataMember(Order = 3)]
-        public string Content { get; set; }
-
-        [DataMember(Order = 4)]
         public SlackFile SlackFile { get; set; }
     }
 

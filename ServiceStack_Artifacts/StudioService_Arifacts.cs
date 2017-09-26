@@ -9,17 +9,11 @@ using System.Threading.Tasks;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
-    public class EbObjectRelationsRequest : IReturn<EbObjectRelationsResponse>, IEbSSRequest
+    public class EbObjectRelationsRequest : EbServiceStackRequest, IReturn<EbObjectRelationsResponse>
     {
         public string DominantId { get; set; }
 
         public int EbObjectType { get; set; }
-
-        public string Token { get; set; }
-
-        public string TenantAccountId { get; set; }
-
-        public int UserId { get; set; }
     }
 
     public class EbObjectRelationsResponse : IEbSSResponse
@@ -34,16 +28,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-    public class EbObjectAllVersionsRequest : IReturn<EbObjectAllVersionsResponse>, IEbSSRequest
+    public class EbObjectAllVersionsRequest : EbServiceStackRequest, IReturn<EbObjectAllVersionsResponse>
     {
         public string RefId { get; set; }
-
-        public string Token { get; set; }
-
-        public string TenantAccountId { get; set; }
-
-        public int UserId { get; set; }
-
     }
 
     public class EbObjectAllVersionsResponse : IEbSSResponse
@@ -58,16 +45,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-    public class EbObjectParticularVersionRequest : IReturn<EbObjectParticularVersionResponse>, IEbSSRequest
+    public class EbObjectParticularVersionRequest : EbServiceStackRequest, IReturn<EbObjectParticularVersionResponse>
     {
         public string RefId { get; set; }
-
-        public string Token { get; set; }
-
-        public string TenantAccountId { get; set; }
-
-        public int UserId { get; set; }
-
     }
 
     public class EbObjectParticularVersionResponse : IEbSSResponse
@@ -82,16 +62,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-    public class EbObjectNonCommitedVersionRequest : IReturn<EbObjectNonCommitedVersionResponse>, IEbSSRequest
+    public class EbObjectNonCommitedVersionRequest : EbServiceStackRequest, IReturn<EbObjectNonCommitedVersionResponse>
     {
         public string RefId { get; set; }
-
-        public string Token { get; set; }
-
-        public string TenantAccountId { get; set; }
-
-        public int UserId { get; set; }
-
     }
 
     public class EbObjectNonCommitedVersionResponse : IEbSSResponse
@@ -106,16 +79,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-    public class EbObjectLatestCommitedRequest : IReturn<EbObjectLatestCommitedResponse>, IEbSSRequest
+    public class EbObjectLatestCommitedRequest : EbServiceStackRequest, IReturn<EbObjectLatestCommitedResponse>
     {
         public string RefId { get; set; }
-
-        public string Token { get; set; }
-
-        public string TenantAccountId { get; set; }
-
-        public int UserId { get; set; }
-
     }
 
     public class EbObjectLatestCommitedResponse : IEbSSResponse
@@ -130,16 +96,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-    public class EbObjectObjListRequest : IReturn<EbObjectObjListResponse>, IEbSSRequest
+    public class EbObjectObjListRequest : EbServiceStackRequest, IReturn<EbObjectObjListResponse>
     {
         public int EbObjectType { get; set; }
-
-        public string Token { get; set; }
-
-        public string TenantAccountId { get; set; }
-
-        public int UserId { get; set; }
-
     }
 
     public class EbObjectObjListResponse : IEbSSResponse
@@ -154,16 +113,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-    public class EbObjectObjLisAllVerRequest : IReturn<EbObjectObjListAllVerResponse>, IEbSSRequest
+    public class EbObjectObjLisAllVerRequest : EbServiceStackRequest, IReturn<EbObjectObjListAllVerResponse>
     {
         public int EbObjectType { get; set; }
-
-        public string Token { get; set; }
-
-        public string TenantAccountId { get; set; }
-
-        public int UserId { get; set; }
-
     }
 
     public class EbObjectObjListAllVerResponse : IEbSSResponse
@@ -178,8 +130,43 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
+    public class EbObjectListRequest : EbServiceStackRequest, IReturn<EbObjectListResponse>
+    {
+        public int EbObjectType { get; set; }
+    }
+
+    public class EbObjectListResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public List<EbObjectWrapper> Data { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 3)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    public class EbObjectExploreObjectRequest : EbServiceStackRequest, IReturn<EbObjectExploreObjectResponse>
+    {
+        public int Id { get; set; }
+    }
+
+    public class EbObjectExploreObjectResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public List<EbObjectWrapper> Data { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 3)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+
     [Route("/ebo", "POST")]
-    public class EbObjectSaveOrCommitRequest : IReturn<EbObjectSaveOrCommitResponse>, IEbSSRequest
+    public class EbObjectSaveOrCommitRequest : EbServiceStackRequest, IReturn<EbObjectSaveOrCommitResponse>
     {
         public bool IsSave { get; set; } // If (IsSave == true) Save else Commit
 
@@ -202,12 +189,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string ChangeLog { get; set; }
 
         public string Relations { get; set; }
-
-        public string Token { get; set; }
-
-        public string TenantAccountId { get; set; }
-
-        public int UserId { get; set; }
     }
 
     [DataContract]
@@ -226,7 +207,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string RefId { get; set; }
     }
 
-    public class EbObjectFirstCommitRequest : IReturn<EbObjectFirstCommitResponse>, IEbSSRequest
+    public class EbObjectFirstCommitRequest : EbServiceStackRequest, IReturn<EbObjectFirstCommitResponse>
     {
         public string Name { get; set; }
 
@@ -239,12 +220,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Json { get; set; }
 
         public string Relations { get; set; }
-
-        public string Token { get; set; }
-
-        public string TenantAccountId { get; set; }
-
-        public int UserId { get; set; }
     }
 
     [DataContract]
@@ -263,7 +238,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string RefId { get; set; }        
     }
 
-    public class EbObjectSubsequentCommitRequest : IReturn<EbObjectSubsequentCommitResponse>, IEbSSRequest
+    public class EbObjectSubsequentCommitRequest : EbServiceStackRequest, IReturn<EbObjectSubsequentCommitResponse>
     {
         public string RefId { get; set; } // (Id == 0) First Commit else Subsequent Commit
 
@@ -282,12 +257,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Relations { get; set; }
 
         public bool IsSave { get; set; } // If (IsSave == true) Save else Commit
-
-        public string Token { get; set; }
-
-        public string TenantAccountId { get; set; }
-
-        public int UserId { get; set; }
     }
 
     [DataContract]
@@ -306,7 +275,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string RefId { get; set; }        
     }
 
-    public class EbObject_CommitRequest : IReturn<EbObject_CommitResponse>, IEbSSRequest
+    public class EbObject_CommitRequest : EbServiceStackRequest, IReturn<EbObject_CommitResponse>
     {
         public string RefId { get; set; } // (Id == 0) First Commit else Subsequent Commit
 
@@ -321,12 +290,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string ChangeLog { get; set; }
 
         public string Relations { get; set; }
-
-        public string Token { get; set; }
-
-        public string TenantAccountId { get; set; }
-
-        public int UserId { get; set; }
     }
 
     [DataContract]
@@ -345,7 +308,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string RefId { get; set; }
     }
 
-    public class EbObject_SaveRequest : IReturn<EbObject_SaveResponse>, IEbSSRequest
+    public class EbObject_SaveRequest : EbServiceStackRequest, IReturn<EbObject_SaveResponse>
     {
         public string RefId { get; set; } // (Id == 0) First Commit else Subsequent Commit
 
@@ -358,12 +321,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Json { get; set; }
 
         public string Relations { get; set; }
-
-        public string Token { get; set; }
-
-        public string TenantAccountId { get; set; }
-
-        public int UserId { get; set; }
     }
 
     [DataContract]
@@ -382,19 +339,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string RefId { get; set; }
     }
 
-    public class EbObject_Create_Major_VersionRequest : IReturn<EbObject_Create_Major_VersionResponse>, IEbSSRequest
+    public class EbObject_Create_Major_VersionRequest : EbServiceStackRequest, IReturn<EbObject_Create_Major_VersionResponse>
     {
         public string RefId { get; set; } // (Id == 0) First Commit else Subsequent Commit
 
         public int EbObjectType { get; set; }
 
         public string Relations { get; set; }
-        
-        public string Token { get; set; }
-
-        public string TenantAccountId { get; set; }
-
-        public int UserId { get; set; }
     }
 
     [DataContract]
@@ -413,19 +364,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string RefId { get; set; }
     }
 
-    public class EbObject_Create_Minor_VersionRequest : IReturn<EbObject_Create_Minor_VersionResponse>, IEbSSRequest
+    public class EbObject_Create_Minor_VersionRequest : EbServiceStackRequest, IReturn<EbObject_Create_Minor_VersionResponse>
     {
         public string RefId { get; set; } // (Id == 0) First Commit else Subsequent Commit
 
         public int EbObjectType { get; set; }
 
         public string Relations { get; set; }
-
-        public string Token { get; set; }
-
-        public string TenantAccountId { get; set; }
-
-        public int UserId { get; set; }
     }
 
     [DataContract]
@@ -445,7 +390,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
 
-    public class EbObject_Create_New_ObjectRequest : IReturn<EbObject_Create_New_ObjectResponse>, IEbSSRequest
+    public class EbObject_Create_New_ObjectRequest : EbServiceStackRequest, IReturn<EbObject_Create_New_ObjectResponse>
     {
         public string RefId { get; set; } // (Id == 0) First Commit else Subsequent Commit
 
@@ -461,11 +406,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public string Relations { get; set; }
 
-        public string Token { get; set; }
-
-        public string TenantAccountId { get; set; }
-
-        public int UserId { get; set; }
+        public bool IsSave { get; set; }
     }
 
     [DataContract]
@@ -484,19 +425,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string RefId { get; set; }
     }
 
-    public class EbObject_Create_Patch_VersionRequest : IReturn<EbObject_Create_Patch_VersionResponse>, IEbSSRequest
+    public class EbObject_Create_Patch_VersionRequest : EbServiceStackRequest, IReturn<EbObject_Create_Patch_VersionResponse>
     {
         public string RefId { get; set; } // (Id == 0) First Commit else Subsequent Commit
 
         public int EbObjectType { get; set; }
 
         public string Relations { get; set; }
-        
-        public string Token { get; set; }
-
-        public string TenantAccountId { get; set; }
-
-        public int UserId { get; set; }
     }
 
     [DataContract]
@@ -515,15 +450,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string RefId { get; set; }
     }
 
-    public class EbObjectRunSqlFunctionRequest : IReturn<EbObjectRunSqlFunctionResponse>, IEbSSRequest
+    public class EbObjectRunSqlFunctionRequest : EbServiceStackRequest, IReturn<EbObjectRunSqlFunctionResponse>
     {
         public string Json { get; set; }
-
-        public string Token { get; set; }
-
-        public string TenantAccountId { get; set; }
-
-        public int UserId { get; set; }
     }
 
         [DataContract]
@@ -564,7 +493,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Status { get; set; }
 
         [DataMember(Order = 7)]
-        public int VersionNumber { get; set; }
+        public string VersionNumber { get; set; }
 
         [DataMember(Order = 8)]
         public string ChangeLog { get; set; }
@@ -580,6 +509,27 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 12)]
         public string RefId { get; set; }
+
+        [DataMember(Order = 13)]
+        public bool WorkingMode { get; set; }
+
+        [DataMember(Order = 14)]
+        public string Json_wc { get; set; }
+
+        [DataMember(Order = 15)]
+        public string Json_lc { get; set; }
+
+        [DataMember(Order =16)]
+        public string[] Wc_All { get; set; }
+
+        [DataMember(Order =17)]
+        public int MajorVersionNumber { get; set; }
+
+        [DataMember(Order = 18)]
+        public int MinorVersionNumber { get; set; }
+
+        [DataMember(Order = 19)]
+        public int PatchVersionNumber { get; set; }
 
         public EbObjectWrapper() { }
     }
