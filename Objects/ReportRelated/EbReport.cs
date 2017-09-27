@@ -25,6 +25,12 @@ namespace ExpressBase.Objects
 
         //public EbReportMargins Margins { get; set; }
         [EnableInBuilder(BuilderType.Report)]
+        public string ReportName { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        public string Description { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
         public bool IsLandscape { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
@@ -45,7 +51,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]
-        public EbReportDetail Details { get; set; }
+        public EbReportDetail Detail { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
@@ -60,7 +66,7 @@ namespace ExpressBase.Objects
 
             this.PageHeaders = new List<EbPageHeader>();
 
-            this.Details = new EbReportDetail();
+            this.Detail = new EbReportDetail();
 
             this.PageFooters = new List<EbPageFooter>();
 
@@ -73,7 +79,8 @@ namespace ExpressBase.Objects
         [UIproperty]
         public string SectionHeight { get; set; }
 
-        public List<EbReportObject> Fields { get; set; }
+        [EnableInBuilder(BuilderType.Report)]
+        public List<EbReportSection> Fields { get; set; }
     }
 
     [EnableInBuilder(BuilderType.Report)]

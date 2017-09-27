@@ -30,7 +30,8 @@ namespace ExpressBase.Objects
 
     public class EbDataVisualizationObject : EbObject
     {
-
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public override string Name { get => base.Name; set => base.Name = value; }
     }
 
     [EnableInBuilder(BuilderType.DVBuilder)]
@@ -55,15 +56,17 @@ namespace ExpressBase.Objects
     
     public abstract class EbDataVisualization : EbDataVisualizationObject
     {
+        
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectType.DataSource)]
         public string DataSourceRefId { get; set; }
 
-        public string Ebsid { get; set; }
+        public string EbSid { get; set; }
         [JsonIgnore]
         public EbDataSource EbDataSource { get; set; }
 
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrcPG)]
         [EnableInBuilder(BuilderType.DVBuilder)]
         public DVColumnCollection Columns { get; set; }
 
@@ -233,6 +236,7 @@ namespace ExpressBase.Objects
         public string IsPaged { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc)]
         public string rowGrouping { get; set; }
 
         public override string GetDesignHtml()
