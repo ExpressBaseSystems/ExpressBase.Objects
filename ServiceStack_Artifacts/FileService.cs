@@ -1,34 +1,56 @@
 ﻿using MongoDB.Bson;
+using MongoDB.Driver.GridFS;
+using ServiceStack;
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Runtime.Serialization;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
-    public class UploadFileRequest : IEbSSRequest
+    [DataContract]
+    public class FileInfo
     {
-        public string FileName { get; set; }
 
-        public byte[] ByteArray { get; set; }
+        [DataMember(Order = 1)]
+        public string ObjectId { get; set; }
 
+        [DataMember(Order = 2)]
         public BsonDocument MetaData { get; set; }
 
-        public string TenantAccountId { get; set; }
-
-        public int UserId { get; set; }
     }
 
-    public class UploadFileMqRequest : IEbSSRequest
+    [DataContract]
+    public class UploadFileRequest : EbServiceStackRequest
     {
+
+        [DataMember(Order = 1)]
         public string FileName { get; set; }
 
+        [DataMember(Order = 2)]
         public byte[] ByteArray { get; set; }
 
+        [DataMember(Order = 3)]
         public BsonDocument MetaData { get; set; }
 
-        public string TenantAccountId { get; set; }
+        [DataMember(Order = 4)]
+        public bool IsAsync { get; set; }
 
-        public int UserId { get; set; }
+        [DataMember(Order = 4)]
+        public IDictionary<String, String> metaDataPair { get; set; }
+    }
+
+    [DataContract]
+    public class UploadFileMqRequest : EbServiceStackRequest
+    {
+        [DataMember(Order = 1)]
+        public string FileName { get; set; }
+
+        [DataMember(Order = 2)]
+        public byte[] ByteArray { get; set; }
+
+        [DataMember(Order = 3)]
+        public BsonDocument MetaData { get; set; }
+
     }
 
     public class UploadFileControllerResponse
@@ -41,12 +63,26 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Uploaded { get; set; }
     }
 
-    public class DownloadFileRequest : IEbSSRequest
+    [DataContract]
+    public class DownloadFileRequest : EbServiceStackRequest
     {
+        [DataMember(Order = 1)]
         public string ObjectId { get; set; }
-        
-        public string TenantAccountId { get; set; }
 
-        public int UserId { get; set; }
+    }
+
+    [DataContract]
+    public class FindFilesByTagRequest : EbServiceStackRequest, IReturn<FindFilesByTagResponse>
+    {
+        [DataMember(Order = 1)]
+        public KeyValuePair<string, string> Filter { get; set; }
+
+    }
+   
+    [DataContract]
+    public class FindFilesByTagResponse
+    {
+        [DataMember(Order = 1)]
+        public List<FileInfo> FileList { get; set; }
     }
 }
