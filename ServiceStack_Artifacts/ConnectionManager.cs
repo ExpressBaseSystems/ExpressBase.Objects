@@ -4,7 +4,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
     public class GetConnectionsRequest : EbServiceStackRequest
     {
-        
+
     }
 
     public class GetConnectionsResponse
