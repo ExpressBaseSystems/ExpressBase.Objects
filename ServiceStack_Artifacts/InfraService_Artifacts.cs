@@ -69,7 +69,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     [DataContract]
     [Route("/unc", "POST")]
-    public class UnRequest : IReturn<bool>,IEbSSRequest
+    public class UnRequest : IReturn<bool>, IEbSSRequest
     {
         [DataMember(Order = 0)]
         public Dictionary<string, object> Colvalues { get; set; }
@@ -83,7 +83,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class DbCheckRequest : IReturn<bool>,IEbSSRequest
+    public class DbCheckRequest : IReturn<bool>, IEbSSRequest
     {
         [DataMember(Order = 0)]
         public Dictionary<string, object> DBColvalues { get; set; }
@@ -140,7 +140,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     }
 
-    [DataContract]  
+    [DataContract]
     public class TokenRequiredSelectRequest : IReturn<TokenRequiredSelectResponse>, IEbSSRequest
     {
         [DataMember(Order = 0)]
@@ -159,7 +159,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int id { get; set; }
 
         [DataMember(Order = 5)]
-        public Dictionary<string,object> Colvalues { get; set; }
+        public Dictionary<string, object> Colvalues { get; set; }
 
         public string TenantAccountId { get; set; }
 
@@ -167,7 +167,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class TokenRequiredSelectResponse: IEbSSResponse
+    public class TokenRequiredSelectResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
         public List<List<object>> returnlist { get; set; }
