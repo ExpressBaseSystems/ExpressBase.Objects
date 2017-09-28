@@ -74,18 +74,20 @@ namespace ExpressBase.Objects
         }
     }
     public class EbReportSection : EbReportObject
-    {
+    {        
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
         public string SectionHeight { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
-        public List<EbReportSection> Fields { get; set; }
+        public List<EbReportFields> Fields { get; set; }
+
     }
 
     [EnableInBuilder(BuilderType.Report)]
     public class EbReportHeader : EbReportSection
     {
+
         public override string GetDesignHtml()
         {
             return "<div class='pageHeaders' eb-type='ReportHeader' id='@id' data_val='0' style='width :100%;position: relative'> </div>".RemoveCR().DoubleQuoted();

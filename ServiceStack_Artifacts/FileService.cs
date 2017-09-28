@@ -56,6 +56,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class UploadFileControllerResponse
     {
         public string Uploaded { get; set; }
+       public string initialPreview { get; set; }
+        public string objId { get; set; }
     }
 
     public class UploadFileControllerError
