@@ -1,4 +1,6 @@
-﻿using ExpressBase.Objects.ObjectContainers;
+﻿using ExpressBase.Common.Objects;
+using ExpressBase.Common.Objects.Attributes;
+using ExpressBase.Objects.ObjectContainers;
 using Newtonsoft.Json;
 using ServiceStack.Redis;
 using System;
@@ -9,13 +11,25 @@ using System.Threading.Tasks;
 
 namespace ExpressBase.Objects
 {
-    [ProtoBuf.ProtoContract]
-    public class EbDataSource : EbObject
+    [EnableInBuilder(BuilderType.DataSource)]
+    public class EbDatasourceMain : EbObject{
+
+        [EnableInBuilder(BuilderType.DataSource)]
+        new public string Name { get; set; }
+
+        [EnableInBuilder(BuilderType.DataSource)]
+        public string Description { get; set; }
+    }
+
+    [EnableInBuilder(BuilderType.DataSource)]
+    public class EbDataSource : EbDatasourceMain
     {
         [ProtoBuf.ProtoMember(1)]
         public string Sql { get; set; }
 
-        [ProtoBuf.ProtoMember(2)]
+        [EnableInBuilder(BuilderType.DataSource)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [OSE_ObjectTypes(EbObjectType.FilterDialog)]
         public string FilterDialogRefId { get; set; }
 
         [JsonIgnore]

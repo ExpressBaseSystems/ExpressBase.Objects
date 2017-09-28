@@ -24,6 +24,14 @@ namespace ExpressBase.Objects
         public List<EbTableTd> CollEdtProp { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc)]
+        public List<EbTableTd> CollFrmSrc { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrcPG)]
+        public List<EbTableTd> ColumnsR { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
         [PropertyEditor(PropertyEditorType.Collection)]
         public List<EbDataVisualization> Visualizations { get; set; }
 
