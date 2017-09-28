@@ -12,6 +12,7 @@ namespace ExpressBase.Objects.ReportRelated
         new public string Name { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
+        [UIproperty]
         public string Title { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
