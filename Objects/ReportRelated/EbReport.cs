@@ -18,10 +18,26 @@ namespace ExpressBase.Objects
         ReportFooter,
     }
 
+    public enum PaperSize
+    {
+        A5,
+        A4,
+        A3,
+        A2,
+        Custom
+    }
+
     [EnableInBuilder(BuilderType.Report)]
     public class EbReport : EbReportObject
     {
-        //public EbReportPaperSize PaperSize { get; set; }
+        [EnableInBuilder(BuilderType.Report)]
+        public PaperSize PaperSize { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        public decimal CustomPaperHeight { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        public decimal CustomPaperWidth { get; set; }
 
         //public EbReportMargins Margins { get; set; }
         [EnableInBuilder(BuilderType.Report)]

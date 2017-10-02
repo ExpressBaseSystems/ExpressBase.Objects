@@ -180,8 +180,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public string Description { get; set; }
 
-        public byte[] Bytea { get; set; }
-
         public string Json { get; set; }
 
         public ObjectLifeCycleStatus Status { get; set; }
