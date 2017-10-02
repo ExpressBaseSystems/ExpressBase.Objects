@@ -17,7 +17,7 @@ namespace ExpressBase.Objects.ReportRelated
 
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
-        public int Left { get; set; }
+        public decimal Left { get; set; }
 
         [UIproperty]
         [EnableInBuilder(BuilderType.Report)]
@@ -25,17 +25,17 @@ namespace ExpressBase.Objects.ReportRelated
 
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
-        public int Top { get; set; }
+        public decimal Top { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
         public int Height { get; set; }
 
-        [EnableInBuilder(BuilderType.Report)]
-        public HorizontalAlignment HAlign { get; set; }
+        //[EnableInBuilder(BuilderType.Report)]
+        //public HorizontalAlignment HAlign { get; set; }
 
-        [EnableInBuilder(BuilderType.Report)]
-        public VerticalAlignment VAlign { get; set; }
+        //[EnableInBuilder(BuilderType.Report)]
+        //public VerticalAlignment VAlign { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]

@@ -18,10 +18,26 @@ namespace ExpressBase.Objects
         ReportFooter,
     }
 
+    public enum PaperSize
+    {
+        A5,
+        A4,
+        A3,
+        A2,
+        Custom
+    }
+
     [EnableInBuilder(BuilderType.Report)]
     public class EbReport : EbReportObject
     {
-        //public EbReportPaperSize PaperSize { get; set; }
+        [EnableInBuilder(BuilderType.Report)]
+        public PaperSize PaperSize { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        public decimal CustomPaperHeight { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        public decimal CustomPaperWidth { get; set; }
 
         //public EbReportMargins Margins { get; set; }
         [EnableInBuilder(BuilderType.Report)]
@@ -74,18 +90,20 @@ namespace ExpressBase.Objects
         }
     }
     public class EbReportSection : EbReportObject
-    {
+    {        
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
         public string SectionHeight { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
-        public List<EbReportSection> Fields { get; set; }
+        public List<EbReportFields> Fields { get; set; }
+
     }
 
     [EnableInBuilder(BuilderType.Report)]
     public class EbReportHeader : EbReportSection
     {
+
         public override string GetDesignHtml()
         {
             return "<div class='pageHeaders' eb-type='ReportHeader' id='@id' data_val='0' style='width :100%;position: relative'> </div>".RemoveCR().DoubleQuoted();
