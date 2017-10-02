@@ -36,7 +36,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public bool IsAsync { get; set; }
 
         [DataMember(Order = 5)]
-        public IDictionary<String, String> metaDataPair { get; set; }
+        public IDictionary<String, String> MetaDataPair { get; set; }
     }
 
     [DataContract]
@@ -52,7 +52,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public BsonDocument MetaData { get; set; }
 
         [DataMember(Order = 4)]
-        public IDictionary<String, String> metaDataPair { get; set; }
+        public IDictionary<String, String> MetaDataPair { get; set; }
 
     }
 
@@ -107,7 +107,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public byte[] ImageByte { get; set; }
 
         [DataMember(Order = 5)]
-        public IDictionary<String, String> metaDataPair { get; set; }
+        public IDictionary<String, String> MetaDataPair { get; set; }
 
     }
 }
