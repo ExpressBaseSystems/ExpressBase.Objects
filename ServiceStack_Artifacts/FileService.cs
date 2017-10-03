@@ -8,7 +8,7 @@ using System.Runtime.Serialization;
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
     [DataContract]
-    public class FileInfo
+    public class FilesInfo
     {
 
         [DataMember(Order = 1)]
@@ -35,8 +35,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 4)]
         public bool IsAsync { get; set; }
 
-        [DataMember(Order = 4)]
-        public IDictionary<String, String> metaDataPair { get; set; }
+        [DataMember(Order = 5)]
+        public IDictionary<String, String> MetaDataPair { get; set; }
     }
 
     [DataContract]
@@ -51,11 +51,16 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 3)]
         public BsonDocument MetaData { get; set; }
 
+        [DataMember(Order = 4)]
+        public IDictionary<String, String> MetaDataPair { get; set; }
+
     }
 
     public class UploadFileControllerResponse
     {
         public string Uploaded { get; set; }
+       public string initialPreview { get; set; }
+        public string objId { get; set; }
     }
 
     public class UploadFileControllerError
@@ -83,6 +88,26 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class FindFilesByTagResponse
     {
         [DataMember(Order = 1)]
-        public List<FileInfo> FileList { get; set; }
+        public List<FilesInfo> FileList { get; set; }
+    }
+
+    [DataContract]
+    public class ImageResizeMqRequest : EbServiceStackRequest
+    {
+        [DataMember(Order = 1)]
+        public string ObjectId { get; set; }
+
+        [DataMember(Order = 2)]
+        public string FileName { get; set; }
+
+        [DataMember(Order = 3)]
+        public BsonDocument MetaData { get; set; }
+
+        [DataMember(Order = 4)]
+        public byte[] ImageByte { get; set; }
+
+        [DataMember(Order = 5)]
+        public IDictionary<String, String> MetaDataPair { get; set; }
+
     }
 }
