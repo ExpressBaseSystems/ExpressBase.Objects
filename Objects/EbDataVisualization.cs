@@ -249,14 +249,14 @@ namespace ExpressBase.Objects
     public class EbChartVisualization : EbDataVisualization
     {
         [HideInPropertyGrid]
-        //[EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilder)]
         public List<axis> Xaxis { get; set; }
         [HideInPropertyGrid]
-        //[EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilder)]
         public List<axis> Yaxis { get; set; }
 
         [HideInPropertyGrid]
-        //[EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilder)]
         public string type { get; set; }
     }
 
