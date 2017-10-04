@@ -8,16 +8,8 @@ using System.Threading.Tasks;
 
 namespace ExpressBase.Objects.ReportRelated
 {
-    public abstract class EbReportFieldShape : EbReportObject
-    {
-        [EnableInBuilder(BuilderType.Report)]
-        [UIproperty]
-        public int Border { get; set; }
-
-        [EnableInBuilder(BuilderType.Report)]
-        [UIproperty]
-        [PropertyEditor(PropertyEditorType.Color)]
-        public string BorderColor { get; set; }
+    public abstract class EbReportFieldShape : EbReportFields
+    {        
     }
 
     [EnableInBuilder(BuilderType.Report)]

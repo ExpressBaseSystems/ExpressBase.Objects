@@ -13,11 +13,13 @@ namespace ExpressBase.Objects.ReportRelated
     {
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
+        [PropertyGroup("Appearance")]
         public int Border { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
         [PropertyEditor(PropertyEditorType.Color)]
+        [PropertyGroup("Appearance")]
         public string BorderColor { get; set; }
     }
 
