@@ -46,10 +46,12 @@ else {
 
         [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("General")]
+        [UIproperty]
         public decimal CustomPaperHeight { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("General")]
+        [UIproperty]
         public decimal CustomPaperWidth { get; set; }
 
         //public EbReportMargins Margins { get; set; }
@@ -103,17 +105,7 @@ else {
             this.PageFooters = new List<EbPageFooter>();
 
             this.ReportFooters = new List<EbReportFooter>();
-        }
-
-        //public override string GetHtml()
-        //{
-        //    string html = string.Empty;
-
-        //    foreach (EbReportObject c in this.Controls)
-        //        html += c.GetHtml();
-
-        //    return html;
-        //}
+        }        
     }
     public class EbReportSection : EbReportObject
     {        

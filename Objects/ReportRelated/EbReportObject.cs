@@ -53,8 +53,6 @@ namespace ExpressBase.Objects.ReportRelated
         [UIproperty]
         [PropertyEditor(PropertyEditorType.Color)]
         [PropertyGroup("Appearance")]
-        public string ForeColor { get; set; }
-
-        public virtual string GetHtml() { return string.Empty; }
+        public string ForeColor { get; set; }        
     }
 }
