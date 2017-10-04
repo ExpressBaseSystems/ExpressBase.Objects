@@ -236,12 +236,17 @@ namespace ExpressBase.Objects
         public string IsPaged { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
-        [PropertyEditor(PropertyEditorType.CollectionFrmSrc)]
-        public string rowGrouping { get; set; }
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
+        public List<DVBaseColumn> rowGrouping { get; set; }
 
         public override string GetDesignHtml()
         {
             return "<table class='table table-bordered' eb-type='Table' id='@id'</table>".RemoveCR().DoubleQuoted();
+        }
+
+        public EbTableVisualization()
+        {
+            this.rowGrouping = new List<DVBaseColumn>();
         }
     }
 
