@@ -1,4 +1,5 @@
-﻿using ExpressBase.Common.Objects;
+﻿using ExpressBase.Common.JsonConverters;
+using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Objects.ObjectContainers;
 using Newtonsoft.Json;
@@ -11,11 +12,8 @@ using System.Threading.Tasks;
 
 namespace ExpressBase.Objects
 {
-    [EnableInBuilder(BuilderType.DataSource)]
+   
     public class EbDatasourceMain : EbObject{
-
-        [EnableInBuilder(BuilderType.DataSource)]
-        new public string Name { get; set; }
 
         [EnableInBuilder(BuilderType.DataSource)]
         public string Description { get; set; }
@@ -24,7 +22,9 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.DataSource)]
     public class EbDataSource : EbDatasourceMain
     {
-        [ProtoBuf.ProtoMember(1)]
+        [EnableInBuilder(BuilderType.DataSource)]
+        [HideInPropertyGrid]
+        [JsonConverter(typeof(Base64Converter))]
         public string Sql { get; set; }
 
         [EnableInBuilder(BuilderType.DataSource)]

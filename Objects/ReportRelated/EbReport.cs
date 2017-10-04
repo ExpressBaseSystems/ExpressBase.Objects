@@ -31,22 +31,38 @@ namespace ExpressBase.Objects
     public class EbReport : EbReportObject
     {
         [EnableInBuilder(BuilderType.Report)]
+        [OnChangeExec(@"
+if (this.PaperSize === 'Custom' ){  
+     pg.ShowProperty('CustomPaperHeight');
+     pg.ShowProperty('CustomPaperWidth');
+}
+else {
+     pg.HideProperty('CustomPaperHeight');
+     pg.HideProperty('CustomPaperWidth');
+}
+            ")]
+        [PropertyGroup("General")]
         public PaperSize PaperSize { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup("General")]
         public decimal CustomPaperHeight { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup("General")]
         public decimal CustomPaperWidth { get; set; }
 
         //public EbReportMargins Margins { get; set; }
         [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup("General")]
         public string ReportName { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup("General")]
         public string Description { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup("General")]
         public bool IsLandscape { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
@@ -88,6 +104,16 @@ namespace ExpressBase.Objects
 
             this.ReportFooters = new List<EbReportFooter>();
         }
+
+        //public override string GetHtml()
+        //{
+        //    string html = string.Empty;
+
+        //    foreach (EbReportObject c in this.Controls)
+        //        html += c.GetHtml();
+
+        //    return html;
+        //}
     }
     public class EbReportSection : EbReportObject
     {        
