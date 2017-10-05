@@ -124,7 +124,7 @@ else {
 
         public override string GetDesignHtml()
         {
-            return "<div class='pageHeaders' eb-type='ReportHeader' id='@id' data_val='0' style='width :100%;position: relative'> </div>".RemoveCR().DoubleQuoted();
+            return "<div class='pageHeaders' eb-type='ReportHeader' tabindex='1' id='@id' data_val='0' style='width :100%;height: @SectionHeight ; background-color:@BackColor ;position: relative'> </div>".RemoveCR().DoubleQuoted();
         }
     }
 
@@ -133,7 +133,7 @@ else {
     {
         public override string GetDesignHtml()
         {
-            return "<div class='pageHeaders' eb-type='PageHeader' id='@id' data_val='1' style='width :100%;position: relative'> </div>".RemoveCR().DoubleQuoted();
+            return "<div class='pageHeaders' eb-type='PageHeader' tabindex='1' id='@id' data_val='1' style='width :100%;height: @SectionHeight ; background-color:@BackColor ;position: relative'> </div>".RemoveCR().DoubleQuoted();
         }
     }
 
@@ -142,7 +142,7 @@ else {
     {
         public override string GetDesignHtml()
         {
-            return "<div class='pageHeaders' eb-type='ReportDetail' id='@id' data_val='2' style='width :100%;position: relative'> </div>".RemoveCR().DoubleQuoted();
+            return "<div class='pageHeaders' eb-type='ReportDetail' tabindex='1' id='@id' data_val='2' style='width :100%;height: @SectionHeight ; background-color:@BackColor ;position: relative'> </div>".RemoveCR().DoubleQuoted();
         }
     }
 
@@ -151,7 +151,7 @@ else {
     {
         public override string GetDesignHtml()
         {
-            return "<div class='pageHeaders' eb-type='PageFooter' id='@id' data_val='3' style='width :100%;position: relative'> </div>".RemoveCR().DoubleQuoted();
+            return "<div class='pageHeaders' eb-type='PageFooter' tabindex='1' id='@id' data_val='3' style='width :100%;height: @SectionHeight ; background-color:@BackColor ;position: relative'> </div>".RemoveCR().DoubleQuoted();
         }
     }
 
@@ -160,7 +160,7 @@ else {
     {
         public override string GetDesignHtml()
         {
-            return "<div class='pageHeaders' eb-type='ReportFooter' id='@id' data_val='4' style='width :100%;position: relative'> </div>".RemoveCR().DoubleQuoted();
+            return "<div class='pageHeaders' eb-type='ReportFooter' tabindex='1' id='@id' data_val='4' style='width :100%;height: @SectionHeight ; background-color:@BackColor ;position: relative'> </div>".RemoveCR().DoubleQuoted();
         }
     }
 }
