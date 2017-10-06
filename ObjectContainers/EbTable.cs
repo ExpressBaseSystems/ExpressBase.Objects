@@ -20,27 +20,38 @@ namespace ExpressBase.Objects
         public override List<EbControl> Controls { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        [PropertyEditor(PropertyEditorType.Expandable)]
+        [PropertyGroup("Test")]
+        public Position Position { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
         [PropertyEditor(PropertyEditorType.Collection)]
+        [PropertyGroup("Test")]
         public List<EbTableTd> CollEdtProp { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc)]
+        [PropertyGroup("Test")]
         public List<EbTableTd> CollFrmSrc { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrcPG)]
+        [PropertyGroup("Test")]
         public List<EbTableTd> ColumnsR { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
         [PropertyEditor(PropertyEditorType.CollectionA2C)]
+        [PropertyGroup("Test")]
         public List<EbTableTd> propA2C { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
         [PropertyEditor(PropertyEditorType.Collection)]
+        [PropertyGroup("Test")]
         public List<EbDataVisualization> Visualizations { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [PropertyGroup("Test")]
         [OSE_ObjectTypes(EbObjectType.DataVisualization, EbObjectType.Report, EbObjectType.MobileForm, EbObjectType.TableVisualization)]
         public string ObjectSelectorProp { get; set; }
 
@@ -143,4 +154,18 @@ this.Init = function(id)
             return html + "</td>";
         }
     }
+}
+
+public class Position:EbControl
+{
+
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+    [PropertyEditor(PropertyEditorType.Number)]
+    public int X { get; set; }
+
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+    [PropertyEditor(PropertyEditorType.Number)]
+    public int Y { get; set; }
+
+    public Position() { }
 }
