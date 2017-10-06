@@ -7,7 +7,6 @@ using System.Text;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
-
     [DataContract]
     public class SlackJson
     {
@@ -49,8 +48,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public bool IsNew { get; set; }
     }
-
-
+    
     [DataContract]
     public class SlackFile
     {
@@ -83,19 +81,14 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 3)]
         public SlackFile SlackFile { get; set; }
     }
-
-
     
-
     public class SlackPostRequest : EbServiceStackRequest
     {
         public SlackPayload Payload { get; set; }
 
         public int PostType { get; set; }
     }
-
-
-
+    
     public class SlackPostMqRequest : EbServiceStackRequest
     {
         public SlackPayload Payload { get; set; }
