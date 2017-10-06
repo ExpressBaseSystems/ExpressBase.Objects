@@ -13,6 +13,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public Dictionary<string, object> Colvalues { get; set; }
 
         [DataMember(Order = 1)]
+        public int Id { get; set; }
+
         public string TenantAccountId { get; set; }
 
         public int UserId { get; set; }
@@ -53,7 +55,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class GetApplicationResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
-        public Dictionary<int, object> Data { get; set; }
+        public Dictionary<string, object> Data { get; set; }
 
         [DataMember(Order = 2)]
         public string Token { get; set; }
