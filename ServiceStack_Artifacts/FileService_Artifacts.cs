@@ -1,5 +1,4 @@
 ﻿using MongoDB.Bson;
-using MongoDB.Driver.GridFS;
 using ServiceStack;
 using System;
 using System.Collections.Generic;
@@ -22,7 +21,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     [DataContract]
     public class UploadFileRequest : EbServiceStackRequest
     {
-
         [DataMember(Order = 1)]
         public string FileName { get; set; }
 
@@ -51,9 +49,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 3)]
         public BsonDocument MetaData { get; set; }
 
-        [DataMember(Order = 4)]
-        public IDictionary<String, String> MetaDataPair { get; set; }
-
     }
 
     public class UploadFileControllerResponse
@@ -72,7 +67,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class DownloadFileRequest : EbServiceStackRequest
     {
         [DataMember(Order = 1)]
-        public string ObjectId { get; set; }
+        public ObjectId ObjectId { get; set; }
+
+        [DataMember(Order = 2)]
+        public string FileName { get; set; }
 
     }
 
@@ -83,7 +81,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public KeyValuePair<string, string> Filter { get; set; }
 
     }
-   
+
     [DataContract]
     public class FindFilesByTagResponse
     {
@@ -105,9 +103,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 4)]
         public byte[] ImageByte { get; set; }
-
-        [DataMember(Order = 5)]
-        public IDictionary<String, String> MetaDataPair { get; set; }
 
     }
 }
