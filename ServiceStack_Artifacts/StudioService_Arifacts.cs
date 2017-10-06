@@ -164,6 +164,22 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
+    public class EbObjectStatusHistoryRequest : EbServiceStackRequest, IReturn<EbObjectStatusHistoryResponse>
+    {
+        public string RefId { get; set; }
+    }
+
+    public class EbObjectStatusHistoryResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public List<EbObjectWrapper> Data { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 3)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
 
     [Route("/ebo", "POST")]
     public class EbObjectSaveOrCommitRequest : EbServiceStackRequest, IReturn<EbObjectSaveOrCommitResponse>
@@ -434,6 +450,31 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     [DataContract]
     public class EbObject_Create_Patch_VersionResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public int Id { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 3)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 4)]
+        public string RefId { get; set; }
+    }
+
+    public class EbObjectChangeStatusRequest : EbServiceStackRequest, IReturn<EbObjectChangeStatusResponse>
+    {
+        public string RefId { get; set; }
+
+        public string ChangeLog { get; set; }
+
+        public ObjectLifeCycleStatus Status { get; set; }
+    }
+
+    [DataContract]
+    public class EbObjectChangeStatusResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
         public int Id { get; set; }
