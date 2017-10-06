@@ -70,6 +70,14 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.DVBuilder)]
         public DVColumnCollection Columns { get; set; }
 
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [JsonIgnore]
+        public object data { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [HideInPropertyGrid]
+        public string Pippedfrom { get; set; }
+
         public override void AfterRedisGet(RedisClient Redis)
         {
             try
