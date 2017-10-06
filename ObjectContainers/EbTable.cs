@@ -32,12 +32,16 @@ namespace ExpressBase.Objects
         public List<EbTableTd> ColumnsR { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        [PropertyEditor(PropertyEditorType.CollectionA2C)]
+        public List<EbTableTd> propA2C { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
         [PropertyEditor(PropertyEditorType.Collection)]
         public List<EbDataVisualization> Visualizations { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
-        [OSE_ObjectTypes(EbObjectType.DataVisualization, EbObjectType.Report, EbObjectType.MobileForm)]
+        [OSE_ObjectTypes(EbObjectType.DataVisualization, EbObjectType.Report, EbObjectType.MobileForm, EbObjectType.TableVisualization)]
         public string ObjectSelectorProp { get; set; }
 
         public EbTableLayout()

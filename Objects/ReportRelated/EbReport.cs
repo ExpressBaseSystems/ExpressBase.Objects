@@ -31,22 +31,40 @@ namespace ExpressBase.Objects
     public class EbReport : EbReportObject
     {
         [EnableInBuilder(BuilderType.Report)]
+        [OnChangeExec(@"
+if (this.PaperSize === 'Custom' ){  
+     pg.ShowProperty('CustomPaperHeight');
+     pg.ShowProperty('CustomPaperWidth');
+}
+else {
+     pg.HideProperty('CustomPaperHeight');
+     pg.HideProperty('CustomPaperWidth');
+}
+            ")]
+        [PropertyGroup("General")]
         public PaperSize PaperSize { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup("General")]
+        [UIproperty]
         public decimal CustomPaperHeight { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup("General")]
+        [UIproperty]
         public decimal CustomPaperWidth { get; set; }
 
         //public EbReportMargins Margins { get; set; }
         [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup("General")]
         public string ReportName { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup("General")]
         public string Description { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup("General")]
         public bool IsLandscape { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
@@ -87,7 +105,7 @@ namespace ExpressBase.Objects
             this.PageFooters = new List<EbPageFooter>();
 
             this.ReportFooters = new List<EbReportFooter>();
-        }
+        }        
     }
     public class EbReportSection : EbReportObject
     {        
@@ -106,7 +124,7 @@ namespace ExpressBase.Objects
 
         public override string GetDesignHtml()
         {
-            return "<div class='pageHeaders' eb-type='ReportHeader' id='@id' data_val='0' style='width :100%;position: relative'> </div>".RemoveCR().DoubleQuoted();
+            return "<div class='pageHeaders' eb-type='ReportHeader' tabindex='1' id='@id' data_val='0' style='width :100%;height: @SectionHeight ; background-color:@BackColor ;position: relative'> </div>".RemoveCR().DoubleQuoted();
         }
     }
 
@@ -115,7 +133,7 @@ namespace ExpressBase.Objects
     {
         public override string GetDesignHtml()
         {
-            return "<div class='pageHeaders' eb-type='PageHeader' id='@id' data_val='1' style='width :100%;position: relative'> </div>".RemoveCR().DoubleQuoted();
+            return "<div class='pageHeaders' eb-type='PageHeader' tabindex='1' id='@id' data_val='1' style='width :100%;height: @SectionHeight ; background-color:@BackColor ;position: relative'> </div>".RemoveCR().DoubleQuoted();
         }
     }
 
@@ -124,7 +142,7 @@ namespace ExpressBase.Objects
     {
         public override string GetDesignHtml()
         {
-            return "<div class='pageHeaders' eb-type='ReportDetail' id='@id' data_val='2' style='width :100%;position: relative'> </div>".RemoveCR().DoubleQuoted();
+            return "<div class='pageHeaders' eb-type='ReportDetail' tabindex='1' id='@id' data_val='2' style='width :100%;height: @SectionHeight ; background-color:@BackColor ;position: relative'> </div>".RemoveCR().DoubleQuoted();
         }
     }
 
@@ -133,7 +151,7 @@ namespace ExpressBase.Objects
     {
         public override string GetDesignHtml()
         {
-            return "<div class='pageHeaders' eb-type='PageFooter' id='@id' data_val='3' style='width :100%;position: relative'> </div>".RemoveCR().DoubleQuoted();
+            return "<div class='pageHeaders' eb-type='PageFooter' tabindex='1' id='@id' data_val='3' style='width :100%;height: @SectionHeight ; background-color:@BackColor ;position: relative'> </div>".RemoveCR().DoubleQuoted();
         }
     }
 
@@ -142,7 +160,7 @@ namespace ExpressBase.Objects
     {
         public override string GetDesignHtml()
         {
-            return "<div class='pageHeaders' eb-type='ReportFooter' id='@id' data_val='4' style='width :100%;position: relative'> </div>".RemoveCR().DoubleQuoted();
+            return "<div class='pageHeaders' eb-type='ReportFooter' tabindex='1' id='@id' data_val='4' style='width :100%;height: @SectionHeight ; background-color:@BackColor ;position: relative'> </div>".RemoveCR().DoubleQuoted();
         }
     }
 }
