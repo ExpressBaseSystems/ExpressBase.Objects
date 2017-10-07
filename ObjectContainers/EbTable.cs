@@ -19,10 +19,10 @@ namespace ExpressBase.Objects
         [Alias("Columns")]
         public override List<EbControl> Controls { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
-        [PropertyEditor(PropertyEditorType.Expandable)]
-        [PropertyGroup("Test")]
-        public Position Position { get; set; }
+        //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        //[PropertyEditor(PropertyEditorType.Expandable)]
+        //[PropertyGroup("Test")]
+        //public Position Position { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
         [PropertyEditor(PropertyEditorType.Collection)]
