@@ -31,10 +31,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public BsonDocument MetaData { get; set; }
 
         [DataMember(Order = 4)]
-        public bool IsAsync { get; set; }
+        public string BucketName { get; set; }
 
         [DataMember(Order = 5)]
-        public IDictionary<String, String> MetaDataPair { get; set; }
+        public bool IsAsync { get; set; }
+
+        [DataMember(Order = 6)]
+        public IDictionary<String, List<string>> MetaDataPair { get; set; }
     }
 
     [DataContract]
@@ -49,12 +52,17 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 3)]
         public BsonDocument MetaData { get; set; }
 
+        [DataMember(Order = 4)]
+        public string BucketName { get; set; }
+
     }
 
     public class UploadFileControllerResponse
     {
         public string Uploaded { get; set; }
+
         public string initialPreview { get; set; }
+
         public string objId { get; set; }
     }
 
@@ -72,6 +80,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 2)]
         public string FileName { get; set; }
 
+        [DataMember(Order = 3)]
+        public string BucketName { get; set; }
+
     }
 
     [DataContract]
@@ -87,6 +98,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         [DataMember(Order = 1)]
         public List<FilesInfo> FileList { get; set; }
+
+        [DataMember(Order = 2)]
+        public string BucketName { get; set; }
     }
 
     [DataContract]
@@ -102,6 +116,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public BsonDocument MetaData { get; set; }
 
         [DataMember(Order = 4)]
+        public string BucketName { get; set; }
+
+        [DataMember(Order = 5)]
         public byte[] ImageByte { get; set; }
 
     }
