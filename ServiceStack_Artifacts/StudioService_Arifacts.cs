@@ -181,6 +181,22 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
+    public class EbObjectFetchLiveVersionRequest : EbServiceStackRequest, IReturn<EbObjectFetchLiveVersionResponse>
+    {
+        public int Id { get; set; }
+    }
+
+    public class EbObjectFetchLiveVersionResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public List<EbObjectWrapper> Data { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 3)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
     [Route("/ebo", "POST")]
     public class EbObjectSaveOrCommitRequest : EbServiceStackRequest, IReturn<EbObjectSaveOrCommitResponse>
     {
