@@ -19,10 +19,10 @@ namespace ExpressBase.Objects
         [Alias("Columns")]
         public override List<EbControl> Controls { get; set; }
 
-        //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
-        //[PropertyEditor(PropertyEditorType.Expandable)]
-        //[PropertyGroup("Test")]
-        //public Position Position { get; set; }
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        [PropertyEditor(PropertyEditorType.Expandable)]
+        [PropertyGroup("Test")]
+        public Position Position { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
         [PropertyEditor(PropertyEditorType.Collection)]
@@ -156,7 +156,8 @@ this.Init = function(id)
     }
 }
 
-public class Position:EbControl
+[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+public class Position
 {
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
@@ -168,4 +169,11 @@ public class Position:EbControl
     public int Y { get; set; }
 
     public Position() { }
+
+
+
+    public string GetHtml()
+    {
+        return "";
+    }
 }
