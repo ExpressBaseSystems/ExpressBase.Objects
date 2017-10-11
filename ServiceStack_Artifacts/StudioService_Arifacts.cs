@@ -320,6 +320,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string ChangeLog { get; set; }
 
         public string Relations { get; set; }
+
+        public string Tags { get; set; }
     }
 
     [DataContract]
@@ -351,6 +353,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Json { get; set; }
 
         public string Relations { get; set; }
+
+        public string Tags { get; set; }
     }
 
     [DataContract]
@@ -437,6 +441,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Relations { get; set; }
 
         public bool IsSave { get; set; }
+
+        public string Tags { get; set; }
     }
 
     [DataContract]
@@ -585,6 +591,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 19)]
         public int PatchVersionNumber { get; set; }
+
+        [DataMember(Order = 19)]
+        public string Tags { get; set; }
+
+        [DataMember(Order = 20)]
+        public string ProfileImage { get; set; }
 
         public EbObjectWrapper() { }
     }
