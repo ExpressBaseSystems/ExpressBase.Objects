@@ -89,7 +89,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class FindFilesByTagRequest : EbServiceStackRequest, IReturn<FindFilesByTagResponse>
     {
         [DataMember(Order = 1)]
-        public KeyValuePair<string, string> Filter { get; set; }
+        public KeyValuePair<string, List<string>> Filter { get; set; }
 
     }
 
