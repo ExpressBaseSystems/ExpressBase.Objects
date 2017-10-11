@@ -25,7 +25,8 @@ namespace ExpressBase.Objects
         Line,
         Pie,
         doughnut,
-        AreaFilled
+        AreaFilled,
+        GoogleMap
     }
 
     public class EbDataVisualizationObject : EbObject
@@ -272,10 +273,36 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.DVBuilder)]
         public List<axis> Yaxis { get; set; }
-
-        [HideInPropertyGrid]
+        
         [EnableInBuilder(BuilderType.DVBuilder)]
-        public string type { get; set; }
+//        [OnChangeExec(@"
+//if(this.Type !== 'GoogleMap'){
+//    pg.HideProperty('LattitudeColumn')
+//    pg.HideProperty('LongitudeColumn')
+//    pg.HideProperty('MarkerNameColumn')
+//    pg.HideProperty('DrawRoute')
+//}
+
+//else{
+//    pg.ShowProperty('LattitudeColumn')
+//    pg.ShowProperty('LongitudeColumn')
+//    pg.ShowProperty('MarkerNameColumn')
+//    pg.ShowProperty('DrawRoute')
+//}")]
+        [HideInPropertyGrid]
+        public string Type { get; set; }
+
+        //[EnableInBuilder(BuilderType.DVBuilder)]
+        //public string LattitudeColumn { get; set; }
+
+        //[EnableInBuilder(BuilderType.DVBuilder)]
+        //public string LongitudeColumn { get; set; }
+
+        //[EnableInBuilder(BuilderType.DVBuilder)]
+        //public string MarkerNameColumn { get; set; }
+
+        //[EnableInBuilder(BuilderType.DVBuilder)]
+        //public bool DrawRoute { get; set; }
     }
 
     public class axis
