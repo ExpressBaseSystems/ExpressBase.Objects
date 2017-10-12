@@ -26,7 +26,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public Int64 Length { get; set; }
 
         [DataMember(Order = 6)]
-        public FileTypes ContentType { get; set; }
+        public FileTypes FileType { get; set; }
     }
 
     [DataContract]
@@ -55,7 +55,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 3)]
         public string BucketName { get; set; }
     }
-
+    
     [DataContract]
     public class UploadImageRequest : EbServiceStackRequest, IReturn<string>
     {
