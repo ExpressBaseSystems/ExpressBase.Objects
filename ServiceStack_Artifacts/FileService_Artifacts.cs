@@ -44,19 +44,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class UploadFileMqRequest : EbServiceStackRequest
-    {
-        [DataMember(Order = 1)]
-        public FileMeta FileDetails { get; set; }
-
-        [DataMember(Order = 2)]
-        public byte[] FileByte { get; set; }
-
-        [DataMember(Order = 3)]
-        public string BucketName { get; set; }
-    }
-
-    [DataContract]
     public class UploadFileMqRequestTest : EbServiceStackRequest
     {
         [DataMember(Order = 1)]
@@ -112,16 +99,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 2)]
         public string BucketName { get; set; }
-    }
-
-    [DataContract]
-    public class ImageResizeMqRequest : EbServiceStackRequest
-    {
-        [DataMember(Order = 1)]
-        public FileMeta ImageInfo { get; set; }
-
-        [DataMember(Order = 2)]
-        public byte[] ImageByte { get; set; }
     }
 
     [DataContract]
