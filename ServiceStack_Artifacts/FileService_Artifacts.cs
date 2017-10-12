@@ -44,7 +44,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class UploadFileMqRequestTest : EbServiceStackRequest
+    public class UploadFileMqRequest : EbServiceStackRequest
     {
         [DataMember(Order = 1)]
         public FileMeta FileDetails { get; set; }
@@ -102,7 +102,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class ImageResizeMqRequestTest : EbServiceStackRequest
+    public class ImageResizeMqRequest : EbServiceStackRequest
     {
         [DataMember(Order = 1)]
         public FileMeta ImageInfo { get; set; }
