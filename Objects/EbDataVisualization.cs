@@ -67,13 +67,13 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         public EbDataSource EbDataSource { get; set; }
 
-        [PropertyEditor(PropertyEditorType.CollectionFrmSrcPG, "TempColumns")]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrcPG, "DSColumns")]
         [EnableInBuilder(BuilderType.DVBuilder)]
         public DVColumnCollection Columns { get; set; }
         
         [EnableInBuilder(BuilderType.DVBuilder)]
         [HideInPropertyGrid]
-        public DVColumnCollection TempColumns { get; set; }
+        public DVColumnCollection DSColumns { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [HideInPropertyGrid]
