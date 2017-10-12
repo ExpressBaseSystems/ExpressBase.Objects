@@ -1,4 +1,4 @@
-﻿using ExpressBase.Common;
+using ExpressBase.Common;
 using MongoDB.Bson;
 using ServiceStack;
 using System;
@@ -26,7 +26,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public Int64 Length { get; set; }
 
         [DataMember(Order = 6)]
-        public int ContentType { get; set; }
+        public FileTypes ContentType { get; set; }
     }
 
     [DataContract]
@@ -36,12 +36,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public FileMeta FileDetails { get; set; }
 
         [DataMember(Order = 2)]
-        public byte[] ByteArray { get; set; }
+        public byte[] FileByte { get; set; }
 
         [DataMember(Order = 3)]
-        public string BucketName { get; set; }
-
-        [DataMember(Order = 4)]
         public bool IsAsync { get; set; }
 
     }
@@ -53,7 +50,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public FileMeta FileDetails { get; set; }
 
         [DataMember(Order = 2)]
-        public byte[] ByteArray { get; set; }
+        public byte[] FileByte { get; set; }
 
         [DataMember(Order = 3)]
         public string BucketName { get; set; }
@@ -66,10 +63,24 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public FileMeta FileDetails { get; set; }
 
         [DataMember(Order = 2)]
-        public byte[] ByteArray { get; set; }
+        public byte[] FileByte { get; set; }
 
         [DataMember(Order = 3)]
         public string BucketName { get; set; }
+    }
+
+    [DataContract]
+    public class UploadImageRequest : EbServiceStackRequest, IReturn<string>
+    {
+        [DataMember(Order = 1)]
+        public FileMeta ImageInfo { get; set; }
+
+        [DataMember(Order = 2)]
+        public byte[] ImageByte { get; set; }
+
+        [DataMember(Order = 3)]
+        public bool IsAsync { get; set; }
+
     }
 
     public class UploadFileControllerResponse
@@ -91,9 +102,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         [DataMember(Order = 1)]
         public FileMeta FileDetails { get; set; }
-
-        [DataMember(Order = 2)]
-        public string BucketName { get; set; }
     }
 
     [DataContract]
@@ -110,12 +118,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class ImageResizeMqRequest : EbServiceStackRequest
     {
         [DataMember(Order = 1)]
-        public FileMeta FileDetails { get; set; }
+        public FileMeta ImageInfo { get; set; }
 
         [DataMember(Order = 2)]
-        public string BucketName { get; set; }
-
-        [DataMember(Order = 3)]
         public byte[] ImageByte { get; set; }
     }
 
@@ -123,12 +128,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class ImageResizeMqRequestTest : EbServiceStackRequest
     {
         [DataMember(Order = 1)]
-        public FileMeta FileDetails { get; set; }
+        public FileMeta ImageInfo { get; set; }
 
         [DataMember(Order = 2)]
-        public string BucketName { get; set; }
-
-        [DataMember(Order = 3)]
         public byte[] ImageByte { get; set; }
 
     }
