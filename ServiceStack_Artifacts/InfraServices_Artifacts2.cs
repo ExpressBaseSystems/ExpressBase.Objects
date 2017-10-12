@@ -150,4 +150,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 4)]
         public string u_token { get; set; }
     }
+
+    [DataContract]
+    public class RegisterRequest : Register
+    {
+
+        [DataMember(Order = 1)]
+        public string TenantAccountId { get; set; }
+    }
 }
