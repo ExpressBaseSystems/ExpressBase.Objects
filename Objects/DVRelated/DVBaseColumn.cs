@@ -23,7 +23,8 @@ namespace ExpressBase.Objects.Objects.DVRelated
     public enum BooleanRenderType
     {
         Default,
-        Image
+        Icon,
+        IsEditable
     }
 
     public enum DateTimeRenderType
@@ -115,6 +116,8 @@ else
 
         
         [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [OSE_ObjectTypes(EbObjectType.DataVisualization)]
         public string LinkRefId { get; set; }
     }
 
@@ -142,9 +145,6 @@ else
     [EnableInBuilder(BuilderType.DVBuilder)]
     public class DVBooleanColumn : DVBaseColumn
     {
-        [EnableInBuilder(BuilderType.DVBuilder)]
-        public bool IsEditable { get; set; }
-
         [EnableInBuilder(BuilderType.DVBuilder)]
         public BooleanRenderType RenderAs { get; set; }
     }
