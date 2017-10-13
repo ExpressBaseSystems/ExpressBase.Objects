@@ -1,5 +1,3 @@
-using ExpressBase.Common;
-using MongoDB.Bson;
 using ServiceStack;
 using System;
 using System.Collections.Generic;
@@ -95,10 +93,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class FindFilesByTagRequest : EbServiceStackRequest, IReturn<List<FileMeta>>
     {
         [DataMember(Order = 1)]
-        public KeyValuePair<string, List<string>> Filter { get; set; }
+        public List<string> Tags { get; set; }
 
-        [DataMember(Order = 2)]
-        public string BucketName { get; set; }
+        public bool IsImage { get; set; }
+
     }
 
     [DataContract]
@@ -110,5 +108,15 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 2)]
         public byte[] ImageByte { get; set; }
 
+    }
+
+    [DataContract]
+    public class FileMetaPersistMqRequest : EbServiceStackRequest
+    {
+        [DataMember(Order = 1)]
+        public FileMeta FileDetails { get; set; }
+
+        [DataMember(Order = 2)]
+        public string BucketName { get; set; }
     }
 }
