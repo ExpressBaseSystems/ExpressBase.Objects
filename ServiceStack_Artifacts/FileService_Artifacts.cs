@@ -26,7 +26,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public Int64 Length { get; set; }
 
         [DataMember(Order = 6)]
-        public FileTypes FileType { get; set; }
+        public string FileType { get; set; }
     }
 
     [DataContract]
