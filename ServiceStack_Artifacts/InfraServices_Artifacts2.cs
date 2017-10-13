@@ -159,6 +159,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string TenantAccountId { get; set; }
     }
     [DataContract]
+    [Route("/unique", "POST")]
     public class UniqueRequest
     {
         [DataMember(Order = 1)]
