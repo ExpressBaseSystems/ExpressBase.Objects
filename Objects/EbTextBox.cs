@@ -66,6 +66,7 @@ else {
         
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyGroup(@"Behavior")]
+        [HelpText("specifies a short hint that describes the expected value of an input field (e.g. a sample value or a short description of the expected format)")]
         public string PlaceHolder { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
