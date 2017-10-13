@@ -117,7 +117,7 @@ else
         
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
-        [OSE_ObjectTypes(EbObjectType.DataVisualization)]
+        [OSE_ObjectTypes(EbObjectType.TableVisualization,EbObjectType.ChartVisualization)]
         public string LinkRefId { get; set; }
     }
 
@@ -139,6 +139,8 @@ else
         public NumericRenderType RenderAs { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [OSE_ObjectTypes(EbObjectType.TableVisualization, EbObjectType.ChartVisualization)]
         public string LinkRefId { get; set; }
     }
 
@@ -164,6 +166,8 @@ else
         public DateTimeRenderType RenderAs { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [OSE_ObjectTypes(EbObjectType.TableVisualization, EbObjectType.ChartVisualization)]
         public string LinkRefId { get; set; }
     }
 }
