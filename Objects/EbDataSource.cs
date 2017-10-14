@@ -32,6 +32,10 @@ namespace ExpressBase.Objects
         [OSE_ObjectTypes(EbObjectType.FilterDialog)]
         public string FilterDialogRefId { get; set; }
 
+        public string VersionNumber { get; set; }
+
+        public string Status { get; set; }
+
         [JsonIgnore]
         public EbFilterDialog FilterDialog { get; set; }
 
