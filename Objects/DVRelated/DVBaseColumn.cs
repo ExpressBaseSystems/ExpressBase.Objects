@@ -8,9 +8,9 @@ namespace ExpressBase.Objects.Objects.DVRelated
 {
     public enum StringRenderType
     {
-        Default,
-        Chart,
-        Link
+        Default = 0,
+        Chart = 1,
+        Link = 2
     }
 
     public enum NumericRenderType
@@ -59,7 +59,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
     {
         [JsonProperty(PropertyName = "data")]
         public int Data { get; set; }
-        
+
         [EnableInBuilder(BuilderType.DVBuilder)]
         [JsonProperty(PropertyName = "name")]
         [Alias("Name")]
@@ -71,7 +71,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
         [EnableInBuilder(BuilderType.DVBuilder)]
         [Alias("Title")]
         public string sTitle { get; set; }
-        
+
         public bool bVisible { get; set; }
 
         public int Pos { get; set; }
@@ -93,7 +93,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
     {
         public DVBaseColumn Get(string name)
         {
-            foreach(DVBaseColumn col in this)
+            foreach (DVBaseColumn col in this)
             {
                 if (col.Name.Equals(name))
                     return col;
@@ -107,6 +107,8 @@ namespace ExpressBase.Objects.Objects.DVRelated
     public class DVStringColumn : DVBaseColumn
     {
         [EnableInBuilder(BuilderType.DVBuilder)]
+        [DefaultValue("2")]
+        [PropertyEditor(PropertyEditorType.DropDown)]
         [OnChangeExec(@"
 if(this.RenderAs !== 'Link')
     pg.HideProperty('LinkRefId')
@@ -114,10 +116,10 @@ else
     pg.ShowProperty('LinkRefId')")]
         public StringRenderType RenderAs { get; set; }
 
-        
+
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
-        [OSE_ObjectTypes(EbObjectType.TableVisualization,EbObjectType.ChartVisualization)]
+        [OSE_ObjectTypes(EbObjectType.TableVisualization, EbObjectType.ChartVisualization)]
         public string LinkRefId { get; set; }
     }
 

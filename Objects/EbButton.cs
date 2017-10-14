@@ -23,7 +23,7 @@ namespace ExpressBase.Objects
         public override string GetHead()
         {
             return this.RequiredString + @"
-                    ".Replace("@name", this.Id.ToString());
+                    ".Replace("@name", ""); //this.Id.ToString()
         }
 
         public override string GetDesignHtml()
