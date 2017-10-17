@@ -38,9 +38,7 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.DVBuilder)]
     public class EbDataVisualizationSet : EbDataVisualizationObject
     {
-        [EnableInBuilder(BuilderType.DVBuilder)]
-        public string Description { get; set; }
-
+        
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.Collection)]
         public List<EbDataVisualization> Visualizations { get; set; }
@@ -62,6 +60,9 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectType.DataSource)]
         public string DataSourceRefId { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public string Description { get; set; }
 
         public string EbSid { get; set; }
         [JsonIgnore]

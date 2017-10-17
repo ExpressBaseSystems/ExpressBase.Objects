@@ -42,6 +42,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
+    public class DeleteFileRequest : EbServiceStackRequest, IReturn<string>
+    {
+        [DataMember(Order = 1)]
+        public FileMeta FileDetails { get; set; }
+    }
+
+    [DataContract]
     public class UploadFileMqRequest : EbServiceStackRequest
     {
         [DataMember(Order = 1)]
