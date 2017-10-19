@@ -117,7 +117,6 @@ this.Init = function(id)
         }
     }
 
-    [ProtoBuf.ProtoContract]
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
     [HideInToolBox]
     public class EbTableTd : EbControlContainer

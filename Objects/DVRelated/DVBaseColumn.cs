@@ -107,7 +107,6 @@ namespace ExpressBase.Objects.Objects.DVRelated
     public class DVStringColumn : DVBaseColumn
     {
         [EnableInBuilder(BuilderType.DVBuilder)]
-        [DefaultValue("2")]
         [PropertyEditor(PropertyEditorType.DropDown)]
         [OnChangeExec(@"
 if(this.RenderAs !== 'Link')
