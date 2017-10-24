@@ -18,7 +18,10 @@ namespace ExpressBase.Objects
     {
         [Browsable(false)]
         public bool IsUpdate { get; set; }
-       
+
+        //[EnableInBuilder(BuilderType.WebForm)]
+        public string Description = "form hardCode desc";// { get; set; }
+
         public EbForm() { }
 
         public override string GetHead()

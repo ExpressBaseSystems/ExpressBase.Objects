@@ -23,8 +23,8 @@ namespace ExpressBase.Objects
         public EbRadioGroup()
         {
             this.Options = new List<EbRadioOptionAbstract>();
-            this.Options.Add(new EbRadioOption("Avegarge", "a"));
-            this.Options.Add(new EbRadioOption("AboveAverage", "aa"));
+            this.Options.Add(new EbRadioOption());
+            this.Options.Add(new EbRadioOption());
             //this.Options.CollectionChanged += Options_CollectionChanged;
             this.ValueType = EbRadioValueType.Boolean;
         }
@@ -58,12 +58,17 @@ namespace ExpressBase.Objects
 
             string html = @"
             <div class='Eb-ctrlContainer' Ctype='TableLayout'>
-                <div>";
+                <div class='radiog-cont'  style='@BackColor '>
+                 <span id='@nameLbl' style='@LabelBackColor @LabelForeColor '> @Label  </span><div>";
 
             foreach (EbControl ec in this.Options)
                 html += ec.GetHtml();
 
-            return html + "</div></div>";
+            return (html + @"</div><span class='helpText'> @HelpText </span></div></div>")
+
+.Replace("@Name ", (this.Name != null) ? this.Name : "@Name ").Replace("@LabelForeColor ", "color:" + ((this.LabelForeColor != null) ? this.LabelForeColor : "@LabelForeColor ") + ";")
+.Replace("@LabelBackColor ", "background-color:" + ((this.LabelBackColor != null) ? this.LabelBackColor : "@LabelBackColor ") + ";")
+.Replace("@BackColor ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor ") + ";"));
         }
 
         public override string GetJsInitFunc()
@@ -86,17 +91,11 @@ this.Init = function(id)
     [HideInToolBox]
     public class EbRadioOption : EbRadioOptionAbstract
     {
-        new public string Label { get; set; }
-        
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        public override string Label { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
         public string Value { get; set; }
-
-        public EbRadioOption(string label, string val)
-        {
-            Label = label;
-            Value = val;
-        }
-
-        public EbRadioOption(){ }
 
         public override string GetHtml()
         {
