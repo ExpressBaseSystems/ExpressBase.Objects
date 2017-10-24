@@ -23,8 +23,8 @@ namespace ExpressBase.Objects
         public EbRadioGroup()
         {
             this.Options = new List<EbRadioOptionAbstract>();
-            this.Options.Add(new EbRadioOption());
-            this.Options.Add(new EbRadioOption());
+            //this.Options.Add(new EbRadioOption());
+            //this.Options.Add(new EbRadioOption());
             //this.Options.CollectionChanged += Options_CollectionChanged;
             this.ValueType = EbRadioValueType.Boolean;
         }
@@ -57,7 +57,7 @@ namespace ExpressBase.Objects
         {
 
             string html = @"
-            <div class='Eb-ctrlContainer' Ctype='TableLayout'>
+            <div class='Eb-ctrlContainer' Ctype='RadioGroup'>
                 <div class='radiog-cont'  style='@BackColor '>
                  <span id='@nameLbl' style='@LabelBackColor @LabelForeColor '> @Label  </span><div>";
 

@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 
 namespace ExpressBase.Objects
 {
-    [ProtoBuf.ProtoContract]
     [EnableInBuilder(BuilderType.WebForm)]
     [HideInToolBox]
     public class EbForm : EbControlContainer
