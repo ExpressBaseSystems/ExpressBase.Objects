@@ -47,7 +47,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
         [PropertyEditor(PropertyEditorType.ImageSeletor)]
         [PropertyGroup("Test")]
-        public string aImg { get; set; }
+        public string AImg { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
         [PropertyEditor(PropertyEditorType.CollectionA2C)]
