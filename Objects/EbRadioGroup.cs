@@ -1,4 +1,5 @@
-﻿using ExpressBase.Common.Objects;
+﻿using ExpressBase.Common.Extensions;
+using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ProtoBuf;
 using System;
@@ -16,14 +17,15 @@ namespace ExpressBase.Objects
         Text
     }
 
-    [ProtoBuf.ProtoContract]
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
     public class EbRadioGroup : EbControl
     {
         public EbRadioGroup()
         {
-            this.Options = new ObservableCollection<EbRadioOption>();
-            this.Options.CollectionChanged += Options_CollectionChanged;
+            this.Options = new List<EbRadioOptionAbstract>();
+            //this.Options.Add(new EbRadioOption());
+            //this.Options.Add(new EbRadioOption());
+            //this.Options.CollectionChanged += Options_CollectionChanged;
             this.ValueType = EbRadioValueType.Boolean;
         }
 
@@ -36,102 +38,68 @@ namespace ExpressBase.Objects
             }
         }
 
-        [ProtoBuf.ProtoMember(1)]
-        [System.ComponentModel.Category("Behavior")]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        [PropertyGroup("Behavior")]
         public EbRadioValueType ValueType { get; set; }
 
-        [ProtoBuf.ProtoMember(2)]
-        [System.ComponentModel.Category("Behavior")]
-        public ObservableCollection<EbRadioOption> Options { get; set; }
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        [PropertyGroup("Behavior")]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        public List<EbRadioOptionAbstract> Options { get; set; }
 
-        private string RadioCode
+        public override string GetDesignHtml()
         {
-            get
-            {
-                string rs = @"<div id='@namecontainer' class='Eb-ctrlContainer' style='position:absolute; left:@leftpx; top:@toppx; @hiddenString'>
-                                <input id='@namehidden' type ='hidden' name='Ebradio'>
-                                <span id='@nameLbl' style='@lblBackColor @LblForeColor'>@label</span>
-                                <div data-toggle='tooltip' title='@toolTipText'>";
-                if (this.Options.Count == 2)
-                {
-                    rs += @"
-                        <input id='@name' type = 'checkbox' data-toggle = 'toggle' data-on='@OnValue' data-off='@OffValue'>
-                        <script>$('#@name').change(function() {
-                            if($(this).prop('checked')===true)
-                                $('#@namehidden').val( '@OnValue' );
-                            else
-                                $('#@namehidden').val( '@OffValue' );
-                        });</script>"
-                    .Replace("@OnValue", this.Options[0].Label).Replace("@OffValue", this.Options[1].Label);
-                }
-                else
-                {
-                    rs += "<div class='btn-group' data-toggle='buttons'>";
-                    for (int i = 0; i < this.Options.Count; i++)
-                    {
-                        rs += @"
-                            <label id='r@idx' class='btn btn-primary'>
-                                <input type ='radio' name='options' autocomplete='off'>
-                                @option
-                            </label>".Replace("@option", this.Options[i].Label).Replace("@idx",i.ToString());
-                    }
-                    rs += @"</div>  <script>
-                                        $('#@namecontainer label').on('click', function () {
-                                            $('#@namehidden').val( $(this).text().trim() );
-                                        })
-                                    </script>";
-                }
-                return rs + "</div><span class='helpText'> @helpText </span></div>";
-            }
-        }
-
-        public override string GetHead()
-        {
-            return this.RequiredString + @"
-$('#@idcontainer [type=checkbox]').bootstrapToggle();
-$('#@idcontainer [type=radio]').on('click', function () {
-    $(this).button('toggle');
-})
-
-
-
-
-".Replace("@id", this.Name );
+            //return @"<div class='btn-group' data-toggle='buttons'> <label class='btn btn-primary active'> <input type='radio' name='options' id='option1' autocomplete='off' checked> Radio 1 </label> <label class='btn btn-primary'> <input type='radio' name='options' id='option2' autocomplete='off'> Radio 2 </label> <label class='btn btn-primary'> <input type='radio' name='options' id='option3' autocomplete='off'> Radio 3 </label> </div>".RemoveCR().DoubleQuoted();
+            return GetHtml().RemoveCR().DoubleQuoted();
         }
 
         public override string GetHtml()
         {
+
+            string html = @"
+            <div class='Eb-ctrlContainer' Ctype='RadioGroup'>
+                <div class='radiog-cont'  style='@BackColor '>
+                 <span id='@nameLbl' style='@LabelBackColor @LabelForeColor '> @Label  </span><div>";
+
+            foreach (EbControl ec in this.Options)
+                html += ec.GetHtml();
+
+            return (html + @"</div><span class='helpText'> @HelpText </span></div></div>")
+
+.Replace("@Name ", (this.Name != null) ? this.Name : "@Name ").Replace("@LabelForeColor ", "color:" + ((this.LabelForeColor != null) ? this.LabelForeColor : "@LabelForeColor ") + ";")
+.Replace("@LabelBackColor ", "background-color:" + ((this.LabelBackColor != null) ? this.LabelBackColor : "@LabelBackColor ") + ";")
+.Replace("@BackColor ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor ") + ";"));
+        }
+
+        public override string GetJsInitFunc()
+        {
             return @"
-            @RadioCode
-"
-.Replace("@RadioCode", this.RadioCode)
-.Replace("@name", this.Name)
-.Replace("@left", this.Left.ToString())
-.Replace("@top", this.Top.ToString())
-.Replace("@width", 30.ToString())//this.Width.ToString())
-.Replace("@height", 20.ToString())// this.Height.ToString())
-.Replace("@label", this.Label)
-.Replace("@hiddenString", this.HiddenString)
-.Replace("@toolTipText", this.ToolTipText)
-.Replace("@helpText", this.HelpText)
-//.Replace("@backColor", "background-color:" + this.BackColorSerialized + ";")
-//.Replace("@foreColor", "color:" + this.ForeColorSerialized + ";")
-//.Replace("@lblBackColor", "background-color:" + this.LabelBackColorSerialized + ";")
-//.Replace("@LblForeColor", "color:" + this.LabelForeColorSerialized + ";")
-;
+this.Init = function(id)
+{
+    this.Options.push(new EbObjects.EbRadioOption(id + '_Rd0'));
+    this.Options.push(new EbObjects.EbRadioOption(id + '_Rd1'));
+};";
         }
     }
 
-    [ProtoContract]
-#if NET462
-    [Serializable]
-#endif
-    public class EbRadioOption
+    public class EbRadioOptionAbstract : EbControl
     {
-        [ProtoMember(1)]
-        public string Label { get; set; }
 
-        [ProtoMember(2)]
+    }
+
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+    [HideInToolBox]
+    public class EbRadioOption : EbRadioOptionAbstract
+    {
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        public override string Label { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
         public string Value { get; set; }
+
+        public override string GetHtml()
+        {
+            return @"<input type ='radio' name='@name '> <span id='@nameLbl' style='@LabelBackColor @LabelForeColor '> @Label  </span>";
+        }
     }
 }

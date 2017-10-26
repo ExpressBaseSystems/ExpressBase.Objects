@@ -21,10 +21,10 @@ namespace ExpressBase.Objects
 
     public enum TextMode
     {
-        SingleLine,
-        Email,
-        Password,
-        Color
+        SingleLine = 2,
+        Email = 0,
+        Password = 1,
+        Color = 3
     }
 
     [ProtoBuf.ProtoContract]
@@ -62,6 +62,7 @@ else {
         
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyGroup("Behavior")]
+        [DefaultPropValue("'Color'")]
         public TextMode TextMode { get; set; }
         
         [EnableInBuilder(BuilderType.WebForm)]
