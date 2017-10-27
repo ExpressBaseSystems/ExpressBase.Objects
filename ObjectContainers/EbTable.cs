@@ -40,6 +40,16 @@ namespace ExpressBase.Objects
         public List<EbTableTd> ColumnsR { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        [PropertyEditor(PropertyEditorType.String)]
+        [PropertyGroup("Test")]
+        public string doc { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        [PropertyEditor(PropertyEditorType.ImageSeletor)]
+        [PropertyGroup("Test")]
+        public string AImg { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
         [PropertyEditor(PropertyEditorType.CollectionA2C)]
         [PropertyGroup("Test")]
         public List<EbTableTd> propA2C { get; set; }
@@ -117,7 +127,6 @@ this.Init = function(id)
         }
     }
 
-    [ProtoBuf.ProtoContract]
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
     [HideInToolBox]
     public class EbTableTd : EbControlContainer

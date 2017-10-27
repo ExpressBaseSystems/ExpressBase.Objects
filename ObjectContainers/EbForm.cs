@@ -11,14 +11,16 @@ using System.Threading.Tasks;
 
 namespace ExpressBase.Objects
 {
-    [ProtoBuf.ProtoContract]
     [EnableInBuilder(BuilderType.WebForm)]
     [HideInToolBox]
     public class EbForm : EbControlContainer
     {
         [Browsable(false)]
         public bool IsUpdate { get; set; }
-       
+
+        //[EnableInBuilder(BuilderType.WebForm)]
+        public string Description = "form hardCode desc";// { get; set; }
+
         public EbForm() { }
 
         public override string GetHead()
