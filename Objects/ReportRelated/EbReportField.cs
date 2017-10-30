@@ -149,5 +149,79 @@ namespace ExpressBase.Objects.ReportRelated
 };";
         }
     }
+
+    [EnableInBuilder(BuilderType.Report)]
+    public class EbText : EbReportFields
+    {
+
+        public override string GetDesignHtml()
+        {
+            return "<div class='Text-Field dropped' eb-type='Text' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; height: @Height px; background-color:@BackColor ; color:@ForeColor ; position: absolute; left: @Left px; top: @Top px;'> @Title </div>".RemoveCR().DoubleQuoted();
+        }
+        public override string GetJsInitFunc()
+        {
+            return @"
+    this.Init = function(id)
+        {
+     this.Height =25;
+    this.Width= 200;
+    this.ForeColor = '#201c1c';
+    this.Border = 1;
+    this.BorderColor = '#aaaaaa'
+};";
+        }
+    }
+
+    [EnableInBuilder(BuilderType.Report)]
+    public class EbBarcode : EbReportFields
+    {
+        [EnableInBuilder(BuilderType.Report)]
+        [UIproperty]
+        [PropertyGroup("Appearance")]
+        public string Background { get; set; }
+
+        public override string GetDesignHtml()
+        {
+            return "<div class='Bar-code dropped' eb-type='Barcode' id='@id' style=' border: @Border px solid;border-color: @BorderColor ; width: @Width px; height: @Height px; background: @Background ; position: absolute; left: @Left px; top: @Top px;background-size: 100% 100%;'></div>".RemoveCR().DoubleQuoted();
+        }
+        public override string GetJsInitFunc()
+        {
+            return @"
+    this.Init = function(id)
+        {
+     this.Height =50;
+    this.Width= 150;    
+    this.Border = 1;
+    this.BorderColor = '#aaaaaa'
+    this.Background = 'url(../images/barcode.png) center no-repeat';
+};";
+        }
+    }
+
+    [EnableInBuilder(BuilderType.Report)]
+    public class EbQRcode : EbReportFields
+    {
+        [EnableInBuilder(BuilderType.Report)]
+        [UIproperty]
+        [PropertyGroup("Appearance")]
+        public string Background { get; set; }
+
+        public override string GetDesignHtml()
+        {
+            return "<div class='QRcode dropped' eb-type='QRcode' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; height: @Height px; background: @Background ; position: absolute; left: @Left px; top: @Top px;background-size: 100% 100%;'></div>".RemoveCR().DoubleQuoted();
+        }
+        public override string GetJsInitFunc()
+        {
+            return @"
+    this.Init = function(id)
+        {
+     this.Height =100;
+    this.Width= 100;    
+    this.Border = 1;
+    this.BorderColor = '#aaaaaa';
+    this.Background = 'url(../images/Qr-code.png) center no-repeat';
+};";
+        }
+    }
 }
 
