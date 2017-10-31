@@ -92,6 +92,10 @@ else {
         [OSE_ObjectTypes(EbObjectType.DataSource)]
         public string DataSourceRefId { get; set; }
 
+        [EnableInBuilder(BuilderType.Report)]
+        [PropertyEditor(PropertyEditorType.ImageSeletor)]
+        public string ImageId { get; set; }
+
         public ColumnColletion ColumnColletion { get; set; }
 
         public EbReport()
