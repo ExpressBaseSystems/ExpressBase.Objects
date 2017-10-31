@@ -44,7 +44,7 @@ else {
 }
             ")]
         public int MaxLength { get; set; }
-        
+
         [EnableInBuilder(BuilderType.WebForm)]
         [Alias("TextTransform-Alias")]
         [PropertyGroup("Behavior")]
@@ -59,12 +59,12 @@ else {
 }
             ")]
         public TextTransform TextTransform { get; set; }
-        
+
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyGroup("Behavior")]
         [DefaultPropValue("'Color'")]
         public TextMode TextMode { get; set; }
-        
+
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyGroup(@"Behavior")]
         [HelpText("specifies a short hint that describes the expected value of an input field (e.g. a sample value or a short description of the expected format)")]
@@ -72,9 +72,10 @@ else {
 
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyGroup("Appearance")]
+        [EbRequired]
+        [Unique]
         public string Text { get; set; }
-        
-        
+
         [PropertyGroup("Behavior")]
         [EnableInBuilder(BuilderType.WebForm)]
         public bool AutoCompleteOff { get; set; }
