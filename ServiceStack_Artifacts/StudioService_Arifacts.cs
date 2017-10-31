@@ -254,6 +254,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Relations { get; set; }
 
         public string Tags { get; set; }
+
+        public int AppId { get; set; }
     }
 
     [DataContract]
@@ -287,6 +289,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Relations { get; set; }
 
         public string Tags { get; set; }
+
+        public int AppId { get; set; }
     }
 
     [DataContract]
@@ -375,6 +379,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public bool IsSave { get; set; }
 
         public string Tags { get; set; }
+
+        public int AppId { get; set; }
     }
 
     [DataContract]
@@ -530,6 +536,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 20)]
         public string ProfileImage { get; set; }
 
+        [DataMember(Order = 21)]
+        public int AppId { get; set; }
+        
         public EbObjectWrapper() { }
     }
 }
