@@ -15,8 +15,6 @@ namespace ExpressBase.Objects
    
     public class EbDatasourceMain : EbObject{
 
-        [EnableInBuilder(BuilderType.DataSource)]
-        public string Description { get; set; }
     }
 
     [EnableInBuilder(BuilderType.DataSource)]
