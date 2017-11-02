@@ -21,6 +21,10 @@ namespace ExpressBase.Objects.ReportRelated
         [PropertyEditor(PropertyEditorType.Color)]
         [PropertyGroup("Appearance")]
         public string BorderColor { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [PropertyEditor(PropertyEditorType.ImageSeletor)]
+        public string Image { get; set; }
     }
 
     [EnableInBuilder(BuilderType.Report)]
@@ -47,10 +51,15 @@ namespace ExpressBase.Objects.ReportRelated
 
     [EnableInBuilder(BuilderType.Report)]
     public class EbImg : EbReportFields
-    {       
+    {
+        [EnableInBuilder(BuilderType.Report)]
+        [UIproperty]
+        [PropertyGroup("Appearance")]
+        public string Background { get; set; }
+
         public override string GetDesignHtml()
         {
-            return "<div class='img-container dropped' eb-type='Img' id='@id' style='border:1px solid #aaaaaa; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;'></div>".RemoveCR().DoubleQuoted();
+            return "<div class='img-container dropped' eb-type='Img' id='@id' style='border:1px solid #aaaaaa; width: @Width px; background: @Background ; height: @Height px; position: absolute; left: @Left px; top: @Top px;'></div>".RemoveCR().DoubleQuoted();
         }
         public override string GetJsInitFunc()
         {
@@ -59,6 +68,7 @@ namespace ExpressBase.Objects.ReportRelated
         {
     this.Height =100;
     this.Width= 100;
+    this.Background = 'url(../images/wave.png) center no-repeat';
 };";
         }
     }
