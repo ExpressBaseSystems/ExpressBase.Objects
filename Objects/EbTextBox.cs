@@ -47,6 +47,7 @@ else {
 
         [EnableInBuilder(BuilderType.WebForm)]
         [Alias("TextTransform-Alias")]
+        [DefaultPropValue("'UPPERCASE'")]
         [PropertyGroup("Behavior")]
         [PropertyEditor(PropertyEditorType.DropDown)]
         [OnChangeExec(@"
@@ -74,6 +75,7 @@ else {
         [PropertyGroup("Appearance")]
         [EbRequired]
         [Unique]
+        [DefaultPropValue("defaultfrom decor")]
         public string Text { get; set; }
 
         [PropertyGroup("Behavior")]
