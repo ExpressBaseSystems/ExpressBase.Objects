@@ -247,12 +247,23 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.DVBuilder)]
     public class EbTableVisualization : EbDataVisualization
     {
+        [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.DVBuilder)]
         public string IsPaged { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
         public List<DVBaseColumn> rowGrouping { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public int LeftFixedColumn { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public int RightFixedColumn { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        //[DefaultPropValue("'10'")]
+        public int PageLength { get; set; }
 
         public override string GetDesignHtml()
         {
@@ -270,10 +281,13 @@ namespace ExpressBase.Objects
     {
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.DVBuilder)]
-        public List<axis> Xaxis { get; set; }
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
+        public List<DVBaseColumn> Xaxis { get; set; }
+
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.DVBuilder)]
-        public List<axis> Yaxis { get; set; }
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
+        public List<DVBaseColumn> Yaxis { get; set; }
         
         [EnableInBuilder(BuilderType.DVBuilder)]
 //        [OnChangeExec(@"
