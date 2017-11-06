@@ -36,6 +36,14 @@ namespace ExpressBase.Objects
     }
 
     [EnableInBuilder(BuilderType.DVBuilder)]
+    public class ChartColor : EbDataVisualizationObject
+    {
+        public string name { get; set; }
+
+        public string color { get; set; }
+    }
+
+    [EnableInBuilder(BuilderType.DVBuilder)]
     public class EbDataVisualizationSet : EbDataVisualizationObject
     {
         
@@ -279,12 +287,11 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.DVBuilder)]
     public class EbChartVisualization : EbDataVisualization
     {
-        [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
         public List<DVBaseColumn> Xaxis { get; set; }
 
-        [HideInPropertyGrid]
+
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
         public List<DVBaseColumn> Yaxis { get; set; }
@@ -318,6 +325,40 @@ namespace ExpressBase.Objects
 
         //[EnableInBuilder(BuilderType.DVBuilder)]
         //public bool DrawRoute { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.Text)]
+        [DefaultPropValue("XLabel")]
+        public string XaxisTitle { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.Text)]
+        [DefaultPropValue("YLabel")]
+        public string YaxisTitle { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.Color)]
+        [DefaultPropValue("#000000")]
+        public string XaxisTitleColor { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.Color)]
+        [DefaultPropValue("#000000")]
+        public string YaxisTitleColor { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.Color)]
+        [DefaultPropValue("#000000")]
+        public string XaxisLabelColor { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.Color)]
+        [DefaultPropValue("#000000")]
+        public string YaxisLabelColor { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [HideInPropertyGrid]
+        public List<ChartColor> LegendColor { get; set; }
     }
 
     public class axis
@@ -326,4 +367,6 @@ namespace ExpressBase.Objects
 
         public string name { get; set; }
     }
+
+    
 }
