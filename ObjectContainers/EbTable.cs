@@ -62,6 +62,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [PropertyGroup("Test")]
+        [DefaultPropValue("eb_roby_dev-eb_roby_dev-3-671-1325")]
         [OSE_ObjectTypes(EbObjectType.DataVisualization, EbObjectType.Report, EbObjectType.MobileForm, EbObjectType.TableVisualization)]
         public string ObjectSelectorProp { get; set; }
 
