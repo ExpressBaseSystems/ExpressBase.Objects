@@ -167,6 +167,41 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     }
 
+    [DataContract]
+    public class GetAccountRequest : IReturn<GetAccountResponse>, IEbSSRequest
+    {
+      
+        [DataMember(Order = 1)]
+        public int Id { get; set; }
+
+        [DataMember(Order = 2)]
+        public string TenantAccountId { get; set; }
+
+        public int UserId { get; set; }
+
+        public string Token { get; set; }
+    }
+
+    [DataContract]
+    public class GetAccountResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public int id { get; set; }
+
+        [DataMember(Order = 2)]
+        public List<List<object>> returnlist { get; set; }
+
+        [DataMember(Order = 3)]
+        public Dictionary<string, object> Data { get; set; }
+
+        [DataMember(Order = 4)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 5)]
+        public ResponseStatus ResponseStatus { get; set; }
+       
+    }
+
     //[DataContract]
     //public class GetUsersResponse : IEbSSResponse
     //{
