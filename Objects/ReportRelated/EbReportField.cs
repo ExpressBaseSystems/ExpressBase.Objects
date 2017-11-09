@@ -20,11 +20,7 @@ namespace ExpressBase.Objects.ReportRelated
         [UIproperty]
         [PropertyEditor(PropertyEditorType.Color)]
         [PropertyGroup("Appearance")]
-        public string BorderColor { get; set; }
-
-        [EnableInBuilder(BuilderType.Report)]
-        [PropertyEditor(PropertyEditorType.ImageSeletor)]
-        public string Image { get; set; }
+        public string BorderColor { get; set; }               
     }
 
     [EnableInBuilder(BuilderType.Report)]
@@ -54,12 +50,16 @@ namespace ExpressBase.Objects.ReportRelated
     {
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
-        [PropertyGroup("Appearance")]
+        //[HideInPropertyGrid]
         public string Background { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [PropertyEditor(PropertyEditorType.ImageSeletor)]
+        public string Image { get; set; }
 
         public override string GetDesignHtml()
         {
-            return "<div class='img-container dropped' eb-type='Img' id='@id' style='border:1px solid #aaaaaa; width: @Width px; background: @Background ; height: @Height px; position: absolute; left: @Left px; top: @Top px;'></div>".RemoveCR().DoubleQuoted();
+            return "<div class='img-container dropped' eb-type='Img' id='@id' style='border:1px solid #aaaaaa; width: @Width px; background: @Background ; background-size: cover; height: @Height px; position: absolute; left: @Left px; top: @Top px;'></div>".RemoveCR().DoubleQuoted();
         }
         public override string GetJsInitFunc()
         {
@@ -68,7 +68,35 @@ namespace ExpressBase.Objects.ReportRelated
         {
     this.Height =100;
     this.Width= 100;
-    this.Background = 'url(../images/wave.png) center no-repeat';
+    this.Background = 'url(../images/image.png) center no-repeat';
+};";
+        }
+    }
+
+    [EnableInBuilder(BuilderType.Report)]
+    public class EbWaterMark : EbReportFields
+    {
+        [EnableInBuilder(BuilderType.Report)]
+        [UIproperty]
+        //[HideInPropertyGrid]
+        public string Background { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [PropertyEditor(PropertyEditorType.ImageSeletor)]
+        public string Image { get; set; }
+
+        public override string GetDesignHtml()
+        {
+            return "<div class='wm-container dropped' eb-type='WaterMark' id='@id' style='opacity:.1; width: @Width px; background: @Background ; background-size: cover; height: @Height px; position: absolute; left: @Left px; top: @Top px;'></div>".RemoveCR().DoubleQuoted();
+        }
+        public override string GetJsInitFunc()
+        {
+            return @"
+    this.Init = function(id)
+        {
+    this.Height =100;
+    this.Width= 100;
+    this.Background = 'url(../images/image.png) center no-repeat';
 };";
         }
     }
