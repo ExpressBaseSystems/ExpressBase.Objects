@@ -63,7 +63,7 @@ else {
 
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyGroup("Behavior")]
-        [DefaultPropValue("'Color'")]
+        [DefaultPropValue("'SingleLine'")]
         public TextMode TextMode { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
@@ -138,16 +138,16 @@ else {
         {
             return @"
 
-<div class='Eb-ctrlContainer' Ctype='TextBox' style='@HiddenString '>
-    <span id='@nameLbl' style='@LabelBackColor @LabelForeColor '> @Label  </span>
+<div id='cont_@name@  ' class='Eb-ctrlContainer' Ctype='TextBox' style='@HiddenString '>
+    <span id='@name@Lbl' style='@LabelBackColor @LabelForeColor '> @Label  </span>
         <div  class='input-group' style='width: 100%;'>
             @attachedLbl
-            <input type='@TextMode '  id='@name ' name='@name ' autocomplete = '@AutoCompleteOff ' data-toggle='tooltip' title='@ToolTipText ' 
+            <input type='@TextMode '  id='@name@' name='@name ' autocomplete = '@AutoCompleteOff ' data-toggle='tooltip' title='@ToolTipText ' 
 @tabIndex @MaxLength  style='width:100%; height:@heightpx; @BackColor @ForeColor display:inline-block; @fontStyle @ReadOnlyString  @Required  @PlaceHolder  @Text  @TabIndex  />
         </div>
     <span class='helpText'> @HelpText </span>
 </div>"
-.Replace("@Name ", (this.Name != null) ? this.Name : "@Name ")
+.Replace("@name@", this.Name)
 .Replace("@MaxLength ", "maxlength='" + ( (this.MaxLength > 0) ? this.MaxLength.ToString() : "@MaxLength" ) + "'")
 .Replace("@TextMode ", this.TextMode.ToString().ToLower())
 .Replace("@HiddenString ", this.HiddenString)
@@ -158,6 +158,7 @@ else {
 .Replace("@TabIndex ", "tabindex='" + this.TabIndex + "' ")
 .Replace("@AutoCompleteOff ", (this.AutoCompleteOff || this.TextMode.ToString().ToLower() == "password") ? "off" : "on")
 
+    //.Replace("@name ", (this.Name != null) ? this.Name : "@name ")
     .Replace("@LabelForeColor ", "color:" + ((this.LabelForeColor != null) ? this.LabelForeColor : "@LabelForeColor ") + ";")
     .Replace("@LabelBackColor ", "background-color:" + ((this.LabelBackColor != null) ? this.LabelBackColor : "@LabelBackColor ") + ";")
     .Replace("@BackColor ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor ") + ";"))

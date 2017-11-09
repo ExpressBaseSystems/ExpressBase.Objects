@@ -165,7 +165,7 @@ $('#{0}').mask('SZZZZZZZZZZZ', {
         private string GetHtmlHelper(RenderMode mode)
         {
             return (@"
-<div class='Eb-ctrlContainer' Ctype='Numeric' style='@hiddenString'>
+<div id='cont_@name@' class='Eb-ctrlContainer' Ctype='Numeric' style='@hiddenString'>
     <span id='@nameLbl' style='@lblBackColor @LblForeColor'>@label</span>
             <div  class='input-group' style='width:100%;'>
                              <span style='font-size: @fontSize' class='input-group-addon'>$</span>   
@@ -173,7 +173,7 @@ $('#{0}').mask('SZZZZZZZZZZZ', {
             </div>
     <span class='helpText'> @helpText </span>
 </div>"
-.Replace("@name", this.Name)
+.Replace("@name@", this.Name)
 .Replace("@left", this.Left.ToString())
 .Replace("@top", this.Top.ToString())
 .Replace("@width", this.Width.ToString())

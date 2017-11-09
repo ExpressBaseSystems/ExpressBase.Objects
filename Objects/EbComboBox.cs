@@ -132,7 +132,7 @@ var @nameEbCombo = new EbSelect('@name', '@DSid', @DDHeight, '@vmName', '', @Max
         private string GetHtmlHelper(RenderMode mode)
         {
             return @"
-    <div id='@nameContainer' Ctype='ComboBox' class='Eb-ctrlContainer' style='@hiddenString'>
+    <div id='cont_@name  ' Ctype='ComboBox' class='Eb-ctrlContainer' style='@hiddenString'>
        <div id='@nameContainer'  role='form' data-toggle='validator' style='width:100%;'>
             <input type='hidden' name='@nameHidden4val' data-ebtype='16' id='@name'/>
             <div style='display:inline-block;' id='@nameLbl'>@label</div>

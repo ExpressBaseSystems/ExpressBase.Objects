@@ -145,16 +145,16 @@ $('#@id').datetimepicker({
         private string GetHtmlHelper()
         {
             string EbCtrlHTML = @"
-    <div id='@nameContainer' Ctype='Date' class='Eb-ctrlContainer' style='@hiddenString'>
-        <span id='@nameLbl' style='@LabelBackColor  @LabelForeColor '> @Label </span>
+    <div id='cont_@name@' Ctype='Date' class='Eb-ctrlContainer' style='@hiddenString'>
+        <span id='@name@Lbl' style='@LabelBackColor  @LabelForeColor '> @Label </span>
         <div  class='input-group' style='width:100%;'>
-            <input id='@name' data-ebtype='@datetype'  data-toggle='tooltip' title='@toolTipText' class='date' type='text'  name='@name' autocomplete = '@autoComplete' @value @tabIndex style='width:100%; height:@heightpx; @BackColor @ForeColor display:inline-block; @fontStyle @readOnlyString @required @placeHolder />
+            <input id='@name@' data-ebtype='@datetype'  data-toggle='tooltip' title='@toolTipText' class='date' type='text'  name='@name' autocomplete = '@autoComplete' @value @tabIndex style='width:100%; height:@heightpx; @BackColor @ForeColor display:inline-block; @fontStyle @readOnlyString @required @placeHolder />
             <span class='input-group-addon'> <i id='@nameTglBtn' class='fa  @atchdLbl' aria-hidden='true'></i> </span>
         </div>
         <span class='helpText'> @HelpText </span>
     </div>
 "
-.Replace("@name", this.Name)
+.Replace("@name@", this.Name)
 .Replace("@left", this.Left.ToString())
 .Replace("@top", this.Top.ToString())
 .Replace("@width", this.Width.ToString())

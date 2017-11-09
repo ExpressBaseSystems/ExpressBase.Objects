@@ -34,7 +34,7 @@ $('#@idcontainer [type=radio]').on('click', function () {
 
         public override string GetHtml()
         {
-            return @"<div class='Eb-ctrlContainer' Ctype='RadioButton' style='@HiddenString '>
+            return @"<div id='cont_@name  ' class='Eb-ctrlContainer' Ctype='RadioButton' style='@HiddenString '>
                         <input id='@namehidden' type ='hidden' name='Ebradio'>
                         <span id='@nameLbl' style='@lblBackColor @LblForeColor'>@label  </span>
                         <div data-toggle='tooltip' title='@toolTipText'>

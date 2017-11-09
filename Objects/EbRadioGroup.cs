@@ -57,16 +57,16 @@ namespace ExpressBase.Objects
         {
 
             string html = @"
-            <div class='Eb-ctrlContainer' Ctype='RadioGroup'>
+            <div id='cont_@name@' class='Eb-ctrlContainer' Ctype='RadioGroup'>
                 <div class='radiog-cont'  style='@BackColor '>
-                 <span id='@nameLbl' style='@LabelBackColor @LabelForeColor '> @Label  </span><div>";
+                 <span id='@name@Lbl' style='@LabelBackColor @LabelForeColor '> @Label  </span><div>";
 
             foreach (EbControl ec in this.Options)
                 html += ec.GetHtml();
 
             return (html + @"</div><span class='helpText'> @HelpText </span></div></div>")
 
-.Replace("@Name ", (this.Name != null) ? this.Name : "@Name ").Replace("@LabelForeColor ", "color:" + ((this.LabelForeColor != null) ? this.LabelForeColor : "@LabelForeColor ") + ";")
+.Replace("@name@", (this.Name != null) ? this.Name : "@name@").Replace("@LabelForeColor ", "color:" + ((this.LabelForeColor != null) ? this.LabelForeColor : "@LabelForeColor ") + ";")
 .Replace("@LabelBackColor ", "background-color:" + ((this.LabelBackColor != null) ? this.LabelBackColor : "@LabelBackColor ") + ";")
 .Replace("@BackColor ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor ") + ";"));
         }
@@ -99,7 +99,7 @@ this.Init = function(id)
 
         public override string GetHtml()
         {
-            return @"<input type ='radio' name='@name '> <span id='@nameLbl' style='@LabelBackColor @LabelForeColor '> @Label  </span>";
+            return @"<input type ='radio' name='@name '> <span id='@name@Lbl' style='@LabelBackColor @LabelForeColor '> @Label  </span>";
         }
     }
 }
