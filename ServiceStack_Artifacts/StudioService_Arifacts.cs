@@ -164,6 +164,21 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
+     public class EbObjectUpdateDashboardRequest : EbServiceStackRequest, IReturn<EbObjectUpdateDashboardResponse>
+    {
+        public string Refid { get; set; }
+    }
+    public class EbObjectUpdateDashboardResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public List<EbObjectWrapper> Data { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 3)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
     public class EbObjectStatusHistoryRequest : EbServiceStackRequest, IReturn<EbObjectStatusHistoryResponse>
     {
         public string RefId { get; set; }
@@ -538,7 +553,51 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 21)]
         public int AppId { get; set; }
-        
+
+        [DataMember(Order = 22)]
+        public EbObjectWrapper_Dashboard Dashboard_Tiles { get; set; }
         public EbObjectWrapper() { }
     }
-}
+
+    [DataContract]
+    public class EbObjectWrapper_Dashboard
+    {
+        [DataMember(Order = 1)]
+        public string LiveVersionRefid { get; set; }
+
+        [DataMember(Order = 2)]
+        public string LiveVersionNumber { get; set; }
+
+        [DataMember(Order = 3)]
+        public DateTime LiveVersionCommit_ts { get; set; }
+
+        [DataMember(Order = 4)]
+        public string LiveVersionCommitby_Name { get; set; } 
+
+        [DataMember(Order = 5)]
+        public int LiveVersionCommitby_Id { get; set; }
+
+        [DataMember(Order = 6)]
+        public string LiveVersion_Status { get; set; }
+
+        [DataMember(Order = 7)]
+        public string LastCommitedVersionRefid { get; set; }
+
+        [DataMember(Order = 8)]
+        public string LastCommitedVersionNumber { get; set; }
+
+        [DataMember(Order = 9)]
+        public DateTime LastCommitedVersionCommit_ts { get; set; }
+
+        [DataMember(Order = 10)]
+        public string LastCommitedby_Name { get; set; }
+
+        [DataMember(Order = 11)]
+        public string LastCommitedVersion_Status { get; set; }
+
+        [DataMember(Order = 12)]
+        public int LastCommitedby_Id { get; set; }
+
+        public EbObjectWrapper_Dashboard() { }
+    }
+    }
