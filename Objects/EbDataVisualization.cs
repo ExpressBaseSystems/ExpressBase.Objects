@@ -359,6 +359,12 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.DVBuilder)]
         [HideInPropertyGrid]
         public List<ChartColor> LegendColor { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public bool ShowTooltip { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public bool ShowValue { get; set; }
     }
 
     public class axis
