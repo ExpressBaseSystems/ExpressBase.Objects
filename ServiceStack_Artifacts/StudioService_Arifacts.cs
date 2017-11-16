@@ -534,27 +534,18 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Json_lc { get; set; }
 
         [DataMember(Order =16)]
-        public string[] Wc_All { get; set; }
+        public string[] Wc_All { get; set; }        
 
-        [DataMember(Order =17)]
-        public int MajorVersionNumber { get; set; }
-
-        [DataMember(Order = 18)]
-        public int MinorVersionNumber { get; set; }
-
-        [DataMember(Order = 19)]
-        public int PatchVersionNumber { get; set; }
-
-        [DataMember(Order = 19)]
+        [DataMember(Order = 17)]
         public string Tags { get; set; }
 
-        [DataMember(Order = 20)]
-        public string ProfileImage { get; set; }
+        [DataMember(Order = 18)]
+        public int CommitUId { get; set; }
 
-        [DataMember(Order = 21)]
+        [DataMember(Order = 19)]
         public int AppId { get; set; }
 
-        [DataMember(Order = 22)]
+        [DataMember(Order = 20)]
         public EbObjectWrapper_Dashboard Dashboard_Tiles { get; set; }
         public EbObjectWrapper() { }
     }
@@ -597,6 +588,24 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 12)]
         public int LastCommitedby_Id { get; set; }
+
+        [DataMember(Order = 13)]
+        public int OwnerUid { get; set; }
+
+        [DataMember(Order = 14)]
+        public string OwnerName { get; set; }
+
+        [DataMember(Order = 15)]
+        public DateTime OwnerTs { get; set; }
+
+        [DataMember(Order = 16)]
+        public int MajorVersionNumber { get; set; }
+
+        [DataMember(Order = 17)]
+        public int MinorVersionNumber { get; set; }
+
+        [DataMember(Order = 18)]
+        public int PatchVersionNumber { get; set; }
 
         public EbObjectWrapper_Dashboard() { }
     }

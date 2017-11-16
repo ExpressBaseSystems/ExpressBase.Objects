@@ -235,21 +235,7 @@ namespace ExpressBase.Objects
             return DbType.String;
         }
 
-        public enum Operations
-        {
-            Create,
-            Edit,
-            PageSummary,
-            TotalSummary,
-            Filtering,
-            Zooming,
-            Graph,
-            PDFExport,
-            ExcelExport,
-            CSVExport,
-            CopyToClipboard,
-            Print
-        }
+       
     }
 
     [EnableInBuilder(BuilderType.DVBuilder)]
@@ -273,6 +259,21 @@ namespace ExpressBase.Objects
         //[DefaultPropValue("'10'")]
         public int PageLength { get; set; }
 
+        public enum Operations
+        {
+            Create,
+            Edit,
+            PageSummary,
+            TotalSummary,
+            Filtering,
+            Zooming,
+            Graph,
+            PDFExport,
+            ExcelExport,
+            CSVExport,
+            CopyToClipboard,
+            Print
+        }
         public override string GetDesignHtml()
         {
             return "<table class='table table-bordered' eb-type='Table' id='@id'</table>".RemoveCR().DoubleQuoted();
@@ -359,6 +360,12 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.DVBuilder)]
         [HideInPropertyGrid]
         public List<ChartColor> LegendColor { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public bool ShowTooltip { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public bool ShowValue { get; set; }
     }
 
     public class axis

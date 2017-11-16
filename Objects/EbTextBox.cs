@@ -142,7 +142,7 @@ else {
     <span id='@name@Lbl' style='@LabelBackColor @LabelForeColor '> @Label  </span>
         <div  class='input-group' style='width: 100%;'>
             @attachedLbl
-            <input type='@TextMode '  id='@name@' name='@name ' autocomplete = '@AutoCompleteOff ' data-toggle='tooltip' title='@ToolTipText ' 
+            <input type='@TextMode ' id='@name@' name='@name ' autocomplete = '@AutoCompleteOff ' data-toggle='tooltip' title='@ToolTipText ' 
 @tabIndex @MaxLength  style='width:100%; height:@heightpx; @BackColor @ForeColor display:inline-block; @fontStyle @ReadOnlyString  @Required  @PlaceHolder  @Text  @TabIndex  />
         </div>
     <span class='helpText'> @HelpText </span>
