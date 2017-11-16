@@ -69,6 +69,38 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 4)]
         public string u_token { get; set; }
     }
+    [DataContract]
+    public class GetApplicationObjectsRequest : IReturn<GetApplicationObjectsResponse>, IEbSSRequest
+    {
+       
+        [DataMember(Order = 1)]
+        public int Id { get; set; }
+
+        [DataMember(Order = 2)]
+        public int objtype { get; set; }
+
+        public string TenantAccountId { get; set; }
+
+        public int UserId { get; set; }
+
+        public string Token { get; set; }
+    }
+
+    [DataContract]
+    public class GetApplicationObjectsResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]     
+        public Dictionary<string, object> Data { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 3)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 4)]
+        public string u_token { get; set; }
+    }
 
     [DataContract]
     public class GetUserRolesRequest : IReturn<GetUserRolesResponse>, IEbSSRequest
@@ -210,7 +242,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public string Token { get; set; }
     }
-
 
     [DataContract]
     public class EditUserPreferenceResponse : IEbSSResponse
@@ -420,5 +451,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 3)]
         public ResponseStatus ResponseStatus { get; set; }
     }
+
+
 
 }
