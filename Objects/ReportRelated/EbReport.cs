@@ -20,10 +20,11 @@ namespace ExpressBase.Objects
 
     public enum PaperSize
     {
-        A5,
-        A4,
-        A3,
         A2,
+        A3,
+        A4,
+        A5,
+        Letter,
         Custom
     }
 
@@ -32,7 +33,7 @@ namespace ExpressBase.Objects
     {
         [EnableInBuilder(BuilderType.Report)]
         [OnChangeExec(@"
-if (this.PaperSize === 'Custom' ){  
+if (this.PaperSize === 6 ){  
      pg.ShowProperty('CustomPaperHeight');
      pg.ShowProperty('CustomPaperWidth');
 }
