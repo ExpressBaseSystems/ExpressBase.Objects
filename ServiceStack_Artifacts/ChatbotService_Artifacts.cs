@@ -8,13 +8,15 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
     public class CreateBotRequest : EbServiceStackRequest, IReturn<CreateBotResponse>
     {
-        public string SolutionId { get; set; }  
+        public string SolutionId { get; set; }
 
         public string BotName { get; set; }
 
         public string WebURL { get; set; }
 
-        public string WelcomeMsg{ get; set; }
+        public string WelcomeMsg { get; set; }
+
+        public string CreatedBy { get; set; }
     }
 
     [System.Runtime.Serialization.DataContract]
@@ -31,8 +33,53 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 4)]
         public string BotId { get; set; }
-
-
     }
-   
+    public class BotListRequest : EbServiceStackRequest, IReturn<CreateBotResponse>
+    {
+        public int SolutionId { get; set; }
+    }
+
+    [System.Runtime.Serialization.DataContract]
+    public class BotListResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public int Id { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 3)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 4)]
+        public List<ChatBot> Data { get; set; }
+    }
+    [DataContract]
+    public class ChatBot
+    {
+
+        [DataMember(Order = 1)]
+        public string Name { get; set; }
+
+        [DataMember(Order = 2)]
+        public string WebsiteURL { get; set; }
+
+        [DataMember(Order = 3)]
+        public string BotId { get; set; }
+
+        [DataMember(Order = 4)]
+        public string CreatedBy { get; set; }
+
+        [DataMember(Order = 5)]
+        public DateTime CreatedAt { get; set; }
+
+        [DataMember(Order = 6)]
+        public string LastModifiedBy { get; set; }
+
+        [DataMember(Order = 7)]
+        public DateTime LastModifiedAt { get; set; }
+
+        public ChatBot() { }
+    }
+
 }
