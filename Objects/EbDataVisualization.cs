@@ -362,6 +362,15 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         public bool ShowValue { get; set; }
+
+        public enum Operations
+        {
+            Customize,
+            Print,
+            DrillDown,
+            Export
+
+        }
     }
 
     public class axis
