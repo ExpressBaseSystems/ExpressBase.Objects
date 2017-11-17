@@ -1,4 +1,5 @@
-﻿using ServiceStack;
+﻿using ExpressBase.Common.Objects;
+using ServiceStack;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
@@ -14,18 +15,32 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class SidebarUserResponse :IEbSSResponse
     {
         [DataMember(Order = 1)]
-        public Dictionary<string, AppWrap> Data { get; set; }
+        public Dictionary<int, AppWrap> Data { get; set; }
+
+        [DataMember(Order = 2)]
+        public Dictionary<int, AppObject> AppList { get; set; }
 
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
     }
 
     [DataContract]
-    public class AppWrap
+    public class AppObject
     {
         [DataMember(Order = 1)]
         public string AppName { get; set; }
+    }
 
+    [DataContract]
+    public class AppWrap
+    {
+        [DataMember(Order = 2)]
+        public Dictionary<int, TypeWrap> Types { get; set; }
+    }
+
+    [DataContract]
+    public class TypeWrap
+    {
         [DataMember(Order = 2)]
         public List<ObjWrap> Objects { get; set; }
     }
@@ -44,6 +59,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 4)]
         public string Refid { get; set; }
+
+        [DataMember(Order = 5)]
+        public EbObjectType EbObjectType { get; set; }
 
         [DataMember(Order = 6)]
         public int AppId { get; set; }
