@@ -261,17 +261,13 @@ namespace ExpressBase.Objects
 
         public enum Operations
         {
-            Create,
-            Edit,
-            PageSummary,
-            TotalSummary,
-            Filtering,
-            Zooming,
-            Graph,
+            Customize,
+            Summarize,
+            Filter,
+            Drilldown,
             PDFExport,
             ExcelExport,
             CSVExport,
-            CopyToClipboard,
             Print
         }
         public override string GetDesignHtml()
