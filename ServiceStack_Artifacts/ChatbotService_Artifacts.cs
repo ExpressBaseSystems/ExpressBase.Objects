@@ -17,6 +17,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string WelcomeMsg { get; set; }
 
         public string CreatedBy { get; set; }
+
+        public string BotId { get; set; }
+
+        public string ChatId { get; set; }
     }
 
     [System.Runtime.Serialization.DataContract]
@@ -78,6 +82,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 7)]
         public DateTime LastModifiedAt { get; set; }
+
+        [DataMember(Order = 8)]
+        public string WelcomeMsg { get; set; }
+
+        [DataMember(Order = 9)]
+        public string ChatId { get; set; }
 
         public ChatBot() { }
     }
