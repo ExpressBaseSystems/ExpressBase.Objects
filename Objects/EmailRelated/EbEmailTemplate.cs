@@ -2,6 +2,7 @@
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using Newtonsoft.Json;
+using ServiceStack.Redis;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -24,8 +25,8 @@ namespace ExpressBase.Objects.EmailRelated
     [EnableInBuilder(BuilderType.EmailBuilder)]
     public class EbEmailTemplate : EbEmailTemplateBase
     {
-        [EnableInBuilder(BuilderType.EmailBuilder)]
-        public string Description { get; set; }
+        //[EnableInBuilder(BuilderType.EmailBuilder)]
+        //public string Description { get; set; }
 
         [EnableInBuilder(BuilderType.EmailBuilder)]
         public EmailPriority Priority { get; set; }
@@ -41,5 +42,21 @@ namespace ExpressBase.Objects.EmailRelated
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectType.DataSource)]
         public string DataSourceRefId { get; set; }
+
+        [JsonIgnore]
+        public EbDataSource EbDataSource { get; set; }
+
+        public override void AfterRedisGet(RedisClient Redis)
+        {
+            try
+            {
+                this.EbDataSource = Redis.Get<EbDataSource>(this.DataSourceRefId);
+                this.EbDataSource.AfterRedisGet(Redis);
+            }
+            catch (Exception e)
+            {
+
+            }
+        }
     }
 }
