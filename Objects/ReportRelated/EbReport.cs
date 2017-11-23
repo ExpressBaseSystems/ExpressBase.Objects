@@ -48,12 +48,12 @@ else {
         [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("General")]
         [UIproperty]
-        public decimal CustomPaperHeight { get; set; }
+        public float CustomPaperHeight { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("General")]
         [UIproperty]
-        public decimal CustomPaperWidth { get; set; }
+        public float CustomPaperWidth { get; set; }
 
         //public EbReportMargins Margins { get; set; }
         [EnableInBuilder(BuilderType.Report)]
