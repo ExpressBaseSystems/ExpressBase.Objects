@@ -66,5 +66,24 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 6)]
         public int AppId { get; set; }
 
+        [DataMember(Order = 7)]
+        public string Description { get; set; }
+
+        [DataMember(Order = 5)]
+        public string EbType { get; set; }
+
+    }
+
+    public class SidebarDevRequest : EbServiceStackRequest, IReturn<SidebarDevResponse>
+    {
+    }
+
+    public class SidebarDevResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public Dictionary<int, TypeWrap> Data { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
     }
 }
