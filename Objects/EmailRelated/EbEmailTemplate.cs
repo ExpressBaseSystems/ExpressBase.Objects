@@ -36,6 +36,7 @@ namespace ExpressBase.Objects.EmailRelated
 
         [EnableInBuilder(BuilderType.EmailBuilder)]
         [JsonConverter(typeof(Base64Converter))]
+        [HideInPropertyGrid]
         public string Body { get; set; }
 
         [EnableInBuilder(BuilderType.EmailBuilder)]
