@@ -86,7 +86,7 @@ else {
 
         [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]
-        public EbReportDetail Detail { get; set; }
+        public List<EbReportDetail> Detail { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
@@ -101,7 +101,7 @@ else {
 
             this.PageHeaders = new List<EbPageHeader>();
 
-            this.Detail = new EbReportDetail();
+            this.Detail = new List<EbReportDetail>();
 
             this.PageFooters = new List<EbPageFooter>();
 
