@@ -25,7 +25,7 @@ namespace ExpressBase.Objects.ReportRelated
         [UIproperty]
         [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("Appearance")]
-        public int Width { get; set; }
+        public float Width { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
