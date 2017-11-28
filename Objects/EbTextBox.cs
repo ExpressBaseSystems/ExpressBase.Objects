@@ -26,9 +26,8 @@ namespace ExpressBase.Objects
         Password = 1,
         Color = 3
     }
-
-    [ProtoBuf.ProtoContract]
-    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+    
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.ChatForm)]
     public class EbTextBox : EbControl
     {
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]

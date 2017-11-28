@@ -16,6 +16,6 @@ namespace ExpressBase.Objects.Helpers
         public string Value { get; set; }
 
         [ProtoBuf.ProtoMember(3)]
-        public DbType Type { get; set; }
+        public int Type { get; set; }
     }
 }
