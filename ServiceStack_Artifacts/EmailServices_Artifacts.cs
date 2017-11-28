@@ -50,7 +50,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Subject { get; set; }
 
         [DataMember(Order = 4)]
-        public string Message { get; set; }
+        public string refid { get; set; }
 
         [DataMember(Order = 5)]
         public string Cc { get; set; }

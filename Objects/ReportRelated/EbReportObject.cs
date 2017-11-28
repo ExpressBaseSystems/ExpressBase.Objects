@@ -20,22 +20,22 @@ namespace ExpressBase.Objects.ReportRelated
         [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("Appearance")]
         [UIproperty]
-        public decimal Left { get; set; }
+        public float Left { get; set; }
 
         [UIproperty]
         [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("Appearance")]
-        public int Width { get; set; }
+        public float Width { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
         [PropertyGroup("Appearance")]
-        public decimal Top { get; set; }
+        public float Top { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
         [PropertyGroup("Appearance")]
-        public int Height { get; set; }
+        public float Height { get; set; }
 
         //[EnableInBuilder(BuilderType.Report)]
         //public HorizontalAlignment HAlign { get; set; }

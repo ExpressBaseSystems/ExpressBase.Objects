@@ -1,6 +1,8 @@
-﻿using ExpressBase.Common.JsonConverters;
+﻿using ExpressBase.Common;
+using ExpressBase.Common.JsonConverters;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
+using ExpressBase.Objects.Helpers;
 using Newtonsoft.Json;
 using ServiceStack.Redis;
 using System;
@@ -36,12 +38,19 @@ namespace ExpressBase.Objects.EmailRelated
 
         [EnableInBuilder(BuilderType.EmailBuilder)]
         [JsonConverter(typeof(Base64Converter))]
+        [HideInPropertyGrid]
         public string Body { get; set; }
 
         [EnableInBuilder(BuilderType.EmailBuilder)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectType.DataSource)]
         public string DataSourceRefId { get; set; }
+
+        [EnableInBuilder(BuilderType.EmailBuilder)]
+        [HideInPropertyGrid]
+        public List<string> Parameters { get; set; }
+
+      //  public Dictionary<string,ColumnColletion> Columns { get; set; }
 
         [JsonIgnore]
         public EbDataSource EbDataSource { get; set; }

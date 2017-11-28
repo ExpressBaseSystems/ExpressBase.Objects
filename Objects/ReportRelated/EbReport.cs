@@ -48,12 +48,12 @@ else {
         [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("General")]
         [UIproperty]
-        public decimal CustomPaperHeight { get; set; }
+        public float CustomPaperHeight { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("General")]
         [UIproperty]
-        public decimal CustomPaperWidth { get; set; }
+        public float CustomPaperWidth { get; set; }
 
         //public EbReportMargins Margins { get; set; }
         [EnableInBuilder(BuilderType.Report)]
@@ -86,7 +86,7 @@ else {
 
         [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]
-        public EbReportDetail Detail { get; set; }
+        public List<EbReportDetail> Detail { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
@@ -101,7 +101,7 @@ else {
 
             this.PageHeaders = new List<EbPageHeader>();
 
-            this.Detail = new EbReportDetail();
+            this.Detail = new List<EbReportDetail>();
 
             this.PageFooters = new List<EbPageFooter>();
 
@@ -115,6 +115,7 @@ else {
         public string SectionHeight { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
         public List<EbReportFields> Fields { get; set; }
 
     }
