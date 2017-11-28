@@ -115,6 +115,7 @@ else {
         public string SectionHeight { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
         public List<EbReportFields> Fields { get; set; }
 
     }
