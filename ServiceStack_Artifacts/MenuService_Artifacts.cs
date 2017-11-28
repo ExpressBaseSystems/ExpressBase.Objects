@@ -84,6 +84,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public Dictionary<int, TypeWrap> Data { get; set; }
 
         [DataMember(Order = 2)]
+        public Dictionary<int, AppObject> AppList { get; set; }
+
+        [DataMember(Order = 3)]
         public ResponseStatus ResponseStatus { get; set; }
     }
 }
