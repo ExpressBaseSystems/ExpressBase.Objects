@@ -166,7 +166,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class UniqueRequest
     {
         [DataMember(Order = 1)]
-        public Dictionary<string, object> Colvalues { get; set; }
+        public string email { get; set; }
 
     }
 

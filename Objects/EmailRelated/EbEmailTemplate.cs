@@ -68,4 +68,25 @@ namespace ExpressBase.Objects.EmailRelated
             }
         }
     }
+
+    [EnableInBuilder(BuilderType.EmailBuilder)]
+    public class DsColumns : EbEmailTemplate
+    {
+        //public override string GetDesignHtml()
+        //{
+        //    return "<div class='ebdscols' eb-type='DsColumns' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;'> @Title </div>".RemoveCR().DoubleQuoted();
+        //}
+        public override string GetJsInitFunc()
+        {
+            return @"
+    this.Init = function(id)
+        {
+    this.Height =25;
+    this.Width= 200;
+    this.ForeColor = '#201c1c';
+    this.Border = 1;
+    this.BorderColor = '#aaaaaa'
+};";
+        }
+    }
 }
