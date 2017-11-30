@@ -12,6 +12,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public string BotName { get; set; }
 
+        public string FullName { get; set; }
+
         public string WebURL { get; set; }
 
         public string WelcomeMsg { get; set; }
@@ -66,27 +68,30 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Name { get; set; }
 
         [DataMember(Order = 2)]
-        public string WebsiteURL { get; set; }
+        public string FullName { get; set; }
 
         [DataMember(Order = 3)]
-        public string BotId { get; set; }
+        public string WebsiteURL { get; set; }
 
         [DataMember(Order = 4)]
-        public string CreatedBy { get; set; }
+        public string BotId { get; set; }
 
         [DataMember(Order = 5)]
-        public DateTime CreatedAt { get; set; }
+        public string CreatedBy { get; set; }
 
         [DataMember(Order = 6)]
-        public string LastModifiedBy { get; set; }
+        public DateTime CreatedAt { get; set; }
 
         [DataMember(Order = 7)]
-        public DateTime LastModifiedAt { get; set; }
+        public string LastModifiedBy { get; set; }
 
         [DataMember(Order = 8)]
-        public string WelcomeMsg { get; set; }
+        public DateTime LastModifiedAt { get; set; }
 
         [DataMember(Order = 9)]
+        public string WelcomeMsg { get; set; }
+
+        [DataMember(Order = 10)]
         public string ChatId { get; set; }
 
         public ChatBot() { }
