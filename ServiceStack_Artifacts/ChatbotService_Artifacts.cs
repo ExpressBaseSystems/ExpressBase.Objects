@@ -1,4 +1,5 @@
-﻿using ExpressBase.Objects.Objects;
+﻿using ExpressBase.Objects.ObjectContainers;
+using ExpressBase.Objects.Objects;
 using ServiceStack;
 using System;
 using System.Collections.Generic;
@@ -24,6 +25,32 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string BotId { get; set; }
 
         public string ChatId { get; set; }
+    }
+
+    public class GetBotForm4UserRequest : EbServiceStackRequest, IReturn<CreateBotResponse>
+    {
+        public string BotFormIds { get; set; }
+    }
+
+    [System.Runtime.Serialization.DataContract]
+    public class GetBotForm4UserResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public int Id { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 3)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 4)]
+        public List<EbBotForm> BotForms{ get; set; }
+
+        public GetBotForm4UserResponse()
+        {
+            this.BotForms = new List<EbBotForm>();
+        }
     }
 
     [System.Runtime.Serialization.DataContract]

@@ -12,7 +12,15 @@ namespace ExpressBase.Objects.ObjectContainers
     {
         public bool IsUpdate { get; set; }
 
+
+
         public EbBotForm() { }
+
+        public enum Operations
+        {
+            Access
+        }
+
 
         public override string GetHead()
         {
