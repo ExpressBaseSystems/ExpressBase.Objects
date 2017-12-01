@@ -12,16 +12,16 @@ using System.Threading.Tasks;
 namespace ExpressBase.Objects
 {
 
-    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.ChatForm)]
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.BotForm)]
     public class EbSimpleSelect : EbControl
     {
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.ChatForm)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
         [OSE_ObjectTypes(EbObjectType.DataSource)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         public string DataSourceId { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.ChatForm)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
         public int Value { get; set; }
 
         public EbSimpleSelect() { }

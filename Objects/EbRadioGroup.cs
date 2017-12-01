@@ -17,7 +17,7 @@ namespace ExpressBase.Objects
         Text
     }
 
-    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
     public class EbRadioGroup : EbControl
     {
         public EbRadioGroup()

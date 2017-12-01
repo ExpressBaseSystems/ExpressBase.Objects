@@ -27,7 +27,7 @@ namespace ExpressBase.Objects
         Color = 3
     }
     
-    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.ChatForm)]
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
     public class EbTextBox : EbControl
     {
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]

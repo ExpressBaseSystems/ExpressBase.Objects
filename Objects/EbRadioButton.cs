@@ -7,7 +7,7 @@ using System.Text;
 
 namespace ExpressBase.Objects.Objects
 {
-    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
     class EbRadioButton : EbControl
     {
         public EbRadioButton() { }

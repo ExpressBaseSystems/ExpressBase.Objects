@@ -1,4 +1,5 @@
-﻿using ServiceStack;
+﻿using ExpressBase.Objects.Objects;
+using ServiceStack;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
@@ -60,6 +61,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 4)]
         public List<ChatBot> Data { get; set; }
     }
+
     [DataContract]
     public class ChatBot
     {
