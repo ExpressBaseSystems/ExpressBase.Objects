@@ -1,4 +1,5 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Extensions;
 using ExpressBase.Common.JsonConverters;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
@@ -17,6 +18,11 @@ namespace ExpressBase.Objects.EmailRelated
         Low,
         Medium
     }
+    public enum DateFormat
+    {
+        ddmmyy,
+        mmddyy
+    }
 
     [EnableInBuilder(BuilderType.EmailBuilder)]
     public class EbEmailTemplateBase : EbObject
@@ -29,9 +35,10 @@ namespace ExpressBase.Objects.EmailRelated
     {
         //[EnableInBuilder(BuilderType.EmailBuilder)]
         //public string Description { get; set; }
+        
 
         [EnableInBuilder(BuilderType.EmailBuilder)]
-        public EmailPriority Priority { get; set; }
+        public EmailPriority Priority { get; set; }      
 
         [EnableInBuilder(BuilderType.EmailBuilder)]
         public string Subject { get; set; }
@@ -72,18 +79,52 @@ namespace ExpressBase.Objects.EmailRelated
     [EnableInBuilder(BuilderType.EmailBuilder)]
     public class DsColumns : EbEmailTemplate
     {
-        //public override string GetDesignHtml()
-        //{
-        //    return "<div class='ebdscols' eb-type='DsColumns' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;'> @Title </div>".RemoveCR().DoubleQuoted();
-        //}
+        [EnableInBuilder(BuilderType.EmailBuilder)]
+        public DateFormat DateFormat { get; set; }
+
+        [EnableInBuilder(BuilderType.EmailBuilder)]
+        [UIproperty]
+        [PropertyGroup("Appearance")]
+        public float Width { get; set; }
+
+        [EnableInBuilder(BuilderType.EmailBuilder)]
+        [UIproperty]
+        [PropertyGroup("Appearance")]
+        public float Left { get; set; }
+
+        [EnableInBuilder(BuilderType.EmailBuilder)]
+        [UIproperty]
+        [PropertyGroup("Appearance")]
+        public float Right { get; set; }
+
+
+        [EnableInBuilder(BuilderType.EmailBuilder)]
+        [UIproperty]
+        [PropertyGroup("General")]
+        public string Title { get; set; }
+
+        //[EnableInBuilder(BuilderType.EmailBuilder)]
+        //[UIproperty]
+        //[PropertyGroup("Appearance")]
+        //public int Border { get; set; }
+
+        [EnableInBuilder(BuilderType.EmailBuilder)]
+        [UIproperty]
+        [PropertyEditor(PropertyEditorType.Color)]
+        [PropertyGroup("Appearance")]
+        public string BorderColor { get; set; }
+
+        public override string GetDesignHtml()
+        {
+            return "<div class='ebdscols' eb-type='DsColumns' format='@format'  id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width; background-color:@BackColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;'> @Title </div>".RemoveCR().DoubleQuoted();
+        }
         public override string GetJsInitFunc()
         {
             return @"
     this.Init = function(id)
         {
     this.Height =25;
-    this.Width= 200;
-    this.ForeColor = '#201c1c';
+    this.Width= 175;
     this.Border = 1;
     this.BorderColor = '#aaaaaa'
 };";
