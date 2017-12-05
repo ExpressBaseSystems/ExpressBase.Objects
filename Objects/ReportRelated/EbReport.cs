@@ -28,6 +28,7 @@ namespace ExpressBase.Objects
         Custom
     }
 
+   
     [EnableInBuilder(BuilderType.Report)]
     public class EbReport : EbReportObject
     {
@@ -106,7 +107,12 @@ else {
             this.PageFooters = new List<EbPageFooter>();
 
             this.ReportFooters = new List<EbReportFooter>();
-        }        
+        }
+
+        public enum Operations
+        {
+            Print
+        }
     }
     public class EbReportSection : EbReportObject
     {        
