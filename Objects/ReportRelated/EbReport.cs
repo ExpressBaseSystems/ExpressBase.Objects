@@ -122,7 +122,7 @@ else {
 
         [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]
-        public List<EbReportFields> Fields { get; set; }
+        public List<EbReportField> Fields { get; set; }
 
     }
 

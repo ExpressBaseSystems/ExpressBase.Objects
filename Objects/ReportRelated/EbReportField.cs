@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace ExpressBase.Objects.ReportRelated
 {
-    public abstract class EbReportFields : EbReportObject
+    public abstract class EbReportField : EbReportObject
     {
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
@@ -24,12 +24,12 @@ namespace ExpressBase.Objects.ReportRelated
     }
 
     [EnableInBuilder(BuilderType.Report)]
-    public class EbReportCol : EbReportFields
+    public class EbDataFieldText : EbReportField
     {       
 
         public override string GetDesignHtml()
         {
-            return "<div class='EbCol dropped' $type='@type' eb-type='ReportCol' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;'> @Title </div>".RemoveCR().DoubleQuoted();
+            return "<div class='EbCol dropped' $type='@type' eb-type='DataFieldText' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;'> @Title </div>".RemoveCR().DoubleQuoted();
         }
         public override string GetJsInitFunc()
         {
@@ -46,7 +46,73 @@ namespace ExpressBase.Objects.ReportRelated
     }
 
     [EnableInBuilder(BuilderType.Report)]
-    public class EbImg : EbReportFields
+    public class EbDataFieldDateTime : EbReportField
+    {
+
+        public override string GetDesignHtml()
+        {
+            return "<div class='EbCol dropped' $type='@type' eb-type='DataFieldText' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;'> @Title </div>".RemoveCR().DoubleQuoted();
+        }
+        public override string GetJsInitFunc()
+        {
+            return @"
+    this.Init = function(id)
+        {
+    this.Height =25;
+    this.Width= 200;
+    this.ForeColor = '#201c1c';
+    this.Border = 1;
+    this.BorderColor = '#aaaaaa'
+};";
+        }
+    }
+
+    [EnableInBuilder(BuilderType.Report)]
+    public class EbDataFieldBoolean : EbReportField
+    {
+
+        public override string GetDesignHtml()
+        {
+            return "<div class='EbCol dropped' $type='@type' eb-type='DataFieldText' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;'> @Title </div>".RemoveCR().DoubleQuoted();
+        }
+        public override string GetJsInitFunc()
+        {
+            return @"
+    this.Init = function(id)
+        {
+    this.Height =25;
+    this.Width= 200;
+    this.ForeColor = '#201c1c';
+    this.Border = 1;
+    this.BorderColor = '#aaaaaa'
+};";
+        }
+    }
+
+    [EnableInBuilder(BuilderType.Report)]
+    public class EbDataFieldNumeric : EbReportField
+    {
+
+        public override string GetDesignHtml()
+        {
+            return "<div class='EbCol dropped' $type='@type' eb-type='DataFieldText' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;'> @Title </div>".RemoveCR().DoubleQuoted();
+        }
+        public override string GetJsInitFunc()
+        {
+            return @"
+    this.Init = function(id)
+        {
+    this.Height =25;
+    this.Width= 200;
+    this.ForeColor = '#201c1c';
+    this.Border = 1;
+    this.BorderColor = '#aaaaaa'
+};";
+        }
+    }
+
+    [EnableInBuilder(BuilderType.Report)]
+    public class EbImg : EbReportField
     {
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
@@ -74,7 +140,7 @@ namespace ExpressBase.Objects.ReportRelated
     }
 
     [EnableInBuilder(BuilderType.Report)]
-    public class EbWaterMark : EbReportFields
+    public class EbWaterMark : EbReportField
     {
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
@@ -102,7 +168,7 @@ namespace ExpressBase.Objects.ReportRelated
     }
 
     [EnableInBuilder(BuilderType.Report)]
-    public class EbDateTime : EbReportFields
+    public class EbDateTime : EbReportField
     {      
         public override string GetDesignHtml()
         {
@@ -123,7 +189,7 @@ namespace ExpressBase.Objects.ReportRelated
     }
 
     [EnableInBuilder(BuilderType.Report)]
-    public class EbPageNo : EbReportFields
+    public class EbPageNo : EbReportField
     {       
 
         public override string GetDesignHtml()
@@ -145,7 +211,7 @@ namespace ExpressBase.Objects.ReportRelated
     }
 
     [EnableInBuilder(BuilderType.Report)]
-    public class EbPageXY : EbReportFields
+    public class EbPageXY : EbReportField
     {
 
         public override string GetDesignHtml()
@@ -167,7 +233,7 @@ namespace ExpressBase.Objects.ReportRelated
     }
 
     [EnableInBuilder(BuilderType.Report)]
-    public class UserName : EbReportFields
+    public class UserName : EbReportField
     {
 
         public override string GetDesignHtml()
@@ -189,7 +255,7 @@ namespace ExpressBase.Objects.ReportRelated
     }
 
     [EnableInBuilder(BuilderType.Report)]
-    public class EbText : EbReportFields
+    public class EbText : EbReportField
     {
 
         public override string GetDesignHtml()
@@ -211,7 +277,7 @@ namespace ExpressBase.Objects.ReportRelated
     }
 
     [EnableInBuilder(BuilderType.Report)]
-    public class EbBarcode : EbReportFields
+    public class EbBarcode : EbReportField
     {
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
@@ -237,7 +303,7 @@ namespace ExpressBase.Objects.ReportRelated
     }
 
     [EnableInBuilder(BuilderType.Report)]
-    public class EbQRcode : EbReportFields
+    public class EbQRcode : EbReportField
     {
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
