@@ -28,6 +28,16 @@ namespace ExpressBase.Objects
         Custom
     }
 
+    public enum SummaryFunctions
+    {
+        Average,
+        Count,
+        Max,
+        Min,
+        Sum
+    }
+
+
     [EnableInBuilder(BuilderType.Report)]
     public class EbReport : EbReportObject
     {
@@ -106,7 +116,12 @@ else {
             this.PageFooters = new List<EbPageFooter>();
 
             this.ReportFooters = new List<EbReportFooter>();
-        }        
+        }
+
+        public enum Operations
+        {
+            Print
+        }
     }
     public class EbReportSection : EbReportObject
     {        
@@ -116,7 +131,7 @@ else {
 
         [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]
-        public List<EbReportFields> Fields { get; set; }
+        public List<EbReportField> Fields { get; set; }
 
     }
 
