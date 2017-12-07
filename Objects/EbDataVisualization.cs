@@ -373,6 +373,32 @@ namespace ExpressBase.Objects
         }
     }
 
+    [EnableInBuilder(BuilderType.DVBuilder)]
+    public class EbGoogleMap : EbDataVisualization
+    {
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
+        [Alias("Longitude")]
+        public List<DVBaseColumn> Xaxis { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
+        [Alias("Lattitude")]
+        public List<DVBaseColumn> Yaxis { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public bool ShowRoute { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public bool ShowMarker { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public string MarkerLabel { get; set; }        
+        
+        [HideInPropertyGrid]
+        public string Type { get; set; }
+    }
+
     public class axis
     {
         public string index { get; set; }
