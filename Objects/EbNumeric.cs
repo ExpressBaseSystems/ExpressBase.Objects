@@ -5,48 +5,50 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Threading.Tasks;
 
 namespace ExpressBase.Objects
 {
-    [ProtoBuf.ProtoContract]
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
     public class EbNumeric : EbControl
     {
         public EbNumeric() { }
 
-        [ProtoBuf.ProtoMember(1)]
-        [System.ComponentModel.Category("Behavior")]
+        [OnDeserialized]
+        public void OnDeserializedMethod(StreamingContext context)
+        {
+            this.BareControlHtml = this.GetBareHtml();
+            this.Type = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
+        }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public int MaxLength { get; set; }
 
-        [ProtoBuf.ProtoMember(2)]
-        [System.ComponentModel.Category("Behavior")]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public int DecimalPlaces { get; set; }
 
-        [ProtoBuf.ProtoMember(3)]
-        [System.ComponentModel.Category("Appearance")]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public decimal Value { get; set; }
 
         //[ProtoBuf.ProtoMember(4)]
         private string PlaceHolder
         {
-            get {
+            get
+            {
                 //for ( int i=0; i< this.DecimalPlaces; i++)
                 //    res += "0";
-                return (this.DecimalPlaces == 0) ? "0" :  "0." + new String('0', this.DecimalPlaces);
+                return (this.DecimalPlaces == 0) ? "0" : "0." + new String('0', this.DecimalPlaces);
             }
         }
 
-        [ProtoBuf.ProtoMember(5)]
-        [System.ComponentModel.Category("Behavior")]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public bool AllowNegative { get; set; }
 
-        [ProtoBuf.ProtoMember(6)]
-        [System.ComponentModel.Category("Behavior")]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public bool IsCurrency { get; set; }
 
-        [ProtoBuf.ProtoMember(7)]
-        [System.ComponentModel.Category("Behavior")]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public bool AutoCompleteOff { get; set; }
 
         //private string MaxLengthString
@@ -56,7 +58,7 @@ namespace ExpressBase.Objects
 
         public override string GetHead()
         {
-            return ( ((!this.Hidden) ? this.UniqueString  + this.RequiredString : string.Empty) + @"
+            return (((!this.Hidden) ? this.UniqueString + this.RequiredString : string.Empty) + @"
 $('#{0}').focusout( function(){   
        var val=$(this).val().toString();
        var l = '{1}'.length-1;
@@ -162,15 +164,37 @@ $('#{0}').mask('SZZZZZZZZZZZ', {
             return GetHtmlHelper(RenderMode.User);
         }
 
+        public override string GetBareHtml()
+        {
+            return @" 
+        <div class='input-group' style='width:100%;'>
+                <span style='font-size: @fontSize@' class='input-group-addon'>$</span>   
+                <input type='text'  class='numinput' name='@name@' value='@value@' @placeHolder autocomplete = '@autoComplete@' data-toggle='tooltip' title='@toolTipText@' id='@name@' style=' width:100%; @backColor@ @foreColor@ @fontStyle@ display:inline-block; @readOnlyString@ @required@ @tabIndex@ />
+        </div>"
+.Replace("@name@", this.Name)
+.Replace("@toolTipText@", this.ToolTipText)
+.Replace("@autoComplete@", this.AutoCompleteOff ? "off" : "on")
+.Replace("@value@", "")//"value='" + this.Value + "'")
+.Replace("@tabIndex@", "tabindex='" + this.TabIndex + "'")
+    .Replace("@BackColor@ ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor@ ") + ";"))
+    .Replace("@ForeColor@ ", "color:" + ((this.ForeColor != null) ? this.ForeColor : "@ForeColor@ ") + ";")
+.Replace("@required@", " required")//(this.Required && !this.Hidden ? " required" : string.Empty))
+.Replace("@readOnlyString@", this.ReadOnlyString)
+.Replace("@placeHolder@", "placeholder='" + this.PlaceHolder + "'")
+
+//.Replace("@fontStyle@", (this.FontSerialized != null) ?
+//                            (" font-family:" + this.FontSerialized.FontFamily + ";" + "font-style:" + this.FontSerialized.Style
+//                            + ";" + "font-size:" + this.FontSerialized.SizeInPoints + "px;")
+//                        : string.Empty)
+;
+        }
+
         private string GetHtmlHelper(RenderMode mode)
         {
             return (@"
 <div id='cont_@name@' class='Eb-ctrlContainer' Ctype='Numeric' style='@hiddenString'>
     <span id='@nameLbl' style='@lblBackColor @LblForeColor'>@label</span>
-            <div  class='input-group' style='width:100%;'>
-                             <span style='font-size: @fontSize' class='input-group-addon'>$</span>   
-                 <input type='text'  class='numinput' name='@name' value='@value' @placeHolder autocomplete = '@autoComplete' data-toggle='tooltip' title='@toolTipText' id='@name' style='width:100%; height:@heightpx; @backColor @foreColor @fontStyle display:inline-block;@readOnlyString @required @tabIndex />
-            </div>
+       @barehtml@            
     <span class='helpText'> @helpText </span>
 </div>"
 .Replace("@name@", this.Name)
@@ -197,7 +221,7 @@ $('#{0}').mask('SZZZZZZZZZZZ', {
 //                            + ";" + "font-size:" + this.FontSerialized.SizeInPoints + "px;")
 //                        : string.Empty)
 //.Replace("@fontSize", (this.FontSerialized != null) ? (this.FontSerialized.SizeInPoints + "px;") : string.Empty)
-);
+).Replace("@barehtml@", this.GetBareHtml());
         }
     }
 }
