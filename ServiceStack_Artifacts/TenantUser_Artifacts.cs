@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using ServiceStack;
 using System.Text;
+using ExpressBase.Security.Core;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
@@ -54,19 +55,32 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Token { get; set; }
     }
 
-    [DataContract]
-    public class GetUserEditResponse : IEbSSResponse
-    {
-        [DataMember(Order = 1)]
-        public Dictionary<string, object> Data { get; set; }
+	[DataContract]
+	public class GetUserEditResponse : IEbSSResponse
+	{
+		[DataMember(Order = 1)]
+		public Dictionary<string, object> UserData { get; set; }
 
-        [DataMember(Order = 2)]
+		[DataMember(Order = 2)]
+		public List<EbRole> Roles { get; set; }
+
+		[DataMember(Order = 3)]
+		public List<int> UserRoles { get; set; }
+
+		[DataMember(Order = 4)]
+		public List<EbUserGroups> EbUserGroups { get; set; }
+
+		[DataMember(Order = 5)]
+		public List<int> UserGroups { get; set; }
+
+
+		[DataMember(Order = 6)]
         public string Token { get; set; }
 
-        [DataMember(Order = 3)]
+        [DataMember(Order = 7)]
         public ResponseStatus ResponseStatus { get; set; }
 
-        [DataMember(Order = 4)]
+        [DataMember(Order = 8)]
         public string u_token { get; set; }
     }
     [DataContract]
@@ -133,7 +147,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
 
-    [DataContract]
+	[DataContract]
     public class RBACRolesRequest : IReturn<RBACRolesResponse>, IEbSSRequest
     {
         [DataMember(Order = 0)]

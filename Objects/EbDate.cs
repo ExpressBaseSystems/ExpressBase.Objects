@@ -35,7 +35,6 @@ namespace ExpressBase.Objects
     }
 
 
-    [ProtoBuf.ProtoContract]
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
     public class EbDate : EbControl
     {
@@ -45,33 +44,28 @@ namespace ExpressBase.Objects
         public void OnDeserializedMethod(StreamingContext context)
         {
             this.BareControlHtml = this.GetBareHtml();
+            this.Type = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
 
-        [ProtoBuf.ProtoMember(1)]
-        [System.ComponentModel.Category("Behavior")]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public EbDateType EbDateType { get; set; }
 
-        [ProtoBuf.ProtoMember(2)]
-        [System.ComponentModel.Category("Data")]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public DateTime Min { get; set; }
 
-        [ProtoBuf.ProtoMember(3)]
-        [System.ComponentModel.Category("Data")]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public DateTime Max { get; set; }
 
-        [ProtoBuf.ProtoMember(4)]
-        [System.ComponentModel.Category("Data")]
+        //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public DateTime Value { get; set; }
 
-        [ProtoBuf.ProtoMember(5)]
-        [System.ComponentModel.Category("Behavior")]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public string PlaceHolder { get; set; }
 
-        [ProtoBuf.ProtoMember(6)]
-        [System.ComponentModel.Category("Behavior")]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public bool AutoCompleteOff { get; set; }
 
-        [ProtoBuf.ProtoMember(7)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         private string maskPattern
         {
             get
@@ -87,12 +81,10 @@ namespace ExpressBase.Objects
             set { }
         }
 
-        [ProtoBuf.ProtoMember(8)]
-        [System.ComponentModel.Category("Behavior")]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public TimeShowFormat ShowTimeAs_ { get; set; }
 
-        [ProtoBuf.ProtoMember(9)]
-        [System.ComponentModel.Category("Behavior")]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public DateShowFormat ShowDateAs_ { get; set; }
 
         public override string GetHead()
@@ -146,24 +138,24 @@ $('#@id').datetimepicker({
         public override string GetBareHtml()
         {
             return @" 
-        <div  class='input-group' style='width:100%;'>
-            <input id='@name@' data-ebtype='@datetype'  data-toggle='tooltip' title='@toolTipText' class='date' type='text'name='@name@' autocomplete = '@autoComplete' @value @tabIndex style='width:100%; @BackColor @ForeColor display:inline-block; @fontStyle @readOnlyString @required @placeHolder />
-            <span class='input-group-addon'> <i id='@nameTglBtn' class='fa  @atchdLbl' aria-hidden='true'></i> </span>
+        <div class='input-group' style='width:100%;'>
+            <input id='@name@' data-ebtype='@datetype@'  data-toggle='tooltip' title='@toolTipText@' class='date' type='text'name='@name@' autocomplete = '@autoComplete@' @value@ @tabIndex@ style='width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@ @readOnlyString@ @required@ @placeHolder@ />
+            <span class='input-group-addon'> <i id='@name@TglBtn' class='fa  @atchdLbl@' aria-hidden='true'></i> </span>
         </div>"
 .Replace("@name@", this.Name)
-.Replace("@datetype", "6")//( (int)this.EbDateType ).ToString())
-.Replace("@toolTipText", this.ToolTipText)
-.Replace("@autoComplete", this.AutoCompleteOff ? "off" : "on")
-.Replace("@value", "")//"value='" + this.Value + "'")
-.Replace("@tabIndex", "tabindex='" + this.TabIndex + "'")
-    .Replace("@BackColor ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor ") + ";"))
-    .Replace("@ForeColor ", "color:" + ((this.ForeColor != null) ? this.ForeColor : "@ForeColor ") + ";")
-.Replace("@required", " required")//(this.Required && !this.Hidden ? " required" : string.Empty))
-.Replace("@readOnlyString", this.ReadOnlyString)
-.Replace("@placeHolder", "placeholder='" + this.PlaceHolder + "'")
-.Replace("@atchdLbl", (this.EbDateType.ToString().ToLower() == "time") ? "fa-clock-o" : "fa-calendar")
+.Replace("@datetype@", "6")//( (int)this.EbDateType ).ToString())
+.Replace("@toolTipText@", this.ToolTipText)
+.Replace("@autoComplete@", this.AutoCompleteOff ? "off" : "on")
+.Replace("@value@", "")//"value='" + this.Value + "'")
+.Replace("@tabIndex@", "tabindex='" + this.TabIndex + "'")
+    .Replace("@BackColor@ ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor@ ") + ";"))
+    .Replace("@ForeColor@ ", "color:" + ((this.ForeColor != null) ? this.ForeColor : "@ForeColor@ ") + ";")
+.Replace("@required@", " required")//(this.Required && !this.Hidden ? " required" : string.Empty))
+.Replace("@readOnlyString@", this.ReadOnlyString)
+.Replace("@placeHolder@", "placeholder='" + this.PlaceHolder + "'")
+.Replace("@atchdLbl@", (this.EbDateType.ToString().ToLower() == "time") ? "fa-clock-o" : "fa-calendar")
 
-//.Replace("@fontStyle", (this.FontSerialized != null) ?
+//.Replace("@fontStyle@", (this.FontSerialized != null) ?
 //                            (" font-family:" + this.FontSerialized.FontFamily + ";" + "font-style:" + this.FontSerialized.Style
 //                            + ";" + "font-size:" + this.FontSerialized.SizeInPoints + "px;")
 //                        : string.Empty)
@@ -184,14 +176,14 @@ $('#@id').datetimepicker({
         <span class='helpText'> @HelpText </span>
     </div>
 "
+.Replace("@barehtml@", this.GetBareHtml())
 .Replace("@name@", this.Name)
 .Replace("@hiddenString", this.HiddenString)
 
     .Replace("@LabelForeColor ", "color:" + ((this.LabelForeColor != null) ? this.LabelForeColor : "@LabelForeColor ") + ";")
     .Replace("@LabelBackColor ", "background-color:" + ((this.LabelBackColor != null) ? this.LabelBackColor : "@LabelBackColor ") + ";")
     .Replace("@HelpText ", ((this.HelpText != null) ? this.HelpText : "@HelpText "))
-    .Replace("@Label ", ((this.Label != null) ? this.Label : "@Label "))
-    .Replace("@barehtml@", this.GetBareHtml());
+    .Replace("@Label ", ((this.Label != null) ? this.Label : "@Label "));
             return EbCtrlHTML;
         }
     }
