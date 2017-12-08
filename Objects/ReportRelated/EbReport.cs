@@ -28,7 +28,7 @@ namespace ExpressBase.Objects
         Custom
     }
 
-    public enum SummaryFunctions
+    public enum SummaryFunctionsText
     {
         Average,
         Count,
@@ -36,7 +36,30 @@ namespace ExpressBase.Objects
         Min,
         Sum
     }
-
+    public enum SummaryFunctionsNumeric
+    {
+        Average,
+        Count,
+        Max,
+        Min,
+        Sum
+    }
+    public enum SummaryFunctionsDateTime
+    {
+        Average,
+        Count,
+        Max,
+        Min,
+        Sum
+    }
+    public enum SummaryFunctionsBoolean
+    {
+        Average,
+        Count,
+        Max,
+        Min,
+        Sum
+    }
 
     [EnableInBuilder(BuilderType.Report)]
     public class EbReport : EbReportObject
