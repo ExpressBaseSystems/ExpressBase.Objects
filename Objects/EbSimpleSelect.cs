@@ -27,6 +27,19 @@ namespace ExpressBase.Objects
 
         public EbSimpleSelect() { }
 
+        public string GetOptionsHtml() {
+            string _html = string.Empty;
+
+            //this.DataSourceId
+
+            //foreach( string option in options)
+            //{
+            //    _html += "<option> @option@ </option>".Replace("@option@", option);
+            //}
+            _html = "<option>select1</option><option>select2</option><option>select3</option>";
+            return _html;
+        }
+
         [OnDeserialized]
         public void OnDeserializedMethod(StreamingContext context)
         {
@@ -60,11 +73,10 @@ namespace ExpressBase.Objects
         public override string GetBareHtml()
         {
             return @"
-        <select id='@name@' class='selectpicker'>
-          <option>Mustard</option>
-          <option>Ketchup</option>
-          <option>Relish</option>
+        <select id='@name@'>
+            @options@
         </select>"
+.Replace("@options@", this.GetOptionsHtml())
 .Replace("@name@", this.Name);
         }
 
