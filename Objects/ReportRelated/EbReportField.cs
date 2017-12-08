@@ -24,94 +24,6 @@ namespace ExpressBase.Objects.ReportRelated
     }
 
     [EnableInBuilder(BuilderType.Report)]
-    public class EbDataFieldText : EbReportField
-    {       
-
-        public override string GetDesignHtml()
-        {
-            return "<div class='EbCol dropped' $type='@type' eb-type='DataFieldText' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;'> @Title </div>".RemoveCR().DoubleQuoted();
-        }
-        public override string GetJsInitFunc()
-        {
-            return @"
-    this.Init = function(id)
-        {
-    this.Height =25;
-    this.Width= 200;
-    this.ForeColor = '#201c1c';
-    this.Border = 1;
-    this.BorderColor = '#aaaaaa'
-};";
-        }
-    }
-
-    [EnableInBuilder(BuilderType.Report)]
-    public class EbDataFieldDateTime : EbReportField
-    {
-
-        public override string GetDesignHtml()
-        {
-            return "<div class='EbCol dropped' $type='@type' eb-type='DataFieldText' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;'> @Title </div>".RemoveCR().DoubleQuoted();
-        }
-        public override string GetJsInitFunc()
-        {
-            return @"
-    this.Init = function(id)
-        {
-    this.Height =25;
-    this.Width= 200;
-    this.ForeColor = '#201c1c';
-    this.Border = 1;
-    this.BorderColor = '#aaaaaa'
-};";
-        }
-    }
-
-    [EnableInBuilder(BuilderType.Report)]
-    public class EbDataFieldBoolean : EbReportField
-    {
-
-        public override string GetDesignHtml()
-        {
-            return "<div class='EbCol dropped' $type='@type' eb-type='DataFieldText' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;'> @Title </div>".RemoveCR().DoubleQuoted();
-        }
-        public override string GetJsInitFunc()
-        {
-            return @"
-    this.Init = function(id)
-        {
-    this.Height =25;
-    this.Width= 200;
-    this.ForeColor = '#201c1c';
-    this.Border = 1;
-    this.BorderColor = '#aaaaaa'
-};";
-        }
-    }
-
-    [EnableInBuilder(BuilderType.Report)]
-    public class EbDataFieldNumeric : EbReportField
-    {
-
-        public override string GetDesignHtml()
-        {
-            return "<div class='EbCol dropped' $type='@type' eb-type='DataFieldText' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;'> @Title </div>".RemoveCR().DoubleQuoted();
-        }
-        public override string GetJsInitFunc()
-        {
-            return @"
-    this.Init = function(id)
-        {
-    this.Height =25;
-    this.Width= 200;
-    this.ForeColor = '#201c1c';
-    this.Border = 1;
-    this.BorderColor = '#aaaaaa'
-};";
-        }
-    }
-
-    [EnableInBuilder(BuilderType.Report)]
     public class EbImg : EbReportField
     {
         [EnableInBuilder(BuilderType.Report)]
@@ -328,32 +240,5 @@ namespace ExpressBase.Objects.ReportRelated
         }
     }
 
-    [EnableInBuilder(BuilderType.Report)]
-    public class EbDataFieldSummary : EbReportField
-    {
-        [EnableInBuilder(BuilderType.Report)]
-        [HideInPropertyGrid]       
-        public string DataField { get; set; }
-
-        [EnableInBuilder(BuilderType.Report)]
-        public SummaryFunctions Function { get; set; }
-
-        public override string GetDesignHtml()
-        {
-            return "<div class='dropped' $type='@type' eb-type='DataFieldSummary' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;'> @Title </div>".RemoveCR().DoubleQuoted();
-        }
-        public override string GetJsInitFunc()
-        {
-            return @"
-    this.Init = function(id)
-        {
-    this.Height =25;
-    this.Width= 200;
-    this.ForeColor = '#201c1c';
-    this.Border = 1;
-    this.BorderColor = '#aaaaaa'
-};";
-        }
-    }
 }
 

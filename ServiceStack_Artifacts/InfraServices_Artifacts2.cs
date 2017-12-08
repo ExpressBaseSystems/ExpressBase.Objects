@@ -245,6 +245,20 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 2)]
         public int UserId { get; set; }
 
+        [DataMember(Order = 3)]
+        public string Subscription { get; set; }
+
+        [DataMember(Order = 4)]
+        public string SolutionName { get; set; }
+
+        [DataMember(Order = 6)]
+        public string EsolutionId { get; set; }
+
+        [DataMember(Order = 7)]
+        public string IsolutionId { get; set; }
+
+        [DataMember(Order = 8)]
+        public string Description { get; set; }
     }
 
     [DataContract]
