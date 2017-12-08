@@ -38,11 +38,11 @@ namespace ExpressBase.Objects
             }
         }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         [PropertyGroup("Behavior")]
         public EbRadioValueType ValueType { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         [PropertyGroup("Behavior")]
         [PropertyEditor(PropertyEditorType.Collection)]
         public List<EbRadioOptionAbstract> Options { get; set; }
@@ -87,19 +87,27 @@ this.Init = function(id)
 
     }
 
-    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
     [HideInToolBox]
     public class EbRadioOption : EbRadioOptionAbstract
     {
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        public EbRadioOption() { }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public override string Label { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public string Value { get; set; }
+
+        public override string GetBareHtml()
+        {
+            return @"<input type ='radio' name='@name@'> <span id='@name@Lbl' style='@LabelBackColor @LabelForeColor '> @Label  </span>"
+.Replace("@name@", this.Name);
+        }
 
         public override string GetHtml()
         {
-            return @"<input type ='radio' name='@name '> <span id='@name@Lbl' style='@LabelBackColor @LabelForeColor '> @Label  </span>";
+            return this.GetBareHtml(); ;
         }
     }
 }

@@ -36,20 +36,11 @@ namespace ExpressBase.Objects
             return GetHtmlHelper(RenderMode.User);
         }
 
-        private string GetHtmlHelper(RenderMode mode)
+        public override string GetBareHtml()
         {
-            return string.Format(@"
-<div id='@namecontainer' class='Eb-ctrlContainer'>
-    <button id='@name' class='btn btn-default'  data-toggle='tooltip' title='@toolTipText' style='width:100%; @backColor @foreColor @fontStyle'>@text</button>
-</div>
-"
-.Replace("@name", this.Name)
-.Replace("@left", this.Left.ToString())
-.Replace("@top", this.Top.ToString())
-.Replace("@width", this.Width.ToString())
-.Replace("@height", this.Height.ToString())
-.Replace("@hiddenString", this.HiddenString)
-.Replace("@toolTipText", this.ToolTipText)
+            return @"
+                    <button id='@name' class='btn btn-default'  data-toggle='tooltip' title='@toolTipText' style='width:100%; @backColor @foreColor @fontStyle'>@text</button>"
+.Replace("@name@", this.Name)
 
     .Replace("@Text ", (this.Text != null) ? this.Text : "@Text ")
 
@@ -60,6 +51,19 @@ namespace ExpressBase.Objects
 //                            (" font-family:" + this.FontSerialized.FontFamily + ";" + "font-style:" + this.FontSerialized.Style
 //                            + ";" + "font-size:" + this.FontSerialized.SizeInPoints + "px;")
 //                        : string.Empty)
+;
+        }
+
+        private string GetHtmlHelper(RenderMode mode)
+        {
+            return string.Format(@"
+<div id='@namecontainer' class='Eb-ctrlContainer'>
+    
+</div>
+"
+.Replace("@name", this.Name)
+.Replace("@hiddenString", this.HiddenString)
+.Replace("@toolTipText", this.ToolTipText)
 );
         }
        

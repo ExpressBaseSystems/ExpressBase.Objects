@@ -23,53 +23,49 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
     public class EbComboBox : EbControl
     {
-        [ProtoBuf.ProtoMember(1)]
+
+        public EbComboBox() {
+        }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public int DataSourceId { get; set; }
 
-        [System.ComponentModel.Category("Behavior")]
-        [ProtoBuf.ProtoMember(2)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public string DisplayMember { get; set; }
 
-        [System.ComponentModel.Category("Behavior")]
-        [ProtoBuf.ProtoMember(3)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public string ValueMember { get; set; }
 
-        [ProtoBuf.ProtoMember(4)]
-        [System.ComponentModel.Category("Layout")]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public int DropdownHeight { get; set; }
 
-        [ProtoBuf.ProtoMember(5)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public int Value { get; set; }
 
-        [ProtoBuf.ProtoMember(6)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public string Text { get; set; }
 
-        [ProtoBuf.ProtoMember(7)]
-        [System.ComponentModel.Category("Layout")]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public int DropdownWidth { get; set; }
 
-        [ProtoBuf.ProtoMember(8)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         [System.ComponentModel.Category("Behavior")]
         public bool MultiSelect { get; set; }
 
-        [ProtoBuf.ProtoMember(9)]
-        [System.ComponentModel.Category("Behavior")]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public int MaxLimit { get; set; }
 
-        [ProtoBuf.ProtoMember(10)]
-        [System.ComponentModel.Category("Behavior")]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public int MinLimit { get; set; }
 
-        [ProtoBuf.ProtoMember(11)]
-        [System.ComponentModel.Category("Behavior")]
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public DefaultSearchFor DefaultSearchFor { get; set; }
 
-        [ProtoBuf.ProtoMember(12)]
-        [System.ComponentModel.Category("Behavior")]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public int NumberOfFields { get; set; }
 
-        [ProtoBuf.ProtoMember(13)]
-        [System.ComponentModel.Category("Behavior")]
+        //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public int[] values { get; set; }
 
         private string VueSelectcode
@@ -93,8 +89,6 @@ namespace ExpressBase.Objects
                 return rs + "</div>";
             }
         }
-
-        public EbComboBox() { }
 
         public override string GetHead()
         {
@@ -129,6 +123,26 @@ var @nameEbCombo = new EbSelect('@name', '@DSid', @DDHeight, '@vmName', '', @Max
             return GetHtmlHelper(RenderMode.User);
         }
 
+        public override string GetBareHtml()
+        {
+            return @"
+            @VueSelectCode
+            <div id='@name_loadingdiv' class='ebCombo-loader'>
+                <i id='@name_loading-image' class='fa fa-spinner fa-pulse fa-2x fa-fw'></i><span class='sr-only'>Loading...</span>
+            </div>
+            <center>
+                <div id='@nameDDdiv' v-show='DDstate' class='DDdiv expand-transition'  style='width:@DDwidthpx;'> 
+                    <table id='@nametbl' tabindex='1000' style='width:100%' class='table table-striped table-bordered'></table>
+                </div>
+            </center>"
+.Replace("@VueSelectCode", this.VueSelectcode)
+.Replace("@name@", this.Name)
+.Replace("@width", 900.ToString())//this.Width.ToString())
+.Replace("@perWidth", (this.NumberOfFields != 0) ? (900 / this.NumberOfFields).ToString() : 900.ToString())
+.Replace("@DDwidth", (this.DropdownWidth == 0) ? "300" : this.DropdownWidth.ToString())
+;
+        }
+
         private string GetHtmlHelper(RenderMode mode)
         {
             return @"
@@ -136,23 +150,12 @@ var @nameEbCombo = new EbSelect('@name', '@DSid', @DDHeight, '@vmName', '', @Max
        <div id='@nameContainer'  role='form' data-toggle='validator' style='width:100%;'>
             <input type='hidden' name='@nameHidden4val' data-ebtype='16' id='@name'/>
             <div style='display:inline-block;' id='@nameLbl'>@label</div>
-            @VueSelectCode
-            <div id='@name_loadingdiv' class='ebCombo-loader'>
-                <i id='@name_loading-image' class='fa fa-spinner fa-pulse fa-2x fa-fw'></i><span class='sr-only'>Loading...</span>
-            </div>
-            <center><div id='@nameDDdiv' v-show='DDstate' class='DDdiv expand-transition'  style='width:@DDwidthpx;'> 
-                <table id='@nametbl' tabindex='1000' style='width:100%' class='table table-striped table-bordered'></table>
-            </div></center>
+           
         </div>
     </div>"
-.Replace("@VueSelectCode", this.VueSelectcode)
+.Replace("@barehtml@", this.GetBareHtml())
 .Replace("@name", this.Name)
-.Replace("@left", this.Left.ToString())
-.Replace("@top", this.Top.ToString())
 .Replace("@label", this.Label)
-.Replace("@width", 900.ToString())//this.Width.ToString())
-.Replace("@perWidth", (this.NumberOfFields != 0) ? (900 / this.NumberOfFields).ToString() : 900.ToString())
-.Replace("@DDwidth", (this.DropdownWidth == 0) ? "300" : this.DropdownWidth.ToString())
 .Replace("@tooltipText", this.ToolTipText);
         }
     }
