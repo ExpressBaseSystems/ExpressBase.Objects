@@ -231,9 +231,11 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     public class ProductPlan
     {
-        public string plan { get; set; }
+        public string Plan { get; set; }
 
-        public decimal amount { get; set; }
+        public decimal Amount { get; set; }
+
+        public decimal EvalDays { get; set; }
     }
 
     [DataContract]
