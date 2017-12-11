@@ -107,10 +107,10 @@ namespace ExpressBase.Objects.Objects.DVRelated
     public class DVStringColumn : DVBaseColumn
     {
         [EnableInBuilder(BuilderType.DVBuilder)]
-        [DefaultPropValue("2")]
+        [DefaultPropValue("1")]
         [PropertyEditor(PropertyEditorType.DropDown)]
         [OnChangeExec(@"
-if(this.RenderAs !== 'Link')
+if(this.RenderAs !== 2)
     pg.HideProperty('LinkRefId')
 else
     pg.ShowProperty('LinkRefId')")]
@@ -161,7 +161,7 @@ else
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [OnChangeExec(@"
-if(this.RenderAs !== 'Link')
+if(this.RenderAs !== '2')
     pg.HideProperty('LinkRefId')
 else
     pg.ShowProperty('LinkRefId')")]
