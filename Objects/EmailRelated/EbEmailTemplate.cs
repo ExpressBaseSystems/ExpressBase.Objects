@@ -116,7 +116,7 @@ namespace ExpressBase.Objects.EmailRelated
 
         public override string GetDesignHtml()
         {
-            return "<div class='ebdscols' eb-type='DsColumns' format='@format'  id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width; background-color:@BackColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;'> @Title </div>".RemoveCR().DoubleQuoted();
+            return "<span class='ebdscols' eb-type='DsColumns' format='@format'  id='@id' style='border: @Border px solid;border-color: @BorderColor ;background-color: @BackColor;'>@Title </span>".RemoveCR().DoubleQuoted();
         }
         public override string GetJsInitFunc()
         {
