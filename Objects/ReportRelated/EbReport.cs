@@ -30,11 +30,9 @@ namespace ExpressBase.Objects
 
     public enum SummaryFunctionsText
     {
-        Average,
         Count,
         Max,
-        Min,
-        Sum
+        Min
     }
     public enum SummaryFunctionsNumeric
     {
@@ -46,19 +44,13 @@ namespace ExpressBase.Objects
     }
     public enum SummaryFunctionsDateTime
     {
-        Average,
         Count,
         Max,
-        Min,
-        Sum
+        Min
     }
     public enum SummaryFunctionsBoolean
     {
-        Average,
-        Count,
-        Max,
-        Min,
-        Sum
+        Count
     }
 
     [EnableInBuilder(BuilderType.Report)]
