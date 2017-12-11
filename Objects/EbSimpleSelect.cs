@@ -1,8 +1,10 @@
-﻿using ExpressBase.Common.Extensions;
+﻿using ExpressBase.Common;
+using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Data;
 using ExpressBase.Objects.ServiceStack_Artifacts;
+using ServiceStack;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -28,10 +30,19 @@ namespace ExpressBase.Objects
         public EbSimpleSelect() { }
 
         public string GetOptionsHtml() {
+            this.DataSourceId = "eb_roby_dev-eb_roby_dev-2-1015-1736";
             string _html = string.Empty;
+            JsonServiceClient ServiceClient = new JsonServiceClient();
+            //DataSourceColumnsResponse cresp = this.Redis.Get<DataSourceColumnsResponse>(string.Format("{0}_columns", this.DataSourceId));
+            //if (cresp.IsNull)
+            DataSourceColumnsResponse cresp = ServiceClient.Get<DataSourceColumnsResponse>(new DataSourceColumnsRequest { RefId = this.DataSourceId });
+
+            ColumnColletion __columns = (cresp.Columns.Count > 1) ? cresp.Columns[1] : cresp.Columns[0];
+
+            DataSourceDataResponse dresp = ServiceClient.Get<DataSourceDataResponse>(new DataSourceDataRequest { RefId = this.DataSourceId, Draw = 1, Start = 0, Length = 100 });
+            var dt = dresp.Data;
 
             //this.DataSourceId
-
             //foreach( string option in options)
             //{
             //    _html += "<option> @option@ </option>".Replace("@option@", option);
