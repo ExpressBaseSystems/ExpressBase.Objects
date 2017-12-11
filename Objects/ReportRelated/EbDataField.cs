@@ -111,6 +111,47 @@ namespace ExpressBase.Objects.ReportRelated
         [EnableInBuilder(BuilderType.Report)]
         public SummaryFunctionsNumeric Function { get; set; }
 
+        private int Count { get; set; }
+
+        private decimal Sum { get; set; }
+
+        private decimal Max { get; set; }
+
+        private decimal Min { get; set; }
+
+        public decimal SummarizedValue
+        {
+            get
+            {
+                if (this.Function == SummaryFunctionsNumeric.Sum)
+                    return this.Sum;
+                else if (this.Function == SummaryFunctionsNumeric.Average)
+                    return this.Sum / this.Count;
+                else if (this.Function == SummaryFunctionsNumeric.Count)
+                    return this.Count;
+                else if (this.Function == SummaryFunctionsNumeric.Max)
+                    return this.Max;
+                else if (this.Function == SummaryFunctionsNumeric.Min)
+                    return this.Min;
+
+                return 0;
+            }
+        }
+
+        public void Summarize(decimal value)
+        {
+            if (this.Function == SummaryFunctionsNumeric.Sum || this.Function == SummaryFunctionsNumeric.Average || this.Function == SummaryFunctionsNumeric.Count)
+            {
+                this.Count++;
+                if (this.Function == SummaryFunctionsNumeric.Sum || this.Function == SummaryFunctionsNumeric.Average)
+                    this.Sum += value;
+            }
+            else if (this.Function == SummaryFunctionsNumeric.Max)
+                this.Max = (this.Max > value) ? this.Max : value;
+            else if (this.Function == SummaryFunctionsNumeric.Min)
+                this.Min = (this.Min < value) ? this.Min : value;
+        }
+
         public override string GetDesignHtml()
         {
             return "<div class='dropped' $type='@type' eb-type='DataFieldNumericSummary' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;'> @Title </div>".RemoveCR().DoubleQuoted();
