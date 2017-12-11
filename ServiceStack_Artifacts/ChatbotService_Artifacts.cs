@@ -45,11 +45,11 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
 
         [DataMember(Order = 4)]
-        public List<EbBotForm> BotForms{ get; set; }
+        public Dictionary<string,string> BotForms{ get; set; }
 
         public GetBotForm4UserResponse()
         {
-            this.BotForms = new List<EbBotForm>();
+            this.BotForms = new Dictionary<string, string>();
         }
     }
 

@@ -29,26 +29,23 @@ namespace ExpressBase.Objects
 
         public EbSimpleSelect() { }
 
-        public string GetOptionsHtml() {
-            this.DataSourceId = "eb_roby_dev-eb_roby_dev-2-1015-1736";
+        public string OptionHtml { get; set; }
+
+
+
+    public void GetOptionsHtml(JsonServiceClient ServiceClient) {
+
+            this.DataSourceId = "eb_roby_dev-eb_roby_dev-2-1015-1739";
+            RowColletion ds = (ServiceClient.Get<DataSourceDataResponse>(new DataSourceDataRequest { RefId = this.DataSourceId })).Data;
             string _html = string.Empty;
-            JsonServiceClient ServiceClient = new JsonServiceClient();
-            //DataSourceColumnsResponse cresp = this.Redis.Get<DataSourceColumnsResponse>(string.Format("{0}_columns", this.DataSourceId));
-            //if (cresp.IsNull)
-            DataSourceColumnsResponse cresp = ServiceClient.Get<DataSourceColumnsResponse>(new DataSourceColumnsRequest { RefId = this.DataSourceId });
 
-            ColumnColletion __columns = (cresp.Columns.Count > 1) ? cresp.Columns[1] : cresp.Columns[0];
+            foreach (EbDataRow option in ds)
+            {
+                _html += string.Format("<option value='{0}'>{1}</option>", option[0], option[1]);
+            }
 
-            DataSourceDataResponse dresp = ServiceClient.Get<DataSourceDataResponse>(new DataSourceDataRequest { RefId = this.DataSourceId, Draw = 1, Start = 0, Length = 100 });
-            var dt = dresp.Data;
-
-            //this.DataSourceId
-            //foreach( string option in options)
-            //{
-            //    _html += "<option> @option@ </option>".Replace("@option@", option);
-            //}
-            _html = "<option>select1</option><option>select2</option><option>select3</option>";
-            return _html;
+            this.OptionHtml = _html;
+            this.BareControlHtml = this.BareControlHtml.Replace("@options@", this.OptionHtml);
         }
 
         [OnDeserialized]
@@ -87,7 +84,6 @@ namespace ExpressBase.Objects
         <select id='@name@'>
             @options@
         </select>"
-.Replace("@options@", this.GetOptionsHtml())
 .Replace("@name@", this.Name);
         }
 
