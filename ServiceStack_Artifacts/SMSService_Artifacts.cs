@@ -78,6 +78,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public SMSSentStatus SMSSentStatus { get; set; }
 
         [DataMember(Order = 2)]
-        public String ContextId { get; set; }
+        public int ContextId { get; set; }
     }
 }

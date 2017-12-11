@@ -20,6 +20,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public EbDataDbConnection DataDBConnection { get; set; }
     }
 
+    public class ChangeObjectsDBConnectionRequest : EbServiceStackRequest
+    {
+        public bool IsNew { get; set; }
+        public EbObjectsDbConnection ObjectsDBConnection { get; set; }
+    }
+
     public class ChangeFilesDBConnectionRequest : EbServiceStackRequest
     {
         public bool IsNew { get; set; }
