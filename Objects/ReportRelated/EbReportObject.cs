@@ -1,5 +1,7 @@
 ﻿using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
+using iTextSharp.text;
+using iTextSharp.text.pdf;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -53,6 +55,6 @@ namespace ExpressBase.Objects.ReportRelated
         [UIproperty]
         [PropertyEditor(PropertyEditorType.Color)]
         [PropertyGroup("Appearance")]
-        public string ForeColor { get; set; }        
+        public string ForeColor { get; set; }
     }
 }

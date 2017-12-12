@@ -6,11 +6,24 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
+using iTextSharp.text;
+using iTextSharp.text.pdf;
+
 namespace ExpressBase.Objects.ReportRelated
 {
     public abstract class EbDataField: EbReportField
     {
+        public virtual void NotifyNewPage(bool status) { }
 
+        public void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
+        {
+            var ury = reportHeight - (printingTop + this.Top + detailprintingtop);
+            var lly = reportHeight - (printingTop + this.Top + this.Height + detailprintingtop);
+
+            ColumnText ct = new ColumnText(canvas);
+            ct.SetSimpleColumn(new Phrase(column_val), this.Left, lly, this.Width + this.Left, ury, 15, Element.ALIGN_LEFT);
+            ct.Go();
+        }
     }
 
     [EnableInBuilder(BuilderType.Report)]
@@ -21,6 +34,7 @@ namespace ExpressBase.Objects.ReportRelated
         {
             return "<div class='EbCol dropped' $type='@type' eb-type='DataFieldText' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;'> @Title </div>".RemoveCR().DoubleQuoted();
         }
+
         public override string GetJsInitFunc()
         {
             return @"
@@ -38,11 +52,11 @@ namespace ExpressBase.Objects.ReportRelated
     [EnableInBuilder(BuilderType.Report)]
     public class EbDataFieldDateTime : EbDataField
     {
-
         public override string GetDesignHtml()
         {
             return "<div class='EbCol dropped' $type='@type' eb-type='DataFieldDateTime' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;'> @Title </div>".RemoveCR().DoubleQuoted();
         }
+
         public override string GetJsInitFunc()
         {
             return @"
@@ -60,11 +74,11 @@ namespace ExpressBase.Objects.ReportRelated
     [EnableInBuilder(BuilderType.Report)]
     public class EbDataFieldBoolean : EbDataField
     {
-
         public override string GetDesignHtml()
         {
             return "<div class='EbCol dropped' $type='@type' eb-type='DataFieldBoolean' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;'> @Title </div>".RemoveCR().DoubleQuoted();
         }
+
         public override string GetJsInitFunc()
         {
             return @"
@@ -82,11 +96,11 @@ namespace ExpressBase.Objects.ReportRelated
     [EnableInBuilder(BuilderType.Report)]
     public class EbDataFieldNumeric : EbDataField
     {
-
         public override string GetDesignHtml()
         {
             return "<div class='EbCol dropped' $type='@type' eb-type='DataFieldNumeric' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;'> @Title </div>".RemoveCR().DoubleQuoted();
         }
+
         public override string GetJsInitFunc()
         {
             return @"
@@ -110,6 +124,10 @@ namespace ExpressBase.Objects.ReportRelated
 
         [EnableInBuilder(BuilderType.Report)]
         public SummaryFunctionsNumeric Function { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
+        public bool ResetOnNewPage { get; set; }
 
         private int Count { get; set; }
 
@@ -152,6 +170,12 @@ namespace ExpressBase.Objects.ReportRelated
                 this.Min = (this.Min < value) ? this.Min : value;
         }
 
+        public override void NotifyNewPage(bool status)
+        {
+            if (status && this.ResetOnNewPage)
+                this.Sum = 0;
+        }
+
         public override string GetDesignHtml()
         {
             return "<div class='dropped' $type='@type' eb-type='DataFieldNumericSummary' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;'> @Title </div>".RemoveCR().DoubleQuoted();
@@ -184,6 +208,7 @@ namespace ExpressBase.Objects.ReportRelated
         {
             return "<div class='dropped' $type='@type' eb-type='DataFieldTextSummary' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;'> @Title </div>".RemoveCR().DoubleQuoted();
         }
+
         public override string GetJsInitFunc()
         {
             return @"

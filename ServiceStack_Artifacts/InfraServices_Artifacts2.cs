@@ -219,7 +219,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class GetProductPlanResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
-        public int id { get; set; }
+        public string Sid { get; set; }
 
         [DataMember(Order = 2)]
         public Dictionary<int,List<ProductPlan>> Plans { get; set; }
@@ -267,7 +267,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class CreateSolutionResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
-        public int id { get; set; }
+        public int Solnid { get; set; }
 
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
