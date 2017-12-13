@@ -134,7 +134,7 @@ else
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [OnChangeExec(@"
-if(this.RenderAs !== 'Link')
+if(this.RenderAs !== 2)
     pg.HideProperty('LinkRefId')
 else
     pg.ShowProperty('LinkRefId')")]
@@ -161,7 +161,7 @@ else
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [OnChangeExec(@"
-if(this.RenderAs !== '2')
+if(this.RenderAs !== 1)
     pg.HideProperty('LinkRefId')
 else
     pg.ShowProperty('LinkRefId')")]
