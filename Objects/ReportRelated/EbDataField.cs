@@ -11,7 +11,7 @@ using iTextSharp.text.pdf;
 
 namespace ExpressBase.Objects.ReportRelated
 {
-    public abstract class EbDataField: EbReportField
+    public abstract class EbDataField : EbReportField
     {
         public virtual void NotifyNewPage(bool status) { }
 
@@ -143,7 +143,7 @@ namespace ExpressBase.Objects.ReportRelated
             {
                 if (this.Function == SummaryFunctionsNumeric.Sum)
                     return this.Sum;
-                else if (this.Function == SummaryFunctionsNumeric.Average)
+                else if (this.Function == SummaryFunctionsNumeric.Average && this.Count > 0)
                     return this.Sum / this.Count;
                 else if (this.Function == SummaryFunctionsNumeric.Count)
                     return this.Count;
@@ -156,18 +156,31 @@ namespace ExpressBase.Objects.ReportRelated
             }
         }
 
-        public void Summarize(decimal value)
+        public void Summarize(dynamic value)
         {
-            if (this.Function == SummaryFunctionsNumeric.Sum || this.Function == SummaryFunctionsNumeric.Average || this.Function == SummaryFunctionsNumeric.Count)
+            this.Count++;
+            value = Convert.ToDecimal(value);
+
+            if (this.Function == SummaryFunctionsNumeric.Sum || this.Function == SummaryFunctionsNumeric.Average)
             {
-                this.Count++;
                 if (this.Function == SummaryFunctionsNumeric.Sum || this.Function == SummaryFunctionsNumeric.Average)
                     this.Sum += value;
             }
-            else if (this.Function == SummaryFunctionsNumeric.Max)
-                this.Max = (this.Max > value) ? this.Max : value;
-            else if (this.Function == SummaryFunctionsNumeric.Min)
-                this.Min = (this.Min < value) ? this.Min : value;
+
+            if (this.Count > 1)
+            {
+                if (this.Function == SummaryFunctionsNumeric.Max)
+                    this.Max = (this.Max > value) ? this.Max : value;
+                else if (this.Function == SummaryFunctionsNumeric.Min)
+                    this.Min = (this.Min < value) ? this.Min : value;
+            }
+            else
+            {
+                if (this.Function == SummaryFunctionsNumeric.Max)
+                    this.Max = value;
+                else if (this.Function == SummaryFunctionsNumeric.Min)
+                    this.Min = value;
+            }
         }
 
         public override void NotifyNewPage(bool status)
@@ -204,6 +217,52 @@ namespace ExpressBase.Objects.ReportRelated
         [EnableInBuilder(BuilderType.Report)]
         public SummaryFunctionsText Function { get; set; }
 
+
+        [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
+        public bool ResetOnNewPage { get; set; }
+
+        private int Count { get; set; }
+
+        private string Max { get; set; } = "";
+
+        private string Min { get; set; } = "";
+
+        public dynamic SummarizedValue
+        {
+            get
+            {
+                if (this.Function == SummaryFunctionsText.Count)
+                    return this.Count;
+                else if (this.Function == SummaryFunctionsText.Max)
+                    return this.Max;
+                else if (this.Function == SummaryFunctionsText.Min)
+                    return this.Min;
+
+                return 0;
+            }
+        }
+
+        public void Summarize(dynamic value)
+        {
+            value = value.ToString();
+            this.Count++;
+            if (this.Count > 0)
+            {
+                if (this.Function == SummaryFunctionsText.Max)
+                    this.Max = (this.Max.CompareTo(value) > 0) ? this.Max : value;
+                else if (this.Function == SummaryFunctionsText.Min)
+                    this.Min = (this.Min.CompareTo(value) > 0) ? value : this.Min;
+            }
+            else
+            {
+                if (this.Function == SummaryFunctionsText.Max)
+                    this.Max = value;
+                else if (this.Function == SummaryFunctionsText.Min)
+                    this.Min = value;
+            }
+        }
+
         public override string GetDesignHtml()
         {
             return "<div class='dropped' $type='@type' eb-type='DataFieldTextSummary' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;'> @Title </div>".RemoveCR().DoubleQuoted();
@@ -233,6 +292,51 @@ namespace ExpressBase.Objects.ReportRelated
         [EnableInBuilder(BuilderType.Report)]
         public SummaryFunctionsDateTime Function { get; set; }
 
+        [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
+        public bool ResetOnNewPage { get; set; }
+
+        private int Count { get; set; }
+
+        private DateTime Max { get; set; }
+
+        private DateTime Min { get; set; }
+
+        public dynamic SummarizedValue
+        {
+            get
+            {
+                if (this.Function == SummaryFunctionsDateTime.Count)
+                    return this.Count;
+                else if (this.Function == SummaryFunctionsDateTime.Max)
+                    return this.Max;
+                else if (this.Function == SummaryFunctionsDateTime.Min)
+                    return this.Min;
+
+                return 0;
+            }
+        }
+
+        public void Summarize(dynamic value)
+        {
+            value = Convert.ToDateTime(value);
+            this.Count++;
+            if (this.Count > 0)
+            {
+                if (this.Function == SummaryFunctionsDateTime.Max)
+                    this.Max = (DateTime.Compare(this.Max, value) > 0) ? this.Max : value;
+                if (this.Function == SummaryFunctionsDateTime.Min)
+                    this.Min = (DateTime.Compare(this.Min, value) > 0) ? value : this.Min;
+            }
+            else
+            {
+                if (this.Function == SummaryFunctionsDateTime.Max)
+                    this.Max = value;
+                if (this.Function == SummaryFunctionsDateTime.Min)
+                    this.Min = value;
+            }
+        }
+
         public override string GetDesignHtml()
         {
             return "<div class='dropped' $type='@type' eb-type='DataFieldDateTimeSummary' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;'> @Title </div>".RemoveCR().DoubleQuoted();
@@ -260,6 +364,28 @@ namespace ExpressBase.Objects.ReportRelated
 
         [EnableInBuilder(BuilderType.Report)]
         public SummaryFunctionsBoolean Function { get; set; }
+
+
+        [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
+        public bool ResetOnNewPage { get; set; }
+
+        private int Count { get; set; }
+
+        public decimal SummarizedValue
+        {
+            get
+            {
+                if (this.Function == SummaryFunctionsBoolean.Count)
+                    return this.Count;
+                return 0;
+            }
+        }
+
+        public void Summarize()
+        {
+                this.Count++;
+        }
 
         public override string GetDesignHtml()
         {
