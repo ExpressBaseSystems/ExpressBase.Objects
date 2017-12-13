@@ -169,7 +169,7 @@ $('#{0}').mask('SZZZZZZZZZZZ', {
             return @" 
         <div class='input-group' style='width:100%;'>
                 <span style='font-size: @fontSize@' class='input-group-addon'>$</span>   
-                <input type='text'  class='numinput' name='@name@' value='@value@' @placeHolder autocomplete = '@autoComplete@' data-toggle='tooltip' title='@toolTipText@' id='@name@' style=' width:100%; @backColor@ @foreColor@ @fontStyle@ display:inline-block; @readOnlyString@ @required@ @tabIndex@ />
+                <input type='text'  class='numinput' id='@name@' name='@name@' value='@value@' @placeHolder autocomplete = '@autoComplete@' data-toggle='tooltip' title='@toolTipText@' style=' width:100%; @backColor@ @foreColor@ @fontStyle@ display:inline-block; @readOnlyString@ @required@ @tabIndex@ />
         </div>"
 .Replace("@name@", this.Name)
 .Replace("@toolTipText@", this.ToolTipText)
@@ -193,16 +193,17 @@ $('#{0}').mask('SZZZZZZZZZZZ', {
         {
             return (@"
 <div id='cont_@name@' class='Eb-ctrlContainer' Ctype='Numeric' style='@hiddenString'>
-    <span id='@nameLbl' style='@lblBackColor @LblForeColor'>@label</span>
+    <span id='@nameLbl' style='@lblBackColor @LblForeColor'>@label@</span>
        @barehtml@            
     <span class='helpText'> @helpText </span>
 </div>"
+.Replace("@barehtml@", this.GetBareHtml())
 .Replace("@name@", this.Name)
 .Replace("@left", this.Left.ToString())
 .Replace("@top", this.Top.ToString())
 .Replace("@width", this.Width.ToString())
 .Replace("@height", this.Height.ToString())
-.Replace("@label", this.Label)//5
+.Replace("@label@", this.Label)//5
 .Replace("@hiddenString", this.HiddenString)
 .Replace("@required", (this.Required && !this.Hidden ? " required" : string.Empty))
 .Replace("@readOnlyString", this.ReadOnlyString)
@@ -221,7 +222,7 @@ $('#{0}').mask('SZZZZZZZZZZZ', {
 //                            + ";" + "font-size:" + this.FontSerialized.SizeInPoints + "px;")
 //                        : string.Empty)
 //.Replace("@fontSize", (this.FontSerialized != null) ? (this.FontSerialized.SizeInPoints + "px;") : string.Empty)
-).Replace("@barehtml@", this.GetBareHtml());
+);
         }
     }
 }
