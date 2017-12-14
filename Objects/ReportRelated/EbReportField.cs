@@ -1,9 +1,11 @@
 ﻿using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
+using iTextSharp.text;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -20,7 +22,13 @@ namespace ExpressBase.Objects.ReportRelated
         [UIproperty]
         [PropertyEditor(PropertyEditorType.Color)]
         [PropertyGroup("Appearance")]
-        public string BorderColor { get; set; }               
+        public string BorderColor { get; set; }
+
+        public BaseColor GetColor(string Color)
+        {
+            var colr = ColorTranslator.FromHtml(Color).ToArgb();
+            return new BaseColor(colr);
+        }
     }
 
     [EnableInBuilder(BuilderType.Report)]
