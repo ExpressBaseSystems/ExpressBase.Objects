@@ -247,7 +247,7 @@ namespace ExpressBase.Objects.ReportRelated
         {
             value = value.ToString();
             this.Count++;
-            if (this.Count > 0)
+            if (this.Count > 1)
             {
                 if (this.Function == SummaryFunctionsText.Max)
                     this.Max = (this.Max.CompareTo(value) > 0) ? this.Max : value;
@@ -321,7 +321,7 @@ namespace ExpressBase.Objects.ReportRelated
         {
             value = Convert.ToDateTime(value);
             this.Count++;
-            if (this.Count > 0)
+            if (this.Count > 1)
             {
                 if (this.Function == SummaryFunctionsDateTime.Max)
                     this.Max = (DateTime.Compare(this.Max, value) > 0) ? this.Max : value;
