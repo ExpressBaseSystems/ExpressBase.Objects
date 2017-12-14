@@ -1,6 +1,7 @@
 ﻿using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
+using iTextSharp.text.pdf;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -68,6 +69,19 @@ namespace ExpressBase.Objects.ReportRelated
     this.Border = 1;
     this.BorderColor = '#000000'
 };";
+        }
+        public void DrawMe(PdfContentByte canvas, EbReportField field, float reportHeight, float printingTop, float detailprintingtop)
+        {
+            (field as EbHl).DrawMe(canvas, field, reportHeight, printingTop, detailprintingtop);
+             var x = field.Left + field.Width;
+            var y = reportHeight - (printingTop + field.Top + detailprintingtop);
+            canvas.SetColorStroke(GetColor(field.BorderColor));
+            canvas.SetColorFill(GetColor(field.BorderColor));
+            canvas.SetLineWidth(field.Border);
+            canvas.MoveTo(x, y);
+            canvas.LineTo(x - 3, y - 3);
+            canvas.LineTo(x - 3, y + 3);
+            canvas.ClosePathFillStroke();
         }
     }
     [EnableInBuilder(BuilderType.Report)]
@@ -165,6 +179,24 @@ namespace ExpressBase.Objects.ReportRelated
     this.BorderColor = '#000000'
 };";
         }
+        public void DrawMe(PdfContentByte canvas, EbReportField field, float reportHeight, float printingTop, float detailprintingtop)
+        {
+            (field as EbVl).DrawMe(canvas, field, reportHeight, printingTop, detailprintingtop);
+            var x1 = field.Left;
+            var y1 = reportHeight - (printingTop + field.Top + detailprintingtop);
+            canvas.SetColorStroke(GetColor(field.BorderColor));
+            canvas.SetColorFill(GetColor(field.BorderColor));
+            canvas.SetLineWidth(field.Border);
+            canvas.MoveTo(x1, y1);
+            canvas.LineTo(x1 + 3, y1 - 3);
+            canvas.LineTo(x1 - 3, y1 - 3);
+            var x2 = field.Left;
+            var y2 = reportHeight - (printingTop + field.Top + field.Height + detailprintingtop);
+            canvas.MoveTo(x2, y2);
+            canvas.LineTo(x2 - 3, y2 + 3);
+            canvas.LineTo(x2 + 3, y2 + 3);
+            canvas.ClosePathFillStroke();
+        }
     }
 
     [EnableInBuilder(BuilderType.Report)]
@@ -185,6 +217,18 @@ namespace ExpressBase.Objects.ReportRelated
     this.BorderColor = '#000000'
 };";
         }
+        public void DrawMe(PdfContentByte canvas, EbReportField field, float reportHeight, float printingTop, float detailprintingtop)
+        {
+            var x1 = field.Left;
+            var y1 = reportHeight - (printingTop + field.Top + detailprintingtop);
+            var x2 = field.Left + field.Width;
+            var y2 = y1 + detailprintingtop;
+            canvas.SetColorStroke(GetColor(field.BorderColor));
+            canvas.SetLineWidth(field.Border);
+            canvas.MoveTo(x1, y1);
+            canvas.LineTo(x2, y2);
+            canvas.Stroke();
+        }
     }
 
     [EnableInBuilder(BuilderType.Report)]
@@ -204,6 +248,18 @@ namespace ExpressBase.Objects.ReportRelated
     this.Border = 1;
     this.BorderColor = '#000000'
 };";
+        }
+        public void DrawMe(PdfContentByte canvas, EbReportField field, float reportHeight, float printingTop, float detailprintingtop)
+        {
+            var x1 = field.Left;
+            var y1 = reportHeight - (printingTop + field.Top + detailprintingtop);
+            var x2 = x1;
+            var y2 = reportHeight - (printingTop + field.Top + field.Height + detailprintingtop);
+            canvas.SetColorStroke(GetColor(field.BorderColor));
+            canvas.SetLineWidth(field.Border);
+            canvas.MoveTo(x1, y1);
+            canvas.LineTo(x2, y2);
+            canvas.Stroke();
         }
     }
     [EnableInBuilder(BuilderType.Report)]
