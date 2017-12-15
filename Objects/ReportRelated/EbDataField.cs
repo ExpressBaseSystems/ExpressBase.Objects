@@ -21,6 +21,7 @@ namespace ExpressBase.Objects.ReportRelated
             var lly = reportHeight - (printingTop + this.Top + this.Height + detailprintingtop);
 
             ColumnText ct = new ColumnText(canvas);
+            ct.Canvas.SetColorFill(GetColor(this.ForeColor));
             ct.SetSimpleColumn(new Phrase(column_val), this.Left, lly, this.Width + this.Left, ury, 15, Element.ALIGN_LEFT);
             ct.Go();
         }
