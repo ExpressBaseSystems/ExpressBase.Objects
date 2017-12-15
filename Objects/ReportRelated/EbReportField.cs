@@ -113,6 +113,18 @@ namespace ExpressBase.Objects.ReportRelated
     this.BorderColor = '#aaaaaa'
 };";
         }
+        public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
+        {
+            var urx = this.Width + this.Left;
+            var ury = reportHeight - (printingTop + this.Top + detailprintingtop);
+            var llx = this.Left;
+            var lly = reportHeight - (printingTop + this.Top + this.Height + detailprintingtop);
+
+            ColumnText ct = new ColumnText(canvas);
+            ct.Canvas.SetColorFill(GetColor(this.ForeColor));
+            ct.SetSimpleColumn(new Phrase(column_val), llx, lly, urx, ury, 15, Element.ALIGN_LEFT);
+            ct.Go();
+        }
     }
 
     [EnableInBuilder(BuilderType.Report)]
@@ -143,6 +155,7 @@ namespace ExpressBase.Objects.ReportRelated
             var lly = reportHeight - (printingTop + this.Top + this.Height + detailprintingtop);
 
             ColumnText ct = new ColumnText(canvas);
+            ct.Canvas.SetColorFill(GetColor(this.ForeColor));
             ct.SetSimpleColumn(new Phrase(column_val), llx, lly, urx, ury, 15, Element.ALIGN_LEFT);
             ct.Go();
         }
@@ -167,6 +180,18 @@ namespace ExpressBase.Objects.ReportRelated
     this.Border = 1;
     this.BorderColor = '#aaaaaa'
 };";
+        }
+        public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
+        {
+            var urx = this.Width + this.Left;
+            var ury = reportHeight - (printingTop + this.Top + detailprintingtop);
+            var llx = this.Left;
+            var lly = reportHeight - (printingTop + this.Top + this.Height + detailprintingtop);
+
+            ColumnText ct = new ColumnText(canvas);
+            ct.Canvas.SetColorFill(GetColor(this.ForeColor));
+            ct.SetSimpleColumn(new Phrase(column_val), llx, lly, urx, ury, 15, Element.ALIGN_LEFT);
+            ct.Go();
         }
     }
 
@@ -220,6 +245,7 @@ namespace ExpressBase.Objects.ReportRelated
             var lly = reportHeight - (printingTop + this.Top + this.Height + detailprintingtop);
 
             ColumnText ct = new ColumnText(canvas);
+            ct.Canvas.SetColorFill(GetColor(this.ForeColor));
             ct.SetSimpleColumn(new Phrase(this.Title), llx, lly, urx, ury, 15, Element.ALIGN_LEFT);
             ct.Go();
         }
