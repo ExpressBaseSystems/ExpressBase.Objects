@@ -2,6 +2,7 @@
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using iTextSharp.text;
+using iTextSharp.text.pdf;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -28,6 +29,12 @@ namespace ExpressBase.Objects.ReportRelated
         {
             var colr = ColorTranslator.FromHtml(Color).ToArgb();
             return new BaseColor(colr);
+        }
+        public virtual void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop)
+        {
+        }
+        public virtual void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_name)
+        {
         }
     }
 
@@ -89,7 +96,7 @@ namespace ExpressBase.Objects.ReportRelated
 
     [EnableInBuilder(BuilderType.Report)]
     public class EbDateTime : EbReportField
-    {      
+    {
         public override string GetDesignHtml()
         {
             return "<div class='date-time dropped' eb-type='DateTime' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; height: @Height px; background-color:@BackColor ; color:@ForeColor ; position: absolute; left: @Left px; top: @Top px;'> @Title </div>".RemoveCR().DoubleQuoted();
@@ -110,7 +117,7 @@ namespace ExpressBase.Objects.ReportRelated
 
     [EnableInBuilder(BuilderType.Report)]
     public class EbPageNo : EbReportField
-    {       
+    {
 
         public override string GetDesignHtml()
         {
@@ -127,6 +134,17 @@ namespace ExpressBase.Objects.ReportRelated
     this.Border = 1;
     this.BorderColor = '#aaaaaa'
 };";
+        }
+        public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop,string column_val)
+        {
+            var urx = this.Width + this.Left;
+            var ury = reportHeight - (printingTop + this.Top + detailprintingtop);
+            var llx = this.Left;
+            var lly = reportHeight - (printingTop + this.Top + this.Height + detailprintingtop);
+
+            ColumnText ct = new ColumnText(canvas);
+            ct.SetSimpleColumn(new Phrase(column_val), llx, lly, urx, ury, 15, Element.ALIGN_LEFT);
+            ct.Go();
         }
     }
 
@@ -193,6 +211,17 @@ namespace ExpressBase.Objects.ReportRelated
     this.Border = 1;
     this.BorderColor = '#aaaaaa'
 };";
+        }
+        public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop)
+        {
+            var urx = this.Width + this.Left;
+            var ury = reportHeight - (printingTop + this.Top + detailprintingtop);
+            var llx = this.Left;
+            var lly = reportHeight - (printingTop + this.Top + this.Height + detailprintingtop);
+
+            ColumnText ct = new ColumnText(canvas);
+            ct.SetSimpleColumn(new Phrase(this.Title), llx, lly, urx, ury, 15, Element.ALIGN_LEFT);
+            ct.Go();
         }
     }
 

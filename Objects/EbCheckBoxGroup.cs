@@ -39,7 +39,7 @@ namespace ExpressBase.Objects
             string html = "<div id='@name@' name='@name@'>";
             foreach (EbCheckBox ec in this.CheckBoxes)
             {
-                ec.Name = this.Name;
+                ec.GName = this.Name;
                 html += ec.GetHtml();
             }
             html += "</div>";
@@ -98,10 +98,14 @@ this.Init = function(id)
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public string Value { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+        public string GName { get; set; }
+
         public override string GetBareHtml()
         {
-            return @"<div><input type ='checkbox' value='@value@' id='@name@' name='@name@'> <span id='@name@Lbl' style='@LabelBackColor @LabelForeColor '> @label@  </span><br></div>"
+            return @"<div><input type ='checkbox' value='@value@' id='@name@' name='@gname@'> <span id='@name@Lbl' style='@LabelBackColor @LabelForeColor '> @label@  </span><br></div>"
 .Replace("@name@", this.Name)
+.Replace("@gname@", this.GName)
 .Replace("@label@", this.Label)
 .Replace("@label@", this.Value);
         }
