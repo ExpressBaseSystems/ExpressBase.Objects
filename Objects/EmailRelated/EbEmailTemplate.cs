@@ -57,7 +57,11 @@ namespace ExpressBase.Objects.EmailRelated
         [HideInPropertyGrid]
         public List<string> Parameters { get; set; }
 
-      //  public Dictionary<string,ColumnColletion> Columns { get; set; }
+        [EnableInBuilder(BuilderType.EmailBuilder)]
+        [HideInPropertyGrid]
+        public List<DsColumns> DsColumnsCollection { get; set; }
+
+        //  public Dictionary<string,ColumnColletion> Columns { get; set; }
 
         [JsonIgnore]
         public EbDataSource EbDataSource { get; set; }
