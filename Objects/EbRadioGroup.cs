@@ -1,11 +1,13 @@
 ﻿using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
+using Newtonsoft.Json;
 using ProtoBuf;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Threading.Tasks;
 
 namespace ExpressBase.Objects
@@ -29,6 +31,13 @@ namespace ExpressBase.Objects
             this.ValueType = EbRadioValueType.Boolean;
         }
 
+        [OnDeserialized]
+        public void OnDeserializedMethod(StreamingContext context)
+        {
+             this.BareControlHtml = this.GetBareHtml();
+            this.Type = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
+        }
+
         private void Options_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
@@ -43,9 +52,22 @@ namespace ExpressBase.Objects
         public EbRadioValueType ValueType { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
-        [PropertyGroup("Behavior")]
         [PropertyEditor(PropertyEditorType.Collection)]
+        [Alias("Options")]
         public List<EbRadioOptionAbstract> Options { get; set; }
+
+        public override string GetBareHtml()
+        {
+            string html = "<div id='@name@' name='@name@'>";
+              foreach (EbRadioOption ec in this.Options)
+            {
+                ec.GName = this.Name;
+                html += ec.GetHtml();
+            }
+            html += "</div>";
+            return html
+.Replace("@name@", (this.Name != null) ? this.Name : "@name@");
+        }
 
         public override string GetDesignHtml()
         {
@@ -59,16 +81,17 @@ namespace ExpressBase.Objects
             string html = @"
             <div id='cont_@name@' class='Eb-ctrlContainer' Ctype='RadioGroup'>
                 <div class='radiog-cont'  style='@BackColor '>
-                 <span id='@name@Lbl' style='@LabelBackColor @LabelForeColor '> @Label  </span><div>";
-
-            foreach (EbControl ec in this.Options)
-                html += ec.GetHtml();
-
-            return (html + @"</div><span class='helpText'> @HelpText </span></div></div>")
-
-.Replace("@name@", (this.Name != null) ? this.Name : "@name@").Replace("@LabelForeColor ", "color:" + ((this.LabelForeColor != null) ? this.LabelForeColor : "@LabelForeColor ") + ";")
+                 <span id='@name@Lbl' style='@LabelBackColor @LabelForeColor '> @Label@  </span>
+                        @barehtml@
+                <span class='helpText'> @HelpText </span></div>
+            </div>"
+.Replace("@barehtml@", this.GetBareHtml())
+.Replace("@name@", (this.Name != null) ? this.Name : "@name@")
+.Replace("@label@", this.Label)
+.Replace("@LabelForeColor ", "color:" + ((this.LabelForeColor != null) ? this.LabelForeColor : "@LabelForeColor ") + ";")
 .Replace("@LabelBackColor ", "background-color:" + ((this.LabelBackColor != null) ? this.LabelBackColor : "@LabelBackColor ") + ";")
 .Replace("@BackColor ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor ") + ";"));
+            return html;
         }
 
         public override string GetJsInitFunc()
@@ -99,10 +122,16 @@ this.Init = function(id)
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public string Value { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+        public string GName { get; set; }
+
         public override string GetBareHtml()
         {
-            return @"<input type ='radio' name='@name@'> <span id='@name@Lbl' style='@LabelBackColor @LabelForeColor '> @Label  </span>"
-.Replace("@name@", this.Name);
+            return @"<div><input type ='radio' id='@name@' value='@value@' name='@gname@'> <span id='@name@Lbl' style='@LabelBackColor @LabelForeColor '> @label@  </span><br></div>"
+.Replace("@name@", this.Name)
+.Replace("@gname@", this.Name)
+.Replace("@label@", this.Label)
+.Replace("@label@", this.Value);
         }
 
         public override string GetHtml()

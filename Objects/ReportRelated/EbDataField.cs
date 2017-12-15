@@ -15,12 +15,13 @@ namespace ExpressBase.Objects.ReportRelated
     {
         public virtual void NotifyNewPage(bool status) { }
 
-        public void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
+        public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
         {
             var ury = reportHeight - (printingTop + this.Top + detailprintingtop);
             var lly = reportHeight - (printingTop + this.Top + this.Height + detailprintingtop);
 
             ColumnText ct = new ColumnText(canvas);
+            ct.Canvas.SetColorFill(GetColor(this.ForeColor));
             ct.SetSimpleColumn(new Phrase(column_val), this.Left, lly, this.Width + this.Left, ury, 15, Element.ALIGN_LEFT);
             ct.Go();
         }
@@ -247,7 +248,7 @@ namespace ExpressBase.Objects.ReportRelated
         {
             value = value.ToString();
             this.Count++;
-            if (this.Count > 0)
+            if (this.Count > 1)
             {
                 if (this.Function == SummaryFunctionsText.Max)
                     this.Max = (this.Max.CompareTo(value) > 0) ? this.Max : value;
@@ -321,7 +322,7 @@ namespace ExpressBase.Objects.ReportRelated
         {
             value = Convert.ToDateTime(value);
             this.Count++;
-            if (this.Count > 0)
+            if (this.Count > 1)
             {
                 if (this.Function == SummaryFunctionsDateTime.Max)
                     this.Max = (DateTime.Compare(this.Max, value) > 0) ? this.Max : value;
