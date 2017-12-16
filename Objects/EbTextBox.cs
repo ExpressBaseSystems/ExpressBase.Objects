@@ -24,7 +24,8 @@ namespace ExpressBase.Objects
         SingleLine = 2,
         Email = 0,
         Password = 1,
-        Color = 3
+        Color = 3,
+        MultiLine = 4
     }
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
@@ -135,9 +136,11 @@ else {
             return GetHtmlHelper(RenderMode.User);
         }
 
-        public override string GetBareHtml()
+        public string TexboxHtml
         {
-            return @"
+            get
+            {
+                return @"
         <div  class='input-group' style='width: 100%;'>
             @attachedLbl
             <input type='@TextMode ' id='@name@' name='@name@' autocomplete = '@AutoCompleteOff ' data-toggle='tooltip' title='@ToolTipText ' 
@@ -172,12 +175,43 @@ else {
                                                         : ("eyedropper")
                                 )
                         : string.Empty);
+            }
+            set { }
+        }
+
+        public string TextareaHtml
+        {
+            get
+            {
+                return @"
+            <textarea id='@name@' name='@name@' autocomplete = '@AutoCompleteOff ' data-toggle='tooltip' title='@ToolTipText ' 
+                @tabIndex @MaxLength  style='width:100%; height:@heightpx; @BackColor @ForeColor display:inline-block; @fontStyle @ReadOnlyString  @Required  @PlaceHolder  @Text  @TabIndex>
+            </textarea>"
+.Replace("@name@", this.Name)
+.Replace("@MaxLength ", "maxlength='" + ((this.MaxLength > 0) ? this.MaxLength.ToString() : "@MaxLength") + "'")
+.Replace("@Required ", (this.Required && !this.Hidden ? " required" : string.Empty))
+.Replace("@ReadOnlyString ", this.ReadOnlyString)
+.Replace("@PlaceHolder ", "placeholder='" + this.PlaceHolder + "'")
+.Replace("@TabIndex ", "tabindex='" + this.TabIndex + "' ")
+.Replace("@AutoCompleteOff ", (this.AutoCompleteOff || this.TextMode.ToString().ToLower() == "password") ? "off" : "on")
+    .Replace("@BackColor ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor ") + ";"))
+    .Replace("@ForeColor ", "color:" + ((this.ForeColor != null) ? this.ForeColor : "@ForeColor ") + ";")
+    .Replace("@Text ", "value='" + ((this.Text != null) ? this.Text : "@Text ") + "' ");
+            }
+            set { }
+        }
+
+        public override string GetBareHtml()
+        {
+            if (this.TextMode == TextMode.MultiLine)
+                return this.TextareaHtml;
+            else
+                return this.TexboxHtml;
         }
 
         private string GetHtmlHelper(RenderMode mode)
         {
             return @"
-
 <div id='cont_@name@  ' class='Eb-ctrlContainer' Ctype='TextBox' style='@HiddenString '>
     <span id='@name@Lbl' style='@LabelBackColor @LabelForeColor '> @Label  </span>
        @barehtml@
