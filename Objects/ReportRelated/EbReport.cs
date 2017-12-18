@@ -17,7 +17,6 @@ namespace ExpressBase.Objects
         PageFooter,
         ReportFooter,
     }
-
     public enum PaperSize
     {
         A2,
@@ -33,6 +32,13 @@ namespace ExpressBase.Objects
         Count,
         Max,
         Min
+    }
+    public enum EbTextAlign
+    {
+        left,
+        center,
+        right,
+        justify
     }
     public enum SummaryFunctionsNumeric
     {
