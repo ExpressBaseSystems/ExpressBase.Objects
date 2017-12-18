@@ -1,6 +1,7 @@
 ﻿using ExpressBase.Common;
 using ServiceStack;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Text;
@@ -105,20 +106,36 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		[DataMember(Order = 4)]
 		public ResponseStatus ResponseStatus { get; set; }
 	}
-	
 
-		[DataContract]
-	public class EB_Object
-	{
-		[DataMember(Order = 1)]
-		public int Obj_Id;
 
-		[DataMember(Order = 2)]
-		public string Obj_Name;
-	}
+	//[DataContract]
+	//public class ApplicationCollection : Dictionary<int, Application>
+	//{
+	//	public ApplicationCollection() { }
+
+	//	public ApplicationCollection(EbDataTable dtApp, EbDataTable dtObjects)
+	//	{
+	//		foreach (var dr in dtApp.Rows)
+	//		{
+	//			int appid = Convert.ToInt32(dr[0]);
+	//			this.Add(appid, new Application { Id = appid, Name = dr[1].ToString() });
+	//		}
+
+	//		foreach (EbDataRow dr in dtObjects.Rows)
+	//		{
+	//			var app_id = Convert.ToInt32(dr[3]);
+	//			var ob_type = Convert.ToInt32(dr[2]);
+
+	//			if (!this[app_id].ObjectTypes.ContainsKey(ob_type))
+	//				this[app_id].ObjectTypes.Add(ob_type);
+
+	//			this[app_id].ObjectTypes[ob_type].Add(new EB_Object { Obj_Id = Convert.ToInt32(dr[0]), Obj_Name = dr[1].ToString() });
+	//		}
+	//	}
+	//}
 
 	[DataContract]
-	public class ApplicationCollection : Dictionary<int, Application>
+	public class ApplicationCollection : List<Application>
 	{
 		public ApplicationCollection() { }
 
@@ -127,7 +144,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 			foreach (var dr in dtApp.Rows)
 			{
 				int appid = Convert.ToInt32(dr[0]);
-				this.Add(appid, new Application { Id = appid, Name = dr[1].ToString() });
+				this.Add(new Application { Id = appid, Name = dr[1].ToString() });
 			}
 
 			foreach (EbDataRow dr in dtObjects.Rows)
@@ -139,6 +156,25 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 					this[app_id].ObjectTypes.Add(ob_type);
 
 				this[app_id].ObjectTypes[ob_type].Add(new EB_Object { Obj_Id = Convert.ToInt32(dr[0]), Obj_Name = dr[1].ToString() });
+			}
+		}
+
+		// CREATE NEW INDEXER
+		new public Application this[int appid]
+		{
+			get
+			{
+				Application _result = null;
+				foreach(Application app in this)
+				{
+					if (app.Id == appid)
+					{
+						_result = app;
+						break;
+					}
+				}
+
+				return _result;
 			}
 		}
 	}
@@ -175,4 +211,28 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 	{
 
 	}
+
+	[DataContract]
+	public class EB_Object
+	{
+		[DataMember(Order = 1)]
+		public int Obj_Id;
+
+		[DataMember(Order = 2)]
+		public string Obj_Name;
+	}
+
+	[DataContract]
+	public class Eb_ObjectTypeOperations
+	{
+		[DataMember(Order = 1)]
+		public int Op_Id;
+
+		[DataMember(Order = 2)]
+		public string Op_Name;
+
+		[DataMember(Order = 3)]
+		public List<string> Operations;
+	}
+
 }
