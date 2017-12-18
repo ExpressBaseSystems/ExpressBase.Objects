@@ -17,7 +17,6 @@ namespace ExpressBase.Objects
         PageFooter,
         ReportFooter,
     }
-
     public enum PaperSize
     {
         A2,
@@ -33,6 +32,13 @@ namespace ExpressBase.Objects
         Count,
         Max,
         Min
+    }
+    public enum EbTextAlign
+    {
+        left,
+        center,
+        right,
+        justify
     }
     public enum SummaryFunctionsNumeric
     {
@@ -120,6 +126,8 @@ else {
 
         public ColumnColletion ColumnColletion { get; set; }
 
+        public int SerialNumber { get; set; }
+
         public EbReport()
         {
             this.ReportHeaders = new List<EbReportHeader>();
@@ -176,6 +184,7 @@ else {
         {
             return "<div class='pageHeaders' eb-type='ReportDetail' tabindex='1' id='@id' data_val='2' style='width :100%;height: @SectionHeight ; background-color:@BackColor ;position: relative'> </div>".RemoveCR().DoubleQuoted();
         }
+
     }
 
     [EnableInBuilder(BuilderType.Report)]

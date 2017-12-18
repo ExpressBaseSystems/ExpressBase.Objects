@@ -111,7 +111,7 @@ namespace ExpressBase.Objects.ReportRelated
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop)
         {
-            (this as EbHl).DrawMe(canvas, reportHeight, printingTop, detailprintingtop);
+            base.DrawMe(canvas, reportHeight, printingTop, detailprintingtop);
             var x = this.Left + this.Width;
             var y = reportHeight - (printingTop + this.Top + detailprintingtop);
             canvas.SetColorStroke(GetColor(this.BorderColor));
@@ -243,7 +243,7 @@ namespace ExpressBase.Objects.ReportRelated
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop)
         {
-            (this as EbHl).DrawMe(canvas,reportHeight, printingTop, detailprintingtop);
+            base.DrawMe(canvas,reportHeight, printingTop, detailprintingtop);
             var x1 = this.Left + this.Width;
             var y1 = reportHeight - (printingTop + this.Top + detailprintingtop);
             canvas.SetColorStroke(GetColor(this.BorderColor));

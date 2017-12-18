@@ -33,7 +33,7 @@ namespace ExpressBase.Objects.ReportRelated
 
         public override string GetDesignHtml()
         {
-            return "<div class='EbCol dropped' $type='@type' eb-type='DataFieldText' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;'> @Title </div>".RemoveCR().DoubleQuoted();
+            return "<div class='EbCol dropped' $type='@type' eb-type='DataFieldText' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;text-align: @TextAlign ;'> @Title </div>".RemoveCR().DoubleQuoted();
         }
 
         public override string GetJsInitFunc()
@@ -55,7 +55,7 @@ namespace ExpressBase.Objects.ReportRelated
     {
         public override string GetDesignHtml()
         {
-            return "<div class='EbCol dropped' $type='@type' eb-type='DataFieldDateTime' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;'> @Title </div>".RemoveCR().DoubleQuoted();
+            return "<div class='EbCol dropped' $type='@type' eb-type='DataFieldDateTime' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;text-align: @TextAlign;'> @Title </div>".RemoveCR().DoubleQuoted();
         }
 
         public override string GetJsInitFunc()
@@ -77,7 +77,7 @@ namespace ExpressBase.Objects.ReportRelated
     {
         public override string GetDesignHtml()
         {
-            return "<div class='EbCol dropped' $type='@type' eb-type='DataFieldBoolean' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;'> @Title </div>".RemoveCR().DoubleQuoted();
+            return "<div class='EbCol dropped' $type='@type' eb-type='DataFieldBoolean' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;text-align: @TextAlign;'> @Title </div>".RemoveCR().DoubleQuoted();
         }
 
         public override string GetJsInitFunc()
@@ -97,9 +97,17 @@ namespace ExpressBase.Objects.ReportRelated
     [EnableInBuilder(BuilderType.Report)]
     public class EbDataFieldNumeric : EbDataField
     {
+        [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup("General")]
+        public int DecimalPlaces { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup("General")]
+        public bool InLetters { get; set; }
+
         public override string GetDesignHtml()
         {
-            return "<div class='EbCol dropped' $type='@type' eb-type='DataFieldNumeric' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;'> @Title </div>".RemoveCR().DoubleQuoted();
+            return "<div class='EbCol dropped' $type='@type' eb-type='DataFieldNumeric' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;text-align: @TextAlign;'> @Title </div>".RemoveCR().DoubleQuoted();
         }
 
         public override string GetJsInitFunc()
@@ -113,6 +121,17 @@ namespace ExpressBase.Objects.ReportRelated
     this.Border = 1;
     this.BorderColor = '#aaaaaa'
 };";
+        }
+        public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
+        {
+            var ury = reportHeight - (printingTop + this.Top + detailprintingtop);
+            var lly = reportHeight - (printingTop + this.Top + this.Height + detailprintingtop);
+            column_val = Convert.ToDecimal(column_val).ToString("F2");
+
+            ColumnText ct = new ColumnText(canvas);
+            ct.Canvas.SetColorFill(GetColor(this.ForeColor));
+            ct.SetSimpleColumn(new Phrase(column_val), this.Left, lly, this.Width + this.Left, ury, 15, Element.ALIGN_RIGHT);
+            ct.Go();
         }
     }
 
@@ -192,7 +211,7 @@ namespace ExpressBase.Objects.ReportRelated
 
         public override string GetDesignHtml()
         {
-            return "<div class='dropped' $type='@type' eb-type='DataFieldNumericSummary' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;'> @Title </div>".RemoveCR().DoubleQuoted();
+            return "<div class='dropped' $type='@type' eb-type='DataFieldNumericSummary' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;text-align: @TextAlign;'> @Title </div>".RemoveCR().DoubleQuoted();
         }
         public override string GetJsInitFunc()
         {
@@ -266,7 +285,7 @@ namespace ExpressBase.Objects.ReportRelated
 
         public override string GetDesignHtml()
         {
-            return "<div class='dropped' $type='@type' eb-type='DataFieldTextSummary' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;'> @Title </div>".RemoveCR().DoubleQuoted();
+            return "<div class='dropped' $type='@type' eb-type='DataFieldTextSummary' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;text-align: @TextAlign;'> @Title </div>".RemoveCR().DoubleQuoted();
         }
 
         public override string GetJsInitFunc()
@@ -340,7 +359,7 @@ namespace ExpressBase.Objects.ReportRelated
 
         public override string GetDesignHtml()
         {
-            return "<div class='dropped' $type='@type' eb-type='DataFieldDateTimeSummary' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;'> @Title </div>".RemoveCR().DoubleQuoted();
+            return "<div class='dropped' $type='@type' eb-type='DataFieldDateTimeSummary' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;text-align: @TextAlign;'> @Title </div>".RemoveCR().DoubleQuoted();
         }
         public override string GetJsInitFunc()
         {
@@ -390,7 +409,7 @@ namespace ExpressBase.Objects.ReportRelated
 
         public override string GetDesignHtml()
         {
-            return "<div class='dropped' $type='@type' eb-type='DataFieldBooleanSummary' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;'> @Title </div>".RemoveCR().DoubleQuoted();
+            return "<div class='dropped' $type='@type' eb-type='DataFieldBooleanSummary' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;text-align: @TextAlign ;'> @Title </div>".RemoveCR().DoubleQuoted();
         }
         public override string GetJsInitFunc()
         {
