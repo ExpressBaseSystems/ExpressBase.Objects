@@ -56,7 +56,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 	public class GetManageRolesResponse : IEbSSResponse
 	{
 		[DataMember(Order = 1)]
-		public ApplicationCollection AppCollection { get; set; }
+		public ApplicationCollection ApplicationCollection { get; set; }
 
 		[DataMember(Order = 2)]
 		public Dictionary<string, object> SelectedRoleInfo { get; set; }
@@ -117,8 +117,11 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public string Obj_Name;
 	}
 
+	[DataContract]
 	public class ApplicationCollection : Dictionary<int, Application>
 	{
+		public ApplicationCollection() { }
+
 		public ApplicationCollection(EbDataTable dtApp, EbDataTable dtObjects)
 		{
 			foreach (var dr in dtApp.Rows)
@@ -140,12 +143,16 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		}
 	}
 
+	[DataContract]
 	public class Application
 	{
+		[DataMember(Order = 1)]
 		public int Id { get; set; }
 
+		[DataMember(Order = 2)]
 		public string Name { get; set; }
 
+		[DataMember(Order = 3)]
 		public ObjectTypeCollection ObjectTypes { get; set; }
 
 		public Application()
@@ -154,6 +161,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		}
 	}
 
+	[DataContract]
 	public class ObjectTypeCollection : Dictionary<int, ObjectCollection>
 	{
 		public void Add(int obj_type)
@@ -162,6 +170,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		}
 	}
 
+	[DataContract]
 	public class ObjectCollection : List<EB_Object>
 	{
 
