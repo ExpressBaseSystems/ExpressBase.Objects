@@ -322,7 +322,7 @@ namespace ExpressBase.Objects.ReportRelated
             var x1 = this.Left;
             var y1 = reportHeight - (printingTop + this.Top + detailprintingtop);
             var x2 = this.Left + this.Width;
-            var y2 = y1 + detailprintingtop;
+            var y2 = y1;
             canvas.SetColorStroke(GetColor(this.BorderColor));
             canvas.SetLineWidth(this.Border);
             canvas.MoveTo(x1, y1);

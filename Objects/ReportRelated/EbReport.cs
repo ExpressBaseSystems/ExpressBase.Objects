@@ -126,7 +126,7 @@ else {
 
         public ColumnColletion ColumnColletion { get; set; }
 
-        public int SerialNumber { get; set; }
+        public int SerialNumber { get; set; } = 1;
 
         public EbReport()
         {

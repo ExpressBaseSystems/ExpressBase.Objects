@@ -41,6 +41,10 @@ namespace ExpressBase.Objects.ReportRelated
         public virtual void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_name)
         {
         }
+        public virtual void DrawMe(Document d)
+        {
+           
+        }
     }
 
     [EnableInBuilder(BuilderType.Report)]
@@ -68,6 +72,16 @@ namespace ExpressBase.Objects.ReportRelated
     this.Width= 100;
     this.Source = 'url(../images/image.png) center no-repeat';
 };";
+        }
+        public override void DrawMe(Document d)
+        {
+            var x = "http://localhost:5000/static/dp_1_micro.jpg";
+            iTextSharp.text.Image myImage = iTextSharp.text.Image.GetInstance(x);
+            myImage.ScaleToFit(300f, 250f);
+            myImage.SpacingBefore = 50f;
+            myImage.SpacingAfter = 10f;
+            myImage.Alignment = Element.ALIGN_CENTER;
+            d.Add(myImage);
         }
     }
 
