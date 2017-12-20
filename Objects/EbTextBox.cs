@@ -9,6 +9,7 @@ using ExpressBase.Common.Objects.Attributes;
 using ServiceStack.Pcl;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Extensions;
+using System.Runtime.Serialization;
 
 namespace ExpressBase.Objects
 {
@@ -53,7 +54,6 @@ else {
         [OnChangeExec(@"
 if (this.TextTransform === 'UPPERCASE' ){
     pg.HideProperty('Text');
-    console.log('HideProperty');
 }
 else {
     pg.ShowProperty('Text');
@@ -64,7 +64,20 @@ else {
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         [PropertyGroup("Behavior")]
         [DefaultPropValue("'SingleLine'")]
+        [OnChangeExec(@"
+if (this.TextMode === 4 ){
+    pg.ShowProperty('RowsVisible');
+}
+else {
+    pg.HideProperty('RowsVisible');
+}
+            ")]
         public TextMode TextMode { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+        [PropertyGroup("Behavior")]
+        [DefaultPropValue("5")]
+        public int RowsVisible { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         [PropertyGroup(@"Behavior")]
@@ -105,6 +118,13 @@ else {
 
         public EbTextBox() { }
 
+        [OnDeserialized]
+        public void OnDeserializedMethod(StreamingContext context)
+        {
+            this.BareControlHtml = this.GetBareHtml();
+            this.Type = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
+        }
+
         public override string GetHead()
         {
             return (((!this.Hidden) ? this.UniqueString + this.RequiredString : string.Empty) + @"".Replace("{0}", this.Name));
@@ -141,14 +161,13 @@ else {
             get
             {
                 return @"
-        <div  class='input-group' style='width: 100%;'>
-            @attachedLbl
+            @attachedLbl@
             <input type='@TextMode ' id='@name@' name='@name@' autocomplete = '@AutoCompleteOff ' data-toggle='tooltip' title='@ToolTipText ' 
 @tabIndex @MaxLength  style='width:100%; height:@heightpx; @BackColor @ForeColor display:inline-block; @fontStyle @ReadOnlyString  @Required  @PlaceHolder  @Text  @TabIndex  />
-        </div>"
+        @attachedLblClose@"
 .Replace("@name@", this.Name)
 .Replace("@MaxLength ", "maxlength='" + ((this.MaxLength > 0) ? this.MaxLength.ToString() : "@MaxLength") + "'")
-.Replace("@TextMode ", this.TextMode.ToString().ToLower())
+.Replace("@TextMode ", (this.TextMode == TextMode.SingleLine) ? "text" : this.TextMode.ToString().ToLower())
 .Replace("@Required ", (this.Required && !this.Hidden ? " required" : string.Empty))
 .Replace("@ReadOnlyString ", this.ReadOnlyString)
 .Replace("@PlaceHolder ", "placeholder='" + this.PlaceHolder + "'")
@@ -158,19 +177,21 @@ else {
     .Replace("@ForeColor ", "color:" + ((this.ForeColor != null) ? this.ForeColor : "@ForeColor ") + ";")
     .Replace("@Text ", "value='" + ((this.Text != null) ? this.Text : "@Text ") + "' ")
 
-.Replace("@attachedLbl", (this.TextMode.ToString() != "SingleLine") ?
+.Replace("@attachedLblClose@", (this.TextMode == TextMode.SingleLine) ? string.Empty : "</div>")
+.Replace("@attachedLbl@", (this.TextMode != TextMode.SingleLine) ?
                                 (
-                                    "<i class='fa fa-$class input-group-addon' aria-hidden='true'"
-                                    + (
-                                        (this.FontFamily != null) ?
-                                            ("style='font-size:" + this.FontSize + "px;'")
-                                        : string.Empty
-                                      )
-                                    + "class='input-group-addon'></i>"
+                                    @"<div  class='input-group' style='width: 100%;'>
+                                        <span class='input-group-addon' onclick='$(`#@name@`).click()'><i class='fa fa-$class aria-hidden='true'"
+                                        + (
+                                            (this.FontFamily != null) ?
+                                                ("style='font-size:" + this.FontSize + "px;'")
+                                            : string.Empty
+                                          )
+                                        + "class='input-group-addon'></i></span>"
                                 )
-                                .Replace("$class", (this.TextMode.ToString() == "Email") ?
+                                .Replace("$class", (this.TextMode == TextMode.Email) ?
                                                             ("envelope")
-                                                        : (this.TextMode.ToString() == "Password") ?
+                                                        : (this.TextMode == TextMode.Password) ?
                                                             "key"
                                                         : ("eyedropper")
                                 )
@@ -184,7 +205,7 @@ else {
             get
             {
                 return @"
-            <textarea id='@name@' name='@name@' autocomplete = '@AutoCompleteOff ' data-toggle='tooltip' title='@ToolTipText ' 
+            <textarea id='@name@' name='@name@' rows='@RowsVisible@' autocomplete = '@AutoCompleteOff ' data-toggle='tooltip' title='@ToolTipText ' 
                 @tabIndex @MaxLength  style='width:100%; height:@heightpx; @BackColor @ForeColor display:inline-block; @fontStyle @ReadOnlyString  @Required  @PlaceHolder  @Text  @TabIndex>
             </textarea>"
 .Replace("@name@", this.Name)
@@ -196,7 +217,8 @@ else {
 .Replace("@AutoCompleteOff ", (this.AutoCompleteOff || this.TextMode.ToString().ToLower() == "password") ? "off" : "on")
     .Replace("@BackColor ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor ") + ";"))
     .Replace("@ForeColor ", "color:" + ((this.ForeColor != null) ? this.ForeColor : "@ForeColor ") + ";")
-    .Replace("@Text ", "value='" + ((this.Text != null) ? this.Text : "@Text ") + "' ");
+    .Replace("@Text ", "value='" + ((this.Text != null) ? this.Text : "@Text ") + "' ")
+    .Replace("@RowsVisible@", (this.RowsVisible != 0) ? this.RowsVisible.ToString() : "5");
             }
             set { }
         }
