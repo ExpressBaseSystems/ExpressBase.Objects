@@ -60,8 +60,7 @@ namespace ExpressBase.Objects.EmailRelated
         [EnableInBuilder(BuilderType.EmailBuilder)]
         [HideInPropertyGrid]
         public List<DsColumns> DsColumnsCollection { get; set; }
-
-        //  public Dictionary<string,ColumnColletion> Columns { get; set; }
+        
 
         [JsonIgnore]
         public EbDataSource EbDataSource { get; set; }
@@ -79,9 +78,8 @@ namespace ExpressBase.Objects.EmailRelated
             }
         }
     }
-
     [EnableInBuilder(BuilderType.EmailBuilder)]
-    public class DsColumns : EbEmailTemplate
+    public class DsColumnsDetails : EbEmailTemplateBase
     {
         [EnableInBuilder(BuilderType.EmailBuilder)]
         public DateFormat DateFormat { get; set; }
@@ -117,7 +115,12 @@ namespace ExpressBase.Objects.EmailRelated
         [PropertyEditor(PropertyEditorType.Color)]
         [PropertyGroup("Appearance")]
         public string BorderColor { get; set; }
+    }
 
+
+    [EnableInBuilder(BuilderType.EmailBuilder)]
+    public class DsColumns : DsColumnsDetails
+    {
         public override string GetDesignHtml()
         {
             return "<span class='ebdscols' eb-type='DsColumns' format='@format'  id='@id' style='border: @Border px solid;border-color: @BorderColor ;background-color: @BackColor;'>@Title </span>".RemoveCR().DoubleQuoted();
@@ -134,4 +137,6 @@ namespace ExpressBase.Objects.EmailRelated
 };";
         }
     }
+
+  
 }

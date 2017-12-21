@@ -55,6 +55,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 5)]
         public string Cc { get; set; }
 
+        [DataMember(Order = 6)]
+        public int newuserid { get; set; }
+
     }
 
 }
