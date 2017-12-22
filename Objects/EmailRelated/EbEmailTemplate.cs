@@ -60,7 +60,15 @@ namespace ExpressBase.Objects.EmailRelated
         [EnableInBuilder(BuilderType.EmailBuilder)]
         [HideInPropertyGrid]
         public List<DsColumns> DsColumnsCollection { get; set; }
-        
+
+
+        [EnableInBuilder(BuilderType.EmailBuilder)]    //remove after use
+        [UIproperty]
+        [PropertyEditor(PropertyEditorType.Color)]
+        [PropertyGroup("Appearance")]
+        public string Febintest { get; set; }
+
+
 
         [JsonIgnore]
         public EbDataSource EbDataSource { get; set; }
@@ -137,6 +145,6 @@ namespace ExpressBase.Objects.EmailRelated
 };";
         }
     }
-
+    /// related to property grid
   
 }
