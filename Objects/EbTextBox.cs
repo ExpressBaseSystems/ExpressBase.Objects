@@ -181,7 +181,7 @@ else {
 .Replace("@attachedLbl@", (this.TextMode != TextMode.SingleLine) ?
                                 (
                                     @"<div  class='input-group' style='width: 100%;'>
-                                        <span class='input-group-addon' onclick='$(`#@name@`).click()'><i class='fa fa-$class aria-hidden='true'"
+                                        <span class='input-group-addon' onclick='$(\'#@name@\').click()'><i class='fa fa-$class aria-hidden='true'"
                                         + (
                                             (this.FontFamily != null) ?
                                                 ("style='font-size:" + this.FontSize + "px;'")
