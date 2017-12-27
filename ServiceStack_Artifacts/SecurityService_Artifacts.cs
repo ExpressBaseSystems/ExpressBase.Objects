@@ -224,10 +224,37 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public string Name;
 
 		[DataMember(Order = 3)]
-		public int Role_Id;
+		public string Email;
+
+		[DataMember(Order = 4)]
+		public int Role2User_Id;
 	}
+	
+	[DataContract]
+	public class GetUserDetailsRequest : IReturn<GetUserDetailsResponse>, IEbSSRequest
+	{
+		[DataMember(Order = 1)]
+		public string SearchText { get; set; }
+		
+		[DataMember(Order = 2)]
+		public string TenantAccountId { get; set; }
 
+		[DataMember(Order = 3)]
+		public int UserId { get; set; }
+	}
+	[DataContract]
+	public class GetUserDetailsResponse : IEbSSResponse
+	{
+		[DataMember(Order = 1)]
+		public List<Eb_Users> UserList { get; set; }
 
+		[DataMember(Order = 2)]
+		public string Token { get; set; }
+
+		[DataMember(Order = 3)]
+		public ResponseStatus ResponseStatus { get; set; }
+	}
+	
 	[DataContract]
 	public class SaveRoleRequest : IReturn<SaveRoleResponse>, IEbSSRequest
 	{
