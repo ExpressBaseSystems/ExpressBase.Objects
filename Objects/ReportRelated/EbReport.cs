@@ -87,13 +87,13 @@ else {
         public float CustomPaperWidth { get; set; }
 
         //public EbReportMargins Margins { get; set; }
-        [EnableInBuilder(BuilderType.Report)]
-        [PropertyGroup("General")]
-        public string ReportName { get; set; }
+        //[EnableInBuilder(BuilderType.Report)]
+        //[PropertyGroup("General")]
+        //public string ReportName { get; set; }
 
-        [EnableInBuilder(BuilderType.Report)]
-        [PropertyGroup("General")]
-        public string Description { get; set; }
+        //[EnableInBuilder(BuilderType.Report)]
+        //[PropertyGroup("General")]
+        //public string Description { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("General")]

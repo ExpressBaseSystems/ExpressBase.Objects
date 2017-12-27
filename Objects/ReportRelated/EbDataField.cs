@@ -478,6 +478,7 @@ namespace ExpressBase.Objects.ReportRelated
             ct.Go();
         }      
     }
+
     [EnableInBuilder(BuilderType.Report)]
     public class EbDataFieldTextSummary : EbDataFieldText
     {
