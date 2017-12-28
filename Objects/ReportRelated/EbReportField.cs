@@ -104,7 +104,7 @@ namespace ExpressBase.Objects.ReportRelated
 
         public override string GetDesignHtml()
         {
-            return "<div class='wm-container dropped' eb-type='WaterMark' id='@id' style='opacity:.5; width: @Width px; background: @Source ; background-size: cover; height: @Height px; position: absolute; left: @Left px; top: @Top px;'> @WaterMarkText </div>".RemoveCR().DoubleQuoted();
+            return "<div class='wm-container' eb-type='WaterMark' id='@id' style='opacity:.5; width: @Width px; background: @Source ; background-size: cover; height: @Height px; position: absolute; left: @Left px; top: @Top px;'> @WaterMarkText </div>".RemoveCR().DoubleQuoted();
         }
         public override string GetJsInitFunc()
         {
