@@ -132,7 +132,7 @@ $('#@id').datetimepicker({
             else //if edit mode
                 _html = Wrap4Developer(GetHtml());
 
-            return _html.RemoveCR().DoubleQuoted();
+            return _html.RemoveCR().GraveAccentQuoted();
         }
 
         public override string GetBareHtml()
@@ -140,7 +140,7 @@ $('#@id').datetimepicker({
             return @" 
         <div class='input-group' style='width:100%;'>
             <input id='@name@' data-ebtype='@datetype@'  data-toggle='tooltip' title='@toolTipText@' class='date' type='text'name='@name@' autocomplete = '@autoComplete@' @value@ @tabIndex@ style='width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@ @readOnlyString@ @required@ @placeHolder@ />
-            <span class='input-group-addon' onclick='$(\'#@name@\').click()'> <i id='@name@TglBtn' class='fa  @atchdLbl@' aria-hidden='true'></i> </span>
+            <span class='input-group-addon' onclick=""$('#@name@').focus().focus()""> <i id='@name@TglBtn' class='fa  @atchdLbl@' aria-hidden='true'></i> </span>
         </div>"
 .Replace("@name@", this.Name)
 .Replace("@datetype@", "6")//( (int)this.EbDateType ).ToString())
