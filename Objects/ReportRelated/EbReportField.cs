@@ -104,7 +104,7 @@ namespace ExpressBase.Objects.ReportRelated
 
         public override string GetDesignHtml()
         {
-            return "<div class='wm-container dropped' eb-type='WaterMark' id='@id' style='opacity:.5; width: @Width px; background: @Source ; background-size: cover; height: @Height px; position: absolute; left: @Left px; top: @Top px;'> @WaterMarkText </div>".RemoveCR().DoubleQuoted();
+            return "<div class='wm-container' eb-type='WaterMark' id='@id' style='opacity:.5; width: @Width px; background: @Source ; background-size: cover; height: @Height px; position: absolute; left: @Left px; top: @Top px;'> @WaterMarkText </div>".RemoveCR().DoubleQuoted();
         }
         public override string GetJsInitFunc()
         {
@@ -119,7 +119,7 @@ namespace ExpressBase.Objects.ReportRelated
 
         public override void DrawMe(PdfReader pdfReader, Document d, PdfStamper stamp, byte[] fileByte)
         {
-           if(this.WaterMarkText != string.Empty)
+            if (this.WaterMarkText != string.Empty)
             {
                 PdfContentByte canvas;
                 iTextSharp.text.Font fo = new iTextSharp.text.Font(5, 20, 5, BaseColor.LightGray);
@@ -129,19 +129,29 @@ namespace ExpressBase.Objects.ReportRelated
                     ColumnText.ShowTextAligned(canvas, Element.ALIGN_CENTER, new Phrase(this.WaterMarkText, fo), d.PageSize.Width / 2, d.PageSize.Height / 2, 45);
                 }
             }
-           if(this.Image != string.Empty)
+            if (this.Image != string.Empty)
             {
                 iTextSharp.text.Image img = iTextSharp.text.Image.GetInstance(fileByte);
                 img.RotationDegrees = 45;
-                img.ScaleToFit(d.PageSize.Width, d.PageSize.Height);
-                img.SetAbsolutePosition(0, d.PageSize.Height); // set the position of watermark to appear (0,0 = bottom left corner of the page)
-                PdfContentByte waterMark;
+                img.ScaleToFit(this.Width, this.Height);
+                img.SetAbsolutePosition(this.Left, this.Top+500); // set the position of watermark to appear (0,0 = bottom left corner of the page)
+                //PdfContentByte waterMark;
+                PdfGState _state = new PdfGState()
+                {
+                    FillOpacity = 0.3F,
+                    StrokeOpacity = 0.3F
+                };
                 for (int page = 1; page <= pdfReader.NumberOfPages; page++)
                 {
-                    waterMark = stamp.GetUnderContent(page);
-                    waterMark.AddImage(img);
+                    PdfContentByte cb = stamp.GetUnderContent(page);
+                    cb.SaveState();
+                    cb.SetGState(_state);
+                    cb.AddImage(img);
+                    cb.RestoreState();
+                    // waterMark = stamp.GetUnderContent(page);
+                    // waterMark.AddImage(img);
                 }
-            }           
+            }
             stamp.FormFlattening = true;
             stamp.Close();
         }
