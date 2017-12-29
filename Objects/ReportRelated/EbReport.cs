@@ -104,7 +104,7 @@ else {
 
         [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]
-        public List<EbWaterMark> WaterMarks{ get; set; }
+        public List<EbReportField> ReportObjects{ get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]
