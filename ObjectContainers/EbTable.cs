@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 
 namespace ExpressBase.Objects
 {
-    [ProtoBuf.ProtoContract]
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
     public class EbTableLayout : EbControlContainer
     {
