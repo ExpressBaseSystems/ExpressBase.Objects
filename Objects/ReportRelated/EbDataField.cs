@@ -105,6 +105,10 @@ namespace ExpressBase.Objects.ReportRelated
         [PropertyGroup("General")]
         public bool InLetters { get; set; }
 
+        [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup("General")]
+        public bool SuppressIfZero { get; set; }
+
         public override string GetDesignHtml()
         {
             return "<div class='EbCol dropped' $type='@type' eb-type='DataFieldNumeric' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;text-align: @TextAlign;'> @Title </div>".RemoveCR().DoubleQuoted();

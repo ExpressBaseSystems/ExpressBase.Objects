@@ -44,7 +44,7 @@ namespace ExpressBase.Objects.ReportRelated
         public virtual void DrawMe(Document d, byte[] fileByte)
         {
         }
-        public virtual void DrawMe(PdfReader pdfReader, Document d, PdfStamper stamp, byte[] fileByte)
+        public virtual void DrawMe(PdfReader pdfReader, Document d,/* PdfStamper stamp*/ PdfWriter writer, byte[] fileByte)
         {
         }
     }
@@ -117,17 +117,23 @@ namespace ExpressBase.Objects.ReportRelated
 };";
         }
 
-        public override void DrawMe(PdfReader pdfReader, Document d, PdfStamper stamp, byte[] fileByte)
+        public override void DrawMe(PdfReader pdfReader, Document d, PdfWriter writer /*PdfStamper stamp*/, byte[] fileByte)
         {
             if (this.WaterMarkText != string.Empty)
             {
                 PdfContentByte canvas;
                 iTextSharp.text.Font fo = new iTextSharp.text.Font(5, 20, 5, BaseColor.LightGray);
-                for (int page = 1; page <= pdfReader.NumberOfPages; page++)
-                {
-                    canvas = stamp.GetUnderContent(page);
-                    ColumnText.ShowTextAligned(canvas, Element.ALIGN_CENTER, new Phrase(this.WaterMarkText, fo), d.PageSize.Width / 2, d.PageSize.Height / 2, 45);
-                }
+                //for (int page = 1; page <= pdfReader.NumberOfPages; page++)
+                //{
+                    canvas = writer.DirectContentUnder; /*stamp.GetUnderContent(page); */
+                  //  ColumnText.ShowTextAligned(canvas, Element.ALIGN_CENTER, new Phrase(this.WaterMarkText, fo), d.PageSize.Width / 2, d.PageSize.Height / 2, 45);
+                canvas.BeginText();
+                canvas.SetColorFill(iTextSharp.text.pdf.CmykColor.LightGray);
+                //canvas.SetFontAndSize(baseFont, fontSize);
+                canvas.ShowTextAligned(PdfContentByte.ALIGN_CENTER, this.WaterMarkText, d.PageSize.Width / 2, d.PageSize.Height / 2, 45);
+                canvas.EndText();
+                canvas.EndText();
+                //}
             }
             if (this.Image != string.Empty)
             {
@@ -141,19 +147,19 @@ namespace ExpressBase.Objects.ReportRelated
                     FillOpacity = 0.3F,
                     StrokeOpacity = 0.3F
                 };
-                for (int page = 1; page <= pdfReader.NumberOfPages; page++)
-                {
-                    PdfContentByte cb = stamp.GetUnderContent(page);
+                //for (int page = 1; page <= pdfReader.NumberOfPages; page++)
+                //{
+                    PdfContentByte cb = writer.DirectContentUnder;
                     cb.SaveState();
                     cb.SetGState(_state);
                     cb.AddImage(img);
                     cb.RestoreState();
                     // waterMark = stamp.GetUnderContent(page);
                     // waterMark.AddImage(img);
-                }
+                //}
             }
-            stamp.FormFlattening = true;
-            stamp.Close();
+            //stamp.FormFlattening = true;
+            //stamp.Close();
         }
     }
 
