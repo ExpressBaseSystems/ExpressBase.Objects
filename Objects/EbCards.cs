@@ -24,6 +24,13 @@ namespace ExpressBase.Objects
             this.CardCollection.Add(new EbCard());
         }
 
+        [OnDeserialized]
+        public void OnDeserializedMethod(StreamingContext context)
+        {
+            this.BareControlHtml = this.GetBareHtml();
+            this.Type = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
+        }
+
         public override string GetJsInitFunc()
         {
             return @"
@@ -42,19 +49,22 @@ this.Init = function(id)
         public override string GetBareHtml()
         {
             string html = @"
-            <div id='cont_@name@' Ctype='Cards' class='Eb-ctrlContainer' style='@hiddenString'>
                 <div class='cards-cont'>";
-
-            foreach (EbCard ec in this.CardCollection)
-                html += ec.GetHtml();
-
-            return html + "</div></div>"
-.Replace("@name@", (this.Name != null) ? this.Name : "@name@"); ;
+                    foreach (EbCard ec in this.CardCollection)
+                        html += ec.GetHtml();
+                return html + "</div>"
+.Replace("@name@", (this.Name != null) ? this.Name : "@name@");
         }
 
         public override string GetHtml()
         {
-            return GetBareHtml();
+            return @"
+            <div id='cont_@name@' Ctype='Cards' class='Eb-ctrlContainer' style='@hiddenString'>
+                @GetBareHtml@
+            </div>"
+.Replace("@name@", (this.Name != null) ? this.Name : "@name@")
+.Replace("@GetBareHtml@", this.GetBareHtml())
+;
         }
 
     }
