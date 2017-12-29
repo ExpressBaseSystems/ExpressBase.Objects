@@ -132,4 +132,25 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             }
         }
     }
+
+    [DataContract]
+    public class EbObjectWithRelatedDVRequest : EbServiceStackRequest, IReturn<EbObjectWithRelatedDVResponse>
+    {
+        [DataMember(Order = 1)]
+        public string Refid { get; set; }
+        
+    }
+
+    [DataContract]
+    public class EbObjectWithRelatedDVResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public EbDataVisualization Dsobj { get; set; }
+
+        [DataMember(Order = 2)]
+        public List<EbObjectWrapper> DvList { get; set; }
+
+        [DataMember(Order = 3)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
 }

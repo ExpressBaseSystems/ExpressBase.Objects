@@ -94,10 +94,17 @@ else {
         //[EnableInBuilder(BuilderType.Report)]
         //[PropertyGroup("General")]
         //public string Description { get; set; }
-
         [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("General")]
         public bool IsLandscape { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [PropertyEditor(PropertyEditorType.ImageSeletor)]
+        public string BackgroundImage { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
+        public List<EbWaterMark> WaterMarks{ get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]
