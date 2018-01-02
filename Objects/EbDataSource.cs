@@ -1,8 +1,11 @@
-﻿using ExpressBase.Common.JsonConverters;
+﻿using ExpressBase.Common;
+using ExpressBase.Common.JsonConverters;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Objects.ObjectContainers;
+using ExpressBase.Objects.ServiceStack_Artifacts;
 using Newtonsoft.Json;
+using ServiceStack;
 using ServiceStack.Redis;
 using System;
 using System.Collections.Generic;
@@ -47,6 +50,24 @@ namespace ExpressBase.Objects
             try
             {
                 this.FilterDialog = Redis.Get<EbFilterDialog>(this.FilterDialogRefId);
+            }
+            catch (Exception e)
+            {
+
+            }
+        }
+
+        public override void AfterRedisGet(RedisClient Redis, IServiceClient client)
+        {
+            try
+            {
+                this.FilterDialog = Redis.Get<EbFilterDialog>(this.FilterDialogRefId);
+                if (this.FilterDialog == null)
+                {
+                    var result = client.Get<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = this.FilterDialogRefId });
+                    this.FilterDialog = EbSerializers.Json_Deserialize(result.Data[0].Json);
+                    Redis.Set<EbFilterDialog>(this.FilterDialogRefId, this.FilterDialog);
+                }
             }
             catch (Exception e)
             {
