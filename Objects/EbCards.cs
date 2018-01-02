@@ -49,7 +49,8 @@ this.Init = function(id)
         public override string GetBareHtml()
         {
             string html = @"
-                <div class='cards-cont'>";
+                <div id='@name@'class='cards-cont'>"
+.Replace("@name@", (this.Name != null) ? this.Name : "@name@");
                     foreach (EbCard ec in this.CardCollection)
                         html += ec.GetHtml();
                 return html + "</div>"
@@ -91,7 +92,7 @@ this.Init = function(id)
         {
             get
             {
-                string html = "<div class='card-btn-cont'>";
+                string html = @"<div class='card-btn-cont'>";
 
                 foreach (EbButton ec in this.Buttons)
                     html += ec.GetHtml();
@@ -122,7 +123,7 @@ this.Init = function(id)
    .Replace("@ButtonCollection@", this.ButtonsString)
    .Replace("@name@", this.Name)
    .Replace("@ContentHTML@", "Chat has become the center of the smartphone universe, so it makes sense that bots are being used to deliver information in a convenient and engaging manner. But how do brands or media companies")//this.ContentHTML)
-   .Replace("@Label@", "TechCrunch")//this.Label)
+   .Replace("@Label@", this.Label)//"TechCrunch")//
    .Replace("@ImageID@", "https://tctechcrunch2011.files.wordpress.com/2016/03/chat-bot.jpg?w=738")//"this.ImageID")
    ;
             return html;
