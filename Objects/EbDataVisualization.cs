@@ -9,6 +9,7 @@ using ExpressBase.Objects.ServiceStack_Artifacts;
 using Newtonsoft.Json;
 using Npgsql;
 using Npgsql.Schema;
+using ServiceStack;
 using ServiceStack.Redis;
 using System;
 using System.Collections.Generic;
@@ -99,6 +100,27 @@ namespace ExpressBase.Objects
             {
                 this.EbDataSource = Redis.Get<EbDataSource>(this.DataSourceRefId);
                 this.EbDataSource.AfterRedisGet(Redis);
+            }
+            catch (Exception e)
+            {
+
+            }
+        }
+
+        public override void AfterRedisGet(RedisClient Redis, IServiceClient client)
+        {
+            try
+            {
+                this.EbDataSource = Redis.Get<EbDataSource>(this.DataSourceRefId);
+                if(this.EbDataSource != null && this.EbDataSource.Sql != null)
+                    this.EbDataSource.AfterRedisGet(Redis);
+                else
+                {
+                    var result = client.Get<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = this.DataSourceRefId });
+                    this.EbDataSource =EbSerializers.Json_Deserialize(result.Data[0].Json);
+                    Redis.Set<EbDataSource>(this.DataSourceRefId, this.EbDataSource);
+                    this.EbDataSource.AfterRedisGet(Redis, client);
+                }
             }
             catch (Exception e)
             {
