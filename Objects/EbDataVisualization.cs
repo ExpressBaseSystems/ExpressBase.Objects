@@ -113,7 +113,7 @@ namespace ExpressBase.Objects
             {
                 this.EbDataSource = Redis.Get<EbDataSource>(this.DataSourceRefId);
                 if(this.EbDataSource != null && this.EbDataSource.Sql != null)
-                    this.EbDataSource.AfterRedisGet(Redis);
+                    this.EbDataSource.AfterRedisGet(Redis, client);
                 else
                 {
                     var result = client.Get<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = this.DataSourceRefId });
