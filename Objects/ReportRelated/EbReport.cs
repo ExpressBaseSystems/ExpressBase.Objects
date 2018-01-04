@@ -251,25 +251,9 @@ else {
             {
                 foreach (EbReportField field in p_footer.Fields)
                 {
-                    if (field is EbDataFieldNumericSummary || field is EbDataFieldBooleanSummary || field is EbDataFieldTextSummary || field is EbDataFieldDateTimeSummary)
+                    if (field is IEbDataFieldSummary)
                     {
-                        dynamic f = field;
-                        if (field is EbDataFieldNumericSummary)
-                        {
-                            f = field as EbDataFieldNumericSummary;
-                        }
-                        if (field is EbDataFieldBooleanSummary)
-                        {
-                            f = field as EbDataFieldBooleanSummary;
-                        }
-                        if (field is EbDataFieldTextSummary)
-                        {
-                            f = field as EbDataFieldTextSummary;
-                        }
-                        if (field is EbDataFieldDateTimeSummary)
-                        {
-                            f = field as EbDataFieldDateTimeSummary;
-                        }
+                        EbDataField f = (field as EbDataField);
                         if (!PageSummaryFields.ContainsKey(f.DataField))
                         {
                             SummaryFieldsList = new List<object>();
@@ -288,27 +272,10 @@ else {
             {
                 foreach (EbReportField field in r_footer.Fields)
                 {
-                    if (field is EbDataFieldNumericSummary || field is EbDataFieldBooleanSummary || field is EbDataFieldTextSummary || field is EbDataFieldDateTimeSummary)
+                    if (field is IEbDataFieldSummary)
                     {
-                        dynamic f = null;
-                        if (field is EbDataFieldNumericSummary)
-                        {
-                            f = field as EbDataFieldNumericSummary;
-                        }
-                        if (field is EbDataFieldBooleanSummary)
-                        {
-                            f = field as EbDataFieldBooleanSummary;
-                        }
-                        if (field is EbDataFieldTextSummary)
-                        {
-                            f = field as EbDataFieldTextSummary;
-                        }
-                        if (field is EbDataFieldDateTimeSummary)
-                        {
-                            f = field as EbDataFieldDateTimeSummary;
-                        }
-
-                        if (!ReportSummaryFields.ContainsKey(f.DataField))
+                        EbDataField f = (field as EbDataField);
+                        if (!ReportSummaryFields.ContainsKey((field as EbDataField).DataField))
                         {
                             SummaryFieldsList = new List<object>();
                             SummaryFieldsList.Add(f);

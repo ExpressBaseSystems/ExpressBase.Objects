@@ -13,6 +13,8 @@ namespace ExpressBase.Objects.ReportRelated
 {
     public abstract class EbDataField : EbReportField
     {
+        public virtual string DataField { get; set; }
+
         public virtual void NotifyNewPage(bool status) { }
 
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
@@ -375,11 +377,11 @@ namespace ExpressBase.Objects.ReportRelated
     }
 
     [EnableInBuilder(BuilderType.Report)]
-    public class EbDataFieldNumericSummary : EbDataFieldNumeric
+    public class EbDataFieldNumericSummary : EbDataFieldNumeric, IEbDataFieldSummary
     {
         [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]
-        public string DataField { get; set; }
+        public override string DataField { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         public SummaryFunctionsNumeric Function { get; set; }
@@ -396,7 +398,7 @@ namespace ExpressBase.Objects.ReportRelated
 
         private decimal Min { get; set; }
 
-        public decimal SummarizedValue
+        public object SummarizedValue
         {
             get
             {
@@ -415,30 +417,30 @@ namespace ExpressBase.Objects.ReportRelated
             }
         }
 
-        public void Summarize(dynamic value)
+        public void Summarize(object value)
         {
             this.Count++;
-            value = Convert.ToDecimal(value);
+            decimal myvalue = Convert.ToDecimal(value);
 
             if (this.Function == SummaryFunctionsNumeric.Sum || this.Function == SummaryFunctionsNumeric.Average)
             {
                 if (this.Function == SummaryFunctionsNumeric.Sum || this.Function == SummaryFunctionsNumeric.Average)
-                    this.Sum += value;
+                    this.Sum += myvalue;
             }
 
             if (this.Count > 1)
             {
                 if (this.Function == SummaryFunctionsNumeric.Max)
-                    this.Max = (this.Max > value) ? this.Max : value;
+                    this.Max = (this.Max > myvalue) ? this.Max : myvalue;
                 else if (this.Function == SummaryFunctionsNumeric.Min)
-                    this.Min = (this.Min < value) ? this.Min : value;
+                    this.Min = (this.Min < myvalue) ? this.Min : myvalue;
             }
             else
             {
                 if (this.Function == SummaryFunctionsNumeric.Max)
-                    this.Max = value;
+                    this.Max = myvalue;
                 else if (this.Function == SummaryFunctionsNumeric.Min)
-                    this.Min = value;
+                    this.Min = myvalue;
             }
         }
 
@@ -483,8 +485,14 @@ namespace ExpressBase.Objects.ReportRelated
         }      
     }
 
+    public interface IEbDataFieldSummary
+    {
+        object SummarizedValue { get; }
+        void Summarize(object value);       
+    }
+
     [EnableInBuilder(BuilderType.Report)]
-    public class EbDataFieldTextSummary : EbDataFieldText
+    public class EbDataFieldTextSummary : EbDataFieldText, IEbDataFieldSummary
     {
         [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]
@@ -504,7 +512,7 @@ namespace ExpressBase.Objects.ReportRelated
 
         private string Min { get; set; } = "";
 
-        public dynamic SummarizedValue
+        public object SummarizedValue
         {
             get
             {
@@ -519,23 +527,23 @@ namespace ExpressBase.Objects.ReportRelated
             }
         }
 
-        public void Summarize(dynamic value)
+        public void Summarize(object value)
         {
-            value = value.ToString();
+           var myvalue = value.ToString();
             this.Count++;
             if (this.Count > 1)
             {
                 if (this.Function == SummaryFunctionsText.Max)
-                    this.Max = (this.Max.CompareTo(value) > 0) ? this.Max : value;
+                    this.Max = (this.Max.CompareTo(myvalue) > 0) ? this.Max : myvalue;
                 else if (this.Function == SummaryFunctionsText.Min)
-                    this.Min = (this.Min.CompareTo(value) > 0) ? value : this.Min;
+                    this.Min = (this.Min.CompareTo(myvalue) > 0) ? myvalue : this.Min;
             }
             else
             {
                 if (this.Function == SummaryFunctionsText.Max)
-                    this.Max = value;
+                    this.Max = myvalue;
                 else if (this.Function == SummaryFunctionsText.Min)
-                    this.Min = value;
+                    this.Min = myvalue;
             }
         }
 
@@ -559,7 +567,7 @@ namespace ExpressBase.Objects.ReportRelated
     }
 
     [EnableInBuilder(BuilderType.Report)]
-    public class EbDataFieldDateTimeSummary : EbDataFieldDateTime
+    public class EbDataFieldDateTimeSummary : EbDataFieldDateTime, IEbDataFieldSummary
     {
         [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]
@@ -578,7 +586,7 @@ namespace ExpressBase.Objects.ReportRelated
 
         private DateTime Min { get; set; }
 
-        public dynamic SummarizedValue
+        public object SummarizedValue
         {
             get
             {
@@ -593,23 +601,23 @@ namespace ExpressBase.Objects.ReportRelated
             }
         }
 
-        public void Summarize(dynamic value)
+        public void Summarize(object value)
         {
-            value = Convert.ToDateTime(value);
+           var myvalue = Convert.ToDateTime(value);
             this.Count++;
             if (this.Count > 1)
             {
                 if (this.Function == SummaryFunctionsDateTime.Max)
-                    this.Max = (DateTime.Compare(this.Max, value) > 0) ? this.Max : value;
+                    this.Max = (DateTime.Compare(this.Max, myvalue) > 0) ? this.Max : myvalue;
                 if (this.Function == SummaryFunctionsDateTime.Min)
-                    this.Min = (DateTime.Compare(this.Min, value) > 0) ? value : this.Min;
+                    this.Min = (DateTime.Compare(this.Min, myvalue) > 0) ? myvalue : this.Min;
             }
             else
             {
                 if (this.Function == SummaryFunctionsDateTime.Max)
-                    this.Max = value;
+                    this.Max = myvalue;
                 if (this.Function == SummaryFunctionsDateTime.Min)
-                    this.Min = value;
+                    this.Min = myvalue;
             }
         }
 
@@ -632,7 +640,7 @@ namespace ExpressBase.Objects.ReportRelated
     }
 
     [EnableInBuilder(BuilderType.Report)]
-    public class EbDataFieldBooleanSummary : EbDataFieldBoolean
+    public class EbDataFieldBooleanSummary : EbDataFieldBoolean, IEbDataFieldSummary
     {
         [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]
@@ -648,7 +656,7 @@ namespace ExpressBase.Objects.ReportRelated
 
         private int Count { get; set; }
 
-        public decimal SummarizedValue
+        public object SummarizedValue
         {
             get
             {
@@ -658,7 +666,7 @@ namespace ExpressBase.Objects.ReportRelated
             }
         }
 
-        public void Summarize()
+        public void Summarize(object value)
         {
             this.Count++;
         }
