@@ -104,7 +104,7 @@ else {
 
         [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]
-        public List<EbReportField> ReportObjects{ get; set; }
+        public List<EbReportField> ReportObjects { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]
@@ -129,11 +129,167 @@ else {
         [EnableInBuilder(BuilderType.Report)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectType.DataSource)]
-        public string DataSourceRefId { get; set; }        
+        public string DataSourceRefId { get; set; }
 
         public ColumnColletion ColumnColletion { get; set; }
 
         public int SerialNumber { get; set; } = 1;
+
+        public Dictionary<string, List<object>> PageSummaryFields { get; set; }
+
+        public Dictionary<string, List<object>> ReportSummaryFields { get; set; }
+
+        public int DataRowCount { get; set; }
+
+        public bool IsLastpage { get; set; }
+
+        public int PageNumber { get; set; }
+
+        private float _rhHeight = 0;
+        public float ReportHeaderHeight
+        {
+            get
+            {
+                if (_rhHeight == 0)
+                {
+                    foreach (EbReportHeader r_header in ReportHeaders)
+                        _rhHeight += r_header.Height;
+                }
+
+                return _rhHeight;
+            }
+        }
+
+        private float _phHeight = 0;
+        public float PageHeaderHeight
+        {
+            get
+            {
+                if (_phHeight == 0)
+                {
+                    foreach (EbPageHeader p_header in PageHeaders)
+                        _phHeight += p_header.Height;
+                }
+                return _phHeight;
+            }
+        }
+
+        private float _pfHeight = 0;
+        public float PageFooterHeight
+        {
+            get
+            {
+                if (_pfHeight == 0)
+                {
+
+                    foreach (EbPageFooter p_footer in PageFooters)
+                        _pfHeight += p_footer.Height;
+                }
+                return _pfHeight;
+            }
+        }
+
+        private float _rfHeight = 0;
+        public float ReportFooterHeight
+        {
+            get
+            {
+                if (_rfHeight == 0)
+                {
+                    foreach (EbReportFooter r_footer in ReportFooters)
+                        _rfHeight += r_footer.Height;
+                }
+                return _rfHeight;
+            }
+        }
+
+        private float _dtHeight = 0;
+        public float DetailHeight
+        {
+            get
+            {
+                if (_dtHeight == 0)
+                {
+                    foreach (EbReportDetail detail in Detail)
+                        _dtHeight += detail.Height;
+                }
+                return _dtHeight;
+            }
+        }
+
+        private float dt_fillheight = 0;
+        public float DT_FillHeight
+        {
+            get
+            {
+                if (DataRowCount > 0)
+                {
+                    var a = DataRowCount * DetailHeight;
+                    var b = Height - (PageHeaderHeight + PageFooterHeight + ReportHeaderHeight + ReportFooterHeight);
+                    if (a < b && PageNumber == 1)
+                        IsLastpage = true;
+                }
+
+                if (PageNumber == 1 && IsLastpage == true)
+                    dt_fillheight = Height - (PageHeaderHeight + PageFooterHeight + ReportHeaderHeight + ReportFooterHeight);
+                else if (PageNumber == 1)
+                    dt_fillheight = Height - (ReportHeaderHeight + PageHeaderHeight + PageFooterHeight);
+                else if (IsLastpage == true)
+                    dt_fillheight = Height - (PageHeaderHeight + PageFooterHeight + ReportFooterHeight);
+                else
+                    dt_fillheight = Height - (PageHeaderHeight + PageFooterHeight);
+                return dt_fillheight;
+            }
+        }
+
+        public void InitializeSummaryFields()
+        {
+            List<object> SummaryFieldsList = null;
+            PageSummaryFields = new Dictionary<string, List<object>>();
+            ReportSummaryFields = new Dictionary<string, List<object>>();
+            foreach (EbPageFooter p_footer in PageFooters)
+            {
+                foreach (EbReportField field in p_footer.Fields)
+                {
+                    if (field is IEbDataFieldSummary)
+                    {
+                        EbDataField f = (field as EbDataField);
+                        if (!PageSummaryFields.ContainsKey(f.DataField))
+                        {
+                            SummaryFieldsList = new List<object>();
+                            SummaryFieldsList.Add(f);
+                            PageSummaryFields.Add(f.DataField, SummaryFieldsList);
+                        }
+                        else
+                        {
+                            PageSummaryFields[f.DataField].Add(f);
+                        }
+                    }
+                }
+            }
+
+            foreach (EbReportFooter r_footer in ReportFooters)
+            {
+                foreach (EbReportField field in r_footer.Fields)
+                {
+                    if (field is IEbDataFieldSummary)
+                    {
+                        EbDataField f = (field as EbDataField);
+                        if (!ReportSummaryFields.ContainsKey((field as EbDataField).DataField))
+                        {
+                            SummaryFieldsList = new List<object>();
+                            SummaryFieldsList.Add(f);
+                            ReportSummaryFields.Add(f.DataField, SummaryFieldsList);
+                        }
+                        else
+                        {
+                            ReportSummaryFields[f.DataField].Add(f);
+                        }
+                    }
+                }
+            }
+
+        }
 
         public EbReport()
         {
@@ -154,7 +310,7 @@ else {
         }
     }
     public class EbReportSection : EbReportObject
-    {        
+    {
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
         public string SectionHeight { get; set; }

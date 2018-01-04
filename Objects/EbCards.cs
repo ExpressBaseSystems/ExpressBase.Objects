@@ -1,6 +1,9 @@
-﻿using ExpressBase.Common.Extensions;
+﻿using ExpressBase.Common;
+using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
+using ExpressBase.Objects.ServiceStack_Artifacts;
+using ServiceStack;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -20,15 +23,52 @@ namespace ExpressBase.Objects
         public EbCards()
         {
             this.CardCollection = new List<EbCard>();
-            this.CardCollection.Add(new EbCard());
-            this.CardCollection.Add(new EbCard());
         }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+        [OSE_ObjectTypes(EbObjectType.DataSource)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        public string DataSourceId { get; set; }
 
         [OnDeserialized]
         public void OnDeserializedMethod(StreamingContext context)
         {
             this.BareControlHtml = this.GetBareHtml();
             this.Type = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
+        }
+
+        //public void InitFromDataBase(JsonServiceClient ServiceClient)
+        //{
+        //    for (int i = 0; i < 2; i++)
+        //    {
+        //        EbCard Card = new EbCard();
+        //        Card.Name = i+" label from DS";
+        //        Card.Label = i + " labelfrom DS";
+        //        Card.ContentHTML = i + " ContentHTML from DS";
+        //        Card.ImageID = i + " ImageURL from DS";
+        //        //Card.BareControlHtml = Card.GetBareHtml();
+        //        this.CardCollection.Add(Card);
+        //    }
+        //}
+
+
+        public void InitFromDataBase(JsonServiceClient ServiceClient)
+        {
+
+            this.DataSourceId = "eb_roby_dev-eb_roby_dev-2-1105-1828";
+            RowColletion ds = (ServiceClient.Get<DataSourceDataResponse>(new DataSourceDataRequest { RefId = this.DataSourceId })).Data;
+            string _html = string.Empty;
+
+            foreach (EbDataRow cardRow in ds)
+            {
+                EbCard Card = new EbCard();
+                Card.Name = cardRow[0].ToString();
+                Card.Label = cardRow[1].ToString();
+               Card.ContentHTML = cardRow[2].ToString();
+                Card.ImageID = cardRow[3].ToString();
+
+                this.CardCollection.Add(Card);
+            }
         }
 
         public override string GetJsInitFunc()
@@ -51,9 +91,9 @@ this.Init = function(id)
             string html = @"
                 <div id='@name@'class='cards-cont'>"
 .Replace("@name@", (this.Name != null) ? this.Name : "@name@");
-                    foreach (EbCard ec in this.CardCollection)
-                        html += ec.GetHtml();
-                return html + "</div>"
+            foreach (EbCard ec in this.CardCollection)
+                html += ec.GetHtml();
+            return html + "</div>"
 .Replace("@name@", (this.Name != null) ? this.Name : "@name@");
         }
 
@@ -122,9 +162,9 @@ this.Init = function(id)
 </div>"
    .Replace("@ButtonCollection@", this.ButtonsString)
    .Replace("@name@", this.Name)
-   .Replace("@ContentHTML@", "Chat has become the center of the smartphone universe, so it makes sense that bots are being used to deliver information in a convenient and engaging manner. But how do brands or media companies")//this.ContentHTML)
+   .Replace("@ContentHTML@", this.ContentHTML) //"Chat has become the center of the smartphone universe, so it makes sense that bots are being used to deliver information in a convenient and engaging manner. But how do brands or media companies")//
    .Replace("@Label@", this.Label)//"TechCrunch")//
-   .Replace("@ImageID@", "https://tctechcrunch2011.files.wordpress.com/2016/03/chat-bot.jpg?w=738")//"this.ImageID")
+   .Replace("@ImageID@", this.ImageID)//"https://tctechcrunch2011.files.wordpress.com/2016/03/chat-bot.jpg?w=738")//
    ;
             return html;
         }
