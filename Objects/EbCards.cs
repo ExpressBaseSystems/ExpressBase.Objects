@@ -20,8 +20,8 @@ namespace ExpressBase.Objects
         public EbCards()
         {
             this.CardCollection = new List<EbCard>();
-            this.CardCollection.Add(new EbCard());
-            this.CardCollection.Add(new EbCard());
+            //this.CardCollection.Add(new EbCard());
+            //this.CardCollection.Add(new EbCard());
         }
 
         [OnDeserialized]
@@ -122,7 +122,7 @@ this.Init = function(id)
 </div>"
    .Replace("@ButtonCollection@", this.ButtonsString)
    .Replace("@name@", this.Name)
-   .Replace("@ContentHTML@", "Chat has become the center of the smartphone universe, so it makes sense that bots are being used to deliver information in a convenient and engaging manner. But how do brands or media companies")//this.ContentHTML)
+   .Replace("@ContentHTML@", this.ContentHTML) //"Chat has become the center of the smartphone universe, so it makes sense that bots are being used to deliver information in a convenient and engaging manner. But how do brands or media companies")//
    .Replace("@Label@", this.Label)//"TechCrunch")//
    .Replace("@ImageID@", "https://tctechcrunch2011.files.wordpress.com/2016/03/chat-bot.jpg?w=738")//"this.ImageID")
    ;
