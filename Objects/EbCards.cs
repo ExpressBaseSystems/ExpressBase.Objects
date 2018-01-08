@@ -64,9 +64,9 @@ namespace ExpressBase.Objects
                 EbCard Card = new EbCard();
                 Card.Name = cardRow[0].ToString();
                 Card.Label = cardRow[1].ToString();
-               Card.ContentHTML = cardRow[2].ToString();
+                Card.ContentHTML = cardRow[2].ToString();
                 Card.ImageID = cardRow[3].ToString();
-
+                Card.Buttons.Add(new EbButton { Text = "Select" });
                 this.CardCollection.Add(Card);
             }
         }
