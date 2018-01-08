@@ -22,6 +22,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 3)]
         public string TenantAccountId { get; set; }
 
+        public string DbName { get; set; }
+
         public int UserId { get; set; }
 
         public string Token { get; set; }
@@ -258,25 +260,16 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class CreateSolutionRequest : IReturn<CreateSolutionResponse>, IEbSSRequest
     {
         [DataMember(Order = 1)]
-        public string TenantAccountId { get; set; }
+        public string TenantAccountId { get; set; }        
 
         [DataMember(Order = 2)]
         public int UserId { get; set; }
 
         [DataMember(Order = 3)]
-        public string Subscription { get; set; }
+        public Dictionary<string, object> Colvalues { get; set; }
 
         [DataMember(Order = 4)]
-        public string SolutionName { get; set; }
-
-        [DataMember(Order = 6)]
-        public string EsolutionId { get; set; }
-
-        [DataMember(Order = 7)]
-        public string IsolutionId { get; set; }
-
-        [DataMember(Order = 8)]
-        public string Description { get; set; }
+        public int TenanantId { get; set; }
     }
 
     [DataContract]
@@ -296,7 +289,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 0)]
         public Dictionary<string, object> Colvalues { get; set; }
 
-        [DataMember(Order = 1)]
+        [DataMember(Order = 2)]
         public int Id { get; set; }
 
         public string TenantAccountId { get; set; }
