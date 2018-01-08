@@ -3,6 +3,8 @@ using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Objects.ReportRelated;
+using iTextSharp.text;
+using iTextSharp.text.pdf;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -139,7 +141,13 @@ else {
 
         public Dictionary<string, List<object>> ReportSummaryFields { get; set; }
 
-        public int DataRowCount { get; set; }
+        public Dictionary<string, byte[]> watermarkImages { get; set; }
+
+        public List<object> WaterMarkList { get; set; }
+
+        public RowColletion DataRow { get; set; }
+
+        public ColumnColletion DataColumns { get; set; }
 
         public bool IsLastpage { get; set; }
 
@@ -222,12 +230,15 @@ else {
         {
             get
             {
-                if (DataRowCount > 0)
+                if (DataRow != null)
                 {
-                    var a = DataRowCount * DetailHeight;
-                    var b = Height - (PageHeaderHeight + PageFooterHeight + ReportHeaderHeight + ReportFooterHeight);
-                    if (a < b && PageNumber == 1)
-                        IsLastpage = true;
+                    if (DataRow.Count > 0)
+                    {
+                        var a = DataRow.Count * DetailHeight;
+                        var b = Height - (PageHeaderHeight + PageFooterHeight + ReportHeaderHeight + ReportFooterHeight);
+                        if (a < b && PageNumber == 1)
+                            IsLastpage = true;
+                    }
                 }
 
                 if (PageNumber == 1 && IsLastpage == true)
@@ -291,6 +302,70 @@ else {
 
         }
 
+        public string GeFieldtData(string column_name, int i)
+        {
+            var columnindex = 0;
+            var column_val = "";
+            foreach (var col in DataColumns)
+            {
+                if (col.ColumnName == column_name)
+                {
+                    column_val = DataRow[i - 1][columnindex].ToString();
+                    return column_val;
+                }
+                columnindex++;
+            }
+            return column_val;
+        }
+
+        public void DrawWaterMark(PdfReader pdfReader, Document d, PdfWriter writer)
+        {
+            byte[] fileByte = null;
+            if (ReportObjects != null)
+            {
+                foreach (var field in ReportObjects)
+                {
+                    if ((field as EbWaterMark).Image != string.Empty)
+                    {
+                        fileByte = watermarkImages[(field as EbWaterMark).Image];
+                    }
+                (field as EbWaterMark).DrawMe(pdfReader, d, writer, fileByte, Height);
+                }
+            }
+        }
+
+        public void CallSummerize(string title, int i)
+        {
+            var column_name = string.Empty;
+            var column_val = string.Empty;
+
+            List<object> SummaryList;
+            if (PageSummaryFields.ContainsKey(title))
+            {
+                SummaryList = PageSummaryFields[title];
+                foreach (var item in SummaryList)
+                {
+                    var table = title.Split('.')[0];
+                    column_name = title.Split('.')[1];
+                    column_val = GeFieldtData(column_name, i);
+                    (item as IEbDataFieldSummary).Summarize(column_val);
+                }
+            }
+            if (ReportSummaryFields.ContainsKey(title))
+            {
+                SummaryList = ReportSummaryFields[title];
+                foreach (var item in SummaryList)
+                {
+                    var table = title.Split('.')[0];
+                    column_name = title.Split('.')[1];
+                    column_val = GeFieldtData(column_name, i);
+                    (item as IEbDataFieldSummary).Summarize(column_val);
+                }
+            }
+
+        }
+
+      
         public EbReport()
         {
             this.ReportHeaders = new List<EbReportHeader>();
