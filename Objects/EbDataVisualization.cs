@@ -30,6 +30,7 @@ namespace ExpressBase.Objects
         GoogleMap
     }
 
+    [EnableInBuilder(BuilderType.BotForm)]
     public class EbDataVisualizationObject : EbObject
     {
         [EnableInBuilder(BuilderType.DVBuilder)]
@@ -47,7 +48,7 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.DVBuilder)]
     public class EbDataVisualizationSet : EbDataVisualizationObject
     {
-        
+
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.Collection)]
         public List<EbDataVisualization> Visualizations { get; set; }
@@ -61,10 +62,10 @@ namespace ExpressBase.Objects
         }
     }
 
-    
+
     public abstract class EbDataVisualization : EbDataVisualizationObject
     {
-        
+
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectType.DataSource)]
@@ -80,7 +81,7 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.CollectionFrmSrcPG, "DSColumns")]
         [EnableInBuilder(BuilderType.DVBuilder)]
         public DVColumnCollection Columns { get; set; }
-        
+
         [EnableInBuilder(BuilderType.DVBuilder)]
         [HideInPropertyGrid]
         public DVColumnCollection DSColumns { get; set; }
@@ -255,10 +256,10 @@ namespace ExpressBase.Objects
             return DbType.String;
         }
 
-       
+
     }
 
-    [EnableInBuilder(BuilderType.DVBuilder)]
+    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
     public class EbTableVisualization : EbDataVisualization
     {
         [HideInPropertyGrid]
@@ -301,7 +302,7 @@ namespace ExpressBase.Objects
         }
     }
 
-    [EnableInBuilder(BuilderType.DVBuilder)]
+    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
     public class EbChartVisualization : EbDataVisualization
     {
         [EnableInBuilder(BuilderType.DVBuilder)]
@@ -312,22 +313,22 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
         public List<DVBaseColumn> Yaxis { get; set; }
-        
-        [EnableInBuilder(BuilderType.DVBuilder)]
-//        [OnChangeExec(@"
-//if(this.Type !== 'GoogleMap'){
-//    pg.HideProperty('LattitudeColumn')
-//    pg.HideProperty('LongitudeColumn')
-//    pg.HideProperty('MarkerNameColumn')
-//    pg.HideProperty('DrawRoute')
-//}
 
-//else{
-//    pg.ShowProperty('LattitudeColumn')
-//    pg.ShowProperty('LongitudeColumn')
-//    pg.ShowProperty('MarkerNameColumn')
-//    pg.ShowProperty('DrawRoute')
-//}")]
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        //        [OnChangeExec(@"
+        //if(this.Type !== 'GoogleMap'){
+        //    pg.HideProperty('LattitudeColumn')
+        //    pg.HideProperty('LongitudeColumn')
+        //    pg.HideProperty('MarkerNameColumn')
+        //    pg.HideProperty('DrawRoute')
+        //}
+
+        //else{
+        //    pg.ShowProperty('LattitudeColumn')
+        //    pg.ShowProperty('LongitudeColumn')
+        //    pg.ShowProperty('MarkerNameColumn')
+        //    pg.ShowProperty('DrawRoute')
+        //}")]
         [HideInPropertyGrid]
         public string Type { get; set; }
 
@@ -413,8 +414,8 @@ namespace ExpressBase.Objects
         public bool ShowMarker { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
-        public string MarkerLabel { get; set; }        
-        
+        public string MarkerLabel { get; set; }
+
         [HideInPropertyGrid]
         public string Type { get; set; }
     }
@@ -426,5 +427,5 @@ namespace ExpressBase.Objects
         public string name { get; set; }
     }
 
-    
+
 }
