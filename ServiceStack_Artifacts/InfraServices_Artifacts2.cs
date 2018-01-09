@@ -18,7 +18,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 2)]
         public int Id { get; set; }
 
-
         [DataMember(Order = 3)]
         public string TenantAccountId { get; set; }
 
