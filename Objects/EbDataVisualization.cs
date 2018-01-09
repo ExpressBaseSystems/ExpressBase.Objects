@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Threading.Tasks;
 
 namespace ExpressBase.Objects
@@ -33,7 +34,7 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.BotForm)]
     public class EbDataVisualizationObject : EbObject
     {
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilderr)]
         public override string Name { get => base.Name; set => base.Name = value; }
     }
 
@@ -66,7 +67,7 @@ namespace ExpressBase.Objects
     public abstract class EbDataVisualization : EbDataVisualizationObject
     {
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilderr)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectType.DataSource)]
         public string DataSourceRefId { get; set; }
@@ -113,12 +114,13 @@ namespace ExpressBase.Objects
             try
             {
                 this.EbDataSource = Redis.Get<EbDataSource>(this.DataSourceRefId);
-                if (this.EbDataSource == null || this.EbDataSource.Sql == null || this.EbDataSource.Sql == string.Empty) {
+                if (this.EbDataSource == null || this.EbDataSource.Sql == null || this.EbDataSource.Sql == string.Empty)
+                {
                     var result = client.Get<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = this.DataSourceRefId });
                     this.EbDataSource = EbSerializers.Json_Deserialize(result.Data[0].Json);
                     Redis.Set<EbDataSource>(this.DataSourceRefId, this.EbDataSource);
                 }
-                if(this.EbDataSource.FilterDialogRefId != string.Empty)
+                if (this.EbDataSource.FilterDialogRefId != string.Empty)
                     this.EbDataSource.AfterRedisGet(Redis, client);
             }
             catch (Exception e)
@@ -262,6 +264,22 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
     public class EbTableVisualization : EbDataVisualization
     {
+
+        [OnDeserialized]
+        public void OnDeserializedMethod(StreamingContext context)
+        {
+            this.BareControlHtml = this.GetBareHtml();
+            this.Type = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
+        }
+
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+        public string Type { get; set; }
+
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+        public string BareControlHtml { get; set; }
+
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.DVBuilder)]
         public string IsPaged { get; set; }
@@ -293,7 +311,20 @@ namespace ExpressBase.Objects
         }
         public override string GetDesignHtml()
         {
-            return "<table class='table table-bordered' eb-type='Table' id='@id'</table>".RemoveCR().DoubleQuoted();
+            return @"
+            <div id='cont_@name@' Ctype='TableVisualization' class='Eb-ctrlContainer'>
+                @GetBareHtml@
+            </div>"
+ .Replace("@name@", (this.Name != null) ? this.Name : "@name@")
+ .Replace("@GetBareHtml@", this.GetBareHtml())
+ .RemoveCR().DoubleQuoted();
+        }
+
+        public override string GetBareHtml()
+        {
+            return "<table class='table table-striped table-bordered' eb-type='Table' id='@id'></table>"
+
+ .Replace("@name@", (this.Name != null) ? this.Name : "@name@");
         }
 
         public EbTableVisualization()
