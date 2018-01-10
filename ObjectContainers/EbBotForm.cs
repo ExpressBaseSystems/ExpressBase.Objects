@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace ExpressBase.Objects.ObjectContainers
+namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.BotForm)]
     [HideInToolBox]
