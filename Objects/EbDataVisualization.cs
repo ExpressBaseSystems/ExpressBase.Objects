@@ -34,7 +34,7 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.BotForm)]
     public class EbDataVisualizationObject : EbObject
     {
-        [EnableInBuilder(BuilderType.DVBuilderr)]
+        [EnableInBuilder(BuilderType.DVBuilder)]
         public override string Name { get => base.Name; set => base.Name = value; }
     }
 
@@ -67,7 +67,7 @@ namespace ExpressBase.Objects
     public abstract class EbDataVisualization : EbDataVisualizationObject
     {
 
-        [EnableInBuilder(BuilderType.DVBuilderr)]
+        [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectType.DataSource)]
         public string DataSourceRefId { get; set; }
