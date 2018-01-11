@@ -43,14 +43,16 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		[DataMember(Order = 5)]
 		public List<int> UserGroups { get; set; }
 
-
 		[DataMember(Order = 6)]
-		public string Token { get; set; }
+		public List<Eb_RoleToRole> Role2RoleList { get; set; }
 
 		[DataMember(Order = 7)]
-		public ResponseStatus ResponseStatus { get; set; }
+		public string Token { get; set; }
 
 		[DataMember(Order = 8)]
+		public ResponseStatus ResponseStatus { get; set; }
+
+		[DataMember(Order = 9)]
 		public string u_token { get; set; }
 	}
 
