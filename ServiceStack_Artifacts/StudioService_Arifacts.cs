@@ -270,7 +270,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public string Tags { get; set; }
 
-        public int AppId { get; set; }
+        public string Apps { get; set; }
     }
 
     [DataContract]
@@ -305,7 +305,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public string Tags { get; set; }
 
-        public int AppId { get; set; }
+        public string Apps { get; set; }
     }
 
     [DataContract]
@@ -395,7 +395,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public string Tags { get; set; }
 
-        public int AppId { get; set; }
+        public string Apps { get; set; }
     }
 
     [DataContract]
@@ -543,7 +543,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int CommitUId { get; set; }
 
         [DataMember(Order = 19)]
-        public int AppId { get; set; }
+        public string Apps { get; set; }
 
         [DataMember(Order = 20)]
         public EbObjectWrapper_Dashboard Dashboard_Tiles { get; set; }

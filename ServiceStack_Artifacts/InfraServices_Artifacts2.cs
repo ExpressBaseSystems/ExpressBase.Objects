@@ -18,10 +18,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 2)]
         public int Id { get; set; }
 
-
         [DataMember(Order = 3)]
         public string TenantAccountId { get; set; }
 
+        [DataMember(Order = 4)]
         public string DbName { get; set; }
 
         public int UserId { get; set; }
@@ -268,8 +268,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 3)]
         public Dictionary<string, object> Colvalues { get; set; }
 
-        [DataMember(Order = 4)]
-        public int TenanantId { get; set; }
     }
 
     [DataContract]
@@ -312,6 +310,48 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
 
     }
+    [DataContract]
+    public class GetSolutionRequest : IReturn<GetSolutionResponse>, IEbSSRequest
+    {
+        public string TenantAccountId { get; set; }
+
+        public int UserId { get; set; }
+
+        public string Token { get; set; }
+
+    }
+
+    [DataContract]
+    public class GetSolutionResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public int id { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 3)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 4)]
+        public List<EbSolutionsWrapper> Data { get; set; }
+
+    }
+
+    public class EbSolutionsWrapper
+    {
+        public string SolutionName { get; set; }
+
+        public string Description { get; set; }
+
+        public string DateCreated { get; set; }
+
+        public string IsolutionId { get; set; }
+
+        public string EsolutionId { get; set; }
+
+    }
+
     //[DataContract]
     //public class GetUsersResponse : IEbSSResponse
     //{

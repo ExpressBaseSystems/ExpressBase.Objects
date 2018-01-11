@@ -68,6 +68,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 4)]
         public string BotId { get; set; }
     }
+
     public class BotListRequest : EbServiceStackRequest, IReturn<CreateBotResponse>
     {
         public int SolutionId { get; set; }

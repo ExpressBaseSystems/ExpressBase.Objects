@@ -38,14 +38,21 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public SMSConnection SMSConnection { get; set; }
     }
 
+
+
+    public class InitialSolutionConnectionsRequest : EbServiceStackRequest
+    {
+        public string SolutionId { get; set; }
+    }
+
     public class ChangeSMTPConnectionRequest : EbServiceStackRequest
     {
-        public bool IsNew { get; set; } 
+        public bool IsNew { get; set; }
         public SMTPConnection SMTPConnection { get; set; }
     }
-    
+
     public class RefreshSolutionConnectionsMqRequest : EbServiceStackRequest
     {
-       
+
     }
 }

@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Threading.Tasks;
 
 namespace ExpressBase.Objects
@@ -113,12 +114,13 @@ namespace ExpressBase.Objects
             try
             {
                 this.EbDataSource = Redis.Get<EbDataSource>(this.DataSourceRefId);
-                if (this.EbDataSource == null || this.EbDataSource.Sql == null || this.EbDataSource.Sql == string.Empty) {
+                if (this.EbDataSource == null || this.EbDataSource.Sql == null || this.EbDataSource.Sql == string.Empty)
+                {
                     var result = client.Get<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = this.DataSourceRefId });
                     this.EbDataSource = EbSerializers.Json_Deserialize(result.Data[0].Json);
                     Redis.Set<EbDataSource>(this.DataSourceRefId, this.EbDataSource);
                 }
-                if(this.EbDataSource.FilterDialogRefId != string.Empty)
+                if (this.EbDataSource.FilterDialogRefId != string.Empty)
                     this.EbDataSource.AfterRedisGet(Redis, client);
             }
             catch (Exception e)
@@ -262,6 +264,21 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
     public class EbTableVisualization : EbDataVisualization
     {
+        [OnDeserialized]
+        public void OnDeserializedMethod(StreamingContext context)
+        {
+            this.BareControlHtml = this.GetBareHtml();
+            this.Type = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
+        }
+
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+        public string Type { get; set; }
+
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+        public string BareControlHtml { get; set; }
+
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.DVBuilder)]
         public string IsPaged { get; set; }
@@ -293,7 +310,21 @@ namespace ExpressBase.Objects
         }
         public override string GetDesignHtml()
         {
-            return "<table class='table table-bordered' eb-type='Table' id='@id'</table>".RemoveCR().DoubleQuoted();
+            return @"
+            <div id='cont_@name@' Ctype='TableVisualization' class='Eb-ctrlContainer'>
+                @GetBareHtml@
+            </div>"
+ .Replace("@name@", (this.Name != null) ? this.Name : "@name@")
+ .Replace("@GetBareHtml@", this.GetBareHtml())
+ .RemoveCR().DoubleQuoted();
+        }
+
+        public override string GetBareHtml()
+        {
+            this.Name = this.Name.Replace(" ", "_");
+            return "<table style='width:100%' class='table table-striped' eb-type='Table' id='@name@'></table>"
+
+ .Replace("@name@", (this.Name != null) ? this.Name : "@name@");
         }
 
         public EbTableVisualization()
@@ -305,6 +336,25 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
     public class EbChartVisualization : EbDataVisualization
     {
+        //[OnDeserialized]
+        //public void OnDeserializedMethod(StreamingContext context)
+        //{
+        //    this.BareControlHtml = this.GetBareHtml();
+        //    this.Type = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
+        //}
+
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+        public string BareControlHtml { get; set; }
+
+        public override string GetBareHtml()
+        {
+            this.Name = this.Name.Replace(" ", "_");
+            return "<canvas style='width:100%' eb-type='Table' id='@name@'></canvas>"
+
+ .Replace("@name@", (this.Name != null) ? this.Name : "@name@");
+        }
+
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
         public List<DVBaseColumn> Xaxis { get; set; }
