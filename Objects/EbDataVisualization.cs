@@ -322,7 +322,7 @@ namespace ExpressBase.Objects
         public override string GetBareHtml()
         {
             this.Name = this.Name.Replace(" ", "_");
-            return "<table style='width:100%' class='table table-striped table-bordered' eb-type='Table' id='@name@'></table>"
+            return "<table style='width:100%' class='table table-striped' eb-type='Table' id='@name@'></table>"
 
  .Replace("@name@", (this.Name != null) ? this.Name : "@name@");
         }
@@ -336,12 +336,12 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
     public class EbChartVisualization : EbDataVisualization
     {
-        [OnDeserialized]
-        public void OnDeserializedMethod(StreamingContext context)
-        {
-            this.BareControlHtml = this.GetBareHtml();
-            this.Type = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
-        }
+        //[OnDeserialized]
+        //public void OnDeserializedMethod(StreamingContext context)
+        //{
+        //    this.BareControlHtml = this.GetBareHtml();
+        //    this.Type = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
+        //}
 
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
