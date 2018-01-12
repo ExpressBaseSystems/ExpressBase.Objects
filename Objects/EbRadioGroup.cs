@@ -35,7 +35,7 @@ namespace ExpressBase.Objects
         public void OnDeserializedMethod(StreamingContext context)
         {
              this.BareControlHtml = this.GetBareHtml();
-            this.Type = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
+            this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
 
         private void Options_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)

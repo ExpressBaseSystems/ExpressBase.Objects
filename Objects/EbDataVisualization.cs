@@ -268,12 +268,12 @@ namespace ExpressBase.Objects
         public void OnDeserializedMethod(StreamingContext context)
         {
             this.BareControlHtml = this.GetBareHtml();
-            this.Type = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
+            this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
 
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
-        public string Type { get; set; }
+        public string ObjType { get; set; }
 
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
@@ -336,12 +336,17 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
     public class EbChartVisualization : EbDataVisualization
     {
-        //[OnDeserialized]
-        //public void OnDeserializedMethod(StreamingContext context)
-        //{
-        //    this.BareControlHtml = this.GetBareHtml();
-        //    this.Type = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
-        //}
+        [OnDeserialized]
+        public void OnDeserializedMethod(StreamingContext context)
+        {
+            this.BareControlHtml = this.GetBareHtml();
+            this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
+        }
+
+
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+        public string ObjType { get; set; }
 
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
