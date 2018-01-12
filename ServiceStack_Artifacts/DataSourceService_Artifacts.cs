@@ -138,7 +138,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         [DataMember(Order = 1)]
         public string Refid { get; set; }
-        
+
+        [DataMember(Order = 2)]
+        public string Ids { get; set; }
+
     }
 
     [DataContract]
@@ -151,6 +154,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public List<EbObjectWrapper> DvList { get; set; }
 
         [DataMember(Order = 3)]
+        public List<EbObjectWrapper> DvTaggedList { get; set; }
+
+        [DataMember(Order = 4)]
         public ResponseStatus ResponseStatus { get; set; }
     }
 }

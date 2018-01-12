@@ -609,4 +609,23 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public EbObjectWrapper_Dashboard() { }
     }
+
+    public class EbObjectTaggedRequest : EbServiceStackRequest, IReturn<EbObjectRelationsResponse>
+    {
+        public string Tags { get; set; }
+
+        public int EbObjectType { get; set; }
     }
+
+    public class EbObjectTaggedResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public List<EbObjectWrapper> Data { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 3)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+}
