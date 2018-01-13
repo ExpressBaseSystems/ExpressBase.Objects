@@ -142,6 +142,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 2)]
         public string Ids { get; set; }
 
+        [DataMember(Order = 3)]
+        public string DsRefid { get; set; }
+
     }
 
     [DataContract]
