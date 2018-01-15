@@ -628,4 +628,22 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 3)]
         public ResponseStatus ResponseStatus { get; set; }
     }
+
+    public class EbObjectGetAllTagsRequest : EbServiceStackRequest, IReturn<EbObjectExploreObjectResponse>
+    {
+       
+    }
+
+    public class EbObjectGetAllTagsResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public string Data { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 3)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
 }
