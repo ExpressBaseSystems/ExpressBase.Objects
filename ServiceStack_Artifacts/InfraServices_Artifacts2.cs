@@ -338,6 +338,34 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     }
 
+    [DataContract]
+    public class GetSolutioInfoRequest : IReturn<GetSolutioInfoResponse>, IEbSSRequest
+    {
+        public string TenantAccountId { get; set; }
+
+        public int UserId { get; set; }
+
+        public string Token { get; set; }
+
+    }
+
+    [DataContract]
+    public class GetSolutioInfoResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public int id { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 3)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 4)]
+        public EbSolutionsWrapper Data { get; set; }
+
+    }
+
     public class EbSolutionsWrapper
     {
         public string SolutionName { get; set; }
