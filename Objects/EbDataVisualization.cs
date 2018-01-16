@@ -321,10 +321,9 @@ namespace ExpressBase.Objects
 
         public override string GetBareHtml()
         {
-            this.Name = this.Name.Replace(" ", "_");
             return "<table style='width:100%' class='table table-striped' eb-type='Table' id='@name@'></table>"
 
- .Replace("@name@", (this.Name != null) ? this.Name : "@name@");
+ .Replace("@name@", (this.EbSid != null) ? this.EbSid : "@name@");
         }
 
         public EbTableVisualization()
@@ -354,10 +353,9 @@ namespace ExpressBase.Objects
 
         public override string GetBareHtml()
         {
-            this.Name = this.Name.Replace(" ", "_");
             return "<canvas style='width:100%' eb-type='Table' id='@name@'></canvas>"
 
- .Replace("@name@", (this.Name != null) ? this.Name : "@name@");
+ .Replace("@name@", (this.EbSid != null) ? this.EbSid : "@name@");
         }
 
         [EnableInBuilder(BuilderType.DVBuilder)]

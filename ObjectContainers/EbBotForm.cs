@@ -2,14 +2,21 @@
 using ExpressBase.Common.Objects.Attributes;
 using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using System.Text;
 
-namespace ExpressBase.Objects
+namespace ExpressBase.Objects.ObjectContainers
 {
     [EnableInBuilder(BuilderType.BotForm)]
     [HideInToolBox]
     public class EbBotForm : EbControlContainer
     {
+        [OnDeserialized]
+        public void OnDeserializedMethod(StreamingContext context)
+        {
+            this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
+        }
+
         public bool IsUpdate { get; set; }
 
 
