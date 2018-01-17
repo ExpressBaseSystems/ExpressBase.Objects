@@ -25,4 +25,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
+    [DataContract]
+    public class EbCreateOracleDBRequest : EbServiceStackRequest, IReturn<bool>
+    {
+       
+    }
+
 }
