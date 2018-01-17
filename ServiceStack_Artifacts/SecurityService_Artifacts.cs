@@ -25,15 +25,27 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 	[DataContract]
 	public class GetUsersResponse1 : IEbSSResponse
 	{
-
 		[DataMember(Order = 1)]
-		public Dictionary<string, object> Data { get; set; }
+		public List<Eb_User_ForCommonList> Data { get; set; }
 
 		[DataMember(Order = 2)]
 		public string Token { get; set; }
 
 		[DataMember(Order = 3)]
 		public ResponseStatus ResponseStatus { get; set; }
+	}
+
+	[DataContract]
+	public class Eb_User_ForCommonList
+	{
+		[DataMember(Order = 1)]
+		public int Id;
+
+		[DataMember(Order = 2)]
+		public string Name;
+
+		[DataMember(Order = 3)]
+		public string Email;
 	}
 
 
