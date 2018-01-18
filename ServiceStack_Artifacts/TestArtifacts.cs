@@ -7,13 +7,13 @@ using System.Text;
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
     [DataContract]
-    public class EbDbCreateRequest : EbServiceStackRequest, IReturn<EbDbCreateResponse>
+    public class TestRequest : EbServiceStackRequest, IReturn<EbDbCreateResponse>
     {
-        [DataMember(Order = 1)]
-        public string dbName { get; set; }
+        //[DataMember(Order = 1)]
+        //public string dbName { get; set; }
     }
     [DataContract]
-    public class EbDbCreateResponse : IEbSSResponse
+    public class TestResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
         public bool resp { get; set; }
@@ -24,11 +24,4 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 3)]
         public ResponseStatus ResponseStatus { get; set; }
     }
-
-    [DataContract]
-    public class EbCreateOracleDBRequest : EbServiceStackRequest, IReturn<bool>
-    {
-       
-    }
-
 }
