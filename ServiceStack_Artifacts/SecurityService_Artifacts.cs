@@ -69,7 +69,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 	public class GetManageUserResponse : IEbSSResponse
 	{
 		[DataMember(Order = 1)]
-		public Dictionary<string, object> UserData { get; set; }
+		public Dictionary<string, string> UserData { get; set; }
 
 		[DataMember(Order = 2)]
 		public List<EbRole> Roles { get; set; }
