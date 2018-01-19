@@ -18,7 +18,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class ReportRenderResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
-        public MemorystreamWrapper MemoryStream { get; set; }
+        public MemorystreamWrapper StreamWrapper { get; set; }
 
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
