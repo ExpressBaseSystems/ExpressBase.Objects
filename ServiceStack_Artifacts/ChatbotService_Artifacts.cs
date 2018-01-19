@@ -33,6 +33,48 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [System.Runtime.Serialization.DataContract]
+    public class GetAppListResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public int Id { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 3)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 4)]
+        public Dictionary<string, List<string>> AppList { get; set; }
+
+        public GetAppListResponse()
+        {
+            this.AppList = new Dictionary<string, List<string>>();
+        }
+    }
+
+    public class AppListRequest : EbServiceStackRequest, IReturn<CreateBotResponse>
+    {
+        public int SolutionId { get; set; }
+    }
+
+    [System.Runtime.Serialization.DataContract]
+    public class BotListResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public int Id { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 3)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 4)]
+        public List<ChatBot> Data { get; set; }
+    }
+
+    [System.Runtime.Serialization.DataContract]
     public class GetBotForm4UserResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
@@ -45,7 +87,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
 
         [DataMember(Order = 4)]
-        public Dictionary<string,string> BotForms{ get; set; }
+        public Dictionary<string, string> BotForms { get; set; }
 
         public GetBotForm4UserResponse()
         {
@@ -72,22 +114,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class BotListRequest : EbServiceStackRequest, IReturn<CreateBotResponse>
     {
         public int SolutionId { get; set; }
-    }
-
-    [System.Runtime.Serialization.DataContract]
-    public class BotListResponse : IEbSSResponse
-    {
-        [DataMember(Order = 1)]
-        public int Id { get; set; }
-
-        [DataMember(Order = 2)]
-        public string Token { get; set; }
-
-        [DataMember(Order = 3)]
-        public ResponseStatus ResponseStatus { get; set; }
-
-        [DataMember(Order = 4)]
-        public List<ChatBot> Data { get; set; }
     }
 
     [DataContract]
