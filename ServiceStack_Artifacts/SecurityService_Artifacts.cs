@@ -99,13 +99,52 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 	[DataContract]
 	public class SaveUserRequest : IReturn<SaveUserResponse>, IEbSSRequest
 	{
-		[DataMember(Order = 0)]
-		public Dictionary<string, object> Colvalues { get; set; }
-
-		[DataMember(Order = 2)]
+		[DataMember(Order = 1)]
 		public int Id { get; set; }
 
+		[DataMember(Order = 2)]
+		public string FullName { get; set; }
+
 		[DataMember(Order = 3)]
+		public string NickName { get; set; }
+
+		[DataMember(Order = 4)]
+		public string EmailParimary { get; set; }
+
+		[DataMember(Order = 5)]
+		public string EmailSecondary { get; set; }
+
+		[DataMember(Order = 6)]
+		public string Sex { get; set; }
+
+		[DataMember(Order = 7)]
+		public string DateOfBirth { get; set; }
+
+		[DataMember(Order = 8)]
+		public string PhonePrimary { get; set; }
+
+		[DataMember(Order = 9)]
+		public string PhoneSecondary { get; set; }
+
+		[DataMember(Order = 10)]
+		public string LandPhone { get; set; }
+
+		[DataMember(Order = 11)]
+		public string PhoneExtension { get; set; }
+
+		[DataMember(Order = 12)]
+		public string FbId { get; set; }
+
+		[DataMember(Order = 13)]
+		public string FbName { get; set; }
+
+		[DataMember(Order = 14)]
+		public string Roles { get; set; }
+
+		[DataMember(Order = 15)]
+		public string UserGroups { get; set; }
+
+		[DataMember(Order = 16)]
 		public string TenantAccountId { get; set; }
 
 		public int UserId { get; set; }
