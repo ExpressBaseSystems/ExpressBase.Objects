@@ -5,9 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ExpressBase.Objects.ObjectContainers
+namespace ExpressBase.Objects
 {
-    [ProtoBuf.ProtoContract]
     [EnableInBuilder(BuilderType.FilterDialog)]
     [HideInToolBox]
     public class EbFilterDialog : EbControlContainer
