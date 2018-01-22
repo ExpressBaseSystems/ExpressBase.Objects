@@ -109,7 +109,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public string NickName { get; set; }
 
 		[DataMember(Order = 4)]
-		public string EmailParimary { get; set; }
+		public string EmailPrimary { get; set; }
 
 		[DataMember(Order = 5)]
 		public string EmailSecondary { get; set; }
@@ -145,6 +145,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public string UserGroups { get; set; }
 
 		[DataMember(Order = 16)]
+		public string StatusId { get; set; }
+
+		[DataMember(Order = 17)]
+		public string Hide { get; set; }
+
+		[DataMember(Order = 18)]
 		public string TenantAccountId { get; set; }
 
 		public int UserId { get; set; }
@@ -166,6 +172,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 		[DataMember(Order = 4)]
 		public string u_token { get; set; }
+	}
+
+	public class UniqueCheckRequest
+	{
+		[DataMember(Order = 1)]
+		public string email { get; set; }
 	}
 
 	//USER GROUP STRAT--------------------------------------
