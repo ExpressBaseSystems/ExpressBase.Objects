@@ -56,4 +56,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
 
     }
+    public class TestConnectionRequest : EbServiceStackRequest
+    {
+        public EbDataDbConnection DataDBConnection { get; set; }
+    }
 }
