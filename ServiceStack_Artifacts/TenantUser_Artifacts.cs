@@ -4,6 +4,7 @@ using System.Runtime.Serialization;
 using ServiceStack;
 using System.Text;
 using ExpressBase.Security.Core;
+using ExpressBase.Common.EbServiceStack.ReqNRes;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
