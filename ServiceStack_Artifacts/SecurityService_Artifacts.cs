@@ -49,6 +49,82 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public string Email;
 	}
 
+	[DataContract]
+	public class GetUserGroupRequest1 : IReturn<GetUserGroupResponse1>, IEbSSRequest
+	{
+		[DataMember(Order = 1)]
+		public Dictionary<string, object> Colvalues { get; set; }
+		public string Token { get; set; }
+
+		public string TenantAccountId { get; set; }
+
+		public int UserId { get; set; }
+	}
+
+	[DataContract]
+	public class GetUserGroupResponse1 : IEbSSResponse
+	{
+		[DataMember(Order = 1)]
+		public List<Eb_UserGroup_ForCommonList> Data { get; set; }
+
+		[DataMember(Order = 2)]
+		public string Token { get; set; }
+
+		[DataMember(Order = 3)]
+		public ResponseStatus ResponseStatus { get; set; }
+	}
+
+	[DataContract]
+	public class Eb_UserGroup_ForCommonList
+	{
+		[DataMember(Order = 1)]
+		public int Id;
+
+		[DataMember(Order = 2)]
+		public string Name;
+
+		[DataMember(Order = 3)]
+		public string Description;
+	}
+
+	[DataContract]
+	public class GetRolesRequest1 : IReturn<GetRolesResponse1>, IEbSSRequest
+	{
+		[DataMember(Order = 1)]
+		public Dictionary<string, object> Colvalues { get; set; }
+		public string Token { get; set; }
+
+		public string TenantAccountId { get; set; }
+
+		public int UserId { get; set; }
+	}
+
+	[DataContract]
+	public class GetRolesResponse1 : IEbSSResponse
+	{
+		[DataMember(Order = 1)]
+		public List<Eb_Roles_ForCommonList> Data { get; set; }
+
+		[DataMember(Order = 2)]
+		public string Token { get; set; }
+
+		[DataMember(Order = 3)]
+		public ResponseStatus ResponseStatus { get; set; }
+	}
+
+	[DataContract]
+	public class Eb_Roles_ForCommonList
+	{
+		[DataMember(Order = 1)]
+		public int Id;
+
+		[DataMember(Order = 2)]
+		public string Name;
+
+		[DataMember(Order = 3)]
+		public string Description;
+	}
+
 
 	//USER START-----------------------------------------
 	[DataContract]
