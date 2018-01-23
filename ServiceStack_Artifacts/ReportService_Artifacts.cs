@@ -1,4 +1,5 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.EbServiceStack.ReqNRes;
 using ServiceStack;
 using System;
 using System.Collections.Generic;

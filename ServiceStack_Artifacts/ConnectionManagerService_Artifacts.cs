@@ -1,5 +1,6 @@
 ﻿using ExpressBase.Common.Connections;
 using ExpressBase.Common.Data;
+using ExpressBase.Common.EbServiceStack.ReqNRes;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {

@@ -1,4 +1,5 @@
-﻿using ExpressBase.Common.Objects;
+﻿using ExpressBase.Common.EbServiceStack.ReqNRes;
+using ExpressBase.Common.Objects;
 using ServiceStack;
 using ServiceStack.Text;
 using System;
