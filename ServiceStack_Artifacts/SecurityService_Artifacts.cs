@@ -123,6 +123,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 		[DataMember(Order = 3)]
 		public string Description;
+
+		[DataMember(Order = 4)]
+		public string Application_Name;
 	}
 
 
@@ -261,10 +264,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 	[DataContract]
 	public class GetManageUserGroupRequest : IReturn<GetManageUserGroupResponse>, IEbSSRequest
 	{
+		
 		[DataMember(Order = 1)]
-		public Dictionary<string, object> Colvalues { get; set; }
-
-		[DataMember(Order = 2)]
 		public int id { get; set; }
 
 		public string Token { get; set; }
@@ -279,12 +280,15 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 	{
 
 		[DataMember(Order = 1)]
-		public Dictionary<string, object> Data { get; set; }
+		public Dictionary<string, object> SelectedUserGroupInfo { get; set; }
 
 		[DataMember(Order = 2)]
-		public string Token { get; set; }
+		public List<Eb_Users> UsersList { get; set; }
 
 		[DataMember(Order = 3)]
+		public string Token { get; set; }
+
+		[DataMember(Order = 4)]
 		public ResponseStatus ResponseStatus { get; set; }
 	}
 
