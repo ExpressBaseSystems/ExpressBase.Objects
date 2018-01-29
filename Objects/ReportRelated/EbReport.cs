@@ -9,6 +9,7 @@ using iTextSharp.text;
 using iTextSharp.text.pdf;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Text;
 
@@ -138,7 +139,7 @@ else {
 
         public ColumnColletion ColumnColletion { get; set; }
 
-        public int SerialNumber { get; set; } = 1;
+        public int iDetailRowPos { get; set; }
 
         public Dictionary<string, List<object>> PageSummaryFields { get; set; }
 
@@ -148,9 +149,11 @@ else {
 
         public List<object> WaterMarkList { get; set; }
 
-        public RowColletion DataRow { get; set; }
+      //  public RowColletion DataRow { get; set; }
 
-        public ColumnColletion DataColumns { get; set; }
+        public DataSet DataSet { get; set; }
+
+        //public ColumnColletion DataColumns { get; set; }
 
         public bool IsLastpage { get; set; }
 
@@ -246,11 +249,12 @@ else {
         {
             get
             {
-                if (DataRow != null)
+                var rows = DataSet.Tables[0].Rows;
+                if (rows != null)
                 {
-                    if (DataRow.Count > 0)
+                    if (rows.Count > 0)
                     {
-                        var a = DataRow.Count * DetailHeight;
+                        var a = rows.Count * DetailHeight;
                         var b = Height - (PageHeaderHeight + PageFooterHeight + ReportHeaderHeight + ReportFooterHeight);
                         if (a < b && PageNumber == 1)
                             IsLastpage = true;
@@ -331,9 +335,10 @@ else {
 
         }
 
-        public string GeFieldtData(string column_name, int i)
+        public string GetFieldtData(string column_name, int i)
         {
-           return this.DataRow[i - 1][column_name].ToString();
+            //return this.DataRow[i - 1][column_name].ToString();
+            return this.DataSet.Tables[0].Rows[i][column_name].ToString();
         }
 
         public void DrawWaterMark(PdfReader pdfReader, Document d, PdfWriter writer)
@@ -365,7 +370,7 @@ else {
                 {
                     var table = title.Split('.')[0];
                     column_name = title.Split('.')[1];
-                    column_val = GeFieldtData(column_name, i);
+                    column_val = GetFieldtData(column_name, i);
                     (item as IEbDataFieldSummary).Summarize(column_val);
                 }
             }
@@ -376,7 +381,7 @@ else {
                 {
                     var table = title.Split('.')[0];
                     column_name = title.Split('.')[1];
-                    column_val = GeFieldtData(column_name, i);
+                    column_val = GetFieldtData(column_name, i);
                     (item as IEbDataFieldSummary).Summarize(column_val);
                 }
             }
@@ -413,23 +418,24 @@ else {
 
         public void DrawDetail()
         {
-            if (DataRow != null)
+            var rows = DataSet.Tables[0].Rows;
+            if (rows != null)
             {
-                for (SerialNumber = 1; SerialNumber <= DataRow.Count; SerialNumber++)
+                for (iDetailRowPos = 0; iDetailRowPos < rows.Count; iDetailRowPos++)
                 {
                     if (detailprintingtop < DT_FillHeight && DT_FillHeight - detailprintingtop >= DetailHeight)
                     {
-                        DoLoopInDetail(SerialNumber);
+                        DoLoopInDetail(iDetailRowPos);
                     }
                     else
                     {
                         detailprintingtop = 0;
                         Doc.NewPage();
                         PageNumber = PageNumber;
-                        DoLoopInDetail(SerialNumber);
+                        DoLoopInDetail(iDetailRowPos);
                     }
                 }
-                if (SerialNumber - 1 == DataRow.Count)
+                if (iDetailRowPos == rows.Count - 1)
                 {
                     IsLastpage = true;
                     // Report.CalculateDetailHeight(Report.IsLastpage, __datarows, Report.PageNumber);
@@ -505,7 +511,7 @@ else {
                 {
                     var table = field.Title.Split('.')[0];
                     column_name = field.Title.Split('.')[1];
-                    column_val = GeFieldtData(column_name, serialnumber);
+                    column_val = GetFieldtData(column_name, serialnumber);
                 }
                 field.DrawMe(Canvas, Height, section_Yposition, detailprintingtop, column_val);
             }
@@ -518,7 +524,7 @@ else {
                 else if (field is EbDateTime)
                     column_val = DateTime.Now.ToString();
                 else if (field is EbSerialNumber)
-                    column_val = SerialNumber.ToString();
+                    column_val = (iDetailRowPos + 1).ToString();
                 field.DrawMe(Canvas, Height, section_Yposition, detailprintingtop, column_val);
             }
             else if (field is EbImg)
