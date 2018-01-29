@@ -1,4 +1,6 @@
-﻿using ServiceStack;
+﻿using ExpressBase.Common;
+using ExpressBase.Common.EbServiceStack.ReqNRes;
+using ServiceStack;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,10 +14,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Refid { get; set; }
 
     }
+
+    [DataContract]
     public class ReportRenderResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
-        public MemoryStream memorystream;
+        public MemorystreamWrapper StreamWrapper { get; set; }
 
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }

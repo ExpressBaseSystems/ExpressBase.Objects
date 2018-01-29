@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using ServiceStack;
 using System.Runtime.Serialization;
+using ExpressBase.Common.EbServiceStack.ReqNRes;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {

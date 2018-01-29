@@ -1,4 +1,5 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.EbServiceStack.ReqNRes;
 using ExpressBase.Security.Core;
 using ServiceStack;
 using System;
@@ -46,6 +47,85 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 		[DataMember(Order = 3)]
 		public string Email;
+	}
+
+	[DataContract]
+	public class GetUserGroupRequest1 : IReturn<GetUserGroupResponse1>, IEbSSRequest
+	{
+		[DataMember(Order = 1)]
+		public Dictionary<string, object> Colvalues { get; set; }
+		public string Token { get; set; }
+
+		public string TenantAccountId { get; set; }
+
+		public int UserId { get; set; }
+	}
+
+	[DataContract]
+	public class GetUserGroupResponse1 : IEbSSResponse
+	{
+		[DataMember(Order = 1)]
+		public List<Eb_UserGroup_ForCommonList> Data { get; set; }
+
+		[DataMember(Order = 2)]
+		public string Token { get; set; }
+
+		[DataMember(Order = 3)]
+		public ResponseStatus ResponseStatus { get; set; }
+	}
+
+	[DataContract]
+	public class Eb_UserGroup_ForCommonList
+	{
+		[DataMember(Order = 1)]
+		public int Id;
+
+		[DataMember(Order = 2)]
+		public string Name;
+
+		[DataMember(Order = 3)]
+		public string Description;
+	}
+
+	[DataContract]
+	public class GetRolesRequest1 : IReturn<GetRolesResponse1>, IEbSSRequest
+	{
+		[DataMember(Order = 1)]
+		public Dictionary<string, object> Colvalues { get; set; }
+		public string Token { get; set; }
+
+		public string TenantAccountId { get; set; }
+
+		public int UserId { get; set; }
+	}
+
+	[DataContract]
+	public class GetRolesResponse1 : IEbSSResponse
+	{
+		[DataMember(Order = 1)]
+		public List<Eb_Roles_ForCommonList> Data { get; set; }
+
+		[DataMember(Order = 2)]
+		public string Token { get; set; }
+
+		[DataMember(Order = 3)]
+		public ResponseStatus ResponseStatus { get; set; }
+	}
+
+	[DataContract]
+	public class Eb_Roles_ForCommonList
+	{
+		[DataMember(Order = 1)]
+		public int Id;
+
+		[DataMember(Order = 2)]
+		public string Name;
+
+		[DataMember(Order = 3)]
+		public string Description;
+
+		[DataMember(Order = 4)]
+		public string Application_Name;
 	}
 
 
@@ -99,13 +179,58 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 	[DataContract]
 	public class SaveUserRequest : IReturn<SaveUserResponse>, IEbSSRequest
 	{
-		[DataMember(Order = 0)]
-		public Dictionary<string, object> Colvalues { get; set; }
-
-		[DataMember(Order = 2)]
+		[DataMember(Order = 1)]
 		public int Id { get; set; }
 
+		[DataMember(Order = 2)]
+		public string FullName { get; set; }
+
 		[DataMember(Order = 3)]
+		public string NickName { get; set; }
+
+		[DataMember(Order = 4)]
+		public string EmailPrimary { get; set; }
+
+		[DataMember(Order = 5)]
+		public string EmailSecondary { get; set; }
+
+		[DataMember(Order = 6)]
+		public string Sex { get; set; }
+
+		[DataMember(Order = 7)]
+		public string DateOfBirth { get; set; }
+
+		[DataMember(Order = 8)]
+		public string PhonePrimary { get; set; }
+
+		[DataMember(Order = 9)]
+		public string PhoneSecondary { get; set; }
+
+		[DataMember(Order = 10)]
+		public string LandPhone { get; set; }
+
+		[DataMember(Order = 11)]
+		public string PhoneExtension { get; set; }
+
+		[DataMember(Order = 12)]
+		public string FbId { get; set; }
+
+		[DataMember(Order = 13)]
+		public string FbName { get; set; }
+
+		[DataMember(Order = 14)]
+		public string Roles { get; set; }
+
+		[DataMember(Order = 15)]
+		public string UserGroups { get; set; }
+
+		[DataMember(Order = 16)]
+		public string StatusId { get; set; }
+
+		[DataMember(Order = 17)]
+		public string Hide { get; set; }
+
+		[DataMember(Order = 18)]
 		public string TenantAccountId { get; set; }
 
 		public int UserId { get; set; }
@@ -129,14 +254,18 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public string u_token { get; set; }
 	}
 
+	public class UniqueCheckRequest
+	{
+		[DataMember(Order = 1)]
+		public string email { get; set; }
+	}
+
 	//USER GROUP STRAT--------------------------------------
 	[DataContract]
 	public class GetManageUserGroupRequest : IReturn<GetManageUserGroupResponse>, IEbSSRequest
 	{
+		
 		[DataMember(Order = 1)]
-		public Dictionary<string, object> Colvalues { get; set; }
-
-		[DataMember(Order = 2)]
 		public int id { get; set; }
 
 		public string Token { get; set; }
@@ -151,12 +280,15 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 	{
 
 		[DataMember(Order = 1)]
-		public Dictionary<string, object> Data { get; set; }
+		public Dictionary<string, object> SelectedUserGroupInfo { get; set; }
 
 		[DataMember(Order = 2)]
-		public string Token { get; set; }
+		public List<Eb_Users> UsersList { get; set; }
 
 		[DataMember(Order = 3)]
+		public string Token { get; set; }
+
+		[DataMember(Order = 4)]
 		public ResponseStatus ResponseStatus { get; set; }
 	}
 

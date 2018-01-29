@@ -1,9 +1,11 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.EbServiceStack.ReqNRes;
 using ExpressBase.Data;
 using ServiceStack;
 using ServiceStack.Text;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
@@ -14,6 +16,45 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     [Route("/ds/data/{RefId}")]
     [DataContract]
     public class DataSourceDataRequest : IReturn<DataSourceDataResponse>, IEbSSRequest
+    {
+        [DataMember(Order = 0)]
+        public string RefId { get; set; }
+
+        [DataMember(Order = 1)]
+        public int Start { get; set; }
+
+        [DataMember(Order = 2)]
+        public int Length { get; set; }
+
+        [DataMember(Order = 3)]
+        public int Draw { get; set; }
+
+        [DataMember(Order = 4)]
+        public int OrderByDir { get; set; }
+
+        [DataMember(Order = 5)]
+        public string OrderByCol { get; set; }
+
+        [DataMember(Order = 6)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 7)]
+        public string rToken { get; set; }
+
+        [DataMember(Order = 8)]
+        public string TenantAccountId { get; set; }
+
+        [DataMember(Order = 9)]
+        public int UserId { get; set; }
+
+        [DataMember(Order = 10)]
+        public List<Dictionary<string, string>> Params { get; set; }
+
+        [DataMember(Order = 11)]
+        public List<Dictionary<string, string>> TFilters { get; set; }
+    }
+
+    public class DataSourceDataRequest444 : IReturn<DataSourceDataResponse>, IEbSSRequest
     {
         [DataMember(Order = 0)]
         public string RefId { get; set; }
@@ -109,6 +150,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 6)]
         public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 7)]
+        public DataSet DataSet { get; set; }
     }
 
     [DataContract]

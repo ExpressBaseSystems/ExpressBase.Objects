@@ -1,12 +1,16 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.EbServiceStack;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Objects.ReportRelated;
+using ExpressBase.Objects.ServiceStack_Artifacts;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.IO;
 using System.Text;
 
 namespace ExpressBase.Objects
@@ -135,7 +139,7 @@ else {
 
         public ColumnColletion ColumnColletion { get; set; }
 
-        public int SerialNumber { get; set; } = 1;
+        public int iDetailRowPos { get; set; }
 
         public Dictionary<string, List<object>> PageSummaryFields { get; set; }
 
@@ -145,15 +149,30 @@ else {
 
         public List<object> WaterMarkList { get; set; }
 
-        public RowColletion DataRow { get; set; }
+      //  public RowColletion DataRow { get; set; }
 
-        public ColumnColletion DataColumns { get; set; }
+        public DataSet DataSet { get; set; }
+
+        //public ColumnColletion DataColumns { get; set; }
 
         public bool IsLastpage { get; set; }
 
         public int PageNumber { get; set; }
+        
+        public PdfContentByte Canvas { get; set; }
+
+        public PdfWriter Writer { get; set; }
+
+        public Document Doc { get; set; }
+
+        public PdfReader PdfReader { get; set; }
+
+        public PdfStamper Stamp { get; set; }
+
+        public MemoryStream Ms1 { get; set; }
 
         private float _rhHeight = 0;
+
         public float ReportHeaderHeight
         {
             get
@@ -230,11 +249,12 @@ else {
         {
             get
             {
-                if (DataRow != null)
+                var rows = DataSet.Tables[0].Rows;
+                if (rows != null)
                 {
-                    if (DataRow.Count > 0)
+                    if (rows.Count > 0)
                     {
-                        var a = DataRow.Count * DetailHeight;
+                        var a = rows.Count * DetailHeight;
                         var b = Height - (PageHeaderHeight + PageFooterHeight + ReportHeaderHeight + ReportFooterHeight);
                         if (a < b && PageNumber == 1)
                             IsLastpage = true;
@@ -252,6 +272,19 @@ else {
                 return dt_fillheight;
             }
         }
+
+        public EbBaseService ReportService { get; set; }
+
+        public EbBaseService FileService { get; set; }
+
+        public string SolutionId { get; set; }
+
+        private float rh_Yposition;
+        private float rf_Yposition;
+        private float pf_Yposition;
+        private float ph_Yposition;
+        private float dt_Yposition;
+        private float detailprintingtop = 0;
 
         public void InitializeSummaryFields()
         {
@@ -302,22 +335,10 @@ else {
 
         }
 
-        public string GeFieldtData(string column_name, int i)
+        public string GetFieldtData(string column_name, int i)
         {
-            var columnindex = 0;
-            var column_val = "";
-            foreach (var col in DataColumns)
-            {
-                if (col.ColumnName == column_name)
-                {
-                    column_val = DataRow[i - 1][columnindex].ToString();
-                    return column_val;
-                }
-                columnindex++;
-            }
-            return column_val;
-
             //return this.DataRow[i - 1][column_name].ToString();
+            return this.DataSet.Tables[0].Rows[i][column_name].ToString();
         }
 
         public void DrawWaterMark(PdfReader pdfReader, Document d, PdfWriter writer)
@@ -349,7 +370,7 @@ else {
                 {
                     var table = title.Split('.')[0];
                     column_name = title.Split('.')[1];
-                    column_val = GeFieldtData(column_name, i);
+                    column_val = GetFieldtData(column_name, i);
                     (item as IEbDataFieldSummary).Summarize(column_val);
                 }
             }
@@ -360,14 +381,162 @@ else {
                 {
                     var table = title.Split('.')[0];
                     column_name = title.Split('.')[1];
-                    column_val = GeFieldtData(column_name, i);
+                    column_val = GetFieldtData(column_name, i);
                     (item as IEbDataFieldSummary).Summarize(column_val);
                 }
             }
 
         }
 
-      
+        public void DrawReportHeader()
+        {
+            rh_Yposition = 0;
+            detailprintingtop = 0;
+            foreach (EbReportHeader r_header in this.ReportHeaders)
+            {
+                foreach (EbReportField field in r_header.Fields)
+                {
+                    DrawFields(field, rh_Yposition, 1);
+                }
+                rh_Yposition += r_header.Height;
+            }
+        }
+
+        public void DrawPageHeader()
+        {
+            detailprintingtop = 0;
+            ph_Yposition = (PageNumber == 1) ? ReportHeaderHeight : 0;
+            foreach (EbPageHeader p_header in PageHeaders)
+            {
+                foreach (EbReportField field in p_header.Fields)
+                {
+                    DrawFields(field, ph_Yposition, 1);
+                }
+                ph_Yposition += p_header.Height;
+            }
+        }
+
+        public void DrawDetail()
+        {
+            var rows = DataSet.Tables[0].Rows;
+            if (rows != null)
+            {
+                for (iDetailRowPos = 0; iDetailRowPos < rows.Count; iDetailRowPos++)
+                {
+                    if (detailprintingtop < DT_FillHeight && DT_FillHeight - detailprintingtop >= DetailHeight)
+                    {
+                        DoLoopInDetail(iDetailRowPos);
+                    }
+                    else
+                    {
+                        detailprintingtop = 0;
+                        Doc.NewPage();
+                        PageNumber = PageNumber;
+                        DoLoopInDetail(iDetailRowPos);
+                    }
+                }
+                if (iDetailRowPos == rows.Count - 1)
+                {
+                    IsLastpage = true;
+                    // Report.CalculateDetailHeight(Report.IsLastpage, __datarows, Report.PageNumber);
+                }
+            }
+            else
+            {
+                IsLastpage = true;
+                DoLoopInDetail(0);
+            }
+        }
+
+        public void DoLoopInDetail(int serialnumber)
+        {
+            ph_Yposition = (PageNumber == 1) ? ReportHeaderHeight : 0;
+            dt_Yposition = ph_Yposition + PageHeaderHeight;
+            foreach (EbReportDetail detail in Detail)
+            {
+                foreach (EbReportField field in detail.Fields)
+                {
+                    DrawFields(field, dt_Yposition, serialnumber);
+                }
+                detailprintingtop += detail.Height;
+            }
+        }
+
+        public void DrawPageFooter()
+        {
+            detailprintingtop = 0;
+            ph_Yposition = (PageNumber == 1) ? ReportHeaderHeight : 0;
+            dt_Yposition = ph_Yposition + PageHeaderHeight;
+            pf_Yposition = dt_Yposition + DT_FillHeight;
+            foreach (EbPageFooter p_footer in PageFooters)
+            {
+                foreach (EbReportField field in p_footer.Fields)
+                {
+                    DrawFields(field, pf_Yposition, 1);
+                }
+                pf_Yposition += p_footer.Height;
+            }
+        }
+
+        public void DrawReportFooter()
+        {
+            detailprintingtop = 0;
+            dt_Yposition = ph_Yposition + PageHeaderHeight;
+            pf_Yposition = dt_Yposition + DT_FillHeight;
+            rf_Yposition = pf_Yposition + PageFooterHeight;
+            foreach (EbReportFooter r_footer in ReportFooters)
+            {
+                foreach (EbReportField field in r_footer.Fields)
+                {
+                    DrawFields(field, rf_Yposition, 1);
+                }
+                rf_Yposition += r_footer.Height;
+            }
+        }
+
+
+        public void DrawFields(EbReportField field, float section_Yposition, int serialnumber)
+        {
+            var column_name = string.Empty;
+            var column_val = string.Empty;
+            if (PageSummaryFields.ContainsKey(field.Title) || ReportSummaryFields.ContainsKey(field.Title))
+                CallSummerize(field.Title, serialnumber);
+            if (field is EbDataField)
+            {
+                if (field is IEbDataFieldSummary)
+                {
+                    column_val = (field as IEbDataFieldSummary).SummarizedValue.ToString();
+                }
+                else
+                {
+                    var table = field.Title.Split('.')[0];
+                    column_name = field.Title.Split('.')[1];
+                    column_val = GetFieldtData(column_name, serialnumber);
+                }
+                field.DrawMe(Canvas, Height, section_Yposition, detailprintingtop, column_val);
+            }
+            if ((field is EbPageNo) || (field is EbPageXY) || (field is EbDateTime) || (field is EbSerialNumber))
+            {
+                if (field is EbPageNo)
+                    column_val = PageNumber.ToString();
+                else if (field is EbPageXY)
+                    column_val = PageNumber + "/"/* + writer.PageCount*/;
+                else if (field is EbDateTime)
+                    column_val = DateTime.Now.ToString();
+                else if (field is EbSerialNumber)
+                    column_val = (iDetailRowPos + 1).ToString();
+                field.DrawMe(Canvas, Height, section_Yposition, detailprintingtop, column_val);
+            }
+            else if (field is EbImg)
+            {
+                byte[] fileByte = this.ReportService.GetFile(this.SolutionId, this.FileService as IEbFileService, field as EbImg);
+                field.DrawMe(Doc, fileByte);
+            }
+            else if ((field is EbText) || (field is EbReportFieldShape))
+            {
+                field.DrawMe(Canvas, Height, section_Yposition, detailprintingtop);
+            }
+        }
         public EbReport()
         {
             this.ReportHeaders = new List<EbReportHeader>();

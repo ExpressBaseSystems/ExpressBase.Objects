@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Text;
 using ServiceStack;
+using ExpressBase.Common.EbServiceStack.ReqNRes;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
@@ -165,11 +166,15 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
     [DataContract]
     [Route("/unique", "POST")]
-    public class UniqueRequest
+    public class UniqueRequest 
     {
         [DataMember(Order = 1)]
         public string email { get; set; }
 
+    }
+    public class UniqueRequestResponse 
+    {
+        public bool isUniq {set;get;}
     }
 
     [DataContract]
