@@ -126,6 +126,15 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 		[DataMember(Order = 4)]
 		public string Application_Name;
+
+		[DataMember(Order = 5)]
+		public int SubRole_Count;
+
+		[DataMember(Order = 6)]
+		public int User_Count;
+
+		[DataMember(Order = 7)]
+		public int Permission_Count;
 	}
 
 
@@ -292,6 +301,44 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public ResponseStatus ResponseStatus { get; set; }
 	}
 
+	[DataContract]
+	public class SaveUserGroupRequest : IReturn<SaveUserGroupResponse>, IEbSSRequest
+	{
+		[DataMember(Order = 1)]
+		public int Id { get; set; }
+
+		[DataMember(Order = 2)]
+		public string Name { get; set; }
+
+		[DataMember(Order = 3)]
+		public string Description { get; set; }
+		
+		[DataMember(Order = 4)]
+		public string Users { get; set; }
+
+		[DataMember(Order = 5)]
+		public string TenantAccountId { get; set; }
+
+		public int UserId { get; set; }
+
+		public string Token { get; set; }
+	}
+
+	[DataContract]
+	public class SaveUserGroupResponse : IEbSSResponse
+	{
+		[DataMember(Order = 1)]
+		public int id { get; set; }
+
+		[DataMember(Order = 2)]
+		public string Token { get; set; }
+
+		[DataMember(Order = 3)]
+		public ResponseStatus ResponseStatus { get; set; }
+
+		[DataMember(Order = 4)]
+		public string u_token { get; set; }
+	}
 
 
 	//ROLES START---------------------------------------------
