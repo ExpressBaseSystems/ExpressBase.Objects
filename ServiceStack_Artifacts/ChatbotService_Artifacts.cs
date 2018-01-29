@@ -53,9 +53,42 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         }
     }
 
+    [System.Runtime.Serialization.DataContract]
+    public class GetBotDetailsResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public int Id { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 3)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 4)]
+        public string Name { get; set; }
+
+        [DataMember(Order = 5)]
+        public string Url { get; set; }
+
+        [DataMember(Order = 6)]
+        public string WelcomeMsg { get; set; }
+
+        [DataMember(Order = 7)]
+        public string BotId { get; set; }
+
+        [DataMember(Order = 8)]
+        public string FullName { get; set; }
+    }
+
     public class AppListRequest : EbServiceStackRequest, IReturn<CreateBotResponse>
     {
         public int SolutionId { get; set; }
+    }
+
+    public class BotDetailsRequest : EbServiceStackRequest, IReturn<CreateBotResponse>
+    {
+        public int AppId { get; set; }
     }
 
     [System.Runtime.Serialization.DataContract]
