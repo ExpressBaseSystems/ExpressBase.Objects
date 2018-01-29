@@ -166,11 +166,15 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
     [DataContract]
     [Route("/unique", "POST")]
-    public class UniqueRequest
+    public class UniqueRequest 
     {
         [DataMember(Order = 1)]
         public string email { get; set; }
 
+    }
+    public class UniqueRequestResponse 
+    {
+        public bool isUniq {set;get;}
     }
 
     [DataContract]

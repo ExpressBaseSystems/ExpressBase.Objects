@@ -1,4 +1,9 @@
-﻿using ExpressBase.Common.Connections;
+﻿using System;
+using System.Collections.Generic;
+using System.Runtime.Serialization;
+using System.Text;
+using ServiceStack;
+using ExpressBase.Common.Connections;
 using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
 
@@ -59,5 +64,30 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class TestConnectionRequest : EbServiceStackRequest
     {
         public EbDataDbConnection DataDBConnection { get; set; }
+    }
+    public class TestConnectionResponse
+    {
+        public bool ConnectionStatus { set; get; }       
+    }
+
+    [DataContract]
+    public class TestFileDbconnectionRequest : IReturn<TestFileDbconnectionRequest>, IEbSSRequest
+    {
+        [DataMember(Order = 1)]
+        public EbFilesDbConnection FilesDBConnection { get; set; }
+
+        public int UserId { get; set; }
+
+        [DataMember(Order = 2)]
+        public string TenantAccountId { get; set; }
+    }
+
+    public class TestFileDbconnectionResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public bool ConnectionStatus { set; get; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
     }
 }
