@@ -83,6 +83,8 @@ this.Init = function(id)
 
         public override string GetDesignHtml()
         {
+            this.CardCollection.Add(new EbCard());
+            this.CardCollection.Add(new EbCard());
             return GetHtml().RemoveCR().DoubleQuoted();
         }
 
