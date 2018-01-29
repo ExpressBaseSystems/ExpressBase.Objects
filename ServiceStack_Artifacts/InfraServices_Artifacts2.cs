@@ -342,7 +342,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public List<EbSolutionsWrapper> Data { get; set; }
 
     }
-
+    
     [DataContract]
     public class GetSolutioInfoRequest : IReturn<GetSolutioInfoResponse>, IEbSSRequest
     {
