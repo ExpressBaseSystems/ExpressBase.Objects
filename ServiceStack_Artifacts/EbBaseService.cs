@@ -1,29 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using ServiceStack;
-using ExpressBase.Data;
-using ExpressBase.Common;
-using System.IO;
-using ExpressBase.Objects;
-using System.Data;
-using ServiceStack.Logging;
-using ServiceStack.Web;
-using ServiceStack.Messaging;
-using ExpressBase.Common.Data;
-using ServiceStack.RabbitMq;
-using System.Net.Http;
-using RestSharp;
+﻿using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
 using ExpressBase.Objects.ReportRelated;
+using RestSharp;
+using ServiceStack;
+using ServiceStack.Logging;
+using ServiceStack.Messaging;
+using ServiceStack.RabbitMq;
+using System.Collections.Generic;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
     public class EbBaseService : Service
     {
-        protected TenantDbFactory TenantDbFactory { get; private set; }
-
-        protected InfraDbFactory InfraDbFactory { get; private set; }
+        protected EbConnectionFactory EbConnectionFactory { get; private set; }
 
         protected RestClient RestClient  { get; private set; }
         
@@ -35,24 +25,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public EbBaseService() { }
 
-        public EbBaseService(IEbTenantDbFactory _dbf)
+        public EbBaseService(IEbConnectionFactory _dbf)
         {
-            this.TenantDbFactory = _dbf as TenantDbFactory;
+            this.EbConnectionFactory = _dbf as EbConnectionFactory;
         }
 
-        public EbBaseService(IEbInfraDbFactory _idbf)
-        {
-            this.InfraDbFactory = _idbf as InfraDbFactory;
-        }
-        public EbBaseService(IEbTenantDbFactory _dbf, IEbInfraDbFactory _idbf)
-        {
-            this.TenantDbFactory = _dbf as TenantDbFactory;
-            this.InfraDbFactory = _idbf as InfraDbFactory;
-        }
-        
         public EbBaseService(IMessageProducer _mqp)
         {
-
             this.MessageProducer3 = _mqp as RabbitMqProducer;
         }
 
@@ -63,7 +42,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public EbBaseService(IMessageProducer _mqp, IMessageQueueClient _mqc)
         {
-
             this.MessageProducer3 = _mqp as RabbitMqProducer;
             this.MessageQueueClient = _mqc as RabbitMqQueueClient;
         }
@@ -75,23 +53,15 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             //this.ServerEvents = _se as RedisServerEvents;
         }
 
-        public EbBaseService(IEbTenantDbFactory _dbf, IMessageProducer _mqp)
+        public EbBaseService(IEbConnectionFactory _dbf, IMessageProducer _mqp)
         {
-            this.TenantDbFactory = _dbf as TenantDbFactory;
+            this.EbConnectionFactory = _dbf as EbConnectionFactory;
             this.MessageProducer3 = _mqp as RabbitMqProducer;
         }
 
-        public EbBaseService(IEbTenantDbFactory _dbf, IMessageProducer _mqp, IMessageQueueClient _mqc)
+        public EbBaseService(IEbConnectionFactory _dbf, IMessageProducer _mqp, IMessageQueueClient _mqc)
         {
-            this.TenantDbFactory = _dbf as TenantDbFactory;
-            this.MessageProducer3 = _mqp as RabbitMqProducer;
-            this.MessageQueueClient = _mqc as RabbitMqQueueClient;
-        }
-
-        public EbBaseService(IEbTenantDbFactory _dbf, IEbInfraDbFactory _idbf, IMessageProducer _mqp, IMessageQueueClient _mqc)
-        {
-            this.TenantDbFactory = _dbf as TenantDbFactory;
-            this.InfraDbFactory = _idbf as InfraDbFactory;
+            this.EbConnectionFactory = _dbf as EbConnectionFactory;
             this.MessageProducer3 = _mqp as RabbitMqProducer;
             this.MessageQueueClient = _mqc as RabbitMqQueueClient;
         }
