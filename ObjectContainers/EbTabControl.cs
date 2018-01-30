@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ExpressBase.Objects.ObjectContainers
+namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
     public class EbTabControl : EbControlContainer

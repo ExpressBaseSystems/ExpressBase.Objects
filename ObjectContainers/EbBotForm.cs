@@ -5,7 +5,8 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Text;
 
-namespace ExpressBase.Objects.ObjectContainers
+//namespace ExpressBase.Objects.ObjectContainers
+namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.BotForm)]
     [HideInToolBox]
