@@ -129,7 +129,7 @@ namespace ExpressBase.Objects
             }
         }
 
-        public EbDataSet DoQueries4DataVis(string sql, ITenantDbFactory df, params DbParameter[] parameters)
+        public EbDataSet DoQueries4DataVis(string sql, IEbTenantDbFactory df, params DbParameter[] parameters)
         {
             EbDataSet ds = new EbDataSet();
 
