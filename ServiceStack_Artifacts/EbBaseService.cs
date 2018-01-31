@@ -1,4 +1,5 @@
-﻿using ExpressBase.Common.Data;
+﻿using ExpressBase.Common.Constants;
+using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
 using ExpressBase.Objects.ReportRelated;
@@ -20,6 +21,19 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         protected RabbitMqProducer MessageProducer3 { get; private set; }
 
         protected RabbitMqQueueClient MessageQueueClient { get; private set; }
+
+        private EbConnectionFactory _infraConnectionFactory = null;
+
+        protected EbConnectionFactory InfraConnectionFactory
+        {
+            get
+            {
+                if(_infraConnectionFactory == null)
+                       _infraConnectionFactory = new EbConnectionFactory(CoreConstants.EXPRESSBASE, this.Redis);
+
+                return _infraConnectionFactory; 
+            }
+        }
 
         //protected RedisServerEvents ServerEvents { get; private set; }
 
