@@ -16,7 +16,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     public class GetConnectionsResponse
     {    
-        public EbConnections EBSolutionConnections { get; set; }
+        public EbConnectionsConfig EBSolutionConnections { get; set; }
         public string Token { get; set; }
     }
 
