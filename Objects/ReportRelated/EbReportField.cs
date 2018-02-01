@@ -41,6 +41,9 @@ namespace ExpressBase.Objects.ReportRelated
         public virtual void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_name)
         {
         }
+        public virtual void DrawMe(Document doc, PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_name)
+        {
+        }
         public virtual void DrawMe(Document d, byte[] fileByte)
         {
         }
@@ -89,7 +92,7 @@ namespace ExpressBase.Objects.ReportRelated
     {
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
-      //  [HideInPropertyGrid]
+        //  [HideInPropertyGrid]
         public string Source { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
@@ -125,25 +128,25 @@ namespace ExpressBase.Objects.ReportRelated
             {
                 PdfContentByte canvas;
                 iTextSharp.text.Font fo = new iTextSharp.text.Font(5, 20, 5, BaseColor.LightGray);
-                    canvas = writer.DirectContentUnder; 
-                  ColumnText.ShowTextAligned(canvas, Element.ALIGN_CENTER, new Phrase(this.WaterMarkText, fo), d.PageSize.Width / 2, d.PageSize.Height / 2, this.Rotation);               
+                canvas = writer.DirectContentUnder;
+                ColumnText.ShowTextAligned(canvas, Element.ALIGN_CENTER, new Phrase(this.WaterMarkText, fo), d.PageSize.Width / 2, d.PageSize.Height / 2, this.Rotation);
             }
             if (this.Image != string.Empty)
             {
                 iTextSharp.text.Image img = iTextSharp.text.Image.GetInstance(fileByte);
                 img.RotationDegrees = this.Rotation;
                 img.ScaleToFit(this.Width, this.Height);
-                img.SetAbsolutePosition(this.Left, reportHeight - this.Top -this.Height); 
+                img.SetAbsolutePosition(this.Left, reportHeight - this.Top - this.Height);
                 PdfGState _state = new PdfGState()
                 {
                     FillOpacity = 0.3F,
                     StrokeOpacity = 0.3F
                 };
-                    PdfContentByte cb = writer.DirectContentUnder;
-                    cb.SaveState();
-                    cb.SetGState(_state);
-                    cb.AddImage(img);
-                    cb.RestoreState();
+                PdfContentByte cb = writer.DirectContentUnder;
+                cb.SaveState();
+                cb.SetGState(_state);
+                cb.AddImage(img);
+                cb.RestoreState();
             }
         }
     }
@@ -314,6 +317,29 @@ namespace ExpressBase.Objects.ReportRelated
         [PropertyGroup("Appearance")]
         public string Source { get; set; }
 
+
+        [EnableInBuilder(BuilderType.Report)]
+        [UIproperty]
+        [PropertyGroup("Appearance")]
+        public string Code { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [UIproperty]
+        [PropertyGroup("Appearance")]
+        public int Type { get; set; }
+
+
+        [EnableInBuilder(BuilderType.Report)]
+        [UIproperty]
+        [PropertyGroup("Appearance")]
+        public bool GuardBars { get; set; }
+
+
+        [EnableInBuilder(BuilderType.Report)]
+        [UIproperty]
+        [PropertyGroup("Appearance")]
+        public float BaseLine { get; set; }
+
         public override string GetDesignHtml()
         {
             return "<div class='Bar-code dropped' eb-type='Barcode' id='@id' style=' border: @Border px solid;border-color: @BorderColor ; width: @Width px; height: @Height px; background: @Source ; position: absolute; left: @Left px; top: @Top px;background-size: 100% 100%;'></div>".RemoveCR().DoubleQuoted();
@@ -330,6 +356,20 @@ namespace ExpressBase.Objects.ReportRelated
     this.Source = 'url(../images/barcode.png) center no-repeat';
 };";
         }
+        public override void DrawMe(Document doc, PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string code_val)
+        {
+            Barcode codeEAN = null;
+            if (Type == 1 || Type == 2)
+                codeEAN = new BarcodeEan();
+           
+            codeEAN.Code = "4512345678906";
+            codeEAN.GuardBars = GuardBars;
+            codeEAN.Baseline = BaseLine;
+            iTextSharp.text.Image imageEAN = codeEAN.CreateImageWithBarcode(cb: canvas, barColor: null, textColor: null);
+            imageEAN.ScaleAbsolute(Width, Height);
+            imageEAN.SetAbsolutePosition(Left, reportHeight - Top - Height);
+            doc.Add(imageEAN);
+        }
     }
 
     [EnableInBuilder(BuilderType.Report)]
@@ -339,6 +379,12 @@ namespace ExpressBase.Objects.ReportRelated
         [UIproperty]
         [PropertyGroup("Appearance")]
         public string Source { get; set; }
+
+
+        [EnableInBuilder(BuilderType.Report)]
+        [UIproperty]
+        [PropertyGroup("Appearance")]
+        public string Code { get; set; }
 
         public override string GetDesignHtml()
         {

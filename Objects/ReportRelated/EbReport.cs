@@ -149,7 +149,7 @@ else {
 
         public List<object> WaterMarkList { get; set; }
 
-      //  public RowColletion DataRow { get; set; }
+        //  public RowColletion DataRow { get; set; }
 
         public DataSet DataSet { get; set; }
 
@@ -158,7 +158,9 @@ else {
         public bool IsLastpage { get; set; }
 
         public int PageNumber { get; set; }
-        
+
+        public DateTime CurrentTimestamp { get; set; }
+
         public PdfContentByte Canvas { get; set; }
 
         public PdfWriter Writer { get; set; }
@@ -249,7 +251,7 @@ else {
         {
             get
             {
-                var rows = DataSet.Tables[0].Rows;
+                var rows = (DataSourceRefId != string.Empty)?DataSet.Tables[0].Rows:null;
                 if (rows != null)
                 {
                     if (rows.Count > 0)
@@ -418,7 +420,7 @@ else {
 
         public void DrawDetail()
         {
-            var rows = DataSet.Tables[0].Rows;
+            var rows = (DataSourceRefId != string.Empty) ? DataSet.Tables[0].Rows : null;
             if (rows != null)
             {
                 for (iDetailRowPos = 0; iDetailRowPos < rows.Count; iDetailRowPos++)
@@ -431,7 +433,7 @@ else {
                     {
                         detailprintingtop = 0;
                         Doc.NewPage();
-                        PageNumber = PageNumber;
+                        PageNumber = Writer.PageNumber;
                         DoLoopInDetail(iDetailRowPos);
                     }
                 }
@@ -522,7 +524,7 @@ else {
                 else if (field is EbPageXY)
                     column_val = PageNumber + "/"/* + writer.PageCount*/;
                 else if (field is EbDateTime)
-                    column_val = DateTime.Now.ToString();
+                    column_val = CurrentTimestamp.ToString();
                 else if (field is EbSerialNumber)
                     column_val = (iDetailRowPos + 1).ToString();
                 field.DrawMe(Canvas, Height, section_Yposition, detailprintingtop, column_val);
@@ -536,6 +538,20 @@ else {
             {
                 field.DrawMe(Canvas, Height, section_Yposition, detailprintingtop);
             }
+            else if ((field is EbBarcode))
+            {
+                var table = (field as EbBarcode).Code.Split('.')[0];
+                column_name = (field as EbBarcode).Code.Split('.')[1];
+                column_val = GetFieldtData(column_name, serialnumber);
+                field.DrawMe(Doc,Canvas, Height, section_Yposition, detailprintingtop, column_val);
+            }
+            //else if ( (field is EbQRcode))
+            //{
+            //    var table = (field as EbQRcode).Code.Split('.')[0];
+            //    column_name = field.Title.Split('.')[1];
+            //    column_val = GetFieldtData(column_name, serialnumber);
+            //    field.DrawMe(Doc, Canvas, Height, section_Yposition, detailprintingtop, column_val);
+            //}
         }
         public EbReport()
         {
