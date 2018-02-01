@@ -30,6 +30,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class GetBotForm4UserRequest : EbServiceStackRequest, IReturn<CreateBotResponse>
     {
         public string BotFormIds { get; set; }
+
+        public string AppId { get; set; }
     }
 
     [System.Runtime.Serialization.DataContract]
