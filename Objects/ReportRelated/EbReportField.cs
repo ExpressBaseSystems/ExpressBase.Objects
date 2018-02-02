@@ -9,6 +9,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
+using QRCoder;
 
 namespace ExpressBase.Objects.ReportRelated
 {
@@ -358,17 +359,73 @@ namespace ExpressBase.Objects.ReportRelated
         }
         public override void DrawMe(Document doc, PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string code_val)
         {
-            Barcode codeEAN = null;
-            if (Type == 1 || Type == 2)
-                codeEAN = new BarcodeEan();
-           
-            codeEAN.Code = "4512345678906";
-            codeEAN.GuardBars = GuardBars;
-            codeEAN.Baseline = BaseLine;
-            iTextSharp.text.Image imageEAN = codeEAN.CreateImageWithBarcode(cb: canvas, barColor: null, textColor: null);
-            imageEAN.ScaleAbsolute(Width, Height);
-            imageEAN.SetAbsolutePosition(Left, reportHeight - Top - Height);
-            doc.Add(imageEAN);
+            //** BarcodeEan(& BarcodeEansupp)
+            //public const int EAN13 = 1;
+            //public const int EAN8 = 2;
+            //public const int UPCA = 3;
+            //public const int UPCE = 4;
+            //public const int SUPP2 = 5;
+            //public const int SUPP5 = 6; 
+            //** Barcode128
+            //public const int CODE128 = 9;      
+            //public const int CODE128_UCC = 10;
+            //public const int CODE128_RAW = 11;   
+            //** BarcodePostnet
+            //public const int POSTNET = 7;
+            //public const int PLANET = 8;      
+
+            //public const int CODABAR = 12;      
+
+
+            //** Barcode39
+            //** BarcodeCodabar
+            //** BarcodeDatamatrix
+            //** BarcodeInter25
+            //** BarcodePdf417
+            Type = 6;
+            iTextSharp.text.Image imageEAN = null;
+            try
+            {
+                if (Type >= 1 && Type <= 6)
+                {
+                    BarcodeEan codeEAN = new BarcodeEan();
+                    codeEAN.Code = code_val;
+                    codeEAN.CodeType = Type;
+                    codeEAN.GuardBars = GuardBars;
+                    codeEAN.Baseline = BaseLine;
+                    imageEAN = codeEAN.CreateImageWithBarcode(cb: canvas, barColor: null, textColor: null);
+                }
+                if (Type == 7 || Type == 8)
+                {
+                    BarcodePostnet codepost = new BarcodePostnet();
+                    codepost.Code = code_val;
+                    codepost.CodeType = Type;
+                    codepost.GuardBars = GuardBars;
+                    codepost.Baseline = BaseLine;
+                    imageEAN = codepost.CreateImageWithBarcode(cb: canvas, barColor: null, textColor: null);
+                }
+                if (Type >= 9 && Type <= 11)
+                {
+                    Barcode128 uccEan128 = new Barcode128();
+
+                    uccEan128.CodeType = Type;
+                    uccEan128.Code = code_val;
+                    uccEan128.GuardBars = GuardBars;
+                    uccEan128.Baseline = BaseLine;
+                    imageEAN = uccEan128.CreateImageWithBarcode(cb: canvas, barColor: null, textColor: null);
+                }
+
+                //imageEAN.ScaleAbsolute(Width, Height);
+                imageEAN.SetAbsolutePosition(Left, reportHeight - (printingTop + this.Top + this.Height + detailprintingtop));
+                doc.Add(imageEAN);
+            }
+            catch (Exception e)
+            {
+                ColumnText ct = new ColumnText(canvas);
+                var x = reportHeight - (printingTop + this.Top + detailprintingtop);
+                ct.SetSimpleColumn(new Phrase("Error in generating barcode"), Left,x - Height, Left + Width, x, 15, Element.ALIGN_LEFT);
+                ct.Go();
+            }
         }
     }
 
@@ -401,6 +458,16 @@ namespace ExpressBase.Objects.ReportRelated
     this.BorderColor = '#aaaaaa';
     this.Source = 'url(../images/Qr-code.png) center no-repeat';
 };";
+        }
+        public override void DrawMe(Document doc, PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string code_val)
+        {
+            QRCodeGenerator qrGenerator = new QRCodeGenerator();
+            QRCodeData qrCodeData = qrGenerator.CreateQrCode("4512345678906", QRCodeGenerator.ECCLevel.Q);
+            BitmapByteQRCode qrCode = new BitmapByteQRCode(qrCodeData);
+            byte[] qrCodeImage = qrCode.GetGraphic(20);
+            iTextSharp.text.Image img = iTextSharp.text.Image.GetInstance(qrCodeImage);
+            img.ScaleAbsolute(200, 200);
+            doc.Add(img);
         }
     }
 

@@ -538,20 +538,20 @@ else {
             {
                 field.DrawMe(Canvas, Height, section_Yposition, detailprintingtop);
             }
-            else if ((field is EbBarcode))
+            else if (field is EbBarcode)
             {
                 var table = (field as EbBarcode).Code.Split('.')[0];
                 column_name = (field as EbBarcode).Code.Split('.')[1];
                 column_val = GetFieldtData(column_name, serialnumber);
-                field.DrawMe(Doc,Canvas, Height, section_Yposition, detailprintingtop, column_val);
+                field.DrawMe(Doc, Canvas, Height, section_Yposition, detailprintingtop, column_val);
             }
-            //else if ( (field is EbQRcode))
-            //{
-            //    var table = (field as EbQRcode).Code.Split('.')[0];
-            //    column_name = field.Title.Split('.')[1];
-            //    column_val = GetFieldtData(column_name, serialnumber);
-            //    field.DrawMe(Doc, Canvas, Height, section_Yposition, detailprintingtop, column_val);
-            //}
+            else if (field is EbQRcode)
+            {
+                var table = (field as EbQRcode).Code.Split('.')[0];
+                column_name = field.Title.Split('.')[1];
+                column_val = GetFieldtData(column_name, serialnumber);
+                field.DrawMe(Doc, Canvas, Height, section_Yposition, detailprintingtop, column_val);
+            }
         }
         public EbReport()
         {
