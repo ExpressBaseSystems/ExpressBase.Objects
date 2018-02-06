@@ -234,21 +234,27 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     }
 
-    public class AutoGenSolIdRequest
+    public class AutoGenEbIdRequest
     {
         [DataMember(Order = 1)]
         public string TenantAccountId { get; set; }
+
+        [DataMember(Order = 2)]
+        public string WhichId { get; set; }
 
         public int UserId { get; set; }
     }
 
     [DataContract]
-    public class AutoGenSolIdResponse: IEbSSResponse
+    public class AutoGenEbIdResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
         public string Sid { get; set; }
 
         [DataMember(Order = 2)]
+        public string AppId { get; set; }
+
+        [DataMember(Order = 3)]
         public ResponseStatus ResponseStatus { get; set; }
     }
 
