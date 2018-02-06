@@ -17,15 +17,28 @@ namespace ExpressBase.Objects.ReportRelated
 
         public virtual void NotifyNewPage(bool status) { }
 
-        public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
+        public override float DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, string column_val, float detailprintingtop, string column_type/*, EbReport report*/)
         {
-            var ury = reportHeight - (printingTop + this.Top + detailprintingtop);
-            var lly = reportHeight - (printingTop + this.Top + this.Height + detailprintingtop);
-
+            var x = column_val.Length;
+            float k = 0;
+            if (column_type == "System.Decimal")
+                column_val = Convert.ToDecimal(column_val).ToString("F" + 5);
             ColumnText ct = new ColumnText(canvas);
             ct.Canvas.SetColorFill(GetColor(this.ForeColor));
-            ct.SetSimpleColumn(new Phrase(column_val), this.Left, lly, this.Width + this.Left, ury, 15, Element.ALIGN_LEFT);
+            var y = new Phrase(column_val);
+           y.Font.Size = 10;
+            //var z = y.Font.CalculatedSize * x;
+            //if (z > Width)
+            //{
+            //    k = (y.Font.CalculatedSize + 5);
+            //    Height += k;
+            //}
+           
+            var ury = reportHeight - (printingTop + this.Top + detailprintingtop);
+            var lly = reportHeight - (printingTop + this.Top + this.Height + detailprintingtop);
+            ct.SetSimpleColumn(y, this.Left, lly, this.Width + this.Left, ury, 15, Element.ALIGN_LEFT);
             ct.Go();
+            return k;
         }
     }
 
@@ -131,7 +144,7 @@ namespace ExpressBase.Objects.ReportRelated
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
         {
             var ury = reportHeight - (printingTop + this.Top + detailprintingtop);
-            var lly = reportHeight - (printingTop + this.Top + this.Height + detailprintingtop);            
+            var lly = reportHeight - (printingTop + this.Top + this.Height + detailprintingtop);
             if (this.DecimalPlaces > 0)
                 column_val = Convert.ToDecimal(column_val).ToString("F" + this.DecimalPlaces);
             if (this.InLetters)
@@ -482,13 +495,13 @@ namespace ExpressBase.Objects.ReportRelated
             ct.Canvas.SetColorFill(GetColor(this.ForeColor));
             ct.SetSimpleColumn(new Phrase(column_val), this.Left, lly, this.Width + this.Left, ury, 15, Element.ALIGN_RIGHT);
             ct.Go();
-        }      
+        }
     }
 
     public interface IEbDataFieldSummary
     {
         object SummarizedValue { get; }
-        void Summarize(object value);       
+        void Summarize(object value);
     }
 
     [EnableInBuilder(BuilderType.Report)]
@@ -529,7 +542,7 @@ namespace ExpressBase.Objects.ReportRelated
 
         public void Summarize(object value)
         {
-           var myvalue = value.ToString();
+            var myvalue = value.ToString();
             this.Count++;
             if (this.Count > 1)
             {
@@ -603,7 +616,7 @@ namespace ExpressBase.Objects.ReportRelated
 
         public void Summarize(object value)
         {
-           var myvalue = Convert.ToDateTime(value);
+            var myvalue = Convert.ToDateTime(value);
             this.Count++;
             if (this.Count > 1)
             {
