@@ -1,5 +1,6 @@
 ﻿using ExpressBase.Common.EbServiceStack.ReqNRes;
 using ExpressBase.Common.Objects;
+using ExpressBase.Common.Structures;
 using ServiceStack;
 using ServiceStack.Text;
 using System;
@@ -493,7 +494,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int Id { get; set; }
 
         [DataMember(Order = 2)]
-        public EbObjectType EbObjectType { get; set; }
+        public EbObjectType? EbObjectType { get; set; }
 
         [DataMember(Order = 3)]
         public string Name { get; set; }

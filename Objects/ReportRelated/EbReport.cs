@@ -3,6 +3,7 @@ using ExpressBase.Common.EbServiceStack;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
+using ExpressBase.Common.Structures;
 using ExpressBase.Objects.ReportRelated;
 using ExpressBase.Objects.ServiceStack_Artifacts;
 using iTextSharp.text;
@@ -65,11 +66,11 @@ namespace ExpressBase.Objects
         Count
     }
 
-    [EnableInBuilder(BuilderType.Report)]
-    public class EbReport : EbReportObject
-    {
-        [EnableInBuilder(BuilderType.Report)]
-        [OnChangeExec(@"
+	[EnableInBuilder(BuilderType.Report)]
+	public class EbReport : EbReportObject
+	{
+		[EnableInBuilder(BuilderType.Report)]
+		[OnChangeExec(@"
 if (this.PaperSize === 6 ){  
      pg.ShowProperty('CustomPaperHeight');
      pg.ShowProperty('CustomPaperWidth');
@@ -79,62 +80,62 @@ else {
      pg.HideProperty('CustomPaperWidth');
 }
             ")]
-        [PropertyGroup("General")]
-        public PaperSize PaperSize { get; set; }
+		[PropertyGroup("General")]
+		public PaperSize PaperSize { get; set; }
 
-        [EnableInBuilder(BuilderType.Report)]
-        [PropertyGroup("General")]
-        [UIproperty]
-        public float CustomPaperHeight { get; set; }
+		[EnableInBuilder(BuilderType.Report)]
+		[PropertyGroup("General")]
+		[UIproperty]
+		public float CustomPaperHeight { get; set; }
 
-        [EnableInBuilder(BuilderType.Report)]
-        [PropertyGroup("General")]
-        [UIproperty]
-        public float CustomPaperWidth { get; set; }
+		[EnableInBuilder(BuilderType.Report)]
+		[PropertyGroup("General")]
+		[UIproperty]
+		public float CustomPaperWidth { get; set; }
 
-        //public EbReportMargins Margins { get; set; }
-        //[EnableInBuilder(BuilderType.Report)]
-        //[PropertyGroup("General")]
-        //public string ReportName { get; set; }
+		//public EbReportMargins Margins { get; set; }
+		//[EnableInBuilder(BuilderType.Report)]
+		//[PropertyGroup("General")]
+		//public string ReportName { get; set; }
 
-        //[EnableInBuilder(BuilderType.Report)]
-        //[PropertyGroup("General")]
-        //public string Description { get; set; }
-        [EnableInBuilder(BuilderType.Report)]
-        [PropertyGroup("General")]
-        public bool IsLandscape { get; set; }
+		//[EnableInBuilder(BuilderType.Report)]
+		//[PropertyGroup("General")]
+		//public string Description { get; set; }
+		[EnableInBuilder(BuilderType.Report)]
+		[PropertyGroup("General")]
+		public bool IsLandscape { get; set; }
 
-        [EnableInBuilder(BuilderType.Report)]
-        [PropertyEditor(PropertyEditorType.ImageSeletor)]
-        public string BackgroundImage { get; set; }
+		[EnableInBuilder(BuilderType.Report)]
+		[PropertyEditor(PropertyEditorType.ImageSeletor)]
+		public string BackgroundImage { get; set; }
 
-        [EnableInBuilder(BuilderType.Report)]
-        [HideInPropertyGrid]
-        public List<EbReportField> ReportObjects { get; set; }
+		[EnableInBuilder(BuilderType.Report)]
+		[HideInPropertyGrid]
+		public List<EbReportField> ReportObjects { get; set; }
 
-        [EnableInBuilder(BuilderType.Report)]
-        [HideInPropertyGrid]
-        public List<EbReportHeader> ReportHeaders { get; set; }
+		[EnableInBuilder(BuilderType.Report)]
+		[HideInPropertyGrid]
+		public List<EbReportHeader> ReportHeaders { get; set; }
 
-        [EnableInBuilder(BuilderType.Report)]
-        [HideInPropertyGrid]
-        public List<EbReportFooter> ReportFooters { get; set; }
+		[EnableInBuilder(BuilderType.Report)]
+		[HideInPropertyGrid]
+		public List<EbReportFooter> ReportFooters { get; set; }
 
-        [EnableInBuilder(BuilderType.Report)]
-        [HideInPropertyGrid]
-        public List<EbPageHeader> PageHeaders { get; set; }
+		[EnableInBuilder(BuilderType.Report)]
+		[HideInPropertyGrid]
+		public List<EbPageHeader> PageHeaders { get; set; }
 
-        [EnableInBuilder(BuilderType.Report)]
-        [HideInPropertyGrid]
-        public List<EbPageFooter> PageFooters { get; set; }
+		[EnableInBuilder(BuilderType.Report)]
+		[HideInPropertyGrid]
+		public List<EbPageFooter> PageFooters { get; set; }
 
-        [EnableInBuilder(BuilderType.Report)]
-        [HideInPropertyGrid]
-        public List<EbReportDetail> Detail { get; set; }
+		[EnableInBuilder(BuilderType.Report)]
+		[HideInPropertyGrid]
+		public List<EbReportDetail> Detail { get; set; }
 
-        [EnableInBuilder(BuilderType.Report)]
-        [PropertyEditor(PropertyEditorType.ObjectSelector)]
-        [OSE_ObjectTypes(EbObjectType.DataSource)]
+		[EnableInBuilder(BuilderType.Report)]
+		[PropertyEditor(PropertyEditorType.ObjectSelector)]
+		[OSE_ObjectTypes(EbObjectTypes.iDataSource)]
         public string DataSourceRefId { get; set; }
 
         public ColumnColletion ColumnColletion { get; set; }
@@ -566,10 +567,7 @@ else {
             this.ReportFooters = new List<EbReportFooter>();
         }
 
-        public enum Operations
-        {
-            Print
-        }
+		public static EbOperations Operations = ReportOperations.Instance;
     }
     public class EbReportSection : EbReportObject
     {

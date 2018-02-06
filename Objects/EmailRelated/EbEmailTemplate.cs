@@ -3,6 +3,7 @@ using ExpressBase.Common.Extensions;
 using ExpressBase.Common.JsonConverters;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
+using ExpressBase.Common.Structures;
 using ExpressBase.Objects.Helpers;
 using Newtonsoft.Json;
 using ServiceStack.Redis;
@@ -50,7 +51,7 @@ namespace ExpressBase.Objects.EmailRelated
 
         [EnableInBuilder(BuilderType.EmailBuilder)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
-        [OSE_ObjectTypes(EbObjectType.DataSource)]
+        [OSE_ObjectTypes(EbObjectTypes.iDataSource)]
         public string DataSourceRefId { get; set; }
 
         [EnableInBuilder(BuilderType.EmailBuilder)]
