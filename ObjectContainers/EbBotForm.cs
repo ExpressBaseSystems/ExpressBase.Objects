@@ -1,5 +1,6 @@
 ﻿using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
+using ExpressBase.Common.Structures;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
@@ -24,11 +25,7 @@ namespace ExpressBase.Objects
 
         public EbBotForm() { }
 
-        public enum Operations
-        {
-            Access
-        }
-
+		public static EbOperations Operations = BFOperations.Instance;
 
         public override string GetHead()
         {

@@ -3,6 +3,7 @@ using ExpressBase.Common.EbServiceStack;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
+using ExpressBase.Common.Structures;
 using ExpressBase.Objects.ReportRelated;
 using ExpressBase.Objects.ServiceStack_Artifacts;
 using iTextSharp.text;
@@ -32,7 +33,6 @@ namespace ExpressBase.Objects
         Letter,
         Custom
     }
-
     public enum SummaryFunctionsText
     {
         Count,
@@ -65,11 +65,11 @@ namespace ExpressBase.Objects
         Count
     }
 
-    [EnableInBuilder(BuilderType.Report)]
-    public class EbReport : EbReportObject
-    {
-        [EnableInBuilder(BuilderType.Report)]
-        [OnChangeExec(@"
+	[EnableInBuilder(BuilderType.Report)]
+	public class EbReport : EbReportObject
+	{
+		[EnableInBuilder(BuilderType.Report)]
+		[OnChangeExec(@"
 if (this.PaperSize === 6 ){  
      pg.ShowProperty('CustomPaperHeight');
      pg.ShowProperty('CustomPaperWidth');
@@ -79,62 +79,62 @@ else {
      pg.HideProperty('CustomPaperWidth');
 }
             ")]
-        [PropertyGroup("General")]
-        public PaperSize PaperSize { get; set; }
+		[PropertyGroup("General")]
+		public PaperSize PaperSize { get; set; }
 
-        [EnableInBuilder(BuilderType.Report)]
-        [PropertyGroup("General")]
-        [UIproperty]
-        public float CustomPaperHeight { get; set; }
+		[EnableInBuilder(BuilderType.Report)]
+		[PropertyGroup("General")]
+		[UIproperty]
+		public float CustomPaperHeight { get; set; }
 
-        [EnableInBuilder(BuilderType.Report)]
-        [PropertyGroup("General")]
-        [UIproperty]
-        public float CustomPaperWidth { get; set; }
+		[EnableInBuilder(BuilderType.Report)]
+		[PropertyGroup("General")]
+		[UIproperty]
+		public float CustomPaperWidth { get; set; }
 
-        //public EbReportMargins Margins { get; set; }
-        //[EnableInBuilder(BuilderType.Report)]
-        //[PropertyGroup("General")]
-        //public string ReportName { get; set; }
+		//public EbReportMargins Margins { get; set; }
+		//[EnableInBuilder(BuilderType.Report)]
+		//[PropertyGroup("General")]
+		//public string ReportName { get; set; }
 
-        //[EnableInBuilder(BuilderType.Report)]
-        //[PropertyGroup("General")]
-        //public string Description { get; set; }
-        [EnableInBuilder(BuilderType.Report)]
-        [PropertyGroup("General")]
-        public bool IsLandscape { get; set; }
+		//[EnableInBuilder(BuilderType.Report)]
+		//[PropertyGroup("General")]
+		//public string Description { get; set; }
+		[EnableInBuilder(BuilderType.Report)]
+		[PropertyGroup("General")]
+		public bool IsLandscape { get; set; }
 
-        [EnableInBuilder(BuilderType.Report)]
-        [PropertyEditor(PropertyEditorType.ImageSeletor)]
-        public string BackgroundImage { get; set; }
+		[EnableInBuilder(BuilderType.Report)]
+		[PropertyEditor(PropertyEditorType.ImageSeletor)]
+		public string BackgroundImage { get; set; }
 
-        [EnableInBuilder(BuilderType.Report)]
-        [HideInPropertyGrid]
-        public List<EbReportField> ReportObjects { get; set; }
+		[EnableInBuilder(BuilderType.Report)]
+		[HideInPropertyGrid]
+		public List<EbReportField> ReportObjects { get; set; }
 
-        [EnableInBuilder(BuilderType.Report)]
-        [HideInPropertyGrid]
-        public List<EbReportHeader> ReportHeaders { get; set; }
+		[EnableInBuilder(BuilderType.Report)]
+		[HideInPropertyGrid]
+		public List<EbReportHeader> ReportHeaders { get; set; }
 
-        [EnableInBuilder(BuilderType.Report)]
-        [HideInPropertyGrid]
-        public List<EbReportFooter> ReportFooters { get; set; }
+		[EnableInBuilder(BuilderType.Report)]
+		[HideInPropertyGrid]
+		public List<EbReportFooter> ReportFooters { get; set; }
 
-        [EnableInBuilder(BuilderType.Report)]
-        [HideInPropertyGrid]
-        public List<EbPageHeader> PageHeaders { get; set; }
+		[EnableInBuilder(BuilderType.Report)]
+		[HideInPropertyGrid]
+		public List<EbPageHeader> PageHeaders { get; set; }
 
-        [EnableInBuilder(BuilderType.Report)]
-        [HideInPropertyGrid]
-        public List<EbPageFooter> PageFooters { get; set; }
+		[EnableInBuilder(BuilderType.Report)]
+		[HideInPropertyGrid]
+		public List<EbPageFooter> PageFooters { get; set; }
 
-        [EnableInBuilder(BuilderType.Report)]
-        [HideInPropertyGrid]
-        public List<EbReportDetail> Detail { get; set; }
+		[EnableInBuilder(BuilderType.Report)]
+		[HideInPropertyGrid]
+		public List<EbReportDetail> Detail { get; set; }
 
-        [EnableInBuilder(BuilderType.Report)]
-        [PropertyEditor(PropertyEditorType.ObjectSelector)]
-        [OSE_ObjectTypes(EbObjectType.DataSource)]
+		[EnableInBuilder(BuilderType.Report)]
+		[PropertyEditor(PropertyEditorType.ObjectSelector)]
+		[OSE_ObjectTypes(EbObjectTypes.iDataSource)]
         public string DataSourceRefId { get; set; }
 
         public ColumnColletion ColumnColletion { get; set; }
@@ -251,7 +251,7 @@ else {
         {
             get
             {
-                var rows = (DataSourceRefId != string.Empty)?DataSet.Tables[0].Rows:null;
+                var rows = (DataSourceRefId != string.Empty) ? DataSet.Tables[0].Rows : null;
                 if (rows != null)
                 {
                     if (rows.Count > 0)
@@ -281,12 +281,14 @@ else {
 
         public string SolutionId { get; set; }
 
+        public float RowHeight { get; set; }
+
         private float rh_Yposition;
         private float rf_Yposition;
         private float pf_Yposition;
         private float ph_Yposition;
         private float dt_Yposition;
-        private float detailprintingtop = 0;
+        public float detailprintingtop = 0;
 
         public void InitializeSummaryFields()
         {
@@ -343,6 +345,12 @@ else {
             return this.DataSet.Tables[0].Rows[i][column_name].ToString();
         }
 
+        public string GetFieldtDataType(string column_name, int i)
+        {
+            //return this.DataRow[i - 1][column_name].ToString();
+            return this.DataSet.Tables[0].Rows[i][column_name].GetType().ToString();
+        }
+
         public void DrawWaterMark(PdfReader pdfReader, Document d, PdfWriter writer)
         {
             byte[] fileByte = null;
@@ -392,6 +400,7 @@ else {
 
         public void DrawReportHeader()
         {
+            RowHeight = 0;
             rh_Yposition = 0;
             detailprintingtop = 0;
             foreach (EbReportHeader r_header in this.ReportHeaders)
@@ -406,6 +415,7 @@ else {
 
         public void DrawPageHeader()
         {
+            RowHeight = 0;
             detailprintingtop = 0;
             ph_Yposition = (PageNumber == 1) ? ReportHeaderHeight : 0;
             foreach (EbPageHeader p_header in PageHeaders)
@@ -452,20 +462,50 @@ else {
 
         public void DoLoopInDetail(int serialnumber)
         {
+            float w = 0;
+            int rowsneeded = 1;
+            RowHeight = 0;
+
             ph_Yposition = (PageNumber == 1) ? ReportHeaderHeight : 0;
             dt_Yposition = ph_Yposition + PageHeaderHeight;
+
             foreach (EbReportDetail detail in Detail)
             {
                 foreach (EbReportField field in detail.Fields)
                 {
-                    DrawFields(field, dt_Yposition, serialnumber);
+                    if (field is EbDataField && !(field is IEbDataFieldSummary))
+                    {
+                        var table = field.Title.Split('.')[0];
+                        var column_name = field.Title.Split('.')[1];
+                        var column_val = GetFieldtData(column_name, serialnumber);
+                        var datatype = GetFieldtDataType(column_name, serialnumber);
+                        if (datatype == "System.Decimal")
+                            column_val = Convert.ToDecimal(column_val).ToString("F" + 2);
+                        var val_length = column_val.Length;
+                        var phrase = new Phrase(column_val);
+                        phrase.Font.Size = 10;
+                        var calculatedSize = phrase.Font.CalculatedSize * val_length;
+                        if (calculatedSize > field.Width)
+                        {
+                            rowsneeded = Convert.ToInt32(Math.Floor(calculatedSize / field.Width));
+
+                            float k = (phrase.Font.CalculatedSize) * rowsneeded;
+                            if (k > RowHeight) RowHeight = k;
+                        }
+                    }
                 }
-                detailprintingtop += detail.Height;
+                foreach (EbReportField field in detail.Fields)
+                {
+                    field.Height += RowHeight;
+                    w = DrawFields(field, dt_Yposition, serialnumber);
+                }
+                detailprintingtop += detail.Height + RowHeight ;
             }
         }
 
         public void DrawPageFooter()
         {
+            RowHeight = 0;
             detailprintingtop = 0;
             ph_Yposition = (PageNumber == 1) ? ReportHeaderHeight : 0;
             dt_Yposition = ph_Yposition + PageHeaderHeight;
@@ -482,6 +522,7 @@ else {
 
         public void DrawReportFooter()
         {
+            RowHeight = 0;
             detailprintingtop = 0;
             dt_Yposition = ph_Yposition + PageHeaderHeight;
             pf_Yposition = dt_Yposition + DT_FillHeight;
@@ -497,10 +538,12 @@ else {
         }
 
 
-        public void DrawFields(EbReportField field, float section_Yposition, int serialnumber)
+        public float DrawFields(EbReportField field, float section_Yposition, int serialnumber)
         {
+            float p = 0;
             var column_name = string.Empty;
             var column_val = string.Empty;
+            var column_type = string.Empty;
             if (PageSummaryFields.ContainsKey(field.Title) || ReportSummaryFields.ContainsKey(field.Title))
                 CallSummerize(field.Title, serialnumber);
             if (field is EbDataField)
@@ -508,14 +551,16 @@ else {
                 if (field is IEbDataFieldSummary)
                 {
                     column_val = (field as IEbDataFieldSummary).SummarizedValue.ToString();
+                    column_type ="System.String";
                 }
                 else
                 {
                     var table = field.Title.Split('.')[0];
                     column_name = field.Title.Split('.')[1];
                     column_val = GetFieldtData(column_name, serialnumber);
+                    column_type = GetFieldtDataType(column_name, serialnumber);
                 }
-                field.DrawMe(Canvas, Height, section_Yposition, detailprintingtop, column_val);
+                p = field.DrawMe(Canvas, Height, section_Yposition, column_val, detailprintingtop, column_type);
             }
             if ((field is EbPageNo) || (field is EbPageXY) || (field is EbDateTime) || (field is EbSerialNumber))
             {
@@ -536,7 +581,7 @@ else {
             }
             else if ((field is EbText) || (field is EbReportFieldShape))
             {
-                field.DrawMe(Canvas, Height, section_Yposition, detailprintingtop);
+                field.DrawMe(Canvas, Height, section_Yposition, detailprintingtop, RowHeight);
             }
             else if (field is EbBarcode)
             {
@@ -552,6 +597,7 @@ else {
                 column_val = GetFieldtData(column_name, serialnumber);
                 field.DrawMe(Doc, Canvas, Height, section_Yposition, detailprintingtop, column_val);
             }
+            return p;
         }
         public EbReport()
         {
@@ -566,10 +612,7 @@ else {
             this.ReportFooters = new List<EbReportFooter>();
         }
 
-        public enum Operations
-        {
-            Print
-        }
+		public static EbOperations Operations = ReportOperations.Instance;
     }
     public class EbReportSection : EbReportObject
     {

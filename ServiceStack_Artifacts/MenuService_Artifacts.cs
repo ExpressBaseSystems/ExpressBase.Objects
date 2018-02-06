@@ -1,5 +1,6 @@
 ﻿using ExpressBase.Common.EbServiceStack.ReqNRes;
 using ExpressBase.Common.Objects;
+using ExpressBase.Common.Structures;
 using ServiceStack;
 using System;
 using System.Collections.Generic;
@@ -62,7 +63,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Refid { get; set; }
 
         [DataMember(Order = 5)]
-        public EbObjectType EbObjectType { get; set; }
+        public int EbObjectType { get; set; }
 
         [DataMember(Order = 6)]
         public int AppId { get; set; }

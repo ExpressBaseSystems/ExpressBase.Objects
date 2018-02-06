@@ -39,6 +39,13 @@ namespace ExpressBase.Objects.ReportRelated
         public virtual void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop)
         {
         }
+        public virtual void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, float rowH)
+        {
+        }
+        public virtual float DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, string column_name, float detailprintingtop, string column_type/*, EbReport report*/)
+        {
+            return 0;
+        }
         public virtual void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_name)
         {
         }
@@ -296,12 +303,12 @@ namespace ExpressBase.Objects.ReportRelated
     this.BorderColor = '#aaaaaa'
 };";
         }
-        public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop)
+        public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, float rowH)
         {
             var urx = this.Width + this.Left;
             var ury = reportHeight - (printingTop + this.Top + detailprintingtop);
             var llx = this.Left;
-            var lly = reportHeight - (printingTop + this.Top + this.Height + detailprintingtop);
+            var lly = reportHeight - (printingTop + this.Top + this.Height + detailprintingtop + rowH);
 
             ColumnText ct = new ColumnText(canvas);
             ct.Canvas.SetColorFill(GetColor(this.ForeColor));
@@ -423,7 +430,7 @@ namespace ExpressBase.Objects.ReportRelated
             {
                 ColumnText ct = new ColumnText(canvas);
                 var x = reportHeight - (printingTop + this.Top + detailprintingtop);
-                ct.SetSimpleColumn(new Phrase("Error in generating barcode"), Left,x - Height, Left + Width, x, 15, Element.ALIGN_LEFT);
+                ct.SetSimpleColumn(new Phrase("Error in generating barcode"), Left, x - Height, Left + Width, x, 15, Element.ALIGN_LEFT);
                 ct.Go();
             }
         }

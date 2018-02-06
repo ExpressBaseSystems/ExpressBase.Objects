@@ -1,6 +1,7 @@
 ﻿using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
+using ExpressBase.Common.Structures;
 using ExpressBase.Objects;
 using System;
 using System.Collections.Generic;
@@ -62,7 +63,7 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [PropertyGroup("Test")]
         [DefaultPropValue("eb_roby_dev-eb_roby_dev-3-671-1325")]
-        [OSE_ObjectTypes(EbObjectType.DataVisualization, EbObjectType.Report, EbObjectType.MobileForm, EbObjectType.TableVisualization)]
+        [OSE_ObjectTypes(EbObjectTypes.iDataVisualization, EbObjectTypes.iReport, EbObjectTypes.iMobileForm, EbObjectTypes.iTableVisualization)]
         public string ObjectSelectorProp { get; set; }
 
         public EbTableLayout()
