@@ -3,6 +3,7 @@ using ExpressBase.Common.Data;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
+using ExpressBase.Common.Structures;
 using ExpressBase.Data;
 using ExpressBase.Objects.Objects.DVRelated;
 using ExpressBase.Objects.ServiceStack_Artifacts;
@@ -69,7 +70,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
-        [OSE_ObjectTypes(EbObjectType.DataSource)]
+        [OSE_ObjectTypes(EbObjectTypes.iDataSource)]
         public string DataSourceRefId { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
@@ -301,17 +302,8 @@ namespace ExpressBase.Objects
         //[DefaultPropValue("'10'")]
         public int PageLength { get; set; }
 
-        public enum Operations
-        {
-            Customize,
-            Summarize,
-            Filter,
-            Drilldown,
-            PDFExport,
-            ExcelExport,
-            CSVExport,
-            Print
-        }
+		public static EbOperations Operations = TVOperations.Instance;
+
         public override string GetDesignHtml()
         {
             return @"
@@ -441,14 +433,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.DVBuilder)]
         public bool ShowValue { get; set; }
 
-        public enum Operations
-        {
-            Customize,
-            Print,
-            DrillDown,
-            Export
-
-        }
+		public static EbOperations Operations = CVOperations.Instance;
     }
 
     [EnableInBuilder(BuilderType.DVBuilder)]

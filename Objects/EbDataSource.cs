@@ -2,6 +2,7 @@
 using ExpressBase.Common.JsonConverters;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
+using ExpressBase.Common.Structures;
 using ExpressBase.Objects.ServiceStack_Artifacts;
 using Newtonsoft.Json;
 using ServiceStack;
@@ -29,7 +30,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.DataSource)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
-        [OSE_ObjectTypes(EbObjectType.FilterDialog)]
+        [OSE_ObjectTypes(EbObjectTypes.iFilterDialog)]
         public string FilterDialogRefId { get; set; }
 
         //public string VersionNumber { get; set; }
