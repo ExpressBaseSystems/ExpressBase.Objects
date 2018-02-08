@@ -35,4 +35,17 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
+    public class GetObjectRequest : EbServiceStackRequest, IReturn<GetObjectResponse>
+    {
+    }
+
+    public class GetObjectResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public Dictionary<int, TypeWrap> Data { get; set; }
+
+        [DataMember(Order = 3)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
 }
