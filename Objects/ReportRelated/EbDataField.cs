@@ -27,13 +27,27 @@ namespace ExpressBase.Objects.ReportRelated
             ct.Canvas.SetColorFill(GetColor(this.ForeColor));
             var y = new Phrase(column_val);
            y.Font.Size = 10;
+
+            var p = y.Font.GetCalculatedBaseFont(false);
+            float q = p.GetWidthPoint(column_val, y.Font.CalculatedSize);
+            var l = q / column_val.Length;
+            int numberofCharsInALine = Convert.ToInt32(this.Width / l);
+            try
+            {
+                if (column_type == "System.Decimal")
+                    column_val = column_val.Substring(0, numberofCharsInALine - 2).Insert(numberofCharsInALine - 2, "xx");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e); Console.WriteLine("column_val:" + column_val);
+            }
             //var z = y.Font.CalculatedSize * x;
             //if (z > Width)
             //{
             //    k = (y.Font.CalculatedSize + 5);
             //    Height += k;
             //}
-           
+
             var ury = reportHeight - (printingTop + this.Top + detailprintingtop);
             var lly = reportHeight - (printingTop + this.Top + this.Height + detailprintingtop);
             ct.SetSimpleColumn(y, this.Left, lly, this.Width + this.Left, ury, 15, Element.ALIGN_LEFT);
