@@ -536,6 +536,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 		[DataMember(Order = 4)]
 		public int App_Id;
+
+		[DataMember(Order = 5)]
+		public bool Is_Anonymous;
 	}
 
 	[DataContract]
