@@ -39,7 +39,10 @@ namespace ExpressBase.Objects.ReportRelated
         public virtual void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop)
         {
         }
-        public virtual void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, float rowH)
+        //public virtual void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, float rowH)
+        //{
+        //}
+        public virtual void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, EbReport report)
         {
         }
         public virtual float DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, string column_name, float detailprintingtop, string column_type/*, EbReport report*/)
@@ -303,12 +306,12 @@ namespace ExpressBase.Objects.ReportRelated
     this.BorderColor = '#aaaaaa'
 };";
         }
-        public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, float rowH)
+        public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, EbReport report)
         {
             var urx = this.Width + this.Left;
-            var ury = reportHeight - (printingTop + this.Top + detailprintingtop);
+            var ury = reportHeight - (printingTop + this.Top + report.detailprintingtop);
             var llx = this.Left;
-            var lly = reportHeight - (printingTop + this.Top + this.Height + detailprintingtop + rowH);
+            var lly = reportHeight - (printingTop + this.Top + this.Height + report.detailprintingtop + report.RowHeight);
 
             ColumnText ct = new ColumnText(canvas);
             ct.Canvas.SetColorFill(GetColor(this.ForeColor));
