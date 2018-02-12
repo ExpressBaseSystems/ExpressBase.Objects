@@ -22,31 +22,22 @@ namespace ExpressBase.Objects.ReportRelated
             var x = column_val.Length;
             float k = 0;
             if (column_type == "System.Decimal")
-                column_val = Convert.ToDecimal(column_val).ToString("F" + 5);
+                column_val = Convert.ToDecimal(column_val).ToString("F" + 4);
             ColumnText ct = new ColumnText(canvas);
             ct.Canvas.SetColorFill(GetColor(this.ForeColor));
             var y = new Phrase(column_val);
-           y.Font.Size = 10;
+            y.Font.Size = 12;
 
             var p = y.Font.GetCalculatedBaseFont(false);
             float q = p.GetWidthPoint(column_val, y.Font.CalculatedSize);
             var l = q / column_val.Length;
-            int numberofCharsInALine = Convert.ToInt32(this.Width / l);
-            try
+            int numberofCharsInALine = Convert.ToInt32(Math.Floor(this.Width / l));
+            if (numberofCharsInALine < column_val.Length)
             {
                 if (column_type == "System.Decimal")
-                    column_val = column_val.Substring(0, numberofCharsInALine - 2).Insert(numberofCharsInALine - 2, "xx");
+                    column_val = "###";
             }
-            catch (Exception e)
-            {
-                Console.WriteLine(e); Console.WriteLine("column_val:" + column_val);
-            }
-            //var z = y.Font.CalculatedSize * x;
-            //if (z > Width)
-            //{
-            //    k = (y.Font.CalculatedSize + 5);
-            //    Height += k;
-            //}
+            y = new Phrase(column_val);
 
             var ury = reportHeight - (printingTop + this.Top + detailprintingtop);
             var lly = reportHeight - (printingTop + this.Top + this.Height + detailprintingtop);

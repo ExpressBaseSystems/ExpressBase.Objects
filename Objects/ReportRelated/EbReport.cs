@@ -490,7 +490,7 @@ else {
                         var datatype = GetFieldtDataType(column_name, serialnumber);
                         var val_length = column_val.Length;
                         var phrase = new Phrase(column_val);
-                        phrase.Font.Size = 10;
+                        phrase.Font.Size = 12;
                         var calculatedValueSize = phrase.Font.CalculatedSize * val_length;
                         if (calculatedValueSize > field.Width)
                         {
