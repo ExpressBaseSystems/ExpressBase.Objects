@@ -487,23 +487,26 @@ else {
                         var table = field.Title.Split('.')[0];
                         var column_name = field.Title.Split('.')[1];
                         var column_val = GetFieldtData(column_name, serialnumber);
-                        var datatype = GetFieldtDataType(column_name, serialnumber);
-                        var val_length = column_val.Length;
-                        var phrase = new Phrase(column_val);
-                        phrase.Font.Size = 12;
-                        var calculatedValueSize = phrase.Font.CalculatedSize * val_length;
-                        if (calculatedValueSize > field.Width)
+                        if ((field as EbDataField).RenderInMultiLineForLargeData == true)
                         {
-                            rowsneeded = (datatype == "System.Decimal")?1:Convert.ToInt32(Math.Floor(calculatedValueSize / field.Width));
+                            var datatype = GetFieldtDataType(column_name, serialnumber);
+                            var val_length = column_val.Length;
+                            var phrase = new Phrase(column_val);
+                            phrase.Font.Size = 12;
+                            var calculatedValueSize = phrase.Font.CalculatedSize * val_length;
+                            if (calculatedValueSize > field.Width)
+                            {
+                                rowsneeded = (datatype == "System.Decimal") ? 1 : Convert.ToInt32(Math.Floor(calculatedValueSize / field.Width));
 
-                            if (MultiRowTop == 0)
-                            {
-                                MultiRowTop = field.Top;
-                            }
-                            float k = (phrase.Font.CalculatedSize) * rowsneeded;
-                            if (k > RowHeight)
-                            {
-                                RowHeight = k;
+                                if (MultiRowTop == 0)
+                                {
+                                    MultiRowTop = field.Top;
+                                }
+                                float k = (phrase.Font.CalculatedSize) * rowsneeded;
+                                if (k > RowHeight)
+                                {
+                                    RowHeight = k;
+                                }
                             }
                         }
                     }
