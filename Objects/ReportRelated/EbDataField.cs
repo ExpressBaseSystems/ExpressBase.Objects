@@ -17,6 +17,9 @@ namespace ExpressBase.Objects.ReportRelated
 
         public virtual void NotifyNewPage(bool status) { }
 
+        [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup("General")]
+        [UIproperty]
         public Boolean RenderInMultiLineForLargeData { get; set; }
 
         public override float DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, string column_val, float detailprintingtop, string column_type/*, EbReport report*/)

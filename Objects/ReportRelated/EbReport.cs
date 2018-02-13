@@ -151,11 +151,11 @@ else {
 
         public List<object> WaterMarkList { get; set; }
 
-        //  public RowColletion DataRow { get; set; }
+        public RowColletion DataRow { get; set; }
 
-        public DataSet DataSet { get; set; }
+      //  public DataSet DataSet { get; set; }
 
-        //public ColumnColletion DataColumns { get; set; }
+        public ColumnColletion DataColumns { get; set; }
 
         public bool IsLastpage { get; set; }
 
@@ -253,7 +253,7 @@ else {
         {
             get
             {
-                var rows = (DataSourceRefId != string.Empty) ? DataSet.Tables[0].Rows : null;
+                var rows = (DataSourceRefId != string.Empty) ? DataRow/*DataSet.Tables[0].Rows*/ : null;
                 if (rows != null)
                 {
                     if (rows.Count > 0)
@@ -346,14 +346,14 @@ else {
 
         public string GetFieldtData(string column_name, int i)
         {
-            //return this.DataRow[i - 1][column_name].ToString();
-            return this.DataSet.Tables[0].Rows[i][column_name].ToString();
+           return this.DataRow[i - 1][column_name].ToString();
+           // return this.DataSet.Tables[0].Rows[i][column_name].ToString();
         }
 
         public string GetFieldtDataType(string column_name, int i)
         {
-            //return this.DataRow[i - 1][column_name].ToString();
-            return this.DataSet.Tables[0].Rows[i][column_name].GetType().ToString();
+            return this.DataRow[i - 1][column_name].GetType().ToString();
+            //return this.DataSet.Tables[0].Rows[i][column_name].GetType().ToString();
         }
 
         public void DrawWaterMark(PdfReader pdfReader, Document d, PdfWriter writer)
@@ -437,7 +437,7 @@ else {
 
         public void DrawDetail()
         {
-            var rows = (DataSourceRefId != string.Empty) ? DataSet.Tables[0].Rows : null;
+            var rows = (DataSourceRefId != string.Empty) ? DataRow/* DataSet.Tables[0].Rows */: null;
             if (rows != null)
             {
                 for (iDetailRowPos = 0; iDetailRowPos < rows.Count; iDetailRowPos++)
