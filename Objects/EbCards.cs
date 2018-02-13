@@ -38,21 +38,6 @@ namespace ExpressBase.Objects
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
 
-        //public void InitFromDataBase(JsonServiceClient ServiceClient)
-        //{
-        //    for (int i = 0; i < 2; i++)
-        //    {
-        //        EbCard Card = new EbCard();
-        //        Card.Name = i+" label from DS";
-        //        Card.Label = i + " labelfrom DS";
-        //        Card.ContentHTML = i + " ContentHTML from DS";
-        //        Card.ImageID = i + " ImageURL from DS";
-        //        //Card.BareControlHtml = Card.GetBareHtml();
-        //        this.CardCollection.Add(Card);
-        //    }
-        //}
-
-
         public void InitFromDataBase(JsonServiceClient ServiceClient)
         {
 
@@ -92,7 +77,7 @@ this.Init = function(id)
         public override string GetBareHtml()
         {
             string html = @"
-                <div id='@name@'class='cards-cont'>"
+                <div id='@name@' class='cards-cont'>"
 .Replace("@name@", (this.Name != null) ? this.Name : "@name@");
             foreach (EbCard ec in this.CardCollection)
                 html += ec.GetHtml();
