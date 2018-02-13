@@ -15,6 +15,11 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.Collection)]
         public List<EbLocation> LocationCollection { get; set; }
 
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+        [PropertyEditor(PropertyEditorType.Boolean)]
+        public bool showTabed { get; set; }
+
         public EbLocations()
         {
             this.LocationCollection = new List<EbLocation>();
@@ -36,15 +41,28 @@ this.Init = function(id)
     this.LocationCollection.push(new EbObjects.EbLocation(id + '_loc1'));
 };";
         }
+        
+        private string getOptDD()
+        {
+            string optHTML = "<select class='loc-opt-DD'>";
+
+            foreach (EbLocation ec in this.LocationCollection)
+                optHTML += "<option class='loc-opt-btn' value='@name@' for='@name@' >@optName@</option>"
+.Replace("@optName@", (ec.ShortName == null || ec.ShortName.Trim() == string.Empty) ? ec.Label.Split(" ")[0] : ec.ShortName)
+.Replace("@name@", ec.Name);
+
+            return optHTML + "</select>";
+        }
 
         private string getOptButtons()
         {
-            string optHTML =string.Empty;
+            string optHTML = string.Empty;
 
             foreach (EbLocation ec in this.LocationCollection)
-                optHTML += "<div class='loc-opt-btn' tabindex='0' style='width:@width@%;'>@optName@</div>"
+                optHTML += "<div class='loc-opt-btn' for='@name@' tabindex='0' style='width:@width@%;'>@optName@</div>"
 .Replace("@optName@", (ec.ShortName == null || ec.ShortName.Trim() == string.Empty) ? ec.Label.Split(" ")[0] : ec.ShortName)
-.Replace("@width@",(100/this.LocationCollection.Count).ToString());
+.Replace("@width@", (100 / this.LocationCollection.Count).ToString())
+.Replace("@name@", ec.Name);
 
             return optHTML;
         }
@@ -64,7 +82,7 @@ this.Init = function(id)
                             @options@
                     </div>"
 .Replace("@name@", (this.Name != null) ? this.Name : "@name@")
-.Replace("@options@", this.getOptButtons());
+.Replace("@options@", (this.showTabed == true) ? this.getOptButtons() : this.getOptDD());
 
             foreach (EbLocation ec in this.LocationCollection)
                 html += ec.GetHtml();
@@ -98,6 +116,9 @@ this.Init = function(id)
         //public LatLng Lat_Long { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+        public string ContentHTML { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.Expandable)]
         public string ShortName { get; set; }
 
@@ -116,7 +137,8 @@ this.Init = function(id)
     </div>
 </div>"
 .Replace("@name@", (this.Name != null) ? this.Name : "@name@")
-.Replace("@Label@", this.Label);
+.Replace("@Label@", this.Label)
+.Replace("@ContentHTML@", this.ContentHTML);
         }
 
         public override string GetHtml()
