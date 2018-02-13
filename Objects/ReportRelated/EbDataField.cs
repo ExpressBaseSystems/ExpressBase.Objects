@@ -17,25 +17,29 @@ namespace ExpressBase.Objects.ReportRelated
 
         public virtual void NotifyNewPage(bool status) { }
 
+        public Boolean RenderInMultiLineForLargeData { get; set; }
+
         public override float DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, string column_val, float detailprintingtop, string column_type/*, EbReport report*/)
         {
             var x = column_val.Length;
             float k = 0;
-            if (column_type == "System.Decimal")
-                column_val = Convert.ToDecimal(column_val).ToString("F" + 4);
+            //if (column_type == "System.Decimal")
+            //    column_val = Convert.ToDecimal(column_val).ToString("F" + 4);
             ColumnText ct = new ColumnText(canvas);
             ct.Canvas.SetColorFill(GetColor(this.ForeColor));
             var y = new Phrase(column_val);
             y.Font.Size = 12;
-
-            var p = y.Font.GetCalculatedBaseFont(false);
-            float q = p.GetWidthPoint(column_val, y.Font.CalculatedSize);
-            var l = q / column_val.Length;
-            int numberofCharsInALine = Convert.ToInt32(Math.Floor(this.Width / l));
-            if (numberofCharsInALine < column_val.Length)
+            if (this.RenderInMultiLineForLargeData == true)
             {
-                if (column_type == "System.Decimal")
-                    column_val = "###";
+                var p = y.Font.GetCalculatedBaseFont(false);
+                float q = p.GetWidthPoint(column_val, y.Font.CalculatedSize);
+                var l = q / column_val.Length;
+                int numberofCharsInALine = Convert.ToInt32(Math.Floor(this.Width / l));
+                if (numberofCharsInALine < column_val.Length)
+                {
+                    if (column_type == "System.Decimal")
+                        column_val = "###";
+                }
             }
             y = new Phrase(column_val);
 
