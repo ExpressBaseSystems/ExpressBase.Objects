@@ -50,10 +50,10 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public EbDateType EbDateType { get; set; }
 
-        [EnableInBuilder(BuilderType.BotForm)]
+        //[EnableInBuilder(BuilderType.BotForm)]
         public DateTime Min { get; set; }
 
-        [EnableInBuilder( BuilderType.BotForm)]
+        //[EnableInBuilder( BuilderType.BotForm)]
         public DateTime Max { get; set; }
 
         //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]

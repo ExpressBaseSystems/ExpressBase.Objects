@@ -48,7 +48,7 @@ this.Init = function(id)
 
             foreach (EbLocation ec in this.LocationCollection)
                 optHTML += "<option class='loc-opt-btn' value='@name@' for='@name@' >@optName@</option>"
-.Replace("@optName@", (ec.ShortName == null || ec.ShortName.Trim() == string.Empty) ? ec.Label.Split(" ")[0] : ec.ShortName)
+.Replace("@optName@", (ec.ShortName != null) ? ((ec.ShortName.Trim() == string.Empty) ? ec.Label.Split(" ")[0] : ec.ShortName) : "@ShortName@")
 .Replace("@name@", ec.Name);
 
             return optHTML + "</select>";
@@ -60,7 +60,7 @@ this.Init = function(id)
 
             foreach (EbLocation ec in this.LocationCollection)
                 optHTML += "<div class='loc-opt-btn' for='@name@' tabindex='0' style='width:@width@%;'>@optName@</div>"
-.Replace("@optName@", (ec.ShortName == null || ec.ShortName.Trim() == string.Empty) ? ec.Label.Split(" ")[0] : ec.ShortName)
+.Replace("@optName@", (ec.ShortName != null) ?( (ec.ShortName.Trim() == string.Empty) ? ec.Label.Split(" ")[0] : ec.ShortName) :"@ShortName@")
 .Replace("@width@", (100 / this.LocationCollection.Count).ToString())
 .Replace("@name@", ec.Name);
 
@@ -119,7 +119,6 @@ this.Init = function(id)
         public string ContentHTML { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
-        [PropertyEditor(PropertyEditorType.Expandable)]
         public string ShortName { get; set; }
 
         public EbLocation() { }
