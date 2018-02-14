@@ -479,9 +479,10 @@ else {
 
             foreach (EbReportDetail detail in Detail)
             {
-                List<EbReportField> SortedList = detail.Fields.OrderBy(o => o.Top).ToList();
-                foreach (EbReportField field in SortedList)
+                var SortedList = detail.Fields.OrderBy(o => o.Top).ToArray();
+                for(int iSortPos = 0; iSortPos < SortedList.Length; iSortPos++)
                 {
+                    var field = SortedList[iSortPos];
                     if (field is EbDataField && !(field is IEbDataFieldSummary))
                     {
                         var table = field.Title.Split('.')[0];
@@ -512,8 +513,9 @@ else {
                     }
                 }
 
-                foreach (EbReportField field in SortedList)
+                for (int iSortPos = 0; iSortPos < SortedList.Length; iSortPos++)
                 {
+                    var field = SortedList[iSortPos];
                     field.Height += RowHeight;
                     w = DrawFields(field, dt_Yposition, serialnumber);
                 }
