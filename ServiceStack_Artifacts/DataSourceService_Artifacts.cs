@@ -48,7 +48,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int UserId { get; set; }
 
         [DataMember(Order = 10)]
-        public List<Dictionary<string, string>> Params { get; set; }
+        public List<Dictionary<string, object>> Params { get; set; }
 
         [DataMember(Order = 11)]
         public List<Dictionary<string, string>> TFilters { get; set; }
@@ -87,7 +87,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int UserId { get; set; }
 
         [DataMember(Order = 10)]
-        public List<Dictionary<string, string>> Params { get; set; }
+        public List<Dictionary<string, object>> Params { get; set; }
 
         [DataMember(Order = 11)]
         public List<Dictionary<string, string>> TFilters { get; set; }
@@ -123,7 +123,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int UserId { get; set; }
 
         [DataMember(Order = 9)]
-        public List<Dictionary<string, string>> Params { get; set; }
+        public List<Dictionary<string, object>> Params { get; set; }
 
         [DataMember(Order = 10)]
         public string CrossDomain { get; set; }
