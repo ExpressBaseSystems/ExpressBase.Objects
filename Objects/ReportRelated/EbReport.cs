@@ -346,13 +346,13 @@ else {
 
         public string GetFieldtData(string column_name, int i)
         {
-           return this.DataRow[i - 1][column_name].ToString();
+           return this.DataRow[i][column_name].ToString();
            // return this.DataSet.Tables[0].Rows[i][column_name].ToString();
         }
 
         public string GetFieldtDataType(string column_name, int i)
         {
-            return this.DataRow[i - 1][column_name].GetType().ToString();
+            return this.DataRow[i][column_name].GetType().ToString();
             //return this.DataSet.Tables[0].Rows[i][column_name].GetType().ToString();
         }
 
