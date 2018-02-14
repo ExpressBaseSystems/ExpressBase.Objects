@@ -346,13 +346,13 @@ else {
 
         public string GetFieldtData(string column_name, int i)
         {
-           return this.DataRow[i - 1][column_name].ToString();
+           return this.DataRow[i][column_name].ToString();
            // return this.DataSet.Tables[0].Rows[i][column_name].ToString();
         }
 
         public string GetFieldtDataType(string column_name, int i)
         {
-            return this.DataRow[i - 1][column_name].GetType().ToString();
+            return this.DataRow[i][column_name].GetType().ToString();
             //return this.DataSet.Tables[0].Rows[i][column_name].GetType().ToString();
         }
 
@@ -479,9 +479,10 @@ else {
 
             foreach (EbReportDetail detail in Detail)
             {
-                List<EbReportField> SortedList = detail.Fields.OrderBy(o => o.Top).ToList();
-                foreach (EbReportField field in SortedList)
+                var SortedList = detail.Fields.OrderBy(o => o.Top).ToArray();
+                for(int iSortPos = 0; iSortPos < SortedList.Length; iSortPos++)
                 {
+                    var field = SortedList[iSortPos];
                     if (field is EbDataField && !(field is IEbDataFieldSummary))
                     {
                         var table = field.Title.Split('.')[0];
@@ -512,8 +513,9 @@ else {
                     }
                 }
 
-                foreach (EbReportField field in SortedList)
+                for (int iSortPos = 0; iSortPos < SortedList.Length; iSortPos++)
                 {
+                    var field = SortedList[iSortPos];
                     field.Height += RowHeight;
                     w = DrawFields(field, dt_Yposition, serialnumber);
                 }
