@@ -20,6 +20,21 @@ namespace ExpressBase.Objects.ReportRelated
         [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("General")]
         [UIproperty]
+        public int DbType { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup("General")]
+        [UIproperty]
+        public int TableIndex { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup("General")]
+        [UIproperty]
+        public string ColumnName{ get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup("General")]
+        [UIproperty]
         public Boolean RenderInMultiLineForLargeData { get; set; }
 
         public override float DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, string column_val, float detailprintingtop, string column_type/*, EbReport report*/)
