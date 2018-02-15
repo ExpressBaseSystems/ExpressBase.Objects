@@ -267,8 +267,11 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 	{
 		[DataMember(Order = 1)]
 		public string email { get; set; }
-	}
 
+		[DataMember(Order = 2)]
+		public string roleName { get; set; }
+	}
+	
 	//USER GROUP STRAT--------------------------------------
 	[DataContract]
 	public class GetManageUserGroupRequest : IReturn<GetManageUserGroupResponse>, IEbSSRequest
