@@ -24,11 +24,7 @@ namespace ExpressBase.Objects
 {
     public enum ChartType
     {
-        Bar,
-        Line,
-        Pie,
-        doughnut,
-        AreaFilled,
+        Default,
         GoogleMap
     }
 
@@ -67,7 +63,7 @@ namespace ExpressBase.Objects
 
     public abstract class EbDataVisualization : EbDataVisualizationObject
     {
-
+        
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iDataSource)]
@@ -331,6 +327,9 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
     public class EbChartVisualization : EbDataVisualization
     {
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public ChartType Charttype { get; set; }
         [OnDeserialized]
         public void OnDeserializedMethod(StreamingContext context)
         {
