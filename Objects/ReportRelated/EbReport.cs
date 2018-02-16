@@ -153,7 +153,7 @@ else {
 
         public RowColletion DataRow { get; set; }
 
-      //  public DataSet DataSet { get; set; }
+        //  public DataSet DataSet { get; set; }
 
         public ColumnColletion DataColumns { get; set; }
 
@@ -346,13 +346,13 @@ else {
 
         public string GetFieldtData(string column_name, int i)
         {
-           return this.DataRow[i][column_name].ToString();
-           // return this.DataSet.Tables[0].Rows[i][column_name].ToString();
+            return this.DataRow[i][column_name].ToString();
+            // return this.DataSet.Tables[0].Rows[i][column_name].ToString();
         }
 
-        public string GetFieldtDataType(string column_name, int i)
+        public DbType GetFieldtDataType(string column_name)
         {
-            return this.DataRow[i][column_name].GetType().ToString();
+            return (DbType)this.DataRow.Table.Columns[column_name].Type;
             //return this.DataSet.Tables[0].Rows[i][column_name].GetType().ToString();
         }
 
@@ -454,16 +454,45 @@ else {
                         DoLoopInDetail(iDetailRowPos);
                     }
                 }
-                if (iDetailRowPos == rows.Count - 1)
-                {
-                    IsLastpage = true;
-                    // Report.CalculateDetailHeight(Report.IsLastpage, __datarows, Report.PageNumber);
-                }
+
+                IsLastpage = true;
             }
             else
             {
                 IsLastpage = true;
                 DoLoopInDetail(0);
+            }
+        }
+
+        private Dictionary<EbReportDetail, EbDataField[]> __fieldsNotSummaryPerDetail = null;
+        private Dictionary<EbReportDetail, EbDataField[]> FieldsNotSummaryPerDetail
+        {
+            get
+            {
+                if (__fieldsNotSummaryPerDetail == null)
+                {
+                    __fieldsNotSummaryPerDetail = new Dictionary<EbReportDetail, EbDataField[]>();
+                    foreach (EbReportDetail detail in Detail)
+                        __fieldsNotSummaryPerDetail[detail] = detail.Fields.Where(x => (x is EbDataField && !(x is IEbDataFieldSummary))).OrderBy(o => o.Top).Cast<EbDataField>().ToArray();
+                }
+
+                return __fieldsNotSummaryPerDetail;
+            }
+        }
+
+        private Dictionary<EbReportDetail, EbReportField[]> __reportFieldsSortedPerDetail = null;
+        private Dictionary<EbReportDetail, EbReportField[]> ReportFieldsSortedPerDetail
+        {
+            get
+            {
+                if (__reportFieldsSortedPerDetail == null)
+                {
+                    __reportFieldsSortedPerDetail = new Dictionary<EbReportDetail, EbReportField[]>();
+                    foreach (EbReportDetail detail in Detail)
+                        __reportFieldsSortedPerDetail[detail] = detail.Fields.OrderBy(o => o.Top).ToArray();
+                }
+
+                return __reportFieldsSortedPerDetail;
             }
         }
 
@@ -479,43 +508,41 @@ else {
 
             foreach (EbReportDetail detail in Detail)
             {
-                var SortedList = detail.Fields.OrderBy(o => o.Top).ToArray();
-                for(int iSortPos = 0; iSortPos < SortedList.Length; iSortPos++)
+                var SortedList = this.FieldsNotSummaryPerDetail[detail];
+                for (int iSortPos = 0; iSortPos < SortedList.Length; iSortPos++)
                 {
                     var field = SortedList[iSortPos];
-                    if (field is EbDataField && !(field is IEbDataFieldSummary))
+                    var table = field.Title.Split('.')[0];
+                    var column_name = field.Title.Split('.')[1];
+                    var column_val = GetFieldtData(column_name, serialnumber);
+                    if ((field as EbDataField).RenderInMultiLineForLargeData == true)
                     {
-                        var table = field.Title.Split('.')[0];
-                        var column_name = field.Title.Split('.')[1];
-                        var column_val = GetFieldtData(column_name, serialnumber);
-                        if ((field as EbDataField).RenderInMultiLineForLargeData == true)
+                        var datatype = GetFieldtDataType(column_name);
+                        var val_length = column_val.Length;
+                        var phrase = new Phrase(column_val);
+                        phrase.Font.Size = 12;
+                        var calculatedValueSize = phrase.Font.CalculatedSize * val_length;
+                        if (calculatedValueSize > field.Width)
                         {
-                            var datatype = GetFieldtDataType(column_name, serialnumber);
-                            var val_length = column_val.Length;
-                            var phrase = new Phrase(column_val);
-                            phrase.Font.Size = 12;
-                            var calculatedValueSize = phrase.Font.CalculatedSize * val_length;
-                            if (calculatedValueSize > field.Width)
-                            {
-                                rowsneeded = (datatype == "System.Decimal") ? 1 : Convert.ToInt32(Math.Floor(calculatedValueSize / field.Width));
+                            rowsneeded = (datatype == DbType.Decimal) ? 1 : Convert.ToInt32(Math.Floor(calculatedValueSize / field.Width));
 
-                                if (MultiRowTop == 0)
-                                {
-                                    MultiRowTop = field.Top;
-                                }
-                                float k = (phrase.Font.CalculatedSize) * rowsneeded;
-                                if (k > RowHeight)
-                                {
-                                    RowHeight = k;
-                                }
+                            if (MultiRowTop == 0)
+                            {
+                                MultiRowTop = field.Top;
+                            }
+                            float k = (phrase.Font.CalculatedSize) * rowsneeded;
+                            if (k > RowHeight)
+                            {
+                                RowHeight = k;
                             }
                         }
                     }
                 }
 
-                for (int iSortPos = 0; iSortPos < SortedList.Length; iSortPos++)
+                var SortedReportFields = this.ReportFieldsSortedPerDetail[detail];
+                for (int iSortPos = 0; iSortPos < SortedReportFields.Length; iSortPos++)
                 {
-                    var field = SortedList[iSortPos];
+                    var field = SortedReportFields[iSortPos];
                     field.Height += RowHeight;
                     w = DrawFields(field, dt_Yposition, serialnumber);
                 }
@@ -565,7 +592,7 @@ else {
             float p = 0;
             var column_name = string.Empty;
             var column_val = string.Empty;
-            var column_type = string.Empty;
+            var column_type = DbType.String;
             if (PageSummaryFields.ContainsKey(field.Title) || ReportSummaryFields.ContainsKey(field.Title))
                 CallSummerize(field.Title, serialnumber);
             if (field is EbDataField)
@@ -573,14 +600,14 @@ else {
                 if (field is IEbDataFieldSummary)
                 {
                     column_val = (field as IEbDataFieldSummary).SummarizedValue.ToString();
-                    column_type = "System.String";
+                    column_type = DbType.String;
                 }
                 else
                 {
                     var table = field.Title.Split('.')[0];
                     column_name = field.Title.Split('.')[1];
                     column_val = GetFieldtData(column_name, serialnumber);
-                    column_type = GetFieldtDataType(column_name, serialnumber);
+                    column_type = GetFieldtDataType(column_name);
                 }
                 p = field.DrawMe(Canvas, Height, section_Yposition, column_val, detailprintingtop, column_type);
             }

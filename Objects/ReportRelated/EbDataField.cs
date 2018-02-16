@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
+using System.Data;
 
 namespace ExpressBase.Objects.ReportRelated
 {
@@ -22,7 +23,7 @@ namespace ExpressBase.Objects.ReportRelated
         [UIproperty]
         public Boolean RenderInMultiLineForLargeData { get; set; }
 
-        public override float DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, string column_val, float detailprintingtop, string column_type/*, EbReport report*/)
+        public override float DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, string column_val, float detailprintingtop, DbType column_type/*, EbReport report*/)
         {
             var x = column_val.Length;
             float k = 0;
@@ -40,7 +41,7 @@ namespace ExpressBase.Objects.ReportRelated
                 int numberofCharsInALine = Convert.ToInt32(Math.Floor(this.Width / l));
                 if (numberofCharsInALine < column_val.Length)
                 {
-                    if (column_type == "System.Decimal")
+                    if (column_type == DbType.Decimal)
                         column_val = "###";
                 }
             }
