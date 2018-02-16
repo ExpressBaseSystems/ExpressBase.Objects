@@ -329,6 +329,8 @@ namespace ExpressBase.Objects
     {
 
         [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.DropDown)]
+        [DefaultPropValue("0")]
         public ChartType Charttype { get; set; }
         [OnDeserialized]
         public void OnDeserializedMethod(StreamingContext context)
@@ -438,6 +440,11 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.DVBuilder)]
     public class EbGoogleMap : EbDataVisualization
     {
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.DropDown)]
+        [DefaultPropValue("1")]
+        public ChartType Charttype { get; set; }
+
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
         [Alias("Longitude")]
