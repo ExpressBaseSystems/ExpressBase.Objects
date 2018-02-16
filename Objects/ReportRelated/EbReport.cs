@@ -350,11 +350,11 @@ else {
             // return this.DataSet.Tables[0].Rows[i][column_name].ToString();
         }
 
-        public DbType GetFieldtDataType(string column_name)
-        {
-            return (DbType)this.DataRow.Table.Columns[column_name].Type;
-            //return this.DataSet.Tables[0].Rows[i][column_name].GetType().ToString();
-        }
+        //public DbType GetFieldtDataType(string column_name)
+        //{
+        //    return (DbType)this.DataRow.Table.Columns[column_name].Type;
+        //    //return this.DataSet.Tables[0].Rows[i][column_name].GetType().ToString();
+        //}
 
         public void DrawWaterMark(PdfReader pdfReader, Document d, PdfWriter writer)
         {
@@ -512,12 +512,12 @@ else {
                 for (int iSortPos = 0; iSortPos < SortedList.Length; iSortPos++)
                 {
                     var field = SortedList[iSortPos];
-                    var table = field.Title.Split('.')[0];
-                    var column_name = field.Title.Split('.')[1];
+                    var table = field.TableIndex;
+                    var column_name = field.ColumnName;
                     var column_val = GetFieldtData(column_name, serialnumber);
                     if ((field as EbDataField).RenderInMultiLineForLargeData == true)
                     {
-                        var datatype = GetFieldtDataType(column_name);
+                        var datatype = (DbType)field.DbType;
                         var val_length = column_val.Length;
                         var phrase = new Phrase(column_val);
                         phrase.Font.Size = 12;
@@ -593,24 +593,24 @@ else {
             var column_name = string.Empty;
             var column_val = string.Empty;
             var column_type = DbType.String;
+
             if (PageSummaryFields.ContainsKey(field.Title) || ReportSummaryFields.ContainsKey(field.Title))
                 CallSummerize(field.Title, serialnumber);
+
             if (field is EbDataField)
             {
+                column_type = (DbType)(field as EbDataField).DbType;
+                var table = (field as EbDataField).TableIndex;
+                column_name = (field as EbDataField).ColumnName;
+
                 if (field is IEbDataFieldSummary)
-                {
                     column_val = (field as IEbDataFieldSummary).SummarizedValue.ToString();
-                    column_type = DbType.String;
-                }
                 else
-                {
-                    var table = field.Title.Split('.')[0];
-                    column_name = field.Title.Split('.')[1];
                     column_val = GetFieldtData(column_name, serialnumber);
-                    column_type = GetFieldtDataType(column_name);
-                }
+
                 p = field.DrawMe(Canvas, Height, section_Yposition, column_val, detailprintingtop, column_type);
             }
+
             if ((field is EbPageNo) || (field is EbPageXY) || (field is EbDateTime) || (field is EbSerialNumber))
             {
                 if (field is EbPageNo)
@@ -646,6 +646,7 @@ else {
                 column_val = GetFieldtData(column_name, serialnumber);
                 field.DrawMe(Doc, Canvas, Height, section_Yposition, detailprintingtop, column_val);
             }
+
             return p;
         }
         public EbReport()

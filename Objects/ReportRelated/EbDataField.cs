@@ -56,7 +56,7 @@ namespace ExpressBase.Objects.ReportRelated
                 int numberofCharsInALine = Convert.ToInt32(Math.Floor(this.Width / l));
                 if (numberofCharsInALine < column_val.Length)
                 {
-                    if (column_type == DbType.Decimal)
+                    if (column_type == System.Data.DbType.Decimal)
                         column_val = "###";
                 }
             }
