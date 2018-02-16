@@ -58,7 +58,7 @@ namespace ExpressBase.Objects
 
         public override string GetBareHtml()
         {
-            string html = "<div id='@name@' name='@name@'>";
+            string html = "<div id='@name@' name='@name@' type='RadioGroup'>";
               foreach (EbRadioOption ec in this.Options)
             {
                 ec.GName = this.Name;
@@ -129,9 +129,9 @@ this.Init = function(id)
         {
             return @"<div><input type ='radio' id='@name@' value='@value@' name='@gname@'> <span id='@name@Lbl' style='@LabelBackColor @LabelForeColor '> @label@  </span><br></div>"
 .Replace("@name@", this.Name)
-.Replace("@gname@", this.Name)
+.Replace("@gname@", this.GName)
 .Replace("@label@", this.Label)
-.Replace("@label@", this.Value);
+.Replace("@value@", this.Value);
         }
 
         public override string GetHtml()
