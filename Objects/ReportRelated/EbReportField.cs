@@ -10,6 +10,7 @@ using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 using QRCoder;
+using System.Data;
 
 namespace ExpressBase.Objects.ReportRelated
 {
@@ -45,7 +46,7 @@ namespace ExpressBase.Objects.ReportRelated
         public virtual void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, EbReport report)
         {
         }
-        public virtual float DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, string column_name, float detailprintingtop, string column_type/*, EbReport report*/)
+        public virtual float DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, string column_name, float detailprintingtop, DbType column_type/*, EbReport report*/)
         {
             return 0;
         }
