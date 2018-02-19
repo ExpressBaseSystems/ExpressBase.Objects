@@ -473,7 +473,7 @@ else {
                 {
                     __fieldsNotSummaryPerDetail = new Dictionary<EbReportDetail, EbDataField[]>();
                     foreach (EbReportDetail detail in Detail)
-                        __fieldsNotSummaryPerDetail[detail] = detail.Fields.Where(x => (x is EbDataField && !(x is IEbDataFieldSummary))).OrderBy(o => o.Top).Cast<EbDataField>().ToArray();
+                        __fieldsNotSummaryPerDetail[detail] = detail.Fields.Where(x => (x is EbDataField && !(x is IEbDataFieldSummary) && !(x is EbCalcField))).OrderBy(o => o.Top).Cast<EbDataField>().ToArray();
                 }
 
                 return __fieldsNotSummaryPerDetail;
@@ -593,6 +593,7 @@ else {
             var column_name = string.Empty;
             var column_val = string.Empty;
             var column_type = DbType.String;
+            string[] _dtaFieldsUsed;
 
             if (PageSummaryFields.ContainsKey(field.Title) || ReportSummaryFields.ContainsKey(field.Title))
                 CallSummerize(field.Title, serialnumber);
@@ -602,8 +603,9 @@ else {
                 column_type = (DbType)(field as EbDataField).DbType;
                 var table = (field as EbDataField).TableIndex;
                 column_name = (field as EbDataField).ColumnName;
-
-                if (field is IEbDataFieldSummary)
+                if (field is EbCalcField)
+                    _dtaFieldsUsed = (field as EbCalcField).DataFieldsUsed;
+                else if (field is IEbDataFieldSummary)
                     column_val = (field as IEbDataFieldSummary).SummarizedValue.ToString();
                 else
                     column_val = GetFieldtData(column_name, serialnumber);
