@@ -328,7 +328,112 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		[DataMember(Order = 2)]
 		public string roleName { get; set; }
 	}
-	
+
+
+
+	//ANONYMOUS USER START-----------------------------------------
+	[DataContract]
+	public class GetManageAnonymousUserRequest : IReturn<GetManageAnonymousUserResponse>, IEbSSRequest
+	{
+
+		[DataMember(Order = 1)]
+		public int Id { get; set; }
+
+		[DataMember(Order = 2)]
+		public string TenantAccountId { get; set; }
+
+		public int UserId { get; set; }
+
+		public string Token { get; set; }
+	}
+
+	[DataContract]
+	public class GetManageAnonymousUserResponse : IEbSSResponse
+	{
+		[DataMember(Order = 1)]
+		public Dictionary<string, string> UserData { get; set; }
+		
+		[DataMember(Order = 2)]
+		public string Token { get; set; }
+
+		[DataMember(Order = 3)]
+		public ResponseStatus ResponseStatus { get; set; }		
+	}
+
+	[DataContract]
+	public class UpdateAnonymousUserRequest : IReturn<UpdateAnonymousUserResponse>, IEbSSRequest
+	{
+		[DataMember(Order = 1)]
+		public int Id { get; set; }
+
+		[DataMember(Order = 2)]
+		public string FullName { get; set; }
+
+		[DataMember(Order = 3)]
+		public string EmailID { get; set; }
+
+		[DataMember(Order = 4)]
+		public string PhoneNumber { get; set; }
+
+		[DataMember(Order = 5)]
+		public string Remarks { get; set; }
+
+		[DataMember(Order = 6)]
+		public string TenantAccountId { get; set; }
+
+		public int UserId { get; set; }
+
+		public string Token { get; set; }
+	}
+
+	[DataContract]
+	public class UpdateAnonymousUserResponse : IEbSSResponse
+	{
+		[DataMember(Order = 1)]
+		public int RowAffected { get; set; }
+
+		[DataMember(Order = 2)]
+		public ResponseStatus ResponseStatus { get; set; }
+	}
+
+	[DataContract]
+	public class ConvertAnonymousUserRequest : IReturn<ConvertAnonymousUserResponse>, IEbSSRequest
+	{
+		[DataMember(Order = 1)]
+		public int Id { get; set; }
+
+		[DataMember(Order = 2)]
+		public string FullName { get; set; }
+
+		[DataMember(Order = 3)]
+		public string EmailID { get; set; }
+
+		[DataMember(Order = 4)]
+		public string PhoneNumber { get; set; }
+
+		[DataMember(Order = 5)]
+		public string Remarks { get; set; }
+
+		[DataMember(Order = 6)]
+		public string TenantAccountId { get; set; }
+
+		public int UserId { get; set; }
+
+		public string Token { get; set; }
+	}
+
+	[DataContract]
+	public class ConvertAnonymousUserResponse : IEbSSResponse
+	{
+		[DataMember(Order = 1)]
+		public int status { get; set; }
+
+		[DataMember(Order = 2)]
+		public ResponseStatus ResponseStatus { get; set; }
+	}
+
+
+
 	//USER GROUP STRAT--------------------------------------
 	[DataContract]
 	public class GetManageUserGroupRequest : IReturn<GetManageUserGroupResponse>, IEbSSRequest
