@@ -50,6 +50,63 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 	}
 
 	[DataContract]
+	public class GetAnonymousUserRequest : IReturn<GetAnonymousUserResponse>, IEbSSRequest
+	{
+		[DataMember(Order = 1)]
+		public Dictionary<string, object> Colvalues { get; set; }
+		public string Token { get; set; }
+
+		public string TenantAccountId { get; set; }
+
+		public int UserId { get; set; }
+	}
+
+	[DataContract]
+	public class GetAnonymousUserResponse : IEbSSResponse
+	{
+		[DataMember(Order = 1)]
+		public List<Eb_AnonymousUser_ForCommonList> Data { get; set; }
+
+		[DataMember(Order = 2)]
+		public string Token { get; set; }
+
+		[DataMember(Order = 3)]
+		public ResponseStatus ResponseStatus { get; set; }
+	}
+
+	[DataContract]
+	public class Eb_AnonymousUser_ForCommonList
+	{
+		[DataMember(Order = 1)]
+		public int Id;
+
+		[DataMember(Order = 2)]
+		public string Full_Name;
+
+		[DataMember(Order = 3)]
+		public string Social_Id;
+
+		[DataMember(Order = 4)]
+		public string Email_Id;
+
+		[DataMember(Order = 5)]
+		public string Phone_No;
+
+		[DataMember(Order = 6)]
+		public string First_Visit;
+
+		[DataMember(Order = 7)]
+		public string Last_Visit;
+
+		[DataMember(Order = 8)]
+		public int Total_Visits;
+
+		[DataMember(Order = 9)]
+		public string App_Name;
+	}
+
+
+	[DataContract]
 	public class GetUserGroupRequest1 : IReturn<GetUserGroupResponse1>, IEbSSRequest
 	{
 		[DataMember(Order = 1)]
