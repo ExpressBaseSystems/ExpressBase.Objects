@@ -64,22 +64,22 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-    public class EbObjectNonCommitedVersionRequest : EbServiceStackRequest, IReturn<EbObjectNonCommitedVersionResponse>
-    {
-        public string RefId { get; set; }
-    }
+    //public class EbObjectNonCommitedVersionRequest : EbServiceStackRequest, IReturn<EbObjectNonCommitedVersionResponse>
+    //{
+    //    public string RefId { get; set; }
+    //}
 
-    public class EbObjectNonCommitedVersionResponse : IEbSSResponse
-    {
-        [DataMember(Order = 1)]
-        public List<EbObjectWrapper> Data { get; set; }
+    //public class EbObjectNonCommitedVersionResponse : IEbSSResponse
+    //{
+    //    [DataMember(Order = 1)]
+    //    public List<EbObjectWrapper> Data { get; set; }
 
-        [DataMember(Order = 2)]
-        public string Token { get; set; }
+    //    [DataMember(Order = 2)]
+    //    public string Token { get; set; }
 
-        [DataMember(Order = 3)]
-        public ResponseStatus ResponseStatus { get; set; }
-    }
+    //    [DataMember(Order = 3)]
+    //    public ResponseStatus ResponseStatus { get; set; }
+    //}
 
     public class EbObjectLatestCommitedRequest : EbServiceStackRequest, IReturn<EbObjectLatestCommitedResponse>
     {

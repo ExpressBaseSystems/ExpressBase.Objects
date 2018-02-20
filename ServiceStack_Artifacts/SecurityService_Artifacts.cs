@@ -297,6 +297,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public string Hide { get; set; }
 
 		[DataMember(Order = 18)]
+		public string Password { get; set; }
+
+		[DataMember(Order = 18)]
 		public string TenantAccountId { get; set; }
 
 		public int UserId { get; set; }

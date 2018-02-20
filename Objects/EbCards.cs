@@ -66,8 +66,8 @@ namespace ExpressBase.Objects
             return @"
 this.Init = function(id)
 {
-    this.CardCollection.push(new EbObjects.EbCard(id + '_card0'));
-    this.CardCollection.push(new EbObjects.EbCard(id + '_card1'));
+    this.CardCollection.$values.push(new EbObjects.EbCard(id + '_card0'));
+    this.CardCollection.$values.push(new EbObjects.EbCard(id + '_card1'));
 };";
         }
 
@@ -81,7 +81,7 @@ this.Init = function(id)
         public override string GetBareHtml()
         {
             string html = @"
-                <div id='@name@' class='cards-cont' ctype='Cards'>"
+                <div id='@name@' class='cards-cont'>"
 .Replace("@name@", (this.Name != null) ? this.Name : "@name@");
             foreach (EbCard ec in this.CardCollection)
                 html += ec.GetHtml();

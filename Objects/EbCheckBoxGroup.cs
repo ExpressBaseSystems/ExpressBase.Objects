@@ -103,7 +103,7 @@ this.Init = function(id)
 
         public override string GetBareHtml()
         {
-            return @"<div ctype='CheckBoxGroup'><input type ='checkbox' value='@value@' id='@name@' name='@gname@'> <span id='@name@Lbl' style='@LabelBackColor @LabelForeColor '> @label@  </span><br></div>"
+            return @"<div><input type ='checkbox' value='@value@' id='@name@' name='@gname@'> <span id='@name@Lbl' style='@LabelBackColor @LabelForeColor '> @label@  </span><br></div>"
 .Replace("@name@", this.Name)
 .Replace("@gname@", this.GName)
 .Replace("@label@", this.Label)
