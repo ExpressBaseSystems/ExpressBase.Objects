@@ -66,8 +66,8 @@ namespace ExpressBase.Objects
             return @"
 this.Init = function(id)
 {
-    this.CardCollection.push(new EbObjects.EbCard(id + '_card0'));
-    this.CardCollection.push(new EbObjects.EbCard(id + '_card1'));
+    this.CardCollection.$values.push(new EbObjects.EbCard(id + '_card0'));
+    this.CardCollection.$values.push(new EbObjects.EbCard(id + '_card1'));
 };";
         }
 
