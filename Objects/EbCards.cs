@@ -81,7 +81,7 @@ this.Init = function(id)
         public override string GetBareHtml()
         {
             string html = @"
-                <div id='@name@' class='cards-cont'>"
+                <div id='@name@' class='cards-cont' ctype='Cards'>"
 .Replace("@name@", (this.Name != null) ? this.Name : "@name@");
             foreach (EbCard ec in this.CardCollection)
                 html += ec.GetHtml();

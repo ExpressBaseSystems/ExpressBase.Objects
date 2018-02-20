@@ -126,7 +126,7 @@ this.Init = function(id)
         public override string GetBareHtml()
         {
             return @"
-<div id='@name@_Cont' class='location-box'>
+<div id='@name@_Cont' class='location-box' ctype='Locations'>
     <div id='@name@' class='map-div'></div>
     <div class='loc-bottom'>
         <div id='@name@Lbl' class='loc-label' style='@LabelBackColor  @LabelForeColor font-weight: bold'> @Label@ </div>
