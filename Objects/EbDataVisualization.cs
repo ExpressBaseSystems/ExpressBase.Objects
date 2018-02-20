@@ -331,6 +331,30 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.DropDown)]
         [DefaultPropValue("0")]
+        [OnChangeExec(@"
+        if(this.Charttype === 1){
+            pg.HideProperty('XaxisTitle')
+            pg.HideProperty('YaxisTitle')
+            pg.HideProperty('XaxisTitleColor')
+            pg.HideProperty('YaxisTitleColor')
+            pg.HideProperty('XaxisLabelColor')
+            pg.HideProperty('YaxisLabelColor')
+            pg.HideProperty('LegendColor')
+            pg.HideProperty('ShowTooltip')
+            pg.HideProperty('ShowValue')
+        }
+
+        else{
+            pg.ShowProperty('XaxisTitle')
+            pg.ShowProperty('YaxisTitle')
+            pg.ShowProperty('XaxisTitleColor')
+            pg.ShowProperty('YaxisTitleColor')
+            pg.ShowProperty('XaxisLabelColor')
+            pg.ShowProperty('YaxisLabelColor')
+            pg.ShowProperty('LegendColor')
+            pg.ShowProperty('ShowTooltip')
+            pg.ShowProperty('ShowValue')
+        }")]
         public ChartType Charttype { get; set; }
         [OnDeserialized]
         public void OnDeserializedMethod(StreamingContext context)
@@ -364,36 +388,10 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
         public List<DVBaseColumn> Yaxis { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
-        //        [OnChangeExec(@"
-        //if(this.Type !== 'GoogleMap'){
-        //    pg.HideProperty('LattitudeColumn')
-        //    pg.HideProperty('LongitudeColumn')
-        //    pg.HideProperty('MarkerNameColumn')
-        //    pg.HideProperty('DrawRoute')
-        //}
-
-        //else{
-        //    pg.ShowProperty('LattitudeColumn')
-        //    pg.ShowProperty('LongitudeColumn')
-        //    pg.ShowProperty('MarkerNameColumn')
-        //    pg.ShowProperty('DrawRoute')
-        //}")]
+        [EnableInBuilder(BuilderType.DVBuilder)]        
         [HideInPropertyGrid]
         public string Type { get; set; }
-
-        //[EnableInBuilder(BuilderType.DVBuilder)]
-        //public string LattitudeColumn { get; set; }
-
-        //[EnableInBuilder(BuilderType.DVBuilder)]
-        //public string LongitudeColumn { get; set; }
-
-        //[EnableInBuilder(BuilderType.DVBuilder)]
-        //public string MarkerNameColumn { get; set; }
-
-        //[EnableInBuilder(BuilderType.DVBuilder)]
-        //public bool DrawRoute { get; set; }
-
+        
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.Text)]
         [DefaultPropValue("XLabel")]
@@ -438,11 +436,35 @@ namespace ExpressBase.Objects
     }
 
     [EnableInBuilder(BuilderType.DVBuilder)]
-    public class EbGoogleMap : EbDataVisualization
+    public class EbGoogleMap : EbChartVisualization
     {
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.DropDown)]
         [DefaultPropValue("1")]
+        [OnChangeExec(@"
+        if(this.Charttype === 1){
+            pg.HideProperty('XaxisTitle')
+            pg.HideProperty('YaxisTitle')
+            pg.HideProperty('XaxisTitleColor')
+            pg.HideProperty('YaxisTitleColor')
+            pg.HideProperty('XaxisLabelColor')
+            pg.HideProperty('YaxisLabelColor')
+            pg.HideProperty('LegendColor')
+            pg.HideProperty('ShowTooltip')
+            pg.HideProperty('ShowValue')
+        }
+
+        else{
+            pg.ShowProperty('XaxisTitle')
+            pg.ShowProperty('YaxisTitle')
+            pg.ShowProperty('XaxisTitleColor')
+            pg.ShowProperty('YaxisTitleColor')
+            pg.ShowProperty('XaxisLabelColor')
+            pg.ShowProperty('YaxisLabelColor')
+            pg.ShowProperty('LegendColor')
+            pg.ShowProperty('ShowTooltip')
+            pg.ShowProperty('ShowValue')
+        }")]
         public ChartType Charttype { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
@@ -464,8 +486,6 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.DVBuilder)]
         public string MarkerLabel { get; set; }
 
-        [HideInPropertyGrid]
-        public string Type { get; set; }
     }
 
     public class axis

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
 using System.Data;
+using System.Text.RegularExpressions;
 
 namespace ExpressBase.Objects.ReportRelated
 {
@@ -716,6 +717,51 @@ namespace ExpressBase.Objects.ReportRelated
         {
             return "<div class='dropped' $type='@type' eb-type='DataFieldBooleanSummary' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;text-align: @TextAlign ;'> @Title </div>".RemoveCR().DoubleQuoted();
         }
+        public override string GetJsInitFunc()
+        {
+            return @"
+    this.Init = function(id)
+        {
+    this.Height =25;
+    this.Width= 200;
+    this.ForeColor = '#201c1c';
+    this.Border = 1;
+    this.BorderColor = '#aaaaaa'
+};";
+        }
+    }
+
+    [EnableInBuilder(BuilderType.Report)]
+    public class EbCalcField : EbDataField
+    {
+        [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup("General")]
+        [UIproperty]
+        public string Expression { get; set; }
+
+        private string[] _dataFieldsUsed;
+        public string[] DataFieldsUsed
+        {
+            get
+            {
+                if (_dataFieldsUsed == null)
+                {
+                    var matches = Regex.Matches(this.Expression, @"T[0-9]{1}.\w+");
+                    _dataFieldsUsed = new string[matches.Count];
+                    int i = 0;
+                    foreach (Match match in matches) 
+                        _dataFieldsUsed[i++] = match.Value;
+                }
+
+                return _dataFieldsUsed;
+            }
+        }
+
+        public override string GetDesignHtml()
+        {
+            return "<div class='dropped' $type='@type' eb-type='CalcField' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;text-align: @TextAlign ;'> @Title </div>".RemoveCR().DoubleQuoted();
+        }
+
         public override string GetJsInitFunc()
         {
             return @"
