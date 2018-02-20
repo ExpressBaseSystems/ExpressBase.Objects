@@ -167,7 +167,7 @@ $('#{0}').mask('SZZZZZZZZZZZ', {
         public override string GetBareHtml()
         {
             return @" 
-        <div class='input-group' style='width:100%;' ctype='Numeric'>
+        <div class='input-group' style='width:100%;'>
                 <span style='font-size: @fontSize@' class='input-group-addon'>$</span>   
                 <input type='text' data-ebtype='@datetype@' class='numinput' id='@name@' name='@name@' value='@value@' @placeHolder autocomplete = '@autoComplete@' data-toggle='tooltip' title='@toolTipText@' style=' width:100%; @backColor@ @foreColor@ @fontStyle@ display:inline-block; @readOnlyString@ @required@ @tabIndex@ />
         </div>"
