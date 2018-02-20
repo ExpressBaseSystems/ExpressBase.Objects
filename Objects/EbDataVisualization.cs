@@ -480,11 +480,16 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.DVBuilder)]
         public bool ShowRoute { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
-        public bool ShowMarker { get; set; }
+        //[EnableInBuilder(BuilderType.DVBuilder)]
+        //public bool ShowMarker { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
-        public string MarkerLabel { get; set; }
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
+        public List<DVBaseColumn> MarkerLabel { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
+        public List<DVBaseColumn> InfoWindow { get; set; }
 
     }
 
