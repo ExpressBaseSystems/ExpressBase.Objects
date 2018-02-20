@@ -9,6 +9,11 @@ using ExpressBase.Common.EbServiceStack.ReqNRes;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
+    public class RefreshSolutionConnectionsRequest : EbServiceStackRequest
+    {
+        
+    }
+
     public class GetConnectionsRequest : EbServiceStackRequest
     {
         public int ConnectionType { get; set; }

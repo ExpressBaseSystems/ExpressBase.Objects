@@ -4,10 +4,13 @@ using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
+using ExpressBase.Objects.Objects.ReportRelated;
 using ExpressBase.Objects.ReportRelated;
 using ExpressBase.Objects.ServiceStack_Artifacts;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
+using Microsoft.CodeAnalysis.Scripting;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -139,44 +142,66 @@ else {
         [OSE_ObjectTypes(EbObjectTypes.iDataSource)]
         public string DataSourceRefId { get; set; }
 
+        [JsonIgnore]
         public ColumnColletion ColumnColletion { get; set; }
 
+        [JsonIgnore]
         public int iDetailRowPos { get; set; }
 
+        [JsonIgnore]
         public Dictionary<string, List<object>> PageSummaryFields { get; set; }
 
+        [JsonIgnore]
         public Dictionary<string, List<object>> ReportSummaryFields { get; set; }
 
+        [JsonIgnore]
         public Dictionary<string, byte[]> watermarkImages { get; set; }
 
+        [JsonIgnore]
         public List<object> WaterMarkList { get; set; }
 
+        [JsonIgnore]
+        public Dictionary<string,Script> ScriptCollection { get; set; }
+
+        [JsonIgnore]
         public RowColletion DataRow { get; set; }
 
-        //  public DataSet DataSet { get; set; }
+        //  [JsonIgnore]
+        //public DataSet DataSet { get; set; }
 
+        [JsonIgnore]
         public ColumnColletion DataColumns { get; set; }
 
+        [JsonIgnore]
         public bool IsLastpage { get; set; }
 
+        [JsonIgnore]
         public int PageNumber { get; set; }
 
+        [JsonIgnore]
         public DateTime CurrentTimestamp { get; set; }
 
+        [JsonIgnore]
         public PdfContentByte Canvas { get; set; }
 
+        [JsonIgnore]
         public PdfWriter Writer { get; set; }
 
+        [JsonIgnore]
         public Document Doc { get; set; }
 
+        [JsonIgnore]
         public PdfReader PdfReader { get; set; }
 
+        [JsonIgnore]
         public PdfStamper Stamp { get; set; }
 
+        [JsonIgnore]
         public MemoryStream Ms1 { get; set; }
 
         private float _rhHeight = 0;
 
+        [JsonIgnore]
         public float ReportHeaderHeight
         {
             get
@@ -192,6 +217,7 @@ else {
         }
 
         private float _phHeight = 0;
+        [JsonIgnore]
         public float PageHeaderHeight
         {
             get
@@ -206,6 +232,7 @@ else {
         }
 
         private float _pfHeight = 0;
+        [JsonIgnore]
         public float PageFooterHeight
         {
             get
@@ -221,6 +248,7 @@ else {
         }
 
         private float _rfHeight = 0;
+        [JsonIgnore]
         public float ReportFooterHeight
         {
             get
@@ -235,6 +263,7 @@ else {
         }
 
         private float _dtHeight = 0;
+        [JsonIgnore]
         public float DetailHeight
         {
             get
@@ -249,6 +278,7 @@ else {
         }
 
         private float dt_fillheight = 0;
+        [JsonIgnore]
         public float DT_FillHeight
         {
             get
@@ -277,14 +307,19 @@ else {
             }
         }
 
+        [JsonIgnore]
         public EbBaseService ReportService { get; set; }
 
+        [JsonIgnore]
         public EbBaseService FileService { get; set; }
 
+        [JsonIgnore]
         public string SolutionId { get; set; }
 
+        [JsonIgnore]
         public float RowHeight { get; set; }
 
+        [JsonIgnore]
         public float MultiRowTop { get; set; }
 
 
@@ -293,6 +328,8 @@ else {
         private float pf_Yposition;
         private float ph_Yposition;
         private float dt_Yposition;
+
+        [JsonIgnore]
         public float detailprintingtop = 0;
 
         public void InitializeSummaryFields()
@@ -593,7 +630,6 @@ else {
             var column_name = string.Empty;
             var column_val = string.Empty;
             var column_type = DbType.String;
-            string[] _dtaFieldsUsed;
 
             if (PageSummaryFields.ContainsKey(field.Title) || ReportSummaryFields.ContainsKey(field.Title))
                 CallSummerize(field.Title, serialnumber);
@@ -603,8 +639,25 @@ else {
                 column_type = (DbType)(field as EbDataField).DbType;
                 var table = (field as EbDataField).TableIndex;
                 column_name = (field as EbDataField).ColumnName;
+
                 if (field is EbCalcField)
-                    _dtaFieldsUsed = (field as EbCalcField).DataFieldsUsed;
+                {
+                    Globals globals = new Globals();
+                    foreach (string calcfd in (field as EbCalcField).DataFieldsUsed)
+                    {
+                        string TName = calcfd.Split('.')[0];
+                        string fName = calcfd.Split('.')[1];
+                        globals[TName].Add(fName, new NTV { Name = fName, Type = (DbType)this.DataRow.Table.Columns[fName].Type, Value = this.DataRow[serialnumber][fName] });
+                    }
+                    try
+                    { 
+                        column_val=(ScriptCollection[field.Name].RunAsync(globals)).Result.ReturnValue.ToString();
+                    }
+                    catch (Exception e)
+                    {
+
+                    }
+                }
                 else if (field is IEbDataFieldSummary)
                     column_val = (field as IEbDataFieldSummary).SummarizedValue.ToString();
                 else

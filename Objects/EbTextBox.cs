@@ -86,9 +86,14 @@ else {
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         [PropertyGroup("Appearance")]
+        [PropertyEditor(PropertyEditorType.FontSelector)]
+        [DefaultPropValue("defaultfrom decor")]
+        public string FontFamilyT { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+        [PropertyGroup("Appearance")]
         [EbRequired]
         [Unique]
-        [DefaultPropValue("defaultfrom decor")]
         public string Text { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
