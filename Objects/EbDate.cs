@@ -138,7 +138,7 @@ $('#@id').datetimepicker({
         public override string GetBareHtml()
         {
             return @" 
-        <div class='input-group' style='width:100%;' ctype='Date'>
+        <div class='input-group' style='width:100%;'>
             <input id='@name@' data-ebtype='@datetype@'  data-toggle='tooltip' title='@toolTipText@' class='date' type='text'name='@name@' autocomplete = '@autoComplete@' @value@ @tabIndex@ style='width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@ @readOnlyString@ @required@ @placeHolder@ />
             <span class='input-group-addon' onclick=""$('#@name@').focus().focus()""> <i id='@name@TglBtn' class='fa  @atchdLbl@' aria-hidden='true'></i> </span>
         </div>"
