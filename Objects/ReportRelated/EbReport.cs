@@ -8,6 +8,7 @@ using ExpressBase.Objects.ReportRelated;
 using ExpressBase.Objects.ServiceStack_Artifacts;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -139,44 +140,63 @@ else {
         [OSE_ObjectTypes(EbObjectTypes.iDataSource)]
         public string DataSourceRefId { get; set; }
 
+        [JsonIgnore]
         public ColumnColletion ColumnColletion { get; set; }
 
+        [JsonIgnore]
         public int iDetailRowPos { get; set; }
 
+        [JsonIgnore]
         public Dictionary<string, List<object>> PageSummaryFields { get; set; }
 
+        [JsonIgnore]
         public Dictionary<string, List<object>> ReportSummaryFields { get; set; }
 
+        [JsonIgnore]
         public Dictionary<string, byte[]> watermarkImages { get; set; }
 
+        [JsonIgnore]
         public List<object> WaterMarkList { get; set; }
 
+        [JsonIgnore]
         public RowColletion DataRow { get; set; }
 
-        //  public DataSet DataSet { get; set; }
+        //  [JsonIgnore]
+        //public DataSet DataSet { get; set; }
 
+        [JsonIgnore]
         public ColumnColletion DataColumns { get; set; }
 
+        [JsonIgnore]
         public bool IsLastpage { get; set; }
 
+        [JsonIgnore]
         public int PageNumber { get; set; }
 
+        [JsonIgnore]
         public DateTime CurrentTimestamp { get; set; }
 
+        [JsonIgnore]
         public PdfContentByte Canvas { get; set; }
 
+        [JsonIgnore]
         public PdfWriter Writer { get; set; }
 
+        [JsonIgnore]
         public Document Doc { get; set; }
 
+        [JsonIgnore]
         public PdfReader PdfReader { get; set; }
 
+        [JsonIgnore]
         public PdfStamper Stamp { get; set; }
 
+        [JsonIgnore]
         public MemoryStream Ms1 { get; set; }
 
         private float _rhHeight = 0;
 
+        [JsonIgnore]
         public float ReportHeaderHeight
         {
             get
@@ -192,6 +212,7 @@ else {
         }
 
         private float _phHeight = 0;
+        [JsonIgnore]
         public float PageHeaderHeight
         {
             get
@@ -206,6 +227,7 @@ else {
         }
 
         private float _pfHeight = 0;
+        [JsonIgnore]
         public float PageFooterHeight
         {
             get
@@ -221,6 +243,7 @@ else {
         }
 
         private float _rfHeight = 0;
+        [JsonIgnore]
         public float ReportFooterHeight
         {
             get
@@ -235,6 +258,7 @@ else {
         }
 
         private float _dtHeight = 0;
+        [JsonIgnore]
         public float DetailHeight
         {
             get
@@ -249,6 +273,7 @@ else {
         }
 
         private float dt_fillheight = 0;
+        [JsonIgnore]
         public float DT_FillHeight
         {
             get
@@ -277,14 +302,19 @@ else {
             }
         }
 
+        [JsonIgnore]
         public EbBaseService ReportService { get; set; }
 
+        [JsonIgnore]
         public EbBaseService FileService { get; set; }
 
+        [JsonIgnore]
         public string SolutionId { get; set; }
 
+        [JsonIgnore]
         public float RowHeight { get; set; }
 
+        [JsonIgnore]
         public float MultiRowTop { get; set; }
 
 
@@ -293,6 +323,8 @@ else {
         private float pf_Yposition;
         private float ph_Yposition;
         private float dt_Yposition;
+
+        [JsonIgnore]
         public float detailprintingtop = 0;
 
         public void InitializeSummaryFields()
