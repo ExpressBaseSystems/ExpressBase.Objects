@@ -34,7 +34,7 @@ namespace ExpressBase.Objects
         public override string GetBareHtml()
         {
             return @" 
-        <div class='input-group' style='width:100%;' ctype='ImageUploader'>
+        <div class='input-group' style='width:100%;'>
             <input id='@name@txt' type='text' style='width:100%;' onclick=""$('#@name@').click()"" />
             <input id='@name@' data-toggle='tooltip' title='@toolTipText@' type='file' onchange=""$('#@name@txt').val($(this).val())""  accept='image/*' name='@name@' @value@ @tabIndex@ style='display:none; width:100%; @BackColor@ @ForeColor@ @fontStyle@ @readOnlyString@ @required@ />
             <span class='input-group-addon' onclick=""$('#@name@').click()""> <i id='@name@TglBtn' class='fa  fa-picture-o' aria-hidden='true'></i> </span>

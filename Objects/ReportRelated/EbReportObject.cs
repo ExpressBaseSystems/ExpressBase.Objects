@@ -10,6 +10,8 @@ namespace ExpressBase.Objects.ReportRelated
 {
     public class EbReportObject : EbObject
     {
+        public string EbSid { get; set; }
+
         [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("General")]
         new public string Name { get; set; }
