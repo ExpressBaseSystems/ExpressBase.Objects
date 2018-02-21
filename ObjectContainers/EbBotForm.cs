@@ -19,6 +19,11 @@ namespace ExpressBase.Objects
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
 
+        [EnableInBuilder(BuilderType.BotForm)]
+        [PropertyGroup("Data")]
+        [HelpText("Name Of database-table Which you want to store Data collected using this Form")]
+        public string TableName { get; set; }
+
         public bool IsUpdate { get; set; }
 
 
