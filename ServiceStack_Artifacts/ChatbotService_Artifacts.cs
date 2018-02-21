@@ -188,4 +188,22 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ChatBot() { }
     }
 
+    public class CreateBotFormTableRequest : EbServiceStackRequest, IReturn<CreateBotResponse>
+    {
+        [DataMember(Order = 1)]
+        public string  TableName { get; set; }
+
+        [DataMember(Order = 2)]
+        public Dictionary<string, string> Fields { get; set; }
+    }
+
+    public class CreateBotFormTableResponse : IEbSSResponse
+    {
+        [DataMember(Order = 3)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 4)]
+        public string BotId { get; set; }
+    }
+
 }
