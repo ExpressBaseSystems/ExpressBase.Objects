@@ -299,7 +299,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		[DataMember(Order = 18)]
 		public string Password { get; set; }
 
-		[DataMember(Order = 18)]
+		[DataMember(Order = 19)]
+		public int AnonymousUserId { get; set; }
+
+		[DataMember(Order = 20)]
 		public string TenantAccountId { get; set; }
 
 		public int UserId { get; set; }
