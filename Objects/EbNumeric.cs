@@ -1,6 +1,7 @@
 ﻿using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
+using ExpressBase.Common.Structures;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -13,7 +14,11 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
     public class EbNumeric : EbControl
     {
-        public EbNumeric() { }
+        public static EbDbType EbDbType { get; set; }
+        public EbNumeric()
+        {
+            EbDbType = EbDbTypes.Int32;
+        }
 
         [OnDeserialized]
         public void OnDeserializedMethod(StreamingContext context)

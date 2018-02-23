@@ -10,6 +10,7 @@ using ServiceStack.Pcl;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Extensions;
 using System.Runtime.Serialization;
+using ExpressBase.Common.Structures;
 
 namespace ExpressBase.Objects
 {
@@ -120,8 +121,11 @@ else {
         //[ProtoBuf.ProtoMember(10)]
         //[Description("Identity")]
         //public override string Label { get; set; }
-
-        public EbTextBox() { }
+        public static EbDbType EbDbType { get; set; }
+        public EbTextBox()
+        {
+            EbDbType = EbDbTypes.String;
+        }
 
         [OnDeserialized]
         public void OnDeserializedMethod(StreamingContext context)

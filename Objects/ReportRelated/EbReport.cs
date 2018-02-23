@@ -88,6 +88,10 @@ else {
         public PaperSize PaperSize { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
+        public float DesignPageHeight { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("General")]
         [UIproperty]
         public float CustomPaperHeight { get; set; }
