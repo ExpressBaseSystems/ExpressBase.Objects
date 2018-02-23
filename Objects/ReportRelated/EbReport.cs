@@ -97,6 +97,16 @@ else {
         [UIproperty]
         public float CustomPaperWidth { get; set; }
 
+        [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup("General")]
+        [UIproperty]
+        public string UserPassword { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup("General")]
+        [UIproperty]
+        public string OwnerPassword { get; set; }
+
         //public EbReportMargins Margins { get; set; }
         //[EnableInBuilder(BuilderType.Report)]
         //[PropertyGroup("General")]
