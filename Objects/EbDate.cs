@@ -1,6 +1,7 @@
 ﻿using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
+using ExpressBase.Common.Structures;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -38,7 +39,11 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
     public class EbDate : EbControl
     {
-        public EbDate() { }
+        public static EbDbType EbDbType { get; set; }
+        public EbDate()
+        {
+            EbDbType = EbDbTypes.Date;
+        }
 
         [OnDeserialized]
         public void OnDeserializedMethod(StreamingContext context)
