@@ -15,6 +15,11 @@ namespace ExpressBase.Objects
     [HideInToolBox]
     public class EbWebForm : EbControlContainer
     {
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyGroup("Data")]
+        [HelpText("Name Of database-table Which you want to store Data collected using this Form")]
+        public string TableName { get; set; }
         [Browsable(false)]
         public bool IsUpdate { get; set; }
 

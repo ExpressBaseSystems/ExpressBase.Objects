@@ -37,8 +37,8 @@ namespace ExpressBase.Objects
             return @"
 this.Init = function(id)
 {
-    this.LocationCollection.push(new EbObjects.EbLocation(id + '_loc0'));
-    this.LocationCollection.push(new EbObjects.EbLocation(id + '_loc1'));
+    this.LocationCollection.$values.push(new EbObjects.EbLocation(id + '_loc0'));
+    this.LocationCollection.$values.push(new EbObjects.EbLocation(id + '_loc1'));
 };";
         }
         
@@ -105,7 +105,7 @@ this.Init = function(id)
 
     /// ////////////////////////////////
 
-    [EnableInBuilder(BuilderType.BotForm)]
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
     [HideInToolBox]
     public class EbLocation : EbControl
     {
