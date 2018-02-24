@@ -188,7 +188,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ChatBot() { }
     }
 
-    [Route("/bots")]
+    //[Route("/bots")]
     [DataContract]
     public class CreateBotFormTableRequest : EbServiceStackRequest, IReturn<CreateBotResponse>
     {
@@ -209,5 +209,27 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 4)]
         public string BotId { get; set; }
     }
+
+    [Route("/bots")]
+    [DataContract]
+    public class InsertIntoBotFormTableRequest : EbServiceStackRequest, IReturn<CreateBotResponse>
+    {
+        [DataMember(Order = 1)]
+        public string  TableName { get; set; }
+
+        [DataMember(Order = 2)]
+        public Dictionary<string, List<string>> Fields { get; set; }
+    }
+
+    [DataContract]
+    public class InsertIntoBotFormTableResponse : IEbSSResponse
+    {
+        [DataMember(Order = 3)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 4)]
+        public string BotId { get; set; }
+    }
+
 
 }

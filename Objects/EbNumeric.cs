@@ -14,15 +14,15 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
     public class EbNumeric : EbControl
     {
-        public static EbDbType EbDbType { get; set; }
+        public string EbDbType { get; set; }
         public EbNumeric()
         {
-            EbDbType = EbDbTypes.Int32;
         }
 
         [OnDeserialized]
         public void OnDeserializedMethod(StreamingContext context)
         {
+            this.EbDbType = "integer";
             this.BareControlHtml = this.GetBareHtml();
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
