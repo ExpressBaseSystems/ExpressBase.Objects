@@ -39,8 +39,26 @@ namespace ExpressBase.Objects.Objects.ReportRelated
             {
                 if (tableIndex == "T0")
                     return this.T0;
-
-                return this.T0;
+                else if (tableIndex == "T1")
+                    return this.T1;
+                else if (tableIndex == "T2")
+                    return this.T2;
+                else if (tableIndex == "T3")
+                    return this.T3;
+                else if (tableIndex == "T4")
+                    return this.T4;
+                else if (tableIndex == "T5")
+                    return this.T5;
+                else if (tableIndex == "T6")
+                    return this.T6;
+                else if (tableIndex == "T7")
+                    return this.T7;
+                else if (tableIndex == "T8")
+                    return this.T8;
+                else if (tableIndex == "T9")
+                    return this.T9;
+                else
+                    return this.T0;
             }
         }
     }
@@ -69,7 +87,7 @@ namespace ExpressBase.Objects.Objects.ReportRelated
 
                 if (_data.Type == DbType.Int32)
                     result = Convert.ToInt32((x as NTV).Value);
-                if (_data.Type == DbType.Decimal)
+                else if (_data.Type == DbType.Decimal)
                     result = Convert.ToDecimal((x as NTV).Value);
                 else
                     result = (x as NTV).Value.ToString();
