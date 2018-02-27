@@ -39,16 +39,16 @@ namespace ExpressBase.Objects.ReportRelated
         [UIproperty]
         public Boolean RenderInMultiLineForLargeData { get; set; }
 
-        public override float DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, string column_val, float detailprintingtop, DbType column_type/*, EbReport report*/)
+        public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, string column_val, float detailprintingtop, DbType column_type)
         {
-            var x = column_val.Length;
-            float k = 0;
+            ColumnText ct = new ColumnText(canvas);
+            // var x = column_val.Length;
             //if (column_type == "System.Decimal")
             //    column_val = Convert.ToDecimal(column_val).ToString("F" + 4);
-            ColumnText ct = new ColumnText(canvas);
-            ct.Canvas.SetColorFill(GetColor(this.ForeColor));
+            ct.Canvas.SetColorFill(GetColor(this.ForeColor));          
             var y = new Phrase(column_val);
-            y.Font.Size = 12;
+            //y.Font.Size = 8;
+           
             if (this.RenderInMultiLineForLargeData == true)
             {
                 var p = y.Font.GetCalculatedBaseFont(false);
@@ -67,7 +67,6 @@ namespace ExpressBase.Objects.ReportRelated
             var lly = reportHeight - (printingTop + this.Top + this.Height + detailprintingtop);
             ct.SetSimpleColumn(y, this.Left, lly, this.Width + this.Left, ury, 15, Element.ALIGN_LEFT);
             ct.Go();
-            return k;
         }
     }
 

@@ -46,9 +46,8 @@ namespace ExpressBase.Objects.ReportRelated
         public virtual void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, EbReport report)
         {
         }
-        public virtual float DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, string column_name, float detailprintingtop, DbType column_type/*, EbReport report*/)
+        public virtual void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, string column_name, float detailprintingtop, DbType column_type)
         {
-            return 0;
         }
         public virtual void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_name)
         {
