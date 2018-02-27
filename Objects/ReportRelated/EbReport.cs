@@ -175,7 +175,7 @@ else {
         public List<object> WaterMarkList { get; set; }
 
         [JsonIgnore]
-        public Dictionary<string,Script> ScriptCollection { get; set; }
+        public Dictionary<string, Script> ScriptCollection { get; set; }
 
         [JsonIgnore]
         public RowColletion DataRow { get; set; }
@@ -549,7 +549,6 @@ else {
 
         public void DoLoopInDetail(int serialnumber)
         {
-            float w = 0;
             int rowsneeded = 1;
             RowHeight = 0;
             MultiRowTop = 0;
@@ -595,7 +594,7 @@ else {
                 {
                     var field = SortedReportFields[iSortPos];
                     field.Height += RowHeight;
-                    w = DrawFields(field, dt_Yposition, serialnumber);
+                    DrawFields(field, dt_Yposition, serialnumber);
                 }
                 detailprintingtop += detail.Height + RowHeight;
             }
@@ -638,9 +637,8 @@ else {
         }
 
 
-        public float DrawFields(EbReportField field, float section_Yposition, int serialnumber)
+        public void DrawFields(EbReportField field, float section_Yposition, int serialnumber)
         {
-            float p = 0;
             var column_name = string.Empty;
             var column_val = string.Empty;
             var column_type = DbType.String;
@@ -664,8 +662,8 @@ else {
                         globals[TName].Add(fName, new NTV { Name = fName, Type = (DbType)this.DataRow.Table.Columns[fName].Type, Value = this.DataRow[serialnumber][fName] });
                     }
                     try
-                    { 
-                        column_val=(ScriptCollection[field.Name].RunAsync(globals)).Result.ReturnValue.ToString();
+                    {
+                        column_val = (ScriptCollection[field.Name].RunAsync(globals)).Result.ReturnValue.ToString();
                     }
                     catch (Exception e)
                     {
@@ -677,7 +675,7 @@ else {
                 else
                     column_val = GetFieldtData(column_name, serialnumber);
 
-                p = field.DrawMe(Canvas, Height, section_Yposition, column_val, detailprintingtop, column_type);
+                field.DrawMe(Canvas, Height, section_Yposition, column_val, detailprintingtop, column_type);
             }
 
             if ((field is EbPageNo) || (field is EbPageXY) || (field is EbDateTime) || (field is EbSerialNumber))
@@ -715,8 +713,18 @@ else {
                 column_val = GetFieldtData(column_name, serialnumber);
                 field.DrawMe(Doc, Canvas, Height, section_Yposition, detailprintingtop, column_val);
             }
+        }
 
-            return p;
+        public void SetPassword()
+        {
+            Ms1.Position = 0;
+            PdfReader = new PdfReader(Ms1);
+            Stamp = new PdfStamper(PdfReader, Ms1);
+            byte[] USER = Encoding.ASCII.GetBytes(UserPassword);
+            byte[] OWNER = Encoding.ASCII.GetBytes(OwnerPassword);
+            Stamp.SetEncryption(USER, OWNER, 0, PdfWriter.ENCRYPTION_AES_128);
+            Stamp.FormFlattening = true;
+            Stamp.Close();
         }
         public EbReport()
         {
