@@ -35,8 +35,13 @@ namespace ExpressBase.Objects
         public override string GetBareHtml()
         {
             return @" 
-                <div id='@name@' class='location-cont'>
-                    <div id='@name@_Cont' class='location-box'>
+                <div class='location-cont'>
+                    <div id='@name@_Cont' class='location-box' style='display:block;'>
+                        <div class='locinp-cont'>
+                            <div class='locinp-wraper'><span class='locinp-span'>Latitude</span><input id='@name@lat' class='locinp' type='text'/></div>
+                            <div class='locinp-wraper'><span class='locinp-span'>Longitude</span><input id='@name@long' class='locinp' type='text'/></div>
+                            <div class='locinp-wraper-address'><span class='locinp-span'>Address</span><input id='@name@address' class='locinp' type='text'/></div>
+                        </div>
                         <div id='@name@' class='map-div'></div>
                         <div class='loc-bottom'>
                             <div id='@name@Lbl' class='loc-label' style='@LabelBackColor@  @LabelForeColor@ font-weight: bold'> @Label@ </div>
