@@ -47,6 +47,18 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 		[DataMember(Order = 3)]
 		public string Email;
+
+		[DataMember(Order = 4)]
+		public string Nick_Name;
+
+		[DataMember(Order = 5)]
+		public string Sex;
+
+		[DataMember(Order = 6)]
+		public string Phone_Number;
+
+		[DataMember(Order = 7)]
+		public string Status;
 	}
 
 	[DataContract]
@@ -334,11 +346,17 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		[DataMember(Order = 2)]
 		public string roleName { get; set; }
 	}
+    public class UniqueCheckResponse
+    {
+        [DataMember(Order = 1)]
+        public bool unrespose { get; set; }
+
+    }
 
 
 
-	//ANONYMOUS USER START-----------------------------------------
-	[DataContract]
+    //ANONYMOUS USER START-----------------------------------------
+    [DataContract]
 	public class GetManageAnonymousUserRequest : IReturn<GetManageAnonymousUserResponse>, IEbSSRequest
 	{
 
