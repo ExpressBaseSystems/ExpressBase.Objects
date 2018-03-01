@@ -252,9 +252,9 @@ namespace ExpressBase.Objects.ReportRelated
             canvas.MoveTo(x1, y1);
             canvas.LineTo(x1 - 3, y1 - 3);
             canvas.LineTo(x1 - 3, y1 + 3);
-
+            canvas.ClosePathFillStroke();
             var x2 = this.Left;
-            var y2 = reportHeight - (printingTop + this.Top + report.detailprintingtop);
+            var y2 = y1;
             canvas.MoveTo(x2, y2);
             canvas.LineTo(x2 + 3, y2 + 3);
             canvas.LineTo(x2 + 3, y2 - 3);
@@ -293,6 +293,7 @@ namespace ExpressBase.Objects.ReportRelated
             canvas.MoveTo(x1, y1);
             canvas.LineTo(x1 + 3, y1 - 3);
             canvas.LineTo(x1 - 3, y1 - 3);
+            canvas.ClosePathFillStroke();
             var x2 = this.Left;
             var y2 = reportHeight - (printingTop + this.Top + this.Height + report.detailprintingtop + rowH);
             canvas.MoveTo(x2, y2);

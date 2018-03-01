@@ -407,7 +407,7 @@ else {
         //    //return this.DataSet.Tables[0].Rows[i][column_name].GetType().ToString();
         //}
 
-        public void DrawWaterMark(PdfReader pdfReader, Document d, PdfWriter writer)
+        public void DrawWaterMark(Document d, PdfWriter writer)
         {
             byte[] fileByte = null;
             if (ReportObjects != null)
@@ -418,7 +418,7 @@ else {
                     {
                         fileByte = watermarkImages[(field as EbWaterMark).Image];
                     }
-                (field as EbWaterMark).DrawMe(pdfReader, d, writer, fileByte, Height);
+                (field as EbWaterMark).DrawMe(d, writer, fileByte, Height);
                 }
             }
         }
@@ -692,7 +692,7 @@ else {
             }
             else if (field is EbImg)
             {
-                byte[] fileByte = this.ReportService.GetFile(this.SolutionId, this.FileService as IEbFileService, field as EbImg);
+                byte[] fileByte = this.ReportService.GetFile(this.SolutionId, this.FileService as IEbFileService, (field as EbImg).Image);
                 field.DrawMe(Doc, fileByte);
             }
             else if ((field is EbText) || (field is EbReportFieldShape))
@@ -709,12 +709,35 @@ else {
             else if (field is EbQRcode)
             {
                 var table = (field as EbQRcode).Code.Split('.')[0];
-                column_name = field.Title.Split('.')[1];
+                column_name = (field as EbQRcode).Code.Split('.')[1];
                 column_val = GetFieldtData(column_name, serialnumber);
                 field.DrawMe(Doc, Canvas, Height, section_Yposition, detailprintingtop, column_val);
             }
         }
 
+        public void GetWatermarkImages()
+        {
+            if (this.ReportObjects != null)
+            {
+                foreach (var field in this.ReportObjects)
+                {
+                    if ((field is EbWaterMark) && (field as EbWaterMark).Image != string.Empty)
+                    {
+                        byte[] fileByte = this.ReportService.GetFile(this.SolutionId, this.FileService as IEbFileService, (field as EbWaterMark).Image);
+                        //  byte[] fileByte = myFileService.Post
+                        //(new DownloadFileRequest
+                        //{
+                        //    FileDetails = new FileMeta
+                        //    {
+                        //        FileName = (field as EbWaterMark).Image + ".jpg",
+                        //        FileType = "jpg"
+                        //    }
+                        //});
+                        watermarkImages.Add((field as EbWaterMark).Image, fileByte);
+                    }
+                }
+            }
+        }
         public void SetPassword()
         {
             Ms1.Position = 0;

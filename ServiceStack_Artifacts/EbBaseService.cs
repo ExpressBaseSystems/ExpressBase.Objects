@@ -98,7 +98,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public ILog Log { get { return LogManager.GetLogger(GetType()); } }
 
-        public byte[] GetFile(string solutionId, IEbFileService myFileService, EbImg field)
+        public byte[] GetFile(string solutionId, IEbFileService myFileService, string Image)
         {
             byte[] fileByte = myFileService.Post
                  (new DownloadFileRequest
@@ -106,7 +106,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
                      TenantAccountId = solutionId,
                      FileDetails = new FileMeta
                      {
-                         FileName = field.Image + ".jpg",
+                         FileName = Image + ".jpg",
                          FileType = "jpg"
                      }
                  });

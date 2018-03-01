@@ -58,7 +58,7 @@ namespace ExpressBase.Objects.ReportRelated
         public virtual void DrawMe(Document d, byte[] fileByte)
         {
         }
-        public virtual void DrawMe(PdfReader pdfReader, Document d, PdfWriter writer, byte[] fileByte, float reportHeight)
+        public virtual void DrawMe(Document d, PdfWriter writer, byte[] fileByte, float reportHeight)
         {
         }
     }
@@ -133,7 +133,7 @@ namespace ExpressBase.Objects.ReportRelated
 };";
         }
 
-        public override void DrawMe(PdfReader pdfReader, Document d, PdfWriter writer, byte[] fileByte, float reportHeight)
+        public override void DrawMe(Document d, PdfWriter writer, byte[] fileByte, float reportHeight)
         {
             if (this.WaterMarkText != string.Empty)
             {
@@ -471,13 +471,23 @@ namespace ExpressBase.Objects.ReportRelated
         }
         public override void DrawMe(Document doc, PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string code_val)
         {
-            QRCodeGenerator qrGenerator = new QRCodeGenerator();
-            QRCodeData qrCodeData = qrGenerator.CreateQrCode("4512345678906", QRCodeGenerator.ECCLevel.Q);
-            BitmapByteQRCode qrCode = new BitmapByteQRCode(qrCodeData);
-            byte[] qrCodeImage = qrCode.GetGraphic(20);
-            iTextSharp.text.Image img = iTextSharp.text.Image.GetInstance(qrCodeImage);
-            img.ScaleAbsolute(200, 200);
-            doc.Add(img);
+            try
+            {
+                QRCodeGenerator qrGenerator = new QRCodeGenerator();
+                QRCodeData qrCodeData = qrGenerator.CreateQrCode("4512345678906", QRCodeGenerator.ECCLevel.Q);
+                BitmapByteQRCode qrCode = new BitmapByteQRCode(qrCodeData);
+                byte[] qrCodeImage = qrCode.GetGraphic(20);
+                iTextSharp.text.Image img = iTextSharp.text.Image.GetInstance(qrCodeImage);
+                img.ScaleAbsolute(200, 200);
+                doc.Add(img);
+            }
+            catch (Exception e)
+            {
+                ColumnText ct = new ColumnText(canvas);
+                var x = reportHeight - (printingTop + this.Top + detailprintingtop);
+                ct.SetSimpleColumn(new Phrase("Error in generating barcode"), Left, x - Height, Left + Width, x, 15, Element.ALIGN_LEFT);
+                ct.Go();
+            }
         }
     }
 
