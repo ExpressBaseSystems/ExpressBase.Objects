@@ -36,8 +36,11 @@ namespace ExpressBase.Objects
 
     public void GetOptionsHtml(JsonServiceClient ServiceClient) {
 
-            this.DataSourceId = "eb_roby_dev-eb_roby_dev-2-1015-1739";
-            RowColletion ds = (ServiceClient.Get<DataSourceDataResponse>(new DataSourceDataRequest { RefId = this.DataSourceId })).Data;
+            //this.DataSourceId = "eb_roby_dev-eb_roby_dev-2-1015-1739";
+            var pclient = new Web2.ProtoBufServiceClient(ServiceClient.BaseUri);
+            pclient.BearerToken = ServiceClient.BearerToken;
+            var result = (pclient.Get<DataSourceDataResponse>(new DataSourceDataRequest { RefId = this.DataSourceId }));
+            var ds = result.Data;
             string _html = string.Empty;
 
             foreach (EbDataRow option in ds)
