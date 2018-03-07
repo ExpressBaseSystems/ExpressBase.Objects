@@ -728,6 +728,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 		[DataMember(Order = 5)]
 		public bool Is_Anonymous;
+
+		[DataMember(Order = 6)]
+		public bool Is_System;
 	}
 
 	[DataContract]
