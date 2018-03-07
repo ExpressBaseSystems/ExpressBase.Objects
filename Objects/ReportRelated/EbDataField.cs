@@ -39,6 +39,12 @@ namespace ExpressBase.Objects.ReportRelated
         [UIproperty]
         public Boolean RenderInMultiLineForLargeData { get; set; }
 
+        [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup("General")]
+        [UIproperty]
+        [PropertyEditor(PropertyEditorType.FontSelector)]
+        public string Font { get; set; }
+
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, string column_val, float detailprintingtop, DbType column_type)
         {
             ColumnText ct = new ColumnText(canvas);
