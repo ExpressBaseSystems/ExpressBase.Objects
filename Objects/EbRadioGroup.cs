@@ -62,7 +62,7 @@ namespace ExpressBase.Objects
               foreach (EbRadioOption ec in this.Options)
             {
                 ec.GName = this.Name;
-                html += ec.GetHtml();
+                html += ec.GetHtml().Replace("@defaultcheked@",((this.Options.IndexOf(ec) == 0) ? " checked='checked' " : ""));
             }
             html += "</div>";
             return html
@@ -99,8 +99,8 @@ namespace ExpressBase.Objects
             return @"
 this.Init = function(id)
 {
-    this.Options.push(new EbObjects.EbRadioOption(id + '_Rd0'));
-    this.Options.push(new EbObjects.EbRadioOption(id + '_Rd1'));
+    this.Options.$values.push(new EbObjects.EbRadioOption(id + '_Rd0'));
+    this.Options.$values.push(new EbObjects.EbRadioOption(id + '_Rd1'));
 };";
         }
     }
@@ -127,7 +127,7 @@ this.Init = function(id)
 
         public override string GetBareHtml()
         {
-            return @"<div><input type ='radio' id='@name@' value='@value@' name='@gname@'> <span id='@name@Lbl' style='@LabelBackColor @LabelForeColor '> @label@  </span><br></div>"
+            return @"<div><input type ='radio' id='@name@' @defaultcheked@ value='@value@' name='@gname@'> <span id='@name@Lbl' style='@LabelBackColor @LabelForeColor '> @label@  </span><br></div>"
 .Replace("@name@", this.Name)
 .Replace("@gname@", this.GName)
 .Replace("@label@", this.Label)

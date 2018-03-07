@@ -88,8 +88,13 @@ else {
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         [PropertyGroup("Appearance")]
         [PropertyEditor(PropertyEditorType.FontSelector)]
-        [DefaultPropValue("defaultfrom decor")]
         public string FontFamilyT { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+        [PropertyGroup("Appearance")]
+        [PropertyEditor(PropertyEditorType.FontSelector)]
+        [HideForUser]
+        public string Only4Dev { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         [PropertyGroup("Appearance")]

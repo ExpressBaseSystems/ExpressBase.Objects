@@ -20,6 +20,11 @@ namespace ExpressBase.Objects
         }
 
         [EnableInBuilder(BuilderType.BotForm)]
+        [PropertyGroup("Behavior")]
+        [HelpText("Set false if want to render controls like a conversation")]
+        public bool RenderAsForm{ get; set; }
+
+        [EnableInBuilder(BuilderType.BotForm)]
         [PropertyGroup("Data")]
         [HelpText("Name Of database-table Which you want to store Data collected using this Form")]
         public string TableName { get; set; }

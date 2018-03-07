@@ -75,8 +75,8 @@ namespace ExpressBase.Objects
             return @"
 this.Init = function(id)
 {
-    this.CheckBoxes.push(new EbObjects.EbCheckBox(id + '_Rd0'));
-    this.CheckBoxes.push(new EbObjects.EbCheckBox(id + '_Rd1'));
+    this.CheckBoxes.$values.push(new EbObjects.EbCheckBox(id + '_Rd0'));
+    this.CheckBoxes.$values.push(new EbObjects.EbCheckBox(id + '_Rd1'));
 };";
         }
     }
