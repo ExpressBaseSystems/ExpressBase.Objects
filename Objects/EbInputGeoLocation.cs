@@ -36,7 +36,7 @@ namespace ExpressBase.Objects
         {
             return @" 
                 <div class='location-cont'>
-                    <div id='@name@_Cont' class='location-box' style='display:block;'>
+                    <div id='@name@_Cont' class='location-box picker-box' style='display:block;'>
                         <div class='locinp-cont'>
                             <div class='locinp-wraper'><span class='locinp-span'>Latitude</span><input id='@name@lat' class='locinp' type='text'/></div>
                             <div class='locinp-wraper'><span class='locinp-span'>Longitude</span><input id='@name@long' class='locinp' type='text'/></div>
@@ -44,7 +44,7 @@ namespace ExpressBase.Objects
                         </div>
                         <div id='@name@' class='map-div'></div>
                         <div class='loc-bottom'>
-                            <div id='@name@Lbl' class='loc-label' style='@LabelBackColor@  @LabelForeColor@ font-weight: bold'> @Label@ </div>
+                            <div id='@name@Lbl' class='loc-label' style='@LabelBackColor@  @LabelForeColor@ font-weight: bold'> @Label@ </div><button class='choose-btn'>Choose</button>
                             <div class='loc-content'>
                                 @ContentHTML@
                             </div>
