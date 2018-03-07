@@ -671,7 +671,16 @@ else {
                     }
                 }
                 else if (field is IEbDataFieldSummary)
+                {
+                    if ((field is EbDataFieldNumericSummary) && (field as EbDataFieldNumericSummary).InLetters == true)
+                    {
+                        column_val = (field as IEbDataFieldSummary).SummarizedValue.ToString();
+                        (field as EbDataFieldNumericSummary).DrawMe(Canvas, Height, section_Yposition,  detailprintingtop,  column_val);
+                        return;
+                    }
+                else
                     column_val = (field as IEbDataFieldSummary).SummarizedValue.ToString();
+                }
                 else
                     column_val = GetFieldtData(column_name, serialnumber);
 

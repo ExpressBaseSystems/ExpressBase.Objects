@@ -315,7 +315,9 @@ namespace ExpressBase.Objects.ReportRelated
 
             ColumnText ct = new ColumnText(canvas);
             ct.Canvas.SetColorFill(GetColor(this.ForeColor));
-            ct.SetSimpleColumn(new Phrase(this.Title), llx, lly, urx, ury, 15, Element.ALIGN_LEFT);
+            var phrase = new Phrase(this.Title);
+            phrase.Font.Size = 8;
+            ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, Element.ALIGN_LEFT);
             ct.Go();
         }
     }

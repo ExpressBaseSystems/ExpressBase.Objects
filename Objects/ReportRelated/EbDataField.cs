@@ -62,6 +62,7 @@ namespace ExpressBase.Objects.ReportRelated
                 }
             }
             y = new Phrase(column_val);
+            y.Font.Size = 8;
 
             var ury = reportHeight - (printingTop + this.Top + detailprintingtop);
             var lly = reportHeight - (printingTop + this.Top + this.Height + detailprintingtop);
@@ -521,7 +522,9 @@ namespace ExpressBase.Objects.ReportRelated
 
             ColumnText ct = new ColumnText(canvas);
             ct.Canvas.SetColorFill(GetColor(this.ForeColor));
-            ct.SetSimpleColumn(new Phrase(column_val), this.Left, lly, this.Width + this.Left, ury, 15, Element.ALIGN_RIGHT);
+            var phrase = new Phrase(column_val);
+            phrase.Font.Size = 8;
+            ct.SetSimpleColumn(phrase, this.Left, lly, this.Width + this.Left, ury, 15, Element.ALIGN_RIGHT);
             ct.Go();
         }
     }
