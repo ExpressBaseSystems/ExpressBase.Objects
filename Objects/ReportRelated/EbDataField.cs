@@ -43,7 +43,7 @@ namespace ExpressBase.Objects.ReportRelated
         [PropertyGroup("General")]
         [UIproperty]
         [PropertyEditor(PropertyEditorType.FontSelector)]
-        public string Font { get; set; }
+        public EbFont Font { get; set; }
 
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, string column_val, float detailprintingtop, DbType column_type)
         {
@@ -51,8 +51,14 @@ namespace ExpressBase.Objects.ReportRelated
             // var x = column_val.Length;
             //if (column_type == "System.Decimal")
             //    column_val = Convert.ToDecimal(column_val).ToString("F" + 4);
-            ct.Canvas.SetColorFill(GetColor(this.ForeColor));          
-            var y = new Phrase(column_val);
+            ct.Canvas.SetColorFill(GetColor(this.ForeColor));
+            BaseFont bf = BaseFont.CreateFont(BaseFont.TIMES_ROMAN, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
+            
+            var x = iTextSharp.text.Font.ITALIC;
+            iTextSharp.text.Font font = new iTextSharp.text.Font(bf, this.Font.Size, 0);
+
+            var y = new Phrase(column_val,font);
+
             //y.Font.Size = 8;
            
             if (this.RenderInMultiLineForLargeData == true)
@@ -67,8 +73,8 @@ namespace ExpressBase.Objects.ReportRelated
                         column_val = "###";
                 }
             }
-            y = new Phrase(column_val);
-            y.Font.Size = 8;
+            //y = new Phrase(column_val);
+          //  y.Font.Size = this.Font.Size;
 
             var ury = reportHeight - (printingTop + this.Top + detailprintingtop);
             var lly = reportHeight - (printingTop + this.Top + this.Height + detailprintingtop);
