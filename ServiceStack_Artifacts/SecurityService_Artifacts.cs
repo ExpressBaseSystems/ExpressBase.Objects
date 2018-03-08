@@ -315,6 +315,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public int AnonymousUserId { get; set; }
 
 		[DataMember(Order = 20)]
+		public string Preference { get; set; }
+
+		[DataMember(Order = 21)]
 		public string TenantAccountId { get; set; }
 
 		public int UserId { get; set; }
