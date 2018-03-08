@@ -43,7 +43,7 @@ namespace ExpressBase.Objects.ReportRelated
         [PropertyGroup("General")]
         [UIproperty]
         [PropertyEditor(PropertyEditorType.FontSelector)]
-        public string Font { get; set; }
+        public EbFont Font { get; set; }
 
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, string column_val, float detailprintingtop, DbType column_type)
         {
