@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Threading.Tasks;
 
 namespace ExpressBase.Objects
@@ -25,6 +26,13 @@ namespace ExpressBase.Objects
     {
 
         public EbComboBox() {
+        }
+
+        [OnDeserialized]
+        public void OnDeserializedMethod(StreamingContext context)
+        {
+            this.BareControlHtml = this.GetBareHtml();
+            this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
@@ -72,20 +80,23 @@ namespace ExpressBase.Objects
         {
             get
             {
-                string rs = "<div id='@nameWraper' data-toggle='tooltip' title='@tooltipText'>";
+                string rs = "<div id='@name@Wraper' data-toggle='tooltip' title='@tooltipText'>";
                 for (int i = 0; i < this.NumberOfFields; i++)
                     rs += @"
-<div style='display:inline-block; width:@perWidthpx; margin-right: -4px;'>
+<div style='display:inline-block; width:@perWidth@%; margin-right: -4px;'>
     <div class='input-group'>
-        <v-select id='@name$$' style='width:{3}px;' 
+        <v-select id='@name@$$' style='width:{3}px;' 
             multiple
             v-model='displayMembers[$$]'
             :on-change='updateCk'
             placeholder = 'label$$'>
         </v-select>
-        <span class='input-group-addon' @border-r$$> <i id='@nameTglBtn' class='fa  fa-search' aria-hidden='true'></i> </span>
+        <span class='input-group-addon' @border-r$$> <i id='@name@TglBtn' class='fa  fa-search' aria-hidden='true'></i> </span>
     </div>
-</div>".Replace("$$", i.ToString()).Replace("@border-r" + i, (i != this.NumberOfFields - 1) ? "style='border-radius: 0px;'" : "");
+</div>"
+.Replace("$$", i.ToString())
+.Replace("@perWidth@", ((int)( 100 / this.NumberOfFields)).ToString())
+.Replace("@border-r" + i, (i != this.NumberOfFields - 1) ? "style='border-radius: 0px;'" : "");
                 return rs + "</div>";
             }
         }
@@ -97,7 +108,7 @@ namespace ExpressBase.Objects
     Vue.component('v-select', VueSelect.VueSelect);
     Vue.config.devtools = true;
 </script>
-$('#@name_loading-image').hide();
+$('#@name@_loading-image').hide();
 var @nameEbCombo = new EbSelect('@name', '@DSid', @DDHeight, '@vmName', '', @MaxLimit, @MinLimit, @Required, '@DefaultSearchFor', '@servicestack_url', @values);
 "
 .Replace("@name", this.Name)
@@ -115,7 +126,11 @@ var @nameEbCombo = new EbSelect('@name', '@DSid', @DDHeight, '@vmName', '', @Max
 
         public override string GetDesignHtml()
         {
-            return "<div role='form' data-toggle='validator' style=' width: inherit;'><input type='hidden' name='acmasteridHidden4val' data-ebtype='16' id='acmasterid'> <div id='acmasteridLbl' style='display: inline-block;'></div> <div id='acmasteridWraper' data-toggle='tooltip' title='' data-original-title=''><div style='display: inline-block; width: 33%; margin-right: -4px;'><div class='input-group'><div class='dropdown v-select searchable' id='acmasterid0'><div type='button' class='dropdown-toggle clearfix' style='border-top-left-radius: 5px; border-bottom-left-radius: 5px;'> <input debounce='0' type='search'  readonly  placeholder='label0' class='form-control' id='acmaster1_xid' style='width: 100%; background-color: #fff;'> <i role='presentation' class='open-indicator' style='display: none;'></i> <div class='spinner' style='display: none;'>Loading...</div></div> <!----></div> <span class='input-group-addon' style='border-radius: 0px;'><i id='acmasteridTglBtn' aria-hidden='true' class='fa  fa-search'></i></span></div></div> <div style='display: inline-block; width: 33%; margin-right: -4px;'><div class='input-group'><div class='dropdown v-select searchable' id='acmasterid1'><div type='button' class='dropdown-toggle clearfix'> <input debounce='0' type='search' placeholder='label1' readonly class='form-control' id='acmaster1_name' style='width: 100%; background-color: #fff;'> <i role='presentation' class='open-indicator' style='display: none;'></i> <div class='spinner' style='display: none;'>Loading...</div></div> <!----></div> <span class='input-group-addon' style='border-radius: 0px;'><i id='acmasteridTglBtn' aria-hidden='true' class='fa  fa-search'></i></span></div></div> <div style='display: inline-block; width: 33%; margin-right: -4px;'><div class='input-group'><div class='dropdown v-select searchable' id='acmasterid2'><div type='button' class='dropdown-toggle clearfix'> <input debounce='0' type='search' readonly placeholder='label2' class='form-control' id='tdebit' style='width: 100%; background-color: #fff;'> <i role='presentation' class='open-indicator' style='display: none;'></i> <div class='spinner' style='display: none;'>Loading...</div></div> <!----></div> <span class='input-group-addon'><i id='acmasteridTglBtn' aria-hidden='true' class='fa  fa-search'></i></span></div></div></div> <div id='acmasterid_loadingdiv' class='ebCombo-loader'><i id='acmasterid_loading-image' class='fa fa-spinner fa-pulse fa-2x fa-fw' style='display: none;'></i><span class='sr-only'>Loading...</span></div> <center><div id='acmasteridDDdiv' class='DDdiv expand-transition' style='width: 600px; display: none;'><table id='acmasteridtbl' class='table table-striped table-bordered' style='width: 100%;'></table></div></center></div>".RemoveCR().DoubleQuoted();//GetHtmlHelper(RenderMode.Developer).RemoveCR().DoubleQuoted();
+            return @"<div id='cont_@name@  ' class='Eb-ctrlContainer' Ctype='TextBox' style='@HiddenString '>
+                        <div role='form' data-toggle='validator' style=' width: inherit;'><input type='hidden' name='acmasteridHidden4val' data-ebtype='16' id='acmasterid'> <div id='acmasteridLbl' style='display: inline-block;'></div> <div id='acmasteridWraper' data-toggle='tooltip' title='' data-original-title=''><div style='display: inline-block; width: 33%; margin-right: -4px;'><div class='input-group'><div class='dropdown v-select searchable' id='acmasterid0'><div type='button' class='dropdown-toggle clearfix' style='border-top-left-radius: 5px; border-bottom-left-radius: 5px;'> <input debounce='0' type='search'  readonly  placeholder='label0' class='form-control' id='acmaster1_xid' style='width: 100%; background-color: #fff;'> <i role='presentation' class='open-indicator' style='display: none;'></i> <div class='spinner' style='display: none;'>Loading...</div></div> <!----></div> <span class='input-group-addon' style='border-radius: 0px;'><i id='acmasteridTglBtn' aria-hidden='true' class='fa  fa-search'></i></span></div></div> <div style='display: inline-block; width: 33%; margin-right: -4px;'><div class='input-group'><div class='dropdown v-select searchable' id='acmasterid1'><div type='button' class='dropdown-toggle clearfix'> <input debounce='0' type='search' placeholder='label1' readonly class='form-control' id='acmaster1_name' style='width: 100%; background-color: #fff;'> <i role='presentation' class='open-indicator' style='display: none;'></i> <div class='spinner' style='display: none;'>Loading...</div></div> <!----></div> <span class='input-group-addon' style='border-radius: 0px;'><i id='acmasteridTglBtn' aria-hidden='true' class='fa  fa-search'></i></span></div></div> <div style='display: inline-block; width: 33%; margin-right: -4px;'><div class='input-group'><div class='dropdown v-select searchable' id='acmasterid2'><div type='button' class='dropdown-toggle clearfix'> <input debounce='0' type='search' readonly placeholder='label2' class='form-control' id='tdebit' style='width: 100%; background-color: #fff;'> <i role='presentation' class='open-indicator' style='display: none;'></i> <div class='spinner' style='display: none;'>Loading...</div></div> <!----></div> <span class='input-group-addon'><i id='acmasteridTglBtn' aria-hidden='true' class='fa  fa-search'></i></span></div></div></div> <div id='acmasterid_loadingdiv' class='ebCombo-loader'><i id='acmasterid_loading-image' class='fa fa-spinner fa-pulse fa-2x fa-fw' style='display: none;'></i><span class='sr-only'>Loading...</span></div> <center><div id='acmasteridDDdiv' class='DDdiv expand-transition' style='width: 600px; display: none;'><table id='acmasteridtbl' class='table table-striped table-bordered' style='width: 100%;'></table></div></center></div>
+                    </div>"
+.Replace("@name@", this.Name)
+.RemoveCR().DoubleQuoted();//GetHtmlHelper(RenderMode.Developer).RemoveCR().DoubleQuoted();
         }
 
         public override string GetHtml()
@@ -126,15 +141,21 @@ var @nameEbCombo = new EbSelect('@name', '@DSid', @DDHeight, '@vmName', '', @Max
         public override string GetBareHtml()
         {
             return @"
+
+       <div id='@name@Container'  role='form' data-toggle='validator' style='width:100%;'>
+            <input type='hidden' name='@name@Hidden4val' data-ebtype='16' id='@name@'/>
+            <div style='display:inline-block;' id='@name@Lbl'>@label</div>
+
             @VueSelectCode
-            <div id='@name_loadingdiv' class='ebCombo-loader'>
-                <i id='@name_loading-image' class='fa fa-spinner fa-pulse fa-2x fa-fw'></i><span class='sr-only'>Loading...</span>
+            <div id='@name@_loadingdiv' class='ebCombo-loader'>
+                <i id='@name@_loading-image' class='fa fa-spinner fa-pulse fa-2x fa-fw'></i><span class='sr-only'>Loading...</span>
             </div>
             <center>
-                <div id='@nameDDdiv' v-show='DDstate' class='DDdiv expand-transition'  style='width:@DDwidthpx;'> 
-                    <table id='@nametbl' tabindex='1000' style='width:100%' class='table table-striped table-bordered'></table>
+                <div id='@name@DDdiv' v-show='DDstate' class='DDdiv expand-transition'  style='width:@DDwidthpx;'> 
+                    <table id='@name@tbl' tabindex='1000' style='width:100%' class='table table-striped table-bordered'></table>
                 </div>
-            </center>"
+            </center>
+        </div>"
 .Replace("@VueSelectCode", this.VueSelectcode)
 .Replace("@name@", this.Name)
 .Replace("@width", 900.ToString())//this.Width.ToString())
@@ -146,15 +167,11 @@ var @nameEbCombo = new EbSelect('@name', '@DSid', @DDHeight, '@vmName', '', @Max
         private string GetHtmlHelper(RenderMode mode)
         {
             return @"
-    <div id='cont_@name  ' Ctype='ComboBox' class='Eb-ctrlContainer' style='@hiddenString'>
-       <div id='@nameContainer'  role='form' data-toggle='validator' style='width:100%;'>
-            <input type='hidden' name='@nameHidden4val' data-ebtype='16' id='@name'/>
-            <div style='display:inline-block;' id='@nameLbl'>@label</div>
-           
-        </div>
+    <div id='cont_@name@  ' Ctype='ComboBox' class='Eb-ctrlContainer' style='@hiddenString'>
+           @barehtml@
     </div>"
 .Replace("@barehtml@", this.GetBareHtml())
-.Replace("@name", this.Name)
+.Replace("@name@", this.Name)
 .Replace("@label", this.Label)
 .Replace("@tooltipText", this.ToolTipText);
         }
