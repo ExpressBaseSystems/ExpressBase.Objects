@@ -9,7 +9,7 @@ using System.Text;
 namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
-    class EbInputGeoLocation : EbControl
+    public class EbInputGeoLocation : EbControl
     {
         public EbInputGeoLocation() { }
 
