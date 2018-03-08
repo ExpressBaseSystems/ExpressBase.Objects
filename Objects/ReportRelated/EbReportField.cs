@@ -292,7 +292,8 @@ namespace ExpressBase.Objects.ReportRelated
         [PropertyGroup("General")]
         [UIproperty]
         [PropertyEditor(PropertyEditorType.FontSelector)]
-        public string Font { get; set; }
+        public EbFont Font { get; set; }
+
         public override string GetDesignHtml()
         {
             return "<div class='Text-Field dropped' eb-type='Text' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; height: @Height px; background-color:@BackColor ; color:@ForeColor ; position: absolute; left: @Left px; top: @Top px;text-overflow: ellipsis;overflow: hidden;text-align: @TextAlign ;'> @Title </div>".RemoveCR().DoubleQuoted();
