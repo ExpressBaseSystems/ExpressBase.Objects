@@ -319,9 +319,17 @@ namespace ExpressBase.Objects.ReportRelated
             var lly = reportHeight - (printingTop + this.Top + this.Height + report.detailprintingtop + report.RowHeight);
 
             ColumnText ct = new ColumnText(canvas);
-            ct.Canvas.SetColorFill(GetColor(this.ForeColor));
-            var phrase = new Phrase(this.Title);
-            phrase.Font.Size = 8;
+            //ct.Canvas.SetColorFill(GetColor(this.ForeColor));
+            BaseFont bf = BaseFont.CreateFont(BaseFont.TIMES_ROMAN, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
+            iTextSharp.text.Font font = new iTextSharp.text.Font(bf, this.Font.Size, (int)this.Font.Style, GetColor(this.Font.color));
+            if (this.Font.Caps == true)
+                this.Title = this.Title.ToUpper();
+            if (this.Font.Strikethrough == true)
+                font.SetStyle(iTextSharp.text.Font.STRIKETHRU);
+            if (this.Font.Underline == true)
+                font.SetStyle(iTextSharp.text.Font.UNDERLINE);
+            var phrase = new Phrase(this.Title, font);
+
             ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, Element.ALIGN_LEFT);
             ct.Go();
         }
