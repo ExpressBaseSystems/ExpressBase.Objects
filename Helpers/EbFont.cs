@@ -8,8 +8,8 @@ namespace ExpressBase.Objects
     {
         public EbFont() { }
 
-        public string Font { get; set; } = "Times-Roman";
-        public int Size { get; set; } = 14;
+        public string Font { get; set; }
+        public int Size { get; set; }
         public FontStyle Style { get; set; }
         public string color { get; set; }
         public bool Caps { get; set; }
@@ -17,12 +17,12 @@ namespace ExpressBase.Objects
         public bool Underline { get; set; }
     }
     //JS OBJ:  {"Font":"Abhaya Libre","Fontsize":"16","Fontstyle":"normal","FontWeight":"bold","Fontcolor":"#000000","Caps":"none","Strikethrough":"line-through","Underline":"none"}
-
+    
     public enum FontStyle
     {
-        Regular,//NORMAL = 0;
-        Italic,//ITALIC = 2
-        Bold,//BOLD = 1;
-        ItalicBold//BOLDITALIC = 3;
+        NORMAL = 0,
+        ITALIC = 2,
+        BOLD = 1,
+        BOLDITALIC = 3
     }
 }
