@@ -32,39 +32,25 @@ namespace ExpressBase.Objects.ReportRelated
         [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("General")]
         [UIproperty]
-        public string ColumnName{ get; set; }
+        public string ColumnName { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("General")]
         [UIproperty]
         public Boolean RenderInMultiLineForLargeData { get; set; }
 
-        [EnableInBuilder(BuilderType.Report)]
-        [PropertyGroup("General")]
-        [UIproperty]
-        [PropertyEditor(PropertyEditorType.FontSelector)]
-        public EbFont Font { get; set; }
-
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, string column_val, float detailprintingtop, DbType column_type)
         {
             ColumnText ct = new ColumnText(canvas);
-            // var x = column_val.Length;
-            //if (column_type == "System.Decimal")
-            //    column_val = Convert.ToDecimal(column_val).ToString("F" + 4);
-            ct.Canvas.SetColorFill(GetColor(this.ForeColor));
-            BaseFont bf = BaseFont.CreateFont(BaseFont.TIMES_ROMAN, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
-            
-            var x = iTextSharp.text.Font.ITALIC;
-            iTextSharp.text.Font font = new iTextSharp.text.Font(bf, this.Font.Size, 0);
-
-            var y = new Phrase(column_val,font);
-
-            //y.Font.Size = 8;
-           
+            Phrase text = null;
+            if (this.Font == null)
+                text = new Phrase(column_val);
+            else
+                text = new Phrase(column_val, base.SetFont(this as EbReportField));
             if (this.RenderInMultiLineForLargeData == true)
             {
-                var p = y.Font.GetCalculatedBaseFont(false);
-                float q = p.GetWidthPoint(column_val, y.Font.CalculatedSize);
+                var p = text.Font.GetCalculatedBaseFont(false);
+                float q = p.GetWidthPoint(column_val, text.Font.CalculatedSize);
                 var l = q / column_val.Length;
                 int numberofCharsInALine = Convert.ToInt32(Math.Floor(this.Width / l));
                 if (numberofCharsInALine < column_val.Length)
@@ -73,12 +59,9 @@ namespace ExpressBase.Objects.ReportRelated
                         column_val = "###";
                 }
             }
-            //y = new Phrase(column_val);
-          //  y.Font.Size = this.Font.Size;
-
             var ury = reportHeight - (printingTop + this.Top + detailprintingtop);
             var lly = reportHeight - (printingTop + this.Top + this.Height + detailprintingtop);
-            ct.SetSimpleColumn(y, this.Left, lly, this.Width + this.Left, ury, 15, Element.ALIGN_LEFT);
+            ct.SetSimpleColumn(text, this.Left, lly, this.Width + this.Left, ury, 15, Element.ALIGN_LEFT);
             ct.Go();
         }
     }
@@ -751,6 +734,7 @@ namespace ExpressBase.Objects.ReportRelated
         [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("General")]
         [UIproperty]
+        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
         public string Expression { get; set; }
 
         private string[] _dataFieldsUsed;
@@ -763,7 +747,7 @@ namespace ExpressBase.Objects.ReportRelated
                     var matches = Regex.Matches(this.Expression, @"T[0-9]{1}.\w+");
                     _dataFieldsUsed = new string[matches.Count];
                     int i = 0;
-                    foreach (Match match in matches) 
+                    foreach (Match match in matches)
                         _dataFieldsUsed[i++] = match.Value;
                 }
 

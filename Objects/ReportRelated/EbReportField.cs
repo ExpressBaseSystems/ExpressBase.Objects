@@ -32,6 +32,12 @@ namespace ExpressBase.Objects.ReportRelated
         [PropertyGroup("Appearance")]
         public string BorderColor { get; set; }
 
+        [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup("General")]
+        [UIproperty]
+        [PropertyEditor(PropertyEditorType.FontSelector)]
+        public EbFont Font { get; set; }
+
         public BaseColor GetColor(string Color)
         {
             var colr = ColorTranslator.FromHtml(Color).ToArgb();
@@ -60,6 +66,19 @@ namespace ExpressBase.Objects.ReportRelated
         }
         public virtual void DrawMe(Document d, PdfWriter writer, byte[] fileByte, float reportHeight)
         {
+        }
+
+        public iTextSharp.text.Font SetFont(EbReportField field)
+        {
+            BaseFont bf = BaseFont.CreateFont(BaseFont.TIMES_ROMAN, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
+            iTextSharp.text.Font font = new iTextSharp.text.Font(bf, field.Font.Size, (int)field.Font.Style, field.GetColor(field.Font.color));
+            if (field.Font.Caps == true)
+                field.Title = this.Title.ToUpper();
+            if (field.Font.Strikethrough == true)
+                font.SetStyle(iTextSharp.text.Font.STRIKETHRU);
+            if (field.Font.Underline == true)
+                font.SetStyle(iTextSharp.text.Font.UNDERLINE);
+            return font;
         }
     }
 
@@ -288,11 +307,11 @@ namespace ExpressBase.Objects.ReportRelated
     [EnableInBuilder(BuilderType.Report)]
     public class EbText : EbReportField
     {
-        [EnableInBuilder(BuilderType.Report)]
-        [PropertyGroup("General")]
-        [UIproperty]
-        [PropertyEditor(PropertyEditorType.FontSelector)]
-        public EbFont Font { get; set; }
+        //[EnableInBuilder(BuilderType.Report)]
+        //[PropertyGroup("General")]
+        //[UIproperty]
+        //[PropertyEditor(PropertyEditorType.FontSelector)]
+        //public EbFont Font { get; set; }
 
         public override string GetDesignHtml()
         {
@@ -319,16 +338,12 @@ namespace ExpressBase.Objects.ReportRelated
             var lly = reportHeight - (printingTop + this.Top + this.Height + report.detailprintingtop + report.RowHeight);
 
             ColumnText ct = new ColumnText(canvas);
+            Phrase phrase = null;
             //ct.Canvas.SetColorFill(GetColor(this.ForeColor));
-            BaseFont bf = BaseFont.CreateFont(BaseFont.TIMES_ROMAN, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
-            iTextSharp.text.Font font = new iTextSharp.text.Font(bf, this.Font.Size, (int)this.Font.Style, GetColor(this.Font.color));
-            if (this.Font.Caps == true)
-                this.Title = this.Title.ToUpper();
-            if (this.Font.Strikethrough == true)
-                font.SetStyle(iTextSharp.text.Font.STRIKETHRU);
-            if (this.Font.Underline == true)
-                font.SetStyle(iTextSharp.text.Font.UNDERLINE);
-            var phrase = new Phrase(this.Title, font);
+            if (this.Font.Font == null)
+                phrase = new Phrase(this.Title);
+            else
+                 phrase = new Phrase(this.Title, this.SetFont(this as EbReportField));
 
             ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, Element.ALIGN_LEFT);
             ct.Go();
