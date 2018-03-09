@@ -24,6 +24,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         private EbConnectionFactory _infraConnectionFactory = null;
 
+        protected JsonServiceClient EbSeClient { get; private set; }
+
         protected EbConnectionFactory InfraConnectionFactory
         {
             get
@@ -54,17 +56,23 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             this.RestClient = _rest as RestClient;
         }
 
+        public EbBaseService(IEbConnectionFactory _dbf, IJsonServiceClient _sec)
+        {
+            this.EbConnectionFactory = _dbf as EbConnectionFactory;
+            this.EbSeClient = _sec as JsonServiceClient;
+        }
+
         public EbBaseService(IMessageProducer _mqp, IMessageQueueClient _mqc)
         {
             this.MessageProducer3 = _mqp as RabbitMqProducer;
             this.MessageQueueClient = _mqc as RabbitMqQueueClient;
         }
 
-        public EbBaseService(IMessageProducer _mqp, IMessageQueueClient _mqc, IServerEvents _se)
+        public EbBaseService(IMessageProducer _mqp, IMessageQueueClient _mqc, IJsonServiceClient _se)
         {
             this.MessageProducer3 = _mqp as RabbitMqProducer;
             this.MessageQueueClient = _mqc as RabbitMqQueueClient;
-            //this.ServerEvents = _se as RedisServerEvents;
+            this.EbSeClient = _se as JsonServiceClient;
         }
 
         public EbBaseService(IEbConnectionFactory _dbf, IMessageProducer _mqp)
@@ -73,11 +81,26 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             this.MessageProducer3 = _mqp as RabbitMqProducer;
         }
 
+        public EbBaseService(IEbConnectionFactory _dbf, IMessageProducer _mqp, IJsonServiceClient _sec)
+        {
+            this.EbConnectionFactory = _dbf as EbConnectionFactory;
+            this.MessageProducer3 = _mqp as RabbitMqProducer;
+            this.EbSeClient = _sec as JsonServiceClient;
+        }
+
         public EbBaseService(IEbConnectionFactory _dbf, IMessageProducer _mqp, IMessageQueueClient _mqc)
         {
             this.EbConnectionFactory = _dbf as EbConnectionFactory;
             this.MessageProducer3 = _mqp as RabbitMqProducer;
             this.MessageQueueClient = _mqc as RabbitMqQueueClient;
+        }
+
+        public EbBaseService(IEbConnectionFactory _dbf, IMessageProducer _mqp, IMessageQueueClient _mqc, IJsonServiceClient _sec)
+        {
+            this.EbConnectionFactory = _dbf as EbConnectionFactory;
+            this.MessageProducer3 = _mqp as RabbitMqProducer;
+            this.MessageQueueClient = _mqc as RabbitMqQueueClient;
+            this.EbSeClient = _sec as JsonServiceClient;
         }
 
         private static Dictionary<string, string> _infraDbSqlQueries;
