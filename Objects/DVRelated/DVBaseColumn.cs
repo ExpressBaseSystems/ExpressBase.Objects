@@ -11,7 +11,8 @@ namespace ExpressBase.Objects.Objects.DVRelated
     {
         Default = 0,
         Chart = 1,
-        Link = 2
+        Link = 2,
+        Marker = 3
     }
 
     public enum NumericRenderType

@@ -758,6 +758,7 @@ else {
             Stamp.FormFlattening = true;
             Stamp.Close();
         }
+      
         public EbReport()
         {
             this.ReportHeaders = new List<EbReportHeader>();
