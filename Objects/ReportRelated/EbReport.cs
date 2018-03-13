@@ -657,7 +657,14 @@ else {
                 globals.CurrentField = this;
                 if (AppearanceScriptCollection.ContainsKey(field.Name))
                 {
-                    (AppearanceScriptCollection[field.Name].RunAsync(globals)).Result.ReturnValue.ToString();
+                    try
+                    {
+                        (AppearanceScriptCollection[field.Name].RunAsync(globals)).Result.ReturnValue.ToString();
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e.Message);
+                    }
                 }
                 if (field is EbCalcField)
                 {
@@ -674,7 +681,7 @@ else {
                     }
                     catch (Exception e)
                     {
-
+                        Console.WriteLine(e.Message);
                     }
                 }
                 else if (field is IEbDataFieldSummary)
