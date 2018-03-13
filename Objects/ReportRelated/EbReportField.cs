@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using QRCoder;
 using System.Data;
+using ExpressBase.Common;
 
 namespace ExpressBase.Objects.ReportRelated
 {

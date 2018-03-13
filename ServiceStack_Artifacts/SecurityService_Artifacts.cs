@@ -359,10 +359,35 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     }
 
+	[DataContract]
+	public class ChangeUserPasswordRequest : IReturn<ChangeUserPasswordResponse>, IEbSSRequest
+	{
+		[DataMember(Order = 1)]
+		public string OldPwd { get; set; }
+
+		[DataMember(Order = 2)]
+		public string NewPwd { get; set; }
+
+		[DataMember(Order = 3)]
+		public string Email { get; set; }
+
+		[DataMember(Order = 4)]
+		public string TenantAccountId { get; set; }
+
+		public int UserId { get; set; }
+	}
+
+	[DataContract]
+	public class ChangeUserPasswordResponse 
+	{
+		[DataMember(Order = 1)]
+		public bool isSuccess { get; set; }
+	}
 
 
-    //ANONYMOUS USER START-----------------------------------------
-    [DataContract]
+
+	//ANONYMOUS USER START-----------------------------------------
+	[DataContract]
 	public class GetManageAnonymousUserRequest : IReturn<GetManageAnonymousUserResponse>, IEbSSRequest
 	{
 
