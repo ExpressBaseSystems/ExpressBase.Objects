@@ -213,19 +213,13 @@ namespace ExpressBase.Objects.ReportRelated
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
         {
-<<<<<<< HEAD
+
             var urx = this.WidthPt + this.LeftPt;
             var ury = reportHeight - (printingTop + this.TopPt + detailprintingtop);
             var llx = this.LeftPt;
             var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
-=======
-            Phrase phrase = null;
-            var urx = this.Width + this.Left;
-            var ury = reportHeight - (printingTop + this.Top + detailprintingtop);
-            var llx = this.Left;
-            var lly = reportHeight - (printingTop + this.Top + this.Height + detailprintingtop);
->>>>>>> f4fd24ff2798e5fc5438e25cfc60d15418ca5f2c
 
+            Phrase phrase = null;
             if (this.Font == null)
                 phrase = new Phrase(column_val);
             else
@@ -260,18 +254,11 @@ namespace ExpressBase.Objects.ReportRelated
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
         {
-<<<<<<< HEAD
             var urx = this.WidthPt + this.LeftPt;
             var ury = reportHeight - (printingTop + this.TopPt + detailprintingtop);
             var llx = this.LeftPt;
             var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
-=======
             Phrase phrase = null;
-            var urx = this.Width + this.Left;
-            var ury = reportHeight - (printingTop + this.Top + detailprintingtop);
-            var llx = this.Left;
-            var lly = reportHeight - (printingTop + this.Top + this.Height + detailprintingtop);
->>>>>>> f4fd24ff2798e5fc5438e25cfc60d15418ca5f2c
 
             if (this.Font == null)
                 phrase = new Phrase(column_val);
@@ -306,19 +293,12 @@ namespace ExpressBase.Objects.ReportRelated
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
         {
-<<<<<<< HEAD
             var urx = this.WidthPt + this.LeftPt;
             var ury = reportHeight - (printingTop + this.TopPt + detailprintingtop);
             var llx = this.LeftPt;
             var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
-=======
-            Phrase phrase = null;
-               var urx = this.Width + this.Left;
-            var ury = reportHeight - (printingTop + this.Top + detailprintingtop);
-            var llx = this.Left;
-            var lly = reportHeight - (printingTop + this.Top + this.Height + detailprintingtop);
->>>>>>> f4fd24ff2798e5fc5438e25cfc60d15418ca5f2c
 
+            Phrase phrase = null;
             if (this.Font == null)
                 phrase = new Phrase(column_val);
             else
@@ -598,22 +578,16 @@ namespace ExpressBase.Objects.ReportRelated
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
         {
-<<<<<<< HEAD
             var urx = this.WidthPt + this.LeftPt;
             var ury = reportHeight - (printingTop + this.TopPt + detailprintingtop);
             var llx = this.LeftPt;
             var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
-=======
+
             Phrase phrase = null;
-            var urx = this.Width + this.Left;
-            var ury = reportHeight - (printingTop + this.Top + detailprintingtop);
-            var llx = this.Left;
-            var lly = reportHeight - (printingTop + this.Top + this.Height + detailprintingtop);
             if (this.Font == null)
                 phrase = new Phrase(column_val);
             else
                 phrase = new Phrase(column_val, this.SetFont());
->>>>>>> f4fd24ff2798e5fc5438e25cfc60d15418ca5f2c
 
             ColumnText ct = new ColumnText(canvas);
             ct.Canvas.SetColorFill(GetColor(this.ForeColor));

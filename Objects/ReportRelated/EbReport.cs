@@ -689,11 +689,7 @@ else {
                     if ((field is EbDataFieldNumericSummary) && (field as EbDataFieldNumericSummary).InLetters == true)
                     {
                         column_val = (field as IEbDataFieldSummary).SummarizedValue.ToString();
-<<<<<<< HEAD
                         (field as EbDataFieldNumericSummary).DrawMe(Canvas, HeightPt, section_Yposition,  detailprintingtop,  column_val);
-=======
-                        (field as EbDataFieldNumericSummary).DrawMe(Canvas, Height, section_Yposition, detailprintingtop, column_val);
->>>>>>> f4fd24ff2798e5fc5438e25cfc60d15418ca5f2c
                         return;
                     }
                     else
