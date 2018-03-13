@@ -111,7 +111,7 @@ namespace ExpressBase.Objects.ReportRelated
         public override void DrawMe(Document d, byte[] fileByte)
         {
             iTextSharp.text.Image myImage = iTextSharp.text.Image.GetInstance(fileByte);
-            myImage.ScaleToFit(this.Width, this.Height);
+            myImage.ScaleToFit(this.WidthPt, this.HeightPt);
             myImage.Alignment = Element.ALIGN_CENTER;
             d.Add(myImage);
         }
@@ -165,8 +165,8 @@ namespace ExpressBase.Objects.ReportRelated
             {
                 iTextSharp.text.Image img = iTextSharp.text.Image.GetInstance(fileByte);
                 img.RotationDegrees = this.Rotation;
-                img.ScaleToFit(this.Width, this.Height);
-                img.SetAbsolutePosition(this.Left, reportHeight - this.Top - this.Height);
+                img.ScaleToFit(this.WidthPt, this.HeightPt);
+                img.SetAbsolutePosition(this.LeftPt, reportHeight - this.TopPt - this.HeightPt);
                 PdfGState _state = new PdfGState()
                 {
                     FillOpacity = 0.3F,
@@ -202,10 +202,10 @@ namespace ExpressBase.Objects.ReportRelated
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
         {
-            var urx = this.Width + this.Left;
-            var ury = reportHeight - (printingTop + this.Top + detailprintingtop);
-            var llx = this.Left;
-            var lly = reportHeight - (printingTop + this.Top + this.Height + detailprintingtop);
+            var urx = this.WidthPt + this.LeftPt;
+            var ury = reportHeight - (printingTop + this.TopPt + detailprintingtop);
+            var llx = this.LeftPt;
+            var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
 
             ColumnText ct = new ColumnText(canvas);
             ct.Canvas.SetColorFill(GetColor(this.ForeColor));
@@ -236,10 +236,10 @@ namespace ExpressBase.Objects.ReportRelated
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
         {
-            var urx = this.Width + this.Left;
-            var ury = reportHeight - (printingTop + this.Top + detailprintingtop);
-            var llx = this.Left;
-            var lly = reportHeight - (printingTop + this.Top + this.Height + detailprintingtop);
+            var urx = this.WidthPt + this.LeftPt;
+            var ury = reportHeight - (printingTop + this.TopPt + detailprintingtop);
+            var llx = this.LeftPt;
+            var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
 
             ColumnText ct = new ColumnText(canvas);
             ct.Canvas.SetColorFill(GetColor(this.ForeColor));
@@ -270,10 +270,10 @@ namespace ExpressBase.Objects.ReportRelated
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
         {
-            var urx = this.Width + this.Left;
-            var ury = reportHeight - (printingTop + this.Top + detailprintingtop);
-            var llx = this.Left;
-            var lly = reportHeight - (printingTop + this.Top + this.Height + detailprintingtop);
+            var urx = this.WidthPt + this.LeftPt;
+            var ury = reportHeight - (printingTop + this.TopPt + detailprintingtop);
+            var llx = this.LeftPt;
+            var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
 
             ColumnText ct = new ColumnText(canvas);
             ct.Canvas.SetColorFill(GetColor(this.ForeColor));
@@ -332,10 +332,10 @@ namespace ExpressBase.Objects.ReportRelated
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, EbReport report)
         {
-            var urx = this.Width + this.Left;
-            var ury = reportHeight - (printingTop + this.Top + report.detailprintingtop);
-            var llx = this.Left;
-            var lly = reportHeight - (printingTop + this.Top + this.Height + report.detailprintingtop + report.RowHeight);
+            var urx = this.WidthPt + this.LeftPt;
+            var ury = reportHeight - (printingTop + this.TopPt + report.detailprintingtop);
+            var llx = this.LeftPt;
+            var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + report.detailprintingtop + report.RowHeight);
 
             ColumnText ct = new ColumnText(canvas);
             Phrase phrase = null;
@@ -456,14 +456,14 @@ namespace ExpressBase.Objects.ReportRelated
                 }
 
                 //imageEAN.ScaleAbsolute(Width, Height);
-                imageEAN.SetAbsolutePosition(Left, reportHeight - (printingTop + this.Top + this.Height + detailprintingtop));
+                imageEAN.SetAbsolutePosition(LeftPt, reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop));
                 doc.Add(imageEAN);
             }
             catch (Exception e)
             {
                 ColumnText ct = new ColumnText(canvas);
-                var x = reportHeight - (printingTop + this.Top + detailprintingtop);
-                ct.SetSimpleColumn(new Phrase("Error in generating barcode"), Left, x - Height, Left + Width, x, 15, Element.ALIGN_LEFT);
+                var x = reportHeight - (printingTop + this.TopPt + detailprintingtop);
+                ct.SetSimpleColumn(new Phrase("Error in generating barcode"), LeftPt, x - HeightPt, LeftPt + WidthPt, x, 15, Element.ALIGN_LEFT);
                 ct.Go();
             }
         }
@@ -514,8 +514,8 @@ namespace ExpressBase.Objects.ReportRelated
             catch (Exception e)
             {
                 ColumnText ct = new ColumnText(canvas);
-                var x = reportHeight - (printingTop + this.Top + detailprintingtop);
-                ct.SetSimpleColumn(new Phrase("Error in generating barcode"), Left, x - Height, Left + Width, x, 15, Element.ALIGN_LEFT);
+                var x = reportHeight - (printingTop + this.TopPt + detailprintingtop);
+                ct.SetSimpleColumn(new Phrase("Error in generating barcode"), LeftPt, x - HeightPt, LeftPt + WidthPt, x, 15, Element.ALIGN_LEFT);
                 ct.Go();
             }
         }
@@ -542,10 +542,10 @@ namespace ExpressBase.Objects.ReportRelated
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
         {
-            var urx = this.Width + this.Left;
-            var ury = reportHeight - (printingTop + this.Top + detailprintingtop);
-            var llx = this.Left;
-            var lly = reportHeight - (printingTop + this.Top + this.Height + detailprintingtop);
+            var urx = this.WidthPt + this.LeftPt;
+            var ury = reportHeight - (printingTop + this.TopPt + detailprintingtop);
+            var llx = this.LeftPt;
+            var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
 
             ColumnText ct = new ColumnText(canvas);
             ct.Canvas.SetColorFill(GetColor(this.ForeColor));

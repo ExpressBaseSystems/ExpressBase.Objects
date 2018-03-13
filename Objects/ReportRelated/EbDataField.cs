@@ -52,16 +52,16 @@ namespace ExpressBase.Objects.ReportRelated
                 var p = text.Font.GetCalculatedBaseFont(false);
                 float q = p.GetWidthPoint(column_val, text.Font.CalculatedSize);
                 var l = q / column_val.Length;
-                int numberofCharsInALine = Convert.ToInt32(Math.Floor(this.Width / l));
+                int numberofCharsInALine = Convert.ToInt32(Math.Floor(this.WidthPt / l));
                 if (numberofCharsInALine < column_val.Length)
                 {
                     if (column_type == System.Data.DbType.Decimal)
                         column_val = "###";
                 }
             }
-            var ury = reportHeight - (printingTop + this.Top + detailprintingtop);
-            var lly = reportHeight - (printingTop + this.Top + this.Height + detailprintingtop);
-            ct.SetSimpleColumn(text, this.Left, lly, this.Width + this.Left, ury, 15, Element.ALIGN_LEFT);
+            var ury = reportHeight - (printingTop + this.TopPt + detailprintingtop);
+            var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
+            ct.SetSimpleColumn(text, this.LeftPt, lly, this.WidthPt + this.LeftPt, ury, 15, Element.ALIGN_LEFT);
             ct.Go();
         }
     }
@@ -167,8 +167,8 @@ namespace ExpressBase.Objects.ReportRelated
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
         {
-            var ury = reportHeight - (printingTop + this.Top + detailprintingtop);
-            var lly = reportHeight - (printingTop + this.Top + this.Height + detailprintingtop);
+            var ury = reportHeight - (printingTop + this.TopPt + detailprintingtop);
+            var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
             if (this.DecimalPlaces > 0)
                 column_val = Convert.ToDecimal(column_val).ToString("F" + this.DecimalPlaces);
             if (this.InLetters)
@@ -179,7 +179,7 @@ namespace ExpressBase.Objects.ReportRelated
 
             ColumnText ct = new ColumnText(canvas);
             ct.Canvas.SetColorFill(GetColor(this.ForeColor));
-            ct.SetSimpleColumn(new Phrase(column_val), this.Left, lly, this.Width + this.Left, ury, 15, Element.ALIGN_RIGHT);
+            ct.SetSimpleColumn(new Phrase(column_val), this.LeftPt, lly, this.WidthPt + this.LeftPt, ury, 15, Element.ALIGN_RIGHT);
             ct.Go();
         }
         public class NumberToEnglish
@@ -505,8 +505,8 @@ namespace ExpressBase.Objects.ReportRelated
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
         {
-            var ury = reportHeight - (printingTop + this.Top + detailprintingtop);
-            var lly = reportHeight - (printingTop + this.Top + this.Height + detailprintingtop);
+            var ury = reportHeight - (printingTop + this.TopPt + detailprintingtop);
+            var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
             if (this.DecimalPlaces > 0)
                 column_val = Convert.ToDecimal(column_val).ToString("F" + this.DecimalPlaces);
             if (this.InLetters)
@@ -519,7 +519,7 @@ namespace ExpressBase.Objects.ReportRelated
             ct.Canvas.SetColorFill(GetColor(this.ForeColor));
             var phrase = new Phrase(column_val);
             phrase.Font.Size = 8;
-            ct.SetSimpleColumn(phrase, this.Left, lly, this.Width + this.Left, ury, 15, Element.ALIGN_RIGHT);
+            ct.SetSimpleColumn(phrase, this.LeftPt, lly, this.WidthPt + this.LeftPt, ury, 15, Element.ALIGN_RIGHT);
             ct.Go();
         }
     }
