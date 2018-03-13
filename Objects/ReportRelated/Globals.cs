@@ -19,6 +19,8 @@ namespace ExpressBase.Objects.Objects.ReportRelated
         public dynamic T8 { get; set; }
         public dynamic T9 { get; set; }
 
+        public dynamic CurrentField { get; set; }
+
         public Globals()
         {
             T0 = new NTVDict();

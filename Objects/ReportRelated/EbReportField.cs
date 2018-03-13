@@ -69,15 +69,17 @@ namespace ExpressBase.Objects.ReportRelated
         {
         }
 
-        public iTextSharp.text.Font SetFont(EbReportField field)
+        public iTextSharp.text.Font SetFont()
         {
-            BaseFont bf = BaseFont.CreateFont(BaseFont.TIMES_ROMAN, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
-            iTextSharp.text.Font font = new iTextSharp.text.Font(bf, field.Font.Size, (int)field.Font.Style, field.GetColor(field.Font.color));
-            if (field.Font.Caps == true)
-                field.Title = this.Title.ToUpper();
-            if (field.Font.Strikethrough == true)
+            iTextSharp.text.FontFactory.RegisterDirectory("G:\\ExpressBase.Core\\ExpressBase.Objects\\Fonts\\");
+            iTextSharp.text.Font font = FontFactory.GetFont("Verdana", Font.Size, (int)Font.Style, GetColor(Font.color));
+            //BaseFont bf = BaseFont.CreateFont("calibrili", BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
+            //iTextSharp.text.Font font = new iTextSharp.text.Font(bf, field.Font.Size, (int)field.Font.Style, field.GetColor(field.Font.color));
+            if (Font.Caps == true)
+                Title = this.Title.ToUpper();
+            if (Font.Strikethrough == true)
                 font.SetStyle(iTextSharp.text.Font.STRIKETHRU);
-            if (field.Font.Underline == true)
+            if (Font.Underline == true)
                 font.SetStyle(iTextSharp.text.Font.UNDERLINE);
             return font;
         }
@@ -94,6 +96,10 @@ namespace ExpressBase.Objects.ReportRelated
         [EnableInBuilder(BuilderType.Report)]
         [PropertyEditor(PropertyEditorType.ImageSeletor)]
         public string Image { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
+        public new EbFont Font { get; set; }
 
         public override string GetDesignHtml()
         {
@@ -112,7 +118,7 @@ namespace ExpressBase.Objects.ReportRelated
         public override void DrawMe(Document d, byte[] fileByte)
         {
             iTextSharp.text.Image myImage = iTextSharp.text.Image.GetInstance(fileByte);
-            myImage.ScaleToFit(this.Width, this.Height);
+            myImage.ScaleToFit(this.WidthPt, this.HeightPt);
             myImage.Alignment = Element.ALIGN_CENTER;
             d.Add(myImage);
         }
@@ -155,19 +161,23 @@ namespace ExpressBase.Objects.ReportRelated
 
         public override void DrawMe(Document d, PdfWriter writer, byte[] fileByte, float reportHeight)
         {
+            Phrase phrase = null;
             if (this.WaterMarkText != string.Empty)
             {
+                if (this.Font == null)
+                    phrase = new Phrase(this.WaterMarkText);
+                else
+                    phrase = new Phrase(this.WaterMarkText, this.SetFont());
                 PdfContentByte canvas;
-                iTextSharp.text.Font fo = new iTextSharp.text.Font(5, 20, 5, BaseColor.LightGray);
                 canvas = writer.DirectContentUnder;
-                ColumnText.ShowTextAligned(canvas, Element.ALIGN_CENTER, new Phrase(this.WaterMarkText, fo), d.PageSize.Width / 2, d.PageSize.Height / 2, this.Rotation);
+                ColumnText.ShowTextAligned(canvas, Element.ALIGN_CENTER, phrase, d.PageSize.Width / 2, d.PageSize.Height / 2, this.Rotation);
             }
             if (this.Image != string.Empty)
             {
                 iTextSharp.text.Image img = iTextSharp.text.Image.GetInstance(fileByte);
                 img.RotationDegrees = this.Rotation;
-                img.ScaleToFit(this.Width, this.Height);
-                img.SetAbsolutePosition(this.Left, reportHeight - this.Top - this.Height);
+                img.ScaleToFit(this.WidthPt, this.HeightPt);
+                img.SetAbsolutePosition(this.LeftPt, reportHeight - this.TopPt - this.HeightPt);
                 PdfGState _state = new PdfGState()
                 {
                     FillOpacity = 0.3F,
@@ -203,10 +213,17 @@ namespace ExpressBase.Objects.ReportRelated
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
         {
-            var urx = this.Width + this.Left;
-            var ury = reportHeight - (printingTop + this.Top + detailprintingtop);
-            var llx = this.Left;
-            var lly = reportHeight - (printingTop + this.Top + this.Height + detailprintingtop);
+
+            var urx = this.WidthPt + this.LeftPt;
+            var ury = reportHeight - (printingTop + this.TopPt + detailprintingtop);
+            var llx = this.LeftPt;
+            var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
+
+            Phrase phrase = null;
+            if (this.Font == null)
+                phrase = new Phrase(column_val);
+            else
+                phrase = new Phrase(column_val, this.SetFont());
 
             ColumnText ct = new ColumnText(canvas);
             ct.Canvas.SetColorFill(GetColor(this.ForeColor));
@@ -237,11 +254,16 @@ namespace ExpressBase.Objects.ReportRelated
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
         {
-            var urx = this.Width + this.Left;
-            var ury = reportHeight - (printingTop + this.Top + detailprintingtop);
-            var llx = this.Left;
-            var lly = reportHeight - (printingTop + this.Top + this.Height + detailprintingtop);
+            var urx = this.WidthPt + this.LeftPt;
+            var ury = reportHeight - (printingTop + this.TopPt + detailprintingtop);
+            var llx = this.LeftPt;
+            var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
+            Phrase phrase = null;
 
+            if (this.Font == null)
+                phrase = new Phrase(column_val);
+            else
+                phrase = new Phrase(column_val, this.SetFont());
             ColumnText ct = new ColumnText(canvas);
             ct.Canvas.SetColorFill(GetColor(this.ForeColor));
             ct.SetSimpleColumn(new Phrase(column_val), llx, lly, urx, ury, 15, Element.ALIGN_LEFT);
@@ -271,11 +293,16 @@ namespace ExpressBase.Objects.ReportRelated
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
         {
-            var urx = this.Width + this.Left;
-            var ury = reportHeight - (printingTop + this.Top + detailprintingtop);
-            var llx = this.Left;
-            var lly = reportHeight - (printingTop + this.Top + this.Height + detailprintingtop);
+            var urx = this.WidthPt + this.LeftPt;
+            var ury = reportHeight - (printingTop + this.TopPt + detailprintingtop);
+            var llx = this.LeftPt;
+            var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
 
+            Phrase phrase = null;
+            if (this.Font == null)
+                phrase = new Phrase(column_val);
+            else
+                phrase = new Phrase(column_val, this.SetFont());
             ColumnText ct = new ColumnText(canvas);
             ct.Canvas.SetColorFill(GetColor(this.ForeColor));
             ct.SetSimpleColumn(new Phrase(column_val), llx, lly, urx, ury, 15, Element.ALIGN_LEFT);
@@ -333,18 +360,18 @@ namespace ExpressBase.Objects.ReportRelated
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, EbReport report)
         {
-            var urx = this.Width + this.Left;
-            var ury = reportHeight - (printingTop + this.Top + report.detailprintingtop);
-            var llx = this.Left;
-            var lly = reportHeight - (printingTop + this.Top + this.Height + report.detailprintingtop + report.RowHeight);
+            var urx = this.WidthPt + this.LeftPt;
+            var ury = reportHeight - (printingTop + this.TopPt + report.detailprintingtop);
+            var llx = this.LeftPt;
+            var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + report.detailprintingtop + report.RowHeight);
 
             ColumnText ct = new ColumnText(canvas);
             Phrase phrase = null;
             //ct.Canvas.SetColorFill(GetColor(this.ForeColor));
-            if (this.Font.Font == null)
+            if (this.Font == null)
                 phrase = new Phrase(this.Title);
             else
-                 phrase = new Phrase(this.Title, this.SetFont(this as EbReportField));
+                 phrase = new Phrase(this.Title, this.SetFont());
 
             ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, Element.ALIGN_LEFT);
             ct.Go();
@@ -381,6 +408,10 @@ namespace ExpressBase.Objects.ReportRelated
         [UIproperty]
         [PropertyGroup("Appearance")]
         public float BaseLine { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
+        public new EbFont Font { get; set; }
 
         public override string GetDesignHtml()
         {
@@ -457,14 +488,14 @@ namespace ExpressBase.Objects.ReportRelated
                 }
 
                 //imageEAN.ScaleAbsolute(Width, Height);
-                imageEAN.SetAbsolutePosition(Left, reportHeight - (printingTop + this.Top + this.Height + detailprintingtop));
+                imageEAN.SetAbsolutePosition(LeftPt, reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop));
                 doc.Add(imageEAN);
             }
             catch (Exception e)
             {
                 ColumnText ct = new ColumnText(canvas);
-                var x = reportHeight - (printingTop + this.Top + detailprintingtop);
-                ct.SetSimpleColumn(new Phrase("Error in generating barcode"), Left, x - Height, Left + Width, x, 15, Element.ALIGN_LEFT);
+                var x = reportHeight - (printingTop + this.TopPt + detailprintingtop);
+                ct.SetSimpleColumn(new Phrase("Error in generating barcode"), LeftPt, x - HeightPt, LeftPt + WidthPt, x, 15, Element.ALIGN_LEFT);
                 ct.Go();
             }
         }
@@ -483,6 +514,10 @@ namespace ExpressBase.Objects.ReportRelated
         [UIproperty]
         [PropertyGroup("Appearance")]
         public string Code { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
+        public new EbFont Font { get; set; }
 
         public override string GetDesignHtml()
         {
@@ -515,8 +550,8 @@ namespace ExpressBase.Objects.ReportRelated
             catch (Exception e)
             {
                 ColumnText ct = new ColumnText(canvas);
-                var x = reportHeight - (printingTop + this.Top + detailprintingtop);
-                ct.SetSimpleColumn(new Phrase("Error in generating barcode"), Left, x - Height, Left + Width, x, 15, Element.ALIGN_LEFT);
+                var x = reportHeight - (printingTop + this.TopPt + detailprintingtop);
+                ct.SetSimpleColumn(new Phrase("Error in generating barcode"), LeftPt, x - HeightPt, LeftPt + WidthPt, x, 15, Element.ALIGN_LEFT);
                 ct.Go();
             }
         }
@@ -543,14 +578,20 @@ namespace ExpressBase.Objects.ReportRelated
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
         {
-            var urx = this.Width + this.Left;
-            var ury = reportHeight - (printingTop + this.Top + detailprintingtop);
-            var llx = this.Left;
-            var lly = reportHeight - (printingTop + this.Top + this.Height + detailprintingtop);
+            var urx = this.WidthPt + this.LeftPt;
+            var ury = reportHeight - (printingTop + this.TopPt + detailprintingtop);
+            var llx = this.LeftPt;
+            var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
+
+            Phrase phrase = null;
+            if (this.Font == null)
+                phrase = new Phrase(column_val);
+            else
+                phrase = new Phrase(column_val, this.SetFont());
 
             ColumnText ct = new ColumnText(canvas);
             ct.Canvas.SetColorFill(GetColor(this.ForeColor));
-            ct.SetSimpleColumn(new Phrase(column_val), llx, lly, urx, ury, 15, Element.ALIGN_LEFT);
+            ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, Element.ALIGN_LEFT);
             ct.Go();
         }
     }
