@@ -225,7 +225,7 @@ else {
                 if (_rhHeight == 0)
                 {
                     foreach (EbReportHeader r_header in ReportHeaders)
-                        _rhHeight += r_header.Height;
+                        _rhHeight += r_header.HeightPt;
                 }
 
                 return _rhHeight;
@@ -241,7 +241,7 @@ else {
                 if (_phHeight == 0)
                 {
                     foreach (EbPageHeader p_header in PageHeaders)
-                        _phHeight += p_header.Height;
+                        _phHeight += p_header.HeightPt;
                 }
                 return _phHeight;
             }
@@ -257,7 +257,7 @@ else {
                 {
 
                     foreach (EbPageFooter p_footer in PageFooters)
-                        _pfHeight += p_footer.Height;
+                        _pfHeight += p_footer.HeightPt;
                 }
                 return _pfHeight;
             }
@@ -272,7 +272,7 @@ else {
                 if (_rfHeight == 0)
                 {
                     foreach (EbReportFooter r_footer in ReportFooters)
-                        _rfHeight += r_footer.Height;
+                        _rfHeight += r_footer.HeightPt;
                 }
                 return _rfHeight;
             }
@@ -287,7 +287,7 @@ else {
                 if (_dtHeight == 0)
                 {
                     foreach (EbReportDetail detail in Detail)
-                        _dtHeight += detail.Height;
+                        _dtHeight += detail.HeightPt;
                 }
                 return _dtHeight + RowHeight;
             }
@@ -305,20 +305,20 @@ else {
                     if (rows.Count > 0)
                     {
                         var a = rows.Count * DetailHeight;
-                        var b = Height - (PageHeaderHeight + PageFooterHeight + ReportHeaderHeight + ReportFooterHeight);
+                        var b = HeightPt - (PageHeaderHeight + PageFooterHeight + ReportHeaderHeight + ReportFooterHeight);
                         if (a < b && PageNumber == 1)
                             IsLastpage = true;
                     }
                 }
 
                 if (PageNumber == 1 && IsLastpage == true)
-                    dt_fillheight = Height - (PageHeaderHeight + PageFooterHeight + ReportHeaderHeight + ReportFooterHeight);
+                    dt_fillheight = HeightPt - (PageHeaderHeight + PageFooterHeight + ReportHeaderHeight + ReportFooterHeight);
                 else if (PageNumber == 1)
-                    dt_fillheight = Height - (ReportHeaderHeight + PageHeaderHeight + PageFooterHeight);
+                    dt_fillheight = HeightPt - (ReportHeaderHeight + PageHeaderHeight + PageFooterHeight);
                 else if (IsLastpage == true)
-                    dt_fillheight = Height - (PageHeaderHeight + PageFooterHeight + ReportFooterHeight);
+                    dt_fillheight = HeightPt - (PageHeaderHeight + PageFooterHeight + ReportFooterHeight);
                 else
-                    dt_fillheight = Height - (PageHeaderHeight + PageFooterHeight);
+                    dt_fillheight = HeightPt - (PageHeaderHeight + PageFooterHeight);
                 return dt_fillheight;
             }
         }
@@ -420,7 +420,7 @@ else {
                     {
                         fileByte = watermarkImages[(field as EbWaterMark).Image];
                     }
-                (field as EbWaterMark).DrawMe(d, writer, fileByte, Height);
+                (field as EbWaterMark).DrawMe(d, writer, fileByte, HeightPt);
                 }
             }
         }
@@ -468,7 +468,7 @@ else {
                 {
                     DrawFields(field, rh_Yposition, 1);
                 }
-                rh_Yposition += r_header.Height;
+                rh_Yposition += r_header.HeightPt;
             }
         }
 
@@ -484,7 +484,7 @@ else {
                 {
                     DrawFields(field, ph_Yposition, 1);
                 }
-                ph_Yposition += p_header.Height;
+                ph_Yposition += p_header.HeightPt;
             }
         }
 
@@ -574,13 +574,13 @@ else {
                         var phrase = new Phrase(column_val);
                         phrase.Font.Size = 12;
                         var calculatedValueSize = phrase.Font.CalculatedSize * val_length;
-                        if (calculatedValueSize > field.Width)
+                        if (calculatedValueSize > field.WidthPt)
                         {
-                            rowsneeded = (datatype == DbType.Decimal) ? 1 : Convert.ToInt32(Math.Floor(calculatedValueSize / field.Width));
+                            rowsneeded = (datatype == DbType.Decimal) ? 1 : Convert.ToInt32(Math.Floor(calculatedValueSize / field.WidthPt));
 
                             if (MultiRowTop == 0)
                             {
-                                MultiRowTop = field.Top;
+                                MultiRowTop = field.TopPt;
                             }
                             float k = (phrase.Font.CalculatedSize) * rowsneeded;
                             if (k > RowHeight)
@@ -598,7 +598,7 @@ else {
                     field.Height += RowHeight;
                     DrawFields(field, dt_Yposition, serialnumber);
                 }
-                detailprintingtop += detail.Height + RowHeight;
+                detailprintingtop += detail.HeightPt + RowHeight;
             }
         }
 
@@ -616,7 +616,7 @@ else {
                 {
                     DrawFields(field, pf_Yposition, 1);
                 }
-                pf_Yposition += p_footer.Height;
+                pf_Yposition += p_footer.HeightPt;
             }
         }
 
@@ -634,7 +634,7 @@ else {
                 {
                     DrawFields(field, rf_Yposition, 1);
                 }
-                rf_Yposition += r_footer.Height;
+                rf_Yposition += r_footer.HeightPt;
             }
         }
 
@@ -689,7 +689,11 @@ else {
                     if ((field is EbDataFieldNumericSummary) && (field as EbDataFieldNumericSummary).InLetters == true)
                     {
                         column_val = (field as IEbDataFieldSummary).SummarizedValue.ToString();
+<<<<<<< HEAD
+                        (field as EbDataFieldNumericSummary).DrawMe(Canvas, HeightPt, section_Yposition,  detailprintingtop,  column_val);
+=======
                         (field as EbDataFieldNumericSummary).DrawMe(Canvas, Height, section_Yposition, detailprintingtop, column_val);
+>>>>>>> f4fd24ff2798e5fc5438e25cfc60d15418ca5f2c
                         return;
                     }
                     else
@@ -698,7 +702,7 @@ else {
                 else
                     column_val = GetFieldtData(column_name, serialnumber);
 
-                field.DrawMe(Canvas, Height, section_Yposition, column_val, detailprintingtop, column_type);
+                field.DrawMe(Canvas, HeightPt, section_Yposition, column_val, detailprintingtop, column_type);
             }
 
             if ((field is EbPageNo) || (field is EbPageXY) || (field is EbDateTime) || (field is EbSerialNumber))
@@ -711,7 +715,7 @@ else {
                     column_val = CurrentTimestamp.ToString();
                 else if (field is EbSerialNumber)
                     column_val = (iDetailRowPos + 1).ToString();
-                field.DrawMe(Canvas, Height, section_Yposition, detailprintingtop, column_val);
+                field.DrawMe(Canvas, HeightPt, section_Yposition, detailprintingtop, column_val);
             }
             else if (field is EbImg)
             {
@@ -720,21 +724,21 @@ else {
             }
             else if ((field is EbText) || (field is EbReportFieldShape))
             {
-                field.DrawMe(Canvas, Height, section_Yposition, this);
+                field.DrawMe(Canvas, HeightPt, section_Yposition, this);
             }
             else if (field is EbBarcode)
             {
                 var table = (field as EbBarcode).Code.Split('.')[0];
                 column_name = (field as EbBarcode).Code.Split('.')[1];
                 column_val = GetFieldtData(column_name, serialnumber);
-                field.DrawMe(Doc, Canvas, Height, section_Yposition, detailprintingtop, column_val);
+                field.DrawMe(Doc, Canvas, HeightPt, section_Yposition, detailprintingtop, column_val);
             }
             else if (field is EbQRcode)
             {
                 var table = (field as EbQRcode).Code.Split('.')[0];
                 column_name = (field as EbQRcode).Code.Split('.')[1];
                 column_val = GetFieldtData(column_name, serialnumber);
-                field.DrawMe(Doc, Canvas, Height, section_Yposition, detailprintingtop, column_val);
+                field.DrawMe(Doc, Canvas, HeightPt, section_Yposition, detailprintingtop, column_val);
             }
         }
 
