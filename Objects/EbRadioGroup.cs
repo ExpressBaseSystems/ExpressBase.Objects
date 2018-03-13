@@ -127,7 +127,10 @@ this.Init = function(id)
 
         public override string GetBareHtml()
         {
-            return @"<div><input type ='radio' id='@name@' @defaultcheked@ value='@value@' name='@gname@'> <span id='@name@Lbl' style='@LabelBackColor @LabelForeColor '> @label@  </span><br></div>"
+            return @"<div class='radio-wrap' onclick=""event.stopPropagation();$('#@name@').prop('checked', true);"">
+                        <input type ='radio' id='@name@' @defaultcheked@ value='@value@' name='@gname@'>
+                        <span id='@name@Lbl' style='@LabelBackColor @LabelForeColor '> @label@  </span>
+                    </div>"
 .Replace("@name@", this.Name)
 .Replace("@gname@", this.GName)
 .Replace("@label@", this.Label)
