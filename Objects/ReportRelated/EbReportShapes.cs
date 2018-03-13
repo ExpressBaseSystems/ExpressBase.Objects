@@ -11,6 +11,9 @@ namespace ExpressBase.Objects.ReportRelated
 {
     public abstract class EbReportFieldShape : EbReportField
     {
+        [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
+        public new EbFont Font { get; set; }
     }
 
     [EnableInBuilder(BuilderType.Report)]
