@@ -37,32 +37,44 @@ namespace ExpressBase.Objects.ReportRelated
         [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("General")]
         [UIproperty]
-        public Boolean RenderInMultiLineForLargeData { get; set; }
+        public Boolean RenderInMultiLine { get; set; }
 
+        [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup("General")]
+        [UIproperty]
+        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
+        public string AppearanceExpression { get; set; }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, string column_val, float detailprintingtop, DbType column_type)
         {
-            ColumnText ct = new ColumnText(canvas);
-            Phrase text = null;
-            if (this.Font == null)
-                text = new Phrase(column_val);
-            else
-                text = new Phrase(column_val, base.SetFont(this as EbReportField));
-            if (this.RenderInMultiLineForLargeData == true)
+            try
             {
-                var p = text.Font.GetCalculatedBaseFont(false);
-                float q = p.GetWidthPoint(column_val, text.Font.CalculatedSize);
-                var l = q / column_val.Length;
-                int numberofCharsInALine = Convert.ToInt32(Math.Floor(this.Width / l));
-                if (numberofCharsInALine < column_val.Length)
+                ColumnText ct = new ColumnText(canvas);
+                Phrase text = null;
+                if (this.Font == null)
+                    text = new Phrase(column_val);
+                else
+                    text = new Phrase(column_val, base.SetFont());
+                if (this.RenderInMultiLine == true)
                 {
-                    if (column_type == System.Data.DbType.Decimal)
-                        column_val = "###";
+                    var p = text.Font.GetCalculatedBaseFont(false);
+                    float q = p.GetWidthPoint(column_val, text.Font.CalculatedSize);
+                    var l = q / column_val.Length;
+                    int numberofCharsInALine = Convert.ToInt32(Math.Floor(this.Width / l));
+                    if (numberofCharsInALine < column_val.Length)
+                    {
+                        if (column_type == System.Data.DbType.Decimal)
+                            column_val = "###";
+                    }
                 }
+                var ury = reportHeight - (printingTop + this.Top + detailprintingtop);
+                var lly = reportHeight - (printingTop + this.Top + this.Height + detailprintingtop);
+                ct.SetSimpleColumn(text, this.Left, lly, this.Width + this.Left, ury, 15, Element.ALIGN_LEFT);
+                ct.Go();
             }
-            var ury = reportHeight - (printingTop + this.Top + detailprintingtop);
-            var lly = reportHeight - (printingTop + this.Top + this.Height + detailprintingtop);
-            ct.SetSimpleColumn(text, this.Left, lly, this.Width + this.Left, ury, 15, Element.ALIGN_LEFT);
-            ct.Go();
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
         }
     }
 
@@ -735,7 +747,9 @@ namespace ExpressBase.Objects.ReportRelated
         [PropertyGroup("General")]
         [UIproperty]
         [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
-        public string Expression { get; set; }
+        public string ValueExpression { get; set; }
+
+
 
         private string[] _dataFieldsUsed;
         public string[] DataFieldsUsed
@@ -744,8 +758,8 @@ namespace ExpressBase.Objects.ReportRelated
             {
                 if (_dataFieldsUsed == null)
                 {
-                    var matches = Regex.Matches(this.Expression, @"T[0-9]{1}.\w+");
-                    _dataFieldsUsed = new string[matches.Count];
+                    var matches = Regex.Matches(this.ValueExpression + " " + this.AppearanceExpression, @"T[0-9]{1}.\w+").Distinct();
+                    _dataFieldsUsed = new string[matches.Count()];
                     int i = 0;
                     foreach (Match match in matches)
                         _dataFieldsUsed[i++] = match.Value;

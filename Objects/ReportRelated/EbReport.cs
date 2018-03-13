@@ -175,7 +175,9 @@ else {
         public List<object> WaterMarkList { get; set; }
 
         [JsonIgnore]
-        public Dictionary<string, Script> ScriptCollection { get; set; }
+        public Dictionary<string, Script> ValueScriptCollection { get; set; }
+        [JsonIgnore]
+        public Dictionary<string, Script> AppearanceScriptCollection { get; set; }
 
         [JsonIgnore]
         public RowColletion DataRow { get; set; }
@@ -565,7 +567,7 @@ else {
                     var table = field.TableIndex;
                     var column_name = field.ColumnName;
                     var column_val = GetFieldtData(column_name, serialnumber);
-                    if ((field as EbDataField).RenderInMultiLineForLargeData == true)
+                    if ((field as EbDataField).RenderInMultiLine == true)
                     {
                         var datatype = (DbType)field.DbType;
                         var val_length = column_val.Length;
@@ -651,10 +653,15 @@ else {
                 column_type = (DbType)(field as EbDataField).DbType;
                 var table = (field as EbDataField).TableIndex;
                 column_name = (field as EbDataField).ColumnName;
-
+                Globals globals = new Globals();
+                globals.CurrentField = this;
+                if (AppearanceScriptCollection.ContainsKey(field.Name))
+                {
+                    (AppearanceScriptCollection[field.Name].RunAsync(globals)).Result.ReturnValue.ToString();
+                }
                 if (field is EbCalcField)
                 {
-                    Globals globals = new Globals();
+
                     foreach (string calcfd in (field as EbCalcField).DataFieldsUsed)
                     {
                         string TName = calcfd.Split('.')[0];
@@ -663,7 +670,7 @@ else {
                     }
                     try
                     {
-                        column_val = (ScriptCollection[field.Name].RunAsync(globals)).Result.ReturnValue.ToString();
+                        column_val = (ValueScriptCollection[field.Name].RunAsync(globals)).Result.ReturnValue.ToString();
                     }
                     catch (Exception e)
                     {
@@ -675,11 +682,11 @@ else {
                     if ((field is EbDataFieldNumericSummary) && (field as EbDataFieldNumericSummary).InLetters == true)
                     {
                         column_val = (field as IEbDataFieldSummary).SummarizedValue.ToString();
-                        (field as EbDataFieldNumericSummary).DrawMe(Canvas, Height, section_Yposition,  detailprintingtop,  column_val);
+                        (field as EbDataFieldNumericSummary).DrawMe(Canvas, Height, section_Yposition, detailprintingtop, column_val);
                         return;
                     }
-                else
-                    column_val = (field as IEbDataFieldSummary).SummarizedValue.ToString();
+                    else
+                        column_val = (field as IEbDataFieldSummary).SummarizedValue.ToString();
                 }
                 else
                     column_val = GetFieldtData(column_name, serialnumber);
@@ -758,7 +765,7 @@ else {
             Stamp.FormFlattening = true;
             Stamp.Close();
         }
-      
+
         public EbReport()
         {
             this.ReportHeaders = new List<EbReportHeader>();
