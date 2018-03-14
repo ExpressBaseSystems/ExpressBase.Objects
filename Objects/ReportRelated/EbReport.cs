@@ -666,12 +666,23 @@ else {
                 var table = (field as EbDataField).TableIndex;
                 column_name = (field as EbDataField).ColumnName;
                 Globals globals = new Globals();
-                globals.CurrentField = this;
+                globals.CurrentField = field;
                 if (AppearanceScriptCollection.ContainsKey(field.Name))
                 {
+
+                    if(field.Font==null)
+                    {
+                        globals.CurrentField.Font = (new EbFont {color="#000000",Font="Courier",Caps=false,Size=14,Strikethrough=false,Style=0,Underline=false });
+                    }
+                    foreach (string calcfd in (field as EbCalcField).DataFieldsUsed)
+                    {
+                        string TName = calcfd.Split('.')[0];
+                        string fName = calcfd.Split('.')[1];
+                        globals[TName].Add(fName, new NTV { Name = fName, Type = (DbType)this.DataRow.Table.Columns[fName].Type, Value = this.DataRow[serialnumber][fName] });
+                    }
                     try
                     {
-                        (AppearanceScriptCollection[field.Name].RunAsync(globals)).Result.ReturnValue.ToString();
+                        AppearanceScriptCollection[field.Name].RunAsync(globals);
                     }
                     catch (Exception e)
                     {
