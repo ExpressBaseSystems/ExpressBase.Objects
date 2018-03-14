@@ -198,6 +198,9 @@ else {
         public DateTime CurrentTimestamp { get; set; }
 
         [JsonIgnore]
+        public string UserName { get; set; }
+
+        [JsonIgnore]
         public PdfContentByte Canvas { get; set; }
 
         [JsonIgnore]
@@ -561,34 +564,43 @@ else {
             foreach (EbReportDetail detail in Detail)
             {
                 var SortedList = this.FieldsNotSummaryPerDetail[detail];
-                for (int iSortPos = 0; iSortPos < SortedList.Length; iSortPos++)
+                if (SortedList.Length > 0)
                 {
-                    var field = SortedList[iSortPos];
-                    var table = field.TableIndex;
-                    var column_name = field.ColumnName;
-                    var column_val = GetFieldtData(column_name, serialnumber);
-                    if ((field as EbDataField).RenderInMultiLine == true)
+                    for (int iSortPos = 0; iSortPos < SortedList.Length; iSortPos++)
                     {
-                        var datatype = (DbType)field.DbType;
-                        var val_length = column_val.Length;
-                        var phrase = new Phrase(column_val);
-                        phrase.Font.Size = 12;
-                        var calculatedValueSize = phrase.Font.CalculatedSize * val_length;
-                        if (calculatedValueSize > field.WidthPt)
+                        var field = SortedList[iSortPos];
+                        var table = field.TableIndex;
+                        var column_name = field.ColumnName;
+                        var column_val = GetFieldtData(column_name, serialnumber);
+                        if ((field as EbDataField).RenderInMultiLine == true)
                         {
-                            rowsneeded = (datatype == DbType.Decimal) ? 1 : Convert.ToInt32(Math.Floor(calculatedValueSize / field.WidthPt));
+                            var datatype = (DbType)field.DbType;
+                            var val_length = column_val.Length;
+                            var phrase = new Phrase(column_val);
+                            phrase.Font.Size = 12;
+                            var calculatedValueSize = phrase.Font.CalculatedSize * val_length;
+                            if (calculatedValueSize > field.WidthPt)
+                            {
+                                rowsneeded = (datatype == DbType.Decimal) ? 1 : Convert.ToInt32(Math.Floor(calculatedValueSize / field.WidthPt));
 
-                            if (MultiRowTop == 0)
-                            {
-                                MultiRowTop = field.TopPt;
-                            }
-                            float k = (phrase.Font.CalculatedSize) * rowsneeded;
-                            if (k > RowHeight)
-                            {
-                                RowHeight = k;
+                                if (MultiRowTop == 0)
+                                {
+                                    MultiRowTop = field.TopPt;
+                                }
+                                float k = (phrase.Font.CalculatedSize) * rowsneeded;
+                                if (k > RowHeight)
+                                {
+                                    RowHeight = k;
+                                }
                             }
                         }
                     }
+                }
+                else
+                {
+                    IsLastpage = true;
+                    this.Writer.PageEvent.OnEndPage(Writer, Doc);
+                    return;
                 }
 
                 var SortedReportFields = this.ReportFieldsSortedPerDetail[detail];
@@ -654,12 +666,23 @@ else {
                 var table = (field as EbDataField).TableIndex;
                 column_name = (field as EbDataField).ColumnName;
                 Globals globals = new Globals();
-                globals.CurrentField = this;
+                globals.CurrentField = field;
                 if (AppearanceScriptCollection.ContainsKey(field.Name))
                 {
+
+                    if(field.Font==null)
+                    {
+                        globals.CurrentField.Font = (new EbFont {color="#000000",Font="Courier",Caps=false,Size=14,Strikethrough=false,Style=0,Underline=false });
+                    }
+                    foreach (string calcfd in (field as EbCalcField).DataFieldsUsed)
+                    {
+                        string TName = calcfd.Split('.')[0];
+                        string fName = calcfd.Split('.')[1];
+                        globals[TName].Add(fName, new NTV { Name = fName, Type = (DbType)this.DataRow.Table.Columns[fName].Type, Value = this.DataRow[serialnumber][fName] });
+                    }
                     try
                     {
-                        (AppearanceScriptCollection[field.Name].RunAsync(globals)).Result.ReturnValue.ToString();
+                        AppearanceScriptCollection[field.Name].RunAsync(globals);
                     }
                     catch (Exception e)
                     {
@@ -689,7 +712,7 @@ else {
                     if ((field is EbDataFieldNumericSummary) && (field as EbDataFieldNumericSummary).InLetters == true)
                     {
                         column_val = (field as IEbDataFieldSummary).SummarizedValue.ToString();
-                        (field as EbDataFieldNumericSummary).DrawMe(Canvas, HeightPt, section_Yposition,  detailprintingtop,  column_val);
+                        (field as EbDataFieldNumericSummary).DrawMe(Canvas, HeightPt, section_Yposition, detailprintingtop, column_val);
                         return;
                     }
                     else
@@ -701,7 +724,7 @@ else {
                 field.DrawMe(Canvas, HeightPt, section_Yposition, column_val, detailprintingtop, column_type);
             }
 
-            if ((field is EbPageNo) || (field is EbPageXY) || (field is EbDateTime) || (field is EbSerialNumber))
+            if ((field is EbPageNo) || (field is EbPageXY) || (field is EbDateTime) || (field is EbSerialNumber) || (field is EbUserName))
             {
                 if (field is EbPageNo)
                     column_val = PageNumber.ToString();
@@ -711,6 +734,8 @@ else {
                     column_val = CurrentTimestamp.ToString();
                 else if (field is EbSerialNumber)
                     column_val = (iDetailRowPos + 1).ToString();
+                else if (field is EbUserName)
+                    column_val = this.UserName;
                 field.DrawMe(Canvas, HeightPt, section_Yposition, detailprintingtop, column_val);
             }
             else if (field is EbImg)

@@ -13,6 +13,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         public string Refid { get; set; }
 
+        public string Fullname { get; set; }
     }
 
     [DataContract]

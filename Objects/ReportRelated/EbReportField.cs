@@ -69,20 +69,40 @@ namespace ExpressBase.Objects.ReportRelated
         {
         }
 
-        public iTextSharp.text.Font SetFont()
+        private iTextSharp.text.Font iTextFont = null;
+        public virtual iTextSharp.text.Font ITextFont
         {
-            iTextSharp.text.FontFactory.RegisterDirectory("G:\\ExpressBase.Core\\ExpressBase.Objects\\Fonts\\");
-            iTextSharp.text.Font font = FontFactory.GetFont("Verdana", Font.Size, (int)Font.Style, GetColor(Font.color));
-            //BaseFont bf = BaseFont.CreateFont("calibrili", BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
-            //iTextSharp.text.Font font = new iTextSharp.text.Font(bf, field.Font.Size, (int)field.Font.Style, field.GetColor(field.Font.color));
-            if (Font.Caps == true)
-                Title = this.Title.ToUpper();
-            if (Font.Strikethrough == true)
-                font.SetStyle(iTextSharp.text.Font.STRIKETHRU);
-            if (Font.Underline == true)
-                font.SetStyle(iTextSharp.text.Font.UNDERLINE);
-            return font;
+            get
+            {
+                if (iTextFont == null && Font!= null)
+                {
+                    iTextFont = new iTextSharp.text.Font(BaseFont.CreateFont(Font.Font, BaseFont.CP1252, BaseFont.EMBEDDED), Font.Size, (int)Font.Style, GetColor(Font.color));
+                    if (Font.Caps == true)
+                        Title = this.Title.ToUpper();
+                    if (Font.Strikethrough == true)
+                        iTextFont.SetStyle(iTextSharp.text.Font.STRIKETHRU);
+                    if (Font.Underline == true)
+                        iTextFont.SetStyle(iTextSharp.text.Font.UNDERLINE);
+                }
+
+                return iTextFont;
+            }
         }
+
+        //public iTextSharp.text.Font SetFont()
+        //{
+        //    //var x=iTextSharp.text.FontFactory.RegisterDirectory("E:\\ExpressBase.Core\\ExpressBase.Objects\\Fonts\\");
+        //    //iTextSharp.text.Font font = FontFactory.GetFont("Verdana", Font.Size, (int)Font.Style, GetColor(Font.color));
+        //    BaseFont bf = BaseFont.CreateFont(Font.Font, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
+        //    iTextSharp.text.Font font = new iTextSharp.text.Font(bf, Font.Size, (int)Font.Style, GetColor(Font.color));
+        //    if (Font.Caps == true)
+        //        Title = this.Title.ToUpper();
+        //    if (Font.Strikethrough == true)
+        //        font.SetStyle(iTextSharp.text.Font.STRIKETHRU);
+        //    if (Font.Underline == true)
+        //        font.SetStyle(iTextSharp.text.Font.UNDERLINE);
+        //    return font;
+        //}
     }
 
     [EnableInBuilder(BuilderType.Report)]
@@ -167,7 +187,7 @@ namespace ExpressBase.Objects.ReportRelated
                 if (this.Font == null)
                     phrase = new Phrase(this.WaterMarkText);
                 else
-                    phrase = new Phrase(this.WaterMarkText, this.SetFont());
+                    phrase = new Phrase(this.WaterMarkText, ITextFont);
                 PdfContentByte canvas;
                 canvas = writer.DirectContentUnder;
                 ColumnText.ShowTextAligned(canvas, Element.ALIGN_CENTER, phrase, d.PageSize.Width / 2, d.PageSize.Height / 2, this.Rotation);
@@ -223,11 +243,11 @@ namespace ExpressBase.Objects.ReportRelated
             if (this.Font == null)
                 phrase = new Phrase(column_val);
             else
-                phrase = new Phrase(column_val, this.SetFont());
+                phrase = new Phrase(column_val,ITextFont);
 
             ColumnText ct = new ColumnText(canvas);
-            ct.Canvas.SetColorFill(GetColor(this.ForeColor));
-            ct.SetSimpleColumn(new Phrase(column_val), llx, lly, urx, ury, 15, Element.ALIGN_LEFT);
+           // ct.Canvas.SetColorFill(GetColor(this.ForeColor));
+            ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, Element.ALIGN_LEFT);
             ct.Go();
         }
     }
@@ -263,10 +283,10 @@ namespace ExpressBase.Objects.ReportRelated
             if (this.Font == null)
                 phrase = new Phrase(column_val);
             else
-                phrase = new Phrase(column_val, this.SetFont());
+                phrase = new Phrase(column_val, ITextFont);
             ColumnText ct = new ColumnText(canvas);
-            ct.Canvas.SetColorFill(GetColor(this.ForeColor));
-            ct.SetSimpleColumn(new Phrase(column_val), llx, lly, urx, ury, 15, Element.ALIGN_LEFT);
+            //ct.Canvas.SetColorFill(GetColor(this.ForeColor));
+            ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, Element.ALIGN_LEFT);
             ct.Go();
         }
     }
@@ -302,10 +322,10 @@ namespace ExpressBase.Objects.ReportRelated
             if (this.Font == null)
                 phrase = new Phrase(column_val);
             else
-                phrase = new Phrase(column_val, this.SetFont());
+                phrase = new Phrase(column_val, ITextFont);
             ColumnText ct = new ColumnText(canvas);
-            ct.Canvas.SetColorFill(GetColor(this.ForeColor));
-            ct.SetSimpleColumn(new Phrase(column_val), llx, lly, urx, ury, 15, Element.ALIGN_LEFT);
+           // ct.Canvas.SetColorFill(GetColor(this.ForeColor));
+            ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, Element.ALIGN_LEFT);
             ct.Go();
         }
     }
@@ -329,6 +349,23 @@ namespace ExpressBase.Objects.ReportRelated
     this.Border = 1;
     this.BorderColor = '#aaaaaa'
 };";
+        }
+        public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
+        {
+            var urx = this.WidthPt + this.LeftPt;
+            var ury = reportHeight - (printingTop + this.TopPt + detailprintingtop);
+            var llx = this.LeftPt;
+            var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
+
+            Phrase phrase = null;
+            if (this.Font == null)
+                phrase = new Phrase(column_val);
+            else
+                phrase = new Phrase(column_val, ITextFont);
+            ColumnText ct = new ColumnText(canvas);
+            //ct.Canvas.SetColorFill(GetColor(this.ForeColor));
+            ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, Element.ALIGN_LEFT);
+            ct.Go();
         }
     }
 
@@ -371,7 +408,7 @@ namespace ExpressBase.Objects.ReportRelated
             if (this.Font == null)
                 phrase = new Phrase(this.Title);
             else
-                 phrase = new Phrase(this.Title, this.SetFont());
+                phrase = new Phrase(this.Title, ITextFont);
 
             ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, Element.ALIGN_LEFT);
             ct.Go();
@@ -587,10 +624,10 @@ namespace ExpressBase.Objects.ReportRelated
             if (this.Font == null)
                 phrase = new Phrase(column_val);
             else
-                phrase = new Phrase(column_val, this.SetFont());
+                phrase = new Phrase(column_val, ITextFont);
 
             ColumnText ct = new ColumnText(canvas);
-            ct.Canvas.SetColorFill(GetColor(this.ForeColor));
+            //ct.Canvas.SetColorFill(GetColor(this.ForeColor));
             ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, Element.ALIGN_LEFT);
             ct.Go();
         }

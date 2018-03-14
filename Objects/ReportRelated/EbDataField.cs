@@ -10,6 +10,8 @@ using iTextSharp.text;
 using iTextSharp.text.pdf;
 using System.Data;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json;
+using ExpressBase.Common.JsonConverters;
 
 namespace ExpressBase.Objects.ReportRelated
 {
@@ -43,6 +45,7 @@ namespace ExpressBase.Objects.ReportRelated
         [PropertyGroup("General")]
         [UIproperty]
         [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
+         [JsonConverter(typeof(Base64Converter))]
         public string AppearanceExpression { get; set; }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, string column_val, float detailprintingtop, DbType column_type)
         {
@@ -51,7 +54,7 @@ namespace ExpressBase.Objects.ReportRelated
             if (this.Font == null)
                 text = new Phrase(column_val);
             else
-                text = new Phrase(column_val, SetFont());
+                text = new Phrase(column_val, ITextFont);
             if (this.RenderInMultiLine == true)
             {
                 var p = text.Font.GetCalculatedBaseFont(false);
@@ -740,6 +743,7 @@ namespace ExpressBase.Objects.ReportRelated
         [PropertyGroup("General")]
         [UIproperty]
         [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
+        [JsonConverter(typeof(Base64Converter))]
         public string ValueExpression { get; set; }
 
         private string[] _dataFieldsUsed;
@@ -749,11 +753,15 @@ namespace ExpressBase.Objects.ReportRelated
             {
                 if (_dataFieldsUsed == null)
                 {
-                    var matches = Regex.Matches(this.ValueExpression + " " + this.AppearanceExpression, @"T[0-9]{1}.\w+");
-                    _dataFieldsUsed = new string[matches.Count];
+                    var matches = Regex.Matches(this.ValueExpression + " " + this.AppearanceExpression, @"T[0-9]{1}.\w+").OfType<Match>()
+     .Select(m => m.Groups[0].Value)
+     .Distinct();
+
+
+                    _dataFieldsUsed = new string[matches.Count()];
                     int i = 0;
-                    foreach (Match match in matches)
-                        _dataFieldsUsed[i++] = match.Value;
+                    foreach (var match in matches)
+                        _dataFieldsUsed[i++] = match;
                 }
 
                 return _dataFieldsUsed;
