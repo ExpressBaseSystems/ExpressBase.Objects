@@ -71,7 +71,7 @@ namespace ExpressBase.Objects.ReportRelated
 
         public iTextSharp.text.Font SetFont()
         {
-            iTextSharp.text.FontFactory.RegisterDirectory("G:\\ExpressBase.Core\\ExpressBase.Objects\\Fonts\\");
+            var x=iTextSharp.text.FontFactory.RegisterDirectory("E:\\ExpressBase.Core\\ExpressBase.Objects\\Fonts\\");
             iTextSharp.text.Font font = FontFactory.GetFont("Verdana", Font.Size, (int)Font.Style, GetColor(Font.color));
             //BaseFont bf = BaseFont.CreateFont("calibrili", BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
             //iTextSharp.text.Font font = new iTextSharp.text.Font(bf, field.Font.Size, (int)field.Font.Style, field.GetColor(field.Font.color));
@@ -226,8 +226,8 @@ namespace ExpressBase.Objects.ReportRelated
                 phrase = new Phrase(column_val, this.SetFont());
 
             ColumnText ct = new ColumnText(canvas);
-            ct.Canvas.SetColorFill(GetColor(this.ForeColor));
-            ct.SetSimpleColumn(new Phrase(column_val), llx, lly, urx, ury, 15, Element.ALIGN_LEFT);
+           // ct.Canvas.SetColorFill(GetColor(this.ForeColor));
+            ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, Element.ALIGN_LEFT);
             ct.Go();
         }
     }
@@ -265,8 +265,8 @@ namespace ExpressBase.Objects.ReportRelated
             else
                 phrase = new Phrase(column_val, this.SetFont());
             ColumnText ct = new ColumnText(canvas);
-            ct.Canvas.SetColorFill(GetColor(this.ForeColor));
-            ct.SetSimpleColumn(new Phrase(column_val), llx, lly, urx, ury, 15, Element.ALIGN_LEFT);
+            //ct.Canvas.SetColorFill(GetColor(this.ForeColor));
+            ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, Element.ALIGN_LEFT);
             ct.Go();
         }
     }
@@ -304,8 +304,8 @@ namespace ExpressBase.Objects.ReportRelated
             else
                 phrase = new Phrase(column_val, this.SetFont());
             ColumnText ct = new ColumnText(canvas);
-            ct.Canvas.SetColorFill(GetColor(this.ForeColor));
-            ct.SetSimpleColumn(new Phrase(column_val), llx, lly, urx, ury, 15, Element.ALIGN_LEFT);
+           // ct.Canvas.SetColorFill(GetColor(this.ForeColor));
+            ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, Element.ALIGN_LEFT);
             ct.Go();
         }
     }
@@ -329,6 +329,23 @@ namespace ExpressBase.Objects.ReportRelated
     this.Border = 1;
     this.BorderColor = '#aaaaaa'
 };";
+        }
+        public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
+        {
+            var urx = this.WidthPt + this.LeftPt;
+            var ury = reportHeight - (printingTop + this.TopPt + detailprintingtop);
+            var llx = this.LeftPt;
+            var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
+
+            Phrase phrase = null;
+            if (this.Font == null)
+                phrase = new Phrase(column_val);
+            else
+                phrase = new Phrase(column_val, this.SetFont());
+            ColumnText ct = new ColumnText(canvas);
+            //ct.Canvas.SetColorFill(GetColor(this.ForeColor));
+            ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, Element.ALIGN_LEFT);
+            ct.Go();
         }
     }
 
@@ -371,7 +388,7 @@ namespace ExpressBase.Objects.ReportRelated
             if (this.Font == null)
                 phrase = new Phrase(this.Title);
             else
-                 phrase = new Phrase(this.Title, this.SetFont());
+                phrase = new Phrase(this.Title, this.SetFont());
 
             ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, Element.ALIGN_LEFT);
             ct.Go();
@@ -590,7 +607,7 @@ namespace ExpressBase.Objects.ReportRelated
                 phrase = new Phrase(column_val, this.SetFont());
 
             ColumnText ct = new ColumnText(canvas);
-            ct.Canvas.SetColorFill(GetColor(this.ForeColor));
+            //ct.Canvas.SetColorFill(GetColor(this.ForeColor));
             ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, Element.ALIGN_LEFT);
             ct.Go();
         }

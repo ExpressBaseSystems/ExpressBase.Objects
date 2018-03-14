@@ -198,6 +198,9 @@ else {
         public DateTime CurrentTimestamp { get; set; }
 
         [JsonIgnore]
+        public string UserName { get; set; }
+
+        [JsonIgnore]
         public PdfContentByte Canvas { get; set; }
 
         [JsonIgnore]
@@ -701,7 +704,7 @@ else {
                 field.DrawMe(Canvas, HeightPt, section_Yposition, column_val, detailprintingtop, column_type);
             }
 
-            if ((field is EbPageNo) || (field is EbPageXY) || (field is EbDateTime) || (field is EbSerialNumber))
+            if ((field is EbPageNo) || (field is EbPageXY) || (field is EbDateTime) || (field is EbSerialNumber)||(field is EbUserName))
             {
                 if (field is EbPageNo)
                     column_val = PageNumber.ToString();
@@ -711,6 +714,8 @@ else {
                     column_val = CurrentTimestamp.ToString();
                 else if (field is EbSerialNumber)
                     column_val = (iDetailRowPos + 1).ToString();
+                else if(field is EbUserName)
+                    column_val = this.UserName;
                 field.DrawMe(Canvas, HeightPt, section_Yposition, detailprintingtop, column_val);
             }
             else if (field is EbImg)
