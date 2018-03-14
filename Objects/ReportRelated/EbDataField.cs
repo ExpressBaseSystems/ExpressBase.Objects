@@ -51,7 +51,7 @@ namespace ExpressBase.Objects.ReportRelated
             if (this.Font == null)
                 text = new Phrase(column_val);
             else
-                text = new Phrase(column_val, SetFont());
+                text = new Phrase(column_val, ITextFont);
             if (this.RenderInMultiLine == true)
             {
                 var p = text.Font.GetCalculatedBaseFont(false);
