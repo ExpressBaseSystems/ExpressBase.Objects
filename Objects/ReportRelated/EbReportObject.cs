@@ -24,22 +24,46 @@ namespace ExpressBase.Objects.ReportRelated
         [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("Appearance")]
         [UIproperty]
-        public float Left { get; set; }
+        public string Left { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        //[PropertyGroup("Appearance")]
+        //[UIproperty]
+       // [HideInPropertyGrid]
+        public float LeftPt { get; set; }
 
         [UIproperty]
         [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("Appearance")]
-        public float Width { get; set; }
+        public string Width { get; set; }
+
+        [UIproperty]
+        //[PropertyGroup("Appearance")]
+        //[UIproperty]
+        //[HideInPropertyGrid]
+        public float WidthPt { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
         [PropertyGroup("Appearance")]
-        public float Top { get; set; }
+        public string Top { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        //[PropertyGroup("Appearance")]
+        //[UIproperty]
+        //[HideInPropertyGrid]
+        public float TopPt { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
         [PropertyGroup("Appearance")]
-        public float Height { get; set; }
+        public string Height { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        //[PropertyGroup("Appearance")]
+        //[UIproperty]
+        //[HideInPropertyGrid]
+        public float HeightPt { get; set; }
 
         //[EnableInBuilder(BuilderType.Report)]
         //public HorizontalAlignment HAlign { get; set; }
@@ -55,8 +79,6 @@ namespace ExpressBase.Objects.ReportRelated
 
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
-        [PropertyEditor(PropertyEditorType.Color)]
-        [PropertyGroup("Appearance")]
         public string ForeColor { get; set; }
     }
 }

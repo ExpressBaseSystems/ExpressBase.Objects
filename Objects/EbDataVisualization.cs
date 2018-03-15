@@ -93,6 +93,10 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public string Pippedfrom { get; set; }
 
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public string IsPaged { get; set; }
+
         public override void AfterRedisGet(RedisClient Redis)
         {
             try
@@ -278,11 +282,7 @@ namespace ExpressBase.Objects
 
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
-        public string BareControlHtml { get; set; }
-
-        [HideInPropertyGrid]
-        [EnableInBuilder(BuilderType.DVBuilder)]
-        public string IsPaged { get; set; }
+        public string BareControlHtml { get; set; }        
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]

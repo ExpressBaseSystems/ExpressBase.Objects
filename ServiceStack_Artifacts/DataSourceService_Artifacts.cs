@@ -218,6 +218,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 7)]
         public DataSet DataSet { get; set; }
+
+        [DataMember(Order = 8)]
+        public bool Ispaged { get; set; }
     }
 
     [DataContract]
