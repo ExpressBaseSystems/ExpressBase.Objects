@@ -27,8 +27,9 @@ namespace ExpressBase.Objects.ReportRelated
         public string Left { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
-        [PropertyGroup("Appearance")]
-        [UIproperty]
+        //[PropertyGroup("Appearance")]
+        //[UIproperty]
+       // [HideInPropertyGrid]
         public float LeftPt { get; set; }
 
         [UIproperty]
@@ -37,8 +38,9 @@ namespace ExpressBase.Objects.ReportRelated
         public string Width { get; set; }
 
         [UIproperty]
-        [EnableInBuilder(BuilderType.Report)]
-        [PropertyGroup("Appearance")]
+        //[PropertyGroup("Appearance")]
+        //[UIproperty]
+        //[HideInPropertyGrid]
         public float WidthPt { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
@@ -47,8 +49,9 @@ namespace ExpressBase.Objects.ReportRelated
         public string Top { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
-        [UIproperty]
-        [PropertyGroup("Appearance")]
+        //[PropertyGroup("Appearance")]
+        //[UIproperty]
+        //[HideInPropertyGrid]
         public float TopPt { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
@@ -57,8 +60,9 @@ namespace ExpressBase.Objects.ReportRelated
         public string Height { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
-        [UIproperty]
-        [PropertyGroup("Appearance")]
+        //[PropertyGroup("Appearance")]
+        //[UIproperty]
+        //[HideInPropertyGrid]
         public float HeightPt { get; set; }
 
         //[EnableInBuilder(BuilderType.Report)]
@@ -75,8 +79,6 @@ namespace ExpressBase.Objects.ReportRelated
 
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
-        [PropertyEditor(PropertyEditorType.Color)]
-        [PropertyGroup("Appearance")]
         public string ForeColor { get; set; }
     }
 }
