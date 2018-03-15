@@ -11,7 +11,16 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
     public class RefreshSolutionConnectionsRequest : EbServiceStackRequest
     {
-        
+    }
+
+    public class RefreshSolutionConnectionsAsyncRequest : EbServiceStackRequest
+    {
+        public string SolutionId { get; set; }
+    }
+
+    public class RefreshSolutionConnectionsBySolutionIdAsyncRequest : EbServiceStackRequest
+    {
+        public string SolutionId { get; set; }
     }
 
     public class GetConnectionsRequest : EbServiceStackRequest
@@ -62,10 +71,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public SMTPConnection SMTPConnection { get; set; }
     }
 
-    public class RefreshSolutionConnectionsMqRequest : EbServiceStackRequest
-    {
-
-    }
+    
     public class TestConnectionRequest : EbServiceStackRequest
     {
         public EbDataDbConnection DataDBConnection { get; set; }
