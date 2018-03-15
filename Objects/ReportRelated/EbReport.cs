@@ -111,14 +111,29 @@ else {
         [UIproperty]
         public string OwnerPassword { get; set; }
 
-        //public EbReportMargins Margins { get; set; }
-        //[EnableInBuilder(BuilderType.Report)]
-        //[PropertyGroup("General")]
-        //public string ReportName { get; set; }
+        //[HideInPropertyGrid]
+        //[JsonIgnore]
+        //public new string Description { get; set; }
 
         //[EnableInBuilder(BuilderType.Report)]
-        //[PropertyGroup("General")]
-        //public string Description { get; set; }
+        //[HideInPropertyGrid]
+        //public new string Left { get; set; }
+
+        //[HideInPropertyGrid]
+        //public new string Top { get; set; }
+
+        //[HideInPropertyGrid]
+        //public new string Height { get; set; }
+
+        //[HideInPropertyGrid]
+        //public new string Width { get; set; }
+
+        //[HideInPropertyGrid]
+        //public new string Title { get; set; }
+
+        //[HideInPropertyGrid]
+        //public new string ForeColor { get; set; }
+
         [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("General")]
         public bool IsLandscape { get; set; }
@@ -564,37 +579,45 @@ else {
             foreach (EbReportDetail detail in Detail)
             {
                 var SortedList = this.FieldsNotSummaryPerDetail[detail];
-                if (SortedList.Length > 0)
+                for (int iSortPos = 0; iSortPos < SortedList.Length; iSortPos++)
                 {
-                    for (int iSortPos = 0; iSortPos < SortedList.Length; iSortPos++)
+                    var field = SortedList[iSortPos];
+                    var table = field.TableIndex;
+                    var column_name = field.ColumnName;
+                    var column_val = GetFieldtData(column_name, serialnumber);
+                    if ((field as EbDataField).RenderInMultiLine == true)
                     {
-                        var field = SortedList[iSortPos];
-                        var table = field.TableIndex;
-                        var column_name = field.ColumnName;
-                        var column_val = GetFieldtData(column_name, serialnumber);
-                        if ((field as EbDataField).RenderInMultiLine == true)
+                        var datatype = (DbType)field.DbType;
+                        var val_length = column_val.Length;
+                        var phrase = new Phrase(column_val);
+                        phrase.Font.Size = 12;
+                        var calculatedValueSize = phrase.Font.CalculatedSize * val_length;
+                        if (calculatedValueSize > field.WidthPt)
                         {
-                            var datatype = (DbType)field.DbType;
-                            var val_length = column_val.Length;
-                            var phrase = new Phrase(column_val);
-                            phrase.Font.Size = 12;
-                            var calculatedValueSize = phrase.Font.CalculatedSize * val_length;
-                            if (calculatedValueSize > field.WidthPt)
-                            {
-                                rowsneeded = (datatype == DbType.Decimal) ? 1 : Convert.ToInt32(Math.Floor(calculatedValueSize / field.WidthPt));
+                            rowsneeded = (datatype == DbType.Decimal) ? 1 : Convert.ToInt32(Math.Floor(calculatedValueSize / field.WidthPt));
 
-                                if (MultiRowTop == 0)
-                                {
-                                    MultiRowTop = field.TopPt;
-                                }
-                                float k = (phrase.Font.CalculatedSize) * rowsneeded;
-                                if (k > RowHeight)
-                                {
-                                    RowHeight = k;
-                                }
+                            if (MultiRowTop == 0)
+                            {
+                                MultiRowTop = field.TopPt;
+                            }
+                            float k = (phrase.Font.CalculatedSize) * rowsneeded;
+                            if (k > RowHeight)
+                            {
+                                RowHeight = k;
                             }
                         }
                     }
+                }
+                var SortedReportFields = this.ReportFieldsSortedPerDetail[detail];
+                if (SortedReportFields.Length > 0)
+                {
+                    for (int iSortPos = 0; iSortPos < SortedReportFields.Length; iSortPos++)
+                    {
+                        var field = SortedReportFields[iSortPos];
+                        field.Height += RowHeight;
+                        DrawFields(field, dt_Yposition, serialnumber);
+                    }
+                    detailprintingtop += detail.HeightPt + RowHeight;
                 }
                 else
                 {
@@ -602,15 +625,6 @@ else {
                     this.Writer.PageEvent.OnEndPage(Writer, Doc);
                     return;
                 }
-
-                var SortedReportFields = this.ReportFieldsSortedPerDetail[detail];
-                for (int iSortPos = 0; iSortPos < SortedReportFields.Length; iSortPos++)
-                {
-                    var field = SortedReportFields[iSortPos];
-                    field.Height += RowHeight;
-                    DrawFields(field, dt_Yposition, serialnumber);
-                }
-                detailprintingtop += detail.HeightPt + RowHeight;
             }
         }
 
@@ -670,11 +684,11 @@ else {
                 if (AppearanceScriptCollection.ContainsKey(field.Name))
                 {
 
-                    if(field.Font==null)
+                    if (field.Font == null)
                     {
-                        globals.CurrentField.Font = (new EbFont {color="#000000",Font="Courier",Caps=false,Size=14,Strikethrough=false,Style=0,Underline=false });
+                        globals.CurrentField.Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 14, Strikethrough = false, Style = 0, Underline = false });
                     }
-                    foreach (string calcfd in (field as EbCalcField).DataFieldsUsed)
+                    foreach (string calcfd in (field as EbDataField).DataFieldsUsedAppearance)
                     {
                         string TName = calcfd.Split('.')[0];
                         string fName = calcfd.Split('.')[1];
@@ -683,6 +697,7 @@ else {
                     try
                     {
                         AppearanceScriptCollection[field.Name].RunAsync(globals);
+
                     }
                     catch (Exception e)
                     {
@@ -692,7 +707,7 @@ else {
                 if (field is EbCalcField)
                 {
 
-                    foreach (string calcfd in (field as EbCalcField).DataFieldsUsed)
+                    foreach (string calcfd in (field as EbCalcField).DataFieldsUsedCalc)
                     {
                         string TName = calcfd.Split('.')[0];
                         string fName = calcfd.Split('.')[1];
@@ -817,11 +832,42 @@ else {
     {
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
+        //[HideInPropertyGrid]
         public string SectionHeight { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]
         public List<EbReportField> Fields { get; set; }
+
+        //[EnableInBuilder(BuilderType.Report)]
+        //[HideInPropertyGrid]
+        //public new string Left { get; set; }
+
+        //[EnableInBuilder(BuilderType.Report)]
+        //[HideInPropertyGrid]
+        //public new string Top { get; set; }
+
+        //[EnableInBuilder(BuilderType.Report)]
+        //[UIproperty]
+        //[HideInPropertyGrid]
+        //public new string Height { get; set; }
+
+        //[EnableInBuilder(BuilderType.Report)]
+        //[UIproperty]
+        //[HideInPropertyGrid]
+        //public new string Width { get; set; }
+
+        //[EnableInBuilder(BuilderType.Report)]
+        //[UIproperty]
+        //[HideInPropertyGrid]
+        //public new string Title { get; set; }
+
+        //[HideInPropertyGrid]
+        //[JsonIgnore]
+        //public new string Description { get; set; }
+
+        //[HideInPropertyGrid]
+        //public new string ForeColor { get; set; }
 
     }
 

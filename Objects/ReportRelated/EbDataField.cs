@@ -47,6 +47,28 @@ namespace ExpressBase.Objects.ReportRelated
         [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
          [JsonConverter(typeof(Base64Converter))]
         public string AppearanceExpression { get; set; }
+
+        private string[] _dataFieldsUsed;
+        public string[] DataFieldsUsedAppearance
+        {
+            get
+            {
+                if (_dataFieldsUsed == null)
+                {
+                    var matches = Regex.Matches(this.AppearanceExpression, @"T[0-9]{1}.\w+").OfType<Match>()
+     .Select(m => m.Groups[0].Value)
+     .Distinct();
+
+
+                    _dataFieldsUsed = new string[matches.Count()];
+                    int i = 0;
+                    foreach (var match in matches)
+                        _dataFieldsUsed[i++] = match;
+                }
+
+                return _dataFieldsUsed;
+            }
+        }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, string column_val, float detailprintingtop, DbType column_type)
         {
             ColumnText ct = new ColumnText(canvas);
@@ -54,7 +76,11 @@ namespace ExpressBase.Objects.ReportRelated
             if (this.Font == null)
                 text = new Phrase(column_val);
             else
+            {
                 text = new Phrase(column_val, ITextFont);
+                if(this.ForeColor != "")
+                    text.Font.Color = GetColor(this.ForeColor);//ct.Canvas.SetColorFill(GetColor(this.Color));
+            }
             if (this.RenderInMultiLine == true)
             {
                 var p = text.Font.GetCalculatedBaseFont(false);
@@ -66,7 +92,7 @@ namespace ExpressBase.Objects.ReportRelated
                     if (column_type == System.Data.DbType.Decimal)
                         column_val = "###";
                 }
-            }
+            }           
             var ury = reportHeight - (printingTop + this.TopPt + detailprintingtop);
             var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
             ct.SetSimpleColumn(text, this.LeftPt, lly, this.WidthPt + this.LeftPt, ury, 15, Element.ALIGN_LEFT);
@@ -747,13 +773,13 @@ namespace ExpressBase.Objects.ReportRelated
         public string ValueExpression { get; set; }
 
         private string[] _dataFieldsUsed;
-        public string[] DataFieldsUsed
+        public new string[] DataFieldsUsedCalc
         {
             get
             {
                 if (_dataFieldsUsed == null)
                 {
-                    var matches = Regex.Matches(this.ValueExpression + " " + this.AppearanceExpression, @"T[0-9]{1}.\w+").OfType<Match>()
+                    var matches = Regex.Matches(this.ValueExpression , @"T[0-9]{1}.\w+").OfType<Match>()
      .Select(m => m.Groups[0].Value)
      .Distinct();
 

@@ -39,6 +39,12 @@ namespace ExpressBase.Objects.ReportRelated
         [PropertyEditor(PropertyEditorType.FontSelector)]
         public EbFont Font { get; set; }
 
+        [EnableInBuilder(BuilderType.Report)]
+        [UIproperty]
+        [PropertyGroup("General")]
+        [HideInPropertyGrid]
+        public new string ForeColor { get; set; } = "";
+
         public BaseColor GetColor(string Color)
         {
             var colr = ColorTranslator.FromHtml(Color).ToArgb();
@@ -74,7 +80,7 @@ namespace ExpressBase.Objects.ReportRelated
         {
             get
             {
-                if (iTextFont == null && Font!= null)
+                if (/*iTextFont == null &&*/ Font!= null)
                 {
                     iTextFont = new iTextSharp.text.Font(BaseFont.CreateFont(Font.Font, BaseFont.CP1252, BaseFont.EMBEDDED), Font.Size, (int)Font.Style, GetColor(Font.color));
                     if (Font.Caps == true)
