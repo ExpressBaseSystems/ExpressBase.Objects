@@ -69,7 +69,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
         [PropertyEditor(PropertyEditorType.Label)]
         public override string Name { get; set; }
 
-        public DbType Type { get; set; }
+        public EbDbType Type { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [Alias("Title")]

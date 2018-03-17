@@ -39,10 +39,10 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
     public class EbDate : EbControl
     {
-        public static EbDbType EbDbType { get; set; }
+        public  string EbDbType { get; set; }
         public EbDate()
         {
-            EbDbType = EbDbTypes.Date;
+            this.EbDbType = "date";
         }
 
         [OnDeserialized]

@@ -136,10 +136,10 @@ else {
         //[ProtoBuf.ProtoMember(10)]
         //[Description("Identity")]
         //public override string Label { get; set; }
-        public static EbDbType EbDbType { get; set; }
+        public string EbDbType  { get; set; }
         public EbTextBox()
         {
-            EbDbType = EbDbTypes.String;
+            this.EbDbType = "string";
         }
 
         [OnDeserialized]
