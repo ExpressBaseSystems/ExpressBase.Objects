@@ -4,6 +4,7 @@ using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
 using ExpressBase.Data;
+using ExpressBase.Objects.Objects.DVRelated;
 using ExpressBase.Objects.ServiceStack_Artifacts;
 using ServiceStack;
 using System;
@@ -24,6 +25,18 @@ namespace ExpressBase.Objects
         [OSE_ObjectTypes(EbObjectTypes.iDataSource)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         public string DataSourceId { get; set; }
+
+        [EnableInBuilder(BuilderType.FilterDialog)]
+        [HideInPropertyGrid]
+        public DVColumnCollection Columns { get; set; }
+
+        [EnableInBuilder(BuilderType.FilterDialog)]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
+        public DVBaseColumn ValueMember { get; set; }
+
+        [EnableInBuilder(BuilderType.FilterDialog)]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
+        public DVBaseColumn DisplayMember { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public int Value { get; set; }
