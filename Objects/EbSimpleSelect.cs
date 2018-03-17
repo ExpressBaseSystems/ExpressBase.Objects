@@ -38,14 +38,10 @@ namespace ExpressBase.Objects
 		{
 
 			this.DataSourceId = "eb_roby_dev-eb_roby_dev-2-1015-1739";
-			//var pclient = new Web2.ProtoBufServiceClient(ServiceClient.BaseUri);
-			//pclient.BearerToken = ServiceClient.BearerToken;
 			var result = ServiceClient.Get<DataSourceDataResponse>(new DataSourceDataRequest { RefId = this.DataSourceId });
-			//var d = EbSerializers.Json_Deserialize(result);
-			var ds = result.Data;
 			string _html = string.Empty;
 
-			foreach (EbDataRow option in ds)
+			foreach (EbDataRow option in result.Data)
 			{
 				_html += string.Format("<option value='{0}'>{1}</option>", option[0], option[1]);
 			}
