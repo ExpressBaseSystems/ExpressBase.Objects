@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ExpressBase.Common.Structures;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Dynamic;
@@ -87,9 +88,9 @@ namespace ExpressBase.Objects.Objects.ReportRelated
             {
                 var _data = x as NTV;
 
-                if (_data.Type == DbType.Int32)
+                if ((int)_data.Type == EbDbTypes.Int32)
                     result = Convert.ToInt32((x as NTV).Value);
-                else if (_data.Type == DbType.Decimal)
+                else if ((int)_data.Type == EbDbTypes.Decimal)
                     result = Convert.ToDecimal((x as NTV).Value);
                 else
                     result = (x as NTV).Value.ToString();
@@ -111,7 +112,7 @@ namespace ExpressBase.Objects.Objects.ReportRelated
     {
         public string Name { get; set; }
 
-        public DbType Type { get; set; }
+        public EbDbType Type { get; set; }
 
         public object Value { get; set; }
     }
