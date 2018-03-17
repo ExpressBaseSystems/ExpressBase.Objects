@@ -87,8 +87,18 @@ else {
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         [PropertyGroup("Appearance")]
+        [PropertyEditor(PropertyEditorType.MultiLanguageKeySelector)]
+        public string LabelT { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+        [PropertyGroup("Appearance")]
         [PropertyEditor(PropertyEditorType.FontSelector)]
         public string FontFamilyT { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+        [PropertyGroup("test")]
+        [MetaOnly]
+        public string MetaOnly { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         [PropertyGroup("Appearance")]

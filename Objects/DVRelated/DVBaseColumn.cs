@@ -12,7 +12,8 @@ namespace ExpressBase.Objects.Objects.DVRelated
         Default = 0,
         Chart = 1,
         Link = 2,
-        Marker = 3
+        Marker = 3,
+        Image = 4
     }
 
     public enum NumericRenderType
@@ -68,7 +69,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
         [PropertyEditor(PropertyEditorType.Label)]
         public override string Name { get; set; }
 
-        public DbType Type { get; set; }
+        public EbDbType Type { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [Alias("Title")]

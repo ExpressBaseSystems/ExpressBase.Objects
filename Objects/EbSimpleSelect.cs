@@ -34,26 +34,24 @@ namespace ExpressBase.Objects
 
 
 
-    public void GetOptionsHtml(JsonServiceClient ServiceClient) {
+		public void GetOptionsHtml(JsonServiceClient ServiceClient)
+		{
 
-            //this.DataSourceId = "eb_roby_dev-eb_roby_dev-2-1015-1739";
-            var pclient = new Web2.ProtoBufServiceClient(ServiceClient.BaseUri);
-            pclient.BearerToken = ServiceClient.BearerToken;
-            ////var result = pclient.Get<DataSourceDataResponsebot>(new DataSourceDataRequestbot { RefId = this.DataSourceId });
-            //var d = EbSerializers.Json_Deserialize(result);
-            ////var ds = result.Data;
-            //string _html = string.Empty;
+			this.DataSourceId = "eb_roby_dev-eb_roby_dev-2-1015-1739";
+			var result = ServiceClient.Get<DataSourceDataResponse>(new DataSourceDataRequest { RefId = this.DataSourceId });
+			string _html = string.Empty;
 
-            //foreach (EbDataRow option in ds)
-            //{
-            //    _html += string.Format("<option value='{0}'>{1}</option>", option[0], option[1]);
-            //}
+			foreach (EbDataRow option in result.Data)
+			{
+				_html += string.Format("<option value='{0}'>{1}</option>", option[0], option[1]);
+			}
 
-            //this.OptionHtml = _html;
-            //this.BareControlHtml = this.BareControlHtml.Replace("@options@", this.OptionHtml);
-        }
+			this.OptionHtml = _html;
+			this.BareControlHtml = this.BareControlHtml.Replace("@options@", this.OptionHtml);
+		}
 
-        [OnDeserialized]
+
+		[OnDeserialized]
         public void OnDeserializedMethod(StreamingContext context)
         {
             this.BareControlHtml = this.GetBareHtml();

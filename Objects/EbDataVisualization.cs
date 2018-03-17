@@ -93,6 +93,10 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public string Pippedfrom { get; set; }
 
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public string IsPaged { get; set; }
+
         public override void AfterRedisGet(RedisClient Redis)
         {
             try
@@ -237,22 +241,22 @@ namespace ExpressBase.Objects
             }
         }
 
-        private DbType ConvertToDbType(Type _typ)
+        private EbDbType ConvertToDbType(Type _typ)
         {
             if (_typ == typeof(DateTime))
-                return DbType.DateTime;
+                return EbDbTypes.DateTime;
             else if (_typ == typeof(string))
-                return DbType.String;
+                return EbDbTypes.String;
             else if (_typ == typeof(bool))
-                return DbType.Boolean;
+                return EbDbTypes.Boolean;
             else if (_typ == typeof(decimal))
-                return DbType.Decimal;
+                return EbDbTypes.Decimal;
             else if (_typ == typeof(int) || _typ == typeof(Int32))
-                return DbType.Int32;
+                return EbDbTypes.Int32;
             else if (_typ == typeof(Int64))
-                return DbType.Int64;
+                return EbDbTypes.Int64;
 
-            return DbType.String;
+            return EbDbTypes.String;
         }
 
 
@@ -278,11 +282,7 @@ namespace ExpressBase.Objects
 
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
-        public string BareControlHtml { get; set; }
-
-        [HideInPropertyGrid]
-        [EnableInBuilder(BuilderType.DVBuilder)]
-        public string IsPaged { get; set; }
+        public string BareControlHtml { get; set; }        
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]

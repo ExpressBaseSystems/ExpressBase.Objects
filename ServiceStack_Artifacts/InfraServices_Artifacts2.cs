@@ -306,6 +306,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int UserId { get; set; }
 
         public string Token { get; set; }
+
+        [DataMember(Order = 3)]
+        public int appid { get; set; }
     }
 
     [DataContract]

@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace ExpressBase.Objects
 {
-    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+    [EnableInBuilder(BuilderType.WebForm)]
     public class EbTableLayout : EbControlContainer
     {
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]

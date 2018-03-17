@@ -1,4 +1,5 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
 using ExpressBase.Data;
 using ServiceStack;
@@ -48,11 +49,27 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int UserId { get; set; }
 
         [DataMember(Order = 10)]
-        public List<Dictionary<string, object>> Params { get; set; }
+        public List<Param> Params { get; set; }
 
         [DataMember(Order = 11)]
-        public List<Dictionary<string, string>> TFilters { get; set; }
+        public List<TFilters> TFilters { get; set; }
     }
+
+    
+
+    [DataContract]
+    public class TFilters
+    {
+        [DataMember(Order = 1)]
+        public string Operator { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Column { get; set; }
+
+        [DataMember(Order = 3)]
+        public string Value { get; set; }
+    }
+
 
     [DataContract]
     public class DataSourceDataRequestbot : IReturn<string>, IEbSSRequest
@@ -119,44 +136,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public DataSet DataSet { get; set; }
     }
 
-    public class DataSourceDataRequest444 : IReturn<DataSourceDataResponse>, IEbSSRequest
-    {
-        [DataMember(Order = 0)]
-        public string RefId { get; set; }
-
-        [DataMember(Order = 1)]
-        public int Start { get; set; }
-
-        [DataMember(Order = 2)]
-        public int Length { get; set; }
-
-        [DataMember(Order = 3)]
-        public int Draw { get; set; }
-
-        [DataMember(Order = 4)]
-        public int OrderByDir { get; set; }
-
-        [DataMember(Order = 5)]
-        public string OrderByCol { get; set; }
-
-        [DataMember(Order = 6)]
-        public string Token { get; set; }
-
-        [DataMember(Order = 7)]
-        public string rToken { get; set; }
-
-        [DataMember(Order = 8)]
-        public string TenantAccountId { get; set; }
-
-        [DataMember(Order = 9)]
-        public int UserId { get; set; }
-
-        [DataMember(Order = 10)]
-        public List<Dictionary<string, object>> Params { get; set; }
-
-        [DataMember(Order = 11)]
-        public List<Dictionary<string, string>> TFilters { get; set; }
-    }
 
     [Route("/ds")]
     [Route("/ds/columns/{RefId}")]
@@ -188,7 +167,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int UserId { get; set; }
 
         [DataMember(Order = 9)]
-        public List<Dictionary<string, object>> Params { get; set; }
+        public List<Param> Params { get; set; }
 
         [DataMember(Order = 10)]
         public string CrossDomain { get; set; }
@@ -218,6 +197,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 7)]
         public DataSet DataSet { get; set; }
+
+        [DataMember(Order = 8)]
+        public bool Ispaged { get; set; }
     }
 
     [DataContract]
