@@ -4,6 +4,7 @@ using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
 using ExpressBase.Data;
+using ExpressBase.Objects.Objects.DVRelated;
 using ExpressBase.Objects.ServiceStack_Artifacts;
 using ServiceStack;
 using System;
@@ -25,6 +26,18 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         public string DataSourceId { get; set; }
 
+        [EnableInBuilder(BuilderType.FilterDialog)]
+        [HideInPropertyGrid]
+        public DVColumnCollection Columns { get; set; }
+
+        [EnableInBuilder(BuilderType.FilterDialog)]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
+        public DVBaseColumn ValueMember { get; set; }
+
+        [EnableInBuilder(BuilderType.FilterDialog)]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
+        public DVBaseColumn DisplayMember { get; set; }
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public int Value { get; set; }
 
@@ -34,26 +47,24 @@ namespace ExpressBase.Objects
 
 
 
-    public void GetOptionsHtml(JsonServiceClient ServiceClient) {
+		public void GetOptionsHtml(JsonServiceClient ServiceClient)
+		{
 
-            //this.DataSourceId = "eb_roby_dev-eb_roby_dev-2-1015-1739";
-            var pclient = new Web2.ProtoBufServiceClient(ServiceClient.BaseUri);
-            pclient.BearerToken = ServiceClient.BearerToken;
-            ////var result = pclient.Get<DataSourceDataResponsebot>(new DataSourceDataRequestbot { RefId = this.DataSourceId });
-            //var d = EbSerializers.Json_Deserialize(result);
-            ////var ds = result.Data;
-            //string _html = string.Empty;
+			this.DataSourceId = "eb_roby_dev-eb_roby_dev-2-1015-1739";
+			var result = ServiceClient.Get<DataSourceDataResponse>(new DataSourceDataRequest { RefId = this.DataSourceId });
+			string _html = string.Empty;
 
-            //foreach (EbDataRow option in ds)
-            //{
-            //    _html += string.Format("<option value='{0}'>{1}</option>", option[0], option[1]);
-            //}
+			foreach (EbDataRow option in result.Data)
+			{
+				_html += string.Format("<option value='{0}'>{1}</option>", option[0], option[1]);
+			}
 
-            //this.OptionHtml = _html;
-            //this.BareControlHtml = this.BareControlHtml.Replace("@options@", this.OptionHtml);
-        }
+			this.OptionHtml = _html;
+			this.BareControlHtml = this.BareControlHtml.Replace("@options@", this.OptionHtml);
+		}
 
-        [OnDeserialized]
+
+		[OnDeserialized]
         public void OnDeserializedMethod(StreamingContext context)
         {
             this.BareControlHtml = this.GetBareHtml();

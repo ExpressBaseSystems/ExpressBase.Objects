@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ExpressBase.Objects
 {
-    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+    [EnableInBuilder(BuilderType.WebForm)]
     public class EbTabControl : EbControlContainer
     {
         public EbTabControl() { }
