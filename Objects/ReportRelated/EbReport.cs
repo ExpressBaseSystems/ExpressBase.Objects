@@ -71,6 +71,19 @@ namespace ExpressBase.Objects
     }
 
     [EnableInBuilder(BuilderType.Report)]
+    public class Margin
+    {
+        public float Left { get; set; }
+        
+        public float Right { get; set; }
+        
+        public float Top { get; set; }
+        
+        public float Bottom { get; set; }
+
+    }
+
+    [EnableInBuilder(BuilderType.Report)]
     public class EbReport : EbReportObject
     {
         [EnableInBuilder(BuilderType.Report)]
@@ -86,6 +99,11 @@ else {
             ")]
         [PropertyGroup("General")]
         public PaperSize PaperSize { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [PropertyEditor(PropertyEditorType.Expandable)]
+        [PropertyGroup("Appearance")]
+        public Margin Margin { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]
