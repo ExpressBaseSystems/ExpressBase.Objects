@@ -118,6 +118,14 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             this.ServerEventClient = _sec as EbServerEventClient;
         }
 
+        public EbBaseService(IEbConnectionFactory _dbf, IMessageProducer _mqp, IMessageQueueClient _mqc, IEbMqClient _mq)
+        {
+            this.EbConnectionFactory = _dbf as EbConnectionFactory;
+            this.MessageProducer3 = _mqp as RabbitMqProducer;
+            this.MessageQueueClient = _mqc as RabbitMqQueueClient;
+            this.MQClient = _mq as EbMqClient;
+        }
+
         private static Dictionary<string, string> _infraDbSqlQueries;
 
         public static Dictionary<string, string> InfraDbSqlQueries
@@ -151,7 +159,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
             return fileByte;
         }
-
 
         //private void LoadCache()
         //{
