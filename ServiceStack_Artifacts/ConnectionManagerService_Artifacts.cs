@@ -58,8 +58,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public SMSConnection SMSConnection { get; set; }
     }
 
-
-
     public class InitialSolutionConnectionsRequest : EbServiceStackRequest
     {
         public string SolutionId { get; set; }
