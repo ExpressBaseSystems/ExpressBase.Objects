@@ -4,6 +4,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using ServiceStack;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
+using ExpressBase.Common.Data;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
@@ -349,7 +350,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 4)]
         public List<EbSolutionsWrapper> Data { get; set; }
-
     }
     
     [DataContract]
@@ -377,6 +377,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 4)]
         public EbSolutionsWrapper Data { get; set; }
+
+        [DataMember(Order = 5)]
+        public EbConnectionsConfig EBSolutionConnections { get; set; }
 
     }
 
