@@ -36,7 +36,8 @@ namespace ExpressBase.Objects
         }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
-        public int DataSourceId { get; set; }
+		[PropertyEditor(PropertyEditorType.ObjectSelector)]
+        public string DataSourceId { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public string DisplayMember { get; set; }
