@@ -26,15 +26,15 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         public string DataSourceId { get; set; }
 
-        [EnableInBuilder(BuilderType.FilterDialog)]
+        [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm)]
         [HideInPropertyGrid]
         public DVColumnCollection Columns { get; set; }
 
-        [EnableInBuilder(BuilderType.FilterDialog)]
+        [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
         public DVBaseColumn ValueMember { get; set; }
 
-        [EnableInBuilder(BuilderType.FilterDialog)]
+        [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
         public DVBaseColumn DisplayMember { get; set; }
 
@@ -50,7 +50,7 @@ namespace ExpressBase.Objects
 		public void GetOptionsHtml(JsonServiceClient ServiceClient)
 		{
 
-			this.DataSourceId = "eb_roby_dev-eb_roby_dev-2-1015-1739";
+			//this.DataSourceId = "eb_roby_dev-eb_roby_dev-2-1015-1739";
 			var result = ServiceClient.Get<DataSourceDataResponse>(new DataSourceDataRequest { RefId = this.DataSourceId });
 			string _html = string.Empty;
 
