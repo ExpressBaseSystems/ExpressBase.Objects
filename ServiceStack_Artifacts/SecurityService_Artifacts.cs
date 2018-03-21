@@ -702,11 +702,14 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		{
 			this.ObjectTypes = new ObjectTypeCollection();
 		}
+
 	}
 
 	[DataContract]
 	public class ObjectTypeCollection : Dictionary<int, ObjectCollection>
 	{
+		public ObjectTypeCollection() { }
+
 		public void Add(int obj_type)
 		{
 			this.Add(obj_type, new ObjectCollection());
@@ -716,7 +719,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 	[DataContract]
 	public class ObjectCollection : List<Eb_Object>
 	{
-
+		public ObjectCollection() { }
 	}
 
 	[DataContract]
@@ -727,6 +730,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 		[DataMember(Order = 2)]
 		public string Obj_Name;
+
+		public Eb_Object() { }
 	}
 
 	[DataContract]
