@@ -223,7 +223,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string  TableName { get; set; }
 
         [DataMember(Order = 2)]
-        public Dictionary<string, List<string>> Fields { get; set; }
+        public List<BotInsert> Fields { get; set; }
     }
 
     [DataContract]
@@ -234,6 +234,20 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 4)]
         public string BotId { get; set; }
+    }
+
+    [DataContract]
+    public class BotInsert
+    {
+        [DataMember(Order = 1)]
+        public string Value { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Type { get; set; }
+
+        [DataMember(Order = 3)]
+        public string Name { get; set; }
+
     }
 
 
