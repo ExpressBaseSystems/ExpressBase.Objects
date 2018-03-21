@@ -32,11 +32,11 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
-        public List<DVBaseColumn> ValueMember { get; set; }
+        public List<DVBaseColumn> ValueMembers { get; set; }
 
         [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
-        public List<DVBaseColumn> DisplayMember { get; set; }
+        public List<DVBaseColumn> DisplayMembers { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public int Value { get; set; }
@@ -56,7 +56,7 @@ namespace ExpressBase.Objects
 
 			foreach (EbDataRow option in result.Data)
 			{
-				_html += string.Format("<option value='{0}'>{1}</option>", option[this.ValueMember[0].Data], option[this.DisplayMember[0].Data]);
+				_html += string.Format("<option value='{0}'>{1}</option>", option[this.ValueMembers[0].Data], option[this.DisplayMembers[0].Data]);
 			}
 
 			this.OptionHtml = _html;
