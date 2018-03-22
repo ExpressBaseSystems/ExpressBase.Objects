@@ -1,4 +1,5 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
 using ServiceStack;
 using System;
@@ -14,6 +15,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Refid { get; set; }
 
         public string Fullname { get; set; }
+
+        public List<Param> Params { get; set; }
     }
 
     [DataContract]
