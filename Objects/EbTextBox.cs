@@ -259,7 +259,7 @@ else {
         {
             return @"
 <div id='cont_@name@  ' class='Eb-ctrlContainer' Ctype='TextBox' style='@HiddenString '>
-    <span id='@name@Lbl' style='@LabelBackColor @LabelForeColor '> @Label  </span>
+    <span id='@name@Lbl' style='@LabelBackColor@ @LabelForeColor@ '> @Label@  </span>
        @barehtml@
     <span class='helpText'> @HelpText </span>
 </div>"
@@ -269,10 +269,10 @@ else {
 .Replace("@ToolTipText ", this.ToolTipText)
 
 //.Replace("@name ", (this.Name != null) ? this.Name : "@name ")
-.Replace("@LabelForeColor ", "color:" + ((this.LabelForeColor != null) ? this.LabelForeColor : "@LabelForeColor ") + ";")
-.Replace("@LabelBackColor ", "background-color:" + ((this.LabelBackColor != null) ? this.LabelBackColor : "@LabelBackColor ") + ";")
+.Replace("@LabelForeColor@ ", "color:" + ((this.LabelForeColor != null) ? this.LabelForeColor : "@LabelForeColor@ ") + ";")
+.Replace("@LabelBackColor@ ", "background-color:" + ((this.LabelBackColor != null) ? this.LabelBackColor : "@LabelBackColor@ ") + ";")
 .Replace("@HelpText ", ((this.HelpText != null) ? this.HelpText : "@HelpText "))
-.Replace("@Label ", ((this.Label != null) ? this.Label : "@Label "));
+.Replace("@Label@ ", ((this.Label != null) ? this.Label : "@Label@ "));
         }
     }
 

@@ -48,11 +48,11 @@ namespace ExpressBase.Objects
 
 		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
 		[PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
-		public string DisplayMember { get; set; }
+		public List<DVBaseColumn> DisplayMembers { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
 		[PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
-		public string ValueMember { get; set; }
+		public List<DVBaseColumn> ValueMembers { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public int DropdownHeight { get; set; }
@@ -124,7 +124,7 @@ var @nameEbCombo = new EbSelect('@name', '@DSid', @DDHeight, '@vmName', '', @Max
 .Replace("@name", this.Name)
 .Replace("@DSid", this.DataSourceId.ToString().Trim())
 .Replace("@DDHeight", (this.DropdownHeight == 0) ? "400" : this.DropdownHeight.ToString())
-.Replace("@vmName", this.ValueMember.ToString())
+.Replace("@vmName", this.ValueMembers.ToString())
 .Replace("@dmNames", "['acmaster1_name', 'tdebit', 'tcredit']")
 .Replace("@MaxLimit", (!this.MultiSelect || this.MaxLimit == 0) ? "1" : this.MaxLimit.ToString())
 .Replace("@MinLimit", this.MinLimit.ToString())
@@ -136,9 +136,25 @@ var @nameEbCombo = new EbSelect('@name', '@DSid', @DDHeight, '@vmName', '', @Max
 
         public override string GetDesignHtml()
         {
-            return @"<div id='cont_@name@  ' class='Eb-ctrlContainer' Ctype='TextBox' style='@HiddenString '>
-                        <div role='form' data-toggle='validator' style=' width: inherit;'><input type='hidden' name='acmasteridHidden4val' data-ebtype='16' id='acmasterid'> <div id='acmasteridLbl' style='display: inline-block;'></div> <div id='acmasteridWraper' data-toggle='tooltip' title='' data-original-title=''><div style='display: inline-block; width: 100%; margin-right: -4px;'><div class='input-group'><div class='dropdown v-select searchable' id='acmasterid0'><div type='button' class='dropdown-toggle clearfix' style='border-top-left-radius: 5px; border-bottom-left-radius: 5px;'> <input debounce='0' type='search'  readonly  placeholder='label0' class='form-control' id='acmaster1_xid' style='width: 100%; background-color: #fff;'> <i role='presentation' class='open-indicator' style='display: none;'></i> <div class='spinner' style='display: none;'>Loading...</div></div> <!----></div> <span class='input-group-addon' style='border-radius: 0px;'><i id='acmasteridTglBtn' aria-hidden='true' class='fa  fa-search'></i></span></div></div> </div> <div id='acmasterid_loadingdiv' class='ebCombo-loader'><i id='acmasterid_loading-image' class='fa fa-spinner fa-pulse fa-2x fa-fw' style='display: none;'></i><span class='sr-only'>Loading...</span></div> <center><div id='acmasteridDDdiv' class='DDdiv expand-transition' style='width: 600px; display: none;'><table id='acmasteridtbl' class='table table-striped table-bordered' style='width: 100%;'></table></div></center></div>
-                    </div>"
+            return @"
+<div id='cont_@name@  ' class='Eb-ctrlContainer' Ctype='TextBox' style='@HiddenString '>
+   <div role='form' data-toggle='validator' style=' width: inherit;'>
+    <span style='background-color:@LabelBackColor@; color:@LabelForeColor@ '> @Label@  </span>
+      <div class='combo-wrap' data-toggle='tooltip' title='' data-original-title=''>
+         <div style='display: inline-block; width: 100%; margin-right: -4px;'>
+            <div class='input-group'>
+               <div class='dropdown v-select searchable' id='acmasterid0'>
+                  <div type='button' class='dropdown-toggle clearfix' style='border-top-left-radius: 5px; border-bottom-left-radius: 5px;'>
+                     <input debounce='0' type='search'  readonly  placeholder='label0' class='form-control' id='acmaster1_xid' style='width: 100%; background-color: #fff;'> <i role='presentation' class='open-indicator' style='display: none;'></i> 
+                     <div class='spinner' style='display: none;'>Loading...</div>
+                  </div>
+               </div>
+               <span class='input-group-addon' style='border-radius: 0px;'><i id='acmasteridTglBtn' aria-hidden='true' class='fa  fa-search'></i></span>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>"
 .Replace("@name@", this.Name)
 .RemoveCR().DoubleQuoted();//GetHtmlHelper(RenderMode.Developer).RemoveCR().DoubleQuoted();
         }
@@ -154,7 +170,7 @@ var @nameEbCombo = new EbSelect('@name', '@DSid', @DDHeight, '@vmName', '', @Max
 
        <div id='@name@Container'  role='form' data-toggle='validator' style='width:100%;'>
             <input type='hidden' name='@name@Hidden4val' data-ebtype='16' id='@name@'/>
-            <div style='display:inline-block;' id='@name@Lbl'>@label</div>
+			<span id='@name@Lbl' style='@LabelBackColor@ @LabelForeColor@ '> @Label@  </span>
 
             @VueSelectCode
             <div id='@name@_loadingdiv' class='ebCombo-loader'>
@@ -168,6 +184,7 @@ var @nameEbCombo = new EbSelect('@name', '@DSid', @DDHeight, '@vmName', '', @Max
         </div>"
 .Replace("@VueSelectCode", this.VueSelectcode)
 .Replace("@name@", this.Name)
+.Replace("@Label@ ", ((this.Label != null) ? this.Label : "@Label@ "))
 .Replace("@width", 900.ToString())//this.Width.ToString())
 .Replace("@perWidth", (this.NumberOfFields != 0) ? (900 / this.NumberOfFields).ToString() : 900.ToString())
 .Replace("@DDwidth", (this.DropdownWidth == 0) ? "300" : this.DropdownWidth.ToString())

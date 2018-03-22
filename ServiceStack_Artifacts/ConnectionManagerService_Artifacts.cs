@@ -11,6 +11,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
     public class RefreshSolutionConnectionsRequest : EbServiceStackRequest
     {
+        public string BToken { get; set; }
+
+        public string RToken { get; set; }
     }
 
     public class RefreshSolutionConnectionsAsyncRequest : EbServiceStackRequest
