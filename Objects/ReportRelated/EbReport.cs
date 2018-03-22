@@ -11,6 +11,8 @@ using iTextSharp.text;
 using iTextSharp.text.pdf;
 using Microsoft.CodeAnalysis.Scripting;
 using Newtonsoft.Json;
+using ServiceStack;
+using ServiceStack.Redis;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -183,6 +185,9 @@ else {
         [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]
         public List<EbReportDetail> Detail { get; set; }
+
+        [JsonIgnore]
+        public EbDataSource EbDataSource { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
@@ -830,7 +835,25 @@ else {
             Stamp.FormFlattening = true;
             Stamp.Close();
         }
+        public override void AfterRedisGet(RedisClient Redis, IServiceClient client)
+        {
+            try
+            {
+                this.EbDataSource = Redis.Get<EbDataSource>(this.DataSourceRefId);
+                if (this.EbDataSource == null || this.EbDataSource.Sql == null || this.EbDataSource.Sql == string.Empty)
+                {
+                    var result = client.Get<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = this.DataSourceRefId });
+                    this.EbDataSource = EbSerializers.Json_Deserialize(result.Data[0].Json);
+                    Redis.Set<EbDataSource>(this.DataSourceRefId, this.EbDataSource);
+                }
+                if (this.EbDataSource.FilterDialogRefId != string.Empty)
+                    this.EbDataSource.AfterRedisGet(Redis, client);
+            }
+            catch (Exception e)
+            {
 
+            }
+        }
         public EbReport()
         {
             this.ReportHeaders = new List<EbReportHeader>();
