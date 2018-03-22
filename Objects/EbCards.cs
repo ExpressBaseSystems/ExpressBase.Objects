@@ -149,8 +149,8 @@ this.Init = function(id)
         <div class='card-content'>
             @ContentHTML@
         </div>
-    </div>
     @ButtonCollection@
+    </div>
 </div>"
    .Replace("@ButtonCollection@", this.ButtonsString)
    .Replace("@name@", this.Name)
