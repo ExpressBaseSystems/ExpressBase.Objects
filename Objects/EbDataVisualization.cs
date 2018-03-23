@@ -241,7 +241,7 @@ namespace ExpressBase.Objects
             }
         }
 
-        private EbDbType ConvertToDbType(Type _typ)
+        private EbDbTypes ConvertToDbType(Type _typ)
         {
             if (_typ == typeof(DateTime))
                 return EbDbTypes.DateTime;
