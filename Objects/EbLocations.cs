@@ -69,9 +69,29 @@ this.Init = function(id)
 
         public override string GetDesignHtml()
         {
-            this.LocationCollection.Add(new EbLocation());
-            this.LocationCollection.Add(new EbLocation());
-            return GetHtml().RemoveCR().DoubleQuoted();
+            //this.LocationCollection.Add(new EbLocation());
+            //this.LocationCollection.Add(new EbLocation());
+            //return GetHtml().RemoveCR().DoubleQuoted();
+            return @"`
+<div class='location-cont'>
+   <div class='loc-opt-cont'>
+      <select class='loc-opt-DD'>
+         <option class='loc-opt-btn' value='Locations0_loc0' for='Locations0_loc0'> Select Location</option>
+      </select>
+   </div>
+   <div class='location-box' style='display: block;'>
+      <div class='map-div' style='position: relative; overflow: hidden;'>
+        <img style='width:100%;height: 100%;' src='/images/LocMapImg1.png'>
+      </div>
+      <div class='loc-bottom'>
+         <div class='loc-label' style='@LabelBackColor  @LabelForeColor font-weight: bold'> Location name </div>
+         <div class='loc-content'>
+            Address: Lorem ipsum dolor , sit amet, Lorem , qety 673001  consectetur adipiscing elitullamcorper lacus. Phone: 0123456789
+         </div>
+      </div>
+   </div>
+</div>
+`";
         }
 
         public override string GetBareHtml()
