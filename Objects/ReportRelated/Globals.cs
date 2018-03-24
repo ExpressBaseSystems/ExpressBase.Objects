@@ -88,9 +88,9 @@ namespace ExpressBase.Objects.Objects.ReportRelated
             {
                 var _data = x as NTV;
 
-                if ((int)_data.Type == EbDbTypes.Int32)
+                if (_data.Type == EbDbTypes.Int32)
                     result = Convert.ToInt32((x as NTV).Value);
-                else if ((int)_data.Type == EbDbTypes.Decimal)
+                else if (_data.Type == EbDbTypes.Decimal)
                     result = Convert.ToDecimal((x as NTV).Value);
                 else
                     result = (x as NTV).Value.ToString();
@@ -112,7 +112,7 @@ namespace ExpressBase.Objects.Objects.ReportRelated
     {
         public string Name { get; set; }
 
-        public EbDbType Type { get; set; }
+        public EbDbTypes Type { get; set; }
 
         public object Value { get; set; }
     }

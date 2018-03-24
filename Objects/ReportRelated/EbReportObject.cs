@@ -14,7 +14,7 @@ namespace ExpressBase.Objects.ReportRelated
 
         [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("General")]
-        new public string Name { get; set; }
+         public override string Name { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
@@ -79,6 +79,6 @@ namespace ExpressBase.Objects.ReportRelated
 
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
-        public string ForeColor { get; set; }
+        public virtual string ForeColor { get; set; }
     }
 }

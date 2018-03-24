@@ -715,7 +715,7 @@ else {
                     {
                         string TName = calcfd.Split('.')[0];
                         string fName = calcfd.Split('.')[1];
-                        globals[TName].Add(fName, new NTV { Name = fName, Type = (EbDbType)this.DataRow.Table.Columns[fName].Type, Value = this.DataRow[serialnumber][fName] });
+                        globals[TName].Add(fName, new NTV { Name = fName, Type = this.DataRow.Table.Columns[fName].Type, Value = this.DataRow[serialnumber][fName] });
                     }
                     try
                     {
@@ -734,7 +734,7 @@ else {
                     {
                         string TName = calcfd.Split('.')[0];
                         string fName = calcfd.Split('.')[1];
-                        globals[TName].Add(fName, new NTV { Name = fName, Type = (EbDbType)this.DataRow.Table.Columns[fName].Type, Value = this.DataRow[serialnumber][fName] });
+                        globals[TName].Add(fName, new NTV { Name = fName, Type = this.DataRow.Table.Columns[fName].Type, Value = this.DataRow[serialnumber][fName] });
                     }
                     try
                     {

@@ -90,8 +90,9 @@ namespace ExpressBase.Objects
         {
             get
             {
+                int noOfFileds = this.DisplayMembers.Count;
                 string rs = "<div id='@name@Wraper' data-toggle='tooltip' title='@tooltipText'>";
-                for (int i = 0; i < this.NumberOfFields; i++)
+                for (int i = 0; i < noOfFileds; i++)
                     rs += @"
 <div style='display:inline-block; width:@perWidth@%; margin-right: -4px;'>
     <div class='input-group'>
@@ -105,8 +106,8 @@ namespace ExpressBase.Objects
     </div>
 </div>"
 .Replace("$$", i.ToString())
-.Replace("@perWidth@", ((int)( 100 / this.NumberOfFields)).ToString())
-.Replace("@border-r" + i, (i != this.NumberOfFields - 1) ? "style='border-radius: 0px;'" : "");
+.Replace("@perWidth@", ((int)( 100 / noOfFileds)).ToString())
+.Replace("@border-r" + i, (i != noOfFileds - 1) ? "style='border-radius: 0px;'" : "");
                 return rs + "</div>";
             }
         }
@@ -186,7 +187,7 @@ var @nameEbCombo = new EbSelect('@name', '@DSid', @DDHeight, '@vmName', '', @Max
 .Replace("@name@", this.Name)
 .Replace("@Label@ ", ((this.Label != null) ? this.Label : "@Label@ "))
 .Replace("@width", 900.ToString())//this.Width.ToString())
-.Replace("@perWidth", (this.NumberOfFields != 0) ? (900 / this.NumberOfFields).ToString() : 900.ToString())
+.Replace("@perWidth", (this.DisplayMembers.Count != 0) ? (900 / this.DisplayMembers.Count).ToString() : 900.ToString())
 .Replace("@DDwidth", (this.DropdownWidth == 0) ? "300" : this.DropdownWidth.ToString())
 ;
         }
