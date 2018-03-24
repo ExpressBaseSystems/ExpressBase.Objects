@@ -42,7 +42,7 @@ namespace ExpressBase.Objects
                             <div class='locinp-wraper'><span class='locinp-span'>Longitude</span><input id='@name@long' class='locinp' type='text'/></div>
                             <div class='locinp-wraper-address'><span class='locinp-span'>Address</span><input id='@name@address' class='locinp' type='text'/></div>
                         </div>
-                        <div id='@name@' class='map-div'></div>
+                        <div id='@name@' class='map-div'>@mapimgforbuilder@</div>
                         <div class='loc-bottom'>
                             <div id='@name@Lbl' class='loc-label' style='@LabelBackColor@  @LabelForeColor@ font-weight: bold'> @Label@ </div><button class='choose-btn'>Choose</button>
                             <div class='loc-content'>
@@ -55,7 +55,8 @@ namespace ExpressBase.Objects
 .Replace("@LabelBackColor@", this.LabelBackColor)
 .Replace("@LabelForeColor@", this.LabelForeColor)
 .Replace("@Label@", this.Label)
-.Replace("@ContentHTML@", this.ContentHTML);
+.Replace("@ContentHTML@", this.ContentHTML)
+.Replace("@mapimgforbuilder@", (this.Name != null) ? string.Empty : "<img style='width:100%;height: 100%;' src='/images/LocMapImg2.png'>");
             ;
         }
 
