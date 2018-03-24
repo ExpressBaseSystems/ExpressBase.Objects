@@ -43,7 +43,7 @@ namespace ExpressBase.Objects.ReportRelated
         [UIproperty]
         [PropertyGroup("General")]
         [HideInPropertyGrid]
-        public new string ForeColor { get; set; } = "";
+        public override string ForeColor { get; set; } = "";
 
         public BaseColor GetColor(string Color)
         {

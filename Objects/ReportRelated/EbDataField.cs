@@ -40,12 +40,12 @@ namespace ExpressBase.Objects.ReportRelated
         [PropertyGroup("General")]
         [UIproperty]
         public Boolean RenderInMultiLine { get; set; }
- 
+
         [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("General")]
         [UIproperty]
         [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
-         [JsonConverter(typeof(Base64Converter))]
+        [JsonConverter(typeof(Base64Converter))]
         public string AppearanceExpression { get; set; }
 
         private string[] _dataFieldsUsed;
@@ -78,7 +78,7 @@ namespace ExpressBase.Objects.ReportRelated
             else
             {
                 text = new Phrase(column_val, ITextFont);
-                if(this.ForeColor != "")
+                if (this.ForeColor != "")
                     text.Font.Color = GetColor(this.ForeColor);//ct.Canvas.SetColorFill(GetColor(this.Color));
             }
             if (this.RenderInMultiLine == true)
@@ -92,7 +92,7 @@ namespace ExpressBase.Objects.ReportRelated
                     if (column_type == System.Data.DbType.Decimal)
                         column_val = "###";
                 }
-            }           
+            }
             var ury = reportHeight - (printingTop + this.TopPt + detailprintingtop);
             var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
             ct.SetSimpleColumn(text, this.LeftPt, lly, this.WidthPt + this.LeftPt, ury, 15, Element.ALIGN_LEFT);
@@ -779,7 +779,7 @@ namespace ExpressBase.Objects.ReportRelated
             {
                 if (_dataFieldsUsed == null)
                 {
-                    var matches = Regex.Matches(this.ValueExpression , @"T[0-9]{1}.\w+").OfType<Match>()
+                    var matches = Regex.Matches(this.ValueExpression, @"T[0-9]{1}.\w+").OfType<Match>()
      .Select(m => m.Groups[0].Value)
      .Distinct();
 
