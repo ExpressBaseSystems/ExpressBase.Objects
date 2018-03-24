@@ -52,7 +52,7 @@ namespace ExpressBase.Objects
             foreach (EbDataRow cardRow in ds)
             {
                 EbCard Card = new EbCard();
-                Card.Name = cardRow[0].ToString();
+                Card.Name = cardRow[0].ToString().Trim();
                 Card.Label = cardRow[1].ToString();
                 Card.ContentHTML = cardRow[2].ToString();
                 Card.ImageID = cardRow[3].ToString();
