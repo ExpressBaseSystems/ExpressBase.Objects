@@ -59,6 +59,10 @@ namespace ExpressBase.Objects
             this.BareControlHtml = this.GetBareHtml();
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
+        public override  string  GetToolHtml()
+        {
+            return @"<div eb-type='@toolName' class='tool'><i class='far fa-window-restore'></i>@toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
+        }
 
         public void InitFromDataBase(JsonServiceClient ServiceClient)
         {
