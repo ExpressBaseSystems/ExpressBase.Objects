@@ -54,8 +54,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 11)]
         public List<TFilters> TFilters { get; set; }
     }
-
     
+
 
     [DataContract]
     public class TFilters
@@ -171,6 +171,37 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 10)]
         public string CrossDomain { get; set; }
+    }
+
+    public class DataSourceDataSetRequest : IReturn<DataSourceDataResponse>, IEbSSRequest
+    {
+        [DataMember(Order = 1)]
+        public string RefId { get; set; }
+
+        [DataMember(Order = 2)]
+        public string TenantAccountId { get; set; }
+
+        [DataMember(Order = 3)]
+        public int UserId { get; set; }
+
+        [DataMember(Order = 4)]
+        public List<Param> Params { get; set; }
+
+
+    }
+
+    [DataContract]
+    [Csv(CsvBehavior.FirstEnumerable)]
+    public class DataSourceDataSetResponse : IEbSSResponse
+    {
+        [DataMember(Order = 5)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 6)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 7)]
+        public EbDataSet DataSet { get; set; }
     }
 
     [DataContract]
