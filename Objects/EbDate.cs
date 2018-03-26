@@ -13,9 +13,9 @@ namespace ExpressBase.Objects
 {
     public enum EbDateType
     {
-        Date = (int)System.Data.DbType.Date,
-        Time = (int)System.Data.DbType.Time,
-        DateTime = (int)System.Data.DbType.DateTime,
+        Date ,
+        Time ,
+        DateTime ,
     }
 
     public enum TimeShowFormat
@@ -39,10 +39,12 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
     public class EbDate : EbControl
     {
-        public  string EbDbType { get; set; }
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+        public  EbDbTypes EbDbType { get { return EbDbTypes.Date; } }
+
         public EbDate()
         {
-            this.EbDbType = "date";
+            
         }
 
         [OnDeserialized]
@@ -91,6 +93,10 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public DateShowFormat ShowDateAs_ { get; set; }
+        public override string GetToolHtml()
+        {
+            return @"<div eb-type='@toolName' class='tool'><i class='fa fa-calendar'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
+        }
 
         public override string GetHead()
         {

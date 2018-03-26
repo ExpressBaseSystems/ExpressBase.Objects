@@ -14,7 +14,8 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
     public class EbNumeric : EbControl
     {
-        public string EbDbType { get; set; }
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+        public EbDbTypes EbDbType { get { return EbDbTypes.Decimal; } }
         public EbNumeric()
         {
         }
@@ -22,7 +23,6 @@ namespace ExpressBase.Objects
         [OnDeserialized]
         public void OnDeserializedMethod(StreamingContext context)
         {
-            this.EbDbType = "integer";
             this.BareControlHtml = this.GetBareHtml();
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }

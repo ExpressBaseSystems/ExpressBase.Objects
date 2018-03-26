@@ -136,10 +136,10 @@ else {
         //[ProtoBuf.ProtoMember(10)]
         //[Description("Identity")]
         //public override string Label { get; set; }
-        public string EbDbType  { get; set; }
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+        public EbDbTypes EbDbType { get { return EbDbTypes.String; } }
         public EbTextBox()
         {
-            this.EbDbType = "string";
         }
 
         [OnDeserialized]
