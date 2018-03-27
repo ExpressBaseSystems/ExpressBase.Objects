@@ -21,27 +21,23 @@ namespace ExpressBase.Objects
 		[EnableInBuilder(BuilderType.BotForm)]
 		[PropertyEditor(PropertyEditorType.Collection)]
 		public List<EbCard> CardCollection { get; set; }
-
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
-		[PropertyEditor(PropertyEditorType.Boolean)]
-		public bool DynamicCards { get; set; }
-
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+		
+		[EnableInBuilder(BuilderType.BotForm)]
 		[OSE_ObjectTypes(EbObjectTypes.iDataSource)]
 		[PropertyEditor(PropertyEditorType.ObjectSelector)]
 		public string DataSourceId { get; set; }
 
 		[EnableInBuilder(BuilderType.BotForm)]
 		[HideInPropertyGrid]
-		public List<DVColumnCollection> Columns { get; set; }
+		public ColumnColletion Columns { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
-		[PropertyEditor(PropertyEditorType.Boolean)]
-		//[OnChangeExec(@"if(this.IsItemCard === true){pg.ShowProperty('Price')}
-		//else{pg.HideProperty('Price')}")]
-		public bool Summarize { get; set; }
+		//[EnableInBuilder(BuilderType.BotForm)]
+		//[PropertyEditor(PropertyEditorType.Boolean)]
+		////[OnChangeExec(@"if(this.IsItemCard === true){pg.ShowProperty('Price')}
+		////else{pg.HideProperty('Price')}")]
+		//public bool Summarize { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+		[EnableInBuilder(BuilderType.BotForm)]
 		[PropertyEditor(PropertyEditorType.Boolean)]
 		public bool MultiSelect { get; set; }
 
@@ -75,14 +71,13 @@ namespace ExpressBase.Objects
 
 		public void InitFromDataBase(JsonServiceClient ServiceClient)
 		{
-			this.DataSourceId = "eb_roby_dev-eb_roby_dev-2-1105-1828";
-			RowColletion ds = (ServiceClient.Get<DataSourceDataResponse>(new DataSourceDataRequest { RefId = this.DataSourceId })).Data;
-			string _html = string.Empty;
+			//this.DataSourceId = "eb_roby_dev-eb_roby_dev-2-1105-1828";
+			//RowColletion ds = (ServiceClient.Get<DataSourceDataResponse>(new DataSourceDataRequest { RefId = this.DataSourceId })).Data;
+			//string _html = string.Empty;
 
-			foreach (EbDataRow cardRow in ds)
+			//foreach (EbDataRow cardRow in ds)
 			{
-				EbCard Card = new EbCard(Fields);
-
+				//EbCard Card = new EbCard(Fields);
 				//Card.Name = cardRow[0].ToString().Trim();
 				//Card.Label = cardRow[1].ToString();
 				//Card.ContentHTML = cardRow[2].ToString();
@@ -91,8 +86,7 @@ namespace ExpressBase.Objects
 				//Card.Quantity = 1;
 				//Card.Price = 115;
 				//Card.Buttons.Add(new EbButton { Text = "Add to Cart" });
-
-				this.CardCollection.Add(Card);
+				//this.CardCollection.Add(Card);
 			}
 		}
 
@@ -118,7 +112,7 @@ namespace ExpressBase.Objects
 
 		public override string GetDesignHtml()
 		{
-			this.CardCollection.Add(new EbCard(Fields));
+			//this.CardCollection.Add(new EbCard(Fields));
 			return GetHtml().RemoveCR().DoubleQuoted();
 		}
 
@@ -133,12 +127,10 @@ namespace ExpressBase.Objects
 
 		public override string GetBareHtml()
 		{
-			string html = @"<div id='@name@'><div class='cards-cont'>".Replace("@name@", this.Name ?? "@name@");
-			foreach (EbCard ec in this.CardCollection)
-				html += ec.GetHtml();
-			html += "</div><div class='cards-footer'>".Replace("@name@", this.Name ?? "@name@");
+			string html = @"<div id='@name@'><div class='cards-cont'> 
+							<img class='card-img' src='../images/image.png'/>
+							</div><div class='cards-footer'>".Replace("@name@", this.Name ?? "@name@");
 			html += this.getCartHtml() + this.ButtonsString;
-
 			html += "</div>";
 			return html;
 		}
@@ -166,16 +158,9 @@ namespace ExpressBase.Objects
 	public class EbCard : EbControl
 	{
 		[EnableInBuilder(BuilderType.BotForm)]
-		[PropertyEditor(PropertyEditorType.ImageSeletor)]
-		public string ImageID { get; set; }
-
-		[EnableInBuilder(BuilderType.BotForm)]
-		public string ContentHTML { get; set; }
-
-		[EnableInBuilder(BuilderType.BotForm)]
 		[PropertyEditor(PropertyEditorType.Collection)]
 		public List<EbButton> Buttons { get; set; }
-
+		
 		public string ButtonsString
 		{
 			get
@@ -187,61 +172,62 @@ namespace ExpressBase.Objects
 			}
 			set { }
 		}
+
         public EbCard()
         {
             this.Buttons = new List<EbButton>();
         }
 
-        public EbCard(List<EbCardField> Fields)
-		{
-			this.Buttons = new List<EbButton>();
-		}
+		//public EbCard(List<EbCardField> Fields)
+		//{
+		//	this.Buttons = new List<EbButton>();
+		//}
 
-		public override string GetDesignHtml()
-		{
-			return GetBareHtml().RemoveCR().DoubleQuoted();
-		}
+		//public override string GetDesignHtml()
+		//{
+		//	return GetBareHtml().RemoveCR().DoubleQuoted();
+		//}
 
 
-		public override string GetBareHtml()
-		{
-			string html = @"<div id='@name@' class='card-cont' style='width:100%;'>
-								<img class='card-img' src='@ImageID@'/>
-								<div class='card-bottom'>
-									<div id='@name@Lbl' class='card-label' style='@LabelBackColor  @LabelForeColor font-weight: bold'> @Label@ </div>
-									<div class='card-content'>
-										@ContentHTML@
-									</div>
-									@CardHtml@
-									@ButtonCollection@
-								</div>
-							</div>"
-				   .Replace("@ButtonCollection@", this.ButtonsString)
-				   .Replace("@name@", this.Name)//this.IsItemCard ? this.Name : "this.EbSid"
-				   .Replace("@ContentHTML@", this.ContentHTML) //"Chat has become the center of the smartphone universe, so it makes sense that bots are being used to deliver information in a convenient and engaging manner. But how do brands or media companies")//
-				   .Replace("@Label@", this.Label)//"TechCrunch")//
-				   .Replace("@ImageID@", this.ImageID.IsNullOrEmpty() ? "../images/image.png" : this.ImageID)//"https://tctechcrunch2011.files.wordpress.com/2016/03/chat-bot.jpg?w=738")//
-				   .Replace("@CardHtml@", this.GetItemCardHtml());//this.IsItemCard ? this.GetItemCardHtml() : ""
-			return html;
-		}
+		//public override string GetBareHtml()
+		//{
+		//	string html = @"<div id='@name@' class='card-cont' style='width:100%;'>
+		//						<img class='card-img' src='@ImageID@'/>
+		//						<div class='card-bottom'>
+		//							<div id='@name@Lbl' class='card-label' style='@LabelBackColor  @LabelForeColor font-weight: bold'> @Label@ </div>
+		//							<div class='card-content'>
+		//								@ContentHTML@
+		//							</div>
+		//							@CardHtml@
+		//							@ButtonCollection@
+		//						</div>
+		//					</div>"
+		//		   .Replace("@ButtonCollection@", this.ButtonsString)
+		//		   .Replace("@name@", this.Name)//this.IsItemCard ? this.Name : "this.EbSid"
+		//		   .Replace("@ContentHTML@", this.ContentHTML) //"Chat has become the center of the smartphone universe, so it makes sense that bots are being used to deliver information in a convenient and engaging manner. But how do brands or media companies")//
+		//		   .Replace("@Label@", this.Label)//"TechCrunch")//
+		//		   .Replace("@ImageID@", this.ImageID.IsNullOrEmpty() ? "../images/image.png" : this.ImageID)//"https://tctechcrunch2011.files.wordpress.com/2016/03/chat-bot.jpg?w=738")//
+		//		   .Replace("@CardHtml@", this.GetItemCardHtml());//this.IsItemCard ? this.GetItemCardHtml() : ""
+		//	return html;
+		//}
 
-		public override string GetHtml()
-		{
-			return GetBareHtml();
-		}
+		//public override string GetHtml()
+		//{
+		//	return GetBareHtml();
+		//}
 
-		public string GetItemCardHtml()
-		{
-			string html = @"<div style='width: 50%; display: inline-block;'>
-								Quantity : <input class='item-quantity' type='number' value='1' min='1' max='10' style='width: 50%;'>
-							</div>
-							<div style='width: 45%; display: inline-block;'>
-								Price : <input class='item-price' type='text' value='@Price@' readonly style='width: 50%;'>
-							</div>"
-					.Replace("@name@", this.Name)
-					.Replace("@Price@", "215.50");
-			return html;
-		}
+		//public string GetItemCardHtml()
+		//{
+		//	string html = @"<div style='width: 50%; display: inline-block;'>
+		//						Quantity : <input class='item-quantity' type='number' value='1' min='1' max='10' style='width: 50%;'>
+		//					</div>
+		//					<div style='width: 45%; display: inline-block;'>
+		//						Price : <input class='item-price' type='text' value='@Price@' readonly style='width: 50%;'>
+		//					</div>"
+		//			.Replace("@name@", this.Name)
+		//			.Replace("@Price@", "215.50");
+		//	return html;
+		//}
 	}
 
 	[EnableInBuilder(BuilderType.BotForm)]
@@ -262,11 +248,12 @@ else {
     pg.MakeReadWrite('DbFieldMap');
 }
             ")]
-        public List<EbDataColumn> DbFieldMap { get; set; }
+        public ColumnColletion DbFieldMap { get; set; }
 
 		[EnableInBuilder(BuilderType.BotForm)]
 		public bool Summarize { get; set; }
 	}
+
 
 	[EnableInBuilder(BuilderType.BotForm)]
 	//[PropertyEditor(PropertyEditorType.xxx)]
@@ -279,7 +266,64 @@ else {
         [PropertyEditor(PropertyEditorType.ImageSeletor)]
         public string ImageID { get; set; }
 
-    }
+		public override string GetBareHtml()
+		{
+			return @"<img class='card-img' src='@ImageID@'/>".Replace("@ImageID@", this.ImageID.IsNullOrEmpty() ? "../images/image.png" : this.ImageID);
+		}
+	}
+
+	[EnableInBuilder(BuilderType.BotForm)]
+	public class EbCardHtmlField : EbCardField
+	{
+		public EbCardHtmlField() { }
+
+		[EnableInBuilder(BuilderType.BotForm)]
+		[PropertyEditor(PropertyEditorType.String)]
+		public string ContentHTML { get; set; }
+
+		public override string GetBareHtml()
+		{
+			return @"<div>@ContentHTML@</div>".Replace("@ImageID@", this.ContentHTML.IsNullOrEmpty() ? "" : this.ContentHTML);
+		}
+	}
+
+	[EnableInBuilder(BuilderType.BotForm)]
+	public class EbCardNumericField: EbCardField
+	{
+		public EbCardNumericField() { }
+
+		[EnableInBuilder(BuilderType.BotForm)]
+		[PropertyEditor(PropertyEditorType.Number)]
+		public string Value { get; set; }
+
+		public override string GetBareHtml()
+		{
+			return @"<input class='card-numeric' type='number' value='@Value@'>".Replace("@Value@", this.Value.IsNullOrEmpty() ? "1" : this.Value);
+		}
+	}
+
+	[EnableInBuilder(BuilderType.BotForm)]
+	public class EbCardTextField : EbCardField
+	{
+		public EbCardTextField() { }
+
+		[EnableInBuilder(BuilderType.BotForm)]
+		[PropertyEditor(PropertyEditorType.String)]
+		public string Text { get; set; }
+
+		public override string GetBareHtml()
+		{
+			return @"<input class='card-text' type='text' value='@Text@'>".Replace("@Text@", this.Text.IsNullOrEmpty() ? "" : this.Text);
+		}
+	}
+
+
+
+
+
+
+
+
 
 	[EnableInBuilder(BuilderType.BotForm)]
     [HideInToolBox]
@@ -288,12 +332,18 @@ else {
 	{
         public EbCardDateField() { }
 
-        //[EnableInBuilder(BuilderType.BotForm)]
-        public DateTime Max { get; set; }
+        [EnableInBuilder(BuilderType.BotForm)]
+		[PropertyEditor(PropertyEditorType.DateTime)]
+		public DateTime Max { get; set; }
 
-        //[EnableInBuilder(BuilderType.BotForm)]
-        public DateTime Min { get; set; }
-    }
+        [EnableInBuilder(BuilderType.BotForm)]
+		[PropertyEditor(PropertyEditorType.DateTime)]
+		public DateTime Min { get; set; }
+
+		[EnableInBuilder(BuilderType.BotForm)]
+		[PropertyEditor(PropertyEditorType.DateTime)]
+		public string Date { get; set; }
+	}
 
 	public enum EBControlType
 	{
