@@ -225,6 +225,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 2)]
         public List<BotInsert> Fields { get; set; }
+
+        public string TenantAccountId { get; set; }
+
+        public int UserId { get; set; }
     }
 
     [DataContract]
