@@ -194,8 +194,8 @@ else {
         [OSE_ObjectTypes(EbObjectTypes.iDataSource)]
         public string DataSourceRefId { get; set; }
 
-        [JsonIgnore]
-        public ColumnColletion ColumnColletion { get; set; }
+        //[JsonIgnore]
+        //public ColumnColletion ColumnColletion { get; set; }
 
         [JsonIgnore]
         public int iDetailRowPos { get; set; }
@@ -217,11 +217,11 @@ else {
         [JsonIgnore]
         public Dictionary<string, Script> AppearanceScriptCollection { get; set; }
 
-        [JsonIgnore]
-        public RowColletion DataRow { get; set; }
+        //[JsonIgnore]
+        //public EbDataSet DataSet { get; set; }
 
-        //  [JsonIgnore]
-        //public DataSet DataSet { get; set; }
+        [JsonIgnore]
+        public RowColletion DataRows { get; set; }
 
         [JsonIgnore]
         public ColumnColletion DataColumns { get; set; }
@@ -340,7 +340,8 @@ else {
         {
             get
             {
-                var rows = (DataSourceRefId != string.Empty) ? DataRow/*DataSet.Tables[0].Rows*/ : null;
+                //var rows = (DataSourceRefId != string.Empty) ?DataSet.Tables[0].Rows : null;
+                var rows = (DataSourceRefId != string.Empty) ? DataRows : null;
                 if (rows != null)
                 {
                     if (rows.Count > 0)
@@ -440,8 +441,8 @@ else {
 
         public string GetFieldtData(string column_name, int i)
         {
-            return this.DataRow[i][column_name].ToString();
-            // return this.DataSet.Tables[0].Rows[i][column_name].ToString();
+         return this.DataRows[i][column_name].ToString();
+          //  return this.DataSet.Tables[0].Rows[i][column_name].ToString();
         }
 
         //public DbType GetFieldtDataType(string column_name)
@@ -531,7 +532,7 @@ else {
 
         public void DrawDetail()
         {
-            var rows = (DataSourceRefId != string.Empty) ? DataRow/* DataSet.Tables[0].Rows */: null;
+            var rows = (DataSourceRefId != string.Empty) ? DataRows/* DataSet.Tables[0].Rows */: null;
             if (rows != null)
             {
                 for (iDetailRowPos = 0; iDetailRowPos < rows.Count; iDetailRowPos++)
@@ -715,7 +716,8 @@ else {
                     {
                         string TName = calcfd.Split('.')[0];
                         string fName = calcfd.Split('.')[1];
-                        globals[TName].Add(fName, new NTV { Name = fName, Type = this.DataRow.Table.Columns[fName].Type, Value = this.DataRow[serialnumber][fName] });
+                      globals[TName].Add(fName, new NTV { Name = fName, Type = this.DataRows.Table.Columns[fName].Type, Value = this.DataRows[serialnumber][fName] });
+                        //globals[TName].Add(fName, new NTV { Name = fName, Type = this.DataSet.Tables[0].Columns[fName].Type, Value = this.DataSet.Tables[0].Rows[serialnumber][fName] });
                     }
                     try
                     {
@@ -734,7 +736,8 @@ else {
                     {
                         string TName = calcfd.Split('.')[0];
                         string fName = calcfd.Split('.')[1];
-                        globals[TName].Add(fName, new NTV { Name = fName, Type = this.DataRow.Table.Columns[fName].Type, Value = this.DataRow[serialnumber][fName] });
+                        globals[TName].Add(fName, new NTV { Name = fName, Type = this.DataRows.Table.Columns[fName].Type, Value = this.DataRows[serialnumber][fName] });
+                        //globals[TName].Add(fName, new NTV { Name = fName, Type = this.DataSet.Tables[0].Columns[fName].Type, Value = this.DataSet.Tables[0].Rows[serialnumber][fName] });
                     }
                     try
                     {
