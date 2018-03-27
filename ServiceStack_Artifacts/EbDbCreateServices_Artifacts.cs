@@ -12,6 +12,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         [DataMember(Order = 1)]
         public string dbName { get; set; }
+        [DataMember(Order = 2)]
+        public string ischange { get; set; }
     }
     [DataContract]
     public class EbDbCreateResponse : IEbSSResponse
