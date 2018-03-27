@@ -249,6 +249,10 @@ namespace ExpressBase.Objects
 	{
 		[EnableInBuilder(BuilderType.BotForm)]
 		[HideInPropertyGrid]
+        public List<DVColumnCollection> Columns { get; set; }
+
+		[EnableInBuilder(BuilderType.BotForm)]
+		[PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
         [OnChangeExec(@"
 console.log(100);
 if (this.Columns.$values.length === 0 ){
@@ -258,11 +262,7 @@ else {
     pg.MakeReadWrite('DbFieldMap');
 }
             ")]
-        public List<DVColumnCollection> Columns { get; set; }
-
-		[EnableInBuilder(BuilderType.BotForm)]
-		[PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
-		public List<DVBaseColumn> DbFieldMap { get; set; }
+        public List<DVBaseColumn> DbFieldMap { get; set; }
 
 		[EnableInBuilder(BuilderType.BotForm)]
 		public bool Summarize { get; set; }
