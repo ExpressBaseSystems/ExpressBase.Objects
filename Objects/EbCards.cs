@@ -270,6 +270,7 @@ else {
 
 	[EnableInBuilder(BuilderType.BotForm)]
 	//[PropertyEditor(PropertyEditorType.xxx)]
+    [HideInToolBox]
 	public class EbCardImageField: EbCardField
     {
         public EbCardImageField() { }
@@ -281,8 +282,9 @@ else {
     }
 
 	[EnableInBuilder(BuilderType.BotForm)]
-	//[PropertyEditor(PropertyEditorType.Date)]
-	public class EbCardDateField : EbCardField
+    [HideInToolBox]
+    //[PropertyEditor(PropertyEditorType.Date)]
+    public class EbCardDateField : EbCardField
 	{
         public EbCardDateField() { }
 
