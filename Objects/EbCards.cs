@@ -29,13 +29,13 @@ namespace ExpressBase.Objects
 
 		[EnableInBuilder(BuilderType.BotForm)]
 		[HideInPropertyGrid]
-		public List<DVColumnCollection> Columns { get; set; }
+		public ColumnColletion Columns { get; set; }
 
-		[EnableInBuilder(BuilderType.BotForm)]
-		[PropertyEditor(PropertyEditorType.Boolean)]
-		//[OnChangeExec(@"if(this.IsItemCard === true){pg.ShowProperty('Price')}
-		//else{pg.HideProperty('Price')}")]
-		public bool Summarize { get; set; }
+		//[EnableInBuilder(BuilderType.BotForm)]
+		//[PropertyEditor(PropertyEditorType.Boolean)]
+		////[OnChangeExec(@"if(this.IsItemCard === true){pg.ShowProperty('Price')}
+		////else{pg.HideProperty('Price')}")]
+		//public bool Summarize { get; set; }
 
 		[EnableInBuilder(BuilderType.BotForm)]
 		[PropertyEditor(PropertyEditorType.Boolean)]
@@ -127,10 +127,9 @@ namespace ExpressBase.Objects
 
 		public override string GetBareHtml()
 		{
-			string html = @"<div id='@name@'><div class='cards-cont'>".Replace("@name@", this.Name ?? "@name@");
-			foreach (EbCard ec in this.CardCollection)
-				html += ec.GetHtml();
-			html += "</div><div class='cards-footer'>".Replace("@name@", this.Name ?? "@name@");
+			string html = @"<div id='@name@'><div class='cards-cont'> 
+							<img class='card-img' src='../images/image.png'/>
+							</div><div class='cards-footer'>".Replace("@name@", this.Name ?? "@name@");
 			html += this.getCartHtml() + this.ButtonsString;
 			html += "</div>";
 			return html;
@@ -173,6 +172,7 @@ namespace ExpressBase.Objects
 			}
 			set { }
 		}
+
         public EbCard()
         {
             this.Buttons = new List<EbButton>();
@@ -248,11 +248,12 @@ else {
     pg.MakeReadWrite('DbFieldMap');
 }
             ")]
-        public List<EbDataColumn> DbFieldMap { get; set; }
+        public ColumnColletion DbFieldMap { get; set; }
 
 		[EnableInBuilder(BuilderType.BotForm)]
 		public bool Summarize { get; set; }
 	}
+
 
 	[EnableInBuilder(BuilderType.BotForm)]
 	//[PropertyEditor(PropertyEditorType.xxx)]
@@ -276,7 +277,7 @@ else {
 		public EbCardHtmlField() { }
 
 		[EnableInBuilder(BuilderType.BotForm)]
-		[PropertyEditor(PropertyEditorType.Number)]
+		[PropertyEditor(PropertyEditorType.String)]
 		public string ContentHTML { get; set; }
 
 		public override string GetBareHtml()
@@ -306,7 +307,7 @@ else {
 		public EbCardTextField() { }
 
 		[EnableInBuilder(BuilderType.BotForm)]
-		[PropertyEditor(PropertyEditorType.Number)]
+		[PropertyEditor(PropertyEditorType.String)]
 		public string Text { get; set; }
 
 		public override string GetBareHtml()
