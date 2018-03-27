@@ -80,7 +80,7 @@ namespace ExpressBase.Objects.Objects.ReportRelated
 
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
-            string name = binder.Name.ToLower();
+            string name = binder.Name;
 
             object x;
             dictionary.TryGetValue(name, out x);
