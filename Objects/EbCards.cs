@@ -22,16 +22,9 @@ namespace ExpressBase.Objects
 		[PropertyEditor(PropertyEditorType.Collection)]
 		public List<EbCard> CardCollection { get; set; }
 
-		//[PropertyGroup("Appearance")]
-		//[EnableInBuilder(BuilderType.BotForm)]
-		//[PropertyEditor(PropertyEditorType.FontSelector)]
-		//public EbFont Font{ get; set; }
-
 		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
 		[PropertyEditor(PropertyEditorType.Boolean)]
-		[OnChangeExec(@"if(this.IsItemCard === true){pg.ShowProperty('Price')}
-		else{pg.HideProperty('Price')}")]
-		public bool IsItemCard { get; set; }
+		public bool DynamicCards { get; set; }
 
 		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
 		[OSE_ObjectTypes(EbObjectTypes.iDataSource)]
@@ -42,16 +35,32 @@ namespace ExpressBase.Objects
 		[HideInPropertyGrid]
 		public List<DVColumnCollection> Columns { get; set; }
 
-		public List<int> SelectedCards { get; set; }
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+		[PropertyEditor(PropertyEditorType.Boolean)]
+		//[OnChangeExec(@"if(this.IsItemCard === true){pg.ShowProperty('Price')}
+		//else{pg.HideProperty('Price')}")]
+		public bool Summarize { get; set; }
+
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+		[PropertyEditor(PropertyEditorType.Boolean)]
+		public bool MultiSelect { get; set; }
 
 		[EnableInBuilder(BuilderType.BotForm)]
-		[PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
-		public DVBaseColumn Price { get; set; }
+		[PropertyEditor(PropertyEditorType.Collection)]
+		public List<EbButton> Buttons { get; set; }
+
+		[EnableInBuilder(BuilderType.BotForm)]
+		[PropertyEditor(PropertyEditorType.Collection)]
+		public List<EbCardField> Fields { get; set; }
+
 
 		public EbCards()
-        {
-            this.CardCollection = new List<EbCard>();
-        }        
+		{
+			this.CardCollection = new List<EbCard>();
+			this.Fields = new List<EbCardField>();
+			this.Buttons = new List<EbButton>();
+			this.Buttons.Add(new EbButton { Text = "Select" });
+		}
 
         [OnDeserialized]
         public void OnDeserializedMethod(StreamingContext context)
@@ -64,101 +73,129 @@ namespace ExpressBase.Objects
             return @"<div eb-type='@toolName' class='tool'><i class='fa fa-window-restore'></i>@toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
         }
 
-        public void InitFromDataBase(JsonServiceClient ServiceClient)
-        {
-            this.DataSourceId = "eb_roby_dev-eb_roby_dev-2-1105-1828";
-            RowColletion ds = (ServiceClient.Get<DataSourceDataResponse>(new DataSourceDataRequest { RefId = this.DataSourceId })).Data;
-            string _html = string.Empty;
+		public void InitFromDataBase(JsonServiceClient ServiceClient)
+		{
+			this.DataSourceId = "eb_roby_dev-eb_roby_dev-2-1105-1828";
+			RowColletion ds = (ServiceClient.Get<DataSourceDataResponse>(new DataSourceDataRequest { RefId = this.DataSourceId })).Data;
+			string _html = string.Empty;
 
-            foreach (EbDataRow cardRow in ds)
-            {
-                EbCard Card = new EbCard();
-                Card.Name = cardRow[0].ToString().Trim();
-                Card.Label = cardRow[1].ToString();
-                Card.ContentHTML = cardRow[2].ToString();
-                Card.ImageID = cardRow[3].ToString();
-				Card.IsItemCard = this.IsItemCard;
-				Card.Quantity = 1;
-				Card.Price = 115;
-				Card.Buttons.Add(new EbButton { Text = "Submit" });
-				
-                this.CardCollection.Add(Card);
-            }
-        }
+			foreach (EbDataRow cardRow in ds)
+			{
+				EbCard Card = new EbCard(Fields);
 
-        public override string GetJsInitFunc()
-        {
-            return @"this.Init = function(id)
+				//Card.Name = cardRow[0].ToString().Trim();
+				//Card.Label = cardRow[1].ToString();
+				//Card.ContentHTML = cardRow[2].ToString();
+				//Card.ImageID = cardRow[3].ToString();
+				//Card.IsItemCard = this.MultiSelect;
+				//Card.Quantity = 1;
+				//Card.Price = 115;
+				//Card.Buttons.Add(new EbButton { Text = "Add to Cart" });
+
+				this.CardCollection.Add(Card);
+			}
+		}
+
+		public override string GetJsInitFunc()
+		{
+			return @"this.Init = function(id)
 					{
-						this.CardCollection.$values.push(new EbObjects.EbCard(id + '_EbCard0'));
+						//this.CardCollection.$values.push(new EbObjects.EbCard(id + '_EbCard0'));
 					};";
-        }
+		}
 
-        public override string GetDesignHtml()
-        {
-			this.CardCollection.Add(new EbCard());
-            return GetHtml().RemoveCR().DoubleQuoted();
-        }
+		public string ButtonsString
+		{
+			get
+			{
+				string html = @"<div class='cards-btn-cont'>";
+				foreach (EbButton ec in this.Buttons)
+					html += ec.GetHtml();
+				return html + "</div>";
+			}
+			set { }
+		}
 
-        public override string GetHtml()
-        {
-            return @"<div id='cont_@name@' Ctype='Cards' class='Eb-ctrlContainer' style='@hiddenString'>
+		public override string GetDesignHtml()
+		{
+			this.CardCollection.Add(new EbCard(Fields));
+			return GetHtml().RemoveCR().DoubleQuoted();
+		}
+
+		public override string GetHtml()
+		{
+			return @"<div id='cont_@name@' Ctype='Cards' class='Eb-ctrlContainer' style='@hiddenString'>
 						@GetBareHtml@
 					</div>"
 						.Replace("@name@", this.Name ?? "@name@")
 						.Replace("@GetBareHtml@", this.GetBareHtml());
-        }
+		}
 
-        public override string GetBareHtml()
-        {
-            string html = @"<div id='@name@' class='cards-cont'>".Replace("@name@", this.Name ?? "@name@");
-            foreach (EbCard ec in this.CardCollection)
-                html += ec.GetHtml();
-            return html + "</div>".Replace("@name@", this.Name ?? "@name@");
-        }
+		public override string GetBareHtml()
+		{
+			string html = @"<div id='@name@'><div class='cards-cont'>".Replace("@name@", this.Name ?? "@name@");
+			foreach (EbCard ec in this.CardCollection)
+				html += ec.GetHtml();
+			html += "</div><div class='cards-footer'>".Replace("@name@", this.Name ?? "@name@");
+			html += this.getCartHtml() + this.ButtonsString;
 
-    }
+			html += "</div>";
+			return html;
+		}
+
+		public string getCartHtml()
+		{
+			string html = @"<div><div style='font-size: 15px;'><b> Shopping Cart : </b></div>
+								<table class='table table-striped'>
+									<thead>
+										<tr><th>Name</th><th>Quantity</th><th>Price</th><th></th></tr>
+									</thead>
+									<tbody></tbody>
+								</table>
+							</div>";
+			return html;
+		}
+	}
 
 
-    /// ////////////////////////////////
+	/// ////////////////////////////////
 
-    [EnableInBuilder(BuilderType.BotForm)]
-    [HideInToolBox]
-    public class EbCard : EbControl
-    {
-        [EnableInBuilder(BuilderType.BotForm)]
-        [PropertyEditor(PropertyEditorType.ImageSeletor)]
-        public string ImageID { get; set; }
+	[EnableInBuilder(BuilderType.BotForm)]
+	[HideInToolBox]
+	//[GenerateDynamicMetaJsFunc("genCardmeta")]
+	public class EbCard : EbControl
+	{
+		[EnableInBuilder(BuilderType.BotForm)]
+		[PropertyEditor(PropertyEditorType.ImageSeletor)]
+		public string ImageID { get; set; }
 
-        [EnableInBuilder(BuilderType.BotForm)]
-        public string ContentHTML { get; set; }
+		[EnableInBuilder(BuilderType.BotForm)]
+		public string ContentHTML { get; set; }
 
-        [EnableInBuilder(BuilderType.BotForm)]
-        [PropertyEditor(PropertyEditorType.Collection)]
-        public List<EbButton> Buttons { get; set; }
-		
-		public bool IsItemCard { get; set; }
-
-		public int Quantity { get; set; }
-
-		public int Price { get; set; }
+		[EnableInBuilder(BuilderType.BotForm)]
+		[PropertyEditor(PropertyEditorType.Collection)]
+		public List<EbButton> Buttons { get; set; }
 
 		public string ButtonsString
-        {
-            get
-            {
-                string html = @"<div class='card-btn-cont'>";
-                foreach (EbButton ec in this.Buttons)
-                    html += ec.GetHtml();
-                return html + "</div>";
-            }
-            set { }
-        }
-
+		{
+			get
+			{
+				string html = @"<div class='card-btn-cont'>";
+				foreach (EbButton ec in this.Buttons)
+					html += ec.GetHtml();
+				return html + "</div>";
+			}
+			set { }
+		}
         public EbCard()
         {
             this.Buttons = new List<EbButton>();
         }
+
+        public EbCard(List<EbCardField> Fields)
+		{
+			this.Buttons = new List<EbButton>();
+		}
 
 		public override string GetDesignHtml()
 		{
@@ -167,7 +204,7 @@ namespace ExpressBase.Objects
 
 
 		public override string GetBareHtml()
-        {
+		{
 			string html = @"<div id='@name@' class='card-cont' style='width:100%;'>
 								<img class='card-img' src='@ImageID@'/>
 								<div class='card-bottom'>
@@ -186,28 +223,92 @@ namespace ExpressBase.Objects
 				   .Replace("@ImageID@", this.ImageID.IsNullOrEmpty() ? "../images/image.png" : this.ImageID)//"https://tctechcrunch2011.files.wordpress.com/2016/03/chat-bot.jpg?w=738")//
 				   .Replace("@CardHtml@", this.GetItemCardHtml());//this.IsItemCard ? this.GetItemCardHtml() : ""
 			return html;
-        }
+		}
 
-        public override string GetHtml()
-        {
-            return GetBareHtml();
-        }
+		public override string GetHtml()
+		{
+			return GetBareHtml();
+		}
 
 		public string GetItemCardHtml()
 		{
-			string html = @"<div class='footercard' style='width: 100%;'>
-								<div style='width: 50%; display: inline-block;'>
-									Count : <input class='itemCount' type='number' value='1' min='1' max='10' style='width: 50%;'>
-									Price : <input class='itemPrice' type='text' value='@Price@' readonly style='width: 50%;'>
-								</div>
-								<div style='width: 45%; display: inline-block;'>
-									<div ><button id='BtnSelect@name@' class='cardselectbtn btn btn-default' style='width:100%; vertical-align: bottom;'>Select</button></div>
-								</div>
-								<div class='shoppingcart'></div>
+			string html = @"<div style='width: 50%; display: inline-block;'>
+								Quantity : <input class='item-quantity' type='number' value='1' min='1' max='10' style='width: 50%;'>
+							</div>
+							<div style='width: 45%; display: inline-block;'>
+								Price : <input class='item-price' type='text' value='@Price@' readonly style='width: 50%;'>
 							</div>"
 					.Replace("@name@", this.Name)
-					.Replace("@Price@", this.Price.ToString());
+					.Replace("@Price@", "215.50");
 			return html;
 		}
-    }
+	}
+
+	[EnableInBuilder(BuilderType.BotForm)]
+	public abstract class EbCardField:EbControl
+	{
+		[EnableInBuilder(BuilderType.BotForm)]
+		[HideInPropertyGrid]
+        public List<DVColumnCollection> Columns { get; set; }
+
+		[EnableInBuilder(BuilderType.BotForm)]
+		[PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
+        [OnChangeExec(@"
+console.log(100);
+if (this.Columns.$values.length === 0 ){
+    pg.MakeReadOnly('DbFieldMap');
 }
+else {
+    pg.MakeReadWrite('DbFieldMap');
+}
+            ")]
+        public List<DVBaseColumn> DbFieldMap { get; set; }
+
+		[EnableInBuilder(BuilderType.BotForm)]
+		public bool Summarize { get; set; }
+	}
+
+	[EnableInBuilder(BuilderType.BotForm)]
+	//[PropertyEditor(PropertyEditorType.xxx)]
+	public class EbCardImageField: EbCardField
+    {
+        public EbCardImageField() { }
+
+        [EnableInBuilder(BuilderType.BotForm)]
+        [PropertyEditor(PropertyEditorType.ImageSeletor)]
+        public string ImageID { get; set; }
+
+    }
+
+	[EnableInBuilder(BuilderType.BotForm)]
+	//[PropertyEditor(PropertyEditorType.Date)]
+	public class EbCardDateField : EbCardField
+	{
+        public EbCardDateField() { }
+
+        //[EnableInBuilder(BuilderType.BotForm)]
+        public DateTime Max { get; set; }
+
+        //[EnableInBuilder(BuilderType.BotForm)]
+        public DateTime Min { get; set; }
+    }
+
+	public enum EBControlType
+	{
+		Image = 0,
+		Html,
+		TextBox,
+		NumericBox,
+		RadioGroup,
+		CheckBox,
+		Date,
+		DropDown,
+	}
+}
+
+//<div ><button id='BtnSelect@name@' class='cardselectbtn btn btn-default' style='width:100%; vertical-align: bottom;'>Select</button></div>
+
+//[PropertyGroup("Appearance")]
+//[EnableInBuilder(BuilderType.BotForm)]
+//[PropertyEditor(PropertyEditorType.FontSelector)]
+//public EbFont Font{ get; set; }
