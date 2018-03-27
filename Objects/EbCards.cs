@@ -273,6 +273,7 @@ else {
 	}
 
 	[EnableInBuilder(BuilderType.BotForm)]
+    [HideInToolBox]
 	public class EbCardHtmlField : EbCardField
 	{
 		public EbCardHtmlField() { }
@@ -288,7 +289,8 @@ else {
 	}
 
 	[EnableInBuilder(BuilderType.BotForm)]
-	public class EbCardNumericField: EbCardField
+    [HideInToolBox]
+    public class EbCardNumericField: EbCardField
 	{
 		public EbCardNumericField() { }
 
@@ -303,7 +305,8 @@ else {
 	}
 
 	[EnableInBuilder(BuilderType.BotForm)]
-	public class EbCardTextField : EbCardField
+    [HideInToolBox]
+    public class EbCardTextField : EbCardField
 	{
 		public EbCardTextField() { }
 
