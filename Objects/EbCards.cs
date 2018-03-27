@@ -68,12 +68,16 @@ namespace ExpressBase.Objects
 			this.Buttons.Add(new EbButton { Text = "Select" });
 		}
 
-		[OnDeserialized]
-		public void OnDeserializedMethod(StreamingContext context)
-		{
-			this.BareControlHtml = this.GetBareHtml();
-			this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
-		}
+        [OnDeserialized]
+        public void OnDeserializedMethod(StreamingContext context)
+        {
+            this.BareControlHtml = this.GetBareHtml();
+            this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
+        }
+        public override  string  GetToolHtml()
+        {
+            return @"<div eb-type='@toolName' class='tool'><i class='fa fa-window-restore'></i>@toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
+        }
 
 		public void InitFromDataBase(JsonServiceClient ServiceClient)
 		{

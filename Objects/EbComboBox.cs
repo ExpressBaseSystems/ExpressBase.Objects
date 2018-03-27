@@ -27,8 +27,7 @@ namespace ExpressBase.Objects
     public class EbComboBox : EbControl
     {
 
-        public EbComboBox() {
-        }
+        public EbComboBox() { }
 
         [OnDeserialized]
         public void OnDeserializedMethod(StreamingContext context)
@@ -38,21 +37,21 @@ namespace ExpressBase.Objects
         }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
-		[PropertyEditor(PropertyEditorType.ObjectSelector)]
-		[OSE_ObjectTypes(EbObjectTypes.iDataSource)]
-		public string DataSourceId { get; set; }
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [OSE_ObjectTypes(EbObjectTypes.iDataSource)]
+        public string DataSourceId { get; set; }
 
-		[EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm)]
-		[HideInPropertyGrid]
-		public DVColumnCollection Columns { get; set; }
-
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
-		[PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
-		public List<DVBaseColumn> DisplayMembers { get; set; }
+        [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm)]
+        [HideInPropertyGrid]
+        public DVColumnCollection Columns { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
-		[PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
-		public List<DVBaseColumn> ValueMembers { get; set; }
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
+        public List<DVBaseColumn> DisplayMembers { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
+        public List<DVBaseColumn> ValueMembers { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public int DropdownHeight { get; set; }
@@ -106,7 +105,7 @@ namespace ExpressBase.Objects
     </div>
 </div>"
 .Replace("$$", i.ToString())
-.Replace("@perWidth@", ((int)( 100 / noOfFileds)).ToString())
+.Replace("@perWidth@", ((int)(100 / noOfFileds)).ToString())
 .Replace("@border-r" + i, (i != noOfFileds - 1) ? "style='border-radius: 0px;'" : "");
                 return rs + "</div>";
             }
@@ -156,8 +155,8 @@ var @nameEbCombo = new EbSelect('@name', '@DSid', @DDHeight, '@vmName', '', @Max
       </div>
    </div>
 </div>"
-.Replace("@name@", this.Name)
-.RemoveCR().DoubleQuoted();//GetHtmlHelper(RenderMode.Developer).RemoveCR().DoubleQuoted();
+    .Replace("@name@", this.Name)
+    .RemoveCR().DoubleQuoted();//GetHtmlHelper(RenderMode.Developer).RemoveCR().DoubleQuoted();
         }
 
         public override string GetHtml()
@@ -167,29 +166,33 @@ var @nameEbCombo = new EbSelect('@name', '@DSid', @DDHeight, '@vmName', '', @Max
 
         public override string GetBareHtml()
         {
-            return @"
+            if (this.DisplayMembers != null)
+            {
+                return @"
+<div id='@name@Container'  role='form' data-toggle='validator' style='width:100%;'>
+    <input type='hidden' name='@name@Hidden4val' data-ebtype='16' id='@name@'/>
+	<span id='@name@Lbl' style='@LabelBackColor@ @LabelForeColor@ '> @Label@  </span>
 
-       <div id='@name@Container'  role='form' data-toggle='validator' style='width:100%;'>
-            <input type='hidden' name='@name@Hidden4val' data-ebtype='16' id='@name@'/>
-			<span id='@name@Lbl' style='@LabelBackColor@ @LabelForeColor@ '> @Label@  </span>
-
-            @VueSelectCode
-            <div id='@name@_loadingdiv' class='ebCombo-loader'>
-                <i id='@name@_loading-image' class='fa fa-spinner fa-pulse fa-2x fa-fw'></i><span class='sr-only'>Loading...</span>
-            </div>
-            <center>
-                <div id='@name@DDdiv' v-show='DDstate' class='DDdiv expand-transition'  style='width:@DDwidthpx;'> 
-                    <table id='@name@tbl' tabindex='1000' style='width:100%' class='table table-striped table-bordered'></table>
-                </div>
-            </center>
-        </div>"
-.Replace("@VueSelectCode", this.VueSelectcode)
-.Replace("@name@", this.Name)
-.Replace("@Label@ ", ((this.Label != null) ? this.Label : "@Label@ "))
-.Replace("@width", 900.ToString())//this.Width.ToString())
-.Replace("@perWidth", (this.DisplayMembers.Count != 0) ? (900 / this.DisplayMembers.Count).ToString() : 900.ToString())
-.Replace("@DDwidth", (this.DropdownWidth == 0) ? "300" : this.DropdownWidth.ToString())
-;
+    @VueSelectCode
+    <div id='@name@_loadingdiv' class='ebCombo-loader'>
+        <i id='@name@_loading-image' class='fa fa-spinner fa-pulse fa-2x fa-fw'></i><span class='sr-only'>Loading...</span>
+    </div>
+    <center>
+        <div id='@name@DDdiv' v-show='DDstate' class='DDdiv expand-transition'  style='width:@DDwidthpx;'> 
+            <table id='@name@tbl' tabindex='1000' style='width:100%' class='table table-striped table-bordered'></table>
+        </div>
+    </center>
+</div>"
+    .Replace("@VueSelectCode", this.VueSelectcode)
+    .Replace("@name@", this.Name)
+    .Replace("@Label@ ", ((this.Label != null) ? this.Label : "@Label@ "))
+    .Replace("@width", 900.ToString())//this.Width.ToString())
+    .Replace("@perWidth", (this.DisplayMembers.Count != 0) ? (900 / this.DisplayMembers.Count).ToString() : 900.ToString())
+    .Replace("@DDwidth", (this.DropdownWidth == 0) ? "300" : this.DropdownWidth.ToString())
+    ;
+            }
+            else
+                return string.Empty;
         }
 
         private string GetHtmlHelper(RenderMode mode)

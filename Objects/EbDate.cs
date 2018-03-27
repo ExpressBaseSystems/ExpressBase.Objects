@@ -11,11 +11,11 @@ using System.Threading.Tasks;
 
 namespace ExpressBase.Objects
 {
-    public enum EbDateType
+    public enum EbDateType // integers corresponding to  EbDbTypes Enum
     {
-        Date = (int)System.Data.DbType.Date,
-        Time = (int)System.Data.DbType.Time,
-        DateTime = (int)System.Data.DbType.DateTime,
+        Date =5,
+        Time =17,
+        DateTime=6 ,
     }
 
     public enum TimeShowFormat
@@ -39,10 +39,12 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
     public class EbDate : EbControl
     {
-        public  string EbDbType { get; set; }
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+        public  EbDbTypes EbDbType { get { return (EbDbTypes)this.EbDateType; } }
+
         public EbDate()
         {
-            this.EbDbType = "date";
+            
         }
 
         [OnDeserialized]
@@ -50,6 +52,7 @@ namespace ExpressBase.Objects
         {
             this.BareControlHtml = this.GetBareHtml();
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
+            //this.EbDbType = this.EbDbType;
         }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
@@ -91,6 +94,10 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public DateShowFormat ShowDateAs_ { get; set; }
+        public override string GetToolHtml()
+        {
+            return @"<div eb-type='@toolName' class='tool'><i class='fa fa-calendar'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
+        }
 
         public override string GetHead()
         {
