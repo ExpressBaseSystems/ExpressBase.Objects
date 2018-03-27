@@ -27,8 +27,7 @@ namespace ExpressBase.Objects
     public class EbComboBox : EbControl
     {
 
-        public EbComboBox() {
-        }
+        public EbComboBox() { }
 
         [OnDeserialized]
         public void OnDeserializedMethod(StreamingContext context)
@@ -38,21 +37,21 @@ namespace ExpressBase.Objects
         }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
-		[PropertyEditor(PropertyEditorType.ObjectSelector)]
-		[OSE_ObjectTypes(EbObjectTypes.iDataSource)]
-		public string DataSourceId { get; set; }
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [OSE_ObjectTypes(EbObjectTypes.iDataSource)]
+        public string DataSourceId { get; set; }
 
-		[EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm)]
-		[HideInPropertyGrid]
-		public DVColumnCollection Columns { get; set; }
-
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
-		[PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
-		public List<DVBaseColumn> DisplayMembers { get; set; }
+        [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm)]
+        [HideInPropertyGrid]
+        public DVColumnCollection Columns { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
-		[PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
-		public List<DVBaseColumn> ValueMembers { get; set; }
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
+        public List<DVBaseColumn> DisplayMembers { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
+        public List<DVBaseColumn> ValueMembers { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public int DropdownHeight { get; set; }
@@ -90,10 +89,12 @@ namespace ExpressBase.Objects
         {
             get
             {
-                int noOfFileds = this.DisplayMembers.Count;
-                string rs = "<div id='@name@Wraper' data-toggle='tooltip' title='@tooltipText'>";
-                for (int i = 0; i < noOfFileds; i++)
-                    rs += @"
+                if (this.DisplayMembers != null)
+                {
+                    int noOfFileds = this.DisplayMembers.Count;
+                    string rs = "<div id='@name@Wraper' data-toggle='tooltip' title='@tooltipText'>";
+                    for (int i = 0; i < noOfFileds; i++)
+                        rs += @"
 <div style='display:inline-block; width:@perWidth@%; margin-right: -4px;'>
     <div class='input-group'>
         <v-select id='@name@$$' style='width:{3}px;' 
@@ -105,10 +106,13 @@ namespace ExpressBase.Objects
         <span class='input-group-addon' @border-r$$> <i id='@name@TglBtn' class='fa  fa-search' aria-hidden='true'></i> </span>
     </div>
 </div>"
-.Replace("$$", i.ToString())
-.Replace("@perWidth@", ((int)( 100 / noOfFileds)).ToString())
-.Replace("@border-r" + i, (i != noOfFileds - 1) ? "style='border-radius: 0px;'" : "");
-                return rs + "</div>";
+    .Replace("$$", i.ToString())
+    .Replace("@perWidth@", ((int)(100 / noOfFileds)).ToString())
+    .Replace("@border-r" + i, (i != noOfFileds - 1) ? "style='border-radius: 0px;'" : "");
+                    return rs + "</div>";
+                }
+                else
+                    return string.Empty;
             }
         }
 

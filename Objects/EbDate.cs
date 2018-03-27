@@ -11,11 +11,11 @@ using System.Threading.Tasks;
 
 namespace ExpressBase.Objects
 {
-    public enum EbDateType
+    public enum EbDateType // integers corresponding to  EbDbTypes Enum
     {
-        Date ,
-        Time ,
-        DateTime ,
+        Date =5,
+        Time =17,
+        DateTime=6 ,
     }
 
     public enum TimeShowFormat
@@ -40,7 +40,7 @@ namespace ExpressBase.Objects
     public class EbDate : EbControl
     {
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
-        public  EbDbTypes EbDbType { get { return EbDbTypes.Date; } }
+        public  EbDbTypes EbDbType { get { return (EbDbTypes)this.EbDateType; } }
 
         public EbDate()
         {
@@ -52,6 +52,7 @@ namespace ExpressBase.Objects
         {
             this.BareControlHtml = this.GetBareHtml();
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
+            //this.EbDbType = this.EbDbType;
         }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
