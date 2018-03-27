@@ -89,12 +89,10 @@ namespace ExpressBase.Objects
         {
             get
             {
-                if (this.DisplayMembers != null)
-                {
-                    int noOfFileds = this.DisplayMembers.Count;
-                    string rs = "<div id='@name@Wraper' data-toggle='tooltip' title='@tooltipText'>";
-                    for (int i = 0; i < noOfFileds; i++)
-                        rs += @"
+                int noOfFileds = this.DisplayMembers.Count;
+                string rs = "<div id='@name@Wraper' data-toggle='tooltip' title='@tooltipText'>";
+                for (int i = 0; i < noOfFileds; i++)
+                    rs += @"
 <div style='display:inline-block; width:@perWidth@%; margin-right: -4px;'>
     <div class='input-group'>
         <v-select id='@name@$$' style='width:{3}px;' 
@@ -106,13 +104,10 @@ namespace ExpressBase.Objects
         <span class='input-group-addon' @border-r$$> <i id='@name@TglBtn' class='fa  fa-search' aria-hidden='true'></i> </span>
     </div>
 </div>"
-    .Replace("$$", i.ToString())
-    .Replace("@perWidth@", ((int)(100 / noOfFileds)).ToString())
-    .Replace("@border-r" + i, (i != noOfFileds - 1) ? "style='border-radius: 0px;'" : "");
-                    return rs + "</div>";
-                }
-                else
-                    return string.Empty;
+.Replace("$$", i.ToString())
+.Replace("@perWidth@", ((int)(100 / noOfFileds)).ToString())
+.Replace("@border-r" + i, (i != noOfFileds - 1) ? "style='border-radius: 0px;'" : "");
+                return rs + "</div>";
             }
         }
 
@@ -160,8 +155,8 @@ var @nameEbCombo = new EbSelect('@name', '@DSid', @DDHeight, '@vmName', '', @Max
       </div>
    </div>
 </div>"
-.Replace("@name@", this.Name)
-.RemoveCR().DoubleQuoted();//GetHtmlHelper(RenderMode.Developer).RemoveCR().DoubleQuoted();
+    .Replace("@name@", this.Name)
+    .RemoveCR().DoubleQuoted();//GetHtmlHelper(RenderMode.Developer).RemoveCR().DoubleQuoted();
         }
 
         public override string GetHtml()
@@ -171,29 +166,33 @@ var @nameEbCombo = new EbSelect('@name', '@DSid', @DDHeight, '@vmName', '', @Max
 
         public override string GetBareHtml()
         {
-            return @"
+            if (this.DisplayMembers != null)
+            {
+                return @"
+<div id='@name@Container'  role='form' data-toggle='validator' style='width:100%;'>
+    <input type='hidden' name='@name@Hidden4val' data-ebtype='16' id='@name@'/>
+	<span id='@name@Lbl' style='@LabelBackColor@ @LabelForeColor@ '> @Label@  </span>
 
-       <div id='@name@Container'  role='form' data-toggle='validator' style='width:100%;'>
-            <input type='hidden' name='@name@Hidden4val' data-ebtype='16' id='@name@'/>
-			<span id='@name@Lbl' style='@LabelBackColor@ @LabelForeColor@ '> @Label@  </span>
-
-            @VueSelectCode
-            <div id='@name@_loadingdiv' class='ebCombo-loader'>
-                <i id='@name@_loading-image' class='fa fa-spinner fa-pulse fa-2x fa-fw'></i><span class='sr-only'>Loading...</span>
-            </div>
-            <center>
-                <div id='@name@DDdiv' v-show='DDstate' class='DDdiv expand-transition'  style='width:@DDwidthpx;'> 
-                    <table id='@name@tbl' tabindex='1000' style='width:100%' class='table table-striped table-bordered'></table>
-                </div>
-            </center>
-        </div>"
-.Replace("@VueSelectCode", this.VueSelectcode)
-.Replace("@name@", this.Name)
-.Replace("@Label@ ", ((this.Label != null) ? this.Label : "@Label@ "))
-.Replace("@width", 900.ToString())//this.Width.ToString())
-.Replace("@perWidth", (this.DisplayMembers.Count != 0) ? (900 / this.DisplayMembers.Count).ToString() : 900.ToString())
-.Replace("@DDwidth", (this.DropdownWidth == 0) ? "300" : this.DropdownWidth.ToString())
-;
+    @VueSelectCode
+    <div id='@name@_loadingdiv' class='ebCombo-loader'>
+        <i id='@name@_loading-image' class='fa fa-spinner fa-pulse fa-2x fa-fw'></i><span class='sr-only'>Loading...</span>
+    </div>
+    <center>
+        <div id='@name@DDdiv' v-show='DDstate' class='DDdiv expand-transition'  style='width:@DDwidthpx;'> 
+            <table id='@name@tbl' tabindex='1000' style='width:100%' class='table table-striped table-bordered'></table>
+        </div>
+    </center>
+</div>"
+    .Replace("@VueSelectCode", this.VueSelectcode)
+    .Replace("@name@", this.Name)
+    .Replace("@Label@ ", ((this.Label != null) ? this.Label : "@Label@ "))
+    .Replace("@width", 900.ToString())//this.Width.ToString())
+    .Replace("@perWidth", (this.DisplayMembers.Count != 0) ? (900 / this.DisplayMembers.Count).ToString() : 900.ToString())
+    .Replace("@DDwidth", (this.DropdownWidth == 0) ? "300" : this.DropdownWidth.ToString())
+    ;
+            }
+            else
+                return string.Empty;
         }
 
         private string GetHtmlHelper(RenderMode mode)
