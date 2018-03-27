@@ -30,10 +30,7 @@ namespace ExpressBase.Objects
 		[OSE_ObjectTypes(EbObjectTypes.iDataSource)]
 		[PropertyEditor(PropertyEditorType.ObjectSelector)]
 		[OnChangeExec(@"
-			if(this.DataSourceId){
-				alert('this.DataSourceId = ' + this.DataSourceId);
-				EbObjects.EbCardField = new Function(['id','jsonObj'], EbObjects.EbCardField.toString().substring(35).substring(0,EbObjects.EbCardField.toString().substring(35).length-1).replace('this.DataSourceId = \'\'','this.DataSourceId = \'' + this.DataSourceId + '\''));
-			}
+				alert('DataSourceId  OnChangeExec fired');
 		")]
 		public string DataSourceId { get; set; }
 
@@ -193,8 +190,12 @@ namespace ExpressBase.Objects
 			}
 			set { }
 		}
+        public EbCard()
+        {
+            this.Buttons = new List<EbButton>();
+        }
 
-		public EbCard(List<EbCardField> Fields)
+        public EbCard(List<EbCardField> Fields)
 		{
 			this.Buttons = new List<EbButton>();
 		}
@@ -247,21 +248,11 @@ namespace ExpressBase.Objects
 	}
 
 	[EnableInBuilder(BuilderType.BotForm)]
-	public class EbCardField:EbControl
+	public abstract class EbCardField:EbControl
 	{
-		[EnableInBuilder(BuilderType.BotForm)]
-		//[HideInPropertyGrid]
-		public string DataSourceId { get; set; }
-
 		[EnableInBuilder(BuilderType.BotForm)]
 		[HideInPropertyGrid]
 		public List<DVColumnCollection> Columns { get; set; }
-
-		[EnableInBuilder(BuilderType.BotForm)]
-		public EBControlType ControlType { get; set; }//item image
-
-		[EnableInBuilder(BuilderType.BotForm)]
-		public PropertyEditorType PropertyEditorType { get; set; }
 
 		[EnableInBuilder(BuilderType.BotForm)]
 		[PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
@@ -274,16 +265,27 @@ namespace ExpressBase.Objects
 	[EnableInBuilder(BuilderType.BotForm)]
 	//[PropertyEditor(PropertyEditorType.xxx)]
 	public class EbCardImageField: EbCardField
-	{
+    {
+        public EbCardImageField() { }
 
-	}
+        [EnableInBuilder(BuilderType.BotForm)]
+        [PropertyEditor(PropertyEditorType.ImageSeletor)]
+        public string ImageID { get; set; }
+
+    }
 
 	[EnableInBuilder(BuilderType.BotForm)]
 	//[PropertyEditor(PropertyEditorType.Date)]
 	public class EbCardDateField : EbCardField
 	{
+        public EbCardDateField() { }
 
-	}
+        //[EnableInBuilder(BuilderType.BotForm)]
+        public DateTime Max { get; set; }
+
+        //[EnableInBuilder(BuilderType.BotForm)]
+        public DateTime Min { get; set; }
+    }
 
 	public enum EBControlType
 	{
