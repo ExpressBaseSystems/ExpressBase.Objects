@@ -272,7 +272,7 @@ else {
 .Replace("@LabelForeColor@ ", "color:" + ((this.LabelForeColor != null) ? this.LabelForeColor : "@LabelForeColor@ ") + ";")
 .Replace("@LabelBackColor@ ", "background-color:" + ((this.LabelBackColor != null) ? this.LabelBackColor : "@LabelBackColor@ ") + ";")
 .Replace("@HelpText ", ((this.HelpText != null) ? this.HelpText : "@HelpText "))
-.Replace("@Label@ ", ((this.Label != null) ? this.Label : "@Label@ "));
+.Replace("@Label@ ", this.Label ?? "@Label@ ");
         }
     }
 
