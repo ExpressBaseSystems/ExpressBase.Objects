@@ -11,10 +11,10 @@ using System.Threading.Tasks;
 namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
-    class EbFileUploader : EbControl
+    class EbImage: EbControl
     {
 
-        public EbFileUploader() { }
+        public EbImage() { }
 
         [OnDeserialized]
         public void OnDeserializedMethod(StreamingContext context)
@@ -22,6 +22,16 @@ namespace ExpressBase.Objects
             this.BareControlHtml = this.GetBareHtml();
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+        public string ImageID { get; set; }
+
+        [EnableInBuilder(BuilderType.BotForm)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        public string DataSourceId { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+        public string Alt { get; set; }
         public override string GetHead()
         {
             return string.Empty;
@@ -34,25 +44,20 @@ namespace ExpressBase.Objects
         public override string GetBareHtml()
         {
             return @" 
-        <div class='input-group' style='width:100%;'>
-            <input id='@name@txt' type='text' style='width:100%;' onclick=""$('#@name@').click()"" />
-            <input id='@name@' data-toggle='tooltip' title='@toolTipText@' type='file' onchange=""$('#@name@txt').val($(this).val())"" name='@name@' @value@ @tabIndex@ style='display:none; width:100%; @BackColor@ @ForeColor@ @fontStyle@ @readOnlyString@ @required@ />
-            <span class='input-group-addon' onclick=""$('#@name@').click()""> <i id='@name@TglBtn' class='fa  fa-file' aria-hidden='true'></i> </span>
+        <div class='ebimg-cont' style='width:100%;'>
+            <img id='@name@' src='@src@'  style='width:100%;' alt='@alt@'>
         </div>"
 .Replace("@name@", this.Name)
+.Replace("@src@", this.DataSourceId ?? this.ImageID )
 .Replace("@toolTipText@", this.ToolTipText)
 .Replace("@value@", "")//"value='" + this.Value + "'")
-.Replace("@tabIndex@", "tabindex='" + this.TabIndex + "'")
-    .Replace("@BackColor@ ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor@ ") + ";"))
-    .Replace("@ForeColor@ ", "color:" + ((this.ForeColor != null) ? this.ForeColor : "@ForeColor@ ") + ";")
-.Replace("@required@", " required")//(this.Required && !this.Hidden ? " required" : string.Empty))
-.Replace("@readOnlyString@", this.ReadOnlyString);
+    .Replace("@alt@ ", this.Alt ?? "@alt@ ");
         }
 
         public override string GetHtml()
         {
             string EbCtrlHTML = @"
-    <div id='cont_@name@' Ctype='FileUploader' class='Eb-ctrlContainer' style='@hiddenString'>
+    <div id='cont_@name@' Ctype='Image' class='Eb-ctrlContainer' style='@hiddenString'>
         <span id='@name@Lbl' style='@LabelBackColor  @LabelForeColor '> @Label </span>
        @barehtml@
         <span class='helpText'> @HelpText </span>
