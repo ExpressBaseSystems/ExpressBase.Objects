@@ -48,7 +48,7 @@ namespace ExpressBase.Objects
             <img id='@name@' src='@src@'  style='width:100%;' alt='@alt@'>
         </div>"
 .Replace("@name@", this.Name)
-.Replace("@src@", this.DataSourceId ?? this.ImageID )
+.Replace("@src@", String.IsNullOrWhiteSpace(this.ImageID) ? "https://www.gstatic.com/webp/gallery3/1_webp_ll.png" : this.ImageID)
 .Replace("@toolTipText@", this.ToolTipText)
 .Replace("@value@", "")//"value='" + this.Value + "'")
     .Replace("@alt@ ", this.Alt ?? "@alt@ ");
