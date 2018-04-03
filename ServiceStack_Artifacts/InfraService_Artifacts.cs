@@ -192,4 +192,11 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 0)]
         public Dictionary<string, object> Emailvals { get; set; }
     }
+
+    [DataContract]
+    public class JoinbetaReq
+    {
+        [DataMember(Order = 1)]
+        public string Email { set; get; }
+    }
 }

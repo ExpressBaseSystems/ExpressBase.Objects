@@ -178,14 +178,18 @@ namespace ExpressBase.Objects
 
 		public override string GetBareHtml()
 		{
-			string html = @"<div id='@name@' class='card-cont' style='width:100%;'>".Replace("@name@", this.Name.Trim());
-			foreach (EbCardField CardField in this.Fields)
-			{
-				html += CardField.GetBareHtml();
-			}
-			html += this.Button.GetBareHtml() + "</div>";
-			return html;
-		}				
+            if (this.Name != null)
+            {
+                string html = @"<div id='@name@' class='card-cont' style='width:100%;'>".Replace("@name@", this.Name.Trim());
+                foreach (EbCardField CardField in this.Fields)
+                {
+                    html += CardField.GetBareHtml();
+                }
+                html += this.Button.GetBareHtml() + "</div>";
+                return html;
+            }
+            return string.Empty;
+        }				
 	}
 
 	[EnableInBuilder(BuilderType.BotForm)]
