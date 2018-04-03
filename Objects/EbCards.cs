@@ -32,20 +32,20 @@ namespace ExpressBase.Objects
 		[PropertyEditor(PropertyEditorType.Boolean)]
 		public bool MultiSelect { get; set; }
 
-		[EnableInBuilder(BuilderType.BotForm)]
-		[PropertyEditor(PropertyEditorType.Collection)]
+		//[EnableInBuilder(BuilderType.BotForm)]
+		//[PropertyEditor(PropertyEditorType.Collection)]
 		public List<EbButton> Buttons { get; set; }
 
 		[EnableInBuilder(BuilderType.BotForm)]
 		[PropertyEditor(PropertyEditorType.Collection)]
-		public List<EbCardField> Fields { get; set; }
+		public List<EbCardField> CardFields { get; set; }
 
 		public List<EbCardField> SummarizeFields { get; set; }
 
 		public EbCards()
 		{
 			this.CardCollection = new List<EbCard>();
-			this.Fields = new List<EbCardField>();
+			this.CardFields = new List<EbCardField>();
 			this.Buttons = new List<EbButton>();
 			this.Buttons.Add(new EbButton { Text = "Select" });
 			this.SummarizeFields = new List<EbCardField>();
@@ -69,7 +69,7 @@ namespace ExpressBase.Objects
 			foreach (EbDataRow cardRow in ds)
 			{
 				EbCard Card = new EbCard();
-				foreach (EbCardField Field in this.Fields)
+				foreach (EbCardField Field in this.CardFields)
 				{
 					Type classType = Field.GetType();
 					Object Obj = Activator.CreateInstance(classType);
@@ -77,11 +77,12 @@ namespace ExpressBase.Objects
 					propInfo.SetValue(Obj, cardRow[Field.DbFieldMap.ColumnIndex].ToString().Trim());
 					Card.Name = "CardIn" + this.Name;//------------------------"CardIn"
 					Card.Fields.Add(Obj as EbCardField);
-					Card.Button = new EbButton { Text = "Order" };//------------------------Text = "Order"			
+					if(this.MultiSelect)
+						Card.Button = new EbButton { Text = "Order" };//------------------------Text = "Order"			
 				}
 				this.CardCollection.Add(Card);
 			}
-			foreach (EbCardField Field in this.Fields)
+			foreach (EbCardField Field in this.CardFields)
 			{
 				if (!Field.Summarize)//----------------------------------------if (Field.Summarize)
 					this.SummarizeFields.Add(Field);
@@ -145,8 +146,8 @@ namespace ExpressBase.Objects
 			}
 			else
 			{
-				string html = @"<div><div style='font-size: 15px;'><b> Summary : </b></div>
-								<table class='table table-striped'>
+				string html = @"<div class='card-summary-cont'><div style='font-size: 15px;'><b> Summary : </b></div>
+								<table class='table table-striped card-summary-table'>
 									<thead><tr>";
 				foreach(EbCardField F in this.SummarizeFields)
 				{
@@ -236,7 +237,7 @@ namespace ExpressBase.Objects
 
 		public override string GetBareHtml()
 		{
-			return @"<div class='card-contenthtml'> @ContentHTML@ </div>".Replace("@ContentHTML@", this.ContentHTML.IsNullOrEmpty() ? "" : this.ContentHTML);
+			return @"<div class='card-contenthtml-cont'> @ContentHTML@ </div>".Replace("@ContentHTML@", this.ContentHTML.IsNullOrEmpty() ? "" : this.ContentHTML);
 		}
 	}
 
@@ -252,7 +253,7 @@ namespace ExpressBase.Objects
 
 		public override string GetBareHtml()
 		{
-			return @"<input class='card-numeric' type='number' value='@Value@'>".Replace("@Value@", this.Value.IsNullOrEmpty() ? "1" : this.Value);
+			return @"<div class='card-numeric-cont'> <input type='number' value='@Value@'> </div>".Replace("@Value@", this.Value.IsNullOrEmpty() ? "1" : this.Value);
 		}
 	}
 
@@ -268,7 +269,7 @@ namespace ExpressBase.Objects
 
 		public override string GetBareHtml()
 		{
-			return @"<input class='card-text' type='text' value='@Text@'>".Replace("@Text@", this.Text.IsNullOrEmpty() ? "" : this.Text);
+			return @"<div class='card-text-cont'> <input type='text' value='@Text@'> </div>".Replace("@Text@", this.Text.IsNullOrEmpty() ? "" : this.Text);
 		}
 	}
 
@@ -284,7 +285,7 @@ namespace ExpressBase.Objects
 
 		public override string GetBareHtml()
 		{
-			return @"<div class='card-title'>@Text@</div>".Replace("@Text@", this.Title.IsNullOrEmpty() ? "" : this.Title);
+			return @"<div class='card-title-cont'>@Text@</div>".Replace("@Text@", this.Title.IsNullOrEmpty() ? "" : this.Title);
 		}
 	}
 }
