@@ -1,13 +1,14 @@
-﻿using ExpressBase.Common.Extensions;
+﻿using ExpressBase.Common;
+using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
+using ExpressBase.Common.Structures;
+using ExpressBase.Objects.ServiceStack_Artifacts;
+using ServiceStack;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
+using System.Reflection;
 using System.Runtime.Serialization;
-using System.Threading.Tasks;
-
 namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
@@ -32,6 +33,11 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
         public string Alt { get; set; }
+
+        public void InitFromDataBase(JsonServiceClient ServiceClient)
+        {
+            RowColletion ds = (ServiceClient.Get<DataSourceDataResponse>(new DataSourceDataRequest { RefId = this.DataSourceId })).Data;
+        }
         public override string GetHead()
         {
             return string.Empty;
