@@ -33,6 +33,15 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
     public class EbTextBox : EbControl
     {
+        public EbTextBox() { }
+
+        [OnDeserialized]
+        public void OnDeserializedMethod(StreamingContext context)
+        {
+            this.BareControlHtml = this.GetBareHtml();
+            this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
+        }
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
         [HelpText("To limit number of charecters")]
         [PropertyGroup("Behavior")]
@@ -138,16 +147,6 @@ else {
         //public override string Label { get; set; }
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public EbDbTypes EbDbType { get { return EbDbTypes.String; } }
-        public EbTextBox()
-        {
-        }
-
-        [OnDeserialized]
-        public void OnDeserializedMethod(StreamingContext context)
-        {
-            this.BareControlHtml = this.GetBareHtml();
-            this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
-        }
 
         public override string GetHead()
         {
@@ -168,6 +167,35 @@ else {
         public override object GetData()
         {
             return this.Text;
+        }
+
+        public override string GetWrapedCtrlHtml4bot()
+        {
+            return @"
+<div id='TextBox0' class='Eb-ctrlContainer iw-mTrigger' ctype='TextBox'  eb-type='TextBox'>
+   <div class='msg-cont'>
+      <div class='bot-icon'></div>
+      <div class='msg-cont-bot'>
+         <div class='msg-wraper-bot'>
+            @Label@
+            <div class='msg-time'>3:44pm</div>
+         </div>
+      </div>
+   </div>
+   <div class='msg-cont' for='TextBox1' form='LeaveJS'>
+      <div class='msg-cont-bot'>
+         <div class='msg-wraper-bot' style='border: none; background-color: transparent; width: 99%; padding-right: 3px;'>
+            <div class='chat-ctrl-cont'>
+               <div class='ctrl-wraper'>
+                    @barehtml@
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>"
+.Replace("@barehtml@", this.GetBareHtml())
+.RemoveCR().DoubleQuoted();
         }
 
         public override string GetDesignHtml()
@@ -195,7 +223,7 @@ else {
       </div>
    </div>
 </div>
-".RemoveCR().DoubleQuoted(); ;
+".RemoveCR().DoubleQuoted();
         }
 
         public override string GetHtml()
