@@ -134,6 +134,11 @@ $('#@id').datetimepicker({
                         + "</div>";
         }
 
+        public override string GetWrapedCtrlHtml4bot()
+        {
+            return base.GetWrapedCtrlHtml4bot(GetBareHtml(), this.GetType().Name);
+        }
+
         public override string GetDesignHtml()
         {
             string _html = null; 
@@ -152,7 +157,7 @@ $('#@id').datetimepicker({
             return @" 
         <div class='input-group' style='width:100%;'>
             <input id='@name@' data-ebtype='@datetype@'  data-toggle='tooltip' title='@toolTipText@' class='date' type='text'name='@name@' autocomplete = '@autoComplete@' @value@ @tabIndex@ style='width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@ @readOnlyString@ @required@ @placeHolder@ />
-            <span class='input-group-addon' onclick=""$('#@name@').focus().focus()""> <i id='@name@TglBtn' class='fa  @atchdLbl@' aria-hidden='true'></i> </span>
+            <span class='input-group-addon' onclick=\""$('#@name@').focus().focus()\""> <i id='@name@TglBtn' class='fa  @atchdLbl@' aria-hidden='true'></i> </span>
         </div>"
 .Replace("@name@", this.Name)
 .Replace("@datetype@", "6")//( (int)this.EbDateType ).ToString())
@@ -183,7 +188,7 @@ $('#@id').datetimepicker({
         {
             string EbCtrlHTML = @"
     <div id='cont_@name@' Ctype='Date' class='Eb-ctrlContainer' style='@hiddenString'>
-        <span id='@name@Lbl' style='@LabelBackColor  @LabelForeColor '> @Label </span>
+        <span id='@name@Lbl' style='@LabelBackColor  @LabelForeColor '> @Label@ </span>
        @barehtml@
         <span class='helpText'> @HelpText </span>
     </div>
@@ -192,10 +197,10 @@ $('#@id').datetimepicker({
 .Replace("@name@", this.Name)
 .Replace("@hiddenString", this.HiddenString)
 
-    .Replace("@LabelForeColor ", "color:" + ((this.LabelForeColor != null) ? this.LabelForeColor : "@LabelForeColor ") + ";")
-    .Replace("@LabelBackColor ", "background-color:" + ((this.LabelBackColor != null) ? this.LabelBackColor : "@LabelBackColor ") + ";")
-    .Replace("@HelpText ", ((this.HelpText != null) ? this.HelpText : "@HelpText "))
-    .Replace("@Label ", ((this.Label != null) ? this.Label : "@Label "));
+    .Replace("@LabelForeColor ", "color:" + (LabelForeColor ?? "@LabelForeColor ") + ";")
+    .Replace("@LabelBackColor ", "background-color:" + (LabelBackColor ?? "@LabelBackColor ") + ";")
+    .Replace("@HelpText ", (HelpText ?? "@HelpText "))
+    .Replace("@Label@ ", (Label ?? "@Label@ "));
             return EbCtrlHTML;
         }
     }

@@ -47,6 +47,11 @@ namespace ExpressBase.Objects
             return this.GetHtml().RemoveCR().GraveAccentQuoted();
         }
 
+        public override string GetWrapedCtrlHtml4bot()
+        {
+            return base.GetWrapedCtrlHtml4bot(GetBareHtml(), this.GetType().Name);
+        }
+
         public override string GetBareHtml()
         {
             return @" 
