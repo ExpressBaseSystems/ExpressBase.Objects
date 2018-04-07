@@ -33,6 +33,10 @@ namespace ExpressBase.Objects
         }
 
         public override bool isFullViewContol { get => true; set => base.isFullViewContol = value; }
+        public override string GetToolHtml()
+        {
+            return @"<div eb-type='@toolName' class='tool'><i class='fa fa-map'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
+        }
 
         public override string DesignHtml4Bot { get => @"
     <div class='location-cont'>

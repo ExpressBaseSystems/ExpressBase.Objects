@@ -12,6 +12,11 @@ namespace ExpressBase.Objects.Objects
     {
         public EbRadioButton() { }
 
+        public override string GetToolHtml()
+        {
+            return @"<div eb-type='@toolName' class='tool'><i class='fa fa-toggle-on'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
+        }
+
         public override string GetDesignHtml()
         {
             //return GetHtml().RemoveCR().DoubleQuoted();

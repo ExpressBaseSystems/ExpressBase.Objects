@@ -111,6 +111,11 @@ namespace ExpressBase.Objects
             }
         }
 
+        public override string GetToolHtml()
+        {
+            return @"<div eb-type='@toolName' class='tool'> &#9869;  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
+        }
+
         public override string GetHead()
         {
             return this.RequiredString + @"

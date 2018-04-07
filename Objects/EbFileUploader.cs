@@ -30,6 +30,10 @@ namespace ExpressBase.Objects
         {
             return this.GetHtml().RemoveCR().GraveAccentQuoted();
         }
+        public override string GetToolHtml()
+        {
+            return @"<div eb-type='@toolName' class='tool'><i class='fa fa-upload'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
+        }
 
         public override string GetBareHtml()
         {
