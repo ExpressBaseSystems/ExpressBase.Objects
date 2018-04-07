@@ -45,9 +45,14 @@ namespace ExpressBase.Objects
 
         public string OptionHtml { get; set; }
 
+        public override string GetToolHtml()
+        {
+            return @"<div eb-type='@toolName' class='tool'><i class='fa fa-align-justify'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
+        }
 
 
-		public void GetOptionsHtml(JsonServiceClient ServiceClient)
+
+        public void GetOptionsHtml(JsonServiceClient ServiceClient)
 		{
 
 			//this.DataSourceId = "eb_roby_dev-eb_roby_dev-2-1015-1739";

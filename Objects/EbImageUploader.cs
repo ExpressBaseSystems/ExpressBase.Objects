@@ -26,6 +26,10 @@ namespace ExpressBase.Objects
         {
             return string.Empty;
         }
+        public override string GetToolHtml()
+        {
+            return @"<div eb-type='@toolName' class='tool'><i class='fa fa-image'></i><i class='fa fa-level-up'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
+        }
         public override string GetDesignHtml()
         {
             return this.GetHtml().RemoveCR().GraveAccentQuoted();

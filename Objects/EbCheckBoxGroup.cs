@@ -34,6 +34,11 @@ namespace ExpressBase.Objects
         [Alias("CheckBoxes")]
         public List<EbCheckBox> CheckBoxes { get; set; }
 
+        public override string GetToolHtml()
+        {
+            return @"<div eb-type='@toolName' class='tool'><i class='fa fa-check-square'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
+        }
+
         public override string GetBareHtml()
         {
             string html = "<div id='@name@' name='@name@'>";

@@ -34,6 +34,8 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
         public string Alt { get; set; }
 
+        public override bool isFullViewContol { get => true; set => base.isFullViewContol = value; }
+
         public void InitFromDataBase(JsonServiceClient ServiceClient)
         {
             RowColletion ds = (ServiceClient.Get<DataSourceDataResponse>(new DataSourceDataRequest { RefId = this.DataSourceId })).Data;
@@ -45,6 +47,10 @@ namespace ExpressBase.Objects
         public override string GetDesignHtml()
         {
             return this.GetHtml().RemoveCR().GraveAccentQuoted();
+        }
+        public override string GetToolHtml()
+        {
+            return @"<div eb-type='@toolName' class='tool'><i class='fa fa-image'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
         }
 
         public override string GetWrapedCtrlHtml4bot()
