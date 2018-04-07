@@ -42,9 +42,11 @@ namespace ExpressBase.Objects
 
 		public bool IsSummaryRequired { get; set; }
 
-		//public List<EbCardField> SummarizeFields { get; set; }
+        public override bool isFullViewContol { get => true; set => base.isFullViewContol = value; }
 
-		public EbCards()
+        //public List<EbCardField> SummarizeFields { get; set; }
+
+        public EbCards()
 		{
 			this.CardCollection = new List<EbCard>();
 			this.CardFields = new List<EbCardField>();

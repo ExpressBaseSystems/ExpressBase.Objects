@@ -27,6 +27,8 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
         public string ContentHTML { get; set; }
 
+        public override bool isFullViewContol { get => true; set => base.isFullViewContol = value; }
+
         public override string GetDesignHtml()
         {
             return GetHtml().RemoveCR().DoubleQuoted();

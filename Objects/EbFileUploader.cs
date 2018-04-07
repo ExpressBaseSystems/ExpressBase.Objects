@@ -35,9 +35,9 @@ namespace ExpressBase.Objects
         {
             return @" 
         <div class='input-group' style='width:100%;'>
-            <input id='@name@txt' type='text' style='width:100%;' onclick=""$('#@name@').click()"" />
-            <input id='@name@' data-toggle='tooltip' title='@toolTipText@' type='file' onchange=""$('#@name@txt').val($(this).val())"" name='@name@' @value@ @tabIndex@ style='display:none; width:100%; @BackColor@ @ForeColor@ @fontStyle@ @readOnlyString@ @required@ />
-            <span class='input-group-addon' onclick=""$('#@name@').click()""> <i id='@name@TglBtn' class='fa  fa-file' aria-hidden='true'></i> </span>
+            <input id='@name@txt' type='text' style='width:100%;' onclick='$(\'#@name@\').click()' />
+            <input id='@name@' data-toggle='tooltip' title='@toolTipText@' type='file' onchange='$(\'#@name@txt\').val($(this).val())' name='@name@' @value@ @tabIndex@ style='display:none; width:100%; @BackColor@ @ForeColor@ @fontStyle@ @readOnlyString@ @required@ />
+            <span class='input-group-addon' onclick='$(\'#@name@\').click()'> <i id='@name@TglBtn' class='fa  fa-file' aria-hidden='true'></i> </span>
         </div>"
 .Replace("@name@", this.Name)
 .Replace("@toolTipText@", this.ToolTipText)

@@ -34,6 +34,8 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
         public string Alt { get; set; }
 
+        public override bool isFullViewContol { get => true; set => base.isFullViewContol = value; }
+
         public void InitFromDataBase(JsonServiceClient ServiceClient)
         {
             RowColletion ds = (ServiceClient.Get<DataSourceDataResponse>(new DataSourceDataRequest { RefId = this.DataSourceId })).Data;
