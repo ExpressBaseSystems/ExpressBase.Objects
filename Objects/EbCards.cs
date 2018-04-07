@@ -155,18 +155,20 @@ namespace ExpressBase.Objects
 		public string getCartHtml()
 		{
 			this.IsSummaryRequired = false;
-			string html = @"<div class='card-summary-cont'><div style='font-size: 15px;'><b> Summary : </b></div>
-							<table class='table table-striped card-summary-table'>
-								<thead><tr>";
+			int tcols = 1;
+			string html = @"<div class='card-summary-cont'><div style='font-size: 15px; padding:5px; text-align:center;'><b> Summary </b></div>
+							<table class='table card-summary-table'>
+								<thead style='font-size:12px;'><tr>";
 			foreach(EbCardField F in this.CardFields)
 			{
 				if (F.Summarize)
 				{
 					html += "<th>" + F.Name + "</th>";
 					this.IsSummaryRequired = true;
+					tcols++;
 				}
 			}
-			html += @"</tr></thead><tbody></tbody></table></div>";
+			html += @"<th></th></tr></thead><tbody style='font-size:12px;'>  <tr><td style='text-align:center;' colspan=" + tcols + "><i> Nothing to Display </i></td></tr>  </tbody></table></div>";
 			if (this.IsSummaryRequired)
 				return html;
 			else
@@ -260,7 +262,7 @@ namespace ExpressBase.Objects
 
 		public override string GetBareHtml()
 		{
-			return @"<div class='card-contenthtml-cont data-@Name@'> @ContentHTML@ </div>".Replace("@ContentHTML@", this.ContentHTML.IsNullOrEmpty() ? "" : this.ContentHTML).Replace("@Name@", this.Name);
+			return @"<div class='card-contenthtml-cont data-@Name@' style='padding:5px;'> @ContentHTML@ </div>".Replace("@ContentHTML@", this.ContentHTML.IsNullOrEmpty() ? "" : this.ContentHTML).Replace("@Name@", this.Name);
 		}
 	}
 
@@ -283,7 +285,10 @@ namespace ExpressBase.Objects
 
 		public override string GetBareHtml()
 		{
-			return @"<div class='card-numeric-cont data-@Name@' style='@display@'> <input type='number' value='@Value@'> </div>".Replace("@Value@", this.Value.IsNullOrEmpty() ? "1" : this.Value).Replace("@display@", this.HideInCard ? "display:none;" : "").Replace("@Name@", this.Name);
+			return @"<div class='card-numeric-cont data-@Name@' style='padding-left:5px; @display@'> @Label@ <input type='number' value='@Value@' style='text-align: center;width: 60px;' min='1' max='9999' step='1'> </div>"
+					.Replace("@Value@", this.Value.IsNullOrEmpty() ? "1" : this.Value)
+					.Replace("@display@", this.HideInCard ? "display:none;" : "").Replace("@Name@", this.Name??"")
+					.Replace("@Label@", this.Label??this.Name);
 		}
 	}
 
@@ -303,7 +308,10 @@ namespace ExpressBase.Objects
 
 		public override string GetBareHtml()
 		{
-			return @"<div class='card-text-cont data-@Name@' style='@display@'> <input type='text' value='@Text@'> </div>".Replace("@Text@", this.Text.IsNullOrEmpty() ? "" : this.Text).Replace("@display@", this.HideInCard?"display:none;":"").Replace("@Name@", this.Name);
+			return @"<div class='card-text-cont data-@Name@' style='padding-left:5px; @display@'> @Label@ <input type='text' value='@Text@'> </div>"
+					.Replace("@Text@", this.Text.IsNullOrEmpty() ? "" : this.Text)
+					.Replace("@display@", this.HideInCard?"display:none;":"").Replace("@Name@", this.Name??"")
+					.Replace("@Label@", this.Label??this.Name);
 		}
 	}
 
@@ -323,7 +331,8 @@ namespace ExpressBase.Objects
 
 		public override string GetBareHtml()
 		{
-			return @"<div class='card-title-cont data-@Name@'>@Text@</div>".Replace("@Text@", this.Title.IsNullOrEmpty() ? "" : this.Title).Replace("@Name@", this.Name);
+			return @"<div class='card-title-cont data-@Name@' style='font-size: 20px;padding: 5px;'>@Text@</div>"
+					.Replace("@Text@", this.Title.IsNullOrEmpty() ? "" : this.Title).Replace("@Name@", this.Name);
 		}
 	}
 }
