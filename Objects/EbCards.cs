@@ -30,7 +30,12 @@ namespace ExpressBase.Objects
 
 		[EnableInBuilder(BuilderType.BotForm)]
 		[PropertyEditor(PropertyEditorType.Boolean)]
+		[OnChangeExec(@"if(this.MultiSelect === true){pg.ShowProperty('SummaryTitle');}
+		else{pg.HideProperty('SummaryTitle');}")]
 		public bool MultiSelect { get; set; }
+
+		[EnableInBuilder(BuilderType.BotForm)]
+		public string SummaryTitle { get; set; }
 
 		//[EnableInBuilder(BuilderType.BotForm)]
 		//[PropertyEditor(PropertyEditorType.Collection)]
@@ -84,13 +89,14 @@ namespace ExpressBase.Objects
 					FieldObj.HideInCard = Field.HideInCard;
 					FieldObj.EbSid = Field.EbSid;
 					FieldObj.Name = Field.Name;
+					FieldObj.ReadOnly = Field.ReadOnly;
 
 					Card.Fields.Add(FieldObj);
 				}
 				Card.SerialNumber = i;
 				Card.Name = "CardIn" + this.Name;//------------------------"CardIn"
 				if (this.MultiSelect)
-					Card.Button = new EbButton { Text = "Select" };//------------------------Text = "Order"			
+					Card.Button = new EbButton { Text = "Select", ToolTipText=""};//------------------------Text = "Order"			
 
 				this.CardCollection.Add(Card);
 			}
@@ -154,9 +160,9 @@ namespace ExpressBase.Objects
 		{
 			this.IsSummaryRequired = false;
 			int tcols = 1;
-			string html = @"<div class='card-summary-cont'><div style='font-size: 15px; padding:5px; text-align:center;'><b> Summary </b></div>
+			string html = @"<div class='card-summary-cont'><div style='font-size: 15px; padding:5px 5px 0px 5px; text-align:center;'><b> @Summary@ </b></div>
 							<table class='table card-summary-table'>
-								<thead style='font-size:12px;'><tr>";
+								<thead style='font-size:12px;'><tr>".Replace("@Summary@",this.SummaryTitle.IsNullOrEmpty()? "Summary": this.SummaryTitle);
 			foreach(EbCardField F in this.CardFields)
 			{
 				if (F.Summarize)
@@ -227,7 +233,10 @@ namespace ExpressBase.Objects
 		[EnableInBuilder(BuilderType.BotForm)]
 		public bool HideInCard { get; set; }
 
-		
+		[PropertyGroup("Appearance")]
+		[EnableInBuilder(BuilderType.BotForm)]
+		[PropertyEditor(PropertyEditorType.FontSelector)]
+		public EbFont Font { get; set; }
 	}
 
 
@@ -279,14 +288,17 @@ namespace ExpressBase.Objects
 		[EnableInBuilder(BuilderType.BotForm)]
 		public bool Sum { get; set; }
 
+		[EnableInBuilder(BuilderType.BotForm)]
+		public override bool ReadOnly { get; set; }
+
 		public EbCardNumericField() { }
 
 		public override string GetBareHtml()
 		{
-			return @"<div class='card-numeric-cont data-@Name@' style='padding-left:5px; @display@'> @Label@ <input type='number' value='@Value@' style='text-align: center;width: 60px;' min='1' max='9999' step='1'> </div>"
+			return @"<div class='card-numeric-cont data-@Name@' style='@display@'> <b>@Label@</b> <input type='number' value='@Value@' style='text-align:center; width: 100%;' min='1' max='9999' step='1' @ReadOnly@> </div>"
 					.Replace("@Value@", this.Value.IsNullOrEmpty() ? "1" : this.Value)
 					.Replace("@display@", this.HideInCard ? "display:none;" : "").Replace("@Name@", this.Name??"")
-					.Replace("@Label@", this.Label??this.Name);
+					.Replace("@Label@", this.Label??this.Name).Replace("@ReadOnly@", this.ReadOnly ? "readonly" : "");
 		}
 	}
 
@@ -302,14 +314,17 @@ namespace ExpressBase.Objects
 		[PropertyEditor(PropertyEditorType.JS)]
 		public string ValueExpression { get; set; }
 
+		[EnableInBuilder(BuilderType.BotForm)]
+		public override bool ReadOnly { get; set; }
+
 		public EbCardTextField() { }
 
 		public override string GetBareHtml()
 		{
-			return @"<div class='card-text-cont data-@Name@' style='padding-left:5px; @display@'> @Label@ <input type='text' value='@Text@'> </div>"
+			return @"<div class='card-text-cont data-@Name@' style='@display@'> <b>@Label@</b> <input type='text' value='@Text@' style='text-align:center; width:100%;' @ReadOnly@> </div>"
 					.Replace("@Text@", this.Text.IsNullOrEmpty() ? "" : this.Text)
 					.Replace("@display@", this.HideInCard?"display:none;":"").Replace("@Name@", this.Name??"")
-					.Replace("@Label@", this.Label??this.Name);
+					.Replace("@Label@", this.Label??this.Name).Replace("@ReadOnly@", this.ReadOnly?"readonly":"");
 		}
 	}
 
@@ -329,7 +344,7 @@ namespace ExpressBase.Objects
 
 		public override string GetBareHtml()
 		{
-			return @"<div class='card-title-cont data-@Name@' style='font-size: 20px;padding: 5px;'>@Text@</div>"
+			return @"<div class='card-title-cont data-@Name@' style='font-size: 20px;padding: 5px;'><i class='fa fa-check' style='color: green;display: none;' aria-hidden='true'></i>&nbsp@Text@</div>"
 					.Replace("@Text@", this.Title.IsNullOrEmpty() ? "" : this.Title).Replace("@Name@", this.Name);
 		}
 	}
