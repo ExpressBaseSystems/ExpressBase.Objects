@@ -131,8 +131,24 @@ namespace ExpressBase.Objects
 
 		public override string GetDesignHtml()
 		{
-			//this.CardCollection.Add(new EbCard(Fields));
-			return GetHtml().RemoveCR().DoubleQuoted();
+			return @"`<div id=@id><div class='cards-cont'>
+						<div class='card-cont' style='width: 100%; min-height: 100px; box-shadow: 0px 0px 20px #ccc; border-radius: 1.3em 1.3em 0 0;'>
+							<div class='card-btn-cont'><button class='btn btn-default' style='width:100%;' disabled>Select</button></div>
+						</div>
+						<div class='card-summary-cont' style='box-shadow: 0px 0px 20px #ccc; border-radius: 0 0 1.3em 1.3em; margin: 5px -4px 0 6px;'><div style='font-size: 15px; padding:5px 5px 0px 5px; text-align:center;'><b> Summary </b></div>
+							<table class='table card-summary-table'>
+								<thead style='font-size:12px;'>
+									<tr>
+										<th>Column 1</th>
+										<th>Column 2</th>
+										<th>Column 3</th>
+									</tr>
+								</thead>
+								<tbody style='font-size:12px;'><tr><td style='text-align:center; border: none;' colspan=3><i> Nothing to Display </i></td></tr>  </tbody>
+							</table>
+						</div>
+						
+					</div></div>`";
 		}
 
 		public override string GetHtml()
@@ -253,6 +269,11 @@ namespace ExpressBase.Objects
 
 		public EbCardImageField() { }
 
+		public override string GetDesignHtml()
+		{
+			return @"`<div><img class='card-img' src='../images/image.png' style='width: 100%; height: 200px; opacity: 0.2;'/></div>`";
+		}
+
 		public override string GetBareHtml()
 		{
 			return @"<img class='card-img' src='@ImageID@'/>".Replace("@ImageID@", this.ImageID.IsNullOrEmpty() ? "../images/image.png" : this.ImageID);
@@ -268,6 +289,11 @@ namespace ExpressBase.Objects
 		public string ContentHTML { get; set; }
 
 		public EbCardHtmlField() { }
+
+		public override string GetDesignHtml()
+		{
+			return @"`<div class='card-contenthtml-cont' style='padding:5px; text-align: center; width: 100%; min-height: 50px;'> HTML Content </div>`";
+		}
 
 		public override string GetBareHtml()
 		{
@@ -295,6 +321,11 @@ namespace ExpressBase.Objects
 
 		public EbCardNumericField() { }
 
+		public override string GetDesignHtml()
+		{
+			return @"`<div class='card-numeric-cont'> <b>Numeric Field</b> <input type='number' value='1' style='text-align:center; width: 100%;' min='1' max='9999' step='1' readonly> </div>`";
+		}
+
 		public override string GetBareHtml()
 		{
 			return @"<div class='card-numeric-cont data-@Name@' style='@display@'> <b>@Label@</b> <input type='number' value='@Value@' style='text-align:center; width: 100%;' min='1' max='9999' step='1' @ReadOnly@> </div>"
@@ -321,6 +352,11 @@ namespace ExpressBase.Objects
 
 		public EbCardTextField() { }
 
+		public override string GetDesignHtml()
+		{
+			return @"`<div class='card-text-cont'> <b>Text Field</b> <input type='text' value='Text' style='text-align:center; width:100%;' readonly> </div>`";
+		}
+
 		public override string GetBareHtml()
 		{
 			return @"<div class='card-text-cont data-@Name@' style='@display@'> <b>@Label@</b> <input type='text' value='@Text@' style='text-align:center; width:100%;' @ReadOnly@> </div>"
@@ -344,9 +380,14 @@ namespace ExpressBase.Objects
 
 		public EbCardTitleField() { }
 
+		public override string GetDesignHtml()
+		{
+			return @"`<div class='card-title-cont' style='font-weight: 600; font-size: 20px; padding: 5px;'>Title Field</div>`";
+		}
+
 		public override string GetBareHtml()
 		{
-			return @"<div class='card-title-cont data-@Name@' style='font-size: 20px;padding: 5px;'><i class='fa fa-check' style='color: green;display: none;' aria-hidden='true'></i>&nbsp@Text@</div>"
+			return @"<div class='card-title-cont data-@Name@' style='font-weight: 600; font-size: 20px; padding: 5px;'> &nbsp @Text@ &nbsp <i class='fa fa-check' style='color: green;display: none;' aria-hidden='true'></i></div>"
 					.Replace("@Text@", this.Title.IsNullOrEmpty() ? "" : this.Title).Replace("@Name@", this.Name);
 		}
 	}
