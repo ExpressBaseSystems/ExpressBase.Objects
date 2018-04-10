@@ -508,7 +508,7 @@ else {
             {
                 foreach (EbReportField field in r_header.Fields)
                 {
-                    DrawFields(field, rh_Yposition, 1);
+                    DrawFields(field, rh_Yposition, 0);
                 }
                 rh_Yposition += r_header.HeightPt;
             }
@@ -524,7 +524,7 @@ else {
             {
                 foreach (EbReportField field in p_header.Fields)
                 {
-                    DrawFields(field, ph_Yposition, 1);
+                    DrawFields(field, ph_Yposition, 0);
                 }
                 ph_Yposition += p_header.HeightPt;
             }
@@ -664,7 +664,7 @@ else {
             {
                 foreach (EbReportField field in p_footer.Fields)
                 {
-                    DrawFields(field, pf_Yposition, 1);
+                    DrawFields(field, pf_Yposition, 0);
                 }
                 pf_Yposition += p_footer.HeightPt;
             }
@@ -682,7 +682,7 @@ else {
             {
                 foreach (EbReportField field in r_footer.Fields)
                 {
-                    DrawFields(field, rf_Yposition, 1);
+                    DrawFields(field, rf_Yposition, 0);
                 }
                 rf_Yposition += r_footer.HeightPt;
             }

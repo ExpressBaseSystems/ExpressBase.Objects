@@ -1,4 +1,5 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Data;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
@@ -12,10 +13,10 @@ using System.Runtime.Serialization;
 namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
-    public class EbImage: EbControl
+    class EbPdfView : EbControl
     {
 
-        public EbImage() { }
+        public EbPdfView() { }
 
         [OnDeserialized]
         public void OnDeserializedMethod(StreamingContext context)
@@ -24,25 +25,11 @@ namespace ExpressBase.Objects
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
-        public string ImageID { get; set; }
-
         [EnableInBuilder(BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         public string DataSourceId { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
-        public string Alt { get; set; }
-
         public override bool isFullViewContol { get => true; set => base.isFullViewContol = value; }
-
-        public void InitFromDataBase(JsonServiceClient ServiceClient)
-        {
-            //this.DataSourceId = "eb_roby_dev-eb_roby_dev-2-1015-1739";
-            var result = ServiceClient.Get<DataSourceDataResponse>(new DataSourceDataRequest { RefId = this.DataSourceId });
-            string _html = string.Empty;
-            this.BareControlHtml = "";
-        }
         public override string GetHead()
         {
             return string.Empty;
@@ -53,7 +40,7 @@ namespace ExpressBase.Objects
         }
         public override string GetToolHtml()
         {
-            return @"<div eb-type='@toolName' class='tool'><i class='fa fa-image'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
+            return @"<div eb-type='@toolName' class='tool'><i class='fa fa-file-pdf'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
         }
 
         public override string GetWrapedCtrlHtml4bot()
@@ -65,13 +52,12 @@ namespace ExpressBase.Objects
         {
             return @" 
         <div class='ebimg-cont' style='width:100%;'>
-            <img id='@name@' src='@src@'  style='width:100%;' alt='@alt@'>
+            <iframe id='@name@' src='@src@'  style='width:100%;'></iframe>
         </div>"
 .Replace("@name@", this.Name)
-.Replace("@src@", String.IsNullOrWhiteSpace(this.ImageID) ? "https://www.gstatic.com/webp/gallery3/1_webp_ll.png" : this.ImageID)
 .Replace("@toolTipText@", this.ToolTipText)
-.Replace("@value@", "")//"value='" + this.Value + "'")
-    .Replace("@alt@ ", this.Alt ?? "@alt@ ");
+.Replace("@src@", "../ReportRender/RenderforBot?refid=@refid@&Params=@Params@".Replace("@refid@", this.DataSourceId ?? "eb_dbpjl5pgxleq20180130063835-eb_dbpjl5pgxleq20180130063835-3-1603-2339"))
+.Replace("@value@", "");//"value='" + this.Value + "'");
         }
 
         public override string GetHtml()

@@ -54,7 +54,7 @@ namespace ExpressBase.Objects
 
 
 
-        public void GetOptionsHtml(JsonServiceClient ServiceClient)
+        public void InitFromDataBase(JsonServiceClient ServiceClient)
 		{
 
 			//this.DataSourceId = "eb_roby_dev-eb_roby_dev-2-1015-1739";
