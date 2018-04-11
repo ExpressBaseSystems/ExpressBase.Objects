@@ -134,11 +134,6 @@ $('#@id').datetimepicker({
                         + "</div>";
         }
 
-        public override string GetWrapedCtrlHtml4bot()
-        {
-            return base.GetWrapedCtrlHtml4bot(GetBareHtml(), this.GetType().Name);
-        }
-
         public override string GetDesignHtml()
         {
             string _html = null; 
@@ -191,7 +186,7 @@ $('#@id').datetimepicker({
         <span id='@name@Lbl' style='@LabelBackColor  @LabelForeColor '> @Label@ </span>
        @barehtml@
         <span class='helpText'> @HelpText </span>
-    </div>
+    </div>  
 "
 .Replace("@barehtml@", this.GetBareHtml())
 .Replace("@name@", this.Name)

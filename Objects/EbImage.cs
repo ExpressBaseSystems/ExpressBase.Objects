@@ -56,11 +56,6 @@ namespace ExpressBase.Objects
             return @"<div eb-type='@toolName' class='tool'><i class='fa fa-image'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
         }
 
-        public override string GetWrapedCtrlHtml4bot()
-        {
-            return base.GetWrapedCtrlHtml4bot(GetBareHtml(), this.GetType().Name);
-        }
-
         public override string GetBareHtml()
         {
             return @" 
