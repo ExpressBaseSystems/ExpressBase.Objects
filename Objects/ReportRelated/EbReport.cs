@@ -217,14 +217,14 @@ else {
         [JsonIgnore]
         public Dictionary<string, Script> AppearanceScriptCollection { get; set; }
 
+        [JsonIgnore]
+        public EbDataSet DataSet { get; set; }
+
         //[JsonIgnore]
-        //public EbDataSet DataSet { get; set; }
+        //public RowColletion DataRows { get; set; }
 
-        [JsonIgnore]
-        public RowColletion DataRows { get; set; }
-
-        [JsonIgnore]
-        public ColumnColletion DataColumns { get; set; }
+        //[JsonIgnore]
+        //public ColumnColletion DataColumns { get; set; }
 
         [JsonIgnore]
         public bool IsLastpage { get; set; }
@@ -340,8 +340,8 @@ else {
         {
             get
             {
-                //var rows = (DataSourceRefId != string.Empty) ?DataSet.Tables[0].Rows : null;
-                var rows = (DataSourceRefId != string.Empty) ? DataRows : null;
+               var rows = (DataSourceRefId != string.Empty) ?DataSet.Tables[0].Rows : null;
+              //  var rows = (DataSourceRefId != string.Empty) ? DataRows : null;
                 if (rows != null)
                 {
                     if (rows.Count > 0)
@@ -439,10 +439,10 @@ else {
 
         }
 
-        public string GetFieldtData(string column_name, int i)
+        public string GetFieldtData(string column_name, int i, int tableIndex)
         {
-         return this.DataRows[i][column_name].ToString();
-          //  return this.DataSet.Tables[0].Rows[i][column_name].ToString();
+        // return this.DataRows[i][column_name].ToString();
+          return this.DataSet.Tables[tableIndex].Rows[i][column_name].ToString();
         }
 
         //public DbType GetFieldtDataType(string column_name)
@@ -478,9 +478,9 @@ else {
                 SummaryList = PageSummaryFields[title];
                 foreach (var item in SummaryList)
                 {
-                    var table = title.Split('.')[0];
+                    int tableIndex = Convert.ToInt32(title.Split('.')[0]);
                     column_name = title.Split('.')[1];
-                    column_val = GetFieldtData(column_name, i);
+                    column_val = GetFieldtData(column_name, i, tableIndex);
                     (item as IEbDataFieldSummary).Summarize(column_val);
                 }
             }
@@ -489,9 +489,9 @@ else {
                 SummaryList = ReportSummaryFields[title];
                 foreach (var item in SummaryList)
                 {
-                    var table = title.Split('.')[0];
+                    int tableIndex = Convert.ToInt32(title.Split('.')[0]);
                     column_name = title.Split('.')[1];
-                    column_val = GetFieldtData(column_name, i);
+                    column_val = GetFieldtData(column_name, i,tableIndex);
                     (item as IEbDataFieldSummary).Summarize(column_val);
                 }
             }
@@ -532,7 +532,17 @@ else {
 
         public void DrawDetail()
         {
-            var rows = (DataSourceRefId != string.Empty) ? DataRows/* DataSet.Tables[0].Rows */: null;
+            int tableIndex=0;
+            foreach (EbReportDetail detail in Detail)
+            {
+                foreach (EbReportField field in detail.Fields)
+                {
+                    if(field is EbDataField)
+                        tableIndex = (Detail[0].Fields[0] as EbDataField).TableIndex;
+                }
+            }
+            //var rows = (DataSourceRefId != string.Empty) ? DataRows: null;
+            var rows = (DataSourceRefId != string.Empty) ? DataSet.Tables[tableIndex].Rows : null;
             if (rows != null)
             {
                 for (iDetailRowPos = 0; iDetailRowPos < rows.Count; iDetailRowPos++)
@@ -606,9 +616,9 @@ else {
                 for (int iSortPos = 0; iSortPos < SortedList.Length; iSortPos++)
                 {
                     var field = SortedList[iSortPos];
-                    var table = field.TableIndex;
+                    int tableIndex = field.TableIndex;
                     var column_name = field.ColumnName;
-                    var column_val = GetFieldtData(column_name, serialnumber);
+                    var column_val = GetFieldtData(column_name, serialnumber, tableIndex);
                     if ((field as EbDataField).RenderInMultiLine == true)
                     {
                         var datatype = (DbType)field.DbType;
@@ -701,7 +711,7 @@ else {
             if (field is EbDataField)
             {
                 column_type = (DbType)(field as EbDataField).DbType;
-                var table = (field as EbDataField).TableIndex;
+                int tableIndex = (field as EbDataField).TableIndex;
                 column_name = (field as EbDataField).ColumnName;
                 Globals globals = new Globals();
                 globals.CurrentField = field;
@@ -716,8 +726,8 @@ else {
                     {
                         string TName = calcfd.Split('.')[0];
                         string fName = calcfd.Split('.')[1];
-                      globals[TName].Add(fName, new NTV { Name = fName, Type = this.DataRows.Table.Columns[fName].Type, Value = this.DataRows[serialnumber][fName] });
-                        //globals[TName].Add(fName, new NTV { Name = fName, Type = this.DataSet.Tables[0].Columns[fName].Type, Value = this.DataSet.Tables[0].Rows[serialnumber][fName] });
+                     // globals[TName].Add(fName, new NTV { Name = fName, Type = this.DataRows.Table.Columns[fName].Type, Value = this.DataRows[serialnumber][fName] });
+                        globals[TName].Add(fName, new NTV { Name = fName, Type = this.DataSet.Tables[0].Columns[fName].Type, Value = this.DataSet.Tables[0].Rows[serialnumber][fName] });
                     }
                     try
                     {
@@ -737,8 +747,8 @@ else {
                     {
                         string TName = calcfd.Split('.')[0];
                         string fName = calcfd.Split('.')[1];
-                        globals[TName].Add(fName, new NTV { Name = fName, Type = this.DataRows.Table.Columns[fName].Type, Value = this.DataRows[serialnumber][fName] });
-                        //globals[TName].Add(fName, new NTV { Name = fName, Type = this.DataSet.Tables[0].Columns[fName].Type, Value = this.DataSet.Tables[0].Rows[serialnumber][fName] });
+                       // globals[TName].Add(fName, new NTV { Name = fName, Type = this.DataRows.Table.Columns[fName].Type, Value = this.DataRows[serialnumber][fName] });
+                        globals[TName].Add(fName, new NTV { Name = fName, Type = this.DataSet.Tables[0].Columns[fName].Type, Value = this.DataSet.Tables[0].Rows[serialnumber][fName] });
                     }
                   
                         column_val = (ValueScriptCollection[field.Name].RunAsync(globals)).Result.ReturnValue.ToString();
@@ -760,7 +770,7 @@ else {
                         column_val = (field as IEbDataFieldSummary).SummarizedValue.ToString();
                 }
                 else
-                    column_val = GetFieldtData(column_name, serialnumber);
+                    column_val = GetFieldtData(column_name, serialnumber, tableIndex);
 
                 field.DrawMe(Canvas, HeightPt, section_Yposition, column_val, detailprintingtop, column_type);
             }
@@ -790,16 +800,16 @@ else {
             }
             else if (field is EbBarcode)
             {
-                var table = (field as EbBarcode).Code.Split('.')[0];
+                int tableIndex = Convert.ToInt32((field as EbBarcode).Code.Split('.')[0]);
                 column_name = (field as EbBarcode).Code.Split('.')[1];
-                column_val = GetFieldtData(column_name, serialnumber);
+                column_val = GetFieldtData(column_name, serialnumber, tableIndex);
                 field.DrawMe(Doc, Canvas, HeightPt, section_Yposition, detailprintingtop, column_val);
             }
             else if (field is EbQRcode)
             {
-                var table = (field as EbQRcode).Code.Split('.')[0];
+                int tableIndex = Convert.ToInt32((field as EbQRcode).Code.Split('.')[0]);
                 column_name = (field as EbQRcode).Code.Split('.')[1];
-                column_val = GetFieldtData(column_name, serialnumber);
+                column_val = GetFieldtData(column_name, serialnumber, tableIndex);
                 field.DrawMe(Doc, Canvas, HeightPt, section_Yposition, detailprintingtop, column_val);
             }
         }
