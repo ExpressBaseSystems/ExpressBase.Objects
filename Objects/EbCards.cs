@@ -37,6 +37,11 @@ namespace ExpressBase.Objects
 		[EnableInBuilder(BuilderType.BotForm)]
 		public string SummaryTitle { get; set; }
 
+		[EnableInBuilder(BuilderType.BotForm)]
+		[PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", 1)]
+		[OnChangeExec(@"console.log(100); if (this.Columns.$values.length === 0 ){pg.MakeReadOnly('ValueMember');} else {pg.MakeReadWrite('ValueMember');}")]
+		public EbDataColumn ValueMember { get; set; }
+
 		//[EnableInBuilder(BuilderType.BotForm)]
 		//[PropertyEditor(PropertyEditorType.Collection)]
 		public List<EbButton> Buttons { get; set; }
