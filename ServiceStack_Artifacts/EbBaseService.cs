@@ -152,8 +152,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
                      TenantAccountId = solutionId,
                      FileDetails = new FileMeta
                      {
-                         FileName = Image + ".jpg",
-                         FileType = "jpg"
+                         FileName = Image + StaticFileConstants.DOTJPG,
+                         FileType = StaticFileConstants.JPG
                      }
                  });
 
