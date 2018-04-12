@@ -43,16 +43,11 @@ namespace ExpressBase.Objects
             return @"<div eb-type='@toolName' class='tool'><i class='fa fa-file-pdf'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
         }
 
-        public override string GetWrapedCtrlHtml4bot()
-        {
-            return base.GetWrapedCtrlHtml4bot(GetBareHtml(), this.GetType().Name);
-        }
-
         public override string GetBareHtml()
         {
             return @" 
         <div class='ebimg-cont' style='width:100%;'>
-            <iframe id='@name@' src='@src@'  style='width:100%;'></iframe>
+            <iframe class='pdf-frame' id='@name@' src='@src@'  style='width:100%;'></iframe>
         </div>"
 .Replace("@name@", this.Name)
 .Replace("@toolTipText@", this.ToolTipText)
