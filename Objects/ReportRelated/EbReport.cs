@@ -537,8 +537,8 @@ else {
             {
                 foreach (EbReportField field in detail.Fields)
                 {
-                    if(field is EbDataField)
-                        tableIndex = (Detail[0].Fields[0] as EbDataField).TableIndex;
+                    if (field is EbDataField)
+                        tableIndex = (field as EbDataField).TableIndex;   //Detail[0].Fields[0] hack by Amal
                 }
             }
             //var rows = (DataSourceRefId != string.Empty) ? DataRows: null;
