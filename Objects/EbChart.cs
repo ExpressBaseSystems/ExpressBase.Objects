@@ -9,8 +9,8 @@ namespace ExpressBase.Objects
 {
     [ProtoBuf.ProtoContract]
     [EnableInBuilder(BuilderType.WebForm)]
-    public class EbChart : EbControl
-    {
+    public class EbChart : EbControlUI
+	{
         [ProtoBuf.ProtoMember(1)]
         public string ChartType { get; set; }
 

@@ -20,7 +20,7 @@ namespace ExpressBase.Objects
     }
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
-    public class EbRadioGroup : EbControl
+    public class EbRadioGroup : EbControlUI
     {
         public EbRadioGroup()
         {
@@ -110,7 +110,7 @@ this.Init = function(id)
         }
     }
 
-    public class EbRadioOptionAbstract : EbControl
+    public class EbRadioOptionAbstract : EbControlUI
     {
 
     }

@@ -14,20 +14,19 @@ using System.Runtime.Serialization;
 namespace ExpressBase.Objects
 {
 	[EnableInBuilder(BuilderType.BotForm)]
-	public class EbDynamicCards : EbControl
+	public class EbCardSetParent : EbControlUI
 	{
+		public EbCardSetParent()
+		{
+			this.SelectedCards = new List<int>();
+			this.CardFields = new List<EbCardField>();
+		}
+
 		[EnableInBuilder(BuilderType.BotForm)]
 		[PropertyEditor(PropertyEditorType.Collection)]
-		public List<EbCard> CardCollection { get; set; }
+		public List<EbCardField> CardFields { get; set; }
 
-		[EnableInBuilder(BuilderType.BotForm)]
-		[OSE_ObjectTypes(EbObjectTypes.iDataSource)]
-		[PropertyEditor(PropertyEditorType.ObjectSelector)]
-		public string DataSourceId { get; set; }
-
-		[EnableInBuilder(BuilderType.BotForm)]
-		[HideInPropertyGrid]
-		public ColumnColletion Columns { get; set; }
+		public bool IsSummaryRequired { get; set; }//////////////////////////////////// need rethink
 
 		[EnableInBuilder(BuilderType.BotForm)]
 		[PropertyEditor(PropertyEditorType.Boolean)]
@@ -39,34 +38,14 @@ namespace ExpressBase.Objects
 
 		[EnableInBuilder(BuilderType.BotForm)]
 		public string SummaryTitle { get; set; }
+	}
 
-		[EnableInBuilder(BuilderType.BotForm)]
-		[PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", 1)]
-		[OnChangeExec(@"console.log(100); if (this.Columns.$values.length === 0 ){pg.MakeReadOnly('ValueMember');} else {pg.MakeReadWrite('ValueMember');}")]
-		public EbDataColumn ValueMember { get; set; }
-
-		//[EnableInBuilder(BuilderType.BotForm)]
-		//[PropertyEditor(PropertyEditorType.Collection)]
-		public List<EbButton> Buttons { get; set; }
-
-		[EnableInBuilder(BuilderType.BotForm)]
-		[PropertyEditor(PropertyEditorType.Collection)]
-		public List<EbCardField> CardFields { get; set; }
-
-		public bool IsSummaryRequired { get; set; }
-
-		public override bool isFullViewContol { get => true; set => base.isFullViewContol = value; }
-
-		//public List<EbCardField> SummarizeFields { get; set; }
-
-		public EbDynamicCards()
+	[EnableInBuilder(BuilderType.BotForm)]
+	public class EbDynamicCardSet : EbCardSetParent
+	{
+		public EbDynamicCardSet()
 		{
-			this.CardCollection = new List<EbCard>();
-			this.SelectedCards = new List<int>();
-			this.CardFields = new List<EbCardField>();
-			this.Buttons = new List<EbButton>();
-			this.Buttons.Add(new EbButton { Text = "Continue" });
-			//this.SummarizeFields = new List<EbCardField>();
+			this.CardCollection = new List<EbDynamicCard>();
 			this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
 		}
 
@@ -76,6 +55,29 @@ namespace ExpressBase.Objects
 			this.BareControlHtml = this.GetBareHtml();
 			this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
 		}
+
+		[EnableInBuilder(BuilderType.BotForm)]
+		[PropertyEditor(PropertyEditorType.Collection)]
+		public List<EbDynamicCard> CardCollection { get; set; }
+
+		[EnableInBuilder(BuilderType.BotForm)]
+		[OSE_ObjectTypes(EbObjectTypes.iDataSource)]
+		[PropertyEditor(PropertyEditorType.ObjectSelector)]
+		public string DataSourceId { get; set; }
+
+		[EnableInBuilder(BuilderType.BotForm)]
+		[HideInPropertyGrid]
+		public ColumnColletion Columns { get; set; }
+
+		[EnableInBuilder(BuilderType.BotForm)]
+		[PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", 1)]
+		[OnChangeExec(@"console.log(100); if (this.Columns.$values.length === 0 ){pg.MakeReadOnly('ValueMember');} else {pg.MakeReadWrite('ValueMember');}")]
+		public EbDataColumn ValueMember { get; set; }
+
+		public override bool isFullViewContol { get => true; set => base.isFullViewContol = value; }
+
+		//public List<EbCardField> SummarizeFields { get; set; }
+
 		public override string GetToolHtml()
 		{
 			return @"<div eb-type='@toolName' class='tool'><i class='fa fa-window-restore'></i>@toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
@@ -87,7 +89,7 @@ namespace ExpressBase.Objects
 
 			for (int i = 0; i < ds.Count; i++)
 			{
-				EbCard Card = new EbCard();
+				EbDynamicCard Card = new EbDynamicCard();
 				foreach (EbCardField Field in this.CardFields)
 				{
 					//Type classType = Field.GetType();
@@ -122,9 +124,7 @@ namespace ExpressBase.Objects
 				}
 				//Card.CardId = i.ToString();
 				Card.CardId = Convert.ToInt32(ds[i][this.ValueMember.ColumnIndex]);
-				Card.Name = "CardIn" + this.Name;//------------------------"CardIn"
-				if (this.MultiSelect)
-					Card.Button = new EbButton { Text = "Select", ToolTipText = "" };//------------------------Text = "Order"			
+				Card.Name = "CardIn" + this.Name;//------------------------"CardIn"		
 
 				this.CardCollection.Add(Card);
 			}
@@ -143,19 +143,8 @@ namespace ExpressBase.Objects
 					};";
 		}
 
-		public string ButtonsString
+		public override string DesignHtml4Bot
 		{
-			get
-			{
-				string html = @"<div class='cards-btn-cont'>";
-				foreach (EbButton ec in this.Buttons)
-					html += ec.GetHtml();
-				return html + "</div>";
-			}
-			set { }
-		}
-
-		public override string DesignHtml4Bot {
 			get => @"<div id=@id><div class='cards-cont'>
 						<div class='card-cont' style='width: 100%; min-height: 100px; box-shadow: 0px 0px 20px #ccc; border-radius: 1.3em 1.3em 0 0;'>
 							<div class='card-btn-cont'><button class='btn btn-default' style='width:100%;' disabled>Select</button></div>
@@ -173,7 +162,8 @@ namespace ExpressBase.Objects
 							</table>
 						</div>
 						
-					</div></div>"; set => base.DesignHtml4Bot = value; }
+					</div></div>"; set => base.DesignHtml4Bot = value;
+		}
 
 		public override string GetDesignHtml()
 		{
@@ -209,7 +199,7 @@ namespace ExpressBase.Objects
 		public override string GetBareHtml()
 		{
 			string html = @"<div id='@name@'><div class='cards-cont'>".Replace("@name@", this.Name ?? "@name@");
-			foreach (EbCard card in CardCollection)
+			foreach (EbDynamicCard card in CardCollection)
 			{
 				//html += Card.GetBareHtml();
 				html += @"<div id='@name@' class='card-cont' card-id='@cardid@' style='width:100%;'>".Replace("@name@", card.Name.Trim()).Replace("@cardid@", card.CardId.ToString());
@@ -230,16 +220,15 @@ namespace ExpressBase.Objects
 					}
 					html += cardField.GetBareHtml();
 				}
-				html += "<div class='card-btn-cont'>" + card.Button.GetBareHtml() + "</div></div>";
+				html += "<div class='card-btn-cont'>Hard codel o</div></div>";
 
 			}
 			html += "</div>@SummarizeHtml@@ButtonsString@</div>"
-				.Replace("@ButtonsString@", this.ButtonsString)
+				.Replace("@ButtonsString@", "Hard code button")
 				.Replace("@SummarizeHtml@", this.getCartHtml() ?? "");
 			return html;
 		}
-
-
+		
 		public string getCartHtml()
 		{
 			this.IsSummaryRequired = false;
@@ -323,20 +312,21 @@ namespace ExpressBase.Objects
 	[EnableInBuilder(BuilderType.BotForm)]
 	[HideInToolBox]
 	//[GenerateDynamicMetaJsFunc("genCardmeta")]
-	public class EbCard : EbControl
+	public class EbCardParent : EbControl
 	{
 		public int CardId { get; set; }
 
-		//public List<EbCardField> Fields { get; set; }
+		public EbCardParent() { }
+	}
+	[EnableInBuilder(BuilderType.BotForm)]
+	[HideInToolBox]
+	public class EbStaticCard : EbCardParent
+	{
+		[EnableInBuilder(BuilderType.BotForm)]
+		public Dictionary<string, object> CustomFields { get; set; }
 
-		public MyDynObject FieldValues { get; set; }
-
-		public EbButton Button { get; set; }
-
-		public EbCard()
-		{
-			//this.Fields = new List<EbCardField>();
-			this.FieldValues = new MyDynObject();
+		public EbStaticCard() {
+			CustomFields.Add("baabu", new { name = "saabu" });
 		}
 
 		public override string GetBareHtml()
@@ -348,7 +338,32 @@ namespace ExpressBase.Objects
 				//{
 				//    html += CardField.GetBareHtml();
 				//}
-				html += "<div class='card-btn-cont'>" + this.Button.GetBareHtml() + "</div></div>";
+				html += "<div class='card-btn-cont'>" + "NEED Hard coding" + "</div></div>";
+				return html;
+			}
+			return string.Empty;
+		}
+	}
+
+	[EnableInBuilder(BuilderType.BotForm)]
+	[HideInToolBox]
+	public class EbDynamicCard : EbCardParent
+	{
+
+		public MyDynObject FieldValues { get; set; }
+
+		public EbDynamicCard() { }
+
+		public override string GetBareHtml()
+		{
+			if (this.Name != null)
+			{
+				string html = @"<div id='@name@' class='card-cont' card-id='@cardid@' style='width:100%;'>".Replace("@name@", this.Name.Trim()).Replace("@cardid@", this.CardId.ToString());
+				//foreach (EbCardField CardField in this.Fields)
+				//{
+				//    html += CardField.GetBareHtml();
+				//}
+				html += "<div class='card-btn-cont'>" + "NEED Hard coding" + "</div></div>";
 				return html;
 			}
 			return string.Empty;
@@ -444,6 +459,9 @@ namespace ExpressBase.Objects
 		[EnableInBuilder(BuilderType.BotForm)]
 		public override bool ReadOnly { get; set; }
 
+		//[EnableInBuilder(BuilderType.BotForm)]
+		//public double Value { get; set; }
+
 		public EbCardNumericField() { }
 
 		public override string GetDesignHtml()
@@ -454,7 +472,7 @@ namespace ExpressBase.Objects
 		public override string GetBareHtml()
 		{
 			return @"<div class='card-numeric-cont data-@Name@' style='@display@'> <b>@Label@</b> <input type='number' value='@Value@' style='text-align:center; width: 100%;' min='1' max='9999' step='1' @ReadOnly@> </div>"
-					.Replace("@Value@", (this.Value == null) ? "1": this.Value.ToString())
+					.Replace("@Value@", (this.Value == null) ? "1" : this.Value.ToString())
 					.Replace("@display@", this.HideInCard ? "display:none;" : "").Replace("@Name@", this.Name ?? "")
 					.Replace("@Label@", this.Label.IsNullOrEmpty() ? this.Name : this.Label).Replace("@ReadOnly@", this.ReadOnly ? "readonly" : "");
 		}

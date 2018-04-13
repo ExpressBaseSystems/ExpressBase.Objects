@@ -31,7 +31,7 @@ namespace ExpressBase.Objects
     }
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
-    public class EbTextBox : EbControl
+    public class EbTextBox : EbControlUI
     {
         public EbTextBox() { }
 

@@ -12,8 +12,8 @@ using System.Runtime.Serialization;
 namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
-    public class EbImage: EbControl
-    {
+    public class EbImage: EbControlUI
+	{
 
         public EbImage() { }
 

@@ -9,8 +9,8 @@ using System.Text;
 namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
-    public class EbInputGeoLocation : EbControl
-    {
+    public class EbInputGeoLocation : EbControlUI
+	{
         public EbInputGeoLocation() { }
 
         [OnDeserialized]

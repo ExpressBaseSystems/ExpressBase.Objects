@@ -12,8 +12,8 @@ using System.Threading.Tasks;
 namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
-    public class EbNumeric : EbControl
-    {
+    public class EbNumeric : EbControlUI
+	{
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public EbDbTypes EbDbType { get { return EbDbTypes.Decimal; } }
         public EbNumeric()

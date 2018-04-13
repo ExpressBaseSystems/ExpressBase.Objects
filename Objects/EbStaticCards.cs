@@ -13,59 +13,11 @@ using System.Runtime.Serialization;
 namespace ExpressBase.Objects
 {
 	[EnableInBuilder(BuilderType.BotForm)]
-	public class EbCards : EbControl
+	public class EbStaticCardSet : EbCardSetParent
 	{
-		[EnableInBuilder(BuilderType.BotForm)]
-		[PropertyEditor(PropertyEditorType.Collection)]
-		public List<EbCard> CardCollection { get; set; }
-
-		[EnableInBuilder(BuilderType.BotForm)]
-		[OSE_ObjectTypes(EbObjectTypes.iDataSource)]
-		[PropertyEditor(PropertyEditorType.ObjectSelector)]
-		public string DataSourceId { get; set; }
-
-		[EnableInBuilder(BuilderType.BotForm)]
-		[HideInPropertyGrid]
-		public ColumnColletion Columns { get; set; }
-
-		[EnableInBuilder(BuilderType.BotForm)]
-		[PropertyEditor(PropertyEditorType.Boolean)]
-		[OnChangeExec(@"if(this.MultiSelect === true){pg.ShowProperty('SummaryTitle');}
-		else{pg.HideProperty('SummaryTitle');}")]
-		public bool MultiSelect { get; set; }
-
-		public List<int> SelectedCards { get; set; }
-
-		[EnableInBuilder(BuilderType.BotForm)]
-		public string SummaryTitle { get; set; }
-
-		[EnableInBuilder(BuilderType.BotForm)]
-		[PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", 1)]
-		[OnChangeExec(@"console.log(100); if (this.Columns.$values.length === 0 ){pg.MakeReadOnly('ValueMember');} else {pg.MakeReadWrite('ValueMember');}")]
-		public EbDataColumn ValueMember { get; set; }
-
-		//[EnableInBuilder(BuilderType.BotForm)]
-		//[PropertyEditor(PropertyEditorType.Collection)]
-		public List<EbButton> Buttons { get; set; }
-
-		[EnableInBuilder(BuilderType.BotForm)]
-		[PropertyEditor(PropertyEditorType.Collection)]
-		public List<EbCardField> CardFields { get; set; }
-
-		public bool IsSummaryRequired { get; set; }
-
-        public override bool isFullViewContol { get => true; set => base.isFullViewContol = value; }
-
-        //public List<EbCardField> SummarizeFields { get; set; }
-
-        public EbCards()
+		public EbStaticCardSet()
 		{
-			this.CardCollection = new List<EbCard>();
-			this.SelectedCards = new List<int>();
-			this.CardFields = new List<EbCardField>();
-			this.Buttons = new List<EbButton>();
-			this.Buttons.Add(new EbButton { Text = "Continue" });
-			//this.SummarizeFields = new List<EbCardField>();
+			this.CardCollection = new List<EbStaticCard>();
 		}
 
 		[OnDeserialized]
@@ -74,6 +26,13 @@ namespace ExpressBase.Objects
 			this.BareControlHtml = this.GetBareHtml();
 			this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
 		}
+
+		[EnableInBuilder(BuilderType.BotForm)]
+		[PropertyEditor(PropertyEditorType.CollectionPropsFrmSrc, "CardFields")]
+		public List<EbStaticCard> CardCollection { get; set; }
+
+        public override bool isFullViewContol { get => true; set => base.isFullViewContol = value; }
+
 		public override string GetToolHtml()
 		{
 			return @"<div eb-type='@toolName' class='tool'><i class='fa fa-window-restore'></i>@toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
@@ -85,18 +44,6 @@ namespace ExpressBase.Objects
 					{
 						//this.CardCollection.$values.push(new EbObjects.EbCard(id + '_EbCard0'));
 					};";
-		}
-
-		public string ButtonsString
-		{
-			get
-			{
-				string html = @"<div class='cards-btn-cont'>";
-				foreach (EbButton ec in this.Buttons)
-					html += ec.GetHtml();
-				return html + "</div>";
-			}
-			set { }
 		}
 
 		public override string GetDesignHtml()
@@ -134,8 +81,7 @@ namespace ExpressBase.Objects
 		{
 			return "";
 		}
-
-
+		
 		public string getCartHtml()
 		{
 			this.IsSummaryRequired = false;

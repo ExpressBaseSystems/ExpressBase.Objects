@@ -24,8 +24,8 @@ namespace ExpressBase.Objects
 
     [ProtoBuf.ProtoContract]
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
-    public class EbComboBox : EbControl
-    {
+    public class EbComboBox : EbControlUI
+	{
 
         public EbComboBox() { }
 

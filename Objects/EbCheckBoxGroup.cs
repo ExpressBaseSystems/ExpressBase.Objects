@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
-    public class EbCheckBoxGroup:EbControl
+    public class EbCheckBoxGroup:EbControlUI
     {
         public EbCheckBoxGroup()
         {
@@ -86,7 +86,7 @@ this.Init = function(id)
         }
     }
 
-    public class EbCheckBoxAbstract : EbControl
+    public class EbCheckBoxAbstract : EbControlUI
     {
 
     }
