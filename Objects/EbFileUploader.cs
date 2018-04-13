@@ -11,8 +11,8 @@ using System.Threading.Tasks;
 namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
-    class EbFileUploader : EbControl
-    {
+    class EbFileUploader : EbControlUI
+	{
 
         public EbFileUploader() { }
 

@@ -37,8 +37,8 @@ namespace ExpressBase.Objects
 
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
-    public class EbDate : EbControl
-    {
+    public class EbDate : EbControlUI
+	{
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public  EbDbTypes EbDbType { get { return (EbDbTypes)this.EbDateType; } }
 

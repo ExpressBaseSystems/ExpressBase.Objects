@@ -9,8 +9,8 @@ using System.Text;
 namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
-    public class EbLocations : EbControl
-    {
+    public class EbLocations : EbControlUI
+	{
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.Collection)]
         public List<EbLocation> LocationCollection { get; set; }
@@ -154,8 +154,8 @@ this.Init = function(id)
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
     [HideInToolBox]
-    public class EbLocation : EbControl
-    {
+    public class EbLocation : EbControlUI
+	{
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.Expandable)]

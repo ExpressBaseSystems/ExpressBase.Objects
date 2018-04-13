@@ -8,8 +8,8 @@ using System.Text;
 namespace ExpressBase.Objects.Objects
 {
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
-    class EbRadioButton : EbControl
-    {
+    class EbRadioButton : EbControlUI
+	{
         public EbRadioButton() { }
 
         public override string GetToolHtml()

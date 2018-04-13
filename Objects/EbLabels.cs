@@ -11,8 +11,8 @@ using System.Threading.Tasks;
 namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.BotForm)]
-    public class EbLabels : EbControl
-    {
+    public class EbLabels : EbControlUI
+	{
 
         public EbLabels()
         {
@@ -91,8 +91,8 @@ this.Init = function(id)
 
     [EnableInBuilder(BuilderType.BotForm)]
     [HideInToolBox]
-    public class EbLabel : EbControl
-    {
+    public class EbLabel : EbControlUI
+	{
 
         public EbLabel() { }
 

@@ -14,7 +14,7 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
     [HideInPropertyGrid]
     [HideInToolBox]
-    public class EbButton : EbControl
+    public class EbButton : EbControlUI
     {
         public EbButton() { }
 
