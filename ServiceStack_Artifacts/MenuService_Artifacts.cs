@@ -85,7 +85,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class SidebarDevResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
-        public Dictionary<int, TypeWrap> Data { get; set; }
+        public Dictionary<int, AppWrap> Data { get; set; }
 
         [DataMember(Order = 2)]
         public Dictionary<int, AppObject> AppList { get; set; }
