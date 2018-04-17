@@ -181,15 +181,15 @@ namespace ExpressBase.Objects
                     if (cardField.DbFieldMap != null)
                     {
                         if (cardField is EbCardImageField)
-                            (cardField as EbCardImageField).ImageID = card.FieldValues[cardField.Name].ToString();
+                            (cardField as EbCardImageField).FieldValue = card.FieldValues[cardField.Name].ToString();
                         else if (cardField is EbCardNumericField)
-                            (cardField as EbCardNumericField).Value = Convert.ToDouble(card.FieldValues[cardField.Name]);
+                            (cardField as EbCardNumericField).FieldValue = Convert.ToDouble(card.FieldValues[cardField.Name]);
                         else if (cardField is EbCardHtmlField)
-                            (cardField as EbCardHtmlField).ContentHTML = card.FieldValues[cardField.Name].ToString();
+                            (cardField as EbCardHtmlField).FieldValue = card.FieldValues[cardField.Name].ToString();
                         else if (cardField is EbCardTextField)
-                            (cardField as EbCardTextField).Text = card.FieldValues[cardField.Name].ToString();
+                            (cardField as EbCardTextField).FieldValue = card.FieldValues[cardField.Name].ToString();
                         else if (cardField is EbCardTitleField)
-                            (cardField as EbCardTitleField).Title = card.FieldValues[cardField.Name].ToString();
+                            (cardField as EbCardTitleField).FieldValue = card.FieldValues[cardField.Name].ToString();
                     }
                     html += cardField.GetBareHtml();
                 }
@@ -372,9 +372,9 @@ namespace ExpressBase.Objects
 		[PropertyEditor(PropertyEditorType.FontSelector)]
 		public EbFont Font { get; set; }
 
-		[EnableInBuilder(BuilderType.BotForm)]
-		[HideInPropertyGrid]
-		public dynamic Value { get; set; }
+		//[EnableInBuilder(BuilderType.BotForm)]
+		//[HideInPropertyGrid]
+		//public dynamic Value { get; set; }
 	}
 
 
@@ -385,7 +385,8 @@ namespace ExpressBase.Objects
 	{
 		[EnableInBuilder(BuilderType.BotForm)]
 		[PropertyEditor(PropertyEditorType.ImageSeletor)]
-		public string ImageID { get; set; }
+        [Alias("ImageID")]
+		public string FieldValue { get; set; }
 
 		public EbCardImageField() { }
 
@@ -396,7 +397,7 @@ namespace ExpressBase.Objects
 
 		public override string GetBareHtml()
 		{
-			return @"<img class='card-img' src='@ImageID@'/>".Replace("@ImageID@", this.ImageID.IsNullOrEmpty() ? "../images/image.png" : this.ImageID);
+			return @"<img class='card-img' src='@ImageID@'/>".Replace("@ImageID@", this.FieldValue.IsNullOrEmpty() ? "../images/image.png" : this.FieldValue);
 		}
 	}
 
@@ -406,7 +407,8 @@ namespace ExpressBase.Objects
 	{
 		[EnableInBuilder(BuilderType.BotForm)]
 		[PropertyEditor(PropertyEditorType.String)]
-		public string ContentHTML { get; set; }
+        [Alias("ContentHTML")]
+        public string FieldValue { get; set; }
 
 		public EbCardHtmlField() { }
 
@@ -417,19 +419,23 @@ namespace ExpressBase.Objects
 
 		public override string GetBareHtml()
 		{
-			return @"<div class='card-contenthtml-cont data-@Name@' style='padding:5px;'> @ContentHTML@ </div>".Replace("@ContentHTML@", this.ContentHTML.IsNullOrEmpty() ? "" : this.ContentHTML).Replace("@Name@", this.Name);
+			return @"<div class='card-contenthtml-cont data-@Name@' style='padding:5px;'> @ContentHTML@ </div>".Replace("@ContentHTML@", this.FieldValue.IsNullOrEmpty() ? "" : this.FieldValue).Replace("@Name@", this.Name);
 		}
 	}
 
 	[EnableInBuilder(BuilderType.BotForm)]
 	[HideInToolBox]
 	public class EbCardNumericField : EbCardField
-	{
-		[EnableInBuilder(BuilderType.BotForm)]
-		[PropertyEditor(PropertyEditorType.JS)]
-		public string ValueExpression { get; set; }
+    {
+        [EnableInBuilder(BuilderType.BotForm)]
+        [PropertyEditor(PropertyEditorType.JS)]
+        public string ValueExpression { get; set; }
 
-		[EnableInBuilder(BuilderType.BotForm)]
+        [EnableInBuilder(BuilderType.BotForm)]
+        [Alias("Value")]
+        public  Double FieldValue { get; set; }
+
+        [EnableInBuilder(BuilderType.BotForm)]
 		public bool Sum { get; set; }
 
 		[EnableInBuilder(BuilderType.BotForm)]
@@ -448,7 +454,7 @@ namespace ExpressBase.Objects
 		public override string GetBareHtml()
 		{
 			return @"<div class='card-numeric-cont data-@Name@' style='@display@'> <b>@Label@</b> <input type='number' value='@Value@' style='text-align:center; width: 100%;' min='1' max='9999' step='1' @ReadOnly@> </div>"
-					.Replace("@Value@", (this.Value == null) ? "1" : this.Value.ToString())
+					.Replace("@Value@", (this.FieldValue == null) ? "1" : this.FieldValue.ToString())
 					.Replace("@display@", this.HideInCard ? "display:none;" : "").Replace("@Name@", this.Name ?? "")
 					.Replace("@Label@", this.Label.IsNullOrEmpty() ? this.Name : this.Label).Replace("@ReadOnly@", this.ReadOnly ? "readonly" : "");
 		}
@@ -459,7 +465,8 @@ namespace ExpressBase.Objects
 	public class EbCardTextField : EbCardField
 	{
 		[EnableInBuilder(BuilderType.BotForm)]
-		public string Text { get; set; }
+        [Alias("Text")]
+        public string FieldValue { get; set; }
 
 		[EnableInBuilder(BuilderType.BotForm)]
 		[PropertyEditor(PropertyEditorType.JS)]
@@ -478,7 +485,7 @@ namespace ExpressBase.Objects
 		public override string GetBareHtml()
 		{
 			return @"<div class='card-text-cont data-@Name@' style='@display@'> <b>@Label@</b> <input type='text' value='@Text@' style='text-align:center; width:100%;' @ReadOnly@> </div>"
-					.Replace("@Text@", this.Text.IsNullOrEmpty() ? "" : this.Text)
+					.Replace("@Text@", this.FieldValue.IsNullOrEmpty() ? "" : this.FieldValue)
 					.Replace("@display@", this.HideInCard ? "display:none;" : "").Replace("@Name@", this.Name ?? "")
 					.Replace("@Label@", this.Label.IsNullOrEmpty() ? this.Name : this.Label).Replace("@ReadOnly@", this.ReadOnly ? "readonly" : "");
 		}
@@ -490,7 +497,8 @@ namespace ExpressBase.Objects
 	{
 		[EnableInBuilder(BuilderType.BotForm)]
 		[PropertyEditor(PropertyEditorType.String)]
-		public string Title { get; set; }
+        [Alias("Title")]
+		public string FieldValue { get; set; }
 
 		[EnableInBuilder(BuilderType.BotForm)]
 		[PropertyEditor(PropertyEditorType.JS)]
@@ -506,7 +514,7 @@ namespace ExpressBase.Objects
 		public override string GetBareHtml()
 		{
 			return @"<div class='card-title-cont data-@Name@' style='font-weight: 600; font-size: 20px; padding: 5px;'> &nbsp @Text@ &nbsp <i class='fa fa-check' style='color: green;display: none;' aria-hidden='true'></i></div>"
-					.Replace("@Text@", this.Title.IsNullOrEmpty() ? "" : this.Title).Replace("@Name@", this.Name);
+					.Replace("@Text@", this.FieldValue.IsNullOrEmpty() ? "" : this.FieldValue).Replace("@Name@", this.Name);
 		}
 	}
 }
