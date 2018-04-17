@@ -459,7 +459,6 @@ namespace ExpressBase.Objects
 	public class EbCardTextField : EbCardField
 	{
 		[EnableInBuilder(BuilderType.BotForm)]
-		[PropertyEditor(PropertyEditorType.String)]
 		public string Text { get; set; }
 
 		[EnableInBuilder(BuilderType.BotForm)]

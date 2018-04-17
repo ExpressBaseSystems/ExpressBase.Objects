@@ -111,9 +111,9 @@ namespace ExpressBase.Objects
     [HideInToolBox]
     public class EbStaticCard : EbCardParent
     {
-        [EnableInBuilder(BuilderType.BotForm)]
-        [PropertyEditor(PropertyEditorType.DictionaryEditor)]
         [JsonConverter(typeof(DictionaryConverter))]
+        [EnableInBuilder(BuilderType.BotForm)]
+        [PropertyEditor(PropertyEditorType.DictionaryEditor, "CardFields")]
         public IDictionary<string, object> CustomFields { get; set; }
 
         public EbStaticCard() { }
