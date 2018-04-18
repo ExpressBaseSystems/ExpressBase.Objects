@@ -33,6 +33,10 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.CollectionPropsFrmSrc, "CardFields")]
         public List<EbStaticCard> CardCollection { get; set; }
 
+        [EnableInBuilder(BuilderType.BotForm)]
+        [PropertyEditor(PropertyEditorType.String)]
+        public string StringEditor { get; set; }
+
         public override bool isFullViewContol { get => true; set => base.isFullViewContol = value; }
 
         public override string GetToolHtml()
@@ -116,7 +120,7 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.DictionaryEditor, "CardFields")]
         public IDictionary<string, object> CustomFields { get; set; }
 
-        public EbStaticCard() { }
+        public EbStaticCard() {}
 
         public override string GetBareHtml()
         {

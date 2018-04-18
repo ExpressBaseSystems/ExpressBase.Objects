@@ -422,13 +422,15 @@ namespace ExpressBase.Objects
     [HideInToolBox]
     public class EbCardNumericField : EbCardField
     {
-        [EnableInBuilder(BuilderType.BotForm)]
-        [PropertyEditor(PropertyEditorType.JS)]
-        public string ValueExpression { get; set; }
 
         [EnableInBuilder(BuilderType.BotForm)]
         [Alias("Value")]
+        [PropertyEditor(PropertyEditorType.Number)]
         public override dynamic FieldValue { get; set; }
+
+        [EnableInBuilder(BuilderType.BotForm)]
+        [PropertyEditor(PropertyEditorType.JS)]
+        public string ValueExpression { get; set; }
 
         [EnableInBuilder(BuilderType.BotForm)]
         public bool Sum { get; set; }
@@ -461,6 +463,7 @@ namespace ExpressBase.Objects
     {
         [EnableInBuilder(BuilderType.BotForm)]
         [Alias("Text")]
+        [PropertyEditor(PropertyEditorType.String)]
         public override dynamic FieldValue { get; set; }
 
         [EnableInBuilder(BuilderType.BotForm)]
