@@ -81,8 +81,23 @@ namespace ExpressBase.Objects
 
         public override string GetBareHtml()
         {
-            return "";
-        }
+			string html = @"<div id='@name@'><div class='cards-cont'>".Replace("@name@", this.Name ?? "@name@");
+			foreach (EbStaticCard card in CardCollection)
+			{
+				//html += Card.GetBareHtml();
+				html += @"<div id='@name@' class='card-cont' card-id='@cardid@' style='width:100%;'>".Replace("@name@", card.Name.Trim()).Replace("@cardid@", card.CardId.ToString());
+				foreach (EbCardField cardField in this.CardFields)
+				{				
+					cardField.FieldValue = card.CustomFields[cardField.Name];					
+					html += cardField.GetBareHtml();
+				}
+				html += "<div class='card-btn-cont'>Hard codel o</div></div>";
+			}
+			html += "</div>@SummarizeHtml@@ButtonsString@</div>"
+				.Replace("@ButtonsString@", "Hard code button")
+				.Replace("@SummarizeHtml@", this.getCartHtml() ?? "");
+			return html;
+		}
 
         public string getCartHtml()
         {

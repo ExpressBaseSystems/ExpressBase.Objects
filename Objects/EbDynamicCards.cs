@@ -48,9 +48,7 @@ namespace ExpressBase.Objects
         public EbDataColumn ValueMember { get; set; }
 
         public override bool isFullViewContol { get => true; set => base.isFullViewContol = value; }
-
-        //public List<EbCardField> SummarizeFields { get; set; }
-
+		
         public override string GetToolHtml()
         {
             return @"<div eb-type='@toolName' class='tool'><i class='fa fa-window-restore'></i>@toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
@@ -79,9 +77,6 @@ namespace ExpressBase.Objects
                         else
                             Card.FieldValues[Field.Name] = ds[i][Field.DbFieldMap.ColumnIndex].ToString().Trim();
                     }
-
-
-
                     //FieldObj.HideInCard = Field.HideInCard;
                     //FieldObj.EbSid = Field.EbSid;
                     //FieldObj.Name = Field.Name;
@@ -333,7 +328,9 @@ namespace ExpressBase.Objects
     [HideInToolBox]
     public class EbCardParent : EbControl
     {
-        public int CardId { get; set; }
+		[EnableInBuilder(BuilderType.BotForm)]
+		[PropertyEditor(PropertyEditorType.Number)]
+		public int CardId { get; set; }
 
         public EbCardParent() { }
     }
@@ -381,7 +378,8 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.ImageSeletor)]
         [Alias("ImageID")]
-        public override dynamic FieldValue { get; set; }
+		[MetaOnly]
+		public override dynamic FieldValue { get; set; }
 
         public EbCardImageField() { }
 
@@ -392,7 +390,7 @@ namespace ExpressBase.Objects
 
         public override string GetBareHtml()
         {
-            return @"<img class='card-img' src='@ImageID@'/>".Replace("@ImageID@", this.FieldValue.IsNullOrEmpty() ? "../images/image.png" : this.FieldValue);
+            return @"<img class='card-img' src='@ImageID@'/>".Replace("@ImageID@", (this.FieldValue == null) ? "../images/image.png" : this.FieldValue);
         }
     }
 
@@ -403,7 +401,8 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.String)]
         [Alias("ContentHTML")]
-        public override dynamic FieldValue { get; set; }
+		[MetaOnly]
+		public override dynamic FieldValue { get; set; }
 
         public EbCardHtmlField() { }
 
@@ -414,7 +413,7 @@ namespace ExpressBase.Objects
 
         public override string GetBareHtml()
         {
-            return @"<div class='card-contenthtml-cont data-@Name@' style='padding:5px;'> @ContentHTML@ </div>".Replace("@ContentHTML@", this.FieldValue.IsNullOrEmpty() ? "" : this.FieldValue).Replace("@Name@", this.Name);
+            return @"<div class='card-contenthtml-cont data-@Name@' style='padding:5px;'> @ContentHTML@ </div>".Replace("@ContentHTML@", (this.FieldValue == null) ? "" : this.FieldValue).Replace("@Name@", this.Name);
         }
     }
 
@@ -428,6 +427,8 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.BotForm)]
         [Alias("Value")]
+		[MetaOnly]
+		[PropertyEditor(PropertyEditorType.Number)]
         public override dynamic FieldValue { get; set; }
 
         [EnableInBuilder(BuilderType.BotForm)]
@@ -461,7 +462,9 @@ namespace ExpressBase.Objects
     {
         [EnableInBuilder(BuilderType.BotForm)]
         [Alias("Text")]
-        public override dynamic FieldValue { get; set; }
+		[MetaOnly]
+		[PropertyEditor(PropertyEditorType.String)]
+		public override dynamic FieldValue { get; set; }
 
         [EnableInBuilder(BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.JS)]
@@ -480,7 +483,7 @@ namespace ExpressBase.Objects
         public override string GetBareHtml()
         {
             return @"<div class='card-text-cont data-@Name@' style='@display@'> <b>@Label@</b> <input type='text' value='@Text@' style='text-align:center; width:100%;' @ReadOnly@> </div>"
-                    .Replace("@Text@", this.FieldValue.IsNullOrEmpty() ? "" : this.FieldValue)
+                    .Replace("@Text@", (this.FieldValue == null) ? "" : this.FieldValue)
                     .Replace("@display@", this.HideInCard ? "display:none;" : "").Replace("@Name@", this.Name ?? "")
                     .Replace("@Label@", this.Label.IsNullOrEmpty() ? this.Name : this.Label).Replace("@ReadOnly@", this.ReadOnly ? "readonly" : "");
         }
