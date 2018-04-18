@@ -74,15 +74,9 @@ namespace ExpressBase.Objects
 
                     if (Field.DbFieldMap != null)
                     {
-                        if (Field is EbCardImageField)
-                            Card.FieldValues[Field.Name] = ds[i][Field.DbFieldMap.ColumnIndex].ToString().Trim();
-                        else if (Field is EbCardNumericField)
+                        if (Field is EbCardNumericField)
                             Card.FieldValues[Field.Name] = Convert.ToDouble(ds[i][Field.DbFieldMap.ColumnIndex]);
-                        else if (Field is EbCardHtmlField)
-                            Card.FieldValues[Field.Name] = ds[i][Field.DbFieldMap.ColumnIndex].ToString().Trim();
-                        else if (Field is EbCardTextField)
-                            Card.FieldValues[Field.Name] = ds[i][Field.DbFieldMap.ColumnIndex].ToString().Trim();
-                        else if (Field is EbCardTitleField)
+                        else
                             Card.FieldValues[Field.Name] = ds[i][Field.DbFieldMap.ColumnIndex].ToString().Trim();
                     }
 
@@ -180,16 +174,15 @@ namespace ExpressBase.Objects
                 {
                     if (cardField.DbFieldMap != null)
                     {
-                        if (cardField is EbCardImageField)
-                            (cardField as EbCardImageField).FieldValue = card.FieldValues[cardField.Name].ToString();
-                        else if (cardField is EbCardNumericField)
-                            (cardField as EbCardNumericField).FieldValue = Convert.ToDouble(card.FieldValues[cardField.Name]);
-                        else if (cardField is EbCardHtmlField)
-                            (cardField as EbCardHtmlField).FieldValue = card.FieldValues[cardField.Name].ToString();
-                        else if (cardField is EbCardTextField)
-                            (cardField as EbCardTextField).FieldValue = card.FieldValues[cardField.Name].ToString();
-                        else if (cardField is EbCardTitleField)
-                            (cardField as EbCardTitleField).FieldValue = card.FieldValues[cardField.Name].ToString();
+                        cardField.FieldValue = card.FieldValues[cardField.Name].ToString();
+                        //    if (cardField is EbCardImageField)
+                        //        (cardField as EbCardImageField).FieldValue = card.FieldValues[cardField.Name].ToString();
+                        //    else if (cardField is EbCardNumericField)
+                        //        (cardField as EbCardNumericField).FieldValue = Convert.ToDouble(card.FieldValues[cardField.Name]);
+                        //    else if (cardField is EbCardHtmlField)
+                        //        (cardField as EbCardHtmlField).FieldValue = card.FieldValues[cardField.Name].ToString();
+                        //    else if (cardField is EbCardTextField)
+                        //        (cardField as EbCardTextField).FieldValue = card.FieldValues[cardField.Name].ToString();
                     }
                     html += cardField.GetBareHtml();
                 }
@@ -254,178 +247,180 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.BotForm)]
     //[HideInToolBox]
     public class EbCardSetParent : EbControlUI
-	{
-		public EbCardSetParent()
-		{
-			this.SelectedCards = new List<int>();
-			this.CardFields = new List<EbCardField>();
-		}
+    {
+        public EbCardSetParent()
+        {
+            this.SelectedCards = new List<int>();
+            this.CardFields = new List<EbCardField>();
+        }
 
-		[EnableInBuilder(BuilderType.BotForm)]
-		[PropertyEditor(PropertyEditorType.Collection)]
-		public List<EbCardField> CardFields { get; set; }
+        [EnableInBuilder(BuilderType.BotForm)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        public List<EbCardField> CardFields { get; set; }
 
-		public bool IsSummaryRequired { get; set; }//////////////////////////////////// need rethink
+        public bool IsSummaryRequired { get; set; }//////////////////////////////////// need rethink
 
-		[EnableInBuilder(BuilderType.BotForm)]
-		[PropertyEditor(PropertyEditorType.Boolean)]
-		[OnChangeExec(@"if(this.MultiSelect === true){pg.ShowProperty('SummaryTitle');}
+        [EnableInBuilder(BuilderType.BotForm)]
+        [PropertyEditor(PropertyEditorType.Boolean)]
+        [OnChangeExec(@"if(this.MultiSelect === true){pg.ShowProperty('SummaryTitle');}
 		else{pg.HideProperty('SummaryTitle');}")]
-		public bool MultiSelect { get; set; }
+        public bool MultiSelect { get; set; }
 
-		public List<int> SelectedCards { get; set; }
+        public List<int> SelectedCards { get; set; }
 
-		[EnableInBuilder(BuilderType.BotForm)]
-		public string SummaryTitle { get; set; }
-	}
+        [EnableInBuilder(BuilderType.BotForm)]
+        public string SummaryTitle { get; set; }
+    }
 
 
-	public sealed class MyDynObject : DynamicObject
-	{
-		private readonly Dictionary<string, object> _properties;
+    public sealed class MyDynObject : DynamicObject
+    {
+        private readonly Dictionary<string, object> _properties;
 
-		public MyDynObject()
-		{
-			_properties = new Dictionary<string, object>();
-		}
+        public MyDynObject()
+        {
+            _properties = new Dictionary<string, object>();
+        }
 
-		public MyDynObject(Dictionary<string, object> properties)
-		{
-			_properties = properties;
-		}
+        public MyDynObject(Dictionary<string, object> properties)
+        {
+            _properties = properties;
+        }
 
-		public object this[string propertyName]
-		{
-			get { return _properties[propertyName]; }
+        public object this[string propertyName]
+        {
+            get { return _properties[propertyName]; }
 
-			set { _properties[propertyName] = value; }
-		}
+            set { _properties[propertyName] = value; }
+        }
 
-		public override IEnumerable<string> GetDynamicMemberNames()
-		{
-			return _properties.Keys;
-		}
+        public override IEnumerable<string> GetDynamicMemberNames()
+        {
+            return _properties.Keys;
+        }
 
-		public override bool TryGetMember(GetMemberBinder binder, out object result)
-		{
-			if (_properties.ContainsKey(binder.Name))
-			{
-				result = _properties[binder.Name];
-				return true;
-			}
-			else
-			{
-				result = null;
-				return false;
-			}
-		}
+        public override bool TryGetMember(GetMemberBinder binder, out object result)
+        {
+            if (_properties.ContainsKey(binder.Name))
+            {
+                result = _properties[binder.Name];
+                return true;
+            }
+            else
+            {
+                result = null;
+                return false;
+            }
+        }
 
-		public override bool TrySetMember(SetMemberBinder binder, object value)
-		{
-			if (_properties.ContainsKey(binder.Name))
-			{
-				_properties[binder.Name] = value;
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-		}
-	}
+        public override bool TrySetMember(SetMemberBinder binder, object value)
+        {
+            if (_properties.ContainsKey(binder.Name))
+            {
+                _properties[binder.Name] = value;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
 
-	/// ////////////////////////////////
+    /// ////////////////////////////////
 
-	[EnableInBuilder(BuilderType.BotForm)]
+    [EnableInBuilder(BuilderType.BotForm)]
     [HideInToolBox]
-	public class EbCardParent : EbControl
-	{
-		public int CardId { get; set; }
+    public class EbCardParent : EbControl
+    {
+        public int CardId { get; set; }
 
-		public EbCardParent() { }
-	}
+        public EbCardParent() { }
+    }
 
-	[EnableInBuilder(BuilderType.BotForm)]
+    [EnableInBuilder(BuilderType.BotForm)]
     [HideInToolBox]
-	public abstract class EbCardField : EbControl
-	{
-		[EnableInBuilder(BuilderType.BotForm)]
-		[HideInPropertyGrid]
-		public ColumnColletion Columns { get; set; }
+    public abstract class EbCardField : EbControl
+    {
+        [EnableInBuilder(BuilderType.BotForm)]
+        [HideInPropertyGrid]
+        public ColumnColletion Columns { get; set; }
 
-		[EnableInBuilder(BuilderType.BotForm)]
-		[PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", 1)]
-		[OnChangeExec(@"console.log(100); if (this.Columns.$values.length === 0 ){pg.MakeReadOnly('DbFieldMap');} else {pg.MakeReadWrite('DbFieldMap');}")]
-		public EbDataColumn DbFieldMap { get; set; }
+        public virtual dynamic FieldValue { get; set; }
 
-		[EnableInBuilder(BuilderType.BotForm)]
-		public bool Summarize { get; set; }
+        [EnableInBuilder(BuilderType.BotForm)]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", 1)]
+        [OnChangeExec(@"console.log(100); if (this.Columns.$values.length === 0 ){pg.MakeReadOnly('DbFieldMap');} else {pg.MakeReadWrite('DbFieldMap');}")]
+        public EbDataColumn DbFieldMap { get; set; }
 
-		[EnableInBuilder(BuilderType.BotForm)]
-		public bool HideInCard { get; set; }
+        [EnableInBuilder(BuilderType.BotForm)]
+        public bool Summarize { get; set; }
 
-		[EnableInBuilder(BuilderType.BotForm)]
-		public bool Persist { get; set; }
+        [EnableInBuilder(BuilderType.BotForm)]
+        public bool HideInCard { get; set; }
 
-		[PropertyGroup("Appearance")]
-		[EnableInBuilder(BuilderType.BotForm)]
-		[PropertyEditor(PropertyEditorType.FontSelector)]
-		public EbFont Font { get; set; }
+        [EnableInBuilder(BuilderType.BotForm)]
+        public bool Persist { get; set; }
 
-		//[EnableInBuilder(BuilderType.BotForm)]
-		//[HideInPropertyGrid]
-		//public dynamic Value { get; set; }
-	}
+        [PropertyGroup("Appearance")]
+        [EnableInBuilder(BuilderType.BotForm)]
+        [PropertyEditor(PropertyEditorType.FontSelector)]
+        public EbFont Font { get; set; }
+
+        //[EnableInBuilder(BuilderType.BotForm)]
+        //[HideInPropertyGrid]
+        //public dynamic Value { get; set; }
+    }
 
 
-	[EnableInBuilder(BuilderType.BotForm)]
-	//[PropertyEditor(PropertyEditorType.xxx)]
-	[HideInToolBox]
-	public class EbCardImageField : EbCardField
-	{
-		[EnableInBuilder(BuilderType.BotForm)]
-		[PropertyEditor(PropertyEditorType.ImageSeletor)]
+    [EnableInBuilder(BuilderType.BotForm)]
+    //[PropertyEditor(PropertyEditorType.xxx)]
+    [HideInToolBox]
+    public class EbCardImageField : EbCardField
+    {
+        [EnableInBuilder(BuilderType.BotForm)]
+        [PropertyEditor(PropertyEditorType.ImageSeletor)]
         [Alias("ImageID")]
-		public string FieldValue { get; set; }
+        public override dynamic FieldValue { get; set; }
 
-		public EbCardImageField() { }
+        public EbCardImageField() { }
 
-		public override string GetDesignHtml()
-		{
-			return @"`<div><img class='card-img' src='../images/image.png' style='width: 100%; height: 200px; opacity: 0.2;'/></div>`";
-		}
+        public override string GetDesignHtml()
+        {
+            return @"`<div><img class='card-img' src='../images/image.png' style='width: 100%; height: 200px; opacity: 0.2;'/></div>`";
+        }
 
-		public override string GetBareHtml()
-		{
-			return @"<img class='card-img' src='@ImageID@'/>".Replace("@ImageID@", this.FieldValue.IsNullOrEmpty() ? "../images/image.png" : this.FieldValue);
-		}
-	}
+        public override string GetBareHtml()
+        {
+            return @"<img class='card-img' src='@ImageID@'/>".Replace("@ImageID@", this.FieldValue.IsNullOrEmpty() ? "../images/image.png" : this.FieldValue);
+        }
+    }
 
-	[EnableInBuilder(BuilderType.BotForm)]
-	[HideInToolBox]
-	public class EbCardHtmlField : EbCardField
-	{
-		[EnableInBuilder(BuilderType.BotForm)]
-		[PropertyEditor(PropertyEditorType.String)]
+    [EnableInBuilder(BuilderType.BotForm)]
+    [HideInToolBox]
+    public class EbCardHtmlField : EbCardField
+    {
+        [EnableInBuilder(BuilderType.BotForm)]
+        [PropertyEditor(PropertyEditorType.String)]
         [Alias("ContentHTML")]
-        public string FieldValue { get; set; }
+        public override dynamic FieldValue { get; set; }
 
-		public EbCardHtmlField() { }
+        public EbCardHtmlField() { }
 
-		public override string GetDesignHtml()
-		{
-			return @"`<div class='card-contenthtml-cont' style='padding:5px; text-align: center; width: 100%; min-height: 50px;'> HTML Content </div>`";
-		}
+        public override string GetDesignHtml()
+        {
+            return @"`<div class='card-contenthtml-cont' style='padding:5px; text-align: center; width: 100%; min-height: 50px;'> HTML Content </div>`";
+        }
 
-		public override string GetBareHtml()
-		{
-			return @"<div class='card-contenthtml-cont data-@Name@' style='padding:5px;'> @ContentHTML@ </div>".Replace("@ContentHTML@", this.FieldValue.IsNullOrEmpty() ? "" : this.FieldValue).Replace("@Name@", this.Name);
-		}
-	}
+        public override string GetBareHtml()
+        {
+            return @"<div class='card-contenthtml-cont data-@Name@' style='padding:5px;'> @ContentHTML@ </div>".Replace("@ContentHTML@", this.FieldValue.IsNullOrEmpty() ? "" : this.FieldValue).Replace("@Name@", this.Name);
+        }
+    }
 
-	[EnableInBuilder(BuilderType.BotForm)]
-	[HideInToolBox]
-	public class EbCardNumericField : EbCardField
+    [EnableInBuilder(BuilderType.BotForm)]
+    [HideInToolBox]
+    public class EbCardNumericField : EbCardField
     {
         [EnableInBuilder(BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.JS)]
@@ -433,88 +428,61 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.BotForm)]
         [Alias("Value")]
-        public  Double FieldValue { get; set; }
+        public override dynamic FieldValue { get; set; }
 
         [EnableInBuilder(BuilderType.BotForm)]
-		public bool Sum { get; set; }
+        public bool Sum { get; set; }
 
-		[EnableInBuilder(BuilderType.BotForm)]
-		public override bool ReadOnly { get; set; }
+        [EnableInBuilder(BuilderType.BotForm)]
+        public override bool ReadOnly { get; set; }
 
-		//[EnableInBuilder(BuilderType.BotForm)]
-		//public double Value { get; set; }
+        //[EnableInBuilder(BuilderType.BotForm)]
+        //public double Value { get; set; }
 
-		public EbCardNumericField() { }
+        public EbCardNumericField() { }
 
-		public override string GetDesignHtml()
-		{
-			return @"`<div class='card-numeric-cont'> <b>Numeric Field</b> <input type='number' value='1' style='text-align:center; width: 100%;' min='1' max='9999' step='1' readonly> </div>`";
-		}
+        public override string GetDesignHtml()
+        {
+            return @"`<div class='card-numeric-cont'> <b>Numeric Field</b> <input type='number' value='1' style='text-align:center; width: 100%;' min='1' max='9999' step='1' readonly> </div>`";
+        }
 
-		public override string GetBareHtml()
-		{
-			return @"<div class='card-numeric-cont data-@Name@' style='@display@'> <b>@Label@</b> <input type='number' value='@Value@' style='text-align:center; width: 100%;' min='1' max='9999' step='1' @ReadOnly@> </div>"
-					.Replace("@Value@", (this.FieldValue == null) ? "1" : this.FieldValue.ToString())
-					.Replace("@display@", this.HideInCard ? "display:none;" : "").Replace("@Name@", this.Name ?? "")
-					.Replace("@Label@", this.Label.IsNullOrEmpty() ? this.Name : this.Label).Replace("@ReadOnly@", this.ReadOnly ? "readonly" : "");
-		}
-	}
+        public override string GetBareHtml()
+        {
+            return @"<div class='card-numeric-cont data-@Name@' style='@display@'> <b>@Label@</b> <input type='number' value='@Value@' style='text-align:center; width: 100%;' min='1' max='9999' step='1' @ReadOnly@> </div>"
+                    .Replace("@Value@", (this.FieldValue == null) ? "1" : this.FieldValue.ToString())
+                    .Replace("@display@", this.HideInCard ? "display:none;" : "").Replace("@Name@", this.Name ?? "")
+                    .Replace("@Label@", this.Label.IsNullOrEmpty() ? this.Name : this.Label).Replace("@ReadOnly@", this.ReadOnly ? "readonly" : "");
+        }
+    }
 
-	[EnableInBuilder(BuilderType.BotForm)]
-	[HideInToolBox]
-	public class EbCardTextField : EbCardField
-	{
-		[EnableInBuilder(BuilderType.BotForm)]
+    [EnableInBuilder(BuilderType.BotForm)]
+    [HideInToolBox]
+    public class EbCardTextField : EbCardField
+    {
+        [EnableInBuilder(BuilderType.BotForm)]
         [Alias("Text")]
-        public string FieldValue { get; set; }
+        public override dynamic FieldValue { get; set; }
 
-		[EnableInBuilder(BuilderType.BotForm)]
-		[PropertyEditor(PropertyEditorType.JS)]
-		public string ValueExpression { get; set; }
+        [EnableInBuilder(BuilderType.BotForm)]
+        [PropertyEditor(PropertyEditorType.JS)]
+        public string ValueExpression { get; set; }
 
-		[EnableInBuilder(BuilderType.BotForm)]
-		public override bool ReadOnly { get; set; }
+        [EnableInBuilder(BuilderType.BotForm)]
+        public override bool ReadOnly { get; set; }
 
-		public EbCardTextField() { }
+        public EbCardTextField() { }
 
-		public override string GetDesignHtml()
-		{
-			return @"`<div class='card-text-cont'> <b>Text Field</b> <input type='text' value='Text' style='text-align:center; width:100%;' readonly> </div>`";
-		}
+        public override string GetDesignHtml()
+        {
+            return @"`<div class='card-text-cont'> <b>Text Field</b> <input type='text' value='Text' style='text-align:center; width:100%;' readonly> </div>`";
+        }
 
-		public override string GetBareHtml()
-		{
-			return @"<div class='card-text-cont data-@Name@' style='@display@'> <b>@Label@</b> <input type='text' value='@Text@' style='text-align:center; width:100%;' @ReadOnly@> </div>"
-					.Replace("@Text@", this.FieldValue.IsNullOrEmpty() ? "" : this.FieldValue)
-					.Replace("@display@", this.HideInCard ? "display:none;" : "").Replace("@Name@", this.Name ?? "")
-					.Replace("@Label@", this.Label.IsNullOrEmpty() ? this.Name : this.Label).Replace("@ReadOnly@", this.ReadOnly ? "readonly" : "");
-		}
-	}
-
-	[EnableInBuilder(BuilderType.BotForm)]
-	[HideInToolBox]
-	public class EbCardTitleField : EbCardField
-	{
-		[EnableInBuilder(BuilderType.BotForm)]
-		[PropertyEditor(PropertyEditorType.String)]
-        [Alias("Title")]
-		public string FieldValue { get; set; }
-
-		[EnableInBuilder(BuilderType.BotForm)]
-		[PropertyEditor(PropertyEditorType.JS)]
-		public string ValueExpression { get; set; }
-
-		public EbCardTitleField() { }
-
-		public override string GetDesignHtml()
-		{
-			return @"`<div class='card-title-cont' style='font-weight: 600; font-size: 20px; padding: 5px;'>Title Field</div>`";
-		}
-
-		public override string GetBareHtml()
-		{
-			return @"<div class='card-title-cont data-@Name@' style='font-weight: 600; font-size: 20px; padding: 5px;'> &nbsp @Text@ &nbsp <i class='fa fa-check' style='color: green;display: none;' aria-hidden='true'></i></div>"
-					.Replace("@Text@", this.FieldValue.IsNullOrEmpty() ? "" : this.FieldValue).Replace("@Name@", this.Name);
-		}
-	}
+        public override string GetBareHtml()
+        {
+            return @"<div class='card-text-cont data-@Name@' style='@display@'> <b>@Label@</b> <input type='text' value='@Text@' style='text-align:center; width:100%;' @ReadOnly@> </div>"
+                    .Replace("@Text@", this.FieldValue.IsNullOrEmpty() ? "" : this.FieldValue)
+                    .Replace("@display@", this.HideInCard ? "display:none;" : "").Replace("@Name@", this.Name ?? "")
+                    .Replace("@Label@", this.Label.IsNullOrEmpty() ? this.Name : this.Label).Replace("@ReadOnly@", this.ReadOnly ? "readonly" : "");
+        }
+    }
 }
