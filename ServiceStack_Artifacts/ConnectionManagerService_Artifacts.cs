@@ -40,6 +40,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class ChangeDataDBConnectionRequest : EbServiceStackRequest
     {
         public bool IsNew { get; set; }
+        public string SolutionId { get; set; }
         public EbDataDbConnection DataDBConnection { get; set; }
     }
 
@@ -47,6 +48,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         public bool IsNew { get; set; }
         public EbObjectsDbConnection ObjectsDBConnection { get; set; }
+        public string SolutionId { get; set; }
     }
 
     public class ChangeFilesDBConnectionRequest : EbServiceStackRequest
