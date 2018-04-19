@@ -185,7 +185,7 @@ namespace ExpressBase.Objects
 
             }
             html += "</div>@SummarizeHtml@@ButtonsString@</div>"
-                .Replace("@ButtonsString@", "Hard code button")
+                .Replace("@ButtonsString@", "<div class='cards-btn-cont> <button id='' class='btn btn-default'  data-toggle='tooltip' title='' style='width:100%;'>Submit</button></div>")
                 .Replace("@SummarizeHtml@", this.getCartHtml() ?? "");
             return html;
         }
@@ -232,7 +232,7 @@ namespace ExpressBase.Objects
                 //{
                 //    html += CardField.GetBareHtml();
                 //}
-                html += "<div class='card-btn-cont'>" + "NEED Hard coding" + "</div></div>";
+                html += "<div class='card-btn-cont'>" + " <button id='' class='btn btn-default'  data-toggle='tooltip' title='' style='width:100%;'>Select</button>" + "</div></div>";
                 return html;
             }
             return string.Empty;
@@ -448,13 +448,34 @@ namespace ExpressBase.Objects
             return @"`<div class='card-numeric-cont'> <b>Numeric Field</b> <input type='number' value='1' style='text-align:center; width: 100%;' min='1' max='9999' step='1' readonly> </div>`";
         }
 
-        public override string GetBareHtml()
-        {
-            return @"<div class='card-numeric-cont data-@Name@' style='@display@'> <b>@Label@</b> <input type='number' value='@Value@' style='text-align:center; width: 100%;' min='1' max='9999' step='1' @ReadOnly@> </div>"
-                    .Replace("@Value@", (this.FieldValue == null) ? "1" : this.FieldValue.ToString())
-                    .Replace("@display@", this.HideInCard ? "display:none;" : "").Replace("@Name@", this.Name ?? "")
-                    .Replace("@Label@", this.Label.IsNullOrEmpty() ? this.Name : this.Label).Replace("@ReadOnly@", this.ReadOnly ? "readonly" : "");
-        }
+        //public override string GetBareHtml()
+        //{
+        //    return @"<div class='card-numeric-cont data-@Name@' style='@display@'> <b>@Label@</b> <input type='number' value='@Value@' style='text-align:center; width: 100%;' min='1' max='9999' step='1' @ReadOnly@> </div>"
+        //            .Replace("@Value@", (this.FieldValue == null) ? "1" : this.FieldValue.ToString())
+        //            .Replace("@display@", this.HideInCard ? "display:none;" : "").Replace("@Name@", this.Name ?? "")
+        //            .Replace("@Label@", this.Label.IsNullOrEmpty() ? this.Name : this.Label).Replace("@ReadOnly@", this.ReadOnly ? "readonly" : "");
+        //}
+
+		public override string GetBareHtml()
+		{
+			return @"<div class='card-numeric-cont data-@Name@' style='@display@' data-value='@Value@'>
+						 <b>&nbsp &nbsp @Label@ &nbsp : </b> 
+						<button style='@PlusMinusDisplay@ padding: 0px; border: none; background-color: transparent; font-size: 14px;' onclick='var num = parseFloat($($(event.target).parent().next().children()[0]).val()); if(num > 1) {$($(event.target).parent().next().children()[0]).val(num - 1); $(event.target).parent().parent().attr(&quot;data-value&quot;, num - 1);}'>
+							<i class='fa fa-minus' aria-hidden='true' style=' padding: 5px; color: darkblue;'></i>
+						</button>
+						<div style='display:inline-block; border: 1px solid #eee;'>
+							<input class='removeArrows' type='number' style='text-align: center; border: none; background: transparent; min-width: 80px;' value='@Value@' min='1' max='9' @ReadOnly@  onchange='var mn=parseFloat($(event.target).attr(&quot;min&quot;));  var mx=parseFloat($(event.target).attr(&quot;max&quot;)); var va=parseFloat($(event.target).val()); if(va >= mn &amp;&amp; va <= mx){ $(event.target).parent().parent().attr(&quot;data-value&quot;, va);} else $(event.target).val(mn);'>
+						</div>
+						<button style='@PlusMinusDisplay@ padding: 0px; border: none; background-color: transparent; font-size: 14px;' onclick='var num = parseFloat($($(event.target).parent().prev().children()[0]).val()); if(num < 9) {$($(event.target).parent().prev().children()[0]).val(num + 1); $(event.target).parent().parent().attr(&quot;data-value&quot;, num + 1);}'>
+							<i class='fa fa-plus' aria-hidden='true' style=' padding: 5px; color: darkblue;'></i>
+						</button>
+					</div>"
+						.Replace("@Value@", (this.FieldValue == null) ? "1" : this.FieldValue.ToString())
+			            .Replace("@display@", this.HideInCard ? "display:none;" : "").Replace("@Name@", this.Name ?? "")
+			            .Replace("@Label@", this.Label.IsNullOrEmpty() ? this.Name : this.Label)
+						.Replace("@ReadOnly@", !this.ReadOnly ? "readonly" : "")//////////////////////////////////////!!!!!
+						/*.Replace("@PlusMinusDisplay@", this.ReadOnly? "display:none;" : "display:inline-block;")*/;
+		}
     }
 
     [EnableInBuilder(BuilderType.BotForm)]
@@ -483,10 +504,35 @@ namespace ExpressBase.Objects
 
         public override string GetBareHtml()
         {
-            return @"<div class='card-text-cont data-@Name@' style='@display@'> <b>@Label@</b> <input type='text' value='@Text@' style='text-align:center; width:100%;' @ReadOnly@> </div>"
-                    .Replace("@Text@", (this.FieldValue == null) ? "" : this.FieldValue)
+            return @"<div class='card-text-cont data-@Name@' style='@display@'> <b>&nbsp &nbsp @Label@ &nbsp : </b> <input type='text' value='@Text@' style='' @ReadOnly@> </div>"
+					.Replace("@Text@", (this.FieldValue == null) ? "" : this.FieldValue)
                     .Replace("@display@", this.HideInCard ? "display:none;" : "").Replace("@Name@", this.Name ?? "")
                     .Replace("@Label@", this.Label.IsNullOrEmpty() ? this.Name : this.Label).Replace("@ReadOnly@", this.ReadOnly ? "readonly" : "");
         }
     }
+
+	[EnableInBuilder(BuilderType.BotForm)]
+	[HideInToolBox]
+	public class EbCardTitleField : EbCardField
+	{
+		[EnableInBuilder(BuilderType.BotForm)]
+		[Alias("Text")]
+		[MetaOnly]
+		[PropertyEditor(PropertyEditorType.String)]
+		public override dynamic FieldValue { get; set; }
+		
+		public EbCardTitleField() { }
+
+		public override string GetDesignHtml()
+		{
+			return @"`<div class='card-title-cont' style='font-weight: 600; font-size: 20px; padding: 5px;'>Title Field</div>`";
+		}
+
+		public override string GetBareHtml()
+		{
+			return @"<div class='card-title-cont data-@Name@' style='font-weight: 600; font-size: 20px; padding: 5px;'> &nbsp @Text@ &nbsp <i class='fa fa-check' style='color: green;display: none;' aria-hidden='true'></i></div>"
+					.Replace("@Text@", (this.FieldValue == null)? "" : this.FieldValue).Replace("@Name@", this.Name);
+		}
+	}
+
 }

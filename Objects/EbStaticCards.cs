@@ -88,17 +88,16 @@ namespace ExpressBase.Objects
 			string html = @"<div id='@name@'><div class='cards-cont'>".Replace("@name@", this.Name ?? "@name@");
 			foreach (EbStaticCard card in CardCollection)
 			{
-				//html += Card.GetBareHtml();
 				html += @"<div id='@name@' class='card-cont' card-id='@cardid@' style='width:100%;'>".Replace("@name@", card.Name.Trim()).Replace("@cardid@", card.CardId.ToString());
 				foreach (EbCardField cardField in this.CardFields)
 				{				
 					cardField.FieldValue = card.CustomFields[cardField.Name];					
 					html += cardField.GetBareHtml();
 				}
-				html += "<div class='card-btn-cont'>Hard codel o</div></div>";
+				html += "<div class='card-btn-cont'><button id='' class='btn btn-default'  data-toggle='tooltip' title='' style='width:100%;'>Select</button></div></div>";
 			}
-			html += "</div>@SummarizeHtml@@ButtonsString@</div>"
-				.Replace("@ButtonsString@", "Hard code button")
+			html += "</div>@SummarizeHtml@  <div class='cards-btn-cont'> <button id='' class='btn btn-default'  data-toggle='tooltip' title='' style='width:100%; box-shadow: 0px 0px 20px #ccc; border-radius: 1.3em 1.3em 1.3em 1.3em;'> Submit </button> </div>   </div>"
+
 				.Replace("@SummarizeHtml@", this.getCartHtml() ?? "");
 			return html;
 		}
