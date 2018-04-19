@@ -1,4 +1,5 @@
-﻿using ExpressBase.Common.EbServiceStack.ReqNRes;
+﻿using ExpressBase.Common.Connections;
+using ExpressBase.Common.EbServiceStack.ReqNRes;
 using ServiceStack;
 using System;
 using System.Collections.Generic;
@@ -14,6 +15,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string dbName { get; set; }
         [DataMember(Order = 2)]
         public string ischange { get; set; }
+        [DataMember(Order = 3)]
+        public EbDataDbConnection DataDBConnection { get; set; }
+
     }
     [DataContract]
     public class EbDbCreateResponse : IEbSSResponse
