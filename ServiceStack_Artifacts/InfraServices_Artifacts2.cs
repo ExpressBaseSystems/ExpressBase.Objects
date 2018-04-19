@@ -364,6 +364,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     [DataContract]
     public class GetSolutioInfoRequest : IReturn<GetSolutioInfoResponse>, IEbSSRequest
     {
+        [DataMember(Order = 0)]
+        public string IsolutionId { get; set; }
+
         public string TenantAccountId { get; set; }
 
         public int UserId { get; set; }
