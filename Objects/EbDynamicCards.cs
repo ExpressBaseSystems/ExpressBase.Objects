@@ -14,7 +14,7 @@ using System.Runtime.Serialization;
 namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.BotForm)]
-    public class EbDynamicCardSet : EbCardSetParent
+	public class EbDynamicCardSet : EbCardSetParent
     {
         public EbDynamicCardSet()
         {
@@ -357,7 +357,7 @@ namespace ExpressBase.Objects
         public bool HideInCard { get; set; }
 
         [EnableInBuilder(BuilderType.BotForm)]
-        public bool Persist { get; set; }
+        public bool DoNotPersist { get; set; }
 
         [PropertyGroup("Appearance")]
         [EnableInBuilder(BuilderType.BotForm)]
@@ -399,7 +399,7 @@ namespace ExpressBase.Objects
     public class EbCardHtmlField : EbCardField
     {
         [EnableInBuilder(BuilderType.BotForm)]
-        [PropertyEditor(PropertyEditorType.String)]
+        //[PropertyEditor(PropertyEditorType.String)]
         [Alias("ContentHTML")]
 		[MetaOnly]
 		public override dynamic FieldValue { get; set; }
@@ -438,10 +438,15 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.BotForm)]
         public override bool ReadOnly { get; set; }
 
-        //[EnableInBuilder(BuilderType.BotForm)]
-        //public double Value { get; set; }
+		[EnableInBuilder(BuilderType.BotForm)]
+		[PropertyEditor(PropertyEditorType.Number)]
+		public int MinimumValue { get; set; }
 
-        public EbCardNumericField() { }
+		[EnableInBuilder(BuilderType.BotForm)]
+		[PropertyEditor(PropertyEditorType.Number)]
+		public int MaximumValue { get; set; }
+
+		public EbCardNumericField() { }
 
         public override string GetDesignHtml()
         {
@@ -459,22 +464,49 @@ namespace ExpressBase.Objects
 		public override string GetBareHtml()
 		{
 			return @"<div class='card-numeric-cont data-@Name@' style='@display@' data-value='@Value@'>
-						 <b>&nbsp &nbsp @Label@ &nbsp : </b> 
-						<button style='@PlusMinusDisplay@ padding: 0px; border: none; background-color: transparent; font-size: 14px;' onclick='var num = parseFloat($($(event.target).parent().next().children()[0]).val()); if(num > 1) {$($(event.target).parent().next().children()[0]).val(num - 1); $(event.target).parent().parent().attr(&quot;data-value&quot;, num - 1);}'>
-							<i class='fa fa-minus' aria-hidden='true' style=' padding: 5px; color: darkblue;'></i>
-						</button>
-						<div style='display:inline-block; border: 1px solid #eee;'>
-							<input class='removeArrows' type='number' style='text-align: center; border: none; background: transparent; min-width: 80px;' value='@Value@' min='1' max='9' @ReadOnly@  onchange='var mn=parseFloat($(event.target).attr(&quot;min&quot;));  var mx=parseFloat($(event.target).attr(&quot;max&quot;)); var va=parseFloat($(event.target).val()); if(va >= mn &amp;&amp; va <= mx){ $(event.target).parent().parent().attr(&quot;data-value&quot;, va);} else $(event.target).val(mn);'>
+						<div style='display: inline-block; width: 38%;'> <b> &nbsp &nbsp @Label@ </b> </div> 
+						<div style='display: inline-block; width: 58%;'>
+							<button style='@PlusMinusDisplay@ padding: 0px; border: none; background-color: transparent; font-size: 14px;' 
+										onclick='	var num = parseFloat($($(event.target).parent().next().children()[0]).val());
+													if(num > @MinValue@){
+														$($(event.target).parent().next().children()[0]).val(num - 1);
+														$(event.target).parents(&quot;.card-numeric-cont&quot;).attr(&quot;data-value&quot;, num - 1);
+													}
+							'>
+								<i class='fa fa-minus' aria-hidden='true' style=' padding: 5px; color: darkblue;'></i>
+							</button>
+							<div style='display:inline-block; border: 1px solid #eee;'>
+								<input class='removeArrows' type='number' style='text-align: center; border: none; background: transparent; min-width: 125px;' value='@Value@' min='@MinValue@' max='@MaxValue@' @ReadOnly@  
+										onchange='	var mn=parseFloat($(event.target).attr(&quot;min&quot;));
+													var mx=parseFloat($(event.target).attr(&quot;max&quot;));
+													var va=parseFloat($(event.target).val());
+													if(va >= mn &amp;&amp; va <= mx){
+														$(event.target).parents(&quot;.card-numeric-cont&quot;).attr(&quot;data-value&quot;, va);
+													}
+													else
+														$(event.target).val($(event.target).parents(&quot;.card-numeric-cont&quot;).attr(&quot;data-value&quot;));
+								'>
+							</div>
+							<button style='@PlusMinusDisplay@ padding: 0px; border: none; background-color: transparent; font-size: 14px;' 
+										onclick='	var num = parseFloat($($(event.target).parent().prev().children()[0]).val());
+													if(num < @MaxValue@) {
+														$($(event.target).parent().prev().children()[0]).val(num + 1);
+														$(event.target).parents(&quot;.card-numeric-cont&quot;).attr(&quot;data-value&quot;, num + 1);
+													}
+							'>
+								<i class='fa fa-plus' aria-hidden='true' style=' padding: 5px; color: darkblue;'></i>
+							</button>
 						</div>
-						<button style='@PlusMinusDisplay@ padding: 0px; border: none; background-color: transparent; font-size: 14px;' onclick='var num = parseFloat($($(event.target).parent().prev().children()[0]).val()); if(num < 9) {$($(event.target).parent().prev().children()[0]).val(num + 1); $(event.target).parent().parent().attr(&quot;data-value&quot;, num + 1);}'>
-							<i class='fa fa-plus' aria-hidden='true' style=' padding: 5px; color: darkblue;'></i>
-						</button>
 					</div>"
 						.Replace("@Value@", (this.FieldValue == null) ? "1" : this.FieldValue.ToString())
 			            .Replace("@display@", this.HideInCard ? "display:none;" : "").Replace("@Name@", this.Name ?? "")
 			            .Replace("@Label@", this.Label.IsNullOrEmpty() ? this.Name : this.Label)
-						.Replace("@ReadOnly@", !this.ReadOnly ? "readonly" : "")//////////////////////////////////////!!!!!
-						/*.Replace("@PlusMinusDisplay@", this.ReadOnly? "display:none;" : "display:inline-block;")*/;
+						.Replace("@ReadOnly@", this.ReadOnly ? "readonly" : "")
+						.Replace("@PlusMinusDisplay@", this.ReadOnly? "visibility: hidden;" : "display:inline-block;")
+						//.Replace("@MinValue@", this.MinimumValue.ToString())
+						//.Replace("@MaxValue@", this.MaximumValue.ToString());
+						.Replace("@MinValue@", this.MaximumValue.ToString())
+						.Replace("@MaxValue@", this.MinimumValue.ToString());
 		}
     }
 
@@ -485,7 +517,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.BotForm)]
         [Alias("Text")]
 		[MetaOnly]
-		[PropertyEditor(PropertyEditorType.String)]
+		//[PropertyEditor(PropertyEditorType.String)]
 		public override dynamic FieldValue { get; set; }
 
         [EnableInBuilder(BuilderType.BotForm)]
@@ -504,7 +536,9 @@ namespace ExpressBase.Objects
 
         public override string GetBareHtml()
         {
-            return @"<div class='card-text-cont data-@Name@' style='@display@'> <b>&nbsp &nbsp @Label@ &nbsp : </b> <input type='text' value='@Text@' style='' @ReadOnly@> </div>"
+            return @"<div class='card-text-cont data-@Name@' style='@display@'> 
+						<b>&nbsp &nbsp @Label@ &nbsp : </b> <div><input type='text' value='@Text@' style='' @ReadOnly@> </div>
+					</div>"
 					.Replace("@Text@", (this.FieldValue == null) ? "" : this.FieldValue)
                     .Replace("@display@", this.HideInCard ? "display:none;" : "").Replace("@Name@", this.Name ?? "")
                     .Replace("@Label@", this.Label.IsNullOrEmpty() ? this.Name : this.Label).Replace("@ReadOnly@", this.ReadOnly ? "readonly" : "");
@@ -516,9 +550,9 @@ namespace ExpressBase.Objects
 	public class EbCardTitleField : EbCardField
 	{
 		[EnableInBuilder(BuilderType.BotForm)]
-		[Alias("Text")]
+		[Alias("Title")]
 		[MetaOnly]
-		[PropertyEditor(PropertyEditorType.String)]
+		//[PropertyEditor(PropertyEditorType.String)]
 		public override dynamic FieldValue { get; set; }
 		
 		public EbCardTitleField() { }
