@@ -6,6 +6,7 @@ using ServiceStack;
 using ExpressBase.Common.Connections;
 using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
+using ExpressBase.Common;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
@@ -41,7 +42,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         public bool IsNew { get; set; }
         public string SolutionId { get; set; }
-        public EbDataDbConnection DataDBConnection { get; set; }
+        public EbDataDbConnection DataDBConnection { get; set; }   
+     
     }
 
     public class ChangeObjectsDBConnectionRequest : EbServiceStackRequest
