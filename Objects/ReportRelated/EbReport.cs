@@ -478,7 +478,8 @@ else {
                 SummaryList = PageSummaryFields[title];
                 foreach (var item in SummaryList)
                 {
-                    int tableIndex = Convert.ToInt32(title.Split('.')[0]);
+                    //int tableIndex = Convert.ToInt32(title.Split('.')[0]);
+                    int tableIndex = Convert.ToInt32(title.Substring(1, 1));
                     column_name = title.Split('.')[1];
                     column_val = GetFieldtData(column_name, i, tableIndex);
                     (item as IEbDataFieldSummary).Summarize(column_val);
@@ -489,7 +490,8 @@ else {
                 SummaryList = ReportSummaryFields[title];
                 foreach (var item in SummaryList)
                 {
-                    int tableIndex = Convert.ToInt32(title.Split('.')[0]);
+                    //int tableIndex = Convert.ToInt32(title.Split('.')[0]);
+                    int tableIndex = Convert.ToInt32(title.Substring(1, 1));
                     column_name = title.Split('.')[1];
                     column_val = GetFieldtData(column_name, i,tableIndex);
                     (item as IEbDataFieldSummary).Summarize(column_val);
