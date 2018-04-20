@@ -1,4 +1,5 @@
-﻿using ExpressBase.Common.Connections;
+﻿using ExpressBase.Common;
+using ExpressBase.Common.Connections;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
 using ServiceStack;
 using System;
@@ -14,9 +15,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 1)]
         public string dbName { get; set; }
         [DataMember(Order = 2)]
-        public string ischange { get; set; }
+        public bool ischange { get; set; }
         [DataMember(Order = 3)]
         public EbDataDbConnection DataDBConnection { get; set; }
+        [DataMember(Order = 4)]
+        public IDatabase Idbcon { get; set; }
+
+
 
     }
     [DataContract]
