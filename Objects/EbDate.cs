@@ -152,7 +152,7 @@ $('#@id').datetimepicker({
             return @" 
         <div class='input-group' style='width:100%;'>
             <input id='@name@' data-ebtype='@datetype@'  data-toggle='tooltip' title='@toolTipText@' class='date' type='text'name='@name@' autocomplete = '@autoComplete@' @value@ @tabIndex@ style='width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@ @readOnlyString@ @required@ @placeHolder@ />
-            <span class='input-group-addon' onclick=\""$('#@name@').focus().focus()\""> <i id='@name@TglBtn' class='fa  @atchdLbl@' aria-hidden='true'></i> </span>
+            <span class='input-group-addon' style='padding: 0px;'> <i id='@name@TglBtn' class='fa  @atchdLbl@' aria-hidden='true' style='padding: 6px 12px;'></i> </span>
         </div>"
 .Replace("@name@", this.Name)
 .Replace("@datetype@", "6")//( (int)this.EbDateType ).ToString())
