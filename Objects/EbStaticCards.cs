@@ -107,18 +107,19 @@ namespace ExpressBase.Objects
             this.IsSummaryRequired = false;
             int tcols = 1;
             string html = @"<div class='card-summary-cont'><div style='font-size: 15px; padding:5px 5px 0px 5px; text-align:center;'><b> @Summary@ </b></div>
-							<table class='table card-summary-table'>
+							<table class='table card-summary-table' style='table-layout: fixed;'>
 								<thead style='font-size:12px;'><tr>".Replace("@Summary@", this.SummaryTitle.IsNullOrEmpty() ? "Summary" : this.SummaryTitle);
             foreach (EbCardField F in this.CardFields)
             {
                 if (F.Summarize)
                 {
-                    html += "<th>" + F.Name + "</th>";
-                    this.IsSummaryRequired = true;
+					string colStyle = ((F.SummarizeColumnWidth > 0) ? "width: " + F.SummarizeColumnWidth + "%;" : "") + " white-space: nowrap; overflow: hidden; text-overflow: ellipsis;";
+					html += "<th style='" + colStyle + "'>" + F.Name + "</th>";
+					this.IsSummaryRequired = true;
                     tcols++;
                 }
             }
-            html += @"<th></th></tr></thead><tbody style='font-size:12px;'>  <tr><td style='text-align:center;' colspan=" + tcols + "><i> Nothing to Display </i></td></tr>  </tbody></table></div>";
+            html += @"<th style='width: 26px;'></th></tr></thead><tbody style='font-size:12px;'>  <tr><td style='text-align:center;' colspan=" + tcols + "><i> Nothing to Display </i></td></tr>  </tbody></table></div>";
             if (this.IsSummaryRequired)
                 return html;
             else

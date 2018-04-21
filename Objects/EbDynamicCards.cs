@@ -195,18 +195,19 @@ namespace ExpressBase.Objects
             this.IsSummaryRequired = false;
             int tcols = 1;
             string html = @"<div class='card-summary-cont'><div style='font-size: 15px; padding:5px 5px 0px 5px; text-align:center;'><b> @Summary@ </b></div>
-							<table class='table card-summary-table'>
+							<table class='table card-summary-table' style='table-layout: fixed;'>
 								<thead style='font-size:12px;'><tr>".Replace("@Summary@", this.SummaryTitle.IsNullOrEmpty() ? "Summary" : this.SummaryTitle);
             foreach (EbCardField F in this.CardFields)
             {
                 if (F.Summarize)
                 {
-                    html += "<th>" + F.Name + "</th>";
+					string colStyle = ((F.SummarizeColumnWidth > 0) ? "width: " + F.SummarizeColumnWidth + "%;" : "") + " white-space: nowrap; overflow: hidden; text-overflow: ellipsis;";
+					html += "<th style='" + colStyle + "'>" + F.Name + "</th>";
                     this.IsSummaryRequired = true;
                     tcols++;
                 }
             }
-            html += @"<th></th></tr></thead><tbody style='font-size:12px;'>  <tr><td style='text-align:center;' colspan=" + tcols + "><i> Nothing to Display </i></td></tr>  </tbody></table></div>";
+            html += @"<th style='width: 26px;'></th></tr></thead><tbody style='font-size:12px;'>  <tr><td style='text-align:center;' colspan=" + tcols + "><i> Nothing to Display </i></td></tr>  </tbody></table></div>";
             if (this.IsSummaryRequired)
                 return html;
             else
@@ -353,7 +354,10 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.BotForm)]
         public bool Summarize { get; set; }
 
-        [EnableInBuilder(BuilderType.BotForm)]
+		[EnableInBuilder(BuilderType.BotForm)]
+		public int SummarizeColumnWidth { get; set; }
+
+		[EnableInBuilder(BuilderType.BotForm)]
         public bool HideInCard { get; set; }
 
         [EnableInBuilder(BuilderType.BotForm)]
@@ -463,6 +467,7 @@ namespace ExpressBase.Objects
 
 		public override string GetBareHtml()
 		{
+			//Console.WriteLine(this.FieldValue.ToString() + "----" + this.FieldValue.GetType().ToString());
 			return @"<div class='card-numeric-cont data-@Name@' style='@display@' data-value='@Value@'>
 						<div style='display: inline-block; width: 38%;'> <b> &nbsp &nbsp @Label@ </b> </div> 
 						<div style='display: inline-block; width: 58%;'>
@@ -506,7 +511,7 @@ namespace ExpressBase.Objects
 						//.Replace("@MinValue@", this.MinimumValue.ToString())
 						//.Replace("@MaxValue@", this.MaximumValue.ToString());
 						.Replace("@MinValue@", this.MaximumValue.ToString())
-						.Replace("@MaxValue@", this.MinimumValue.ToString());
+						.Replace("@MaxValue@", this.MinimumValue.ToString());			
 		}
     }
 
@@ -517,14 +522,14 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.BotForm)]
         [Alias("Text")]
 		[MetaOnly]
-		//[PropertyEditor(PropertyEditorType.String)]
+		[PropertyEditor(PropertyEditorType.String)]
 		public override dynamic FieldValue { get; set; }
 
         [EnableInBuilder(BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.JS)]
         public string ValueExpression { get; set; }
-
-        [EnableInBuilder(BuilderType.BotForm)]
+		
+		[EnableInBuilder(BuilderType.BotForm)]
         public override bool ReadOnly { get; set; }
 
         public EbCardTextField() { }

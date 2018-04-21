@@ -219,6 +219,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public int Id { get; set; }
 
 		[DataMember(Order = 2)]
+		public int RqstMode { get; set; }
+
+		[DataMember(Order = 2)]
 		public string TenantAccountId { get; set; }
 
 		public int UserId { get; set; }
