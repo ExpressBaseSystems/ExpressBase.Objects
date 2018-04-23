@@ -244,27 +244,18 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     }
 
-    public class AutoGenEbIdRequest
+    public class AutoGenSidRequest
     {
-        [DataMember(Order = 1)]
-        public string TenantAccountId { get; set; }
-
-        [DataMember(Order = 2)]
-        public string WhichId { get; set; }
-
-        public int UserId { get; set; }
+        
     }
 
     [DataContract]
-    public class AutoGenEbIdResponse : IEbSSResponse
+    public class AutoGenSidResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
         public string Sid { get; set; }
-
+        
         [DataMember(Order = 2)]
-        public string AppId { get; set; }
-
-        [DataMember(Order = 3)]
         public ResponseStatus ResponseStatus { get; set; }
     }
 
@@ -302,38 +293,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     }
 
-    [DataContract]
-    public class CreateApplicationRequest : IReturn<CreateApplicationResponse>, IEbSSRequest
-    {
-        [DataMember(Order = 0)]
-        public Dictionary<string, object> Colvalues { get; set; }
-
-        [DataMember(Order = 2)]
-        public int Id { get; set; }
-
-        public string TenantAccountId { get; set; }
-
-        public int UserId { get; set; }
-
-        public string Token { get; set; }
-
-        [DataMember(Order = 3)]
-        public int appid { get; set; }
-    }
-
-    [DataContract]
-    public class CreateApplicationResponse : IEbSSResponse
-    {
-        [DataMember(Order = 1)]
-        public int id { get; set; }
-
-        [DataMember(Order = 2)]
-        public string Token { get; set; }
-
-        [DataMember(Order = 3)]
-        public ResponseStatus ResponseStatus { get; set; }
-
-    }
     [DataContract]
     public class GetSolutionRequest : IReturn<GetSolutionResponse>, IEbSSRequest
     {
