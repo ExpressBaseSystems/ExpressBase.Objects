@@ -63,7 +63,7 @@ namespace ExpressBase.Objects
 
         public override string GetBareHtml()
         {
-            string html = "<div id='@name@' name='@name@' type='RadioGroup'>";
+            string html = "<div id='@name@' data-ebtype='@data-ebtype@' name='@name@' type='RadioGroup'>";
               foreach (EbRadioOption ec in this.Options)
             {
                 ec.GName = this.Name;
@@ -71,7 +71,8 @@ namespace ExpressBase.Objects
             }
             html += "</div>";
             return html
-.Replace("@name@", (this.Name != null) ? this.Name : "@name@");
+.Replace("@name@", (this.Name != null) ? this.Name : "@name@")
+.Replace("@data-ebtype@", "3");
         }
 
         public override string GetDesignHtml()
@@ -92,7 +93,7 @@ namespace ExpressBase.Objects
             </div>"
 .Replace("@barehtml@", this.GetBareHtml())
 .Replace("@name@", (this.Name != null) ? this.Name : "@name@")
-.Replace("@label@", this.Label)
+.Replace("@Label@", this.Label)
 .Replace("@LabelForeColor ", "color:" + ((this.LabelForeColor != null) ? this.LabelForeColor : "@LabelForeColor ") + ";")
 .Replace("@LabelBackColor ", "background-color:" + ((this.LabelBackColor != null) ? this.LabelBackColor : "@LabelBackColor ") + ";")
 .Replace("@BackColor ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor ") + ";"));

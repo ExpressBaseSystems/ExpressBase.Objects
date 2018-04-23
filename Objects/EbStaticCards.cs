@@ -37,6 +37,10 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.String)]
         public string StringEditor { get; set; }
 
+        [EnableInBuilder(BuilderType.BotForm)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
+        public string V_CSEditor { get; set; }
+
         public override bool isFullViewContol { get => true; set => base.isFullViewContol = value; }
 
         public override string GetToolHtml()
