@@ -92,7 +92,7 @@ namespace ExpressBase.Objects
             </div>"
 .Replace("@barehtml@", this.GetBareHtml())
 .Replace("@name@", (this.Name != null) ? this.Name : "@name@")
-.Replace("@label@", this.Label)
+.Replace("@Label@", this.Label)
 .Replace("@LabelForeColor ", "color:" + ((this.LabelForeColor != null) ? this.LabelForeColor : "@LabelForeColor ") + ";")
 .Replace("@LabelBackColor ", "background-color:" + ((this.LabelBackColor != null) ? this.LabelBackColor : "@LabelBackColor ") + ";")
 .Replace("@BackColor ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor ") + ";"));
