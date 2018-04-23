@@ -363,14 +363,10 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.BotForm)]
         public bool DoNotPersist { get; set; }
 
-        [PropertyGroup("Appearance")]
-        [EnableInBuilder(BuilderType.BotForm)]
-        [PropertyEditor(PropertyEditorType.FontSelector)]
-        public EbFont Font { get; set; }
-
+        //[PropertyGroup("Appearance")]
         //[EnableInBuilder(BuilderType.BotForm)]
-        //[HideInPropertyGrid]
-        //public dynamic Value { get; set; }
+        //[PropertyEditor(PropertyEditorType.FontSelector)]
+        //public EbFont Font { get; set; }
     }
 
 
@@ -467,6 +463,11 @@ namespace ExpressBase.Objects
 
 		public override string GetBareHtml()
 		{
+			dynamic tempvar;
+			if (this.FieldValue is String)
+				tempvar = Convert.ToDouble(this.FieldValue);
+			else
+				tempvar = this.FieldValue;
 			//Console.WriteLine(this.FieldValue.ToString() + "----" + this.FieldValue.GetType().ToString());
 			return @"<div class='card-numeric-cont data-@Name@' style='@display@' data-value='@Value@'>
 						<div style='display: inline-block; width: 38%;'> <b> &nbsp &nbsp @Label@ </b> </div> 
@@ -503,7 +504,7 @@ namespace ExpressBase.Objects
 							</button>
 						</div>
 					</div>"
-						.Replace("@Value@", (this.FieldValue == null) ? "1" : this.FieldValue.ToString())
+						.Replace("@Value@", (this.FieldValue == null) ? "1" : ((tempvar is Double)?tempvar.ToString("0.00") : tempvar.ToString()))
 			            .Replace("@display@", this.HideInCard ? "display:none;" : "").Replace("@Name@", this.Name ?? "")
 			            .Replace("@Label@", this.Label.IsNullOrEmpty() ? this.Name : this.Label)
 						.Replace("@ReadOnly@", this.ReadOnly ? "readonly" : "")
