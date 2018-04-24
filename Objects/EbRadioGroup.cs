@@ -63,7 +63,7 @@ namespace ExpressBase.Objects
 
         public override string GetBareHtml()
         {
-            string html = "<div id='@name@' data-ebtype='@data-ebtype@' name='@name@' type='RadioGroup'>";
+            string html = "<div id='@name@' data-ebtype='@data-ebtype@' name='@name@' style='padding:5px' type='RadioGroup'>";
               foreach (EbRadioOption ec in this.Options)
             {
                 ec.GName = this.Name;
@@ -87,13 +87,14 @@ namespace ExpressBase.Objects
             string html = @"
             <div id='cont_@name@' class='Eb-ctrlContainer' Ctype='RadioGroup'>
                 <div class='radiog-cont'  style='@BackColor '>
-                 <span id='@name@Lbl' style='@LabelBackColor @LabelForeColor '> @Label@  </span>
+                 <div id='@name@Lbl' class='radiog-label' style='@LabelBackColor @LabelForeColor '> @Label@  </div>
                         @barehtml@
-                <span class='helpText'> @HelpText </span></div>
+                <span class='helpText'> @HelpText@ </span></div>
             </div>"
 .Replace("@barehtml@", this.GetBareHtml())
 .Replace("@name@", (this.Name != null) ? this.Name : "@name@")
 .Replace("@Label@", this.Label)
+.Replace("@HelpText@", this.HelpText ?? "")
 .Replace("@LabelForeColor ", "color:" + ((this.LabelForeColor != null) ? this.LabelForeColor : "@LabelForeColor ") + ";")
 .Replace("@LabelBackColor ", "background-color:" + ((this.LabelBackColor != null) ? this.LabelBackColor : "@LabelBackColor ") + ";")
 .Replace("@BackColor ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor ") + ";"));
