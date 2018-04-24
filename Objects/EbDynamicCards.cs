@@ -102,6 +102,11 @@ namespace ExpressBase.Objects
             return @"this.Init = function(id)
 					{
 						//this.CardCollection.$values.push(new EbObjects.EbCard(id + '_EbCard0'));
+						this.CardFields.$values.push(new EbObjects.EbCardImageField(id + '_EbCardImageField0'));
+						this.CardFields.$values.push(new EbObjects.EbCardTitleField(id + '_EbCardTitleField0'));
+						this.CardFields.$values.push(new EbObjects.EbCardHtmlField(id + '_EbCardHtmlField0'));
+						this.CardFields.$values.push(new EbObjects.EbCardNumericField(id + '_EbCardNumericField0'));
+						this.CardFields.$values.push(new EbObjects.EbCardTextField(id + '_EbCardTextField0'));
 					};";
         }
 
@@ -130,10 +135,10 @@ namespace ExpressBase.Objects
         public override string GetDesignHtml()
         {
             return @"`<div id=@id><div class='cards-cont'>
-						<div class='card-cont' style='width: 100%; min-height: 100px; box-shadow: 0px 0px 20px #ccc; border-radius: 1.3em 1.3em 0 0;'>
+						<div class='card-cont' style='width: 100%; min-height: 100px; box-shadow: 0px 0px 20px #ccc; border-radius: 1.3em;'>
 							<div class='card-btn-cont'><button class='btn btn-default' style='width:100%;' disabled>Select</button></div>
 						</div>
-						<div class='card-summary-cont' style='box-shadow: 0px 0px 20px #ccc; border-radius: 0 0 1.3em 1.3em; margin: 5px -4px 0 6px;'><div style='font-size: 15px; padding:5px 5px 0px 5px; text-align:center;'><b> Summary </b></div>
+						<div class='card-summary-cont' style='box-shadow: 0px 0px 20px #ccc; border-radius: 0; margin: 20px -4px 0 6px;'><div style='font-size: 15px; padding:5px 5px 0px 5px; text-align:center;'><b> Summary </b></div>
 							<table class='table card-summary-table'>
 								<thead style='font-size:12px;'>
 									<tr>
@@ -453,7 +458,20 @@ namespace ExpressBase.Objects
 
         public override string GetDesignHtml()
         {
-            return @"`<div class='card-numeric-cont'> <b>Numeric Field</b> <input type='number' value='1' style='text-align:center; width: 100%;' min='1' max='9999' step='1' readonly> </div>`";
+            return @"`<div class='card-numeric-cont data-@Name@' style='@display@' data-value='@Value@'>
+						<div style='display: inline-block; width: 38%;'> <b> &nbsp&nbsp Numeric Field </b> </div> 
+						<div style='display: inline-block; width: 58%;'>
+							<button style='padding: 0px; border: none; background-color: transparent; font-size: 14px;' disabled>
+								<i class='fa fa-minus' aria-hidden='true' style=' padding: 5px; color: darkblue;'></i>
+							</button>
+							<div style='display:inline-block; border: 1px solid #eee;'>
+								<input class='removeArrows' type='number' style='text-align: center; border: none; background: transparent; width: 120px;' value='12345' readonly>
+							</div>
+							<button style='padding: 0px; border: none; background-color: transparent; font-size: 14px;' disabled>
+								<i class='fa fa-plus' aria-hidden='true' style=' padding: 5px; color: darkblue;'></i>
+							</button>
+						</div>
+					</div>`";
         }
 
         //public override string GetBareHtml()
@@ -484,7 +502,7 @@ namespace ExpressBase.Objects
 							'>
 								<i class='fa fa-minus' aria-hidden='true' style=' padding: 5px; color: darkblue;'></i>
 							</button>
-							<div style='display:inline-block; border: 1px solid #eee;'>
+							<div style='display:inline-block; @DivBorder@'>
 								<input class='removeArrows' type='number' style='text-align: center; border: none; background: transparent; min-width: 125px;' value='@Value@' min='@MinValue@' max='@MaxValue@' @ReadOnly@  
 										onchange='	var mn=parseFloat($(event.target).attr(&quot;min&quot;));
 													var mx=parseFloat($(event.target).attr(&quot;max&quot;));
@@ -512,6 +530,7 @@ namespace ExpressBase.Objects
 			            .Replace("@Label@", this.Label.IsNullOrEmpty() ? this.Name : this.Label)
 						.Replace("@ReadOnly@", this.ReadOnly ? "readonly" : "")
 						.Replace("@PlusMinusDisplay@", this.ReadOnly? "visibility: hidden;" : "display:inline-block;")
+						.Replace("@DivBorder@", this.ReadOnly? "": "border: 1px solid #eee;")
 						//.Replace("@MinValue@", this.MinimumValue.ToString())
 						//.Replace("@MaxValue@", this.MaximumValue.ToString());
 						.Replace("@MinValue@", this.MaximumValue.ToString())
@@ -541,13 +560,25 @@ namespace ExpressBase.Objects
 
         public override string GetDesignHtml()
         {
-            return @"`<div class='card-text-cont'> <b>Text Field</b> <input type='text' value='Text' style='text-align:center; width:100%;' readonly> </div>`";
+            return @"`<div class='card-text-cont'>
+						<div style='display: inline-block; width: 38%;'> 
+							<b>&nbsp&nbsp Text Field </b>  
+						</div>
+						<div style='display: inline-block; width: 58%;'>
+							<input type='text' value='@Text@' style='text-align: center;' readonly> 
+						</div>
+					</div>`";
         }
 
         public override string GetBareHtml()
         {
-            return @"<div class='card-text-cont data-@Name@' style='@display@'> 
-						<b>&nbsp &nbsp @Label@ &nbsp : </b> <div><input type='text' value='@Text@' style='' @ReadOnly@> </div>
+            return @"<div class='card-text-cont data-@Name@' style='@display@'>
+						<div style='display: inline-block; width: 38%;'> 
+							<b>&nbsp&nbsp @Label@ </b>  
+						</div>
+						<div style='display: inline-block; width: 58%;'>
+							<input type='text' value='@Text@' style='text-align: center;' @ReadOnly@> 
+						</div>
 					</div>"
 					.Replace("@Text@", (this.FieldValue == null) ? "" : this.FieldValue)
                     .Replace("@display@", this.HideInCard ? "display:none;" : "").Replace("@Name@", this.Name ?? "")
@@ -570,7 +601,7 @@ namespace ExpressBase.Objects
 
 		public override string GetDesignHtml()
 		{
-			return @"`<div class='card-title-cont' style='font-weight: 600; font-size: 20px; padding: 5px;'>Title Field</div>`";
+			return @"`<div class='card-title-cont' style='font-weight: 600; font-size: 20px; padding: 5px;'>&nbsp&nbspTitle Field</div>`";
 		}
 
 		public override string GetBareHtml()

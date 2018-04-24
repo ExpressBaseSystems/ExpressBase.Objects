@@ -53,16 +53,21 @@ namespace ExpressBase.Objects
             return @"this.Init = function(id)
 					{
 						//this.CardCollection.$values.push(new EbObjects.EbCard(id + '_EbCard0'));
+						this.CardFields.$values.push(new EbObjects.EbCardImageField(id + '_EbCardImageField0'));
+						this.CardFields.$values.push(new EbObjects.EbCardTitleField(id + '_EbCardTitleField0'));
+						this.CardFields.$values.push(new EbObjects.EbCardHtmlField(id + '_EbCardHtmlField0'));
+						this.CardFields.$values.push(new EbObjects.EbCardNumericField(id + '_EbCardNumericField0'));
+						this.CardFields.$values.push(new EbObjects.EbCardTextField(id + '_EbCardTextField0'));
 					};";
         }
 
         public override string GetDesignHtml()
         {
             return @"`<div id=@id><div class='cards-cont'>
-						<div class='card-cont' style='width: 100%; min-height: 100px; box-shadow: 0px 0px 20px #ccc; border-radius: 1.3em 1.3em 0 0;'>
+						<div class='card-cont' style='width: 100%; min-height: 100px; box-shadow: 0px 0px 20px #ccc; border-radius: 1.3em;'>
 							<div class='card-btn-cont'><button class='btn btn-default' style='width:100%;' disabled>Select</button></div>
 						</div>
-						<div class='card-summary-cont' style='box-shadow: 0px 0px 20px #ccc; border-radius: 0 0 1.3em 1.3em; margin: 5px -4px 0 6px;'><div style='font-size: 15px; padding:5px 5px 0px 5px; text-align:center;'><b> Summary </b></div>
+						<div class='card-summary-cont' style='box-shadow: 0px 0px 20px #ccc; border-radius: 0; margin: 20px -4px 0 6px;'><div style='font-size: 15px; padding:5px 5px 0px 5px; text-align:center;'><b> Summary </b></div>
 							<table class='table card-summary-table'>
 								<thead style='font-size:12px;'>
 									<tr>
