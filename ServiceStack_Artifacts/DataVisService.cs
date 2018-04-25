@@ -138,6 +138,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 11)]
         public List<TFilters> TFilters { get; set; }
+
+        [DataMember(Order = 10)]
+        public bool Ispaging { get; set; }
     }
 
     [Route("/table")]

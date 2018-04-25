@@ -96,6 +96,9 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.DVBuilder)]
         public string IsPaged { get; set; }
+        
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public bool IsPaging { get; set; }
 
         public override void AfterRedisGet(RedisClient Redis)
         {
