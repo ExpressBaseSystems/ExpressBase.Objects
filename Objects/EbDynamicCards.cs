@@ -378,6 +378,7 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.BotForm)]
     //[PropertyEditor(PropertyEditorType.xxx)]
     [HideInToolBox]
+    [Alias("Image")]
     public class EbCardImageField : EbCardField
     {
         [EnableInBuilder(BuilderType.BotForm)]
@@ -401,6 +402,7 @@ namespace ExpressBase.Objects
 
     [EnableInBuilder(BuilderType.BotForm)]
     [HideInToolBox]
+    [Alias("Html")]
     public class EbCardHtmlField : EbCardField
     {
         [EnableInBuilder(BuilderType.BotForm)]
@@ -424,6 +426,7 @@ namespace ExpressBase.Objects
 
     [EnableInBuilder(BuilderType.BotForm)]
     [HideInToolBox]
+    [Alias("Numeric")]
     public class EbCardNumericField : EbCardField
     {
 
@@ -537,6 +540,7 @@ namespace ExpressBase.Objects
 
     [EnableInBuilder(BuilderType.BotForm)]
     [HideInToolBox]
+    [Alias("Text")]
     public class EbCardTextField : EbCardField
     {
         [EnableInBuilder(BuilderType.BotForm)]
@@ -584,7 +588,8 @@ namespace ExpressBase.Objects
 
 	[EnableInBuilder(BuilderType.BotForm)]
 	[HideInToolBox]
-	public class EbCardTitleField : EbCardField
+    [Alias("Title")]
+    public class EbCardTitleField : EbCardField
 	{
 		[EnableInBuilder(BuilderType.BotForm)]
 		[Alias("Title")]
