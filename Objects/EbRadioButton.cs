@@ -1,4 +1,5 @@
-﻿using ExpressBase.Common.Extensions;
+﻿
+using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using System;
@@ -10,7 +11,7 @@ namespace ExpressBase.Objects.Objects
 {
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
     class EbRadioButton : EbControlUI
-	{
+    {
         public EbRadioButton() { }
 
         [OnDeserialized]

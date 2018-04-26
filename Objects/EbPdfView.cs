@@ -1,4 +1,5 @@
-﻿using ExpressBase.Common;
+﻿
+using ExpressBase.Common;
 using ExpressBase.Common.Data;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
@@ -45,8 +46,9 @@ namespace ExpressBase.Objects
 
         public override string GetBareHtml()
         {
-            return @" 
+            return @"
         <div class='ebimg-cont' style='width:100%;'>
+            <div class='pdf-extbtn' onclick=""window.open($(this).next().attr('src'))""><i class='fa fa-external-link'></i></div>
             <iframe class='pdf-frame' id='@name@' src='@src@'  style='width:100%;'></iframe>
         </div>"
 .Replace("@name@", this.Name)
