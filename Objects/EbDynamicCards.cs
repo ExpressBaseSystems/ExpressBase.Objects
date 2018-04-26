@@ -368,11 +368,15 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.BotForm)]
         public bool DoNotPersist { get; set; }
 
-        //[PropertyGroup("Appearance")]
-        //[EnableInBuilder(BuilderType.BotForm)]
-        //[PropertyEditor(PropertyEditorType.FontSelector)]
-        //public EbFont Font { get; set; }
-    }
+		[EnableInBuilder(BuilderType.BotForm)]
+		[HideInPropertyGrid]
+		public virtual EbDbTypes EbDbType { get; set; }
+
+		//[PropertyGroup("Appearance")]
+		//[EnableInBuilder(BuilderType.BotForm)]
+		//[PropertyEditor(PropertyEditorType.FontSelector)]
+		//public EbFont Font { get; set; }
+	}
 
 
     [EnableInBuilder(BuilderType.BotForm)]
@@ -387,7 +391,11 @@ namespace ExpressBase.Objects
 		[MetaOnly]
 		public override dynamic FieldValue { get; set; }
 
-        public EbCardImageField() { }
+		[EnableInBuilder(BuilderType.BotForm)]
+		[HideInPropertyGrid]
+		public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
+
+		public EbCardImageField() { }
 
         public override string GetDesignHtml()
         {
@@ -411,7 +419,11 @@ namespace ExpressBase.Objects
 		[MetaOnly]
 		public override dynamic FieldValue { get; set; }
 
-        public EbCardHtmlField() { }
+		[EnableInBuilder(BuilderType.BotForm)]
+		[HideInPropertyGrid]
+		public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
+
+		public EbCardHtmlField() { }
 
         public override string GetDesignHtml()
         {
@@ -453,6 +465,10 @@ namespace ExpressBase.Objects
 		[EnableInBuilder(BuilderType.BotForm)]
 		[PropertyEditor(PropertyEditorType.Number)]
 		public int MaximumValue { get; set; }
+
+		[EnableInBuilder(BuilderType.BotForm)]
+		[HideInPropertyGrid]
+		public override EbDbTypes EbDbType { get { return EbDbTypes.Double; } }
 
 		public EbCardNumericField() { }
 
@@ -531,10 +547,8 @@ namespace ExpressBase.Objects
 						.Replace("@ReadOnly@", this.ReadOnly ? "readonly" : "")
 						.Replace("@PlusMinusDisplay@", this.ReadOnly? "visibility: hidden;" : "display:inline-block;")
 						.Replace("@DivBorder@", this.ReadOnly? "": "border: 1px solid #eee;")
-						//.Replace("@MinValue@", this.MinimumValue.ToString())
-						//.Replace("@MaxValue@", this.MaximumValue.ToString());
-						.Replace("@MinValue@", this.MaximumValue.ToString())
-						.Replace("@MaxValue@", this.MinimumValue.ToString());			
+						.Replace("@MinValue@", this.MinimumValue.ToString())
+						.Replace("@MaxValue@", this.MaximumValue.ToString());
 		}
     }
 
@@ -556,7 +570,11 @@ namespace ExpressBase.Objects
 		[EnableInBuilder(BuilderType.BotForm)]
         public override bool ReadOnly { get; set; }
 
-        public EbCardTextField() { }
+		[EnableInBuilder(BuilderType.BotForm)]
+		[HideInPropertyGrid]
+		public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
+
+		public EbCardTextField() { }
 
         public override string GetDesignHtml()
         {
@@ -597,6 +615,10 @@ namespace ExpressBase.Objects
 		//[PropertyEditor(PropertyEditorType.String)]
 		public override dynamic FieldValue { get; set; }
 		
+		[EnableInBuilder(BuilderType.BotForm)]
+		[HideInPropertyGrid]
+		public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
+
 		public EbCardTitleField() { }
 
 		public override string GetDesignHtml()
