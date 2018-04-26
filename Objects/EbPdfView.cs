@@ -1,4 +1,5 @@
-﻿using ExpressBase.Common;
+﻿
+using ExpressBase.Common;
 using ExpressBase.Common.Data;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
@@ -14,7 +15,7 @@ namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
     class EbPdfView : EbControlUI
-	{
+    {
 
         public EbPdfView() { }
 
@@ -45,13 +46,14 @@ namespace ExpressBase.Objects
 
         public override string GetBareHtml()
         {
-            return @" 
+            return @"
         <div class='ebimg-cont' style='width:100%;'>
+            <div class='pdf-extbtn' onclick=""window.open($(this).next().attr('src'))""><i class='fa fa-external-link'></i></div>
             <iframe class='pdf-frame' id='@name@' src='@src@'  style='width:100%;'></iframe>
         </div>"
 .Replace("@name@", this.Name)
 .Replace("@toolTipText@", this.ToolTipText)
-.Replace("@src@", "../ReportRender/RenderforBot?refid=@refid@&Params=@Params@".Replace("@refid@", this.DataSourceId ?? "eb_dbpjl5pgxleq20180130063835-eb_dbpjl5pgxleq20180130063835-3-1603-2339"))
+.Replace("@src@", "../ReportRender/RenderforBot?refid=@refid@&Params=@Params@".Replace("@refid@", (this.DataSourceId.IsNullOrEmpty()) ? "eb_dbpjl5pgxleq20180130063835-eb_dbpjl5pgxleq20180130063835-3-1603-2339" : this.DataSourceId))
 .Replace("@value@", "");//"value='" + this.Value + "'");
         }
 
