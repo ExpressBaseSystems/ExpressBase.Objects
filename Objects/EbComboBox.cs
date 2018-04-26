@@ -144,7 +144,7 @@ var @nameEbCombo = new EbSelect('@name', '@DSid', @DDHeight, '@vmName', '', @Max
             return @"
 <div id='cont_@name@  ' class='Eb-ctrlContainer' Ctype='TextBox' style='@HiddenString '>
    <div role='form' data-toggle='validator' style=' width: inherit;'>
-    <span style='background-color:@LabelBackColor@; color:@LabelForeColor@ '> @Label@  </span>
+    <div class='eb-ctrl-label' style='background-color:@LabelBackColor@; color:@LabelForeColor@ '> @Label@  </div>
       <div class='combo-wrap' data-toggle='tooltip' title='' data-original-title=''>
          <div style='display: inline-block; width: 100%; margin-right: -4px;'>
             <div class='input-group'>

@@ -183,7 +183,7 @@ $('#@id').datetimepicker({
         {
             string EbCtrlHTML = @"
     <div id='cont_@name@' Ctype='Date' class='Eb-ctrlContainer' style='@hiddenString'>
-        <span id='@name@Lbl' style='@LabelBackColor  @LabelForeColor '> @Label@ </span>
+        <div class='eb-ctrl-label' id='@name@Lbl' style='@LabelBackColor  @LabelForeColor '> @Label@ </div>
        @barehtml@
         <span class='helpText'> @HelpText </span>
     </div>  

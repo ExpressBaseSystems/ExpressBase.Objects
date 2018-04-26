@@ -62,7 +62,7 @@ namespace ExpressBase.Objects
             string html = @"
             <div id='cont_@name@' class='Eb-ctrlContainer' Ctype='CheckBoxGroup'>
                 <div class='radiog-cont'  style='@BackColor '>
-                 <span id='@name@Lbl' style='@LabelBackColor @LabelForeColor '> @Label@  </span>
+                 <div class='eb-ctrl-label' id='@name@Lbl' style='@LabelBackColor @LabelForeColor '> @Label@  </div>
                         @barehtml@
                 <span class='helpText'> @HelpText </span></div>
             </div>"

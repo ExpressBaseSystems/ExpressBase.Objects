@@ -122,7 +122,7 @@ this.Init = function(id)
         {
             return @"
     <div id='cont_@name@' Ctype='Image' class='Eb-ctrlContainer' style='@hiddenString'>
-        <span id='@name@Lbl' style='@LabelBackColor  @LabelForeColor '> @Label@ </span>
+        <div class='eb-ctrl-label' id='@name@Lbl' style='@LabelBackColor  @LabelForeColor '> @Label@ </div>
     </div>
 "
 .Replace("@name@", this.Name)

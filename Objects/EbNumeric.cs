@@ -203,7 +203,7 @@ $('#{0}').mask('SZZZZZZZZZZZ', {
         {
             return (@"
 <div id='cont_@name@' class='Eb-ctrlContainer' Ctype='Numeric' style='@hiddenString'>
-    <span id='@nameLbl' style='@lblBackColor @LblForeColor'>@label@</span>
+    <div class='eb-ctrl-label' id='@nameLbl' style='@lblBackColor @LblForeColor'>@label@</div>
        @barehtml@            
     <span class='helpText'> @helpText </span>
 </div>"
