@@ -14,7 +14,7 @@ namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
     class EbPdfView : EbControlUI
-	{
+    {
 
         public EbPdfView() { }
 
@@ -51,7 +51,7 @@ namespace ExpressBase.Objects
         </div>"
 .Replace("@name@", this.Name)
 .Replace("@toolTipText@", this.ToolTipText)
-.Replace("@src@", "../ReportRender/RenderforBot?refid=@refid@&Params=@Params@".Replace("@refid@", this.DataSourceId ?? "eb_dbpjl5pgxleq20180130063835-eb_dbpjl5pgxleq20180130063835-3-1603-2339"))
+.Replace("@src@", "../ReportRender/RenderforBot?refid=@refid@&Params=@Params@".Replace("@refid@", (this.DataSourceId.IsNullOrEmpty()) ? "eb_dbpjl5pgxleq20180130063835-eb_dbpjl5pgxleq20180130063835-3-1603-2339" : this.DataSourceId))
 .Replace("@value@", "");//"value='" + this.Value + "'");
         }
 
