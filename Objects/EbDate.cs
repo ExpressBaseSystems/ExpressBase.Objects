@@ -109,12 +109,16 @@ $('#@idContainer [class=input-group-addon]').click(function(){
 });
 
 $('#@id').mask('@maskPattern'); 
-$('#@id').datetimepicker({
-    format:'@format',
+//$('#@id').datetimepicker({
+//    format:'@format',
     //minDate:'@maxDate',
     //maxDate:'@minDate',
-    @dateType
-});"
+//    @dateType
+//});
+
+alert('chinchu');
+$('#@id').MonthPicker({ StartYear: 2018, ShowIcon: false });"
+
 .Replace("@dateType", (this.EbDateType.ToString() == "Date") ? "timepicker:false" : ((this.EbDateType.ToString() == "Time") ? "datepicker:false" : string.Empty))
 .Replace("@id", this.Name)
 .Replace("@maskPattern", this.maskPattern)

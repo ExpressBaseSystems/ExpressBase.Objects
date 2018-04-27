@@ -24,7 +24,7 @@ namespace ExpressBase.Objects
     {
         public EbRadioGroup()
         {
-            this.Options = new List<EbRadioOption>();
+            this.Options = new List<EbRadioOptionAbstract>();
             //this.Options.Add(new EbRadioOption());
             //this.Options.Add(new EbRadioOption());
             //this.Options.CollectionChanged += Options_CollectionChanged;
@@ -54,7 +54,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.Collection)]
         [Alias("Options")]
-        public List<EbRadioOption> Options { get; set; }
+        public List<EbRadioOptionAbstract> Options { get; set; }
 
         public override string GetToolHtml()
         {
@@ -120,7 +120,7 @@ this.Init = function(id)
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
     [HideInToolBox]
-    public class EbRadioOption : EbControlUI
+    public class EbRadioOption : EbRadioOptionAbstract
     {
         public EbRadioOption() { }
 
