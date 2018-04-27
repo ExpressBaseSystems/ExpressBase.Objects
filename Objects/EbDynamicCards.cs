@@ -357,7 +357,9 @@ namespace ExpressBase.Objects
         public EbDataColumn DbFieldMap { get; set; }
 
         [EnableInBuilder(BuilderType.BotForm)]
-        public bool Summarize { get; set; }
+		[OnChangeExec(@"if(this.Summarize === true){pg.ShowProperty('SummarizeColumnWidth');}
+		else{pg.HideProperty('SummarizeColumnWidth');}")]
+		public bool Summarize { get; set; }
 
 		[EnableInBuilder(BuilderType.BotForm)]
 		public int SummarizeColumnWidth { get; set; }
@@ -391,6 +393,9 @@ namespace ExpressBase.Objects
 		[MetaOnly]
 		public override dynamic FieldValue { get; set; }
 
+		[HideInPropertyGrid]
+		public override string Label { get; set; }
+
 		[EnableInBuilder(BuilderType.BotForm)]
 		[HideInPropertyGrid]
 		public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
@@ -418,6 +423,9 @@ namespace ExpressBase.Objects
         [Alias("ContentHTML")]
 		[MetaOnly]
 		public override dynamic FieldValue { get; set; }
+
+		[HideInPropertyGrid]
+		public override string Label { get; set; }
 
 		[EnableInBuilder(BuilderType.BotForm)]
 		[HideInPropertyGrid]
@@ -460,11 +468,25 @@ namespace ExpressBase.Objects
 
 		[EnableInBuilder(BuilderType.BotForm)]
 		[PropertyEditor(PropertyEditorType.Number)]
+		[OnChangeExec(@"
+		if($(event.target).val() > this.MaximumValue){
+			$(event.target).val('0');
+			this.MinimumValue = 0 ;
+		}
+			")]
 		public int MinimumValue { get; set; }
 
 		[EnableInBuilder(BuilderType.BotForm)]
 		[PropertyEditor(PropertyEditorType.Number)]
+		[OnChangeExec(@"
+		if($(event.target).val() <= this.MinimumValue){
+			$(event.target).val('999999');
+			this.MinimumValue = 999999 ;
+		}
+			")]
 		public int MaximumValue { get; set; }
+
+		public override string Label { get; set; }
 
 		[EnableInBuilder(BuilderType.BotForm)]
 		[HideInPropertyGrid]
@@ -570,6 +592,8 @@ namespace ExpressBase.Objects
 		[EnableInBuilder(BuilderType.BotForm)]
         public override bool ReadOnly { get; set; }
 
+		public override string Label { get; set; }
+
 		[EnableInBuilder(BuilderType.BotForm)]
 		[HideInPropertyGrid]
 		public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
@@ -614,7 +638,10 @@ namespace ExpressBase.Objects
 		[MetaOnly]
 		//[PropertyEditor(PropertyEditorType.String)]
 		public override dynamic FieldValue { get; set; }
-		
+
+		[HideInPropertyGrid]
+		public override string Label { get; set; }
+
 		[EnableInBuilder(BuilderType.BotForm)]
 		[HideInPropertyGrid]
 		public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }

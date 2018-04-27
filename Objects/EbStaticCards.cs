@@ -56,11 +56,11 @@ namespace ExpressBase.Objects
             return @"this.Init = function(id)
 					{
 						//this.CardCollection.$values.push(new EbObjects.EbCard(id + '_EbCard0'));
-						//this.CardFields.$values.push(new EbObjects.EbCardImageField(id + '_EbCardImageField0'));
-						//this.CardFields.$values.push(new EbObjects.EbCardTitleField(id + '_EbCardTitleField0'));
-						//this.CardFields.$values.push(new EbObjects.EbCardHtmlField(id + '_EbCardHtmlField0'));
-						//this.CardFields.$values.push(new EbObjects.EbCardNumericField(id + '_EbCardNumericField0'));
-						//this.CardFields.$values.push(new EbObjects.EbCardTextField(id + '_EbCardTextField0'));
+						this.CardFields.$values.push(new EbObjects.EbCardImageField(id + '_EbCardImageField0'));
+						this.CardFields.$values.push(new EbObjects.EbCardTitleField(id + '_EbCardTitleField0'));
+						this.CardFields.$values.push(new EbObjects.EbCardHtmlField(id + '_EbCardHtmlField0'));
+						this.CardFields.$values.push(new EbObjects.EbCardNumericField(id + '_EbCardNumericField0'));
+						this.CardFields.$values.push(new EbObjects.EbCardTextField(id + '_EbCardTextField0'));
 					};";
         }
 
