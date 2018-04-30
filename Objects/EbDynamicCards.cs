@@ -271,7 +271,10 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.BotForm)]
         public string SummaryTitle { get; set; }
-    }
+
+		[EnableInBuilder(BuilderType.BotForm)]
+		public string ButtonText { get; set; }
+	}
 
 
     public sealed class MyDynObject : DynamicObject
@@ -388,7 +391,7 @@ namespace ExpressBase.Objects
     public class EbCardImageField : EbCardField
     {
         [EnableInBuilder(BuilderType.BotForm)]
-        [PropertyEditor(PropertyEditorType.ImageSeletor)]
+        //[PropertyEditor(PropertyEditorType.ImageSeletor)]
         [Alias("ImageID")]
 		[MetaOnly]
 		public override dynamic FieldValue { get; set; }

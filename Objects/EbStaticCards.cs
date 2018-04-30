@@ -106,11 +106,12 @@ namespace ExpressBase.Objects
 					cardField.FieldValue = card.CustomFields[cardField.Name];					
 					html += cardField.GetBareHtml();
 				}
-				html += "<div class='card-btn-cont'><button id='' class='btn btn-default'  data-toggle='tooltip' title='' style='width:100%;'>Select</button></div></div>";
-			}
-			html += "</div>@SummarizeHtml@  <div class='cards-btn-cont'> <button id='' class='btn btn-default'  data-toggle='tooltip' title='' style='width:100%; box-shadow: 0px 0px 20px #ccc; border-radius: 1.3em 1.3em 1.3em 1.3em;'> Submit </button> </div>   </div>"
 
-				.Replace("@SummarizeHtml@", this.getCartHtml() ?? "");
+				html += "<div class='card-btn-cont' style='@BtnDisplay@'><button id='' class='btn btn-default'  data-toggle='tooltip' title='' style='width:100%;'>Select</button></div></div>".Replace("@BtnDisplay@", this.MultiSelect ? "" : "display:none;");
+			}
+			html += "</div>@SummarizeHtml@  <div class='cards-btn-cont' style='margin-top: 20px;'> <button id='' class='btn btn-default'  data-toggle='tooltip' title='' style='width:100%; box-shadow: 0px 0px 20px #ccc; border-radius: 1.3em 1.3em 1.3em 1.3em;'> @ButtonText@ </button> </div>   </div>"
+				.Replace("@SummarizeHtml@", (this.getCartHtml().IsNullOrEmpty() || !this.MultiSelect)? "": this.getCartHtml())
+				.Replace("@ButtonText@", this.ButtonText.IsNullOrEmpty()? "Submit" : this.ButtonText);
 			return html;
 		}
 
@@ -119,14 +120,14 @@ namespace ExpressBase.Objects
             this.IsSummaryRequired = false;
             int tcols = 1;
             string html = @"<div class='card-summary-cont'><div style='font-size: 15px; padding:5px 5px 0px 5px; text-align:center;'><b> @Summary@ </b></div>
-							<table class='table card-summary-table' style='table-layout: fixed;'>
+							<table class='table card-summary-table' style='table-layout: fixed; margin-bottom: 0px;'>
 								<thead style='font-size:12px;'><tr>".Replace("@Summary@", this.SummaryTitle.IsNullOrEmpty() ? "Summary" : this.SummaryTitle);
             foreach (EbCardField F in this.CardFields)
             {
                 if (F.Summarize)
                 {
 					string colStyle = ((F.SummarizeColumnWidth > 0) ? "width: " + F.SummarizeColumnWidth + "%;" : "") + " white-space: nowrap; overflow: hidden; text-overflow: ellipsis;";
-					html += "<th style='" + colStyle + "'>" + F.Name + "</th>";
+					html += "<th style='" + colStyle + "' title='" + F.Name + "'>" + F.Name + "</th>";
 					this.IsSummaryRequired = true;
                     tcols++;
                 }
