@@ -400,6 +400,9 @@ namespace ExpressBase.Objects
 		public override string Label { get; set; }
 
 		[EnableInBuilder(BuilderType.BotForm)]
+		public int HeigthInPixel { get; set; }
+
+		[EnableInBuilder(BuilderType.BotForm)]
 		[HideInPropertyGrid]
 		public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
 
@@ -412,7 +415,9 @@ namespace ExpressBase.Objects
 
         public override string GetBareHtml()
         {
-            return @"<img class='card-img' src='@ImageID@'/>".Replace("@ImageID@", (this.FieldValue == null) ? "../images/image.png" : this.FieldValue);
+            return @"<div style='@divstyle@'><img class='card-img' src='@ImageID@'/></div>"
+				.Replace("@ImageID@", (this.FieldValue) ?? "../images/image.png")
+				.Replace("@divstyle@", (this.HeigthInPixel == 0)? "": "height: " + this.HeigthInPixel + "px; display: flex; justify-content: center;");
         }
     }
 
@@ -422,7 +427,7 @@ namespace ExpressBase.Objects
     public class EbCardHtmlField : EbCardField
     {
         [EnableInBuilder(BuilderType.BotForm)]
-        //[PropertyEditor(PropertyEditorType.String)]
+        [PropertyEditor(PropertyEditorType.String)]
         [Alias("ContentHTML")]
 		[MetaOnly]
 		public override dynamic FieldValue { get; set; }
