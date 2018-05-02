@@ -650,7 +650,7 @@ else {
                     for (int iSortPos = 0; iSortPos < SortedReportFields.Length; iSortPos++)
                     {
                         var field = SortedReportFields[iSortPos];
-                        field.Height += RowHeight;
+                        field.HeightPt += RowHeight;
                         DrawFields(field, dt_Yposition, serialnumber);
                     }
                     detailprintingtop += detail.HeightPt + RowHeight;
