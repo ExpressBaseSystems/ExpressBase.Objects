@@ -18,8 +18,10 @@ namespace ExpressBase.Objects
         {
 
             this.LabelCollection = new List<EbLabel>();
-            this.LabelCollection.Add(new EbLabel { Label = "label_1" });
         }
+
+        [HideInPropertyGrid]
+        public override string Label { get => base.Label; set => base.Label = value; }
 
         [OnDeserialized]
         public void OnDeserializedMethod(StreamingContext context)
@@ -51,7 +53,7 @@ namespace ExpressBase.Objects
             return @"
 this.Init = function(id)
 {
-    this.LabelCollection.$values.push(new EbObjects.EbLabel('label_1_GetJsinit1'));
+    this.LabelCollection.$values.push(new EbObjects.EbLabel('default_label1'));
 };";
         }
 
@@ -79,7 +81,7 @@ this.Init = function(id)
         public override string GetHtml()
         {
             string EbCtrlHTML = @"
-    <div id='cont_@name@' Ctype='Image' class='Eb-ctrlContainer' style='@hiddenString'>
+    <div id='cont_@name@' Ctype='Labels' class='Eb-ctrlContainer' style='@hiddenString'>
        @barehtml@
     </div>
 "
@@ -121,7 +123,7 @@ this.Init = function(id)
         public override string GetBareHtml()
         {
             return @"
-    <div id='cont_@name@' Ctype='Image' class='Eb-ctrlContainer' style='@hiddenString'>
+    <div id='cont_@name@' Ctype='Labels' class='Eb-ctrlContainer' style='@hiddenString'>
         <div class='eb-ctrl-label' id='@name@Lbl' style='@LabelBackColor  @LabelForeColor '> @Label@ </div>
     </div>
 "
