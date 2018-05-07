@@ -416,7 +416,7 @@ namespace ExpressBase.Objects
         public override string GetBareHtml()
         {
             return @"<div style='@divstyle@'><img class='card-img' src='@ImageID@'/></div>"
-				.Replace("@ImageID@", (this.FieldValue) ?? "../images/image.png")
+				.Replace("@ImageID@", (String.IsNullOrEmpty(this.FieldValue)) ? "../images/image.png": this.FieldValue)
 				.Replace("@divstyle@", (this.HeigthInPixel == 0)? "": "height: " + this.HeigthInPixel + "px; display: flex; justify-content: center;");
         }
     }
@@ -549,7 +549,7 @@ namespace ExpressBase.Objects
 								<i class='fa fa-minus' aria-hidden='true' style=' padding: 5px; color: darkblue;'></i>
 							</button>
 							<div style='display:inline-block; @DivBorder@'>
-								<input class='removeArrows' type='number' style='text-align: center; border: none; background: transparent; min-width: 125px;' value='@Value@' min='@MinValue@' max='@MaxValue@' @ReadOnly@  
+								<input class='removeArrows' type='number' style='text-align: center; border: none; background: transparent; min-width: 100px;' value='@Value@' min='@MinValue@' max='@MaxValue@' @ReadOnly@  
 										onchange='	var mn=parseFloat($(event.target).attr(&quot;min&quot;));
 													var mx=parseFloat($(event.target).attr(&quot;max&quot;));
 													var va=parseFloat($(event.target).val());
