@@ -66,7 +66,7 @@ namespace ExpressBase.Objects
 
         public override string GetDesignHtml()
         {
-            return @"`<div id=@id><div class='cards-cont'>
+            return @"`<div id=@id class='Eb-ctrlContainer'><div class='cards-cont'>
 						<div class='card-cont' style='width: 100%; min-height: 100px; box-shadow: 0px 0px 20px #ccc; border-radius: 1.3em;'>
 							<div class='card-btn-cont'><button class='btn btn-default' style='width:100%;' disabled>Select</button></div>
 						</div>

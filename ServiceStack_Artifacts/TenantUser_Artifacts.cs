@@ -9,49 +9,6 @@ using ExpressBase.Common.EbServiceStack.ReqNRes;
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
 
-    [DataContract]
-    public class CreateApplicationRequest : IReturn<CreateApplicationResponse>, IEbSSRequest
-    {
-        [DataMember(Order = 1)]
-        public string AppName { get; set; }
-
-        [DataMember(Order = 2)]
-        public int AppType { get; set; }
-
-        [DataMember(Order = 3)]
-        public string Description { get; set; }
-
-        [DataMember(Order = 4)]
-        public string AppIcon { get; set; }
-
-        [DataMember(Order = 5)]
-        public string Sid { get; set; }
-
-        [DataMember(Order = 6)]
-        public int appid { get; set; }
-
-        public string TenantAccountId { get; set; }
-
-        public int UserId { get; set; }
-
-        public string Token { get; set; }
-        
-    }
-
-    [DataContract]
-    public class CreateApplicationResponse : IEbSSResponse
-    {
-        [DataMember(Order = 1)]
-        public int id { get; set; }
-
-        [DataMember(Order = 2)]
-        public string Token { get; set; }
-
-        [DataMember(Order = 3)]
-        public ResponseStatus ResponseStatus { get; set; }
-
-    }
-
     [DataContract] 
     public class CreateUserRequest : IReturn<CreateUserResponse>, IEbSSRequest
     {
