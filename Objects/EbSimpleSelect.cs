@@ -63,11 +63,11 @@ namespace ExpressBase.Objects
 
 			foreach (EbDataRow option in result.Data)
 			{
-				_html += string.Format("<option value='{0}'>{1}</option>", option[this.ValueMember.ColumnIndex], option[this.DisplayMember.ColumnIndex]);
-			}
+				//_html += string.Format("<option value='{0}'>{1}</option>", option[this.ValueMember.ColumnIndex], option[this.DisplayMember.ColumnIndex]);
+				_html += string.Format("<option value='{0}'>{1}</option>", option[0].ToString().Trim(), option[0]);
+            }
 
 			this.OptionHtml = _html;
-			this.BareControlHtml = this.BareControlHtml.Replace("@options@", this.OptionHtml);
 		}
 
 
@@ -107,7 +107,8 @@ namespace ExpressBase.Objects
         <select id='@name@'>
             @options@
         </select>"
-.Replace("@name@", this.Name);
+.Replace("@name@", this.Name)
+.Replace("@options@", this.OptionHtml);
         }
 
         private string GetHtmlHelper(RenderMode mode)
