@@ -66,7 +66,7 @@ namespace ExpressBase.Objects
 
         public override string GetDesignHtml()
         {
-            return @"`<div id=@id><div class='cards-cont'>
+            return @"`<div id=@id class='Eb-ctrlContainer'><div class='cards-cont'>
 						<div class='card-cont' style='width: 100%; min-height: 100px; box-shadow: 0px 0px 20px #ccc; border-radius: 1.3em;'>
 							<div class='card-btn-cont'><button class='btn btn-default' style='width:100%;' disabled>Select</button></div>
 						</div>
@@ -109,7 +109,7 @@ namespace ExpressBase.Objects
 
 				html += "<div class='card-btn-cont' style='@BtnDisplay@'><button id='' class='btn btn-default'  data-toggle='tooltip' title='' style='width:100%;'>Select</button></div></div>".Replace("@BtnDisplay@", this.MultiSelect ? "" : "display:none;");
 			}
-			html += "</div>@SummarizeHtml@  <div class='cards-btn-cont' style='margin-top: 20px;'> <button id='' class='btn btn-default'  data-toggle='tooltip' title='' style='width:100%; box-shadow: 0px 0px 20px #ccc; border-radius: 1.3em 1.3em 1.3em 1.3em;'> @ButtonText@ </button> </div>   </div>"
+			html += "</div>@SummarizeHtml@  <div class='cards-btn-cont' style='margin-top: 20px;'> <button id='' class='btn btn-default'  data-toggle='tooltip' title='' style='width:100%; box-shadow: 0px 0px 10px #ccc; border-radius: 1.3em 1.3em 1.3em 1.3em;'> @ButtonText@ </button> </div>   </div>"
 				.Replace("@SummarizeHtml@", (this.getCartHtml().IsNullOrEmpty() || !this.MultiSelect)? "": this.getCartHtml())
 				.Replace("@ButtonText@", this.ButtonText.IsNullOrEmpty()? "Submit" : this.ButtonText);
 			return html;
