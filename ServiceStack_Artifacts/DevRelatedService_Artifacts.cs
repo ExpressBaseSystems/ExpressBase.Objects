@@ -52,6 +52,35 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
+    public class CreateApplicationDevRequest : IReturn<CreateApplicationResponse>, IEbSSRequest
+    {
+        [DataMember(Order = 1)]
+        public string AppName { get; set; }
+
+        [DataMember(Order = 2)]
+        public int AppType { get; set; }
+
+        [DataMember(Order = 3)]
+        public string Description { get; set; }
+
+        [DataMember(Order = 4)]
+        public string AppIcon { get; set; }
+
+        [DataMember(Order = 5)]
+        public string Sid { get; set; }
+
+        [DataMember(Order = 6)]
+        public int appid { get; set; }
+
+        public string TenantAccountId { get; set; }
+
+        public int UserId { get; set; }
+
+        public string Token { get; set; }
+
+    }
+
+    [DataContract]
     public class GetApplicationRequest : IReturn<GetApplicationResponse>, IEbSSRequest
     {
         [DataMember(Order = 1)]
