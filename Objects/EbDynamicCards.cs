@@ -627,7 +627,7 @@ namespace ExpressBase.Objects
 							<b>&nbsp&nbsp @Label@ </b>  
 						</div>
 						<div style='display: inline-block; width: 58%;'>
-							<input type='text' value='@Text@' style='text-align: center;' @ReadOnly@> 
+							<input type='text' value='@Text@' style='text-align: center; width: 100%;' @ReadOnly@> 
 						</div>
 					</div>"
 					.Replace("@Text@", (this.FieldValue == null) ? "" : this.FieldValue)
