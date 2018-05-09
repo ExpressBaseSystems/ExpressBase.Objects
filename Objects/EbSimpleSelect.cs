@@ -18,7 +18,7 @@ namespace ExpressBase.Objects
 {
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.BotForm)]
-    public class EbSimpleSelect : EbControl
+    public class EbSimpleSelect : EbControlUI
     {
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
@@ -63,8 +63,8 @@ namespace ExpressBase.Objects
 
 			foreach (EbDataRow option in result.Data)
 			{
-				//_html += string.Format("<option value='{0}'>{1}</option>", option[this.ValueMember.ColumnIndex], option[this.DisplayMember.ColumnIndex]);
-				_html += string.Format("<option value='{0}'>{1}</option>", option[0].ToString().Trim(), option[0]);
+				_html += string.Format("<option value='{0}'>{1}</option>", option[this.ValueMember.ColumnIndex], option[this.DisplayMember.ColumnIndex]);
+				//_html += string.Format("<option value='{0}'>{1}</option>", option[0].ToString().Trim(), option[0]);
             }
 
 			this.OptionHtml = _html;
@@ -104,16 +104,29 @@ namespace ExpressBase.Objects
         public override string GetBareHtml()
         {
             return @"
-        <select id='@name@'>
+        <select id='@name@' name='@name@' data-ebtype='@data-ebtype@'>
             @options@
         </select>"
 .Replace("@name@", this.Name)
-.Replace("@options@", this.OptionHtml);
+.Replace("@options@", this.OptionHtml)
+.Replace("@data-ebtype@", "16");
         }
 
         private string GetHtmlHelper(RenderMode mode)
         {
-            return this.GetBareHtml();
+            return @"
+<div id='cont_@name@  ' class='Eb-ctrlContainer' Ctype='TextBox' style='@HiddenString '>
+    <div class='eb-ctrl-label' id='@name@Lbl' style='@LabelBackColor@ @LabelForeColor@ '> @Label@  </div>
+       @barehtml@
+    <span class='helpText'> @HelpText@ </span>
+</div>"
+.Replace("@barehtml@", this.GetBareHtml())
+.Replace("@HelpText@", this.HelpText)
+.Replace("@Label@", this.Label)
+.Replace("@name@", this.Name)
+.Replace("@HiddenString ", this.HiddenString)
+.Replace("@ToolTipText ", this.ToolTipText);
+
         }
     }
 }
