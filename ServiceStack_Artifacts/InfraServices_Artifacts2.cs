@@ -278,7 +278,19 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int UserId { get; set; }
 
         [DataMember(Order = 3)]
-        public Dictionary<string, object> Colvalues { get; set; }
+        public string SolutionName { get; set; }
+
+        [DataMember(Order = 4)]
+        public string Isid { get; set; }
+
+        [DataMember(Order = 5)]
+        public string Esid { get; set; }
+
+        [DataMember(Order = 6)]
+        public string Description { get; set; }
+
+        [DataMember(Order = 7)]
+        public string Subscription { get; set; }
 
     }
 
