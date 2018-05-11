@@ -75,6 +75,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
         [Alias("Title")]
         public string sTitle { get; set; }
 
+        [EnableInBuilder(BuilderType.DVBuilder)]
         public bool bVisible { get; set; }
 
         public int Pos { get; set; }
