@@ -27,6 +27,14 @@ namespace ExpressBase.Objects
         Default,
         GoogleMap
     }
+    
+    public enum ControlType
+    {
+        Default,
+        Date,
+        Numeric,
+        Text
+    }
 
     [EnableInBuilder(BuilderType.BotForm)]
     public class EbDataVisualizationObject : EbObject
@@ -76,7 +84,8 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         public EbDataSource EbDataSource { get; set; }
 
-        [PropertyEditor(PropertyEditorType.CollectionFrmSrcPG, "DSColumns")]
+        [PropertyEditor(PropertyEditorType.CollectionProp, "Columns", "bVisible")]
+        //[PropertyEditor(PropertyEditorType.CollectionFrmSrcPG, "DSColumns")]
         [EnableInBuilder(BuilderType.DVBuilder)]
         public DVColumnCollection Columns { get; set; }
 

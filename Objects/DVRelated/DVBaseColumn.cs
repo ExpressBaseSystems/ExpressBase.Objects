@@ -75,6 +75,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
         [Alias("Title")]
         public string sTitle { get; set; }
 
+        [EnableInBuilder(BuilderType.DVBuilder)]
         public bool bVisible { get; set; }
 
         public int Pos { get; set; }
@@ -90,6 +91,10 @@ namespace ExpressBase.Objects.Objects.DVRelated
         [EnableInBuilder(BuilderType.DVBuilder)]
         [Alias("FontFamily")]
         public FontFamily fontfamily { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.DropDown)]
+        public ControlType FilterControl { get; set; }
     }
 
     public class DVColumnCollection : List<DVBaseColumn>

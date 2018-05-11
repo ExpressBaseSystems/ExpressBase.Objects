@@ -74,7 +74,7 @@ namespace ExpressBase.Objects.ReportRelated
         public virtual void DrawMe(Document d, PdfWriter writer, byte[] fileByte, float reportHeight)
         {
         }
-
+       
         private iTextSharp.text.Font iTextFont = null;
         public virtual iTextSharp.text.Font ITextFont
         {
