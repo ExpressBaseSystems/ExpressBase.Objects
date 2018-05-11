@@ -90,6 +90,10 @@ namespace ExpressBase.Objects.Objects.DVRelated
         [EnableInBuilder(BuilderType.DVBuilder)]
         [Alias("FontFamily")]
         public FontFamily fontfamily { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.DropDown)]
+        public ControlType FilterControl { get; set; }
     }
 
     public class DVColumnCollection : List<DVBaseColumn>

@@ -27,6 +27,14 @@ namespace ExpressBase.Objects
         Default,
         GoogleMap
     }
+    
+    public enum ControlType
+    {
+        Default,
+        Date,
+        Numeric,
+        Text
+    }
 
     [EnableInBuilder(BuilderType.BotForm)]
     public class EbDataVisualizationObject : EbObject
