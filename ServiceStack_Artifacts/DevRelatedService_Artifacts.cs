@@ -170,6 +170,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 3)]
+        public AppWrapper AppInfo { get; set; }
     }
 
     public class GetObjectRequest : EbServiceStackRequest, IReturn<GetObjectResponse>

@@ -84,7 +84,8 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         public EbDataSource EbDataSource { get; set; }
 
-        [PropertyEditor(PropertyEditorType.CollectionFrmSrcPG, "DSColumns")]
+        [PropertyEditor(PropertyEditorType.CollectionProp, "Columns", "bVisible")]
+        //[PropertyEditor(PropertyEditorType.CollectionFrmSrcPG, "DSColumns")]
         [EnableInBuilder(BuilderType.DVBuilder)]
         public DVColumnCollection Columns { get; set; }
 
