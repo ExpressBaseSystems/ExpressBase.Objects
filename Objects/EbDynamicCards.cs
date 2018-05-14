@@ -152,9 +152,9 @@ namespace ExpressBase.Objects
 
 		public override string GetBareHtml()
 		{
-			string html = @"<div id='@name@' class='Eb-ctrlContainer'>@FilterHtml@<div class='cards-cont'>"
+			string html = @"<div id='@name@' class='Eb-ctrlContainer'>@HeaderHtml@<div class='cards-cont'>"
 									.Replace("@name@", this.Name ?? "@name@")
-									.Replace("@FilterHtml@", this.getFilterHtml());
+									.Replace("@HeaderHtml@", this.getHeaderHtml());
 			if(CardCollection != null)
 			{
 				foreach (EbCard card in CardCollection)
@@ -202,27 +202,43 @@ namespace ExpressBase.Objects
 				return null;
 		}
 
-		public string getFilterHtml()
-		{
-			string html = string.Empty;
-			if (this.FilterValues.Count != 0)
-			{
-				html += @"<div class='card-filter-cont'><select id='' name='' data-ebtype=''>";
-				foreach(string val in this.FilterValues)
-				{
-					html += @"<option value='" + val + "'>" + val + "</option>";
-				}
-				html += "</select></div>";
-			}
-			return html;
-		}	
+		//public string getFilterHtml()
+		//{
+		//	string html = string.Empty;
+		//	if (this.FilterValues.Count != 0)
+		//	{
+		//		html += @"<div class='card-filter-cont'><select id='' name='' data-ebtype=''>";
+		//		foreach(string val in this.FilterValues)
+		//		{
+		//			html += @"<option value='" + val + "'>" + val + "</option>";
+		//		}
+		//		html += "</select></div>";
+		//	}
+		//	return html;
+		//}	
 		
 		public string getHeaderHtml()
 		{
-			string html = string.Empty;
+			string html = @"<div class='card-header-cont'> 
+								<div class='card-head-cardno'>
+									1 of 1
+								</div>
+								<div class='card-head-searchdiv'>
+									<input type='text' class='card-head-search-box form-control' placeholder='Search' title='Search' style=' height: 28px; min-height: 25px; border-radius: 12px;border: none;padding-right: 22px; -webkit-transition: width 0.4s ease-in-out; transition: width 0.4s ease-in-out;'/>            
+									<i class='fa fa-search card-head-search-icon form-control-feedback' aria-hidden='true'></i>
+								</div>";
 
-
-
+			if (this.FilterValues.Count != 0)
+			{
+				html += @"<div class='card-head-filterdiv'>
+							<select class='card-head-filter-box form-control'> <option value='All'> All </option>";
+				foreach (string val in this.FilterValues)
+				{
+					html += @"<option value='" + val + "'>" + val + "</option>";
+				}
+				html += "</select> <i class='fa fa-filter card-head-filter-icon' aria-hidden='true'></i></div>";
+			}
+			html += "</div>";
 
 			return html;
 		}
