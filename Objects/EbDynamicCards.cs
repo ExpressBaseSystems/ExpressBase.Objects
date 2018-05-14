@@ -47,7 +47,7 @@ namespace ExpressBase.Objects
 		{
 			this.BareControlHtml = this.GetBareHtml();
 			this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
-			this.FilterField = "ftype";/////////Hard coding for test filter field //febin
+			//this.FilterField = "ftype";/////////Hard coding for test filter field //febin
 		}
 		
         public void InitFromDataBase(JsonServiceClient ServiceClient)
@@ -127,6 +127,8 @@ namespace ExpressBase.Objects
 		public override bool isFullViewContol { get => true; set => base.isFullViewContol = value; }
 
 		[EnableInBuilder(BuilderType.BotForm)]
+        //[PropertyEditor(PropertyEditorType.DDfromDictProp, "CustomFields")]
+        [DefaultPropValue("ftype")]
 		public string FilterField { get; set; }
 
 		public List<string> FilterValues { get; set; }

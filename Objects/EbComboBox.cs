@@ -1,4 +1,5 @@
-﻿using ExpressBase.Common.Extensions;
+﻿using ExpressBase.Common;
+using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
@@ -43,15 +44,16 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm)]
         [HideInPropertyGrid]
-        public DVColumnCollection Columns { get; set; }
+        public ColumnColletion Columns { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
-        public List<DVBaseColumn> DisplayMembers { get; set; }
+        public ColumnColletion DisplayMembers { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
-        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
-        public List<DVBaseColumn> ValueMembers { get; set; }
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns",1)]
+        [OnChangeExec(@"if (this.Columns.$values.length === 0 ){pg.MakeReadOnly('ValueMember');} else {pg.MakeReadWrite('ValueMember');}")]
+        public EbDataColumn ValueMember { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public int DropdownHeight { get; set; }
@@ -129,7 +131,7 @@ var @nameEbCombo = new EbSelect('@name', '@DSid', @DDHeight, '@vmName', '', @Max
 .Replace("@name", this.Name)
 .Replace("@DSid", this.DataSourceId.ToString().Trim())
 .Replace("@DDHeight", (this.DropdownHeight == 0) ? "400" : this.DropdownHeight.ToString())
-.Replace("@vmName", this.ValueMembers.ToString())
+.Replace("@vmName", this.ValueMember.ToString())
 .Replace("@dmNames", "['acmaster1_name', 'tdebit', 'tcredit']")
 .Replace("@MaxLimit", (!this.MultiSelect || this.MaxLimit == 0) ? "1" : this.MaxLimit.ToString())
 .Replace("@MinLimit", this.MinLimit.ToString())
