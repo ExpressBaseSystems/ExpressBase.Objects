@@ -1,6 +1,7 @@
 ﻿using ExpressBase.Common;
 using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
+using ExpressBase.Common.Structures;
 using ServiceStack;
 using System;
 using System.Collections.Generic;
@@ -26,6 +27,29 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public MemorystreamWrapper StreamWrapper { get; set; }
 
         [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    public class ValidateCalcExpressionRequest : EbServiceStackRequest, IReturn<ReportRenderResponse>
+    {
+        public string DataSourceRefId { get; set; }
+
+        public string ValueExpression { get; set; }
+    }
+
+    [DataContract]
+    public class ValidateCalcExpressionResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public bool IsValid { get; set; }
+
+        [DataMember(Order = 2)]
+        public int Type { get; set; }
+
+        [DataMember(Order = 3)]
+        public string ExceptionMessage { get; set; }
+
+        [DataMember(Order = 4)]
         public ResponseStatus ResponseStatus { get; set; }
     }
 }

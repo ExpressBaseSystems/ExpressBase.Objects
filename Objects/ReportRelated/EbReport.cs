@@ -749,10 +749,9 @@ else {
                     {
                         string TName = calcfd.Split('.')[0];
                         string fName = calcfd.Split('.')[1];
-                       // globals[TName].Add(fName, new NTV { Name = fName, Type = this.DataRows.Table.Columns[fName].Type, Value = this.DataRows[serialnumber][fName] });
+                        //globals[TName].Add(fName, new NTV { Name = fName, Type = this.DataRows.Table.Columns[fName].Type, Value = this.DataRows[serialnumber][fName] });
                         globals[TName].Add(fName, new NTV { Name = fName, Type = this.DataSet.Tables[0].Columns[fName].Type, Value = this.DataSet.Tables[0].Rows[serialnumber][fName] });
-                    }
-                  
+                    }                  
                         column_val = (ValueScriptCollection[field.Name].RunAsync(globals)).Result.ReturnValue.ToString();
                     }
                     catch (Exception e)
