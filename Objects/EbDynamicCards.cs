@@ -48,6 +48,7 @@ namespace ExpressBase.Objects
 			this.BareControlHtml = this.GetBareHtml();
 			this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
 			this.FilterField = "ftype";/////////Hard coding for test filter field //febin
+			this.SearchField = "Title0";/////////Hard coding for test search field //febin
 		}
 		
         public void InitFromDataBase(JsonServiceClient ServiceClient)
@@ -127,9 +128,14 @@ namespace ExpressBase.Objects
 		public override bool isFullViewContol { get => true; set => base.isFullViewContol = value; }
 
 		[EnableInBuilder(BuilderType.BotForm)]
+        //[PropertyEditor(PropertyEditorType.DDfromDictProp, "CustomFields")]
+        //[DefaultPropValue("ftype")]
 		public string FilterField { get; set; }
 
 		public List<string> FilterValues { get; set; }
+
+		[EnableInBuilder(BuilderType.BotForm)]
+		public string SearchField { get; set; }
 
 		public override string GetToolHtml()
 		{
@@ -152,17 +158,21 @@ namespace ExpressBase.Objects
 
 		public override string GetBareHtml()
 		{
-			string html = @"<div id='@name@' class='Eb-ctrlContainer'>@FilterHtml@<div class='cards-cont'>"
+			string html = @"<div id='@name@' class='Eb-ctrlContainer'>@HeaderHtml@ 
+								<div style='position: absolute; margin-top: 50%; text-align: center; width: 100%; font-size: 21px; color: #bbb; font-weight: 300;'>Nothing to Display</div> 
+								<div class='cards-cont'>"
 									.Replace("@name@", this.Name ?? "@name@")
-									.Replace("@FilterHtml@", this.getFilterHtml());
+									.Replace("@HeaderHtml@", this.getHeaderHtml());
+			
 			if(CardCollection != null)
 			{
 				foreach (EbCard card in CardCollection)
 				{
-					html += @"<div id='@name@' class='card-cont' card-id='@cardid@' filter-value='@FilterValue@' style='width:100%;'>"
+					html += @"<div id='@name@' class='card-cont' card-id='@cardid@' filter-value='@FilterValue@' search-value='@SearchValue@' style='width:100%;'>"
 									.Replace("@name@", card.Name.Trim())
 									.Replace("@cardid@", card.CardId.ToString())
-									.Replace("@FilterValue@", card.CustomFields[this.FilterField].ToString());
+									.Replace("@FilterValue@", card.CustomFields[this.FilterField].ToString())
+									.Replace("@SearchValue@", card.CustomFields[this.SearchField].ToString());
 					foreach (EbCardField cardField in this.CardFields)
 					{
 						cardField.FieldValue = card.CustomFields.ContainsKey(cardField.Name) ? card.CustomFields[cardField.Name] : null;
@@ -202,27 +212,43 @@ namespace ExpressBase.Objects
 				return null;
 		}
 
-		public string getFilterHtml()
-		{
-			string html = string.Empty;
-			if (this.FilterValues.Count != 0)
-			{
-				html += @"<div class='card-filter-cont'><select id='' name='' data-ebtype=''>";
-				foreach(string val in this.FilterValues)
-				{
-					html += @"<option value='" + val + "'>" + val + "</option>";
-				}
-				html += "</select></div>";
-			}
-			return html;
-		}	
+		//public string getFilterHtml()
+		//{
+		//	string html = string.Empty;
+		//	if (this.FilterValues.Count != 0)
+		//	{
+		//		html += @"<div class='card-filter-cont'><select id='' name='' data-ebtype=''>";
+		//		foreach(string val in this.FilterValues)
+		//		{
+		//			html += @"<option value='" + val + "'>" + val + "</option>";
+		//		}
+		//		html += "</select></div>";
+		//	}
+		//	return html;
+		//}	
 		
 		public string getHeaderHtml()
 		{
-			string html = string.Empty;
+			string html = @"<div class='card-header-cont'> 
+								<div class='card-head-cardno'>
+									1 of 1
+								</div>
+								<div class='card-head-searchdiv'>
+									<input type='text' class='card-head-search-box form-control' placeholder='Search' title='Search' style=' height: 28px; min-height: 25px; border-radius: 12px;border: none;padding-right: 22px; -webkit-transition: width 0.4s ease-in-out; transition: width 0.4s ease-in-out;'/>            
+									<i class='fa fa-search card-head-search-icon form-control-feedback' aria-hidden='true'></i>
+								</div>";
 
-
-
+			if (this.FilterValues.Count != 0)
+			{
+				html += @"<div class='card-head-filterdiv'>
+							<select class='card-head-filter-box form-control'> <option value='All'> All </option>";
+				foreach (string val in this.FilterValues)
+				{
+					html += @"<option value='" + val + "'>" + val + "</option>";
+				}
+				html += "</select> <i class='fa fa-filter card-head-filter-icon' aria-hidden='true'></i></div>";
+			}
+			html += "</div>";
 
 			return html;
 		}
@@ -525,7 +551,7 @@ namespace ExpressBase.Objects
 								<i class='fa fa-minus' aria-hidden='true' style=' padding: 5px; color: darkblue;'></i>
 							</button>
 							<div style='display:inline-block; @DivBorder@'>
-								<input class='removeArrows' type='number' style='text-align: center; border: none; background: transparent; min-width: 100px;' value='@Value@' min='@MinValue@' max='@MaxValue@' @ReadOnly@  
+								<input class='removeArrows' type='number' style='text-align: center; border: none; background: transparent; min-width: 90px;' value='@Value@' min='@MinValue@' max='@MaxValue@' @ReadOnly@  
 										onchange='	var mn=parseFloat($(event.target).attr(&quot;min&quot;));
 													var mx=parseFloat($(event.target).attr(&quot;max&quot;));
 													var va=parseFloat($(event.target).val());
