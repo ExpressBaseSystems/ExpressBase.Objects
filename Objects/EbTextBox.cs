@@ -146,7 +146,7 @@ else {
         //[Description("Identity")]
         //public override string Label { get; set; }
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
-        public EbDbTypes EbDbType { get { return EbDbTypes.String; } }
+        public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
 
         public override string GetHead()
         {
