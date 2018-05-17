@@ -118,7 +118,7 @@ namespace ExpressBase.Objects
             }
             catch (Exception e)
             {
-
+                Console.WriteLine("AfterRedisGet " + e.Message);
             }
         }
 
@@ -138,7 +138,7 @@ namespace ExpressBase.Objects
             }
             catch (Exception e)
             {
-
+                Console.WriteLine("AfterRedisGet " + e.Message);
             }
         }
 

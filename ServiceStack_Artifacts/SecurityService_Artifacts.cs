@@ -18,7 +18,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 	public class GetUsersRequest1 : IReturn<GetUsersResponse1>, IEbSSRequest
 	{
 		[DataMember(Order = 1)]
-		public Dictionary<string, object> Colvalues { get; set; }
+		public string Show { get; set; }
+
 		public string Token { get; set; }
 
 		public string TenantAccountId { get; set; }

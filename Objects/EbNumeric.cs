@@ -15,7 +15,7 @@ namespace ExpressBase.Objects
     public class EbNumeric : EbControlUI
 	{
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
-        public EbDbTypes EbDbType { get { return EbDbTypes.Decimal; } }
+        public override EbDbTypes EbDbType { get { return EbDbTypes.Decimal; } }
         public EbNumeric()
         {
         }

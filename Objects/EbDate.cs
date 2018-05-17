@@ -15,7 +15,7 @@ namespace ExpressBase.Objects
     {
         Date =5,
         Time =17,
-        DateTime=6 ,
+        DateTime=6,
     }
 
     public enum TimeShowFormat
@@ -40,7 +40,7 @@ namespace ExpressBase.Objects
     public class EbDate : EbControlUI
 	{
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
-        public  EbDbTypes EbDbType { get { return (EbDbTypes)this.EbDateType; } }
+        public override EbDbTypes EbDbType { get { return (EbDbTypes)this.EbDateType; } }
 
         public EbDate()
         {
