@@ -136,8 +136,8 @@ namespace ExpressBase.Objects.ReportRelated
             return @"
     this.Init = function(id)
         {
-    this.Height =100;
-    this.Width= 100;
+    this.Height =50;
+    this.Width= 50;
     this.Source = 'url(../images/image.png) center no-repeat';
 };";
         }
@@ -233,8 +233,6 @@ namespace ExpressBase.Objects.ReportRelated
      this.Height =25;
     this.Width= 200;
     this.ForeColor = '#201c1c';
-    this.Border = 1;
-    this.BorderColor = '#aaaaaa'
 };";
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
@@ -274,8 +272,6 @@ namespace ExpressBase.Objects.ReportRelated
      this.Height =25;
     this.Width= 100;
     this.ForeColor = '#201c1c';
-    this.Border = 1;
-    this.BorderColor = '#aaaaaa'
 };";
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
@@ -313,8 +309,6 @@ namespace ExpressBase.Objects.ReportRelated
      this.Height =25;
     this.Width= 100;
     this.ForeColor = '#201c1c';
-    this.Border = 1;
-    this.BorderColor = '#aaaaaa'
 };";
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
@@ -352,8 +346,6 @@ namespace ExpressBase.Objects.ReportRelated
      this.Height =25;
     this.Width= 100;
     this.ForeColor = '#201c1c';
-    this.Border = 1;
-    this.BorderColor = '#aaaaaa'
 };";
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
@@ -397,8 +389,6 @@ namespace ExpressBase.Objects.ReportRelated
      this.Height =25;
     this.Width= 200;
     this.ForeColor = '#201c1c';
-    this.Border = 1;
-    this.BorderColor = '#aaaaaa'
 };";
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, EbReport report)
@@ -466,9 +456,7 @@ namespace ExpressBase.Objects.ReportRelated
     this.Init = function(id)
         {
      this.Height =50;
-    this.Width= 150;    
-    this.Border = 1;
-    this.BorderColor = '#aaaaaa'
+    this.Width= 150;
     this.Source = 'url(../images/barcode.png) center no-repeat';
 };";
         }
@@ -572,9 +560,7 @@ namespace ExpressBase.Objects.ReportRelated
     this.Init = function(id)
         {
      this.Height =100;
-    this.Width= 100;    
-    this.Border = 1;
-    this.BorderColor = '#aaaaaa';
+    this.Width= 100; 
     this.Source = 'url(../images/Qr-code.png) center no-repeat';
 };";
         }
@@ -615,8 +601,6 @@ namespace ExpressBase.Objects.ReportRelated
      this.Height =25;
     this.Width= 200;
     this.ForeColor = '#201c1c';
-    this.Border = 1;
-    this.BorderColor = '#aaaaaa'
 };";
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
