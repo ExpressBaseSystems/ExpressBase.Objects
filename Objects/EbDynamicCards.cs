@@ -128,7 +128,7 @@ namespace ExpressBase.Objects
 		public override bool isFullViewContol { get => true; set => base.isFullViewContol = value; }
 
 		[EnableInBuilder(BuilderType.BotForm)]
-        //[PropertyEditor(PropertyEditorType.DDfromDictProp, "CustomFields")]
+        [PropertyEditor(PropertyEditorType.DDfromDictProp, "CardFields")]
         //[DefaultPropValue("ftype")]
 		public string FilterField { get; set; }
 
