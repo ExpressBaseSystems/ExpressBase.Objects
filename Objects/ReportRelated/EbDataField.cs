@@ -136,8 +136,6 @@ namespace ExpressBase.Objects.ReportRelated
     this.Height =25;
     this.Width= 200;
     this.ForeColor = '#201c1c';
-    this.Border = 1;
-    this.BorderColor = '#aaaaaa'
 };";
         }
     }
@@ -158,8 +156,6 @@ namespace ExpressBase.Objects.ReportRelated
     this.Height =25;
     this.Width= 200;
     this.ForeColor = '#201c1c';
-    this.Border = 1;
-    this.BorderColor = '#aaaaaa'
 };";
         }
     }
@@ -180,8 +176,6 @@ namespace ExpressBase.Objects.ReportRelated
     this.Height =25;
     this.Width= 200;
     this.ForeColor = '#201c1c';
-    this.Border = 1;
-    this.BorderColor = '#aaaaaa'
 };";
         }
     }
@@ -214,8 +208,6 @@ namespace ExpressBase.Objects.ReportRelated
     this.Height =25;
     this.Width= 200;
     this.ForeColor = '#201c1c';
-    this.Border = 1;
-    this.BorderColor = '#aaaaaa'
 };";
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, string column_val, float detailprintingtop, DbType column_type)
@@ -339,8 +331,6 @@ namespace ExpressBase.Objects.ReportRelated
     this.Height =25;
     this.Width= 200;
     this.ForeColor = '#201c1c';
-    this.Border = 1;
-    this.BorderColor = '#aaaaaa'
 };";
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, string column_val, float detailprintingtop, DbType column_type)
@@ -444,8 +434,6 @@ namespace ExpressBase.Objects.ReportRelated
     this.Height =25;
     this.Width= 200;
     this.ForeColor = '#201c1c';
-    this.Border = 1;
-    this.BorderColor = '#aaaaaa'
 };";
         }
     }
@@ -517,8 +505,6 @@ namespace ExpressBase.Objects.ReportRelated
     this.Height =25;
     this.Width= 200;
     this.ForeColor = '#201c1c';
-    this.Border = 1;
-    this.BorderColor = '#aaaaaa'
 };";
         }
     }
@@ -567,15 +553,80 @@ namespace ExpressBase.Objects.ReportRelated
     this.Height =25;
     this.Width= 200;
     this.ForeColor = '#201c1c';
-    this.Border = 1;
-    this.BorderColor = '#aaaaaa'
 };";
         }
     }
 
     [EnableInBuilder(BuilderType.Report)]
-    public class EbCalcField : EbDataField
+    public class EbCalcField : EbDataField, IEbDataFieldSummary
     {
+        [EnableInBuilder(BuilderType.Report)]
+        public SummaryFunctionsNumeric Function { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
+        public bool ResetOnNewPage { get; set; }
+
+        private int Count { get; set; }
+
+        private decimal Sum { get; set; }
+
+        private decimal Max { get; set; }
+
+        private decimal Min { get; set; }
+
+        public object SummarizedValue
+        {
+            get
+            {
+                if (this.Function == SummaryFunctionsNumeric.Sum)
+                    return this.Sum;
+                else if (this.Function == SummaryFunctionsNumeric.Average && this.Count > 0)
+                    return this.Sum / this.Count;
+                else if (this.Function == SummaryFunctionsNumeric.Count)
+                    return this.Count;
+                else if (this.Function == SummaryFunctionsNumeric.Max)
+                    return this.Max;
+                else if (this.Function == SummaryFunctionsNumeric.Min)
+                    return this.Min;
+
+                return 0;
+            }
+        }
+
+        public void Summarize(object value)
+        {
+            this.Count++;
+            decimal myvalue = Convert.ToDecimal(value);
+
+            if (this.Function == SummaryFunctionsNumeric.Sum || this.Function == SummaryFunctionsNumeric.Average)
+            {
+                if (this.Function == SummaryFunctionsNumeric.Sum || this.Function == SummaryFunctionsNumeric.Average)
+                    this.Sum += myvalue;
+            }
+
+            if (this.Count > 1)
+            {
+                if (this.Function == SummaryFunctionsNumeric.Max)
+                    this.Max = (this.Max > myvalue) ? this.Max : myvalue;
+                else if (this.Function == SummaryFunctionsNumeric.Min)
+                    this.Min = (this.Min < myvalue) ? this.Min : myvalue;
+            }
+            else
+            {
+                if (this.Function == SummaryFunctionsNumeric.Max)
+                    this.Max = myvalue;
+                else if (this.Function == SummaryFunctionsNumeric.Min)
+                    this.Min = myvalue;
+            }
+        }
+
+        public override void NotifyNewPage(bool status)
+        {
+            if (status && this.ResetOnNewPage)
+                this.Sum = 0;
+        }
+
         [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("General")]
         [UIproperty]
@@ -626,8 +677,6 @@ namespace ExpressBase.Objects.ReportRelated
     this.Height =25;
     this.Width= 200;
     this.ForeColor = '#201c1c';
-    this.Border = 1;
-    this.BorderColor = '#aaaaaa'
 };";
         }
 

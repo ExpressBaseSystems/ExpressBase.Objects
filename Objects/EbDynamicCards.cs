@@ -35,7 +35,9 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", 1)]
         [OnChangeExec(@"console.log(100); if (this.Columns.$values.length === 0 ){pg.MakeReadOnly('ValueMember');} else {pg.MakeReadWrite('ValueMember');}")]
         public EbDataColumn ValueMember { get; set; }
+
 		
+
 		public EbDynamicCardSet()
 		{
 			this.CardCollection = new List<EbCard>();
@@ -47,8 +49,8 @@ namespace ExpressBase.Objects
 		{
 			this.BareControlHtml = this.GetBareHtml();
 			this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
-			this.FilterField = "ftype";/////////Hard coding for test filter field //febin
-			this.SearchField = "Title0";/////////Hard coding for test search field //febin
+			//this.FilterField = "ftype";/////////Hard coding for test filter field //febin
+			//this.SearchField = "Title0";/////////Hard coding for test search field //febin
 		}
 		
         public void InitFromDataBase(JsonServiceClient ServiceClient)
@@ -147,12 +149,22 @@ namespace ExpressBase.Objects
 		{
 			return @"this.Init = function(id)
 					{
-						//this.CardCollection.$values.push(new EbObjects.EbCard(id + '_EbCard0'));
-						this.CardFields.$values.push(new EbObjects.EbCardImageField('Image0'));
-						this.CardFields.$values.push(new EbObjects.EbCardTitleField('Title0'));
-						this.CardFields.$values.push(new EbObjects.EbCardHtmlField('Html0'));
-						this.CardFields.$values.push(new EbObjects.EbCardNumericField('Numeric0'));
-						this.CardFields.$values.push(new EbObjects.EbCardTextField('Text0'));
+						//this.CardCollection.$values.push(new EbObjects.EbCard(id + '_EbCard0'));						
+						var field0 = new EbObjects.EbCardImageField(id + '_EbCardImageField0');
+						var field1 = new EbObjects.EbCardTitleField(id + '_EbCardTitleField1');
+						var field2 = new EbObjects.EbCardHtmlField(id + '_EbCardHtmlField2');
+						var field3 = new EbObjects.EbCardNumericField(id + '_EbCardNumericField3');
+						var field4 = new EbObjects.EbCardTextField(id + '_EbCardTextField4');
+						field0.Name = 'Image0';
+						field1.Name = 'Title1';
+						field2.Name = 'Html2';
+						field3.Name = 'Numeric3';
+						field4.Name = 'Text4';
+						this.CardFields.$values.push(field0);
+						this.CardFields.$values.push(field1);
+						this.CardFields.$values.push(field2);
+						this.CardFields.$values.push(field3);
+						this.CardFields.$values.push(field4);
 					};";
 		}
 
@@ -171,8 +183,8 @@ namespace ExpressBase.Objects
 					html += @"<div id='@name@' class='card-cont' card-id='@cardid@' filter-value='@FilterValue@' search-value='@SearchValue@' style='width:100%;'>"
 									.Replace("@name@", card.Name.Trim())
 									.Replace("@cardid@", card.CardId.ToString())
-									.Replace("@FilterValue@", card.CustomFields[this.FilterField].ToString())
-									.Replace("@SearchValue@", card.CustomFields[this.SearchField].ToString());
+									.Replace("@FilterValue@", this.FilterField.IsNullOrEmpty() ? "": card.CustomFields[this.FilterField].ToString())
+									.Replace("@SearchValue@", this.SearchField.IsNullOrEmpty() ? "": card.CustomFields[this.SearchField].ToString());
 					foreach (EbCardField cardField in this.CardFields)
 					{
 						cardField.FieldValue = card.CustomFields.ContainsKey(cardField.Name) ? card.CustomFields[cardField.Name] : null;
@@ -199,8 +211,9 @@ namespace ExpressBase.Objects
 			{
 				if (F.Summarize)
 				{
+					string tempst = F.Label.IsNullOrEmpty() ? F.Name : F.Label;
 					string colStyle = ((F.SummarizeColumnWidth > 0) ? "width: " + F.SummarizeColumnWidth + "%;" : "") + " white-space: nowrap; overflow: hidden; text-overflow: ellipsis;";
-					html += "<th style='" + colStyle + "' title='" + F.Name + "'>" + F.Name + "</th>";
+					html += "<th style='" + colStyle + "' title='" + tempst + "'>" + tempst + "</th>";
 					this.IsSummaryRequired = true;
 					tcols++;
 				}
@@ -232,22 +245,26 @@ namespace ExpressBase.Objects
 			string html = @"<div class='card-header-cont'> 
 								<div class='card-head-cardno'>
 									1 of 1
-								</div>
-								<div class='card-head-searchdiv'>
+								</div>";
+			string shtml = @"	<div class='card-head-searchdiv'>
 									<input type='text' class='card-head-search-box form-control' placeholder='Search' title='Search' style=' height: 28px; min-height: 25px; border-radius: 12px;border: none;padding-right: 22px; -webkit-transition: width 0.4s ease-in-out; transition: width 0.4s ease-in-out;'/>            
 									<i class='fa fa-search card-head-search-icon form-control-feedback' aria-hidden='true'></i>
 								</div>";
-
+			string fhtml = string.Empty;
 			if (this.FilterValues.Count != 0)
 			{
-				html += @"<div class='card-head-filterdiv'>
+				fhtml += @"<div class='card-head-filterdiv'>
 							<select class='card-head-filter-box form-control'> <option value='All'> All </option>";
 				foreach (string val in this.FilterValues)
 				{
-					html += @"<option value='" + val + "'>" + val + "</option>";
+					fhtml += @"<option value='" + val + "'>" + val + "</option>";
 				}
-				html += "</select> <i class='fa fa-filter card-head-filter-icon' aria-hidden='true'></i></div>";
+				fhtml += "</select> <i class='fa fa-filter card-head-filter-icon' aria-hidden='true'></i></div>";
 			}
+			if (!this.SearchField.IsNullOrEmpty())
+				html += shtml;
+			if (!this.FilterField.IsNullOrEmpty())
+				html += fhtml;
 			html += "</div>";
 
 			return html;
@@ -305,6 +322,28 @@ namespace ExpressBase.Objects
 						.Replace("@name@", this.Name ?? "@name@")
 						.Replace("@GetBareHtml@", this.GetBareHtml());
 		}
+
+		//public override string GetDesignHtml()
+		//{
+		//	return @"`<div id=@id class='Eb-ctrlContainer'><div class='cards-cont'>
+		//				<div class='card-cont' style='width: 100%; min-height: 100px; box-shadow: 0px 0px 20px #ccc; border-radius: 1.3em;'>
+		//					<div class='card-btn-cont'><button class='btn btn-default' style='width:100%;' disabled>Select</button></div>
+		//				</div>
+		//				<div class='card-summary-cont' style='box-shadow: 0px 0px 20px #ccc; border-radius: 0; margin: 20px -4px 0 6px;'><div style='font-size: 15px; padding:5px 5px 0px 5px; text-align:center;'><b> Summary </b></div>
+		//					<table class='table card-summary-table'>
+		//						<thead style='font-size:12px;'>
+		//							<tr>
+		//								<th>Column 1</th>
+		//								<th>Column 2</th>
+		//								<th>Column 3</th>
+		//							</tr>
+		//						</thead>
+		//						<tbody style='font-size:12px;'><tr><td style='text-align:center; border: none;' colspan=3><i> Nothing to Display </i></td></tr>  </tbody>
+		//					</table>
+		//				</div>
+						
+		//			</div></div>`";
+		//}
 	}
 
 
@@ -378,6 +417,8 @@ namespace ExpressBase.Objects
 		[HideInPropertyGrid]
 		public virtual EbDbTypes EbDbType { get; set; }
 
+		public string DesignHtml { get; set; }
+
 		//[PropertyGroup("Appearance")]
 		//[EnableInBuilder(BuilderType.BotForm)]
 		//[PropertyEditor(PropertyEditorType.FontSelector)]
@@ -408,8 +449,15 @@ namespace ExpressBase.Objects
 		public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
 
 		public EbCardImageField() { }
+		
+		[OnDeserialized]
+		public void OnDeserializedMethod(StreamingContext context)
+		{
+			this.DesignHtml = this.GetDesignHtml();
+			this.DesignHtml = this.DesignHtml.Substring(1, this.DesignHtml.Length - 2);
+		}
 
-        public override string GetDesignHtml()
+		public override string GetDesignHtml()
         {
             return @"`<div><img class='card-img' src='../images/image.png' style='width: 100%; height: 200px; opacity: 0.2;'/></div>`";
         }
@@ -441,8 +489,15 @@ namespace ExpressBase.Objects
 		public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
 
 		public EbCardHtmlField() { }
+		
+		[OnDeserialized]
+		public void OnDeserializedMethod(StreamingContext context)
+		{
+			this.DesignHtml = this.GetDesignHtml();
+			this.DesignHtml = this.DesignHtml.Substring(1, this.DesignHtml.Length - 2);
+		}
 
-        public override string GetDesignHtml()
+		public override string GetDesignHtml()
         {
             return @"`<div class='card-contenthtml-cont' style='padding:5px; text-align: center; width: 100%; min-height: 50px;'> HTML Content </div>`";
         }
@@ -504,7 +559,14 @@ namespace ExpressBase.Objects
 
 		public EbCardNumericField() { }
 
-        public override string GetDesignHtml()
+		[OnDeserialized]
+		public void OnDeserializedMethod(StreamingContext context)
+		{
+			this.DesignHtml = this.GetDesignHtml();
+			this.DesignHtml = this.DesignHtml.Substring(1, this.DesignHtml.Length - 2);
+		}
+
+		public override string GetDesignHtml()
         {
             return @"`<div class='card-numeric-cont data-@Name@' style='@display@' data-value='@Value@'>
 						<div style='display: inline-block; width: 38%;'> <b> &nbsp&nbsp Numeric Field </b> </div> 
@@ -611,7 +673,14 @@ namespace ExpressBase.Objects
 
 		public EbCardTextField() { }
 
-        public override string GetDesignHtml()
+		[OnDeserialized]
+		public void OnDeserializedMethod(StreamingContext context)
+		{
+			this.DesignHtml = this.GetDesignHtml();
+			this.DesignHtml = this.DesignHtml.Substring(1, this.DesignHtml.Length - 2);
+		}
+
+		public override string GetDesignHtml()
         {
             return @"`<div class='card-text-cont'>
 						<div style='display: inline-block; width: 38%;'> 
@@ -658,6 +727,13 @@ namespace ExpressBase.Objects
 		public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
 
 		public EbCardTitleField() { }
+
+		[OnDeserialized]
+		public void OnDeserializedMethod(StreamingContext context)
+		{
+			this.DesignHtml = this.GetDesignHtml();
+			this.DesignHtml = this.DesignHtml.Substring(1, this.DesignHtml.Length - 2);
+		}
 
 		public override string GetDesignHtml()
 		{
