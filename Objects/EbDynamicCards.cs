@@ -130,13 +130,13 @@ namespace ExpressBase.Objects
 		public override bool isFullViewContol { get => true; set => base.isFullViewContol = value; }
 
 		[EnableInBuilder(BuilderType.BotForm)]
-        [PropertyEditor(PropertyEditorType.DDfromDictProp, "CardFields")]
-        //[DefaultPropValue("ftype")]
+        //[PropertyEditor(PropertyEditorType.DDfromDictProp, "CardFields")]
 		public string FilterField { get; set; }
 
 		public List<string> FilterValues { get; set; }
 
 		[EnableInBuilder(BuilderType.BotForm)]
+		[PropertyEditor(PropertyEditorType.DDfromDictProp, "CardFields")]
 		public string SearchField { get; set; }
 
 		public string IsReadOnly { get; set; }
@@ -748,7 +748,66 @@ namespace ExpressBase.Objects
 					.Replace("@Text@", (this.FieldValue == null)? "" : this.FieldValue).Replace("@Name@", this.Name);
 		}
 	}
-	
+
+	[EnableInBuilder(BuilderType.BotForm)]
+	[HideInToolBox]
+	[Alias("Location")]
+	public class EbCardLocationField : EbCardField
+	{
+		[EnableInBuilder(BuilderType.BotForm)]
+		//[PropertyEditor(PropertyEditorType.String)]
+		[Alias("Position")]
+		[MetaOnly]
+		public override dynamic FieldValue { get; set; }
+
+		//[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+		//[PropertyEditor(PropertyEditorType.Expandable)]
+		//public LatLng Position { get; set; }
+		//public LatLng Lat_Long { get; set; }
+		//public Decimal Latitude { get; set; }
+		//public Decimal Longitude { get; set; }
+
+		[EnableInBuilder(BuilderType.BotForm)]
+		[HideInPropertyGrid]
+		public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
+
+		public EbCardLocationField() { }
+
+		[OnDeserialized]
+		public void OnDeserializedMethod(StreamingContext context)
+		{
+			this.DesignHtml = this.GetDesignHtml();
+			this.DesignHtml = this.DesignHtml.Substring(1, this.DesignHtml.Length - 2);
+		}
+
+		public override string GetDesignHtml()
+		{
+			return @"`<div class='card-location-cont'>
+							<div class='map-div' style='position: relative; overflow: hidden;'>
+								<img style='width:100%;height: 100%;' src='/images/LocMapImg1.png'>
+							</div>
+						</div>`";
+		}
+
+		public override string DesignHtml4Bot {
+			get => @"	<div class='card-location-cont'>
+							<div class='map-div' style='position: relative; overflow: hidden;'>
+								<img style='width:100%;height: 100%;' src='/images/LocMapImg1.png'>
+							</div>
+						</div>";
+			set => base.DesignHtml4Bot = value;
+		}
+
+		public override string GetBareHtml()
+		{
+			return @"	<div id='@name@_Cont' class='card-location-cont' @DataLatLng@>
+							<div id='@name@' class='map-div'></div>
+						</div>"
+								.Replace("@name@", (this.Name != null) ? this.Name : "@name@")
+								.Replace("@DataLatLng@", String.IsNullOrEmpty(this.FieldValue) ? "": ("data-lat='" + this.FieldValue.Split(",")[0].Trim() + "' data-lng='" + this.FieldValue.Split(",")[1].Trim() + "'"));
+		}
+	}
+
 }
 
 
