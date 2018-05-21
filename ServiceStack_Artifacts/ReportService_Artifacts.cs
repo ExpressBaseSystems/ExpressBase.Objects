@@ -28,6 +28,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 3)]
+        public String ReportName { get; set; }
     }
 
     public class ValidateCalcExpressionRequest : EbServiceStackRequest, IReturn<ReportRenderResponse>

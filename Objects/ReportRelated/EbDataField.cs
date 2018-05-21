@@ -730,4 +730,28 @@ namespace ExpressBase.Objects.ReportRelated
             ct.Go();
         }
     }
+
+    [EnableInBuilder(BuilderType.Report)]
+    public class EbCalcNumeric
+    {
+
+    }
+
+    [EnableInBuilder(BuilderType.Report)]
+    public class EbCalcText
+    {
+
+    }
+
+    [EnableInBuilder(BuilderType.Report)]
+    public class EbCalcDatetime
+    {
+
+    }
+
+    [EnableInBuilder(BuilderType.Report)]
+    public class EbCalcBoolean
+    {
+
+    }
 }
