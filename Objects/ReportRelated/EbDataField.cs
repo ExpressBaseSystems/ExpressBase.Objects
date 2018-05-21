@@ -245,6 +245,12 @@ namespace ExpressBase.Objects.ReportRelated
 
     }
 
+    public interface IEbDataFieldSummary
+    {
+        object SummarizedValue { get; }
+        void Summarize(object value);
+    }
+
     [EnableInBuilder(BuilderType.Report)]
     public class EbDataFieldNumericSummary : EbDataFieldNumeric, IEbDataFieldSummary
     {
@@ -323,6 +329,7 @@ namespace ExpressBase.Objects.ReportRelated
         {
             return "<div class='dropped' $type='@type' eb-type='DataFieldNumericSummary' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;text-align: @TextAlign;'> @Title </div>".RemoveCR().DoubleQuoted();
         }
+
         public override string GetJsInitFunc()
         {
             return @"
@@ -333,6 +340,7 @@ namespace ExpressBase.Objects.ReportRelated
     this.ForeColor = '#201c1c';
 };";
         }
+
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, string column_val, float detailprintingtop, DbType column_type)
         {
             Phrase phrase;
@@ -359,22 +367,11 @@ namespace ExpressBase.Objects.ReportRelated
         }
     }
 
-    public interface IEbDataFieldSummary
-    {
-        object SummarizedValue { get; }
-        void Summarize(object value);
-    }
-
     [EnableInBuilder(BuilderType.Report)]
     public class EbDataFieldTextSummary : EbDataFieldText, IEbDataFieldSummary
     {
         [EnableInBuilder(BuilderType.Report)]
-        [HideInPropertyGrid]
-        public string DataField { get; set; }
-
-        [EnableInBuilder(BuilderType.Report)]
         public SummaryFunctionsText Function { get; set; }
-
 
         [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]
@@ -441,10 +438,6 @@ namespace ExpressBase.Objects.ReportRelated
     [EnableInBuilder(BuilderType.Report)]
     public class EbDataFieldDateTimeSummary : EbDataFieldDateTime, IEbDataFieldSummary
     {
-        [EnableInBuilder(BuilderType.Report)]
-        [HideInPropertyGrid]
-        public string DataField { get; set; }
-
         [EnableInBuilder(BuilderType.Report)]
         public SummaryFunctionsDateTime Function { get; set; }
 
@@ -513,12 +506,7 @@ namespace ExpressBase.Objects.ReportRelated
     public class EbDataFieldBooleanSummary : EbDataFieldBoolean, IEbDataFieldSummary
     {
         [EnableInBuilder(BuilderType.Report)]
-        [HideInPropertyGrid]
-        public string DataField { get; set; }
-
-        [EnableInBuilder(BuilderType.Report)]
         public SummaryFunctionsBoolean Function { get; set; }
-
 
         [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]
@@ -558,75 +546,8 @@ namespace ExpressBase.Objects.ReportRelated
     }
 
     [EnableInBuilder(BuilderType.Report)]
-    public class EbCalcField : EbDataField, IEbDataFieldSummary
+    public class EbCalcField : EbDataField
     {
-        [EnableInBuilder(BuilderType.Report)]
-        public SummaryFunctionsNumeric Function { get; set; }
-
-        [EnableInBuilder(BuilderType.Report)]
-        [HideInPropertyGrid]
-        public bool ResetOnNewPage { get; set; }
-
-        private int Count { get; set; }
-
-        private decimal Sum { get; set; }
-
-        private decimal Max { get; set; }
-
-        private decimal Min { get; set; }
-
-        public object SummarizedValue
-        {
-            get
-            {
-                if (this.Function == SummaryFunctionsNumeric.Sum)
-                    return this.Sum;
-                else if (this.Function == SummaryFunctionsNumeric.Average && this.Count > 0)
-                    return this.Sum / this.Count;
-                else if (this.Function == SummaryFunctionsNumeric.Count)
-                    return this.Count;
-                else if (this.Function == SummaryFunctionsNumeric.Max)
-                    return this.Max;
-                else if (this.Function == SummaryFunctionsNumeric.Min)
-                    return this.Min;
-
-                return 0;
-            }
-        }
-
-        public void Summarize(object value)
-        {
-            this.Count++;
-            decimal myvalue = Convert.ToDecimal(value);
-
-            if (this.Function == SummaryFunctionsNumeric.Sum || this.Function == SummaryFunctionsNumeric.Average)
-            {
-                if (this.Function == SummaryFunctionsNumeric.Sum || this.Function == SummaryFunctionsNumeric.Average)
-                    this.Sum += myvalue;
-            }
-
-            if (this.Count > 1)
-            {
-                if (this.Function == SummaryFunctionsNumeric.Max)
-                    this.Max = (this.Max > myvalue) ? this.Max : myvalue;
-                else if (this.Function == SummaryFunctionsNumeric.Min)
-                    this.Min = (this.Min < myvalue) ? this.Min : myvalue;
-            }
-            else
-            {
-                if (this.Function == SummaryFunctionsNumeric.Max)
-                    this.Max = myvalue;
-                else if (this.Function == SummaryFunctionsNumeric.Min)
-                    this.Min = myvalue;
-            }
-        }
-
-        public override void NotifyNewPage(bool status)
-        {
-            if (status && this.ResetOnNewPage)
-                this.Sum = 0;
-        }
-
         [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("General")]
         [UIproperty]
@@ -728,6 +649,297 @@ namespace ExpressBase.Objects.ReportRelated
             var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
             ct.SetSimpleColumn(text, this.LeftPt, lly, this.WidthPt + this.LeftPt, ury, 15, Element.ALIGN_LEFT);
             ct.Go();
+        }
+    }
+
+    [EnableInBuilder(BuilderType.Report)]
+    public class EbCalcFieldNumericSummary : EbCalcField, IEbDataFieldSummary
+    {
+        [EnableInBuilder(BuilderType.Report)]
+        public SummaryFunctionsNumeric Function { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
+        public bool ResetOnNewPage { get; set; }
+
+        private int Count { get; set; }
+
+        private decimal Sum { get; set; }
+
+        private decimal Max { get; set; }
+
+        private decimal Min { get; set; }
+
+        public object SummarizedValue
+        {
+            get
+            {
+                if (this.Function == SummaryFunctionsNumeric.Sum)
+                    return this.Sum;
+                else if (this.Function == SummaryFunctionsNumeric.Average && this.Count > 0)
+                    return this.Sum / this.Count;
+                else if (this.Function == SummaryFunctionsNumeric.Count)
+                    return this.Count;
+                else if (this.Function == SummaryFunctionsNumeric.Max)
+                    return this.Max;
+                else if (this.Function == SummaryFunctionsNumeric.Min)
+                    return this.Min;
+
+                return 0;
+            }
+        }
+
+        public void Summarize(object value)
+        {
+            this.Count++;
+            decimal myvalue = Convert.ToDecimal(value);
+
+            if (this.Function == SummaryFunctionsNumeric.Sum || this.Function == SummaryFunctionsNumeric.Average)
+            {
+                if (this.Function == SummaryFunctionsNumeric.Sum || this.Function == SummaryFunctionsNumeric.Average)
+                    this.Sum += myvalue;
+            }
+
+            if (this.Count > 1)
+            {
+                if (this.Function == SummaryFunctionsNumeric.Max)
+                    this.Max = (this.Max > myvalue) ? this.Max : myvalue;
+                else if (this.Function == SummaryFunctionsNumeric.Min)
+                    this.Min = (this.Min < myvalue) ? this.Min : myvalue;
+            }
+            else
+            {
+                if (this.Function == SummaryFunctionsNumeric.Max)
+                    this.Max = myvalue;
+                else if (this.Function == SummaryFunctionsNumeric.Min)
+                    this.Min = myvalue;
+            }
+        }
+
+        public override void NotifyNewPage(bool status)
+        {
+            if (status && this.ResetOnNewPage)
+                this.Sum = 0;
+        }
+
+        public override string GetDesignHtml()
+        {
+            return "<div class='dropped' $type='@type' eb-type='EbCalcFieldNumericSummary' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;text-align: @TextAlign;'> @Title </div>".RemoveCR().DoubleQuoted();
+        }
+
+        public override string GetJsInitFunc()
+        {
+            return @"
+    this.Init = function(id)
+        {
+    this.Height =25;
+    this.Width= 200;
+    this.ForeColor = '#201c1c';
+};";
+        }
+
+        public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, string column_val, float detailprintingtop, DbType column_type)
+        {
+            Phrase phrase;
+            var ury = reportHeight - (printingTop + this.TopPt + detailprintingtop);
+            var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
+            if (this.DecimalPlaces > 0)
+                column_val = Convert.ToDecimal(column_val).ToString("F" + this.DecimalPlaces);
+            if (this.InLetters)
+            {
+                NumberToEnglish numToE = new NumberToEnglish();
+                column_val = numToE.changeCurrencyToWords(column_val);
+            }
+            if (this.Font == null)
+                phrase = new Phrase(column_val);
+            else
+            {
+                phrase = new Phrase(column_val, ITextFont);
+                if (this.ForeColor != "")
+                    phrase.Font.Color = GetColor(this.ForeColor);//ct.Canvas.SetColorFill(GetColor(this.Color));
+            }
+            ColumnText ct = new ColumnText(canvas);
+            ct.SetSimpleColumn(phrase, this.LeftPt, lly, this.WidthPt + this.LeftPt, ury, 15, Element.ALIGN_RIGHT);
+            ct.Go();
+        }
+
+    }
+
+    [EnableInBuilder(BuilderType.Report)]
+    public class EbCalcFieldTextSummary : EbCalcField, IEbDataFieldSummary
+    {
+        [EnableInBuilder(BuilderType.Report)]
+        public SummaryFunctionsText Function { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
+        public bool ResetOnNewPage { get; set; }
+
+        private int Count { get; set; }
+
+        private string Max { get; set; } = "";
+
+        private string Min { get; set; } = "";
+
+        public object SummarizedValue
+        {
+            get
+            {
+                if (this.Function == SummaryFunctionsText.Count)
+                    return this.Count;
+                else if (this.Function == SummaryFunctionsText.Max)
+                    return this.Max;
+                else if (this.Function == SummaryFunctionsText.Min)
+                    return this.Min;
+
+                return 0;
+            }
+        }
+
+        public void Summarize(object value)
+        {
+            var myvalue = value.ToString();
+            this.Count++;
+            if (this.Count > 1)
+            {
+                if (this.Function == SummaryFunctionsText.Max)
+                    this.Max = (this.Max.CompareTo(myvalue) > 0) ? this.Max : myvalue;
+                else if (this.Function == SummaryFunctionsText.Min)
+                    this.Min = (this.Min.CompareTo(myvalue) > 0) ? myvalue : this.Min;
+            }
+            else
+            {
+                if (this.Function == SummaryFunctionsText.Max)
+                    this.Max = myvalue;
+                else if (this.Function == SummaryFunctionsText.Min)
+                    this.Min = myvalue;
+            }
+        }
+
+        public override string GetDesignHtml()
+        {
+            return "<div class='dropped' $type='@type' eb-type='EbCalcFieldTextSummary' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;text-align: @TextAlign;'> @Title </div>".RemoveCR().DoubleQuoted();
+        }
+
+        public override string GetJsInitFunc()
+        {
+            return @"
+    this.Init = function(id)
+        {
+    this.Height =25;
+    this.Width= 200;
+    this.ForeColor = '#201c1c';
+};";
+        }
+    }
+
+    [EnableInBuilder(BuilderType.Report)]
+    public class EbCalcFieldDatetimeSummary : EbCalcField, IEbDataFieldSummary
+    {
+        [EnableInBuilder(BuilderType.Report)]
+        public SummaryFunctionsDateTime Function { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
+        public bool ResetOnNewPage { get; set; }
+
+        private int Count { get; set; }
+
+        private DateTime Max { get; set; }
+
+        private DateTime Min { get; set; }
+
+        public object SummarizedValue
+        {
+            get
+            {
+                if (this.Function == SummaryFunctionsDateTime.Count)
+                    return this.Count;
+                else if (this.Function == SummaryFunctionsDateTime.Max)
+                    return this.Max;
+                else if (this.Function == SummaryFunctionsDateTime.Min)
+                    return this.Min;
+
+                return 0;
+            }
+        }
+
+        public void Summarize(object value)
+        {
+            var myvalue = Convert.ToDateTime(value);
+            this.Count++;
+            if (this.Count > 1)
+            {
+                if (this.Function == SummaryFunctionsDateTime.Max)
+                    this.Max = (DateTime.Compare(this.Max, myvalue) > 0) ? this.Max : myvalue;
+                if (this.Function == SummaryFunctionsDateTime.Min)
+                    this.Min = (DateTime.Compare(this.Min, myvalue) > 0) ? myvalue : this.Min;
+            }
+            else
+            {
+                if (this.Function == SummaryFunctionsDateTime.Max)
+                    this.Max = myvalue;
+                if (this.Function == SummaryFunctionsDateTime.Min)
+                    this.Min = myvalue;
+            }
+        }
+
+        public override string GetDesignHtml()
+        {
+            return "<div class='dropped' $type='@type' eb-type='EbCalcFieldDatetimeSummary' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;text-align: @TextAlign;'> @Title </div>".RemoveCR().DoubleQuoted();
+        }
+        public override string GetJsInitFunc()
+        {
+            return @"
+    this.Init = function(id)
+        {
+    this.Height =25;
+    this.Width= 200;
+    this.ForeColor = '#201c1c';
+};";
+        }
+    }
+
+    [EnableInBuilder(BuilderType.Report)]
+    public class EbCalcFieldBooleanSummary : EbCalcField, IEbDataFieldSummary
+    {
+        [EnableInBuilder(BuilderType.Report)]
+        public SummaryFunctionsBoolean Function { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
+        public bool ResetOnNewPage { get; set; }
+
+        private int Count { get; set; }
+
+        public object SummarizedValue
+        {
+            get
+            {
+                if (this.Function == SummaryFunctionsBoolean.Count)
+                    return this.Count;
+                return 0;
+            }
+        }
+
+        public void Summarize(object value)
+        {
+            this.Count++;
+        }
+
+        public override string GetDesignHtml()
+        {
+            return "<div class='dropped' $type='@type' eb-type='EbCalcFieldBooleanSummary' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;text-align: @TextAlign ;'> @Title </div>".RemoveCR().DoubleQuoted();
+        }
+        public override string GetJsInitFunc()
+        {
+            return @"
+    this.Init = function(id)
+        {
+    this.Height =25;
+    this.Width= 200;
+    this.ForeColor = '#201c1c';
+};";
         }
     }
 }
