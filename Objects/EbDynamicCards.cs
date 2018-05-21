@@ -130,7 +130,7 @@ namespace ExpressBase.Objects
 		public override bool isFullViewContol { get => true; set => base.isFullViewContol = value; }
 
 		[EnableInBuilder(BuilderType.BotForm)]
-        //[PropertyEditor(PropertyEditorType.DDfromDictProp, "CustomFields")]
+        [PropertyEditor(PropertyEditorType.DDfromDictProp, "CardFields")]
         //[DefaultPropValue("ftype")]
 		public string FilterField { get; set; }
 
@@ -139,6 +139,8 @@ namespace ExpressBase.Objects
 		[EnableInBuilder(BuilderType.BotForm)]
 		public string SearchField { get; set; }
 
+		public string IsReadOnly { get; set; }
+		
 		public override string GetToolHtml()
 		{
 			return @"<div eb-type='@toolName' class='tool'><i class='fa fa-window-restore'></i>@toolName</div>"
