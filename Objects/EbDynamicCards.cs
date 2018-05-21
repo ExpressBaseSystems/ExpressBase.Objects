@@ -139,6 +139,8 @@ namespace ExpressBase.Objects
 		[EnableInBuilder(BuilderType.BotForm)]
 		public string SearchField { get; set; }
 
+		public string IsReadOnly { get; set; }
+		
 		public override string GetToolHtml()
 		{
 			return @"<div eb-type='@toolName' class='tool'><i class='fa fa-window-restore'></i>@toolName</div>"
