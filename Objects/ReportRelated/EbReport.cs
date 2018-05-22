@@ -792,7 +792,7 @@ else {
             }
             else if (field is EbImg)
             {
-                byte[] fileByte = this.ReportService.GetFile(this.SolutionId, this.FileService as IEbFileService, (field as EbImg).Image);
+                byte[] fileByte = this.ReportService.GetFile(this.SolutionId, (field as EbImg).Image);
                 field.DrawMe(Doc, fileByte);
             }
             else if ((field is EbText) || (field is EbReportFieldShape))
@@ -823,7 +823,7 @@ else {
                 {
                     if ((field is EbWaterMark) && (field as EbWaterMark).Image != string.Empty)
                     {
-                        byte[] fileByte = this.ReportService.GetFile(this.SolutionId, this.FileService as IEbFileService, (field as EbWaterMark).Image);
+                        byte[] fileByte = this.ReportService.GetFile(this.SolutionId, (field as EbWaterMark).Image);
                         //  byte[] fileByte = myFileService.Post
                         //(new DownloadFileRequest
                         //{
