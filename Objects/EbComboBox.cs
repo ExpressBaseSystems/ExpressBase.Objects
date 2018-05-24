@@ -87,7 +87,11 @@ namespace ExpressBase.Objects
         //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public int[] values { get; set; }
 
-        private string VueSelectcode
+		[HideInPropertyGrid]
+		[EnableInBuilder(BuilderType.BotForm)]
+		public override bool IsReadOnly { get => this.ReadOnly; }
+
+		private string VueSelectcode
         {
             get
             {

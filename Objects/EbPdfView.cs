@@ -31,7 +31,12 @@ namespace ExpressBase.Objects
         public string DataSourceId { get; set; }
 
         public override bool isFullViewContol { get => true; set => base.isFullViewContol = value; }
-        public override string GetHead()
+
+		[HideInPropertyGrid]
+		[EnableInBuilder(BuilderType.BotForm)]
+		public override bool IsReadOnly { get => true; }
+
+		public override string GetHead()
         {
             return string.Empty;
         }

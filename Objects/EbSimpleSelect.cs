@@ -43,7 +43,11 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public int Value { get; set; }
 
-        public EbSimpleSelect() { }
+		[HideInPropertyGrid]
+		[EnableInBuilder(BuilderType.BotForm)]
+		public override bool IsReadOnly { get => this.ReadOnly; }
+
+		public EbSimpleSelect() { }
 
         public string OptionHtml { get; set; }
 

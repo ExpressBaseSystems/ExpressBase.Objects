@@ -34,9 +34,9 @@ namespace ExpressBase.Objects
 				foreach (EbCard Card in this.CardCollection)
 				{
 					//for getting distinct filter values
-					if (!this.FilterValues.Contains(Card.CustomFields[this.FilterField].ToString()))
+					if (this.FilterField != null && !this.FilterValues.Contains(Card.CustomFields[this.FilterField.Name].ToString()))
 					{
-						this.FilterValues.Add(Card.CustomFields[this.FilterField].ToString().Trim());
+						this.FilterValues.Add(Card.CustomFields[this.FilterField.Name].ToString().Trim());
 					}
 				}
 			

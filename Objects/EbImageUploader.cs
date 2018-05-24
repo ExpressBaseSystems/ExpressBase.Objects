@@ -16,7 +16,11 @@ namespace ExpressBase.Objects
 
         public EbImageUploader() { }
 
-        [OnDeserialized]
+		[HideInPropertyGrid]
+		[EnableInBuilder(BuilderType.BotForm)]
+		public override bool IsReadOnly { get => this.ReadOnly; }
+
+		[OnDeserialized]
         public void OnDeserializedMethod(StreamingContext context)
         {
             this.BareControlHtml = this.GetBareHtml();
