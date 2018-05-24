@@ -556,6 +556,10 @@ namespace ExpressBase.Objects.ReportRelated
         public string ValueExpression { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
+        [UIproperty]
+        public string CalcFieldType { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("General")]
         public int DecimalPlaces { get; set; }
 
@@ -587,7 +591,7 @@ namespace ExpressBase.Objects.ReportRelated
 
         public override string GetDesignHtml()
         {
-            return "<div class='dropped' $type='@type' eb-type='CalcField' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;text-align: @TextAlign ;'> @Title </div>".RemoveCR().DoubleQuoted();
+            return "<div class='dropped CalcField' $type='@type' cfType='@CalcFieldType ' eb-type='CalcField' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;text-align: @TextAlign ;'> @Title </div>".RemoveCR().DoubleQuoted();
         }
 
         public override string GetJsInitFunc()
@@ -659,6 +663,9 @@ namespace ExpressBase.Objects.ReportRelated
         public SummaryFunctionsNumeric Function { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
+        public string CalcFieldName { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]
         public bool ResetOnNewPage { get; set; }
 
@@ -724,7 +731,7 @@ namespace ExpressBase.Objects.ReportRelated
 
         public override string GetDesignHtml()
         {
-            return "<div class='dropped' $type='@type' eb-type='EbCalcFieldNumericSummary' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;text-align: @TextAlign;'> @Title </div>".RemoveCR().DoubleQuoted();
+            return "<div class='dropped' $type='@type' eb-type='CalcFieldNumericSummary' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;text-align: @TextAlign;'> @Title </div>".RemoveCR().DoubleQuoted();
         }
 
         public override string GetJsInitFunc()
@@ -770,6 +777,9 @@ namespace ExpressBase.Objects.ReportRelated
     {
         [EnableInBuilder(BuilderType.Report)]
         public SummaryFunctionsText Function { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        public string CalcFieldName { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]
@@ -818,7 +828,7 @@ namespace ExpressBase.Objects.ReportRelated
 
         public override string GetDesignHtml()
         {
-            return "<div class='dropped' $type='@type' eb-type='EbCalcFieldTextSummary' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;text-align: @TextAlign;'> @Title </div>".RemoveCR().DoubleQuoted();
+            return "<div class='dropped' eb-type='CalcFieldTextSummary' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;text-align: @TextAlign;'> @Title </div>".RemoveCR().DoubleQuoted();
         }
 
         public override string GetJsInitFunc()
@@ -834,10 +844,13 @@ namespace ExpressBase.Objects.ReportRelated
     }
 
     [EnableInBuilder(BuilderType.Report)]
-    public class EbCalcFieldDatetimeSummary : EbCalcField, IEbDataFieldSummary
+    public class EbCalcFieldDateTimeSummary : EbCalcField, IEbDataFieldSummary
     {
         [EnableInBuilder(BuilderType.Report)]
         public SummaryFunctionsDateTime Function { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        public string CalcFieldName { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]
@@ -886,7 +899,7 @@ namespace ExpressBase.Objects.ReportRelated
 
         public override string GetDesignHtml()
         {
-            return "<div class='dropped' $type='@type' eb-type='EbCalcFieldDatetimeSummary' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;text-align: @TextAlign;'> @Title </div>".RemoveCR().DoubleQuoted();
+            return "<div class='dropped' eb-type='CalcFieldDatetimeSummary' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;text-align: @TextAlign;'> @Title </div>".RemoveCR().DoubleQuoted();
         }
         public override string GetJsInitFunc()
         {
@@ -905,6 +918,9 @@ namespace ExpressBase.Objects.ReportRelated
     {
         [EnableInBuilder(BuilderType.Report)]
         public SummaryFunctionsBoolean Function { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        public string CalcFieldName { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]
@@ -929,7 +945,7 @@ namespace ExpressBase.Objects.ReportRelated
 
         public override string GetDesignHtml()
         {
-            return "<div class='dropped' $type='@type' eb-type='EbCalcFieldBooleanSummary' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;text-align: @TextAlign ;'> @Title </div>".RemoveCR().DoubleQuoted();
+            return "<div class='dropped' eb-type='CalcFieldBooleanSummary' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;text-align: @TextAlign ;'> @Title </div>".RemoveCR().DoubleQuoted();
         }
         public override string GetJsInitFunc()
         {

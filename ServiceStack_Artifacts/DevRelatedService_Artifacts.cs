@@ -202,7 +202,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string foreign_cnm { get; set; }
     }
 
-
     public class GetTableSchemaRequest : IReturn<GetTbaleSchemaResponse>, IEbSSRequest
     {
         public string TenantAccountId { get; set; }
