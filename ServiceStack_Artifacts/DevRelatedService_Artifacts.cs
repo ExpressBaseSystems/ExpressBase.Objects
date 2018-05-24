@@ -189,4 +189,33 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
+    public class Coloums
+    {
+        public string cname { get; set; }
+
+        public string type { get; set; }
+
+        public string constraints { get; set; }
+
+        public string foreign_tnm { get; set; }
+
+        public string foreign_cnm { get; set; }
+    }
+
+
+    public class GetTableSchemaRequest : IReturn<GetTbaleSchemaResponse>, IEbSSRequest
+    {
+        public string TenantAccountId { get; set; }
+
+        public int UserId { get; set; }
+    }
+
+    public class GetTbaleSchemaResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public Dictionary<string, List<Coloums>> Data { get; set; }
+
+       [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
 }
