@@ -20,7 +20,11 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.Boolean)]
         public bool showTabed { get; set; }
 
-        public EbLocations()
+		[HideInPropertyGrid]
+		[EnableInBuilder(BuilderType.BotForm)]
+		public override bool IsReadOnly { get => true; }
+
+		public EbLocations()
         {
             this.LocationCollection = new List<EbLocation>();
         }

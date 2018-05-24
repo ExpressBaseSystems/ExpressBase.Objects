@@ -36,7 +36,11 @@ namespace ExpressBase.Objects
 
         public override bool isFullViewContol { get => true; set => base.isFullViewContol = value; }
 
-        public void InitFromDataBase(JsonServiceClient ServiceClient)
+		[HideInPropertyGrid]
+		[EnableInBuilder(BuilderType.BotForm)]		
+		public override bool IsReadOnly { get => true;}
+
+		public void InitFromDataBase(JsonServiceClient ServiceClient)
         {
             //this.DataSourceId = "eb_roby_dev-eb_roby_dev-2-1015-1739";
             var result = ServiceClient.Get<DataSourceDataResponse>(new DataSourceDataRequest { RefId = this.DataSourceId });

@@ -31,7 +31,18 @@ namespace ExpressBase.Objects
 
         public bool IsUpdate { get; set; }
 
-
+		public override bool IsReadOnly//to identify a bot form is readonly or not
+		{
+			get
+			{
+				foreach(EbControl ctrl in this.Controls)
+				{
+					if (!ctrl.IsReadOnly)
+						return false;
+				}
+				return true;
+			}
+		}
 
         public EbBotForm() { }
 

@@ -36,8 +36,12 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public decimal Value { get; set; }
 
-        //[ProtoBuf.ProtoMember(4)]
-        private string PlaceHolder
+		[HideInPropertyGrid]
+		[EnableInBuilder(BuilderType.BotForm)]
+		public override bool IsReadOnly { get => this.ReadOnly; }
+
+		//[ProtoBuf.ProtoMember(4)]
+		private string PlaceHolder
         {
             get
             {

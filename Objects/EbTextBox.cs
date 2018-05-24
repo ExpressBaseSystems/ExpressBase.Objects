@@ -148,7 +148,11 @@ else {
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
 
-        public override string GetHead()
+		[HideInPropertyGrid]
+		[EnableInBuilder(BuilderType.BotForm)]
+		public override bool IsReadOnly { get => this.ReadOnly; }
+
+		public override string GetHead()
         {
             return (((!this.Hidden) ? this.UniqueString + this.RequiredString : string.Empty) + @"".Replace("{0}", this.Name));
         }

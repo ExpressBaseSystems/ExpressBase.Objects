@@ -17,8 +17,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         protected EbConnectionFactory EbConnectionFactory { get; private set; }
 
-        protected RestClient RestClient  { get; private set; }
-        
+        protected RestClient RestClient { get; private set; }
+
         protected RabbitMqProducer MessageProducer3 { get; private set; }
 
         protected RabbitMqQueueClient MessageQueueClient { get; private set; }
@@ -29,14 +29,16 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         protected EbMqClient MQClient { get; private set; }
 
+        protected EbStaticFileClient FileClient { get; private set; }
+
         protected EbConnectionFactory InfraConnectionFactory
         {
             get
             {
-                if(_infraConnectionFactory == null)
-                       _infraConnectionFactory = new EbConnectionFactory(CoreConstants.EXPRESSBASE, this.Redis);
+                if (_infraConnectionFactory == null)
+                    _infraConnectionFactory = new EbConnectionFactory(CoreConstants.EXPRESSBASE, this.Redis);
 
-                return _infraConnectionFactory; 
+                return _infraConnectionFactory;
             }
         }
 
@@ -57,6 +59,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public EbBaseService(RestSharp.IRestClient _rest)
         {
             this.RestClient = _rest as RestClient;
+        }
+
+        public EbBaseService(IEbConnectionFactory _dbf, IEbStaticFileClient _sfc)
+        {
+            this.EbConnectionFactory = _dbf as EbConnectionFactory;
+            this.FileClient = _sfc as EbStaticFileClient;
+            
         }
 
         public EbBaseService(IEbConnectionFactory _dbf, IEbServerEventClient _sec)
@@ -144,9 +153,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public ILog Log { get { return LogManager.GetLogger(GetType()); } }
 
-        public byte[] GetFile(string solutionId, IEbFileService myFileService, string Image)
+        public byte[] GetFile(string solutionId, string Image)
         {
-            byte[] fileByte = myFileService.Post
+            DownloadFileResponse dfs = null;
+
+            byte[] fileByte = new byte[0];
+
+            dfs = this.FileClient.Get
                  (new DownloadFileRequest
                  {
                      TenantAccountId = solutionId,
@@ -156,6 +169,11 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
                          FileType = StaticFileConstants.JPG
                      }
                  });
+            if (dfs.StreamWrapper != null)
+            {
+                dfs.StreamWrapper.Memorystream.Position = 0;
+                fileByte = dfs.StreamWrapper.Memorystream.ToBytes();
+            }
 
             return fileByte;
         }
