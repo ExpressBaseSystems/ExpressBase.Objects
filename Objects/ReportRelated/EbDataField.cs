@@ -256,10 +256,6 @@ namespace ExpressBase.Objects.ReportRelated
     public class EbDataFieldNumericSummary : EbDataFieldNumeric, IEbDataFieldSummary
     {
         [EnableInBuilder(BuilderType.Report)]
-        [HideInPropertyGrid]
-        public override string DataField { get; set; }
-
-        [EnableInBuilder(BuilderType.Report)]
         public SummaryFunctionsNumeric Function { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
