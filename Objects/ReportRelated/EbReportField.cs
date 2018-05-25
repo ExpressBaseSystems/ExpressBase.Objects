@@ -83,11 +83,11 @@ namespace ExpressBase.Objects.ReportRelated
                 if (/*iTextFont == null &&*/ Font!= null)
                 {
                     iTextFont = new iTextSharp.text.Font(BaseFont.CreateFont(Font.Font, BaseFont.CP1252, BaseFont.EMBEDDED), Font.Size, (int)Font.Style, GetColor(Font.color));
-                    if (Font.Caps == true)
+                    if (Font.Caps)
                         Title = this.Title.ToUpper();
-                    if (Font.Strikethrough == true)
+                    if (Font.Strikethrough)
                         iTextFont.SetStyle(iTextSharp.text.Font.STRIKETHRU);
-                    if (Font.Underline == true)
+                    if (Font.Underline)
                         iTextFont.SetStyle(iTextSharp.text.Font.UNDERLINE);
                 }
 
@@ -101,11 +101,11 @@ namespace ExpressBase.Objects.ReportRelated
         //    //iTextSharp.text.Font font = FontFactory.GetFont("Verdana", Font.Size, (int)Font.Style, GetColor(Font.color));
         //    BaseFont bf = BaseFont.CreateFont(Font.Font, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
         //    iTextSharp.text.Font font = new iTextSharp.text.Font(bf, Font.Size, (int)Font.Style, GetColor(Font.color));
-        //    if (Font.Caps == true)
+        //    if (Font.Caps)
         //        Title = this.Title.ToUpper();
-        //    if (Font.Strikethrough == true)
+        //    if (Font.Strikethrough)
         //        font.SetStyle(iTextSharp.text.Font.STRIKETHRU);
-        //    if (Font.Underline == true)
+        //    if (Font.Underline)
         //        font.SetStyle(iTextSharp.text.Font.UNDERLINE);
         //    return font;
         //}
@@ -116,7 +116,7 @@ namespace ExpressBase.Objects.ReportRelated
     {
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
-        //[HideInPropertyGrid]
+        [MetaOnly]
         public string Source { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]

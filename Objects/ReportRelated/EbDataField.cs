@@ -17,10 +17,11 @@ using ExpressBase.Objects.Objects.ReportRelated;
 namespace ExpressBase.Objects.ReportRelated
 {
     public abstract class EbDataField : EbReportField
-    {
-        public virtual string DataField { get; set; }
+    { 
+        public virtual void NotifyNewPage(bool status) { } 
 
-        public virtual void NotifyNewPage(bool status) { }
+        [EnableInBuilder(BuilderType.Report)]
+        public string SummaryOf { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("General")]
@@ -254,10 +255,6 @@ namespace ExpressBase.Objects.ReportRelated
     [EnableInBuilder(BuilderType.Report)]
     public class EbDataFieldNumericSummary : EbDataFieldNumeric, IEbDataFieldSummary
     {
-        [EnableInBuilder(BuilderType.Report)]
-        [HideInPropertyGrid]
-        public override string DataField { get; set; }
-
         [EnableInBuilder(BuilderType.Report)]
         public SummaryFunctionsNumeric Function { get; set; }
 
@@ -663,9 +660,6 @@ namespace ExpressBase.Objects.ReportRelated
         public SummaryFunctionsNumeric Function { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
-        public string CalcFieldName { get; set; }
-
-        [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]
         public bool ResetOnNewPage { get; set; }
 
@@ -776,10 +770,7 @@ namespace ExpressBase.Objects.ReportRelated
     public class EbCalcFieldTextSummary : EbCalcField, IEbDataFieldSummary
     {
         [EnableInBuilder(BuilderType.Report)]
-        public SummaryFunctionsText Function { get; set; }
-
-        [EnableInBuilder(BuilderType.Report)]
-        public string CalcFieldName { get; set; }
+        public SummaryFunctionsText Function { get; set; } 
 
         [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]
@@ -847,10 +838,7 @@ namespace ExpressBase.Objects.ReportRelated
     public class EbCalcFieldDateTimeSummary : EbCalcField, IEbDataFieldSummary
     {
         [EnableInBuilder(BuilderType.Report)]
-        public SummaryFunctionsDateTime Function { get; set; }
-
-        [EnableInBuilder(BuilderType.Report)]
-        public string CalcFieldName { get; set; }
+        public SummaryFunctionsDateTime Function { get; set; } 
 
         [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]
@@ -918,9 +906,6 @@ namespace ExpressBase.Objects.ReportRelated
     {
         [EnableInBuilder(BuilderType.Report)]
         public SummaryFunctionsBoolean Function { get; set; }
-
-        [EnableInBuilder(BuilderType.Report)]
-        public string CalcFieldName { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]
