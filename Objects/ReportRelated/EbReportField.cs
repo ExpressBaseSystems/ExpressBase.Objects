@@ -116,7 +116,7 @@ namespace ExpressBase.Objects.ReportRelated
     {
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
-        //[HideInPropertyGrid]
+        [MetaOnly]
         public string Source { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
