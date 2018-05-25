@@ -407,15 +407,15 @@ else {
                         //else
                         //    fname = (field as EbDataField).DataField;
                         EbDataField f = (field as EbDataField);
-                        if (!PageSummaryFields.ContainsKey(f.DataField))
+                        if (!PageSummaryFields.ContainsKey(f.SummaryOf))
                         {
                             SummaryFieldsList = new List<object>();
                             SummaryFieldsList.Add(f);
-                            PageSummaryFields.Add(f.DataField, SummaryFieldsList);
+                            PageSummaryFields.Add(f.SummaryOf, SummaryFieldsList);
                         }
                         else
                         {
-                            PageSummaryFields[f.DataField].Add(f);
+                            PageSummaryFields[f.SummaryOf].Add(f);
                         }
                     }
                 }
@@ -433,15 +433,15 @@ else {
                         //else
                         //    fname = (field as EbDataField).DataField;
                         EbDataField f = (field as EbDataField);
-                        if (!ReportSummaryFields.ContainsKey(f.DataField))
+                        if (!ReportSummaryFields.ContainsKey(f.SummaryOf))
                         {
                             SummaryFieldsList = new List<object>();
                             SummaryFieldsList.Add(f);
-                            ReportSummaryFields.Add(f.DataField, SummaryFieldsList);
+                            ReportSummaryFields.Add(f.SummaryOf, SummaryFieldsList);
                         }
                         else
                         {
-                            ReportSummaryFields[f.DataField].Add(f);
+                            ReportSummaryFields[f.SummaryOf].Add(f);
                         }
                     }
                 }
@@ -479,7 +479,7 @@ else {
 
         public void CallSummerize(EbDataField field, int serialnumber)
         {
-            var column_name = string.Empty;
+            //var column_name = string.Empty;
             var column_val = string.Empty;
             Globals globals = new Globals();
             globals.CurrentField = field;
@@ -497,9 +497,9 @@ else {
             }
             else
             {
-                int tableIndex = Convert.ToInt32((field as EbDataField).DataField.Substring(1, 1));
-                column_name = (field as EbDataField).DataField.Split('.')[1];
-                column_val = GetDataFieldtValue(column_name, serialnumber, tableIndex);
+                //int tableIndex = Convert.ToInt32((field as EbDataField).SummaryOf.Substring(1, 1));
+                //column_name = (field as EbDataField).SummaryOf.Split('.')[1];
+                column_val = GetDataFieldtValue(field.ColumnName, serialnumber, field.TableIndex);
             }
             List<object> SummaryList;
             if (PageSummaryFields.ContainsKey(field.Name))
