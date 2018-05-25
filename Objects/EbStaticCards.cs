@@ -30,8 +30,20 @@ namespace ExpressBase.Objects
 		[OnDeserialized]
 		public void OnDeserializedMethod(StreamingContext context)
 		{
+			
+				foreach (EbCard Card in this.CardCollection)
+				{
+					//for getting distinct filter values
+					if (this.FilterField != null && !this.FilterValues.Contains(Card.CustomFields[this.FilterField.Name].ToString()))
+					{
+						this.FilterValues.Add(Card.CustomFields[this.FilterField.Name].ToString().Trim());
+					}
+				}
+			
+
 			this.BareControlHtml = this.GetBareHtml();
 			this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
+
 		}		     
     }	
 }

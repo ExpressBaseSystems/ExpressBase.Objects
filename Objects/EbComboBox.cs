@@ -87,7 +87,11 @@ namespace ExpressBase.Objects
         //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public int[] values { get; set; }
 
-        private string VueSelectcode
+		[HideInPropertyGrid]
+		[EnableInBuilder(BuilderType.BotForm)]
+		public override bool IsReadOnly { get => this.ReadOnly; }
+
+		private string VueSelectcode
         {
             get
             {
@@ -205,7 +209,7 @@ var @nameEbCombo = new EbSelect('@name', '@DSid', @DDHeight, '@vmName', '', @Max
         <i id='@name@_loading-image' class='fa fa-spinner fa-pulse fa-2x fa-fw'></i><span class='sr-only'>Loading...</span>
     </div>
     <center>
-        <div id='@name@DDdiv' v-show='DDstate' class='DDdiv expand-transition'  style='width:@DDwidthpx;'> 
+        <div id='@name@DDdiv' v-show='DDstate' class='DDdiv expand-transition'  style='width:@DDwidth%;'> 
             <table id='@name@tbl' tabindex='1000' style='width:100%' class='table table-striped table-bordered'></table>
         </div>
     </center>
@@ -215,7 +219,7 @@ var @nameEbCombo = new EbSelect('@name', '@DSid', @DDHeight, '@vmName', '', @Max
     .Replace("@Label@ ", ((this.Label != null) ? this.Label : "@Label@ "))
     .Replace("@width", 900.ToString())//this.Width.ToString())
     .Replace("@perWidth", (this.DisplayMembers.Count != 0) ? (900 / this.DisplayMembers.Count).ToString() : 900.ToString())
-    .Replace("@DDwidth", (this.DropdownWidth == 0) ? "300" : this.DropdownWidth.ToString())
+    .Replace("@DDwidth", (this.DropdownWidth == 0) ? "100" : this.DropdownWidth.ToString())
     ;
             }
             else

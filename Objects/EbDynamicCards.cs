@@ -71,7 +71,7 @@ namespace ExpressBase.Objects
 							Card.CustomFields[Field.Name] = tempdata.ToString().Trim();
 
 						//for getting distinct filter values
-						if (Field.Name == this.FilterField && !this.FilterValues.Contains(tempdata.ToString().Trim()))
+						if (this.FilterField != null && Field.Name == this.FilterField.Name && !this.FilterValues.Contains(tempdata.ToString().Trim()))
 						{
 							this.FilterValues.Add(tempdata.ToString().Trim());
 						}
@@ -131,15 +131,26 @@ namespace ExpressBase.Objects
 
 		[EnableInBuilder(BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.DDfromDictProp, "CardFields")]
-        //[DefaultPropValue("ftype")]
-		public string FilterField { get; set; }
+		public EbControl FilterField { get; set; }
 
 		public List<string> FilterValues { get; set; }
 
 		[EnableInBuilder(BuilderType.BotForm)]
-		public string SearchField { get; set; }
+		[PropertyEditor(PropertyEditorType.DDfromDictProp, "CardFields")]
+		public EbControl SearchField { get; set; }
 
-		public string IsReadOnly { get; set; }
+		[HideInPropertyGrid]
+		public override bool IsReadOnly {
+			get
+			{
+				foreach(EbCardField field in this.CardFields)
+				{
+					if (!field.DoNotPersist)
+						return false;
+				}
+				return true;
+			}
+		}
 		
 		public override string GetToolHtml()
 		{
@@ -173,7 +184,7 @@ namespace ExpressBase.Objects
 		public override string GetBareHtml()
 		{
 			string html = @"<div id='@name@' class='Eb-ctrlContainer'>@HeaderHtml@ 
-								<div style='position: absolute; margin-top: 50%; text-align: center; width: 100%; font-size: 21px; color: #bbb; font-weight: 300;'>Nothing to Display</div> 
+								<div style='position: absolute; margin-top: 10%; text-align: center; width: 100%; font-size: 21px; color: #bbb; font-weight: 300;'>Nothing to Display</div> 
 								<div class='cards-cont'>"
 									.Replace("@name@", this.Name ?? "@name@")
 									.Replace("@HeaderHtml@", this.getHeaderHtml());
@@ -185,8 +196,8 @@ namespace ExpressBase.Objects
 					html += @"<div id='@name@' class='card-cont' card-id='@cardid@' filter-value='@FilterValue@' search-value='@SearchValue@' style='width:100%;'>"
 									.Replace("@name@", card.Name.Trim())
 									.Replace("@cardid@", card.CardId.ToString())
-									.Replace("@FilterValue@", this.FilterField.IsNullOrEmpty() ? "": card.CustomFields[this.FilterField].ToString())
-									.Replace("@SearchValue@", this.SearchField.IsNullOrEmpty() ? "": card.CustomFields[this.SearchField].ToString());
+									.Replace("@FilterValue@", this.FilterField == null ? "": card.CustomFields[this.FilterField.Name].ToString())
+									.Replace("@SearchValue@", this.SearchField == null ? "": card.CustomFields[this.SearchField.Name].ToString());
 					foreach (EbCardField cardField in this.CardFields)
 					{
 						cardField.FieldValue = card.CustomFields.ContainsKey(cardField.Name) ? card.CustomFields[cardField.Name] : null;
@@ -198,7 +209,7 @@ namespace ExpressBase.Objects
 			}			
 			html += "</div>@SummarizeHtml@  <div class='cards-btn-cont' style='margin-top: 20px;'> <button id='' class='btn btn-default'  data-toggle='tooltip' title='' style='width:100%; box-shadow: 0px 0px 10px #ccc; border-radius: 1.3em 1.3em 1.3em 1.3em;'> @ButtonText@ </button> </div>   </div>"
 				.Replace("@SummarizeHtml@", (this.getCartHtml().IsNullOrEmpty() || !this.MultiSelect) ? "" : this.getCartHtml())
-				.Replace("@ButtonText@", this.ButtonText.IsNullOrEmpty() ? "Submit" : this.ButtonText);
+				.Replace("@ButtonText@", this.ButtonText.IsNullOrEmpty() ? (this.IsReadOnly? "OK": "Submit") : this.ButtonText);
 			return html;
 		}
 
@@ -263,9 +274,9 @@ namespace ExpressBase.Objects
 				}
 				fhtml += "</select> <i class='fa fa-filter card-head-filter-icon' aria-hidden='true'></i></div>";
 			}
-			if (!this.SearchField.IsNullOrEmpty())
+			if (this.SearchField != null)
 				html += shtml;
-			if (!this.FilterField.IsNullOrEmpty())
+			if (this.FilterField != null)
 				html += fhtml;
 			html += "</div>";
 
@@ -290,7 +301,6 @@ namespace ExpressBase.Objects
 								<tbody style='font-size:12px;'><tr><td style='text-align:center; border: none;' colspan=3><i> Nothing to Display </i></td></tr>  </tbody>
 							</table>
 						</div>
-						
 					</div></div>"; set => base.DesignHtml4Bot = value;
 		}
 
@@ -312,7 +322,6 @@ namespace ExpressBase.Objects
 								<tbody style='font-size:12px;'><tr><td style='text-align:center; border: none;' colspan=3><i> Nothing to Display </i></td></tr>  </tbody>
 							</table>
 						</div>
-						
 					</div></div>`";
 		}
 
@@ -459,6 +468,12 @@ namespace ExpressBase.Objects
 			this.DesignHtml = this.DesignHtml.Substring(1, this.DesignHtml.Length - 2);
 		}
 
+		public override string DesignHtml4Bot
+		{
+			get => @"<div><img class='card-img' src='../images/image.png' style='width: 100%; height: 200px; opacity: 0.2;'/></div>";
+			set => base.DesignHtml4Bot = value;
+		}
+
 		public override string GetDesignHtml()
         {
             return @"`<div><img class='card-img' src='../images/image.png' style='width: 100%; height: 200px; opacity: 0.2;'/></div>`";
@@ -497,6 +512,12 @@ namespace ExpressBase.Objects
 		{
 			this.DesignHtml = this.GetDesignHtml();
 			this.DesignHtml = this.DesignHtml.Substring(1, this.DesignHtml.Length - 2);
+		}
+
+		public override string DesignHtml4Bot
+		{
+			get => @"<div class='card-contenthtml-cont' style='padding:5px; text-align: center; width: 100%; min-height: 50px;'> HTML Content </div>";
+			set => base.DesignHtml4Bot = value;
 		}
 
 		public override string GetDesignHtml()
@@ -566,6 +587,25 @@ namespace ExpressBase.Objects
 		{
 			this.DesignHtml = this.GetDesignHtml();
 			this.DesignHtml = this.DesignHtml.Substring(1, this.DesignHtml.Length - 2);
+		}
+
+		public override string DesignHtml4Bot
+		{
+			get => @"<div class='card-numeric-cont data-@Name@' style='@display@' data-value='@Value@'>
+						<div style='display: inline-block; width: 38%;'> <b> &nbsp&nbsp Numeric Field </b> </div> 
+						<div style='display: inline-block; width: 58%;'>
+							<button style='padding: 0px; border: none; background-color: transparent; font-size: 14px;' disabled>
+								<i class='fa fa-minus' aria-hidden='true' style=' padding: 5px; color: darkblue;'></i>
+							</button>
+							<div style='display:inline-block; border: 1px solid #eee;'>
+								<input class='removeArrows' type='number' style='text-align: center; border: none; background: transparent; width: 120px;' value='12345' readonly>
+							</div>
+							<button style='padding: 0px; border: none; background-color: transparent; font-size: 14px;' disabled>
+								<i class='fa fa-plus' aria-hidden='true' style=' padding: 5px; color: darkblue;'></i>
+							</button>
+						</div>
+					</div>";
+			set => base.DesignHtml4Bot = value;
 		}
 
 		public override string GetDesignHtml()
@@ -682,6 +722,19 @@ namespace ExpressBase.Objects
 			this.DesignHtml = this.DesignHtml.Substring(1, this.DesignHtml.Length - 2);
 		}
 
+		public override string DesignHtml4Bot
+		{
+			get => @"<div class='card-text-cont'>
+						<div style='display: inline-block; width: 38%;'> 
+							<b>&nbsp&nbsp Text Field </b>  
+						</div>
+						<div style='display: inline-block; width: 58%;'>
+							<input type='text' value='@Text@' style='text-align: center;' readonly> 
+						</div>
+					</div>";
+			set => base.DesignHtml4Bot = value;
+		}
+
 		public override string GetDesignHtml()
         {
             return @"`<div class='card-text-cont'>
@@ -737,6 +790,12 @@ namespace ExpressBase.Objects
 			this.DesignHtml = this.DesignHtml.Substring(1, this.DesignHtml.Length - 2);
 		}
 
+		public override string DesignHtml4Bot
+		{
+			get => @"<div class='card-title-cont' style='font-weight: 600; font-size: 20px; padding: 5px;'>&nbsp&nbspTitle Field</div>";
+			set => base.DesignHtml4Bot = value;
+		}
+
 		public override string GetDesignHtml()
 		{
 			return @"`<div class='card-title-cont' style='font-weight: 600; font-size: 20px; padding: 5px;'>&nbsp&nbspTitle Field</div>`";
@@ -748,7 +807,66 @@ namespace ExpressBase.Objects
 					.Replace("@Text@", (this.FieldValue == null)? "" : this.FieldValue).Replace("@Name@", this.Name);
 		}
 	}
-	
+
+	[EnableInBuilder(BuilderType.BotForm)]
+	[HideInToolBox]
+	[Alias("Location")]
+	public class EbCardLocationField : EbCardField
+	{
+		[EnableInBuilder(BuilderType.BotForm)]
+		//[PropertyEditor(PropertyEditorType.String)]
+		[Alias("Position")]
+		[MetaOnly]
+		public override dynamic FieldValue { get; set; }
+
+		//[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+		//[PropertyEditor(PropertyEditorType.Expandable)]
+		//public LatLng Position { get; set; }
+		//public LatLng Lat_Long { get; set; }
+		//public Decimal Latitude { get; set; }
+		//public Decimal Longitude { get; set; }
+
+		[EnableInBuilder(BuilderType.BotForm)]
+		[HideInPropertyGrid]
+		public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
+
+		public EbCardLocationField() { }
+
+		[OnDeserialized]
+		public void OnDeserializedMethod(StreamingContext context)
+		{
+			this.DesignHtml = this.GetDesignHtml();
+			this.DesignHtml = this.DesignHtml.Substring(1, this.DesignHtml.Length - 2);
+		}
+
+		public override string GetDesignHtml()
+		{
+			return @"`<div class='card-location-cont'>
+							<div class='map-div' style='position: relative; overflow: hidden;'>
+								<img style='width:100%;height: 100%;' src='/images/LocMapImg1.png'>
+							</div>
+						</div>`";
+		}
+
+		public override string DesignHtml4Bot {
+			get => @"	<div class='card-location-cont'>
+							<div class='map-div' style='position: relative; overflow: hidden;'>
+								<img style='width:100%;height: 100%;' src='/images/LocMapImg1.png'>
+							</div>
+						</div>";
+			set => base.DesignHtml4Bot = value;
+		}
+
+		public override string GetBareHtml()
+		{
+			return @"	<div id='@name@_Cont' class='card-location-cont' @DataLatLng@>
+							<div id='@name@' class='map-div'></div>
+						</div>"
+								.Replace("@name@", (this.Name != null) ? this.Name : "@name@")
+								.Replace("@DataLatLng@", String.IsNullOrEmpty(this.FieldValue) ? "": ("data-lat='" + this.FieldValue.Split(",")[0].Trim() + "' data-lng='" + this.FieldValue.Split(",")[1].Trim() + "'"));
+		}
+	}
+
 }
 
 

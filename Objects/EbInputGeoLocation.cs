@@ -29,7 +29,11 @@ namespace ExpressBase.Objects
 
         public override bool isFullViewContol { get => true; set => base.isFullViewContol = value; }
 
-        public override string GetDesignHtml()
+		[HideInPropertyGrid]
+		[EnableInBuilder(BuilderType.BotForm)]
+		public override bool IsReadOnly { get => this.ReadOnly; }
+
+		public override string GetDesignHtml()
         {
             return GetHtml().RemoveCR().DoubleQuoted();
         }

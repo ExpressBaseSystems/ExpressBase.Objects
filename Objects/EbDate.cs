@@ -94,7 +94,12 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public DateShowFormat ShowDateAs_ { get; set; }
-        public override string GetToolHtml()
+
+		[HideInPropertyGrid]
+		[EnableInBuilder(BuilderType.BotForm)]
+		public override bool IsReadOnly { get => this.ReadOnly; }
+
+		public override string GetToolHtml()
         {
             return @"<div eb-type='@toolName' class='tool'><i class='fa fa-calendar'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
         }

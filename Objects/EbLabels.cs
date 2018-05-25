@@ -23,7 +23,11 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public override string Label { get => base.Label; set => base.Label = value; }
 
-        [OnDeserialized]
+		[HideInPropertyGrid]
+		[EnableInBuilder(BuilderType.BotForm)]
+		public override bool IsReadOnly { get => true; }
+
+		[OnDeserialized]
         public void OnDeserializedMethod(StreamingContext context)
         {
             this.BareControlHtml = this.GetBareHtml();
