@@ -184,7 +184,7 @@ namespace ExpressBase.Objects
 		public override string GetBareHtml()
 		{
 			string html = @"<div id='@name@' class='Eb-ctrlContainer'>@HeaderHtml@ 
-								<div style='position: absolute; margin-top: 10%; text-align: center; width: 100%; font-size: 21px; color: #bbb; font-weight: 300;'>Nothing to Display</div> 
+								<div style='position: absolute; margin-top: 25px; text-align: center; width: 100%; font-size: 21px; color: #bbb; font-weight: 300;'>Nothing to Display</div> 
 								<div class='cards-cont'>"
 									.Replace("@name@", this.Name ?? "@name@")
 									.Replace("@HeaderHtml@", this.getHeaderHtml());
