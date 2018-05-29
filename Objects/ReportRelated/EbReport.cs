@@ -390,6 +390,9 @@ else {
         [JsonIgnore]
         public float detailprintingtop = 0;
 
+        [JsonIgnore]
+        public Dictionary<string, object> FieldDict { get; set; }
+
         public void InitializeSummaryFields()
         {
             List<object> SummaryFieldsList = null;
@@ -489,7 +492,7 @@ else {
                 {
                     string TName = calcfd.Split('.')[0];
                     string fName = calcfd.Split('.')[1];
-                    int tableIndex = Convert.ToInt32(TName.Substring(2));
+                    int tableIndex = Convert.ToInt32(TName.Substring(1));
                     //globals[TName].Add(fName, new NTV { Name = fName, Type = this.DataRows.Table.Columns[fName].Type, Value = this.DataRows[serialnumber][fName] });
                     globals[TName].Add(fName, new NTV { Name = fName, Type = this.DataSet.Tables[0].Columns[fName].Type, Value = this.DataSet.Tables[0].Rows[serialnumber][fName] });
                 }
@@ -499,6 +502,7 @@ else {
             {
                 //int tableIndex = Convert.ToInt32((field as EbDataField).SummaryOf.Substring(1, 1));
                 //column_name = (field as EbDataField).SummaryOf.Split('.')[1];
+
                 column_val = GetDataFieldtValue(field.ColumnName, serialnumber, field.TableIndex);
             }
             List<object> SummaryList;
@@ -773,8 +777,18 @@ else {
                         Console.WriteLine(e.Message);
                     }
                 }
-
-                if (field is EbCalcField)
+                if (field is IEbDataFieldSummary)
+                {
+                    if ((field is EbDataFieldNumericSummary) && (field as EbDataFieldNumericSummary).InLetters)
+                    {
+                        column_val = (field as IEbDataFieldSummary).SummarizedValue.ToString();
+                        (field as EbDataFieldNumericSummary).DrawMe(Canvas, HeightPt, section_Yposition, detailprintingtop, column_val);
+                        return;
+                    }
+                    else
+                        column_val = (field as IEbDataFieldSummary).SummarizedValue.ToString();
+                }
+                else if (field is EbCalcField)
                 {
                     try
                     {
@@ -792,17 +806,7 @@ else {
                         Console.WriteLine(e.Message);
                     }
                 }
-                else if (field is IEbDataFieldSummary)
-                {
-                    if ((field is EbDataFieldNumericSummary) && (field as EbDataFieldNumericSummary).InLetters)
-                    {
-                        column_val = (field as IEbDataFieldSummary).SummarizedValue.ToString();
-                        (field as EbDataFieldNumericSummary).DrawMe(Canvas, HeightPt, section_Yposition, detailprintingtop, column_val);
-                        return;
-                    }
-                    else
-                        column_val = (field as IEbDataFieldSummary).SummarizedValue.ToString();
-                }
+
                 else
                     column_val = GetDataFieldtValue(column_name, serialnumber, tableIndex);
 

@@ -100,7 +100,7 @@ namespace ExpressBase.Objects.ReportRelated
                     text.Font.Color = GetColor(this.ForeColor);//ct.Canvas.SetColorFill(GetColor(this.Color));
             }
 
-            if (this.RenderInMultiLine == true)
+            if (this.RenderInMultiLine)
             {
                 var p = text.Font.GetCalculatedBaseFont(false);
                 float q = p.GetWidthPoint(column_val, text.Font.CalculatedSize);
@@ -633,7 +633,7 @@ namespace ExpressBase.Objects.ReportRelated
                     text.Font.Color = GetColor(this.ForeColor);//ct.Canvas.SetColorFill(GetColor(this.Color));
             }
 
-            if (this.RenderInMultiLine == true)
+            if (this.RenderInMultiLine)
             {
                 var p = text.Font.GetCalculatedBaseFont(false);
                 float q = p.GetWidthPoint(column_val, text.Font.CalculatedSize);

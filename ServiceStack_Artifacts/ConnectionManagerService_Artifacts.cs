@@ -10,13 +10,17 @@ using ExpressBase.Common;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
-    public class RefreshSolutionConnectionsRequest : EbServiceStackRequest
+    public class RefreshSolutionConnectionsRequest : EbServiceStackRequest, IReturn<RefreshSolutionConnectionsResponse>
     {
         public string BToken { get; set; }
 
         public string RToken { get; set; }
     }
 
+    public class RefreshSolutionConnectionsResponse : IEbSSResponse
+    {
+        public ResponseStatus ResponseStatus { get; set; }
+    }
 
     public class RefreshSolutionConnectionsAsyncRequest : EbServiceStackRequest, IReturn<RefreshSolutionConnectionsAsyncResponse>
     {
@@ -80,7 +84,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     public class InitialSolutionConnectionsResponse : IEbSSResponse
     {
-        public ResponseStatus ResponseStatus { get ; set ; }
+        public ResponseStatus ResponseStatus { get; set; }
     }
 
     public class ChangeSMTPConnectionRequest : EbServiceStackRequest, IReturn<ChangeConnectionResponse>

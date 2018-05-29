@@ -246,6 +246,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 4)]
         public ResponseStatus ResponseStatus { get; set; }
 
+        [DataMember(Order = 5)]
+        public List<Param> ParamsList { get; set; }
+
         public bool IsNull
         {
             get
