@@ -412,6 +412,34 @@ namespace ExpressBase.Objects.ReportRelated
     }
 
     [EnableInBuilder(BuilderType.Report)]
+    public class EbParameter : EbReportField
+    {
+        [OnChangeExec(@"
+            pg.MakeReadOnly('Title');
+        ")]
+        [EnableInBuilder(BuilderType.Report)]
+        [UIproperty]
+        [PropertyGroup("General")]
+        public override string Title { set; get; }
+
+        public override string GetDesignHtml()
+        {
+            return "<div class='Parameter dropped' eb-type='Parameter' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; height: @Height px; background-color:@BackColor ; color:@ForeColor ; position: absolute; left: @Left px; top: @Top px;text-overflow: ellipsis;overflow: hidden;text-align: @TextAlign ;'> @Title </div>".RemoveCR().DoubleQuoted();
+        }
+
+        public override string GetJsInitFunc()
+        {
+            return @"
+    this.Init = function(id)
+        {
+     this.Height =25;
+    this.Width= 200;
+    this.ForeColor = '#201c1c';
+};";
+        }
+    }
+
+    [EnableInBuilder(BuilderType.Report)]
     public class EbBarcode : EbReportField
     {
         [EnableInBuilder(BuilderType.Report)]

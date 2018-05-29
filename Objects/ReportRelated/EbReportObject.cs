@@ -19,7 +19,7 @@ namespace ExpressBase.Objects.ReportRelated
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
         [PropertyGroup("General")]
-        public string Title { get; set; }
+        public virtual string Title { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("Appearance")]
