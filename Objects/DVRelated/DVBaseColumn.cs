@@ -1,4 +1,5 @@
-﻿using ExpressBase.Common.Objects;
+﻿using ExpressBase.Common;
+using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
 using Newtonsoft.Json;
@@ -89,8 +90,8 @@ namespace ExpressBase.Objects.Objects.DVRelated
         public string ClassName { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
-        [Alias("FontFamily")]
-        public FontFamily fontfamily { get; set; }
+        [PropertyEditor(PropertyEditorType.FontSelector)]
+        public EbFont Font { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.DropDown)]
