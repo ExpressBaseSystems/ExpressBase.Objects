@@ -252,5 +252,34 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     }
 
+	[DataContract]
+	public class GetBotsResponse : IEbSSResponse
+	{
+		[DataMember(Order = 1)]
+		public ResponseStatus ResponseStatus { get; set; }
+
+		[DataMember(Order = 2)]
+		public List<BotDetails> BotList { get; set; }
+	}
+
+	[DataContract]
+	public class GetBotsRequest : EbServiceStackRequest, IReturn<GetBotsResponse>
+	{
+		[DataMember(Order = 1)]
+		public string Value { get; set; }
+
+	}
+
+	[DataContract]
+	public class BotDetails
+	{
+		[DataMember(Order = 1)]
+		public int id { get; set; }
+
+		[DataMember(Order = 2)]
+		public string name { get; set; }
+
+	}
+
 
 }
