@@ -76,7 +76,9 @@ namespace ExpressBase.Objects
 .Replace("@LabelForeColor ", "color:" + ((this.LabelForeColor != null) ? this.LabelForeColor : "@LabelForeColor ") + ";")
 .Replace("@LabelBackColor ", "background-color:" + ((this.LabelBackColor != null) ? this.LabelBackColor : "@LabelBackColor ") + ";")
 .Replace("@BackColor ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor ") + ";"));
-			return html.RemoveCR();
+            Console.WriteLine("==================================================================");
+            Console.WriteLine(html.RemoveCR());
+            return html.RemoveCR();
 		}
 
 		public override string GetJsInitFunc()
