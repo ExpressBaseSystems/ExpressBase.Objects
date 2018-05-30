@@ -57,7 +57,7 @@ namespace ExpressBase.Objects
 
 		public override string GetDesignHtml()
 		{
-			return GetHtml().RemoveCR().DoubleQuoted();
+			return GetHtml().RemoveCR().GraveAccentQuoted();
 		}
 
 		public override string GetHtml()
@@ -78,7 +78,7 @@ namespace ExpressBase.Objects
 .Replace("@BackColor ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor ") + ";"));
             Console.WriteLine("==================================================================");
             Console.WriteLine(html.RemoveCR());
-            return html.RemoveCR();
+            return html;
 		}
 
 		public override string GetJsInitFunc()
