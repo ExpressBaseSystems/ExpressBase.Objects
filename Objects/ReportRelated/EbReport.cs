@@ -1,8 +1,11 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Constants;
 using ExpressBase.Common.EbServiceStack;
+using ExpressBase.Common.EbServiceStack.ReqNRes;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
+using ExpressBase.Common.ServiceClients;
 using ExpressBase.Common.Structures;
 using ExpressBase.Objects.Objects.ReportRelated;
 using ExpressBase.Objects.ReportRelated;
@@ -369,7 +372,7 @@ else {
         public EbBaseService ReportService { get; set; }
 
         [JsonIgnore]
-        public EbBaseService FileService { get; set; }
+        public EbStaticFileClient FileClient { get; set; }
 
         [JsonIgnore]
         public string SolutionId { get; set; }
@@ -829,7 +832,7 @@ else {
             }
             else if (field is EbImg)
             {
-                byte[] fileByte = this.ReportService.GetFile(this.SolutionId, (field as EbImg).Image);
+                byte[] fileByte = GetFile((field as EbImg).Image);
                 field.DrawMe(Doc, fileByte);
             }
             else if ((field is EbText) || (field is EbReportFieldShape))
@@ -860,7 +863,7 @@ else {
                 {
                     if ((field is EbWaterMark) && (field as EbWaterMark).Image != string.Empty)
                     {
-                        byte[] fileByte = this.ReportService.GetFile(this.SolutionId, (field as EbWaterMark).Image);
+                        byte[] fileByte = GetFile((field as EbWaterMark).Image);
                         //  byte[] fileByte = myFileService.Post
                         //(new DownloadFileRequest
                         //{
@@ -922,6 +925,31 @@ else {
         }
 
         public static EbOperations Operations = ReportOperations.Instance;
+
+        public byte[] GetFile(string Image)
+        {
+            DownloadFileResponse dfs = null;
+
+            byte[] fileByte = new byte[0];
+
+            dfs = this.FileClient.Get
+                 (new DownloadFileRequest
+                 {
+                     TenantAccountId = this.SolutionId,
+                     FileDetails = new FileMeta
+                     {
+                         FileName = Image + StaticFileConstants.DOTJPG,
+                         FileType = StaticFileConstants.JPG
+                     }
+                 });
+            if (dfs.StreamWrapper != null)
+            {
+                dfs.StreamWrapper.Memorystream.Position = 0;
+                fileByte = dfs.StreamWrapper.Memorystream.ToBytes();
+            }
+
+            return fileByte;
+        }
     }
 
     public class EbReportSection : EbReportObject
