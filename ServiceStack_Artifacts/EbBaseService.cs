@@ -153,30 +153,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public ILog Log { get { return LogManager.GetLogger(GetType()); } }
 
-        public byte[] GetFile(string solutionId, string Image)
-        {
-            DownloadFileResponse dfs = null;
 
-            byte[] fileByte = new byte[0];
-
-            dfs = this.FileClient.Get
-                 (new DownloadFileRequest
-                 {
-                     TenantAccountId = solutionId,
-                     FileDetails = new FileMeta
-                     {
-                         FileName = Image + StaticFileConstants.DOTJPG,
-                         FileType = StaticFileConstants.JPG
-                     }
-                 });
-            if (dfs.StreamWrapper != null)
-            {
-                dfs.StreamWrapper.Memorystream.Position = 0;
-                fileByte = dfs.StreamWrapper.Memorystream.ToBytes();
-            }
-
-            return fileByte;
-        }
 
         //private void LoadCache()
         //{

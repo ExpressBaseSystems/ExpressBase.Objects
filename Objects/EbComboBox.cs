@@ -68,7 +68,58 @@ namespace ExpressBase.Objects
         public int DropdownWidth { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
-        [System.ComponentModel.Category("Behavior")]
+        [OnChangeExec(@"
+            if (this.MultiSelect === true ){
+                pg.MakeReadWrite('MaxLimit');   
+                if (this.Required === true ){
+                    if(this.MinLimit < 1)
+                        this.MinLimit = 1;                 
+                    pg.MakeReadWrite('MinLimit');
+                }
+                else{
+                    this.MinLimit = 0;
+                    pg.MakeReadOnly('MinLimit');                 
+                }
+            } 
+            else {
+                pg.MakeReadOnly('MaxLimit');                    
+                pg.MakeReadOnly('MinLimit');
+                this.MaxLimit = 1;
+                if (this.Required === true ){
+                    this.MinLimit = 1;  
+                }
+                else{
+                    this.MinLimit = 0;  
+                }
+            }")]
+        public override bool Required { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+        [Category("Behavior")]
+        [OnChangeExec(@"
+            if (this.MultiSelect === true ){
+                pg.MakeReadWrite('MaxLimit');   
+                if (this.Required === true ){
+                    if(this.MinLimit < 1)
+                        this.MinLimit = 1;                 
+                    pg.MakeReadWrite('MinLimit');
+                }
+                else{
+                    this.MinLimit = 0;
+                    pg.MakeReadOnly('MinLimit');                 
+                }
+            } 
+            else {
+                pg.MakeReadOnly('MaxLimit');                    
+                pg.MakeReadOnly('MinLimit');
+                this.MaxLimit = 1;
+                if (this.Required === true ){
+                    this.MinLimit = 1;  
+                }
+                else{
+                    this.MinLimit = 0;  
+                }
+            }")]
         public bool MultiSelect { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
@@ -210,7 +261,7 @@ var @nameEbCombo = new EbSelect('@name', '@DSid', @DDHeight, '@vmName', '', @Max
     </div>
     <center>
         <div id='@name@DDdiv' v-show='DDstate' class='DDdiv expand-transition'  style='width:@DDwidth%;'> 
-            <table id='@name@tbl' tabindex='1000' style='width:100%' class='table table-striped table-bordered'></table>
+            <table id='@name@tbl' tabindex='1000' style='width:100%' class='table table-bordered'></table>
         </div>
     </center>
 </div>"
