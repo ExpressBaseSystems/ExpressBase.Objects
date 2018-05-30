@@ -437,6 +437,23 @@ namespace ExpressBase.Objects.ReportRelated
     this.ForeColor = '#201c1c';
 };";
         }
+        public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
+        {
+            var urx = this.WidthPt + this.LeftPt;
+            var ury = reportHeight - (printingTop + this.TopPt + detailprintingtop);
+            var llx = this.LeftPt;
+            var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
+
+            Phrase phrase = null;
+            if (this.Font == null)
+                phrase = new Phrase(column_val);
+            else
+                phrase = new Phrase(column_val, ITextFont);
+            ColumnText ct = new ColumnText(canvas);
+            //ct.Canvas.SetColorFill(GetColor(this.ForeColor));
+            ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, Element.ALIGN_LEFT);
+            ct.Go();
+        }
     }
 
     [EnableInBuilder(BuilderType.Report)]

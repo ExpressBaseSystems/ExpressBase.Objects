@@ -1,4 +1,5 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
@@ -207,7 +208,7 @@ else {
         public Dictionary<string, List<object>> ReportSummaryFields { get; set; }
 
         [JsonIgnore]
-        public Dictionary<string, byte[]> watermarkImages { get; set; }
+        public Dictionary<string, byte[]> WatermarkImages { get; set; }
 
         [JsonIgnore]
         public List<object> WaterMarkList { get; set; }
@@ -380,6 +381,8 @@ else {
         [JsonIgnore]
         public float MultiRowTop { get; set; }
 
+        [JsonIgnore]
+        public List<Param> Parameters { get; set; }
 
         private float rh_Yposition;
         private float rf_Yposition;
@@ -473,7 +476,7 @@ else {
                 {
                     if ((field as EbWaterMark).Image != string.Empty)
                     {
-                        fileByte = watermarkImages[(field as EbWaterMark).Image];
+                        fileByte = WatermarkImages[(field as EbWaterMark).Image];
                     }
                 (field as EbWaterMark).DrawMe(d, writer, fileByte, HeightPt);
                 }
@@ -813,7 +816,7 @@ else {
                 field.DrawMe(Canvas, HeightPt, section_Yposition, column_val, detailprintingtop, column_type);
             }
 
-            if ((field is EbPageNo) || (field is EbPageXY) || (field is EbDateTime) || (field is EbSerialNumber) || (field is EbUserName))
+            if ((field is EbPageNo) || (field is EbPageXY) || (field is EbDateTime) || (field is EbSerialNumber) || (field is EbUserName) || (field is EbParameter))
             {
                 if (field is EbPageNo)
                     column_val = PageNumber.ToString();
@@ -825,6 +828,12 @@ else {
                     column_val = (iDetailRowPos + 1).ToString();
                 else if (field is EbUserName)
                     column_val = this.UserName;
+                else if (field is EbParameter)
+                {
+                    foreach (Param p in Parameters)
+                        if (p.Name == field.Title)
+                            column_val = p.Value;
+                }
                 field.DrawMe(Canvas, HeightPt, section_Yposition, detailprintingtop, column_val);
             }
             else if (field is EbImg)
@@ -870,7 +879,7 @@ else {
                         //        FileType = "jpg"
                         //    }
                         //});
-                        watermarkImages.Add((field as EbWaterMark).Image, fileByte);
+                        WatermarkImages.Add((field as EbWaterMark).Image, fileByte);
                     }
                 }
             }
@@ -892,12 +901,12 @@ else {
         {
             try
             {
-                this.EbDataSource = Redis.Get<EbDataSource>(this.DataSourceRefId);
+                this.EbDataSource = Redis.Get<EbDataSource>(DataSourceRefId);
                 if (this.EbDataSource == null || this.EbDataSource.Sql == null || this.EbDataSource.Sql == string.Empty)
                 {
                     var result = client.Get<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = this.DataSourceRefId });
                     this.EbDataSource = EbSerializers.Json_Deserialize(result.Data[0].Json);
-                    Redis.Set<EbDataSource>(this.DataSourceRefId, this.EbDataSource);
+                    Redis.Set<EbDataSource>(DataSourceRefId, this.EbDataSource);
                 }
                 if (this.EbDataSource.FilterDialogRefId != string.Empty)
                     this.EbDataSource.AfterRedisGet(Redis, client);
