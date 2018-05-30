@@ -382,24 +382,22 @@ namespace ExpressBase.Objects.ReportRelated
         [EnableInBuilder(BuilderType.Report)]
         public int RowNo { get; set; }
 
-        [EnableInBuilder(BuilderType.Report)]
-        [UIproperty]
-        public string TableRowCol { get; set; }
-
         public override string GetDesignHtml()
         {
-            return "<table class='table Ebshapes table-bordered dropped' eb-type='Table' id='@id' style='border: @Border px solid; border-color: @BorderColor ; background-color:@BackColor ; color:@ForeColor ; width: @Width px; height: @Height px; position: absolute; left: @Left px; top: @Top px;'> @TableRowCol </table>".RemoveCR().DoubleQuoted();
+            return @"<div class='eb_table_container dropped' id='@id' eb-type='Table' 
+style='position: absolute;top: @Top px;left: @Left px;height: @Height px;width: @Width px;'>
+<table onclick='$(this).parent().click();' style='border: @Border px solid ; border-color: @BorderColor ;' class='table eb_table_layout'>
+<tr><td></td><td></td><td></td></tr>
+</table><div class='eb_draggbale_table_handle' onclick='$(this).parent().focus();'><i class='fa fa-arrows'></i></div></div>".RemoveCR().DoubleQuoted();
         }
         public override string GetJsInitFunc()
         {
             return @"
     this.Init = function(id)
         {
-    this.Height =100;
-    this.Width= 100;
+    this.Width= 300;
     this.Border = 1;
-    this.BorderColor = '#000000'
-    this.TableRowCol= '<tr><td></td><td></td></tr><tr><td></td><td></td></tr>';
+    this.BorderColor = '#eeeeee';
 };";
         }
     }
