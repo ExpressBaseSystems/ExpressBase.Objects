@@ -26,7 +26,7 @@ namespace ExpressBase.Objects
     [ProtoBuf.ProtoContract]
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
     public class EbComboBox : EbControlUI
-	{
+    {
 
         public EbComboBox() { }
 
@@ -51,7 +51,7 @@ namespace ExpressBase.Objects
         public ColumnColletion DisplayMembers { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
-        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns",1)]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", 1)]
         [OnChangeExec(@"if (this.Columns.$values.length === 0 ){pg.MakeReadOnly('ValueMember');} else {pg.MakeReadWrite('ValueMember');}")]
         public EbDataColumn ValueMember { get; set; }
 
@@ -72,8 +72,10 @@ namespace ExpressBase.Objects
             if (this.MultiSelect === true ){
                 pg.MakeReadWrite('MaxLimit');   
                 if (this.Required === true ){
-                    if(this.MinLimit < 1)
-                        this.MinLimit = 1;                 
+                    if(this.MinLimit < 1){
+                        this.MinLimit = 1;
+                        console.log(this.MinLimit);
+                    }
                     pg.MakeReadWrite('MinLimit');
                 }
                 else{
@@ -82,9 +84,8 @@ namespace ExpressBase.Objects
                 }
             } 
             else {
-                pg.MakeReadOnly('MaxLimit');                    
-                pg.MakeReadOnly('MinLimit');
                 this.MaxLimit = 1;
+                pg.MakeReadOnly(['MaxLimit','MinLimit']);
                 if (this.Required === true ){
                     this.MinLimit = 1;  
                 }
@@ -100,8 +101,10 @@ namespace ExpressBase.Objects
             if (this.MultiSelect === true ){
                 pg.MakeReadWrite('MaxLimit');   
                 if (this.Required === true ){
-                    if(this.MinLimit < 1)
-                        this.MinLimit = 1;                 
+                    if(this.MinLimit < 1){
+                        this.MinLimit = 1;
+                        console.log(this.MinLimit);
+                    }
                     pg.MakeReadWrite('MinLimit');
                 }
                 else{
@@ -110,9 +113,8 @@ namespace ExpressBase.Objects
                 }
             } 
             else {
-                pg.MakeReadOnly('MaxLimit');                    
-                pg.MakeReadOnly('MinLimit');
                 this.MaxLimit = 1;
+                pg.MakeReadOnly(['MaxLimit','MinLimit']);
                 if (this.Required === true ){
                     this.MinLimit = 1;  
                 }
@@ -138,32 +140,36 @@ namespace ExpressBase.Objects
         //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public int[] values { get; set; }
 
-		[HideInPropertyGrid]
-		[EnableInBuilder(BuilderType.BotForm)]
-		public override bool IsReadOnly { get => this.ReadOnly; }
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.BotForm)]
+        public override bool IsReadOnly { get => this.ReadOnly; }
 
-		private string VueSelectcode
+        private string VueSelectcode
         {
             get
             {
                 int noOfFileds = this.DisplayMembers.Count;
+                int i = 0;
                 string rs = "<div id='@name@Wraper' data-toggle='tooltip' title='@tooltipText'>";
-                for (int i = 0; i < noOfFileds; i++)
+                foreach (EbDataColumn obj in this.DisplayMembers)
+                {
                     rs += @"
 <div style='display:inline-block; width:@perWidth@%; margin-right: -4px;'>
     <div class='input-group'>
         <v-select id='@name@$$' style='width:{3}px;' 
             multiple
-            v-model='displayMembers[$$]'
+            v-model='displayMembers[`$$`]'
             :on-change='updateCk'
             placeholder = 'label$$'>
         </v-select>
         <span class='input-group-addon' @border-r$$> <i id='@name@TglBtn' class='fa  fa-search' aria-hidden='true'></i> </span>
     </div>
 </div>"
-.Replace("$$", i.ToString())
+.Replace("$$", obj.ColumnName.ToString())
 .Replace("@perWidth@", ((int)(100 / noOfFileds)).ToString())
 .Replace("@border-r" + i, (i != noOfFileds - 1) ? "style='border-radius: 0px;'" : "");
+                    i++;
+                }
                 return rs + "</div>";
             }
         }
