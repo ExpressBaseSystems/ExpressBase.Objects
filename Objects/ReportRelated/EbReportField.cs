@@ -50,31 +50,17 @@ namespace ExpressBase.Objects.ReportRelated
             var colr = ColorTranslator.FromHtml(Color).ToArgb();
             return new BaseColor(colr);
         }
-        public virtual void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop)
-        {
-        }
+        public virtual void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop) { }
         //public virtual void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, float rowH)
         //{
         //}
-        public virtual void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, EbReport report)
-        {
-        }
-        public virtual void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, string column_name, float detailprintingtop, DbType column_type)
-        {
-        }
-        public virtual void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_name)
-        {
-        }
-        public virtual void DrawMe(Document doc, PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_name)
-        {
-        }
-        public virtual void DrawMe(Document d, byte[] fileByte)
-        {
-        }
-        public virtual void DrawMe(Document d, PdfWriter writer, byte[] fileByte, float reportHeight)
-        {
-        }
-       
+        public virtual void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, EbReport report) { }
+        public virtual void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, string column_name, float detailprintingtop, DbType column_type) { }
+        public virtual void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_name) { }
+        public virtual void DrawMe(Document doc, PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_name) { }
+        public virtual void DrawMe(Document d, byte[] fileByte) { }
+        public virtual void DrawMe(Document d, PdfWriter writer, byte[] fileByte, float reportHeight) { }
+        public virtual void DrawMe(Document d, byte[] fileByte, float reportHeight, float printingTop, float detailprintingtop) { }
         private iTextSharp.text.Font iTextFont = null;
         public virtual iTextSharp.text.Font ITextFont
         {
@@ -141,10 +127,11 @@ namespace ExpressBase.Objects.ReportRelated
     this.Source = 'url(../images/image.png) center no-repeat';
 };";
         }
-        public override void DrawMe(Document d, byte[] fileByte)
+        public override void DrawMe(Document d, byte[] fileByte, float reportHeight, float printingTop, float detailprintingtop)
         {
             iTextSharp.text.Image myImage = iTextSharp.text.Image.GetInstance(fileByte);
             myImage.ScaleToFit(this.WidthPt, this.HeightPt);
+            myImage.SetAbsolutePosition(this.LeftPt, reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop));
             myImage.Alignment = Element.ALIGN_CENTER;
             d.Add(myImage);
         }

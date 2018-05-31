@@ -842,7 +842,7 @@ else {
             else if (field is EbImg)
             {
                 byte[] fileByte = GetFile((field as EbImg).Image);
-                field.DrawMe(Doc, fileByte);
+                field.DrawMe(Doc, fileByte, HeightPt, section_Yposition, detailprintingtop);
             }
             else if ((field is EbText) || (field is EbReportFieldShape))
             {
