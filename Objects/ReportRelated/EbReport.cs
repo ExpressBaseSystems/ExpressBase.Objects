@@ -1,8 +1,12 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Constants;
+using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack;
+using ExpressBase.Common.EbServiceStack.ReqNRes;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
+using ExpressBase.Common.ServiceClients;
 using ExpressBase.Common.Structures;
 using ExpressBase.Objects.Objects.ReportRelated;
 using ExpressBase.Objects.ReportRelated;
@@ -207,7 +211,7 @@ else {
         public Dictionary<string, List<object>> ReportSummaryFields { get; set; }
 
         [JsonIgnore]
-        public Dictionary<string, byte[]> watermarkImages { get; set; }
+        public Dictionary<string, byte[]> WatermarkImages { get; set; }
 
         [JsonIgnore]
         public List<object> WaterMarkList { get; set; }
@@ -369,7 +373,7 @@ else {
         public EbBaseService ReportService { get; set; }
 
         [JsonIgnore]
-        public EbBaseService FileService { get; set; }
+        public EbStaticFileClient FileClient { get; set; }
 
         [JsonIgnore]
         public string SolutionId { get; set; }
@@ -380,6 +384,8 @@ else {
         [JsonIgnore]
         public float MultiRowTop { get; set; }
 
+        [JsonIgnore]
+        public List<Param> Parameters { get; set; }
 
         private float rh_Yposition;
         private float rf_Yposition;
@@ -473,7 +479,7 @@ else {
                 {
                     if ((field as EbWaterMark).Image != string.Empty)
                     {
-                        fileByte = watermarkImages[(field as EbWaterMark).Image];
+                        fileByte = WatermarkImages[(field as EbWaterMark).Image];
                     }
                 (field as EbWaterMark).DrawMe(d, writer, fileByte, HeightPt);
                 }
@@ -813,7 +819,7 @@ else {
                 field.DrawMe(Canvas, HeightPt, section_Yposition, column_val, detailprintingtop, column_type);
             }
 
-            if ((field is EbPageNo) || (field is EbPageXY) || (field is EbDateTime) || (field is EbSerialNumber) || (field is EbUserName))
+            if ((field is EbPageNo) || (field is EbPageXY) || (field is EbDateTime) || (field is EbSerialNumber) || (field is EbUserName) || (field is EbParameter))
             {
                 if (field is EbPageNo)
                     column_val = PageNumber.ToString();
@@ -825,12 +831,18 @@ else {
                     column_val = (iDetailRowPos + 1).ToString();
                 else if (field is EbUserName)
                     column_val = this.UserName;
+                else if (field is EbParameter)
+                {
+                    foreach (Param p in Parameters)
+                        if (p.Name == field.Title)
+                            column_val = p.Value;
+                }
                 field.DrawMe(Canvas, HeightPt, section_Yposition, detailprintingtop, column_val);
             }
             else if (field is EbImg)
             {
-                byte[] fileByte = this.ReportService.GetFile(this.SolutionId, (field as EbImg).Image);
-                field.DrawMe(Doc, fileByte);
+                byte[] fileByte = GetFile((field as EbImg).Image);
+                field.DrawMe(Doc, fileByte, HeightPt, section_Yposition, detailprintingtop);
             }
             else if ((field is EbText) || (field is EbReportFieldShape))
             {
@@ -860,7 +872,7 @@ else {
                 {
                     if ((field is EbWaterMark) && (field as EbWaterMark).Image != string.Empty)
                     {
-                        byte[] fileByte = this.ReportService.GetFile(this.SolutionId, (field as EbWaterMark).Image);
+                        byte[] fileByte = GetFile((field as EbWaterMark).Image);
                         //  byte[] fileByte = myFileService.Post
                         //(new DownloadFileRequest
                         //{
@@ -870,7 +882,7 @@ else {
                         //        FileType = "jpg"
                         //    }
                         //});
-                        watermarkImages.Add((field as EbWaterMark).Image, fileByte);
+                        WatermarkImages.Add((field as EbWaterMark).Image, fileByte);
                     }
                 }
             }
@@ -892,12 +904,12 @@ else {
         {
             try
             {
-                this.EbDataSource = Redis.Get<EbDataSource>(this.DataSourceRefId);
+                this.EbDataSource = Redis.Get<EbDataSource>(DataSourceRefId);
                 if (this.EbDataSource == null || this.EbDataSource.Sql == null || this.EbDataSource.Sql == string.Empty)
                 {
                     var result = client.Get<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = this.DataSourceRefId });
                     this.EbDataSource = EbSerializers.Json_Deserialize(result.Data[0].Json);
-                    Redis.Set<EbDataSource>(this.DataSourceRefId, this.EbDataSource);
+                    Redis.Set<EbDataSource>(DataSourceRefId, this.EbDataSource);
                 }
                 if (this.EbDataSource.FilterDialogRefId != string.Empty)
                     this.EbDataSource.AfterRedisGet(Redis, client);
@@ -922,6 +934,31 @@ else {
         }
 
         public static EbOperations Operations = ReportOperations.Instance;
+
+        public byte[] GetFile(string Image)
+        {
+            DownloadFileResponse dfs = null;
+
+            byte[] fileByte = new byte[0];
+
+            dfs = this.FileClient.Get
+                 (new DownloadFileRequest
+                 {
+                     TenantAccountId = this.SolutionId,
+                     FileDetails = new FileMeta
+                     {
+                         FileName = Image + StaticFileConstants.DOTJPG,
+                         FileType = StaticFileConstants.JPG
+                     }
+                 });
+            if (dfs.StreamWrapper != null)
+            {
+                dfs.StreamWrapper.Memorystream.Position = 0;
+                fileByte = dfs.StreamWrapper.Memorystream.ToBytes();
+            }
+
+            return fileByte;
+        }
     }
 
     public class EbReportSection : EbReportObject
