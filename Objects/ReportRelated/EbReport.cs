@@ -950,7 +950,7 @@ else {
             DownloadFileResponse dfs = null;
 
             byte[] fileByte = new byte[0];
-
+            Console.WriteLine("___________________\nFileClient.BaseUri" + this.FileClient.BaseUri+ "\n BearerToken" + this.FileClient.BearerToken + "\n RefreshToken" + this.FileClient.RefreshToken + "\n RefreshTokenUri" + this.FileClient.RefreshTokenUri);
             dfs = this.FileClient.Get
                  (new DownloadFileRequest
                  {
