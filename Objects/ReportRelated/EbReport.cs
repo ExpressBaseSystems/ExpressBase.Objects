@@ -745,122 +745,130 @@ else {
 
         public void DrawFields(EbReportField field, float section_Yposition, int serialnumber)
         {
-            var column_name = string.Empty;
-            var column_val = string.Empty;
-            var column_type = DbType.String;
-
-            if (PageSummaryFields.ContainsKey(field.Name) || ReportSummaryFields.ContainsKey(field.EbSid))
-                CallSummerize(field as EbDataField, serialnumber);
-
-            if (field is EbDataField)
+            try
             {
-                column_type = (DbType)(field as EbDataField).DbType;
-                int tableIndex = (field as EbDataField).TableIndex;
-                column_name = (field as EbDataField).ColumnName;
-                Globals globals = new Globals();
-                globals.CurrentField = field;
-                if (AppearanceScriptCollection.ContainsKey(field.Name))
-                {
+                var column_name = string.Empty;
+                var column_val = string.Empty;
+                var column_type = DbType.String;
 
-                    if (field.Font == null)
-                    {
-                        globals.CurrentField.Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 14, Strikethrough = false, Style = 0, Underline = false });
-                    }
-                    foreach (string calcfd in (field as EbDataField).DataFieldsUsedAppearance)
-                    {
-                        string TName = calcfd.Split('.')[0];
-                        string fName = calcfd.Split('.')[1];
-                        // globals[TName].Add(fName, new NTV { Name = fName, Type = this.DataRows.Table.Columns[fName].Type, Value = this.DataRows[serialnumber][fName] });
-                        globals[TName].Add(fName, new NTV { Name = fName, Type = this.DataSet.Tables[0].Columns[fName].Type, Value = this.DataSet.Tables[0].Rows[serialnumber][fName] });
-                    }
-                    try
-                    {
-                        AppearanceScriptCollection[field.Name].RunAsync(globals);
+                if (PageSummaryFields.ContainsKey(field.Name) || ReportSummaryFields.ContainsKey(field.EbSid))
+                    CallSummerize(field as EbDataField, serialnumber);
 
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e.Message);
-                    }
-                }
-                if (field is IEbDataFieldSummary)
+                if (field is EbDataField)
                 {
-                    if ((field is EbDataFieldNumericSummary) && (field as EbDataFieldNumericSummary).InLetters)
+                    column_type = (DbType)(field as EbDataField).DbType;
+                    int tableIndex = (field as EbDataField).TableIndex;
+                    column_name = (field as EbDataField).ColumnName;
+                    Globals globals = new Globals();
+                    globals.CurrentField = field;
+                    if (AppearanceScriptCollection.ContainsKey(field.Name))
                     {
-                        column_val = (field as IEbDataFieldSummary).SummarizedValue.ToString();
-                        (field as EbDataFieldNumericSummary).DrawMe(Canvas, HeightPt, section_Yposition, detailprintingtop, column_val);
-                        return;
-                    }
-                    else
-                        column_val = (field as IEbDataFieldSummary).SummarizedValue.ToString();
-                }
-                else if (field is EbCalcField)
-                {
-                    try
-                    {
-                        foreach (string calcfd in (field as EbCalcField).DataFieldsUsedCalc)
+
+                        if (field.Font == null)
+                        {
+                            globals.CurrentField.Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 14, Strikethrough = false, Style = 0, Underline = false });
+                        }
+                        foreach (string calcfd in (field as EbDataField).DataFieldsUsedAppearance)
                         {
                             string TName = calcfd.Split('.')[0];
                             string fName = calcfd.Split('.')[1];
-                            //globals[TName].Add(fName, new NTV { Name = fName, Type = this.DataRows.Table.Columns[fName].Type, Value = this.DataRows[serialnumber][fName] });
+                            // globals[TName].Add(fName, new NTV { Name = fName, Type = this.DataRows.Table.Columns[fName].Type, Value = this.DataRows[serialnumber][fName] });
                             globals[TName].Add(fName, new NTV { Name = fName, Type = this.DataSet.Tables[0].Columns[fName].Type, Value = this.DataSet.Tables[0].Rows[serialnumber][fName] });
                         }
-                        column_val = (ValueScriptCollection[field.Name].RunAsync(globals)).Result.ReturnValue.ToString();
+                        try
+                        {
+                            AppearanceScriptCollection[field.Name].RunAsync(globals);
+
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(e.Message);
+                        }
                     }
-                    catch (Exception e)
+                    if (field is IEbDataFieldSummary)
                     {
-                        Console.WriteLine(e.Message);
+                        if ((field is EbDataFieldNumericSummary) && (field as EbDataFieldNumericSummary).InLetters)
+                        {
+                            column_val = (field as IEbDataFieldSummary).SummarizedValue.ToString();
+                            (field as EbDataFieldNumericSummary).DrawMe(Canvas, HeightPt, section_Yposition, detailprintingtop, column_val);
+                            return;
+                        }
+                        else
+                            column_val = (field as IEbDataFieldSummary).SummarizedValue.ToString();
                     }
+                    else if (field is EbCalcField)
+                    {
+                        try
+                        {
+                            foreach (string calcfd in (field as EbCalcField).DataFieldsUsedCalc)
+                            {
+                                string TName = calcfd.Split('.')[0];
+                                string fName = calcfd.Split('.')[1];
+                                //globals[TName].Add(fName, new NTV { Name = fName, Type = this.DataRows.Table.Columns[fName].Type, Value = this.DataRows[serialnumber][fName] });
+                                globals[TName].Add(fName, new NTV { Name = fName, Type = this.DataSet.Tables[0].Columns[fName].Type, Value = this.DataSet.Tables[0].Rows[serialnumber][fName] });
+                            }
+                            column_val = (ValueScriptCollection[field.Name].RunAsync(globals)).Result.ReturnValue.ToString();
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(e.Message);
+                        }
+                    }
+
+                    else
+                        column_val = GetDataFieldtValue(column_name, serialnumber, tableIndex);
+
+                    field.DrawMe(Canvas, HeightPt, section_Yposition, column_val, detailprintingtop, column_type);
                 }
 
-                else
-                    column_val = GetDataFieldtValue(column_name, serialnumber, tableIndex);
-
-                field.DrawMe(Canvas, HeightPt, section_Yposition, column_val, detailprintingtop, column_type);
-            }
-
-            if ((field is EbPageNo) || (field is EbPageXY) || (field is EbDateTime) || (field is EbSerialNumber) || (field is EbUserName) || (field is EbParameter))
-            {
-                if (field is EbPageNo)
-                    column_val = PageNumber.ToString();
-                else if (field is EbPageXY)
-                    column_val = PageNumber + "/"/* + writer.PageCount*/;
-                else if (field is EbDateTime)
-                    column_val = CurrentTimestamp.ToString();
-                else if (field is EbSerialNumber)
-                    column_val = (iDetailRowPos + 1).ToString();
-                else if (field is EbUserName)
-                    column_val = this.UserName;
-                else if (field is EbParameter)
+                if ((field is EbPageNo) || (field is EbPageXY) || (field is EbDateTime) || (field is EbSerialNumber) || (field is EbUserName) || (field is EbParameter))
                 {
-                    foreach (Param p in Parameters)
-                        if (p.Name == field.Title)
-                            column_val = p.Value;
+                    if (field is EbPageNo)
+                        column_val = PageNumber.ToString();
+                    else if (field is EbPageXY)
+                        column_val = PageNumber + "/"/* + writer.PageCount*/;
+                    else if (field is EbDateTime)
+                        column_val = CurrentTimestamp.ToString();
+                    else if (field is EbSerialNumber)
+                        column_val = (iDetailRowPos + 1).ToString();
+                    else if (field is EbUserName)
+                        column_val = this.UserName;
+                    else if (field is EbParameter)
+                    {
+                        foreach (Param p in Parameters)
+                            if (p.Name == field.Title)
+                                column_val = p.Value;
+                    }
+                    field.DrawMe(Canvas, HeightPt, section_Yposition, detailprintingtop, column_val);
                 }
-                field.DrawMe(Canvas, HeightPt, section_Yposition, detailprintingtop, column_val);
+                else if (field is EbImg)
+                {
+                    byte[] fileByte = GetFile((field as EbImg).Image);
+                    if (fileByte != null)
+                        field.DrawMe(Doc, fileByte, HeightPt, section_Yposition, detailprintingtop);
+                }
+                else if ((field is EbText) || (field is EbReportFieldShape))
+                {
+                    field.DrawMe(Canvas, HeightPt, section_Yposition, this);
+                }
+                else if (field is EbBarcode)
+                {
+                    int tableIndex = Convert.ToInt32((field as EbBarcode).Code.Split('.')[0]);
+                    column_name = (field as EbBarcode).Code.Split('.')[1];
+                    column_val = GetDataFieldtValue(column_name, serialnumber, tableIndex);
+                    field.DrawMe(Doc, Canvas, HeightPt, section_Yposition, detailprintingtop, column_val);
+                }
+                else if (field is EbQRcode)
+                {
+                    int tableIndex = Convert.ToInt32((field as EbQRcode).Code.Split('.')[0]);
+                    column_name = (field as EbQRcode).Code.Split('.')[1];
+                    column_val = GetDataFieldtValue(column_name, serialnumber, tableIndex);
+                    field.DrawMe(Doc, Canvas, HeightPt, section_Yposition, detailprintingtop, column_val);
+                }
             }
-            else if (field is EbImg)
+            catch (Exception e)
             {
-                byte[] fileByte = GetFile((field as EbImg).Image);
-                field.DrawMe(Doc, fileByte, HeightPt, section_Yposition, detailprintingtop);
-            }
-            else if ((field is EbText) || (field is EbReportFieldShape))
-            {
-                field.DrawMe(Canvas, HeightPt, section_Yposition, this);
-            }
-            else if (field is EbBarcode)
-            {
-                int tableIndex = Convert.ToInt32((field as EbBarcode).Code.Split('.')[0]);
-                column_name = (field as EbBarcode).Code.Split('.')[1];
-                column_val = GetDataFieldtValue(column_name, serialnumber, tableIndex);
-                field.DrawMe(Doc, Canvas, HeightPt, section_Yposition, detailprintingtop, column_val);
-            }
-            else if (field is EbQRcode)
-            {
-                int tableIndex = Convert.ToInt32((field as EbQRcode).Code.Split('.')[0]);
-                column_name = (field as EbQRcode).Code.Split('.')[1];
-                column_val = GetDataFieldtValue(column_name, serialnumber, tableIndex);
-                field.DrawMe(Doc, Canvas, HeightPt, section_Yposition, detailprintingtop, column_val);
+                Console.WriteLine(e.Message);
             }
         }
 
