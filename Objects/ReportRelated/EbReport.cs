@@ -868,7 +868,9 @@ else {
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(e.Message + e.StackTrace);
+                Console.ForegroundColor = ConsoleColor.White;
             }
         }
 
