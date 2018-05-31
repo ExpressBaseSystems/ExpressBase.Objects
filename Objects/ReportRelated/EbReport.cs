@@ -868,9 +868,7 @@ else {
             }
             catch (Exception e)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine(e.Message + e.StackTrace);
-                Console.ForegroundColor = ConsoleColor.White;
             }
         }
 
@@ -950,9 +948,6 @@ else {
             DownloadFileResponse dfs = null;
 
             byte[] fileByte = new byte[0];
-            Console.ForegroundColor = ConsoleColor.DarkYellow;
-            Console.WriteLine("___________________\nFileClient.BaseUri" + this.FileClient.BaseUri+ "\n BearerToken" + this.FileClient.BearerToken + "\n RefreshToken" + this.FileClient.RefreshToken + "\n RefreshTokenUri" + this.FileClient.RefreshTokenUri);
-            Console.ForegroundColor = ConsoleColor.White;
             dfs = this.FileClient.Get
                  (new DownloadFileRequest
                  {
