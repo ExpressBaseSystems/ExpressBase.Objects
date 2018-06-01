@@ -782,7 +782,7 @@ else {
                         }
                         catch (Exception e)
                         {
-                            Console.WriteLine(e.Message);
+                            Console.WriteLine(e.Message + e.StackTrace);
                         }
                     }
                     if (field is IEbDataFieldSummary)
@@ -811,7 +811,7 @@ else {
                         }
                         catch (Exception e)
                         {
-                            Console.WriteLine(e.Message);
+                            Console.WriteLine(e.Message + e.StackTrace);
                         }
                     }
 
@@ -860,7 +860,7 @@ else {
                 }
                 else if (field is EbQRcode)
                 {
-                    int tableIndex = Convert.ToInt32((field as EbQRcode).Code.Split('.')[0]);
+                    int tableIndex = Convert.ToInt32((field as EbQRcode).Code.Split('.')[0].Substring(1));
                     column_name = (field as EbQRcode).Code.Split('.')[1];
                     column_val = GetDataFieldtValue(column_name, serialnumber, tableIndex);
                     field.DrawMe(Doc, Canvas, HeightPt, section_Yposition, detailprintingtop, column_val);

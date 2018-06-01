@@ -523,14 +523,14 @@ namespace ExpressBase.Objects.ReportRelated
             {
                 //if (Type >= 1 && Type <= 6)
                 //{
-                BarcodeEan codeEAN = new BarcodeEan
-                {
-                    Code = code_val.PadLeft(10, '0'),
-                    CodeType = Type,
-                    GuardBars = GuardBars,
-                    Baseline = BaseLine
-                };
-                imageEAN = codeEAN.CreateImageWithBarcode(cb: canvas, barColor: null, textColor: null);
+                ////BarcodeEan codeEAN = new BarcodeEan
+                ////{
+                ////    Code = code_val.PadLeft(10, '0'),
+                ////    CodeType = Type,
+                ////    GuardBars = GuardBars,
+                ////    Baseline = BaseLine
+                ////};
+                ////imageEAN = codeEAN.CreateImageWithBarcode(cb: canvas, barColor: null, textColor: null);
                 //}
                 //if (Type == 7 || Type == 8)
                 //{
@@ -543,16 +543,16 @@ namespace ExpressBase.Objects.ReportRelated
                 //}
                 //if (Type >= 9 && Type <= 11)
                 //{
-                //    Barcode128 uccEan128 = new Barcode128();
+                Barcode128 uccEan128 = new Barcode128();
 
-                //    uccEan128.CodeType = Type;
-                //    uccEan128.Code = code_val;
-                //    uccEan128.GuardBars = GuardBars;
-                //    uccEan128.Baseline = BaseLine;
-                //    imageEAN = uccEan128.CreateImageWithBarcode(cb: canvas, barColor: null, textColor: null);
+                uccEan128.CodeType = Type;
+                uccEan128.Code = code_val;
+                uccEan128.GuardBars = GuardBars;
+                uccEan128.Baseline = BaseLine;
+                imageEAN = uccEan128.CreateImageWithBarcode(cb: canvas, barColor: null, textColor: null);
                 //}
 
-                //imageEAN.ScaleAbsolute(Width, Height);
+               // imageEAN.ScaleAbsolute(Width, Height);
                 imageEAN.SetAbsolutePosition(LeftPt, reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop));
                 doc.Add(imageEAN);
             }
@@ -603,11 +603,12 @@ namespace ExpressBase.Objects.ReportRelated
             try
             {
                 QRCodeGenerator qrGenerator = new QRCodeGenerator();
-                QRCodeData qrCodeData = qrGenerator.CreateQrCode("4512345678906", QRCodeGenerator.ECCLevel.Q);
+                QRCodeData qrCodeData = qrGenerator.CreateQrCode(code_val, QRCodeGenerator.ECCLevel.Q);
                 BitmapByteQRCode qrCode = new BitmapByteQRCode(qrCodeData);
                 byte[] qrCodeImage = qrCode.GetGraphic(20);
                 iTextSharp.text.Image img = iTextSharp.text.Image.GetInstance(qrCodeImage);
-                img.ScaleAbsolute(200, 200);
+                img.SetAbsolutePosition(LeftPt, reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop));
+                img.ScaleAbsolute(WidthPt, HeightPt);
                 doc.Add(img);
             }
             catch (Exception e)
