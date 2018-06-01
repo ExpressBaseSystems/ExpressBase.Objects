@@ -24,6 +24,11 @@ namespace ExpressBase.Objects.ReportRelated
 
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
+        [HideInPropertyGrid]
+        public string  ParentName { get; set; }//only for builder
+
+        [EnableInBuilder(BuilderType.Report)]
+        [UIproperty]
         [PropertyGroup("Appearance")]
         public int Border { get; set; }
 

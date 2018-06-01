@@ -924,6 +924,19 @@ else {
         public static EbOperations Operations = ReportOperations.Instance;
     }
 
+    [EnableInBuilder(BuilderType.Report)]
+    public class EbTableLayoutCell : EbReportObject
+    {
+        [EnableInBuilder(BuilderType.Report)]
+        public int RowIndex { set; get; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        public int CellIndex { set; get; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        public List<EbReportField> ControlCollection { set; get; }
+    }
+
     public class EbReportSection : EbReportObject
     {
         [EnableInBuilder(BuilderType.Report)]

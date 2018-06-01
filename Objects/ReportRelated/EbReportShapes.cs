@@ -374,20 +374,24 @@ namespace ExpressBase.Objects.ReportRelated
         }
     }
     [EnableInBuilder(BuilderType.Report)]
-    public class EbTable : EbReportFieldShape
+    public class EbTableLayout : EbReportFieldShape
     {
         [EnableInBuilder(BuilderType.Report)]
-        public int ColoumNo { get; set; }
+        public int ColoumCount { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
-        public int RowNo { get; set; }
+        public int RowCount { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
+        public List<EbTableLayoutCell> CellCollection { get; set; }
 
         public override string GetDesignHtml()
         {
-            return @"<div class='eb_table_container dropped' id='@id' eb-type='Table' 
+            return @"<div class='eb_table_container dropped' id='@id' eb-type='TableLayout' 
 style='position: absolute;top: @Top px;left: @Left px;height: @Height px;width: @Width px;'>
 <table onclick='$(this).parent().click();' style='border: @Border px solid ; border-color: @BorderColor ;' class='table eb_table_layout'>
-<tr><td></td><td></td><td></td></tr>
+<tr><td eb-type='TableLayout'></td><td eb-type='TableLayout'></td><td eb-type='TableLayout'></td></tr>
 </table><div class='eb_draggbale_table_handle' onclick='$(this).parent().focus();'><i class='fa fa-arrows'></i></div></div>".RemoveCR().DoubleQuoted();
         }
         public override string GetJsInitFunc()
