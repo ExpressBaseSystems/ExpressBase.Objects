@@ -258,9 +258,8 @@ var @nameEbCombo = new EbSelect('@name', '@DSid', @DDHeight, '@vmName', '', @Max
             {
                 return @"
 <div id='@name@Container'  role='form' data-toggle='validator' style='width:100%;'>
+    <label id='@name@errormsg' class='text-danger'></label>
     <input type='hidden' name='@name@Hidden4val' data-ebtype='16' id='@name@'/>
-	<span id='@name@Lbl' style='@LabelBackColor@ @LabelForeColor@ '> @Label@  </span>
-
     @VueSelectCode
     <div id='@name@_loadingdiv' class='ebCombo-loader'>
         <i id='@name@_loading-image' class='fa fa-spinner fa-pulse fa-2x fa-fw'></i><span class='sr-only'>Loading...</span>
@@ -273,7 +272,6 @@ var @nameEbCombo = new EbSelect('@name', '@DSid', @DDHeight, '@vmName', '', @Max
 </div>"
     .Replace("@VueSelectCode", this.VueSelectcode)
     .Replace("@name@", this.Name)
-    .Replace("@Label@ ", ((this.Label != null) ? this.Label : "@Label@ "))
     .Replace("@width", 900.ToString())//this.Width.ToString())
     .Replace("@perWidth", (this.DisplayMembers.Count != 0) ? (900 / this.DisplayMembers.Count).ToString() : 900.ToString())
     .Replace("@DDwidth", (this.DropdownWidth == 0) ? "100" : this.DropdownWidth.ToString())
@@ -287,11 +285,12 @@ var @nameEbCombo = new EbSelect('@name', '@DSid', @DDHeight, '@vmName', '', @Max
         {
             return @"
     <div id='cont_@name@  ' Ctype='ComboBox' class='Eb-ctrlContainer' style='@hiddenString'>
+	<div id='@name@Lbl' style='@LabelBackColor@ @LabelForeColor@ '> @Label@  </div>
            @barehtml@
     </div>"
 .Replace("@barehtml@", this.GetBareHtml())
 .Replace("@name@", this.Name)
-.Replace("@label", this.Label)
+.Replace("@Label@ ", ((this.Label != null) ? this.Label : "@Label@ "))
 .Replace("@tooltipText", this.ToolTipText);
         }
     }
