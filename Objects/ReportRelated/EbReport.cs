@@ -1,8 +1,12 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Constants;
+using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack;
+using ExpressBase.Common.EbServiceStack.ReqNRes;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
+using ExpressBase.Common.ServiceClients;
 using ExpressBase.Common.Structures;
 using ExpressBase.Objects.Objects.ReportRelated;
 using ExpressBase.Objects.ReportRelated;
@@ -207,7 +211,7 @@ else {
         public Dictionary<string, List<object>> ReportSummaryFields { get; set; }
 
         [JsonIgnore]
-        public Dictionary<string, byte[]> watermarkImages { get; set; }
+        public Dictionary<string, byte[]> WatermarkImages { get; set; }
 
         [JsonIgnore]
         public List<object> WaterMarkList { get; set; }
@@ -369,7 +373,7 @@ else {
         public EbBaseService ReportService { get; set; }
 
         [JsonIgnore]
-        public EbBaseService FileService { get; set; }
+        public EbStaticFileClient FileClient { get; set; }
 
         [JsonIgnore]
         public string SolutionId { get; set; }
@@ -380,6 +384,8 @@ else {
         [JsonIgnore]
         public float MultiRowTop { get; set; }
 
+        [JsonIgnore]
+        public List<Param> Parameters { get; set; }
 
         private float rh_Yposition;
         private float rf_Yposition;
@@ -473,7 +479,7 @@ else {
                 {
                     if ((field as EbWaterMark).Image != string.Empty)
                     {
-                        fileByte = watermarkImages[(field as EbWaterMark).Image];
+                        fileByte = WatermarkImages[(field as EbWaterMark).Image];
                     }
                 (field as EbWaterMark).DrawMe(d, writer, fileByte, HeightPt);
                 }
@@ -739,116 +745,130 @@ else {
 
         public void DrawFields(EbReportField field, float section_Yposition, int serialnumber)
         {
-            var column_name = string.Empty;
-            var column_val = string.Empty;
-            var column_type = DbType.String;
-
-            if (PageSummaryFields.ContainsKey(field.Name) || ReportSummaryFields.ContainsKey(field.EbSid))
-                CallSummerize(field as EbDataField, serialnumber);
-
-            if (field is EbDataField)
+            try
             {
-                column_type = (DbType)(field as EbDataField).DbType;
-                int tableIndex = (field as EbDataField).TableIndex;
-                column_name = (field as EbDataField).ColumnName;
-                Globals globals = new Globals();
-                globals.CurrentField = field;
-                if (AppearanceScriptCollection.ContainsKey(field.Name))
-                {
+                var column_name = string.Empty;
+                var column_val = string.Empty;
+                var column_type = DbType.String;
 
-                    if (field.Font == null)
-                    {
-                        globals.CurrentField.Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 14, Strikethrough = false, Style = 0, Underline = false });
-                    }
-                    foreach (string calcfd in (field as EbDataField).DataFieldsUsedAppearance)
-                    {
-                        string TName = calcfd.Split('.')[0];
-                        string fName = calcfd.Split('.')[1];
-                        // globals[TName].Add(fName, new NTV { Name = fName, Type = this.DataRows.Table.Columns[fName].Type, Value = this.DataRows[serialnumber][fName] });
-                        globals[TName].Add(fName, new NTV { Name = fName, Type = this.DataSet.Tables[0].Columns[fName].Type, Value = this.DataSet.Tables[0].Rows[serialnumber][fName] });
-                    }
-                    try
-                    {
-                        AppearanceScriptCollection[field.Name].RunAsync(globals);
+                if (PageSummaryFields.ContainsKey(field.Name) || ReportSummaryFields.ContainsKey(field.EbSid))
+                    CallSummerize(field as EbDataField, serialnumber);
 
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e.Message);
-                    }
-                }
-                if (field is IEbDataFieldSummary)
+                if (field is EbDataField)
                 {
-                    if ((field is EbDataFieldNumericSummary) && (field as EbDataFieldNumericSummary).InLetters)
+                    column_type = (DbType)(field as EbDataField).DbType;
+                    int tableIndex = (field as EbDataField).TableIndex;
+                    column_name = (field as EbDataField).ColumnName;
+                    Globals globals = new Globals();
+                    globals.CurrentField = field;
+                    if (AppearanceScriptCollection.ContainsKey(field.Name))
                     {
-                        column_val = (field as IEbDataFieldSummary).SummarizedValue.ToString();
-                        (field as EbDataFieldNumericSummary).DrawMe(Canvas, HeightPt, section_Yposition, detailprintingtop, column_val);
-                        return;
-                    }
-                    else
-                        column_val = (field as IEbDataFieldSummary).SummarizedValue.ToString();
-                }
-                else if (field is EbCalcField)
-                {
-                    try
-                    {
-                        foreach (string calcfd in (field as EbCalcField).DataFieldsUsedCalc)
+
+                        if (field.Font == null)
+                        {
+                            globals.CurrentField.Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 14, Strikethrough = false, Style = 0, Underline = false });
+                        }
+                        foreach (string calcfd in (field as EbDataField).DataFieldsUsedAppearance)
                         {
                             string TName = calcfd.Split('.')[0];
                             string fName = calcfd.Split('.')[1];
-                            //globals[TName].Add(fName, new NTV { Name = fName, Type = this.DataRows.Table.Columns[fName].Type, Value = this.DataRows[serialnumber][fName] });
+                            // globals[TName].Add(fName, new NTV { Name = fName, Type = this.DataRows.Table.Columns[fName].Type, Value = this.DataRows[serialnumber][fName] });
                             globals[TName].Add(fName, new NTV { Name = fName, Type = this.DataSet.Tables[0].Columns[fName].Type, Value = this.DataSet.Tables[0].Rows[serialnumber][fName] });
                         }
-                        column_val = (ValueScriptCollection[field.Name].RunAsync(globals)).Result.ReturnValue.ToString();
+                        try
+                        {
+                            AppearanceScriptCollection[field.Name].RunAsync(globals);
+
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(e.Message + e.StackTrace);
+                        }
                     }
-                    catch (Exception e)
+                    if (field is IEbDataFieldSummary)
                     {
-                        Console.WriteLine(e.Message);
+                        if ((field is EbDataFieldNumericSummary) && (field as EbDataFieldNumericSummary).InLetters)
+                        {
+                            column_val = (field as IEbDataFieldSummary).SummarizedValue.ToString();
+                            (field as EbDataFieldNumericSummary).DrawMe(Canvas, HeightPt, section_Yposition, detailprintingtop, column_val);
+                            return;
+                        }
+                        else
+                            column_val = (field as IEbDataFieldSummary).SummarizedValue.ToString();
                     }
+                    else if (field is EbCalcField)
+                    {
+                        try
+                        {
+                            foreach (string calcfd in (field as EbCalcField).DataFieldsUsedCalc)
+                            {
+                                string TName = calcfd.Split('.')[0];
+                                string fName = calcfd.Split('.')[1];
+                                //globals[TName].Add(fName, new NTV { Name = fName, Type = this.DataRows.Table.Columns[fName].Type, Value = this.DataRows[serialnumber][fName] });
+                                globals[TName].Add(fName, new NTV { Name = fName, Type = this.DataSet.Tables[0].Columns[fName].Type, Value = this.DataSet.Tables[0].Rows[serialnumber][fName] });
+                            }
+                            column_val = (ValueScriptCollection[field.Name].RunAsync(globals)).Result.ReturnValue.ToString();
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(e.Message + e.StackTrace);
+                        }
+                    }
+
+                    else
+                        column_val = GetDataFieldtValue(column_name, serialnumber, tableIndex);
+
+                    field.DrawMe(Canvas, HeightPt, section_Yposition, column_val, detailprintingtop, column_type);
                 }
 
-                else
+                if ((field is EbPageNo) || (field is EbPageXY) || (field is EbDateTime) || (field is EbSerialNumber) || (field is EbUserName) || (field is EbParameter))
+                {
+                    if (field is EbPageNo)
+                        column_val = PageNumber.ToString();
+                    else if (field is EbPageXY)
+                        column_val = PageNumber + "/"/* + writer.PageCount*/;
+                    else if (field is EbDateTime)
+                        column_val = CurrentTimestamp.ToString();
+                    else if (field is EbSerialNumber)
+                        column_val = (iDetailRowPos + 1).ToString();
+                    else if (field is EbUserName)
+                        column_val = this.UserName;
+                    else if (field is EbParameter)
+                    {
+                        foreach (Param p in Parameters)
+                            if (p.Name == field.Title)
+                                column_val = p.Value;
+                    }
+                    field.DrawMe(Canvas, HeightPt, section_Yposition, detailprintingtop, column_val);
+                }
+                else if (field is EbImg)
+                {
+                    byte[] fileByte = GetFile((field as EbImg).Image);
+                    if (fileByte != null)
+                        field.DrawMe(Doc, fileByte, HeightPt, section_Yposition, detailprintingtop);
+                }
+                else if ((field is EbText) || (field is EbReportFieldShape))
+                {
+                    field.DrawMe(Canvas, HeightPt, section_Yposition, this);
+                }
+                else if (field is EbBarcode)
+                {
+                    int tableIndex = Convert.ToInt32((field as EbBarcode).Code.Split('.')[0].Substring(1));
+                    column_name = (field as EbBarcode).Code.Split('.')[1];
                     column_val = GetDataFieldtValue(column_name, serialnumber, tableIndex);
-
-                field.DrawMe(Canvas, HeightPt, section_Yposition, column_val, detailprintingtop, column_type);
+                    field.DrawMe(Doc, Canvas, HeightPt, section_Yposition, detailprintingtop, column_val);
+                }
+                else if (field is EbQRcode)
+                {
+                    int tableIndex = Convert.ToInt32((field as EbQRcode).Code.Split('.')[0].Substring(1));
+                    column_name = (field as EbQRcode).Code.Split('.')[1];
+                    column_val = GetDataFieldtValue(column_name, serialnumber, tableIndex);
+                    field.DrawMe(Doc, Canvas, HeightPt, section_Yposition, detailprintingtop, column_val);
+                }
             }
-
-            if ((field is EbPageNo) || (field is EbPageXY) || (field is EbDateTime) || (field is EbSerialNumber) || (field is EbUserName))
+            catch (Exception e)
             {
-                if (field is EbPageNo)
-                    column_val = PageNumber.ToString();
-                else if (field is EbPageXY)
-                    column_val = PageNumber + "/"/* + writer.PageCount*/;
-                else if (field is EbDateTime)
-                    column_val = CurrentTimestamp.ToString();
-                else if (field is EbSerialNumber)
-                    column_val = (iDetailRowPos + 1).ToString();
-                else if (field is EbUserName)
-                    column_val = this.UserName;
-                field.DrawMe(Canvas, HeightPt, section_Yposition, detailprintingtop, column_val);
-            }
-            else if (field is EbImg)
-            {
-                byte[] fileByte = this.ReportService.GetFile(this.SolutionId, (field as EbImg).Image);
-                field.DrawMe(Doc, fileByte);
-            }
-            else if ((field is EbText) || (field is EbReportFieldShape))
-            {
-                field.DrawMe(Canvas, HeightPt, section_Yposition, this);
-            }
-            else if (field is EbBarcode)
-            {
-                int tableIndex = Convert.ToInt32((field as EbBarcode).Code.Split('.')[0]);
-                column_name = (field as EbBarcode).Code.Split('.')[1];
-                column_val = GetDataFieldtValue(column_name, serialnumber, tableIndex);
-                field.DrawMe(Doc, Canvas, HeightPt, section_Yposition, detailprintingtop, column_val);
-            }
-            else if (field is EbQRcode)
-            {
-                int tableIndex = Convert.ToInt32((field as EbQRcode).Code.Split('.')[0]);
-                column_name = (field as EbQRcode).Code.Split('.')[1];
-                column_val = GetDataFieldtValue(column_name, serialnumber, tableIndex);
-                field.DrawMe(Doc, Canvas, HeightPt, section_Yposition, detailprintingtop, column_val);
+                Console.WriteLine(e.Message + e.StackTrace);
             }
         }
 
@@ -860,7 +880,7 @@ else {
                 {
                     if ((field is EbWaterMark) && (field as EbWaterMark).Image != string.Empty)
                     {
-                        byte[] fileByte = this.ReportService.GetFile(this.SolutionId, (field as EbWaterMark).Image);
+                        byte[] fileByte = GetFile((field as EbWaterMark).Image);
                         //  byte[] fileByte = myFileService.Post
                         //(new DownloadFileRequest
                         //{
@@ -870,7 +890,7 @@ else {
                         //        FileType = "jpg"
                         //    }
                         //});
-                        watermarkImages.Add((field as EbWaterMark).Image, fileByte);
+                        WatermarkImages.Add((field as EbWaterMark).Image, fileByte);
                     }
                 }
             }
@@ -887,17 +907,25 @@ else {
             Stamp.FormFlattening = true;
             Stamp.Close();
         }
-
+        public void SetDetail()
+        {
+            ColumnText ct = new ColumnText(Canvas);
+            Phrase phrase = new Phrase("page:"+PageNumber.ToString() + ", " + UserName + ", " + CurrentTimestamp);
+            //phrase.Font = FontFactory.GetFont("Arial", 4, iTextSharp.text.Font.UNDERLINE, BaseColor.Red);
+            phrase.Font.Size = 6;
+            ct.SetSimpleColumn(phrase, 5, 2, WidthPt - 10, 20, 15, Element.ALIGN_RIGHT);
+            ct.Go();
+        }
         public override void AfterRedisGet(RedisClient Redis, IServiceClient client)
         {
             try
             {
-                this.EbDataSource = Redis.Get<EbDataSource>(this.DataSourceRefId);
+                this.EbDataSource = Redis.Get<EbDataSource>(DataSourceRefId);
                 if (this.EbDataSource == null || this.EbDataSource.Sql == null || this.EbDataSource.Sql == string.Empty)
                 {
                     var result = client.Get<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = this.DataSourceRefId });
                     this.EbDataSource = EbSerializers.Json_Deserialize(result.Data[0].Json);
-                    Redis.Set<EbDataSource>(this.DataSourceRefId, this.EbDataSource);
+                    Redis.Set<EbDataSource>(DataSourceRefId, this.EbDataSource);
                 }
                 if (this.EbDataSource.FilterDialogRefId != string.Empty)
                     this.EbDataSource.AfterRedisGet(Redis, client);
@@ -922,6 +950,30 @@ else {
         }
 
         public static EbOperations Operations = ReportOperations.Instance;
+
+        public byte[] GetFile(string Image)
+        {
+            DownloadFileResponse dfs = null;
+
+            byte[] fileByte = new byte[0];
+            dfs = this.FileClient.Get
+                 (new DownloadFileRequest
+                 {
+                     TenantAccountId = this.SolutionId,
+                     FileDetails = new FileMeta
+                     {
+                         FileName = Image + StaticFileConstants.DOTJPG,
+                         FileType = StaticFileConstants.JPG
+                     }
+                 });
+            if (dfs.StreamWrapper != null)
+            {
+                dfs.StreamWrapper.Memorystream.Position = 0;
+                fileByte = dfs.StreamWrapper.Memorystream.ToBytes();
+            }
+
+            return fileByte;
+        }
     }
 
     [EnableInBuilder(BuilderType.Report)]

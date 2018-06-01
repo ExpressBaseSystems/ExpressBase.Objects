@@ -55,31 +55,17 @@ namespace ExpressBase.Objects.ReportRelated
             var colr = ColorTranslator.FromHtml(Color).ToArgb();
             return new BaseColor(colr);
         }
-        public virtual void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop)
-        {
-        }
+        public virtual void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop) { }
         //public virtual void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, float rowH)
         //{
         //}
-        public virtual void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, EbReport report)
-        {
-        }
-        public virtual void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, string column_name, float detailprintingtop, DbType column_type)
-        {
-        }
-        public virtual void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_name)
-        {
-        }
-        public virtual void DrawMe(Document doc, PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_name)
-        {
-        }
-        public virtual void DrawMe(Document d, byte[] fileByte)
-        {
-        }
-        public virtual void DrawMe(Document d, PdfWriter writer, byte[] fileByte, float reportHeight)
-        {
-        }
-       
+        public virtual void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, EbReport report) { }
+        public virtual void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, string column_name, float detailprintingtop, DbType column_type) { }
+        public virtual void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_name) { }
+        public virtual void DrawMe(Document doc, PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_name) { }
+        public virtual void DrawMe(Document d, byte[] fileByte) { }
+        public virtual void DrawMe(Document d, PdfWriter writer, byte[] fileByte, float reportHeight) { }
+        public virtual void DrawMe(Document d, byte[] fileByte, float reportHeight, float printingTop, float detailprintingtop) { }
         private iTextSharp.text.Font iTextFont = null;
         public virtual iTextSharp.text.Font ITextFont
         {
@@ -146,10 +132,11 @@ namespace ExpressBase.Objects.ReportRelated
     this.Source = 'url(../images/image.png) center no-repeat';
 };";
         }
-        public override void DrawMe(Document d, byte[] fileByte)
+        public override void DrawMe(Document d, byte[] fileByte, float reportHeight, float printingTop, float detailprintingtop)
         {
             iTextSharp.text.Image myImage = iTextSharp.text.Image.GetInstance(fileByte);
             myImage.ScaleToFit(this.WidthPt, this.HeightPt);
+            myImage.SetAbsolutePosition(this.LeftPt, reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop));
             myImage.Alignment = Element.ALIGN_CENTER;
             d.Add(myImage);
         }
@@ -442,6 +429,23 @@ namespace ExpressBase.Objects.ReportRelated
     this.ForeColor = '#201c1c';
 };";
         }
+        public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
+        {
+            var urx = this.WidthPt + this.LeftPt;
+            var ury = reportHeight - (printingTop + this.TopPt + detailprintingtop);
+            var llx = this.LeftPt;
+            var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
+
+            Phrase phrase = null;
+            if (this.Font == null)
+                phrase = new Phrase(column_val);
+            else
+                phrase = new Phrase(column_val, ITextFont);
+            ColumnText ct = new ColumnText(canvas);
+            //ct.Canvas.SetColorFill(GetColor(this.ForeColor));
+            ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, Element.ALIGN_LEFT);
+            ct.Go();
+        }
     }
 
     [EnableInBuilder(BuilderType.Report)]
@@ -518,40 +522,42 @@ namespace ExpressBase.Objects.ReportRelated
             //** BarcodeDatamatrix
             //** BarcodeInter25
             //** BarcodePdf417
-            Type = 6;
+            //Type = 6;
             iTextSharp.text.Image imageEAN = null;
             try
             {
-                if (Type >= 1 && Type <= 6)
-                {
-                    BarcodeEan codeEAN = new BarcodeEan();
-                    codeEAN.Code = code_val;
-                    codeEAN.CodeType = Type;
-                    codeEAN.GuardBars = GuardBars;
-                    codeEAN.Baseline = BaseLine;
-                    imageEAN = codeEAN.CreateImageWithBarcode(cb: canvas, barColor: null, textColor: null);
-                }
-                if (Type == 7 || Type == 8)
-                {
-                    BarcodePostnet codepost = new BarcodePostnet();
-                    codepost.Code = code_val;
-                    codepost.CodeType = Type;
-                    codepost.GuardBars = GuardBars;
-                    codepost.Baseline = BaseLine;
-                    imageEAN = codepost.CreateImageWithBarcode(cb: canvas, barColor: null, textColor: null);
-                }
-                if (Type >= 9 && Type <= 11)
-                {
-                    Barcode128 uccEan128 = new Barcode128();
+                //if (Type >= 1 && Type <= 6)
+                //{
+                ////BarcodeEan codeEAN = new BarcodeEan
+                ////{
+                ////    Code = code_val.PadLeft(10, '0'),
+                ////    CodeType = Type,
+                ////    GuardBars = GuardBars,
+                ////    Baseline = BaseLine
+                ////};
+                ////imageEAN = codeEAN.CreateImageWithBarcode(cb: canvas, barColor: null, textColor: null);
+                //}
+                //if (Type == 7 || Type == 8)
+                //{
+                //    BarcodePostnet codepost = new BarcodePostnet();
+                //    codepost.Code = code_val;
+                //    codepost.CodeType = Type;
+                //    codepost.GuardBars = GuardBars;
+                //    codepost.Baseline = BaseLine;
+                //    imageEAN = codepost.CreateImageWithBarcode(cb: canvas, barColor: null, textColor: null);
+                //}
+                //if (Type >= 9 && Type <= 11)
+                //{
+                Barcode128 uccEan128 = new Barcode128();
 
-                    uccEan128.CodeType = Type;
-                    uccEan128.Code = code_val;
-                    uccEan128.GuardBars = GuardBars;
-                    uccEan128.Baseline = BaseLine;
-                    imageEAN = uccEan128.CreateImageWithBarcode(cb: canvas, barColor: null, textColor: null);
-                }
+                uccEan128.CodeType = Type;
+                uccEan128.Code = code_val;
+                uccEan128.GuardBars = GuardBars;
+                uccEan128.Baseline = BaseLine;
+                imageEAN = uccEan128.CreateImageWithBarcode(cb: canvas, barColor: null, textColor: null);
+                //}
 
-                //imageEAN.ScaleAbsolute(Width, Height);
+               // imageEAN.ScaleAbsolute(Width, Height);
                 imageEAN.SetAbsolutePosition(LeftPt, reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop));
                 doc.Add(imageEAN);
             }
@@ -602,11 +608,12 @@ namespace ExpressBase.Objects.ReportRelated
             try
             {
                 QRCodeGenerator qrGenerator = new QRCodeGenerator();
-                QRCodeData qrCodeData = qrGenerator.CreateQrCode("4512345678906", QRCodeGenerator.ECCLevel.Q);
+                QRCodeData qrCodeData = qrGenerator.CreateQrCode(code_val, QRCodeGenerator.ECCLevel.Q);
                 BitmapByteQRCode qrCode = new BitmapByteQRCode(qrCodeData);
                 byte[] qrCodeImage = qrCode.GetGraphic(20);
                 iTextSharp.text.Image img = iTextSharp.text.Image.GetInstance(qrCodeImage);
-                img.ScaleAbsolute(200, 200);
+                img.SetAbsolutePosition(LeftPt, reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop));
+                img.ScaleAbsolute(WidthPt, HeightPt);
                 doc.Add(img);
             }
             catch (Exception e)
