@@ -517,38 +517,40 @@ namespace ExpressBase.Objects.ReportRelated
             //** BarcodeDatamatrix
             //** BarcodeInter25
             //** BarcodePdf417
-            Type = 6;
+            //Type = 6;
             iTextSharp.text.Image imageEAN = null;
             try
             {
-                if (Type >= 1 && Type <= 6)
+                //if (Type >= 1 && Type <= 6)
+                //{
+                BarcodeEan codeEAN = new BarcodeEan
                 {
-                    BarcodeEan codeEAN = new BarcodeEan();
-                    codeEAN.Code = code_val;
-                    codeEAN.CodeType = Type;
-                    codeEAN.GuardBars = GuardBars;
-                    codeEAN.Baseline = BaseLine;
-                    imageEAN = codeEAN.CreateImageWithBarcode(cb: canvas, barColor: null, textColor: null);
-                }
-                if (Type == 7 || Type == 8)
-                {
-                    BarcodePostnet codepost = new BarcodePostnet();
-                    codepost.Code = code_val;
-                    codepost.CodeType = Type;
-                    codepost.GuardBars = GuardBars;
-                    codepost.Baseline = BaseLine;
-                    imageEAN = codepost.CreateImageWithBarcode(cb: canvas, barColor: null, textColor: null);
-                }
-                if (Type >= 9 && Type <= 11)
-                {
-                    Barcode128 uccEan128 = new Barcode128();
+                    Code = code_val.PadLeft(10, '0'),
+                    CodeType = Type,
+                    GuardBars = GuardBars,
+                    Baseline = BaseLine
+                };
+                imageEAN = codeEAN.CreateImageWithBarcode(cb: canvas, barColor: null, textColor: null);
+                //}
+                //if (Type == 7 || Type == 8)
+                //{
+                //    BarcodePostnet codepost = new BarcodePostnet();
+                //    codepost.Code = code_val;
+                //    codepost.CodeType = Type;
+                //    codepost.GuardBars = GuardBars;
+                //    codepost.Baseline = BaseLine;
+                //    imageEAN = codepost.CreateImageWithBarcode(cb: canvas, barColor: null, textColor: null);
+                //}
+                //if (Type >= 9 && Type <= 11)
+                //{
+                //    Barcode128 uccEan128 = new Barcode128();
 
-                    uccEan128.CodeType = Type;
-                    uccEan128.Code = code_val;
-                    uccEan128.GuardBars = GuardBars;
-                    uccEan128.Baseline = BaseLine;
-                    imageEAN = uccEan128.CreateImageWithBarcode(cb: canvas, barColor: null, textColor: null);
-                }
+                //    uccEan128.CodeType = Type;
+                //    uccEan128.Code = code_val;
+                //    uccEan128.GuardBars = GuardBars;
+                //    uccEan128.Baseline = BaseLine;
+                //    imageEAN = uccEan128.CreateImageWithBarcode(cb: canvas, barColor: null, textColor: null);
+                //}
 
                 //imageEAN.ScaleAbsolute(Width, Height);
                 imageEAN.SetAbsolutePosition(LeftPt, reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop));

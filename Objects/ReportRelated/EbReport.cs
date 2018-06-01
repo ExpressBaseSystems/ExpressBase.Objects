@@ -853,7 +853,7 @@ else {
                 }
                 else if (field is EbBarcode)
                 {
-                    int tableIndex = Convert.ToInt32((field as EbBarcode).Code.Split('.')[0]);
+                    int tableIndex = Convert.ToInt32((field as EbBarcode).Code.Split('.')[0].Substring(1));
                     column_name = (field as EbBarcode).Code.Split('.')[1];
                     column_val = GetDataFieldtValue(column_name, serialnumber, tableIndex);
                     field.DrawMe(Doc, Canvas, HeightPt, section_Yposition, detailprintingtop, column_val);
@@ -907,7 +907,15 @@ else {
             Stamp.FormFlattening = true;
             Stamp.Close();
         }
-
+        public void SetDetail()
+        {
+            ColumnText ct = new ColumnText(Canvas);
+            Phrase phrase = new Phrase("page:"+PageNumber.ToString() + ", " + UserName + ", " + CurrentTimestamp);
+            //phrase.Font = FontFactory.GetFont("Arial", 4, iTextSharp.text.Font.UNDERLINE, BaseColor.Red);
+            phrase.Font.Size = 6;
+            ct.SetSimpleColumn(phrase, 5, 2, WidthPt - 10, 20, 15, Element.ALIGN_RIGHT);
+            ct.Go();
+        }
         public override void AfterRedisGet(RedisClient Redis, IServiceClient client)
         {
             try
