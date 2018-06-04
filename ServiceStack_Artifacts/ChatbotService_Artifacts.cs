@@ -250,7 +250,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 3)]
         public string Name { get; set; }
 
-    }
+		[DataMember(Order = 4)]
+		public bool AutoIncrement { get; set; }
+		
+	}
 
 	[DataContract]
 	public class GetBotsResponse : IEbSSResponse

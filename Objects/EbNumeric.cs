@@ -39,6 +39,9 @@ namespace ExpressBase.Objects
 		[HideInPropertyGrid]
 		[EnableInBuilder(BuilderType.BotForm)]
 		public override bool IsReadOnly { get => this.ReadOnly; }
+		
+		[EnableInBuilder(BuilderType.BotForm)]
+		public bool AutoIncrement { get; set; }
 
 		//[ProtoBuf.ProtoMember(4)]
 		private string PlaceHolder
