@@ -169,7 +169,9 @@ namespace ExpressBase.Objects
                         }
                     }
                 }
-                catch (Npgsql.NpgsqlException npgse) { }
+                catch (Npgsql.NpgsqlException npgse) {
+                    Console.WriteLine("Exception: " + npgse.ToString());
+                }
             }
 
             return ds;

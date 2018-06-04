@@ -83,7 +83,7 @@ namespace ExpressBase.Objects.EmailRelated
             }
             catch (Exception e)
             {
-
+                Console.WriteLine("Exception: " + e.ToString());
             }
         }
     }

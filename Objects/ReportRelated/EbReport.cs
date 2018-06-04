@@ -932,7 +932,7 @@ else {
             }
             catch (Exception e)
             {
-
+                Console.WriteLine("Exception: " + e.ToString());
             }
         }
 

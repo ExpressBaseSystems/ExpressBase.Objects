@@ -563,6 +563,7 @@ namespace ExpressBase.Objects.ReportRelated
             }
             catch (Exception e)
             {
+                Console.WriteLine("Exception: " + e.ToString());
                 ColumnText ct = new ColumnText(canvas);
                 var x = reportHeight - (printingTop + this.TopPt + detailprintingtop);
                 ct.SetSimpleColumn(new Phrase("Error in generating barcode"), LeftPt, x - HeightPt, LeftPt + WidthPt, x, 15, Element.ALIGN_LEFT);
@@ -622,6 +623,7 @@ namespace ExpressBase.Objects.ReportRelated
                 var x = reportHeight - (printingTop + this.TopPt + detailprintingtop);
                 ct.SetSimpleColumn(new Phrase("Error in generating barcode"), LeftPt, x - HeightPt, LeftPt + WidthPt, x, 15, Element.ALIGN_LEFT);
                 ct.Go();
+                Console.WriteLine("Exception: " + e.ToString());
             }
         }
     }
