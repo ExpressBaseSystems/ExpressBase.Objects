@@ -58,13 +58,13 @@ namespace ExpressBase.Objects.Objects.DVRelated
         DateTimeWithoutSecondsAndTT,
     }
 
-    [EnableInBuilder(BuilderType.DVBuilder)]
+    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
     public class DVBaseColumn : EbDataVisualizationObject
     {
         [JsonProperty(PropertyName = "data")]
         public int Data { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [JsonProperty(PropertyName = "name")]
         [Alias("Name")]
         [PropertyEditor(PropertyEditorType.Label)]
@@ -72,16 +72,16 @@ namespace ExpressBase.Objects.Objects.DVRelated
 
         public EbDbTypes Type { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [Alias("Title")]
         public string sTitle { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         public bool bVisible { get; set; }
 
         public int Pos { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [Alias("Width")]
         public string sWidth { get; set; }
 
@@ -89,11 +89,11 @@ namespace ExpressBase.Objects.Objects.DVRelated
         [JsonProperty(PropertyName = "className")]
         public string ClassName { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.FontSelector)]
         public EbFont Font { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.DropDown)]
         public ControlType FilterControl { get; set; }
     }
@@ -112,10 +112,10 @@ namespace ExpressBase.Objects.Objects.DVRelated
         }
     }
 
-    [EnableInBuilder(BuilderType.DVBuilder)]
+    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
     public class DVStringColumn : DVBaseColumn
     {
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [DefaultPropValue("1")]
         [PropertyEditor(PropertyEditorType.DropDown)]
         [OnChangeExec(@"
@@ -126,22 +126,22 @@ else
         public StringRenderType RenderAs { get; set; }
 
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iTableVisualization, EbObjectTypes.iChartVisualization, EbObjectTypes.iReport)]
         public string LinkRefId { get; set; }
     }
 
-    [EnableInBuilder(BuilderType.DVBuilder)]
+    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
     public class DVNumericColumn : DVBaseColumn
     {
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         public bool Aggregate { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         public int DecimalPlaces { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [OnChangeExec(@"
 if(this.RenderAs !== 2)
     pg.HideProperty('LinkRefId')
@@ -149,26 +149,26 @@ else
     pg.ShowProperty('LinkRefId')")]
         public NumericRenderType RenderAs { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iTableVisualization, EbObjectTypes.iChartVisualization, EbObjectTypes.iReport)]
         public string LinkRefId { get; set; }
     }
 
-    [EnableInBuilder(BuilderType.DVBuilder)]
+    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
     public class DVBooleanColumn : DVBaseColumn
     {
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         public BooleanRenderType RenderAs { get; set; }
     }
 
-    [EnableInBuilder(BuilderType.DVBuilder)]
+    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
     public class DVDateTimeColumn : DVBaseColumn
     {
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         public DateFormat Format { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [OnChangeExec(@"
 if(this.RenderAs !== 1)
     pg.HideProperty('LinkRefId')
@@ -176,7 +176,7 @@ else
     pg.ShowProperty('LinkRefId')")]
         public DateTimeRenderType RenderAs { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iTableVisualization, EbObjectTypes.iChartVisualization, EbObjectTypes.iReport)]
         public string LinkRefId { get; set; }

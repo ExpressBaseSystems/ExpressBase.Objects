@@ -31,7 +31,7 @@ namespace ExpressBase.Objects
             var typeArray = this.GetType().GetTypeInfo().Assembly.GetTypes();
 
             //var _jsResult = CSharpToJs.GenerateJs<EbControl>(_builderType, typeArray);
-            var _c2js = new Context2Js(typeArray, _builderType, typeof(EbControl));
+            var _c2js = new Context2Js(typeArray, _builderType, typeof(EbObject));
             System.Console.WriteLine("-------------> Time take for Context2Js: " + _c2js.MilliSeconds.ToString());
 
             this.AllMetas = _c2js.AllMetas;

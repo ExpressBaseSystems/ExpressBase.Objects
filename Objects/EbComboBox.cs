@@ -43,17 +43,17 @@ namespace ExpressBase.Objects
         public string DataSourceId { get; set; }
 
         [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm)]
-        [HideInPropertyGrid]
-        public ColumnColletion Columns { get; set; }
+        [PropertyEditor(PropertyEditorType.CollectionProp, "Columns", "bVisible")]
+        public DVColumnCollection Columns { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
-        public ColumnColletion DisplayMembers { get; set; }
+        public DVColumnCollection DisplayMembers { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", 1)]
         [OnChangeExec(@"if (this.Columns.$values.length === 0 ){pg.MakeReadOnly('ValueMember');} else {pg.MakeReadWrite('ValueMember');}")]
-        public EbDataColumn ValueMember { get; set; }
+        public DVBaseColumn ValueMember { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public int DropdownHeight { get; set; }
@@ -73,24 +73,23 @@ namespace ExpressBase.Objects
                 pg.MakeReadWrite('MaxLimit');   
                 if (this.Required === true ){
                     if(this.MinLimit < 1){
-                        this.MinLimit = 1;
-                        console.log(this.MinLimit);
+                        pg.setSimpleProperty('MinLimit', 1);
                     }
                     pg.MakeReadWrite('MinLimit');
                 }
                 else{
-                    this.MinLimit = 0;
+                    pg.setSimpleProperty('MinLimit', 0);
                     pg.MakeReadOnly('MinLimit');                 
                 }
             } 
             else {
-                this.MaxLimit = 1;
+                pg.setSimpleProperty('MaxLimit', 1);
                 pg.MakeReadOnly(['MaxLimit','MinLimit']);
                 if (this.Required === true ){
-                    this.MinLimit = 1;  
+                    pg.setSimpleProperty('MinLimit', 1);
                 }
                 else{
-                    this.MinLimit = 0;  
+                    pg.setSimpleProperty('MinLimit', 0);
                 }
             }")]
         public override bool Required { get; set; }
@@ -102,24 +101,23 @@ namespace ExpressBase.Objects
                 pg.MakeReadWrite('MaxLimit');   
                 if (this.Required === true ){
                     if(this.MinLimit < 1){
-                        this.MinLimit = 1;
-                        console.log(this.MinLimit);
+                        pg.setSimpleProperty('MinLimit', 1);
                     }
                     pg.MakeReadWrite('MinLimit');
                 }
                 else{
-                    this.MinLimit = 0;
+                    pg.setSimpleProperty('MinLimit', 0);
                     pg.MakeReadOnly('MinLimit');                 
                 }
             } 
             else {
-                this.MaxLimit = 1;
+                pg.setSimpleProperty('MaxLimit', 1);
                 pg.MakeReadOnly(['MaxLimit','MinLimit']);
                 if (this.Required === true ){
-                    this.MinLimit = 1;  
+                    pg.setSimpleProperty('MinLimit', 1);
                 }
                 else{
-                    this.MinLimit = 0;  
+                    pg.setSimpleProperty('MinLimit', 0);
                 }
             }")]
         public bool MultiSelect { get; set; }
@@ -151,7 +149,7 @@ namespace ExpressBase.Objects
                 int noOfFileds = this.DisplayMembers.Count;
                 int i = 0;
                 string rs = "<div id='@name@Wraper' data-toggle='tooltip' title='@tooltipText'>";
-                foreach (EbDataColumn obj in this.DisplayMembers)
+                foreach (DVBaseColumn obj in this.DisplayMembers)
                 {
                     rs += @"
 <div style='display:inline-block; width:@perWidth@%; margin-right: -4px;'>
@@ -165,7 +163,7 @@ namespace ExpressBase.Objects
         <span class='input-group-addon' @border-r$$> <i id='@name@TglBtn' class='fa  fa-search' aria-hidden='true'></i> </span>
     </div>
 </div>"
-.Replace("$$", obj.ColumnName.ToString())
+.Replace("$$", obj.Name.ToString())
 .Replace("@perWidth@", ((int)(100 / noOfFileds)).ToString())
 .Replace("@border-r" + i, (i != noOfFileds - 1) ? "style='border-radius: 0px;'" : "");
                     i++;
