@@ -52,10 +52,22 @@ namespace ExpressBase.Objects
     }
     public enum EbTextAlign
     {
-        left,
-        center,
-        right,
-        justify
+        Left = 0,
+        Center = 1,
+        Right = 2,
+        Justify = 3,
+        Top = 4,
+        Middle = 5,
+        Bottom = 6,
+        Baseline = 7,
+        JustifiedAll = 8,
+        Undefined = -1
+    }
+    public enum DateFormatReport
+    {
+        Year_Month_Date,
+        Year_Month,
+        Year,
     }
     public enum SummaryFunctionsNumeric
     {
@@ -910,7 +922,7 @@ else {
         public void SetDetail()
         {
             ColumnText ct = new ColumnText(Canvas);
-            Phrase phrase = new Phrase("page:"+PageNumber.ToString() + ", " + UserName + ", " + CurrentTimestamp);
+            Phrase phrase = new Phrase("page:" + PageNumber.ToString() + ", " + UserName + ", " + CurrentTimestamp);
             //phrase.Font = FontFactory.GetFont("Arial", 4, iTextSharp.text.Font.UNDERLINE, BaseColor.Red);
             phrase.Font.Size = 6;
             ct.SetSimpleColumn(phrase, 5, 2, WidthPt - 10, 20, 15, Element.ALIGN_RIGHT);

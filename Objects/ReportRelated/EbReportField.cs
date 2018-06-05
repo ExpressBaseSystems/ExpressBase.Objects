@@ -137,7 +137,7 @@ namespace ExpressBase.Objects.ReportRelated
             iTextSharp.text.Image myImage = iTextSharp.text.Image.GetInstance(fileByte);
             myImage.ScaleToFit(this.WidthPt, this.HeightPt);
             myImage.SetAbsolutePosition(this.LeftPt, reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop));
-            myImage.Alignment = Element.ALIGN_CENTER;
+            myImage.Alignment = (int)TextAlign;
             d.Add(myImage);
         }
     }
@@ -161,6 +161,11 @@ namespace ExpressBase.Objects.ReportRelated
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
         public int Rotation { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [UIproperty]
+        [PropertyGroup("Appearance")]
+        public new EbTextAlign TextAlign { get; set; } = EbTextAlign.Center;
 
         public override string GetDesignHtml()
         {
@@ -188,7 +193,7 @@ namespace ExpressBase.Objects.ReportRelated
                     phrase = new Phrase(this.WaterMarkText, ITextFont);
                 PdfContentByte canvas;
                 canvas = writer.DirectContentUnder;
-                ColumnText.ShowTextAligned(canvas, Element.ALIGN_CENTER, phrase, d.PageSize.Width / 2, d.PageSize.Height / 2, this.Rotation);
+                ColumnText.ShowTextAligned(canvas, (int)TextAlign, phrase, d.PageSize.Width / 2, d.PageSize.Height / 2, this.Rotation);
             }
             if (this.Image != string.Empty)
             {
@@ -243,7 +248,7 @@ namespace ExpressBase.Objects.ReportRelated
 
             ColumnText ct = new ColumnText(canvas);
            // ct.Canvas.SetColorFill(GetColor(this.ForeColor));
-            ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, Element.ALIGN_LEFT);
+            ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, (int)TextAlign);
             ct.Go();
         }
     }
@@ -280,7 +285,7 @@ namespace ExpressBase.Objects.ReportRelated
                 phrase = new Phrase(column_val, ITextFont);
             ColumnText ct = new ColumnText(canvas);
             //ct.Canvas.SetColorFill(GetColor(this.ForeColor));
-            ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, Element.ALIGN_LEFT);
+            ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, (int)TextAlign);
             ct.Go();
         }
     }
@@ -317,7 +322,7 @@ namespace ExpressBase.Objects.ReportRelated
                 phrase = new Phrase(column_val, ITextFont);
             ColumnText ct = new ColumnText(canvas);
            // ct.Canvas.SetColorFill(GetColor(this.ForeColor));
-            ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, Element.ALIGN_LEFT);
+            ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, (int)TextAlign);
             ct.Go();
         }
     }
@@ -354,7 +359,7 @@ namespace ExpressBase.Objects.ReportRelated
                 phrase = new Phrase(column_val, ITextFont);
             ColumnText ct = new ColumnText(canvas);
             //ct.Canvas.SetColorFill(GetColor(this.ForeColor));
-            ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, Element.ALIGN_LEFT);
+            ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, (int)TextAlign);
             ct.Go();
         }
     }
@@ -398,7 +403,7 @@ namespace ExpressBase.Objects.ReportRelated
             else
                 phrase = new Phrase(this.Title, ITextFont);
 
-            ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, Element.ALIGN_LEFT);
+            ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15,(int)TextAlign);
             ct.Go();
         }
     }
@@ -443,7 +448,7 @@ namespace ExpressBase.Objects.ReportRelated
                 phrase = new Phrase(column_val, ITextFont);
             ColumnText ct = new ColumnText(canvas);
             //ct.Canvas.SetColorFill(GetColor(this.ForeColor));
-            ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, Element.ALIGN_LEFT);
+            ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, (int)TextAlign);
             ct.Go();
         }
     }
@@ -566,7 +571,7 @@ namespace ExpressBase.Objects.ReportRelated
                 Console.WriteLine("Exception: " + e.ToString());
                 ColumnText ct = new ColumnText(canvas);
                 var x = reportHeight - (printingTop + this.TopPt + detailprintingtop);
-                ct.SetSimpleColumn(new Phrase("Error in generating barcode"), LeftPt, x - HeightPt, LeftPt + WidthPt, x, 15, Element.ALIGN_LEFT);
+                ct.SetSimpleColumn(new Phrase("Error in generating barcode"), LeftPt, x - HeightPt, LeftPt + WidthPt, x, 15, (int)TextAlign);
                 ct.Go();
             }
         }
@@ -621,7 +626,7 @@ namespace ExpressBase.Objects.ReportRelated
             {
                 ColumnText ct = new ColumnText(canvas);
                 var x = reportHeight - (printingTop + this.TopPt + detailprintingtop);
-                ct.SetSimpleColumn(new Phrase("Error in generating barcode"), LeftPt, x - HeightPt, LeftPt + WidthPt, x, 15, Element.ALIGN_LEFT);
+                ct.SetSimpleColumn(new Phrase("Error in generating barcode"), LeftPt, x - HeightPt, LeftPt + WidthPt, x, 15, (int)TextAlign);
                 ct.Go();
                 Console.WriteLine("Exception: " + e.ToString());
             }
@@ -660,7 +665,7 @@ namespace ExpressBase.Objects.ReportRelated
 
             ColumnText ct = new ColumnText(canvas);
             //ct.Canvas.SetColorFill(GetColor(this.ForeColor));
-            ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, Element.ALIGN_LEFT);
+            ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, (int)TextAlign);
             ct.Go();
         }
     }

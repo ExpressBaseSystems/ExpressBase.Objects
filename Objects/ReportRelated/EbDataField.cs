@@ -17,8 +17,8 @@ using ExpressBase.Objects.Objects.ReportRelated;
 namespace ExpressBase.Objects.ReportRelated
 {
     public abstract class EbDataField : EbReportField
-    { 
-        public virtual void NotifyNewPage(bool status) { } 
+    {
+        public virtual void NotifyNewPage(bool status) { }
 
         [EnableInBuilder(BuilderType.Report)]
         public string SummaryOf { get; set; }
@@ -84,8 +84,8 @@ namespace ExpressBase.Objects.ReportRelated
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, string column_val, float detailprintingtop, DbType column_type)
         {
             ColumnText ct = new ColumnText(canvas);
-            Phrase text;          
-            
+            Phrase text;
+
             if (this.Prefix != "" || this.Suffix != "")
             {
                 column_val = this.Prefix + " " + column_val + " " + this.Suffix;
@@ -115,7 +115,7 @@ namespace ExpressBase.Objects.ReportRelated
 
             var ury = reportHeight - (printingTop + this.TopPt + detailprintingtop);
             var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
-            ct.SetSimpleColumn(text, this.LeftPt, lly, this.WidthPt + this.LeftPt, ury, 15, Element.ALIGN_LEFT);
+            ct.SetSimpleColumn(text, this.LeftPt, lly, this.WidthPt + this.LeftPt, ury, 15, (int)TextAlign);
             ct.Go();
         }
     }
@@ -144,6 +144,11 @@ namespace ExpressBase.Objects.ReportRelated
     [EnableInBuilder(BuilderType.Report)]
     public class EbDataFieldDateTime : EbDataField
     {
+        [EnableInBuilder(BuilderType.Report)]
+        [UIproperty]
+        [PropertyGroup("Appearance")]
+        public DateFormatReport Format { get; set;}
+
         public override string GetDesignHtml()
         {
             return "<div class='EbCol dropped' $type='@type' eb-type='DataFieldDateTime' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;text-align: @TextAlign;'> @Title </div>".RemoveCR().DoubleQuoted();
@@ -240,7 +245,7 @@ namespace ExpressBase.Objects.ReportRelated
 
             ColumnText ct = new ColumnText(canvas);
             ct.Canvas.SetColorFill(GetColor(this.ForeColor));
-            ct.SetSimpleColumn(text, this.LeftPt, lly, this.WidthPt + this.LeftPt, ury, 15, Element.ALIGN_RIGHT);
+            ct.SetSimpleColumn(text, this.LeftPt, lly, this.WidthPt + this.LeftPt, ury, 15, (int)TextAlign);
             ct.Go();
         }
 
@@ -350,7 +355,7 @@ namespace ExpressBase.Objects.ReportRelated
                 NumberToEnglish numToE = new NumberToEnglish();
                 column_val = numToE.changeCurrencyToWords(column_val);
             }
-             if (this.Font == null)
+            if (this.Font == null)
                 phrase = new Phrase(column_val);
             else
             {
@@ -359,7 +364,7 @@ namespace ExpressBase.Objects.ReportRelated
                     phrase.Font.Color = GetColor(this.ForeColor);//ct.Canvas.SetColorFill(GetColor(this.Color));
             }
             ColumnText ct = new ColumnText(canvas);
-            ct.SetSimpleColumn(phrase, this.LeftPt, lly, this.WidthPt + this.LeftPt, ury, 15, Element.ALIGN_RIGHT);
+            ct.SetSimpleColumn(phrase, this.LeftPt, lly, this.WidthPt + this.LeftPt, ury, 15, (int)TextAlign);
             ct.Go();
         }
     }
@@ -648,7 +653,7 @@ namespace ExpressBase.Objects.ReportRelated
 
             var ury = reportHeight - (printingTop + this.TopPt + detailprintingtop);
             var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
-            ct.SetSimpleColumn(text, this.LeftPt, lly, this.WidthPt + this.LeftPt, ury, 15, Element.ALIGN_LEFT);
+            ct.SetSimpleColumn(text, this.LeftPt, lly, this.WidthPt + this.LeftPt, ury, 15, (int)TextAlign);
             ct.Go();
         }
     }
@@ -760,7 +765,7 @@ namespace ExpressBase.Objects.ReportRelated
                     phrase.Font.Color = GetColor(this.ForeColor);//ct.Canvas.SetColorFill(GetColor(this.Color));
             }
             ColumnText ct = new ColumnText(canvas);
-            ct.SetSimpleColumn(phrase, this.LeftPt, lly, this.WidthPt + this.LeftPt, ury, 15, Element.ALIGN_RIGHT);
+            ct.SetSimpleColumn(phrase, this.LeftPt, lly, this.WidthPt + this.LeftPt, ury, 15, (int)TextAlign);
             ct.Go();
         }
 
@@ -770,7 +775,7 @@ namespace ExpressBase.Objects.ReportRelated
     public class EbCalcFieldTextSummary : EbCalcField, IEbDataFieldSummary
     {
         [EnableInBuilder(BuilderType.Report)]
-        public SummaryFunctionsText Function { get; set; } 
+        public SummaryFunctionsText Function { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]
@@ -838,7 +843,7 @@ namespace ExpressBase.Objects.ReportRelated
     public class EbCalcFieldDateTimeSummary : EbCalcField, IEbDataFieldSummary
     {
         [EnableInBuilder(BuilderType.Report)]
-        public SummaryFunctionsDateTime Function { get; set; } 
+        public SummaryFunctionsDateTime Function { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]
