@@ -4,6 +4,7 @@ using ExpressBase.Common.JsonConverters;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
+using ExpressBase.Objects.Objects.DVRelated;
 using ExpressBase.Objects.ServiceStack_Artifacts;
 using Newtonsoft.Json;
 using ServiceStack;
@@ -29,12 +30,12 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.BotForm)]
         [HideInPropertyGrid]
-        public ColumnColletion Columns { get; set; }
+        public DVColumnCollection Columns { get; set; }
 
         [EnableInBuilder(BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", 1)]
         [OnChangeExec(@"console.log(100); if (this.Columns.$values.length === 0 ){pg.MakeReadOnly('ValueMember');} else {pg.MakeReadWrite('ValueMember');}")]
-        public EbDataColumn ValueMember { get; set; }
+        public DVBaseColumn ValueMember { get; set; }
 
 		
 
@@ -64,7 +65,7 @@ namespace ExpressBase.Objects
                 {
 					if (Field.DbFieldMap != null)
 					{
-						var tempdata = ds[i][Field.DbFieldMap.ColumnIndex];
+						var tempdata = ds[i][Field.DbFieldMap.Data];
 						if (Field is EbCardNumericField)
 							Card.CustomFields[Field.Name] = Convert.ToDouble(tempdata);
 						else
@@ -77,7 +78,7 @@ namespace ExpressBase.Objects
 						}
                     }
                 }
-                Card.CardId = Convert.ToInt32(ds[i][this.ValueMember.ColumnIndex]);
+                Card.CardId = Convert.ToInt32(ds[i][this.ValueMember.Data]);
                 Card.Name = "CardIn" + this.Name;//------------------------"CardIn"		
 
                 this.CardCollection.Add(Card);
@@ -401,14 +402,14 @@ namespace ExpressBase.Objects
     {
         [EnableInBuilder(BuilderType.BotForm)]
         [HideInPropertyGrid]
-        public ColumnColletion Columns { get; set; }
+        public DVColumnCollection Columns { get; set; }
 
         public virtual dynamic FieldValue { get; set; }
 
         [EnableInBuilder(BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", 1)]
         [OnChangeExec(@"console.log(100); if (this.Columns.$values.length === 0 ){pg.MakeReadOnly('DbFieldMap');} else {pg.MakeReadWrite('DbFieldMap');}")]
-        public EbDataColumn DbFieldMap { get; set; }
+        public DVBaseColumn DbFieldMap { get; set; }
 
         [EnableInBuilder(BuilderType.BotForm)]
 		[OnChangeExec(@"if(this.Summarize === true){pg.ShowProperty('SummarizeColumnWidth');}
