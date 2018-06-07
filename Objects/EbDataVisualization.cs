@@ -327,9 +327,9 @@ namespace ExpressBase.Objects
 
         public override string GetBareHtml()
         {
-            return "<table style='width:100%' class='table table-striped' eb-type='Table' id='@name@'></table>"
+            return "<table style='width:100%' class='table table-striped' eb-type='Table' id='@name@tbl'></table>"
 
- .Replace("@name@", (this.EbSid != null) ? this.EbSid : "@name@");
+ .Replace("@name@", (this.EbSid != null) ? this.Name : "@name@");
         }
 
         public EbTableVisualization()
