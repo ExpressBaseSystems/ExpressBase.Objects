@@ -9,18 +9,18 @@ using ExpressBase.Common.EbServiceStack.ReqNRes;
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
 
-    [DataContract] 
+    [DataContract]
     public class CreateUserRequest : IReturn<CreateUserResponse>, IEbSSRequest
     {
         [DataMember(Order = 0)]
-        public Dictionary<string, object> Colvalues { get; set; }     
+        public Dictionary<string, object> Colvalues { get; set; }
 
         [DataMember(Order = 2)]
         public int Id { get; set; }
 
         [DataMember(Order = 3)]
         public string TenantAccountId { get; set; }
-       
+
         public int UserId { get; set; }
 
         public string Token { get; set; }
@@ -45,7 +45,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     [DataContract]
     public class GetUserEditRequest : IReturn<GetUserEditResponse>, IEbSSRequest
     {
-      
+
         [DataMember(Order = 1)]
         public int Id { get; set; }
 
@@ -57,26 +57,26 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Token { get; set; }
     }
 
-	[DataContract]
-	public class GetUserEditResponse : IEbSSResponse
-	{
-		[DataMember(Order = 1)]
-		public Dictionary<string, object> UserData { get; set; }
+    [DataContract]
+    public class GetUserEditResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public Dictionary<string, object> UserData { get; set; }
 
-		[DataMember(Order = 2)]
-		public List<EbRole> Roles { get; set; }
+        [DataMember(Order = 2)]
+        public List<EbRole> Roles { get; set; }
 
-		[DataMember(Order = 3)]
-		public List<int> UserRoles { get; set; }
+        [DataMember(Order = 3)]
+        public List<int> UserRoles { get; set; }
 
-		[DataMember(Order = 4)]
-		public List<EbUserGroups> EbUserGroups { get; set; }
+        [DataMember(Order = 4)]
+        public List<EbUserGroups> EbUserGroups { get; set; }
 
-		[DataMember(Order = 5)]
-		public List<int> UserGroups { get; set; }
+        [DataMember(Order = 5)]
+        public List<int> UserGroups { get; set; }
 
 
-		[DataMember(Order = 6)]
+        [DataMember(Order = 6)]
         public string Token { get; set; }
 
         [DataMember(Order = 7)]
@@ -88,7 +88,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     [DataContract]
     public class GetApplicationObjectsRequest : IReturn<GetApplicationObjectsResponse>, IEbSSRequest
     {
-       
+
         [DataMember(Order = 1)]
         public int Id { get; set; }
 
@@ -105,7 +105,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     [DataContract]
     public class GetApplicationObjectsResponse : IEbSSResponse
     {
-        [DataMember(Order = 1)]     
+        [DataMember(Order = 1)]
         public Dictionary<string, object> Data { get; set; }
 
         [DataMember(Order = 2)]
@@ -126,7 +126,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 2)]
         public int id { get; set; }
-      
+
         public string TenantAccountId { get; set; }
 
         public int UserId { get; set; }
@@ -149,7 +149,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
 
-	[DataContract]
+    [DataContract]
     public class RBACRolesRequest : IReturn<RBACRolesResponse>, IEbSSRequest
     {
         [DataMember(Order = 0)]
@@ -251,7 +251,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     [DataContract]
     public class EditUserPreferenceRequest : IReturn<EditUserPreferenceResponse>, IEbSSRequest
     {
-        
+
         public string TenantAccountId { get; set; }
 
         public int UserId { get; set; }
@@ -268,7 +268,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
 
-      
+
     }
 
     [DataContract]
@@ -293,7 +293,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         [DataMember(Order = 1)]
         public List<List<object>> returnlist { get; set; }
-     
+
         [DataMember(Order = 2)]
         public Dictionary<string, object> Data { get; set; }
 
@@ -307,7 +307,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     [DataContract]
     public class GetRolesRequest : IReturn<GetRolesResponse>, IEbSSRequest
     {
-       
+
         public string Token { get; set; }
 
         public string TenantAccountId { get; set; }
@@ -318,7 +318,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     [DataContract]
     public class GetRolesResponse : IEbSSResponse
     {
-        
+
         [DataMember(Order = 1)]
         public Dictionary<string, object> Data { get; set; }
 
@@ -375,7 +375,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 1)]
         public Dictionary<string, object> Data { get; set; }
-       
+
         [DataMember(Order = 2)]
         public string Token { get; set; }
 
@@ -402,7 +402,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
 
         [DataMember(Order = 1)]
-        public Dictionary<string, object> Data { get; set; }       
+        public Dictionary<string, object> Data { get; set; }
 
         [DataMember(Order = 2)]
         public string Token { get; set; }
@@ -414,9 +414,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     [DataContract]
     public class GetUser2UserGroupRequest : IReturn<GetUser2UserGroupResponse>, IEbSSRequest
     {
-       
+
         [DataMember(Order = 1)]
         public int id { get; set; }
+
         public string Token { get; set; }
 
         public string TenantAccountId { get; set; }
@@ -468,6 +469,51 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
+    [DataContract]
+    public class CreateLocationConfigRequest : IReturn<GetUserGroupResponse>, IEbSSRequest
+    {
+        [DataMember(Order = 1)]
+        public List<LocationConfig> ConfString { get; set; }
 
+        public string Token { get; set; }
 
+        public string TenantAccountId { get; set; }
+
+        public int UserId { get; set; }
+    }
+
+    [DataContract]
+    public class CreateLocationConfigResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    [DataContract]
+    public class GetLocationConfigRequest : IReturn<GetUserGroupResponse>, IEbSSRequest
+    {
+        public string Token { get; set; }
+
+        public string TenantAccountId { get; set; }
+
+        public int UserId { get; set; }
+    }
+
+    [DataContract]
+    public class GetLocationConfigResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public List<LocationConfig> Data { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+        public class LocationConfig
+    {
+        public string KeyId { get; set; }
+
+        public string Name { get; set; }
+
+        public string Isrequired { get; set; }
+    }
 }
