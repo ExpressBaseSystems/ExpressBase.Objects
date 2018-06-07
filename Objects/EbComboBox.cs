@@ -158,12 +158,13 @@ namespace ExpressBase.Objects
             multiple
             v-model='displayMembers[`$$`]'
             :on-change='updateCk'
-            placeholder = 'label$$'>
+            placeholder = '@sTitle@'>
         </v-select>
         <span class='input-group-addon' @border-r$$> <i id='@name@TglBtn' class='fa  fa-search' aria-hidden='true'></i> </span>
     </div>
 </div>"
 .Replace("$$", obj.Name.ToString())
+.Replace("@sTitle@", obj.sTitle.ToString())
 .Replace("@perWidth@", ((int)(100 / noOfFileds)).ToString())
 .Replace("@border-r" + i, (i != noOfFileds - 1) ? "style='border-radius: 0px;'" : "");
                     i++;
