@@ -76,6 +76,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
         [Alias("Title")]
         public string sTitle { get; set; }
 
+		[HideInPropertyGrid]
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         public bool bVisible { get; set; }
 
