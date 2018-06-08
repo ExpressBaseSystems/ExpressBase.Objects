@@ -18,15 +18,19 @@ namespace ExpressBase.Objects
         private List<Param> _paramlist = new List<Param>();
         public List<Param> GetDefaultParams()
         {
-                foreach (EbControl c in this.Controls)
-                {
-                    string val = string.Empty;
-                    if ((c.EbDbType).ToString() == "Decimal")
-                        val = "0";
-                    Param _p = new Param { Name = c.Name, Type = Convert.ToInt32(c.EbDbType).ToString(), Value = val };
-                    _paramlist.Add(_p);
-                }
-                return _paramlist;
+            foreach (EbControl c in this.Controls)
+            {
+                string val = string.Empty;
+                if ((c.EbDbType).ToString() == "Decimal")
+                    val = "0";
+                else if ((c as EbDate).ShowDateAs_ == DateShowFormat.Year_Month)
+                    val = "01/2018";
+                else if ((c as EbDate).ShowDateAs_ == DateShowFormat.Year_Month_Date)
+                    val = "01/01/2018";
+                Param _p = new Param { Name = c.Name, Type = Convert.ToInt32(c.EbDbType).ToString(), Value = val };
+                _paramlist.Add(_p);
+            }
+            return _paramlist;
         }
 
         public override string GetHead()
