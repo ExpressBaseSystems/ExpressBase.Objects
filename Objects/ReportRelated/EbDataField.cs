@@ -137,6 +137,8 @@ namespace ExpressBase.Objects.ReportRelated
     this.Height =25;
     this.Width= 200;
     this.ForeColor = '#201c1c';
+this.Border = 1;
+this.BorderColor = '#eae6e6';
 };";
         }
     }
@@ -162,6 +164,8 @@ namespace ExpressBase.Objects.ReportRelated
     this.Height =25;
     this.Width= 200;
     this.ForeColor = '#201c1c';
+this.Border = 1;
+this.BorderColor = '#eae6e6';
 };";
         }
     }
@@ -182,6 +186,8 @@ namespace ExpressBase.Objects.ReportRelated
     this.Height =25;
     this.Width= 200;
     this.ForeColor = '#201c1c';
+this.Border = 1;
+this.BorderColor = '#eae6e6';
 };";
         }
     }
@@ -214,6 +220,8 @@ namespace ExpressBase.Objects.ReportRelated
     this.Height =25;
     this.Width= 200;
     this.ForeColor = '#201c1c';
+this.Border = 1;
+this.BorderColor = '#eae6e6';
 };";
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, string column_val, float detailprintingtop, DbType column_type)
@@ -340,6 +348,8 @@ namespace ExpressBase.Objects.ReportRelated
     this.Height =25;
     this.Width= 200;
     this.ForeColor = '#201c1c';
+this.Border = 1;
+this.BorderColor = '#eae6e6';
 };";
         }
 
@@ -433,6 +443,8 @@ namespace ExpressBase.Objects.ReportRelated
     this.Height =25;
     this.Width= 200;
     this.ForeColor = '#201c1c';
+this.Border = 1;
+this.BorderColor = '#eae6e6';
 };";
         }
     }
@@ -500,6 +512,8 @@ namespace ExpressBase.Objects.ReportRelated
     this.Height =25;
     this.Width= 200;
     this.ForeColor = '#201c1c';
+this.Border = 1;
+this.BorderColor = '#eae6e6';
 };";
         }
     }
@@ -543,6 +557,8 @@ namespace ExpressBase.Objects.ReportRelated
     this.Height =25;
     this.Width= 200;
     this.ForeColor = '#201c1c';
+this.Border = 1;
+this.BorderColor = '#eae6e6';
 };";
         }
     }
@@ -604,6 +620,8 @@ namespace ExpressBase.Objects.ReportRelated
     this.Height =25;
     this.Width= 200;
     this.ForeColor = '#201c1c';
+this.Border = 1;
+this.BorderColor = '#eae6e6';
 };";
         }
 
@@ -741,6 +759,8 @@ namespace ExpressBase.Objects.ReportRelated
     this.Height =25;
     this.Width= 200;
     this.ForeColor = '#201c1c';
+this.Border = 1;
+this.BorderColor = '#eae6e6';
 };";
         }
 
@@ -835,6 +855,8 @@ namespace ExpressBase.Objects.ReportRelated
     this.Height =25;
     this.Width= 200;
     this.ForeColor = '#201c1c';
+this.Border = 1;
+this.BorderColor = '#eae6e6';
 };";
         }
     }
@@ -902,6 +924,8 @@ namespace ExpressBase.Objects.ReportRelated
     this.Height =25;
     this.Width= 200;
     this.ForeColor = '#201c1c';
+this.Border = 1;
+this.BorderColor = '#eae6e6';
 };";
         }
     }
@@ -945,6 +969,8 @@ namespace ExpressBase.Objects.ReportRelated
     this.Height =25;
     this.Width= 200;
     this.ForeColor = '#201c1c';
+this.Border = 1;
+this.BorderColor = '#eae6e6';
 };";
         }
     }

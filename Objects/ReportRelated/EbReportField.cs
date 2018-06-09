@@ -120,7 +120,7 @@ namespace ExpressBase.Objects.ReportRelated
 
         public override string GetDesignHtml()
         {
-            return "<div class='img-container dropped' eb-type='Img' id='@id' style='border:1px solid #aaaaaa; width: @Width px; background: @Source ; background-size: cover; height: @Height px; position: absolute; left: @Left px; top: @Top px;'></div>".RemoveCR().DoubleQuoted();
+            return "<div class='img-container dropped' eb-type='Img' id='@id' style='border: @Border px solid;border-color: @BorderColor ;width: @Width px; background: @Source ; background-size: cover; height: @Height px; position: absolute; left: @Left px; top: @Top px;'></div>".RemoveCR().DoubleQuoted();
         }
         public override string GetJsInitFunc()
         {
@@ -130,6 +130,8 @@ namespace ExpressBase.Objects.ReportRelated
     this.Height =50;
     this.Width= 50;
     this.Source = 'url(../images/image.png) center no-repeat';
+    this.Border = 1;
+this.BorderColor = '#eae6e6';
 };";
         }
         public override void DrawMe(Document d, byte[] fileByte, float reportHeight, float printingTop, float detailprintingtop)
@@ -169,7 +171,7 @@ namespace ExpressBase.Objects.ReportRelated
 
         public override string GetDesignHtml()
         {
-            return "<div class='wm-container' eb-type='WaterMark' id='@id' style='opacity:.5; width: @Width px; background: @Source ; background-size: cover; height: @Height px; position: absolute; left: @Left px; top: @Top px;'> @WaterMarkText </div>".RemoveCR().DoubleQuoted();
+            return "<div class='wm-container dropped' eb-type='WaterMark' id='@id' style='border: @Border px solid;border-color: @BorderColor ;opacity:.5; width: @Width px; background: @Source ; background-size: cover; height: @Height px; position: absolute; left: @Left px; top: @Top px;'> @WaterMarkText </div>".RemoveCR().DoubleQuoted();
         }
         public override string GetJsInitFunc()
         {
@@ -179,6 +181,8 @@ namespace ExpressBase.Objects.ReportRelated
     this.Height =100;
     this.Width= 100;
     this.Source = 'url(../images/image.png) center no-repeat';
+this.Border = 1;
+this.BorderColor = '#eae6e6';
 };";
         }
 
@@ -230,6 +234,8 @@ namespace ExpressBase.Objects.ReportRelated
      this.Height =25;
     this.Width= 200;
     this.ForeColor = '#201c1c';
+this.Border = 1;
+this.BorderColor = '#eae6e6';
 };";
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
@@ -269,6 +275,8 @@ namespace ExpressBase.Objects.ReportRelated
      this.Height =25;
     this.Width= 100;
     this.ForeColor = '#201c1c';
+this.Border = 1;
+this.BorderColor = '#eae6e6';
 };";
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
@@ -306,6 +314,8 @@ namespace ExpressBase.Objects.ReportRelated
      this.Height =25;
     this.Width= 100;
     this.ForeColor = '#201c1c';
+this.Border = 1;
+this.BorderColor = '#eae6e6';
 };";
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
@@ -343,6 +353,8 @@ namespace ExpressBase.Objects.ReportRelated
      this.Height =25;
     this.Width= 100;
     this.ForeColor = '#201c1c';
+this.Border = 1;
+this.BorderColor = '#eae6e6';
 };";
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
@@ -386,6 +398,8 @@ namespace ExpressBase.Objects.ReportRelated
      this.Height =25;
     this.Width= 200;
     this.ForeColor = '#201c1c';
+this.Border = 1;
+this.BorderColor = '#eae6e6';
 };";
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, EbReport report)
@@ -432,6 +446,8 @@ namespace ExpressBase.Objects.ReportRelated
      this.Height =25;
     this.Width= 200;
     this.ForeColor = '#201c1c';
+this.Border = 1;
+this.BorderColor = '#eae6e6';
 };";
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
@@ -500,6 +516,8 @@ namespace ExpressBase.Objects.ReportRelated
      this.Height =50;
     this.Width= 150;
     this.Source = 'url(../images/barcode.png) center no-repeat';
+this.Border = 1;
+this.BorderColor = '#eae6e6';
 };";
         }
         public override void DrawMe(Document doc, PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string code_val)
@@ -607,6 +625,8 @@ namespace ExpressBase.Objects.ReportRelated
      this.Height =100;
     this.Width= 100; 
     this.Source = 'url(../images/Qr-code.png) center no-repeat';
+this.Border = 1;
+this.BorderColor = '#eae6e6';
 };";
         }
         public override void DrawMe(Document doc, PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string code_val)
@@ -648,6 +668,8 @@ namespace ExpressBase.Objects.ReportRelated
      this.Height =25;
     this.Width= 200;
     this.ForeColor = '#201c1c';
+this.Border = 1;
+this.BorderColor = '#eae6e6';
 };";
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
