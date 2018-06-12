@@ -154,7 +154,7 @@ namespace ExpressBase.Objects
                     rs += @"
 <div class='search-block'>
     <div class='input-group'>
-        <v-select id='@name@$$' style='width:{3}px;' 
+        <v-select maped-column='$$' id='@name@$$' style='width:{3}px;' 
             multiple
             v-model='displayMembers[`$$`]'
             :on-change='updateCk'
