@@ -192,8 +192,8 @@ this.BorderColor = '#eae6e6';
             if (this.WaterMarkText != string.Empty)
             {
                 if (this.Font == null)
-                    phrase = new Phrase(this.WaterMarkText);
-                else
+                    Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
+               // else
                     phrase = new Phrase(this.WaterMarkText, ITextFont);
                 PdfContentByte canvas;
                 canvas = writer.DirectContentUnder;
@@ -248,9 +248,9 @@ this.BorderColor = '#eae6e6';
 
             Phrase phrase = null;
             if (this.Font == null)
-                phrase = new Phrase(column_val);
-            else
-                phrase = new Phrase(column_val,ITextFont);
+                Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
+            // else
+            phrase = new Phrase(column_val,ITextFont);
 
             ColumnText ct = new ColumnText(canvas);
            // ct.Canvas.SetColorFill(GetColor(this.ForeColor));
@@ -288,9 +288,9 @@ this.BorderColor = '#eae6e6';
             Phrase phrase = null;
 
             if (this.Font == null)
-                phrase = new Phrase(column_val);
-            else
-                phrase = new Phrase(column_val, ITextFont);
+                Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
+            //else
+            phrase = new Phrase(column_val, ITextFont);
             ColumnText ct = new ColumnText(canvas);
             //ct.Canvas.SetColorFill(GetColor(this.ForeColor));
             ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, (int)TextAlign);
@@ -327,9 +327,10 @@ this.BorderColor = '#eae6e6';
 
             Phrase phrase = null;
             if (this.Font == null)
-                phrase = new Phrase(column_val);
-            else
-                phrase = new Phrase(column_val, ITextFont);
+                Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
+            //phrase = new Phrase(column_val);
+            // else
+            phrase = new Phrase(column_val, ITextFont);
             ColumnText ct = new ColumnText(canvas);
            // ct.Canvas.SetColorFill(GetColor(this.ForeColor));
             ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, (int)TextAlign);
@@ -366,9 +367,10 @@ this.BorderColor = '#eae6e6';
 
             Phrase phrase = null;
             if (this.Font == null)
-                phrase = new Phrase(column_val);
-            else
-                phrase = new Phrase(column_val, ITextFont);
+                Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
+            //    phrase = new Phrase(column_val);
+            //else
+            phrase = new Phrase(column_val, ITextFont);
             ColumnText ct = new ColumnText(canvas);
             //ct.Canvas.SetColorFill(GetColor(this.ForeColor));
             ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, (int)TextAlign);
@@ -413,9 +415,10 @@ this.BorderColor = '#eae6e6';
             Phrase phrase = null;
             //ct.Canvas.SetColorFill(GetColor(this.ForeColor));
             if (this.Font == null)
-                phrase = new Phrase(this.Title);
-            else
-                phrase = new Phrase(this.Title, ITextFont);
+                Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
+            //    phrase = new Phrase(this.Title);
+            //else
+            phrase = new Phrase(this.Title, ITextFont);
 
             ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15,(int)TextAlign);
             ct.Go();
@@ -459,9 +462,10 @@ this.BorderColor = '#eae6e6';
 
             Phrase phrase = null;
             if (this.Font == null)
-                phrase = new Phrase(column_val);
-            else
-                phrase = new Phrase(column_val, ITextFont);
+                Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
+            //    phrase = new Phrase(column_val);
+            //else
+            phrase = new Phrase(column_val, ITextFont);
             ColumnText ct = new ColumnText(canvas);
             //ct.Canvas.SetColorFill(GetColor(this.ForeColor));
             ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, (int)TextAlign);
@@ -681,9 +685,10 @@ this.BorderColor = '#eae6e6';
 
             Phrase phrase = null;
             if (this.Font == null)
-                phrase = new Phrase(column_val);
-            else
-                phrase = new Phrase(column_val, ITextFont);
+                Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
+            //    phrase = new Phrase(column_val);
+            //else
+            phrase = new Phrase(column_val, ITextFont);
 
             ColumnText ct = new ColumnText(canvas);
             //ct.Canvas.SetColorFill(GetColor(this.ForeColor));
