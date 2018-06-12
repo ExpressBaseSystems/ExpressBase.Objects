@@ -148,11 +148,11 @@ namespace ExpressBase.Objects
             {
                 int noOfFileds = this.DisplayMembers.Count;
                 int i = 0;
-                string rs = "<div id='@name@Wraper' data-toggle='tooltip' title='@tooltipText'>";
+                string rs = "<div id='@name@Wraper' class='search-wraper' data-toggle='tooltip' title='@tooltipText'>";
                 foreach (DVBaseColumn obj in this.DisplayMembers)
                 {
                     rs += @"
-<div style='display:inline-block; width:@perWidth@%; margin-right: -4px;'>
+<div class='search-block'>
     <div class='input-group'>
         <v-select id='@name@$$' style='width:{3}px;' 
             multiple
@@ -263,7 +263,7 @@ var @nameEbCombo = new EbSelect('@name', '@DSid', @DDHeight, '@vmName', '', @Max
     <div id='@name@_loadingdiv' class='ebCombo-loader'>
         <i id='@name@_loading-image' class='fa fa-spinner fa-pulse fa-2x fa-fw'></i><span class='sr-only'>Loading...</span>
     </div>
-    <center>
+    <center style='position:relative'>
         <div id='@name@DDdiv' v-show='DDstate' class='DDdiv expand-transition'  style='width:@DDwidth%;'> 
             <table id='@name@tbl' tabindex='1000' style='width:100%' class='table table-bordered'></table>
         </div>
