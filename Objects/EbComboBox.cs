@@ -148,11 +148,11 @@ namespace ExpressBase.Objects
             {
                 int noOfFileds = this.DisplayMembers.Count;
                 int i = 0;
-                string rs = "<div id='@name@Wraper' data-toggle='tooltip' title='@tooltipText'>";
+                string rs = "<div id='@name@Wraper' class='search-wraper' data-toggle='tooltip' title='@tooltipText'>";
                 foreach (DVBaseColumn obj in this.DisplayMembers)
                 {
                     rs += @"
-<div style='display:inline-block; width:@perWidth@%; margin-right: -4px;'>
+<div class='search-block'>
     <div class='input-group'>
         <v-select id='@name@$$' style='width:{3}px;' 
             multiple
