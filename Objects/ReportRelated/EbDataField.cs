@@ -13,6 +13,7 @@ using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using ExpressBase.Common.JsonConverters;
 using ExpressBase.Objects.Objects.ReportRelated;
+using ExpressBase.Common;
 
 namespace ExpressBase.Objects.ReportRelated
 {
@@ -92,13 +93,14 @@ namespace ExpressBase.Objects.ReportRelated
             }
 
             if (this.Font == null)
-                text = new Phrase(column_val);
-            else
-            {
-                text = new Phrase(column_val, ITextFont);
-                if (this.ForeColor != "")
-                    text.Font.Color = GetColor(this.ForeColor);//ct.Canvas.SetColorFill(GetColor(this.Color));
-            }
+                Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
+            //    text = new Phrase(column_val);
+            //else
+            //{
+            text = new Phrase(column_val, ITextFont);
+            if (this.ForeColor != "")
+                text.Font.Color = GetColor(this.ForeColor);//ct.Canvas.SetColorFill(GetColor(this.Color));
+            //}
 
             if (this.RenderInMultiLine)
             {
@@ -149,7 +151,7 @@ this.BorderColor = '#eae6e6';
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
         [PropertyGroup("Appearance")]
-        public DateFormatReport Format { get; set;}
+        public DateFormatReport Format { get; set; }
 
         public override string GetDesignHtml()
         {
@@ -243,13 +245,14 @@ this.BorderColor = '#eae6e6';
             }
 
             if (this.Font == null)
-                text = new Phrase(column_val);
-            else
-            {
-                text = new Phrase(column_val, ITextFont);
-                if (this.ForeColor != "")
-                    text.Font.Color = GetColor(this.ForeColor);//ct.Canvas.SetColorFill(GetColor(this.Color));
-            }
+                Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
+            //    text = new Phrase(column_val);
+            //else
+            //{
+            text = new Phrase(column_val, ITextFont);
+            if (this.ForeColor != "")
+                text.Font.Color = GetColor(this.ForeColor);//ct.Canvas.SetColorFill(GetColor(this.Color));
+            //}
 
             ColumnText ct = new ColumnText(canvas);
             ct.Canvas.SetColorFill(GetColor(this.ForeColor));
@@ -366,13 +369,14 @@ this.BorderColor = '#eae6e6';
                 column_val = numToE.changeCurrencyToWords(column_val);
             }
             if (this.Font == null)
-                phrase = new Phrase(column_val);
-            else
-            {
-                phrase = new Phrase(column_val, ITextFont);
-                if (this.ForeColor != "")
-                    phrase.Font.Color = GetColor(this.ForeColor);//ct.Canvas.SetColorFill(GetColor(this.Color));
-            }
+                Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
+            // phrase = new Phrase(column_val);
+            //else
+            //{
+            phrase = new Phrase(column_val, ITextFont);
+            if (this.ForeColor != "")
+                phrase.Font.Color = GetColor(this.ForeColor);//ct.Canvas.SetColorFill(GetColor(this.Color));
+            //}
             ColumnText ct = new ColumnText(canvas);
             ct.SetSimpleColumn(phrase, this.LeftPt, lly, this.WidthPt + this.LeftPt, ury, 15, (int)TextAlign);
             ct.Go();
@@ -648,13 +652,14 @@ this.BorderColor = '#eae6e6';
             }
 
             if (this.Font == null)
-                text = new Phrase(column_val);
-            else
-            {
-                text = new Phrase(column_val, ITextFont);
-                if (this.ForeColor != "")
-                    text.Font.Color = GetColor(this.ForeColor);//ct.Canvas.SetColorFill(GetColor(this.Color));
-            }
+                Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
+            //    text = new Phrase(column_val);
+            //else
+            //{
+            text = new Phrase(column_val, ITextFont);
+            if (this.ForeColor != "")
+                text.Font.Color = GetColor(this.ForeColor);//ct.Canvas.SetColorFill(GetColor(this.Color));
+                                                           // }
 
             if (this.RenderInMultiLine)
             {
@@ -777,13 +782,14 @@ this.BorderColor = '#eae6e6';
                 column_val = numToE.changeCurrencyToWords(column_val);
             }
             if (this.Font == null)
-                phrase = new Phrase(column_val);
-            else
-            {
-                phrase = new Phrase(column_val, ITextFont);
+                Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
+            //    phrase = new Phrase(column_val);
+            //else
+            //{
+            phrase = new Phrase(column_val, ITextFont);
                 if (this.ForeColor != "")
                     phrase.Font.Color = GetColor(this.ForeColor);//ct.Canvas.SetColorFill(GetColor(this.Color));
-            }
+            //}
             ColumnText ct = new ColumnText(canvas);
             ct.SetSimpleColumn(phrase, this.LeftPt, lly, this.WidthPt + this.LeftPt, ury, 15, (int)TextAlign);
             ct.Go();
