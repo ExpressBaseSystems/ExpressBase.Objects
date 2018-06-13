@@ -62,6 +62,10 @@ namespace ExpressBase.Objects
         public int Value { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+        [HelpText("Specify minimum number of charecters to initiate search")]
+        public int MinSeachLength { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public string Text { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
@@ -154,7 +158,7 @@ namespace ExpressBase.Objects
                     rs += @"
 <div class='search-block'>
     <div class='input-group'>
-        <v-select id='@name@$$' style='width:{3}px;' 
+        <v-select maped-column='$$' column-type='@type@' id='@name@$$' style='width:{3}px;' 
             multiple
             v-model='displayMembers[`$$`]'
             :on-change='updateCk'
@@ -164,6 +168,7 @@ namespace ExpressBase.Objects
     </div>
 </div>"
 .Replace("$$", obj.Name.ToString())
+.Replace("@type@", obj.Type.ToString())
 .Replace("@sTitle@", obj.sTitle.ToString())
 .Replace("@perWidth@", ((int)(100 / noOfFileds)).ToString())
 .Replace("@border-r" + i, (i != noOfFileds - 1) ? "style='border-radius: 0px;'" : "");
