@@ -28,17 +28,17 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm)]
         [HideInPropertyGrid]
-        public ColumnColletion Columns { get; set; }
+        public DVColumnCollection Columns { get; set; }
 
         [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", 1)]
 		[OnChangeExec(@"console.log(100); if (this.Columns.$values.length === 0 ){pg.MakeReadOnly('ValueMember');} else {pg.MakeReadWrite('ValueMember');}")]
-		public EbDataColumn ValueMember { get; set; }
+		public DVBaseColumn ValueMember { get; set; }
 
         [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", 1)]
 		[OnChangeExec(@"console.log(100); if (this.Columns.$values.length === 0 ){pg.MakeReadOnly('DisplayMember');} else {pg.MakeReadWrite('DisplayMember');}")]
-		public EbDataColumn DisplayMember { get; set; }
+		public DVBaseColumn DisplayMember { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public int Value { get; set; }
@@ -67,7 +67,7 @@ namespace ExpressBase.Objects
 
 			foreach (EbDataRow option in result.Data)
 			{
-				_html += string.Format("<option value='{0}'>{1}</option>", option[this.ValueMember.ColumnIndex], option[this.DisplayMember.ColumnIndex]);
+				_html += string.Format("<option value='{0}'>{1}</option>", option[this.ValueMember.Data], option[this.DisplayMember.Data]);
 				//_html += string.Format("<option value='{0}'>{1}</option>", option[0].ToString().Trim(), option[0]);
             }
 

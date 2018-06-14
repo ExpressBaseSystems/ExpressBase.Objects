@@ -285,6 +285,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		[DataMember(Order = 2)]
 		public string name { get; set; }
 
+		[DataMember(Order = 3)]
+		public string icon { get; set; }
 	}
 
 
