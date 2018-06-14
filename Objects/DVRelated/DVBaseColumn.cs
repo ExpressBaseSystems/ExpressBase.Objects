@@ -85,6 +85,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [Alias("Width")]
+        [JsonIgnore]
         public string sWidth { get; set; }
 
         //[EnableInBuilder(BuilderType.DVBuilder)]
