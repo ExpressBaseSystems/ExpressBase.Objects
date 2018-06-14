@@ -226,7 +226,7 @@ namespace ExpressBase.Objects
 				if (F.Summarize)
 				{
 					string tempst = F.Label.IsNullOrEmpty() ? F.Name : F.Label;
-					string colStyle = ((F.SummarizeColumnWidth > 0) ? "width: " + F.SummarizeColumnWidth + "%;" : "") + " white-space: nowrap; overflow: hidden; text-overflow: ellipsis;";
+					string colStyle = ((F.SummarizeColumnWidth > 0) ? "width: " + F.SummarizeColumnWidth + "%;" : "") + ((F is EbCardNumericField) ? "text-align: right;":"") + " white-space: nowrap; overflow: hidden; text-overflow: ellipsis;";
 					html += "<th style='" + colStyle + "' title='" + tempst + "'>" + tempst + "</th>";
 					this.IsSummaryRequired = true;
 					tcols++;

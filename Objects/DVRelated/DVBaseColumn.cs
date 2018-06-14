@@ -14,7 +14,8 @@ namespace ExpressBase.Objects.Objects.DVRelated
         Chart = 1,
         Link = 2,
         Marker = 3,
-        Image = 4
+        Image = 4,
+        Icon = 5
     }
 
     public enum NumericRenderType

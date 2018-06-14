@@ -75,6 +75,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iDataSource)]
+        [HideForUser]
         public string DataSourceRefId { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
@@ -300,6 +301,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
+        [HideForUser]
         public List<DVBaseColumn> rowGrouping { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]

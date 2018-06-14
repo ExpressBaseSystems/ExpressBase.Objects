@@ -62,6 +62,10 @@ namespace ExpressBase.Objects
         public int Value { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+        [HelpText("Specify minimum number of charecters to initiate search")]
+        public int MinSeachLength { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public string Text { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
@@ -148,13 +152,13 @@ namespace ExpressBase.Objects
             {
                 int noOfFileds = this.DisplayMembers.Count;
                 int i = 0;
-                string rs = "<div id='@name@Wraper' data-toggle='tooltip' title='@tooltipText'>";
+                string rs = "<div id='@name@Wraper' class='search-wraper' data-toggle='tooltip' title='@tooltipText'>";
                 foreach (DVBaseColumn obj in this.DisplayMembers)
                 {
                     rs += @"
-<div style='display:inline-block; width:@perWidth@%; margin-right: -4px;'>
+<div class='search-block'>
     <div class='input-group'>
-        <v-select id='@name@$$' style='width:{3}px;' 
+        <v-select maped-column='$$' column-type='@type@' id='@name@$$' style='width:{3}px;' 
             multiple
             v-model='displayMembers[`$$`]'
             :on-change='updateCk'
@@ -164,6 +168,7 @@ namespace ExpressBase.Objects
     </div>
 </div>"
 .Replace("$$", obj.Name.ToString())
+.Replace("@type@", obj.Type.ToString())
 .Replace("@sTitle@", obj.sTitle.ToString())
 .Replace("@perWidth@", ((int)(100 / noOfFileds)).ToString())
 .Replace("@border-r" + i, (i != noOfFileds - 1) ? "style='border-radius: 0px;'" : "");
@@ -263,7 +268,7 @@ var @nameEbCombo = new EbSelect('@name', '@DSid', @DDHeight, '@vmName', '', @Max
     <div id='@name@_loadingdiv' class='ebCombo-loader'>
         <i id='@name@_loading-image' class='fa fa-spinner fa-pulse fa-2x fa-fw'></i><span class='sr-only'>Loading...</span>
     </div>
-    <center>
+    <center style='position:relative'>
         <div id='@name@DDdiv' v-show='DDstate' class='DDdiv expand-transition'  style='width:@DDwidth%;'> 
             <table id='@name@tbl' tabindex='1000' style='width:100%' class='table table-bordered'></table>
         </div>

@@ -71,6 +71,8 @@ namespace ExpressBase.Objects.ReportRelated
         {
             get
             {
+              if(Font ==null)
+                Font = (new EbFont { color = "#000000", Font = "Times-Roman", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
                 if (/*iTextFont == null &&*/ Font!= null)
                 {
                     iTextFont = new iTextSharp.text.Font(BaseFont.CreateFont(Font.Font, BaseFont.CP1252, BaseFont.EMBEDDED), Font.Size, (int)Font.Style, GetColor(Font.color));
@@ -81,7 +83,6 @@ namespace ExpressBase.Objects.ReportRelated
                     if (Font.Underline)
                         iTextFont.SetStyle(iTextSharp.text.Font.UNDERLINE);
                 }
-
                 return iTextFont;
             }
         }
@@ -191,9 +192,9 @@ this.BorderColor = '#eae6e6';
             Phrase phrase = null;
             if (this.WaterMarkText != string.Empty)
             {
-                if (this.Font == null)
-                    phrase = new Phrase(this.WaterMarkText);
-                else
+                //if (this.Font == null)
+                //    Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
+               // else
                     phrase = new Phrase(this.WaterMarkText, ITextFont);
                 PdfContentByte canvas;
                 canvas = writer.DirectContentUnder;
@@ -247,10 +248,10 @@ this.BorderColor = '#eae6e6';
             var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
 
             Phrase phrase = null;
-            if (this.Font == null)
-                phrase = new Phrase(column_val);
-            else
-                phrase = new Phrase(column_val,ITextFont);
+            //if (this.Font == null)
+            //    Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
+            // else
+            phrase = new Phrase(column_val,ITextFont);
 
             ColumnText ct = new ColumnText(canvas);
            // ct.Canvas.SetColorFill(GetColor(this.ForeColor));
@@ -287,10 +288,10 @@ this.BorderColor = '#eae6e6';
             var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
             Phrase phrase = null;
 
-            if (this.Font == null)
-                phrase = new Phrase(column_val);
-            else
-                phrase = new Phrase(column_val, ITextFont);
+            //if (this.Font == null)
+            //    Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
+            //else
+            phrase = new Phrase(column_val, ITextFont);
             ColumnText ct = new ColumnText(canvas);
             //ct.Canvas.SetColorFill(GetColor(this.ForeColor));
             ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, (int)TextAlign);
@@ -326,10 +327,11 @@ this.BorderColor = '#eae6e6';
             var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
 
             Phrase phrase = null;
-            if (this.Font == null)
-                phrase = new Phrase(column_val);
-            else
-                phrase = new Phrase(column_val, ITextFont);
+            //if (this.Font == null)
+            //    Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
+            //phrase = new Phrase(column_val);
+            // else
+            phrase = new Phrase(column_val, ITextFont);
             ColumnText ct = new ColumnText(canvas);
            // ct.Canvas.SetColorFill(GetColor(this.ForeColor));
             ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, (int)TextAlign);
@@ -365,10 +367,11 @@ this.BorderColor = '#eae6e6';
             var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
 
             Phrase phrase = null;
-            if (this.Font == null)
-                phrase = new Phrase(column_val);
-            else
-                phrase = new Phrase(column_val, ITextFont);
+            //if (this.Font == null)
+            //    Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
+            //    phrase = new Phrase(column_val);
+            //else
+            phrase = new Phrase(column_val, ITextFont);
             ColumnText ct = new ColumnText(canvas);
             //ct.Canvas.SetColorFill(GetColor(this.ForeColor));
             ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, (int)TextAlign);
@@ -412,10 +415,11 @@ this.BorderColor = '#eae6e6';
             ColumnText ct = new ColumnText(canvas);
             Phrase phrase = null;
             //ct.Canvas.SetColorFill(GetColor(this.ForeColor));
-            if (this.Font == null)
-                phrase = new Phrase(this.Title);
-            else
-                phrase = new Phrase(this.Title, ITextFont);
+            //if (this.Font == null)
+            //    Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
+            //    phrase = new Phrase(this.Title);
+            //else
+            phrase = new Phrase(this.Title, ITextFont);
 
             ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15,(int)TextAlign);
             ct.Go();
@@ -458,10 +462,11 @@ this.BorderColor = '#eae6e6';
             var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
 
             Phrase phrase = null;
-            if (this.Font == null)
-                phrase = new Phrase(column_val);
-            else
-                phrase = new Phrase(column_val, ITextFont);
+            //if (this.Font == null)
+            //    Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
+            //    phrase = new Phrase(column_val);
+            //else
+            phrase = new Phrase(column_val, ITextFont);
             ColumnText ct = new ColumnText(canvas);
             //ct.Canvas.SetColorFill(GetColor(this.ForeColor));
             ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, (int)TextAlign);
@@ -680,10 +685,11 @@ this.BorderColor = '#eae6e6';
             var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
 
             Phrase phrase = null;
-            if (this.Font == null)
-                phrase = new Phrase(column_val);
-            else
-                phrase = new Phrase(column_val, ITextFont);
+            //if (this.Font == null)
+            //    Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
+            //    phrase = new Phrase(column_val);
+            //else
+            phrase = new Phrase(column_val, ITextFont);
 
             ColumnText ct = new ColumnText(canvas);
             //ct.Canvas.SetColorFill(GetColor(this.ForeColor));

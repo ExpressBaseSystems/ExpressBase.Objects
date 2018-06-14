@@ -289,8 +289,7 @@ else {
             {
                 return @"
             <textarea id='@name@' name='@name@' rows='@RowsVisible@' autocomplete = '@AutoCompleteOff ' data-toggle='tooltip' title='@ToolTipText ' 
-                @tabIndex @MaxLength  style='width:100%; height:@heightpx; @BackColor @ForeColor display:inline-block; @fontStyle @ReadOnlyString  @Required  @PlaceHolder  @Text  @TabIndex>
-            </textarea>"
+                @tabIndex @MaxLength  style='width:100%; height:@heightpx; @BackColor @ForeColor display:inline-block; @fontStyle @ReadOnlyString  @Required  @PlaceHolder  @Text  @TabIndex></textarea>"
 .Replace("@name@", this.Name)
 .Replace("@MaxLength ", "maxlength='" + ((this.MaxLength > 0) ? this.MaxLength.ToString() : "@MaxLength") + "'")
 .Replace("@Required ", (this.Required && !this.Hidden ? " required" : string.Empty))

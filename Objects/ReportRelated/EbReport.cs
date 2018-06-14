@@ -678,8 +678,9 @@ else {
                         var datatype = (DbType)field.DbType;
                         var val_length = column_val.Length;
                         if (field.Font == null)
-                            phrase = new Phrase(column_val);
-                        else
+                            field.Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
+                        //    phrase = new Phrase(column_val);
+                        //else
                             phrase = new Phrase(column_val, field.ITextFont);
                         var calculatedValueSize = phrase.Font.CalculatedSize * val_length;
                         if (calculatedValueSize > field.WidthPt)
@@ -778,7 +779,7 @@ else {
 
                         if (field.Font == null)
                         {
-                            globals.CurrentField.Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 14, Strikethrough = false, Style = 0, Underline = false });
+                            globals.CurrentField.Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
                         }
                         foreach (string calcfd in (field as EbDataField).DataFieldsUsedAppearance)
                         {

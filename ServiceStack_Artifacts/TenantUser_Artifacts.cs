@@ -5,6 +5,7 @@ using ServiceStack;
 using System.Text;
 using ExpressBase.Security.Core;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
+using ExpressBase.Common.LocationNSolution;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
@@ -473,7 +474,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class CreateLocationConfigRequest : IReturn<GetUserGroupResponse>, IEbSSRequest
     {
         [DataMember(Order = 1)]
-        public List<LocationConfig> ConfString { get; set; }
+        public List<EbLocationConfig> ConfString { get; set; }
 
         public string Token { get; set; }
 
@@ -492,6 +493,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     [DataContract]
     public class GetLocationConfigRequest : IReturn<GetUserGroupResponse>, IEbSSRequest
     {
+        [DataMember(Order = 1)]
+        public int LocId { get; set; }
+
         public string Token { get; set; }
 
         public string TenantAccountId { get; set; }
@@ -503,17 +507,47 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class GetLocationConfigResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
-        public List<LocationConfig> Data { get; set; }
+        public List<EbLocationConfig> Data { get; set; }
+
+        [DataMember(Order = 2)]
+        public Dictionary<string, string> Meta { get; set; }
+
+        [DataMember(Order = 3)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    [DataContract]
+    public class SaveLocationMetaRequest : IReturn<GetUserGroupResponse>, IEbSSRequest
+    {
+        [DataMember(Order = 1)]
+        public string ConfMeta { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Longname { get; set; }
+
+        [DataMember(Order = 3)]
+        public string Shortname { get; set; }
+
+        [DataMember(Order = 4)]
+        public string Img { get; set; }
+
+        [DataMember(Order = 5)]
+        public int Locid { get; set; }
+
+        public string Token { get; set; }
+
+        public string TenantAccountId { get; set; }
+
+        public int UserId { get; set; }
+    }
+
+    [DataContract]
+    public class SaveLocationMetaResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public List<string> Data { get; set; }
 
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
-    }
-        public class LocationConfig
-    {
-        public string KeyId { get; set; }
-
-        public string Name { get; set; }
-
-        public string Isrequired { get; set; }
     }
 }
