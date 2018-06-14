@@ -52,7 +52,7 @@ namespace ExpressBase.Objects.ReportRelated
         [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("General")]
         [UIproperty]
-        public Boolean RenderInMultiLine { get; set; }
+        public Boolean RenderInMultiLine { get; set; } = true;
 
         [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("General")]
@@ -92,8 +92,8 @@ namespace ExpressBase.Objects.ReportRelated
                 column_val = this.Prefix + " " + column_val + " " + this.Suffix;
             }
 
-            if (this.Font == null)
-                Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
+            //if (this.Font == null)
+            //    Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
             //    text = new Phrase(column_val);
             //else
             //{
@@ -103,22 +103,24 @@ namespace ExpressBase.Objects.ReportRelated
             //}
 
             if (this.RenderInMultiLine)
-            {
-                var p = text.Font.GetCalculatedBaseFont(false);
-                float q = p.GetWidthPoint(column_val, text.Font.CalculatedSize);
-                var l = q / column_val.Length;
-                int numberofCharsInALine = Convert.ToInt32(Math.Floor(this.WidthPt / l));
-                if (numberofCharsInALine < column_val.Length)
-                {
-                    if (column_type == System.Data.DbType.Decimal)
-                        column_val = "###";
-                }
-            }
-
+                column_val = RenderMultiLine(column_val, text, column_type);
             var ury = reportHeight - (printingTop + this.TopPt + detailprintingtop);
             var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
             ct.SetSimpleColumn(text, this.LeftPt, lly, this.WidthPt + this.LeftPt, ury, 15, (int)TextAlign);
             ct.Go();
+        }
+        public string RenderMultiLine(string column_val, Phrase text, DbType column_type)
+        {
+            var calcbasefont = text.Font.GetCalculatedBaseFont(false);
+            float stringwidth = calcbasefont.GetWidthPoint(column_val, text.Font.CalculatedSize);
+            var charwidth = stringwidth / column_val.Length;
+            int numberofCharsInALine = Convert.ToInt32(Math.Floor(this.WidthPt / charwidth));
+            if (numberofCharsInALine < column_val.Length)
+            {
+                if (column_type == System.Data.DbType.Decimal)
+                    column_val = "###";
+            }
+            return column_val;
         }
     }
 
@@ -244,12 +246,14 @@ this.BorderColor = '#eae6e6';
                 column_val = this.Prefix + " " + column_val + " " + this.Suffix;
             }
 
-            if (this.Font == null)
-                Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
+            //if (this.Font == null)
+            //    Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
             //    text = new Phrase(column_val);
             //else
             //{
             text = new Phrase(column_val, ITextFont);
+            if (this.RenderInMultiLine)
+                column_val = RenderMultiLine(column_val, text, column_type);
             if (this.ForeColor != "")
                 text.Font.Color = GetColor(this.ForeColor);//ct.Canvas.SetColorFill(GetColor(this.Color));
             //}
@@ -368,12 +372,14 @@ this.BorderColor = '#eae6e6';
                 NumberToEnglish numToE = new NumberToEnglish();
                 column_val = numToE.changeCurrencyToWords(column_val);
             }
-            if (this.Font == null)
-                Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
+            //if (this.Font == null)
+            //    Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
             // phrase = new Phrase(column_val);
             //else
             //{
             phrase = new Phrase(column_val, ITextFont);
+            if (this.RenderInMultiLine)
+                column_val = RenderMultiLine(column_val, phrase, column_type);
             if (this.ForeColor != "")
                 phrase.Font.Color = GetColor(this.ForeColor);//ct.Canvas.SetColorFill(GetColor(this.Color));
             //}
@@ -651,8 +657,8 @@ this.BorderColor = '#eae6e6';
                 column_val = this.Prefix + " " + column_val + " " + this.Suffix;
             }
 
-            if (this.Font == null)
-                Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
+            //if (this.Font == null)
+            //    Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
             //    text = new Phrase(column_val);
             //else
             //{
@@ -662,17 +668,7 @@ this.BorderColor = '#eae6e6';
                                                            // }
 
             if (this.RenderInMultiLine)
-            {
-                var p = text.Font.GetCalculatedBaseFont(false);
-                float q = p.GetWidthPoint(column_val, text.Font.CalculatedSize);
-                var l = q / column_val.Length;
-                int numberofCharsInALine = Convert.ToInt32(Math.Floor(this.WidthPt / l));
-                if (numberofCharsInALine < column_val.Length)
-                {
-                    if (column_type == System.Data.DbType.Decimal)
-                        column_val = "###";
-                }
-            }
+                column_val = RenderMultiLine(column_val, text, column_type);
 
             var ury = reportHeight - (printingTop + this.TopPt + detailprintingtop);
             var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
@@ -781,15 +777,17 @@ this.BorderColor = '#eae6e6';
                 NumberToEnglish numToE = new NumberToEnglish();
                 column_val = numToE.changeCurrencyToWords(column_val);
             }
-            if (this.Font == null)
-                Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
+            //if (this.Font == null)
+            //    Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
             //    phrase = new Phrase(column_val);
             //else
             //{
             phrase = new Phrase(column_val, ITextFont);
-                if (this.ForeColor != "")
-                    phrase.Font.Color = GetColor(this.ForeColor);//ct.Canvas.SetColorFill(GetColor(this.Color));
-            //}
+            if (this.ForeColor != "")
+                phrase.Font.Color = GetColor(this.ForeColor);//ct.Canvas.SetColorFill(GetColor(this.Color));
+                                                             //}
+            if (this.RenderInMultiLine)
+                column_val = RenderMultiLine(column_val, phrase, column_type);
             ColumnText ct = new ColumnText(canvas);
             ct.SetSimpleColumn(phrase, this.LeftPt, lly, this.WidthPt + this.LeftPt, ury, 15, (int)TextAlign);
             ct.Go();

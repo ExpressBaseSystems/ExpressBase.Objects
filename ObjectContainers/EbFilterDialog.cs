@@ -23,6 +23,10 @@ namespace ExpressBase.Objects
                 string val = string.Empty;
                 if ((c.EbDbType).ToString() == "Decimal")
                     val = "0";
+                else if ((c.EbDbType).ToString() == "AnsiString")
+                    val = "F";
+                else if ((c.EbDbType).ToString() == "String")
+                    val = "EB";
                 else if ((c as EbDate).ShowDateAs_ == DateShowFormat.Year_Month)
                     val = "01/2018";
                 else if ((c as EbDate).ShowDateAs_ == DateShowFormat.Year_Month_Date)
