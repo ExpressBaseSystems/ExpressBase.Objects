@@ -168,9 +168,53 @@ this.BorderColor = '#eae6e6';
     this.Height =25;
     this.Width= 200;
     this.ForeColor = '#201c1c';
-this.Border = 1;
-this.BorderColor = '#eae6e6';
-};";
+    this.Border = 1;
+    this.BorderColor = '#eae6e6';
+    };";
+        }
+
+        public string FormatDate(string column_val)
+        {
+            DateTime dt = Convert.ToDateTime(column_val);
+            if (this.Format == DateFormatReport.dddd_MMMM_d_yyyy)
+                return String.Format("{0:dddd, MMMM d, yyyy}", dt);
+            else if (this.Format == DateFormatReport.M_d_yyyy)
+                return String.Format("{0:M/d/yyyy}", dt);
+            else if (this.Format == DateFormatReport.ddd_MMM_d_yyyy)
+                return String.Format("{0:ddd, MMM d, yyyy}", dt);
+            else if (this.Format == DateFormatReport.MM_dd_yy)
+                return String.Format("{0:MM/dd/yy}", dt);
+            else if (this.Format == DateFormatReport.MM_dd_yyyy)
+                return String.Format("{0:MM/dd/yyyy}", dt);
+            return column_val;
+        }
+
+        public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, string column_val, float detailprintingtop, DbType column_type)
+        {
+            ColumnText ct = new ColumnText(canvas);
+            Phrase text;
+            column_val = FormatDate(column_val);
+            if (this.Prefix != "" || this.Suffix != "")
+            {
+                column_val = this.Prefix + " " + column_val + " " + this.Suffix;
+            }
+
+            //if (this.Font == null)
+            //    Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
+            //    text = new Phrase(column_val);
+            //else
+            //{
+            text = new Phrase(column_val, ITextFont);
+            if (this.ForeColor != "")
+                text.Font.Color = GetColor(this.ForeColor);//ct.Canvas.SetColorFill(GetColor(this.Color));
+            //}
+
+            if (this.RenderInMultiLine)
+                column_val = RenderMultiLine(column_val, text, column_type);
+            var ury = reportHeight - (printingTop + this.TopPt + detailprintingtop);
+            var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
+            ct.SetSimpleColumn(text, this.LeftPt, lly, this.WidthPt + this.LeftPt, ury, 15, (int)TextAlign);
+            ct.Go();
         }
     }
 

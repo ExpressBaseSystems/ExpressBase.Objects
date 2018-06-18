@@ -61,7 +61,7 @@ namespace ExpressBase.Objects
         {
             try
             {
-                this.FilterDialog = Redis.Get<EbFilterDialog>(this.FilterDialogRefId);
+               // this.FilterDialog = Redis.Get<EbFilterDialog>(this.FilterDialogRefId);
                 if (this.FilterDialog == null && this.FilterDialogRefId != "")
                 {
                     var result = client.Get<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = this.FilterDialogRefId });

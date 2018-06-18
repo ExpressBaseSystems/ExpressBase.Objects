@@ -65,9 +65,14 @@ namespace ExpressBase.Objects
     }
     public enum DateFormatReport
     {
-        Year_Month_Date,
-        Year_Month,
-        Year,
+        M_d_yyyy,
+        MM_dd_yyyy,
+        ddd_MMM_d_yyyy,
+        dddd_MMMM_d_yyyy,
+        MM_dd_yy
+        //Year_Month_Date,
+        //Year_Month,
+        //Year,
     }
     public enum SummaryFunctionsNumeric
     {
@@ -681,7 +686,7 @@ else {
                             field.Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
                         //    phrase = new Phrase(column_val);
                         //else
-                            phrase = new Phrase(column_val, field.ITextFont);
+                        phrase = new Phrase(column_val, field.ITextFont);
                         var calculatedValueSize = phrase.Font.CalculatedSize * val_length;
                         if (calculatedValueSize > field.WidthPt)
                         {
