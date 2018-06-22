@@ -14,6 +14,8 @@ using Newtonsoft.Json;
 using ExpressBase.Common.JsonConverters;
 using ExpressBase.Objects.Objects.ReportRelated;
 using ExpressBase.Common;
+using ExpressBase.Common.Structures;
+using ExpressBase.Common.Data;
 
 namespace ExpressBase.Objects.ReportRelated
 {
@@ -55,6 +57,11 @@ namespace ExpressBase.Objects.ReportRelated
         public Boolean RenderInMultiLine { get; set; } = true;
 
         [EnableInBuilder(BuilderType.Report)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [OSE_ObjectTypes(EbObjectTypes.iReport)]
+        public string LinkRefid { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("General")]
         [UIproperty]
         [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
@@ -82,8 +89,9 @@ namespace ExpressBase.Objects.ReportRelated
                 return _dataFieldsUsed;
             }
         }
-        public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, string column_val, float detailprintingtop, DbType column_type)
+        public override void DrawMe(Document doc, PdfContentByte canvas, float reportHeight, float printingTop, string column_val, float detailprintingtop, DbType column_type, List<Param> Params)
         {
+
             ColumnText ct = new ColumnText(canvas);
             Phrase text;
 
@@ -91,24 +99,23 @@ namespace ExpressBase.Objects.ReportRelated
             {
                 column_val = this.Prefix + " " + column_val + " " + this.Suffix;
             }
-
-            //if (this.Font == null)
-            //    Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
-            //    text = new Phrase(column_val);
-            //else
-            //{
             text = new Phrase(column_val, ITextFont);
-            if (this.ForeColor != "")
-                text.Font.Color = GetColor(this.ForeColor);//ct.Canvas.SetColorFill(GetColor(this.Color));
-            //}
-
             if (this.RenderInMultiLine)
+            {
                 column_val = RenderMultiLine(column_val, text, column_type);
+                text = new Phrase(column_val, ITextFont);
+            }
+            if (!string.IsNullOrEmpty(this.LinkRefid))
+            {
+                CreateLink(text, LinkRefid, doc, Params);
+                return;
+            }
             var ury = reportHeight - (printingTop + this.TopPt + detailprintingtop);
             var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
             ct.SetSimpleColumn(text, this.LeftPt, lly, this.WidthPt + this.LeftPt, ury, 15, (int)TextAlign);
             ct.Go();
         }
+
         public string RenderMultiLine(string column_val, Phrase text, DbType column_type)
         {
             var calcbasefont = text.Font.GetCalculatedBaseFont(false);
@@ -121,6 +128,15 @@ namespace ExpressBase.Objects.ReportRelated
                     column_val = "###";
             }
             return column_val;
+        }
+
+        public void CreateLink(Phrase text, string LinkRefid, Document doc, List<Param> Params)
+        {
+            Anchor anchor = new Anchor(text)
+            {
+                Reference = "../ReportRender/RenderReport2?refid=" + LinkRefid + "&&Params=" + JsonConvert.SerializeObject(Params)
+            };
+            doc.Add(anchor);
         }
     }
 
@@ -136,15 +152,37 @@ namespace ExpressBase.Objects.ReportRelated
         public override string GetJsInitFunc()
         {
             return @"
-    this.Init = function(id)
-        {
-    this.Height =25;
-    this.Width= 200;
-    this.ForeColor = '#201c1c';
-this.Border = 1;
-this.BorderColor = '#eae6e6';
-};";
+        this.Init = function(id)
+            {
+        this.Height =25;
+        this.Width= 200;
+        this.ForeColor = '#201c1c';
+        this.Border = 1;
+        this.BorderColor = '#eae6e6';
+        };";
         }
+
+        public override void DrawMe(Document doc, PdfContentByte canvas, float reportHeight, float printingTop, string column_val, float detailprintingtop, DbType column_type, List<Param> Params)
+        {
+            ColumnText ct = new ColumnText(canvas);
+            Phrase text;
+            text = new Phrase(column_val, ITextFont);
+            if (this.RenderInMultiLine)
+            {
+                column_val = RenderMultiLine(column_val, text, column_type);
+                text = new Phrase(column_val, ITextFont);
+            }
+            if (!string.IsNullOrEmpty(this.LinkRefid))
+            {
+                CreateLink(text, LinkRefid, doc, Params);
+                return;
+            }
+            var ury = reportHeight - (printingTop + this.TopPt + detailprintingtop);
+            var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
+            ct.SetSimpleColumn(text, this.LeftPt, lly, this.WidthPt + this.LeftPt, ury, 15, (int)TextAlign);
+            ct.Go();
+        }
+
     }
 
     [EnableInBuilder(BuilderType.Report)]
@@ -162,15 +200,15 @@ this.BorderColor = '#eae6e6';
 
         public override string GetJsInitFunc()
         {
-            return @"
-    this.Init = function(id)
-        {
-    this.Height =25;
-    this.Width= 200;
-    this.ForeColor = '#201c1c';
-    this.Border = 1;
-    this.BorderColor = '#eae6e6';
-    };";
+                return @"
+        this.Init = function(id)
+            {
+        this.Height =25;
+        this.Width= 200;
+        this.ForeColor = '#201c1c';
+        this.Border = 1;
+        this.BorderColor = '#eae6e6';
+        };";
         }
 
         public string FormatDate(string column_val)
@@ -189,7 +227,7 @@ this.BorderColor = '#eae6e6';
             return column_val;
         }
 
-        public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, string column_val, float detailprintingtop, DbType column_type)
+        public override void DrawMe(Document doc, PdfContentByte canvas, float reportHeight, float printingTop, string column_val, float detailprintingtop, DbType column_type, List<Param> Params)
         {
             ColumnText ct = new ColumnText(canvas);
             Phrase text;
@@ -198,19 +236,17 @@ this.BorderColor = '#eae6e6';
             {
                 column_val = this.Prefix + " " + column_val + " " + this.Suffix;
             }
-
-            //if (this.Font == null)
-            //    Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
-            //    text = new Phrase(column_val);
-            //else
-            //{
             text = new Phrase(column_val, ITextFont);
-            if (this.ForeColor != "")
-                text.Font.Color = GetColor(this.ForeColor);//ct.Canvas.SetColorFill(GetColor(this.Color));
-            //}
-
             if (this.RenderInMultiLine)
+            {
                 column_val = RenderMultiLine(column_val, text, column_type);
+                text = new Phrase(column_val, ITextFont);
+            }
+            if (!string.IsNullOrEmpty(this.LinkRefid))
+            {
+                CreateLink(text, LinkRefid, doc, Params);
+                return;
+            }
             var ury = reportHeight - (printingTop + this.TopPt + detailprintingtop);
             var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
             ct.SetSimpleColumn(text, this.LeftPt, lly, this.WidthPt + this.LeftPt, ury, 15, (int)TextAlign);
@@ -229,14 +265,14 @@ this.BorderColor = '#eae6e6';
         public override string GetJsInitFunc()
         {
             return @"
-    this.Init = function(id)
+         this.Init = function(id)
         {
-    this.Height =25;
-    this.Width= 200;
-    this.ForeColor = '#201c1c';
-this.Border = 1;
-this.BorderColor = '#eae6e6';
-};";
+        this.Height =25;
+        this.Width= 200;
+        this.ForeColor = '#201c1c';
+        this.Border = 1;
+        this.BorderColor = '#eae6e6';
+        };";
         }
     }
 
@@ -272,7 +308,7 @@ this.Border = 1;
 this.BorderColor = '#eae6e6';
 };";
         }
-        public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, string column_val, float detailprintingtop, DbType column_type)
+        public override void DrawMe(Document doc, PdfContentByte canvas, float reportHeight, float printingTop, string column_val, float detailprintingtop, DbType column_type, List<Param> Params)
         {
             Phrase text;
             var ury = reportHeight - (printingTop + this.TopPt + detailprintingtop);
@@ -289,19 +325,17 @@ this.BorderColor = '#eae6e6';
             {
                 column_val = this.Prefix + " " + column_val + " " + this.Suffix;
             }
-
-            //if (this.Font == null)
-            //    Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
-            //    text = new Phrase(column_val);
-            //else
-            //{
             text = new Phrase(column_val, ITextFont);
             if (this.RenderInMultiLine)
+            {
                 column_val = RenderMultiLine(column_val, text, column_type);
-            if (this.ForeColor != "")
-                text.Font.Color = GetColor(this.ForeColor);//ct.Canvas.SetColorFill(GetColor(this.Color));
-            //}
-
+                text = new Phrase(column_val, ITextFont);
+            }
+            if (!string.IsNullOrEmpty(this.LinkRefid))
+            {
+                CreateLink(text, LinkRefid, doc, Params);
+                return;
+            }
             ColumnText ct = new ColumnText(canvas);
             ct.Canvas.SetColorFill(GetColor(this.ForeColor));
             ct.SetSimpleColumn(text, this.LeftPt, lly, this.WidthPt + this.LeftPt, ury, 15, (int)TextAlign);
@@ -406,7 +440,7 @@ this.BorderColor = '#eae6e6';
 
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, string column_val, float detailprintingtop, DbType column_type)
         {
-            Phrase phrase;
+            Phrase text;
             var ury = reportHeight - (printingTop + this.TopPt + detailprintingtop);
             var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
             if (this.DecimalPlaces > 0)
@@ -416,19 +450,14 @@ this.BorderColor = '#eae6e6';
                 NumberToEnglish numToE = new NumberToEnglish();
                 column_val = numToE.changeCurrencyToWords(column_val);
             }
-            //if (this.Font == null)
-            //    Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
-            // phrase = new Phrase(column_val);
-            //else
-            //{
-            phrase = new Phrase(column_val, ITextFont);
+            text = new Phrase(column_val, ITextFont);
             if (this.RenderInMultiLine)
-                column_val = RenderMultiLine(column_val, phrase, column_type);
-            if (this.ForeColor != "")
-                phrase.Font.Color = GetColor(this.ForeColor);//ct.Canvas.SetColorFill(GetColor(this.Color));
-            //}
+            {
+                column_val = RenderMultiLine(column_val, text, column_type);
+                text = new Phrase(column_val, ITextFont);
+            }
             ColumnText ct = new ColumnText(canvas);
-            ct.SetSimpleColumn(phrase, this.LeftPt, lly, this.WidthPt + this.LeftPt, ury, 15, (int)TextAlign);
+            ct.SetSimpleColumn(text, this.LeftPt, lly, this.WidthPt + this.LeftPt, ury, 15, (int)TextAlign);
             ct.Go();
         }
     }
@@ -492,14 +521,14 @@ this.BorderColor = '#eae6e6';
         public override string GetJsInitFunc()
         {
             return @"
-    this.Init = function(id)
-        {
-    this.Height =25;
-    this.Width= 200;
-    this.ForeColor = '#201c1c';
-this.Border = 1;
-this.BorderColor = '#eae6e6';
-};";
+        this.Init = function(id)
+            {
+        this.Height =25;
+        this.Width= 200;
+        this.ForeColor = '#201c1c';
+        this.Border = 1;
+        this.BorderColor = '#eae6e6';
+        };";
         }
     }
 
@@ -558,17 +587,18 @@ this.BorderColor = '#eae6e6';
         {
             return "<div class='dropped' $type='@type' eb-type='DataFieldDateTimeSummary' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;text-align: @TextAlign;'> @Title </div>".RemoveCR().DoubleQuoted();
         }
+
         public override string GetJsInitFunc()
         {
             return @"
-    this.Init = function(id)
-        {
-    this.Height =25;
-    this.Width= 200;
-    this.ForeColor = '#201c1c';
-this.Border = 1;
-this.BorderColor = '#eae6e6';
-};";
+        this.Init = function(id)
+            {
+        this.Height =25;
+        this.Width= 200;
+        this.ForeColor = '#201c1c';
+        this.Border = 1;
+        this.BorderColor = '#eae6e6';
+        };";
         }
     }
 
@@ -603,17 +633,18 @@ this.BorderColor = '#eae6e6';
         {
             return "<div class='dropped' $type='@type' eb-type='DataFieldBooleanSummary' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; position: absolute; left: @Left px; top: @Top px;text-align: @TextAlign ;'> @Title </div>".RemoveCR().DoubleQuoted();
         }
+
         public override string GetJsInitFunc()
         {
             return @"
-    this.Init = function(id)
+        this.Init = function(id)
         {
-    this.Height =25;
-    this.Width= 200;
-    this.ForeColor = '#201c1c';
-this.Border = 1;
-this.BorderColor = '#eae6e6';
-};";
+        this.Height =25;
+        this.Width= 200;
+        this.ForeColor = '#201c1c';
+        this.Border = 1;
+        this.BorderColor = '#eae6e6';
+        };";
         }
     }
 
@@ -669,14 +700,14 @@ this.BorderColor = '#eae6e6';
         public override string GetJsInitFunc()
         {
             return @"
-    this.Init = function(id)
-        {
-    this.Height =25;
-    this.Width= 200;
-    this.ForeColor = '#201c1c';
-this.Border = 1;
-this.BorderColor = '#eae6e6';
-};";
+        this.Init = function(id)
+            {
+        this.Height =25;
+        this.Width= 200;
+        this.ForeColor = '#201c1c';
+        this.Border = 1;
+        this.BorderColor = '#eae6e6';
+        };";
         }
 
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, string column_val, float detailprintingtop, DbType column_type)
@@ -700,20 +731,12 @@ this.BorderColor = '#eae6e6';
             {
                 column_val = this.Prefix + " " + column_val + " " + this.Suffix;
             }
-
-            //if (this.Font == null)
-            //    Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
-            //    text = new Phrase(column_val);
-            //else
-            //{
             text = new Phrase(column_val, ITextFont);
-            if (this.ForeColor != "")
-                text.Font.Color = GetColor(this.ForeColor);//ct.Canvas.SetColorFill(GetColor(this.Color));
-                                                           // }
-
             if (this.RenderInMultiLine)
+            {
                 column_val = RenderMultiLine(column_val, text, column_type);
-
+                text = new Phrase(column_val, ITextFont);
+            }
             var ury = reportHeight - (printingTop + this.TopPt + detailprintingtop);
             var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
             ct.SetSimpleColumn(text, this.LeftPt, lly, this.WidthPt + this.LeftPt, ury, 15, (int)TextAlign);
@@ -799,19 +822,19 @@ this.BorderColor = '#eae6e6';
         public override string GetJsInitFunc()
         {
             return @"
-    this.Init = function(id)
-        {
-    this.Height =25;
-    this.Width= 200;
-    this.ForeColor = '#201c1c';
-this.Border = 1;
-this.BorderColor = '#eae6e6';
-};";
-        }
+         this.Init = function(id)
+            {
+        this.Height =25;
+        this.Width= 200;
+        this.ForeColor = '#201c1c';
+        this.Border = 1;
+        this.BorderColor = '#eae6e6';
+        };";
+            }
 
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, string column_val, float detailprintingtop, DbType column_type)
         {
-            Phrase phrase;
+            Phrase text;
             var ury = reportHeight - (printingTop + this.TopPt + detailprintingtop);
             var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
             if (this.DecimalPlaces > 0)
@@ -821,19 +844,14 @@ this.BorderColor = '#eae6e6';
                 NumberToEnglish numToE = new NumberToEnglish();
                 column_val = numToE.changeCurrencyToWords(column_val);
             }
-            //if (this.Font == null)
-            //    Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
-            //    phrase = new Phrase(column_val);
-            //else
-            //{
-            phrase = new Phrase(column_val, ITextFont);
-            if (this.ForeColor != "")
-                phrase.Font.Color = GetColor(this.ForeColor);//ct.Canvas.SetColorFill(GetColor(this.Color));
-                                                             //}
+            text = new Phrase(column_val, ITextFont);
             if (this.RenderInMultiLine)
-                column_val = RenderMultiLine(column_val, phrase, column_type);
+            {
+                column_val = RenderMultiLine(column_val, text, column_type);
+                text = new Phrase(column_val, ITextFont);
+            }
             ColumnText ct = new ColumnText(canvas);
-            ct.SetSimpleColumn(phrase, this.LeftPt, lly, this.WidthPt + this.LeftPt, ury, 15, (int)TextAlign);
+            ct.SetSimpleColumn(text, this.LeftPt, lly, this.WidthPt + this.LeftPt, ury, 15, (int)TextAlign);
             ct.Go();
         }
 

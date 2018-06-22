@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using QRCoder;
 using System.Data;
 using ExpressBase.Common;
+using ExpressBase.Common.Data;
 
 namespace ExpressBase.Objects.ReportRelated
 {
@@ -62,6 +63,7 @@ namespace ExpressBase.Objects.ReportRelated
         public virtual void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, EbReport report) { }
         public virtual void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, string column_name, float detailprintingtop, DbType column_type) { }
         public virtual void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_name) { }
+        public virtual void DrawMe(Document doc, PdfContentByte canvas, float reportHeight, float printingTop, string column_val, float detailprintingtop, DbType column_type, List<Param> l) { }
         public virtual void DrawMe(Document doc, PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_name) { }
         public virtual void DrawMe(Document d, byte[] fileByte) { }
         public virtual void DrawMe(Document d, PdfWriter writer, byte[] fileByte, float reportHeight) { }
@@ -208,8 +210,8 @@ this.BorderColor = '#eae6e6';
                 img.SetAbsolutePosition(this.LeftPt, reportHeight - this.TopPt - this.HeightPt);
                 PdfGState _state = new PdfGState()
                 {
-                    FillOpacity = 0.3F,
-                    StrokeOpacity = 0.3F
+                    FillOpacity = 0.2F,
+                    StrokeOpacity = 0.2F
                 };
                 PdfContentByte cb = writer.DirectContentUnder;
                 cb.SaveState();
