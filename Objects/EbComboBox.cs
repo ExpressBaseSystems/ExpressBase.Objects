@@ -262,7 +262,6 @@ var @nameEbCombo = new EbSelect('@name', '@DSid', @DDHeight, '@vmName', '', @Max
             {
                 return @"
 <div id='@name@Container'  role='form' data-toggle='validator' style='width:100%;'>
-    <label id='@name@errormsg' class='text-danger'></label>
     <input type='hidden' name='@name@Hidden4val' data-ebtype='16' id='@name@'/>
     @VueSelectCode
     <div id='@name@_loadingdiv' class='ebCombo-loader'>
