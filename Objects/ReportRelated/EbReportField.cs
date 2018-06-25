@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using QRCoder;
 using System.Data;
 using ExpressBase.Common;
+using ExpressBase.Common.Data;
 
 namespace ExpressBase.Objects.ReportRelated
 {
@@ -62,6 +63,7 @@ namespace ExpressBase.Objects.ReportRelated
         public virtual void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, EbReport report) { }
         public virtual void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, string column_name, float detailprintingtop, DbType column_type) { }
         public virtual void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_name) { }
+        public virtual void DrawMe(Document doc, PdfContentByte canvas, float reportHeight, float printingTop, string column_val, float detailprintingtop, DbType column_type, List<Param> l) { }
         public virtual void DrawMe(Document doc, PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_name) { }
         public virtual void DrawMe(Document d, byte[] fileByte) { }
         public virtual void DrawMe(Document d, PdfWriter writer, byte[] fileByte, float reportHeight) { }
@@ -208,8 +210,8 @@ this.BorderColor = '#eae6e6';
                 img.SetAbsolutePosition(this.LeftPt, reportHeight - this.TopPt - this.HeightPt);
                 PdfGState _state = new PdfGState()
                 {
-                    FillOpacity = 0.3F,
-                    StrokeOpacity = 0.3F
+                    FillOpacity = 0.2F,
+                    StrokeOpacity = 0.2F
                 };
                 PdfContentByte cb = writer.DirectContentUnder;
                 cb.SaveState();
@@ -223,6 +225,27 @@ this.BorderColor = '#eae6e6';
     [EnableInBuilder(BuilderType.Report)]
     public class EbDateTime : EbReportField
     {
+        [EnableInBuilder(BuilderType.Report)]
+        [UIproperty]
+        [PropertyGroup("Appearance")]
+        public DateFormatReport Format { get; set; }
+
+        public string FormatDate(string column_val)
+        {
+            DateTime dt = Convert.ToDateTime(column_val);
+            if (this.Format == DateFormatReport.dddd_MMMM_d_yyyy)
+                return String.Format("{0:dddd, MMMM d, yyyy}", dt);
+            else if (this.Format == DateFormatReport.M_d_yyyy)
+                return String.Format("{0:M/d/yyyy}", dt);
+            else if (this.Format == DateFormatReport.ddd_MMM_d_yyyy)
+                return String.Format("{0:ddd, MMM d, yyyy}", dt);
+            else if (this.Format == DateFormatReport.MM_dd_yy)
+                return String.Format("{0:MM/dd/yy}", dt);
+            else if (this.Format == DateFormatReport.MM_dd_yyyy)
+                return String.Format("{0:MM/dd/yyyy}", dt);
+            return column_val;
+        }
+
         public override string GetDesignHtml()
         {
             return "<div class='date-time dropped' eb-type='DateTime' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; height: @Height px; background-color:@BackColor ; color:@ForeColor ; position: absolute; left: @Left px; top: @Top px;text-align: @TextAlign;'> @Title </div>".RemoveCR().DoubleQuoted();
@@ -235,9 +258,9 @@ this.BorderColor = '#eae6e6';
      this.Height =25;
     this.Width= 200;
     this.ForeColor = '#201c1c';
-this.Border = 1;
-this.BorderColor = '#eae6e6';
-};";
+    this.Border = 1;
+    this.BorderColor = '#eae6e6';
+    };";
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
         {
@@ -246,13 +269,9 @@ this.BorderColor = '#eae6e6';
             var ury = reportHeight - (printingTop + this.TopPt + detailprintingtop);
             var llx = this.LeftPt;
             var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
-
+            column_val = FormatDate(column_val);
             Phrase phrase = null;
-            //if (this.Font == null)
-            //    Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
-            // else
             phrase = new Phrase(column_val,ITextFont);
-
             ColumnText ct = new ColumnText(canvas);
            // ct.Canvas.SetColorFill(GetColor(this.ForeColor));
             ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, (int)TextAlign);

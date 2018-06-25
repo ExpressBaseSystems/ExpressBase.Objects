@@ -65,9 +65,14 @@ namespace ExpressBase.Objects
     }
     public enum DateFormatReport
     {
-        Year_Month_Date,
-        Year_Month,
-        Year,
+        M_d_yyyy,
+        MM_dd_yyyy,
+        ddd_MMM_d_yyyy,
+        dddd_MMMM_d_yyyy,
+        MM_dd_yy
+        //Year_Month_Date,
+        //Year_Month,
+        //Year,
     }
     public enum SummaryFunctionsNumeric
     {
@@ -411,6 +416,10 @@ else {
         [JsonIgnore]
         public Dictionary<string, object> FieldDict { get; set; }
 
+        [JsonIgnore]
+        public Dictionary<string, List<EbControl>> LinkCollection { get; set; }
+
+
         public void InitializeSummaryFields()
         {
             List<object> SummaryFieldsList = null;
@@ -681,7 +690,7 @@ else {
                             field.Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
                         //    phrase = new Phrase(column_val);
                         //else
-                            phrase = new Phrase(column_val, field.ITextFont);
+                        phrase = new Phrase(column_val, field.ITextFont);
                         var calculatedValueSize = phrase.Font.CalculatedSize * val_length;
                         if (calculatedValueSize > field.WidthPt)
                         {
@@ -758,6 +767,7 @@ else {
 
         public void DrawFields(EbReportField field, float section_Yposition, int serialnumber)
         {
+            List<Param> l = (this.Parameters!=null)?this.Parameters:new List<Param>();
             try
             {
                 var column_name = string.Empty;
@@ -769,15 +779,16 @@ else {
 
                 if (field is EbDataField)
                 {
-                    column_type = (DbType)(field as EbDataField).DbType;
-                    int tableIndex = (field as EbDataField).TableIndex;
-                    column_name = (field as EbDataField).ColumnName;
+                    EbDataField _field = field as EbDataField;
+                    column_type = (DbType)_field.DbType;
+                    int tableIndex = _field.TableIndex;
+                    column_name = _field.ColumnName;
                     Globals globals = new Globals();
                     globals.CurrentField = field;
                     if (AppearanceScriptCollection.ContainsKey(field.Name))
                     {
 
-                        if (field.Font == null)
+                        if (field.Font is null)
                         {
                             globals.CurrentField.Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
                         }
@@ -831,7 +842,16 @@ else {
                     else
                         column_val = GetDataFieldtValue(column_name, serialnumber, tableIndex);
 
-                    field.DrawMe(Canvas, HeightPt, section_Yposition, column_val, detailprintingtop, column_type);
+                    if (!string.IsNullOrEmpty(_field.LinkRefid))
+                    {
+                        var linkparams = LinkCollection[_field.LinkRefid];
+                        foreach (var p in LinkCollection[(field as EbDataField).LinkRefid])
+                        {
+                            var x = this.DataSet.Tables[tableIndex].Rows[serialnumber].GetCellParam(p.Name);
+                            l.Add(x);
+                        }
+                    }
+                   field.DrawMe(Doc, Canvas, HeightPt, section_Yposition, column_val, detailprintingtop, column_type, l);
                 }
 
                 if ((field is EbPageNo) || (field is EbPageXY) || (field is EbDateTime) || (field is EbSerialNumber) || (field is EbUserName) || (field is EbParameter))
@@ -854,16 +874,19 @@ else {
                     }
                     field.DrawMe(Canvas, HeightPt, section_Yposition, detailprintingtop, column_val);
                 }
+
                 else if (field is EbImg)
                 {
                     byte[] fileByte = GetFile((field as EbImg).Image);
                     if (fileByte != null)
                         field.DrawMe(Doc, fileByte, HeightPt, section_Yposition, detailprintingtop);
                 }
+
                 else if ((field is EbText) || (field is EbReportFieldShape))
                 {
                     field.DrawMe(Canvas, HeightPt, section_Yposition, this);
                 }
+
                 else if (field is EbBarcode)
                 {
                     int tableIndex = Convert.ToInt32((field as EbBarcode).Code.Split('.')[0].Substring(1));
@@ -871,6 +894,7 @@ else {
                     column_val = GetDataFieldtValue(column_name, serialnumber, tableIndex);
                     field.DrawMe(Doc, Canvas, HeightPt, section_Yposition, detailprintingtop, column_val);
                 }
+
                 else if (field is EbQRcode)
                 {
                     int tableIndex = Convert.ToInt32((field as EbQRcode).Code.Split('.')[0].Substring(1));
