@@ -36,6 +36,14 @@ namespace ExpressBase.Objects
         Text
     }
 
+    public enum Position
+    {
+        top,
+        left,
+        bottom,
+        right
+    }
+
     [EnableInBuilder(BuilderType.BotForm)]
     public class EbDataVisualizationObject : EbObject
     {
@@ -406,6 +414,24 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.DVBuilder)]        
         [HideInPropertyGrid]
+        [OnChangeExec(@"
+        if(this.Type === 'pie'){
+            pg.HideProperty('XaxisTitle')
+            pg.HideProperty('YaxisTitle')
+            pg.HideProperty('XaxisTitleColor')
+            pg.HideProperty('YaxisTitleColor')
+            pg.HideProperty('XaxisLabelColor')
+            pg.HideProperty('YaxisLabelColor')
+        }
+
+        else{
+            pg.ShowProperty('XaxisTitle')
+            pg.ShowProperty('YaxisTitle')
+            pg.ShowProperty('XaxisTitleColor')
+            pg.ShowProperty('YaxisTitleColor')
+            pg.ShowProperty('XaxisLabelColor')
+            pg.ShowProperty('YaxisLabelColor')
+        }")]
         public string Type { get; set; }
         
         [EnableInBuilder(BuilderType.DVBuilder)]
@@ -448,7 +474,10 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.DVBuilder)]
         public bool ShowValue { get; set; }
 
-		public static EbOperations Operations = CVOperations.Instance;
+        //[EnableInBuilder(BuilderType.DVBuilder)]
+        //public Position LegendPosition { get; set; }
+
+        public static EbOperations Operations = CVOperations.Instance;
     }
 
     [EnableInBuilder(BuilderType.DVBuilder)]
