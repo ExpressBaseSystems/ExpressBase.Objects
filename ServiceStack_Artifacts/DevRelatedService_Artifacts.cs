@@ -148,7 +148,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 5)]
         public string Description { set; get; }
 
-    }
+		[DataMember(Order = 6)]
+		public object AppSettings { set; get; }
+	}
 
     public class GetObjectsByAppIdRequest : IReturn<GetObjectsByAppIdResponse>, IEbSSRequest
     {
@@ -217,4 +219,25 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
        [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
     }
+
+	[DataContract]
+	public class SaveAppSettingsRequest : EbServiceStackRequest, IReturn<SaveAppSettingsResponse>
+	{
+		[DataMember(Order = 1)]
+		public int AppId { get; set; }
+
+		[DataMember(Order = 1)]
+		public int AppType { get; set; }
+
+		[DataMember(Order = 2)]
+		public string Settings { get; set; }
+
+	}
+
+	[DataContract]
+	public class SaveAppSettingsResponse
+	{
+		[DataMember(Order = 1)]
+		public int ResStatus { get; set; }
+	}
 }
