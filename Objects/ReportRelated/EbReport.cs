@@ -18,6 +18,7 @@ using Newtonsoft.Json;
 using ServiceStack;
 using ServiceStack.Redis;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
@@ -767,7 +768,7 @@ else {
 
         public void DrawFields(EbReportField field, float section_Yposition, int serialnumber)
         {
-            List<Param> l = (this.Parameters!=null)?this.Parameters:new List<Param>();
+            List<Param> RowParams = (this.Parameters!=null)?this.Parameters:new List<Param>();
             try
             {
                 var column_name = string.Empty;
@@ -847,11 +848,23 @@ else {
                         var linkparams = LinkCollection[_field.LinkRefid];
                         foreach (var p in LinkCollection[(field as EbDataField).LinkRefid])
                         {
-                            var x = this.DataSet.Tables[tableIndex].Rows[serialnumber].GetCellParam(p.Name);
-                            l.Add(x);
-                        }
+                                var x = this.DataSet.Tables[tableIndex].Rows[serialnumber].GetCellParam(p.Name);
+                                ArrayList IndexToRemove= new ArrayList();
+                                for(int i=0;i<RowParams.Count;i++)//each (var r in l)
+                                {
+                                    if (RowParams[i].Name == p.Name)
+                                    {
+                                        IndexToRemove.Add(i);
+                                    }
+                                }
+                                for (int i = 0; i < IndexToRemove.Count; i++)
+                                {
+                                    RowParams.RemoveAt(Convert.ToInt32(IndexToRemove[i]));
+                                }
+                                    RowParams.Add(x);
+                            }
                     }
-                   field.DrawMe(Doc, Canvas, HeightPt, section_Yposition, column_val, detailprintingtop, column_type, l);
+                   field.DrawMe(Doc, Canvas, HeightPt, section_Yposition, column_val, detailprintingtop, column_type, RowParams);
                 }
 
                 if ((field is EbPageNo) || (field is EbPageXY) || (field is EbDateTime) || (field is EbSerialNumber) || (field is EbUserName) || (field is EbParameter))
