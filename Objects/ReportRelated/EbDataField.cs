@@ -105,14 +105,23 @@ namespace ExpressBase.Objects.ReportRelated
                 column_val = RenderMultiLine(column_val, text, column_type);
                 text = new Phrase(column_val, ITextFont);
             }
-            if (!string.IsNullOrEmpty(this.LinkRefid))
+            if (!string.IsNullOrEmpty(LinkRefid))
             {
-                CreateLink(text, LinkRefid, doc, Params);
-                return;
+                Anchor a = CreateLink(text, LinkRefid, doc, Params);
+                Paragraph p = new Paragraph
+                {
+                    a
+                };
+                p.Font = ITextFont;
+                ct.AddText(p);
             }
-            var ury = reportHeight - (printingTop + this.TopPt + detailprintingtop);
-            var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
-            ct.SetSimpleColumn(text, this.LeftPt, lly, this.WidthPt + this.LeftPt, ury, 15, (int)TextAlign);
+            else
+            {
+                ct.AddText(text);
+            }
+            var ury = reportHeight - (printingTop + TopPt + detailprintingtop);
+            var lly = reportHeight - (printingTop + TopPt + HeightPt + detailprintingtop);
+            ct.SetSimpleColumn(LeftPt, lly,WidthPt + LeftPt, ury, 15, (int)TextAlign);
             ct.Go();
         }
 
@@ -130,13 +139,13 @@ namespace ExpressBase.Objects.ReportRelated
             return column_val;
         }
 
-        public void CreateLink(Phrase text, string LinkRefid, Document doc, List<Param> Params)
+        public Anchor CreateLink(Phrase text, string LinkRefid, Document doc, List<Param> Params)
         {
             Anchor anchor = new Anchor(text)
             {
                 Reference = "../ReportRender/RenderReport2?refid=" + LinkRefid + "&&Params=" + JsonConvert.SerializeObject(Params)
             };
-            doc.Add(anchor);
+            return anchor;
         }
     }
 
@@ -172,15 +181,24 @@ namespace ExpressBase.Objects.ReportRelated
                 column_val = RenderMultiLine(column_val, text, column_type);
                 text = new Phrase(column_val, ITextFont);
             }
-            if (!string.IsNullOrEmpty(this.LinkRefid))
+            if (!string.IsNullOrEmpty(LinkRefid))
             {
-                CreateLink(text, LinkRefid, doc, Params);
-                return;
+                Anchor a = CreateLink(text, LinkRefid, doc, Params);
+                Paragraph p = new Paragraph
+                {
+                    a
+                };
+                p.Font = ITextFont;
+                ct.AddText(p);
             }
-            var ury = reportHeight - (printingTop + this.TopPt + detailprintingtop);
-            var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
-            ct.SetSimpleColumn(text, this.LeftPt, lly, this.WidthPt + this.LeftPt, ury, 15, (int)TextAlign);
-            ct.Go();
+            else
+            {
+                ct.AddText(text);
+            }
+            var ury = reportHeight - (printingTop + TopPt + detailprintingtop);
+                var lly = reportHeight - (printingTop + TopPt + this.HeightPt + detailprintingtop);
+                ct.SetSimpleColumn(LeftPt, lly, WidthPt + LeftPt, ury, 15, (int)TextAlign);
+                ct.Go();
         }
 
     }
@@ -200,7 +218,7 @@ namespace ExpressBase.Objects.ReportRelated
 
         public override string GetJsInitFunc()
         {
-                return @"
+            return @"
         this.Init = function(id)
             {
         this.Height =25;
@@ -234,22 +252,31 @@ namespace ExpressBase.Objects.ReportRelated
             column_val = FormatDate(column_val);
             if (this.Prefix != "" || this.Suffix != "")
             {
-                column_val = this.Prefix + " " + column_val + " " + this.Suffix;
+                column_val = this.Prefix + " " + column_val + " " + Suffix;
             }
             text = new Phrase(column_val, ITextFont);
-            if (this.RenderInMultiLine)
+            if (RenderInMultiLine)
             {
                 column_val = RenderMultiLine(column_val, text, column_type);
                 text = new Phrase(column_val, ITextFont);
             }
-            if (!string.IsNullOrEmpty(this.LinkRefid))
+            if (!string.IsNullOrEmpty(LinkRefid))
             {
-                CreateLink(text, LinkRefid, doc, Params);
-                return;
+                Anchor a = CreateLink(text, LinkRefid, doc, Params);
+                Paragraph p = new Paragraph
+                {
+                    a
+                };
+                p.Font = ITextFont;
+                ct.AddText(p);
             }
-            var ury = reportHeight - (printingTop + this.TopPt + detailprintingtop);
-            var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
-            ct.SetSimpleColumn(text, this.LeftPt, lly, this.WidthPt + this.LeftPt, ury, 15, (int)TextAlign);
+            else
+            {
+                ct.AddText(text);
+            }
+            var ury = reportHeight - (printingTop + TopPt + detailprintingtop);
+            var lly = reportHeight - (printingTop + TopPt + HeightPt + detailprintingtop);
+            ct.SetSimpleColumn(LeftPt, lly, WidthPt + LeftPt, ury, 15, (int)TextAlign);
             ct.Go();
         }
     }
@@ -311,6 +338,7 @@ this.BorderColor = '#eae6e6';
         public override void DrawMe(Document doc, PdfContentByte canvas, float reportHeight, float printingTop, string column_val, float detailprintingtop, DbType column_type, List<Param> Params)
         {
             Phrase text;
+            ColumnText ct = new ColumnText(canvas);
             var ury = reportHeight - (printingTop + this.TopPt + detailprintingtop);
             var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
             if (this.DecimalPlaces > 0)
@@ -333,12 +361,20 @@ this.BorderColor = '#eae6e6';
             }
             if (!string.IsNullOrEmpty(this.LinkRefid))
             {
-                CreateLink(text, LinkRefid, doc, Params);
-                return;
+                Anchor a = CreateLink(text, LinkRefid, doc, Params);
+                Paragraph p = new Paragraph
+                {
+                    a
+                };
+                p.Font = ITextFont;
+                ct.AddText(p);
             }
-            ColumnText ct = new ColumnText(canvas);
-            ct.Canvas.SetColorFill(GetColor(this.ForeColor));
-            ct.SetSimpleColumn(text, this.LeftPt, lly, this.WidthPt + this.LeftPt, ury, 15, (int)TextAlign);
+            else
+            {
+                ct.AddText(text);
+            }
+            ct.Canvas.SetColorFill(GetColor(ForeColor));
+            ct.SetSimpleColumn(LeftPt, lly, WidthPt + LeftPt, ury, 15, (int)TextAlign);
             ct.Go();
         }
 
@@ -830,7 +866,7 @@ this.BorderColor = '#eae6e6';
         this.Border = 1;
         this.BorderColor = '#eae6e6';
         };";
-            }
+        }
 
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, string column_val, float detailprintingtop, DbType column_type)
         {
