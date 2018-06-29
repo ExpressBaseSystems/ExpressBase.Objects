@@ -73,6 +73,8 @@ namespace ExpressBase.Objects.Objects.DVRelated
 
         public EbDbTypes Type { get; set; }
 
+        public string type { get; set; }
+
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [Alias("Title")]
         public string sTitle { get; set; }

@@ -116,6 +116,7 @@ namespace ExpressBase.Objects
         public string IsPaged { get; set; }
         
         [EnableInBuilder(BuilderType.DVBuilder)]
+        [DefaultPropValue("true")]
         public bool IsPaging { get; set; }
 
         public override void AfterRedisGet(RedisClient Redis)
@@ -319,7 +320,7 @@ namespace ExpressBase.Objects
         public int RightFixedColumn { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
-        //[DefaultPropValue("'10'")]
+        [DefaultPropValue("100")]
         public int PageLength { get; set; }
 
 		public static EbOperations Operations = TVOperations.Instance;
