@@ -1,4 +1,5 @@
-﻿using ExpressBase.Common.EbServiceStack.ReqNRes;
+﻿using ExpressBase.Common.Application;
+using ExpressBase.Common.EbServiceStack.ReqNRes;
 using ExpressBase.Common.Structures;
 using ExpressBase.Objects.Objects;
 using ServiceStack;
@@ -287,7 +288,27 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 		[DataMember(Order = 3)]
 		public string icon { get; set; }
+
+		[DataMember(Order = 4)]
+		public EbBotSettings botsettings { get; set; }
+	}
+	
+	[DataContract]
+	public class GetBotSettingsRequest : EbServiceStackRequest, IReturn<GetBotSettingsResponse>
+	{
+		[DataMember(Order = 1)]
+		public int AppId { get; set; }
+
 	}
 
+	[DataContract]
+	public class GetBotSettingsResponse : IEbSSResponse
+	{
+		[DataMember(Order = 1)]
+		public ResponseStatus ResponseStatus { get; set; }
+		
+		[DataMember(Order = 2)]
+		public EbBotSettings Settings { get; set; }
+	}
 
 }
