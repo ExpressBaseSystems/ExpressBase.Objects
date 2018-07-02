@@ -68,6 +68,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 3)]
         public string Value { get; set; }
+
+        [DataMember(Order = 3)]
+        public string Type { get; set; }
     }
 
 

@@ -675,24 +675,24 @@ else {
 
             foreach (EbReportDetail detail in Detail)
             {
-                var SortedList = this.FieldsNotSummaryPerDetail[detail];
+                EbDataField[] SortedList = this.FieldsNotSummaryPerDetail[detail];
                 for (int iSortPos = 0; iSortPos < SortedList.Length; iSortPos++)
                 {
-                    var field = SortedList[iSortPos];
+                    EbDataField field = SortedList[iSortPos];
                     int tableIndex = field.TableIndex;
-                    var column_name = field.ColumnName;
+                    string column_name = field.ColumnName;
                     Phrase phrase;
-                    var column_val = GetDataFieldtValue(column_name, serialnumber, tableIndex);
+                    string column_val = GetDataFieldtValue(column_name, serialnumber, tableIndex);
                     if ((field as EbDataField).RenderInMultiLine)
                     {
-                        var datatype = (DbType)field.DbType;
-                        var val_length = column_val.Length;
+                        DbType datatype = (DbType)field.DbType;
+                        int val_length = column_val.Length;
                         if (field.Font == null)
                             field.Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
                         //    phrase = new Phrase(column_val);
                         //else
                         phrase = new Phrase(column_val, field.ITextFont);
-                        var calculatedValueSize = phrase.Font.CalculatedSize * val_length;
+                        float calculatedValueSize = phrase.Font.CalculatedSize * val_length;
                         if (calculatedValueSize > field.WidthPt)
                         {
                             rowsneeded = (datatype == DbType.Decimal) ? 1 : Convert.ToInt32(Math.Floor(calculatedValueSize / field.WidthPt));
@@ -768,12 +768,12 @@ else {
 
         public void DrawFields(EbReportField field, float section_Yposition, int serialnumber)
         {
-            List<Param> RowParams = (this.Parameters!=null)?this.Parameters:new List<Param>();
+            List<Param> RowParams = new List<Param>();
             try
             {
-                var column_name = string.Empty;
-                var column_val = string.Empty;
-                var column_type = DbType.String;
+                string column_name = string.Empty;
+                string column_val = string.Empty;
+                DbType column_type = DbType.String;
 
                 if (PageSummaryFields.ContainsKey(field.Name) || ReportSummaryFields.ContainsKey(field.EbSid))
                     CallSummerize(field as EbDataField, serialnumber);
@@ -845,24 +845,37 @@ else {
 
                     if (!string.IsNullOrEmpty(_field.LinkRefid))
                     {
-                        var linkparams = LinkCollection[_field.LinkRefid];
-                        foreach (var p in LinkCollection[(field as EbDataField).LinkRefid])
+                        foreach (EbControl control in LinkCollection[(field as EbDataField).LinkRefid])
                         {
-                                var x = this.DataSet.Tables[tableIndex].Rows[serialnumber].GetCellParam(p.Name);
-                                ArrayList IndexToRemove= new ArrayList();
-                                for(int i=0;i<RowParams.Count;i++)//each (var r in l)
+                            int flag = 0;
+                            foreach (Param param in this.Parameters)
+                            {
+                                if (control.Name == param.Name)
                                 {
-                                    if (RowParams[i].Name == p.Name)
-                                    {
-                                        IndexToRemove.Add(i);
-                                    }
+                                    flag = 1;
                                 }
-                                for (int i = 0; i < IndexToRemove.Count; i++)
-                                {
-                                    RowParams.RemoveAt(Convert.ToInt32(IndexToRemove[i]));
-                                }
-                                    RowParams.Add(x);
                             }
+                                if(flag==0)
+                                {   Param x = this.DataSet.Tables[tableIndex].Rows[serialnumber].GetCellParam(control.Name);
+                                    ArrayList IndexToRemove = new ArrayList();
+                                    for (int i = 0; i < RowParams.Count; i++)
+                                    {
+                                        if (RowParams[i].Name == control.Name)
+                                        {
+                                            IndexToRemove.Add(i);
+                                        }
+                                    }
+                                    for (int i = 0; i < IndexToRemove.Count; i++)
+                                    {
+                                        RowParams.RemoveAt(Convert.ToInt32(IndexToRemove[i]));
+                                    }
+                                    RowParams.Add(x);
+                                }
+                        }
+                        if (!this.Parameters.IsEmpty()) {
+                            foreach ( Param p in this.Parameters) {
+                                RowParams.Add(p);
+                            } }
                     }
                    field.DrawMe(Doc, Canvas, HeightPt, section_Yposition, column_val, detailprintingtop, column_type, RowParams);
                 }
@@ -926,20 +939,11 @@ else {
         {
             if (this.ReportObjects != null)
             {
-                foreach (var field in this.ReportObjects)
+                foreach (EbReportField field in this.ReportObjects)
                 {
                     if ((field is EbWaterMark) && (field as EbWaterMark).Image != string.Empty)
                     {
                         byte[] fileByte = GetFile((field as EbWaterMark).Image);
-                        //  byte[] fileByte = myFileService.Post
-                        //(new DownloadFileRequest
-                        //{
-                        //    FileDetails = new FileMeta
-                        //    {
-                        //        FileName = (field as EbWaterMark).Image + ".jpg",
-                        //        FileType = "jpg"
-                        //    }
-                        //});
                         WatermarkImages.Add((field as EbWaterMark).Image, fileByte);
                     }
                 }
@@ -961,8 +965,7 @@ else {
         {
             ColumnText ct = new ColumnText(Canvas);
             Phrase phrase = new Phrase("page:" + PageNumber.ToString() + ", " + UserName + ", " + CurrentTimestamp);
-            //phrase.Font = FontFactory.GetFont("Arial", 4, iTextSharp.text.Font.UNDERLINE, BaseColor.Red);
-            phrase.Font.Size = 6;
+           phrase.Font.Size = 6;
             ct.SetSimpleColumn(phrase, 5, 2, WidthPt - 10, 20, 15, Element.ALIGN_RIGHT);
             ct.Go();
         }
@@ -973,7 +976,7 @@ else {
                 this.EbDataSource = Redis.Get<EbDataSource>(DataSourceRefId);
                 if (this.EbDataSource == null || this.EbDataSource.Sql == null || this.EbDataSource.Sql == string.Empty)
                 {
-                    var result = client.Get<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = this.DataSourceRefId });
+                    EbObjectParticularVersionResponse result = client.Get(new EbObjectParticularVersionRequest { RefId = this.DataSourceRefId });
                     this.EbDataSource = EbSerializers.Json_Deserialize(result.Data[0].Json);
                     Redis.Set<EbDataSource>(DataSourceRefId, this.EbDataSource);
                 }
