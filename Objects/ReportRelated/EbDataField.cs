@@ -308,7 +308,7 @@ namespace ExpressBase.Objects.ReportRelated
     {
         [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("General")]
-        public int DecimalPlaces { get; set; }
+        public int DecimalPlaces { get; set; } = 2;
 
         [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("General")]
@@ -700,7 +700,7 @@ this.BorderColor = '#eae6e6';
 
         [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("General")]
-        public int DecimalPlaces { get; set; }
+        public int DecimalPlaces { get; set; } = 2;
 
         [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("General")]
