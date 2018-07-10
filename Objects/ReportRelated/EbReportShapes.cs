@@ -369,9 +369,11 @@ namespace ExpressBase.Objects.ReportRelated
     public class EbTableLayout : EbReportFieldShape
     {
         [EnableInBuilder(BuilderType.Report)]
+        [DefaultPropValue("3")]
         public int ColoumCount { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
+        [DefaultPropValue("1")]
         public int RowCount { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
