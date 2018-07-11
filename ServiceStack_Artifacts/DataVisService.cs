@@ -116,10 +116,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int Draw { get; set; }
 
         [DataMember(Order = 4)]
-        public int OrderByDir { get; set; }
+        public List<OrderBy> OrderBy { get; set; }
 
-        [DataMember(Order = 5)]
-        public string OrderByCol { get; set; }
+        //[DataMember(Order = 4)]
+        //public int OrderByDir { get; set; }
+
+        //[DataMember(Order = 5)]
+        //public string OrderByCol { get; set; }
 
         [DataMember(Order = 6)]
         public string Token { get; set; }
@@ -228,5 +231,16 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
                 return (this.Columns == null || this.Columns.Count == 0);
             }
         }
+    }
+
+    [DataContract]
+    public class OrderBy
+    {
+        
+        [DataMember(Order = 1)]
+        public string Column { get; set; }
+
+        [DataMember(Order = 2)]
+        public int Direction { get; set; }
     }
 }

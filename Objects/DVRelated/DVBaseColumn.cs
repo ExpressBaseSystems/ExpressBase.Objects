@@ -5,6 +5,7 @@ using ExpressBase.Common.Structures;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Data;
+using System.Runtime.Serialization;
 
 namespace ExpressBase.Objects.Objects.DVRelated
 {
@@ -140,7 +141,15 @@ else
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
     public class DVNumericColumn : DVBaseColumn
     {
+
+        //[OnDeserialized]
+        //public void OnDeserializedMethod(StreamingContext context)
+        //{
+        //    this.Aggregate = true;
+        //}
+
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
+        [DefaultPropValue("true")]
         public bool Aggregate { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
