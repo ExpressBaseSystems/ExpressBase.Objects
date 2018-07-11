@@ -699,6 +699,10 @@ this.BorderColor = '#eae6e6';
         public string CalcFieldType { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
+        public int CalcFieldIntType { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("General")]
         public int DecimalPlaces { get; set; } = 2;
 

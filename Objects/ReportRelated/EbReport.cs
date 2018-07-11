@@ -420,6 +420,8 @@ else {
         [JsonIgnore]
         public Dictionary<string, List<EbControl>> LinkCollection { get; set; }
 
+        [JsonIgnore]
+        public Dictionary<string, NTV> CalcValInRow { get; set; } = new Dictionary<string, NTV>();
 
         public void InitializeSummaryFields()
         {
@@ -784,8 +786,21 @@ else {
                     column_type = (DbType)_field.DbType;
                     int tableIndex = _field.TableIndex;
                     column_name = _field.ColumnName;
-                    Globals globals = new Globals();
-                    globals.CurrentField = field;
+                    Globals globals = new Globals
+                    {
+                        CurrentField = field
+                    };
+                    if (AppearanceScriptCollection.ContainsKey(field.Name) || field is EbCalcField)
+                    {
+                        foreach (string key in CalcValInRow.Keys)//adding Calc to global
+                        {
+                            globals["Calc"].Add(key, CalcValInRow[key]);
+                        }
+                        foreach (Param p in Parameters) //adding Params to global
+                        {
+                            globals["Params"].Add(p.Name, new NTV { Name = p.Name, Type = (EbDbTypes)Convert.ToInt32(p.Type), Value = p.Value });
+                        }
+                    }
                     if (AppearanceScriptCollection.ContainsKey(field.Name))
                     {
 
@@ -833,6 +848,7 @@ else {
                                 globals[TName].Add(fName, new NTV { Name = fName, Type = this.DataSet.Tables[0].Columns[fName].Type, Value = this.DataSet.Tables[0].Rows[serialnumber][fName] });
                             }
                             column_val = (ValueScriptCollection[field.Name].RunAsync(globals)).Result.ReturnValue.ToString();
+                          CalcValInRow.Add(field.Title,new NTV { Name=field.Title,Type= (EbDbTypes)((field as EbCalcField).CalcFieldIntType),Value= column_val });
                         }
                         catch (Exception e)
                         {

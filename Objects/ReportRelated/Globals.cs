@@ -19,6 +19,8 @@ namespace ExpressBase.Objects.Objects.ReportRelated
         public dynamic T7 { get; set; }
         public dynamic T8 { get; set; }
         public dynamic T9 { get; set; }
+        public dynamic Params { get; set; }
+        public dynamic Calc { get; set; }
 
         public dynamic CurrentField { get; set; }
 
@@ -34,6 +36,8 @@ namespace ExpressBase.Objects.Objects.ReportRelated
             T7 = new NTVDict();
             T8 = new NTVDict();
             T9 = new NTVDict();
+            Params = new NTVDict();
+            Calc = new NTVDict();
         }
 
         public dynamic this[string tableIndex]
@@ -60,6 +64,10 @@ namespace ExpressBase.Objects.Objects.ReportRelated
                     return this.T8;
                 else if (tableIndex == "T9")
                     return this.T9;
+                else if (tableIndex == "Params")
+                    return this.Params;
+                else if (tableIndex == "Calc")
+                    return this.Calc;
                 else
                     return this.T0;
             }
@@ -92,6 +100,10 @@ namespace ExpressBase.Objects.Objects.ReportRelated
                     result = Convert.ToInt32((x as NTV).Value);
                 else if (_data.Type == EbDbTypes.Decimal)
                     result = Convert.ToDecimal((x as NTV).Value);
+                else if (_data.Type == EbDbTypes.String)
+                    result = ((x as NTV).Value).ToString();
+                else if (_data.Type == EbDbTypes.DateTime)
+                    result = Convert.ToDateTime((x as NTV).Value);
                 else
                     result = (x as NTV).Value.ToString();
 
