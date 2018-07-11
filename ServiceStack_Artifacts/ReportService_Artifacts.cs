@@ -38,6 +38,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string DataSourceRefId { get; set; }
 
         public string ValueExpression { get; set; }
+
+        public List<Param> Parameters { get; set; }
     }
 
     [DataContract]

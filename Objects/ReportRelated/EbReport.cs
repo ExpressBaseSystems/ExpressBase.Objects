@@ -420,6 +420,8 @@ else {
         [JsonIgnore]
         public Dictionary<string, List<EbControl>> LinkCollection { get; set; }
 
+        [JsonIgnore]
+        public Dictionary<string, NTV> CalcValInRow { get; set; } = new Dictionary<string, NTV>();
 
         public void InitializeSummaryFields()
         {
@@ -786,6 +788,10 @@ else {
                     column_name = _field.ColumnName;
                     Globals globals = new Globals();
                     globals.CurrentField = field;
+                    foreach (Param p in Parameters) //adding Params to global
+                    {
+                        globals["Params"].Add(p.Name, new NTV { Name = p.Name, Type = (EbDbTypes)Convert.ToInt32(p.Type), Value = p.Value });
+                    }
                     if (AppearanceScriptCollection.ContainsKey(field.Name))
                     {
 
@@ -833,6 +839,7 @@ else {
                                 globals[TName].Add(fName, new NTV { Name = fName, Type = this.DataSet.Tables[0].Columns[fName].Type, Value = this.DataSet.Tables[0].Rows[serialnumber][fName] });
                             }
                             column_val = (ValueScriptCollection[field.Name].RunAsync(globals)).Result.ReturnValue.ToString();
+                           // CalcValInRow.Add(field.Name,new NTV { Name=field.Name,Type=field.});
                         }
                         catch (Exception e)
                         {

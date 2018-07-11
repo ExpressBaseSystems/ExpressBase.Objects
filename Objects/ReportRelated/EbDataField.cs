@@ -94,7 +94,7 @@ namespace ExpressBase.Objects.ReportRelated
 
             ColumnText ct = new ColumnText(canvas);
             Phrase text;
-
+            
             if (this.Prefix != "" || this.Suffix != "")
             {
                 column_val = this.Prefix + " " + column_val + " " + this.Suffix;
@@ -308,7 +308,7 @@ namespace ExpressBase.Objects.ReportRelated
     {
         [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("General")]
-        public int DecimalPlaces { get; set; }
+        public int DecimalPlaces { get; set; } = 2;
 
         [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("General")]
@@ -335,6 +335,7 @@ this.Border = 1;
 this.BorderColor = '#eae6e6';
 };";
         }
+
         public override void DrawMe(Document doc, PdfContentByte canvas, float reportHeight, float printingTop, string column_val, float detailprintingtop, DbType column_type, List<Param> Params)
         {
             Phrase text;
@@ -473,8 +474,7 @@ this.Border = 1;
 this.BorderColor = '#eae6e6';
 };";
         }
-
-        public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, string column_val, float detailprintingtop, DbType column_type)
+        public override void DrawMe(Document doc, PdfContentByte canvas, float reportHeight, float printingTop, string column_val, float detailprintingtop, DbType column_type, List<Param> Params)
         {
             Phrase text;
             var ury = reportHeight - (printingTop + this.TopPt + detailprintingtop);
@@ -699,8 +699,12 @@ this.BorderColor = '#eae6e6';
         public string CalcFieldType { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
+        public int CalcFieldIntType { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("General")]
-        public int DecimalPlaces { get; set; }
+        public int DecimalPlaces { get; set; } = 2;
 
         [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("General")]
@@ -746,7 +750,7 @@ this.BorderColor = '#eae6e6';
         };";
         }
 
-        public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, string column_val, float detailprintingtop, DbType column_type)
+        public override void DrawMe(Document doc, PdfContentByte canvas, float reportHeight, float printingTop, string column_val, float detailprintingtop, DbType column_type, List<Param> Params)
         {
             ColumnText ct = new ColumnText(canvas);
             Phrase text = null;
@@ -867,8 +871,7 @@ this.BorderColor = '#eae6e6';
         this.BorderColor = '#eae6e6';
         };";
         }
-
-        public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, string column_val, float detailprintingtop, DbType column_type)
+        public override void DrawMe(Document doc, PdfContentByte canvas, float reportHeight, float printingTop, string column_val, float detailprintingtop, DbType column_type, List<Param> Params)
         {
             Phrase text;
             var ury = reportHeight - (printingTop + this.TopPt + detailprintingtop);
