@@ -168,7 +168,7 @@ namespace ExpressBase.Objects
     </div>
 </div>"
 .Replace("$$", obj.Name.ToString())
-.Replace("@type@", obj.Type.ToString())
+.Replace("@type@", ((int)obj.Type).ToString())
 .Replace("@sTitle@", obj.sTitle.ToString())
 .Replace("@perWidth@", ((int)(100 / noOfFileds)).ToString())
 .Replace("@border-r" + i, (i != noOfFileds - 1) ? "style='border-radius: 0px;'" : "");

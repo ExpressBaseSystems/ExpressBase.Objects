@@ -117,10 +117,10 @@ namespace ExpressBase.Objects.Objects.DVRelated
         }
     }
 
-    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
+    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
     public class DVStringColumn : DVBaseColumn
     {
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
         [DefaultPropValue("1")]
         [PropertyEditor(PropertyEditorType.DropDown)]
         [OnChangeExec(@"
@@ -131,22 +131,22 @@ else
         public StringRenderType RenderAs { get; set; }
 
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iTableVisualization, EbObjectTypes.iChartVisualization, EbObjectTypes.iReport)]
         public string LinkRefId { get; set; }
     }
 
-    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
+    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
     public class DVNumericColumn : DVBaseColumn
     {
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
         public bool Aggregate { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
         public int DecimalPlaces { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
         [OnChangeExec(@"
 if(this.RenderAs !== 2)
     pg.HideProperty('LinkRefId')
@@ -154,26 +154,26 @@ else
     pg.ShowProperty('LinkRefId')")]
         public NumericRenderType RenderAs { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iTableVisualization, EbObjectTypes.iChartVisualization, EbObjectTypes.iReport)]
         public string LinkRefId { get; set; }
     }
 
-    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
+    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
     public class DVBooleanColumn : DVBaseColumn
     {
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
         public BooleanRenderType RenderAs { get; set; }
     }
 
-    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
+    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
     public class DVDateTimeColumn : DVBaseColumn
     {
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
         public DateFormat Format { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
         [OnChangeExec(@"
 if(this.RenderAs !== 1)
     pg.HideProperty('LinkRefId')
@@ -181,7 +181,7 @@ else
     pg.ShowProperty('LinkRefId')")]
         public DateTimeRenderType RenderAs { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iTableVisualization, EbObjectTypes.iChartVisualization, EbObjectTypes.iReport)]
         public string LinkRefId { get; set; }
