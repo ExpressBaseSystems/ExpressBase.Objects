@@ -31,14 +31,14 @@ namespace ExpressBase.Objects
             this.ValueType = EbRadioValueType.Boolean;
         }
 
-		[HideInPropertyGrid]
-		[EnableInBuilder(BuilderType.BotForm)]
-		public override bool IsReadOnly { get => this.ReadOnly; }
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.BotForm)]
+        public override bool IsReadOnly { get => this.ReadOnly; }
 
-		[OnDeserialized]
+        [OnDeserialized]
         public void OnDeserializedMethod(StreamingContext context)
         {
-             this.BareControlHtml = this.GetBareHtml();
+            this.BareControlHtml = this.GetBareHtml();
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
 
@@ -60,6 +60,10 @@ namespace ExpressBase.Objects
         [Alias("Options")]
         public List<EbRadioOptionAbstract> Options { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        public bool RenderHorizontally { get; set; }
+
         public override string GetToolHtml()
         {
             return @"<div eb-type='@toolName' class='tool'> &#9673;  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
@@ -68,10 +72,12 @@ namespace ExpressBase.Objects
         public override string GetBareHtml()
         {
             string html = "<div id='@name@' data-ebtype='@data-ebtype@' name='@name@' style='padding:5px' type='RadioGroup'>";
-              foreach (EbRadioOption ec in this.Options)
+            foreach (EbRadioOption ec in this.Options)
             {
                 ec.GName = this.Name;
-                html += ec.GetHtml().Replace("@defaultcheked@",((this.Options.IndexOf(ec) == 0) ? " checked='checked' " : ""));
+                html += ec.GetHtml()
+                    .Replace("@radio-wrap-block@", (this.RenderHorizontally ? "radio-wrap-block" : String.Empty))
+                    .Replace("@defaultcheked@", ((this.Options.IndexOf(ec) == 0) ? " checked='checked' " : ""));
             }
             html += "</div>";
             return html
@@ -140,7 +146,7 @@ this.Init = function(id)
 
         public override string GetBareHtml()
         {
-            return @"<div class='radio-wrap' onclick=""event.stopPropagation();$('#@name@').prop('checked', true);"">
+            return @"<div class='radio-wrap @radio-wrap-block@' onclick=""event.stopPropagation();$('#@name@').prop('checked', true);"">
                         <input type ='radio' id='@name@' @defaultcheked@ value='@value@' name='@gname@'>
                         <span id='@name@Lbl' style='@LabelBackColor @LabelForeColor '> @label@  </span>
                     </div>"
