@@ -112,14 +112,14 @@ namespace ExpressBase.Objects
     {
         [EnableInBuilder(BuilderType.Report)]
         [OnChangeExec(@"
-if (this.PaperSize === 6 ){  
-     pg.ShowProperty('CustomPaperHeight');
-     pg.ShowProperty('CustomPaperWidth');
-}
-else {
-     pg.HideProperty('CustomPaperHeight');
-     pg.HideProperty('CustomPaperWidth');
-}
+                if (this.PaperSize === 6 ){  
+                        pg.ShowProperty('CustomPaperHeight');
+                        pg.ShowProperty('CustomPaperWidth');
+                }
+                else {
+                        pg.HideProperty('CustomPaperHeight');
+                        pg.HideProperty('CustomPaperWidth');
+                }
             ")]
         [PropertyGroup("General")]
         public PaperSize PaperSize { get; set; }
@@ -514,8 +514,11 @@ else {
         {
             //var column_name = string.Empty;
             var column_val = string.Empty;
-            Globals globals = new Globals();
-            globals.CurrentField = field;
+            Globals globals = new Globals
+            {
+                CurrentField = field
+            };
+            AddParamsNCalcsInGlobal(globals);
             if (field is EbCalcField)
             {
                 foreach (string calcfd in (field as EbCalcField).DataFieldsUsedCalc)
@@ -792,14 +795,7 @@ else {
                     };
                     if (AppearanceScriptCollection.ContainsKey(field.Name) || field is EbCalcField)
                     {
-                        foreach (string key in CalcValInRow.Keys)//adding Calc to global
-                        {
-                            globals["Calc"].Add(key, CalcValInRow[key]);
-                        }
-                        foreach (Param p in Parameters) //adding Params to global
-                        {
-                            globals["Params"].Add(p.Name, new NTV { Name = p.Name, Type = (EbDbTypes)Convert.ToInt32(p.Type), Value = p.Value });
-                        }
+                        AddParamsNCalcsInGlobal(globals);
                     }
                     if (AppearanceScriptCollection.ContainsKey(field.Name))
                     {
@@ -848,7 +844,7 @@ else {
                                 globals[TName].Add(fName, new NTV { Name = fName, Type = this.DataSet.Tables[0].Columns[fName].Type, Value = this.DataSet.Tables[0].Rows[serialnumber][fName] });
                             }
                             column_val = (ValueScriptCollection[field.Name].RunAsync(globals)).Result.ReturnValue.ToString();
-                          CalcValInRow.Add(field.Title,new NTV { Name=field.Title,Type= (EbDbTypes)((field as EbCalcField).CalcFieldIntType),Value= column_val });
+                            CalcValInRow.Add(field.Title, new NTV { Name = field.Title, Type = (EbDbTypes)((field as EbCalcField).CalcFieldIntType), Value = column_val });
                         }
                         catch (Exception e)
                         {
@@ -871,29 +867,33 @@ else {
                                     flag = 1;
                                 }
                             }
-                                if(flag==0)
-                                {   Param x = this.DataSet.Tables[tableIndex].Rows[serialnumber].GetCellParam(control.Name);
-                                    ArrayList IndexToRemove = new ArrayList();
-                                    for (int i = 0; i < RowParams.Count; i++)
+                            if (flag == 0)
+                            {
+                                Param x = this.DataSet.Tables[tableIndex].Rows[serialnumber].GetCellParam(control.Name);
+                                ArrayList IndexToRemove = new ArrayList();
+                                for (int i = 0; i < RowParams.Count; i++)
+                                {
+                                    if (RowParams[i].Name == control.Name)
                                     {
-                                        if (RowParams[i].Name == control.Name)
-                                        {
-                                            IndexToRemove.Add(i);
-                                        }
+                                        IndexToRemove.Add(i);
                                     }
-                                    for (int i = 0; i < IndexToRemove.Count; i++)
-                                    {
-                                        RowParams.RemoveAt(Convert.ToInt32(IndexToRemove[i]));
-                                    }
-                                    RowParams.Add(x);
                                 }
+                                for (int i = 0; i < IndexToRemove.Count; i++)
+                                {
+                                    RowParams.RemoveAt(Convert.ToInt32(IndexToRemove[i]));
+                                }
+                                RowParams.Add(x);
+                            }
                         }
-                        if (!this.Parameters.IsEmpty()) {
-                            foreach ( Param p in this.Parameters) {
+                        if (!this.Parameters.IsEmpty())
+                        {
+                            foreach (Param p in this.Parameters)
+                            {
                                 RowParams.Add(p);
-                            } }
+                            }
+                        }
                     }
-                   field.DrawMe(Doc, Canvas, HeightPt, section_Yposition, column_val, detailprintingtop, column_type, RowParams);
+                    field.DrawMe(Doc, Canvas, HeightPt, section_Yposition, column_val, detailprintingtop, column_type, RowParams);
                 }
 
                 if ((field is EbPageNo) || (field is EbPageXY) || (field is EbDateTime) || (field is EbSerialNumber) || (field is EbUserName) || (field is EbParameter))
@@ -977,14 +977,16 @@ else {
             Stamp.FormFlattening = true;
             Stamp.Close();
         }
+
         public void SetDetail()
         {
             ColumnText ct = new ColumnText(Canvas);
             Phrase phrase = new Phrase("page:" + PageNumber.ToString() + ", " + UserName + ", " + CurrentTimestamp);
-           phrase.Font.Size = 6;
+            phrase.Font.Size = 6;
             ct.SetSimpleColumn(phrase, 5, 2, WidthPt - 10, 20, 15, Element.ALIGN_RIGHT);
             ct.Go();
         }
+
         public override void AfterRedisGet(RedisClient Redis, IServiceClient client)
         {
             try
@@ -1042,6 +1044,18 @@ else {
             }
 
             return fileByte;
+        }
+
+        public void AddParamsNCalcsInGlobal(Globals globals)
+        {
+            foreach (string key in CalcValInRow.Keys)//adding Calc to global
+            {
+                globals["Calc"].Add(key, CalcValInRow[key]);
+            }
+            foreach (Param p in Parameters) //adding Params to global
+            {
+                globals["Params"].Add(p.Name, new NTV { Name = p.Name, Type = (EbDbTypes)Convert.ToInt32(p.Type), Value = p.Value });
+            }
         }
     }
 
