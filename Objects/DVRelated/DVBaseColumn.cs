@@ -5,6 +5,7 @@ using ExpressBase.Common.Structures;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Data;
+using System.Runtime.Serialization;
 
 namespace ExpressBase.Objects.Objects.DVRelated
 {

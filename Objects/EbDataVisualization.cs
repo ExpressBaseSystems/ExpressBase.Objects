@@ -310,7 +310,18 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
-        [HideForUser]
+        [OnChangeExec(@"
+            console.log('outer' + this.rowGrouping.$values.length);
+        if(this.rowGrouping.$values.length > 0){
+            console.log(this.rowGrouping.$values.length);
+            pg.HideProperty('LeftFixedColumn')
+            pg.HideProperty('RightFixedColumn')
+        }
+
+        else{
+            pg.ShowProperty('LeftFixedColumn')
+            pg.ShowProperty('RightFixedColumn')
+        }")]
         public List<DVBaseColumn> rowGrouping { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
