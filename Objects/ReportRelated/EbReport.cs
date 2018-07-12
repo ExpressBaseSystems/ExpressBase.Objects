@@ -601,15 +601,14 @@ namespace ExpressBase.Objects
         public void DrawDetail()
         {
             int tableIndex = 0;
-            foreach (EbReportDetail detail in Detail)
+            foreach (EbDataTable ebtbl in DataSet.Tables)
             {
-                foreach (EbReportField field in detail.Fields)
-                {
-                    if (field is EbDataField)
-                        tableIndex = (field as EbDataField).TableIndex;   //Detail[0].Fields[0] hack by Amal
-                }
+                if (ebtbl.Rows.Count > 1)
+                    break;
+
+                tableIndex++;
             }
-            //var rows = (DataSourceRefId != string.Empty) ? DataRows: null;
+
             var rows = (DataSourceRefId != string.Empty) ? DataSet.Tables[tableIndex].Rows : null;
             if (rows != null)
             {
