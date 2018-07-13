@@ -97,12 +97,20 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.Report)]
     public class Margin
     {
+        [EnableInBuilder(BuilderType.Report)]
+        [PropertyEditor(PropertyEditorType.Number)]
         public float Left { get; set; }
 
+        [EnableInBuilder(BuilderType.Report)]
+        [PropertyEditor(PropertyEditorType.Number)]
         public float Right { get; set; }
 
+        [EnableInBuilder(BuilderType.Report)]
+        [PropertyEditor(PropertyEditorType.Number)]
         public float Top { get; set; }
 
+        [EnableInBuilder(BuilderType.Report)]
+        [PropertyEditor(PropertyEditorType.Number)]
         public float Bottom { get; set; }
 
     }
@@ -112,7 +120,7 @@ namespace ExpressBase.Objects
     {
         [EnableInBuilder(BuilderType.Report)]
         [OnChangeExec(@"
-                if (this.PaperSize === 6 ){  
+                if (this.PaperSize === 5 ){ 
                         pg.ShowProperty('CustomPaperHeight');
                         pg.ShowProperty('CustomPaperWidth');
                 }
@@ -121,27 +129,27 @@ namespace ExpressBase.Objects
                         pg.HideProperty('CustomPaperWidth');
                 }
             ")]
-        [PropertyGroup("General")]
+        [PropertyGroup("Dimensions")]
         public PaperSize PaperSize { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup("Dimensions")]
+        [UIproperty]
+        public float CustomPaperHeight { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup("Dimensions")]
+        [UIproperty]
+        public float CustomPaperWidth { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
         [PropertyEditor(PropertyEditorType.Expandable)]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup("Dimensions")]
         public Margin Margin { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]
         public float DesignPageHeight { get; set; }
-
-        [EnableInBuilder(BuilderType.Report)]
-        [PropertyGroup("General")]
-        [UIproperty]
-        public float CustomPaperHeight { get; set; }
-
-        [EnableInBuilder(BuilderType.Report)]
-        [PropertyGroup("General")]
-        [UIproperty]
-        public float CustomPaperWidth { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("General")]
@@ -153,35 +161,37 @@ namespace ExpressBase.Objects
         [UIproperty]
         public string OwnerPassword { get; set; }
 
-        //[HideInPropertyGrid]
-        //[JsonIgnore]
-        //public new string Description { get; set; }
-
-        //[EnableInBuilder(BuilderType.Report)]
-        //[HideInPropertyGrid]
-        //public new string Left { get; set; }
-
-        //[HideInPropertyGrid]
-        //public new string Top { get; set; }
-
-        //[HideInPropertyGrid]
-        //public new string Height { get; set; }
-
-        //[HideInPropertyGrid]
-        //public new string Width { get; set; }
-
-        //[HideInPropertyGrid]
-        //public new string Title { get; set; }
-
-        //[HideInPropertyGrid]
-        //public new string ForeColor { get; set; }
+        [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
+        public override string Width { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
-        [PropertyGroup("General")]
+        [HideInPropertyGrid]
+        public override string Left { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
+        public override string Top { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
+        public override string Height { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
+        public override string ForeColor { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
+        public override string Title { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup("Appearance")]
         public bool IsLandscape { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [PropertyEditor(PropertyEditorType.ImageSeletor)]
+        [PropertyGroup("Appearance")]
         public string BackgroundImage { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
@@ -214,6 +224,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.Report)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iDataSource)]
+        [PropertyGroup("Data")]
         public string DataSourceRefId { get; set; }
 
         //[JsonIgnore]
@@ -1075,42 +1086,36 @@ namespace ExpressBase.Objects
     {
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
-        //[HideInPropertyGrid]
+        [MetaOnly]
         public string SectionHeight { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]
         public List<EbReportField> Fields { get; set; }
 
-        //[EnableInBuilder(BuilderType.Report)]
-        //[HideInPropertyGrid]
-        //public new string Left { get; set; }
+        [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
+        public override string Left { get; set; }
 
-        //[EnableInBuilder(BuilderType.Report)]
-        //[HideInPropertyGrid]
-        //public new string Top { get; set; }
+        [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
+        public override string Top { get; set; }
 
-        //[EnableInBuilder(BuilderType.Report)]
-        //[UIproperty]
-        //[HideInPropertyGrid]
-        //public new string Height { get; set; }
+        [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
+        public override string Height { get; set; }
 
-        //[EnableInBuilder(BuilderType.Report)]
-        //[UIproperty]
-        //[HideInPropertyGrid]
-        //public new string Width { get; set; }
+        [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
+        public override string Width { get; set; }
 
-        //[EnableInBuilder(BuilderType.Report)]
-        //[UIproperty]
-        //[HideInPropertyGrid]
-        //public new string Title { get; set; }
+        [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
+        public override string Title { get; set; }
 
-        //[HideInPropertyGrid]
-        //[JsonIgnore]
-        //public new string Description { get; set; }
-
-        //[HideInPropertyGrid]
-        //public new string ForeColor { get; set; }
+        [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
+        public override string ForeColor { get; set; }
 
     }
 
