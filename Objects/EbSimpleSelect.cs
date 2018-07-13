@@ -108,7 +108,7 @@ namespace ExpressBase.Objects
         public override string GetBareHtml()
         {
             return @"
-        <select id='@name@' name='@name@' data-ebtype='@data-ebtype@'>
+        <select id='@name@' name='@name@' data-ebtype='@data-ebtype@' style='width: 100%;'>
             @options@
         </select>"
 .Replace("@name@", this.Name)
