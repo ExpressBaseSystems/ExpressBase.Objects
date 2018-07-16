@@ -1009,15 +1009,18 @@ namespace ExpressBase.Objects
         {
             try
             {
-                this.EbDataSource = Redis.Get<EbDataSource>(DataSourceRefId);
-                if (this.EbDataSource == null || this.EbDataSource.Sql == null || this.EbDataSource.Sql == string.Empty)
+                if (DataSourceRefId!=string.Empty)
                 {
-                    EbObjectParticularVersionResponse result = client.Get(new EbObjectParticularVersionRequest { RefId = this.DataSourceRefId });
-                    this.EbDataSource = EbSerializers.Json_Deserialize(result.Data[0].Json);
-                    Redis.Set<EbDataSource>(DataSourceRefId, this.EbDataSource);
+                    this.EbDataSource = Redis.Get<EbDataSource>(DataSourceRefId);
+                    if (this.EbDataSource == null || this.EbDataSource.Sql == null || this.EbDataSource.Sql == string.Empty)
+                    {
+                        EbObjectParticularVersionResponse result = client.Get(new EbObjectParticularVersionRequest { RefId = this.DataSourceRefId });
+                        this.EbDataSource = EbSerializers.Json_Deserialize(result.Data[0].Json);
+                        Redis.Set<EbDataSource>(DataSourceRefId, this.EbDataSource);
+                    }
+                    if (this.EbDataSource.FilterDialogRefId != string.Empty)
+                        this.EbDataSource.AfterRedisGet(Redis, client);
                 }
-                if (this.EbDataSource.FilterDialogRefId != string.Empty)
-                    this.EbDataSource.AfterRedisGet(Redis, client);
             }
             catch (Exception e)
             {

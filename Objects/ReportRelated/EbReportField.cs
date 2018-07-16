@@ -222,8 +222,8 @@ this.BorderColor = '#eae6e6';
                 img.SetAbsolutePosition(this.LeftPt, reportHeight - this.TopPt - this.HeightPt);
                 PdfGState _state = new PdfGState()
                 {
-                    FillOpacity = 0.2F,
-                    StrokeOpacity = 0.2F
+                    FillOpacity = 0.1F,
+                    StrokeOpacity = 0.1F
                 };
                 PdfContentByte cb = writer.DirectContentUnder;
                 cb.SaveState();
