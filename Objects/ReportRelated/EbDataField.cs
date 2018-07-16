@@ -24,45 +24,50 @@ namespace ExpressBase.Objects.ReportRelated
         public virtual void NotifyNewPage(bool status) { }
 
         [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
         public string SummaryOf { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
-        [PropertyGroup("General")]
-        [UIproperty]
+        [HideInPropertyGrid]
         public int DbType { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
-        [PropertyGroup("General")]
-        [UIproperty]
+        [HideInPropertyGrid]
         public int TableIndex { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
-        [PropertyGroup("General")]
-        [UIproperty]
+        [HideInPropertyGrid]
         public string ColumnName { get; set; }
 
+        [OnChangeExec(@"
+            pg.MakeReadOnly('Title');
+        ")]
         [EnableInBuilder(BuilderType.Report)]
-        [PropertyGroup("General")]
+        public override string Title { set; get; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup("Data Settings")]
         [UIproperty]
         public string Prefix { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
-        [PropertyGroup("General")]
+        [PropertyGroup("Data Settings")]
         [UIproperty]
         public string Suffix { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
-        [PropertyGroup("General")]
+        [PropertyGroup("Data Settings")]
         [UIproperty]
         public Boolean RenderInMultiLine { get; set; } = true;
 
         [EnableInBuilder(BuilderType.Report)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iReport)]
+        [PropertyGroup("Data Settings")]
         public string LinkRefid { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
-        [PropertyGroup("General")]
+        [PropertyGroup("Data Settings")]
         [UIproperty]
         [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
         [JsonConverter(typeof(Base64Converter))]
@@ -207,8 +212,7 @@ namespace ExpressBase.Objects.ReportRelated
     public class EbDataFieldDateTime : EbDataField
     {
         [EnableInBuilder(BuilderType.Report)]
-        [UIproperty]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup("Data Settings")]
         public DateFormatReport Format { get; set; }
 
         public override string GetDesignHtml()
@@ -307,15 +311,15 @@ namespace ExpressBase.Objects.ReportRelated
     public class EbDataFieldNumeric : EbDataField
     {
         [EnableInBuilder(BuilderType.Report)]
-        [PropertyGroup("General")]
+        [PropertyGroup("Data Settings")]
         public int DecimalPlaces { get; set; } = 2;
 
         [EnableInBuilder(BuilderType.Report)]
-        [PropertyGroup("General")]
+        [PropertyGroup("Data Settings")]
         public bool InLetters { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
-        [PropertyGroup("General")]
+        [PropertyGroup("Data Settings")]
         public bool SuppressIfZero { get; set; }
 
         public override string GetDesignHtml()
@@ -391,6 +395,7 @@ this.BorderColor = '#eae6e6';
     public class EbDataFieldNumericSummary : EbDataFieldNumeric, IEbDataFieldSummary
     {
         [EnableInBuilder(BuilderType.Report)]
+        [MetaOnly]
         public SummaryFunctionsNumeric Function { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
@@ -502,6 +507,7 @@ this.BorderColor = '#eae6e6';
     public class EbDataFieldTextSummary : EbDataFieldText, IEbDataFieldSummary
     {
         [EnableInBuilder(BuilderType.Report)]
+        [MetaOnly]
         public SummaryFunctionsText Function { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
@@ -572,6 +578,7 @@ this.BorderColor = '#eae6e6';
     public class EbDataFieldDateTimeSummary : EbDataFieldDateTime, IEbDataFieldSummary
     {
         [EnableInBuilder(BuilderType.Report)]
+        [MetaOnly]
         public SummaryFunctionsDateTime Function { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
@@ -642,6 +649,7 @@ this.BorderColor = '#eae6e6';
     public class EbDataFieldBooleanSummary : EbDataFieldBoolean, IEbDataFieldSummary
     {
         [EnableInBuilder(BuilderType.Report)]
+        [MetaOnly]
         public SummaryFunctionsBoolean Function { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
@@ -688,14 +696,14 @@ this.BorderColor = '#eae6e6';
     public class EbCalcField : EbDataField
     {
         [EnableInBuilder(BuilderType.Report)]
-        [PropertyGroup("General")]
-        [UIproperty]
+        [PropertyGroup("Data Settings")]
         [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
         [JsonConverter(typeof(Base64Converter))]
         public string ValueExpression { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
+        [MetaOnly]
         public string CalcFieldType { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
@@ -703,11 +711,11 @@ this.BorderColor = '#eae6e6';
         public int CalcFieldIntType { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
-        [PropertyGroup("General")]
+        [PropertyGroup("Data Settings")]
         public int DecimalPlaces { get; set; } = 2;
 
         [EnableInBuilder(BuilderType.Report)]
-        [PropertyGroup("General")]
+        [PropertyGroup("Data Settings")]
         public bool InLetters { get; set; }
 
         private string[] _dataFieldsUsed;
@@ -788,6 +796,7 @@ this.BorderColor = '#eae6e6';
     public class EbCalcFieldNumericSummary : EbCalcField, IEbDataFieldSummary
     {
         [EnableInBuilder(BuilderType.Report)]
+        [MetaOnly]
         public SummaryFunctionsNumeric Function { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
@@ -900,6 +909,7 @@ this.BorderColor = '#eae6e6';
     public class EbCalcFieldTextSummary : EbCalcField, IEbDataFieldSummary
     {
         [EnableInBuilder(BuilderType.Report)]
+        [MetaOnly]
         public SummaryFunctionsText Function { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
@@ -970,6 +980,7 @@ this.BorderColor = '#eae6e6';
     public class EbCalcFieldDateTimeSummary : EbCalcField, IEbDataFieldSummary
     {
         [EnableInBuilder(BuilderType.Report)]
+        [MetaOnly]
         public SummaryFunctionsDateTime Function { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
@@ -1039,6 +1050,7 @@ this.BorderColor = '#eae6e6';
     public class EbCalcFieldBooleanSummary : EbCalcField, IEbDataFieldSummary
     {
         [EnableInBuilder(BuilderType.Report)]
+        [MetaOnly]
         public SummaryFunctionsBoolean Function { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]

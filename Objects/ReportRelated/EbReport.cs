@@ -8,7 +8,7 @@ using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.ServiceClients;
 using ExpressBase.Common.Structures;
-using ExpressBase.Objects.Objects.ReportRelated;
+using ExpressBase.Objects.Objects;
 using ExpressBase.Objects.ReportRelated;
 using ExpressBase.Objects.ServiceStack_Artifacts;
 using iTextSharp.text;
@@ -97,12 +97,20 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.Report)]
     public class Margin
     {
+        [EnableInBuilder(BuilderType.Report)]
+        [PropertyEditor(PropertyEditorType.Number)]
         public float Left { get; set; }
 
+        [EnableInBuilder(BuilderType.Report)]
+        [PropertyEditor(PropertyEditorType.Number)]
         public float Right { get; set; }
 
+        [EnableInBuilder(BuilderType.Report)]
+        [PropertyEditor(PropertyEditorType.Number)]
         public float Top { get; set; }
 
+        [EnableInBuilder(BuilderType.Report)]
+        [PropertyEditor(PropertyEditorType.Number)]
         public float Bottom { get; set; }
 
     }
@@ -112,7 +120,7 @@ namespace ExpressBase.Objects
     {
         [EnableInBuilder(BuilderType.Report)]
         [OnChangeExec(@"
-                if (this.PaperSize === 6 ){  
+                if (this.PaperSize === 5 ){ 
                         pg.ShowProperty('CustomPaperHeight');
                         pg.ShowProperty('CustomPaperWidth');
                 }
@@ -121,27 +129,27 @@ namespace ExpressBase.Objects
                         pg.HideProperty('CustomPaperWidth');
                 }
             ")]
-        [PropertyGroup("General")]
+        [PropertyGroup("Dimensions")]
         public PaperSize PaperSize { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup("Dimensions")]
+        [UIproperty]
+        public float CustomPaperHeight { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup("Dimensions")]
+        [UIproperty]
+        public float CustomPaperWidth { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
         [PropertyEditor(PropertyEditorType.Expandable)]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup("Dimensions")]
         public Margin Margin { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]
         public float DesignPageHeight { get; set; }
-
-        [EnableInBuilder(BuilderType.Report)]
-        [PropertyGroup("General")]
-        [UIproperty]
-        public float CustomPaperHeight { get; set; }
-
-        [EnableInBuilder(BuilderType.Report)]
-        [PropertyGroup("General")]
-        [UIproperty]
-        public float CustomPaperWidth { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("General")]
@@ -153,35 +161,37 @@ namespace ExpressBase.Objects
         [UIproperty]
         public string OwnerPassword { get; set; }
 
-        //[HideInPropertyGrid]
-        //[JsonIgnore]
-        //public new string Description { get; set; }
-
-        //[EnableInBuilder(BuilderType.Report)]
-        //[HideInPropertyGrid]
-        //public new string Left { get; set; }
-
-        //[HideInPropertyGrid]
-        //public new string Top { get; set; }
-
-        //[HideInPropertyGrid]
-        //public new string Height { get; set; }
-
-        //[HideInPropertyGrid]
-        //public new string Width { get; set; }
-
-        //[HideInPropertyGrid]
-        //public new string Title { get; set; }
-
-        //[HideInPropertyGrid]
-        //public new string ForeColor { get; set; }
+        [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
+        public override string Width { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
-        [PropertyGroup("General")]
+        [HideInPropertyGrid]
+        public override string Left { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
+        public override string Top { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
+        public override string Height { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
+        public override string ForeColor { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
+        public override string Title { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup("Appearance")]
         public bool IsLandscape { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [PropertyEditor(PropertyEditorType.ImageSeletor)]
+        [PropertyGroup("Appearance")]
         public string BackgroundImage { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
@@ -214,6 +224,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.Report)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iDataSource)]
+        [PropertyGroup("Data")]
         public string DataSourceRefId { get; set; }
 
         //[JsonIgnore]
@@ -484,8 +495,10 @@ namespace ExpressBase.Objects
 
         public string GetDataFieldtValue(string column_name, int i, int tableIndex)
         {
-            // return this.DataRows[i][column_name].ToString();
-            return this.DataSet.Tables[tableIndex].Rows[i][column_name].ToString();
+            if (this.DataSet.Tables[tableIndex].Rows.Count > 1)
+                return this.DataSet.Tables[tableIndex].Rows[i][column_name].ToString();
+            else
+                return this.DataSet.Tables[tableIndex].Rows[0][column_name].ToString();
         }
 
         //public DbType GetFieldtDataType(string column_name)
@@ -600,15 +613,23 @@ namespace ExpressBase.Objects
 
         public void DrawDetail()
         {
+            List<int> tableindexes = new List<int>();
+
             int tableIndex = 0;
-            foreach (EbDataTable ebtbl in DataSet.Tables)
+            int maxRowCount = 0;
+
+            foreach (EbReportDetail _detail in Detail)
             {
-                if (ebtbl.Rows.Count > 1)
-                    break;
-
-                tableIndex++;
+                foreach (EbReportField field in _detail.Fields)
+                {
+                    if (field is EbDataField && !tableindexes.Contains((field as EbDataField).TableIndex))
+                    {
+                        int r_count = DataSet.Tables[(field as EbDataField).TableIndex].Rows.Count;
+                        tableIndex = (r_count > maxRowCount) ? (field as EbDataField).TableIndex : tableIndex;
+                        maxRowCount = (r_count > maxRowCount) ? r_count:maxRowCount;
+                    }
+                }
             }
-
             var rows = (DataSourceRefId != string.Empty) ? DataSet.Tables[tableIndex].Rows : null;
             if (rows != null)
             {
@@ -693,8 +714,6 @@ namespace ExpressBase.Objects
                         int val_length = column_val.Length;
                         if (field.Font == null)
                             field.Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
-                        //    phrase = new Phrase(column_val);
-                        //else
                         phrase = new Phrase(column_val, field.ITextFont);
                         float calculatedValueSize = phrase.Font.CalculatedSize * val_length;
                         if (calculatedValueSize > field.WidthPt)
@@ -721,7 +740,6 @@ namespace ExpressBase.Objects
                         var field = SortedReportFields[iSortPos];
                         field.HeightPt += RowHeight;
                         DrawFields(field, dt_Yposition, serialnumber);
-                        //Space to add summary logic
                     }
                     detailprintingtop += detail.HeightPt + RowHeight;
                 }
@@ -807,7 +825,6 @@ namespace ExpressBase.Objects
                         {
                             string TName = calcfd.Split('.')[0];
                             string fName = calcfd.Split('.')[1];
-                            // globals[TName].Add(fName, new NTV { Name = fName, Type = this.DataRows.Table.Columns[fName].Type, Value = this.DataRows[serialnumber][fName] });
                             globals[TName].Add(fName, new NTV { Name = fName, Type = this.DataSet.Tables[0].Columns[fName].Type, Value = this.DataSet.Tables[0].Rows[serialnumber][fName] });
                         }
                         try
@@ -839,11 +856,13 @@ namespace ExpressBase.Objects
                             {
                                 string TName = calcfd.Split('.')[0];
                                 string fName = calcfd.Split('.')[1];
-                                //globals[TName].Add(fName, new NTV { Name = fName, Type = this.DataRows.Table.Columns[fName].Type, Value = this.DataRows[serialnumber][fName] });
                                 globals[TName].Add(fName, new NTV { Name = fName, Type = this.DataSet.Tables[0].Columns[fName].Type, Value = this.DataSet.Tables[0].Rows[serialnumber][fName] });
                             }
                             column_val = (ValueScriptCollection[field.Name].RunAsync(globals)).Result.ReturnValue.ToString();
-                            CalcValInRow.Add(field.Title, new NTV { Name = field.Title, Type = (EbDbTypes)((field as EbCalcField).CalcFieldIntType), Value = column_val });
+                            if (CalcValInRow.ContainsKey(field.Title))
+                                CalcValInRow[field.Title] = new NTV { Name = field.Title, Type = (EbDbTypes)((field as EbCalcField).CalcFieldIntType), Value = column_val };
+                            else
+                                CalcValInRow.Add(field.Title, new NTV { Name = field.Title, Type = (EbDbTypes)((field as EbCalcField).CalcFieldIntType), Value = column_val });
                         }
                         catch (Exception e)
                         {
@@ -990,15 +1009,18 @@ namespace ExpressBase.Objects
         {
             try
             {
-                this.EbDataSource = Redis.Get<EbDataSource>(DataSourceRefId);
-                if (this.EbDataSource == null || this.EbDataSource.Sql == null || this.EbDataSource.Sql == string.Empty)
+                if (DataSourceRefId!=string.Empty)
                 {
-                    EbObjectParticularVersionResponse result = client.Get(new EbObjectParticularVersionRequest { RefId = this.DataSourceRefId });
-                    this.EbDataSource = EbSerializers.Json_Deserialize(result.Data[0].Json);
-                    Redis.Set<EbDataSource>(DataSourceRefId, this.EbDataSource);
+                    this.EbDataSource = Redis.Get<EbDataSource>(DataSourceRefId);
+                    if (this.EbDataSource == null || this.EbDataSource.Sql == null || this.EbDataSource.Sql == string.Empty)
+                    {
+                        EbObjectParticularVersionResponse result = client.Get(new EbObjectParticularVersionRequest { RefId = this.DataSourceRefId });
+                        this.EbDataSource = EbSerializers.Json_Deserialize(result.Data[0].Json);
+                        Redis.Set<EbDataSource>(DataSourceRefId, this.EbDataSource);
+                    }
+                    if (this.EbDataSource.FilterDialogRefId != string.Empty)
+                        this.EbDataSource.AfterRedisGet(Redis, client);
                 }
-                if (this.EbDataSource.FilterDialogRefId != string.Empty)
-                    this.EbDataSource.AfterRedisGet(Redis, client);
             }
             catch (Exception e)
             {
@@ -1051,10 +1073,11 @@ namespace ExpressBase.Objects
             {
                 globals["Calc"].Add(key, CalcValInRow[key]);
             }
-            foreach (Param p in Parameters) //adding Params to global
-            {
-                globals["Params"].Add(p.Name, new NTV { Name = p.Name, Type = (EbDbTypes)Convert.ToInt32(p.Type), Value = p.Value });
-            }
+            if (Parameters != null)
+                foreach (Param p in Parameters) //adding Params to global
+                {
+                    globals["Params"].Add(p.Name, new NTV { Name = p.Name, Type = (EbDbTypes)Convert.ToInt32(p.Type), Value = p.Value });
+                }
         }
     }
 
@@ -1075,42 +1098,36 @@ namespace ExpressBase.Objects
     {
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
-        //[HideInPropertyGrid]
+        [MetaOnly]
         public string SectionHeight { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]
         public List<EbReportField> Fields { get; set; }
 
-        //[EnableInBuilder(BuilderType.Report)]
-        //[HideInPropertyGrid]
-        //public new string Left { get; set; }
+        [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
+        public override string Left { get; set; }
 
-        //[EnableInBuilder(BuilderType.Report)]
-        //[HideInPropertyGrid]
-        //public new string Top { get; set; }
+        [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
+        public override string Top { get; set; }
 
-        //[EnableInBuilder(BuilderType.Report)]
-        //[UIproperty]
-        //[HideInPropertyGrid]
-        //public new string Height { get; set; }
+        [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
+        public override string Height { get; set; }
 
-        //[EnableInBuilder(BuilderType.Report)]
-        //[UIproperty]
-        //[HideInPropertyGrid]
-        //public new string Width { get; set; }
+        [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
+        public override string Width { get; set; }
 
-        //[EnableInBuilder(BuilderType.Report)]
-        //[UIproperty]
-        //[HideInPropertyGrid]
-        //public new string Title { get; set; }
+        [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
+        public override string Title { get; set; }
 
-        //[HideInPropertyGrid]
-        //[JsonIgnore]
-        //public new string Description { get; set; }
-
-        //[HideInPropertyGrid]
-        //public new string ForeColor { get; set; }
+        [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
+        public override string ForeColor { get; set; }
 
     }
 

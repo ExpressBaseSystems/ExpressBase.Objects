@@ -3,6 +3,7 @@ using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using iTextSharp.text.pdf;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +15,15 @@ namespace ExpressBase.Objects.ReportRelated
     {
         [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]
-        public new EbFont Font { get; set; }
+        public override EbFont Font { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [JsonIgnore]
+        public override EbTextAlign TextAlign { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
+        public override string Title { get; set; }
     }
 
     [EnableInBuilder(BuilderType.Report)]
@@ -370,10 +379,12 @@ namespace ExpressBase.Objects.ReportRelated
     {
         [EnableInBuilder(BuilderType.Report)]
         [DefaultPropValue("3")]
+        [PropertyGroup("Dimensions")]
         public int ColoumCount { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [DefaultPropValue("1")]
+        [PropertyGroup("Dimensions")]
         public int RowCount { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]

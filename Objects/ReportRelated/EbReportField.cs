@@ -21,7 +21,7 @@ namespace ExpressBase.Objects.ReportRelated
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
         [PropertyGroup("Appearance")]
-        public EbTextAlign TextAlign { get; set; }
+        public virtual EbTextAlign TextAlign { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
@@ -40,10 +40,10 @@ namespace ExpressBase.Objects.ReportRelated
         public string BorderColor { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
-        [PropertyGroup("General")]
+        [PropertyGroup("Appearance")]
         [UIproperty]
         [PropertyEditor(PropertyEditorType.FontSelector)]
-        public EbFont Font { get; set; }
+        public virtual EbFont Font { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
@@ -115,11 +115,16 @@ namespace ExpressBase.Objects.ReportRelated
 
         [EnableInBuilder(BuilderType.Report)]
         [PropertyEditor(PropertyEditorType.ImageSeletor)]
+        [PropertyGroup("URL")]
         public string Image { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]
-        public new EbFont Font { get; set; }
+        public override string Title { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
+        public override EbFont Font { get; set; }
 
         public override string GetDesignHtml()
         {
@@ -130,8 +135,8 @@ namespace ExpressBase.Objects.ReportRelated
             return @"
     this.Init = function(id)
         {
-    this.Height =50;
-    this.Width= 50;
+    this.Height =40;
+    this.Width= 40;
     this.Source = 'url(../images/image.png) center no-repeat';
     this.Border = 1;
 this.BorderColor = '#eae6e6';
@@ -152,19 +157,26 @@ this.BorderColor = '#eae6e6';
     {
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
-        //  [HideInPropertyGrid]
+        [MetaOnly]
         public string Source { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
+        public override string Title { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
         [PropertyEditor(PropertyEditorType.ImageSeletor)]
+        [PropertyGroup("URL")]
         public string Image { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
+        [PropertyGroup("General")]
         public string WaterMarkText { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
+        [PropertyGroup("General")]
         public int Rotation { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
@@ -181,8 +193,8 @@ this.BorderColor = '#eae6e6';
             return @"
     this.Init = function(id)
         {
-    this.Height =100;
-    this.Width= 100;
+    this.Height =50;
+    this.Width= 50;
     this.Source = 'url(../images/image.png) center no-repeat';
 this.Border = 1;
 this.BorderColor = '#eae6e6';
@@ -210,8 +222,8 @@ this.BorderColor = '#eae6e6';
                 img.SetAbsolutePosition(this.LeftPt, reportHeight - this.TopPt - this.HeightPt);
                 PdfGState _state = new PdfGState()
                 {
-                    FillOpacity = 0.2F,
-                    StrokeOpacity = 0.2F
+                    FillOpacity = 0.1F,
+                    StrokeOpacity = 0.1F
                 };
                 PdfContentByte cb = writer.DirectContentUnder;
                 cb.SaveState();
@@ -227,8 +239,14 @@ this.BorderColor = '#eae6e6';
     {
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup("General")]
         public DateFormatReport Format { get; set; }
+
+        [OnChangeExec(@"
+            pg.MakeReadOnly('Title');
+        ")]
+        [EnableInBuilder(BuilderType.Report)]
+        public override string Title { set; get; }
 
         public string FormatDate(string column_val)
         {
@@ -282,6 +300,11 @@ this.BorderColor = '#eae6e6';
     [EnableInBuilder(BuilderType.Report)]
     public class EbPageNo : EbReportField
     {
+        [OnChangeExec(@"
+            pg.MakeReadOnly('Title');
+        ")]
+        [EnableInBuilder(BuilderType.Report)]
+        public override string Title { set; get; }
 
         public override string GetDesignHtml()
         {
@@ -321,6 +344,11 @@ this.BorderColor = '#eae6e6';
     [EnableInBuilder(BuilderType.Report)]
     public class EbPageXY : EbReportField
     {
+        [OnChangeExec(@"
+            pg.MakeReadOnly('Title');
+        ")]
+        [EnableInBuilder(BuilderType.Report)]
+        public override string Title { set; get; }
 
         public override string GetDesignHtml()
         {
@@ -361,6 +389,11 @@ this.BorderColor = '#eae6e6';
     [EnableInBuilder(BuilderType.Report)]
     public class EbUserName : EbReportField
     {
+        [OnChangeExec(@"
+            pg.MakeReadOnly('Title');
+        ")]
+        [EnableInBuilder(BuilderType.Report)]
+        public override string Title { set; get; }
 
         public override string GetDesignHtml()
         {
@@ -401,12 +434,7 @@ this.BorderColor = '#eae6e6';
     [EnableInBuilder(BuilderType.Report)]
     public class EbText : EbReportField
     {
-        //[EnableInBuilder(BuilderType.Report)]
-        //[PropertyGroup("General")]
-        //[UIproperty]
-        //[PropertyEditor(PropertyEditorType.FontSelector)]
-        //public EbFont Font { get; set; }
-
+        
         public override string GetDesignHtml()
         {
             return "<div class='Text-Field dropped' eb-type='Text' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; height: @Height px; background-color:@BackColor ; color:@ForeColor ; left: @Left px; top: @Top px;text-overflow: ellipsis;overflow: hidden;text-align: @TextAlign ;'> @Title </div>".RemoveCR().DoubleQuoted();
@@ -452,8 +480,6 @@ this.BorderColor = '#eae6e6';
             pg.MakeReadOnly('Title');
         ")]
         [EnableInBuilder(BuilderType.Report)]
-        [UIproperty]
-        [PropertyGroup("General")]
         public override string Title { set; get; }
 
         public override string GetDesignHtml()
@@ -498,26 +524,27 @@ this.BorderColor = '#eae6e6';
     {
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
-        [PropertyGroup("Appearance")]
+        [MetaOnly]
         public string Source { get; set; }
-
 
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup("Data")]
         public string Code { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup("General")]
         public int Type { get; set; }
 
+        [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
+        public override string Title { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
         [PropertyGroup("Appearance")]
         public bool GuardBars { get; set; }
-
 
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
@@ -537,8 +564,8 @@ this.BorderColor = '#eae6e6';
             return @"
     this.Init = function(id)
         {
-     this.Height =50;
-    this.Width= 150;
+     this.Height =40;
+    this.Width= 140;
     this.Source = 'url(../images/barcode.png) center no-repeat';
 this.Border = 1;
 this.BorderColor = '#eae6e6';
@@ -624,18 +651,21 @@ this.BorderColor = '#eae6e6';
     {
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
-        [PropertyGroup("Appearance")]
+        [MetaOnly]
         public string Source { get; set; }
-
 
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup("Data")]
         public string Code { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]
-        public new EbFont Font { get; set; }
+        public override EbFont Font { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
+        public override string Title { get; set; }
 
         public override string GetDesignHtml()
         {
@@ -646,8 +676,8 @@ this.BorderColor = '#eae6e6';
             return @"
     this.Init = function(id)
         {
-     this.Height =100;
-    this.Width= 100; 
+     this.Height =40;
+    this.Width= 40; 
     this.Source = 'url(../images/Qr-code.png) center no-repeat';
 this.Border = 1;
 this.BorderColor = '#eae6e6';

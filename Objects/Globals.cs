@@ -5,7 +5,7 @@ using System.Data;
 using System.Dynamic;
 using System.Text;
 
-namespace ExpressBase.Objects.Objects.ReportRelated
+namespace ExpressBase.Objects.Objects
 {
     public class Globals
     {
