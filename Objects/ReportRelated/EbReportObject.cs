@@ -24,7 +24,7 @@ namespace ExpressBase.Objects.ReportRelated
         [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("Appearance")]
         [UIproperty]
-        public string Left { get; set; }
+        public virtual string Left { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]
@@ -33,7 +33,7 @@ namespace ExpressBase.Objects.ReportRelated
         [UIproperty]
         [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("Appearance")]
-        public string Width { get; set; }
+        public virtual string Width { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]
@@ -42,7 +42,7 @@ namespace ExpressBase.Objects.ReportRelated
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
         [PropertyGroup("Appearance")]
-        public string Top { get; set; }
+        public virtual string Top { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]
@@ -51,7 +51,7 @@ namespace ExpressBase.Objects.ReportRelated
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
         [PropertyGroup("Appearance")]
-        public string Height { get; set; }
+        public virtual string Height { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]
