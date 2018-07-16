@@ -8,7 +8,7 @@ using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.ServiceClients;
 using ExpressBase.Common.Structures;
-using ExpressBase.Objects.Objects.ReportRelated;
+using ExpressBase.Objects.Objects;
 using ExpressBase.Objects.ReportRelated;
 using ExpressBase.Objects.ServiceStack_Artifacts;
 using iTextSharp.text;
@@ -484,8 +484,10 @@ namespace ExpressBase.Objects
 
         public string GetDataFieldtValue(string column_name, int i, int tableIndex)
         {
-            // return this.DataRows[i][column_name].ToString();
-            return this.DataSet.Tables[tableIndex].Rows[i][column_name].ToString();
+            if (this.DataSet.Tables[tableIndex].Rows.Count > 1)
+                return this.DataSet.Tables[tableIndex].Rows[i][column_name].ToString();
+            else
+                return this.DataSet.Tables[tableIndex].Rows[0][column_name].ToString();
         }
 
         //public DbType GetFieldtDataType(string column_name)
@@ -600,14 +602,33 @@ namespace ExpressBase.Objects
 
         public void DrawDetail()
         {
-            int tableIndex = 0;
-            foreach (EbDataTable ebtbl in DataSet.Tables)
+            List<int> tableindexes = new List<int>();
+            foreach (EbReportDetail _detail in Detail)
             {
-                if (ebtbl.Rows.Count > 1)
-                    break;
-
-                tableIndex++;
+                foreach (EbReportField field in _detail.Fields)
+                {
+                    if (field is EbDataField && !tableindexes.Contains((field as EbDataField).TableIndex))
+                    {
+                        tableindexes.Add((field as EbDataField).TableIndex);
+                    }
+                }
             }
+            int tableIndex = 0;
+            int maxRowCount = 0;
+            foreach (int index in tableindexes)
+            {
+                int r_count = DataSet.Tables[index].Rows.Count;
+                tableIndex = (r_count > maxRowCount) ? index : tableIndex;
+                maxRowCount = r_count;
+            }
+
+            //foreach (EbDataTable ebtbl in DataSet.Tables)
+            //{
+            //    if (ebtbl.Rows.Count > 1)
+            //        break;
+
+            //    tableIndex++;
+            //}
 
             var rows = (DataSourceRefId != string.Empty) ? DataSet.Tables[tableIndex].Rows : null;
             if (rows != null)
@@ -843,7 +864,10 @@ namespace ExpressBase.Objects
                                 globals[TName].Add(fName, new NTV { Name = fName, Type = this.DataSet.Tables[0].Columns[fName].Type, Value = this.DataSet.Tables[0].Rows[serialnumber][fName] });
                             }
                             column_val = (ValueScriptCollection[field.Name].RunAsync(globals)).Result.ReturnValue.ToString();
-                            CalcValInRow.Add(field.Title, new NTV { Name = field.Title, Type = (EbDbTypes)((field as EbCalcField).CalcFieldIntType), Value = column_val });
+                            if (CalcValInRow.ContainsKey(field.Title))
+                                CalcValInRow[field.Title] = new NTV { Name = field.Title, Type = (EbDbTypes)((field as EbCalcField).CalcFieldIntType), Value = column_val };
+                            else
+                                CalcValInRow.Add(field.Title, new NTV { Name = field.Title, Type = (EbDbTypes)((field as EbCalcField).CalcFieldIntType), Value = column_val });
                         }
                         catch (Exception e)
                         {
@@ -1051,10 +1075,11 @@ namespace ExpressBase.Objects
             {
                 globals["Calc"].Add(key, CalcValInRow[key]);
             }
-            foreach (Param p in Parameters) //adding Params to global
-            {
-                globals["Params"].Add(p.Name, new NTV { Name = p.Name, Type = (EbDbTypes)Convert.ToInt32(p.Type), Value = p.Value });
-            }
+            if (Parameters != null)
+                foreach (Param p in Parameters) //adding Params to global
+                {
+                    globals["Params"].Add(p.Name, new NTV { Name = p.Name, Type = (EbDbTypes)Convert.ToInt32(p.Type), Value = p.Value });
+                }
         }
     }
 
