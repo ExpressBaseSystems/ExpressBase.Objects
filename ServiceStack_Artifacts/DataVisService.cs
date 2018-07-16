@@ -144,6 +144,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 10)]
         public bool Ispaging { get; set; }
+
+        [DataMember(Order = 11)]
+        public string DataVizObjString { get; set; }
+
+        [DataMember(Order = 12)]
+        public EbDataVisualization EbDataVisualization { get; set; }
     }
 
     [Route("/table")]

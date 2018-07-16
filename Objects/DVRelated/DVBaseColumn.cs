@@ -1,4 +1,5 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.JsonConverters;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
@@ -102,6 +103,10 @@ namespace ExpressBase.Objects.Objects.DVRelated
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.DropDown)]
         public ControlType FilterControl { get; set; }
+
+        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
+        [JsonConverter(typeof(Base64Converter))]
+        public string Formula { get; set; }
     }
 
     public class DVColumnCollection : List<DVBaseColumn>
