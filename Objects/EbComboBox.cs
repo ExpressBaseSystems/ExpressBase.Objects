@@ -180,7 +180,7 @@ namespace ExpressBase.Objects
 
         public override string GetToolHtml()
         {
-            return @"<div eb-type='@toolName' class='tool'> &#9869;  PowerSelect</div>";
+            return @"<div eb-type='@toolName' class='tool'> &#9869; PowerSelect</div>".Replace("@toolName", this.GetType().Name.Substring(2));
         }
 
         public override string GetHead()
