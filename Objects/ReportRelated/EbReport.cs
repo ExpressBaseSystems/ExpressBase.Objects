@@ -614,33 +614,22 @@ namespace ExpressBase.Objects
         public void DrawDetail()
         {
             List<int> tableindexes = new List<int>();
+
+            int tableIndex = 0;
+            int maxRowCount = 0;
+
             foreach (EbReportDetail _detail in Detail)
             {
                 foreach (EbReportField field in _detail.Fields)
                 {
                     if (field is EbDataField && !tableindexes.Contains((field as EbDataField).TableIndex))
                     {
-                        tableindexes.Add((field as EbDataField).TableIndex);
+                        int r_count = DataSet.Tables[(field as EbDataField).TableIndex].Rows.Count;
+                        tableIndex = (r_count > maxRowCount) ? (field as EbDataField).TableIndex : tableIndex;
+                        maxRowCount = (r_count > maxRowCount) ? r_count:maxRowCount;
                     }
                 }
             }
-            int tableIndex = 0;
-            int maxRowCount = 0;
-            foreach (int index in tableindexes)
-            {
-                int r_count = DataSet.Tables[index].Rows.Count;
-                tableIndex = (r_count > maxRowCount) ? index : tableIndex;
-                maxRowCount = r_count;
-            }
-
-            //foreach (EbDataTable ebtbl in DataSet.Tables)
-            //{
-            //    if (ebtbl.Rows.Count > 1)
-            //        break;
-
-            //    tableIndex++;
-            //}
-
             var rows = (DataSourceRefId != string.Empty) ? DataSet.Tables[tableIndex].Rows : null;
             if (rows != null)
             {
@@ -725,8 +714,6 @@ namespace ExpressBase.Objects
                         int val_length = column_val.Length;
                         if (field.Font == null)
                             field.Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
-                        //    phrase = new Phrase(column_val);
-                        //else
                         phrase = new Phrase(column_val, field.ITextFont);
                         float calculatedValueSize = phrase.Font.CalculatedSize * val_length;
                         if (calculatedValueSize > field.WidthPt)
@@ -753,7 +740,6 @@ namespace ExpressBase.Objects
                         var field = SortedReportFields[iSortPos];
                         field.HeightPt += RowHeight;
                         DrawFields(field, dt_Yposition, serialnumber);
-                        //Space to add summary logic
                     }
                     detailprintingtop += detail.HeightPt + RowHeight;
                 }
@@ -839,7 +825,6 @@ namespace ExpressBase.Objects
                         {
                             string TName = calcfd.Split('.')[0];
                             string fName = calcfd.Split('.')[1];
-                            // globals[TName].Add(fName, new NTV { Name = fName, Type = this.DataRows.Table.Columns[fName].Type, Value = this.DataRows[serialnumber][fName] });
                             globals[TName].Add(fName, new NTV { Name = fName, Type = this.DataSet.Tables[0].Columns[fName].Type, Value = this.DataSet.Tables[0].Rows[serialnumber][fName] });
                         }
                         try
@@ -871,7 +856,6 @@ namespace ExpressBase.Objects
                             {
                                 string TName = calcfd.Split('.')[0];
                                 string fName = calcfd.Split('.')[1];
-                                //globals[TName].Add(fName, new NTV { Name = fName, Type = this.DataRows.Table.Columns[fName].Type, Value = this.DataRows[serialnumber][fName] });
                                 globals[TName].Add(fName, new NTV { Name = fName, Type = this.DataSet.Tables[0].Columns[fName].Type, Value = this.DataSet.Tables[0].Rows[serialnumber][fName] });
                             }
                             column_val = (ValueScriptCollection[field.Name].RunAsync(globals)).Result.ReturnValue.ToString();
