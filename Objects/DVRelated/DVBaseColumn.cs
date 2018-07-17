@@ -109,6 +109,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
+        [JsonConverter(typeof(Base64Converter))]
         public string Formula { get; set; }
 
         
