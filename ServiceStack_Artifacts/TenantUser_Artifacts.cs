@@ -491,32 +491,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class GetLocationConfigRequest : IReturn<GetUserGroupResponse>, IEbSSRequest
-    {
-        [DataMember(Order = 1)]
-        public int LocId { get; set; }
-
-        public string Token { get; set; }
-
-        public string TenantAccountId { get; set; }
-
-        public int UserId { get; set; }
-    }
-
-    [DataContract]
-    public class GetLocationConfigResponse : IEbSSResponse
-    {
-        [DataMember(Order = 1)]
-        public List<EbLocationConfig> Data { get; set; }
-
-        [DataMember(Order = 2)]
-        public Dictionary<string, string> Meta { get; set; }
-
-        [DataMember(Order = 3)]
-        public ResponseStatus ResponseStatus { get; set; }
-    }
-
-    [DataContract]
     public class SaveLocationMetaRequest : IReturn<GetUserGroupResponse>, IEbSSRequest
     {
         [DataMember(Order = 1)]
@@ -549,5 +523,45 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    [DataContract]
+    public class LocationInfoRequest : IReturn<LocationInfoResponse>, IEbSSRequest
+    {
+        public string Token { get; set; }
+
+        public string TenantAccountId { get; set; }
+
+        public int UserId { get; set; }
+    }
+
+    [DataContract]
+    public class LocationInfoResponse: IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public Dictionary<int,EbSolutionLocation> Locations { get; set; }
+
+        [DataMember(Order = 1)]
+        public List<EbLocationConfig> Config { get; set; }
+
+        [DataMember(Order = 3)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+    [DataContract]
+    public class UpdateSolutionRequest : IReturn<UpdateSolutionResponse>, IEbSSRequest
+    {
+        public string Token { get; set; }
+
+        public string TenantAccountId { get; set; }
+
+        public int UserId { get; set; }
+    }
+
+    [DataContract]
+    public class UpdateSolutionResponse : IEbSSResponse {
+
+        [DataMember(Order = 1)]
+        public ResponseStatus ResponseStatus { get; set; }
+
     }
 }
