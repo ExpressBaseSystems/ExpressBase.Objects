@@ -64,6 +64,10 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.Collection)]
         public bool RenderHorizontally { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+        [PropertyEditor(PropertyEditorType.JS)]
+        public string OnChangeExe { get; set; }
+
         public override string GetToolHtml()
         {
             return @"<div eb-type='@toolName' class='tool'> &#9673;  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
