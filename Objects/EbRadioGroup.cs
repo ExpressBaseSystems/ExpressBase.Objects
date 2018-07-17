@@ -64,6 +64,10 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.Collection)]
         public bool RenderHorizontally { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+        [PropertyEditor(PropertyEditorType.JS)]
+        public string OnChangeExe { get; set; }
+
         public override string GetToolHtml()
         {
             return @"<div eb-type='@toolName' class='tool'> &#9673;  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
@@ -146,8 +150,8 @@ this.Init = function(id)
         public string GName { get; set; }
 
         public override string GetBareHtml()
-        {
-            return @"<div class='radio-wrap @radio-wrap-block@' onclick=""event.stopPropagation();$('#@name@').prop('checked', true);"">
+        {/*onclick=""event.stopPropagation();$('#@name@').prop('checked', true);""*/
+            return @"<div class='radio-wrap @radio-wrap-block@' onclick=""event.stopPropagation(); $(this).children('input[type=radio]').prop('checked', true); $(this).children('input[type=radio]').trigger('change');"">
                         <input type ='radio' id='@name@' @defaultcheked@ value='@value@' name='@gname@'>
                         <span id='@name@Lbl' style='@LabelBackColor @LabelForeColor '> @label@  </span>
                     </div>"
