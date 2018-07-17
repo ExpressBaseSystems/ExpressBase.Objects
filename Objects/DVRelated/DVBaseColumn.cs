@@ -72,6 +72,9 @@ namespace ExpressBase.Objects.Objects.DVRelated
         [PropertyEditor(PropertyEditorType.Label)]
         public override string Name { get; set; }
 
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
+        public string EbSid{ get; set; }
+
         public EbDbTypes Type { get; set; }
 
         public string sType { get; set; }
@@ -102,6 +105,12 @@ namespace ExpressBase.Objects.Objects.DVRelated
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.DropDown)]
         public ControlType FilterControl { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
+        public string Formula { get; set; }
+
+        
     }
 
     public class DVColumnCollection : List<DVBaseColumn>
@@ -119,6 +128,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
     }
 
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
+    [Alias("DVStringColumnAlias")]
     public class DVStringColumn : DVBaseColumn
     {
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
