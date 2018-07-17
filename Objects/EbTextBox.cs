@@ -152,6 +152,10 @@ else {
 		[EnableInBuilder(BuilderType.BotForm)]
 		public override bool IsReadOnly { get => this.ReadOnly; }
 
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+		[PropertyEditor(PropertyEditorType.JS)]
+		public string OnChangeExe { get; set; }
+
 		public override string GetHead()
         {
             return (((!this.Hidden) ? this.UniqueString + this.RequiredString : string.Empty) + @"".Replace("{0}", this.Name));

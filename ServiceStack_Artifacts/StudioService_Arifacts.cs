@@ -63,24 +63,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 3)]
         public ResponseStatus ResponseStatus { get; set; }
     }
-
-    //public class EbObjectNonCommitedVersionRequest : EbServiceStackRequest, IReturn<EbObjectNonCommitedVersionResponse>
-    //{
-    //    public string RefId { get; set; }
-    //}
-
-    //public class EbObjectNonCommitedVersionResponse : IEbSSResponse
-    //{
-    //    [DataMember(Order = 1)]
-    //    public List<EbObjectWrapper> Data { get; set; }
-
-    //    [DataMember(Order = 2)]
-    //    public string Token { get; set; }
-
-    //    [DataMember(Order = 3)]
-    //    public ResponseStatus ResponseStatus { get; set; }
-    //}
-
     public class EbObjectLatestCommitedRequest : EbServiceStackRequest, IReturn<EbObjectLatestCommitedResponse>
     {
         public string RefId { get; set; }
@@ -166,7 +148,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-     public class EbObjectUpdateDashboardRequest : EbServiceStackRequest, IReturn<EbObjectUpdateDashboardResponse>
+    public class EbObjectUpdateDashboardRequest : EbServiceStackRequest, IReturn<EbObjectUpdateDashboardResponse>
     {
         public string Refid { get; set; }
     }
@@ -471,7 +453,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Json { get; set; }
     }
 
-        [DataContract]
+    [DataContract]
     public class EbObjectRunSqlFunctionResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
@@ -535,8 +517,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 15)]
         public string Json_lc { get; set; }
 
-        [DataMember(Order =16)]
-        public string[] Wc_All { get; set; }        
+        [DataMember(Order = 16)]
+        public string[] Wc_All { get; set; }
 
         [DataMember(Order = 17)]
         public string Tags { get; set; }
@@ -565,7 +547,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public DateTime LiveVersionCommit_ts { get; set; }
 
         [DataMember(Order = 4)]
-        public string LiveVersionCommitby_Name { get; set; } 
+        public string LiveVersionCommitby_Name { get; set; }
 
         [DataMember(Order = 5)]
         public int LiveVersionCommitby_Id { get; set; }
@@ -633,7 +615,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     public class EbObjectGetAllTagsRequest : EbServiceStackRequest, IReturn<EbObjectExploreObjectResponse>
     {
-       
+
     }
 
     public class EbObjectGetAllTagsResponse : IEbSSResponse
@@ -645,6 +627,19 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Token { get; set; }
 
         [DataMember(Order = 3)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+    public class UniqueObjectNameCheckRequest : EbServiceStackRequest, IReturn<UniqueObjectNameCheckResponse>
+    {
+        public string ObjName { get; set; }
+    }
+
+    public class UniqueObjectNameCheckResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public bool IsUnique { get; set; }
+
+        [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
     }
 

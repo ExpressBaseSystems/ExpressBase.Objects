@@ -35,7 +35,12 @@ namespace ExpressBase.Objects
 		[OnChangeExec(@"console.log(100); if (this.Columns.$values.length === 0 ){pg.MakeReadOnly('ValueMember');} else {pg.MakeReadWrite('ValueMember');}")]
 		public DVBaseColumn ValueMember { get; set; }
 
-        [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+		[PropertyEditor(PropertyEditorType.Collection)]
+		[Alias("Options")]
+		public List<EbSimpleSelectOption> Options { get; set; }
+
+		[EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", 1)]
 		[OnChangeExec(@"console.log(100); if (this.Columns.$values.length === 0 ){pg.MakeReadOnly('DisplayMember');} else {pg.MakeReadWrite('DisplayMember');}")]
 		public DVBaseColumn DisplayMember { get; set; }
@@ -47,7 +52,16 @@ namespace ExpressBase.Objects
 		[EnableInBuilder(BuilderType.BotForm)]
 		public override bool IsReadOnly { get => this.ReadOnly; }
 
-		public EbSimpleSelect() { }
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+		[PropertyEditor(PropertyEditorType.Boolean)]
+		[OnChangeExec(@"if(this.IsDynamic === true){pg.ShowProperty('DataSourceId');pg.ShowProperty('ValueMember');pg.ShowProperty('DisplayMember');pg.HideProperty('Options');}
+		else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HideProperty('DisplayMember');pg.ShowProperty('Options');}")]
+		public bool IsDynamic { get; set; }
+
+		public EbSimpleSelect()
+		{
+			this.Options = new List<EbSimpleSelectOption>();
+		}
 
         public string OptionHtml { get; set; }
 
@@ -60,17 +74,24 @@ namespace ExpressBase.Objects
 
         public void InitFromDataBase(JsonServiceClient ServiceClient)
 		{
-
 			//this.DataSourceId = "eb_roby_dev-eb_roby_dev-2-1015-1739";
-			var result = ServiceClient.Get<DataSourceDataResponse>(new DataSourceDataRequest { RefId = this.DataSourceId });
 			string _html = string.Empty;
-
-			foreach (EbDataRow option in result.Data)
+			if (!this.IsDynamic)
 			{
-				_html += string.Format("<option value='{0}'>{1}</option>", option[this.ValueMember.Data], option[this.DisplayMember.Data]);
-				//_html += string.Format("<option value='{0}'>{1}</option>", option[0].ToString().Trim(), option[0]);
-            }
-
+				foreach (EbSimpleSelectOption opt in this.Options)
+				{
+					_html += string.Format("<option value='{0}'>{1}</option>", opt.Value, opt.Label);
+				}
+			}
+			else
+			{
+				var result = ServiceClient.Get<DataSourceDataResponse>(new DataSourceDataRequest { RefId = this.DataSourceId });
+				foreach (EbDataRow option in result.Data)
+				{
+					_html += string.Format("<option value='{0}'>{1}</option>", option[this.ValueMember.Data], option[this.DisplayMember.Data]);
+					//_html += string.Format("<option value='{0}'>{1}</option>", option[0].ToString().Trim(), option[0]);
+				}
+			}
 			this.OptionHtml = _html;
 		}
 
@@ -133,4 +154,17 @@ namespace ExpressBase.Objects
 
         }
     }
+
+	[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+	[HideInToolBox]
+	public class EbSimpleSelectOption: EbControl
+	{
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+		public string Label { get; set; }
+
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+		public string Value { get; set; }
+
+		public EbSimpleSelectOption() { }
+	}
 }

@@ -13,6 +13,7 @@ using ExpressBase.Objects.ReportRelated;
 using ExpressBase.Objects.ServiceStack_Artifacts;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
+using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
 using Newtonsoft.Json;
 using ServiceStack;
@@ -425,8 +426,8 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         public float detailprintingtop = 0;
 
-        [JsonIgnore]
-        public Dictionary<string, object> FieldDict { get; set; }
+        //[JsonIgnore]
+        //public Dictionary<string, object> FieldDict { get; set; }
 
         [JsonIgnore]
         public Dictionary<string, List<EbControl>> LinkCollection { get; set; }
@@ -515,10 +516,8 @@ namespace ExpressBase.Objects
                 foreach (var field in ReportObjects)
                 {
                     if ((field as EbWaterMark).Image != string.Empty)
-                    {
                         fileByte = WatermarkImages[(field as EbWaterMark).Image];
-                    }
-                (field as EbWaterMark).DrawMe(d, writer, fileByte, HeightPt);
+                    (field as EbWaterMark).DrawMe(d, writer, fileByte, HeightPt);
                 }
             }
         }
@@ -537,10 +536,11 @@ namespace ExpressBase.Objects
                 foreach (string calcfd in (field as EbCalcField).DataFieldsUsedCalc)
                 {
                     string TName = calcfd.Split('.')[0];
+                    int TableIndex = Convert.ToInt32(TName.Substring(1));
                     string fName = calcfd.Split('.')[1];
                     int tableIndex = Convert.ToInt32(TName.Substring(1));
                     //globals[TName].Add(fName, new NTV { Name = fName, Type = this.DataRows.Table.Columns[fName].Type, Value = this.DataRows[serialnumber][fName] });
-                    globals[TName].Add(fName, new NTV { Name = fName, Type = this.DataSet.Tables[0].Columns[fName].Type, Value = this.DataSet.Tables[0].Rows[serialnumber][fName] });
+                    globals[TName].Add(fName, new NTV { Name = fName, Type = this.DataSet.Tables[TableIndex].Columns[fName].Type, Value = this.DataSet.Tables[TableIndex].Rows[serialnumber][fName] });
                 }
                 column_val = (ValueScriptCollection[(field as EbCalcField).Name].RunAsync(globals)).Result.ReturnValue.ToString();
             }
@@ -626,7 +626,7 @@ namespace ExpressBase.Objects
                     {
                         int r_count = DataSet.Tables[(field as EbDataField).TableIndex].Rows.Count;
                         tableIndex = (r_count > maxRowCount) ? (field as EbDataField).TableIndex : tableIndex;
-                        maxRowCount = (r_count > maxRowCount) ? r_count:maxRowCount;
+                        maxRowCount = (r_count > maxRowCount) ? r_count : maxRowCount;
                     }
                 }
             }
@@ -824,8 +824,9 @@ namespace ExpressBase.Objects
                         foreach (string calcfd in (field as EbDataField).DataFieldsUsedAppearance)
                         {
                             string TName = calcfd.Split('.')[0];
+                            int TableIndex = Convert.ToInt32(TName.Substring(1));
                             string fName = calcfd.Split('.')[1];
-                            globals[TName].Add(fName, new NTV { Name = fName, Type = this.DataSet.Tables[0].Columns[fName].Type, Value = this.DataSet.Tables[0].Rows[serialnumber][fName] });
+                            globals[TName].Add(fName, new NTV { Name = fName, Type = this.DataSet.Tables[TableIndex].Columns[fName].Type, Value = this.DataSet.Tables[TableIndex].Rows[serialnumber][fName] });
                         }
                         try
                         {
@@ -855,8 +856,9 @@ namespace ExpressBase.Objects
                             foreach (string calcfd in (field as EbCalcField).DataFieldsUsedCalc)
                             {
                                 string TName = calcfd.Split('.')[0];
+                                int TableIndex = Convert.ToInt32(TName.Substring(1));
                                 string fName = calcfd.Split('.')[1];
-                                globals[TName].Add(fName, new NTV { Name = fName, Type = this.DataSet.Tables[0].Columns[fName].Type, Value = this.DataSet.Tables[0].Rows[serialnumber][fName] });
+                                globals[TName].Add(fName, new NTV { Name = fName, Type = this.DataSet.Tables[TableIndex].Columns[fName].Type, Value = this.DataSet.Tables[TableIndex].Rows[serialnumber][fName] });
                             }
                             column_val = (ValueScriptCollection[field.Name].RunAsync(globals)).Result.ReturnValue.ToString();
                             if (CalcValInRow.ContainsKey(field.Title))
@@ -1009,7 +1011,7 @@ namespace ExpressBase.Objects
         {
             try
             {
-                if (DataSourceRefId!=string.Empty)
+                if (DataSourceRefId != string.Empty)
                 {
                     this.EbDataSource = Redis.Get<EbDataSource>(DataSourceRefId);
                     if (this.EbDataSource == null || this.EbDataSource.Sql == null || this.EbDataSource.Sql == string.Empty)
@@ -1079,6 +1081,76 @@ namespace ExpressBase.Objects
                     globals["Params"].Add(p.Name, new NTV { Name = p.Name, Type = (EbDbTypes)Convert.ToInt32(p.Type), Value = p.Value });
                 }
         }
+        public void FillingCollections()
+        {
+            foreach (EbReportHeader r_header in ReportHeaders)
+            {
+                FillScriptCollection(r_header.Fields);
+               // FillFieldDict(r_header.Fields);
+               // FillLinkCollection(Report, r_header.Fields);
+            }
+
+            foreach (EbReportFooter r_footer in ReportFooters)
+            {
+                FillScriptCollection(r_footer.Fields);
+                //FillFieldDict(r_footer.Fields);
+               // FillLinkCollection(Report, r_footer.Fields);
+            }
+
+            foreach (EbPageHeader p_header in PageHeaders)
+            {
+                FillScriptCollection( p_header.Fields);
+               // FillFieldDict(p_header.Fields);
+               // FillLinkCollection(Report, p_header.Fields);
+            }
+
+            foreach (EbReportDetail detail in Detail)
+            {
+                FillScriptCollection( detail.Fields);
+               // FillFieldDict(detail.Fields);
+              // FillLinkCollection(Report, detail.Fields);
+            }
+
+            foreach (EbPageFooter p_footer in PageFooters)
+            {
+                FillScriptCollection( p_footer.Fields);
+               // FillFieldDict(p_footer.Fields);
+               // FillLinkCollection(Report, p_footer.Fields);
+            }
+        }
+        private void FillScriptCollection(List<EbReportField> fields)
+        {
+            foreach (EbReportField field in fields)
+            {
+                try
+                {
+                    if (field is EbCalcField && !ValueScriptCollection.ContainsKey(field.Name))
+                    {
+                        Script valscript = CSharpScript.Create<dynamic>((field as EbCalcField).ValueExpression, ScriptOptions.Default.WithReferences("Microsoft.CSharp", "System.Core").WithImports("System.Dynamic"), globalsType: typeof(Globals));
+                        valscript.Compile();
+                        ValueScriptCollection.Add(field.Name, valscript);
+
+                    }
+                    if ((field is EbDataField && !AppearanceScriptCollection.ContainsKey(field.Name) && (field as EbDataField).AppearanceExpression != ""))
+                    {
+                        Script appearscript = Microsoft.CodeAnalysis.CSharp.Scripting.CSharpScript.Create<dynamic>((field as EbDataField).AppearanceExpression, ScriptOptions.Default.WithReferences("Microsoft.CSharp", "System.Core").WithImports("System.Dynamic"), globalsType: typeof(Globals));
+                        appearscript.Compile();
+                        AppearanceScriptCollection.Add(field.Name, appearscript);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message + e.StackTrace);
+                }
+            }
+        }
+        //private void FillFieldDict(List<EbReportField> fields)
+        //{
+        //    foreach (EbReportField field in fields)
+        //    {
+        //        //FieldDict.Add(field.Name, field);
+        //    }
+        //}    
     }
 
     [EnableInBuilder(BuilderType.Report)]

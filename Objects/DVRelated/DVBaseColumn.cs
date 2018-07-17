@@ -1,4 +1,5 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.JsonConverters;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
@@ -61,6 +62,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
     }
 
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
+    [HideInPropertyGrid]
     public class DVBaseColumn : EbDataVisualizationObject
     {
         [JsonProperty(PropertyName = "data")]
@@ -71,6 +73,9 @@ namespace ExpressBase.Objects.Objects.DVRelated
         [Alias("Name")]
         [PropertyEditor(PropertyEditorType.Label)]
         public override string Name { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
+        public string EbSid{ get; set; }
 
         public EbDbTypes Type { get; set; }
 
@@ -102,6 +107,17 @@ namespace ExpressBase.Objects.Objects.DVRelated
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.DropDown)]
         public ControlType FilterControl { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
+        [JsonConverter(typeof(Base64Converter))]
+        public string Formula { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
+        [HideInPropertyGrid]
+        public bool IsCustomColumn { get; set; }
+
+
     }
 
     public class DVColumnCollection : List<DVBaseColumn>
@@ -119,6 +135,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
     }
 
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
+    [Alias("DVStringColumnAlias")]
     public class DVStringColumn : DVBaseColumn
     {
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
