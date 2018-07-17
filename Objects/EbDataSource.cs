@@ -62,7 +62,7 @@ namespace ExpressBase.Objects
             try
             {
                // this.FilterDialog = Redis.Get<EbFilterDialog>(this.FilterDialogRefId);
-                if (this.FilterDialog == null && this.FilterDialogRefId != "")
+                if (this.FilterDialog != null && this.FilterDialogRefId != "")
                 {
                     var result = client.Get<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = this.FilterDialogRefId });
                     this.FilterDialog = EbSerializers.Json_Deserialize(result.Data[0].Json);
