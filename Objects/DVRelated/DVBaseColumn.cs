@@ -62,6 +62,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
     }
 
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
+    [HideInPropertyGrid]
     public class DVBaseColumn : EbDataVisualizationObject
     {
         [JsonProperty(PropertyName = "data")]
@@ -112,7 +113,11 @@ namespace ExpressBase.Objects.Objects.DVRelated
         [JsonConverter(typeof(Base64Converter))]
         public string Formula { get; set; }
 
-        
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
+        [HideInPropertyGrid]
+        public bool IsCustomColumn { get; set; }
+
+
     }
 
     public class DVColumnCollection : List<DVBaseColumn>

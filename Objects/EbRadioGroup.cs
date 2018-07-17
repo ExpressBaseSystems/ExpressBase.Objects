@@ -123,6 +123,7 @@ this.Init = function(id)
     }
 
     [HideInToolBox]
+    [HideInPropertyGrid]
     public class EbRadioOptionAbstract : EbControlUI
     {
 
