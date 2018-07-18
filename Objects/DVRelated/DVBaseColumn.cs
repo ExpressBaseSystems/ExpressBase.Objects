@@ -75,7 +75,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
         public override string Name { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
-        public string EbSid{ get; set; }
+        public string EbSid { get; set; }
 
         public EbDbTypes Type { get; set; }
 
@@ -122,6 +122,28 @@ namespace ExpressBase.Objects.Objects.DVRelated
 
     public class DVColumnCollection : List<DVBaseColumn>
     {
+        public bool Contains(string name)
+        {
+            foreach (DVBaseColumn col in this)
+            {
+                if (col.Name.Equals(name))
+                    return true;
+            }
+
+            return false;
+        }
+
+        public DVBaseColumn Get(string name, EbDbTypes type)
+        {
+            foreach (DVBaseColumn col in this)
+            {
+                if (col.Name.Equals(name) && col.Type == type)
+                    return col;
+            }
+
+            return null;
+        }
+
         public DVBaseColumn Get(string name)
         {
             foreach (DVBaseColumn col in this)
@@ -131,6 +153,23 @@ namespace ExpressBase.Objects.Objects.DVRelated
             }
 
             return null;
+        }
+
+        public DVBaseColumn Pop(string name, EbDbTypes type)
+        {
+            DVBaseColumn tempCol = null;
+            foreach (DVBaseColumn col in this)
+            {
+                if (col.Name.Equals(name) && col.Type == type)
+                {
+                    tempCol = col;
+                    break;
+                }
+            }
+
+            this.Remove(tempCol);
+
+            return tempCol;
         }
     }
 
