@@ -75,7 +75,8 @@ namespace ExpressBase.Objects.Objects.DVRelated
         public override string Name { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
-        public string EbSid { get; set; }
+        [HideInPropertyGrid]
+        public string EbSid{ get; set; }
 
         public EbDbTypes Type { get; set; }
 
