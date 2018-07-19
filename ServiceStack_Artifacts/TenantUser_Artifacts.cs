@@ -542,10 +542,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class LocationInfoResponse: IEbSSResponse
+    public class LocationInfoResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
-        public Dictionary<int,EbSolutionLocation> Locations { get; set; }
+        public Dictionary<int, EbSolutionLocation> Locations { get; set; }
 
         [DataMember(Order = 1)]
         public List<EbLocationConfig> Config { get; set; }
@@ -553,6 +553,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 3)]
         public ResponseStatus ResponseStatus { get; set; }
     }
+
     [DataContract]
     public class UpdateSolutionRequest : IReturn<UpdateSolutionResponse>, IEbSSRequest
     {
@@ -564,9 +565,34 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class UpdateSolutionResponse : IEbSSResponse {
+    public class UpdateSolutionResponse : IEbSSResponse
+    {
 
         [DataMember(Order = 1)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+    }
+
+    [DataContract]
+    public class DeleteLocRequest : IReturn<DeleteLocResponse>, IEbSSRequest
+    {
+        [DataMember(Order = 1)]
+        public int Id { get; set; }
+
+        public string Token { get; set; }
+
+        public string TenantAccountId { get; set; }
+
+        public int UserId { get; set; }
+    }
+
+    [DataContract]
+    public class DeleteLocResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public int id { get; set; }
+
+        [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
 
     }
