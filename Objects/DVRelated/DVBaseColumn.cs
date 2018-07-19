@@ -193,6 +193,11 @@ else
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iTableVisualization, EbObjectTypes.iChartVisualization, EbObjectTypes.iReport)]
         public string LinkRefId { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [DefaultPropValue("16")]
+        [HideInPropertyGrid]
+        public override EbDbTypes Type { get; set; }
     }
 
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
@@ -248,5 +253,10 @@ else
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iTableVisualization, EbObjectTypes.iChartVisualization, EbObjectTypes.iReport)]
         public string LinkRefId { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [DefaultPropValue("5")]
+        [HideInPropertyGrid]
+        public override EbDbTypes Type { get; set; }
     }
 }
