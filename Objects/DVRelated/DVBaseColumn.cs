@@ -78,7 +78,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
         [HideInPropertyGrid]
         public string EbSid{ get; set; }
 
-        public EbDbTypes Type { get; set; }
+        public virtual EbDbTypes Type { get; set; }
 
         public string sType { get; set; }
 
@@ -216,6 +216,11 @@ else
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iTableVisualization, EbObjectTypes.iChartVisualization, EbObjectTypes.iReport)]
         public string LinkRefId { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [DefaultPropValue("11")]
+        [HideInPropertyGrid]
+        public override EbDbTypes Type { get; set; }
     }
 
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
