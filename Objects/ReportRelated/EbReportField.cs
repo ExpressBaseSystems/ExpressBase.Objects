@@ -751,51 +751,7 @@ this.BorderColor = '#eae6e6';
             ct.Go();
         }
     }
-
-    [EnableInBuilder(BuilderType.Report)]
-    public class EbLocFieldImage : EbReportField
-    {
-        [EnableInBuilder(BuilderType.Report)]
-        [JsonIgnore]
-        public override EbTextAlign TextAlign { get; set; }
-
-        public override string GetDesignHtml()
-        {
-            return "<div class='EbLocFieldImg dropped' eb-type='LocFieldImage' id='@id' style='border: @Border px solid;border-color: @BorderColor ;width: @Width px; background: url(../images/image.png) center no-repeat ; background-size: cover; height: @Height px; left: @Left px; top: @Top px;'></div>".RemoveCR().DoubleQuoted();
-        }
-        public override string GetJsInitFunc()
-        {
-            return @"
-    this.Init = function(id)
-        {
-    this.Height =40;
-    this.Width= 40;
-    this.Border = 1;
-this.BorderColor = '#eae6e6';
-};";
-        }
-    }
-
-    [EnableInBuilder(BuilderType.Report)]
-    public class EbLocFieldText : EbReportField
-    {
-        public override string GetDesignHtml()
-        {
-            return "<div class='EbLocFieldText dropped' eb-type='LocFieldText' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; height: @Height px; background-color:@BackColor ; color:@ForeColor ; left: @Left px; top: @Top px;text-align: @TextAlign ;'> @Title </div>".RemoveCR().DoubleQuoted();
-        }
-        public override string GetJsInitFunc()
-        {
-            return @"
-    this.Init = function(id)
-        {
-     this.Height =25;
-    this.Width= 200;
-    this.ForeColor = '#201c1c';
-this.Border = 1;
-this.BorderColor = '#eae6e6';
-};";
-        }
-    }
+    
     [EnableInBuilder(BuilderType.Report)]
     public class EbLocFieldImage : EbReportField
     {
