@@ -27,7 +27,7 @@ namespace ExpressBase.Objects.ReportRelated
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
         [HideInPropertyGrid]
-        public string  ParentName { get; set; }//only for builder
+        public string ParentName { get; set; }//only for builder
 
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
@@ -74,9 +74,9 @@ namespace ExpressBase.Objects.ReportRelated
         {
             get
             {
-              if(Font ==null)
-                Font = (new EbFont { color = "#000000", Font = "Times-Roman", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
-                if (/*iTextFont == null &&*/ Font!= null)
+                if (Font == null)
+                    Font = (new EbFont { color = "#000000", Font = "Times-Roman", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
+                if (/*iTextFont == null &&*/ Font != null)
                 {
                     iTextFont = new iTextSharp.text.Font(BaseFont.CreateFont(Font.Font, BaseFont.CP1252, BaseFont.EMBEDDED), Font.Size, (int)Font.Style, GetColor(Font.color));
                     if (Font.Caps)
@@ -213,8 +213,8 @@ this.BorderColor = '#eae6e6';
             {
                 //if (this.Font == null)
                 //    Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
-               // else
-                    phrase = new Phrase(this.WaterMarkText, ITextFont);
+                // else
+                phrase = new Phrase(this.WaterMarkText, ITextFont);
                 PdfContentByte canvas;
                 canvas = writer.DirectContentUnder;
                 ColumnText.ShowTextAligned(canvas, (int)TextAlign, phrase, d.PageSize.Width / 2, d.PageSize.Height / 2, this.Rotation);
@@ -294,9 +294,9 @@ this.BorderColor = '#eae6e6';
             var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
             column_val = FormatDate(column_val);
             Phrase phrase = null;
-            phrase = new Phrase(column_val,ITextFont);
+            phrase = new Phrase(column_val, ITextFont);
             ColumnText ct = new ColumnText(canvas);
-           // ct.Canvas.SetColorFill(GetColor(this.ForeColor));
+            // ct.Canvas.SetColorFill(GetColor(this.ForeColor));
             ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, (int)TextAlign);
             ct.Go();
         }
@@ -385,7 +385,7 @@ this.BorderColor = '#eae6e6';
             // else
             phrase = new Phrase(column_val, ITextFont);
             ColumnText ct = new ColumnText(canvas);
-           // ct.Canvas.SetColorFill(GetColor(this.ForeColor));
+            // ct.Canvas.SetColorFill(GetColor(this.ForeColor));
             ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, (int)TextAlign);
             ct.Go();
         }
@@ -439,7 +439,7 @@ this.BorderColor = '#eae6e6';
     [EnableInBuilder(BuilderType.Report)]
     public class EbText : EbReportField
     {
-        
+
         public override string GetDesignHtml()
         {
             return "<div class='Text-Field dropped' eb-type='Text' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; height: @Height px; background-color:@BackColor ; color:@ForeColor ; left: @Left px; top: @Top px;text-overflow: ellipsis;overflow: hidden;text-align: @TextAlign ;'> @Title </div>".RemoveCR().DoubleQuoted();
@@ -473,7 +473,7 @@ this.BorderColor = '#eae6e6';
             //else
             phrase = new Phrase(this.Title, ITextFont);
 
-            ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15,(int)TextAlign);
+            ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, (int)TextAlign);
             ct.Go();
         }
     }
@@ -636,7 +636,7 @@ this.BorderColor = '#eae6e6';
                 imageEAN = uccEan128.CreateImageWithBarcode(cb: canvas, barColor: null, textColor: null);
                 //}
 
-               // imageEAN.ScaleAbsolute(Width, Height);
+                // imageEAN.ScaleAbsolute(Width, Height);
                 imageEAN.SetAbsolutePosition(LeftPt, reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop));
                 doc.Add(imageEAN);
             }
@@ -866,4 +866,5 @@ this.BorderColor = '#eae6e6';
             ct.Go();
         }
     }
+}
 
