@@ -13,7 +13,7 @@ namespace ExpressBase.Objects
 	{
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.Collection)]
-        public List<EbLocation> LocationCollection { get; set; }
+        public List<EbLocationCard> LocationCollection { get; set; }
 
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
@@ -26,7 +26,7 @@ namespace ExpressBase.Objects
 
 		public EbLocations()
         {
-            this.LocationCollection = new List<EbLocation>();
+            this.LocationCollection = new List<EbLocationCard>();
         }
 
         [OnDeserialized]
@@ -75,7 +75,7 @@ this.Init = function(id)
         {
             string optHTML = "<select class='loc-opt-DD'>";
 
-            foreach (EbLocation ec in this.LocationCollection)
+            foreach (EbLocationCard ec in this.LocationCollection)
                 optHTML += "<option class='loc-opt-btn' value='@name@' for='@name@' >@optName@</option>"
 .Replace("@optName@", (ec.ShortName != null) ? ((ec.ShortName.Trim() == string.Empty) ? ec.Label.Split(" ")[0] : ec.ShortName) : "@ShortName@")
 .Replace("@name@", ec.Name);
@@ -87,7 +87,7 @@ this.Init = function(id)
         {
             string optHTML = string.Empty;
 
-            foreach (EbLocation ec in this.LocationCollection)
+            foreach (EbLocationCard ec in this.LocationCollection)
                 optHTML += "<div class='loc-opt-btn' for='@name@' tabindex='0' style='width:@width@%;'>@optName@</div>"
 .Replace("@optName@", (ec.ShortName != null) ?( (ec.ShortName.Trim() == string.Empty) ? ec.Label.Split(" ")[0] : ec.ShortName) :"@ShortName@")
 .Replace("@width@", (100 / this.LocationCollection.Count).ToString())
@@ -135,7 +135,7 @@ this.Init = function(id)
 .Replace("@name@", (this.Name != null) ? this.Name : "@name@")
 .Replace("@options@", (this.showTabed == true) ? this.getOptButtons() : this.getOptDD());
 
-            foreach (EbLocation ec in this.LocationCollection)
+            foreach (EbLocationCard ec in this.LocationCollection)
                 html += ec.GetHtml();
 
             return html + "</div>"
@@ -158,7 +158,7 @@ this.Init = function(id)
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
     [HideInToolBox]
-    public class EbLocation : EbControlUI
+    public class EbLocationCard : EbControlUI
 	{
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
@@ -172,7 +172,7 @@ this.Init = function(id)
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
         public string ShortName { get; set; }
 
-        public EbLocation() { }
+        public EbLocationCard() { }
 
         public override string GetBareHtml()
         {
