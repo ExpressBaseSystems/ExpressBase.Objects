@@ -389,12 +389,15 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int Id { get; set; }
 
         [DataMember(Order = 2)]
-        public string Token { get; set; }
+        public string ExceptionMessage { get; set; }
 
         [DataMember(Order = 3)]
-        public ResponseStatus ResponseStatus { get; set; }
+        public string Token { get; set; }
 
         [DataMember(Order = 4)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 5)]
         public string RefId { get; set; }
     }
 
