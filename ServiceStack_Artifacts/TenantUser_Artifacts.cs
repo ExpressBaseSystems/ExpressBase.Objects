@@ -474,7 +474,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class CreateLocationConfigRequest : IReturn<GetUserGroupResponse>, IEbSSRequest
     {
         [DataMember(Order = 1)]
-        public EbLocationConfig Conf { get; set; }
+        public EbLocationCustomField Conf { get; set; }
 
         public string Token { get; set; }
 
@@ -545,10 +545,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class LocationInfoResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
-        public Dictionary<int, EbSolutionLocation> Locations { get; set; }
+        public Dictionary<int, Common.LocationNSolution.EbLocation> Locations { get; set; }
 
         [DataMember(Order = 1)]
-        public List<EbLocationConfig> Config { get; set; }
+        public List<EbLocationCustomField> Config { get; set; }
 
         [DataMember(Order = 3)]
         public ResponseStatus ResponseStatus { get; set; }
