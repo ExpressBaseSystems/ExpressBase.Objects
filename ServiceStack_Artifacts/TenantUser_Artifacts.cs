@@ -545,7 +545,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class LocationInfoResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
-        public Dictionary<int, Common.LocationNSolution.EbLocation> Locations { get; set; }
+        public Dictionary<int, EbLocation> Locations { get; set; }
 
         [DataMember(Order = 1)]
         public List<EbLocationCustomField> Config { get; set; }
