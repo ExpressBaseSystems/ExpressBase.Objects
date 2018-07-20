@@ -4,6 +4,7 @@ using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
 using ExpressBase.Common.Extensions;
+using ExpressBase.Common.LocationNSolution;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.ServiceClients;
@@ -289,6 +290,9 @@ namespace ExpressBase.Objects
 
         [JsonIgnore]
         public MemoryStream Ms1 { get; set; }
+
+        [JsonIgnore]
+        public Eb_Solution Solution { get; set; }
 
         private float _rhHeight = 0;
 
@@ -964,6 +968,17 @@ namespace ExpressBase.Objects
                     column_val = GetDataFieldtValue(column_name, serialnumber, tableIndex);
                     field.DrawMe(Doc, Canvas, HeightPt, section_Yposition, detailprintingtop, column_val);
                 }
+                else if (field is EbLocFieldImage)
+                {
+                    byte[] fileByte = GetFile(Solution.Locations[41][field.Title]);
+                    if (fileByte != null)
+                        field.DrawMe(Doc, fileByte, HeightPt, section_Yposition, detailprintingtop);
+                }
+                else if (field is EbLocFieldText)
+                {
+                    column_val =Solution.Locations[41][field.Title] ;
+                    field.DrawMe(Canvas, HeightPt, section_Yposition, detailprintingtop, column_val);
+                }
             }
             catch (Exception e)
             {
@@ -1086,36 +1101,36 @@ namespace ExpressBase.Objects
             foreach (EbReportHeader r_header in ReportHeaders)
             {
                 FillScriptCollection(r_header.Fields);
-               // FillFieldDict(r_header.Fields);
-               // FillLinkCollection(Report, r_header.Fields);
+                // FillFieldDict(r_header.Fields);
+                // FillLinkCollection(Report, r_header.Fields);
             }
 
             foreach (EbReportFooter r_footer in ReportFooters)
             {
                 FillScriptCollection(r_footer.Fields);
                 //FillFieldDict(r_footer.Fields);
-               // FillLinkCollection(Report, r_footer.Fields);
+                // FillLinkCollection(Report, r_footer.Fields);
             }
 
             foreach (EbPageHeader p_header in PageHeaders)
             {
-                FillScriptCollection( p_header.Fields);
-               // FillFieldDict(p_header.Fields);
-               // FillLinkCollection(Report, p_header.Fields);
+                FillScriptCollection(p_header.Fields);
+                // FillFieldDict(p_header.Fields);
+                // FillLinkCollection(Report, p_header.Fields);
             }
 
             foreach (EbReportDetail detail in Detail)
             {
-                FillScriptCollection( detail.Fields);
-               // FillFieldDict(detail.Fields);
-              // FillLinkCollection(Report, detail.Fields);
+                FillScriptCollection(detail.Fields);
+                // FillFieldDict(detail.Fields);
+                // FillLinkCollection(Report, detail.Fields);
             }
 
             foreach (EbPageFooter p_footer in PageFooters)
             {
-                FillScriptCollection( p_footer.Fields);
-               // FillFieldDict(p_footer.Fields);
-               // FillLinkCollection(Report, p_footer.Fields);
+                FillScriptCollection(p_footer.Fields);
+                // FillFieldDict(p_footer.Fields);
+                // FillLinkCollection(Report, p_footer.Fields);
             }
         }
         private void FillScriptCollection(List<EbReportField> fields)

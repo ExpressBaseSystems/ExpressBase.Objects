@@ -796,5 +796,74 @@ this.BorderColor = '#eae6e6';
 };";
         }
     }
-}
+    [EnableInBuilder(BuilderType.Report)]
+    public class EbLocFieldImage : EbReportField
+    {
+        [EnableInBuilder(BuilderType.Report)]
+        [JsonIgnore]
+        public override EbTextAlign TextAlign { get; set; }
+
+        public override string GetDesignHtml()
+        {
+            return "<div class='EbLocFieldImg dropped' eb-type='LocFieldImage' id='@id' style='border: @Border px solid;border-color: @BorderColor ;width: @Width px; background: url(../images/image.png) center no-repeat ; background-size: cover; height: @Height px; left: @Left px; top: @Top px;'></div>".RemoveCR().DoubleQuoted();
+        }
+        public override string GetJsInitFunc()
+        {
+            return @"
+    this.Init = function(id)
+        {
+    this.Height =40;
+    this.Width= 40;
+    this.Border = 1;
+this.BorderColor = '#eae6e6';
+};";
+        }
+        public override void DrawMe(Document d, byte[] fileByte, float reportHeight, float printingTop, float detailprintingtop)
+        {
+            iTextSharp.text.Image myImage = iTextSharp.text.Image.GetInstance(fileByte);
+            myImage.ScaleToFit(this.WidthPt, this.HeightPt);
+            myImage.SetAbsolutePosition(this.LeftPt, reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop));
+            myImage.Alignment = (int)TextAlign;
+            d.Add(myImage);
+        }
+
+    }
+
+    [EnableInBuilder(BuilderType.Report)]
+    public class EbLocFieldText : EbReportField
+    {
+        [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup("Data Settings")]
+        [UIproperty]
+        public Boolean RenderInMultiLine { get; set; } = true;
+        public override string GetDesignHtml()
+        {
+            return "<div class='EbLocFieldText dropped' eb-type='LocFieldText' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; height: @Height px; background-color:@BackColor ; color:@ForeColor ; left: @Left px; top: @Top px;text-align: @TextAlign ;'> @Title </div>".RemoveCR().DoubleQuoted();
+        }
+        public override string GetJsInitFunc()
+        {
+            return @"
+    this.Init = function(id)
+        {
+     this.Height =25;
+    this.Width= 200;
+    this.ForeColor = '#201c1c';
+this.Border = 1;
+this.BorderColor = '#eae6e6';
+};";
+        }
+
+        public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
+        {
+            var urx = this.WidthPt + this.LeftPt;
+            var ury = reportHeight - (printingTop + this.TopPt + detailprintingtop);
+            var llx = this.LeftPt;
+            var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
+            Phrase phrase = null;
+            phrase = new Phrase(column_val, ITextFont);
+            ColumnText ct = new ColumnText(canvas);
+            ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, (int)TextAlign);
+            ct.Go();
+        }
+    }
 
