@@ -100,9 +100,9 @@ namespace ExpressBase.Objects.ReportRelated
             ColumnText ct = new ColumnText(canvas);
             Phrase text;
             
-            if (this.Prefix != "" || this.Suffix != "")
+            if (Prefix != "" || Suffix != "")
             {
-                column_val = this.Prefix + " " + column_val + " " + this.Suffix;
+                column_val = Prefix + " " + column_val + " " + Suffix;
             }
             text = new Phrase(column_val, ITextFont);
             if (this.RenderInMultiLine)
@@ -135,7 +135,7 @@ namespace ExpressBase.Objects.ReportRelated
             var calcbasefont = text.Font.GetCalculatedBaseFont(false);
             float stringwidth = calcbasefont.GetWidthPoint(column_val, text.Font.CalculatedSize);
             var charwidth = stringwidth / column_val.Length;
-            int numberofCharsInALine = Convert.ToInt32(Math.Floor(this.WidthPt / charwidth));
+            int numberofCharsInALine = Convert.ToInt32(Math.Floor(WidthPt / charwidth));
             if (numberofCharsInALine < column_val.Length)
             {
                 if (column_type == System.Data.DbType.Decimal)
@@ -201,7 +201,7 @@ namespace ExpressBase.Objects.ReportRelated
                 ct.AddText(text);
             }
             var ury = reportHeight - (printingTop + TopPt + detailprintingtop);
-                var lly = reportHeight - (printingTop + TopPt + this.HeightPt + detailprintingtop);
+                var lly = reportHeight - (printingTop + TopPt + HeightPt + detailprintingtop);
                 ct.SetSimpleColumn(LeftPt, lly, WidthPt + LeftPt, ury, 15, (int)TextAlign);
                 ct.Go();
         }
@@ -236,15 +236,15 @@ namespace ExpressBase.Objects.ReportRelated
         public string FormatDate(string column_val)
         {
             DateTime dt = Convert.ToDateTime(column_val);
-            if (this.Format == DateFormatReport.dddd_MMMM_d_yyyy)
+            if (Format == DateFormatReport.dddd_MMMM_d_yyyy)
                 return String.Format("{0:dddd, MMMM d, yyyy}", dt);
-            else if (this.Format == DateFormatReport.M_d_yyyy)
+            else if (Format == DateFormatReport.M_d_yyyy)
                 return String.Format("{0:M/d/yyyy}", dt);
-            else if (this.Format == DateFormatReport.ddd_MMM_d_yyyy)
+            else if (Format == DateFormatReport.ddd_MMM_d_yyyy)
                 return String.Format("{0:ddd, MMM d, yyyy}", dt);
-            else if (this.Format == DateFormatReport.MM_dd_yy)
+            else if (Format == DateFormatReport.MM_dd_yy)
                 return String.Format("{0:MM/dd/yy}", dt);
-            else if (this.Format == DateFormatReport.MM_dd_yyyy)
+            else if (Format == DateFormatReport.MM_dd_yyyy)
                 return String.Format("{0:MM/dd/yyyy}", dt);
             return column_val;
         }
@@ -254,9 +254,9 @@ namespace ExpressBase.Objects.ReportRelated
             ColumnText ct = new ColumnText(canvas);
             Phrase text;
             column_val = FormatDate(column_val);
-            if (this.Prefix != "" || this.Suffix != "")
+            if (Prefix != "" || Suffix != "")
             {
-                column_val = this.Prefix + " " + column_val + " " + Suffix;
+                column_val = Prefix + " " + column_val + " " + Suffix;
             }
             text = new Phrase(column_val, ITextFont);
             if (RenderInMultiLine)
@@ -344,27 +344,27 @@ this.BorderColor = '#eae6e6';
         {
             Phrase text;
             ColumnText ct = new ColumnText(canvas);
-            var ury = reportHeight - (printingTop + this.TopPt + detailprintingtop);
-            var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
-            if (this.DecimalPlaces > 0)
-                column_val = Convert.ToDecimal(column_val).ToString("F" + this.DecimalPlaces);
-            if (this.InLetters)
+            var ury = reportHeight - (printingTop + TopPt + detailprintingtop);
+            var lly = reportHeight - (printingTop + TopPt + HeightPt + detailprintingtop);
+            if (DecimalPlaces > 0)
+                column_val = Convert.ToDecimal(column_val).ToString("F" + DecimalPlaces);
+            if (InLetters)
             {
                 NumberToEnglish numToE = new NumberToEnglish();
                 column_val = numToE.changeCurrencyToWords(column_val);
             }
 
-            if (this.Prefix != "" || this.Suffix != "")
+            if (Prefix != "" || Suffix != "")
             {
-                column_val = this.Prefix + " " + column_val + " " + this.Suffix;
+                column_val = Prefix + " " + column_val + " " + Suffix;
             }
             text = new Phrase(column_val, ITextFont);
-            if (this.RenderInMultiLine)
+            if (RenderInMultiLine)
             {
                 column_val = RenderMultiLine(column_val, text, column_type);
                 text = new Phrase(column_val, ITextFont);
             }
-            if (!string.IsNullOrEmpty(this.LinkRefid))
+            if (!string.IsNullOrEmpty(LinkRefid))
             {
                 Anchor a = CreateLink(text, LinkRefid, doc, Params);
                 Paragraph p = new Paragraph
@@ -414,16 +414,16 @@ this.BorderColor = '#eae6e6';
         {
             get
             {
-                if (this.Function == SummaryFunctionsNumeric.Sum)
-                    return this.Sum;
-                else if (this.Function == SummaryFunctionsNumeric.Average && this.Count > 0)
-                    return this.Sum / this.Count;
-                else if (this.Function == SummaryFunctionsNumeric.Count)
-                    return this.Count;
-                else if (this.Function == SummaryFunctionsNumeric.Max)
-                    return this.Max;
-                else if (this.Function == SummaryFunctionsNumeric.Min)
-                    return this.Min;
+                if (Function == SummaryFunctionsNumeric.Sum)
+                    return Sum;
+                else if (Function == SummaryFunctionsNumeric.Average && this.Count > 0)
+                    return Sum / Count;
+                else if (Function == SummaryFunctionsNumeric.Count)
+                    return Count;
+                else if (Function == SummaryFunctionsNumeric.Max)
+                    return Max;
+                else if (Function == SummaryFunctionsNumeric.Min)
+                    return Min;
 
                 return 0;
             }
@@ -431,35 +431,35 @@ this.BorderColor = '#eae6e6';
 
         public void Summarize(object value)
         {
-            this.Count++;
+            Count++;
             decimal myvalue = Convert.ToDecimal(value);
 
-            if (this.Function == SummaryFunctionsNumeric.Sum || this.Function == SummaryFunctionsNumeric.Average)
+            if (Function == SummaryFunctionsNumeric.Sum || Function == SummaryFunctionsNumeric.Average)
             {
-                if (this.Function == SummaryFunctionsNumeric.Sum || this.Function == SummaryFunctionsNumeric.Average)
-                    this.Sum += myvalue;
+                if (Function == SummaryFunctionsNumeric.Sum || Function == SummaryFunctionsNumeric.Average)
+                    Sum += myvalue;
             }
 
-            if (this.Count > 1)
+            if (Count > 1)
             {
-                if (this.Function == SummaryFunctionsNumeric.Max)
-                    this.Max = (this.Max > myvalue) ? this.Max : myvalue;
-                else if (this.Function == SummaryFunctionsNumeric.Min)
-                    this.Min = (this.Min < myvalue) ? this.Min : myvalue;
+                if (Function == SummaryFunctionsNumeric.Max)
+                    Max = (Max > myvalue) ? Max : myvalue;
+                else if (Function == SummaryFunctionsNumeric.Min)
+                    Min = (Min < myvalue) ? Min : myvalue;
             }
             else
             {
-                if (this.Function == SummaryFunctionsNumeric.Max)
-                    this.Max = myvalue;
-                else if (this.Function == SummaryFunctionsNumeric.Min)
-                    this.Min = myvalue;
+                if (Function == SummaryFunctionsNumeric.Max)
+                    Max = myvalue;
+                else if (Function == SummaryFunctionsNumeric.Min)
+                    Min = myvalue;
             }
         }
 
         public override void NotifyNewPage(bool status)
         {
-            if (status && this.ResetOnNewPage)
-                this.Sum = 0;
+            if (status && ResetOnNewPage)
+                Sum = 0;
         }
 
         public override string GetDesignHtml()
@@ -482,11 +482,11 @@ this.BorderColor = '#eae6e6';
         public override void DrawMe(Document doc, PdfContentByte canvas, float reportHeight, float printingTop, string column_val, float detailprintingtop, DbType column_type, List<Param> Params)
         {
             Phrase text;
-            var ury = reportHeight - (printingTop + this.TopPt + detailprintingtop);
-            var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
-            if (this.DecimalPlaces > 0)
-                column_val = Convert.ToDecimal(column_val).ToString("F" + this.DecimalPlaces);
-            if (this.InLetters)
+            var ury = reportHeight - (printingTop + TopPt + detailprintingtop);
+            var lly = reportHeight - (printingTop + TopPt + HeightPt + detailprintingtop);
+            if (DecimalPlaces > 0)
+                column_val = Convert.ToDecimal(column_val).ToString("F" + DecimalPlaces);
+            if (InLetters)
             {
                 NumberToEnglish numToE = new NumberToEnglish();
                 column_val = numToE.changeCurrencyToWords(column_val);
@@ -498,7 +498,7 @@ this.BorderColor = '#eae6e6';
                 text = new Phrase(column_val, ITextFont);
             }
             ColumnText ct = new ColumnText(canvas);
-            ct.SetSimpleColumn(text, this.LeftPt, lly, this.WidthPt + this.LeftPt, ury, 15, (int)TextAlign);
+            ct.SetSimpleColumn(text, LeftPt, lly, WidthPt + LeftPt, ury, 15, (int)TextAlign);
             ct.Go();
         }
     }
@@ -524,12 +524,12 @@ this.BorderColor = '#eae6e6';
         {
             get
             {
-                if (this.Function == SummaryFunctionsText.Count)
-                    return this.Count;
-                else if (this.Function == SummaryFunctionsText.Max)
-                    return this.Max;
-                else if (this.Function == SummaryFunctionsText.Min)
-                    return this.Min;
+                if (Function == SummaryFunctionsText.Count)
+                    return Count;
+                else if (Function == SummaryFunctionsText.Max)
+                    return Max;
+                else if (Function == SummaryFunctionsText.Min)
+                    return Min;
 
                 return 0;
             }
@@ -538,20 +538,20 @@ this.BorderColor = '#eae6e6';
         public void Summarize(object value)
         {
             var myvalue = value.ToString();
-            this.Count++;
-            if (this.Count > 1)
+            Count++;
+            if (Count > 1)
             {
-                if (this.Function == SummaryFunctionsText.Max)
-                    this.Max = (this.Max.CompareTo(myvalue) > 0) ? this.Max : myvalue;
-                else if (this.Function == SummaryFunctionsText.Min)
-                    this.Min = (this.Min.CompareTo(myvalue) > 0) ? myvalue : this.Min;
+                if (Function == SummaryFunctionsText.Max)
+                    Max = (Max.CompareTo(myvalue) > 0) ? Max : myvalue;
+                else if (Function == SummaryFunctionsText.Min)
+                    Min = (Min.CompareTo(myvalue) > 0) ? myvalue : Min;
             }
             else
             {
-                if (this.Function == SummaryFunctionsText.Max)
-                    this.Max = myvalue;
-                else if (this.Function == SummaryFunctionsText.Min)
-                    this.Min = myvalue;
+                if (Function == SummaryFunctionsText.Max)
+                    Max = myvalue;
+                else if (Function == SummaryFunctionsText.Min)
+                    Min = myvalue;
             }
         }
 
@@ -595,12 +595,12 @@ this.BorderColor = '#eae6e6';
         {
             get
             {
-                if (this.Function == SummaryFunctionsDateTime.Count)
-                    return this.Count;
-                else if (this.Function == SummaryFunctionsDateTime.Max)
-                    return this.Max;
-                else if (this.Function == SummaryFunctionsDateTime.Min)
-                    return this.Min;
+                if (Function == SummaryFunctionsDateTime.Count)
+                    return Count;
+                else if (Function == SummaryFunctionsDateTime.Max)
+                    return Max;
+                else if (Function == SummaryFunctionsDateTime.Min)
+                    return Min;
 
                 return 0;
             }
@@ -609,20 +609,20 @@ this.BorderColor = '#eae6e6';
         public void Summarize(object value)
         {
             var myvalue = Convert.ToDateTime(value);
-            this.Count++;
-            if (this.Count > 1)
+            Count++;
+            if (Count > 1)
             {
-                if (this.Function == SummaryFunctionsDateTime.Max)
-                    this.Max = (DateTime.Compare(this.Max, myvalue) > 0) ? this.Max : myvalue;
-                if (this.Function == SummaryFunctionsDateTime.Min)
-                    this.Min = (DateTime.Compare(this.Min, myvalue) > 0) ? myvalue : this.Min;
+                if (Function == SummaryFunctionsDateTime.Max)
+                    Max = (DateTime.Compare(Max, myvalue) > 0) ? Max : myvalue;
+                if (Function == SummaryFunctionsDateTime.Min)
+                    Min = (DateTime.Compare(Min, myvalue) > 0) ? myvalue : Min;
             }
             else
             {
-                if (this.Function == SummaryFunctionsDateTime.Max)
-                    this.Max = myvalue;
-                if (this.Function == SummaryFunctionsDateTime.Min)
-                    this.Min = myvalue;
+                if (Function == SummaryFunctionsDateTime.Max)
+                    Max = myvalue;
+                if (Function == SummaryFunctionsDateTime.Min)
+                    Min = myvalue;
             }
         }
 
@@ -662,15 +662,15 @@ this.BorderColor = '#eae6e6';
         {
             get
             {
-                if (this.Function == SummaryFunctionsBoolean.Count)
-                    return this.Count;
+                if (Function == SummaryFunctionsBoolean.Count)
+                    return Count;
                 return 0;
             }
         }
 
         public void Summarize(object value)
         {
-            this.Count++;
+            Count++;
         }
 
         public override string GetDesignHtml()
@@ -725,7 +725,7 @@ this.BorderColor = '#eae6e6';
             {
                 if (_dataFieldsUsed == null)
                 {
-                    var matches = Regex.Matches(this.ValueExpression, @"T[0-9]{1}.\w+").OfType<Match>()
+                    var matches = Regex.Matches(ValueExpression, @"T[0-9]{1}.\w+").OfType<Match>()
      .Select(m => m.Groups[0].Value)
      .Distinct();
 
@@ -767,27 +767,27 @@ this.BorderColor = '#eae6e6';
             {
                 column_val = "0";
             }
-            if (this.DecimalPlaces > 0)
-                column_val = Convert.ToDecimal(column_val).ToString("F" + this.DecimalPlaces);
-            if (this.InLetters)
+            if (DecimalPlaces > 0)
+                column_val = Convert.ToDecimal(column_val).ToString("F" + DecimalPlaces);
+            if (InLetters)
             {
                 NumberToEnglish numToE = new NumberToEnglish();
                 column_val = numToE.changeCurrencyToWords(column_val);
             }
 
-            if (this.Prefix != "" || this.Suffix != "")
+            if (Prefix != "" || Suffix != "")
             {
-                column_val = this.Prefix + " " + column_val + " " + this.Suffix;
+                column_val = Prefix + " " + column_val + " " + Suffix;
             }
             text = new Phrase(column_val, ITextFont);
-            if (this.RenderInMultiLine)
+            if (RenderInMultiLine)
             {
                 column_val = RenderMultiLine(column_val, text, column_type);
                 text = new Phrase(column_val, ITextFont);
             }
-            var ury = reportHeight - (printingTop + this.TopPt + detailprintingtop);
-            var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
-            ct.SetSimpleColumn(text, this.LeftPt, lly, this.WidthPt + this.LeftPt, ury, 15, (int)TextAlign);
+            var ury = reportHeight - (printingTop + TopPt + detailprintingtop);
+            var lly = reportHeight - (printingTop + TopPt + HeightPt + detailprintingtop);
+            ct.SetSimpleColumn(text, LeftPt, lly, WidthPt + LeftPt, ury, 15, (int)TextAlign);
             ct.Go();
         }
     }
@@ -815,16 +815,16 @@ this.BorderColor = '#eae6e6';
         {
             get
             {
-                if (this.Function == SummaryFunctionsNumeric.Sum)
-                    return this.Sum;
-                else if (this.Function == SummaryFunctionsNumeric.Average && this.Count > 0)
-                    return this.Sum / this.Count;
-                else if (this.Function == SummaryFunctionsNumeric.Count)
-                    return this.Count;
-                else if (this.Function == SummaryFunctionsNumeric.Max)
-                    return this.Max;
-                else if (this.Function == SummaryFunctionsNumeric.Min)
-                    return this.Min;
+                if (Function == SummaryFunctionsNumeric.Sum)
+                    return Sum;
+                else if (Function == SummaryFunctionsNumeric.Average && Count > 0)
+                    return Sum / Count;
+                else if (Function == SummaryFunctionsNumeric.Count)
+                    return Count;
+                else if (Function == SummaryFunctionsNumeric.Max)
+                    return Max;
+                else if (Function == SummaryFunctionsNumeric.Min)
+                    return Min;
 
                 return 0;
             }
@@ -832,35 +832,35 @@ this.BorderColor = '#eae6e6';
 
         public void Summarize(object value)
         {
-            this.Count++;
+            Count++;
             decimal myvalue = Convert.ToDecimal(value);
 
-            if (this.Function == SummaryFunctionsNumeric.Sum || this.Function == SummaryFunctionsNumeric.Average)
+            if (Function == SummaryFunctionsNumeric.Sum || Function == SummaryFunctionsNumeric.Average)
             {
-                if (this.Function == SummaryFunctionsNumeric.Sum || this.Function == SummaryFunctionsNumeric.Average)
-                    this.Sum += myvalue;
+                if (Function == SummaryFunctionsNumeric.Sum || Function == SummaryFunctionsNumeric.Average)
+                    Sum += myvalue;
             }
 
-            if (this.Count > 1)
+            if (Count > 1)
             {
-                if (this.Function == SummaryFunctionsNumeric.Max)
-                    this.Max = (this.Max > myvalue) ? this.Max : myvalue;
-                else if (this.Function == SummaryFunctionsNumeric.Min)
-                    this.Min = (this.Min < myvalue) ? this.Min : myvalue;
+                if (Function == SummaryFunctionsNumeric.Max)
+                    Max = (Max > myvalue) ? Max : myvalue;
+                else if (Function == SummaryFunctionsNumeric.Min)
+                    Min = (Min < myvalue) ? Min : myvalue;
             }
             else
             {
-                if (this.Function == SummaryFunctionsNumeric.Max)
-                    this.Max = myvalue;
-                else if (this.Function == SummaryFunctionsNumeric.Min)
-                    this.Min = myvalue;
+                if (Function == SummaryFunctionsNumeric.Max)
+                    Max = myvalue;
+                else if (Function == SummaryFunctionsNumeric.Min)
+                    Min = myvalue;
             }
         }
 
         public override void NotifyNewPage(bool status)
         {
-            if (status && this.ResetOnNewPage)
-                this.Sum = 0;
+            if (status && ResetOnNewPage)
+                Sum = 0;
         }
 
         public override string GetDesignHtml()
@@ -883,23 +883,23 @@ this.BorderColor = '#eae6e6';
         public override void DrawMe(Document doc, PdfContentByte canvas, float reportHeight, float printingTop, string column_val, float detailprintingtop, DbType column_type, List<Param> Params)
         {
             Phrase text;
-            var ury = reportHeight - (printingTop + this.TopPt + detailprintingtop);
-            var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
-            if (this.DecimalPlaces > 0)
-                column_val = Convert.ToDecimal(column_val).ToString("F" + this.DecimalPlaces);
-            if (this.InLetters)
+            var ury = reportHeight - (printingTop + TopPt + detailprintingtop);
+            var lly = reportHeight - (printingTop + TopPt + HeightPt + detailprintingtop);
+            if (DecimalPlaces > 0)
+                column_val = Convert.ToDecimal(column_val).ToString("F" + DecimalPlaces);
+            if (InLetters)
             {
                 NumberToEnglish numToE = new NumberToEnglish();
                 column_val = numToE.changeCurrencyToWords(column_val);
             }
             text = new Phrase(column_val, ITextFont);
-            if (this.RenderInMultiLine)
+            if (RenderInMultiLine)
             {
                 column_val = RenderMultiLine(column_val, text, column_type);
                 text = new Phrase(column_val, ITextFont);
             }
             ColumnText ct = new ColumnText(canvas);
-            ct.SetSimpleColumn(text, this.LeftPt, lly, this.WidthPt + this.LeftPt, ury, 15, (int)TextAlign);
+            ct.SetSimpleColumn(text, LeftPt, lly, WidthPt + LeftPt, ury, 15, (int)TextAlign);
             ct.Go();
         }
 
@@ -926,12 +926,12 @@ this.BorderColor = '#eae6e6';
         {
             get
             {
-                if (this.Function == SummaryFunctionsText.Count)
-                    return this.Count;
-                else if (this.Function == SummaryFunctionsText.Max)
-                    return this.Max;
-                else if (this.Function == SummaryFunctionsText.Min)
-                    return this.Min;
+                if (Function == SummaryFunctionsText.Count)
+                    return Count;
+                else if (Function == SummaryFunctionsText.Max)
+                    return Max;
+                else if (Function == SummaryFunctionsText.Min)
+                    return Min;
 
                 return 0;
             }
@@ -940,20 +940,20 @@ this.BorderColor = '#eae6e6';
         public void Summarize(object value)
         {
             var myvalue = value.ToString();
-            this.Count++;
-            if (this.Count > 1)
+            Count++;
+            if (Count > 1)
             {
-                if (this.Function == SummaryFunctionsText.Max)
-                    this.Max = (this.Max.CompareTo(myvalue) > 0) ? this.Max : myvalue;
-                else if (this.Function == SummaryFunctionsText.Min)
-                    this.Min = (this.Min.CompareTo(myvalue) > 0) ? myvalue : this.Min;
+                if (Function == SummaryFunctionsText.Max)
+                    Max = (Max.CompareTo(myvalue) > 0) ? Max : myvalue;
+                else if (Function == SummaryFunctionsText.Min)
+                    Min = (Min.CompareTo(myvalue) > 0) ? myvalue : Min;
             }
             else
             {
-                if (this.Function == SummaryFunctionsText.Max)
-                    this.Max = myvalue;
-                else if (this.Function == SummaryFunctionsText.Min)
-                    this.Min = myvalue;
+                if (Function == SummaryFunctionsText.Max)
+                    Max = myvalue;
+                else if (Function == SummaryFunctionsText.Min)
+                    Min = myvalue;
             }
         }
 
@@ -997,12 +997,12 @@ this.BorderColor = '#eae6e6';
         {
             get
             {
-                if (this.Function == SummaryFunctionsDateTime.Count)
-                    return this.Count;
-                else if (this.Function == SummaryFunctionsDateTime.Max)
-                    return this.Max;
-                else if (this.Function == SummaryFunctionsDateTime.Min)
-                    return this.Min;
+                if (Function == SummaryFunctionsDateTime.Count)
+                    return Count;
+                else if (Function == SummaryFunctionsDateTime.Max)
+                    return Max;
+                else if (Function == SummaryFunctionsDateTime.Min)
+                    return Min;
 
                 return 0;
             }
@@ -1011,20 +1011,20 @@ this.BorderColor = '#eae6e6';
         public void Summarize(object value)
         {
             var myvalue = Convert.ToDateTime(value);
-            this.Count++;
-            if (this.Count > 1)
+            Count++;
+            if (Count > 1)
             {
-                if (this.Function == SummaryFunctionsDateTime.Max)
-                    this.Max = (DateTime.Compare(this.Max, myvalue) > 0) ? this.Max : myvalue;
-                if (this.Function == SummaryFunctionsDateTime.Min)
-                    this.Min = (DateTime.Compare(this.Min, myvalue) > 0) ? myvalue : this.Min;
+                if (Function == SummaryFunctionsDateTime.Max)
+                    Max = (DateTime.Compare(Max, myvalue) > 0) ? Max : myvalue;
+                if (Function == SummaryFunctionsDateTime.Min)
+                    Min = (DateTime.Compare(Min, myvalue) > 0) ? myvalue : Min;
             }
             else
             {
-                if (this.Function == SummaryFunctionsDateTime.Max)
-                    this.Max = myvalue;
-                if (this.Function == SummaryFunctionsDateTime.Min)
-                    this.Min = myvalue;
+                if (Function == SummaryFunctionsDateTime.Max)
+                    Max = myvalue;
+                if (Function == SummaryFunctionsDateTime.Min)
+                    Min = myvalue;
             }
         }
 
@@ -1063,15 +1063,15 @@ this.BorderColor = '#eae6e6';
         {
             get
             {
-                if (this.Function == SummaryFunctionsBoolean.Count)
-                    return this.Count;
+                if (Function == SummaryFunctionsBoolean.Count)
+                    return Count;
                 return 0;
             }
         }
 
         public void Summarize(object value)
         {
-            this.Count++;
+            Count++;
         }
 
         public override string GetDesignHtml()

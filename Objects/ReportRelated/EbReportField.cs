@@ -80,7 +80,7 @@ namespace ExpressBase.Objects.ReportRelated
                 {
                     iTextFont = new iTextSharp.text.Font(BaseFont.CreateFont(Font.Font, BaseFont.CP1252, BaseFont.EMBEDDED), Font.Size, (int)Font.Style, GetColor(Font.color));
                     if (Font.Caps)
-                        Title = this.Title.ToUpper();
+                        Title = Title.ToUpper();
                     if (Font.Strikethrough)
                         iTextFont.SetStyle(iTextSharp.text.Font.STRIKETHRU);
                     if (Font.Underline)
@@ -89,21 +89,6 @@ namespace ExpressBase.Objects.ReportRelated
                 return iTextFont;
             }
         }
-
-        //public iTextSharp.text.Font SetFont()
-        //{
-        //    //var x=iTextSharp.text.FontFactory.RegisterDirectory("E:\\ExpressBase.Core\\ExpressBase.Objects\\Fonts\\");
-        //    //iTextSharp.text.Font font = FontFactory.GetFont("Verdana", Font.Size, (int)Font.Style, GetColor(Font.color));
-        //    BaseFont bf = BaseFont.CreateFont(Font.Font, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
-        //    iTextSharp.text.Font font = new iTextSharp.text.Font(bf, Font.Size, (int)Font.Style, GetColor(Font.color));
-        //    if (Font.Caps)
-        //        Title = this.Title.ToUpper();
-        //    if (Font.Strikethrough)
-        //        font.SetStyle(iTextSharp.text.Font.STRIKETHRU);
-        //    if (Font.Underline)
-        //        font.SetStyle(iTextSharp.text.Font.UNDERLINE);
-        //    return font;
-        //}
     }
 
     [EnableInBuilder(BuilderType.Report)]
@@ -150,8 +135,8 @@ this.BorderColor = '#eae6e6';
         public override void DrawMe(Document d, byte[] fileByte, float reportHeight, float printingTop, float detailprintingtop)
         {
             iTextSharp.text.Image myImage = iTextSharp.text.Image.GetInstance(fileByte);
-            myImage.ScaleToFit(this.WidthPt, this.HeightPt);
-            myImage.SetAbsolutePosition(this.LeftPt, reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop));
+            myImage.ScaleToFit(WidthPt, HeightPt);
+            myImage.SetAbsolutePosition(LeftPt, reportHeight - (printingTop + TopPt + HeightPt + detailprintingtop));
             myImage.Alignment = (int)TextAlign;
             d.Add(myImage);
         }
@@ -209,22 +194,19 @@ this.BorderColor = '#eae6e6';
         public override void DrawMe(Document d, PdfWriter writer, byte[] fileByte, float reportHeight)
         {
             Phrase phrase = null;
-            if (this.WaterMarkText != string.Empty)
+            if (WaterMarkText != string.Empty)
             {
-                //if (this.Font == null)
-                //    Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
-                // else
-                phrase = new Phrase(this.WaterMarkText, ITextFont);
+                phrase = new Phrase(WaterMarkText, ITextFont);
                 PdfContentByte canvas;
                 canvas = writer.DirectContentUnder;
-                ColumnText.ShowTextAligned(canvas, (int)TextAlign, phrase, d.PageSize.Width / 2, d.PageSize.Height / 2, this.Rotation);
+                ColumnText.ShowTextAligned(canvas, (int)TextAlign, phrase, d.PageSize.Width / 2, d.PageSize.Height / 2, Rotation);
             }
-            if (this.Image != string.Empty)
+            if (Image != string.Empty)
             {
                 iTextSharp.text.Image img = iTextSharp.text.Image.GetInstance(fileByte);
-                img.RotationDegrees = this.Rotation;
-                img.ScaleToFit(this.WidthPt, this.HeightPt);
-                img.SetAbsolutePosition(this.LeftPt, reportHeight - this.TopPt - this.HeightPt);
+                img.RotationDegrees = Rotation;
+                img.ScaleToFit(WidthPt, HeightPt);
+                img.SetAbsolutePosition(LeftPt, reportHeight - TopPt - HeightPt);
                 PdfGState _state = new PdfGState()
                 {
                     FillOpacity = 0.1F,
@@ -256,15 +238,15 @@ this.BorderColor = '#eae6e6';
         public string FormatDate(string column_val)
         {
             DateTime dt = Convert.ToDateTime(column_val);
-            if (this.Format == DateFormatReport.dddd_MMMM_d_yyyy)
+            if (Format == DateFormatReport.dddd_MMMM_d_yyyy)
                 return String.Format("{0:dddd, MMMM d, yyyy}", dt);
-            else if (this.Format == DateFormatReport.M_d_yyyy)
+            else if (Format == DateFormatReport.M_d_yyyy)
                 return String.Format("{0:M/d/yyyy}", dt);
-            else if (this.Format == DateFormatReport.ddd_MMM_d_yyyy)
+            else if (Format == DateFormatReport.ddd_MMM_d_yyyy)
                 return String.Format("{0:ddd, MMM d, yyyy}", dt);
-            else if (this.Format == DateFormatReport.MM_dd_yy)
+            else if (Format == DateFormatReport.MM_dd_yy)
                 return String.Format("{0:MM/dd/yy}", dt);
-            else if (this.Format == DateFormatReport.MM_dd_yyyy)
+            else if (Format == DateFormatReport.MM_dd_yyyy)
                 return String.Format("{0:MM/dd/yyyy}", dt);
             return column_val;
         }
@@ -288,15 +270,14 @@ this.BorderColor = '#eae6e6';
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
         {
 
-            var urx = this.WidthPt + this.LeftPt;
-            var ury = reportHeight - (printingTop + this.TopPt + detailprintingtop);
-            var llx = this.LeftPt;
-            var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
+            var urx = WidthPt + LeftPt;
+            var ury = reportHeight - (printingTop + TopPt + detailprintingtop);
+            var llx = LeftPt;
+            var lly = reportHeight - (printingTop + TopPt + HeightPt + detailprintingtop);
             column_val = FormatDate(column_val);
             Phrase phrase = null;
             phrase = new Phrase(column_val, ITextFont);
             ColumnText ct = new ColumnText(canvas);
-            // ct.Canvas.SetColorFill(GetColor(this.ForeColor));
             ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, (int)TextAlign);
             ct.Go();
         }
@@ -329,18 +310,14 @@ this.BorderColor = '#eae6e6';
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
         {
-            var urx = this.WidthPt + this.LeftPt;
-            var ury = reportHeight - (printingTop + this.TopPt + detailprintingtop);
-            var llx = this.LeftPt;
-            var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
+            var urx = WidthPt + LeftPt;
+            var ury = reportHeight - (printingTop + TopPt + detailprintingtop);
+            var llx = LeftPt;
+            var lly = reportHeight - (printingTop + TopPt + HeightPt + detailprintingtop);
             Phrase phrase = null;
 
-            //if (this.Font == null)
-            //    Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
-            //else
             phrase = new Phrase(column_val, ITextFont);
             ColumnText ct = new ColumnText(canvas);
-            //ct.Canvas.SetColorFill(GetColor(this.ForeColor));
             ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, (int)TextAlign);
             ct.Go();
         }
@@ -373,19 +350,14 @@ this.BorderColor = '#eae6e6';
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
         {
-            var urx = this.WidthPt + this.LeftPt;
-            var ury = reportHeight - (printingTop + this.TopPt + detailprintingtop);
-            var llx = this.LeftPt;
-            var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
+            var urx = WidthPt + LeftPt;
+            var ury = reportHeight - (printingTop + TopPt + detailprintingtop);
+            var llx = LeftPt;
+            var lly = reportHeight - (printingTop + TopPt + HeightPt + detailprintingtop);
 
             Phrase phrase = null;
-            //if (this.Font == null)
-            //    Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
-            //phrase = new Phrase(column_val);
-            // else
             phrase = new Phrase(column_val, ITextFont);
             ColumnText ct = new ColumnText(canvas);
-            // ct.Canvas.SetColorFill(GetColor(this.ForeColor));
             ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, (int)TextAlign);
             ct.Go();
         }
@@ -418,19 +390,14 @@ this.BorderColor = '#eae6e6';
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
         {
-            var urx = this.WidthPt + this.LeftPt;
-            var ury = reportHeight - (printingTop + this.TopPt + detailprintingtop);
-            var llx = this.LeftPt;
-            var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
+            var urx = WidthPt + LeftPt;
+            var ury = reportHeight - (printingTop + TopPt + detailprintingtop);
+            var llx = LeftPt;
+            var lly = reportHeight - (printingTop + TopPt + HeightPt + detailprintingtop);
 
             Phrase phrase = null;
-            //if (this.Font == null)
-            //    Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
-            //    phrase = new Phrase(column_val);
-            //else
             phrase = new Phrase(column_val, ITextFont);
             ColumnText ct = new ColumnText(canvas);
-            //ct.Canvas.SetColorFill(GetColor(this.ForeColor));
             ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, (int)TextAlign);
             ct.Go();
         }
@@ -459,19 +426,14 @@ this.BorderColor = '#eae6e6';
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, EbReport report)
         {
-            var urx = this.WidthPt + this.LeftPt;
-            var ury = reportHeight - (printingTop + this.TopPt + report.detailprintingtop);
-            var llx = this.LeftPt;
-            var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + report.detailprintingtop + report.RowHeight);
+            var urx = WidthPt + LeftPt;
+            var ury = reportHeight - (printingTop + TopPt + report.detailprintingtop);
+            var llx = LeftPt;
+            var lly = reportHeight - (printingTop + TopPt + HeightPt + report.detailprintingtop + report.RowHeight);
 
             ColumnText ct = new ColumnText(canvas);
             Phrase phrase = null;
-            //ct.Canvas.SetColorFill(GetColor(this.ForeColor));
-            //if (this.Font == null)
-            //    Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
-            //    phrase = new Phrase(this.Title);
-            //else
-            phrase = new Phrase(this.Title, ITextFont);
+            phrase = new Phrase(Title, ITextFont);
 
             ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, (int)TextAlign);
             ct.Go();
@@ -506,19 +468,14 @@ this.BorderColor = '#eae6e6';
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
         {
-            var urx = this.WidthPt + this.LeftPt;
-            var ury = reportHeight - (printingTop + this.TopPt + detailprintingtop);
-            var llx = this.LeftPt;
-            var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
+            var urx = WidthPt + LeftPt;
+            var ury = reportHeight - (printingTop + TopPt + detailprintingtop);
+            var llx = LeftPt;
+            var lly = reportHeight - (printingTop + TopPt + HeightPt + detailprintingtop);
 
             Phrase phrase = null;
-            //if (this.Font == null)
-            //    Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
-            //    phrase = new Phrase(column_val);
-            //else
             phrase = new Phrase(column_val, ITextFont);
             ColumnText ct = new ColumnText(canvas);
-            //ct.Canvas.SetColorFill(GetColor(this.ForeColor));
             ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, (int)TextAlign);
             ct.Go();
         }
@@ -637,14 +594,14 @@ this.BorderColor = '#eae6e6';
                 //}
 
                 // imageEAN.ScaleAbsolute(Width, Height);
-                imageEAN.SetAbsolutePosition(LeftPt, reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop));
+                imageEAN.SetAbsolutePosition(LeftPt, reportHeight - (printingTop + TopPt + HeightPt + detailprintingtop));
                 doc.Add(imageEAN);
             }
             catch (Exception e)
             {
                 Console.WriteLine("Exception: " + e.ToString());
                 ColumnText ct = new ColumnText(canvas);
-                var x = reportHeight - (printingTop + this.TopPt + detailprintingtop);
+                var x = reportHeight - (printingTop + TopPt + detailprintingtop);
                 ct.SetSimpleColumn(new Phrase("Error in generating barcode"), LeftPt, x - HeightPt, LeftPt + WidthPt, x, 15, (int)TextAlign);
                 ct.Go();
             }
@@ -697,14 +654,14 @@ this.BorderColor = '#eae6e6';
                 BitmapByteQRCode qrCode = new BitmapByteQRCode(qrCodeData);
                 byte[] qrCodeImage = qrCode.GetGraphic(20);
                 iTextSharp.text.Image img = iTextSharp.text.Image.GetInstance(qrCodeImage);
-                img.SetAbsolutePosition(LeftPt, reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop));
+                img.SetAbsolutePosition(LeftPt, reportHeight - (printingTop + TopPt + HeightPt + detailprintingtop));
                 img.ScaleAbsolute(WidthPt, HeightPt);
                 doc.Add(img);
             }
             catch (Exception e)
             {
                 ColumnText ct = new ColumnText(canvas);
-                var x = reportHeight - (printingTop + this.TopPt + detailprintingtop);
+                var x = reportHeight - (printingTop + TopPt + detailprintingtop);
                 ct.SetSimpleColumn(new Phrase("Error in generating barcode"), LeftPt, x - HeightPt, LeftPt + WidthPt, x, 15, (int)TextAlign);
                 ct.Go();
                 Console.WriteLine("Exception: " + e.ToString());
@@ -733,20 +690,15 @@ this.BorderColor = '#eae6e6';
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
         {
-            var urx = this.WidthPt + this.LeftPt;
-            var ury = reportHeight - (printingTop + this.TopPt + detailprintingtop);
-            var llx = this.LeftPt;
-            var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
+            var urx = WidthPt + LeftPt;
+            var ury = reportHeight - (printingTop + TopPt + detailprintingtop);
+            var llx = LeftPt;
+            var lly = reportHeight - (printingTop + TopPt + HeightPt + detailprintingtop);
 
             Phrase phrase = null;
-            //if (this.Font == null)
-            //    Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
-            //    phrase = new Phrase(column_val);
-            //else
             phrase = new Phrase(column_val, ITextFont);
 
             ColumnText ct = new ColumnText(canvas);
-            //ct.Canvas.SetColorFill(GetColor(this.ForeColor));
             ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, (int)TextAlign);
             ct.Go();
         }
@@ -777,8 +729,8 @@ this.BorderColor = '#eae6e6';
         public override void DrawMe(Document d, byte[] fileByte, float reportHeight, float printingTop, float detailprintingtop)
         {
             iTextSharp.text.Image myImage = iTextSharp.text.Image.GetInstance(fileByte);
-            myImage.ScaleToFit(this.WidthPt, this.HeightPt);
-            myImage.SetAbsolutePosition(this.LeftPt, reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop));
+            myImage.ScaleToFit(WidthPt, HeightPt);
+            myImage.SetAbsolutePosition(LeftPt, reportHeight - (printingTop + TopPt + HeightPt + detailprintingtop));
             myImage.Alignment = (int)TextAlign;
             d.Add(myImage);
         }
@@ -811,10 +763,10 @@ this.BorderColor = '#eae6e6';
 
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
         {
-            var urx = this.WidthPt + this.LeftPt;
-            var ury = reportHeight - (printingTop + this.TopPt + detailprintingtop);
-            var llx = this.LeftPt;
-            var lly = reportHeight - (printingTop + this.TopPt + this.HeightPt + detailprintingtop);
+            var urx = WidthPt + LeftPt;
+            var ury = reportHeight - (printingTop + TopPt + detailprintingtop);
+            var llx = LeftPt;
+            var lly = reportHeight - (printingTop + TopPt + HeightPt + detailprintingtop);
             Phrase phrase = null;
             phrase = new Phrase(column_val, ITextFont);
             ColumnText ct = new ColumnText(canvas);
