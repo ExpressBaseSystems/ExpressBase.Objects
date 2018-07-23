@@ -47,27 +47,27 @@ namespace ExpressBase.Objects.ReportRelated
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, EbReport report)
         {
-            if (this.Height == this.Width)
+            if (Height == Width)
             {
-                float radius = this.WidthPt / 2;
-                float xval = this.LeftPt + radius;
-                float yval = reportHeight - (printingTop + this.TopPt + radius + report.detailprintingtop);
+                float radius = WidthPt / 2;
+                float xval = LeftPt + radius;
+                float yval = reportHeight - (printingTop + TopPt + radius + report.detailprintingtop);
 
-                canvas.SetColorStroke(GetColor(this.BorderColor));
-                canvas.SetColorFill(GetColor(this.BackColor));
-                canvas.SetLineWidth(this.Border);
+                canvas.SetColorStroke(GetColor(BorderColor));
+                canvas.SetColorFill(GetColor(BackColor));
+                canvas.SetLineWidth(Border);
                 canvas.Circle(xval, yval, radius);
                 canvas.FillStroke();
             }
             else
             {
-                var x1 = this.LeftPt;
-                var y1 = reportHeight - (printingTop + this.TopPt + this.HeightPt + report.detailprintingtop);
-                var x2 = this.LeftPt + this.WidthPt;
-                var y2 = reportHeight - (printingTop + this.TopPt + report.detailprintingtop);
-                canvas.SetColorStroke(GetColor(this.BorderColor));
-                canvas.SetColorFill(GetColor(this.BackColor));
-                canvas.SetLineWidth(this.Border);
+                var x1 = LeftPt;
+                var y1 = reportHeight - (printingTop + TopPt + HeightPt + report.detailprintingtop);
+                var x2 = LeftPt + WidthPt;
+                var y2 = reportHeight - (printingTop + TopPt + report.detailprintingtop);
+                canvas.SetColorStroke(GetColor(BorderColor));
+                canvas.SetColorFill(GetColor(BackColor));
+                canvas.SetLineWidth(Border);
                 canvas.Ellipse(x1, y1, x2, y2);
                 canvas.FillStroke();
             }
@@ -93,13 +93,13 @@ namespace ExpressBase.Objects.ReportRelated
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, EbReport report)
         {
-            float x = this.LeftPt;
-            float y = reportHeight - (printingTop + this.TopPt + this.HeightPt + report.detailprintingtop);
-            float w = this.WidthPt;
-            float h = this.HeightPt;
-            canvas.SetColorStroke(GetColor(this.BorderColor));
-            canvas.SetColorFill(GetColor(this.BackColor));
-            canvas.SetLineWidth(this.Border);
+            float x = LeftPt;
+            float y = reportHeight - (printingTop + TopPt + HeightPt + report.detailprintingtop);
+            float w = WidthPt;
+            float h = HeightPt;
+            canvas.SetColorStroke(GetColor(BorderColor));
+            canvas.SetColorFill(GetColor(BackColor));
+            canvas.SetLineWidth(Border);
             canvas.Rectangle(x, y, w, h);
             canvas.FillStroke();
         }
@@ -124,11 +124,11 @@ namespace ExpressBase.Objects.ReportRelated
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, EbReport report)
         {
             base.DrawMe(canvas, reportHeight, printingTop, report);
-            var x = this.LeftPt + this.WidthPt;
-            var y = reportHeight - (printingTop + this.TopPt + report.detailprintingtop);
-            canvas.SetColorStroke(GetColor(this.BorderColor));
-            canvas.SetColorFill(GetColor(this.BorderColor));
-            canvas.SetLineWidth(this.Border);
+            var x = LeftPt + WidthPt;
+            var y = reportHeight - (printingTop + TopPt + report.detailprintingtop);
+            canvas.SetColorStroke(GetColor(BorderColor));
+            canvas.SetColorFill(GetColor(BorderColor));
+            canvas.SetLineWidth(Border);
             canvas.MoveTo(x, y);
             canvas.LineTo(x - 3, y - 3);
             canvas.LineTo(x - 3, y + 3);
@@ -155,11 +155,11 @@ namespace ExpressBase.Objects.ReportRelated
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, EbReport report)
         {
             base.DrawMe(canvas, reportHeight, printingTop, report);
-            var x = this.LeftPt;
-            var y = reportHeight - (printingTop + this.TopPt + report.detailprintingtop);
-            canvas.SetColorStroke(GetColor(this.BorderColor));
-            canvas.SetColorFill(GetColor(this.BorderColor));
-            canvas.SetLineWidth(this.Border);
+            var x = LeftPt;
+            var y = reportHeight - (printingTop + TopPt + report.detailprintingtop);
+            canvas.SetColorStroke(GetColor(BorderColor));
+            canvas.SetColorFill(GetColor(BorderColor));
+            canvas.SetLineWidth(Border);
             canvas.MoveTo(x, y);
             canvas.LineTo(x + 3, y + 3);
             canvas.LineTo(x + 3, y - 3);
@@ -188,11 +188,11 @@ namespace ExpressBase.Objects.ReportRelated
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, EbReport report)
         {
             base.DrawMe(canvas, reportHeight, printingTop, report);
-            var x = this.LeftPt;
-            var y = reportHeight - (printingTop + this.TopPt + this.HeightPt + report.detailprintingtop);
-            canvas.SetColorStroke(GetColor(this.BorderColor));
-            canvas.SetColorFill(GetColor(this.BorderColor));
-            canvas.SetLineWidth(this.Border);
+            var x = LeftPt;
+            var y = reportHeight - (printingTop + TopPt + HeightPt + report.detailprintingtop);
+            canvas.SetColorStroke(GetColor(BorderColor));
+            canvas.SetColorFill(GetColor(BorderColor));
+            canvas.SetLineWidth(Border);
             canvas.MoveTo(x, y);
             canvas.LineTo(x - 3, y + 3);
             canvas.LineTo(x + 3, y + 3);
@@ -219,11 +219,11 @@ namespace ExpressBase.Objects.ReportRelated
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, EbReport report)
         {
             base.DrawMe(canvas, reportHeight, printingTop, report);
-            var x = this.LeftPt;
-            var y = reportHeight - (printingTop + this.TopPt + report.detailprintingtop);
-            canvas.SetColorStroke(GetColor(this.BorderColor));
-            canvas.SetColorFill(GetColor(this.BorderColor));
-            canvas.SetLineWidth(this.Border);
+            var x = LeftPt;
+            var y = reportHeight - (printingTop + TopPt + report.detailprintingtop);
+            canvas.SetColorStroke(GetColor(BorderColor));
+            canvas.SetColorFill(GetColor(BorderColor));
+            canvas.SetLineWidth(Border);
             canvas.MoveTo(x, y);
             canvas.LineTo(x + 3, y - 3);
             canvas.LineTo(x - 3, y - 3);
@@ -252,16 +252,16 @@ namespace ExpressBase.Objects.ReportRelated
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, EbReport report)
         {
             base.DrawMe(canvas, reportHeight, printingTop, report);
-            var x1 = this.LeftPt + this.WidthPt;
-            var y1 = reportHeight - (printingTop + this.TopPt + report.detailprintingtop);
-            canvas.SetColorStroke(GetColor(this.BorderColor));
-            canvas.SetColorFill(GetColor(this.BorderColor));
-            canvas.SetLineWidth(this.Border);
+            var x1 = LeftPt + WidthPt;
+            var y1 = reportHeight - (printingTop + TopPt + report.detailprintingtop);
+            canvas.SetColorStroke(GetColor(BorderColor));
+            canvas.SetColorFill(GetColor(BorderColor));
+            canvas.SetLineWidth(Border);
             canvas.MoveTo(x1, y1);
             canvas.LineTo(x1 - 3, y1 - 3);
             canvas.LineTo(x1 - 3, y1 + 3);
             canvas.ClosePathFillStroke();
-            var x2 = this.LeftPt;
+            var x2 = LeftPt;
             var y2 = y1;
             canvas.MoveTo(x2, y2);
             canvas.LineTo(x2 + 3, y2 + 3);
@@ -289,20 +289,20 @@ namespace ExpressBase.Objects.ReportRelated
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, EbReport report)
         {
             float rowH = 0;
-            if (this.TopPt > report.MultiRowTop)
+            if (TopPt > report.MultiRowTop)
                 rowH = report.RowHeight;
             base.DrawMe(canvas, reportHeight, printingTop, report);
-            var x1 = this.LeftPt;
-            var y1 = reportHeight - (printingTop + this.TopPt + report.detailprintingtop);
-            canvas.SetColorStroke(GetColor(this.BorderColor));
-            canvas.SetColorFill(GetColor(this.BorderColor));
-            canvas.SetLineWidth(this.Border);
+            var x1 = LeftPt;
+            var y1 = reportHeight - (printingTop + TopPt + report.detailprintingtop);
+            canvas.SetColorStroke(GetColor(BorderColor));
+            canvas.SetColorFill(GetColor(BorderColor));
+            canvas.SetLineWidth(Border);
             canvas.MoveTo(x1, y1);
             canvas.LineTo(x1 + 3, y1 - 3);
             canvas.LineTo(x1 - 3, y1 - 3);
             canvas.ClosePathFillStroke();
-            var x2 = this.LeftPt;
-            var y2 = reportHeight - (printingTop + this.TopPt + this.HeightPt + report.detailprintingtop + rowH);
+            var x2 = LeftPt;
+            var y2 = reportHeight - (printingTop + TopPt + HeightPt + report.detailprintingtop + rowH);
             canvas.MoveTo(x2, y2);
             canvas.LineTo(x2 - 3, y2 + 3);
             canvas.LineTo(x2 + 3, y2 + 3);
@@ -330,14 +330,14 @@ namespace ExpressBase.Objects.ReportRelated
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, EbReport report)
         {
             float rowH = 0;
-            if (this.TopPt > report.MultiRowTop)
+            if (TopPt > report.MultiRowTop)
                 rowH = report.RowHeight;
-            var x1 = this.LeftPt;
-            var y1 = reportHeight - (printingTop + this.TopPt + report.detailprintingtop + rowH);
-            var x2 = this.LeftPt + this.WidthPt;
+            var x1 = LeftPt;
+            var y1 = reportHeight - (printingTop + TopPt + report.detailprintingtop + rowH);
+            var x2 = LeftPt + WidthPt;
             var y2 = y1;
-            canvas.SetColorStroke(GetColor(this.BorderColor));
-            canvas.SetLineWidth(this.Border);
+            canvas.SetColorStroke(GetColor(BorderColor));
+            canvas.SetLineWidth(Border);
             canvas.MoveTo(x1, y1);
             canvas.LineTo(x2, y2);
             canvas.Stroke();
@@ -363,12 +363,12 @@ namespace ExpressBase.Objects.ReportRelated
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, EbReport report)
         {
-            var x1 = this.LeftPt;
-            var y1 = reportHeight - (printingTop + this.TopPt + report.detailprintingtop);
+            var x1 = LeftPt;
+            var y1 = reportHeight - (printingTop + TopPt + report.detailprintingtop);
             var x2 = x1;
-            var y2 = reportHeight - (printingTop + this.TopPt + this.HeightPt + report.detailprintingtop);
-            canvas.SetColorStroke(GetColor(this.BorderColor));
-            canvas.SetLineWidth(this.Border);
+            var y2 = reportHeight - (printingTop + TopPt + HeightPt + report.detailprintingtop);
+            canvas.SetColorStroke(GetColor(BorderColor));
+            canvas.SetLineWidth(Border);
             canvas.MoveTo(x1, y1);
             canvas.LineTo(x2, y2);
             canvas.Stroke();
