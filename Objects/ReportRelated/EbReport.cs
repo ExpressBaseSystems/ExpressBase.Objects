@@ -254,7 +254,7 @@ namespace ExpressBase.Objects
 
         [JsonIgnore]
         public EbDataSet DataSet { get; set; }
-        
+
         [JsonIgnore]
         public bool IsLastpage { get; set; }
 
@@ -485,7 +485,7 @@ namespace ExpressBase.Objects
             else
                 return DataSet.Tables[tableIndex].Rows[0][column_name].ToString();
         }
-        
+
         public void DrawWaterMark(Document d, PdfWriter writer)
         {
             byte[] fileByte = null;
@@ -905,7 +905,7 @@ namespace ExpressBase.Objects
                 else if (field is EbImg)
                 {
                     byte[] fileByte = GetFile((field as EbImg).Image);
-                    if (fileByte != null)
+                    if (!fileByte.IsEmpty())
                         field.DrawMe(Doc, fileByte, HeightPt, section_Yposition, detailprintingtop);
                 }
 
@@ -931,13 +931,13 @@ namespace ExpressBase.Objects
                 }
                 else if (field is EbLocFieldImage)
                 {
-                    byte[] fileByte = GetFile(Solution.Locations[41][field.Title]);
-                    if (fileByte != null)
+                    byte[] fileByte = GetFile(Solution.Locations[42][field.Title]);
+                    if (!fileByte.IsEmpty())
                         field.DrawMe(Doc, fileByte, HeightPt, section_Yposition, detailprintingtop);
                 }
                 else if (field is EbLocFieldText)
                 {
-                    column_val =Solution.Locations[41][field.Title] ;
+                    column_val = Solution.Locations[42][field.Title];
                     field.DrawMe(Canvas, HeightPt, section_Yposition, detailprintingtop, column_val);
                 }
             }
@@ -956,7 +956,9 @@ namespace ExpressBase.Objects
                     if ((field is EbWaterMark) && (field as EbWaterMark).Image != string.Empty)
                     {
                         byte[] fileByte = GetFile((field as EbWaterMark).Image);
-                        WatermarkImages.Add((field as EbWaterMark).Image, fileByte);
+                        if (!fileByte.IsEmpty())
+                            WatermarkImages.Add((field as EbWaterMark).Image, fileByte);
+
                     }
                 }
             }
