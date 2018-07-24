@@ -579,7 +579,7 @@ namespace ExpressBase.Objects
         public void DrawDetail()
         {
             List<int> tableindexes = new List<int>();
-
+            bool hasRows = false;
             int tableIndex = 0;
             int maxRowCount = 0;
 
@@ -587,6 +587,7 @@ namespace ExpressBase.Objects
             {
                 foreach (EbReportField field in _detail.Fields)
                 {
+                    hasRows = true;
                     if (field is EbDataField && !tableindexes.Contains((field as EbDataField).TableIndex))
                     {
                         int r_count = DataSet.Tables[(field as EbDataField).TableIndex].Rows.Count;
@@ -596,7 +597,7 @@ namespace ExpressBase.Objects
                 }
             }
             var rows = (DataSourceRefId != string.Empty) ? DataSet.Tables[tableIndex].Rows : null;
-            if (rows != null)
+            if (rows != null && hasRows == true)
             {
                 for (iDetailRowPos = 0; iDetailRowPos < rows.Count; iDetailRowPos++)
                 {
