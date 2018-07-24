@@ -179,7 +179,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
     public class DVStringColumn : DVBaseColumn
     {
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
-        [DefaultPropValue("1")]
+        [DefaultPropValue("0")]
         [PropertyEditor(PropertyEditorType.DropDown)]
         [OnChangeExec(@"
 if(this.RenderAs !== 2)
