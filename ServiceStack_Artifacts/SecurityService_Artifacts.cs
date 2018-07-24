@@ -643,16 +643,20 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 	//}
 
 	[DataContract]
-	public class ApplicationCollection : List<Application>
+	public class ApplicationCollection
 	{
-		public ApplicationCollection() { }
+		[DataMember(Order = 1)]
+		public List<Application> _acol { get; set; }
+
+		public ApplicationCollection() { _acol = new List<Application>(); }
 
 		public ApplicationCollection(EbDataTable dtApp, EbDataTable dtObjects)
 		{
+			_acol = new List<Application>();
 			foreach (var dr in dtApp.Rows)
 			{
 				int appid = Convert.ToInt32(dr[0]);
-				this.Add(new Application { Id = appid, Name = dr[1].ToString() });
+				_acol.Add(new Application { Id = appid, Name = dr[1].ToString() });
 			}
 
 			foreach (EbDataRow dr in dtObjects.Rows)
@@ -661,33 +665,48 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 				var ob_type = Convert.ToInt32(dr[2]);
                 if (app_id != 0)
                 {
-                    if (!this[app_id].ObjectTypes.ContainsKey(ob_type))
-                        this[app_id].ObjectTypes.Add(ob_type);
+                    if (!this.GetApplication(app_id).ObjectTypes.ContainsKey(ob_type))
+                        this.GetApplication(app_id).ObjectTypes.Add(ob_type);
 
 
-                    this[app_id].ObjectTypes[ob_type].Add(new Eb_Object { Obj_Id = Convert.ToInt32(dr[0]), Obj_Name = dr[1].ToString() });
+                    this.GetApplication(app_id).ObjectTypes[ob_type].Add(new Eb_Object { Obj_Id = Convert.ToInt32(dr[0]), Obj_Name = dr[1].ToString() });
                 }
 			}
 		}
 
-		// CREATE NEW INDEXER
-		new public Application this[int appid]
+		public Application GetApplication(int appid)
 		{
-			get
+			Application _result = null;
+			foreach (Application app in _acol)
 			{
-				Application _result = null;
-				foreach(Application app in this)
+				if (app.Id == appid)
 				{
-					if (app.Id == appid)
-					{
-						_result = app;
-						break;
-					}
+					_result = app;
+					break;
 				}
-
-				return _result;
 			}
+
+			return _result;
 		}
+
+		//// CREATE NEW INDEXER
+		//new public Application this[int appid]
+		//{
+		//	get
+		//	{
+		//		Application _result = null;
+		//		foreach(Application app in this)
+		//		{
+		//			if (app.Id == appid)
+		//			{
+		//				_result = app;
+		//				break;
+		//			}
+		//		}
+
+		//		return _result;
+		//	}
+		//}
 	}
 
 	[DataContract]
@@ -710,20 +729,44 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 	}
 
 	[DataContract]
-	public class ObjectTypeCollection : Dictionary<int, ObjectCollection>
+	public class ObjectTypeCollection 
 	{
-		public ObjectTypeCollection() { }
+		[DataMember(Order = 1)]
+		public Dictionary<int, ObjectCollection> _otypecol { get; set; }
+
+		public ObjectTypeCollection()
+		{
+			_otypecol = new Dictionary<int, ObjectCollection>();
+		}
 
 		public void Add(int obj_type)
 		{
-			this.Add(obj_type, new ObjectCollection());
+			_otypecol.Add(obj_type, new ObjectCollection());
+		}
+
+		public bool ContainsKey(int obj_type)
+		{
+			return (_otypecol.ContainsKey(obj_type));
+		}
+
+		public ObjectCollection this[int obj_type]
+		{
+			get { return _otypecol[obj_type]; }
 		}
 	}
 
 	[DataContract]
-	public class ObjectCollection : List<Eb_Object>
+	public class ObjectCollection
 	{
-		public ObjectCollection() { }
+		[DataMember(Order = 1)]
+		public List<Eb_Object> _obcol { get; set; }
+
+		public ObjectCollection() { _obcol = new List<Eb_Object>(); }
+
+		public void Add(Eb_Object ob)
+		{
+			_obcol.Add(ob);
+		}
 	}
 
 	[DataContract]
@@ -861,5 +904,4 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		[DataMember(Order = 4)]
 		public string u_token { get; set; }
 	}
-
 }
