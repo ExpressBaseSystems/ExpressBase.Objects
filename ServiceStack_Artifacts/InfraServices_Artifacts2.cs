@@ -221,29 +221,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
        
     }
-
-    [DataContract]
-    public class GetProductPlanRequest : IReturn<GetProductPlanResponse>, IEbSSRequest
-    {       
-
-        [DataMember(Order = 1)]
-        public string TenantAccountId { get; set; }
-
-        public int UserId { get; set; }
-    }
-
-    [DataContract]
-    public class GetProductPlanResponse : IEbSSResponse
-    {        
-
-        [DataMember(Order = 2)]
-        public Dictionary<int,List<ProductPlan>> Plans { get; set; }
-
-        [DataMember(Order = 3)]
-        public ResponseStatus ResponseStatus { get; set; }
-
-    }
-
+   
     public class AutoGenSidRequest
     {
         
