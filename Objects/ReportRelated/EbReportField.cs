@@ -75,10 +75,10 @@ namespace ExpressBase.Objects.ReportRelated
             get
             {
                 if (Font == null)
-                    Font = (new EbFont { color = "#000000", Font = "Times-Roman", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
+                    Font = (new EbFont { color = "#000000", FontName = "Times-Roman", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
                 if (/*iTextFont == null &&*/ Font != null)
                 {
-                    iTextFont = new iTextSharp.text.Font(BaseFont.CreateFont(Font.Font, BaseFont.CP1252, BaseFont.EMBEDDED), Font.Size, (int)Font.Style, GetColor(Font.color));
+                    iTextFont = new iTextSharp.text.Font(BaseFont.CreateFont(Font.FontName, BaseFont.CP1252, BaseFont.EMBEDDED), Font.Size, (int)Font.Style, GetColor(Font.color));
                     if (Font.Caps)
                         Title = Title.ToUpper();
                     if (Font.Strikethrough)
