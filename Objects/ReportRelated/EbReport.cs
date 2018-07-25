@@ -678,8 +678,6 @@ namespace ExpressBase.Objects
                     {
                         DbType datatype = (DbType)field.DbType;
                         int val_length = column_val.Length;
-                        if (field.Font == null)
-                            field.Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
                         phrase = new Phrase(column_val, field.ITextFont);
                         float calculatedValueSize = phrase.Font.CalculatedSize * val_length;
                         if (calculatedValueSize > field.WidthPt)
@@ -782,11 +780,8 @@ namespace ExpressBase.Objects
                     }
                     if (AppearanceScriptCollection.ContainsKey(field.Name))
                     {
-
                         if (field.Font is null)
-                        {
-                            globals.CurrentField.Font = (new EbFont { color = "#000000", Font = "Courier", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
-                        }
+                            globals.CurrentField.Font = (new EbFont { color = "#000000", FontName = "Times-Roman", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
                         foreach (string calcfd in (field as EbDataField).DataFieldsUsedAppearance)
                         {
                             string TName = calcfd.Split('.')[0];
