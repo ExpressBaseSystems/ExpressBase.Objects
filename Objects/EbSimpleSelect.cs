@@ -85,7 +85,7 @@ namespace ExpressBase.Objects
 			}
 			else
 			{
-				var result = ServiceClient.Get<DataSourceDataResponse>(new DataSourceDataRequest { RefId = this.DataSourceId });
+				var result = ServiceClient.Get<FDDataResponse>(new FDDataRequest { RefId = this.DataSourceId });
 				foreach (EbDataRow option in result.Data)
 				{
 					_html += string.Format("<option value='{0}'>{1}</option>", option[this.ValueMember.Data], option[this.DisplayMember.Data]);

@@ -68,7 +68,6 @@ namespace ExpressBase.Objects
             return html;
         }
 
-
         public IEnumerable<string> ControlNames
         {
             get
@@ -80,5 +79,8 @@ namespace ExpressBase.Objects
                 }
             }
         }
+
+        [EnableInBuilder(BuilderType.FilterDialog)]
+        public int Width { get; set; }
     }
 }
