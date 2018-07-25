@@ -140,6 +140,8 @@ namespace ExpressBase.Objects.ReportRelated
             {
                 if (column_type == System.Data.DbType.Decimal)
                     column_val = "###";
+                else if (column_type == System.Data.DbType.String)
+                    column_val = column_val.Substring(0, numberofCharsInALine - 2) + "...";
             }
             return column_val;
         }
