@@ -218,7 +218,6 @@ $('#{0}').mask('SZZZZZZZZZZZ', {
 .Replace("@name@", this.Name)
 .Replace("@left", this.Left.ToString())
 .Replace("@top", this.Top.ToString())
-.Replace("@width", this.Width.ToString())
 .Replace("@height", this.Height.ToString())
 .Replace("@label@", this.Label)//5
 .Replace("@hiddenString", this.HiddenString)
