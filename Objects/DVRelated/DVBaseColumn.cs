@@ -118,6 +118,10 @@ namespace ExpressBase.Objects.Objects.DVRelated
         [HideInPropertyGrid]
         public bool IsCustomColumn { get; set; }
 
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [OSE_ObjectTypes(EbObjectTypes.iTableVisualization, EbObjectTypes.iChartVisualization, EbObjectTypes.iReport)]
+        public string LinkRefId { get; set; }
 
     }
 
@@ -189,10 +193,10 @@ else
         public StringRenderType RenderAs { get; set; }
 
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
-        [PropertyEditor(PropertyEditorType.ObjectSelector)]
-        [OSE_ObjectTypes(EbObjectTypes.iTableVisualization, EbObjectTypes.iChartVisualization, EbObjectTypes.iReport)]
-        public string LinkRefId { get; set; }
+        //[EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
+        //[PropertyEditor(PropertyEditorType.ObjectSelector)]
+        //[OSE_ObjectTypes(EbObjectTypes.iTableVisualization, EbObjectTypes.iChartVisualization, EbObjectTypes.iReport)]
+        //public string LinkRefId { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [DefaultPropValue("16")]
@@ -217,10 +221,10 @@ else
     pg.ShowProperty('LinkRefId')")]
         public NumericRenderType RenderAs { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
-        [PropertyEditor(PropertyEditorType.ObjectSelector)]
-        [OSE_ObjectTypes(EbObjectTypes.iTableVisualization, EbObjectTypes.iChartVisualization, EbObjectTypes.iReport)]
-        public string LinkRefId { get; set; }
+        //[EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
+        //[PropertyEditor(PropertyEditorType.ObjectSelector)]
+        //[OSE_ObjectTypes(EbObjectTypes.iTableVisualization, EbObjectTypes.iChartVisualization, EbObjectTypes.iReport)]
+        //public string LinkRefId { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [DefaultPropValue("11")]
@@ -249,10 +253,10 @@ else
     pg.ShowProperty('LinkRefId')")]
         public DateTimeRenderType RenderAs { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
-        [PropertyEditor(PropertyEditorType.ObjectSelector)]
-        [OSE_ObjectTypes(EbObjectTypes.iTableVisualization, EbObjectTypes.iChartVisualization, EbObjectTypes.iReport)]
-        public string LinkRefId { get; set; }
+        //[EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
+        //[PropertyEditor(PropertyEditorType.ObjectSelector)]
+        //[OSE_ObjectTypes(EbObjectTypes.iTableVisualization, EbObjectTypes.iChartVisualization, EbObjectTypes.iReport)]
+        //public string LinkRefId { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [DefaultPropValue("5")]

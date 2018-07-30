@@ -64,7 +64,7 @@ namespace ExpressBase.Objects.ReportRelated
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iReport)]
         [PropertyGroup("Data Settings")]
-        public string LinkRefid { get; set; }
+        public string LinkRefId { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("Data Settings")]
@@ -110,9 +110,9 @@ namespace ExpressBase.Objects.ReportRelated
                 column_val = RenderMultiLine(column_val, text, column_type);
                 text = new Phrase(column_val, ITextFont);
             }
-            if (!string.IsNullOrEmpty(LinkRefid))
+            if (!string.IsNullOrEmpty(LinkRefId))
             {
-                Anchor a = CreateLink(text, LinkRefid, doc, Params);
+                Anchor a = CreateLink(text, LinkRefId, doc, Params);
                 Paragraph p = new Paragraph
                 {
                     a
@@ -188,9 +188,9 @@ namespace ExpressBase.Objects.ReportRelated
                 column_val = RenderMultiLine(column_val, text, column_type);
                 text = new Phrase(column_val, ITextFont);
             }
-            if (!string.IsNullOrEmpty(LinkRefid))
+            if (!string.IsNullOrEmpty(LinkRefId))
             {
-                Anchor a = CreateLink(text, LinkRefid, doc, Params);
+                Anchor a = CreateLink(text, LinkRefId, doc, Params);
                 Paragraph p = new Paragraph
                 {
                     a
@@ -266,9 +266,9 @@ namespace ExpressBase.Objects.ReportRelated
                 column_val = RenderMultiLine(column_val, text, column_type);
                 text = new Phrase(column_val, ITextFont);
             }
-            if (!string.IsNullOrEmpty(LinkRefid))
+            if (!string.IsNullOrEmpty(LinkRefId))
             {
-                Anchor a = CreateLink(text, LinkRefid, doc, Params);
+                Anchor a = CreateLink(text, LinkRefId, doc, Params);
                 Paragraph p = new Paragraph
                 {
                     a
@@ -366,9 +366,9 @@ this.BorderColor = '#eae6e6';
                 column_val = RenderMultiLine(column_val, text, column_type);
                 text = new Phrase(column_val, ITextFont);
             }
-            if (!string.IsNullOrEmpty(LinkRefid))
+            if (!string.IsNullOrEmpty(LinkRefId))
             {
-                Anchor a = CreateLink(text, LinkRefid, doc, Params);
+                Anchor a = CreateLink(text, LinkRefId, doc, Params);
                 Paragraph p = new Paragraph
                 {
                     a

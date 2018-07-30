@@ -836,9 +836,9 @@ namespace ExpressBase.Objects
                     else
                         column_val = GetDataFieldtValue(column_name, serialnumber, tableIndex);
 
-                    if (!string.IsNullOrEmpty(_field.LinkRefid))
+                    if (!string.IsNullOrEmpty(_field.LinkRefId))
                     {
-                        foreach (EbControl control in LinkCollection[(field as EbDataField).LinkRefid])
+                        foreach (EbControl control in LinkCollection[(field as EbDataField).LinkRefId])
                         {
                             int flag = 0;
                             foreach (Param param in Parameters)
