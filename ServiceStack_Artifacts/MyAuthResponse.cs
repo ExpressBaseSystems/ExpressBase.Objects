@@ -12,6 +12,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         [DataMember(Order = 1)]
         public User User { get; set; }
-    }
+		
+		[DataMember(Order = 2)]
+		public int AnonId { get; set; }
+	}
 
 }
