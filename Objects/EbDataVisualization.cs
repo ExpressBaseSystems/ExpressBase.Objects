@@ -306,10 +306,10 @@ namespace ExpressBase.Objects
 
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
-        public string BareControlHtml { get; set; }        
+        public string BareControlHtml { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
-        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", 3)]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", "bVisible")]
         [OnChangeExec(@"
             console.log('outer' + this.rowGrouping.$values.length);
         if(this.rowGrouping.$values.length > 0){
@@ -323,6 +323,10 @@ namespace ExpressBase.Objects
             pg.ShowProperty('RightFixedColumn')
         }")]
         public List<DVBaseColumn> rowGrouping { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        public List<RowGroup> RowGroupCollection { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         public int LeftFixedColumn { get; set; }
@@ -357,6 +361,7 @@ namespace ExpressBase.Objects
         public EbTableVisualization()
         {
             this.rowGrouping = new List<DVBaseColumn>();
+            this.RowGroupCollection = new List<RowGroup>();
         }
     }
 
@@ -555,6 +560,24 @@ namespace ExpressBase.Objects
         public string index { get; set; }
 
         public string name { get; set; }
+    }
+
+
+    [EnableInBuilder(BuilderType.DVBuilder)]
+    public class RowGroup: RowGroupCollection
+    {
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public string Name { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
+        public List<DVBaseColumn> RowGrouping { get; set; }
+    }
+
+    [EnableInBuilder(BuilderType.DVBuilder)]
+    public class RowGroupCollection : EbTableVisualization
+    {
+        
     }
 
 

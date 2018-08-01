@@ -88,7 +88,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Token { get; set; }
 
         [DataMember(Order = 2)]
-        public int id { get; set; }
+        public int Id { get; set; }
 
         public string TenantAccountId { get; set; }
 
@@ -106,6 +106,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 3)]
         public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 4)]
+        public AppWrapper AppInfo { get; set; }
     }
 
     public class GetAllApplicationRequest : IReturn<GetAllApplicationResponse>, IEbSSRequest
@@ -150,7 +153,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 		[DataMember(Order = 6)]
 		public object AppSettings { set; get; }
-	}
+
+        [DataMember(Order =7)]
+        public List<EbObject> ObjCollection { get; set; }
+    }
 
     public class GetObjectsByAppIdRequest : IReturn<GetObjectsByAppIdResponse>, IEbSSRequest
     {
