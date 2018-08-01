@@ -309,7 +309,7 @@ namespace ExpressBase.Objects
         public string BareControlHtml { get; set; }        
 
         [EnableInBuilder(BuilderType.DVBuilder)]
-        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", 3)]
         [OnChangeExec(@"
             console.log('outer' + this.rowGrouping.$values.length);
         if(this.rowGrouping.$values.length > 0){
