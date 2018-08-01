@@ -249,10 +249,11 @@ else {
             {
                 return @"
             @attachedLbl@
-            <input type='@TextMode ' id='@name@' name='@name@' autocomplete = '@AutoCompleteOff ' data-toggle='tooltip' title='@ToolTipText ' 
+            <input type='@TextMode '  data-ebtype='@data-ebtype@' id='@name@' name='@name@' autocomplete = '@AutoCompleteOff ' data-toggle='tooltip' title='@ToolTipText ' 
 @tabIndex @MaxLength  style='width:100%; height:@heightpx; @BackColor @ForeColor display:inline-block; @fontStyle @ReadOnlyString  @Required  @PlaceHolder  @Text  @TabIndex  />
         @attachedLblClose@"
 .Replace("@name@", this.Name)
+.Replace("@data-ebtype@", "16")//( (int)this.EbDateType ).ToString())
 .Replace("@MaxLength ", "maxlength='" + ((this.MaxLength > 0) ? this.MaxLength.ToString() : "@MaxLength") + "'")
 .Replace("@TextMode ", (this.TextMode == TextMode.SingleLine) ? "text" : this.TextMode.ToString().ToLower())
 .Replace("@Required ", (this.Required && !this.Hidden ? " required" : string.Empty))
