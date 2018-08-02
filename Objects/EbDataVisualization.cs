@@ -94,7 +94,12 @@ namespace ExpressBase.Objects
         public EbDataSource EbDataSource { get; set; }
 
         //[PropertyEditor(PropertyEditorType.CollectionProp, "Columns", "bVisible")]
-        [PropertyEditor(PropertyEditorType.CollectionABCpropToggle, "Columns", "bVisible", "Formula")]
+        //[PropertyEditor(PropertyEditorType.CollectionABCpropToggle, "Columns", "bVisible", "Formula")]
+        [PropertyEditor(PropertyEditorType.CollectionABCpropToggle, "Columns", "Formula")]
+
+        [CEOnSelectFn("console.log('kiduve..........');this.bVisible = true; console.log(this.bVisible)")]
+        [CEOnDeselectFn("console.log('kikikikiduve..........');this.bVisible = false; console.log(this.bVisible)")]
+
         [EnableInBuilder(BuilderType.DVBuilder)]
         public DVColumnCollection Columns { get; set; }
 
@@ -309,7 +314,10 @@ namespace ExpressBase.Objects
         public string BareControlHtml { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
-        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", "bVisible")]
+        //[PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", "bVisible")]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
+        [CEOnSelectFn("console.log('kiduve..........');console.log(this.bVisible)")]
+        [CEOnDeselectFn("console.log('kikikikiduve..........');console.log(this.bVisible)")]
         [OnChangeExec(@"
             console.log('outer' + this.rowGrouping.$values.length);
         if(this.rowGrouping.$values.length > 0){
