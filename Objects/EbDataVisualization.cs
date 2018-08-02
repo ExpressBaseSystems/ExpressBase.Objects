@@ -95,7 +95,12 @@ namespace ExpressBase.Objects
         public EbDataSource EbDataSource { get; set; }
 
         //[PropertyEditor(PropertyEditorType.CollectionProp, "Columns", "bVisible")]
-        [PropertyEditor(PropertyEditorType.CollectionABCpropToggle, "Columns", "bVisible", "Formula")]
+        //[PropertyEditor(PropertyEditorType.CollectionABCpropToggle, "Columns", "bVisible", "Formula")]
+        [PropertyEditor(PropertyEditorType.CollectionABCpropToggle, "Columns", "Formula")]
+
+        [CEOnSelectFn("console.log('kiduve..........');this.bVisible = true; console.log(this.bVisible)")]
+        [CEOnDeselectFn("console.log('kikikikiduve..........');this.bVisible = false; console.log(this.bVisible)")]
+
         [EnableInBuilder(BuilderType.DVBuilder)]
         public DVColumnCollection Columns { get; set; }
 
@@ -311,7 +316,10 @@ namespace ExpressBase.Objects
         public string BareControlHtml { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
-        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", "bVisible")]
+        //[PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", "bVisible")]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
+        [CEOnSelectFn("console.log('kiduve..........');console.log(this.bVisible)")]
+        [CEOnDeselectFn("console.log('kikikikiduve..........');console.log(this.bVisible)")]
         [OnChangeExec(@"
             console.log('outer' + this.rowGrouping.$values.length);
         if(this.rowGrouping.$values.length > 0){
@@ -328,7 +336,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.Collection)]
-        public List<RowGroup> RowGroupCollection { get; set; }
+        public List<RowGroupParent> RowGroupCollection { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         public int LeftFixedColumn { get; set; }
@@ -363,8 +371,9 @@ namespace ExpressBase.Objects
         public EbTableVisualization()
         {
             this.rowGrouping = new List<DVBaseColumn>();
-            this.RowGroupCollection = new List<RowGroup>();
+            this.RowGroupCollection = new List<RowGroupParent>();
         }
+
         public override OrderedDictionary DiscoverRelatedObjects(IServiceClient ServiceClient,OrderedDictionary obj_dict)
         {
             if (!obj_dict.Contains(RefId))
@@ -620,9 +629,10 @@ namespace ExpressBase.Objects
         public string name { get; set; }
     }
 
-
     [EnableInBuilder(BuilderType.DVBuilder)]
-    public class RowGroup: RowGroupCollection
+    [HideInToolBox]
+    [HideInPropertyGrid]
+    public class RowGroupParent : EbTableVisualization
     {
         [EnableInBuilder(BuilderType.DVBuilder)]
         public string Name { get; set; }
@@ -633,10 +643,14 @@ namespace ExpressBase.Objects
     }
 
     [EnableInBuilder(BuilderType.DVBuilder)]
-    public class RowGroupCollection : EbTableVisualization
+    public class MultipleLevelRowGroup: RowGroupParent
     {
-        
+       
     }
 
-
+    [EnableInBuilder(BuilderType.DVBuilder)]
+    public class SingleLevelRowGroup : RowGroupParent
+    {
+    }
+   
 }
