@@ -328,7 +328,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.Collection)]
-        public List<RowGroup> RowGroupCollection { get; set; }
+        public List<RowGroupParent> RowGroupCollection { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         public int LeftFixedColumn { get; set; }
@@ -363,8 +363,9 @@ namespace ExpressBase.Objects
         public EbTableVisualization()
         {
             this.rowGrouping = new List<DVBaseColumn>();
-            this.RowGroupCollection = new List<RowGroup>();
+            this.RowGroupCollection = new List<RowGroupParent>();
         }
+
         public override OrderedDictionary DiscoverRelatedObjects(IServiceClient ServiceClient,OrderedDictionary obj_dict)
         {
             if (!obj_dict.Contains(this.RefId))
@@ -618,9 +619,10 @@ namespace ExpressBase.Objects
         public string name { get; set; }
     }
 
-
     [EnableInBuilder(BuilderType.DVBuilder)]
-    public class RowGroup: RowGroupCollection
+    [HideInToolBox]
+    [HideInPropertyGrid]
+    public class RowGroupParent : EbTableVisualization
     {
         [EnableInBuilder(BuilderType.DVBuilder)]
         public string Name { get; set; }
@@ -631,10 +633,14 @@ namespace ExpressBase.Objects
     }
 
     [EnableInBuilder(BuilderType.DVBuilder)]
-    public class RowGroupCollection : EbTableVisualization
+    public class MultipleLevelRowGroup: RowGroupParent
     {
-        
+       
     }
 
-
+    [EnableInBuilder(BuilderType.DVBuilder)]
+    public class SingleLevelRowGroup : RowGroupParent
+    {
+    }
+   
 }
