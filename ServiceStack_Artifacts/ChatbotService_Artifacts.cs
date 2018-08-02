@@ -226,8 +226,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 2)]
         public List<BotInsert> Fields { get; set; }
-		
-    }
+
+		[DataMember(Order = 3)]
+		public int AnonUserId { get; set; }
+	}
 
     [DataContract]
     public class InsertIntoBotFormTableResponse : IEbSSResponse
