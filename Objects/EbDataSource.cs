@@ -75,16 +75,18 @@ namespace ExpressBase.Objects
         }
         public override OrderedDictionary DiscoverRelatedObjects(IServiceClient ServiceClient, OrderedDictionary obj_dict)
         {
-            if (!obj_dict.Contains(this.RefId))
-                obj_dict.Add(RefId, this);
-            var x = obj_dict[RefId];
-            if (!FilterDialogRefId.IsEmpty())
+            if (!obj_dict.Contains(RefId))
             {
-                EbFilterDialog fd = FilterDialog;
-                if (fd is null)
+                obj_dict.Add(RefId, this);
+                var x = obj_dict[RefId];
+                if (!FilterDialogRefId.IsEmpty())
                 {
-                    fd = GetObjfromDB(FilterDialogRefId, ServiceClient) as EbFilterDialog;
-                    fd.DiscoverRelatedObjects(ServiceClient, obj_dict);
+                    EbFilterDialog fd = FilterDialog;
+                    if (fd is null)
+                    {
+                        fd = GetObjfromDB(FilterDialogRefId, ServiceClient) as EbFilterDialog;
+                        fd.DiscoverRelatedObjects(ServiceClient, obj_dict);
+                    }
                 }
             }
             return obj_dict;

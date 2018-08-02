@@ -367,23 +367,25 @@ namespace ExpressBase.Objects
         }
         public override OrderedDictionary DiscoverRelatedObjects(IServiceClient ServiceClient,OrderedDictionary obj_dict)
         {
-            if (!obj_dict.Contains(this.RefId))
+            if (!obj_dict.Contains(RefId))
+            {
                 obj_dict.Add(RefId, this);
-            if (!DataSourceRefId.IsEmpty())
-            {
-                EbDataSource ds = EbDataSource;
-                if (ds is null)
+                if (!DataSourceRefId.IsEmpty())
                 {
-                    ds = GetObjfromDB(DataSourceRefId, ServiceClient) as EbDataSource;
-                    ds.DiscoverRelatedObjects(ServiceClient, obj_dict);
+                    EbDataSource ds = EbDataSource;
+                    if (ds is null)
+                    {
+                        ds = GetObjfromDB(DataSourceRefId, ServiceClient) as EbDataSource;
+                        ds.DiscoverRelatedObjects(ServiceClient, obj_dict);
+                    }
                 }
-            }
-            foreach (DVBaseColumn _col in Columns)
-            {
-                if (!_col.LinkRefId.IsNullOrEmpty())
+                foreach (DVBaseColumn _col in Columns)
                 {
-                    var linkobj = GetObjfromDB(_col.LinkRefId, ServiceClient);
-                    linkobj.DiscoverRelatedObjects(ServiceClient, obj_dict);
+                    if (!_col.LinkRefId.IsNullOrEmpty())
+                    {
+                        var linkobj = GetObjfromDB(_col.LinkRefId, ServiceClient);
+                        linkobj.DiscoverRelatedObjects(ServiceClient, obj_dict);
+                    }
                 }
             }
             return obj_dict;
@@ -530,7 +532,7 @@ namespace ExpressBase.Objects
 
         public override OrderedDictionary DiscoverRelatedObjects(IServiceClient ServiceClient, OrderedDictionary obj_dict)
         {
-            if (!obj_dict.Contains(this.RefId))
+            if (!obj_dict.Contains(RefId))
                 obj_dict.Add(RefId, this);
             if (DataSourceRefId.IsEmpty())
             {
