@@ -14,6 +14,7 @@ using ServiceStack;
 using ServiceStack.Redis;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Data;
 using System.Data.Common;
 using System.Linq;
@@ -27,7 +28,7 @@ namespace ExpressBase.Objects
         Default,
         GoogleMap
     }
-    
+
     public enum ControlType
     {
         Default,
@@ -79,7 +80,7 @@ namespace ExpressBase.Objects
 
     public abstract class EbDataVisualization : EbDataVisualizationObject
     {
-        
+
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iDataSource)]
@@ -119,7 +120,7 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.DVBuilder)]
         public string IsPaged { get; set; }
-        
+
         [EnableInBuilder(BuilderType.DVBuilder)]
         [DefaultPropValue("true")]
         public bool IsPaging { get; set; }
@@ -184,7 +185,8 @@ namespace ExpressBase.Objects
                         }
                     }
                 }
-                catch (Npgsql.NpgsqlException npgse) {
+                catch (Npgsql.NpgsqlException npgse)
+                {
                     Console.WriteLine("Exception: " + npgse.ToString());
                 }
             }
@@ -334,7 +336,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.Collection)]
-        public List<RowGroup> RowGroupCollection { get; set; }
+        public List<RowGroupParent> RowGroupCollection { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         public int LeftFixedColumn { get; set; }
@@ -346,7 +348,7 @@ namespace ExpressBase.Objects
         [DefaultPropValue("100")]
         public int PageLength { get; set; }
 
-		public static EbOperations Operations = TVOperations.Instance;
+        public static EbOperations Operations = TVOperations.Instance;
 
         public override string GetDesignHtml()
         {
@@ -369,7 +371,39 @@ namespace ExpressBase.Objects
         public EbTableVisualization()
         {
             this.rowGrouping = new List<DVBaseColumn>();
-            this.RowGroupCollection = new List<RowGroup>();
+            this.RowGroupCollection = new List<RowGroupParent>();
+        }
+
+        public override OrderedDictionary DiscoverRelatedObjects(IServiceClient ServiceClient,OrderedDictionary obj_dict)
+        {
+            if (!obj_dict.Contains(this.RefId))
+                obj_dict.Add(RefId, this);
+            if (!DataSourceRefId.IsEmpty())
+            {
+                EbDataSource ds = EbDataSource;
+                if (ds is null)
+                {
+                    ds = GetObjfromDB(DataSourceRefId, ServiceClient) as EbDataSource;
+                    ds.DiscoverRelatedObjects(ServiceClient, obj_dict);
+                }
+            }
+            foreach (DVBaseColumn _col in Columns)
+            {
+                if (!_col.LinkRefId.IsNullOrEmpty())
+                {
+                    var linkobj = GetObjfromDB(_col.LinkRefId, ServiceClient);
+                    linkobj.DiscoverRelatedObjects(ServiceClient, obj_dict);
+                }
+            }
+            return obj_dict;
+        }
+
+        public EbObject GetObjfromDB(string _refid, IServiceClient ServiceClient)
+        {
+            var res = ServiceClient.Get(new EbObjectParticularVersionRequest { RefId = _refid });
+            EbObject obj = EbSerializers.Json_Deserialize(res.Data[0].Json);
+            obj.RefId = _refid;
+            return obj;
         }
     }
 
@@ -412,7 +446,6 @@ namespace ExpressBase.Objects
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
 
-
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public string ObjType { get; set; }
@@ -437,7 +470,7 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
         public List<DVBaseColumn> Yaxis { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]        
+        [EnableInBuilder(BuilderType.DVBuilder)]
         [HideInPropertyGrid]
         [OnChangeExec(@"
         if(this.Type === 'pie'){
@@ -458,7 +491,7 @@ namespace ExpressBase.Objects
             pg.ShowProperty('YaxisLabelColor')
         }")]
         public string Type { get; set; }
-        
+
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.Text)]
         [DefaultPropValue("XLabel")]
@@ -503,6 +536,30 @@ namespace ExpressBase.Objects
         //public Position LegendPosition { get; set; }
 
         public static EbOperations Operations = CVOperations.Instance;
+
+        public override OrderedDictionary DiscoverRelatedObjects(IServiceClient ServiceClient, OrderedDictionary obj_dict)
+        {
+            if (!obj_dict.Contains(this.RefId))
+                obj_dict.Add(RefId, this);
+            if (DataSourceRefId.IsEmpty())
+            {
+                EbDataSource ds = EbDataSource;
+                if (ds is null)
+                {
+                    ds = GetObjfromDB(DataSourceRefId, ServiceClient) as EbDataSource;
+                    ds.DiscoverRelatedObjects(ServiceClient, obj_dict);
+                }
+            }
+            return obj_dict;
+        }
+
+        public EbObject GetObjfromDB(string _refid, IServiceClient ServiceClient)
+        {
+            var res = ServiceClient.Get(new EbObjectParticularVersionRequest { RefId = _refid });
+            EbObject obj = EbSerializers.Json_Deserialize(res.Data[0].Json);
+            obj.RefId = _refid;
+            return obj;
+        }
     }
 
     [EnableInBuilder(BuilderType.DVBuilder)]
@@ -570,9 +627,10 @@ namespace ExpressBase.Objects
         public string name { get; set; }
     }
 
-
     [EnableInBuilder(BuilderType.DVBuilder)]
-    public class RowGroup: RowGroupCollection
+    [HideInToolBox]
+    [HideInPropertyGrid]
+    public class RowGroupParent : EbTableVisualization
     {
         [EnableInBuilder(BuilderType.DVBuilder)]
         public string Name { get; set; }
@@ -583,10 +641,14 @@ namespace ExpressBase.Objects
     }
 
     [EnableInBuilder(BuilderType.DVBuilder)]
-    public class RowGroupCollection : EbTableVisualization
+    public class MultipleLevelRowGroup: RowGroupParent
     {
-        
+       
     }
 
-
+    [EnableInBuilder(BuilderType.DVBuilder)]
+    public class SingleLevelRowGroup : RowGroupParent
+    {
+    }
+   
 }

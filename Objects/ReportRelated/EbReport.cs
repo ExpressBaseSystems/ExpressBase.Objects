@@ -22,6 +22,7 @@ using ServiceStack.Redis;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Data;
 using System.Drawing;
 using System.IO;
@@ -1002,6 +1003,44 @@ namespace ExpressBase.Objects
             {
                 Console.WriteLine("Exception: " + e.ToString());
             }
+        }
+
+        public override OrderedDictionary DiscoverRelatedObjects(IServiceClient ServiceClient, OrderedDictionary obj_dict)
+        {
+            if (!obj_dict.Contains(this.RefId))
+                obj_dict.Add(RefId, this);
+            if (!DataSourceRefId.IsEmpty())
+            {
+                EbDataSource ds = EbDataSource;
+                if (ds is null)
+                {
+                    ds = GetObjfromDB(DataSourceRefId, ServiceClient) as EbDataSource;
+                    ds.DiscoverRelatedObjects( ServiceClient, obj_dict);
+                }
+            }
+            foreach (EbReportDetail dt in Detail)
+            {
+                foreach (EbReportField field in dt.Fields)
+                {
+                    if (field is EbDataField)
+                    {
+                        if (!(field as EbDataField).LinkRefId.IsEmpty())
+                        {
+                            var linkobj = GetObjfromDB((field as EbDataField).LinkRefId, ServiceClient);
+                            linkobj.DiscoverRelatedObjects(ServiceClient, obj_dict);
+                        }
+                    }
+                }
+            }
+            return obj_dict;
+        }
+
+        public EbObject GetObjfromDB(string _refid, IServiceClient ServiceClient)
+        {
+            var res = ServiceClient.Get(new EbObjectParticularVersionRequest { RefId = _refid });
+            EbObject obj = EbSerializers.Json_Deserialize(res.Data[0].Json);
+            obj.RefId = _refid;
+            return obj;
         }
 
         public EbReport()
