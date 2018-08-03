@@ -1007,27 +1007,29 @@ namespace ExpressBase.Objects
 
         public override OrderedDictionary DiscoverRelatedObjects(IServiceClient ServiceClient, OrderedDictionary obj_dict)
         {
-            if (!obj_dict.Contains(this.RefId))
+            if (!obj_dict.Contains(RefId))
+            {
                 obj_dict.Add(RefId, this);
-            if (!DataSourceRefId.IsEmpty())
-            {
-                EbDataSource ds = EbDataSource;
-                if (ds is null)
+                if (!DataSourceRefId.IsEmpty())
                 {
-                    ds = GetObjfromDB(DataSourceRefId, ServiceClient) as EbDataSource;
-                    ds.DiscoverRelatedObjects( ServiceClient, obj_dict);
-                }
-            }
-            foreach (EbReportDetail dt in Detail)
-            {
-                foreach (EbReportField field in dt.Fields)
-                {
-                    if (field is EbDataField)
+                    EbDataSource ds = EbDataSource;
+                    if (ds is null)
                     {
-                        if (!(field as EbDataField).LinkRefId.IsEmpty())
+                        ds = GetObjfromDB(DataSourceRefId, ServiceClient) as EbDataSource;
+                        ds.DiscoverRelatedObjects(ServiceClient, obj_dict);
+                    }
+                }
+                foreach (EbReportDetail dt in Detail)
+                {
+                    foreach (EbReportField field in dt.Fields)
+                    {
+                        if (field is EbDataField)
                         {
-                            var linkobj = GetObjfromDB((field as EbDataField).LinkRefId, ServiceClient);
-                            linkobj.DiscoverRelatedObjects(ServiceClient, obj_dict);
+                            if (!(field as EbDataField).LinkRefId.IsEmpty())
+                            {
+                                var linkobj = GetObjfromDB((field as EbDataField).LinkRefId, ServiceClient);
+                                linkobj.DiscoverRelatedObjects(ServiceClient, obj_dict);
+                            }
                         }
                     }
                 }
