@@ -376,27 +376,26 @@ namespace ExpressBase.Objects
             this.RowGroupCollection = new List<RowGroupParent>();
         }
 
-        public override OrderedDictionary DiscoverRelatedObjects(IServiceClient ServiceClient,OrderedDictionary obj_dict)
+        public override OrderedDictionary DiscoverRelatedObjects(IServiceClient ServiceClient, OrderedDictionary obj_dict)
         {
-            if (!obj_dict.Contains(RefId))
+            if (obj_dict.Contains(RefId))
+                obj_dict.Remove(RefId);
+            obj_dict.Add(RefId, this);
+            if (!DataSourceRefId.IsEmpty())
             {
-                obj_dict.Add(RefId, this);
-                if (!DataSourceRefId.IsEmpty())
+                EbDataSource ds = EbDataSource;
+                if (ds is null)
                 {
-                    EbDataSource ds = EbDataSource;
-                    if (ds is null)
-                    {
-                        ds = GetObjfromDB(DataSourceRefId, ServiceClient) as EbDataSource;
-                        ds.DiscoverRelatedObjects(ServiceClient, obj_dict);
-                    }
+                    ds = GetObjfromDB(DataSourceRefId, ServiceClient) as EbDataSource;
+                    ds.DiscoverRelatedObjects(ServiceClient, obj_dict);
                 }
-                foreach (DVBaseColumn _col in Columns)
+            }
+            foreach (DVBaseColumn _col in Columns)
+            {
+                if (!_col.LinkRefId.IsNullOrEmpty())
                 {
-                    if (!_col.LinkRefId.IsNullOrEmpty())
-                    {
-                        var linkobj = GetObjfromDB(_col.LinkRefId, ServiceClient);
-                        linkobj.DiscoverRelatedObjects(ServiceClient, obj_dict);
-                    }
+                    var linkobj = GetObjfromDB(_col.LinkRefId, ServiceClient);
+                    linkobj.DiscoverRelatedObjects(ServiceClient, obj_dict);
                 }
             }
             return obj_dict;
@@ -408,6 +407,27 @@ namespace ExpressBase.Objects
             EbObject obj = EbSerializers.Json_Deserialize(res.Data[0].Json);
             obj.RefId = _refid;
             return obj;
+        }
+        public override void ReplaceRefid(Dictionary<string, string> RefidMap)
+        {
+            if (DataSourceRefId.IsEmpty())
+            {
+                string dsid = DataSourceRefId;
+                if (RefidMap.ContainsKey(dsid))
+                   DataSourceRefId = RefidMap[dsid];
+                else
+                    DataSourceRefId = "failed-to-update-";
+            }
+            foreach (DVBaseColumn _col in Columns)
+            {
+                if (!_col.LinkRefId.IsNullOrEmpty())
+                {
+                    if (RefidMap.ContainsKey(_col.LinkRefId))
+                        _col.LinkRefId = RefidMap[_col.LinkRefId];
+                    else
+                        _col.LinkRefId = "failed-to-update-";
+                }
+            }
         }
     }
 
@@ -543,8 +563,8 @@ namespace ExpressBase.Objects
 
         public override OrderedDictionary DiscoverRelatedObjects(IServiceClient ServiceClient, OrderedDictionary obj_dict)
         {
-            if (!obj_dict.Contains(RefId))
-                obj_dict.Add(RefId, this);
+            if (obj_dict.Contains(RefId))
+                obj_dict.Remove(RefId);
             if (DataSourceRefId.IsEmpty())
             {
                 EbDataSource ds = EbDataSource;
@@ -563,6 +583,16 @@ namespace ExpressBase.Objects
             EbObject obj = EbSerializers.Json_Deserialize(res.Data[0].Json);
             obj.RefId = _refid;
             return obj;
+        }
+        public override void ReplaceRefid(Dictionary<string, string> RefidMap)
+        {
+            if (!DataSourceRefId.IsEmpty())
+            {
+                if (RefidMap.ContainsKey(DataSourceRefId))
+                    DataSourceRefId = RefidMap[DataSourceRefId];
+                else
+                    DataSourceRefId = "failed-to-update-";
+            }
         }
     }
 
@@ -652,7 +682,7 @@ namespace ExpressBase.Objects
     [Alias("MultiLvlRowGrp")]
     public class MultipleLevelRowGroup: RowGroupParent
     {
-       
+
     }
 
     [EnableInBuilder(BuilderType.DVBuilder)]
@@ -660,5 +690,5 @@ namespace ExpressBase.Objects
     public class SingleLevelRowGroup : RowGroupParent
     {
     }
-   
+
 }
