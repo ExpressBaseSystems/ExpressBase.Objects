@@ -98,14 +98,10 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.CollectionABCpropToggle, "Columns", "bVisible", "Formula")]
         //[PropertyEditor(PropertyEditorType.CollectionABCpropToggle, "Columns", "Formula")]
 
-        [CEOnSelectFn(@"
-            console.log('kiduve..........');
-            this.bVisible = true;
-            console.log(this.bVisible)")]
+        [CEOnSelectFn(@";
+            this.bVisible = true;")]
         [CEOnDeselectFn(@"
-            console.log('kikikikiduve..........');
-            this.bVisible = false;
-            console.log(this.bVisible)")]
+            this.bVisible = false;")]
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         public DVColumnCollection Columns { get; set; }
@@ -329,9 +325,7 @@ namespace ExpressBase.Objects
         [CEOnDeselectFn(@"
             this.bVisible = true;")]
         [OnChangeExec(@"
-            console.log('outer' + this.rowGrouping.$values.length);
         if(this.rowGrouping.$values.length > 0){
-            console.log(this.rowGrouping.$values.length);
             pg.HideProperty('LeftFixedColumn')
             pg.HideProperty('RightFixedColumn')
         }
@@ -676,17 +670,23 @@ namespace ExpressBase.Objects
         public string Name { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
-        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
-        public List<DVBaseColumn> RowGrouping { get; set; }
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Parent.Columns")]
+        [CEOnSelectFn(@"
+            this.bVisible = false;")]
+        [CEOnDeselectFn(@"
+            this.bVisible = true;")]
+        public List<DVBaseColumn> RowGroupingNew { get; set; }
     }
 
     [EnableInBuilder(BuilderType.DVBuilder)]
-    public class MultipleLevelRowGroup : RowGroupParent
+    [Alias("MultiLvlRowGrp")]
+    public class MultipleLevelRowGroup: RowGroupParent
     {
 
     }
 
     [EnableInBuilder(BuilderType.DVBuilder)]
+    [Alias("SingleLvlRowGrp")]
     public class SingleLevelRowGroup : RowGroupParent
     {
     }

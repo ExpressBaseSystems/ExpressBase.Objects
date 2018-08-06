@@ -604,9 +604,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public List<Eb_Users> UsersList { get; set; }
 
 		[DataMember(Order = 7)]
-		public string Token { get; set; }
+		public List<Eb_Location> LocationList { get; set; }
 
 		[DataMember(Order = 8)]
+		public string Token { get; set; }
+
+		[DataMember(Order = 9)]
 		public ResponseStatus ResponseStatus { get; set; }
 	}
 
@@ -827,6 +830,19 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 		[DataMember(Order = 3)]
 		public int Dependent;
+	}
+
+	[DataContract]
+	public class Eb_Location
+	{
+		[DataMember(Order = 1)]
+		public int Id;
+
+		[DataMember(Order = 2)]
+		public string LongName;
+
+		[DataMember(Order = 3)]
+		public string ShortName;
 	}
 
 	[DataContract]
