@@ -99,16 +99,24 @@ namespace ExpressBase.Objects
         //[PropertyEditor(PropertyEditorType.CollectionABCpropToggle, "Columns", "Formula")]
 
         [CEOnSelectFn(@";
-            this.bVisible = true;")]
+            this.bVisible = true;
+            NonVC = Parent.NonVisibleColumns.$values;
+            let  idx = NonVC.indexOf(this);
+            if(idx > -1)
+                NonVC.splice(idx, 1);")]
         [CEOnDeselectFn(@"
-            this.bVisible = false;")]
-
+            this.bVisible = false;
+            Parent.NonVisibleColumns.$values.push(this)")]
         [EnableInBuilder(BuilderType.DVBuilder)]
         public DVColumnCollection Columns { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [HideInPropertyGrid]
         public DVColumnCollection DSColumns { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [HideInPropertyGrid]
+        public List<DVBaseColumn> NonVisibleColumns { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [HideInPropertyGrid]
@@ -319,11 +327,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         //[PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", "bVisible")]
-        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
-        [CEOnSelectFn(@"
-            this.bVisible = false;")]
-        [CEOnDeselectFn(@"
-            this.bVisible = true;")]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]        
         [OnChangeExec(@"
         if(this.rowGrouping.$values.length > 0){
             pg.HideProperty('LeftFixedColumn')
@@ -374,6 +378,7 @@ namespace ExpressBase.Objects
         {
             this.rowGrouping = new List<DVBaseColumn>();
             this.RowGroupCollection = new List<RowGroupParent>();
+            this.NonVisibleColumns = new List<DVBaseColumn>();            
         }
 
         public override OrderedDictionary DiscoverRelatedObjects(IServiceClient ServiceClient, OrderedDictionary obj_dict)
@@ -668,13 +673,9 @@ namespace ExpressBase.Objects
     {
         [EnableInBuilder(BuilderType.DVBuilder)]
         public string Name { get; set; }
-
+        
         [EnableInBuilder(BuilderType.DVBuilder)]
-        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Parent.Columns")]
-        [CEOnSelectFn(@"
-            this.bVisible = false;")]
-        [CEOnDeselectFn(@"
-            this.bVisible = true;")]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Parent.Columns")]        
         public List<DVBaseColumn> RowGroupingNew { get; set; }
     }
 
