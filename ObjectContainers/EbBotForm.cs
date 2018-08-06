@@ -79,15 +79,15 @@ namespace ExpressBase.Objects
             if (obj_dict.Contains(RefId))
                 obj_dict.Remove(RefId);
             obj_dict.Add(RefId, this);
-                foreach (EbControl control in Controls)
+            foreach (EbControl control in Controls)
+            {
+                PropertyInfo[] _props = control.GetType().GetProperties();
+                foreach (PropertyInfo _prop in _props)
                 {
-                    PropertyInfo[] _props = control.GetType().GetProperties();
-                    foreach (PropertyInfo _prop in _props)
-                    {
-                        if (_prop.IsDefined(typeof(OSE_ObjectTypes)))
-                            obj_dict.Add(GetObjfromDB(_prop.GetValue(this, null).ToString(), ServiceClient), RefId);
-                    }
+                    if (_prop.IsDefined(typeof(OSE_ObjectTypes)))
+                        GetObjfromDB(_prop.GetValue(control, null).ToString(), ServiceClient).DiscoverRelatedObjects(ServiceClient, obj_dict);
                 }
+            }
             return obj_dict;
         }
         public EbObject GetObjfromDB(string _refid, IServiceClient ServiceClient)
@@ -99,7 +99,22 @@ namespace ExpressBase.Objects
         }
         public override void ReplaceRefid(Dictionary<string, string> RefidMap)
         {
-           
+            foreach (EbControl control in Controls)
+            {
+                PropertyInfo[] _props = control.GetType().GetProperties();
+                foreach (PropertyInfo _prop in _props)
+                {
+                    if (_prop.IsDefined(typeof(OSE_ObjectTypes)))
+                    {
+                        string _val = _prop.GetValue(control, null).ToString();
+                        if (RefidMap.ContainsKey(_val))
+                            _prop.SetValue(control, RefidMap[_val],null);
+                        else
+                            _prop.SetValue(control, "failed-to-update-");
+                    }
+
+                }
+            }
         }
     }
 }
