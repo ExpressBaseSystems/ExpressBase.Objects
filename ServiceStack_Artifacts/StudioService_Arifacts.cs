@@ -380,6 +380,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Tags { get; set; }
 
         public string Apps { get; set; }
+
+        public string SourceSolutionId { get; set; }
+
+        public string SourceObjId { get; set; }
+
+        public string SourceVerID { get; set; }
     }
 
     [DataContract]

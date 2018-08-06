@@ -160,10 +160,10 @@ $('#@id').MonthPicker({ StartYear: 2018, ShowIcon: false });"
         {
             return @" 
         <div class='input-group' style='width:100%;'>
-            <input id='@name@' data-ebtype='@data-ebtype@'  data-toggle='tooltip' title='@toolTipText@' class='date' type='text'name='@name@' autocomplete = '@autoComplete@' @value@ @tabIndex@ style='width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@ @readOnlyString@ @required@ @placeHolder@ />
+            <input id='@name@' data-ebtype='@data-ebtype@'  data-toggle='tooltip' title='@toolTipText@' class='date' type='text' name='@name@' autocomplete = '@autoComplete@' @value@ @tabIndex@ style='width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@ @readOnlyString@ @required@ @placeHolder@ />
             <span class='input-group-addon' onclick=""$('#@name@').click()"" style='padding: 0px;'> <i id='@name@TglBtn' class='fa  @atchdLbl@' aria-hidden='true' style='padding: 6px 12px;'></i> </span>
         </div>"
-.Replace("@name@", this.Name)
+.Replace("@name@", this.Name.Trim())
 .Replace("@data-ebtype@", "6")//( (int)this.EbDateType ).ToString())
 .Replace("@toolTipText@", this.ToolTipText)
 .Replace("@autoComplete@", this.AutoCompleteOff ? "off" : "on")

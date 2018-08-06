@@ -96,6 +96,13 @@ namespace ExpressBase.Objects
 
         //[PropertyEditor(PropertyEditorType.CollectionProp, "Columns", "bVisible")]
         [PropertyEditor(PropertyEditorType.CollectionABCpropToggle, "Columns", "bVisible", "Formula")]
+        //[PropertyEditor(PropertyEditorType.CollectionABCpropToggle, "Columns", "Formula")]
+
+        [CEOnSelectFn(@";
+            this.bVisible = true;")]
+        [CEOnDeselectFn(@"
+            this.bVisible = false;")]
+
         [EnableInBuilder(BuilderType.DVBuilder)]
         public DVColumnCollection Columns { get; set; }
 
@@ -311,11 +318,14 @@ namespace ExpressBase.Objects
         public string BareControlHtml { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
-        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", "bVisible")]
+        //[PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", "bVisible")]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
+        [CEOnSelectFn(@"
+            this.bVisible = false;")]
+        [CEOnDeselectFn(@"
+            this.bVisible = true;")]
         [OnChangeExec(@"
-            console.log('outer' + this.rowGrouping.$values.length);
         if(this.rowGrouping.$values.length > 0){
-            console.log(this.rowGrouping.$values.length);
             pg.HideProperty('LeftFixedColumn')
             pg.HideProperty('RightFixedColumn')
         }
@@ -328,7 +338,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.Collection)]
-        public List<RowGroup> RowGroupCollection { get; set; }
+        public List<RowGroupParent> RowGroupCollection { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         public int LeftFixedColumn { get; set; }
@@ -363,12 +373,14 @@ namespace ExpressBase.Objects
         public EbTableVisualization()
         {
             this.rowGrouping = new List<DVBaseColumn>();
-            this.RowGroupCollection = new List<RowGroup>();
+            this.RowGroupCollection = new List<RowGroupParent>();
         }
-        public override OrderedDictionary DiscoverRelatedObjects(IServiceClient ServiceClient,OrderedDictionary obj_dict)
+
+        public override OrderedDictionary DiscoverRelatedObjects(IServiceClient ServiceClient, OrderedDictionary obj_dict)
         {
-            if (!obj_dict.Contains(this.RefId))
-                obj_dict.Add(RefId, this);
+            if (obj_dict.Contains(RefId))
+                obj_dict.Remove(RefId);
+            obj_dict.Add(RefId, this);
             if (!DataSourceRefId.IsEmpty())
             {
                 EbDataSource ds = EbDataSource;
@@ -395,6 +407,27 @@ namespace ExpressBase.Objects
             EbObject obj = EbSerializers.Json_Deserialize(res.Data[0].Json);
             obj.RefId = _refid;
             return obj;
+        }
+        public override void ReplaceRefid(Dictionary<string, string> RefidMap)
+        {
+            if (DataSourceRefId.IsEmpty())
+            {
+                string dsid = DataSourceRefId;
+                if (RefidMap.ContainsKey(dsid))
+                   DataSourceRefId = RefidMap[dsid];
+                else
+                    DataSourceRefId = "failed-to-update-";
+            }
+            foreach (DVBaseColumn _col in Columns)
+            {
+                if (!_col.LinkRefId.IsNullOrEmpty())
+                {
+                    if (RefidMap.ContainsKey(_col.LinkRefId))
+                        _col.LinkRefId = RefidMap[_col.LinkRefId];
+                    else
+                        _col.LinkRefId = "failed-to-update-";
+                }
+            }
         }
     }
 
@@ -530,8 +563,8 @@ namespace ExpressBase.Objects
 
         public override OrderedDictionary DiscoverRelatedObjects(IServiceClient ServiceClient, OrderedDictionary obj_dict)
         {
-            if (!obj_dict.Contains(this.RefId))
-                obj_dict.Add(RefId, this);
+            if (obj_dict.Contains(RefId))
+                obj_dict.Remove(RefId);
             if (DataSourceRefId.IsEmpty())
             {
                 EbDataSource ds = EbDataSource;
@@ -550,6 +583,16 @@ namespace ExpressBase.Objects
             EbObject obj = EbSerializers.Json_Deserialize(res.Data[0].Json);
             obj.RefId = _refid;
             return obj;
+        }
+        public override void ReplaceRefid(Dictionary<string, string> RefidMap)
+        {
+            if (!DataSourceRefId.IsEmpty())
+            {
+                if (RefidMap.ContainsKey(DataSourceRefId))
+                    DataSourceRefId = RefidMap[DataSourceRefId];
+                else
+                    DataSourceRefId = "failed-to-update-";
+            }
         }
     }
 
@@ -618,23 +661,34 @@ namespace ExpressBase.Objects
         public string name { get; set; }
     }
 
-
     [EnableInBuilder(BuilderType.DVBuilder)]
-    public class RowGroup: RowGroupCollection
+    [HideInToolBox]
+    [HideInPropertyGrid]
+    public class RowGroupParent : EbTableVisualization
     {
         [EnableInBuilder(BuilderType.DVBuilder)]
         public string Name { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
-        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
-        public List<DVBaseColumn> RowGrouping { get; set; }
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Parent.Columns")]
+        [CEOnSelectFn(@"
+            this.bVisible = false;")]
+        [CEOnDeselectFn(@"
+            this.bVisible = true;")]
+        public List<DVBaseColumn> RowGroupingNew { get; set; }
     }
 
     [EnableInBuilder(BuilderType.DVBuilder)]
-    public class RowGroupCollection : EbTableVisualization
+    [Alias("MultiLvlRowGrp")]
+    public class MultipleLevelRowGroup: RowGroupParent
     {
-        
+
     }
 
+    [EnableInBuilder(BuilderType.DVBuilder)]
+    [Alias("SingleLvlRowGrp")]
+    public class SingleLevelRowGroup : RowGroupParent
+    {
+    }
 
 }

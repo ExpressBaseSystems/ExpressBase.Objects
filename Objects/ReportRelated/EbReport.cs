@@ -1007,15 +1007,16 @@ namespace ExpressBase.Objects
 
         public override OrderedDictionary DiscoverRelatedObjects(IServiceClient ServiceClient, OrderedDictionary obj_dict)
         {
-            if (!obj_dict.Contains(this.RefId))
-                obj_dict.Add(RefId, this);
+            if (obj_dict.Contains(RefId))
+                obj_dict.Remove(RefId);
+            obj_dict.Add(RefId, this);
             if (!DataSourceRefId.IsEmpty())
             {
                 EbDataSource ds = EbDataSource;
                 if (ds is null)
                 {
                     ds = GetObjfromDB(DataSourceRefId, ServiceClient) as EbDataSource;
-                    ds.DiscoverRelatedObjects( ServiceClient, obj_dict);
+                    ds.DiscoverRelatedObjects(ServiceClient, obj_dict);
                 }
             }
             foreach (EbReportDetail dt in Detail)
@@ -1043,6 +1044,30 @@ namespace ExpressBase.Objects
             return obj;
         }
 
+        public override void ReplaceRefid(Dictionary<string, string> RefidMap)
+        {
+            if (!DataSourceRefId.IsEmpty() && RefidMap.ContainsKey(DataSourceRefId))
+                DataSourceRefId = RefidMap[DataSourceRefId];
+            else
+                DataSourceRefId = "failed-to-update-";
+
+            foreach (EbReportDetail dt in Detail)
+            {
+                foreach (EbReportField field in dt.Fields)
+                {
+                    if (field is EbDataField)
+                    {
+                        if (!(field as EbDataField).LinkRefId.IsEmpty())
+                        {
+                            if (RefidMap.ContainsKey((field as EbDataField).LinkRefId))
+                                (field as EbDataField).LinkRefId = RefidMap[(field as EbDataField).LinkRefId];
+                            else
+                                (field as EbDataField).LinkRefId = "failed-to-update-";
+                        }
+                    }
+                }
+            }
+        }
         public EbReport()
         {
             ReportHeaders = new List<EbReportHeader>();
