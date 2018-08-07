@@ -56,7 +56,7 @@ namespace ExpressBase.Objects
 		
         public void InitFromDataBase(JsonServiceClient ServiceClient)
         {
-            RowColletion ds = (ServiceClient.Get<DataSourceDataResponse>(new DataSourceDataRequest { RefId = this.DataSourceId })).Data;
+            RowColletion ds = (ServiceClient.Get<DataSourceDataResponse>(new DataSourceDataRequest { RefId = this.DataSourceId , Start = 0, Length = 1000})).Data;
 
             for (int i = 0; i < ds.Count; i++)
             {
