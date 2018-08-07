@@ -7,11 +7,19 @@ using System.Text;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
-        public class RelationTreeRequest : EbServiceStackRequest, IReturn<RelationTreeResponse>
+        public class SaveToAppStoreRequest : EbServiceStackRequest, IReturn<SaveToAppStoreResponse>
         {
-            
-        }
-        public class RelationTreeResponse : IEbSSResponse
+        public string AppName { get; set; }
+
+        public int Status { get; set; }
+
+        public int Cost { get; set; }
+
+        public string Json { get; set; }
+
+        public string Currency { get; set; }
+    }
+        public class SaveToAppStoreResponse : IEbSSResponse
         {
             [DataMember(Order = 2)]
             public string Token { get; set; }
