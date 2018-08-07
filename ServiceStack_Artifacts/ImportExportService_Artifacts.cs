@@ -7,8 +7,8 @@ using System.Text;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
-        public class SaveToAppStoreRequest : EbServiceStackRequest, IReturn<SaveToAppStoreResponse>
-        {
+    public class SaveToAppStoreRequest : EbServiceStackRequest, IReturn<SaveToAppStoreResponse>
+    {
         public string AppName { get; set; }
 
         public int Status { get; set; }
@@ -19,12 +19,30 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public string Currency { get; set; }
     }
-        public class SaveToAppStoreResponse : IEbSSResponse
-        {
-            [DataMember(Order = 2)]
-            public string Token { get; set; }
 
-            [DataMember(Order = 3)]
-            public ResponseStatus ResponseStatus { get; set; }
-        }
+    public class SaveToAppStoreResponse : IEbSSResponse
+    {
+        [DataMember(Order = 2)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 3)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    public class GetOneFromAppStoreRequest : EbServiceStackRequest, IReturn<GetOneFromAppstoreResponse>
+    {
+        public int Id { get; set; }
+    }
+
+    public class GetOneFromAppstoreResponse:IEbSSResponse
+    {
+        [DataMember(Order =1)]
+        public AppWrapper Wrapper { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 3)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
 }
