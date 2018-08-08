@@ -101,12 +101,12 @@ namespace ExpressBase.Objects
         [CEOnSelectFn(@";
             this.bVisible = true;
             NonVC = Parent.NonVisibleColumns.$values;
-            let  idx = NonVC.indexOf(this);
+            let  idx = NonVC.indexOf(this.name);
             if(idx > -1)
                 NonVC.splice(idx, 1);")]
         [CEOnDeselectFn(@"
             this.bVisible = false;
-            Parent.NonVisibleColumns.$values.push(this)")]
+            Parent.NonVisibleColumns.$values.push(this.name)")]
         [EnableInBuilder(BuilderType.DVBuilder)]
         public DVColumnCollection Columns { get; set; }
 
@@ -116,7 +116,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [HideInPropertyGrid]
-        public List<DVBaseColumn> NonVisibleColumns { get; set; }
+        public List<string> NonVisibleColumns { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [HideInPropertyGrid]
@@ -325,11 +325,23 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public string BareControlHtml { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
-        //[PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", "bVisible")]
-        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]        
+        //[EnableInBuilder(BuilderType.DVBuilder)]
+        ////[PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", "bVisible")]
+        //[PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]        
+        //[OnChangeExec(@"
+        //if(this.rowGrouping.$values.length > 0){
+        //    pg.HideProperty('LeftFixedColumn')
+        //    pg.HideProperty('RightFixedColumn')
+        //}
+
+        //else{
+        //    pg.ShowProperty('LeftFixedColumn')
+        //    pg.ShowProperty('RightFixedColumn')
+        //}")]
+        //public List<DVBaseColumn> rowGrouping { get; set; }
+
         [OnChangeExec(@"
-        if(this.rowGrouping.$values.length > 0){
+        if(this.RowGroupCollection.$values.length > 0){
             pg.HideProperty('LeftFixedColumn')
             pg.HideProperty('RightFixedColumn')
         }
@@ -338,8 +350,6 @@ namespace ExpressBase.Objects
             pg.ShowProperty('LeftFixedColumn')
             pg.ShowProperty('RightFixedColumn')
         }")]
-        public List<DVBaseColumn> rowGrouping { get; set; }
-
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.Collection)]
         public List<RowGroupParent> RowGroupCollection { get; set; }
@@ -376,9 +386,8 @@ namespace ExpressBase.Objects
 
         public EbTableVisualization()
         {
-            this.rowGrouping = new List<DVBaseColumn>();
             this.RowGroupCollection = new List<RowGroupParent>();
-            this.NonVisibleColumns = new List<DVBaseColumn>();            
+            this.NonVisibleColumns = new List<string>();            
         }
 
         public override OrderedDictionary DiscoverRelatedObjects(IServiceClient ServiceClient, OrderedDictionary obj_dict)
@@ -668,15 +677,20 @@ namespace ExpressBase.Objects
 
     [EnableInBuilder(BuilderType.DVBuilder)]
     [HideInToolBox]
-    [HideInPropertyGrid]
-    public class RowGroupParent : EbTableVisualization
+    [UsedWithTopObjectParent(typeof(EbDataVisualizationObject))]
+    public class RowGroupParent
     {
         [EnableInBuilder(BuilderType.DVBuilder)]
         public string Name { get; set; }
         
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Parent.Columns")]        
-        public List<DVBaseColumn> RowGroupingNew { get; set; }
+        public List<DVBaseColumn> RowGrouping { get; set; }
+
+        public RowGroupParent()
+        {
+            this.RowGrouping = new List<DVBaseColumn>();
+        }
     }
 
     [EnableInBuilder(BuilderType.DVBuilder)]
