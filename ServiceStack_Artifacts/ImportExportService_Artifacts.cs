@@ -57,7 +57,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         public int Id { get; set; }
 
-        public string AppName { get; set; }
+        public string Name { get; set; }
 
         public int Status { get; set; }
 
@@ -70,5 +70,15 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int CreatedBy { get; set; }
 
         public DateTime CreatedAt { get; set; }
+
+        public int AppType { get; set; }
+
+        public string Description { get; set; }
+
+        public string Icon { get; set; }
+
+        public string SolutionName { get; set; }
+
+        public string TenantName { get; set; }
     }
 }
