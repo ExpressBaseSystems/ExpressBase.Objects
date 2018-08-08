@@ -677,7 +677,7 @@ namespace ExpressBase.Objects
 
     [EnableInBuilder(BuilderType.DVBuilder)]
     [HideInToolBox]
-    [UsedWithTopObjectParent(typeof(EbDataVisualizationObject))]
+    [HideInPropertyGrid]
     public class RowGroupParent
     {
         [EnableInBuilder(BuilderType.DVBuilder)]
@@ -694,14 +694,16 @@ namespace ExpressBase.Objects
     }
 
     [EnableInBuilder(BuilderType.DVBuilder)]
-    [Alias("MultiLvlRowGrp")]
+    [UsedWithTopObjectParent(typeof(EbDataVisualizationObject))]
+    [Alias("Multi Level")]
     public class MultipleLevelRowGroup: RowGroupParent
     {
 
     }
 
     [EnableInBuilder(BuilderType.DVBuilder)]
-    [Alias("SingleLvlRowGrp")]
+    [UsedWithTopObjectParent(typeof(EbDataVisualizationObject))]
+    [Alias("Single Level")]
     public class SingleLevelRowGroup : RowGroupParent
     {
     }

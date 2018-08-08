@@ -76,5 +76,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Description { get; set; }
 
         public string Icon { get; set; }
+
+        public string SolutionName { get; set; }
+
+        public string TenantName { get; set; }
     }
 }
