@@ -24,6 +24,8 @@ namespace ExpressBase.Objects
 
         public string EbObjectTypes { get; set; }
 
+        public string EbOnChangeUIfns { get; set; }
+
         EbToolbox() { }
 
         public EbToolbox(BuilderType _builderType)
@@ -40,6 +42,7 @@ namespace ExpressBase.Objects
             this.TypeRegister = _c2js.TypeRegister;
             this.JsonToJsObjectFuncs = _c2js.JsonToJsObjectFuncs;
             this.EbObjectTypes = _c2js.EbObjectTypes;
+            this.EbOnChangeUIfns = _c2js.EbOnChangeUIfns;
         }
 
         public string getHead()

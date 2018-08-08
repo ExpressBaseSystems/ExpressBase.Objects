@@ -35,6 +35,24 @@ namespace ExpressBase.Objects
     {
         public EbTextBox() { }
 
+        public override string UIchangeFns
+        {
+            get
+            {
+                return @"EbTextBox = {
+                x : function(elementId, props) {
+                        console.log(elementId);
+                        console.log(props);
+                },
+
+                y : function(elementId, props) {
+                        console.log(elementId);
+                        console.log(props);
+                },
+            }";
+            }
+        }
+
         [OnDeserialized]
         public void OnDeserializedMethod(StreamingContext context)
         {
@@ -45,6 +63,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
         [HelpText("To limit number of charecters")]
         [PropertyGroup("Behavior")]
+        [OnChangeUIFunction("EbTextBox.x")]
         [PropertyEditor(PropertyEditorType.Number)]
         [OnChangeExec(@"
 if (this.MaxLength <= 10 ){
@@ -91,6 +110,7 @@ else {
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         [PropertyGroup(@"Behavior")]
+        [OnChangeUIFunction("EbTextBox.y")]
         [HelpText("specifies a short hint that describes the expected value of an input field (e.g. a sample value or a short description of the expected format)")]
         public string PlaceHolder { get; set; }
 
@@ -148,15 +168,15 @@ else {
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
 
-		[HideInPropertyGrid]
-		[EnableInBuilder(BuilderType.BotForm)]
-		public override bool IsReadOnly { get => this.ReadOnly; }
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.BotForm)]
+        public override bool IsReadOnly { get => this.ReadOnly; }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
-		[PropertyEditor(PropertyEditorType.JS)]
-		public string OnChangeExe { get; set; }
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+        [PropertyEditor(PropertyEditorType.JS)]
+        public string OnChangeExe { get; set; }
 
-		public override string GetHead()
+        public override string GetHead()
         {
             return (((!this.Hidden) ? this.UniqueString + this.RequiredString : string.Empty) + @"".Replace("{0}", this.Name));
         }
@@ -212,30 +232,7 @@ else {
 
         public override string GetDesignHtml()
         {
-            return @"
-<div id='TextBox0' class='Eb-ctrlContainer iw-mTrigger' ctype='TextBox'  eb-type='TextBox'>
-   <div class='msg-cont'>
-      <div class='bot-icon'></div>
-      <div class='msg-cont-bot'>
-         <div class='msg-wraper-bot'>
-            @Label@
-            <div class='msg-time'>3:44pm</div>
-         </div>
-      </div>
-   </div>
-   <div class='msg-cont' for='TextBox1' form='LeaveJS'>
-      <div class='msg-cont-bot'>
-         <div class='msg-wraper-bot' style='border: none; background-color: transparent; width: 99%; padding-right: 3px;'>
-            <div class='chat-ctrl-cont'>
-               <div class='ctrl-wraper' style='width: calc(100% - 17px);'>
-                  <input type='text' id='TextBox1' name='TextBox1' autocomplete='off' data-toggle='tooltip' title='@ToolTipText ' @tabindex='' maxlength='@MaxLength' style='width:100%; height:@heightpx; background-color:#ffffff;color:#333333;display:inline-block; @fontStyle ' placeholder='' value='' tabindex='0'>
-               </div>
-            </div>
-         </div>
-      </div>
-   </div>
-</div>
-".RemoveCR().DoubleQuoted();
+            return GetHtml().RemoveCR().DoubleQuoted();
         }
 
         public override string GetHtml()
@@ -249,7 +246,7 @@ else {
             {
                 return @"
             @attachedLbl@
-            <input type='@TextMode '  data-ebtype='@data-ebtype@' id='@name@' name='@name@' autocomplete = '@AutoCompleteOff ' data-toggle='tooltip' title='@ToolTipText ' 
+            <input type='@TextMode '  data-ebtype='@data-ebtype@' ui-inp id='@name@' name='@name@' autocomplete = '@AutoCompleteOff ' data-toggle='tooltip' title='@ToolTipText ' 
 @tabIndex @MaxLength  style='width:100%; height:@heightpx; @BackColor @ForeColor display:inline-block; @fontStyle @ReadOnlyString  @Required  @PlaceHolder  @Text  @TabIndex  />
         @attachedLblClose@"
 .Replace("@name@", this.Name)
