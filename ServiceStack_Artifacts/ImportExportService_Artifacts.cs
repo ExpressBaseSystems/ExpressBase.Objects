@@ -53,6 +53,43 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
+    public class ExportApplicationRequest : EbServiceStackRequest, IReturn<GetAllFromAppstoreResponse>
+    {
+        [DataMember(Order = 1)]
+        public string Refids { get; set; }
+    }
+
+    public class ExportApplicationResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order =3)]
+        public string Result { get; set; }
+    }
+
+    public class ImportApplicationRequest : EbServiceStackRequest, IReturn<GetAllFromAppstoreResponse>
+    {
+        [DataMember(Order = 1)]
+        public int Id { get; set; }
+    }
+
+    public class ImportApplicationResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 3)]
+        public string Result { get; set; }
+
+    }
+
     public class AppStore
     {
         public int Id { get; set; }
