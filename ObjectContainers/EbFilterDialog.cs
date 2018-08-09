@@ -86,16 +86,20 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.FilterDialog)]
         public int Width { get; set; }
 
-        public override OrderedDictionary DiscoverRelatedObjects(IServiceClient ServiceClient, OrderedDictionary obj_dict)
-        {
-            if (obj_dict.Contains(RefId))
-                obj_dict.Remove(RefId);
-            obj_dict.Add(RefId, this);
-            return obj_dict;
-        }
+        //public override OrderedDictionary DiscoverRelatedObjects(IServiceClient ServiceClient, OrderedDictionary obj_dict)
+        //{
+        //    if (obj_dict.Contains(RefId))
+        //        obj_dict.Remove(RefId);
+        //    obj_dict.Add(RefId, this);
+        //    return obj_dict;
+        //}
         public override void ReplaceRefid(Dictionary<string, string> RefidMap)
         {
             
+        }
+        public override string DiscoverRelatedRefids()
+        {
+            return base.DiscoverRelatedRefids();
         }
     }
 }

@@ -73,30 +73,33 @@ namespace ExpressBase.Objects
                 Console.WriteLine("Exception:" + e.ToString());
             }
         }
-        public override OrderedDictionary DiscoverRelatedObjects(IServiceClient ServiceClient, OrderedDictionary obj_dict)
-        {
-            if (obj_dict.Contains(RefId))
-                obj_dict.Remove(RefId);
-            obj_dict.Add(RefId, this);
-            var x = obj_dict[RefId];
-            if (!FilterDialogRefId.IsEmpty())
-            {
-                EbFilterDialog fd = FilterDialog;
-                if (fd is null)
-                {
-                    fd = GetObjfromDB(FilterDialogRefId, ServiceClient) as EbFilterDialog;
-                    fd.DiscoverRelatedObjects(ServiceClient, obj_dict);
-                }
-            }
-            return obj_dict;
-        }
-        public EbObject GetObjfromDB(string _refid, IServiceClient ServiceClient)
-        {
-            var res = ServiceClient.Get(new EbObjectParticularVersionRequest { RefId = _refid });
-            EbObject obj = EbSerializers.Json_Deserialize(res.Data[0].Json);
-            obj.RefId = _refid;
-            return obj;
-        }
+
+        //public override OrderedDictionary DiscoverRelatedObjects(IServiceClient ServiceClient, OrderedDictionary obj_dict)
+        //{
+        //    if (obj_dict.Contains(RefId))
+        //        obj_dict.Remove(RefId);
+        //    obj_dict.Add(RefId, this);
+        //    var x = obj_dict[RefId];
+        //    if (!FilterDialogRefId.IsEmpty())
+        //    {
+        //        EbFilterDialog fd = FilterDialog;
+        //        if (fd is null)
+        //        {
+        //            fd = GetObjfromDB(FilterDialogRefId, ServiceClient) as EbFilterDialog;
+        //            fd.DiscoverRelatedObjects(ServiceClient, obj_dict);
+        //        }
+        //    }
+        //    return obj_dict;
+        //}
+
+        //public EbObject GetObjfromDB(string _refid, IServiceClient ServiceClient)
+        //{
+        //    var res = ServiceClient.Get(new EbObjectParticularVersionRequest { RefId = _refid });
+        //    EbObject obj = EbSerializers.Json_Deserialize(res.Data[0].Json);
+        //    obj.RefId = _refid;
+        //    return obj;
+        //}
+
         public override void ReplaceRefid(Dictionary<string, string> RefidMap)
         {
             if (!FilterDialogRefId.IsEmpty())
@@ -106,6 +109,19 @@ namespace ExpressBase.Objects
                 else
                     FilterDialogRefId = "failed-to-update-";
             }
+        }
+
+        public override string DiscoverRelatedRefids()
+        {
+            if (!FilterDialogRefId.IsEmpty())
+            {
+                EbFilterDialog fd = FilterDialog;
+                if (fd is null)
+                {
+                   return FilterDialogRefId;                    
+                }
+            }
+            return "" ;
         }
     }
 

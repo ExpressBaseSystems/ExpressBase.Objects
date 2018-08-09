@@ -1,5 +1,6 @@
 ﻿using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
+using ExpressBase.Common.Structures;
 using ExpressBase.Data;
 using ServiceStack.Redis;
 using System;
@@ -24,6 +25,8 @@ namespace ExpressBase.Objects
         public bool IsUpdate { get; set; }
 
         public EbWebForm() { }
+
+        public static EbOperations Operations = BFOperations.Instance;
 
         public override string GetHead()
         {

@@ -352,6 +352,7 @@ namespace ExpressBase.Objects
         }")]
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.Collection)]
+        [HideForUser]
         public List<RowGroupParent> RowGroupCollection { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
@@ -387,48 +388,67 @@ namespace ExpressBase.Objects
         public EbTableVisualization()
         {
             this.RowGroupCollection = new List<RowGroupParent>();
-            this.NonVisibleColumns = new List<string>();            
+            this.NonVisibleColumns = new List<string>();
         }
 
-        public override OrderedDictionary DiscoverRelatedObjects(IServiceClient ServiceClient, OrderedDictionary obj_dict)
+        //public override OrderedDictionary DiscoverRelatedObjects(IServiceClient ServiceClient, OrderedDictionary obj_dict)
+        //{
+        //    if (obj_dict.Contains(RefId))
+        //        obj_dict.Remove(RefId);
+        //    obj_dict.Add(RefId, this);
+        //    if (!DataSourceRefId.IsEmpty())
+        //    {
+        //        EbDataSource ds = EbDataSource;
+        //        if (ds is null)
+        //        {
+        //            ds = GetObjfromDB(DataSourceRefId, ServiceClient) as EbDataSource;
+        //            ds.DiscoverRelatedObjects(ServiceClient, obj_dict);
+        //        }
+        //    }
+        //    foreach (DVBaseColumn _col in Columns)
+        //    {
+        //        if (!_col.LinkRefId.IsNullOrEmpty())
+        //        {
+        //            var linkobj = GetObjfromDB(_col.LinkRefId, ServiceClient);
+        //            linkobj.DiscoverRelatedObjects(ServiceClient, obj_dict);
+        //        }
+        //    }
+        //    return obj_dict;
+        //}
+        public override string DiscoverRelatedRefids()
         {
-            if (obj_dict.Contains(RefId))
-                obj_dict.Remove(RefId);
-            obj_dict.Add(RefId, this);
+            string refids = "";
             if (!DataSourceRefId.IsEmpty())
             {
                 EbDataSource ds = EbDataSource;
                 if (ds is null)
                 {
-                    ds = GetObjfromDB(DataSourceRefId, ServiceClient) as EbDataSource;
-                    ds.DiscoverRelatedObjects(ServiceClient, obj_dict);
+                    refids += DataSourceRefId + ",";
                 }
             }
             foreach (DVBaseColumn _col in Columns)
             {
                 if (!_col.LinkRefId.IsNullOrEmpty())
                 {
-                    var linkobj = GetObjfromDB(_col.LinkRefId, ServiceClient);
-                    linkobj.DiscoverRelatedObjects(ServiceClient, obj_dict);
+                    refids += _col.LinkRefId + ",";
                 }
             }
-            return obj_dict;
+            return refids;
         }
-
-        public EbObject GetObjfromDB(string _refid, IServiceClient ServiceClient)
-        {
-            var res = ServiceClient.Get(new EbObjectParticularVersionRequest { RefId = _refid });
-            EbObject obj = EbSerializers.Json_Deserialize(res.Data[0].Json);
-            obj.RefId = _refid;
-            return obj;
-        }
+        //public EbObject GetObjfromDB(string _refid, IServiceClient ServiceClient)
+        //{
+        //    var res = ServiceClient.Get(new EbObjectParticularVersionRequest { RefId = _refid });
+        //    EbObject obj = EbSerializers.Json_Deserialize(res.Data[0].Json);
+        //    obj.RefId = _refid;
+        //    return obj;
+        //}
         public override void ReplaceRefid(Dictionary<string, string> RefidMap)
         {
             if (DataSourceRefId.IsEmpty())
             {
                 string dsid = DataSourceRefId;
                 if (RefidMap.ContainsKey(dsid))
-                   DataSourceRefId = RefidMap[dsid];
+                    DataSourceRefId = RefidMap[dsid];
                 else
                     DataSourceRefId = "failed-to-update-";
             }
@@ -575,29 +595,38 @@ namespace ExpressBase.Objects
 
         public static EbOperations Operations = CVOperations.Instance;
 
-        public override OrderedDictionary DiscoverRelatedObjects(IServiceClient ServiceClient, OrderedDictionary obj_dict)
+        //public override OrderedDictionary DiscoverRelatedObjects(IServiceClient ServiceClient, OrderedDictionary obj_dict)
+        //{
+        //    if (obj_dict.Contains(RefId))
+        //        obj_dict.Remove(RefId);
+        //    if (DataSourceRefId.IsEmpty())
+        //    {
+        //        EbDataSource ds = EbDataSource;
+        //        if (ds is null)
+        //        {
+        //            ds = GetObjfromDB(DataSourceRefId, ServiceClient) as EbDataSource;
+        //            ds.DiscoverRelatedObjects(ServiceClient, obj_dict);
+        //        }
+        //    }
+        //    return obj_dict;
+        //}
+        public override string DiscoverRelatedRefids()
         {
-            if (obj_dict.Contains(RefId))
-                obj_dict.Remove(RefId);
-            if (DataSourceRefId.IsEmpty())
+            if (!DataSourceRefId.IsEmpty())
             {
                 EbDataSource ds = EbDataSource;
                 if (ds is null)
-                {
-                    ds = GetObjfromDB(DataSourceRefId, ServiceClient) as EbDataSource;
-                    ds.DiscoverRelatedObjects(ServiceClient, obj_dict);
-                }
+                    return DataSourceRefId;
             }
-            return obj_dict;
+            return "";
         }
-
-        public EbObject GetObjfromDB(string _refid, IServiceClient ServiceClient)
-        {
-            var res = ServiceClient.Get(new EbObjectParticularVersionRequest { RefId = _refid });
-            EbObject obj = EbSerializers.Json_Deserialize(res.Data[0].Json);
-            obj.RefId = _refid;
-            return obj;
-        }
+        //public EbObject GetObjfromDB(string _refid, IServiceClient ServiceClient)
+        //{
+        //    var res = ServiceClient.Get(new EbObjectParticularVersionRequest { RefId = _refid });
+        //    EbObject obj = EbSerializers.Json_Deserialize(res.Data[0].Json);
+        //    obj.RefId = _refid;
+        //    return obj;
+        //}
         public override void ReplaceRefid(Dictionary<string, string> RefidMap)
         {
             if (!DataSourceRefId.IsEmpty())
@@ -682,9 +711,9 @@ namespace ExpressBase.Objects
     {
         [EnableInBuilder(BuilderType.DVBuilder)]
         public string Name { get; set; }
-        
+
         [EnableInBuilder(BuilderType.DVBuilder)]
-        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Parent.Columns")]        
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Parent.Columns")]
         public List<DVBaseColumn> RowGrouping { get; set; }
 
         public RowGroupParent()
@@ -696,7 +725,7 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.DVBuilder)]
     [UsedWithTopObjectParent(typeof(EbDataVisualizationObject))]
     [Alias("Multi Level")]
-    public class MultipleLevelRowGroup: RowGroupParent
+    public class MultipleLevelRowGroup : RowGroupParent
     {
 
     }
