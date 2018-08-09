@@ -204,7 +204,7 @@ else {
         public override string GetWrapedCtrlHtml4bot()
         {
             return @"
-<div id='TextBox0' class='Eb-ctrlContainer iw-mTrigger' ctype='TextBox'  eb-type='TextBox'>
+<div class='Eb-ctrlContainer iw-mTrigger' ctype='TextBox'  eb-type='TextBox'>
    <div class='msg-cont'>
       <div class='bot-icon'></div>
       <div class='msg-cont-bot'>
@@ -319,9 +319,9 @@ else {
         {
             return @"
 <div id='cont_@name@  ' class='Eb-ctrlContainer' Ctype='TextBox' style='@HiddenString '>
-    <div class='eb-ctrl-label' id='@name@Lbl' style='@LabelBackColor@ @LabelForeColor@ '> @Label@  </div>
+    <div class='eb-ctrl-label' ui-label id='@name@Lbl' style='@LabelBackColor@ @LabelForeColor@ '> @Label@  </div>
        @barehtml@
-    <span class='helpText'> @HelpText@ </span>
+    <span ui-helptxt class='helpText'> @HelpText@ </span>
 </div>"
 .Replace("@barehtml@", this.GetBareHtml())
 .Replace("@name@", this.Name)
