@@ -246,4 +246,18 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		[DataMember(Order = 1)]
 		public int ResStatus { get; set; }
 	}
+
+    public class UniqueApplicationNameCheckRequest : EbServiceStackRequest, IReturn<UniqueObjectNameCheckResponse>
+    {
+        public string AppName { get; set; }
+    }
+
+    public class UniqueApplicationNameCheckResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public bool IsUnique { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
 }
