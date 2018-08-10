@@ -27,12 +27,15 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 	public class GetManageLeadResponse : IEbSSResponse
 	{
 		[DataMember(Order = 1)]
-		public Dictionary<string, string> CustomerDataDict { get; set; }
+		public string AccId { get; set; }
 
 		[DataMember(Order = 2)]
+		public Dictionary<string, string> CustomerDataDict { get; set; }
+
+		[DataMember(Order = 3)]
 		public Dictionary<int, string> CostCenterDict { get; set; }
 		
-		[DataMember(Order = 3)]
+		[DataMember(Order = 4)]
 		public ResponseStatus ResponseStatus { get; set; }
 
 	}
