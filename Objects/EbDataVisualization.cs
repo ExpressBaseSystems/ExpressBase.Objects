@@ -45,6 +45,13 @@ namespace ExpressBase.Objects
         right
     }
 
+    public enum LinkTypeEnum
+    {
+        Popout,
+        Inline,
+        Both
+    }
+
     [EnableInBuilder(BuilderType.BotForm)]
     public class EbDataVisualizationObject : EbObject
     {
@@ -324,21 +331,6 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public string BareControlHtml { get; set; }
-
-        //[EnableInBuilder(BuilderType.DVBuilder)]
-        ////[PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", "bVisible")]
-        //[PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]        
-        //[OnChangeExec(@"
-        //if(this.rowGrouping.$values.length > 0){
-        //    pg.HideProperty('LeftFixedColumn')
-        //    pg.HideProperty('RightFixedColumn')
-        //}
-
-        //else{
-        //    pg.ShowProperty('LeftFixedColumn')
-        //    pg.ShowProperty('RightFixedColumn')
-        //}")]
-        //public List<DVBaseColumn> rowGrouping { get; set; }
 
         [OnChangeExec(@"
         if(this.RowGroupCollection.$values.length > 0){

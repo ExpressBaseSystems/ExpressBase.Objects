@@ -249,4 +249,46 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 2)]
         public int Direction { get; set; }
     }
+
+    [Route("/table")]
+    [Route("/table/data/{RefId}")]
+    [DataContract]
+    public class InlineTableDataRequest : IReturn<DataSourceDataResponse>, IEbSSRequest
+    {
+        [DataMember(Order = 0)]
+        public string RefId { get; set; }
+
+        [DataMember(Order = 1)]
+        public int Start { get; set; }
+
+        [DataMember(Order = 2)]
+        public int Length { get; set; }        
+
+        [DataMember(Order = 6)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 7)]
+        public string rToken { get; set; }
+
+        [DataMember(Order = 8)]
+        public string TenantAccountId { get; set; }
+
+        [DataMember(Order = 9)]
+        public int UserId { get; set; }
+
+        [DataMember(Order = 10)]
+        public List<Param> Params { get; set; }
+
+        [DataMember(Order = 11)]
+        public List<TFilters> TFilters { get; set; }
+
+        [DataMember(Order = 10)]
+        public bool Ispaging { get; set; }
+
+        [DataMember(Order = 11)]
+        public string DataVizObjString { get; set; }
+
+        [DataMember(Order = 12)]
+        public EbDataVisualization EbDataVisualization { get; set; }
+    }
 }
