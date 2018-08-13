@@ -74,22 +74,7 @@ namespace ExpressBase.Objects
 
             return html.Replace("@name@", this.Name);
         }
-        //public override OrderedDictionary DiscoverRelatedObjects(IServiceClient ServiceClient, OrderedDictionary obj_dict)
-        //{
-        //    if (obj_dict.Contains(RefId))
-        //        obj_dict.Remove(RefId);
-        //    obj_dict.Add(RefId, this);
-        //    foreach (EbControl control in Controls)
-        //    {
-        //        PropertyInfo[] _props = control.GetType().GetProperties();
-        //        foreach (PropertyInfo _prop in _props)
-        //        {
-        //            if (_prop.IsDefined(typeof(OSE_ObjectTypes)))
-        //                GetObjfromDB(_prop.GetValue(control, null).ToString(), ServiceClient).DiscoverRelatedObjects(ServiceClient, obj_dict);
-        //        }
-        //    }
-        //    return obj_dict;
-        //}
+
         public override string DiscoverRelatedRefids()
         {
             string refids = "";
@@ -104,13 +89,7 @@ namespace ExpressBase.Objects
             }
             return "";
         }
-        //public EbObject GetObjfromDB(string _refid, IServiceClient ServiceClient)
-        //{
-        //    var res = ServiceClient.Get(new EbObjectParticularVersionRequest { RefId = _refid });
-        //    EbObject obj = EbSerializers.Json_Deserialize(res.Data[0].Json);
-        //    obj.RefId = _refid;
-        //    return obj;
-        //}
+
         public override void ReplaceRefid(Dictionary<string, string> RefidMap)
         {
             foreach (EbControl control in Controls)
