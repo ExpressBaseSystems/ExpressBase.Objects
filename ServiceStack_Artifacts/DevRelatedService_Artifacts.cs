@@ -260,4 +260,28 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
     }
+    //survey
+    public class SurveyQuesRequest: IReturn<SurveyQuesResponse>, IEbSSRequest
+    {
+        public string TenantAccountId { get; set; }
+
+        public int UserId { get; set; }
+
+        [DataMember(Order = 1)]
+        public string Question { get; set; }
+
+        [DataMember(Order = 2)]
+        public int QuesType { get; set; }
+
+        [DataMember(Order = 3)]
+        public List<string> Choices { get; set; }
+    }
+    public class SurveyQuesResponse: IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public bool Status { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
 }
