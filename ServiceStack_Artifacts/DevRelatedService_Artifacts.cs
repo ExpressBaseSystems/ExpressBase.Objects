@@ -284,4 +284,65 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
     }
+
+	public class ManageSurveyRequest : IReturn<ManageSurveyResponse>, IEbSSRequest
+	{
+		[DataMember(Order = 1)]
+		public int Id { get; set; }
+
+		public string TenantAccountId { get; set; }
+
+		public int UserId { get; set; }
+
+	}
+	public class ManageSurveyResponse : IEbSSResponse
+	{
+		[DataMember(Order = 1)]
+		public Eb_Survey Obj { get; set; }
+
+		[DataMember(Order = 2)]
+		public List<Eb_SurveyQuestion> AllQuestions { get; set; }
+		
+		[DataMember(Order = 2)]
+		public ResponseStatus ResponseStatus { get; set; }
+	}
+
+	[DataContract]
+	public class Eb_Survey
+	{
+		[DataMember(Order = 1)]
+		public int Id { get; set; }
+
+		[DataMember(Order = 2)]
+		public string Name { get; set; }
+
+		[DataMember(Order = 3)]
+		public DateTime Start { get; set; }
+
+		[DataMember(Order = 4)]
+		public DateTime End { get; set; }
+
+		[DataMember(Order = 5)]
+		public int Status { get; set; }
+
+		[DataMember(Order = 6)]
+		public List<int> QuesIds { get; set; }
+
+		public Eb_Survey() { }
+	}
+
+	[DataContract]
+	public class Eb_SurveyQuestion
+	{
+		[DataMember(Order = 1)]
+		public int Id;
+
+		[DataMember(Order = 2)]
+		public string Question;
+
+		[DataMember(Order = 3)]
+		public List<string> Choices { get; set; }
+
+		public Eb_SurveyQuestion() { }
+	}
 }
