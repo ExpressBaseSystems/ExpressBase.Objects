@@ -82,12 +82,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public string Data { get; set; }
 
 		[DataMember(Order = 2)]
-		public int RequestMode { get; set; }
-
-		[DataMember(Order = 3)]
 		public string TenantAccountId { get; set; }
 
+		[DataMember(Order = 3)]
 		public int UserId { get; set; }
+
+		[DataMember(Order = 4)]
+		public string UserName { get; set; }
 	}
 
 	[DataContract]
@@ -170,7 +171,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 	public class FeedbackEntry
 	{
 		[DataMember(Order = 1)]
-		public string Id { get; set; }
+		public int Id { get; set; }
 
 		[DataMember(Order = 2)]
 		public string Date { get; set; }
@@ -183,6 +184,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		
 		[DataMember(Order = 5)]
 		public string Comments { get; set; }
+
+		[DataMember(Order = 6)]
+		public string Account_Code { get; set; }
 	}
 
 	[DataContract]
