@@ -261,6 +261,21 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
     //survey
+    public class GetSurveyQueriesRequest : IEbSSRequest, IReturn<GetSurveyQueriesResponse>
+    {
+        public string TenantAccountId { get; set; }
+
+        public int UserId { get; set; }
+    }
+    public class GetSurveyQueriesResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public Dictionary<int,EbSurveyQuery> Data { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
     public class SurveyQuesRequest: IReturn<SurveyQuesResponse>, IEbSSRequest
     {
         public string TenantAccountId { get; set; }
@@ -268,13 +283,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int UserId { get; set; }
 
         [DataMember(Order = 1)]
-        public string Question { get; set; }
-
-        [DataMember(Order = 2)]
-        public int QuesType { get; set; }
-
-        [DataMember(Order = 3)]
-        public List<string> Choices { get; set; }
+        public EbSurveyQuery Query { set; get; }
     }
     public class SurveyQuesResponse: IEbSSResponse
     {
@@ -283,5 +292,20 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    public class EbSurveyQuery
+    {
+        [DataMember(Order = 1)]
+        public int QuesId { set; get; }
+
+        [DataMember(Order = 2)]
+        public string Question { set; get; }
+
+        [DataMember(Order = 3)]
+        public int QuesType { set; get; }
+
+        [DataMember(Order = 4)]
+        public List<string> Choices { set; get; }
     }
 }
