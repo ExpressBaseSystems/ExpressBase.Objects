@@ -6,6 +6,7 @@ using ExpressBase.Common.Structures;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.Runtime.Serialization;
 
 namespace ExpressBase.Objects.Objects.DVRelated
@@ -127,6 +128,10 @@ namespace ExpressBase.Objects.Objects.DVRelated
         [PropertyEditor(PropertyEditorType.DropDown)]
         public LinkTypeEnum LinkType { get; set; }
 
+        public virtual CultureInfo GetColumnCultureInfo(CultureInfo user_cultureinfo)
+        {
+            return user_cultureinfo;
+        }
     }
 
     public class DVColumnCollection : List<DVBaseColumn>
@@ -242,6 +247,15 @@ else{
         [DefaultPropValue("11")]
         [HideInPropertyGrid]
         public override EbDbTypes Type { get; set; }
+
+        public override CultureInfo GetColumnCultureInfo(CultureInfo user_cultureinfo)
+        {
+            var cultureInfo = user_cultureinfo.Clone() as CultureInfo;
+
+            cultureInfo.NumberFormat.NumberDecimalDigits = this.DecimalPlaces;
+
+            return cultureInfo;
+        }
     }
 
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
