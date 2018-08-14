@@ -2,6 +2,7 @@
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
+using ExpressBase.Objects.Helpers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -13,7 +14,7 @@ namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
     public class EbNumeric : EbControlUI
-	{
+    {
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public override EbDbTypes EbDbType { get { return EbDbTypes.Decimal; } }
         public EbNumeric()
@@ -36,15 +37,15 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public decimal Value { get; set; }
 
-		[HideInPropertyGrid]
-		[EnableInBuilder(BuilderType.BotForm)]
-		public override bool IsReadOnly { get => this.ReadOnly; }
-		
-		[EnableInBuilder(BuilderType.BotForm)]
-		public bool AutoIncrement { get; set; }
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.BotForm)]
+        public override bool IsReadOnly { get => this.ReadOnly; }
 
-		//[ProtoBuf.ProtoMember(4)]
-		private string PlaceHolder
+        [EnableInBuilder(BuilderType.BotForm)]
+        public bool AutoIncrement { get; set; }
+
+        //[ProtoBuf.ProtoMember(4)]
+        private string PlaceHolder
         {
             get
             {
@@ -186,59 +187,68 @@ $('#{0}').mask('SZZZZZZZZZZZ', {
             return @" 
         <div class='input-group' style='width:100%;'>
                 <span style='font-size: @fontSize@' class='input-group-addon'>$</span>   
-                <input type='text' data-ebtype='@datetype@' class='numinput' ui-inp id='@name@' name='@name@' value='@value@' @placeHolder autocomplete = '@autoComplete@' data-toggle='tooltip' title='@toolTipText@' style=' width:100%; @backColor@ @foreColor@ @fontStyle@ display:inline-block; @readOnlyString@ @required@ @tabIndex@ />
+                <input type='text' class='numinput' ui-inp data-ebtype='@datetype@' id='@name@' name='@name@' data-toggle='tooltip' style=' width:100%; display:inline-block;'/>
         </div>"
 .Replace("@name@", this.Name)
-.Replace("@toolTipText@", this.ToolTipText)
-.Replace("@autoComplete@", this.AutoCompleteOff ? "off" : "on")
-.Replace("@value@", "")//"value='" + this.Value + "'")
-.Replace("@tabIndex@", "tabindex='" + this.TabIndex + "'")
-    .Replace("@BackColor@ ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor@ ") + ";"))
-    .Replace("@ForeColor@ ", "color:" + ((this.ForeColor != null) ? this.ForeColor : "@ForeColor@ ") + ";")
-.Replace("@required@", " required")//(this.Required && !this.Hidden ? " required" : string.Empty))
-.Replace("@readOnlyString@", this.ReadOnlyString)
-.Replace("@placeHolder@", "placeholder='" + this.PlaceHolder + "'")
-.Replace("@datetype@", "11")
-//.Replace("@fontStyle@", (this.FontSerialized != null) ?
-//                            (" font-family:" + this.FontSerialized.FontFamily + ";" + "font-style:" + this.FontSerialized.Style
-//                            + ";" + "font-size:" + this.FontSerialized.SizeInPoints + "px;")
-//                        : string.Empty)
-;
+.Replace("@datetype@", "11");
         }
+
+        //        public override string GetBareHtml()
+        //        {
+        //            return @" 
+        //        <div class='input-group' style='width:100%;'>
+        //                <span style='font-size: @fontSize@' class='input-group-addon'>$</span>   
+        //                <input type='text' data-ebtype='@datetype@' class='numinput' ui-inp id='@name@' name='@name@' value='@value@' @placeHolder autocomplete = '@autoComplete@' data-toggle='tooltip' title='@toolTipText@' style=' width:100%; @backColor@ @foreColor@ @fontStyle@ display:inline-block; @readOnlyString@ @required@ @tabIndex@ />
+        //        </div>"
+        //.Replace("@name@", this.Name)
+        //.Replace("@toolTipText@", this.ToolTipText)
+        //.Replace("@autoComplete@", this.AutoCompleteOff ? "off" : "on")
+        //.Replace("@value@", "")//"value='" + this.Value + "'")
+        //.Replace("@tabIndex@", "tabindex='" + this.TabIndex + "'")
+        //    .Replace("@BackColor@ ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor@ ") + ";"))
+        //    .Replace("@ForeColor@ ", "color:" + ((this.ForeColor != null) ? this.ForeColor : "@ForeColor@ ") + ";")
+        //.Replace("@required@", " required")//(this.Required && !this.Hidden ? " required" : string.Empty))
+        //.Replace("@readOnlyString@", this.ReadOnlyString)
+        //.Replace("@placeHolder@", "placeholder='" + this.PlaceHolder + "'")
+        //.Replace("@datetype@", "11")
+        ////.Replace("@fontStyle@", (this.FontSerialized != null) ?
+        ////                            (" font-family:" + this.FontSerialized.FontFamily + ";" + "font-style:" + this.FontSerialized.Style
+        ////                            + ";" + "font-size:" + this.FontSerialized.SizeInPoints + "px;")
+        ////                        : string.Empty)
+        //;
+        //        }
 
         private string GetHtmlHelper(RenderMode mode)
         {
-            return (@"
-<div id='cont_@name@' class='Eb-ctrlContainer' Ctype='Numeric' style='@hiddenString'>
-    <div class='eb-ctrl-label' id='@nameLbl' style='@lblBackColor @LblForeColor'>@label@</div>
-       @barehtml@            
-    <span class='helpText'> @helpText </span>
-</div>"
+            return (
+                HtmlConstants.CONTROL_WRAPER_HTML4WEB
 .Replace("@barehtml@", this.GetBareHtml())
 .Replace("@name@", this.Name)
-.Replace("@left", this.Left.ToString())
-.Replace("@top", this.Top.ToString())
-.Replace("@height", this.Height.ToString())
-.Replace("@label@", this.Label)//5
-.Replace("@hiddenString", this.HiddenString)
-.Replace("@required", (this.Required && !this.Hidden ? " required" : string.Empty))
-.Replace("@readOnlyString", this.ReadOnlyString)
-.Replace("@toolTipText", this.ToolTipText)
-.Replace("@helpText", this.HelpText)//10
-.Replace("@placeHolder", "placeholder='" + this.PlaceHolder + "'")
-.Replace("@tabIndex", "tabindex='" + this.TabIndex + "'")
-.Replace("@autoComplete", this.AutoCompleteOff ? "off" : "on")
-//.Replace("@backColor", "background-color:" + this.BackColorSerialized + ";")
-//.Replace("@foreColor", "color:" + this.ForeColorSerialized + ";")//15
-//.Replace("@lblBackColor", "background-color:" + this.LabelBackColorSerialized + ";")
-//.Replace("@LblForeColor", "color:" + this.LabelForeColorSerialized + ";")
-//.Replace("@value", (this.Value == 0) ? "''" : this.Value.ToString())
-//.Replace("@fontStyle", (this.FontSerialized != null) ?
-//                            (" font-family:" + this.FontSerialized.FontFamily + ";" + "font-style:" + this.FontSerialized.Style
-//                            + ";" + "font-size:" + this.FontSerialized.SizeInPoints + "px;")
-//                        : string.Empty)
-//.Replace("@fontSize", (this.FontSerialized != null) ? (this.FontSerialized.SizeInPoints + "px;") : string.Empty)
-);
+.Replace("@type@", this.ObjType));
         }
+
+        //        private string GetHtmlHelper(RenderMode mode)
+        //        {
+        //            return (@"
+        //<div id='cont_@name@' class='Eb-ctrlContainer' Ctype='Numeric' style='@hiddenString'>
+        //    <div class='eb-ctrl-label' id='@nameLbl' style='@lblBackColor @LblForeColor'>@label@</div>
+        //       @barehtml@            
+        //    <span class='helpText'> @helpText </span>
+        //</div>"
+        //.Replace("@barehtml@", this.GetBareHtml())
+        //.Replace("@name@", this.Name)
+        //.Replace("@left", this.Left.ToString())
+        //.Replace("@top", this.Top.ToString())
+        //.Replace("@height", this.Height.ToString())
+        //.Replace("@label@", this.Label)//5
+        //.Replace("@hiddenString", this.HiddenString)
+        //.Replace("@required", (this.Required && !this.Hidden ? " required" : string.Empty))
+        //.Replace("@readOnlyString", this.ReadOnlyString)
+        //.Replace("@toolTipText", this.ToolTipText)
+        //.Replace("@helpText", this.HelpText)//10
+        //.Replace("@placeHolder", "placeholder='" + this.PlaceHolder + "'")
+        //.Replace("@tabIndex", "tabindex='" + this.TabIndex + "'")
+        //.Replace("@autoComplete", this.AutoCompleteOff ? "off" : "on"));
+        //        }
     }
 }

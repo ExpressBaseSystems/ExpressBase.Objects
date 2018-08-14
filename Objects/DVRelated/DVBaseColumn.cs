@@ -123,6 +123,10 @@ namespace ExpressBase.Objects.Objects.DVRelated
         [OSE_ObjectTypes(EbObjectTypes.iTableVisualization, EbObjectTypes.iChartVisualization, EbObjectTypes.iReport)]
         public string LinkRefId { get; set; }
 
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.DropDown)]
+        public LinkTypeEnum LinkType { get; set; }
+
     }
 
     public class DVColumnCollection : List<DVBaseColumn>
@@ -186,10 +190,14 @@ namespace ExpressBase.Objects.Objects.DVRelated
         [DefaultPropValue("0")]
         [PropertyEditor(PropertyEditorType.DropDown)]
         [OnChangeExec(@"
-if(this.RenderAs !== 2)
-    pg.HideProperty('LinkRefId')
-else
-    pg.ShowProperty('LinkRefId')")]
+if(this.RenderAs !== 2){
+    pg.HideProperty('LinkRefId');
+    pg.HideProperty('LinkType');
+}
+else{
+    pg.ShowProperty('LinkRefId');
+    pg.ShowProperty('LinkType');
+    }")]
         public StringRenderType RenderAs { get; set; }
 
 
@@ -215,10 +223,14 @@ else
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
         [OnChangeExec(@"
-if(this.RenderAs !== 2)
-    pg.HideProperty('LinkRefId')
-else
-    pg.ShowProperty('LinkRefId')")]
+if(this.RenderAs !== 2){
+    pg.HideProperty('LinkRefId');
+    pg.HideProperty('LinkType');
+}
+else{
+    pg.ShowProperty('LinkRefId');
+    pg.ShowProperty('LinkType');
+    }")]
         public NumericRenderType RenderAs { get; set; }
 
         //[EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
@@ -247,10 +259,14 @@ else
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
         [OnChangeExec(@"
-if(this.RenderAs !== 1)
-    pg.HideProperty('LinkRefId')
-else
-    pg.ShowProperty('LinkRefId')")]
+if(this.RenderAs !== 1){
+    pg.HideProperty('LinkRefId');
+    pg.HideProperty('LinkType');
+}
+else{
+    pg.ShowProperty('LinkRefId');
+    pg.ShowProperty('LinkType');
+    }")]
         public DateTimeRenderType RenderAs { get; set; }
 
         //[EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
