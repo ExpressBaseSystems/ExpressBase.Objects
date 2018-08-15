@@ -11,6 +11,7 @@ using ExpressBase.Common.Objects;
 using ExpressBase.Common.Extensions;
 using System.Runtime.Serialization;
 using ExpressBase.Common.Structures;
+using ExpressBase.Objects.Helpers;
 
 namespace ExpressBase.Objects
 {
@@ -317,23 +318,32 @@ else {
 
         private string GetHtmlHelper(RenderMode mode)
         {
-            return @"
-<div id='cont_@name@  ' class='Eb-ctrlContainer' Ctype='TextBox' style='@HiddenString '>
-    <div class='eb-ctrl-label' ui-label id='@name@Lbl' style='@LabelBackColor@ @LabelForeColor@ '> @Label@  </div>
-       @barehtml@
-    <span ui-helptxt class='helpText'> @HelpText@ </span>
-</div>"
+            return (
+                HtmlConstants.CONTROL_WRAPER_HTML4WEB
 .Replace("@barehtml@", this.GetBareHtml())
 .Replace("@name@", this.Name)
-.Replace("@HiddenString ", this.HiddenString)
-.Replace("@ToolTipText ", this.ToolTipText)
-
-//.Replace("@name ", (this.Name != null) ? this.Name : "@name ")
-.Replace("@LabelForeColor@ ", "color:" + ((this.LabelForeColor != null) ? this.LabelForeColor : "@LabelForeColor@ ") + ";")
-.Replace("@LabelBackColor@ ", "background-color:" + ((this.LabelBackColor != null) ? this.LabelBackColor : "@LabelBackColor@ ") + ";")
-.Replace("@HelpText@ ", ((this.HelpText != null) ? this.HelpText : "@HelpText@ "))
-.Replace("@Label@ ", this.Label ?? "@Label@ ");
+.Replace("@type@", this.ObjType));
         }
+
+        //        private string GetHtmlHelper(RenderMode mode)
+        //        {
+        //            return @"
+        //<div id='cont_@name@  ' class='Eb-ctrlContainer' Ctype='TextBox' style='@HiddenString '>
+        //    <div class='eb-ctrl-label' ui-label id='@name@Lbl' style='@LabelBackColor@ @LabelForeColor@ '> @Label@  </div>
+        //       @barehtml@
+        //    <span ui-helptxt class='helpText'> @HelpText@ </span>
+        //</div>"
+        //.Replace("@barehtml@", this.GetBareHtml())
+        //.Replace("@name@", this.Name)
+        //.Replace("@HiddenString ", this.HiddenString)
+        //.Replace("@ToolTipText ", this.ToolTipText)
+
+        ////.Replace("@name ", (this.Name != null) ? this.Name : "@name ")
+        //.Replace("@LabelForeColor@ ", "color:" + ((this.LabelForeColor != null) ? this.LabelForeColor : "@LabelForeColor@ ") + ";")
+        //.Replace("@LabelBackColor@ ", "background-color:" + ((this.LabelBackColor != null) ? this.LabelBackColor : "@LabelBackColor@ ") + ";")
+        //.Replace("@HelpText@ ", ((this.HelpText != null) ? this.HelpText : "@HelpText@ "))
+        //.Replace("@Label@ ", this.Label ?? "@Label@ ");
+        //        }
     }
 
     public enum RenderMode

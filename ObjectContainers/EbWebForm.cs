@@ -40,7 +40,7 @@ namespace ExpressBase.Objects
 
         public override string GetHtml()
         {
-            string html = "<form id='@name@' eb-form='true' ui-inp class='eb-form'>";
+            string html = "<form id='@name@' class='formB-box form-buider-form' eb-form='true' ui-inp eb-type='WebForm' tabindex='1'>";
 
             foreach (EbControl c in this.Controls)
                 html += c.GetHtml();
