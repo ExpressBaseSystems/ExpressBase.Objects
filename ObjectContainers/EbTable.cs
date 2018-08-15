@@ -19,6 +19,8 @@ namespace ExpressBase.Objects
         [Alias("Columns")]
         public override List<EbControl> Controls { get; set; }
 
+        public override string Label { get; set; }
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
         [PropertyEditor(PropertyEditorType.Expandable)]
         [PropertyGroup("Test")]
@@ -94,11 +96,11 @@ this.Init = function(id)
 {
     this.Controls.$values.push(new EbObjects.EbTableTd(id + '_Td0'));
     this.Controls.$values.push(new EbObjects.EbTableTd(id + '_Td1'));
-    this.Controls.$values.push(new EbObjects.EbTableTd(id + '_Td2'));
+    //this.Controls.$values.push(new EbObjects.EbTableTd(id + '_Td2'));
 
     this.CollEdtProp.$values.push(new EbObjects.EbTableTd(id + '_Tdsamp0'));
     this.CollEdtProp.$values.push(new EbObjects.EbTableTd(id + '_Tdsamp1'));
-    this.CollEdtProp.$values.push(new EbObjects.EbTableTd(id + '_Tdsamp2'));
+    //this.CollEdtProp.$values.push(new EbObjects.EbTableTd(id + '_Tdsamp2'));
 };";
         }
 
@@ -118,13 +120,13 @@ this.Init = function(id)
         public override string GetHtml()
         {
             string html = @"
-            <div class='Eb-ctrlContainer' Ctype='TableLayout'>
+            <div id='@name@' ebsid='@name@' class='Eb-ctrlContainer' Ctype='TableLayout'>
                 <table class='form-render-table' ><tr>";
 
             foreach (EbControl ec in this.Controls)
                 html += ec.GetHtml();
 
-            return html + "</tr></table></div>";
+            return (html + "</tr></table></div>").Replace("@name@", this.Name);
         }
     }
 
@@ -156,12 +158,12 @@ this.Init = function(id)
 
         public override string GetHtml()
         {
-            string html = "<td class='form-render-table-Td tdDropable'>";
+            string html = "<td id='@name@' class='form-render-table-Td tdDropable'>";
 
             foreach (EbControl ec in this.Controls)
                 html += ec.GetHtml();
 
-            return html + "</td>";
+            return (html + "</td>").Replace("@name@", this.Name);
         }
     }
 }

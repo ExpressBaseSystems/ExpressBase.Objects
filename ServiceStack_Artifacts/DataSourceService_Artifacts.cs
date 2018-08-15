@@ -231,6 +231,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 8)]
         public bool Ispaged { get; set; }
+
+        [DataMember(Order = 4)]
+        public RowColletion FormattedData { get; set; }
     }
 
     [DataContract]

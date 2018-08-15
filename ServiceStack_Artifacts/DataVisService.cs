@@ -2,6 +2,7 @@
 using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
 using ExpressBase.Data;
+using ExpressBase.Security;
 using ServiceStack;
 using ServiceStack.Text;
 using System;
@@ -150,6 +151,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 12)]
         public EbDataVisualization EbDataVisualization { get; set; }
+
+        [DataMember(Order = 13)]
+        public User UserInfo { get; set; }
     }
 
     [Route("/table")]

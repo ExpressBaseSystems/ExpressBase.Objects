@@ -349,6 +349,25 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public ResponseStatus ResponseStatus { get; set; }
 	}
 
+	public class SaveSurveyRequest : IReturn<SaveSurveyResponse>, IEbSSRequest
+	{
+		[DataMember(Order = 1)]
+		public string Data { get; set; }
+
+		public string TenantAccountId { get; set; }
+
+		public int UserId { get; set; }
+
+	}
+	public class SaveSurveyResponse : IEbSSResponse
+	{
+		[DataMember(Order = 1)]
+		public int Status { get; set; }
+
+		[DataMember(Order = 2)]
+		public ResponseStatus ResponseStatus { get; set; }
+	}
+
 	[DataContract]
 	public class Eb_Survey
 	{
@@ -359,10 +378,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public string Name { get; set; }
 
 		[DataMember(Order = 3)]
-		public DateTime Start { get; set; }
+		public string Start { get; set; }
 
 		[DataMember(Order = 4)]
-		public DateTime End { get; set; }
+		public string End { get; set; }
 
 		[DataMember(Order = 5)]
 		public int Status { get; set; }
