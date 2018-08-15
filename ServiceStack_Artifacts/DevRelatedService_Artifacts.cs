@@ -344,7 +344,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 	public class SaveSurveyResponse : IEbSSResponse
 	{
 		[DataMember(Order = 1)]
-		public bool Status { get; set; }
+		public int Status { get; set; }
 
 		[DataMember(Order = 2)]
 		public ResponseStatus ResponseStatus { get; set; }
