@@ -306,7 +306,25 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int QuesType { set; get; }
 
         [DataMember(Order = 4)]
-        public List<string> Choices { set; get; }
+        public List<QueryChoices> Choices { set; get; }
+    }
+
+    public class QueryChoices
+    {
+        [DataMember(Order = 1)]
+        public int ChoiceId { set; get; }
+
+        [DataMember(Order = 2)]
+        public string Choice { set; get; }
+
+        [DataMember(Order = 3)]
+        public bool EbDel { set; get; }
+
+        [DataMember(Order = 4)]
+        public int Score { set; get; }
+
+        [DataMember(Order = 5)]
+        public bool IsNew { set; get; }
     }
 
 	public class ManageSurveyRequest : IReturn<ManageSurveyResponse>, IEbSSRequest

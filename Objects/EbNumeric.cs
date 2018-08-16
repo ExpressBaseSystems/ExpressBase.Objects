@@ -182,41 +182,41 @@ $('#{0}').mask('SZZZZZZZZZZZ', {
             return GetHtmlHelper(RenderMode.User);
         }
 
+//        public override string GetBareHtml()
+//        {
+//            return @" 
+//        <div class='input-group' style='width:100%;'>
+//                <span style='font-size: @fontSize@' class='input-group-addon'>$</span>   
+//                <input type='text' class='numinput' ui-inp data-ebtype='@datetype@' id='@name@' name='@name@' data-toggle='tooltip' style=' width:100%; display:inline-block;'/>
+//        </div>"
+//.Replace("@name@", this.Name)
+//.Replace("@datetype@", "11");
+//        }
+
         public override string GetBareHtml()
         {
             return @" 
-        <div class='input-group' style='width:100%;'>
-                <span style='font-size: @fontSize@' class='input-group-addon'>$</span>   
-                <input type='text' class='numinput' ui-inp data-ebtype='@datetype@' id='@name@' name='@name@' data-toggle='tooltip' style=' width:100%; display:inline-block;'/>
-        </div>"
+                <div class='input-group' style='width:100%;'>
+                        <span style='font-size: @fontSize@' class='input-group-addon'>$</span>   
+                        <input type='text' data-ebtype='@datetype@' class='numinput' ui-inp id='@name@' name='@name@' value='@value@' @placeHolder autocomplete = '@autoComplete@' data-toggle='tooltip' title='@toolTipText@' style=' width:100%; @backColor@ @foreColor@ @fontStyle@ display:inline-block; @readOnlyString@ @required@ @tabIndex@ />
+                </div>"
 .Replace("@name@", this.Name)
-.Replace("@datetype@", "11");
+.Replace("@toolTipText@", this.ToolTipText)
+.Replace("@autoComplete@", this.AutoCompleteOff ? "off" : "on")
+.Replace("@value@", "")//"value='" + this.Value + "'")
+.Replace("@tabIndex@", "tabindex='" + this.TabIndex + "'")
+    .Replace("@BackColor@ ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor@ ") + ";"))
+    .Replace("@ForeColor@ ", "color:" + ((this.ForeColor != null) ? this.ForeColor : "@ForeColor@ ") + ";")
+.Replace("@required@", " required")//(this.Required && !this.Hidden ? " required" : string.Empty))
+.Replace("@readOnlyString@", this.ReadOnlyString)
+.Replace("@placeHolder@", "placeholder='" + this.PlaceHolder + "'")
+.Replace("@datetype@", "11")
+//.Replace("@fontStyle@", (this.FontSerialized != null) ?
+//                            (" font-family:" + this.FontSerialized.FontFamily + ";" + "font-style:" + this.FontSerialized.Style
+//                            + ";" + "font-size:" + this.FontSerialized.SizeInPoints + "px;")
+//                        : string.Empty)
+;
         }
-
-        //        public override string GetBareHtml()
-        //        {
-        //            return @" 
-        //        <div class='input-group' style='width:100%;'>
-        //                <span style='font-size: @fontSize@' class='input-group-addon'>$</span>   
-        //                <input type='text' data-ebtype='@datetype@' class='numinput' ui-inp id='@name@' name='@name@' value='@value@' @placeHolder autocomplete = '@autoComplete@' data-toggle='tooltip' title='@toolTipText@' style=' width:100%; @backColor@ @foreColor@ @fontStyle@ display:inline-block; @readOnlyString@ @required@ @tabIndex@ />
-        //        </div>"
-        //.Replace("@name@", this.Name)
-        //.Replace("@toolTipText@", this.ToolTipText)
-        //.Replace("@autoComplete@", this.AutoCompleteOff ? "off" : "on")
-        //.Replace("@value@", "")//"value='" + this.Value + "'")
-        //.Replace("@tabIndex@", "tabindex='" + this.TabIndex + "'")
-        //    .Replace("@BackColor@ ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor@ ") + ";"))
-        //    .Replace("@ForeColor@ ", "color:" + ((this.ForeColor != null) ? this.ForeColor : "@ForeColor@ ") + ";")
-        //.Replace("@required@", " required")//(this.Required && !this.Hidden ? " required" : string.Empty))
-        //.Replace("@readOnlyString@", this.ReadOnlyString)
-        //.Replace("@placeHolder@", "placeholder='" + this.PlaceHolder + "'")
-        //.Replace("@datetype@", "11")
-        ////.Replace("@fontStyle@", (this.FontSerialized != null) ?
-        ////                            (" font-family:" + this.FontSerialized.FontFamily + ";" + "font-style:" + this.FontSerialized.Style
-        ////                            + ";" + "font-size:" + this.FontSerialized.SizeInPoints + "px;")
-        ////                        : string.Empty)
-        //;
-        //        }
 
         private string GetHtmlHelper(RenderMode mode)
         {
