@@ -1,5 +1,6 @@
 ﻿using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
+using ExpressBase.Common.Structures;
 using ExpressBase.Objects.ServiceStack_Artifacts;
 using ServiceStack;
 using System;
@@ -19,6 +20,12 @@ namespace ExpressBase.Objects
 		public int SurveyId { get; set; }
 
 		public List<EbSurveyQueries> QueryList { get; set; }
+
+		public override bool isFullViewContol { get => true; set => base.isFullViewContol = value; }
+
+		[EnableInBuilder(BuilderType.BotForm)]
+		[HideInPropertyGrid]
+		public override EbDbTypes EbDbType { get { return EbDbTypes.Json; } }
 
 		public EbSurvey()
 		{
@@ -52,9 +59,17 @@ namespace ExpressBase.Objects
 					</div>"; set => base.DesignHtml4Bot = value;
 		}
 
+		public override string GetDesignHtml()
+		{
+			return "`"+this.DesignHtml4Bot + "`";
+		}
+
 		public override string GetBareHtml()
 		{
-			return @"<div id='@name@' class='Eb-ctrlContainer'>qqqqqqqq</div>";
+			return @"<div id='@name@' class='Eb-ctrlContainer'>
+						
+					</div>"
+					.Replace("@name@", this.Name ?? "@name@");
 		}
 	}
 	
