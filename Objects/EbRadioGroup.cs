@@ -135,7 +135,20 @@ this.Init = function(id)
     {
         public EbRadioOption() { }
 
+        public override string UIchangeFns
+        {
+            get
+            {
+                return @"EbRadioOption = {
+                Label : function(elementId, props) {
+                        $(`#${ elementId}`).closestInner('[ui-label]').text(props.Label);
+                },
+            }";
+            }
+        }
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+        [OnChangeUIFunction("EbTextBox.Label")]
         public override string Label { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
@@ -147,9 +160,9 @@ this.Init = function(id)
 
         public override string GetBareHtml()
         {/*onclick=""event.stopPropagation();$('#@name@').prop('checked', true);""*/
-            return @"<div class='radio-wrap @radio-wrap-block@' onclick=""event.stopPropagation(); $(this).children('input[type=radio]').prop('checked', true); $(this).children('input[type=radio]').trigger('change');"">
+            return @"<div id='@name@' class='radio-wrap @radio-wrap-block@' onclick=""event.stopPropagation(); $(this).children('input[type=radio]').prop('checked', true); $(this).children('input[type=radio]').trigger('change');"">
                         <input type ='radio' id='@name@' @defaultcheked@ value='@value@' name='@gname@'>
-                        <span id='@name@Lbl' style='@LabelBackColor @LabelForeColor '> @label@  </span>
+                        <span id='@name@Lbl' ui-label style='@LabelBackColor @LabelForeColor '> @label@  </span>
                     </div>"
 .Replace("@name@", this.Name)
 .Replace("@gname@", this.GName)
