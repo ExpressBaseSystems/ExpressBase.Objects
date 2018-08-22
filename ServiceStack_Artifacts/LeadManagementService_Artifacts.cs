@@ -141,6 +141,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public string TenantAccountId { get; set; }
 
 		public int UserId { get; set; }
+
+		[DataMember(Order = 4)]
+		public string UserName { get; set; }
 	}
 
 	[DataContract]
@@ -187,6 +190,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 		[DataMember(Order = 6)]
 		public string Account_Code { get; set; }
+
+		[DataMember(Order = 7)]
+		public string Created_By { get; set; }
 	}
 
 	[DataContract]
@@ -211,23 +217,41 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 	[DataContract]
 	public class BillingEntry
 	{
-		[DataMember(Order = 6)]
-		public string Id { get; set; }
-
 		[DataMember(Order = 1)]
-		public string Date { get; set; }
+		public int Id { get; set; }
 
 		[DataMember(Order = 2)]
-		public string Total { get; set; }
+		public string Date { get; set; }
 
 		[DataMember(Order = 3)]
-		public string Balance { get; set; }
+		public int Total_Amount { get; set; }
 
 		[DataMember(Order = 4)]
-		public string CashPaid { get; set; }
+		public int Amount_Received { get; set; }
 
 		[DataMember(Order = 5)]
+		public int Balance_Amount { get; set; }
+
+		[DataMember(Order = 6)]
+		public int Cash_Paid { get; set; }
+
+		[DataMember(Order = 7)]
+		public string Payment_Mode { get; set; }
+
+		[DataMember(Order = 8)]
+		public string Bank { get; set; }
+
+		[DataMember(Order = 9)]
+		public string Clearence_Date { get; set; }
+
+		[DataMember(Order = 10)]
 		public string Narration { get; set; }
+
+		[DataMember(Order = 11)]
+		public string Account_Code { get; set; }
+
+		[DataMember(Order = 12)]
+		public string Created_By { get; set; }
 	}
 
 	public class SurgeryEntry
