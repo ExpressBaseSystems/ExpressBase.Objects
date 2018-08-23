@@ -49,7 +49,8 @@ namespace ExpressBase.Objects
     {
         Popout,
         Inline,
-        Both
+        Both,
+		Tab
     }
 
     [EnableInBuilder(BuilderType.BotForm)]
@@ -121,11 +122,15 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public DVColumnCollection DSColumns { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
-        [HideInPropertyGrid]
-        public List<string> NonVisibleColumns { get; set; }
+		//[EnableInBuilder(BuilderType.DVBuilder)]
+		//[HideInPropertyGrid]
+		//public List<string> NonVisibleColumns { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
+		[EnableInBuilder(BuilderType.DVBuilder)]
+		[HideInPropertyGrid]
+		public DVNonVisibleColumnCollection NonVisibleColumns { get; set; }
+
+		[EnableInBuilder(BuilderType.DVBuilder)]
         [HideInPropertyGrid]
         [JsonIgnore]
         public object data { get; set; }
@@ -380,7 +385,7 @@ namespace ExpressBase.Objects
         public EbTableVisualization()
         {
             this.RowGroupCollection = new List<RowGroupParent>();
-            this.NonVisibleColumns = new List<string>();
+            this.NonVisibleColumns = new DVNonVisibleColumnCollection();
         }
 
 
