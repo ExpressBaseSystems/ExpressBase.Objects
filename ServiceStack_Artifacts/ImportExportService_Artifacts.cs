@@ -26,9 +26,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int Id { get; set; }
     }
 
-    public class GetOneFromAppstoreResponse:IEbSSResponse
+    public class GetOneFromAppstoreResponse : IEbSSResponse
     {
-        [DataMember(Order =1)]
+        [DataMember(Order = 1)]
         public AppWrapper Wrapper { get; set; }
 
         [DataMember(Order = 2)]
@@ -67,7 +67,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
 
-        [DataMember(Order =3)]
+        [DataMember(Order = 3)]
         public string Result { get; set; }
     }
 
@@ -90,6 +90,41 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     }
 
+    public class ShareToPublicRequest : EbServiceStackRequest, IReturn<ShareToPublicResponse>
+    {
+        public int AppStoreId { get; set; }
+
+        public string Title { get; set; }
+
+        public string IsFree { get; set; }
+
+        public int Price { get; set; }
+
+        public string ShortDesc { get; set; }
+
+        public string Tags { get; set; }
+
+        public string DetailedDesc { get; set; }
+
+        public string DemoLinks { get; set; }
+
+        public string VideoLinks { get; set; }
+
+        public string Images { get; set; }
+
+        public string PricingDesc { get; set; }
+
+        public int Cost { get; set; }        
+    }
+
+    public class ShareToPublicResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
     public class AppStore
     {
         public int Id { get; set; }
@@ -117,5 +152,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string SolutionName { get; set; }
 
         public string TenantName { get; set; }
+
+        public string SolutionId { get; set; }
     }
 }
