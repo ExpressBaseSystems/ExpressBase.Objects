@@ -35,16 +35,19 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		[DataMember(Order = 3)]
 		public Dictionary<int, string> CostCenterDict { get; set; }
 
-		[DataMember(Order = 3)]
+		[DataMember(Order = 4)]
 		public List<FeedbackEntry> FeedbackList { get; set; }
 
-		[DataMember(Order = 3)]
+		[DataMember(Order = 5)]
 		public List<GraftEntry> GraftList { get; set; }
 
-		[DataMember(Order = 3)]
+		[DataMember(Order = 6)]
 		public List<BillingEntry> BillingList { get; set; }
 
-		[DataMember(Order = 4)]
+		[DataMember(Order = 7)]
+		public List<SurgeryEntry> SurgeryList { get; set; }
+
+		[DataMember(Order = 8)]
 		public ResponseStatus ResponseStatus { get; set; }
 
 	}
@@ -158,6 +161,35 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 	}
 
 	[DataContract]
+	public class SaveSurgeryDetailsRequest : IReturn<SaveSurgeryDetailsResponse>, IEbSSRequest
+	{
+		[DataMember(Order = 1)]
+		public string Data { get; set; }
+
+		[DataMember(Order = 2)]
+		public int RequestMode { get; set; }
+
+		[DataMember(Order = 3)]
+		public string TenantAccountId { get; set; }
+
+		public int UserId { get; set; }
+
+		[DataMember(Order = 4)]
+		public string UserName { get; set; }
+	}
+
+	[DataContract]
+	public class SaveSurgeryDetailsResponse : IEbSSResponse
+	{
+		[DataMember(Order = 1)]
+		public int Status { get; set; }
+
+		[DataMember(Order = 3)]
+		public ResponseStatus ResponseStatus { get; set; }
+
+	}
+
+	[DataContract]
 	public class KeyValueType_Field
 	{
 		[DataMember(Order = 1)]
@@ -256,14 +288,23 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 	public class SurgeryEntry
 	{
-		[DataMember(Order = 3)]
-		public string Id { get; set; }
-
 		[DataMember(Order = 1)]
-		public string Date { get; set; }
+		public int Id { get; set; }
 
 		[DataMember(Order = 2)]
+		public string Date { get; set; }
+
+		[DataMember(Order = 3)]
 		public string Branch { get; set; }
+
+		[DataMember(Order = 4)]
+		public string Account_Code { get; set; }
+
+		[DataMember(Order = 5)]
+		public string Created_By { get; set; }
+
+		[DataMember(Order = 5)]
+		public string Created_Date { get; set; }
 
 	}
 }
