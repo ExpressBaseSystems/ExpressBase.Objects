@@ -42,7 +42,7 @@ namespace ExpressBase.Objects
         [OSE_ObjectTypes(EbObjectTypes.iDataSource)]
         public string DataSourceId { get; set; }
 
-        [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm)]
+        [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.CollectionProp, "Columns", "bVisible")]
         public DVColumnCollection Columns { get; set; }
 
@@ -186,24 +186,25 @@ namespace ExpressBase.Objects
         public override string GetHead()
         {
             return this.RequiredString + @"
-<script>
-    Vue.component('v-select', VueSelect.VueSelect);
-    Vue.config.devtools = true;
-</script>
-$('#@name@_loading-image').hide();
-var @nameEbCombo = new EbSelect('@name', '@DSid', @DDHeight, '@vmName', '', @MaxLimit, @MinLimit, @Required, '@DefaultSearchFor', '@servicestack_url', @values);
+//<script>
+//    Vue.component('v-select', VueSelect.VueSelect);
+//    Vue.config.devtools = true;
+//</script>
+//$('#@name@_loading-image').hide();
+//var @nameEbCombo = new EbSelect('@name', '@DSid', @DDHeight, '@vmName', '', @MaxLimit, @MinLimit, @Required, '@DefaultSearchFor', '@servicestack_url', @values);
 "
-.Replace("@name", this.Name)
-.Replace("@DSid", this.DataSourceId.ToString().Trim())
-.Replace("@DDHeight", (this.DropdownHeight == 0) ? "400" : this.DropdownHeight.ToString())
-.Replace("@vmName", this.ValueMember.ToString())
-.Replace("@dmNames", "['acmaster1_name', 'tdebit', 'tcredit']")
-.Replace("@MaxLimit", (!this.MultiSelect || this.MaxLimit == 0) ? "1" : this.MaxLimit.ToString())
-.Replace("@MinLimit", this.MinLimit.ToString())
-.Replace("@Required", this.Required.ToString().ToLower())
-.Replace("@DefaultSearchFor", this.DefaultSearchFor.ToString())
-.Replace("@servicestack_url", "https://expressbaseservicestack.azurewebsites.net")
-.Replace("@values", "[1000]");//this.values.ToString());
+//.Replace("@name", this.Name)
+//.Replace("@DSid", this.DataSourceId.ToString().Trim())
+//.Replace("@DDHeight", (this.DropdownHeight == 0) ? "400" : this.DropdownHeight.ToString())
+//.Replace("@vmName", this.ValueMember.ToString())
+//.Replace("@dmNames", "['acmaster1_name', 'tdebit', 'tcredit']")
+//.Replace("@MaxLimit", (!this.MultiSelect || this.MaxLimit == 0) ? "1" : this.MaxLimit.ToString())
+//.Replace("@MinLimit", this.MinLimit.ToString())
+//.Replace("@Required", this.Required.ToString().ToLower())
+//.Replace("@DefaultSearchFor", this.DefaultSearchFor.ToString())
+//.Replace("@servicestack_url", "https://expressbaseservicestack.azurewebsites.net")
+//.Replace("@values", "[1000]");//this.values.ToString())
+            ;
         }
 
         public override string GetDesignHtml()
