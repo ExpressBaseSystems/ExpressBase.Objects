@@ -2,6 +2,7 @@
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
+using ExpressBase.Objects.Helpers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -190,21 +191,16 @@ $('#@id').MonthPicker({ StartYear: 2018, ShowIcon: false });"
 
         private string GetHtmlHelper()
         {
-            string EbCtrlHTML = @"
-    <div id='cont_@name@' Ctype='Date' class='Eb-ctrlContainer' style='@hiddenString'>
-        <div class='eb-ctrl-label' id='@name@Lbl' style='@LabelBackColor  @LabelForeColor '> @Label@ </div>
-       @barehtml@
-        <span class='helpText'> @HelpText </span>
-    </div>  
-"
+            string EbCtrlHTML = 
+                HtmlConstants.CONTROL_WRAPER_HTML4WEB
 .Replace("@barehtml@", this.GetBareHtml())
 .Replace("@name@", this.Name)
-.Replace("@hiddenString", this.HiddenString)
+.Replace("@type@", this.ObjType)
 
     .Replace("@LabelForeColor ", "color:" + (LabelForeColor ?? "@LabelForeColor ") + ";")
     .Replace("@LabelBackColor ", "background-color:" + (LabelBackColor ?? "@LabelBackColor ") + ";")
-    .Replace("@HelpText ", (HelpText ?? "@HelpText "))
-    .Replace("@Label@ ", (Label ?? "@Label@ "));
+    .Replace("@HelpText@ ", (HelpText ?? ""))
+    .Replace("@Label@ ", (Label ?? ""));
             return EbCtrlHTML;
         }
     }
