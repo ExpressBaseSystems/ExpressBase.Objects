@@ -13,7 +13,9 @@ namespace ExpressBase.Objects.Helpers
         public const string CONTROL_WRAPER_HTML4WEB = @"
         <div id='cont_@name@' class='Eb-ctrlContainer' ebsid='@name@' Ctype='@type@' style='@hiddenString'>
             <span class='eb-ctrl-label' ui-label id='@nameLbl'>@Label@ </span>
-                @barehtml@
+                <div  class='@name@Wraper'>
+                    @barehtml@
+                </div>
             <span class='helpText' ui-helptxt >@HelpText@ </span>
         </div>";
     }

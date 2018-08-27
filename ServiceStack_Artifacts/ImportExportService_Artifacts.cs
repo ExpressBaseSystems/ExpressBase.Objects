@@ -92,29 +92,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     public class ShareToPublicRequest : EbServiceStackRequest, IReturn<ShareToPublicResponse>
     {
-        public int AppStoreId { get; set; }
-
-        public string Title { get; set; }
-
-        public string IsFree { get; set; }
-
-        public int Price { get; set; }
-
-        public string ShortDesc { get; set; }
-
-        public string Tags { get; set; }
-
-        public string DetailedDesc { get; set; }
-
-        public string DemoLinks { get; set; }
-
-        public string VideoLinks { get; set; }
-
-        public string Images { get; set; }
-
-        public string PricingDesc { get; set; }
-
-        public int Cost { get; set; }        
+        public AppStore Store { get; set; }
     }
 
     public class ShareToPublicResponse : IEbSSResponse
@@ -124,6 +102,26 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order =3)]
+        public int ReturningId { get; set; }
+    }
+
+    public class GetAppDetailsRequest : EbServiceStackRequest, IReturn<GetAppDetailsResponse>
+    {
+        public int Id { get; set; }
+    }
+    public class GetAppDetailsResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 3)]
+        public List<AppStore> StoreCollection { get; set; }
+
     }
     public class AppStore
     {
@@ -133,7 +131,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public int Status { get; set; }
 
-        public int Cost { get; set; }
+        public decimal Cost { get; set; }
 
         public string Json { get; set; }
 
@@ -154,5 +152,25 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string TenantName { get; set; }
 
         public string SolutionId { get; set; }
+
+        public string Title { get; set; }
+
+        public string IsFree { get; set; }
+
+        public string ShortDesc { get; set; }
+
+        public string Tags { get; set; }
+
+        public string DetailedDesc { get; set; }
+
+        public string DemoLinks { get; set; }
+
+        public string VideoLinks { get; set; }
+
+        public string Images { get; set; }
+
+        public string PricingDesc { get; set; }
+
+        public int DetailId { get; set; }
     }
 }
