@@ -2,6 +2,7 @@
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
+using ExpressBase.Objects.Helpers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -13,9 +14,9 @@ namespace ExpressBase.Objects
 {
     public enum EbDateType // integers corresponding to  EbDbTypes Enum
     {
-        Date =5,
-        Time =17,
-        DateTime=6,
+        Date = 5,
+        Time = 17,
+        DateTime = 6,
     }
 
     public enum TimeShowFormat
@@ -38,13 +39,13 @@ namespace ExpressBase.Objects
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
     public class EbDate : EbControlUI
-	{
+    {
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public override EbDbTypes EbDbType { get { return (EbDbTypes)this.EbDateType; } }
 
         public EbDate()
         {
-            
+
         }
 
         [OnDeserialized]
@@ -95,11 +96,11 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public DateShowFormat ShowDateAs_ { get; set; }
 
-		[HideInPropertyGrid]
-		[EnableInBuilder(BuilderType.BotForm)]
-		public override bool IsReadOnly { get => this.ReadOnly; }
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.BotForm)]
+        public override bool IsReadOnly { get => this.ReadOnly; }
 
-		public override string GetToolHtml()
+        public override string GetToolHtml()
         {
             return @"<div eb-type='@toolName' class='tool'><i class='fa fa-calendar'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
         }
@@ -145,8 +146,8 @@ $('#@id').MonthPicker({ StartYear: 2018, ShowIcon: false });"
 
         public override string GetDesignHtml()
         {
-            string _html = null; 
-            
+            string _html = null;
+
             if (this.Name == null) //if in new mode
                 _html = GetHtml();
 
@@ -163,7 +164,7 @@ $('#@id').MonthPicker({ StartYear: 2018, ShowIcon: false });"
             <input id='@name@' data-ebtype='@data-ebtype@'  data-toggle='tooltip' title='@toolTipText@' class='date' type='text' name='@name@' autocomplete = '@autoComplete@' @value@ @tabIndex@ style='width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@ @readOnlyString@ @required@ @placeHolder@ />
             <span class='input-group-addon' onclick=""$('#@name@').click()"" style='padding: 0px;'> <i id='@name@TglBtn' class='fa  @atchdLbl@' aria-hidden='true' style='padding: 6px 12px;'></i> </span>
         </div>"
-.Replace("@name@", this.Name.Trim())
+.Replace("@name@", (this.Name != null ? this.Name.Trim() : ""))
 .Replace("@data-ebtype@", "6")//( (int)this.EbDateType ).ToString())
 .Replace("@toolTipText@", this.ToolTipText)
 .Replace("@autoComplete@", this.AutoCompleteOff ? "off" : "on")
@@ -190,21 +191,16 @@ $('#@id').MonthPicker({ StartYear: 2018, ShowIcon: false });"
 
         private string GetHtmlHelper()
         {
-            string EbCtrlHTML = @"
-    <div id='cont_@name@' Ctype='Date' class='Eb-ctrlContainer' style='@hiddenString'>
-        <div class='eb-ctrl-label' id='@name@Lbl' style='@LabelBackColor  @LabelForeColor '> @Label@ </div>
-       @barehtml@
-        <span class='helpText'> @HelpText </span>
-    </div>  
-"
+            string EbCtrlHTML = 
+                HtmlConstants.CONTROL_WRAPER_HTML4WEB
 .Replace("@barehtml@", this.GetBareHtml())
 .Replace("@name@", this.Name)
-.Replace("@hiddenString", this.HiddenString)
+.Replace("@type@", this.ObjType)
 
     .Replace("@LabelForeColor ", "color:" + (LabelForeColor ?? "@LabelForeColor ") + ";")
     .Replace("@LabelBackColor ", "background-color:" + (LabelBackColor ?? "@LabelBackColor ") + ";")
-    .Replace("@HelpText ", (HelpText ?? "@HelpText "))
-    .Replace("@Label@ ", (Label ?? "@Label@ "));
+    .Replace("@HelpText@ ", (HelpText ?? ""))
+    .Replace("@Label@ ", (Label ?? ""));
             return EbCtrlHTML;
         }
     }

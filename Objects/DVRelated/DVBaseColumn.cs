@@ -187,6 +187,11 @@ namespace ExpressBase.Objects.Objects.DVRelated
         }
     }
 
+	public class DVNonVisibleColumnCollection : List<string>
+	{
+
+	}
+
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
     [Alias("DVStringColumnAlias")]
     public class DVStringColumn : DVBaseColumn

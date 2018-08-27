@@ -1,6 +1,7 @@
 ﻿using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
+using ExpressBase.Objects.Helpers;
 using Newtonsoft.Json;
 using ProtoBuf;
 using System;
@@ -94,20 +95,17 @@ namespace ExpressBase.Objects
         public override string GetHtml()
         {
 
-            string html = @"
-            <div id='cont_@name@' class='Eb-ctrlContainer' Ctype='RadioGroup'>
-                <div class='radiog-cont'  style='@BackColor '>
-                 <div class='eb-ctrl-label' id='@name@Lbl' class='radiog-label' style='@LabelBackColor @LabelForeColor '> @Label@  </div>
-                        @barehtml@
-                <span class='helpText'> @HelpText@ </span></div>
-            </div>"
+            string html =
+                HtmlConstants.CONTROL_WRAPER_HTML4WEB
 .Replace("@barehtml@", this.GetBareHtml())
 .Replace("@name@", (this.Name != null) ? this.Name : "@name@")
-.Replace("@Label@", this.Label)
-.Replace("@HelpText@", this.HelpText ?? "")
-.Replace("@LabelForeColor ", "color:" + ((this.LabelForeColor != null) ? this.LabelForeColor : "@LabelForeColor ") + ";")
-.Replace("@LabelBackColor ", "background-color:" + ((this.LabelBackColor != null) ? this.LabelBackColor : "@LabelBackColor ") + ";")
-.Replace("@BackColor ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor ") + ";"));
+
+
+
+    .Replace("@LabelForeColor ", "color:" + (LabelForeColor ?? "@LabelForeColor ") + ";")
+    .Replace("@LabelBackColor ", "background-color:" + (LabelBackColor ?? "@LabelBackColor ") + ";")
+    .Replace("@HelpText@ ", (HelpText ?? ""))
+    .Replace("@Label@ ", (Label ?? ""));
             return html;
         }
 

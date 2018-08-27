@@ -224,7 +224,12 @@ $('#{0}').mask('SZZZZZZZZZZZ', {
                 HtmlConstants.CONTROL_WRAPER_HTML4WEB
 .Replace("@barehtml@", this.GetBareHtml())
 .Replace("@name@", this.Name)
-.Replace("@type@", this.ObjType));
+.Replace("@type@", this.ObjType))
+
+    .Replace("@LabelForeColor ", "color:" + (LabelForeColor ?? "@LabelForeColor ") + ";")
+    .Replace("@LabelBackColor ", "background-color:" + (LabelBackColor ?? "@LabelBackColor ") + ";")
+    .Replace("@HelpText@ ", (HelpText ?? ""))
+    .Replace("@Label@ ", (Label ?? ""));
         }
 
         //        private string GetHtmlHelper(RenderMode mode)
