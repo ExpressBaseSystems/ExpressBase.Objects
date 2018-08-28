@@ -122,13 +122,14 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public DVColumnCollection DSColumns { get; set; }
 
-		//[EnableInBuilder(BuilderType.DVBuilder)]
-		//[HideInPropertyGrid]
-		//public List<string> NonVisibleColumns { get; set; }
-
 		[EnableInBuilder(BuilderType.DVBuilder)]
 		[HideInPropertyGrid]
-		public DVNonVisibleColumnCollection NonVisibleColumns { get; set; }
+		[JsonIgnore]
+		public List<string> NonVisibleColumns { get; set; }
+
+		//[EnableInBuilder(BuilderType.DVBuilder)]
+		//[HideInPropertyGrid]
+		//public DVNonVisibleColumnCollection NonVisibleColumns { get; set; }
 
 		[EnableInBuilder(BuilderType.DVBuilder)]
         [HideInPropertyGrid]
@@ -323,6 +324,11 @@ namespace ExpressBase.Objects
         {
             this.BareControlHtml = this.GetBareHtml();
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
+			foreach(DVBaseColumn col in this.Columns)
+			{
+				if (!col.bVisible)
+					this.NonVisibleColumns.Add(col.Name);
+			}
         }
 
         public string BotCols { get; set; }
@@ -385,8 +391,10 @@ namespace ExpressBase.Objects
         public EbTableVisualization()
         {
             this.RowGroupCollection = new List<RowGroupParent>();
-            this.NonVisibleColumns = new DVNonVisibleColumnCollection();
-        }
+			this.NonVisibleColumns = new List<string>();
+			//this.NonVisibleColumns = new DVNonVisibleColumnCollection();
+			
+		}
 
 
         public override string DiscoverRelatedRefids()
