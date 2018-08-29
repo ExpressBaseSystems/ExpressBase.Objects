@@ -96,6 +96,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 3)]
         public ResponseStatus ResponseStatus { get; set; }
     }
+    public class EbAllObjNVerRequest : EbServiceStackRequest, IReturn<EbObjectObjListAllVerResponse>
+    {
+        public string ObjectIds { get; set; }
+    }
 
     public class EbObjectObjLisAllVerRequest : EbServiceStackRequest, IReturn<EbObjectObjListAllVerResponse>
     {

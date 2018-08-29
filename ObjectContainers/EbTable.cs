@@ -14,6 +14,18 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.WebForm)]
     public class EbTableLayout : EbControlContainer
     {
+
+        public override string UIchangeFns
+        {
+            get
+            {
+                return @"EbTable = {
+                padding : function(elementId, props) {
+                    $(`#${ elementId}>table>tbody>tr>td`).css('padding', props.Padding + 'px');
+                }
+            }";
+            }
+        }
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
         [PropertyEditor(PropertyEditorType.Collection)]
         [Alias("Columns")]
@@ -52,6 +64,11 @@ namespace ExpressBase.Objects
         public string AImg { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        [PropertyGroup("Test")]
+        [OnChangeUIFunction("EbTable.padding")]
+        public int Padding { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
         [PropertyEditor(PropertyEditorType.CollectionA2C)]
         [PropertyGroup("Test")]
         public List<EbTableTd> propA2C { get; set; }
@@ -72,13 +89,14 @@ namespace ExpressBase.Objects
         {
             this.Controls = new List<EbControl>();
             this.Visualizations = new List<EbDataVisualization>();
+            this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
 
         public override string GetDesignHtml()
         {
             return @"
 <div class='Eb-ctrlContainer' Ctype='TableLayout'>
-    <table style='width:100%'   style=' @BackColor  @ForeColor ' >
+    <table style='width:100%' style=' @BackColor  @ForeColor ' >
         <tr>
             <td id='@id_Td0' class='tdDropable' ></td>
             <td id='@id_Td1' class='tdDropable'></td style='min-height:20px;'>
@@ -120,7 +138,7 @@ this.Init = function(id)
         public override string GetHtml()
         {
             string html = @"
-            <div id='@name@' ebsid='@name@' class='Eb-ctrlContainer' Ctype='TableLayout'>
+            <div id='cont_@name@' ebsid='@name@' class='Eb-ctrlContainer' Ctype='TableLayout'>
                 <table class='form-render-table' ><tr>";
 
             foreach (EbControl ec in this.Controls)
@@ -137,6 +155,7 @@ this.Init = function(id)
         public EbTableTd()
         {
             this.Controls = new List<EbControl>();
+            this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
@@ -158,7 +177,7 @@ this.Init = function(id)
 
         public override string GetHtml()
         {
-            string html = "<td id='@name@' class='form-render-table-Td tdDropable'>";
+            string html = "<td id='cont_@name@' class='form-render-table-Td tdDropable'>";
 
             foreach (EbControl ec in this.Controls)
                 html += ec.GetHtml();
