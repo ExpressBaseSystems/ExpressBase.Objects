@@ -107,9 +107,14 @@ namespace ExpressBase.Objects
         //[PropertyEditor(PropertyEditorType.CollectionABCpropToggle, "Columns", "Formula")]
 
         [CEOnSelectFn(@";
-            this.bVisible = true;")]
+            this.bVisible = true;
+            NonVC = Parent.NotVisibleColumns.$values;
+            let  idx = NonVC.indexOf(this);
+            if(idx > -1)
+                NonVC.splice(idx, 1);")]
         [CEOnDeselectFn(@"
-            this.bVisible = false;")]
+            this.bVisible = false;
+            Parent.NotVisibleColumns.$values.push(this)")]
         [EnableInBuilder(BuilderType.DVBuilder)]
         public DVColumnCollection Columns { get; set; }
 
@@ -117,16 +122,15 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public DVColumnCollection DSColumns { get; set; }
 
-		//[EnableInBuilder(BuilderType.DVBuilder)]
-		//[HideInPropertyGrid]
-		////[JsonIgnore]
-		//public List<string> NonVisibleColumns { get; set; }
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [HideInPropertyGrid]
+        public List<DVBaseColumn> NotVisibleColumns { get; set; }
 
-		//[EnableInBuilder(BuilderType.DVBuilder)]
-		//[HideInPropertyGrid]
-		//public DVNonVisibleColumnCollection NonVisibleColumns { get; set; }
+        //[EnableInBuilder(BuilderType.DVBuilder)]
+        //[HideInPropertyGrid]
+        //public DVNonVisibleColumnCollection NonVisibleColumns { get; set; }
 
-		[EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilder)]
         [HideInPropertyGrid]
         [JsonIgnore]
         public object data { get; set; }
@@ -319,12 +323,6 @@ namespace ExpressBase.Objects
         {
             this.BareControlHtml = this.GetBareHtml();
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
-            //foreach (DVBaseColumn col in this.Columns)
-            //{
-            //    if (!col.bVisible)
-            //        this.NonVisibleColumns.Add(col.Name);
-
-            //}
         }
 
         public string BotCols { get; set; }
@@ -387,7 +385,7 @@ namespace ExpressBase.Objects
         public EbTableVisualization()
         {
             this.RowGroupCollection = new List<RowGroupParent>();
-			//this.NonVisibleColumns = new List<string>();
+			this.NotVisibleColumns = new List<DVBaseColumn>();
 			//this.NonVisibleColumns = new DVNonVisibleColumnCollection();
 			
 		}
