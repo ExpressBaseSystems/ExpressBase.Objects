@@ -57,6 +57,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         [DataMember(Order = 1)]
         public string Refids { get; set; }
+
+        [DataMember(Order = 2)]
+        public int AppId { get; set; }        
     }
 
     public class ExportApplicationResponse : IEbSSResponse

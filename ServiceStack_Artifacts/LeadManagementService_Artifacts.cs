@@ -12,7 +12,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 	public class GetManageLeadRequest : IReturn<GetManageLeadResponse>, IEbSSRequest
 	{
 		[DataMember(Order = 1)]
-		public string AccId { get; set; }
+		public int AccId { get; set; }
 
 		[DataMember(Order = 2)]
 		public int RequestMode { get; set; }
@@ -49,6 +49,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 		[DataMember(Order = 8)]
 		public ResponseStatus ResponseStatus { get; set; }
+
+		[DataMember(Order = 9)]
+		public Dictionary<string, int> DoctorDict { get; set; }
+
+		[DataMember(Order = 10)]
+		public Dictionary<string, int> StaffDict { get; set; }
 
 	}
 
