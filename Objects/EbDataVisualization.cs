@@ -107,14 +107,9 @@ namespace ExpressBase.Objects
         //[PropertyEditor(PropertyEditorType.CollectionABCpropToggle, "Columns", "Formula")]
 
         [CEOnSelectFn(@";
-            this.bVisible = true;
-            NonVC = Parent.NonVisibleColumns.$values;
-            let  idx = NonVC.indexOf(this.name);
-            if(idx > -1)
-                NonVC.splice(idx, 1);")]
+            this.bVisible = true;")]
         [CEOnDeselectFn(@"
-            this.bVisible = false;
-            Parent.NonVisibleColumns.$values.push(this.name)")]
+            this.bVisible = false;")]
         [EnableInBuilder(BuilderType.DVBuilder)]
         public DVColumnCollection Columns { get; set; }
 
@@ -122,10 +117,10 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public DVColumnCollection DSColumns { get; set; }
 
-		[EnableInBuilder(BuilderType.DVBuilder)]
-		[HideInPropertyGrid]
-		[JsonIgnore]
-		public List<string> NonVisibleColumns { get; set; }
+		//[EnableInBuilder(BuilderType.DVBuilder)]
+		//[HideInPropertyGrid]
+		////[JsonIgnore]
+		//public List<string> NonVisibleColumns { get; set; }
 
 		//[EnableInBuilder(BuilderType.DVBuilder)]
 		//[HideInPropertyGrid]
@@ -324,11 +319,12 @@ namespace ExpressBase.Objects
         {
             this.BareControlHtml = this.GetBareHtml();
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
-			foreach(DVBaseColumn col in this.Columns)
-			{
-				if (!col.bVisible)
-					this.NonVisibleColumns.Add(col.Name);
-			}
+            //foreach (DVBaseColumn col in this.Columns)
+            //{
+            //    if (!col.bVisible)
+            //        this.NonVisibleColumns.Add(col.Name);
+
+            //}
         }
 
         public string BotCols { get; set; }
@@ -391,7 +387,7 @@ namespace ExpressBase.Objects
         public EbTableVisualization()
         {
             this.RowGroupCollection = new List<RowGroupParent>();
-			this.NonVisibleColumns = new List<string>();
+			//this.NonVisibleColumns = new List<string>();
 			//this.NonVisibleColumns = new DVNonVisibleColumnCollection();
 			
 		}
