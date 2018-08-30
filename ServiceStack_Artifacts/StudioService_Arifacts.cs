@@ -543,12 +543,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Apps { get; set; }
 
         [DataMember(Order = 20)]
-        public EbObjectWrapper_Dashboard Dashboard_Tiles { get; set; }
+        public EbObj_Dashboard Dashboard_Tiles { get; set; }
         public EbObjectWrapper() { }
     }
 
     [DataContract]
-    public class EbObjectWrapper_Dashboard
+    public class EbObj_Dashboard
     {
         [DataMember(Order = 1)]
         public string LiveVersionRefid { get; set; }
@@ -604,7 +604,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 18)]
         public int PatchVersionNumber { get; set; }
 
-        public EbObjectWrapper_Dashboard() { }
+        public EbObj_Dashboard() { }
     }
 
     public class EbObjectTaggedRequest : EbServiceStackRequest, IReturn<EbObjectRelationsResponse>

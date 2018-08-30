@@ -93,7 +93,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string TenantAccountId { get; set; }
 
         public int UserId { get; set; }
-    }  
+    }
 
     [DataContract]
     public class GetApplicationResponse : IEbSSResponse
@@ -151,10 +151,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 5)]
         public string Description { set; get; }
 
-		[DataMember(Order = 6)]
-		public object AppSettings { set; get; }
+        [DataMember(Order = 6)]
+        public object AppSettings { set; get; }
 
-        [DataMember(Order =7)]
+        [DataMember(Order = 7)]
         public List<EbObject> ObjCollection { get; set; }
     }
 
@@ -171,7 +171,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int UserId { get; set; }
     }
 
-    public class GetObjectsByAppIdResponse: IEbSSResponse
+    public class GetObjectsByAppIdResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
         public Dictionary<int, TypeWrap> Data { get; set; }
@@ -222,30 +222,30 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 1)]
         public Dictionary<string, List<Coloums>> Data { get; set; }
 
-       [DataMember(Order = 2)]
+        [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-	[DataContract]
-	public class SaveAppSettingsRequest : EbServiceStackRequest, IReturn<SaveAppSettingsResponse>
-	{
-		[DataMember(Order = 1)]
-		public int AppId { get; set; }
+    [DataContract]
+    public class SaveAppSettingsRequest : EbServiceStackRequest, IReturn<SaveAppSettingsResponse>
+    {
+        [DataMember(Order = 1)]
+        public int AppId { get; set; }
 
-		[DataMember(Order = 1)]
-		public int AppType { get; set; }
+        [DataMember(Order = 1)]
+        public int AppType { get; set; }
 
-		[DataMember(Order = 2)]
-		public string Settings { get; set; }
+        [DataMember(Order = 2)]
+        public string Settings { get; set; }
 
-	}
+    }
 
-	[DataContract]
-	public class SaveAppSettingsResponse
-	{
-		[DataMember(Order = 1)]
-		public int ResStatus { get; set; }
-	}
+    [DataContract]
+    public class SaveAppSettingsResponse
+    {
+        [DataMember(Order = 1)]
+        public int ResStatus { get; set; }
+    }
 
     public class UniqueApplicationNameCheckRequest : EbServiceStackRequest, IReturn<UniqueObjectNameCheckResponse>
     {
@@ -270,13 +270,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class GetSurveyQueriesResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
-        public Dictionary<int,EbSurveyQuery> Data { get; set; }
+        public Dictionary<int, EbSurveyQuery> Data { get; set; }
 
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-    public class SurveyQuesRequest: IReturn<SurveyQuesResponse>, IEbSSRequest
+    public class SurveyQuesRequest : IReturn<SurveyQuesResponse>, IEbSSRequest
     {
         public string TenantAccountId { get; set; }
 
@@ -285,13 +285,16 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 1)]
         public EbSurveyQuery Query { set; get; }
     }
-    public class SurveyQuesResponse: IEbSSResponse
+    public class SurveyQuesResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
         public bool Status { get; set; }
 
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 3)]
+        public int Quesid { set; get; }
     }
 
     public class EbSurveyQuery
@@ -327,127 +330,141 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public bool IsNew { set; get; }
     }
 
-	public class ManageSurveyRequest : IReturn<ManageSurveyResponse>, IEbSSRequest
-	{
-		[DataMember(Order = 1)]
-		public int Id { get; set; }
+    public class ManageSurveyRequest : IReturn<ManageSurveyResponse>, IEbSSRequest
+    {
+        [DataMember(Order = 1)]
+        public int Id { get; set; }
 
-		public string TenantAccountId { get; set; }
+        public string TenantAccountId { get; set; }
 
-		public int UserId { get; set; }
+        public int UserId { get; set; }
 
-	}
-	public class ManageSurveyResponse : IEbSSResponse
-	{
-		[DataMember(Order = 1)]
-		public Eb_Survey Obj { get; set; }
+    }
+    public class ManageSurveyResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public Eb_Survey Obj { get; set; }
 
-		[DataMember(Order = 2)]
-		public List<Eb_SurveyQuestion> AllQuestions { get; set; }
-		
-		[DataMember(Order = 2)]
-		public ResponseStatus ResponseStatus { get; set; }
-	}
+        [DataMember(Order = 2)]
+        public List<Eb_SurveyQuestion> AllQuestions { get; set; }
 
-	public class SaveSurveyRequest : IReturn<SaveSurveyResponse>, IEbSSRequest
-	{
-		[DataMember(Order = 1)]
-		public string Data { get; set; }
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
 
-		public string TenantAccountId { get; set; }
+    public class SaveSurveyRequest : IReturn<SaveSurveyResponse>, IEbSSRequest
+    {
+        [DataMember(Order = 1)]
+        public string Data { get; set; }
 
-		public int UserId { get; set; }
+        public string TenantAccountId { get; set; }
 
-	}
-	public class SaveSurveyResponse : IEbSSResponse
-	{
-		[DataMember(Order = 1)]
-		public int Status { get; set; }
+        public int UserId { get; set; }
 
-		[DataMember(Order = 2)]
-		public ResponseStatus ResponseStatus { get; set; }
-	}
+    }
+    public class SaveSurveyResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public int Status { get; set; }
 
-	public class GetSurveyListRequest : IReturn<GetSurveyListResponse>, IEbSSRequest
-	{
-		public string TenantAccountId { get; set; }
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
 
-		public int UserId { get; set; }
+    public class GetSurveyListRequest : IReturn<GetSurveyListResponse>, IEbSSRequest
+    {
+        public string TenantAccountId { get; set; }
 
-	}
-	public class GetSurveyListResponse : IEbSSResponse
-	{
-		[DataMember(Order = 1)]
-		public Dictionary<int, string> SurveyDict { get; set; }
+        public int UserId { get; set; }
 
-		[DataMember(Order = 2)]
-		public ResponseStatus ResponseStatus { get; set; }
-	}
+    }
+    public class GetSurveyListResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public Dictionary<int, string> SurveyDict { get; set; }
 
-	public class GetParticularSurveyRequest : IReturn<GetParticularSurveyResponse>, IEbSSRequest
-	{
-		[DataMember(Order = 1)]
-		public int SurveyId { get; set; }
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
 
-		public string TenantAccountId { get; set; }
+    public class GetParticularSurveyRequest : IReturn<GetParticularSurveyResponse>, IEbSSRequest
+    {
+        [DataMember(Order = 1)]
+        public int SurveyId { get; set; }
 
-		public int UserId { get; set; }
+        public string TenantAccountId { get; set; }
 
-	}
-	public class GetParticularSurveyResponse : IEbSSResponse
-	{
-		[DataMember(Order = 1)]
-		public int SurveyId { get; set; }
-		
-		[DataMember(Order = 2)]
-		public string SurveyName { get; set; }
+        public int UserId { get; set; }
 
-		[DataMember(Order = 3)]
-		public Dictionary<int, Eb_SurveyQuestion> Queries { get; set; }
+    }
+    public class GetParticularSurveyResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public int SurveyId { get; set; }
 
-		[DataMember(Order = 4)]
-		public ResponseStatus ResponseStatus { get; set; }
-	}
+        [DataMember(Order = 2)]
+        public string SurveyName { get; set; }
 
-	[DataContract]
-	public class Eb_Survey
-	{
-		[DataMember(Order = 1)]
-		public int Id { get; set; }
+        [DataMember(Order = 3)]
+        public Dictionary<int, Eb_SurveyQuestion> Queries { get; set; }
 
-		[DataMember(Order = 2)]
-		public string Name { get; set; }
+        [DataMember(Order = 4)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
 
-		[DataMember(Order = 3)]
-		public string Start { get; set; }
+    [DataContract]
+    public class Eb_Survey
+    {
+        [DataMember(Order = 1)]
+        public int Id { get; set; }
 
-		[DataMember(Order = 4)]
-		public string End { get; set; }
+        [DataMember(Order = 2)]
+        public string Name { get; set; }
 
-		[DataMember(Order = 5)]
-		public int Status { get; set; }
+        [DataMember(Order = 3)]
+        public string Start { get; set; }
 
-		[DataMember(Order = 6)]
-		public List<int> QuesIds { get; set; }
+        [DataMember(Order = 4)]
+        public string End { get; set; }
 
-		public Eb_Survey() { }
-	}
+        [DataMember(Order = 5)]
+        public int Status { get; set; }
 
-	[DataContract]
-	public class Eb_SurveyQuestion
-	{
-		[DataMember(Order = 1)]
-		public int Id;
+        [DataMember(Order = 6)]
+        public List<int> QuesIds { get; set; }
 
-		[DataMember(Order = 2)]
-		public string Question;
+        public Eb_Survey() { }
+    }
 
-		[DataMember(Order = 3)]
-		public List<string> Choices { get; set; }
+    [DataContract]
+    public class Eb_SurveyQuestion
+    {
+        [DataMember(Order = 1)]
+        public int Id;
 
-		[DataMember(Order = 4)]
-		public int ChoiceType;
-		
-		public Eb_SurveyQuestion() { }
-	}
+        [DataMember(Order = 2)]
+        public string Question;
+
+        [DataMember(Order = 3)]
+        public List<string> Choices { get; set; }
+
+        [DataMember(Order = 4)]
+        public int ChoiceType;
+    }
+
+    public class GetSurveysByAppRequest : IReturn<GetSurveysByAppResponse>, IEbSSRequest
+    {
+        public string TenantAccountId { get; set; }
+
+        public int UserId { get; set; }
+    }
+
+    public class GetSurveysByAppResponse:IEbSSResponse
+    {
+        [DataMember(Order =1)]
+        public List<Eb_Survey> Surveys { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
 }
