@@ -132,16 +132,19 @@ namespace ExpressBase.Objects.ReportRelated
 
         public string RenderMultiLine(string column_val, Phrase text, DbType column_type)
         {
-            var calcbasefont = text.Font.GetCalculatedBaseFont(false);
-            float stringwidth = calcbasefont.GetWidthPoint(column_val, text.Font.CalculatedSize);
-            var charwidth = stringwidth / column_val.Length;
-            int numberofCharsInALine = Convert.ToInt32(Math.Floor(WidthPt / charwidth));
-            if (numberofCharsInALine < column_val.Length)
+            if (column_val != string.Empty)
             {
-                if (column_type == System.Data.DbType.Decimal)
-                    column_val = "###";
-                //else if (column_type == System.Data.DbType.String)
-                //    column_val = column_val.Substring(0, numberofCharsInALine - 2) + "...";
+                var calcbasefont = text.Font.GetCalculatedBaseFont(false);
+                float stringwidth = calcbasefont.GetWidthPoint(column_val, text.Font.CalculatedSize);
+                var charwidth = stringwidth / column_val.Length;
+                int numberofCharsInALine = Convert.ToInt32(Math.Floor(WidthPt / charwidth));
+                if (numberofCharsInALine < column_val.Length)
+                {
+                    if (column_type == System.Data.DbType.Decimal)
+                        column_val = "###";
+                    //else if (column_type == System.Data.DbType.String)
+                    //    column_val = column_val.Substring(0, numberofCharsInALine - 2) + "...";
+                }
             }
             return column_val;
         }
