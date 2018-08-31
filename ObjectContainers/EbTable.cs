@@ -138,7 +138,7 @@ this.Init = function(id)
         public override string GetHtml()
         {
             string html = @"
-            <div id='cont_@name@' ebsid='@name@' class='Eb-ctrlContainer' Ctype='TableLayout'>
+            <div id='@name@' ebsid='@name@' class='Eb-ctrlContainer' Ctype='TableLayout'>
                 <table class='form-render-table' ><tr>";
 
             foreach (EbControl ec in this.Controls)
@@ -177,7 +177,7 @@ this.Init = function(id)
 
         public override string GetHtml()
         {
-            string html = "<td id='cont_@name@' class='form-render-table-Td tdDropable'>";
+            string html = "<td id='@name@' class='form-render-table-Td tdDropable'>";
 
             foreach (EbControl ec in this.Controls)
                 html += ec.GetHtml();
