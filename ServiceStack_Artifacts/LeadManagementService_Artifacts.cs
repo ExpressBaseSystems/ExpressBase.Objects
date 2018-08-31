@@ -56,6 +56,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		[DataMember(Order = 10)]
 		public Dictionary<string, int> StaffDict { get; set; }
 
+		[DataMember(Order = 11)]
+		public int RespMode { get; set; }
+
 	}
 
 	[DataContract]
