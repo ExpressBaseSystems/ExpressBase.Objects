@@ -37,13 +37,13 @@ namespace ExpressBase.Objects.ReportRelated
         public override string GetJsInitFunc()
         {
             return @"
-    this.Init = function(id)
-        {
-    this.Height =50;
-    this.Width= 50;
-    this.Border = 1;
-    this.BorderColor = '#000000'
-};";
+                this.Init = function(id)
+                    {
+                        this.Height =50;
+                        this.Width= 50;
+                        this.Border = 1;
+                        this.BorderColor = '#000000'
+                   };";
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, EbReport report)
         {
@@ -61,10 +61,10 @@ namespace ExpressBase.Objects.ReportRelated
             }
             else
             {
-                var x1 = LeftPt;
-                var y1 = reportHeight - (printingTop + TopPt + HeightPt + report.detailprintingtop);
-                var x2 = LeftPt + WidthPt;
-                var y2 = reportHeight - (printingTop + TopPt + report.detailprintingtop);
+                float x1 = LeftPt;
+                float y1 = reportHeight - (printingTop + TopPt + HeightPt + report.detailprintingtop);
+                float x2 = LeftPt + WidthPt;
+                float y2 = reportHeight - (printingTop + TopPt + report.detailprintingtop);
                 canvas.SetColorStroke(GetColor(BorderColor));
                 canvas.SetColorFill(GetColor(BackColor));
                 canvas.SetLineWidth(Border);
@@ -83,13 +83,13 @@ namespace ExpressBase.Objects.ReportRelated
         public override string GetJsInitFunc()
         {
             return @"
-    this.Init = function(id)
-        {
-    this.Height =50;
-    this.Width= 50;
-    this.Border = 1;
-    this.BorderColor = '#000000'
-};";
+                this.Init = function(id)
+                {
+                    this.Height =50;
+                    this.Width= 50;
+                    this.Border = 1;
+                    this.BorderColor = '#000000'
+                };";
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, EbReport report)
         {
@@ -114,18 +114,18 @@ namespace ExpressBase.Objects.ReportRelated
         public override string GetJsInitFunc()
         {
             return @"
-    this.Init = function(id)
-        {
-    this.Width= 50;
-    this.Border = 1;
-    this.BorderColor = '#000000'
-};";
+                this.Init = function(id)
+                {
+                    this.Width= 50;
+                    this.Border = 1;
+                    this.BorderColor = '#000000'
+                };";
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, EbReport report)
         {
             base.DrawMe(canvas, reportHeight, printingTop, report);
-            var x = LeftPt + WidthPt;
-            var y = reportHeight - (printingTop + TopPt + report.detailprintingtop);
+            float x = LeftPt + WidthPt;
+            float y = reportHeight - (printingTop + TopPt + report.detailprintingtop);
             canvas.SetColorStroke(GetColor(BorderColor));
             canvas.SetColorFill(GetColor(BorderColor));
             canvas.SetLineWidth(Border);
@@ -145,18 +145,18 @@ namespace ExpressBase.Objects.ReportRelated
         public override string GetJsInitFunc()
         {
             return @"
-    this.Init = function(id)
-        {
-    this.Width= 50;
-    this.Border = 1;
-    this.BorderColor = '#000000'
-};";
+                this.Init = function(id)
+                    {
+                        this.Width= 50;
+                        this.Border = 1;
+                        this.BorderColor = '#000000'
+                    };";
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, EbReport report)
         {
             base.DrawMe(canvas, reportHeight, printingTop, report);
-            var x = LeftPt;
-            var y = reportHeight - (printingTop + TopPt + report.detailprintingtop);
+            float x = LeftPt;
+            float y = reportHeight - (printingTop + TopPt + report.detailprintingtop);
             canvas.SetColorStroke(GetColor(BorderColor));
             canvas.SetColorFill(GetColor(BorderColor));
             canvas.SetLineWidth(Border);
@@ -178,18 +178,18 @@ namespace ExpressBase.Objects.ReportRelated
         public override string GetJsInitFunc()
         {
             return @"
-    this.Init = function(id)
-        {
-    this.Height =50;
-    this.Border = 1;
-    this.BorderColor = '#000000'
-};";
+                this.Init = function(id)
+                    {
+                        this.Height =50;
+                        this.Border = 1;
+                        this.BorderColor = '#000000'
+                    };";
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, EbReport report)
         {
             base.DrawMe(canvas, reportHeight, printingTop, report);
-            var x = LeftPt;
-            var y = reportHeight - (printingTop + TopPt + HeightPt + report.detailprintingtop);
+            float x = LeftPt;
+            float y = reportHeight - (printingTop + TopPt + HeightPt + report.detailprintingtop);
             canvas.SetColorStroke(GetColor(BorderColor));
             canvas.SetColorFill(GetColor(BorderColor));
             canvas.SetLineWidth(Border);
@@ -209,18 +209,18 @@ namespace ExpressBase.Objects.ReportRelated
         public override string GetJsInitFunc()
         {
             return @"
-    this.Init = function(id)
-        {
-    this.Height =50;
-    this.Border = 1;
-    this.BorderColor = '#000000'
-};";
+                this.Init = function(id)
+                    {
+                        this.Height =50;
+                        this.Border = 1;
+                        this.BorderColor = '#000000'
+                    };";
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, EbReport report)
         {
             base.DrawMe(canvas, reportHeight, printingTop, report);
-            var x = LeftPt;
-            var y = reportHeight - (printingTop + TopPt + report.detailprintingtop);
+            float x = LeftPt;
+            float y = reportHeight - (printingTop + TopPt + report.detailprintingtop);
             canvas.SetColorStroke(GetColor(BorderColor));
             canvas.SetColorFill(GetColor(BorderColor));
             canvas.SetLineWidth(Border);
@@ -242,18 +242,18 @@ namespace ExpressBase.Objects.ReportRelated
         public override string GetJsInitFunc()
         {
             return @"
-    this.Init = function(id)
-        {
-    this.Width= 50;
-    this.Border = 1;
-    this.BorderColor = '#000000'
-};";
+                this.Init = function(id)
+                    {
+                        this.Width= 50;
+                        this.Border = 1;
+                        this.BorderColor = '#000000'
+                    };";
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, EbReport report)
         {
             base.DrawMe(canvas, reportHeight, printingTop, report);
-            var x1 = LeftPt + WidthPt;
-            var y1 = reportHeight - (printingTop + TopPt + report.detailprintingtop);
+            float x1 = LeftPt + WidthPt;
+            float y1 = reportHeight - (printingTop + TopPt + report.detailprintingtop);
             canvas.SetColorStroke(GetColor(BorderColor));
             canvas.SetColorFill(GetColor(BorderColor));
             canvas.SetLineWidth(Border);
@@ -261,8 +261,8 @@ namespace ExpressBase.Objects.ReportRelated
             canvas.LineTo(x1 - 3, y1 - 3);
             canvas.LineTo(x1 - 3, y1 + 3);
             canvas.ClosePathFillStroke();
-            var x2 = LeftPt;
-            var y2 = y1;
+            float x2 = LeftPt;
+            float y2 = y1;
             canvas.MoveTo(x2, y2);
             canvas.LineTo(x2 + 3, y2 + 3);
             canvas.LineTo(x2 + 3, y2 - 3);
@@ -279,12 +279,12 @@ namespace ExpressBase.Objects.ReportRelated
         public override string GetJsInitFunc()
         {
             return @"
-    this.Init = function(id)
-        {
-    this.Height =50;
-    this.Border = 1;
-    this.BorderColor = '#000000'
-};";
+                this.Init = function(id)
+                    {
+                        this.Height =50;
+                        this.Border = 1;
+                        this.BorderColor = '#000000'
+                    };";
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, EbReport report)
         {
@@ -292,8 +292,8 @@ namespace ExpressBase.Objects.ReportRelated
             if (TopPt > report.MultiRowTop)
                 rowH = report.RowHeight;
             base.DrawMe(canvas, reportHeight, printingTop, report);
-            var x1 = LeftPt;
-            var y1 = reportHeight - (printingTop + TopPt + report.detailprintingtop);
+            float x1 = LeftPt;
+            float y1 = reportHeight - (printingTop + TopPt + report.detailprintingtop);
             canvas.SetColorStroke(GetColor(BorderColor));
             canvas.SetColorFill(GetColor(BorderColor));
             canvas.SetLineWidth(Border);
@@ -301,8 +301,8 @@ namespace ExpressBase.Objects.ReportRelated
             canvas.LineTo(x1 + 3, y1 - 3);
             canvas.LineTo(x1 - 3, y1 - 3);
             canvas.ClosePathFillStroke();
-            var x2 = LeftPt;
-            var y2 = reportHeight - (printingTop + TopPt + HeightPt + report.detailprintingtop + rowH);
+            float x2 = LeftPt;
+            float y2 = reportHeight - (printingTop + TopPt + HeightPt + report.detailprintingtop + rowH);
             canvas.MoveTo(x2, y2);
             canvas.LineTo(x2 - 3, y2 + 3);
             canvas.LineTo(x2 + 3, y2 + 3);
@@ -320,22 +320,22 @@ namespace ExpressBase.Objects.ReportRelated
         public override string GetJsInitFunc()
         {
             return @"
-    this.Init = function(id)
-        {
-    this.Width= 50;
-    this.Border = 1;
-    this.BorderColor = '#000000'
-};";
+                this.Init = function(id)
+                    {
+                        this.Width= 50;
+                        this.Border = 1;
+                        this.BorderColor = '#000000'
+                    };";
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, EbReport report)
         {
             float rowH = 0;
             if (TopPt > report.MultiRowTop)
                 rowH = report.RowHeight;
-            var x1 = LeftPt;
-            var y1 = reportHeight - (printingTop + TopPt + report.detailprintingtop + rowH);
-            var x2 = LeftPt + WidthPt;
-            var y2 = y1;
+            float x1 = LeftPt;
+            float y1 = reportHeight - (printingTop + TopPt + report.detailprintingtop + rowH);
+            float x2 = LeftPt + WidthPt;
+            float y2 = y1;
             canvas.SetColorStroke(GetColor(BorderColor));
             canvas.SetLineWidth(Border);
             canvas.MoveTo(x1, y1);
@@ -354,19 +354,19 @@ namespace ExpressBase.Objects.ReportRelated
         public override string GetJsInitFunc()
         {
             return @"
-    this.Init = function(id)
-        {
-    this.Height =50;
-    this.Border = 1;
-    this.BorderColor = '#000000'
-};";
+                this.Init = function(id)
+                    {
+                        this.Height =50;
+                        this.Border = 1;
+                        this.BorderColor = '#000000'
+                    };";
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, EbReport report)
         {
-            var x1 = LeftPt;
-            var y1 = reportHeight - (printingTop + TopPt + report.detailprintingtop);
-            var x2 = x1;
-            var y2 = reportHeight - (printingTop + TopPt + HeightPt + report.detailprintingtop);
+            float x1 = LeftPt;
+            float y1 = reportHeight - (printingTop + TopPt + report.detailprintingtop);
+            float x2 = x1;
+            float y2 = reportHeight - (printingTop + TopPt + HeightPt + report.detailprintingtop);
             canvas.SetColorStroke(GetColor(BorderColor));
             canvas.SetLineWidth(Border);
             canvas.MoveTo(x1, y1);
@@ -394,20 +394,20 @@ namespace ExpressBase.Objects.ReportRelated
         public override string GetDesignHtml()
         {
             return @"<div class='eb_table_container dropped' id='@id' eb-type='TableLayout' 
-style='top: @Top px;left: @Left px;height: @Height px;width: @Width px;'>
-<table onclick='$(this).parent().click();' style='border: @Border px solid ; border-color: @BorderColor ;' class='table eb_table_layout'>
-<tr><td eb-type='TableLayout'></td><td eb-type='TableLayout'></td><td eb-type='TableLayout'></td></tr>
-</table><div class='eb_draggbale_table_handle' onclick='$(this).parent().focus();'><i class='fa fa-arrows'></i></div></div>".RemoveCR().DoubleQuoted();
-        }
+                style='top: @Top px;left: @Left px;height: @Height px;width: @Width px;'>
+                <table onclick='$(this).parent().click();' style='border: @Border px solid ; border-color: @BorderColor ;' class='table eb_table_layout'>
+                <tr><td eb-type='TableLayout'></td><td eb-type='TableLayout'></td><td eb-type='TableLayout'></td></tr>
+                </table><div class='eb_draggbale_table_handle' onclick='$(this).parent().focus();'><i class='fa fa-arrows'></i></div></div>".RemoveCR().DoubleQuoted();
+                        }
         public override string GetJsInitFunc()
         {
             return @"
-    this.Init = function(id)
-        {
-    this.Width= 300;
-    this.Border = 1;
-    this.BorderColor = '#eeeeee';
-};";
+                this.Init = function(id)
+                    {
+                        this.Width= 300;
+                        this.Border = 1;
+                        this.BorderColor = '#eeeeee';
+                    };";
         }
     }
 }
