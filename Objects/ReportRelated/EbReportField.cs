@@ -57,18 +57,35 @@ namespace ExpressBase.Objects.ReportRelated
             var colr = ColorTranslator.FromHtml(Color).ToArgb();
             return new BaseColor(colr);
         }
-        public virtual void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop) { }
-        //public virtual void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, float rowH)
-        //{
-        //}
-        public virtual void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, EbReport report) { }
-        public virtual void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, string column_name, float detailprintingtop, DbType column_type) { }
-        public virtual void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_name) { }
-        public virtual void DrawMe(Document doc, PdfContentByte canvas, float reportHeight, float printingTop, string column_val, float detailprintingtop, DbType column_type, List<Param> l) { }
-        public virtual void DrawMe(Document doc, PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_name) { }
-        public virtual void DrawMe(Document d, byte[] fileByte) { }
-        public virtual void DrawMe(Document d, PdfWriter writer, byte[] fileByte, float reportHeight) { }
-        public virtual void DrawMe(Document d, byte[] fileByte, float reportHeight, float printingTop, float detailprintingtop) { }
+
+        public virtual void DrawMe(Document d, byte[] fileByte)
+        {
+        }
+        public virtual void DrawMe(Document d, PdfWriter writer, byte[] fileByte, float reportHeight)
+        {
+        }
+        public virtual void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, EbReport report)
+        {
+        }
+        public virtual void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop)
+        {
+        }
+        public virtual void DrawMe(Document d, byte[] fileByte, float reportHeight, float printingTop, float detailprintingtop)
+        {
+        }
+        public virtual void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_name)
+        {
+        }
+        public virtual void DrawMe(Document doc, PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_name)
+        {
+        }
+        public virtual void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, string column_name, float detailprintingtop, DbType column_type)
+        {
+        }
+        public virtual void DrawMe(Document doc, PdfContentByte canvas, float reportHeight, float printingTop, string column_val, float detailprintingtop, DbType column_type, List<Param> l)
+        {
+        }
+
         private iTextSharp.text.Font iTextFont = null;
         public virtual iTextSharp.text.Font ITextFont
         {
@@ -703,7 +720,7 @@ this.BorderColor = '#eae6e6';
             ct.Go();
         }
     }
-    
+
     [EnableInBuilder(BuilderType.Report)]
     public class EbLocFieldImage : EbReportField
     {
