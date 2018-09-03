@@ -118,13 +118,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 4)]
         public List<OrderBy> OrderBy { get; set; }
-
-        //[DataMember(Order = 4)]
-        //public int OrderByDir { get; set; }
-
-        //[DataMember(Order = 5)]
-        //public string OrderByCol { get; set; }
-
+        
         [DataMember(Order = 6)]
         public string Token { get; set; }
 
@@ -154,6 +148,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 13)]
         public User UserInfo { get; set; }
+
+        [DataMember(Order = 14)]
+        public List<int> RGIndex { get; set; }
     }
 
     [Route("/table")]
