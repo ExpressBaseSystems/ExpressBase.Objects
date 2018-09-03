@@ -26,6 +26,7 @@ namespace ExpressBase.Objects
             }";
             }
         }
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
         [PropertyEditor(PropertyEditorType.Collection)]
         [Alias("Columns")]

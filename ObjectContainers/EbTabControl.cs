@@ -4,6 +4,7 @@ using ExpressBase.Common.Objects.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace ExpressBase.Objects
@@ -11,48 +12,87 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.WebForm)]
     public class EbTabControl : EbControlContainer
     {
-        public EbTabControl() { }
+        public EbTabControl() {
+
+            this.Controls = new List<EbControl>();
+            this.ControlsT = new List<EbControl>();            
+            this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
+        }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        [Alias("TabCollection")]
+        [PropertyGroup("test")]
+        public override List<EbControl> Controls { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        [PropertyGroup("test")]
+        public List<EbControl> ControlsT { get; set; }
+
         public override string GetDesignHtml()
         {
-            return @"
-<div class='Eb-ctrlContainer' Ctype='TableLayout'>
-    <table style='width:100%'   style=' @BackColor  @ForeColor ' >
-        <tr>
-            <td id='@id_Td0' class='tdDropable' ></td>
-            <td id='@id_Td1' class='tdDropable'></td style='min-height:20px;'> 
-        </tr>
-    </table>
-</div>"
-    .Replace("@BackColor ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor ") + ";"))
-    .Replace("@ForeColor ", "color:" + ((this.ForeColor != null) ? this.ForeColor : "@ForeColor ") + ";").RemoveCR().DoubleQuoted();
+            string Html = "<div class='Eb-ctrlContainer' Ctype='TabControl'>";
+            this.Controls = new List<EbControl>();
+            this.Controls.Add(new EbTabPane { Name = "EbTab0TabPane0" });
+            Html += GetHtml() + "</div>";
+            return Html.RemoveCR().DoubleQuoted(); ;
         }
 
         public override string GetJsInitFunc()
         {
-            return @"";
-        }
-
-        public override string GetHead()
-        {
-            string head = string.Empty;
-
-            if (base.Controls != null)
-            {
-                foreach (EbControl ec in base.Controls)
-                    head += ec.GetHead();
-            }
-
-            return head;
+            return @"
+this.Init = function(id)
+{
+    this.Controls.$values.push(new EbObjects.EbTabPane('EbTab0TabPane0'));
+    this.ControlsT = this.Controls;
+};";
         }
 
         public override string GetHtml()
         {
-            string html = "<div id='menu1' class='tab-pane fade'>";
+            string TabBtnHtml = "<div class='Eb-ctrlContainer' Ctype='TabControl'><ul class='nav nav-tabs'>";
+            string TabContentHtml = "<div class='tab-content'>";
 
-            foreach (EbControl ec in base.Controls)
+            foreach (EbControl tab in Controls)
+                TabBtnHtml += "<li><a data-toggle='tab' href='#@name@'>@name@</a></li>".Replace("@name@", tab.Name);
+
+            TabBtnHtml += "</ul>";
+
+
+            foreach (EbControl tab in Controls)
+                TabContentHtml += tab.GetHtml();
+
+            TabContentHtml += "</div>";
+            Regex regex = new Regex(Regex.Escape("@inactive"));
+            TabContentHtml = regex.Replace(TabContentHtml, "in active", 1).Replace("@inactive","");
+
+            return string.Concat(TabBtnHtml, TabContentHtml) ;
+        }
+    }
+
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+    [HideInToolBox]
+    public class EbTabPane : EbControlContainer
+    {
+        public EbTabPane()
+        {
+            this.Controls = new List<EbControl>();
+            this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
+        }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        [HideInPropertyGrid]
+        public override List<EbControl> Controls { get; set; }
+
+        public override string GetHtml()
+        {
+            string html = "<div id='@name@' class='tab-pane fade @inactive'>";
+
+            foreach (EbControl ec in this.Controls)
                 html += ec.GetHtml();
 
-            return html + "</div>";
+            return (html + "</div>").Replace("@name@", this.Name);
         }
     }
 }
