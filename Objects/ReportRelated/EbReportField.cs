@@ -54,7 +54,7 @@ namespace ExpressBase.Objects.ReportRelated
 
         public BaseColor GetColor(string Color)
         {
-            var colr = ColorTranslator.FromHtml(Color).ToArgb();
+            int colr = ColorTranslator.FromHtml(Color).ToArgb();
             return new BaseColor(colr);
         }
 
@@ -140,14 +140,14 @@ namespace ExpressBase.Objects.ReportRelated
         public override string GetJsInitFunc()
         {
             return @"
-    this.Init = function(id)
-        {
-    this.Height =40;
-    this.Width= 40;
-    this.Source = 'url(../images/image.png) center no-repeat';
-    this.Border = 1;
-this.BorderColor = '#eae6e6';
-};";
+                this.Init = function(id)
+                {
+                    this.Height =40;
+                    this.Width= 40;
+                    this.Source = 'url(../images/image.png) center no-repeat';
+                    this.Border = 1;
+                    this.BorderColor = '#eae6e6';
+                };";
         }
         public override void DrawMe(Document d, byte[] fileByte, float reportHeight, float printingTop, float detailprintingtop)
         {
@@ -198,14 +198,14 @@ this.BorderColor = '#eae6e6';
         public override string GetJsInitFunc()
         {
             return @"
-    this.Init = function(id)
-        {
-    this.Height =50;
-    this.Width= 50;
-    this.Source = 'url(../images/image.png) center no-repeat';
-this.Border = 1;
-this.BorderColor = '#eae6e6';
-};";
+                this.Init = function(id)
+                {
+                    this.Height =50;
+                    this.Width= 50;
+                    this.Source = 'url(../images/image.png) center no-repeat';
+                    this.Border = 1;
+                    this.BorderColor = '#eae6e6';
+                };";
         }
 
         public override void DrawMe(Document d, PdfWriter writer, byte[] fileByte, float reportHeight)
@@ -275,22 +275,22 @@ this.BorderColor = '#eae6e6';
         public override string GetJsInitFunc()
         {
             return @"
-    this.Init = function(id)
-        {
-     this.Height =25;
-    this.Width= 200;
-    this.ForeColor = '#201c1c';
-    this.Border = 1;
-    this.BorderColor = '#eae6e6';
-    };";
+                this.Init = function(id)
+                {
+                    this.Height =25;
+                    this.Width= 200;
+                    this.ForeColor = '#201c1c';
+                    this.Border = 1;
+                    this.BorderColor = '#eae6e6';
+                };";
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
         {
 
-            var urx = WidthPt + LeftPt;
-            var ury = reportHeight - (printingTop + TopPt + detailprintingtop);
-            var llx = LeftPt;
-            var lly = reportHeight - (printingTop + TopPt + HeightPt + detailprintingtop);
+            float urx = WidthPt + LeftPt;
+            float ury = reportHeight - (printingTop + TopPt + detailprintingtop);
+            float llx = LeftPt;
+            float lly = reportHeight - (printingTop + TopPt + HeightPt + detailprintingtop);
             column_val = FormatDate(column_val);
             Phrase phrase = null;
             phrase = new Phrase(column_val, ITextFont);
@@ -316,21 +316,21 @@ this.BorderColor = '#eae6e6';
         public override string GetJsInitFunc()
         {
             return @"
-    this.Init = function(id)
-        {
-     this.Height =25;
-    this.Width= 100;
-    this.ForeColor = '#201c1c';
-this.Border = 1;
-this.BorderColor = '#eae6e6';
-};";
+                this.Init = function(id)
+                {
+                    this.Height =25;
+                    this.Width= 100;
+                    this.ForeColor = '#201c1c';
+                    this.Border = 1;
+                    this.BorderColor = '#eae6e6';
+                };";
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
         {
-            var urx = WidthPt + LeftPt;
-            var ury = reportHeight - (printingTop + TopPt + detailprintingtop);
-            var llx = LeftPt;
-            var lly = reportHeight - (printingTop + TopPt + HeightPt + detailprintingtop);
+            float urx = WidthPt + LeftPt;
+            float ury = reportHeight - (printingTop + TopPt + detailprintingtop);
+            float llx = LeftPt;
+            float lly = reportHeight - (printingTop + TopPt + HeightPt + detailprintingtop);
             Phrase phrase = null;
 
             phrase = new Phrase(column_val, ITextFont);
@@ -356,21 +356,21 @@ this.BorderColor = '#eae6e6';
         public override string GetJsInitFunc()
         {
             return @"
-    this.Init = function(id)
-        {
-     this.Height =25;
-    this.Width= 100;
-    this.ForeColor = '#201c1c';
-this.Border = 1;
-this.BorderColor = '#eae6e6';
-};";
+                this.Init = function(id)
+                {
+                    this.Height =25;
+                    this.Width= 100;
+                    this.ForeColor = '#201c1c';
+                    this.Border = 1;
+                    this.BorderColor = '#eae6e6';
+                };";
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
         {
-            var urx = WidthPt + LeftPt;
-            var ury = reportHeight - (printingTop + TopPt + detailprintingtop);
-            var llx = LeftPt;
-            var lly = reportHeight - (printingTop + TopPt + HeightPt + detailprintingtop);
+            float urx = WidthPt + LeftPt;
+            float ury = reportHeight - (printingTop + TopPt + detailprintingtop);
+            float llx = LeftPt;
+            float lly = reportHeight - (printingTop + TopPt + HeightPt + detailprintingtop);
 
             Phrase phrase = null;
             phrase = new Phrase(column_val, ITextFont);
@@ -396,21 +396,21 @@ this.BorderColor = '#eae6e6';
         public override string GetJsInitFunc()
         {
             return @"
-    this.Init = function(id)
-        {
-     this.Height =25;
-    this.Width= 100;
-    this.ForeColor = '#201c1c';
-this.Border = 1;
-this.BorderColor = '#eae6e6';
-};";
+                this.Init = function(id)
+                {
+                    this.Height =25;
+                    this.Width= 100;
+                    this.ForeColor = '#201c1c';
+                    this.Border = 1;
+                    this.BorderColor = '#eae6e6';
+                };";
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
         {
-            var urx = WidthPt + LeftPt;
-            var ury = reportHeight - (printingTop + TopPt + detailprintingtop);
-            var llx = LeftPt;
-            var lly = reportHeight - (printingTop + TopPt + HeightPt + detailprintingtop);
+            float urx = WidthPt + LeftPt;
+            float ury = reportHeight - (printingTop + TopPt + detailprintingtop);
+            float llx = LeftPt;
+            float lly = reportHeight - (printingTop + TopPt + HeightPt + detailprintingtop);
 
             Phrase phrase = null;
             phrase = new Phrase(column_val, ITextFont);
@@ -432,21 +432,21 @@ this.BorderColor = '#eae6e6';
         public override string GetJsInitFunc()
         {
             return @"
-    this.Init = function(id)
-        {
-     this.Height =25;
-    this.Width= 200;
-    this.ForeColor = '#201c1c';
-this.Border = 1;
-this.BorderColor = '#eae6e6';
-};";
+                this.Init = function(id)
+                {
+                    this.Height =25;
+                    this.Width= 200;
+                    this.ForeColor = '#201c1c';
+                    this.Border = 1;
+                    this.BorderColor = '#eae6e6';
+                };";
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, EbReport report)
         {
-            var urx = WidthPt + LeftPt;
-            var ury = reportHeight - (printingTop + TopPt + report.detailprintingtop);
-            var llx = LeftPt;
-            var lly = reportHeight - (printingTop + TopPt + HeightPt + report.detailprintingtop + report.RowHeight);
+            float urx = WidthPt + LeftPt;
+            float ury = reportHeight - (printingTop + TopPt + report.detailprintingtop);
+            float llx = LeftPt;
+            float lly = reportHeight - (printingTop + TopPt + HeightPt + report.detailprintingtop + report.RowHeight);
 
             ColumnText ct = new ColumnText(canvas);
             Phrase phrase = null;
@@ -474,21 +474,21 @@ this.BorderColor = '#eae6e6';
         public override string GetJsInitFunc()
         {
             return @"
-    this.Init = function(id)
-        {
-     this.Height =25;
-    this.Width= 200;
-    this.ForeColor = '#201c1c';
-this.Border = 1;
-this.BorderColor = '#eae6e6';
-};";
+                this.Init = function(id)
+                {
+                    this.Height =25;
+                    this.Width= 200;
+                    this.ForeColor = '#201c1c';
+                    this.Border = 1;
+                    this.orderColor = '#eae6e6';
+                };";
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
         {
-            var urx = WidthPt + LeftPt;
-            var ury = reportHeight - (printingTop + TopPt + detailprintingtop);
-            var llx = LeftPt;
-            var lly = reportHeight - (printingTop + TopPt + HeightPt + detailprintingtop);
+            float urx = WidthPt + LeftPt;
+            float ury = reportHeight - (printingTop + TopPt + detailprintingtop);
+            float llx = LeftPt;
+            float lly = reportHeight - (printingTop + TopPt + HeightPt + detailprintingtop);
 
             Phrase phrase = null;
             phrase = new Phrase(column_val, ITextFont);
@@ -541,14 +541,14 @@ this.BorderColor = '#eae6e6';
         public override string GetJsInitFunc()
         {
             return @"
-    this.Init = function(id)
-        {
-     this.Height =40;
-    this.Width= 140;
-    this.Source = 'url(../images/barcode.png) center no-repeat';
-this.Border = 1;
-this.BorderColor = '#eae6e6';
-};";
+                this.Init = function(id)
+                {
+                    this.Height =40;
+                    this.Width= 140;
+                    this.Source = 'url(../images/barcode.png) center no-repeat';
+                    this.Border = 1;
+                    this.BorderColor = '#eae6e6';
+                };";
         }
         public override void DrawMe(Document doc, PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string code_val)
         {
@@ -618,7 +618,7 @@ this.BorderColor = '#eae6e6';
             {
                 Console.WriteLine("Exception: " + e.ToString());
                 ColumnText ct = new ColumnText(canvas);
-                var x = reportHeight - (printingTop + TopPt + detailprintingtop);
+                float x = reportHeight - (printingTop + TopPt + detailprintingtop);
                 ct.SetSimpleColumn(new Phrase("Error in generating barcode"), LeftPt, x - HeightPt, LeftPt + WidthPt, x, 15, (int)TextAlign);
                 ct.Go();
             }
@@ -653,14 +653,14 @@ this.BorderColor = '#eae6e6';
         public override string GetJsInitFunc()
         {
             return @"
-    this.Init = function(id)
-        {
-     this.Height =40;
-    this.Width= 40; 
-    this.Source = 'url(../images/Qr-code.png) center no-repeat';
-this.Border = 1;
-this.BorderColor = '#eae6e6';
-};";
+                this.Init = function(id)
+                {
+                    this.Height =40;
+                    this.Width= 40; 
+                    this.Source = 'url(../images/Qr-code.png) center no-repeat';
+                    this.Border = 1;
+                    this.BorderColor = '#eae6e6';
+                };";
         }
         public override void DrawMe(Document doc, PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string code_val)
         {
@@ -678,7 +678,7 @@ this.BorderColor = '#eae6e6';
             catch (Exception e)
             {
                 ColumnText ct = new ColumnText(canvas);
-                var x = reportHeight - (printingTop + TopPt + detailprintingtop);
+                float x = reportHeight - (printingTop + TopPt + detailprintingtop);
                 ct.SetSimpleColumn(new Phrase("Error in generating barcode"), LeftPt, x - HeightPt, LeftPt + WidthPt, x, 15, (int)TextAlign);
                 ct.Go();
                 Console.WriteLine("Exception: " + e.ToString());
@@ -696,21 +696,21 @@ this.BorderColor = '#eae6e6';
         public override string GetJsInitFunc()
         {
             return @"
-    this.Init = function(id)
-        {
-     this.Height =25;
-    this.Width= 200;
-    this.ForeColor = '#201c1c';
-this.Border = 1;
-this.BorderColor = '#eae6e6';
-};";
+                this.Init = function(id)
+                {
+                    this.Height =25;
+                    this.Width= 200;
+                    this.ForeColor = '#201c1c';
+                    this.Border = 1;
+                    this.BorderColor = '#eae6e6';
+                };";
         }
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
         {
-            var urx = WidthPt + LeftPt;
-            var ury = reportHeight - (printingTop + TopPt + detailprintingtop);
-            var llx = LeftPt;
-            var lly = reportHeight - (printingTop + TopPt + HeightPt + detailprintingtop);
+            float urx = WidthPt + LeftPt;
+            float ury = reportHeight - (printingTop + TopPt + detailprintingtop);
+            float llx = LeftPt;
+            float lly = reportHeight - (printingTop + TopPt + HeightPt + detailprintingtop);
 
             Phrase phrase = null;
             phrase = new Phrase(column_val, ITextFont);
@@ -735,13 +735,13 @@ this.BorderColor = '#eae6e6';
         public override string GetJsInitFunc()
         {
             return @"
-    this.Init = function(id)
-        {
-    this.Height =40;
-    this.Width= 40;
-    this.Border = 1;
-this.BorderColor = '#eae6e6';
-};";
+                this.Init = function(id)
+                {
+                    this.Height =40;
+                    this.Width= 40;
+                    this.Border = 1;
+                    this.BorderColor = '#eae6e6';
+                };";
         }
         public override void DrawMe(Document d, byte[] fileByte, float reportHeight, float printingTop, float detailprintingtop)
         {
@@ -768,22 +768,22 @@ this.BorderColor = '#eae6e6';
         public override string GetJsInitFunc()
         {
             return @"
-    this.Init = function(id)
-        {
-     this.Height =25;
-    this.Width= 200;
-    this.ForeColor = '#201c1c';
-this.Border = 1;
-this.BorderColor = '#eae6e6';
-};";
+                this.Init = function(id)
+                {
+                    this.Height =25;
+                    this.Width= 200;
+                    this.ForeColor = '#201c1c';
+                    this.Border = 1;
+                    this.BorderColor = '#eae6e6';
+                };";
         }
 
         public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
         {
-            var urx = WidthPt + LeftPt;
-            var ury = reportHeight - (printingTop + TopPt + detailprintingtop);
-            var llx = LeftPt;
-            var lly = reportHeight - (printingTop + TopPt + HeightPt + detailprintingtop);
+            float urx = WidthPt + LeftPt;
+            float ury = reportHeight - (printingTop + TopPt + detailprintingtop);
+            float llx = LeftPt;
+            float lly = reportHeight - (printingTop + TopPt + HeightPt + detailprintingtop);
             Phrase phrase = null;
             phrase = new Phrase(column_val, ITextFont);
             ColumnText ct = new ColumnText(canvas);

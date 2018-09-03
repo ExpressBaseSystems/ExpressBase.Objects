@@ -80,14 +80,14 @@ namespace ExpressBase.Objects.ReportRelated
             {
                 if (_dataFieldsUsed == null)
                 {
-                    var matches = Regex.Matches(this.AppearanceExpression, @"T[0-9]{1}.\w+").OfType<Match>()
+                    IEnumerable<string> matches = Regex.Matches(this.AppearanceExpression, @"T[0-9]{1}.\w+").OfType<Match>()
      .Select(m => m.Groups[0].Value)
      .Distinct();
 
 
                     _dataFieldsUsed = new string[matches.Count()];
                     int i = 0;
-                    foreach (var match in matches)
+                    foreach (string match in matches)
                         _dataFieldsUsed[i++] = match;
                 }
 
@@ -99,7 +99,7 @@ namespace ExpressBase.Objects.ReportRelated
 
             ColumnText ct = new ColumnText(canvas);
             Phrase text;
-            
+
             if (Prefix != "" || Suffix != "")
             {
                 column_val = Prefix + " " + column_val + " " + Suffix;
@@ -124,9 +124,9 @@ namespace ExpressBase.Objects.ReportRelated
             {
                 ct.AddText(text);
             }
-            var ury = reportHeight - (printingTop + TopPt + detailprintingtop);
-            var lly = reportHeight - (printingTop + TopPt + HeightPt + detailprintingtop);
-            ct.SetSimpleColumn(LeftPt, lly,WidthPt + LeftPt, ury, 15, (int)TextAlign);
+            float ury = reportHeight - (printingTop + TopPt + detailprintingtop);
+            float lly = reportHeight - (printingTop + TopPt + HeightPt + detailprintingtop);
+            ct.SetSimpleColumn(LeftPt, lly, WidthPt + LeftPt, ury, 15, (int)TextAlign);
             ct.Go();
         }
 
@@ -134,9 +134,9 @@ namespace ExpressBase.Objects.ReportRelated
         {
             if (column_val != string.Empty)
             {
-                var calcbasefont = text.Font.GetCalculatedBaseFont(false);
+                BaseFont calcbasefont = text.Font.GetCalculatedBaseFont(false);
                 float stringwidth = calcbasefont.GetWidthPoint(column_val, text.Font.CalculatedSize);
-                var charwidth = stringwidth / column_val.Length;
+                float charwidth = stringwidth / column_val.Length;
                 int numberofCharsInALine = Convert.ToInt32(Math.Floor(WidthPt / charwidth));
                 if (numberofCharsInALine < column_val.Length)
                 {
@@ -171,14 +171,14 @@ namespace ExpressBase.Objects.ReportRelated
         public override string GetJsInitFunc()
         {
             return @"
-        this.Init = function(id)
-            {
-        this.Height =25;
-        this.Width= 200;
-        this.ForeColor = '#201c1c';
-        this.Border = 1;
-        this.BorderColor = '#eae6e6';
-        };";
+                this.Init = function(id)
+                    {
+                        this.Height =25;
+                        this.Width= 200;
+                        this.ForeColor = '#201c1c';
+                        this.Border = 1;
+                        this.BorderColor = '#eae6e6';
+                    };";
         }
 
         public override void DrawMe(Document doc, PdfContentByte canvas, float reportHeight, float printingTop, string column_val, float detailprintingtop, DbType column_type, List<Param> Params)
@@ -205,10 +205,10 @@ namespace ExpressBase.Objects.ReportRelated
             {
                 ct.AddText(text);
             }
-            var ury = reportHeight - (printingTop + TopPt + detailprintingtop);
-                var lly = reportHeight - (printingTop + TopPt + HeightPt + detailprintingtop);
-                ct.SetSimpleColumn(LeftPt, lly, WidthPt + LeftPt, ury, 15, (int)TextAlign);
-                ct.Go();
+            float ury = reportHeight - (printingTop + TopPt + detailprintingtop);
+            float lly = reportHeight - (printingTop + TopPt + HeightPt + detailprintingtop);
+            ct.SetSimpleColumn(LeftPt, lly, WidthPt + LeftPt, ury, 15, (int)TextAlign);
+            ct.Go();
         }
 
     }
@@ -228,14 +228,14 @@ namespace ExpressBase.Objects.ReportRelated
         public override string GetJsInitFunc()
         {
             return @"
-        this.Init = function(id)
-            {
-        this.Height =25;
-        this.Width= 200;
-        this.ForeColor = '#201c1c';
-        this.Border = 1;
-        this.BorderColor = '#eae6e6';
-        };";
+                this.Init = function(id)
+                    {
+                        this.Height =25;
+                        this.Width= 200;
+                        this.ForeColor = '#201c1c';
+                        this.Border = 1;
+                        this.BorderColor = '#eae6e6';
+                    };";
         }
 
         public string FormatDate(string column_val)
@@ -283,8 +283,8 @@ namespace ExpressBase.Objects.ReportRelated
             {
                 ct.AddText(text);
             }
-            var ury = reportHeight - (printingTop + TopPt + detailprintingtop);
-            var lly = reportHeight - (printingTop + TopPt + HeightPt + detailprintingtop);
+            float ury = reportHeight - (printingTop + TopPt + detailprintingtop);
+            float lly = reportHeight - (printingTop + TopPt + HeightPt + detailprintingtop);
             ct.SetSimpleColumn(LeftPt, lly, WidthPt + LeftPt, ury, 15, (int)TextAlign);
             ct.Go();
         }
@@ -301,14 +301,14 @@ namespace ExpressBase.Objects.ReportRelated
         public override string GetJsInitFunc()
         {
             return @"
-         this.Init = function(id)
-        {
-        this.Height =25;
-        this.Width= 200;
-        this.ForeColor = '#201c1c';
-        this.Border = 1;
-        this.BorderColor = '#eae6e6';
-        };";
+                 this.Init = function(id)
+                {
+                    this.Height =25;
+                    this.Width= 200;
+                    this.ForeColor = '#201c1c';
+                    this.Border = 1;
+                    this.BorderColor = '#eae6e6';
+                };";
         }
     }
 
@@ -335,22 +335,22 @@ namespace ExpressBase.Objects.ReportRelated
         public override string GetJsInitFunc()
         {
             return @"
-    this.Init = function(id)
-        {
-    this.Height =25;
-    this.Width= 200;
-    this.ForeColor = '#201c1c';
-this.Border = 1;
-this.BorderColor = '#eae6e6';
-};";
+                this.Init = function(id)
+                    {
+                        this.Height =25;
+                        this.Width= 200;
+                        this.ForeColor = '#201c1c';
+                        this.Border = 1;
+                        this.BorderColor = '#eae6e6';
+                    };";
         }
 
         public override void DrawMe(Document doc, PdfContentByte canvas, float reportHeight, float printingTop, string column_val, float detailprintingtop, DbType column_type, List<Param> Params)
         {
             Phrase text;
             ColumnText ct = new ColumnText(canvas);
-            var ury = reportHeight - (printingTop + TopPt + detailprintingtop);
-            var lly = reportHeight - (printingTop + TopPt + HeightPt + detailprintingtop);
+            float ury = reportHeight - (printingTop + TopPt + detailprintingtop);
+            float lly = reportHeight - (printingTop + TopPt + HeightPt + detailprintingtop);
             if (DecimalPlaces > 0)
                 column_val = Convert.ToDecimal(column_val).ToString("F" + DecimalPlaces);
             if (InLetters)
@@ -475,20 +475,20 @@ this.BorderColor = '#eae6e6';
         public override string GetJsInitFunc()
         {
             return @"
-    this.Init = function(id)
-        {
-    this.Height =25;
-    this.Width= 200;
-    this.ForeColor = '#201c1c';
-this.Border = 1;
-this.BorderColor = '#eae6e6';
-};";
+                this.Init = function(id)
+                {
+                    this.Height =25;
+                    this.Width= 200;
+                    this.ForeColor = '#201c1c';
+                    this.Border = 1;
+                    this.BorderColor = '#eae6e6';
+                };";
         }
         public override void DrawMe(Document doc, PdfContentByte canvas, float reportHeight, float printingTop, string column_val, float detailprintingtop, DbType column_type, List<Param> Params)
         {
             Phrase text;
-            var ury = reportHeight - (printingTop + TopPt + detailprintingtop);
-            var lly = reportHeight - (printingTop + TopPt + HeightPt + detailprintingtop);
+            float ury = reportHeight - (printingTop + TopPt + detailprintingtop);
+            float lly = reportHeight - (printingTop + TopPt + HeightPt + detailprintingtop);
             if (DecimalPlaces > 0)
                 column_val = Convert.ToDecimal(column_val).ToString("F" + DecimalPlaces);
             if (InLetters)
@@ -542,7 +542,7 @@ this.BorderColor = '#eae6e6';
 
         public void Summarize(object value)
         {
-            var myvalue = value.ToString();
+            string myvalue = value.ToString();
             Count++;
             if (Count > 1)
             {
@@ -568,14 +568,14 @@ this.BorderColor = '#eae6e6';
         public override string GetJsInitFunc()
         {
             return @"
-        this.Init = function(id)
-            {
-        this.Height =25;
-        this.Width= 200;
-        this.ForeColor = '#201c1c';
-        this.Border = 1;
-        this.BorderColor = '#eae6e6';
-        };";
+                this.Init = function(id)
+                {
+                    this.Height =25;
+                    this.Width= 200;
+                    this.ForeColor = '#201c1c';
+                    this.Border = 1;
+                    this.BorderColor = '#eae6e6';
+                };";
         }
     }
 
@@ -613,7 +613,7 @@ this.BorderColor = '#eae6e6';
 
         public void Summarize(object value)
         {
-            var myvalue = Convert.ToDateTime(value);
+            DateTime myvalue = Convert.ToDateTime(value);
             Count++;
             if (Count > 1)
             {
@@ -730,14 +730,14 @@ this.BorderColor = '#eae6e6';
             {
                 if (_dataFieldsUsed == null)
                 {
-                    var matches = Regex.Matches(ValueExpression, @"T[0-9]{1}.\w+").OfType<Match>()
+                    IEnumerable<string> matches = Regex.Matches(ValueExpression, @"T[0-9]{1}.\w+").OfType<Match>()
      .Select(m => m.Groups[0].Value)
      .Distinct();
 
 
                     _dataFieldsUsed = new string[matches.Count()];
                     int i = 0;
-                    foreach (var match in matches)
+                    foreach (string match in matches)
                         _dataFieldsUsed[i++] = match;
                 }
 
@@ -790,8 +790,8 @@ this.BorderColor = '#eae6e6';
                 column_val = RenderMultiLine(column_val, text, column_type);
                 text = new Phrase(column_val, ITextFont);
             }
-            var ury = reportHeight - (printingTop + TopPt + detailprintingtop);
-            var lly = reportHeight - (printingTop + TopPt + HeightPt + detailprintingtop);
+            float ury = reportHeight - (printingTop + TopPt + detailprintingtop);
+            float lly = reportHeight - (printingTop + TopPt + HeightPt + detailprintingtop);
             ct.SetSimpleColumn(text, LeftPt, lly, WidthPt + LeftPt, ury, 15, (int)TextAlign);
             ct.Go();
         }
@@ -876,20 +876,20 @@ this.BorderColor = '#eae6e6';
         public override string GetJsInitFunc()
         {
             return @"
-         this.Init = function(id)
-            {
-        this.Height =25;
-        this.Width= 200;
-        this.ForeColor = '#201c1c';
-        this.Border = 1;
-        this.BorderColor = '#eae6e6';
-        };";
+                this.Init = function(id)
+                {
+                    this.Height =25;
+                    this.Width= 200;
+                    this.ForeColor = '#201c1c';
+                    this.Border = 1;
+                    this.BorderColor = '#eae6e6';
+                };";
         }
         public override void DrawMe(Document doc, PdfContentByte canvas, float reportHeight, float printingTop, string column_val, float detailprintingtop, DbType column_type, List<Param> Params)
         {
             Phrase text;
-            var ury = reportHeight - (printingTop + TopPt + detailprintingtop);
-            var lly = reportHeight - (printingTop + TopPt + HeightPt + detailprintingtop);
+            float ury = reportHeight - (printingTop + TopPt + detailprintingtop);
+            float lly = reportHeight - (printingTop + TopPt + HeightPt + detailprintingtop);
             if (DecimalPlaces > 0)
                 column_val = Convert.ToDecimal(column_val).ToString("F" + DecimalPlaces);
             if (InLetters)
@@ -944,7 +944,7 @@ this.BorderColor = '#eae6e6';
 
         public void Summarize(object value)
         {
-            var myvalue = value.ToString();
+            string myvalue = value.ToString();
             Count++;
             if (Count > 1)
             {
@@ -970,14 +970,14 @@ this.BorderColor = '#eae6e6';
         public override string GetJsInitFunc()
         {
             return @"
-    this.Init = function(id)
-        {
-    this.Height =25;
-    this.Width= 200;
-    this.ForeColor = '#201c1c';
-this.Border = 1;
-this.BorderColor = '#eae6e6';
-};";
+                this.Init = function(id)
+                {
+                    this.Height =25;
+                    this.Width= 200;
+                    this.ForeColor = '#201c1c';
+                    this.Border = 1;
+                    this.BorderColor = '#eae6e6';
+                };";
         }
     }
 
@@ -1015,7 +1015,7 @@ this.BorderColor = '#eae6e6';
 
         public void Summarize(object value)
         {
-            var myvalue = Convert.ToDateTime(value);
+            DateTime myvalue = Convert.ToDateTime(value);
             Count++;
             if (Count > 1)
             {
@@ -1040,14 +1040,14 @@ this.BorderColor = '#eae6e6';
         public override string GetJsInitFunc()
         {
             return @"
-    this.Init = function(id)
-        {
-    this.Height =25;
-    this.Width= 200;
-    this.ForeColor = '#201c1c';
-this.Border = 1;
-this.BorderColor = '#eae6e6';
-};";
+                this.Init = function(id)
+                {
+                    this.Height =25;
+                    this.Width= 200;
+                    this.ForeColor = '#201c1c';
+                    this.Border = 1;
+                    this.BorderColor = '#eae6e6';
+                };";
         }
     }
 
@@ -1086,14 +1086,14 @@ this.BorderColor = '#eae6e6';
         public override string GetJsInitFunc()
         {
             return @"
-    this.Init = function(id)
-        {
-    this.Height =25;
-    this.Width= 200;
-    this.ForeColor = '#201c1c';
-this.Border = 1;
-this.BorderColor = '#eae6e6';
-};";
+                this.Init = function(id)
+                {
+                    this.Height =25;
+                    this.Width= 200;
+                    this.ForeColor = '#201c1c';
+                    this.Border = 1;
+                    this.BorderColor = '#eae6e6';
+                };";
         }
     }
 }

@@ -373,13 +373,13 @@ namespace ExpressBase.Objects
         {
             get
             {
-                var rows = (DataSourceRefId != string.Empty) ? DataSet.Tables[0].Rows : null;
+                RowColletion rows = (DataSourceRefId != string.Empty) ? DataSet.Tables[0].Rows : null;
                 if (rows != null)
                 {
                     if (rows.Count > 0)
                     {
-                        var a = rows.Count * DetailHeight;
-                        var b = HeightPt - (PageHeaderHeight + PageFooterHeight + ReportHeaderHeight + ReportFooterHeight);
+                        float a = rows.Count * DetailHeight;
+                        float b = HeightPt - (PageHeaderHeight + PageFooterHeight + ReportHeaderHeight + ReportFooterHeight);
                         if (a < b && PageNumber == 1)
                             IsLastpage = true;
                     }
@@ -492,7 +492,7 @@ namespace ExpressBase.Objects
             byte[] fileByte = null;
             if (ReportObjects != null)
             {
-                foreach (var field in ReportObjects)
+                foreach (EbReportField field in ReportObjects)
                 {
                     if ((field as EbWaterMark).Image != string.Empty)
                         fileByte = WatermarkImages[(field as EbWaterMark).Image];
@@ -503,7 +503,7 @@ namespace ExpressBase.Objects
 
         public void CallSummerize(EbDataField field, int serialnumber)
         {
-            var column_val = string.Empty;
+            string column_val = string.Empty;
             Globals globals = new Globals
             {
                 CurrentField = field
@@ -529,7 +529,7 @@ namespace ExpressBase.Objects
             if (PageSummaryFields.ContainsKey(field.Name))
             {
                 SummaryList = PageSummaryFields[field.Name];
-                foreach (var item in SummaryList)
+                foreach (object item in SummaryList)
                 {
                     (item as IEbDataFieldSummary).Summarize(column_val);
                 }
@@ -537,7 +537,7 @@ namespace ExpressBase.Objects
             if (ReportSummaryFields.ContainsKey(field.Name))
             {
                 SummaryList = ReportSummaryFields[field.Name];
-                foreach (var item in SummaryList)
+                foreach (object item in SummaryList)
                 {
                     (item as IEbDataFieldSummary).Summarize(column_val);
                 }
@@ -597,7 +597,7 @@ namespace ExpressBase.Objects
                     }
                 }
             }
-            var rows = (DataSourceRefId != string.Empty) ? DataSet.Tables[tableIndex].Rows : null;
+            RowColletion rows = (DataSourceRefId != string.Empty) ? DataSet.Tables[tableIndex].Rows : null;
             if (rows != null && hasRows == true)
             {
                 for (iDetailRowPos = 0; iDetailRowPos < rows.Count; iDetailRowPos++)
@@ -697,12 +697,12 @@ namespace ExpressBase.Objects
                         }
                     }
                 }
-                var SortedReportFields = this.ReportFieldsSortedPerDetail[detail];
+                EbReportField[] SortedReportFields = this.ReportFieldsSortedPerDetail[detail];
                 if (SortedReportFields.Length > 0)
                 {
                     for (int iSortPos = 0; iSortPos < SortedReportFields.Length; iSortPos++)
                     {
-                        var field = SortedReportFields[iSortPos];
+                        EbReportField field = SortedReportFields[iSortPos];
                         field.HeightPt += RowHeight;
                         DrawFields(field, dt_Yposition, serialnumber);
                     }
@@ -1007,12 +1007,12 @@ namespace ExpressBase.Objects
 
         public override string DiscoverRelatedRefids()
         {
-            string refids="";
+            string refids = "";
             if (!DataSourceRefId.IsEmpty())
             {
                 EbDataSource ds = EbDataSource;
                 if (ds is null)
-                    refids += DataSourceRefId +",";
+                    refids += DataSourceRefId + ",";
             }
             foreach (EbReportDetail dt in Detail)
             {
@@ -1022,7 +1022,7 @@ namespace ExpressBase.Objects
                     {
                         if (!(field as EbDataField).LinkRefId.IsEmpty())
                         {
-                            refids += (field as EbDataField).LinkRefId+",";
+                            refids += (field as EbDataField).LinkRefId + ",";
                         }
                     }
                 }
