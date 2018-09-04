@@ -56,6 +56,24 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		[DataMember(Order = 10)]
 		public Dictionary<string, int> StaffDict { get; set; }
 
+		[DataMember(Order = 10)]
+		public List<string> CrntCityList { get; set; }
+
+		[DataMember(Order = 10)]
+		public List<string> CrntCountryList { get; set; }
+
+		[DataMember(Order = 10)]
+		public List<string> CityList { get; set; }
+
+		[DataMember(Order = 10)]
+		public List<string> SourceCategoryList { get; set; }
+
+		[DataMember(Order = 10)]
+		public List<string> SubCategoryList { get; set; }
+
+		[DataMember(Order = 11)]
+		public int RespMode { get; set; }
+
 	}
 
 	[DataContract]
@@ -286,7 +304,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public string Narration { get; set; }
 
 		[DataMember(Order = 11)]
-		public string Account_Code { get; set; }
+		public int Account_Code { get; set; }
 
 		[DataMember(Order = 12)]
 		public string Created_By { get; set; }

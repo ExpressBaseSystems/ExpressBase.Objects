@@ -135,6 +135,14 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             this.MQClient = _mq as EbMqClient;
         }
 
+        public EbBaseService(IEbConnectionFactory _dbf, IEbStaticFileClient _sfc, IMessageProducer _mqp, IMessageQueueClient _mqc)
+        {
+            this.EbConnectionFactory = _dbf as EbConnectionFactory;
+            this.FileClient = _sfc as EbStaticFileClient;
+            this.MessageProducer3 = _mqp as RabbitMqProducer;
+            this.MessageQueueClient = _mqc as RabbitMqQueueClient;
+        }
+
         private static Dictionary<string, string> _infraDbSqlQueries;
 
         public static Dictionary<string, string> InfraDbSqlQueries
