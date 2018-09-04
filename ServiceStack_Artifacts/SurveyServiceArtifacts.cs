@@ -280,4 +280,17 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public string Answer { get; set; }
     }
+    public class GetSurveyEnqRequest : IReturn<GetSurveyEnqResponse>, IEbSSRequest
+    {
+        public string TenantAccountId { get; set; }
+
+        public int UserId { get; set; }
+    }
+
+    public class GetSurveyEnqResponse : IEbSSResponse
+    {
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
 }
+
