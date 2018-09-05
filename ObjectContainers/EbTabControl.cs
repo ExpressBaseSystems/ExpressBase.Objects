@@ -66,7 +66,7 @@ this.Init = function(id)
             string TabContentHtml = "<div class='tab-content'>";
 
             foreach (EbControl tab in Controls)
-                TabBtnHtml += "<li @active><a data-toggle='tab' href='#@name@'>@name@</a></li>".Replace("@name@", tab.Name);
+                TabBtnHtml += "<li li-of='@name@' @active><a data-toggle='tab' href='#@name@'>@name@</a></li>".Replace("@name@", tab.Name);
 
             TabBtnHtml += "</ul>";
 
