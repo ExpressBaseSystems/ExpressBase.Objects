@@ -67,6 +67,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
         [PropertyGroup("Test")]
         [OnChangeUIFunction("EbTable.padding")]
+        [DefaultPropValue("3")]
         [UIproperty]
         public int Padding { get; set; }
 

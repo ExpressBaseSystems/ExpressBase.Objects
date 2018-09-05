@@ -34,21 +34,21 @@ namespace ExpressBase.Objects
 
 		public void InitFromDataBase(JsonServiceClient ServiceClient)
 		{
-			GetParticularSurveyResponse res = ServiceClient.Post<GetParticularSurveyResponse>(new GetParticularSurveyRequest { SurveyId = this.SurveyId });
-			foreach(KeyValuePair<int, Eb_SurveyQuestion> item in res.Queries)
-			{
-				List<EbSurveyQueriesOptions> _templist = new List<EbSurveyQueriesOptions>();
-				foreach (string ch in item.Value.Choices)
-				{
-					_templist.Add(new EbSurveyQueriesOptions { Option = ch});
-				}
-				this.QueryList.Add(new EbSurveyQueries {
-					QueryId = item.Value.Id,
-					Query = item.Value.Question,
-					OptionTypeId = item.Value.ChoiceType,
-					OptionsList = _templist
-				});				
-			}			
+			//GetParticularSurveyResponse res = ServiceClient.Post<GetParticularSurveyResponse>(new GetParticularSurveyRequest { SurveyId = this.SurveyId });
+			//foreach(KeyValuePair<int, Eb_SurveyQuestion> item in res.Queries)
+			//{
+			//	List<EbSurveyQueriesOptions> _templist = new List<EbSurveyQueriesOptions>();
+			//	foreach (string ch in item.Value.Choices)
+			//	{
+			//		_templist.Add(new EbSurveyQueriesOptions { Option = ch});
+			//	}
+			//	this.QueryList.Add(new EbSurveyQueries {
+			//		QueryId = item.Value.Id,
+			//		Query = item.Value.Question,
+			//		OptionTypeId = item.Value.ChoiceType,
+			//		OptionsList = _templist
+			//	});				
+			//}			
 		}
 
 		public override string DesignHtml4Bot
