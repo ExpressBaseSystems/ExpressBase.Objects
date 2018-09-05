@@ -56,7 +56,7 @@ namespace ExpressBase.Objects.EmailRelated
 
         [EnableInBuilder(BuilderType.EmailBuilder)]
         [HideInPropertyGrid]
-        public List<string> Parameters { get; set; }
+        public StringList Parameters { get; set; }
 
         [EnableInBuilder(BuilderType.EmailBuilder)]
         [HideInPropertyGrid]
@@ -147,5 +147,5 @@ namespace ExpressBase.Objects.EmailRelated
         }
     }
     /// related to property grid
-  
+ public class StringList: List<string> { }
 }

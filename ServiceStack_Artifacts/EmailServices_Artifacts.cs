@@ -39,7 +39,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class EmailServicesMqRequest : EbServiceStackRequest
+    public class EmailServicesMqRequest : EbMqRequest
     {
         [DataMember(Order = 1)]
         public string From { get; set; }
@@ -51,7 +51,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Subject { get; set; }
 
         [DataMember(Order = 4)]
-        public string refid { get; set; }
+        public string Refid { get; set; }
 
         [DataMember(Order = 5)]
         public string Cc { get; set; }
