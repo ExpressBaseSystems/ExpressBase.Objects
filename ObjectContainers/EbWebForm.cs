@@ -40,14 +40,14 @@ namespace ExpressBase.Objects
 
         public override string GetHtml()
         {
-            string html = "<form id='@name@' class='formB-box form-buider-form' eb-form='true' ui-inp eb-type='WebForm' tabindex='1'>";
+            string html = "<form id='@name@' ebsid='@ebsid@' class='formB-box form-buider-form' eb-form='true' ui-inp eb-type='WebForm' tabindex='1'>";
 
             foreach (EbControl c in this.Controls)
                 html += c.GetHtml();
 
             html += "</form>";
 
-            return html.Replace("@name@", this.Name);
+            return html.Replace("@name@", this.Name).Replace("@ebsid@", this.EbSid);
         }
 
         public string GetControlNames()

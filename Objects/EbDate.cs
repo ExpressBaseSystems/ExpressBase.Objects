@@ -195,6 +195,7 @@ $('#@id').MonthPicker({ StartYear: 2018, ShowIcon: false });"
                 HtmlConstants.CONTROL_WRAPER_HTML4WEB
 .Replace("@barehtml@", this.GetBareHtml())
 .Replace("@name@", this.Name)
+.Replace("@ebsid@", this.EbSid)
 .Replace("@type@", this.ObjType)
 
     .Replace("@LabelForeColor ", "color:" + (LabelForeColor ?? "@LabelForeColor ") + ";")
