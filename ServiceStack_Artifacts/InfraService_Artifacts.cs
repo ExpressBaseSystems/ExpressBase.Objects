@@ -194,7 +194,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class JoinbetaReq
+    public class JoinbetaReq : EbServiceStackNoAuthRequest
     {
         [DataMember(Order = 1)]
         public string Email { set; get; }

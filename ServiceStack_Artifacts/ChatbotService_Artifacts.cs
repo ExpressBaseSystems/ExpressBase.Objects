@@ -322,7 +322,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 	}
 
 	[DataContract]
-	public class GetBotsRequest : EbServiceStackAuthRequest, IReturn<GetBotsResponse>
+	public class GetBotsRequest : EbServiceStackNoAuthRequest, IReturn<GetBotsResponse>
 	{
 		[DataMember(Order = 1)]
 		public string Value { get; set; }

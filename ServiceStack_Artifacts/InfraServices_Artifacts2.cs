@@ -222,7 +222,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
        
     }
    
-    public class AutoGenSidRequest
+    public class AutoGenSidRequest : EbServiceStackNoAuthRequest
     {
         
     }
