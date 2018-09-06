@@ -27,7 +27,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Password { get; set; }
 
         [DataMember(Order = 5)]
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         [DataMember(Order = 6)]
         public string DbName { get; set; }
@@ -69,7 +69,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int Id { get; set; }
 
         [DataMember(Order = 3)]
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         public int UserId { get; set; }
 
@@ -107,7 +107,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 
         [DataMember(Order = 3)]
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         public int UserId { get; set; }
 
@@ -144,7 +144,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 
         [DataMember(Order = 3)]
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         public int UserId { get; set; }
 
@@ -195,7 +195,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int Id { get; set; }
 
         [DataMember(Order = 2)]
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         public int UserId { get; set; }
 
@@ -250,7 +250,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class CreateSolutionRequest : IReturn<CreateSolutionResponse>, IEbSSRequest
     {
         [DataMember(Order = 1)]
-        public string TenantAccountId { get; set; }        
+        public string SolnId { get; set; }        
 
         [DataMember(Order = 2)]
         public int UserId { get; set; }
@@ -286,7 +286,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     [DataContract]
     public class GetSolutionRequest : IReturn<GetSolutionResponse>, IEbSSRequest
     {
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         public int UserId { get; set; }
 
@@ -316,7 +316,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 0)]
         public string IsolutionId { get; set; }
 
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         public int UserId { get; set; }
 

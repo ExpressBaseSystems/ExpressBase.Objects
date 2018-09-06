@@ -7,7 +7,7 @@ using System.Text;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
-    public class SaveToAppStoreRequest : EbServiceStackRequest, IReturn<SaveToAppStoreResponse>
+    public class SaveToAppStoreRequest : EbServiceStackAuthRequest, IReturn<SaveToAppStoreResponse>
     {
 
         public AppStore Store { get; set; }
@@ -22,7 +22,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-    public class GetOneFromAppStoreRequest : EbServiceStackRequest, IReturn<GetOneFromAppstoreResponse>
+    public class GetOneFromAppStoreRequest : EbServiceStackAuthRequest, IReturn<GetOneFromAppstoreResponse>
     {
         public int Id { get; set; }
     }
@@ -39,7 +39,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-    public class GetAllFromAppStoreRequest : EbServiceStackRequest, IReturn<GetAllFromAppstoreResponse>
+    public class GetAllFromAppStoreRequest : EbServiceStackAuthRequest, IReturn<GetAllFromAppstoreResponse>
     {
     }
 
@@ -55,7 +55,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-    public class ShareToPublicRequest : EbServiceStackRequest, IReturn<ShareToPublicResponse>
+    public class ShareToPublicRequest : EbServiceStackAuthRequest, IReturn<ShareToPublicResponse>
     {
         public AppStore Store { get; set; }
     }
@@ -72,7 +72,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int ReturningId { get; set; }
     }
 
-    public class GetAppDetailsRequest : EbServiceStackRequest, IReturn<GetAppDetailsResponse>
+    public class GetAppDetailsRequest : EbServiceStackAuthRequest, IReturn<GetAppDetailsResponse>
     {
         public int Id { get; set; }
     }

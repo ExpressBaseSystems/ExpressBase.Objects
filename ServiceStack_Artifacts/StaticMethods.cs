@@ -28,7 +28,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             cmd.Parameters.Add(EbConnectionFactory.ObjectsDB.GetNewParameter(":obj_cur_status", EbDbTypes.Int32, (int)request.Status));
             cmd.Parameters.Add(EbConnectionFactory.ObjectsDB.GetNewParameter(":commit_uid", EbDbTypes.Int32, request.UserId));
             cmd.Parameters.Add(EbConnectionFactory.ObjectsDB.GetNewParameter(":src_pid", EbDbTypes.String, request.SourceSolutionId));
-            cmd.Parameters.Add(EbConnectionFactory.ObjectsDB.GetNewParameter(":cur_pid", EbDbTypes.String, request.TenantAccountId));
+            cmd.Parameters.Add(EbConnectionFactory.ObjectsDB.GetNewParameter(":cur_pid", EbDbTypes.String, request.SolnId));
             cmd.Parameters.Add(EbConnectionFactory.ObjectsDB.GetNewParameter(":relations", EbDbTypes.String, (request.Relations != null) ? request.Relations : string.Empty));
             cmd.Parameters.Add(EbConnectionFactory.ObjectsDB.GetNewParameter(":issave", EbDbTypes.String, (request.IsSave == true) ? 'T' : 'F'));
             cmd.Parameters.Add(EbConnectionFactory.ObjectsDB.GetNewParameter(":tags", EbDbTypes.String, (!string.IsNullOrEmpty(request.Tags)) ? request.Tags : string.Empty));

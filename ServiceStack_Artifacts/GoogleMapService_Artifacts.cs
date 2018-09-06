@@ -10,7 +10,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class GoogleMapRequest : IReturn<GoogleMapResponse>, IEbSSRequest
     {
         [DataMember(Order = 1)]
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         [DataMember(Order = 2)]
         public int UserId { get; set; }

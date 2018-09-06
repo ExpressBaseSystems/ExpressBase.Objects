@@ -17,7 +17,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Token { get; set; }
 
         [DataMember(Order = 2)]
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         [DataMember(Order = 3)]
         public string InfraDbSqlQueryKey { get; set; }
@@ -47,7 +47,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 2)]
         public string Token { get; set; }
 
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         public int UserId { get; set; }
     }
@@ -78,7 +78,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 1)]
         public string Token { get; set; }
 
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         public int UserId { get; set; }
     }
@@ -95,7 +95,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 2)]
         public string Token { get; set; }
 
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         public int UserId { get; set; }
     }
@@ -114,7 +114,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int Id { get; set; }
 
         [DataMember(Order = 3)]
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         [DataMember(Order = 4)]
         public int TId { get; set; }
@@ -162,7 +162,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 5)]
         public Dictionary<string, object> Colvalues { get; set; }
 
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         public int UserId { get; set; }
     }

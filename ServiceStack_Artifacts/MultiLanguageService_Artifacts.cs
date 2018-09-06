@@ -118,7 +118,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 	//}
 
 		
-	public class MLLoadLangRequest : EbServiceStackRequest, IReturn<MLLoadLangResponse>
+	public class MLLoadLangRequest : EbServiceStackAuthRequest, IReturn<MLLoadLangResponse>
 	{
 		public int Lang { get; set; }
 	}
@@ -135,7 +135,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 	}
 
 
-	public class MLGetSearchResultRqst: EbServiceStackRequest, IReturn<MLGetSearchResultRspns>
+	public class MLGetSearchResultRqst: EbServiceStackAuthRequest, IReturn<MLGetSearchResultRspns>
 	{
 		public string Key_String { get; set; }
 		public int Offset { get; set; }
@@ -157,7 +157,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 	}
 
 
-	public class MLGetStoredKeyValueRequest : EbServiceStackRequest, IReturn<MLGetStoredKeyValueResponse>
+	public class MLGetStoredKeyValueRequest : EbServiceStackAuthRequest, IReturn<MLGetStoredKeyValueResponse>
 	{
 		public string Key { get; set; }
 	}
@@ -173,7 +173,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public ResponseStatus ResponseStatus { get; set; }
 	}
 
-	public class MLUpdateKeyValueRequest : EbServiceStackRequest, IReturn<MLUpdateKeyValueResponse>
+	public class MLUpdateKeyValueRequest : EbServiceStackAuthRequest, IReturn<MLUpdateKeyValueResponse>
 	{
 		public List<MLKeyValue> Data { get; set; }
 	}
@@ -189,7 +189,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public ResponseStatus ResponseStatus { get; set; }
 	}
 
-	public class MLAddKeyRequest : EbServiceStackRequest, IReturn<MLAddKeyResponse>
+	public class MLAddKeyRequest : EbServiceStackAuthRequest, IReturn<MLAddKeyResponse>
 	{
 		public string Key { get; set; }
 		public List<MLAddKey> Data { get; set; }

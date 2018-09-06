@@ -30,7 +30,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 6)]
         public int appid { get; set; }
 
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         public int UserId { get; set; }
 
@@ -73,7 +73,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 6)]
         public int appid { get; set; }
 
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         public int UserId { get; set; }
 
@@ -90,7 +90,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 2)]
         public int Id { get; set; }
 
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         public int UserId { get; set; }
     }
@@ -116,7 +116,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 1)]
         public string Token { get; set; }
 
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         public int UserId { get; set; }
     }
@@ -166,7 +166,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 2)]
         public EbApplicationTypes AppType { get; set; }
 
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         public int UserId { get; set; }
     }
@@ -183,7 +183,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public AppWrapper AppInfo { get; set; }
     }
 
-    public class GetObjectRequest : EbServiceStackRequest, IReturn<GetObjectResponse>
+    public class GetObjectRequest : EbServiceStackAuthRequest, IReturn<GetObjectResponse>
     {
 
     }
@@ -212,7 +212,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     public class GetTableSchemaRequest : IReturn<GetTbaleSchemaResponse>, IEbSSRequest
     {
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         public int UserId { get; set; }
     }
@@ -227,7 +227,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class SaveAppSettingsRequest : EbServiceStackRequest, IReturn<SaveAppSettingsResponse>
+    public class SaveAppSettingsRequest : EbServiceStackAuthRequest, IReturn<SaveAppSettingsResponse>
     {
         [DataMember(Order = 1)]
         public int AppId { get; set; }
@@ -247,7 +247,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int ResStatus { get; set; }
     }
 
-    public class UniqueApplicationNameCheckRequest : EbServiceStackRequest, IReturn<UniqueObjectNameCheckResponse>
+    public class UniqueApplicationNameCheckRequest : EbServiceStackAuthRequest, IReturn<UniqueObjectNameCheckResponse>
     {
         public string AppName { get; set; }
     }
