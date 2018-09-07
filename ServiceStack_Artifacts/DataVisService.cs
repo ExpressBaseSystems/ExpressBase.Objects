@@ -16,7 +16,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     [Route("/dv")]
     [Route("/dv/data/{RefId}")]
     [DataContract]
-    public class DataVisDataRequest : EbServiceStackRequest, IReturn<DataSourceDataResponse>
+    public class DataVisDataRequest : EbServiceStackAuthRequest, IReturn<DataSourceDataResponse>
     {
         [DataMember(Order = 0)]
         public EbDataVisualization EbDataVisualization { get; set; }
@@ -47,7 +47,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     [Route("/dv")]
     [Route("/dv/columns/{RefId}")]
     [DataContract]
-    public class DataVisColumnsRequest : EbServiceStackRequest, IReturn<DataSourceColumnsResponse>
+    public class DataVisColumnsRequest : EbServiceStackAuthRequest, IReturn<DataSourceColumnsResponse>
     {
         [DataMember(Order = 1)]
         public EbDataVisualization EbDataVisualization { get; set; }
@@ -126,7 +126,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string rToken { get; set; }
 
         [DataMember(Order = 8)]
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         [DataMember(Order = 9)]
         public int UserId { get; set; }
@@ -177,7 +177,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string rToken { get; set; }
 
         [DataMember(Order = 7)]
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         [DataMember(Order = 8)]
         public int UserId { get; set; }
@@ -272,7 +272,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string rToken { get; set; }
 
         [DataMember(Order = 8)]
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         [DataMember(Order = 9)]
         public int UserId { get; set; }

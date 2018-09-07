@@ -1,20 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Runtime.Serialization;
-using System.Text;
-using ServiceStack;
-using ExpressBase.Common.Connections;
+﻿using ExpressBase.Common.Connections;
 using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
-using ExpressBase.Common;
+using ServiceStack;
+using System.Runtime.Serialization;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
-    public class RefreshSolutionConnectionsRequest : EbServiceStackRequest, IReturn<RefreshSolutionConnectionsResponse>
+    public class RefreshSolutionConnectionsRequest : EbMqRequest
     {
-        public string BToken { get; set; }
-
-        public string RToken { get; set; }
     }
 
     public class RefreshSolutionConnectionsResponse : IEbSSResponse
@@ -22,7 +15,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-    public class RefreshSolutionConnectionsAsyncRequest : EbServiceStackRequest, IReturn<RefreshSolutionConnectionsAsyncResponse>
+    public class RefreshSolutionConnectionsAsyncRequest : EbServiceStackAuthRequest, IReturn<RefreshSolutionConnectionsAsyncResponse>
     {
         public string SolutionId { get; set; }
     }
@@ -32,14 +25,15 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-
-    public class RefreshSolutionConnectionsBySolutionIdAsyncRequest : EbServiceStackRequest, IReturn<RefreshSolutionConnectionsAsyncResponse>
+    public class RefreshSolutionConnectionsBySolutionIdAsyncRequest : EbServiceStackAuthRequest, IReturn<RefreshSolutionConnectionsAsyncResponse>
     {
         public string SolutionId { get; set; }
     }
 
-    public class GetConnectionsRequest : EbServiceStackRequest, IReturn<GetConnectionsResponse>
+    public class GetConnectionsRequest : EbServiceStackAuthRequest, IReturn<GetConnectionsResponse>
     {
+        public string SolutionId { get; set; }
+
         public int ConnectionType { get; set; }
     }
 
@@ -50,7 +44,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-    public class ChangeDataDBConnectionRequest : EbServiceStackRequest, IReturn<ChangeConnectionResponse>
+    public class ChangeDataDBConnectionRequest : EbServiceStackAuthRequest, IReturn<ChangeConnectionResponse>
     {
         public bool IsNew { get; set; }
         public string SolutionId { get; set; }
@@ -58,28 +52,39 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     }
 
-    public class ChangeObjectsDBConnectionRequest : EbServiceStackRequest, IReturn<ChangeConnectionResponse>
+    public class ChangeObjectsDBConnectionRequest : EbServiceStackAuthRequest, IReturn<ChangeConnectionResponse>
     {
         public bool IsNew { get; set; }
         public EbObjectsDbConnection ObjectsDBConnection { get; set; }
         public string SolutionId { get; set; }
     }
 
-    public class ChangeFilesDBConnectionRequest : EbServiceStackRequest, IReturn<ChangeConnectionResponse>
+    public class ChangeFilesDBConnectionRequest : EbServiceStackAuthRequest, IReturn<ChangeConnectionResponse>
     {
         public bool IsNew { get; set; }
+        public string SolutionId { get; set; }
         public EbFilesDbConnection FilesDBConnection { get; set; }
     }
 
-    public class ChangeSMSConnectionRequest : EbServiceStackRequest, IReturn<ChangeConnectionResponse>
+    public class ChangeFTPConnectionRequest : EbServiceStackAuthRequest, IReturn<ChangeConnectionResponse>
     {
         public bool IsNew { get; set; }
+        public string SolutionId { get; set; }
+        public EbFTPConnection FTPConnection { get; set; }
+    }
+
+    public class ChangeSMSConnectionRequest : EbServiceStackAuthRequest, IReturn<ChangeConnectionResponse>
+    {
+        public bool IsNew { get; set; }
+
+        public string SolutionId { get; set; }
+
         public SMSConnection SMSConnection { get; set; }
     }
 
-    public class InitialSolutionConnectionsRequest : EbServiceStackRequest, IReturn<InitialSolutionConnectionsResponse>
+    public class InitialSolutionConnectionsRequest : EbServiceStackAuthRequest, IReturn<InitialSolutionConnectionsResponse>
     {
-        public string SolutionId { get; set; }
+        public string NewSolnId { get; set; }
     }
 
     public class InitialSolutionConnectionsResponse : IEbSSResponse
@@ -87,10 +92,22 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-    public class ChangeSMTPConnectionRequest : EbServiceStackRequest, IReturn<ChangeConnectionResponse>
+    public class ChangeSMTPConnectionRequest : EbServiceStackAuthRequest, IReturn<ChangeConnectionResponse>
     {
         public bool IsNew { get; set; }
+
+        public string SolutionId { get; set; }
+
         public SMTPConnection SMTPConnection { get; set; }
+    }
+
+    public class ChangeCloudinaryConnectionRequest : EbServiceStackAuthRequest, IReturn<ChangeConnectionResponse>
+    {
+        public bool IsNew { get; set; }
+
+        public string SolutionId { get; set; }
+
+        public EbCloudinaryConnection ImageManipulateConnection { get; set; }
     }
 
     public class ChangeConnectionResponse : IEbSSResponse
@@ -98,7 +115,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-    public class TestConnectionRequest : EbServiceStackRequest
+    public class TestConnectionRequest : EbServiceStackAuthRequest
     {
         public EbDataDbConnection DataDBConnection { get; set; }
     }
@@ -116,7 +133,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int UserId { get; set; }
 
         [DataMember(Order = 2)]
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
     }
 
     public class TestFileDbconnectionResponse : IEbSSResponse

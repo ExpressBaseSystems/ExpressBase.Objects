@@ -18,7 +18,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public int RequestMode { get; set; }
 
 		[DataMember(Order = 3)]
-		public string TenantAccountId { get; set; }
+		public string SolnId { get; set; }
 
 		public int UserId { get; set; }
 	}
@@ -86,7 +86,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public int RequestMode { get; set; }
 
 		[DataMember(Order = 3)]
-		public string TenantAccountId { get; set; }
+		public string SolnId { get; set; }
 
 		public int UserId { get; set; }
 	}
@@ -109,7 +109,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public string Data { get; set; }
 
 		[DataMember(Order = 2)]
-		public string TenantAccountId { get; set; }
+		public string SolnId { get; set; }
 
 		[DataMember(Order = 3)]
 		public int UserId { get; set; }
@@ -139,7 +139,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public int RequestMode { get; set; }
 
 		[DataMember(Order = 3)]
-		public string TenantAccountId { get; set; }
+		public string SolnId { get; set; }
 
 		public int UserId { get; set; }
 	}
@@ -165,7 +165,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public int RequestMode { get; set; }
 
 		[DataMember(Order = 3)]
-		public string TenantAccountId { get; set; }
+		public string SolnId { get; set; }
 
 		public int UserId { get; set; }
 
@@ -194,7 +194,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public int RequestMode { get; set; }
 
 		[DataMember(Order = 3)]
-		public string TenantAccountId { get; set; }
+		public string SolnId { get; set; }
 
 		public int UserId { get; set; }
 

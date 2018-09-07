@@ -13,7 +13,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataContract]
 
         //.................................................................
-        public class CheckTblRequest : EbServiceStackRequest, IReturn<ExcelCreateTableResponse>
+        public class CheckTblRequest : EbServiceStackAuthRequest, IReturn<ExcelCreateTableResponse>
         {
             [DataMember(Order = 1)]
             public string tblName { get; set; }
@@ -31,7 +31,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             public ResponseStatus ResponseStatus { get; set; }
         }
         //........................................................................
-        public class CreateTblRequest : EbServiceStackRequest, IReturn<ExcelCreateTableResponse>
+        public class CreateTblRequest : EbServiceStackAuthRequest, IReturn<ExcelCreateTableResponse>
         {
             [DataMember(Order = 1)]
             public string tblName { get; set; }
@@ -49,7 +49,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             public ResponseStatus ResponseStatus { get; set; }
         }
         //.............................................................
-        public class InsertIntoTblResponseRequest : EbServiceStackRequest, IReturn<ExcelCreateTableResponse>
+        public class InsertIntoTblResponseRequest : EbServiceStackAuthRequest, IReturn<ExcelCreateTableResponse>
         {
             [DataMember(Order = 1)]
             public string tblName { get; set; }
@@ -68,7 +68,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             public ResponseStatus ResponseStatus { get; set; }
         }
         //................................................................
-        public class ExcelCreateTableRequest : EbServiceStackRequest, IReturn<ExcelCreateTableResponse>
+        public class ExcelCreateTableRequest : EbServiceStackAuthRequest, IReturn<ExcelCreateTableResponse>
         {
             [DataMember(Order = 1)]
             public string DataTbl { get; set; }
@@ -94,7 +94,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         //..................................................................
 
-        public class DBTableRequest : EbServiceStackRequest, IReturn<ExcelCreateTableResponse>
+        public class DBTableRequest : EbServiceStackAuthRequest, IReturn<ExcelCreateTableResponse>
         {
             //[DataMember(Order = 1)]
             //public string DataTbl { get; set; }
@@ -115,7 +115,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         //.................................................................................
 
-        public class DBColumnRequest : EbServiceStackRequest, IReturn<ExcelCreateTableResponse>
+        public class DBColumnRequest : EbServiceStackAuthRequest, IReturn<ExcelCreateTableResponse>
         {
             [DataMember(Order = 1)]
             public string tblName { get; set; }

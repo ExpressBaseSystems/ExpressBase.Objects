@@ -1076,7 +1076,7 @@ namespace ExpressBase.Objects
             dfs = FileClient.Get
                  (new DownloadFileRequest
                  {
-                     TenantAccountId = SolutionId,
+                     SolnId = SolutionId,
                      FileDetails = new FileMeta
                      {
                          FileName = Image + StaticFileConstants.DOTJPG,

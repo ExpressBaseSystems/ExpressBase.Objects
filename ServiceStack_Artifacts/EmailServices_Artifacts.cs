@@ -1,4 +1,5 @@
-﻿using ExpressBase.Common.EbServiceStack.ReqNRes;
+﻿using ExpressBase.Common;
+using ExpressBase.Common.EbServiceStack.ReqNRes;
 using ServiceStack;
 using System;
 using System.Collections.Generic;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
     [DataContract]
-    public class EmailServicesRequest : EbServiceStackRequest, IReturn<EmailServicesResponse>
+    public class EmailServicesRequest : EbServiceStackAuthRequest, IReturn<EmailServicesResponse>
     {
         [DataMember(Order = 1)]
         public string From { get; set; }
@@ -26,6 +27,14 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 5)]
         public string Cc { get; set; }
 
+        [DataMember(Order = 6)]
+        public string Bcc { get; set; }
+
+        [DataMember(Order = 7)]
+        public MemorystreamWrapper AttachmentReport { get; set; }
+
+        [DataMember(Order = 7)]
+        public string AttachmentName { get; set; }
     }
 
     [DataContract]
@@ -45,20 +54,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string From { get; set; }
 
         [DataMember(Order = 2)]
-        public string To { get; set; }
-
-        [DataMember(Order = 3)]
         public string Subject { get; set; }
 
-        [DataMember(Order = 4)]
+        [DataMember(Order = 3)]
         public string Refid { get; set; }
 
-        [DataMember(Order = 5)]
-        public string Cc { get; set; }
-
-        [DataMember(Order = 6)]
-        public int newuserid { get; set; }
-
+       
     }
 
 }

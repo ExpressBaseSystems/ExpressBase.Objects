@@ -21,7 +21,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 3)]
         public string Token { get; set; }
 
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         public int UserId { get; set; }
     }
@@ -38,7 +38,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 2)]
         public string Token { get; set; }
 
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         public int UserId { get; set; }
     }
@@ -59,7 +59,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 4)]
         public string Token { get; set; }
 
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         public int UserId { get; set; }
     }

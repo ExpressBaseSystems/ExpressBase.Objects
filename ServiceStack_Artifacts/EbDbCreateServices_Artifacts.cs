@@ -10,7 +10,7 @@ using System.Text;
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
     [DataContract]
-    public class EbDbCreateRequest : EbServiceStackRequest, IReturn<EbDbCreateResponse>
+    public class EbDbCreateRequest : EbServiceStackAuthRequest, IReturn<EbDbCreateResponse>
     {
         [DataMember(Order = 1)]
         public string dbName { get; set; }
@@ -50,7 +50,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class EbCreateOracleDBRequest : EbServiceStackRequest, IReturn<bool>
+    public class EbCreateOracleDBRequest : EbServiceStackAuthRequest, IReturn<bool>
     {
        
     }
