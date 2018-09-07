@@ -93,6 +93,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class ChangeImageManipulationConnectionRequest : EbServiceStackAuthRequest, IReturn<ChangeConnectionResponse>
     {
         public bool IsNew { get; set; }
+        public string SolutionId { get; set; }
         public ImageManipulateConnection ImageManipulateConnection { get; set; }
     }
 
