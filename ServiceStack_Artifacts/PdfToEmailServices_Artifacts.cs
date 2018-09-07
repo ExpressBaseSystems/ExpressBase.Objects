@@ -9,14 +9,14 @@ using System.Text;
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
     [DataContract]
-    public class PdfCreateServiceMqRequest : EbServiceStackRequest, IReturn<PdfCreateServicesResponse>
+    public class PdfCreateServiceMqRequest : EbServiceStackAuthRequest, IReturn<PdfCreateServicesResponse>
     {
         [DataMember(Order = 1)]
         public string Refid  { get; set; }
 
     }
     [DataContract]
-    public class PdfCreateServiceRequest : EbServiceStackRequest, IReturn<PdfCreateServicesResponse>
+    public class PdfCreateServiceRequest : EbServiceStackAuthRequest, IReturn<PdfCreateServicesResponse>
     {
         [DataMember(Order = 1)]
         public string Refid { get; set; }
