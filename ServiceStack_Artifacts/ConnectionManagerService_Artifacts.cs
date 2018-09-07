@@ -99,6 +99,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class ChangeCloudinaryConnectionRequest : EbServiceStackAuthRequest, IReturn<ChangeConnectionResponse>
     {
         public bool IsNew { get; set; }
+
+        public string SolutionId { get; set; }
+
         public EbCloudinaryConnection ImageManipulateConnection { get; set; }
     }
 
