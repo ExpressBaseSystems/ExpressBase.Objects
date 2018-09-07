@@ -76,7 +76,7 @@ namespace ExpressBase.Objects.Objects
         private string GetHtmlHelper(RenderMode mode)
         {
             return @"
-<div id='cont_@name@  ' class='Eb-ctrlContainer' Ctype='TextBox' style='@HiddenString '>
+<div id='cont_@name@  ' class='Eb-ctrlContainer' Ctype='UserLocation' style='@HiddenString '>
     <div class='eb-ctrl-label' id='@name@Lbl' style='@LabelBackColor@ @LabelForeColor@ '> @Label@  </div>
        @barehtml@
     <span class='helpText'> @HelpText@ </span>
