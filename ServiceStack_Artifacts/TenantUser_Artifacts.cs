@@ -20,7 +20,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int Id { get; set; }
 
         [DataMember(Order = 3)]
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         public int UserId { get; set; }
 
@@ -51,7 +51,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int Id { get; set; }
 
         [DataMember(Order = 2)]
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         public int UserId { get; set; }
 
@@ -96,7 +96,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 2)]
         public int objtype { get; set; }
 
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         public int UserId { get; set; }
 
@@ -128,7 +128,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 2)]
         public int id { get; set; }
 
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         public int UserId { get; set; }
     }
@@ -160,7 +160,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int Id { get; set; }
 
         [DataMember(Order = 3)]
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         public int UserId { get; set; }
 
@@ -193,7 +193,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int Id { get; set; }
 
         [DataMember(Order = 3)]
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         public int UserId { get; set; }
 
@@ -226,7 +226,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int Id { get; set; }
 
         [DataMember(Order = 3)]
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         public int UserId { get; set; }
 
@@ -253,7 +253,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class EditUserPreferenceRequest : IReturn<EditUserPreferenceResponse>, IEbSSRequest
     {
 
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         public int UserId { get; set; }
 
@@ -284,7 +284,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 3)]
         public Dictionary<string, object> Colvalues { get; set; }
 
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         public int UserId { get; set; }
     }
@@ -311,7 +311,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public string Token { get; set; }
 
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         public int UserId { get; set; }
     }
@@ -337,7 +337,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int id { get; set; }
         public string Token { get; set; }
 
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         public int UserId { get; set; }
     }
@@ -365,7 +365,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public Dictionary<string, object> Colvalues { get; set; }
         public string Token { get; set; }
 
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         public int UserId { get; set; }
     }
@@ -393,7 +393,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int id { get; set; }
         public string Token { get; set; }
 
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         public int UserId { get; set; }
     }
@@ -421,7 +421,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public string Token { get; set; }
 
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         public int UserId { get; set; }
     }
@@ -451,7 +451,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public string Token { get; set; }
 
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         public int UserId { get; set; }
     }
@@ -478,7 +478,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public string Token { get; set; }
 
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         public int UserId { get; set; }
     }
@@ -513,7 +513,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public string Token { get; set; }
 
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         public int UserId { get; set; }
     }
@@ -536,7 +536,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         public string Token { get; set; }
 
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         public int UserId { get; set; }
     }
@@ -559,7 +559,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         public string Token { get; set; }
 
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         public int UserId { get; set; }
     }
@@ -581,7 +581,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public string Token { get; set; }
 
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         public int UserId { get; set; }
     }

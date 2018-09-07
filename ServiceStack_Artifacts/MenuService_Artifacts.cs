@@ -9,7 +9,7 @@ using System.Text;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
-    public class SidebarUserRequest : EbServiceStackRequest, IReturn<SidebarUserResponse>
+    public class SidebarUserRequest : EbServiceStackAuthRequest, IReturn<SidebarUserResponse>
     {
         public string Ids { get; set; }
 
@@ -78,7 +78,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     }
 
-    public class SidebarDevRequest : EbServiceStackRequest, IReturn<SidebarDevResponse>
+    public class SidebarDevRequest : EbServiceStackAuthRequest, IReturn<SidebarDevResponse>
     {
     }
 

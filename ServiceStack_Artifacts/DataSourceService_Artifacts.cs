@@ -43,7 +43,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string rToken { get; set; }
 
         [DataMember(Order = 8)]
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         [DataMember(Order = 9)]
         public int UserId { get; set; }
@@ -99,7 +99,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string rToken { get; set; }
 
         [DataMember(Order = 8)]
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         [DataMember(Order = 9)]
         public int UserId { get; set; }
@@ -161,7 +161,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string rToken { get; set; }
 
         [DataMember(Order = 7)]
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         [DataMember(Order = 8)]
         public int UserId { get; set; }
@@ -179,7 +179,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string RefId { get; set; }
 
         [DataMember(Order = 2)]
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         [DataMember(Order = 3)]
         public int UserId { get; set; }
@@ -262,7 +262,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class EbObjectWithRelatedDVRequest : EbServiceStackRequest, IReturn<EbObjectWithRelatedDVResponse>
+    public class EbObjectWithRelatedDVRequest : EbServiceStackAuthRequest, IReturn<EbObjectWithRelatedDVResponse>
     {
         [DataMember(Order = 1)]
         public string Refid { get; set; }
@@ -319,7 +319,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string rToken { get; set; }
 
         [DataMember(Order = 8)]
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         [DataMember(Order = 9)]
         public int UserId { get; set; }

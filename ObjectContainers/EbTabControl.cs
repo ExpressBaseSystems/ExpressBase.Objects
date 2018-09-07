@@ -56,30 +56,30 @@ namespace ExpressBase.Objects
             return @"
 this.Init = function(id)
 {
-    this.Controls.$values.push(new EbObjects.EbTabPane('EbTab0TabPane0'));
+    this.Controls.$values.push(new EbObjects.EbTabPane(this.EbSid + 'TabPane0'));
 };";
         }
 
         public override string GetHtml()
         {
-            string TabBtnHtml = "<div id='cont_@name@' class='Eb-ctrlContainer' Ctype='TabControl'><ul class='nav nav-tabs'>".Replace("@name@", Name);
+            string TabBtnHtml = "<div id='cont_@name@' ebsid='@name@' class='Eb-ctrlContainer' Ctype='TabControl'><ul class='nav nav-tabs'>".Replace("@name@", Name);
             string TabContentHtml = "<div class='tab-content'>";
 
             foreach (EbControl tab in Controls)
-                TabBtnHtml += "<li @active><a data-toggle='tab' href='#@name@'>@name@</a></li>".Replace("@name@", tab.Name);
+                TabBtnHtml += "<li li-of='@name@' @active><a data-toggle='tab' href='#@name@'>@name@</a></li>".Replace("@name@", tab.Name);
 
             TabBtnHtml += "</ul>";
+
+            Regex regex = new Regex(Regex.Escape("@active"));
+            TabBtnHtml = regex.Replace(TabBtnHtml, "class='active'", 1).Replace("@active", "");
 
 
             foreach (EbControl tab in Controls)
                 TabContentHtml += tab.GetHtml();
 
-            TabContentHtml += "</div>";
-            Regex regex = new Regex(Regex.Escape("@inactive"));
+            TabContentHtml += "</div></div>";
+            regex = new Regex(Regex.Escape("@inactive"));
             TabContentHtml = regex.Replace(TabContentHtml, "in active", 1).Replace("@inactive", "");
-            
-            regex = new Regex(Regex.Escape("@active"));
-            TabBtnHtml = regex.Replace(TabBtnHtml, "class='active'", 1).Replace("@active", "");
 
             return string.Concat(TabBtnHtml, TabContentHtml);
         }
@@ -101,12 +101,12 @@ this.Init = function(id)
 
         public override string GetHtml()
         {
-            string html = "<div id='@name@' class='tab-pane fade @inactive'>";
+            string html = "<div id='@name@' ebsid='@ebsid@' class='tab-pane fade @inactive'>";
 
             foreach (EbControl ec in this.Controls)
                 html += ec.GetHtml();
 
-            return (html + "</div>").Replace("@name@", this.Name);
+            return (html + "</div>").Replace("@name@", this.Name).Replace("@ebsid@", this.EbSid);
         }
     }
 }

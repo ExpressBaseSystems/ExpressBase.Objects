@@ -25,19 +25,19 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
                 String sql = EbConnectionFactory.ObjectsDB.EB_CREATE_NEW_OBJECT;
                 cmd = EbConnectionFactory.ObjectsDB.GetNewCommand(con, sql);
 
-                cmd.Parameters.Add(EbConnectionFactory.ObjectsDB.GetNewParameter(":obj_name", EbDbTypes.String, request.Name.Replace("\n", "").Replace("\t", "").Replace("\r", "")));
-                cmd.Parameters.Add(EbConnectionFactory.ObjectsDB.GetNewParameter(":obj_desc", EbDbTypes.String, (!string.IsNullOrEmpty(request.Description)) ? request.Description : string.Empty));
-                cmd.Parameters.Add(EbConnectionFactory.ObjectsDB.GetNewParameter(":obj_type", EbDbTypes.Int32, GetObjectType(EbSerializers.Json_Deserialize(request.Json))));
-                cmd.Parameters.Add(EbConnectionFactory.ObjectsDB.GetNewParameter(":obj_cur_status", EbDbTypes.Int32, (int)request.Status));
-                cmd.Parameters.Add(EbConnectionFactory.ObjectsDB.GetNewParameter(":commit_uid", EbDbTypes.Int32, request.UserId));
-                cmd.Parameters.Add(EbConnectionFactory.ObjectsDB.GetNewParameter(":src_pid", EbDbTypes.String, request.SourceSolutionId));
-                cmd.Parameters.Add(EbConnectionFactory.ObjectsDB.GetNewParameter(":cur_pid", EbDbTypes.String, request.TenantAccountId));
-                cmd.Parameters.Add(EbConnectionFactory.ObjectsDB.GetNewParameter(":relations", EbDbTypes.String, (request.Relations != null) ? request.Relations : string.Empty));
-                cmd.Parameters.Add(EbConnectionFactory.ObjectsDB.GetNewParameter(":issave", EbDbTypes.String, (request.IsSave == true) ? 'T' : 'F'));
-                cmd.Parameters.Add(EbConnectionFactory.ObjectsDB.GetNewParameter(":tags", EbDbTypes.String, (!string.IsNullOrEmpty(request.Tags)) ? request.Tags : string.Empty));
-                cmd.Parameters.Add(EbConnectionFactory.ObjectsDB.GetNewParameter(":app_id", EbDbTypes.String, _appids));
-                cmd.Parameters.Add(EbConnectionFactory.ObjectsDB.GetNewParameter(":s_obj_id", EbDbTypes.String, request.SourceObjId));
-                cmd.Parameters.Add(EbConnectionFactory.ObjectsDB.GetNewParameter(":s_ver_id", EbDbTypes.String, request.SourceVerID));
+            cmd.Parameters.Add(EbConnectionFactory.ObjectsDB.GetNewParameter(":obj_name", EbDbTypes.String, request.Name.Replace("\n", "").Replace("\t", "").Replace("\r", "")));
+            cmd.Parameters.Add(EbConnectionFactory.ObjectsDB.GetNewParameter(":obj_desc", EbDbTypes.String, (!string.IsNullOrEmpty(request.Description)) ? request.Description : string.Empty));
+            cmd.Parameters.Add(EbConnectionFactory.ObjectsDB.GetNewParameter(":obj_type", EbDbTypes.Int32, GetObjectType(EbSerializers.Json_Deserialize(request.Json))));
+            cmd.Parameters.Add(EbConnectionFactory.ObjectsDB.GetNewParameter(":obj_cur_status", EbDbTypes.Int32, (int)request.Status));
+            cmd.Parameters.Add(EbConnectionFactory.ObjectsDB.GetNewParameter(":commit_uid", EbDbTypes.Int32, request.UserId));
+            cmd.Parameters.Add(EbConnectionFactory.ObjectsDB.GetNewParameter(":src_pid", EbDbTypes.String, request.SourceSolutionId));
+            cmd.Parameters.Add(EbConnectionFactory.ObjectsDB.GetNewParameter(":cur_pid", EbDbTypes.String, request.SolnId));
+            cmd.Parameters.Add(EbConnectionFactory.ObjectsDB.GetNewParameter(":relations", EbDbTypes.String, (request.Relations != null) ? request.Relations : string.Empty));
+            cmd.Parameters.Add(EbConnectionFactory.ObjectsDB.GetNewParameter(":issave", EbDbTypes.String, (request.IsSave == true) ? 'T' : 'F'));
+            cmd.Parameters.Add(EbConnectionFactory.ObjectsDB.GetNewParameter(":tags", EbDbTypes.String, (!string.IsNullOrEmpty(request.Tags)) ? request.Tags : string.Empty));
+            cmd.Parameters.Add(EbConnectionFactory.ObjectsDB.GetNewParameter(":app_id", EbDbTypes.String, _appids));
+            cmd.Parameters.Add(EbConnectionFactory.ObjectsDB.GetNewParameter(":s_obj_id", EbDbTypes.String, request.SourceObjId));
+            cmd.Parameters.Add(EbConnectionFactory.ObjectsDB.GetNewParameter(":s_ver_id", EbDbTypes.String, request.SourceVerID));
 
                 if (sql.Contains(":obj_json"))
                 {

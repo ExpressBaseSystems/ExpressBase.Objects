@@ -30,6 +30,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
         [PropertyEditor(PropertyEditorType.Collection)]
         [Alias("Columns")]
+        [ListType(typeof(EbTableTd))]
         public override List<EbControl> Controls { get; set; }
 
         public override string Label { get; set; }

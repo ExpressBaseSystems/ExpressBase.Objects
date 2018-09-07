@@ -8,7 +8,7 @@ using System.Text;
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
     [DataContract]
-    public class TestRequest : EbServiceStackRequest, IReturn<EbDbCreateResponse>
+    public class TestRequest : EbServiceStackAuthRequest, IReturn<EbDbCreateResponse>
     {
         //[DataMember(Order = 1)]
         //public string dbName { get; set; }

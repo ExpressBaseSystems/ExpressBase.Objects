@@ -11,7 +11,7 @@ using System.Text;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
-    public class ReportRenderRequest : EbServiceStackRequest, IReturn<ReportRenderResponse>
+    public class ReportRenderRequest : EbServiceStackAuthRequest, IReturn<ReportRenderResponse>
     {
         public string Refid { get; set; }
 
@@ -33,7 +33,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public String ReportName { get; set; }
     }
 
-    public class ValidateCalcExpressionRequest : EbServiceStackRequest, IReturn<ReportRenderResponse>
+    public class ValidateCalcExpressionRequest : EbServiceStackAuthRequest, IReturn<ReportRenderResponse>
     {
         public string DataSourceRefId { get; set; }
 

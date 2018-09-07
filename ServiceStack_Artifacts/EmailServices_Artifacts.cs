@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
     [DataContract]
-    public class EmailServicesRequest : EbServiceStackRequest, IReturn<EmailServicesResponse>
+    public class EmailServicesRequest : EbServiceStackAuthRequest, IReturn<EmailServicesResponse>
     {
         [DataMember(Order = 1)]
         public string From { get; set; }

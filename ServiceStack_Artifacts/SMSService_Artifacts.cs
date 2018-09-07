@@ -10,7 +10,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
 
     [DataContract]
-    public class SMSSentMqRequest : EbServiceStackRequest
+    public class SMSSentMqRequest : EbServiceStackAuthRequest
     {
         [DataMember(Order = 1)]
         public string To { get; set; }
@@ -26,7 +26,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class SMSSentRequest : EbServiceStackRequest
+    public class SMSSentRequest : EbServiceStackAuthRequest
     {
         [DataMember(Order = 1)]
         public string To { get; set; }
@@ -42,7 +42,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class SMSSentStatus : EbServiceStackRequest
+    public class SMSSentStatus : EbServiceStackAuthRequest
     {
         [DataMember(Order = 1)]
         public string To { get; set; }
@@ -73,7 +73,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     }
     [DataContract]
-    public class SMSStatusLogMqRequest : EbServiceStackRequest
+    public class SMSStatusLogMqRequest : EbServiceStackAuthRequest
     {
         [DataMember(Order = 1)]
         public SMSSentStatus SMSSentStatus { get; set; }

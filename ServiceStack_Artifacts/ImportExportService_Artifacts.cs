@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
-    public class ExportApplicationMqRequest : EbServiceStackRequest, IReturn<GetAllFromAppstoreResponse>
+    public class ExportApplicationMqRequest : EbServiceStackAuthRequest, IReturn<GetAllFromAppstoreResponse>
     {
         [DataMember(Order = 1)]
         public string Refids { get; set; }
@@ -34,7 +34,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Result { get; set; }
     }
 
-    public class ImportApplicationMqRequest : EbServiceStackRequest, IReturn<GetAllFromAppstoreResponse>
+    public class ImportApplicationMqRequest : EbServiceStackAuthRequest, IReturn<GetAllFromAppstoreResponse>
     {
         [DataMember(Order = 1)]
         public int Id { get; set; }
