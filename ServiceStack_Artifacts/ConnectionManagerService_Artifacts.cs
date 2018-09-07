@@ -68,6 +68,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public EbFilesDbConnection FilesDBConnection { get; set; }
     }
 
+    public class ChangeFTPConnectionRequest : EbServiceStackAuthRequest, IReturn<ChangeConnectionResponse>
+    {
+        public bool IsNew { get; set; }
+        public EbFTPConnection FTPConnection { get; set; }
+    }
+
     public class ChangeSMSConnectionRequest : EbServiceStackAuthRequest, IReturn<ChangeConnectionResponse>
     {
         public bool IsNew { get; set; }
@@ -90,10 +96,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public SMTPConnection SMTPConnection { get; set; }
     }
 
-    public class ChangeImageManipulationConnectionRequest : EbServiceStackAuthRequest, IReturn<ChangeConnectionResponse>
+    public class ChangeCloudinaryConnectionRequest : EbServiceStackAuthRequest, IReturn<ChangeConnectionResponse>
     {
         public bool IsNew { get; set; }
-        public ImageManipulateConnection ImageManipulateConnection { get; set; }
+        public EbCloudinaryConnection ImageManipulateConnection { get; set; }
     }
 
     public class ChangeConnectionResponse : IEbSSResponse
