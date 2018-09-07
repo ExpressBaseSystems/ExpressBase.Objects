@@ -32,6 +32,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     public class GetConnectionsRequest : EbServiceStackAuthRequest, IReturn<GetConnectionsResponse>
     {
+        public string SolutionId { get; set; }
+
         public int ConnectionType { get; set; }
     }
 
@@ -74,6 +76,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class ChangeSMSConnectionRequest : EbServiceStackAuthRequest, IReturn<ChangeConnectionResponse>
     {
         public bool IsNew { get; set; }
+
+        public string SolutionId { get; set; }
+
         public SMSConnection SMSConnection { get; set; }
     }
 
@@ -90,6 +95,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class ChangeSMTPConnectionRequest : EbServiceStackAuthRequest, IReturn<ChangeConnectionResponse>
     {
         public bool IsNew { get; set; }
+
+        public string SolutionId { get; set; }
+
         public SMTPConnection SMTPConnection { get; set; }
     }
 
