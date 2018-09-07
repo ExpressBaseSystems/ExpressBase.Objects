@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Runtime.Serialization;
-using System.Text;
-using ServiceStack;
-using ExpressBase.Common.Connections;
+﻿using ExpressBase.Common.Connections;
 using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
-using ExpressBase.Common;
+using ServiceStack;
+using System.Runtime.Serialization;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
@@ -28,7 +24,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         public ResponseStatus ResponseStatus { get; set; }
     }
-
 
     public class RefreshSolutionConnectionsBySolutionIdAsyncRequest : EbServiceStackAuthRequest, IReturn<RefreshSolutionConnectionsAsyncResponse>
     {
@@ -65,12 +60,14 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class ChangeFilesDBConnectionRequest : EbServiceStackAuthRequest, IReturn<ChangeConnectionResponse>
     {
         public bool IsNew { get; set; }
+        public string SolutionId { get; set; }
         public EbFilesDbConnection FilesDBConnection { get; set; }
     }
 
     public class ChangeFTPConnectionRequest : EbServiceStackAuthRequest, IReturn<ChangeConnectionResponse>
     {
         public bool IsNew { get; set; }
+        public string SolutionId { get; set; }
         public EbFTPConnection FTPConnection { get; set; }
     }
 
