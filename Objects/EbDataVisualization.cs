@@ -362,6 +362,9 @@ namespace ExpressBase.Objects
         [DefaultPropValue("100")]
         public int PageLength { get; set; }
 
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public bool DisableRowGrouping { get; set; }
+
         public static EbOperations Operations = TVOperations.Instance;
 
         public override string GetDesignHtml()
