@@ -34,7 +34,7 @@ namespace ExpressBase.Objects
         [HelpText("Name Of database-table Which you want to store Data collected using this Form")]
         public string TableName { get; set; }
 
-        public bool IsUpdate { get; set; }
+        public int FormId { get; set; }//equal to 0 for new mode, any other value indicate edit mode
 
         public override bool IsReadOnly//to identify a bot form is readonly or not
         {
