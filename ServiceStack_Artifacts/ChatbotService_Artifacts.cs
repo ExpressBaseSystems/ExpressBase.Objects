@@ -267,7 +267,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
 	[DataContract]
-	public class SubmitBotFormRequest : EbServiceStackRequest, IReturn<SubmitBotFormResponse>
+	public class SubmitBotFormRequest : EbServiceStackAuthRequest, IReturn<SubmitBotFormResponse>
 	{
 		[DataMember(Order = 1)]
 		public int Id { get; set; }
