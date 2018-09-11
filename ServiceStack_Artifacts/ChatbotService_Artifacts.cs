@@ -10,7 +10,7 @@ using System.Text;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
-    public class CreateBotRequest : EbServiceStackRequest, IReturn<CreateBotResponse>
+    public class CreateBotRequest : EbServiceStackAuthRequest, IReturn<CreateBotResponse>
     {
         public string SolutionId { get; set; }
 
@@ -29,7 +29,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string ChatId { get; set; }
     }
 
-    public class GetBotForm4UserRequest : EbServiceStackRequest, IReturn<CreateBotResponse>
+    public class GetBotForm4UserRequest : EbServiceStackAuthRequest, IReturn<CreateBotResponse>
     {
         public string BotFormIds { get; set; }
 
@@ -85,12 +85,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string FullName { get; set; }
     }
 
-    public class AppListRequest : EbServiceStackRequest, IReturn<CreateBotResponse>
+    public class AppListRequest : EbServiceStackAuthRequest, IReturn<CreateBotResponse>
     {
         public int SolutionId { get; set; }
     }
 
-    public class BotDetailsRequest : EbServiceStackRequest, IReturn<CreateBotResponse>
+    public class BotDetailsRequest : EbServiceStackAuthRequest, IReturn<CreateBotResponse>
     {
         public int AppId { get; set; }
     }
@@ -148,7 +148,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string BotId { get; set; }
     }
 
-    public class BotListRequest : EbServiceStackRequest, IReturn<CreateBotResponse>
+    public class BotListRequest : EbServiceStackAuthRequest, IReturn<CreateBotResponse>
     {
         public int SolutionId { get; set; }
     }
@@ -192,7 +192,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     //[Route("/bots")]
     [DataContract]
-    public class CreateWebFormTableRequest : EbServiceStackRequest, IReturn<CreateBotResponse>
+    public class CreateWebFormTableRequest : EbServiceStackAuthRequest, IReturn<CreateBotResponse>
     {
         [DataMember(Order = 1)]
         public EbWebForm WebObj { get; set; }
@@ -207,7 +207,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         //public Dictionary<string, string> Fields { get; set; }
     }
     [DataContract]
-    public class CreateBotFormTableRequest : EbServiceStackRequest, IReturn<CreateBotResponse>
+    public class CreateBotFormTableRequest : EbServiceStackAuthRequest, IReturn<CreateBotResponse>
     {
         [DataMember(Order = 1)]
         public dynamic BotObj { get; set; }
@@ -241,7 +241,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     [Route("/bots")]
     [DataContract]
-    public class InsertIntoBotFormTableRequest : EbServiceStackRequest, IReturn<CreateBotResponse>
+    public class InsertIntoBotFormTableRequest : EbServiceStackAuthRequest, IReturn<CreateBotResponse>
     {
         [DataMember(Order = 1)]
         public string  TableName { get; set; }
@@ -322,7 +322,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 	}
 
 	[DataContract]
-	public class GetBotsRequest : EbServiceStackRequest, IReturn<GetBotsResponse>
+	public class GetBotsRequest : EbServiceStackNoAuthRequest, IReturn<GetBotsResponse>
 	{
 		[DataMember(Order = 1)]
 		public string Value { get; set; }
@@ -346,7 +346,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 	}
 	
 	[DataContract]
-	public class GetBotSettingsRequest : EbServiceStackRequest, IReturn<GetBotSettingsResponse>
+	public class GetBotSettingsRequest : EbServiceStackAuthRequest, IReturn<GetBotSettingsResponse>
 	{
 		[DataMember(Order = 1)]
 		public int AppId { get; set; }

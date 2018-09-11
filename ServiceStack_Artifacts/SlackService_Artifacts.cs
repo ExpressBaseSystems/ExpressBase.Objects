@@ -8,14 +8,14 @@ using System.Text;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
-    public class SlackPostRequest : EbServiceStackRequest
+    public class SlackPostRequest : EbServiceStackAuthRequest
     {
         public SlackPayload Payload { get; set; }
 
         public int PostType { get; set; }
     }
 
-    public class SlackAuthRequest : EbServiceStackRequest
+    public class SlackAuthRequest : EbServiceStackAuthRequest
     {
         public SlackJson SlackJson { get; set; }
 
@@ -50,7 +50,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string UserId { get; set; }
     }
 
-    public class SlackAuthAsyncRequest : EbServiceStackRequest
+    public class SlackAuthAsyncRequest : EbServiceStackAuthRequest
     {
         public SlackJson SlackJson { get; set; }
 
@@ -90,7 +90,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public SlackFile SlackFile { get; set; }
     }
     
-    public class SlackPostAsyncRequest : EbServiceStackRequest
+    public class SlackPostAsyncRequest : EbServiceStackAuthRequest
     {
         public SlackPayload Payload { get; set; }
 

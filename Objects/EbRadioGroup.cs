@@ -99,7 +99,7 @@ namespace ExpressBase.Objects
                 HtmlConstants.CONTROL_WRAPER_HTML4WEB
 .Replace("@barehtml@", this.GetBareHtml())
 .Replace("@name@", (this.Name != null) ? this.Name : "@name@")
-
+.Replace("@type@", this.ObjType)
 
 
     .Replace("@LabelForeColor ", "color:" + (LabelForeColor ?? "@LabelForeColor ") + ";")

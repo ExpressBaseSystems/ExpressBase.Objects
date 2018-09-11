@@ -10,7 +10,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
     public class GetSurveyQueriesRequest : IEbSSRequest, IReturn<GetSurveyQueriesResponse>
     {
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         public int UserId { get; set; }
     }
@@ -25,7 +25,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     public class SurveyQuesRequest : IReturn<SurveyQuesResponse>, IEbSSRequest
     {
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         public int UserId { get; set; }
 
@@ -85,7 +85,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 1)]
         public int Id { get; set; }
 
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         public int UserId { get; set; }
 
@@ -107,7 +107,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 1)]
         public string Data { get; set; }
 
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         public int UserId { get; set; }
 
@@ -123,7 +123,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     public class GetSurveyListRequest : IReturn<GetSurveyListResponse>, IEbSSRequest
     {
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         public int UserId { get; set; }
 
@@ -142,7 +142,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 1)]
         public int SurveyId { get; set; }
 
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         public int UserId { get; set; }
 
@@ -201,7 +201,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     public class GetSurveysByAppRequest : IReturn<GetSurveysByAppResponse>, IEbSSRequest
     {
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         public int UserId { get; set; }
     }
@@ -217,7 +217,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     public class SurveyMasterRequest : IReturn<SurveyMasterResponse>, IEbSSRequest
     {
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         public int UserId { get; set; }
 
@@ -239,7 +239,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     public class SurveyLinesRequest : IReturn<SurveyLinesResponse>, IEbSSRequest
     {
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         public int UserId { get; set; }
 
@@ -282,7 +282,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
     public class GetSurveyEnqRequest : IReturn<GetSurveyEnqResponse>, IEbSSRequest
     {
-        public string TenantAccountId { get; set; }
+        public string SolnId { get; set; }
 
         public int UserId { get; set; }
     }

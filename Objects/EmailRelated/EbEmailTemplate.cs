@@ -34,15 +34,20 @@ namespace ExpressBase.Objects.EmailRelated
     [EnableInBuilder(BuilderType.EmailBuilder)]
     public class EbEmailTemplate : EbEmailTemplateBase
     {
-        //[EnableInBuilder(BuilderType.EmailBuilder)]
-        //public string Description { get; set; }
-        
-
         [EnableInBuilder(BuilderType.EmailBuilder)]
         public EmailPriority Priority { get; set; }      
 
         [EnableInBuilder(BuilderType.EmailBuilder)]
         public string Subject { get; set; }
+
+        [EnableInBuilder(BuilderType.EmailBuilder)]
+        public string To { get; set; }
+
+        [EnableInBuilder(BuilderType.EmailBuilder)]
+        public string Cc { get; set; }
+
+        [EnableInBuilder(BuilderType.EmailBuilder)]
+        public string Bcc { get; set; }
 
         [EnableInBuilder(BuilderType.EmailBuilder)]
         [JsonConverter(typeof(Base64Converter))]
@@ -62,12 +67,10 @@ namespace ExpressBase.Objects.EmailRelated
         [HideInPropertyGrid]
         public List<DsColumns> DsColumnsCollection { get; set; }
 
-
-        [EnableInBuilder(BuilderType.EmailBuilder)]    //remove after use
-        [UIproperty]
-        [PropertyEditor(PropertyEditorType.Color)]
-        [PropertyGroup("Appearance")]
-        public string Febintest { get; set; }
+        [EnableInBuilder(BuilderType.EmailBuilder)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [OSE_ObjectTypes(EbObjectTypes.iReport)]
+        public string AttachmentReportRefID { get; set; }
 
 
 

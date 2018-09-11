@@ -30,10 +30,13 @@ namespace ExpressBase.Objects
 
         public EbToolbox(BuilderType _builderType)
         {
-            var typeArray = this.GetType().GetTypeInfo().Assembly.GetTypes();
+            Type[] _typeArray = (this.GetType().GetTypeInfo().Assembly.GetTypes());
+            Type[] typeArray = new Type[_typeArray.Length + 1];
+            _typeArray.CopyTo(typeArray, 0);
+            typeArray[_typeArray.Length] = typeof(EbValidator);
 
             //var _jsResult = CSharpToJs.GenerateJs<EbControl>(_builderType, typeArray);
-            var _c2js = new Context2Js(typeArray, _builderType, typeof(EbObject));
+            Context2Js _c2js = new Context2Js(typeArray, _builderType, typeof(EbObject));
             System.Console.WriteLine("-------------> Time take for Context2Js: " + _c2js.MilliSeconds.ToString());
 
             this.AllMetas = _c2js.AllMetas;
