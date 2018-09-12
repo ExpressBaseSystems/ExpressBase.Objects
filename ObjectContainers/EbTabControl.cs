@@ -25,11 +25,23 @@ namespace ExpressBase.Objects
                 return @"EbTabControl = {
                 padding : function(elementId, props) {
                     $(`#${ elementId}.Eb-ctrlContainer > .tab-content >.tab-pane`).css('padding', props.Padding + 'px');
-                }
-                adjustPanesHeightToHighest : function(elementId, props) {
-                    alert();
                 },
-            }";
+                adjustPanesHeightToHighest : function(elementId, props) {
+                    var maxH = 0;
+                    let $panes = $(`#${ elementId}.Eb-ctrlContainer > .tab-content >.tab-pane`);
+                    $panes.css('min-height', 'inherit');
+                    $panes.each(function () {
+                        $this = $(this);
+                        if ($this.outerHeight() > maxH) {
+                            maxH = $this.outerHeight();
+                        }
+                    });
+                    if($('form[eb-form=true]').attr('IsRenderMode') === 'True')
+                        $panes.outerHeight(maxH);      
+                    else
+                        $panes.css('min-height', maxH +'px');                      
+                    }
+                }";
             }
         }
 
@@ -46,7 +58,7 @@ namespace ExpressBase.Objects
         [PropertyGroup("test")]
         [UIproperty]
         [ListType(typeof(EbTabPane))]
-        [OnChangeUIFunction("adjustPanesHeightToHighest")]
+        [OnChangeUIFunction("EbTabControl.adjustPanesHeightToHighest")]
         public override List<EbControl> Controls { get; set; }
 
         public override string GetDesignHtml()
