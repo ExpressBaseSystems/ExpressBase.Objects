@@ -98,17 +98,21 @@ namespace ExpressBase.Objects
 
         public override string GetDesignHtml()
         {
-            return @"
-<div class='Eb-ctrlContainer' Ctype='TableLayout'>
-    <table style='width:100%' style=' @BackColor  @ForeColor ' >
-        <tr>
-            <td id='@id_Td0' class='tdDropable' ></td>
-            <td id='@id_Td1' class='tdDropable'></td style='min-height:20px;'>
-        </tr>
-    </table>
-</div>"
-    .Replace("@BackColor ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor ") + ";"))
-    .Replace("@ForeColor ", "color:" + ((this.ForeColor != null) ? this.ForeColor : "@ForeColor ") + ";").RemoveCR().DoubleQuoted();
+            this.Controls = new List<EbControl>();
+            this.Controls.Add(new EbTableTd { Name = "EbTable0_Td0" });
+            this.Controls.Add(new EbTableTd { Name = "EbTable0_Td1" });
+            return GetHtml().RemoveCR().DoubleQuoted(); 
+//            return @"
+//<div class='Eb-ctrlContainer' Ctype='TableLayout'>
+//    <table style='width:100%' style=' @BackColor  @ForeColor ' >
+//        <tr>
+//            <td id='@id_Td0' class='tdDropable' ></td>
+//            <td id='@id_Td1' class='tdDropable'></td style='min-height:20px;'>
+//        </tr>
+//    </table>
+//</div>"
+//    .Replace("@BackColor ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor ") + ";"))
+//    .Replace("@ForeColor ", "color:" + ((this.ForeColor != null) ? this.ForeColor : "@ForeColor ") + ";").RemoveCR().DoubleQuoted();
         }
 
         public override string GetJsInitFunc()
@@ -142,13 +146,13 @@ this.Init = function(id)
         public override string GetHtml()
         {
             string html = @"
-            <div id='@name@' ebsid='@name@' class='Eb-ctrlContainer' Ctype='TableLayout'>
+            <div id='@name@' ebsid='@ebsid@' class='Eb-ctrlContainer' Ctype='TableLayout'>
                 <table class='form-render-table' ><tr>";
 
             foreach (EbControl ec in this.Controls)
                 html += ec.GetHtml();
 
-            return (html + "</tr></table></div>").Replace("@name@", this.Name);
+            return (html + "</tr></table></div>").Replace("@name@", this.Name).Replace("@ebsid@", this.EbSid);
         }
     }
 
@@ -181,12 +185,12 @@ this.Init = function(id)
 
         public override string GetHtml()
         {
-            string html = "<td id='@name@' class='form-render-table-Td tdDropable'>";
+            string html = "<td id='@name@' ebsid='@ebsid@' class='form-render-table-Td tdDropable'>";
 
             foreach (EbControl ec in this.Controls)
                 html += ec.GetHtml();
 
-            return (html + "</td>").Replace("@name@", this.Name);
+            return (html + "</td>").Replace("@name@", this.Name).Replace("@ebsid@", this.EbSid);
         }
     }
 }
