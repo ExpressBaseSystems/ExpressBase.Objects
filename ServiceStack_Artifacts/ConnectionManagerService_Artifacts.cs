@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Runtime.Serialization;
-using System.Text;
-using ServiceStack;
-using ExpressBase.Common.Connections;
+﻿using ExpressBase.Common.Connections;
 using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
-using ExpressBase.Common;
+using ServiceStack;
+using System.Runtime.Serialization;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
@@ -29,7 +25,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-
     public class RefreshSolutionConnectionsBySolutionIdAsyncRequest : EbServiceStackAuthRequest, IReturn<RefreshSolutionConnectionsAsyncResponse>
     {
         public string SolutionId { get; set; }
@@ -37,6 +32,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     public class GetConnectionsRequest : EbServiceStackAuthRequest, IReturn<GetConnectionsResponse>
     {
+        public string SolutionId { get; set; }
+
         public int ConnectionType { get; set; }
     }
 
@@ -65,12 +62,23 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class ChangeFilesDBConnectionRequest : EbServiceStackAuthRequest, IReturn<ChangeConnectionResponse>
     {
         public bool IsNew { get; set; }
+        public string SolutionId { get; set; }
         public EbFilesDbConnection FilesDBConnection { get; set; }
+    }
+
+    public class ChangeFTPConnectionRequest : EbServiceStackAuthRequest, IReturn<ChangeConnectionResponse>
+    {
+        public bool IsNew { get; set; }
+        public string SolutionId { get; set; }
+        public EbFTPConnection FTPConnection { get; set; }
     }
 
     public class ChangeSMSConnectionRequest : EbServiceStackAuthRequest, IReturn<ChangeConnectionResponse>
     {
         public bool IsNew { get; set; }
+
+        public string SolutionId { get; set; }
+
         public SMSConnection SMSConnection { get; set; }
     }
 
@@ -87,13 +95,19 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class ChangeSMTPConnectionRequest : EbServiceStackAuthRequest, IReturn<ChangeConnectionResponse>
     {
         public bool IsNew { get; set; }
+
+        public string SolutionId { get; set; }
+
         public SMTPConnection SMTPConnection { get; set; }
     }
 
-    public class ChangeImageManipulationConnectionRequest : EbServiceStackAuthRequest, IReturn<ChangeConnectionResponse>
+    public class ChangeCloudinaryConnectionRequest : EbServiceStackAuthRequest, IReturn<ChangeConnectionResponse>
     {
         public bool IsNew { get; set; }
-        public ImageManipulateConnection ImageManipulateConnection { get; set; }
+
+        public string SolutionId { get; set; }
+
+        public EbCloudinaryConnection ImageManipulateConnection { get; set; }
     }
 
     public class ChangeConnectionResponse : IEbSSResponse
