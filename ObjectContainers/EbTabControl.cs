@@ -25,8 +25,23 @@ namespace ExpressBase.Objects
                 return @"EbTabControl = {
                 padding : function(elementId, props) {
                     $(`#${ elementId}.Eb-ctrlContainer > .tab-content >.tab-pane`).css('padding', props.Padding + 'px');
-                }
-            }";
+                },
+                adjustPanesHeightToHighest : function(elementId, props) {
+                    var maxH = 0;
+                    let $panes = $(`#${ elementId}.Eb-ctrlContainer > .tab-content >.tab-pane`);
+                    $panes.css('min-height', 'inherit');
+                    $panes.each(function () {
+                        $this = $(this);
+                        if ($this.outerHeight() > maxH) {
+                            maxH = $this.outerHeight();
+                        }
+                    });
+                    if($('form[eb-form=true]').attr('IsRenderMode') === 'True')
+                        $panes.outerHeight(maxH);      
+                    else
+                        $panes.css('min-height', maxH +'px');                      
+                    }
+                }";
             }
         }
 
@@ -41,7 +56,9 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.Collection)]
         [Alias("TabCollection")]
         [PropertyGroup("test")]
+        [UIproperty]
         [ListType(typeof(EbTabPane))]
+        [OnChangeUIFunction("EbTabControl.adjustPanesHeightToHighest")]
         public override List<EbControl> Controls { get; set; }
 
         public override string GetDesignHtml()
@@ -62,11 +79,11 @@ this.Init = function(id)
 
         public override string GetHtml()
         {
-            string TabBtnHtml = "<div id='cont_@name@' ebsid='@name@' class='Eb-ctrlContainer' Ctype='TabControl'><ul class='nav nav-tabs'>".Replace("@name@", Name);
+            string TabBtnHtml = "<div id='cont_@ebsid@' ebsid='@ebsid@' class='Eb-ctrlContainer' Ctype='TabControl'><ul class='nav nav-tabs'>".Replace("@ebsid@", EbSid);
             string TabContentHtml = "<div class='tab-content'>";
 
             foreach (EbControl tab in Controls)
-                TabBtnHtml += "<li li-of='@name@' @active><a data-toggle='tab' href='#@name@'>@name@</a></li>".Replace("@name@", tab.Name);
+                TabBtnHtml += "<li li-of='@ebsid@' @active><a data-toggle='tab' href='#@ebsid@'>@name@</a></li>".Replace("@name@", tab.Name).Replace("@ebsid@", tab.EbSid);
 
             TabBtnHtml += "</ul>";
 
@@ -101,7 +118,7 @@ this.Init = function(id)
 
         public override string GetHtml()
         {
-            string html = "<div id='@name@' ebsid='@ebsid@' class='tab-pane fade @inactive'>";
+            string html = "<div id='@ebsid@' ebsid='@ebsid@' class='tab-pane fade @inactive'>";
 
             foreach (EbControl ec in this.Controls)
                 html += ec.GetHtml();

@@ -72,6 +72,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public List<string> SubCategoryList { get; set; }
 
 		[DataMember(Order = 11)]
+		public List<string> ImageIdList { get; set; }
+
+		[DataMember(Order = 12)]
 		public int RespMode { get; set; }
 
 	}
@@ -89,6 +92,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public string SolnId { get; set; }
 
 		public int UserId { get; set; }
+
+		[DataMember(Order = 4)]
+		public string ImgRefId { get; set; }
 	}
 
 	[DataContract]
