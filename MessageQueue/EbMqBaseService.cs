@@ -6,7 +6,7 @@ using ServiceStack.Logging;
 using ServiceStack.Messaging;
 using ServiceStack.RabbitMq;
 
-namespace ExpressBase.MessageQueue.Services
+namespace ExpressBase.Objects.Services
 {
     public class EbMqBaseService : Service
     {
