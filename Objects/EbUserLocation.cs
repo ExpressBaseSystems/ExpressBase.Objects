@@ -36,7 +36,7 @@ namespace ExpressBase.Objects.Objects
             string _html = string.Empty;
             try
             {
-
+                Console.WriteLine("Location:  "+_user.LocationIds);
                 if (_user.LocationIds.Contains(-1))
                 {
                     foreach (var key in _sol.Locations)
