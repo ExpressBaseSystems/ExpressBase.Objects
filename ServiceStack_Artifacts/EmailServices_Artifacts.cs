@@ -31,7 +31,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Bcc { get; set; }
 
         [DataMember(Order = 7)]
-        public MemorystreamWrapper AttachmentReport { get; set; }
+        // public MemorystreamWrapper AttachmentReport { get; set; }
+        public byte[] AttachmentReport { get; set; }
 
         [DataMember(Order = 7)]
         public string AttachmentName { get; set; }
