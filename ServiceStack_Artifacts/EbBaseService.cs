@@ -15,7 +15,16 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
     public class EbBaseService : Service
     {
-        protected EbConnectionFactory EbConnectionFactory { get; private set; }
+        private EbConnectionFactory __EbConnectionFactory;
+        public EbConnectionFactory EbConnectionFactory
+        {
+            get { return __EbConnectionFactory; }
+            set
+            {
+                if(value != null)
+                    __EbConnectionFactory = value;
+            }
+        }
 
         protected RestClient RestClient { get; private set; }
 
