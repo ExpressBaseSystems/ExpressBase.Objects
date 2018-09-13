@@ -249,9 +249,22 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 2)]
         public List<BotFormField> Fields { get; set; }
 
-		[DataMember(Order = 3)]
-		public int AnonUserId { get; set; }
-	}
+        [DataMember(Order = 3)]
+        public int AnonUserId { get; set; }
+
+        [DataMember(Order = 4)]
+        public int Id { get; set; }
+    }
+
+    [DataContract]
+    public class GetRowDataRequest : EbServiceStackAuthRequest, IReturn<CreateBotResponse>
+    {
+        [DataMember(Order = 1)]
+        public string  RefId { get; set; }
+
+        [DataMember(Order = 2)]
+        public string RowId { get; set; }
+    }
 
     [DataContract]
     public class InsertIntoBotFormTableResponse : IEbSSResponse
@@ -264,6 +277,16 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 3)]
         public string BotId { get; set; }
+    }
+
+    [DataContract]
+    public class GetRowDataResponse : IEbSSResponse
+    {
+		[DataMember(Order = 1)]
+		public List<Object> RowValues { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
     }
 
 	[DataContract]
