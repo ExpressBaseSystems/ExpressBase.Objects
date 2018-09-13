@@ -19,6 +19,11 @@ namespace ExpressBase.Objects.Objects
         [HideInPropertyGrid]
         public List<EbSimpleSelectOption> Options { get; set; }
 
+        [EnableInBuilder(BuilderType.FilterDialog)]
+        [DefaultPropValue("eb_location_id")]
+        [PropertyEditor(PropertyEditorType.Label)]
+        public override string Name { get; set; }
+
         public EbUserLocation()
         {
             this.Options = new List<EbSimpleSelectOption>();

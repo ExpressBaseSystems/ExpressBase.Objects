@@ -232,8 +232,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 8)]
         public bool Ispaged { get; set; }
 
-        [DataMember(Order = 4)]
+        [DataMember(Order = 9)]
         public RowColletion FormattedData { get; set; }
+
+        [DataMember(Order = 10)]
+        public List<LevelInfo> Levels { get; set; }
+        
     }
 
     [DataContract]
@@ -358,5 +362,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 8)]
         public bool Ispaged { get; set; }
+    }
+
+    public class LevelInfo
+    {
+        public string LevelText { get; set; }
+        public int Count { get; set; }
+        public int RowIndex { get; set; }
     }
 }

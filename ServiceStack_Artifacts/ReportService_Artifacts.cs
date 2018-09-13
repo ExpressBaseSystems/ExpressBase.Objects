@@ -31,6 +31,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 3)]
         public String ReportName { get; set; }
+
+        [DataMember (Order =4)]
+        public byte[] ReportBytea { get; set; }
     }
 
     public class ValidateCalcExpressionRequest : EbServiceStackAuthRequest, IReturn<ReportRenderResponse>
