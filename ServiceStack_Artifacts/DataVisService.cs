@@ -151,6 +151,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 14)]
         public List<int> RGIndex { get; set; }
+
+        [DataMember(Order = 15)]
+        public RowGroupParent CurrentRowGroup { get; set; }
+       
     }
 
     [Route("/table")]

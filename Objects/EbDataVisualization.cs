@@ -353,6 +353,10 @@ namespace ExpressBase.Objects
         public List<RowGroupParent> RowGroupCollection { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
+        [HideInPropertyGrid]
+        public RowGroupParent CurrentRowGroup { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
         public int LeftFixedColumn { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
