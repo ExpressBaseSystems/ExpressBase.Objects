@@ -236,7 +236,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public RowColletion FormattedData { get; set; }
 
         [DataMember(Order = 10)]
-        public List<LevelInfo> Levels { get; set; }
+        public LevelInfoCollection Levels { get; set; }
         
     }
 
@@ -369,5 +369,74 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string LevelText { get; set; }
         public int Count { get; set; }
         public int RowIndex { get; set; }
+        public string Type { get; set; }
+        public int Level { get; set; }
+        public string GroupString { get; set; }
+    }
+
+    public class LevelInfoCollection : List<LevelInfo>
+    {
+        public LevelInfo Update(int _index, int _count, int level)
+        {
+            foreach (LevelInfo _lvl in this)
+            {
+                if (_lvl.RowIndex == _index && _lvl.GroupString.IndexOf("group-sum") == -1 && _lvl.Level == level)
+                {
+                    _lvl.Count = _count;
+                    return _lvl;
+                }
+            }
+            return null;
+        }
+
+        public LevelInfo PreviousLevelCheck(int _index, int level)
+        {
+            foreach (LevelInfo _lvl in this)
+            {
+                if (_lvl.RowIndex == _index-1 && _lvl.GroupString.IndexOf("group-sum") == -1 && _lvl.Level == level-1)
+                {
+                    return _lvl;
+                }
+            }
+            return null;
+        }
+
+        public LevelInfo UpdatePreviousLevelCount(int _index, int _count, int level)
+        {
+            foreach (LevelInfo _lvl in this)
+            {
+                if (_lvl.RowIndex == _index && _lvl.GroupString.IndexOf("group-sum") == -1 && _lvl.Level == level - 1)
+                {
+                    _lvl.Count = _count;
+                    return _lvl;
+                }
+            }
+            return null;
+        }
+
+        public LevelInfo CurrentLevelDataCheck(int level, string data)
+        {
+            foreach (LevelInfo _lvl in this)
+            {
+                if ( _lvl.LevelText != data && _lvl.Level == level && _lvl.GroupString.IndexOf("group-sum") == -1)
+                {
+                    return _lvl;
+                }
+            }
+            return null;
+        }
+
+        public int GetCount(int r1, int r2, int level)
+        {
+            int Count = 0;
+            foreach (LevelInfo _lvl in this)
+            {
+                if (_lvl.RowIndex >= r1 &&  _lvl.RowIndex <= r2 && _lvl.Level == level && _lvl.GroupString.IndexOf("group-sum") == -1)
+                {
+                    Count++;
+                }
+            }
+            return Count;
+        }
     }
 }

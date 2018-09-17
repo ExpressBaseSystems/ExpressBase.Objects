@@ -34,20 +34,27 @@ namespace ExpressBase.Objects.Objects
         public void InitFromDataBase(JsonServiceClient ServiceClient, User _user, Eb_Solution _sol)
         {
             string _html = string.Empty;
-
-            if (_user.LocationIds.Contains(-1))
+            try
             {
-                foreach (var key in _sol.Locations)
+                Console.WriteLine("Location:  "+_user.LocationIds);
+                if (_user.LocationIds.Contains(-1))
                 {
-                    _html += string.Format("<option value='{0}'>{1}</option>", key.Value.LocId, key.Value.ShortName);
+                    foreach (var key in _sol.Locations)
+                    {
+                        _html += string.Format("<option value='{0}'>{1}</option>", key.Value.LocId, key.Value.ShortName);
+                    }
+                }
+                else
+                {
+                    foreach (int loc in _user.LocationIds)
+                    {
+                        _html += string.Format("<option value='{0}'>{1}</option>", _sol.Locations[loc].LocId, _sol.Locations[loc].ShortName);
+                    }
                 }
             }
-            else
+            catch (Exception ex)
             {
-                foreach (int loc in _user.LocationIds)
-                {
-                    _html += string.Format("<option value='{0}'>{1}</option>", _sol.Locations[loc].LocId, _sol.Locations[loc].ShortName);
-                }
+                Console.WriteLine(ex.ToString());
             }
 
             this.OptionHtml = _html;

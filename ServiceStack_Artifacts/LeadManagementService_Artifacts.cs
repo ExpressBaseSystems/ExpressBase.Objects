@@ -95,6 +95,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 		[DataMember(Order = 4)]
 		public string ImgRefId { get; set; }
+		
+		[DataMember(Order = 5)]
+		public string UserName { get; set; }
 	}
 
 	[DataContract]
