@@ -132,6 +132,11 @@ namespace ExpressBase.Objects.Objects.DVRelated
         {
             return user_cultureinfo;
         }
+
+        public DVBaseColumn ShallowCopy()
+        {
+            return (DVBaseColumn)this.MemberwiseClone();
+        }
     }
 
     public class DVColumnCollection : List<DVBaseColumn>

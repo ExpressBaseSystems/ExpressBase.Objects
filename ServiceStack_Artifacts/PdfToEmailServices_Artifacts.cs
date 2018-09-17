@@ -1,4 +1,5 @@
-﻿using ExpressBase.Common.EbServiceStack.ReqNRes;
+﻿using ExpressBase.Common.Data;
+using ExpressBase.Common.EbServiceStack.ReqNRes;
 using ExpressBase.Objects.EmailRelated;
 using ServiceStack;
 using System;
@@ -14,6 +15,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 1)]
         public string Refid  { get; set; }
 
+        [DataMember(Order = 2)]
+        public List<Param> Params { get; set; }
+
     }
     [DataContract]
     public class PdfCreateServiceRequest : EbServiceStackAuthRequest, IReturn<PdfCreateServicesResponse>
@@ -21,10 +25,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 1)]
         public string Refid { get; set; }
 
+        [DataMember(Order =2)]
+        public List<Param> Params { get; set; }
     }
     public  class PdfCreateServicesResponse
     {
-        [DataMember(Order = 2)]
+        [DataMember(Order = 1)]
         public ResponseStatus ResponseStatus { get; set; }
     }
 }

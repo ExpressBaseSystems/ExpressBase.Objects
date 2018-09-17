@@ -95,6 +95,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 		[DataMember(Order = 4)]
 		public string ImgRefId { get; set; }
+		
+		[DataMember(Order = 5)]
+		public string UserName { get; set; }
 	}
 
 	[DataContract]
@@ -215,6 +218,32 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public int Status { get; set; }
 
 		[DataMember(Order = 3)]
+		public ResponseStatus ResponseStatus { get; set; }
+
+	}
+
+	[DataContract]
+	public class LmUniqueCheckRequest : IReturn<LmUniqueCheckResponse>, IEbSSRequest
+	{
+		[DataMember(Order = 1)]
+		public string Key { get; set; }
+
+		[DataMember(Order = 2)]
+		public string Value { get; set; }
+
+		[DataMember(Order = 3)]
+		public string SolnId { get; set; }
+
+		public int UserId { get; set; }
+	}
+
+	[DataContract]
+	public class LmUniqueCheckResponse : IEbSSResponse
+	{
+		[DataMember(Order = 1)]
+		public bool Status { get; set; }
+
+		[DataMember(Order = 2)]
 		public ResponseStatus ResponseStatus { get; set; }
 
 	}
