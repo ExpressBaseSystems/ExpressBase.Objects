@@ -243,7 +243,7 @@ namespace ExpressBase.Objects
         public Dictionary<string, List<object>> ReportSummaryFields { get; set; }
 
         [JsonIgnore]
-        public Dictionary<string, byte[]> WatermarkImages { get; set; }
+        public Dictionary<int, byte[]> WatermarkImages { get; set; }
 
         [JsonIgnore]
         public List<object> WaterMarkList { get; set; }
@@ -494,9 +494,12 @@ namespace ExpressBase.Objects
             {
                 foreach (EbReportField field in ReportObjects)
                 {
-                    if ((field as EbWaterMark).Image != string.Empty)
-                        fileByte = WatermarkImages[(field as EbWaterMark).Image];
-                    (field as EbWaterMark).DrawMe(d, writer, fileByte, HeightPt);
+                    if (field is EbWaterMark)
+                        if ((field as EbWaterMark).ImageRefId != 0)
+                        {
+                            fileByte = WatermarkImages[(field as EbWaterMark).ImageRefId];
+                            (field as EbWaterMark).DrawMe(d, writer, fileByte, HeightPt);
+                        }
                 }
             }
         }
@@ -901,8 +904,21 @@ namespace ExpressBase.Objects
 
                 else if (field is EbImg)
                 {
-                    byte[] fileByte = GetFile((field as EbImg).Image);
-                    if (!fileByte.IsEmpty())
+                    byte[] fileByte;
+                    if ((field as EbImg).ImageRefId != 0)
+                        fileByte = GetImage((field as EbImg).ImageRefId);
+                    else if (!string.IsNullOrEmpty((field as EbImg).ImageColName))
+                    {
+                        var col = (field as EbImg).ImageColName;
+
+                        fileByte = GetImage(Convert.ToInt32(GetDataFieldtValue(col.Split(".")[1], serialnumber, Convert.ToInt32(col.Split(".")[0].Substring(1)))));
+                    }
+                    else
+                    {
+                        fileByte = new byte[0];
+                    }
+
+                    if (fileByte.Length != 0)
                         field.DrawMe(Doc, fileByte, HeightPt, section_Yposition, detailprintingtop);
                 }
 
@@ -928,7 +944,7 @@ namespace ExpressBase.Objects
                 }
                 else if (field is EbLocFieldImage)
                 {
-                    byte[] fileByte = GetFile(Solution.Locations[42][field.Title]);
+                    byte[] fileByte = GetImage(Convert.ToInt32(Solution.Locations[42][field.Title]));
                     if (!fileByte.IsEmpty())
                         field.DrawMe(Doc, fileByte, HeightPt, section_Yposition, detailprintingtop);
                 }
@@ -950,11 +966,11 @@ namespace ExpressBase.Objects
             {
                 foreach (EbReportField field in ReportObjects)
                 {
-                    if ((field is EbWaterMark) && (field as EbWaterMark).Image != string.Empty)
+                    if ((field is EbWaterMark) && (field as EbWaterMark).ImageRefId != 0)
                     {
-                        byte[] fileByte = GetFile((field as EbWaterMark).Image);
+                        byte[] fileByte = GetImage((field as EbWaterMark).ImageRefId);
                         if (!fileByte.IsEmpty())
-                            WatermarkImages.Add((field as EbWaterMark).Image, fileByte);
+                            WatermarkImages.Add((field as EbWaterMark).ImageRefId, fileByte);
 
                     }
                 }
@@ -1068,19 +1084,17 @@ namespace ExpressBase.Objects
 
         public static EbOperations Operations = ReportOperations.Instance;
 
-        public byte[] GetFile(string Image)
+        public byte[] GetImage(int refId)
         {
             DownloadFileResponse dfs = null;
 
             byte[] fileByte = new byte[0];
             dfs = FileClient.Get
-                 (new DownloadFileRequest
+                 (new DownloadImageByIdRequest
                  {
-                     SolnId = SolutionId,
-                     FileDetails = new FileMeta
+                     ImageInfo = new ImageMeta
                      {
-                         FileName = Image + StaticFileConstants.DOTJPG,
-                         FileType = StaticFileConstants.JPG
+                         FileRefId = refId
                      }
                  });
             if (dfs.StreamWrapper != null)
