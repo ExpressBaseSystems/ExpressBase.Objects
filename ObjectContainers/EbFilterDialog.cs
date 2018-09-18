@@ -3,6 +3,7 @@ using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
+using ExpressBase.Objects.Objects;
 using ServiceStack;
 using System;
 using System.Collections.Generic;
@@ -43,6 +44,11 @@ namespace ExpressBase.Objects
                         _p.Type = "11";
                     }
                     //_p.Type = Convert.ToInt32((EbDbType)((c as EbComboBox).ValueMember.Type));
+                }
+                if(c is EbUserLocation)
+                {
+                    _p.Value = "0";
+                    _p.Type = "11";
                 }
                 _paramlist.Add(_p);
             }
