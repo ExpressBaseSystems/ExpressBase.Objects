@@ -15,8 +15,33 @@ namespace ExpressBase.Objects
             this.Controls = new List<EbControl>();
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
+        public override string UIchangeFns
+        {
+            get
+            {
+                return @"EbGroupBox = {
+                    padding : function(elementId, props) {
+                        $(`#${ elementId}.Eb-ctrlContainer`).closestInner('.group-box').css('padding', props.Padding + 'px');
+                    }
+                }";
+            }
+        }
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyGroup("Data")]
+        [HelpText("Name Of database-table Which you want to store Data collected using this Section")]
+        public string TableName { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        [UIproperty]
+        [OnChangeUIFunction("Common.LABEL")]
         public override string Label { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        [PropertyGroup("Test")]
+        [OnChangeUIFunction("EbGroupBox.padding")]
+        [UIproperty]
+        [DefaultPropValue("3")]
+        public int Padding { get; set; }
 
         public override string GetToolHtml()
         {
@@ -31,13 +56,20 @@ namespace ExpressBase.Objects
         public override string GetHtml()
         {
             string html = @"
-            <div id='@name@' ebsid='@ebsid@' class='Eb-ctrlContainer' Ctype='TableLayout'>
-                <div class='group-box'>";
+            <div id='@name@' ebsid='@ebsid@' class='Eb-ctrlContainer ebcont-ctrl' ctype='@objtype@'>
+                <div class='gb-wraper'>
+                    <span class='gb-label' ui-label>@glabel@</span>
+                    <div class='gb-border'>
+                        <div class='group-box'>";
 
             foreach (EbControl ec in this.Controls)
                 html += ec.GetHtml();
 
-            return (html + "</div></div>").Replace("@name@", this.Name).Replace("@ebsid@", this.EbSid);
+            return (html + "</div></div></div>")
+                .Replace("@name@", this.Name)
+                .Replace("@ebsid@", this.EbSid)
+                .Replace("@glabel@", this.Label)
+                .Replace("@objtype@", this.ObjType);
         }
 
     }

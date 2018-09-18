@@ -102,17 +102,6 @@ namespace ExpressBase.Objects
             this.Controls.Add(new EbTableTd { Name = "EbTable0_Td0" });
             this.Controls.Add(new EbTableTd { Name = "EbTable0_Td1" });
             return GetHtml().RemoveCR().DoubleQuoted(); 
-//            return @"
-//<div class='Eb-ctrlContainer' Ctype='TableLayout'>
-//    <table style='width:100%' style=' @BackColor  @ForeColor ' >
-//        <tr>
-//            <td id='@id_Td0' class='tdDropable' ></td>
-//            <td id='@id_Td1' class='tdDropable'></td style='min-height:20px;'>
-//        </tr>
-//    </table>
-//</div>"
-//    .Replace("@BackColor ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor ") + ";"))
-//    .Replace("@ForeColor ", "color:" + ((this.ForeColor != null) ? this.ForeColor : "@ForeColor ") + ";").RemoveCR().DoubleQuoted();
         }
 
         public override string GetJsInitFunc()
@@ -185,7 +174,7 @@ this.Init = function(id)
 
         public override string GetHtml()
         {
-            string html = "<td id='@name@' ebsid='@ebsid@' class='form-render-table-Td tdDropable'>";
+            string html = "<td id='@name@' ebsid='@ebsid@' class='form-render-table-Td tdDropable ebcont-ctrl'>";
 
             foreach (EbControl ec in this.Controls)
                 html += ec.GetHtml();

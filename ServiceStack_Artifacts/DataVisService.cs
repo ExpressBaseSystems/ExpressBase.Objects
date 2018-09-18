@@ -153,7 +153,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public List<int> RGIndex { get; set; }
 
         [DataMember(Order = 15)]
-        public RowGroupParent CurrentRowGroup { get; set; }
+        public string CurrentRowGroup { get; set; }
        
     }
 
