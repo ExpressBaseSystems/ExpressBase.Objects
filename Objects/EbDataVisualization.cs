@@ -424,7 +424,7 @@ namespace ExpressBase.Objects
 
         public override void ReplaceRefid(Dictionary<string, string> RefidMap)
         {
-            if (DataSourceRefId.IsEmpty())
+            if (!DataSourceRefId.IsEmpty())
             {
                 string dsid = DataSourceRefId;
                 if (RefidMap.ContainsKey(dsid))
