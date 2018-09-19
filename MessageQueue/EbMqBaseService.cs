@@ -10,7 +10,7 @@ namespace ExpressBase.Objects.Services
 {
     public class EbMqBaseService : Service
     {
-        protected EbConnectionFactory EbConnectionFactory { get; private set; }
+        protected EbConnectionFactory EbConnectionFactory { get; set; }
 
         protected RabbitMqProducer MessageProducer3 { get; private set; }
 
