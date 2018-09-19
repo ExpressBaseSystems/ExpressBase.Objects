@@ -479,12 +479,12 @@ namespace ExpressBase.Objects
 
         }
 
-        public string GetDataFieldtValue(string column_name, int i, int tableIndex)
+        public dynamic GetDataFieldtValue(string column_name, int i, int tableIndex)
         {
-            if (DataSet.Tables[tableIndex].Rows.Count > 1)
-                return DataSet.Tables[tableIndex].Rows[i][column_name].ToString();
-            else
-                return DataSet.Tables[tableIndex].Rows[0][column_name].ToString();
+            dynamic value = null;
+            int index = (DataSet.Tables[tableIndex].Rows.Count > 1) ? i : 0;
+            EbDbTypes type = (DataSet.Tables[tableIndex].Columns[column_name].Type);
+            return value = (type == EbDbTypes.Bytea) ? DataSet.Tables[tableIndex].Rows[index][column_name] : DataSet.Tables[tableIndex].Rows[index][column_name].ToString();
         }
 
         public void DrawWaterMark(Document d, PdfWriter writer)
@@ -904,18 +904,17 @@ namespace ExpressBase.Objects
 
                 else if (field is EbImg)
                 {
-                    byte[] fileByte;
+                    byte[] fileByte = new byte[0]; ;
                     if ((field as EbImg).ImageRefId != 0)
                         fileByte = GetImage((field as EbImg).ImageRefId);
                     else if (!string.IsNullOrEmpty((field as EbImg).ImageColName))
                     {
-                        var col = (field as EbImg).ImageColName;
-
-                        fileByte = GetImage(Convert.ToInt32(GetDataFieldtValue(col.Split(".")[1], serialnumber, Convert.ToInt32(col.Split(".")[0].Substring(1)))));
-                    }
-                    else
-                    {
-                        fileByte = new byte[0];
+                        string col = (field as EbImg).ImageColName;
+                        dynamic val = GetDataFieldtValue(col.Split(".")[1], serialnumber, Convert.ToInt32(col.Split(".")[0].Substring(1)));
+                        if (val is string)
+                            fileByte = GetImage(Convert.ToInt32(val));
+                        else if (val is byte[])
+                            fileByte = val;
                     }
 
                     if (fileByte.Length != 0)
