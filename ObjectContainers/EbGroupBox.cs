@@ -15,6 +15,19 @@ namespace ExpressBase.Objects
             this.Controls = new List<EbControl>();
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
+
+        public override string GetQuery()
+        {
+            string qry = string.Empty;
+
+            foreach (EbControl control in Controls)
+            {
+                if (control is EbControlContainer)
+                    qry += (control as EbControlContainer).GetQuery();
+            }
+            return qry;
+        }
+
         public override string UIchangeFns
         {
             get

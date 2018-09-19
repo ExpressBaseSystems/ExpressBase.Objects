@@ -1,4 +1,5 @@
-﻿using ExpressBase.Common.Objects;
+﻿using ExpressBase.Common.Extensions;
+using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
 using ExpressBase.Data;
@@ -27,6 +28,27 @@ namespace ExpressBase.Objects
         public bool IsRenderMode { get; set; }
 
         public EbWebForm() { }
+
+        public override int TableRowId { get; set; }
+
+        public override string GetQuery()
+        {
+            string ColoumsStr = String.Empty;
+            IEnumerable<EbControl> controls = Controls.FlattenEbControls();
+            foreach (var control in controls)
+            {
+                ColoumsStr += control.Name + ", ";
+            }
+            ColoumsStr = ColoumsStr.Substring(0, ColoumsStr.Length - 2);
+            string qry = string.Format("SELECT {0} FROM {1} WHERE id={2};", ColoumsStr, TableName, TableRowId);
+
+            foreach (EbControl control in Controls)
+            {
+                if (control is EbControlContainer)
+                    qry += (control as EbControlContainer).GetQuery();
+            }
+            return qry;
+        }
 
         public static EbOperations Operations = BFOperations.Instance;
 
