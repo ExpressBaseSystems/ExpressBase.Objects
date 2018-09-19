@@ -56,25 +56,28 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		[DataMember(Order = 10)]
 		public Dictionary<string, int> StaffDict { get; set; }
 
-		[DataMember(Order = 10)]
+		[DataMember(Order = 11)]
 		public List<string> CrntCityList { get; set; }
 
-		[DataMember(Order = 10)]
+		[DataMember(Order = 12)]
 		public List<string> CrntCountryList { get; set; }
 
-		[DataMember(Order = 10)]
+		[DataMember(Order = 13)]
 		public List<string> CityList { get; set; }
 
-		[DataMember(Order = 10)]
+		[DataMember(Order = 14)]
+		public List<string> DistrictList { get; set; }
+
+		[DataMember(Order = 15)]
 		public List<string> SourceCategoryList { get; set; }
 
-		[DataMember(Order = 10)]
+		[DataMember(Order = 16)]
 		public List<string> SubCategoryList { get; set; }
 
-		[DataMember(Order = 11)]
+		[DataMember(Order = 17)]
 		public List<string> ImageIdList { get; set; }
 
-		[DataMember(Order = 12)]
+		[DataMember(Order = 18)]
 		public int RespMode { get; set; }
 
 	}
