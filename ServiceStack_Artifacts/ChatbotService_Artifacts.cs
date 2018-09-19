@@ -263,7 +263,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string  RefId { get; set; }
 
         [DataMember(Order = 2)]
-        public string RowId { get; set; }
+        public int RowId { get; set; }
     }
 
     [DataContract]

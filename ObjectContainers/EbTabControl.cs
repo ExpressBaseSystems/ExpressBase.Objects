@@ -118,12 +118,15 @@ this.Init = function(id)
 
         public override string GetHtml()
         {
-            string html = "<div id='@ebsid@' ebsid='@ebsid@' class='tab-pane fade @inactive'>";
+            string html = "<div id='@ebsid@' ebsid='@ebsid@' ctype='@objtype@' class='tab-pane fade @inactive ebcont-ctrl'>";
 
             foreach (EbControl ec in this.Controls)
                 html += ec.GetHtml();
 
-            return (html + "</div>").Replace("@name@", this.Name).Replace("@ebsid@", this.EbSid);
+            return (html + "</div>")
+                .Replace("@name@", this.Name)
+                .Replace("@ebsid@", this.EbSid)
+                .Replace("@objtype@", this.ObjType);
         }
     }
 }
