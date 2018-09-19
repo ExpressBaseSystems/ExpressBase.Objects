@@ -16,18 +16,6 @@ namespace ExpressBase.Objects
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
 
-        public override string GetQuery()
-        {
-            string qry = string.Empty;
-
-            foreach (EbControl control in Controls)
-            {
-                if (control is EbControlContainer)
-                    qry += (control as EbControlContainer).GetQuery();
-            }
-            return qry;
-        }
-
         public override string UIchangeFns
         {
             get
@@ -39,10 +27,6 @@ namespace ExpressBase.Objects
                 }";
             }
         }
-        [EnableInBuilder(BuilderType.WebForm)]
-        [PropertyGroup("Data")]
-        [HelpText("Name Of database-table Which you want to store Data collected using this Section")]
-        public string TableName { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
         [UIproperty]

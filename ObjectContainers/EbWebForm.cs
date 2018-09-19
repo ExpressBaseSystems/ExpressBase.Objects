@@ -17,11 +17,6 @@ namespace ExpressBase.Objects
     [HideInToolBox]
     public class EbWebForm : EbControlContainer
     {
-        [EnableInBuilder(BuilderType.WebForm)]
-        [PropertyGroup("Data")]
-        [HelpText("Name Of database-table Which you want to store Data collected using this Form")]
-        public string TableName { get; set; }
-
         [Browsable(false)]
         public bool IsUpdate { get; set; }
 
@@ -31,24 +26,6 @@ namespace ExpressBase.Objects
 
         public override int TableRowId { get; set; }
 
-        public override string GetQuery()
-        {
-            string ColoumsStr = String.Empty;
-            IEnumerable<EbControl> controls = Controls.FlattenEbControls();
-            foreach (var control in controls)
-            {
-                ColoumsStr += control.Name + ", ";
-            }
-            ColoumsStr = ColoumsStr.Substring(0, ColoumsStr.Length - 2);
-            string qry = string.Format("SELECT {0} FROM {1} WHERE id={2};", ColoumsStr, TableName, TableRowId);
-
-            foreach (EbControl control in Controls)
-            {
-                if (control is EbControlContainer)
-                    qry += (control as EbControlContainer).GetQuery();
-            }
-            return qry;
-        }
 
         public static EbOperations Operations = BFOperations.Instance;
 
