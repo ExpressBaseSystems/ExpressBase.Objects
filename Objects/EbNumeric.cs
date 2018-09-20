@@ -69,6 +69,11 @@ namespace ExpressBase.Objects
         //    get { return ((this.MaxLength > 0) ? "$('#{0}').focus(function() {$(this).select();});".Replace("{0}", this.Name).Replace("{1}", this.Value.ToString()) : string.Empty); }
         //}
 
+        public override VendorDbType GetvDbType(IVendorDbTypes vDbTypes)
+        {
+            return vDbTypes.Decimal;
+        }
+
         public override string GetToolHtml()
         {
             return @"<div eb-type='@toolName' class='tool'><b>0-9 </b></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
