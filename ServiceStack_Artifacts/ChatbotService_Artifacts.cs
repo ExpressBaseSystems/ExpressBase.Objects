@@ -1,5 +1,6 @@
 ﻿using ExpressBase.Common.Application;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
+using ExpressBase.Common.Objects;
 using ExpressBase.Common.Structures;
 using ExpressBase.Objects.Objects;
 using ServiceStack;
@@ -195,7 +196,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class CreateWebFormTableRequest : EbServiceStackAuthRequest, IReturn<CreateBotResponse>
     {
         [DataMember(Order = 1)]
-        public EbWebForm WebObj { get; set; }
+        public EbControlContainer WebObj { get; set; }
 
         [DataMember(Order = 1)]
         public string Apps { get; set; }
