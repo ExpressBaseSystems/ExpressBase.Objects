@@ -239,7 +239,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 3)]
         public ResponseStatus ResponseStatus { get; set; }
     }
-
+    
     [Route("/bots")]
     [DataContract]
     public class InsertIntoBotFormTableRequest : EbServiceStackAuthRequest, IReturn<CreateBotResponse>
@@ -268,6 +268,32 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
+    public class InsertDataFromWebformResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public int RowAffected { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+    
+    [DataContract]
+    public class InsertDataFromWebformRequest : EbServiceStackAuthRequest, IReturn<CreateBotResponse>
+    {
+        [DataMember(Order = 1)]
+        public string TableName { get; set; }
+
+        [DataMember(Order = 2)]
+        public object ValObj { get; set; }
+
+        [DataMember(Order = 3)]
+        public string RefId { get; set; }
+
+        [DataMember(Order = 3)]
+        public int RowId { get; set; }
+    }
+
+    [DataContract]
     public class InsertIntoBotFormTableResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
@@ -284,39 +310,39 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class GetRowDataResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
-		public List<Object> RowValues { get; set; }
+        public List<Object> RowValues { get; set; }
 
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-	[DataContract]
-	public class SubmitBotFormRequest : EbServiceStackAuthRequest, IReturn<SubmitBotFormResponse>
-	{
-		[DataMember(Order = 1)]
-		public int Id { get; set; }
+    [DataContract]
+    public class SubmitBotFormRequest : EbServiceStackAuthRequest, IReturn<SubmitBotFormResponse>
+    {
+        [DataMember(Order = 1)]
+        public int Id { get; set; }
 
-		[DataMember(Order = 2)]
-		public string RefId { get; set; }	
+        [DataMember(Order = 2)]
+        public string RefId { get; set; }
 
-		[DataMember(Order = 3)]
-		public List<BotFormField> Fields { get; set; }
+        [DataMember(Order = 3)]
+        public List<BotFormField> Fields { get; set; }
 
-		[DataMember(Order = 4)]
-		public int AnonUserId { get; set; }
-	}
+        [DataMember(Order = 4)]
+        public int AnonUserId { get; set; }
+    }
 
-	[DataContract]
-	public class SubmitBotFormResponse : IEbSSResponse
-	{
-		[DataMember(Order = 1)]
-		public int RowAffected { get; set; }
+    [DataContract]
+    public class SubmitBotFormResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public int RowAffected { get; set; }
 
-		[DataMember(Order = 2)]
-		public ResponseStatus ResponseStatus { get; set; }
-	}
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
 
-	[DataContract]
+    [DataContract]
     public class BotFormField
     {
         [DataMember(Order = 1)]
@@ -328,63 +354,63 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 3)]
         public string Name { get; set; }
 
-		[DataMember(Order = 4)]
-		public bool AutoIncrement { get; set; }
+        [DataMember(Order = 4)]
+        public bool AutoIncrement { get; set; }
 
-		[DataMember(Order = 5)]
-		public string OldValue { get; set; }
-	}
+        [DataMember(Order = 5)]
+        public string OldValue { get; set; }
+    }
 
-	[DataContract]
-	public class GetBotsResponse : IEbSSResponse
-	{
-		[DataMember(Order = 1)]
-		public ResponseStatus ResponseStatus { get; set; }
+    [DataContract]
+    public class GetBotsResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public ResponseStatus ResponseStatus { get; set; }
 
-		[DataMember(Order = 2)]
-		public List<BotDetails> BotList { get; set; }
-	}
+        [DataMember(Order = 2)]
+        public List<BotDetails> BotList { get; set; }
+    }
 
-	[DataContract]
-	public class GetBotsRequest : EbServiceStackNoAuthRequest, IReturn<GetBotsResponse>
-	{
-		[DataMember(Order = 1)]
-		public string Value { get; set; }
+    [DataContract]
+    public class GetBotsRequest : EbServiceStackNoAuthRequest, IReturn<GetBotsResponse>
+    {
+        [DataMember(Order = 1)]
+        public string Value { get; set; }
 
-	}
+    }
 
-	[DataContract]
-	public class BotDetails
-	{
-		[DataMember(Order = 1)]
-		public int id { get; set; }
+    [DataContract]
+    public class BotDetails
+    {
+        [DataMember(Order = 1)]
+        public int id { get; set; }
 
-		[DataMember(Order = 2)]
-		public string name { get; set; }
+        [DataMember(Order = 2)]
+        public string name { get; set; }
 
-		[DataMember(Order = 3)]
-		public string icon { get; set; }
+        [DataMember(Order = 3)]
+        public string icon { get; set; }
 
-		[DataMember(Order = 4)]
-		public EbBotSettings botsettings { get; set; }
-	}
-	
-	[DataContract]
-	public class GetBotSettingsRequest : EbServiceStackAuthRequest, IReturn<GetBotSettingsResponse>
-	{
-		[DataMember(Order = 1)]
-		public int AppId { get; set; }
+        [DataMember(Order = 4)]
+        public EbBotSettings botsettings { get; set; }
+    }
 
-	}
+    [DataContract]
+    public class GetBotSettingsRequest : EbServiceStackAuthRequest, IReturn<GetBotSettingsResponse>
+    {
+        [DataMember(Order = 1)]
+        public int AppId { get; set; }
 
-	[DataContract]
-	public class GetBotSettingsResponse : IEbSSResponse
-	{
-		[DataMember(Order = 1)]
-		public ResponseStatus ResponseStatus { get; set; }
-		
-		[DataMember(Order = 2)]
-		public EbBotSettings Settings { get; set; }
-	}
+    }
+
+    [DataContract]
+    public class GetBotSettingsResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 2)]
+        public EbBotSettings Settings { get; set; }
+    }
 
 }
