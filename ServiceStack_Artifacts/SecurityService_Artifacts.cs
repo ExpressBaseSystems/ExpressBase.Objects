@@ -388,6 +388,31 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public bool isSuccess { get; set; }
 	}
 
+	[DataContract]
+	public class ResetUserPasswordRequest : IReturn<ResetUserPasswordResponse>, IEbSSRequest
+	{
+		[DataMember(Order = 1)]
+		public int Id { get; set; }
+
+		[DataMember(Order = 2)]
+		public string Email { get; set; }
+
+		[DataMember(Order = 3)]
+		public string NewPwd { get; set; }
+
+		[DataMember(Order = 4)]
+		public string SolnId { get; set; }
+
+		public int UserId { get; set; }
+	}
+
+	[DataContract]
+	public class ResetUserPasswordResponse
+	{
+		[DataMember(Order = 1)]
+		public bool isSuccess { get; set; }
+	}
+
 
 
 	//ANONYMOUS USER START-----------------------------------------
