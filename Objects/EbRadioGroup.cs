@@ -31,6 +31,16 @@ namespace ExpressBase.Objects
             //this.Options.CollectionChanged += Options_CollectionChanged;
             this.ValueType = EbRadioValueType.Boolean;
         }
+        public override string GetValueJSfn
+        {
+            get
+            {
+                return @"
+                    return $('[name=' + this.ebSid_CtxId + ']:checked').val();
+                ";
+            }
+            set { }
+        }
 
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.BotForm)]
@@ -72,10 +82,10 @@ namespace ExpressBase.Objects
 
         public override string GetBareHtml()
         {
-            string html = "<div id='@name@' data-ebtype='@data-ebtype@' name='@name@' style='padding:5px' type='RadioGroup'>";
+            string html = "<div id='@ebsid@' data-ebtype='3' name='@name@' style='padding:5px' type='RadioGroup'>";
             foreach (EbRadioOption ec in this.Options)
             {
-                ec.GName = this.Name;
+                ec.GName = this.EbSid_CtxId;
                 html += ec.GetHtml()
                     .Replace("@radio-wrap-block@", (this.RenderHorizontally ? "radio-wrap-block" : String.Empty))
                     .Replace("@defaultcheked@", ((this.Options.IndexOf(ec) == 0) ? " checked='checked' " : ""));
@@ -83,7 +93,7 @@ namespace ExpressBase.Objects
             html += "</div>";
             return html
 .Replace("@name@", (this.Name != null) ? this.Name : "@name@")
-.Replace("@data-ebtype@", "3");
+.Replace("@ebsid@", EbSid_CtxId);
         }
 
         public override string GetDesignHtml()
@@ -95,18 +105,19 @@ namespace ExpressBase.Objects
         public override string GetHtml()
         {
 
-            string html =
-                HtmlConstants.CONTROL_WRAPER_HTML4WEB
-.Replace("@barehtml@", this.GetBareHtml())
-.Replace("@name@", (this.Name != null) ? this.Name : "@name@")
-.Replace("@type@", this.ObjType)
-
-
+            string EbCtrlHTML = @"
+        <div id='cont_@ebsid@'  ebsid='@ebsid@'  class='Eb-ctrlContainer' ebsid='@ebsid@' ctype='@type@' style='@hiddenString'>
+            <span class='eb-ctrl-label' ui-label id='@ebsidLbl'>@Label@ </span>
+                <div  class='@ebsid@Wraper'>
+                    @barehtml@
+                </div>
+            <span class='helpText' ui-helptxt >@HelpText@ </span>
+        </div>"
     .Replace("@LabelForeColor ", "color:" + (LabelForeColor ?? "@LabelForeColor ") + ";")
     .Replace("@LabelBackColor ", "background-color:" + (LabelBackColor ?? "@LabelBackColor ") + ";")
     .Replace("@HelpText@ ", (HelpText ?? ""))
     .Replace("@Label@ ", (Label ?? ""));
-            return html;
+            return ReplacePropsInHTML(EbCtrlHTML);
         }
 
         public override string GetJsInitFunc()
@@ -157,12 +168,13 @@ this.Init = function(id)
         public string GName { get; set; }
 
         public override string GetBareHtml()
-        {/*onclick=""event.stopPropagation();$('#@name@').prop('checked', true);""*/
-            return @"<div id='@name@' class='radio-wrap @radio-wrap-block@' onclick=""event.stopPropagation(); $(this).children('input[type=radio]').prop('checked', true); $(this).children('input[type=radio]').trigger('change');"">
-                        <input type ='radio' id='@name@' @defaultcheked@ value='@value@' name='@gname@'>
-                        <span id='@name@Lbl' ui-label style='@LabelBackColor @LabelForeColor '> @label@  </span>
+        {/*onclick=""event.stopPropagation();$('#@ebsid@').prop('checked', true);""*/
+            return @"<div id='@ebsid@' class='radio-wrap @radio-wrap-block@' onclick=""event.stopPropagation(); $(this).children('input[type=radio]').prop('checked', true); $(this).children('input[type=radio]').trigger('change');"">
+                        <input type ='radio' id='@ebsid@' @defaultcheked@ value='@value@' name='@gname@'>
+                        <span id='@ebsid@Lbl' ui-label style='@LabelBackColor @LabelForeColor '> @label@  </span>
                     </div>"
 .Replace("@name@", this.Name)
+.Replace("@ebsid@", this.EbSid_CtxId)
 .Replace("@gname@", this.GName)
 .Replace("@label@", this.Label)
 .Replace("@value@", this.Value);

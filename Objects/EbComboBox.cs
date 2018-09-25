@@ -152,19 +152,19 @@ namespace ExpressBase.Objects
             {
                 int noOfFileds = this.DisplayMembers.Count;
                 int i = 0;
-                string rs = "<div id='@name@Wraper' class='search-wraper' data-toggle='tooltip' title='@tooltipText'>";
+                string rs = "<div id='@ebsid@Wraper' class='search-wraper' data-toggle='tooltip' title='@tooltipText'>";
                 foreach (DVBaseColumn obj in this.DisplayMembers)
                 {
                     rs += @"
 <div class='search-block'>
     <div class='input-group'>
-        <v-select maped-column='$$' column-type='@type@' id='@name@$$' style='width:{3}px;' 
+        <v-select maped-column='$$' column-type='@type@' id='@ebsid@$$' style='width:{3}px;' 
             multiple
             v-model='displayMembers[`$$`]'
             :on-change='updateCk'
             placeholder = '@sTitle@'>
         </v-select>
-        <span class='input-group-addon' @border-r$$> <i id='@name@TglBtn' class='fa  fa-search' aria-hidden='true'></i> </span>
+        <span class='input-group-addon' @border-r$$> <i id='@ebsid@TglBtn' class='fa  fa-search' aria-hidden='true'></i> </span>
     </div>
 </div>"
 .Replace("$$", obj.Name.ToString())
@@ -193,17 +193,17 @@ namespace ExpressBase.Objects
 //$('#@name@_loading-image').hide();
 //var @nameEbCombo = new EbSelect('@name', '@DSid', @DDHeight, '@vmName', '', @MaxLimit, @MinLimit, @Required, '@DefaultSearchFor', '@servicestack_url', @values);
 "
-//.Replace("@name", this.Name)
-//.Replace("@DSid", this.DataSourceId.ToString().Trim())
-//.Replace("@DDHeight", (this.DropdownHeight == 0) ? "400" : this.DropdownHeight.ToString())
-//.Replace("@vmName", this.ValueMember.ToString())
-//.Replace("@dmNames", "['acmaster1_name', 'tdebit', 'tcredit']")
-//.Replace("@MaxLimit", (!this.MultiSelect || this.MaxLimit == 0) ? "1" : this.MaxLimit.ToString())
-//.Replace("@MinLimit", this.MinLimit.ToString())
-//.Replace("@Required", this.Required.ToString().ToLower())
-//.Replace("@DefaultSearchFor", this.DefaultSearchFor.ToString())
-//.Replace("@servicestack_url", "https://expressbaseservicestack.azurewebsites.net")
-//.Replace("@values", "[1000]");//this.values.ToString())
+            //.Replace("@name", this.Name)
+            //.Replace("@DSid", this.DataSourceId.ToString().Trim())
+            //.Replace("@DDHeight", (this.DropdownHeight == 0) ? "400" : this.DropdownHeight.ToString())
+            //.Replace("@vmName", this.ValueMember.ToString())
+            //.Replace("@dmNames", "['acmaster1_name', 'tdebit', 'tcredit']")
+            //.Replace("@MaxLimit", (!this.MultiSelect || this.MaxLimit == 0) ? "1" : this.MaxLimit.ToString())
+            //.Replace("@MinLimit", this.MinLimit.ToString())
+            //.Replace("@Required", this.Required.ToString().ToLower())
+            //.Replace("@DefaultSearchFor", this.DefaultSearchFor.ToString())
+            //.Replace("@servicestack_url", "https://expressbaseservicestack.azurewebsites.net")
+            //.Replace("@values", "[1000]");//this.values.ToString())
             ;
         }
 
@@ -262,20 +262,18 @@ namespace ExpressBase.Objects
             if (this.DisplayMembers != null)
             {
                 return @"
-<div id='@name@Container'  role='form' data-toggle='validator' style='width:100%;'>
-    <input type='hidden' name='@name@Hidden4val' data-ebtype='16' id='@name@'/>
+<div id='@ebsid@Container'  role='form' data-toggle='validator' style='width:100%;'>
+    <input type='hidden' name='@ebsid@Hidden4val' data-ebtype='8' id='@ebsid@'/>
     @VueSelectCode
-    <div id='@name@_loadingdiv' class='ebCombo-loader'>
-        <i id='@name@_loading-image' class='fa fa-spinner fa-pulse fa-2x fa-fw'></i><span class='sr-only'>Loading...</span>
-    </div>
     <center style='position:relative'>
-        <div id='@name@DDdiv' v-show='DDstate' class='DDdiv expand-transition'  style='width:@DDwidth%;'> 
-            <table id='@name@tbl' tabindex='1000' style='width:100%' class='table table-bordered'></table>
+        <div id='@ebsid@DDdiv' v-show='DDstate' class='DDdiv expand-transition'  style='width:@DDwidth%;'> 
+            <table id='@ebsid@tbl' tabindex='1000' style='width:100%' class='table table-bordered'></table>
         </div>
     </center>
 </div>"
     .Replace("@VueSelectCode", this.VueSelectcode)
     .Replace("@name@", this.Name)
+    .Replace("@ebsid@", this.EbSid_CtxId)
     .Replace("@width", 900.ToString())//this.Width.ToString())
     .Replace("@perWidth", (this.DisplayMembers.Count != 0) ? (900 / this.DisplayMembers.Count).ToString() : 900.ToString())
     .Replace("@DDwidth", (this.DropdownWidth == 0) ? "100" : this.DropdownWidth.ToString())
@@ -287,15 +285,11 @@ namespace ExpressBase.Objects
 
         private string GetHtmlHelper(RenderMode mode)
         {
-            return @"
-    <div id='cont_@name@  ' Ctype='ComboBox' class='Eb-ctrlContainer' style='@hiddenString'>
-	<div id='@name@Lbl' style='@LabelBackColor@ @LabelForeColor@ '> @Label@  </div>
-           @barehtml@
-    </div>"
-.Replace("@barehtml@", this.GetBareHtml())
-.Replace("@name@", this.Name)
+            string EbCtrlHTML = Helpers.HtmlConstants.CONTROL_WRAPER_HTML4WEB
 .Replace("@Label@ ", ((this.Label != null) ? this.Label : "@Label@ "))
 .Replace("@tooltipText", this.ToolTipText);
+
+            return ReplacePropsInHTML(EbCtrlHTML);
         }
     }
 }

@@ -174,12 +174,13 @@ $('#@id').MonthPicker({ StartYear: 2018, ShowIcon: false });"
         {
             return @" 
         <div class='input-group' style='width:100%;'>
-            <input id='@name@' data-ebtype='@data-ebtype@'  data-toggle='tooltip' title='@toolTipText@' class='date' type='text' name='@name@' autocomplete = '@autoComplete@' @value@ @tabIndex@ style='width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@ @readOnlyString@ @required@ @placeHolder@ />
-            <span class='input-group-addon' onclick=""$('#@name@').click()"" style='padding: 0px;'> <i id='@name@TglBtn' class='fa  @atchdLbl@' aria-hidden='true' style='padding: 6px 12px;'></i> </span>
+            <input id='@ebsid@' data-ebtype='@data-ebtype@'  data-toggle='tooltip' title='@toolTipText@' class='date' type='text' name='@name@' autocomplete = '@autoComplete@' @value@ @tabIndex@ style='width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@ @readOnlyString@ @required@ @placeHolder@ />
+            <span class='input-group-addon' onclick=""$('#@ebsid@').click()"" style='padding: 0px;'> <i id='@ebsid@TglBtn' class='fa  @atchdLbl@' aria-hidden='true' style='padding: 6px 12px;'></i> </span>
         </div>"
 .Replace("@name@", (this.Name != null ? this.Name.Trim() : ""))
 .Replace("@data-ebtype@", "6")//( (int)this.EbDateType ).ToString())
 .Replace("@toolTipText@", this.ToolTipText)
+.Replace("@ebsid@", EbSid_CtxId)
 .Replace("@autoComplete@", this.AutoCompleteOff ? "off" : "on")
 .Replace("@value@", "")//"value='" + this.Value + "'")
 .Replace("@tabIndex@", "tabindex='" + this.TabIndex + "'")
@@ -204,18 +205,20 @@ $('#@id').MonthPicker({ StartYear: 2018, ShowIcon: false });"
 
         private string GetHtmlHelper()
         {
-            string EbCtrlHTML =
-                HtmlConstants.CONTROL_WRAPER_HTML4WEB
-.Replace("@barehtml@", this.GetBareHtml())
-.Replace("@name@", this.Name)
-.Replace("@ebsid@", this.EbSid)
-.Replace("@type@", this.ObjType)
+//            string EbCtrlHTML =
+//                HtmlConstants.CONTROL_WRAPER_HTML4WEB
+//.Replace("@barehtml@", this.GetBareHtml())
+//.Replace("@name@", this.Name)
+//.Replace("@ebsid@", EbSid_CtxId)
+//.Replace("@type@", this.ObjType)
 
+ string EbCtrlHTML = HtmlConstants.CONTROL_WRAPER_HTML4WEB
     .Replace("@LabelForeColor ", "color:" + (LabelForeColor ?? "@LabelForeColor ") + ";")
     .Replace("@LabelBackColor ", "background-color:" + (LabelBackColor ?? "@LabelBackColor ") + ";")
     .Replace("@HelpText@ ", (HelpText ?? ""))
     .Replace("@Label@ ", (Label ?? ""));
-            return EbCtrlHTML;
+
+            return ReplacePropsInHTML(EbCtrlHTML);
         }
     }
 }

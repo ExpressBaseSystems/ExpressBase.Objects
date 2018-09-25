@@ -74,6 +74,7 @@ namespace ExpressBase.Objects
                 html += c.GetHtml();
 
             html += string.Format("<input type='hidden' name='all_control_names' id='all_control_names' value='{0}' />", string.Join(",", ControlNames));
+            html += string.Format("<input type='hidden' name='all_control_cxtnames' id='all_control_cxtnames' value='{0}' />", string.Join(",", ControlctxNames));
 
             return html;
         }
@@ -86,6 +87,18 @@ namespace ExpressBase.Objects
                 {
                     if (!(_c is EbControlContainer))
                         yield return _c.Name;
+                }
+            }
+        }
+
+        public IEnumerable<string> ControlctxNames
+        {
+            get
+            {
+                foreach (EbControl _c in this.Controls.Flatten())
+                {
+                    if (!(_c is EbControlContainer))
+                        yield return _c.EbSid_CtxId;
                 }
             }
         }
