@@ -100,6 +100,19 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.BotForm)]
         public override bool IsReadOnly { get => this.ReadOnly; }
 
+        public override VendorDbType GetvDbType(IVendorDbTypes vDbTypes)
+        {
+            VendorDbType _vdbtype = vDbTypes.String;
+            if (EbDateType == EbDateType.Date)
+                _vdbtype = vDbTypes.Date;
+            else if (EbDateType == EbDateType.DateTime)
+                _vdbtype = vDbTypes.DateTime;
+            else if (EbDateType == EbDateType.Time)
+                _vdbtype = vDbTypes.Time;
+
+            return _vdbtype;
+        }
+
         public override string GetToolHtml()
         {
             return @"<div eb-type='@toolName' class='tool'><i class='fa fa-calendar'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
@@ -191,7 +204,7 @@ $('#@id').MonthPicker({ StartYear: 2018, ShowIcon: false });"
 
         private string GetHtmlHelper()
         {
-            string EbCtrlHTML = 
+            string EbCtrlHTML =
                 HtmlConstants.CONTROL_WRAPER_HTML4WEB
 .Replace("@barehtml@", this.GetBareHtml())
 .Replace("@name@", this.Name)

@@ -92,7 +92,8 @@ namespace ExpressBase.Objects
                 EbFilterDialog fd = FilterDialog;
                 if (fd is null)
                 {
-                   return FilterDialogRefId;                    
+                  //  Console.WriteLine(this.RefId + "-->" + FilterDialogRefId);
+                    return FilterDialogRefId;                    
                 }
             }
             return "" ;

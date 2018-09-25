@@ -56,25 +56,28 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		[DataMember(Order = 10)]
 		public Dictionary<string, int> StaffDict { get; set; }
 
-		[DataMember(Order = 10)]
+		[DataMember(Order = 11)]
 		public List<string> CrntCityList { get; set; }
 
-		[DataMember(Order = 10)]
+		[DataMember(Order = 12)]
 		public List<string> CrntCountryList { get; set; }
 
-		[DataMember(Order = 10)]
+		[DataMember(Order = 13)]
 		public List<string> CityList { get; set; }
 
-		[DataMember(Order = 10)]
+		[DataMember(Order = 14)]
+		public List<string> DistrictList { get; set; }
+
+		[DataMember(Order = 15)]
 		public List<string> SourceCategoryList { get; set; }
 
-		[DataMember(Order = 10)]
+		[DataMember(Order = 16)]
 		public List<string> SubCategoryList { get; set; }
 
-		[DataMember(Order = 11)]
+		[DataMember(Order = 17)]
 		public List<string> ImageIdList { get; set; }
 
-		[DataMember(Order = 12)]
+		[DataMember(Order = 18)]
 		public int RespMode { get; set; }
 
 	}
@@ -218,6 +221,32 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public int Status { get; set; }
 
 		[DataMember(Order = 3)]
+		public ResponseStatus ResponseStatus { get; set; }
+
+	}
+
+	[DataContract]
+	public class LmUniqueCheckRequest : IReturn<LmUniqueCheckResponse>, IEbSSRequest
+	{
+		[DataMember(Order = 1)]
+		public string Key { get; set; }
+
+		[DataMember(Order = 2)]
+		public string Value { get; set; }
+
+		[DataMember(Order = 3)]
+		public string SolnId { get; set; }
+
+		public int UserId { get; set; }
+	}
+
+	[DataContract]
+	public class LmUniqueCheckResponse : IEbSSResponse
+	{
+		[DataMember(Order = 1)]
+		public bool Status { get; set; }
+
+		[DataMember(Order = 2)]
 		public ResponseStatus ResponseStatus { get; set; }
 
 	}

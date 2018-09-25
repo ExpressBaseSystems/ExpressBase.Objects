@@ -1,4 +1,5 @@
-﻿using ExpressBase.Common.Objects;
+﻿using ExpressBase.Common.Extensions;
+using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
 using ExpressBase.Data;
@@ -16,17 +17,15 @@ namespace ExpressBase.Objects
     [HideInToolBox]
     public class EbWebForm : EbControlContainer
     {
-
-        [EnableInBuilder(BuilderType.WebForm)]
-        [PropertyGroup("Data")]
-        [HelpText("Name Of database-table Which you want to store Data collected using this Form")]
-        public string TableName { get; set; }
         [Browsable(false)]
         public bool IsUpdate { get; set; }
 
         public bool IsRenderMode { get; set; }
 
         public EbWebForm() { }
+
+        public override int TableRowId { get; set; }
+
 
         public static EbOperations Operations = BFOperations.Instance;
 
@@ -42,7 +41,7 @@ namespace ExpressBase.Objects
 
         public override string GetHtml()
         {
-            string html = "<form id='@name@' IsRenderMode='@rmode@' ebsid='@ebsid@' class='formB-box form-buider-form' eb-form='true' ui-inp eb-type='WebForm' @tabindex@>";
+             string html = "<form id='@name@' IsRenderMode='@rmode@' ebsid='@ebsid@' class='formB-box form-buider-form ebcont-ctrl' eb-form='true' ui-inp eb-type='WebForm' @tabindex@>";
 
             foreach (EbControl c in this.Controls)
                 html += c.GetHtml();

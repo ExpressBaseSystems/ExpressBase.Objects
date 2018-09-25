@@ -122,8 +122,12 @@ namespace ExpressBase.Objects.ReportRelated
 
         [EnableInBuilder(BuilderType.Report)]
         [PropertyEditor(PropertyEditorType.ImageSeletor)]
-        [PropertyGroup("URL")]
-        public string Image { get; set; }
+        [PropertyGroup("Image")]
+        public int ImageRefId { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup("Image")]
+        public string ImageColName { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]
@@ -173,8 +177,8 @@ namespace ExpressBase.Objects.ReportRelated
 
         [EnableInBuilder(BuilderType.Report)]
         [PropertyEditor(PropertyEditorType.ImageSeletor)]
-        [PropertyGroup("URL")]
-        public string Image { get; set; }
+        [PropertyGroup("Image")]
+        public int ImageRefId { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
@@ -218,7 +222,7 @@ namespace ExpressBase.Objects.ReportRelated
                 canvas = writer.DirectContentUnder;
                 ColumnText.ShowTextAligned(canvas, (int)TextAlign, phrase, d.PageSize.Width / 2, d.PageSize.Height / 2, Rotation);
             }
-            if (Image != string.Empty)
+            if (ImageRefId != 0)
             {
                 iTextSharp.text.Image img = iTextSharp.text.Image.GetInstance(fileByte);
                 img.RotationDegrees = Rotation;

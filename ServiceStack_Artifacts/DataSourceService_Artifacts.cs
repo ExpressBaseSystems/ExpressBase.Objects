@@ -509,7 +509,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         {
             foreach (LevelInfo _lvl in this)
             {
-                if (_lvl.RowIndex == _index-1 && _lvl.GroupString.IndexOf("group-sum") == -1 && _lvl.Level == level-1)
+                if (_lvl.RowIndex == _index && _lvl.GroupString.IndexOf("group-sum") == -1 && _lvl.Level == level)
                 {
                     return _lvl;
                 }

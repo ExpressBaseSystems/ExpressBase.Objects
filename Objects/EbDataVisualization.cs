@@ -396,9 +396,9 @@ namespace ExpressBase.Objects
         {
             this.RowGroupCollection = new List<RowGroupParent>();
 			this.NotVisibleColumns = new List<DVBaseColumn>();
-			//this.NonVisibleColumns = new DVNonVisibleColumnCollection();
-			
-		}
+            //this.NonVisibleColumns = new DVNonVisibleColumnCollection();
+            this.CurrentRowGroup = new RowGroupParent();
+        }
 
 
         public override string DiscoverRelatedRefids()
@@ -424,7 +424,7 @@ namespace ExpressBase.Objects
 
         public override void ReplaceRefid(Dictionary<string, string> RefidMap)
         {
-            if (DataSourceRefId.IsEmpty())
+            if (!DataSourceRefId.IsEmpty())
             {
                 string dsid = DataSourceRefId;
                 if (RefidMap.ContainsKey(dsid))

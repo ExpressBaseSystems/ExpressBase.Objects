@@ -98,6 +98,10 @@ namespace ExpressBase.Objects.Objects
 
                 if (_data.Type == EbDbTypes.Int32)
                     result = Convert.ToInt32((x as NTV).Value);
+                else if (_data.Type == EbDbTypes.Int64)
+                    result = Convert.ToInt32((x as NTV).Value);
+                else if (_data.Type == EbDbTypes.Int16)
+                    result = Convert.ToInt32((x as NTV).Value);
                 else if (_data.Type == EbDbTypes.Decimal)
                     result = Convert.ToDecimal((x as NTV).Value);
                 else if (_data.Type == EbDbTypes.String)

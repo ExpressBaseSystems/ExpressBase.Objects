@@ -3,11 +3,13 @@ using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
+using ExpressBase.Objects.Objects;
 using ServiceStack;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace ExpressBase.Objects
@@ -43,6 +45,11 @@ namespace ExpressBase.Objects
                         _p.Type = "11";
                     }
                     //_p.Type = Convert.ToInt32((EbDbType)((c as EbComboBox).ValueMember.Type));
+                }
+                if(c is EbUserLocation)
+                {
+                    _p.Value = "0";
+                    _p.Type = "11";
                 }
                 _paramlist.Add(_p);
             }
@@ -89,11 +96,38 @@ namespace ExpressBase.Objects
      
         public override void ReplaceRefid(Dictionary<string, string> RefidMap)
         {
-            
+            foreach (EbControl control in Controls)
+            {
+                PropertyInfo[] _props = control.GetType().GetProperties();
+                foreach (PropertyInfo _prop in _props)
+                {
+                    if (_prop.IsDefined(typeof(OSE_ObjectTypes)))
+                    {
+                        string _val = _prop.GetValue(control, null).ToString();
+                        if (RefidMap.ContainsKey(_val))
+                            _prop.SetValue(control, RefidMap[_val], null);
+                        else
+                            _prop.SetValue(control, "failed-to-update-");
+                    }
+
+                }
+            }
         }
         public override string DiscoverRelatedRefids()
         {
-            return base.DiscoverRelatedRefids();
+            var x = this.RefId;
+            string refids = "";
+            foreach (EbControl control in Controls)
+            {
+                PropertyInfo[] _props = control.GetType().GetProperties();
+                foreach (PropertyInfo _prop in _props)
+                {
+                    if (_prop.IsDefined(typeof(OSE_ObjectTypes)))
+                        refids += _prop.GetValue(control, null).ToString() + ",";
+                }
+            }
+            Console.WriteLine(this.RefId +"-->" + refids);
+            return refids;
         }
     }
 }
