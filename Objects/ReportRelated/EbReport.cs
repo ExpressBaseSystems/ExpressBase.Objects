@@ -234,13 +234,22 @@ namespace ExpressBase.Objects
         //public ColumnColletion ColumnColletion { get; set; }
 
         [JsonIgnore]
+        public int DetailTableIndex { get; set; } = 0;
+
+        [JsonIgnore]
+        public int MaxRowCount { get; set; } = 0;
+
+        [JsonIgnore]
+        public bool HasRows = false;
+
+        [JsonIgnore]
         public int iDetailRowPos { get; set; }
 
         [JsonIgnore]
-        public Dictionary<string, List<object>> PageSummaryFields { get; set; }
+        public Dictionary<string, List<EbDataField>> PageSummaryFields { get; set; }
 
         [JsonIgnore]
-        public Dictionary<string, List<object>> ReportSummaryFields { get; set; }
+        public Dictionary<string, List<EbDataField>> ReportSummaryFields { get; set; }
 
         [JsonIgnore]
         public Dictionary<int, byte[]> WatermarkImages { get; set; }
@@ -432,21 +441,18 @@ namespace ExpressBase.Objects
 
         public void InitializeSummaryFields()
         {
-            List<object> SummaryFieldsList = null;
-            PageSummaryFields = new Dictionary<string, List<object>>();
-            ReportSummaryFields = new Dictionary<string, List<object>>();
+            PageSummaryFields = new Dictionary<string, List<EbDataField>>();
+            ReportSummaryFields = new Dictionary<string, List<EbDataField>>();
             foreach (EbPageFooter p_footer in PageFooters)
             {
                 foreach (EbReportField field in p_footer.Fields)
                 {
                     if (field is IEbDataFieldSummary)
                     {
-                        EbDataField f = (field as EbDataField);
+                        EbDataField f = field as EbDataField;
                         if (!PageSummaryFields.ContainsKey(f.SummaryOf))
                         {
-                            SummaryFieldsList = new List<object>();
-                            SummaryFieldsList.Add(f);
-                            PageSummaryFields.Add(f.SummaryOf, SummaryFieldsList);
+                            PageSummaryFields.Add(f.SummaryOf, new List<EbDataField> { f });
                         }
                         else
                         {
@@ -465,9 +471,7 @@ namespace ExpressBase.Objects
                         EbDataField f = (field as EbDataField);
                         if (!ReportSummaryFields.ContainsKey(f.SummaryOf))
                         {
-                            SummaryFieldsList = new List<object>();
-                            SummaryFieldsList.Add(f);
-                            ReportSummaryFields.Add(f.SummaryOf, SummaryFieldsList);
+                            ReportSummaryFields.Add(f.SummaryOf, new List<EbDataField> { f });
                         }
                         else
                         {
@@ -476,7 +480,6 @@ namespace ExpressBase.Objects
                     }
                 }
             }
-
         }
 
         public dynamic GetDataFieldtValue(string column_name, int i, int tableIndex)
@@ -489,17 +492,11 @@ namespace ExpressBase.Objects
 
         public void DrawWaterMark(Document d, PdfWriter writer)
         {
-            byte[] fileByte = null;
             if (ReportObjects != null)
             {
                 foreach (EbReportField field in ReportObjects)
                 {
-                    if (field is EbWaterMark)
-                        if ((field as EbWaterMark).ImageRefId != 0)
-                        {
-                            fileByte = WatermarkImages[(field as EbWaterMark).ImageRefId];
-                            (field as EbWaterMark).DrawMe(d, writer, fileByte, HeightPt);
-                        }
+                    DrawFields(field, 0, 0);
                 }
             }
         }
@@ -514,21 +511,21 @@ namespace ExpressBase.Objects
             AddParamsNCalcsInGlobal(globals);
             if (field is EbCalcField)
             {
-                foreach (string calcfd in (field as EbCalcField).DataFieldsUsedCalc)
+                EbCalcField field_orig = field as EbCalcField;
+                foreach (string calcfd in field_orig.DataFieldsUsedCalc)
                 {
                     string TName = calcfd.Split('.')[0];
-                    int TableIndex = Convert.ToInt32(TName.Substring(1));
                     string fName = calcfd.Split('.')[1];
-                    int tableIndex = Convert.ToInt32(TName.Substring(1));
-                    globals[TName].Add(fName, new NTV { Name = fName, Type = DataSet.Tables[TableIndex].Columns[fName].Type, Value = DataSet.Tables[TableIndex].Rows[serialnumber][fName] });
+                    int tableindex = Convert.ToInt32(TName.Substring(1));
+                    globals[TName].Add(fName, new NTV { Name = fName, Type = DataSet.Tables[tableindex].Columns[fName].Type, Value = DataSet.Tables[tableindex].Rows[serialnumber][fName] });
                 }
-                column_val = (ValueScriptCollection[(field as EbCalcField).Name].RunAsync(globals)).Result.ReturnValue.ToString();
+                column_val = (ValueScriptCollection[field_orig.Name].RunAsync(globals)).Result.ReturnValue.ToString();
             }
             else
             {
                 column_val = GetDataFieldtValue(field.ColumnName, serialnumber, field.TableIndex);
             }
-            List<object> SummaryList;
+            List<EbDataField> SummaryList;
             if (PageSummaryFields.ContainsKey(field.Name))
             {
                 SummaryList = PageSummaryFields[field.Name];
@@ -582,26 +579,8 @@ namespace ExpressBase.Objects
 
         public void DrawDetail()
         {
-            List<int> tableindexes = new List<int>();
-            bool hasRows = false;
-            int tableIndex = 0;
-            int maxRowCount = 0;
-
-            foreach (EbReportDetail _detail in Detail)
-            {
-                foreach (EbReportField field in _detail.Fields)
-                {
-                    hasRows = true;
-                    if (field is EbDataField && !tableindexes.Contains((field as EbDataField).TableIndex))
-                    {
-                        int r_count = DataSet.Tables[(field as EbDataField).TableIndex].Rows.Count;
-                        tableIndex = (r_count > maxRowCount) ? (field as EbDataField).TableIndex : tableIndex;
-                        maxRowCount = (r_count > maxRowCount) ? r_count : maxRowCount;
-                    }
-                }
-            }
-            RowColletion rows = (DataSourceRefId != string.Empty) ? DataSet.Tables[tableIndex].Rows : null;
-            if (rows != null && hasRows == true)
+            RowColletion rows = (DataSourceRefId != string.Empty) ? DataSet.Tables[DetailTableIndex].Rows : null;
+            if (rows != null && HasRows == true)
             {
                 for (iDetailRowPos = 0; iDetailRowPos < rows.Count; iDetailRowPos++)
                 {
@@ -674,10 +653,8 @@ namespace ExpressBase.Objects
                 for (int iSortPos = 0; iSortPos < SortedList.Length; iSortPos++)
                 {
                     EbDataField field = SortedList[iSortPos];
-                    int tableIndex = field.TableIndex;
-                    string column_name = field.ColumnName;
                     Phrase phrase;
-                    string column_val = GetDataFieldtValue(column_name, serialnumber, tableIndex);
+                    string column_val = GetDataFieldtValue(field.ColumnName, serialnumber, field.TableIndex);
                     if ((field as EbDataField).RenderInMultiLine)
                     {
                         DbType datatype = (DbType)field.DbType;
@@ -758,205 +735,64 @@ namespace ExpressBase.Objects
 
         public void DrawFields(EbReportField field, float section_Yposition, int serialnumber)
         {
-            List<Param> RowParams = new List<Param>();
-            try
+            List<Param> RowParams = null;
+            if (field is EbDataField)
             {
-                string column_name = string.Empty;
-                string column_val = string.Empty;
-                DbType column_type = DbType.String;
-
+                EbDataField field_org = field as EbDataField;
                 if (PageSummaryFields.ContainsKey(field.Name) || ReportSummaryFields.ContainsKey(field.EbSid))
-                    CallSummerize(field as EbDataField, serialnumber);
-
-                if (field is EbDataField)
-                {
-                    EbDataField _field = field as EbDataField;
-                    column_type = (DbType)_field.DbType;
-                    int tableIndex = _field.TableIndex;
-                    column_name = _field.ColumnName;
-                    Globals globals = new Globals
-                    {
-                        CurrentField = field
-                    };
-                    if (AppearanceScriptCollection.ContainsKey(field.Name) || field is EbCalcField)
-                    {
-                        AddParamsNCalcsInGlobal(globals);
-                    }
-                    if (AppearanceScriptCollection.ContainsKey(field.Name))
-                    {
-                        if (field.Font is null)
-                            globals.CurrentField.Font = (new EbFont { color = "#000000", FontName = "Times-Roman", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
-                        foreach (string calcfd in (field as EbDataField).DataFieldsUsedAppearance)
-                        {
-                            string TName = calcfd.Split('.')[0];
-                            int TableIndex = Convert.ToInt32(TName.Substring(1));
-                            string fName = calcfd.Split('.')[1];
-                            globals[TName].Add(fName, new NTV { Name = fName, Type = DataSet.Tables[TableIndex].Columns[fName].Type, Value = DataSet.Tables[TableIndex].Rows[serialnumber][fName] });
-                        }
-                        try
-                        {
-                            AppearanceScriptCollection[field.Name].RunAsync(globals);
-
-                        }
-                        catch (Exception e)
-                        {
-                            Console.WriteLine(e.Message + e.StackTrace);
-                        }
-                    }
-                    if (field is IEbDataFieldSummary)
-                    {
-                        if ((field is EbDataFieldNumericSummary) && (field as EbDataFieldNumericSummary).InLetters)
-                        {
-                            column_val = (field as IEbDataFieldSummary).SummarizedValue.ToString();
-                            (field as EbDataFieldNumericSummary).DrawMe(Canvas, HeightPt, section_Yposition, detailprintingtop, column_val);
-                            return;
-                        }
-                        else
-                            column_val = (field as IEbDataFieldSummary).SummarizedValue.ToString();
-                    }
-                    else if (field is EbCalcField)
-                    {
-                        try
-                        {
-                            foreach (string calcfd in (field as EbCalcField).DataFieldsUsedCalc)
-                            {
-                                string TName = calcfd.Split('.')[0];
-                                int TableIndex = Convert.ToInt32(TName.Substring(1));
-                                string fName = calcfd.Split('.')[1];
-                                globals[TName].Add(fName, new NTV { Name = fName, Type = DataSet.Tables[TableIndex].Columns[fName].Type, Value = DataSet.Tables[TableIndex].Rows[serialnumber][fName] });
-                            }
-                            column_val = (ValueScriptCollection[field.Name].RunAsync(globals)).Result.ReturnValue.ToString();
-                            if (CalcValInRow.ContainsKey(field.Title))
-                                CalcValInRow[field.Title] = new NTV { Name = field.Title, Type = (EbDbTypes)((field as EbCalcField).CalcFieldIntType), Value = column_val };
-                            else
-                                CalcValInRow.Add(field.Title, new NTV { Name = field.Title, Type = (EbDbTypes)((field as EbCalcField).CalcFieldIntType), Value = column_val });
-                        }
-                        catch (Exception e)
-                        {
-                            Console.WriteLine(e.Message + e.StackTrace);
-                        }
-                    }
-
-                    else
-                        column_val = GetDataFieldtValue(column_name, serialnumber, tableIndex);
-
-                    if (!string.IsNullOrEmpty(_field.LinkRefId))
-                    {
-                        foreach (EbControl control in LinkCollection[(field as EbDataField).LinkRefId])
-                        {
-                            int flag = 0;
-                            foreach (Param param in Parameters)
-                            {
-                                if (control.Name == param.Name)
-                                {
-                                    flag = 1;
-                                }
-                            }
-                            if (flag == 0)
-                            {
-                                Param x = DataSet.Tables[tableIndex].Rows[serialnumber].GetCellParam(control.Name);
-                                ArrayList IndexToRemove = new ArrayList();
-                                for (int i = 0; i < RowParams.Count; i++)
-                                {
-                                    if (RowParams[i].Name == control.Name)
-                                    {
-                                        IndexToRemove.Add(i);
-                                    }
-                                }
-                                for (int i = 0; i < IndexToRemove.Count; i++)
-                                {
-                                    RowParams.RemoveAt(Convert.ToInt32(IndexToRemove[i]));
-                                }
-                                RowParams.Add(x);
-                            }
-                        }
-                        if (!Parameters.IsEmpty())
-                        {
-                            foreach (Param p in Parameters)
-                            {
-                                RowParams.Add(p);
-                            }
-                        }
-                    }
-                    field.DrawMe(Doc, Canvas, HeightPt, section_Yposition, column_val, detailprintingtop, column_type, RowParams);
-                }
-
-                if ((field is EbPageNo) || (field is EbPageXY) || (field is EbDateTime) || (field is EbSerialNumber) || (field is EbUserName) || (field is EbParameter))
-                {
-                    if (field is EbPageNo)
-                        column_val = PageNumber.ToString();
-                    else if (field is EbPageXY)
-                        column_val = PageNumber + "/"/* + writer.PageCount*/;
-                    else if (field is EbDateTime)
-                        column_val = CurrentTimestamp.ToString();
-                    else if (field is EbSerialNumber)
-                        column_val = (iDetailRowPos + 1).ToString();
-                    else if (field is EbUserName)
-                        column_val = this.UserName;
-                    else if (field is EbParameter)
-                    {
-                        foreach (Param p in Parameters)
-                            if (p.Name == field.Title)
-                                column_val = p.Value;
-                    }
-                    field.DrawMe(Canvas, HeightPt, section_Yposition, detailprintingtop, column_val);
-                }
-
-                else if (field is EbImg)
-                {
-                    byte[] fileByte = new byte[0]; ;
-                    if ((field as EbImg).ImageRefId != 0)
-                        fileByte = GetImage((field as EbImg).ImageRefId);
-                    else if (!string.IsNullOrEmpty((field as EbImg).ImageColName))
-                    {
-                        string col = (field as EbImg).ImageColName;
-                        dynamic val = GetDataFieldtValue(col.Split(".")[1], serialnumber, Convert.ToInt32(col.Split(".")[0].Substring(1)));
-                        if (val is string)
-                            fileByte = GetImage(Convert.ToInt32(val));
-                        else if (val is byte[])
-                            fileByte = val;
-                    }
-
-                    if (fileByte.Length != 0)
-                        field.DrawMe(Doc, fileByte, HeightPt, section_Yposition, detailprintingtop);
-                }
-
-                else if ((field is EbText) || (field is EbReportFieldShape))
-                {
-                    field.DrawMe(Canvas, HeightPt, section_Yposition, this);
-                }
-
-                else if (field is EbBarcode)
-                {
-                    int tableIndex = Convert.ToInt32((field as EbBarcode).Code.Split('.')[0].Substring(1));
-                    column_name = (field as EbBarcode).Code.Split('.')[1];
-                    column_val = GetDataFieldtValue(column_name, serialnumber, tableIndex);
-                    field.DrawMe(Doc, Canvas, HeightPt, section_Yposition, detailprintingtop, column_val);
-                }
-
-                else if (field is EbQRcode)
-                {
-                    int tableIndex = Convert.ToInt32((field as EbQRcode).Code.Split('.')[0].Substring(1));
-                    column_name = (field as EbQRcode).Code.Split('.')[1];
-                    column_val = GetDataFieldtValue(column_name, serialnumber, tableIndex);
-                    field.DrawMe(Doc, Canvas, HeightPt, section_Yposition, detailprintingtop, column_val);
-                }
-                else if (field is EbLocFieldImage)
-                {
-                    byte[] fileByte = GetImage(Convert.ToInt32(Solution.Locations[42][field.Title]));
-                    if (!fileByte.IsEmpty())
-                        field.DrawMe(Doc, fileByte, HeightPt, section_Yposition, detailprintingtop);
-                }
-                else if (field is EbLocFieldText)
-                {
-                    column_val = Solution.Locations[42][field.Title];
-                    field.DrawMe(Canvas, HeightPt, section_Yposition, detailprintingtop, column_val);
-                }
+                    CallSummerize(field_org, serialnumber);
+                if (AppearanceScriptCollection.ContainsKey(field.Name))
+                    RunAppearanceExpression(field_org, serialnumber);
+                if (!string.IsNullOrEmpty(field_org.LinkRefId))
+                    RowParams = CreateRowParamForLink(field_org, serialnumber);
             }
-            catch (Exception e)
+            field.DrawMe(section_Yposition, this, RowParams, serialnumber);
+        }
+
+        public void RunAppearanceExpression(EbDataField field, int slno)
+        {
+            Globals globals = new Globals { CurrentField = field };
+            AddParamsNCalcsInGlobal(globals);
+            if (field.Font is null)
+                globals.CurrentField.Font = (new EbFont { color = "#000000", FontName = "Times-Roman", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
+            foreach (string calcfd in field.DataFieldsUsedAppearance)
             {
-                Console.WriteLine(e.Message + e.StackTrace);
+                string TName = calcfd.Split('.')[0];
+                int TableIndex = Convert.ToInt32(TName.Substring(1));
+                string fName = calcfd.Split('.')[1];
+                globals[TName].Add(fName, new NTV { Name = fName, Type = DataSet.Tables[TableIndex].Columns[fName].Type, Value = DataSet.Tables[TableIndex].Rows[slno][fName] });
             }
+            AppearanceScriptCollection[field.Name].RunAsync(globals);
+        }
+
+        public List<Param> CreateRowParamForLink(EbDataField field, int slno)
+        {
+            List<Param> RowParams = new List<Param>();
+            foreach (EbControl control in LinkCollection[field.LinkRefId])
+            {
+                Param x = DataSet.Tables[field.TableIndex].Rows[slno].GetCellParam(control.Name);
+                ArrayList IndexToRemove = new ArrayList();
+                for (int i = 0; i < RowParams.Count; i++)
+                {
+                    if (RowParams[i].Name == control.Name)
+                    {
+                        IndexToRemove.Add(i); //the parameter will be in the report alredy
+                    }
+                }
+                for (int i = 0; i < IndexToRemove.Count; i++)
+                {
+                    RowParams.RemoveAt(Convert.ToInt32(IndexToRemove[i]));
+                }
+                RowParams.Add(x);
+            }
+            if (!Parameters.IsEmpty())//the parameters which are alredy present in the rendering of current report
+            {
+                foreach (Param p in Parameters)
+                {
+                    RowParams.Add(p);
+                }
+            }
+            return RowParams;
         }
 
         public void GetWatermarkImages()
@@ -965,12 +801,15 @@ namespace ExpressBase.Objects
             {
                 foreach (EbReportField field in ReportObjects)
                 {
-                    if ((field is EbWaterMark) && (field as EbWaterMark).ImageRefId != 0)
+                    if (field is EbWaterMark)
                     {
-                        byte[] fileByte = GetImage((field as EbWaterMark).ImageRefId);
-                        if (!fileByte.IsEmpty())
-                            WatermarkImages.Add((field as EbWaterMark).ImageRefId, fileByte);
-
+                        int id = (field as EbWaterMark).ImageRefId;
+                        if (id != 0)
+                        {
+                            byte[] fileByte = GetImage(id);
+                            if (!fileByte.IsEmpty())
+                                WatermarkImages.Add(id, fileByte);
+                        }
                     }
                 }
             }
@@ -1035,15 +874,17 @@ namespace ExpressBase.Objects
                 {
                     if (field is EbDataField)
                     {
-                        if (!(field as EbDataField).LinkRefId.IsEmpty())
+                        EbDataField fd_org = field as EbDataField;
+                        if (!fd_org.LinkRefId.IsEmpty())
                         {
-                            refids += (field as EbDataField).LinkRefId + ",";
+                            refids += fd_org.LinkRefId + ",";
                         }
                     }
                 }
             }
             return refids/*.Substring(0,refids.Length-1)*/;
         }
+
         public override void ReplaceRefid(Dictionary<string, string> RefidMap)
         {
             if (!DataSourceRefId.IsEmpty() && RefidMap.ContainsKey(DataSourceRefId))
@@ -1057,17 +898,19 @@ namespace ExpressBase.Objects
                 {
                     if (field is EbDataField)
                     {
-                        if (!(field as EbDataField).LinkRefId.IsEmpty())
+                        EbDataField fd_org = field as EbDataField;
+                        if (!fd_org.LinkRefId.IsEmpty())
                         {
-                            if (RefidMap.ContainsKey((field as EbDataField).LinkRefId))
-                                (field as EbDataField).LinkRefId = RefidMap[(field as EbDataField).LinkRefId];
+                            if (RefidMap.ContainsKey(fd_org.LinkRefId))
+                                fd_org.LinkRefId = RefidMap[fd_org.LinkRefId];
                             else
-                                (field as EbDataField).LinkRefId = "failed-to-update-";
+                                fd_org.LinkRefId = "failed-to-update-";
                         }
                     }
                 }
             }
         }
+
         public EbReport()
         {
             ReportHeaders = new List<EbReportHeader>();
@@ -1107,7 +950,7 @@ namespace ExpressBase.Objects
 
         public void AddParamsNCalcsInGlobal(Globals globals)
         {
-            foreach (string key in CalcValInRow.Keys)//adding Calc to global
+            foreach (string key in CalcValInRow.Keys) //adding Calc to global
             {
                 globals["Calc"].Add(key, CalcValInRow[key]);
             }
@@ -1116,59 +959,6 @@ namespace ExpressBase.Objects
                 {
                     globals["Params"].Add(p.Name, new NTV { Name = p.Name, Type = (EbDbTypes)Convert.ToInt32(p.Type), Value = p.Value });
                 }
-        }
-        public void FillingCollections()
-        {
-            foreach (EbReportHeader r_header in ReportHeaders)
-            {
-                FillScriptCollection(r_header.Fields);
-            }
-
-            foreach (EbReportFooter r_footer in ReportFooters)
-            {
-                FillScriptCollection(r_footer.Fields);
-            }
-
-            foreach (EbPageHeader p_header in PageHeaders)
-            {
-                FillScriptCollection(p_header.Fields);
-            }
-
-            foreach (EbReportDetail detail in Detail)
-            {
-                FillScriptCollection(detail.Fields);
-            }
-
-            foreach (EbPageFooter p_footer in PageFooters)
-            {
-                FillScriptCollection(p_footer.Fields);
-            }
-        }
-        private void FillScriptCollection(List<EbReportField> fields)
-        {
-            foreach (EbReportField field in fields)
-            {
-                try
-                {
-                    if (field is EbCalcField && !ValueScriptCollection.ContainsKey(field.Name))
-                    {
-                        Script valscript = CSharpScript.Create<dynamic>((field as EbCalcField).ValueExpression, ScriptOptions.Default.WithReferences("Microsoft.CSharp", "System.Core").WithImports("System.Dynamic"), globalsType: typeof(Globals));
-                        valscript.Compile();
-                        ValueScriptCollection.Add(field.Name, valscript);
-
-                    }
-                    if ((field is EbDataField && !AppearanceScriptCollection.ContainsKey(field.Name) && (field as EbDataField).AppearanceExpression != ""))
-                    {
-                        Script appearscript = CSharpScript.Create<dynamic>((field as EbDataField).AppearanceExpression, ScriptOptions.Default.WithReferences("Microsoft.CSharp", "System.Core").WithImports("System.Dynamic"), globalsType: typeof(Globals));
-                        appearscript.Compile();
-                        AppearanceScriptCollection.Add(field.Name, appearscript);
-                    }
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e.Message + e.StackTrace);
-                }
-            }
         }
     }
 
