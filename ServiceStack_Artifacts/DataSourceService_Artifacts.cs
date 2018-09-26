@@ -364,58 +364,41 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public bool Ispaged { get; set; }
     }
 
-    public class GroupingDetails
+    public abstract class GroupingDetails
     {
-        public GroupingDetails()
-        {
-            GroupingTexts = new List<string>();
-        }
+        //public GroupingDetails()
+        //{
+        //    GroupingTexts = new List<string>();
+        //}
 
-        public GroupingDetails(GroupingDetails CurLevel)
-        {
-
-            CurrentLevel = CurLevel.CurrentLevel;
-            RowIndex = CurLevel.RowIndex;
-            LevelText = CurLevel.LevelText;
-            GroupingTexts = new List<string>(CurLevel.GroupingTexts);
-            ParentLevelText = CurLevel.ParentLevelText;
-            InsertionType = CurLevel.InsertionType;
-            LevelCount = CurLevel.LevelCount;
-            ParentLevel = CurLevel.ParentLevel;
-            Html = CurLevel.Html;
-            //FooterHtml = CurLevel.FooterHtml;
-            //AggregateValues = new Dictionary<int, int>(CurLevel.AggregateValues);
-            GroupingCount = CurLevel.GroupingCount;
-            IsHeader = CurLevel.IsHeader;
-            GroupingString = CurLevel.GroupingString;
-        }
-
-        /// <summary>
-        /// The concatenated grouping string for a row grouping
-        /// </summary>
-        public string GroupingString { get; set; }
-
-        /// <summary>
-        /// The concatenated grouping string for the previous row grouping
-        /// </summary>
-        public string PreviousGroupingString { get; set; }
-
-        /// <summary>
-        /// The current level's group string - only used in multi-level grouping. It is an element of the GroupingTexts list, 
-        /// but stored separately for convenience. Might be refactored away later.
-        /// </summary>
-        public string LevelBasedGroupingString { get; set; }
+        //public GroupingDetails(GroupingDetails CurLevel)
+        //{
+        //    CurrentLevel = CurLevel.CurrentLevel;
+        //    RowIndex = CurLevel.RowIndex;
+        //    GroupingTexts = new List<string>(CurLevel.GroupingTexts);
+        //    InsertionType = CurLevel.InsertionType;
+        //    LevelCount = CurLevel.LevelCount;
+        //    ParentLevel = CurLevel.ParentLevel;
+        //    Html = CurLevel.Html;
+        //    GroupingCount = CurLevel.GroupingCount;
+        //    //IsHeader = CurLevel.IsHeader;
+        //}
         
         /// <summary>
         /// 
         /// </summary>
         public int GroupingCount { get; set; }
-        
+
+        private int _currentLevel;
         /// <summary>
         /// The level of row grouping for an element. Used in multi-level row grouping.
         /// FOr single level, it is always 1.
         /// </summary>
-        public int CurrentLevel { get; set; }
+        public int CurrentLevel
+        {
+            get { return _currentLevel; }
+            set { _currentLevel = value; }
+        }
         
         /// <summary>
         /// Stores the level previous to the current level.
@@ -424,18 +407,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         /// </summary>
         public int ParentLevel { get; set; }
         
-        /// <summary>
-        /// Contains the name of the grouping text for a particular row grouping at a particular level.
-        /// Changes for each grouping at each level.
-        /// </summary>
-        public string LevelText { get; set; }
-        
-        /// <summary>
-        /// The list of strings that denotes each row grouping string.
-        /// For multiple level row grouping, it denotes each different level too.
-        /// For single level, each column value is denoted separately for ease of processing.
-        /// </summary>
-        public List<string> GroupingTexts { get; set; }
 
         /// <summary>
         /// The index in the EbDataTable object of the row before/after which grouping should be inserted.
@@ -454,30 +425,63 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         /// this contains the actual number of data rows.
         /// </summary>
         public int LevelCount { get; set; }
-        //public Dictionary<int, int> AggregateValues { get; set; }
-        
-        /// <summary>
-        /// The level text of the parent level. For different row groupings at the same level, it should be the same.
-        /// Empty string for single level or topmost level of multi-level grouping.
-        /// </summary>
-        public string ParentLevelText { get; set; }
         
         /// <summary>
         /// The HTML text generated for the particular header or footer
         /// </summary>
         public string Html { get; set; }
-        
-        /// <summary>
-        /// Flag to check whether the generated HTML is a header or footer.
-        /// </summary>
-        public bool IsHeader { get; set; }
+    }
 
-        ///// <summary>
-        ///// The number where the current index in the Table processed is 
-        ///// taken and returned to the calling function, so that many elements
-        ///// can be skipped over in the next iteration.
-        ///// </summary>
-        //public int CurrentIndex { get; set; }
+    public class HeaderGroupingDetails : GroupingDetails
+    {
+        /// <summary>
+        /// The list of strings that denotes each row grouping string.
+        /// For multiple level row grouping, it denotes each different level too.
+        /// For single level, each column value is denoted separately for ease of processing.
+        /// </summary>
+        public List<string> GroupingTexts { get; set; }
+
+        public HeaderGroupingDetails()
+        {
+            GroupingTexts = new List<string>();
+        }
+    }
+
+    public class FooterGroupingDetails : GroupingDetails
+    {
+        public Dictionary<int, NumericAggregates> Aggregations { get; set; }
+
+        public FooterGroupingDetails(List<int> aggregateColumnIndexes)
+        {
+            Aggregations = new Dictionary<int, NumericAggregates>();
+            foreach(int index in aggregateColumnIndexes)
+            {
+                Aggregations.Add(index, new NumericAggregates());
+            }
+        }
+    }
+
+    public class NumericAggregates
+    {
+        public double Minimum { get; private set; }
+        public double Maximum { get; private set; }
+        public double Average
+        {
+            get
+            {
+                return Sum / Count;
+            }
+        }
+        public double Sum     { get; private set; }
+        public int Count      { get; private set; }
+
+        public void SetValue(double _value)
+        {
+            Count++;
+            Sum += _value;
+            Minimum = (_value < Minimum) ? _value : Minimum;
+            Maximum = (_value > Maximum) ? _value : Maximum;
+        }
     }
 
     public class LevelInfo
