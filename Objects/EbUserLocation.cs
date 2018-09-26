@@ -2,6 +2,8 @@
 using ExpressBase.Common.LocationNSolution;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
+using ExpressBase.Common.Structures;
+using ExpressBase.Objects.Helpers;
 using ExpressBase.Security;
 using ServiceStack;
 using System;
@@ -13,11 +15,14 @@ using System.Text;
 namespace ExpressBase.Objects.Objects
 {
     [EnableInBuilder(BuilderType.FilterDialog)]
-    public class EbUserLocation: EbControlUI
+    public class EbUserLocation : EbControlUI
     {
         [EnableInBuilder(BuilderType.FilterDialog)]
         [HideInPropertyGrid]
         public List<EbSimpleSelectOption> Options { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+        public override EbDbTypes EbDbType { get { return EbDbTypes.Decimal; } }
 
         [EnableInBuilder(BuilderType.FilterDialog)]
         [DefaultPropValue("eb_location_id")]
@@ -31,12 +36,23 @@ namespace ExpressBase.Objects.Objects
 
         public string OptionHtml { get; set; }
 
+        public override string GetValueJSfn
+        {
+            get
+            {
+                return @"
+                    return $('#' + this.EbSid_CtxId + ' option:selected').val();
+                ";
+            }
+            set { }
+        }
+
         public void InitFromDataBase(JsonServiceClient ServiceClient, User _user, Eb_Solution _sol)
         {
             string _html = string.Empty;
             try
             {
-                Console.WriteLine("Location:  "+_user.LocationIds);
+                Console.WriteLine("Location:  " + _user.LocationIds);
                 if (_user.LocationIds.Contains(-1))
                 {
                     foreach (var key in _sol.Locations)
@@ -77,28 +93,23 @@ namespace ExpressBase.Objects.Objects
         public override string GetBareHtml()
         {
             return @"
-        <select id='@name@' name='@name@' data-ebtype='@data-ebtype@' style='width: 100%;'>
+        <select id='@ebsid@' name='@name@' data-ebtype='@data-ebtype@' style='width: 100%;'>
             @options@
         </select>"
 .Replace("@name@", this.Name)
+.Replace("@ebsid@", this.EbSid_CtxId)
 .Replace("@options@", this.OptionHtml)
 .Replace("@data-ebtype@", "16");
         }
 
         private string GetHtmlHelper(RenderMode mode)
         {
-            return @"
-<div id='cont_@name@  ' class='Eb-ctrlContainer' Ctype='UserLocation' style='@HiddenString '>
-    <div class='eb-ctrl-label' id='@name@Lbl' style='@LabelBackColor@ @LabelForeColor@ '> @Label@  </div>
-       @barehtml@
-    <span class='helpText'> @HelpText@ </span>
-</div>"
-.Replace("@barehtml@", this.GetBareHtml())
+
+            string EbCtrlHTML = HtmlConstants.CONTROL_WRAPER_HTML4WEB
 .Replace("@HelpText@", this.HelpText)
 .Replace("@Label@", this.Label)
-.Replace("@name@", this.Name)
-.Replace("@HiddenString ", this.HiddenString)
 .Replace("@ToolTipText ", this.ToolTipText);
+            return ReplacePropsInHTML(EbCtrlHTML);
 
         }
     }

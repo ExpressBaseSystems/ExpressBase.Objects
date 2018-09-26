@@ -1,6 +1,7 @@
 ﻿using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
+using ExpressBase.Common.Structures;
 using ExpressBase.Objects.Helpers;
 using Newtonsoft.Json;
 using ProtoBuf;
@@ -36,11 +37,14 @@ namespace ExpressBase.Objects
             get
             {
                 return @"
-                    return $('[name=' + this.ebSid_CtxId + ']:checked').val();
+                    return $('[name=' + this.EbSid_CtxId + ']:checked').val();
                 ";
             }
             set { }
         }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+        public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
 
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.BotForm)]
