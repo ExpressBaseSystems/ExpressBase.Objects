@@ -25,10 +25,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Message { get; set; }
 
         [DataMember(Order = 5)]
-        public string Cc { get; set; }
+        public string[] Cc { get; set; }
 
         [DataMember(Order = 6)]
-        public string Bcc { get; set; }
+        public string[] Bcc { get; set; }
 
         [DataMember(Order = 7)]
         // public MemorystreamWrapper AttachmentReport { get; set; }

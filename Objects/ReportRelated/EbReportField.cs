@@ -14,6 +14,7 @@ using System.Data;
 using ExpressBase.Common;
 using ExpressBase.Common.Data;
 using Newtonsoft.Json;
+using ServiceStack;
 
 namespace ExpressBase.Objects.ReportRelated
 {
@@ -52,38 +53,27 @@ namespace ExpressBase.Objects.ReportRelated
         [HideInPropertyGrid]
         public override string ForeColor { get; set; } = "";
 
+        [JsonIgnore]
+        public float Llx
+        {
+            get
+            {
+                return LeftPt;
+            }
+        }
+
+        [JsonIgnore]
+        public float Urx
+        {
+            get
+            {
+                return WidthPt + LeftPt;
+            }
+        }
         public BaseColor GetColor(string Color)
         {
             int colr = ColorTranslator.FromHtml(Color).ToArgb();
             return new BaseColor(colr);
-        }
-
-        public virtual void DrawMe(Document d, byte[] fileByte)
-        {
-        }
-        public virtual void DrawMe(Document d, PdfWriter writer, byte[] fileByte, float reportHeight)
-        {
-        }
-        public virtual void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, EbReport report)
-        {
-        }
-        public virtual void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop)
-        {
-        }
-        public virtual void DrawMe(Document d, byte[] fileByte, float reportHeight, float printingTop, float detailprintingtop)
-        {
-        }
-        public virtual void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_name)
-        {
-        }
-        public virtual void DrawMe(Document doc, PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_name)
-        {
-        }
-        public virtual void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, string column_name, float detailprintingtop, DbType column_type)
-        {
-        }
-        public virtual void DrawMe(Document doc, PdfContentByte canvas, float reportHeight, float printingTop, string column_val, float detailprintingtop, DbType column_type, List<Param> l)
-        {
         }
 
         private iTextSharp.text.Font iTextFont = null;
@@ -106,6 +96,8 @@ namespace ExpressBase.Objects.ReportRelated
                 return iTextFont;
             }
         }
+
+        public virtual void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno) { }
     }
 
     [EnableInBuilder(BuilderType.Report)]
@@ -153,13 +145,29 @@ namespace ExpressBase.Objects.ReportRelated
                     this.BorderColor = '#eae6e6';
                 };";
         }
-        public override void DrawMe(Document d, byte[] fileByte, float reportHeight, float printingTop, float detailprintingtop)
+        public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
         {
-            iTextSharp.text.Image myImage = iTextSharp.text.Image.GetInstance(fileByte);
-            myImage.ScaleToFit(WidthPt, HeightPt);
-            myImage.SetAbsolutePosition(LeftPt, reportHeight - (printingTop + TopPt + HeightPt + detailprintingtop));
-            myImage.Alignment = (int)TextAlign;
-            d.Add(myImage);
+            byte[] fileByte = new byte[0]; ;
+            if (ImageRefId != 0)
+                fileByte = Rep.GetImage(ImageRefId);
+            else if (!string.IsNullOrEmpty(ImageColName))
+            {
+
+                dynamic val = Rep.GetDataFieldtValue(ImageColName.Split(".")[1], slno, Convert.ToInt32(ImageColName.Split(".")[0].Substring(1)));
+                if (val is string)
+                    fileByte = Rep.GetImage(Convert.ToInt32(val));
+                else if (val is byte[])
+                    fileByte = val;
+            }
+
+            if (fileByte.Length != 0)
+            {
+                iTextSharp.text.Image myImage = iTextSharp.text.Image.GetInstance(fileByte);
+                myImage.ScaleToFit(WidthPt, HeightPt);
+                myImage.SetAbsolutePosition(LeftPt, Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop));
+                myImage.Alignment = (int)TextAlign;
+                Rep.Doc.Add(myImage);
+            }
         }
     }
 
@@ -212,28 +220,24 @@ namespace ExpressBase.Objects.ReportRelated
                 };";
         }
 
-        public override void DrawMe(Document d, PdfWriter writer, byte[] fileByte, float reportHeight)
+        public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
         {
             Phrase phrase = null;
             if (WaterMarkText != string.Empty)
             {
                 phrase = new Phrase(WaterMarkText, ITextFont);
                 PdfContentByte canvas;
-                canvas = writer.DirectContentUnder;
-                ColumnText.ShowTextAligned(canvas, (int)TextAlign, phrase, d.PageSize.Width / 2, d.PageSize.Height / 2, Rotation);
+                canvas = Rep.Writer.DirectContentUnder;
+                ColumnText.ShowTextAligned(canvas, (int)TextAlign, phrase, Rep.Doc.PageSize.Width / 2, Rep.Doc.PageSize.Height / 2, Rotation);
             }
             if (ImageRefId != 0)
             {
-                iTextSharp.text.Image img = iTextSharp.text.Image.GetInstance(fileByte);
+                iTextSharp.text.Image img = iTextSharp.text.Image.GetInstance(Rep.WatermarkImages[ImageRefId]);
                 img.RotationDegrees = Rotation;
                 img.ScaleToFit(WidthPt, HeightPt);
-                img.SetAbsolutePosition(LeftPt, reportHeight - TopPt - HeightPt);
-                PdfGState _state = new PdfGState()
-                {
-                    FillOpacity = 0.1F,
-                    StrokeOpacity = 0.1F
-                };
-                PdfContentByte cb = writer.DirectContentUnder;
+                img.SetAbsolutePosition(LeftPt, Rep.HeightPt - TopPt - HeightPt);
+                PdfGState _state = new PdfGState() { FillOpacity = 0.1F, StrokeOpacity = 0.1F };
+                PdfContentByte cb = Rep.Writer.DirectContentUnder;
                 cb.SaveState();
                 cb.SetGState(_state);
                 cb.AddImage(img);
@@ -276,6 +280,7 @@ namespace ExpressBase.Objects.ReportRelated
         {
             return "<div class='date-time dropped' eb-type='DateTime' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; height: @Height px; background-color:@BackColor ; color:@ForeColor ; left: @Left px; top: @Top px;text-align: @TextAlign;'> @Title </div>".RemoveCR().DoubleQuoted();
         }
+
         public override string GetJsInitFunc()
         {
             return @"
@@ -288,18 +293,16 @@ namespace ExpressBase.Objects.ReportRelated
                     this.BorderColor = '#eae6e6';
                 };";
         }
-        public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
-        {
 
-            float urx = WidthPt + LeftPt;
-            float ury = reportHeight - (printingTop + TopPt + detailprintingtop);
-            float llx = LeftPt;
-            float lly = reportHeight - (printingTop + TopPt + HeightPt + detailprintingtop);
-            column_val = FormatDate(column_val);
-            Phrase phrase = null;
-            phrase = new Phrase(column_val, ITextFont);
-            ColumnText ct = new ColumnText(canvas);
-            ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, (int)TextAlign);
+        public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
+        {
+           
+            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
+            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
+            string column_val = FormatDate(Rep.CurrentTimestamp.ToString());
+            Phrase phrase = new Phrase(column_val, ITextFont);
+            ColumnText ct = new ColumnText(Rep.Canvas);
+            ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, 15, (int)TextAlign);
             ct.Go();
         }
     }
@@ -329,17 +332,15 @@ namespace ExpressBase.Objects.ReportRelated
                     this.BorderColor = '#eae6e6';
                 };";
         }
-        public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
+        public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
         {
-            float urx = WidthPt + LeftPt;
-            float ury = reportHeight - (printingTop + TopPt + detailprintingtop);
-            float llx = LeftPt;
-            float lly = reportHeight - (printingTop + TopPt + HeightPt + detailprintingtop);
-            Phrase phrase = null;
+           
+            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
+            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop + Rep.RowHeight);
 
-            phrase = new Phrase(column_val, ITextFont);
-            ColumnText ct = new ColumnText(canvas);
-            ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, (int)TextAlign);
+            ColumnText ct = new ColumnText(Rep.Canvas);
+            Phrase phrase = new Phrase(Rep.PageNumber.ToString(), ITextFont);
+            ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, 15, (int)TextAlign);
             ct.Go();
         }
     }
@@ -369,17 +370,14 @@ namespace ExpressBase.Objects.ReportRelated
                     this.BorderColor = '#eae6e6';
                 };";
         }
-        public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
+        public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
         {
-            float urx = WidthPt + LeftPt;
-            float ury = reportHeight - (printingTop + TopPt + detailprintingtop);
-            float llx = LeftPt;
-            float lly = reportHeight - (printingTop + TopPt + HeightPt + detailprintingtop);
+            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
+            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop + Rep.RowHeight);
 
-            Phrase phrase = null;
-            phrase = new Phrase(column_val, ITextFont);
-            ColumnText ct = new ColumnText(canvas);
-            ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, (int)TextAlign);
+            ColumnText ct = new ColumnText(Rep.Canvas);
+            Phrase phrase = new Phrase(Rep.PageNumber + "/"/* + writer.PageCount*/, ITextFont);
+            ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, 15, (int)TextAlign);
             ct.Go();
         }
     }
@@ -409,17 +407,14 @@ namespace ExpressBase.Objects.ReportRelated
                     this.BorderColor = '#eae6e6';
                 };";
         }
-        public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
+        public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
         {
-            float urx = WidthPt + LeftPt;
-            float ury = reportHeight - (printingTop + TopPt + detailprintingtop);
-            float llx = LeftPt;
-            float lly = reportHeight - (printingTop + TopPt + HeightPt + detailprintingtop);
+            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
+            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop + Rep.RowHeight);
 
-            Phrase phrase = null;
-            phrase = new Phrase(column_val, ITextFont);
-            ColumnText ct = new ColumnText(canvas);
-            ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, (int)TextAlign);
+            ColumnText ct = new ColumnText(Rep.Canvas);
+            Phrase phrase = new Phrase(Rep.UserName, ITextFont);
+            ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, 15, (int)TextAlign);
             ct.Go();
         }
     }
@@ -445,18 +440,14 @@ namespace ExpressBase.Objects.ReportRelated
                     this.BorderColor = '#eae6e6';
                 };";
         }
-        public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, EbReport report)
+        public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
         {
-            float urx = WidthPt + LeftPt;
-            float ury = reportHeight - (printingTop + TopPt + report.detailprintingtop);
-            float llx = LeftPt;
-            float lly = reportHeight - (printingTop + TopPt + HeightPt + report.detailprintingtop + report.RowHeight);
+            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
+            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop + Rep.RowHeight);
 
-            ColumnText ct = new ColumnText(canvas);
-            Phrase phrase = null;
-            phrase = new Phrase(Title, ITextFont);
-
-            ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, (int)TextAlign);
+            ColumnText ct = new ColumnText(Rep.Canvas);
+            Phrase phrase = new Phrase(Title, ITextFont);
+            ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, 15, (int)TextAlign);
             ct.Go();
         }
     }
@@ -487,17 +478,17 @@ namespace ExpressBase.Objects.ReportRelated
                     this.orderColor = '#eae6e6';
                 };";
         }
-        public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
+        public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
         {
-            float urx = WidthPt + LeftPt;
-            float ury = reportHeight - (printingTop + TopPt + detailprintingtop);
-            float llx = LeftPt;
-            float lly = reportHeight - (printingTop + TopPt + HeightPt + detailprintingtop);
-
-            Phrase phrase = null;
-            phrase = new Phrase(column_val, ITextFont);
-            ColumnText ct = new ColumnText(canvas);
-            ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, (int)TextAlign);
+            string column_val = "";
+            foreach (Param p in Rep.Parameters)
+                if (p.Name == Title)
+                    column_val = p.Value;
+            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
+            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
+            Phrase phrase = new Phrase(column_val, ITextFont);
+            ColumnText ct = new ColumnText(Rep.Canvas);
+            ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, 15, (int)TextAlign);
             ct.Go();
         }
     }
@@ -554,8 +545,11 @@ namespace ExpressBase.Objects.ReportRelated
                     this.BorderColor = '#eae6e6';
                 };";
         }
-        public override void DrawMe(Document doc, PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string code_val)
+        public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
         {
+            int tableIndex = Convert.ToInt32(Code.Split('.')[0].Substring(1));
+            string column_name = Code.Split('.')[1];
+            string column_val = Rep.GetDataFieldtValue(column_name, slno, tableIndex);
             //** BarcodeEan(& BarcodeEansupp)
             //public const int EAN13 = 1;
             //public const int EAN8 = 2;
@@ -608,21 +602,21 @@ namespace ExpressBase.Objects.ReportRelated
                 Barcode128 uccEan128 = new Barcode128();
 
                 uccEan128.CodeType = Type;
-                uccEan128.Code = code_val;
+                uccEan128.Code = column_val;
                 uccEan128.GuardBars = GuardBars;
                 uccEan128.Baseline = BaseLine;
-                imageEAN = uccEan128.CreateImageWithBarcode(cb: canvas, barColor: null, textColor: null);
+                imageEAN = uccEan128.CreateImageWithBarcode(cb: Rep.Canvas, barColor: null, textColor: null);
                 //}
 
                 // imageEAN.ScaleAbsolute(Width, Height);
-                imageEAN.SetAbsolutePosition(LeftPt, reportHeight - (printingTop + TopPt + HeightPt + detailprintingtop));
-                doc.Add(imageEAN);
+                imageEAN.SetAbsolutePosition(LeftPt, Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop));
+                Rep.Doc.Add(imageEAN);
             }
             catch (Exception e)
             {
                 Console.WriteLine("Exception: " + e.ToString());
-                ColumnText ct = new ColumnText(canvas);
-                float x = reportHeight - (printingTop + TopPt + detailprintingtop);
+                ColumnText ct = new ColumnText(Rep.Canvas);
+                float x = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
                 ct.SetSimpleColumn(new Phrase("Error in generating barcode"), LeftPt, x - HeightPt, LeftPt + WidthPt, x, 15, (int)TextAlign);
                 ct.Go();
             }
@@ -666,23 +660,26 @@ namespace ExpressBase.Objects.ReportRelated
                     this.BorderColor = '#eae6e6';
                 };";
         }
-        public override void DrawMe(Document doc, PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string code_val)
+        public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
         {
             try
             {
+                int tableIndex = Convert.ToInt32(Code.Split('.')[0].Substring(1));
+                string column_name = Code.Split('.')[1];
+                string column_val = Rep.GetDataFieldtValue(column_name, slno, tableIndex);
                 QRCodeGenerator qrGenerator = new QRCodeGenerator();
-                QRCodeData qrCodeData = qrGenerator.CreateQrCode(code_val, QRCodeGenerator.ECCLevel.Q);
+                QRCodeData qrCodeData = qrGenerator.CreateQrCode(column_val, QRCodeGenerator.ECCLevel.Q);
                 BitmapByteQRCode qrCode = new BitmapByteQRCode(qrCodeData);
                 byte[] qrCodeImage = qrCode.GetGraphic(20);
                 iTextSharp.text.Image img = iTextSharp.text.Image.GetInstance(qrCodeImage);
-                img.SetAbsolutePosition(LeftPt, reportHeight - (printingTop + TopPt + HeightPt + detailprintingtop));
+                img.SetAbsolutePosition(LeftPt, Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop));
                 img.ScaleAbsolute(WidthPt, HeightPt);
-                doc.Add(img);
+                Rep.Doc.Add(img);
             }
             catch (Exception e)
             {
-                ColumnText ct = new ColumnText(canvas);
-                float x = reportHeight - (printingTop + TopPt + detailprintingtop);
+                ColumnText ct = new ColumnText(Rep.Canvas);
+                float x = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
                 ct.SetSimpleColumn(new Phrase("Error in generating barcode"), LeftPt, x - HeightPt, LeftPt + WidthPt, x, 15, (int)TextAlign);
                 ct.Go();
                 Console.WriteLine("Exception: " + e.ToString());
@@ -709,18 +706,14 @@ namespace ExpressBase.Objects.ReportRelated
                     this.BorderColor = '#eae6e6';
                 };";
         }
-        public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
+        public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
         {
-            float urx = WidthPt + LeftPt;
-            float ury = reportHeight - (printingTop + TopPt + detailprintingtop);
-            float llx = LeftPt;
-            float lly = reportHeight - (printingTop + TopPt + HeightPt + detailprintingtop);
+            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
+            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
 
-            Phrase phrase = null;
-            phrase = new Phrase(column_val, ITextFont);
-
-            ColumnText ct = new ColumnText(canvas);
-            ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, (int)TextAlign);
+            Phrase phrase = new Phrase((Rep.iDetailRowPos + 1).ToString(), ITextFont);
+            ColumnText ct = new ColumnText(Rep.Canvas);
+            ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, 15, (int)TextAlign);
             ct.Go();
         }
     }
@@ -747,13 +740,17 @@ namespace ExpressBase.Objects.ReportRelated
                     this.BorderColor = '#eae6e6';
                 };";
         }
-        public override void DrawMe(Document d, byte[] fileByte, float reportHeight, float printingTop, float detailprintingtop)
+        public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
         {
-            iTextSharp.text.Image myImage = iTextSharp.text.Image.GetInstance(fileByte);
-            myImage.ScaleToFit(WidthPt, HeightPt);
-            myImage.SetAbsolutePosition(LeftPt, reportHeight - (printingTop + TopPt + HeightPt + detailprintingtop));
-            myImage.Alignment = (int)TextAlign;
-            d.Add(myImage);
+            byte[] fileByte = Rep.GetImage(Convert.ToInt32(Rep.Solution.Locations[42][Title]));
+            if (!fileByte.IsEmpty())
+            {
+                iTextSharp.text.Image myImage = iTextSharp.text.Image.GetInstance(fileByte);
+                myImage.ScaleToFit(WidthPt, HeightPt);
+                myImage.SetAbsolutePosition(Llx, Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop));
+                myImage.Alignment = (int)TextAlign;
+                Rep.Doc.Add(myImage);
+            }
         }
 
     }
@@ -782,16 +779,15 @@ namespace ExpressBase.Objects.ReportRelated
                 };";
         }
 
-        public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, float detailprintingtop, string column_val)
+        public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
         {
-            float urx = WidthPt + LeftPt;
-            float ury = reportHeight - (printingTop + TopPt + detailprintingtop);
-            float llx = LeftPt;
-            float lly = reportHeight - (printingTop + TopPt + HeightPt + detailprintingtop);
-            Phrase phrase = null;
-            phrase = new Phrase(column_val, ITextFont);
-            ColumnText ct = new ColumnText(canvas);
-            ct.SetSimpleColumn(phrase, llx, lly, urx, ury, 15, (int)TextAlign);
+            string column_val = Rep.Solution.Locations[42][Title];
+            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
+            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
+
+            Phrase phrase = new Phrase(column_val, ITextFont);
+            ColumnText ct = new ColumnText(Rep.Canvas);
+            ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, 15, (int)TextAlign);
             ct.Go();
         }
     }

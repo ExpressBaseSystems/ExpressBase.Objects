@@ -1,4 +1,5 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Data;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
@@ -45,31 +46,29 @@ namespace ExpressBase.Objects.ReportRelated
                         this.BorderColor = '#000000'
                    };";
         }
-        public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, EbReport report)
+        public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
         {
             if (Height == Width)
             {
                 float radius = WidthPt / 2;
                 float xval = LeftPt + radius;
-                float yval = reportHeight - (printingTop + TopPt + radius + report.detailprintingtop);
+                float yval = Rep.HeightPt - (printingTop + TopPt + radius + Rep.detailprintingtop);
 
-                canvas.SetColorStroke(GetColor(BorderColor));
-                canvas.SetColorFill(GetColor(BackColor));
-                canvas.SetLineWidth(Border);
-                canvas.Circle(xval, yval, radius);
-                canvas.FillStroke();
+                Rep.Canvas.SetColorStroke(GetColor(BorderColor));
+                Rep.Canvas.SetColorFill(GetColor(BackColor));
+                Rep.Canvas.SetLineWidth(Border);
+                Rep.Canvas.Circle(xval, yval, radius);
+                Rep.Canvas.FillStroke();
             }
             else
             {
-                float x1 = LeftPt;
-                float y1 = reportHeight - (printingTop + TopPt + HeightPt + report.detailprintingtop);
-                float x2 = LeftPt + WidthPt;
-                float y2 = reportHeight - (printingTop + TopPt + report.detailprintingtop);
-                canvas.SetColorStroke(GetColor(BorderColor));
-                canvas.SetColorFill(GetColor(BackColor));
-                canvas.SetLineWidth(Border);
-                canvas.Ellipse(x1, y1, x2, y2);
-                canvas.FillStroke();
+                float y1 = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
+                float y2 = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
+                Rep.Canvas.SetColorStroke(GetColor(BorderColor));
+                Rep.Canvas.SetColorFill(GetColor(BackColor));
+                Rep.Canvas.SetLineWidth(Border);
+                Rep.Canvas.Ellipse(Llx, y1, Urx, y2);
+                Rep.Canvas.FillStroke();
             }
         }
     }
@@ -91,17 +90,14 @@ namespace ExpressBase.Objects.ReportRelated
                     this.BorderColor = '#000000'
                 };";
         }
-        public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, EbReport report)
+        public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
         {
-            float x = LeftPt;
-            float y = reportHeight - (printingTop + TopPt + HeightPt + report.detailprintingtop);
-            float w = WidthPt;
-            float h = HeightPt;
-            canvas.SetColorStroke(GetColor(BorderColor));
-            canvas.SetColorFill(GetColor(BackColor));
-            canvas.SetLineWidth(Border);
-            canvas.Rectangle(x, y, w, h);
-            canvas.FillStroke();
+            float y = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
+            Rep.Canvas.SetColorStroke(GetColor(BorderColor));
+            Rep.Canvas.SetColorFill(GetColor(BackColor));
+            Rep.Canvas.SetLineWidth(Border);
+            Rep.Canvas.Rectangle(Llx, y, WidthPt, HeightPt);
+            Rep.Canvas.FillStroke();
         }
     }
     [EnableInBuilder(BuilderType.Report)]
@@ -121,18 +117,17 @@ namespace ExpressBase.Objects.ReportRelated
                     this.BorderColor = '#000000'
                 };";
         }
-        public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, EbReport report)
+        public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
         {
-            base.DrawMe(canvas, reportHeight, printingTop, report);
-            float x = LeftPt + WidthPt;
-            float y = reportHeight - (printingTop + TopPt + report.detailprintingtop);
-            canvas.SetColorStroke(GetColor(BorderColor));
-            canvas.SetColorFill(GetColor(BorderColor));
-            canvas.SetLineWidth(Border);
-            canvas.MoveTo(x, y);
-            canvas.LineTo(x - 3, y - 3);
-            canvas.LineTo(x - 3, y + 3);
-            canvas.ClosePathFillStroke();
+            base.DrawMe(printingTop, Rep, Linkparams, slno);
+            float y = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
+            Rep.Canvas.SetColorStroke(GetColor(BorderColor));
+            Rep.Canvas.SetColorFill(GetColor(BorderColor));
+            Rep.Canvas.SetLineWidth(Border);
+            Rep.Canvas.MoveTo(Urx, y);
+            Rep.Canvas.LineTo(Urx - 3, y - 3);
+            Rep.Canvas.LineTo(Urx - 3, y + 3);
+            Rep.Canvas.ClosePathFillStroke();
         }
     }
     [EnableInBuilder(BuilderType.Report)]
@@ -152,18 +147,17 @@ namespace ExpressBase.Objects.ReportRelated
                         this.BorderColor = '#000000'
                     };";
         }
-        public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, EbReport report)
+        public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
         {
-            base.DrawMe(canvas, reportHeight, printingTop, report);
-            float x = LeftPt;
-            float y = reportHeight - (printingTop + TopPt + report.detailprintingtop);
-            canvas.SetColorStroke(GetColor(BorderColor));
-            canvas.SetColorFill(GetColor(BorderColor));
-            canvas.SetLineWidth(Border);
-            canvas.MoveTo(x, y);
-            canvas.LineTo(x + 3, y + 3);
-            canvas.LineTo(x + 3, y - 3);
-            canvas.ClosePathFillStroke();
+            base.DrawMe(printingTop,Rep, Linkparams, slno);
+            float y = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
+            Rep.Canvas.SetColorStroke(GetColor(BorderColor));
+            Rep.Canvas.SetColorFill(GetColor(BorderColor));
+            Rep.Canvas.SetLineWidth(Border);
+            Rep.Canvas.MoveTo(Llx, y);
+            Rep.Canvas.LineTo(Llx + 3, y + 3);
+            Rep.Canvas.LineTo(Llx + 3, y - 3);
+            Rep.Canvas.ClosePathFillStroke();
         }
 
 
@@ -185,18 +179,17 @@ namespace ExpressBase.Objects.ReportRelated
                         this.BorderColor = '#000000'
                     };";
         }
-        public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, EbReport report)
+        public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
         {
-            base.DrawMe(canvas, reportHeight, printingTop, report);
-            float x = LeftPt;
-            float y = reportHeight - (printingTop + TopPt + HeightPt + report.detailprintingtop);
-            canvas.SetColorStroke(GetColor(BorderColor));
-            canvas.SetColorFill(GetColor(BorderColor));
-            canvas.SetLineWidth(Border);
-            canvas.MoveTo(x, y);
-            canvas.LineTo(x - 3, y + 3);
-            canvas.LineTo(x + 3, y + 3);
-            canvas.ClosePathFillStroke();
+            base.DrawMe(printingTop,  Rep, Linkparams, slno);
+            float y = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
+            Rep.Canvas.SetColorStroke(GetColor(BorderColor));
+            Rep.Canvas.SetColorFill(GetColor(BorderColor));
+            Rep.Canvas.SetLineWidth(Border);
+            Rep.Canvas.MoveTo(Llx, y);
+            Rep.Canvas.LineTo(Llx - 3, y + 3);
+            Rep.Canvas.LineTo(Llx + 3, y + 3);
+            Rep.Canvas.ClosePathFillStroke();
         }
     }
     [EnableInBuilder(BuilderType.Report)]
@@ -216,18 +209,17 @@ namespace ExpressBase.Objects.ReportRelated
                         this.BorderColor = '#000000'
                     };";
         }
-        public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, EbReport report)
+        public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
         {
-            base.DrawMe(canvas, reportHeight, printingTop, report);
-            float x = LeftPt;
-            float y = reportHeight - (printingTop + TopPt + report.detailprintingtop);
-            canvas.SetColorStroke(GetColor(BorderColor));
-            canvas.SetColorFill(GetColor(BorderColor));
-            canvas.SetLineWidth(Border);
-            canvas.MoveTo(x, y);
-            canvas.LineTo(x + 3, y - 3);
-            canvas.LineTo(x - 3, y - 3);
-            canvas.ClosePathFillStroke();
+            base.DrawMe(printingTop,Rep, Linkparams, slno);
+            float y = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
+            Rep.Canvas.SetColorStroke(GetColor(BorderColor));
+            Rep.Canvas.SetColorFill(GetColor(BorderColor));
+            Rep.Canvas.SetLineWidth(Border);
+            Rep.Canvas.MoveTo(Llx, y);
+            Rep.Canvas.LineTo(Llx + 3, y - 3);
+            Rep.Canvas.LineTo(Llx - 3, y - 3);
+            Rep.Canvas.ClosePathFillStroke();
         }
 
     }
@@ -249,24 +241,22 @@ namespace ExpressBase.Objects.ReportRelated
                         this.BorderColor = '#000000'
                     };";
         }
-        public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, EbReport report)
+        public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
         {
-            base.DrawMe(canvas, reportHeight, printingTop, report);
-            float x1 = LeftPt + WidthPt;
-            float y1 = reportHeight - (printingTop + TopPt + report.detailprintingtop);
-            canvas.SetColorStroke(GetColor(BorderColor));
-            canvas.SetColorFill(GetColor(BorderColor));
-            canvas.SetLineWidth(Border);
-            canvas.MoveTo(x1, y1);
-            canvas.LineTo(x1 - 3, y1 - 3);
-            canvas.LineTo(x1 - 3, y1 + 3);
-            canvas.ClosePathFillStroke();
-            float x2 = LeftPt;
+            base.DrawMe(printingTop, Rep, Linkparams, slno);
+            float y1 = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
+            Rep.Canvas.SetColorStroke(GetColor(BorderColor));
+            Rep.Canvas.SetColorFill(GetColor(BorderColor));
+            Rep.Canvas.SetLineWidth(Border);
+            Rep.Canvas.MoveTo(Urx, y1);
+            Rep.Canvas.LineTo(Urx - 3, y1 - 3);
+            Rep.Canvas.LineTo(Urx - 3, y1 + 3);
+            Rep.Canvas.ClosePathFillStroke();
             float y2 = y1;
-            canvas.MoveTo(x2, y2);
-            canvas.LineTo(x2 + 3, y2 + 3);
-            canvas.LineTo(x2 + 3, y2 - 3);
-            canvas.ClosePathFillStroke();
+            Rep.Canvas.MoveTo(Llx, y2);
+            Rep.Canvas.LineTo(Llx + 3, y2 + 3);
+            Rep.Canvas.LineTo(Llx + 3, y2 - 3);
+            Rep.Canvas.ClosePathFillStroke();
         }
     }
     [EnableInBuilder(BuilderType.Report)]
@@ -286,27 +276,23 @@ namespace ExpressBase.Objects.ReportRelated
                         this.BorderColor = '#000000'
                     };";
         }
-        public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, EbReport report)
+        public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
         {
-            float rowH = 0;
-            if (TopPt > report.MultiRowTop)
-                rowH = report.RowHeight;
-            base.DrawMe(canvas, reportHeight, printingTop, report);
-            float x1 = LeftPt;
-            float y1 = reportHeight - (printingTop + TopPt + report.detailprintingtop);
-            canvas.SetColorStroke(GetColor(BorderColor));
-            canvas.SetColorFill(GetColor(BorderColor));
-            canvas.SetLineWidth(Border);
-            canvas.MoveTo(x1, y1);
-            canvas.LineTo(x1 + 3, y1 - 3);
-            canvas.LineTo(x1 - 3, y1 - 3);
-            canvas.ClosePathFillStroke();
-            float x2 = LeftPt;
-            float y2 = reportHeight - (printingTop + TopPt + HeightPt + report.detailprintingtop + rowH);
-            canvas.MoveTo(x2, y2);
-            canvas.LineTo(x2 - 3, y2 + 3);
-            canvas.LineTo(x2 + 3, y2 + 3);
-            canvas.ClosePathFillStroke();
+            float rowH = (TopPt > Rep.MultiRowTop) ? Rep.RowHeight : 0;
+            base.DrawMe(printingTop, Rep, Linkparams, slno);
+            float y1 = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
+            Rep.Canvas.SetColorStroke(GetColor(BorderColor));
+            Rep.Canvas.SetColorFill(GetColor(BorderColor));
+            Rep.Canvas.SetLineWidth(Border);
+            Rep.Canvas.MoveTo(Llx, y1);
+            Rep.Canvas.LineTo(Llx + 3, y1 - 3);
+            Rep.Canvas.LineTo(Llx - 3, y1 - 3);
+            Rep.Canvas.ClosePathFillStroke();
+            float y2 = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop + rowH);
+            Rep.Canvas.MoveTo(Llx, y2);
+            Rep.Canvas.LineTo(Llx - 3, y2 + 3);
+            Rep.Canvas.LineTo(Llx + 3, y2 + 3);
+            Rep.Canvas.ClosePathFillStroke();
         }
     }
 
@@ -327,20 +313,16 @@ namespace ExpressBase.Objects.ReportRelated
                         this.BorderColor = '#000000'
                     };";
         }
-        public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, EbReport report)
+        public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams,int slno)
         {
-            float rowH = 0;
-            if (TopPt > report.MultiRowTop)
-                rowH = report.RowHeight;
-            float x1 = LeftPt;
-            float y1 = reportHeight - (printingTop + TopPt + report.detailprintingtop + rowH);
-            float x2 = LeftPt + WidthPt;
+            float rowH = (TopPt > Rep.MultiRowTop) ? Rep.RowHeight : 0;
+            float y1 = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop + rowH);
             float y2 = y1;
-            canvas.SetColorStroke(GetColor(BorderColor));
-            canvas.SetLineWidth(Border);
-            canvas.MoveTo(x1, y1);
-            canvas.LineTo(x2, y2);
-            canvas.Stroke();
+            Rep.Canvas.SetColorStroke(GetColor(BorderColor));
+            Rep.Canvas.SetLineWidth(Border);
+            Rep.Canvas.MoveTo(Llx, y1);
+            Rep.Canvas.LineTo(Urx, y2);
+            Rep.Canvas.Stroke();
         }
     }
 
@@ -361,17 +343,15 @@ namespace ExpressBase.Objects.ReportRelated
                         this.BorderColor = '#000000'
                     };";
         }
-        public override void DrawMe(PdfContentByte canvas, float reportHeight, float printingTop, EbReport report)
+        public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
         {
-            float x1 = LeftPt;
-            float y1 = reportHeight - (printingTop + TopPt + report.detailprintingtop);
-            float x2 = x1;
-            float y2 = reportHeight - (printingTop + TopPt + HeightPt + report.detailprintingtop);
-            canvas.SetColorStroke(GetColor(BorderColor));
-            canvas.SetLineWidth(Border);
-            canvas.MoveTo(x1, y1);
-            canvas.LineTo(x2, y2);
-            canvas.Stroke();
+            float y1 = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
+            float y2 = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
+            Rep.Canvas.SetColorStroke(GetColor(BorderColor));
+            Rep.Canvas.SetLineWidth(Border);
+            Rep.Canvas.MoveTo(Llx, y1);
+            Rep.Canvas.LineTo(Llx, y2);
+            Rep.Canvas.Stroke();
         }
     }
     [EnableInBuilder(BuilderType.Report)]
@@ -398,7 +378,7 @@ namespace ExpressBase.Objects.ReportRelated
                 <table onclick='$(this).parent().click();' style='border: @Border px solid ; border-color: @BorderColor ;' class='table eb_table_layout'>
                 <tr><td eb-type='TableLayout'></td><td eb-type='TableLayout'></td><td eb-type='TableLayout'></td></tr>
                 </table><div class='eb_draggbale_table_handle' onclick='$(this).parent().focus();'><i class='fa fa-arrows'></i></div></div>".RemoveCR().DoubleQuoted();
-                        }
+        }
         public override string GetJsInitFunc()
         {
             return @"

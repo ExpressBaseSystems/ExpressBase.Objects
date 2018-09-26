@@ -22,6 +22,13 @@ namespace ExpressBase.Objects
     {
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+        public override EbDbTypes EbDbType {
+            get {
+                return ValueMember.Type;
+            }
+        }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         [OSE_ObjectTypes(EbObjectTypes.iDataSource)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         public string DataSourceId { get; set; }
