@@ -237,7 +237,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 10)]
         //public LevelInfoCollection Levels { get; set; }
-        public Dictionary<string, GroupingDetails> Levels { get; set; }
+        public List<GroupingDetails> Levels { get; set; }
         
     }
 
@@ -365,7 +365,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public bool Ispaged { get; set; }
     }
 
-    public abstract class GroupingDetails
+    public abstract class GroupingDetails : IComparable
     {
         //public GroupingDetails()
         //{
@@ -384,7 +384,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         //    GroupingCount = CurLevel.GroupingCount;
         //    //IsHeader = CurLevel.IsHeader;
         //}
-        
+        public int SortIndex { get; set; }
+
         /// <summary>
         /// 
         /// </summary>
@@ -431,6 +432,11 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         /// The HTML text generated for the particular header or footer
         /// </summary>
         public string Html { get; set; }
+
+        public int CompareTo(object obj)
+        {
+            return SortIndex.CompareTo((obj as GroupingDetails).SortIndex);
+        }
     }
 
     public class HeaderGroupingDetails : GroupingDetails
