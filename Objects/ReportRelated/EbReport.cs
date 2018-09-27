@@ -439,49 +439,6 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         public Dictionary<string, NTV> CalcValInRow { get; set; } = new Dictionary<string, NTV>();
 
-        public void InitializeSummaryFields()
-        {
-            PageSummaryFields = new Dictionary<string, List<EbDataField>>();
-            ReportSummaryFields = new Dictionary<string, List<EbDataField>>();
-            foreach (EbPageFooter p_footer in PageFooters)
-            {
-                foreach (EbReportField field in p_footer.Fields)
-                {
-                    if (field is IEbDataFieldSummary)
-                    {
-                        EbDataField f = field as EbDataField;
-                        if (!PageSummaryFields.ContainsKey(f.SummaryOf))
-                        {
-                            PageSummaryFields.Add(f.SummaryOf, new List<EbDataField> { f });
-                        }
-                        else
-                        {
-                            PageSummaryFields[f.SummaryOf].Add(f);
-                        }
-                    }
-                }
-            }
-
-            foreach (EbReportFooter r_footer in ReportFooters)
-            {
-                foreach (EbReportField field in r_footer.Fields)
-                {
-                    if (field is IEbDataFieldSummary)
-                    {
-                        EbDataField f = (field as EbDataField);
-                        if (!ReportSummaryFields.ContainsKey(f.SummaryOf))
-                        {
-                            ReportSummaryFields.Add(f.SummaryOf, new List<EbDataField> { f });
-                        }
-                        else
-                        {
-                            ReportSummaryFields[f.SummaryOf].Add(f);
-                        }
-                    }
-                }
-            }
-        }
-
         public dynamic GetDataFieldtValue(string column_name, int i, int tableIndex)
         {
             dynamic value = null;
