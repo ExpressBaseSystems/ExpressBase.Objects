@@ -37,8 +37,30 @@ namespace ExpressBase.Objects
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
 
+        public override string SetValueJSfn
+        {
+            get
+            {
+                return @"
+                     this.initializer.setValues(p1);
+                ";
+            }
+            set { }
+        }
+
+        public override string ClearJSfn 
+        {
+            get
+            {
+                return @"
+                     this.initializer.clearValues();
+                ";
+            }
+            set { }
+        }
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
-        public override EbDbTypes EbDbType { get { return EbDbTypes.Decimal; } }
+        public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
