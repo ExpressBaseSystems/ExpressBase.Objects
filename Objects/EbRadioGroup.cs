@@ -32,12 +32,24 @@ namespace ExpressBase.Objects
             //this.Options.CollectionChanged += Options_CollectionChanged;
             this.ValueType = EbRadioValueType.Boolean;
         }
+
         public override string GetValueJSfn
         {
             get
             {
                 return @"
                     return $('[name=' + this.EbSid_CtxId + ']:checked').val();
+                ";
+            }
+            set { }
+        }
+
+        public override string SetValueJSfn
+        {
+            get
+            {
+                return @"
+                     $('input[name = ' + this.EbSid_CtxId + '][value = ' + p1 + ']').prop('checked', true);
                 ";
             }
             set { }

@@ -175,7 +175,7 @@ $('#@id').MonthPicker({ StartYear: 2018, ShowIcon: false });"
             return @" 
         <div class='input-group' style='width:100%;'>
             <input id='@ebsid@' data-ebtype='@data-ebtype@'  data-toggle='tooltip' title='@toolTipText@' class='date' type='text' name='@name@' autocomplete = '@autoComplete@' @value@ @tabIndex@ style='width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@ @readOnlyString@ @required@ @placeHolder@ />
-            <span class='input-group-addon' onclick=""$('#@ebsid@').click()"" style='padding: 0px;'> <i id='@ebsid@TglBtn' class='fa  @atchdLbl@' aria-hidden='true' style='padding: 6px 12px;'></i> </span>
+            <span class='input-group-addon' onclick=""$('#@ebsid@').focus()"" style='padding: 0px;'> <i id='@ebsid@TglBtn' class='fa  @atchdLbl@' aria-hidden='true' style='padding: 6px 12px;'></i> </span>
         </div>"
 .Replace("@name@", (this.Name != null ? this.Name.Trim() : ""))
 .Replace("@data-ebtype@", "6")//( (int)this.EbDateType ).ToString())
