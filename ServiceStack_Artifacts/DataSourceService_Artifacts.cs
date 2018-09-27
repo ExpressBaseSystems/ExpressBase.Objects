@@ -236,7 +236,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public RowColletion FormattedData { get; set; }
 
         [DataMember(Order = 10)]
-        public LevelInfoCollection Levels { get; set; }
+        //public LevelInfoCollection Levels { get; set; }
+        public Dictionary<string, GroupingDetails> Levels { get; set; }
         
     }
 
