@@ -41,16 +41,7 @@ namespace ExpressBase.Objects
             get
             {
                 return @"EbTextBox = {
-                x : function(elementId, props) {
-                        console.log(elementId);
-                        console.log(props);
-                },
-
-                y : function(elementId, props) {
-                        console.log(elementId);
-                        console.log(props);
-                },
-            }";
+                }";
             }
         }
 

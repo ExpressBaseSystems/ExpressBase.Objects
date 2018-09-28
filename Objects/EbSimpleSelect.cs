@@ -39,7 +39,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", 1)]
-		[OnChangeExec(@"console.log(100); if (this.Columns.$values.length === 0 ){pg.MakeReadOnly('ValueMember');} else {pg.MakeReadWrite('ValueMember');}")]
+		[OnChangeExec(@"if (this.Columns.$values.length === 0 ){pg.MakeReadOnly('ValueMember');} else {pg.MakeReadWrite('ValueMember');}")]
 		public DVBaseColumn ValueMember { get; set; }
 
 		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
@@ -49,7 +49,7 @@ namespace ExpressBase.Objects
 
 		[EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", 1)]
-		[OnChangeExec(@"console.log(100); if (this.Columns.$values.length === 0 ){pg.MakeReadOnly('DisplayMember');} else {pg.MakeReadWrite('DisplayMember');}")]
+		[OnChangeExec(@"if (this.Columns.$values.length === 0 ){pg.MakeReadOnly('DisplayMember');} else {pg.MakeReadWrite('DisplayMember');}")]
 		public DVBaseColumn DisplayMember { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
