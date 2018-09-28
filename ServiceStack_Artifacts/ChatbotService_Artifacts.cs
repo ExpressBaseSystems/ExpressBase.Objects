@@ -1,4 +1,5 @@
-﻿using ExpressBase.Common.Application;
+﻿using ExpressBase.Common;
+using ExpressBase.Common.Application;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Structures;
@@ -255,7 +256,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string TableName { get; set; }
 
         [DataMember(Order = 2)]
-        public object ValObj { get; set; }
+        public Dictionary<string, List<TableColumnMetaS>> Values { get; set; }
 
         [DataMember(Order = 3)]
         public string RefId { get; set; }
