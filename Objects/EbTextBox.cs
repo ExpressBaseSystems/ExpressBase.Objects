@@ -239,10 +239,11 @@ else {
             {
                 return @"
             @attachedLbl@
-            <input type='@TextMode '  data-ebtype='@data-ebtype@' ui-inp id='@name@' name='@name@' autocomplete = '@AutoCompleteOff ' data-toggle='tooltip' title='@ToolTipText ' 
+            <input type='@TextMode '  data-ebtype='@data-ebtype@' ui-inp id='@ebsid@' name='@name@' autocomplete = '@AutoCompleteOff ' data-toggle='tooltip' title='@ToolTipText ' 
 @tabIndex @MaxLength  style='width:100%; height:@heightpx; @BackColor @ForeColor display:inline-block; @fontStyle @ReadOnlyString  @Required  @PlaceHolder  @Text  @TabIndex  />
         @attachedLblClose@"
-.Replace("@name@", this.Name)
+.Replace("@ebsid@", this.EbSid_CtxId)
+.Replace("@name@", this.EbSid_CtxId)
 .Replace("@data-ebtype@", "16")//( (int)this.EbDateType ).ToString())
 .Replace("@MaxLength ", "maxlength='" + ((this.MaxLength > 0) ? this.MaxLength.ToString() : "@MaxLength") + "'")
 .Replace("@TextMode ", (this.TextMode == TextMode.SingleLine) ? "text" : this.TextMode.ToString().ToLower())
@@ -259,7 +260,7 @@ else {
 .Replace("@attachedLbl@", (this.TextMode != TextMode.SingleLine) ?
                                 (
                                     @"<div  class='input-group' style='width: 100%;'>
-                                        <span class='input-group-addon' onclick='$(\'#@name@\').click()'><i class='fa fa-$class aria-hidden='true'"
+                                        <span class='input-group-addon' onclick='$(\'#@ebsid@\').click()'><i class='fa fa-$class aria-hidden='true'"
                                         + (
                                             (this.FontFamily != null) ?
                                                 ("style='font-size:" + this.FontSize + "px;'")
@@ -286,6 +287,7 @@ else {
             <textarea id='@name@' name='@name@' rows='@RowsVisible@' autocomplete = '@AutoCompleteOff ' data-toggle='tooltip' title='@ToolTipText ' 
                 @tabIndex @MaxLength  style='width:100%; height:@heightpx; @BackColor @ForeColor display:inline-block; @fontStyle @ReadOnlyString  @Required  @PlaceHolder  @Text  @TabIndex></textarea>"
 .Replace("@name@", this.Name)
+.Replace("@ebsid@", this.EbSid_CtxId)
 .Replace("@MaxLength ", "maxlength='" + ((this.MaxLength > 0) ? this.MaxLength.ToString() : "@MaxLength") + "'")
 .Replace("@Required ", (this.Required && !this.Hidden ? " required" : string.Empty))
 .Replace("@ReadOnlyString ", this.ReadOnlyString)
@@ -314,7 +316,7 @@ else {
                 HtmlConstants.CONTROL_WRAPER_HTML4WEB
 .Replace("@barehtml@", this.GetBareHtml())
 .Replace("@name@", this.Name)
-.Replace("@ebsid@", this.EbSid)
+.Replace("@ebsid@", this.EbSid_CtxId)
 .Replace("@type@", this.ObjType))
 
     .Replace("@LabelForeColor ", "color:" + (LabelForeColor ?? "@LabelForeColor ") + ";")
