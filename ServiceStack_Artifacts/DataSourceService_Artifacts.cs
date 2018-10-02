@@ -470,19 +470,19 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     public class NumericAggregates
     {
-        public double Minimum { get; private set; }
-        public double Maximum { get; private set; }
-        public double Average
+        public decimal Minimum { get; private set; }
+        public decimal Maximum { get; private set; }
+        public decimal Average
         {
             get
             {
-                return Sum / Count;
+                return (Count >0) ? (Sum / Count) : 0;
             }
         }
-        public double Sum     { get; private set; }
+        public decimal Sum     { get; private set; }
         public int Count      { get; private set; }
 
-        public void SetValue(double _value)
+        public void SetValue(decimal _value)
         {
             Count++;
             Sum += _value;

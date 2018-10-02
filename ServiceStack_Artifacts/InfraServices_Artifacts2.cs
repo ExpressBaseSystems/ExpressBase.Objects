@@ -250,7 +250,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class CreateSolutionRequest : IReturn<CreateSolutionResponse>, IEbSSRequest
     {
         [DataMember(Order = 1)]
-        public string SolnId { get; set; }        
+        public string SolnUrl { get; set; }
 
         [DataMember(Order = 2)]
         public int UserId { get; set; }
@@ -260,13 +260,15 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 4)]
         public string Description { get; set; }
+
+        public string SolnId { get; set; }
     }
 
     [DataContract]
     public class CreateSolutionResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
-        public int Solnid { get; set; }
+        public int Status { get; set; }
 
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
