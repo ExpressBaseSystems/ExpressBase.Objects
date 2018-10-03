@@ -372,6 +372,10 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.DVBuilder)]
         public string SecondaryTableMapField { get; set; }
 
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [HideForUser]
+        public bool DisableCopy { get; set; }
+
         public static EbOperations Operations = TVOperations.Instance;
 
         public override string GetDesignHtml()
