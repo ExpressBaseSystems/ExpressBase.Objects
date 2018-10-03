@@ -365,27 +365,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public bool Ispaged { get; set; }
     }
 
-    public abstract class GroupingDetails : IComparable
+    public abstract class GroupingDetails
     {
-        //public GroupingDetails()
-        //{
-        //    GroupingTexts = new List<string>();
-        //}
-
-        //public GroupingDetails(GroupingDetails CurLevel)
-        //{
-        //    CurrentLevel = CurLevel.CurrentLevel;
-        //    RowIndex = CurLevel.RowIndex;
-        //    GroupingTexts = new List<string>(CurLevel.GroupingTexts);
-        //    InsertionType = CurLevel.InsertionType;
-        //    LevelCount = CurLevel.LevelCount;
-        //    ParentLevel = CurLevel.ParentLevel;
-        //    Html = CurLevel.Html;
-        //    GroupingCount = CurLevel.GroupingCount;
-        //    //IsHeader = CurLevel.IsHeader;
-        //}
-        public int SortIndex { get; set; }
-
         /// <summary>
         /// 
         /// </summary>
@@ -401,14 +382,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             get { return _currentLevel; }
             set { _currentLevel = value; }
         }
-        
-        /// <summary>
-        /// Stores the level previous to the current level.
-        /// Updated when the parent level text changes.
-        /// Used in multi-level row grouping. For single level, it is always set to 0.
-        /// </summary>
-        public int ParentLevel { get; set; }
-        
 
         /// <summary>
         /// The index in the EbDataTable object of the row before/after which grouping should be inserted.
@@ -432,11 +405,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         /// The HTML text generated for the particular header or footer
         /// </summary>
         public string Html { get; set; }
-
-        public int CompareTo(object obj)
-        {
-            return SortIndex.CompareTo((obj as GroupingDetails).SortIndex);
-        }
     }
 
     public class HeaderGroupingDetails : GroupingDetails
@@ -488,82 +456,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             Sum += _value;
             Minimum = (_value < Minimum) ? _value : Minimum;
             Maximum = (_value > Maximum) ? _value : Maximum;
-        }
-    }
-
-    public class LevelInfo
-    {
-        public string LevelText { get; set; }
-        public int Count { get; set; }
-        public int RowIndex { get; set; }
-        public string Type { get; set; }
-        public int Level { get; set; }
-        public string GroupString { get; set; }
-    }
-
-    public class LevelInfoCollection : List<LevelInfo>
-    {
-        public LevelInfo Update(int _index, int _count, int level)
-        {
-            foreach (LevelInfo _lvl in this)
-            {
-                if (_lvl.RowIndex == _index && _lvl.GroupString.IndexOf("group-sum") == -1 && _lvl.Level == level)
-                {
-                    _lvl.Count = _count;
-                    return _lvl;
-                }
-            }
-            return null;
-        }
-
-        public LevelInfo PreviousLevelCheck(int _index, int level)
-        {
-            foreach (LevelInfo _lvl in this)
-            {
-                if (_lvl.RowIndex == _index && _lvl.GroupString.IndexOf("group-sum") == -1 && _lvl.Level == level)
-                {
-                    return _lvl;
-                }
-            }
-            return null;
-        }
-
-        public LevelInfo UpdatePreviousLevelCount(int _index, int _count, int level)
-        {
-            foreach (LevelInfo _lvl in this)
-            {
-                if (_lvl.RowIndex == _index && _lvl.GroupString.IndexOf("group-sum") == -1 && _lvl.Level == level - 1)
-                {
-                    _lvl.Count = _count;
-                    return _lvl;
-                }
-            }
-            return null;
-        }
-
-        public LevelInfo CurrentLevelDataCheck(int level, string data)
-        {
-            foreach (LevelInfo _lvl in this)
-            {
-                if ( _lvl.LevelText != data && _lvl.Level == level && _lvl.GroupString.IndexOf("group-sum") == -1)
-                {
-                    return _lvl;
-                }
-            }
-            return null;
-        }
-
-        public int GetCount(int r1, int r2, int level)
-        {
-            int Count = 0;
-            foreach (LevelInfo _lvl in this)
-            {
-                if (_lvl.RowIndex >= r1 &&  _lvl.RowIndex <= r2 && _lvl.Level == level && _lvl.GroupString.IndexOf("group-sum") == -1)
-                {
-                    Count++;
-                }
-            }
-            return Count;
         }
     }
 }
