@@ -10,7 +10,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
 
     [DataContract]
-    public class SMSSentMqRequest : EbServiceStackAuthRequest
+    public class SMSSentMqRequest : EbMqRequest
     {
         [DataMember(Order = 1)]
         public string To { get; set; }
