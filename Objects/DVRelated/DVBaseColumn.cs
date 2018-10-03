@@ -129,9 +129,8 @@ namespace ExpressBase.Objects.Objects.DVRelated
         public LinkTypeEnum LinkType { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
-        [PropertyEditor(PropertyEditorType.Expandable)]
         [HideForUser]
-        public HideColumnData HideDataIfRowMoreThan { get; set; }
+        public int HideDataIfRowMoreThan { get; set; }
 
         public virtual CultureInfo GetColumnCultureInfo(CultureInfo user_cultureinfo)
         {
@@ -312,17 +311,17 @@ else{
     [EnableInBuilder(BuilderType.DVBuilder)]
     public class HideColumnData
     {
-        [OnChangeExec(@"
-if(this.Enable === False){
-    pg.HideProperty('UnRestrictedRowCount');
-    pg.HideProperty('ReplaceByCharacter');
-    pg.HideProperty('ReplaceByText');
-}
-else{
-    pg.ShowProperty('UnRestrictedRowCount');
-    pg.ShowProperty('ReplaceByCharacter');
-    pg.ShowProperty('ReplaceByText');
-    }")]
+//        [OnChangeExec(@"
+//if(this.Enable === False){
+//    pg.HideProperty('UnRestrictedRowCount');
+//    pg.HideProperty('ReplaceByCharacter');
+//    pg.HideProperty('ReplaceByText');
+//}
+//else{
+//    pg.ShowProperty('UnRestrictedRowCount');
+//    pg.ShowProperty('ReplaceByCharacter');
+//    pg.ShowProperty('ReplaceByText');
+//    }")]
         [EnableInBuilder(BuilderType.DVBuilder)]
         public bool Enable { get; set; }
 
