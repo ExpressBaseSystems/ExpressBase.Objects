@@ -90,7 +90,8 @@ namespace ExpressBase.Objects.EmailRelated
             }
         }
     }
-    [EnableInBuilder(BuilderType.EmailBuilder)]
+
+    [EnableInBuilder(BuilderType.EmailBuilder, BuilderType.SmsBuilder)]
     public class DsColumnsDetails : EbEmailTemplateBase
     {
         [EnableInBuilder(BuilderType.EmailBuilder)]
@@ -130,7 +131,7 @@ namespace ExpressBase.Objects.EmailRelated
     }
 
 
-    [EnableInBuilder(BuilderType.EmailBuilder)]
+    [EnableInBuilder(BuilderType.EmailBuilder, BuilderType.SmsBuilder)]
     public class DsColumns : DsColumnsDetails
     {
         public override string GetDesignHtml()
