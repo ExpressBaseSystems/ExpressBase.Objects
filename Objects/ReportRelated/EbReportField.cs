@@ -475,7 +475,171 @@ namespace ExpressBase.Objects.ReportRelated
                     this.Width= 200;
                     this.ForeColor = '#201c1c';
                     this.Border = 1;
-                    this.orderColor = '#eae6e6';
+                    this.BorderColor = '#eae6e6';
+                };";
+        }
+        public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
+        {
+            string column_val = "";
+            foreach (Param p in Rep.Parameters)
+                if (p.Name == Title)
+                    column_val = p.Value;
+            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
+            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
+            Phrase phrase = new Phrase(column_val, ITextFont);
+            ColumnText ct = new ColumnText(Rep.Canvas);
+            ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, 15, (int)TextAlign);
+            ct.Go();
+        }
+    }
+
+    [EnableInBuilder(BuilderType.Report)]
+    public class EbParamNumeric : EbReportField
+    {
+        [OnChangeExec(@"
+            pg.MakeReadOnly('Title');
+        ")]
+        [EnableInBuilder(BuilderType.Report)]
+        public override string Title { set; get; }
+
+        public override string GetDesignHtml()
+        {
+            return "<div class='Parameter dropped' eb-type='ParamNumeric' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; height: @Height px; background-color:@BackColor ; color:@ForeColor ; left: @Left px; top: @Top px;text-overflow: ellipsis;overflow: hidden;text-align: @TextAlign ;'> @Title </div>".RemoveCR().DoubleQuoted();
+        }
+
+        public override string GetJsInitFunc()
+        {
+            return @"
+                this.Init = function(id)
+                {
+                    this.Height =25;
+                    this.Width= 200;
+                    this.ForeColor = '#201c1c';
+                    this.Border = 1;
+                    this.BorderColor = '#eae6e6';
+                };";
+        }
+        public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
+        {
+            string column_val = "";
+            foreach (Param p in Rep.Parameters)
+                if (p.Name == Title)
+                    column_val = p.Value;
+            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
+            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
+            Phrase phrase = new Phrase(column_val, ITextFont);
+            ColumnText ct = new ColumnText(Rep.Canvas);
+            ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, 15, (int)TextAlign);
+            ct.Go();
+        }
+    }
+
+    [EnableInBuilder(BuilderType.Report)]
+    public class EbParamText : EbReportField
+    {
+        [OnChangeExec(@"
+            pg.MakeReadOnly('Title');
+        ")]
+        [EnableInBuilder(BuilderType.Report)]
+        public override string Title { set; get; }
+
+        public override string GetDesignHtml()
+        {
+            return "<div class='Parameter dropped' eb-type='ParamText' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; height: @Height px; background-color:@BackColor ; color:@ForeColor ; left: @Left px; top: @Top px;text-overflow: ellipsis;overflow: hidden;text-align: @TextAlign ;'> @Title </div>".RemoveCR().DoubleQuoted();
+        }
+
+        public override string GetJsInitFunc()
+        {
+            return @"
+                this.Init = function(id)
+                {
+                    this.Height =25;
+                    this.Width= 200;
+                    this.ForeColor = '#201c1c';
+                    this.Border = 1;
+                    this.BorderColor = '#eae6e6';
+                };";
+        }
+        public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
+        {
+            string column_val = "";
+            foreach (Param p in Rep.Parameters)
+                if (p.Name == Title)
+                    column_val = p.Value;
+            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
+            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
+            Phrase phrase = new Phrase(column_val, ITextFont);
+            ColumnText ct = new ColumnText(Rep.Canvas);
+            ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, 15, (int)TextAlign);
+            ct.Go();
+        }
+    }
+
+    [EnableInBuilder(BuilderType.Report)]
+    public class EbParamDateTime : EbReportField
+    {
+        [OnChangeExec(@"
+            pg.MakeReadOnly('Title');
+        ")]
+        [EnableInBuilder(BuilderType.Report)]
+        public override string Title { set; get; }
+
+        public override string GetDesignHtml()
+        {
+            return "<div class='Parameter dropped' eb-type='ParamDateTime' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; height: @Height px; background-color:@BackColor ; color:@ForeColor ; left: @Left px; top: @Top px;text-overflow: ellipsis;overflow: hidden;text-align: @TextAlign ;'> @Title </div>".RemoveCR().DoubleQuoted();
+        }
+
+        public override string GetJsInitFunc()
+        {
+            return @"
+                this.Init = function(id)
+                {
+                    this.Height =25;
+                    this.Width= 200;
+                    this.ForeColor = '#201c1c';
+                    this.Border = 1;
+                    this.BorderColor = '#eae6e6';
+                };";
+        }
+        public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
+        {
+            string column_val = "";
+            foreach (Param p in Rep.Parameters)
+                if (p.Name == Title)
+                    column_val = p.Value;
+            float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
+            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
+            Phrase phrase = new Phrase(column_val, ITextFont);
+            ColumnText ct = new ColumnText(Rep.Canvas);
+            ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, 15, (int)TextAlign);
+            ct.Go();
+        }
+    }
+
+    [EnableInBuilder(BuilderType.Report)]
+    public class EbParamBoolean : EbReportField
+    {
+        [OnChangeExec(@"
+            pg.MakeReadOnly('Title');
+        ")]
+        [EnableInBuilder(BuilderType.Report)]
+        public override string Title { set; get; }
+
+        public override string GetDesignHtml()
+        {
+            return "<div class='Parameter dropped' eb-type='ParamBoolean' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; height: @Height px; background-color:@BackColor ; color:@ForeColor ; left: @Left px; top: @Top px;text-overflow: ellipsis;overflow: hidden;text-align: @TextAlign ;'> @Title </div>".RemoveCR().DoubleQuoted();
+        }
+
+        public override string GetJsInitFunc()
+        {
+            return @"
+                this.Init = function(id)
+                {
+                    this.Height =25;
+                    this.Width= 200;
+                    this.ForeColor = '#201c1c';
+                    this.Border = 1;
+                    this.BorderColor = '#eae6e6';
                 };";
         }
         public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
