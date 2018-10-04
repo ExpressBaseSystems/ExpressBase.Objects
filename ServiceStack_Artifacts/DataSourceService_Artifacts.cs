@@ -1,12 +1,16 @@
 ﻿using ExpressBase.Common;
 using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
+using ExpressBase.Common.Singletons;
 using ExpressBase.Data;
+using ExpressBase.Objects.Objects.DVRelated;
+using Newtonsoft.Json;
 using ServiceStack;
 using ServiceStack.Text;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
@@ -367,44 +371,47 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     public abstract class GroupingDetails
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        public int GroupingCount { get; set; }
+        [JsonIgnore]
+        public bool IsMultiLevel { get; set; }
 
-        private int _currentLevel;
+        [JsonIgnore]
+        public int ColumnCount { get; set; }
+
         /// <summary>
         /// The level of row grouping for an element. Used in multi-level row grouping.
         /// FOr single level, it is always 1.
         /// </summary>
-        public int CurrentLevel
-        {
-            get { return _currentLevel; }
-            set { _currentLevel = value; }
-        }
+        [JsonIgnore]
+        public int CurrentLevel { get; set; }
 
         /// <summary>
         /// The index in the EbDataTable object of the row before/after which grouping should be inserted.
         /// </summary>
         public int RowIndex { get; set; }
-        
+
         /// <summary>
         /// The insertion type for HTML contents at a particular row index. 
         /// Possible values are 'Before' and 'After'.
         /// </summary>
         public string InsertionType { get; set; }
-        
+
         /// <summary>
         /// Number of groupings in a particular level.
         /// If the grouping is single level or the final single level iteration of multi-level grouping,
         /// this contains the actual number of data rows.
         /// </summary>
+        [JsonIgnore]
+        public int ChildCount { get; set; }
+
+        [JsonIgnore]
+        public int GroupingCount { get; set; }
+
+        [JsonIgnore]
         public int LevelCount { get; set; }
-        
         /// <summary>
         /// The HTML text generated for the particular header or footer
         /// </summary>
-        public string Html { get; set; }
+        public virtual string Html { get; set; }
     }
 
     public class HeaderGroupingDetails : GroupingDetails
@@ -413,42 +420,138 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         /// The list of strings that denotes each row grouping string.
         /// For multiple level row grouping, it denotes each different level too.
         /// For single level, each column value is denoted separately for ease of processing.
-        /// </summary>
+        /// </summary> 
+        [JsonIgnore]
         public List<string> GroupingTexts { get; set; }
 
-        public HeaderGroupingDetails()
+        [JsonIgnore]
+        public int TotalLevels { get; set; }
+
+        public HeaderGroupingDetails() { }
+
+        public HeaderGroupingDetails(bool _isMultiLevel, int _columnCount)
         {
+            base.IsMultiLevel = _isMultiLevel;
+            base.ColumnCount = _columnCount;
             GroupingTexts = new List<string>();
+        }
+
+        [OnSerializing]
+        public void Process(System.Runtime.Serialization.StreamingContext context)
+        {
+            if (string.IsNullOrEmpty(base.Html))
+            {
+                string tempstr = string.Empty;
+                string _singleLevelTempStr = string.Empty;
+                for (int itr = 0; itr < base.CurrentLevel + 1; itr++)
+                    tempstr += "<td> &nbsp;</td>";
+
+                if (IsMultiLevel)
+                    base.Html = string.Format("<tr class='group' group='{0}'>{1}<td><i class='fa fa-minus-square-o' style='cursor:pointer;'></i></td><td colspan='{2}'>{3} : {4}</td></tr>",
+                    (base.CurrentLevel + 1).ToString(), tempstr, base.ColumnCount.ToString(), 
+                    GroupingTexts[CurrentLevel - 1], (CurrentLevel==TotalLevels)?base.GroupingCount.ToString():base.LevelCount.ToString());
+                else
+                {
+                    foreach (string groupString in GroupingTexts)
+                    {
+                        _singleLevelTempStr += groupString;
+                        if (groupString.Equals(GroupingTexts.Last()) == false)
+                            _singleLevelTempStr += " - ";
+                    }
+                    base.Html = string.Format("<tr class='group' group='{0}'>{1}<td><i class='fa fa-minus-square-o' style='cursor:pointer;'></i></td><td colspan='{2}'>{3} : {4}</td></tr>",
+                        (base.CurrentLevel + 1).ToString(), tempstr, base.ColumnCount.ToString(), _singleLevelTempStr, base.GroupingCount.ToString());
+                }
+            }
         }
     }
 
     public class FooterGroupingDetails : GroupingDetails
     {
+        [JsonIgnore]
         public Dictionary<int, NumericAggregates> Aggregations { get; set; }
 
-        public FooterGroupingDetails(List<int> aggregateColumnIndexes)
+        [JsonIgnore]
+        public List<string> GroupingTexts { get; set; }
+
+        [JsonIgnore]
+        public int TotalLevels { get; set; }
+
+        [JsonIgnore]
+        public EbDataVisualization Visualization { get; set; }
+
+        [JsonIgnore]
+        public CultureInfo CultureDetails { get; set; }
+
+        [JsonIgnore]
+        public FooterGroupingDetails ParentLevelFooter { get; set; }
+
+        public FooterGroupingDetails() { }
+
+        public FooterGroupingDetails(int _totalLevels, List<int> aggregateColumnIndexes, EbDataVisualization _visualization, CultureInfo _culture)
         {
+            TotalLevels = _totalLevels;
             Aggregations = new Dictionary<int, NumericAggregates>();
+            Visualization = _visualization;
+            CultureDetails = _culture;
+            GroupingTexts = new List<string>();
+            ParentLevelFooter = new FooterGroupingDetails();
+
             foreach(int index in aggregateColumnIndexes)
             {
                 Aggregations.Add(index, new NumericAggregates());
+            }
+        }
+
+        [OnSerializing]
+        public void Process(System.Runtime.Serialization.StreamingContext context)
+        {
+            if (string.IsNullOrEmpty(base.Html))
+            {
+                string _tempFooterPadding = string.Empty;
+                for (int i = 0; i < TotalLevels; i++)
+                    _tempFooterPadding += "<td>&nbsp;</td>";
+
+                if (TotalLevels > 1)
+                    _tempFooterPadding += "<td>&nbsp;</td>";
+
+                _tempFooterPadding += "<td>&nbsp;</td>";//serial column
+
+                string _tempFooterText = string.Empty;
+                foreach (DVBaseColumn col in (Visualization as EbTableVisualization).Columns)
+                {
+                    var ColumnCulture = col.GetColumnCultureInfo(CultureDetails);
+                    if (col.bVisible)
+                    {
+                        if ((col is DVNumericColumn) && (col as DVNumericColumn).Aggregate)
+                            _tempFooterText += "<td class='dt-body-right'>" + (this.Aggregations[col.Data].Sum).ToString("N", ColumnCulture.NumberFormat) 
+                                + "</td>";
+                        else
+                            _tempFooterText += "<td>&nbsp;</td>";
+                    }
+                }
+
+                base.Html = string.Format("<tr class='group-sum' group='{0}'>{1}{2}</tr>", (base.CurrentLevel + 1).ToString(), _tempFooterPadding,
+                    _tempFooterText);
             }
         }
     }
 
     public class NumericAggregates
     {
+        [JsonIgnore]
+        public FooterGroupingDetails ParentFooter { get; set; }
+
         public decimal Minimum { get; private set; }
         public decimal Maximum { get; private set; }
         public decimal Average
         {
             get
             {
-                return (Count >0) ? (Sum / Count) : 0;
+                return (Count > 0) ? (Sum / Count) : 0;
             }
         }
-        public decimal Sum     { get; private set; }
-        public int Count      { get; private set; }
+        public decimal Sum { get; private set; }
+        public int Count { get; private set; }
 
         public void SetValue(decimal _value)
         {
@@ -456,6 +559,18 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             Sum += _value;
             Minimum = (_value < Minimum) ? _value : Minimum;
             Maximum = (_value > Maximum) ? _value : Maximum;
+        }
+
+        public void CascadingSetValue(decimal _value, EbDataRow currentRow)
+        {
+            this.SetValue(_value);
+            if (ParentFooter!=null)//.Aggregations.Count != 0)
+            {
+                foreach (var _key in ParentFooter.Aggregations.Keys)
+                {
+                    ParentFooter.Aggregations[_key].SetValue(Convert.ToDecimal(currentRow[_key]));
+                }
+            }
         }
     }
 }
