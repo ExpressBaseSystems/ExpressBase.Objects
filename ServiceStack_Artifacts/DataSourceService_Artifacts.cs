@@ -372,6 +372,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public abstract class GroupingDetails
     {
         [JsonIgnore]
+        public Dictionary<string, GroupingDetails> RowGrouping { get; set; }
+
+        [JsonIgnore]
         public bool IsMultiLevel { get; set; }
 
         [JsonIgnore]
@@ -408,14 +411,53 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [JsonIgnore]
         public int LevelCount { get; set; }
+
         /// <summary>
         /// The HTML text generated for the particular header or footer
         /// </summary>
         public virtual string Html { get; set; }
+
+        [JsonIgnore]
+        public string CollectionKey { get; set; }
     }
 
     public class HeaderGroupingDetails : GroupingDetails
     {
+        private const string Delimiter = ":-:";
+        private HeaderGroupingDetails _parentHeader = null;
+
+        [JsonIgnore]
+        public HeaderGroupingDetails ParentHeader
+        {
+            get
+            {
+                if (_parentHeader == null)
+                {
+                    var index = CollectionKey.LastIndexOf(Delimiter);
+
+                    if(CollectionKey.StartsWith("H_ABDULLA"))
+                    {
+                        Console.WriteLine("DEBUG PRINT :: Abdulla");
+                    }
+
+                    if (index > 0)
+                    {
+                        _parentHeader = RowGrouping[CollectionKey.Substring(0, index)] as HeaderGroupingDetails;
+                        _parentHeader.LevelCount++;
+                    }
+                }
+
+                return _parentHeader;
+            }
+        }
+
+        public void SetRowIndex(int index)
+        {
+            this.RowIndex = index;
+            if (ParentHeader != null)
+                ParentHeader.SetRowIndex(index);
+        }
+
         /// <summary>
         /// The list of strings that denotes each row grouping string.
         /// For multiple level row grouping, it denotes each different level too.
@@ -467,11 +509,27 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     public class FooterGroupingDetails : GroupingDetails
     {
-        [JsonIgnore]
-        public Dictionary<int, NumericAggregates> Aggregations { get; set; }
+        private const string Delimiter= ":-:";
+        private FooterGroupingDetails _parentFooter = null;
 
         [JsonIgnore]
-        public List<string> GroupingTexts { get; set; }
+        public FooterGroupingDetails ParentFooter
+        {
+            get
+            {
+                if (_parentFooter == null)
+                {
+                    var index = CollectionKey.LastIndexOf(Delimiter);
+                    if (index > 0)
+                        _parentFooter = RowGrouping[CollectionKey.Substring(0, index)] as FooterGroupingDetails;
+                }
+
+                return _parentFooter;
+            }
+        }
+
+        [JsonIgnore]
+        public Dictionary<int, NumericAggregates> Aggregations { get; set; }
 
         [JsonIgnore]
         public int TotalLevels { get; set; }
@@ -482,8 +540,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [JsonIgnore]
         public CultureInfo CultureDetails { get; set; }
 
-        [JsonIgnore]
-        public FooterGroupingDetails ParentLevelFooter { get; set; }
+        public void SetRowIndex(int index)
+        {
+            this.RowIndex = index;
+            if (ParentFooter != null)
+                ParentFooter.SetRowIndex(index);
+        }
 
         public FooterGroupingDetails() { }
 
@@ -493,8 +555,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             Aggregations = new Dictionary<int, NumericAggregates>();
             Visualization = _visualization;
             CultureDetails = _culture;
-            GroupingTexts = new List<string>();
-            ParentLevelFooter = new FooterGroupingDetails();
 
             foreach(int index in aggregateColumnIndexes)
             {
@@ -534,13 +594,19 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
                     _tempFooterText);
             }
         }
+
+        public void SetValue(EbDataRow currentRow)
+        {
+            foreach (var _key in this.Aggregations.Keys)
+                this.Aggregations[_key].SetValue(Convert.ToDecimal(currentRow[_key]));
+
+            if (ParentFooter != null)
+                ParentFooter.SetValue(currentRow);
+        }
     }
 
     public class NumericAggregates
     {
-        [JsonIgnore]
-        public FooterGroupingDetails ParentFooter { get; set; }
-
         public decimal Minimum { get; private set; }
         public decimal Maximum { get; private set; }
         public decimal Average
@@ -559,18 +625,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             Sum += _value;
             Minimum = (_value < Minimum) ? _value : Minimum;
             Maximum = (_value > Maximum) ? _value : Maximum;
-        }
-
-        public void CascadingSetValue(decimal _value, EbDataRow currentRow)
-        {
-            this.SetValue(_value);
-            if (ParentFooter!=null)//.Aggregations.Count != 0)
-            {
-                foreach (var _key in ParentFooter.Aggregations.Keys)
-                {
-                    ParentFooter.Aggregations[_key].SetValue(Convert.ToDecimal(currentRow[_key]));
-                }
-            }
         }
     }
 }
