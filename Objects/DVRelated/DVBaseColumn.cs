@@ -129,8 +129,9 @@ namespace ExpressBase.Objects.Objects.DVRelated
         public LinkTypeEnum LinkType { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
+        [DefaultPropValue("0")]
         [HideForUser]
-        public int HideDataIfRowMoreThan { get; set; }
+        public int HideDataRowMoreThan { get; set; }
 
         public virtual CultureInfo GetColumnCultureInfo(CultureInfo user_cultureinfo)
         {

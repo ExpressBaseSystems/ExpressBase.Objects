@@ -33,6 +33,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         [DataMember(Order = 1)]
         public string AppName { get; set; }
+
+        [DataMember(Order = 1)]
+        public string AppIcon { get; set; }
     }
 
     [DataContract]
@@ -45,8 +48,27 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     [DataContract]
     public class TypeWrap
     {
-        [DataMember(Order = 2)]
+        [DataMember(Order = 1)]
         public List<ObjWrap> Objects { get; set; }
+    }
+
+    public class EbObjectTypeWrap
+    {
+        [DataMember(Order = 1)]
+        public string Name { get; set; }
+
+        [DataMember(Order = 1)]
+        public int IntCode { get; set; }
+
+        [DataMember(Order = 1)]
+        public string BMW { get; set; }
+
+        [DataMember(Order = 1)]
+        public bool IsUserFacing { get; set; }
+
+        [DataMember(Order = 1)]
+        public string Icon { get; set; }
+
     }
 
     [DataContract]

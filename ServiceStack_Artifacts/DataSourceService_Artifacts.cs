@@ -538,17 +538,20 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     public class NumericAggregates
     {
+        [JsonIgnore]
+        public FooterGroupingDetails ParentFooter { get; set; }
+
         public decimal Minimum { get; private set; }
         public decimal Maximum { get; private set; }
         public decimal Average
         {
             get
             {
-                return (Count >0) ? (Sum / Count) : 0;
+                return (Count > 0) ? (Sum / Count) : 0;
             }
         }
-        public decimal Sum     { get; private set; }
-        public int Count      { get; private set; }
+        public decimal Sum { get; private set; }
+        public int Count { get; private set; }
 
         public void SetValue(decimal _value)
         {
@@ -556,6 +559,18 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             Sum += _value;
             Minimum = (_value < Minimum) ? _value : Minimum;
             Maximum = (_value > Maximum) ? _value : Maximum;
+        }
+
+        public void CascadingSetValue(decimal _value, EbDataRow currentRow)
+        {
+            this.SetValue(_value);
+            if (ParentFooter!=null)//.Aggregations.Count != 0)
+            {
+                foreach (var _key in ParentFooter.Aggregations.Keys)
+                {
+                    ParentFooter.Aggregations[_key].SetValue(Convert.ToDecimal(currentRow[_key]));
+                }
+            }
         }
     }
 }
