@@ -128,6 +128,11 @@ namespace ExpressBase.Objects.Objects.DVRelated
         [PropertyEditor(PropertyEditorType.DropDown)]
         public LinkTypeEnum LinkType { get; set; }
 
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [DefaultPropValue("0")]
+        [HideForUser]
+        public int HideDataRowMoreThan { get; set; }
+
         public virtual CultureInfo GetColumnCultureInfo(CultureInfo user_cultureinfo)
         {
             return user_cultureinfo;
@@ -302,5 +307,32 @@ else{
         [DefaultPropValue("5")]
         [HideInPropertyGrid]
         public override EbDbTypes Type { get; set; }
+    }
+
+    [EnableInBuilder(BuilderType.DVBuilder)]
+    public class HideColumnData
+    {
+//        [OnChangeExec(@"
+//if(this.Enable === False){
+//    pg.HideProperty('UnRestrictedRowCount');
+//    pg.HideProperty('ReplaceByCharacter');
+//    pg.HideProperty('ReplaceByText');
+//}
+//else{
+//    pg.ShowProperty('UnRestrictedRowCount');
+//    pg.ShowProperty('ReplaceByCharacter');
+//    pg.ShowProperty('ReplaceByText');
+//    }")]
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public bool Enable { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public int UnRestrictedRowCount { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public char ReplaceByCharacter { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public char ReplaceByText { get; set; }
     }
 }
