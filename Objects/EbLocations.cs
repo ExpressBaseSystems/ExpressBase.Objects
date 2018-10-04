@@ -66,8 +66,8 @@ namespace ExpressBase.Objects
             return @"
 this.Init = function(id)
 {
-    this.LocationCollection.$values.push(new EbObjects.EbLocation(id + '_loc0'));
-    this.LocationCollection.$values.push(new EbObjects.EbLocation(id + '_loc1'));
+    this.LocationCollection.$values.push(new EbObjects.EbLocationCard(id + '_loc0'));
+    this.LocationCollection.$values.push(new EbObjects.EbLocationCard(id + '_loc1'));
 };";
         }
         
