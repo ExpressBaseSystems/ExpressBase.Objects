@@ -52,16 +52,25 @@ namespace ExpressBase.Objects.Objects
             string _html = string.Empty;
             try
             {
-                Console.WriteLine("Location:  " + _user.LocationIds);
                 if (_user.LocationIds.Contains(-1))
                 {
-                    foreach (var key in _sol.Locations)
+                    Console.WriteLine("Location: Only -1 " + _user.LocationIds.ToString());
+                    if (_sol == null)
                     {
-                        _html += string.Format("<option value='{0}'>{1}</option>", key.Value.LocId, key.Value.ShortName);
+                        Console.WriteLine("Solution null");
+                        throw new Exception("Solution null");
+                    }
+                    else
+                    {
+                        foreach (var key in _sol.Locations)
+                        {
+                            _html += string.Format("<option value='{0}'>{1}</option>", key.Value.LocId, key.Value.ShortName);
+                        }
                     }
                 }
                 else
                 {
+                    Console.WriteLine("Location:  " + _user.LocationIds.ToString());
                     foreach (int loc in _user.LocationIds)
                     {
                         _html += string.Format("<option value='{0}'>{1}</option>", _sol.Locations[loc].LocId, _sol.Locations[loc].ShortName);

@@ -40,9 +40,10 @@ namespace ExpressBase.Objects
                 Param _p = new Param { Name = c.Name, Type = Convert.ToInt32(c.EbDbType).ToString(), Value = val };
                 if (c is EbComboBox)
                 {
-                    if ((c as EbComboBox).ValueMember.Type.ToString() == "Int32")
+                    if ((c as EbComboBox).EbDbType.ToString() == "String")
                     {
-                        _p.Type = "11";
+                        _p.Value = "0";
+                        _p.Type = "16";
                     }
                     //_p.Type = Convert.ToInt32((EbDbType)((c as EbComboBox).ValueMember.Type));
                 }
