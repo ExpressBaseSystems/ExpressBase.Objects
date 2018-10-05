@@ -256,7 +256,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string TableName { get; set; }
 
         [DataMember(Order = 2)]
-        public Dictionary<string, List<TableColumnMetaS>> Values { get; set; }
+        public Dictionary<string, List<SingleRecordField>> Values { get; set; }
 
         [DataMember(Order = 3)]
         public string RefId { get; set; }
