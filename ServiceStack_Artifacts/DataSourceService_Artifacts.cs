@@ -370,7 +370,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public bool Ispaged { get; set; }
     }
 
-    public abstract class GroupingDetails
+    public abstract class GroupingDetails : IComparable
     {
         [JsonIgnore]
         public Dictionary<string, GroupingDetails> RowGrouping { get; set; }
@@ -394,7 +394,25 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             }
         }
 
-        public int RowIndex { get; set; }
+        private int _rowIndex = -1;
+        public int RowIndex
+        {
+            get
+            {
+                return _rowIndex;
+            }
+            set
+            {
+                _rowIndex = value;
+            }
+        }
+
+        private int _sortIndex = -1;
+        public int SortIndex
+        {
+            get { return _sortIndex; }
+            set { _sortIndex = value; }
+        }
 
         public string InsertionType { get; set; }
 
@@ -411,6 +429,11 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [JsonIgnore]
         public string CollectionKey { get; set; }
+
+        public int CompareTo(object obj)
+        {
+            return SortIndex.CompareTo((obj as GroupingDetails).SortIndex);
+        }
     }
 
     public class HeaderGroupingDetails : GroupingDetails
@@ -423,15 +446,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         {
             get
             {
-                if (_parentHeader == null)
+                if (_parentHeader == null && IsMultiLevel)
                 {
                     var index = CollectionKey.LastIndexOf(Delimiter);
-
-                    if(CollectionKey.StartsWith("H_ABDULLA"))
-                    {
-                        Console.WriteLine("DEBUG PRINT :: Abdulla");
-                    }
-
+                    
                     if (index > 0)
                     {
                         _parentHeader = RowGrouping[CollectionKey.Substring(0, index)] as HeaderGroupingDetails;
@@ -446,8 +464,15 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public void SetRowIndex(int index)
         {
             this.RowIndex = index;
-            if (ParentHeader != null)
+            if (ParentHeader != null && ParentHeader.RowIndex == -1)
                 ParentHeader.SetRowIndex(index);
+        }
+
+        public void SetSortIndex(int index)
+        {
+            this.SortIndex = index;
+            if (this.ParentHeader != null && this.ParentHeader.SortIndex == -1)
+                this.ParentHeader.SetSortIndex(index - 1);
         }
  
         [JsonIgnore]
@@ -514,7 +539,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         {
             get
             {
-                if (_parentFooter == null)
+                if (_parentFooter == null && IsMultiLevel)
                 {
                     var index = CollectionKey.LastIndexOf(Delimiter);
                     if (index > 0)
@@ -542,6 +567,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             this.RowIndex = index;
             if (ParentFooter != null)
                 ParentFooter.SetRowIndex(index);
+        }
+
+        public void SetSortIndex(int index)
+        {
+            this.SortIndex = index;
+            if (this.ParentFooter != null)
+                this.ParentFooter.SetSortIndex(index + 1);
         }
 
         public FooterGroupingDetails() { }
