@@ -238,8 +238,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int Id { get; set; }
     }
 
-
-	[DataContract]
+    [DataContract]
     public class InsertDataFromWebformResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
@@ -247,6 +246,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    [DataContract]
+    public class DoUniqueCheckResponse
+    {
+        [DataMember(Order = 1)]
+        public int NoRowsWithSameValue { get; set; }
     }
     
     [DataContract]
@@ -286,6 +292,19 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    [DataContract]
+    public class DoUniqueCheckRequest
+    {
+        [DataMember(Order = 1)]
+        public string TableName { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Field { get; set; }
+
+        [DataMember(Order = 3)]
+        public string Value { get; set; }
     }
 
     [DataContract]
