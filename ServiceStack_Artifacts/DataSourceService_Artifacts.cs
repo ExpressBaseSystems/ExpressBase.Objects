@@ -419,7 +419,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [JsonIgnore]
         public int ChildCount { get; set; }
 
-        [JsonIgnore]
+        //[JsonIgnore]
         public int GroupingCount { get; set; }
 
         [JsonIgnore]
@@ -511,9 +511,11 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
                     tempstr += "<td> &nbsp;</td>";
 
                 if (IsMultiLevel)
+                {
                     base.Html = string.Format("<tr class='group' group='{0}'>{1}<td><i class='fa fa-minus-square-o' style='cursor:pointer;'></i></td><td colspan='{2}'>{3} : {4}</td></tr>",
-                    (base.CurrentLevel + 1).ToString(), tempstr, base.ColumnCount.ToString(), 
-                    GroupingTexts[CurrentLevel - 1], (CurrentLevel==TotalLevels)?base.GroupingCount.ToString():base.LevelCount.ToString());
+                    (base.CurrentLevel + 1).ToString(), tempstr, base.ColumnCount.ToString(),
+                    GroupingTexts[CurrentLevel - 1], (CurrentLevel == TotalLevels) ? base.GroupingCount.ToString() : base.LevelCount.ToString());
+                }
                 else
                 {
                     foreach (string groupString in GroupingTexts)
