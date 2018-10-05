@@ -55,7 +55,6 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
         [HelpText("To limit number of charecters")]
         [PropertyGroup("Behavior")]
-        [OnChangeUIFunction("EbTextBox.x")]
         [PropertyEditor(PropertyEditorType.Number)]
         [OnChangeExec(@"
 if (this.MaxLength <= 10 ){
@@ -102,7 +101,6 @@ else {
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         [PropertyGroup(@"Behavior")]
-        [OnChangeUIFunction("EbTextBox.y")]
         [HelpText("specifies a short hint that describes the expected value of an input field (e.g. a sample value or a short description of the expected format)")]
         public string PlaceHolder { get; set; }
 
@@ -312,17 +310,13 @@ else {
 
         private string GetHtmlHelper(RenderMode mode)
         {
-            return (
-                HtmlConstants.CONTROL_WRAPER_HTML4WEB
-.Replace("@barehtml@", this.GetBareHtml())
-.Replace("@name@", this.Name)
-.Replace("@ebsid@", this.EbSid_CtxId)
-.Replace("@type@", this.ObjType))
+            string EbCtrlHTML = HtmlConstants.CONTROL_WRAPER_HTML4WEB
+               .Replace("@LabelForeColor ", "color:" + (LabelForeColor ?? "@LabelForeColor ") + ";")
+               .Replace("@LabelBackColor ", "background-color:" + (LabelBackColor ?? "@LabelBackColor ") + ";")
+               .Replace("@HelpText@ ", (HelpText ?? ""))
+               .Replace("@Label@ ", (Label ?? ""));
 
-    .Replace("@LabelForeColor ", "color:" + (LabelForeColor ?? "@LabelForeColor ") + ";")
-    .Replace("@LabelBackColor ", "background-color:" + (LabelBackColor ?? "@LabelBackColor ") + ";")
-    .Replace("@HelpText@ ", (HelpText ?? ""))
-    .Replace("@Label@ ", (Label ?? ""));
+            return ReplacePropsInHTML(EbCtrlHTML);
         }
 
         //        private string GetHtmlHelper(RenderMode mode)

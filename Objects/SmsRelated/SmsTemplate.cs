@@ -1,4 +1,5 @@
-﻿using ExpressBase.Common.JsonConverters;
+﻿using ExpressBase.Common.Extensions;
+using ExpressBase.Common.JsonConverters;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
@@ -55,6 +56,63 @@ namespace ExpressBase.Objects.Objects.SmsRelated
             {
                 Console.WriteLine("Exception: " + e.ToString());
             }
+        }
+        [EnableInBuilder( BuilderType.SmsBuilder)]
+        public class DsColumns : DsColumnsDetails
+        {
+            public override string GetDesignHtml()
+            {
+                return "<span class='ebdscols' eb-type='DsColumns' format='@format'  id='@id' style='border: @Border px solid;border-color: @BorderColor ;background-color: @BackColor;'>@Title </span>".RemoveCR().DoubleQuoted();
+            }
+            public override string GetJsInitFunc()
+            {
+                return @"
+    this.Init = function(id)
+        {
+    this.Height =25;
+    this.Width= 175;
+    this.Border = 1;
+    this.BorderColor = '#aaaaaa'
+};";
+            }
+        }
+        [EnableInBuilder( BuilderType.SmsBuilder)]
+        public class DsColumnsDetails : EbSmsTemplateBase
+        {
+            //[EnableInBuilder(BuilderType.SmsBuilder)]
+            //public DateFormat DateFormat { get; set; }
+
+            [EnableInBuilder(BuilderType.SmsBuilder)]
+            [UIproperty]
+            [PropertyGroup("Appearance")]
+            public float Width { get; set; }
+
+            [EnableInBuilder(BuilderType.SmsBuilder)]
+            [UIproperty]
+            [PropertyGroup("Appearance")]
+            public float Left { get; set; }
+
+            [EnableInBuilder(BuilderType.SmsBuilder)]
+            [UIproperty]
+            [PropertyGroup("Appearance")]
+            public float Right { get; set; }
+
+
+            [EnableInBuilder(BuilderType.SmsBuilder)]
+            [UIproperty]
+            [PropertyGroup("General")]
+            public string Title { get; set; }
+
+            //[EnableInBuilder(BuilderType.EmailBuilder)]
+            //[UIproperty]
+            //[PropertyGroup("Appearance")]
+            //public int Border { get; set; }
+
+            [EnableInBuilder(BuilderType.SmsBuilder)]
+            [UIproperty]
+            [PropertyEditor(PropertyEditorType.Color)]
+            [PropertyGroup("Appearance")]
+            public string BorderColor { get; set; }
         }
     }
 }

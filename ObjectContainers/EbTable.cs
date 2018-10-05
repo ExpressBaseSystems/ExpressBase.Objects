@@ -101,7 +101,7 @@ namespace ExpressBase.Objects
             this.Controls = new List<EbControl>();
             this.Controls.Add(new EbTableTd { Name = "EbTable0_Td0" });
             this.Controls.Add(new EbTableTd { Name = "EbTable0_Td1" });
-            return GetHtml().RemoveCR().DoubleQuoted(); 
+            return GetHtml().RemoveCR().DoubleQuoted();
         }
 
         public override string GetJsInitFunc()
@@ -156,6 +156,9 @@ this.Init = function(id)
         }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        public float WidthPercentage { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
         [HideInPropertyGrid]
         public override List<EbControl> Controls { get; set; }
 
@@ -174,12 +177,15 @@ this.Init = function(id)
 
         public override string GetHtml()
         {
-            string html = "<td id='@name@' ebsid='@ebsid@' class='form-render-table-Td tdDropable ebcont-ctrl'>";
+            string html = "<td id='@name@' ebsid='@ebsid@' style='width:@wperc@;'; class='form-render-table-Td tdDropable ebcont-ctrl'>";
 
             foreach (EbControl ec in this.Controls)
                 html += ec.GetHtml();
 
-            return (html + "</td>").Replace("@name@", this.Name).Replace("@ebsid@", this.EbSid);
+            return (html + "</td>")
+                .Replace("@name@", this.Name)
+                .Replace("@wperc@", (this.WidthPercentage != 0) ? this.WidthPercentage.ToString() + "%" : "auto")
+                .Replace("@ebsid@", this.EbSid);
         }
     }
 }

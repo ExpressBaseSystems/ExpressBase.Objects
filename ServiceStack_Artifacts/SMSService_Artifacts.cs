@@ -1,4 +1,5 @@
-﻿using ExpressBase.Common.EbServiceStack.ReqNRes;
+﻿using ExpressBase.Common.Data;
+using ExpressBase.Common.EbServiceStack.ReqNRes;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
@@ -16,28 +17,22 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string To { get; set; }
 
         [DataMember(Order = 2)]
-        public string From { get; set; }
-
-        [DataMember(Order = 3)]
         public string Body { get; set; }
 
-        [DataMember(Order = 4)]
+        [DataMember(Order = 3)]
         public string MediaUrl { get; set; }
     }
 
     [DataContract]
     public class SMSSentRequest : EbServiceStackAuthRequest
     {
-        [DataMember(Order = 1)]
-        public string To { get; set; }
+        [DataMember(Order =1)]
+        public string Refid { get; set; }
 
         [DataMember(Order = 2)]
-        public string From { get; set; }
+        public List<Param> Params { get; set; }
 
         [DataMember(Order = 3)]
-        public string Body { get; set; }
-
-        [DataMember(Order = 4)]
         public string MediaUrl { get; set; }
     }
 
