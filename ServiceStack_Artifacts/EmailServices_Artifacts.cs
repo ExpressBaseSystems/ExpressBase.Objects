@@ -59,8 +59,20 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 3)]
         public string Refid { get; set; }
-
-       
     }
 
+    public class ResetPasswordMqRequest: EbServiceStackNoAuthRequest,IReturn<ResetPasswordMqResponse>
+    {
+        [DataMember(Order = 1)]
+        public string Email { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Refid { get; set; }
+    }
+
+    public class ResetPasswordMqResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
 }

@@ -13,6 +13,7 @@ using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
@@ -369,60 +370,124 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public bool Ispaged { get; set; }
     }
 
-    public abstract class GroupingDetails
+    public abstract class GroupingDetails : IComparable
     {
+        [JsonIgnore]
+        public Dictionary<string, GroupingDetails> RowGrouping { get; set; }
+
         [JsonIgnore]
         public bool IsMultiLevel { get; set; }
 
         [JsonIgnore]
         public int ColumnCount { get; set; }
 
-        /// <summary>
-        /// The level of row grouping for an element. Used in multi-level row grouping.
-        /// FOr single level, it is always 1.
-        /// </summary>
         [JsonIgnore]
-        public int CurrentLevel { get; set; }
+        private int _currentLevel = 0;
+        [JsonIgnore]
+        public int CurrentLevel
+        {
+            get
+            {
+                if (_currentLevel == 0)
+                    _currentLevel = Regex.Matches(CollectionKey, ":-:").Count + 1;
+                return _currentLevel;
+            }
+        }
 
-        /// <summary>
-        /// The index in the EbDataTable object of the row before/after which grouping should be inserted.
-        /// </summary>
-        public int RowIndex { get; set; }
+        private int _rowIndex = -1;
+        public int RowIndex
+        {
+            get
+            {
+                return _rowIndex;
+            }
+            set
+            {
+                _rowIndex = value;
+            }
+        }
 
-        /// <summary>
-        /// The insertion type for HTML contents at a particular row index. 
-        /// Possible values are 'Before' and 'After'.
-        /// </summary>
+        private int _sortIndex = -1;
+        public int SortIndex
+        {
+            get { return _sortIndex; }
+            set { _sortIndex = value; }
+        }
+
         public string InsertionType { get; set; }
 
-        /// <summary>
-        /// Number of groupings in a particular level.
-        /// If the grouping is single level or the final single level iteration of multi-level grouping,
-        /// this contains the actual number of data rows.
-        /// </summary>
         [JsonIgnore]
         public int ChildCount { get; set; }
 
-        [JsonIgnore]
+        //[JsonIgnore]
         public int GroupingCount { get; set; }
 
         [JsonIgnore]
         public int LevelCount { get; set; }
-        /// <summary>
-        /// The HTML text generated for the particular header or footer
-        /// </summary>
+
         public virtual string Html { get; set; }
+
+        [JsonIgnore]
+        public string CollectionKey { get; set; }
+
+        public int CompareTo(object obj)
+        {
+            return SortIndex.CompareTo((obj as GroupingDetails).SortIndex);
+        }
     }
 
     public class HeaderGroupingDetails : GroupingDetails
     {
-        /// <summary>
-        /// The list of strings that denotes each row grouping string.
-        /// For multiple level row grouping, it denotes each different level too.
-        /// For single level, each column value is denoted separately for ease of processing.
-        /// </summary> 
+        private const string Delimiter = ":-:";
+        private HeaderGroupingDetails _parentHeader = null;
+
         [JsonIgnore]
-        public List<string> GroupingTexts { get; set; }
+        public HeaderGroupingDetails ParentHeader
+        {
+            get
+            {
+                if (_parentHeader == null && IsMultiLevel)
+                {
+                    var index = CollectionKey.LastIndexOf(Delimiter);
+                    
+                    if (index > 0)
+                    {
+                        _parentHeader = RowGrouping[CollectionKey.Substring(0, index)] as HeaderGroupingDetails;
+                        _parentHeader.LevelCount++;
+                    }
+                }
+
+                return _parentHeader;
+            }
+        }
+
+        public void SetRowIndex(int index)
+        {
+            this.RowIndex = index;
+            if (ParentHeader != null && ParentHeader.RowIndex == -1)
+                ParentHeader.SetRowIndex(index);
+        }
+
+        public void SetSortIndex(int index)
+        {
+            this.SortIndex = index;
+            if (this.ParentHeader != null && this.ParentHeader.SortIndex == -1)
+                this.ParentHeader.SetSortIndex(index - 1);
+        }
+ 
+        [JsonIgnore]
+        private string[] _groupingTexts = null;
+
+        [JsonIgnore]
+        public string[] GroupingTexts
+        {
+            get
+            {
+                if (_groupingTexts == null)
+                    _groupingTexts = CollectionKey.Split(":-:");
+                return _groupingTexts;
+            }
+        }
 
         [JsonIgnore]
         public int TotalLevels { get; set; }
@@ -433,7 +498,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         {
             base.IsMultiLevel = _isMultiLevel;
             base.ColumnCount = _columnCount;
-            GroupingTexts = new List<string>();
         }
 
         [OnSerializing]
@@ -447,9 +511,11 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
                     tempstr += "<td> &nbsp;</td>";
 
                 if (IsMultiLevel)
+                {
                     base.Html = string.Format("<tr class='group' group='{0}'>{1}<td><i class='fa fa-minus-square-o' style='cursor:pointer;'></i></td><td colspan='{2}'>{3} : {4}</td></tr>",
-                    (base.CurrentLevel + 1).ToString(), tempstr, base.ColumnCount.ToString(), 
-                    GroupingTexts[CurrentLevel - 1], (CurrentLevel==TotalLevels)?base.GroupingCount.ToString():base.LevelCount.ToString());
+                    (base.CurrentLevel + 1).ToString(), tempstr, base.ColumnCount.ToString(),
+                    GroupingTexts[CurrentLevel - 1], (CurrentLevel == TotalLevels) ? base.GroupingCount.ToString() : base.LevelCount.ToString());
+                }
                 else
                 {
                     foreach (string groupString in GroupingTexts)
@@ -467,34 +533,59 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     public class FooterGroupingDetails : GroupingDetails
     {
-        [JsonIgnore]
-        public Dictionary<int, NumericAggregates> Aggregations { get; set; }
+        private const string Delimiter= ":-:";
+        private FooterGroupingDetails _parentFooter = null;
 
         [JsonIgnore]
-        public List<string> GroupingTexts { get; set; }
+        public FooterGroupingDetails ParentFooter
+        {
+            get
+            {
+                if (_parentFooter == null && IsMultiLevel)
+                {
+                    var index = CollectionKey.LastIndexOf(Delimiter);
+                    if (index > 0)
+                        _parentFooter = RowGrouping[CollectionKey.Substring(0, index)] as FooterGroupingDetails;
+                }
+
+                return _parentFooter;
+            }
+        }
+
+        [JsonIgnore]
+        public Dictionary<int, NumericAggregates> Aggregations { get; set; }
 
         [JsonIgnore]
         public int TotalLevels { get; set; }
 
         [JsonIgnore]
-        public EbDataVisualization Visualization { get; set; }
+        public DVColumnCollection TableColumns { get; set; }
 
         [JsonIgnore]
         public CultureInfo CultureDetails { get; set; }
 
-        [JsonIgnore]
-        public FooterGroupingDetails ParentLevelFooter { get; set; }
+        public void SetRowIndex(int index)
+        {
+            this.RowIndex = index;
+            if (ParentFooter != null)
+                ParentFooter.SetRowIndex(index);
+        }
+
+        public void SetSortIndex(int index)
+        {
+            this.SortIndex = index;
+            if (this.ParentFooter != null)
+                this.ParentFooter.SetSortIndex(index + 1);
+        }
 
         public FooterGroupingDetails() { }
 
-        public FooterGroupingDetails(int _totalLevels, List<int> aggregateColumnIndexes, EbDataVisualization _visualization, CultureInfo _culture)
+        public FooterGroupingDetails(int _totalLevels, List<int> aggregateColumnIndexes, DVColumnCollection _columns, CultureInfo _culture)
         {
             TotalLevels = _totalLevels;
             Aggregations = new Dictionary<int, NumericAggregates>();
-            Visualization = _visualization;
+            TableColumns = _columns;
             CultureDetails = _culture;
-            GroupingTexts = new List<string>();
-            ParentLevelFooter = new FooterGroupingDetails();
 
             foreach(int index in aggregateColumnIndexes)
             {
@@ -517,13 +608,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
                 _tempFooterPadding += "<td>&nbsp;</td>";//serial column
 
                 string _tempFooterText = string.Empty;
-                foreach (DVBaseColumn col in (Visualization as EbTableVisualization).Columns)
+                foreach (DVBaseColumn Column in TableColumns)
                 {
-                    var ColumnCulture = col.GetColumnCultureInfo(CultureDetails);
-                    if (col.bVisible)
+                    var ColumnCulture = Column.GetColumnCultureInfo(CultureDetails);
+                    if (Column.bVisible)
                     {
-                        if ((col is DVNumericColumn) && (col as DVNumericColumn).Aggregate)
-                            _tempFooterText += "<td class='dt-body-right'>" + (this.Aggregations[col.Data].Sum).ToString("N", ColumnCulture.NumberFormat) 
+                        if ((Column is DVNumericColumn) && (Column as DVNumericColumn).Aggregate)
+                            _tempFooterText += "<td class='dt-body-right'>" + (this.Aggregations[Column.Data].Sum).ToString("N", ColumnCulture.NumberFormat) 
                                 + "</td>";
                         else
                             _tempFooterText += "<td>&nbsp;</td>";
@@ -534,13 +625,19 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
                     _tempFooterText);
             }
         }
+
+        public void SetValue(EbDataRow currentRow)
+        {
+            foreach (var _key in this.Aggregations.Keys)
+                this.Aggregations[_key].SetValue(Convert.ToDecimal(currentRow[_key]));
+
+            if (ParentFooter != null)
+                ParentFooter.SetValue(currentRow);
+        }
     }
 
     public class NumericAggregates
     {
-        [JsonIgnore]
-        public FooterGroupingDetails ParentFooter { get; set; }
-
         public decimal Minimum { get; private set; }
         public decimal Maximum { get; private set; }
         public decimal Average
@@ -559,18 +656,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             Sum += _value;
             Minimum = (_value < Minimum) ? _value : Minimum;
             Maximum = (_value > Maximum) ? _value : Maximum;
-        }
-
-        public void CascadingSetValue(decimal _value, EbDataRow currentRow)
-        {
-            this.SetValue(_value);
-            if (ParentFooter!=null)//.Aggregations.Count != 0)
-            {
-                foreach (var _key in ParentFooter.Aggregations.Keys)
-                {
-                    ParentFooter.Aggregations[_key].SetValue(Convert.ToDecimal(currentRow[_key]));
-                }
-            }
         }
     }
 }
