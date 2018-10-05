@@ -78,6 +78,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public List<string> ImageIdList { get; set; }
 
 		[DataMember(Order = 18)]
+		public List<string> StatusList { get; set; }
+
+		[DataMember(Order = 19)]
 		public int RespMode { get; set; }
 
 	}
