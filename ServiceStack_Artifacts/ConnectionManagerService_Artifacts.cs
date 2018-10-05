@@ -1,6 +1,7 @@
 ﻿using ExpressBase.Common.Connections;
 using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
+using ExpressBase.Common.Messaging;
 using ServiceStack;
 using System.Runtime.Serialization;
 
@@ -79,7 +80,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public string SolutionId { get; set; }
 
-        public SMSConnection SMSConnection { get; set; }
+        public ISMSConnection SMSConnection { get; set; }
     }
 
     public class InitialSolutionConnectionsRequest : EbServiceStackAuthRequest, IReturn<InitialSolutionConnectionsResponse>
