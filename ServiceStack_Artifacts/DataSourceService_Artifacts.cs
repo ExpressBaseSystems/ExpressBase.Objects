@@ -507,17 +507,18 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             {
                 string tempstr = string.Empty;
                 string _singleLevelTempStr = string.Empty;
-                for (int itr = 0; itr < base.CurrentLevel + 1; itr++)
-                    tempstr += "<td> &nbsp;</td>";
-
+                
                 if (IsMultiLevel)
                 {
+                    for (int itr = 0; itr < CurrentLevel; itr++)
+                        tempstr += "<td> &nbsp;</td>";
                     base.Html = string.Format("<tr class='group' group='{0}'>{1}<td><i class='fa fa-minus-square-o' style='cursor:pointer;'></i></td><td colspan='{2}'>{3} : {4}</td></tr>",
                     (base.CurrentLevel + 1).ToString(), tempstr, base.ColumnCount.ToString(),
                     GroupingTexts[CurrentLevel - 1], (CurrentLevel == TotalLevels) ? base.GroupingCount.ToString() : base.LevelCount.ToString());
                 }
                 else
                 {
+                    tempstr += "<td> &nbsp;</td>";
                     foreach (string groupString in GroupingTexts)
                     {
                         _singleLevelTempStr += groupString;
@@ -600,9 +601,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             {
                 string _tempFooterPadding = string.Empty;
                 for (int i = 0; i < TotalLevels; i++)
-                    _tempFooterPadding += "<td>&nbsp;</td>";
-
-                if (TotalLevels > 1)
                     _tempFooterPadding += "<td>&nbsp;</td>";
 
                 _tempFooterPadding += "<td>&nbsp;</td>";//serial column
