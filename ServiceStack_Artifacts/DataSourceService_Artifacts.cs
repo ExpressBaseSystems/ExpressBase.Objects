@@ -13,6 +13,7 @@ using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
@@ -380,29 +381,23 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [JsonIgnore]
         public int ColumnCount { get; set; }
 
-        /// <summary>
-        /// The level of row grouping for an element. Used in multi-level row grouping.
-        /// FOr single level, it is always 1.
-        /// </summary>
         [JsonIgnore]
-        public int CurrentLevel { get; set; }
+        private int _currentLevel = 0;
+        [JsonIgnore]
+        public int CurrentLevel
+        {
+            get
+            {
+                if (_currentLevel == 0)
+                    _currentLevel = Regex.Matches(CollectionKey, ":-:").Count + 1;
+                return _currentLevel;
+            }
+        }
 
-        /// <summary>
-        /// The index in the EbDataTable object of the row before/after which grouping should be inserted.
-        /// </summary>
         public int RowIndex { get; set; }
 
-        /// <summary>
-        /// The insertion type for HTML contents at a particular row index. 
-        /// Possible values are 'Before' and 'After'.
-        /// </summary>
         public string InsertionType { get; set; }
 
-        /// <summary>
-        /// Number of groupings in a particular level.
-        /// If the grouping is single level or the final single level iteration of multi-level grouping,
-        /// this contains the actual number of data rows.
-        /// </summary>
         [JsonIgnore]
         public int ChildCount { get; set; }
 
@@ -412,9 +407,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [JsonIgnore]
         public int LevelCount { get; set; }
 
-        /// <summary>
-        /// The HTML text generated for the particular header or footer
-        /// </summary>
         public virtual string Html { get; set; }
 
         [JsonIgnore]
@@ -457,14 +449,20 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             if (ParentHeader != null)
                 ParentHeader.SetRowIndex(index);
         }
-
-        /// <summary>
-        /// The list of strings that denotes each row grouping string.
-        /// For multiple level row grouping, it denotes each different level too.
-        /// For single level, each column value is denoted separately for ease of processing.
-        /// </summary> 
+ 
         [JsonIgnore]
-        public List<string> GroupingTexts { get; set; }
+        private string[] _groupingTexts = null;
+
+        [JsonIgnore]
+        public string[] GroupingTexts
+        {
+            get
+            {
+                if (_groupingTexts == null)
+                    _groupingTexts = CollectionKey.Split(":-:");
+                return _groupingTexts;
+            }
+        }
 
         [JsonIgnore]
         public int TotalLevels { get; set; }
@@ -475,7 +473,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         {
             base.IsMultiLevel = _isMultiLevel;
             base.ColumnCount = _columnCount;
-            GroupingTexts = new List<string>();
         }
 
         [OnSerializing]
@@ -535,7 +532,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int TotalLevels { get; set; }
 
         [JsonIgnore]
-        public EbDataVisualization Visualization { get; set; }
+        public DVColumnCollection TableColumns { get; set; }
 
         [JsonIgnore]
         public CultureInfo CultureDetails { get; set; }
@@ -549,11 +546,11 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public FooterGroupingDetails() { }
 
-        public FooterGroupingDetails(int _totalLevels, List<int> aggregateColumnIndexes, EbDataVisualization _visualization, CultureInfo _culture)
+        public FooterGroupingDetails(int _totalLevels, List<int> aggregateColumnIndexes, DVColumnCollection _columns, CultureInfo _culture)
         {
             TotalLevels = _totalLevels;
             Aggregations = new Dictionary<int, NumericAggregates>();
-            Visualization = _visualization;
+            TableColumns = _columns;
             CultureDetails = _culture;
 
             foreach(int index in aggregateColumnIndexes)
@@ -577,13 +574,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
                 _tempFooterPadding += "<td>&nbsp;</td>";//serial column
 
                 string _tempFooterText = string.Empty;
-                foreach (DVBaseColumn col in (Visualization as EbTableVisualization).Columns)
+                foreach (DVBaseColumn Column in TableColumns)
                 {
-                    var ColumnCulture = col.GetColumnCultureInfo(CultureDetails);
-                    if (col.bVisible)
+                    var ColumnCulture = Column.GetColumnCultureInfo(CultureDetails);
+                    if (Column.bVisible)
                     {
-                        if ((col is DVNumericColumn) && (col as DVNumericColumn).Aggregate)
-                            _tempFooterText += "<td class='dt-body-right'>" + (this.Aggregations[col.Data].Sum).ToString("N", ColumnCulture.NumberFormat) 
+                        if ((Column is DVNumericColumn) && (Column as DVNumericColumn).Aggregate)
+                            _tempFooterText += "<td class='dt-body-right'>" + (this.Aggregations[Column.Data].Sum).ToString("N", ColumnCulture.NumberFormat) 
                                 + "</td>";
                         else
                             _tempFooterText += "<td>&nbsp;</td>";
