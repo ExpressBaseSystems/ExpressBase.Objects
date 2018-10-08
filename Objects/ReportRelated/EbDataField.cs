@@ -242,28 +242,13 @@ namespace ExpressBase.Objects.ReportRelated
                     };";
         }
 
-        public string FormatDate(string column_val)
-        {
-            DateTime dt = Convert.ToDateTime(column_val);
-            if (Format == DateFormatReport.dddd_MMMM_d_yyyy)
-                return String.Format("{0:dddd, MMMM d, yyyy}", dt);
-            else if (Format == DateFormatReport.M_d_yyyy)
-                return String.Format("{0:M/d/yyyy}", dt);
-            else if (Format == DateFormatReport.ddd_MMM_d_yyyy)
-                return String.Format("{0:ddd, MMM d, yyyy}", dt);
-            else if (Format == DateFormatReport.MM_dd_yy)
-                return String.Format("{0:MM/dd/yy}", dt);
-            else if (Format == DateFormatReport.MM_dd_yyyy)
-                return String.Format("{0:MM/dd/yyyy}", dt);
-            return column_val;
-        }
 
         public override void DrawMe(float printingTop, EbReport Rep, List<Param> Params, int slno)
         {
             ColumnText ct = new ColumnText(Rep.Canvas);
             Phrase phrase;
             string column_val = Rep.GetDataFieldtValue(ColumnName, slno, TableIndex);
-            column_val = FormatDate(column_val);
+            column_val = FormatDate(column_val, Format);
             if (Prefix != "" || Suffix != "")
                 column_val = Prefix + " " + column_val + " " + Suffix;
             phrase = new Phrase(column_val, ITextFont);
@@ -288,7 +273,7 @@ namespace ExpressBase.Objects.ReportRelated
             }
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
-            ct.SetSimpleColumn(Llx, lly,Urx, ury, 15, (int)TextAlign);
+            ct.SetSimpleColumn(Llx, lly, Urx, ury, 15, (int)TextAlign);
             ct.Go();
         }
     }
@@ -690,7 +675,7 @@ namespace ExpressBase.Objects.ReportRelated
         public override void DrawMe(float printingTop, EbReport Rep, List<Param> Params, int slno)
         {
             ColumnText ct = new ColumnText(Rep.Canvas);
-            string column_val = FormatDate(SummarizedValue.ToString());
+            string column_val = FormatDate(SummarizedValue.ToString(),Format);
             if (Prefix != "" || Suffix != "")
                 column_val = Prefix + " " + column_val + " " + Suffix;
             Phrase phrase = new Phrase(column_val, ITextFont);

@@ -73,7 +73,9 @@ namespace ExpressBase.Objects
         MM_dd_yyyy,
         ddd_MMM_d_yyyy,
         dddd_MMMM_d_yyyy,
-        MM_dd_yy
+        MM_dd_yy,
+        dd_MM_yyyy,
+        dd_slash_mm_slash_yy
         //Year_Month_Date,
         //Year_Month,
         //Year,
