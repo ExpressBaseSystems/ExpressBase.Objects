@@ -600,7 +600,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             if (string.IsNullOrEmpty(base.Html))
             {
                 string _tempFooterPadding = string.Empty;
-                for (int i = 0; i < TotalLevels; i++)
+                for (int i = 0; i <= TotalLevels; i++)
                     _tempFooterPadding += "<td>&nbsp;</td>";
 
                 _tempFooterPadding += "<td>&nbsp;</td>";//serial column
