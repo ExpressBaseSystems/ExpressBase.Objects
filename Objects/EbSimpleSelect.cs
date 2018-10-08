@@ -74,20 +74,24 @@ namespace ExpressBase.Objects
             this.Options = new List<EbSimpleSelectOption>();
         }
 
+        private string _optionHtml = string.Empty;
         [JsonIgnore]
         public string OptionHtml
         {
             get
             {
-                string _html = string.Empty;
-                if (!this.IsDynamic)
+                if (_optionHtml.Equals(string.Empty))
                 {
-                    foreach (EbSimpleSelectOption opt in this.Options)
+                    _optionHtml = string.Empty;
+                    if (!this.IsDynamic)
                     {
-                        _html += string.Format("<option value='{0}'>{1}</option>", opt.Value, opt.Label);
+                        foreach (EbSimpleSelectOption opt in this.Options)
+                        {
+                            _optionHtml += string.Format("<option value='{0}'>{1}</option>", opt.Value, opt.Label);
+                        }
                     }
                 }
-                return _html;
+                return _optionHtml;
             }
             set { }
         }
@@ -112,6 +116,7 @@ namespace ExpressBase.Objects
                     //_html += string.Format("<option value='{0}'>{1}</option>", option[0].ToString().Trim(), option[0]);
                 }
             }
+            _optionHtml = _html;
             this.OptionHtml = _html;
         }
 
@@ -149,9 +154,10 @@ namespace ExpressBase.Objects
         public override string GetBareHtml()
         {
             return @"
-        <select id='@name@' name='@name@' data-ebtype='@data-ebtype@' style='width: 100%;'>
+        <select id='@ebsid@' name='@name@' data-ebtype='@data-ebtype@' style='width: 100%;'>
             @options@
         </select>"
+.Replace("@ebsid@", this.EbSid_CtxId)
 .Replace("@name@", this.Name)
 .Replace("@options@", this.OptionHtml)
 .Replace("@data-ebtype@", "16");
