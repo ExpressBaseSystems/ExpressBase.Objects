@@ -526,7 +526,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
                             _singleLevelTempStr += " - ";
                     }
                     base.Html = string.Format("<tr class='group' group='{0}'>{1}<td><i class='fa fa-minus-square-o' style='cursor:pointer;'></i></td><td colspan='{2}'>{3} : {4}</td></tr>",
-                        (base.CurrentLevel + 1).ToString(), tempstr, base.ColumnCount.ToString(), _singleLevelTempStr, base.GroupingCount.ToString());
+                        (base.CurrentLevel + 1).ToString(), tempstr, base.ColumnCount.ToString(), _singleLevelTempStr, base.GroupingCount.ToString()+1);
                 }
             }
         }
