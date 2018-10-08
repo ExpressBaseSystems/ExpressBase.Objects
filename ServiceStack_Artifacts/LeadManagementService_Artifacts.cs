@@ -274,13 +274,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public int Id { get; set; }
 
 		[DataMember(Order = 2)]
-		public string Date { get; set; }
+		public string Tr_Date { get; set; }
 
 		[DataMember(Order = 3)]
 		public string Status { get; set; }
 
 		[DataMember(Order = 4)]
-		public string Followup_Date { get; set; }
+		public string Fup_Date { get; set; }
 		
 		[DataMember(Order = 5)]
 		public string Comments { get; set; }
@@ -290,6 +290,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 		[DataMember(Order = 7)]
 		public string Created_By { get; set; }
+
+		[DataMember(Order = 8)]
+		public string Created_Date { get; set; }
 	}
 
 	[DataContract]
