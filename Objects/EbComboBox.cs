@@ -193,6 +193,7 @@ namespace ExpressBase.Objects
     </div>
 </div>"
 .Replace("$$", obj.Name.ToString())
+.Replace("@ebsid@", this.EbSid_CtxId)
 .Replace("@type@", ((int)obj.Type).ToString())
 .Replace("@sTitle@", obj.sTitle.ToString())
 .Replace("@perWidth@", ((int)(100 / noOfFileds)).ToString())
