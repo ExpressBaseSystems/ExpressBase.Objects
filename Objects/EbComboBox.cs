@@ -60,7 +60,13 @@ namespace ExpressBase.Objects
         }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
-        public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
+        public override EbDbTypes EbDbType {
+            get
+            {
+                return (this.MultiSelect) ? EbDbTypes.String:  EbDbTypes.Decimal;
+            }
+            set { }
+        }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
