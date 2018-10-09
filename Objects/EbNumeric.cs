@@ -3,6 +3,7 @@ using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
 using ExpressBase.Objects.Helpers;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -20,6 +21,18 @@ namespace ExpressBase.Objects
 
         public EbNumeric()
         {
+        }
+
+        [JsonIgnore]
+        public override string GetValueJSfn
+        {
+            get
+            {
+                return @"
+                    return parseInt($('#' + this.EbSid_CtxId).val());
+                ";
+            }
+            set { }
         }
 
         [OnDeserialized]
