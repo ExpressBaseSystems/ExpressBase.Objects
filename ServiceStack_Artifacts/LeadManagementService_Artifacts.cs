@@ -274,7 +274,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public int Id { get; set; }
 
 		[DataMember(Order = 2)]
-		public string Tr_Date { get; set; }
+		public string Date { get; set; }
 
 		[DataMember(Order = 3)]
 		public string Status { get; set; }
