@@ -526,7 +526,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
                             _singleLevelTempStr += " - ";
                     }
                     base.Html = string.Format("<tr class='group' group='{0}'>{1}<td><i class='fa fa-minus-square-o' style='cursor:pointer;'></i></td><td colspan='{2}'>{3} : {4}</td></tr>",
-                        (base.CurrentLevel + 1).ToString(), tempstr, base.ColumnCount.ToString(), _singleLevelTempStr, base.GroupingCount.ToString());
+                        ((IsMultiLevel) ? base.CurrentLevel : base.CurrentLevel - 1).ToString(), tempstr, base.ColumnCount.ToString(), _singleLevelTempStr, base.GroupingCount + 1);
                 }
             }
         }
@@ -600,7 +600,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             if (string.IsNullOrEmpty(base.Html))
             {
                 string _tempFooterPadding = string.Empty;
-                for (int i = 0; i < TotalLevels; i++)
+                for (int i = 0; i <= TotalLevels; i++)
                     _tempFooterPadding += "<td>&nbsp;</td>";
 
                 _tempFooterPadding += "<td>&nbsp;</td>";//serial column
@@ -619,7 +619,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
                     }
                 }
 
-                base.Html = string.Format("<tr class='group-sum' group='{0}'>{1}{2}</tr>", (base.CurrentLevel + 1).ToString(), _tempFooterPadding,
+                base.Html = string.Format("<tr class='group-sum' group='{0}'>{1}{2}</tr>", ((IsMultiLevel) ? base.CurrentLevel : base.CurrentLevel-1).ToString(), _tempFooterPadding,
                     _tempFooterText);
             }
         }
