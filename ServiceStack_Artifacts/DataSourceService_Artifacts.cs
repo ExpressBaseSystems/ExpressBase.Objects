@@ -512,9 +512,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
                 {
                     for (int itr = 0; itr < CurrentLevel; itr++)
                         tempstr += "<td> &nbsp;</td>";
-                    base.Html = string.Format("<tr class='group' group='{0}'>{1}<td><i class='fa fa-minus-square-o' style='cursor:pointer;'></i></td><td colspan='{2}'>{3} : {4}</td></tr>",
-                    (base.CurrentLevel + 1).ToString(), tempstr, base.ColumnCount.ToString(),
-                    GroupingTexts[CurrentLevel - 1], (CurrentLevel == TotalLevels) ? base.GroupingCount.ToString() : base.LevelCount.ToString());
+                    base.Html = string.Format("<tr class='group' group='{0}'>{1}<td><i class='fa fa-minus-square-o' style='cursor:pointer;'></i></td><td colspan='{2}'>{3} ({4})</td></tr>",
+                    base.CurrentLevel /*+ 1*/, tempstr, base.ColumnCount.ToString(),
+                    GroupingTexts[CurrentLevel - 1].Substring(2, GroupingTexts[CurrentLevel - 1].Length - 2), (CurrentLevel == TotalLevels) ? base.GroupingCount.ToString() : base.LevelCount.ToString());
                 }
                 else
                 {
@@ -525,8 +525,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
                         if (groupString.Equals(GroupingTexts.Last()) == false)
                             _singleLevelTempStr += " - ";
                     }
-                    base.Html = string.Format("<tr class='group' group='{0}'>{1}<td><i class='fa fa-minus-square-o' style='cursor:pointer;'></i></td><td colspan='{2}'>{3} : {4}</td></tr>",
-                        ((IsMultiLevel) ? base.CurrentLevel : base.CurrentLevel - 1).ToString(), tempstr, base.ColumnCount.ToString(), _singleLevelTempStr, base.GroupingCount + 1);
+                    base.Html = string.Format("<tr class='group' group='{0}'>{1}<td><i class='fa fa-minus-square-o' style='cursor:pointer;'></i></td><td colspan='{2}'>{3} ({4})</td></tr>",
+                         base.CurrentLevel - 1, tempstr, base.ColumnCount.ToString(), _singleLevelTempStr.Substring(2, _singleLevelTempStr.Length-2), base.GroupingCount + 1);
                 }
             }
         }
