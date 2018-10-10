@@ -213,6 +213,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
 if(this.RenderAs !== 2){
     pg.HideProperty('LinkRefId');
     pg.HideProperty('LinkType');
+    pg.setSimpleProperty('LinkRefId', null);
 }
 else{
     pg.ShowProperty('LinkRefId');
@@ -246,6 +247,7 @@ else{
 if(this.RenderAs !== 2){
     pg.HideProperty('LinkRefId');
     pg.HideProperty('LinkType');
+pg.setSimpleProperty('LinkRefId', null);
 }
 else{
     pg.ShowProperty('LinkRefId');
@@ -291,6 +293,7 @@ else{
 if(this.RenderAs !== 1){
     pg.HideProperty('LinkRefId');
     pg.HideProperty('LinkType');
+pg.setSimpleProperty('LinkRefId', null);
 }
 else{
     pg.ShowProperty('LinkRefId');
