@@ -33,7 +33,7 @@ namespace ExpressBase.Objects
         }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
-        [OSE_ObjectTypes(EbObjectTypes.iDataSource)]
+        [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         public string DataSourceId { get; set; }
 
