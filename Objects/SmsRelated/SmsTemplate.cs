@@ -30,11 +30,11 @@ namespace ExpressBase.Objects.Objects.SmsRelated
         public string Body { get; set; }
 
         [JsonIgnore]
-        public EbDataSource EbDataSource { get; set; }
+        public EbDataReader EbDataSource { get; set; }
 
         [EnableInBuilder(BuilderType.SmsBuilder)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
-        [OSE_ObjectTypes(EbObjectTypes.iDataSource)]
+        [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
         public string DataSourceRefId { get; set; }
 
         [EnableInBuilder(BuilderType.SmsBuilder)]
@@ -49,7 +49,7 @@ namespace ExpressBase.Objects.Objects.SmsRelated
         {
             try
             {
-                this.EbDataSource = Redis.Get<EbDataSource>(this.DataSourceRefId);
+                this.EbDataSource = Redis.Get<EbDataReader>(this.DataSourceRefId);
                 this.EbDataSource.AfterRedisGet(Redis);
             }
             catch (Exception e)

@@ -65,8 +65,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         }
         public static int GetObjectType(object obj)
         {
-            if (obj is EbDataSource)
-                return EbObjectTypes.DataSource.IntCode;
+            if (obj is EbDataReader)
+                return EbObjectTypes.DataReader.IntCode;
             else if (obj is EbTableVisualization)
                 return EbObjectTypes.TableVisualization.IntCode;
             else if (obj is EbChartVisualization)
