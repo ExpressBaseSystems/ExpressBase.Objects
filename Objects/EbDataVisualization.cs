@@ -126,10 +126,6 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public List<DVBaseColumn> NotVisibleColumns { get; set; }
 
-        //[EnableInBuilder(BuilderType.DVBuilder)]
-        //[HideInPropertyGrid]
-        //public DVNonVisibleColumnCollection NonVisibleColumns { get; set; }
-
         [EnableInBuilder(BuilderType.DVBuilder)]
         [HideInPropertyGrid]
         [JsonIgnore]
@@ -376,6 +372,10 @@ namespace ExpressBase.Objects
         [HideForUser]
         public bool DisableCopy { get; set; }
 
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
+        public List<DVBaseColumn> OrderBy { get; set; }
+
         public static EbOperations Operations = TVOperations.Instance;
 
         public override string GetDesignHtml()
@@ -402,6 +402,7 @@ namespace ExpressBase.Objects
 			this.NotVisibleColumns = new List<DVBaseColumn>();
             //this.NonVisibleColumns = new DVNonVisibleColumnCollection();
             this.CurrentRowGroup = new RowGroupParent();
+            this.OrderBy = new List<DVBaseColumn>();
         }
 
 
