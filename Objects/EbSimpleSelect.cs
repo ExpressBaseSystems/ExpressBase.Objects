@@ -33,7 +33,7 @@ namespace ExpressBase.Objects
         }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
-        [OSE_ObjectTypes(EbObjectTypes.iDataSource)]
+        [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         public string DataSourceId { get; set; }
 
@@ -41,9 +41,9 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public DVColumnCollection Columns { get; set; }
 
-        [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm)]
+        [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", 1)]
-        [OnChangeExec(@"if (this.Columns.$values.length === 0 ){pg.MakeReadOnly('ValueMember');} else {pg.MakeReadWrite('ValueMember');}")]
+        [OnChangeExec(@"if (this.Columns && this.Columns.$values.length === 0 ){pg.MakeReadOnly('ValueMember');} else {pg.MakeReadWrite('ValueMember');}")]
         public DVBaseColumn ValueMember { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
@@ -51,9 +51,9 @@ namespace ExpressBase.Objects
         [Alias("Options")]
         public List<EbSimpleSelectOption> Options { get; set; }
 
-        [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm)]
+        [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", 1)]
-        [OnChangeExec(@"if (this.Columns.$values.length === 0 ){pg.MakeReadOnly('DisplayMember');} else {pg.MakeReadWrite('DisplayMember');}")]
+        [OnChangeExec(@"if (this.Columns && this.Columns.$values.length === 0 ){pg.MakeReadOnly('DisplayMember');} else {pg.MakeReadWrite('DisplayMember');}")]
         public DVBaseColumn DisplayMember { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]

@@ -632,7 +632,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
                     }
                 }
 
-                base.Html = string.Format("<tr class='group-sum' group='{0}'>{1}{2}</tr>", ((IsMultiLevel) ? base.CurrentLevel : base.CurrentLevel-1).ToString(), _tempFooterPadding,
+                base.Html = string.Format("<tr class='group-sum' group='{0}'>{1}{2}</tr>", base.CurrentLevel.ToString(), _tempFooterPadding,
                     _tempFooterText);
             }
         }

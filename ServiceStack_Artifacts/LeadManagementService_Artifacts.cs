@@ -81,6 +81,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public List<string> StatusList { get; set; }
 
 		[DataMember(Order = 19)]
+		public List<string> ServiceList { get; set; }
+
+		[DataMember(Order = 20)]
 		public int RespMode { get; set; }
 
 	}

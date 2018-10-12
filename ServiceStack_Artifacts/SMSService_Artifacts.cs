@@ -26,8 +26,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     [DataContract]
     public class SMSSentRequest : EbServiceStackAuthRequest
     {
-        [DataMember(Order =1)]
-        public string Refid { get; set; }
+        [DataMember(Order = 1)]
+        public int ObjId { get; set; }
 
         [DataMember(Order = 2)]
         public List<Param> Params { get; set; }

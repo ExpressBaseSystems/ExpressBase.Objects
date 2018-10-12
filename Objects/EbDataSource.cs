@@ -17,17 +17,19 @@ using System.Threading.Tasks;
 namespace ExpressBase.Objects
 {
 
-    public class EbDatasourceMain : EbObject { }
+    public class EbDataSourceMain : EbObject {
 
-    [EnableInBuilder(BuilderType.DataSource)]
-    public class EbDataSource : EbDatasourceMain
+    }
+
+    [EnableInBuilder(BuilderType.DataReader)]
+    public class EbDataReader : EbDataSourceMain
     {
-        [EnableInBuilder(BuilderType.DataSource)]
+        [EnableInBuilder(BuilderType.DataReader,BuilderType.DataWriter)]
         [HideInPropertyGrid]
         [JsonConverter(typeof(Base64Converter))]
         public string Sql { get; set; }
 
-        [EnableInBuilder(BuilderType.DataSource)]
+        [EnableInBuilder(BuilderType.DataReader)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iFilterDialog)]
         public string FilterDialogRefId { get; set; }
@@ -98,6 +100,12 @@ namespace ExpressBase.Objects
             }
             return "" ;
         }
+    }
+
+    [EnableInBuilder(BuilderType.DataWriter)]
+    public class EbDataWriter: EbDataReader
+    {
+
     }
 
     [ProtoBuf.ProtoContract]
