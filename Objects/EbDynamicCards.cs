@@ -24,7 +24,7 @@ namespace ExpressBase.Objects
 		public override List<EbCard> CardCollection { get; set; }
 
         [EnableInBuilder(BuilderType.BotForm)]
-        [OSE_ObjectTypes(EbObjectTypes.iDataSource)]
+        [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         public string DataSourceId { get; set; }
 

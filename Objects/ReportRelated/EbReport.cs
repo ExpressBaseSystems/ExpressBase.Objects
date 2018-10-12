@@ -224,11 +224,11 @@ namespace ExpressBase.Objects
         public List<EbReportDetail> Detail { get; set; }
 
         [JsonIgnore]
-        public EbDataSource EbDataSource { get; set; }
+        public EbDataReader EbDataSource { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
-        [OSE_ObjectTypes(EbObjectTypes.iDataSource)]
+        [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
         [PropertyGroup("Data")]
         public string DataSourceRefId { get; set; }
 
@@ -801,12 +801,12 @@ namespace ExpressBase.Objects
             {
                 if (DataSourceRefId != string.Empty)
                 {
-                    EbDataSource = Redis.Get<EbDataSource>(DataSourceRefId);
+                    EbDataSource = Redis.Get<EbDataReader>(DataSourceRefId);
                     if (EbDataSource == null || EbDataSource.Sql == null || EbDataSource.Sql == string.Empty)
                     {
                         EbObjectParticularVersionResponse result = client.Get(new EbObjectParticularVersionRequest { RefId = DataSourceRefId });
                         this.EbDataSource = EbSerializers.Json_Deserialize(result.Data[0].Json);
-                        Redis.Set<EbDataSource>(DataSourceRefId, EbDataSource);
+                        Redis.Set<EbDataReader>(DataSourceRefId, EbDataSource);
                     }
                     if (EbDataSource.FilterDialogRefId != string.Empty)
                         EbDataSource.AfterRedisGet(Redis, client);
@@ -823,7 +823,7 @@ namespace ExpressBase.Objects
             string refids = "";
             if (!DataSourceRefId.IsEmpty())
             {
-                EbDataSource ds = EbDataSource;
+                EbDataReader ds = EbDataSource;
                 if (ds is null)
                     refids += DataSourceRefId + ",";
             }

@@ -526,7 +526,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
                             _singleLevelTempStr += " - ";
                     }
                     base.Html = string.Format("<tr class='group' group='{0}'>{1}<td><i class='fa fa-minus-square-o' style='cursor:pointer;'></i></td><td colspan='{2}'>{3} ({4})</td></tr>",
-                         base.CurrentLevel - 1, tempstr, base.ColumnCount.ToString(), _singleLevelTempStr.Substring(2, _singleLevelTempStr.Length-2), base.GroupingCount + 1);
+                         base.CurrentLevel, tempstr, base.ColumnCount.ToString(), _singleLevelTempStr.Substring(2, _singleLevelTempStr.Length-2), base.GroupingCount + 1);
                 }
             }
         }
@@ -619,7 +619,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
                     }
                 }
 
-                base.Html = string.Format("<tr class='group-sum' group='{0}'>{1}{2}</tr>", ((IsMultiLevel) ? base.CurrentLevel : base.CurrentLevel-1).ToString(), _tempFooterPadding,
+                base.Html = string.Format("<tr class='group-sum' group='{0}'>{1}{2}</tr>", base.CurrentLevel.ToString(), _tempFooterPadding,
                     _tempFooterText);
             }
         }

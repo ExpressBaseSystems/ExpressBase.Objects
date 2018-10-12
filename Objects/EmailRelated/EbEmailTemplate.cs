@@ -56,7 +56,7 @@ namespace ExpressBase.Objects.EmailRelated
 
         [EnableInBuilder(BuilderType.EmailBuilder)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
-        [OSE_ObjectTypes(EbObjectTypes.iDataSource)]
+        [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
         public string DataSourceRefId { get; set; }
 
         [EnableInBuilder(BuilderType.EmailBuilder)]
@@ -75,13 +75,13 @@ namespace ExpressBase.Objects.EmailRelated
 
 
         [JsonIgnore]
-        public EbDataSource EbDataSource { get; set; }
+        public EbDataReader EbDataSource { get; set; }
 
         public override void AfterRedisGet(RedisClient Redis)
         {
             try
             {
-                this.EbDataSource = Redis.Get<EbDataSource>(this.DataSourceRefId);
+                this.EbDataSource = Redis.Get<EbDataReader>(this.DataSourceRefId);
                 this.EbDataSource.AfterRedisGet(Redis);
             }
             catch (Exception e)

@@ -413,6 +413,53 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public bool isSuccess { get; set; }
 	}
 
+	//MY PROFILE ----------------------------------------------------
+
+	[DataContract]
+	public class GetMyProfileRequest : IReturn<GetMyProfileResponse>, IEbSSRequest
+	{
+		[DataMember(Order = 1)]
+		public string SolnId { get; set; }
+
+		public int UserId { get; set; }
+
+		public string Token { get; set; }
+	}
+
+	[DataContract]
+	public class GetMyProfileResponse : IEbSSResponse
+	{
+		[DataMember(Order = 1)]
+		public Dictionary<string, string> UserData { get; set; }		
+
+		[DataMember(Order = 2)]
+		public ResponseStatus ResponseStatus { get; set; }
+	}
+
+	[DataContract]
+	public class SaveMyProfileRequest : IReturn<SaveMyProfileResponse>, IEbSSRequest
+	{
+		[DataMember(Order = 1)]
+		public string UserData { get; set; }
+
+		[DataMember(Order = 2)]
+		public string SolnId { get; set; }
+
+		public int UserId { get; set; }
+
+		public string Token { get; set; }
+	}
+
+	[DataContract]
+	public class SaveMyProfileResponse : IEbSSResponse
+	{
+		[DataMember(Order = 1)]
+		public int RowsAffectd { get; set; }
+
+		[DataMember(Order = 2)]
+		public ResponseStatus ResponseStatus { get; set; }
+	}
+
 
 
 	//ANONYMOUS USER START-----------------------------------------
