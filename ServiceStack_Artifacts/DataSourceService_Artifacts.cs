@@ -540,7 +540,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
                         count++;
                     }
                     base.Html = string.Format("<tr class='group' group='{0}'>{1}<td><i class='fa fa-minus-square-o' style='cursor:pointer;'></i></td><td colspan='{2}'>{3} ({4})</td></tr>",
-                         base.CurrentLevel - 1, tempstr, base.ColumnCount.ToString(), _singleLevelTempStr, base.GroupingCount + 1);
+                         base.CurrentLevel, tempstr, base.ColumnCount.ToString(), _singleLevelTempStr, base.GroupingCount + 1);
                 }
             }
         }
