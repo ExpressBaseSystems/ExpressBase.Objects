@@ -2,6 +2,7 @@
 using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
 using ExpressBase.Common.Singletons;
+using ExpressBase.Common.Structures;
 using ExpressBase.Data;
 using ExpressBase.Objects.Objects.DVRelated;
 using Newtonsoft.Json;
@@ -474,6 +475,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             if (this.ParentHeader != null && this.ParentHeader.SortIndex == -1)
                 this.ParentHeader.SetSortIndex(index - 1);
         }
+
+        [JsonIgnore]
+        public List<DVBaseColumn> RowGroupingColumns
+        {
+            get;
+            set;
+        }
  
         [JsonIgnore]
         private string[] _groupingTexts = null;
@@ -513,20 +521,26 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
                     for (int itr = 0; itr < CurrentLevel; itr++)
                         tempstr += "<td> &nbsp;</td>";
                     string cleanedHeaderText = (CurrentLevel == 1) ? GroupingTexts[CurrentLevel - 1].Substring(2, GroupingTexts[CurrentLevel - 1].Length - 2) : GroupingTexts[CurrentLevel - 1];
-                    base.Html = string.Format("<tr class='group' group='{0}'>{1}<td><i class='fa fa-minus-square-o' style='cursor:pointer;'></i></td><td colspan='{2}'>{3} ({4})</td></tr>",
-                    base.CurrentLevel /*+ 1*/, tempstr, base.ColumnCount.ToString(), cleanedHeaderText, (CurrentLevel == TotalLevels) ? base.GroupingCount.ToString() : base.LevelCount.ToString());
+                    string GroupingColumnName = RowGroupingColumns[CurrentLevel - 1].sTitle;
+                    base.Html = string.Format("<tr class='group' group='{0}'>{1}<td><i class='fa fa-minus-square-o' style='cursor:pointer;'></i></td><td colspan='{2}'>{3}: <b>{4}</b> ({5})</td></tr>",
+                    base.CurrentLevel, tempstr, base.ColumnCount.ToString(), GroupingColumnName, cleanedHeaderText, (CurrentLevel == TotalLevels) ? base.GroupingCount.ToString() : base.LevelCount.ToString());
                 }
                 else
                 {
                     tempstr += "<td> &nbsp;</td>";
+                    int count = 0;
+                    string GroupingColumnName = string.Empty;
                     foreach (string groupString in GroupingTexts)
                     {
-                        _singleLevelTempStr += groupString;
+                        _singleLevelTempStr += RowGroupingColumns[count].sTitle + ": ";
+                        _singleLevelTempStr += (count == 0) ? "<b>"+groupString.Substring(2, groupString.Length - 2)+"</b>" : "<b>"+groupString+"</b>";
                         if (groupString.Equals(GroupingTexts.Last()) == false)
-                            _singleLevelTempStr += " - ";
+                            _singleLevelTempStr += ", ";
+
+                        count++;
                     }
                     base.Html = string.Format("<tr class='group' group='{0}'>{1}<td><i class='fa fa-minus-square-o' style='cursor:pointer;'></i></td><td colspan='{2}'>{3} ({4})</td></tr>",
-                         base.CurrentLevel, tempstr, base.ColumnCount.ToString(), _singleLevelTempStr.Substring(2, _singleLevelTempStr.Length-2), base.GroupingCount + 1);
+                         base.CurrentLevel, tempstr, base.ColumnCount.ToString(), _singleLevelTempStr, base.GroupingCount + 1);
                 }
             }
         }
@@ -612,8 +626,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
                     if (Column.bVisible)
                     {
                         if ((Column is DVNumericColumn) && (Column as DVNumericColumn).Aggregate)
-                            _tempFooterText += "<td class='dt-body-right'>" + (this.Aggregations[Column.Data].Sum).ToString("N", ColumnCulture.NumberFormat) 
-                                + "</td>";
+                            _tempFooterText += "<td class='dt-body-right'><b>" + (this.Aggregations[Column.Data].Sum).ToString("N", ColumnCulture.NumberFormat) 
+                                + "</b></td>";
                         else
                             _tempFooterText += "<td>&nbsp;</td>";
                     }
@@ -655,5 +669,18 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             Minimum = (_value < Minimum) ? _value : Minimum;
             Maximum = (_value > Maximum) ? _value : Maximum;
         }
+    }
+
+    public class InputParam
+    {
+        [DataMember(Order = 0)]
+        public string Column { get; set; }
+
+        [DataMember(Order = 1)]
+        public EbDbTypes Type { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Value { get; set; }
+
     }
 }
