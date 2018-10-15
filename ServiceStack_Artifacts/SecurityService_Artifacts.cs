@@ -364,31 +364,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
 	[DataContract]
-	public class ChangeUserPasswordRequest : IReturn<ChangeUserPasswordResponse>, IEbSSRequest
-	{
-		[DataMember(Order = 1)]
-		public string OldPwd { get; set; }
-
-		[DataMember(Order = 2)]
-		public string NewPwd { get; set; }
-
-		[DataMember(Order = 3)]
-		public string Email { get; set; }
-
-		[DataMember(Order = 4)]
-		public string SolnId { get; set; }
-
-		public int UserId { get; set; }
-	}
-
-	[DataContract]
-	public class ChangeUserPasswordResponse 
-	{
-		[DataMember(Order = 1)]
-		public bool isSuccess { get; set; }
-	}
-
-	[DataContract]
 	public class ResetUserPasswordRequest : IReturn<ResetUserPasswordResponse>, IEbSSRequest
 	{
 		[DataMember(Order = 1)]
@@ -421,6 +396,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		[DataMember(Order = 1)]
 		public string SolnId { get; set; }
 
+		[DataMember(Order = 2)]
+		public string WC { get; set; }
+
 		public int UserId { get; set; }
 
 		public string Token { get; set; }
@@ -444,6 +422,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 		[DataMember(Order = 2)]
 		public string SolnId { get; set; }
+		
+		[DataMember(Order = 3)]
+		public string WC { get; set; }
+
+		[DataMember(Order = 4)]
+		public bool PreferenceOnly { get; set; }
 
 		public int UserId { get; set; }
 
@@ -459,7 +443,34 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		[DataMember(Order = 2)]
 		public ResponseStatus ResponseStatus { get; set; }
 	}
+	
+	[DataContract]
+	public class ChangeUserPasswordRequest : IReturn<ChangeUserPasswordResponse>, IEbSSRequest
+	{
+		[DataMember(Order = 1)]
+		public string OldPwd { get; set; }
 
+		[DataMember(Order = 2)]
+		public string NewPwd { get; set; }
+
+		[DataMember(Order = 3)]
+		public string Email { get; set; }
+
+		[DataMember(Order = 4)]
+		public string SolnId { get; set; }
+		
+		[DataMember(Order = 5)]
+		public string WC { get; set; }
+
+		public int UserId { get; set; }
+	}
+
+	[DataContract]
+	public class ChangeUserPasswordResponse
+	{
+		[DataMember(Order = 1)]
+		public bool isSuccess { get; set; }
+	}
 
 
 	//ANONYMOUS USER START-----------------------------------------

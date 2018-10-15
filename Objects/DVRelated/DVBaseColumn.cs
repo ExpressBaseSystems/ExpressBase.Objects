@@ -62,6 +62,24 @@ namespace ExpressBase.Objects.Objects.DVRelated
         DateTimeWithoutSecondsAndTT,
     }
 
+    public enum StringOperators
+    {
+        Equals = 0,
+        Startwith = 1,
+        EndsWith = 2,
+        Between = 3
+    }
+    public enum NumericOperators
+    {
+        Equals = 0,
+        LessThan = 1,
+        GreaterThan = 2,
+        LessThanOrEqual = 3,
+        GreaterThanOrEqual = 4,
+        Between = 5
+    }
+
+
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
     [HideInPropertyGrid]
     public class DVBaseColumn : EbDataVisualizationObject
@@ -231,6 +249,11 @@ else{
         [DefaultPropValue("16")]
         [HideInPropertyGrid]
         public override EbDbTypes Type { get; set; }
+
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.DropDown)]
+        public StringOperators DefaultOperator { get; set; }
     }
 
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
@@ -273,6 +296,10 @@ else{
 
             return cultureInfo;
         }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.DropDown)]
+        public NumericOperators DefaultOperator { get; set; }
     }
 
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
@@ -310,6 +337,10 @@ else{
         [DefaultPropValue("5")]
         [HideInPropertyGrid]
         public override EbDbTypes Type { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.DropDown)]
+        public NumericOperators DefaultOperator { get; set; }
     }
 
     [EnableInBuilder(BuilderType.DVBuilder)]
