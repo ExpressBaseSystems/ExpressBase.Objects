@@ -99,7 +99,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public string SolutionId { get; set; }
 
-        public SMTPConnection SMTPConnection { get; set; }
+        public EbEmail Email { get; set; }
     }
 
     public class ChangeCloudinaryConnectionRequest : EbServiceStackAuthRequest, IReturn<ChangeConnectionResponse>

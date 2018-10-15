@@ -557,8 +557,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     [DataContract]
     public class UpdateSolutionRequest : IReturn<UpdateSolutionResponse>, IEbSSRequest
     {
-        public string Token { get; set; }
-
         public string SolnId { get; set; }
 
         public int UserId { get; set; }
