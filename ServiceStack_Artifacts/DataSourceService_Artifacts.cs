@@ -2,6 +2,7 @@
 using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
 using ExpressBase.Common.Singletons;
+using ExpressBase.Common.Structures;
 using ExpressBase.Data;
 using ExpressBase.Objects.Objects.DVRelated;
 using Newtonsoft.Json;
@@ -668,5 +669,18 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             Minimum = (_value < Minimum) ? _value : Minimum;
             Maximum = (_value > Maximum) ? _value : Maximum;
         }
+    }
+
+    public class InputParam
+    {
+        [DataMember(Order = 0)]
+        public string Column { get; set; }
+
+        [DataMember(Order = 1)]
+        public EbDbTypes Type { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Value { get; set; }
+
     }
 }
