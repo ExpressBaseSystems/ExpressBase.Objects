@@ -105,7 +105,9 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.DataWriter)]
     public class EbDataWriter: EbDataReader
     {
-
+        [EnableInBuilder(BuilderType.DataWriter)]
+        [HideInPropertyGrid]
+        List<InputParam> InputParams { get; set; }
     }
 
     [ProtoBuf.ProtoContract]
