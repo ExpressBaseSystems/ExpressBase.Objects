@@ -91,6 +91,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
         [JsonProperty(PropertyName = "name")]
         [Alias("Name")]
         [PropertyEditor(PropertyEditorType.Label)]
+        [HideInPropertyGrid]
         public override string Name { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
