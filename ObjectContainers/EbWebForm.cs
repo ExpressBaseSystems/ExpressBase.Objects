@@ -41,7 +41,7 @@ namespace ExpressBase.Objects
 
         public override string GetHtml()
         {
-             string html = "<form id='@name@' IsRenderMode='@rmode@' ebsid='@ebsid@' class='formB-box form-buider-form ebcont-ctrl' eb-form='true' ui-inp eb-type='WebForm' @tabindex@>";
+             string html = "<form id='@ebsid@' IsRenderMode='@rmode@' ebsid='@ebsid@' class='formB-box form-buider-form ebcont-ctrl' eb-form='true' ui-inp eb-type='WebForm' @tabindex@>";
 
             foreach (EbControl c in this.Controls)
                 html += c.GetHtml();
