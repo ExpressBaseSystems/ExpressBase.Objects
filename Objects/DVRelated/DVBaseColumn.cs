@@ -307,6 +307,16 @@ else{
     public class DVBooleanColumn : DVBaseColumn
     {
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
+        [OnChangeExec(@"
+if(this.RenderAs !== 2){
+    pg.HideProperty('LinkRefId');
+    pg.HideProperty('LinkType');
+pg.setSimpleProperty('LinkRefId', null);
+}
+else{
+    pg.ShowProperty('LinkRefId');
+    pg.ShowProperty('LinkType');
+    }")]
         public BooleanRenderType RenderAs { get; set; }
     }
 
