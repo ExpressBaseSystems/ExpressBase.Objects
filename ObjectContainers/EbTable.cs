@@ -21,7 +21,7 @@ namespace ExpressBase.Objects
             {
                 return @"EbTable = {
                 padding : function(elementId, props) {
-                    $(`#${ elementId}>table>tbody>tr>td`).css('padding', props.Padding + 'px');
+                    $(`#cont_${ elementId}>table>tbody>tr>td`).css('padding', props.Padding + 'px');
                 }
             }";
             }

@@ -22,7 +22,7 @@ namespace ExpressBase.Objects
             {
                 return @"EbGroupBox = {
                     padding : function(elementId, props) {
-                        $(`#${ elementId}.Eb-ctrlContainer`).closestInner('.group-box').css('padding', props.Padding + 'px');
+                        $(`#cont_${ elementId}.Eb-ctrlContainer`).closestInner('.group-box').css('padding', props.Padding + 'px');
                     }
                 }";
             }
