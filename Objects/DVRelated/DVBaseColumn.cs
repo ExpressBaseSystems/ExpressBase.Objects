@@ -89,9 +89,14 @@ namespace ExpressBase.Objects.Objects.DVRelated
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [JsonProperty(PropertyName = "name")]
-        [Alias("Name")]
         [PropertyEditor(PropertyEditorType.Label)]
-        [HideInPropertyGrid]
+        [OnChangeExec(@"
+        if (this.IsCustomColumn){
+            pg.MakeReadWrite('name');// [JsonProperty(PropertyName = 'name')]
+        }
+        else {
+            pg.MakeReadOnly('name');
+        }")]
         public override string Name { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
