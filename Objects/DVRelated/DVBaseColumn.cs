@@ -90,7 +90,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [JsonProperty(PropertyName = "name")]
         [PropertyEditor(PropertyEditorType.Label)]
-        [OnChangeExec(@"
+        [OnChangeExec(@"this.Name = this.name;
         if (this.IsCustomColumn){
             pg.MakeReadWrite('name');// [JsonProperty(PropertyName = 'name')]
         }
