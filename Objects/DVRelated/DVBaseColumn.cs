@@ -122,7 +122,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
         [JsonIgnore]
         public string sWidth { get; set; }
 
-        //[EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilder)]
         [JsonProperty(PropertyName = "className")]
         public string ClassName { get; set; }
 
