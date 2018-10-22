@@ -124,6 +124,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [JsonProperty(PropertyName = "className")]
+        [HideInPropertyGrid]
         public string ClassName { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
