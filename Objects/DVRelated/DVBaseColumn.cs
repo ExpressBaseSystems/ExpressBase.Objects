@@ -3,11 +3,16 @@ using ExpressBase.Common.JsonConverters;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
+using ExpressBase.Objects.ServiceStack_Artifacts;
+using Microsoft.CodeAnalysis.CSharp.Scripting;
+using Microsoft.CodeAnalysis.Scripting;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
+using System.Linq;
 using System.Runtime.Serialization;
+using System.Text.RegularExpressions;
 
 namespace ExpressBase.Objects.Objects.DVRelated
 {
@@ -101,7 +106,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [HideInPropertyGrid]
-        public string EbSid{ get; set; }
+        public string EbSid { get; set; }
 
         public virtual EbDbTypes Type { get; set; }
 
@@ -111,7 +116,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
         [Alias("Title")]
         public string sTitle { get; set; }
 
-		[HideInPropertyGrid]
+        [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         public bool bVisible { get; set; }
 
@@ -157,6 +162,77 @@ namespace ExpressBase.Objects.Objects.DVRelated
         [DefaultPropValue("0")]
         [HideForUser]
         public int HideDataRowMoreThan { get; set; }
+
+        [JsonIgnore]
+        private List<string> __formulaDataFieldsUsed = null;
+        [JsonIgnore]
+        public List<string> FormulaDataFieldsUsed
+        {
+            get
+            {
+                if (__formulaDataFieldsUsed == null)
+                {
+                    var matches = Regex.Matches(this.Formula, @"T[0-9]{1}.\w+").OfType<Match>().Select(m => m.Groups[0].Value).Distinct();
+                    __formulaDataFieldsUsed = new List<string>(matches.Count());
+                    int j = 0;
+                    foreach (var match in matches)
+                        __formulaDataFieldsUsed.Add(match);
+                }
+
+                return __formulaDataFieldsUsed;
+            }
+        }
+
+        [JsonIgnore]
+        private List<FormulaPart> __formulaParts = new List<FormulaPart>();
+        [JsonIgnore]
+        public List<FormulaPart> FormulaParts
+        {
+            get
+            {
+                if (__formulaParts .Count == 0)
+                {
+                    foreach (string calcfd in this.FormulaDataFieldsUsed)
+                    {
+                        string[] splits = calcfd.Split('.');
+                        __formulaParts.Add(new FormulaPart { TableName = splits[0], FieldName = splits[1] });
+                    }
+                }
+
+                return __formulaParts;
+            }
+        }
+
+        //[JsonIgnore]
+        //private Script __codeAnalysisScript = null;
+        //[JsonIgnore]
+        //public Script CodeAnalysisScript
+        //{
+        //    get
+        //    {
+        //        if (__codeAnalysisScript == null)
+        //        {
+        //            __codeAnalysisScript = CSharpScript.Create<dynamic>(this.Formula, ScriptOptions.Default.WithReferences("Microsoft.CSharp", "System.Core").WithImports("System.Dynamic"), globalsType: typeof(Globals));
+        //            __codeAnalysisScript.Compile();
+        //        }
+
+        //        return __codeAnalysisScript;
+        //    }
+        //}
+
+        [JsonIgnore]
+        private Script __codeAnalysisScript = null;
+
+        public Script GetCodeAnalysisScript()
+        {
+            if (__codeAnalysisScript == null && !string.IsNullOrEmpty(this.Formula))
+            {
+                __codeAnalysisScript = CSharpScript.Create<dynamic>(this.Formula, ScriptOptions.Default.WithReferences("Microsoft.CSharp", "System.Core").WithImports("System.Dynamic"), globalsType: typeof(Globals));
+                __codeAnalysisScript.Compile();
+            }
+
+            return __codeAnalysisScript;
+        }
 
         public virtual CultureInfo GetColumnCultureInfo(CultureInfo user_cultureinfo)
         {
@@ -222,10 +298,10 @@ namespace ExpressBase.Objects.Objects.DVRelated
         }
     }
 
-	//public class DVNonVisibleColumnCollection : List<string>
-	//{
+    //public class DVNonVisibleColumnCollection : List<string>
+    //{
 
-	//}
+    //}
 
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
     [Alias("DVStringColumnAlias")]
@@ -363,17 +439,17 @@ else{
     [EnableInBuilder(BuilderType.DVBuilder)]
     public class HideColumnData
     {
-//        [OnChangeExec(@"
-//if(this.Enable === False){
-//    pg.HideProperty('UnRestrictedRowCount');
-//    pg.HideProperty('ReplaceByCharacter');
-//    pg.HideProperty('ReplaceByText');
-//}
-//else{
-//    pg.ShowProperty('UnRestrictedRowCount');
-//    pg.ShowProperty('ReplaceByCharacter');
-//    pg.ShowProperty('ReplaceByText');
-//    }")]
+        //        [OnChangeExec(@"
+        //if(this.Enable === False){
+        //    pg.HideProperty('UnRestrictedRowCount');
+        //    pg.HideProperty('ReplaceByCharacter');
+        //    pg.HideProperty('ReplaceByText');
+        //}
+        //else{
+        //    pg.ShowProperty('UnRestrictedRowCount');
+        //    pg.ShowProperty('ReplaceByCharacter');
+        //    pg.ShowProperty('ReplaceByText');
+        //    }")]
         [EnableInBuilder(BuilderType.DVBuilder)]
         public bool Enable { get; set; }
 
