@@ -602,9 +602,15 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public List<Eb_Users> UsersList { get; set; }
 
 		[DataMember(Order = 3)]
-		public string Token { get; set; }
+		public List<Eb_Constraints> IpConsList { get; set; }
 
 		[DataMember(Order = 4)]
+		public List<Eb_Constraints> DtConsList { get; set; }
+
+		[DataMember(Order = 5)]
+		public string Token { get; set; }
+
+		[DataMember(Order = 6)]
 		public ResponseStatus ResponseStatus { get; set; }
 	}
 
@@ -624,6 +630,18 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public string Users { get; set; }
 
 		[DataMember(Order = 5)]
+		public string IpConstraintNw { get; set; }
+
+		[DataMember(Order = 6)]
+		public string IpConstraintOld { get; set; }
+
+		[DataMember(Order = 7)]
+		public string DtConstraintNw { get; set; }
+
+		[DataMember(Order = 8)]
+		public string DtConstraintOld { get; set; }
+
+		[DataMember(Order = 9)]
 		public string SolnId { get; set; }
 
 		public int UserId { get; set; }
@@ -647,6 +665,21 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public string u_token { get; set; }
 	}
 
+	public class IpConstraint
+	{
+		public string Ip { get; set; }
+		public string Description { get; set; }
+	}
+	
+	public class DateTimeConstraint
+	{
+		public string Title { get; set; }
+		public string Description { get; set; }
+		public int Type { get; set; }
+		public string Start { get; set; }
+		public string End { get; set; }
+		public int DaysCoded { get; set; }
+	}
 
 	//ROLES START---------------------------------------------
 	[DataContract]
@@ -943,7 +976,20 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		[DataMember(Order = 4)]
 		public int Role2User_Id;
 	}
-	
+
+	[DataContract]
+	public class Eb_Constraints
+	{
+		[DataMember(Order = 1)]
+		public int Id;
+
+		[DataMember(Order = 2)]
+		public string Title;
+
+		[DataMember(Order = 3)]
+		public string Description;
+	}
+
 	[DataContract]
 	public class GetUserDetailsRequest : IReturn<GetUserDetailsResponse>, IEbSSRequest
 	{
