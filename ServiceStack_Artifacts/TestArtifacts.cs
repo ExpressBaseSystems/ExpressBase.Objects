@@ -25,4 +25,21 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 3)]
         public ResponseStatus ResponseStatus { get; set; }
     }
+    public class SchedulerMQRequest : EbMqRequest
+    {
+        [DataMember(Order = 1)]
+        public int Id { get; set; }
+    }
+
+    public class SchedulerMQResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 3)]
+        public string Result { get; set; }
+    }
 }
