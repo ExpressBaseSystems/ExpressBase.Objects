@@ -296,4 +296,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 12)]
         public EbDataVisualization EbDataVisualization { get; set; }
     }
+
+    public class FormulaPart
+    {
+        public string TableName { get; set; }
+        public string FieldName { get; set; }
+    }
 }

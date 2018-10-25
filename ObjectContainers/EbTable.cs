@@ -21,7 +21,7 @@ namespace ExpressBase.Objects
             {
                 return @"EbTable = {
                 padding : function(elementId, props) {
-                    $(`#${ elementId}>table>tbody>tr>td`).css('padding', props.Padding + 'px');
+                    $(`#cont_${ elementId}>table>tbody>tr>td`).css('padding', props.Padding + 'px');
                 }
             }";
             }
@@ -135,13 +135,13 @@ this.Init = function(id)
         public override string GetHtml()
         {
             string html = @"
-            <div id='@name@' ebsid='@ebsid@' class='Eb-ctrlContainer' Ctype='TableLayout'>
-                <table class='form-render-table' ><tr>";
+            <div id='cont_@ebsid@' ebsid='@ebsid@' class='Eb-ctrlContainer' Ctype='TableLayout'>
+                <table id='@ebsid@' class='form-render-table' ><tr>";
 
             foreach (EbControl ec in this.Controls)
                 html += ec.GetHtml();
 
-            return (html + "</tr></table></div>").Replace("@name@", this.Name).Replace("@ebsid@", this.EbSid);
+            return (html + "</tr></table></div>").Replace("@name@", this.Name).Replace("@ebsid@", this.EbSid_CtxId);
         }
     }
 

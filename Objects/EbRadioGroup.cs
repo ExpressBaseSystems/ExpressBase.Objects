@@ -166,7 +166,7 @@ this.Init = function(id)
             {
                 return @"EbRadioOption = {
                 Label : function(elementId, props) {
-                        $(`#${ elementId}`).closestInner('[ui-label]').text(props.Label);
+                        $(`#cont_${ elementId}`).closestInner('[ui-label]').text(props.Label);
                 },
             }";
             }

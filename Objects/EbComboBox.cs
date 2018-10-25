@@ -198,7 +198,7 @@ namespace ExpressBase.Objects
         <span class='input-group-addon' @border-r$$> <i id='@ebsid@TglBtn' class='fa  fa-search' aria-hidden='true'></i> </span>
     </div>
 </div>"
-.Replace("$$", obj.Name.ToString())
+.Replace("$$", obj.Name ?? "")
 .Replace("@ebsid@", this.EbSid_CtxId)
 .Replace("@type@", ((int)obj.Type).ToString())
 .Replace("@sTitle@", obj.sTitle.ToString())
