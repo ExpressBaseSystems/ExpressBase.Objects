@@ -143,11 +143,6 @@ else {
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public string MinDateExpression { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
-        [PropertyGroup(@"Behavior")]
-        [PropertyEditor(PropertyEditorType.JS)]
-        public string Validation { get; set; }
-
         //[ProtoBuf.ProtoMember(9)]
         //[Description("Identity")]
         //public override string Name { get; set; }
