@@ -367,7 +367,7 @@ else{
         //public string LinkRefId { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
-        [DefaultPropValue("11")]
+        [DefaultPropValue("7")]
         [HideInPropertyGrid]
         public override EbDbTypes Type { get; set; }
 
