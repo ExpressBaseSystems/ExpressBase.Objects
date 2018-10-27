@@ -1,4 +1,5 @@
-﻿using ExpressBase.Common.EbServiceStack.ReqNRes;
+﻿using ExpressBase.Common;
+using ExpressBase.Common.EbServiceStack.ReqNRes;
 using ExpressBase.Common.Objects;
 using ServiceStack;
 using System;
@@ -8,9 +9,9 @@ using System.Text;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
-	
-	//===================================== TABLE CREATION  ==========================================
-	//[Route("/bots")]
+
+	//===================================== FORM TABLE CREATION   ==========================================
+
 	[DataContract]
 	public class CreateWebFormTableRequest : EbServiceStackAuthRequest, IReturn<CreateWebFormTableResponse>
 	{
@@ -19,24 +20,19 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 		[DataMember(Order = 1)]
 		public string Apps { get; set; }
-
-
-		//public string  TableName { get; set; }
-
-		//[DataMember(Order = 2)]
-		//public Dictionary<string, string> Fields { get; set; }
 	}
 
 	[DataContract]
 	public class CreateWebFormTableResponse : IEbSSResponse
 	{
-		[DataMember(Order = 3)]
+		[DataMember(Order = 1)]
 		public ResponseStatus ResponseStatus { get; set; }
 	}
 
-	//================================== GET PARTICULAR RECORD ================================================
+	//================================== GET RECORD FOR RENDERING ================================================
+
 	[DataContract]
-	public class GetRowDataRequest : EbServiceStackAuthRequest
+	public class GetRowDataRequest : EbServiceStackAuthRequest, IReturn<GetRowDataResponse>
 	{
 		[DataMember(Order = 1)]
 		public string RefId { get; set; }
@@ -45,7 +41,68 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public int RowId { get; set; }
 	}
 
-	//======================================= SAVE OR UPDATE RECORD =============================================
+	[DataContract]
+	public class GetRowDataResponse : IEbSSResponse
+	{
+		[DataMember(Order = 1)]
+		public List<Object> RowValues { get; set; }
+
+		[DataMember(Order = 2)]
+		public ResponseStatus ResponseStatus { get; set; }
+	}
 
 
+	[DataContract]
+	public class DoUniqueCheckRequest : EbServiceStackAuthRequest, IReturn<GetRowDataResponse>
+	{
+		[DataMember(Order = 1)]
+		public string TableName { get; set; }
+
+		[DataMember(Order = 2)]
+		public string Field { get; set; }
+
+		[DataMember(Order = 3)]
+		public string Value { get; set; }
+
+		[DataMember(Order = 4)]
+		public string TypeS { get; set; }
+	}
+
+	[DataContract]
+	public class DoUniqueCheckResponse : IEbSSResponse
+	{
+		[DataMember(Order = 1)]
+		public int NoRowsWithSameValue { get; set; }
+
+		[DataMember(Order = 2)]
+		public ResponseStatus ResponseStatus { get; set; }
+	}
+
+	//======================================= INSERT OR UPDATE RECORD =============================================
+
+	[DataContract]
+	public class InsertDataFromWebformRequest : EbServiceStackAuthRequest, IReturn<InsertDataFromWebformResponse>
+	{
+		[DataMember(Order = 1)]
+		public string TableName { get; set; }
+
+		[DataMember(Order = 2)]
+		public Dictionary<string, List<SingleRecordField>> Values { get; set; }
+
+		[DataMember(Order = 3)]
+		public string RefId { get; set; }
+
+		[DataMember(Order = 3)]
+		public int RowId { get; set; }
+	}
+	
+	[DataContract]
+	public class InsertDataFromWebformResponse : IEbSSResponse
+	{
+		[DataMember(Order = 1)]
+		public int RowAffected { get; set; }
+
+		[DataMember(Order = 2)]
+		public ResponseStatus ResponseStatus { get; set; }
+	}
 }
