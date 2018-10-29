@@ -23,7 +23,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class PdfCreateServiceRequest : EbServiceStackAuthRequest, IReturn<PdfCreateServicesResponse>
     {
         [DataMember(Order = 1)]
-        public int Id { get; set; }
+        public int ObjId { get; set; }
 
         [DataMember(Order =2)]
         public List<Param> Params { get; set; }
