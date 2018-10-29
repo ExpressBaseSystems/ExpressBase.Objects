@@ -78,6 +78,27 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public ResponseStatus ResponseStatus { get; set; }
 	}
 
+	[DataContract]
+	public class GetDictionaryValueRequest : EbServiceStackAuthRequest, IReturn<GetDictionaryValueResponse>
+	{
+		[DataMember(Order = 1)]
+		public List<string> Keys { get; set; }
+
+		[DataMember(Order = 2)]
+		public string Locale { get; set; }
+	}
+
+	[DataContract]
+	public class GetDictionaryValueResponse : IEbSSResponse
+	{
+		[DataMember(Order = 1)]
+		public Dictionary<string, string> Dict { get; set; }
+
+		[DataMember(Order = 2)]
+		public ResponseStatus ResponseStatus { get; set; }
+	}
+
+
 	//======================================= INSERT OR UPDATE RECORD =============================================
 
 	[DataContract]

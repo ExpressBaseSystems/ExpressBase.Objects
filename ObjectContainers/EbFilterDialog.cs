@@ -22,6 +22,8 @@ namespace ExpressBase.Objects
 
         private List<Param> _paramlist = new List<Param>();
 
+        public bool IsRenderMode { get; set; }
+
         public List<Param> GetDefaultParams()
         {
             foreach (EbControl c in this.Controls)
@@ -69,7 +71,7 @@ namespace ExpressBase.Objects
 
         public override string GetHtml()
         {
-            string html = string.Empty;
+            string html = "<form id='@ebsid@' IsRenderMode='@rmode@' ebsid='@ebsid@' class='formB-box form-buider-form ebcont-ctrl' eb-form='true' ui-inp eb-type='FilterDialog' @tabindex@>";
 
             foreach (EbControl c in this.Controls)
                 html += c.GetHtml();
@@ -77,7 +79,13 @@ namespace ExpressBase.Objects
             html += string.Format("<input type='hidden' name='all_control_names' id='all_control_names' value='{0}' />", string.Join(",", ControlNames));
             html += string.Format("<input type='hidden' name='all_control_cxtnames' id='all_control_cxtnames' value='{0}' />", string.Join(",", ControlctxNames));
 
-            return html;
+            html += "</form>";
+
+            return html
+                .Replace("@name@", this.Name)
+                .Replace("@ebsid@", this.EbSid_CtxId)
+                .Replace("@rmode@", IsRenderMode.ToString())
+                .Replace("@tabindex@", IsRenderMode ? string.Empty : " tabindex='1'");
         }
 
         public IEnumerable<string> ControlNames
