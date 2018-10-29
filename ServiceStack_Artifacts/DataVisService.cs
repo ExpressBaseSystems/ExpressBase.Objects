@@ -154,7 +154,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 15)]
         public string CurrentRowGroup { get; set; }
-       
+
+        [DataMember(Order = 16)]
+        public string dvRefId { get; set; }
+
     }
 
     [Route("/table")]
@@ -295,6 +298,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 12)]
         public EbDataVisualization EbDataVisualization { get; set; }
+
+        [DataMember(Order = 13)]
+        public User UserInfo { get; set; }
     }
 
     public class FormulaPart
