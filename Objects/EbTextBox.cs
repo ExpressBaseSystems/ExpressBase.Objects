@@ -277,7 +277,7 @@ else {
             get
             {
                 return @"
-            <textarea id='@name@' name='@name@' rows='@RowsVisible@' autocomplete = '@AutoCompleteOff ' data-toggle='tooltip' title='@ToolTipText ' 
+            <textarea id='@ebsid@' ui-inp name='@name@' rows='@RowsVisible@' autocomplete = '@AutoCompleteOff ' data-toggle='tooltip' title='@ToolTipText ' 
                 @tabIndex @MaxLength  style='width:100%; height:@heightpx; @BackColor @ForeColor display:inline-block; @fontStyle @ReadOnlyString  @Required  @PlaceHolder  @Text  @TabIndex></textarea>"
 .Replace("@name@", this.Name)
 .Replace("@ebsid@", this.EbSid_CtxId)
