@@ -82,7 +82,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 	public class GetDictionaryValueRequest : EbServiceStackAuthRequest, IReturn<GetDictionaryValueResponse>
 	{
 		[DataMember(Order = 1)]
-		public List<string> Keys { get; set; }
+		public string[] Keys { get; set; }
 
 		[DataMember(Order = 2)]
 		public string Locale { get; set; }
