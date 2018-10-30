@@ -1,5 +1,6 @@
 ﻿using ExpressBase.Common.Constants;
 using ExpressBase.Common.Data;
+using ExpressBase.Common.EbServiceStack.ReqNRes;
 using ExpressBase.Common.ServiceClients;
 using ServiceStack;
 using ServiceStack.Logging;
@@ -32,6 +33,8 @@ namespace ExpressBase.Objects.Services
                 return _infraConnectionFactory;
             }
         }
+
+        protected EbMqResponse MqResponse { get; set; }
 
         public EbMqBaseService()
         {
