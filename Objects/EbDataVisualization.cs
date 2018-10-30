@@ -366,6 +366,7 @@ namespace ExpressBase.Objects
         public bool DisableRowGrouping { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
+        [HideForUser]
         public string SecondaryTableMapField { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
