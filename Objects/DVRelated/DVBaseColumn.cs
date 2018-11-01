@@ -371,11 +371,14 @@ else{
         [HideInPropertyGrid]
         public override EbDbTypes Type { get; set; }
 
+        private CultureInfo cultureInfo = null;
         public override CultureInfo GetColumnCultureInfo(CultureInfo user_cultureinfo)
         {
-            var cultureInfo = user_cultureinfo.Clone() as CultureInfo;
-
-            cultureInfo.NumberFormat.NumberDecimalDigits = this.DecimalPlaces;
+            if (cultureInfo == null)
+            {
+                cultureInfo = user_cultureinfo.Clone() as CultureInfo;
+                cultureInfo.NumberFormat.NumberDecimalDigits = this.DecimalPlaces;
+            }
 
             return cultureInfo;
         }
