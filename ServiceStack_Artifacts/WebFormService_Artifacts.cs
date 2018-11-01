@@ -113,7 +113,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		[DataMember(Order = 3)]
 		public string RefId { get; set; }
 
-		[DataMember(Order = 3)]
+		[DataMember(Order = 4)]
 		public int RowId { get; set; }
 	}
 	
@@ -125,5 +125,54 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 		[DataMember(Order = 2)]
 		public ResponseStatus ResponseStatus { get; set; }
+	}
+
+
+	//=============================================== AUDIT TRAIL ====================================================
+
+	[DataContract]
+	public class GetAuditTrailRequest : EbServiceStackAuthRequest, IReturn<GetAuditTrailResponse>
+	{
+		[DataMember(Order = 1)]
+		public string FormId { get; set; }
+
+		[DataMember(Order = 2)]
+		public int RowId { get; set; }
+	}
+
+	[DataContract]
+	public class GetAuditTrailResponse : IEbSSResponse
+	{
+		[DataMember(Order = 1)]
+		public Dictionary<int, FormTransaction> Logs { get; set; }
+
+		[DataMember(Order = 2)]
+		public ResponseStatus ResponseStatus { get; set; }
+	}
+
+	[DataContract]
+	public class FormTransaction
+	{
+		[DataMember(Order = 1)]
+		public string CreatedBy;
+
+		[DataMember(Order = 2)]
+		public string CreatedAt;
+
+		[DataMember(Order = 3)]
+		public List<FormTransactionLine> Details;
+	}
+
+	[DataContract]
+	public class FormTransactionLine
+	{
+		[DataMember(Order = 1)]
+		public string FieldName;
+
+		[DataMember(Order = 2)]
+		public string OldValue;
+
+		[DataMember(Order = 3)]
+		public string NewValue;
 	}
 }
