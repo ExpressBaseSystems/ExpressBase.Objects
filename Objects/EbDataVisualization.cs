@@ -681,6 +681,10 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Parent.Columns")]
         public List<DVBaseColumn> RowGrouping { get; set; }
 
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Parent.Columns")]
+        public List<DVBaseColumn> OrderBy { get; set; }
+
         public RowGroupParent()
         {
             this.RowGrouping = new List<DVBaseColumn>();

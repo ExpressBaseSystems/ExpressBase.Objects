@@ -298,10 +298,6 @@ namespace ExpressBase.Objects.Objects.DVRelated
         }
     }
 
-    //public class DVNonVisibleColumnCollection : List<string>
-    //{
-
-    //}
 
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
     [Alias("DVStringColumnAlias")]
@@ -321,12 +317,6 @@ else{
     pg.ShowProperty('LinkType');
     }")]
         public StringRenderType RenderAs { get; set; }
-
-
-        //[EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
-        //[PropertyEditor(PropertyEditorType.ObjectSelector)]
-        //[OSE_ObjectTypes(EbObjectTypes.iTableVisualization, EbObjectTypes.iChartVisualization, EbObjectTypes.iReport)]
-        //public string LinkRefId { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [DefaultPropValue("16")]
@@ -361,11 +351,6 @@ else{
     }")]
         public NumericRenderType RenderAs { get; set; }
 
-        //[EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
-        //[PropertyEditor(PropertyEditorType.ObjectSelector)]
-        //[OSE_ObjectTypes(EbObjectTypes.iTableVisualization, EbObjectTypes.iChartVisualization, EbObjectTypes.iReport)]
-        //public string LinkRefId { get; set; }
-
         [EnableInBuilder(BuilderType.DVBuilder)]
         [DefaultPropValue("7")]
         [HideInPropertyGrid]
@@ -386,6 +371,9 @@ else{
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.DropDown)]
         public NumericOperators DefaultOperator { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public bool SuppresIfZero { get; set; }
     }
 
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
@@ -423,11 +411,6 @@ else{
     pg.ShowProperty('LinkType');
     }")]
         public DateTimeRenderType RenderAs { get; set; }
-
-        //[EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
-        //[PropertyEditor(PropertyEditorType.ObjectSelector)]
-        //[OSE_ObjectTypes(EbObjectTypes.iTableVisualization, EbObjectTypes.iChartVisualization, EbObjectTypes.iReport)]
-        //public string LinkRefId { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [DefaultPropValue("5")]
