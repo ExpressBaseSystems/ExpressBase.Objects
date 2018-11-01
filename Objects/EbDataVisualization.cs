@@ -401,7 +401,6 @@ namespace ExpressBase.Objects
         {
             this.RowGroupCollection = new List<RowGroupParent>();
 			this.NotVisibleColumns = new List<DVBaseColumn>();
-            //this.NonVisibleColumns = new DVNonVisibleColumnCollection();
             this.CurrentRowGroup = new RowGroupParent();
             this.OrderBy = new List<DVBaseColumn>();
         }
@@ -688,6 +687,7 @@ namespace ExpressBase.Objects
         public RowGroupParent()
         {
             this.RowGrouping = new List<DVBaseColumn>();
+            this.OrderBy = new List<DVBaseColumn>();
         }
     }
 
