@@ -405,7 +405,6 @@ namespace ExpressBase.Objects
             this.OrderBy = new List<DVBaseColumn>();
         }
 
-
         public override string DiscoverRelatedRefids()
         {
             string refids = "";
