@@ -38,8 +38,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 3)]
         public ResponseStatus ResponseStatus { get; set; }
     }
-
-    public class GetAllFromAppStoreRequest : EbServiceStackAuthRequest, IReturn<GetAllFromAppstoreResponse>
+    public class GetAllFromAppStoreInternalRequest : EbServiceStackAuthRequest, IReturn<GetAllFromAppstoreResponse>
+    {
+    }
+    public class GetAllFromAppStoreExternalRequest : EbServiceStackAuthRequest, IReturn<GetAllFromAppstoreResponse>
     {
     }
 
