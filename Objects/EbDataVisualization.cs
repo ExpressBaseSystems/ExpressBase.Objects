@@ -366,6 +366,7 @@ namespace ExpressBase.Objects
         public bool DisableRowGrouping { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
+        [HideForUser]
         public string SecondaryTableMapField { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
@@ -400,7 +401,6 @@ namespace ExpressBase.Objects
         {
             this.RowGroupCollection = new List<RowGroupParent>();
 			this.NotVisibleColumns = new List<DVBaseColumn>();
-            //this.NonVisibleColumns = new DVNonVisibleColumnCollection();
             this.CurrentRowGroup = new RowGroupParent();
             this.OrderBy = new List<DVBaseColumn>();
         }
@@ -680,9 +680,14 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Parent.Columns")]
         public List<DVBaseColumn> RowGrouping { get; set; }
 
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Parent.Columns")]
+        public List<DVBaseColumn> OrderBy { get; set; }
+
         public RowGroupParent()
         {
             this.RowGrouping = new List<DVBaseColumn>();
+            this.OrderBy = new List<DVBaseColumn>();
         }
     }
 

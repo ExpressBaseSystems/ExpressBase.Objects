@@ -78,6 +78,27 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public ResponseStatus ResponseStatus { get; set; }
 	}
 
+	[DataContract]
+	public class GetDictionaryValueRequest : EbServiceStackAuthRequest, IReturn<GetDictionaryValueResponse>
+	{
+		[DataMember(Order = 1)]
+		public string[] Keys { get; set; }
+
+		[DataMember(Order = 2)]
+		public string Locale { get; set; }
+	}
+
+	[DataContract]
+	public class GetDictionaryValueResponse : IEbSSResponse
+	{
+		[DataMember(Order = 1)]
+		public Dictionary<string, string> Dict { get; set; }
+
+		[DataMember(Order = 2)]
+		public ResponseStatus ResponseStatus { get; set; }
+	}
+
+
 	//======================================= INSERT OR UPDATE RECORD =============================================
 
 	[DataContract]
@@ -92,7 +113,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		[DataMember(Order = 3)]
 		public string RefId { get; set; }
 
-		[DataMember(Order = 3)]
+		[DataMember(Order = 4)]
 		public int RowId { get; set; }
 	}
 	
@@ -104,5 +125,54 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 		[DataMember(Order = 2)]
 		public ResponseStatus ResponseStatus { get; set; }
+	}
+
+
+	//=============================================== AUDIT TRAIL ====================================================
+
+	[DataContract]
+	public class GetAuditTrailRequest : EbServiceStackAuthRequest, IReturn<GetAuditTrailResponse>
+	{
+		[DataMember(Order = 1)]
+		public string FormId { get; set; }
+
+		[DataMember(Order = 2)]
+		public int RowId { get; set; }
+	}
+
+	[DataContract]
+	public class GetAuditTrailResponse : IEbSSResponse
+	{
+		[DataMember(Order = 1)]
+		public Dictionary<int, FormTransaction> Logs { get; set; }
+
+		[DataMember(Order = 2)]
+		public ResponseStatus ResponseStatus { get; set; }
+	}
+
+	[DataContract]
+	public class FormTransaction
+	{
+		[DataMember(Order = 1)]
+		public string CreatedBy;
+
+		[DataMember(Order = 2)]
+		public string CreatedAt;
+
+		[DataMember(Order = 3)]
+		public List<FormTransactionLine> Details;
+	}
+
+	[DataContract]
+	public class FormTransactionLine
+	{
+		[DataMember(Order = 1)]
+		public string FieldName;
+
+		[DataMember(Order = 2)]
+		public string OldValue;
+
+		[DataMember(Order = 3)]
+		public string NewValue;
 	}
 }

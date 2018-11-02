@@ -555,8 +555,37 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
+    public class LocationInfoTenantRequest : IReturn<LocationInfoTenantResponse>, IEbSSRequest
+    {
+        [DataMember(Order = 1)]
+        public string DbName { get; set; }
+
+        public string Token { get; set; }
+
+        public string SolnId { get; set; }
+
+        public int UserId { get; set; }
+    }
+
+    [DataContract]
+    public class LocationInfoTenantResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public Dictionary<int, EbLocation> Locations { get; set; }
+
+        [DataMember(Order = 1)]
+        public List<EbLocationCustomField> Config { get; set; }
+
+        [DataMember(Order = 3)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    [DataContract]
     public class UpdateSolutionRequest : IReturn<UpdateSolutionResponse>, IEbSSRequest
     {
+        [DataMember(Order = 1)]
+        public string DbName { get; set; }
+
         public string SolnId { get; set; }
 
         public int UserId { get; set; }

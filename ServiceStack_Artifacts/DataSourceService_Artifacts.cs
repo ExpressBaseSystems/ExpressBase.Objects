@@ -244,7 +244,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 10)]
         //public LevelInfoCollection Levels { get; set; }
         public List<GroupingDetails> Levels { get; set; }
-        
+
+        [DataMember(Order = 11)]
+        public List<string> Permission { get; set; }
+
     }
 
     [DataContract]

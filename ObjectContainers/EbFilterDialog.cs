@@ -22,6 +22,8 @@ namespace ExpressBase.Objects
 
         private List<Param> _paramlist = new List<Param>();
 
+        public bool IsRenderMode { get; set; }
+
         public List<Param> GetDefaultParams()
         {
             foreach (EbControl c in this.Controls)
@@ -47,7 +49,7 @@ namespace ExpressBase.Objects
                     }
                     //_p.Type = Convert.ToInt32((EbDbType)((c as EbComboBox).ValueMember.Type));
                 }
-                if(c is EbUserLocation)
+                if (c is EbUserLocation)
                 {
                     _p.Value = "0";
                     _p.Type = "11";
@@ -69,15 +71,20 @@ namespace ExpressBase.Objects
 
         public override string GetHtml()
         {
-            string html = string.Empty;
-
+            string html = this.IsRenderMode ? string.Empty : "<form id='@ebsid@' IsRenderMode='@rmode@' ebsid='@ebsid@' class='formB-box form-buider-form ebcont-ctrl' eb-form='true' ui-inp eb-type='FilterDialog' @tabindex@>";
             foreach (EbControl c in this.Controls)
                 html += c.GetHtml();
 
             html += string.Format("<input type='hidden' name='all_control_names' id='all_control_names' value='{0}' />", string.Join(",", ControlNames));
             html += string.Format("<input type='hidden' name='all_control_cxtnames' id='all_control_cxtnames' value='{0}' />", string.Join(",", ControlctxNames));
 
-            return html;
+            html += this.IsRenderMode ? string.Empty : "</form>";
+
+            return html
+                .Replace("@name@", this.Name)
+                .Replace("@ebsid@", this.EbSid_CtxId)
+                .Replace("@rmode@", IsRenderMode.ToString())
+                .Replace("@tabindex@", IsRenderMode ? string.Empty : " tabindex='1'");
         }
 
         public IEnumerable<string> ControlNames
@@ -107,7 +114,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.FilterDialog)]
         public int Width { get; set; }
 
-     
+
         public override void ReplaceRefid(Dictionary<string, string> RefidMap)
         {
             foreach (EbControl control in Controls)
@@ -140,7 +147,7 @@ namespace ExpressBase.Objects
                         refids += _prop.GetValue(control, null).ToString() + ",";
                 }
             }
-            Console.WriteLine(this.RefId +"-->" + refids);
+            Console.WriteLine(this.RefId + "-->" + refids);
             return refids;
         }
     }
