@@ -240,17 +240,11 @@ $('#{0}').mask('SZZZZZZZZZZZ', {
 
         private string GetHtmlHelper(RenderMode mode)
         {
-            return (
-                HtmlConstants.CONTROL_WRAPER_HTML4WEB
-.Replace("@barehtml@", this.GetBareHtml())
-.Replace("@name@", this.Name)
-.Replace("@ebsid@", this.EbSid)
-.Replace("@type@", this.ObjType))
+            string EbCtrlHTML = HtmlConstants.CONTROL_WRAPER_HTML4WEB
+               .Replace("@LabelForeColor ", "color:" + (LabelForeColor ?? "@LabelForeColor ") + ";")
+               .Replace("@LabelBackColor ", "background-color:" + (LabelBackColor ?? "@LabelBackColor ") + ";");
 
-    .Replace("@LabelForeColor ", "color:" + (LabelForeColor ?? "@LabelForeColor ") + ";")
-    .Replace("@LabelBackColor ", "background-color:" + (LabelBackColor ?? "@LabelBackColor ") + ";")
-    .Replace("@HelpText@ ", (HelpText ?? ""))
-    .Replace("@Label@ ", (Label ?? ""));
+            return ReplacePropsInHTML(EbCtrlHTML);
         }
 
         //        private string GetHtmlHelper(RenderMode mode)

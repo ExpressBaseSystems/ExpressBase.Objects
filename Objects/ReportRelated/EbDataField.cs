@@ -151,7 +151,7 @@ namespace ExpressBase.Objects.ReportRelated
             string returnValue = System.Convert.ToBase64String(toEncodeAsBytes);
             int type = Convert.ToInt32(LinkRefid.Split("-")[2]);
             if (type == 3)
-                _ref = "/ReportRender/Renderlink?refid=" + LinkRefid + "&Params=" + returnValue;
+                _ref = "/ReportRender/Renderlink?refid=" + LinkRefid + "&_params=" + returnValue;
             else if (type == 16 || type == 17)
                 _ref = "/DV/renderlink?_refid=" + LinkRefid + "&Params=" + returnValue;
             Anchor anchor = new Anchor(phrase)
