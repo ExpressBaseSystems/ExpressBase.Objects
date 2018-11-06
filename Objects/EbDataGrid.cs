@@ -1,4 +1,5 @@
-﻿using ExpressBase.Common.Extensions;
+﻿using ExpressBase.Common;
+using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
@@ -11,11 +12,11 @@ using System.Text;
 namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
-    public class EbDataGrid : EbControlUI
+    public class EbDataGrid : EbControlContainer
     {
         public EbDataGrid()
         {
-            Columns = new List<EbDGColumn>();
+            this.Controls = new List<EbControl>();
         }
 
         [OnDeserialized]
@@ -27,7 +28,11 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
         [PropertyEditor(PropertyEditorType.Collection)]
-        public List<EbDGColumn> Columns { get; set; }
+        [Alias("Columns")]
+        [ListType(typeof(EbDGColumn))]
+        public override List<EbControl> Controls { get; set; }
+
+        public List<List<SingleRecordField>> Rows { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
         [PropertyGroup("test")]
@@ -37,14 +42,31 @@ namespace ExpressBase.Objects
         [PropertyGroup("test")]
         public bool IsAddable { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm)]
-        [PropertyGroup("Data")]
-        [HelpText("Name Of database-table Which you want to store Data collected using this DataGrid")]
-        public virtual string TableName { get; set; }
-
         public override string GetToolHtml()
         {
             return @"<div eb-type='@toolName' class='tool'><i class='fa fa-table'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
+        }
+        public override string GetBareHtml()
+        {
+            string html = @"
+<div id='add_@ebsid@' class='btn btn-info pull-right btn-sm'>ADD <span class='fa fa-plus'></span></div>
+<div class='grid-cont'>
+    <table id='tbl_@ebsid@' class='table table-bordered'>
+        <thead>
+          <tr>";
+            foreach (EbDGColumn col in Controls)
+            {
+                html += string.Concat("<th>", col.Title, "</th>");
+            }
+
+            html += @"
+          </tr>
+        </thead>
+    </thead>
+    <tbody>
+    </table>
+</div>";
+            return html;
         }
 
         public override string GetDesignHtml()
@@ -64,19 +86,12 @@ namespace ExpressBase.Objects
 
     [UsedWithTopObjectParent(typeof(EbObject))]
     [HideInPropertyGrid]
-    public abstract class EbDGColumn
+    public abstract class EbDGColumn : EbControl
     {
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
-        public string Name { get; set; }
-
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
-        public string EbSid { get; set; }
-
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
-        public virtual EbDbTypes EbDbTypes { get; set; }
-
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
         public string Title { get; set; }
+
+        public virtual string InputControlType { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
         public bool IsEditable { get; set; }
@@ -89,7 +104,9 @@ namespace ExpressBase.Objects
     public class EbDGStringColumn : EbDGColumn
     {
         [HideInPropertyGrid]
-        public override EbDbTypes EbDbTypes { get { return EbDbTypes.String; } }
+        public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
+
+        public override  string InputControlType { get { return "EbTextBox"; } }
     }
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
@@ -98,7 +115,9 @@ namespace ExpressBase.Objects
     public class EbDGNumericColumn : EbDGColumn
     {
         [HideInPropertyGrid]
-        public override EbDbTypes EbDbTypes { get { return EbDbTypes.Decimal; } }
+        public override EbDbTypes EbDbType { get { return EbDbTypes.Decimal; } }
+
+        public override string InputControlType { get { return "EbNumeric"; } }
     }
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
@@ -107,7 +126,9 @@ namespace ExpressBase.Objects
     public class EbDGBooleanColumn : EbDGColumn
     {
         [HideInPropertyGrid]
-        public override EbDbTypes EbDbTypes { get { return EbDbTypes.Boolean; } }
+        public override EbDbTypes EbDbType { get { return EbDbTypes.Boolean; } }
+
+        public override string InputControlType { get { return "EbCheckBox"; } }
     }
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
@@ -116,6 +137,8 @@ namespace ExpressBase.Objects
     public class EbDGDateColumn : EbDGColumn
     {
         [HideInPropertyGrid]
-        public override EbDbTypes EbDbTypes { get { return EbDbTypes.Date; } }
+        public override EbDbTypes EbDbType { get { return EbDbTypes.Date; } }
+
+        public override string InputControlType { get { return "EbDate"; } }
     }
 }
