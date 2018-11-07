@@ -49,9 +49,12 @@ namespace ExpressBase.Objects
         public override string GetBareHtml()
         {
             string html = @"
-<div id='add_@ebsid@' class='btn btn-info pull-right btn-sm'>ADD <span class='fa fa-plus'></span></div>
+<div id='add_@ebsid@' class='btn btn-info pull-right btn-sm' state='add'>
+    <div class='add-div'>ADD <span class='fa fa-plus'></span></div>
+    <div class='cancel-div'>Cancel <span class='fa fa-times'></span></div>
+</div>
 <div class='grid-cont'>
-    <table id='tbl_@ebsid@' class='table table-bordered'>
+    <table id='tbl_@ebsid@' class='table table-bordered dgtbl'>
         <thead>
           <tr>";
             foreach (EbDGColumn col in Controls)
@@ -60,10 +63,26 @@ namespace ExpressBase.Objects
             }
 
             html += @"
+            <th><span class='fa fa-cogs'></span></th>
           </tr>
         </thead>
     </thead>
-    <tbody>
+    <tbody>";
+            // need optimization
+            if (Rows != null)
+            {
+                foreach (List<SingleRecordField> row in Rows)
+                {
+                    html += @"<tr added='false'>";
+                    foreach (SingleRecordField td in row)
+                    {
+                        html += string.Concat("<td>", td.Value, "</td>");
+                    }
+                    html += @"</tr>";
+                }
+            }
+            html += @"
+    </tbody>
     </table>
 </div>";
             return html;
@@ -106,7 +125,7 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
 
-        public override  string InputControlType { get { return "EbTextBox"; } }
+        public override string InputControlType { get { return "EbTextBox"; } }
     }
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]

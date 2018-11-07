@@ -103,7 +103,19 @@ this.Init = function(id)
 	{
 		public EbCheckBox() { }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+        [JsonIgnore]
+        public override string GetValueJSfn
+        {
+            get
+            {
+                return @"
+                    return $('#' + this.EbSid_CtxId).is(':checked');
+                ";
+            }
+            set { }
+        }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
 		public override string Label { get; set; }
 
 		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
@@ -114,8 +126,8 @@ this.Init = function(id)
 
 		public override string GetBareHtml()
 		{
-			return @"<div><input class='bot-checkbox' type ='checkbox' value='@value@' id='@name@' name='@gname@'> <span id='@name@Lbl' style='@LabelBackColor @LabelForeColor '> @label@  </span><br></div>"
-.Replace("@name@", this.Name)
+			return @"<div><input class='bot-checkbox' type ='checkbox' value='@value@' id='@ebsid@' name='@gname@'> <span id='@name@Lbl' style='@LabelBackColor @LabelForeColor '> @label@  </span><br></div>"
+.Replace("@ebsid@", String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId)
 .Replace("@gname@", this.GName)
 .Replace("@label@", this.Label)
 .Replace("@label@", this.Value);
