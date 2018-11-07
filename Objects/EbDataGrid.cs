@@ -49,10 +49,6 @@ namespace ExpressBase.Objects
         public override string GetBareHtml()
         {
             string html = @"
-<div id='add_@ebsid@' class='btn btn-info pull-right btn-sm' state='add'>
-    <div class='add-div'>ADD <span class='fa fa-plus'></span></div>
-    <div class='cancel-div'>Cancel <span class='fa fa-times'></span></div>
-</div>
 <div class='grid-cont'>
     <table id='tbl_@ebsid@' class='table table-bordered dgtbl'>
         <thead>
@@ -73,7 +69,7 @@ namespace ExpressBase.Objects
             {
                 foreach (List<SingleRecordField> row in Rows)
                 {
-                    html += @"<tr added='false'>";
+                    //html += @"<tr added='false' row-id='" + +"'>";// include rowid
                     foreach (SingleRecordField td in row)
                     {
                         html += string.Concat("<td>", td.Value, "</td>");
