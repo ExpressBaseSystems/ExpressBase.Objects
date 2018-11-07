@@ -24,8 +24,8 @@ namespace ExpressBase.Objects
 
     public enum TextMode
     {
-        SingleLine = 2,
-        Email = 0,
+        SingleLine = 0,
+        Email = 2,
         Password = 1,
         Color = 3,
         MultiLine = 4
@@ -247,7 +247,7 @@ else {
 .Replace("@AutoCompleteOff ", (this.AutoCompleteOff || this.TextMode.ToString().ToLower() == "password") ? "off" : "on")
     .Replace("@BackColor ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor ") + ";"))
     .Replace("@ForeColor ", "color:" + ((this.ForeColor != null) ? this.ForeColor : "@ForeColor ") + ";")
-    .Replace("@Text ", "value='" + ((this.Text != null) ? this.Text : "@Text ") + "' ")
+    .Replace("@Text ", "value='" + (String.IsNullOrEmpty(this.Text) ? this.Text : "@Text ") + "' ")
 
 .Replace("@attachedLblClose@", (this.TextMode == TextMode.SingleLine) ? string.Empty : "</div>")
 .Replace("@attachedLbl@", (this.TextMode != TextMode.SingleLine) ?
