@@ -180,7 +180,7 @@ $('#@id').MonthPicker({ StartYear: 2018, ShowIcon: false });"
 .Replace("@name@", (this.Name != null ? this.Name.Trim() : ""))
 .Replace("@data-ebtype@", "6")//( (int)this.EbDateType ).ToString())
 .Replace("@toolTipText@", this.ToolTipText)
-.Replace("@ebsid@", EbSid_CtxId)
+.Replace("@ebsid@", String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId)
 .Replace("@autoComplete@", this.AutoCompleteOff ? "off" : "on")
 .Replace("@value@", "")//"value='" + this.Value + "'")
 .Replace("@tabIndex@", "tabindex='" + this.TabIndex + "'")

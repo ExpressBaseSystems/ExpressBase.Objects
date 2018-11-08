@@ -235,7 +235,7 @@ else {
             <input type='@TextMode '  data-ebtype='@data-ebtype@' ui-inp id='@ebsid@' name='@name@' autocomplete = '@AutoCompleteOff ' data-toggle='tooltip' title='@ToolTipText ' 
 @tabIndex @MaxLength  style='width:100%; height:@heightpx; @BackColor @ForeColor display:inline-block; @fontStyle @ReadOnlyString  @Required  @PlaceHolder  @Text  @TabIndex  />
         @attachedLblClose@"
-.Replace("@ebsid@", this.EbSid_CtxId)
+.Replace("@ebsid@", String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId)
 .Replace("@name@", this.EbSid_CtxId)
 .Replace("@data-ebtype@", "16")//( (int)this.EbDateType ).ToString())
 .Replace("@MaxLength ", "maxlength='" + ((this.MaxLength > 0) ? this.MaxLength.ToString() : "@MaxLength") + "'")
@@ -280,7 +280,7 @@ else {
             <textarea id='@ebsid@' ui-inp name='@name@' rows='@RowsVisible@' autocomplete = '@AutoCompleteOff ' data-toggle='tooltip' title='@ToolTipText ' 
                 @tabIndex @MaxLength  style='width:100%; height:@heightpx; @BackColor @ForeColor display:inline-block; @fontStyle @ReadOnlyString  @Required  @PlaceHolder  @Text  @TabIndex></textarea>"
 .Replace("@name@", this.Name)
-.Replace("@ebsid@", this.EbSid_CtxId)
+.Replace("@ebsid@", String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId)
 .Replace("@MaxLength ", "maxlength='" + ((this.MaxLength > 0) ? this.MaxLength.ToString() : "@MaxLength") + "'")
 .Replace("@Required ", (this.Required && !this.Hidden ? " required" : string.Empty))
 .Replace("@ReadOnlyString ", this.ReadOnlyString)
