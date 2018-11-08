@@ -220,7 +220,7 @@ $('#{0}').mask('SZZZZZZZZZZZ', {
                         <input type='text' data-ebtype='@datetype@' class='numinput' ui-inp id='@ebsid@' name='@name@' value='@value@' @placeHolder autocomplete = '@autoComplete@' data-toggle='tooltip' title='@toolTipText@' style=' width:100%; @backColor@ @foreColor@ @fontStyle@ display:inline-block; @readOnlyString@ @required@ @tabIndex@ />
                 </div>"
 .Replace("@name@", this.Name)
-.Replace("@ebsid@", this.EbSid_CtxId)
+.Replace("@ebsid@", String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@": this.EbSid_CtxId)
 .Replace("@toolTipText@", this.ToolTipText)
 .Replace("@autoComplete@", this.AutoCompleteOff ? "off" : "on")
 .Replace("@value@", "")//"value='" + this.Value + "'")
