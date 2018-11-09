@@ -258,8 +258,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int Direction { get; set; }
     }
 
-    [Route("/table")]
-    [Route("/table/data/{RefId}")]
+    
     [DataContract]
     public class InlineTableDataRequest : IReturn<DataSourceDataResponse>, IEbSSRequest
     {

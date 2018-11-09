@@ -24,8 +24,8 @@ namespace ExpressBase.Objects
 
     public enum TextMode
     {
-        SingleLine = 2,
-        Email = 0,
+        SingleLine = 0,
+        Email = 2,
         Password = 1,
         Color = 3,
         MultiLine = 4
@@ -235,7 +235,7 @@ else {
             <input type='@TextMode '  data-ebtype='@data-ebtype@' ui-inp id='@ebsid@' name='@name@' autocomplete = '@AutoCompleteOff ' data-toggle='tooltip' title='@ToolTipText ' 
 @tabIndex @MaxLength  style='width:100%; height:@heightpx; @BackColor @ForeColor display:inline-block; @fontStyle @ReadOnlyString  @Required  @PlaceHolder  @Text  @TabIndex  />
         @attachedLblClose@"
-.Replace("@ebsid@", this.EbSid_CtxId)
+.Replace("@ebsid@", String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId)
 .Replace("@name@", this.EbSid_CtxId)
 .Replace("@data-ebtype@", "16")//( (int)this.EbDateType ).ToString())
 .Replace("@MaxLength ", "maxlength='" + ((this.MaxLength > 0) ? this.MaxLength.ToString() : "@MaxLength") + "'")
@@ -247,7 +247,7 @@ else {
 .Replace("@AutoCompleteOff ", (this.AutoCompleteOff || this.TextMode.ToString().ToLower() == "password") ? "off" : "on")
     .Replace("@BackColor ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor ") + ";"))
     .Replace("@ForeColor ", "color:" + ((this.ForeColor != null) ? this.ForeColor : "@ForeColor ") + ";")
-    .Replace("@Text ", "value='" + ((this.Text != null) ? this.Text : "@Text ") + "' ")
+    .Replace("@Text ", "value='" + (String.IsNullOrEmpty(this.Text) ? this.Text : "@Text ") + "' ")
 
 .Replace("@attachedLblClose@", (this.TextMode == TextMode.SingleLine) ? string.Empty : "</div>")
 .Replace("@attachedLbl@", (this.TextMode != TextMode.SingleLine) ?
@@ -280,7 +280,7 @@ else {
             <textarea id='@ebsid@' ui-inp name='@name@' rows='@RowsVisible@' autocomplete = '@AutoCompleteOff ' data-toggle='tooltip' title='@ToolTipText ' 
                 @tabIndex @MaxLength  style='width:100%; height:@heightpx; @BackColor @ForeColor display:inline-block; @fontStyle @ReadOnlyString  @Required  @PlaceHolder  @Text  @TabIndex></textarea>"
 .Replace("@name@", this.Name)
-.Replace("@ebsid@", this.EbSid_CtxId)
+.Replace("@ebsid@", String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId)
 .Replace("@MaxLength ", "maxlength='" + ((this.MaxLength > 0) ? this.MaxLength.ToString() : "@MaxLength") + "'")
 .Replace("@Required ", (this.Required && !this.Hidden ? " required" : string.Empty))
 .Replace("@ReadOnlyString ", this.ReadOnlyString)
@@ -307,9 +307,7 @@ else {
         {
             string EbCtrlHTML = HtmlConstants.CONTROL_WRAPER_HTML4WEB
                .Replace("@LabelForeColor ", "color:" + (LabelForeColor ?? "@LabelForeColor ") + ";")
-               .Replace("@LabelBackColor ", "background-color:" + (LabelBackColor ?? "@LabelBackColor ") + ";")
-               .Replace("@HelpText@ ", (HelpText ?? ""))
-               .Replace("@Label@ ", (Label ?? ""));
+               .Replace("@LabelBackColor ", "background-color:" + (LabelBackColor ?? "@LabelBackColor ") + ";");
 
             return ReplacePropsInHTML(EbCtrlHTML);
         }

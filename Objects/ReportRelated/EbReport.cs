@@ -12,6 +12,7 @@ using ExpressBase.Common.Structures;
 using ExpressBase.Objects.Objects;
 using ExpressBase.Objects.ReportRelated;
 using ExpressBase.Objects.ServiceStack_Artifacts;
+using ExpressBase.Security;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
@@ -25,6 +26,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -277,7 +279,7 @@ namespace ExpressBase.Objects
         public DateTime CurrentTimestamp { get; set; }
 
         [JsonIgnore]
-        public string UserName { get; set; }
+        public User User { get; set; }
 
         [JsonIgnore]
         public PdfContentByte Canvas { get; set; }
@@ -786,10 +788,12 @@ namespace ExpressBase.Objects
             Stamp.Close();
         }
 
-        public void SetDetail()
+        public void SetDetail(User user)
         {
+            CultureInfo culture = CultureInfo.GetCultureInfo(user.Preference.Locale);
+            string timestamp = String.Format("{0:" + culture.DateTimeFormat.FullDateTimePattern + "}", CurrentTimestamp);
             ColumnText ct = new ColumnText(Canvas);
-            Phrase phrase = new Phrase("page:" + PageNumber.ToString() + ", " + UserName + ", " + CurrentTimestamp);
+            Phrase phrase = new Phrase("page:" + PageNumber.ToString() + ", " + user.FullName + ", " + timestamp);
             phrase.Font.Size = 6;
             ct.SetSimpleColumn(phrase, 5, 2, WidthPt - 10, 20, 15, Element.ALIGN_RIGHT);
             ct.Go();

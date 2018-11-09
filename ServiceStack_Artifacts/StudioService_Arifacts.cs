@@ -544,6 +544,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 20)]
         public EbObj_Dashboard Dashboard_Tiles { get; set; }
+
+        [DataMember(Order =21)]
+        public string DisplayName { get; set; }
+
         public EbObjectWrapper() { }
     }
 

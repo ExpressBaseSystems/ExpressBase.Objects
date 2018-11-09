@@ -114,6 +114,8 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.FilterDialog)]
         public int Width { get; set; }
 
+        [EnableInBuilder(BuilderType.FilterDialog)]
+        public bool AutoRun { get; set; }
 
         public override void ReplaceRefid(Dictionary<string, string> RefidMap)
         {
@@ -134,6 +136,7 @@ namespace ExpressBase.Objects
                 }
             }
         }
+
         public override string DiscoverRelatedRefids()
         {
             var x = this.RefId;
