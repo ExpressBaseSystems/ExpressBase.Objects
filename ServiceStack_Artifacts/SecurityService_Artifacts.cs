@@ -579,10 +579,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 	//USER GROUP STRAT--------------------------------------
 	[DataContract]
 	public class GetManageUserGroupRequest : IReturn<GetManageUserGroupResponse>, IEbSSRequest
-	{
-		
+	{		
 		[DataMember(Order = 1)]
 		public int id { get; set; }
+
+		[DataMember(Order = 2)]
+		public string Timezone { get; set; }
 
 		public string Token { get; set; }
 
@@ -642,6 +644,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public string DtConstraintOld { get; set; }
 
 		[DataMember(Order = 9)]
+		public string UsersTimezone { get; set; }
+
+		[DataMember(Order = 10)]
 		public string SolnId { get; set; }
 
 		public int UserId { get; set; }

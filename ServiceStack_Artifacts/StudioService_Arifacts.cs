@@ -248,6 +248,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public string Name { get; set; }
 
+        public string DisplayName { get; set; }
+
         public string Description { get; set; }
 
         public string Json { get; set; }
@@ -284,6 +286,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int EbObjectType { get; set; }
 
         public string Name { get; set; }
+
+        public string DisplayName { get; set; }
 
         public string Description { get; set; }
 
@@ -368,6 +372,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string RefId { get; set; } // (Id == 0) First Commit else Subsequent Commit
 
         public string Name { get; set; }
+
+        public string DisplayName { get; set; }
 
         public int EbObjectType { get; set; }
 
