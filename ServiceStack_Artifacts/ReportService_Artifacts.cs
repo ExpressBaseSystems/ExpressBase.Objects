@@ -2,6 +2,7 @@
 using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
 using ExpressBase.Common.Structures;
+using ExpressBase.Security;
 using ServiceStack;
 using System;
 using System.Collections.Generic;
@@ -15,7 +16,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         public string Refid { get; set; }
 
-        public string Fullname { get; set; }
+        public User User { get; set; }
 
         public List<Param> Params { get; set; }
     }
