@@ -676,6 +676,9 @@ namespace ExpressBase.Objects
         public string Name { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
+        public string DisplayName { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Parent.Columns")]
         public List<DVBaseColumn> RowGrouping { get; set; }
 

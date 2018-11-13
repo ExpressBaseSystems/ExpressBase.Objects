@@ -118,6 +118,14 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 	}
 	
 	[DataContract]
+	public class WebformData 
+	{
+		public Dictionary<string, List<SingleRecordField>> FormData { get; set; }
+        
+		public Dictionary<string, List<Dictionary<string, List<SingleRecordField>>>> GridData { get; set; }
+	}
+	
+	[DataContract]
 	public class InsertDataFromWebformResponse : IEbSSResponse
 	{
 		[DataMember(Order = 1)]

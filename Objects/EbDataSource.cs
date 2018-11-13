@@ -17,18 +17,17 @@ using System.Threading.Tasks;
 namespace ExpressBase.Objects
 {
 
-    public class EbDataSourceMain : EbObject {
+    public abstract class EbDataSourceMain : EbObject {
 
+        [EnableInBuilder(BuilderType.DataReader, BuilderType.DataWriter, BuilderType.SqlFunctions)]
+        [HideInPropertyGrid]
+        [JsonConverter(typeof(Base64Converter))]
+        public string Sql { get; set; }
     }
 
     [EnableInBuilder(BuilderType.DataReader)]
     public class EbDataReader : EbDataSourceMain
     {
-        [EnableInBuilder(BuilderType.DataReader,BuilderType.DataWriter)]
-        [HideInPropertyGrid]
-        [JsonConverter(typeof(Base64Converter))]
-        public string Sql { get; set; }
-
         [EnableInBuilder(BuilderType.DataReader)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iFilterDialog)]
@@ -103,21 +102,17 @@ namespace ExpressBase.Objects
     }
 
     [EnableInBuilder(BuilderType.DataWriter)]
-    public class EbDataWriter: EbDataReader
+    public class EbDataWriter: EbDataSourceMain
     {
         [EnableInBuilder(BuilderType.DataWriter)]
         [HideInPropertyGrid]
         List<InputParam> InputParams { get; set; }
     }
 
-    [ProtoBuf.ProtoContract]
-    public class EbSqlFunction : EbObject
+    [EnableInBuilder(BuilderType.SqlFunctions)]
+    public class EbSqlFunction : EbDataSourceMain
     {
-        [ProtoBuf.ProtoMember(1)]
-        public string Sql { get; set; }
-
-        [ProtoBuf.ProtoMember(2)]
-        public int FilterDialogId { get; set; }
+        
     }
 
     [ProtoBuf.ProtoContract]
