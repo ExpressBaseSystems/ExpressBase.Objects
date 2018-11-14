@@ -45,7 +45,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 	public class GetRowDataResponse : IEbSSResponse
 	{
 		[DataMember(Order = 1)]
-		public List<Object> RowValues { get; set; }
+		public WebformData FormData { get; set; }
 
 		[DataMember(Order = 2)]
 		public ResponseStatus ResponseStatus { get; set; }
@@ -108,21 +108,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public string TableName { get; set; }
 
 		[DataMember(Order = 2)]
-		public Dictionary<string, List<SingleRecordField>> Values { get; set; }
+		public WebformData FormData { get; set; }
 
 		[DataMember(Order = 3)]
 		public string RefId { get; set; }
 
 		[DataMember(Order = 4)]
 		public int RowId { get; set; }
-	}
-	
-	[DataContract]
-	public class WebformData 
-	{
-		public Dictionary<string, List<SingleRecordField>> FormData { get; set; }
-        
-		public Dictionary<string, List<Dictionary<string, List<SingleRecordField>>>> GridData { get; set; }
 	}
 	
 	[DataContract]
