@@ -86,6 +86,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class InitialSolutionConnectionsRequest : EbServiceStackAuthRequest, IReturn<InitialSolutionConnectionsResponse>
     {
         public string NewSolnId { get; set; }
+
+        [DataMember(Order = 2)]
+        public EbDbUsers DbUsers { get; set; }
     }
 
     public class InitialSolutionConnectionsResponse : IEbSSResponse

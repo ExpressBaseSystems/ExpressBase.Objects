@@ -32,7 +32,9 @@ namespace ExpressBase.Objects
         [ListType(typeof(EbDGColumn))]
         public override List<EbControl> Controls { get; set; }
 
-        public List<List<SingleRecordField>> Rows { get; set; }
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        [HideInPropertyGrid]
+        public List<List<SinglColumn>> Rows { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
         [PropertyGroup("test")]
@@ -67,10 +69,10 @@ namespace ExpressBase.Objects
             // need optimization
             if (Rows != null)
             {
-                foreach (List<SingleRecordField> row in Rows)
+                foreach (List<SinglColumn> row in Rows)
                 {
                     //html += @"<tr added='false' row-id='" + +"'>";// include rowid
-                    foreach (SingleRecordField td in row)
+                    foreach (SinglColumn td in row)
                     {
                         html += string.Concat("<td>", td.Value, "</td>");
                     }
