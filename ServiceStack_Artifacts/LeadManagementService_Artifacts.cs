@@ -384,19 +384,19 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public string Created_Date { get; set; }
 
 		[DataMember(Order = 7)]
-		public int ExtractBy { get; set; }
+		public int Extract_By { get; set; }
 
 		[DataMember(Order = 8)]
-		public int ImplantBy { get; set; }
+		public int Implant_By { get; set; }
 
 		[DataMember(Order = 9)]
-		public int ConsentBy { get; set; }
+		public int Consent_By { get; set; }
 
 		[DataMember(Order = 10)]
-		public int AnaesthesiaBy { get; set; }
+		public int Anaesthesia_By { get; set; }
 
 		[DataMember(Order = 11)]
-		public int PostBriefBy { get; set; }
+		public int Post_Brief_By { get; set; }
 
 		[DataMember(Order = 12)]
 		public int Nurse { get; set; }
