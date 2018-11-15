@@ -86,6 +86,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		[DataMember(Order = 20)]
 		public int RespMode { get; set; }
 
+		[DataMember(Order = 21)]
+		public Dictionary<string, int> NurseDict { get; set; }
+
 	}
 
 	[DataContract]
@@ -355,6 +358,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 		[DataMember(Order = 12)]
 		public string Created_By { get; set; }
+
+		[DataMember(Order = 13)]
+		public bool PDC { get; set; }//Post Dated Cheque
 	}
 
 	public class SurgeryEntry
@@ -369,13 +375,30 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public string Branch { get; set; }
 
 		[DataMember(Order = 4)]
-		public string Account_Code { get; set; }
+		public int Account_Code { get; set; }
 
 		[DataMember(Order = 5)]
 		public string Created_By { get; set; }
 
-		[DataMember(Order = 5)]
+		[DataMember(Order = 6)]
 		public string Created_Date { get; set; }
 
+		[DataMember(Order = 7)]
+		public int ExtractBy { get; set; }
+
+		[DataMember(Order = 8)]
+		public int ImplantBy { get; set; }
+
+		[DataMember(Order = 9)]
+		public int ConsentBy { get; set; }
+
+		[DataMember(Order = 10)]
+		public int AnaesthesiaBy { get; set; }
+
+		[DataMember(Order = 11)]
+		public int PostBriefBy { get; set; }
+
+		[DataMember(Order = 12)]
+		public int Nurse { get; set; }
 	}
 }
