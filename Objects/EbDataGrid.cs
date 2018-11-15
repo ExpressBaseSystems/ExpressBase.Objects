@@ -19,6 +19,9 @@ namespace ExpressBase.Objects
             this.Controls = new List<EbControl>();
         }
 
+        [EnableInBuilder(BuilderType.WebForm)]
+        public override bool IsSpecialContainer { get { return true; } set { } }
+
         [OnDeserialized]
         public void OnDeserializedMethod(StreamingContext context)
         {
@@ -32,9 +35,9 @@ namespace ExpressBase.Objects
         [ListType(typeof(EbDGColumn))]
         public override List<EbControl> Controls { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
-        [HideInPropertyGrid]
-        public List<List<SinglColumn>> Rows { get; set; }
+        //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        //[HideInPropertyGrid]
+        //public List<List<SinglColumn>> Rows { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
         [PropertyGroup("test")]
@@ -67,18 +70,18 @@ namespace ExpressBase.Objects
     </thead>
     <tbody>";
             // need optimization
-            if (Rows != null)
-            {
-                foreach (List<SinglColumn> row in Rows)
-                {
-                    //html += @"<tr added='false' row-id='" + +"'>";// include rowid
-                    foreach (SinglColumn td in row)
-                    {
-                        html += string.Concat("<td>", td.Value, "</td>");
-                    }
-                    html += @"</tr>";
-                }
-            }
+            //if (Rows != null)
+            //{
+            //    foreach (List<SinglColumn> row in Rows)
+            //    {
+            //        //html += @"<tr added='false' row-id='" + +"'>";// include rowid
+            //        foreach (SinglColumn td in row)
+            //        {
+            //            html += string.Concat("<td>", td.Value, "</td>");
+            //        }
+            //        html += @"</tr>";
+            //    }
+            //}
             html += @"
     </tbody>
     </table>
