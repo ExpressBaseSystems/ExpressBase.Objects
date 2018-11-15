@@ -700,7 +700,7 @@ namespace ExpressBase.Objects
             if (field is EbDataField)
             {
                 EbDataField field_org = field as EbDataField;
-                if (PageSummaryFields.ContainsKey(field.Name) || ReportSummaryFields.ContainsKey(field.EbSid))
+                if (PageSummaryFields.ContainsKey(field.Name) || ReportSummaryFields.ContainsKey(field.Name))
                     CallSummerize(field_org, serialnumber);
                 if (AppearanceScriptCollection.ContainsKey(field.Name))
                     RunAppearanceExpression(field_org, serialnumber);
