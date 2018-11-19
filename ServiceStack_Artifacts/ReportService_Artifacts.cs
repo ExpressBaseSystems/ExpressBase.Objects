@@ -61,4 +61,16 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 4)]
         public ResponseStatus ResponseStatus { get; set; }
     }
+
+    public class ReportInternalRequest : EbServiceStackAuthRequest, IReturn<ReportRenderResponse>
+    {
+        [DataMember(Order = 1)]
+        public EbJobArguments JobArgs { get; set; }
+    }
+
+    public class ReportInternalResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
 }
