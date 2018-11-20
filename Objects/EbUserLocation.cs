@@ -22,7 +22,7 @@ namespace ExpressBase.Objects.Objects
         public List<EbSimpleSelectOption> Options { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
-        public override EbDbTypes EbDbType { get { return EbDbTypes.Decimal; } }
+        public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
 
         [EnableInBuilder(BuilderType.FilterDialog)]
         [DefaultPropValue("eb_location_id")]
@@ -41,20 +41,21 @@ namespace ExpressBase.Objects.Objects
             get
             {
                 return @"
-                    return $('#' + this.EbSid_CtxId + ' option:selected').val();
+                    return $('#' + this.EbSid_CtxId).val().toString();
                 ";
             }
             set { }
         }
 
-        public void InitFromDataBase(JsonServiceClient ServiceClient, User _user, Eb_Solution _sol)
+        public void InitFromDataBase(JsonServiceClient ServiceClient, User _user, Eb_Solution _sol, string ParentRefid)
         {
             string _html = string.Empty;
             try
             {
-                if (_user.LocationIds.Contains(-1))
+                List<int> locations = _user.GetLocationsByObject(ParentRefid);
+                if (locations.Contains(-1))
                 {
-                    Console.WriteLine("Location: Only -1 " + _user.LocationIds.ToString());
+                    Console.WriteLine("Location: Only -1 " + locations.ToString());
                     if (_sol == null)
                     {
                         Console.WriteLine("Solution null");
@@ -70,8 +71,8 @@ namespace ExpressBase.Objects.Objects
                 }
                 else
                 {
-                    Console.WriteLine("Location:  " + _user.LocationIds.ToString());
-                    foreach (int loc in _user.LocationIds)
+                    Console.WriteLine("Location:  " + locations.ToString());
+                    foreach (int loc in locations)
                     {
                         _html += string.Format("<option value='{0}'>{1}</option>", _sol.Locations[loc].LocId, _sol.Locations[loc].ShortName);
                     }
@@ -102,7 +103,7 @@ namespace ExpressBase.Objects.Objects
         public override string GetBareHtml()
         {
             return @"
-        <select id='@ebsid@' name='@name@' data-ebtype='@data-ebtype@' style='width: 100%;'>
+        <select id='@ebsid@' name='@name@' data-ebtype='@data-ebtype@' style='width: 100%;' class='multiselect-ui form-control' multiple='multiple'>
             @options@
         </select>"
 .Replace("@name@", this.Name)
