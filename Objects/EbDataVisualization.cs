@@ -109,7 +109,7 @@ namespace ExpressBase.Objects
         [CEOnSelectFn(@";
             this.bVisible = true;
             NonVC = Parent.NotVisibleColumns.$values;
-            let  idx = NonVC.indexOf(this);
+            let  idx = NonVC.findIndex(x => x.name === this.name);
             if(idx > -1)
                 NonVC.splice(idx, 1);")]
         [CEOnDeselectFn(@"
