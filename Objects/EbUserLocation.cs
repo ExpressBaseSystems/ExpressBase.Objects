@@ -29,6 +29,10 @@ namespace ExpressBase.Objects.Objects
         [PropertyEditor(PropertyEditorType.Label)]
         public override string Name { get; set; }
 
+        [EnableInBuilder(BuilderType.FilterDialog)]
+        public bool  LoadCurrentLocation { get; set; }
+        
+
         public EbUserLocation()
         {
             this.Options = new List<EbSimpleSelectOption>();
@@ -41,7 +45,26 @@ namespace ExpressBase.Objects.Objects
             get
             {
                 return @"
-                    return $('#' + this.EbSid_CtxId).val().toString();
+                    var value = $('#' + this.EbSid_CtxId).val();
+                    if(value !== null)
+                        return value.toString();
+                    else
+                        return null;
+                ";
+            }
+            set { }
+        }
+
+        public override string SetValueJSfn 
+        {
+            get
+            {
+                return @"
+                    $('#' + this.EbSid_CtxId).next('div').children().find('.active').children().find('input').trigger('click');
+                    var arr = p1.split(',');
+                    $.each(arr, function(i, val){
+                        $('#' + this.EbSid_CtxId).next('div').children().find('[value='+val+']').trigger('click');
+                    }.bind(this));
                 ";
             }
             set { }
