@@ -53,7 +53,7 @@ namespace ExpressBase.Objects
         public override string GetHtml()
         {
             string html = @"
-            <div id='@name@' ebsid='@ebsid@' class='Eb-ctrlContainer ebcont-ctrl' ctype='@objtype@'>
+            <div id='cont_@ebsid@' ebsid='@ebsid@' class='Eb-ctrlContainer ebcont-ctrl' ctype='@objtype@'>
                 <div class='gb-wraper'>
                     <span class='gb-label' ui-label>@glabel@</span>
                     <div class='gb-border'>
@@ -64,7 +64,7 @@ namespace ExpressBase.Objects
 
             return (html + "</div></div></div>")
                 .Replace("@name@", this.Name)
-                .Replace("@ebsid@", this.EbSid)
+                .Replace("@ebsid@", this.EbSid_CtxId)
                 .Replace("@glabel@", this.Label)
                 .Replace("@objtype@", this.ObjType);
         }
