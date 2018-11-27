@@ -24,4 +24,27 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 1)]
         public ResponseStatus ResponseStatus { get; set; }
     }
+
+    public class JsonTable
+    {
+        public string TableName { set; get; }
+
+        public List<JsonColVal> Rows { set; get; }
+
+        public JsonTable()
+        {
+            this.Rows = new List<JsonColVal>();
+        }
+    }
+
+    public class JsonColVal:Dictionary<string, dynamic>
+    {
+
+    }
+
+    public static class SqlConstants
+    {
+        public const string SQL_FUNC_HEADER = @"CREATE OR REPLACE FUNCTION {0}(insert_json,update_json) RETURNS void LANGUAGE {1} AS $BODY$"; 
+
+    }
 }
