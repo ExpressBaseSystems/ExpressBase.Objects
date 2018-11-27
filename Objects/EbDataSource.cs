@@ -112,7 +112,79 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.SqlFunctions)]
     public class EbSqlFunction : EbDataSourceMain
     {
-        
+        [JsonIgnore]
+        public WebformData FormData { set; get; }
+
+        [JsonIgnore]
+        public List<JsonTable> JsonColoumsInsert { get; set; }
+
+        [JsonIgnore]
+        public List<JsonTable> JsonColoumsUpdate { get; set; }
+
+        public EbSqlFunction(){ }
+
+        public EbSqlFunction(WebformData data) {
+            this.FormData = data;
+            this.GenJsonColumns();
+            this.Sql = this.GenSqlFunc();
+        }
+
+        private void GenJsonColumns()
+        {
+            this.JsonColoumsInsert = new List<JsonTable>();
+            this.JsonColoumsUpdate = new List<JsonTable>();
+
+            foreach (KeyValuePair<string, SingleTable> kp in this.FormData.MultipleTables)
+            {
+                List<JsonColVal> insertcols = new List<JsonColVal>();
+                List<JsonColVal> updatecols = new List<JsonColVal>();
+
+                foreach (SingleRow _row in kp.Value)
+                {
+                    JsonColVal jsoncols_ins = new JsonColVal();
+                    JsonColVal jsoncols_upd = new JsonColVal();
+
+                    if (_row.IsUpdate)
+                        updatecols.Add(this.GetCols(jsoncols_upd, _row));
+                    else
+                        insertcols.Add(this.GetCols(jsoncols_ins, _row));
+                }
+                if (insertcols.Count > 0)
+                {
+                    this.JsonColoumsInsert.Add(new JsonTable
+                    {
+                        TableName = kp.Key,
+                        Rows = insertcols
+                    });
+                }
+                if (updatecols.Count > 0)
+                {
+                    this.JsonColoumsUpdate.Add(new JsonTable
+                    {
+                        TableName = kp.Key,
+                        Rows = updatecols
+                    });
+                }
+            }
+        }
+
+        private JsonColVal GetCols(JsonColVal col, SingleRow row)
+        {
+           foreach (SingleColumn _cols in row.Columns)
+            {
+                col.Add(_cols.Name, _cols.Value);
+            }
+            return col;
+        }
+
+        private string GenSqlFunc()
+        {
+            StringBuilder qry = new StringBuilder();
+            qry.AppendFormat(SqlConstants.SQL_FUNC_HEADER, this.FormData.Name, "'plpgsql'");
+            qry.Append("DECLARE temp_table jsonb; _row jsonb; BEGIN");
+
+            return qry.ToString();
+        }
     }
 
     [ProtoBuf.ProtoContract]

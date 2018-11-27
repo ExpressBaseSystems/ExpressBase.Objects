@@ -75,7 +75,7 @@ namespace ExpressBase.Objects.Objects
             string _html = string.Empty;
             try
             {
-                List<int> locations = _user.GetLocationsByObject(ParentRefid);
+                List<int> locations = (ParentRefid == null) ? new List<int> { -1} : _user.GetLocationsByObject(ParentRefid);
                 if (locations.Contains(-1))
                 {
                     Console.WriteLine("Location: Only -1 " + locations.ToString());
