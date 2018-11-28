@@ -115,6 +115,18 @@ this.Init = function(id)
             set { }
         }
 
+        [JsonIgnore]
+        public override string SetValueJSfn
+        {
+            get
+            {
+                return @"
+                    return $('#' + this.EbSid_CtxId).prop('checked', p1 ==='true');
+                ";
+            }
+            set { }
+        }
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
 		public override string Label { get; set; }
 
