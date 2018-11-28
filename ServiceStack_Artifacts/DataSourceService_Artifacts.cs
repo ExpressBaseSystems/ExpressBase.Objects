@@ -248,6 +248,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 11)]
         public List<string> Permission { get; set; }
 
+        [DataMember(Order = 12)]
+        public Dictionary<int, List<object>> Summary { get; set; }
+
     }
 
     [DataContract]

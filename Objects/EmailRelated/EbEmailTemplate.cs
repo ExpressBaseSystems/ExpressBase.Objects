@@ -38,15 +38,19 @@ namespace ExpressBase.Objects.EmailRelated
         public EmailPriority Priority { get; set; }      
 
         [EnableInBuilder(BuilderType.EmailBuilder)]
+        [HideInPropertyGrid]
         public string Subject { get; set; }
 
         [EnableInBuilder(BuilderType.EmailBuilder)]
+        [HideInPropertyGrid]
         public string To { get; set; }
 
         [EnableInBuilder(BuilderType.EmailBuilder)]
+        [HideInPropertyGrid]
         public string Cc { get; set; }
 
         [EnableInBuilder(BuilderType.EmailBuilder)]
+        [HideInPropertyGrid]
         public string Bcc { get; set; }
 
         [EnableInBuilder(BuilderType.EmailBuilder)]
