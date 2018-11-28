@@ -131,7 +131,8 @@ namespace ExpressBase.Objects.Objects
         <select id='@ebsid@' name='@name@' data-ebtype='@data-ebtype@' style='width: 100%;' class='multiselect-ui form-control' multiple='multiple'>
             @options@
         </select>
-        <input type='checkbox' id='@ebsid@_checkbox' value='-1' class='userloc-checkbox'>Global"
+        <div id='@ebsid@_checkbox_div'>
+        <input type='checkbox' id='@ebsid@_checkbox' value='-1' class='userloc-checkbox'>Global</div>"
 .Replace("@name@", this.Name)
 .Replace("@ebsid@", this.EbSid_CtxId)
 .Replace("@options@", this.OptionHtml)
