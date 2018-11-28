@@ -16,7 +16,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         public string Refid { get; set; }
 
-        public User User { get; set; }
+        public User RenderingUser { get; set; }
+
+        public User ReadingUser { get; set; }
 
         public List<Param> Params { get; set; }
     }
@@ -62,7 +64,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-    public class ReportInternalRequest : EbServiceStackAuthRequest, IReturn<ReportRenderResponse>
+    public class ReportInternalRequest1 : EbServiceStackAuthRequest, IReturn<ReportRenderResponse>
     {
         [DataMember(Order = 1)]
         public EbJobArguments JobArgs { get; set; }
