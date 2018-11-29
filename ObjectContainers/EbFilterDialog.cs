@@ -40,14 +40,14 @@ namespace ExpressBase.Objects
                 else if ((c as EbDate).ShowDateAs_ == DateShowFormat.Year_Month_Date)
                     val = "01-01-2018";
                 Param _p = new Param { Name = c.Name, Type = Convert.ToInt32(c.EbDbType).ToString(), Value = val };
-                if (c is EbComboBox)
+                if (c is EbPowerSelect)
                 {
-                    if ((c as EbComboBox).EbDbType.ToString() == "String")
+                    if ((c as EbPowerSelect).EbDbType.ToString() == "String")
                     {
                         _p.Value = "0";
                         _p.Type = "16";
                     }
-                    //_p.Type = Convert.ToInt32((EbDbType)((c as EbComboBox).ValueMember.Type));
+                    //_p.Type = Convert.ToInt32((EbDbType)((c as EbPowerSelect).ValueMember.Type));
                 }
                 if (c is EbUserLocation)
                 {

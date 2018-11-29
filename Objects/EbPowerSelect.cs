@@ -24,11 +24,11 @@ namespace ExpressBase.Objects
     }
 
     [ProtoBuf.ProtoContract]
-    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-    public class EbComboBox : EbControlUI
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+    public class EbPowerSelect : EbControlUI
     {
 
-        public EbComboBox() { }
+        public EbPowerSelect() { }
 
         [OnDeserialized]
         public void OnDeserializedMethod(StreamingContext context)

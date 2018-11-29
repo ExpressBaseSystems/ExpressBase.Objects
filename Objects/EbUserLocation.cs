@@ -45,7 +45,7 @@ namespace ExpressBase.Objects.Objects
             get
             {
                 return @"
-                    var value = $('#' + this.EbSid_CtxId).val();
+                    var value =( $('#' + this.EbSid_CtxId+'_checkbox').prop('checked') ) ?  -1 : $('#' + this.EbSid_CtxId).val();
                     if(value !== null)
                         return value.toString();
                     else
@@ -60,11 +60,13 @@ namespace ExpressBase.Objects.Objects
             get
             {
                 return @"
-                    $('#' + this.EbSid_CtxId).next('div').children().find('.active').children().find('input').trigger('click');
-                    var arr = p1.split(',');
-                    $.each(arr, function(i, val){
-                        $('#' + this.EbSid_CtxId).next('div').children().find('[value='+val+']').trigger('click');
-                    }.bind(this));
+                    if(p1 !== '-1'){
+                        $('#' + this.EbSid_CtxId).next('div').children().find('.active').children().find('input').trigger('click');
+                        var arr = p1.split(',');
+                        $.each(arr, function(i, val){
+                            $('#' + this.EbSid_CtxId).next('div').children().find('[value='+val+']').trigger('click');
+                        }.bind(this));
+                    }
                 ";
             }
             set { }
@@ -128,7 +130,9 @@ namespace ExpressBase.Objects.Objects
             return @"
         <select id='@ebsid@' name='@name@' data-ebtype='@data-ebtype@' style='width: 100%;' class='multiselect-ui form-control' multiple='multiple'>
             @options@
-        </select>"
+        </select>
+        <div id='@ebsid@_checkbox_div'>
+        <input type='checkbox' id='@ebsid@_checkbox' value='-1' class='userloc-checkbox'>Global</div>"
 .Replace("@name@", this.Name)
 .Replace("@ebsid@", this.EbSid_CtxId)
 .Replace("@options@", this.OptionHtml)
