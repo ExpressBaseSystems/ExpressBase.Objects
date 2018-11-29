@@ -11,7 +11,7 @@ using System.Text;
 
 namespace ExpressBase.Objects
 {
-    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
     public class EbDataGrid : EbControlContainer
     {
         public EbDataGrid()
@@ -19,7 +19,7 @@ namespace ExpressBase.Objects
             this.Controls = new List<EbControl>();
         }
 
-        [EnableInBuilder(BuilderType.WebForm)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         public override bool IsSpecialContainer { get { return true; } set { } }
 
         [OnDeserialized]
@@ -29,17 +29,17 @@ namespace ExpressBase.Objects
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.Collection)]
         [Alias("Columns")]
         [ListType(typeof(EbDGColumn))]
         public override List<EbControl> Controls { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyGroup("test")]
         public bool IsEditable { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyGroup("test")]
         public bool IsAddable { get; set; }
 
@@ -92,17 +92,17 @@ namespace ExpressBase.Objects
     [HideInPropertyGrid]
     public abstract class EbDGColumn : EbControl
     {
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         public string Title { get; set; }
 
         public virtual string InputControlType { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         public bool IsEditable { get; set; }
 
     }
 
-    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
     [Alias("String Column")]
     [UsedWithTopObjectParent(typeof(EbObject))]
     public class EbDGStringColumn : EbDGColumn
@@ -113,7 +113,7 @@ namespace ExpressBase.Objects
         public override string InputControlType { get { return "EbTextBox"; } }
     }
 
-    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
     [Alias("Numeric Column")]
     [UsedWithTopObjectParent(typeof(EbObject))]
     public class EbDGNumericColumn : EbDGColumn
@@ -124,7 +124,7 @@ namespace ExpressBase.Objects
         public override string InputControlType { get { return "EbNumeric"; } }
     }
 
-    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
     [Alias("Boolean Column")]
     [UsedWithTopObjectParent(typeof(EbObject))]
     public class EbDGBooleanColumn : EbDGColumn
@@ -135,7 +135,7 @@ namespace ExpressBase.Objects
         public override string InputControlType { get { return "EbCheckBox"; } }
     }
 
-    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
     [Alias("Date Column")]
     [UsedWithTopObjectParent(typeof(EbObject))]
     public class EbDGDateColumn : EbDGColumn

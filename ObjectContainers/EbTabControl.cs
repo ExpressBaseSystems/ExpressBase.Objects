@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace ExpressBase.Objects
 {
-    [EnableInBuilder(BuilderType.WebForm)]
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
     public class EbTabControl : EbControlContainer
     {
         public EbTabControl()
@@ -48,14 +48,14 @@ namespace ExpressBase.Objects
         [OnChangeUIFunction("")]
         public override string Label { get => base.Label; set => base.Label = value; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyGroup("Test")]
         [OnChangeUIFunction("EbTabControl.padding")]
         [UIproperty]
         [DefaultPropValue("3")]
         public int Padding { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.Collection)]
         [Alias("TabCollection")]
         [PropertyGroup("test")]
@@ -105,7 +105,7 @@ this.Init = function(id)
         }
     }
 
-    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
     [HideInToolBox]
     public class EbTabPane : EbControlContainer
     {
@@ -115,7 +115,7 @@ this.Init = function(id)
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [HideInPropertyGrid]
         public override List<EbControl> Controls { get; set; }
 

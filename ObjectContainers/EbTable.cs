@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace ExpressBase.Objects
 {
-    [EnableInBuilder(BuilderType.WebForm)]
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
     public class EbTableLayout : EbControlContainer
     {
 
@@ -27,7 +27,7 @@ namespace ExpressBase.Objects
             }
         }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.Collection)]
         [Alias("Columns")]
         [ListType(typeof(EbTableTd))]
@@ -35,54 +35,54 @@ namespace ExpressBase.Objects
 
         public override string Label { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.Expandable)]
         [PropertyGroup("Test")]
         public Position Position { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.Collection)]
         [PropertyGroup("Test")]
         public List<EbTableTd> CollEdtProp { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc)]
         [PropertyGroup("Test")]
         public List<EbTableTd> CollFrmSrc { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrcPG)]
         [PropertyGroup("Test")]
         public List<EbTableTd> ColumnsR { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.String)]
         [PropertyGroup("Test")]
         public string doc { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.ImageSeletor)]
         [PropertyGroup("Test")]
         public string AImg { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyGroup("Test")]
         [OnChangeUIFunction("EbTable.padding")]
         [DefaultPropValue("3")]
         [UIproperty]
         public int Padding { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.CollectionA2C)]
         [PropertyGroup("Test")]
         public List<EbTableTd> propA2C { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.Collection)]
         [PropertyGroup("Test")]
         public List<EbDataVisualization> Visualizations { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [PropertyGroup("Test")]
         [DefaultPropValue("eb_roby_dev-eb_roby_dev-3-671-1325")]
@@ -145,7 +145,7 @@ this.Init = function(id)
         }
     }
 
-    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
     [HideInToolBox]
     public class EbTableTd : EbControlContainer
     {
@@ -155,10 +155,10 @@ this.Init = function(id)
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         public float WidthPercentage { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [HideInPropertyGrid]
         public override List<EbControl> Controls { get; set; }
 
@@ -190,15 +190,15 @@ this.Init = function(id)
     }
 }
 
-[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
 public class Position
 {
 
-    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
     [PropertyEditor(PropertyEditorType.Number)]
     public int X { get; set; }
 
-    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
     [PropertyEditor(PropertyEditorType.Number)]
     public int Y { get; set; }
 

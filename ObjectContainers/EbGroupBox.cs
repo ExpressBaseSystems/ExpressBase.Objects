@@ -7,7 +7,7 @@ using System.Text;
 
 namespace ExpressBase.Objects
 {
-    [EnableInBuilder(BuilderType.WebForm)]
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
     class EbGroupBox : EbControlContainer
     {
         public EbGroupBox()
@@ -28,12 +28,12 @@ namespace ExpressBase.Objects
             }
         }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [UIproperty]
         [OnChangeUIFunction("Common.LABEL")]
         public override string Label { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyGroup("Test")]
         [OnChangeUIFunction("EbGroupBox.padding")]
         [UIproperty]

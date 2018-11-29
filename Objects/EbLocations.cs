@@ -8,15 +8,15 @@ using System.Text;
 
 namespace ExpressBase.Objects
 {
-    [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
     public class EbLocations : EbControlUI
 	{
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.Collection)]
         public List<EbLocationCard> LocationCollection { get; set; }
 
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.Boolean)]
         public bool showTabed { get; set; }
 
@@ -156,20 +156,20 @@ this.Init = function(id)
 
     /// ////////////////////////////////
 
-    [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
     [HideInToolBox]
     public class EbLocationCard : EbControlUI
 	{
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.Expandable)]
         public LatLng Position { get; set; }
         //public LatLng Lat_Long { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
         public string ContentHTML { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
         public string ShortName { get; set; }
 
         public EbLocationCard() { }
@@ -197,16 +197,16 @@ this.Init = function(id)
         }
     }
 
-    [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
     public class LatLng
     {
         public LatLng() { }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.Number)]
         public Decimal Latitude { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.Number)]
         public Decimal Longitude { get; set; }
 
