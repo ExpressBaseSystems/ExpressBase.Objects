@@ -173,7 +173,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.CollectionProp, "Columns", "bVisible")]
-        public DVColumnCollection Columns8
+        public DVColumnCollection Columns
         {
             get { return this.EbPowerSelect.Columns; }
             set { this.EbPowerSelect.Columns = value; }
