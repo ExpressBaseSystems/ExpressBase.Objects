@@ -374,6 +374,10 @@ namespace ExpressBase.Objects
         public bool DisableCopy { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
+        [HideForUser]
+        public bool AllowMultilineHeader { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
         public List<DVBaseColumn> OrderBy { get; set; }
 
