@@ -123,7 +123,42 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 	}
 
-	[DataContract]
+    [DataContract]
+    public class GetImageInfoRequest : IReturn<GetImageInfoResponse>, IEbSSRequest
+    {
+        [DataMember(Order = 1)]
+        public int CustomerId { get; set; }
+
+        [DataMember(Order = 2)]
+        public string SolnId { get; set; }
+
+        public int UserId { get; set; }
+    }
+
+    [DataContract]
+    public class GetImageInfoResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public List<FileMetaInfo> Data { get; set; }
+
+        [DataMember(Order = 3)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    public class FileMetaInfo
+    {
+        public string FileName { get; set; }
+
+        public int FileSize { get; set; }
+
+        public int FileRefId { get; set; }
+
+        public Dictionary<string,List<string>> Meta { set; get; }
+
+        public string UploadTime { get; set; }
+    }
+
+    [DataContract]
 	public class SaveCustomerFollowupRequest : IReturn<SaveCustomerFollowupResponse>, IEbSSRequest
 	{
 		[DataMember(Order = 1)]
