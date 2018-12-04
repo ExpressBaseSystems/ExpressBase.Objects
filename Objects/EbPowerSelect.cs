@@ -48,7 +48,7 @@ namespace ExpressBase.Objects
             set { }
         }
 
-        public override string ClearJSfn 
+        public override string ClearJSfn
         {
             get
             {
@@ -60,10 +60,11 @@ namespace ExpressBase.Objects
         }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        public override EbDbTypes EbDbType {
+        public override EbDbTypes EbDbType
+        {
             get
             {
-                return (this.MultiSelect) ? EbDbTypes.String:  EbDbTypes.Decimal;
+                return (this.MultiSelect) ? EbDbTypes.String : EbDbTypes.Decimal;
             }
             set { }
         }
@@ -183,7 +184,7 @@ namespace ExpressBase.Objects
             {
                 int noOfFileds = this.DisplayMembers.Count;
                 int i = 0;
-                string rs = "<div id='@ebsid@Wraper' class='search-wraper' data-toggle='tooltip' title='@tooltipText'>";
+                string rs = "<div id='@ebsid@Wraper' class='search-wraper' data-toggle='tooltip' title='@tooltipText@'>";
                 foreach (DVBaseColumn obj in this.DisplayMembers)
                 {
                     rs += @"
@@ -309,7 +310,7 @@ namespace ExpressBase.Objects
     .Replace("@width", 900.ToString())//this.Width.ToString())
     .Replace("@perWidth", (this.DisplayMembers.Count != 0) ? (900 / this.DisplayMembers.Count).ToString() : 900.ToString())
     .Replace("@DDwidth", (this.DropdownWidth == 0) ? "100" : this.DropdownWidth.ToString())
-    ;
+    .Replace("@tooltipText@", this.ToolTipText ?? string.Empty);
             }
             else
                 return string.Empty;
@@ -319,7 +320,7 @@ namespace ExpressBase.Objects
         {
             string EbCtrlHTML = Helpers.HtmlConstants.CONTROL_WRAPER_HTML4WEB
 .Replace("@Label@ ", ((this.Label != null) ? this.Label : "@Label@ "))
-.Replace("@tooltipText", this.ToolTipText);
+.Replace("@tooltipText@", this.ToolTipText ?? string.Empty);
 
             return ReplacePropsInHTML(EbCtrlHTML);
         }
