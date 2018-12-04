@@ -8,7 +8,7 @@ using System.Text;
 
 namespace ExpressBase.Objects
 {
-    [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
     public class EbInputGeoLocation : EbControlUI
 	{
         public EbInputGeoLocation() { }
@@ -20,11 +20,11 @@ namespace ExpressBase.Objects
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.Expandable)]
         public LatLng Position { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
         public string ContentHTML { get; set; }
 
         public override bool isFullViewContol { get => true; set => base.isFullViewContol = value; }

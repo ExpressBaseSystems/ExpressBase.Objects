@@ -13,7 +13,7 @@ using System.Reflection;
 using System.Runtime.Serialization;
 namespace ExpressBase.Objects
 {
-    [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
     class EbPdfView : EbControlUI
     {
 

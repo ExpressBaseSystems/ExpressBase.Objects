@@ -11,7 +11,7 @@ using System.Reflection;
 using System.Runtime.Serialization;
 namespace ExpressBase.Objects
 {
-    [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
     public class EbImage: EbControlUI
 	{
 
@@ -24,14 +24,14 @@ namespace ExpressBase.Objects
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
         public string ImageID { get; set; }
 
         [EnableInBuilder(BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         public string DataSourceId { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
         public string Alt { get; set; }
 
         public override bool isFullViewContol { get => true; set => base.isFullViewContol = value; }

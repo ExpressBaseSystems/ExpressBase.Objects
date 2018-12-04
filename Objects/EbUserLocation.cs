@@ -96,9 +96,10 @@ namespace ExpressBase.Objects.Objects
                 }
                 else
                 {
-                    Console.WriteLine("Location:  " + locations.ToString());
+                    Console.WriteLine("===========ObjectId: " + ParentRefid + "Locations: ");
                     foreach (int loc in locations)
                     {
+                        Console.WriteLine(loc +":"+ _sol.Locations[loc].LocId +":"+ _sol.Locations[loc].ShortName + "=====");
                         _html += string.Format("<option value='{0}'>{1}</option>", _sol.Locations[loc].LocId, _sol.Locations[loc].ShortName);
                     }
                 }

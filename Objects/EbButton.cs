@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace ExpressBase.Objects
 {
     [ProtoBuf.ProtoContract]
-    [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
     [HideInPropertyGrid]
     [HideInToolBox]
     public class EbButton : EbControlUI
@@ -26,7 +26,7 @@ namespace ExpressBase.Objects
         }
 
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
         [ProtoBuf.ProtoMember(1)]
         [System.ComponentModel.Category("Appearance")]
         public string Text { get; set; }
