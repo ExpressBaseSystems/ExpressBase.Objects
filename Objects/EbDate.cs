@@ -134,8 +134,6 @@ $('#@id').mask('@maskPattern');
     //maxDate:'@minDate',
 //    @dateType
 //});
-
-alert('chinchu');
 $('#@id').MonthPicker({ StartYear: 2018, ShowIcon: false });"
 
 .Replace("@dateType", (this.EbDateType.ToString() == "Date") ? "timepicker:false" : ((this.EbDateType.ToString() == "Time") ? "datepicker:false" : string.Empty))
@@ -186,7 +184,7 @@ $('#@id').MonthPicker({ StartYear: 2018, ShowIcon: false });"
 .Replace("@tabIndex@", "tabindex='" + this.TabIndex + "'")
     .Replace("@BackColor@ ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor@ ") + ";"))
     .Replace("@ForeColor@ ", "color:" + ((this.ForeColor != null) ? this.ForeColor : "@ForeColor@ ") + ";")
-.Replace("@required@", " required")//(this.Required && !this.Hidden ? " required" : string.Empty))
+.Replace("@required@", (this.Required && !this.Hidden ? " required" : string.Empty))
 .Replace("@readOnlyString@", this.ReadOnlyString)
 .Replace("@placeHolder@", "placeholder='" + this.PlaceHolder + "'")
 .Replace("@atchdLbl@", (this.EbDateType.ToString().ToLower() == "time") ? "fa-clock-o" : "fa-calendar")
