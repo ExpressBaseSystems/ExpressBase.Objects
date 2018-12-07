@@ -26,7 +26,7 @@ namespace ExpressBase.Objects.Objects
 
         [EnableInBuilder(BuilderType.FilterDialog)]
         [DefaultPropValue("eb_location_id")]
-        [PropertyEditor(PropertyEditorType.Label)]
+        //[PropertyEditor(PropertyEditorType.Label)]
         public override string Name { get; set; }
 
         [EnableInBuilder(BuilderType.FilterDialog)]
