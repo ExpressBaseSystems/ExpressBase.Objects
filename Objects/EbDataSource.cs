@@ -1,4 +1,5 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Constants;
 using ExpressBase.Common.JsonConverters;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
@@ -17,7 +18,8 @@ using System.Threading.Tasks;
 namespace ExpressBase.Objects
 {
 
-    public abstract class EbDataSourceMain : EbObject {
+    public abstract class EbDataSourceMain : EbObject
+    {
 
         [EnableInBuilder(BuilderType.DataReader, BuilderType.DataWriter, BuilderType.SqlFunctions)]
         [HideInPropertyGrid]
@@ -93,16 +95,16 @@ namespace ExpressBase.Objects
                 EbFilterDialog fd = FilterDialog;
                 if (fd is null)
                 {
-                  //  Console.WriteLine(this.RefId + "-->" + FilterDialogRefId);
-                    return FilterDialogRefId;                    
+                    //  Console.WriteLine(this.RefId + "-->" + FilterDialogRefId);
+                    return FilterDialogRefId;
                 }
             }
-            return "" ;
+            return "";
         }
     }
 
     [EnableInBuilder(BuilderType.DataWriter)]
-    public class EbDataWriter: EbDataSourceMain
+    public class EbDataWriter : EbDataSourceMain
     {
         [EnableInBuilder(BuilderType.DataWriter)]
         [HideInPropertyGrid]
@@ -121,9 +123,10 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         public List<JsonTable> JsonColoumsUpdate { get; set; }
 
-        public EbSqlFunction(){ }
+        public EbSqlFunction() { }
 
-        public EbSqlFunction(WebformData data) {
+        public EbSqlFunction(WebformData data)
+        {
             this.FormData = data;
             this.GenJsonColumns();
             this.Sql = this.GenSqlFunc();
@@ -170,7 +173,7 @@ namespace ExpressBase.Objects
 
         private JsonColVal GetCols(JsonColVal col, SingleRow row)
         {
-           foreach (SingleColumn _cols in row.Columns)
+            foreach (SingleColumn _cols in row.Columns)
             {
                 col.Add(_cols.Name, _cols.Value);
             }
@@ -181,9 +184,101 @@ namespace ExpressBase.Objects
         {
             StringBuilder qry = new StringBuilder();
             qry.AppendFormat(SqlConstants.SQL_FUNC_HEADER, this.FormData.Name, "'plpgsql'");
-            qry.Append("DECLARE temp_table jsonb; _row jsonb; BEGIN");
+            qry.Append(@" DECLARE 
+temp_table jsonb;
+_row jsonb;
+BEGIN ");
+            qry.AppendLine();
+            for (int i = 0; i < this.JsonColoumsInsert.Count; i++)
+            {
+                qry.AppendLine();
+                qry.AppendFormat(@"SELECT
+_table->'Rows' 
+FROM 
+jsonb_array_elements(insert_json) _table 
+INTO 
+temp_table 
+WHERE 
+_table->>'TableName' = '{0}';", this.JsonColoumsInsert[i].TableName);
+                qry.AppendLine();
+                qry.AppendFormat(@" FOR _row IN SELECT * FROM jsonb_array_elements(temp_table)
+LOOP 
+{0} 
+END LOOP;", GetExecuteQryI(this.JsonColoumsInsert[i]));
+            }
 
+            for(int k = 0; k < this.JsonColoumsUpdate.Count; k++)
+            {
+                qry.AppendLine();
+                qry.AppendFormat(@"SELECT
+_table->'Rows' 
+FROM 
+jsonb_array_elements(update_json) _table 
+INTO 
+temp_table 
+WHERE 
+_table->>'TableName' = '{0}';", this.JsonColoumsUpdate[k].TableName);
+                qry.AppendLine();
+                qry.AppendFormat(@" FOR _row IN SELECT * FROM jsonb_array_elements(temp_table)
+LOOP 
+{0} 
+END LOOP;", GetExecuteQryU(this.JsonColoumsUpdate[k]));
+
+            }
+            qry.AppendLine("$BODY$");
             return qry.ToString();
+        }
+
+        private string GetExecuteQryI(JsonTable _rowCollection)
+        {
+            string qry = "EXECUTE 'INSERT INTO " + _rowCollection.TableName + "(";
+            string _using_clas = string.Empty;
+            foreach (KeyValuePair<string, dynamic> _pair in _rowCollection.Rows[0])
+            {
+                if (!_pair.Equals(_rowCollection.Rows[0].Last()))
+                {
+                    qry = qry + _pair.Key + CharConstants.COMMA;
+                    _using_clas = _using_clas + "_row->>'" + _pair.Key + "'" + CharConstants.COMMA;
+                }
+                else
+                {
+                    qry = qry + _pair.Key + ") VALUES(";
+                    _using_clas = _using_clas+ "_row->>'" + _pair.Key + "'" + CharConstants.SEMI_COLON;
+                }
+            }
+
+            for (int i = 1; i <= _rowCollection.Rows[0].Count; i++)
+            {
+                if (i != _rowCollection.Rows[0].Count)
+                    qry = qry + "$" + i + CharConstants.COMMA;
+                else
+                    qry = qry + "$" + i + ")'";
+            }
+            qry = qry + "USING " + _using_clas;
+            return qry;
+        }
+
+        private string GetExecuteQryU(JsonTable _rowCollection)
+        {
+            string qry = string.Format("EXECUTE 'UPDATE {0} SET ", _rowCollection.TableName);
+            string _using_clas = string.Empty;
+            int _counter = 1;
+            foreach (KeyValuePair<string, dynamic> _pair in _rowCollection.Rows[0])
+            {
+                _counter = _counter++;
+                if (!_pair.Equals(_rowCollection.Rows[0].Last()))
+                {
+                    qry = qry + _pair.Key + CharConstants.EQUALS +"$"+ _counter + CharConstants.COMMA;
+                    _using_clas = _using_clas + "_row->>'" + _pair.Key + "'" + CharConstants.COMMA;
+                }
+                else
+                {
+                    qry = qry + _pair.Key + CharConstants.EQUALS + "$" + _counter + "WHERE id=$"+ _counter+";'";
+                    _using_clas = _using_clas + "_row->>'" + _pair.Key + "'" + CharConstants.SEMI_COLON;
+                }
+            }
+            qry = qry + "USING " + _using_clas;
+            return qry;
         }
     }
 
