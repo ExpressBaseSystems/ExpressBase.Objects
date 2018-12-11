@@ -620,7 +620,14 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             if (string.IsNullOrEmpty(base.Html))
             {
                 string _tempFooterPadding = string.Empty;
-                for (int i = 0; i < TotalLevels; i++)
+
+                int LevelSize = 0;
+                if (TotalLevels == 1)
+                    LevelSize = CollectionKey.Split(":-:").Length;
+                else
+                    LevelSize = TotalLevels;
+
+                for (int i = 0; i < LevelSize; i++)
                     _tempFooterPadding += "<td>&nbsp;</td>";
                 if(IsMultiLevel)
                     _tempFooterPadding += "<td>&nbsp;</td>";
