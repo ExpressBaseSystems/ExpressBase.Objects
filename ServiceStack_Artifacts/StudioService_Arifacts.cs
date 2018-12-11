@@ -118,6 +118,23 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
+    public class EbUsrCtrlObjLisAllVerRequest : EbServiceStackAuthRequest, IReturn<EbUsrCtrlObjLisAllVerResponse>
+    {
+        public string EbObjectRefId { get; set; }
+    }
+
+    public class EbUsrCtrlObjLisAllVerResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public Dictionary<string, List<EbObjectWrapper>> Data { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 3)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
     public class EbObjectListRequest : EbServiceStackAuthRequest, IReturn<EbObjectListResponse>
     {
         public int EbObjectType { get; set; }
