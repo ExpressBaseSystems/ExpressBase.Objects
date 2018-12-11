@@ -42,9 +42,24 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     }
 
+    public class FormSqlData
+    {
+        public List<JsonTable> JsonColoumsInsert { set; get; }
+
+        public List<JsonTable> JsonColoumsUpdate { set; get; }
+
+        public FormSqlData()
+        {
+            this.JsonColoumsInsert = new List<JsonTable>();
+
+            this.JsonColoumsUpdate = new List<JsonTable>();
+        }
+    }
+
     public static class SqlConstants
     {
-        public const string SQL_FUNC_HEADER = @"CREATE OR REPLACE FUNCTION {0}(insert_json,update_json) RETURNS void LANGUAGE {1} AS $BODY$"; 
-
+        public const string SQL_FUNC_HEADER = @"CREATE OR REPLACE FUNCTION {0}(insert_json,update_json)
+RETURNS void
+LANGUAGE {1} AS $BODY$"; 
     }
 }

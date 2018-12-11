@@ -114,170 +114,113 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.SqlFunctions)]
     public class EbSqlFunction : EbDataSourceMain
     {
-        [JsonIgnore]
-        public WebformData FormData { set; get; }
-
-        [JsonIgnore]
-        public List<JsonTable> JsonColoumsInsert { get; set; }
-
-        [JsonIgnore]
-        public List<JsonTable> JsonColoumsUpdate { get; set; }
+        public WebFormSchema FormSchema { set; get; }
 
         public EbSqlFunction() { }
 
-        public EbSqlFunction(WebformData data)
+        public EbSqlFunction(WebFormSchema data)
         {
-            this.FormData = data;
-            this.GenJsonColumns();
+            this.FormSchema = data;
             this.Sql = this.GenSqlFunc();
         }
-
-        private void GenJsonColumns()
-        {
-            this.JsonColoumsInsert = new List<JsonTable>();
-            this.JsonColoumsUpdate = new List<JsonTable>();
-
-            foreach (KeyValuePair<string, SingleTable> kp in this.FormData.MultipleTables)
-            {
-                List<JsonColVal> insertcols = new List<JsonColVal>();
-                List<JsonColVal> updatecols = new List<JsonColVal>();
-
-                foreach (SingleRow _row in kp.Value)
-                {
-                    JsonColVal jsoncols_ins = new JsonColVal();
-                    JsonColVal jsoncols_upd = new JsonColVal();
-
-                    if (_row.IsUpdate)
-                        updatecols.Add(this.GetCols(jsoncols_upd, _row));
-                    else
-                        insertcols.Add(this.GetCols(jsoncols_ins, _row));
-                }
-                if (insertcols.Count > 0)
-                {
-                    this.JsonColoumsInsert.Add(new JsonTable
-                    {
-                        TableName = kp.Key,
-                        Rows = insertcols
-                    });
-                }
-                if (updatecols.Count > 0)
-                {
-                    this.JsonColoumsUpdate.Add(new JsonTable
-                    {
-                        TableName = kp.Key,
-                        Rows = updatecols
-                    });
-                }
-            }
-        }
-
-        private JsonColVal GetCols(JsonColVal col, SingleRow row)
-        {
-            foreach (SingleColumn _cols in row.Columns)
-            {
-                col.Add(_cols.Name, _cols.Value);
-            }
-            return col;
-        }
-
+        
         private string GenSqlFunc()
         {
             StringBuilder qry = new StringBuilder();
-            qry.AppendFormat(SqlConstants.SQL_FUNC_HEADER, this.FormData.Name, "'plpgsql'");
+            qry.AppendFormat(SqlConstants.SQL_FUNC_HEADER, this.FormSchema.FormName, "'plpgsql'");
+            qry.AppendLine();
             qry.Append(@" DECLARE 
 temp_table jsonb;
 _row jsonb;
 BEGIN ");
             qry.AppendLine();
-            for (int i = 0; i < this.JsonColoumsInsert.Count; i++)
+            for (int i = 0; i < this.FormSchema.Tables.Count; i++)
             {
+                //insertquery
                 qry.AppendLine();
                 qry.AppendFormat(@"SELECT
-_table->'Rows' 
+    _table->'Rows' 
 FROM 
-jsonb_array_elements(insert_json) _table 
+    jsonb_array_elements(insert_json) _table 
 INTO 
-temp_table 
+    temp_table 
 WHERE 
-_table->>'TableName' = '{0}';", this.JsonColoumsInsert[i].TableName);
+    _table->>'TableName' = '{0}';", this.FormSchema.Tables[i].TableName);
                 qry.AppendLine();
-                qry.AppendFormat(@" FOR _row IN SELECT * FROM jsonb_array_elements(temp_table)
+                qry.AppendFormat(@"FOR _row IN SELECT * FROM jsonb_array_elements(temp_table)
 LOOP 
-{0} 
-END LOOP;", GetExecuteQryI(this.JsonColoumsInsert[i]));
-            }
-
-            for(int k = 0; k < this.JsonColoumsUpdate.Count; k++)
-            {
+    {0} 
+END LOOP;", GetExecuteQryI(this.FormSchema.Tables[i]));
+                //update query
                 qry.AppendLine();
                 qry.AppendFormat(@"SELECT
-_table->'Rows' 
+    _table->'Rows' 
 FROM 
-jsonb_array_elements(update_json) _table 
+    jsonb_array_elements(update_json) _table 
 INTO 
-temp_table 
+    temp_table 
 WHERE 
-_table->>'TableName' = '{0}';", this.JsonColoumsUpdate[k].TableName);
+    _table->>'TableName' = '{0}';", this.FormSchema.Tables[i].TableName);
                 qry.AppendLine();
-                qry.AppendFormat(@" FOR _row IN SELECT * FROM jsonb_array_elements(temp_table)
+                qry.AppendFormat(@"FOR _row IN SELECT * FROM jsonb_array_elements(temp_table)
 LOOP 
-{0} 
-END LOOP;", GetExecuteQryU(this.JsonColoumsUpdate[k]));
-
+    {0} 
+END LOOP;", GetExecuteQryU(this.FormSchema.Tables[i]));
             }
-            qry.AppendLine("$BODY$");
+            qry.AppendLine("\r\n$BODY$");
             return qry.ToString();
         }
 
-        private string GetExecuteQryI(JsonTable _rowCollection)
+        private string GetExecuteQryI(TableSchema _schema)
         {
-            string qry = "EXECUTE 'INSERT INTO " + _rowCollection.TableName + "(";
+            string qry = "EXECUTE 'INSERT INTO " + _schema.TableName + "(";
             string _using_clas = string.Empty;
-            foreach (KeyValuePair<string, dynamic> _pair in _rowCollection.Rows[0])
+
+            foreach (ColumSchema col in _schema.Colums)
             {
-                if (!_pair.Equals(_rowCollection.Rows[0].Last()))
+                if (!col.Equals(_schema.Colums.Last()))
                 {
-                    qry = qry + _pair.Key + CharConstants.COMMA;
-                    _using_clas = _using_clas + "_row->>'" + _pair.Key + "'" + CharConstants.COMMA;
+                    qry = qry + col.ColumName + CharConstants.COMMA;
+                    _using_clas = _using_clas + "_row->>'" + col.ColumName + "'" + CharConstants.COMMA;
                 }
                 else
                 {
-                    qry = qry + _pair.Key + ") VALUES(";
-                    _using_clas = _using_clas+ "_row->>'" + _pair.Key + "'" + CharConstants.SEMI_COLON;
+                    qry = qry + col.ColumName + ") VALUES(";
+                    _using_clas = _using_clas+ "_row->>'" + col.ColumName + "'" + CharConstants.SEMI_COLON;
                 }
             }
 
-            for (int i = 1; i <= _rowCollection.Rows[0].Count; i++)
+            for (int i = 1; i <= _schema.Colums.Count; i++)
             {
-                if (i != _rowCollection.Rows[0].Count)
+                if (i != _schema.Colums.Count)
                     qry = qry + "$" + i + CharConstants.COMMA;
                 else
                     qry = qry + "$" + i + ")'";
             }
-            qry = qry + "USING " + _using_clas;
+            qry = qry + " USING " + _using_clas;
             return qry;
         }
 
-        private string GetExecuteQryU(JsonTable _rowCollection)
+        private string GetExecuteQryU(TableSchema _schema)
         {
-            string qry = string.Format("EXECUTE 'UPDATE {0} SET ", _rowCollection.TableName);
+            string qry = string.Format("EXECUTE 'UPDATE {0} SET ", _schema.TableName);
             string _using_clas = string.Empty;
-            int _counter = 1;
-            foreach (KeyValuePair<string, dynamic> _pair in _rowCollection.Rows[0])
+            int _counter = 0;
+            foreach (ColumSchema col in _schema.Colums)
             {
-                _counter = _counter++;
-                if (!_pair.Equals(_rowCollection.Rows[0].Last()))
+                _counter++;
+                if (!col.Equals(_schema.Colums.Last()))
                 {
-                    qry = qry + _pair.Key + CharConstants.EQUALS +"$"+ _counter + CharConstants.COMMA;
-                    _using_clas = _using_clas + "_row->>'" + _pair.Key + "'" + CharConstants.COMMA;
+                    qry = qry + col.ColumName + CharConstants.EQUALS +"$"+ _counter + CharConstants.COMMA;
+                    _using_clas = _using_clas + "_row->>'" + col.ColumName + "'" + CharConstants.COMMA;
                 }
                 else
                 {
-                    qry = qry + _pair.Key + CharConstants.EQUALS + "$" + _counter + "WHERE id=$"+ _counter+";'";
-                    _using_clas = _using_clas + "_row->>'" + _pair.Key + "'" + CharConstants.SEMI_COLON;
+                    qry = qry + col.ColumName + CharConstants.EQUALS + "$" + _counter + " WHERE id=$"+ _counter+";'";
+                    _using_clas = _using_clas + "_row->>'" + col.ColumName + "'" + CharConstants.SEMI_COLON;
                 }
             }
-            qry = qry + "USING " + _using_clas;
+            qry = qry + " USING " + _using_clas;
             return qry;
         }
     }
