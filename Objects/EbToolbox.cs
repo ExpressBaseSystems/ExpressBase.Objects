@@ -16,7 +16,9 @@ namespace ExpressBase.Objects
 
         public string AllMetas { get; set; }
 
-        public string html { get; set; }
+        public string ToolsHtml { get; set; }
+
+        public object UserControlsHtml { get; }
 
         public string TypeRegister { get; set; }
 
@@ -41,7 +43,7 @@ namespace ExpressBase.Objects
 
             this.AllMetas = _c2js.AllMetas;
             this.AllControlls = _c2js.JsObjects;
-            this.html = _c2js.ToolBoxHtml;
+            this.ToolsHtml = _c2js.ToolsHtml;
             this.TypeRegister = _c2js.TypeRegister;
             this.JsonToJsObjectFuncs = _c2js.JsonToJsObjectFuncs;
             this.EbObjectTypes = _c2js.EbObjectTypes;
@@ -51,6 +53,13 @@ namespace ExpressBase.Objects
         public string getHead()
         {
             return this.EbObjectTypes + this.AllControlls + this.AllMetas + this.TypeRegister;
+        }
+
+        private string getUserControlsHtml()
+        {
+           
+
+            return string.Empty;
         }
     }
 }
