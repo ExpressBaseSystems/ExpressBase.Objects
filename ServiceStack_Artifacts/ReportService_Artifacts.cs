@@ -64,7 +64,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-    public class ReportInternalRequest177 : EbServiceStackAuthRequest, IReturn<ReportRenderResponse>
+    public class ReportInternalRequest : EbServiceStackAuthRequest, IReturn<ReportRenderResponse>
     {
         [DataMember(Order = 1)]
         public EbJobArguments JobArgs { get; set; }

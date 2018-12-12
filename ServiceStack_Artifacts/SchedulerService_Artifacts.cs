@@ -10,13 +10,30 @@ using System.Text;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
-    public class SchedulerRequest : EbMqRequest
+    public class ScheduleRequest : EbMqRequest
     {
         [DataMember(Order = 1)]
         public EbTask Task { get; set; }
     }
 
-    public class SchedulerResponse : IEbSSResponse
+    public class ScheduleResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 3)]
+        public string Result { get; set; }
+    }
+    public class UnscheduleRequest : EbMqRequest
+    {
+        [DataMember(Order = 1)]
+        public string TriggerKey { get; set; }
+    }
+
+    public class UnscheduleResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
         public string Token { get; set; }
@@ -35,6 +52,23 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     public class SchedulerMQResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 3)]
+        public string Result { get; set; }
+    }
+    public class UnschedulerMQRequest : EbMqRequest
+    {
+        [DataMember(Order = 1)]
+        public string TriggerKey { get; set; }
+    }
+
+    public class UnschedulerMQResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
         public string Token { get; set; }
