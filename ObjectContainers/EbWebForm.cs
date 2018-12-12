@@ -27,7 +27,7 @@ namespace ExpressBase.Objects
         public override int TableRowId { get; set; }
 
 
-        public static EbOperations Operations = BFOperations.Instance;
+        public static EbOperations Operations = WFOperations.Instance;
 
         public override string GetHead()
         {
