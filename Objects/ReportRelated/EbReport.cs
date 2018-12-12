@@ -69,19 +69,6 @@ namespace ExpressBase.Objects
         JustifiedAll = 8,
         Undefined = -1
     }
-    public enum DateFormatReport
-    {
-        M_d_yyyy,
-        MM_dd_yyyy,
-        ddd_MMM_d_yyyy,
-        dddd_MMMM_d_yyyy,
-        MM_dd_yy,
-        dd_MM_yyyy,
-        dd_slash_mm_slash_yy
-        //Year_Month_Date,
-        //Year_Month,
-        //Year,
-    }
     public enum SummaryFunctionsNumeric
     {
         Average,
@@ -280,6 +267,9 @@ namespace ExpressBase.Objects
 
         [JsonIgnore]
         public User User { get; set; }
+
+        [JsonIgnore]
+        public CultureInfo CultureInfo { get; set; }
 
         [JsonIgnore]
         public PdfContentByte Canvas { get; set; }
@@ -788,12 +778,11 @@ namespace ExpressBase.Objects
             Stamp.Close();
         }
 
-        public void SetDetail(User user)
-        {
-            CultureInfo culture = CultureInfo.GetCultureInfo(user.Preference.Locale);
-            string timestamp = String.Format("{0:" + culture.DateTimeFormat.FullDateTimePattern + "}", CurrentTimestamp);
+        public void SetDetail()
+        {            
+            string timestamp = String.Format("{0:" + CultureInfo.DateTimeFormat.FullDateTimePattern + "}", CurrentTimestamp);
             ColumnText ct = new ColumnText(Canvas);
-            Phrase phrase = new Phrase("page:" + PageNumber.ToString() + ", " + user.FullName + ", " + timestamp);
+            Phrase phrase = new Phrase("page:" + PageNumber.ToString() + ", " + User.FullName + ", " + timestamp);
             phrase.Font.Size = 6;
             ct.SetSimpleColumn(phrase, 5, 2, WidthPt - 10, 20, 15, Element.ALIGN_RIGHT);
             ct.Go();

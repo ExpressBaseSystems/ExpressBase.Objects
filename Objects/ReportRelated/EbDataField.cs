@@ -220,10 +220,6 @@ namespace ExpressBase.Objects.ReportRelated
     [EnableInBuilder(BuilderType.Report)]
     public class EbDataFieldDateTime : EbDataField
     {
-        [EnableInBuilder(BuilderType.Report)]
-        [PropertyGroup("Data Settings")]
-        public DateFormatReport Format { get; set; }
-
         public override string GetDesignHtml()
         {
             return "<div class='EbCol dropped' $type='@type' eb-type='DataFieldDateTime' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; left: @Left px; top: @Top px;text-align: @TextAlign;'> @Title </div>".RemoveCR().DoubleQuoted();
@@ -248,7 +244,7 @@ namespace ExpressBase.Objects.ReportRelated
             ColumnText ct = new ColumnText(Rep.Canvas);
             Phrase phrase;
             string column_val = Rep.GetDataFieldtValue(ColumnName, slno, TableIndex);
-            column_val = FormatDate(column_val, Format);
+            column_val = String.Format(Rep.CultureInfo.DateTimeFormat, column_val);
             if (Prefix != "" || Suffix != "")
                 column_val = Prefix + " " + column_val + " " + Suffix;
             phrase = new Phrase(column_val, ITextFont);
@@ -362,15 +358,18 @@ namespace ExpressBase.Objects.ReportRelated
             ColumnText ct = new ColumnText(Rep.Canvas);
             string column_val = Rep.GetDataFieldtValue(ColumnName, slno, TableIndex);
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
-            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
+            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);            
             if (DecimalPlaces > 0)
-                column_val = Convert.ToDecimal(column_val).ToString("F" + DecimalPlaces);
+                column_val = Convert.ToDecimal(column_val).ToString("F" + DecimalPlaces);            
             if (AmountInWords)
             {
                 NumberToEnglish numToE = new NumberToEnglish();
                 column_val = numToE.changeCurrencyToWords(column_val);
             }
-
+            else
+            {
+                column_val = Convert.ToDecimal(column_val).ToString("N", Rep.CultureInfo.NumberFormat);
+            }
             if (Prefix != "" || Suffix != "")
                 column_val = Prefix + " " + column_val + " " + Suffix;
             phrase = new Phrase(column_val, ITextFont);
@@ -502,6 +501,10 @@ namespace ExpressBase.Objects.ReportRelated
             {
                 NumberToEnglish numToE = new NumberToEnglish();
                 column_val = numToE.changeCurrencyToWords(column_val);
+            }
+            else
+            {
+                column_val = Convert.ToDecimal(column_val).ToString("N", Rep.CultureInfo.NumberFormat);
             }
             phrase = new Phrase(column_val, ITextFont);
             if (this.RenderInMultiLine)
@@ -675,7 +678,9 @@ namespace ExpressBase.Objects.ReportRelated
         public override void DrawMe(float printingTop, EbReport Rep, List<Param> Params, int slno)
         {
             ColumnText ct = new ColumnText(Rep.Canvas);
-            string column_val = FormatDate(SummarizedValue.ToString(),Format);
+            string column_val = String.Format(Rep.CultureInfo.DateTimeFormat, SummarizedValue.ToString());
+
+            column_val = String.Format(Rep.CultureInfo.DateTimeFormat, column_val);
             if (Prefix != "" || Suffix != "")
                 column_val = Prefix + " " + column_val + " " + Suffix;
             Phrase phrase = new Phrase(column_val, ITextFont);
@@ -867,7 +872,10 @@ namespace ExpressBase.Objects.ReportRelated
                 NumberToEnglish numToE = new NumberToEnglish();
                 column_val = numToE.changeCurrencyToWords(column_val);
             }
-
+            else
+            {
+                column_val = Convert.ToDecimal(column_val).ToString("N", Rep.CultureInfo.NumberFormat);
+            }
             if (Prefix != "" || Suffix != "")
             {
                 column_val = Prefix + " " + column_val + " " + Suffix;
@@ -996,6 +1004,10 @@ namespace ExpressBase.Objects.ReportRelated
             {
                 NumberToEnglish numToE = new NumberToEnglish();
                 column_val = numToE.changeCurrencyToWords(column_val);
+            }
+            else
+            {
+                column_val = Convert.ToDecimal(column_val).ToString("N", Rep.CultureInfo.NumberFormat);
             }
             Phrase phrase = new Phrase(column_val, ITextFont);
             if (RenderInMultiLine)
