@@ -1,5 +1,6 @@
 ﻿using ExpressBase.Common;
 using ExpressBase.Common.Constants;
+using ExpressBase.Common.Data;
 using ExpressBase.Common.JsonConverters;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
@@ -114,16 +115,23 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.SqlFunctions)]
     public class EbSqlFunction : EbDataSourceMain
     {
+        [JsonIgnore]
         public WebFormSchema FormSchema { set; get; }
 
-        public EbSqlFunction() { }
+        [JsonIgnore]
+        private IEbConnectionFactory ConnectionFactory { get; set; }
 
-        public EbSqlFunction(WebFormSchema data)
+        public EbSqlFunction() {
+
+        }
+
+        public EbSqlFunction(WebFormSchema data, IEbConnectionFactory con)
         {
             this.FormSchema = data;
+            this.ConnectionFactory = con;
             this.Sql = this.GenSqlFunc();
         }
-        
+
         private string GenSqlFunc()
         {
             StringBuilder qry = new StringBuilder();
@@ -132,48 +140,83 @@ namespace ExpressBase.Objects
             qry.Append(@" DECLARE 
 temp_table jsonb;
 _row jsonb;
+_master_id integer;
 BEGIN ");
+            for (int k = 0; k < this.FormSchema.Tables.Count; k++)
+            {
+                if (this.FormSchema.Tables[k].TableName == this.FormSchema.MasterTable)
+                {
+                    qry.AppendLine(GetQueryBlockInsert(this.FormSchema.Tables[k]));
+                    qry.AppendFormat(@"SELECT 
+    CURRVAL('{0}_id_seq') 
+INTO 
+    master_id;", this.FormSchema.MasterTable);
+                    qry.AppendLine();
+                    qry.AppendLine(GetQueryBlockUpdate(this.FormSchema.Tables[k]));
+                    break;
+                }
+            }
             qry.AppendLine();
             for (int i = 0; i < this.FormSchema.Tables.Count; i++)
             {
-                //insertquery
-                qry.AppendLine();
-                qry.AppendFormat(@"SELECT
+                if (this.FormSchema.Tables[i].TableName == this.FormSchema.MasterTable)
+                    continue;
+                else
+                {
+                    qry.AppendLine();
+                    qry.AppendLine(GetQueryBlockInsert(this.FormSchema.Tables[i]));
+                    qry.AppendLine();
+                    qry.AppendLine(GetQueryBlockUpdate(this.FormSchema.Tables[i]));
+                }
+            }
+            qry.AppendLine("\r\n$BODY$");
+            return qry.ToString();
+        }
+
+        private string GetQueryBlockInsert(TableSchema _schema)
+        {
+            return string.Format(@"SELECT
     _table->'Rows' 
 FROM 
     jsonb_array_elements(insert_json) _table 
 INTO 
     temp_table 
 WHERE 
-    _table->>'TableName' = '{0}';", this.FormSchema.Tables[i].TableName);
-                qry.AppendLine();
-                qry.AppendFormat(@"FOR _row IN SELECT * FROM jsonb_array_elements(temp_table)
+    _table->>'TableName' = '{0}';
+FOR _row IN SELECT * FROM jsonb_array_elements(temp_table)
 LOOP 
-    {0} 
-END LOOP;", GetExecuteQryI(this.FormSchema.Tables[i]));
-                //update query
-                qry.AppendLine();
-                qry.AppendFormat(@"SELECT
+    {1} 
+END LOOP;", _schema.TableName, GetExecuteQryI(_schema));
+        }
+
+        private string GetQueryBlockUpdate(TableSchema _schema)
+        {
+            return string.Format(@"SELECT
     _table->'Rows' 
 FROM 
     jsonb_array_elements(update_json) _table 
 INTO 
     temp_table 
 WHERE 
-    _table->>'TableName' = '{0}';", this.FormSchema.Tables[i].TableName);
-                qry.AppendLine();
-                qry.AppendFormat(@"FOR _row IN SELECT * FROM jsonb_array_elements(temp_table)
+    _table->>'TableName' = '{0}';
+FOR _row IN SELECT * FROM jsonb_array_elements(temp_table)
 LOOP 
-    {0} 
-END LOOP;", GetExecuteQryU(this.FormSchema.Tables[i]));
-            }
-            qry.AppendLine("\r\n$BODY$");
-            return qry.ToString();
+    {1} 
+END LOOP;", _schema.TableName, GetExecuteQryU(_schema));
+
         }
 
         private string GetExecuteQryI(TableSchema _schema)
         {
-            string qry = "EXECUTE 'INSERT INTO " + _schema.TableName + "(";
+            string m_tablename=string.Empty, m_table_id = string.Empty;
+
+            if (_schema.TableName != this.FormSchema.MasterTable)
+            {
+                m_tablename = this.FormSchema.MasterTable + "_id,";
+                m_table_id = "master_id,";
+            }
+
+            string qry = "EXECUTE 'INSERT INTO " + _schema.TableName + "("+ m_tablename;
             string _using_clas = string.Empty;
 
             foreach (ColumSchema col in _schema.Colums)
@@ -181,12 +224,12 @@ END LOOP;", GetExecuteQryU(this.FormSchema.Tables[i]));
                 if (!col.Equals(_schema.Colums.Last()))
                 {
                     qry = qry + col.ColumName + CharConstants.COMMA;
-                    _using_clas = _using_clas + "_row->>'" + col.ColumName + "'" + CharConstants.COMMA;
+                    _using_clas = _using_clas + "_row->>'" + col.ColumName + "'" + "::" + this.GetVendorDbText(col.EbDbType) + CharConstants.COMMA;
                 }
                 else
                 {
-                    qry = qry + col.ColumName + ") VALUES(";
-                    _using_clas = _using_clas+ "_row->>'" + col.ColumName + "'" + CharConstants.SEMI_COLON;
+                    qry = qry + col.ColumName + ") VALUES("+ m_table_id;
+                    _using_clas = _using_clas + "_row->>'" + col.ColumName + "'" + "::" + this.GetVendorDbText(col.EbDbType) + CharConstants.SEMI_COLON;
                 }
             }
 
@@ -211,17 +254,22 @@ END LOOP;", GetExecuteQryU(this.FormSchema.Tables[i]));
                 _counter++;
                 if (!col.Equals(_schema.Colums.Last()))
                 {
-                    qry = qry + col.ColumName + CharConstants.EQUALS +"$"+ _counter + CharConstants.COMMA;
-                    _using_clas = _using_clas + "_row->>'" + col.ColumName + "'" + CharConstants.COMMA;
+                    qry = qry + col.ColumName + CharConstants.EQUALS + "$" + _counter + CharConstants.COMMA;
+                    _using_clas = _using_clas + "_row->>'" + col.ColumName + "'" + "::" + this.GetVendorDbText(col.EbDbType) + CharConstants.COMMA;
                 }
                 else
                 {
-                    qry = qry + col.ColumName + CharConstants.EQUALS + "$" + _counter + " WHERE id=$"+ _counter+";'";
-                    _using_clas = _using_clas + "_row->>'" + col.ColumName + "'" + CharConstants.SEMI_COLON;
+                    qry = qry + col.ColumName + CharConstants.EQUALS + "$" + _counter + " WHERE id=$" + _counter + ";'";
+                    _using_clas = _using_clas + "_row->>'" + col.ColumName + "'" + "::" + this.GetVendorDbText(col.EbDbType) + CharConstants.SEMI_COLON;
                 }
             }
             qry = qry + " USING " + _using_clas;
             return qry;
+        }
+
+        private string GetVendorDbText(int type)
+        {
+            return ConnectionFactory.DataDB.VendorDbTypes.GetVendorDbText((EbDbTypes)type);
         }
     }
 
