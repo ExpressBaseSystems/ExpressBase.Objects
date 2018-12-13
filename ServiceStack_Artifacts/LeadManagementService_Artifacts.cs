@@ -74,8 +74,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		[DataMember(Order = 16)]
 		public List<string> SubCategoryList { get; set; }
 
-		[DataMember(Order = 17)]
-		public List<string> ImageIdList { get; set; }
+		//[DataMember(Order = 17)]
+		//public List<string> ImageIdList { get; set; }
 
 		[DataMember(Order = 18)]
 		public List<string> StatusList { get; set; }
@@ -105,8 +105,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 		public int UserId { get; set; }
 
-		[DataMember(Order = 4)]
-		public string ImgRefId { get; set; }
+		//[DataMember(Order = 4)]
+		//public string ImgRefId { get; set; }
 		
 		[DataMember(Order = 5)]
 		public string UserName { get; set; }
@@ -292,10 +292,34 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 		[DataMember(Order = 2)]
 		public ResponseStatus ResponseStatus { get; set; }
-
 	}
 
-	[DataContract]
+    [DataContract]
+    public class LmDeleteImageRequest : IReturn<LmDeleteImageResponse>, IEbSSRequest
+    {
+        [DataMember(Order = 1)]
+        public int CustId { get; set; }
+
+        [DataMember(Order = 2)]
+        public string ImgRefIds { get; set; }
+
+        [DataMember(Order = 3)]
+        public string SolnId { get; set; }
+
+        public int UserId { get; set; }
+    }
+
+    [DataContract]
+    public class LmDeleteImageResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public int RowsAffected { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    [DataContract]
 	public class KeyValueType_Field
 	{
 		[DataMember(Order = 1)]
