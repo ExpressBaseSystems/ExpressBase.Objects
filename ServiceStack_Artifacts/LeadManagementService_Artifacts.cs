@@ -105,10 +105,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 		public int UserId { get; set; }
 
-		//[DataMember(Order = 4)]
-		//public string ImgRefId { get; set; }
-		
-		[DataMember(Order = 5)]
+        [DataMember(Order = 4)]
+        public string ImgRefId { get; set; }
+
+        [DataMember(Order = 5)]
 		public string UserName { get; set; }
 	}
 
