@@ -128,6 +128,8 @@ namespace ExpressBase.Objects
         public EbSqlFunction(WebFormSchema data, IEbConnectionFactory con)
         {
             this.FormSchema = data;
+            DisplayName = FormSchema.FormName + "_data_insert";
+            Name = DisplayName;
             this.ConnectionFactory = con;
             this.Sql = this.GenSqlFunc();
         }

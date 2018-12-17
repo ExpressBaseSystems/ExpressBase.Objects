@@ -23,6 +23,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         [DataMember(Order = 1)]
         public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 2)]
+        public string RefId { get; set; }
+
     }
 
     public class JsonTable
@@ -58,7 +62,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     public static class SqlConstants
     {
-        public const string SQL_FUNC_HEADER = @"CREATE OR REPLACE FUNCTION {0}(insert_json,update_json)
+        public const string SQL_FUNC_HEADER = @"CREATE OR REPLACE FUNCTION {0}(insert_json jsonb,update_json jsonb)
 RETURNS void
 LANGUAGE {1} AS $BODY$";
 
