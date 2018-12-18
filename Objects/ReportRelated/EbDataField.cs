@@ -324,10 +324,6 @@ namespace ExpressBase.Objects.ReportRelated
     {
         [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("Data Settings")]
-        public int DecimalPlaces { get; set; } = 2;
-
-        [EnableInBuilder(BuilderType.Report)]
-        [PropertyGroup("Data Settings")]
         public bool AmountInWords { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
@@ -358,9 +354,8 @@ namespace ExpressBase.Objects.ReportRelated
             ColumnText ct = new ColumnText(Rep.Canvas);
             string column_val = Rep.GetDataFieldtValue(ColumnName, slno, TableIndex);
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
-            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);            
-            if (DecimalPlaces > 0)
-                column_val = Convert.ToDecimal(column_val).ToString("F" + DecimalPlaces);            
+            float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
+
             if (AmountInWords)
             {
                 NumberToEnglish numToE = new NumberToEnglish();
@@ -495,8 +490,7 @@ namespace ExpressBase.Objects.ReportRelated
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
             string column_val = SummarizedValue.ToString();
-            if (DecimalPlaces > 0)
-                column_val = Convert.ToDecimal(column_val).ToString("F" + DecimalPlaces);
+
             if (AmountInWords)
             {
                 NumberToEnglish numToE = new NumberToEnglish();
@@ -787,9 +781,9 @@ namespace ExpressBase.Objects.ReportRelated
         [HideInPropertyGrid]
         public int CalcFieldIntType { get; set; }
 
-        [EnableInBuilder(BuilderType.Report)]
-        [PropertyGroup("Data Settings")]
-        public int DecimalPlaces { get; set; } = 2;
+        //[EnableInBuilder(BuilderType.Report)]
+        //[PropertyGroup("Data Settings")]
+        //public int DecimalPlaces { get; set; } = 2;
 
         [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("Data Settings")]
@@ -839,10 +833,12 @@ namespace ExpressBase.Objects.ReportRelated
         {
             ColumnText ct = new ColumnText(Rep.Canvas);
             string column_val = string.Empty;
+            EbDbTypes dbtype = EbDbTypes.String;
             Globals globals = new Globals
             {
                 CurrentField = this
             };
+
             Rep.AddParamsNCalcsInGlobal(globals);
             try
             {
@@ -854,19 +850,22 @@ namespace ExpressBase.Objects.ReportRelated
                     globals[TName].Add(fName, new NTV { Name = fName, Type = Rep.DataSet.Tables[TableIndex].Columns[fName].Type, Value = Rep.DataSet.Tables[TableIndex].Rows[slno][fName] });
                 }
                 column_val = (Rep.ValueScriptCollection[Name].RunAsync(globals)).Result.ReturnValue.ToString();
+
+                dbtype = (EbDbTypes)CalcFieldIntType;
+
                 if (Rep.CalcValInRow.ContainsKey(Title))
-                    Rep.CalcValInRow[Title] = new NTV { Name = Title, Type = (EbDbTypes)(CalcFieldIntType), Value = column_val };
+                    Rep.CalcValInRow[Title] = new NTV { Name = Title, Type = dbtype, Value = column_val };
                 else
-                    Rep.CalcValInRow.Add(Title, new NTV { Name = Title, Type = (EbDbTypes)(CalcFieldIntType), Value = column_val });
+                    Rep.CalcValInRow.Add(Title, new NTV { Name = Title, Type = dbtype, Value = column_val });
             }
             catch (Exception e)
             {
                 Console.WriteLine(e.Message + e.StackTrace);
+
             }
-            if (column_val == string.Empty)
-                column_val = "-";
-            if (DecimalPlaces > 0)
-                column_val = Convert.ToDecimal(column_val).ToString("F" + DecimalPlaces);
+
+            column_val = (column_val == string.Empty) ? "-" : column_val;
+
             if (AmountInWords)
             {
                 NumberToEnglish numToE = new NumberToEnglish();
@@ -874,18 +873,22 @@ namespace ExpressBase.Objects.ReportRelated
             }
             else
             {
-                column_val = Convert.ToDecimal(column_val).ToString("N", Rep.CultureInfo.NumberFormat);
+                if (dbtype == EbDbTypes.Decimal)
+                    column_val = Convert.ToDecimal(column_val).ToString("N", Rep.CultureInfo.NumberFormat);
             }
+
             if (Prefix != "" || Suffix != "")
             {
                 column_val = Prefix + " " + column_val + " " + Suffix;
             }
             Phrase phrase = new Phrase(column_val, ITextFont);
+
             if (RenderInMultiLine)
             {
                 column_val = RenderMultiLine(column_val, phrase, (DbType)DbType);
                 phrase = new Phrase(column_val, ITextFont);
             }
+
             if (!string.IsNullOrEmpty(LinkRefId))
             {
                 Anchor a = CreateLink(phrase, LinkRefId, Rep.Doc, Params);
@@ -897,6 +900,7 @@ namespace ExpressBase.Objects.ReportRelated
             {
                 ct.AddText(phrase);
             }
+
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
             ct.SetSimpleColumn(Llx, lly, Urx, ury, 15, (int)TextAlign);
@@ -998,8 +1002,7 @@ namespace ExpressBase.Objects.ReportRelated
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
             string column_val = SummarizedValue.ToString();
-            if (DecimalPlaces > 0)
-                column_val = Convert.ToDecimal(column_val).ToString("F" + DecimalPlaces);
+
             if (AmountInWords)
             {
                 NumberToEnglish numToE = new NumberToEnglish();
