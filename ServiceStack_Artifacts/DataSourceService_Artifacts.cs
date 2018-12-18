@@ -192,8 +192,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 4)]
         public List<Param> Params { get; set; }
-
-
     }
 
     [DataContract]
@@ -456,7 +454,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
                 if (_parentHeader == null && IsMultiLevel)
                 {
                     var index = CollectionKey.LastIndexOf(Delimiter);
-                    
+
                     if (index > 0)
                     {
                         _parentHeader = RowGrouping[CollectionKey.Substring(0, index)] as HeaderGroupingDetails;
@@ -488,7 +486,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             get;
             set;
         }
- 
+
         [JsonIgnore]
         private string[] _groupingTexts = null;
 
@@ -521,7 +519,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             {
                 string tempstr = string.Empty;
                 string _singleLevelTempStr = string.Empty;
-                
+
                 if (IsMultiLevel)
                 {
                     for (int itr = 0; itr < CurrentLevel; itr++)
@@ -539,7 +537,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
                     foreach (string groupString in GroupingTexts)
                     {
                         _singleLevelTempStr += RowGroupingColumns[count].sTitle + ": ";
-                        _singleLevelTempStr += (count == 0) ? "<b>"+groupString.Substring(2, groupString.Length - 2)+"</b>" : "<b>"+groupString+"</b>";
+                        _singleLevelTempStr += (count == 0) ? "<b>" + groupString.Substring(2, groupString.Length - 2) + "</b>" : "<b>" + groupString + "</b>";
                         if (groupString.Equals(GroupingTexts.Last()) == false)
                             _singleLevelTempStr += ", ";
 
@@ -554,7 +552,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     public class FooterGroupingDetails : GroupingDetails
     {
-        private const string Delimiter= ":-:";
+        private const string Delimiter = ":-:";
         private FooterGroupingDetails _parentFooter = null;
 
         [JsonIgnore]
@@ -608,7 +606,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             TableColumns = _columns;
             CultureDetails = _culture;
 
-            foreach(int index in aggregateColumnIndexes)
+            foreach (int index in aggregateColumnIndexes)
             {
                 Aggregations.Add(index, new NumericAggregates());
             }
@@ -629,7 +627,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
                 for (int i = 0; i < LevelSize; i++)
                     _tempFooterPadding += "<td>&nbsp;</td>";
-                if(IsMultiLevel)
+                if (IsMultiLevel)
                     _tempFooterPadding += "<td>&nbsp;</td>";
                 _tempFooterPadding += "<td>&nbsp;</td>";//serial column
 
@@ -640,14 +638,14 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
                     if (Column.bVisible)
                     {
                         if ((Column is DVNumericColumn) && (Column as DVNumericColumn).Aggregate)
-                            _tempFooterText += "<td class='dt-body-right'><b>" + (this.Aggregations[Column.Data].Sum).ToString("N", ColumnCulture.NumberFormat) 
+                            _tempFooterText += "<td class='dt-body-right'><b>" + (this.Aggregations[Column.Data].Sum).ToString("N", ColumnCulture.NumberFormat)
                                 + "</b></td>";
                         else
                             _tempFooterText += "<td>&nbsp;</td>";
                     }
                 }
 
-                base.Html = string.Format("<tr class='group-sum' group='{0}'>{1}{2}</tr>", (this.IsMultiLevel)?base.CurrentLevel.ToString():1.ToString(), _tempFooterPadding,
+                base.Html = string.Format("<tr class='group-sum' group='{0}'>{1}{2}</tr>", (this.IsMultiLevel) ? base.CurrentLevel.ToString() : 1.ToString(), _tempFooterPadding,
                     _tempFooterText);
             }
         }
@@ -696,5 +694,38 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 2)]
         public string Value { get; set; }
 
+    }
+
+    public class SqlFunParamWrapper
+    {
+        public string FunctionName { set; get; }
+
+        public List<InputParam> Arguments { set; get; }
+    }
+
+    [DataContract]
+    public class SqlFuncTestRequest : IReturn<string>, IEbSSRequest
+    {
+        [DataMember(Order = 1)]
+        public string FunctionName { get; set; }
+
+        [DataMember(Order = 2)]
+        public List<InputParam> Parameters { get; set; }
+
+        [DataMember(Order = 3)]
+        public string SolnId { get; set; }
+
+        [DataMember(Order = 4)]
+        public int UserId { get; set; }
+    }
+
+    [DataContract]
+    public class SqlFuncTestResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 1)]
+        public string Reponse { set; get; }
     }
 }

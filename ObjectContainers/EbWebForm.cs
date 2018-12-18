@@ -1,8 +1,11 @@
-﻿using ExpressBase.Common.Extensions;
+﻿using ExpressBase.Common;
+using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
 using ExpressBase.Data;
+using ExpressBase.Objects.ServiceStack_Artifacts;
+using ServiceStack;
 using ServiceStack.Redis;
 using System;
 using System.Collections.Generic;
@@ -41,7 +44,7 @@ namespace ExpressBase.Objects
 
         public override string GetHtml()
         {
-             string html = "<form id='@ebsid@' IsRenderMode='@rmode@' ebsid='@ebsid@' class='formB-box form-buider-form ebcont-ctrl' eb-form='true' ui-inp eb-type='WebForm' @tabindex@>";
+             string html = "<form id='@ebsid@' isrendermode='@rmode@' ebsid='@ebsid@' class='formB-box form-buider-form ebcont-ctrl' eb-form='true' ui-inp eb-type='WebForm' @tabindex@>";
 
             foreach (EbControl c in this.Controls)
                 html += c.GetHtml();
@@ -66,6 +69,37 @@ namespace ExpressBase.Objects
             //}
 
             return string.Join(",", _lst.ToArray());
+        }
+
+        public override void AfterRedisGet(RedisClient Redis, IServiceClient client)
+        {
+            try
+            {
+                for (int i = 0; i < this.Controls.Count; i++)
+                {
+                    if (this.Controls[i] is EbUserControl)
+                    {
+                        EbUserControl _temp = Redis.Get<EbUserControl>(this.Controls[i].RefId);
+                        if (_temp == null)
+                        {
+                            var result = client.Get<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = this.Controls[i].RefId });
+                            _temp = EbSerializers.Json_Deserialize(result.Data[0].Json);
+                            Redis.Set<EbUserControl>(this.Controls[i].RefId, _temp);
+                        }
+                        _temp.RefId = this.Controls[i].RefId;
+                        foreach (EbControl Control in _temp.Controls)
+                        {
+                            Control.ChildOf = "EbUserControl";
+                        }
+                        this.Controls[i] = _temp;
+                        this.Controls[i].AfterRedisGet(Redis, client);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("EXCEPTION : FormAfterRedisGet " + e.Message);
+            }
         }
     }
 }
