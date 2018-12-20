@@ -19,12 +19,12 @@ namespace ExpressBase.Objects
 
         //public string RefId { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [UIproperty]
-        [Unique]
-        [OnChangeUIFunction("Common.LABEL")]
-        [PropertyEditor(PropertyEditorType.MultiLanguageKeySelector)]
-        public string Label { get; set; }
+        //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        //[UIproperty]
+        //[Unique]
+        //[OnChangeUIFunction("Common.LABEL")]
+        //[PropertyEditor(PropertyEditorType.MultiLanguageKeySelector)]
+        //public string Label { get; set; }
 
         public override string GetToolHtml()
         {
@@ -48,43 +48,87 @@ namespace ExpressBase.Objects
             return html.RemoveCR().DoubleQuoted();
         }
 
+        public string GetDHtml()
+        {
+            string ctrlhtml = string.Empty;
+            foreach (EbControl c in this.Controls)
+            {
+                ctrlhtml += c.GetHtml();
+            }
+            string coverhtml = @"
+            
+                <div  id='@ebsid@Wraper' class='ctrl-cover'>
+                    <span class='eb-ctrl-label' ui-label id='@ebsid@Lbl' style='font-style: italic; font-weight: normal;'>@Label@</span>
+                    @barehtml@
+                </div>
+                <span class='helpText' ui-helptxt > @helpText@ </span>
+           "
+                .Replace("@barehtml@", ctrlhtml)
+                .Replace("@name@", this.Name)
+                .Replace("@type@", this.ObjType)
+                .Replace("@ebsid@", this.EbSid)
+                .Replace("@rmode@", IsRenderMode.ToString())
+                .Replace("@id@", "cont_" + this.EbSid)
+                .Replace("@Label@", string.Concat(this.DisplayName, " - ", this.VersionNumber));
+
+            return ReplacePropsInHTML(coverhtml);
+        }
+
         public override string GetHtml()
         {
-            return this.GetHtml(false);
+            string ctrlhtml = string.Empty;
+            foreach (EbControl c in this.Controls)
+            {
+                ctrlhtml += c.GetHtml();
+            }
+            string coverhtml = @"
+            <div id='@id@' ebsid='@ebsid@' ctype='@type@' isrendermode='@rmode@' class='Eb-ctrlContainer ebcont-ctrl user-ctrl' eb-type='UserControl' tabindex='1'>
+                <div  id='@ebsid@Wraper' class='ctrl-cover'>
+                    
+                    @barehtml@
+                </div>
+                <span class='helpText' ui-helptxt > @helpText@ </span>
+            </div>"
+                .Replace("@barehtml@", ctrlhtml)                                                   
+                .Replace("@name@", this.Name)
+                .Replace("@type@", this.ObjType)
+                .Replace("@ebsid@", this.EbSid)
+                .Replace("@rmode@", IsRenderMode.ToString())
+                .Replace("@id@", "cont_" + this.EbSid)
+                .Replace("@Label@", string.Concat(this.DisplayName, " - ", this.VersionNumber));
+
+            return ReplacePropsInHTML(coverhtml);
         }
 
         public override string GetHtml(bool isRootObj)
         {
-            string html = string.Empty;
-            foreach (EbControl c in this.Controls)
+            if (isRootObj)
             {
-                html += c.GetHtml();
+                string html = string.Empty;
+                foreach (EbControl c in this.Controls)
+                {
+                    html += c.GetHtml();
+                    //<span class='eb-ctrl-label' ui-label id='@ebsidLbl'>@Label@</span>
+                }
+
+                string coverhtml = @"
+                <div id='@id@' ebsid='@ebsid@' eb-form='true' ctype='@type@' isrendermode='@rmode@' class='ebcont-ctrl user-ctrl' eb-type='UserControl' tabindex='1'>
+                    @barehtml@                        
+                    <span class='helpText' ui-helptxt >@helpText@ </span>
+                </div>"
+                    .Replace("@barehtml@", html)
+                    .Replace("@name@", this.Name)
+                    .Replace("@type@", this.ObjType)
+                    .Replace("@ebsid@", this.EbSid)
+                    .Replace("@rmode@", IsRenderMode.ToString())
+                    .Replace("@id@", this.EbSid);
+                return ReplacePropsInHTML(coverhtml);
             }
-
-            string coverhtml = @"
-        <div id='@id@' ebsid='@ebsid@' @ebformattr@ ctype='@type@' isrendermode='@rmode@' class='@Eb-ctrlContainer@ ebcont-ctrl user-ctrl' eb-type='UserControl' tabindex='1'>
-            <span class='eb-ctrl-label' ui-label id='@ebsidLbl'>@Label@ </span>
-                @indivstart@
-                    @barehtml@
-                @indivend@
-            <span class='helpText' ui-helptxt >@helpText@ </span>
-        </div>"
-        .Replace("@barehtml@", html)
-        .Replace("@indivstart@", isRootObj ? string.Empty: "<div  id='@ebsid@Wraper' class='ctrl-cover'>")
-        .Replace("@indivend@", isRootObj ? string.Empty: "</div>");
-
-            coverhtml = coverhtml
-               .Replace("@name@", this.Name)
-               .Replace("@type@", this.ObjType)
-               .Replace("@ebsid@", this.EbSid)
-               .Replace("@rmode@", IsRenderMode.ToString())
-
-               .Replace("@id@", isRootObj ? this.EbSid : "cont_" + this.EbSid)
-               .Replace("@ebformattr@", isRootObj ? "eb-form='true'" : string.Empty)
-               .Replace("@Eb-ctrlContainer@", isRootObj ? string.Empty : " Eb-ctrlContainer ");
-            return ReplacePropsInHTML(coverhtml);
-
+            else
+                return GetHtml();
         }
+
+        
 
         public override void AfterRedisGet(RedisClient Redis, IServiceClient client)
         {
