@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace ExpressBase.Objects
@@ -131,6 +132,28 @@ namespace ExpressBase.Objects
             {
                 Console.WriteLine("EXCEPTION : FormAfterRedisGet " + e.Message);
             }
+        }
+
+        public override string DiscoverRelatedRefids()
+        {
+            string refids = string.Empty;
+            for (int i = 0; i < this.Controls.Count; i++)
+            {
+                if (this.Controls[i] is EbUserControl)
+                {
+                    refids += this.Controls[i].RefId + ",";
+                }
+                else
+                {
+                    PropertyInfo[] _props = this.Controls[i].GetType().GetProperties();
+                    foreach (PropertyInfo _prop in _props)
+                    {
+                        if (_prop.IsDefined(typeof(OSE_ObjectTypes)))
+                            refids += _prop.GetValue(this.Controls[i], null).ToString() + ",";
+                    }
+                }
+            }
+            return refids;
         }
     }
 }
