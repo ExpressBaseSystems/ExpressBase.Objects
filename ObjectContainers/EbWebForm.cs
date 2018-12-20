@@ -71,6 +71,37 @@ namespace ExpressBase.Objects
             return string.Join(",", _lst.ToArray());
         }
 
+        public void AfterRedisGet(Service service)
+        {
+            try
+            {
+                for (int i = 0; i < this.Controls.Count; i++)
+                {
+                    if (this.Controls[i] is EbUserControl)
+                    {
+                        EbUserControl _temp = service.Redis.Get<EbUserControl>(this.Controls[i].RefId);
+                        if (_temp == null)
+                        {
+                            var result = service.Gateway.Send<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = this.Controls[i].RefId });
+                            _temp = EbSerializers.Json_Deserialize(result.Data[0].Json);
+                            service.Redis.Set<EbUserControl>(this.Controls[i].RefId, _temp);
+                        }
+                        _temp.RefId = this.Controls[i].RefId;
+                        foreach (EbControl Control in _temp.Controls)
+                        {
+                            Control.ChildOf = "EbUserControl";
+                        }
+                        this.Controls[i] = _temp;
+                        //this.Controls[i].AfterRedisGet()
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("EXCEPTION : UserControlAfterRedisGet " + e.Message);
+            }
+        }
+
         public override void AfterRedisGet(RedisClient Redis, IServiceClient client)
         {
             try

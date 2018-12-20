@@ -8,6 +8,7 @@ using ExpressBase.Common.LocationNSolution;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.ServiceClients;
+using ExpressBase.Common.Singletons;
 using ExpressBase.Common.Structures;
 using ExpressBase.Objects.Objects;
 using ExpressBase.Objects.ReportRelated;
@@ -262,8 +263,21 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         public int PageNumber { get; set; }
 
+        private DateTime _currentTimeStamp = DateTime.MinValue;
         [JsonIgnore]
-        public DateTime CurrentTimestamp { get; set; }
+        public DateTime CurrentTimestamp
+        {
+            get
+            {
+                if (_currentTimeStamp == DateTime.MinValue)
+                {
+                    _currentTimeStamp = DateTime.UtcNow;
+                    string timezone = User.Preference.TimeZone;
+                    _currentTimeStamp = _currentTimeStamp.Add(CultureHelper.GetDifference(timezone,true));
+                }
+                return _currentTimeStamp;
+            }
+        }
 
         [JsonIgnore]
         public User User { get; set; }
@@ -779,7 +793,7 @@ namespace ExpressBase.Objects
         }
 
         public void SetDetail()
-        {            
+        {
             string timestamp = String.Format("{0:" + CultureInfo.DateTimeFormat.FullDateTimePattern + "}", CurrentTimestamp);
             ColumnText ct = new ColumnText(Canvas);
             Phrase phrase = new Phrase("page:" + PageNumber.ToString() + ", " + User.FullName + ", " + timestamp);
