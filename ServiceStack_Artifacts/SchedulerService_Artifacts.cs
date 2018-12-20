@@ -51,6 +51,18 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public EbTask Task { get; set; }
     }
 
+    public class UpdateSolutionSchedulesRequest : EbMqRequest
+    {
+        [DataMember(Order = 1)]
+        public EbTask Task { get; set; }
+
+        [DataMember(Order = 2)]
+        public string JobKey { get; set; }
+
+        [DataMember(Order = 3)]
+        public string TriggerKey { get; set; }
+    }
+
     public class SchedulerMQResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
