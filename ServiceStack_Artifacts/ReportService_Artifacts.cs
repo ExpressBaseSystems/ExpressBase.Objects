@@ -37,6 +37,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember (Order =4)]
         public byte[] ReportBytea { get; set; }
+
+        [DataMember(Order =5)]
+        public DateTime CurrentTimestamp { get; set; }
     }
 
     public class ValidateCalcExpressionRequest : EbServiceStackAuthRequest, IReturn<ReportRenderResponse>
