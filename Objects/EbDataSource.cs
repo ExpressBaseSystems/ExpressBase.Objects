@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace ExpressBase.Objects
@@ -117,6 +118,13 @@ namespace ExpressBase.Objects
     {
         [JsonIgnore]
         public WebFormSchema FormSchema { set; get; }
+
+        [EnableInBuilder(BuilderType.SqlFunctions)]
+        [HideInPropertyGrid]
+        public string FunctionName {set { } get {
+                return GetFuncNameByRegex();
+            }
+        }
 
         [JsonIgnore]
         private IEbConnectionFactory ConnectionFactory { get; set; }
@@ -272,6 +280,15 @@ END LOOP;", _schema.TableName, GetExecuteQryU(_schema));
         private string GetVendorDbText(int type)
         {
             return ConnectionFactory.DataDB.VendorDbTypes.GetVendorDbText((EbDbTypes)type);
+        }
+
+        private string GetFuncNameByRegex()
+        {
+            string _funcname = string.Empty;
+            Regex r = new Regex(@"(\w+)(\s+|)\(.*?\)");
+            if (!string.IsNullOrEmpty(this.Sql))
+                _funcname = r.Match(this.Sql.Replace("\n", "")).Groups[1].Value;
+            return _funcname;
         }
     }
 

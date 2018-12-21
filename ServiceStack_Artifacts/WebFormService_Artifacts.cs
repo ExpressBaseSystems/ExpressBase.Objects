@@ -175,4 +175,24 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		[DataMember(Order = 3)]
 		public string NewValue;
 	}
+
+
+    //=============================================== MISCELLANEOUS ====================================================
+
+    [DataContract]
+    public class GetDesignHtmlRequest : EbServiceStackAuthRequest, IReturn<GetDesignHtmlResponse>
+    {
+        [DataMember(Order = 1)]
+        public string RefId { get; set; }
+    }
+
+    [DataContract]
+    public class GetDesignHtmlResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public string Html { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
 }

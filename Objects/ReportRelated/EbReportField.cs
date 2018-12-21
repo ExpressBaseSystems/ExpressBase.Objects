@@ -433,7 +433,7 @@ namespace ExpressBase.Objects.ReportRelated
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop + Rep.RowHeight);
 
             ColumnText ct = new ColumnText(Rep.Canvas);
-            Phrase phrase = new Phrase(Rep.User.FullName, ITextFont);
+            Phrase phrase = new Phrase(Rep.ReadingUser.FullName, ITextFont);
             ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, 15, (int)TextAlign);
             ct.Go();
         }
