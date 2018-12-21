@@ -306,7 +306,7 @@ namespace ExpressBase.Objects
 </div>"
     .Replace("@VueSelectCode", this.VueSelectcode)
     .Replace("@name@", this.Name)
-    .Replace("@ebsid@", this.EbSid_CtxId)
+    //.Replace("@ebsid@", this.EbSid_CtxId)
     .Replace("@width", 900.ToString())//this.Width.ToString())
     .Replace("@perWidth", (this.DisplayMembers.Count != 0) ? (900 / this.DisplayMembers.Count).ToString() : 900.ToString())
     .Replace("@DDwidth", (this.DropdownWidth == 0) ? "100" : this.DropdownWidth.ToString())
