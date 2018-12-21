@@ -272,7 +272,7 @@ namespace ExpressBase.Objects
                 if (_currentTimeStamp == DateTime.MinValue)
                 {
                     _currentTimeStamp = DateTime.UtcNow;
-                    string timezone = User.Preference.TimeZone;
+                    string timezone = ReadingUser.Preference.TimeZone;
                     _currentTimeStamp = _currentTimeStamp.Add(CultureHelper.GetDifference(timezone,true));
                 }
                 return _currentTimeStamp;
@@ -280,7 +280,10 @@ namespace ExpressBase.Objects
         }
 
         [JsonIgnore]
-        public User User { get; set; }
+        public User ReadingUser { get; set; }
+
+        [JsonIgnore]
+        public User RenderingUser { get; set; }
 
         [JsonIgnore]
         public CultureInfo CultureInfo { get; set; }
@@ -796,7 +799,7 @@ namespace ExpressBase.Objects
         {
             string timestamp = String.Format("{0:" + CultureInfo.DateTimeFormat.FullDateTimePattern + "}", CurrentTimestamp);
             ColumnText ct = new ColumnText(Canvas);
-            Phrase phrase = new Phrase("page:" + PageNumber.ToString() + ", " + User.FullName + ", " + timestamp);
+            Phrase phrase = new Phrase("page:" + PageNumber.ToString() + ", " + RenderingUser.FullName + ", " + timestamp);
             phrase.Font.Size = 6;
             ct.SetSimpleColumn(phrase, 5, 2, WidthPt - 10, 20, 15, Element.ALIGN_RIGHT);
             ct.Go();
