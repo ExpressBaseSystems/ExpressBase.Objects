@@ -140,20 +140,42 @@ namespace ExpressBase.Objects
             }
         }
 
+        //public override string DiscoverRelatedRefids()
+        //{
+        //    var x = this.RefId;
+        //    string refids = "";
+        //    foreach (EbControl control in Controls)
+        //    {
+        //        PropertyInfo[] _props = control.GetType().GetProperties();
+        //        foreach (PropertyInfo _prop in _props)
+        //        {
+        //            if (_prop.IsDefined(typeof(OSE_ObjectTypes)))
+        //                refids += _prop.GetValue(control, null).ToString() + ",";
+        //        }
+        //    }
+        //    Console.WriteLine(this.RefId + "-->" + refids);
+        //    return refids;
+        //}
+
         public override string DiscoverRelatedRefids()
         {
-            var x = this.RefId;
-            string refids = "";
-            foreach (EbControl control in Controls)
+            string refids = string.Empty;
+            for (int i = 0; i < this.Controls.Count; i++)
             {
-                PropertyInfo[] _props = control.GetType().GetProperties();
-                foreach (PropertyInfo _prop in _props)
+                if (this.Controls[i] is EbUserControl)
                 {
-                    if (_prop.IsDefined(typeof(OSE_ObjectTypes)))
-                        refids += _prop.GetValue(control, null).ToString() + ",";
+                    refids += this.Controls[i].RefId + ",";
+                }
+                else
+                {
+                    PropertyInfo[] _props = this.Controls[i].GetType().GetProperties();
+                    foreach (PropertyInfo _prop in _props)
+                    {
+                        if (_prop.IsDefined(typeof(OSE_ObjectTypes)))
+                            refids += _prop.GetValue(this.Controls[i], null).ToString() + ",";
+                    }
                 }
             }
-            Console.WriteLine(this.RefId + "-->" + refids);
             return refids;
         }
 

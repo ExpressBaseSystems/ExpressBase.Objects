@@ -725,7 +725,22 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 1)]
         public ResponseStatus ResponseStatus { get; set; }
 
-        [DataMember(Order = 1)]
+        [DataMember(Order = 2)]
         public string Reponse { set; get; }
+
+        [DataMember(Order = 3)]
+        public EbDataTable Data { set; get; }
+
+        public SqlFuncTestResponse()
+        {
+            ResponseStatus = new ResponseStatus();
+        }
+    }
+
+    public class SqlFuncDataTable
+    {
+        public RowColletion Rows { set; get; }
+
+        public DVColumnCollection Colums { set; get; }
     }
 }
