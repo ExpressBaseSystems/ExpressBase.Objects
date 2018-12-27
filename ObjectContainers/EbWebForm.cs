@@ -131,8 +131,9 @@ namespace ExpressBase.Objects
                         (_this.Controls[i] as EbUserControl).Controls = _temp.Controls;
                         foreach (EbControl Control in (_this.Controls[i] as EbUserControl).Controls)
                         {
-                            Control.ChildOf = "EbUserControl";
-                            Control.Name = _this.Controls[i].Name + "_" + Control.Name;
+                            RenameControlsRec(Control, _this.Controls[i].Name);
+                            //Control.ChildOf = "EbUserControl";
+                            //Control.Name = _this.Controls[i].Name + "_" + Control.Name;
                         }
                         //_this.Controls[i] = _temp;
                         _this.Controls[i].AfterRedisGet(Redis, client);
@@ -144,7 +145,7 @@ namespace ExpressBase.Objects
                 Console.WriteLine("EXCEPTION : FormAfterRedisGet " + e.Message);
             }
         }
-
+                
         public static void AfterRedisGet(EbControlContainer _this, Service service)
         {
             try
@@ -164,8 +165,9 @@ namespace ExpressBase.Objects
                         (_this.Controls[i] as EbUserControl).Controls = _temp.Controls;
                         foreach (EbControl Control in (_this.Controls[i] as EbUserControl).Controls)
                         {
-                            Control.ChildOf = "EbUserControl";
-                            Control.Name = _this.Controls[i].Name + "_" + Control.Name;
+                            RenameControlsRec(Control, _this.Controls[i].Name);
+                            //Control.ChildOf = "EbUserControl";
+                            //Control.Name = _this.Controls[i].Name + "_" + Control.Name;
                         }
                         //_this.Controls[i] = _temp;
                         (_this.Controls[i] as EbUserControl).AfterRedisGet(service);
@@ -175,6 +177,25 @@ namespace ExpressBase.Objects
             catch (Exception e)
             {
                 Console.WriteLine("EXCEPTION : EbFormAfterRedisGet(service) " + e.Message);
+            }
+        }
+
+        private static void RenameControlsRec(EbControl _control, string _ucName)
+        {
+            if (_control is EbControlContainer)
+            {
+                if (!(_control is EbUserControl))
+                {
+                    foreach (EbControl _ctrl in (_control as EbControlContainer).Controls)
+                    {
+                        RenameControlsRec(_ctrl, _ucName);
+                    }
+                }
+            }
+            else
+            {
+                _control.ChildOf = "EbUserControl";
+                _control.Name = _ucName + "_" + _control.Name;
             }
         }
     }
