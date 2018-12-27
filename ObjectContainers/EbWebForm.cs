@@ -127,12 +127,14 @@ namespace ExpressBase.Objects
                             _temp = EbSerializers.Json_Deserialize(result.Data[0].Json);
                             Redis.Set<EbUserControl>(_this.Controls[i].RefId, _temp);
                         }
-                        _temp.RefId = _this.Controls[i].RefId;
-                        foreach (EbControl Control in _temp.Controls)
+                        //_temp.RefId = _this.Controls[i].RefId;
+                        (_this.Controls[i] as EbUserControl).Controls = _temp.Controls;
+                        foreach (EbControl Control in (_this.Controls[i] as EbUserControl).Controls)
                         {
                             Control.ChildOf = "EbUserControl";
+                            Control.Name = _this.Controls[i].Name + "_" + Control.Name;
                         }
-                        _this.Controls[i] = _temp;
+                        //_this.Controls[i] = _temp;
                         _this.Controls[i].AfterRedisGet(Redis, client);
                     }
                 }
@@ -158,12 +160,14 @@ namespace ExpressBase.Objects
                             _temp = EbSerializers.Json_Deserialize(result.Data[0].Json);
                             service.Redis.Set<EbUserControl>(_this.Controls[i].RefId, _temp);
                         }
-                        _temp.RefId = _this.Controls[i].RefId;
-                        foreach (EbControl Control in _temp.Controls)
+                        //_temp.RefId = _this.Controls[i].RefId;
+                        (_this.Controls[i] as EbUserControl).Controls = _temp.Controls;
+                        foreach (EbControl Control in (_this.Controls[i] as EbUserControl).Controls)
                         {
                             Control.ChildOf = "EbUserControl";
+                            Control.Name = _this.Controls[i].Name + "_" + Control.Name;
                         }
-                        _this.Controls[i] = _temp;
+                        //_this.Controls[i] = _temp;
                         (_this.Controls[i] as EbUserControl).AfterRedisGet(service);
                     }
                 }
