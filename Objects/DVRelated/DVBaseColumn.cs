@@ -407,6 +407,10 @@ else{
     pg.ShowProperty('LinkType');
     }")]
         public BooleanRenderType RenderAs { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.DropDown)]
+        public Align Align { get; set; }
     }
 
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
