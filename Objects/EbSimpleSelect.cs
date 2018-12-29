@@ -101,8 +101,6 @@ namespace ExpressBase.Objects
             return @"<div eb-type='@toolName' class='tool'><i class='fa fa-align-justify'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
         }
 
-
-
         public void InitFromDataBase(JsonServiceClient ServiceClient)
         {
             //this.DataSourceId = "eb_roby_dev-eb_roby_dev-2-1015-1739";
