@@ -32,16 +32,16 @@ namespace ExpressBase.Objects
             }
         }
 
-        //public override string GetValueJSfn
-        //{
-        //    get
-        //    {
-        //        return @"
-        //            return $('#' + this.EbSid_CtxId +' [name=' + this.Name + ']').val();
-        //        ";
-        //    }
-        //    set { }
-        //}
+        public override string GetDisplayMemberJSfn
+        {
+            get
+            {
+                return @"
+                    return $('#' + this.EbSid_CtxId +' :selected').text();
+                ";
+            }
+            set { }
+        }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
@@ -166,7 +166,7 @@ namespace ExpressBase.Objects
         <select id='@ebsid@' name='@ebsid@' data-ebtype='@data-ebtype@' style='width: 100%;'>
             @options@
         </select>"
-.Replace("@ebsid@", this.EbSid_CtxId)
+.Replace("@ebsid@", String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId)
 .Replace("@name@", this.Name)
 .Replace("@options@", this.OptionHtml)
 .Replace("@data-ebtype@", "16");
