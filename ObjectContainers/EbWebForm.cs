@@ -196,6 +196,7 @@ namespace ExpressBase.Objects
             {
                 _control.ChildOf = "EbUserControl";
                 _control.Name = _ucName + "_" + _control.Name;
+                _control.EbSid = _ucName + "_" + _control.EbSid;
             }
         }
     }
