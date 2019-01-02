@@ -166,12 +166,12 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
     [Alias("Dropdown Column")]
     [UsedWithTopObjectParent(typeof(EbObject))]
-    public class EbDGSimoleSelectColumn : EbDGColumn
+    public class EbDGSimpleSelectColumn : EbDGColumn
     {
 
         private EbSimpleSelect EbSimpleSelect { get; set; }
 
-        public EbDGSimoleSelectColumn()
+        public EbDGSimpleSelectColumn()
         {
             this.EbSimpleSelect = new EbSimpleSelect();
         }
