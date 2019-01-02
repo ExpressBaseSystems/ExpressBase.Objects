@@ -32,6 +32,17 @@ namespace ExpressBase.Objects
             }
         }
 
+        //public override string GetValueJSfn
+        //{
+        //    get
+        //    {
+        //        return @"
+        //            return $('#' + this.EbSid_CtxId +' [name=' + this.Name + ']').val();
+        //        ";
+        //    }
+        //    set { }
+        //}
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
@@ -101,8 +112,6 @@ namespace ExpressBase.Objects
             return @"<div eb-type='@toolName' class='tool'><i class='fa fa-align-justify'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
         }
 
-
-
         public void InitFromDataBase(JsonServiceClient ServiceClient)
         {
             //this.DataSourceId = "eb_roby_dev-eb_roby_dev-2-1015-1739";
@@ -154,7 +163,7 @@ namespace ExpressBase.Objects
         public override string GetBareHtml()
         {
             return @"
-        <select id='@ebsid@' name='@name@' data-ebtype='@data-ebtype@' style='width: 100%;'>
+        <select id='@ebsid@' name='@ebsid@' data-ebtype='@data-ebtype@' style='width: 100%;'>
             @options@
         </select>"
 .Replace("@ebsid@", this.EbSid_CtxId)

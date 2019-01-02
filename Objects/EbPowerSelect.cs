@@ -188,7 +188,7 @@ namespace ExpressBase.Objects
                 foreach (DVBaseColumn obj in this.DisplayMembers)
                 {
                     rs += @"
-<div class='search-block'>
+<div class='search-block' @perWidth@>
     <div class='input-group'>
         <v-select maped-column='$$' column-type='@type@' id='@ebsid@$$' style='width:{3}px;' 
             multiple
@@ -203,7 +203,7 @@ namespace ExpressBase.Objects
 .Replace("@ebsid@", this.EbSid_CtxId)
 .Replace("@type@", ((int)obj.Type).ToString())
 .Replace("@sTitle@", obj.sTitle.ToString())
-.Replace("@perWidth@", ((int)(100 / noOfFileds)).ToString())
+.Replace("@perWidth@", "style='width:" + ((int)(100 / noOfFileds)).ToString() +"%'")
 .Replace("@border-r" + i, (i != noOfFileds - 1) ? "style='border-radius: 0px;'" : "");
                     i++;
                 }
@@ -214,30 +214,6 @@ namespace ExpressBase.Objects
         public override string GetToolHtml()
         {
             return @"<div eb-type='@toolName' class='tool'> &#9869; PowerSelect</div>".Replace("@toolName", this.GetType().Name.Substring(2));
-        }
-
-        public override string GetHead()
-        {
-            return this.RequiredString + @"
-//<script>
-//    Vue.component('v-select', VueSelect.VueSelect);
-//    Vue.config.devtools = true;
-//</script>
-//$('#@name@_loading-image').hide();
-//var @nameEbCombo = new EbSelect('@name', '@DSid', @DDHeight, '@vmName', '', @MaxLimit, @MinLimit, @Required, '@DefaultSearchFor', '@servicestack_url', @values);
-"
-            //.Replace("@name", this.Name)
-            //.Replace("@DSid", this.DataSourceId.ToString().Trim())
-            //.Replace("@DDHeight", (this.DropdownHeight == 0) ? "400" : this.DropdownHeight.ToString())
-            //.Replace("@vmName", this.ValueMember.ToString())
-            //.Replace("@dmNames", "['acmaster1_name', 'tdebit', 'tcredit']")
-            //.Replace("@MaxLimit", (!this.MultiSelect || this.MaxLimit == 0) ? "1" : this.MaxLimit.ToString())
-            //.Replace("@MinLimit", this.MinLimit.ToString())
-            //.Replace("@Required", this.Required.ToString().ToLower())
-            //.Replace("@DefaultSearchFor", this.DefaultSearchFor.ToString())
-            //.Replace("@servicestack_url", "https://expressbaseservicestack.azurewebsites.net")
-            //.Replace("@values", "[1000]");//this.values.ToString())
-            ;
         }
 
         public override string GetDesignHtml()
