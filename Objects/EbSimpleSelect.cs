@@ -164,6 +164,7 @@ namespace ExpressBase.Objects
         {
             return @"
         <select id='@ebsid@' name='@ebsid@' data-ebtype='@data-ebtype@' style='width: 100%;'>
+            <option disabled selected value> -- select an option -- </option>
             @options@
         </select>"
 .Replace("@ebsid@", String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId)
