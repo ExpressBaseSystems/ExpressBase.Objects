@@ -98,7 +98,7 @@ namespace ExpressBase.Objects
                     {
                         foreach (EbSimpleSelectOption opt in this.Options)
                         {
-                            _optionHtml += string.Format("<option value='{0}'>{1}</option>", opt.Value, opt.Label);
+                            _optionHtml += string.Format("<option value='{0}'>{1}</option>", opt.Value, opt.DisplayName);
                         }
                     }
                 }
@@ -164,12 +164,13 @@ namespace ExpressBase.Objects
         {
             return @"
         <select id='@ebsid@' name='@ebsid@' data-ebtype='@data-ebtype@' style='width: 100%;'>
-            <option disabled selected value> -- select an option -- </option>
+            @-sel-@
             @options@
         </select>"
 .Replace("@ebsid@", String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId)
 .Replace("@name@", this.Name)
 .Replace("@options@", this.OptionHtml)
+.Replace("@-sel-@", this.Required ? string.Empty : "<option selected value='-1' style='color: #6f6f6f;'> -- nothing selected -- </option>")
 .Replace("@data-ebtype@", "16");
         }
 
