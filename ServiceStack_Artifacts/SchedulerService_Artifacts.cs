@@ -61,6 +61,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 3)]
         public string TriggerKey { get; set; }
+
+        [DataMember(Order = 4)]
+        public ScheduleStatuses Status { get; set; }
+
     }
 
     public class SchedulerMQResponse : IEbSSResponse
@@ -109,8 +113,21 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
 
     }
+    public class GetSchedulesOfSolutionRequest : EbServiceStackAuthRequest, IReturn<GetSchedulesOfSolutionResponse>
+    {
 
-    public class GetUserEmailsRequest:EbServiceStackAuthRequest,IReturn<GetUserEmailsResponse>
+    }
+    public class GetSchedulesOfSolutionResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public List<EbSchedule> Schedules { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+    }
+
+    public class GetUserEmailsRequest : EbServiceStackAuthRequest, IReturn<GetUserEmailsResponse>
     {
         [DataMember(Order = 1)]
         public string UserIds { get; set; }
@@ -118,7 +135,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 2)]
         public string UserGroupIds { get; set; }
     }
-    public class GetUserEmailsResponse:IEbSSResponse
+    public class GetUserEmailsResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
         public Dictionary<int, string> UserEmails { get; set; }
