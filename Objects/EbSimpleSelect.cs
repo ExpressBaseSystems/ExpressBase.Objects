@@ -32,6 +32,17 @@ namespace ExpressBase.Objects
             }
         }
 
+        public override string GetDisplayMemberJSfn
+        {
+            get
+            {
+                return @"
+                    return $('#' + this.EbSid_CtxId +' :selected').text();
+                ";
+            }
+            set { }
+        }
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
@@ -87,7 +98,7 @@ namespace ExpressBase.Objects
                     {
                         foreach (EbSimpleSelectOption opt in this.Options)
                         {
-                            _optionHtml += string.Format("<option value='{0}'>{1}</option>", opt.Value, opt.Label);
+                            _optionHtml += string.Format("<option value='{0}'>{1}</option>", opt.Value, opt.DisplayName);
                         }
                     }
                 }
@@ -100,8 +111,6 @@ namespace ExpressBase.Objects
         {
             return @"<div eb-type='@toolName' class='tool'><i class='fa fa-align-justify'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
         }
-
-
 
         public void InitFromDataBase(JsonServiceClient ServiceClient)
         {
@@ -154,12 +163,14 @@ namespace ExpressBase.Objects
         public override string GetBareHtml()
         {
             return @"
-        <select id='@ebsid@' name='@name@' data-ebtype='@data-ebtype@' style='width: 100%;'>
+        <select id='@ebsid@' name='@ebsid@' data-ebtype='@data-ebtype@' style='width: 100%;'>
+            @-sel-@
             @options@
         </select>"
-.Replace("@ebsid@", this.EbSid_CtxId)
+.Replace("@ebsid@", String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId)
 .Replace("@name@", this.Name)
 .Replace("@options@", this.OptionHtml)
+.Replace("@-sel-@", this.Required ? string.Empty : "<option selected value='-1' style='color: #6f6f6f;'> -- nothing selected -- </option>")
 .Replace("@data-ebtype@", "16");
         }
 

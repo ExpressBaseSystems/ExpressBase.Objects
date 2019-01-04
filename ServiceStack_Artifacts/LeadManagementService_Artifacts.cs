@@ -164,7 +164,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		[DataMember(Order = 1)]
 		public string Data { get; set; }
 
-		[DataMember(Order = 2)]
+        [DataMember(Order = 5)]
+        public bool Permission { get; set; }
+
+        [DataMember(Order = 2)]
 		public string SolnId { get; set; }
 
 		[DataMember(Order = 3)]
@@ -314,6 +317,28 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         [DataMember(Order = 1)]
         public int RowsAffected { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    [DataContract]
+    public class LmDeleteCustomerRequest : IReturn<LmDeleteCustomerResponse>, IEbSSRequest
+    {
+        [DataMember(Order = 1)]
+        public int CustId { get; set; }
+
+        [DataMember(Order = 2)]
+        public string SolnId { get; set; }
+
+        public int UserId { get; set; }
+    }
+
+    [DataContract]
+    public class LmDeleteCustomerResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public bool Status { get; set; }
 
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
