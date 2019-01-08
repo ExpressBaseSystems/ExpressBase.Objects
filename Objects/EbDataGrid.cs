@@ -169,7 +169,7 @@ namespace ExpressBase.Objects
     public class EbDGSimpleSelectColumn : EbDGColumn
     {
 
-        private EbSimpleSelect EbSimpleSelect { get; set; }
+        public EbSimpleSelect EbSimpleSelect { get; set; }
 
         public EbDGSimpleSelectColumn()
         {
@@ -255,7 +255,7 @@ namespace ExpressBase.Objects
             get { return this.EbSimpleSelect.IsDynamic; }
             set { this.EbSimpleSelect.IsDynamic = value; }
         }
-        
+
         [JsonIgnore]
         public string OptionHtml
         {
@@ -269,7 +269,7 @@ namespace ExpressBase.Objects
             DBareHtml = EbSimpleSelect.GetBareHtml();
         }
 
-        public string DBareHtml { get; internal set; }
+        public string DBareHtml { get; set; }
     }
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
