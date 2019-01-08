@@ -7,6 +7,7 @@ using ServiceStack;
 using ServiceStack.Redis;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 
 namespace ExpressBase.Objects
@@ -48,21 +49,19 @@ namespace ExpressBase.Objects
             return html.RemoveCR().DoubleQuoted();
         }
 
-        public string GetDHtml()
+        public string GetInnerHtml()
         {
             string ctrlhtml = string.Empty;
             foreach (EbControl c in this.Controls)
             {
                 ctrlhtml += c.GetHtml();
             }
-            string coverhtml = @"
-            
+            string coverhtml = @"            
                 <div  id='@ebsid@Wraper' class='ctrl-cover'>
                     <span class='eb-ctrl-label' ui-label id='@ebsid@Lbl' style='font-style: italic; font-weight: normal;'>@Label@</span>
                     @barehtml@
                 </div>
-                <span class='helpText' ui-helptxt > @helpText@ </span>
-           "
+                <span class='helpText' ui-helptxt > @helpText@ </span>"
                 .Replace("@barehtml@", ctrlhtml)
                 .Replace("@name@", this.Name)
                 .Replace("@type@", this.ObjType)
@@ -128,37 +127,19 @@ namespace ExpressBase.Objects
                 return GetHtml();
         }
 
-        
+        public void AfterRedisGet(Service service)
+        {
+            EbFormHelper.AfterRedisGet(this, service);
+        }
 
         public override void AfterRedisGet(RedisClient Redis, IServiceClient client)
         {
-            try
-            {
-                for (int i = 0; i < this.Controls.Count; i++)
-                {
-                    if (this.Controls[i] is EbUserControl)
-                    {
-                        EbUserControl _temp = Redis.Get<EbUserControl>(this.Controls[i].RefId);
-                        if (_temp == null)
-                        {
-                            var result = client.Get<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = this.Controls[i].RefId });
-                            _temp = EbSerializers.Json_Deserialize(result.Data[0].Json);
-                            Redis.Set<EbUserControl>(this.Controls[i].RefId, _temp);
-                        }
-                        _temp.RefId = this.Controls[i].RefId;
-                        foreach (EbControl Control in _temp.Controls)
-                        {
-                            Control.ChildOf = "EbUserControl";
-                        }
-                        this.Controls[i] = _temp;
-                        this.Controls[i].AfterRedisGet(Redis, client);
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("EXCEPTION : UserControlAfterRedisGet " + e.Message);
-            }
+            EbFormHelper.AfterRedisGet(this, Redis, client);
+        }
+
+        public override string DiscoverRelatedRefids()
+        {
+            return EbFormHelper.DiscoverRelatedRefids(this);
         }
     }
 }

@@ -638,8 +638,17 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
                     if (Column.bVisible)
                     {
                         if ((Column is DVNumericColumn) && (Column as DVNumericColumn).Aggregate)
-                            _tempFooterText += "<td class='dt-body-right'><b>" + (this.Aggregations[Column.Data].Sum).ToString("N", ColumnCulture.NumberFormat)
+                        {
+                            string _style = string.Empty;
+                            if ((Column as DVNumericColumn).Align == Align.Left)
+                                _style = "text-align:left;";
+                            else if ((Column as DVNumericColumn).Align == Align.Right || (Column as DVNumericColumn).Align == Align.Auto)
+                                _style = "text-align:right;";
+                            else 
+                                _style = "text-align:center;";
+                            _tempFooterText += "<td style="+ _style + "><b>" + (this.Aggregations[Column.Data].Sum).ToString("N", ColumnCulture.NumberFormat)
                                 + "</b></td>";
+                        }
                         else
                             _tempFooterText += "<td>&nbsp;</td>";
                     }

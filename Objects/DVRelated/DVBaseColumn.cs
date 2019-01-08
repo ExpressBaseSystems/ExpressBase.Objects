@@ -84,6 +84,14 @@ namespace ExpressBase.Objects.Objects.DVRelated
         Between = 5
     }
 
+    public enum Align
+    {
+        Auto = 0,
+        Left = 1,
+        Right = 2,
+        Center = 3
+    }
+
 
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
     [HideInPropertyGrid]
@@ -327,6 +335,10 @@ else{
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.DropDown)]
         public StringOperators DefaultOperator { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.DropDown)]
+        public Align Align { get; set; }
     }
 
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
@@ -374,6 +386,10 @@ else{
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         public bool SuppresIfZero { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.DropDown)]
+        public Align Align { get; set; }
     }
 
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
@@ -391,6 +407,10 @@ else{
     pg.ShowProperty('LinkType');
     }")]
         public BooleanRenderType RenderAs { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.DropDown)]
+        public Align Align { get; set; }
     }
 
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
@@ -420,6 +440,10 @@ else{
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.DropDown)]
         public NumericOperators DefaultOperator { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.DropDown)]
+        public Align Align { get; set; }
     }
 
     [EnableInBuilder(BuilderType.DVBuilder)]

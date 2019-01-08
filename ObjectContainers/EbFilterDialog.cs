@@ -140,52 +140,36 @@ namespace ExpressBase.Objects
             }
         }
 
-        public override string DiscoverRelatedRefids()
+        //public override string DiscoverRelatedRefids()
+        //{
+        //    var x = this.RefId;
+        //    string refids = "";
+        //    foreach (EbControl control in Controls)
+        //    {
+        //        PropertyInfo[] _props = control.GetType().GetProperties();
+        //        foreach (PropertyInfo _prop in _props)
+        //        {
+        //            if (_prop.IsDefined(typeof(OSE_ObjectTypes)))
+        //                refids += _prop.GetValue(control, null).ToString() + ",";
+        //        }
+        //    }
+        //    Console.WriteLine(this.RefId + "-->" + refids);
+        //    return refids;
+        //}
+
+        public void AfterRedisGet(Service service)
         {
-            var x = this.RefId;
-            string refids = "";
-            foreach (EbControl control in Controls)
-            {
-                PropertyInfo[] _props = control.GetType().GetProperties();
-                foreach (PropertyInfo _prop in _props)
-                {
-                    if (_prop.IsDefined(typeof(OSE_ObjectTypes)))
-                        refids += _prop.GetValue(control, null).ToString() + ",";
-                }
-            }
-            Console.WriteLine(this.RefId + "-->" + refids);
-            return refids;
+            EbFormHelper.AfterRedisGet(this, service);
         }
 
         public override void AfterRedisGet(RedisClient Redis, IServiceClient client)
         {
-            try
-            {
-                for (int i = 0; i < this.Controls.Count; i++)
-                {
-                    if (this.Controls[i] is EbUserControl)
-                    {
-                        EbUserControl _temp = Redis.Get<EbUserControl>(this.Controls[i].RefId);
-                        if (_temp == null)
-                        {
-                            var result = client.Get<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = this.Controls[i].RefId });
-                            _temp = EbSerializers.Json_Deserialize(result.Data[0].Json);
-                            Redis.Set<EbUserControl>(this.Controls[i].RefId, _temp);
-                        }
-                        _temp.RefId = this.Controls[i].RefId;
-                        foreach (EbControl Control in _temp.Controls)
-                        {
-                            Control.ChildOf = "EbUserControl";
-                        }
-                        this.Controls[i] = _temp;
-                        this.Controls[i].AfterRedisGet(Redis, client);
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("EXCEPTION : FilterDialogAfterRedisGet " + e.Message);
-            }
+            EbFormHelper.AfterRedisGet(this, Redis, client);
+        }
+
+        public override string DiscoverRelatedRefids()
+        {
+            return EbFormHelper.DiscoverRelatedRefids(this);
         }
     }
 }
