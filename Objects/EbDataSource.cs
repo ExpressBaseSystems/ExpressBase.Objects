@@ -19,7 +19,6 @@ using System.Threading.Tasks;
 
 namespace ExpressBase.Objects
 {
-
     public abstract class EbDataSourceMain : EbObject
     {
 
@@ -27,6 +26,8 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         [JsonConverter(typeof(Base64Converter))]
         public string Sql { get; set; }
+
+        public virtual string GetInputParams() { return null; }
     }
 
     [EnableInBuilder(BuilderType.DataReader)]
@@ -103,6 +104,27 @@ namespace ExpressBase.Objects
             }
             return "";
         }
+
+        public override string GetInputParams()
+        {
+            List<InputParam> param = new List<InputParam>();
+            List<string> _temp = new List<string>();
+            Regex r = new Regex(@"\:\w+|\@\w+g");
+
+            foreach (Match match in r.Matches(this.Sql))
+            {
+                if (!_temp.Contains(match.Value))
+                {
+                    param.Add(new InputParam
+                    {
+                        Column = match.Value,
+                    });
+
+                    _temp.Add(match.Value);
+                }
+            }
+            return JsonConvert.SerializeObject(param);
+        }
     }
 
     [EnableInBuilder(BuilderType.DataWriter)]
@@ -111,6 +133,27 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.DataWriter)]
         [HideInPropertyGrid]
         List<InputParam> InputParams { get; set; }
+
+        public override string GetInputParams()
+        {
+            List<InputParam> param = new List<InputParam>();
+            List<string> _temp = new List<string>();
+            Regex r = new Regex(@"\:\w+|\@\w+g");
+
+            foreach (Match match in r.Matches(this.Sql))
+            {
+                if (!_temp.Contains(match.Value))
+                {
+                    param.Add(new InputParam
+                    {
+                        Column = match.Value,
+                    });
+
+                    _temp.Add(match.Value);
+                }
+            }
+            return JsonConvert.SerializeObject(param);
+        }
     }
 
     [EnableInBuilder(BuilderType.SqlFunctions)]
@@ -131,6 +174,28 @@ namespace ExpressBase.Objects
 
         public EbSqlFunction() {
 
+        }
+
+        public override string GetInputParams()
+        {
+            List<InputParam> param = new List<InputParam>();
+            Regex r = new Regex(@"(\w+)(\s+|)\(.*?\)");
+            Regex r1 = new Regex(@"\(.*?\)");
+            string _func = r.Match(this.Sql.Replace("\n", "").Replace("\r", "").Replace("\t", "")).Groups[1].Value;
+            string _params = r.Match(this.Sql.Replace("\n", "").Replace("\r", "").Replace("\t", "")).Groups[0].Value;
+            string[] _arguments = r1.Match(_params).Groups[0].Value.Replace("(", "").Replace(")", "").Split(",");
+
+            foreach (string _arg in _arguments)
+            {
+                if (!string.IsNullOrEmpty(_arg))
+                {
+                    param.Add(new InputParam
+                    {
+                        Column = _arg.Split(" ")[0],
+                    });
+                }
+            }
+            return JsonConvert.SerializeObject(new SqlFunParamWrapper { FunctionName = _func, Arguments = param });
         }
 
         public EbSqlFunction(WebFormSchema data, IEbConnectionFactory con)
@@ -305,4 +370,5 @@ END LOOP;", _schema.TableName, GetExecuteQryU(_schema));
         [ProtoBuf.ProtoMember(1)]
         public string JsCode { get; set; }
     }
+
 }
