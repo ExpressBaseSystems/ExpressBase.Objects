@@ -232,7 +232,7 @@ else {
             {
                 return @"
             @attachedLbl@
-            <input type='@TextMode '  data-ebtype='@data-ebtype@' ui-inp id='@ebsid@' name='@name@' autocomplete = '@AutoCompleteOff ' data-toggle='tooltip' title='@ToolTipText ' 
+            <input type='@TextMode '  data-ebtype='@data-ebtype@' ui-inp id='@ebsid@' name='@name@' autocomplete = '@AutoCompleteOff ' data-toggle='tooltip' title='@ToolTipText@ ' 
 @tabIndex @MaxLength  style='width:100%; height:@heightpx; @BackColor @ForeColor display:inline-block; @fontStyle @ReadOnlyString  @Required  @PlaceHolder  @Text  @TabIndex  />
         @attachedLblClose@"
 .Replace("@ebsid@", String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId)
@@ -277,7 +277,7 @@ else {
             get
             {
                 return @"
-            <textarea id='@ebsid@' ui-inp name='@name@' rows='@RowsVisible@' autocomplete = '@AutoCompleteOff ' data-toggle='tooltip' title='@ToolTipText ' 
+            <textarea id='@ebsid@' ui-inp name='@name@' rows='@RowsVisible@' autocomplete = '@AutoCompleteOff ' data-toggle='tooltip'  data-placement='top' title='@ToolTipText ' 
                 @tabIndex @MaxLength  style='width:100%; height:@heightpx; @BackColor @ForeColor display:inline-block; @fontStyle @ReadOnlyString  @Required  @PlaceHolder  @Text  @TabIndex></textarea>"
 .Replace("@name@", this.Name)
 .Replace("@ebsid@", String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId)
@@ -297,10 +297,14 @@ else {
 
         public override string GetBareHtml()
         {
+            
+            string Html = string.Empty;
             if (this.TextMode == TextMode.MultiLine)
-                return this.TextareaHtml;
+                Html = this.TextareaHtml;
             else
-                return this.TexboxHtml;
+                Html = this.TexboxHtml;
+            return Html
+                .Replace("@ToolTipText@", this.ToolTipText ?? String.Empty);
         }
 
         private string GetHtmlHelper(RenderMode mode)

@@ -66,7 +66,8 @@ namespace ExpressBase.Objects
           <tr>";
             foreach (EbDGColumn col in Controls)
             {
-                html += string.Concat("<th>", col.Title, "</th>");
+                if (!col.Hidden)
+                    html += string.Concat("<th>", col.Title, "</th>");
             }
 
             html += @"
@@ -118,10 +119,33 @@ namespace ExpressBase.Objects
     [UsedWithTopObjectParent(typeof(EbObject))]
     public class EbDGStringColumn : EbDGColumn
     {
+
+        public EbTextBox EbTextBox { get; set; }
+
+        public EbDGStringColumn()
+        {
+            this.EbTextBox = new EbTextBox();
+        }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        public TextMode TextMode
+        {
+            get { return this.EbTextBox.TextMode; }
+            set { this.EbTextBox.TextMode = value; }
+        }
+
         [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
 
         public override string InputControlType { get { return "EbTextBox"; } }
+
+        [OnDeserialized]
+        public void OnDeserializedMethod(StreamingContext context)
+        {
+            DBareHtml = EbTextBox.GetBareHtml();
+        }
+
+        public string DBareHtml { get; set; }
     }
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
