@@ -107,6 +107,8 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         public string Title { get; set; }
 
+        public string DBareHtml { get; set; }
+
         public virtual string InputControlType { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
@@ -134,6 +136,13 @@ namespace ExpressBase.Objects
             set { this.EbTextBox.TextMode = value; }
         }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        public override string ToolTipText
+        {
+            get { return this.EbTextBox.ToolTipText; }
+            set { this.EbTextBox.ToolTipText = value; }
+        }
+
         [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
 
@@ -144,8 +153,6 @@ namespace ExpressBase.Objects
         {
             DBareHtml = EbTextBox.GetBareHtml();
         }
-
-        public string DBareHtml { get; set; }
     }
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
@@ -292,8 +299,6 @@ namespace ExpressBase.Objects
         {
             DBareHtml = EbSimpleSelect.GetBareHtml();
         }
-
-        public string DBareHtml { get; set; }
     }
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
@@ -323,9 +328,7 @@ namespace ExpressBase.Objects
         {
             return this.EbPowerSelect.GetBareHtml();
         }
-
-        public string DBareHtml { get; internal set; }
-
+        
         [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.CollectionProp, "Columns", "bVisible")]
         public DVColumnCollection Columns

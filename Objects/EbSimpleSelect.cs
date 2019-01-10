@@ -19,7 +19,17 @@ using System.Threading.Tasks;
 namespace ExpressBase.Objects
 {
 
-    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.BotForm, BuilderType.UserControl)]
+    public enum BootStrapClass
+    {
+        Default = 0,// 'default' is a key word
+        primary = 1,
+        info = 2,
+        success = 3,
+        warning = 4,
+        danger = 5
+    }
+
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
     public class EbSimpleSelect : EbControlUI
     {
 
@@ -30,6 +40,17 @@ namespace ExpressBase.Objects
             {
                 return IsDynamic ? ValueMember.Type : EbDbTypes.String;
             }
+        }
+
+        public override string GetValueJSfn
+        {
+            get
+            {
+                return @"
+                    return $('#' + this.EbSid_CtxId).selectpicker('val').toString();
+                ";
+            }
+            set { }
         }
 
         public override string GetDisplayMemberJSfn
@@ -48,7 +69,36 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         public string DataSourceId { get; set; }
 
-        [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        public BootStrapClass BootStrapStyle { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        public string PlaceHolder { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        public bool IsMultiSelect { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [OnChangeExec(@"
+            if(this.IsMultiSelect === true){
+                pg.ShowProperty('IsSearchable');
+                pg.ShowProperty('MaxLimit');
+                pg.ShowProperty('MinLimit');
+            }
+		    else{
+                pg.HideProperty('IsSearchable');
+                pg.HideProperty('MaxLimit');
+                pg.HideProperty('MinLimit');
+            }")]
+        public bool IsSearchable { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        public int MaxLimit { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        public int MinLimit { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [HideInPropertyGrid]
         public DVColumnCollection Columns { get; set; }
 
@@ -98,7 +148,7 @@ namespace ExpressBase.Objects
                     {
                         foreach (EbSimpleSelectOption opt in this.Options)
                         {
-                            _optionHtml += string.Format("<option value='{0}'>{1}</option>", opt.Value, opt.DisplayName);
+                            _optionHtml += string.Format("<option data-tokens='{0}'>{1}</option>", opt.Value, opt.DisplayName);
                         }
                     }
                 }
@@ -163,14 +213,23 @@ namespace ExpressBase.Objects
         public override string GetBareHtml()
         {
             return @"
-        <select id='@ebsid@' name='@ebsid@' data-ebtype='@data-ebtype@' style='width: 100%;'>
+        <select id='@ebsid@' class='selectpicker' title='@PlaceHolder@' @selOpts@ @MaxLimit@ @multiple@ @IsSearchable@ name='@ebsid@' @bootStrapStyle@ data-ebtype='@data-ebtype@' style='width: 100%;'>
             @-sel-@
             @options@
         </select>"
 .Replace("@ebsid@", String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId)
 .Replace("@name@", this.Name)
+.Replace("@HelpText@", this.HelpText)
+
+.Replace("@multiple@", this.IsMultiSelect ? "multiple" : "")
+.Replace("@MaxLimit@", IsMultiSelect ? "data-max-options='" + (!IsMultiSelect ? 1 : MaxLimit) +"'" : string.Empty)
+.Replace("@IsSearchable@", IsMultiSelect ? "data-live-search='" + this.IsSearchable +"'" : string.Empty)
+.Replace("@selOpts@", IsMultiSelect ? "data-actions-box='true'" : string.Empty)
+.Replace("@bootStrapStyle@", "data-style='btn-" + this.BootStrapStyle.ToString() + "'")
+
+.Replace("@PlaceHolder@", (PlaceHolder ?? ""))
 .Replace("@options@", this.OptionHtml)
-.Replace("@-sel-@", this.Required ? string.Empty : "<option selected value='-1' style='color: #6f6f6f;'> -- nothing selected -- </option>")
+.Replace("@-sel-@", this.IsMultiSelect ? string.Empty : "<option selected value='-1' style='color: #6f6f6f;'> -- nothing selected -- </option>")
 .Replace("@data-ebtype@", "16");
         }
 
@@ -192,7 +251,7 @@ namespace ExpressBase.Objects
     public class EbSimpleSelectOption : EbControl
     {
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        public string Label { get; set; }
+        public override string Label { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         public string Value { get; set; }
