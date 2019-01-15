@@ -1,4 +1,5 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Data;
 using ExpressBase.Common.JsonConverters;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
@@ -171,6 +172,10 @@ namespace ExpressBase.Objects.Objects.DVRelated
         [HideForUser]
         public int HideDataRowMoreThan { get; set; }
 
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        public List<StaticParam> StaticParameters { get; set; }
+
         [JsonIgnore]
         private List<string> __formulaDataFieldsUsed = null;
         [JsonIgnore]
@@ -250,6 +255,11 @@ namespace ExpressBase.Objects.Objects.DVRelated
         public DVBaseColumn ShallowCopy()
         {
             return (DVBaseColumn)this.MemberwiseClone();
+        }
+
+        public DVBaseColumn()
+        {
+            this.StaticParameters = new List<StaticParam>();
         }
     }
 
@@ -471,5 +481,20 @@ else{
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         public char ReplaceByText { get; set; }
+    }
+
+    [EnableInBuilder(BuilderType.DVBuilder)]
+    public class StaticParam : EbDataVisualizationObject
+    {
+        public StaticParam() { }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public string Name { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public EbDbTypes Type { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public string Value { get; set; }        
     }
 }
