@@ -383,7 +383,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 		[DataMember(Order = 8)]
 		public string Created_Date { get; set; }
-	}
+
+        [DataMember(Order = 9)]
+        public string Is_Picked_Up { get; set; }
+    }
 
 	[DataContract]
 	public class GraftEntry
