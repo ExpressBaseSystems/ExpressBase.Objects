@@ -42,12 +42,34 @@ namespace ExpressBase.Objects
             }
         }
 
+        public override string SetValueJSfn
+        {
+            get
+            {
+                return @" $('#' + this.EbSid_CtxId).selectpicker('val', p1);";
+            }
+            set { }
+        }
+
         public override string GetValueJSfn
         {
             get
             {
                 return @"
-                    return $('#' + this.EbSid_CtxId).selectpicker('val').toString();
+                    let val = $('#' + this.EbSid_CtxId).selectpicker('val');
+                    val = (val === null) ? '-1' : val.toString();
+                    return val;
+                ";
+            }
+            set { }
+        }
+
+        public override string IsRequiredOKJSfn
+        {
+            get
+            {
+                return @"
+                    return !isNaNOrEmpty(this.getValue()) && (this.getValue() !== '-1');
                 ";
             }
             set { }
@@ -222,8 +244,8 @@ namespace ExpressBase.Objects
 .Replace("@HelpText@", this.HelpText)
 
 .Replace("@multiple@", this.IsMultiSelect ? "multiple" : "")
-.Replace("@MaxLimit@", IsMultiSelect ? "data-max-options='" + (!IsMultiSelect ? 1 : MaxLimit) +"'" : string.Empty)
-.Replace("@IsSearchable@", IsMultiSelect ? "data-live-search='" + this.IsSearchable +"'" : string.Empty)
+.Replace("@MaxLimit@", IsMultiSelect ? "data-max-options='" + (!IsMultiSelect ? 1 : MaxLimit) + "'" : string.Empty)
+.Replace("@IsSearchable@", IsMultiSelect ? "data-live-search='" + this.IsSearchable + "'" : string.Empty)
 .Replace("@selOpts@", IsMultiSelect ? "data-actions-box='true'" : string.Empty)
 .Replace("@bootStrapStyle@", "data-style='btn-" + this.BootStrapStyle.ToString() + "'")
 
