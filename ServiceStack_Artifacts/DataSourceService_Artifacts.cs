@@ -692,24 +692,11 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         }
     }
 
-    public class InputParam
-    {
-        [DataMember(Order = 0)]
-        public string Column { get; set; }
-
-        [DataMember(Order = 1)]
-        public EbDbTypes Type { get; set; }
-
-        [DataMember(Order = 2)]
-        public string Value { get; set; }
-
-    }
-
     public class SqlFunParamWrapper
     {
         public string FunctionName { set; get; }
 
-        public List<InputParam> Arguments { set; get; }
+        public List<Param> Arguments { set; get; }
     }
 
     [DataContract]
@@ -719,7 +706,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string FunctionName { get; set; }
 
         [DataMember(Order = 2)]
-        public List<InputParam> Parameters { get; set; }
+        public List<Param> Parameters { get; set; }
 
         [DataMember(Order = 3)]
         public string SolnId { get; set; }

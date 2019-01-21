@@ -8,8 +8,9 @@ using System.Collections.Generic;
 using System.Text;
 using ExpressBase.Common.Extensions;
 using Newtonsoft.Json;
+using ExpressBase.Common;
 
-namespace ExpressBase.Objects.ApiBuilderRelated
+namespace ExpressBase.Objects
 {
     public class ListOrdered: List<EbApiWrapper>
     {
@@ -29,6 +30,10 @@ namespace ExpressBase.Objects.ApiBuilderRelated
         [UIproperty]
         [MetaOnly]
         public string Label { set; get; }
+
+        public virtual string Refid { get; set; }
+
+        public object Result { set; get; }
     }
 
     [EnableInBuilder(BuilderType.ApiBuilder)]
@@ -46,9 +51,9 @@ namespace ExpressBase.Objects.ApiBuilderRelated
     {
         [EnableInBuilder(BuilderType.ApiBuilder)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
-        [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
         [PropertyGroup("Data Settings")]
-        public string Refid { get; set; }
+        [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
+        public override string Refid { get; set; }
 
         public override string GetDesignHtml()
         {
@@ -61,9 +66,9 @@ namespace ExpressBase.Objects.ApiBuilderRelated
     {
         [EnableInBuilder(BuilderType.ApiBuilder)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
-        [OSE_ObjectTypes(EbObjectTypes.iSqlFunction)]
         [PropertyGroup("Data Settings")]
-        public string Refid { get; set; }
+        [OSE_ObjectTypes(EbObjectTypes.iSqlFunction)]
+        public override string Refid { get; set; }
 
         public override string GetDesignHtml()
         {
@@ -76,9 +81,9 @@ namespace ExpressBase.Objects.ApiBuilderRelated
     {
         [EnableInBuilder(BuilderType.ApiBuilder)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
-        [OSE_ObjectTypes(EbObjectTypes.iDataWriter)]
         [PropertyGroup("Data Settings")]
-        public string Refid { get; set; }
+        [OSE_ObjectTypes(EbObjectTypes.iDataWriter)]
+        public override string Refid { get; set; }
 
         public override string GetDesignHtml()
         {
