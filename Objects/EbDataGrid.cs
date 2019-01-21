@@ -66,7 +66,8 @@ namespace ExpressBase.Objects
           <tr>";
             foreach (EbDGColumn col in Controls)
             {
-                html += string.Concat("<th>", col.Title, "</th>");
+                if (!col.Hidden)
+                    html += string.Concat("<th>", col.Title, "</th>");
             }
 
             html += @"
@@ -106,6 +107,8 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         public string Title { get; set; }
 
+        public string DBareHtml { get; set; }
+
         public virtual string InputControlType { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
@@ -118,10 +121,38 @@ namespace ExpressBase.Objects
     [UsedWithTopObjectParent(typeof(EbObject))]
     public class EbDGStringColumn : EbDGColumn
     {
+
+        public EbTextBox EbTextBox { get; set; }
+
+        public EbDGStringColumn()
+        {
+            this.EbTextBox = new EbTextBox();
+        }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        public TextMode TextMode
+        {
+            get { return this.EbTextBox.TextMode; }
+            set { this.EbTextBox.TextMode = value; }
+        }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        public override string ToolTipText
+        {
+            get { return this.EbTextBox.ToolTipText; }
+            set { this.EbTextBox.ToolTipText = value; }
+        }
+
         [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
 
         public override string InputControlType { get { return "EbTextBox"; } }
+
+        [OnDeserialized]
+        public void OnDeserializedMethod(StreamingContext context)
+        {
+            DBareHtml = EbTextBox.GetBareHtml();
+        }
     }
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
@@ -268,8 +299,6 @@ namespace ExpressBase.Objects
         {
             DBareHtml = EbSimpleSelect.GetBareHtml();
         }
-
-        public string DBareHtml { get; set; }
     }
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
@@ -299,9 +328,7 @@ namespace ExpressBase.Objects
         {
             return this.EbPowerSelect.GetBareHtml();
         }
-
-        public string DBareHtml { get; internal set; }
-
+        
         [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.CollectionProp, "Columns", "bVisible")]
         public DVColumnCollection Columns

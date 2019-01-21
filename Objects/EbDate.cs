@@ -36,6 +36,14 @@ namespace ExpressBase.Objects
         Year,
     }
 
+    //public enum DateFormat
+    //{
+    //    dd_mm_yyyy = 0,
+    //    mm_dd_yyyy = 1,
+    //    yyyy_mm_dd = 2,
+    //    yyyy_dd_mm = 3,
+    //}
+
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
     public class EbDate : EbControlUI
@@ -95,6 +103,9 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         public DateShowFormat ShowDateAs_ { get; set; }
+
+        //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        //public DateFormat DateFormat { get; set; }
 
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.BotForm)]

@@ -29,7 +29,7 @@ namespace ExpressBase.Objects
             get
             {
                 return @"
-                    return parseInt($('#' + this.EbSid_CtxId).val());
+                    return parseInt($('#' + this.EbSid_CtxId).val()) || 0;
                 ";
             }
             set { }

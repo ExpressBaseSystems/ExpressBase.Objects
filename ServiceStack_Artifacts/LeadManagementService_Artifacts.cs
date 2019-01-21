@@ -78,7 +78,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		//public List<string> ImageIdList { get; set; }
 
 		[DataMember(Order = 18)]
-		public List<string> StatusList { get; set; }
+		public Dictionary<string, string> StatusDict { get; set; }
 
 		[DataMember(Order = 19)]
 		public List<string> ServiceList { get; set; }
@@ -383,7 +383,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 		[DataMember(Order = 8)]
 		public string Created_Date { get; set; }
-	}
+
+        [DataMember(Order = 9)]
+        public string Is_Picked_Up { get; set; }
+    }
 
 	[DataContract]
 	public class GraftEntry
@@ -484,5 +487,11 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 		[DataMember(Order = 12)]
 		public int Nurse { get; set; }
-	}
+        
+        [DataMember(Order = 13)]
+        public string Complimentary { get; set; }
+
+        [DataMember(Order = 14)]
+        public string Method { get; set; }
+    }
 }
