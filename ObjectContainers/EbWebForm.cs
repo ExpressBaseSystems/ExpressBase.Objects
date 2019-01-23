@@ -89,11 +89,27 @@ namespace ExpressBase.Objects
                         _id = _schema.MasterTable + "_id";
                     else
                         _cols = "eb_auto_id," + _cols;
-                    query += string.Format("SELECT id, {0} FROM {1} WHERE {2} = :id;", _cols, _table.TableName, _id);
+                    query += string.Format("SELECT id, {0} FROM {1} WHERE {2} = :id AND eb_del='F';", _cols, _table.TableName, _id);
                 }
             }
             return query;
         }
+
+        public string GetDeleteQuery(WebFormSchema _schema = null)
+        {
+            string query = string.Empty;
+            if (_schema == null)
+                _schema = this.GetWebFormSchema();
+            foreach (TableSchema _table in _schema.Tables)
+            {
+                string _id = "id";
+                if (_table.TableName != _schema.MasterTable)
+                    _id = _schema.MasterTable + "_id";
+                query += string.Format("UPDATE {0} SET eb_del='T',eb_lastmodified_by = :eb_modified_by, eb_lastmodified_at = NOW() WHERE {1} = :id AND eb_del='F';", _table.TableName, _id);
+            }
+            return query;
+        }
+
 
         public WebFormSchema GetWebFormSchema()
         {

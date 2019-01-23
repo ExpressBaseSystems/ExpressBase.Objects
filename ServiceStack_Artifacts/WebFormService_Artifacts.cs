@@ -99,7 +99,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 	}
 
 
-	//======================================= INSERT OR UPDATE RECORD =============================================
+	//======================================= INSERT OR UPDATE OR DELETE RECORD =============================================
 
 	[DataContract]
 	public class InsertDataFromWebformRequest : EbServiceStackAuthRequest, IReturn<InsertDataFromWebformResponse>
@@ -133,10 +133,30 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public ResponseStatus ResponseStatus { get; set; }
 	}
 
+    [DataContract]
+    public class DeleteDataFromWebformRequest : EbServiceStackAuthRequest, IReturn<DeleteDataFromWebformResponse>
+    {
+        [DataMember(Order = 1)]
+        public string RefId { get; set; }
 
-	//=============================================== AUDIT TRAIL ====================================================
+        [DataMember(Order = 2)]
+        public int RowId { get; set; }
+    }
 
-	[DataContract]
+    [DataContract]
+    public class DeleteDataFromWebformResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public int RowAffected { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+
+    //=============================================== AUDIT TRAIL ====================================================
+
+    [DataContract]
 	public class GetAuditTrailRequest : EbServiceStackAuthRequest, IReturn<GetAuditTrailResponse>
 	{
 		[DataMember(Order = 1)]
