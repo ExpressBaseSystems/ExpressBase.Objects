@@ -55,7 +55,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Message { get; set; }
 
         [DataMember(Order = 2)]
-        public string Result { get; set; }
+        public object Result { get; set; }
     }
 
     [DataContract]

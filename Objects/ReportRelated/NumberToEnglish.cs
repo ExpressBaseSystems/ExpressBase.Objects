@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ExpressBase.Objects.Objects.ReportRelated
+namespace ExpressBase.Objects
 {
     public class NumberToEnglish
     {

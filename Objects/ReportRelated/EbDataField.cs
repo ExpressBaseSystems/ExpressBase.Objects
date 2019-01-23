@@ -12,13 +12,12 @@ using System.Data;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using ExpressBase.Common.JsonConverters;
-using ExpressBase.Objects.Objects.ReportRelated;
 using ExpressBase.Common;
 using ExpressBase.Common.Structures;
 using ExpressBase.Common.Data;
 using ExpressBase.Objects.Objects;
 
-namespace ExpressBase.Objects.ReportRelated
+namespace ExpressBase.Objects
 {
     public abstract class EbDataField : EbReportField
     {

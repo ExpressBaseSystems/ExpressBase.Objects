@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace ExpressBase.Objects.ReportRelated
+namespace ExpressBase.Objects
 {
     public class EbReportObject : EbObject
     {
