@@ -3,7 +3,6 @@ using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
 using ExpressBase.Common.ServiceClients;
-using ExpressBase.Objects.ReportRelated;
 using RestSharp;
 using ServiceStack;
 using ServiceStack.Logging;

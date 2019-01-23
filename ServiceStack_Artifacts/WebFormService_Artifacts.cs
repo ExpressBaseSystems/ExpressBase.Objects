@@ -123,7 +123,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		[DataMember(Order = 1)]
 		public int RowAffected { get; set; }
 
-		[DataMember(Order = 2)]
+        [DataMember(Order = 2)]
+        public int RowId { get; set; }
+
+        [DataMember(Order = 3)]
+        public WebformData FormData { get; set; }
+        
+        [DataMember(Order = 4)]
 		public ResponseStatus ResponseStatus { get; set; }
 	}
 

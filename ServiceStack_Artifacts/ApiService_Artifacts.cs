@@ -1,4 +1,6 @@
-﻿using ExpressBase.Common.EbServiceStack.ReqNRes;
+﻿using ExpressBase.Common;
+using ExpressBase.Common.Data;
+using ExpressBase.Common.EbServiceStack.ReqNRes;
 using ServiceStack;
 using System;
 using System.Collections.Generic;
@@ -27,6 +29,57 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 2)]
         public string RefId { get; set; }
 
+    }
+
+    [DataContract]
+    public class ApiRequest : IReturn<ApiResponse>, IEbSSRequest
+    {
+        public string SolnId { get; set; }
+
+        public int UserId { get; set; }
+
+        [DataMember(Order = 1)]
+        public string Version { set; get; }
+
+        [DataMember(Order = 2)]
+        public string Name { set; get; }
+
+        [DataMember(Order = 3)]
+        public Dictionary<string,object> Data { set; get; }
+    }
+
+    [DataContract]
+    public class ApiResponse
+    {
+        [DataMember(Order = 1)]
+        public string Message { get; set; }
+
+        [DataMember(Order = 2)]
+        public object Result { get; set; }
+    }
+
+    [DataContract]
+    public class ApiByNameRequest : IReturn<ApiByNameResponse>, IEbSSRequest
+    {
+        public string SolnId { get; set; }
+
+        public int UserId { get; set; }
+
+        [DataMember(Order = 1)]
+        public string Version { set; get; }
+
+        [DataMember(Order = 2)]
+        public string Name { set; get; }
+    }
+
+    [DataContract]
+    public class ApiByNameResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 2)]
+        public EbApi Api { get; set; }
     }
 
     public class JsonTable
@@ -83,5 +136,18 @@ BEGIN
     RETURN temp_table;
 END;";
  
+    }
+
+    public class SqlParams
+    {
+        public SqlParams()
+        {
+            this.Parameter = new List<Param>();
+        }
+        public string Sql { get; set; }
+
+        public object Object { get; set; }
+
+        public List<Param> Parameter { set; get; }
     }
 }

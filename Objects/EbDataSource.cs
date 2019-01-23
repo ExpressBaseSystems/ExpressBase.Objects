@@ -19,7 +19,6 @@ using System.Threading.Tasks;
 
 namespace ExpressBase.Objects
 {
-
     public abstract class EbDataSourceMain : EbObject
     {
 
@@ -27,6 +26,10 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         [JsonConverter(typeof(Base64Converter))]
         public string Sql { get; set; }
+
+        [EnableInBuilder(BuilderType.DataReader, BuilderType.DataWriter, BuilderType.SqlFunctions)]
+        [HideInPropertyGrid]
+        public List<Param> InputParams { get; set; }
     }
 
     [EnableInBuilder(BuilderType.DataReader)]
@@ -108,9 +111,7 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.DataWriter)]
     public class EbDataWriter : EbDataSourceMain
     {
-        [EnableInBuilder(BuilderType.DataWriter)]
-        [HideInPropertyGrid]
-        List<InputParam> InputParams { get; set; }
+
     }
 
     [EnableInBuilder(BuilderType.SqlFunctions)]
