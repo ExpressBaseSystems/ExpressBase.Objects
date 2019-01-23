@@ -71,6 +71,82 @@ namespace ExpressBase.Objects
 
             return string.Join(",", _lst.ToArray());
         }
+        
+        public string GetSelectQuery(WebFormSchema _schema = null)
+        {
+            string query = string.Empty;
+            if (_schema == null)
+                _schema = this.GetWebFormSchema();
+            foreach (TableSchema _table in _schema.Tables)
+            {
+                string _cols = string.Empty;
+                string _id = "id";
+
+                if (_table.Colums.Count > 0)
+                {
+                    _cols = String.Join(", ", _table.Colums.Select(x => x.ColumName));
+                    if (_table.TableName != _schema.MasterTable)
+                        _id = _schema.MasterTable + "_id";
+                    else
+                        _cols = "eb_auto_id," + _cols;
+                    query += string.Format("SELECT id, {0} FROM {1} WHERE {2} = :id;", _cols, _table.TableName, _id);
+                }
+            }
+            return query;
+        }
+
+        public WebFormSchema GetWebFormSchema()
+        {
+            WebFormSchema _formSchema = new WebFormSchema();
+            _formSchema.FormName = this.Name;
+            _formSchema.MasterTable = this.TableName.ToLower();
+            _formSchema.Tables = new List<TableSchema>();
+            _formSchema = GetWebFormSchemaRec(_formSchema, this);
+            return _formSchema;
+        }
+
+        private WebFormSchema GetWebFormSchemaRec(WebFormSchema _schema, EbControlContainer _container)
+        {
+            IEnumerable<EbControl> _flatControls = _container.Controls.Get1stLvlControls();
+            TableSchema _table = _schema.Tables.FirstOrDefault(tbl => tbl.TableName == _container.TableName);
+            if (_table == null)
+            {
+                List<ColumSchema> _columns = new List<ColumSchema>();
+                foreach (EbControl control in _flatControls)
+                {
+                    if (control is EbAutoId)
+                        _columns.Add(new ColumSchema { ColumName = "eb_auto_id", EbDbType = (int)EbDbTypes.String });
+                    else
+                        _columns.Add(new ColumSchema { ColumName = control.Name, EbDbType = (int)control.EbDbType });
+                }
+                if (_columns.Count > 0)
+                    _schema.Tables.Add(new TableSchema { TableName = _container.TableName.ToLower(), Colums = _columns });
+            }
+            else
+            {
+                foreach (EbControl control in _flatControls)
+                {
+                    if (control is EbAutoId)
+                        _table.Colums.Add(new ColumSchema { ColumName = "eb_auto_id", EbDbType = (int)EbDbTypes.String });
+                    else
+                        _table.Colums.Add(new ColumSchema { ColumName = control.Name, EbDbType = (int)control.EbDbType });
+                }
+            }
+            foreach (EbControl _control in _container.Controls)
+            {
+                if (_control is EbControlContainer)
+                {
+                    EbControlContainer Container = _control as EbControlContainer;
+
+                    if (Container.TableName.IsNullOrEmpty())
+                    {
+                        Container.TableName = _container.TableName;
+                    }
+                    _schema = GetWebFormSchemaRec(_schema, Container);
+                }
+            }
+            return _schema;
+        }
 
         public void AfterRedisGet(Service service)
         {
