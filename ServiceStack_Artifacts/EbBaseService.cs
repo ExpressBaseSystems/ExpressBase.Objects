@@ -1,14 +1,19 @@
-﻿using ExpressBase.Common.Constants;
+﻿using ExpressBase.Common;
+using ExpressBase.Common.Constants;
 using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
 using ExpressBase.Common.ServiceClients;
+using Newtonsoft.Json;
+using Npgsql;
 using RestSharp;
 using ServiceStack;
 using ServiceStack.Logging;
 using ServiceStack.Messaging;
 using ServiceStack.RabbitMq;
+using System;
 using System.Collections.Generic;
+using System.Data.Common;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
@@ -20,7 +25,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             get { return __EbConnectionFactory; }
             set
             {
-                if(value != null)
+                if (value != null)
                     __EbConnectionFactory = value;
             }
         }
@@ -73,7 +78,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         {
             this.EbConnectionFactory = _dbf as EbConnectionFactory;
             this.FileClient = _sfc as EbStaticFileClient;
-            
+
         }
 
         public EbBaseService(IEbConnectionFactory _dbf, IEbServerEventClient _sec)
@@ -169,7 +174,22 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public ILog Log { get { return LogManager.GetLogger(GetType()); } }
 
-
+        public bool Queryinsert(string rows, TimeSpan t, DateTime starttime, int userid, List<Param> param)
+        {
+            string start = starttime.ToString("yyyy-MM-dd hh:mm:ss");        
+            string _params = EbSerializers.Json_Serialize(param); 
+            try
+            {
+                string query = @"INSERT INTO executionlogs(rows, exec_time, version_id, created_by, created_at, params) 
+                                VALUES(" + "'" + rows + "'" + "," + t.TotalMilliseconds + ",1," + userid + ",'" + start + "'," + "'" + _params + "'" + ")";
+                this.EbConnectionFactory.ObjectsDB.DoNonQuery(query);
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+            return true;
+        }
 
         //private void LoadCache()
         //{
