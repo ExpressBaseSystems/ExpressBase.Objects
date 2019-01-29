@@ -174,18 +174,20 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public ILog Log { get { return LogManager.GetLogger(GetType()); } }
 
-        public bool Queryinsert(string rows, TimeSpan t, DateTime starttime, int userid, List<Param> param)
+        public bool InsertExecutionLog(string rows, TimeSpan t, DateTime starttime, int userid, List<Param> param, string refid)
         {
             string start = starttime.ToString("yyyy-MM-dd hh:mm:ss");        
             string _params = EbSerializers.Json_Serialize(param); 
             try
             {
-                string query = @"INSERT INTO executionlogs(rows, exec_time, version_id, created_by, created_at, params) 
-                                VALUES(" + "'" + rows + "'" + "," + t.TotalMilliseconds + ",1," + userid + ",'" + start + "'," + "'" + _params + "'" + ")";
+                string query = @"INSERT INTO executionlogs(rows, exec_time, created_by, created_at, params, refid) 
+                                VALUES(" + "'" + rows + "'" + "," + t.TotalMilliseconds + "," + userid + ",'" +
+                                start + "'," + "'" + _params + "'"+ ",'"+ refid+"'" + ")";
                 this.EbConnectionFactory.ObjectsDB.DoNonQuery(query);
             }
             catch (Exception e)
             {
+                Console.WriteLine(e.StackTrace);
                 return false;
             }
             return true;
