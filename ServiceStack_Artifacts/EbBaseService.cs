@@ -4,6 +4,7 @@ using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
 using ExpressBase.Common.ServiceClients;
+using ExpressBase.Common.Structures;
 using Newtonsoft.Json;
 using Npgsql;
 using RestSharp;
@@ -14,6 +15,7 @@ using ServiceStack.RabbitMq;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Globalization;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
@@ -176,14 +178,19 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public bool InsertExecutionLog(string rows, TimeSpan t, DateTime starttime, int userid, List<Param> param, string refid)
         {
-            string start = starttime.ToString("yyyy-MM-dd hh:mm:ss");        
-            string _params = EbSerializers.Json_Serialize(param); 
             try
             {
                 string query = @"INSERT INTO executionlogs(rows, exec_time, created_by, created_at, params, refid) 
-                                VALUES(" + "'" + rows + "'" + "," + t.TotalMilliseconds + "," + userid + ",'" +
-                                start + "'," + "'" + _params + "'"+ ",'"+ refid+"'" + ")";
-                this.EbConnectionFactory.ObjectsDB.DoNonQuery(query);
+                                VALUES(:rows, :exec_time, :created_by, :created_at, :params, :refid)";
+                DbParameter[] parameters = {
+                     EbConnectionFactory.ObjectsDB.GetNewParameter("rows", EbDbTypes.String,rows),
+                     EbConnectionFactory.ObjectsDB.GetNewParameter("exec_time", EbDbTypes.Int32,t.TotalMilliseconds),
+                     EbConnectionFactory.ObjectsDB.GetNewParameter("created_by", EbDbTypes.Int32,userid),
+                     EbConnectionFactory.ObjectsDB.GetNewParameter("created_at", EbDbTypes.DateTime,starttime),
+                     EbConnectionFactory.ObjectsDB.GetNewParameter("params", EbDbTypes.Json, EbSerializers.Json_Serialize(param)),
+                     EbConnectionFactory.ObjectsDB.GetNewParameter("refid", EbDbTypes.String,refid)
+                    };
+                this.EbConnectionFactory.ObjectsDB.DoNonQuery(query, parameters);
             }
             catch (Exception e)
             {
