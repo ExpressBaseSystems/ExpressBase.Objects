@@ -274,7 +274,7 @@ namespace ExpressBase.Objects
 <div id='@ebsid@Container'  role='form' data-toggle='validator' style='width:100%;'>
     <input type='hidden' name='@ebsid@Hidden4val' data-ebtype='8' id='@ebsid@'/>
     @VueSelectCode
-    <center style='position:relative'>
+    <center class='pow-center'>
         <div id='@ebsid@DDdiv' v-show='DDstate' class='DDdiv expand-transition'  style='width:@DDwidth%;'> 
             <table id='@ebsid@tbl' tabindex='1000' style='width:100%' class='table table-bordered'></table>
         </div>

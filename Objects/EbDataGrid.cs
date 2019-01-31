@@ -67,7 +67,8 @@ namespace ExpressBase.Objects
             foreach (EbDGColumn col in Controls)
             {
                 if (!col.Hidden)
-                    html += string.Concat("<th>", col.Title, "</th>");
+                    html += string.Concat("<th>", col.Title, "@req@</th>")
+                        .Replace("@req@", (col.Required ? "<sup style='color: red'>*</sup>" : string.Empty));
             }
 
             html += @"
