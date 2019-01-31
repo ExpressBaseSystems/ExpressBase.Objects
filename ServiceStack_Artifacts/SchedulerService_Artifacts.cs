@@ -163,6 +163,33 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Result { get; set; }
     }
 
+    public class RescheduleMQRequest : EbServiceStackAuthRequest, IReturn<DeleteJobMQResponse>
+    {
+        [DataMember(Order = 1)]
+        public string TriggerKey { get; set; }
+
+        [DataMember(Order = 2)]
+        public string JobKey { get; set; }
+
+        [DataMember(Order = 3)]
+        public EbTask Task { get; set; }
+
+        [DataMember(Order = 4)]
+        public int Id { get; set; }
+    }
+
+    public class RescheduleMQResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 3)]
+        public string Result { get; set; }
+    }
+
     public class GetAllUsersRequest : EbServiceStackAuthRequest, IReturn<GetAllUsersResponse>
     {
 
