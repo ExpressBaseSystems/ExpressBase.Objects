@@ -83,23 +83,27 @@ namespace ExpressBase.Objects
                 string _cols = string.Empty;
                 string _id = "id";
 
-                if (_table.Colums.Count > 0)
+                if (_table.Columns.Count > 0)
                 {
-                    _cols = String.Join(", ", _table.Colums.Select(x => x.ColumName));
+                    _cols = String.Join(", ", _table.Columns.Select(x => x.ColumnName));
                     if (_table.TableName != _schema.MasterTable)
                         _id = _schema.MasterTable + "_id";
                     else
                         _cols = "eb_auto_id," + _cols;
                     query += string.Format("SELECT id, {0} FROM {1} WHERE {2} = :id AND eb_del='F';", _cols, _table.TableName, _id);
 
-                    foreach(ColumSchema Col in _table.Colums)
+                    foreach(ColumnSchema Col in _table.Columns)
                     {
                         if (Col.Control.GetType().Equals(typeof(EbPowerSelect)))
                         {
-                            queryExt += (Col.Control as EbPowerSelect).GetSelectQuery(_service, Col.ColumName, _table.ParentTable, _id);
+                            queryExt += (Col.Control as EbPowerSelect).GetSelectQuery(_service, Col.ColumnName, _table.ParentTable, _id);
                         }
                     }
                 }
+            }
+            foreach(Object Ctrl in _schema.ExtendedControls)
+            {
+                queryExt += (Ctrl as EbFileUploader).GetSelectQuery();
             }
             return query + queryExt;
         }
@@ -125,7 +129,7 @@ namespace ExpressBase.Objects
             WebFormSchema _formSchema = new WebFormSchema();
             _formSchema.FormName = this.Name;
             _formSchema.MasterTable = this.TableName.ToLower();
-            _formSchema.Tables = new List<TableSchema>();
+            //_formSchema.Tables = new List<TableSchema>();
             _formSchema = GetWebFormSchemaRec(_formSchema, this, this.TableName.ToLower());
             return _formSchema;
         }
@@ -136,27 +140,30 @@ namespace ExpressBase.Objects
             TableSchema _table = _schema.Tables.FirstOrDefault(tbl => tbl.TableName == _container.TableName);
             if (_table == null)
             {
-                List<ColumSchema> _columns = new List<ColumSchema>();
-                foreach (EbControl control in _flatControls)
-                {
-                    if (control is EbAutoId)
-                        _columns.Add(new ColumSchema { ColumName = "eb_auto_id", EbDbType = (int)EbDbTypes.String, Control = control });
-                    else
-                        _columns.Add(new ColumSchema { ColumName = control.Name, EbDbType = (int)control.EbDbType, Control = control });
-                }
-                if (_columns.Count > 0)
-                    _schema.Tables.Add(new TableSchema { TableName = _container.TableName.ToLower(), Colums = _columns, ParentTable = _parentTable });
+                _table = new TableSchema { TableName = _container.TableName.ToLower(), ParentTable = _parentTable };
+                _schema.Tables.Add(_table);
+                
+                //List<ColumnSchema> _columns = new List<ColumnSchema>();
+                //foreach (EbControl control in _flatControls)
+                //{
+                //    if (control is EbAutoId)
+                //        _columns.Add(new ColumnSchema { ColumnName = "eb_auto_id", EbDbType = (int)EbDbTypes.String, Control = control });
+                //    else
+                //        _columns.Add(new ColumnSchema { ColumnName = control.Name, EbDbType = (int)control.EbDbType, Control = control });
+                //}
+                //if (_columns.Count > 0)
+                //    _schema.Tables.Add(new TableSchema { TableName = _container.TableName.ToLower(), Columns = _columns, ParentTable = _parentTable });
             }
-            else
+            foreach (EbControl control in _flatControls)
             {
-                foreach (EbControl control in _flatControls)
-                {
-                    if (control is EbAutoId)
-                        _table.Colums.Add(new ColumSchema { ColumName = "eb_auto_id", EbDbType = (int)EbDbTypes.String, Control = control });
-                    else
-                        _table.Colums.Add(new ColumSchema { ColumName = control.Name, EbDbType = (int)control.EbDbType, Control = control });
-                }
+                if (control is EbFileUploader)
+                    _schema.ExtendedControls.Add(control);
+                else if (control is EbAutoId)
+                    _table.Columns.Add(new ColumnSchema { ColumnName = "eb_auto_id", EbDbType = (int)EbDbTypes.String, Control = control });
+                else
+                    _table.Columns.Add(new ColumnSchema { ColumnName = control.Name, EbDbType = (int)control.EbDbType, Control = control });
             }
+            
             foreach (EbControl _control in _container.Controls)
             {
                 if (_control is EbControlContainer)
