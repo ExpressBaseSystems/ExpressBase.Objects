@@ -230,23 +230,23 @@ END LOOP;", _schema.TableName, GetExecuteQryU(_schema));
             string qry = "EXECUTE 'INSERT INTO " + _schema.TableName + "("+ m_tablename;
             string _using_clas = string.Empty;
 
-            foreach (ColumSchema col in _schema.Colums)
+            foreach (ColumnSchema col in _schema.Columns)
             {
-                if (!col.Equals(_schema.Colums.Last()))
+                if (!col.Equals(_schema.Columns.Last()))
                 {
-                    qry = qry + col.ColumName + CharConstants.COMMA;
-                    _using_clas = _using_clas + "_row->>'" + col.ColumName + "'" + "::" + this.GetVendorDbText(col.EbDbType) + CharConstants.COMMA;
+                    qry = qry + col.ColumnName + CharConstants.COMMA;
+                    _using_clas = _using_clas + "_row->>'" + col.ColumnName + "'" + "::" + this.GetVendorDbText(col.EbDbType) + CharConstants.COMMA;
                 }
                 else
                 {
-                    qry = qry + col.ColumName + ") VALUES("+ m_table_id;
-                    _using_clas = _using_clas + "_row->>'" + col.ColumName + "'" + "::" + this.GetVendorDbText(col.EbDbType) + CharConstants.SEMI_COLON;
+                    qry = qry + col.ColumnName + ") VALUES("+ m_table_id;
+                    _using_clas = _using_clas + "_row->>'" + col.ColumnName + "'" + "::" + this.GetVendorDbText(col.EbDbType) + CharConstants.SEMI_COLON;
                 }
             }
 
-            for (int i = 1; i <= _schema.Colums.Count; i++)
+            for (int i = 1; i <= _schema.Columns.Count; i++)
             {
-                if (i != _schema.Colums.Count)
+                if (i != _schema.Columns.Count)
                     qry = qry + "$" + i + CharConstants.COMMA;
                 else
                     qry = qry + "$" + i + ")'";
@@ -260,18 +260,18 @@ END LOOP;", _schema.TableName, GetExecuteQryU(_schema));
             string qry = string.Format("EXECUTE 'UPDATE {0} SET ", _schema.TableName);
             string _using_clas = string.Empty;
             int _counter = 0;
-            foreach (ColumSchema col in _schema.Colums)
+            foreach (ColumnSchema col in _schema.Columns)
             {
                 _counter++;
-                if (!col.Equals(_schema.Colums.Last()))
+                if (!col.Equals(_schema.Columns.Last()))
                 {
-                    qry = qry + col.ColumName + CharConstants.EQUALS + "$" + _counter + CharConstants.COMMA;
-                    _using_clas = _using_clas + "_row->>'" + col.ColumName + "'" + "::" + this.GetVendorDbText(col.EbDbType) + CharConstants.COMMA;
+                    qry = qry + col.ColumnName + CharConstants.EQUALS + "$" + _counter + CharConstants.COMMA;
+                    _using_clas = _using_clas + "_row->>'" + col.ColumnName + "'" + "::" + this.GetVendorDbText(col.EbDbType) + CharConstants.COMMA;
                 }
                 else
                 {
-                    qry = qry + col.ColumName + CharConstants.EQUALS + "$" + _counter + " WHERE id=$" + _counter + ";'";
-                    _using_clas = _using_clas + "_row->>'" + col.ColumName + "'" + "::" + this.GetVendorDbText(col.EbDbType) + CharConstants.SEMI_COLON;
+                    qry = qry + col.ColumnName + CharConstants.EQUALS + "$" + _counter + " WHERE id=$" + _counter + ";'";
+                    _using_clas = _using_clas + "_row->>'" + col.ColumnName + "'" + "::" + this.GetVendorDbText(col.EbDbType) + CharConstants.SEMI_COLON;
                 }
             }
             qry = qry + " USING " + _using_clas;

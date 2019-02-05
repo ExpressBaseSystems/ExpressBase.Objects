@@ -313,7 +313,7 @@ namespace ExpressBase.Objects
                 dr = EbSerializers.Json_Deserialize(result.Data[0].Json);
                 service.Redis.Set<EbDataReader>(this.DataSourceId, dr);
             }
-            string dispcol = string.Join(",", this.DisplayMembers.Select(c => this.EbSid + "." + c.Name));//powerselect table __A
+            string dispcol = string.Join(",", this.DisplayMembers.Select(c => "__A." + c.Name));//powerselect table __A
 
             //string whrcond = string.Join(" AND ", this.Values.Select(v => this.ValueMember.Name + "=" + v));
 
@@ -323,7 +323,6 @@ namespace ExpressBase.Objects
                                         ({2}) __A, {3} __B
                                     WHERE 
                                         __A.{0} = ANY(STRING_TO_ARRAY(__B.{4}::TEXT, ',')::INT[]) AND __B.{5} = :{5};"
-                    .Replace("__A", this.EbSid)
                     , this.ValueMember.Name, dispcol, dr.Sql, Tbl, Col, _id);            
             return tt;
             //a.id = any(string_to_array(b.set_id, ',')::int[]
