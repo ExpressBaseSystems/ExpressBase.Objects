@@ -3,6 +3,7 @@ using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Objects.Helpers;
+using ServiceStack;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -13,7 +14,7 @@ using System.Threading.Tasks;
 namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
-    class EbFileUploader : EbControlUI
+    public class EbFileUploader : EbControlUI
 	{
 
         public EbFileUploader() { }
@@ -101,6 +102,20 @@ namespace ExpressBase.Objects
                .Replace("@LabelBackColor ", "background-color:" + (LabelBackColor ?? "@LabelBackColor ") + ";");
 
             return ReplacePropsInHTML(EbCtrlHTML);
+        }
+
+        //INCOMPLETE
+        public string GetSelectQuery()
+        {
+            string Qry = @"
+SELECT 
+	B.id, B.filename, B.tags, B.uploadts
+FROM
+	eb_files_ref B
+WHERE
+	B.contextid = :context AND B.eb_del = false;";
+
+            return Qry;
         }
     }
 }

@@ -493,5 +493,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 14)]
         public string Method { get; set; }
+
+        [DataMember(Order = 15)]
+        public string Comment { get; set; }
     }
 }

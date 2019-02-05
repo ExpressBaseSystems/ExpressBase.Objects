@@ -6,6 +6,7 @@ using ExpressBase.Common.Structures;
 using ExpressBase.Data;
 using ExpressBase.Objects.Objects.DVRelated;
 using ExpressBase.Objects.ServiceStack_Artifacts;
+using ServiceStack;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -274,7 +275,7 @@ namespace ExpressBase.Objects
 <div id='@ebsid@Container'  role='form' data-toggle='validator' style='width:100%;'>
     <input type='hidden' name='@ebsid@Hidden4val' data-ebtype='8' id='@ebsid@'/>
     @VueSelectCode
-    <center style='position:relative'>
+    <center class='pow-center'>
         <div id='@ebsid@DDdiv' v-show='DDstate' class='DDdiv expand-transition'  style='width:@DDwidth%;'> 
             <table id='@ebsid@tbl' tabindex='1000' style='width:100%' class='table table-bordered'></table>
         </div>
@@ -299,6 +300,33 @@ namespace ExpressBase.Objects
 .Replace("@tooltipText@", this.ToolTipText ?? string.Empty);
 
             return ReplacePropsInHTML(EbCtrlHTML);
+        }
+
+
+        //INCOMPLETE
+        public string GetSelectQuery(Service service, string Col, string Tbl, string _id)
+        {
+            EbDataReader dr = service.Redis.Get<EbDataReader>(this.DataSourceId);
+            if (dr == null)
+            {
+                var result = service.Gateway.Send<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = this.DataSourceId });
+                dr = EbSerializers.Json_Deserialize(result.Data[0].Json);
+                service.Redis.Set<EbDataReader>(this.DataSourceId, dr);
+            }
+            string dispcol = string.Join(",", this.DisplayMembers.Select(c => this.EbSid + "." + c.Name));//powerselect table __A
+
+            //string whrcond = string.Join(" AND ", this.Values.Select(v => this.ValueMember.Name + "=" + v));
+
+            var tt = string.Format(@"SELECT 
+                                        __A.{0},{1} 
+                                    FROM 
+                                        ({2}) __A, {3} __B
+                                    WHERE 
+                                        __A.{0} = ANY(STRING_TO_ARRAY(__B.{4}::TEXT, ',')::INT[]) AND __B.{5} = :{5};"
+                    .Replace("__A", this.EbSid)
+                    , this.ValueMember.Name, dispcol, dr.Sql, Tbl, Col, _id);            
+            return tt;
+            //a.id = any(string_to_array(b.set_id, ',')::int[]
         }
     }
 }

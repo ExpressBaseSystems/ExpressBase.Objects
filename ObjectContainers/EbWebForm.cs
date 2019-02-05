@@ -45,7 +45,7 @@ namespace ExpressBase.Objects
 
         public override string GetHtml()
         {
-             string html = "<form id='@ebsid@' isrendermode='@rmode@' ebsid='@ebsid@' class='formB-box form-buider-form ebcont-ctrl' eb-form='true' ui-inp eb-type='WebForm' @tabindex@>";
+            string html = "<form id='@ebsid@' isrendermode='@rmode@' ebsid='@ebsid@' class='formB-box form-buider-form ebcont-ctrl' eb-form='true' ui-inp eb-type='WebForm' @tabindex@>";
 
             foreach (EbControl c in this.Controls)
                 html += c.GetHtml();
@@ -71,10 +71,11 @@ namespace ExpressBase.Objects
 
             return string.Join(",", _lst.ToArray());
         }
-        
-        public string GetSelectQuery(WebFormSchema _schema = null)
+
+        public string GetSelectQuery(WebFormSchema _schema = null, Service _service = null)
         {
             string query = string.Empty;
+            string queryExt = string.Empty;
             if (_schema == null)
                 _schema = this.GetWebFormSchema();
             foreach (TableSchema _table in _schema.Tables)
@@ -90,9 +91,17 @@ namespace ExpressBase.Objects
                     else
                         _cols = "eb_auto_id," + _cols;
                     query += string.Format("SELECT id, {0} FROM {1} WHERE {2} = :id AND eb_del='F';", _cols, _table.TableName, _id);
+
+                    foreach(ColumSchema Col in _table.Colums)
+                    {
+                        if (Col.Control.GetType().Equals(typeof(EbPowerSelect)))
+                        {
+                            queryExt += (Col.Control as EbPowerSelect).GetSelectQuery(_service, Col.ColumName, _table.ParentTable, _id);
+                        }
+                    }
                 }
             }
-            return query;
+            return query + queryExt;
         }
 
         public string GetDeleteQuery(WebFormSchema _schema = null)
@@ -117,11 +126,11 @@ namespace ExpressBase.Objects
             _formSchema.FormName = this.Name;
             _formSchema.MasterTable = this.TableName.ToLower();
             _formSchema.Tables = new List<TableSchema>();
-            _formSchema = GetWebFormSchemaRec(_formSchema, this);
+            _formSchema = GetWebFormSchemaRec(_formSchema, this, this.TableName.ToLower());
             return _formSchema;
         }
 
-        private WebFormSchema GetWebFormSchemaRec(WebFormSchema _schema, EbControlContainer _container)
+        private WebFormSchema GetWebFormSchemaRec(WebFormSchema _schema, EbControlContainer _container, string _parentTable)
         {
             IEnumerable<EbControl> _flatControls = _container.Controls.Get1stLvlControls();
             TableSchema _table = _schema.Tables.FirstOrDefault(tbl => tbl.TableName == _container.TableName);
@@ -131,21 +140,21 @@ namespace ExpressBase.Objects
                 foreach (EbControl control in _flatControls)
                 {
                     if (control is EbAutoId)
-                        _columns.Add(new ColumSchema { ColumName = "eb_auto_id", EbDbType = (int)EbDbTypes.String });
+                        _columns.Add(new ColumSchema { ColumName = "eb_auto_id", EbDbType = (int)EbDbTypes.String, Control = control });
                     else
-                        _columns.Add(new ColumSchema { ColumName = control.Name, EbDbType = (int)control.EbDbType });
+                        _columns.Add(new ColumSchema { ColumName = control.Name, EbDbType = (int)control.EbDbType, Control = control });
                 }
                 if (_columns.Count > 0)
-                    _schema.Tables.Add(new TableSchema { TableName = _container.TableName.ToLower(), Colums = _columns });
+                    _schema.Tables.Add(new TableSchema { TableName = _container.TableName.ToLower(), Colums = _columns, ParentTable = _parentTable });
             }
             else
             {
                 foreach (EbControl control in _flatControls)
                 {
                     if (control is EbAutoId)
-                        _table.Colums.Add(new ColumSchema { ColumName = "eb_auto_id", EbDbType = (int)EbDbTypes.String });
+                        _table.Colums.Add(new ColumSchema { ColumName = "eb_auto_id", EbDbType = (int)EbDbTypes.String, Control = control });
                     else
-                        _table.Colums.Add(new ColumSchema { ColumName = control.Name, EbDbType = (int)control.EbDbType });
+                        _table.Colums.Add(new ColumSchema { ColumName = control.Name, EbDbType = (int)control.EbDbType, Control = control });
                 }
             }
             foreach (EbControl _control in _container.Controls)
@@ -153,12 +162,12 @@ namespace ExpressBase.Objects
                 if (_control is EbControlContainer)
                 {
                     EbControlContainer Container = _control as EbControlContainer;
-
+                    string __parentTbl = _parentTable;
                     if (Container.TableName.IsNullOrEmpty())
-                    {
                         Container.TableName = _container.TableName;
-                    }
-                    _schema = GetWebFormSchemaRec(_schema, Container);
+                    else
+                        __parentTbl = _container.TableName;
+                    _schema = GetWebFormSchemaRec(_schema, Container, __parentTbl);
                 }
             }
             return _schema;
@@ -175,7 +184,7 @@ namespace ExpressBase.Objects
         }
 
         public override string DiscoverRelatedRefids()
-        {            
+        {
             return EbFormHelper.DiscoverRelatedRefids(this);
         }
     }
@@ -237,7 +246,7 @@ namespace ExpressBase.Objects
                 Console.WriteLine("EXCEPTION : FormAfterRedisGet " + e.Message);
             }
         }
-                
+
         public static void AfterRedisGet(EbControlContainer _this, Service service)
         {
             try
