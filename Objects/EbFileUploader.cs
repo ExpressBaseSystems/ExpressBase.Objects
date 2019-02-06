@@ -113,7 +113,7 @@ SELECT
 FROM
 	eb_files_ref B
 WHERE
-	B.contextid = :context || '_@EbSid@' AND B.eb_del = false;".Replace("EbSid", this.EbSid);
+	B.context = :context || '_@Name@' AND B.eb_del = 'F';".Replace("@Name@", this.Name?? this.EbSid);
 
             return Qry;
         }
