@@ -66,11 +66,8 @@ namespace ExpressBase.Objects
         public string AImg { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
-        [PropertyGroup("Test")]
         [OnChangeUIFunction("EbTable.padding")]
-        [DefaultPropValue("3")]
-        [UIproperty]
-        public int Padding { get; set; }
+        public override int Padding { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.CollectionA2C)]
