@@ -17,7 +17,10 @@ namespace ExpressBase.Objects
     public class EbFileUploader : EbControlUI
 	{
 
-        public EbFileUploader() { }
+        public EbFileUploader()
+        {
+            this.Categories = new List<EbFupCategories>();
+        }
 
 		[HideInPropertyGrid]
 		[EnableInBuilder(BuilderType.BotForm)]
@@ -30,7 +33,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup("General")]
         [PropertyEditor(PropertyEditorType.Collection)]
-        public List<string> Categories { set; get; }
+        public List<EbFupCategories> Categories { set; get; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup("General")]
@@ -117,5 +120,18 @@ WHERE
 
             return Qry;
         }
+    }
+
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+    public class EbFupCategories : EbControl
+    {
+        public EbFupCategories()
+        {
+
+        }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup("General")]
+        public string CategoryTitle { set; get; }
     }
 }
