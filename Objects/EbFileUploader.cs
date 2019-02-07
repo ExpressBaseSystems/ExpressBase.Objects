@@ -123,6 +123,7 @@ WHERE
     }
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+    [HideInToolBox]
     public class EbFupCategories : EbControl
     {
         public EbFupCategories()
