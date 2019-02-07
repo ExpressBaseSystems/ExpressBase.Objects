@@ -49,6 +49,25 @@ namespace ExpressBase.Objects
             set { }
         }
 
+        public override string SetDisplayMemberJSfn
+        {
+            get
+            {
+                return @"console.log(1000);
+                        $.each(p1, function (i, row) {
+                            $.each(row.Columns, function (j, dm) {
+                                if (j === 0) {
+                                    this.initializer.Vobj.valueMembers.push(dm.Value);
+                                    return true;
+                                }
+                                this.initializer.Vobj.displayMembers[dm.Name].push(dm.Value);
+                            }.bind(this));
+                        }.bind(this));
+                ";
+            }
+            set { }
+        }
+
         public override string ClearJSfn
         {
             get
