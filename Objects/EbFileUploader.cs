@@ -3,6 +3,7 @@ using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Objects.Helpers;
+using ServiceStack;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -13,10 +14,13 @@ using System.Threading.Tasks;
 namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
-    class EbFileUploader : EbControlUI
+    public class EbFileUploader : EbControlUI
 	{
 
-        public EbFileUploader() { }
+        public EbFileUploader()
+        {
+            this.Categories = new List<EbFupCategories>();
+        }
 
 		[HideInPropertyGrid]
 		[EnableInBuilder(BuilderType.BotForm)]
@@ -29,7 +33,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup("General")]
         [PropertyEditor(PropertyEditorType.Collection)]
-        public List<string> Categories { set; get; }
+        public List<EbFupCategories> Categories { set; get; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup("General")]
@@ -102,5 +106,33 @@ namespace ExpressBase.Objects
 
             return ReplacePropsInHTML(EbCtrlHTML);
         }
+
+        //INCOMPLETE
+        public string GetSelectQuery()
+        {
+            string Qry = @"
+SELECT 
+	B.id, B.filename, B.tags, B.uploadts
+FROM
+	eb_files_ref B
+WHERE
+	B.context = :context || '_@Name@' AND B.eb_del = 'F';".Replace("@Name@", this.Name?? this.EbSid);
+
+            return Qry;
+        }
+    }
+
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+    [HideInToolBox]
+    public class EbFupCategories : EbControl
+    {
+        public EbFupCategories()
+        {
+
+        }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup("General")]
+        public string CategoryTitle { set; get; }
     }
 }

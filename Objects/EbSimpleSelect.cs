@@ -272,12 +272,12 @@ namespace ExpressBase.Objects
     [HideInToolBox]
     public class EbSimpleSelectOption : EbControl
     {
+        public EbSimpleSelectOption() { }
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         public override string Label { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         public string Value { get; set; }
-
-        public EbSimpleSelectOption() { }
     }
 }

@@ -49,11 +49,8 @@ namespace ExpressBase.Objects
         public override string Label { get => base.Label; set => base.Label = value; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
-        [PropertyGroup("Test")]
         [OnChangeUIFunction("EbTabControl.padding")]
-        [UIproperty]
-        [DefaultPropValue("3")]
-        public int Padding { get; set; }
+        public override int Padding { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.Collection)]

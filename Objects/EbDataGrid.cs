@@ -123,6 +123,7 @@ namespace ExpressBase.Objects
     public class EbDGStringColumn : EbDGColumn
     {
 
+        [JsonIgnore]
         public EbTextBox EbTextBox { get; set; }
 
         public EbDGStringColumn()
@@ -200,7 +201,7 @@ namespace ExpressBase.Objects
     [UsedWithTopObjectParent(typeof(EbObject))]
     public class EbDGSimpleSelectColumn : EbDGColumn
     {
-
+        [JsonIgnore]
         public EbSimpleSelect EbSimpleSelect { get; set; }
 
         public EbDGSimpleSelectColumn()
@@ -308,7 +309,8 @@ namespace ExpressBase.Objects
     public class EbDGPowerSelectColumn : EbDGColumn
     {
         public bool MultiSelect { get; set; }
-
+        
+        [JsonIgnore]
         private EbPowerSelect EbPowerSelect { get; set; }
 
         public EbDGPowerSelectColumn()
