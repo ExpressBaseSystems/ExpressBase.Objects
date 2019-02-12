@@ -180,7 +180,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         {
             try
             {
-                string query = @"INSERT INTO executionlogs(rows, exec_time, created_by, created_at, params, refid) 
+                string query = @"INSERT INTO eb_executionlogs(rows, exec_time, created_by, created_at, params, refid) 
                                 VALUES(:rows, :exec_time, :created_by, :created_at, :params, :refid)";
                 DbParameter[] parameters = {
                      EbConnectionFactory.ObjectsDB.GetNewParameter("rows", EbDbTypes.String,rows),
