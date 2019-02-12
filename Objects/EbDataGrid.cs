@@ -67,7 +67,8 @@ namespace ExpressBase.Objects
             foreach (EbDGColumn col in Controls)
             {
                 if (!col.Hidden)
-                    html += string.Concat("<th>", col.Title, "</th>");
+                    html += string.Concat("<th>", col.Title, "@req@</th>")
+                        .Replace("@req@", (col.Required ? "<sup style='color: red'>*</sup>" : string.Empty));
             }
 
             html += @"
@@ -122,6 +123,7 @@ namespace ExpressBase.Objects
     public class EbDGStringColumn : EbDGColumn
     {
 
+        [JsonIgnore]
         public EbTextBox EbTextBox { get; set; }
 
         public EbDGStringColumn()
@@ -199,7 +201,7 @@ namespace ExpressBase.Objects
     [UsedWithTopObjectParent(typeof(EbObject))]
     public class EbDGSimpleSelectColumn : EbDGColumn
     {
-
+        [JsonIgnore]
         public EbSimpleSelect EbSimpleSelect { get; set; }
 
         public EbDGSimpleSelectColumn()
@@ -307,7 +309,8 @@ namespace ExpressBase.Objects
     public class EbDGPowerSelectColumn : EbDGColumn
     {
         public bool MultiSelect { get; set; }
-
+        
+        [JsonIgnore]
         private EbPowerSelect EbPowerSelect { get; set; }
 
         public EbDGPowerSelectColumn()

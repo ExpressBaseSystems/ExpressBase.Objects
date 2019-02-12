@@ -10,7 +10,7 @@ using System.Text;
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
     [DataContract]
-    public class PdfCreateServiceMqRequest : EbServiceStackAuthRequest, IReturn<PdfCreateServicesResponse>
+    public class EmailAttachmentMqRequest : EbServiceStackAuthRequest, IReturn<EmailAttachmenResponse>
     {
         [DataMember(Order = 1)]
         public int ObjId  { get; set; }
@@ -20,7 +20,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     }
     [DataContract]
-    public class PdfCreateServiceRequest : EbServiceStackAuthRequest, IReturn<PdfCreateServicesResponse>
+    public class EmailAttachmenRequest : EbServiceStackAuthRequest, IReturn<EmailAttachmenResponse>
     {
         [DataMember(Order = 1)]
         public int ObjId { get; set; }
@@ -28,7 +28,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order =2)]
         public List<Param> Params { get; set; }
     }
-    public  class PdfCreateServicesResponse
+    public  class EmailAttachmenResponse
     {
         [DataMember(Order = 1)]
         public ResponseStatus ResponseStatus { get; set; }

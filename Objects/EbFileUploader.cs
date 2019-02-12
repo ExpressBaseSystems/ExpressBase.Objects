@@ -1,6 +1,9 @@
-﻿using ExpressBase.Common.Extensions;
+﻿using ExpressBase.Common;
+using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
+using ExpressBase.Objects.Helpers;
+using ServiceStack;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -11,16 +14,48 @@ using System.Threading.Tasks;
 namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
-    class EbFileUploader : EbControlUI
+    public class EbFileUploader : EbControlUI
 	{
 
-        public EbFileUploader() { }
+        public EbFileUploader()
+        {
+            this.Categories = new List<EbFupCategories>();
+        }
 
 		[HideInPropertyGrid]
 		[EnableInBuilder(BuilderType.BotForm)]
 		public override bool IsReadOnly { get => this.ReadOnly; }
 
-		[OnDeserialized]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup("General")]
+        public FileClass FileType { set; get; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup("General")]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        public List<EbFupCategories> Categories { set; get; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup("General")]
+        public bool IsMultipleUpload { set; get; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup("General")]
+        public bool EnableTag { set; get; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup("General")]
+        public bool EnableCrop { set; get; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup("General")]
+        public int MaxFileSize { set; get; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup("Crop Properties")]
+        public bool ResizeViewPort { set; get; }
+
+        [OnDeserialized]
         public void OnDeserializedMethod(StreamingContext context)
         {
             this.BareControlHtml = this.GetBareHtml();
@@ -42,39 +77,62 @@ namespace ExpressBase.Objects
         public override string GetBareHtml()
         {
             return @" 
-        <div class='input-group' style='width:100%;'>
-            <input id='@name@txt' type='text' style='width:100%;' onclick=""$('#@name@').click()""  />
-            <input id='@name@' data-toggle='tooltip' title='@toolTipText@' type='file' onchange=""$('#@name@txt').val($(this).val())"" name='@name@' @value@ @tabIndex@ style='display:none; width:100%; @BackColor@ @ForeColor@ @fontStyle@ @readOnlyString@ @required@ />
-            <span class='input-group-addon' onclick=""$('#@name@').click()""> <i id='@name@TglBtn' class='fa  fa-file' aria-hidden='true'></i> </span>
-        </div>"
-.Replace("@name@", this.Name)
-.Replace("@toolTipText@", this.ToolTipText)
-.Replace("@value@", "")//"value='" + this.Value + "'")
-.Replace("@tabIndex@", "tabindex='" + this.TabIndex + "'")
-    .Replace("@BackColor@ ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor@ ") + ";"))
-    .Replace("@ForeColor@ ", "color:" + ((this.ForeColor != null) ? this.ForeColor : "@ForeColor@ ") + ";")
-.Replace("@required@", " required")//(this.Required && !this.Hidden ? " required" : string.Empty))
-.Replace("@readOnlyString@", this.ReadOnlyString);
+        <div id='@ebsid@' style='width:100%;'></div>"
+            .Replace("@ebsid@", this.EbSid);
         }
 
         public override string GetHtml()
         {
-            string EbCtrlHTML = @"
-    <div id='cont_@name@' Ctype='FileUploader' class='Eb-ctrlContainer' style='@hiddenString'>
-        <div class='eb-ctrl-label' id='@name@Lbl' style='@LabelBackColor  @LabelForeColor '> @Label </div>
-       @barehtml@
-        <span class='helpText'> @HelpText </span>
-    </div>
-"
-.Replace("@barehtml@", this.GetBareHtml())
-.Replace("@name@", this.Name)
-.Replace("@hiddenString", this.HiddenString)
+            //            string EbCtrlHTML = @"
+            //    <div id='cont_@name@' Ctype='FileUploader' class='Eb-ctrlContainer' style='@hiddenString'>
+            //        <div class='eb-ctrl-label' id='@name@Lbl' style='@LabelBackColor  @LabelForeColor '> @Label </div>
+            //       @barehtml@
+            //        <span class='helpText'> @HelpText </span>
+            //    </div>
+            //"
+            //.Replace("@barehtml@", this.GetBareHtml())
+            //.Replace("@name@", this.Name)
+            //.Replace("@hiddenString", this.HiddenString)
 
-    .Replace("@LabelForeColor ", "color:" + ((this.LabelForeColor != null) ? this.LabelForeColor : "@LabelForeColor ") + ";")
-    .Replace("@LabelBackColor ", "background-color:" + ((this.LabelBackColor != null) ? this.LabelBackColor : "@LabelBackColor ") + ";")
-    .Replace("@HelpText ", ((this.HelpText != null) ? this.HelpText : "@HelpText "))
-    .Replace("@Label ", ((this.Label != null) ? this.Label : "@Label "));
-            return EbCtrlHTML;
+            //    .Replace("@LabelForeColor ", "color:" + ((this.LabelForeColor != null) ? this.LabelForeColor : "@LabelForeColor ") + ";")
+            //    .Replace("@LabelBackColor ", "background-color:" + ((this.LabelBackColor != null) ? this.LabelBackColor : "@LabelBackColor ") + ";")
+            //    .Replace("@HelpText ", ((this.HelpText != null) ? this.HelpText : "@HelpText "))
+            //    .Replace("@Label ", ((this.Label != null) ? this.Label : "@Label "));
+            //            return EbCtrlHTML;
+
+            string EbCtrlHTML = HtmlConstants.CONTROL_WRAPER_HTML4WEB
+               .Replace("@LabelForeColor ", "color:" + (LabelForeColor ?? "@LabelForeColor ") + ";")
+               .Replace("@LabelBackColor ", "background-color:" + (LabelBackColor ?? "@LabelBackColor ") + ";");
+
+            return ReplacePropsInHTML(EbCtrlHTML);
         }
+
+        //INCOMPLETE
+        public string GetSelectQuery()
+        {
+            string Qry = @"
+SELECT 
+	B.id, B.filename, B.tags, B.uploadts
+FROM
+	eb_files_ref B
+WHERE
+	B.context = :context || '_@Name@' AND B.eb_del = 'F';".Replace("@Name@", this.Name?? this.EbSid);
+
+            return Qry;
+        }
+    }
+
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+    [HideInToolBox]
+    public class EbFupCategories : EbControl
+    {
+        public EbFupCategories()
+        {
+
+        }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup("General")]
+        public string CategoryTitle { set; get; }
     }
 }

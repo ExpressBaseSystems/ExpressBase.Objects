@@ -55,7 +55,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Message { get; set; }
 
         [DataMember(Order = 2)]
-        public string Result { get; set; }
+        public object Result { get; set; }
     }
 
     [DataContract]
@@ -138,16 +138,32 @@ END;";
  
     }
 
-    public class SqlParams
+    public class ResultWrapper
     {
-        public SqlParams()
+        public ResultWrapper()
         {
-            this.Parameter = new List<Param>();
+            this.InputParams = new List<Param>();
         }
-        public string Sql { get; set; }
 
-        public object Object { get; set; }
+        public object Result { get; set; }
 
-        public List<Param> Parameter { set; get; }
+        public List<Param> InputParams { set; get; }
+    }
+
+    public class ObjWrapperInt
+    {
+        public int ObjectType { get; set; }
+
+        public EbObject EbObj { set; get; }
+    }
+
+    [Serializable()]
+    public class ApiException : Exception
+    {
+        public ApiException(): base() { }
+
+        public ApiException(string message): base(message) { }
+
+        public ApiException(string message, Exception innerException):base(message, innerException) { }
     }
 }

@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ExpressBase.Objects.ReportRelated
+namespace ExpressBase.Objects
 {
     public abstract class EbReportFieldShape : EbReportField
     {
@@ -355,7 +355,7 @@ namespace ExpressBase.Objects.ReportRelated
         }
     }
     [EnableInBuilder(BuilderType.Report)]
-    public class EbTableLayout : EbReportFieldShape
+    public class EbTable_Layout : EbReportFieldShape
     {
         [EnableInBuilder(BuilderType.Report)]
         [DefaultPropValue("3")]
@@ -373,10 +373,10 @@ namespace ExpressBase.Objects.ReportRelated
 
         public override string GetDesignHtml()
         {
-            return @"<div class='eb_table_container dropped' id='@id' eb-type='TableLayout' 
+            return @"<div class='eb_table_container dropped' id='@id' eb-type='Table_Layout' 
                 style='top: @Top px;left: @Left px;height: @Height px;width: @Width px;'>
                 <table onclick='$(this).parent().click();' style='border: @Border px solid ; border-color: @BorderColor ;' class='table eb_table_layout'>
-                <tr><td eb-type='TableLayout'></td><td eb-type='TableLayout'></td><td eb-type='TableLayout'></td></tr>
+                <tr><td eb-type='Table_Layout'></td><td eb-type='TableLayout'></td><td eb-type='Table_Layout'></td></tr>
                 </table><div class='eb_draggbale_table_handle' onclick='$(this).parent().focus();'><i class='fa fa-arrows'></i></div></div>".RemoveCR().DoubleQuoted();
         }
         public override string GetJsInitFunc()

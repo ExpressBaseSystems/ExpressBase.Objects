@@ -27,6 +27,30 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 3)]
         public string Result { get; set; }
     }
+    public class RescheduleRequest : EbMqRequest
+    {
+        [DataMember(Order = 1)]
+        public EbTask Task { get; set; }
+
+        [DataMember(Order = 2)]
+        public string TriggerKey { get; set; }
+
+        [DataMember(Order = 2)]
+        public string JobKey { get; set; }
+
+    }
+
+    public class RescheduleResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 3)]
+        public string Result { get; set; }
+    }
     public class UnscheduleRequest : EbMqRequest
     {
         [DataMember(Order = 1)]
@@ -44,14 +68,31 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 3)]
         public string Result { get; set; }
     }
+    public class DeleteJobRequest : EbMqRequest
+    {
+        [DataMember(Order = 1)]
+        public string JobKey { get; set; }
+    }
 
-    public class SchedulerMQRequest : EbMqRequest
+    public class DeleteJobResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 3)]
+        public string Result { get; set; }
+    }
+
+    public class ScheduleMQRequest : EbMqRequest
     {
         [DataMember(Order = 1)]
         public EbTask Task { get; set; }
     }
 
-    public class UpdateSolutionSchedulesRequest : EbMqRequest
+    public class AddSchedulesToSolutionRequest : EbMqRequest
     {
         [DataMember(Order = 1)]
         public EbTask Task { get; set; }
@@ -65,9 +106,23 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 4)]
         public ScheduleStatuses Status { get; set; }
 
+        [DataMember(Order = 5)]
+        public int ObjId { get; set; }
+
+        [DataMember(Order = 5)]
+        public string Name { get; set; }
     }
 
-    public class SchedulerMQResponse : IEbSSResponse
+    public class DeleteJobMQRequest : EbServiceStackAuthRequest, IReturn<DeleteJobMQResponse>
+    {
+        [DataMember(Order = 1)]
+        public int Id { get; set; }
+
+        [DataMember(Order = 2)]
+        public string JobKey { get; set; }
+    }
+
+    public class DeleteJobMQResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
         public string Token { get; set; }
@@ -78,13 +133,52 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 3)]
         public string Result { get; set; }
     }
-    public class UnschedulerMQRequest : EbMqRequest
+
+    public class ScheduleMQResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 3)]
+        public string Result { get; set; }
+    }
+    public class UnscheduleMQRequest : EbMqRequest
     {
         [DataMember(Order = 1)]
         public string TriggerKey { get; set; }
     }
 
-    public class UnschedulerMQResponse : IEbSSResponse
+    public class UnscheduleMQResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 3)]
+        public string Result { get; set; }
+    }
+
+    public class RescheduleMQRequest : EbServiceStackAuthRequest, IReturn<DeleteJobMQResponse>
+    {
+        [DataMember(Order = 1)]
+        public string TriggerKey { get; set; }
+
+        [DataMember(Order = 2)]
+        public string JobKey { get; set; }
+
+        [DataMember(Order = 3)]
+        public EbTask Task { get; set; }
+
+        [DataMember(Order = 4)]
+        public int Id { get; set; }
+    }
+
+    public class RescheduleMQResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
         public string Token { get; set; }
@@ -115,7 +209,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
     public class GetSchedulesOfSolutionRequest : EbServiceStackAuthRequest, IReturn<GetSchedulesOfSolutionResponse>
     {
-
+        [DataMember(Order = 1)]
+        public int ObjectId { get; set; }
     }
     public class GetSchedulesOfSolutionResponse : IEbSSResponse
     {

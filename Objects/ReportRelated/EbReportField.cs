@@ -16,7 +16,7 @@ using ExpressBase.Common.Data;
 using Newtonsoft.Json;
 using ServiceStack;
 
-namespace ExpressBase.Objects.ReportRelated
+namespace ExpressBase.Objects
 {
     public abstract class EbReportField : EbReportObject
     {

@@ -1,15 +1,21 @@
-﻿using ExpressBase.Common.Constants;
+﻿using ExpressBase.Common;
+using ExpressBase.Common.Constants;
 using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
 using ExpressBase.Common.ServiceClients;
-using ExpressBase.Objects.ReportRelated;
+using ExpressBase.Common.Structures;
+using Newtonsoft.Json;
+using Npgsql;
 using RestSharp;
 using ServiceStack;
 using ServiceStack.Logging;
 using ServiceStack.Messaging;
 using ServiceStack.RabbitMq;
+using System;
 using System.Collections.Generic;
+using System.Data.Common;
+using System.Globalization;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
@@ -21,7 +27,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             get { return __EbConnectionFactory; }
             set
             {
-                if(value != null)
+                if (value != null)
                     __EbConnectionFactory = value;
             }
         }
@@ -74,7 +80,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         {
             this.EbConnectionFactory = _dbf as EbConnectionFactory;
             this.FileClient = _sfc as EbStaticFileClient;
-            
+
         }
 
         public EbBaseService(IEbConnectionFactory _dbf, IEbServerEventClient _sec)
@@ -170,7 +176,29 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public ILog Log { get { return LogManager.GetLogger(GetType()); } }
 
-
+        public bool InsertExecutionLog(string rows, TimeSpan t, DateTime starttime, int userid, List<Param> param, string refid)
+        {
+            try
+            {
+                string query = @"INSERT INTO executionlogs(rows, exec_time, created_by, created_at, params, refid) 
+                                VALUES(:rows, :exec_time, :created_by, :created_at, :params, :refid)";
+                DbParameter[] parameters = {
+                     EbConnectionFactory.ObjectsDB.GetNewParameter("rows", EbDbTypes.String,rows),
+                     EbConnectionFactory.ObjectsDB.GetNewParameter("exec_time", EbDbTypes.Int32,t.TotalMilliseconds),
+                     EbConnectionFactory.ObjectsDB.GetNewParameter("created_by", EbDbTypes.Int32,userid),
+                     EbConnectionFactory.ObjectsDB.GetNewParameter("created_at", EbDbTypes.DateTime,starttime),
+                     EbConnectionFactory.ObjectsDB.GetNewParameter("params", EbDbTypes.Json, EbSerializers.Json_Serialize(param)),
+                     EbConnectionFactory.ObjectsDB.GetNewParameter("refid", EbDbTypes.String,refid)
+                    };
+                this.EbConnectionFactory.ObjectsDB.DoNonQuery(query, parameters);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.StackTrace);
+                return false;
+            }
+            return true;
+        }
 
         //private void LoadCache()
         //{

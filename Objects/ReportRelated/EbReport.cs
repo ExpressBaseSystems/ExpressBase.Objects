@@ -11,7 +11,6 @@ using ExpressBase.Common.ServiceClients;
 using ExpressBase.Common.Singletons;
 using ExpressBase.Common.Structures;
 using ExpressBase.Objects.Objects;
-using ExpressBase.Objects.ReportRelated;
 using ExpressBase.Objects.ServiceStack_Artifacts;
 using ExpressBase.Security;
 using iTextSharp.text;
