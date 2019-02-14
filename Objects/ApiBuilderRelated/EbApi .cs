@@ -14,6 +14,12 @@ using System.Linq;
 
 namespace ExpressBase.Objects
 {
+    public enum DataReaderResult
+    {
+        Actual = 0,
+        Formated = 1
+    }
+
     public class ListOrdered : List<EbApiWrapper>
     {
         public ListOrdered()
@@ -59,9 +65,29 @@ namespace ExpressBase.Objects
         [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
         public override string Refid { get; set; }
 
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        [MetaOnly]
+        [UIproperty]
+        public string RefName { set; get; }
+
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        [MetaOnly]
+        [UIproperty]
+        public string Version { set; get; }
+
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        [PropertyGroup("Data Settings")]
+        public DataReaderResult ResultType { set; get; }
+
         public override string GetDesignHtml()
         {
-            return "<div class='apiPrcItem dropped' eb-type='SqlReader' id='@id'><div tabindex='1' class='drpbox' onclick='$(this).focus();'> @Label </div></div>".RemoveCR().DoubleQuoted(); ;
+            return @"<div class='apiPrcItem dropped' eb-type='SqlReader' id='@id'>
+                        <div tabindex='1' class='drpbox' onclick='$(this).focus();'>  
+                            <div class='CompLabel'> @Label </div>
+                            <div class='CompName'> @RefName </div>
+                            <div class='CompVersion'> @Version </div>
+                        </div>
+                     </div>".RemoveCR().DoubleQuoted(); ;
         }
 
         public override object GetOutParams(List<Param> _param)
@@ -89,9 +115,25 @@ namespace ExpressBase.Objects
         [OSE_ObjectTypes(EbObjectTypes.iSqlFunction)]
         public override string Refid { get; set; }
 
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        [MetaOnly]
+        [UIproperty]
+        public string RefName { set; get; }
+
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        [MetaOnly]
+        [UIproperty]
+        public string Version { set; get; }
+
         public override string GetDesignHtml()
         {
-            return "<div class='apiPrcItem dropped' eb-type='SqlFunc' id='@id'><div tabindex='1' class='drpbox' onclick='$(this).focus();'> @Label </div></div>".RemoveCR().DoubleQuoted();
+            return @"<div class='apiPrcItem dropped' eb-type='SqlFunc' id='@id'>
+                        <div tabindex='1' class='drpbox' onclick='$(this).focus();'>  
+                            <div class='CompLabel'> @Label </div>
+                            <div class='CompName'> @RefName </div>
+                            <div class='CompVersion'> @Version </div>
+                        </div>
+                    </div>".RemoveCR().DoubleQuoted();
         }
 
         public override object GetOutParams(List<Param> _param)
@@ -109,9 +151,25 @@ namespace ExpressBase.Objects
         [OSE_ObjectTypes(EbObjectTypes.iDataWriter)]
         public override string Refid { get; set; }
 
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        [MetaOnly]
+        [UIproperty]
+        public string RefName { set; get; }
+
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        [MetaOnly]
+        [UIproperty]
+        public string Version { set; get; }
+
         public override string GetDesignHtml()
         {
-            return "<div class='apiPrcItem dropped' eb-type='SqlWriter' id='@id'><div tabindex='1' class='drpbox' onclick='$(this).focus();'> @Label </div></div>".RemoveCR().DoubleQuoted();
+            return @"<div class='apiPrcItem dropped' eb-type='SqlWriter' id='@id'>
+                        <div tabindex='1' class='drpbox' onclick='$(this).focus();'>  
+                            <div class='CompLabel'> @Label </div>
+                            <div class='CompName'> @RefName </div>
+                            <div class='CompVersion'> @Version </div>
+                        </div>
+                    </div>".RemoveCR().DoubleQuoted();
         }
 
         public override object GetOutParams(List<Param> _param)
@@ -129,15 +187,49 @@ namespace ExpressBase.Objects
         [OSE_ObjectTypes(EbObjectTypes.iEmailBuilder)]
         public override string Refid { get; set; }
 
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        [MetaOnly]
+        [UIproperty]
+        public string RefName { set; get; }
+
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        [MetaOnly]
+        [UIproperty]
+        public string Version { set; get; }
+
         public override string GetDesignHtml()
         {
-            return "<div class='apiPrcItem dropped' eb-type='EmailNode' id='@id'><div tabindex='1' class='drpbox' onclick='$(this).focus();'> @Label </div></div>".RemoveCR().DoubleQuoted();
+            return @"<div class='apiPrcItem dropped' eb-type='EmailNode' id='@id'>
+                        <div tabindex='1' class='drpbox' onclick='$(this).focus();'>  
+                            <div class='CompLabel'> @Label </div>
+                            <div class='CompName'> @RefName </div>
+                            <div class='CompVersion'> @Version </div>
+                        </div>
+                    </div>".RemoveCR().DoubleQuoted();
         }
 
         public override object GetOutParams(List<Param> _param)
         {
-            
             return null;
+        }
+    }
+
+    [EnableInBuilder(BuilderType.ApiBuilder)]
+    public class EbProcessor : EbApiWrapper
+    {
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
+        public string Script { get; set; }
+
+        public override string GetDesignHtml()
+        {
+            return @"<div class='apiPrcItem dropped' eb-type='Processor' id='@id'>
+                        <div tabindex='1' class='drpbox' onclick='$(this).focus();'>  
+                            <div class='CompLabel'> @Label </div>
+                            <div class='CompName'></div>
+                            <div class='CompVersion'></div>
+                        </div>
+                    </div>".RemoveCR().DoubleQuoted();
         }
     }
 }
