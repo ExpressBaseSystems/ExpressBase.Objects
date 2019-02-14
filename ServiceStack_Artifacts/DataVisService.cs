@@ -7,6 +7,7 @@ using ServiceStack;
 using ServiceStack.Text;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
@@ -158,6 +159,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 16)]
         public string dvRefId { get; set; }
 
+        [DataMember(Order = 17)]
+        public bool IsExcel { get; set; }
+
     }
 
     [Route("/table")]
@@ -300,6 +304,102 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 13)]
         public User UserInfo { get; set; }
+
+        [DataMember(Order = 14)]
+        public bool IsExcel { get; set; }
+    }
+
+    [DataContract]
+    public class ExportToExcelMqRequest : EbServiceStackAuthRequest, IReturn<ExportToExcelServiceResponse>
+    {
+        [DataMember(Order = 11)]
+        public string RefId { get; set; }
+
+        [DataMember(Order = 10)]
+        public List<Param> Params { get; set; }
+
+        [DataMember(Order = 2)]
+        public int Length { get; set; }
+
+        [DataMember(Order = 11)]
+        public string DataVizObjString { get; set; }
+
+        [DataMember(Order = 12)]
+        public EbDataVisualization EbDataVisualization { get; set; }
+
+        [DataMember(Order = 13)]
+        public User UserInfo { get; set; }
+
+        [DataMember(Order = 16)]
+        public string dvRefId { get; set; }
+
+        [DataMember(Order = 16)]
+        public bool Ispaging { get; set; }
+
+        [DataMember(Order = 16)]
+        public bool IsExcel { get; set; }
+    }
+
+    [DataContract]
+    public class ExportToExcelServiceRequest : EbServiceStackAuthRequest, IReturn<ExportToExcelServiceResponse>
+    {
+        [DataMember(Order = 11)]
+        public string RefId { get; set; }
+
+        [DataMember(Order = 10)]
+        public List<Param> Params { get; set; }
+
+        [DataMember(Order = 2)]
+        public int Length { get; set; }
+
+        [DataMember(Order = 11)]
+        public string DataVizObjString { get; set; }
+
+        [DataMember(Order = 12)]
+        public EbDataVisualization EbDataVisualization { get; set; }
+
+        [DataMember(Order = 13)]
+        public User UserInfo { get; set; }
+
+        [DataMember(Order = 16)]
+        public string dvRefId { get; set; }
+
+        [DataMember(Order = 16)]
+        public bool Ispaging { get; set; }
+
+        [DataMember(Order = 16)]
+        public bool IsExcel { get; set; }
+
+
+        [DataMember(Order = 16)]
+        public string BToken { get; set; }
+
+        [DataMember(Order = 16)]
+        public string RToken { get; set; }
+    }
+
+    [DataContract]
+    [Csv(CsvBehavior.FirstEnumerable)]
+    public class ExportToExcelServiceResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public RowColletion Data { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 3)]
+        public DataSet DataSet { get; set; }
+
+        [DataMember(Order = 4)]
+        public RowColletion FormattedData { get; set; }
+
+        [DataMember(Order = 5)]
+        public Dictionary<int, List<object>> Summary { get; set; }
+
+        [DataMember(Order = 6)]
+        public string tableString { get; set; }
+
     }
 
     public class FormulaPart

@@ -249,6 +249,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 12)]
         public Dictionary<int, List<object>> Summary { get; set; }
 
+        [DataMember(Order = 13)]
+        public byte[] excel_file { get; set; }
+
     }
 
     [DataContract]

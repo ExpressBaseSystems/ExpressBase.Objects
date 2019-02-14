@@ -86,7 +86,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Result { get; set; }
     }
 
-    public class SchedulerMQRequest : EbMqRequest
+    public class ScheduleMQRequest : EbMqRequest
     {
         [DataMember(Order = 1)]
         public EbTask Task { get; set; }
@@ -134,7 +134,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Result { get; set; }
     }
 
-    public class SchedulerMQResponse : IEbSSResponse
+    public class ScheduleMQResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
         public string Token { get; set; }
@@ -145,13 +145,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 3)]
         public string Result { get; set; }
     }
-    public class UnschedulerMQRequest : EbMqRequest
+    public class UnscheduleMQRequest : EbMqRequest
     {
         [DataMember(Order = 1)]
         public string TriggerKey { get; set; }
     }
 
-    public class UnschedulerMQResponse : IEbSSResponse
+    public class UnscheduleMQResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
         public string Token { get; set; }
