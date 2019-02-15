@@ -34,6 +34,20 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
+    public class ApiComponetRequest: IReturn<ApiResponse>, IEbSSRequest
+    {
+        public string SolnId { get; set; }
+
+        public int UserId { get; set; }
+
+        [DataMember(Order = 1)]
+        public EbApiWrapper Component { set; get; }
+
+        [DataMember(Order = 2)]
+        public List<Param> Params { set; get; }
+    }
+
+    [DataContract]
     public class ApiRequest : IReturn<ApiResponse>, IEbSSRequest
     {
         public string SolnId { get; set; }
