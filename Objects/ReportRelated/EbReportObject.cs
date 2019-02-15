@@ -14,7 +14,8 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("General")]
-         public override string Name { get; set; }
+        [HideInPropertyGrid]
+        public override string Name { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]

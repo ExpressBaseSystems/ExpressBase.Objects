@@ -158,13 +158,9 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]
         public override string Width { get; set; }
-
-        [EnableInBuilder(BuilderType.Report)]
-        [HideInPropertyGrid]
+       
         public override string Left { get; set; }
 
-        [EnableInBuilder(BuilderType.Report)]
-        [HideInPropertyGrid]
         public override string Top { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
@@ -174,9 +170,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]
         public override string ForeColor { get; set; }
-
-        [EnableInBuilder(BuilderType.Report)]
-        [HideInPropertyGrid]
+       
         public override string Title { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
