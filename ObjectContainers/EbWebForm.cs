@@ -19,9 +19,10 @@ namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.WebForm)]
     [HideInToolBox]
-    public class EbWebForm : EbControlContainer
+    [BuilderTypeEnum(BuilderType.WebForm)]
+    public class EbWebForm : EbControlContainer , IEBRootObject
     {
-        [Browsable(false)]
+        [HideInPropertyGrid]
         public bool IsUpdate { get; set; }
 
         public bool IsRenderMode { get; set; }
