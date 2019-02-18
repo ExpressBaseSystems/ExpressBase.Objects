@@ -1,7 +1,9 @@
 ﻿using ExpressBase.Common;
 using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
+using Newtonsoft.Json;
 using ServiceStack;
+using ServiceStack.Text;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
@@ -32,6 +34,20 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
+    public class ApiComponetRequest: IReturn<ApiResponse>, IEbSSRequest
+    {
+        public string SolnId { get; set; }
+
+        public int UserId { get; set; }
+
+        [DataMember(Order = 1)]
+        public EbApiWrapper Component { set; get; }
+
+        [DataMember(Order = 2)]
+        public List<Param> Params { set; get; }
+    }
+
+    [DataContract]
     public class ApiRequest : IReturn<ApiResponse>, IEbSSRequest
     {
         public string SolnId { get; set; }
@@ -45,17 +61,55 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Name { set; get; }
 
         [DataMember(Order = 3)]
-        public Dictionary<string,object> Data { set; get; }
+        public Dictionary<string, object> Data { set; get; }
     }
 
     [DataContract]
     public class ApiResponse
     {
         [DataMember(Order = 1)]
-        public string Message { get; set; }
+        public string Name { set; get; }
 
         [DataMember(Order = 2)]
+        public string Version { set; get; }
+
+        [DataMember(Order = 3)]
+        public ApiMessage Message { get; set; }
+
+        [DataMember(Order = 4)]
         public object Result { get; set; }
+
+        public ApiResponse()
+        {
+            this.Message = new ApiMessage();
+        }
+    }
+
+    [DataContract]
+    public class ApiMessage
+    {
+        [DataMember(Order = 1)]
+        public string Status { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Description { get; set; }
+
+        [DataMember(Order = 3)]
+        [JsonProperty("Executed On")]
+        public string ExecutedOn { set; get; }
+
+        [DataMember(Order = 4)]
+        [JsonProperty("Execution Time")]
+        public string ExecutionTime { set; get; }
+    }
+
+    public class ApiComponent
+    {
+        [DataMember(Order = 1)]
+        public string Name { get; set; }
+
+        [DataMember(Order = 1)]
+        public string Version { get; set; }
     }
 
     [DataContract]
@@ -82,6 +136,17 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public EbApi Api { get; set; }
     }
 
+   [RuntimeSerializable]
+    public class JsonTableSet
+    {
+        public List<JsonTable> Tables { set; get; }
+
+        public JsonTableSet()
+        {
+            Tables = new List<JsonTable>();
+        }
+    }
+
     public class JsonTable
     {
         public string TableName { set; get; }
@@ -94,7 +159,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         }
     }
 
-    public class JsonColVal:Dictionary<string, dynamic>
+    public class JsonColVal : Dictionary<string, object>
     {
 
     }
@@ -135,7 +200,7 @@ BEGIN
         _table->>'TableName' = table_name;
     RETURN temp_table;
 END;";
- 
+
     }
 
     public class ResultWrapper
@@ -160,10 +225,10 @@ END;";
     [Serializable()]
     public class ApiException : Exception
     {
-        public ApiException(): base() { }
+        public ApiException() : base() { }
 
-        public ApiException(string message): base(message) { }
+        public ApiException(string message) : base(message) { }
 
-        public ApiException(string message, Exception innerException):base(message, innerException) { }
+        public ApiException(string message, Exception innerException) : base(message, innerException) { }
     }
 }
