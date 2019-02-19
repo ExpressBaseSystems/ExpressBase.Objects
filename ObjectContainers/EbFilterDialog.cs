@@ -19,7 +19,8 @@ namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.FilterDialog)]
     [HideInToolBox]
-    public class EbFilterDialog : EbControlContainer
+    [BuilderTypeEnum(BuilderType.FilterDialog)]
+    public class EbFilterDialog : EbControlContainer, IEBRootObject
     {
         public EbFilterDialog() { }
 
