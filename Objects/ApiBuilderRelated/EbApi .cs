@@ -47,7 +47,8 @@ namespace ExpressBase.Objects
     }
 
     [EnableInBuilder(BuilderType.ApiBuilder)]
-    public class EbApi : EbApiWrapper
+    [BuilderTypeEnum(BuilderType.ApiBuilder)]
+    public class EbApi : EbApiWrapper,IEBRootObject
     {
         public override int RouteIndex { set; get; }
 

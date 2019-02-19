@@ -110,7 +110,8 @@ namespace ExpressBase.Objects
     }
 
     [EnableInBuilder(BuilderType.Report)]
-    public class EbReport : EbReportObject
+    [BuilderTypeEnum(BuilderType.Report)]
+    public class EbReport : EbReportObject, IEBRootObject
     {
         [EnableInBuilder(BuilderType.Report)]
         [OnChangeExec(@"
