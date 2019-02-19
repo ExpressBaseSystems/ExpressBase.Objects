@@ -166,6 +166,10 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]
+        public override string RefId { set; get; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
         public override string Height { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]

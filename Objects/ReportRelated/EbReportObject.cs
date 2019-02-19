@@ -29,7 +29,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]
-        public float LeftPt { get; set; }
+        public virtual float LeftPt { get; set; }
 
         [UIproperty]
         [EnableInBuilder(BuilderType.Report)]
@@ -38,7 +38,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]
-        public float WidthPt { get; set; }
+        public virtual float WidthPt { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
@@ -47,7 +47,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]
-        public float TopPt { get; set; }
+        public virtual float TopPt { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
@@ -56,7 +56,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]
-        public float HeightPt { get; set; }
+        public virtual float HeightPt { get; set; }
 
         //[EnableInBuilder(BuilderType.Report)]
         //public HorizontalAlignment HAlign { get; set; }
@@ -68,7 +68,7 @@ namespace ExpressBase.Objects
         [UIproperty]
         [PropertyEditor(PropertyEditorType.Color)]
         [PropertyGroup("Appearance")]
-        public string BackColor { get; set; }
+        public virtual string BackColor { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]

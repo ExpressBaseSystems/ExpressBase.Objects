@@ -25,6 +25,12 @@ namespace ExpressBase.Objects
         [PropertyGroup("Appearance")]
         public virtual EbTextAlign TextAlign { get; set; }
 
+        public override string RefId { set; get; }
+
+        public override string Status { set; get; }
+
+        public override string VersionNumber { set; get; }
+
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
         [HideInPropertyGrid]
