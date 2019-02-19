@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using ExpressBase.Common;
 using ExpressBase.Common.Data;
 using System.Linq;
+using ExpressBase.Objects.ServiceStack_Artifacts;
 
 namespace ExpressBase.Objects
 {
@@ -44,6 +45,8 @@ namespace ExpressBase.Objects
         public object Result { set; get; }
 
         public virtual object GetOutParams(List<Param> _param) { return null; }
+
+        public virtual object GetResult() { return this.Result; }
     }
 
     [EnableInBuilder(BuilderType.ApiBuilder)]
@@ -103,6 +106,31 @@ namespace ExpressBase.Objects
                 }
             }
             return p;
+        }
+
+        public override object GetResult()
+        {
+            if (this.ResultType == DataReaderResult.Formated)
+            {
+                JsonTableSet table = new JsonTableSet();
+                foreach (EbDataTable t in (this.Result as EbDataSet).Tables)
+                {
+                    JsonTable jt = new JsonTable { TableName = t.TableName };
+                    for (int k = 0; k < t.Rows.Count; k++)
+                    {
+                        JsonColVal d = new JsonColVal();
+                        for (int i = 0; i < t.Columns.Count; i++)
+                        {
+                            d.Add(t.Columns[i].ColumnName, t.Rows[k][t.Columns[i].ColumnIndex]);
+                        }
+                        jt.Rows.Add(d);
+                    }
+                    table.Tables.Add(jt);
+                }
+                return table;
+            }
+            else
+                return this.Result;
         }
     }
 
