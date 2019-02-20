@@ -110,6 +110,7 @@ namespace ExpressBase.Objects
 
         public string DBareHtml { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm)]
         public virtual string InputControlType { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
@@ -148,6 +149,7 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
 
+        [EnableInBuilder(BuilderType.WebForm)]
         public override string InputControlType { get { return "EbTextBox"; } }
 
         [OnDeserialized]
@@ -165,6 +167,7 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.Decimal; } }
 
+        [EnableInBuilder(BuilderType.WebForm)]
         public override string InputControlType { get { return "EbNumeric"; } }
     }
 
@@ -176,6 +179,7 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.Boolean; } }
 
+        [EnableInBuilder(BuilderType.WebForm)]
         public override string InputControlType { get { return "EbCheckBox"; } }
     }
 
@@ -193,6 +197,7 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.Date; } }
 
+        [EnableInBuilder(BuilderType.WebForm)]
         public override string InputControlType { get { return "EbDate"; } }
     }
 
@@ -209,10 +214,10 @@ namespace ExpressBase.Objects
             this.EbSimpleSelect = new EbSimpleSelect();
         }
 
+        [EnableInBuilder(BuilderType.WebForm)]
         public override string InputControlType { get { return "EbSimpleSelect"; } }
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-
-
         [HideInPropertyGrid]
         public override EbDbTypes EbDbType
         {
@@ -391,6 +396,7 @@ else {pg.MakeReadWrite('ValueMember');}")]
             set { this.EbPowerSelect.ValueMember = value; }
         }
 
+        [EnableInBuilder(BuilderType.WebForm)]
         public override string InputControlType { get { return "EbPowerSelect"; } }
     }
 }
