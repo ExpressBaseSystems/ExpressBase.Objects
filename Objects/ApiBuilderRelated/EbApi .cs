@@ -40,6 +40,8 @@ namespace ExpressBase.Objects
         [MetaOnly]
         public string Label { set; get; }
 
+        public override string RefId { get; set; }
+
         public virtual string Refid { get; set; }
 
         public object Result { set; get; }
@@ -50,8 +52,7 @@ namespace ExpressBase.Objects
     }
 
     [EnableInBuilder(BuilderType.ApiBuilder)]
-    [BuilderTypeEnum(BuilderType.ApiBuilder)]
-    public class EbApi : EbApiWrapper,IEBRootObject
+    public class EbApi : EbApiWrapper, IEBRootObject
     {
         public override int RouteIndex { set; get; }
 
@@ -78,6 +79,10 @@ namespace ExpressBase.Objects
         [MetaOnly]
         [UIproperty]
         public string Version { set; get; }
+
+        public override string Status { set; get; }
+
+        public override string VersionNumber { set; get; }
 
         [EnableInBuilder(BuilderType.ApiBuilder)]
         [PropertyGroup("Data Settings")]
