@@ -56,7 +56,7 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.BotForm)]
     public class EbDataVisualizationObject : EbObject
     {
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         public override string Name { get => base.Name; set => base.Name = value; }
     }
 
