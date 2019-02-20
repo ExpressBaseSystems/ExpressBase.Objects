@@ -486,16 +486,28 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string RefId { get; set; }
     }
 
-    public class EbObjectRunSqlFunctionRequest : EbServiceStackAuthRequest, IReturn<EbObjectRunSqlFunctionResponse>
+    public class RunSqlFunctionRequest : EbServiceStackAuthRequest, IReturn<RunSqlFunctionResponse>
     {
         public string Json { get; set; }
     }
 
     [DataContract]
-    public class EbObjectRunSqlFunctionResponse : IEbSSResponse
+    public class RunSqlFunctionResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
         public int Status { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    public class DeleteEbObjectRequest : EbServiceStackAuthRequest, IReturn<DeleteObjectResponse> {
+        public int ObjId { get; set; }
+    }
+
+    public class DeleteObjectResponse : IEbSSResponse
+    {[DataMember(Order =1)]
+        public int RowsDeleted { get; set; }
 
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
