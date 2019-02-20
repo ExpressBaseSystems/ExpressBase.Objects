@@ -110,7 +110,8 @@ namespace ExpressBase.Objects
     }
 
     [EnableInBuilder(BuilderType.Report)]
-    public class EbReport : EbReportObject
+    [BuilderTypeEnum(BuilderType.Report)]
+    public class EbReport : EbReportObject, IEBRootObject
     {
         [EnableInBuilder(BuilderType.Report)]
         [OnChangeExec(@"
@@ -162,6 +163,10 @@ namespace ExpressBase.Objects
         public override string Left { get; set; }
 
         public override string Top { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
+        public override string RefId { set; get; }
 
         [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]

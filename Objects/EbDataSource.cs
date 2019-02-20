@@ -32,8 +32,9 @@ namespace ExpressBase.Objects
         public List<Param> InputParams { get; set; }
     }
 
+    [BuilderTypeEnum(BuilderType.DataReader)]
     [EnableInBuilder(BuilderType.DataReader)]
-    public class EbDataReader : EbDataSourceMain
+    public class EbDataReader : EbDataSourceMain,IEBRootObject
     {
         [EnableInBuilder(BuilderType.DataReader)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
@@ -108,14 +109,16 @@ namespace ExpressBase.Objects
         }
     }
 
+    [BuilderTypeEnum(BuilderType.DataWriter)]
     [EnableInBuilder(BuilderType.DataWriter)]
-    public class EbDataWriter : EbDataSourceMain
+    public class EbDataWriter : EbDataSourceMain,IEBRootObject
     {
 
     }
 
     [EnableInBuilder(BuilderType.SqlFunctions)]
-    public class EbSqlFunction : EbDataSourceMain
+    [BuilderTypeEnum(BuilderType.SqlFunctions)]
+    public class EbSqlFunction : EbDataSourceMain,IEBRootObject
     {
         [JsonIgnore]
         public WebFormSchema FormSchema { set; get; }
