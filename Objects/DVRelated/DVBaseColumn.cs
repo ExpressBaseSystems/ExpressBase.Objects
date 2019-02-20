@@ -101,7 +101,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
         [JsonProperty(PropertyName = "data")]
         public int Data { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.WebForm)]
         [JsonProperty(PropertyName = "name")]
         [PropertyEditor(PropertyEditorType.Label)]
         [OnChangeExec(@"this.Name = this.name;
@@ -315,7 +315,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
             return tempCol;
         }
     }
-
+    
 
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
     [Alias("DVStringColumnAlias")]
