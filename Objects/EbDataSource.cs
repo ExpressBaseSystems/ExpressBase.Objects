@@ -21,7 +21,6 @@ namespace ExpressBase.Objects
 {
     public abstract class EbDataSourceMain : EbObject, IEBRootObject
     {
-
         [EnableInBuilder(BuilderType.DataReader, BuilderType.DataWriter, BuilderType.SqlFunctions)]
         [HideInPropertyGrid]
         [JsonConverter(typeof(Base64Converter))]
