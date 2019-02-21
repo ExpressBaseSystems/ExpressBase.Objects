@@ -132,4 +132,62 @@ namespace ExpressBase.Objects.Objects
 
         public object Value { get; set; }
     }
+
+    public class ApiGlobals
+    {
+        public dynamic T0 { get; set; }
+        public dynamic T1 { get; set; }
+        public dynamic T2 { get; set; }
+        public dynamic T3 { get; set; }
+        public dynamic T4 { get; set; }
+        public dynamic T5 { get; set; }
+        public dynamic T6 { get; set; }
+        public dynamic T7 { get; set; }
+        public dynamic T8 { get; set; }
+        public dynamic T9 { get; set; }
+
+        public ApiGlobals()
+        {
+            T0 = new NTVDict();
+            T1 = new NTVDict();
+            T2 = new NTVDict();
+            T3 = new NTVDict();
+            T4 = new NTVDict();
+            T5 = new NTVDict();
+            T6 = new NTVDict();
+            T7 = new NTVDict();
+            T8 = new NTVDict();
+            T9 = new NTVDict();
+        }
+
+        public dynamic this[string tableIndex]
+        {
+            get
+            {
+                if (tableIndex == "T0")
+                    return this.T0;
+                else if (tableIndex == "T1")
+                    return this.T1;
+                else if (tableIndex == "T2")
+                    return this.T2;
+                else if (tableIndex == "T3")
+                    return this.T3;
+                else if (tableIndex == "T4")
+                    return this.T4;
+                else if (tableIndex == "T5")
+                    return this.T5;
+                else if (tableIndex == "T6")
+                    return this.T6;
+                else if (tableIndex == "T7")
+                    return this.T7;
+                else if (tableIndex == "T8")
+                    return this.T8;
+                else if (tableIndex == "T9")
+                    return this.T9;
+                else
+                    return this.T0;
+            }
+        }
+
+    }
 }

@@ -49,6 +49,10 @@ namespace ExpressBase.Objects
         public virtual object GetOutParams(List<Param> _param) { return null; }
 
         public virtual object GetResult() { return this.Result; }
+
+        public virtual EbDataColumn GetColumn(int index, string cname) { return null; }
+
+        public virtual object GetColVal(int index, string cname) { return null; }
     }
 
     [EnableInBuilder(BuilderType.ApiBuilder)]
@@ -138,6 +142,16 @@ namespace ExpressBase.Objects
             }
             else
                 return this.Result;
+        }
+
+        public override EbDataColumn GetColumn(int index,string cname)
+        {
+            return (this.Result as EbDataSet).Tables[index].Columns.Find(i => i.ColumnName == cname);
+        }
+
+        public override object GetColVal(int index, string cname)
+        {
+            return (this.Result as EbDataSet).Tables[index].Rows;
         }
     }
 
@@ -265,6 +279,11 @@ namespace ExpressBase.Objects
                             <div class='CompVersion'></div>
                         </div>
                     </div>".RemoveCR().DoubleQuoted();
+        }
+
+        public void Evaluate()
+        {
+
         }
     }
 }
