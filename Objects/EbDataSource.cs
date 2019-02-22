@@ -36,6 +36,22 @@ namespace ExpressBase.Objects
     public class EbDataReader : EbDataSourceMain,IEBRootObject
     {
         [EnableInBuilder(BuilderType.DataReader)]
+        [HideInPropertyGrid]
+        public override string RefId { get; set; }
+
+        [EnableInBuilder(BuilderType.DataReader)]
+        public override string DisplayName { get; set; }
+
+        [EnableInBuilder(BuilderType.DataReader)]
+        public override string Description { get; set; }
+
+        [EnableInBuilder(BuilderType.DataReader)]
+        public override string VersionNumber { get; set; }
+
+        [EnableInBuilder(BuilderType.DataReader)]
+        public override string Status { get; set; }
+
+        [EnableInBuilder(BuilderType.DataReader)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iFilterDialog)]
         public string FilterDialogRefId { get; set; }
@@ -112,13 +128,43 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.DataWriter)]
     public class EbDataWriter : EbDataSourceMain,IEBRootObject
     {
+        [EnableInBuilder(BuilderType.DataWriter)]
+        [HideInPropertyGrid]
+        public override string RefId { get; set; }
 
+        [EnableInBuilder(BuilderType.DataWriter)]
+        public override string DisplayName { get; set; }
+
+        [EnableInBuilder(BuilderType.DataWriter)]
+        public override string Description { get; set; }
+
+        [EnableInBuilder(BuilderType.DataWriter)]
+        public override string VersionNumber { get; set; }
+
+        [EnableInBuilder(BuilderType.DataWriter)]
+        public override string Status { get; set; }
     }
 
     [EnableInBuilder(BuilderType.SqlFunctions)]
     [BuilderTypeEnum(BuilderType.SqlFunctions)]
     public class EbSqlFunction : EbDataSourceMain,IEBRootObject
     {
+        [EnableInBuilder(BuilderType.SqlFunctions)]
+        [HideInPropertyGrid]
+        public override string RefId { get; set; }
+
+        [EnableInBuilder(BuilderType.SqlFunctions)]
+        public override string DisplayName { get; set; }
+
+        [EnableInBuilder(BuilderType.SqlFunctions)]
+        public override string Description { get; set; }
+
+        [EnableInBuilder(BuilderType.SqlFunctions)]
+        public override string VersionNumber { get; set; }
+
+        [EnableInBuilder(BuilderType.SqlFunctions)]
+        public override string Status { get; set; }
+
         [JsonIgnore]
         public WebFormSchema FormSchema { set; get; }
 
