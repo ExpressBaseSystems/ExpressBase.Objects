@@ -286,7 +286,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class EbObject_CommitResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
-        public int Id { get; set; }
+        public string Message { get; set; }
 
         [DataMember(Order = 2)]
         public string Token { get; set; }
@@ -323,7 +323,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class EbObject_SaveResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
-        public int Id { get; set; }
+        public string Message { get; set; }
+        //public int Id { get; set; }
 
         [DataMember(Order = 2)]
         public string Token { get; set; }
@@ -424,7 +425,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int Id { get; set; }
 
         [DataMember(Order = 2)]
-        public string ExceptionMessage { get; set; }
+        public string Message { get; set; }
 
         [DataMember(Order = 3)]
         public string Token { get; set; }
@@ -578,6 +579,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order =21)]
         public string DisplayName { get; set; }
+
+        [DataMember(Order =22)]
+        public bool IsLogEnabled { get; set; }
 
         public EbObjectWrapper() { }
     }
