@@ -18,9 +18,26 @@ namespace ExpressBase.Objects.Objects.SmsRelated
 
     }
 
+    [BuilderTypeEnum(BuilderType.SmsBuilder)]
     [EnableInBuilder(BuilderType.SmsBuilder)]
-    public class EbSmsTemplate : EbSmsTemplateBase
+    public class EbSmsTemplate : EbSmsTemplateBase,IEBRootObject
     {
+        [EnableInBuilder(BuilderType.SmsBuilder)]
+        [HideInPropertyGrid]
+        public override string RefId { get; set; }
+
+        [EnableInBuilder(BuilderType.SmsBuilder)]
+        public override string DisplayName { get; set; }
+
+        [EnableInBuilder(BuilderType.SmsBuilder)]
+        public override string Description { get; set; }
+
+        [EnableInBuilder(BuilderType.SmsBuilder)]
+        public override string VersionNumber { get; set; }
+
+        [EnableInBuilder(BuilderType.SmsBuilder)]
+        public override string Status { get; set; }
+
         [HideInPropertyGrid]
         public string To { get; set; }
 

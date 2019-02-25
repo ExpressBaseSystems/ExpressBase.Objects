@@ -21,7 +21,7 @@ namespace ExpressBase.Objects
         Formated = 1
     }
 
-    public class ListOrdered : List<EbApiWrapper>
+    public class ListOrdered : List<ApiResources>
     {
         public ListOrdered()
         {
@@ -31,16 +31,44 @@ namespace ExpressBase.Objects
 
     public abstract class EbApiWrapper : EbObject
     {
+        
+    }
+
+    [EnableInBuilder(BuilderType.ApiBuilder)]
+    [BuilderTypeEnum(BuilderType.ApiBuilder)]
+    public class EbApi : EbApiWrapper, IEBRootObject
+    {
         [EnableInBuilder(BuilderType.ApiBuilder)]
         [HideInPropertyGrid]
-        public virtual int RouteIndex { set; get; }
+        public override string RefId { get; set; }
+
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        public override string DisplayName { get; set; }
+
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        public override string Description { get; set; }
+
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        public override string VersionNumber { get; set; }
+
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        public override string Status { get; set; }
+
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        [HideInPropertyGrid]
+        public ListOrdered Resources { set; get; }
+    }
+
+    public abstract class ApiResources : EbApiWrapper
+    {
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        [HideInPropertyGrid]
+        public int RouteIndex { set; get; }
 
         [EnableInBuilder(BuilderType.ApiBuilder)]
         [UIproperty]
         [MetaOnly]
         public string Label { set; get; }
-
-        public override string RefId { get; set; }
 
         public virtual string Refid { get; set; }
 
@@ -56,18 +84,7 @@ namespace ExpressBase.Objects
     }
 
     [EnableInBuilder(BuilderType.ApiBuilder)]
-    [BuilderTypeEnum(BuilderType.ApiBuilder)]
-    public class EbApi : EbApiWrapper, IEBRootObject
-    {
-        public override int RouteIndex { set; get; }
-
-        [EnableInBuilder(BuilderType.ApiBuilder)]
-        [HideInPropertyGrid]
-        public ListOrdered Resources { set; get; }
-    }
-
-    [EnableInBuilder(BuilderType.ApiBuilder)]
-    public class EbSqlReader : EbApiWrapper
+    public class EbSqlReader : ApiResources
     {
         [EnableInBuilder(BuilderType.ApiBuilder)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
@@ -84,10 +101,6 @@ namespace ExpressBase.Objects
         [MetaOnly]
         [UIproperty]
         public string Version { set; get; }
-
-        public override string Status { set; get; }
-
-        public override string VersionNumber { set; get; }
 
         [EnableInBuilder(BuilderType.ApiBuilder)]
         [PropertyGroup("Data Settings")]
@@ -156,7 +169,7 @@ namespace ExpressBase.Objects
     }
 
     [EnableInBuilder(BuilderType.ApiBuilder)]
-    public class EbSqlFunc : EbApiWrapper
+    public class EbSqlFunc : ApiResources
     {
         [EnableInBuilder(BuilderType.ApiBuilder)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
@@ -192,7 +205,7 @@ namespace ExpressBase.Objects
     }
 
     [EnableInBuilder(BuilderType.ApiBuilder)]
-    public class EbSqlWriter : EbApiWrapper
+    public class EbSqlWriter : ApiResources
     {
         [EnableInBuilder(BuilderType.ApiBuilder)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
@@ -228,7 +241,7 @@ namespace ExpressBase.Objects
     }
 
     [EnableInBuilder(BuilderType.ApiBuilder)]
-    public class EbEmailNode : EbApiWrapper
+    public class EbEmailNode : ApiResources
     {
         [EnableInBuilder(BuilderType.ApiBuilder)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
@@ -264,7 +277,7 @@ namespace ExpressBase.Objects
     }
 
     [EnableInBuilder(BuilderType.ApiBuilder)]
-    public class EbProcessor : EbApiWrapper
+    public class EbProcessor : ApiResources
     {
         [EnableInBuilder(BuilderType.ApiBuilder)]
         [PropertyEditor(PropertyEditorType.ScriptEditorCS)]

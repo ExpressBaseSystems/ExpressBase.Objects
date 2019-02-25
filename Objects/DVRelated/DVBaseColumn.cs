@@ -99,6 +99,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
     public class DVBaseColumn : EbDataVisualizationObject
     {
         [JsonProperty(PropertyName = "data")]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         public int Data { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.WebForm)]
@@ -117,8 +118,12 @@ namespace ExpressBase.Objects.Objects.DVRelated
         [HideInPropertyGrid]
         public string EbSid { get; set; }
 
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
+        [HideInPropertyGrid]
         public virtual EbDbTypes Type { get; set; }
 
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
+        [HideInPropertyGrid]
         public string sType { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
@@ -129,6 +134,8 @@ namespace ExpressBase.Objects.Objects.DVRelated
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         public bool bVisible { get; set; }
 
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
+        [HideInPropertyGrid]
         public int Pos { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
@@ -487,9 +494,6 @@ else{
     public class StaticParam : EbDataVisualizationObject
     {
         public StaticParam() { }
-
-        [EnableInBuilder(BuilderType.DVBuilder)]
-        public string Name { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         public EbDbTypes Type { get; set; }

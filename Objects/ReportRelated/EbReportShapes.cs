@@ -14,11 +14,13 @@ namespace ExpressBase.Objects
 {
     public abstract class EbReportFieldShape : EbReportField
     {
-        public override EbFont Font { get; set; }
-
         public override EbTextAlign TextAlign { get; set; }
 
         public override string Title { get; set; }
+
+        public override string ForeColor { get; set; }
+
+        public override EbFont Font { get; set; }
     }
 
     [EnableInBuilder(BuilderType.Report)]

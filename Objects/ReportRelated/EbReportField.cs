@@ -23,13 +23,13 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
         [PropertyGroup("Appearance")]
+        [PropertyEditor(PropertyEditorType.Color)]
+        public virtual string ForeColor { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [UIproperty]
+        [PropertyGroup("Appearance")]
         public virtual EbTextAlign TextAlign { get; set; }
-
-        public override string RefId { set; get; }
-
-        public override string Status { set; get; }
-
-        public override string VersionNumber { set; get; }
 
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
@@ -52,12 +52,6 @@ namespace ExpressBase.Objects
         [UIproperty]
         [PropertyEditor(PropertyEditorType.FontSelector)]
         public virtual EbFont Font { get; set; }
-
-        [EnableInBuilder(BuilderType.Report)]
-        [UIproperty]
-        [PropertyGroup("General")]
-        [HideInPropertyGrid]
-        public override string ForeColor { get; set; } = "";
 
         [JsonIgnore]
         public float Llx
@@ -134,9 +128,11 @@ namespace ExpressBase.Objects
         [MetaOnly]
         public string Source { get; set; }
 
-        [EnableInBuilder(BuilderType.Report)]
-        [JsonIgnore]
         public override EbTextAlign TextAlign { get; set; }
+
+        public override string Title { get; set; }
+
+        public override EbFont Font { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [PropertyEditor(PropertyEditorType.ImageSeletor)]
@@ -145,15 +141,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("Image")]
-        public string ImageColName { get; set; }
-
-        [EnableInBuilder(BuilderType.Report)]
-        [HideInPropertyGrid]
-        public override string Title { get; set; }
-
-        [EnableInBuilder(BuilderType.Report)]
-        [HideInPropertyGrid]
-        public override EbFont Font { get; set; }
+        public string ImageColName { get; set; }  
 
         public override string GetDesignHtml()
         {
@@ -205,8 +193,6 @@ namespace ExpressBase.Objects
         [MetaOnly]
         public string Source { get; set; }
 
-        [EnableInBuilder(BuilderType.Report)]
-        [HideInPropertyGrid]
         public override string Title { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
@@ -692,6 +678,12 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.Report)]
     public class EbBarcode : EbReportField
     {
+        public override string ForeColor { get; set; }
+
+        public override string Title { get; set; }
+
+        public override EbFont Font { get; set; }
+
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
         [MetaOnly]
@@ -708,10 +700,6 @@ namespace ExpressBase.Objects
         public int Type { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
-        [HideInPropertyGrid]
-        public override string Title { get; set; }
-
-        [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
         [PropertyGroup("Appearance")]
         public bool GuardBars { get; set; }
@@ -720,10 +708,6 @@ namespace ExpressBase.Objects
         [UIproperty]
         [PropertyGroup("Appearance")]
         public float BaseLine { get; set; }
-
-        [EnableInBuilder(BuilderType.Report)]
-        [HideInPropertyGrid]
-        public new EbFont Font { get; set; }
 
         public override string GetDesignHtml()
         {
@@ -822,6 +806,12 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.Report)]
     public class EbQRcode : EbReportField
     {
+        public override string ForeColor { get; set; }
+
+        public override string Title { get; set; }
+
+        public override EbFont Font { get; set; }
+
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
         [MetaOnly]
@@ -831,14 +821,6 @@ namespace ExpressBase.Objects
         [UIproperty]
         [PropertyGroup("Data")]
         public string Code { get; set; }
-
-        [EnableInBuilder(BuilderType.Report)]
-        [HideInPropertyGrid]
-        public override EbFont Font { get; set; }
-
-        [EnableInBuilder(BuilderType.Report)]
-        [HideInPropertyGrid]
-        public override string Title { get; set; }
 
         public override string GetDesignHtml()
         {
@@ -886,6 +868,12 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.Report)]
     public class EbSerialNumber : EbReportField
     {
+        [OnChangeExec(@"
+            pg.MakeReadOnly('Title');
+        ")]
+        [EnableInBuilder(BuilderType.Report)]
+        public override string Title { set; get; }
+
         public override string GetDesignHtml()
         {
             return "<div class='Serial-Number dropped' eb-type='SerialNumber' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; height: @Height px; background-color:@BackColor ; color:@ForeColor ; left: @Left px; top: @Top px;text-align: @TextAlign ;'> @Title </div>".RemoveCR().DoubleQuoted();
@@ -917,9 +905,7 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.Report)]
     public class EbLocFieldImage : EbReportField
     {
-        [EnableInBuilder(BuilderType.Report)]
-        [JsonIgnore]
-        public override EbTextAlign TextAlign { get; set; }
+        public override EbFont Font { get; set ; }
 
         public override string GetDesignHtml()
         {
@@ -954,10 +940,17 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.Report)]
     public class EbLocFieldText : EbReportField
     {
+        [OnChangeExec(@"
+            pg.MakeReadOnly('Title');
+        ")]
+        [EnableInBuilder(BuilderType.Report)]
+        public override string Title { set; get; }
+
         [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("Data Settings")]
         [UIproperty]
         public Boolean RenderInMultiLine { get; set; } = true;
+
         public override string GetDesignHtml()
         {
             return "<div class='EbLocFieldText dropped' eb-type='LocFieldText' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; height: @Height px; background-color:@BackColor ; color:@ForeColor ; left: @Left px; top: @Top px;text-align: @TextAlign ;'> @Title </div>".RemoveCR().DoubleQuoted();

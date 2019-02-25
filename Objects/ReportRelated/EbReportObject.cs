@@ -10,6 +10,8 @@ namespace ExpressBase.Objects
 {
     public class EbReportObject : EbObject
     {
+        [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
         public string EbSid { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
@@ -58,20 +60,10 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public virtual float HeightPt { get; set; }
 
-        //[EnableInBuilder(BuilderType.Report)]
-        //public HorizontalAlignment HAlign { get; set; }
-
-        //[EnableInBuilder(BuilderType.Report)]
-        //public VerticalAlignment VAlign { get; set; }
-
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
         [PropertyEditor(PropertyEditorType.Color)]
         [PropertyGroup("Appearance")]
         public virtual string BackColor { get; set; }
-
-        [EnableInBuilder(BuilderType.Report)]
-        [UIproperty]
-        public virtual string ForeColor { get; set; }
     }
 }
