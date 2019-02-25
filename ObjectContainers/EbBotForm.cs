@@ -17,7 +17,7 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.BotForm)]
     [HideInToolBox]
     [BuilderTypeEnum(BuilderType.WebForm)]
-    public class EbBotForm : EbForm, IEBRootObject
+    public class EbBotForm : EbForm
     {
         [OnDeserialized]
         public void OnDeserializedMethod(StreamingContext context)

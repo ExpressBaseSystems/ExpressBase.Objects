@@ -20,7 +20,7 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.FilterDialog)]
     [HideInToolBox]
     [BuilderTypeEnum(BuilderType.FilterDialog)]
-    public class EbFilterDialog : EbForm, IEBRootObject
+    public class EbFilterDialog : EbForm
     {
         public EbFilterDialog() { }
 

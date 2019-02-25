@@ -15,7 +15,7 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.UserControl, BuilderType.WebForm, BuilderType.FilterDialog)]
     [HideInToolBox]
     [BuilderTypeEnum(BuilderType.WebForm)]
-    public class EbUserControl : EbForm, IEBRootObject
+    public class EbUserControl : EbForm
     {
         public EbUserControl() { }
 

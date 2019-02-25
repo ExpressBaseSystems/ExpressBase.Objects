@@ -20,7 +20,7 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.WebForm)]
     [HideInToolBox]
     [BuilderTypeEnum(BuilderType.WebForm)]
-    public class EbWebForm : EbForm, IEBRootObject
+    public class EbWebForm : EbForm
     {
         [HideInPropertyGrid]
         public bool IsUpdate { get; set; }
