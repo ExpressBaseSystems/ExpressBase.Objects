@@ -20,28 +20,8 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.WebForm)]
     [HideInToolBox]
     [BuilderTypeEnum(BuilderType.WebForm)]
-    public class EbWebForm : EbControlContainer , IEBRootObject
+    public class EbWebForm : EbForm, IEBRootObject
     {
-
-        // implementation of IEBRootObject props
-        //{
-        public string RefId { get; set; }
-
-        //public EbObjectType EbObjectType { get; set; }
-
-        [Description("Identity")]        
-        public string DisplayName { get; set; }
-
-        public string Description { get; set; }
-
-        //public string ChangeLog { get; set; }
-        public string VersionNumber { get; set; }
-
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.EmailBuilder, BuilderType.DataReader, BuilderType.DataWriter, BuilderType.Report, BuilderType.BotForm, BuilderType.SmsBuilder, BuilderType.SqlFunctions, BuilderType.UserControl, BuilderType.ApiBuilder)]
-        public string Status { get; set; }
-        //}
-
-
         [HideInPropertyGrid]
         public bool IsUpdate { get; set; }
 
