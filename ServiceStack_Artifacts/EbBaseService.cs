@@ -200,6 +200,22 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             return true;
         }
 
+        public bool GetLogEnabled(string _refId)
+
+        {
+
+            List<DbParameter> parameter = new List<DbParameter>();
+
+            string query = @"SELECT is_logenabled FROM eb_objects WHERE id = (SELECT eb_objects_id FROM eb_objects_ver WHERE refid=:refid)";
+
+            parameter.Add(EbConnectionFactory.ObjectsDB.GetNewParameter("refid", EbDbTypes.String, _refId));
+
+            EbDataTable dt = EbConnectionFactory.ObjectsDB.DoQuery(query, parameter.ToArray());
+
+            return ((dt.Rows[0][0].ToString()) == "T") ? true : false;
+
+        }
+
         //private void LoadCache()
         //{
         //    using (var redisClient = this.Redis)
