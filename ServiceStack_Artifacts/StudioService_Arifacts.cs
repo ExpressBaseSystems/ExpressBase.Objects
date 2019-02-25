@@ -1,5 +1,6 @@
 ﻿using ExpressBase.Common.EbServiceStack.ReqNRes;
 using ExpressBase.Common.Objects;
+using ExpressBase.Common.SqlProfiler;
 using ExpressBase.Common.Structures;
 using ServiceStack;
 using ServiceStack.Text;
@@ -509,6 +510,35 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class DeleteObjectResponse : IEbSSResponse
     {[DataMember(Order =1)]
         public int RowsDeleted { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    public class EnableLogRequest : EbServiceStackAuthRequest, IReturn<EnableLogResponse>
+    {
+        public int ObjId { get; set; }
+        public bool Islog { get; set; }
+    }
+
+    public class EnableLogResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public int RowsDeleted { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    public class GetLogdetailsRequest : EbServiceStackAuthRequest, IReturn<GetLogdetailsResponse>
+    {
+        public int Index { get; set; }
+    }
+
+    public class GetLogdetailsResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public EbExecutionLogs logdetails { get; set; }
 
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }

@@ -56,8 +56,7 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.BotForm)]
     public class EbDataVisualizationObject : EbObject
     {
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        public override string Name { get => base.Name; set => base.Name = value; }
+
     }
 
     [EnableInBuilder(BuilderType.DVBuilder)]
@@ -88,6 +87,23 @@ namespace ExpressBase.Objects
 
     public abstract class EbDataVisualization : EbDataVisualizationObject
     {
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [HideInPropertyGrid]
+        public override string RefId { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public override string DisplayName { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public override string Description { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [HideInPropertyGrid]
+        public override string VersionNumber { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [HideInPropertyGrid]
+        public override string Status { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
@@ -96,9 +112,9 @@ namespace ExpressBase.Objects
         public string DataSourceRefId { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
-        public string Description { get; set; }
-
+        [HideInPropertyGrid]
         public string EbSid { get; set; }
+
         [JsonIgnore]
         public EbDataReader EbDataSource { get; set; }
 
@@ -312,8 +328,10 @@ namespace ExpressBase.Objects
     }
 
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
-    public class EbTableVisualization : EbDataVisualization
+    [BuilderTypeEnum(BuilderType.DVBuilder)]
+    public class EbTableVisualization : EbDataVisualization,IEBRootObject
     {
+
         [OnDeserialized]
         public void OnDeserializedMethod(StreamingContext context)
         {
@@ -454,7 +472,8 @@ namespace ExpressBase.Objects
     }
 
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
-    public class EbChartVisualization : EbDataVisualization
+    [BuilderTypeEnum(BuilderType.DVBuilder)]
+    public class EbChartVisualization : EbDataVisualization, IEBRootObject
     {
 
         [EnableInBuilder(BuilderType.DVBuilder)]
@@ -484,7 +503,8 @@ namespace ExpressBase.Objects
             pg.ShowProperty('ShowTooltip')
             pg.ShowProperty('ShowValue')
         }")]
-        public ChartType Charttype { get; set; }
+        public virtual ChartType Charttype { get; set; }
+
         [OnDeserialized]
         public void OnDeserializedMethod(StreamingContext context)
         {
@@ -636,7 +656,7 @@ namespace ExpressBase.Objects
             pg.ShowProperty('ShowTooltip')
             pg.ShowProperty('ShowValue')
         }")]
-        public ChartType Charttype { get; set; }
+        public override ChartType Charttype { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
@@ -710,6 +730,6 @@ namespace ExpressBase.Objects
     [Alias("Single Level")]
     public class SingleLevelRowGroup : RowGroupParent
     {
-    }
 
+    }
 }

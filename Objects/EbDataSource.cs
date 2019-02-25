@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 
 namespace ExpressBase.Objects
 {
-    public abstract class EbDataSourceMain : EbObject, IEBRootObject
+    public abstract class EbDataSourceMain : EbObject
     {
         [EnableInBuilder(BuilderType.DataReader, BuilderType.DataWriter, BuilderType.SqlFunctions)]
         [HideInPropertyGrid]

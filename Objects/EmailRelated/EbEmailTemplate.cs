@@ -32,8 +32,27 @@ namespace ExpressBase.Objects.EmailRelated
     }
 
     [EnableInBuilder(BuilderType.EmailBuilder)]
-    public class EbEmailTemplate : EbEmailTemplateBase
+    [BuilderTypeEnum(BuilderType.EmailBuilder)]
+    public class EbEmailTemplate : EbEmailTemplateBase,IEBRootObject
     {
+        [EnableInBuilder(BuilderType.EmailBuilder)]
+        [HideInPropertyGrid]
+        public override string RefId { get; set; }
+
+        [EnableInBuilder(BuilderType.EmailBuilder)]
+        public override string DisplayName { get; set; }
+
+        [EnableInBuilder(BuilderType.EmailBuilder)]
+        public override string Description { get; set; }
+
+        [EnableInBuilder(BuilderType.EmailBuilder)]
+        [HideInPropertyGrid]
+        public override string VersionNumber { get; set; }
+
+        [EnableInBuilder(BuilderType.EmailBuilder)]
+        [HideInPropertyGrid]
+        public override string Status { get; set; }
+
         [EnableInBuilder(BuilderType.EmailBuilder)]
         public EmailPriority Priority { get; set; }      
 

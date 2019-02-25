@@ -88,31 +88,37 @@ namespace ExpressBase.Objects
         Count
     }
 
-    [EnableInBuilder(BuilderType.Report)]
     public class Margin
     {
-        [EnableInBuilder(BuilderType.Report)]
-        [PropertyEditor(PropertyEditorType.Number)]
         public float Left { get; set; }
-
-        [EnableInBuilder(BuilderType.Report)]
-        [PropertyEditor(PropertyEditorType.Number)]
+       
         public float Right { get; set; }
-
-        [EnableInBuilder(BuilderType.Report)]
-        [PropertyEditor(PropertyEditorType.Number)]
+       
         public float Top { get; set; }
 
-        [EnableInBuilder(BuilderType.Report)]
-        [PropertyEditor(PropertyEditorType.Number)]
         public float Bottom { get; set; }
-
     }
 
     [EnableInBuilder(BuilderType.Report)]
     [BuilderTypeEnum(BuilderType.Report)]
     public class EbReport : EbReportObject, IEBRootObject
     {
+        [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
+        public override string RefId { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        public override string DisplayName { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        public override string Description { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        public override string VersionNumber { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        public override string Status { get; set; }
+
         [EnableInBuilder(BuilderType.Report)]
         [OnChangeExec(@"
                 if (this.PaperSize === 5 ){ 
@@ -159,24 +165,20 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]
         public override string Width { get; set; }
-       
-        public override string Left { get; set; }
-
-        public override string Top { get; set; }
-
-        [EnableInBuilder(BuilderType.Report)]
-        [HideInPropertyGrid]
-        public override string RefId { set; get; }
 
         [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]
         public override string Height { get; set; }
 
-        [EnableInBuilder(BuilderType.Report)]
-        [HideInPropertyGrid]
-        public override string ForeColor { get; set; }
+        public override string Left { get; set; }
+
+        public override string Top { get; set; }
        
         public override string Title { get; set; }
+
+        public override float LeftPt { get; set; }
+
+        public override float TopPt { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("Appearance")]
@@ -942,6 +944,7 @@ namespace ExpressBase.Objects
         public List<EbReportField> ControlCollection { set; get; }
     }
 
+    [EnableInBuilder(BuilderType.Report)]
     public class EbReportSection : EbReportObject
     {
         [EnableInBuilder(BuilderType.Report)]
@@ -953,13 +956,15 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public List<EbReportField> Fields { get; set; }
 
-        [EnableInBuilder(BuilderType.Report)]
-        [HideInPropertyGrid]
         public override string Left { get; set; }
-
-        [EnableInBuilder(BuilderType.Report)]
-        [HideInPropertyGrid]
+      
         public override string Top { get; set; }
+
+        public override float LeftPt { get; set; }
+
+        public override float TopPt { get; set; }
+
+        public override string Title { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]
@@ -968,15 +973,6 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.Report)]
         [HideInPropertyGrid]
         public override string Width { get; set; }
-
-        [EnableInBuilder(BuilderType.Report)]
-        [HideInPropertyGrid]
-        public override string Title { get; set; }
-
-        [EnableInBuilder(BuilderType.Report)]
-        [HideInPropertyGrid]
-        public override string ForeColor { get; set; }
-
     }
 
     [EnableInBuilder(BuilderType.Report)]
