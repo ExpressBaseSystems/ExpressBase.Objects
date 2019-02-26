@@ -94,15 +94,15 @@ namespace ExpressBase.Objects.Objects.DVRelated
     }
 
 
-    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
+    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl)]
     [HideInPropertyGrid]
     public class DVBaseColumn : EbDataVisualizationObject
     {
         [JsonProperty(PropertyName = "data")]
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         public int Data { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.WebForm)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [JsonProperty(PropertyName = "name")]
         [PropertyEditor(PropertyEditorType.Label)]
         [OnChangeExec(@"this.Name = this.name;
@@ -114,11 +114,11 @@ namespace ExpressBase.Objects.Objects.DVRelated
         }")]
         public override string Name { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [HideInPropertyGrid]
         public string EbSid { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [HideInPropertyGrid]
         public virtual EbDbTypes Type { get; set; }
 
@@ -126,15 +126,15 @@ namespace ExpressBase.Objects.Objects.DVRelated
         [HideInPropertyGrid]
         public string sType { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [Alias("Title")]
         public string sTitle { get; set; }
 
         [HideInPropertyGrid]
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         public bool bVisible { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [HideInPropertyGrid]
         public int Pos { get; set; }
 
@@ -143,7 +143,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
         [JsonIgnore]
         public string sWidth { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [JsonProperty(PropertyName = "className")]
         [HideInPropertyGrid]
         public string ClassName { get; set; }
@@ -165,21 +165,21 @@ namespace ExpressBase.Objects.Objects.DVRelated
         [HideInPropertyGrid]
         public bool IsCustomColumn { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iTableVisualization, EbObjectTypes.iChartVisualization, EbObjectTypes.iReport, EbObjectTypes.iWebForm)]
         public string LinkRefId { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.DropDown)]
         public LinkTypeEnum LinkType { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilder,  BuilderType.BotForm)]
         [DefaultPropValue("0")]
         [HideForUser]
         public int HideDataRowMoreThan { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.Collection)]
         public List<StaticParam> StaticParameters { get; set; }
 
@@ -324,11 +324,11 @@ namespace ExpressBase.Objects.Objects.DVRelated
     }
     
 
-    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
+    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl)]
     [Alias("DVStringColumnAlias")]
     public class DVStringColumn : DVBaseColumn
     {
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [DefaultPropValue("0")]
         [PropertyEditor(PropertyEditorType.DropDown)]
         [OnChangeExec(@"
@@ -343,31 +343,31 @@ else{
     }")]
         public StringRenderType RenderAs { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [DefaultPropValue("16")]
         [HideInPropertyGrid]
         public override EbDbTypes Type { get; set; }
 
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.DropDown)]
         public StringOperators DefaultOperator { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.DropDown)]
         public Align Align { get; set; }
     }
 
-    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
+    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl)]
     public class DVNumericColumn : DVBaseColumn
     {
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         public bool Aggregate { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         public int DecimalPlaces { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [OnChangeExec(@"
 if(this.RenderAs !== 2){
     pg.HideProperty('LinkRefId');
@@ -380,7 +380,7 @@ else{
     }")]
         public NumericRenderType RenderAs { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [DefaultPropValue("7")]
         [HideInPropertyGrid]
         public override EbDbTypes Type { get; set; }
@@ -397,22 +397,22 @@ else{
             return cultureInfo;
         }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.DropDown)]
         public NumericOperators DefaultOperator { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         public bool SuppresIfZero { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.DropDown)]
         public Align Align { get; set; }
     }
 
-    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
+    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl)]
     public class DVBooleanColumn : DVBaseColumn
     {
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [OnChangeExec(@"
 if(this.RenderAs !== 2){
     pg.HideProperty('LinkRefId');
@@ -425,18 +425,18 @@ else{
     }")]
         public BooleanRenderType RenderAs { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.DropDown)]
         public Align Align { get; set; }
     }
 
-    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
+    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl)]
     public class DVDateTimeColumn : DVBaseColumn
     {
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         public DateFormat Format { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [OnChangeExec(@"
 if(this.RenderAs !== 1){
     pg.HideProperty('LinkRefId');
@@ -449,16 +449,16 @@ else{
     }")]
         public DateTimeRenderType RenderAs { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [DefaultPropValue("5")]
         [HideInPropertyGrid]
         public override EbDbTypes Type { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.DropDown)]
         public NumericOperators DefaultOperator { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.DropDown)]
         public Align Align { get; set; }
     }
