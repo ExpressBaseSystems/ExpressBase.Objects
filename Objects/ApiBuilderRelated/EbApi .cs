@@ -12,6 +12,10 @@ using ExpressBase.Common;
 using ExpressBase.Common.Data;
 using System.Linq;
 using ExpressBase.Objects.ServiceStack_Artifacts;
+using ExpressBase.Objects.Objects;
+using Microsoft.CodeAnalysis.CSharp.Scripting;
+using Microsoft.CodeAnalysis.Scripting;
+using System.Text.RegularExpressions;
 
 namespace ExpressBase.Objects
 {
@@ -31,7 +35,7 @@ namespace ExpressBase.Objects
 
     public abstract class EbApiWrapper : EbObject
     {
-        
+
     }
 
     [EnableInBuilder(BuilderType.ApiBuilder)]
@@ -49,9 +53,11 @@ namespace ExpressBase.Objects
         public override string Description { get; set; }
 
         [EnableInBuilder(BuilderType.ApiBuilder)]
+        [HideInPropertyGrid]
         public override string VersionNumber { get; set; }
 
         [EnableInBuilder(BuilderType.ApiBuilder)]
+        [HideInPropertyGrid]
         public override string Status { get; set; }
 
         [EnableInBuilder(BuilderType.ApiBuilder)]
@@ -157,9 +163,9 @@ namespace ExpressBase.Objects
                 return this.Result;
         }
 
-        public override EbDataColumn GetColumn(int index,string cname)
+        public override EbDataColumn GetColumn(int index, string cname)
         {
-            return (this.Result as EbDataSet).Tables[index].Columns.Find(i => i.ColumnName == cname);
+            return (this.Result as EbDataSet).Tables[index].Columns[cname];
         }
 
         public override object GetColVal(int index, string cname)
@@ -294,9 +300,81 @@ namespace ExpressBase.Objects
                     </div>".RemoveCR().DoubleQuoted();
         }
 
-        public void Evaluate()
+        public object Evaluate(ApiResources _prevres)
         {
+            object result = null;
+            EbDataSet _ds = _prevres.Result as EbDataSet;
+            string code = this.Script.B2S().Trim();
+            string[] exp = code.Split(";");
+            try
+            {
+                if (exp.Length <= 2 && (exp[0].Contains("return") || Regex.Match(exp[0], @"T[0-9]{1}.\w+").Success))
+                {
+                    string[] matches = Regex.Matches(exp[0], @"T[0-9]{1}.\w+").OfType<Match>().Select(m => m.Groups[0].Value).Distinct().ToArray<string>();
+                    foreach (string s in matches)
+                    {
+                        int index = Convert.ToInt32(s.Split(".")[0].Replace("T", ""));
+                        if (Convert.ToInt32(s.Split(".")[0].Replace("T", "")) != index)
+                            throw new ApiException("all column should be from single table");
+                    }
+                    result = this.ExecuteTableExp(code, _prevres);
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+            return result;
+        }
 
+        private object ExecuteTableExp(string code, ApiResources _prevres)
+        {
+            Script valscript = CSharpScript.Create<dynamic>(code,
+                   ScriptOptions.Default.WithReferences("Microsoft.CSharp", "System.Core")
+                   .WithImports("System.Dynamic", "System", "System.Collections.Generic", "System.Diagnostics", "System.Linq")
+                   , globalsType: typeof(ApiGlobals));
+
+            EbDataSet _ds = _prevres.Result as EbDataSet;
+            try
+            {
+                valscript.Compile();
+                string[] matches = Regex.Matches(code, @"T[0-9]{1}.\w+").OfType<Match>().Select(m => m.Groups[0].Value).Distinct().ToArray<string>();
+                ApiGlobals globals = new ApiGlobals();
+
+                for (int i = 0; i < _ds.Tables.Count; i++)
+                {
+                    EbDataTable _t = _ds.Tables[i];
+
+                    this.AddCutomCol(ref _ds, i);
+
+                    if (matches.Any(c => c.Contains("T" + i)))
+                    {
+                        string[] _tparams = matches.Where(c => c.Contains("T" + i)).ToArray();
+                        for (int j = 0; j < _t.Rows.Count; j++)
+                        {
+                            foreach (string item in _tparams)
+                            {
+                                string TName = item.Split('.')[0];
+                                string fName = item.Split('.')[1];
+                                EbDataColumn col = _prevres.GetColumn(i, fName);
+                                globals[TName].Add(fName, new NTV { Name = fName, Type = col.Type, Value = _t.Rows[j][fName] });
+                            }
+                            _ds.Tables[i].Rows[j]["exp1"] = valscript.RunAsync(globals).Result.ReturnValue;
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+            return _ds;
+        }
+
+        private void AddCutomCol(ref EbDataSet _ds, int index)
+        {
+            int newi = _ds.Tables[index].Columns.Count;
+            _ds.Tables[index].Columns.Add(new EbDataColumn { ColumnName = "exp1", Type = EbDbTypes.String, ColumnIndex = newi });
         }
     }
 }

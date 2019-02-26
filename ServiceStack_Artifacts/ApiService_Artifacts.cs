@@ -41,7 +41,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int UserId { get; set; }
 
         [DataMember(Order = 1)]
-        public EbApiWrapper Component { set; get; }
+        public ApiResources Component { set; get; }
 
         [DataMember(Order = 2)]
         public List<Param> Params { set; get; }
