@@ -1,4 +1,5 @@
 ﻿using ExpressBase.Common.Objects;
+using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Data;
 using ExpressBase.Objects.ServiceStack_Artifacts;
 using Newtonsoft.Json;
@@ -10,6 +11,7 @@ using System.IO;
 namespace ExpressBase.Objects
 {
     [ProtoBuf.ProtoContract]
+    [HideInToolBox]
     public class EbDataGridView : EbControlContainer
     {
         [ProtoBuf.ProtoMember(1)]
