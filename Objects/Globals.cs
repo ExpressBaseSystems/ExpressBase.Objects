@@ -190,4 +190,90 @@ namespace ExpressBase.Objects.Objects
         }
 
     }
+
+
+    public class FormGlobals
+    {
+        public dynamic FORM { get; set; }
+
+        public dynamic USER { get; set; }
+
+        public FormGlobals()
+        {
+            this.FORM = new FormAsGlobal();
+        }
+    }
+    public class FormAsGlobal : DynamicObject
+    {
+        public List<NTV> Controls { get; set; }
+
+        public List<FormAsGlobal> Containers { get; set; }
+
+        public string TableName { get; set; }
+
+        public string Name { get; set; }
+
+        public FormAsGlobal()
+        {
+            this.Controls = new List<NTV>();
+            this.Containers = new List<FormAsGlobal>();
+        }
+
+        public int Count
+        {
+            get
+            {
+                return this.Controls.Count;
+            }
+        }
+
+        public List<NTV> Rows
+        {
+            get
+            {
+                return this.Controls;
+            }
+        }
+
+
+        public override bool TryGetMember(GetMemberBinder binder, out object result)
+        {
+            string name = binder.Name;
+
+            NTV ntv = this.Controls.Find(e => e.Name.Equals(name));
+
+            if (ntv != null)
+            {
+                if (ntv.Type == EbDbTypes.Int32)
+                    result = Convert.ToDecimal(ntv.Value);
+                else if (ntv.Type == EbDbTypes.Int64)
+                    result = Convert.ToDecimal(ntv.Value);
+                else if (ntv.Type == EbDbTypes.Int16)
+                    result = Convert.ToDecimal(ntv.Value);
+                else if (ntv.Type == EbDbTypes.Decimal)
+                    result = Convert.ToDecimal(ntv.Value);
+                else if (ntv.Type == EbDbTypes.String)
+                    result = (ntv.Value).ToString();
+                else if (ntv.Type == EbDbTypes.DateTime)
+                    result = Convert.ToDateTime(ntv.Value);
+                else
+                    result = ntv.Value.ToString();
+
+                return true;
+            }
+            else
+            {
+                FormAsGlobal fg = this.Containers.Find(e => e.Name.Equals(name));
+                if (fg != null)
+                {
+                    result = fg;
+                    return true;
+                }
+            }
+
+            result = null;
+            return false;
+        }
+    }
+
 }
