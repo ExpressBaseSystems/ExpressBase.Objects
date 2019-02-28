@@ -401,23 +401,23 @@ namespace ExpressBase.Objects
 
         public static EbOperations Operations = TVOperations.Instance;
 
-        public override string GetDesignHtml()
-        {
-            return @"
-            <div id='cont_@name@' Ctype='TableVisualization' class='Eb-ctrlContainer'>
-                @GetBareHtml@
-            </div>"
- .Replace("@name@", (this.Name != null) ? this.Name : "@name@")
- .Replace("@GetBareHtml@", this.GetBareHtml())
- .RemoveCR().DoubleQuoted();
-        }
+ //       public override string GetDesignHtml()
+ //       {
+ //           return @"
+ //           <div id='cont_@name@' Ctype='TableVisualization' class='Eb-ctrlContainer'>
+ //               @GetBareHtml@
+ //           </div>"
+ //.Replace("@name@", (this.Name != null) ? this.Name : "@name@")
+ //.Replace("@GetBareHtml@", this.GetBareHtml())
+ //.RemoveCR().DoubleQuoted();
+ //       }
 
-        public override string GetBareHtml()
-        {
-            return "<table style='width:100%' class='table table-striped' eb-type='Table' id='@name@tbl'></table>"
+ //       public override string GetBareHtml()
+ //       {
+ //           return "<table style='width:100%' class='table table-striped' eb-type='Table' id='@name@tbl'></table>"
 
- .Replace("@name@", (this.EbSid != null) ? this.Name : "@name@");
-        }
+ //.Replace("@name@", (this.EbSid != null) ? this.Name : "@name@");
+ //       }
 
         public EbTableVisualization()
         {

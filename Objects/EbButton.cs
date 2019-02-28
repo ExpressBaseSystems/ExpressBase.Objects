@@ -28,7 +28,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
         [ProtoBuf.ProtoMember(1)]
-        [System.ComponentModel.Category("Appearance")]
+        [PropertyGroup("Appearance")]
         public string Text { get; set; }
 
         public override string GetHead()
