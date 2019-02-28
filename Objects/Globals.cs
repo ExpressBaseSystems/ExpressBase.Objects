@@ -96,7 +96,7 @@ namespace ExpressBase.Objects.Objects
             {
                 var _data = x as NTV;
 
-                 if (_data.Type == EbDbTypes.Int32)
+                if (_data.Type == EbDbTypes.Int32)
                     result = Convert.ToDecimal((x as NTV).Value);
                 else if (_data.Type == EbDbTypes.Int64)
                     result = Convert.ToDecimal((x as NTV).Value);
@@ -203,19 +203,20 @@ namespace ExpressBase.Objects.Objects
             this.FORM = new FormAsGlobal();
         }
     }
+
     public class FormAsGlobal : DynamicObject
     {
-        public List<NTV> Controls { get; set; }
+        public dynamic Rows { get; set; }
 
         public List<FormAsGlobal> Containers { get; set; }
 
-        public string TableName { get; set; }
+        //public string TableName { get; set; }
 
         public string Name { get; set; }
 
         public FormAsGlobal()
         {
-            this.Controls = new List<NTV>();
+            this.Rows = new List<ListNTV>();
             this.Containers = new List<FormAsGlobal>();
         }
 
@@ -223,42 +224,27 @@ namespace ExpressBase.Objects.Objects
         {
             get
             {
-                return this.Controls.Count;
+                return this.Rows.Count;
             }
         }
 
-        public List<NTV> Rows
+        public void Add(ListNTV listNTV)
         {
-            get
-            {
-                return this.Controls;
-            }
+            this.Rows.Add(listNTV);
         }
-
 
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
             string name = binder.Name;
-
-            NTV ntv = this.Controls.Find(e => e.Name.Equals(name));
-
-            if (ntv != null)
+            object value = null;
+            if (this.Count > 0)
             {
-                if (ntv.Type == EbDbTypes.Int32)
-                    result = Convert.ToDecimal(ntv.Value);
-                else if (ntv.Type == EbDbTypes.Int64)
-                    result = Convert.ToDecimal(ntv.Value);
-                else if (ntv.Type == EbDbTypes.Int16)
-                    result = Convert.ToDecimal(ntv.Value);
-                else if (ntv.Type == EbDbTypes.Decimal)
-                    result = Convert.ToDecimal(ntv.Value);
-                else if (ntv.Type == EbDbTypes.String)
-                    result = (ntv.Value).ToString();
-                else if (ntv.Type == EbDbTypes.DateTime)
-                    result = Convert.ToDateTime(ntv.Value);
-                else
-                    result = ntv.Value.ToString();
-
+                ListNTV temp = this.Rows[0];
+                value = temp[name];
+            }            
+            if (value != null)
+            {
+                result = value;
                 return true;
             }
             else
@@ -270,10 +256,74 @@ namespace ExpressBase.Objects.Objects
                     return true;
                 }
             }
-
             result = null;
             return false;
         }
     }
+
+    public class ListNTV : DynamicObject
+    {
+        public List<NTV> Columns { get; set; }
+
+        public ListNTV()
+        {
+            this.Columns = new List<NTV>();
+        }
+
+        public void Add(NTV ntv)
+        {
+            this.Columns.Add(ntv);
+        }
+
+        public object this[string name]
+        {
+            get
+            {
+                NTV ntv = this.Columns.Find(e => e.Name.Equals(name));
+                if (ntv != null)
+                    return GetValueFromNTV(ntv);
+                else
+                    return null;
+            }
+        }
+
+        public override bool TryGetMember(GetMemberBinder binder, out object result)
+        {
+            string name = binder.Name;
+
+            NTV ntv = this.Columns.Find(e => e.Name.Equals(name));
+
+            if (ntv != null)
+            {
+                result = GetValueFromNTV(ntv);
+                return true;
+            }
+
+            result = null;
+            return false;
+        }
+
+        private object GetValueFromNTV(NTV ntv)
+        {
+            object result;
+            if (ntv.Type == EbDbTypes.Int32)
+                result = Convert.ToDecimal(ntv.Value);
+            else if (ntv.Type == EbDbTypes.Int64)
+                result = Convert.ToDecimal(ntv.Value);
+            else if (ntv.Type == EbDbTypes.Int16)
+                result = Convert.ToDecimal(ntv.Value);
+            else if (ntv.Type == EbDbTypes.Decimal)
+                result = Convert.ToDecimal(ntv.Value);
+            else if (ntv.Type == EbDbTypes.String)
+                result = (ntv.Value).ToString();
+            else if (ntv.Type == EbDbTypes.DateTime)
+                result = Convert.ToDateTime(ntv.Value);
+            else
+                result = ntv.Value.ToString();
+            return result;
+        }
+    }
+
+
 
 }
