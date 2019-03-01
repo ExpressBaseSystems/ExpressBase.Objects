@@ -208,6 +208,11 @@ namespace ExpressBase.Objects.Objects
             this.Rows.Add(listNTV);
         }
 
+        public void AddContainer(FormAsGlobal global)
+        {
+            this.Containers.Add(global);
+        }
+
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
             string name = binder.Name;
