@@ -231,4 +231,12 @@ END;";
 
         public ApiException(string message, Exception innerException) : base(message, innerException) { }
     }
+
+    [RuntimeSerializable]
+    public class ApiScript
+    {
+        public Type ResultType { get { return this.Data.GetType(); } }
+
+        public string Data { set; get; }
+    }
 }
