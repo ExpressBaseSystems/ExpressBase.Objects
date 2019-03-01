@@ -1,4 +1,5 @@
-﻿using ExpressBase.Common.EbServiceStack.ReqNRes;
+﻿using ExpressBase.Common.Data;
+using ExpressBase.Common.EbServiceStack.ReqNRes;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.SqlProfiler;
 using ExpressBase.Common.Structures;
@@ -544,6 +545,23 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
+    public class GetExplainRequest : EbServiceStackAuthRequest, IReturn<GetExplainResponse>
+    {
+        [DataMember(Order = 1)]
+        public string Query { get; set; }
+
+        [DataMember(Order = 2)]
+        public List<Param> Params { get; set; }
+    }
+       
+    public class GetExplainResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public string Explain { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
     [DataContract]
     public class EbObjectWrapper
     {
