@@ -300,26 +300,35 @@ namespace ExpressBase.Objects
                     </div>".RemoveCR().DoubleQuoted();
         }
 
-        public object Evaluate(ApiResources _prevres)
+        public ApiScript Evaluate(ApiResources _prevres)
         {
             string code = this.Script.B2S().Trim();
-
+            ApiScript script = new ApiScript();
             Script valscript = CSharpScript.Create<dynamic>(code,
                    ScriptOptions.Default.WithReferences("Microsoft.CSharp", "System.Core")
-                   .WithImports("System.Dynamic", "System", "System.Collections.Generic", "System.Diagnostics", "System.Linq")
+                   .WithImports("System.Dynamic", "System", "System.Collections.Generic",
+                   "System.Diagnostics", "System.Linq")
                    ,globalsType: typeof(ApiGlobals));
-
             EbDataSet _ds = _prevres.Result as EbDataSet;
             try
             {
                 valscript.Compile();
-                ApiGlobals globals = new ApiGlobals(_ds);
-                return valscript.RunAsync(globals).Result.ReturnValue;
             }
             catch (Exception e)
             {
-                throw new Exception(e.Message);
+                throw new ApiException("Compilation Error: "+e.Message);
             }
+
+            try
+            {
+                ApiGlobals globals = new ApiGlobals(_ds);
+                script.Data = JsonConvert.SerializeObject(valscript.RunAsync(globals).Result.ReturnValue);
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Execution Error: "+e.Message);
+            }
+            return script;
         }
     }
 }

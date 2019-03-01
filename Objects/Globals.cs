@@ -1,5 +1,6 @@
 ﻿using ExpressBase.Common;
 using ExpressBase.Common.Structures;
+using ExpressBase.Objects.ServiceStack_Artifacts;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -145,27 +146,6 @@ namespace ExpressBase.Objects.Objects
             this.Tables = _ds.Tables;
         }
     }
-
-    public class ApiTable : List<EbDataTable>
-    {
-        EbDataSet DataSet { set; get; }
-
-        public ApiTable(EbDataSet ds)
-        {
-            this.DataSet = ds;
-        }
-        //public dynamic this[int index]
-        //{
-        //    get
-        //    {
-        //        if (index <= this.DataSet.Tables.Count)
-        //            return this.DataSet.Tables[index];
-        //        else
-        //            return null;
-        //    }
-        //}
-    }
-
 
     public class FormGlobals
     {
