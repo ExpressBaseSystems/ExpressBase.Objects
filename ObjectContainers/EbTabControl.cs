@@ -1,6 +1,7 @@
 ﻿using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -45,21 +46,33 @@ namespace ExpressBase.Objects
             }
         }
 
-        [OnChangeUIFunction("")]
-        public override string Label { get => base.Label; set => base.Label = value; }
-
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [OnChangeUIFunction("EbTabControl.padding")]
         public override int Padding { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.Collection)]
-        [Alias("TabCollection")]
+        [Alias("TabPanes")]
         [PropertyGroup("test")]
         [UIproperty]
         [ListType(typeof(EbTabPane))]
         [OnChangeUIFunction("EbTabControl.adjustPanesHeightToHighest")]
         public override List<EbControl> Controls { get; set; }
+
+        [JsonIgnore]
+        public override string Label { get; set; }
+
+        [JsonIgnore]
+        public override string BackColor { get; set; }
+
+        [JsonIgnore]
+        public override string ForeColor { get; set; }
+
+        [JsonIgnore]
+        public override string LabelBackColor { get; set; }
+
+        [JsonIgnore]
+        public override string LabelForeColor { get; set; }
 
         public override string GetDesignHtml()
         {

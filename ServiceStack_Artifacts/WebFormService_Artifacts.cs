@@ -221,4 +221,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
     }
+
+    [Serializable()]
+    public class FormException : Exception
+    {
+        public FormException() : base() { }
+
+        public FormException(string message) : base(message) { }
+    }
 }
