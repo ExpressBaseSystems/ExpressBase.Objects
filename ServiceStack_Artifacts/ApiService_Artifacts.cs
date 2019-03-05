@@ -86,6 +86,24 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
+    public class ApiReqJsonRequest:IReturn<ApiReqJsonResponse>, IEbSSRequest
+    {
+        public string SolnId { get; set; }
+
+        public int UserId { get; set; }
+
+        [DataMember(Order = 1)]
+        public ListOrdered Components { set; get; }
+    }
+
+    [DataContract]
+    public class ApiReqJsonResponse
+    {
+        [DataMember(Order = 1)]
+        public List<Param> Params { set; get; }
+    }
+
+    [DataContract]
     public class ApiMessage
     {
         [DataMember(Order = 1)]
