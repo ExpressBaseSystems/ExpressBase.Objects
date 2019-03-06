@@ -1,11 +1,8 @@
 ﻿using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
-using iTextSharp.text;
-using iTextSharp.text.pdf;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using ExpressBase.Common.Extensions;
 using Newtonsoft.Json;
 using ExpressBase.Common;
@@ -15,7 +12,6 @@ using ExpressBase.Objects.ServiceStack_Artifacts;
 using ExpressBase.Objects.Objects;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
-using System.Text.RegularExpressions;
 
 namespace ExpressBase.Objects
 {
