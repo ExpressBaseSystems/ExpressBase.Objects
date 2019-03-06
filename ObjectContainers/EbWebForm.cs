@@ -127,8 +127,10 @@ namespace ExpressBase.Objects
 
         public FormAsGlobal GetFormAsGlobal(WebformData FormData)
         {
-            FormAsGlobal _globals = new FormAsGlobal();
-            _globals.Name = this.Name;
+            FormAsGlobal _globals = new FormAsGlobal
+            {
+                Name = this.Name
+            };
             return GetFormAsGlobalRec(this, FormData, _globals);
         }
 
@@ -184,6 +186,33 @@ namespace ExpressBase.Objects
             return ntv;
         }
 
+        //get controls in webform as a single dimensional structure 
+        public static Dictionary<int, EbControlWrapper> GetControlsAsDict(EbControlContainer _container, string _path = "", Dictionary<int, EbControlWrapper> _dict = null, int _counter = 0)
+        {
+            if(_dict == null)
+            {
+                _dict = new Dictionary<int, EbControlWrapper>();
+            }
+            IEnumerable<EbControl> FlatCtrls = _container.Controls.Get1stLvlControls();
+            foreach (EbControl control in FlatCtrls)
+            {
+                _dict.Add(_counter++, new EbControlWrapper
+                {
+                    TableName = _container.TableName,
+                    Path = _path == "" ? control.Name: _path + "." + control.Name,
+                    Control = control
+                });
+            }
+            foreach(EbControl control in _container.Controls)
+            {
+                if(control is EbControlContainer)
+                {
+                    _dict = GetControlsAsDict(control as EbControlContainer, _path + "." + (control as EbControlContainer).Name, _dict, _counter);
+                }
+            }
+            return _dict;
+        }
+        
         public WebFormSchema GetWebFormSchema()
         {
             WebFormSchema _formSchema = new WebFormSchema();
@@ -367,5 +396,16 @@ namespace ExpressBase.Objects
                 _control.EbSid = _ucName + "_" + _control.EbSid;
             }
         }
+    }
+
+    public class EbControlWrapper
+    {
+        public string TableName { get; set; }
+
+        public string Path { get; set; }
+
+        //public object Value { get; set; }///////
+
+        public EbControl Control { get; set; }
     }
 }
