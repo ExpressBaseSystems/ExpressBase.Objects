@@ -4,6 +4,7 @@ using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
 using ExpressBase.Data;
+using ExpressBase.Objects.Objects;
 using ExpressBase.Objects.ServiceStack_Artifacts;
 using ServiceStack;
 using ServiceStack.Redis;
@@ -93,7 +94,7 @@ namespace ExpressBase.Objects
                         _cols = "eb_auto_id," + _cols;
                     query += string.Format("SELECT id, {0} FROM {1} WHERE {2} = :id AND eb_del='F';", _cols, _table.TableName, _id);
 
-                    foreach(ColumnSchema Col in _table.Columns)
+                    foreach (ColumnSchema Col in _table.Columns)
                     {
                         if (Col.Control.GetType().Equals(typeof(EbPowerSelect)))
                         {
@@ -102,7 +103,7 @@ namespace ExpressBase.Objects
                     }
                 }
             }
-            foreach(Object Ctrl in _schema.ExtendedControls)
+            foreach (Object Ctrl in _schema.ExtendedControls)
             {
                 queryExt += (Ctrl as EbFileUploader).GetSelectQuery();
             }
@@ -124,7 +125,94 @@ namespace ExpressBase.Objects
             return query;
         }
 
+        public FormAsGlobal GetFormAsGlobal(WebformData FormData)
+        {
+            FormAsGlobal _globals = new FormAsGlobal
+            {
+                Name = this.Name
+            };
+            return GetFormAsGlobalRec(this, FormData, _globals);
+        }
 
+        private FormAsGlobal GetFormAsGlobalRec(EbControlContainer _container, WebformData _formData, FormAsGlobal _globals)
+        {
+            ListNTV listNTV = new ListNTV();
+
+            if (_formData.MultipleTables.ContainsKey(_container.TableName))
+            {
+                for (int i = 0; i < _formData.MultipleTables[_container.TableName].Count; i++)
+                {
+                    foreach (EbControl control in _container.Controls)
+                    {
+                        if (control is EbControlContainer)
+                        {
+                            FormAsGlobal g = new FormAsGlobal();
+                            g.Name = (control as EbControlContainer).Name;
+                            _globals.AddContainer(g);
+                            return GetFormAsGlobalRec(control as EbControlContainer, _formData, g);
+                        }
+                        else
+                        {
+                            NTV n = GetNtvFromFormData(_formData, _container.TableName, i, control.Name);
+                            if (n != null)
+                                listNTV.Columns.Add(n);
+                        }
+                    }
+                }
+                _globals.Add(listNTV);
+            }
+            return _globals;
+        }
+
+        private NTV GetNtvFromFormData(WebformData _formData, string _table, int _row, string _column)
+        {
+            NTV ntv = null;
+            if (_formData.MultipleTables.ContainsKey(_table))
+            {
+                foreach (SingleColumn col in _formData.MultipleTables[_table][_row].Columns)
+                {
+                    if (col.Name.Equals(_column))
+                    {
+                        ntv = new NTV()
+                        {
+                            Name = _column,
+                            Type = (EbDbTypes)col.Type,
+                            Value = col.Value
+                        };
+                        break;
+                    }
+                }
+            }
+            return ntv;
+        }
+
+        //get controls in webform as a single dimensional structure 
+        public static Dictionary<int, EbControlWrapper> GetControlsAsDict(EbControlContainer _container, string _path = "", Dictionary<int, EbControlWrapper> _dict = null, int _counter = 0)
+        {
+            if(_dict == null)
+            {
+                _dict = new Dictionary<int, EbControlWrapper>();
+            }
+            IEnumerable<EbControl> FlatCtrls = _container.Controls.Get1stLvlControls();
+            foreach (EbControl control in FlatCtrls)
+            {
+                _dict.Add(_counter++, new EbControlWrapper
+                {
+                    TableName = _container.TableName,
+                    Path = _path == "" ? control.Name: _path + "." + control.Name,
+                    Control = control
+                });
+            }
+            foreach(EbControl control in _container.Controls)
+            {
+                if(control is EbControlContainer)
+                {
+                    _dict = GetControlsAsDict(control as EbControlContainer, _path + "." + (control as EbControlContainer).Name, _dict, _counter);
+                }
+            }
+            return _dict;
+        }
+        
         public WebFormSchema GetWebFormSchema()
         {
             WebFormSchema _formSchema = new WebFormSchema();
@@ -143,7 +231,7 @@ namespace ExpressBase.Objects
             {
                 _table = new TableSchema { TableName = _container.TableName.ToLower(), ParentTable = _parentTable };
                 _schema.Tables.Add(_table);
-                
+
                 //List<ColumnSchema> _columns = new List<ColumnSchema>();
                 //foreach (EbControl control in _flatControls)
                 //{
@@ -164,7 +252,7 @@ namespace ExpressBase.Objects
                 else
                     _table.Columns.Add(new ColumnSchema { ColumnName = control.Name, EbDbType = (int)control.EbDbType, Control = control });
             }
-            
+
             foreach (EbControl _control in _container.Controls)
             {
                 if (_control is EbControlContainer)
@@ -308,5 +396,16 @@ namespace ExpressBase.Objects
                 _control.EbSid = _ucName + "_" + _control.EbSid;
             }
         }
+    }
+
+    public class EbControlWrapper
+    {
+        public string TableName { get; set; }
+
+        public string Path { get; set; }
+
+        //public object Value { get; set; }///////
+
+        public EbControl Control { get; set; }
     }
 }

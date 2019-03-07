@@ -3,6 +3,7 @@ using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
 using ExpressBase.Objects;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -33,63 +34,28 @@ namespace ExpressBase.Objects
         [ListType(typeof(EbTableTd))]
         public override List<EbControl> Controls { get; set; }
 
+        [JsonIgnore]
         public override string Label { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
-        [PropertyEditor(PropertyEditorType.Expandable)]
-        [PropertyGroup("Test")]
-        public Position Position { get; set; }
+        [JsonIgnore]
+        public override string BackColor { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
-        [PropertyEditor(PropertyEditorType.Collection)]
-        [PropertyGroup("Test")]
-        public List<EbTableTd> CollEdtProp { get; set; }
+        [JsonIgnore]
+        public override string ForeColor { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
-        [PropertyEditor(PropertyEditorType.CollectionFrmSrc)]
-        [PropertyGroup("Test")]
-        public List<EbTableTd> CollFrmSrc { get; set; }
+        [JsonIgnore]
+        public override string LabelBackColor { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
-        [PropertyEditor(PropertyEditorType.CollectionFrmSrcPG)]
-        [PropertyGroup("Test")]
-        public List<EbTableTd> ColumnsR { get; set; }
-
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
-        [PropertyEditor(PropertyEditorType.String)]
-        [PropertyGroup("Test")]
-        public string doc { get; set; }
-
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
-        [PropertyEditor(PropertyEditorType.ImageSeletor)]
-        [PropertyGroup("Test")]
-        public string AImg { get; set; }
+        [JsonIgnore]
+        public override string LabelForeColor { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [OnChangeUIFunction("EbTable.padding")]
         public override int Padding { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
-        [PropertyEditor(PropertyEditorType.CollectionA2C)]
-        [PropertyGroup("Test")]
-        public List<EbTableTd> propA2C { get; set; }
-
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
-        [PropertyEditor(PropertyEditorType.Collection)]
-        [PropertyGroup("Test")]
-        public List<EbDataVisualization> Visualizations { get; set; }
-
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
-        [PropertyEditor(PropertyEditorType.ObjectSelector)]
-        [PropertyGroup("Test")]
-        [DefaultPropValue("eb_roby_dev-eb_roby_dev-3-671-1325")]
-        //[OSE_ObjectTypes(EbObjectTypes.iDataVisualization, EbObjectTypes.iReport, EbObjectTypes.iMobileForm, EbObjectTypes.iTableVisualization)]
-        public string ObjectSelectorProp { get; set; }
-
         public EbTableLayout()
         {
             this.Controls = new List<EbControl>();
-            this.Visualizations = new List<EbDataVisualization>();
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
 
@@ -104,15 +70,9 @@ namespace ExpressBase.Objects
         public override string GetJsInitFunc()
         {
             return @"
-this.Init = function(id)
-{
+this.Init = function(id){
     this.Controls.$values.push(new EbObjects.EbTableTd(id + '_Td0'));
     this.Controls.$values.push(new EbObjects.EbTableTd(id + '_Td1'));
-    //this.Controls.$values.push(new EbObjects.EbTableTd(id + '_Td2'));
-
-    this.CollEdtProp.$values.push(new EbObjects.EbTableTd(id + '_Tdsamp0'));
-    this.CollEdtProp.$values.push(new EbObjects.EbTableTd(id + '_Tdsamp1'));
-    //this.CollEdtProp.$values.push(new EbObjects.EbTableTd(id + '_Tdsamp2'));
 };";
         }
 

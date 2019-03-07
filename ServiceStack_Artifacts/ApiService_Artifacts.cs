@@ -86,6 +86,24 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
+    public class ApiReqJsonRequest:IReturn<ApiReqJsonResponse>, IEbSSRequest
+    {
+        public string SolnId { get; set; }
+
+        public int UserId { get; set; }
+
+        [DataMember(Order = 1)]
+        public ListOrdered Components { set; get; }
+    }
+
+    [DataContract]
+    public class ApiReqJsonResponse
+    {
+        [DataMember(Order = 1)]
+        public List<Param> Params { set; get; }
+    }
+
+    [DataContract]
     public class ApiMessage
     {
         [DataMember(Order = 1)]
@@ -101,6 +119,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 4)]
         [JsonProperty("Execution Time")]
         public string ExecutionTime { set; get; }
+
+        [DataMember(Order = 4)]
+        [JsonProperty("Error Code")]
+        public ApiErrorCode ErrorCode { set; get; }
     }
 
     public class ApiComponent
@@ -230,5 +252,42 @@ END;";
         public ApiException(string message) : base(message) { }
 
         public ApiException(string message, Exception innerException) : base(message, innerException) { }
+    }
+
+    [RuntimeSerializable]
+    public class ApiScript
+    {
+        public Type ResultType { get { return this.Data.GetType(); } }
+
+        public string Data { set; get; }
+    }
+
+    public static class ApiConstants
+    {
+        public const string CIRCULAR_REF = "Cannot call {0} from {0}";
+
+        public const string DESCRPT_ERR = "Error at position {0}, Resource {1} failed to execute. Resource Name = '{2}'";
+
+        public const string EXE_FAIL = "Execution failed,{0}";
+
+        public const string UNSET_PARAM = "Parameter {0} must be set";
+
+        public const string EXE_SUCCESS = "Execution success";
+
+        public const string MAIL_SUCCESS = "The mail has been sent successfully to {0} with subject {1} and cc {2}";
+
+        public const string SUCCESS = "Success";
+
+        public const string FAIL = "Failed";
+
+        public const string API_NOTFOUND = "Api,{0} does not Exist";
+    }
+
+    public enum ApiErrorCode
+    {
+        NotFound = 404,
+        Success = 1,
+        Failed = -1,
+        ParamNFound = 0
     }
 }

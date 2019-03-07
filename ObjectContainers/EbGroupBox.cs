@@ -62,7 +62,7 @@ namespace ExpressBase.Objects
             foreach (EbControl ec in this.Controls)
                 html += ec.GetHtml();
 
-            return (html + "</div></div></div>")
+            return (html + "</div></div></div></div>")
                 .Replace("@name@", this.Name)
                 .Replace("@ebsid@", this.EbSid_CtxId)
                 .Replace("@glabel@", this.Label)
