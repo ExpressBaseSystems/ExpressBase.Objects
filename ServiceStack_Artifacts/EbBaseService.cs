@@ -4,6 +4,7 @@ using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
 using ExpressBase.Common.ServiceClients;
+using ExpressBase.Common.SqlProfiler;
 using ExpressBase.Common.Structures;
 using Newtonsoft.Json;
 using Npgsql;
@@ -180,6 +181,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         {
             try
             {
+                List<JsonParams> _ParamList = new List<JsonParams>();
+                foreach (Param item in param)
+                {
+                    JsonParams obj = new JsonParams { Name = item.Name, Type = Enum.GetName(typeof(EbDbTypes), Convert.ToInt32(item.Type)), Value = item.Value };
+                    _ParamList.Add(obj);
+                }
+                var _param = JsonConvert.SerializeObject(_ParamList);
                 string query = @"INSERT INTO eb_executionlogs(rows, exec_time, created_by, created_at, params, refid) 
                                 VALUES(:rows, :exec_time, :created_by, :created_at, :params, :refid)";
                 DbParameter[] parameters = {
@@ -187,7 +195,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
                      EbConnectionFactory.ObjectsDB.GetNewParameter("exec_time", EbDbTypes.Int32,t.TotalMilliseconds),
                      EbConnectionFactory.ObjectsDB.GetNewParameter("created_by", EbDbTypes.Int32,userid),
                      EbConnectionFactory.ObjectsDB.GetNewParameter("created_at", EbDbTypes.DateTime,starttime),
-                     EbConnectionFactory.ObjectsDB.GetNewParameter("params", EbDbTypes.Json, EbSerializers.Json_Serialize(param)),
+                     EbConnectionFactory.ObjectsDB.GetNewParameter("params", EbDbTypes.Json, _param),
                      EbConnectionFactory.ObjectsDB.GetNewParameter("refid", EbDbTypes.String,refid)
                     };
                 this.EbConnectionFactory.ObjectsDB.DoNonQuery(query, parameters);
