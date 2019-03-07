@@ -742,4 +742,125 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public DVColumnCollection Colums { set; get; }
     }
+    
+    [DataContract]
+    public class DataSourceDataSetColumnsRequest : IReturn<DataSourceDataSetColumnsResponse>, IEbSSRequest
+    {
+        [DataMember(Order = 1)]
+        public string RefId { get; set; }
+
+        [DataMember(Order = 7)]
+        public string SolnId { get; set; }
+
+        [DataMember(Order = 8)]
+        public int UserId { get; set; }
+
+        [DataMember(Order = 9)]
+        public List<Param> Params { get; set; }
+    }
+
+    [DataContract]
+    [Csv(CsvBehavior.FirstEnumerable)]
+    public class DataSourceDataSetColumnsResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public List<ColumnColletion> ColumnsCollection { get; set; }
+
+        [DataMember(Order = 3)]
+        public bool IsPaged { get; set; }
+
+        [DataMember(Order = 4)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 5)]
+        public List<Param> ParamsList { get; set; }
+    }
+
+    
+    [DataContract]
+    public class DataSourceDataSetDataRequest : IReturn<DataSourceDataSetDataResponse>, IEbSSRequest
+    {
+        [DataMember(Order = 0)]
+        public string RefId { get; set; }
+
+        [DataMember(Order = 1)]
+        public int Start { get; set; }
+
+        [DataMember(Order = 2)]
+        public int Length { get; set; }
+
+        [DataMember(Order = 3)]
+        public int Draw { get; set; }
+
+        [DataMember(Order = 4)]
+        public OrderBy OrderBy { get; set; }
+
+        [DataMember(Order = 6)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 7)]
+        public string rToken { get; set; }
+
+        [DataMember(Order = 8)]
+        public string SolnId { get; set; }
+
+        [DataMember(Order = 9)]
+        public int UserId { get; set; }
+
+        [DataMember(Order = 10)]
+        public List<Param> Params { get; set; }
+
+        [DataMember(Order = 11)]
+        public List<TFilters> TFilters { get; set; }
+
+        [DataMember(Order = 3)]
+        public int QueryIndex { get; set; }
+
+    }
+
+    [DataContract]
+    [Csv(CsvBehavior.FirstEnumerable)]
+    public class DataSourceDataSetDataResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public int Draw { get; set; }
+
+        [DataMember(Order = 2)]
+        public int RecordsTotal { get; set; }
+
+        [DataMember(Order = 3)]
+        public int RecordsFiltered { get; set; }
+
+        [DataMember(Order = 4)]
+        public RowColletion Data { get; set; }
+
+        [DataMember(Order = 5)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 6)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 7)]
+        public DataSet DataSet { get; set; }
+
+        [DataMember(Order = 8)]
+        public bool Ispaged { get; set; }
+
+        [DataMember(Order = 9)]
+        public RowColletion FormattedData { get; set; }
+
+        [DataMember(Order = 10)]
+        //public LevelInfoCollection Levels { get; set; }
+        public List<GroupingDetails> Levels { get; set; }
+
+        [DataMember(Order = 11)]
+        public List<string> Permission { get; set; }
+
+        [DataMember(Order = 12)]
+        public Dictionary<int, List<object>> Summary { get; set; }
+
+        [DataMember(Order = 13)]
+        public byte[] excel_file { get; set; }
+
+    }
 }
