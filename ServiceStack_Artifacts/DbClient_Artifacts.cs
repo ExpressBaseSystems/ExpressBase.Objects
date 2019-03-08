@@ -28,12 +28,64 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
 
+        [DataMember(Order = 3)]
+        public string DB_Name { get; set; }
+
     }
 
     [DataContract]
-    public class DbClientQueryRequest
+    public class DbClientCreateRequest
     {
-        [DataMember(Order =1)]
+        [DataMember(Order = 1)]
+        public string Query { get; set; }
+    }
+
+    [DataContract]
+    public class DbClientSelectRequest
+    {
+        [DataMember(Order = 1)]
+        public string Query { get; set; }
+    }
+
+    [DataContract]
+    public class DbClientInsertRequest
+    {
+        [DataMember(Order = 1)]
+        public string Query { get; set; }
+    }
+
+    [DataContract]
+    public class DbClientDropRequest
+    {
+        [DataMember(Order = 1)]
+        public string Query { get; set; }
+    }
+
+    [DataContract]
+    public class DbClientDeleteRequest
+    {
+        [DataMember(Order = 1)]
+        public string Query { get; set; }
+    }
+
+    [DataContract]
+    public class DbClientAlterRequest
+    {
+        [DataMember(Order = 1)]
+        public string Query { get; set; }
+    }
+
+    [DataContract]
+    public class DbClientTruncateRequest
+    {
+        [DataMember(Order = 1)]
+        public string Query { get; set; }
+    }
+
+    [DataContract]
+    public class DbClientUpdateRequest
+    {
+        [DataMember(Order = 1)]
         public string Query { get; set; }
     }
 
@@ -43,11 +95,20 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 1)]
         public EbDataSet Dataset { get; set; }
 
-        [DataMember(Order = 1)]
+        [DataMember(Order = 2)]
+        public int Result { get; set; }
+
+        [DataMember(Order = 3)]
         public List<DVColumnCollection> ColumnCollection { get; set; }
 
-        [DataMember(Order = 1)]
+        [DataMember(Order = 4)]
         public List<RowColletion> RowCollection { get; set; }
+
+        [DataMember(Order = 5)]
+        public string Message { get; set; }
+
+        [DataMember(Order = 5)]
+        public DBOperations Type { get; set; }
     }
 
     public class EbDbExplorerTablesDict
@@ -95,7 +156,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public Sequence Sequence { set; get; }
 
         [DataMember(Order = 5)]
-        public List<EbDbExplorerColumn> Columns {set;get;}
+        public List<EbDbExplorerColumn> Columns { set; get; }
 
         public EbDbExplorerTable()
         {
@@ -108,6 +169,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     public class Sequence
     {
-    }    
+    }
 
 }
