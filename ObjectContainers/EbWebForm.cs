@@ -125,17 +125,14 @@ namespace ExpressBase.Objects
             return query;
         }
 
-        public FormAsGlobal GetFormAsGlobal(WebformData FormData)
+        //get formdata as globals for c# script engine
+        public FormAsGlobal GetFormAsGlobal(WebformData _formData, EbControlContainer _container = null, FormAsGlobal _globals = null)
         {
-            FormAsGlobal _globals = new FormAsGlobal
-            {
-                Name = this.Name
-            };
-            return GetFormAsGlobalRec(this, FormData, _globals);
-        }
-
-        private FormAsGlobal GetFormAsGlobalRec(EbControlContainer _container, WebformData _formData, FormAsGlobal _globals)
-        {
+            if (_container == null)
+                _container = this;
+            if (_globals == null)
+                _globals = new FormAsGlobal { Name = this.Name };
+            
             ListNTV listNTV = new ListNTV();
 
             if (_formData.MultipleTables.ContainsKey(_container.TableName))
@@ -149,7 +146,7 @@ namespace ExpressBase.Objects
                             FormAsGlobal g = new FormAsGlobal();
                             g.Name = (control as EbControlContainer).Name;
                             _globals.AddContainer(g);
-                            return GetFormAsGlobalRec(control as EbControlContainer, _formData, g);
+                            g = GetFormAsGlobal( _formData, control as EbControlContainer, g);
                         }
                         else
                         {
@@ -163,7 +160,7 @@ namespace ExpressBase.Objects
             }
             return _globals;
         }
-
+        
         private NTV GetNtvFromFormData(WebformData _formData, string _table, int _row, string _column)
         {
             NTV ntv = null;
@@ -189,7 +186,7 @@ namespace ExpressBase.Objects
         //get controls in webform as a single dimensional structure 
         public static Dictionary<int, EbControlWrapper> GetControlsAsDict(EbControlContainer _container, string _path = "", Dictionary<int, EbControlWrapper> _dict = null, int _counter = 0)
         {
-            if(_dict == null)
+            if (_dict == null)
             {
                 _dict = new Dictionary<int, EbControlWrapper>();
             }
@@ -199,20 +196,20 @@ namespace ExpressBase.Objects
                 _dict.Add(_counter++, new EbControlWrapper
                 {
                     TableName = _container.TableName,
-                    Path = _path == "" ? control.Name: _path + "." + control.Name,
+                    Path = _path == "" ? control.Name : _path + "." + control.Name,
                     Control = control
                 });
             }
-            foreach(EbControl control in _container.Controls)
+            foreach (EbControl control in _container.Controls)
             {
-                if(control is EbControlContainer)
+                if (control is EbControlContainer)
                 {
                     _dict = GetControlsAsDict(control as EbControlContainer, _path + "." + (control as EbControlContainer).Name, _dict, _counter);
                 }
             }
             return _dict;
         }
-        
+
         public WebFormSchema GetWebFormSchema()
         {
             WebFormSchema _formSchema = new WebFormSchema();
