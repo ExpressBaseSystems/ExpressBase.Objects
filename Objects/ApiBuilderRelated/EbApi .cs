@@ -76,7 +76,7 @@ namespace ExpressBase.Objects
 
         public object Result { set; get; }
 
-        public virtual object GetOutParams(List<Param> _param) { return null; }
+        public virtual List<Param> GetOutParams(List<Param> _param) { return new List<Param>(); }
 
         public virtual object GetResult() { return this.Result; }
 
@@ -119,7 +119,7 @@ namespace ExpressBase.Objects
                      </div>".RemoveCR().DoubleQuoted(); ;
         }
 
-        public override object GetOutParams(List<Param> _param)
+        public override List<Param> GetOutParams(List<Param> _param)
         {
             List<Param> p = new List<Param>();
             foreach (EbDataTable table in (this.Result as EbDataSet).Tables)
@@ -200,9 +200,9 @@ namespace ExpressBase.Objects
                     </div>".RemoveCR().DoubleQuoted();
         }
 
-        public override object GetOutParams(List<Param> _param)
+        public override List<Param> GetOutParams(List<Param> _param)
         {
-            return null;
+            return new List<Param>();
         }
     }
 
@@ -235,11 +235,6 @@ namespace ExpressBase.Objects
                         </div>
                     </div>".RemoveCR().DoubleQuoted();
         }
-
-        public override object GetOutParams(List<Param> _param)
-        {
-            return null;
-        }
     }
 
     [EnableInBuilder(BuilderType.ApiBuilder)]
@@ -270,11 +265,6 @@ namespace ExpressBase.Objects
                             <div class='CompVersion'> @Version </div>
                         </div>
                     </div>".RemoveCR().DoubleQuoted();
-        }
-
-        public override object GetOutParams(List<Param> _param)
-        {
-            return null;
         }
     }
 
@@ -356,6 +346,16 @@ namespace ExpressBase.Objects
                             <div class='CompVersion'> @Version </div>
                         </div>
                     </div>".RemoveCR().DoubleQuoted();
+        }
+
+        public override List<Param> GetOutParams(List<Param> _param)
+        {
+            return new List<Param>();
+        }
+
+        public override object GetResult()
+        {
+            return (this.Result as ApiResponse).Result;
         }
     }
 }

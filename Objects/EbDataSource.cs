@@ -5,17 +5,16 @@ using ExpressBase.Common.JsonConverters;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
+using ExpressBase.Objects.Helpers;
 using ExpressBase.Objects.ServiceStack_Artifacts;
 using Newtonsoft.Json;
 using ServiceStack;
 using ServiceStack.Redis;
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace ExpressBase.Objects
 {
@@ -29,11 +28,16 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.DataReader, BuilderType.DataWriter, BuilderType.SqlFunctions)]
         [HideInPropertyGrid]
         public List<Param> InputParams { get; set; }
+
+        public virtual List<Param> GetParams(RedisClient _redis)
+        {
+            return new List<Param>();
+        }
     }
 
     [BuilderTypeEnum(BuilderType.DataReader)]
     [EnableInBuilder(BuilderType.DataReader)]
-    public class EbDataReader : EbDataSourceMain,IEBRootObject
+    public class EbDataReader : EbDataSourceMain, IEBRootObject
     {
         [EnableInBuilder(BuilderType.DataReader)]
         [HideInPropertyGrid]
@@ -122,11 +126,37 @@ namespace ExpressBase.Objects
             }
             return "";
         }
+
+        //for api
+        public override List<Param> GetParams(RedisClient _redis)
+        {
+            List<Param> p = new List<Param>();
+            if (string.IsNullOrEmpty(this.FilterDialogRefId))
+            {
+                if ((this.InputParams != null) && (this.InputParams.Any()))
+                    p = this.InputParams;
+                else
+                    p = SqlHelper.GetSqlParams(this.Sql, (int)EbObjectTypes.DataReader);
+            }
+            else
+            {
+                this.AfterRedisGet(_redis);
+                foreach (EbControl ctrl in this.FilterDialog.Controls)
+                {
+                    p.Add(new Param
+                    {
+                        Name = ctrl.Name,
+                        Type = ((int)ctrl.EbDbType).ToString(),
+                    });
+                }
+            }
+            return p;
+        }
     }
 
     [BuilderTypeEnum(BuilderType.DataWriter)]
     [EnableInBuilder(BuilderType.DataWriter)]
-    public class EbDataWriter : EbDataSourceMain,IEBRootObject
+    public class EbDataWriter : EbDataSourceMain, IEBRootObject
     {
         [EnableInBuilder(BuilderType.DataWriter)]
         [HideInPropertyGrid]
@@ -143,11 +173,20 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.DataWriter)]
         public override string Status { get; set; }
+
+        //forapi
+        public override List<Param> GetParams(RedisClient _redis)
+        {
+            if ((this.InputParams != null) && (this.InputParams.Any()))
+                return this.InputParams;
+            else
+                return SqlHelper.GetSqlParams(this.Sql, (int)EbObjectTypes.DataWriter);
+        }
     }
 
     [EnableInBuilder(BuilderType.SqlFunctions)]
     [BuilderTypeEnum(BuilderType.SqlFunctions)]
-    public class EbSqlFunction : EbDataSourceMain,IEBRootObject
+    public class EbSqlFunction : EbDataSourceMain, IEBRootObject
     {
         [EnableInBuilder(BuilderType.SqlFunctions)]
         [HideInPropertyGrid]
@@ -170,7 +209,11 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.SqlFunctions)]
         [HideInPropertyGrid]
-        public string FunctionName {set { } get {
+        public string FunctionName
+        {
+            set { }
+            get
+            {
                 return GetFuncNameByRegex();
             }
         }
@@ -178,7 +221,8 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         private IEbConnectionFactory ConnectionFactory { get; set; }
 
-        public EbSqlFunction() {
+        public EbSqlFunction()
+        {
 
         }
 
@@ -267,7 +311,7 @@ END LOOP;", _schema.TableName, GetExecuteQryU(_schema));
 
         private string GetExecuteQryI(TableSchema _schema)
         {
-            string m_tablename=string.Empty, m_table_id = string.Empty;
+            string m_tablename = string.Empty, m_table_id = string.Empty;
 
             if (_schema.TableName != this.FormSchema.MasterTable)
             {
@@ -275,7 +319,7 @@ END LOOP;", _schema.TableName, GetExecuteQryU(_schema));
                 m_table_id = "master_id,";
             }
 
-            string qry = "EXECUTE 'INSERT INTO " + _schema.TableName + "("+ m_tablename;
+            string qry = "EXECUTE 'INSERT INTO " + _schema.TableName + "(" + m_tablename;
             string _using_clas = string.Empty;
 
             foreach (ColumnSchema col in _schema.Columns)
@@ -287,7 +331,7 @@ END LOOP;", _schema.TableName, GetExecuteQryU(_schema));
                 }
                 else
                 {
-                    qry = qry + col.ColumnName + ") VALUES("+ m_table_id;
+                    qry = qry + col.ColumnName + ") VALUES(" + m_table_id;
                     _using_clas = _using_clas + "_row->>'" + col.ColumnName + "'" + "::" + this.GetVendorDbText(col.EbDbType) + CharConstants.SEMI_COLON;
                 }
             }
@@ -338,6 +382,15 @@ END LOOP;", _schema.TableName, GetExecuteQryU(_schema));
             if (!string.IsNullOrEmpty(this.Sql))
                 _funcname = r.Match(this.Sql.Replace("\n", "")).Groups[1].Value;
             return _funcname;
+        }
+
+        //for api
+        public override List<Param> GetParams(RedisClient _redis)
+        {
+            if ((this.InputParams != null) && (this.InputParams.Any()))
+                return this.InputParams;
+            else
+                return SqlHelper.GetSqlParams(this.Sql, (int)EbObjectTypes.DataWriter);
         }
     }
 
