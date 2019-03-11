@@ -1,11 +1,8 @@
 ﻿using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
-using iTextSharp.text;
-using iTextSharp.text.pdf;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using ExpressBase.Common.Extensions;
 using Newtonsoft.Json;
 using ExpressBase.Common;
@@ -15,7 +12,6 @@ using ExpressBase.Objects.ServiceStack_Artifacts;
 using ExpressBase.Objects.Objects;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
-using System.Text.RegularExpressions;
 
 namespace ExpressBase.Objects
 {
@@ -76,11 +72,11 @@ namespace ExpressBase.Objects
         [MetaOnly]
         public string Label { set; get; }
 
-        public virtual string Refid { get; set; }
+        public virtual string Reference { set; get; }
 
         public object Result { set; get; }
 
-        public virtual object GetOutParams(List<Param> _param) { return null; }
+        public virtual List<Param> GetOutParams(List<Param> _param) { return new List<Param>(); }
 
         public virtual object GetResult() { return this.Result; }
 
@@ -96,7 +92,7 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [PropertyGroup("Data Settings")]
         [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
-        public override string Refid { get; set; }
+        public override string Reference { get; set; }
 
         [EnableInBuilder(BuilderType.ApiBuilder)]
         [MetaOnly]
@@ -123,7 +119,7 @@ namespace ExpressBase.Objects
                      </div>".RemoveCR().DoubleQuoted(); ;
         }
 
-        public override object GetOutParams(List<Param> _param)
+        public override List<Param> GetOutParams(List<Param> _param)
         {
             List<Param> p = new List<Param>();
             foreach (EbDataTable table in (this.Result as EbDataSet).Tables)
@@ -181,7 +177,7 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [PropertyGroup("Data Settings")]
         [OSE_ObjectTypes(EbObjectTypes.iSqlFunction)]
-        public override string Refid { get; set; }
+        public override string Reference { get; set; }
 
         [EnableInBuilder(BuilderType.ApiBuilder)]
         [MetaOnly]
@@ -204,9 +200,9 @@ namespace ExpressBase.Objects
                     </div>".RemoveCR().DoubleQuoted();
         }
 
-        public override object GetOutParams(List<Param> _param)
+        public override List<Param> GetOutParams(List<Param> _param)
         {
-            return null;
+            return new List<Param>();
         }
     }
 
@@ -217,7 +213,7 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [PropertyGroup("Data Settings")]
         [OSE_ObjectTypes(EbObjectTypes.iDataWriter)]
-        public override string Refid { get; set; }
+        public override string Reference { get; set; }
 
         [EnableInBuilder(BuilderType.ApiBuilder)]
         [MetaOnly]
@@ -239,11 +235,6 @@ namespace ExpressBase.Objects
                         </div>
                     </div>".RemoveCR().DoubleQuoted();
         }
-
-        public override object GetOutParams(List<Param> _param)
-        {
-            return null;
-        }
     }
 
     [EnableInBuilder(BuilderType.ApiBuilder)]
@@ -253,7 +244,7 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [PropertyGroup("Data Settings")]
         [OSE_ObjectTypes(EbObjectTypes.iEmailBuilder)]
-        public override string Refid { get; set; }
+        public override string Reference { get; set; }
 
         [EnableInBuilder(BuilderType.ApiBuilder)]
         [MetaOnly]
@@ -274,11 +265,6 @@ namespace ExpressBase.Objects
                             <div class='CompVersion'> @Version </div>
                         </div>
                     </div>".RemoveCR().DoubleQuoted();
-        }
-
-        public override object GetOutParams(List<Param> _param)
-        {
-            return null;
         }
     }
 
@@ -308,7 +294,7 @@ namespace ExpressBase.Objects
                    ScriptOptions.Default.WithReferences("Microsoft.CSharp", "System.Core")
                    .WithImports("System.Dynamic", "System", "System.Collections.Generic",
                    "System.Diagnostics", "System.Linq")
-                   ,globalsType: typeof(ApiGlobals));
+                   , globalsType: typeof(ApiGlobals));
             EbDataSet _ds = _prevres.Result as EbDataSet;
             try
             {
@@ -316,7 +302,7 @@ namespace ExpressBase.Objects
             }
             catch (Exception e)
             {
-                throw new ApiException("Compilation Error: "+e.Message);
+                throw new ApiException("Compilation Error: " + e.Message);
             }
 
             try
@@ -326,9 +312,50 @@ namespace ExpressBase.Objects
             }
             catch (Exception e)
             {
-                throw new Exception("Execution Error: "+e.Message);
+                throw new Exception("Execution Error: " + e.Message);
             }
             return script;
+        }
+    }
+
+    [EnableInBuilder(BuilderType.ApiBuilder)]
+    public class EbConnectApi : ApiResources
+    {
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [PropertyGroup("Data Settings")]
+        [OSE_ObjectTypes(EbObjectTypes.iApi)]
+        public override string Reference { get; set; }
+
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        [MetaOnly]
+        [UIproperty]
+        public string RefName { set; get; }
+
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        [MetaOnly]
+        [UIproperty]
+        public string Version { set; get; }
+
+        public override string GetDesignHtml()
+        {
+            return @"<div class='apiPrcItem dropped' eb-type='ConnectApi' id='@id'>
+                        <div tabindex='1' class='drpbox' onclick='$(this).focus();'>  
+                            <div class='CompLabel'> @Label </div>
+                            <div class='CompName'> @RefName </div>
+                            <div class='CompVersion'> @Version </div>
+                        </div>
+                    </div>".RemoveCR().DoubleQuoted();
+        }
+
+        public override List<Param> GetOutParams(List<Param> _param)
+        {
+            return new List<Param>();
+        }
+
+        public override object GetResult()
+        {
+            return (this.Result as ApiResponse).Result;
         }
     }
 }
