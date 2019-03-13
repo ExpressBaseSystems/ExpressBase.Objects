@@ -182,12 +182,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             try
             {
                 List<JsonParams> _ParamList = new List<JsonParams>();
-                foreach (Param item in param)
-                {
-                    JsonParams obj = new JsonParams { Name = item.Name, Type = Enum.GetName(typeof(EbDbTypes), Convert.ToInt32(item.Type)), Value = item.Value };
-                    _ParamList.Add(obj);
-                }
-                var _param = JsonConvert.SerializeObject(_ParamList);
+                if (param != null)
+                    foreach (Param item in param)
+                    {
+                        JsonParams obj = new JsonParams { Name = item.Name, Type = Enum.GetName(typeof(EbDbTypes), Convert.ToInt32(item.Type)), Value = item.Value };
+                        _ParamList.Add(obj);
+                    }
+                string _param = JsonConvert.SerializeObject(_ParamList);
                 string query = @"INSERT INTO eb_executionlogs(rows, exec_time, created_by, created_at, params, refid) 
                                 VALUES(:rows, :exec_time, :created_by, :created_at, :params, :refid)";
                 DbParameter[] parameters = {
@@ -195,14 +196,14 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
                      EbConnectionFactory.ObjectsDB.GetNewParameter("exec_time", EbDbTypes.Int32,t.TotalMilliseconds),
                      EbConnectionFactory.ObjectsDB.GetNewParameter("created_by", EbDbTypes.Int32,userid),
                      EbConnectionFactory.ObjectsDB.GetNewParameter("created_at", EbDbTypes.DateTime,starttime),
-                     EbConnectionFactory.ObjectsDB.GetNewParameter("params", EbDbTypes.Json, _param),
+                     EbConnectionFactory.ObjectsDB.GetNewParameter("params", EbDbTypes.Json,_param),
                      EbConnectionFactory.ObjectsDB.GetNewParameter("refid", EbDbTypes.String,refid)
                     };
                 this.EbConnectionFactory.ObjectsDB.DoNonQuery(query, parameters);
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.StackTrace);
+                Console.WriteLine(e.Message);
                 return false;
             }
             return true;

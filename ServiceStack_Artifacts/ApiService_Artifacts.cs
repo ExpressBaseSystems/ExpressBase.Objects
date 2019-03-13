@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Text;
+using System.Xml.Serialization;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
@@ -34,7 +35,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class ApiComponetRequest: IReturn<ApiResponse>, IEbSSRequest
+    public class ApiComponetRequest : IReturn<ApiResponse>, IEbSSRequest
     {
         public string SolnId { get; set; }
 
@@ -86,6 +87,32 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
+    public class ApiMetaRequest: EbServiceStackNoAuthRequest,IReturn<ApiMetaResponse>
+    {
+        [DataMember(Order = 1)]
+        public string Name { set; get; }
+
+        [DataMember(Order = 2)]
+        public string Version { set; get; }
+
+        [DataMember(Order = 3)]
+        public string SolutionId { set; get; }
+    }
+
+    [DataContract]
+    public class ApiMetaResponse
+    {
+        [DataMember(Order = 1)]
+        public List<Param> Params { set; get; }
+
+        [DataMember(Order = 2)]
+        public string Name { set; get; }
+
+        [DataMember(Order = 3)]
+        public string Version { set; get; }
+    }
+
+    [DataContract]
     public class ApiReqJsonRequest:IReturn<ApiReqJsonResponse>, IEbSSRequest
     {
         public string SolnId { get; set; }
@@ -113,15 +140,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Description { get; set; }
 
         [DataMember(Order = 3)]
-        [JsonProperty("Executed On")]
         public string ExecutedOn { set; get; }
 
         [DataMember(Order = 4)]
-        [JsonProperty("Execution Time")]
         public string ExecutionTime { set; get; }
 
         [DataMember(Order = 4)]
-        [JsonProperty("Error Code")]
         public ApiErrorCode ErrorCode { set; get; }
     }
 
