@@ -744,7 +744,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
     
     [DataContract]
-    public class DataSourceDataSetColumnsRequest : IReturn<DataSourceDataSetColumnsResponse>, IEbSSRequest
+    public class DataSourceDataSetColumnsRequest : IReturn<DataSourceColumnsResponse>, IEbSSRequest
     {
         [DataMember(Order = 1)]
         public string RefId { get; set; }
