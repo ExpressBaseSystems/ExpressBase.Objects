@@ -211,11 +211,7 @@ namespace ExpressBase.Objects
 
         public override string GetHead()
         {
-            return this.RequiredString + @"
-<script>
-
-</script>
-";
+            return this.RequiredString;
         }
 
         public override string GetDesignHtml()
