@@ -100,6 +100,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
     {
         [JsonProperty(PropertyName = "data")]
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [HideInPropertyGrid]
         public int Data { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl)]
