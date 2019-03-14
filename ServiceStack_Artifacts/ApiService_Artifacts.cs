@@ -87,7 +87,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class ApiMetaRequest: EbServiceStackNoAuthRequest,IReturn<ApiMetaResponse>
+    public class ApiMetaRequest : EbServiceStackNoAuthRequest, IReturn<ApiMetaResponse>
     {
         [DataMember(Order = 1)]
         public string Name { set; get; }
@@ -113,7 +113,26 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class ApiReqJsonRequest:IReturn<ApiReqJsonResponse>, IEbSSRequest
+    public class ApiAllMetaRequest : EbServiceStackNoAuthRequest, IReturn<ApiAllMetaResponse>
+    {
+        [DataMember(Order = 1)]
+        public string SolutionId { set; get; }
+    }
+
+    [DataContract]
+    public class ApiAllMetaResponse
+    {
+        [DataMember(Order = 1)]
+        public List<EbObjectWrapper> AllMetas { set; get; }
+
+        public ApiAllMetaResponse()
+        {
+            AllMetas = new List<EbObjectWrapper>();
+        }
+    }
+
+    [DataContract]
+    public class ApiReqJsonRequest : IReturn<ApiReqJsonResponse>, IEbSSRequest
     {
         public string SolnId { get; set; }
 
@@ -182,7 +201,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public EbApi Api { get; set; }
     }
 
-   [RuntimeSerializable]
+    [RuntimeSerializable]
     public class JsonTableSet
     {
         public List<JsonTable> Tables { set; get; }
