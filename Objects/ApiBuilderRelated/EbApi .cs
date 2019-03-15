@@ -358,4 +358,41 @@ namespace ExpressBase.Objects
             return (this.Result as ApiResponse).Result;
         }
     }
+
+    [EnableInBuilder(BuilderType.ApiBuilder)]
+    public class EbThirdPartyApi: ApiResources
+    {
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        public string Url { set; get; }
+
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        public ApiMethods Method { set; get; }
+
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        public List<RequestParam> Parameters { get; set; }
+
+        public override string GetDesignHtml()
+        {
+            return @"<div class='apiPrcItem dropped' eb-type='ThirdPartyApi' id='@id'>
+                        <div tabindex='1' class='drpbox' onclick='$(this).focus();'>  
+                            <div class='CompLabel'> @Label </div>
+                        </div>
+                    </div>".RemoveCR().DoubleQuoted();
+        }
+    }
+
+    [UsedWithTopObjectParent(typeof(EbObject))]
+    [EnableInBuilder(BuilderType.ApiBuilder)]
+    public class RequestParam
+    {
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        public string Name { set; get; }
+
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        public object Value { set; get; }
+
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        public bool UseThisVal { set; get; }
+    }
 }

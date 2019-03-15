@@ -1,6 +1,8 @@
 ﻿using ExpressBase.Common;
 using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
+using ExpressBase.Common.Objects;
+using ExpressBase.Common.Objects.Attributes;
 using Newtonsoft.Json;
 using ServiceStack;
 using ServiceStack.Text;
@@ -332,5 +334,14 @@ END;";
         Success = 1,
         Failed = -1,
         ParamNFound = 0
+    }
+
+    public enum ApiMethods
+    {
+        POST = 1,
+        GET = 2,
+        PUT = 3,
+        PATCH = 4,
+        DELETE = 5,
     }
 }
