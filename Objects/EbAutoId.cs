@@ -25,12 +25,12 @@ namespace ExpressBase.Objects
         }
 
         [EnableInBuilder(BuilderType.WebForm)]
-        [PropertyEditor(PropertyEditorType.JS)]
-        public string Prefix { get; set; }
+        [PropertyEditor(PropertyEditorType.ScriptEditorJS)]
+        public EbScript Prefix { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
-        [PropertyEditor(PropertyEditorType.JS)]
-        public string Suffix { get; set; }
+        [PropertyEditor(PropertyEditorType.ScriptEditorJS)]
+        public EbScript Suffix { get; set; }
 
         //HideInPropertyGrid
         public string OnChange { get; set; }
