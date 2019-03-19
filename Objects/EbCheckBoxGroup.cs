@@ -17,9 +17,19 @@ namespace ExpressBase.Objects
 		public EbCheckBoxGroup()
 		{
 			this.CheckBoxes = new List<EbCheckBox>();
-		}
+        }
 
-		[OnDeserialized]
+        [JsonIgnore]
+        public override string OnChangeBindJSFn
+        {
+            get
+            {
+                return @"$('input[name = ' + this.EbSid_CtxId + ']').on('change', p1);;";
+            }
+            set { }
+        }
+
+        [OnDeserialized]
 		public void OnDeserializedMethod(StreamingContext context)
 		{
 			this.BareControlHtml = this.GetBareHtml();
@@ -48,7 +58,7 @@ namespace ExpressBase.Objects
 			string html = "<div id='@name@' name='@name@'>";
 			foreach (EbCheckBox ec in this.CheckBoxes)
 			{
-				ec.GName = this.Name;
+				ec.GName = this.EbSid_CtxId;
 				html += ec.GetHtml();
 			}
 			html += "</div>";
