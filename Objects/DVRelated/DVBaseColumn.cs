@@ -159,7 +159,13 @@ namespace ExpressBase.Objects.Objects.DVRelated
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
+        [Alias("Formula")]
+        public EbScript _Formula { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
         [JsonConverter(typeof(Base64Converter))]
+        [Alias("Formula old")]
         public string Formula { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
@@ -193,7 +199,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
             {
                 if (__formulaDataFieldsUsed == null)
                 {
-                    var matches = Regex.Matches(this.Formula, @"T[0-9]{1}.\w+").OfType<Match>().Select(m => m.Groups[0].Value).Distinct();
+                    var matches = Regex.Matches(this._Formula.Code, @"T[0-9]{1}.\w+").OfType<Match>().Select(m => m.Groups[0].Value).Distinct();
                     __formulaDataFieldsUsed = new List<string>(matches.Count());
                     int j = 0;
                     foreach (var match in matches)
@@ -246,9 +252,9 @@ namespace ExpressBase.Objects.Objects.DVRelated
 
         public Script GetCodeAnalysisScript()
         {
-            if (__codeAnalysisScript == null && !string.IsNullOrEmpty(this.Formula))
+            if (__codeAnalysisScript == null && !string.IsNullOrEmpty(this._Formula.Code))
             {
-                __codeAnalysisScript = CSharpScript.Create<dynamic>(this.Formula, ScriptOptions.Default.WithReferences("Microsoft.CSharp", "System.Core").WithImports("System.Dynamic"), globalsType: typeof(Globals));
+                __codeAnalysisScript = CSharpScript.Create<dynamic>(this._Formula.Code, ScriptOptions.Default.WithReferences("Microsoft.CSharp", "System.Core").WithImports("System.Dynamic"), globalsType: typeof(Globals));
                 __codeAnalysisScript.Compile();
             }
 

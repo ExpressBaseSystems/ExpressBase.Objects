@@ -273,7 +273,7 @@ namespace ExpressBase.Objects
     {
         [EnableInBuilder(BuilderType.ApiBuilder)]
         [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
-        public string Script { get; set; }
+        public EbScript Script { get; set; }
 
         public override string GetDesignHtml()
         {
@@ -288,7 +288,7 @@ namespace ExpressBase.Objects
 
         public ApiScript Evaluate(ApiResources _prevres)
         {
-            string code = this.Script.B2S().Trim();
+            string code = this.Script.Code.B2S().Trim();
             ApiScript script = new ApiScript();
             Script valscript = CSharpScript.Create<dynamic>(code,
                    ScriptOptions.Default.WithReferences("Microsoft.CSharp", "System.Core")

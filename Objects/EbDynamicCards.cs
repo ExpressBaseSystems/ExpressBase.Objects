@@ -545,8 +545,8 @@ namespace ExpressBase.Objects
         public override dynamic FieldValue { get; set; }
 
         [EnableInBuilder(BuilderType.BotForm)]
-        [PropertyEditor(PropertyEditorType.JS)]
-        public string ValueExpression { get; set; }
+        [PropertyEditor(PropertyEditorType.ScriptEditorJS)]
+        public EbScript ValueExpression { get; set; }
 
         [EnableInBuilder(BuilderType.BotForm)]
         public bool Sum { get; set; }
@@ -701,8 +701,8 @@ namespace ExpressBase.Objects
 		public override dynamic FieldValue { get; set; }
 
         [EnableInBuilder(BuilderType.BotForm)]
-        [PropertyEditor(PropertyEditorType.JS)]
-        public string ValueExpression { get; set; }
+        [PropertyEditor(PropertyEditorType.ScriptEditorJS)]
+        public EbScript ValueExpression { get; set; }
 		
 		[EnableInBuilder(BuilderType.BotForm)]
         public override bool ReadOnly { get; set; }

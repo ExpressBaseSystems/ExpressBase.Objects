@@ -71,7 +71,15 @@ namespace ExpressBase.Objects
         [UIproperty]
         [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
         [JsonConverter(typeof(Base64Converter))]
+        [Alias("Appearance Expression Old")]
         public string AppearanceExpression { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup("Data Settings")]
+        [UIproperty]
+        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
+        [Alias("Appearance Expression")]
+        public EbScript AppearExpression { get; set; }
 
         private string[] _dataFieldsUsed;
         public string[] DataFieldsUsedAppearance
@@ -80,7 +88,7 @@ namespace ExpressBase.Objects
             {
                 if (_dataFieldsUsed == null)
                 {
-                    IEnumerable<string> matches = Regex.Matches(this.AppearanceExpression, @"T[0-9]{1}.\w+").OfType<Match>()
+                    IEnumerable<string> matches = Regex.Matches(this.AppearExpression.Code, @"T[0-9]{1}.\w+").OfType<Match>()
                              .Select(m => m.Groups[0].Value)
                              .Distinct();
 
@@ -769,7 +777,14 @@ namespace ExpressBase.Objects
         [PropertyGroup("Data Settings")]
         [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
         [JsonConverter(typeof(Base64Converter))]
+        [Alias("Value Exp Old")]
         public string ValueExpression { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup("Data Settings")]
+        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
+        [Alias("Value Expression")]
+        public EbScript ValExpression { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
@@ -795,7 +810,7 @@ namespace ExpressBase.Objects
             {
                 if (_dataFieldsUsed == null)
                 {
-                    IEnumerable<string> matches = Regex.Matches(ValueExpression, @"T[0-9]{1}.\w+").OfType<Match>()
+                    IEnumerable<string> matches = Regex.Matches(ValExpression.Code, @"T[0-9]{1}.\w+").OfType<Match>()
      .Select(m => m.Groups[0].Value)
      .Distinct();
 
