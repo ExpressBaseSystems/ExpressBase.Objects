@@ -384,13 +384,16 @@ namespace ExpressBase.Objects
 
     [UsedWithTopObjectParent(typeof(EbObject))]
     [EnableInBuilder(BuilderType.ApiBuilder)]
-    public class RequestParam
+    public class RequestParam : EbApiWrapper
     {
-        [EnableInBuilder(BuilderType.ApiBuilder)]
-        public string Name { set; get; }
+        //[EnableInBuilder(BuilderType.ApiBuilder)]
+        //public string Name { set; get; }
 
         [EnableInBuilder(BuilderType.ApiBuilder)]
-        public object Value { set; get; }
+        public string Value { set; get; }
+
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        public EbDbTypes Type { set; get; }
 
         [EnableInBuilder(BuilderType.ApiBuilder)]
         public bool UseThisVal { set; get; }

@@ -55,6 +55,16 @@ namespace ExpressBase.Objects
             set { }
         }
 
+        [JsonIgnore]
+        public override string OnChangeBindJSFn
+        {
+            get
+            {
+                return @"$('input[name = ' + this.EbSid_CtxId + ']').on('change', p1);;";
+            }
+            set { }
+        }
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
 
