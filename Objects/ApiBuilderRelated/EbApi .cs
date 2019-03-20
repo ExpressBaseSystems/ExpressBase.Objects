@@ -370,6 +370,10 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.ApiBuilder)]
         [PropertyEditor(PropertyEditorType.Collection)]
+        public List<RequestHeader> Headers { get; set; }
+
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        [PropertyEditor(PropertyEditorType.Collection)]
         public List<RequestParam> Parameters { get; set; }
 
         public override string GetDesignHtml()
@@ -382,7 +386,6 @@ namespace ExpressBase.Objects
         }
     }
 
-    [UsedWithTopObjectParent(typeof(EbObject))]
     [EnableInBuilder(BuilderType.ApiBuilder)]
     public class RequestParam : EbApiWrapper
     {
@@ -397,5 +400,12 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.ApiBuilder)]
         public bool UseThisVal { set; get; }
+    }
+
+    [EnableInBuilder(BuilderType.ApiBuilder)]
+    public class RequestHeader:EbApiWrapper
+    {
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        public string Value { set; get; }
     }
 }
