@@ -8,6 +8,7 @@ using ExpressBase.Objects.Objects.DVRelated;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 
@@ -19,6 +20,20 @@ namespace ExpressBase.Objects
         public EbDataGrid()
         {
             this.Controls = new List<EbControl>();
+        }
+
+        [JsonIgnore]
+        public override string OnChangeBindJSFn
+        {
+            get
+            {
+                return @"
+$.each(this.Controls.$values, function (i, col) {
+    col.bindOnChange({form:this.formObject, col:col, DG:this});
+}.bind(this));
+               ";
+            }
+            set { }
         }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
@@ -67,8 +82,9 @@ namespace ExpressBase.Objects
             foreach (EbDGColumn col in Controls)
             {
                 if (!col.Hidden)
-                    html += string.Concat("<th>", col.Title, "@req@</th>")
-                        .Replace("@req@", (col.Required ? "<sup style='color: red'>*</sup>" : string.Empty));
+                    html += string.Concat("<th style='width: @Width@;' title='", col.Title, "'><span class='grid-col-title'>", col.Title, "</span>@req@</th>")
+                        .Replace("@req@", (col.Required ? "<sup style='color: red'>*</sup>" : string.Empty))
+                        .Replace("@Width@", (col.Width <= 0) ? "auto" : col.Width.ToString() + "px");
             }
 
             html += @"
@@ -105,6 +121,61 @@ namespace ExpressBase.Objects
     [HideInToolBox]
     public abstract class EbDGColumn : EbControl
     {
+        [JsonIgnore]
+        public override string OnChangeBindJSFn
+        {
+            get
+            {
+                return @"
+                if (p1.col.OnChangeFn && p1.col.OnChangeFn.Code && p1.col.OnChangeFn.Code.trim() !== ''){
+
+
+                  $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, new Function('form', 'user', `event`, atob(p1.col.OnChangeFn.Code)).bind(this, p1.form, 'user'));
+                }; ";
+            }
+            set { }
+        }
+
+        [JsonIgnore]
+        public override string SetValueJSfn
+        {
+            get
+            {
+                return @"
+                     $('[ebsid='+this.__DG.EbSid+']').find(`tr[is-editing='true'] [colname=${this.Name}] [ui-inp]`).val(p1);
+                ";
+            }
+            set { }
+        }
+
+        [JsonIgnore]
+        public override string GetValueJSfn
+        {
+            get
+            {
+                return @"
+                    return $('[ebsid='+this.__DG.EbSid+']').find(`tr[is-editing='true'] [colname=${this.Name}] [ui-inp]`).val();
+                ";
+            }
+            set { }
+        }
+
+        [JsonIgnore]
+        public override string EnableJSfn { get { return @"$('[ebsid='+this.__DG.EbSid+']').find(`tr[is-editing='true'] [colname=${this.Name}] .ctrl-cover *`).prop('disabled',false).css('pointer-events', 'inherit').find('input').css('background-color','#fff');;"; } set { } }
+
+        [JsonIgnore]
+        public override string DisableJSfn { get { return @"$('[ebsid='+this.__DG.EbSid+']').find(`tr[is-editing='true'] [colname=${this.Name}] .ctrl-cover *`).attr('disabled', 'disabled').css('pointer-events', 'none').find('input').css('background-color','#eee');;"; } set { } }
+
+        [JsonIgnore]
+        public override string ClearJSfn { get { return @"$('[ebsid='+this.__DG.EbSid+']').find(`tr[is-editing='true'] [colname=${this.Name}] [ui-inp]`).val('');"; } set { } }
+
+        [JsonIgnore]
+        public override string HideJSfn { get { return @""; } set { } }
+
+        [JsonIgnore]
+        public override string ShowJSfn { get { return @""; } set { } }
+
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         public string Title { get; set; }
 
@@ -116,6 +187,9 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         public bool IsEditable { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [PropertyGroup("Appearance")]
+        public int Width { get; set; }
     }
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
@@ -146,6 +220,7 @@ namespace ExpressBase.Objects
             set { this.EbTextBox.ToolTipText = value; }
         }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
 
@@ -164,6 +239,7 @@ namespace ExpressBase.Objects
     [UsedWithTopObjectParent(typeof(EbObject))]
     public class EbDGNumericColumn : EbDGColumn
     {
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.Decimal; } }
 
@@ -176,6 +252,7 @@ namespace ExpressBase.Objects
     [UsedWithTopObjectParent(typeof(EbObject))]
     public class EbDGBooleanColumn : EbDGColumn
     {
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.Boolean; } }
 
@@ -194,6 +271,7 @@ namespace ExpressBase.Objects
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.Date; } }
 
@@ -314,7 +392,7 @@ namespace ExpressBase.Objects
     public class EbDGPowerSelectColumn : EbDGColumn
     {
         public bool MultiSelect { get; set; }
-        
+
         [JsonIgnore]
         private EbPowerSelect EbPowerSelect { get; set; }
 
@@ -336,7 +414,7 @@ namespace ExpressBase.Objects
         {
             return this.EbPowerSelect.GetBareHtml();
         }
-        
+
         [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.CollectionProp, "Columns", "bVisible")]
         public DVColumnCollection Columns
@@ -361,6 +439,7 @@ namespace ExpressBase.Objects
             set { this.EbPowerSelect.EbSid = value; }
         }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [HideInPropertyGrid]
         public override EbDbTypes EbDbType
         {

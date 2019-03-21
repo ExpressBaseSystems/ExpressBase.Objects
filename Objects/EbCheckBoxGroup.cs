@@ -74,7 +74,7 @@ namespace ExpressBase.Objects
 		{
 
 			string html = @"
-			<div id='cont_@name@' class='Eb-ctrlContainer' Ctype='CheckBoxGroup'>
+			<div id='cont_@name@' class='Eb-ctrlContainer' ebsid='@ebsid@' Ctype='CheckBoxGroup'>
 				<div class='radiog-cont'  style='@BackColor '>
 				 <div class='eb-ctrl-label' id='@name@Lbl' style='@LabelBackColor @LabelForeColor '> @Label@  </div>
 						@barehtml@
@@ -82,6 +82,7 @@ namespace ExpressBase.Objects
 			</div>"
 .Replace("@barehtml@", this.GetBareHtml())
 .Replace("@name@", (this.Name != null) ? this.Name : "@name@")
+.Replace("@ebsid@", this.EbSid)
 .Replace("@label@", this.Label)
 .Replace("@LabelForeColor ", "color:" + ((this.LabelForeColor != null) ? this.LabelForeColor : "@LabelForeColor ") + ";")
 .Replace("@LabelBackColor ", "background-color:" + ((this.LabelBackColor != null) ? this.LabelBackColor : "@LabelBackColor ") + ";")

@@ -60,7 +60,7 @@ namespace ExpressBase.Objects
         {
             get
             {
-                return @"$('input[name = ' + this.EbSid_CtxId + ']').on('change', p1);;";
+                return @"$('input[name = ' + this.EbSid_CtxId + ']').on('change', p1);";
             }
             set { }
         }
