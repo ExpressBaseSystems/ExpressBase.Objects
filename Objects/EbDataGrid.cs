@@ -8,6 +8,7 @@ using ExpressBase.Objects.Objects.DVRelated;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 
@@ -77,8 +78,9 @@ namespace ExpressBase.Objects
             foreach (EbDGColumn col in Controls)
             {
                 if (!col.Hidden)
-                    html += string.Concat("<th>", col.Title, "@req@</th>")
-                        .Replace("@req@", (col.Required ? "<sup style='color: red'>*</sup>" : string.Empty));
+                    html += string.Concat("<th style='width: @Width@;' title='", col.Title, "'><span class='grid-col-title'>", col.Title, "</span>@req@</th>")
+                        .Replace("@req@", (col.Required ? "<sup style='color: red'>*</sup>" : string.Empty))
+                        .Replace("@Width@", (col.Width <= 0) ? "auto" : col.Width.ToString() + "px");
             }
 
             html += @"
@@ -126,6 +128,9 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         public bool IsEditable { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [PropertyGroup("Appearance")]
+        public int Width { get; set; }
     }
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
@@ -337,7 +342,7 @@ namespace ExpressBase.Objects
     public class EbDGPowerSelectColumn : EbDGColumn
     {
         public bool MultiSelect { get; set; }
-        
+
         [JsonIgnore]
         private EbPowerSelect EbPowerSelect { get; set; }
 
@@ -359,7 +364,7 @@ namespace ExpressBase.Objects
         {
             return this.EbPowerSelect.GetBareHtml();
         }
-        
+
         [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.CollectionProp, "Columns", "bVisible")]
         public DVColumnCollection Columns
