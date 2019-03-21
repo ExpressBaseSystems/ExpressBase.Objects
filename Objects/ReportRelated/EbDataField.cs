@@ -77,7 +77,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("Data Settings")]
         [UIproperty]
-        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorCS, PropertyEditorType.ScriptEditorJS)]
         [Alias("Appearance Expression")]
         public EbScript AppearExpression { get; set; }
 
@@ -88,15 +88,17 @@ namespace ExpressBase.Objects
             {
                 if (_dataFieldsUsed == null)
                 {
-                    IEnumerable<string> matches = Regex.Matches(this.AppearExpression.Code, @"T[0-9]{1}.\w+").OfType<Match>()
-                             .Select(m => m.Groups[0].Value)
-                             .Distinct();
+                    if (this.AppearExpression != null && this.AppearExpression.Code != null)
+                    {
+                        IEnumerable<string> matches = Regex.Matches(this.AppearExpression.Code, @"T[0-9]{1}.\w+").OfType<Match>()
+                               .Select(m => m.Groups[0].Value)
+                               .Distinct();
 
-
-                    _dataFieldsUsed = new string[matches.Count()];
-                    int i = 0;
-                    foreach (string match in matches)
-                        _dataFieldsUsed[i++] = match;
+                        _dataFieldsUsed = new string[matches.Count()];
+                        int i = 0;
+                        foreach (string match in matches)
+                            _dataFieldsUsed[i++] = match;
+                    }
                 }
 
                 return _dataFieldsUsed;
@@ -809,18 +811,18 @@ namespace ExpressBase.Objects
             get
             {
                 if (_dataFieldsUsed == null)
-                {
-                    IEnumerable<string> matches = Regex.Matches(ValExpression.Code, @"T[0-9]{1}.\w+").OfType<Match>()
-     .Select(m => m.Groups[0].Value)
-     .Distinct();
+                    if (ValExpression != null && ValExpression.Code != null)
+                    {
+                        IEnumerable<string> matches = Regex.Matches(ValExpression.Code, @"T[0-9]{1}.\w+").OfType<Match>()
+         .Select(m => m.Groups[0].Value)
+         .Distinct();
 
 
-                    _dataFieldsUsed = new string[matches.Count()];
-                    int i = 0;
-                    foreach (string match in matches)
-                        _dataFieldsUsed[i++] = match;
-                }
-
+                        _dataFieldsUsed = new string[matches.Count()];
+                        int i = 0;
+                        foreach (string match in matches)
+                            _dataFieldsUsed[i++] = match;
+                    }
                 return _dataFieldsUsed;
             }
         }
