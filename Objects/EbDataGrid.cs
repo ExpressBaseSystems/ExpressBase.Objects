@@ -21,6 +21,16 @@ namespace ExpressBase.Objects
             this.Controls = new List<EbControl>();
         }
 
+        [JsonIgnore]
+        public override string OnChangeBindJSFn
+        {
+            get
+            {
+                return @"console.log('bindddd');$('input[name = ' + this.EbSid_CtxId + ']').on('change', p1);";
+            }
+            set { }
+        }
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         public override bool IsSpecialContainer { get { return true; } set { } }
 
@@ -164,6 +174,19 @@ namespace ExpressBase.Objects
     [UsedWithTopObjectParent(typeof(EbObject))]
     public class EbDGNumericColumn : EbDGColumn
     {
+
+
+        public override string SetValueJSfn
+        {
+            get
+            {
+                return @"
+                     $(event.target).find('tr').find(`[colname=${this.Name}]`).val(p1);
+                ";
+            }
+            set { }
+        }
+
         [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.Decimal; } }
 
