@@ -12,6 +12,7 @@ using ExpressBase.Objects.ServiceStack_Artifacts;
 using ExpressBase.Objects.Objects;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
+using System.Net.Http;
 
 namespace ExpressBase.Objects
 {
@@ -288,13 +289,14 @@ namespace ExpressBase.Objects
 
         public ApiScript Evaluate(ApiResources _prevres)
         {
-            string code = this.Script.Code.B2S().Trim();
+            string code = this.Script.Code.Trim();
             ApiScript script = new ApiScript();
-            Script valscript = CSharpScript.Create<dynamic>(code,
-                   ScriptOptions.Default.WithReferences("Microsoft.CSharp", "System.Core")
-                   .WithImports("System.Dynamic", "System", "System.Collections.Generic",
-                   "System.Diagnostics", "System.Linq")
-                   , globalsType: typeof(ApiGlobals));
+            var scriptoptions = ScriptOptions.Default;
+            scriptoptions.WithReferences("Microsoft.CSharp", "System.Core");
+            scriptoptions.AddReferences(typeof(ExpressBase.Common.EbDataSet).Assembly);
+            scriptoptions.WithImports("System.Dynamic", "System", "System.Collections.Generic","System.Diagnostics", "System.Linq");
+
+            Script valscript = CSharpScript.Create<dynamic>(code, scriptoptions, globalsType: typeof(ApiGlobals));
             EbDataSet _ds = _prevres.Result as EbDataSet;
             try
             {
@@ -383,6 +385,35 @@ namespace ExpressBase.Objects
                             <div class='CompLabel'> @Label </div>
                         </div>
                     </div>".RemoveCR().DoubleQuoted();
+        }
+
+        public string Execute(List<Param> param)
+        {
+            var uri = new Uri(this.Url);
+            HttpResponseMessage response = null;
+            using (var client = new HttpClient())
+            {
+                if (this.Headers != null && this.Headers.Any())
+                {
+                    foreach (RequestHeader header in this.Headers)
+                    {
+                        client.DefaultRequestHeaders.Add(header.Name, header.Value);
+                    }
+                }
+
+                client.BaseAddress = new Uri(uri.GetLeftPart(System.UriPartial.Authority));
+                if (this.Method == ApiMethods.POST)
+                {
+                    var parameters = param.Select(i => new { prop = i.Name, val = i.Value })
+                            .ToDictionary(x => x.prop, x => x.val);
+                    response = client.PostAsync(uri.PathAndQuery, new FormUrlEncodedContent(parameters)).Result;
+                }
+                else if (this.Method == ApiMethods.GET)
+                {
+                    response = client.GetAsync(uri.PathAndQuery).Result;
+                }
+            }
+            return response.Content.ReadAsStringAsync().Result;
         }
     }
 
