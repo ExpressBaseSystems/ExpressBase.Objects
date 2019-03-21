@@ -220,6 +220,7 @@ $.each(this.Controls.$values, function (i, col) {
             set { this.EbTextBox.ToolTipText = value; }
         }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
 
@@ -238,6 +239,7 @@ $.each(this.Controls.$values, function (i, col) {
     [UsedWithTopObjectParent(typeof(EbObject))]
     public class EbDGNumericColumn : EbDGColumn
     {
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.Decimal; } }
 
@@ -250,6 +252,7 @@ $.each(this.Controls.$values, function (i, col) {
     [UsedWithTopObjectParent(typeof(EbObject))]
     public class EbDGBooleanColumn : EbDGColumn
     {
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.Boolean; } }
 
@@ -268,6 +271,7 @@ $.each(this.Controls.$values, function (i, col) {
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.Date; } }
 
@@ -435,6 +439,7 @@ $.each(this.Controls.$values, function (i, col) {
             set { this.EbPowerSelect.EbSid = value; }
         }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [HideInPropertyGrid]
         public override EbDbTypes EbDbType
         {
