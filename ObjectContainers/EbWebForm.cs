@@ -6,11 +6,13 @@ using ExpressBase.Common.Structures;
 using ExpressBase.Data;
 using ExpressBase.Objects.Objects;
 using ExpressBase.Objects.ServiceStack_Artifacts;
+using Newtonsoft.Json;
 using ServiceStack;
 using ServiceStack.Redis;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data.Common;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -32,6 +34,9 @@ namespace ExpressBase.Objects
 
         public override int TableRowId { get; set; }
 
+        public WebformData FormData { get; set; }
+
+        public int UserId { get; set; }
 
         public static EbOperations Operations = WFOperations.Instance;
 
@@ -105,7 +110,8 @@ namespace ExpressBase.Objects
             }
             foreach (Object Ctrl in _schema.ExtendedControls)
             {
-                queryExt += (Ctrl as EbFileUploader).GetSelectQuery();
+                if (Ctrl is EbFileUploader)
+                    queryExt += (Ctrl as EbFileUploader).GetSelectQuery();
             }
             return query + queryExt;
         }
@@ -132,7 +138,7 @@ namespace ExpressBase.Objects
                 _container = this;
             if (_globals == null)
                 _globals = new FormAsGlobal { Name = this.Name };
-            
+
             ListNTV listNTV = new ListNTV();
 
             if (_formData.MultipleTables.ContainsKey(_container.TableName))
@@ -146,7 +152,7 @@ namespace ExpressBase.Objects
                             FormAsGlobal g = new FormAsGlobal();
                             g.Name = (control as EbControlContainer).Name;
                             _globals.AddContainer(g);
-                            g = GetFormAsGlobal( _formData, control as EbControlContainer, g);
+                            g = GetFormAsGlobal(_formData, control as EbControlContainer, g);
                         }
                         else
                         {
@@ -160,7 +166,7 @@ namespace ExpressBase.Objects
             }
             return _globals;
         }
-        
+
         private NTV GetNtvFromFormData(WebformData _formData, string _table, int _row, string _column)
         {
             NTV ntv = null;
@@ -209,6 +215,383 @@ namespace ExpressBase.Objects
             }
             return _dict;
         }
+
+        //get all control container as flat structure
+        public List<EbControlContainer> GetAllContainers(EbControlContainer _container, List<EbControlContainer> _list = null)
+        {
+            if (_list == null)
+                _list = new List<EbControlContainer>();
+            _list.Add(_container);
+            foreach (EbControl c in this.Controls)
+            {
+                if (c is EbControlContainer)
+                {
+                    _list = GetAllContainers(_container, _list);
+                }
+            }
+            return _list;
+        }
+
+        //merge formdata and webform object
+        public void MergeFormData()
+        {
+            MergeFormDataInner(this);
+        }
+
+        private void MergeFormDataInner(EbControlContainer _container)
+        {
+            foreach(EbControl c in _container.Controls)
+            {
+                if(c is EbDataGrid)
+                {
+                    foreach (EbControl control in (c as EbDataGrid).Controls)
+                    {
+                        List<object> val = new List<object>();
+                        for (int i = 0; i < FormData.MultipleTables[(c as EbDataGrid).TableName].Count; i++)
+                        {
+                            val.Add(FormData.MultipleTables[(c as EbDataGrid).TableName][i][control.Name]);
+                            FormData.MultipleTables[(c as EbDataGrid).TableName][i].SetType(control.Name, control.EbDbType);
+                        }
+                        control.ValueFE = val;
+                    }
+                }
+                else if(c is EbControlContainer)
+                {
+                    if (string.IsNullOrEmpty((c as EbControlContainer).TableName))
+                        (c as EbControlContainer).TableName = _container.TableName;
+                    MergeFormDataInner(c as EbControlContainer);
+                }
+                else
+                {
+                    c.ValueFE = FormData.MultipleTables[_container.TableName][0][c.Name];
+                    FormData.MultipleTables[_container.TableName][0].SetType(c.Name, c.EbDbType);
+                }
+            }
+        }
+
+        private void GetFormattedData(EbDataTable dataTable, SingleTable Table)
+        {
+            foreach (EbDataRow dataRow in dataTable.Rows)
+            {
+                SingleRow Row = new SingleRow();
+                foreach (EbDataColumn dataColumn in dataTable.Columns)
+                {
+                    object _unformattedData = dataRow[dataColumn.ColumnIndex];
+                    object _formattedData = _unformattedData;
+
+                    if (dataColumn.Type == EbDbTypes.Date)
+                    {
+                        _unformattedData = (_unformattedData == DBNull.Value) ? DateTime.MinValue : _unformattedData;
+                        _formattedData = ((DateTime)_unformattedData).Date != DateTime.MinValue ? Convert.ToDateTime(_unformattedData).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) : string.Empty;
+                    }
+                    //else if(dataColumn.Type == EbDbTypes.DateTime)
+                    //{
+                    //    _unformattedData = (_unformattedData == DBNull.Value) ? DateTime.MinValue : _unformattedData;
+                    //    _formattedData = ((DateTime)_unformattedData).Date != DateTime.MinValue ? Convert.ToDateTime(_unformattedData).ToString("yyyy-MM-dd hh:mm tt", CultureInfo.InvariantCulture) : string.Empty;
+                    //}
+                    Row.Columns.Add(new SingleColumn()
+                    {
+                        Name = dataColumn.ColumnName,
+                        Type = (int)dataColumn.Type,
+                        Value = _formattedData
+                    });
+                }
+                Row.RowId = dataRow[dataTable.Columns[0].ColumnIndex].ToString();
+                Table.Add(Row);
+            }
+        }
+
+        public void RefreshformData(IDatabase DataDB, Service service)
+        {
+            WebFormSchema _schema = this.GetWebFormSchema();
+            string query = this.GetSelectQuery(_schema, service);
+            string context = this.RefId.Split("-")[3] + "_" + this.TableRowId.ToString();//context format = objectId_rowId_ControlId
+
+            EbDataSet dataset = DataDB.DoQueries(query, new DbParameter[]
+            {
+                DataDB.GetNewParameter("id", EbDbTypes.Int32, this.TableRowId),
+                DataDB.GetNewParameter("context", EbDbTypes.String, context)
+            });
+
+            this.FormData = new WebformData();
+
+            for (int i = 0; i < _schema.Tables.Count && dataset.Tables.Count >= _schema.Tables.Count; i++)
+            {
+                EbDataTable dataTable = dataset.Tables[i];////
+                SingleTable Table = new SingleTable();
+
+                GetFormattedData(dataTable, Table);
+
+                if (!this.FormData.MultipleTables.ContainsKey(dataTable.TableName) && Table.Count > 0)
+                    this.FormData.MultipleTables.Add(dataTable.TableName, Table);
+            }
+            if (this.FormData.MultipleTables.Count > 0)
+                this.FormData.MasterTable = dataset.Tables[0].TableName;
+
+            if (dataset.Tables.Count > _schema.Tables.Count)
+            {
+                int tableIndex = _schema.Tables.Count;
+                foreach (TableSchema Tbl in _schema.Tables)
+                {
+                    foreach (ColumnSchema Col in Tbl.Columns)
+                    {
+                        if (Col.Control.GetType().Equals(typeof(EbPowerSelect)))
+                        {
+                            SingleTable Table = new SingleTable();
+                            GetFormattedData(dataset.Tables[tableIndex], Table);
+                            this.FormData.ExtendedTables.Add((Col.Control as EbControl).EbSid, Table);
+                            tableIndex++;
+                        }
+                    }
+                }
+                foreach (Object Ctrl in _schema.ExtendedControls)//FileUploader Controls
+                {
+                    SingleTable Table = new SingleTable();
+                    GetFormattedData(dataset.Tables[tableIndex], Table);
+                    //--------------
+                    List<FileMetaInfo> _list = new List<FileMetaInfo>();
+                    foreach (SingleRow dr in Table)
+                    {
+                        FileMetaInfo info = new FileMetaInfo
+                        {
+                            FileRefId = dr["id"],
+                            FileName = dr["filename"],
+                            Meta = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(dr["tags"] as string),
+                            UploadTime = dr["uploadts"]
+                        };
+
+                        if (!_list.Contains(info))
+                            _list.Add(info);
+                    }
+                    SingleTable _Table = new SingleTable {
+                        new SingleRow() {
+                            Columns = new List<SingleColumn> {
+                                new SingleColumn { Name = "Files", Type = (int)EbDbTypes.Json, Value = JsonConvert.SerializeObject(_list) }
+                            }
+                        }
+                    };
+                    //--------------
+                    this.FormData.ExtendedTables.Add((Ctrl as EbControl).EbSid, _Table);
+                    tableIndex++;
+                }
+            }
+
+            try
+            {
+                SingleRow _masterRow = this.FormData.MultipleTables[this.FormData.MasterTable][0];
+                SingleColumn _idval = _masterRow.Columns.FirstOrDefault(c => c.Name.Equals("eb_auto_id"));
+                this.FormData.AutoIdText = _idval.Value;
+
+                var temp1 = _schema.Tables.FirstOrDefault(t => t.TableName == _schema.MasterTable);
+                var temp2 = temp1.Columns.FirstOrDefault(c => c.ColumnName.Equals("eb_auto_id"));
+                if (temp2 == null)
+                {
+                    _masterRow.Columns.Remove(_idval);
+                }
+            }
+            catch (Exception Ex)
+            {
+                Console.WriteLine("Exception - eb_auto_id not found: From WebFormService - " + Ex.Message);
+            }
+            //if (_extend)
+            //    GetWebformData_Extended(FormObj, FormData);
+        }
+
+        public int Save(IDatabase DataDB, Service service)
+        {
+            int r = 0;
+            if (this.TableRowId > 0)
+                r = this.Update(DataDB);                
+            else
+            {
+                this.TableRowId = this.Insert(DataDB);
+                 r = 1;
+            }
+            this.RefreshformData(DataDB, service);
+            return r;
+        }
+
+        public int Update(IDatabase DataDB)
+        {
+            string fullqry = string.Empty;
+            List<DbParameter> param = new List<DbParameter>();
+            int i = 0;
+            foreach (KeyValuePair<string, SingleTable> entry in this.FormData.MultipleTables)
+            {
+                foreach (SingleRow row in entry.Value)
+                {
+                    string _tblname = entry.Key;
+                    if (Convert.ToInt32(row.RowId) > 0)
+                    {
+                        string _qry = "UPDATE {0} SET {1} eb_lastmodified_by = :eb_modified_by, eb_lastmodified_at = NOW() WHERE id={2};";
+                        string _colvals = string.Empty;
+                        if (row.IsDelete && !_tblname.Equals(this.FormData.MasterTable))
+                        {
+                            _qry = "UPDATE {0} SET {1}, eb_lastmodified_by = :eb_modified_by, eb_lastmodified_at = NOW() WHERE id={2} AND eb_del='F';";
+                            _colvals = "eb_del='T'";
+                        }
+                        else
+                        {
+                            foreach (SingleColumn rField in row.Columns)
+                            {
+                                _colvals += string.Concat(rField.Name, "=:", rField.Name, "_", i, ",");
+                                param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
+                            }
+                        }
+
+                        fullqry += string.Format(_qry, _tblname, _colvals, row.RowId);
+                    }
+                    else
+                    {
+                        string _qry = "INSERT INTO {0} ({1} eb_created_by, eb_created_at, {3}_id ) VALUES ({2} :eb_createdby, NOW() ,:{4}_id);";
+                        string _cols = string.Empty, _vals = string.Empty;
+                        foreach (SingleColumn rField in row.Columns)
+                        {
+                            _cols += string.Concat(rField.Name, ",");
+                            _vals += string.Concat(":", rField.Name, "_", i, ",");
+                            param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
+                        }
+                        fullqry += string.Format(_qry, _tblname, _cols, _vals, this.FormData.MasterTable, this.FormData.MasterTable);
+                        param.Add(DataDB.GetNewParameter(this.FormData.MasterTable + "_id", EbDbTypes.Int32, this.FormData.MultipleTables[this.FormData.MasterTable][0].RowId));
+                    }
+                    i++;
+                }
+            }
+
+            //------------------
+            string EbObId = this.RefId.Split("-")[3];
+            List<string> InnerVals = new List<string>();
+            List<string> Innercxt = new List<string>();
+            List<string> InnerIds = new List<string>();
+            foreach (KeyValuePair<string, SingleTable> entry in this.FormData.ExtendedTables)
+            {
+                foreach (SingleRow row in entry.Value)
+                {
+                    string cn = entry.Key + "_" + i.ToString();
+                    i++;
+                    InnerVals.Add(string.Format("(:{0}, '{1}_{2}_{3}')", cn, EbObId, this.TableRowId, entry.Key));
+                    param.Add(DataDB.GetNewParameter(cn, EbDbTypes.Decimal, row.Columns[0].Value));
+                    InnerIds.Add(":" + cn);
+                }
+                Innercxt.Add("context = '" + EbObId + "_" + this.TableRowId + "_" + entry.Key + "'");
+            }
+            if (InnerVals.Count > 0)
+            {
+                fullqry += string.Format(@"UPDATE 
+                                            eb_files_ref AS t
+                                        SET
+                                            context = c.context
+                                        FROM
+                                            (VALUES{0}) AS c(id, context)
+                                        WHERE
+                                            c.id = t.id AND t.eb_del = 'F';", InnerVals.Join(","));
+                fullqry += string.Format(@"UPDATE eb_files_ref 
+                                        SET eb_del='T' 
+                                        WHERE ({0}) AND eb_del='F' AND id NOT IN ({1});", Innercxt.Join(" OR "), InnerIds.Join(","));
+            }
+
+            //-------------------------
+
+            param.Add(DataDB.GetNewParameter("eb_createdby", EbDbTypes.Int32, this.UserId));
+            //param.Add(this.EbConnectionFactory.DataDB.GetNewParameter("eb_createdat", EbDbTypes.DateTime, System.DateTime.Now));
+            param.Add(DataDB.GetNewParameter("eb_modified_by", EbDbTypes.Int32, this.UserId));
+            //param.Add(this.EbConnectionFactory.DataDB.GetNewParameter("eb_modified_at", EbDbTypes.DateTime, System.DateTime.Now));
+            return DataDB.InsertTable(fullqry, param.ToArray());
+        }
+
+        public int Insert(IDatabase DataDB)
+        {
+            string fullqry = string.Empty;
+            List<DbParameter> param = new List<DbParameter>();
+            int count = 0;
+            int i = 0;
+            foreach (KeyValuePair<string, SingleTable> entry in FormData.MultipleTables)
+            {
+                foreach (SingleRow row in entry.Value)
+                {
+                    string _qry = "INSERT INTO {0} ({1} eb_created_by, eb_created_at {3} ) VALUES ({2} :eb_createdby, NOW() {4});";
+                    string _tblname = entry.Key;
+                    string _cols = string.Empty;
+                    string _values = string.Empty;
+                    //_cols = FormObj.GetCtrlNamesOfTable(entry.Key);
+
+                    foreach (SingleColumn rField in row.Columns)
+                    {
+                        if (!rField.Name.Equals("id"))
+                        {
+                            _cols += string.Concat(rField.Name, ", ");
+                            _values += string.Concat(":", rField.Name, "_", i, ", ");
+                            param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
+                        }
+                    }
+                    i++;
+
+                    if (count == 0)
+                        _qry = _qry.Replace("{3}", "").Replace("{4}", "");
+                    else
+                        _qry = _qry.Replace("{3}", string.Concat(",", this.TableName, "_id")).Replace("{4}", string.Concat(", (SELECT cur_val('", this.TableName, "_id_seq'" + "))"));
+                    fullqry += string.Format(_qry, _tblname, _cols, _values);
+                }
+                count++;
+
+            }
+            //------------------
+            
+            string EbObId = this.RefId.Split("-")[3];
+            List<string> InnerVals = new List<string>();
+            List<string> Innercxt = new List<string>();
+            List<string> InnerIds = new List<string>();
+            foreach (KeyValuePair<string, SingleTable> entry in FormData.ExtendedTables)
+            {
+                foreach (SingleRow row in entry.Value)
+                {
+                    string cn = entry.Key + "_" + i.ToString();
+                    i++;
+                    InnerVals.Add(string.Format("(:{0}, '{1}_' || cur_val('{2}_id_seq')::text || '_{3}')", cn, EbObId, this.TableName, entry.Key));
+                    param.Add(DataDB.GetNewParameter(cn, EbDbTypes.Decimal, row.Columns[0].Value));
+                    InnerIds.Add(":" + cn);
+                }
+                Innercxt.Add("context = '" + EbObId + "_' || cur_val('" + this.TableName + "_id_seq')::text || '_" + entry.Key + "'");
+            }
+            if (InnerVals.Count > 0)
+            {
+                fullqry += string.Format(@"UPDATE 
+                                            eb_files_ref AS t
+                                        SET
+                                            context = c.context
+                                        FROM
+                                            (VALUES{0}) AS c(id, context)
+                                        WHERE
+                                            c.id = t.id AND t.eb_del = 'F';", InnerVals.Join(","));
+                fullqry += string.Format(@"UPDATE eb_files_ref 
+                                        SET eb_del='T' 
+                                        WHERE ({0}) AND eb_del='F' AND id NOT IN ({1});", Innercxt.Join(" OR "), InnerIds.Join(","));
+            }
+
+            //-------------------------
+            param.Add(DataDB.GetNewParameter("eb_createdby", EbDbTypes.Int32, this.UserId));
+            //param.Add(this.EbConnectionFactory.DataDB.GetNewParameter("eb_createdat", EbDbTypes.DateTime, System.DateTime.Now));
+            param.Add(DataDB.GetNewParameter("eb_auto_id", EbDbTypes.String, FormData.AutoIdText ?? string.Empty));
+            fullqry += string.Format("UPDATE {0} SET eb_auto_id = :eb_auto_id || cur_val('{0}_id_seq')::text WHERE id = cur_val('{0}_id_seq');", this.TableName);
+            fullqry += string.Concat("SELECT cur_val('", this.TableName, "_id_seq');");
+
+            EbDataTable temp = DataDB.DoQuery(fullqry, param.ToArray());
+            int _rowid = temp.Rows.Count > 0 ? Convert.ToInt32(temp.Rows[0][0]) : 0;
+
+
+            return _rowid;
+        }
+
+        public int Delete(IDatabase DataDB)
+        {
+            string query = this.GetDeleteQuery();
+            DbParameter[] param = new DbParameter[] {
+                DataDB.GetNewParameter("eb_modified_by", EbDbTypes.Int32, this.UserId),
+                DataDB.GetNewParameter("id", EbDbTypes.Int32, this.TableRowId)
+            };
+            return DataDB.UpdateTable(query, param);
+        }
+
 
         public WebFormSchema GetWebFormSchema()
         {
