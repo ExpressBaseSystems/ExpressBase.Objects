@@ -26,7 +26,11 @@ namespace ExpressBase.Objects
         {
             get
             {
-                return @"console.log('bindddd');$('input[name = ' + this.EbSid_CtxId + ']').on('change', p1);";
+                return @"
+$.each(this.Controls.$values, function (i, col) {
+    col.bindOnChange({form:this.formObject, col:col, DG:this});
+}.bind(this));
+               ";
             }
             set { }
         }
@@ -115,6 +119,61 @@ namespace ExpressBase.Objects
     [HideInToolBox]
     public abstract class EbDGColumn : EbControl
     {
+        [JsonIgnore]
+        public override string OnChangeBindJSFn
+        {
+            get
+            {
+                return @"
+                if (p1.col.OnChangeFn && p1.col.OnChangeFn.Code && p1.col.OnChangeFn.Code.trim() !== ''){
+
+
+                  $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, new Function('form', 'user', `event`, atob(p1.col.OnChangeFn.Code)).bind(this, p1.form, 'user'));
+                }; ";
+            }
+            set { }
+        }
+
+        [JsonIgnore]
+        public override string SetValueJSfn
+        {
+            get
+            {
+                return @"
+                     $('[ebsid='+this.__DG.EbSid+']').find(`tr[is-editing='true'] [colname=${this.Name}] [ui-inp]`).val(p1);
+                ";
+            }
+            set { }
+        }
+
+        [JsonIgnore]
+        public override string GetValueJSfn
+        {
+            get
+            {
+                return @"
+                    return $('[ebsid='+this.__DG.EbSid+']').find(`tr[is-editing='true'] [colname=${this.Name}] [ui-inp]`).val();
+                ";
+            }
+            set { }
+        }
+
+        [JsonIgnore]
+        public override string EnableJSfn { get { return @"$('[ebsid='+this.__DG.EbSid+']').find(`tr[is-editing='true'] [colname=${this.Name}] .ctrl-cover *`).prop('disabled',false).css('pointer-events', 'inherit').find('input').css('background-color','#fff');;"; } set { } }
+
+        [JsonIgnore]
+        public override string DisableJSfn { get { return @"$('[ebsid='+this.__DG.EbSid+']').find(`tr[is-editing='true'] [colname=${this.Name}] .ctrl-cover *`).attr('disabled', 'disabled').css('pointer-events', 'none').find('input').css('background-color','#eee');;"; } set { } }
+
+        [JsonIgnore]
+        public override string ClearJSfn { get { return @"$('[ebsid='+this.__DG.EbSid+']').find(`tr[is-editing='true'] [colname=${this.Name}] [ui-inp]`).val('');"; } set { } }
+
+        [JsonIgnore]
+        public override string HideJSfn { get { return @""; } set { } }
+
+        [JsonIgnore]
+        public override string ShowJSfn { get { return @""; } set { } }
+
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         public string Title { get; set; }
 
@@ -174,19 +233,6 @@ namespace ExpressBase.Objects
     [UsedWithTopObjectParent(typeof(EbObject))]
     public class EbDGNumericColumn : EbDGColumn
     {
-
-
-        public override string SetValueJSfn
-        {
-            get
-            {
-                return @"
-                     $(event.target).find('tr').find(`[colname=${this.Name}]`).val(p1);
-                ";
-            }
-            set { }
-        }
-
         [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.Decimal; } }
 
