@@ -10,7 +10,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
     public class LogRedisInsertRequest : EbServiceStackAuthRequest, IReturn<LogRedisInsertResponse>
     {
-        public RedisOperations  Operation { get; set; }
+        public RedisOperations Operation { get; set; }
 
         public string PreviousValue { get; set; }
 
@@ -19,11 +19,11 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Key { get; set; }
 
         public int SolutionId { get; set; }
-        
+
     }
 
-     public class LogRedisInsertResponse : IEbSSResponse
-    {        
+    public class LogRedisInsertResponse : IEbSSResponse
+    {
 
         [DataMember(Order = 1)]
         public ResponseStatus ResponseStatus { get; set; }
@@ -53,8 +53,20 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         [DataMember(Order = 1)]
         public EbRedisLogValues RedisLogValues { get; set; }
-         [DataMember(Order = 2)]
+        [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
     }
 
+
+    public class RedisGetGroupDetails : EbServiceStackAuthRequest, IReturn<RedisGroupDetailsResponse>
+    { }
+
+    public class RedisGroupDetailsResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public Dictionary<string, List<EbRedisGroupDetails>> GroupsDict { get; set; }
+        //public List<EbRedisGroupDetails> GrpLst { get; set; }
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
 }
