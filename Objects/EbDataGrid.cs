@@ -29,7 +29,7 @@ namespace ExpressBase.Objects
             {
                 return @"
 $.each(this.Controls.$values, function (i, col) {
-    col.bindOnChange({form:this.formObject, col:col, DG:this});
+    col.bindOnChange({form:this.formObject, col:col, DG:this, user : this.__userObject});
 }.bind(this));
                ";
             }
@@ -130,7 +130,7 @@ $.each(this.Controls.$values, function (i, col) {
                 if (p1.col.OnChangeFn && p1.col.OnChangeFn.Code && p1.col.OnChangeFn.Code.trim() !== ''){
 
 
-                  $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, new Function('form', 'user', `event`, atob(p1.col.OnChangeFn.Code)).bind(this, p1.form, 'user'));
+                  $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, new Function('form', 'user', `event`, atob(p1.col.OnChangeFn.Code)).bind(this, p1.form, p1.user));
                 }; ";
             }
             set { }
