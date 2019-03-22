@@ -261,7 +261,7 @@ namespace ExpressBase.Objects
                         (c as EbControlContainer).TableName = _container.TableName;
                     MergeFormDataInner(c as EbControlContainer);
                 }
-                else
+                else if(!(c is EbFileUploader))
                 {
                     c.ValueFE = FormData.MultipleTables[_container.TableName][0][c.Name];
                     FormData.MultipleTables[_container.TableName][0].SetType(c.Name, c.EbDbType);
