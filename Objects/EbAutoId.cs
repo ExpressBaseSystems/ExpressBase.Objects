@@ -1,6 +1,7 @@
 ﻿using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
+using ExpressBase.Common.Structures;
 using ExpressBase.Objects.Helpers;
 using System;
 using System.Collections.Generic;
@@ -21,16 +22,14 @@ namespace ExpressBase.Objects
         {
             this.BareControlHtml = this.GetBareHtml();
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
-            this.Name = "eb_auto_id";
+            //this.Name = "eb_auto_id";
         }
 
         [EnableInBuilder(BuilderType.WebForm)]
-        [PropertyEditor(PropertyEditorType.ScriptEditorJS, PropertyEditorType.ScriptEditorCS)]
-        public EbScript Prefix { get; set; }
-
-        [EnableInBuilder(BuilderType.WebForm)]
-        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
-        public EbScript Suffix { get; set; }
+        [PropertyEditor(PropertyEditorType.Expandable)]
+        public EbAutoIdPattern Pattern { get; set; }
+        
+        public override EbDbTypes EbDbType { get { return EbDbTypes.String; } set { } }
 
         //HideInPropertyGrid
         public string OnChange { get; set; }
@@ -38,7 +37,7 @@ namespace ExpressBase.Objects
         public override bool Required { get => base.Required; set => base.Required = value; }
         public override bool Unique { get => base.Unique; set => base.Unique = value; }
         public string DefaultValue { get; set; }
-        public List<EbValidator> Validators { get; set; }
+        //public List<EbValidator> Validators { get; set; }
 
         public override string GetToolHtml()
         {
@@ -85,11 +84,9 @@ namespace ExpressBase.Objects
 
         public override string GetBareHtml()
         {
-            return @" 
-        <div class='input-group' style='width:100%;'>
+            return @"
             <input id='@ebsid@' data-ebtype='@data-ebtype@'  data-toggle='tooltip' title='@toolTipText@' class='date' type='text' name='@name@' autocomplete = 'off' @value@ @tabIndex@ style='width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@ @readOnlyString@ @required@ @placeHolder@ disabled />
-            <span class='input-group-addon' style='padding: 0px;'> <i id='@ebsid@TglBtn' class='fa  @atchdLbl@' aria-hidden='true' style='padding: 6px 12px;'></i> </span>
-        </div>"
+            "
 .Replace("@name@", (this.Name != null ? this.Name.Trim() : ""))
 .Replace("@data-ebtype@", "16")//( (int)this.EbDateType ).ToString())
 .Replace("@toolTipText@", this.ToolTipText)
@@ -102,5 +99,17 @@ namespace ExpressBase.Objects
 .Replace("@readOnlyString@", this.ReadOnlyString)
 .Replace("@placeHolder@", "placeholder=''");
         }
+        
+        public override string EnableJSfn { get { return @""; } set { } }
+    }
+
+    [EnableInBuilder(BuilderType.WebForm)]
+    public class EbAutoIdPattern
+    {
+        [EnableInBuilder(BuilderType.WebForm)]
+        public string sPattern { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        public int SerialLength { get; set; }
     }
 }

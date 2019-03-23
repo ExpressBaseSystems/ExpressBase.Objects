@@ -16,6 +16,7 @@ using System.Data.Common;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace ExpressBase.Objects
@@ -37,6 +38,8 @@ namespace ExpressBase.Objects
         public WebformData FormData { get; set; }
 
         public int UserId { get; set; }
+
+        public int LocationId { get; set; }
 
         public static EbOperations Operations = WFOperations.Instance;
 
@@ -95,8 +98,8 @@ namespace ExpressBase.Objects
                     _cols = String.Join(", ", _table.Columns.Select(x => x.ColumnName));
                     if (_table.TableName != _schema.MasterTable)
                         _id = _schema.MasterTable + "_id";
-                    else
-                        _cols = "eb_auto_id," + _cols;
+                    //else
+                    //    _cols = "eb_auto_id," + _cols;
                     query += string.Format("SELECT id, {0} FROM {1} WHERE {2} = :id AND eb_del='F';", _cols, _table.TableName, _id);
 
                     foreach (ColumnSchema Col in _table.Columns)
@@ -250,7 +253,8 @@ namespace ExpressBase.Objects
                         for (int i = 0; i < FormData.MultipleTables[(c as EbDataGrid).TableName].Count; i++)
                         {
                             val.Add(FormData.MultipleTables[(c as EbDataGrid).TableName][i][control.Name]);
-                            FormData.MultipleTables[(c as EbDataGrid).TableName][i].SetType(control.Name, control.EbDbType);
+                            FormData.MultipleTables[(c as EbDataGrid).TableName][i].SetEbDbType(control.Name, control.EbDbType);
+                            FormData.MultipleTables[(c as EbDataGrid).TableName][i].SetControl(control.Name, control);
                         }
                         control.ValueFE = val;
                     }
@@ -261,10 +265,28 @@ namespace ExpressBase.Objects
                         (c as EbControlContainer).TableName = _container.TableName;
                     MergeFormDataInner(c as EbControlContainer);
                 }
+                else if(c is EbAutoId)
+                {
+                    Dictionary<string, string> dict = new Dictionary<string, string>();
+                    dict.Add("{currentlocation.id}",this.LocationId.ToString());
+                    dict.Add("{user.id}", this.UserId.ToString());
+
+                    MatchCollection mc = Regex.Matches((c as EbAutoId).Pattern.sPattern, @"{(.*?)}");
+                    foreach(Match m in mc)
+                    {
+                        if(dict.ContainsKey(m.Value))
+                            (c as EbAutoId).Pattern.sPattern = (c as EbAutoId).Pattern.sPattern.Replace(m.Value, dict[m.Value]);
+                    }
+                    FormData.MultipleTables[_container.TableName][0].SetEbDbType(c.Name, c.EbDbType);
+                    FormData.MultipleTables[_container.TableName][0].SetControl(c.Name, c);
+                    FormData.MultipleTables[_container.TableName][0][c.Name] = (c as EbAutoId).Pattern.sPattern;
+                    c.ValueFE = FormData.MultipleTables[_container.TableName][0][c.Name];
+                }
                 else if(!(c is EbFileUploader))
                 {
                     c.ValueFE = FormData.MultipleTables[_container.TableName][0][c.Name];
-                    FormData.MultipleTables[_container.TableName][0].SetType(c.Name, c.EbDbType);
+                    FormData.MultipleTables[_container.TableName][0].SetEbDbType(c.Name, c.EbDbType);
+                    FormData.MultipleTables[_container.TableName][0].SetControl(c.Name, c);
                 }
             }
         }
@@ -376,23 +398,24 @@ namespace ExpressBase.Objects
                 }
             }
 
-            try
-            {
-                SingleRow _masterRow = this.FormData.MultipleTables[this.FormData.MasterTable][0];
-                SingleColumn _idval = _masterRow.Columns.FirstOrDefault(c => c.Name.Equals("eb_auto_id"));
-                this.FormData.AutoIdText = _idval.Value;
+            //try
+            //{
+            //    SingleRow _masterRow = this.FormData.MultipleTables[this.FormData.MasterTable][0];
+            //    SingleColumn _idval = _masterRow.Columns.FirstOrDefault(c => c.Name.Equals("eb_auto_id"));
+            //    this.FormData.AutoIdText = _idval.Value;
 
-                var temp1 = _schema.Tables.FirstOrDefault(t => t.TableName == _schema.MasterTable);
-                var temp2 = temp1.Columns.FirstOrDefault(c => c.ColumnName.Equals("eb_auto_id"));
-                if (temp2 == null)
-                {
-                    _masterRow.Columns.Remove(_idval);
-                }
-            }
-            catch (Exception Ex)
-            {
-                Console.WriteLine("Exception - eb_auto_id not found: From WebFormService - " + Ex.Message);
-            }
+            //    var temp1 = _schema.Tables.FirstOrDefault(t => t.TableName == _schema.MasterTable);
+            //    var temp2 = temp1.Columns.FirstOrDefault(c => c.ColumnName.Equals("eb_auto_id"));
+            //    if (temp2 == null)
+            //    {
+            //        _masterRow.Columns.Remove(_idval);
+            //    }
+            //}
+            //catch (Exception Ex)
+            //{
+            //    Console.WriteLine("Exception - eb_auto_id not found: From WebFormService - " + Ex.Message);
+            //}
+
             //if (_extend)
             //    GetWebformData_Extended(FormObj, FormData);
         }
@@ -434,8 +457,11 @@ namespace ExpressBase.Objects
                         {
                             foreach (SingleColumn rField in row.Columns)
                             {
-                                _colvals += string.Concat(rField.Name, "=:", rField.Name, "_", i, ",");
-                                param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
+                                if(!(rField.Control is EbAutoId))
+                                {
+                                    _colvals += string.Concat(rField.Name, "=:", rField.Name, "_", i, ",");
+                                    param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
+                                }                                
                             }
                         }
 
@@ -443,7 +469,7 @@ namespace ExpressBase.Objects
                     }
                     else
                     {
-                        string _qry = "INSERT INTO {0} ({1} eb_created_by, eb_created_at, {3}_id ) VALUES ({2} :eb_createdby, NOW() ,:{4}_id);";
+                        string _qry = "INSERT INTO {0} ({1} eb_created_by, eb_created_at, eb_loc_id, {3}_id ) VALUES ({2} :eb_createdby, NOW(), :eb_loc_id, :{4}_id);";
                         string _cols = string.Empty, _vals = string.Empty;
                         foreach (SingleColumn rField in row.Columns)
                         {
@@ -452,7 +478,6 @@ namespace ExpressBase.Objects
                             param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
                         }
                         fullqry += string.Format(_qry, _tblname, _cols, _vals, this.FormData.MasterTable, this.FormData.MasterTable);
-                        param.Add(DataDB.GetNewParameter(this.FormData.MasterTable + "_id", EbDbTypes.Int32, this.FormData.MultipleTables[this.FormData.MasterTable][0].RowId));
                     }
                     i++;
                 }
@@ -491,14 +516,17 @@ namespace ExpressBase.Objects
             }
 
             //-------------------------
-
+            
+            param.Add(DataDB.GetNewParameter(this.FormData.MasterTable + "_id", EbDbTypes.Int32, this.FormData.MultipleTables[this.FormData.MasterTable][0].RowId));
+            param.Add(DataDB.GetNewParameter("eb_loc_id", EbDbTypes.Int32, this.LocationId));
             param.Add(DataDB.GetNewParameter("eb_createdby", EbDbTypes.Int32, this.UserId));
             //param.Add(this.EbConnectionFactory.DataDB.GetNewParameter("eb_createdat", EbDbTypes.DateTime, System.DateTime.Now));
             param.Add(DataDB.GetNewParameter("eb_modified_by", EbDbTypes.Int32, this.UserId));
             //param.Add(this.EbConnectionFactory.DataDB.GetNewParameter("eb_modified_at", EbDbTypes.DateTime, System.DateTime.Now));
+
             return DataDB.InsertTable(fullqry, param.ToArray());
         }
-
+        
         public int Insert(IDatabase DataDB)
         {
             string fullqry = string.Empty;
@@ -509,7 +537,7 @@ namespace ExpressBase.Objects
             {
                 foreach (SingleRow row in entry.Value)
                 {
-                    string _qry = "INSERT INTO {0} ({1} eb_created_by, eb_created_at {3} ) VALUES ({2} :eb_createdby, NOW() {4});";
+                    string _qry = "INSERT INTO {0} ({1} eb_created_by, eb_created_at, eb_loc_id {3} ) VALUES ({2} :eb_createdby, NOW(), :eb_loc_id {4});";
                     string _tblname = entry.Key;
                     string _cols = string.Empty;
                     string _values = string.Empty;
@@ -517,7 +545,13 @@ namespace ExpressBase.Objects
 
                     foreach (SingleColumn rField in row.Columns)
                     {
-                        if (!rField.Name.Equals("id"))
+                        if (rField.Control is EbAutoId)
+                        {
+                            _cols += string.Concat(rField.Name, ", ");
+                            _values += string.Concat(":", rField.Name, "_", i, " || (SELECT LPAD((SELECT COUNT(*) FROM ", entry.Key, " WHERE ", rField.Name, " LIKE '", rField.Value, "_", i, "%')::TEXT, ", (rField.Control as EbAutoId).Pattern.SerialLength,", '0'))", ", ");
+                            param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
+                        }
+                        else if (rField.Control != null)
                         {
                             _cols += string.Concat(rField.Name, ", ");
                             _values += string.Concat(":", rField.Name, "_", i, ", ");
@@ -535,8 +569,8 @@ namespace ExpressBase.Objects
                 count++;
 
             }
-            //------------------
-            
+
+            //------------------File Uploader entries------------------------------------
             string EbObId = this.RefId.Split("-")[3];
             List<string> InnerVals = new List<string>();
             List<string> Innercxt = new List<string>();
@@ -567,18 +601,17 @@ namespace ExpressBase.Objects
                                         SET eb_del='T' 
                                         WHERE ({0}) AND eb_del='F' AND id NOT IN ({1});", Innercxt.Join(" OR "), InnerIds.Join(","));
             }
+            //-----------------------------------------------------------------------------
 
-            //-------------------------
             param.Add(DataDB.GetNewParameter("eb_createdby", EbDbTypes.Int32, this.UserId));
-            //param.Add(this.EbConnectionFactory.DataDB.GetNewParameter("eb_createdat", EbDbTypes.DateTime, System.DateTime.Now));
-            param.Add(DataDB.GetNewParameter("eb_auto_id", EbDbTypes.String, FormData.AutoIdText ?? string.Empty));
-            fullqry += string.Format("UPDATE {0} SET eb_auto_id = :eb_auto_id || cur_val('{0}_id_seq')::text WHERE id = cur_val('{0}_id_seq');", this.TableName);
+            param.Add(DataDB.GetNewParameter("eb_loc_id", EbDbTypes.Int32, this.LocationId)); 
+            //param.Add(DataDB.GetNewParameter("eb_auto_id", EbDbTypes.String, FormData.AutoIdText ?? string.Empty));
+            //fullqry += string.Format("UPDATE {0} SET eb_auto_id = :eb_auto_id || cur_val('{0}_id_seq')::text WHERE id = cur_val('{0}_id_seq');", this.TableName);
             fullqry += string.Concat("SELECT cur_val('", this.TableName, "_id_seq');");
 
             EbDataTable temp = DataDB.DoQuery(fullqry, param.ToArray());
             int _rowid = temp.Rows.Count > 0 ? Convert.ToInt32(temp.Rows[0][0]) : 0;
-
-
+            
             return _rowid;
         }
 
@@ -627,8 +660,8 @@ namespace ExpressBase.Objects
             {
                 if (control is EbFileUploader)
                     _schema.ExtendedControls.Add(control);
-                else if (control is EbAutoId)
-                    _table.Columns.Add(new ColumnSchema { ColumnName = "eb_auto_id", EbDbType = (int)EbDbTypes.String, Control = control });
+                //else if (control is EbAutoId)
+                //    _table.Columns.Add(new ColumnSchema { ColumnName = "eb_auto_id", EbDbType = (int)EbDbTypes.String, Control = control });
                 else
                     _table.Columns.Add(new ColumnSchema { ColumnName = control.Name, EbDbType = (int)control.EbDbType, Control = control });
             }
