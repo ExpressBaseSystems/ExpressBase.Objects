@@ -548,7 +548,7 @@ namespace ExpressBase.Objects
                         if (rField.Control is EbAutoId)
                         {
                             _cols += string.Concat(rField.Name, ", ");
-                            _values += string.Concat(":", rField.Name, "_", i, " || (SELECT LPAD((SELECT COUNT(*) FROM ", entry.Key, " WHERE ", rField.Name, " LIKE '", rField.Value, "_", i, "%')::TEXT, ", (rField.Control as EbAutoId).Pattern.SerialLength,", '0'))", ", ");
+                            _values += string.Format(":{0}_{1} || (SELECT LPAD((COUNT(*) + 1)::TEXT, {2}, '0') FROM {3} WHERE {0} LIKE '{4}%'),", rField.Name, i, (rField.Control as EbAutoId).Pattern.SerialLength, entry.Key, rField.Value);
                             param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
                         }
                         else if (rField.Control != null)
