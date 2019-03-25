@@ -114,9 +114,11 @@ namespace ExpressBase.Objects
         public override string Description { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
         public override string VersionNumber { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
         public override string Status { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
