@@ -65,7 +65,7 @@ namespace ExpressBase.Objects
         public override string GetHtml()
         {
             string EbCtrlHTML = @"
-    <div id='cont_@name@' Ctype='Image' class='Eb-ctrlContainer' style='@hiddenString'>
+    <div id='cont_@name@' Ctype='Image' class='Eb-ctrlContainer' eb-hidden='@isHidden@'>
         <div class='eb-ctrl-label' id='@name@Lbl' style='@LabelBackColor  @LabelForeColor '> @Label </div>
        @barehtml@
         <span class='helpText'> @HelpText </span>
@@ -73,7 +73,7 @@ namespace ExpressBase.Objects
 "
 .Replace("@barehtml@", this.GetBareHtml())
 .Replace("@name@", this.Name)
-.Replace("@hiddenString", this.HiddenString)
+.Replace("@isHidden@", this.Hidden.ToString())
 
     .Replace("@LabelForeColor ", "color:" + ((this.LabelForeColor != null) ? this.LabelForeColor : "@LabelForeColor ") + ";")
     .Replace("@LabelBackColor ", "background-color:" + ((this.LabelBackColor != null) ? this.LabelBackColor : "@LabelBackColor ") + ";")
