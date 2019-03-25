@@ -115,7 +115,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 		[DataMember(Order = 4)]
 		public int RowId { get; set; }
-	}
+
+        [DataMember(Order = 5)]
+        public int CurrentLoc { get; set; }
+    }
 	
 	[DataContract]
 	public class InsertDataFromWebformResponse : IEbSSResponse
