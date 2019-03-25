@@ -468,6 +468,13 @@ $.each(this.Controls.$values, function (i, col) {
         }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+        public int DropdownHeight
+        {
+            get { return this.EbPowerSelect.DropdownHeight; }
+            set { this.EbPowerSelect.DropdownHeight = value; }
+        }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", 1)]
         [OnChangeExec(@"if (
 this.Columns.$values.length === 0 ){

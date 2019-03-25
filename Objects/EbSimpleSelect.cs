@@ -273,6 +273,7 @@ namespace ExpressBase.Objects
 
         public EbSimpleSelectOption() { }
 
+        [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         public string EbSid { get; set; }
 
@@ -280,12 +281,9 @@ namespace ExpressBase.Objects
         public string Name { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        public string Label { get; set; }
-
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         public string Value { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        public string DisplayName { get; internal set; }
+        public string DisplayName { get; set; }
     }
 }
