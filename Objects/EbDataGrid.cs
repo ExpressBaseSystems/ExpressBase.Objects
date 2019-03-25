@@ -179,6 +179,7 @@ $.each(this.Controls.$values, function (i, col) {
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         public string Title { get; set; }
 
+        [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         public string DBareHtml { get; set; }
 
@@ -428,15 +429,14 @@ $.each(this.Controls.$values, function (i, col) {
         }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
-        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
         public override string Name
         {
             get { return this.EbPowerSelect.Name; }
             set { this.EbPowerSelect.Name = value; }
         }
 
+        [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
-        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
         public override string EbSid
         {
             get { return this.EbPowerSelect.EbSid; }
@@ -451,8 +451,8 @@ $.each(this.Controls.$values, function (i, col) {
             set { this.EbPowerSelect.EbDbType = value; }
         }
 
+        [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
-        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
         new public string EbSid_CtxId
         {
             get { return this.EbPowerSelect.EbSid_CtxId; }
