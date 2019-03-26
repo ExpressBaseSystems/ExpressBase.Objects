@@ -82,6 +82,24 @@ namespace ExpressBase.Objects
             return string.Join(",", _lst.ToArray());
         }
 
+        public override void BeforeSave()
+        {
+            BeforeSaveRec(this);
+        }
+
+        private void BeforeSaveRec(EbControlContainer _container)
+        {
+            foreach (EbControl c in _container.Controls)
+            {
+                if(c is EbControlContainer)
+                {
+                    if ((c as EbControlContainer).TableName.IsNullOrEmpty())
+                        (c as EbControlContainer).TableName = _container.TableName;
+                    BeforeSaveRec(c as EbControlContainer);
+                }
+            }
+        }
+
         public string GetSelectQuery(WebFormSchema _schema = null, Service _service = null)
         {
             string query = string.Empty;
