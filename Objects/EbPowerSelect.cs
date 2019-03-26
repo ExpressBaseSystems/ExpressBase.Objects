@@ -336,14 +336,17 @@ $.each(p1, function (i, row) {
             string dispcol = string.Join(",", this.DisplayMembers.Select(c => "__A." + c.Name));//powerselect table __A
 
             //string whrcond = string.Join(" AND ", this.Values.Select(v => this.ValueMember.Name + "=" + v));
+            string Sql = dr.Sql.Trim();
+            if (Sql.LastIndexOf(";") == Sql.Length - 1)
+                Sql = Sql.Substring(0, Sql.Length - 1);
 
             var tt = string.Format(@"SELECT 
                                         __A.{0},{1} 
                                     FROM 
                                         ({2}) __A, {3} __B
                                     WHERE 
-                                        __A.{0} = ANY(STRING_TO_ARRAY(__B.{4}::TEXT, ',')::INT[]) AND __B.{5} = :{5};"
-                    , this.ValueMember.Name, dispcol, dr.Sql, Tbl, Col, _id);            
+                                        __A.{0} = ANY(STRING_TO_ARRAY(__B.{4}::TEXT, ',')::INT[]) AND __B.{5} = :id;"
+                    , this.ValueMember.Name, dispcol, Sql, Tbl, Col, _id);            
             return tt;
             //a.id = any(string_to_array(b.set_id, ',')::int[]
         }

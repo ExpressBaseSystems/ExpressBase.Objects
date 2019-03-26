@@ -90,25 +90,22 @@ namespace ExpressBase.Objects
                 _schema = this.GetWebFormSchema();
             foreach (TableSchema _table in _schema.Tables)
             {
-                string _cols = string.Empty;
+                string _cols = "id";
                 string _id = "id";
 
-                if (_table.Columns.Count > 0)
-                {
-                    _cols = String.Join(", ", _table.Columns.Select(x => x.ColumnName));
-                    if (_table.TableName != _schema.MasterTable)
-                        _id = _schema.MasterTable + "_id";
-                    //else
-                    //    _cols = "eb_auto_id," + _cols;
-                    query += string.Format("SELECT id, {0} FROM {1} WHERE {2} = :id AND eb_del='F';", _cols, _table.TableName, _id);
+                if(_table.Columns.Count > 0)
+                    _cols = "id, " + String.Join(", ", _table.Columns.Select(x => x.ColumnName));
+                if (_table.TableName != _schema.MasterTable)
+                    _id = _schema.MasterTable + "_id";
+                
+                query += string.Format("SELECT {0} FROM {1} WHERE {2} = :id AND eb_del='F';", _cols, _table.TableName, _id);
 
-                    foreach (ColumnSchema Col in _table.Columns)
-                    {
-                        if (Col.Control.GetType().Equals(typeof(EbPowerSelect)))
-                        {
-                            queryExt += (Col.Control as EbPowerSelect).GetSelectQuery(_service, Col.ColumnName, _table.ParentTable, _id);
-                        }
-                    }
+                foreach (ColumnSchema Col in _table.Columns)
+                {
+                    if (Col.Control is EbPowerSelect)
+                        queryExt += (Col.Control as EbPowerSelect).GetSelectQuery(_service, Col.ColumnName, _table.TableName, _id);
+                    else if (Col.Control is EbDGPowerSelectColumn)
+                        queryExt += (Col.Control as EbDGPowerSelectColumn).GetSelectQuery(_service, Col.ColumnName, _table.TableName, _id);
                 }
             }
             foreach (Object Ctrl in _schema.ExtendedControls)
@@ -243,9 +240,9 @@ namespace ExpressBase.Objects
 
         private void MergeFormDataInner(EbControlContainer _container)
         {
-            foreach(EbControl c in _container.Controls)
+            foreach (EbControl c in _container.Controls)
             {
-                if(c is EbDataGrid)
+                if (c is EbDataGrid)
                 {
                     foreach (EbControl control in (c as EbDataGrid).Controls)
                     {
@@ -259,25 +256,25 @@ namespace ExpressBase.Objects
                                 FormData.MultipleTables[(c as EbDataGrid).TableName][i].SetControl(control.Name, control);
                             }
                             control.ValueFE = val;
-                        }                        
+                        }
                     }
                 }
-                else if(c is EbControlContainer)
+                else if (c is EbControlContainer)
                 {
                     if (string.IsNullOrEmpty((c as EbControlContainer).TableName))
                         (c as EbControlContainer).TableName = _container.TableName;
                     MergeFormDataInner(c as EbControlContainer);
                 }
-                else if(c is EbAutoId)
+                else if (c is EbAutoId)
                 {
                     Dictionary<string, string> dict = new Dictionary<string, string>();
-                    dict.Add("{currentlocation.id}",this.LocationId.ToString());
+                    dict.Add("{currentlocation.id}", this.LocationId.ToString());
                     dict.Add("{user.id}", this.UserId.ToString());
 
                     MatchCollection mc = Regex.Matches((c as EbAutoId).Pattern.sPattern, @"{(.*?)}");
-                    foreach(Match m in mc)
+                    foreach (Match m in mc)
                     {
-                        if(dict.ContainsKey(m.Value))
+                        if (dict.ContainsKey(m.Value))
                             (c as EbAutoId).Pattern.sPattern = (c as EbAutoId).Pattern.sPattern.Replace(m.Value, dict[m.Value]);
                     }
                     FormData.MultipleTables[_container.TableName][0].SetEbDbType(c.Name, c.EbDbType);
@@ -285,14 +282,14 @@ namespace ExpressBase.Objects
                     FormData.MultipleTables[_container.TableName][0][c.Name] = (c as EbAutoId).Pattern.sPattern;
                     c.ValueFE = FormData.MultipleTables[_container.TableName][0][c.Name];
                 }
-                else if(!(c is EbFileUploader))
+                else if (!(c is EbFileUploader))
                 {
                     if (!c.DoNotPersist)
                     {
                         c.ValueFE = FormData.MultipleTables[_container.TableName][0][c.Name];
                         FormData.MultipleTables[_container.TableName][0].SetEbDbType(c.Name, c.EbDbType);
                         FormData.MultipleTables[_container.TableName][0].SetControl(c.Name, c);
-                    }                    
+                    }
                 }
             }
         }
@@ -363,7 +360,7 @@ namespace ExpressBase.Objects
                 {
                     foreach (ColumnSchema Col in Tbl.Columns)
                     {
-                        if (Col.Control.GetType().Equals(typeof(EbPowerSelect)))
+                        if (Col.Control is EbPowerSelect || Col.Control is EbDGPowerSelectColumn)
                         {
                             SingleTable Table = new SingleTable();
                             GetFormattedData(dataset.Tables[tableIndex], Table);
@@ -430,11 +427,11 @@ namespace ExpressBase.Objects
         {
             int r = 0;
             if (this.TableRowId > 0)
-                r = this.Update(DataDB);                
+                r = this.Update(DataDB);
             else
             {
                 this.TableRowId = this.Insert(DataDB);
-                 r = 1;
+                r = 1;
             }
             this.RefreshformData(DataDB, service);
             return r;
@@ -463,11 +460,11 @@ namespace ExpressBase.Objects
                         {
                             foreach (SingleColumn rField in row.Columns)
                             {
-                                if(!(rField.Control is EbAutoId))
+                                if (!(rField.Control is EbAutoId))
                                 {
                                     _colvals += string.Concat(rField.Name, "=:", rField.Name, "_", i, ",");
                                     param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
-                                }                                
+                                }
                             }
                         }
 
@@ -522,7 +519,7 @@ namespace ExpressBase.Objects
             }
 
             //-------------------------
-            
+
             param.Add(DataDB.GetNewParameter(this.FormData.MasterTable + "_id", EbDbTypes.Int32, this.FormData.MultipleTables[this.FormData.MasterTable][0].RowId));
             param.Add(DataDB.GetNewParameter("eb_loc_id", EbDbTypes.Int32, this.LocationId));
             param.Add(DataDB.GetNewParameter("eb_createdby", EbDbTypes.Int32, this.UserId));
@@ -532,7 +529,7 @@ namespace ExpressBase.Objects
 
             return DataDB.InsertTable(fullqry, param.ToArray());
         }
-        
+
         public int Insert(IDatabase DataDB)
         {
             string fullqry = string.Empty;
@@ -610,14 +607,14 @@ namespace ExpressBase.Objects
             //-----------------------------------------------------------------------------
 
             param.Add(DataDB.GetNewParameter("eb_createdby", EbDbTypes.Int32, this.UserId));
-            param.Add(DataDB.GetNewParameter("eb_loc_id", EbDbTypes.Int32, this.LocationId)); 
+            param.Add(DataDB.GetNewParameter("eb_loc_id", EbDbTypes.Int32, this.LocationId));
             //param.Add(DataDB.GetNewParameter("eb_auto_id", EbDbTypes.String, FormData.AutoIdText ?? string.Empty));
             //fullqry += string.Format("UPDATE {0} SET eb_auto_id = :eb_auto_id || cur_val('{0}_id_seq')::text WHERE id = cur_val('{0}_id_seq');", this.TableName);
             fullqry += string.Concat("SELECT cur_val('", this.TableName, "_id_seq');");
 
             EbDataTable temp = DataDB.DoQuery(fullqry, param.ToArray());
             int _rowid = temp.Rows.Count > 0 ? Convert.ToInt32(temp.Rows[0][0]) : 0;
-            
+
             return _rowid;
         }
 
@@ -664,7 +661,7 @@ namespace ExpressBase.Objects
             }
             foreach (EbControl control in _flatControls)
             {
-                if(!control.DoNotPersist)
+                if (!control.DoNotPersist)
                 {
                     if (control is EbFileUploader)
                         _schema.ExtendedControls.Add(control);
@@ -672,7 +669,7 @@ namespace ExpressBase.Objects
                     //    _table.Columns.Add(new ColumnSchema { ColumnName = "eb_auto_id", EbDbType = (int)EbDbTypes.String, Control = control });
                     else
                         _table.Columns.Add(new ColumnSchema { ColumnName = control.Name, EbDbType = (int)control.EbDbType, Control = control });
-                }                
+                }
             }
 
             foreach (EbControl _control in _container.Controls)
