@@ -175,7 +175,41 @@ namespace ExpressBase.Objects.Objects.DVRelated
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iTableVisualization, EbObjectTypes.iChartVisualization, EbObjectTypes.iReport, EbObjectTypes.iWebForm)]
+        [OnChangeExec(@"
+if(this.LinkRefId !== null){
+    if(this.LinkRefId.split('-')[2] === '0'){
+        pg.ShowProperty('FormMode');
+    }
+    else{
+        pg.HideProperty('FormMode');
+    }
+}
+else{
+    pg.HideProperty('FormMode');
+}")]
         public string LinkRefId { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.DropDown)]
+        [OnChangeExec(@"
+if(this.FormMode === 0){
+    pg.ShowProperty('FormId');
+    pg.HideProperty('FormParameters');
+}
+else{
+    pg.HideProperty('FormId');
+    pg.ShowProperty('FormParameters');
+}")]
+        public WebFormDVModes FormMode { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Parent.Columns")]
+        [EbRequired]
+        public List<DVBaseColumn> FormId { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Parent.Columns")]
+        public List<DVBaseColumn> FormParameters { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.DropDown)]
@@ -274,6 +308,8 @@ namespace ExpressBase.Objects.Objects.DVRelated
         public DVBaseColumn()
         {
             this.StaticParameters = new List<StaticParam>();
+            this.FormParameters = new List<DVBaseColumn>();
+            this.FormId = new List<DVBaseColumn>();
         }
     }
 

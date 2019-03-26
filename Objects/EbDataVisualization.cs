@@ -401,6 +401,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [HideForUser]
+        [PropertyGroup("TreeVisualization")]
         [OnChangeExec(@"
         if(this.IsTree){
             pg.ShowProperty('ParentColumn')
@@ -413,12 +414,14 @@ namespace ExpressBase.Objects
         }")]
         public bool IsTree { get; set; }
 
+        [PropertyGroup("TreeVisualization")]
         [EnableInBuilder(BuilderType.DVBuilder)]
-        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns",1)]
         public List<DVBaseColumn> ParentColumn { get; set; }
 
+        [PropertyGroup("TreeVisualization")]
         [EnableInBuilder(BuilderType.DVBuilder)]
-        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns",1)]
         public List<DVBaseColumn> GroupingColumn { get; set; }
 
         public static EbOperations Operations = TVOperations.Instance;
