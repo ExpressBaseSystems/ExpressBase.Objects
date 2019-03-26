@@ -387,8 +387,15 @@ namespace ExpressBase.Objects
                     </div>".RemoveCR().DoubleQuoted();
         }
 
-        public string Execute(List<Param> param)
+        private List<Param> GetParams()
         {
+            return this.Parameters.Select(i => new Param { Name = i.Name, Type = i.Type.ToString(), Value = i.Value })
+                    .ToList();
+        }
+
+        public string Execute()
+        {
+            List<Param> param = this.GetParams();
             var uri = new Uri(this.Url);
             HttpResponseMessage response = null;
             using (var client = new HttpClient())
