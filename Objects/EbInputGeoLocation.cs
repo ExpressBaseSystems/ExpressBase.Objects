@@ -73,7 +73,7 @@ namespace ExpressBase.Objects
         public override string GetHtml()
         {
             return @"
-            <div id='cont_@name@' Ctype='Locations' class='Eb-ctrlContainer' style='@hiddenString'>
+            <div id='cont_@name@' Ctype='Locations' class='Eb-ctrlContainer' eb-hidden='@isHidden@'>
                 @GetBareHtml@
             </div>"
 .Replace("@name@", (this.Name != null) ? this.Name : "@name@")

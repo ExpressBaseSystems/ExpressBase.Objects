@@ -328,10 +328,10 @@ namespace ExpressBase.Objects
 
 		public override string GetHtml()
 		{
-			return @"<div id='cont_@name@' Ctype='Cards' class='Eb-ctrlContainer' style='@hiddenString'>
+			return @"<div id='cont_@name@' Ctype='Cards' class='Eb-ctrlContainer' eb-hidden='@isHidden@'>
 						@GetBareHtml@
 					</div>"
-						.Replace("@name@", this.Name ?? "@name@")
+                        .Replace("@name@", this.Name ?? "@name@")
 						.Replace("@GetBareHtml@", this.GetBareHtml());
 		}
 

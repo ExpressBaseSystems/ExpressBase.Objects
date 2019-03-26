@@ -102,7 +102,7 @@ this.Init = function(id)
             //this.LocationCollection.Add(new EbLocation());
             //return GetHtml().RemoveCR().DoubleQuoted();
             return @"`
-<div id='cont_@name@' Ctype='Locations' class='Eb-ctrlContainer' style='@hiddenString'>
+<div id='cont_@name@' Ctype='Locations' class='Eb-ctrlContainer' eb-hidden='@isHidden@'>
     <div class='location-cont'>
        <div class='loc-opt-cont'>
           <select class='loc-opt-DD'>
@@ -145,7 +145,7 @@ this.Init = function(id)
         public override string GetHtml()
         {
             return @"
-            <div id='cont_@name@' Ctype='Locations' class='Eb-ctrlContainer' style='@hiddenString'>
+            <div id='cont_@name@' Ctype='Locations' class='Eb-ctrlContainer' eb-hidden='@isHidden@'>
                 @GetBareHtml@
             </div>"
 .Replace("@name@", (this.Name != null) ? this.Name : "@name@")

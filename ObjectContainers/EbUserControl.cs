@@ -43,7 +43,7 @@ namespace ExpressBase.Objects
         public override string GetDesignHtml()
         {
             string html = @"
-        <div id='cont_@ebsid@' ebsid='@ebsid@' name='@name@' class='Eb-ctrlContainer' ctype='@type@' style='@hiddenString@'>
+        <div id='cont_@ebsid@' ebsid='@ebsid@' name='@name@' class='Eb-ctrlContainer' ctype='@type@' eb-hidden='@isHidden@'>
             <span class='eb-ctrl-label' ui-label id='@ebsidLbl'>____ UserControl ____</span>
                 
         </div>";

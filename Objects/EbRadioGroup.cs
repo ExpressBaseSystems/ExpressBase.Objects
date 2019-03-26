@@ -132,7 +132,7 @@ namespace ExpressBase.Objects
         {
 
             string EbCtrlHTML = @"
-        <div id='cont_@ebsid@'  ebsid='@ebsid@'  class='Eb-ctrlContainer' ebsid='@ebsid@' ctype='@type@' style='@hiddenString'>
+        <div id='cont_@ebsid@'  ebsid='@ebsid@'  class='Eb-ctrlContainer' ebsid='@ebsid@' ctype='@type@' eb-hidden='@isHidden@'>
             <span class='eb-ctrl-label' ui-label id='@ebsidLbl'>@Label@ </span>
                 <div  class='@ebsid@Wraper'>
                     @barehtml@

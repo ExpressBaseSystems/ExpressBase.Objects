@@ -33,9 +33,11 @@ namespace ExpressBase.Objects.Objects.SmsRelated
         public override string Description { get; set; }
 
         [EnableInBuilder(BuilderType.SmsBuilder)]
+        [HideInPropertyGrid]
         public override string VersionNumber { get; set; }
 
         [EnableInBuilder(BuilderType.SmsBuilder)]
+        [HideInPropertyGrid]
         public override string Status { get; set; }
 
         [HideInPropertyGrid]
