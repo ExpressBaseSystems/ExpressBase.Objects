@@ -249,14 +249,17 @@ namespace ExpressBase.Objects
                 {
                     foreach (EbControl control in (c as EbDataGrid).Controls)
                     {
-                        List<object> val = new List<object>();
-                        for (int i = 0; i < FormData.MultipleTables[(c as EbDataGrid).TableName].Count; i++)
+                        if (!control.DoNotPersist)
                         {
-                            val.Add(FormData.MultipleTables[(c as EbDataGrid).TableName][i][control.Name]);
-                            FormData.MultipleTables[(c as EbDataGrid).TableName][i].SetEbDbType(control.Name, control.EbDbType);
-                            FormData.MultipleTables[(c as EbDataGrid).TableName][i].SetControl(control.Name, control);
-                        }
-                        control.ValueFE = val;
+                            List<object> val = new List<object>();
+                            for (int i = 0; i < FormData.MultipleTables[(c as EbDataGrid).TableName].Count; i++)
+                            {
+                                val.Add(FormData.MultipleTables[(c as EbDataGrid).TableName][i][control.Name]);
+                                FormData.MultipleTables[(c as EbDataGrid).TableName][i].SetEbDbType(control.Name, control.EbDbType);
+                                FormData.MultipleTables[(c as EbDataGrid).TableName][i].SetControl(control.Name, control);
+                            }
+                            control.ValueFE = val;
+                        }                        
                     }
                 }
                 else if(c is EbControlContainer)
@@ -284,9 +287,12 @@ namespace ExpressBase.Objects
                 }
                 else if(!(c is EbFileUploader))
                 {
-                    c.ValueFE = FormData.MultipleTables[_container.TableName][0][c.Name];
-                    FormData.MultipleTables[_container.TableName][0].SetEbDbType(c.Name, c.EbDbType);
-                    FormData.MultipleTables[_container.TableName][0].SetControl(c.Name, c);
+                    if (!c.DoNotPersist)
+                    {
+                        c.ValueFE = FormData.MultipleTables[_container.TableName][0][c.Name];
+                        FormData.MultipleTables[_container.TableName][0].SetEbDbType(c.Name, c.EbDbType);
+                        FormData.MultipleTables[_container.TableName][0].SetControl(c.Name, c);
+                    }                    
                 }
             }
         }
@@ -658,12 +664,15 @@ namespace ExpressBase.Objects
             }
             foreach (EbControl control in _flatControls)
             {
-                if (control is EbFileUploader)
-                    _schema.ExtendedControls.Add(control);
-                //else if (control is EbAutoId)
-                //    _table.Columns.Add(new ColumnSchema { ColumnName = "eb_auto_id", EbDbType = (int)EbDbTypes.String, Control = control });
-                else
-                    _table.Columns.Add(new ColumnSchema { ColumnName = control.Name, EbDbType = (int)control.EbDbType, Control = control });
+                if(!control.DoNotPersist)
+                {
+                    if (control is EbFileUploader)
+                        _schema.ExtendedControls.Add(control);
+                    //else if (control is EbAutoId)
+                    //    _table.Columns.Add(new ColumnSchema { ColumnName = "eb_auto_id", EbDbType = (int)EbDbTypes.String, Control = control });
+                    else
+                        _table.Columns.Add(new ColumnSchema { ColumnName = control.Name, EbDbType = (int)control.EbDbType, Control = control });
+                }                
             }
 
             foreach (EbControl _control in _container.Controls)

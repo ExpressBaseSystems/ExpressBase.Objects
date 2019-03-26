@@ -50,9 +50,11 @@ namespace ExpressBase.Objects
         public override string Description { get; set; }
 
         [EnableInBuilder(BuilderType.DataReader)]
+        [HideInPropertyGrid]
         public override string VersionNumber { get; set; }
 
         [EnableInBuilder(BuilderType.DataReader)]
+        [HideInPropertyGrid]
         public override string Status { get; set; }
 
         [EnableInBuilder(BuilderType.DataReader)]
@@ -169,9 +171,11 @@ namespace ExpressBase.Objects
         public override string Description { get; set; }
 
         [EnableInBuilder(BuilderType.DataWriter)]
+        [HideInPropertyGrid]
         public override string VersionNumber { get; set; }
 
         [EnableInBuilder(BuilderType.DataWriter)]
+        [HideInPropertyGrid]
         public override string Status { get; set; }
 
         //forapi
@@ -199,9 +203,11 @@ namespace ExpressBase.Objects
         public override string Description { get; set; }
 
         [EnableInBuilder(BuilderType.SqlFunctions)]
+        [HideInPropertyGrid]
         public override string VersionNumber { get; set; }
 
         [EnableInBuilder(BuilderType.SqlFunctions)]
+        [HideInPropertyGrid]
         public override string Status { get; set; }
 
         [JsonIgnore]

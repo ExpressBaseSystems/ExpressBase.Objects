@@ -240,7 +240,7 @@ $.each(p1, function (i, row) {
         public override string GetDesignHtml()
         {
             return @"
-<div id='cont_@name@  ' class='Eb-ctrlContainer' Ctype='TextBox' style='@HiddenString '>
+<div id='cont_@name@  ' class='Eb-ctrlContainer' Ctype='TextBox' eb-hidden='@isHidden@'>
    <div role='form' data-toggle='validator' style=' width: inherit;'>
     <div class='eb-ctrl-label' style='background-color:@LabelBackColor@; color:@LabelForeColor@ '> @Label@  </div>
       <div class='combo-wrap' data-toggle='tooltip' title='' data-original-title=''>
@@ -268,7 +268,7 @@ $.each(p1, function (i, row) {
         }
 
         public override string DesignHtml4Bot { get => @"
-<div id='cont_@name@  ' class='Eb-ctrlContainer' Ctype='TextBox' style='@HiddenString '>
+<div id='cont_@name@  ' class='Eb-ctrlContainer' Ctype='TextBox' eb-hidden='@isHidden@'>
    <div role='form' data-toggle='validator' style=' width: inherit;'>
     <span style='background-color:@LabelBackColor@; color:@LabelForeColor@ '> @Label@  </span>
       <div class='combo-wrap' data-toggle='tooltip' title='' data-original-title=''>

@@ -85,7 +85,7 @@ this.Init = function(id)
         public override string GetHtml()
         {
             string EbCtrlHTML = @"
-    <div id='cont_@name@' Ctype='Labels' class='Eb-ctrlContainer' style='@hiddenString'>
+    <div id='cont_@name@' Ctype='Labels' class='Eb-ctrlContainer' eb-hidden='@isHidden@'>
        @barehtml@
     </div>
 "
@@ -127,7 +127,7 @@ this.Init = function(id)
         public override string GetBareHtml()
         {
             return @"
-    <div id='cont_@name@' Ctype='Labels' class='Eb-ctrlContainer' style='@hiddenString'>
+    <div id='cont_@name@' Ctype='Labels' class='Eb-ctrlContainer' eb-hidden='@isHidden@'>
         <div class='eb-ctrl-label' id='@name@Lbl' style='@LabelBackColor  @LabelForeColor '> @Label@ </div>
     </div>
 "

@@ -73,10 +73,10 @@ $('#@idcontainer [type=radio]').on('click', function () {
 
         public override string GetHtml()
         {
-            return @"<div id='cont_@name  ' class='Eb-ctrlContainer' Ctype='RadioButton' style='@HiddenString '>
+            return @"<div id='cont_@name  ' class='Eb-ctrlContainer' Ctype='RadioButton' eb-hidden='@isHidden@'>
                     </div>"
 .Replace("@name", this.Name)
-.Replace("@hiddenString", this.HiddenString)
+.Replace("@isHidden@", this.Hidden.ToString())
 ;
         }
     }

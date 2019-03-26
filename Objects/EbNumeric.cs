@@ -201,22 +201,22 @@ $('#{0}').mask('SZZZZZZZZZZZ', {
             return GetHtmlHelper(RenderMode.User);
         }
 
-//        public override string GetBareHtml()
-//        {
-//            return @" 
-//        <div class='input-group' style='width:100%;'>
-//                <span style='font-size: @fontSize@' class='input-group-addon'>$</span>   
-//                <input type='text' class='numinput' ui-inp data-ebtype='@datetype@' id='@name@' name='@name@' data-toggle='tooltip' style=' width:100%; display:inline-block;'/>
-//        </div>"
-//.Replace("@name@", this.Name)
-//.Replace("@datetype@", "11");
-//        }
+        //        public override string GetBareHtml()
+        //        {
+        //            return @" 
+        //        <div class='input-group' style='width:100%;'>
+        //                <span style='font-size: @fontSize@' class='input-group-addon'><i class='fa fa-sort-numeric-asc' aria-hidden='true'></i></span>   
+        //                <input type='text' class='numinput' ui-inp data-ebtype='@datetype@' id='@name@' name='@name@' data-toggle='tooltip' style=' width:100%; display:inline-block;'/>
+        //        </div>"
+        //.Replace("@name@", this.Name)
+        //.Replace("@datetype@", "11");
+        //        }
 
         public override string GetBareHtml()
         {
             return @" 
                 <div class='input-group' style='width:100%;'>
-                        <span style='font-size: @fontSize@' class='input-group-addon'>$</span>   
+                        <span style='font-size: @fontSize@' class='input-group-addon'><i class='fa fa-sort-numeric-asc' aria-hidden='true'></i></span>   
                         <input type='text' data-ebtype='@datetype@' class='numinput' ui-inp id='@ebsid@' name='@name@' value='@value@' @placeHolder autocomplete = '@autoComplete@' data-toggle='tooltip' title='@toolTipText@' style=' width:100%; @backColor@ @foreColor@ @fontStyle@ display:inline-block; @readOnlyString@ @required@ @tabIndex@ />
                 </div>"
 .Replace("@name@", this.Name)
@@ -250,7 +250,7 @@ $('#{0}').mask('SZZZZZZZZZZZ', {
         //        private string GetHtmlHelper(RenderMode mode)
         //        {
         //            return (@"
-        //<div id='cont_@name@' class='Eb-ctrlContainer' Ctype='Numeric' style='@hiddenString'>
+        //<div id='cont_@name@' class='Eb-ctrlContainer' Ctype='Numeric' eb-hidden='@isHidden@'>
         //    <div class='eb-ctrl-label' id='@nameLbl' style='@lblBackColor @LblForeColor'>@label@</div>
         //       @barehtml@            
         //    <span class='helpText'> @helpText </span>
@@ -261,7 +261,7 @@ $('#{0}').mask('SZZZZZZZZZZZ', {
         //.Replace("@top", this.Top.ToString())
         //.Replace("@height", this.Height.ToString())
         //.Replace("@label@", this.Label)//5
-        //.Replace("@hiddenString", this.HiddenString)
+        //.Replace("@isHidden@", this.Hidden.ToString())
         //.Replace("@required", (this.Required && !this.Hidden ? " required" : string.Empty))
         //.Replace("@readOnlyString", this.ReadOnlyString)
         //.Replace("@toolTipText", this.ToolTipText)

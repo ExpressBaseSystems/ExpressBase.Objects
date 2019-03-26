@@ -319,14 +319,14 @@ else {
         //        private string GetHtmlHelper(RenderMode mode)
         //        {
         //            return @"
-        //<div id='cont_@name@  ' class='Eb-ctrlContainer' Ctype='TextBox' style='@HiddenString '>
+        //<div id='cont_@name@  ' class='Eb-ctrlContainer' Ctype='TextBox' eb-hidden='@isHidden@'>
         //    <div class='eb-ctrl-label' ui-label id='@name@Lbl' style='@LabelBackColor@ @LabelForeColor@ '> @Label@  </div>
         //       @barehtml@
         //    <span ui-helptxt class='helpText'> @HelpText@ </span>
         //</div>"
         //.Replace("@barehtml@", this.GetBareHtml())
         //.Replace("@name@", this.Name)
-        //.Replace("@HiddenString ", this.HiddenString)
+        //.Replace("@isHidden@", this.Hidden.ToString())
         //.Replace("@ToolTipText ", this.ToolTipText)
 
         ////.Replace("@name ", (this.Name != null) ? this.Name : "@name ")

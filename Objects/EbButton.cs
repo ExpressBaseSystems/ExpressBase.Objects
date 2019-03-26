@@ -74,7 +74,7 @@ namespace ExpressBase.Objects
 "
 .Replace("@barehtml@", this.GetBareHtml())
 .Replace("@name", this.Name)
-.Replace("@hiddenString", this.HiddenString)
+.Replace("@isHidden@", this.Hidden.ToString())
 .Replace("@toolTipText", this.ToolTipText)
 );
         }
