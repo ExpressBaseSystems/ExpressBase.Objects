@@ -424,6 +424,11 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns",1)]
         public List<DVBaseColumn> GroupingColumn { get; set; }
 
+        [PropertyGroup("TreeVisualization")]
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", 1)]
+        public List<DVBaseColumn> TreeNode { get; set; }
+
         public static EbOperations Operations = TVOperations.Instance;
 
  //       public override string GetDesignHtml()
