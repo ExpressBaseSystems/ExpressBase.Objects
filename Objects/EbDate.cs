@@ -214,7 +214,7 @@ $('#@id').MonthPicker({ StartYear: 2018, ShowIcon: false });"
 .Replace("@readOnlyString@", this.ReadOnlyString)
 .Replace("@placeHolder@", "placeholder='" + this.PlaceHolder + "'")
 .Replace("@atchdLbl@", (this.EbDateType.ToString().ToLower() == "time") ? "fa-clock-o" : "fa-calendar")
-.Replace("@IsNullable@", (this.IsNullable) ? "<span class='input-group-addon nullable-check'><input type='checkbox' checked style='min-height:unset;'></span>" : "");
+.Replace("@IsNullable@", (this.IsNullable) ? "<span class='input-group-addon nullable-check'><input type='checkbox' style='min-height:unset;'></span>" : "");
 //.Replace("@fontStyle@", (this.FontSerialized != null) ?
 //                            (" font-family:" + this.FontSerialized.FontFamily + ";" + "font-style:" + this.FontSerialized.Style
 //                            + ";" + "font-size:" + this.FontSerialized.SizeInPoints + "px;")
