@@ -55,15 +55,20 @@ namespace ExpressBase.Objects
             {
                 return @"
 console.log(1000);
-$.each(p1, function (i, row) {
-    $.each(row.Columns, function (j, dm) {
-        if (j === 0) {
-            this.initializer.Vobj.valueMembers.push(parseInt(dm.Value));
-            return true;
+        let VMs = this.initializer.Vobj.valueMembers;
+        let DMs = this.initializer.Vobj.displayMembers;
+
+        if (VMs.length > 0) {// clear if already values there
+            this.initializer.clearValues();
         }
-        this.initializer.Vobj.displayMembers[dm.Name].push(dm.Value);
-    }.bind(this));
-}.bind(this));
+
+        $.each(p1, function (i, row) {
+            VMs.push(getObjByval(row.Columns, 'Name', this.ValueMember.name).Value);
+
+            $.each(this.DisplayMembers.$values, function (j, dm) {
+                DMs[dm.name].push(getObjByval(row.Columns, 'Name', dm.name).Value);
+            }.bind(this));
+        }.bind(this));
                 ";
             }
             set { }

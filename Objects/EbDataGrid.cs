@@ -398,7 +398,12 @@ $.each(this.Controls.$values, function (i, col) {
     [UsedWithTopObjectParent(typeof(EbObject))]
     public class EbDGPowerSelectColumn : EbDGColumn
     {
-        public bool MultiSelect { get; set; }
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+        public bool MultiSelect
+        {
+            get { return this.EbPowerSelect.MultiSelect; }
+            set { this.EbPowerSelect.MultiSelect = value; }
+        }
 
         [JsonIgnore]
         private EbPowerSelect EbPowerSelect { get; set; }
@@ -415,6 +420,20 @@ $.each(this.Controls.$values, function (i, col) {
         {
             get { return this.EbPowerSelect.DataSourceId; }
             set { this.EbPowerSelect.DataSourceId = value; }
+        }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        public int MaxLimit
+        {
+            get { return this.EbPowerSelect.MaxLimit; }
+            set { this.EbPowerSelect.MaxLimit = value; }
+        }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        public int MinLimit
+        {
+            get { return this.EbPowerSelect.MaxLimit; }
+            set { this.EbPowerSelect.MinLimit = value; }
         }
 
         public override string GetBareHtml()
