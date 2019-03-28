@@ -247,7 +247,7 @@ namespace ExpressBase.Objects
 
 .Replace("@PlaceHolder@", (PlaceHolder ?? ""))
 .Replace("@options@", this.OptionHtml)
-.Replace("@-sel-@", this.IsMultiSelect ? string.Empty : "<option selected value='-1' style='color: #6f6f6f;'> -- nothing selected -- </option>")
+.Replace("@-sel-@", this.IsMultiSelect ? string.Empty : "<option selected value='-1' style='color: #6f6f6f;'> -- selected -- </option>")
 .Replace("@data-ebtype@", "16");
         }
 
