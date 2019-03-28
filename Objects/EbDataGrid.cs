@@ -509,7 +509,7 @@ else {pg.MakeReadWrite('ValueMember');}")]
                 Sql = Sql.Substring(0, Sql.Length - 1);
 
             var tt = string.Format(@"SELECT 
-                                        __A.{0},{1} 
+                                        __A.*
                                     FROM 
                                         ({2}) __A, {3} __B
                                     WHERE 
