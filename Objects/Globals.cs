@@ -137,6 +137,8 @@ namespace ExpressBase.Objects.Objects
 
     public class ApiGlobals
     {
+        public dynamic Params { get; set; }
+
         public List<EbDataTable> Tables { set; get; }
 
         public ApiGlobals() { }
@@ -144,6 +146,19 @@ namespace ExpressBase.Objects.Objects
         public ApiGlobals(EbDataSet _ds)
         {
             this.Tables = _ds.Tables;
+
+            Params = new NTVDict();
+        }
+
+        public dynamic this[string key]
+        {
+            get
+            {
+                if (key == "Params")
+                    return this.Params;
+                else
+                    return null;
+            }
         }
     }
 
@@ -201,7 +216,7 @@ namespace ExpressBase.Objects.Objects
             {
                 ListNTV temp = this.Rows[0];
                 value = temp[name];
-            }            
+            }
             if (value != null)
             {
                 result = value;
