@@ -84,9 +84,10 @@ $.each(this.Controls.$values, function (i, col) {
             foreach (EbDGColumn col in Controls)
             {
                 if (!col.Hidden)
-                    html += string.Concat("<th style='width: @Width@;' title='", col.Title, "'><span class='grid-col-title'>", col.Title, "</span>@req@</th>")
+                    html += string.Concat("<th style='width: @Width@; @bg@' title='", col.Title, "'><span class='grid-col-title'>", col.Title, "</span>@req@</th>")
                         .Replace("@req@", (col.Required ? "<sup style='color: red'>*</sup>" : string.Empty))
-                        .Replace("@Width@", (col.Width <= 0) ? "auto" : col.Width.ToString() + "px");
+                        .Replace("@Width@", (col.Width <= 0) ? "auto" : col.Width.ToString() + "px")
+                        .Replace("@bg@", col.IsDisable ? "background-color:#fafafa; color:#555" : string.Empty);
             }
 
             html += @"
@@ -163,10 +164,10 @@ $.each(this.Controls.$values, function (i, col) {
         }
 
         [JsonIgnore]
-        public override string EnableJSfn { get { return @"$('[ebsid='+this.__DG.EbSid+']').find(`tr[is-editing='true'] [colname=${this.Name}] .ctrl-cover *`).prop('disabled',false).css('pointer-events', 'inherit').find('input').css('background-color','#fff');;"; } set { } }
+        public override string EnableJSfn { get { return @"$('[ebsid='+this.__DG.EbSid+']').find(`tr[is-editing='true'] [colname=${this.Name}] .ctrl-cover *`).prop('disabled',false).css('pointer-events', 'inherit').find('input').css('background-color','#fff');"; } set { } }
 
         [JsonIgnore]
-        public override string DisableJSfn { get { return @"$('[ebsid='+this.__DG.EbSid+']').find(`tr[is-editing='true'] [colname=${this.Name}] .ctrl-cover *`).attr('disabled', 'disabled').css('pointer-events', 'none').find('input').css('background-color','#eee');;"; } set { } }
+        public override string DisableJSfn { get { return @"$('[ebsid='+this.__DG.EbSid+']').find(`tr[is-editing='true'] [colname=${this.Name}] .ctrl-cover *`).attr('disabled', 'disabled').css('pointer-events', 'none').find('input').css('background-color','#eee');"; } set { } }
 
         [JsonIgnore]
         public override string ClearJSfn { get { return @"$('[ebsid='+this.__DG.EbSid+']').find(`tr[is-editing='true'] [colname=${this.Name}] [ui-inp]`).val('');"; } set { } }
@@ -187,6 +188,9 @@ $.each(this.Controls.$values, function (i, col) {
 
         [EnableInBuilder(BuilderType.WebForm)]
         public virtual string InputControlType { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        public bool IsDisable { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         public bool IsEditable { get; set; }
@@ -398,7 +402,12 @@ $.each(this.Controls.$values, function (i, col) {
     [UsedWithTopObjectParent(typeof(EbObject))]
     public class EbDGPowerSelectColumn : EbDGColumn
     {
-        public bool MultiSelect { get; set; }
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+        public bool MultiSelect
+        {
+            get { return this.EbPowerSelect.MultiSelect; }
+            set { this.EbPowerSelect.MultiSelect = value; }
+        }
 
         [JsonIgnore]
         private EbPowerSelect EbPowerSelect { get; set; }
@@ -415,6 +424,20 @@ $.each(this.Controls.$values, function (i, col) {
         {
             get { return this.EbPowerSelect.DataSourceId; }
             set { this.EbPowerSelect.DataSourceId = value; }
+        }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        public int MaxLimit
+        {
+            get { return this.EbPowerSelect.MaxLimit; }
+            set { this.EbPowerSelect.MaxLimit = value; }
+        }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        public int MinLimit
+        {
+            get { return this.EbPowerSelect.MaxLimit; }
+            set { this.EbPowerSelect.MinLimit = value; }
         }
 
         public override string GetBareHtml()
@@ -509,7 +532,7 @@ else {pg.MakeReadWrite('ValueMember');}")]
                 Sql = Sql.Substring(0, Sql.Length - 1);
 
             var tt = string.Format(@"SELECT 
-                                        __A.{0},{1} 
+                                        __A.*
                                     FROM 
                                         ({2}) __A, {3} __B
                                     WHERE 
