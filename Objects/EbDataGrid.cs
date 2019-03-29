@@ -70,9 +70,6 @@ $.each(this.Controls.$values, function (i, col) {
         [PropertyGroup("test")]
         public bool IsAddable { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
-        public override int Height { get; set; }
-
         public override string GetToolHtml()
         {
             return @"<div eb-type='@toolName' class='tool'><i class='fa fa-table'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
@@ -81,40 +78,29 @@ $.each(this.Controls.$values, function (i, col) {
         {
             string html = @"
 <div class='grid-cont'>
-    <div class='Dg_head'>
-        <table id='tbl_@ebsid@_head' class='table table-bordered dgtbl'>
-            <thead>
-              <tr>";
-                foreach (EbDGColumn col in Controls)
-                {
-                    if (!col.Hidden)
-                        html += string.Concat("<th style='width: @Width@;' title='", col.Title, "'><span class='grid-col-title'>", col.Title, "</span>@req@</th>")
-                            .Replace("@req@", (col.Required ? "<sup style='color: red'>*</sup>" : string.Empty))
-                            .Replace("@Width@", (col.Width <= 0) ? "auto" : col.Width.ToString() + "px");
-                }
-
-                html += @"
-                <th style='width:55px;'><span class='fa fa-cogs'></span></th>
-              </tr>
-            </thead>
-        </table>
-    </div>";
+    <table id='tbl_@ebsid@' class='table table-bordered dgtbl'>
+        <thead>
+          <tr>";
+            foreach (EbDGColumn col in Controls)
+            {
+                if (!col.Hidden)
+                    html += string.Concat("<th style='width: @Width@; @bg@' title='", col.Title, "'><span class='grid-col-title'>", col.Title, "</span>@req@</th>")
+                        .Replace("@req@", (col.Required ? "<sup style='color: red'>*</sup>" : string.Empty))
+                        .Replace("@Width@", (col.Width <= 0) ? "auto" : col.Width.ToString() + "px")
+                        .Replace("@bg@", col.IsDisable ? "background-color:#fafafa; color:#555" : string.Empty);
+            }
 
             html += @"
-    <div class='Dg_body' style='overflow-y:scroll;height:@_height@px ;'>
-        <table id='tbl_@ebsid@' class='table table-bordered dgtbl'>
-            <tbody>
-            </tbody>
-        </table>
-    </div>
-    <div class='Dg_footer'>
-        <table id='tbl_@ebsid@_footer' class='table table-bordered dgtbl'>
-            <tbody>
-            </tbody>
-        </table>
-     </div>
-</div>".Replace("@_height@",this.Height.ToString());
+            <th><span class='fa fa-cogs'></span></th>
+          </tr>
+        </thead>
+    </thead>
+    <tbody>";
 
+            html += @"
+    </tbody>
+    </table>
+</div>";
             return html;
         }
 
@@ -178,10 +164,10 @@ $.each(this.Controls.$values, function (i, col) {
         }
 
         [JsonIgnore]
-        public override string EnableJSfn { get { return @"$('[ebsid='+this.__DG.EbSid+']').find(`tr[is-editing='true'] [colname=${this.Name}] .ctrl-cover *`).prop('disabled',false).css('pointer-events', 'inherit').find('input').css('background-color','#fff');;"; } set { } }
+        public override string EnableJSfn { get { return @"$('[ebsid='+this.__DG.EbSid+']').find(`tr[is-editing='true'] [colname=${this.Name}] .ctrl-cover *`).prop('disabled',false).css('pointer-events', 'inherit').find('input').css('background-color','#fff');"; } set { } }
 
         [JsonIgnore]
-        public override string DisableJSfn { get { return @"$('[ebsid='+this.__DG.EbSid+']').find(`tr[is-editing='true'] [colname=${this.Name}] .ctrl-cover *`).attr('disabled', 'disabled').css('pointer-events', 'none').find('input').css('background-color','#eee');;"; } set { } }
+        public override string DisableJSfn { get { return @"$('[ebsid='+this.__DG.EbSid+']').find(`tr[is-editing='true'] [colname=${this.Name}] .ctrl-cover *`).attr('disabled', 'disabled').css('pointer-events', 'none').find('input').css('background-color','#eee');"; } set { } }
 
         [JsonIgnore]
         public override string ClearJSfn { get { return @"$('[ebsid='+this.__DG.EbSid+']').find(`tr[is-editing='true'] [colname=${this.Name}] [ui-inp]`).val('');"; } set { } }
@@ -202,6 +188,9 @@ $.each(this.Controls.$values, function (i, col) {
 
         [EnableInBuilder(BuilderType.WebForm)]
         public virtual string InputControlType { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        public bool IsDisable { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         public bool IsEditable { get; set; }
@@ -413,7 +402,21 @@ $.each(this.Controls.$values, function (i, col) {
     [UsedWithTopObjectParent(typeof(EbObject))]
     public class EbDGPowerSelectColumn : EbDGColumn
     {
-        public bool MultiSelect { get; set; }
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+        public bool MultiSelect
+        {
+            get { return this.EbPowerSelect.MultiSelect; }
+            set { this.EbPowerSelect.MultiSelect = value; }
+        }
+
+
+
+        [JsonIgnore]
+        public override string SetDisplayMemberJSfn
+        {
+            get { return this.EbPowerSelect.SetDisplayMemberJSfn; }
+            set { }
+        }
 
         [JsonIgnore]
         private EbPowerSelect EbPowerSelect { get; set; }
@@ -430,6 +433,20 @@ $.each(this.Controls.$values, function (i, col) {
         {
             get { return this.EbPowerSelect.DataSourceId; }
             set { this.EbPowerSelect.DataSourceId = value; }
+        }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        public int MaxLimit
+        {
+            get { return this.EbPowerSelect.MaxLimit; }
+            set { this.EbPowerSelect.MaxLimit = value; }
+        }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        public int MinLimit
+        {
+            get { return this.EbPowerSelect.MaxLimit; }
+            set { this.EbPowerSelect.MinLimit = value; }
         }
 
         public override string GetBareHtml()

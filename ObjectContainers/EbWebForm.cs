@@ -1,4 +1,5 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Data;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
@@ -36,6 +37,8 @@ namespace ExpressBase.Objects
         public override int TableRowId { get; set; }
 
         public WebformData FormData { get; set; }
+
+        public WebFormSchema FormSchema { get; set; }
 
         public int UserId { get; set; }
 
@@ -91,7 +94,7 @@ namespace ExpressBase.Objects
         {
             foreach (EbControl c in _container.Controls)
             {
-                if(c is EbControlContainer)
+                if (c is EbControlContainer)
                 {
                     if ((c as EbControlContainer).TableName.IsNullOrEmpty())
                         (c as EbControlContainer).TableName = _container.TableName;
@@ -111,11 +114,11 @@ namespace ExpressBase.Objects
                 string _cols = "id";
                 string _id = "id";
 
-                if(_table.Columns.Count > 0)
+                if (_table.Columns.Count > 0)
                     _cols = "id, " + String.Join(", ", _table.Columns.Select(x => x.ColumnName));
                 if (_table.TableName != _schema.MasterTable)
                     _id = _schema.MasterTable + "_id";
-                
+
                 query += string.Format("SELECT {0} FROM {1} WHERE {2} = :id AND eb_del='F';", _cols, _table.TableName, _id);
 
                 foreach (ColumnSchema Col in _table.Columns)
@@ -269,9 +272,12 @@ namespace ExpressBase.Objects
                             List<object> val = new List<object>();
                             for (int i = 0; i < FormData.MultipleTables[(c as EbDataGrid).TableName].Count; i++)
                             {
-                                val.Add(FormData.MultipleTables[(c as EbDataGrid).TableName][i][control.Name]);
-                                FormData.MultipleTables[(c as EbDataGrid).TableName][i].SetEbDbType(control.Name, control.EbDbType);
-                                FormData.MultipleTables[(c as EbDataGrid).TableName][i].SetControl(control.Name, control);
+                                if (FormData.MultipleTables[(c as EbDataGrid).TableName][i][control.Name] != null)
+                                {
+                                    val.Add(FormData.MultipleTables[(c as EbDataGrid).TableName][i][control.Name]);
+                                    FormData.MultipleTables[(c as EbDataGrid).TableName][i].SetEbDbType(control.Name, control.EbDbType);
+                                    FormData.MultipleTables[(c as EbDataGrid).TableName][i].SetControl(control.Name, control);
+                                }
                             }
                             control.ValueFE = val;
                         }
@@ -304,9 +310,12 @@ namespace ExpressBase.Objects
                 {
                     if (!c.DoNotPersist)
                     {
-                        c.ValueFE = FormData.MultipleTables[_container.TableName][0][c.Name];
-                        FormData.MultipleTables[_container.TableName][0].SetEbDbType(c.Name, c.EbDbType);
-                        FormData.MultipleTables[_container.TableName][0].SetControl(c.Name, c);
+                        if (FormData.MultipleTables[_container.TableName][0][c.Name] != null)
+                        {
+                            c.ValueFE = FormData.MultipleTables[_container.TableName][0][c.Name];
+                            FormData.MultipleTables[_container.TableName][0].SetEbDbType(c.Name, c.EbDbType);
+                            FormData.MultipleTables[_container.TableName][0].SetControl(c.Name, c);
+                        }
                     }
                 }
             }
@@ -439,6 +448,37 @@ namespace ExpressBase.Objects
 
             //if (_extend)
             //    GetWebformData_Extended(FormObj, FormData);
+        }
+
+        public void RefreshFormData(List<Param> _params)
+        {
+            WebFormSchema _schema = this.GetWebFormSchema();
+            this.FormData = new WebformData();
+            this.FormData.MasterTable = _schema.MasterTable;
+            for (int i = 0; i < _params.Count; i++)
+            {
+                for (int j = 0; j < _schema.Tables.Count; j++)
+                {
+                    for (int k = 0; k < _schema.Tables[j].Columns.Count; k++)
+                    {
+                        if (_schema.Tables[j].Columns[k].ColumnName.Equals(_params[i].Name))
+                        {
+                            if (!this.FormData.MultipleTables.ContainsKey(_schema.Tables[j].TableName))
+                            {
+                                SingleTable tbl = new SingleTable();
+                                tbl.Add(new SingleRow());
+                                this.FormData.MultipleTables.Add(_schema.Tables[j].TableName, tbl);
+                            }
+                            SingleColumn col = new SingleColumn() {
+                                Name = _params[i].Name,
+                                Type = _schema.Tables[j].Columns[k].EbDbType,
+                                Value = _params[i].ValueTo
+                            };
+                            this.FormData.MultipleTables[_schema.Tables[j].TableName][0].Columns.Add(col);
+                        }
+                    }
+                }
+            }
         }
 
         public int Save(IDatabase DataDB, Service service)
