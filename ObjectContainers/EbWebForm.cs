@@ -272,9 +272,12 @@ namespace ExpressBase.Objects
                             List<object> val = new List<object>();
                             for (int i = 0; i < FormData.MultipleTables[(c as EbDataGrid).TableName].Count; i++)
                             {
-                                val.Add(FormData.MultipleTables[(c as EbDataGrid).TableName][i][control.Name]);
-                                FormData.MultipleTables[(c as EbDataGrid).TableName][i].SetEbDbType(control.Name, control.EbDbType);
-                                FormData.MultipleTables[(c as EbDataGrid).TableName][i].SetControl(control.Name, control);
+                                if (FormData.MultipleTables[(c as EbDataGrid).TableName][i][control.Name] != null)
+                                {
+                                    val.Add(FormData.MultipleTables[(c as EbDataGrid).TableName][i][control.Name]);
+                                    FormData.MultipleTables[(c as EbDataGrid).TableName][i].SetEbDbType(control.Name, control.EbDbType);
+                                    FormData.MultipleTables[(c as EbDataGrid).TableName][i].SetControl(control.Name, control);
+                                }
                             }
                             control.ValueFE = val;
                         }
@@ -307,9 +310,12 @@ namespace ExpressBase.Objects
                 {
                     if (!c.DoNotPersist)
                     {
-                        c.ValueFE = FormData.MultipleTables[_container.TableName][0][c.Name];
-                        FormData.MultipleTables[_container.TableName][0].SetEbDbType(c.Name, c.EbDbType);
-                        FormData.MultipleTables[_container.TableName][0].SetControl(c.Name, c);
+                        if (FormData.MultipleTables[_container.TableName][0][c.Name] != null)
+                        {
+                            c.ValueFE = FormData.MultipleTables[_container.TableName][0][c.Name];
+                            FormData.MultipleTables[_container.TableName][0].SetEbDbType(c.Name, c.EbDbType);
+                            FormData.MultipleTables[_container.TableName][0].SetControl(c.Name, c);
+                        }
                     }
                 }
             }
