@@ -409,6 +409,15 @@ $.each(this.Controls.$values, function (i, col) {
             set { this.EbPowerSelect.MultiSelect = value; }
         }
 
+
+
+        [JsonIgnore]
+        public override string SetDisplayMemberJSfn
+        {
+            get { return this.EbPowerSelect.SetDisplayMemberJSfn; }
+            set { }
+        }
+
         [JsonIgnore]
         private EbPowerSelect EbPowerSelect { get; set; }
 
