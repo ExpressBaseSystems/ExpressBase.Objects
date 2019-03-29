@@ -32,11 +32,11 @@ namespace ExpressBase.Objects
         public override EbDbTypes EbDbType { get { return EbDbTypes.String; } set { } }
 
         //HideInPropertyGrid
-        public string OnChange { get; set; }
+        //public string OnChange { get; set; }
         public override bool Hidden { get => base.Hidden; set => base.Hidden = value; }
         public override bool Required { get => base.Required; set => base.Required = value; }
         public override bool Unique { get => base.Unique; set => base.Unique = value; }
-        public string DefaultValue { get; set; }
+        public override dynamic DefaultValue { get; set; }
         //public List<EbValidator> Validators { get; set; }
 
         public override string GetToolHtml()
