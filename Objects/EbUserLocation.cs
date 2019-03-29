@@ -14,22 +14,22 @@ using System.Text;
 
 namespace ExpressBase.Objects.Objects
 {
-    [EnableInBuilder(BuilderType.FilterDialog)]
+    [EnableInBuilder(BuilderType.FilterDialog, BuilderType.WebForm)]
     public class EbUserLocation : EbControlUI
     {
-        [EnableInBuilder(BuilderType.FilterDialog)]
+        [EnableInBuilder(BuilderType.FilterDialog, BuilderType.WebForm)]
         [HideInPropertyGrid]
         public List<EbSimpleSelectOption> Options { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
 
-        [EnableInBuilder(BuilderType.FilterDialog)]
+        [EnableInBuilder(BuilderType.FilterDialog, BuilderType.WebForm)]
         [DefaultPropValue("eb_location_id")]
         //[PropertyEditor(PropertyEditorType.Label)]
         public override string Name { get; set; }
 
-        [EnableInBuilder(BuilderType.FilterDialog)]
+        [EnableInBuilder(BuilderType.FilterDialog, BuilderType.WebForm)]
         public bool  LoadCurrentLocation { get; set; }
         
 

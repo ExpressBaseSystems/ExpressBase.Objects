@@ -83,6 +83,20 @@ namespace ExpressBase.Objects
         public bool AutoCompleteOff { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [OnChangeExec(@"
+                if (this.DoNotPersist){
+                        pg.HideProperty('IsNullable');
+                }
+                else {
+                       pg.ShowProperty('IsNullable');
+                }
+            ")]
+        public override bool DoNotPersist { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        public bool IsNullable { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         private string maskPattern
         {
             get
@@ -183,6 +197,7 @@ $('#@id').MonthPicker({ StartYear: 2018, ShowIcon: false });"
         {
             return @" 
         <div class='input-group' style='width:100%;'>
+            @IsNullable@
             <input id='@ebsid@' ui-inp data-ebtype='@data-ebtype@'  data-toggle='tooltip' title='@toolTipText@' class='date' type='text' name='@name@' autocomplete = '@autoComplete@' @value@ @tabIndex@ style='width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@ @readOnlyString@ @required@ @placeHolder@ />
             <span class='input-group-addon' style='padding: 0px;'> <i id='@ebsid@TglBtn' class='fa  @atchdLbl@' aria-hidden='true' style='padding: 6px 12px;'></i> </span>
         </div>"
@@ -199,7 +214,7 @@ $('#@id').MonthPicker({ StartYear: 2018, ShowIcon: false });"
 .Replace("@readOnlyString@", this.ReadOnlyString)
 .Replace("@placeHolder@", "placeholder='" + this.PlaceHolder + "'")
 .Replace("@atchdLbl@", (this.EbDateType.ToString().ToLower() == "time") ? "fa-clock-o" : "fa-calendar")
-
+.Replace("@IsNullable@", (this.IsNullable) ? "<span class='input-group-addon nullable-check'><input type='checkbox' style='min-height:unset;'></span>" : "");
 //.Replace("@fontStyle@", (this.FontSerialized != null) ?
 //                            (" font-family:" + this.FontSerialized.FontFamily + ";" + "font-style:" + this.FontSerialized.Style
 //                            + ";" + "font-size:" + this.FontSerialized.SizeInPoints + "px;")

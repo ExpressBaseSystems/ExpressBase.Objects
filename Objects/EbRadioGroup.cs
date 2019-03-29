@@ -131,18 +131,25 @@ namespace ExpressBase.Objects
         public override string GetHtml()
         {
 
-            string EbCtrlHTML = @"
-        <div id='cont_@ebsid@'  ebsid='@ebsid@'  class='Eb-ctrlContainer' ebsid='@ebsid@' ctype='@type@' eb-hidden='@isHidden@'>
-            <span class='eb-ctrl-label' ui-label id='@ebsidLbl'>@Label@ </span>
-                <div  class='@ebsid@Wraper'>
-                    @barehtml@
-                </div>
-            <span class='helpText' ui-helptxt >@HelpText@ </span>
-        </div>"
-    .Replace("@LabelForeColor ", "color:" + (LabelForeColor ?? "@LabelForeColor ") + ";")
-    .Replace("@LabelBackColor ", "background-color:" + (LabelBackColor ?? "@LabelBackColor ") + ";")
-    .Replace("@HelpText@ ", (HelpText ?? ""))
-    .Replace("@Label@ ", (Label ?? ""));
+            //        string EbCtrlHTML = @"
+            //    <div id='cont_@ebsid@'  ebsid='@ebsid@'  class='Eb-ctrlContainer' ebsid='@ebsid@' ctype='@type@' eb-hidden='@isHidden@'>
+            //        <span class='eb-ctrl-label' ui-label id='@ebsidLbl'>@Label@ </span>
+            //            <div  class='@ebsid@Wraper'>
+            //                @barehtml@
+            //            </div>
+            //        <span class='helpText' ui-helptxt >@HelpText@ </span>
+            //    </div>"
+            //.Replace("@LabelForeColor ", "color:" + (LabelForeColor ?? "@LabelForeColor ") + ";")
+            //.Replace("@LabelBackColor ", "background-color:" + (LabelBackColor ?? "@LabelBackColor ") + ";")
+            //.Replace("@HelpText@ ", (HelpText ?? ""))
+            //.Replace("@Label@ ", (Label ?? ""));
+            //        return ReplacePropsInHTML(EbCtrlHTML);
+
+
+            string EbCtrlHTML = HtmlConstants.CONTROL_WRAPER_HTML4WEB
+               .Replace("@LabelForeColor ", "color:" + (LabelForeColor ?? "@LabelForeColor ") + ";")
+               .Replace("@LabelBackColor ", "background-color:" + (LabelBackColor ?? "@LabelBackColor ") + ";");
+
             return ReplacePropsInHTML(EbCtrlHTML);
         }
 
