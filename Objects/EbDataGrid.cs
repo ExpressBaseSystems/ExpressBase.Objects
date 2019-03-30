@@ -69,7 +69,6 @@ $.each(this.Controls.$values, function (i, col) {
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyGroup("test")]
         public bool IsAddable { get; set; }
-
         public override string GetToolHtml()
         {
             return @"<div eb-type='@toolName' class='tool'><i class='fa fa-table'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
@@ -78,9 +77,10 @@ $.each(this.Controls.$values, function (i, col) {
         {
             string html = @"
 <div class='grid-cont'>
-    <table id='tbl_@ebsid@' class='table table-bordered dgtbl'>
-        <thead>
-          <tr>";
+    <div class='Dg_head'>
+        <table id='tbl_@ebsid@_head' class='table table-bordered dgtbl'>
+            <thead>
+              <tr>";
             foreach (EbDGColumn col in Controls)
             {
                 if (!col.Hidden)
@@ -91,16 +91,27 @@ $.each(this.Controls.$values, function (i, col) {
             }
 
             html += @"
-            <th><span class='fa fa-cogs'></span></th>
-          </tr>
-        </thead>
-    </thead>
-    <tbody>";
+                <th style='width:55px;'><span class='fa fa-cogs'></span></th>
+              </tr>
+            </thead>
+        </table>
+    </div>";
 
             html += @"
-    </tbody>
-    </table>
-</div>";
+    <div class='Dg_body' style='overflow-y:scroll;height:@_height@px ;'>
+        <table id='tbl_@ebsid@' class='table table-bordered dgtbl'>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+    <div class='Dg_footer'>
+        <table id='tbl_@ebsid@_footer' class='table table-bordered dgtbl'>
+            <tbody>
+            </tbody>
+        </table>
+     </div>
+</div>".Replace("@_height@", this.Height.ToString());
+
             return html;
         }
 
