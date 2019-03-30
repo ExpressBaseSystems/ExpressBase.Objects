@@ -190,7 +190,7 @@ namespace ExpressBase.Objects
                     {
                         foreach (EbSimpleSelectOption opt in this.Options)
                         {
-                            _optionHtml += string.Format("<option data-tokens='{0}'>{1}</option>", opt.Value, opt.DisplayName);
+                            _optionHtml += string.Format("<option  value='{0}'>{1}</option>", opt.Value, opt.DisplayName);
                         }
                     }
                 }
