@@ -58,15 +58,25 @@ console.log(1000);
         let VMs = this.initializer.Vobj.valueMembers;
         let DMs = this.initializer.Vobj.displayMembers;
 
-        if (VMs.length > 0) {// clear if already values there
+        if (VMs.length > 0)// clear if already values there
             this.initializer.clearValues();
-        }
 
-        $.each(p1, function (i, row) {
-            VMs.push(getObjByval(row.Columns, 'Name', this.ValueMember.name).Value);
+        let valMsArr = p1[0].split(',');
+        let DMtable = p1[1];
 
+
+        $.each(valMsArr, function (i, vm) {
+            VMs.push(vm);
             $.each(this.DisplayMembers.$values, function (j, dm) {
-                DMs[dm.name].push(getObjByval(row.Columns, 'Name', dm.name).Value);
+                valMsArr;
+                DMtable;
+
+                $.each(DMtable, function (j, r) {
+                    if (getObjByval(r.Columns, 'Name', this.ValueMember.name).Value === vm) {
+                        let _dm = getObjByval(r.Columns, 'Name', dm.name).Value;
+                        DMs[dm.name].push(_dm);
+                    }
+                }.bind(this));
             }.bind(this));
         }.bind(this));
                 ";

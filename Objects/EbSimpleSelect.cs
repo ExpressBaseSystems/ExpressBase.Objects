@@ -86,6 +86,26 @@ namespace ExpressBase.Objects
             set { }
         }
 
+        public override string DisableJSfn
+        {
+            get
+            {
+                return @"
+                    return $('#' + this.EbSid_CtxId +'Wraper .dropdown-toggle').attr('disabled', 'disabled').css('pointer-events', 'none').find('[ui-inp]').css('background-color', '#f3f3f3');";
+            }
+            set { }
+        }
+
+        public override string EnableJSfn
+        {
+            get
+            {
+                return @"
+                    return $('#' + this.EbSid_CtxId +'Wraper .dropdown-toggle').attr('disabled', 'disabled').css('pointer-events', 'none').find('[ui-inp]').css('background-color', '#f3f3f3');";
+            }
+            set { }
+        }
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]

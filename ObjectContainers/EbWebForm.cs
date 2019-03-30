@@ -469,7 +469,7 @@ namespace ExpressBase.Objects
                             if(_schema.Tables[j].Columns[k].Control is EbPowerSelect)
                             {
                                 string t = (_schema.Tables[j].Columns[k].Control as EbPowerSelect).GetSelectQuery(service, _params[i].Value);
-                                QrsDict.Add(_params[i].Name, t);
+                                QrsDict.Add((_schema.Tables[j].Columns[k].Control as EbPowerSelect).EbSid, t);
                             }
                             if (!this.FormData.MultipleTables.ContainsKey(_schema.Tables[j].TableName))
                             {
