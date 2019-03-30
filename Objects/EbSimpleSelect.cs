@@ -46,7 +46,18 @@ namespace ExpressBase.Objects
         {
             get
             {
-                return @" $('#' + this.EbSid_CtxId).selectpicker('val', p1);";
+                return @" 
+                    isContained = false;
+                    $('#' + this.EbSid_CtxId + ' option').each(function () {
+                        if ($(this).attr('value') === p1) {
+                            isContained = true;
+                            return false;
+                        }
+                    });
+
+                    if(!isContained)
+                        return;
+                    $('#' + this.EbSid_CtxId).selectpicker('val', p1);";
             }
             set { }
         }
