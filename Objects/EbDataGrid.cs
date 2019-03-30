@@ -24,6 +24,9 @@ namespace ExpressBase.Objects
             this.Controls = new List<EbControl>();
         }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        public override int Height { get; set; }
+
         [JsonIgnore]
         public override string OnChangeBindJSFn
         {
