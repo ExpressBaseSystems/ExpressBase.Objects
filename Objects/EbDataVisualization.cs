@@ -399,36 +399,6 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
         public List<DVBaseColumn> OrderBy { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
-        [HideForUser]
-        [PropertyGroup("TreeVisualization")]
-        [OnChangeExec(@"
-        if(this.IsTree){
-            pg.ShowProperty('ParentColumn')
-            pg.ShowProperty('GroupingColumn')
-        }
-
-        else{
-            pg.HideProperty('ParentColumn')
-            pg.HideProperty('GroupingColumn')
-        }")]
-        public bool IsTree { get; set; }
-
-        [PropertyGroup("TreeVisualization")]
-        [EnableInBuilder(BuilderType.DVBuilder)]
-        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns",1)]
-        public List<DVBaseColumn> ParentColumn { get; set; }
-
-        [PropertyGroup("TreeVisualization")]
-        [EnableInBuilder(BuilderType.DVBuilder)]
-        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns",1)]
-        public List<DVBaseColumn> GroupingColumn { get; set; }
-
-        [PropertyGroup("TreeVisualization")]
-        [EnableInBuilder(BuilderType.DVBuilder)]
-        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", 1)]
-        public List<DVBaseColumn> TreeNode { get; set; }
-
         public static EbOperations Operations = TVOperations.Instance;
 
  //       public override string GetDesignHtml()
@@ -455,8 +425,8 @@ namespace ExpressBase.Objects
 			this.NotVisibleColumns = new List<DVBaseColumn>();
             this.CurrentRowGroup = new RowGroupParent();
             this.OrderBy = new List<DVBaseColumn>();
-            this.ParentColumn = new List<DVBaseColumn>();
-            this.GroupingColumn = new List<DVBaseColumn>();
+            //this.ParentColumn = new List<DVBaseColumn>();
+            //this.GroupingColumn = new List<DVBaseColumn>();
         }
 
         public override string DiscoverRelatedRefids()

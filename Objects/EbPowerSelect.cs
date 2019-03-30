@@ -229,7 +229,7 @@ console.log(1000);
 .Replace("@ebsid@", this.EbSid_CtxId)
 .Replace("@type@", ((int)obj.Type).ToString())
 .Replace("@sTitle@", obj.sTitle.ToString())
-.Replace("@perWidth@", "style='width:" + ((int)(100 / noOfFileds)).ToString() +"%'")
+.Replace("@perWidth@", "style='width:" + ((int)(100 / noOfFileds)).ToString() + "%'")
 .Replace("@border-r" + i, (i != noOfFileds - 1) ? "style='border-radius: 0px;'" : "");
                     i++;
                 }
@@ -329,7 +329,7 @@ console.log(1000);
 
 
         //INCOMPLETE
-        public string GetSelectQuery(Service service, string Col, string Tbl, string _id)
+        public string GetSelectQuery(Service service, string Col, string Tbl = null, string _id = null)
         {
             EbDataReader dr = service.Redis.Get<EbDataReader>(this.DataSourceId);
             if (dr == null)
@@ -338,22 +338,19 @@ console.log(1000);
                 dr = EbSerializers.Json_Deserialize(result.Data[0].Json);
                 service.Redis.Set<EbDataReader>(this.DataSourceId, dr);
             }
-            string dispcol = string.Join(",", this.DisplayMembers.Select(c => "__A." + c.Name));//powerselect table __A
 
-            //string whrcond = string.Join(" AND ", this.Values.Select(v => this.ValueMember.Name + "=" + v));
             string Sql = dr.Sql.Trim();
             if (Sql.LastIndexOf(";") == Sql.Length - 1)
                 Sql = Sql.Substring(0, Sql.Length - 1);
 
-            var tt = string.Format(@"SELECT 
-                                        __A.*
-                                    FROM 
-                                        ({2}) __A, {3} __B
-                                    WHERE 
-                                        __A.{0} = ANY(STRING_TO_ARRAY(__B.{4}::TEXT, ',')::INT[]) AND __B.{5} = :id;"
-                    , this.ValueMember.Name, dispcol, Sql, Tbl, Col, _id);            
-            return tt;
-            //a.id = any(string_to_array(b.set_id, ',')::int[]
+            if (Tbl == null || _id == null)
+                return string.Format(@"SELECT __A.* FROM ({0}) __A 
+                                    WHERE __A.{1} = ANY(STRING_TO_ARRAY({2}::TEXT, ',')::INT[]);",
+                                    Sql, this.ValueMember.Name, Col);
+            else
+                return string.Format(@"SELECT __A.* FROM ({0}) __A, {1} __B
+                                    WHERE __A.{2} = ANY(STRING_TO_ARRAY(__B.{3}::TEXT, ',')::INT[]) AND __B.{4} = :id;",
+                                        Sql, Tbl, this.ValueMember.Name, Col, _id);
         }
     }
 }

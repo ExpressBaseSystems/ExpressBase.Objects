@@ -110,6 +110,8 @@ namespace ExpressBase.Objects.Objects
                     result = ((x as NTV).Value).ToString();
                 else if (_data.Type == EbDbTypes.DateTime)
                     result = Convert.ToDateTime((x as NTV).Value);
+                else if(_data.Type == EbDbTypes.Boolean)
+                    result = Convert.ToBoolean((x as NTV).Value);
                 else
                     result = (x as NTV).Value.ToString();
 

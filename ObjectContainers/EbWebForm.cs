@@ -272,9 +272,12 @@ namespace ExpressBase.Objects
                             List<object> val = new List<object>();
                             for (int i = 0; i < FormData.MultipleTables[(c as EbDataGrid).TableName].Count; i++)
                             {
-                                val.Add(FormData.MultipleTables[(c as EbDataGrid).TableName][i][control.Name]);
-                                FormData.MultipleTables[(c as EbDataGrid).TableName][i].SetEbDbType(control.Name, control.EbDbType);
-                                FormData.MultipleTables[(c as EbDataGrid).TableName][i].SetControl(control.Name, control);
+                                if (FormData.MultipleTables[(c as EbDataGrid).TableName][i][control.Name] != null)
+                                {
+                                    val.Add(FormData.MultipleTables[(c as EbDataGrid).TableName][i][control.Name]);
+                                    FormData.MultipleTables[(c as EbDataGrid).TableName][i].SetEbDbType(control.Name, control.EbDbType);
+                                    FormData.MultipleTables[(c as EbDataGrid).TableName][i].SetControl(control.Name, control);
+                                }
                             }
                             control.ValueFE = val;
                         }
@@ -307,9 +310,12 @@ namespace ExpressBase.Objects
                 {
                     if (!c.DoNotPersist)
                     {
-                        c.ValueFE = FormData.MultipleTables[_container.TableName][0][c.Name];
-                        FormData.MultipleTables[_container.TableName][0].SetEbDbType(c.Name, c.EbDbType);
-                        FormData.MultipleTables[_container.TableName][0].SetControl(c.Name, c);
+                        if (FormData.MultipleTables[_container.TableName][0][c.Name] != null)
+                        {
+                            c.ValueFE = FormData.MultipleTables[_container.TableName][0][c.Name];
+                            FormData.MultipleTables[_container.TableName][0].SetEbDbType(c.Name, c.EbDbType);
+                            FormData.MultipleTables[_container.TableName][0].SetControl(c.Name, c);
+                        }
                     }
                 }
             }
@@ -347,7 +353,7 @@ namespace ExpressBase.Objects
             }
         }
 
-        public void RefreshformData(IDatabase DataDB, Service service)
+        public void RefreshFormData(IDatabase DataDB, Service service)
         {
             WebFormSchema _schema = this.GetWebFormSchema();
             string query = this.GetSelectQuery(_schema, service);
@@ -444,11 +450,14 @@ namespace ExpressBase.Objects
             //    GetWebformData_Extended(FormObj, FormData);
         }
 
-        public void RefreshFormData(List<Param> _params)
+        public void RefreshFormData(IDatabase DataDB, Service service, List<Param> _params)
         {
             WebFormSchema _schema = this.GetWebFormSchema();
-            this.FormData = new WebformData();
-            this.FormData.MasterTable = _schema.MasterTable;
+            this.FormData = new WebformData
+            {
+                MasterTable = _schema.MasterTable
+            };
+            Dictionary<string, string> QrsDict = new Dictionary<string, string>();
             for (int i = 0; i < _params.Count; i++)
             {
                 for (int j = 0; j < _schema.Tables.Count; j++)
@@ -457,6 +466,11 @@ namespace ExpressBase.Objects
                     {
                         if (_schema.Tables[j].Columns[k].ColumnName.Equals(_params[i].Name))
                         {
+                            if(_schema.Tables[j].Columns[k].Control is EbPowerSelect)
+                            {
+                                string t = (_schema.Tables[j].Columns[k].Control as EbPowerSelect).GetSelectQuery(service, _params[i].Value);
+                                QrsDict.Add(_params[i].Name, t);
+                            }
                             if (!this.FormData.MultipleTables.ContainsKey(_schema.Tables[j].TableName))
                             {
                                 SingleTable tbl = new SingleTable();
@@ -473,6 +487,17 @@ namespace ExpressBase.Objects
                     }
                 }
             }
+            if(QrsDict.Count > 0)
+            {
+                EbDataSet dataset = DataDB.DoQueries(string.Join(" ", QrsDict.Select(d => d.Value)), new DbParameter[] { });
+                int i = 0;
+                foreach (KeyValuePair<string, string> item in QrsDict)
+                {
+                    SingleTable Table = new SingleTable();
+                    GetFormattedData(dataset.Tables[i++], Table);
+                    this.FormData.ExtendedTables.Add(item.Key, Table);
+                }
+            }
         }
 
         public int Save(IDatabase DataDB, Service service)
@@ -485,7 +510,7 @@ namespace ExpressBase.Objects
                 this.TableRowId = this.Insert(DataDB);
                 r = 1;
             }
-            this.RefreshformData(DataDB, service);
+            this.RefreshFormData(DataDB, service);
             return r;
         }
 
