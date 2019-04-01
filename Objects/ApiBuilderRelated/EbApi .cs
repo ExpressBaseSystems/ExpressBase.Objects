@@ -287,16 +287,18 @@ namespace ExpressBase.Objects
                     </div>".RemoveCR().DoubleQuoted();
         }
 
-        public ApiScript Evaluate(ApiResources _prevres)
+        public ApiScript Evaluate(ApiResources _prevres, Dictionary<string, object> GlobalParams)
         {
             string code = this.Script.Code.Trim();
             ApiScript script = new ApiScript();
-            var scriptoptions = ScriptOptions.Default;
-            scriptoptions.WithReferences("Microsoft.CSharp", "System.Core");
-            scriptoptions.AddReferences(typeof(ExpressBase.Common.EbDataSet).Assembly);
-            scriptoptions.WithImports("System.Dynamic", "System", "System.Collections.Generic","System.Diagnostics", "System.Linq");
 
-            Script valscript = CSharpScript.Create<dynamic>(code, scriptoptions, globalsType: typeof(ApiGlobals));
+            Script valscript = CSharpScript.Create<dynamic>(code,
+                ScriptOptions.Default.WithReferences("Microsoft.CSharp", "System.Core")
+                .WithImports("System.Dynamic", "System", "System.Collections.Generic", "System.Diagnostics", "System.Linq")
+                .AddReferences(typeof(ExpressBase.Common.EbDataSet).Assembly),
+                globalsType: typeof(ApiGlobals));
+
+
             EbDataSet _ds = _prevres.Result as EbDataSet;
             try
             {
@@ -310,6 +312,17 @@ namespace ExpressBase.Objects
             try
             {
                 ApiGlobals globals = new ApiGlobals(_ds);
+
+                foreach (KeyValuePair<string, object> kp in GlobalParams)
+                {
+                    globals["Params"].Add(kp.Key, new NTV
+                    {
+                        Name = kp.Key,
+                        Type = (EbDbTypes)Enum.Parse(typeof(EbDbTypes), kp.Value.GetType().Name, true),
+                        Value = kp.Value
+                    });
+                }
+
                 script.Data = JsonConvert.SerializeObject(valscript.RunAsync(globals).Result.ReturnValue);
             }
             catch (Exception e)
@@ -362,7 +375,7 @@ namespace ExpressBase.Objects
     }
 
     [EnableInBuilder(BuilderType.ApiBuilder)]
-    public class EbThirdPartyApi: ApiResources
+    public class EbThirdPartyApi : ApiResources
     {
         [EnableInBuilder(BuilderType.ApiBuilder)]
         public string Url { set; get; }
@@ -387,8 +400,15 @@ namespace ExpressBase.Objects
                     </div>".RemoveCR().DoubleQuoted();
         }
 
-        public string Execute(List<Param> param)
+        private List<Param> GetParams()
         {
+            return this.Parameters.Select(i => new Param { Name = i.Name, Type = i.Type.ToString(), Value = i.Value })
+                    .ToList();
+        }
+
+        public string Execute()
+        {
+            List<Param> param = this.GetParams();
             var uri = new Uri(this.Url);
             HttpResponseMessage response = null;
             using (var client = new HttpClient())
@@ -434,7 +454,7 @@ namespace ExpressBase.Objects
     }
 
     [EnableInBuilder(BuilderType.ApiBuilder)]
-    public class RequestHeader:EbApiWrapper
+    public class RequestHeader : EbApiWrapper
     {
         [EnableInBuilder(BuilderType.ApiBuilder)]
         public string Value { set; get; }

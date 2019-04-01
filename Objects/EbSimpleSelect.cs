@@ -46,7 +46,18 @@ namespace ExpressBase.Objects
         {
             get
             {
-                return @" $('#' + this.EbSid_CtxId).selectpicker('val', p1);";
+                return @" 
+                    isContained = false;
+                    $('#' + this.EbSid_CtxId + ' option').each(function () {
+                        if ($(this).attr('value') === p1) {
+                            isContained = true;
+                            return false;
+                        }
+                    });
+
+                    if(!isContained)
+                        return;
+                    $('#' + this.EbSid_CtxId).selectpicker('val', p1);";
             }
             set { }
         }
@@ -82,6 +93,26 @@ namespace ExpressBase.Objects
                 return @"
                     return $('#' + this.EbSid_CtxId +' :selected').text();
                 ";
+            }
+            set { }
+        }
+
+        public override string DisableJSfn
+        {
+            get
+            {
+                return @"
+                    return $('#' + this.EbSid_CtxId +'Wraper .dropdown-toggle').attr('disabled', 'disabled').css('pointer-events', 'none').find('[ui-inp]').css('background-color', '#f3f3f3');";
+            }
+            set { }
+        }
+
+        public override string EnableJSfn
+        {
+            get
+            {
+                return @"
+                    return $('#' + this.EbSid_CtxId +'Wraper .dropdown-toggle').prop('disabled',false).css('pointer-events', 'inherit').find('[ui-inp]').css('background-color', '#fff');";
             }
             set { }
         }
@@ -170,7 +201,7 @@ namespace ExpressBase.Objects
                     {
                         foreach (EbSimpleSelectOption opt in this.Options)
                         {
-                            _optionHtml += string.Format("<option data-tokens='{0}'>{1}</option>", opt.Value, opt.DisplayName);
+                            _optionHtml += string.Format("<option  value='{0}'>{1}</option>", opt.Value, opt.DisplayName);
                         }
                     }
                 }
@@ -247,7 +278,7 @@ namespace ExpressBase.Objects
 
 .Replace("@PlaceHolder@", (PlaceHolder ?? ""))
 .Replace("@options@", this.OptionHtml)
-.Replace("@-sel-@", this.IsMultiSelect ? string.Empty : "<option selected value='-1' style='color: #6f6f6f;'> -- nothing selected -- </option>")
+.Replace("@-sel-@", this.IsMultiSelect ? string.Empty : "<option selected value='-1' style='color: #6f6f6f;'> -- select -- </option>")
 .Replace("@data-ebtype@", "16");
         }
 

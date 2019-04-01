@@ -110,6 +110,8 @@ namespace ExpressBase.Objects.Objects
                     result = ((x as NTV).Value).ToString();
                 else if (_data.Type == EbDbTypes.DateTime)
                     result = Convert.ToDateTime((x as NTV).Value);
+                else if(_data.Type == EbDbTypes.Boolean)
+                    result = Convert.ToBoolean((x as NTV).Value);
                 else
                     result = (x as NTV).Value.ToString();
 
@@ -137,6 +139,8 @@ namespace ExpressBase.Objects.Objects
 
     public class ApiGlobals
     {
+        public dynamic Params { get; set; }
+
         public List<EbDataTable> Tables { set; get; }
 
         public ApiGlobals() { }
@@ -144,6 +148,19 @@ namespace ExpressBase.Objects.Objects
         public ApiGlobals(EbDataSet _ds)
         {
             this.Tables = _ds.Tables;
+
+            Params = new NTVDict();
+        }
+
+        public dynamic this[string key]
+        {
+            get
+            {
+                if (key == "Params")
+                    return this.Params;
+                else
+                    return null;
+            }
         }
     }
 
@@ -201,7 +218,7 @@ namespace ExpressBase.Objects.Objects
             {
                 ListNTV temp = this.Rows[0];
                 value = temp[name];
-            }            
+            }
             if (value != null)
             {
                 result = value;

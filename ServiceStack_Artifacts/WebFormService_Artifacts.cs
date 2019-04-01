@@ -1,4 +1,5 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
 using ExpressBase.Common.Objects;
 using ServiceStack;
@@ -51,8 +52,27 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public ResponseStatus ResponseStatus { get; set; }
 	}
 
+    [DataContract]
+    public class GetPrefillDataRequest : EbServiceStackAuthRequest, IReturn<GetPrefillDataResponse>
+    {
+        [DataMember(Order = 1)]
+        public string RefId { get; set; }
 
-	[DataContract]
+        [DataMember(Order = 2)]
+        public List<Param> Params { get; set; }
+    }
+
+    [DataContract]
+    public class GetPrefillDataResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public WebformData FormData { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    [DataContract]
 	public class DoUniqueCheckRequest : EbServiceStackAuthRequest, IReturn<GetRowDataResponse>
 	{
 		[DataMember(Order = 1)]

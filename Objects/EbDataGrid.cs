@@ -5,7 +5,9 @@ using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
 using ExpressBase.Objects.Helpers;
 using ExpressBase.Objects.Objects.DVRelated;
+using ExpressBase.Objects.ServiceStack_Artifacts;
 using Newtonsoft.Json;
+using ServiceStack;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,6 +23,9 @@ namespace ExpressBase.Objects
         {
             this.Controls = new List<EbControl>();
         }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        public override int Height { get; set; }
 
         [JsonIgnore]
         public override string OnChangeBindJSFn
@@ -67,7 +72,6 @@ $.each(this.Controls.$values, function (i, col) {
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyGroup("test")]
         public bool IsAddable { get; set; }
-
         public override string GetToolHtml()
         {
             return @"<div eb-type='@toolName' class='tool'><i class='fa fa-table'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
@@ -76,28 +80,41 @@ $.each(this.Controls.$values, function (i, col) {
         {
             string html = @"
 <div class='grid-cont'>
-    <table id='tbl_@ebsid@' class='table table-bordered dgtbl'>
-        <thead>
-          <tr>";
+    <div class='Dg_head'>
+        <table id='tbl_@ebsid@_head' class='table table-bordered dgtbl'>
+            <thead>
+              <tr>";
             foreach (EbDGColumn col in Controls)
             {
                 if (!col.Hidden)
-                    html += string.Concat("<th style='width: @Width@;' title='", col.Title, "'><span class='grid-col-title'>", col.Title, "</span>@req@</th>")
+                    html += string.Concat("<th style='width: @Width@; @bg@' title='", col.Title, "'><span class='grid-col-title'>", col.Title, "</span>@req@</th>")
                         .Replace("@req@", (col.Required ? "<sup style='color: red'>*</sup>" : string.Empty))
-                        .Replace("@Width@", (col.Width <= 0) ? "auto" : col.Width.ToString() + "px");
+                        .Replace("@Width@", (col.Width <= 0) ? "auto" : col.Width.ToString() + "px")
+                        .Replace("@bg@", col.IsDisable ? "background-color:#fafafa; color:#555" : string.Empty);
             }
 
             html += @"
-            <th><span class='fa fa-cogs'></span></th>
-          </tr>
-        </thead>
-    </thead>
-    <tbody>";
+                <th style='width:55px;'><span class='fa fa-cogs'></span></th>
+              </tr>
+            </thead>
+        </table>
+    </div>";
 
             html += @"
-    </tbody>
-    </table>
-</div>";
+    <div class='Dg_body' style='overflow-y:scroll;height:@_height@px ;'>
+        <table id='tbl_@ebsid@' class='table table-bordered dgtbl'>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+    <div class='Dg_footer'>
+        <table id='tbl_@ebsid@_footer' class='table table-bordered dgtbl'>
+            <tbody>
+            </tbody>
+        </table>
+     </div>
+</div>".Replace("@_height@", this.Height.ToString());
+
             return html;
         }
 
@@ -161,10 +178,10 @@ $.each(this.Controls.$values, function (i, col) {
         }
 
         [JsonIgnore]
-        public override string EnableJSfn { get { return @"$('[ebsid='+this.__DG.EbSid+']').find(`tr[is-editing='true'] [colname=${this.Name}] .ctrl-cover *`).prop('disabled',false).css('pointer-events', 'inherit').find('input').css('background-color','#fff');;"; } set { } }
+        public override string EnableJSfn { get { return @"$('[ebsid='+this.__DG.EbSid+']').find(`tr[is-editing='true'] [colname=${this.Name}] .ctrl-cover *`).prop('disabled',false).css('pointer-events', 'inherit').find('input').css('background-color','#fff');"; } set { } }
 
         [JsonIgnore]
-        public override string DisableJSfn { get { return @"$('[ebsid='+this.__DG.EbSid+']').find(`tr[is-editing='true'] [colname=${this.Name}] .ctrl-cover *`).attr('disabled', 'disabled').css('pointer-events', 'none').find('input').css('background-color','#eee');;"; } set { } }
+        public override string DisableJSfn { get { return @"$('[ebsid='+this.__DG.EbSid+']').find(`tr[is-editing='true'] [colname=${this.Name}] .ctrl-cover *`).attr('disabled', 'disabled').css('pointer-events', 'none').find('input').css('background-color','#eee');"; } set { } }
 
         [JsonIgnore]
         public override string ClearJSfn { get { return @"$('[ebsid='+this.__DG.EbSid+']').find(`tr[is-editing='true'] [colname=${this.Name}] [ui-inp]`).val('');"; } set { } }
@@ -185,6 +202,9 @@ $.each(this.Controls.$values, function (i, col) {
 
         [EnableInBuilder(BuilderType.WebForm)]
         public virtual string InputControlType { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        public bool IsDisable { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         public bool IsEditable { get; set; }
@@ -396,7 +416,21 @@ $.each(this.Controls.$values, function (i, col) {
     [UsedWithTopObjectParent(typeof(EbObject))]
     public class EbDGPowerSelectColumn : EbDGColumn
     {
-        public bool MultiSelect { get; set; }
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+        public bool MultiSelect
+        {
+            get { return this.EbPowerSelect.MultiSelect; }
+            set { this.EbPowerSelect.MultiSelect = value; }
+        }
+
+
+
+        [JsonIgnore]
+        public override string SetDisplayMemberJSfn
+        {
+            get { return this.EbPowerSelect.SetDisplayMemberJSfn; }
+            set { }
+        }
 
         [JsonIgnore]
         private EbPowerSelect EbPowerSelect { get; set; }
@@ -413,6 +447,20 @@ $.each(this.Controls.$values, function (i, col) {
         {
             get { return this.EbPowerSelect.DataSourceId; }
             set { this.EbPowerSelect.DataSourceId = value; }
+        }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        public int MaxLimit
+        {
+            get { return this.EbPowerSelect.MaxLimit; }
+            set { this.EbPowerSelect.MaxLimit = value; }
+        }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        public int MinLimit
+        {
+            get { return this.EbPowerSelect.MaxLimit; }
+            set { this.EbPowerSelect.MinLimit = value; }
         }
 
         public override string GetBareHtml()
@@ -488,5 +536,33 @@ else {pg.MakeReadWrite('ValueMember');}")]
 
         [EnableInBuilder(BuilderType.WebForm)]
         public override string InputControlType { get { return "EbPowerSelect"; } }
+
+        //INCOMPLETE
+        public string GetSelectQuery(Service service, string Col, string Tbl, string _id)
+        {
+            EbDataReader dr = service.Redis.Get<EbDataReader>(this.DataSourceId);
+            if (dr == null)
+            {
+                var result = service.Gateway.Send<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = this.DataSourceId });
+                dr = EbSerializers.Json_Deserialize(result.Data[0].Json);
+                service.Redis.Set<EbDataReader>(this.DataSourceId, dr);
+            }
+            string dispcol = string.Join(",", this.DisplayMembers.Select(c => "__A." + c.Name));//powerselect table __A
+
+            //string whrcond = string.Join(" AND ", this.Values.Select(v => this.ValueMember.Name + "=" + v));
+            string Sql = dr.Sql.Trim();
+            if (Sql.LastIndexOf(";") == Sql.Length - 1)
+                Sql = Sql.Substring(0, Sql.Length - 1);
+
+            var tt = string.Format(@"SELECT 
+                                        __A.*
+                                    FROM 
+                                        ({2}) __A, {3} __B
+                                    WHERE 
+                                        __A.{0} = ANY(STRING_TO_ARRAY(__B.{4}::TEXT, ',')::INT[]) AND __B.{5} = :id;"
+                    , this.ValueMember.Name, dispcol, Sql, Tbl, Col, _id);
+            return tt;
+            //a.id = any(string_to_array(b.set_id, ',')::int[]
+        }
     }
 }
