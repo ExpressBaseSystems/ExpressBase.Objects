@@ -176,6 +176,27 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
+    [DataContract]
+    public class CancelDataFromWebformRequest : EbServiceStackAuthRequest, IReturn<CancelDataFromWebformResponse>
+    {
+        [DataMember(Order = 1)]
+        public string RefId { get; set; }
+
+        [DataMember(Order = 2)]
+        public int RowId { get; set; }
+    }
+
+    [DataContract]
+    public class CancelDataFromWebformResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public int RowAffected { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+
 
     //=============================================== AUDIT TRAIL ====================================================
 

@@ -43,6 +43,16 @@ namespace ExpressBase.Objects
         public int UserId { get; set; }
 
         public int LocationId { get; set; }
+                
+        [PropertyGroup("Events")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorSQ)]
+        public EbScript BeforeDelete { get; set; }
+
+        [PropertyGroup("Events")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorSQ)]
+        public EbScript BeforeCancel { get; set; }
 
         public static EbOperations Operations = WFOperations.Instance;
 
@@ -148,6 +158,21 @@ namespace ExpressBase.Objects
                 if (_table.TableName != _schema.MasterTable)
                     _id = _schema.MasterTable + "_id";
                 query += string.Format("UPDATE {0} SET eb_del='T',eb_lastmodified_by = :eb_modified_by, eb_lastmodified_at = NOW() WHERE {1} = :id AND eb_del='F';", _table.TableName, _id);
+            }
+            return query;
+        }
+
+        public string GetCancelQuery(WebFormSchema _schema = null)
+        {
+            string query = string.Empty;
+            if (_schema == null)
+                _schema = this.GetWebFormSchema();
+            foreach (TableSchema _table in _schema.Tables)
+            {
+                string _id = "id";
+                if (_table.TableName != _schema.MasterTable)
+                    _id = _schema.MasterTable + "_id";
+                query += string.Format("UPDATE {0} SET eb_void='T',eb_lastmodified_by = :eb_modified_by, eb_lastmodified_at = NOW() WHERE {1} = :id AND eb_void='F' AND eb_del='F';", _table.TableName, _id);
             }
             return query;
         }
@@ -328,6 +353,8 @@ namespace ExpressBase.Objects
                 SingleRow Row = new SingleRow();
                 foreach (EbDataColumn dataColumn in dataTable.Columns)
                 {
+                    if (dataRow.IsDBNull(dataColumn.ColumnIndex))
+                        continue;
                     object _unformattedData = dataRow[dataColumn.ColumnIndex];
                     object _formattedData = _unformattedData;
 
@@ -540,6 +567,8 @@ namespace ExpressBase.Objects
                                 if (!(rField.Control is EbAutoId))
                                 {
                                     _colvals += string.Concat(rField.Name, "=:", rField.Name, "_", i, ",");
+                                    if (rField.Value == null)
+                                        rField.Value = DBNull.Value;
                                     param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
                                 }
                             }
@@ -555,6 +584,8 @@ namespace ExpressBase.Objects
                         {
                             _cols += string.Concat(rField.Name, ",");
                             _vals += string.Concat(":", rField.Name, "_", i, ",");
+                            if (rField.Value == null)
+                                rField.Value = DBNull.Value;
                             param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
                         }
                         fullqry += string.Format(_qry, _tblname, _cols, _vals, this.FormData.MasterTable, this.FormData.MasterTable);
@@ -635,6 +666,8 @@ namespace ExpressBase.Objects
                         {
                             _cols += string.Concat(rField.Name, ", ");
                             _values += string.Concat(":", rField.Name, "_", i, ", ");
+                            if (rField.Value == null)
+                                rField.Value = DBNull.Value;
                             param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
                         }
                     }
@@ -697,12 +730,54 @@ namespace ExpressBase.Objects
 
         public int Delete(IDatabase DataDB)
         {
-            string query = this.GetDeleteQuery();
-            DbParameter[] param = new DbParameter[] {
-                DataDB.GetNewParameter("eb_modified_by", EbDbTypes.Int32, this.UserId),
-                DataDB.GetNewParameter("id", EbDbTypes.Int32, this.TableRowId)
-            };
-            return DataDB.UpdateTable(query, param);
+            int s = -1;
+            if (this.BeforeDelete != null && !this.BeforeDelete.Code.IsNullOrEmpty())
+            {
+                DbParameter[] p = new DbParameter[] {
+                    DataDB.GetNewParameter("id", EbDbTypes.Int32, this.TableRowId)
+                };
+                EbDataTable t = DataDB.DoQuery(this.BeforeDelete.Code, p);
+                if(t.Rows.Count > 0 && t.Rows[0].Count > 0)
+                {
+                    s = Convert.ToInt32(t.Rows[0][0]);
+                }
+            }
+            if(s != 0)
+            {
+                string query = this.GetDeleteQuery();
+                DbParameter[] param = new DbParameter[] {
+                    DataDB.GetNewParameter("eb_modified_by", EbDbTypes.Int32, this.UserId),
+                    DataDB.GetNewParameter("id", EbDbTypes.Int32, this.TableRowId)
+                };
+                return DataDB.UpdateTable(query, param);
+            }
+            return -1;
+        }
+
+        public int Cancel(IDatabase DataDB)
+        {
+            int s = -1;
+            if (this.BeforeCancel != null && !this.BeforeCancel.Code.IsNullOrEmpty())
+            {
+                DbParameter[] p = new DbParameter[] {
+                    DataDB.GetNewParameter("id", EbDbTypes.Int32, this.TableRowId)
+                };
+                EbDataTable t = DataDB.DoQuery(this.BeforeCancel.Code, p);
+                if (t.Rows.Count > 0 && t.Rows[0].Count > 0)
+                {
+                    s = Convert.ToInt32(t.Rows[0][0]);
+                }
+            }
+            if (s != 0)
+            {
+                string query = this.GetCancelQuery();
+                DbParameter[] param = new DbParameter[] {
+                    DataDB.GetNewParameter("eb_modified_by", EbDbTypes.Int32, this.UserId),
+                    DataDB.GetNewParameter("id", EbDbTypes.Int32, this.TableRowId)
+                };
+                return DataDB.UpdateTable(query, param);
+            }
+            return -1;
         }
 
 
