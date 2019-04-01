@@ -181,6 +181,14 @@ namespace ExpressBase.Objects.Objects.DVRelated
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iTableVisualization, EbObjectTypes.iChartVisualization, EbObjectTypes.iReport, EbObjectTypes.iWebForm)]
         [OnChangeExec(@"
+pg.HideProperty('ParentColumn');
+    pg.HideProperty('GroupingColumn');
+    pg.HideProperty('GroupFormLink');
+    pg.HideProperty('ItemFormLink');
+pg.HideProperty('GroupFormParameters');
+    pg.HideProperty('GroupFormId');
+    pg.HideProperty('ItemFormParameters');
+    pg.HideProperty('ItemFormId');
 if(this.LinkRefId !== null){
     if(this.LinkRefId.split('-')[2] === '0'){
         pg.ShowProperty('FormMode');
@@ -213,12 +221,10 @@ else{
 }")]
         public WebFormDVModes FormMode { get; set; }
 
-        [PropertyGroup("TreeVisualization")]
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Parent.Columns")]
         public List<DVBaseColumn> FormId { get; set; }
 
-        [PropertyGroup("TreeVisualization")]
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Parent.Columns")]
         public List<DVBaseColumn> FormParameters { get; set; }
