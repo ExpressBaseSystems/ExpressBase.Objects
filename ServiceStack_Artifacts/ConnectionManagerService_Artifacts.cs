@@ -148,4 +148,117 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
     }
+
+    //--------------------------------------------------------------------------Integrations--------------------------------------
+    public class AddDBRequest : IReturn<AddDBResponse>, IEbSSRequest
+    {
+        public EbDbConfig DbConfig { get; set; }
+
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
+
+        //public bool IsNew { get; set; }
+
+        public string SolutionId { get; set; }
+    }
+
+    public class AddDBResponse : IEbSSResponse
+    {
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    public class GetIntegrationConfigsRequest : IReturn<GetIntegrationConfigsResponse>, IEbSSRequest
+    {
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
+    }
+
+    public class GetIntegrationConfigsResponse : IEbSSResponse
+    {
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    public class GetIntegrationsRequest : IReturn<GetIntegrationsResponse>, IEbSSRequest
+    {
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
+    }
+
+    public class GetIntegrationsResponse : IEbSSResponse
+    {
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    public class AddTwilioRequest : IReturn<AddTwilioResponse>, IEbSSRequest
+    {
+        public EbTwilioConfig Config { get; set; }
+
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
+    }
+
+    public class AddTwilioResponse : IEbSSResponse
+    {
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    public class AddETRequest : IReturn<AddETResponse>, IEbSSRequest
+    {
+        public EbExpertTextingConfig Config { get; set; }
+
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
+    }
+
+    public class AddETResponse : IEbSSResponse
+    {
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    public class AddMongoRequest : IReturn<AddMongoResponse>, IEbSSRequest
+    {
+        public EbMongoConfig Config { get; set; }
+
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
+    }
+
+    public class AddMongoResponse : IEbSSResponse
+    {
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    public class AddSmtpRequest : IReturn<AddMongoResponse>, IEbSSRequest
+    {
+        public EbSmtpConfig Config { get; set; }
+
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
+    }
+
+    public class AddSmtpResponse : IEbSSResponse
+    {
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    public class EbIntegrationRequest : IReturn<EbIntegrationResponse>, IEbSSRequest
+    {
+        public EbIntegration IntegrationO { get; set; }
+
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
+    }
+
+    public class EbIntegrationResponse : IEbSSResponse
+    {
+        public ResponseStatus ResponseStatus { get; set; }
+    }
 }
