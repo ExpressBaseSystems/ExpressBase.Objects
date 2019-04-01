@@ -159,7 +159,7 @@ $.each(this.Controls.$values, function (i, col) {
             get
             {
                 return @"
-                     $('[ebsid='+this.__DG.EbSid+']').find(`tr[is-editing='true'] [colname=${this.Name}] [ui-inp]`).val(p1);
+                     $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val(p1);
                 ";
             }
             set { }
