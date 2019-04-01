@@ -67,6 +67,10 @@ namespace ExpressBase.Objects.Objects
                             $('#' + this.EbSid_CtxId).next('div').children().find('[value='+val+']').trigger('click');
                         }.bind(this));
                     }
+                    else{
+                        $('#' + this.EbSid_CtxId).next('div').children().find('[value=multiselect-all]').trigger('click');
+                        $('#' + this.EbSid_CtxId+'_checkbox').prop('checked', true);                           
+                    }
                 ";
             }
             set { }
