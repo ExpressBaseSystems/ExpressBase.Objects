@@ -317,6 +317,8 @@ $.each(this.Controls.$values, function (i, col) {
             this.EbSimpleSelect = new EbSimpleSelect();
         }
 
+        public override string GetDisplayMemberJSfn { get { return @" return $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp] :selected`).text(); "; } set { } }
+
         [EnableInBuilder(BuilderType.WebForm)]
         public override string InputControlType { get { return "EbSimpleSelect"; } }
 
