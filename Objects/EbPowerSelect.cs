@@ -192,7 +192,15 @@ console.log(1000);
                     pg.setSimpleProperty('MinLimit', 0);
                 }
             }")]
-        public bool MultiSelect { get; set; }
+
+        public bool MultiSelect
+        {
+            get
+            {
+                return this.MaxLimit != 1;
+            }
+            set { }
+        }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         public int MaxLimit { get; set; }
