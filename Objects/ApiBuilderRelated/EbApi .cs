@@ -30,6 +30,19 @@ namespace ExpressBase.Objects
         }
     }
 
+    public class ApiParams
+    {
+        public List<Param> Default { set; get; }
+
+        public List<Param> Custom { set; get; }
+
+        public ApiParams()
+        {
+            Default = new List<Param>();
+            Custom = new List<Param>();
+        }
+    }
+
     public abstract class EbApiWrapper : EbObject
     {
 
@@ -60,6 +73,10 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.ApiBuilder)]
         [HideInPropertyGrid]
         public ListOrdered Resources { set; get; }
+
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        [HideInPropertyGrid]
+        public ApiParams Request { set; get; }
     }
 
     public abstract class ApiResources : EbApiWrapper
