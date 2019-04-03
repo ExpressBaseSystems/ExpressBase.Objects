@@ -58,15 +58,25 @@ console.log(1000);
         let VMs = this.initializer.Vobj.valueMembers;
         let DMs = this.initializer.Vobj.displayMembers;
 
-        if (VMs.length > 0) {// clear if already values there
+        if (VMs.length > 0)// clear if already values there
             this.initializer.clearValues();
-        }
 
-        $.each(p1, function (i, row) {
-            VMs.push(getObjByval(row.Columns, 'Name', this.ValueMember.name).Value);
+        let valMsArr = p1[0].split(',');
+        let DMtable = p1[1];
 
+
+        $.each(valMsArr, function (i, vm) {
+            VMs.push(vm);
             $.each(this.DisplayMembers.$values, function (j, dm) {
-                DMs[dm.name].push(getObjByval(row.Columns, 'Name', dm.name).Value);
+                valMsArr;
+                DMtable;
+
+                $.each(DMtable, function (j, r) {
+                    if (getObjByval(r.Columns, 'Name', this.ValueMember.name).Value === vm) {
+                        let _dm = getObjByval(r.Columns, 'Name', dm.name).Value;
+                        DMs[dm.name].push(_dm);
+                    }
+                }.bind(this));
             }.bind(this));
         }.bind(this));
                 ";
@@ -182,7 +192,15 @@ console.log(1000);
                     pg.setSimpleProperty('MinLimit', 0);
                 }
             }")]
-        public bool MultiSelect { get; set; }
+
+        public bool MultiSelect
+        {
+            get
+            {
+                return this.MaxLimit != 1;
+            }
+            set { }
+        }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         public int MaxLimit { get; set; }
@@ -229,7 +247,7 @@ console.log(1000);
 .Replace("@ebsid@", this.EbSid_CtxId)
 .Replace("@type@", ((int)obj.Type).ToString())
 .Replace("@sTitle@", obj.sTitle.ToString())
-.Replace("@perWidth@", "style='width:" + ((int)(100 / noOfFileds)).ToString() +"%'")
+.Replace("@perWidth@", "style='width:" + ((int)(100 / noOfFileds)).ToString() + "%'")
 .Replace("@border-r" + i, (i != noOfFileds - 1) ? "style='border-radius: 0px;'" : "");
                     i++;
                 }
@@ -298,7 +316,7 @@ console.log(1000);
             {
                 return @"
 <div id='@ebsid@Container'  role='form' data-toggle='validator' style='width:100%;'>
-    <input type='hidden' name='@ebsid@Hidden4val' data-ebtype='8' id='@ebsid@'/>
+    <input type='hidden' ui-inp name='@ebsid@Hidden4val' data-ebtype='8' id='@ebsid@'/>
     @VueSelectCode
     <center class='pow-center'>
         <div id='@ebsid@DDdiv' v-show='DDstate' class='DDdiv expand-transition'  style='width:@DDwidth%;'> 
@@ -329,7 +347,7 @@ console.log(1000);
 
 
         //INCOMPLETE
-        public string GetSelectQuery(Service service, string Col, string Tbl, string _id)
+        public string GetSelectQuery(Service service, string Col, string Tbl = null, string _id = null)
         {
             EbDataReader dr = service.Redis.Get<EbDataReader>(this.DataSourceId);
             if (dr == null)
@@ -338,22 +356,19 @@ console.log(1000);
                 dr = EbSerializers.Json_Deserialize(result.Data[0].Json);
                 service.Redis.Set<EbDataReader>(this.DataSourceId, dr);
             }
-            string dispcol = string.Join(",", this.DisplayMembers.Select(c => "__A." + c.Name));//powerselect table __A
 
-            //string whrcond = string.Join(" AND ", this.Values.Select(v => this.ValueMember.Name + "=" + v));
             string Sql = dr.Sql.Trim();
             if (Sql.LastIndexOf(";") == Sql.Length - 1)
                 Sql = Sql.Substring(0, Sql.Length - 1);
 
-            var tt = string.Format(@"SELECT 
-                                        __A.*
-                                    FROM 
-                                        ({2}) __A, {3} __B
-                                    WHERE 
-                                        __A.{0} = ANY(STRING_TO_ARRAY(__B.{4}::TEXT, ',')::INT[]) AND __B.{5} = :id;"
-                    , this.ValueMember.Name, dispcol, Sql, Tbl, Col, _id);            
-            return tt;
-            //a.id = any(string_to_array(b.set_id, ',')::int[]
+            if (Tbl == null || _id == null)
+                return string.Format(@"SELECT __A.* FROM ({0}) __A 
+                                    WHERE __A.{1} = ANY(STRING_TO_ARRAY({2}::TEXT, ',')::INT[]);",
+                                    Sql, this.ValueMember.Name, Col);
+            else
+                return string.Format(@"SELECT __A.* FROM ({0}) __A, {1} __B
+                                    WHERE __A.{2} = ANY(STRING_TO_ARRAY(__B.{3}::TEXT, ',')::INT[]) AND __B.{4} = :id;",
+                                        Sql, Tbl, this.ValueMember.Name, Col, _id);
         }
     }
 }

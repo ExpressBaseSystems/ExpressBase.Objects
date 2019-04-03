@@ -7,6 +7,7 @@ using ExpressBase.Common.Structures;
 using ExpressBase.Data;
 using ExpressBase.Objects.Objects;
 using ExpressBase.Objects.ServiceStack_Artifacts;
+using ExpressBase.Security;
 using Newtonsoft.Json;
 using ServiceStack;
 using ServiceStack.Redis;
@@ -42,7 +43,19 @@ namespace ExpressBase.Objects
 
         public int UserId { get; set; }
 
+        public User UserObj { get; set; }
+
         public int LocationId { get; set; }
+                
+        [PropertyGroup("Events")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        public List<EbSQLValidator> DisableDelete { get; set; }
+
+        [PropertyGroup("Events")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        public List<EbSQLValidator> DisableCancel { get; set; }
 
         public static EbOperations Operations = WFOperations.Instance;
 
@@ -148,6 +161,21 @@ namespace ExpressBase.Objects
                 if (_table.TableName != _schema.MasterTable)
                     _id = _schema.MasterTable + "_id";
                 query += string.Format("UPDATE {0} SET eb_del='T',eb_lastmodified_by = :eb_modified_by, eb_lastmodified_at = NOW() WHERE {1} = :id AND eb_del='F';", _table.TableName, _id);
+            }
+            return query;
+        }
+
+        public string GetCancelQuery(WebFormSchema _schema = null)
+        {
+            string query = string.Empty;
+            if (_schema == null)
+                _schema = this.GetWebFormSchema();
+            foreach (TableSchema _table in _schema.Tables)
+            {
+                string _id = "id";
+                if (_table.TableName != _schema.MasterTable)
+                    _id = _schema.MasterTable + "_id";
+                query += string.Format("UPDATE {0} SET eb_void='T',eb_lastmodified_by = :eb_modified_by, eb_lastmodified_at = NOW() WHERE {1} = :id AND eb_void='F' AND eb_del='F';", _table.TableName, _id);
             }
             return query;
         }
@@ -328,6 +356,8 @@ namespace ExpressBase.Objects
                 SingleRow Row = new SingleRow();
                 foreach (EbDataColumn dataColumn in dataTable.Columns)
                 {
+                    if (dataRow.IsDBNull(dataColumn.ColumnIndex))
+                        continue;
                     object _unformattedData = dataRow[dataColumn.ColumnIndex];
                     object _formattedData = _unformattedData;
 
@@ -353,7 +383,7 @@ namespace ExpressBase.Objects
             }
         }
 
-        public void RefreshformData(IDatabase DataDB, Service service)
+        public void RefreshFormData(IDatabase DataDB, Service service)
         {
             WebFormSchema _schema = this.GetWebFormSchema();
             string query = this.GetSelectQuery(_schema, service);
@@ -428,33 +458,17 @@ namespace ExpressBase.Objects
                 }
             }
 
-            //try
-            //{
-            //    SingleRow _masterRow = this.FormData.MultipleTables[this.FormData.MasterTable][0];
-            //    SingleColumn _idval = _masterRow.Columns.FirstOrDefault(c => c.Name.Equals("eb_auto_id"));
-            //    this.FormData.AutoIdText = _idval.Value;
-
-            //    var temp1 = _schema.Tables.FirstOrDefault(t => t.TableName == _schema.MasterTable);
-            //    var temp2 = temp1.Columns.FirstOrDefault(c => c.ColumnName.Equals("eb_auto_id"));
-            //    if (temp2 == null)
-            //    {
-            //        _masterRow.Columns.Remove(_idval);
-            //    }
-            //}
-            //catch (Exception Ex)
-            //{
-            //    Console.WriteLine("Exception - eb_auto_id not found: From WebFormService - " + Ex.Message);
-            //}
-
-            //if (_extend)
-            //    GetWebformData_Extended(FormObj, FormData);
+            this.ExeDeleteCancelScript(DataDB);
         }
 
-        public void RefreshFormData(List<Param> _params)
+        public void RefreshFormData(IDatabase DataDB, Service service, List<Param> _params)
         {
             WebFormSchema _schema = this.GetWebFormSchema();
-            this.FormData = new WebformData();
-            this.FormData.MasterTable = _schema.MasterTable;
+            this.FormData = new WebformData
+            {
+                MasterTable = _schema.MasterTable
+            };
+            Dictionary<string, string> QrsDict = new Dictionary<string, string>();
             for (int i = 0; i < _params.Count; i++)
             {
                 for (int j = 0; j < _schema.Tables.Count; j++)
@@ -463,6 +477,11 @@ namespace ExpressBase.Objects
                     {
                         if (_schema.Tables[j].Columns[k].ColumnName.Equals(_params[i].Name))
                         {
+                            if(_schema.Tables[j].Columns[k].Control is EbPowerSelect)
+                            {
+                                string t = (_schema.Tables[j].Columns[k].Control as EbPowerSelect).GetSelectQuery(service, _params[i].Value);
+                                QrsDict.Add((_schema.Tables[j].Columns[k].Control as EbPowerSelect).EbSid, t);
+                            }
                             if (!this.FormData.MultipleTables.ContainsKey(_schema.Tables[j].TableName))
                             {
                                 SingleTable tbl = new SingleTable();
@@ -479,6 +498,17 @@ namespace ExpressBase.Objects
                     }
                 }
             }
+            if(QrsDict.Count > 0)
+            {
+                EbDataSet dataset = DataDB.DoQueries(string.Join(" ", QrsDict.Select(d => d.Value)), new DbParameter[] { });
+                int i = 0;
+                foreach (KeyValuePair<string, string> item in QrsDict)
+                {
+                    SingleTable Table = new SingleTable();
+                    GetFormattedData(dataset.Tables[i++], Table);
+                    this.FormData.ExtendedTables.Add(item.Key, Table);
+                }
+            }
         }
 
         public int Save(IDatabase DataDB, Service service)
@@ -491,7 +521,7 @@ namespace ExpressBase.Objects
                 this.TableRowId = this.Insert(DataDB);
                 r = 1;
             }
-            this.RefreshformData(DataDB, service);
+            this.RefreshFormData(DataDB, service);
             return r;
         }
 
@@ -521,6 +551,8 @@ namespace ExpressBase.Objects
                                 if (!(rField.Control is EbAutoId))
                                 {
                                     _colvals += string.Concat(rField.Name, "=:", rField.Name, "_", i, ",");
+                                    if (rField.Value == null)
+                                        rField.Value = DBNull.Value;
                                     param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
                                 }
                             }
@@ -536,6 +568,8 @@ namespace ExpressBase.Objects
                         {
                             _cols += string.Concat(rField.Name, ",");
                             _vals += string.Concat(":", rField.Name, "_", i, ",");
+                            if (rField.Value == null)
+                                rField.Value = DBNull.Value;
                             param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
                         }
                         fullqry += string.Format(_qry, _tblname, _cols, _vals, this.FormData.MasterTable, this.FormData.MasterTable);
@@ -616,6 +650,8 @@ namespace ExpressBase.Objects
                         {
                             _cols += string.Concat(rField.Name, ", ");
                             _values += string.Concat(":", rField.Name, "_", i, ", ");
+                            if (rField.Value == null)
+                                rField.Value = DBNull.Value;
                             param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
                         }
                     }
@@ -676,14 +712,126 @@ namespace ExpressBase.Objects
             return _rowid;
         }
 
-        public int Delete(IDatabase DataDB)
+        private bool BeforeDelete(IDatabase DataDB)
         {
-            string query = this.GetDeleteQuery();
-            DbParameter[] param = new DbParameter[] {
-                DataDB.GetNewParameter("eb_modified_by", EbDbTypes.Int32, this.UserId),
-                DataDB.GetNewParameter("id", EbDbTypes.Int32, this.TableRowId)
-            };
-            return DataDB.UpdateTable(query, param);
+            if (this.DisableDelete != null && this.DisableDelete.Count > 0)
+            {
+                string q = string.Join(";", this.DisableDelete.Select(e => e.Script.Code));
+                DbParameter[] p = new DbParameter[] {
+                    DataDB.GetNewParameter("id", EbDbTypes.Int32, this.TableRowId)
+                };
+                EbDataSet ds = DataDB.DoQueries(q, p);
+
+                for (int i = 0; i < ds.Tables.Count; i++)
+                {
+                    if (ds.Tables[0].Rows.Count > 0 && ds.Tables[0].Rows[0].Count > 0)
+                    {
+                        if (!this.DisableDelete[i].IsDisabled && Convert.ToInt32(ds.Tables[0].Rows[0][0]) > 0 && !this.DisableDelete[i].IsWarningOnly)
+                            return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        public int Delete(IDatabase DataDB)
+        {            
+            if (this.BeforeDelete(DataDB))
+            {
+                string query = this.GetDeleteQuery();
+                DbParameter[] param = new DbParameter[] {
+                    DataDB.GetNewParameter("eb_modified_by", EbDbTypes.Int32, this.UserId),
+                    DataDB.GetNewParameter("id", EbDbTypes.Int32, this.TableRowId)
+                };
+                return DataDB.UpdateTable(query, param);
+            }
+            return -1;
+        }
+
+        private bool BeforeCancel(IDatabase DataDB)
+        {
+            if (this.DisableCancel != null && this.DisableCancel.Count > 0)
+            {
+                string q = string.Join(";", this.DisableCancel.Select(e => e.Script.Code));
+                DbParameter[] p = new DbParameter[] {
+                    DataDB.GetNewParameter("id", EbDbTypes.Int32, this.TableRowId)
+                };
+                EbDataSet ds = DataDB.DoQueries(q, p);
+
+                for (int i = 0; i < ds.Tables.Count; i++)
+                {
+                    if (ds.Tables[0].Rows.Count > 0 && ds.Tables[0].Rows[0].Count > 0)
+                    {
+                        if (!this.DisableCancel[i].IsDisabled && Convert.ToInt32(ds.Tables[0].Rows[0][0]) > 0 && !this.DisableCancel[i].IsWarningOnly)
+                            return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        public int Cancel(IDatabase DataDB)
+        {            
+            if (this.BeforeCancel(DataDB))
+            {
+                string query = this.GetCancelQuery();
+                DbParameter[] param = new DbParameter[] {
+                    DataDB.GetNewParameter("eb_modified_by", EbDbTypes.Int32, this.UserId),
+                    DataDB.GetNewParameter("id", EbDbTypes.Int32, this.TableRowId)
+                };
+                return DataDB.UpdateTable(query, param);
+            }
+            return -1;
+        }
+
+        private void ExeDeleteCancelScript(IDatabase DataDB)
+        {
+            string q = string.Empty;
+            if (this.DisableDelete != null && this.DisableDelete.Count > 0)
+            {
+                q = string.Join(";", this.DisableDelete.Select(e => e.Script.Code));
+            }
+            if (this.DisableCancel != null && this.DisableCancel.Count > 0)
+            {
+                q += string.Join(";", this.DisableCancel.Select(e => e.Script.Code));
+            }
+            if (!q.Equals(string.Empty))
+            {
+                DbParameter[] p = new DbParameter[] {
+                    DataDB.GetNewParameter("id", EbDbTypes.Int32, this.TableRowId)
+                };
+                EbDataSet ds = DataDB.DoQueries(q, p);
+                int i = 0;
+                for (; i < this.DisableDelete.Count; i++)
+                {
+                    if (ds.Tables[i].Rows.Count > 0 && ds.Tables[i].Rows[0].Count > 0)
+                    {
+                        if (this.DisableDelete[i].IsDisabled || Convert.ToInt32(ds.Tables[i].Rows[0][0]) == 0)
+                        {
+                            this.FormData.DisableDelete.Add(this.DisableDelete[i].Name, false);
+                        }
+                        else
+                        {
+                            this.FormData.DisableDelete.Add(this.DisableDelete[i].Name, true);
+                        }
+                    }
+                }
+
+                for (int j = 0; j < this.DisableCancel.Count; i++, j++)
+                {
+                    if (ds.Tables[i].Rows.Count > 0 && ds.Tables[i].Rows[0].Count > 0)
+                    {
+                        if (this.DisableCancel[j].IsDisabled || Convert.ToInt32(ds.Tables[i].Rows[0][0]) == 0)
+                        {
+                            this.FormData.DisableCancel.Add(this.DisableCancel[j].Name, false);
+                        }
+                        else
+                        {
+                            this.FormData.DisableCancel.Add(this.DisableCancel[j].Name, true);
+                        }
+                    }
+                }
+            }
         }
 
 
@@ -884,5 +1032,14 @@ namespace ExpressBase.Objects
         //public object Value { get; set; }///////
 
         public EbControl Control { get; set; }
+    }
+
+    public class EbSQLValidator : EbValidator
+    {
+        public EbSQLValidator() { }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
+        public override EbScript Script { get; set; }
     }
 }

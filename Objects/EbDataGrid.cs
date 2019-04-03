@@ -24,6 +24,9 @@ namespace ExpressBase.Objects
             this.Controls = new List<EbControl>();
         }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        public override int Height { get; set; }
+
         [JsonIgnore]
         public override string OnChangeBindJSFn
         {
@@ -69,7 +72,6 @@ $.each(this.Controls.$values, function (i, col) {
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyGroup("test")]
         public bool IsAddable { get; set; }
-
         public override string GetToolHtml()
         {
             return @"<div eb-type='@toolName' class='tool'><i class='fa fa-table'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
@@ -78,9 +80,10 @@ $.each(this.Controls.$values, function (i, col) {
         {
             string html = @"
 <div class='grid-cont'>
-    <table id='tbl_@ebsid@' class='table table-bordered dgtbl'>
-        <thead>
-          <tr>";
+    <div class='Dg_head'>
+        <table id='tbl_@ebsid@_head' class='table table-bordered dgtbl'>
+            <thead>
+              <tr>";
             foreach (EbDGColumn col in Controls)
             {
                 if (!col.Hidden)
@@ -91,16 +94,27 @@ $.each(this.Controls.$values, function (i, col) {
             }
 
             html += @"
-            <th><span class='fa fa-cogs'></span></th>
-          </tr>
-        </thead>
-    </thead>
-    <tbody>";
+                <th style='width:55px;'><span class='fa fa-cogs'></span></th>
+              </tr>
+            </thead>
+        </table>
+    </div>";
 
             html += @"
-    </tbody>
-    </table>
-</div>";
+    <div class='Dg_body' style='overflow-y:scroll;height:@_height@px ;'>
+        <table id='tbl_@ebsid@' class='table table-bordered dgtbl'>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+    <div class='Dg_footer'>
+        <table id='tbl_@ebsid@_footer' class='table table-bordered dgtbl'>
+            <tbody>
+            </tbody>
+        </table>
+     </div>
+</div>".Replace("@_height@", this.Height.ToString());
+
             return html;
         }
 
@@ -145,7 +159,7 @@ $.each(this.Controls.$values, function (i, col) {
             get
             {
                 return @"
-                     $('[ebsid='+this.__DG.EbSid+']').find(`tr[is-editing='true'] [colname=${this.Name}] [ui-inp]`).val(p1);
+                     $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val(p1);
                 ";
             }
             set { }
@@ -157,20 +171,20 @@ $.each(this.Controls.$values, function (i, col) {
             get
             {
                 return @"
-                    return $('[ebsid='+this.__DG.EbSid+']').find(`tr[is-editing='true'] [colname=${this.Name}] [ui-inp]`).val();
+                    return $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val();
                 ";
             }
             set { }
         }
 
         [JsonIgnore]
-        public override string EnableJSfn { get { return @"$('[ebsid='+this.__DG.EbSid+']').find(`tr[is-editing='true'] [colname=${this.Name}] .ctrl-cover *`).prop('disabled',false).css('pointer-events', 'inherit').find('input').css('background-color','#fff');"; } set { } }
+        public override string EnableJSfn { get { return @"$('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] .ctrl-cover *`).prop('disabled',false).css('pointer-events', 'inherit').find('input').css('background-color','#fff');"; } set { } }
 
         [JsonIgnore]
-        public override string DisableJSfn { get { return @"$('[ebsid='+this.__DG.EbSid+']').find(`tr[is-editing='true'] [colname=${this.Name}] .ctrl-cover *`).attr('disabled', 'disabled').css('pointer-events', 'none').find('input').css('background-color','#eee');"; } set { } }
+        public override string DisableJSfn { get { return @"$('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] .ctrl-cover *`).attr('disabled', 'disabled').css('pointer-events', 'none').find('input').css('background-color','#eee');"; } set { } }
 
         [JsonIgnore]
-        public override string ClearJSfn { get { return @"$('[ebsid='+this.__DG.EbSid+']').find(`tr[is-editing='true'] [colname=${this.Name}] [ui-inp]`).val('');"; } set { } }
+        public override string ClearJSfn { get { return @"$('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val('');"; } set { } }
 
         [JsonIgnore]
         public override string HideJSfn { get { return @""; } set { } }
@@ -303,6 +317,8 @@ $.each(this.Controls.$values, function (i, col) {
             this.EbSimpleSelect = new EbSimpleSelect();
         }
 
+        public override string GetDisplayMemberJSfn { get { return @" return $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp] :selected`).text(); "; } set { } }
+
         [EnableInBuilder(BuilderType.WebForm)]
         public override string InputControlType { get { return "EbSimpleSelect"; } }
 
@@ -402,7 +418,6 @@ $.each(this.Controls.$values, function (i, col) {
     [UsedWithTopObjectParent(typeof(EbObject))]
     public class EbDGPowerSelectColumn : EbDGColumn
     {
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public bool MultiSelect
         {
             get { return this.EbPowerSelect.MultiSelect; }

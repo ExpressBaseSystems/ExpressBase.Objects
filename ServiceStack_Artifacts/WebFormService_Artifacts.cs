@@ -1,6 +1,8 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
 using ExpressBase.Common.Objects;
+using ExpressBase.Security;
 using ServiceStack;
 using System;
 using System.Collections.Generic;
@@ -51,8 +53,27 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public ResponseStatus ResponseStatus { get; set; }
 	}
 
+    [DataContract]
+    public class GetPrefillDataRequest : EbServiceStackAuthRequest, IReturn<GetPrefillDataResponse>
+    {
+        [DataMember(Order = 1)]
+        public string RefId { get; set; }
 
-	[DataContract]
+        [DataMember(Order = 2)]
+        public List<Param> Params { get; set; }
+    }
+
+    [DataContract]
+    public class GetPrefillDataResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public WebformData FormData { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    [DataContract]
 	public class DoUniqueCheckRequest : EbServiceStackAuthRequest, IReturn<GetRowDataResponse>
 	{
 		[DataMember(Order = 1)]
@@ -144,6 +165,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 2)]
         public int RowId { get; set; }
+
+        [DataMember(Order = 3)]
+        public User UserObj { get; set; }
     }
 
     [DataContract]
@@ -155,6 +179,30 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
     }
+
+    [DataContract]
+    public class CancelDataFromWebformRequest : EbServiceStackAuthRequest, IReturn<CancelDataFromWebformResponse>
+    {
+        [DataMember(Order = 1)]
+        public string RefId { get; set; }
+
+        [DataMember(Order = 2)]
+        public int RowId { get; set; }
+        
+        [DataMember(Order = 3)]
+        public User UserObj { get; set; }
+    }
+
+    [DataContract]
+    public class CancelDataFromWebformResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public int RowAffected { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
 
 
     //=============================================== AUDIT TRAIL ====================================================
