@@ -159,7 +159,7 @@ $.each(this.Controls.$values, function (i, col) {
             get
             {
                 return @"
-                     $('[ebsid='+this.__DG.EbSid+']').find(`tr[is-editing='true'] [colname=${this.Name}] [ui-inp]`).val(p1);
+                     $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val(p1);
                 ";
             }
             set { }
@@ -171,20 +171,20 @@ $.each(this.Controls.$values, function (i, col) {
             get
             {
                 return @"
-                    return $('[ebsid='+this.__DG.EbSid+']').find(`tr[is-editing='true'] [colname=${this.Name}] [ui-inp]`).val();
+                    return $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val();
                 ";
             }
             set { }
         }
 
         [JsonIgnore]
-        public override string EnableJSfn { get { return @"$('[ebsid='+this.__DG.EbSid+']').find(`tr[is-editing='true'] [colname=${this.Name}] .ctrl-cover *`).prop('disabled',false).css('pointer-events', 'inherit').find('input').css('background-color','#fff');"; } set { } }
+        public override string EnableJSfn { get { return @"$('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] .ctrl-cover *`).prop('disabled',false).css('pointer-events', 'inherit').find('input').css('background-color','#fff');"; } set { } }
 
         [JsonIgnore]
-        public override string DisableJSfn { get { return @"$('[ebsid='+this.__DG.EbSid+']').find(`tr[is-editing='true'] [colname=${this.Name}] .ctrl-cover *`).attr('disabled', 'disabled').css('pointer-events', 'none').find('input').css('background-color','#eee');"; } set { } }
+        public override string DisableJSfn { get { return @"$('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] .ctrl-cover *`).attr('disabled', 'disabled').css('pointer-events', 'none').find('input').css('background-color','#eee');"; } set { } }
 
         [JsonIgnore]
-        public override string ClearJSfn { get { return @"$('[ebsid='+this.__DG.EbSid+']').find(`tr[is-editing='true'] [colname=${this.Name}] [ui-inp]`).val('');"; } set { } }
+        public override string ClearJSfn { get { return @"$('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val('');"; } set { } }
 
         [JsonIgnore]
         public override string HideJSfn { get { return @""; } set { } }
@@ -317,6 +317,8 @@ $.each(this.Controls.$values, function (i, col) {
             this.EbSimpleSelect = new EbSimpleSelect();
         }
 
+        public override string GetDisplayMemberJSfn { get { return @" return $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp] :selected`).text(); "; } set { } }
+
         [EnableInBuilder(BuilderType.WebForm)]
         public override string InputControlType { get { return "EbSimpleSelect"; } }
 
@@ -416,7 +418,6 @@ $.each(this.Controls.$values, function (i, col) {
     [UsedWithTopObjectParent(typeof(EbObject))]
     public class EbDGPowerSelectColumn : EbDGColumn
     {
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public bool MultiSelect
         {
             get { return this.EbPowerSelect.MultiSelect; }
