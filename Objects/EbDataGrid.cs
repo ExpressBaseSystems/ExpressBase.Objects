@@ -424,6 +424,17 @@ $.each(this.Controls.$values, function (i, col) {
         public EbDGUserControlColumn()
         {
             this.EbUserControl = new EbUserControl();
+            DBareHtml = string.Concat(@"
+    <div class=`uc-col-wraper`>
+    ada mwone
+    </div>
+    
+        <div class=`input-group` style=`width:100%;`>
+            <input id=`@ebsid@` ui-inp data-ebtype=`@data-ebtype@`  data-toggle=`tooltip` title=`@toolTipText@` class=`date` type=`text` name=`@name@` autocomplete = `@autoComplete@` @value@ @tabIndex@ style=`width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@ @readOnlyString@ @required@ @placeHolder@ />
+            <span class=`input-group-addon` style=`padding: 0px;`> <i id=`@ebsid@TglBtn` class=`fa fa-ellipsis-h` aria-hidden=`true` style=`padding: 6px 12px;`></i> </span>
+        </div>
+
+").RemoveCR();
         }
 
         [EnableInBuilder(BuilderType.WebForm)]
@@ -432,30 +443,44 @@ $.each(this.Controls.$values, function (i, col) {
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [HideInPropertyGrid]
         [Alias("Controls")]
-        public List<EbControl> Columns
-        {
-            get { return this.EbUserControl.Controls; }
-            set { this.EbUserControl.Controls = value; }
-        }
+        public List<EbControl> Columns { get { return this.EbUserControl.Controls; } set { this.EbUserControl.Controls = value; } }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [OSE_ObjectTypes(EbObjectTypes.iUserControl)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
-        public string UserControlRefId
-        {
-            get { return this.EbUserControl.RefId; }
-            set { this.EbUserControl.RefId = value; }
-        }
+        public string UserControlRefId { get { return this.EbUserControl.RefId; } set { this.EbUserControl.RefId = value; } }
 
         //public override string GetBareHtml()
         //{
         //    return "<button class='btn'>xyz</button>";
         //}
 
+        public override string GetBareHtml()
+        {
+            return this.EbUserControl.GetBareHtml();
+        }
+
+        //[OnDeserialized]
+        //public void OnDeserializedMethod(StreamingContext context)
+        //{
+        //    DBareHtml = "<button class='btn'>xyz</button>"; ;
+        //}
+
+
         [OnDeserialized]
         public void OnDeserializedMethod(StreamingContext context)
         {
-            DBareHtml = "<button class='btn'>xyz</button>"; ;
+            DBareHtml = string.Concat(@"
+    <div class=`uc-col-wraper`>
+    ada mwone
+    </div>
+    
+        <div class=`input-group` style=`width:100%;`>
+            <input id=`@ebsid@` ui-inp data-ebtype=`@data-ebtype@`  data-toggle=`tooltip` title=`@toolTipText@` class=`date` type=`text` name=`@name@` autocomplete = `@autoComplete@` @value@ @tabIndex@ style=`width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@ @readOnlyString@ @required@ @placeHolder@ />
+            <span class=`input-group-addon` style=`padding: 0px;`> <i id=`@ebsid@TglBtn` class=`fa fa-ellipsis-h` aria-hidden=`true` style=`padding: 6px 12px;`></i> </span>
+        </div>
+
+").RemoveCR();
         }
     }
 
@@ -464,13 +489,7 @@ $.each(this.Controls.$values, function (i, col) {
     [UsedWithTopObjectParent(typeof(EbObject))]
     public class EbDGPowerSelectColumn : EbDGColumn
     {
-        public bool MultiSelect
-        {
-            get { return this.EbPowerSelect.MultiSelect; }
-            set { this.EbPowerSelect.MultiSelect = value; }
-        }
-
-
+        public bool MultiSelect { get { return this.EbPowerSelect.MultiSelect; } set { this.EbPowerSelect.MultiSelect = value; } }
 
         [JsonIgnore]
         public override string SetDisplayMemberJSfn { get { return this.EbPowerSelect.SetDisplayMemberJSfn; } set { } }
@@ -535,33 +554,10 @@ else {pg.MakeReadWrite('ValueMember');}")]
         {
             return this.EbPowerSelect.GetBareHtml();
         }
-
-        //INCOMPLETE
-        public string GetSelectQuery(Service service, string Col, string Tbl, string _id)
+                
+        public string GetSelectQuery(Service service, string Col, string Tbl = null, string _id = null)
         {
-            EbDataReader dr = service.Redis.Get<EbDataReader>(this.DataSourceId);
-            if (dr == null)
-            {
-                var result = service.Gateway.Send<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = this.DataSourceId });
-                dr = EbSerializers.Json_Deserialize(result.Data[0].Json);
-                service.Redis.Set<EbDataReader>(this.DataSourceId, dr);
-            }
-            string dispcol = string.Join(",", this.DisplayMembers.Select(c => "__A." + c.Name));//powerselect table __A
-
-            //string whrcond = string.Join(" AND ", this.Values.Select(v => this.ValueMember.Name + "=" + v));
-            string Sql = dr.Sql.Trim();
-            if (Sql.LastIndexOf(";") == Sql.Length - 1)
-                Sql = Sql.Substring(0, Sql.Length - 1);
-
-            var tt = string.Format(@"SELECT 
-                                        __A.*
-                                    FROM 
-                                        ({2}) __A, {3} __B
-                                    WHERE 
-                                        __A.{0} = ANY(STRING_TO_ARRAY(__B.{4}::TEXT, ',')::INT[]) AND __B.{5} = :id;"
-                    , this.ValueMember.Name, dispcol, Sql, Tbl, Col, _id);
-            return tt;
-            //a.id = any(string_to_array(b.set_id, ',')::int[]
+            return this.EbPowerSelect.GetSelectQuery(service, Col, Tbl, _id);
         }
     }
 }

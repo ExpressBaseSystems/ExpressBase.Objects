@@ -357,26 +357,36 @@ namespace ExpressBase.Objects
                 foreach (EbDataColumn dataColumn in dataTable.Columns)
                 {
                     if (dataRow.IsDBNull(dataColumn.ColumnIndex))
-                        continue;
-                    object _unformattedData = dataRow[dataColumn.ColumnIndex];
-                    object _formattedData = _unformattedData;
-
-                    if (dataColumn.Type == EbDbTypes.Date)
                     {
-                        _unformattedData = (_unformattedData == DBNull.Value) ? DateTime.MinValue : _unformattedData;
-                        _formattedData = ((DateTime)_unformattedData).Date != DateTime.MinValue ? Convert.ToDateTime(_unformattedData).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) : string.Empty;
+                        Row.Columns.Add(new SingleColumn()
+                        {
+                            Name = dataColumn.ColumnName,
+                            Type = (int)dataColumn.Type,
+                            Value = null
+                        });
                     }
-                    //else if(dataColumn.Type == EbDbTypes.DateTime)
-                    //{
-                    //    _unformattedData = (_unformattedData == DBNull.Value) ? DateTime.MinValue : _unformattedData;
-                    //    _formattedData = ((DateTime)_unformattedData).Date != DateTime.MinValue ? Convert.ToDateTime(_unformattedData).ToString("yyyy-MM-dd hh:mm tt", CultureInfo.InvariantCulture) : string.Empty;
-                    //}
-                    Row.Columns.Add(new SingleColumn()
+                    else
                     {
-                        Name = dataColumn.ColumnName,
-                        Type = (int)dataColumn.Type,
-                        Value = _formattedData
-                    });
+                        object _unformattedData = dataRow[dataColumn.ColumnIndex];
+                        object _formattedData = _unformattedData;
+
+                        if (dataColumn.Type == EbDbTypes.Date)
+                        {
+                            _unformattedData = (_unformattedData == DBNull.Value) ? DateTime.MinValue : _unformattedData;
+                            _formattedData = ((DateTime)_unformattedData).Date != DateTime.MinValue ? Convert.ToDateTime(_unformattedData).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) : string.Empty;
+                        }
+                        //else if(dataColumn.Type == EbDbTypes.DateTime)
+                        //{
+                        //    _unformattedData = (_unformattedData == DBNull.Value) ? DateTime.MinValue : _unformattedData;
+                        //    _formattedData = ((DateTime)_unformattedData).Date != DateTime.MinValue ? Convert.ToDateTime(_unformattedData).ToString("yyyy-MM-dd hh:mm tt", CultureInfo.InvariantCulture) : string.Empty;
+                        //}
+                        Row.Columns.Add(new SingleColumn()
+                        {
+                            Name = dataColumn.ColumnName,
+                            Type = (int)dataColumn.Type,
+                            Value = _formattedData
+                        });
+                    }                    
                 }
                 Row.RowId = dataRow[dataTable.Columns[0].ColumnIndex].ToString();
                 Table.Add(Row);
