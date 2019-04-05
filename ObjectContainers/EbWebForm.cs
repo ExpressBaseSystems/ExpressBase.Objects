@@ -57,6 +57,11 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.Collection)]
         public List<EbSQLValidator> DisableCancel { get; set; }
 
+        [PropertyGroup("Events")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        public List<EbRoutines> BeforeSaveRoutines { get; set; }
+
         public static EbOperations Operations = WFOperations.Instance;
 
         public override string GetHead()
@@ -1051,5 +1056,18 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
         public override EbScript Script { get; set; }
+    }
+
+    public class EbRoutines : EbValidator
+    {
+        public EbRoutines() { }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorJS, PropertyEditorType.ScriptEditorCS)]
+        public override EbScript Script { get; set; }
+
+        public override bool IsWarningOnly { get; set; }
+
+        public override string FailureMSG { get; set; }
     }
 }
