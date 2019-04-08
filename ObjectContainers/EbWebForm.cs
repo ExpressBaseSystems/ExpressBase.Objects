@@ -168,9 +168,9 @@ namespace ExpressBase.Objects
                     _id = _schema.MasterTable + "_id";
                 foreach (ColumnSchema _column in _table.Columns)
                 {
-                    if ((_column.Control as EbControl).Unique)
+                    if (_column.Control is EbAutoId)
                     {
-                        _dupcols += string.Format(", {0}_old = {0}, {0} = null", _column.ColumnName);
+                        _dupcols += string.Format(", {0}_ebbkup = {0}, {0} = {0} || '_ebbkup'", _column.ColumnName);
                     }
                 }
                 query += string.Format("UPDATE {0} SET eb_del='T',eb_lastmodified_by = :eb_modified_by, eb_lastmodified_at = NOW() {1} WHERE {2} = :id AND eb_del='F';", _table.TableName, _dupcols, _id);
