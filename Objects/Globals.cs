@@ -141,17 +141,47 @@ namespace ExpressBase.Objects.Objects
         public object Value { get; set; }
     }
 
+    public class ApiScriptHelper
+    {
+        public Dictionary<string, object> Parameters { set; get; }
+
+        public ApiGlobals Globals { set; get; }
+
+        public ApiScriptHelper(ref Dictionary<string, object> global,ApiGlobals api_global)
+        {
+            Parameters = global;
+
+            Globals = api_global;
+        }
+
+        public void SetParam(string name, object value)
+        {
+            Parameters.Add(name, value);
+
+            this.Globals["Params"].Add(name, new NTV
+            {
+                Name = name,
+                Type = (value.GetType() == typeof(JObject)|| value.GetType().Name== "JValue") ? EbDbTypes.Object : (EbDbTypes)Enum.Parse(typeof(EbDbTypes), value.GetType().Name, true),
+                Value = value as object
+            });
+        }
+    }
+
     public class ApiGlobals
     {
+        public ApiScriptHelper Api { set; get; }
+
         public dynamic Params { get; set; }
 
         public List<EbDataTable> Tables { set; get; }
 
         public ApiGlobals() { }
 
-        public ApiGlobals(EbDataSet _ds)
+        public ApiGlobals(EbDataSet _ds,ref Dictionary<string,object> global)
         {
             this.Tables = (_ds == null) ? null : _ds.Tables;
+
+            this.Api = new ApiScriptHelper(ref global,this);
 
             Params = new NTVDict();
         }

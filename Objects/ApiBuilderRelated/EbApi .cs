@@ -330,7 +330,7 @@ namespace ExpressBase.Objects
 
             try
             {
-                ApiGlobals globals = new ApiGlobals(_ds);
+                ApiGlobals globals = new ApiGlobals(_ds,ref GlobalParams);
 
                 foreach (KeyValuePair<string, object> kp in GlobalParams)
                 {
