@@ -17,11 +17,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 2)]
         public bool ischange { get; set; }
         [DataMember(Order = 3)]
-        public EbDataDbConnection DataDBConnection { get; set; }
+        public EbDbConfig DataDBConfig { get; set; }
         [DataMember(Order = 4)]
         public IDatabase Idbcon { get; set; }
-
-
 
     }
     [DataContract]
