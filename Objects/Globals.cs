@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Data;
 using System.Dynamic;
 using System.Text;
+using Newtonsoft.Json.Linq;
+
 
 namespace ExpressBase.Objects.Objects
 {
@@ -110,8 +112,10 @@ namespace ExpressBase.Objects.Objects
                     result = ((x as NTV).Value).ToString();
                 else if (_data.Type == EbDbTypes.DateTime)
                     result = Convert.ToDateTime((x as NTV).Value);
-                else if(_data.Type == EbDbTypes.Boolean)
+                else if (_data.Type == EbDbTypes.Boolean)
                     result = Convert.ToBoolean((x as NTV).Value);
+                else if (_data.Type == EbDbTypes.Object && _data.Value.GetType() == typeof(JObject))
+                    result = _data.Value as JObject;
                 else
                     result = (x as NTV).Value.ToString();
 
@@ -147,7 +151,7 @@ namespace ExpressBase.Objects.Objects
 
         public ApiGlobals(EbDataSet _ds)
         {
-            this.Tables = _ds.Tables;
+            this.Tables = (_ds == null) ? null : _ds.Tables;
 
             Params = new NTVDict();
         }

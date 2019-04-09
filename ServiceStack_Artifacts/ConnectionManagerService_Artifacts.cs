@@ -279,4 +279,15 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         public ResponseStatus ResponseStatus { get; set; }
     }
+    public class _GetConectionsRequest : IReturn<_GetConectionsResponse>, IEbSSRequest
+    {
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
+    }
+
+    public class _GetConectionsResponse : IEbSSResponse
+    {
+        public ResponseStatus ResponseStatus { get; set; }
+    }
 }

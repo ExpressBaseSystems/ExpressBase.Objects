@@ -175,8 +175,11 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 1)]
         public string Name { get; set; }
 
-        [DataMember(Order = 1)]
+        [DataMember(Order = 2)]
         public string Version { get; set; }
+
+        [DataMember(Order = 3)]
+        public string Parameters { get; set; }
     }
 
     [DataContract]
