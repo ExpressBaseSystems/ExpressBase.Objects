@@ -57,6 +57,11 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.Collection)]
         public List<EbSQLValidator> DisableCancel { get; set; }
 
+        [PropertyGroup("Events")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        public List<EbRoutines> BeforeSaveRoutines { get; set; }
+
         public static EbOperations Operations = WFOperations.Instance;
 
         public override string GetHead()
@@ -158,9 +163,17 @@ namespace ExpressBase.Objects
             foreach (TableSchema _table in _schema.Tables)
             {
                 string _id = "id";
+                string _dupcols = string.Empty;
                 if (_table.TableName != _schema.MasterTable)
                     _id = _schema.MasterTable + "_id";
-                query += string.Format("UPDATE {0} SET eb_del='T',eb_lastmodified_by = :eb_modified_by, eb_lastmodified_at = NOW() WHERE {1} = :id AND eb_del='F';", _table.TableName, _id);
+                foreach (ColumnSchema _column in _table.Columns)
+                {
+                    if (_column.Control is EbAutoId)
+                    {
+                        _dupcols += string.Format(", {0}_ebbkup = {0}, {0} = {0} || '_ebbkup'", _column.ColumnName);
+                    }
+                }
+                query += string.Format("UPDATE {0} SET eb_del='T',eb_lastmodified_by = :eb_modified_by, eb_lastmodified_at = NOW() {1} WHERE {2} = :id AND eb_del='F';", _table.TableName, _dupcols, _id);
             }
             return query;
         }
@@ -357,26 +370,36 @@ namespace ExpressBase.Objects
                 foreach (EbDataColumn dataColumn in dataTable.Columns)
                 {
                     if (dataRow.IsDBNull(dataColumn.ColumnIndex))
-                        continue;
-                    object _unformattedData = dataRow[dataColumn.ColumnIndex];
-                    object _formattedData = _unformattedData;
-
-                    if (dataColumn.Type == EbDbTypes.Date)
                     {
-                        _unformattedData = (_unformattedData == DBNull.Value) ? DateTime.MinValue : _unformattedData;
-                        _formattedData = ((DateTime)_unformattedData).Date != DateTime.MinValue ? Convert.ToDateTime(_unformattedData).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) : string.Empty;
+                        Row.Columns.Add(new SingleColumn()
+                        {
+                            Name = dataColumn.ColumnName,
+                            Type = (int)dataColumn.Type,
+                            Value = null
+                        });
                     }
-                    //else if(dataColumn.Type == EbDbTypes.DateTime)
-                    //{
-                    //    _unformattedData = (_unformattedData == DBNull.Value) ? DateTime.MinValue : _unformattedData;
-                    //    _formattedData = ((DateTime)_unformattedData).Date != DateTime.MinValue ? Convert.ToDateTime(_unformattedData).ToString("yyyy-MM-dd hh:mm tt", CultureInfo.InvariantCulture) : string.Empty;
-                    //}
-                    Row.Columns.Add(new SingleColumn()
+                    else
                     {
-                        Name = dataColumn.ColumnName,
-                        Type = (int)dataColumn.Type,
-                        Value = _formattedData
-                    });
+                        object _unformattedData = dataRow[dataColumn.ColumnIndex];
+                        object _formattedData = _unformattedData;
+
+                        if (dataColumn.Type == EbDbTypes.Date)
+                        {
+                            _unformattedData = (_unformattedData == DBNull.Value) ? DateTime.MinValue : _unformattedData;
+                            _formattedData = ((DateTime)_unformattedData).Date != DateTime.MinValue ? Convert.ToDateTime(_unformattedData).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) : string.Empty;
+                        }
+                        //else if(dataColumn.Type == EbDbTypes.DateTime)
+                        //{
+                        //    _unformattedData = (_unformattedData == DBNull.Value) ? DateTime.MinValue : _unformattedData;
+                        //    _formattedData = ((DateTime)_unformattedData).Date != DateTime.MinValue ? Convert.ToDateTime(_unformattedData).ToString("yyyy-MM-dd hh:mm tt", CultureInfo.InvariantCulture) : string.Empty;
+                        //}
+                        Row.Columns.Add(new SingleColumn()
+                        {
+                            Name = dataColumn.ColumnName,
+                            Type = (int)dataColumn.Type,
+                            Value = _formattedData
+                        });
+                    }                    
                 }
                 Row.RowId = dataRow[dataTable.Columns[0].ColumnIndex].ToString();
                 Table.Add(Row);
@@ -712,7 +735,7 @@ namespace ExpressBase.Objects
             return _rowid;
         }
 
-        private bool BeforeDelete(IDatabase DataDB)
+        private bool CanDelete(IDatabase DataDB)
         {
             if (this.DisableDelete != null && this.DisableDelete.Count > 0)
             {
@@ -736,7 +759,7 @@ namespace ExpressBase.Objects
 
         public int Delete(IDatabase DataDB)
         {            
-            if (this.BeforeDelete(DataDB))
+            if (this.CanDelete(DataDB))
             {
                 string query = this.GetDeleteQuery();
                 DbParameter[] param = new DbParameter[] {
@@ -748,7 +771,7 @@ namespace ExpressBase.Objects
             return -1;
         }
 
-        private bool BeforeCancel(IDatabase DataDB)
+        private bool CanCancel(IDatabase DataDB)
         {
             if (this.DisableCancel != null && this.DisableCancel.Count > 0)
             {
@@ -772,7 +795,7 @@ namespace ExpressBase.Objects
 
         public int Cancel(IDatabase DataDB)
         {            
-            if (this.BeforeCancel(DataDB))
+            if (this.CanCancel(DataDB))
             {
                 string query = this.GetCancelQuery();
                 DbParameter[] param = new DbParameter[] {
@@ -840,7 +863,6 @@ namespace ExpressBase.Objects
             WebFormSchema _formSchema = new WebFormSchema();
             _formSchema.FormName = this.Name;
             _formSchema.MasterTable = this.TableName.ToLower();
-            //_formSchema.Tables = new List<TableSchema>();
             _formSchema = GetWebFormSchemaRec(_formSchema, this, this.TableName.ToLower());
             return _formSchema;
         }
@@ -853,17 +875,6 @@ namespace ExpressBase.Objects
             {
                 _table = new TableSchema { TableName = _container.TableName.ToLower(), ParentTable = _parentTable };
                 _schema.Tables.Add(_table);
-
-                //List<ColumnSchema> _columns = new List<ColumnSchema>();
-                //foreach (EbControl control in _flatControls)
-                //{
-                //    if (control is EbAutoId)
-                //        _columns.Add(new ColumnSchema { ColumnName = "eb_auto_id", EbDbType = (int)EbDbTypes.String, Control = control });
-                //    else
-                //        _columns.Add(new ColumnSchema { ColumnName = control.Name, EbDbType = (int)control.EbDbType, Control = control });
-                //}
-                //if (_columns.Count > 0)
-                //    _schema.Tables.Add(new TableSchema { TableName = _container.TableName.ToLower(), Columns = _columns, ParentTable = _parentTable });
             }
             foreach (EbControl control in _flatControls)
             {
@@ -871,8 +882,6 @@ namespace ExpressBase.Objects
                 {
                     if (control is EbFileUploader)
                         _schema.ExtendedControls.Add(control);
-                    //else if (control is EbAutoId)
-                    //    _table.Columns.Add(new ColumnSchema { ColumnName = "eb_auto_id", EbDbType = (int)EbDbTypes.String, Control = control });
                     else
                         _table.Columns.Add(new ColumnSchema { ColumnName = control.Name, EbDbType = (int)control.EbDbType, Control = control });
                 }
@@ -1041,5 +1050,18 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
         public override EbScript Script { get; set; }
+    }
+
+    public class EbRoutines : EbValidator
+    {
+        public EbRoutines() { }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorJS, PropertyEditorType.ScriptEditorCS)]
+        public override EbScript Script { get; set; }
+
+        public override bool IsWarningOnly { get; set; }
+
+        public override string FailureMSG { get; set; }
     }
 }

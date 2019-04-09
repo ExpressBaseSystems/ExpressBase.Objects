@@ -13,6 +13,7 @@ using ExpressBase.Objects.Objects;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
 using System.Net.Http;
+using Newtonsoft.Json.Linq;
 
 namespace ExpressBase.Objects
 {
@@ -307,6 +308,7 @@ namespace ExpressBase.Objects
         public ApiScript Evaluate(ApiResources _prevres, Dictionary<string, object> GlobalParams)
         {
             string code = this.Script.Code.Trim();
+            EbDataSet _ds = null;
             ApiScript script = new ApiScript();
 
             Script valscript = CSharpScript.Create<dynamic>(code,
@@ -315,8 +317,8 @@ namespace ExpressBase.Objects
                 .AddReferences(typeof(ExpressBase.Common.EbDataSet).Assembly),
                 globalsType: typeof(ApiGlobals));
 
-
-            EbDataSet _ds = _prevres.Result as EbDataSet;
+            if (_prevres != null)
+                _ds = _prevres.Result as EbDataSet;
             try
             {
                 valscript.Compile();
@@ -335,7 +337,7 @@ namespace ExpressBase.Objects
                     globals["Params"].Add(kp.Key, new NTV
                     {
                         Name = kp.Key,
-                        Type = (EbDbTypes)Enum.Parse(typeof(EbDbTypes), kp.Value.GetType().Name, true),
+                        Type = (kp.Value.GetType() == typeof(JObject)) ? EbDbTypes.Object:(EbDbTypes)Enum.Parse(typeof(EbDbTypes), kp.Value.GetType().Name, true),
                         Value = kp.Value
                     });
                 }
