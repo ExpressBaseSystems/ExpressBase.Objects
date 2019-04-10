@@ -3,6 +3,7 @@ using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
 using ExpressBase.Common.Messaging;
 using ServiceStack;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
@@ -45,43 +46,43 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-    public class ChangeDataDBConnectionRequest : EbServiceStackAuthRequest, IReturn<ChangeConnectionResponse>
-    {
-        public bool IsNew { get; set; }
-        public string SolutionId { get; set; }
-        public EbDataDbConnection DataDBConnection { get; set; }
+    //public class ChangeDataDBConnectionRequest : EbServiceStackAuthRequest, IReturn<ChangeConnectionResponse>
+    //{
+    //    public bool IsNew { get; set; }
+    //    public string SolutionId { get; set; }
+    //    public EbDataDbConnection DataDBConnection { get; set; }
 
-    }
+    //}
 
-    public class ChangeObjectsDBConnectionRequest : EbServiceStackAuthRequest, IReturn<ChangeConnectionResponse>
-    {
-        public bool IsNew { get; set; }
-        public EbObjectsDbConnection ObjectsDBConnection { get; set; }
-        public string SolutionId { get; set; }
-    }
+    //public class ChangeObjectsDBConnectionRequest : EbServiceStackAuthRequest, IReturn<ChangeConnectionResponse>
+    //{
+    //    public bool IsNew { get; set; }
+    //    public EbObjectsDbConnection ObjectsDBConnection { get; set; }
+    //    public string SolutionId { get; set; }
+    //}
 
-    public class ChangeFilesDBConnectionRequest : EbServiceStackAuthRequest, IReturn<ChangeConnectionResponse>
-    {
-        public bool IsNew { get; set; }
-        public string SolutionId { get; set; }
-        public EbFilesDbConnection FilesDBConnection { get; set; }
-    }
+    //public class ChangeFilesDBConnectionRequest : EbServiceStackAuthRequest, IReturn<ChangeConnectionResponse>
+    //{
+    //    public bool IsNew { get; set; }
+    //    public string SolutionId { get; set; }
+    //    public EbFilesDbConnection FilesDBConnection { get; set; }
+    //}
 
-    public class ChangeFTPConnectionRequest : EbServiceStackAuthRequest, IReturn<ChangeConnectionResponse>
-    {
-        public bool IsNew { get; set; }
-        public string SolutionId { get; set; }
-        public EbFTPConnection FTPConnection { get; set; }
-    }
+    //public class ChangeFTPConnectionRequest : EbServiceStackAuthRequest, IReturn<ChangeConnectionResponse>
+    //{
+    //    public bool IsNew { get; set; }
+    //    public string SolutionId { get; set; }
+    //    public EbFTPConnection FTPConnection { get; set; }
+    //}
 
-    public class ChangeSMSConnectionRequest : EbServiceStackAuthRequest, IReturn<ChangeConnectionResponse>
-    {
-        public bool IsNew { get; set; }
+    //public class ChangeSMSConnectionRequest : EbServiceStackAuthRequest, IReturn<ChangeConnectionResponse>
+    //{
+    //    public bool IsNew { get; set; }
 
-        public string SolutionId { get; set; }
+    //    public string SolutionId { get; set; }
 
-        public ISMSConnection SMSConnection { get; set; }
-    }
+    //    public ISMSConnection SMSConnection { get; set; }
+    //}
 
     public class InitialSolutionConnectionsRequest : EbServiceStackAuthRequest, IReturn<InitialSolutionConnectionsResponse>
     {
@@ -102,17 +103,18 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public string SolutionId { get; set; }
 
-        public EbEmail Email { get; set; }
+        public EbSmtp Email { get; set; }
     }
 
-    public class ChangeCloudinaryConnectionRequest : EbServiceStackAuthRequest, IReturn<ChangeConnectionResponse>
-    {
-        public bool IsNew { get; set; }
+    //public class ChangeCloudinaryConnectionRequest : EbServiceStackAuthRequest, IReturn<ChangeConnectionResponse>
+    //{
+    //    public bool IsNew { get; set; }
 
-        public string SolutionId { get; set; }
 
-        public EbCloudinaryConnection ImageManipulateConnection { get; set; }
-    }
+    //    public string SolutionId { get; set; }
+
+    //    public EbCloudinaryConnection ImageManipulateConnection { get; set; }
+    //}
 
     public class ChangeConnectionResponse : IEbSSResponse
     {
@@ -121,24 +123,24 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     public class TestConnectionRequest : EbServiceStackAuthRequest
     {
-        public EbDataDbConnection DataDBConnection { get; set; }
+        public EbDbConfig DataDBConfig { get; set; }
     }
     public class TestConnectionResponse
     {
         public bool ConnectionStatus { set; get; }
     }
 
-    [DataContract]
-    public class TestFileDbconnectionRequest : IReturn<TestFileDbconnectionRequest>, IEbSSRequest
-    {
-        [DataMember(Order = 1)]
-        public EbFilesDbConnection FilesDBConnection { get; set; }
+    //[DataContract]
+    //public class TestFileDbconnectionRequest : IReturn<TestFileDbconnectionRequest>, IEbSSRequest
+    //{
+    //    [DataMember(Order = 1)]
+    //    public EbFilesDbConnection FilesDBConnection { get; set; }
 
-        public int UserId { get; set; }
+    //    public int UserId { get; set; }
 
-        [DataMember(Order = 2)]
-        public string SolnId { get; set; }
-    }
+    //    [DataMember(Order = 2)]
+    //    public string SolnId { get; set; }
+    //}
 
     public class TestFileDbconnectionResponse : IEbSSResponse
     {
@@ -189,6 +191,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     public class GetIntegrationsResponse : IEbSSResponse
     {
+        public List<EbIntegration> Integrations { get; set; }
+
         public ResponseStatus ResponseStatus { get; set; }
     }
 
@@ -248,6 +252,20 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
+    public class AddCloudinaryRequest : IReturn<AddCloudinaryResponse>, IEbSSRequest
+    {
+        public EbCloudinaryConfig Config { get; set; }
+
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
+    }
+
+    public class AddCloudinaryResponse : IEbSSResponse
+    {
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
     public class EbIntegrationRequest : IReturn<EbIntegrationResponse>, IEbSSRequest
     {
         public EbIntegration IntegrationO { get; set; }
@@ -258,6 +276,17 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     public class EbIntegrationResponse : IEbSSResponse
+    {
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+    public class _GetConectionsRequest : IReturn<_GetConectionsResponse>, IEbSSRequest
+    {
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
+    }
+
+    public class _GetConectionsResponse : IEbSSResponse
     {
         public ResponseStatus ResponseStatus { get; set; }
     }

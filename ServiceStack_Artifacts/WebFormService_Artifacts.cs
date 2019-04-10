@@ -2,6 +2,7 @@
 using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
 using ExpressBase.Common.Objects;
+using ExpressBase.Security;
 using ServiceStack;
 using System;
 using System.Collections.Generic;
@@ -164,6 +165,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 2)]
         public int RowId { get; set; }
+
+        [DataMember(Order = 3)]
+        public User UserObj { get; set; }
     }
 
     [DataContract]
@@ -184,6 +188,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 2)]
         public int RowId { get; set; }
+        
+        [DataMember(Order = 3)]
+        public User UserObj { get; set; }
     }
 
     [DataContract]
