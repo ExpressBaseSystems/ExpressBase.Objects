@@ -40,6 +40,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
     {
         Default,
         Icon,
+        Link,
         IsEditable,
         Tree
     }
@@ -617,7 +618,7 @@ pg.setSimpleProperty('IsTree', false);
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [OnChangeExec(@"
-if(this.RenderAs === 2){
+if(this.RenderAs === 1){
     pg.ShowProperty('LinkRefId');
     pg.ShowProperty('LinkType');
 }

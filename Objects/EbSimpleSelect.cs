@@ -57,7 +57,7 @@ namespace ExpressBase.Objects
 
                     if(!isContained)
                         return;
-                    $('#' + this.EbSid_CtxId).selectpicker('val', p1);";
+                    $('#' + this.EbSid_CtxId).selectpicker('val', p1).trigger('change');";
             }
             set { }
         }

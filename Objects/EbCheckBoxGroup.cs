@@ -141,7 +141,7 @@ this.Init = function(id)
             get
             {
                 return @"
-                    return $('#' + this.EbSid_CtxId).prop('checked', p1 ==='true');
+                    return $('#' + this.EbSid_CtxId).prop('checked', p1 ==='true').trigger('change');
                 ";
             }
             set { }
