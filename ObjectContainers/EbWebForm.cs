@@ -405,6 +405,7 @@ namespace ExpressBase.Objects
             }
         }
 
+        //For Normal Mode
         public void RefreshFormData(IDatabase DataDB, Service service)
         {
             WebFormSchema _schema = this.GetWebFormSchema();
@@ -416,6 +417,8 @@ namespace ExpressBase.Objects
                 DataDB.GetNewParameter("id", EbDbTypes.Int32, this.TableRowId),
                 DataDB.GetNewParameter("context", EbDbTypes.String, context)
             });
+
+            Console.WriteLine("From RefreshFormData : Schema table count = " + _schema.Tables.Count + " Dataset count = " + dataset.Tables.Count);
 
             this.FormData = new WebformData();
 
@@ -483,6 +486,7 @@ namespace ExpressBase.Objects
             this.ExeDeleteCancelScript(DataDB);
         }
 
+        //For Prefill Mode
         public void RefreshFormData(IDatabase DataDB, Service service, List<Param> _params)
         {
             WebFormSchema _schema = this.GetWebFormSchema();
