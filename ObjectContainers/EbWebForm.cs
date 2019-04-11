@@ -954,25 +954,41 @@ namespace ExpressBase.Objects
             {
                 for (int i = 0; i < _this.Controls.Count; i++)
                 {
-                    if (_this.Controls[i] is EbUserControl)
+                    EbControl c = _this.Controls[i];
+                    if (c is EbUserControl || c is EbDGUserControlColumn)
                     {
-                        EbUserControl _temp = Redis.Get<EbUserControl>(_this.Controls[i].RefId);
+                        EbUserControl _temp = Redis.Get<EbUserControl>(c.RefId);
                         if (_temp == null)
                         {
-                            var result = client.Get<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = _this.Controls[i].RefId });
+                            var result = client.Get<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = c.RefId });
                             _temp = EbSerializers.Json_Deserialize(result.Data[0].Json);
-                            Redis.Set<EbUserControl>(_this.Controls[i].RefId, _temp);
+                            Redis.Set<EbUserControl>(c.RefId, _temp);
                         }
                         //_temp.RefId = _this.Controls[i].RefId;
-                        (_this.Controls[i] as EbUserControl).Controls = _temp.Controls;
-                        foreach (EbControl Control in (_this.Controls[i] as EbUserControl).Controls)
+                        if (c is EbDGUserControlColumn)
                         {
-                            RenameControlsRec(Control, _this.Controls[i].Name);
-                            //Control.ChildOf = "EbUserControl";
-                            //Control.Name = _this.Controls[i].Name + "_" + Control.Name;
+                            (c as EbDGUserControlColumn).Columns = _temp.Controls;
+                            foreach (EbControl Control in (c as EbDGUserControlColumn).Columns)
+                            {
+                                RenameControlsRec(Control, c.Name);
+                            }
                         }
-                        //_this.Controls[i] = _temp;
-                        _this.Controls[i].AfterRedisGet(Redis, client);
+                        else
+                        {
+                            (c as EbUserControl).Controls = _temp.Controls;
+                            foreach (EbControl Control in (c as EbUserControl).Controls)
+                            {
+                                RenameControlsRec(Control, c.Name);
+                                //Control.ChildOf = "EbUserControl";
+                                //Control.Name = c.Name + "_" + Control.Name;
+                            }
+                            //c = _temp;
+                            c.AfterRedisGet(Redis, client);
+                        }                        
+                    }
+                    else if(c is EbControlContainer)
+                    {
+                        AfterRedisGet(c as EbControlContainer, Redis, client);
                     }
                 }
             }
@@ -988,7 +1004,7 @@ namespace ExpressBase.Objects
             {
                 for (int i = 0; i < _this.Controls.Count; i++)
                 {
-                    if (_this.Controls[i] is EbUserControl)
+                    if (_this.Controls[i] is EbUserControl || _this.Controls[i] is EbDGUserControlColumn)
                     {
                         EbUserControl _temp = service.Redis.Get<EbUserControl>(_this.Controls[i].RefId);
                         if (_temp == null)
@@ -998,15 +1014,30 @@ namespace ExpressBase.Objects
                             service.Redis.Set<EbUserControl>(_this.Controls[i].RefId, _temp);
                         }
                         //_temp.RefId = _this.Controls[i].RefId;
-                        (_this.Controls[i] as EbUserControl).Controls = _temp.Controls;
-                        foreach (EbControl Control in (_this.Controls[i] as EbUserControl).Controls)
+                        if (_this.Controls[i] is EbDGUserControlColumn)
                         {
-                            RenameControlsRec(Control, _this.Controls[i].Name);
-                            //Control.ChildOf = "EbUserControl";
-                            //Control.Name = _this.Controls[i].Name + "_" + Control.Name;
+                            (_this.Controls[i] as EbDGUserControlColumn).Columns = _temp.Controls;
+                            foreach (EbControl Control in (_this.Controls[i] as EbDGUserControlColumn).Columns)
+                            {
+                                RenameControlsRec(Control, _this.Controls[i].Name);
+                            }
                         }
+                        else
+                        {
+                            (_this.Controls[i] as EbUserControl).Controls = _temp.Controls;
+                            foreach (EbControl Control in (_this.Controls[i] as EbUserControl).Controls)
+                            {
+                                RenameControlsRec(Control, _this.Controls[i].Name);
+                                //Control.ChildOf = "EbUserControl";
+                                //Control.Name = _this.Controls[i].Name + "_" + Control.Name;
+                            }
                         //_this.Controls[i] = _temp;
                         (_this.Controls[i] as EbUserControl).AfterRedisGet(service);
+                        }                        
+                    }
+                    else if (_this.Controls[i] is EbControlContainer)
+                    {
+                        AfterRedisGet(_this.Controls[i] as EbControlContainer, service);
                     }
                 }
             }

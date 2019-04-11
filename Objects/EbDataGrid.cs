@@ -159,7 +159,7 @@ $.each(this.Controls.$values, function (i, col) {
             get
             {
                 return @"
-                     $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val(p1);
+                     $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val(p1).trigger('change');
                 ";
             }
             set { }
@@ -424,17 +424,6 @@ $.each(this.Controls.$values, function (i, col) {
         public EbDGUserControlColumn()
         {
             this.EbUserControl = new EbUserControl();
-            DBareHtml = string.Concat(@"
-    <div class=`uc-col-wraper`>
-    ada mwone
-    </div>
-    
-        <div class=`input-group` style=`width:100%;`>
-            <input id=`@ebsid@` ui-inp data-ebtype=`@data-ebtype@`  data-toggle=`tooltip` title=`@toolTipText@` class=`date` type=`text` name=`@name@` autocomplete = `@autoComplete@` @value@ @tabIndex@ style=`width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@ @readOnlyString@ @required@ @placeHolder@ />
-            <span class=`input-group-addon` style=`padding: 0px;`> <i id=`@ebsid@TglBtn` class=`fa fa-ellipsis-h` aria-hidden=`true` style=`padding: 6px 12px;`></i> </span>
-        </div>
-
-").RemoveCR();
         }
 
         [EnableInBuilder(BuilderType.WebForm)]
@@ -443,12 +432,16 @@ $.each(this.Controls.$values, function (i, col) {
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [HideInPropertyGrid]
         [Alias("Controls")]
-        public List<EbControl> Columns { get { return this.EbUserControl.Controls; } set { this.EbUserControl.Controls = value; } }
+        public List<EbControl> Columns
+        {
+            get { return this.EbUserControl.Controls; }
+            set { this.EbUserControl.Controls = value; }
+        }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [OSE_ObjectTypes(EbObjectTypes.iUserControl)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
-        public string UserControlRefId { get { return this.EbUserControl.RefId; } set { this.EbUserControl.RefId = value; } }
+        public override string RefId { get { return this.EbUserControl.RefId; } set { this.EbUserControl.RefId = value; } }
 
         //public override string GetBareHtml()
         //{
@@ -470,17 +463,34 @@ $.each(this.Controls.$values, function (i, col) {
         [OnDeserialized]
         public void OnDeserializedMethod(StreamingContext context)
         {
-            DBareHtml = string.Concat(@"
-    <div class=`uc-col-wraper`>
-    ada mwone
-    </div>
-    
-        <div class=`input-group` style=`width:100%;`>
-            <input id=`@ebsid@` ui-inp data-ebtype=`@data-ebtype@`  data-toggle=`tooltip` title=`@toolTipText@` class=`date` type=`text` name=`@name@` autocomplete = `@autoComplete@` @value@ @tabIndex@ style=`width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@ @readOnlyString@ @required@ @placeHolder@ />
-            <span class=`input-group-addon` style=`padding: 0px;`> <i id=`@ebsid@TglBtn` class=`fa fa-ellipsis-h` aria-hidden=`true` style=`padding: 6px 12px;`></i> </span>
-        </div>
+            DBareHtml = @"
+<div class='input-group' style='width:100%;'>            
+    <input id='' ui-inp data-toggle='tooltip' title='' type='text' tabindex='0' style='width:100%; data-original-title=''>
+    <span class='input-group-addon' data-toggle='modal' data-target='#@ebsid@' style='padding: 0px;'> <i id='Date1TglBtn' class='fa  fa-ellipsis-h' aria-hidden='true' style='padding: 6px 12px;'></i> </span>
+</div>
 
-").RemoveCR();
+
+<!-- Modal -->
+<div class='modal fade' id='@ebsid@' tabindex='-1' role='dialog' aria-labelledby='@ebsid@Title' aria-hidden='true'>
+  <div class='modal-dialog modal-dialog-centered' role='document'>
+    <div class='modal-content'>
+      <div class='modal-header'>
+        <h5 class='modal-title' id='exampleModalLongTitle'>Modal title</h5>
+        <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
+          <span aria-hidden='true'>&times;</span>
+        </button>
+      </div>
+        <div class='modal-body'>
+        " + GetBareHtml() +
+        @" 
+        </div>
+      <div class='modal-footer'>
+        <button type='button' class='btn btn-secondary' data-dismiss='modal'>Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+".RemoveCR();
         }
     }
 
@@ -554,7 +564,7 @@ else {pg.MakeReadWrite('ValueMember');}")]
         {
             return this.EbPowerSelect.GetBareHtml();
         }
-                
+
         public string GetSelectQuery(Service service, string Col, string Tbl = null, string _id = null)
         {
             return this.EbPowerSelect.GetSelectQuery(service, Col, Tbl, _id);

@@ -37,7 +37,12 @@ namespace ExpressBase.Objects
 
         public override string GetBareHtml()
         {
-            return base.GetBareHtml();
+            string html = string.Empty;
+
+            foreach (EbControl c in this.Controls)
+                html += c.GetHtml();
+
+            return html;
         }
 
         public override string GetDesignHtml()
