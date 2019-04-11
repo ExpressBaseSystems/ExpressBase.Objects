@@ -78,6 +78,9 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.ApiBuilder)]
         [HideInPropertyGrid]
         public ApiParams Request { set; get; }
+
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        public ApiMethods Method { set; get; }
     }
 
     public abstract class ApiResources : EbApiWrapper
