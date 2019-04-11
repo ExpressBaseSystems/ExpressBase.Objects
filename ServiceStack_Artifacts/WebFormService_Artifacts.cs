@@ -41,7 +41,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 		[DataMember(Order = 2)]
 		public int RowId { get; set; }
-	}
+        
+        [DataMember(Order = 3)]
+        public User UserObj { get; set; }
+    }
 
 	[DataContract]
 	public class GetRowDataResponse : IEbSSResponse
@@ -139,6 +142,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 5)]
         public int CurrentLoc { get; set; }
+
+        [DataMember(Order = 6)]
+        public User UserObj { get; set; }
     }
 	
 	[DataContract]
