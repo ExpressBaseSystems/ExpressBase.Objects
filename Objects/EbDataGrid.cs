@@ -463,7 +463,7 @@ $.each(this.Controls.$values, function (i, col) {
         [OnDeserialized]
         public void OnDeserializedMethod(StreamingContext context)
         {
-            DBareHtml = @"
+            DBareHtml = (@"
 <div class='input-group' style='width:100%;'>            
     <input id='' ui-inp data-toggle='tooltip' title='' type='text' tabindex='0' style='width:100%; data-original-title=''>
     <span class='input-group-addon' data-toggle='modal' data-target='#@ebsid@' style='padding: 0px;'> <i id='Date1TglBtn' class='fa  fa-ellipsis-h' aria-hidden='true' style='padding: 6px 12px;'></i> </span>
@@ -475,7 +475,7 @@ $.each(this.Controls.$values, function (i, col) {
   <div class='modal-dialog modal-dialog-centered' role='document'>
     <div class='modal-content'>
       <div class='modal-header'>
-        <h5 class='modal-title' id='exampleModalLongTitle'>Modal title</h5>
+        <h5 class='modal-title' id='exampleModalLongTitle'>@modaltitle@</h5>
         <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
           <span aria-hidden='true'>&times;</span>
         </button>
@@ -490,7 +490,7 @@ $.each(this.Controls.$values, function (i, col) {
     </div>
   </div>
 </div>
-".RemoveCR();
+").Replace("@modaltitle@", Title).RemoveCR();
         }
     }
 
@@ -510,6 +510,17 @@ $.each(this.Controls.$values, function (i, col) {
         public EbDGPowerSelectColumn()
         {
             this.EbPowerSelect = new EbPowerSelect();
+        }
+
+        public override string SetValueJSfn
+        {
+            get
+            {
+                return @"
+                     this.initializer.setValues(p1);
+                ";
+            }
+            set { }
         }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
