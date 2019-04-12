@@ -579,8 +579,8 @@ namespace ExpressBase.Objects
                                     _colvals += string.Concat(rField.Name, "=:", rField.Name, "_", i, ",");
                                     if (rField.Value == null)
                                         rField.Value = DBNull.Value;
-                                    else if ((EbDbTypes)rField.Type == EbDbTypes.Date || (EbDbTypes)rField.Type == EbDbTypes.DateTime)
-                                        rField.Value = DateTime.ParseExact(rField.Value.ToString(), this.UserObj.Preference.ShortDatePattern, CultureInfo.InvariantCulture).Add(CultureHelper.GetDifference(this.UserObj.Preference.TimeZone));
+                                    //else if ((EbDbTypes)rField.Type == EbDbTypes.Date || (EbDbTypes)rField.Type == EbDbTypes.DateTime)
+                                    //    rField.Value = DateTime.ParseExact(rField.Value.ToString(), this.UserObj.Preference.ShortDatePattern, CultureInfo.InvariantCulture).Add(CultureHelper.GetDifference(this.UserObj.Preference.TimeZone));
                                     param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
                                 }
                             }
@@ -598,8 +598,8 @@ namespace ExpressBase.Objects
                             _vals += string.Concat(":", rField.Name, "_", i, ",");
                             if (rField.Value == null)
                                 rField.Value = DBNull.Value;
-                            else if ((EbDbTypes)rField.Type == EbDbTypes.Date || (EbDbTypes)rField.Type == EbDbTypes.DateTime)
-                                rField.Value = DateTime.ParseExact(rField.Value.ToString(), this.UserObj.Preference.ShortDatePattern, CultureInfo.InvariantCulture).Add(CultureHelper.GetDifference(this.UserObj.Preference.TimeZone));
+                            //else if ((EbDbTypes)rField.Type == EbDbTypes.Date || (EbDbTypes)rField.Type == EbDbTypes.DateTime)
+                            //    rField.Value = DateTime.ParseExact(rField.Value.ToString(), this.UserObj.Preference.ShortDatePattern, CultureInfo.InvariantCulture).Add(CultureHelper.GetDifference(this.UserObj.Preference.TimeZone));
                             param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
                         }
                         fullqry += string.Format(_qry, _tblname, _cols, _vals, this.FormData.MasterTable, this.FormData.MasterTable);
@@ -682,8 +682,8 @@ namespace ExpressBase.Objects
                             _values += string.Concat(":", rField.Name, "_", i, ", ");
                             if (rField.Value == null)
                                 rField.Value = DBNull.Value;
-                            else if ((EbDbTypes)rField.Type == EbDbTypes.Date || (EbDbTypes)rField.Type == EbDbTypes.DateTime)
-                                rField.Value = DateTime.ParseExact(rField.Value.ToString(), this.UserObj.Preference.ShortDatePattern, CultureInfo.InvariantCulture).Add(CultureHelper.GetDifference(this.UserObj.Preference.TimeZone));
+                            //else if ((EbDbTypes)rField.Type == EbDbTypes.Date || (EbDbTypes)rField.Type == EbDbTypes.DateTime)
+                            //    rField.Value = DateTime.ParseExact(rField.Value.ToString(), this.UserObj.Preference.ShortDatePattern, CultureInfo.InvariantCulture).Add(CultureHelper.GetDifference(this.UserObj.Preference.TimeZone));
                             param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
                         }
                     }
