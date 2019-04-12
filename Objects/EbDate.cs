@@ -248,13 +248,9 @@ $('#@id').MonthPicker({ StartYear: 2018, ShowIcon: false });"
         public override string GetValueJSfn
         {
             get
-            { return 
-            @"if(this.IsNullable){
-                if($('#' + this.EbSid_CtxId).siblings('.nullable-check').find('input[type=checkbox]').prop('checked'))
-		            return $('#' + this.EbSid_CtxId).val();
-	            else
-		            null;
-            }
+            { return
+            @"if((this.IsNullable && !($('#' + this.EbSid_CtxId).siblings('.nullable-check').find('input[type=checkbox]').prop('checked'))) || $('#' + this.EbSid_CtxId).val() === '')
+                null;
             else
 	            return $('#' + this.EbSid_CtxId).val();";
             }
