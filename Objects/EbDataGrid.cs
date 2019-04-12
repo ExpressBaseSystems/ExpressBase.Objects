@@ -66,12 +66,14 @@ $.each(this.Controls.$values, function (i, col) {
         public override List<EbControl> Controls { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
-        [PropertyGroup("test")]
+        [PropertyGroup("Behavior")]
         public bool IsEditable { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
-        [PropertyGroup("test")]
+        [PropertyGroup("Behavior")]
+        [DefaultPropValue("true")]
         public bool IsAddable { get; set; }
+
         public override string GetToolHtml()
         {
             return @"<div eb-type='@toolName' class='tool'><i class='fa fa-table'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
@@ -211,7 +213,7 @@ $.each(this.Controls.$values, function (i, col) {
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyGroup("Appearance")]
-        public int Width { get; set; }
+        public virtual int Width { get; set; }
     }
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
@@ -522,6 +524,11 @@ $.each(this.Controls.$values, function (i, col) {
             }
             set { }
         }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [PropertyGroup("Appearance")]
+        [DefaultPropValue("100")]
+        public override int Width { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
