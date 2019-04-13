@@ -61,6 +61,11 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.Collection)]
         public List<EbRoutines> BeforeSaveRoutines { get; set; }
 
+        [PropertyGroup("Events")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        public List<EbRoutines> AfterSaveRoutines { get; set; }
+
         public static EbOperations Operations = WFOperations.Instance;
 
         public override string GetHead()
@@ -104,7 +109,7 @@ namespace ExpressBase.Objects
 
         public override void BeforeSave()
         {
-            BeforeSaveRec(this);
+            //BeforeSaveRec(this);
         }
 
         private void BeforeSaveRec(EbControlContainer _container)
@@ -761,6 +766,48 @@ namespace ExpressBase.Objects
             int _rowid = temp.Rows.Count > 0 ? Convert.ToInt32(temp.Rows[0][0]) : 0;
 
             return _rowid;
+        }
+
+        public int AfterSave(IDatabase DataDB, bool IsUpdate)
+        {
+            string q = string.Empty;
+            if (this.AfterSaveRoutines != null && this.AfterSaveRoutines.Count > 0)
+            {
+                foreach(EbRoutines e in this.AfterSaveRoutines)
+                {
+                    if (!e.IsDisabled)
+                    {
+                        if (IsUpdate && e.Script.Code.ToLower().IndexOf("update") == 0)
+                            q += e.Script.Code + ";";
+                        if (!IsUpdate && e.Script.Code.ToLower().IndexOf("insert") == 0)
+                            q += e.Script.Code + ";";
+                    }
+                }
+                //q = string.Join(";", this.AfterSaveRoutines.Select(e => e.IsDisabled? "": (IsUpdate && e.Script.Code.ToLower().IndexOf("update") == 0) ? e.Script.Code: ""));
+            }
+            if (!q.Equals(string.Empty))
+            {
+                List<DbParameter> param = new List<DbParameter>();
+                foreach (KeyValuePair<string, SingleTable> item in this.FormData.MultipleTables)
+                {
+                    foreach (SingleColumn rField in item.Value[0].Columns)
+                    {
+                        if(q.Contains(":" + item.Key + "_" + rField.Name))
+                        {
+                            if (rField.Value == null)
+                            {
+                                var p = DataDB.GetNewParameter(item.Key + "_" + rField.Name, (EbDbTypes)rField.Type);
+                                p.Value = DBNull.Value;
+                                param.Add(p);
+                            }
+                            else
+                                param.Add(DataDB.GetNewParameter(item.Key + "_" + rField.Name, (EbDbTypes)rField.Type, rField.Value));
+                        }                        
+                    }
+                }
+                return DataDB.InsertTable(q, param.ToArray());
+            }
+            return -1;
         }
 
         private bool CanDelete(IDatabase DataDB)
