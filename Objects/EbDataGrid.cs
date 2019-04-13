@@ -292,18 +292,67 @@ $.each(this.Controls.$values, function (i, col) {
     [UsedWithTopObjectParent(typeof(EbObject))]
     public class EbDGDateColumn : EbDGColumn
     {
+        [JsonIgnore]
+        public EbDate EbDate { get; set; }
+
+        public EbDGDateColumn()
+        {
+            this.EbDate= new EbDate();
+        }
         [OnDeserialized]
         public void OnDeserializedMethod(StreamingContext context)
         {
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
+            DBareHtml = EbDate.GetBareHtml();
         }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [HideInPropertyGrid]
-        public override EbDbTypes EbDbType { get { return EbDbTypes.Date; } }
+        public override EbDbTypes EbDbType
+        {
+            get { return this.EbDate.EbDbType; }
+            set { this.EbDate.EbDbType = value; }
+        }
+
+        [JsonIgnore]
+        public override string GetValueJSfn
+        {
+            get
+            {
+                return
+              @"if((this.IsNullable && !($('#' + this.EbSid_CtxId).siblings('.nullable-check').find('input[type=checkbox]').prop('checked'))) || $('#' + this.EbSid_CtxId).val() === '')
+                null;
+            else
+	            return $('#' + this.EbSid_CtxId).val();";
+            }
+            set { }
+        }
 
         [EnableInBuilder(BuilderType.WebForm)]
         public override string InputControlType { get { return "EbDate"; } }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [OnChangeExec(@"
+                if (this.DoNotPersist){
+                        pg.HideProperty('IsNullable');
+                }
+                else {
+                       pg.ShowProperty('IsNullable');
+                }
+            ")]
+        public override bool DoNotPersist
+        {
+            get { return this.EbDate.DoNotPersist; }
+            set { this.EbDate.DoNotPersist = value; }
+        }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        public bool IsNullable
+        {
+            get { return this.EbDate.IsNullable; }
+            set { this.EbDate.IsNullable = value; }
+        }
+
     }
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
@@ -445,22 +494,10 @@ $.each(this.Controls.$values, function (i, col) {
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         public override string RefId { get { return this.EbUserControl.RefId; } set { this.EbUserControl.RefId = value; } }
 
-        //public override string GetBareHtml()
-        //{
-        //    return "<button class='btn'>xyz</button>";
-        //}
-
         public override string GetBareHtml()
         {
             return this.EbUserControl.GetBareHtml();
         }
-
-        //[OnDeserialized]
-        //public void OnDeserializedMethod(StreamingContext context)
-        //{
-        //    DBareHtml = "<button class='btn'>xyz</button>"; ;
-        //}
-
 
         [OnDeserialized]
         public void OnDeserializedMethod(StreamingContext context)
