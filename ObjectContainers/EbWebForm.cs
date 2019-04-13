@@ -780,13 +780,10 @@ namespace ExpressBase.Objects
             {
                 foreach(EbRoutines e in this.AfterSaveRoutines)
                 {
-                    if (!e.IsDisabled)
-                    {
-                        if (IsUpdate && e.Script.Code.ToLower().IndexOf("update") == 0)
-                            q += e.Script.Code + ";";
-                        if (!IsUpdate && e.Script.Code.ToLower().IndexOf("insert") == 0)
-                            q += e.Script.Code + ";";
-                    }
+                    if (IsUpdate && !e.IsDisabledOnEdit)
+                        q += e.Script.Code + ";";
+                    else if (!IsUpdate && !e.IsDisabledOnNew)
+                        q += e.Script.Code + ";";
                 }
             }
             if (!q.Equals(string.Empty))
@@ -1170,8 +1167,16 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.ScriptEditorJS, PropertyEditorType.ScriptEditorCS)]
         public override EbScript Script { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm)]
+        public bool IsDisabledOnNew { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        public bool IsDisabledOnEdit { get; set; }
+
         public override bool IsWarningOnly { get; set; }
 
         public override string FailureMSG { get; set; }
+
+        public override bool IsDisabled { get; set; }
     }
 }
