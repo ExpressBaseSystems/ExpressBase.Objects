@@ -158,8 +158,11 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 3)]
         public WebformData FormData { get; set; }
-        
+
         [DataMember(Order = 4)]
+        public int AfterSaveStatus { get; set; }
+
+        [DataMember(Order = 5)]
 		public ResponseStatus ResponseStatus { get; set; }
 	}
 
