@@ -321,7 +321,7 @@ $.each(this.Controls.$values, function (i, col) {
             {
                 return
               @"if((this.IsNullable && !($('#' + this.EbSid_CtxId).siblings('.nullable-check').find('input[type=checkbox]').prop('checked'))) || $('#' + this.EbSid_CtxId).val() === '')
-                null;
+                return undefined;
             else
 	            return $('#' + this.EbSid_CtxId).val();";
             }
