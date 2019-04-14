@@ -328,6 +328,10 @@ $.each(this.Controls.$values, function (i, col) {
             set { }
         }
 
+        [JsonIgnore]
+        public override string OnChangeBindJSFn { get { return @"$(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, new Function('form', 'user', `event`, atob(p1.col.OnChangeFn.Code)).bind(this, p1.form, p1.user));
+                                                                $(`[ebsid=${p1.DG.EbSid}] [colname=${this.Name}] [ui-inp]`).siblings('.nullable-check').on('change', `input[type=checkbox]`, new Function('form', 'user', `event`, atob(p1.col.OnChangeFn.Code)).bind(this, p1.form, p1.user));"; } set { } }
+
         [EnableInBuilder(BuilderType.WebForm)]
         public override string InputControlType { get { return "EbDate"; } }
 
