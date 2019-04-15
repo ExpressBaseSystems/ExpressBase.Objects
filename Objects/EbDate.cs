@@ -269,5 +269,8 @@ $('#@id').MonthPicker({ StartYear: 2018, ShowIcon: false });"
             }
             set { }
         }
+
+        [JsonIgnore]
+        public override string OnChangeBindJSFn { get { return @"$('#' + this.EbSid_CtxId).on('change', p1); $('#' + this.EbSid_CtxId).siblings('.nullable-check').find('input[type=checkbox]').on('change', p1);"; } set { } }
     }
 }
