@@ -314,6 +314,13 @@ $.each(this.Controls.$values, function (i, col) {
             set { this.EbDate.EbDbType = value; }
         }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        public EbDateType EbDateType
+        {
+            get { return this.EbDate.EbDateType; }
+            set { this.EbDate.EbDateType = value; }
+        }
+
         [JsonIgnore]
         public override string GetValueJSfn
         {
