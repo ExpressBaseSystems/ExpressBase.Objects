@@ -336,8 +336,9 @@ $.each(this.Controls.$values, function (i, col) {
         }
 
         [JsonIgnore]
-        public override string OnChangeBindJSFn { get { return @"$(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, new Function('form', 'user', `event`, atob(p1.col.OnChangeFn.Code)).bind(this, p1.form, p1.user));
-                                                                $(`[ebsid=${p1.DG.EbSid}] [colname=${this.Name}] [ui-inp]`).siblings('.nullable-check').on('change', `input[type=checkbox]`, new Function('form', 'user', `event`, atob(p1.col.OnChangeFn.Code)).bind(this, p1.form, p1.user));"; } set { } }
+        public override string OnChangeBindJSFn { get { return @"
+let func =new Function('form', 'user', `event`, atob(p1.col.OnChangeFn.Code)).bind(this, p1.form, p1.user);
+$(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, func).siblings('.nullable-check').on('change', `input[type=checkbox]`, func);"; } set { } }
 
         [EnableInBuilder(BuilderType.WebForm)]
         public override string InputControlType { get { return "EbDate"; } }
