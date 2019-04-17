@@ -29,7 +29,7 @@ namespace ExpressBase.Objects
             get
             {
                 return @"
-                    return parseInt($('#' + this.EbSid_CtxId).val()) || 0;
+                    return parseFloat($('#' + this.EbSid_CtxId).val()) || 0;
                 ";
             }
             set { }
@@ -71,6 +71,12 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         public bool AllowNegative { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        public int MaxLimit { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        public int MinLimit { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         public bool IsCurrency { get; set; }
@@ -220,7 +226,7 @@ $('#{0}').mask('SZZZZZZZZZZZ', {
                         <input type='text' data-ebtype='@datetype@' class='numinput' ui-inp id='@ebsid@' name='@name@' value='@value@' @placeHolder autocomplete = '@autoComplete@' data-toggle='tooltip' title='@toolTipText@' style=' width:100%; @backColor@ @foreColor@ @fontStyle@ display:inline-block; @readOnlyString@ @required@ @tabIndex@ />
                 </div>"
 .Replace("@name@", this.Name)
-.Replace("@ebsid@", String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@": this.EbSid_CtxId)
+.Replace("@ebsid@", String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId)
 .Replace("@toolTipText@", this.ToolTipText)
 .Replace("@autoComplete@", this.AutoCompleteOff ? "off" : "on")
 .Replace("@value@", "")//"value='" + this.Value + "'")

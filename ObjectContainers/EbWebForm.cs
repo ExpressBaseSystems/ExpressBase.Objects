@@ -3,6 +3,7 @@ using ExpressBase.Common.Data;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
+using ExpressBase.Common.Singletons;
 using ExpressBase.Common.Structures;
 using ExpressBase.Data;
 using ExpressBase.Objects.Objects;
@@ -40,9 +41,7 @@ namespace ExpressBase.Objects
         public WebformData FormData { get; set; }
 
         public WebFormSchema FormSchema { get; set; }
-
-        public int UserId { get; set; }
-
+        
         public User UserObj { get; set; }
 
         public int LocationId { get; set; }
@@ -61,6 +60,11 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.Collection)]
         public List<EbRoutines> BeforeSaveRoutines { get; set; }
+
+        [PropertyGroup("Events")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        public List<EbRoutines> AfterSaveRoutines { get; set; }
 
         public static EbOperations Operations = WFOperations.Instance;
 
@@ -105,7 +109,7 @@ namespace ExpressBase.Objects
 
         public override void BeforeSave()
         {
-            BeforeSaveRec(this);
+            //BeforeSaveRec(this);
         }
 
         private void BeforeSaveRec(EbControlContainer _container)
@@ -173,7 +177,7 @@ namespace ExpressBase.Objects
                         _dupcols += string.Format(", {0}_ebbkup = {0}, {0} = {0} || '_ebbkup'", _column.ColumnName);
                     }
                 }
-                query += string.Format("UPDATE {0} SET eb_del='T',eb_lastmodified_by = :eb_modified_by, eb_lastmodified_at = NOW() {1} WHERE {2} = :id AND eb_del='F';", _table.TableName, _dupcols, _id);
+                query += string.Format("UPDATE {0} SET eb_del='T',eb_lastmodified_by = :eb_modified_by, eb_lastmodified_at = CURRENT_TIMESTAMP AT TIME ZONE 'UTC' {1} WHERE {2} = :id AND eb_del='F';", _table.TableName, _dupcols, _id);
             }
             return query;
         }
@@ -188,7 +192,7 @@ namespace ExpressBase.Objects
                 string _id = "id";
                 if (_table.TableName != _schema.MasterTable)
                     _id = _schema.MasterTable + "_id";
-                query += string.Format("UPDATE {0} SET eb_void='T',eb_lastmodified_by = :eb_modified_by, eb_lastmodified_at = NOW() WHERE {1} = :id AND eb_void='F' AND eb_del='F';", _table.TableName, _id);
+                query += string.Format("UPDATE {0} SET eb_void='T',eb_lastmodified_by = :eb_modified_by, eb_lastmodified_at = CURRENT_TIMESTAMP AT TIME ZONE 'UTC' WHERE {1} = :id AND eb_void='F' AND eb_del='F';", _table.TableName, _id);
             }
             return query;
         }
@@ -334,7 +338,7 @@ namespace ExpressBase.Objects
                 {
                     Dictionary<string, string> dict = new Dictionary<string, string>();
                     dict.Add("{currentlocation.id}", this.LocationId.ToString());
-                    dict.Add("{user.id}", this.UserId.ToString());
+                    dict.Add("{user.id}", this.UserObj.UserId.ToString());
 
                     MatchCollection mc = Regex.Matches((c as EbAutoId).Pattern.sPattern, @"{(.*?)}");
                     foreach (Match m in mc)
@@ -386,7 +390,7 @@ namespace ExpressBase.Objects
                         if (dataColumn.Type == EbDbTypes.Date)
                         {
                             _unformattedData = (_unformattedData == DBNull.Value) ? DateTime.MinValue : _unformattedData;
-                            _formattedData = ((DateTime)_unformattedData).Date != DateTime.MinValue ? Convert.ToDateTime(_unformattedData).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) : string.Empty;
+                            _formattedData = ((DateTime)_unformattedData).Date != DateTime.MinValue ? Convert.ToDateTime(_unformattedData).Add(CultureHelper.GetDifference(this.UserObj.Preference.TimeZone, true)).ToString(this.UserObj.Preference.ShortDatePattern, CultureInfo.InvariantCulture) : string.Empty;
                         }
                         //else if(dataColumn.Type == EbDbTypes.DateTime)
                         //{
@@ -406,6 +410,7 @@ namespace ExpressBase.Objects
             }
         }
 
+        //For Normal Mode
         public void RefreshFormData(IDatabase DataDB, Service service)
         {
             WebFormSchema _schema = this.GetWebFormSchema();
@@ -417,6 +422,8 @@ namespace ExpressBase.Objects
                 DataDB.GetNewParameter("id", EbDbTypes.Int32, this.TableRowId),
                 DataDB.GetNewParameter("context", EbDbTypes.String, context)
             });
+
+            Console.WriteLine("From RefreshFormData : Schema table count = " + _schema.Tables.Count + " Dataset count = " + dataset.Tables.Count);
 
             this.FormData = new WebformData();
 
@@ -484,6 +491,7 @@ namespace ExpressBase.Objects
             this.ExeDeleteCancelScript(DataDB);
         }
 
+        //For Prefill Mode
         public void RefreshFormData(IDatabase DataDB, Service service, List<Param> _params)
         {
             WebFormSchema _schema = this.GetWebFormSchema();
@@ -560,11 +568,11 @@ namespace ExpressBase.Objects
                     string _tblname = entry.Key;
                     if (Convert.ToInt32(row.RowId) > 0)
                     {
-                        string _qry = "UPDATE {0} SET {1} eb_lastmodified_by = :eb_modified_by, eb_lastmodified_at = NOW() WHERE id={2};";
+                        string _qry = "UPDATE {0} SET {1} eb_lastmodified_by = :eb_modified_by, eb_lastmodified_at = CURRENT_TIMESTAMP AT TIME ZONE 'UTC' WHERE id={2};";
                         string _colvals = string.Empty;
                         if (row.IsDelete && !_tblname.Equals(this.FormData.MasterTable))
                         {
-                            _qry = "UPDATE {0} SET {1}, eb_lastmodified_by = :eb_modified_by, eb_lastmodified_at = NOW() WHERE id={2} AND eb_del='F';";
+                            _qry = "UPDATE {0} SET {1}, eb_lastmodified_by = :eb_modified_by, eb_lastmodified_at = CURRENT_TIMESTAMP AT TIME ZONE 'UTC' WHERE id={2} AND eb_del='F';";
                             _colvals = "eb_del='T'";
                         }
                         else
@@ -575,8 +583,18 @@ namespace ExpressBase.Objects
                                 {
                                     _colvals += string.Concat(rField.Name, "=:", rField.Name, "_", i, ",");
                                     if (rField.Value == null)
-                                        rField.Value = DBNull.Value;
-                                    param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
+                                    {
+                                        var p = DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type);
+                                        p.Value = DBNull.Value;
+                                        param.Add(p);
+                                    }
+                                    else if ((EbDbTypes)rField.Type == EbDbTypes.Date || (EbDbTypes)rField.Type == EbDbTypes.DateTime)
+                                    {
+                                        rField.Value = DateTime.ParseExact(rField.Value.ToString(), this.UserObj.Preference.ShortDatePattern, CultureInfo.InvariantCulture).Add(CultureHelper.GetDifference(this.UserObj.Preference.TimeZone));
+                                        param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
+                                    }
+                                    else
+                                        param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));                                    
                                 }
                             }
                         }
@@ -585,15 +603,25 @@ namespace ExpressBase.Objects
                     }
                     else
                     {
-                        string _qry = "INSERT INTO {0} ({1} eb_created_by, eb_created_at, eb_loc_id, {3}_id ) VALUES ({2} :eb_createdby, NOW(), :eb_loc_id, :{4}_id);";
+                        string _qry = "INSERT INTO {0} ({1} eb_created_by, eb_created_at, eb_loc_id, {3}_id ) VALUES ({2} :eb_createdby, CURRENT_TIMESTAMP AT TIME ZONE 'UTC', :eb_loc_id, :{4}_id);";
                         string _cols = string.Empty, _vals = string.Empty;
                         foreach (SingleColumn rField in row.Columns)
                         {
                             _cols += string.Concat(rField.Name, ",");
                             _vals += string.Concat(":", rField.Name, "_", i, ",");
                             if (rField.Value == null)
-                                rField.Value = DBNull.Value;
-                            param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
+                            {
+                                var p = DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type);
+                                p.Value = DBNull.Value;
+                                param.Add(p);
+                            }
+                            else if ((EbDbTypes)rField.Type == EbDbTypes.Date || (EbDbTypes)rField.Type == EbDbTypes.DateTime)
+                            {
+                                rField.Value = DateTime.ParseExact(rField.Value.ToString(), this.UserObj.Preference.ShortDatePattern, CultureInfo.InvariantCulture).Add(CultureHelper.GetDifference(this.UserObj.Preference.TimeZone));
+                                param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
+                            }
+                            else
+                                param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
                         }
                         fullqry += string.Format(_qry, _tblname, _cols, _vals, this.FormData.MasterTable, this.FormData.MasterTable);
                     }
@@ -637,9 +665,9 @@ namespace ExpressBase.Objects
 
             param.Add(DataDB.GetNewParameter(this.FormData.MasterTable + "_id", EbDbTypes.Int32, this.FormData.MultipleTables[this.FormData.MasterTable][0].RowId));
             param.Add(DataDB.GetNewParameter("eb_loc_id", EbDbTypes.Int32, this.LocationId));
-            param.Add(DataDB.GetNewParameter("eb_createdby", EbDbTypes.Int32, this.UserId));
+            param.Add(DataDB.GetNewParameter("eb_createdby", EbDbTypes.Int32, this.UserObj.UserId));
             //param.Add(this.EbConnectionFactory.DataDB.GetNewParameter("eb_createdat", EbDbTypes.DateTime, System.DateTime.Now));
-            param.Add(DataDB.GetNewParameter("eb_modified_by", EbDbTypes.Int32, this.UserId));
+            param.Add(DataDB.GetNewParameter("eb_modified_by", EbDbTypes.Int32, this.UserObj.UserId));
             //param.Add(this.EbConnectionFactory.DataDB.GetNewParameter("eb_modified_at", EbDbTypes.DateTime, System.DateTime.Now));
 
             return DataDB.InsertTable(fullqry, param.ToArray());
@@ -655,7 +683,7 @@ namespace ExpressBase.Objects
             {
                 foreach (SingleRow row in entry.Value)
                 {
-                    string _qry = "INSERT INTO {0} ({1} eb_created_by, eb_created_at, eb_loc_id {3} ) VALUES ({2} :eb_createdby, NOW(), :eb_loc_id {4});";
+                    string _qry = "INSERT INTO {0} ({1} eb_created_by, eb_created_at, eb_loc_id {3} ) VALUES ({2} :eb_createdby, CURRENT_TIMESTAMP AT TIME ZONE 'UTC', :eb_loc_id {4});";
                     string _tblname = entry.Key;
                     string _cols = string.Empty;
                     string _values = string.Empty;
@@ -674,8 +702,18 @@ namespace ExpressBase.Objects
                             _cols += string.Concat(rField.Name, ", ");
                             _values += string.Concat(":", rField.Name, "_", i, ", ");
                             if (rField.Value == null)
-                                rField.Value = DBNull.Value;
-                            param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
+                            {
+                                var p = DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type);
+                                p.Value = DBNull.Value;
+                                param.Add(p);
+                            }
+                            else if ((EbDbTypes)rField.Type == EbDbTypes.Date || (EbDbTypes)rField.Type == EbDbTypes.DateTime)
+                            {
+                                rField.Value = DateTime.ParseExact(rField.Value.ToString(), this.UserObj.Preference.ShortDatePattern, CultureInfo.InvariantCulture).Add(CultureHelper.GetDifference(this.UserObj.Preference.TimeZone));
+                                param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
+                            }
+                            else
+                                param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));   
                         }
                     }
                     i++;
@@ -723,7 +761,7 @@ namespace ExpressBase.Objects
             }
             //-----------------------------------------------------------------------------
 
-            param.Add(DataDB.GetNewParameter("eb_createdby", EbDbTypes.Int32, this.UserId));
+            param.Add(DataDB.GetNewParameter("eb_createdby", EbDbTypes.Int32, this.UserObj.UserId));
             param.Add(DataDB.GetNewParameter("eb_loc_id", EbDbTypes.Int32, this.LocationId));
             //param.Add(DataDB.GetNewParameter("eb_auto_id", EbDbTypes.String, FormData.AutoIdText ?? string.Empty));
             //fullqry += string.Format("UPDATE {0} SET eb_auto_id = :eb_auto_id || cur_val('{0}_id_seq')::text WHERE id = cur_val('{0}_id_seq');", this.TableName);
@@ -733,6 +771,44 @@ namespace ExpressBase.Objects
             int _rowid = temp.Rows.Count > 0 ? Convert.ToInt32(temp.Rows[0][0]) : 0;
 
             return _rowid;
+        }
+
+        public int AfterSave(IDatabase DataDB, bool IsUpdate)
+        {
+            string q = string.Empty;
+            if (this.AfterSaveRoutines != null && this.AfterSaveRoutines.Count > 0)
+            {
+                foreach(EbRoutines e in this.AfterSaveRoutines)
+                {
+                    if (IsUpdate && !e.IsDisabledOnEdit)
+                        q += e.Script.Code + ";";
+                    else if (!IsUpdate && !e.IsDisabledOnNew)
+                        q += e.Script.Code + ";";
+                }
+            }
+            if (!q.Equals(string.Empty))
+            {
+                List<DbParameter> param = new List<DbParameter>();
+                foreach (KeyValuePair<string, SingleTable> item in this.FormData.MultipleTables)
+                {
+                    foreach (SingleColumn rField in item.Value[0].Columns)
+                    {
+                        if(q.Contains(":" + item.Key + "_" + rField.Name))
+                        {
+                            if (rField.Value == null)
+                            {
+                                var p = DataDB.GetNewParameter(item.Key + "_" + rField.Name, (EbDbTypes)rField.Type);
+                                p.Value = DBNull.Value;
+                                param.Add(p);
+                            }
+                            else
+                                param.Add(DataDB.GetNewParameter(item.Key + "_" + rField.Name, (EbDbTypes)rField.Type, rField.Value));
+                        }                        
+                    }
+                }
+                return DataDB.InsertTable(q, param.ToArray());
+            }
+            return -1;
         }
 
         private bool CanDelete(IDatabase DataDB)
@@ -763,7 +839,7 @@ namespace ExpressBase.Objects
             {
                 string query = this.GetDeleteQuery();
                 DbParameter[] param = new DbParameter[] {
-                    DataDB.GetNewParameter("eb_modified_by", EbDbTypes.Int32, this.UserId),
+                    DataDB.GetNewParameter("eb_modified_by", EbDbTypes.Int32, this.UserObj.UserId),
                     DataDB.GetNewParameter("id", EbDbTypes.Int32, this.TableRowId)
                 };
                 return DataDB.UpdateTable(query, param);
@@ -799,7 +875,7 @@ namespace ExpressBase.Objects
             {
                 string query = this.GetCancelQuery();
                 DbParameter[] param = new DbParameter[] {
-                    DataDB.GetNewParameter("eb_modified_by", EbDbTypes.Int32, this.UserId),
+                    DataDB.GetNewParameter("eb_modified_by", EbDbTypes.Int32, this.UserObj.UserId),
                     DataDB.GetNewParameter("id", EbDbTypes.Int32, this.TableRowId)
                 };
                 return DataDB.UpdateTable(query, param);
@@ -1091,8 +1167,16 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.ScriptEditorJS, PropertyEditorType.ScriptEditorCS)]
         public override EbScript Script { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm)]
+        public bool IsDisabledOnNew { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        public bool IsDisabledOnEdit { get; set; }
+
         public override bool IsWarningOnly { get; set; }
 
         public override string FailureMSG { get; set; }
+
+        public override bool IsDisabled { get; set; }
     }
 }
