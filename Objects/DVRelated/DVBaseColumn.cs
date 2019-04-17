@@ -212,11 +212,11 @@ else{
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.DropDown)]
         [OnChangeExec(@"
-if(this.FormMode === 0){
+if(this.FormMode === 1){
     pg.ShowProperty('FormId');
     pg.HideProperty('FormParameters');
 }
-else{
+else if(this.FormMode === 2){
     pg.HideProperty('FormId');
     pg.ShowProperty('FormParameters');
 }")]
