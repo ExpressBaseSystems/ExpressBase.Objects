@@ -272,6 +272,9 @@ $.each(this.Controls.$values, function (i, col) {
 
         [EnableInBuilder(BuilderType.WebForm)]
         public bool IsAggragate { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        public bool AllowNegative { get; set; }
     }
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
