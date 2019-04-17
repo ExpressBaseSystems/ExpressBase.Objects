@@ -3,6 +3,7 @@ using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
 using ExpressBase.Objects.Helpers;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -242,5 +243,34 @@ $('#@id').MonthPicker({ StartYear: 2018, ShowIcon: false });"
 
             return ReplacePropsInHTML(EbCtrlHTML);
         }
+
+        [JsonIgnore]
+        public override string GetValueJSfn
+        {
+            get
+            { return
+            @"if((this.IsNullable && !($('#' + this.EbSid_CtxId).siblings('.nullable-check').find('input[type=checkbox]').prop('checked'))) || $('#' + this.EbSid_CtxId).val() === '')
+                return undefined;
+            else
+	            return $('#' + this.EbSid_CtxId).val();";
+            }
+            set { }
+        }
+
+        [JsonIgnore]
+        public override string SetValueJSfn
+        {
+            get
+            { return
+            @"if(this.IsNullable && p1 !== null){
+                $('#' + this.EbSid_CtxId).siblings('.nullable-check').find('input[type=checkbox]').prop('checked', true);
+            }
+            $('#' + this.EbSid_CtxId).val(p1).trigger('change');";
+            }
+            set { }
+        }
+
+        [JsonIgnore]
+        public override string OnChangeBindJSFn { get { return @"$('#' + this.EbSid_CtxId).on('change', p1); $('#' + this.EbSid_CtxId).siblings('.nullable-check').find('input[type=checkbox]').on('change', p1);"; } set { } }
     }
 }
