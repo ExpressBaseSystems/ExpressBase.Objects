@@ -57,7 +57,7 @@ namespace ExpressBase.Objects
 console.log(1000);
         let VMs = this.initializer.Vobj.valueMembers;
         let DMs = this.initializer.Vobj.displayMembers;
-        let columnvals = this.initializer.columnvals;
+        let columnVals = this.initializer.columnVals;
 
         if (VMs.length > 0)// clear if already values there
             this.initializer.clearValues();
@@ -80,11 +80,11 @@ console.log(1000);
 
         $.each(DMtable, function (j, r) {
             $.each(r.Columns, function (j, item) {
-                if (!columnvals[item.Name]) {
+                if (!columnVals[item.Name]) {
                     console.warn('Mismatch found in Colums in datasource and Colums in object');
                     return true;
                 }
-                columnvals[item.Name].push(item.Value);
+                columnVals[item.Name].push(item.Value);
             }.bind(this));
         }.bind(this));
 
