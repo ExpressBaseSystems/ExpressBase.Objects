@@ -370,6 +370,19 @@ namespace ExpressBase.Objects
         {
             foreach (EbDataRow dataRow in dataTable.Rows)
             {
+                string _rowId = dataRow[dataTable.Columns[0].ColumnIndex].ToString();
+                bool _rowFound = false;
+                foreach (SingleRow r in Table)
+                {
+                    if (r.RowId.Equals(_rowId))
+                    {
+                        _rowFound = true;
+                        break;
+                    }
+                }                    
+                if (_rowFound)
+                    continue;
+
                 SingleRow Row = new SingleRow();
                 foreach (EbDataColumn dataColumn in dataTable.Columns)
                 {
@@ -405,7 +418,7 @@ namespace ExpressBase.Objects
                         });
                     }                    
                 }
-                Row.RowId = dataRow[dataTable.Columns[0].ColumnIndex].ToString();
+                Row.RowId = _rowId;
                 Table.Add(Row);
             }
         }
