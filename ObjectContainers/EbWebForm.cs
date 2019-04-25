@@ -408,7 +408,7 @@ namespace ExpressBase.Objects
                         else if (dataColumn.Type == EbDbTypes.DateTime)
                         {
                             _unformattedData = (_unformattedData == DBNull.Value) ? DateTime.MinValue : _unformattedData;
-                            _formattedData = ((DateTime)_unformattedData).Date != DateTime.MinValue ? Convert.ToDateTime(_unformattedData).Add(CultureHelper.GetDifference(this.UserObj.Preference.TimeZone, true)).ToString(this.UserObj.Preference.ShortDatePattern, CultureInfo.InvariantCulture) : string.Empty;
+                            _formattedData = ((DateTime)_unformattedData).Date != DateTime.MinValue ? Convert.ToDateTime(_unformattedData).ConvertFromUtc(this.UserObj.Preference.TimeZone).ToString(this.UserObj.Preference.ShortDatePattern, CultureInfo.InvariantCulture) : string.Empty;
                         }
                         Row.Columns.Add(new SingleColumn()
                         {
@@ -608,7 +608,7 @@ namespace ExpressBase.Objects
                                     }
                                     else if ((EbDbTypes)rField.Type == EbDbTypes.DateTime)
                                     {
-                                        rField.Value = DateTime.ParseExact(rField.Value.ToString(), this.UserObj.Preference.ShortDatePattern, CultureInfo.InvariantCulture).Add(CultureHelper.GetDifference(this.UserObj.Preference.TimeZone));
+                                        rField.Value = DateTime.ParseExact(rField.Value.ToString(), this.UserObj.Preference.ShortDatePattern, CultureInfo.InvariantCulture).ConvertToUtc(this.UserObj.Preference.TimeZone);
                                         param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
                                     }
                                     else
@@ -640,7 +640,7 @@ namespace ExpressBase.Objects
                             }
                             else if ((EbDbTypes)rField.Type == EbDbTypes.DateTime)
                             {
-                                rField.Value = DateTime.ParseExact(rField.Value.ToString(), this.UserObj.Preference.ShortDatePattern, CultureInfo.InvariantCulture).Add(CultureHelper.GetDifference(this.UserObj.Preference.TimeZone));
+                                rField.Value = DateTime.ParseExact(rField.Value.ToString(), this.UserObj.Preference.ShortDatePattern, CultureInfo.InvariantCulture).ConvertToUtc(this.UserObj.Preference.TimeZone);
                                 param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
                             }
                             else
@@ -737,7 +737,7 @@ namespace ExpressBase.Objects
                             }
                             else if ((EbDbTypes)rField.Type == EbDbTypes.DateTime)
                             {
-                                rField.Value = DateTime.ParseExact(rField.Value.ToString(), this.UserObj.Preference.ShortDatePattern, CultureInfo.InvariantCulture).Add(CultureHelper.GetDifference(this.UserObj.Preference.TimeZone));
+                                rField.Value = DateTime.ParseExact(rField.Value.ToString(), this.UserObj.Preference.ShortDatePattern, CultureInfo.InvariantCulture).ConvertToUtc(this.UserObj.Preference.TimeZone);
                                 param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
                             }
                             else
