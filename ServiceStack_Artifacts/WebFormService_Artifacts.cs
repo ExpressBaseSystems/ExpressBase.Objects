@@ -224,43 +224,46 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 		[DataMember(Order = 2)]
 		public int RowId { get; set; }
-	}
+
+        [DataMember(Order = 3)]
+        public User UserObj { get; set; }
+    }
 
 	[DataContract]
 	public class GetAuditTrailResponse : IEbSSResponse
 	{
 		[DataMember(Order = 1)]
-		public Dictionary<int, FormTransaction> Logs { get; set; }
+		public string Json { get; set; }
 
 		[DataMember(Order = 2)]
 		public ResponseStatus ResponseStatus { get; set; }
 	}
 
-	[DataContract]
-	public class FormTransaction
-	{
-		[DataMember(Order = 1)]
-		public string CreatedBy;
+	//[DataContract]
+	//public class FormTransaction
+	//{
+	//	[DataMember(Order = 1)]
+	//	public string CreatedBy;
 
-		[DataMember(Order = 2)]
-		public string CreatedAt;
+	//	[DataMember(Order = 2)]
+	//	public string CreatedAt;
 
-		[DataMember(Order = 3)]
-		public List<FormTransactionLine> Details;
-	}
+	//	[DataMember(Order = 3)]
+	//	public List<FormTransactionLine> Details;
+	//}
 
-	[DataContract]
-	public class FormTransactionLine
-	{
-		[DataMember(Order = 1)]
-		public string FieldName;
+	//[DataContract]
+	//public class FormTransactionLine
+	//{
+	//	[DataMember(Order = 1)]
+	//	public string FieldName;
 
-		[DataMember(Order = 2)]
-		public string OldValue;
+	//	[DataMember(Order = 2)]
+	//	public string OldValue;
 
-		[DataMember(Order = 3)]
-		public string NewValue;
-	}
+	//	[DataMember(Order = 3)]
+	//	public string NewValue;
+	//}
 
 
     //=============================================== MISCELLANEOUS ====================================================

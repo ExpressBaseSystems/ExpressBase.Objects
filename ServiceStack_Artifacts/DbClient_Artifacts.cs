@@ -31,6 +31,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 3)]
         public string DB_Name { get; set; }
 
+        [DataMember(Order = 4)]
+        public int TableCount { get; set; }       
+
     }
 
     [DataContract]

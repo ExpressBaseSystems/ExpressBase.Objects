@@ -275,7 +275,7 @@ namespace ExpressBase.Objects
                 {
                     _currentTimeStamp = DateTime.UtcNow;
                     string timezone = ReadingUser.Preference.TimeZone;
-                    _currentTimeStamp = _currentTimeStamp.Add(CultureHelper.GetDifference(timezone,true));
+                    _currentTimeStamp = _currentTimeStamp.ConvertFromUtc(timezone);
                 }
                 return _currentTimeStamp;
             }

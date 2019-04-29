@@ -736,13 +736,54 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         }
     }
 
+    [DataContract]
+    public class DatawriterRequest : IReturn<string>, IEbSSRequest
+    {
+        [DataMember(Order = 1)]
+        public string Sql { get; set; }
+
+        [DataMember(Order = 2)]
+        public List<Param> Parameters { get; set; }
+
+        [DataMember(Order = 3)]
+        public string SolnId { get; set; }
+
+        [DataMember(Order = 4)]
+        public int UserId { get; set; }
+    }
+
+    [DataContract]
+    public class DatawriterResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Reponse { set; get; }
+
+        [DataMember(Order = 3)]
+        public EbDataTable Data { set; get; }
+
+        public DatawriterResponse()
+        {
+            ResponseStatus = new ResponseStatus();
+        }
+    }
+
     public class SqlFuncDataTable
     {
         public RowColletion Rows { set; get; }
 
         public DVColumnCollection Colums { set; get; }
     }
-    
+
+    public class DataWriterDataTable
+    {
+        public RowColletion Rows { set; get; }
+
+        public DVColumnCollection Colums { set; get; }
+    }
+
     [DataContract]
     public class DataSourceDataSetColumnsRequest : IReturn<DataSourceColumnsResponse>, IEbSSRequest
     {
