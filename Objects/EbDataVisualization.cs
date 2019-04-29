@@ -140,6 +140,14 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [HideInPropertyGrid]
+        public List<DVColumnCollection> ColumnsCollection { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [HideInPropertyGrid]
+        public List<Param> ParamsList { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [HideInPropertyGrid]
         public List<DVBaseColumn> NotVisibleColumns { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
