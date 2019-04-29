@@ -497,7 +497,7 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, func
         [EnableInBuilder(BuilderType.WebForm)]
         public override string InputControlType { get { return "EbUserControl"; } }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [HideInPropertyGrid]
         [Alias("Controls")]
         public List<EbControl> Columns
@@ -510,6 +510,14 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, func
         [OSE_ObjectTypes(EbObjectTypes.iUserControl)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         public override string RefId { get { return this.EbUserControl.RefId; } set { this.EbUserControl.RefId = value; } }
+
+        [EnableInBuilder(BuilderType.UserControl, BuilderType.WebForm, BuilderType.FilterDialog)]
+        [HideInPropertyGrid]
+        public Dictionary<string, string> ChildDBareHtmlColl { get { return this.EbUserControl.ChildDBareHtmlColl; } set { this.EbUserControl.ChildDBareHtmlColl = value; } }
+
+        [EnableInBuilder(BuilderType.UserControl, BuilderType.WebForm, BuilderType.FilterDialog)]
+        [HideInPropertyGrid]
+        public string temps { get { return this.EbUserControl.temps; } set { this.EbUserControl.temps = value; } }
 
         public override string GetBareHtml()
         {

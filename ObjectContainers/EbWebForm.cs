@@ -1274,7 +1274,7 @@ namespace ExpressBase.Objects
                         //_temp.RefId = _this.Controls[i].RefId;
                         if (c is EbDGUserControlColumn)
                         {
-                            (c as EbDGUserControlColumn).Columns = _temp.Controls;
+                            (c as EbDGUserControlColumn).EbUserControl = _temp;
                             foreach (EbControl Control in (c as EbDGUserControlColumn).Columns)
                             {
                                 RenameControlsRec(Control, c.Name);
@@ -1323,7 +1323,7 @@ namespace ExpressBase.Objects
                         //_temp.RefId = _this.Controls[i].RefId;
                         if (_this.Controls[i] is EbDGUserControlColumn)
                         {
-                            (_this.Controls[i] as EbDGUserControlColumn).Columns = _temp.Controls;
+                            (_this.Controls[i] as EbDGUserControlColumn).EbUserControl = _temp;
                             foreach (EbControl Control in (_this.Controls[i] as EbDGUserControlColumn).Columns)
                             {
                                 RenameControlsRec(Control, _this.Controls[i].Name);
