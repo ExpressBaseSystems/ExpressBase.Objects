@@ -577,7 +577,7 @@ namespace ExpressBase.Objects
                 r = 1;
             }
             this.RefreshFormData(DataDB, service);
-            this.UpdateAuditTrail(DataDB);
+            //this.UpdateAuditTrail(DataDB);//
             return r;
         }
 
