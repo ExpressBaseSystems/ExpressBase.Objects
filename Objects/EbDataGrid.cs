@@ -522,7 +522,7 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, func
             DBareHtml = (@"
 <div class='input-group' style='width:100%;'>            
     <input id='' ui-inp data-toggle='tooltip' title='' type='text' tabindex='0' style='width:100%; data-original-title=''>
-    <span class='input-group-addon' data-toggle='modal' data-target='#@ebsid@' style='padding: 0px;'> <i id='Date1TglBtn' class='fa  fa-ellipsis-h' aria-hidden='true' style='padding: 6px 12px;'></i> </span>
+    <span class='input-group-addon ucspan' data-toggle='modal' data-target='#@ebsid@' style='padding: 0px;'> <button type='button' id='Date1TglBtn' class='fa  fa-ellipsis-h ucbtn' aria-hidden='true' style='padding: 6px 12px;'></button> </span>
 </div>
 
 
