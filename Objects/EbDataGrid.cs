@@ -497,7 +497,7 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, func
         [EnableInBuilder(BuilderType.WebForm)]
         public override string InputControlType { get { return "EbUserControl"; } }
 
-        //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [HideInPropertyGrid]
         [Alias("Controls")]
         public List<EbControl> Columns

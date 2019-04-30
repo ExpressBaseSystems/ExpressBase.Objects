@@ -111,6 +111,26 @@ namespace ExpressBase.Objects
 
         public override void BeforeSave()
         {
+            EbControl[] Allctrls = this.Controls.FlattenAllEbControls();
+            for (int i = 0; i < Allctrls.Length; i++)
+            {
+                if (Allctrls[i] is EbDataGrid)
+                {
+                    for (int j = 0; j < (Allctrls[i] as EbDataGrid).Controls.Count; j++)
+                    {
+                        if ((Allctrls[i] as EbDataGrid).Controls[j] is EbDGUserControlColumn) {
+                            EbControl DGColumn = (Allctrls[i] as EbDataGrid).Controls[j];
+                            (Allctrls[i] as EbDataGrid).Controls[j] = new EbDGUserControlColumn {
+                                RefId = DGColumn.RefId,
+                                Name = DGColumn.Name,
+                                EbSid = DGColumn.EbSid,
+                                EbSid_CtxId = DGColumn.EbSid_CtxId
+                            };
+                        }
+                    }
+                }
+            }
+
             //BeforeSaveRec(this);
         }
 
@@ -1275,10 +1295,10 @@ namespace ExpressBase.Objects
                         if (c is EbDGUserControlColumn)
                         {
                             (c as EbDGUserControlColumn).EbUserControl = _temp;
-                            foreach (EbControl Control in (c as EbDGUserControlColumn).Columns)
-                            {
-                                RenameControlsRec(Control, c.Name);
-                            }
+                            //foreach (EbControl Control in (c as EbDGUserControlColumn).Columns)
+                            //{
+                            //    RenameControlsRec(Control, c.Name);
+                            //}
                         }
                         else
                         {
@@ -1324,10 +1344,10 @@ namespace ExpressBase.Objects
                         if (_this.Controls[i] is EbDGUserControlColumn)
                         {
                             (_this.Controls[i] as EbDGUserControlColumn).EbUserControl = _temp;
-                            foreach (EbControl Control in (_this.Controls[i] as EbDGUserControlColumn).Columns)
-                            {
-                                RenameControlsRec(Control, _this.Controls[i].Name);
-                            }
+                            //foreach (EbControl Control in (_this.Controls[i] as EbDGUserControlColumn).Columns)
+                            //{
+                            //    RenameControlsRec(Control, _this.Controls[i].Name);
+                            //}
                         }
                         else
                         {
