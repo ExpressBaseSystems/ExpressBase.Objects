@@ -435,6 +435,8 @@ namespace ExpressBase.Objects
             this.OrderBy = new List<DVBaseColumn>();
             //this.ParentColumn = new List<DVBaseColumn>();
             //this.GroupingColumn = new List<DVBaseColumn>();
+            this.ColumnsCollection = new List<DVColumnCollection>();
+            this.ParamsList = new List<Param>();
         }
 
         public override string DiscoverRelatedRefids()
