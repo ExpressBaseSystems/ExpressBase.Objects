@@ -511,6 +511,14 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, func
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         public override string RefId { get { return this.EbUserControl.RefId; } set { this.EbUserControl.RefId = value; } }
 
+        [EnableInBuilder(BuilderType.UserControl, BuilderType.WebForm, BuilderType.FilterDialog)]
+        [HideInPropertyGrid]
+        public Dictionary<string, string> ChildDBareHtmlColl { get { return this.EbUserControl.ChildDBareHtmlColl; } set { this.EbUserControl.ChildDBareHtmlColl = value; } }
+
+        [EnableInBuilder(BuilderType.UserControl, BuilderType.WebForm, BuilderType.FilterDialog)]
+        [HideInPropertyGrid]
+        public string temps { get { return this.EbUserControl.temps; } set { this.EbUserControl.temps = value; } }
+
         public override string GetBareHtml()
         {
             return this.EbUserControl.GetBareHtml();
