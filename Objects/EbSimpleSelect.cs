@@ -80,7 +80,7 @@ namespace ExpressBase.Objects
             get
             {
                 return @"
-                    return !isNaNOrEmpty(this.getValue()) && (this.getValue() !== '-1');
+                    return !this.isInVisibleInUI ? (!isNaNOrEmpty(this.getValue()) && (this.getValue() !== '-1')) : true;
                 ";
             }
             set { }

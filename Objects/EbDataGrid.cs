@@ -91,7 +91,7 @@ $.each(this.Controls.$values, function (i, col) {
                 if (!col.Hidden)
                     html += string.Concat("<th style='width: @Width@; @bg@' title='", col.Title, "'><span class='grid-col-title'>", col.Title, "</span>@req@</th>")
                         .Replace("@req@", (col.Required ? "<sup style='color: red'>*</sup>" : string.Empty))
-                        .Replace("@Width@", (col.Width <= 0) ? "auto" : col.Width.ToString() + "px")
+                        .Replace("@Width@", (col.Width <= 0) ? "auto" : col.Width.ToString() + "%")
                         .Replace("@bg@", col.IsDisable ? "background-color:#fafafa; color:#555" : string.Empty);
             }
 
