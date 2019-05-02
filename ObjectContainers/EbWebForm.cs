@@ -1123,7 +1123,7 @@ namespace ExpressBase.Objects
                     {
                         ActionType = Convert.ToInt32(dr["actiontype"]) == 1 ? "Insert" : "Update",
                         CreatedBy = dr["fullname"].ToString(),
-                        CreatedAt = Convert.ToDateTime(dr["eb_createdat"]).ToString("dd-MM-yyyy hh:mm:ss tt", CultureInfo.InvariantCulture) + " (UTC)"
+                        CreatedAt = Convert.ToDateTime(dr["eb_createdat"]).ToString("dd-MM-yyyy hh:mm tt", CultureInfo.InvariantCulture) + " (UTC)"
                     });
                 }
                 string[] ids = dr["idrelation"].ToString().Split('-');
