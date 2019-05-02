@@ -91,7 +91,7 @@ $.each(this.Controls.$values, function (i, col) {
                 if (!col.Hidden)
                     html += string.Concat("<th style='width: @Width@; @bg@' title='", col.Title, "'><span class='grid-col-title'>", col.Title, "</span>@req@</th>")
                         .Replace("@req@", (col.Required ? "<sup style='color: red'>*</sup>" : string.Empty))
-                        .Replace("@Width@", (col.Width <= 0) ? "auto" : col.Width.ToString() + "px")
+                        .Replace("@Width@", (col.Width <= 0) ? "auto" : col.Width.ToString() + "%")
                         .Replace("@bg@", col.IsDisable ? "background-color:#fafafa; color:#555" : string.Empty);
             }
 
@@ -510,6 +510,14 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, func
         [OSE_ObjectTypes(EbObjectTypes.iUserControl)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         public override string RefId { get { return this.EbUserControl.RefId; } set { this.EbUserControl.RefId = value; } }
+
+        [EnableInBuilder(BuilderType.UserControl, BuilderType.WebForm, BuilderType.FilterDialog)]
+        [HideInPropertyGrid]
+        public Dictionary<string, string> ChildDBareHtmlColl { get { return this.EbUserControl.ChildDBareHtmlColl; } set { this.EbUserControl.ChildDBareHtmlColl = value; } }
+
+        [EnableInBuilder(BuilderType.UserControl, BuilderType.WebForm, BuilderType.FilterDialog)]
+        [HideInPropertyGrid]
+        public string temps { get { return this.EbUserControl.temps; } set { this.EbUserControl.temps = value; } }
 
         public override string GetBareHtml()
         {
