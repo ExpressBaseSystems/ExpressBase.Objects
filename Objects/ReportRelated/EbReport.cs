@@ -108,9 +108,15 @@ namespace ExpressBase.Objects
         public override string RefId { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup("General")]
         public override string DisplayName { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup("General")]
+        public override string Name { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup("General")]
         public override string Description { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
