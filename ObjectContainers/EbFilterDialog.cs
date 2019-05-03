@@ -33,7 +33,7 @@ namespace ExpressBase.Objects
             foreach (EbControl c in this.Controls)
             {
                 string val = string.Empty;
-                if ((c.EbDbType).ToString() == "Decimal")
+                if ((c.EbDbType).ToString() == "Decimal" || (c.EbDbType).ToString() == "Int32")
                     val = "0";
                 else if ((c.EbDbType).ToString() == "AnsiString")
                     val = "0";
