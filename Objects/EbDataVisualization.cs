@@ -140,6 +140,14 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [HideInPropertyGrid]
+        public List<DVColumnCollection> ColumnsCollection { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [HideInPropertyGrid]
+        public List<Param> ParamsList { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [HideInPropertyGrid]
         public List<DVBaseColumn> NotVisibleColumns { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
@@ -427,6 +435,8 @@ namespace ExpressBase.Objects
             this.OrderBy = new List<DVBaseColumn>();
             //this.ParentColumn = new List<DVBaseColumn>();
             //this.GroupingColumn = new List<DVBaseColumn>();
+            this.ColumnsCollection = new List<DVColumnCollection>();
+            this.ParamsList = new List<Param>();
         }
 
         public override string DiscoverRelatedRefids()

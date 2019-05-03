@@ -40,6 +40,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
     {
         Default,
         Icon,
+        Link,
         IsEditable,
         Tree
     }
@@ -211,11 +212,11 @@ else{
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.DropDown)]
         [OnChangeExec(@"
-if(this.FormMode === 0){
+if(this.FormMode === 1){
     pg.ShowProperty('FormId');
     pg.HideProperty('FormParameters');
 }
-else{
+else if(this.FormMode === 2){
     pg.HideProperty('FormId');
     pg.ShowProperty('FormParameters');
 }")]
@@ -617,7 +618,7 @@ pg.setSimpleProperty('IsTree', false);
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [OnChangeExec(@"
-if(this.RenderAs === 2){
+if(this.RenderAs === 1){
     pg.ShowProperty('LinkRefId');
     pg.ShowProperty('LinkType');
 }

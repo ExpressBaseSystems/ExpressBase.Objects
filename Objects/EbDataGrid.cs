@@ -66,12 +66,14 @@ $.each(this.Controls.$values, function (i, col) {
         public override List<EbControl> Controls { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
-        [PropertyGroup("test")]
+        [PropertyGroup("Behavior")]
         public bool IsEditable { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
-        [PropertyGroup("test")]
+        [PropertyGroup("Behavior")]
+        [DefaultPropValue("true")]
         public bool IsAddable { get; set; }
+
         public override string GetToolHtml()
         {
             return @"<div eb-type='@toolName' class='tool'><i class='fa fa-table'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
@@ -89,16 +91,16 @@ $.each(this.Controls.$values, function (i, col) {
                 if (!col.Hidden)
                     html += string.Concat("<th style='width: @Width@; @bg@' title='", col.Title, "'><span class='grid-col-title'>", col.Title, "</span>@req@</th>")
                         .Replace("@req@", (col.Required ? "<sup style='color: red'>*</sup>" : string.Empty))
-                        .Replace("@Width@", (col.Width <= 0) ? "auto" : col.Width.ToString() + "px")
+                        .Replace("@Width@", (col.Width <= 0) ? "auto" : col.Width.ToString() + "%")
                         .Replace("@bg@", col.IsDisable ? "background-color:#fafafa; color:#555" : string.Empty);
             }
 
             html += @"
-                <th style='width:55px;'><span class='fa fa-cogs'></span></th>
+                @cogs@
               </tr>
             </thead>
         </table>
-    </div>";
+    </div>".Replace("@cogs@", !this.IsDisable ? "<th style='width:50px;'><span class='fa fa-cogs'></span></th>" : string.Empty);
 
             html += @"
     <div class='Dg_body' style='overflow-y:scroll;height:@_height@px ;'>
@@ -159,7 +161,7 @@ $.each(this.Controls.$values, function (i, col) {
             get
             {
                 return @"
-                     $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val(p1);
+                     $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val(p1).trigger('change');
                 ";
             }
             set { }
@@ -211,7 +213,7 @@ $.each(this.Controls.$values, function (i, col) {
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyGroup("Appearance")]
-        public int Width { get; set; }
+        public virtual int Width { get; set; }
     }
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
@@ -270,6 +272,9 @@ $.each(this.Controls.$values, function (i, col) {
 
         [EnableInBuilder(BuilderType.WebForm)]
         public bool IsAggragate { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        public bool AllowNegative { get; set; }
     }
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
@@ -290,18 +295,81 @@ $.each(this.Controls.$values, function (i, col) {
     [UsedWithTopObjectParent(typeof(EbObject))]
     public class EbDGDateColumn : EbDGColumn
     {
+        [JsonIgnore]
+        public EbDate EbDate { get; set; }
+
+        public EbDGDateColumn()
+        {
+            this.EbDate= new EbDate();
+        }
         [OnDeserialized]
         public void OnDeserializedMethod(StreamingContext context)
         {
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
+            DBareHtml = EbDate.GetBareHtml();
         }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [HideInPropertyGrid]
-        public override EbDbTypes EbDbType { get { return EbDbTypes.Date; } }
+        public override EbDbTypes EbDbType
+        {
+            get { return this.EbDate.EbDbType; }
+            set { this.EbDate.EbDbType = value; }
+        }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        public EbDateType EbDateType
+        {
+            get { return this.EbDate.EbDateType; }
+            set { this.EbDate.EbDateType = value; }
+        }
+
+        [JsonIgnore]
+        public override string GetValueJSfn
+        {
+            get
+            {
+                return
+              @"if((this.IsNullable && !($('#' + this.EbSid_CtxId).siblings('.nullable-check').find('input[type=checkbox]').prop('checked'))) || $('#' + this.EbSid_CtxId).val() === '')
+                return undefined;
+            else
+	            return $('#' + this.EbSid_CtxId).val();";
+            }
+            set { }
+        }
+
+        [JsonIgnore]
+        public override string OnChangeBindJSFn { get { return @"
+if(p1.col.OnChangeFn.Code === null)
+    return;
+let func =new Function('form', 'user', `event`, atob(p1.col.OnChangeFn.Code)).bind(this, p1.form, p1.user);
+$(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, func).siblings('.nullable-check').on('change', `input[type=checkbox]`, func);"; } set { } }
 
         [EnableInBuilder(BuilderType.WebForm)]
         public override string InputControlType { get { return "EbDate"; } }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [OnChangeExec(@"
+                if (this.DoNotPersist){
+                        pg.HideProperty('IsNullable');
+                }
+                else {
+                       pg.ShowProperty('IsNullable');
+                }
+            ")]
+        public override bool DoNotPersist
+        {
+            get { return this.EbDate.DoNotPersist; }
+            set { this.EbDate.DoNotPersist = value; }
+        }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        public bool IsNullable
+        {
+            get { return this.EbDate.IsNullable; }
+            set { this.EbDate.IsNullable = value; }
+        }
+
     }
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
@@ -413,25 +481,92 @@ $.each(this.Controls.$values, function (i, col) {
         }
     }
 
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+    [UsedWithTopObjectParent(typeof(EbObject))]
+    [Alias("UserControl Column")]
+    public class EbDGUserControlColumn : EbDGColumn
+    {
+        [JsonIgnore]
+        public EbUserControl EbUserControl { get; set; }
+
+        public EbDGUserControlColumn()
+        {
+            this.EbUserControl = new EbUserControl();
+        }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        public override string InputControlType { get { return "EbUserControl"; } }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [HideInPropertyGrid]
+        [Alias("Controls")]
+        public List<EbControl> Columns
+        {
+            get { return this.EbUserControl.Controls; }
+            set { this.EbUserControl.Controls = value; }
+        }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [OSE_ObjectTypes(EbObjectTypes.iUserControl)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        public override string RefId { get { return this.EbUserControl.RefId; } set { this.EbUserControl.RefId = value; } }
+
+        [EnableInBuilder(BuilderType.UserControl, BuilderType.WebForm, BuilderType.FilterDialog)]
+        [HideInPropertyGrid]
+        public Dictionary<string, string> ChildDBareHtmlColl { get { return this.EbUserControl.ChildDBareHtmlColl; } set { this.EbUserControl.ChildDBareHtmlColl = value; } }
+
+        [EnableInBuilder(BuilderType.UserControl, BuilderType.WebForm, BuilderType.FilterDialog)]
+        [HideInPropertyGrid]
+        public string temps { get { return this.EbUserControl.temps; } set { this.EbUserControl.temps = value; } }
+
+        public override string GetBareHtml()
+        {
+            return this.EbUserControl.GetBareHtml();
+        }
+
+        [OnDeserialized]
+        public void OnDeserializedMethod(StreamingContext context)
+        {
+            DBareHtml = (@"
+<div class='input-group' style='width:100%;'>            
+    <input id='' ui-inp data-toggle='tooltip' title='' type='text' tabindex='0' style='width:100%; data-original-title=''>
+    <span class='input-group-addon ucspan' data-toggle='modal' data-target='#@ebsid@' style='padding: 0px;'> <button type='button' id='Date1TglBtn' class='fa  fa-ellipsis-h ucbtn' aria-hidden='true' style='padding: 6px 12px;'></button> </span>
+</div>
+
+
+<!-- Modal -->
+<div class='modal fade' id='@ebsid@' tabindex='-1' role='dialog' aria-labelledby='@ebsid@Title' aria-hidden='true'>
+  <div class='modal-dialog modal-dialog-centered' role='document'>
+    <div class='modal-content'>
+      <div class='modal-header'>
+        <h5 class='modal-title' id='exampleModalLongTitle'>@modaltitle@</h5>
+        <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
+          <span aria-hidden='true'>&times;</span>
+        </button>
+      </div>
+        <div class='modal-body'>
+        " + GetBareHtml() +
+        @" 
+        </div>
+      <div class='modal-footer'>
+        <button type='button' class='btn btn-secondary' data-dismiss='modal'>Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+").Replace("@modaltitle@", Title).RemoveCR();
+        }
+    }
+
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
     [Alias("PowerSelect Column")]
     [UsedWithTopObjectParent(typeof(EbObject))]
     public class EbDGPowerSelectColumn : EbDGColumn
     {
-        public bool MultiSelect
-        {
-            get { return this.EbPowerSelect.MultiSelect; }
-            set { this.EbPowerSelect.MultiSelect = value; }
-        }
-
-
+        public bool MultiSelect { get { return this.EbPowerSelect.MultiSelect; } set { this.EbPowerSelect.MultiSelect = value; } }
 
         [JsonIgnore]
-        public override string SetDisplayMemberJSfn
-        {
-            get { return this.EbPowerSelect.SetDisplayMemberJSfn; }
-            set { }
-        }
+        public override string SetDisplayMemberJSfn { get { return this.EbPowerSelect.SetDisplayMemberJSfn; } set { } }
 
         [JsonIgnore]
         private EbPowerSelect EbPowerSelect { get; set; }
@@ -441,87 +576,64 @@ $.each(this.Controls.$values, function (i, col) {
             this.EbPowerSelect = new EbPowerSelect();
         }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
-        [PropertyEditor(PropertyEditorType.ObjectSelector)]
-        [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
-        public string DataSourceId
+        public override string SetValueJSfn
         {
-            get { return this.EbPowerSelect.DataSourceId; }
-            set { this.EbPowerSelect.DataSourceId = value; }
-        }
-
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        public int MaxLimit
-        {
-            get { return this.EbPowerSelect.MaxLimit; }
-            set { this.EbPowerSelect.MaxLimit = value; }
-        }
-
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        public int MinLimit
-        {
-            get { return this.EbPowerSelect.MaxLimit; }
-            set { this.EbPowerSelect.MinLimit = value; }
-        }
-
-        public override string GetBareHtml()
-        {
-            return this.EbPowerSelect.GetBareHtml();
-        }
-
-        [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.WebForm)]
-        [PropertyEditor(PropertyEditorType.CollectionProp, "Columns", "bVisible")]
-        public DVColumnCollection Columns
-        {
-            get { return this.EbPowerSelect.Columns; }
-            set { this.EbPowerSelect.Columns = value; }
-        }
-
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
-        public override string Name
-        {
-            get { return this.EbPowerSelect.Name; }
-            set { this.EbPowerSelect.Name = value; }
-        }
-
-        [HideInPropertyGrid]
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
-        public override string EbSid
-        {
-            get { return this.EbPowerSelect.EbSid; }
-            set { this.EbPowerSelect.EbSid = value; }
+            get
+            {
+                return @"
+                     this.initializer.setValues(p1);
+                ";
+            }
+            set { }
         }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
-        [HideInPropertyGrid]
-        public override EbDbTypes EbDbType
-        {
-            get { return this.EbPowerSelect.EbDbType; }
-            set { this.EbPowerSelect.EbDbType = value; }
-        }
+        [PropertyGroup("Appearance")]
+        [DefaultPropValue("100")]
+        public override int Width { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
+        public string DataSourceId { get { return this.EbPowerSelect.DataSourceId; } set { this.EbPowerSelect.DataSourceId = value; } }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [DefaultPropValue("1")]
+        public int MaxLimit { get { return this.EbPowerSelect.MaxLimit; } set { this.EbPowerSelect.MaxLimit = value; } }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        public int MinLimit { get { return this.EbPowerSelect.MaxLimit; } set { this.EbPowerSelect.MinLimit = value; } }
+
+        [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.CollectionProp, "Columns", "bVisible")]
+        public DVColumnCollection Columns { get { return this.EbPowerSelect.Columns; } set { this.EbPowerSelect.Columns = value; } }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+        public override string Name { get { return this.EbPowerSelect.Name; } set { this.EbPowerSelect.Name = value; } }
 
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
-        new public string EbSid_CtxId
-        {
-            get { return this.EbPowerSelect.EbSid_CtxId; }
-            set { this.EbPowerSelect.EbSid_CtxId = value; }
-        }
+        public override string EbSid { get { return this.EbPowerSelect.EbSid; } set { this.EbPowerSelect.EbSid = value; } }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [HideInPropertyGrid]
+        public override EbDbTypes EbDbType { get { return this.EbPowerSelect.EbDbType; } set { this.EbPowerSelect.EbDbType = value; } }
+
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+        new public string EbSid_CtxId { get { return this.EbPowerSelect.EbSid_CtxId; } set { this.EbPowerSelect.EbSid_CtxId = value; } }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
-        public DVColumnCollection DisplayMembers
-        {
-            get { return this.EbPowerSelect.DisplayMembers; }
-            set { this.EbPowerSelect.DisplayMembers = value; }
-        }
+        public DVColumnCollection DisplayMembers { get { return this.EbPowerSelect.DisplayMembers; } set { this.EbPowerSelect.DisplayMembers = value; } }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
-        public int DropdownHeight
-        {
-            get { return this.EbPowerSelect.DropdownHeight; }
-            set { this.EbPowerSelect.DropdownHeight = value; }
-        }
+        public int DropdownHeight { get { return this.EbPowerSelect.DropdownHeight; } set { this.EbPowerSelect.DropdownHeight = value; } }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+        [Alias("DropdownWidth(%)")]
+        [DefaultPropValue("100")]
+        public int DropdownWidth { get { return this.EbPowerSelect.DropdownWidth; } set { this.EbPowerSelect.DropdownWidth = value; } }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", 1)]
@@ -529,41 +641,19 @@ $.each(this.Controls.$values, function (i, col) {
 this.Columns.$values.length === 0 ){
 pg.MakeReadOnly('ValueMember');} 
 else {pg.MakeReadWrite('ValueMember');}")]
-        public DVBaseColumn ValueMember
-        {
-            get { return this.EbPowerSelect.ValueMember; }
-            set { this.EbPowerSelect.ValueMember = value; }
-        }
+        public DVBaseColumn ValueMember { get { return this.EbPowerSelect.ValueMember; } set { this.EbPowerSelect.ValueMember = value; } }
 
         [EnableInBuilder(BuilderType.WebForm)]
         public override string InputControlType { get { return "EbPowerSelect"; } }
 
-        //INCOMPLETE
-        public string GetSelectQuery(Service service, string Col, string Tbl, string _id)
+        public override string GetBareHtml()
         {
-            EbDataReader dr = service.Redis.Get<EbDataReader>(this.DataSourceId);
-            if (dr == null)
-            {
-                var result = service.Gateway.Send<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = this.DataSourceId });
-                dr = EbSerializers.Json_Deserialize(result.Data[0].Json);
-                service.Redis.Set<EbDataReader>(this.DataSourceId, dr);
-            }
-            string dispcol = string.Join(",", this.DisplayMembers.Select(c => "__A." + c.Name));//powerselect table __A
+            return this.EbPowerSelect.GetBareHtml();
+        }
 
-            //string whrcond = string.Join(" AND ", this.Values.Select(v => this.ValueMember.Name + "=" + v));
-            string Sql = dr.Sql.Trim();
-            if (Sql.LastIndexOf(";") == Sql.Length - 1)
-                Sql = Sql.Substring(0, Sql.Length - 1);
-
-            var tt = string.Format(@"SELECT 
-                                        __A.*
-                                    FROM 
-                                        ({2}) __A, {3} __B
-                                    WHERE 
-                                        __A.{0} = ANY(STRING_TO_ARRAY(__B.{4}::TEXT, ',')::INT[]) AND __B.{5} = :id;"
-                    , this.ValueMember.Name, dispcol, Sql, Tbl, Col, _id);
-            return tt;
-            //a.id = any(string_to_array(b.set_id, ',')::int[]
+        public string GetSelectQuery(Service service, string Col, string Tbl = null, string _id = null)
+        {
+            return this.EbPowerSelect.GetSelectQuery(service, Col, Tbl, _id);
         }
     }
 }

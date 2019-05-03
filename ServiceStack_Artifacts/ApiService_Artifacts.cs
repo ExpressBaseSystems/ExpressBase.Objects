@@ -175,8 +175,11 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 1)]
         public string Name { get; set; }
 
-        [DataMember(Order = 1)]
+        [DataMember(Order = 2)]
         public string Version { get; set; }
+
+        [DataMember(Order = 3)]
+        public string Parameters { get; set; }
     }
 
     [DataContract]
@@ -343,5 +346,18 @@ END;";
         //PUT = 3,
         //PATCH = 4,
         //DELETE = 5,
+    }
+
+    public class ApiAuthResponse
+    {
+        public string BToken { set; get; }
+
+        public string RToken { set; get; }
+
+        public bool IsValid { set; get; }
+
+        public int UserId { set; get; }
+
+        public string DisplayName { set; get; }
     }
 }

@@ -8,6 +8,7 @@ using ServiceStack.Redis;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Runtime.Serialization;
 using System.Text;
 
 namespace ExpressBase.Objects
@@ -17,7 +18,10 @@ namespace ExpressBase.Objects
     [BuilderTypeEnum(BuilderType.WebForm)]
     public class EbUserControl : EbForm
     {
-        public EbUserControl() { }
+        public EbUserControl()
+        {
+            ChildDBareHtmlColl = new Dictionary<string, string>();
+        }
 
         //public string RefId { get; set; }
 
@@ -35,10 +39,59 @@ namespace ExpressBase.Objects
 
         public bool IsRenderMode { get; set; }
 
+        [EnableInBuilder(BuilderType.UserControl, BuilderType.WebForm, BuilderType.FilterDialog)]
+        [HideInPropertyGrid]
+        public Dictionary<string, string> ChildDBareHtmlColl { get; set; }
+
+        [EnableInBuilder(BuilderType.UserControl, BuilderType.WebForm, BuilderType.FilterDialog)]
+        [HideInPropertyGrid]
+        public string temps { get; set; }
+
+        public override void BeforeSave()
+        {
+            string html = string.Empty;
+
+            foreach (EbControl c in this.Controls)
+            {
+                string Html = c.GetHtml();
+                html += Html;
+                if (!ChildDBareHtmlColl.ContainsKey(c.EbSid_CtxId))
+                    ChildDBareHtmlColl.Add(c.EbSid_CtxId, html);
+                temps += (c.EbSid_CtxId + " ,");
+            }
+        }
+
         public override string GetBareHtml()
         {
-            return base.GetBareHtml();
+            string html = string.Empty;
+
+            foreach (EbControl c in this.Controls)
+            {
+                string Html = c.GetHtml();
+                html += Html;
+                if (!ChildDBareHtmlColl.ContainsKey(c.EbSid_CtxId))
+                    ChildDBareHtmlColl.Add(c.EbSid_CtxId, html);
+                temps += (c.EbSid_CtxId + " ,");
+            }
+
+            return html;
         }
+
+        //[OnDeserialized]
+        //public void OnDeserializedMethod(StreamingContext context)
+        //{
+        //    string html = string.Empty;
+
+        //    foreach (EbControl c in this.Controls)
+        //    {
+        //        string Html = c.GetHtml();
+        //        html += Html;
+        //        if (!ChildDBareHtmlColl.ContainsKey(c.EbSid_CtxId))
+        //            ChildDBareHtmlColl.Add(c.EbSid_CtxId, html);
+        //        temps += (c.EbSid_CtxId + " ,");
+        //    }
+
+        //}
 
         public override string GetDesignHtml()
         {
@@ -89,7 +142,7 @@ namespace ExpressBase.Objects
                 </div>
                 <span class='helpText' ui-helptxt > @helpText@ </span>
             </div>"
-                .Replace("@barehtml@", ctrlhtml)                                                   
+                .Replace("@barehtml@", ctrlhtml)
                 .Replace("@name@", this.Name)
                 .Replace("@type@", this.ObjType)
                 .Replace("@ebsid@", this.EbSid)

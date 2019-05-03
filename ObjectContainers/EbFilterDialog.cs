@@ -56,7 +56,7 @@ namespace ExpressBase.Objects
                 if (c is EbUserLocation)
                 {
                     _p.Value = "-1";
-                    _p.Type = "11";
+                    _p.Type = "16";
                 }
                 _paramlist.Add(_p);
             }

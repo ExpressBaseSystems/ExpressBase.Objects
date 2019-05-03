@@ -57,6 +57,7 @@ namespace ExpressBase.Objects
 console.log(1000);
         let VMs = this.initializer.Vobj.valueMembers;
         let DMs = this.initializer.Vobj.displayMembers;
+        let columnVals = this.initializer.columnVals;
 
         if (VMs.length > 0)// clear if already values there
             this.initializer.clearValues();
@@ -68,9 +69,6 @@ console.log(1000);
         $.each(valMsArr, function (i, vm) {
             VMs.push(vm);
             $.each(this.DisplayMembers.$values, function (j, dm) {
-                valMsArr;
-                DMtable;
-
                 $.each(DMtable, function (j, r) {
                     if (getObjByval(r.Columns, 'Name', this.ValueMember.name).Value === vm) {
                         let _dm = getObjByval(r.Columns, 'Name', dm.name).Value;
@@ -79,6 +77,17 @@ console.log(1000);
                 }.bind(this));
             }.bind(this));
         }.bind(this));
+
+        $.each(DMtable, function (j, r) {
+            $.each(r.Columns, function (j, item) {
+                if (!columnVals[item.Name]) {
+                    console.warn('Mismatch found in Colums in datasource and Colums in object');
+                    return true;
+                }
+                columnVals[item.Name].push(item.Value);
+            }.bind(this));
+        }.bind(this));
+
                 ";
             }
             set { }
@@ -124,6 +133,12 @@ console.log(1000);
         public DVBaseColumn ValueMember { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [DefaultPropValue("100")]
+        [Alias("DropdownWidth(%)")]
+        public int DropdownWidth { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [DefaultPropValue("100")]
         public int DropdownHeight { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
@@ -135,9 +150,6 @@ console.log(1000);
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         public string Text { get; set; }
-
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        public int DropdownWidth { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [OnChangeExec(@"
@@ -203,6 +215,7 @@ console.log(1000);
         }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [DefaultPropValue("1")]
         public int MaxLimit { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
