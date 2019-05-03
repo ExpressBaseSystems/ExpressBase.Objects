@@ -125,7 +125,7 @@ namespace ExpressBase.Objects
                                 Name = DGColumn.Name,
                                 EbSid = DGColumn.EbSid,
                                 EbSid_CtxId = DGColumn.EbSid_CtxId,
-                                Title = DGColumn.Title
+                                Title = DGColumn.Title                                
                             };
                         }
                     }
@@ -1295,11 +1295,11 @@ namespace ExpressBase.Objects
                         //_temp.RefId = _this.Controls[i].RefId;
                         if (c is EbDGUserControlColumn)
                         {
-                            (c as EbDGUserControlColumn).EbUserControl = _temp;
-                            //foreach (EbControl Control in (c as EbDGUserControlColumn).Columns)
-                            //{
-                            //    RenameControlsRec(Control, c.Name);
-                            //}
+                            foreach (EbControl Control in _temp.Controls)
+                            {
+                                RenameControlsRec(Control, c.Name);
+                            }
+                            (c as EbDGUserControlColumn).InitUserControl(_temp);
                         }
                         else
                         {
@@ -1344,11 +1344,11 @@ namespace ExpressBase.Objects
                         //_temp.RefId = _this.Controls[i].RefId;
                         if (_this.Controls[i] is EbDGUserControlColumn)
                         {
-                            (_this.Controls[i] as EbDGUserControlColumn).EbUserControl = _temp;
-                            //foreach (EbControl Control in (_this.Controls[i] as EbDGUserControlColumn).Columns)
-                            //{
-                            //    RenameControlsRec(Control, _this.Controls[i].Name);
-                            //}
+                            foreach (EbControl Control in _temp.Controls)
+                            {
+                                RenameControlsRec(Control, _this.Controls[i].Name);
+                            }
+                            (_this.Controls[i] as EbDGUserControlColumn).InitUserControl(_temp);                           
                         }
                         else
                         {
