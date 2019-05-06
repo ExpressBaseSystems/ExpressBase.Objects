@@ -111,6 +111,27 @@ namespace ExpressBase.Objects
 
         public override void BeforeSave()
         {
+            EbControl[] Allctrls = this.Controls.FlattenAllEbControls();
+            for (int i = 0; i < Allctrls.Length; i++)
+            {
+                if (Allctrls[i] is EbDataGrid)
+                {
+                    for (int j = 0; j < (Allctrls[i] as EbDataGrid).Controls.Count; j++)
+                    {
+                        if ((Allctrls[i] as EbDataGrid).Controls[j] is EbDGUserControlColumn) {
+                            EbDGColumn DGColumn = (Allctrls[i] as EbDataGrid).Controls[j] as EbDGColumn;
+                            (Allctrls[i] as EbDataGrid).Controls[j] = new EbDGUserControlColumn {
+                                RefId = DGColumn.RefId,
+                                Name = DGColumn.Name,
+                                EbSid = DGColumn.EbSid,
+                                EbSid_CtxId = DGColumn.EbSid_CtxId,
+                                Title = DGColumn.Title                                
+                            };
+                        }
+                    }
+                }
+            }
+
             //BeforeSaveRec(this);
         }
 
@@ -577,7 +598,7 @@ namespace ExpressBase.Objects
                 r = 1;
             }
             this.RefreshFormData(DataDB, service);
-            this.UpdateAuditTrail(DataDB);
+            //this.UpdateAuditTrail(DataDB);//
             return r;
         }
 
@@ -1123,7 +1144,7 @@ namespace ExpressBase.Objects
                     {
                         ActionType = Convert.ToInt32(dr["actiontype"]) == 1 ? "Insert" : "Update",
                         CreatedBy = dr["fullname"].ToString(),
-                        CreatedAt = Convert.ToDateTime(dr["eb_createdat"]).ToString("dd-MM-yyyy hh:mm:ss tt", CultureInfo.InvariantCulture) + " (UTC)"
+                        CreatedAt = Convert.ToDateTime(dr["eb_createdat"]).ToString("dd-MM-yyyy hh:mm tt", CultureInfo.InvariantCulture) + " (UTC)"
                     });
                 }
                 string[] ids = dr["idrelation"].ToString().Split('-');
@@ -1274,11 +1295,11 @@ namespace ExpressBase.Objects
                         //_temp.RefId = _this.Controls[i].RefId;
                         if (c is EbDGUserControlColumn)
                         {
-                            (c as EbDGUserControlColumn).Columns = _temp.Controls;
-                            foreach (EbControl Control in (c as EbDGUserControlColumn).Columns)
+                            foreach (EbControl Control in _temp.Controls)
                             {
                                 RenameControlsRec(Control, c.Name);
                             }
+                            (c as EbDGUserControlColumn).InitUserControl(_temp);
                         }
                         else
                         {
@@ -1323,11 +1344,11 @@ namespace ExpressBase.Objects
                         //_temp.RefId = _this.Controls[i].RefId;
                         if (_this.Controls[i] is EbDGUserControlColumn)
                         {
-                            (_this.Controls[i] as EbDGUserControlColumn).Columns = _temp.Controls;
-                            foreach (EbControl Control in (_this.Controls[i] as EbDGUserControlColumn).Columns)
+                            foreach (EbControl Control in _temp.Controls)
                             {
                                 RenameControlsRec(Control, _this.Controls[i].Name);
                             }
+                            (_this.Controls[i] as EbDGUserControlColumn).InitUserControl(_temp);                           
                         }
                         else
                         {

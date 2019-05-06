@@ -8,6 +8,7 @@ using ServiceStack.Redis;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Runtime.Serialization;
 using System.Text;
 
 namespace ExpressBase.Objects
@@ -35,15 +36,44 @@ namespace ExpressBase.Objects
 
         public bool IsRenderMode { get; set; }
 
+
+        //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        //[HideInPropertyGrid]
+        //public string BareHtml { get; set; }
+
+        //public override void BeforeSave()
+        //{
+        //    this.BareHtml = this.GetBareHtml();
+
+        //}
+
         public override string GetBareHtml()
         {
             string html = string.Empty;
 
             foreach (EbControl c in this.Controls)
+            {
                 html += c.GetHtml();
+            }
 
             return html;
         }
+
+        //[OnDeserialized]
+        //public void OnDeserializedMethod(StreamingContext context)
+        //{
+        //    string html = string.Empty;
+
+        //    foreach (EbControl c in this.Controls)
+        //    {
+        //        string Html = c.GetHtml();
+        //        html += Html;
+        //        if (!ChildDBareHtmlColl.ContainsKey(c.EbSid_CtxId))
+        //            ChildDBareHtmlColl.Add(c.EbSid_CtxId, html);
+        //        temps += (c.EbSid_CtxId + " ,");
+        //    }
+
+        //}
 
         public override string GetDesignHtml()
         {
@@ -94,7 +124,7 @@ namespace ExpressBase.Objects
                 </div>
                 <span class='helpText' ui-helptxt > @helpText@ </span>
             </div>"
-                .Replace("@barehtml@", ctrlhtml)                                                   
+                .Replace("@barehtml@", ctrlhtml)
                 .Replace("@name@", this.Name)
                 .Replace("@type@", this.ObjType)
                 .Replace("@ebsid@", this.EbSid)
