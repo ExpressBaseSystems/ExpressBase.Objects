@@ -66,8 +66,19 @@ namespace ExpressBase.Objects
             return string.Empty;
         }
         public override string GetDesignHtml()
-        {
-            return this.GetHtml().RemoveCR().GraveAccentQuoted();
+       {
+            return HtmlConstants.CONTROL_WRAPER_HTML4WEB
+                .Replace("@barehtml@", @"
+                    <div id='Wraper' class='ctrl-cover'>                             
+                        <div class='input-group'style='width: 100 %; '> 
+                                 <input id='' ui-inp='' data-ebtype='6' class='date' type='text' name=' tabindex='0' style='width: 100%; display: inline - block; background - color: rgb(255, 255, 255); color: rgb(51, 51, 51);' placeholder=''>
+                                 <span class='input-group-addon' style='padding: 0px; '>
+                                <i class='fa fa fa-upload' aria-hidden='true'  style='padding: 6px 12px;'></i>  
+                            </span>
+                        </div>
+                    </div>
+                ").RemoveCR().DoubleQuoted();
+            //return this.GetHtml().RemoveCR().GraveAccentQuoted();
         }
         public override string GetToolHtml()
         {
