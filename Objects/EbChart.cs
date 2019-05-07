@@ -28,6 +28,11 @@ namespace ExpressBase.Objects
         {
             return GetHtmlHelper(RenderMode.User);
         }
+       
+        public override string GetToolHtml()
+        {
+            return @"<div eb-type='@toolName' class='tool'> <i class='fa fa-pie-chart'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
+        }
 
         private string GetHtmlHelper(RenderMode mode)
         {

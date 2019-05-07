@@ -511,50 +511,33 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, func
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         public override string RefId { get { return this.EbUserControl.RefId; } set { this.EbUserControl.RefId = value; } }
 
-        [EnableInBuilder(BuilderType.UserControl, BuilderType.WebForm, BuilderType.FilterDialog)]
-        [HideInPropertyGrid]
-        public Dictionary<string, string> ChildDBareHtmlColl { get { return this.EbUserControl.ChildDBareHtmlColl; } set { this.EbUserControl.ChildDBareHtmlColl = value; } }
 
-        [EnableInBuilder(BuilderType.UserControl, BuilderType.WebForm, BuilderType.FilterDialog)]
         [HideInPropertyGrid]
-        public string temps { get { return this.EbUserControl.temps; } set { this.EbUserControl.temps = value; } }
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        public string ChildHtml { get; set; }
 
         public override string GetBareHtml()
         {
             return this.EbUserControl.GetBareHtml();
         }
 
-        [OnDeserialized]
-        public void OnDeserializedMethod(StreamingContext context)
+        public void InitUserControl(EbUserControl ebUserControl)
+        {
+            this.Columns = ebUserControl.Controls;
+            this.InitDBareHtml();
+        }
+
+        public void InitDBareHtml()
         {
             DBareHtml = (@"
-<div class='input-group' style='width:100%;'>            
-    <input id='' ui-inp data-toggle='tooltip' title='' type='text' tabindex='0' style='width:100%; data-original-title=''>
-    <span class='input-group-addon ucspan' data-toggle='modal' data-target='#@ebsid@' style='padding: 0px;'> <button type='button' id='Date1TglBtn' class='fa  fa-ellipsis-h ucbtn' aria-hidden='true' style='padding: 6px 12px;'></button> </span>
-</div>
-
-
-<!-- Modal -->
-<div class='modal fade' id='@ebsid@' tabindex='-1' role='dialog' aria-labelledby='@ebsid@Title' aria-hidden='true'>
-  <div class='modal-dialog modal-dialog-centered' role='document'>
-    <div class='modal-content'>
-      <div class='modal-header'>
-        <h5 class='modal-title' id='exampleModalLongTitle'>@modaltitle@</h5>
-        <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
-          <span aria-hidden='true'>&times;</span>
-        </button>
-      </div>
-        <div class='modal-body'>
-        " + GetBareHtml() +
-        @" 
-        </div>
-      <div class='modal-footer'>
-        <button type='button' class='btn btn-secondary' data-dismiss='modal'>Close</button>
-      </div>
+<div  id='@ebsid@_wrap'>
+    <div class='input-group' style='width:100%;'>            
+        <input id='' ui-inp data-toggle='tooltip' title='' type='text' tabindex='0' style='width:100%; data-original-title=''>
+        <span id='@ebsid@_showbtn' class='input-group-addon ucspan' data-toggle='modal' data-target='#@colebsid@_usercontrolmodal' style='padding: 0px;'> <button type='button' id='Date1TglBtn' class='fa  fa-ellipsis-h ucbtn' aria-hidden='true' style='padding: 6px 12px;'></button> </span>
     </div>
-  </div>
 </div>
-").Replace("@modaltitle@", Title).RemoveCR();
+").Replace("@colebsid@", EbSid_CtxId).RemoveCR();
+            ChildHtml = GetBareHtml();
         }
     }
 

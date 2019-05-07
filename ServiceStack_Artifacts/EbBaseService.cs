@@ -215,7 +215,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
             List<DbParameter> parameter = new List<DbParameter>();
 
-            string query = @"SELECT is_logenabled FROM eb_objects WHERE id = (SELECT eb_objects_id FROM eb_objects_ver WHERE refid=:refid)";
+            string query = @"SELECT is_logenabled FROM eb_objects WHERE id = (SELECT eb_objects_id FROM eb_objects_ver WHERE refid = @refid)";
 
             parameter.Add(EbConnectionFactory.ObjectsDB.GetNewParameter("refid", EbDbTypes.String, _refId));
 

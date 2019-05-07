@@ -216,11 +216,13 @@ else {
 .RemoveCR().DoubleQuoted();
         }
 
+        //control html definition- for builder side
         public override string GetDesignHtml()
         {
             return GetHtml().RemoveCR().DoubleQuoted();
         }
 
+        //control html definition - for rendering side(with wrapper divs)
         public override string GetHtml()
         {
             return GetHtmlHelper(RenderMode.User);
@@ -295,6 +297,8 @@ else {
             set { }
         }
 
+
+        //control html definition - for rendering side(without wrapper divs)
         public override string GetBareHtml()
         {
             

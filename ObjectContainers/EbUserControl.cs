@@ -18,10 +18,7 @@ namespace ExpressBase.Objects
     [BuilderTypeEnum(BuilderType.WebForm)]
     public class EbUserControl : EbForm
     {
-        public EbUserControl()
-        {
-            ChildDBareHtmlColl = new Dictionary<string, string>();
-        }
+        public EbUserControl() { }
 
         //public string RefId { get; set; }
 
@@ -39,27 +36,16 @@ namespace ExpressBase.Objects
 
         public bool IsRenderMode { get; set; }
 
-        [EnableInBuilder(BuilderType.UserControl, BuilderType.WebForm, BuilderType.FilterDialog)]
-        [HideInPropertyGrid]
-        public Dictionary<string, string> ChildDBareHtmlColl { get; set; }
 
-        [EnableInBuilder(BuilderType.UserControl, BuilderType.WebForm, BuilderType.FilterDialog)]
-        [HideInPropertyGrid]
-        public string temps { get; set; }
+        //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        //[HideInPropertyGrid]
+        //public string BareHtml { get; set; }
 
-        public override void BeforeSave()
-        {
-            string html = string.Empty;
+        //public override void BeforeSave()
+        //{
+        //    this.BareHtml = this.GetBareHtml();
 
-            foreach (EbControl c in this.Controls)
-            {
-                string Html = c.GetHtml();
-                html += Html;
-                if (!ChildDBareHtmlColl.ContainsKey(c.EbSid_CtxId))
-                    ChildDBareHtmlColl.Add(c.EbSid_CtxId, html);
-                temps += (c.EbSid_CtxId + " ,");
-            }
-        }
+        //}
 
         public override string GetBareHtml()
         {
@@ -67,11 +53,7 @@ namespace ExpressBase.Objects
 
             foreach (EbControl c in this.Controls)
             {
-                string Html = c.GetHtml();
-                html += Html;
-                if (!ChildDBareHtmlColl.ContainsKey(c.EbSid_CtxId))
-                    ChildDBareHtmlColl.Add(c.EbSid_CtxId, html);
-                temps += (c.EbSid_CtxId + " ,");
+                html += c.GetHtml();
             }
 
             return html;
