@@ -62,7 +62,7 @@ $('#@idcontainer [type=radio]').on('click', function () {
         {
             return @"<div class='checkbox'>
                         <label>
-                            <input type='checkbox' id='@ebsid@' ui-inp data-ebtype='@data-ebtype@' style='vertical-align: bottom;' data-toggle='tooltip'>
+                            <input type='radio' id='@ebsid@' ui-inp data-ebtype='@data-ebtype@' style='vertical-align: bottom;' data-toggle='tooltip'>
                             <span class='eb-ctrl-label' ui-label id='@ebsidLbl'>@Label@ @req@ </span>
                         </label>
                     </div>"

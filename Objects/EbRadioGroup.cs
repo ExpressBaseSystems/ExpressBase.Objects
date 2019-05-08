@@ -124,8 +124,18 @@ namespace ExpressBase.Objects
 
         public override string GetDesignHtml()
         {
-            //return @"<div class='btn-group' data-toggle='buttons'> <label class='btn btn-primary active'> <input type='radio' name='options' id='option1' autocomplete='off' checked> Radio 1 </label> <label class='btn btn-primary'> <input type='radio' name='options' id='option2' autocomplete='off'> Radio 2 </label> <label class='btn btn-primary'> <input type='radio' name='options' id='option3' autocomplete='off'> Radio 3 </label> </div>".RemoveCR().DoubleQuoted();
-            return GetHtml().RemoveCR().DoubleQuoted();
+            return HtmlConstants.CONTROL_WRAPER_HTML4WEB
+                .Replace("@barehtml@", @"
+                            <div id='@ebsid@' class='radio-wrap @radio-wrap-block@'>
+                                <input type ='radio' id='@ebsid@' @defaultcheked@ value='@value@' name='@gname@'>
+                                <span id='@ebsid@Lbl' ui-label style='@LabelBackColor @LabelForeColor '> RadioButton1 </span>
+                            </div>
+                            <div id='@ebsid@' class='radio-wrap @radio-wrap-block@'>
+                                <input type ='radio' id='@ebsid@' @defaultcheked@ value='@value@' name='@gname@'>
+                                <span id='@ebsid@Lbl' ui-label style='@LabelBackColor @LabelForeColor '> RadioButton2  </span>
+                            </div>")
+                            .RemoveCR().DoubleQuoted();
+            //return GetHtml().RemoveCR().DoubleQuoted();
         }
 
         public override string GetHtml()
@@ -202,7 +212,7 @@ this.Init = function(id)
 
         public override string GetBareHtml()
         {/*onclick=""event.stopPropagation();$('#@ebsid@').prop('checked', true);""*/
-            return @"<div id='@ebsid@' class='radio-wrap @radio-wrap-block@' onclick=""event.stopPropagation(); $(this).children('input[type=radio]').prop('checked', true); $(this).children('input[type=radio]').trigger('change');"">
+            return @"<div id='@ebsid@' class='radio-wrap @radio-wrap-block@' style='padding:5px onclick=""event.stopPropagation(); $(this).children('input[type=radio]').prop('checked', true); $(this).children('input[type=radio]').trigger('change');"">
                         <input type ='radio' id='@ebsid@' @defaultcheked@ value='@value@' name='@gname@'>
                         <span id='@ebsid@Lbl' ui-label style='@LabelBackColor @LabelForeColor '> @label@  </span>
                     </div>"
