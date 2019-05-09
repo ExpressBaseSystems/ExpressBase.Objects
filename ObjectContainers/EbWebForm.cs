@@ -125,7 +125,7 @@ namespace ExpressBase.Objects
                                 Name = DGColumn.Name,
                                 EbSid = DGColumn.EbSid,
                                 EbSid_CtxId = DGColumn.EbSid_CtxId,
-                                Title = DGColumn.Title                                
+                                Title = DGColumn.Title
                             };
                         }
                     }
@@ -1040,8 +1040,8 @@ namespace ExpressBase.Objects
                                     FormFields.Add(new AuditTrailEntry
                                     {
                                         Name = cField.Name,
-                                        NewVal = cField.Value,
-                                        OldVal = ocf.Value,
+                                        NewVal = cField.Value.ToString(),
+                                        OldVal = ocf.Value.ToString(),
                                         DataRel = relation,
                                         TableName = entry.Key
                                     });
@@ -1117,6 +1117,7 @@ namespace ExpressBase.Objects
             return DataDB.DoNonQuery(lineQry.Substring(0, lineQry.Length - 1), parameters1.ToArray());
         }
 
+        //Get the latest data as a transaction
         private FormTransaction GetCurrTransationAll()
         {
             FormTransaction curTransAll = new FormTransaction();
@@ -1153,6 +1154,7 @@ namespace ExpressBase.Objects
         {
             this.RefreshFormData(DataDB, Service);
             FormTransaction curTransAll = this.GetCurrTransationAll();
+            Dictionary<string, string> DictVmAll = new Dictionary<string, string>();
 
             string qry = @"	SELECT 
             	m.id, u.fullname, m.eb_createdat, m.actiontype, l.tablename, l.fieldname, l.idrelation, l.oldvalue, l.newvalue
@@ -1170,15 +1172,40 @@ namespace ExpressBase.Objects
 
             Dictionary<int, FormTransaction> Trans = new Dictionary<int, FormTransaction>();
             TableSchema _table = null;
+            ColumnSchema _column = null;
 
             foreach (EbDataRow dr in dt.Rows)
             {
                 int m_id = Convert.ToInt32(dr["id"]);
+                string new_val = dr["newvalue"].ToString();
+                string old_val = dr["oldvalue"].ToString();
+
                 if (_table == null || !_table.TableName.Equals(dr["tablename"].ToString()))
                 {
                     _table = this.FormSchema.Tables.FirstOrDefault(tbl => tbl.TableName == dr["tablename"].ToString());
                     if (_table == null)//skipping invalid Audit Trail entry
                         continue;
+                }
+                _column = _table.Columns.FirstOrDefault(col => col.ColumnName == dr["fieldname"].ToString());
+                if (_column == null)//skipping invalid Audit Trail entry
+                    continue;
+
+                if (_column.Control is EbPowerSelect || _column.Control is EbDGPowerSelectColumn)//copy vm for dm
+                {
+                    string key = string.Concat(_table.TableName, "_", _column.ColumnName);
+                    string temp = string.Empty;
+                    if (!(new_val.Equals(string.Empty) || new_val.Equals("[null]")))/////
+                        temp = string.Concat(new_val, ",");
+                    if (!(old_val.Equals(string.Empty) || old_val.Equals("[null]")))/////
+                        temp += string.Concat(old_val, ",");
+
+                    if (!temp.Equals(string.Empty))
+                    {
+                        if (!DictVmAll.ContainsKey(key))
+                            DictVmAll.Add(key, temp);
+                        else
+                            DictVmAll[key] = string.Concat(DictVmAll[key], temp);
+                    }
                 }
 
                 if (!Trans.ContainsKey(m_id))
@@ -1198,16 +1225,22 @@ namespace ExpressBase.Objects
                     if (!Trans[m_id].Tables.ContainsKey(_table.TableName))
                         Trans[m_id].Tables.Add(_table.TableName, new FormTransactionRow() { });
 
-                    FormTransactionEntry curEntry = curTransAll.Tables[_table.TableName].Columns[dr["fieldname"].ToString()];
-                    if (curEntry.NewValue != dr["newvalue"].ToString())
+                    FormTransactionEntry curEntry = curTransAll.Tables[_table.TableName].Columns[_column.ColumnName];
+                    if (curEntry.NewValue != new_val)
                     {
                         Trans[m_id].MissingEntry = true;
                     }
-                    curEntry.NewValue = dr["oldvalue"].ToString();//back tracking
-                    curEntry.OldValue = dr["newvalue"].ToString();                        
+                    curEntry.NewValue = old_val;//back tracking
+                    curEntry.OldValue = new_val;
 
-                    curtrans = new FormTransactionEntry() { OldValue = dr["oldvalue"].ToString(), NewValue = dr["newvalue"].ToString(), IsModified = true };
-                    Trans[m_id].Tables[_table.TableName].Columns.Add(dr["fieldname"].ToString(), curtrans);
+                    curtrans = new FormTransactionEntry()
+                    {
+                        OldValue = old_val,
+                        NewValue = new_val,
+                        IsModified = true,
+                        Title = (_column.Control as EbControl).Label
+                    };
+                    Trans[m_id].Tables[_table.TableName].Columns.Add(_column.ColumnName, curtrans);
                 }
                 else
                 {
@@ -1220,7 +1253,7 @@ namespace ExpressBase.Objects
                             //{
 
                             //}
-                            Trans[m_id].GridTables[_table.TableName].ColumnMeta.Add(i, _table.Columns.ElementAt(i).ColumnName);
+                            Trans[m_id].GridTables[_table.TableName].ColumnMeta.Add(i, (_table.Columns.ElementAt(i).Control as EbDGColumn).Title);
                         }
                     }
                     int curid = Convert.ToInt32(ids[1]);//index hardcoded// assuming that table hierarchy is two level
@@ -1235,22 +1268,120 @@ namespace ExpressBase.Objects
                             TblRef.Rows[curid].Columns.Add(entry.Key, new FormTransactionEntry() { OldValue = entry.Value.OldValue, NewValue = entry.Value.NewValue });
                         }
                     }
-                    FormTransactionEntry curEntry = curTransAll.GridTables[_table.TableName].Rows[curid].Columns[dr["fieldname"].ToString()];
-                    if (curEntry.NewValue != dr["newvalue"].ToString())
+                    FormTransactionEntry curEntry = curTransAll.GridTables[_table.TableName].Rows[curid].Columns[_column.ColumnName];
+                    if (curEntry.NewValue != new_val)
                     {
                         Trans[m_id].MissingEntry = true;
                     }
-                    curEntry.NewValue = dr["oldvalue"].ToString();//back tracking...
-                    curEntry.OldValue = dr["newvalue"].ToString();
+                    curEntry.NewValue = old_val;//back tracking...
+                    curEntry.OldValue = new_val;
 
-                    curtrans = TblRef.Rows[curid].Columns[dr["fieldname"].ToString()];
-                    curtrans.OldValue = dr["oldvalue"].ToString();
-                    curtrans.NewValue = dr["newvalue"].ToString();
+                    curtrans = TblRef.Rows[curid].Columns[_column.ColumnName];
+                    curtrans.OldValue = old_val;
+                    curtrans.NewValue = new_val;
                     curtrans.IsModified = true;
+                    //curtrans.Title = (_column.Control as EbDGColumn).Title;
+                }
+            }
+            ProcessTransationsData(DataDB, Service, Trans, DictVmAll);
+
+            return JsonConvert.SerializeObject(Trans);
+        }
+
+        private void ProcessTransationsData(IDatabase DataDB, Service Service, Dictionary<int, FormTransaction> Trans, Dictionary<string, string> DictVmAll)
+        {
+            string Qry = string.Empty;
+            foreach (TableSchema _table in this.FormSchema.Tables)
+            {
+                foreach (ColumnSchema _column in _table.Columns)
+                {
+                    if (_column.Control is EbPowerSelect || _column.Control is EbDGPowerSelectColumn)
+                    {
+                        string key = string.Concat(_table.TableName, "_", _column.ColumnName);
+                        if (DictVmAll.ContainsKey(key))
+                        {
+                            if (_column.Control is EbPowerSelect)
+                                Qry += (_column.Control as EbPowerSelect).GetDisplayMembersQuery(Service, DictVmAll[key].Substring(0, DictVmAll[key].Length - 1));
+                            else
+                                Qry += (_column.Control as EbDGPowerSelectColumn).GetDisplayMembersQuery(Service, DictVmAll[key].Substring(0, DictVmAll[key].Length - 1));
+                        }
+                    }
                 }
             }
 
-            return JsonConvert.SerializeObject(Trans);
+            EbDataSet ds = DataDB.DoQueries(Qry);
+
+            Dictionary<string, Dictionary<string, List<string>>> DictDm = new Dictionary<string, Dictionary<string, List<string>>>();
+            foreach (string key in DictVmAll.Keys)
+                DictDm.Add(key, new Dictionary<string, List<string>>());
+
+            for (int i = 0; i < ds.Tables.Count; i++)
+            {
+                foreach (EbDataRow row in ds.Tables[i].Rows)
+                {
+                    List<string> list = new List<string>();
+                    for (int j = 1; j < row.Count; j++)
+                    {
+                        list.Add(row[j].ToString());
+                    }
+                    if (!DictDm.ElementAt(i).Value.ContainsKey(row[0].ToString()))
+                        DictDm.ElementAt(i).Value.Add(row[0].ToString(), list);
+                }
+            }
+
+            foreach (KeyValuePair<int, FormTransaction> trans in Trans)
+            {
+                foreach(KeyValuePair<string, FormTransactionRow> table in trans.Value.Tables)
+                {
+                    ReplaceVmWithDm(table.Value.Columns, DictDm, table.Key);
+                }
+
+                foreach (KeyValuePair<string, FormTransactionTable> table in trans.Value.GridTables)
+                {
+                    foreach (KeyValuePair<int, FormTransactionRow> row in table.Value.Rows)
+                    {
+                        ReplaceVmWithDm(row.Value.Columns, DictDm, table.Key);
+                    }
+                }
+            }            
+        }
+
+        private void ReplaceVmWithDm(Dictionary<string, FormTransactionEntry> Columns, Dictionary<string, Dictionary<string, List<string>>> DictDm, string tablename)
+        {
+            foreach (KeyValuePair<string, FormTransactionEntry> column in Columns)
+            {
+                if (DictDm.ContainsKey(tablename + "_" + column.Key))
+                {
+                    if (column.Value.OldValue != "[null]")
+                    {
+                        string[] vm_arr = column.Value.OldValue.Split(',');
+                        string dm = string.Empty;
+                        for (int i = 0; i < vm_arr.Length; i++)
+                        {
+                            List<string> dmlist = DictDm[tablename + "_" + column.Key][vm_arr[i]];
+                            foreach (string d in dmlist)
+                            {
+                                dm += " " + d;
+                            }
+                        }
+                        column.Value.OldValue = dm;
+                    }
+                    if (column.Value.NewValue != "[null]")
+                    {
+                        string[] vm_arr = column.Value.NewValue.Split(',');
+                        string dm = string.Empty;
+                        for (int i = 0; i < vm_arr.Length; i++)
+                        {
+                            List<string> dmlist = DictDm[tablename + "_" + column.Key][vm_arr[i]];
+                            foreach (string d in dmlist)
+                            {
+                                dm += " " + d;
+                            }
+                        }
+                        column.Value.NewValue = dm;
+                    }
+                }
+            }
         }
 
         private WebFormSchema GetWebFormSchema()
@@ -1415,7 +1546,7 @@ namespace ExpressBase.Objects
                             {
                                 RenameControlsRec(Control, _this.Controls[i].Name);
                             }
-                            (_this.Controls[i] as EbDGUserControlColumn).InitUserControl(_temp);                           
+                            (_this.Controls[i] as EbDGUserControlColumn).InitUserControl(_temp);
                         }
                         else
                         {

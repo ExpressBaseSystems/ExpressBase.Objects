@@ -10,6 +10,7 @@ using ServiceStack;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data.Common;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
@@ -358,9 +359,7 @@ console.log(1000);
             return ReplacePropsInHTML(EbCtrlHTML);
         }
 
-
-        //INCOMPLETE
-        public string GetSelectQuery(Service service, string Col, string Tbl = null, string _id = null)
+        private string GetSql(Service service)
         {
             EbDataReader dr = service.Redis.Get<EbDataReader>(this.DataSourceId);
             if (dr == null)
@@ -374,14 +373,33 @@ console.log(1000);
             if (Sql.LastIndexOf(";") == Sql.Length - 1)
                 Sql = Sql.Substring(0, Sql.Length - 1);
 
+            return Sql;
+        }
+
+        //INCOMPLETE
+        public string GetSelectQuery(Service service, string Col, string Tbl = null, string _id = null)
+        {
+            string Sql = this.GetSql(service);
+
             if (Tbl == null || _id == null)
                 return string.Format(@"SELECT __A.* FROM ({0}) __A 
-                                    WHERE __A.{1} = ANY(STRING_TO_ARRAY({2}::TEXT, ',')::INT[]);",
+                                    WHERE __A.{1} = ANY(STRING_TO_ARRAY('{2}'::TEXT, ',')::INT[]);",
                                     Sql, this.ValueMember.Name, Col);
             else
                 return string.Format(@"SELECT __A.* FROM ({0}) __A, {1} __B
                                     WHERE __A.{2} = ANY(STRING_TO_ARRAY(__B.{3}::TEXT, ',')::INT[]) AND __B.{4} = :id;",
                                         Sql, Tbl, this.ValueMember.Name, Col, _id);
+        }
+
+        public string GetDisplayMembersQuery(Service service, string vms)
+        {
+            string Sql = this.GetSql(service);
+            string vm = this.ValueMember.Name;
+            string dm = string.Join(',', this.DisplayMembers.Select(e => e.Name));
+
+            return string.Format(@"SELECT {0}, {1} FROM ({2}) __A
+                                        WHERE __A.{0} = ANY(STRING_TO_ARRAY('{3}'::TEXT, ',')::INT[]);",
+                                            vm, dm, Sql, vms);
         }
     }
 }
