@@ -62,7 +62,7 @@ $('#@idcontainer [type=radio]').on('click', function () {
         {
             return @"<div class='checkbox'>
                         <label>
-                            <input type='checkbox' id='@ebsid@' ui-inp data-ebtype='@data-ebtype@' style='vertical-align: bottom;' data-toggle='tooltip'>
+                            <input type='radio' id='@ebsid@' ui-inp data-ebtype='@data-ebtype@' style='vertical-align: bottom;' data-toggle='tooltip'>
                             <span class='eb-ctrl-label' ui-label id='@ebsidLbl'>@Label@ @req@ </span>
                         </label>
                     </div>"
@@ -96,7 +96,7 @@ $('#@idcontainer [type=radio]').on('click', function () {
         public override string GetValueJSfn { get { return @"return $('#' + this.EbSid_CtxId).prop('checked')? 'true': 'false';"; } set { } }
 
         [JsonIgnore]
-        public override string SetValueJSfn { get { return @"$('#' + this.EbSid_CtxId).prop('checked', (p1 === 'T'? true: false));"; } set { } }
+        public override string SetValueJSfn { get { return @"$('#' + this.EbSid_CtxId).prop('checked', (p1 === 'T'? true: false)).trigger('change');"; } set { } }
 
     }
 }

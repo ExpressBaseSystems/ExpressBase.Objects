@@ -78,6 +78,9 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.ApiBuilder)]
         [HideInPropertyGrid]
         public ApiParams Request { set; get; }
+
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        public ApiMethods Method { set; get; }
     }
 
     public abstract class ApiResources : EbApiWrapper
@@ -330,7 +333,7 @@ namespace ExpressBase.Objects
 
             try
             {
-                ApiGlobals globals = new ApiGlobals(_ds);
+                ApiGlobals globals = new ApiGlobals(_ds,ref GlobalParams);
 
                 foreach (KeyValuePair<string, object> kp in GlobalParams)
                 {

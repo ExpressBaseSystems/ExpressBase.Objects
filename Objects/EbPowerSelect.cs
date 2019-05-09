@@ -57,7 +57,7 @@ namespace ExpressBase.Objects
 console.log(1000);
         let VMs = this.initializer.Vobj.valueMembers;
         let DMs = this.initializer.Vobj.displayMembers;
-        let columnvals = this.initializer.columnvals;
+        let columnVals = this.initializer.columnVals;
 
         if (VMs.length > 0)// clear if already values there
             this.initializer.clearValues();
@@ -80,11 +80,11 @@ console.log(1000);
 
         $.each(DMtable, function (j, r) {
             $.each(r.Columns, function (j, item) {
-                if (!columnvals[item.Name]) {
+                if (!columnVals[item.Name]) {
                     console.warn('Mismatch found in Colums in datasource and Colums in object');
                     return true;
                 }
-                columnvals[item.Name].push(item.Value);
+                columnVals[item.Name].push(item.Value);
             }.bind(this));
         }.bind(this));
 
@@ -133,6 +133,12 @@ console.log(1000);
         public DVBaseColumn ValueMember { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [DefaultPropValue("100")]
+        [Alias("DropdownWidth(%)")]
+        public int DropdownWidth { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [DefaultPropValue("100")]
         public int DropdownHeight { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
@@ -144,9 +150,6 @@ console.log(1000);
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         public string Text { get; set; }
-
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        public int DropdownWidth { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [OnChangeExec(@"
@@ -212,6 +215,7 @@ console.log(1000);
         }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [DefaultPropValue("1")]
         public int MaxLimit { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]

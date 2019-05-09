@@ -33,7 +33,7 @@ namespace ExpressBase.Objects
             foreach (EbControl c in this.Controls)
             {
                 string val = string.Empty;
-                if ((c.EbDbType).ToString() == "Decimal")
+                if ((c.EbDbType).ToString() == "Decimal" || (c.EbDbType).ToString() == "Int32")
                     val = "0";
                 else if ((c.EbDbType).ToString() == "AnsiString")
                     val = "0";
@@ -56,7 +56,7 @@ namespace ExpressBase.Objects
                 if (c is EbUserLocation)
                 {
                     _p.Value = "-1";
-                    _p.Type = "11";
+                    _p.Type = "16";
                 }
                 _paramlist.Add(_p);
             }

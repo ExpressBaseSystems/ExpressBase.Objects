@@ -108,9 +108,15 @@ namespace ExpressBase.Objects
         public override string RefId { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup("General")]
         public override string DisplayName { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup("General")]
+        public override string Name { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup("General")]
         public override string Description { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
@@ -275,7 +281,7 @@ namespace ExpressBase.Objects
                 {
                     _currentTimeStamp = DateTime.UtcNow;
                     string timezone = ReadingUser.Preference.TimeZone;
-                    _currentTimeStamp = _currentTimeStamp.Add(CultureHelper.GetDifference(timezone,true));
+                    _currentTimeStamp = _currentTimeStamp.ConvertFromUtc(timezone);
                 }
                 return _currentTimeStamp;
             }

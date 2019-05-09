@@ -17,6 +17,7 @@ namespace ExpressBase.Objects.Helpers
             if (obj_type == EbObjectTypes.DataWriter || obj_type == EbObjectTypes.DataReader)
             {
                 List<string> _temp = new List<string>();
+                sql = Regex.Replace(sql, @"'([^']*)'", string.Empty); 
                 //Regex r = new Regex(@"\:\w+|\@\w+g");
                 Regex r = new Regex(@"((?<=:(?<!::))\w+|(?<=@(?<!::))\w+)");
 

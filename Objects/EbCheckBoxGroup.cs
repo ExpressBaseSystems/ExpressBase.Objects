@@ -68,8 +68,21 @@ namespace ExpressBase.Objects
 
 		public override string GetDesignHtml()
 		{
-			return GetHtml().RemoveCR().GraveAccentQuoted();
-		}
+            return HtmlConstants.CONTROL_WRAPER_HTML4WEB
+                .Replace("@barehtml@", @"
+                <div style='padding:5px'>
+                    <div class='check-wraper'>
+                        <input class='bot-checkbox' type ='checkbox' value='@value@' id='@ebsid@' name='@gname@'> 
+                            <span id='@name@Lbl' style='@LabelBackColor @LabelForeColor '> CheckBox1  </span>
+                    </div>
+                    <div class='check-wraper'>
+                        <input class='bot-checkbox' type ='checkbox' value='@value@' id='@ebsid@' name='@gname@'> 
+                            <span id='@name@Lbl' style='@LabelBackColor @LabelForeColor '> CheckBox2  </span>
+                    </div>
+                </div>
+                ").RemoveCR().DoubleQuoted();
+            //return GetHtml().RemoveCR().GraveAccentQuoted();
+        }
 
 		public override string GetHtml()
 		{
@@ -141,7 +154,7 @@ this.Init = function(id)
             get
             {
                 return @"
-                    return $('#' + this.EbSid_CtxId).prop('checked', p1 ==='true');
+                    return $('#' + this.EbSid_CtxId).prop('checked', p1 ==='true').trigger('change');
                 ";
             }
             set { }
@@ -158,7 +171,7 @@ this.Init = function(id)
 
 		public override string GetBareHtml()
 		{
-			return @"<div class='check-wraper'><input class='bot-checkbox' type ='checkbox' value='@value@' id='@ebsid@' name='@gname@'> <span id='@name@Lbl' style='@LabelBackColor @LabelForeColor '> @label@  </span><br></div>"
+			return @"<div class='radio-wrap' style='padding:5px'><input class='bot-checkbox' type ='checkbox' value='@value@' id='@ebsid@' name='@gname@'> <span id='@name@Lbl' style='@LabelBackColor @LabelForeColor '> @label@  </span><br></div>"
 .Replace("@ebsid@", String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId)
 .Replace("@gname@", this.GName)
 .Replace("@label@", this.Label)
