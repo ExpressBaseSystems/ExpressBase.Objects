@@ -719,21 +719,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class SqlFuncTestResponse : IEbSSResponse
+    public class SqlFuncTestResponse
     {
         [DataMember(Order = 1)]
-        public ResponseStatus ResponseStatus { get; set; }
+        public bool Reponse { set; get; }
 
         [DataMember(Order = 2)]
-        public string Reponse { set; get; }
-
-        [DataMember(Order = 3)]
         public EbDataTable Data { set; get; }
-
-        public SqlFuncTestResponse()
-        {
-            ResponseStatus = new ResponseStatus();
-        }
     }
 
     [DataContract]
