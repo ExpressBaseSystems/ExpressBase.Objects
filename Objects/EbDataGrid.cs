@@ -638,5 +638,10 @@ else {pg.MakeReadWrite('ValueMember');}")]
         {
             return this.EbPowerSelect.GetSelectQuery(service, Col, Tbl, _id);
         }
+
+        public string GetDisplayMembersQuery(Service service, string vms)
+        {
+            return this.EbPowerSelect.GetDisplayMembersQuery(service, vms);
+        }
     }
 }
