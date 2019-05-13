@@ -120,13 +120,9 @@ namespace ExpressBase.Objects
                     {
                         if ((Allctrls[i] as EbDataGrid).Controls[j] is EbDGUserControlColumn) {
                             EbDGColumn DGColumn = (Allctrls[i] as EbDataGrid).Controls[j] as EbDGColumn;
-                            (Allctrls[i] as EbDataGrid).Controls[j] = new EbDGUserControlColumn {
-                                RefId = DGColumn.RefId,
-                                Name = DGColumn.Name,
-                                EbSid = DGColumn.EbSid,
-                                EbSid_CtxId = DGColumn.EbSid_CtxId,
-                                Title = DGColumn.Title
-                            };
+
+                            ((Allctrls[i] as EbDataGrid).Controls[j] as EbDGUserControlColumn).Columns = new List<EbControl>();
+
                         }
                     }
                 }
