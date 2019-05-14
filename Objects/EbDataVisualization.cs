@@ -119,7 +119,7 @@ namespace ExpressBase.Objects
         public EbDataReader EbDataSource { get; set; }
 
         //[PropertyEditor(PropertyEditorType.CollectionProp, "Columns", "bVisible")]
-        [PropertyEditor(PropertyEditorType.CollectionABCpropToggle, "Columns", "bVisible", "Formula")]
+        [PropertyEditor(PropertyEditorType.CollectionABCpropToggle, "Columns", "bVisible", "_Formula")]
         //[PropertyEditor(PropertyEditorType.CollectionABCpropToggle, "Columns", "Formula")]
 
         [CEOnSelectFn(@";
@@ -372,6 +372,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.Collection)]
         [HideForUser]
+        [HideInPropertyGrid]
         public List<RowGroupParent> RowGroupCollection { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
