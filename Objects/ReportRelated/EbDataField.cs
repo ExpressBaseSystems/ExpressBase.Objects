@@ -863,7 +863,8 @@ namespace ExpressBase.Objects
                     string TName = calcfd.Split('.')[0];
                     int TableIndex = Convert.ToInt32(TName.Substring(1));
                     string fName = calcfd.Split('.')[1];
-                    globals[TName].Add(fName, new NTV { Name = fName, Type = Rep.DataSet.Tables[TableIndex].Columns[fName].Type, Value = Rep.DataSet.Tables[TableIndex].Rows[slno][fName] });
+                    int RowIndex = (TableIndex == Rep.DetailTableIndex) ? slno : 0;
+                    globals[TName].Add(fName, new NTV { Name = fName, Type = Rep.DataSet.Tables[TableIndex].Columns[fName].Type, Value = Rep.DataSet.Tables[TableIndex].Rows[RowIndex][fName] });
                 }
                 column_val = (Rep.ValueScriptCollection[Name].RunAsync(globals)).Result.ReturnValue.ToString();
 

@@ -251,8 +251,10 @@ $('#@id').MonthPicker({ StartYear: 2018, ShowIcon: false });"
             { return
             @"if((this.IsNullable && !($('#' + this.EbSid_CtxId).siblings('.nullable-check').find('input[type=checkbox]').prop('checked'))) || $('#' + this.EbSid_CtxId).val() === '')
                 return undefined;
-            else
-	            return $('#' + this.EbSid_CtxId).val();";
+            else{
+                console.log(7012);
+                return moment($('#' + this.EbSid_CtxId).val(), ebcontext.user.Preference.ShortDatePattern).format('YYYY-MM-DD');
+            }";
             }
             set { }
         }
@@ -264,8 +266,8 @@ $('#@id').MonthPicker({ StartYear: 2018, ShowIcon: false });"
             { return
             @"if(this.IsNullable && p1 !== null){
                 $('#' + this.EbSid_CtxId).siblings('.nullable-check').find('input[type=checkbox]').prop('checked', true);
-            }
-            $('#' + this.EbSid_CtxId).val(p1).trigger('change');";
+            }            
+            $('#' + this.EbSid_CtxId).val(moment(p1, 'YYYY-MM-DD').format(ebcontext.user.Preference.ShortDatePattern)).trigger('change');";
             }
             set { }
         }
