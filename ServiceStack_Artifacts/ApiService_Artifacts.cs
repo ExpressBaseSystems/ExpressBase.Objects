@@ -360,4 +360,13 @@ END;";
 
         public string DisplayName { set; get; }
     }
+
+    public class ApiFileData
+    {
+        public string FileName { set; get; }
+
+        public string FileType { set; get; }
+
+        public int FileRefId { set; get; }
+    }
 }
