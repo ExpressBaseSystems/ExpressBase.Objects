@@ -1,6 +1,7 @@
 ﻿using ExpressBase.Common;
 using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
+using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Singletons;
 using ExpressBase.Common.Structures;
 using ExpressBase.Data;
@@ -251,6 +252,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 13)]
         public byte[] excel_file { get; set; }
+
+        [DataMember(Order = 14)]
+        public List<Node<EbDataRow>> Tree { get; set; }
+
+        [DataMember(Order = 15)]
+        public string TableName { get; set; }
 
     }
 
