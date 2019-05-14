@@ -165,7 +165,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
-        [Alias("Formula")]
+        [Alias("Formula")]        
         public EbScript _Formula { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
@@ -177,6 +177,14 @@ namespace ExpressBase.Objects.Objects.DVRelated
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [HideInPropertyGrid]
+        [OnChangeExec(@"
+console.log('IsCustomColumn');
+if(this.IsCustomColumn){
+    pg.ShowProperty('_Formula');
+}
+else {
+    pg.HideProperty('_Formula');
+}")]
         public bool IsCustomColumn { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
@@ -213,6 +221,7 @@ else{
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.DropDown)]
         [OnChangeExec(@"
+console.log('kkkoiiii');
 if(this.FormMode === 1){
     pg.ShowProperty('FormId');
     pg.HideProperty('FormParameters');
@@ -462,6 +471,15 @@ else if(this.FormMode === 2){
 if(this.RenderAs === 2){
     pg.ShowProperty('LinkRefId');
     pg.ShowProperty('LinkType');
+    pg.HideProperty('ParentColumn');
+    pg.HideProperty('GroupingColumn');
+    pg.HideProperty('GroupFormLink');
+    pg.HideProperty('ItemFormLink');
+    pg.HideProperty('GroupFormParameters');
+    pg.HideProperty('GroupFormId');
+    pg.HideProperty('ItemFormParameters');
+    pg.HideProperty('ItemFormId');
+    pg.setSimpleProperty('IsTree', false);
 }
 else if(this.RenderAs === 6){
     pg.ShowProperty('ParentColumn');
@@ -473,6 +491,8 @@ else if(this.RenderAs === 6){
     pg.ShowProperty('ItemFormParameters');
     pg.ShowProperty('ItemFormId');
     pg.setSimpleProperty('IsTree', true);
+    pg.HideProperty('LinkRefId');
+    pg.HideProperty('LinkType');
 }
 else{
     pg.HideProperty('LinkRefId');
@@ -520,17 +540,28 @@ else{
 if(this.RenderAs === 2){
     pg.ShowProperty('LinkRefId');
     pg.ShowProperty('LinkType');
+    pg.HideProperty('ParentColumn');
+    pg.HideProperty('GroupingColumn');
+    pg.HideProperty('GroupFormLink');
+    pg.HideProperty('ItemFormLink');
+    pg.HideProperty('GroupFormParameters');
+    pg.HideProperty('GroupFormId');
+    pg.HideProperty('ItemFormParameters');
+    pg.HideProperty('ItemFormId');
+    pg.setSimpleProperty('IsTree', false);
 }
 else if(this.RenderAs === 3){
     pg.ShowProperty('ParentColumn');
     pg.ShowProperty('GroupingColumn');
     pg.ShowProperty('GroupFormLink');
     pg.ShowProperty('ItemFormLink');
-pg.ShowProperty('GroupFormParameters');
+    pg.ShowProperty('GroupFormParameters');
     pg.ShowProperty('GroupFormId');
     pg.ShowProperty('ItemFormParameters');
     pg.ShowProperty('ItemFormId');
-pg.setSimpleProperty('IsTree', true);
+    pg.setSimpleProperty('IsTree', true);
+    pg.HideProperty('LinkRefId');
+    pg.HideProperty('LinkType');
 }
 else{
     pg.HideProperty('LinkRefId');
@@ -540,7 +571,7 @@ else{
     pg.HideProperty('GroupingColumn');
     pg.HideProperty('GroupFormLink');
     pg.HideProperty('ItemFormLink');
-pg.HideProperty('GroupFormParameters');
+    pg.HideProperty('GroupFormParameters');
     pg.HideProperty('GroupFormId');
     pg.HideProperty('ItemFormParameters');
     pg.HideProperty('ItemFormId');
@@ -587,17 +618,28 @@ pg.setSimpleProperty('IsTree', false);
 if(this.RenderAs === 2){
     pg.ShowProperty('LinkRefId');
     pg.ShowProperty('LinkType');
+    pg.HideProperty('ParentColumn');
+    pg.HideProperty('GroupingColumn');
+    pg.HideProperty('GroupFormLink');
+    pg.HideProperty('ItemFormLink');
+    pg.HideProperty('GroupFormParameters');
+    pg.HideProperty('GroupFormId');
+    pg.HideProperty('ItemFormParameters');
+    pg.HideProperty('ItemFormId');
+    pg.setSimpleProperty('IsTree', false);
 }
-else if(this.RenderAs === 3){
+else if(this.RenderAs === 4){
     pg.ShowProperty('ParentColumn');
     pg.ShowProperty('GroupingColumn');
     pg.ShowProperty('GroupFormLink');
     pg.ShowProperty('ItemFormLink');
-pg.ShowProperty('GroupFormParameters');
+    pg.ShowProperty('GroupFormParameters');
     pg.ShowProperty('GroupFormId');
     pg.ShowProperty('ItemFormParameters');
     pg.ShowProperty('ItemFormId');
-pg.setSimpleProperty('IsTree', true);
+    pg.setSimpleProperty('IsTree', true);
+    pg.HideProperty('LinkRefId');
+    pg.HideProperty('LinkType');
 }
 else{
     pg.HideProperty('LinkRefId');
@@ -633,17 +675,28 @@ pg.setSimpleProperty('IsTree', false);
 if(this.RenderAs === 1){
     pg.ShowProperty('LinkRefId');
     pg.ShowProperty('LinkType');
+    pg.HideProperty('ParentColumn');
+    pg.HideProperty('GroupingColumn');
+    pg.HideProperty('GroupFormLink');
+    pg.HideProperty('ItemFormLink');
+    pg.HideProperty('GroupFormParameters');
+    pg.HideProperty('GroupFormId');
+    pg.HideProperty('ItemFormParameters');
+    pg.HideProperty('ItemFormId');
+    pg.setSimpleProperty('IsTree', false);
 }
 else if(this.RenderAs === 2){
     pg.ShowProperty('ParentColumn');
     pg.ShowProperty('GroupingColumn');
     pg.ShowProperty('GroupFormLink');
     pg.ShowProperty('ItemFormLink');
-pg.ShowProperty('GroupFormParameters');
+    pg.ShowProperty('GroupFormParameters');
     pg.ShowProperty('GroupFormId');
     pg.ShowProperty('ItemFormParameters');
     pg.ShowProperty('ItemFormId');
-pg.setSimpleProperty('IsTree', true);
+    pg.setSimpleProperty('IsTree', true);
+    pg.HideProperty('LinkRefId');
+    pg.HideProperty('LinkType');
 }
 else{
     pg.HideProperty('LinkRefId');
