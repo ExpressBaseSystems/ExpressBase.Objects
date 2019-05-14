@@ -252,6 +252,8 @@ $('#@id').MonthPicker({ StartYear: 2018, ShowIcon: false });"
                 return
                     @"if((this.IsNullable && !($('#' + this.EbSid_CtxId).siblings('.nullable-check').find('input[type=checkbox]').prop('checked'))) || $('#' + this.EbSid_CtxId).val() === '')
                         return undefined;
+                    else if(this.ShowDateAs_ === 1)
+                        return $('#' + this.EbSid_CtxId).val();
                     else
                         return moment($('#' + this.EbSid_CtxId).val(), ebcontext.user.Preference.ShortDatePattern).format('YYYY-MM-DD');";
             }
@@ -266,7 +268,10 @@ $('#@id').MonthPicker({ StartYear: 2018, ShowIcon: false });"
                 return
                     @"if(this.IsNullable && p1 !== null)
                         $('#' + this.EbSid_CtxId).siblings('.nullable-check').find('input[type=checkbox]').prop('checked', true);
-                    $('#' + this.EbSid_CtxId).val(moment(p1, 'YYYY-MM-DD').format(ebcontext.user.Preference.ShortDatePattern)).trigger('change');";
+                    if(this.ShowDateAs_ === 1)
+                        $('#' + this.EbSid_CtxId).val(p1);
+                    else
+                        $('#' + this.EbSid_CtxId).val(moment(p1, 'YYYY-MM-DD').format(ebcontext.user.Preference.ShortDatePattern)).trigger('change');";
             }
             set { }
         }
