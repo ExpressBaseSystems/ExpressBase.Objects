@@ -329,11 +329,27 @@ $.each(this.Controls.$values, function (i, col) {
         {
             get
             {
-                return
-              @"if((this.IsNullable && !($('#' + this.EbSid_CtxId).siblings('.nullable-check').find('input[type=checkbox]').prop('checked'))) || $('#' + this.EbSid_CtxId).val() === '')
-                return undefined;
-            else
-	            return $('#' + this.EbSid_CtxId).val();";
+                return this.EbDate.GetValueJSfn;
+            }
+            set { }
+        }
+
+        [JsonIgnore]
+        public override string SetValueJSfn
+        {
+            get
+            {
+                return this.EbDate.SetValueJSfn;
+            }
+            set { }
+        }
+
+        [JsonIgnore]
+        public override string GetDisplayMemberJSfn
+        {
+            get
+            {
+                return this.EbDate.GetDisplayMemberJSfn;
             }
             set { }
         }
