@@ -238,7 +238,7 @@ else if(this.FormMode === 2){
         public DVColumnCollection ColumnsRef { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
-        [PropertyEditor(PropertyEditorType.Mapper, "ColumnsRef", "LinkRefId", "FormControl")]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "ColumnsRef")]
         public List<DVBaseColumn> FormId { get; set; }
 
 
@@ -284,7 +284,7 @@ else if(this.FormMode === 2){
 
         [PropertyGroup("TreeVisualization")]
         [EnableInBuilder(BuilderType.DVBuilder)]
-        [PropertyEditor(PropertyEditorType.Mapper, "ColumnsRef", "GroupFormLink", "FormControl")]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "ColumnsRef")]
         public List<DVBaseColumn> GroupFormId { get; set; }
 
         [PropertyGroup("TreeVisualization")]
@@ -294,7 +294,7 @@ else if(this.FormMode === 2){
 
         [PropertyGroup("TreeVisualization")]
         [EnableInBuilder(BuilderType.DVBuilder)]
-        [PropertyEditor(PropertyEditorType.Mapper, "ColumnsRef", "ItemFormLink", "FormControl")]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "ColumnsRef")]
         public List<DVBaseColumn> ItemFormId { get; set; }
 
         [PropertyGroup("TreeVisualization")]
