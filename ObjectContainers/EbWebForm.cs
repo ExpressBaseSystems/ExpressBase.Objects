@@ -1432,6 +1432,8 @@ namespace ExpressBase.Objects
                             {
                                 dm += " " + d;
                             }
+                            if (i < vm_arr.Length - 1)
+                                dm += "<br>";
                         }
                         column.Value.NewValue = dm;
                     }
