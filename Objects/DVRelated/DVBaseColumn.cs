@@ -441,12 +441,12 @@ else if(this.FormMode === 2){
             return null;
         }
 
-        public DVBaseColumn Pop(string name, EbDbTypes type)
+        public DVBaseColumn Pop(string name, EbDbTypes type, bool iscustom)
         {
             DVBaseColumn tempCol = null;
             foreach (DVBaseColumn col in this)
             {
-                if (col.Name.Equals(name) && col.Type == type)
+                if (col.Name.Equals(name) && col.Type == type && !iscustom)
                 {
                     tempCol = col;
                     break;
