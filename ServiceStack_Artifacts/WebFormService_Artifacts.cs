@@ -180,10 +180,27 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
+    public class GetCtrlsFlatRequest : EbServiceStackAuthRequest, IReturn<GetCtrlsFlatResponse>
+    {
+        [DataMember(Order = 1)]
+        public string RefId { get; set; }
+    }
+
+    [DataContract]
     public class DeleteDataFromWebformResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
         public int RowAffected { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    [DataContract]
+    public class GetCtrlsFlatResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public List<EbControl> Controls{ get; set; }
 
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
