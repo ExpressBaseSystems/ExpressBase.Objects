@@ -1467,6 +1467,13 @@ namespace ExpressBase.Objects
                 {
                     if (control is EbFileUploader)
                         _schema.ExtendedControls.Add(control);
+                    else if(control is EbDGUserControlColumn)
+                    {
+                        foreach(EbControl _ctrl in (control as EbDGUserControlColumn).Columns)
+                        {
+                            _table.Columns.Add(new ColumnSchema { ColumnName = _ctrl.Name, EbDbType = (int)_ctrl.EbDbType, Control = _ctrl });
+                        }
+                    }
                     else
                         _table.Columns.Add(new ColumnSchema { ColumnName = control.Name, EbDbType = (int)control.EbDbType, Control = control });
                 }
