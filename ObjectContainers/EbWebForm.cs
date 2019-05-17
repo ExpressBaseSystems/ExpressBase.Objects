@@ -1,6 +1,7 @@
 ﻿using ExpressBase.Common;
 using ExpressBase.Common.Data;
 using ExpressBase.Common.Extensions;
+using ExpressBase.Common.LocationNSolution;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Singletons;
@@ -47,6 +48,8 @@ namespace ExpressBase.Objects
         public User UserObj { get; set; }
 
         public int LocationId { get; set; }
+
+        public Eb_Solution SolutionObj { get; set; }
 
         [PropertyGroup("Events")]
         [EnableInBuilder(BuilderType.WebForm)]
@@ -358,6 +361,7 @@ namespace ExpressBase.Objects
                     Dictionary<string, string> dict = new Dictionary<string, string>();
                     dict.Add("{currentlocation.id}", this.LocationId.ToString());
                     dict.Add("{user.id}", this.UserObj.UserId.ToString());
+                    dict.Add("{currentlocation.shortname}", this.SolutionObj.Locations[this.LocationId].ShortName);
 
                     MatchCollection mc = Regex.Matches((c as EbAutoId).Pattern.sPattern, @"{(.*?)}");
                     foreach (Match m in mc)
@@ -1750,6 +1754,8 @@ namespace ExpressBase.Objects
         public Dictionary<int, FormTransactionRow> Rows { get; set; }//Key = Row id
 
         public Dictionary<int, string> ColumnMeta { get; set; }
+
+        public string Title { get; set; }
 
         public FormTransactionTable()
         {
