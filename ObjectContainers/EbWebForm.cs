@@ -1297,9 +1297,19 @@ namespace ExpressBase.Objects
                     {
                         if (!Trans[m_id].GridTables.ContainsKey(_table.TableName))
                         {
-                            Trans[m_id].GridTables.Add(_table.TableName, new FormTransactionTable() { });
+                            Trans[m_id].GridTables.Add(_table.TableName, new FormTransactionTable() { Title = _table.Title});
                             for (int i = 0; i < _table.Columns.Count; i++)
-                                Trans[m_id].GridTables[_table.TableName].ColumnMeta.Add(i, (_table.Columns.ElementAt(i).Control as EbDGColumn).Title);
+                            {
+                                if (_table.Columns.ElementAt(i).Control is EbDGColumn)
+                                {
+                                    if (_table.Columns.ElementAt(i).Control is EbDGUserControlColumn)
+                                        continue;
+                                    else
+                                        Trans[m_id].GridTables[_table.TableName].ColumnMeta.Add(i, (_table.Columns.ElementAt(i).Control as EbDGColumn).Title);
+                                }
+                                else
+                                    Trans[m_id].GridTables[_table.TableName].ColumnMeta.Add(i, (_table.Columns.ElementAt(i).Control as EbControl).Label);
+                            }
                         }
                         int curid = Convert.ToInt32(ids[1]);
                         FormTransactionTable TblRef = Trans[m_id].GridTables[_table.TableName];
@@ -1484,10 +1494,10 @@ namespace ExpressBase.Objects
             TableSchema _table = _schema.Tables.FirstOrDefault(tbl => tbl.TableName == _container.TableName);
             if (_table == null)
             {
-                bool IsGrid = false;
                 if (_container is EbDataGrid)
-                    IsGrid = true;
-                _table = new TableSchema { TableName = _container.TableName.ToLower(), ParentTable = _parentTable, IsGridTable = IsGrid };
+                    _table = new TableSchema { TableName = _container.TableName.ToLower(), ParentTable = _parentTable, IsGridTable = true , Title = _container.Label };
+                else
+                    _table = new TableSchema { TableName = _container.TableName.ToLower(), ParentTable = _parentTable, IsGridTable = false };
                 _schema.Tables.Add(_table);
             }
             foreach (EbControl control in _flatControls)
