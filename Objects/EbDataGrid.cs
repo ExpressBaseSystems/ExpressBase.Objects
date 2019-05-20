@@ -535,6 +535,7 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, func
         public void InitUserControl(EbUserControl ebUserControl)
         {
             this.Columns = ebUserControl.Controls;
+            this.ObjType = this.ObjType;
             this.InitDBareHtml();
         }
 
