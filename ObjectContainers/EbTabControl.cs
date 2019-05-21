@@ -95,8 +95,8 @@ this.Init = function(id)
             string TabBtnHtml = "<div id='cont_@ebsid@' ebsid='@ebsid@' class='Eb-ctrlContainer' Ctype='TabControl'><ul class='nav nav-tabs'>".Replace("@ebsid@", EbSid);
             string TabContentHtml = "<div class='tab-content'>";
 
-            foreach (EbControl tab in Controls)
-                TabBtnHtml += "<li li-of='@ebsid@' @active><a data-toggle='tab' href='#@ebsid@'>@name@</a></li>".Replace("@name@", tab.Name).Replace("@ebsid@", tab.EbSid);
+            foreach (EbTabPane tab in Controls)
+                TabBtnHtml += "<li li-of='@ebsid@' @active><a data-toggle='tab' href='#@ebsid@'>@title@</a></li>".Replace("@title@", tab.Title).Replace("@ebsid@", tab.EbSid);
 
             TabBtnHtml += "</ul>";
 
@@ -128,6 +128,9 @@ this.Init = function(id)
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [HideInPropertyGrid]
         public override List<EbControl> Controls { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        public string Title { get; set; }
 
         public override string GetHtml()
         {

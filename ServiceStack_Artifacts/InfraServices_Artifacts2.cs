@@ -10,7 +10,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
     [DataContract]
     public class CreateAccountRequest : IReturn<CreateAccountResponse>, IEbSSRequest
-    {       
+    {
         [DataMember(Order = 0)]
         public string Op { get; set; }
 
@@ -176,21 +176,21 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
     [DataContract]
     [Route("/unique", "POST")]
-    public class UniqueRequest 
+    public class UniqueRequest
     {
         [DataMember(Order = 1)]
         public string email { get; set; }
 
     }
-    public class UniqueRequestResponse 
+    public class UniqueRequestResponse
     {
-        public bool isUniq {set;get;}
+        public bool isUniq { set; get; }
     }
 
     [DataContract]
     public class GetAccountRequest : IReturn<GetAccountResponse>, IEbSSRequest
     {
-      
+
         [DataMember(Order = 1)]
         public int Id { get; set; }
 
@@ -219,12 +219,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 5)]
         public ResponseStatus ResponseStatus { get; set; }
-       
+
     }
-   
+
     public class AutoGenSidRequest : EbServiceStackNoAuthRequest
     {
-        
+
     }
 
     [DataContract]
@@ -232,7 +232,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         [DataMember(Order = 1)]
         public string Sid { get; set; }
-        
+
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
     }
@@ -261,6 +261,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 4)]
         public string Description { get; set; }
 
+        [DataMember(Order = 5)]
+        public bool DeployDB { get; set; }
+
+
         public string SolnId { get; set; }
     }
 
@@ -272,6 +276,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 3)]
+        public string ErrSolMessage { get; set; }
+
+        [DataMember(Order = 4)]
+        public string ErrDbMessage { get; set; }
 
     }
 
@@ -301,7 +311,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 4)]
         public List<EbSolutionsWrapper> Data { get; set; }
     }
-    
+
     [DataContract]
     public class GetSolutioInfoRequest : IReturn<GetSolutioInfoResponse>, IEbSSRequest
     {

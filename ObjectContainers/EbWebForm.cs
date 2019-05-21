@@ -1,6 +1,7 @@
 ﻿using ExpressBase.Common;
 using ExpressBase.Common.Data;
 using ExpressBase.Common.Extensions;
+using ExpressBase.Common.LocationNSolution;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Singletons;
@@ -47,6 +48,8 @@ namespace ExpressBase.Objects
         public User UserObj { get; set; }
 
         public int LocationId { get; set; }
+
+        public Eb_Solution SolutionObj { get; set; }
 
         [PropertyGroup("Events")]
         [EnableInBuilder(BuilderType.WebForm)]
@@ -358,6 +361,7 @@ namespace ExpressBase.Objects
                     Dictionary<string, string> dict = new Dictionary<string, string>();
                     dict.Add("{currentlocation.id}", this.LocationId.ToString());
                     dict.Add("{user.id}", this.UserObj.UserId.ToString());
+                    dict.Add("{currentlocation.shortname}", this.SolutionObj.Locations[this.LocationId].ShortName);
 
                     MatchCollection mc = Regex.Matches((c as EbAutoId).Pattern.sPattern, @"{(.*?)}");
                     foreach (Match m in mc)
@@ -594,7 +598,16 @@ namespace ExpressBase.Objects
                 r = 1;
             }
             this.RefreshFormData(DataDB, service);
-            //this.UpdateAuditTrail(DataDB);//
+
+            try
+            {
+                this.UpdateAuditTrail(DataDB);
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine("Exception!!! UpdateAuditTrail : " + e.Message);
+            }
+            
             return r;
         }
 
@@ -1284,9 +1297,19 @@ namespace ExpressBase.Objects
                     {
                         if (!Trans[m_id].GridTables.ContainsKey(_table.TableName))
                         {
-                            Trans[m_id].GridTables.Add(_table.TableName, new FormTransactionTable() { });
+                            Trans[m_id].GridTables.Add(_table.TableName, new FormTransactionTable() { Title = _table.Title});
                             for (int i = 0; i < _table.Columns.Count; i++)
-                                Trans[m_id].GridTables[_table.TableName].ColumnMeta.Add(i, (_table.Columns.ElementAt(i).Control as EbDGColumn).Title);
+                            {
+                                if (_table.Columns.ElementAt(i).Control is EbDGColumn)
+                                {
+                                    if (_table.Columns.ElementAt(i).Control is EbDGUserControlColumn)
+                                        continue;
+                                    else
+                                        Trans[m_id].GridTables[_table.TableName].ColumnMeta.Add(i, (_table.Columns.ElementAt(i).Control as EbDGColumn).Title);
+                                }
+                                else
+                                    Trans[m_id].GridTables[_table.TableName].ColumnMeta.Add(i, (_table.Columns.ElementAt(i).Control as EbControl).Label);
+                            }
                         }
                         int curid = Convert.ToInt32(ids[1]);
                         FormTransactionTable TblRef = Trans[m_id].GridTables[_table.TableName];
@@ -1297,8 +1320,10 @@ namespace ExpressBase.Objects
                         bool IsModified = false;
                         if (new_val_dict[__column.ColumnName] != old_val_dict[__column.ColumnName])
                             IsModified = true;
-                        TblRef.Rows[curid].Columns.Add(__column.ColumnName, new FormTransactionEntry() { OldValue = old_val_dict[__column.ColumnName], NewValue = new_val_dict[__column.ColumnName], IsModified = IsModified });
-                        ProcessTransDataHelper(DictVmAll, _table, __column, old_val_dict[__column.ColumnName], new_val_dict[__column.ColumnName]);                        
+                        string a = old_val_dict[__column.ColumnName];
+                        string b = new_val_dict[__column.ColumnName];
+                        PreProcessTransationData(DictVmAll, _table, __column, ref a, ref b);
+                        TblRef.Rows[curid].Columns.Add(__column.ColumnName, new FormTransactionEntry() { OldValue = a, NewValue = b, IsModified = IsModified });
                     }
                 }
                 else
@@ -1306,23 +1331,24 @@ namespace ExpressBase.Objects
                     if (!Trans[m_id].Tables.ContainsKey(_table.TableName))
                         Trans[m_id].Tables.Add(_table.TableName, new FormTransactionRow() { });
 
+                    PreProcessTransationData(DictVmAll, _table, _column, ref old_val, ref new_val);
+
                     FormTransactionEntry curtrans = new FormTransactionEntry()
                     {
                         OldValue = old_val,
                         NewValue = new_val,
                         IsModified = true,
                         Title = (_column.Control as EbControl).Label
-                    };
+                    };                    
                     Trans[m_id].Tables[_table.TableName].Columns.Add(_column.ColumnName, curtrans);
-                    ProcessTransDataHelper(DictVmAll, _table, _column, old_val, new_val);
                 }
             }
-            ProcessTransationsData(DataDB, Service, Trans, DictVmAll);
+            PostProcessTransationData(DataDB, Service, Trans, DictVmAll);
 
             return JsonConvert.SerializeObject(Trans);
         }
 
-        private void ProcessTransDataHelper(Dictionary<string, string> DictVmAll, TableSchema _table, ColumnSchema _column, string old_val, string new_val)
+        private void PreProcessTransationData(Dictionary<string, string> DictVmAll, TableSchema _table, ColumnSchema _column, ref string old_val, ref string new_val)
         {
             if (_column.Control is EbPowerSelect || _column.Control is EbDGPowerSelectColumn)//copy vm for dm
             {
@@ -1341,9 +1367,20 @@ namespace ExpressBase.Objects
                         DictVmAll[key] = string.Concat(DictVmAll[key], temp);
                 }
             }
+            else if(_column.Control is EbDate || _column.Control is EbDGDateColumn)
+            {
+                if (!old_val.Equals("[null]"))
+                {
+                    old_val = DateTime.ParseExact(old_val, "yyyy-MM-dd", CultureInfo.InvariantCulture).ToString(this.UserObj.Preference.GetShortDatePattern(), CultureInfo.InvariantCulture);
+                }
+                if (!new_val.Equals("[null]"))
+                {
+                    new_val = DateTime.ParseExact(new_val, "yyyy-MM-dd", CultureInfo.InvariantCulture).ToString(this.UserObj.Preference.GetShortDatePattern(), CultureInfo.InvariantCulture);
+                }
+            }
         }
 
-        private void ProcessTransationsData(IDatabase DataDB, Service Service, Dictionary<int, FormTransaction> Trans, Dictionary<string, string> DictVmAll)
+        private void PostProcessTransationData(IDatabase DataDB, Service Service, Dictionary<int, FormTransaction> Trans, Dictionary<string, string> DictVmAll)
         {
             string Qry = string.Empty;
             foreach (TableSchema _table in this.FormSchema.Tables)
@@ -1432,6 +1469,8 @@ namespace ExpressBase.Objects
                             {
                                 dm += " " + d;
                             }
+                            if (i < vm_arr.Length - 1)
+                                dm += "<br>";
                         }
                         column.Value.NewValue = dm;
                     }
@@ -1455,10 +1494,10 @@ namespace ExpressBase.Objects
             TableSchema _table = _schema.Tables.FirstOrDefault(tbl => tbl.TableName == _container.TableName);
             if (_table == null)
             {
-                bool IsGrid = false;
                 if (_container is EbDataGrid)
-                    IsGrid = true;
-                _table = new TableSchema { TableName = _container.TableName.ToLower(), ParentTable = _parentTable, IsGridTable = IsGrid };
+                    _table = new TableSchema { TableName = _container.TableName.ToLower(), ParentTable = _parentTable, IsGridTable = true , Title = _container.Label };
+                else
+                    _table = new TableSchema { TableName = _container.TableName.ToLower(), ParentTable = _parentTable, IsGridTable = false };
                 _schema.Tables.Add(_table);
             }
             foreach (EbControl control in _flatControls)
@@ -1725,6 +1764,8 @@ namespace ExpressBase.Objects
         public Dictionary<int, FormTransactionRow> Rows { get; set; }//Key = Row id
 
         public Dictionary<int, string> ColumnMeta { get; set; }
+
+        public string Title { get; set; }
 
         public FormTransactionTable()
         {

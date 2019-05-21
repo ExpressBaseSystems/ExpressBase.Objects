@@ -396,6 +396,20 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, func
             this.EbSimpleSelect = new EbSimpleSelect();
         }
 
+        [JsonIgnore]
+        public override string DisableJSfn
+        {
+            get
+            {
+                return @"$('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] .ctrl-cover .dropdown-toggle`).attr('disabled', 'disabled').css('pointer-events', 'none').find('[ui-inp]').css('background-color', '#f3f3f3');";
+            }
+            set { }
+        }
+
+        [JsonIgnore]
+        public override string EnableJSfn { get {
+                return @"$('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] .ctrl-cover .dropdown-toggle`).prop('disabled',false).css('pointer-events', 'inherit').find('[ui-inp]').css('background-color', '#fff');"; } set { } }
+
         public override string GetDisplayMemberJSfn { get { return @" return $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp] :selected`).text(); "; } set { } }
 
         [EnableInBuilder(BuilderType.WebForm)]
@@ -535,6 +549,7 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, func
         public void InitUserControl(EbUserControl ebUserControl)
         {
             this.Columns = ebUserControl.Controls;
+            this.ObjType = this.ObjType;
             this.InitDBareHtml();
         }
 
