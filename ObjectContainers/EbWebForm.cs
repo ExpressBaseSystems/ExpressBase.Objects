@@ -1,6 +1,7 @@
 ﻿using ExpressBase.Common;
 using ExpressBase.Common.Data;
 using ExpressBase.Common.Extensions;
+using ExpressBase.Common.LocationNSolution;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Singletons;
@@ -47,6 +48,8 @@ namespace ExpressBase.Objects
         public User UserObj { get; set; }
 
         public int LocationId { get; set; }
+
+        public Eb_Solution SolutionObj { get; set; }
 
         [PropertyGroup("Events")]
         [EnableInBuilder(BuilderType.WebForm)]
@@ -120,13 +123,9 @@ namespace ExpressBase.Objects
                     {
                         if ((Allctrls[i] as EbDataGrid).Controls[j] is EbDGUserControlColumn) {
                             EbDGColumn DGColumn = (Allctrls[i] as EbDataGrid).Controls[j] as EbDGColumn;
-                            (Allctrls[i] as EbDataGrid).Controls[j] = new EbDGUserControlColumn {
-                                RefId = DGColumn.RefId,
-                                Name = DGColumn.Name,
-                                EbSid = DGColumn.EbSid,
-                                EbSid_CtxId = DGColumn.EbSid_CtxId,
-                                Title = DGColumn.Title
-                            };
+
+                            ((Allctrls[i] as EbDataGrid).Controls[j] as EbDGUserControlColumn).Columns = new List<EbControl>();
+
                         }
                     }
                 }
@@ -362,6 +361,7 @@ namespace ExpressBase.Objects
                     Dictionary<string, string> dict = new Dictionary<string, string>();
                     dict.Add("{currentlocation.id}", this.LocationId.ToString());
                     dict.Add("{user.id}", this.UserObj.UserId.ToString());
+                    dict.Add("{currentlocation.shortname}", this.SolutionObj.Locations[this.LocationId].ShortName);
 
                     MatchCollection mc = Regex.Matches((c as EbAutoId).Pattern.sPattern, @"{(.*?)}");
                     foreach (Match m in mc)
@@ -426,12 +426,12 @@ namespace ExpressBase.Objects
                         if (dataColumn.Type == EbDbTypes.Date)
                         {
                             _unformattedData = (_unformattedData == DBNull.Value) ? DateTime.MinValue : _unformattedData;
-                            _formattedData = ((DateTime)_unformattedData).Date != DateTime.MinValue ? Convert.ToDateTime(_unformattedData).ToString(this.UserObj.Preference.ShortDatePattern, CultureInfo.InvariantCulture) : string.Empty;
+                            _formattedData = ((DateTime)_unformattedData).Date != DateTime.MinValue ? Convert.ToDateTime(_unformattedData).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) : string.Empty;
                         }
                         else if (dataColumn.Type == EbDbTypes.DateTime)
                         {
                             _unformattedData = (_unformattedData == DBNull.Value) ? DateTime.MinValue : _unformattedData;
-                            _formattedData = ((DateTime)_unformattedData).Date != DateTime.MinValue ? Convert.ToDateTime(_unformattedData).ConvertFromUtc(this.UserObj.Preference.TimeZone).ToString(this.UserObj.Preference.ShortDatePattern, CultureInfo.InvariantCulture) : string.Empty;
+                            _formattedData = ((DateTime)_unformattedData).Date != DateTime.MinValue ? Convert.ToDateTime(_unformattedData).ConvertFromUtc(this.UserObj.Preference.TimeZone).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) : string.Empty;
                         }
                         Row.Columns.Add(new SingleColumn()
                         {
@@ -598,7 +598,16 @@ namespace ExpressBase.Objects
                 r = 1;
             }
             this.RefreshFormData(DataDB, service);
-            //this.UpdateAuditTrail(DataDB);//
+
+            try
+            {
+                this.UpdateAuditTrail(DataDB);
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine("Exception!!! UpdateAuditTrail : " + e.Message);
+            }
+            
             return r;
         }
 
@@ -636,12 +645,12 @@ namespace ExpressBase.Objects
                                     }
                                     else if ((EbDbTypes)rField.Type == EbDbTypes.Date)
                                     {
-                                        rField.Value = DateTime.ParseExact(rField.Value.ToString(), this.UserObj.Preference.ShortDatePattern, CultureInfo.InvariantCulture);
+                                        rField.Value = DateTime.ParseExact(rField.Value.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
                                         param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
                                     }
                                     else if ((EbDbTypes)rField.Type == EbDbTypes.DateTime)
                                     {
-                                        rField.Value = DateTime.ParseExact(rField.Value.ToString(), this.UserObj.Preference.ShortDatePattern, CultureInfo.InvariantCulture).ConvertToUtc(this.UserObj.Preference.TimeZone);
+                                        rField.Value = DateTime.ParseExact(rField.Value.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture).ConvertToUtc(this.UserObj.Preference.TimeZone);
                                         param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
                                     }
                                     else
@@ -668,12 +677,12 @@ namespace ExpressBase.Objects
                             }
                             else if ((EbDbTypes)rField.Type == EbDbTypes.Date)
                             {
-                                rField.Value = DateTime.ParseExact(rField.Value.ToString(), this.UserObj.Preference.ShortDatePattern, CultureInfo.InvariantCulture);
+                                rField.Value = DateTime.ParseExact(rField.Value.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
                                 param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
                             }
                             else if ((EbDbTypes)rField.Type == EbDbTypes.DateTime)
                             {
-                                rField.Value = DateTime.ParseExact(rField.Value.ToString(), this.UserObj.Preference.ShortDatePattern, CultureInfo.InvariantCulture).ConvertToUtc(this.UserObj.Preference.TimeZone);
+                                rField.Value = DateTime.ParseExact(rField.Value.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture).ConvertToUtc(this.UserObj.Preference.TimeZone);
                                 param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
                             }
                             else
@@ -765,12 +774,12 @@ namespace ExpressBase.Objects
                             }
                             else if ((EbDbTypes)rField.Type == EbDbTypes.Date)
                             {
-                                rField.Value = DateTime.ParseExact(rField.Value.ToString(), this.UserObj.Preference.ShortDatePattern, CultureInfo.InvariantCulture);
+                                rField.Value = DateTime.ParseExact(rField.Value.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
                                 param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
                             }
                             else if ((EbDbTypes)rField.Type == EbDbTypes.DateTime)
                             {
-                                rField.Value = DateTime.ParseExact(rField.Value.ToString(), this.UserObj.Preference.ShortDatePattern, CultureInfo.InvariantCulture).ConvertToUtc(this.UserObj.Preference.TimeZone);
+                                rField.Value = DateTime.ParseExact(rField.Value.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture).ConvertToUtc(this.UserObj.Preference.TimeZone);
                                 param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
                             }
                             else
@@ -999,11 +1008,16 @@ namespace ExpressBase.Objects
             List<AuditTrailEntry> FormFields = new List<AuditTrailEntry>();
             foreach (KeyValuePair<string, SingleTable> entry in this.FormData.MultipleTables)
             {
+                bool IsGridTable = false;
+                TableSchema _table = this.FormSchema.Tables.FirstOrDefault(tbl => tbl.TableName.Equals(entry.Key));
+                if (_table != null)
+                    IsGridTable = _table.IsGridTable;
+
                 if (this.FormDataBackup == null || !this.FormDataBackup.MultipleTables.ContainsKey(entry.Key))//insert mode
                 {
                     foreach (SingleRow rField in entry.Value)
                     {
-                        this.PushAuditTrailEntry(entry.Key, rField, FormFields, true);
+                        this.PushAuditTrailEntry(entry.Key, rField, FormFields, true, IsGridTable);
                     }
                 }
                 else//update mode
@@ -1015,10 +1029,23 @@ namespace ExpressBase.Objects
                         SingleRow orF = this.FormDataBackup.MultipleTables[entry.Key].Find(e => e.RowId == rField.RowId);
                         if (orF == null)//if it is new row
                         {
-                            this.PushAuditTrailEntry(entry.Key, rField, FormFields, true);
+                            this.PushAuditTrailEntry(entry.Key, rField, FormFields, true, IsGridTable);
                         }
                         else//row edited
                         {
+                            string relation = string.Concat(this.TableRowId, "-", rField.RowId);
+
+                            if (this.FormSchema.MasterTable.Equals(entry.Key))
+                                relation = this.TableRowId.ToString();
+
+                            bool IsRowEdited = false;
+                            Dictionary<string, string> dic1 = null;
+                            Dictionary<string, string> dic2 = null;
+                            if (IsGridTable)
+                            {
+                                dic1 = new Dictionary<string, string>();
+                                dic2 = new Dictionary<string, string>();
+                            }
                             foreach (SingleColumn cField in rField.Columns)
                             {
                                 if (cField.Name.Equals("id"))//skipping 'id' field
@@ -1028,14 +1055,18 @@ namespace ExpressBase.Objects
 
                                 if (ocf == null)
                                 {
-                                    ocf = new SingleColumn() { Value = "[null]" };
+                                    ocf = new SingleColumn() { Name = cField.Name, Value = "[null]" };
+                                }
+                                if (IsGridTable)
+                                {
+                                    dic1.Add(cField.Name, cField.Value.ToString());
+                                    dic2.Add(ocf.Name, ocf.Value.ToString());
                                 }
                                 if (ocf.Value != cField.Value)//checking for changes /////// modifications required
                                 {
-                                    string relation = string.Concat(this.TableRowId, "-", rField.RowId);
-
-                                    if (this.FormSchema.MasterTable.Equals(entry.Key))
-                                        relation = this.TableRowId.ToString();
+                                    IsRowEdited = true;
+                                    if (IsGridTable)
+                                        continue;                                 
 
                                     FormFields.Add(new AuditTrailEntry
                                     {
@@ -1047,13 +1078,24 @@ namespace ExpressBase.Objects
                                     });
                                 }
                             }
+                            if(IsGridTable && IsRowEdited)
+                            {
+                                FormFields.Add(new AuditTrailEntry
+                                {
+                                    Name = "dgrow",
+                                    NewVal = JsonConvert.SerializeObject(dic1),
+                                    OldVal = JsonConvert.SerializeObject(dic2),
+                                    DataRel = relation,
+                                    TableName = entry.Key
+                                });
+                            }
                         }
                     }
                     foreach (SingleRow Row in this.FormDataBackup.MultipleTables[entry.Key])//looking for deleted rows
                     {
                         if (!rids.Contains(Row.RowId))
                         {
-                            this.PushAuditTrailEntry(entry.Key, Row, FormFields, false);
+                            this.PushAuditTrailEntry(entry.Key, Row, FormFields, false, IsGridTable);
                         }
                     }
                 }
@@ -1068,27 +1110,50 @@ namespace ExpressBase.Objects
 
         }
 
-        private void PushAuditTrailEntry(string Table, SingleRow Row, List<AuditTrailEntry> FormFields, bool IsIns)
+        //managing new or deleted row
+        private void PushAuditTrailEntry(string Table, SingleRow Row, List<AuditTrailEntry> FormFields, bool IsIns, bool IsGridRow)
         {
-            foreach (SingleColumn cField in Row.Columns)
+            string relation = string.Concat(this.TableRowId, "-", Row.RowId);
+
+            if (this.FormSchema.MasterTable.Equals(Table))
+                relation = this.TableRowId.ToString();
+
+            if (IsGridRow)
             {
-                if (cField.Name.Equals("id"))//skipping 'id' field
-                    continue;
-
-                string relation = string.Concat(this.TableRowId, "-", Row.RowId);
-
-                if (this.FormSchema.MasterTable.Equals(Table))
-                    relation = this.TableRowId.ToString();
-
+                Dictionary<string, string> dic = new Dictionary<string, string>();
+                foreach (SingleColumn cField in Row.Columns)
+                {
+                    if (cField.Name.Equals("id"))//skipping 'id' field
+                        continue;
+                    dic.Add(cField.Name, cField.Value.ToString());
+                }
+                string val = JsonConvert.SerializeObject(dic);
                 FormFields.Add(new AuditTrailEntry
                 {
-                    Name = cField.Name,
-                    NewVal = IsIns ? cField.Value.ToString() : "[null]",
-                    OldVal = IsIns ? "[null]" : cField.Value.ToString(),
+                    Name = "dgrow",
+                    NewVal = IsIns ? val : "[null]",
+                    OldVal = IsIns ? "[null]" : val,
                     DataRel = relation,
                     TableName = Table
                 });
             }
+            else
+            {
+                foreach (SingleColumn cField in Row.Columns)
+                {
+                    if (cField.Name.Equals("id"))//skipping 'id' field
+                        continue;     
+
+                    FormFields.Add(new AuditTrailEntry
+                    {
+                        Name = cField.Name,
+                        NewVal = IsIns ? cField.Value.ToString() : "[null]",
+                        OldVal = IsIns ? "[null]" : cField.Value.ToString(),
+                        DataRel = relation,
+                        TableName = Table
+                    });
+                }
+            }            
         }
 
         private int UpdateAuditTrail(IDatabase DataDB, int Action, List<AuditTrailEntry> _Fields)
@@ -1157,7 +1222,7 @@ namespace ExpressBase.Objects
             Dictionary<string, string> DictVmAll = new Dictionary<string, string>();
 
             string qry = @"	SELECT 
-            	m.id, u.fullname, m.eb_createdat, m.actiontype, l.tablename, l.fieldname, l.idrelation, l.oldvalue, l.newvalue
+            	m.id, u.fullname, m.eb_createdby, m.eb_createdat, m.actiontype, l.tablename, l.fieldname, l.idrelation, l.oldvalue, l.newvalue
             FROM 
             	eb_audit_master m, eb_audit_lines l, eb_users u
             WHERE
@@ -1186,26 +1251,12 @@ namespace ExpressBase.Objects
                     if (_table == null)//skipping invalid Audit Trail entry
                         continue;
                 }
-                _column = _table.Columns.FirstOrDefault(col => col.ColumnName == dr["fieldname"].ToString());
-                if (_column == null)//skipping invalid Audit Trail entry
-                    continue;
 
-                if (_column.Control is EbPowerSelect || _column.Control is EbDGPowerSelectColumn)//copy vm for dm
+                if (!_table.IsGridTable)
                 {
-                    string key = string.Concat(_table.TableName, "_", _column.ColumnName);
-                    string temp = string.Empty;
-                    if (!(new_val.Equals(string.Empty) || new_val.Equals("[null]")))/////
-                        temp = string.Concat(new_val, ",");
-                    if (!(old_val.Equals(string.Empty) || old_val.Equals("[null]")))/////
-                        temp += string.Concat(old_val, ",");
-
-                    if (!temp.Equals(string.Empty))
-                    {
-                        if (!DictVmAll.ContainsKey(key))
-                            DictVmAll.Add(key, temp);
-                        else
-                            DictVmAll[key] = string.Concat(DictVmAll[key], temp);
-                    }
+                    _column = _table.Columns.FirstOrDefault(col => col.ColumnName == dr["fieldname"].ToString());
+                    if (_column == null)//skipping invalid Audit Trail entry
+                        continue;
                 }
 
                 if (!Trans.ContainsKey(m_id))
@@ -1214,81 +1265,122 @@ namespace ExpressBase.Objects
                     {
                         ActionType = Convert.ToInt32(dr["actiontype"]) == 1 ? "Insert" : "Update",
                         CreatedBy = dr["fullname"].ToString(),
-                        CreatedAt = Convert.ToDateTime(dr["eb_createdat"]).ToString("dd-MM-yyyy hh:mm tt", CultureInfo.InvariantCulture) + " (UTC)"
+                        CreatedById = dr["eb_createdby"].ToString(),
+                        CreatedAt = Convert.ToDateTime(dr["eb_createdat"]).ConvertFromUtc(this.UserObj.Preference.TimeZone).ToString(this.UserObj.Preference.GetShortDatePattern() + " " + this.UserObj.Preference.GetShortTimePattern(), CultureInfo.InvariantCulture)
                     });
                 }
-                string[] ids = dr["idrelation"].ToString().Split('-');
-                FormTransactionEntry curtrans = null;
 
-                if (ids.Length == 1)
+                string[] ids = dr["idrelation"].ToString().Split('-');
+
+                if (_table.IsGridTable)
+                {
+                    Dictionary<string, string> new_val_dict = new_val == "[null]" ? null: JsonConvert.DeserializeObject<Dictionary<string, string>>(new_val);
+                    Dictionary<string, string> old_val_dict = old_val == "[null]" ? null: JsonConvert.DeserializeObject<Dictionary<string, string>>(old_val);
+                    if(new_val_dict == null)
+                    {
+                        new_val_dict = new Dictionary<string, string>();
+                        foreach (KeyValuePair<string, string> entry in old_val_dict)
+                        {
+                            new_val_dict.Add(entry.Key, "[null]");
+                        }
+                    }
+                    else if (old_val_dict == null)
+                    {
+                        old_val_dict = new Dictionary<string, string>();
+                        foreach (KeyValuePair<string, string> entry in new_val_dict)
+                        {
+                            old_val_dict.Add(entry.Key, "[null]");
+                        }
+                    }
+
+                    foreach (ColumnSchema __column in _table.Columns)
+                    {
+                        if (!Trans[m_id].GridTables.ContainsKey(_table.TableName))
+                        {
+                            Trans[m_id].GridTables.Add(_table.TableName, new FormTransactionTable() { Title = _table.Title});
+                            for (int i = 0; i < _table.Columns.Count; i++)
+                            {
+                                if (_table.Columns.ElementAt(i).Control is EbDGColumn)
+                                {
+                                    if (_table.Columns.ElementAt(i).Control is EbDGUserControlColumn)
+                                        continue;
+                                    else
+                                        Trans[m_id].GridTables[_table.TableName].ColumnMeta.Add(i, (_table.Columns.ElementAt(i).Control as EbDGColumn).Title);
+                                }
+                                else
+                                    Trans[m_id].GridTables[_table.TableName].ColumnMeta.Add(i, (_table.Columns.ElementAt(i).Control as EbControl).Label);
+                            }
+                        }
+                        int curid = Convert.ToInt32(ids[1]);
+                        FormTransactionTable TblRef = Trans[m_id].GridTables[_table.TableName];
+                        if (!TblRef.Rows.ContainsKey(curid))
+                        {
+                            TblRef.Rows.Add(curid, new FormTransactionRow() { });
+                        }
+                        bool IsModified = false;
+                        if (new_val_dict[__column.ColumnName] != old_val_dict[__column.ColumnName])
+                            IsModified = true;
+                        string a = old_val_dict[__column.ColumnName];
+                        string b = new_val_dict[__column.ColumnName];
+                        PreProcessTransationData(DictVmAll, _table, __column, ref a, ref b);
+                        TblRef.Rows[curid].Columns.Add(__column.ColumnName, new FormTransactionEntry() { OldValue = a, NewValue = b, IsModified = IsModified });
+                    }
+                }
+                else
                 {
                     if (!Trans[m_id].Tables.ContainsKey(_table.TableName))
                         Trans[m_id].Tables.Add(_table.TableName, new FormTransactionRow() { });
 
-                    FormTransactionEntry curEntry = curTransAll.Tables[_table.TableName].Columns[_column.ColumnName];
-                    if (curEntry.NewValue != new_val)
-                    {
-                        Trans[m_id].MissingEntry = true;
-                    }
-                    curEntry.NewValue = old_val;//back tracking
-                    curEntry.OldValue = new_val;
+                    PreProcessTransationData(DictVmAll, _table, _column, ref old_val, ref new_val);
 
-                    curtrans = new FormTransactionEntry()
+                    FormTransactionEntry curtrans = new FormTransactionEntry()
                     {
                         OldValue = old_val,
                         NewValue = new_val,
                         IsModified = true,
                         Title = (_column.Control as EbControl).Label
-                    };
+                    };                    
                     Trans[m_id].Tables[_table.TableName].Columns.Add(_column.ColumnName, curtrans);
                 }
-                else
-                {
-                    if (!Trans[m_id].GridTables.ContainsKey(_table.TableName))
-                    {
-                        Trans[m_id].GridTables.Add(_table.TableName, new FormTransactionTable() { });
-                        for (int i = 0; i < _table.Columns.Count; i++)
-                        {
-                            //if(columnSchema.Control is EbDGUserControlColumn)
-                            //{
-
-                            //}
-                            Trans[m_id].GridTables[_table.TableName].ColumnMeta.Add(i, (_table.Columns.ElementAt(i).Control as EbDGColumn).Title);
-                        }
-                    }
-                    int curid = Convert.ToInt32(ids[1]);//index hardcoded// assuming that table hierarchy is two level
-                    FormTransactionTable TblRef = Trans[m_id].GridTables[_table.TableName];
-
-                    if (!TblRef.Rows.ContainsKey(curid))
-                    {
-                        TblRef.Rows.Add(curid, new FormTransactionRow() { });
-
-                        foreach (KeyValuePair<string, FormTransactionEntry> entry in curTransAll.GridTables[_table.TableName].Rows[curid].Columns)
-                        {
-                            TblRef.Rows[curid].Columns.Add(entry.Key, new FormTransactionEntry() { OldValue = entry.Value.OldValue, NewValue = entry.Value.NewValue });
-                        }
-                    }
-                    FormTransactionEntry curEntry = curTransAll.GridTables[_table.TableName].Rows[curid].Columns[_column.ColumnName];
-                    if (curEntry.NewValue != new_val)
-                    {
-                        Trans[m_id].MissingEntry = true;
-                    }
-                    curEntry.NewValue = old_val;//back tracking...
-                    curEntry.OldValue = new_val;
-
-                    curtrans = TblRef.Rows[curid].Columns[_column.ColumnName];
-                    curtrans.OldValue = old_val;
-                    curtrans.NewValue = new_val;
-                    curtrans.IsModified = true;
-                    //curtrans.Title = (_column.Control as EbDGColumn).Title;
-                }
             }
-            ProcessTransationsData(DataDB, Service, Trans, DictVmAll);
+            PostProcessTransationData(DataDB, Service, Trans, DictVmAll);
 
             return JsonConvert.SerializeObject(Trans);
         }
 
-        private void ProcessTransationsData(IDatabase DataDB, Service Service, Dictionary<int, FormTransaction> Trans, Dictionary<string, string> DictVmAll)
+        private void PreProcessTransationData(Dictionary<string, string> DictVmAll, TableSchema _table, ColumnSchema _column, ref string old_val, ref string new_val)
+        {
+            if (_column.Control is EbPowerSelect || _column.Control is EbDGPowerSelectColumn)//copy vm for dm
+            {
+                string key = string.Concat(_table.TableName, "_", _column.ColumnName);
+                string temp = string.Empty;
+                if (!(new_val.Equals(string.Empty) || new_val.Equals("[null]")))/////
+                    temp = string.Concat(new_val, ",");
+                if (!(old_val.Equals(string.Empty) || old_val.Equals("[null]")))/////
+                    temp += string.Concat(old_val, ",");
+
+                if (!temp.Equals(string.Empty))
+                {
+                    if (!DictVmAll.ContainsKey(key))
+                        DictVmAll.Add(key, temp);
+                    else
+                        DictVmAll[key] = string.Concat(DictVmAll[key], temp);
+                }
+            }
+            else if(_column.Control is EbDate || _column.Control is EbDGDateColumn)
+            {
+                if (!old_val.Equals("[null]"))
+                {
+                    old_val = DateTime.ParseExact(old_val, "yyyy-MM-dd", CultureInfo.InvariantCulture).ToString(this.UserObj.Preference.GetShortDatePattern(), CultureInfo.InvariantCulture);
+                }
+                if (!new_val.Equals("[null]"))
+                {
+                    new_val = DateTime.ParseExact(new_val, "yyyy-MM-dd", CultureInfo.InvariantCulture).ToString(this.UserObj.Preference.GetShortDatePattern(), CultureInfo.InvariantCulture);
+                }
+            }
+        }
+
+        private void PostProcessTransationData(IDatabase DataDB, Service Service, Dictionary<int, FormTransaction> Trans, Dictionary<string, string> DictVmAll)
         {
             string Qry = string.Empty;
             foreach (TableSchema _table in this.FormSchema.Tables)
@@ -1377,6 +1469,8 @@ namespace ExpressBase.Objects
                             {
                                 dm += " " + d;
                             }
+                            if (i < vm_arr.Length - 1)
+                                dm += "<br>";
                         }
                         column.Value.NewValue = dm;
                     }
@@ -1400,10 +1494,10 @@ namespace ExpressBase.Objects
             TableSchema _table = _schema.Tables.FirstOrDefault(tbl => tbl.TableName == _container.TableName);
             if (_table == null)
             {
-                bool IsGrid = false;
                 if (_container is EbDataGrid)
-                    IsGrid = true;
-                _table = new TableSchema { TableName = _container.TableName.ToLower(), ParentTable = _parentTable, IsGridTable = IsGrid };
+                    _table = new TableSchema { TableName = _container.TableName.ToLower(), ParentTable = _parentTable, IsGridTable = true , Title = _container.Label };
+                else
+                    _table = new TableSchema { TableName = _container.TableName.ToLower(), ParentTable = _parentTable, IsGridTable = false };
                 _schema.Tables.Add(_table);
             }
             foreach (EbControl control in _flatControls)
@@ -1412,6 +1506,13 @@ namespace ExpressBase.Objects
                 {
                     if (control is EbFileUploader)
                         _schema.ExtendedControls.Add(control);
+                    else if(control is EbDGUserControlColumn)
+                    {
+                        foreach(EbControl _ctrl in (control as EbDGUserControlColumn).Columns)
+                        {
+                            _table.Columns.Add(new ColumnSchema { ColumnName = _ctrl.Name, EbDbType = (int)_ctrl.EbDbType, Control = _ctrl });
+                        }
+                    }
                     else
                         _table.Columns.Add(new ColumnSchema { ColumnName = control.Name, EbDbType = (int)control.EbDbType, Control = control });
                 }
@@ -1639,6 +1740,8 @@ namespace ExpressBase.Objects
     {
         public string CreatedBy { get; set; }
 
+        public string CreatedById { get; set; }
+
         public string CreatedAt { get; set; }
 
         public string ActionType { get; set; }
@@ -1661,6 +1764,8 @@ namespace ExpressBase.Objects
         public Dictionary<int, FormTransactionRow> Rows { get; set; }//Key = Row id
 
         public Dictionary<int, string> ColumnMeta { get; set; }
+
+        public string Title { get; set; }
 
         public FormTransactionTable()
         {

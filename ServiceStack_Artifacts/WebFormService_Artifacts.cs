@@ -1,6 +1,7 @@
 ﻿using ExpressBase.Common;
 using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
+using ExpressBase.Common.LocationNSolution;
 using ExpressBase.Common.Objects;
 using ExpressBase.Security;
 using ServiceStack;
@@ -145,6 +146,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 6)]
         public User UserObj { get; set; }
+
+        [DataMember(Order = 7)]
+        public Eb_Solution SolutionObj { get; set; }
     }
 	
 	[DataContract]
@@ -180,10 +184,27 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
+    public class GetCtrlsFlatRequest : EbServiceStackAuthRequest, IReturn<GetCtrlsFlatResponse>
+    {
+        [DataMember(Order = 1)]
+        public string RefId { get; set; }
+    }
+
+    [DataContract]
     public class DeleteDataFromWebformResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
         public int RowAffected { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    [DataContract]
+    public class GetCtrlsFlatResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public List<EbControl> Controls{ get; set; }
 
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }

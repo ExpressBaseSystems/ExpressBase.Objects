@@ -259,7 +259,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 		[DataMember(Order = 4)]
 		public string UserName { get; set; }
-	}
+        
+        [DataMember(Order = 5)]
+        public bool Permission { get; set; }
+    }
 
 	[DataContract]
 	public class SaveSurgeryDetailsResponse : IEbSSResponse

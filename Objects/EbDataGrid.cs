@@ -25,6 +25,7 @@ namespace ExpressBase.Objects
         }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [DefaultPropValue("200")]
         public override int Height { get; set; }
 
         [JsonIgnore]
@@ -65,9 +66,10 @@ $.each(this.Controls.$values, function (i, col) {
         [ListType(typeof(EbDGColumn))]
         public override List<EbControl> Controls { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
-        [PropertyGroup("Behavior")]
-        public bool IsEditable { get; set; }
+        //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        //[PropertyGroup("Behavior")]
+        //[DefaultPropValue("true")]
+        //public bool IsEditable { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyGroup("Behavior")]
@@ -158,24 +160,16 @@ $.each(this.Controls.$values, function (i, col) {
         [JsonIgnore]
         public override string SetValueJSfn
         {
-            get
-            {
-                return @"
-                     $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val(p1).trigger('change');
-                ";
-            }
+            get { return @" $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val(p1).trigger('change'); "; }
+
             set { }
         }
 
         [JsonIgnore]
         public override string GetValueJSfn
         {
-            get
-            {
-                return @"
-                    return $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val();
-                ";
-            }
+            get { return @" return $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val(); "; }
+
             set { }
         }
 
@@ -209,6 +203,7 @@ $.each(this.Controls.$values, function (i, col) {
         public bool IsDisable { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [DefaultPropValue("true")]
         public bool IsEditable { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
@@ -300,7 +295,7 @@ $.each(this.Controls.$values, function (i, col) {
 
         public EbDGDateColumn()
         {
-            this.EbDate= new EbDate();
+            this.EbDate = new EbDate();
         }
         [OnDeserialized]
         public void OnDeserializedMethod(StreamingContext context)
@@ -329,11 +324,27 @@ $.each(this.Controls.$values, function (i, col) {
         {
             get
             {
-                return
-              @"if((this.IsNullable && !($('#' + this.EbSid_CtxId).siblings('.nullable-check').find('input[type=checkbox]').prop('checked'))) || $('#' + this.EbSid_CtxId).val() === '')
-                return undefined;
-            else
-	            return $('#' + this.EbSid_CtxId).val();";
+                return this.EbDate.GetValueJSfn;
+            }
+            set { }
+        }
+
+        [JsonIgnore]
+        public override string SetValueJSfn
+        {
+            get
+            {
+                return this.EbDate.SetValueJSfn;
+            }
+            set { }
+        }
+
+        [JsonIgnore]
+        public override string GetDisplayMemberJSfn
+        {
+            get
+            {
+                return this.EbDate.GetDisplayMemberJSfn;
             }
             set { }
         }
@@ -524,6 +535,7 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, func
         public void InitUserControl(EbUserControl ebUserControl)
         {
             this.Columns = ebUserControl.Controls;
+            this.ObjType = this.ObjType;
             this.InitDBareHtml();
         }
 

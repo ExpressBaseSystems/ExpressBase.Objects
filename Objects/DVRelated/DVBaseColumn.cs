@@ -165,17 +165,26 @@ namespace ExpressBase.Objects.Objects.DVRelated
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
-        [Alias("Formula")]
+        [Alias("Formula")]        
         public EbScript _Formula { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
         [JsonConverter(typeof(Base64Converter))]
         [Alias("Formula old")]
+        [HideInPropertyGrid]
         public string Formula { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [HideInPropertyGrid]
+        [OnChangeExec(@"
+console.log('IsCustomColumn');
+if(this.IsCustomColumn){
+    pg.ShowProperty('_Formula');
+}
+else {
+    pg.HideProperty('_Formula');
+}")]
         public bool IsCustomColumn { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
@@ -212,6 +221,7 @@ else{
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.DropDown)]
         [OnChangeExec(@"
+console.log('kkkoiiii');
 if(this.FormMode === 1){
     pg.ShowProperty('FormId');
     pg.HideProperty('FormParameters');
@@ -222,13 +232,24 @@ else if(this.FormMode === 2){
 }")]
         public WebFormDVModes FormMode { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
-        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Parent.Columns")]
-        public List<DVBaseColumn> FormId { get; set; }
+        //[EnableInBuilder(BuilderType.DVBuilder)]
+        [HideInPropertyGrid]
+        [JsonIgnore]
+        public DVColumnCollection ColumnsRef { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
-        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Parent.Columns")]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "ColumnsRef")]
+        public List<DVBaseColumn> FormId { get; set; }
+
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        //[PropertyEditor(PropertyEditorType.CollectionFrmSrc, "ColumnsRef")]
+        [PropertyEditor(PropertyEditorType.Mapper, "ColumnsRef", "LinkRefId", "FormControl")]
         public List<DVBaseColumn> FormParameters { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [HideInPropertyGrid]
+        public EbControl FormControl { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.DropDown)]
@@ -241,12 +262,12 @@ else if(this.FormMode === 2){
 
         [PropertyGroup("TreeVisualization")]
         [EnableInBuilder(BuilderType.DVBuilder)]
-        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Parent.Columns")]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "ColumnsRef")]
         public List<DVBaseColumn> ParentColumn { get; set; }
 
         [PropertyGroup("TreeVisualization")]
         [EnableInBuilder(BuilderType.DVBuilder)]
-        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Parent.Columns")]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "ColumnsRef")]
         public List<DVBaseColumn> GroupingColumn { get; set; }
 
         [PropertyGroup("TreeVisualization")]
@@ -263,22 +284,22 @@ else if(this.FormMode === 2){
 
         [PropertyGroup("TreeVisualization")]
         [EnableInBuilder(BuilderType.DVBuilder)]
-        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Parent.Columns")]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "ColumnsRef")]
         public List<DVBaseColumn> GroupFormId { get; set; }
 
         [PropertyGroup("TreeVisualization")]
         [EnableInBuilder(BuilderType.DVBuilder)]
-        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Parent.Columns")]
+        [PropertyEditor(PropertyEditorType.Mapper, "ColumnsRef", "GroupFormLink", "FormControl")]
         public List<DVBaseColumn> GroupFormParameters { get; set; }
 
         [PropertyGroup("TreeVisualization")]
         [EnableInBuilder(BuilderType.DVBuilder)]
-        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Parent.Columns")]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "ColumnsRef")]
         public List<DVBaseColumn> ItemFormId { get; set; }
 
         [PropertyGroup("TreeVisualization")]
         [EnableInBuilder(BuilderType.DVBuilder)]
-        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Parent.Columns")]
+        [PropertyEditor(PropertyEditorType.Mapper, "ColumnsRef", "ItemFormLink", "FormControl")]
         public List<DVBaseColumn> ItemFormParameters { get; set; }
 
         [PropertyGroup("TreeVisualization")]
@@ -420,12 +441,12 @@ else if(this.FormMode === 2){
             return null;
         }
 
-        public DVBaseColumn Pop(string name, EbDbTypes type)
+        public DVBaseColumn Pop(string name, EbDbTypes type, bool iscustom)
         {
             DVBaseColumn tempCol = null;
             foreach (DVBaseColumn col in this)
             {
-                if (col.Name.Equals(name) && col.Type == type)
+                if (col.Name.Equals(name) && col.Type == type && !iscustom)
                 {
                     tempCol = col;
                     break;
@@ -450,6 +471,15 @@ else if(this.FormMode === 2){
 if(this.RenderAs === 2){
     pg.ShowProperty('LinkRefId');
     pg.ShowProperty('LinkType');
+    pg.HideProperty('ParentColumn');
+    pg.HideProperty('GroupingColumn');
+    pg.HideProperty('GroupFormLink');
+    pg.HideProperty('ItemFormLink');
+    pg.HideProperty('GroupFormParameters');
+    pg.HideProperty('GroupFormId');
+    pg.HideProperty('ItemFormParameters');
+    pg.HideProperty('ItemFormId');
+    pg.setSimpleProperty('IsTree', false);
 }
 else if(this.RenderAs === 6){
     pg.ShowProperty('ParentColumn');
@@ -461,6 +491,8 @@ else if(this.RenderAs === 6){
     pg.ShowProperty('ItemFormParameters');
     pg.ShowProperty('ItemFormId');
     pg.setSimpleProperty('IsTree', true);
+    pg.HideProperty('LinkRefId');
+    pg.HideProperty('LinkType');
 }
 else{
     pg.HideProperty('LinkRefId');
@@ -508,17 +540,28 @@ else{
 if(this.RenderAs === 2){
     pg.ShowProperty('LinkRefId');
     pg.ShowProperty('LinkType');
+    pg.HideProperty('ParentColumn');
+    pg.HideProperty('GroupingColumn');
+    pg.HideProperty('GroupFormLink');
+    pg.HideProperty('ItemFormLink');
+    pg.HideProperty('GroupFormParameters');
+    pg.HideProperty('GroupFormId');
+    pg.HideProperty('ItemFormParameters');
+    pg.HideProperty('ItemFormId');
+    pg.setSimpleProperty('IsTree', false);
 }
 else if(this.RenderAs === 3){
     pg.ShowProperty('ParentColumn');
     pg.ShowProperty('GroupingColumn');
     pg.ShowProperty('GroupFormLink');
     pg.ShowProperty('ItemFormLink');
-pg.ShowProperty('GroupFormParameters');
+    pg.ShowProperty('GroupFormParameters');
     pg.ShowProperty('GroupFormId');
     pg.ShowProperty('ItemFormParameters');
     pg.ShowProperty('ItemFormId');
-pg.setSimpleProperty('IsTree', true);
+    pg.setSimpleProperty('IsTree', true);
+    pg.HideProperty('LinkRefId');
+    pg.HideProperty('LinkType');
 }
 else{
     pg.HideProperty('LinkRefId');
@@ -528,7 +571,7 @@ else{
     pg.HideProperty('GroupingColumn');
     pg.HideProperty('GroupFormLink');
     pg.HideProperty('ItemFormLink');
-pg.HideProperty('GroupFormParameters');
+    pg.HideProperty('GroupFormParameters');
     pg.HideProperty('GroupFormId');
     pg.HideProperty('ItemFormParameters');
     pg.HideProperty('ItemFormId');
@@ -575,17 +618,28 @@ pg.setSimpleProperty('IsTree', false);
 if(this.RenderAs === 2){
     pg.ShowProperty('LinkRefId');
     pg.ShowProperty('LinkType');
+    pg.HideProperty('ParentColumn');
+    pg.HideProperty('GroupingColumn');
+    pg.HideProperty('GroupFormLink');
+    pg.HideProperty('ItemFormLink');
+    pg.HideProperty('GroupFormParameters');
+    pg.HideProperty('GroupFormId');
+    pg.HideProperty('ItemFormParameters');
+    pg.HideProperty('ItemFormId');
+    pg.setSimpleProperty('IsTree', false);
 }
-else if(this.RenderAs === 3){
+else if(this.RenderAs === 4){
     pg.ShowProperty('ParentColumn');
     pg.ShowProperty('GroupingColumn');
     pg.ShowProperty('GroupFormLink');
     pg.ShowProperty('ItemFormLink');
-pg.ShowProperty('GroupFormParameters');
+    pg.ShowProperty('GroupFormParameters');
     pg.ShowProperty('GroupFormId');
     pg.ShowProperty('ItemFormParameters');
     pg.ShowProperty('ItemFormId');
-pg.setSimpleProperty('IsTree', true);
+    pg.setSimpleProperty('IsTree', true);
+    pg.HideProperty('LinkRefId');
+    pg.HideProperty('LinkType');
 }
 else{
     pg.HideProperty('LinkRefId');
@@ -621,17 +675,28 @@ pg.setSimpleProperty('IsTree', false);
 if(this.RenderAs === 1){
     pg.ShowProperty('LinkRefId');
     pg.ShowProperty('LinkType');
+    pg.HideProperty('ParentColumn');
+    pg.HideProperty('GroupingColumn');
+    pg.HideProperty('GroupFormLink');
+    pg.HideProperty('ItemFormLink');
+    pg.HideProperty('GroupFormParameters');
+    pg.HideProperty('GroupFormId');
+    pg.HideProperty('ItemFormParameters');
+    pg.HideProperty('ItemFormId');
+    pg.setSimpleProperty('IsTree', false);
 }
 else if(this.RenderAs === 2){
     pg.ShowProperty('ParentColumn');
     pg.ShowProperty('GroupingColumn');
     pg.ShowProperty('GroupFormLink');
     pg.ShowProperty('ItemFormLink');
-pg.ShowProperty('GroupFormParameters');
+    pg.ShowProperty('GroupFormParameters');
     pg.ShowProperty('GroupFormId');
     pg.ShowProperty('ItemFormParameters');
     pg.ShowProperty('ItemFormId');
-pg.setSimpleProperty('IsTree', true);
+    pg.setSimpleProperty('IsTree', true);
+    pg.HideProperty('LinkRefId');
+    pg.HideProperty('LinkType');
 }
 else{
     pg.HideProperty('LinkRefId');
