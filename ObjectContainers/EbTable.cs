@@ -51,7 +51,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [OnChangeUIFunction("EbTable.padding")]
-        public override int Padding { get; set; }
+        public override UISides Padding { get; set; }
 
         public EbTableLayout()
         {

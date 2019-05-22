@@ -25,7 +25,7 @@ namespace ExpressBase.Objects
             {
                 return @"EbTabControl = {
                 padding : function(elementId, props) {
-                    $(`#cont_${ elementId}.Eb-ctrlContainer > .tab-content >.tab-pane`).css('padding', props.Padding + 'px');
+                    $(`#cont_${ elementId}.Eb-ctrlContainer > .tab-content >.tab-pane`).css('padding', `${props.Padding.Top}px ${props.Padding.Right}px ${props.Padding.Bottom}px ${props.Padding.Left}px`);
                 },
                 adjustPanesHeightToHighest : function(elementId, props) {
                     var maxH = 0;
@@ -48,7 +48,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [OnChangeUIFunction("EbTabControl.padding")]
-        public override int Padding { get; set; }
+        public override UISides Padding { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.Collection)]
