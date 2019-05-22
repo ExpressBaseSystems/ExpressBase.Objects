@@ -91,9 +91,10 @@ $.each(this.Controls.$values, function (i, col) {
             foreach (EbDGColumn col in Controls)
             {
                 if (!col.Hidden)
-                    html += string.Concat("<th style='width: @Width@; @bg@' title='", col.Title, "'><span class='grid-col-title'>", col.Title, "</span>@req@</th>")
+                    html += string.Concat("<th style='width: @Width@; @bg@' @type@ title='", col.Title, "'><span class='grid-col-title'>", col.Title, "</span>@req@</th>")
                         .Replace("@req@", (col.Required ? "<sup style='color: red'>*</sup>" : string.Empty))
                         .Replace("@Width@", (col.Width <= 0) ? "auto" : col.Width.ToString() + "%")
+                        .Replace("@type@", "type = '" + col.ObjType + "'")
                         .Replace("@bg@", col.IsDisable ? "background-color:#fafafa; color:#555" : string.Empty);
             }
 
@@ -230,6 +231,15 @@ $.each(this.Controls.$values, function (i, col) {
         {
             get { return this.EbTextBox.TextMode; }
             set { this.EbTextBox.TextMode = value; }
+        }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup("Behavior")]
+        [DefaultPropValue("3")]
+        public int RowsVisible
+        {
+            get { return this.EbTextBox.RowsVisible; }
+            set { this.EbTextBox.RowsVisible = value; }
         }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
@@ -558,7 +568,7 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, func
             DBareHtml = (@"
 <div  id='@ebsid@_wrap'>
     <div class='input-group' style='width:100%;'>            
-        <input id='' ui-inp data-toggle='tooltip' title='' type='text' tabindex='0' style='width:100%; data-original-title=''>
+        <input id='@ebsid@_inp' ui-inp data-toggle='tooltip' title='' type='text' tabindex='0' style='width:100%; data-original-title='' disabled>
         <span id='@ebsid@_showbtn' class='input-group-addon ucspan' data-toggle='modal' data-target='#@colebsid@_usercontrolmodal' style='padding: 0px;'> <button type='button' id='Date1TglBtn' class='fa  fa-ellipsis-h ucbtn' aria-hidden='true' style='padding: 6px 12px;'></button> </span>
     </div>
 </div>
