@@ -311,6 +311,21 @@ else if(this.FormMode === 2){
         [PropertyEditor(PropertyEditorType.Collection)]
         public List<StaticParam> StaticParameters { get; set; }
 
+        [PropertyGroup("Tooltip")]
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [OnChangeExec(@"
+if(this.AllowTooltip){
+    pg.ShowProperty('AllowedCharacterLength');
+}
+else {
+    pg.HideProperty('AllowedCharacterLength');
+}")]
+        public bool AllowTooltip { get; set; }
+
+        [PropertyGroup("Tooltip")]
+        [EnableInBuilder(BuilderType.DVBuilder)]        
+        public int AllowedCharacterLength { get; set; }
+
         [JsonIgnore]
         private List<string> __formulaDataFieldsUsed = null;
         [JsonIgnore]

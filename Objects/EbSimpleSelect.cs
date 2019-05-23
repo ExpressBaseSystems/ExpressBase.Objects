@@ -97,6 +97,7 @@ namespace ExpressBase.Objects
             set { }
         }
 
+        [JsonIgnore]
         public override string DisableJSfn
         {
             get
