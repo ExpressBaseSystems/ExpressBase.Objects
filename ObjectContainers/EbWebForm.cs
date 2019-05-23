@@ -603,11 +603,11 @@ namespace ExpressBase.Objects
             {
                 this.UpdateAuditTrail(DataDB);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Console.WriteLine("Exception!!! UpdateAuditTrail : " + e.Message);
             }
-            
+
             return r;
         }
 
@@ -1059,8 +1059,8 @@ namespace ExpressBase.Objects
                                 }
                                 if (IsGridTable)
                                 {
-                                    dic1.Add(cField.Name, cField.Value.ToString());
-                                    dic2.Add(ocf.Name, ocf.Value.ToString());
+                                    dic1.Add(cField.Name, cField.Value == null ? "[null]" : cField.Value.ToString());
+                                    dic2.Add(ocf.Name, ocf.Value == null ? "[null]" : ocf.Value.ToString());
                                 }
                                 if (ocf.Value != cField.Value)//checking for changes /////// modifications required
                                 {
@@ -1071,8 +1071,8 @@ namespace ExpressBase.Objects
                                     FormFields.Add(new AuditTrailEntry
                                     {
                                         Name = cField.Name,
-                                        NewVal = cField.Value.ToString(),
-                                        OldVal = ocf.Value.ToString(),
+                                        NewVal = cField.Value == null ? "[null]" : cField.Value.ToString(),
+                                        OldVal = ocf.Value == null ? "[null]" : ocf.Value.ToString(),
                                         DataRel = relation,
                                         TableName = entry.Key
                                     });
@@ -1147,8 +1147,8 @@ namespace ExpressBase.Objects
                     FormFields.Add(new AuditTrailEntry
                     {
                         Name = cField.Name,
-                        NewVal = IsIns ? cField.Value.ToString() : "[null]",
-                        OldVal = IsIns ? "[null]" : cField.Value.ToString(),
+                        NewVal = IsIns && cField.Value != null ? cField.Value.ToString() : "[null]",
+                        OldVal = IsIns && cField.Value == null ? "[null]" : cField.Value.ToString(),
                         DataRel = relation,
                         TableName = Table
                     });
@@ -1218,7 +1218,7 @@ namespace ExpressBase.Objects
         public string GetAuditTrail(IDatabase DataDB, Service Service)
         {
             this.RefreshFormData(DataDB, Service);
-            FormTransaction curTransAll = this.GetCurrTransationAll();
+            //FormTransaction curTransAll = this.GetCurrTransationAll();
             Dictionary<string, string> DictVmAll = new Dictionary<string, string>();
 
             string qry = @"	SELECT 
@@ -1318,6 +1318,11 @@ namespace ExpressBase.Objects
                             TblRef.Rows.Add(curid, new FormTransactionRow() { });
                         }
                         bool IsModified = false;
+                        if (!new_val_dict.ContainsKey(__column.ColumnName))
+                            new_val_dict.Add(__column.ColumnName, "[null]");
+                        if (!old_val_dict.ContainsKey(__column.ColumnName))
+                            old_val_dict.Add(__column.ColumnName, "[null]");
+
                         if (new_val_dict[__column.ColumnName] != old_val_dict[__column.ColumnName])
                             IsModified = true;
                         string a = old_val_dict[__column.ColumnName];
@@ -1455,6 +1460,8 @@ namespace ExpressBase.Objects
                             {
                                 dm += " " + d;
                             }
+                            if (i < vm_arr.Length - 1)
+                                dm += "<br>";
                         }
                         column.Value.OldValue = dm;
                     }
