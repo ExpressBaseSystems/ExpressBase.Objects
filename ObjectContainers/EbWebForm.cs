@@ -35,7 +35,13 @@ namespace ExpressBase.Objects
 
         public bool IsRenderMode { get; set; }
 
-        public EbWebForm() { }
+        public EbWebForm()
+        {
+            this.DisableDelete = new List<EbSQLValidator>();
+            this.DisableCancel = new List<EbSQLValidator>();
+            this.BeforeSaveRoutines = new List<EbRoutines>();
+            this.AfterSaveRoutines = new List<EbRoutines>();
+        }
 
         public override int TableRowId { get; set; }
 
@@ -55,7 +61,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.Collection)]
         public List<EbSQLValidator> DisableDelete { get; set; }
-
+        
         [PropertyGroup("Events")]
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.Collection)]
