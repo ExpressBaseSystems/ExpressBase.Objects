@@ -165,7 +165,12 @@ namespace ExpressBase.Objects
                 string _id = "id";
 
                 if (_table.Columns.Count > 0)
-                    _cols = "id, " + String.Join(", ", _table.Columns.Select(x => x.ColumnName));
+                {
+                    if (_table.IsGridTable)
+                        _cols = "id, eb_row_num, " + String.Join(", ", _table.Columns.Select(x => x.ColumnName));
+                    else
+                        _cols = "id, " + String.Join(", ", _table.Columns.Select(x => x.ColumnName));
+                }
                 if (_table.TableName != _schema.MasterTable)
                     _id = _schema.MasterTable + "_id";
 
