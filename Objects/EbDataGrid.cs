@@ -26,6 +26,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [DefaultPropValue("200")]
+        [PropertyGroup("Identity")]
         public override int Height { get; set; }
 
         [JsonIgnore]
@@ -63,7 +64,9 @@ $.each(this.Controls.$values, function (i, col) {
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.Collection)]
         [Alias("Columns")]
+        [PropertyGroup("Behavior")]
         [ListType(typeof(EbDGColumn))]
+        [PropertyPriority(99)]
         public override List<EbControl> Controls { get; set; }
 
         //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
@@ -73,6 +76,7 @@ $.each(this.Controls.$values, function (i, col) {
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyGroup("Behavior")]
+        [PropertyPriority(98)]
         [DefaultPropValue("true")]
         public bool IsAddable { get; set; }
 
@@ -87,7 +91,8 @@ $.each(this.Controls.$values, function (i, col) {
     <div class='Dg_head'>
         <table id='tbl_@ebsid@_head' class='table table-bordered dgtbl'>
             <thead>
-              <tr>";
+              <tr>
+                <th style='width:50px'><span class='grid-col-title'>Row No.</span></th>";
             foreach (EbDGColumn col in Controls)
             {
                 if (!col.Hidden)
