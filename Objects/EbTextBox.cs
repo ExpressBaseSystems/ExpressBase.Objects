@@ -56,6 +56,7 @@ namespace ExpressBase.Objects
         [HelpText("To limit number of charecters")]
         [PropertyGroup("Behavior")]
         [PropertyEditor(PropertyEditorType.Number)]
+        [PropertyPriority(99)]
         [OnChangeExec(@"
 if (this.MaxLength <= 10 ){
     pg.MakeReadOnly('PlaceHolder');
@@ -101,6 +102,7 @@ else {
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup(@"Behavior")]
+        [PropertyPriority(8)]
         [HelpText("specifies a short hint that describes the expected value of an input field (e.g. a sample value or a short description of the expected format)")]
         public string PlaceHolder { get; set; }
 
