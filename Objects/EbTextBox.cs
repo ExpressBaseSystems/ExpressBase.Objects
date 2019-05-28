@@ -281,8 +281,8 @@ else {
             get
             {
                 return @"
-            <textarea id='@ebsid@' ui-inp name='@name@' rows='@RowsVisible@' '@AutoCompleteOff@' data-toggle='tooltip'  data-placement='top' title='@ToolTipText@' 
-                @tabIndex@ @MaxLength@  style='width:100%; height:@heightpx; @BackColor@ @ForeColor@ display:inline-block; @fontStyle @ReadOnlyString@  @Required@  @PlaceHolder@  @Text@  @TabIndex></textarea>"
+            <textarea id='@ebsid@' class='eb-textarea' ui-inp name='@name@' rows='@RowsVisible@' '@AutoCompleteOff@' data-toggle='tooltip'  data-placement='top' title='@ToolTipText@' 
+                @tabIndex@ @MaxLength@  style='width:100%;' @Required@  @PlaceHolder@  @Text@  @TabIndex></textarea>"
 .Replace("@name@", this.Name)
 .Replace("@ebsid@", String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId)
 .Replace("@MaxLength@", "maxlength='" + ((this.MaxLength > 0) ? this.MaxLength.ToString() : "@MaxLength") + "'")
