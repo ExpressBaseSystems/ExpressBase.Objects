@@ -3,6 +3,7 @@ using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Objects.Helpers;
+using Newtonsoft.Json;
 using ServiceStack;
 using System;
 using System.Collections.Generic;
@@ -72,7 +73,7 @@ namespace ExpressBase.Objects
                     <div id='Wraper' class='ctrl-cover'>                             
                         <div class='input-group'style='width: 100 %; '> 
                                  <input id='' ui-inp='' data-ebtype='6' class='date' type='text' name=' tabindex='0' style='width: 100%; display: inline - block; background - color: rgb(255, 255, 255); color: rgb(51, 51, 51);' placeholder=''>
-                                 <span class='input-group-addon' style='padding: 0px; '>
+                                 <span class='input-group-addon'>
                                 <i class='fa fa fa-upload' aria-hidden='true'  style='padding: 6px 12px;'></i>  
                             </span>
                         </div>
@@ -131,6 +132,14 @@ WHERE
 
             return Qry;
         }
+
+
+        [JsonIgnore]
+        public override string EnableJSfn { get { return @"$('#cont_' + this.EbSid_CtxId + ' .Col_apndBody, #cont_' + this.EbSid_CtxId + ' .FUP_Head_W').prop('disabled',false).css('pointer-events', 'inherit');"; } set { } }
+
+        [JsonIgnore]
+        public override string DisableJSfn { get { return @"$('#cont_' + this.EbSid_CtxId + ' .Col_apndBody, #cont_' + this.EbSid_CtxId + ' .FUP_Head_W').attr('disabled', 'disabled').css('pointer-events', 'none');"; } set { } }
+
     }
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]

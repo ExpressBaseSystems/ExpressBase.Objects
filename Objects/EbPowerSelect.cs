@@ -317,7 +317,7 @@ console.log(1000);
                      <div class='spinner' style='display: none;'>Loading...</div>
                   </div>
                </div>
-               <span class='input-group-addon' style='border-radius: 0px;'><i id='acmasteridTglBtn' aria-hidden='true' class='fa  fa-search'></i></span>
+               <span class='input-group-addon'><i id='acmasteridTglBtn' aria-hidden='true' class='fa  fa-search'></i></span>
             </div>
          </div>
       </div>

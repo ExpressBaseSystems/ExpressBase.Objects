@@ -22,7 +22,7 @@ namespace ExpressBase.Objects
             {
                 return @"EbTable = {
                 padding : function(elementId, props) {
-                    $(`#cont_${ elementId}>table>tbody>tr>td`).css('padding', props.Padding + 'px');
+                    $(`#cont_${ elementId}>table>tbody>tr>td`).css('padding', `${props.Padding.Top}px ${props.Padding.Right}px ${props.Padding.Bottom}px ${props.Padding.Left}px`);
                 }
             }";
             }
@@ -51,7 +51,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [OnChangeUIFunction("EbTable.padding")]
-        public override int Padding { get; set; }
+        public override UISides Padding { get; set; }
 
         public EbTableLayout()
         {

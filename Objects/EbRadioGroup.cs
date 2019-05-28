@@ -212,7 +212,7 @@ this.Init = function(id)
 
         public override string GetBareHtml()
         {/*onclick=""event.stopPropagation();$('#@ebsid@').prop('checked', true);""*/
-            return @"<div id='@ebsid@' class='radio-wrap @radio-wrap-block@' style='padding:5px onclick=""event.stopPropagation(); $(this).children('input[type=radio]').prop('checked', true); $(this).children('input[type=radio]').trigger('change');"">
+            return @"<div id='@ebsid@' class='radio-wrap @radio-wrap-block@' style='padding:5px' onclick=""event.stopPropagation(); $(this).children('input[type=radio]').prop('checked', true); $(this).children('input[type=radio]').trigger('change');"">
                         <input type ='radio' id='@ebsid@' @defaultcheked@ value='@value@' name='@gname@'>
                         <span id='@ebsid@Lbl' ui-label style='@LabelBackColor @LabelForeColor '> @label@  </span>
                     </div>"

@@ -56,6 +56,7 @@ namespace ExpressBase.Objects
         [HelpText("To limit number of charecters")]
         [PropertyGroup("Behavior")]
         [PropertyEditor(PropertyEditorType.Number)]
+        [PropertyPriority(99)]
         [OnChangeExec(@"
 if (this.MaxLength <= 10 ){
     pg.MakeReadOnly('PlaceHolder');
@@ -96,11 +97,12 @@ else {
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup("Behavior")]
-        [DefaultPropValue("5")]
+        [DefaultPropValue("3")]
         public int RowsVisible { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup(@"Behavior")]
+        [PropertyPriority(8)]
         [HelpText("specifies a short hint that describes the expected value of an input field (e.g. a sample value or a short description of the expected format)")]
         public string PlaceHolder { get; set; }
 
@@ -292,7 +294,7 @@ else {
     .Replace("@BackColor@", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor ") + ";"))
     .Replace("@ForeColor@", "color:" + ((this.ForeColor != null) ? this.ForeColor : "@ForeColor ") + ";")
     .Replace("@Text@ ", "value='" + ((this.Text != null) ? this.Text : "@Text@") + "' ")
-    .Replace("@RowsVisible@", (this.RowsVisible != 0) ? this.RowsVisible.ToString() : "5");
+    .Replace("@RowsVisible@", (this.RowsVisible != 0) ? this.RowsVisible.ToString() : "3");
             }
             set { }
         }

@@ -26,6 +26,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [DefaultPropValue("200")]
+        [PropertyGroup("Identity")]
         public override int Height { get; set; }
 
         [JsonIgnore]
@@ -63,7 +64,9 @@ $.each(this.Controls.$values, function (i, col) {
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.Collection)]
         [Alias("Columns")]
+        [PropertyGroup("Behavior")]
         [ListType(typeof(EbDGColumn))]
+        [PropertyPriority(99)]
         public override List<EbControl> Controls { get; set; }
 
         //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
@@ -73,6 +76,7 @@ $.each(this.Controls.$values, function (i, col) {
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyGroup("Behavior")]
+        [PropertyPriority(98)]
         [DefaultPropValue("true")]
         public bool IsAddable { get; set; }
 
@@ -87,13 +91,15 @@ $.each(this.Controls.$values, function (i, col) {
     <div class='Dg_head'>
         <table id='tbl_@ebsid@_head' class='table table-bordered dgtbl'>
             <thead>
-              <tr>";
+              <tr>
+                <th style='width:50px'><span class='grid-col-title'>Row No.</span></th>";
             foreach (EbDGColumn col in Controls)
             {
                 if (!col.Hidden)
-                    html += string.Concat("<th style='width: @Width@; @bg@' title='", col.Title, "'><span class='grid-col-title'>", col.Title, "</span>@req@</th>")
+                    html += string.Concat("<th style='width: @Width@; @bg@' @type@ title='", col.Title, "'><span class='grid-col-title'>", col.Title, "</span>@req@</th>")
                         .Replace("@req@", (col.Required ? "<sup style='color: red'>*</sup>" : string.Empty))
                         .Replace("@Width@", (col.Width <= 0) ? "auto" : col.Width.ToString() + "%")
+                        .Replace("@type@", "type = '" + col.ObjType + "'")
                         .Replace("@bg@", col.IsDisable ? "background-color:#fafafa; color:#555" : string.Empty);
             }
 
@@ -102,7 +108,7 @@ $.each(this.Controls.$values, function (i, col) {
               </tr>
             </thead>
         </table>
-    </div>".Replace("@cogs@", !this.IsDisable ? "<th style='width:50px;'><span class='fa fa-cogs'></span></th>" : string.Empty);
+    </div>".Replace("@cogs@", !this.IsDisable ? "<th style='width:50px;'><span class='fa fa-cog'></span></th>" : string.Empty);
 
             html += @"
     <div class='Dg_body' style='overflow-y:scroll;height:@_height@px ;'>
@@ -230,6 +236,15 @@ $.each(this.Controls.$values, function (i, col) {
         {
             get { return this.EbTextBox.TextMode; }
             set { this.EbTextBox.TextMode = value; }
+        }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup("Behavior")]
+        [DefaultPropValue("3")]
+        public int RowsVisible
+        {
+            get { return this.EbTextBox.RowsVisible; }
+            set { this.EbTextBox.RowsVisible = value; }
         }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
@@ -396,6 +411,20 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, func
             this.EbSimpleSelect = new EbSimpleSelect();
         }
 
+        [JsonIgnore]
+        public override string DisableJSfn
+        {
+            get
+            {
+                return @"$('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] .ctrl-cover .dropdown-toggle`).attr('disabled', 'disabled').css('pointer-events', 'none').find('[ui-inp]').css('background-color', '#f3f3f3');";
+            }
+            set { }
+        }
+
+        [JsonIgnore]
+        public override string EnableJSfn { get {
+                return @"$('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] .ctrl-cover .dropdown-toggle`).prop('disabled',false).css('pointer-events', 'inherit').find('[ui-inp]').css('background-color', '#fff');"; } set { } }
+
         public override string GetDisplayMemberJSfn { get { return @" return $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp] :selected`).text(); "; } set { } }
 
         [EnableInBuilder(BuilderType.WebForm)]
@@ -544,7 +573,7 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, func
             DBareHtml = (@"
 <div  id='@ebsid@_wrap'>
     <div class='input-group' style='width:100%;'>            
-        <input id='' ui-inp data-toggle='tooltip' title='' type='text' tabindex='0' style='width:100%; data-original-title=''>
+        <input id='@ebsid@_inp' ui-inp data-toggle='tooltip' title='' type='text' tabindex='0' style='width:100%; data-original-title='' disabled>
         <span id='@ebsid@_showbtn' class='input-group-addon ucspan' data-toggle='modal' data-target='#@colebsid@_usercontrolmodal' style='padding: 0px;'> <button type='button' id='Date1TglBtn' class='fa  fa-ellipsis-h ucbtn' aria-hidden='true' style='padding: 6px 12px;'></button> </span>
     </div>
 </div>
