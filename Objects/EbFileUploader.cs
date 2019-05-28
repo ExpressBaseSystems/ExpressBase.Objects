@@ -3,6 +3,7 @@ using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Objects.Helpers;
+using Newtonsoft.Json;
 using ServiceStack;
 using System;
 using System.Collections.Generic;
@@ -131,6 +132,14 @@ WHERE
 
             return Qry;
         }
+
+
+        [JsonIgnore]
+        public override string EnableJSfn { get { return @"$('#cont_' + this.EbSid_CtxId + ' .Col_apndBody, #cont_' + this.EbSid_CtxId + ' .FUP_Head_W').prop('disabled',false).css('pointer-events', 'inherit');"; } set { } }
+
+        [JsonIgnore]
+        public override string DisableJSfn { get { return @"$('#cont_' + this.EbSid_CtxId + ' .Col_apndBody, #cont_' + this.EbSid_CtxId + ' .FUP_Head_W').attr('disabled', 'disabled').css('pointer-events', 'none');"; } set { } }
+
     }
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]

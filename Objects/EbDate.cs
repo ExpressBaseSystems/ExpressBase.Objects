@@ -215,7 +215,7 @@ $('#@id').MonthPicker({ StartYear: 2018, ShowIcon: false });"
 .Replace("@readOnlyString@", this.ReadOnlyString)
 .Replace("@placeHolder@", "placeholder='" + this.PlaceHolder + "'")
 .Replace("@atchdLbl@", (this.EbDateType.ToString().ToLower() == "time") ? "fa-clock-o" : "fa-calendar")
-.Replace("@IsNullable@", (this.IsNullable) ? "<span class='input-group-addon nullable-check'><input type='checkbox' style='min-height:unset;'></span>" : "");
+.Replace("@IsNullable@", (this.IsNullable) ? "<span class='input-group-addon nullable-check' style='padding: 0px 7px !important;'><input type='checkbox' style='min-height:unset;'></span>" : "");
 //.Replace("@fontStyle@", (this.FontSerialized != null) ?
 //                            (" font-family:" + this.FontSerialized.FontFamily + ";" + "font-style:" + this.FontSerialized.Style
 //                            + ";" + "font-size:" + this.FontSerialized.SizeInPoints + "px;")
@@ -270,8 +270,10 @@ $('#@id').MonthPicker({ StartYear: 2018, ShowIcon: false });"
                         $('#' + this.EbSid_CtxId).siblings('.nullable-check').find('input[type=checkbox]').prop('checked', true);
                     if(this.ShowDateAs_ === 1)
                         $('#' + this.EbSid_CtxId).val(p1);
-                    else
-                        $('#' + this.EbSid_CtxId).val(moment(p1, 'YYYY-MM-DD').format(ebcontext.user.Preference.ShortDatePattern)).trigger('change');";
+                    else if(p1 !== null && p1 !== undefined)
+                        $('#' + this.EbSid_CtxId).val(moment(p1, 'YYYY-MM-DD').format(ebcontext.user.Preference.ShortDatePattern)).trigger('change');
+                    else 
+                        $('#' + this.EbSid_CtxId).val('');";
             }
             set { }
         }
