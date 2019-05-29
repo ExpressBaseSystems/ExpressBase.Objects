@@ -98,6 +98,12 @@ namespace ExpressBase.Objects.Objects.DVRelated
         Center = 3
     }
 
+    public enum OrderByDirection
+    {
+        ASC = 0,
+        DESC = 1
+    }
+
 
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl)]
     [HideInPropertyGrid]
@@ -325,6 +331,9 @@ else {
         [PropertyGroup("Tooltip")]
         [EnableInBuilder(BuilderType.DVBuilder)]        
         public int AllowedCharacterLength { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public OrderByDirection Direction { get; set; }
 
         [JsonIgnore]
         private List<string> __formulaDataFieldsUsed = null;
@@ -683,7 +692,17 @@ pg.setSimpleProperty('IsTree', false);
     public class DVDateTimeColumn : DVBaseColumn
     {
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
+        [OnChangeExec(@"
+if(this.Format === 3){
+    pg.ShowProperty('ConvretToUsersTimeZone');
+}
+else{
+    pg.HideProperty('ConvretToUsersTimeZone');
+    }")]
         public DateFormat Format { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
+        public bool ConvretToUsersTimeZone { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [OnChangeExec(@"
