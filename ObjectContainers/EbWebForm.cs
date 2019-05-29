@@ -161,15 +161,15 @@ namespace ExpressBase.Objects
                 _schema = this.FormSchema;//this.GetWebFormSchema();
             foreach (TableSchema _table in _schema.Tables)
             {
-                string _cols = "id";
+                string _cols = "id, eb_loc_id";
                 string _id = "id";
 
                 if (_table.Columns.Count > 0)
                 {
                     if (_table.IsGridTable)
-                        _cols = "id, eb_row_num, " + String.Join(", ", _table.Columns.Select(x => x.ColumnName));
+                        _cols = "id, eb_loc_id, eb_row_num, " + String.Join(", ", _table.Columns.Select(x => x.ColumnName));
                     else
-                        _cols = "id, " + String.Join(", ", _table.Columns.Select(x => x.ColumnName));
+                        _cols = "id, eb_loc_id, " + String.Join(", ", _table.Columns.Select(x => x.ColumnName));
                 }
                 if (_table.TableName != _schema.MasterTable)
                     _id = _schema.MasterTable + "_id";
@@ -414,13 +414,17 @@ namespace ExpressBase.Objects
                         break;
                     }
                 }
-                if (_rowFound)
+                if (_rowFound)// skipping duplicate rows in dataTable
                     continue;
 
                 SingleRow Row = new SingleRow();
                 foreach (EbDataColumn dataColumn in dataTable.Columns)
                 {
-                    if (dataRow.IsDBNull(dataColumn.ColumnIndex))
+                    if (dataColumn.ColumnName == "eb_loc_id")
+                    {
+                        Row.LocId = Convert.ToInt32(dataRow[dataColumn.ColumnIndex]);
+                    }
+                    else if (dataRow.IsDBNull(dataColumn.ColumnIndex))
                     {
                         Row.Columns.Add(new SingleColumn()
                         {
@@ -1140,7 +1144,7 @@ namespace ExpressBase.Objects
                 {
                     if (cField.Name.Equals("id"))//skipping 'id' field
                         continue;
-                    dic.Add(cField.Name, cField.Value.ToString());
+                    dic.Add(cField.Name, cField.Value == null ? "[null]" : cField.Value.ToString());
                 }
                 string val = JsonConvert.SerializeObject(dic);
                 FormFields.Add(new AuditTrailEntry
@@ -1163,7 +1167,7 @@ namespace ExpressBase.Objects
                     {
                         Name = cField.Name,
                         NewVal = IsIns && cField.Value != null ? cField.Value.ToString() : "[null]",
-                        OldVal = IsIns && cField.Value == null ? "[null]" : cField.Value.ToString(),
+                        OldVal = !IsIns && cField.Value != null ? cField.Value.ToString() : "[null]",
                         DataRel = relation,
                         TableName = Table
                     });
@@ -1198,37 +1202,37 @@ namespace ExpressBase.Objects
         }
 
         //Get the latest data as a transaction
-        private FormTransaction GetCurrTransationAll()
-        {
-            FormTransaction curTransAll = new FormTransaction();
-            foreach (TableSchema Table in this.FormSchema.Tables)
-            {
-                if (Table.IsGridTable)
-                {
-                    curTransAll.GridTables.Add(Table.TableName, new FormTransactionTable());
-                    foreach (SingleRow Row in this.FormData.MultipleTables[Table.TableName])
-                    {
-                        int _rowid = Convert.ToInt32(Row.RowId);
-                        curTransAll.GridTables[Table.TableName].Rows.Add(_rowid, new FormTransactionRow());
-                        foreach (SingleColumn Column in Row.Columns)
-                        {
-                            if (!Column.Name.Equals("id"))//skipping id field
-                                curTransAll.GridTables[Table.TableName].Rows[_rowid].Columns.Add(Column.Name, new FormTransactionEntry { NewValue = Column.Value.ToString(), OldValue = Column.Value.ToString() });
-                        }
-                    }
-                }
-                else
-                {
-                    curTransAll.Tables.Add(Table.TableName, new FormTransactionRow());
-                    foreach (SingleColumn Column in this.FormData.MultipleTables[Table.TableName][0].Columns)
-                    {
-                        if (!Column.Name.Equals("id"))//skipping id
-                            curTransAll.Tables[Table.TableName].Columns.Add(Column.Name, new FormTransactionEntry { NewValue = Column.Value.ToString(), OldValue = Column.Value.ToString() });
-                    }
-                }
-            }
-            return curTransAll;
-        }
+        //private FormTransaction GetCurrTransationAll()
+        //{
+        //    FormTransaction curTransAll = new FormTransaction();
+        //    foreach (TableSchema Table in this.FormSchema.Tables)
+        //    {
+        //        if (Table.IsGridTable)
+        //        {
+        //            curTransAll.GridTables.Add(Table.TableName, new FormTransactionTable());
+        //            foreach (SingleRow Row in this.FormData.MultipleTables[Table.TableName])
+        //            {
+        //                int _rowid = Convert.ToInt32(Row.RowId);
+        //                curTransAll.GridTables[Table.TableName].Rows.Add(_rowid, new FormTransactionRow());
+        //                foreach (SingleColumn Column in Row.Columns)
+        //                {
+        //                    if (!Column.Name.Equals("id"))//skipping id field
+        //                        curTransAll.GridTables[Table.TableName].Rows[_rowid].Columns.Add(Column.Name, new FormTransactionEntry { NewValue = Column.Value.ToString(), OldValue = Column.Value.ToString() });
+        //                }
+        //            }
+        //        }
+        //        else
+        //        {
+        //            curTransAll.Tables.Add(Table.TableName, new FormTransactionRow());
+        //            foreach (SingleColumn Column in this.FormData.MultipleTables[Table.TableName][0].Columns)
+        //            {
+        //                if (!Column.Name.Equals("id"))//skipping id
+        //                    curTransAll.Tables[Table.TableName].Columns.Add(Column.Name, new FormTransactionEntry { NewValue = Column.Value.ToString(), OldValue = Column.Value.ToString() });
+        //            }
+        //        }
+        //    }
+        //    return curTransAll;
+        //}
 
         public string GetAuditTrail(IDatabase DataDB, Service Service)
         {
@@ -1498,6 +1502,51 @@ namespace ExpressBase.Objects
                     }
                 }
             }
+        }
+
+        public Dictionary<int, List<string>> GetLocBasedPermissions()
+        {
+            Dictionary<int, List<string>> _perm = new Dictionary<int, List<string>>();
+            //New View Edit Delete Cancel Print AuditTrail
+
+            foreach(int locid in this.SolutionObj.Locations.Keys)
+            {
+                List<string> _temp = new List<string>();
+                foreach(EbOperation op in Operations.Enumerator)
+                {
+                    if (this.HasPermission(op.Name, locid))
+                        _temp.Add(op.Name);
+                }
+                _perm.Add(locid, _temp);
+            }
+            return _perm;
+        }
+
+        private bool HasPermission(string ForWhat, int LocId)
+        {
+            if (this.UserObj.Roles.Contains(SystemRoles.SolutionOwner.ToString()) ||
+                this.UserObj.Roles.Contains(SystemRoles.SolutionAdmin.ToString()) ||
+                this.UserObj.Roles.Contains(SystemRoles.SolutionPM.ToString()))
+                return true;
+
+            EbOperation Op = EbWebForm.Operations.Get(ForWhat);
+            if (!Op.IsAvailableInWeb)
+                return false;
+
+            try
+            {
+                string Ps = string.Concat(this.RefId.Split("-")[2].PadLeft(2, '0'), '-', this.RefId.Split("-")[3].PadLeft(5, '0'), '-', Op.IntCode.ToString().PadLeft(2, '0'));
+                string t = this.UserObj.Permissions.FirstOrDefault(p => p.Substring(p.IndexOf("-") + 1).Equals(Ps + ":" + LocId) ||
+                            (p.Substring(p.IndexOf("-") + 1, 11).Equals(Ps) && p.Substring(p.LastIndexOf(":") + 1).Equals("-1")));
+                if (!t.IsNullOrEmpty())
+                    return true;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Exception when checking user permission(EbWebForm -> HasPermission): " + e.Message);
+            }
+
+            return false;
         }
 
         private WebFormSchema GetWebFormSchema()

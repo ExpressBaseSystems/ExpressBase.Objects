@@ -366,7 +366,7 @@ $.each(this.Controls.$values, function (i, col) {
 
         [JsonIgnore]
         public override string OnChangeBindJSFn { get { return @"
-if(p1.col.OnChangeFn.Code === null)
+if(p1.col.OnChangeFn == null || p1.col.OnChangeFn.Code === null)
     return;
 let func =new Function('form', 'user', `event`, atob(p1.col.OnChangeFn.Code)).bind(this, p1.form, p1.user);
 $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, func).siblings('.nullable-check').on('change', `input[type=checkbox]`, func);"; } set { } }
