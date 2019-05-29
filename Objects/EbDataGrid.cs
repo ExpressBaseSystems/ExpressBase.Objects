@@ -44,6 +44,7 @@ $.each(this.Controls.$values, function (i, col) {
         }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [HideInPropertyGrid]
         public override bool IsSpecialContainer { get { return true; } set { } }
 
         [OnDeserialized]
@@ -92,7 +93,7 @@ $.each(this.Controls.$values, function (i, col) {
         <table id='tbl_@ebsid@_head' class='table table-bordered dgtbl'>
             <thead>
               <tr>
-                <th style='width:50px'><span class='grid-col-title'>Row No.</span></th>";
+                <th style='width:50px'><span class='grid-col-title'>SL. No.</span></th>";
             foreach (EbDGColumn col in Controls)
             {
                 if (!col.Hidden)
