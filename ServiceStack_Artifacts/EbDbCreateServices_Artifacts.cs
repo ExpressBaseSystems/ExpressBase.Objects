@@ -18,8 +18,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public bool ischange { get; set; }
         [DataMember(Order = 3)]
         public EbDbConfig DataDBConfig { get; set; }
-        [DataMember(Order = 4)]
-        public IDatabase Idbcon { get; set; }
+        //[DataMember(Order = 4)]
+        //public IDatabase Idbcon { get; set; }
 
     }
     [DataContract]
