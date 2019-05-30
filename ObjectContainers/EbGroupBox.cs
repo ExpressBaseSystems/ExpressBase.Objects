@@ -22,7 +22,7 @@ namespace ExpressBase.Objects
             {
                 return @"EbGroupBox = {
                     padding : function(elementId, props) {
-                        $(`#cont_${ elementId}.Eb-ctrlContainer`).closestInner('.group-box').css('padding', props.Padding + 'px');
+                        $(`#cont_${ elementId}.Eb-ctrlContainer`).closestInner('.group-box').css('padding', `${props.Padding.Top}px ${props.Padding.Right}px ${props.Padding.Bottom}px ${props.Padding.Left}px`);
                     }
                 }";
             }
@@ -33,17 +33,14 @@ namespace ExpressBase.Objects
         [OnChangeUIFunction("Common.LABEL")]
         public override string Label { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
-        [PropertyGroup("Test")]
-        [OnChangeUIFunction("EbGroupBox.padding")]
-        [UIproperty]
-        [DefaultPropValue("3")]
-        public int Padding { get; set; }
-
         public override string GetToolHtml()
         {
             return @"<div eb-type='@toolName' class='tool'><i class='fa fa-square-o'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
         }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [OnChangeUIFunction("EbGroupBox.padding")]
+        public override UISides Padding { get; set; }
 
         public override string GetDesignHtml()
         {

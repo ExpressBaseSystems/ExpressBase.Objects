@@ -20,7 +20,7 @@ namespace ExpressBase.Objects
     public class EbBotForm : EbForm
     {
         [OnDeserialized]
-        public void OnDeserializedMethod(StreamingContext context)
+        public new void OnDeserializedMethod(StreamingContext context)
         {
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
