@@ -209,7 +209,7 @@ namespace ExpressBase.Objects
                 {
                     if (_column.Control is EbAutoId)
                     {
-                        _dupcols += string.Format(", {0}_ebbkup = {0}, {0} = {0} || '_ebbkup'", _column.ColumnName);
+                        _dupcols += string.Format(", {0}_ebbkup = {0}, {0} = CONCAT({0}, '_ebbkup')", _column.ColumnName);
                     }
                 }
                 query += string.Format("UPDATE {0} SET eb_del='T',eb_lastmodified_by = :eb_modified_by, eb_lastmodified_at = "+ DataDB.EB_CURRENT_TIMESTAMP + " {1} WHERE {2} = :id AND eb_del='F';", _table.TableName, _dupcols, _id);
@@ -769,7 +769,7 @@ namespace ExpressBase.Objects
                 {
                     string cn = entry.Key + "_" + i.ToString();
                     i++;
-                    InnerVals.Add(string.Format("(:{0}, '{1}_{2}_{3}')", cn, EbObId, this.TableRowId, entry.Key));
+                    InnerVals.Add(string.Format("('{0}_{1}_{2}')", EbObId, this.TableRowId, entry.Key));
                     param.Add(DataDB.GetNewParameter(cn, EbDbTypes.Decimal, row.Columns[0].Value));
                     InnerIds.Add(":" + cn);
                 }
@@ -777,14 +777,24 @@ namespace ExpressBase.Objects
             }
             if (InnerVals.Count > 0)
             {
-                fullqry += string.Format(@"UPDATE 
+                for (int k = 0; k < InnerVals.Count; k++)
+                {
+                    fullqry += string.Format(@"UPDATE 
                                             eb_files_ref AS t
                                         SET
-                                            context = c.context
-                                        FROM
-                                            (VALUES{0}) AS c(id, context)
+                                            context = {0}                                        
                                         WHERE
-                                            c.id = t.id AND t.eb_del = 'F';", InnerVals.Join(","));
+                                           t.id = {1} AND t.eb_del = 'F';", InnerVals[k], InnerIds[k]);
+                }
+
+                //fullqry += string.Format(@"UPDATE 
+                //                            eb_files_ref AS t
+                //                        SET
+                //                            context = c.context
+                //                        FROM
+                //                            (VALUES{0}) AS c(id, context)
+                //                        WHERE
+                //                            c.id = t.id AND t.eb_del = 'F';", InnerVals.Join(","));
                 fullqry += string.Format(@"UPDATE eb_files_ref 
                                         SET eb_del='T' 
                                         WHERE ({0}) AND eb_del='F' AND id NOT IN ({1});", Innercxt.Join(" OR "), InnerIds.Join(","));
@@ -815,7 +825,7 @@ namespace ExpressBase.Objects
                     string _qry = "INSERT INTO {0} ({1} eb_created_by, eb_created_at, eb_loc_id {3} ) VALUES ({2} :eb_createdby, " + DataDB.EB_CURRENT_TIMESTAMP + ", :eb_loc_id {4});";
                     if(DataDB.Vendor == DatabaseVendors.MYSQL && entry.Key == this.FormSchema.MasterTable)
                     {
-                        _qry += "eb_persist_currval('" + entry.Key + "_id_seq');";
+                        _qry += "SELECT eb_persist_currval('" + entry.Key + "_id_seq');";
                     }
                     string _tblname = entry.Key;
                     string _cols = string.Empty;
@@ -827,7 +837,7 @@ namespace ExpressBase.Objects
                         if (rField.Control is EbAutoId)
                         {
                             _cols += string.Concat(rField.Name, ", ");
-                            _values += string.Format(":{0}_{1} || (SELECT LPAD(CAST((COUNT(*) + 1) as CHAR(100)), {2}, '0') FROM {3} WHERE {0} LIKE '{4}%'),", rField.Name, i, (rField.Control as EbAutoId).Pattern.SerialLength, entry.Key, rField.Value);
+                            _values += string.Format("CONCAT(:{0}_{1}, (SELECT LPAD(CAST((COUNT(*) + 1) as CHAR(100))), {2}, '0') FROM {3} WHERE {0} LIKE '{4}%'),", rField.Name, i, (rField.Control as EbAutoId).Pattern.SerialLength, entry.Key, rField.Value);
                             param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
                         }
                         else if (rField.Control != null)
@@ -877,22 +887,34 @@ namespace ExpressBase.Objects
                 {
                     string cn = entry.Key + "_" + i.ToString();
                     i++;
-                    InnerVals.Add(string.Format("(:{0}, '{1}_' || eb_currval('{2}_id_seq')::text || '_{3}')", cn, EbObId, this.TableName, entry.Key));
+                    InnerVals.Add(string.Format("( CONCAT('{0}_', CAST(eb_currval('{1}_id_seq') AS CHAR(32)), '_{2}'))", EbObId, this.TableName, entry.Key));
                     param.Add(DataDB.GetNewParameter(cn, EbDbTypes.Decimal, row.Columns[0].Value));
                     InnerIds.Add(":" + cn);
                 }
-                Innercxt.Add("context = '" + EbObId + "_' || eb_currval('" + this.TableName + "_id_seq')::text || '_" + entry.Key + "'");
+                Innercxt.Add("context = CONCAT('" + EbObId + "_', CAST(eb_currval('" + this.TableName + "_id_seq') AS CHAR(32)), '_" + entry.Key + "')");
             }
+           
             if (InnerVals.Count > 0)
             {
-                fullqry += string.Format(@"UPDATE 
+                
+                for ( int k = 0;k < InnerVals.Count; k++)
+                {
+                    fullqry += string.Format(@"UPDATE 
                                             eb_files_ref AS t
                                         SET
-                                            context = c.context
-                                        FROM
-                                            (VALUES{0}) AS c(id, context)
+                                            context = {0}                                        
                                         WHERE
-                                            c.id = t.id AND t.eb_del = 'F';", InnerVals.Join(","));
+                                           t.id = {1} AND t.eb_del = 'F';", InnerVals[k],InnerIds[k]);                    
+                }
+
+                //fullqry += string.Format(@"UPDATE 
+                //                            eb_files_ref AS t
+                //                        SET
+                //                            context = c.context
+                //                        FROM
+                //                            (VALUES{0}) AS c(id, context)
+                //                        WHERE
+                //                            c.id = t.id AND t.eb_del = 'F';", InnerVals.Join(","));
                 fullqry += string.Format(@"UPDATE eb_files_ref 
                                         SET eb_del='T' 
                                         WHERE ({0}) AND eb_del='F' AND id NOT IN ({1});", Innercxt.Join(" OR "), InnerIds.Join(","));
@@ -907,7 +929,7 @@ namespace ExpressBase.Objects
 
             EbDataTable temp = DataDB.DoQuery(fullqry, param.ToArray());
             int _rowid = temp.Rows.Count > 0 ? Convert.ToInt32(temp.Rows[0][0]) : 0;
-
+            //int _rowid = temp.Tables[temp.Tables.Count - 1].Rows.Count > 0 ? Convert.ToInt32(temp.Tables[temp.Tables.Count - 1].Rows[0][0]) : 0;
             return _rowid;
         }
 
