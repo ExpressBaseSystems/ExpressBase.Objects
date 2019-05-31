@@ -48,7 +48,7 @@ $.each(this.Controls.$values, function (i, col) {
         public override bool IsSpecialContainer { get { return true; } set { } }
 
         [OnDeserialized]
-        public void OnDeserializedMethod(StreamingContext context)
+        public new void OnDeserializedMethod(StreamingContext context)
         {
             this.BareControlHtml = this.GetBareHtml();
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
@@ -61,6 +61,9 @@ $.each(this.Controls.$values, function (i, col) {
                 }
             }
         }
+
+        [JsonIgnore]
+        public override UISides Padding { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.Collection)]
@@ -93,7 +96,7 @@ $.each(this.Controls.$values, function (i, col) {
         <table id='tbl_@ebsid@_head' class='table table-bordered dgtbl'>
             <thead>
               <tr>
-                <th style='width:50px'><span class='grid-col-title'>SL. No.</span></th>";
+                <th style='width:34px'><span class='grid-col-title'>SL No</span></th>";
             foreach (EbDGColumn col in Controls)
             {
                 if (!col.Hidden)
@@ -207,7 +210,7 @@ $.each(this.Controls.$values, function (i, col) {
         public virtual string InputControlType { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
-        public bool IsDisable { get; set; }
+        public override bool IsDisable { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [DefaultPropValue("true")]

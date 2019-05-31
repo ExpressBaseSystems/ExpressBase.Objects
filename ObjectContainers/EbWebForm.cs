@@ -550,6 +550,9 @@ namespace ExpressBase.Objects
                 DataDB.GetNewParameter("id", EbDbTypes.Int32, this.TableRowId);
                 foreach (KeyValuePair<string, SingleTable> entry in _FormData.MultipleTables)
                 {
+                    if(entry.Key == _FormData.MasterTable)
+                        this.LocationId = entry.Value[0].LocId;
+
                     foreach (SingleColumn column in entry.Value[0].Columns)
                     {
                         DbParameter t = param.Find(e => e.ParameterName == column.Name);
@@ -557,6 +560,10 @@ namespace ExpressBase.Objects
                             param.Add(DataDB.GetNewParameter(column.Name, (EbDbTypes)column.Type, column.Value));
                     }
                 }
+                DbParameter tt = param.Find(e => e.ParameterName == "eb_loc_id");
+                if (tt == null)
+                    param.Add(DataDB.GetNewParameter("eb_loc_id", EbDbTypes.Decimal, this.LocationId));
+
                 EbDataSet ds = DataDB.DoQueries(psquery, param.ToArray());
 
                 if (ds.Tables.Count > 0)
