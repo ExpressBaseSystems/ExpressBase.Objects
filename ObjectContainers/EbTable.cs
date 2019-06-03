@@ -52,8 +52,16 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.Expandable)]
         [OnChangeUIFunction("EbTable.padding")]
-        [DefaultPropValue(10, 20, 30, 40)]
-        public new UISides Padding { get; set; }
+        [DefaultPropValue(0, 0, 0, 0)]
+        public override UISides Padding { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyEditor(PropertyEditorType.Expandable)]
+        [PropertyGroup("Appearance")]
+        [UIproperty]
+        [OnChangeUIFunction("Common.MARGIN")]
+        [DefaultPropValue(0, 0, 0, 0)]
+        public override UISides Margin { get; set; }
 
         public EbTableLayout()
         {
@@ -148,27 +156,6 @@ this.Init = function(id){
         }
     }
 
-    [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
-    public class UISides4Cont : UISides
-    {
-        public UISides4Cont() { }
-
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
-        [DefaultPropValue(0)]
-        public override int Top { get; set; }
-
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
-        [DefaultPropValue(0)]
-        public override int Right { get; set; }
-
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
-        [DefaultPropValue(0)]
-        public override int Bottom { get; set; }
-
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
-        [DefaultPropValue(0)]
-        public override int Left { get; set; }
-    }
 }
 
 [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]

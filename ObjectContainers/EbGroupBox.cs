@@ -40,6 +40,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [OnChangeUIFunction("EbGroupBox.padding")]
+        [DefaultPropValue(8, 8, 8, 8)]
         public override UISides Padding { get; set; }
 
         public override string GetDesignHtml()
