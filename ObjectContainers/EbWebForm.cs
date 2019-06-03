@@ -176,7 +176,7 @@ namespace ExpressBase.Objects
                 if (_table.TableName != _schema.MasterTable)
                     _id = _schema.MasterTable + "_id";
 
-                query += string.Format("SELECT {0} FROM {1} WHERE {2} = :id AND eb_del='F' {3};", _cols, _table.TableName, _id, _table.IsGridTable? "ORDER BY eb_row_num": string.Empty);
+                query += string.Format("SELECT {0} FROM {1} WHERE {2} = :id AND eb_del='F' {3};", _cols, _table.TableName, _id, _table.IsGridTable ? "ORDER BY eb_row_num" : string.Empty);
 
                 foreach (ColumnSchema Col in _table.Columns)
                 {
@@ -212,7 +212,7 @@ namespace ExpressBase.Objects
                         _dupcols += string.Format(", {0}_ebbkup = {0}, {0} = CONCAT({0}, '_ebbkup')", _column.ColumnName);
                     }
                 }
-                query += string.Format("UPDATE {0} SET eb_del='T',eb_lastmodified_by = :eb_modified_by, eb_lastmodified_at = "+ DataDB.EB_CURRENT_TIMESTAMP + " {1} WHERE {2} = :id AND eb_del='F';", _table.TableName, _dupcols, _id);
+                query += string.Format("UPDATE {0} SET eb_del='T',eb_lastmodified_by = :eb_modified_by, eb_lastmodified_at = " + DataDB.EB_CURRENT_TIMESTAMP + " {1} WHERE {2} = :id AND eb_del='F';", _table.TableName, _dupcols, _id);
             }
             return query;
         }
@@ -227,7 +227,7 @@ namespace ExpressBase.Objects
                 string _id = "id";
                 if (_table.TableName != _schema.MasterTable)
                     _id = _schema.MasterTable + "_id";
-                query += string.Format("UPDATE {0} SET eb_void='T',eb_lastmodified_by = :eb_modified_by, eb_lastmodified_at = "+ DataDB.EB_CURRENT_TIMESTAMP + " WHERE {1} = :id AND eb_void='F' AND eb_del='F';", _table.TableName, _id);
+                query += string.Format("UPDATE {0} SET eb_void='T',eb_lastmodified_by = :eb_modified_by, eb_lastmodified_at = " + DataDB.EB_CURRENT_TIMESTAMP + " WHERE {1} = :id AND eb_void='F' AND eb_del='F';", _table.TableName, _id);
             }
             return query;
         }
@@ -550,7 +550,7 @@ namespace ExpressBase.Objects
                 DataDB.GetNewParameter("id", EbDbTypes.Int32, this.TableRowId);
                 foreach (KeyValuePair<string, SingleTable> entry in _FormData.MultipleTables)
                 {
-                    if(entry.Key == _FormData.MasterTable)
+                    if (entry.Key == _FormData.MasterTable)
                         this.LocationId = entry.Value[0].LocId;
 
                     foreach (SingleColumn column in entry.Value[0].Columns)
@@ -687,11 +687,11 @@ namespace ExpressBase.Objects
                     string _tblname = entry.Key;
                     if (Convert.ToInt32(row.RowId) > 0)
                     {
-                        string _qry = "UPDATE {0} SET {1} eb_lastmodified_by = :eb_modified_by, eb_lastmodified_at = "+ DataDB.EB_CURRENT_TIMESTAMP +" WHERE id={2};";
+                        string _qry = "UPDATE {0} SET {1} eb_lastmodified_by = :eb_modified_by, eb_lastmodified_at = " + DataDB.EB_CURRENT_TIMESTAMP + " WHERE id={2};";
                         string _colvals = string.Empty;
                         if (row.IsDelete && !_tblname.Equals(this.FormData.MasterTable))
                         {
-                            _qry = "UPDATE {0} SET {1}, eb_lastmodified_by = :eb_modified_by, eb_lastmodified_at = "+ DataDB.EB_CURRENT_TIMESTAMP + " WHERE id={2} AND eb_del='F';";
+                            _qry = "UPDATE {0} SET {1}, eb_lastmodified_by = :eb_modified_by, eb_lastmodified_at = " + DataDB.EB_CURRENT_TIMESTAMP + " WHERE id={2} AND eb_del='F';";
                             _colvals = "eb_del='T'";
                         }
                         else
@@ -714,7 +714,8 @@ namespace ExpressBase.Objects
                                     }
                                     else if ((EbDbTypes)rField.Type == EbDbTypes.DateTime)
                                     {
-                                        rField.Value = DateTime.ParseExact(rField.Value.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture).ConvertToUtc(this.UserObj.Preference.TimeZone);
+                                        DateTime dt = DateTime.ParseExact(rField.Value.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
+                                        rField.Value = dt.ConvertToUtc(this.UserObj.Preference.TimeZone);
                                         param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
                                     }
                                     else
@@ -727,7 +728,7 @@ namespace ExpressBase.Objects
                     }
                     else
                     {
-                        string _qry = "INSERT INTO {0} ({1} eb_created_by, eb_created_at, eb_loc_id, {3}_id ) VALUES ({2} :eb_createdby, "+ DataDB.EB_CURRENT_TIMESTAMP + ", :eb_loc_id, :{4}_id);";
+                        string _qry = "INSERT INTO {0} ({1} eb_created_by, eb_created_at, eb_loc_id, {3}_id ) VALUES ({2} :eb_createdby, " + DataDB.EB_CURRENT_TIMESTAMP + ", :eb_loc_id, :{4}_id);";
                         string _cols = string.Empty, _vals = string.Empty;
                         foreach (SingleColumn rField in row.Columns)
                         {
@@ -746,7 +747,8 @@ namespace ExpressBase.Objects
                             }
                             else if ((EbDbTypes)rField.Type == EbDbTypes.DateTime)
                             {
-                                rField.Value = DateTime.ParseExact(rField.Value.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture).ConvertToUtc(this.UserObj.Preference.TimeZone);
+                                DateTime dt = DateTime.ParseExact(rField.Value.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
+                                rField.Value = dt.ConvertToUtc(this.UserObj.Preference.TimeZone);
                                 param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
                             }
                             else
@@ -823,7 +825,7 @@ namespace ExpressBase.Objects
                 foreach (SingleRow row in entry.Value)
                 {
                     string _qry = "INSERT INTO {0} ({1} eb_created_by, eb_created_at, eb_loc_id {3} ) VALUES ({2} :eb_createdby, " + DataDB.EB_CURRENT_TIMESTAMP + ", :eb_loc_id {4});";
-                    if(DataDB.Vendor == DatabaseVendors.MYSQL && entry.Key == this.FormSchema.MasterTable)
+                    if (DataDB.Vendor == DatabaseVendors.MYSQL && entry.Key == this.FormSchema.MasterTable)
                     {
                         _qry += "SELECT eb_persist_currval('" + entry.Key + "_id_seq');";
                     }
@@ -837,7 +839,7 @@ namespace ExpressBase.Objects
                         if (rField.Control is EbAutoId)
                         {
                             _cols += string.Concat(rField.Name, ", ");
-                            _values += string.Format("CONCAT(:{0}_{1}, (SELECT LPAD(CAST((COUNT(*) + 1) as CHAR(100))), {2}, '0') FROM {3} WHERE {0} LIKE '{4}%'),", rField.Name, i, (rField.Control as EbAutoId).Pattern.SerialLength, entry.Key, rField.Value);
+                            _values += string.Format("CONCAT(:{0}_{1}, (SELECT LPAD(CAST((COUNT(*) + 1) AS CHAR(12)), {2}, '0') FROM {3} WHERE {0} LIKE '{4}%')),", rField.Name, i, (rField.Control as EbAutoId).Pattern.SerialLength, entry.Key, rField.Value);
                             param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
                         }
                         else if (rField.Control != null)
@@ -857,7 +859,8 @@ namespace ExpressBase.Objects
                             }
                             else if ((EbDbTypes)rField.Type == EbDbTypes.DateTime)
                             {
-                                rField.Value = DateTime.ParseExact(rField.Value.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture).ConvertToUtc(this.UserObj.Preference.TimeZone);
+                                DateTime dt = DateTime.ParseExact(rField.Value.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
+                                rField.Value = dt.ConvertToUtc(this.UserObj.Preference.TimeZone);
                                 param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
                             }
                             else
@@ -893,18 +896,18 @@ namespace ExpressBase.Objects
                 }
                 Innercxt.Add("context = CONCAT('" + EbObId + "_', CAST(eb_currval('" + this.TableName + "_id_seq') AS CHAR(32)), '_" + entry.Key + "')");
             }
-           
+
             if (InnerVals.Count > 0)
             {
-                
-                for ( int k = 0;k < InnerVals.Count; k++)
+
+                for (int k = 0; k < InnerVals.Count; k++)
                 {
                     fullqry += string.Format(@"UPDATE 
                                             eb_files_ref AS t
                                         SET
                                             context = {0}                                        
                                         WHERE
-                                           t.id = {1} AND t.eb_del = 'F';", InnerVals[k],InnerIds[k]);                    
+                                           t.id = {1} AND t.eb_del = 'F';", InnerVals[k], InnerIds[k]);
                 }
 
                 //fullqry += string.Format(@"UPDATE 
