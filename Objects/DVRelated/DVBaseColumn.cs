@@ -516,7 +516,7 @@ else if(this.RenderAs === 6){
     pg.ShowProperty('ItemFormId');
     pg.setSimpleProperty('IsTree', true);
     pg.HideProperty('LinkRefId');
-    pg.HideProperty('LinkType');
+    pg.ShowProperty('LinkType');
 }
 else{
     pg.HideProperty('LinkRefId');
@@ -585,7 +585,7 @@ else if(this.RenderAs === 3){
     pg.ShowProperty('ItemFormId');
     pg.setSimpleProperty('IsTree', true);
     pg.HideProperty('LinkRefId');
-    pg.HideProperty('LinkType');
+    pg.ShowProperty('LinkType');
 }
 else{
     pg.HideProperty('LinkRefId');
@@ -663,7 +663,7 @@ else if(this.RenderAs === 4){
     pg.ShowProperty('ItemFormId');
     pg.setSimpleProperty('IsTree', true);
     pg.HideProperty('LinkRefId');
-    pg.HideProperty('LinkType');
+    pg.ShowProperty('LinkType');
 }
 else{
     pg.HideProperty('LinkRefId');
@@ -730,7 +730,7 @@ else if(this.RenderAs === 2){
     pg.ShowProperty('ItemFormId');
     pg.setSimpleProperty('IsTree', true);
     pg.HideProperty('LinkRefId');
-    pg.HideProperty('LinkType');
+    pg.ShowProperty('LinkType');
 }
 else{
     pg.HideProperty('LinkRefId');
