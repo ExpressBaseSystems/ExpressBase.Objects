@@ -50,6 +50,7 @@ namespace ExpressBase.Objects
         public override string LabelForeColor { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [PropertyEditor(PropertyEditorType.Expandable)]
         [OnChangeUIFunction("EbTable.padding")]
         public new  UISides Padding { get; set; }
 
