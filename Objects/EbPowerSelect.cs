@@ -44,7 +44,7 @@ namespace ExpressBase.Objects
             get
             {
                 return @"
-                     this.initializer.setValues(p1);
+                     this.initializer.setValues(p1, p2);
                 ";
             }
             set { }
