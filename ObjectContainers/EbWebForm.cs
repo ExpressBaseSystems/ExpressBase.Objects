@@ -420,11 +420,13 @@ namespace ExpressBase.Objects
                     continue;
 
                 SingleRow Row = new SingleRow();
+                bool skipFst = true;
                 foreach (EbDataColumn dataColumn in dataTable.Columns)
                 {
-                    if (dataColumn.ColumnName == "eb_loc_id")
+                    if (dataColumn.ColumnName == "eb_loc_id" && skipFst)
                     {
                         Row.LocId = Convert.ToInt32(dataRow[dataColumn.ColumnIndex]);
+                        skipFst = false;
                     }
                     else if (dataRow.IsDBNull(dataColumn.ColumnIndex))
                     {
@@ -1647,7 +1649,7 @@ namespace ExpressBase.Objects
             }
             foreach (EbControl control in _flatControls)
             {
-                if (!control.DoNotPersist)
+                if (!control.DoNotPersist || control.IsSysControl)
                 {
                     if (control is EbFileUploader)
                         _schema.ExtendedControls.Add(control);
