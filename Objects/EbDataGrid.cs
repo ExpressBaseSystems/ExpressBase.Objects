@@ -29,6 +29,12 @@ namespace ExpressBase.Objects
         [PropertyGroup("Identity")]
         public override int Height { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [DefaultPropValue("true")]
+        [PropertyGroup("Behavior")]
+        [Alias("Serial numbered")]
+        public bool IsShowSerialNumber{ get; set; }
+
         [JsonIgnore]
         public override string OnChangeBindJSFn
         {
@@ -96,7 +102,7 @@ $.each(this.Controls.$values, function (i, col) {
         <table id='tbl_@ebsid@_head' class='table table-bordered dgtbl'>
             <thead>
               <tr>
-                <th style='width:34px'><span class='grid-col-title'>SL No</span></th>";
+                <th class='slno' style='width:34px'><span class='grid-col-title'>SL No</span></th>";
             foreach (EbDGColumn col in Controls)
             {
                 if (!col.Hidden)
