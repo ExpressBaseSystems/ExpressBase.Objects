@@ -1,6 +1,7 @@
 ﻿using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
+using ExpressBase.Common.Structures;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -10,10 +11,7 @@ using System.Threading.Tasks;
 
 namespace ExpressBase.Objects
 {
-    [ProtoBuf.ProtoContract]
     [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
-    [HideInPropertyGrid]
-    [HideInToolBox]
     public class EbButton : EbControlUI
     {
         public EbButton() { }
@@ -24,18 +22,18 @@ namespace ExpressBase.Objects
             this.BareControlHtml = this.GetBareHtml();
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
+        
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+        public override string Label { get; set; }
 
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+        public override bool DoNotPersist { get { return true; } }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
-        [ProtoBuf.ProtoMember(1)]
-        [PropertyGroup("Appearance")]
-        public string Text { get; set; }
-
-        public override string GetHead()
-        {
-            return this.RequiredString + @"
-                    ".Replace("@name", ""); //this.Id.ToString()
-        }
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [OSE_ObjectTypes(EbObjectTypes.iWebForm)]
+        public string FormRefId { get; set; }
 
         public override string GetDesignHtml()
         {
@@ -49,12 +47,9 @@ namespace ExpressBase.Objects
 
         public override string GetBareHtml()
         {
-            return @"
-                    <button id='@name' class='btn btn-default'  data-toggle='tooltip' title='@toolTipText' style='width:100%; @backColor @foreColor @fontStyle'>@Text@</button>"
-.Replace("@name@", this.Name)
-
-    .Replace("@Text@", (this.Text != null) ? this.Text : "@Text@")
-
+            return @"<button id='@ebsid@' class='btn btn-default' style='width:100%; @backColor @foreColor @fontStyle' disabled >@Label@</button>"
+                .Replace("@ebsid@", this.EbSid)
+                .Replace("@Label@", this.Label ??"@Text@")
 .Replace("@tabIndex", "tabindex='" + this.TabIndex + "'")
 .Replace("@backColor", "background-color:" + this.BackColor + ";")
 .Replace("@foreColor", "color:" + this.ForeColor + ";")
@@ -67,16 +62,14 @@ namespace ExpressBase.Objects
 
         private string GetHtmlHelper(RenderMode mode)
         {
-            return string.Format(@"
-<div id='@namecontainer' class='Eb-ctrlContainer'>
-       @barehtml@    
-</div>
-"
-.Replace("@barehtml@", this.GetBareHtml())
-.Replace("@name", this.Name)
-.Replace("@isHidden@", this.Hidden.ToString())
-.Replace("@toolTipText", this.ToolTipText)
-);
+            string EbCtrlHTML = @"
+            <div id='cont_@ebsid@' ebsid='@ebsid@' name='@name@' class='Eb-ctrlContainer' @childOf@ ctype='@type@' eb-hidden='@isHidden@'>
+                <div  id='@ebsid@Wraper' class='ctrl-cover'>
+                    @barehtml@
+                </div>
+                <span class='helpText' ui-helptxt >@helpText@ </span>
+            </div>";
+            return ReplacePropsInHTML(EbCtrlHTML);
         }
        
     }

@@ -407,4 +407,16 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string TableName { get; set; }
         public string FieldName { get; set; }
     }
+
+    public class UpdateTreeColumnRequest : EbServiceStackAuthRequest, IReturn<UpdateTreeColumnResponse>
+    {
+        [DataMember(Order = 1)]
+        public string sql { get; set; }
+    }
+
+    public class UpdateTreeColumnResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
 }

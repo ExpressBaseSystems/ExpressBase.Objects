@@ -1,6 +1,7 @@
 ﻿using ExpressBase.Common;
 using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
+using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Singletons;
 using ExpressBase.Common.Structures;
 using ExpressBase.Data;
@@ -251,6 +252,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 13)]
         public byte[] excel_file { get; set; }
+
+        [DataMember(Order = 14)]
+        public List<Node<EbDataRow>> Tree { get; set; }
+
+        [DataMember(Order = 15)]
+        public string TableName { get; set; }
 
     }
 
@@ -719,21 +726,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class SqlFuncTestResponse : IEbSSResponse
+    public class SqlFuncTestResponse
     {
         [DataMember(Order = 1)]
-        public ResponseStatus ResponseStatus { get; set; }
+        public bool Reponse { set; get; }
 
         [DataMember(Order = 2)]
-        public string Reponse { set; get; }
-
-        [DataMember(Order = 3)]
         public EbDataTable Data { set; get; }
-
-        public SqlFuncTestResponse()
-        {
-            ResponseStatus = new ResponseStatus();
-        }
     }
 
     [DataContract]

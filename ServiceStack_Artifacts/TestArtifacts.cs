@@ -15,6 +15,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         //[DataMember(Order = 1)]
         //public string dbName { get; set; }
+        public EbSurveyQuery Query { get; set; }
     }
     [DataContract]
     public class TestResponse : IEbSSResponse

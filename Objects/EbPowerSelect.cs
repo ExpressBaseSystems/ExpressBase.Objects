@@ -10,6 +10,7 @@ using ServiceStack;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data.Common;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
@@ -43,7 +44,7 @@ namespace ExpressBase.Objects
             get
             {
                 return @"
-                     this.initializer.setValues(p1);
+                     this.initializer.setValues(p1, p2);
                 ";
             }
             set { }
@@ -316,7 +317,7 @@ console.log(1000);
                      <div class='spinner' style='display: none;'>Loading...</div>
                   </div>
                </div>
-               <span class='input-group-addon' style='border-radius: 0px;'><i id='acmasteridTglBtn' aria-hidden='true' class='fa  fa-search'></i></span>
+               <span class='input-group-addon'><i id='acmasteridTglBtn' aria-hidden='true' class='fa  fa-search'></i></span>
             </div>
          </div>
       </div>
@@ -358,9 +359,7 @@ console.log(1000);
             return ReplacePropsInHTML(EbCtrlHTML);
         }
 
-
-        //INCOMPLETE
-        public string GetSelectQuery(Service service, string Col, string Tbl = null, string _id = null)
+        private string GetSql(Service service)
         {
             EbDataReader dr = service.Redis.Get<EbDataReader>(this.DataSourceId);
             if (dr == null)
@@ -374,14 +373,34 @@ console.log(1000);
             if (Sql.LastIndexOf(";") == Sql.Length - 1)
                 Sql = Sql.Substring(0, Sql.Length - 1);
 
-            if (Tbl == null || _id == null)
+            return Sql;
+        }
+
+        //INCOMPLETE// to get the entire columns(vm+dm+others) in ps query
+        public string GetSelectQuery(Service service, string Col, string Tbl = null, string _id = null)
+        {
+            string Sql = this.GetSql(service);
+
+            if (Tbl == null || _id == null)// prefill mode
                 return string.Format(@"SELECT __A.* FROM ({0}) __A 
-                                    WHERE __A.{1} = ANY(STRING_TO_ARRAY({2}::TEXT, ',')::INT[]);",
+                                    WHERE __A.{1} = ANY(STRING_TO_ARRAY('{2}'::TEXT, ',')::INT[]);",
                                     Sql, this.ValueMember.Name, Col);
-            else
+            else// normal mode
                 return string.Format(@"SELECT __A.* FROM ({0}) __A, {1} __B
                                     WHERE __A.{2} = ANY(STRING_TO_ARRAY(__B.{3}::TEXT, ',')::INT[]) AND __B.{4} = :id;",
                                         Sql, Tbl, this.ValueMember.Name, Col, _id);
+        }
+
+        //to get vm+dm only for audit trail
+        public string GetDisplayMembersQuery(Service service, string vms)
+        {
+            string Sql = this.GetSql(service);
+            string vm = this.ValueMember.Name;
+            string dm = string.Join(',', this.DisplayMembers.Select(e => e.Name));
+
+            return string.Format(@"SELECT {0}, {1} FROM ({2}) __A
+                                        WHERE __A.{0} = ANY(STRING_TO_ARRAY('{3}'::TEXT, ',')::INT[]);",
+                                            vm, dm, Sql, vms);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Connections;
 using ExpressBase.Common.Constants;
 using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack;
@@ -309,5 +310,21 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         //        }
         //    }
         //}
+    }
+
+    public class EbBaseTenatService : Service
+    {
+        private EbConnectionFactory _infraConnectionFactory = null;
+
+        protected EbConnectionFactory InfraConnectionFactory
+        {
+            get
+            {
+                if (_infraConnectionFactory == null)
+                    _infraConnectionFactory = new EbConnectionFactory(EbConnectionsConfigProvider.InfraConnections,CoreConstants.EXPRESSBASE);
+
+                return _infraConnectionFactory;
+            }
+        }
     }
 }
