@@ -490,11 +490,11 @@ namespace ExpressBase.Objects
 
                 GetFormattedData(dataTable, Table);
 
-                if (!_FormData.MultipleTables.ContainsKey(dataTable.TableName) && Table.Count > 0)
-                    _FormData.MultipleTables.Add(dataTable.TableName, Table);
+                if (!_FormData.MultipleTables.ContainsKey(_schema.Tables[i].TableName) && Table.Count > 0)
+                    _FormData.MultipleTables.Add(_schema.Tables[i].TableName, Table);
             }
             if (_FormData.MultipleTables.Count > 0)
-                _FormData.MasterTable = dataset.Tables[0].TableName;
+                _FormData.MasterTable = _schema.Tables[0].TableName;
 
             if (dataset.Tables.Count > _schema.Tables.Count)
             {
@@ -559,7 +559,16 @@ namespace ExpressBase.Objects
                     {
                         DbParameter t = param.Find(e => e.ParameterName == column.Name);
                         if (t == null)
-                            param.Add(DataDB.GetNewParameter(column.Name, (EbDbTypes)column.Type, column.Value));
+                        {
+                            if (column.Value == null)
+                            {
+                                var p = DataDB.GetNewParameter(column.Name, (EbDbTypes)column.Type);
+                                p.Value = DBNull.Value;
+                                param.Add(p);
+                            }
+                            else
+                                param.Add(DataDB.GetNewParameter(column.Name, (EbDbTypes)column.Type, column.Value));
+                        }
                     }
                 }
                 DbParameter tt = param.Find(e => e.ParameterName == "eb_loc_id");
@@ -808,7 +817,7 @@ namespace ExpressBase.Objects
 
             param.Add(DataDB.GetNewParameter(this.FormData.MasterTable + "_id", EbDbTypes.Int32, this.FormData.MultipleTables[this.FormData.MasterTable][0].RowId));
             param.Add(DataDB.GetNewParameter("eb_loc_id", EbDbTypes.Int32, this.LocationId));
-            param.Add(DataDB.GetNewParameter("eb_loc_s", EbDbTypes.String, this.SolutionObj.Locations.ContainsKey(this.LocationId)? this.SolutionObj.Locations[this.LocationId].ShortName : string.Empty));
+            param.Add(DataDB.GetNewParameter("eb_loc_s", EbDbTypes.String, this.SolutionObj.Locations.ContainsKey(this.LocationId) ? this.SolutionObj.Locations[this.LocationId].ShortName : string.Empty));
             param.Add(DataDB.GetNewParameter("eb_createdby", EbDbTypes.Int32, this.UserObj.UserId));
             param.Add(DataDB.GetNewParameter("eb_createdby_s", EbDbTypes.String, this.UserObj.FullName));
             param.Add(DataDB.GetNewParameter("eb_modified_by", EbDbTypes.Int32, this.UserObj.UserId));
@@ -1242,9 +1251,9 @@ namespace ExpressBase.Objects
                     if (cField.Name.Equals("id"))//skipping 'id' field
                         continue;
                     ColumnSchema _column = _table.Columns.Find(c => c.ColumnName.Equals(cField.Name));
-                    if(_column != null)
+                    if (_column != null)
                     {
-                        if ((_column.Control as EbControl).DoNotPersist)//shipping DoNotPersist field from audit entry// written for EbSystemControls
+                        if ((_column.Control as EbControl).DoNotPersist)//skip DoNotPersist field from audit entry// written for EbSystemControls
                             continue;
                     }
 
