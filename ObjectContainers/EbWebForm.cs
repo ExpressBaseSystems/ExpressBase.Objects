@@ -739,7 +739,7 @@ namespace ExpressBase.Objects
                     }
                     else
                     {
-                        string _qry = "INSERT INTO {0} ({1} eb_created_by, eb_created_by_s, eb_created_at, eb_loc_id, eb_loc_s, {3}_id ) VALUES ({2} :eb_createdby, :eb_createdby_s " + DataDB.EB_CURRENT_TIMESTAMP + ", :eb_loc_id, :eb_loc_s, :{4}_id);";
+                        string _qry = "INSERT INTO {0} ({1} eb_created_by, eb_created_by_s, eb_created_at, eb_loc_id, eb_loc_s, {3}_id ) VALUES ({2} :eb_createdby, :eb_createdby_s, " + DataDB.EB_CURRENT_TIMESTAMP + ", :eb_loc_id, :eb_loc_s, :{4}_id);";
                         string _cols = string.Empty, _vals = string.Empty;
                         foreach (SingleColumn rField in row.Columns)
                         {
