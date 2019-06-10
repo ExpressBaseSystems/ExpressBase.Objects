@@ -66,6 +66,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 5)]
         public string u_token { get; set; }
+
+        [DataMember(Order = 6)]
+        public string Sol_id_autogen { get; set; }
+
     }
 
     [DataContract]
