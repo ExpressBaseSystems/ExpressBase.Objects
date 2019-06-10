@@ -128,7 +128,7 @@ SELECT
 FROM
 	eb_files_ref B
 WHERE
-	B.context = :context || '_@Name@' AND B.eb_del = 'F';".Replace("@Name@", this.Name?? this.EbSid);
+	B.context = CONCAT(:context, '_@Name@') AND B.eb_del = 'F';".Replace("@Name@", this.Name?? this.EbSid);
 
             return Qry;
         }
