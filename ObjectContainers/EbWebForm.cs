@@ -902,11 +902,11 @@ namespace ExpressBase.Objects
                 {
                     string cn = entry.Key + "_" + i.ToString();
                     i++;
-                    InnerVals.Add(string.Format("( CONCAT('{0}_', CAST(eb_currval('{1}_id_seq') AS CHAR(32)), '_{2}'))", EbObId, this.TableName, entry.Key));
+                    InnerVals.Add(string.Format("( CONCAT('{0}_', TRIM(CAST(eb_currval('{1}_id_seq') AS CHAR(32))), '_{2}'))", EbObId, this.TableName, entry.Key));
                     param.Add(DataDB.GetNewParameter(cn, EbDbTypes.Decimal, row.Columns[0].Value));
                     InnerIds.Add(":" + cn);
                 }
-                Innercxt.Add("context = CONCAT('" + EbObId + "_', CAST(eb_currval('" + this.TableName + "_id_seq') AS CHAR(32)), '_" + entry.Key + "')");
+                Innercxt.Add("context = CONCAT('" + EbObId + "_', TRIM(CAST(eb_currval('" + this.TableName + "_id_seq') AS CHAR(32))), '_" + entry.Key + "')");
             }
 
             if (InnerVals.Count > 0)
