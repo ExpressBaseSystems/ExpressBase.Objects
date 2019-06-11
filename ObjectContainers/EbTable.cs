@@ -50,8 +50,18 @@ namespace ExpressBase.Objects
         public override string LabelForeColor { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [PropertyEditor(PropertyEditorType.Expandable)]
         [OnChangeUIFunction("EbTable.padding")]
+        [DefaultPropValue(0, 0, 0, 0)]
         public override UISides Padding { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyEditor(PropertyEditorType.Expandable)]
+        [PropertyGroup("Appearance")]
+        [UIproperty]
+        [OnChangeUIFunction("Common.MARGIN")]
+        [DefaultPropValue(0, 0, 0, 0)]
+        public override UISides Margin { get; set; }
 
         public EbTableLayout()
         {
@@ -145,6 +155,7 @@ this.Init = function(id){
                 .Replace("@ebsid@", this.EbSid);
         }
     }
+
 }
 
 [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]

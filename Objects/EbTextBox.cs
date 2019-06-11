@@ -52,6 +52,15 @@ namespace ExpressBase.Objects
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
 
+        [JsonIgnore]
+        public override string DisableJSfn { get {
+                return @"$('#cont_' + this.EbSid_CtxId + ' *')
+.attr('disabled', 'disabled').css('pointer-events', 'none')
+.find('[ui-inp]').css('background-color', '#f3f3f3');
+$('#cont_' + this.EbSid_CtxId + ' .ctrl-cover').css('pointer-events', 'inherit')
+.find('[ui-inp]').css('pointer-events', 'inherit')";
+            } set { } }
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [HelpText("To limit number of charecters")]
         [PropertyGroup("Behavior")]

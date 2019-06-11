@@ -29,6 +29,12 @@ namespace ExpressBase.Objects
         [PropertyGroup("Identity")]
         public override int Height { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [DefaultPropValue("true")]
+        [PropertyGroup("Behavior")]
+        [Alias("Serial numbered")]
+        public bool IsShowSerialNumber{ get; set; }
+
         [JsonIgnore]
         public override string OnChangeBindJSFn
         {
@@ -48,7 +54,7 @@ $.each(this.Controls.$values, function (i, col) {
         public override bool IsSpecialContainer { get { return true; } set { } }
 
         [OnDeserialized]
-        public void OnDeserializedMethod(StreamingContext context)
+        public new void OnDeserializedMethod(StreamingContext context)
         {
             this.BareControlHtml = this.GetBareHtml();
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
@@ -61,6 +67,9 @@ $.each(this.Controls.$values, function (i, col) {
                 }
             }
         }
+
+        [JsonIgnore]
+        public override UISides Padding { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.Collection)]
@@ -93,7 +102,7 @@ $.each(this.Controls.$values, function (i, col) {
         <table id='tbl_@ebsid@_head' class='table table-bordered dgtbl'>
             <thead>
               <tr>
-                <th style='width:50px'><span class='grid-col-title'>SL. No.</span></th>";
+                <th class='slno' style='width:34px'><span class='grid-col-title'>SL No</span></th>";
             foreach (EbDGColumn col in Controls)
             {
                 if (!col.Hidden)
@@ -207,7 +216,7 @@ $.each(this.Controls.$values, function (i, col) {
         public virtual string InputControlType { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
-        public bool IsDisable { get; set; }
+        public override bool IsDisable { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [DefaultPropValue("true")]
@@ -423,8 +432,14 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, func
         }
 
         [JsonIgnore]
-        public override string EnableJSfn { get {
-                return @"$('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] .ctrl-cover .dropdown-toggle`).prop('disabled',false).css('pointer-events', 'inherit').find('[ui-inp]').css('background-color', '#fff');"; } set { } }
+        public override string EnableJSfn
+        {
+            get
+            {
+                return @"$('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] .ctrl-cover .dropdown-toggle`).prop('disabled',false).css('pointer-events', 'inherit').find('[ui-inp]').css('background-color', '#fff');";
+            }
+            set { }
+        }
 
         public override string GetDisplayMemberJSfn { get { return @" return $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp] :selected`).text(); "; } set { } }
 
@@ -601,16 +616,7 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, func
             this.EbPowerSelect = new EbPowerSelect();
         }
 
-        public override string SetValueJSfn
-        {
-            get
-            {
-                return @"
-                     this.initializer.setValues(p1);
-                ";
-            }
-            set { }
-        }
+        public override string SetValueJSfn { get { return EbPowerSelect.SetValueJSfn; } set { } }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyGroup("Appearance")]

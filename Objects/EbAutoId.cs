@@ -51,7 +51,17 @@ namespace ExpressBase.Objects
 
         private string GetHtmlHelper()
         {
-            string EbCtrlHTML = HtmlConstants.CONTROL_WRAPER_HTML4WEB
+            string WraperHtml = @"
+        <div id='cont_@ebsid@' ebsid='@ebsid@' name='@name@' class='Eb-ctrlContainer' @childOf@ ctype='@type@' eb-hidden='@isHidden@'>
+            <i class='fa fa-key' aria-hidden='true' style='font-size: 14px;'></i>
+            <span class='eb-ctrl-label' ui-label id='@ebsidLbl'>@Label@ </span> @req@ 
+                <div  id='@ebsid@Wraper' class='ctrl-cover'>
+                    @barehtml@
+                </div>
+            <span class='helpText' ui-helptxt >@helpText@ </span>
+        </div>";
+
+            string EbCtrlHTML = WraperHtml
                .Replace("@LabelForeColor ", "color:" + (LabelForeColor ?? "@LabelForeColor ") + ";")
                .Replace("@LabelBackColor ", "background-color:" + (LabelBackColor ?? "@LabelBackColor ") + ";");
 
@@ -85,7 +95,7 @@ namespace ExpressBase.Objects
         public override string GetBareHtml()
         {
             return @"
-            <input id='@ebsid@' data-ebtype='@data-ebtype@'  data-toggle='tooltip' title='@toolTipText@' class='date' type='text' name='@name@' autocomplete = 'off' @value@ @tabIndex@ style='width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@ @readOnlyString@ @required@ @placeHolder@ disabled />
+            <input id='@ebsid@' data-ebtype='@data-ebtype@'  data-toggle='tooltip' title='@toolTipText@' class='date' type='text' name='@name@' autocomplete = 'off' @value@ @tabIndex@ style='font-size: 14px; width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@ @readOnlyString@ @required@ @placeHolder@ disabled />
             "
 .Replace("@name@", (this.Name != null ? this.Name.Trim() : ""))
 .Replace("@data-ebtype@", "16")//( (int)this.EbDateType ).ToString())
@@ -93,7 +103,8 @@ namespace ExpressBase.Objects
 .Replace("@ebsid@", String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId)
 .Replace("@value@", "")//"value='" + this.Value + "'")
 .Replace("@tabIndex@", "tabindex='" + this.TabIndex + "'")
-    .Replace("@BackColor@ ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor@ ") + ";"))
+.Replace("@BackColor@ ", "background-color: #eee;")
+    //.Replace("@BackColor@ ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor@ ") + ";"))
     .Replace("@ForeColor@ ", "color:" + ((this.ForeColor != null) ? this.ForeColor : "@ForeColor@ ") + ";")
 .Replace("@required@", (this.Required && !this.Hidden ? " required" : string.Empty))
 .Replace("@readOnlyString@", this.ReadOnlyString)

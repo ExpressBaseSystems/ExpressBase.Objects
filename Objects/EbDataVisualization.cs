@@ -50,7 +50,8 @@ namespace ExpressBase.Objects
         Popout,
         Inline,
         Both,
-		Tab
+        Popup,
+        Tab
     }
 
     [EnableInBuilder(BuilderType.BotForm)]
