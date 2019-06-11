@@ -10,11 +10,18 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class Wiki
     {
         public int Id { get; set; }
+
         public string Title { get; set; }
+
         public string Category { get; set; }
+
         public string HTML { get; set; }
+
         public DateTime CreatedAt { get; set; }
-        public string CreatedBy { get; set; }
+
+        public Int32 CreatedBy { get; set; }
+
+        public string Tags { get; set; }
     }
 
     public class PersistWikiRequest : IEbTenentRequest, IReturn<PersistWikiResponse>
@@ -23,15 +30,31 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public Wiki Wiki { get; set; }
 
         public string SolnId { get ; set ; }
-        public int UserId { get; set; }
 
-        //public string Title { get; set; }
-        //public string Subtitle { get; set; }
-        //public string Content { get; set; }
+        public int UserId { get; set; }
+        
 
     }
 
     public class PersistWikiResponse
+    {
+
+        public Wiki Wiki { get; set; }
+
+        public bool ResponseStatus { get; set; }
+    }
+
+    public class UpdateWikiRequest : IEbTenentRequest, IReturn<UpdateWikiResponse>
+    {
+        public Wiki Wiki { get; set; }
+
+        public string SolnId { get ; set ; }
+
+        public int UserId { get; set; }
+
+    }
+
+    public class UpdateWikiResponse
     {
         public Wiki Wiki { get; set; }
 
@@ -41,8 +64,11 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class GetWikiListRequest : EbServiceStackNoAuthRequest, IReturn<GetWikiListResponse>
     {
         public string Category { get; set; }
+
         public string Tag { get; set; }
+
         public DateTime StartDate { get; set; }
+
         public DateTime EndDate { get; set; }
     }
 
@@ -55,12 +81,11 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public List<Wiki> WikiList { get; set; }
 
-
     }
 
     public class GetWikiByIdRequest : EbServiceStackNoAuthRequest, IReturn<GetWikiByIdResponse>
     {
-        public Wiki Wiki { get; set; }
+        public int Id { get; set; }
     }
 
     public class GetWikiByIdResponse
@@ -68,34 +93,28 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public Wiki Wiki { get; set; }
     }
 
-    //public class GetTitleRequest : EbServiceStackNoAuthRequest
-    //{
+    public class GetWikiRequest : EbServiceStackNoAuthRequest, IReturn<GetWikiResponse>
+    {
+        public int Id { get; set; }
+    }
 
-    //}
-    //public class GetTitleResponse : EbServiceStackNoAuthRequest
-    //{
-    //    public List<string> Title { get; set; }
+    public class GetWikiResponse
+    {
+        public Wiki Wiki { get; set; }
+    }
 
-    //    public GetTitleResponse()
-    //    {
-    //        Title = new List<string>();
-    //    }
-    //}
+      public class GetWikiBySearchRequest : EbServiceStackNoAuthRequest, IReturn<GetWikiBySearchResponse>
+    {
+        public string Wiki_Search { get; set; }
+    }
 
-    //public class GetContentResponse : EbServiceStackNoAuthRequest
-    //{
-    //    public List<string> Content { get; set; }
-
-    //    public GetContentResponse()
-    //    {
-    //        Content = new List<string>();
-    //    }
-    //}
-
-    //public class GetContentRequest : EbServiceStackNoAuthRequest
-    //{
-    //    public string Contentname { get; set; }
-    //}
-
+    public class GetWikiBySearchResponse
+    {
+        public GetWikiBySearchResponse()
+        {
+            WikiListBySearch = new List<Wiki>();
+        }
+        public List<Wiki> WikiListBySearch { get; set; }
+    }
 
 }
