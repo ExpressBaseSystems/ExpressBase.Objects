@@ -86,7 +86,7 @@ namespace ExpressBase.Objects
         {
             get
             {
-                if (_dataFieldsUsed == null)
+                if (_dataFieldsUsed == null || _dataFieldsUsed.Count() <= 0)
                 {
                     if (this.AppearExpression != null && this.AppearExpression.Code != null)
                     {
@@ -99,6 +99,10 @@ namespace ExpressBase.Objects
                         foreach (string match in matches)
                             _dataFieldsUsed[i++] = match;
                     }
+                }
+                else
+                {
+                    _dataFieldsUsed = new string[0];
                 }
 
                 return _dataFieldsUsed;
@@ -806,7 +810,7 @@ namespace ExpressBase.Objects
         public bool AmountInWords { get; set; }
 
         private string[] _dataFieldsUsed;
-        public new string[] DataFieldsUsedCalc
+        public string[] DataFieldsUsedCalc
         {
             get
             {
@@ -814,8 +818,8 @@ namespace ExpressBase.Objects
                     if (ValExpression != null && ValExpression.Code != null)
                     {
                         IEnumerable<string> matches = Regex.Matches(ValExpression.Code, @"T[0-9]{1}.\w+").OfType<Match>()
-         .Select(m => m.Groups[0].Value)
-         .Distinct();
+                             .Select(m => m.Groups[0].Value)
+                             .Distinct();
 
 
                         _dataFieldsUsed = new string[matches.Count()];
@@ -858,14 +862,15 @@ namespace ExpressBase.Objects
             Rep.AddParamsNCalcsInGlobal(globals);
             try
             {
-                foreach (string calcfd in DataFieldsUsedCalc)
-                {
-                    string TName = calcfd.Split('.')[0];
-                    int TableIndex = Convert.ToInt32(TName.Substring(1));
-                    string fName = calcfd.Split('.')[1];
-                    int RowIndex = (TableIndex == Rep.DetailTableIndex) ? slno : 0;
-                    globals[TName].Add(fName, new NTV { Name = fName, Type = Rep.DataSet.Tables[TableIndex].Columns[fName].Type, Value = Rep.DataSet.Tables[TableIndex].Rows[RowIndex][fName] });
-                }
+                if (DataFieldsUsedCalc != null && DataFieldsUsedCalc.Count() > 0)
+                    foreach (string calcfd in DataFieldsUsedCalc)
+                    {
+                        string TName = calcfd.Split('.')[0];
+                        int TableIndex = Convert.ToInt32(TName.Substring(1));
+                        string fName = calcfd.Split('.')[1];
+                        int RowIndex = (TableIndex == Rep.DetailTableIndex) ? slno : 0;
+                        globals[TName].Add(fName, new NTV { Name = fName, Type = Rep.DataSet.Tables[TableIndex].Columns[fName].Type, Value = Rep.DataSet.Tables[TableIndex].Rows[RowIndex][fName] });
+                    }
                 column_val = (Rep.ValueScriptCollection[Name].RunAsync(globals)).Result.ReturnValue.ToString();
 
                 dbtype = (EbDbTypes)CalcFieldIntType;
