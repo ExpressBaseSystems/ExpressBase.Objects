@@ -52,10 +52,20 @@ namespace ExpressBase.Objects
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
 
+        [JsonIgnore]
+        public override string DisableJSfn { get {
+                return @"$('#cont_' + this.EbSid_CtxId + ' *')
+.attr('disabled', 'disabled').css('pointer-events', 'none')
+.find('[ui-inp]').css('background-color', '#f3f3f3');
+$('#cont_' + this.EbSid_CtxId + ' .ctrl-cover').css('pointer-events', 'inherit')
+.find('[ui-inp]').css('pointer-events', 'inherit')";
+            } set { } }
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [HelpText("To limit number of charecters")]
         [PropertyGroup("Behavior")]
         [PropertyEditor(PropertyEditorType.Number)]
+        [PropertyPriority(99)]
         [OnChangeExec(@"
 if (this.MaxLength <= 10 ){
     pg.MakeReadOnly('PlaceHolder');
@@ -96,11 +106,12 @@ else {
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup("Behavior")]
-        [DefaultPropValue("5")]
+        [DefaultPropValue("3")]
         public int RowsVisible { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup(@"Behavior")]
+        [PropertyPriority(8)]
         [HelpText("specifies a short hint that describes the expected value of an input field (e.g. a sample value or a short description of the expected format)")]
         public string PlaceHolder { get; set; }
 
@@ -279,8 +290,8 @@ else {
             get
             {
                 return @"
-            <textarea id='@ebsid@' ui-inp name='@name@' rows='@RowsVisible@' '@AutoCompleteOff@' data-toggle='tooltip'  data-placement='top' title='@ToolTipText@' 
-                @tabIndex@ @MaxLength@  style='width:100%; height:@heightpx; @BackColor@ @ForeColor@ display:inline-block; @fontStyle @ReadOnlyString@  @Required@  @PlaceHolder@  @Text@  @TabIndex></textarea>"
+            <textarea id='@ebsid@' class='eb-textarea' ui-inp name='@name@' rows='@RowsVisible@' '@AutoCompleteOff@' data-toggle='tooltip'  data-placement='top' title='@ToolTipText@' 
+                @tabIndex@ @MaxLength@  style='width:100%;' @Required@  @PlaceHolder@  @Text@  @TabIndex></textarea>"
 .Replace("@name@", this.Name)
 .Replace("@ebsid@", String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId)
 .Replace("@MaxLength@", "maxlength='" + ((this.MaxLength > 0) ? this.MaxLength.ToString() : "@MaxLength") + "'")
@@ -292,7 +303,7 @@ else {
     .Replace("@BackColor@", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor ") + ";"))
     .Replace("@ForeColor@", "color:" + ((this.ForeColor != null) ? this.ForeColor : "@ForeColor ") + ";")
     .Replace("@Text@ ", "value='" + ((this.Text != null) ? this.Text : "@Text@") + "' ")
-    .Replace("@RowsVisible@", (this.RowsVisible != 0) ? this.RowsVisible.ToString() : "5");
+    .Replace("@RowsVisible@", (this.RowsVisible != 0) ? this.RowsVisible.ToString() : "3");
             }
             set { }
         }

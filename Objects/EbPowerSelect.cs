@@ -44,7 +44,7 @@ namespace ExpressBase.Objects
             get
             {
                 return @"
-                     this.initializer.setValues(p1);
+                     this.initializer.setValues(p1, p2);
                 ";
             }
             set { }
@@ -317,7 +317,7 @@ console.log(1000);
                      <div class='spinner' style='display: none;'>Loading...</div>
                   </div>
                </div>
-               <span class='input-group-addon' style='border-radius: 0px;'><i id='acmasteridTglBtn' aria-hidden='true' class='fa  fa-search'></i></span>
+               <span class='input-group-addon'><i id='acmasteridTglBtn' aria-hidden='true' class='fa  fa-search'></i></span>
             </div>
          </div>
       </div>
@@ -376,21 +376,22 @@ console.log(1000);
             return Sql;
         }
 
-        //INCOMPLETE
+        //INCOMPLETE// to get the entire columns(vm+dm+others) in ps query
         public string GetSelectQuery(Service service, string Col, string Tbl = null, string _id = null)
         {
             string Sql = this.GetSql(service);
 
-            if (Tbl == null || _id == null)
+            if (Tbl == null || _id == null)// prefill mode
                 return string.Format(@"SELECT __A.* FROM ({0}) __A 
                                     WHERE __A.{1} = ANY(STRING_TO_ARRAY('{2}'::TEXT, ',')::INT[]);",
                                     Sql, this.ValueMember.Name, Col);
-            else
+            else// normal mode
                 return string.Format(@"SELECT __A.* FROM ({0}) __A, {1} __B
                                     WHERE __A.{2} = ANY(STRING_TO_ARRAY(__B.{3}::TEXT, ',')::INT[]) AND __B.{4} = :id;",
                                         Sql, Tbl, this.ValueMember.Name, Col, _id);
         }
 
+        //to get vm+dm only for audit trail
         public string GetDisplayMembersQuery(Service service, string vms)
         {
             string Sql = this.GetSql(service);

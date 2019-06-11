@@ -42,7 +42,7 @@ namespace ExpressBase.Objects
                     <div id='Wraper' class='ctrl-cover'>                             
                         <div class='input-group'style='width: 100 %; '> 
                                  <input id='' ui-inp='' data-ebtype='6' class='date' type='text' name=' tabindex='0' style='width: 100%; display: inline - block; background - color: rgb(255, 255, 255); color: rgb(51, 51, 51);' placeholder=''>
-                                 <span class='input-group-addon' style='padding: 0px; '>
+                                 <span class='input-group-addon'>
                                     <i class='fa fa-image'></i>
                                     <i class='fa fa-level-up'></i>
                             </span>
