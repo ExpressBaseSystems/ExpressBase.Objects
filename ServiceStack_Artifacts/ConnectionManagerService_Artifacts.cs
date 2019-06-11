@@ -3,6 +3,7 @@ using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
 using ExpressBase.Common.Messaging;
 using ServiceStack;
+using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
@@ -152,7 +153,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     //--------------------------------------------------------------------------Integrations--------------------------------------
-    public class AddDBRequest : IReturn<AddDBResponse>, IEbSSRequest
+    public class AddDBRequest : IReturn<AddDBResponse>, IEbTenentRequest
     {
         public EbDbConfig DbConfig { get; set; }
 
@@ -162,7 +163,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         //public bool IsNew { get; set; }
 
-        public string SolutionId { get; set; }
     }
 
     public class AddDBResponse : IEbSSResponse
@@ -196,7 +196,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-    public class AddTwilioRequest : IReturn<AddTwilioResponse>, IEbSSRequest
+    public class AddTwilioRequest : IReturn<AddTwilioResponse>, IEbTenentRequest
     {
         public EbTwilioConfig Config { get; set; }
 
@@ -210,7 +210,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-    public class AddETRequest : IReturn<AddETResponse>, IEbSSRequest
+    public class AddETRequest : IReturn<AddETResponse>, IEbTenentRequest
     {
         public EbExpertTextingConfig Config { get; set; }
 
@@ -224,7 +224,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-    public class AddMongoRequest : IReturn<AddMongoResponse>, IEbSSRequest
+    public class AddMongoRequest : IReturn<AddMongoResponse>, IEbTenentRequest
     {
         public EbMongoConfig Config { get; set; }
 
@@ -238,13 +238,14 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-    public class AddSmtpRequest : IReturn<AddMongoResponse>, IEbSSRequest
+    public class AddSmtpRequest : IReturn<AddMongoResponse>, IEbTenentRequest
     {
         public EbSmtpConfig Config { get; set; }
 
         public int UserId { get; set; }
 
         public string SolnId { get; set; }
+
     }
 
     public class AddSmtpResponse : IEbSSResponse
@@ -252,7 +253,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-    public class AddCloudinaryRequest : IReturn<AddCloudinaryResponse>, IEbSSRequest
+    public class AddCloudinaryRequest : IReturn<AddCloudinaryResponse>, IEbTenentRequest
     {
         public EbCloudinaryConfig Config { get; set; }
 
@@ -266,7 +267,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-    public class EbIntegrationRequest : IReturn<EbIntegrationResponse>, IEbSSRequest
+    public class EbIntegrationRequest : IReturn<EbIntegrationResponse>, IEbTenentRequest
     {
         public EbIntegration IntegrationO { get; set; }
 
@@ -289,5 +290,71 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class _GetConectionsResponse : IEbSSResponse
     {
         public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    [DataContract]
+    public class GetSolutioInfoRequests : IReturn<GetSolutioInfoResponses>, IEbSSRequest
+    {
+        [DataMember(Order = 0)]
+        public string IsolutionId { get; set; }
+
+        public string SolnId { get; set; }
+
+        public int UserId { get; set; }
+
+        public string Token { get; set; }
+
+    }
+
+    [DataContract]
+    public class GetSolutioInfoResponses : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public int id { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 3)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 4)]
+        public EbSolutionsWrapper SolutionInfo { get; set; }
+
+        [DataMember(Order = 5)]
+        public Dictionary<string,List<EbIntegrationConfData>> IntegrationsConfig { set; get; }
+
+        [DataMember(Order = 6)]
+        public Dictionary<string, List<EbIntegrationData>> Integrations { set; get; }
+
+    }
+    public class EbIntegrationConfData
+    {
+        public int Id { get; set; }
+
+        public string SolutionId { get; set; }
+
+        public string NickName { get; set; }
+
+        public string Type { get; set; }
+
+        public string ConObject { get; set; }
+
+        public string CreatedOn { get; set; }
+    }
+
+    public class EbIntegrationData
+    {
+        public string Id { get; set; }
+
+        public string ConfId { get; set; }
+
+        public string NickName { get; set; }
+
+        public string Ctype { get; set; }
+
+        public string Type { get; set; }
+
+        public string Preference { get; set; }
     }
 }
