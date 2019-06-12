@@ -62,6 +62,10 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.Collection)]
         public List<EbSQLValidator> DisableDelete { get; set; }
 
+        [PropertyGroup("Behavior")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        public WebFormAfterSaveModes FormModeAfterSave { get; set; }
+
         [PropertyGroup("Events")]
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.Collection)]
