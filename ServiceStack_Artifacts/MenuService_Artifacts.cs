@@ -24,8 +24,11 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 2)]
         public Dictionary<int, AppObject> AppList { get; set; }
 
-        [DataMember(Order = 2)]
+        [DataMember(Order = 3)]
         public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 4)]
+        public List<ObjWrap> Favourites { get; set; }
     }
 
     [DataContract]
@@ -115,6 +118,24 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public Dictionary<int, AppObject> AppList { get; set; }
 
         [DataMember(Order = 3)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    public class AddFavouriteRequest : IEbSSRequest, IReturn<AddFavouriteResponse>
+    {
+        [DataMember(Order = 1)]
+        public int ObjId { set; get; }
+
+        public string SolnId { get; set; }
+
+        public int UserId { get; set; }
+    }
+    public class AddFavouriteResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public bool Status { set; get; }
+
+        [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
     }
 }
