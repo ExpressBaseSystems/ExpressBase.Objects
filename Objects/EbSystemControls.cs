@@ -11,6 +11,18 @@ using System.Text;
 
 namespace ExpressBase.Objects
 {
+    public enum EbSysLocDM//DisplayMember
+    {
+        LocationId = 1,
+        ShortName
+    }
+
+    public enum EbSysCreatedByDM
+    {
+        UserId = 1,
+        FullName
+    }
+
     [EnableInBuilder(BuilderType.WebForm)]
     public class EbSysLocation : EbControlUI
     {
@@ -21,10 +33,22 @@ namespace ExpressBase.Objects
         {
             this.BareControlHtml = this.GetBareHtml();
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
-            this.Name = "eb_loc_id";
+            this.Name = this.DisplayMember == EbSysLocDM.LocationId ? "eb_loc_id" : "eb_loc_s";
         }
 
-        public override EbDbTypes EbDbType { get { return EbDbTypes.String; } set { } }
+        public override EbDbTypes EbDbType
+        {
+            get
+            {
+                if (this.DisplayMember == EbSysLocDM.LocationId)
+                    return EbDbTypes.Int32;
+                else
+                    return EbDbTypes.String;
+            } 
+        }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        public EbSysLocDM DisplayMember { get; set; }
 
         public override string GetToolHtml()
         {
@@ -72,7 +96,7 @@ namespace ExpressBase.Objects
         public override string GetBareHtml()
         {
             return @"
-            <input id='@ebsid@' data-ebtype='@data-ebtype@'  data-toggle='tooltip' title='@toolTipText@' class='date' type='text' name='@name@' autocomplete = 'off' @value@ @tabIndex@ style='font-size: 14px; width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@ @readOnlyString@ @required@ @placeHolder@ disabled />
+            <input id='@ebsid@' data-ebtype='@data-ebtype@'  data-toggle='tooltip' title='@toolTipText@' class='date' type='text' name='@name@' autocomplete = 'off' @value@ @tabIndex@ style='width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@ @readOnlyString@ @required@ @placeHolder@ disabled />
             "
 .Replace("@name@", (this.Name != null ? this.Name.Trim() : ""))
 .Replace("@data-ebtype@", "16")//( (int)this.EbDateType ).ToString())
@@ -97,7 +121,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
         public override bool DoNotPersist { get { return true; } }
-        
+
         public override bool Unique { get { return false; } }
         public override bool Required { get { return false; } }
         public override string OnChange { get => base.OnChange; set => base.OnChange = value; }
@@ -123,11 +147,22 @@ namespace ExpressBase.Objects
         {
             this.BareControlHtml = this.GetBareHtml();
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
-            this.Name = "eb_created_by";
+            this.Name = this.DisplayMember == EbSysCreatedByDM.UserId ? "eb_created_by" : "eb_created_by_s";
         }
 
-        public override EbDbTypes EbDbType { get { return EbDbTypes.String; } set { } }
+        public override EbDbTypes EbDbType
+        {
+            get
+            {
+                if (this.DisplayMember == EbSysCreatedByDM.UserId)
+                    return EbDbTypes.Decimal;
+                else
+                    return EbDbTypes.String;
+            }
+        }
 
+        [EnableInBuilder(BuilderType.WebForm)]
+        public EbSysCreatedByDM DisplayMember { get; set; }
 
         public override string GetToolHtml()
         {
@@ -175,7 +210,7 @@ namespace ExpressBase.Objects
         public override string GetBareHtml()
         {
             return @"
-            <input id='@ebsid@' data-ebtype='@data-ebtype@'  data-toggle='tooltip' title='@toolTipText@' class='date' type='text' name='@name@' autocomplete = 'off' @value@ @tabIndex@ style='font-size: 14px; width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@ @readOnlyString@ @required@ @placeHolder@ disabled />
+            <input id='@ebsid@' data-ebtype='@data-ebtype@'  data-toggle='tooltip' title='@toolTipText@' class='date' type='text' name='@name@' autocomplete = 'off' @value@ @tabIndex@ style='width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@ @readOnlyString@ @required@ @placeHolder@ disabled />
             "
 .Replace("@name@", (this.Name != null ? this.Name.Trim() : ""))
 .Replace("@data-ebtype@", "16")//( (int)this.EbDateType ).ToString())
@@ -200,7 +235,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
         public override bool DoNotPersist { get { return true; } }
-        
+
         public override bool Unique { get { return false; } }
         public override bool Required { get { return false; } }
         public override string OnChange { get => base.OnChange; set => base.OnChange = value; }
@@ -322,7 +357,7 @@ namespace ExpressBase.Objects
         public override string GetBareHtml()
         {
             return @"
-            <input id='@ebsid@' data-ebtype='@data-ebtype@'  data-toggle='tooltip' title='@toolTipText@' class='date' type='text' name='@name@' autocomplete = 'off' @value@ @tabIndex@ style='font-size: 14px; width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@ @readOnlyString@ @required@ @placeHolder@ disabled />
+            <input id='@ebsid@' data-ebtype='@data-ebtype@'  data-toggle='tooltip' title='@toolTipText@' class='date' type='text' name='@name@' autocomplete = 'off' @value@ @tabIndex@ style='width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@ @readOnlyString@ @required@ @placeHolder@ disabled />
             "
 .Replace("@name@", (this.Name != null ? this.Name.Trim() : ""))
 .Replace("@data-ebtype@", "16")//( (int)this.EbDateType ).ToString())
