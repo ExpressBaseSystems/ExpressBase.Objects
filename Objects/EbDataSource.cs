@@ -244,7 +244,8 @@ namespace ExpressBase.Objects
         private string GenSqlFunc()
         {
             StringBuilder qry = new StringBuilder();
-            qry.AppendFormat(SqlConstants.SQL_FUNC_HEADER, this.FormSchema.FormName, "'plpgsql'");
+            // qry.AppendFormat(SqlConstants.SQL_FUNC_HEADER, this.FormSchema.FormName, "'plpgsql'");
+            qry.AppendFormat(this.ConnectionFactory.DataDB.EB_API_SQL_FUNC_HEADER, this.FormSchema.FormName, "'plpgsql'");
             qry.AppendLine();
             qry.Append(@" DECLARE 
 temp_table jsonb;

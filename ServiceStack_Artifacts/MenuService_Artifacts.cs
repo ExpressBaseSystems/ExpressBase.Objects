@@ -98,11 +98,14 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 7)]
         public string Description { get; set; }
 
-        [DataMember(Order = 5)]
+        [DataMember(Order = 8)]
         public string EbType { get; set; }
 
-        [DataMember(Order = 6)]
+        [DataMember(Order = 9)]
         public string DisplayName { get; set; }
+
+        [DataMember(Order = 10)]
+        public bool Favourite { get; set; } = false;
     }
 
     public class SidebarDevRequest : EbServiceStackAuthRequest, IReturn<SidebarDevResponse>
