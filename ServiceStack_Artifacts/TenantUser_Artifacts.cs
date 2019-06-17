@@ -558,8 +558,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class LocationInfoTenantRequest : IReturn<LocationInfoTenantResponse>, IEbSSRequest
     {
         [DataMember(Order = 1)]
-        public string DbName { get; set; }
-
         public string Token { get; set; }
 
         public string SolnId { get; set; }
@@ -583,9 +581,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     [DataContract]
     public class UpdateSolutionRequest : IReturn<UpdateSolutionResponse>, IEbSSRequest
     {
-        [DataMember(Order = 1)]
-        public string DbName { get; set; }
-
         public string SolnId { get; set; }
 
         public int UserId { get; set; }
