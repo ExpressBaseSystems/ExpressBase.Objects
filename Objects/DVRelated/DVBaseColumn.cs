@@ -504,6 +504,7 @@ if(this.RenderAs === 2){
     pg.HideProperty('ItemFormParameters');
     pg.HideProperty('ItemFormId');
     pg.setSimpleProperty('IsTree', false);
+pg.HideProperty('FormMode');
 }
 else if(this.RenderAs === 6){
     pg.ShowProperty('ParentColumn');
@@ -517,6 +518,7 @@ else if(this.RenderAs === 6){
     pg.setSimpleProperty('IsTree', true);
     pg.HideProperty('LinkRefId');
     pg.ShowProperty('LinkType');
+    pg.ShowProperty('FormMode');
 }
 else{
     pg.HideProperty('LinkRefId');
@@ -531,6 +533,7 @@ else{
     pg.HideProperty('ItemFormParameters');
     pg.HideProperty('ItemFormId');
     pg.setSimpleProperty('IsTree', false);
+pg.HideProperty('FormMode');
     }")]
         public StringRenderType RenderAs { get; set; }
 
@@ -573,6 +576,7 @@ if(this.RenderAs === 2){
     pg.HideProperty('ItemFormParameters');
     pg.HideProperty('ItemFormId');
     pg.setSimpleProperty('IsTree', false);
+pg.HideProperty('FormMode');
 }
 else if(this.RenderAs === 3){
     pg.ShowProperty('ParentColumn');
@@ -586,6 +590,7 @@ else if(this.RenderAs === 3){
     pg.setSimpleProperty('IsTree', true);
     pg.HideProperty('LinkRefId');
     pg.ShowProperty('LinkType');
+    pg.ShowProperty('FormMode');
 }
 else{
     pg.HideProperty('LinkRefId');
@@ -600,6 +605,7 @@ else{
     pg.HideProperty('ItemFormParameters');
     pg.HideProperty('ItemFormId');
 pg.setSimpleProperty('IsTree', false);
+pg.HideProperty('FormMode');
     }")]
         public NumericRenderType RenderAs { get; set; }
 
@@ -651,6 +657,7 @@ if(this.RenderAs === 2){
     pg.HideProperty('ItemFormParameters');
     pg.HideProperty('ItemFormId');
     pg.setSimpleProperty('IsTree', false);
+pg.HideProperty('FormMode');
 }
 else if(this.RenderAs === 4){
     pg.ShowProperty('ParentColumn');
@@ -664,6 +671,7 @@ else if(this.RenderAs === 4){
     pg.setSimpleProperty('IsTree', true);
     pg.HideProperty('LinkRefId');
     pg.ShowProperty('LinkType');
+    pg.ShowProperty('FormMode');
 }
 else{
     pg.HideProperty('LinkRefId');
@@ -678,6 +686,7 @@ pg.HideProperty('GroupFormParameters');
     pg.HideProperty('ItemFormParameters');
     pg.HideProperty('ItemFormId');
 pg.setSimpleProperty('IsTree', false);
+pg.HideProperty('FormMode');
     }")]
         public BooleanRenderType RenderAs { get; set; }
 
@@ -718,6 +727,7 @@ if(this.RenderAs === 1){
     pg.HideProperty('ItemFormParameters');
     pg.HideProperty('ItemFormId');
     pg.setSimpleProperty('IsTree', false);
+    pg.HideProperty('FormMode');
 }
 else if(this.RenderAs === 2){
     pg.ShowProperty('ParentColumn');
@@ -731,6 +741,7 @@ else if(this.RenderAs === 2){
     pg.setSimpleProperty('IsTree', true);
     pg.HideProperty('LinkRefId');
     pg.ShowProperty('LinkType');
+    pg.ShowProperty('FormMode');
 }
 else{
     pg.HideProperty('LinkRefId');
@@ -745,6 +756,7 @@ pg.HideProperty('GroupFormParameters');
     pg.HideProperty('ItemFormParameters');
     pg.HideProperty('ItemFormId');
 pg.setSimpleProperty('IsTree', false);
+pg.HideProperty('FormMode');
     }")]
         public DateTimeRenderType RenderAs { get; set; }
 
