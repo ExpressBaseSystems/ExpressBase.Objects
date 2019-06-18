@@ -124,7 +124,6 @@ namespace ExpressBase.Objects
 
         public override bool Unique { get { return false; } }
         public override bool Required { get { return false; } }
-        public override string OnChange { get => base.OnChange; set => base.OnChange = value; }
         public override EbScript _OnChange { get => base._OnChange; set => base._OnChange = value; }
         public override EbScript OnChangeFn { get => base.OnChangeFn; set => base.OnChangeFn = value; }
         [EnableInBuilder(BuilderType.WebForm)]
@@ -238,7 +237,6 @@ namespace ExpressBase.Objects
 
         public override bool Unique { get { return false; } }
         public override bool Required { get { return false; } }
-        public override string OnChange { get => base.OnChange; set => base.OnChange = value; }
         public override EbScript _OnChange { get => base._OnChange; set => base._OnChange = value; }
         public override EbScript OnChangeFn { get => base.OnChangeFn; set => base.OnChangeFn = value; }
         [EnableInBuilder(BuilderType.WebForm)]
@@ -385,7 +383,6 @@ namespace ExpressBase.Objects
 
         public override bool Unique { get { return false; } }
         public override bool Required { get { return false; } }
-        public override string OnChange { get => base.OnChange; set => base.OnChange = value; }
         public override EbScript _OnChange { get => base._OnChange; set => base._OnChange = value; }
         public override EbScript OnChangeFn { get => base.OnChangeFn; set => base.OnChangeFn = value; }
         [EnableInBuilder(BuilderType.WebForm)]

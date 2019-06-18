@@ -227,7 +227,7 @@ else{
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.DropDown)]
         [OnChangeExec(@"
-console.log('kkkoiiii');
+console.log('onchange fired');
 if(this.FormMode === 1){
     pg.ShowProperty('FormId');
     pg.HideProperty('FormParameters');
