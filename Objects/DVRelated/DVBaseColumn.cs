@@ -197,24 +197,27 @@ else {
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iTableVisualization, EbObjectTypes.iChartVisualization, EbObjectTypes.iReport, EbObjectTypes.iWebForm)]
         [OnChangeExec(@"
-pg.HideProperty('ParentColumn');
+    pg.HideProperty('ParentColumn');
     pg.HideProperty('GroupingColumn');
     pg.HideProperty('GroupFormLink');
     pg.HideProperty('ItemFormLink');
-pg.HideProperty('GroupFormParameters');
+    pg.HideProperty('GroupFormParameters');
     pg.HideProperty('GroupFormId');
     pg.HideProperty('ItemFormParameters');
     pg.HideProperty('ItemFormId');
 if(this.LinkRefId !== null){
+    console.log(this.LinkRefId);
     if(this.LinkRefId.split('-')[2] === '0'){
+        console.log('Link to form');
         pg.ShowProperty('FormMode');
-    pg.HideProperty('FormParameters');
-    pg.HideProperty('FormId');
+        pg.HideProperty('FormParameters');
+        pg.HideProperty('FormId');
     }
     else{
+        console.log('Link to Other');
         pg.HideProperty('FormMode');
- pg.HideProperty('FormParameters');
-    pg.HideProperty('FormId');
+        pg.HideProperty('FormParameters');
+        pg.HideProperty('FormId');
     }
 }
 else{
@@ -493,6 +496,7 @@ else {
         [PropertyEditor(PropertyEditorType.DropDown)]
         [OnChangeExec(@"
 if(this.RenderAs === 2){
+console.log('Render as link');
     pg.ShowProperty('LinkRefId');
     pg.ShowProperty('LinkType');
     pg.HideProperty('ParentColumn');
@@ -507,6 +511,7 @@ if(this.RenderAs === 2){
 pg.HideProperty('FormMode');
 }
 else if(this.RenderAs === 6){
+console.log('Render as tree');
     pg.ShowProperty('ParentColumn');
     pg.ShowProperty('GroupingColumn');
     pg.ShowProperty('GroupFormLink');
@@ -521,6 +526,7 @@ else if(this.RenderAs === 6){
     pg.ShowProperty('FormMode');
 }
 else{
+console.log('Render as other');
     pg.HideProperty('LinkRefId');
     pg.HideProperty('LinkType');
     pg.setSimpleProperty('LinkRefId', null);
