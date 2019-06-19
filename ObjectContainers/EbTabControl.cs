@@ -37,6 +37,8 @@ namespace ExpressBase.Objects
                             maxH = $this.outerHeight();
                         }
                     });
+                    if (props.MinHeight > maxH)
+                        maxH = props.MinHeight;
                     if($('form[eb-form=true]').attr('IsRenderMode') === 'True')
                         $panes.outerHeight(maxH);      
                     else
@@ -49,13 +51,23 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [OnChangeUIFunction("EbTabControl.padding")]
         [DefaultPropValue(8, 8, 8, 8)]
+        [PropertyGroup("Appearance")]
+        [PropertyEditor(PropertyEditorType.Expandable)]
         public new UISides Padding { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [OnChangeUIFunction("EbTabControl.adjustPanesHeightToHighest")]
+        [DefaultPropValue("150")]
+        [PropertyGroup("Appearance")]
+        [Alias("Minimum height")]
+        public int MinHeight { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.Collection)]
         [Alias("TabPanes")]
         [PropertyGroup("test")]
         [UIproperty]
+        [PropertyPriority(95)]
         [ListType(typeof(EbTabPane))]
         [OnChangeUIFunction("EbTabControl.adjustPanesHeightToHighest")]
         public override List<EbControl> Controls { get; set; }
@@ -87,7 +99,9 @@ namespace ExpressBase.Objects
             return @"
 this.Init = function(id)
 {
-    this.Controls.$values.push(new EbObjects.EbTabPane(this.EbSid + 'TabPane0'));
+    let pane = new EbObjects.EbTabPane(this.EbSid + 'TabPane0');
+    pane.Name = 'pane1';
+    this.Controls.$values.push(pane);
 };";
         }
 
