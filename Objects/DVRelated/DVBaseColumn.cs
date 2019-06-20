@@ -484,6 +484,16 @@ else {
 
             return tempCol;
         }
+
+        public DVColumnCollection(){}
+
+        public DVColumnCollection (DVColumnCollection other)
+        {
+            foreach(var aa in other)
+            {
+                this.Add(aa.ShallowCopy());
+            }
+        }
     }
     
 
