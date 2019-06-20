@@ -143,6 +143,8 @@ namespace ExpressBase.Objects
             }
 
             //BeforeSaveRec(this);
+
+            CalcValueExprDependency();
         }
 
         private void BeforeSaveRec(EbControlContainer _container)
@@ -155,6 +157,90 @@ namespace ExpressBase.Objects
                         (c as EbControlContainer).TableName = _container.TableName;
                     BeforeSaveRec(c as EbControlContainer);
                 }
+            }
+        }
+
+        //Populate Property DependedValExp
+        private void CalcValueExprDependency()
+        {
+            Dictionary<int, EbControlWrapper> _dict = GetControlsAsDict(this, "form");
+            List<int> CalcFlds = new List<int>();
+            List<KeyValuePair<int, int>> dpndcy = new List<KeyValuePair<int, int>>();
+            List<int> ExeOrd = new List<int>();
+
+            for (int i = 0; i < _dict.Count; i++)
+            {
+                if (_dict[i].Control.ValueExpr != null && !string.IsNullOrEmpty(_dict[i].Control.ValueExpr.Code))
+                {
+                    CalcFlds.Add(i);
+                    ExeOrd.Add(i);
+                }
+            }
+
+            for (int i = 0; i < CalcFlds.Count; i++)
+            {
+                if (_dict[CalcFlds[i]].Control.ValueExpr.Code.ToLower().Contains("form"))
+                {
+                    for (int j = 0; j < _dict.Count; j++)
+                    {
+                        if (_dict[CalcFlds[i]].Control.ValueExpr.Code.ToLower().Contains(_dict[j].Path))
+                        {
+                            if(CalcFlds[i] == j)
+                                throw new FormException("Avoid circular reference by the following control in 'ValueExpression' : " + _dict[CalcFlds[i]].Control.Name);
+                            dpndcy.Add(new KeyValuePair<int, int>(CalcFlds[i], j));//<depended, dominant>
+                        }
+                    }
+                }
+            }
+
+            int stopCounter = 0;
+            while (dpndcy.Count > 0 && stopCounter < CalcFlds.Count)
+            {
+                for (int i = 0; i < CalcFlds.Count; i++)
+                {
+                    if (dpndcy.FindIndex(x => x.Value == CalcFlds[i]) == -1)
+                    {
+                        bool isProcessed = false;
+                        foreach (KeyValuePair<int, int> item in dpndcy.Where(e => e.Key == CalcFlds[i]))
+                        {
+                            _dict[item.Value].Control.DependedValExp.Remove(_dict[item.Key].Path);
+                            _dict[item.Value].Control.DependedValExp.Insert(0, _dict[item.Key].Path);
+                            ExeOrd.Remove(item.Value);
+                            ExeOrd.Insert(0, item.Value);
+                            isProcessed = true;
+                        }
+                        if (isProcessed)
+                            dpndcy.RemoveAll(x => x.Key == CalcFlds[i]);
+                    }
+                }
+                stopCounter++;
+            }
+            if (dpndcy.Count > 0)
+            {
+                throw new FormException("Avoid circular reference by the following controls in 'ValueExpression' : " + string.Join(',', dpndcy.Select(e => _dict[e.Key].Control.Name).Distinct()));
+            }
+            else
+            {
+                FillDependedCtrlRec(_dict, ExeOrd);
+            }
+        }
+
+        //To populate multilevel DependedValExp property
+        private void FillDependedCtrlRec(Dictionary<int, EbControlWrapper> _dict, List<int> ExeOrd)
+        {
+            for (int i = ExeOrd.Count - 1; i >= 0; i--)
+            {
+                List<string> extList = new List<string>();
+                foreach (string item in _dict[ExeOrd[i]].Control.DependedValExp)
+                {
+                    EbControlWrapper ctrlWrap = _dict.Values.FirstOrDefault(e => e.Path.Equals(item));
+                    foreach (var path in ctrlWrap.Control.DependedValExp)
+                    {
+                        if (!_dict[ExeOrd[i]].Control.DependedValExp.Contains(path) && !extList.Contains(path))
+                            extList.Add(path);
+                    }
+                }
+                _dict[ExeOrd[i]].Control.DependedValExp.AddRange(extList);
             }
         }
 
@@ -304,6 +390,7 @@ namespace ExpressBase.Objects
             IEnumerable<EbControl> FlatCtrls = _container.Controls.Get1stLvlControls();
             foreach (EbControl control in FlatCtrls)
             {
+                control.DependedValExp.Clear();
                 _dict.Add(_counter++, new EbControlWrapper
                 {
                     TableName = _container.TableName,
@@ -315,7 +402,9 @@ namespace ExpressBase.Objects
             {
                 if (control is EbControlContainer)
                 {
-                    _dict = GetControlsAsDict(control as EbControlContainer, _path + "." + (control as EbControlContainer).Name, _dict, _counter);
+                    if (control is EbDataGrid)
+                        _path += "." + (control as EbControlContainer).Name;
+                    _dict = GetControlsAsDict(control as EbControlContainer, _path, _dict, _counter);
                 }
             }
             return _dict;
