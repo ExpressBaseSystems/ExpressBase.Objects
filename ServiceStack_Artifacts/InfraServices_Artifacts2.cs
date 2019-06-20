@@ -5,6 +5,8 @@ using System.Text;
 using ServiceStack;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
 using ExpressBase.Common.Data;
+using ExpressBase.Common.LocationNSolution;
+using ExpressBase.Common;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
@@ -369,6 +371,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string IsolutionId { get; set; }
 
         public string EsolutionId { get; set; }
+
+        public PricingTiers PricingTier { get; set; }
     }
 
     [DataContract]
