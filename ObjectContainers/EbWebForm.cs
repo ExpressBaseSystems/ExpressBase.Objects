@@ -381,12 +381,13 @@ namespace ExpressBase.Objects
         }
 
         //get controls in webform as a single dimensional structure 
-        public static Dictionary<int, EbControlWrapper> GetControlsAsDict(EbControlContainer _container, string _path = "", Dictionary<int, EbControlWrapper> _dict = null, int _counter = 0)
+        public static Dictionary<int, EbControlWrapper> GetControlsAsDict(EbControlContainer _container, string _path = "", Dictionary<int, EbControlWrapper> _dict = null)
         {
             if (_dict == null)
             {
                 _dict = new Dictionary<int, EbControlWrapper>();
             }
+            int _counter = _dict.Count;
             IEnumerable<EbControl> FlatCtrls = _container.Controls.Get1stLvlControls();
             foreach (EbControl control in FlatCtrls)
             {
@@ -404,7 +405,7 @@ namespace ExpressBase.Objects
                 {
                     if (control is EbDataGrid)
                         _path += "." + (control as EbControlContainer).Name;
-                    _dict = GetControlsAsDict(control as EbControlContainer, _path, _dict, _counter);
+                    _dict = GetControlsAsDict(control as EbControlContainer, _path, _dict);
                 }
             }
             return _dict;
