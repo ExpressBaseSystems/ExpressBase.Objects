@@ -250,9 +250,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     public static class SqlConstants
     {
-        public const string SQL_FUNC_HEADER = @"CREATE OR REPLACE FUNCTION {0}(insert_json jsonb,update_json jsonb)
-RETURNS void
-LANGUAGE {1} AS $BODY$";
+//        public const string SQL_FUNC_HEADER = @"CREATE OR REPLACE FUNCTION {0}(insert_json jsonb,update_json jsonb)
+//RETURNS void
+//LANGUAGE {1} AS $BODY$";
 
         public const string JSON_ROW_SELECT = @"CREATE OR REPLACE FUNCTION {0}(_json,table_name)
 RETURNS jsonb
