@@ -164,6 +164,10 @@ namespace ExpressBase.Objects
         private void CalcValueExprDependency()
         {
             Dictionary<int, EbControlWrapper> _dict = GetControlsAsDict(this, "form");
+            EbControl[] tempo = this.Controls.FlattenEbControls().ToArray<EbControl>();
+            foreach (var item in this.Controls.FlattenEbControls()) {
+                Console.WriteLine(item.Name);
+            }
             List<int> CalcFlds = new List<int>();
             List<KeyValuePair<int, int>> dpndcy = new List<KeyValuePair<int, int>>();
             List<int> ExeOrd = new List<int>();
@@ -392,10 +396,12 @@ namespace ExpressBase.Objects
             foreach (EbControl control in FlatCtrls)
             {
                 control.DependedValExp.Clear();
+                string path = _path == "" ? control.Name : _path + "." + control.Name;
+                control.__path = path;
                 _dict.Add(_counter++, new EbControlWrapper
                 {
                     TableName = _container.TableName,
-                    Path = _path == "" ? control.Name : _path + "." + control.Name,
+                    Path = path,
                     Control = control
                 });
             }
@@ -403,9 +409,10 @@ namespace ExpressBase.Objects
             {
                 if (control is EbControlContainer)
                 {
+                    string path = _path;
                     if (control is EbDataGrid)
-                        _path += "." + (control as EbControlContainer).Name;
-                    _dict = GetControlsAsDict(control as EbControlContainer, _path, _dict);
+                        path = _path + "." + (control as EbControlContainer).Name;
+                    _dict = GetControlsAsDict(control as EbControlContainer, path, _dict);
                 }
             }
             return _dict;
