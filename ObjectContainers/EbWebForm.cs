@@ -1,5 +1,6 @@
 ﻿using ExpressBase.Common;
 using ExpressBase.Common.Data;
+using ExpressBase.Common.Enums;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.LocationNSolution;
 using ExpressBase.Common.Objects;
@@ -531,7 +532,8 @@ namespace ExpressBase.Objects
                             FileRefId = dr["id"],
                             FileName = dr["filename"],
                             Meta = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(dr["tags"] as string),
-                            UploadTime = dr["uploadts"]
+                            UploadTime = dr["uploadts"],
+                            FileCategory = (EbFileCategory)Convert.ToInt32(dr["filecategory"])
                         };
 
                         if (!_list.Contains(info))
