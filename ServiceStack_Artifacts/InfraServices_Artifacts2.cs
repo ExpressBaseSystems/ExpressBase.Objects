@@ -44,6 +44,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 10)]
         public string PagePath { get; set; }
 
+        [DataMember(Order =11)]
+        public string Account_type { get; set; }
+
+        [DataMember(Order =12)]
+        public string DisplayName { get; set; }
+
+
         public int UserId { get; set; }
 
         public string Token { get; set; }
