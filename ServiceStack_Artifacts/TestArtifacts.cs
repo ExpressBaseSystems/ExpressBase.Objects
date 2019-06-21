@@ -17,6 +17,18 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         //public string dbName { get; set; }
         public EbSurveyQuery Query { get; set; }
     }
+
+    [Route("/apitest")]
+    public class ApiTestReq : IReturn<UnniTest>
+    {
+
+    }
+
+    public class UnniTest
+    {
+        public string Name = "Unni";
+    }
+
     [DataContract]
     public class TestResponse : IEbSSResponse
     {

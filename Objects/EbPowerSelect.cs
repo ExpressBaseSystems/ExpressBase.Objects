@@ -254,7 +254,7 @@ console.log(1000);
             :on-change='updateCk'
             placeholder = '@sTitle@'>
         </v-select>
-        <span class='input-group-addon' @border-r$$> <i id='@ebsid@TglBtn' class='fa  fa-search' aria-hidden='true'></i> </span>
+        <span class='input-group-addon ps-srch' @border-r$$> <i id='@ebsid@TglBtn' class='fa  fa-search' aria-hidden='true'></i> </span>
     </div>
 </div>"
 .Replace("$$", obj.Name ?? "")
