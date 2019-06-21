@@ -26,6 +26,20 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
+    public class GetCustomerRequest : EbServiceStackAuthRequest, IReturn<GetCustomerResponse>
+    {
+        public string CustId { get; set; }
+    }
+
+    public class GetCustomerResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public string Email { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
     public class CheckCustomerRequest : EbServiceStackAuthRequest, IReturn<CheckCustomerResponse>
     {
         public string EmailId { get; set; }
@@ -52,15 +66,15 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public string Name { get; set; }
 
-        public string Address1 { get; set; }
-
-        public string Address2 { get; set; }
+        public string Address { get; set; }
 
         public string City { get; set; }
 
         public string State { get; set; }
 
         public string Country { get; set; }
+
+        public string Zip { get; set; }
     }
 
     public class UpdateCardResponse : IEbSSResponse
@@ -155,11 +169,37 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string CoupId { get; set; }
 
         public string SolutionId { get; set; }
+
+        public long? Total { get; set; }
     }
 
     public class CreateSubscriptionResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
+        public DateTime? PeriodStart { get; set; }
+
+        [DataMember(Order = 2)]
+        public DateTime? PeriodEnd { get; set; }
+
+        [DataMember(Order = 3)]
+        public DateTime? Created { get; set; }
+
+        [DataMember(Order = 4)]
+        public long? Amount { get; set; }
+
+        [DataMember(Order = 5)]
+        public string UseageType { get; set; }
+
+        [DataMember(Order = 6)]
+        public string BillingScheme { get; set; }
+
+        [DataMember(Order = 7)]
+        public long Quantity { get; set; }
+
+        [DataMember(Order = 8)]
+        public string Url { get; set; }
+
+        [DataMember(Order = 9)]
         public ResponseStatus ResponseStatus { get; set; }
     }
 
