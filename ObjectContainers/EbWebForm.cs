@@ -165,10 +165,6 @@ namespace ExpressBase.Objects
         private void CalcValueExprDependency()
         {
             Dictionary<int, EbControlWrapper> _dict = GetControlsAsDict(this, "form");
-            EbControl[] tempo = this.Controls.FlattenEbControls().ToArray<EbControl>();
-            foreach (var item in this.Controls.FlattenEbControls()) {
-                Console.WriteLine(item.Name);
-            }
             List<int> CalcFlds = new List<int>();
             List<KeyValuePair<int, int>> dpndcy = new List<KeyValuePair<int, int>>();
             List<int> ExeOrd = new List<int>();
