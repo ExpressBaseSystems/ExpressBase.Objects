@@ -393,10 +393,12 @@ namespace ExpressBase.Objects
             foreach (EbControl control in FlatCtrls)
             {
                 control.DependedValExp.Clear();
+                string path = _path == "" ? control.Name : _path + "." + control.Name;
+                control.__path = path;
                 _dict.Add(_counter++, new EbControlWrapper
                 {
                     TableName = _container.TableName,
-                    Path = _path == "" ? control.Name : _path + "." + control.Name,
+                    Path = path,
                     Control = control
                 });
             }
@@ -404,9 +406,10 @@ namespace ExpressBase.Objects
             {
                 if (control is EbControlContainer)
                 {
+                    string path = _path;
                     if (control is EbDataGrid)
-                        _path += "." + (control as EbControlContainer).Name;
-                    _dict = GetControlsAsDict(control as EbControlContainer, _path, _dict);
+                        path = _path + "." + (control as EbControlContainer).Name;
+                    _dict = GetControlsAsDict(control as EbControlContainer, path, _dict);
                 }
             }
             return _dict;

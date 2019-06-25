@@ -1,6 +1,8 @@
 ﻿using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
+using ExpressBase.Common.Structures;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
@@ -20,12 +22,16 @@ namespace ExpressBase.Objects
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
-        [PropertyEditor(PropertyEditorType.Expandable)]
-        public LatLng Position { get; set; }
+        //[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+        //[PropertyEditor(PropertyEditorType.Expandable)]
+        //public LatLng Position { get; set; }
+
+        //[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+        //public string ContentHTML { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
-        public string ContentHTML { get; set; }
+        [DefaultPropValue("200")]
+        public override int Height { get; set; }
 
         public override bool isFullViewContol { get => true; set => base.isFullViewContol = value; }
 
@@ -45,39 +51,64 @@ namespace ExpressBase.Objects
         public override string GetBareHtml()
         {
             return @" 
-                <div class='location-cont'>
-                    <div id='@name@_Cont' class='location-box picker-box' style='display:block;'>
+                    <div id='@EbSid@_Cont' class='location-box picker-box' style='display:block;'>
                         <div class='locinp-cont'>
-                            <div class='locinp-wraper'><span class='locinp-span'>Latitude</span><input id='@name@lat' class='locinp' type='text'/></div>
-                            <div class='locinp-wraper'><span class='locinp-span'>Longitude</span><input id='@name@long' class='locinp' type='text'/></div>
-                            <div class='locinp-wraper-address'><span class='locinp-span'>Address</span><input id='@name@address' class='locinp' type='text'/></div>
-                        </div>
-                        <div id='@name@' class='map-div'>@mapimgforbuilder@</div>
-                        <div class='loc-bottom'>
-                            <div id='@name@Lbl' class='loc-label' style='@LabelBackColor@  @LabelForeColor@ font-weight: bold'> @Label@ </div><button class='choose-btn'>Choose</button>
-                            <div class='loc-content'>
-                                @ContentHTML@
+                            <div class='locinp-wraper-address'>
+                                <div style='display: inline-block; min-width: 50px;'>Address</div>
+                                <div style='display: inline-block; min-width: calc(100% - 54px); border: 1px solid rgba(34,36,38,.15);' ><input id='@EbSid@address' type='text' style='width: 100%;' /> </div>
+                            </div>
+                            <div>
+                                <div class='locinp-wraper' style='display: inline-block;'><span class='locinp-span'>Latitude</span><input id='@EbSid@lat' class='locinp' type='text'/></div>
+                                <div class='locinp-wraper' style='display: inline-block;'><span class='locinp-span'>Longitude</span><input id='@EbSid@long' class='locinp' type='text'/></div>
                             </div>
                         </div>
+                        <div id='@EbSid@' class='map-div' style='height: @Height@;'>@mapimgforbuilder@</div>                        
                     </div>  
-                </div>"
-.Replace("@name@", (this.Name != null) ? this.Name : "@name@")
-.Replace("@LabelBackColor@", this.LabelBackColor)
-.Replace("@LabelForeColor@", this.LabelForeColor)
-.Replace("@Label@", this.Label)
-.Replace("@ContentHTML@", this.ContentHTML)
-.Replace("@mapimgforbuilder@", (this.Name != null) ? string.Empty : "<img style='width:100%;height: 100%;' src='/images/LocMapImg2.png'>");
-            ;
+                "
+.Replace("@EbSid@", (this.EbSid != null) ? this.EbSid : "@EbSid@")
+.Replace("@mapimgforbuilder@", (this.Name != null) ? string.Empty : "<img style='width:100%;height: 100%;' src='/images/LocMapImg2.png'>")
+.Replace("@BackColor@ ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor@ ") + ";"))
+.Replace("@ForeColor@ ", "color:" + ((this.ForeColor != null) ? this.ForeColor : "@ForeColor@ ") + ";")
+.Replace("@Height@", this.Height == 0 ? "200px" : this.Height + "px");
         }
 
         public override string GetHtml()
         {
             return @"
-            <div id='cont_@name@' Ctype='Locations' class='Eb-ctrlContainer' eb-hidden='@isHidden@'>
-                @GetBareHtml@
+            <div id='cont_@EbSid@' Ctype='InputGeoLocation' ebsid='@EbSid@' class='Eb-ctrlContainer' eb-hidden='@isHidden@'>
+                <span class='eb-ctrl-label' ui-label='' id='@EbSidLbl' style=' @BackColor@ @ForeColor@ '>@Label@</span>
+                    @GetBareHtml@
             </div>"
-.Replace("@name@", (this.Name != null) ? this.Name : "@name@")
+.Replace("@EbSid@", (this.EbSid != null) ? this.EbSid : "@EbSid@")
+.Replace("@Label@", this.Label)
+.Replace("@LabelBackColor@", this.LabelBackColor)
+.Replace("@LabelForeColor@", this.LabelForeColor)
 .Replace("@GetBareHtml@", this.GetBareHtml());
         }
+
+        public override EbDbTypes EbDbType { get { return EbDbTypes.String; } set { } }
+
+        [JsonIgnore]
+        public override string GetValueJSfn
+        {
+            get
+            {
+                return @"let loc = $('#' + this.EbSid_CtxId).locationpicker('location');
+                        return loc.latitude + ',' + loc.longitude;";
+            }
+            set { }
+        }
+
+        [JsonIgnore]
+        public override string SetValueJSfn
+        {
+            get
+            {
+                return @"let tmp = p1.split(',');
+                        $('#' + this.EbSid_CtxId).locationpicker('location', { latitude : parseFloat(tmp[0]), longitude : parseFloat(tmp[1])});";
+            }
+            set { }
+        }
+
     }
 }
