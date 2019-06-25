@@ -1,4 +1,5 @@
 ﻿using ExpressBase.Common.EbServiceStack.ReqNRes;
+using ExpressBase.Common.Enums;
 using ExpressBase.Common.Structures;
 using ServiceStack;
 using System;
@@ -156,6 +157,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public Dictionary<string,List<string>> Meta { set; get; }
 
         public string UploadTime { get; set; }
+
+        public EbFileCategory FileCategory { set; get; }
     }
 
     [DataContract]

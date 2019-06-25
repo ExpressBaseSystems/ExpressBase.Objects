@@ -133,7 +133,7 @@ namespace ExpressBase.Objects
             this.bVisible = false;
             Parent.NotVisibleColumns.$values.push(this)")]
         [EnableInBuilder(BuilderType.DVBuilder)]
-        public DVColumnCollection Columns { get; set; }
+        public virtual DVColumnCollection Columns { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [HideInPropertyGrid]
@@ -166,7 +166,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [DefaultPropValue("true")]
-        public bool IsPaging { get; set; }
+        public virtual bool IsPaging { get; set; }
 
         public override void AfterRedisGet(RedisClient Redis)
         {
@@ -494,6 +494,7 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.DropDown)]
         [DefaultPropValue("0")]
         [OnChangeExec(@"
+console.log('this.Charttype in chartobj'+   this.Charttype);
         if(this.Charttype === 1){
             pg.HideProperty('XaxisTitle')
             pg.HideProperty('YaxisTitle')
@@ -517,6 +518,7 @@ namespace ExpressBase.Objects
             pg.ShowProperty('ShowTooltip')
             pg.ShowProperty('ShowValue')
         }")]
+        [HideForUser]
         public virtual ChartType Charttype { get; set; }
 
         [OnDeserialized]
@@ -644,9 +646,18 @@ namespace ExpressBase.Objects
     public class EbGoogleMap : EbChartVisualization
     {
         [EnableInBuilder(BuilderType.DVBuilder)]
+        [HideInPropertyGrid]
+        public override DVColumnCollection Columns { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [HideInPropertyGrid]
+        public override bool IsPaging { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.DropDown)]
         [DefaultPropValue("1")]
         [OnChangeExec(@"
+console.log('this.Charttype in googlemap'+   this.Charttype);
         if(this.Charttype === 1){
             pg.HideProperty('XaxisTitle')
             pg.HideProperty('YaxisTitle')
@@ -670,7 +681,8 @@ namespace ExpressBase.Objects
             pg.ShowProperty('ShowTooltip')
             pg.ShowProperty('ShowValue')
         }")]
-        public override ChartType Charttype { get; set; }
+        [HideForUser]
+        public override ChartType Charttype { get { return ChartType.GoogleMap; } }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
@@ -695,6 +707,10 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
         public List<DVBaseColumn> InfoWindow { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [DefaultPropValue("6")]        
+        public int Zoomlevel { get; set; }
 
     }
 
