@@ -545,12 +545,12 @@ console.log('this.Charttype in chartobj'+   this.Charttype);
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
-        public List<DVBaseColumn> Xaxis { get; set; }
+        public virtual List<DVBaseColumn> Xaxis { get; set; }
 
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
-        public List<DVBaseColumn> Yaxis { get; set; }
+        public virtual List<DVBaseColumn> Yaxis { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [HideInPropertyGrid]
@@ -577,42 +577,42 @@ console.log('this.Charttype in chartobj'+   this.Charttype);
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.Text)]
         [DefaultPropValue("XLabel")]
-        public string XaxisTitle { get; set; }
+        public virtual string XaxisTitle { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.Text)]
         [DefaultPropValue("YLabel")]
-        public string YaxisTitle { get; set; }
+        public virtual string YaxisTitle { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.Color)]
         [DefaultPropValue("#000000")]
-        public string XaxisTitleColor { get; set; }
+        public virtual string XaxisTitleColor { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.Color)]
         [DefaultPropValue("#000000")]
-        public string YaxisTitleColor { get; set; }
+        public virtual string YaxisTitleColor { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.Color)]
         [DefaultPropValue("#000000")]
-        public string XaxisLabelColor { get; set; }
+        public virtual string XaxisLabelColor { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.Color)]
         [DefaultPropValue("#000000")]
-        public string YaxisLabelColor { get; set; }
+        public virtual string YaxisLabelColor { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [HideInPropertyGrid]
-        public List<ChartColor> LegendColor { get; set; }
+        public virtual List<ChartColor> LegendColor { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
-        public bool ShowTooltip { get; set; }
+        public virtual  bool ShowTooltip { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
-        public bool ShowValue { get; set; }
+        public virtual bool ShowValue { get; set; }
 
         //[EnableInBuilder(BuilderType.DVBuilder)]
         //public Position LegendPosition { get; set; }
@@ -687,12 +687,12 @@ console.log('this.Charttype in googlemap'+   this.Charttype);
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
         [Alias("Longitude")]
-        public List<DVBaseColumn> Xaxis { get; set; }
+        public override List<DVBaseColumn> Xaxis { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
         [Alias("Lattitude")]
-        public List<DVBaseColumn> Yaxis { get; set; }
+        public override List<DVBaseColumn> Yaxis { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         public bool ShowRoute { get; set; }
@@ -711,6 +711,33 @@ console.log('this.Charttype in googlemap'+   this.Charttype);
         [EnableInBuilder(BuilderType.DVBuilder)]
         [DefaultPropValue("6")]        
         public int Zoomlevel { get; set; }
+
+        
+        public override string XaxisTitle { get; set; }
+
+        
+        public override string YaxisTitle { get; set; }
+
+        
+        public override string XaxisTitleColor { get; set; }
+
+        
+        public override string YaxisTitleColor { get; set; }
+
+        
+        public override string XaxisLabelColor { get; set; }
+
+        
+        public override string YaxisLabelColor { get; set; }
+
+        
+        public override List<ChartColor> LegendColor { get; set; }
+
+        
+        public override bool ShowTooltip { get; set; }
+
+        
+        public override bool ShowValue { get; set; }
 
     }
 
