@@ -492,32 +492,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.DropDown)]
-        [DefaultPropValue("0")]
-        [OnChangeExec(@"
-console.log('this.Charttype in chartobj'+   this.Charttype);
-        if(this.Charttype === 1){
-            pg.HideProperty('XaxisTitle')
-            pg.HideProperty('YaxisTitle')
-            pg.HideProperty('XaxisTitleColor')
-            pg.HideProperty('YaxisTitleColor')
-            pg.HideProperty('XaxisLabelColor')
-            pg.HideProperty('YaxisLabelColor')
-            pg.HideProperty('LegendColor')
-            pg.HideProperty('ShowTooltip')
-            pg.HideProperty('ShowValue')
-        }
-
-        else{
-            pg.ShowProperty('XaxisTitle')
-            pg.ShowProperty('YaxisTitle')
-            pg.ShowProperty('XaxisTitleColor')
-            pg.ShowProperty('YaxisTitleColor')
-            pg.ShowProperty('XaxisLabelColor')
-            pg.ShowProperty('YaxisLabelColor')
-            pg.ShowProperty('LegendColor')
-            pg.ShowProperty('ShowTooltip')
-            pg.ShowProperty('ShowValue')
-        }")]
+        [DefaultPropValue("0")]        
         [HideForUser]
         public virtual ChartType Charttype { get; set; }
 
@@ -654,33 +629,7 @@ console.log('this.Charttype in chartobj'+   this.Charttype);
         public override bool IsPaging { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
-        [PropertyEditor(PropertyEditorType.DropDown)]
-        [DefaultPropValue("1")]
-        [OnChangeExec(@"
-console.log('this.Charttype in googlemap'+   this.Charttype);
-        if(this.Charttype === 1){
-            pg.HideProperty('XaxisTitle')
-            pg.HideProperty('YaxisTitle')
-            pg.HideProperty('XaxisTitleColor')
-            pg.HideProperty('YaxisTitleColor')
-            pg.HideProperty('XaxisLabelColor')
-            pg.HideProperty('YaxisLabelColor')
-            pg.HideProperty('LegendColor')
-            pg.HideProperty('ShowTooltip')
-            pg.HideProperty('ShowValue')
-        }
-
-        else{
-            pg.ShowProperty('XaxisTitle')
-            pg.ShowProperty('YaxisTitle')
-            pg.ShowProperty('XaxisTitleColor')
-            pg.ShowProperty('YaxisTitleColor')
-            pg.ShowProperty('XaxisLabelColor')
-            pg.ShowProperty('YaxisLabelColor')
-            pg.ShowProperty('LegendColor')
-            pg.ShowProperty('ShowTooltip')
-            pg.ShowProperty('ShowValue')
-        }")]
+        [PropertyEditor(PropertyEditorType.DropDown)]        
         [HideForUser]
         public override ChartType Charttype { get { return ChartType.GoogleMap; } }
 
