@@ -274,12 +274,51 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int UserId { get; set; }
 
         public string SolnId { get; set; }
-    }
+    }    
 
     public class EbIntegrationResponse : IEbSSResponse
     {
         public ResponseStatus ResponseStatus { get; set; }
     }
+
+    public class EbIntergationConfDeleteRequest : IReturn<EbIntegrationDeleteResponse>, IEbTenentRequest
+    {
+        public EbIntegrationConf IntegrationConfdelete { get; set; }
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
+    }
+
+    public class EbIntegrationConfDeleteResponse : IEbSSResponse
+    {
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    public class EbIntergationDeleteRequest : IReturn<EbIntegrationDeleteResponse>, IEbTenentRequest
+    {
+        public EbIntegration Integrationdelete { get; set; }
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
+    }
+
+    public class EbIntegrationDeleteResponse : IEbSSResponse
+    {
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    public class EbIntergationSwitchRequest : IReturn<EbIntegrationSwitchResponse>, IEbTenentRequest
+    {
+        public List<EbIntegration> Integrations { set; get; }
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
+    }
+    public class EbIntegrationSwitchResponse : IEbSSResponse
+    {
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
     public class _GetConectionsRequest : IReturn<_GetConectionsResponse>, IEbSSRequest
     {
         public int UserId { get; set; }
