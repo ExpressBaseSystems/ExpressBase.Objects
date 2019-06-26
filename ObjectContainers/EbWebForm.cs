@@ -106,7 +106,7 @@ namespace ExpressBase.Objects
             return html
                 .Replace("@name@", this.Name)
                 .Replace("@ebsid@", this.EbSid)
-                .Replace("@rmode@", IsRenderMode.ToString())
+                .Replace("@rmode@", IsRenderMode.ToString().ToLower())
                 .Replace("@tabindex@", IsRenderMode ? string.Empty : " tabindex='1'");
         }
 
@@ -500,7 +500,7 @@ namespace ExpressBase.Objects
             }
         }
 
-        private void GetFormattedData(EbDataTable dataTable, SingleTable Table)
+        private void GetFormattedData(EbDataTable dataTable, SingleTable Table, TableSchema _table = null)
         {
             foreach (EbDataRow dataRow in dataTable.Rows)
             {
@@ -540,16 +540,40 @@ namespace ExpressBase.Objects
                         object _unformattedData = dataRow[dataColumn.ColumnIndex];
                         object _formattedData = _unformattedData;
 
-                        if (dataColumn.Type == EbDbTypes.Date)
+                        if(_table != null)
+                        {
+                            ColumnSchema _column = _table.Columns.Find(c => c.ColumnName.Equals(dataColumn.ColumnName));
+                            if(_column != null)
+                            {
+                                if(_column.Control is EbDate || _column.Control is EbDGDateColumn || _column.Control is EbSysCreatedAt)
+                                {
+                                    EbDateType _type = _column.Control is EbDate ? (_column.Control as EbDate).EbDateType : _column.Control is EbDGDateColumn ? (_column.Control as EbDGDateColumn).EbDateType : (_column.Control as EbSysCreatedAt).EbDateType;
+                                    DateTime dt = Convert.ToDateTime(_unformattedData);
+                                    if (_type == EbDateType.Date)
+                                    {
+                                        _formattedData = dt.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+                                    }
+                                    else if(_type == EbDateType.DateTime)
+                                    {                                        
+                                        _formattedData = dt.ConvertFromUtc(this.UserObj.Preference.TimeZone).ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+                                    }
+                                    else
+                                    {
+                                        _formattedData = dt.ConvertFromUtc(this.UserObj.Preference.TimeZone).ToString("HH:mm:ss", CultureInfo.InvariantCulture);
+                                    }
+                                }
+                            }
+                        }
+                        else if (dataColumn.Type == EbDbTypes.Date)
                         {
                             _unformattedData = (_unformattedData == DBNull.Value) ? DateTime.MinValue : _unformattedData;
                             _formattedData = ((DateTime)_unformattedData).Date != DateTime.MinValue ? Convert.ToDateTime(_unformattedData).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) : string.Empty;
                         }
-                        else if (dataColumn.Type == EbDbTypes.DateTime)
-                        {
-                            _unformattedData = (_unformattedData == DBNull.Value) ? DateTime.MinValue : _unformattedData;
-                            _formattedData = ((DateTime)_unformattedData).Date != DateTime.MinValue ? Convert.ToDateTime(_unformattedData).ConvertFromUtc(this.UserObj.Preference.TimeZone).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) : string.Empty;
-                        }
+                        //else if (dataColumn.Type == EbDbTypes.DateTime)
+                        //{
+                        //    _unformattedData = (_unformattedData == DBNull.Value) ? DateTime.MinValue : _unformattedData;
+                        //    _formattedData = ((DateTime)_unformattedData).Date != DateTime.MinValue ? Convert.ToDateTime(_unformattedData).ConvertFromUtc(this.UserObj.Preference.TimeZone).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) : string.Empty;
+                        //}
                         Row.Columns.Add(new SingleColumn()
                         {
                             Name = dataColumn.ColumnName,
@@ -586,7 +610,7 @@ namespace ExpressBase.Objects
                 EbDataTable dataTable = dataset.Tables[i];////
                 SingleTable Table = new SingleTable();
 
-                GetFormattedData(dataTable, Table);
+                GetFormattedData(dataTable, Table, _schema.Tables[i]);
 
                 if (!_FormData.MultipleTables.ContainsKey(_schema.Tables[i].TableName) && Table.Count > 0)
                     _FormData.MultipleTables.Add(_schema.Tables[i].TableName, Table);
@@ -817,17 +841,31 @@ namespace ExpressBase.Objects
                                         p.Value = DBNull.Value;
                                         param.Add(p);
                                     }
-                                    else if ((EbDbTypes)rField.Type == EbDbTypes.Date)
+                                    else if(rField.Control is EbDate || rField.Control is EbDGDateColumn)
                                     {
-                                        rField.Value = DateTime.ParseExact(rField.Value.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
-                                        param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
+                                        EbDateType _type = rField.Control is EbDate ? (rField.Control as EbDate).EbDateType : (rField.Control as EbDGDateColumn).EbDateType;
+                                        if (_type == EbDateType.Date)
+                                        {
+                                            rField.Value = DateTime.ParseExact(rField.Value.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
+                                        }
+                                        else
+                                        {
+                                            DateTime dt = DateTime.ParseExact(rField.Value.ToString(), "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+                                            rField.Value = dt.ConvertToUtc(this.UserObj.Preference.TimeZone);
+                                        }
+                                        param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, EbDbTypes.DateTime, rField.Value));
                                     }
-                                    else if ((EbDbTypes)rField.Type == EbDbTypes.DateTime)
-                                    {
-                                        DateTime dt = DateTime.ParseExact(rField.Value.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
-                                        rField.Value = dt.ConvertToUtc(this.UserObj.Preference.TimeZone);
-                                        param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
-                                    }
+                                    //else if ((EbDbTypes)rField.Type == EbDbTypes.Date)
+                                    //{
+                                    //    rField.Value = DateTime.ParseExact(rField.Value.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
+                                    //    param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
+                                    //}
+                                    //else if ((EbDbTypes)rField.Type == EbDbTypes.DateTime)
+                                    //{
+                                    //    DateTime dt = DateTime.ParseExact(rField.Value.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
+                                    //    rField.Value = dt.ConvertToUtc(this.UserObj.Preference.TimeZone);
+                                    //    param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
+                                    //}
                                     else
                                         param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
                                 }
@@ -850,17 +888,31 @@ namespace ExpressBase.Objects
                                 p.Value = DBNull.Value;
                                 param.Add(p);
                             }
-                            else if ((EbDbTypes)rField.Type == EbDbTypes.Date)
+                            else if (rField.Control is EbDate || rField.Control is EbDGDateColumn)
                             {
-                                rField.Value = DateTime.ParseExact(rField.Value.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
-                                param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
+                                EbDateType _type = rField.Control is EbDate ? (rField.Control as EbDate).EbDateType : (rField.Control as EbDGDateColumn).EbDateType;
+                                if (_type == EbDateType.Date)
+                                {
+                                    rField.Value = DateTime.ParseExact(rField.Value.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
+                                }
+                                else
+                                {
+                                    DateTime dt = DateTime.ParseExact(rField.Value.ToString(), "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+                                    rField.Value = dt.ConvertToUtc(this.UserObj.Preference.TimeZone);
+                                }
+                                param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, EbDbTypes.DateTime, rField.Value));
                             }
-                            else if ((EbDbTypes)rField.Type == EbDbTypes.DateTime)
-                            {
-                                DateTime dt = DateTime.ParseExact(rField.Value.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
-                                rField.Value = dt.ConvertToUtc(this.UserObj.Preference.TimeZone);
-                                param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
-                            }
+                            //else if ((EbDbTypes)rField.Type == EbDbTypes.Date)
+                            //{
+                            //    rField.Value = DateTime.ParseExact(rField.Value.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
+                            //    param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
+                            //}
+                            //else if ((EbDbTypes)rField.Type == EbDbTypes.DateTime)
+                            //{
+                            //    DateTime dt = DateTime.ParseExact(rField.Value.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
+                            //    rField.Value = dt.ConvertToUtc(this.UserObj.Preference.TimeZone);
+                            //    param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
+                            //}
                             else
                                 param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
                         }
@@ -963,17 +1015,31 @@ namespace ExpressBase.Objects
                                 p.Value = DBNull.Value;
                                 param.Add(p);
                             }
-                            else if ((EbDbTypes)rField.Type == EbDbTypes.Date)
+                            else if (rField.Control is EbDate || rField.Control is EbDGDateColumn)
                             {
-                                rField.Value = DateTime.ParseExact(rField.Value.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
-                                param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
+                                EbDateType _type = rField.Control is EbDate ? (rField.Control as EbDate).EbDateType : (rField.Control as EbDGDateColumn).EbDateType;
+                                if (_type == EbDateType.Date)
+                                {
+                                    rField.Value = DateTime.ParseExact(rField.Value.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
+                                }
+                                else
+                                {
+                                    DateTime dt = DateTime.ParseExact(rField.Value.ToString(), "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+                                    rField.Value = dt.ConvertToUtc(this.UserObj.Preference.TimeZone);
+                                }
+                                param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, EbDbTypes.DateTime, rField.Value));
                             }
-                            else if ((EbDbTypes)rField.Type == EbDbTypes.DateTime)
-                            {
-                                DateTime dt = DateTime.ParseExact(rField.Value.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
-                                rField.Value = dt.ConvertToUtc(this.UserObj.Preference.TimeZone);
-                                param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
-                            }
+                            //else if ((EbDbTypes)rField.Type == EbDbTypes.Date)
+                            //{
+                            //    rField.Value = DateTime.ParseExact(rField.Value.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
+                            //    param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
+                            //}
+                            //else if ((EbDbTypes)rField.Type == EbDbTypes.DateTime)
+                            //{
+                            //    DateTime dt = DateTime.ParseExact(rField.Value.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
+                            //    rField.Value = dt.ConvertToUtc(this.UserObj.Preference.TimeZone);
+                            //    param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
+                            //}
                             else
                                 param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
                         }
