@@ -106,7 +106,7 @@ namespace ExpressBase.Objects
             return html
                 .Replace("@name@", this.Name)
                 .Replace("@ebsid@", this.EbSid)
-                .Replace("@rmode@", IsRenderMode.ToString())
+                .Replace("@rmode@", IsRenderMode.ToString().ToLower())
                 .Replace("@tabindex@", IsRenderMode ? string.Empty : " tabindex='1'");
         }
 

@@ -615,6 +615,13 @@ namespace ExpressBase.Objects
                     DataSourceRefId = "failed-to-update-";
             }
         }
+
+        public EbChartVisualization()
+        {
+            this.Xaxis = new List<DVBaseColumn>();
+            this.Yaxis = new List<DVBaseColumn>();
+            this.LegendColor = new List<ChartColor>();
+        }
     }
 
     [EnableInBuilder(BuilderType.DVBuilder)]
@@ -636,11 +643,13 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
         [Alias("Longitude")]
+        [HideForUser]
         public override List<DVBaseColumn> Xaxis { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
         [Alias("Lattitude")]
+        [HideForUser]
         public override List<DVBaseColumn> Yaxis { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
@@ -648,6 +657,14 @@ namespace ExpressBase.Objects
 
         //[EnableInBuilder(BuilderType.DVBuilder)]
         //public bool ShowMarker { get; set; }
+
+        public EbGoogleMap()
+        {
+            this.Xaxis = new List<DVBaseColumn>();
+            this.Yaxis = new List<DVBaseColumn>();
+            this.MarkerLabel = new List<DVBaseColumn>();
+            this.InfoWindow = new List<DVBaseColumn>();
+        }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
