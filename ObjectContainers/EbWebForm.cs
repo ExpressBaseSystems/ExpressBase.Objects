@@ -545,9 +545,9 @@ namespace ExpressBase.Objects
                             ColumnSchema _column = _table.Columns.Find(c => c.ColumnName.Equals(dataColumn.ColumnName));
                             if(_column != null)
                             {
-                                if(_column.Control is EbDate || _column.Control is EbDGDateColumn)
+                                if(_column.Control is EbDate || _column.Control is EbDGDateColumn || _column.Control is EbSysCreatedAt)
                                 {
-                                    EbDateType _type = _column.Control is EbDate ? (_column.Control as EbDate).EbDateType : (_column.Control as EbDGDateColumn).EbDateType;
+                                    EbDateType _type = _column.Control is EbDate ? (_column.Control as EbDate).EbDateType : _column.Control is EbDGDateColumn ? (_column.Control as EbDGDateColumn).EbDateType : (_column.Control as EbSysCreatedAt).EbDateType;
                                     DateTime dt = Convert.ToDateTime(_unformattedData);
                                     if (_type == EbDateType.Date)
                                     {
