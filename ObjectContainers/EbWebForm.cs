@@ -853,7 +853,7 @@ namespace ExpressBase.Objects
                                             DateTime dt = DateTime.ParseExact(rField.Value.ToString(), "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
                                             rField.Value = dt.ConvertToUtc(this.UserObj.Preference.TimeZone);
                                         }
-                                        param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
+                                        param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, EbDbTypes.DateTime, rField.Value));
                                     }
                                     //else if ((EbDbTypes)rField.Type == EbDbTypes.Date)
                                     //{
@@ -900,7 +900,7 @@ namespace ExpressBase.Objects
                                     DateTime dt = DateTime.ParseExact(rField.Value.ToString(), "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
                                     rField.Value = dt.ConvertToUtc(this.UserObj.Preference.TimeZone);
                                 }
-                                param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
+                                param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, EbDbTypes.DateTime, rField.Value));
                             }
                             //else if ((EbDbTypes)rField.Type == EbDbTypes.Date)
                             //{
@@ -1027,7 +1027,7 @@ namespace ExpressBase.Objects
                                     DateTime dt = DateTime.ParseExact(rField.Value.ToString(), "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
                                     rField.Value = dt.ConvertToUtc(this.UserObj.Preference.TimeZone);
                                 }
-                                param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
+                                param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, EbDbTypes.DateTime, rField.Value));
                             }
                             //else if ((EbDbTypes)rField.Type == EbDbTypes.Date)
                             //{
