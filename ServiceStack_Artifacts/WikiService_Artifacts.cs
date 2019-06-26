@@ -31,10 +31,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public Wiki Wiki { get; set; }
 
-        public string SolnId { get ; set ; }
+        public string SolnId { get; set; }
 
         public int UserId { get; set; }
-        
+
 
     }
 
@@ -50,7 +50,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         public Wiki Wiki { get; set; }
 
-        public string SolnId { get ; set ; }
+        public string SolnId { get; set; }
 
         public int UserId { get; set; }
 
@@ -105,7 +105,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public Wiki Wiki { get; set; }
     }
 
-      public class GetWikiBySearchRequest : EbServiceStackNoAuthRequest, IReturn<GetWikiBySearchResponse>
+    public class GetWikiBySearchRequest : EbServiceStackNoAuthRequest, IReturn<GetWikiBySearchResponse>
     {
         public string Wiki_Search { get; set; }
     }
@@ -146,7 +146,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     public class Admin_Wiki_ListRequest : EbServiceStackAuthRequest, IReturn<Admin_Wiki_ListResponse>
     {
-            public string  Status { get; set; }
+        public string Status { get; set; }
     }
     public class Admin_Wiki_ListResponse
     {
@@ -178,5 +178,16 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         }
 
         public List<Wiki> WikiList { get; set; }
+    }
+
+    public class UpdateOrderRequest : EbServiceStackAuthRequest, IReturn<UpdateOrderResponse>
+    {
+        public int[] Wiki_id { get; set; }
+        public int Order { get; set; }
+    }
+
+    public class UpdateOrderResponse
+    {
+        public bool ResponseStatus { get; set; }
     }
 }
