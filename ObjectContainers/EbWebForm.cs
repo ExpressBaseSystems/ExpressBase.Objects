@@ -562,6 +562,28 @@ namespace ExpressBase.Objects
                                         _formattedData = dt.ConvertFromUtc(this.UserObj.Preference.TimeZone).ToString("HH:mm:ss", CultureInfo.InvariantCulture);
                                     }
                                 }
+                                else if(_column.Control is EbSysLocation)
+                                {
+                                    int loc_id = Convert.ToInt32(_unformattedData);
+                                    EbSysLocDM dm = (_column.Control as EbSysLocation).DisplayMember;
+                                    if (this.SolutionObj.Locations.ContainsKey(loc_id))
+                                    {
+                                        if (dm == EbSysLocDM.LongName)
+                                            _formattedData = this.SolutionObj.Locations[loc_id].LongName;
+                                        else if(dm == EbSysLocDM.ShortName)
+                                            _formattedData = this.SolutionObj.Locations[loc_id].ShortName;
+                                    }
+                                }
+                                else if(_column.Control is EbSysCreatedBy || _column.Control is EbSysModifiedBy)
+                                {
+                                    int user_id = Convert.ToInt32(_unformattedData);
+                                    EbSysCreatedByDM dm = (_column.Control is EbSysCreatedBy) ? (_column.Control as EbSysCreatedBy).DisplayMember : (_column.Control as EbSysModifiedBy).DisplayMember;
+                                    if ( this.SolutionObj.Users != null && this.SolutionObj.Users.ContainsKey(user_id))
+                                    {
+                                        if (dm == EbSysCreatedByDM.FullName)
+                                            _formattedData = this.SolutionObj.Users[user_id];
+                                    }
+                                }
                             }
                         }
                         else if (dataColumn.Type == EbDbTypes.Date)
@@ -821,11 +843,11 @@ namespace ExpressBase.Objects
                     string _tblname = entry.Key;
                     if (Convert.ToInt32(row.RowId) > 0)
                     {
-                        string _qry = "UPDATE {0} SET {1} eb_lastmodified_by = :eb_modified_by, eb_lastmodified_by_s = :eb_modified_by_s, eb_lastmodified_at = " + DataDB.EB_CURRENT_TIMESTAMP + " WHERE id={2};";
+                        string _qry = "UPDATE {0} SET {1} eb_lastmodified_by = :eb_modified_by, eb_lastmodified_at = " + DataDB.EB_CURRENT_TIMESTAMP + " WHERE id={2};";
                         string _colvals = string.Empty;
                         if (row.IsDelete && !_tblname.Equals(this.FormData.MasterTable))
                         {
-                            _qry = "UPDATE {0} SET {1}, eb_lastmodified_by = :eb_modified_by, eb_lastmodified_by_s = :eb_modified_by_s, eb_lastmodified_at = " + DataDB.EB_CURRENT_TIMESTAMP + " WHERE id={2} AND eb_del='F';";
+                            _qry = "UPDATE {0} SET {1}, eb_lastmodified_by = :eb_modified_by, eb_lastmodified_at = " + DataDB.EB_CURRENT_TIMESTAMP + " WHERE id={2} AND eb_del='F';";
                             _colvals = "eb_del='T'";
                         }
                         else
@@ -876,7 +898,7 @@ namespace ExpressBase.Objects
                     }
                     else
                     {
-                        string _qry = "INSERT INTO {0} ({1} eb_created_by, eb_created_by_s, eb_created_at, eb_loc_id, eb_loc_s, {3}_id ) VALUES ({2} :eb_createdby, :eb_createdby_s, " + DataDB.EB_CURRENT_TIMESTAMP + ", :eb_loc_id, :eb_loc_s, :{4}_id);";
+                        string _qry = "INSERT INTO {0} ({1} eb_created_by, eb_created_at, eb_loc_id, {3}_id ) VALUES ({2} :eb_createdby, " + DataDB.EB_CURRENT_TIMESTAMP + ", :eb_loc_id, :{4}_id);";
                         string _cols = string.Empty, _vals = string.Empty;
                         foreach (SingleColumn rField in row.Columns)
                         {
@@ -967,12 +989,13 @@ namespace ExpressBase.Objects
             //-------------------------
 
             param.Add(DataDB.GetNewParameter(this.FormData.MasterTable + "_id", EbDbTypes.Int32, this.FormData.MultipleTables[this.FormData.MasterTable][0].RowId));
-            param.Add(DataDB.GetNewParameter("eb_loc_id", EbDbTypes.Int32, this.LocationId));
-            param.Add(DataDB.GetNewParameter("eb_loc_s", EbDbTypes.String, this.SolutionObj.Locations.ContainsKey(this.LocationId) ? this.SolutionObj.Locations[this.LocationId].ShortName : string.Empty));
+            param.Add(DataDB.GetNewParameter("eb_loc_id", EbDbTypes.Int32, this.LocationId));            
             param.Add(DataDB.GetNewParameter("eb_createdby", EbDbTypes.Int32, this.UserObj.UserId));
-            param.Add(DataDB.GetNewParameter("eb_createdby_s", EbDbTypes.String, this.UserObj.FullName));
             param.Add(DataDB.GetNewParameter("eb_modified_by", EbDbTypes.Int32, this.UserObj.UserId));
-            param.Add(DataDB.GetNewParameter("eb_modified_by_s", EbDbTypes.String, this.UserObj.FullName));
+
+            //param.Add(DataDB.GetNewParameter("eb_loc_s", EbDbTypes.String, this.SolutionObj.Locations.ContainsKey(this.LocationId) ? this.SolutionObj.Locations[this.LocationId].ShortName : string.Empty));
+            //param.Add(DataDB.GetNewParameter("eb_createdby_s", EbDbTypes.String, this.UserObj.FullName));
+            //param.Add(DataDB.GetNewParameter("eb_modified_by_s", EbDbTypes.String, this.UserObj.FullName));
 
             return DataDB.InsertTable(fullqry, param.ToArray());
         }
@@ -987,7 +1010,7 @@ namespace ExpressBase.Objects
             {
                 foreach (SingleRow row in entry.Value)
                 {
-                    string _qry = "INSERT INTO {0} ({1} eb_created_by, eb_created_by_s, eb_created_at, eb_loc_id, eb_loc_s {3} ) VALUES ({2} :eb_createdby, :eb_createdby_s, " + DataDB.EB_CURRENT_TIMESTAMP + ", :eb_loc_id, :eb_loc_s {4});";
+                    string _qry = "INSERT INTO {0} ({1} eb_created_by, eb_created_at, eb_loc_id {3} ) VALUES ({2} :eb_createdby, " + DataDB.EB_CURRENT_TIMESTAMP + ", :eb_loc_id {4});";
                     if (DataDB.Vendor == DatabaseVendors.MYSQL && entry.Key == this.FormSchema.MasterTable)
                     {
                         _qry += "SELECT eb_persist_currval('" + entry.Key + "_id_seq');";
@@ -1102,9 +1125,9 @@ namespace ExpressBase.Objects
             //-----------------------------------------------------------------------------
 
             param.Add(DataDB.GetNewParameter("eb_createdby", EbDbTypes.Int32, this.UserObj.UserId));
-            param.Add(DataDB.GetNewParameter("eb_createdby_s", EbDbTypes.String, this.UserObj.FullName));
+            //param.Add(DataDB.GetNewParameter("eb_createdby_s", EbDbTypes.String, this.UserObj.FullName));
             param.Add(DataDB.GetNewParameter("eb_loc_id", EbDbTypes.Int32, this.LocationId));
-            param.Add(DataDB.GetNewParameter("eb_loc_s", EbDbTypes.String, this.SolutionObj.Locations.ContainsKey(this.LocationId) ? this.SolutionObj.Locations[this.LocationId].ShortName : string.Empty));
+            //param.Add(DataDB.GetNewParameter("eb_loc_s", EbDbTypes.String, this.SolutionObj.Locations.ContainsKey(this.LocationId) ? this.SolutionObj.Locations[this.LocationId].ShortName : string.Empty));
             //param.Add(DataDB.GetNewParameter("eb_auto_id", EbDbTypes.String, FormData.AutoIdText ?? string.Empty));
             //fullqry += string.Format("UPDATE {0} SET eb_auto_id = :eb_auto_id || cur_val('{0}_id_seq')::text WHERE id = cur_val('{0}_id_seq');", this.TableName);
             fullqry += string.Concat("SELECT eb_currval('", this.TableName, "_id_seq');");
