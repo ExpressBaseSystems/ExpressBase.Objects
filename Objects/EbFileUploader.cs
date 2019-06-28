@@ -124,7 +124,7 @@ namespace ExpressBase.Objects
         {
             string Qry = @"
 SELECT 
-	B.id, B.filename, B.tags, B.uploadts
+	B.id, B.filename, B.tags, B.uploadts,B.filecategory
 FROM
 	eb_files_ref B
 WHERE
