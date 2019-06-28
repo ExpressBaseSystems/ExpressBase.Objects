@@ -248,21 +248,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-    public class AutoGenSidRequest : EbServiceStackNoAuthRequest
-    {
-
-    }
-
-    [DataContract]
-    public class AutoGenSidResponse : IEbSSResponse
-    {
-        [DataMember(Order = 1)]
-        public string Sid { get; set; }
-
-        [DataMember(Order = 2)]
-        public ResponseStatus ResponseStatus { get; set; }
-    }
-
     public class ProductPlan
     {
         public string Plan { get; set; }
