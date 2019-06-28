@@ -83,6 +83,7 @@ namespace ExpressBase.Objects
 .Replace("@Label@", this.Label)
 .Replace("@LabelBackColor@", this.LabelBackColor)
 .Replace("@LabelForeColor@", this.LabelForeColor)
+.Replace("@isHidden@", this.Hidden.ToString())
 .Replace("@GetBareHtml@", this.GetBareHtml());
         }
 
@@ -104,8 +105,11 @@ namespace ExpressBase.Objects
         {
             get
             {
-                return @"let tmp = p1.split(',');
-                        $('#' + this.EbSid_CtxId).locationpicker('location', { latitude : parseFloat(tmp[0]), longitude : parseFloat(tmp[1])});";
+                return @"if(p1){
+                            let tmp = p1.split(',');
+                            if(tmp.length === 2 && parseFloat(tmp[0]) && parseFloat(tmp[1]))
+                                $('#' + this.EbSid_CtxId).locationpicker('location', { latitude : parseFloat(tmp[0]), longitude : parseFloat(tmp[1])});
+                        }";
             }
             set { }
         }
