@@ -83,6 +83,7 @@ namespace ExpressBase.Objects
 .Replace("@Label@", this.Label)
 .Replace("@LabelBackColor@", this.LabelBackColor)
 .Replace("@LabelForeColor@", this.LabelForeColor)
+.Replace("@isHidden@", this.Hidden.ToString())
 .Replace("@GetBareHtml@", this.GetBareHtml());
         }
 

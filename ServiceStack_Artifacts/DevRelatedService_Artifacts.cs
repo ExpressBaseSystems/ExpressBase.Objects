@@ -133,31 +133,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-    [DataContract]
-    public class AppWrapper
-    {
-        [DataMember(Order = 1)]
-        public int Id { set; get; }
-
-        [DataMember(Order = 2)]
-        public string Name { set; get; }
-
-        [DataMember(Order = 3)]
-        public int AppType { set; get; }
-
-        [DataMember(Order = 4)]
-        public string Icon { set; get; }
-
-        [DataMember(Order = 5)]
-        public string Description { set; get; }
-
-        [DataMember(Order = 6)]
-        public object AppSettings { set; get; }
-
-        [DataMember(Order = 7)]
-        public List<EbObject> ObjCollection { get; set; }
-    }
-
     public class GetObjectsByAppIdRequest : IReturn<GetObjectsByAppIdResponse>, IEbSSRequest
     {
         [DataMember(Order = 1)]
