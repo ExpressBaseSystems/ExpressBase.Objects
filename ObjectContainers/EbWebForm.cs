@@ -545,13 +545,18 @@ namespace ExpressBase.Objects
                             ColumnSchema _column = _table.Columns.Find(c => c.ColumnName.Equals(dataColumn.ColumnName));
                             if(_column != null)
                             {
-                                if(_column.Control is EbDate || _column.Control is EbDGDateColumn || _column.Control is EbSysCreatedAt)
+                                if(_column.Control is EbDate || _column.Control is EbDGDateColumn || _column.Control is EbSysCreatedAt || _column.Control is EbSysModifiedAt)
                                 {
-                                    EbDateType _type = _column.Control is EbDate ? (_column.Control as EbDate).EbDateType : _column.Control is EbDGDateColumn ? (_column.Control as EbDGDateColumn).EbDateType : (_column.Control as EbSysCreatedAt).EbDateType;
+                                    EbDateType _type = _column.Control is EbDate ? (_column.Control as EbDate).EbDateType : 
+                                        _column.Control is EbDGDateColumn ? (_column.Control as EbDGDateColumn).EbDateType :
+                                        _column.Control is EbSysCreatedAt ? (_column.Control as EbSysCreatedAt).EbDateType : (_column.Control as EbSysModifiedAt).EbDateType;
                                     DateTime dt = Convert.ToDateTime(_unformattedData);
                                     if (_type == EbDateType.Date)
                                     {
-                                        _formattedData = dt.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+                                        if(_column.Control is EbSysCreatedAt || _column.Control is EbSysModifiedAt)
+                                            _formattedData = dt.ConvertFromUtc(this.UserObj.Preference.TimeZone).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+                                        else
+                                            _formattedData = dt.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
                                     }
                                     else if(_type == EbDateType.DateTime)
                                     {                                        
