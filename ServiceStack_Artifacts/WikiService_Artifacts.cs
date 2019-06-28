@@ -182,7 +182,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     public class UpdateOrderRequest : EbServiceStackAuthRequest, IReturn<UpdateOrderResponse>
     {
-        public int[] Wiki_id { get; set; }
+        public string Wiki_id { get; set; }
         public int Order { get; set; }
     }
 
