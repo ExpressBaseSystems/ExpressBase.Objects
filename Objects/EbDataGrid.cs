@@ -29,6 +29,10 @@ namespace ExpressBase.Objects
         [PropertyGroup("Identity")]
         public override int Height { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        public override List<EbValidator> Validators { get; set; }
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [DefaultPropValue("true")]
         [PropertyGroup("Behavior")]
