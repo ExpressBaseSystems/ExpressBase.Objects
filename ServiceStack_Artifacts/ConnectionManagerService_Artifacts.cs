@@ -1,4 +1,5 @@
-﻿using ExpressBase.Common.Connections;
+﻿using ExpressBase.Common;
+using ExpressBase.Common.Connections;
 using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
 using ExpressBase.Common.Messaging;
@@ -168,6 +169,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class AddDBResponse : IEbSSResponse
     {
         public ResponseStatus ResponseStatus { get; set; }
+
+        public int nid { get; set; }
     }
 
     public class GetIntegrationConfigsRequest : IReturn<GetIntegrationConfigsResponse>, IEbSSRequest
@@ -369,6 +372,16 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
     public class EbIntegrationConfData
     {
+        public EbIntegrationConfData(EbDataRow _row)
+        {
+            Id = Convert.ToInt32(_row[0]);
+            SolutionId = _row[1].ToString();
+            NickName = _row[2].ToString();
+            ConObject = _row[4].ToString();
+            Type = _row[3].ToString();
+            CreatedOn = Convert.ToDateTime(_row[6]).ToString("dddd, dd MMMM yyyy");
+        }
+
         public int Id { get; set; }
 
         public string SolutionId { get; set; }
@@ -384,6 +397,15 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     public class EbIntegrationData
     {
+        public EbIntegrationData (EbDataRow row)
+        {
+            Id = row[10].ToString();
+            ConfId = row[14].ToString();
+            NickName = row[2].ToString();
+            Ctype = row[3].ToString();
+            Type = row[12].ToString();
+            Preference = row[13].ToString();
+        }
         public string Id { get; set; }
 
         public string ConfId { get; set; }
