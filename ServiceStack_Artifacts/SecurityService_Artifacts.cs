@@ -378,7 +378,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		[DataMember(Order = 4)]
 		public string SolnId { get; set; }
 
-		public int UserId { get; set; }
+        [DataMember(Order = 5)]
+        public int UserId { get; set; }
 	}
 
 	[DataContract]

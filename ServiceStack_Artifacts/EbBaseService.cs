@@ -190,8 +190,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
                         _ParamList.Add(obj);
                     }
                 string _param = JsonConvert.SerializeObject(_ParamList);
-                string query = @"INSERT INTO eb_executionlogs(rows, exec_time, created_by, created_at, params, refid) 
-                                VALUES(:rows, :exec_time, :created_by, :created_at, :params, :refid)";
+                string query = EbConnectionFactory.ObjectsDB.EB_INSERT_EXECUTION_LOGS;
                 DbParameter[] parameters = {
                      EbConnectionFactory.ObjectsDB.GetNewParameter("rows", EbDbTypes.String,rows),
                      EbConnectionFactory.ObjectsDB.GetNewParameter("exec_time", EbDbTypes.Int32,t.TotalMilliseconds),

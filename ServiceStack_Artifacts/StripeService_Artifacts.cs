@@ -8,13 +8,15 @@ using ExpressBase.Common.Stripe;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
-    public class CreateCustomerRequest : EbServiceStackAuthRequest, IReturn<CreateCustomerResponse>
+    public class CreateCustomerRequest : IEbTenentRequest, IReturn<CreateCustomerResponse>
     {
         public string EmailId { get; set; }
 
         public string TokenId { get; set; }
 
-        public string SolutionId { get; set; }
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
     }
 
     public class CreateCustomerResponse : IEbSSResponse
@@ -34,9 +36,70 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class GetCustomerResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
-        public string Email { get; set; }
+        public string Name { get; set; }
 
         [DataMember(Order = 2)]
+        public string Address { get; set; }
+
+        [DataMember(Order = 3)]
+        public string City { get; set; }
+
+        [DataMember(Order = 4)]
+        public string State { get; set; }
+
+        [DataMember(Order = 5)]
+        public string Country { get; set; }
+
+        [DataMember(Order = 6)]
+        public string Zip { get; set; }
+
+        [DataMember(Order = 7)]
+        public string Email { get; set; }
+
+        [DataMember(Order = 8)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    public class GetCardRequest : EbServiceStackAuthRequest, IReturn<GetCardResponse>
+    {
+        public string CustId { get; set; }
+    }
+
+    public class GetCardResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public string Last4 { get; set; }
+
+        [DataMember(Order = 2)]
+        public long ExpMonth { get; set; }
+
+        [DataMember(Order = 3)]
+        public long ExpYear { get; set; }
+
+        [DataMember(Order = 4)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+
+    public class CheckCustomerSubscribedRequest : IEbTenentRequest, IReturn<CheckCustomerSubscribedResponse>
+    {
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
+    }
+
+    public class CheckCustomerSubscribedResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public string Plan { get; set; }
+
+        [DataMember(Order = 2)]
+        public int Users { get; set; }
+
+        [DataMember(Order = 3)]
+        public string CustId { get; set; }
+
+        [DataMember(Order = 4)]
         public ResponseStatus ResponseStatus { get; set; }
     }
 
@@ -176,13 +239,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class CreateSubscriptionResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
-        public DateTime? PeriodStart { get; set; }
+        public DateTime PeriodStart { get; set; }
 
         [DataMember(Order = 2)]
-        public DateTime? PeriodEnd { get; set; }
+        public DateTime PeriodEnd { get; set; }
 
         [DataMember(Order = 3)]
-        public DateTime? Created { get; set; }
+        public DateTime Created { get; set; }
 
         [DataMember(Order = 4)]
         public long? Amount { get; set; }
@@ -197,17 +260,18 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public long Quantity { get; set; }
 
         [DataMember(Order = 8)]
-        public string Url { get; set; }
+        public string Plan { get; set; }
 
         [DataMember(Order = 9)]
         public ResponseStatus ResponseStatus { get; set; }
     }
 
+  
     public class UpgradeSubscriptionRequest : EbServiceStackAuthRequest, IReturn<UpgradeSubscriptionResponse>
     {
-        public string CustId { get; set; }
-
         public string PlanId { get; set; }
+
+        public int Total { get; set; }
 
         public string SolutionId { get; set; }
     }
@@ -215,6 +279,30 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class UpgradeSubscriptionResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
+        public DateTime PeriodStart { get; set; }
+
+        [DataMember(Order = 2)]
+        public DateTime PeriodEnd { get; set; }
+
+        [DataMember(Order = 3)]
+        public DateTime Created { get; set; }
+
+        [DataMember(Order = 4)]
+        public long? Amount { get; set; }
+
+        [DataMember(Order = 5)]
+        public string UseageType { get; set; }
+
+        [DataMember(Order = 6)]
+        public string BillingScheme { get; set; }
+
+        [DataMember(Order = 7)]
+        public long Quantity { get; set; }
+
+        [DataMember(Order = 8)]
+        public string Plan { get; set; }
+
+        [DataMember(Order = 9)]
         public ResponseStatus ResponseStatus { get; set; }
     }
 

@@ -39,7 +39,7 @@ namespace ExpressBase.Objects
                     });
                     if (props.MinHeight > maxH)
                         maxH = props.MinHeight;
-                    if($('form[eb-form=true]').attr('IsRenderMode') === 'True')
+                    if($('form[eb-form=true]').attr('IsRenderMode') === 'true')
                         $panes.outerHeight(maxH);      
                     else
                         $panes.css('min-height', maxH +'px');                      
