@@ -270,7 +270,8 @@ $('#@id').MonthPicker({ StartYear: 2018, ShowIcon: false });"
             get
             {
                 return
-                    @"if(this.IsNullable && p1 !== null)
+                    @"console.log('setvalue');
+                    if(this.IsNullable && p1 !== null)
                         $('#' + this.EbSid_CtxId).siblings('.nullable-check').find('input[type=checkbox]').prop('checked', true);
                     if(this.ShowDateAs_ === 1) //month picker
                         $('#' + this.EbSid_CtxId).val(p1).trigger('change');
