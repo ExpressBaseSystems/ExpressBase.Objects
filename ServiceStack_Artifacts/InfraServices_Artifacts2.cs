@@ -365,6 +365,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string EsolutionId { get; set; }
 
         public PricingTiers PricingTier { get; set; }
+
+        public bool IsVersioningEnabled { get; set; }
     }
 
     [DataContract]
