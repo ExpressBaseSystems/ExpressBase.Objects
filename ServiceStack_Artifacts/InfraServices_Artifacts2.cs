@@ -11,11 +11,8 @@ using ExpressBase.Common;
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
     [DataContract]
-    public class CreateAccountRequest : IReturn<CreateAccountResponse>, IEbSSRequest
+    public class CreateAccountRequest : EbServiceStackNoAuthRequest
     {
-        [DataMember(Order = 0)]
-        public string Op { get; set; }
-
         [DataMember(Order = 1)]
         public string Email { get; set; }
 
@@ -31,9 +28,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 5)]
         public string SolnId { get; set; }
 
-        [DataMember(Order = 6)]
-        public string DbName { get; set; }
-
         [DataMember(Order = 7)]
         public string Country { get; set; }
 
@@ -48,37 +42,28 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order =11)]
         public string Account_type { get; set; }
-
-        [DataMember(Order =12)]
-        public string DisplayName { get; set; }
-
-
-        public int UserId { get; set; }
-
-        public string Token { get; set; }
     }
 
     [DataContract]
     public class CreateAccountResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
-        public int id { get; set; }
+        public int Id { get; set; }
 
         [DataMember(Order = 2)]
-        public string email { get; set; }
+        public bool Notified { get; set; } = false;
 
         [DataMember(Order = 3)]
-        public string Token { get; set; }
+        public bool DbCreated { get; set; } = false;
 
         [DataMember(Order = 4)]
         public ResponseStatus ResponseStatus { get; set; }
 
         [DataMember(Order = 5)]
-        public string u_token { get; set; }
+        public bool IsEmailUniq { get; set; }
 
         [DataMember(Order = 6)]
-        public string Sol_id_autogen { get; set; }
-
+        public bool AccountCreated { get; set; } = false;
     }
 
     [DataContract]
@@ -282,7 +267,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class CreateSolutionResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
-        public int Status { get; set; }
+        public int Id { get; set; }
 
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
@@ -293,6 +278,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 4)]
         public string ErrDbMessage { get; set; }
     }
+  
+   
 
     [DataContract]
     public class GetSolutionRequest : IReturn<GetSolutionResponse>, IEbSSRequest
