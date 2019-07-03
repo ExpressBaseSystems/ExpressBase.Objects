@@ -656,15 +656,7 @@ namespace ExpressBase.Objects
         public bool ShowRoute { get; set; }
 
         //[EnableInBuilder(BuilderType.DVBuilder)]
-        //public bool ShowMarker { get; set; }
-
-        public EbGoogleMap()
-        {
-            this.Xaxis = new List<DVBaseColumn>();
-            this.Yaxis = new List<DVBaseColumn>();
-            this.MarkerLabel = new List<DVBaseColumn>();
-            this.InfoWindow = new List<DVBaseColumn>();
-        }
+        //public bool ShowMarker { get; set; }        
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
@@ -674,11 +666,31 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
         public List<DVBaseColumn> InfoWindow { get; set; }
 
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [OSE_ObjectTypes(EbObjectTypes.iWebForm)]
+        [HideForUser]
+        public string MarkerLink { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
+        [HideForUser]
+        public List<DVBaseColumn> FormParameter { get; set; }
+
         [EnableInBuilder(BuilderType.DVBuilder)]
         [DefaultPropValue("6")]        
         public int Zoomlevel { get; set; }
 
-        
+        public EbGoogleMap()
+        {
+            this.Xaxis = new List<DVBaseColumn>();
+            this.Yaxis = new List<DVBaseColumn>();
+            this.MarkerLabel = new List<DVBaseColumn>();
+            this.InfoWindow = new List<DVBaseColumn>();
+            this.FormParameter = new List<DVBaseColumn>();
+        }
+
+
         public override string XaxisTitle { get; set; }
 
         

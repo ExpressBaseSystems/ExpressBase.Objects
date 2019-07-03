@@ -8,6 +8,7 @@ using ExpressBase.Objects.ServiceStack_Artifacts;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
@@ -78,7 +79,8 @@ namespace ExpressBase.Objects.Objects.DVRelated
         Equals = 0,
         Startwith = 1,
         EndsWith = 2,
-        Between = 3
+        Between = 3,
+        Contains = 4
     }
     public enum NumericOperators
     {
@@ -88,6 +90,11 @@ namespace ExpressBase.Objects.Objects.DVRelated
         LessThanOrEqual = 3,
         GreaterThanOrEqual = 4,
         Between = 5
+    }
+
+    public enum BooleanOperators
+    {
+        Equals = 0
     }
 
     public enum Align
@@ -104,7 +111,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
         DESC = 1
     }
 
-
+    
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl)]
     [HideInPropertyGrid]
     public class DVBaseColumn : EbDataVisualizationObject
@@ -336,7 +343,7 @@ else {
         public int AllowedCharacterLength { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
-        public OrderByDirection Direction { get; set; }
+        public OrderByDirection Direction { get; set; }        
 
         [JsonIgnore]
         private List<string> __formulaDataFieldsUsed = null;
@@ -494,8 +501,7 @@ else {
                 this.Add(aa.ShallowCopy());
             }
         }
-    }
-    
+    }    
 
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl)]
     [Alias("DVStringColumnAlias")]
@@ -566,12 +572,22 @@ pg.HideProperty('FormMode');
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.DropDown)]
         public Align Align { get; set; }
-        
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        public List<StringCondition> ConditionalFormat { get; set; }
+
+        public DVStringColumn()
+        {
+            this.ConditionalFormat = new List<StringCondition>();
+        }
+
     }
 
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl)]
     public class DVNumericColumn : DVBaseColumn
     {
+        [OnChangeExec(@"console.log('------------   this.Type')")]
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         public bool Aggregate { get; set; }
 
@@ -653,7 +669,15 @@ pg.HideProperty('FormMode');
         [PropertyEditor(PropertyEditorType.DropDown)]
         public Align Align { get; set; }
 
-        
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        public List<NumericCondition> ConditionalFormat { get; set; }
+
+        public DVNumericColumn()
+        {
+            this.ConditionalFormat = new List<NumericCondition>();
+        }
+
     }
 
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl)]
@@ -710,7 +734,16 @@ pg.HideProperty('FormMode');
         [PropertyEditor(PropertyEditorType.DropDown)]
         public Align Align { get; set; }
 
-        
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        public List<BooleanCondition> ConditionalFormat { get; set; }
+
+        public DVBooleanColumn()
+        {
+            this.ConditionalFormat = new List<BooleanCondition>();
+        }
+
+
     }
 
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl)]
@@ -789,7 +822,14 @@ pg.HideProperty('FormMode');
         [PropertyEditor(PropertyEditorType.DropDown)]
         public Align Align { get; set; }
 
-        
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        public List<DateCondition> ConditionalFormat { get; set; }
+
+        public DVDateTimeColumn()
+        {
+            this.ConditionalFormat = new List<DateCondition>();
+        }
     }
 
     [EnableInBuilder(BuilderType.DVBuilder)]
@@ -828,6 +868,125 @@ pg.HideProperty('FormMode');
         public EbDbTypes Type { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
-        public string Value { get; set; }        
+        public string Value { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [HideInPropertyGrid]
+        public string EbSid { get; set; }
+    }
+
+    [EnableInBuilder(BuilderType.DVBuilder)]
+    public class NumericCondition : EbDataVisualizationObject
+    {
+        public NumericCondition() { }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [OnChangeExec(@"
+if(this.Operator === 5)
+    pg.ShowProperty('Value1');
+else
+    pg.HideProperty('Value1');
+    
+")]
+        public NumericOperators Operator { get; set; }
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public int Value { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public int Value1 { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.Color)]
+        public string FontColor { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.Color)]
+        public  string BackGroundColor { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [HideInPropertyGrid]
+        public string EbSid { get; set; }
+    }
+
+    [EnableInBuilder(BuilderType.DVBuilder)]
+    public class StringCondition : EbDataVisualizationObject
+    {
+        public StringCondition() { }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public StringOperators Operator { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public string Value { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.Color)]
+        public string FontColor { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.Color)]
+        public string BackGroundColor { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [HideInPropertyGrid]
+        public string EbSid { get; set; }
+    }
+
+    [EnableInBuilder(BuilderType.DVBuilder)]
+    public class BooleanCondition : EbDataVisualizationObject
+    {
+        public BooleanCondition() { }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public BooleanOperators Operator { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public bool Value { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.Color)]
+        public string FontColor { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.Color)]
+        public string BackGroundColor { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [HideInPropertyGrid]
+        public string EbSid { get; set; }
+    }
+
+    [EnableInBuilder(BuilderType.DVBuilder)]
+    public class DateCondition : EbDataVisualizationObject
+    {
+        public DateCondition() { }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [OnChangeExec(@"
+if(this.Operator === 5)
+    pg.ShowProperty('Value1');
+else
+    pg.HideProperty('Value1');
+    
+")]
+        public NumericOperators Operator { get; set; }
+        [DefaultPropValue("")]
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public DateTime Value { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public DateTime Value1 { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.Color)]
+        public string FontColor { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.Color)]
+        public string BackGroundColor { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [HideInPropertyGrid]
+        public string EbSid { get; set; }
     }
 }
