@@ -61,6 +61,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 5)]
         public bool IsEmailUniq { get; set; }
+
+        [DataMember(Order = 6)]
+        public bool AccountCreated { get; set; } = false;
     }
 
     [DataContract]
@@ -275,6 +278,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 4)]
         public string ErrDbMessage { get; set; }
     }
+  
+   
 
     [DataContract]
     public class GetSolutionRequest : IReturn<GetSolutionResponse>, IEbSSRequest
