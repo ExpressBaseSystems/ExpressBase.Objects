@@ -477,16 +477,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class EbObjectChangeStatusResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
-        public int Id { get; set; }
-
-        [DataMember(Order = 2)]
-        public string Token { get; set; }
-
-        [DataMember(Order = 3)]
         public ResponseStatus ResponseStatus { get; set; }
 
-        [DataMember(Order = 4)]
-        public string RefId { get; set; }
+        [DataMember(Order = 2)]
+        public bool Response { get; set; }
     }
 
     public class RunSqlFunctionRequest : EbServiceStackAuthRequest, IReturn<RunSqlFunctionResponse>
@@ -504,12 +498,14 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-    public class DeleteEbObjectRequest : EbServiceStackAuthRequest, IReturn<DeleteObjectResponse> {
+    public class DeleteEbObjectRequest : EbServiceStackAuthRequest, IReturn<DeleteObjectResponse>
+    {
         public int ObjId { get; set; }
     }
 
     public class DeleteObjectResponse : IEbSSResponse
-    {[DataMember(Order =1)]
+    {
+        [DataMember(Order = 1)]
         public int RowsDeleted { get; set; }
 
         [DataMember(Order = 2)]
@@ -530,7 +526,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
     }
-    
+
     [DataContract]
     public class EbObjectWrapper
     {
@@ -594,10 +590,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 20)]
         public EbObj_Dashboard Dashboard_Tiles { get; set; }
 
-        [DataMember(Order =21)]
+        [DataMember(Order = 21)]
         public string DisplayName { get; set; }
 
-        [DataMember(Order =22)]
+        [DataMember(Order = 22)]
         public bool IsLogEnabled { get; set; }
 
         public EbObjectWrapper() { }
