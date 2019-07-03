@@ -655,8 +655,9 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.DVBuilder)]
         public bool ShowRoute { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
-        public bool ShowMarker { get; set; }
+        //[EnableInBuilder(BuilderType.DVBuilder)]
+        //public bool ShowMarker { get; set; }
+
         [PropertyGroup("Marker")]
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
