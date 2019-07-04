@@ -656,29 +656,52 @@ namespace ExpressBase.Objects
         public bool ShowRoute { get; set; }
 
         //[EnableInBuilder(BuilderType.DVBuilder)]
-        //public bool ShowMarker { get; set; }        
+        //public bool ShowMarker { get; set; }
 
+        [PropertyGroup("Marker")]
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
+        [HideInPropertyGrid]
         public List<DVBaseColumn> MarkerLabel { get; set; }
 
+        [PropertyGroup("Marker")]
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
         public List<DVBaseColumn> InfoWindow { get; set; }
 
+        [PropertyGroup("Marker")]
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iWebForm)]
         [HideForUser]
+        [OnChangeExec(@"
+            if(this.MarkerLink !== null)
+                pg.ShowProperty('FormParameter');
+            else 
+                pg.HideProperty('FormParameter');
+        ")]
         public string MarkerLink { get; set; }
 
+        [PropertyGroup("Marker")]
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
         [HideForUser]
         public List<DVBaseColumn> FormParameter { get; set; }
 
+        [PropertyGroup("Zoom")]
         [EnableInBuilder(BuilderType.DVBuilder)]
-        [DefaultPropValue("6")]        
+        [DefaultPropValue("True")]
+        [OnChangeExec(@"
+        if(this.AutoZoom === true)
+            pg.HideProperty('Zoomlevel');
+        else
+            pg.ShowProperty('Zoomlevel');
+        ")]
+        public bool AutoZoom { get; set; }
+
+        [PropertyGroup("Zoom")]
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [DefaultPropValue("10")]        
         public int Zoomlevel { get; set; }
 
         public EbGoogleMap()
@@ -688,6 +711,7 @@ namespace ExpressBase.Objects
             this.MarkerLabel = new List<DVBaseColumn>();
             this.InfoWindow = new List<DVBaseColumn>();
             this.FormParameter = new List<DVBaseColumn>();
+            this.AutoZoom = true;
         }
 
 

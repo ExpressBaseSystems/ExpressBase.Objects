@@ -270,6 +270,19 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
+    public class AddGoogleMapRequest : IReturn<AddGoogleMapResponse>, IEbTenentRequest
+    {
+        public EbGoogleMapConfig Config { get; set; }
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
+    }
+
+    public class AddGoogleMapResponse : IEbSSResponse
+    {
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
     public class EbIntegrationRequest : IReturn<EbIntegrationResponse>, IEbTenentRequest
     {
         public EbIntegration IntegrationO { get; set; }
@@ -277,7 +290,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int UserId { get; set; }
 
         public string SolnId { get; set; }
-    }    
+    }
 
     public class EbIntegrationResponse : IEbSSResponse
     {
@@ -364,7 +377,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public EbSolutionsWrapper SolutionInfo { get; set; }
 
         [DataMember(Order = 5)]
-        public Dictionary<string,List<EbIntegrationConfData>> IntegrationsConfig { set; get; }
+        public Dictionary<string, List<EbIntegrationConfData>> IntegrationsConfig { set; get; }
 
         [DataMember(Order = 6)]
         public Dictionary<string, List<EbIntegrationData>> Integrations { set; get; }
@@ -397,7 +410,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     public class EbIntegrationData
     {
-        public EbIntegrationData (EbDataRow row)
+        public EbIntegrationData(EbDataRow row)
         {
             Id = row[10].ToString();
             ConfId = row[14].ToString();

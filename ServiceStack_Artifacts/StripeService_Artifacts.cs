@@ -28,9 +28,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-    public class GetCustomerRequest : EbServiceStackAuthRequest, IReturn<GetCustomerResponse>
+    public class GetCustomerRequest : IEbTenentRequest, IReturn<GetCustomerResponse>
     {
         public string CustId { get; set; }
+
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
     }
 
     public class GetCustomerResponse : IEbSSResponse
@@ -60,9 +64,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-    public class GetCardRequest : EbServiceStackAuthRequest, IReturn<GetCardResponse>
+    public class GetCardRequest : IEbTenentRequest, IReturn<GetCardResponse>
     {
         public string CustId { get; set; }
+
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
     }
 
     public class GetCardResponse : IEbSSResponse
@@ -103,13 +111,17 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-    public class CheckCustomerRequest : EbServiceStackAuthRequest, IReturn<CheckCustomerResponse>
+    public class CheckCustomerRequest : IEbTenentRequest, IReturn<CheckCustomerResponse>
     {
         public string EmailId { get; set; }
 
         public string TokenId { get; set; }
 
         public string SolutionId { get; set; }
+
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
     }
 
     public class CheckCustomerResponse : IEbSSResponse
@@ -121,7 +133,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-    public class UpdateCardRequest : EbServiceStackAuthRequest, IReturn<UpdateCardResponse>
+    public class UpdateCardRequest : IEbTenentRequest, IReturn<UpdateCardResponse>
     {
         public string CustId { get; set; }
 
@@ -138,6 +150,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Country { get; set; }
 
         public string Zip { get; set; }
+
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
     }
 
     public class UpdateCardResponse : IEbSSResponse
@@ -146,9 +162,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-    public class CreateChargeRequest : EbServiceStackAuthRequest, IReturn<CreateChargeResponse>
+    public class CreateChargeRequest : IEbTenentRequest, IReturn<CreateChargeResponse>
     {
         public string CustId { get; set; }
+
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
     }
 
     public class CreateChargeResponse : IEbSSResponse
@@ -157,11 +177,15 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-    public class CreateCharge2Request : EbServiceStackAuthRequest, IReturn<CreateCharge2Response>
+    public class CreateCharge2Request : IEbTenentRequest, IReturn<CreateCharge2Response>
     {
         public string CustId { get; set; }
 
         public string Total { get; set; }
+
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
     }
 
     public class CreateCharge2Response : IEbSSResponse
@@ -170,13 +194,17 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-    public class CreatePlanRequest : EbServiceStackAuthRequest, IReturn<CreatePlanResponse>
+    public class CreatePlanRequest : IEbTenentRequest, IReturn<CreatePlanResponse>
     {
         public string Total { get; set; }
 
         public int Interval { get; set; }
 
         public int Interval_count { get; set; }
+
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
     }
 
     public class CreatePlanResponse : IEbSSResponse
@@ -188,8 +216,11 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-    public class GetPlansRequest : EbServiceStackAuthRequest, IReturn<GetPlansResponse>
+    public class GetPlansRequest : IEbTenentRequest, IReturn<GetPlansResponse>
     {
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
     }
 
     public class GetPlansResponse : IEbSSResponse
@@ -201,7 +232,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-    public class CreateCouponRequest : EbServiceStackAuthRequest, IReturn<CreateCouponResponse>
+    public class CreateCouponRequest : IEbTenentRequest, IReturn<CreateCouponResponse>
     {
         public int Duration { get; set; }
 
@@ -212,6 +243,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int RedeemBy { get; set; }
 
         public int MaxRedeem { get; set; }
+
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
     }
 
     public class CreateCouponResponse : IEbSSResponse
@@ -223,7 +258,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-    public class CreateSubscriptionRequest : EbServiceStackAuthRequest, IReturn<CreateSubscriptionResponse>
+    public class CreateSubscriptionRequest : IEbTenentRequest, IReturn<CreateSubscriptionResponse>
     {
         public string CustId { get; set; }
 
@@ -234,18 +269,22 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string SolutionId { get; set; }
 
         public long? Total { get; set; }
+
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
     }
 
     public class CreateSubscriptionResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
-        public DateTime PeriodStart { get; set; }
+        public string PeriodStart { get; set; }
 
         [DataMember(Order = 2)]
-        public DateTime PeriodEnd { get; set; }
+        public string PeriodEnd { get; set; }
 
         [DataMember(Order = 3)]
-        public DateTime Created { get; set; }
+        public string Created { get; set; }
 
         [DataMember(Order = 4)]
         public long? Amount { get; set; }
@@ -267,25 +306,29 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
   
-    public class UpgradeSubscriptionRequest : EbServiceStackAuthRequest, IReturn<UpgradeSubscriptionResponse>
+    public class UpgradeSubscriptionRequest : IEbTenentRequest, IReturn<UpgradeSubscriptionResponse>
     {
         public string PlanId { get; set; }
 
         public int Total { get; set; }
 
         public string SolutionId { get; set; }
+
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
     }
 
     public class UpgradeSubscriptionResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
-        public DateTime PeriodStart { get; set; }
+        public string PeriodStart { get; set; }
 
         [DataMember(Order = 2)]
-        public DateTime PeriodEnd { get; set; }
+        public string PeriodEnd { get; set; }
 
         [DataMember(Order = 3)]
-        public DateTime Created { get; set; }
+        public string Created { get; set; }
 
         [DataMember(Order = 4)]
         public long? Amount { get; set; }
@@ -306,11 +349,15 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-    public class CreateInvoiceRequest : EbServiceStackAuthRequest, IReturn<CreateInvoiceResponse>
+    public class CreateInvoiceRequest : IEbTenentRequest, IReturn<CreateInvoiceResponse>
     {
         public string CustId { get; set; }
 
         public string Total { get; set; }
+
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
     }
 
     public class CreateInvoiceResponse : IEbSSResponse
@@ -319,9 +366,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-    public class StripewebhookRequest : EbServiceStackAuthRequest, IReturn<StripewebhookResponse>
+    public class StripewebhookRequest : IEbTenentRequest, IReturn<StripewebhookResponse>
     {
         public string Json { get; set; }
+
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
     }
 
     public class StripewebhookResponse : IEbSSResponse
@@ -330,9 +381,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-    public class GetCustomerInvoiceRequest : EbServiceStackAuthRequest, IReturn<GetCustomerInvoiceResponse>
+    public class GetCustomerInvoiceRequest : IEbTenentRequest, IReturn<GetCustomerInvoiceResponse>
     {
         public string CustId { get; set; }
+
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
     }
 
     public class GetCustomerInvoiceResponse : IEbSSResponse
@@ -344,9 +399,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-    public class GetCustomerUpcomingInvoiceRequest : EbServiceStackAuthRequest, IReturn<GetCustomerUpcomingInvoiceResponse>
+    public class GetCustomerUpcomingInvoiceRequest : IEbTenentRequest, IReturn<GetCustomerUpcomingInvoiceResponse>
     {
         public string CustId { get; set; }
+
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
     }
 
     public class GetCustomerUpcomingInvoiceResponse : IEbSSResponse
