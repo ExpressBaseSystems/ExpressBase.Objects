@@ -1,6 +1,7 @@
 ﻿using ExpressBase.Common;
 using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
+using ExpressBase.Common.LocationNSolution;
 using ExpressBase.Data;
 using ExpressBase.Security;
 using ServiceStack;
@@ -161,6 +162,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 17)]
         public bool IsExcel { get; set; }
+
+        [DataMember(Order = 18)]
+        public Eb_Solution eb_Solution { get; set; }
 
     }
 
