@@ -186,7 +186,7 @@ namespace ExpressBase.Objects
                     {
                         if (_dict[CalcFlds[i]].Control.ValueExpr.Code.ToLower().Contains(_dict[j].Path))
                         {
-                            if(CalcFlds[i] == j)
+                            if (CalcFlds[i] == j)
                                 throw new FormException("Avoid circular reference by the following control in 'ValueExpression' : " + _dict[CalcFlds[i]].Control.Name);
                             dpndcy.Add(new KeyValuePair<int, int>(CalcFlds[i], j));//<depended, dominant>
                         }
@@ -540,26 +540,26 @@ namespace ExpressBase.Objects
                         object _unformattedData = dataRow[dataColumn.ColumnIndex];
                         object _formattedData = _unformattedData;
 
-                        if(_table != null)
+                        if (_table != null)
                         {
                             ColumnSchema _column = _table.Columns.Find(c => c.ColumnName.Equals(dataColumn.ColumnName));
-                            if(_column != null)
+                            if (_column != null)
                             {
-                                if(_column.Control is EbDate || _column.Control is EbDGDateColumn || _column.Control is EbSysCreatedAt || _column.Control is EbSysModifiedAt)
+                                if (_column.Control is EbDate || _column.Control is EbDGDateColumn || _column.Control is EbSysCreatedAt || _column.Control is EbSysModifiedAt)
                                 {
-                                    EbDateType _type = _column.Control is EbDate ? (_column.Control as EbDate).EbDateType : 
+                                    EbDateType _type = _column.Control is EbDate ? (_column.Control as EbDate).EbDateType :
                                         _column.Control is EbDGDateColumn ? (_column.Control as EbDGDateColumn).EbDateType :
                                         _column.Control is EbSysCreatedAt ? (_column.Control as EbSysCreatedAt).EbDateType : (_column.Control as EbSysModifiedAt).EbDateType;
                                     DateTime dt = Convert.ToDateTime(_unformattedData);
                                     if (_type == EbDateType.Date)
                                     {
-                                        if(_column.Control is EbSysCreatedAt || _column.Control is EbSysModifiedAt)
+                                        if (_column.Control is EbSysCreatedAt || _column.Control is EbSysModifiedAt)
                                             _formattedData = dt.ConvertFromUtc(this.UserObj.Preference.TimeZone).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
                                         else
                                             _formattedData = dt.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
                                     }
-                                    else if(_type == EbDateType.DateTime)
-                                    {                                        
+                                    else if (_type == EbDateType.DateTime)
+                                    {
                                         _formattedData = dt.ConvertFromUtc(this.UserObj.Preference.TimeZone).ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
                                     }
                                     else
@@ -567,7 +567,7 @@ namespace ExpressBase.Objects
                                         _formattedData = dt.ConvertFromUtc(this.UserObj.Preference.TimeZone).ToString("HH:mm:ss", CultureInfo.InvariantCulture);
                                     }
                                 }
-                                else if(_column.Control is EbSysLocation)
+                                else if (_column.Control is EbSysLocation)
                                 {
                                     int loc_id = Convert.ToInt32(_unformattedData);
                                     EbSysLocDM dm = (_column.Control as EbSysLocation).DisplayMember;
@@ -575,15 +575,15 @@ namespace ExpressBase.Objects
                                     {
                                         if (dm == EbSysLocDM.LongName)
                                             _formattedData = this.SolutionObj.Locations[loc_id].LongName;
-                                        else if(dm == EbSysLocDM.ShortName)
+                                        else if (dm == EbSysLocDM.ShortName)
                                             _formattedData = this.SolutionObj.Locations[loc_id].ShortName;
                                     }
                                 }
-                                else if(_column.Control is EbSysCreatedBy || _column.Control is EbSysModifiedBy)
+                                else if (_column.Control is EbSysCreatedBy || _column.Control is EbSysModifiedBy)
                                 {
                                     int user_id = Convert.ToInt32(_unformattedData);
                                     EbSysCreatedByDM dm = (_column.Control is EbSysCreatedBy) ? (_column.Control as EbSysCreatedBy).DisplayMember : (_column.Control as EbSysModifiedBy).DisplayMember;
-                                    if ( this.SolutionObj.Users != null && this.SolutionObj.Users.ContainsKey(user_id))
+                                    if (this.SolutionObj.Users != null && this.SolutionObj.Users.ContainsKey(user_id))
                                     {
                                         if (dm == EbSysCreatedByDM.FullName)
                                             _formattedData = this.SolutionObj.Users[user_id];
@@ -700,27 +700,51 @@ namespace ExpressBase.Objects
             {
                 List<DbParameter> param = new List<DbParameter>();
                 DataDB.GetNewParameter("id", EbDbTypes.Int32, this.TableRowId);
-                foreach (KeyValuePair<string, SingleTable> entry in _FormData.MultipleTables)
-                {
-                    if (entry.Key == _FormData.MasterTable)
-                        this.LocationId = entry.Value[0].LocId;
+                this.LocationId = _FormData.MultipleTables[_FormData.MasterTable][0].LocId;
 
-                    foreach (SingleColumn column in entry.Value[0].Columns)
+                for (int i = 0; i < _schema.Tables.Count && dataset.Tables.Count >= _schema.Tables.Count; i++)
+                {
+                    if (dataset.Tables[i].Rows.Count > 0)
                     {
-                        DbParameter t = param.Find(e => e.ParameterName == column.Name);
-                        if (t == null)
+                        EbDataRow dataRow = dataset.Tables[i].Rows[0];
+                        foreach (EbDataColumn dataColumn in dataset.Tables[i].Columns)
                         {
-                            if (column.Value == null)
+                            DbParameter t = param.Find(e => e.ParameterName == dataColumn.ColumnName);
+                            if (t == null)
                             {
-                                var p = DataDB.GetNewParameter(column.Name, (EbDbTypes)column.Type);
-                                p.Value = DBNull.Value;
-                                param.Add(p);
+                                if (dataRow.IsDBNull(dataColumn.ColumnIndex))
+                                {
+                                    var p = DataDB.GetNewParameter(dataColumn.ColumnName, dataColumn.Type);
+                                    p.Value = DBNull.Value;
+                                    param.Add(p);
+                                }
+                                else
+                                    param.Add(DataDB.GetNewParameter(dataColumn.ColumnName, dataColumn.Type, dataRow[dataColumn.ColumnIndex]));
                             }
-                            else
-                                param.Add(DataDB.GetNewParameter(column.Name, (EbDbTypes)column.Type, column.Value));
                         }
                     }
                 }
+                //foreach (KeyValuePair<string, SingleTable> entry in _FormData.MultipleTables)
+                //{
+                //    if (entry.Key == _FormData.MasterTable)
+                //        this.LocationId = entry.Value[0].LocId;
+
+                //    foreach (SingleColumn column in entry.Value[0].Columns)
+                //    {
+                //        DbParameter t = param.Find(e => e.ParameterName == column.Name);
+                //        if (t == null)
+                //        {
+                //            if (column.Value == null)
+                //            {
+                //                var p = DataDB.GetNewParameter(column.Name, (EbDbTypes)column.Type);
+                //                p.Value = DBNull.Value;
+                //                param.Add(p);
+                //            }
+                //            else
+                //                param.Add(DataDB.GetNewParameter(column.Name, (EbDbTypes)column.Type, column.Value));
+                //        }
+                //    }
+                //}
                 DbParameter tt = param.Find(e => e.ParameterName == "eb_loc_id");
                 if (tt == null)
                     param.Add(DataDB.GetNewParameter("eb_loc_id", EbDbTypes.Decimal, this.LocationId));
@@ -753,6 +777,7 @@ namespace ExpressBase.Objects
                 this.FormData = _FormData;
                 this.ExeDeleteCancelScript(DataDB);
             }
+            Console.WriteLine("No Exception in RefreshFormData");
         }
 
         //For Prefill Mode
@@ -868,7 +893,7 @@ namespace ExpressBase.Objects
                                         p.Value = DBNull.Value;
                                         param.Add(p);
                                     }
-                                    else if(rField.Control is EbDate || rField.Control is EbDGDateColumn)
+                                    else if (rField.Control is EbDate || rField.Control is EbDGDateColumn)
                                     {
                                         EbDateType _type = rField.Control is EbDate ? (rField.Control as EbDate).EbDateType : (rField.Control as EbDGDateColumn).EbDateType;
                                         if (_type == EbDateType.Date)
@@ -994,7 +1019,7 @@ namespace ExpressBase.Objects
             //-------------------------
 
             param.Add(DataDB.GetNewParameter(this.FormData.MasterTable + "_id", EbDbTypes.Int32, this.FormData.MultipleTables[this.FormData.MasterTable][0].RowId));
-            param.Add(DataDB.GetNewParameter("eb_loc_id", EbDbTypes.Int32, this.LocationId));            
+            param.Add(DataDB.GetNewParameter("eb_loc_id", EbDbTypes.Int32, this.LocationId));
             param.Add(DataDB.GetNewParameter("eb_createdby", EbDbTypes.Int32, this.UserObj.UserId));
             param.Add(DataDB.GetNewParameter("eb_modified_by", EbDbTypes.Int32, this.UserObj.UserId));
 
