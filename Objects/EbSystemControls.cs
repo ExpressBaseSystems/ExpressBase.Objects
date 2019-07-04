@@ -37,16 +37,7 @@ namespace ExpressBase.Objects
             this.Name = "eb_loc_id";
         }
 
-        public override EbDbTypes EbDbType
-        {
-            get
-            {
-                if (this.DisplayMember == EbSysLocDM.LocationId)
-                    return EbDbTypes.Int32;
-                else
-                    return EbDbTypes.String;
-            } 
-        }
+        public override EbDbTypes EbDbType { get { return EbDbTypes.Decimal; } }
 
         [EnableInBuilder(BuilderType.WebForm)]
         public EbSysLocDM DisplayMember { get; set; }
@@ -115,6 +106,19 @@ namespace ExpressBase.Objects
 
         public override string EnableJSfn { get { return @""; } set { } }
 
+        public override string GetValueJSfn { get { return @"return $('#' + this.EbSid_CtxId).attr('data-id');"; } set { } }
+
+        public override string SetValueJSfn
+        {
+            get
+            {
+                return @"let arr = p1.split('$$');
+                        $('#' + this.EbSid_CtxId).attr('data-id', arr[0]);
+                        $('#' + this.EbSid_CtxId).val(arr[1]).trigger('change');";
+            }
+            set { }
+        }
+
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
         public override bool IsSysControl { get { return true; } }
@@ -150,16 +154,7 @@ namespace ExpressBase.Objects
             this.Name = "eb_created_by";
         }
 
-        public override EbDbTypes EbDbType
-        {
-            get
-            {
-                if (this.DisplayMember == EbSysCreatedByDM.UserId)
-                    return EbDbTypes.Decimal;
-                else
-                    return EbDbTypes.String;
-            }
-        }
+        public override EbDbTypes EbDbType { get { return EbDbTypes.Decimal; } }
 
         [EnableInBuilder(BuilderType.WebForm)]
         public EbSysCreatedByDM DisplayMember { get; set; }
@@ -227,6 +222,19 @@ namespace ExpressBase.Objects
         }
 
         public override string EnableJSfn { get { return @""; } set { } }
+
+        public override string GetValueJSfn { get { return @"return $('#' + this.EbSid_CtxId).attr('data-id');"; } set { } }
+        
+        public override string SetValueJSfn
+        {
+            get
+            {
+                return @"let arr = p1.split('$$');
+                        $('#' + this.EbSid_CtxId).attr('data-id', arr[0]);
+                        $('#' + this.EbSid_CtxId).val(arr[1]).trigger('change');";
+            }
+            set { }
+        }
 
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
@@ -262,16 +270,7 @@ namespace ExpressBase.Objects
             this.Name = "eb_lastmodified_by";
         }
 
-        public override EbDbTypes EbDbType
-        {
-            get
-            {
-                if (this.DisplayMember == EbSysCreatedByDM.UserId)
-                    return EbDbTypes.Decimal;
-                else
-                    return EbDbTypes.String;
-            }
-        }
+        public override EbDbTypes EbDbType { get { return EbDbTypes.Decimal; } }
 
         [EnableInBuilder(BuilderType.WebForm)]
         public EbSysCreatedByDM DisplayMember { get; set; }
@@ -339,6 +338,19 @@ namespace ExpressBase.Objects
         }
 
         public override string EnableJSfn { get { return @""; } set { } }
+
+        public override string GetValueJSfn { get { return @"return $('#' + this.EbSid_CtxId).attr('data-id');"; } set { } }
+
+        public override string SetValueJSfn
+        {
+            get
+            {
+                return @"let arr = p1.split('$$');
+                        $('#' + this.EbSid_CtxId).attr('data-id', arr[0]);
+                        $('#' + this.EbSid_CtxId).val(arr[1]).trigger('change');";
+            }
+            set { }
+        }
 
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]

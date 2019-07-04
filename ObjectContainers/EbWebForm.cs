@@ -574,9 +574,9 @@ namespace ExpressBase.Objects
                                     if (this.SolutionObj.Locations.ContainsKey(loc_id))
                                     {
                                         if (dm == EbSysLocDM.LongName)
-                                            _formattedData = this.SolutionObj.Locations[loc_id].LongName;
+                                            _formattedData = loc_id + "$$" + this.SolutionObj.Locations[loc_id].LongName;
                                         else if (dm == EbSysLocDM.ShortName)
-                                            _formattedData = this.SolutionObj.Locations[loc_id].ShortName;
+                                            _formattedData = loc_id + "$$" + this.SolutionObj.Locations[loc_id].ShortName;
                                     }
                                 }
                                 else if (_column.Control is EbSysCreatedBy || _column.Control is EbSysModifiedBy)
@@ -586,7 +586,7 @@ namespace ExpressBase.Objects
                                     if (this.SolutionObj.Users != null && this.SolutionObj.Users.ContainsKey(user_id))
                                     {
                                         if (dm == EbSysCreatedByDM.FullName)
-                                            _formattedData = this.SolutionObj.Users[user_id];
+                                            _formattedData = user_id + "$$" + this.SolutionObj.Users[user_id];
                                     }
                                 }
                             }
