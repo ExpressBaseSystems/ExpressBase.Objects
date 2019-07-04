@@ -22,6 +22,7 @@ namespace ExpressBase.Objects
         public EbDataGrid()
         {
             this.Controls = new List<EbControl>();
+            this.Validators = new List<EbValidator>();
         }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
@@ -31,13 +32,13 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.Collection)]
-        public override List<EbValidator> Validators { get; set; }
+        public new List<EbValidator> Validators { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [DefaultPropValue("true")]
         [PropertyGroup("Behavior")]
         [Alias("Serial numbered")]
-        public bool IsShowSerialNumber{ get; set; }
+        public bool IsShowSerialNumber { get; set; }
 
         [JsonIgnore]
         public override string OnChangeBindJSFn
