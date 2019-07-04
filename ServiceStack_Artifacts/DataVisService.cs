@@ -311,6 +311,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 14)]
         public bool IsExcel { get; set; }
+
+        [DataMember(Order = 15)]
+        public Eb_Solution eb_solution { get; set; }
     }
 
     [DataContract]
