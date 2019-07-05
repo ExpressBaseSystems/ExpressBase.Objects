@@ -139,6 +139,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public string CardId { get; set; }
 
+        public string TokenId { get; set; }
+
         public string Name { get; set; }
 
         public string Address { get; set; }
@@ -159,6 +161,53 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class UpdateCardResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+    public class UpdateCustomerCardRequest : IEbTenentRequest, IReturn<UpdateCustomerCardResponse>
+    {
+        public string CustId { get; set; }
+
+        public string Name { get; set; }
+
+        public string Address { get; set; }
+
+        public string City { get; set; }
+
+        public string State { get; set; }
+
+        public string Country { get; set; }
+
+        public string Zip { get; set; }
+
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
+    }
+
+    public class UpdateCustomerCardResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public string Name { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Address { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Email { get; set; }
+
+        [DataMember(Order = 3)]
+        public string City { get; set; }
+
+        [DataMember(Order = 4)]
+        public string State { get; set; }
+
+        [DataMember(Order = 5)]
+        public string Country { get; set; }
+
+        [DataMember(Order = 6)]
+        public string Zip { get; set; }
+
+        [DataMember(Order = 7)]
         public ResponseStatus ResponseStatus { get; set; }
     }
 

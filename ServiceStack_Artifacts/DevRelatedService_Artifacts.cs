@@ -203,4 +203,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
     }
+
+   public class GetDefaultMapApiKeyFromConnectionRequest : EbServiceStackAuthRequest
+    {
+
+    }
 }
