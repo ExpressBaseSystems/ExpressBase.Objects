@@ -1234,7 +1234,7 @@ namespace ExpressBase.Objects
             {
                 string query = this.GetDeleteQuery(DataDB);
                 DbParameter[] param = new DbParameter[] {
-                    DataDB.GetNewParameter("eb_modified_by", EbDbTypes.Int32, this.UserObj.UserId),
+                    DataDB.GetNewParameter("eb_lastmodified_by", EbDbTypes.Int32, this.UserObj.UserId),
                     DataDB.GetNewParameter("id", EbDbTypes.Int32, this.TableRowId)
                 };
                 return DataDB.UpdateTable(query, param);
@@ -1270,7 +1270,7 @@ namespace ExpressBase.Objects
             {
                 string query = this.GetCancelQuery(DataDB);
                 DbParameter[] param = new DbParameter[] {
-                    DataDB.GetNewParameter("eb_modified_by", EbDbTypes.Int32, this.UserObj.UserId),
+                    DataDB.GetNewParameter("eb_lastmodified_by", EbDbTypes.Int32, this.UserObj.UserId),
                     DataDB.GetNewParameter("id", EbDbTypes.Int32, this.TableRowId)
                 };
                 return DataDB.UpdateTable(query, param);
@@ -1375,7 +1375,12 @@ namespace ExpressBase.Objects
                             {
                                 if (cField.Name.Equals("id"))//skipping 'id' field
                                     continue;
-
+                                ColumnSchema _column = _table.Columns.Find(c => c.ColumnName.Equals(cField.Name));
+                                if (_column != null)
+                                {
+                                    if ((_column.Control as EbControl).DoNotPersist)//skip DoNotPersist field from audit entry// written for EbSystemControls
+                                        continue;
+                                }
                                 SingleColumn ocf = orF.Columns.Find(e => e.Name == cField.Name);
 
                                 if (ocf == null)
