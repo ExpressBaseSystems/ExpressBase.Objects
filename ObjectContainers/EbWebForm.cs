@@ -574,9 +574,9 @@ namespace ExpressBase.Objects
                                     if (this.SolutionObj.Locations.ContainsKey(loc_id))
                                     {
                                         if (dm == EbSysLocDM.LongName)
-                                            _formattedData = this.SolutionObj.Locations[loc_id].LongName;
+                                            _formattedData = loc_id + "$$" + this.SolutionObj.Locations[loc_id].LongName;
                                         else if (dm == EbSysLocDM.ShortName)
-                                            _formattedData = this.SolutionObj.Locations[loc_id].ShortName;
+                                            _formattedData = loc_id + "$$" + this.SolutionObj.Locations[loc_id].ShortName;
                                     }
                                 }
                                 else if (_column.Control is EbSysCreatedBy || _column.Control is EbSysModifiedBy)
@@ -586,7 +586,7 @@ namespace ExpressBase.Objects
                                     if (this.SolutionObj.Users != null && this.SolutionObj.Users.ContainsKey(user_id))
                                     {
                                         if (dm == EbSysCreatedByDM.FullName)
-                                            _formattedData = this.SolutionObj.Users[user_id];
+                                            _formattedData = user_id + "$$" + this.SolutionObj.Users[user_id];
                                     }
                                 }
                             }
@@ -1234,7 +1234,7 @@ namespace ExpressBase.Objects
             {
                 string query = this.GetDeleteQuery(DataDB);
                 DbParameter[] param = new DbParameter[] {
-                    DataDB.GetNewParameter("eb_modified_by", EbDbTypes.Int32, this.UserObj.UserId),
+                    DataDB.GetNewParameter("eb_lastmodified_by", EbDbTypes.Int32, this.UserObj.UserId),
                     DataDB.GetNewParameter("id", EbDbTypes.Int32, this.TableRowId)
                 };
                 return DataDB.UpdateTable(query, param);
@@ -1270,7 +1270,7 @@ namespace ExpressBase.Objects
             {
                 string query = this.GetCancelQuery(DataDB);
                 DbParameter[] param = new DbParameter[] {
-                    DataDB.GetNewParameter("eb_modified_by", EbDbTypes.Int32, this.UserObj.UserId),
+                    DataDB.GetNewParameter("eb_lastmodified_by", EbDbTypes.Int32, this.UserObj.UserId),
                     DataDB.GetNewParameter("id", EbDbTypes.Int32, this.TableRowId)
                 };
                 return DataDB.UpdateTable(query, param);
@@ -1375,7 +1375,12 @@ namespace ExpressBase.Objects
                             {
                                 if (cField.Name.Equals("id"))//skipping 'id' field
                                     continue;
-
+                                ColumnSchema _column = _table.Columns.Find(c => c.ColumnName.Equals(cField.Name));
+                                if (_column != null)
+                                {
+                                    if ((_column.Control as EbControl).DoNotPersist)//skip DoNotPersist field from audit entry// written for EbSystemControls
+                                        continue;
+                                }
                                 SingleColumn ocf = orF.Columns.Find(e => e.Name == cField.Name);
 
                                 if (ocf == null)
