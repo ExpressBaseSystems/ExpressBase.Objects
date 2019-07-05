@@ -271,6 +271,10 @@ else if(this.FormMode === 2){
         [PropertyEditor(PropertyEditorType.DropDown)]
         public LinkTypeEnum LinkType { get; set; }
 
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
+        [HideForUser]
+        public bool HideLinkifNoData { get; set; }
+
         [EnableInBuilder(BuilderType.DVBuilder,  BuilderType.BotForm)]
         [DefaultPropValue("0")]
         [HideForUser]
@@ -515,6 +519,7 @@ if(this.RenderAs === 2){
 console.log('Render as link');
     pg.ShowProperty('LinkRefId');
     pg.ShowProperty('LinkType');
+    pg.ShowProperty('HideLinkifNoData');
     pg.HideProperty('ParentColumn');
     pg.HideProperty('GroupingColumn');
     pg.HideProperty('GroupFormLink');
@@ -538,6 +543,7 @@ console.log('Render as tree');
     pg.ShowProperty('ItemFormId');
     pg.setSimpleProperty('IsTree', true);
     pg.HideProperty('LinkRefId');
+    pg.HideProperty('HideLinkifNoData');
     pg.ShowProperty('LinkType');
     pg.ShowProperty('FormMode');
 }
@@ -545,6 +551,7 @@ else{
 console.log('Render as other');
     pg.HideProperty('LinkRefId');
     pg.HideProperty('LinkType');
+    pg.HideProperty('HideLinkifNoData');
     pg.setSimpleProperty('LinkRefId', null);
     pg.HideProperty('ParentColumn');
     pg.HideProperty('GroupingColumn');
@@ -599,6 +606,7 @@ pg.HideProperty('FormMode');
 if(this.RenderAs === 2){
     pg.ShowProperty('LinkRefId');
     pg.ShowProperty('LinkType');
+    pg.ShowProperty('HideLinkifNoData');
     pg.HideProperty('ParentColumn');
     pg.HideProperty('GroupingColumn');
     pg.HideProperty('GroupFormLink');
@@ -621,12 +629,14 @@ else if(this.RenderAs === 3){
     pg.ShowProperty('ItemFormId');
     pg.setSimpleProperty('IsTree', true);
     pg.HideProperty('LinkRefId');
+    pg.HideProperty('HideLinkifNoData');
     pg.ShowProperty('LinkType');
     pg.ShowProperty('FormMode');
 }
 else{
     pg.HideProperty('LinkRefId');
     pg.HideProperty('LinkType');
+    pg.HideProperty('HideLinkifNoData');
     pg.setSimpleProperty('LinkRefId', null);
     pg.HideProperty('ParentColumn');
     pg.HideProperty('GroupingColumn');
@@ -688,6 +698,7 @@ pg.HideProperty('FormMode');
 if(this.RenderAs === 2){
     pg.ShowProperty('LinkRefId');
     pg.ShowProperty('LinkType');
+    pg.ShowProperty('HideLinkifNoData');
     pg.HideProperty('ParentColumn');
     pg.HideProperty('GroupingColumn');
     pg.HideProperty('GroupFormLink');
@@ -710,12 +721,14 @@ else if(this.RenderAs === 4){
     pg.ShowProperty('ItemFormId');
     pg.setSimpleProperty('IsTree', true);
     pg.HideProperty('LinkRefId');
+    pg.HideProperty('HideLinkifNoData');
     pg.ShowProperty('LinkType');
     pg.ShowProperty('FormMode');
 }
 else{
     pg.HideProperty('LinkRefId');
     pg.HideProperty('LinkType');
+    pg.HideProperty('HideLinkifNoData');
     pg.setSimpleProperty('LinkRefId', null);
     pg.HideProperty('ParentColumn');
     pg.HideProperty('GroupingColumn');
@@ -767,6 +780,7 @@ else{
 if(this.RenderAs === 1){
     pg.ShowProperty('LinkRefId');
     pg.ShowProperty('LinkType');
+    pg.ShowProperty('HideLinkifNoData');
     pg.HideProperty('ParentColumn');
     pg.HideProperty('GroupingColumn');
     pg.HideProperty('GroupFormLink');
@@ -789,12 +803,14 @@ else if(this.RenderAs === 2){
     pg.ShowProperty('ItemFormId');
     pg.setSimpleProperty('IsTree', true);
     pg.HideProperty('LinkRefId');
+    pg.HideProperty('HideLinkifNoData');
     pg.ShowProperty('LinkType');
     pg.ShowProperty('FormMode');
 }
 else{
     pg.HideProperty('LinkRefId');
     pg.HideProperty('LinkType');
+    pg.HideProperty('HideLinkifNoData');
     pg.setSimpleProperty('LinkRefId', null);
     pg.HideProperty('ParentColumn');
     pg.HideProperty('GroupingColumn');
