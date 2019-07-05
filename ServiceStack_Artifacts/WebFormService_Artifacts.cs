@@ -146,9 +146,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 6)]
         public User UserObj { get; set; }
-
-        [DataMember(Order = 7)]
-        public Eb_Solution SolutionObj { get; set; }
     }
 	
 	[DataContract]
