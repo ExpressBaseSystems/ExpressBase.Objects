@@ -76,15 +76,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class GetCardResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
-        public string Last4 { get; set; }
+        public Eb_StripeCardsList Cards { get; set; }
 
         [DataMember(Order = 2)]
-        public long ExpMonth { get; set; }
+        public int Count { get; set; }
 
         [DataMember(Order = 3)]
-        public long ExpYear { get; set; }
-
-        [DataMember(Order = 4)]
         public ResponseStatus ResponseStatus { get; set; }
     }
 
@@ -208,6 +205,31 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Zip { get; set; }
 
         [DataMember(Order = 7)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    public class AddCustomerCardRequest : IEbTenentRequest, IReturn<UpdateCustomerCardResponse>
+    {
+        public string CustId { get; set; }
+
+        public string TokenId { get; set; }
+
+        public string CardId { get; set; }
+
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
+    }
+
+    public class AddCustomerCardResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public Eb_StripeCardsList Cards { get; set; }
+
+        [DataMember(Order = 2)]
+        public int Count { get; set; }
+
+        [DataMember(Order = 3)]
         public ResponseStatus ResponseStatus { get; set; }
     }
 
