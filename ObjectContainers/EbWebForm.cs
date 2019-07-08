@@ -164,7 +164,8 @@ namespace ExpressBase.Objects
         //Populate Property DependedValExp
         private void CalcValueExprDependency()
         {
-            Dictionary<int, EbControlWrapper> _dict = GetControlsAsDict(this, "form");
+            Dictionary<int, EbControlWrapper> _dict = new Dictionary<int, EbControlWrapper>();
+            GetControlsAsDict(this, "form", _dict);
             List<int> CalcFlds = new List<int>();
             List<KeyValuePair<int, int>> dpndcy = new List<KeyValuePair<int, int>>();
             List<int> ExeOrd = new List<int>();
@@ -180,11 +181,18 @@ namespace ExpressBase.Objects
 
             for (int i = 0; i < CalcFlds.Count; i++)
             {
-                if (_dict[CalcFlds[i]].Control.ValueExpr.Code.ToLower().Contains("form"))
+                string code = _dict[CalcFlds[i]].Control.ValueExpr.Code.ToLower();
+                if (code.Contains("form"))
                 {
                     for (int j = 0; j < _dict.Count; j++)
                     {
-                        if (_dict[CalcFlds[i]].Control.ValueExpr.Code.ToLower().Contains(_dict[j].Path))
+                        string[] stringArr = new string[] {
+                            _dict[j].Path,
+                            _dict[j].Root + ".currentrow." + _dict[j].Control.Name,
+                            _dict[j].Root + ".currentrow['" + _dict[j].Control.Name + "']",
+                            _dict[j].Root + ".currentrow[\"" + _dict[j].Control.Name + "\"]"
+                        };
+                        if (stringArr.Any(code.Contains))
                         {
                             if (CalcFlds[i] == j)
                                 throw new FormException("Avoid circular reference by the following control in 'ValueExpression' : " + _dict[CalcFlds[i]].Control.Name);
@@ -382,12 +390,8 @@ namespace ExpressBase.Objects
         }
 
         //get controls in webform as a single dimensional structure 
-        public static Dictionary<int, EbControlWrapper> GetControlsAsDict(EbControlContainer _container, string _path = "", Dictionary<int, EbControlWrapper> _dict = null)
+        public static void GetControlsAsDict(EbControlContainer _container, string _path, Dictionary<int, EbControlWrapper> _dict)
         {
-            if (_dict == null)
-            {
-                _dict = new Dictionary<int, EbControlWrapper>();
-            }
             int _counter = _dict.Count;
             IEnumerable<EbControl> FlatCtrls = _container.Controls.Get1stLvlControls();
             foreach (EbControl control in FlatCtrls)
@@ -399,7 +403,8 @@ namespace ExpressBase.Objects
                 {
                     TableName = _container.TableName,
                     Path = path,
-                    Control = control
+                    Control = control,
+                    Root = _path
                 });
             }
             foreach (EbControl control in _container.Controls)
@@ -409,10 +414,9 @@ namespace ExpressBase.Objects
                     string path = _path;
                     if (control is EbDataGrid)
                         path = _path + "." + (control as EbControlContainer).Name;
-                    _dict = GetControlsAsDict(control as EbControlContainer, path, _dict);
+                    GetControlsAsDict(control as EbControlContainer, path, _dict);
                 }
             }
-            return _dict;
         }
 
         //get all control container as flat structure
@@ -2089,7 +2093,7 @@ namespace ExpressBase.Objects
 
         public string Path { get; set; }
 
-        //public object Value { get; set; }///////
+        public string Root { get; set; }
 
         public EbControl Control { get; set; }
     }
