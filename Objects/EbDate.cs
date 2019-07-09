@@ -143,33 +143,7 @@ namespace ExpressBase.Objects
         {
             return @"<div eb-type='@toolName' class='tool'><i class='fa fa-calendar'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
         }
-
-        public override string GetHead()
-        {
-            return (((!this.Hidden) ? this.UniqueString + this.RequiredString : string.Empty) + @"".Replace("{0}", this.Name)) + @"
-$('#@idContainer [class=input-group-addon]').click(function(){
-    //$('#@idContainer [class=date]').toggle();
-        $('#@id').focus();
-        $('#@id').trigger('click');
-});
-
-$('#@id').mask('@maskPattern'); 
-//$('#@id').datetimepicker({
-//    format:'@format',
-    //minDate:'@maxDate',
-    //maxDate:'@minDate',
-//    @dateType
-//});
-$('#@id').MonthPicker({ StartYear: 2018, ShowIcon: false });"
-
-.Replace("@dateType", (this.EbDateType.ToString() == "Date") ? "timepicker:false" : ((this.EbDateType.ToString() == "Time") ? "datepicker:false" : string.Empty))
-.Replace("@id", this.Name)
-.Replace("@maskPattern", this.maskPattern)
-.Replace("@format", (this.EbDateType.ToString() == "Date") ? "Y/m/d" : (this.EbDateType.ToString() == "Time") ? "H:i" : "Y/m/d H:i")
-.Replace("@maxDate", this.Max.ToString())
-.Replace("@minDate", this.Min.ToString());
-        }
-
+        
         public string Wrap4Developer(string EbCtrlHTML)
         {
             return @"<div class='controlTile' tabindex='1' onclick='event.stopPropagation();$(this).focus()'>

@@ -44,20 +44,6 @@ namespace ExpressBase.Objects
             //return @"<div class='toggle btn btn-xs btn-primary' data-toggle='toggle' style='width: 34px; height: 22px;'><input type='checkbox' checked='' data-toggle='toggle' data-size='mini'><div class='toggle-group'><label class='btn btn-primary btn-xs toggle-on'>On</label><label class='btn btn-default btn-xs active toggle-off'>Off</label><span class='toggle-handle btn btn-default btn-xs'></span></div></div>".RemoveCR().DoubleQuoted();
         }
 
-        public override string GetHead()
-        {
-            return this.RequiredString + @"
-$('#@idcontainer [type=checkbox]').bootstrapToggle();
-$('#@idcontainer [type=radio]').on('click', function () {
-    $(this).button('toggle');
-})
-
-
-
-
-".Replace("@id", this.Name);
-        }
-
         public override string GetBareHtml()
         {
             return @"<div class='checkbox'>
