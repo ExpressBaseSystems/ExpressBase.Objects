@@ -418,6 +418,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             Ctype = row[3].ToString();
             Type = row[12].ToString();
             Preference = row[13].ToString();
+            CreatedOn = Convert.ToDateTime(row[6]).ToString("dddd, dd MMMM yyyy");
         }
         public string Id { get; set; }
 
@@ -430,5 +431,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Type { get; set; }
 
         public string Preference { get; set; }
+
+        public string CreatedOn { get; set; }
     }
 }
