@@ -172,11 +172,6 @@ else {
         //[PropertyEditor(PropertyEditorType.JS)]
         //public string OnChangeExe { get; set; }
 
-        public override string GetHead()
-        {
-            return (((!this.Hidden) ? this.UniqueString + this.RequiredString : string.Empty) + @"".Replace("{0}", this.Name));
-        }
-
         private string TextTransformString
         {
             get { return (((int)this.TextTransform > 0) ? "$('#{0}').keydown(function(event) { textTransform(this, {1}); }); $('#{0}').on('paste', function(event) { textTransform(this, {1}); });".Replace("{0}", this.Name).Replace("{1}", ((int)this.TextTransform).ToString()) : string.Empty); }

@@ -241,11 +241,6 @@ namespace ExpressBase.Objects
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
 
-        public override string GetHead()
-        {
-            return this.RequiredString;
-        }
-
         public override string GetDesignHtml()
         {
             return @"
