@@ -430,4 +430,21 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     //    [DataMember(Order = 3)]
     //    public ResponseStatus ResponseStatus { get; set; }
     //}
+
+    public class GetVersioning : IEbSSRequest
+    {
+        public bool Versioning { get; set; }
+
+        public ResponseStatus status { get; set; }
+
+        public string SolnId { get; set; }
+
+        public int UserId { get; set; }
+    }
+
+    public class SetVersioning
+    {
+        public bool Versioning { get; set; }
+        public string solution_id { get; set; }
+    }
 }
