@@ -190,4 +190,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         public bool ResponseStatus { get; set; }
     }
+    public class UserReviewRateRequest : EbServiceStackNoAuthRequest, IReturn<UserReviewRateResponse>
+    {
+        public string UserReview { get; set; }
+    }
+    public class UserReviewRateResponse
+    {
+        public bool Resp { get; set; }
+    }
 }
