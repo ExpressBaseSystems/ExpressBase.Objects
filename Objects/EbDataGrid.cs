@@ -46,8 +46,15 @@ namespace ExpressBase.Objects
             get
             {
                 return @"
+    console.log('OnChangeBindJSFn DG');
+
 $.each(this.Controls.$values, function (i, col) {
-    col.bindOnChange({form:this.formObject, col:col, DG:this, user : this.__userObject});
+    if ((col.OnChangeFn && col.OnChangeFn.Code && col.OnChangeFn.Code.trim() !== '') || col.DependedValExp.$values.length > 0){
+        let FnString = `console.log('${col.__path || col.Name}');` + atob(col.OnChangeFn.Code) + (col.DependedValExp.$values.length !== 0 ? ` ; form.updateDependentControls(${col.__path}, form)` : '');
+        let OnChangeFn = new Function('form', 'user', `event`, FnString).bind(col, this.formObject, this.__userObject);
+
+        col.bindOnChange({form:this.formObject, col:col, DG:this, user : this.__userObject},OnChangeFn);
+    }
 }.bind(this));
                ";
             }
@@ -169,10 +176,11 @@ $.each(this.Controls.$values, function (i, col) {
             get
             {
                 return @"
+console.log('OnChangeBindJSFn : string');
                 if (p1.col.OnChangeFn && p1.col.OnChangeFn.Code && p1.col.OnChangeFn.Code.trim() !== ''){
 
 
-                  $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, new Function('form', 'user', `event`, atob(p1.col.OnChangeFn.Code)).bind(this, p1.form, p1.user));
+                  $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, p2);
                 }; ";
             }
             set { }
@@ -383,8 +391,7 @@ $.each(this.Controls.$values, function (i, col) {
         public override string OnChangeBindJSFn { get { return @"
 if(p1.col.OnChangeFn == null || p1.col.OnChangeFn.Code === null)
     return;
-let func =new Function('form', 'user', `event`, atob(p1.col.OnChangeFn.Code)).bind(this, p1.form, p1.user);
-$(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, func).siblings('.nullable-check').on('change', `input[type=checkbox]`, func);"; } set { } }
+$(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, p2).siblings('.nullable-check').on('change', `input[type=checkbox]`, p2);"; } set { } }
 
         [EnableInBuilder(BuilderType.WebForm)]
         public override string InputControlType { get { return "EbDate"; } }
