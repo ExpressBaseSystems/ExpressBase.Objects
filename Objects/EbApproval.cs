@@ -99,11 +99,11 @@ namespace ExpressBase.Objects
         foreach (EbFormStage FormStage in FormStages)
         {
             html += string.Concat(@"
-            <tr style='@bg@'>",
+            <tr name='", FormStage.Name , "'role='", FormStage.ApproverRole.ToString(), "' style ='@bg@'>",
                 "<td class='row-no-td'>", SlNo++, "</td>",
-                "<td><span class='fstd-div'>", FormStage.Name, "</span></td>",
+                "<td col='stage'><span class='fstd-div'>", FormStage.Name, "</span></td>",
                 "<td><span class='fstd-div'>", FormStage.ApproverRole.ToString().Replace("_", " "), "</span></td>",
-                @"<td class='fs-ctrl-td'><div class='fstd-div'>", @"
+                @"<td col='status' class='fs-ctrl-td'><div class='fstd-div'>", @"
                     <select class='selectpicker'>
                         <option value='2'>Hold</option>
                         <option value='1'>Accepted</option>
@@ -121,7 +121,7 @@ namespace ExpressBase.Objects
                         </div>
                     </div>
                 </td>",
-                "<td class='fs-ctrl-td'><div class='fstd-div'>", "<textarea class='fs-textarea'></textarea>", "</div></td>",
+                "<td col='remarks' class='fs-ctrl-td'><div class='fstd-div'>", "<textarea class='fs-textarea'></textarea>", "</div></td>",
             "</tr>");
         }
 
@@ -159,6 +159,7 @@ namespace ExpressBase.Objects
         public string ObjType { get { return this.GetType().Name.Substring(2, this.GetType().Name.Length - 2); } set { } }
 
         [EnableInBuilder(BuilderType.WebForm)]
+        [Unique]
         public string Name { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
