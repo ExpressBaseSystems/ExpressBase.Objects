@@ -267,7 +267,7 @@ namespace ExpressBase.Objects
 
                 if (_table.Columns.Count > 0)
                 {
-                    if (_table.IsGridTable)
+                    if (_table.TableType == WebFormTableTypes.Grid)
                         _cols = "id, eb_loc_id, eb_row_num, " + String.Join(", ", _table.Columns.Select(x => x.ColumnName));
                     else
                         _cols = "id, eb_loc_id, " + String.Join(", ", _table.Columns.Select(x => x.ColumnName));
@@ -275,7 +275,7 @@ namespace ExpressBase.Objects
                 if (_table.TableName != _schema.MasterTable)
                     _id = _schema.MasterTable + "_id";
 
-                query += string.Format("SELECT {0} FROM {1} WHERE {2} = :id AND eb_del='F' {3};", _cols, _table.TableName, _id, _table.IsGridTable ? "ORDER BY eb_row_num" : string.Empty);
+                query += string.Format("SELECT {0} FROM {1} WHERE {2} = :id AND eb_del='F' {3};", _cols, _table.TableName, _id, _table.TableType == WebFormTableTypes.Grid ? "ORDER BY eb_row_num" : string.Empty);
 
                 foreach (ColumnSchema Col in _table.Columns)
                 {
@@ -504,6 +504,24 @@ namespace ExpressBase.Objects
             }
         }
 
+        private void GetFormattedDataApproval(EbDataTable dataTable, SingleTable Table)
+        {
+            foreach(EbDataRow dataRow in dataTable.Rows)
+            {
+                Table.Add(new SingleRow { Columns = new List<SingleColumn>
+                {
+                    new SingleColumn { Name = "id", Type = (int)EbDbTypes.Decimal, Value = Convert.ToInt32(dataRow["id"])},
+                    new SingleColumn { Name = "stage", Type = (int)EbDbTypes.String, Value = dataRow["stage"].ToString()},
+                    new SingleColumn { Name = "approver_role", Type = (int)EbDbTypes.String, Value = dataRow["approverrole"].ToString()},
+                    new SingleColumn { Name = "status", Type = (int)EbDbTypes.Decimal, Value = Convert.ToInt32(dataRow["status"])},
+                    new SingleColumn { Name = "remarks", Type = (int)EbDbTypes.String, Value = dataRow["remarks"].ToString()},
+                    new SingleColumn { Name = "eb_created_by_id", Type = (int)EbDbTypes.Decimal, Value = Convert.ToInt32(dataRow["eb_created_by"])},
+                    new SingleColumn { Name = "eb_created_by_name", Type = (int)EbDbTypes.String, Value = this.SolutionObj.Users[Convert.ToInt32(dataRow["eb_created_by"])]},
+                    new SingleColumn { Name = "eb_created_at", Type = (int)EbDbTypes.String, Value = Convert.ToDateTime(dataRow["eb_created_at"]).ToString("dd-MM-yyyy hh:mm tt")}
+                }, RowId = dataRow["id"].ToString(), LocId = Convert.ToInt32(dataRow["eb_loc_id"])});
+            }
+        }
+
         private void GetFormattedData(EbDataTable dataTable, SingleTable Table, TableSchema _table = null)
         {
             foreach (EbDataRow dataRow in dataTable.Rows)
@@ -641,7 +659,10 @@ namespace ExpressBase.Objects
                 EbDataTable dataTable = dataset.Tables[i];////
                 SingleTable Table = new SingleTable();
 
-                GetFormattedData(dataTable, Table, _schema.Tables[i]);
+                if (_schema.Tables[i].TableType == WebFormTableTypes.Approval)
+                    GetFormattedDataApproval(dataTable, Table);
+                else
+                    GetFormattedData(dataTable, Table, _schema.Tables[i]);
 
                 if (!_FormData.MultipleTables.ContainsKey(_schema.Tables[i].TableName) && Table.Count > 0)
                     _FormData.MultipleTables.Add(_schema.Tables[i].TableName, Table);
@@ -1340,7 +1361,7 @@ namespace ExpressBase.Objects
                 bool IsGridTable = false;
                 TableSchema _table = this.FormSchema.Tables.FirstOrDefault(tbl => tbl.TableName.Equals(entry.Key));
                 if (_table != null)
-                    IsGridTable = _table.IsGridTable;
+                    IsGridTable = _table.TableType == WebFormTableTypes.Grid;
 
                 if (this.FormDataBackup == null || !this.FormDataBackup.MultipleTables.ContainsKey(entry.Key))//insert mode
                 {
@@ -1592,7 +1613,7 @@ namespace ExpressBase.Objects
                         continue;
                 }
 
-                if (!_table.IsGridTable)
+                if (_table.TableType != WebFormTableTypes.Grid)
                 {
                     _column = _table.Columns.FirstOrDefault(col => col.ColumnName == dr["fieldname"].ToString());
                     if (_column == null)//skipping invalid Audit Trail entry
@@ -1612,7 +1633,7 @@ namespace ExpressBase.Objects
 
                 string[] ids = dr["idrelation"].ToString().Split('-');
 
-                if (_table.IsGridTable)
+                if (_table.TableType == WebFormTableTypes.Grid)
                 {
                     Dictionary<string, string> new_val_dict = new_val == "[null]" ? null : JsonConvert.DeserializeObject<Dictionary<string, string>>(new_val);
                     Dictionary<string, string> old_val_dict = old_val == "[null]" ? null : JsonConvert.DeserializeObject<Dictionary<string, string>>(old_val);
@@ -1887,16 +1908,18 @@ namespace ExpressBase.Objects
             if (_table == null)
             {
                 if (_container is EbDataGrid)
-                    _table = new TableSchema { TableName = _container.TableName.ToLower(), ParentTable = _parentTable, IsGridTable = true, Title = _container.Label };
+                    _table = new TableSchema { TableName = _container.TableName.ToLower(), ParentTable = _parentTable, TableType = WebFormTableTypes.Grid, Title = _container.Label };
                 else
-                    _table = new TableSchema { TableName = _container.TableName.ToLower(), ParentTable = _parentTable, IsGridTable = false };
+                    _table = new TableSchema { TableName = _container.TableName.ToLower(), ParentTable = _parentTable, TableType = WebFormTableTypes.Normal };
                 _schema.Tables.Add(_table);
             }
             foreach (EbControl control in _flatControls)
             {
                 if (!control.DoNotPersist || control.IsSysControl)
                 {
-                    if (control is EbFileUploader)
+                    if(control is EbApproval)
+                        _schema.Tables.Add((control as EbApproval).GetTableSchema(_container.TableName.ToLower()));
+                    else if (control is EbFileUploader)
                         _schema.ExtendedControls.Add(control);
                     else if (control is EbDGUserControlColumn)
                     {

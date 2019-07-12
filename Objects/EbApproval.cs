@@ -1,6 +1,8 @@
-﻿using ExpressBase.Common.Extensions;
+﻿using ExpressBase.Common;
+using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
+using ExpressBase.Common.Structures;
 using ExpressBase.Objects.Helpers;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
@@ -148,6 +150,15 @@ namespace ExpressBase.Objects
             return ReplacePropsInHTML(EbCtrlHTML);
         }
 
+        public TableSchema GetTableSchema(string Parent)
+        {
+            TableSchema t = new TableSchema { TableName = this.TableName.ToLower(), ParentTable =Parent, TableType = WebFormTableTypes.Approval };
+            t.Columns.Add(new ColumnSchema { ColumnName = "stage", EbDbType = (int)EbDbTypes.String });
+            t.Columns.Add(new ColumnSchema { ColumnName = "approver_role", EbDbType = (int)EbDbTypes.String });
+            t.Columns.Add(new ColumnSchema { ColumnName = "status", EbDbType = (int)EbDbTypes.Decimal });
+            t.Columns.Add(new ColumnSchema { ColumnName = "remarks", EbDbType = (int)EbDbTypes.String });
+            return t;
+        }
 
     }
 
