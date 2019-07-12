@@ -259,7 +259,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 		[DataMember(Order = 9)]
 		public string u_token { get; set; }
-	}
+
+        [DataMember(Order = 10)]
+        public List<int> LocConstraint { get; set; }
+    }
 
 	[DataContract]
 	public class SaveUserRequest : IReturn<SaveUserResponse>, IEbSSRequest
@@ -605,10 +608,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public List<Eb_Users> UsersList { get; set; }
 
 		[DataMember(Order = 3)]
-		public List<Eb_Constraints> IpConsList { get; set; }
+		public List<Eb_Constraints1> IpConsList { get; set; }
 
 		[DataMember(Order = 4)]
-		public List<Eb_Constraints> DtConsList { get; set; }
+		public List<Eb_Constraints1> DtConsList { get; set; }
 
 		[DataMember(Order = 5)]
 		public string Token { get; set; }
@@ -984,7 +987,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 	}
 
 	[DataContract]
-	public class Eb_Constraints
+	public class Eb_Constraints1
 	{
 		[DataMember(Order = 1)]
 		public int Id;
@@ -1055,4 +1058,65 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		[DataMember(Order = 4)]
 		public string u_token { get; set; }
 	}
+
+    //for support all types of constraints
+    public class EbConstraints
+    {
+        public EbConstraints(EbDataTable ebDataTable)
+        {
+            _cons = new List<EbConstraint>();
+            for(int i = 0; i < ebDataTable.Rows.Count; i++)
+            {
+                this._cons.Add(new EbConstraint(ebDataTable.Rows[i]));
+            }
+        }
+
+        private List<EbConstraint> _cons { get; set; }
+
+        private List<EbConstraint> _userLocCons = null;
+
+        public List<EbConstraint> UserLocCons
+        {
+            get
+            {
+                if (_userLocCons == null)
+                {
+                    _userLocCons = new List<EbConstraint>();
+                    for(int i = 0; i < _cons.Count; i++)
+                    {
+                        if(_cons[i].Type == EbConstraintTypes.User_Location)
+                        {
+                            _userLocCons.Add(_cons[i]);
+                        }
+                    }
+                }
+                return _userLocCons;
+            }
+        }
+    }
+
+    public class EbConstraint
+    {
+        public EbConstraint(EbDataRow ebDataRow)
+        {
+            this.Id = Convert.ToInt32(ebDataRow["id"]);
+            this.UserId = Convert.ToInt32(ebDataRow["user_id"]);
+            this.UsergroupId = Convert.ToInt32(ebDataRow["usergroup_id"]);
+            this.RoleId = Convert.ToInt32(ebDataRow["role_id"]);
+            this.Type = (EbConstraintTypes)ebDataRow["c_type"];
+            this.Value = ebDataRow["c_value"].ToString();
+            this.Operation = (EbConstraintOperators)ebDataRow["c_operation"];
+            this.Meta = ebDataRow["c_meta"].ToString();
+        }
+        public EbConstraint() { }
+
+        public int Id { get; set; }
+        public int UserId { get; set; }
+        public int UsergroupId { get; set; }
+        public int RoleId { get; set; }
+        public EbConstraintTypes Type { get; set; }
+        public object Value { get; set; }
+        public EbConstraintOperators Operation { get; set; }
+        public string Meta { get; set; }
+    }
 }
