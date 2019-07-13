@@ -4,6 +4,7 @@ using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
 using ExpressBase.Objects.Helpers;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
@@ -17,19 +18,35 @@ namespace ExpressBase.Objects
     }
 
     [EnableInBuilder(BuilderType.WebForm)]
-    public class EbApproval : EbControlUI
+    public class EbApproval : EbControlContainer
     {
         public EbApproval()
         {
             FormStages = new List<EbFormStage>();
+            Controls = new List<EbControl>();           
         }
 
         [OnDeserialized]
         public void OnDeserializedMethod(StreamingContext context)
         {
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
-            //this.EbDbType = this.EbDbType;
+            //this.EbDbType = this.EbDbType;    
+            Controls = new List<EbControl>() {
+                new EbDGStringColumn() { Name = "stage", EbDbType = EbDbTypes.String, Label = "Stage"},
+                new EbDGSimpleSelectColumn() { Name = "status",IsDynamic = false, EbDbType = EbDbTypes.Decimal, Label = "Status"},
+                new EbDGStringColumn() { Name = "remarks", EbDbType = EbDbTypes.String, Label = "Remarks"},
+                new EbDGDateColumn() { Name = "eb_created_at", EbDbType = EbDbTypes.DateTime, DoNotPersist = true, IsSysControl = true},
+                new EbDGStringColumn() { Name = "eb_created_by", EbDbType = EbDbTypes.String, DoNotPersist = true, IsSysControl = true},
+                new EbDGStringColumn() { Name = "approver_role", EbDbType = EbDbTypes.String, Label = "Approver Role"}
+            };
         }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [HideInPropertyGrid]
+        public override bool IsSpecialContainer { get { return true; } set { } }
+
+        [JsonIgnore]
+        public override UISides Padding { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
         public override string Name { get; set; }
@@ -52,7 +69,7 @@ namespace ExpressBase.Objects
         [PropertyGroup("Data")]
         [HelpText("Name Of database-table Which you want to store Data collected using this Form")]
         [InputMask("[a-z][a-z0-9]*(_[a-z0-9]+)*")]
-        public virtual string TableName { get; set; }
+        public override string TableName { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.Collection)]
@@ -60,6 +77,15 @@ namespace ExpressBase.Objects
         [ListType(typeof(EbFormStage))]
         [PropertyPriority(99)]
         public List<EbFormStage> FormStages { get; set; }
+
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        [PropertyGroup("Behavior")]
+        [ListType(typeof(EbDGColumn))]
+        [PropertyPriority(98)]
+        [Alias("Columns")]
+        public override List<EbControl> Controls { get; set; }
 
         public override string GetToolHtml()
         {
@@ -82,52 +108,52 @@ namespace ExpressBase.Objects
             <th class='grid-col-title'><span class='grid-col-title'>Reviewed by/At</span></th>
             <th class='grid-col-title'><span class='grid-col-title'>Remarks</span></th>
             ".Replace("@_height@", this.Height.ToString());
-        //foreach (EbFormStage FormStage in FormStages)
-        //{
-        //    if (!FormStage.Hidden)
-        //        html += string.Concat("<th style='width: @Width@; @bg@' @type@ title='", FormStage.Title, "'><span class='grid-col-title'>", FormStage.Title, "</span>@req@</th>")
-        //            .Replace("@req@", (FormStage.Required ? "<sup style='color: red'>*</sup>" : string.Empty))
-        //            .Replace("@Width@", (FormStage.Width <= 0) ? "auto" : FormStage.Width.ToString() + "%")
-        //            .Replace("@type@", "type = '" + FormStage.ObjType + "'")
-        //            .Replace("@bg@", FormStage.IsDisable ? "background-color:#fafafa; color:#555" : string.Empty);
-        //}
+            //foreach (EbFormStage FormStage in FormStages)
+            //{
+            //    if (!FormStage.Hidden)
+            //        html += string.Concat("<th style='width: @Width@; @bg@' @type@ title='", FormStage.Title, "'><span class='grid-col-title'>", FormStage.Title, "</span>@req@</th>")
+            //            .Replace("@req@", (FormStage.Required ? "<sup style='color: red'>*</sup>" : string.Empty))
+            //            .Replace("@Width@", (FormStage.Width <= 0) ? "auto" : FormStage.Width.ToString() + "%")
+            //            .Replace("@type@", "type = '" + FormStage.ObjType + "'")
+            //            .Replace("@bg@", FormStage.IsDisable ? "background-color:#fafafa; color:#555" : string.Empty);
+            //}
 
-        html += @"
+            html += @"
             </tr>
         </thead>";
 
-        html += @"
+            html += @"
         <tbody>";
-        foreach (EbFormStage FormStage in FormStages)
-        {
-            html += string.Concat(@"
-            <tr name='", FormStage.Name , "'role='", FormStage.ApproverRole.ToString(), "' style ='@bg@'>",
-                "<td class='row-no-td'>", SlNo++, "</td>",
-                "<td col='stage'><span class='fstd-div'>", FormStage.Name, "</span></td>",
-                "<td><span class='fstd-div'>", FormStage.ApproverRole.ToString().Replace("_", " "), "</span></td>",
-                @"<td col='status' class='fs-ctrl-td'><div class='fstd-div'>", @"
+            foreach (EbFormStage FormStage in FormStages)
+            {
+                html += string.Concat(@"
+            <tr name='", FormStage.Name, "'role='", FormStage.ApproverRole.ToString(), "' style ='@bg@'>",
+                    "<td class='row-no-td'>", SlNo++, "</td>",
+                    "<td col='stage'><span class='fstd-div'>", FormStage.Name, "</span></td>",
+                    "<td><span class='fstd-div'>", FormStage.ApproverRole.ToString().Replace("_", " "), "</span></td>",
+                    @"<td col='status' class='fs-ctrl-td'><div class='fstd-div'>", @"
                     <select class='selectpicker'>
                         <option value='2'>Hold</option>
                         <option value='1'>Accepted</option>
                         <option value='0'>Rejected</option>
                     </select></div>
                 </td>
-                <td class='fs-ctrl-td'>
+                <td col='review-dtls' class='fs-ctrl-td'>
                     <div class='fstd-div'>
                         <div class='fs-user-cont'>
                             <div class='fs-dp'></div>
                             <div class='fs-udtls-cont'>
-                                <span class='fs-uname'>John Snow</span>
-                                <span class='fs-time'>10:10 am</span>
+                                <span class='fs-uname'>-----</span>
+                                <span class='fs-time'>-----</span>
                             </div>
                         </div>
                     </div>
                 </td>",
-                "<td col='remarks' class='fs-ctrl-td'><div class='fstd-div'>", "<textarea class='fs-textarea'></textarea>", "</div></td>",
-            "</tr>");
-        }
+                    "<td col='remarks' class='fs-ctrl-td'><div class='fstd-div'>", "<textarea class='fs-textarea'></textarea>", "</div></td>",
+                "</tr>");
+            }
 
-        html += @"
+            html += @"
         </tbody>
     </table>
     <button class='btn btn-success fs-submit'>Submit</button>
@@ -148,16 +174,6 @@ namespace ExpressBase.Objects
                .Replace("@LabelBackColor ", "background-color:" + (LabelBackColor ?? "@LabelBackColor ") + ";");
 
             return ReplacePropsInHTML(EbCtrlHTML);
-        }
-
-        public TableSchema GetTableSchema(string Parent)
-        {
-            TableSchema t = new TableSchema { TableName = this.TableName.ToLower(), ParentTable =Parent, TableType = WebFormTableTypes.Approval };
-            t.Columns.Add(new ColumnSchema { ColumnName = "stage", EbDbType = (int)EbDbTypes.String });
-            t.Columns.Add(new ColumnSchema { ColumnName = "approver_role", EbDbType = (int)EbDbTypes.String });
-            t.Columns.Add(new ColumnSchema { ColumnName = "status", EbDbType = (int)EbDbTypes.Decimal });
-            t.Columns.Add(new ColumnSchema { ColumnName = "remarks", EbDbType = (int)EbDbTypes.String });
-            return t;
         }
 
     }

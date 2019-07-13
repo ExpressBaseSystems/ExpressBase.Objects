@@ -443,6 +443,10 @@ namespace ExpressBase.Objects
 
         private void MergeFormDataInner(EbControlContainer _container)
         {
+            if (!FormData.MultipleTables.ContainsKey(_container.TableName))
+            {
+                return;
+            }
             foreach (EbControl c in _container.Controls)
             {
                 if (c is EbDataGrid)
@@ -512,7 +516,7 @@ namespace ExpressBase.Objects
                 {
                     new SingleColumn { Name = "id", Type = (int)EbDbTypes.Decimal, Value = Convert.ToInt32(dataRow["id"])},
                     new SingleColumn { Name = "stage", Type = (int)EbDbTypes.String, Value = dataRow["stage"].ToString()},
-                    new SingleColumn { Name = "approver_role", Type = (int)EbDbTypes.String, Value = dataRow["approverrole"].ToString()},
+                    new SingleColumn { Name = "approver_role", Type = (int)EbDbTypes.String, Value = dataRow["approver_role"].ToString()},
                     new SingleColumn { Name = "status", Type = (int)EbDbTypes.Decimal, Value = Convert.ToInt32(dataRow["status"])},
                     new SingleColumn { Name = "remarks", Type = (int)EbDbTypes.String, Value = dataRow["remarks"].ToString()},
                     new SingleColumn { Name = "eb_created_by_id", Type = (int)EbDbTypes.Decimal, Value = Convert.ToInt32(dataRow["eb_created_by"])},
@@ -1907,7 +1911,9 @@ namespace ExpressBase.Objects
             TableSchema _table = _schema.Tables.FirstOrDefault(tbl => tbl.TableName == _container.TableName);
             if (_table == null)
             {
-                if (_container is EbDataGrid)
+                if(_container is EbApproval)
+                    _table = new TableSchema { TableName = _container.TableName.ToLower(), ParentTable = _parentTable, TableType = WebFormTableTypes.Approval, Title = _container.Label };
+                else if (_container is EbDataGrid)
                     _table = new TableSchema { TableName = _container.TableName.ToLower(), ParentTable = _parentTable, TableType = WebFormTableTypes.Grid, Title = _container.Label };
                 else
                     _table = new TableSchema { TableName = _container.TableName.ToLower(), ParentTable = _parentTable, TableType = WebFormTableTypes.Normal };
@@ -1917,9 +1923,7 @@ namespace ExpressBase.Objects
             {
                 if (!control.DoNotPersist || control.IsSysControl)
                 {
-                    if(control is EbApproval)
-                        _schema.Tables.Add((control as EbApproval).GetTableSchema(_container.TableName.ToLower()));
-                    else if (control is EbFileUploader)
+                    if (control is EbFileUploader)
                         _schema.ExtendedControls.Add(control);
                     else if (control is EbDGUserControlColumn)
                     {
