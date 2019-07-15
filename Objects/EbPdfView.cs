@@ -14,6 +14,7 @@ using System.Reflection;
 using System.Runtime.Serialization;
 namespace ExpressBase.Objects
 {
+    [HideInToolBox]
     [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
     class EbPdfView : EbControlUI
     {

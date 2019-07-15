@@ -125,11 +125,20 @@ namespace ExpressBase.Objects
 
         public override void BeforeSave()
         {
+            if (string.IsNullOrEmpty(this.TableName))
+                throw new FormException("Please enter a valid master table name");
             EbControl[] Allctrls = this.Controls.FlattenAllEbControls();
             for (int i = 0; i < Allctrls.Length; i++)
             {
+                if (Allctrls[i] is EbApproval)
+                    if (string.IsNullOrEmpty((Allctrls[i] as EbApproval).TableName))
+                        throw new FormException("Please enter a valid table name for approval control : " + Allctrls[i].Label);
+
                 if (Allctrls[i] is EbDataGrid)
                 {
+                    if (string.IsNullOrEmpty((Allctrls[i] as EbDataGrid).TableName))
+                        throw new FormException("Please enter a valid table name for data grid : " + Allctrls[i].Label);
+
                     for (int j = 0; j < (Allctrls[i] as EbDataGrid).Controls.Count; j++)
                     {
                         if ((Allctrls[i] as EbDataGrid).Controls[j] is EbDGUserControlColumn)
