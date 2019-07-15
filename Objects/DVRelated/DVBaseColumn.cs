@@ -346,6 +346,11 @@ else {
         [EnableInBuilder(BuilderType.DVBuilder)]        
         public int AllowedCharacterLength { get; set; }
 
+        [PropertyGroup("Tooltip")]
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "ColumnsRef")]
+        public List<DVBaseColumn> InfoWindow { get; set; }
+
         [EnableInBuilder(BuilderType.DVBuilder)]
         [MetaOnly]
         public OrderByDirection Direction { get; set; }        
@@ -442,6 +447,7 @@ else {
             this.GroupFormId = new List<DVBaseColumn>();
             this.ItemFormParameters = new List<DVBaseColumn>();
             this.ItemFormId = new List<DVBaseColumn>();
+            this.InfoWindow = new List<DVBaseColumn>();
         }
     }
 
