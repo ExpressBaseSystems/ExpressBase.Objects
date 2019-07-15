@@ -34,16 +34,32 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string SolnId { get; set; }
 
         public int UserId { get; set; }
-
-
     }
 
     public class PersistWikiResponse
     {
-
         public Wiki Wiki { get; set; }
 
         public bool ResponseStatus { get; set; }
+    }
+
+    public class FileRefByContextRequest:IEbTenentRequest, IReturn<PersistWikiResponse>
+    {
+        public string Context { set; get; }
+
+        public string SolnId { get; set; }
+
+        public int UserId { get; set; }
+    }
+
+    public class FileRefByContextResponse
+    {
+        public List<FileMetaInfo> Images { set; get; }
+
+        public FileRefByContextResponse()
+        {
+            this.Images = new List<FileMetaInfo>();
+        }
     }
 
     public class UpdateWikiRequest : IEbTenentRequest, IReturn<UpdateWikiResponse>
@@ -189,5 +205,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class UpdateOrderResponse
     {
         public bool ResponseStatus { get; set; }
+    }
+    public class UserReviewRateRequest : EbServiceStackNoAuthRequest, IReturn<UserReviewRateResponse>
+    {
+        public string UserReview { get; set; }
+    }
+    public class UserReviewRateResponse
+    {
+        public bool Resp { get; set; }
     }
 }

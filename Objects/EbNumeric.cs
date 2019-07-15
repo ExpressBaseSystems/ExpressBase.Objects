@@ -16,25 +16,14 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
     public class EbNumeric : EbControlUI
     {
+        public EbNumeric() { }
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.Decimal; } }
 
-        public EbNumeric()
-        {
-        }
-
         [JsonIgnore]
-        public override string GetValueJSfn
-        {
-            get
-            {
-                return @"
-                    return parseFloat($('#' + this.EbSid_CtxId).val()) || 0;
-                ";
-            }
-            set { }
-        }
+        public override string GetValueJSfn { get { return @" return parseFloat($('#' + this.EbSid_CtxId).val()) || 0; "; } set { } }
 
         [OnDeserialized]
         public void OnDeserializedMethod(StreamingContext context)
@@ -96,10 +85,7 @@ namespace ExpressBase.Objects
             return vDbTypes.Decimal;
         }
 
-        public override string GetToolHtml()
-        {
-            return @"<div eb-type='@toolName' class='tool'><b>0-9 </b></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
-        }
+        public override string GetToolHtml() { return @"<div eb-type='@toolName' class='tool'><b>0-9 </b></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2)); }
 
         public override string GetDesignHtml()
         {
