@@ -14,7 +14,8 @@ namespace ExpressBase.Objects
     {
         NHG_President = 0,
         ADS_Committee = 1,
-        CDS_Committee = 2
+        CDS_Committee = 2,
+        test_role = 3
     }
 
     [EnableInBuilder(BuilderType.WebForm)]
@@ -22,7 +23,7 @@ namespace ExpressBase.Objects
     {
         public EbApproval()
         {
-            FormStages = new List<EbFormStage>();
+            FormStages = new List<ApprovalStageAbstract>();
             Controls = new List<EbControl>();           
         }
 
@@ -69,14 +70,16 @@ namespace ExpressBase.Objects
         [PropertyGroup("Data")]
         [HelpText("Name Of database-table Which you want to store Data collected using this Form")]
         [InputMask("[a-z][a-z0-9]*(_[a-z0-9]+)*")]
+        [EbRequired]
         public override string TableName { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.Collection)]
         [PropertyGroup("Behavior")]
-        [ListType(typeof(EbFormStage))]
+        [Alias("Approval stages")]
+        [ListType(typeof(ApprovalStageAbstract))]
         [PropertyPriority(99)]
-        public List<EbFormStage> FormStages { get; set; }
+        public List<ApprovalStageAbstract> FormStages { get; set; }
 
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.WebForm)]
@@ -89,7 +92,7 @@ namespace ExpressBase.Objects
 
         public override string GetToolHtml()
         {
-            return @"<div eb-type='@toolName' class='tool'><i class='fa fa-stack-exchange'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
+            return @"<div eb-type='@toolName' class='tool'><i class='fa fa-stack-exchange'></i>  Review control </div>".Replace("@toolName", this.GetType().Name.Substring(2));
         }
 
 
@@ -124,13 +127,15 @@ namespace ExpressBase.Objects
 
             html += @"
         <tbody>";
-            foreach (EbFormStage FormStage in FormStages)
+            FormStages.Reverse();
+            foreach (ApprovalStageAbstract FormStage in FormStages)
             {
+                EbFormStage _FormStage = (FormStage as EbFormStage);
                 html += string.Concat(@"
-            <tr name='", FormStage.Name, "'role='", FormStage.ApproverRole.ToString(), "' style ='@bg@'>",
+            <tr name='", _FormStage.Name, "'role='", _FormStage.ApproverRole.ToString(), "' style ='@bg@'>",
                     "<td class='row-no-td'>", SlNo++, "</td>",
-                    "<td col='stage'><span class='fstd-div'>", FormStage.Name, "</span></td>",
-                    "<td><span class='fstd-div'>", FormStage.ApproverRole.ToString().Replace("_", " "), "</span></td>",
+                    "<td col='stage'><span class='fstd-div'>", _FormStage.Name, "</span></td>",
+                    "<td><span class='fstd-div'>", _FormStage.ApproverRole.ToString().Replace("_", " "), "</span></td>",
                     @"<td col='status' class='fs-ctrl-td'><div class='fstd-div'>", @"
                     <select class='selectpicker'>
                         <option value='2'>Hold</option>
@@ -156,7 +161,7 @@ namespace ExpressBase.Objects
             html += @"
         </tbody>
     </table>
-    <button class='btn btn-success fs-submit'>Submit</button>
+    <button class='btn btn-success fs-submit'>Execute Review <i class='fa fa-check-square-o' aria-hidden='true'></i></button>
 </div>";
 
             return html;
@@ -178,10 +183,17 @@ namespace ExpressBase.Objects
 
     }
 
+    public abstract class ApprovalStageAbstract { }
+
     [UsedWithTopObjectParent(typeof(EbObject))]
     [EnableInBuilder(BuilderType.WebForm)]
-    public class EbFormStage
+    [Alias("Approval Stage")]
+    public class EbFormStage : ApprovalStageAbstract
     {
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public string EbSid { get; set; }
+
         public EbFormStage() { }
         public string ObjType { get { return this.GetType().Name.Substring(2, this.GetType().Name.Length - 2); } set { } }
 
