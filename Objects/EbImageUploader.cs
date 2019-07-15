@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace ExpressBase.Objects
 {
+    [HideInToolBox]
     [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
     class EbImageUploader : EbControlUI
 	{

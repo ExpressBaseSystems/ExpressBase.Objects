@@ -125,11 +125,20 @@ namespace ExpressBase.Objects
 
         public override void BeforeSave()
         {
+            if (string.IsNullOrEmpty(this.TableName))
+                throw new FormException("Please enter a valid master table name");
             EbControl[] Allctrls = this.Controls.FlattenAllEbControls();
             for (int i = 0; i < Allctrls.Length; i++)
             {
+                if (Allctrls[i] is EbApproval)
+                    if (string.IsNullOrEmpty((Allctrls[i] as EbApproval).TableName))
+                        throw new FormException("Please enter a valid table name for approval control : " + Allctrls[i].Label);
+
                 if (Allctrls[i] is EbDataGrid)
                 {
+                    if (string.IsNullOrEmpty((Allctrls[i] as EbDataGrid).TableName))
+                        throw new FormException("Please enter a valid table name for data grid : " + Allctrls[i].Label);
+
                     for (int j = 0; j < (Allctrls[i] as EbDataGrid).Controls.Count; j++)
                     {
                         if ((Allctrls[i] as EbDataGrid).Controls[j] is EbDGUserControlColumn)
@@ -512,6 +521,7 @@ namespace ExpressBase.Objects
         {
             foreach(EbDataRow dataRow in dataTable.Rows)
             {
+                DateTime dt = Convert.ToDateTime(dataRow["eb_created_at"]);
                 Table.Add(new SingleRow { Columns = new List<SingleColumn>
                 {
                     new SingleColumn { Name = "id", Type = (int)EbDbTypes.Decimal, Value = Convert.ToInt32(dataRow["id"])},
@@ -521,7 +531,7 @@ namespace ExpressBase.Objects
                     new SingleColumn { Name = "remarks", Type = (int)EbDbTypes.String, Value = dataRow["remarks"].ToString()},
                     new SingleColumn { Name = "eb_created_by_id", Type = (int)EbDbTypes.Decimal, Value = Convert.ToInt32(dataRow["eb_created_by"])},
                     new SingleColumn { Name = "eb_created_by_name", Type = (int)EbDbTypes.String, Value = this.SolutionObj.Users[Convert.ToInt32(dataRow["eb_created_by"])]},
-                    new SingleColumn { Name = "eb_created_at", Type = (int)EbDbTypes.String, Value = Convert.ToDateTime(dataRow["eb_created_at"]).ToString("dd-MM-yyyy hh:mm tt")}
+                    new SingleColumn { Name = "eb_created_at", Type = (int)EbDbTypes.String, Value = dt.ConvertFromUtc(this.UserObj.TimeZone).ToString("dd-MM-yyyy hh:mm tt")}
                 }, RowId = dataRow["id"].ToString(), LocId = Convert.ToInt32(dataRow["eb_loc_id"])});
             }
         }
