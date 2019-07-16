@@ -61,6 +61,13 @@ $('#cont_' + this.EbSid_CtxId + ' .ctrl-cover').css('pointer-events', 'inherit')
 .find('[ui-inp]').css('pointer-events', 'inherit')";
             } set { } }
 
+        [JsonIgnore]
+        public override string EnableJSfn { get {
+                return @"$('#cont_' + this.EbSid_CtxId + ' *')
+.removeAttr('disabled').css('pointer-events', 'inherit')
+.find('[ui-inp]').css('background-color', '#fff');";
+            } set { } }
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [HelpText("To limit number of charecters")]
         [PropertyGroup("Behavior")]

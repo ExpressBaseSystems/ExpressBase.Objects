@@ -125,11 +125,31 @@ namespace ExpressBase.Objects
 
         public override void BeforeSave()
         {
+            Dictionary<string, string> tbls = new Dictionary<string, string>();
+            if (string.IsNullOrEmpty(this.TableName))
+                throw new FormException("Please enter a valid form table name");
+            tbls.Add(this.TableName, "form table");
             EbControl[] Allctrls = this.Controls.FlattenAllEbControls();
             for (int i = 0; i < Allctrls.Length; i++)
             {
+                if (Allctrls[i] is EbApproval)
+                {
+                    string _tn = (Allctrls[i] as EbApproval).TableName;
+                    if (string.IsNullOrEmpty(_tn))
+                        throw new FormException("Please enter a valid table name for approval control : " + Allctrls[i].Label);
+                    if (tbls.ContainsKey(_tn))
+                        throw new FormException(string.Format("Same table '{0}' not allowed for {1} and approval control {2}", _tn, tbls[_tn], Allctrls[i].Label));
+                    tbls.Add(_tn, "approval control " + Allctrls[i].Label);
+                }
                 if (Allctrls[i] is EbDataGrid)
                 {
+                    string _tn = (Allctrls[i] as EbDataGrid).TableName;
+                    if (string.IsNullOrEmpty((Allctrls[i] as EbDataGrid).TableName))
+                        throw new FormException("Please enter a valid table name for data grid : " + Allctrls[i].Label);
+                    if (tbls.ContainsKey(_tn))
+                        throw new FormException(string.Format("Same table '{0}' not allowed for {1} and data grid {2}", _tn, tbls[_tn], Allctrls[i].Label));
+                    tbls.Add(_tn, "data grid " + Allctrls[i].Label);
+
                     for (int j = 0; j < (Allctrls[i] as EbDataGrid).Controls.Count; j++)
                     {
                         if ((Allctrls[i] as EbDataGrid).Controls[j] is EbDGUserControlColumn)
@@ -311,7 +331,7 @@ namespace ExpressBase.Objects
                         _dupcols += string.Format(", {0}_ebbkup = {0}, {0} = CONCAT({0}, '_ebbkup')", _column.ColumnName);
                     }
                 }
-                query += string.Format("UPDATE {0} SET eb_del='T',eb_lastmodified_by = :eb_modified_by, eb_lastmodified_at = " + DataDB.EB_CURRENT_TIMESTAMP + " {1} WHERE {2} = :id AND eb_del='F';", _table.TableName, _dupcols, _id);
+                query += string.Format("UPDATE {0} SET eb_del='T',eb_lastmodified_by = :eb_lastmodified_by, eb_lastmodified_at = " + DataDB.EB_CURRENT_TIMESTAMP + " {1} WHERE {2} = :id AND eb_del='F';", _table.TableName, _dupcols, _id);
             }
             return query;
         }
@@ -326,7 +346,7 @@ namespace ExpressBase.Objects
                 string _id = "id";
                 if (_table.TableName != _schema.MasterTable)
                     _id = _schema.MasterTable + "_id";
-                query += string.Format("UPDATE {0} SET eb_void='T',eb_lastmodified_by = :eb_modified_by, eb_lastmodified_at = " + DataDB.EB_CURRENT_TIMESTAMP + " WHERE {1} = :id AND eb_void='F' AND eb_del='F';", _table.TableName, _id);
+                query += string.Format("UPDATE {0} SET eb_void='T',eb_lastmodified_by = :eb_lastmodified_by, eb_lastmodified_at = " + DataDB.EB_CURRENT_TIMESTAMP + " WHERE {1} = :id AND eb_void='F' AND eb_del='F';", _table.TableName, _id);
             }
             return query;
         }
