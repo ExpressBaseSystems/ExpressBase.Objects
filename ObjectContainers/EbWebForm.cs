@@ -530,10 +530,12 @@ namespace ExpressBase.Objects
 
         private void GetFormattedDataApproval(EbDataTable dataTable, SingleTable Table)
         {
-            foreach(EbDataRow dataRow in dataTable.Rows)
+            foreach (EbDataRow dataRow in dataTable.Rows)
             {
                 DateTime dt = Convert.ToDateTime(dataRow["eb_created_at"]);
-                Table.Add(new SingleRow { Columns = new List<SingleColumn>
+                Table.Add(new SingleRow
+                {
+                    Columns = new List<SingleColumn>
                 {
                     new SingleColumn { Name = "id", Type = (int)EbDbTypes.Decimal, Value = Convert.ToInt32(dataRow["id"])},
                     new SingleColumn { Name = "stage", Type = (int)EbDbTypes.String, Value = dataRow["stage"].ToString()},
@@ -543,7 +545,10 @@ namespace ExpressBase.Objects
                     new SingleColumn { Name = "eb_created_by_id", Type = (int)EbDbTypes.Decimal, Value = Convert.ToInt32(dataRow["eb_created_by"])},
                     new SingleColumn { Name = "eb_created_by_name", Type = (int)EbDbTypes.String, Value = this.SolutionObj.Users[Convert.ToInt32(dataRow["eb_created_by"])]},
                     new SingleColumn { Name = "eb_created_at", Type = (int)EbDbTypes.String, Value = dt.ConvertFromUtc(this.UserObj.TimeZone).ToString("dd-MM-yyyy hh:mm tt")}
-                }, RowId = dataRow["id"].ToString(), LocId = Convert.ToInt32(dataRow["eb_loc_id"])});
+                },
+                    RowId = dataRow["id"].ToString(),
+                    LocId = Convert.ToInt32(dataRow["eb_loc_id"])
+                });
             }
         }
 
@@ -603,7 +608,13 @@ namespace ExpressBase.Objects
                                         if (_column.Control is EbSysCreatedAt || _column.Control is EbSysModifiedAt)
                                             _formattedData = dt.ConvertFromUtc(this.UserObj.Preference.TimeZone).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
                                         else
-                                            _formattedData = dt.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+                                        {
+                                            DateShowFormat _showtype = _column.Control is EbDate ? (_column.Control as EbDate).ShowDateAs_ : (_column.Control as EbDGDateColumn).EbDate.ShowDateAs_;
+                                            if (_showtype == DateShowFormat.Year_Month)
+                                                _formattedData = dt.ToString("MM/yyyy", CultureInfo.InvariantCulture);
+                                            else
+                                                _formattedData = dt.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+                                        }
                                     }
                                     else if (_type == EbDateType.DateTime)
                                     {
@@ -946,9 +957,13 @@ namespace ExpressBase.Objects
                                     else if (rField.Control is EbDate || rField.Control is EbDGDateColumn)
                                     {
                                         EbDateType _type = rField.Control is EbDate ? (rField.Control as EbDate).EbDateType : (rField.Control as EbDGDateColumn).EbDateType;
+                                        DateShowFormat _showtype = rField.Control is EbDate ? (rField.Control as EbDate).ShowDateAs_ : (rField.Control as EbDGDateColumn).EbDate.ShowDateAs_;
                                         if (_type == EbDateType.Date)
                                         {
-                                            rField.Value = DateTime.ParseExact(rField.Value.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
+                                            if (_showtype == DateShowFormat.Year_Month)
+                                                rField.Value = DateTime.ParseExact(rField.Value.ToString(), "MM/yyyy", CultureInfo.InvariantCulture);
+                                            else
+                                                rField.Value = DateTime.ParseExact(rField.Value.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
                                         }
                                         else
                                         {
@@ -993,9 +1008,13 @@ namespace ExpressBase.Objects
                             else if (rField.Control is EbDate || rField.Control is EbDGDateColumn)
                             {
                                 EbDateType _type = rField.Control is EbDate ? (rField.Control as EbDate).EbDateType : (rField.Control as EbDGDateColumn).EbDateType;
+                                DateShowFormat _showtype = rField.Control is EbDate ? (rField.Control as EbDate).ShowDateAs_ : (rField.Control as EbDGDateColumn).EbDate.ShowDateAs_;
                                 if (_type == EbDateType.Date)
                                 {
-                                    rField.Value = DateTime.ParseExact(rField.Value.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
+                                    if (_showtype == DateShowFormat.Year_Month)
+                                        rField.Value = DateTime.ParseExact(rField.Value.ToString(), "MM/yyyy", CultureInfo.InvariantCulture);
+                                    else
+                                        rField.Value = DateTime.ParseExact(rField.Value.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
                                 }
                                 else
                                 {
@@ -1121,9 +1140,13 @@ namespace ExpressBase.Objects
                             else if (rField.Control is EbDate || rField.Control is EbDGDateColumn)
                             {
                                 EbDateType _type = rField.Control is EbDate ? (rField.Control as EbDate).EbDateType : (rField.Control as EbDGDateColumn).EbDateType;
+                                DateShowFormat _showtype = rField.Control is EbDate ? (rField.Control as EbDate).ShowDateAs_ : (rField.Control as EbDGDateColumn).EbDate.ShowDateAs_;
                                 if (_type == EbDateType.Date)
                                 {
-                                    rField.Value = DateTime.ParseExact(rField.Value.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
+                                    if (_showtype == DateShowFormat.Year_Month)
+                                        rField.Value = DateTime.ParseExact(rField.Value.ToString(), "MM/yyyy", CultureInfo.InvariantCulture);
+                                    else
+                                        rField.Value = DateTime.ParseExact(rField.Value.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
                                 }
                                 else
                                 {
@@ -1760,13 +1783,41 @@ namespace ExpressBase.Objects
             }
             else if (_column.Control is EbDate || _column.Control is EbDGDateColumn)
             {
+                EbDateType _type = _column.Control is EbDate ? (_column.Control as EbDate).EbDateType : (_column.Control as EbDGDateColumn).EbDateType;
+                DateShowFormat _showtype = _column.Control is EbDate ? (_column.Control as EbDate).ShowDateAs_ : (_column.Control as EbDGDateColumn).EbDate.ShowDateAs_;
                 if (!old_val.Equals("[null]"))
-                {
-                    old_val = DateTime.ParseExact(old_val, "yyyy-MM-dd", CultureInfo.InvariantCulture).ToString(this.UserObj.Preference.GetShortDatePattern(), CultureInfo.InvariantCulture);
+                {                    
+                    if (_type == EbDateType.Date)
+                    {
+                        if (_showtype != DateShowFormat.Year_Month)
+                            old_val = DateTime.ParseExact(old_val, "yyyy-MM-dd", CultureInfo.InvariantCulture).ToString(this.UserObj.Preference.GetShortDatePattern(), CultureInfo.InvariantCulture);
+                    }
+                    else if(_type == EbDateType.DateTime)
+                    {
+                        old_val = DateTime.ParseExact(old_val, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture).ToString(this.UserObj.Preference.GetShortDatePattern() + " " + this.UserObj.Preference.GetShortTimePattern(), CultureInfo.InvariantCulture);
+                        //old_val = dt.ConvertFromUtc(this.UserObj.Preference.TimeZone);
+                    }
+                    else if(_type == EbDateType.Time)
+                    {
+                        old_val = DateTime.ParseExact(old_val, "HH:mm:ss", CultureInfo.InvariantCulture).ToString(this.UserObj.Preference.GetShortTimePattern(), CultureInfo.InvariantCulture);
+                        //old_val = dt.ConvertFromUtc(this.UserObj.Preference.TimeZone);
+                    }
                 }
                 if (!new_val.Equals("[null]"))
                 {
-                    new_val = DateTime.ParseExact(new_val, "yyyy-MM-dd", CultureInfo.InvariantCulture).ToString(this.UserObj.Preference.GetShortDatePattern(), CultureInfo.InvariantCulture);
+                    if (_type == EbDateType.Date)
+                    {
+                        if (_showtype != DateShowFormat.Year_Month)
+                            new_val = DateTime.ParseExact(new_val, "yyyy-MM-dd", CultureInfo.InvariantCulture).ToString(this.UserObj.Preference.GetShortDatePattern(), CultureInfo.InvariantCulture);
+                    }
+                    else if (_type == EbDateType.DateTime)
+                    {
+                        new_val = DateTime.ParseExact(new_val, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture).ToString(this.UserObj.Preference.GetShortDatePattern() + " " + this.UserObj.Preference.GetShortTimePattern(), CultureInfo.InvariantCulture);
+                    }
+                    else if (_type == EbDateType.Time)
+                    {
+                        new_val = DateTime.ParseExact(new_val, "HH:mm:ss", CultureInfo.InvariantCulture).ToString(this.UserObj.Preference.GetShortTimePattern(), CultureInfo.InvariantCulture);
+                    }
                 }
             }
         }
@@ -1932,7 +1983,7 @@ namespace ExpressBase.Objects
             TableSchema _table = _schema.Tables.FirstOrDefault(tbl => tbl.TableName == _container.TableName);
             if (_table == null)
             {
-                if(_container is EbApproval)
+                if (_container is EbApproval)
                     _table = new TableSchema { TableName = _container.TableName.ToLower(), ParentTable = _parentTable, TableType = WebFormTableTypes.Approval, Title = _container.Label };
                 else if (_container is EbDataGrid)
                     _table = new TableSchema { TableName = _container.TableName.ToLower(), ParentTable = _parentTable, TableType = WebFormTableTypes.Grid, Title = _container.Label };
