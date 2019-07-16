@@ -306,8 +306,28 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         }
     }
 
+	[DataContract]
+	public class SocialAutoSignInRequest : EbServiceStackNoAuthRequest
+	{
+		[DataMember(Order = 1)]
+		public string Email { get; set; }
 
-    [DataContract]
+		[DataMember(Order = 2)]
+		public string Social_id { get; set; }
+	}
+
+	[DataContract]
+	public class SocialAutoSignInResponse 
+	{
+		[DataMember(Order = 1)]
+		public int Id { get; set; }
+
+		[DataMember(Order = 2)]
+		public string psw { get; set; }
+
+	}
+
+	[DataContract]
     public class GetSolutionRequest : IReturn<GetSolutionResponse>, IEbSSRequest
     {
         public string SolnId { get; set; }
