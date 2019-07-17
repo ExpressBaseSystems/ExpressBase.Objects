@@ -161,7 +161,7 @@ namespace ExpressBase.Objects
             html += @"
         </tbody>
     </table>
-    <button class='btn btn-success fs-submit'>Execute Review <i class='fa fa-check-square-o' aria-hidden='true'></i></button>
+    <div class='fs-submit-cont'><button class='btn btn-success fs-submit'>Execute Review <i class='fa fa-check-square-o' aria-hidden='true'></i></button></div>
 </div>";
 
             return html;
