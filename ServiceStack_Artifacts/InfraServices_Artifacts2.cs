@@ -278,10 +278,56 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 4)]
         public string ErrDbMessage { get; set; }
     }
-  
-   
+
 
     [DataContract]
+    public class CreateSolutionFurtherRequest : IReturn<CreateSolutionFurtherResponse>, IEbSSRequest
+    {
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
+    }
+
+    [DataContract]
+    public class CreateSolutionFurtherResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public bool Status { get; set; }
+
+        [DataMember(Order = 2)]
+        public int SolId { get; set; }
+
+        [DataMember(Order = 3)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        public CreateSolutionFurtherResponse()
+        {
+            ResponseStatus = new ResponseStatus();
+        }
+    }
+
+	[DataContract]
+	public class SocialAutoSignInRequest : EbServiceStackNoAuthRequest
+	{
+		[DataMember(Order = 1)]
+		public string Email { get; set; }
+
+		[DataMember(Order = 2)]
+		public string Social_id { get; set; }
+	}
+
+	[DataContract]
+	public class SocialAutoSignInResponse 
+	{
+		[DataMember(Order = 1)]
+		public int Id { get; set; }
+
+		[DataMember(Order = 2)]
+		public string psw { get; set; }
+
+	}
+
+	[DataContract]
     public class GetSolutionRequest : IReturn<GetSolutionResponse>, IEbSSRequest
     {
         public string SolnId { get; set; }
@@ -430,4 +476,21 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     //    [DataMember(Order = 3)]
     //    public ResponseStatus ResponseStatus { get; set; }
     //}
+
+    public class GetVersioning : IEbSSRequest
+    {
+        public bool Versioning { get; set; }
+
+        public ResponseStatus status { get; set; }
+
+        public string SolnId { get; set; }
+
+        public int UserId { get; set; }
+    }
+
+    public class SetVersioning
+    {
+        public bool Versioning { get; set; }
+        public string solution_id { get; set; }
+    }
 }

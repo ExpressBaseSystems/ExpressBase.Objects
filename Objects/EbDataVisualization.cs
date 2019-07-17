@@ -110,6 +110,7 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
         [HideForUser]
+        [PropertyPriority(0)]
         public string DataSourceRefId { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
@@ -160,12 +161,17 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public string Pippedfrom { get; set; }
 
-        [HideInPropertyGrid]
-        [EnableInBuilder(BuilderType.DVBuilder)]
-        public string IsPaged { get; set; }
-
         [EnableInBuilder(BuilderType.DVBuilder)]
         [DefaultPropValue("true")]
+        [PropertyGroup("Paging")]
+        [OnChangeExec(@"
+        if(this.IsPaging){
+            pg.ShowProperty('PageLength')
+        }
+
+        else{
+            pg.HideProperty('PageLength')
+        }")]
         public virtual bool IsPaging { get; set; }
 
         public override void AfterRedisGet(RedisClient Redis)
@@ -380,14 +386,17 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public RowGroupParent CurrentRowGroup { get; set; }
 
+        [PropertyGroup("Fixed Column")]
         [EnableInBuilder(BuilderType.DVBuilder)]
         public int LeftFixedColumn { get; set; }
 
+        [PropertyGroup("Fixed Column")]
         [EnableInBuilder(BuilderType.DVBuilder)]
         public int RightFixedColumn { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [DefaultPropValue("100")]
+        [PropertyGroup("Paging")]
         public int PageLength { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]

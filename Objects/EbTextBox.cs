@@ -61,6 +61,13 @@ $('#cont_' + this.EbSid_CtxId + ' .ctrl-cover').css('pointer-events', 'inherit')
 .find('[ui-inp]').css('pointer-events', 'inherit')";
             } set { } }
 
+        [JsonIgnore]
+        public override string EnableJSfn { get {
+                return @"$('#cont_' + this.EbSid_CtxId + ' *')
+.removeAttr('disabled').css('pointer-events', 'inherit')
+.find('[ui-inp]').css('background-color', '#fff');";
+            } set { } }
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [HelpText("To limit number of charecters")]
         [PropertyGroup("Behavior")]
@@ -171,11 +178,6 @@ else {
         //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         //[PropertyEditor(PropertyEditorType.JS)]
         //public string OnChangeExe { get; set; }
-
-        public override string GetHead()
-        {
-            return (((!this.Hidden) ? this.UniqueString + this.RequiredString : string.Empty) + @"".Replace("{0}", this.Name));
-        }
 
         private string TextTransformString
         {

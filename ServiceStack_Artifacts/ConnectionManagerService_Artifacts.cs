@@ -283,6 +283,19 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
+    public class AddSendGridRequest : IReturn<AddGoogleMapResponse>, IEbTenentRequest
+    {
+        public EbSendGridConfig Config { get; set; }
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
+    }
+
+    public class AddSendGridResponse : IEbSSResponse
+    {
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
     public class EbIntegrationRequest : IReturn<EbIntegrationResponse>, IEbTenentRequest
     {
         public EbIntegration IntegrationO { get; set; }
@@ -418,6 +431,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             Ctype = row[3].ToString();
             Type = row[12].ToString();
             Preference = row[13].ToString();
+            CreatedOn = Convert.ToDateTime(row[6]).ToString("dddd, dd MMMM yyyy");
         }
         public string Id { get; set; }
 
@@ -430,5 +444,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Type { get; set; }
 
         public string Preference { get; set; }
+
+        public string CreatedOn { get; set; }
     }
 }

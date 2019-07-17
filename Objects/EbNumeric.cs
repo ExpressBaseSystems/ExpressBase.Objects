@@ -16,24 +16,14 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
     public class EbNumeric : EbControlUI
     {
+        public EbNumeric() { }
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.Decimal; } }
 
-        public EbNumeric()
-        {
-        }
-
         [JsonIgnore]
-        public override string GetValueJSfn
-        {
-            get
-            {
-                return @"
-                    return parseFloat($('#' + this.EbSid_CtxId).val()) || 0;
-                ";
-            }
-            set { }
-        }
+        public override string GetValueJSfn { get { return @" return parseFloat($('#' + this.EbSid_CtxId).val()) || 0; "; } set { } }
 
         [OnDeserialized]
         public void OnDeserializedMethod(StreamingContext context)
@@ -95,108 +85,7 @@ namespace ExpressBase.Objects
             return vDbTypes.Decimal;
         }
 
-        public override string GetToolHtml()
-        {
-            return @"<div eb-type='@toolName' class='tool'><b>0-9 </b></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
-        }
-
-        public override string GetHead()
-        {
-            return (((!this.Hidden) ? this.UniqueString + this.RequiredString : string.Empty) + @"
-$('#{0}').focusout( function(){   
-       var val=$(this).val().toString();
-       var l = '{1}'.length-1;
-       var ndp = {2}; 
-       if( val==0 || val==='' || val==='.')
-            $(this).val('');
-       else{
-            if(ndp!==0){
-                if( (!val.includes('.'))  && (l!==val.length))
-                    val = val + '.';
-                if ((val.includes('.')))
-                {
-                    var pi = val.indexOf('.');
-                    var lmt = pi + ndp;
-                    for (pi; pi <= l; pi++)
-                    {
-                        if (val[pi] == null)
-                            val += '0';
-                        if (pi === lmt)
-                            break;
-                    }
-                }
-             }
-             if(val[0]==='.')
-                val='0'+val;
-             $(this).val(val);
-        }
-    });
-
-$('#{0}').focus(function() {$(this).select();});         
-$('#{0}').keypress(function(e) { 
-
-        var val = $('#{0}').val();
-        var cs = document.getElementById('{0}').selectionStart;
-        var ce = document.getElementById('{0}').selectionEnd;
-            if(e.which==46 && val.includes('.')) {
-                 setTimeout(function () {
-                        $('#{0}').val(val);
-                 }, 1);
-            }
-            // containes '.' and no selection
-            if(val.includes('.') && cs === ce ){
-                setTimeout(function () {
-                    var pi = val.indexOf('.');  
-                    //prevents exceeding decimal part length when containes '.'
-                    if( (val.length-pi) === ({2} + 1) &&  (e.which >=48)&&(e.which<=57) && ce>pi )
-                        $('#{0}').val(val);
-                    //prevents exceeding integer part length when containes '.'
-                    if( pi === {3} &&  (e.which >=48)&&(e.which<=57) && ce<=pi)
-                        $('#{0}').val(val);
-
-                }, 1);
-            }
-            //prevents exceeding integer-part length when no '.'
-            if(!(val.includes('.')) && val.length === {3} && (e.which >=48)&&(e.which<=57)  ){
-                setTimeout(function () {
-                   $('#{0}').val( val + '.' + String.fromCharCode(e.which));
-
-                }, 1);
-            }
-            //prevents del before '.'if it leads to exceed integerpart limit
-            if( val.includes('.') && (val.length-1)>{3}  && cs===val.indexOf('.') && e.which===0 ){
-                setTimeout(function () {
-                   $('#{0}').val(val);
-                }, 1);
-            }
-            //prevents <- after '.' if it leads to exceed integerpart limit
-            if( val.includes('.') && (val.length-1)>{3}  && cs===(val.indexOf('.')+1) && e.which===8 ){
-                setTimeout(function () {
-                   $('#{0}').val(val);
-                }, 1);
-            }
-            //prevents deletion of selection when containes '.' if it leads to exceed integerpart limit
-            if( (val.includes('.') && val.length-(ce-cs))>{3} &&  cs<=val.indexOf('.') && ce>val.indexOf('.') ){
-                setTimeout(function () {
-                   $('#{0}').val(val);
-                }, 1);
-            }
-    });
-
-$('#{0}').mask('SZZZZZZZZZZZ', {
-    //reverse: true,
-    translation: {
-        'S':{
-            pattern: /-/,
-            optional:true
-            },
-        'Z': {
-                pattern: /[0-9.]/,
-                optional: true
-            }
-    }
-}); ").Replace("{0}", this.Name).Replace("{1}", "SZZZZZZZZZZZ").Replace("{2}", this.DecimalPlaces.ToString()).Replace("{3}", (this.MaxLength - this.DecimalPlaces).ToString());
-        }
+        public override string GetToolHtml() { return @"<div eb-type='@toolName' class='tool'><b>0-9 </b></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2)); }
 
         public override string GetDesignHtml()
         {

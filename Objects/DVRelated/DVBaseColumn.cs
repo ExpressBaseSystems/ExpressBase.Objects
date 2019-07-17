@@ -113,7 +113,6 @@ namespace ExpressBase.Objects.Objects.DVRelated
 
     
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl)]
-    [HideInPropertyGrid]
     public class DVBaseColumn : EbDataVisualizationObject
     {
         [JsonProperty(PropertyName = "data")]
@@ -147,6 +146,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [Alias("Title")]
+        [HideInPropertyGrid]
         public string sTitle { get; set; }
 
         [HideInPropertyGrid]
@@ -346,7 +346,13 @@ else {
         [EnableInBuilder(BuilderType.DVBuilder)]        
         public int AllowedCharacterLength { get; set; }
 
+        [PropertyGroup("Tooltip")]
         [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "ColumnsRef")]
+        public List<DVBaseColumn> InfoWindow { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [MetaOnly]
         public OrderByDirection Direction { get; set; }        
 
         [JsonIgnore]
@@ -441,6 +447,7 @@ else {
             this.GroupFormId = new List<DVBaseColumn>();
             this.ItemFormParameters = new List<DVBaseColumn>();
             this.ItemFormId = new List<DVBaseColumn>();
+            this.InfoWindow = new List<DVBaseColumn>();
         }
     }
 
