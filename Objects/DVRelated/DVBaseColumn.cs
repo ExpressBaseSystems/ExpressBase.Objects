@@ -336,9 +336,11 @@ else if(this.FormMode === 2){
         [OnChangeExec(@"
 if(this.AllowTooltip){
     pg.ShowProperty('AllowedCharacterLength');
+    pg.ShowProperty('InfoWindow');
 }
 else {
     pg.HideProperty('AllowedCharacterLength');
+    pg.HideProperty('InfoWindow');
 }")]
         public bool AllowTooltip { get; set; }
 
