@@ -61,6 +61,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Email { get; set; }
 
         [DataMember(Order = 8)]
+        public string DefaultSourceId { get; set; }
+
+        [DataMember(Order = 9)]
         public ResponseStatus ResponseStatus { get; set; }
     }
 
@@ -84,8 +87,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 3)]
         public ResponseStatus ResponseStatus { get; set; }
     }
-
-
+    
     public class CheckCustomerSubscribedRequest : IEbTenentRequest, IReturn<CheckCustomerSubscribedResponse>
     {
         public int UserId { get; set; }
@@ -160,6 +162,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 1)]
         public ResponseStatus ResponseStatus { get; set; }
     }
+
     public class UpdateCustomerCardRequest : IEbTenentRequest, IReturn<UpdateCustomerCardResponse>
     {
         public string CustId { get; set; }
@@ -208,7 +211,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-    public class AddCustomerCardRequest : IEbTenentRequest, IReturn<UpdateCustomerCardResponse>
+    public class AddCustomerCardRequest : IEbTenentRequest, IReturn<AddCustomerCardResponse>
     {
         public string CustId { get; set; }
 
@@ -230,6 +233,60 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int Count { get; set; }
 
         [DataMember(Order = 3)]
+        public string DefaultSourceId { get; set; }
+
+        [DataMember(Order = 4)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    public class RemoveCustomerCardRequest : IEbTenentRequest, IReturn<RemoveCustomerCardResponse>
+    {
+        public string CustId { get; set; }
+
+        public string TokenId { get; set; }
+
+        public string CardId { get; set; }
+
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
+    }
+
+    public class RemoveCustomerCardResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public Eb_StripeCardsList Cards { get; set; }
+
+        [DataMember(Order = 2)]
+        public int Count { get; set; }
+
+        [DataMember(Order = 3)]
+        public string DefaultSourceId { get; set; }
+
+        [DataMember(Order = 4)]
+        public bool Status { get; set; }
+
+        [DataMember(Order = 5)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    public class ChangeCardSourceRequest : IEbTenentRequest, IReturn<ChangeCardSourceResponse>
+    {
+        public string CustId { get; set; }
+
+        public string CardId { get; set; }
+
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
+    }
+
+    public class ChangeCardSourceResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public string CardId { get; set; }
+
+        [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
     }
 
@@ -375,10 +432,11 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 9)]
         public ResponseStatus ResponseStatus { get; set; }
     }
-
-  
+    
     public class UpgradeSubscriptionRequest : IEbTenentRequest, IReturn<UpgradeSubscriptionResponse>
     {
+        public string CustId { get; set; }
+
         public string PlanId { get; set; }
 
         public int Total { get; set; }
@@ -417,6 +475,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Plan { get; set; }
 
         [DataMember(Order = 9)]
+        public Eb_StripeUpcomingInvoiceList Invoice { get; set; }
+
+        [DataMember(Order = 10)]
+        public int Count { get; set; }
+
+        [DataMember(Order = 11)]
         public ResponseStatus ResponseStatus { get; set; }
     }
 

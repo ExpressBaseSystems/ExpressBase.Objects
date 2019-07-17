@@ -24,6 +24,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Tags { get; set; }
 
         public string Status { get; set; }
+
+        public int Order { get; set; }
     }
 
     public class PersistWikiRequest : IEbTenentRequest, IReturn<PersistWikiResponse>
@@ -98,6 +100,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         }
 
         public List<Wiki> WikiList { get; set; }
+      
 
     }
 
