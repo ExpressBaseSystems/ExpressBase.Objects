@@ -15,7 +15,7 @@ namespace ExpressBase.Objects
         NHG_President = 0,
         ADS_Committee = 1,
         CDS_Committee = 2,
-        test_role = 3
+        //test_role = 3
     }
 
     [EnableInBuilder(BuilderType.WebForm)]
