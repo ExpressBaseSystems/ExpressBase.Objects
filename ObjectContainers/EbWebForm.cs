@@ -295,7 +295,7 @@ namespace ExpressBase.Objects
                 if (_table.TableName != _schema.MasterTable)
                     _id = _schema.MasterTable + "_id";
 
-                query += string.Format("SELECT {0} FROM {1} WHERE {2} = :id AND eb_del='F' {3};", _cols, _table.TableName, _id, _table.TableType == WebFormTableTypes.Grid ? "ORDER BY eb_row_num" : string.Empty);
+                query += string.Format("SELECT {0} FROM {1} WHERE {2} = :id AND eb_del='F' {3};", _cols, _table.TableName, _id, _table.TableType == WebFormTableTypes.Grid ? "ORDER BY eb_row_num" : "ORDER BY id");
 
                 foreach (ColumnSchema Col in _table.Columns)
                 {
@@ -1259,7 +1259,9 @@ namespace ExpressBase.Objects
                 List<DbParameter> param = new List<DbParameter>();
                 foreach (KeyValuePair<string, SingleTable> item in this.FormData.MultipleTables)
                 {
-                    foreach (SingleColumn rField in item.Value[0].Columns)
+                    if (item.Value.Count == 0)
+                        continue;
+                    foreach (SingleColumn rField in item.Value[item.Value.Count - 1].Columns)
                     {
                         if (q.Contains(":" + item.Key + "_" + rField.Name))
                         {
@@ -1404,6 +1406,11 @@ namespace ExpressBase.Objects
         private void UpdateAuditTrail(IDatabase DataDB)
         {
             List<AuditTrailEntry> FormFields = new List<AuditTrailEntry>();
+            if (this.FormDataBackup == null)
+            {
+                UpdateAuditTrail(DataDB, 1, FormFields);
+                return;
+            }
             foreach (KeyValuePair<string, SingleTable> entry in this.FormData.MultipleTables)
             {
                 bool IsGridTable = false;
@@ -1411,7 +1418,7 @@ namespace ExpressBase.Objects
                 if (_table != null)
                     IsGridTable = _table.TableType == WebFormTableTypes.Grid;
 
-                if (this.FormDataBackup == null || !this.FormDataBackup.MultipleTables.ContainsKey(entry.Key))//insert mode
+                if (!this.FormDataBackup.MultipleTables.ContainsKey(entry.Key))//insert mode
                 {
                     foreach (SingleRow rField in entry.Value)
                     {
@@ -1505,12 +1512,8 @@ namespace ExpressBase.Objects
             }
             if (FormFields.Count > 0)
             {
-                if (this.FormDataBackup == null)
-                    UpdateAuditTrail(DataDB, 1, FormFields);
-                else
-                    UpdateAuditTrail(DataDB, 2, FormFields);
+                UpdateAuditTrail(DataDB, 2, FormFields);
             }
-
         }
 
         //managing new or deleted row
@@ -1575,7 +1578,8 @@ namespace ExpressBase.Objects
             string Qry = DataDB.EB_UPDATEAUDITTRAIL;
             EbDataTable dt = DataDB.DoQuery(Qry, parameters.ToArray());
             var id = Convert.ToInt32(dt.Rows[0][0]);
-
+            if (_Fields.Count == 0)
+                return id;
             string lineQry = "INSERT INTO eb_audit_lines(masterid, fieldname, oldvalue, newvalue, idrelation, tablename) VALUES ";
             List<DbParameter> parameters1 = new List<DbParameter>();
             parameters1.Add(DataDB.GetNewParameter("masterid", EbDbTypes.Int32, id));
