@@ -106,7 +106,7 @@ namespace ExpressBase.Objects
             <tr>
             <th class='slno' style='width:50px'><span class='grid-col-title'>SL No</span></th>
             <th class='grid-col-title'><span class='grid-col-title'>Stage</span></th>
-            <th class='grid-col-title'><span class='grid-col-title'>Approver Role</span></th>
+            <th style='display: none;' class='grid-col-title'><span class='grid-col-title'>Approver Role</span></th>
             <th style='width:100px;'><span class='grid-col-title'> Status</span></th>
             <th class='grid-col-title'><span class='grid-col-title'>Reviewed by/At</span></th>
             <th class='grid-col-title'><span class='grid-col-title'>Remarks</span></th>
@@ -135,7 +135,7 @@ namespace ExpressBase.Objects
             <tr name='", _FormStage.Name, "'role='", _FormStage.ApproverRole.ToString(), "' style ='@bg@'>",
                     "<td class='row-no-td'>", SlNo++, "</td>",
                     "<td col='stage'><span class='fstd-div'>", _FormStage.Name, "</span></td>",
-                    "<td><span class='fstd-div'>", _FormStage.ApproverRole.ToString().Replace("_", " "), "</span></td>",
+                    "<td style='display: none;'><span class='fstd-div'>", _FormStage.ApproverRole.ToString().Replace("_", " "), "</span></td>",
                     @"<td col='status' class='fs-ctrl-td'><div class='fstd-div'>", @"
                     <select class='selectpicker'>
                         <option value='2'>Hold</option>
