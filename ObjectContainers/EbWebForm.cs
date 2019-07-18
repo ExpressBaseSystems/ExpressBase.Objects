@@ -489,6 +489,23 @@ namespace ExpressBase.Objects
                         }
                     }
                 }
+                else if(c is EbApproval)
+                {
+                    if (!c.DoNotPersist)
+                    {
+                        EbApproval ebApproval = (c as EbApproval);
+                        if (FormData.MultipleTables.ContainsKey(ebApproval.TableName))
+                        {
+                            string lastStage = (ebApproval.FormStages[ebApproval.FormStages.Count - 1] as EbFormStage).Name;
+                            string stage = Convert.ToString(FormData.MultipleTables[ebApproval.TableName][0]["stage"]);
+                            int status = Convert.ToInt32(FormData.MultipleTables[ebApproval.TableName][0]["status"]);
+                            if (lastStage.Equals(stage) && status == 1)
+                            {
+                                this.AfterSaveRoutines.AddRange(ebApproval.OnApprovalRoutines);
+                            }
+                        }
+                    }
+                }
                 else if (c is EbControlContainer)
                 {
                     if (string.IsNullOrEmpty((c as EbControlContainer).TableName))
