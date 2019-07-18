@@ -24,7 +24,8 @@ namespace ExpressBase.Objects
         public EbApproval()
         {
             FormStages = new List<ApprovalStageAbstract>();
-            Controls = new List<EbControl>();           
+            Controls = new List<EbControl>();
+            this.OnApprovalRoutines = new List<EbRoutines>();
         }
 
         [OnDeserialized]
@@ -51,6 +52,11 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm)]
         public override string Name { get; set; }
+
+        [PropertyGroup("Events")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        public List<EbRoutines> OnApprovalRoutines { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
         public override string Label { get; set; }
