@@ -109,20 +109,8 @@ namespace ExpressBase.Objects
                 .Replace("@rmode@", IsRenderMode.ToString().ToLower())
                 .Replace("@tabindex@", IsRenderMode ? string.Empty : " tabindex='1'");
         }
-
-        public string GetControlNames()
-        {
-            List<string> _lst = new List<string>();
-
-            //foreach (EbControl _c in this.FlattenedControls)
-            //{
-            //    if (!(_c is EbControlContainer))
-            //        _lst.Add(_c.Name);
-            //}
-
-            return string.Join(",", _lst.ToArray());
-        }
-
+        
+        //Operations to be performed before form object save - table name required, table name repetition, calculate dependency
         public override void BeforeSave()
         {
             Dictionary<string, string> tbls = new Dictionary<string, string>();
@@ -163,24 +151,9 @@ namespace ExpressBase.Objects
                 }
             }
 
-            //BeforeSaveRec(this);
-
             CalcValueExprDependency();
         }
-
-        private void BeforeSaveRec(EbControlContainer _container)
-        {
-            foreach (EbControl c in _container.Controls)
-            {
-                if (c is EbControlContainer)
-                {
-                    if ((c as EbControlContainer).TableName.IsNullOrEmpty())
-                        (c as EbControlContainer).TableName = _container.TableName;
-                    BeforeSaveRec(c as EbControlContainer);
-                }
-            }
-        }
-
+        
         //Populate Property DependedValExp
         private void CalcValueExprDependency()
         {
@@ -216,7 +189,7 @@ namespace ExpressBase.Objects
                         {
                             if (CalcFlds[i] == j)
                                 throw new FormException("Avoid circular reference by the following control in 'ValueExpression' : " + _dict[CalcFlds[i]].Control.Name);
-                            dpndcy.Add(new KeyValuePair<int, int>(CalcFlds[i], j));//<depended, dominant>
+                            dpndcy.Add(new KeyValuePair<int, int>(CalcFlds[i], j));//<dependent, dominant>
                         }
                     }
                 }
@@ -671,11 +644,6 @@ namespace ExpressBase.Objects
                             _unformattedData = (_unformattedData == DBNull.Value) ? DateTime.MinValue : _unformattedData;
                             _formattedData = ((DateTime)_unformattedData).Date != DateTime.MinValue ? Convert.ToDateTime(_unformattedData).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) : string.Empty;
                         }
-                        //else if (dataColumn.Type == EbDbTypes.DateTime)
-                        //{
-                        //    _unformattedData = (_unformattedData == DBNull.Value) ? DateTime.MinValue : _unformattedData;
-                        //    _formattedData = ((DateTime)_unformattedData).Date != DateTime.MinValue ? Convert.ToDateTime(_unformattedData).ConvertFromUtc(this.UserObj.Preference.TimeZone).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) : string.Empty;
-                        //}
                         Row.Columns.Add(new SingleColumn()
                         {
                             Name = dataColumn.ColumnName,
@@ -726,21 +694,6 @@ namespace ExpressBase.Objects
             if (dataset.Tables.Count > _schema.Tables.Count)
             {
                 int tableIndex = _schema.Tables.Count;
-
-                //foreach (TableSchema Tbl in _schema.Tables)//PowerSelect
-                //{
-                //    foreach (ColumnSchema Col in Tbl.Columns)
-                //    {
-                //        if (Col.Control is EbPowerSelect || Col.Control is EbDGPowerSelectColumn)
-                //        {
-                //            SingleTable Table = new SingleTable();
-                //            GetFormattedData(dataset.Tables[tableIndex], Table);
-                //            _FormData.ExtendedTables.Add((Col.Control as EbControl).EbSid, Table);
-                //            tableIndex++;
-                //        }
-                //    }
-                //}
-
                 foreach (Object Ctrl in _schema.ExtendedControls)//FileUploader Controls
                 {
                     SingleTable Table = new SingleTable();
@@ -802,27 +755,7 @@ namespace ExpressBase.Objects
                         }
                     }
                 }
-                //foreach (KeyValuePair<string, SingleTable> entry in _FormData.MultipleTables)
-                //{
-                //    if (entry.Key == _FormData.MasterTable)
-                //        this.LocationId = entry.Value[0].LocId;
-
-                //    foreach (SingleColumn column in entry.Value[0].Columns)
-                //    {
-                //        DbParameter t = param.Find(e => e.ParameterName == column.Name);
-                //        if (t == null)
-                //        {
-                //            if (column.Value == null)
-                //            {
-                //                var p = DataDB.GetNewParameter(column.Name, (EbDbTypes)column.Type);
-                //                p.Value = DBNull.Value;
-                //                param.Add(p);
-                //            }
-                //            else
-                //                param.Add(DataDB.GetNewParameter(column.Name, (EbDbTypes)column.Type, column.Value));
-                //        }
-                //    }
-                //}
+                //if eb_loc_id control is not present then form data entered location adding as 'eb_loc_id' 
                 DbParameter tt = param.Find(e => e.ParameterName == "eb_loc_id");
                 if (tt == null)
                     param.Add(DataDB.GetNewParameter("eb_loc_id", EbDbTypes.Decimal, this.LocationId));
@@ -989,17 +922,6 @@ namespace ExpressBase.Objects
                                         }
                                         param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, EbDbTypes.DateTime, rField.Value));
                                     }
-                                    //else if ((EbDbTypes)rField.Type == EbDbTypes.Date)
-                                    //{
-                                    //    rField.Value = DateTime.ParseExact(rField.Value.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
-                                    //    param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
-                                    //}
-                                    //else if ((EbDbTypes)rField.Type == EbDbTypes.DateTime)
-                                    //{
-                                    //    DateTime dt = DateTime.ParseExact(rField.Value.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
-                                    //    rField.Value = dt.ConvertToUtc(this.UserObj.Preference.TimeZone);
-                                    //    param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
-                                    //}
                                     else
                                         param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
                                 }
@@ -1040,17 +962,6 @@ namespace ExpressBase.Objects
                                 }
                                 param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, EbDbTypes.DateTime, rField.Value));
                             }
-                            //else if ((EbDbTypes)rField.Type == EbDbTypes.Date)
-                            //{
-                            //    rField.Value = DateTime.ParseExact(rField.Value.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
-                            //    param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
-                            //}
-                            //else if ((EbDbTypes)rField.Type == EbDbTypes.DateTime)
-                            //{
-                            //    DateTime dt = DateTime.ParseExact(rField.Value.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
-                            //    rField.Value = dt.ConvertToUtc(this.UserObj.Preference.TimeZone);
-                            //    param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
-                            //}
                             else
                                 param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
                         }
@@ -1089,14 +1000,6 @@ namespace ExpressBase.Objects
                                            t.id = {1} AND t.eb_del = 'F';", InnerVals[k], InnerIds[k]);
                 }
 
-                //fullqry += string.Format(@"UPDATE 
-                //                            eb_files_ref AS t
-                //                        SET
-                //                            context = c.context
-                //                        FROM
-                //                            (VALUES{0}) AS c(id, context)
-                //                        WHERE
-                //                            c.id = t.id AND t.eb_del = 'F';", InnerVals.Join(","));
                 fullqry += string.Format(@"UPDATE eb_files_ref 
                                         SET eb_del='T' 
                                         WHERE ({0}) AND eb_del='F' AND id NOT IN ({1});", Innercxt.Join(" OR "), InnerIds.Join(","));
@@ -1108,10 +1011,6 @@ namespace ExpressBase.Objects
             param.Add(DataDB.GetNewParameter("eb_loc_id", EbDbTypes.Int32, this.LocationId));
             param.Add(DataDB.GetNewParameter("eb_createdby", EbDbTypes.Int32, this.UserObj.UserId));
             param.Add(DataDB.GetNewParameter("eb_modified_by", EbDbTypes.Int32, this.UserObj.UserId));
-
-            //param.Add(DataDB.GetNewParameter("eb_loc_s", EbDbTypes.String, this.SolutionObj.Locations.ContainsKey(this.LocationId) ? this.SolutionObj.Locations[this.LocationId].ShortName : string.Empty));
-            //param.Add(DataDB.GetNewParameter("eb_createdby_s", EbDbTypes.String, this.UserObj.FullName));
-            //param.Add(DataDB.GetNewParameter("eb_modified_by_s", EbDbTypes.String, this.UserObj.FullName));
 
             return DataDB.InsertTable(fullqry, param.ToArray());
         }
@@ -1134,7 +1033,6 @@ namespace ExpressBase.Objects
                     string _tblname = entry.Key;
                     string _cols = string.Empty;
                     string _values = string.Empty;
-                    //_cols = FormObj.GetCtrlNamesOfTable(entry.Key);
 
                     foreach (SingleColumn rField in row.Columns)
                     {
@@ -1172,17 +1070,6 @@ namespace ExpressBase.Objects
                                 }
                                 param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, EbDbTypes.DateTime, rField.Value));
                             }
-                            //else if ((EbDbTypes)rField.Type == EbDbTypes.Date)
-                            //{
-                            //    rField.Value = DateTime.ParseExact(rField.Value.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
-                            //    param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
-                            //}
-                            //else if ((EbDbTypes)rField.Type == EbDbTypes.DateTime)
-                            //{
-                            //    DateTime dt = DateTime.ParseExact(rField.Value.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
-                            //    rField.Value = dt.ConvertToUtc(this.UserObj.Preference.TimeZone);
-                            //    param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
-                            //}
                             else
                                 param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
                         }
@@ -1230,14 +1117,6 @@ namespace ExpressBase.Objects
                                            t.id = {1} AND t.eb_del = 'F';", InnerVals[k], InnerIds[k]);
                 }
 
-                //fullqry += string.Format(@"UPDATE 
-                //                            eb_files_ref AS t
-                //                        SET
-                //                            context = c.context
-                //                        FROM
-                //                            (VALUES{0}) AS c(id, context)
-                //                        WHERE
-                //                            c.id = t.id AND t.eb_del = 'F';", InnerVals.Join(","));
                 fullqry += string.Format(@"UPDATE eb_files_ref 
                                         SET eb_del='T' 
                                         WHERE ({0}) AND eb_del='F' AND id NOT IN ({1});", Innercxt.Join(" OR "), InnerIds.Join(","));
@@ -1245,19 +1124,15 @@ namespace ExpressBase.Objects
             //-----------------------------------------------------------------------------
 
             param.Add(DataDB.GetNewParameter("eb_createdby", EbDbTypes.Int32, this.UserObj.UserId));
-            //param.Add(DataDB.GetNewParameter("eb_createdby_s", EbDbTypes.String, this.UserObj.FullName));
             param.Add(DataDB.GetNewParameter("eb_loc_id", EbDbTypes.Int32, this.LocationId));
-            //param.Add(DataDB.GetNewParameter("eb_loc_s", EbDbTypes.String, this.SolutionObj.Locations.ContainsKey(this.LocationId) ? this.SolutionObj.Locations[this.LocationId].ShortName : string.Empty));
-            //param.Add(DataDB.GetNewParameter("eb_auto_id", EbDbTypes.String, FormData.AutoIdText ?? string.Empty));
-            //fullqry += string.Format("UPDATE {0} SET eb_auto_id = :eb_auto_id || cur_val('{0}_id_seq')::text WHERE id = cur_val('{0}_id_seq');", this.TableName);
             fullqry += string.Concat("SELECT eb_currval('", this.TableName, "_id_seq');");
 
             EbDataTable temp = DataDB.DoQuery(fullqry, param.ToArray());
             int _rowid = temp.Rows.Count > 0 ? Convert.ToInt32(temp.Rows[0][0]) : 0;
-            //int _rowid = temp.Tables[temp.Tables.Count - 1].Rows.Count > 0 ? Convert.ToInt32(temp.Tables[temp.Tables.Count - 1].Rows[0][0]) : 0;
             return _rowid;
         }
 
+        //execute sql queries after form data save
         public int AfterSave(IDatabase DataDB, bool IsUpdate)
         {
             string q = string.Empty;
@@ -1298,6 +1173,7 @@ namespace ExpressBase.Objects
             return -1;
         }
 
+        //to check whether this form data entry can be delete by executing DisableDelete sql quries
         private bool CanDelete(IDatabase DataDB)
         {
             if (this.DisableDelete != null && this.DisableDelete.Count > 0)
@@ -1334,6 +1210,7 @@ namespace ExpressBase.Objects
             return -1;
         }
 
+        //to check whether this form data entry can be cancel by executing DisableCancel sql quries
         private bool CanCancel(IDatabase DataDB)
         {
             if (this.DisableCancel != null && this.DisableCancel.Count > 0)
@@ -1611,44 +1488,10 @@ namespace ExpressBase.Objects
             }
             return DataDB.DoNonQuery(lineQry.Substring(0, lineQry.Length - 1), parameters1.ToArray());
         }
-
-        //Get the latest data as a transaction
-        //private FormTransaction GetCurrTransationAll()
-        //{
-        //    FormTransaction curTransAll = new FormTransaction();
-        //    foreach (TableSchema Table in this.FormSchema.Tables)
-        //    {
-        //        if (Table.IsGridTable)
-        //        {
-        //            curTransAll.GridTables.Add(Table.TableName, new FormTransactionTable());
-        //            foreach (SingleRow Row in this.FormData.MultipleTables[Table.TableName])
-        //            {
-        //                int _rowid = Convert.ToInt32(Row.RowId);
-        //                curTransAll.GridTables[Table.TableName].Rows.Add(_rowid, new FormTransactionRow());
-        //                foreach (SingleColumn Column in Row.Columns)
-        //                {
-        //                    if (!Column.Name.Equals("id"))//skipping id field
-        //                        curTransAll.GridTables[Table.TableName].Rows[_rowid].Columns.Add(Column.Name, new FormTransactionEntry { NewValue = Column.Value.ToString(), OldValue = Column.Value.ToString() });
-        //                }
-        //            }
-        //        }
-        //        else
-        //        {
-        //            curTransAll.Tables.Add(Table.TableName, new FormTransactionRow());
-        //            foreach (SingleColumn Column in this.FormData.MultipleTables[Table.TableName][0].Columns)
-        //            {
-        //                if (!Column.Name.Equals("id"))//skipping id
-        //                    curTransAll.Tables[Table.TableName].Columns.Add(Column.Name, new FormTransactionEntry { NewValue = Column.Value.ToString(), OldValue = Column.Value.ToString() });
-        //            }
-        //        }
-        //    }
-        //    return curTransAll;
-        //}
-
+        
         public string GetAuditTrail(IDatabase DataDB, Service Service)
         {
             this.RefreshFormData(DataDB, Service);
-            //FormTransaction curTransAll = this.GetCurrTransationAll();
             Dictionary<string, string> DictVmAll = new Dictionary<string, string>();
 
             string qry = @"	SELECT 
