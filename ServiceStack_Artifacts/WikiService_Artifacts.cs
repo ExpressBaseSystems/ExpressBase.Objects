@@ -28,6 +28,15 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int Order { get; set; }
     }
 
+    public class WikiCat
+    {
+        public string WikiCategory { get; set; }
+
+        public string WikiIconClass { get; set; }
+
+        public string WikiDescription { get; set; }
+    }
+
     public class PersistWikiRequest : IEbTenentRequest, IReturn<PersistWikiResponse>
     {
 
@@ -97,11 +106,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public GetWikiListResponse()
         {
             WikiList = new List<Wiki>();
+
+            WikiCat = new List<WikiCat>();      
         }
 
         public List<Wiki> WikiList { get; set; }
-      
 
+        public List<WikiCat> WikiCat { get; set; }
     }
 
     public class GetWikiByIdRequest : EbServiceStackNoAuthRequest, IReturn<GetWikiByIdResponse>
@@ -110,9 +121,30 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     public class GetWikiByIdResponse
-    {
+    {     
+        public GetWikiByIdResponse()
+        {
+            WikiCat = new List<WikiCat>();
+        }
+        public List<WikiCat> WikiCat { get; set; }
         public Wiki Wiki { get; set; }
+
     }
+
+    public class AddNewWikiRequest : EbServiceStackNoAuthRequest, IReturn<AddNewWikiResponse>
+    {
+        public int Id { get; set; }
+    }
+
+    public class AddNewWikiResponse
+    {
+        public AddNewWikiResponse()
+        {
+            WikiCat = new List<WikiCat>();
+        }
+        public List<WikiCat> WikiCat { get; set; }
+    }
+
 
     public class GetWikiRequest : EbServiceStackNoAuthRequest, IReturn<GetWikiResponse>
     {
@@ -172,8 +204,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public Admin_Wiki_ListResponse()
         {
             WikiList = new List<Wiki>();
+            WikiCat = new List<WikiCat>();
         }
         public List<Wiki> WikiList { get; set; }
+        public List<WikiCat> WikiCat { get; set; }
     }
 
     public class Publish_wikiRequest : EbServiceStackAuthRequest, IReturn<Publish_wikiResponse>
@@ -194,9 +228,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public PublicViewResponse()
         {
             WikiList = new List<Wiki>();
+            WikiCat = new List<WikiCat>();
         }
-
         public List<Wiki> WikiList { get; set; }
+        public List<WikiCat> WikiCat { get; set; }
     }
 
     public class UpdateOrderRequest : EbServiceStackAuthRequest, IReturn<UpdateOrderResponse>
