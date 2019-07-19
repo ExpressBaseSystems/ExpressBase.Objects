@@ -351,7 +351,28 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public string u_token { get; set; }
 	}
 
-	public class UniqueCheckRequest
+    [DataContract]
+    public class DeleteUserRequest : IReturn<DeleteUserResponse>, IEbSSRequest
+    {
+        [DataMember(Order = 1)]
+        public int Id { get; set; }
+
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
+    }
+
+    [DataContract]
+    public class DeleteUserResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public int Status { get; set; }
+
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+
+    public class UniqueCheckRequest
 	{
 		[DataMember(Order = 1)]
 		public string email { get; set; }

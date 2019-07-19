@@ -15,6 +15,7 @@ namespace ExpressBase.Objects
         NHG_President = 0,
         ADS_Committee = 1,
         CDS_Committee = 2,
+        Block_Coordinator = 3
         //test_role = 3
     }
 
@@ -24,7 +25,8 @@ namespace ExpressBase.Objects
         public EbApproval()
         {
             FormStages = new List<ApprovalStageAbstract>();
-            Controls = new List<EbControl>();           
+            Controls = new List<EbControl>();
+            this.OnApprovalRoutines = new List<EbRoutines>();
         }
 
         [OnDeserialized]
@@ -51,6 +53,11 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm)]
         public override string Name { get; set; }
+
+        [PropertyGroup("Events")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        public List<EbRoutines> OnApprovalRoutines { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
         public override string Label { get; set; }
@@ -127,8 +134,9 @@ namespace ExpressBase.Objects
 
             html += @"
         <tbody>";
-            FormStages.Reverse();
-            foreach (ApprovalStageAbstract FormStage in FormStages)
+            List<EbFormStage> _FormStages = JsonConvert.DeserializeObject<List<EbFormStage>>(JsonConvert.SerializeObject(FormStages));
+            _FormStages.Reverse();
+            foreach (ApprovalStageAbstract FormStage in _FormStages)
             {
                 EbFormStage _FormStage = (FormStage as EbFormStage);
                 html += string.Concat(@"
