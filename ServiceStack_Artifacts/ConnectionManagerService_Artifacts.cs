@@ -300,6 +300,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         public EbIntegration IntegrationO { get; set; }
 
+        public bool deploy { get; set; }
+
         public int UserId { get; set; }
 
         public string SolnId { get; set; }

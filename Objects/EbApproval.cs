@@ -15,7 +15,8 @@ namespace ExpressBase.Objects
         NHG_President = 0,
         ADS_Committee = 1,
         CDS_Committee = 2,
-        test_role = 3
+        Block_Coordinator = 3
+        //test_role = 3
     }
 
     [EnableInBuilder(BuilderType.WebForm)]
@@ -24,7 +25,8 @@ namespace ExpressBase.Objects
         public EbApproval()
         {
             FormStages = new List<ApprovalStageAbstract>();
-            Controls = new List<EbControl>();           
+            Controls = new List<EbControl>();
+            this.OnApprovalRoutines = new List<EbRoutines>();
         }
 
         [OnDeserialized]
@@ -51,6 +53,11 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm)]
         public override string Name { get; set; }
+
+        [PropertyGroup("Events")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        public List<EbRoutines> OnApprovalRoutines { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
         public override string Label { get; set; }
@@ -106,7 +113,7 @@ namespace ExpressBase.Objects
             <tr>
             <th class='slno' style='width:50px'><span class='grid-col-title'>SL No</span></th>
             <th class='grid-col-title'><span class='grid-col-title'>Stage</span></th>
-            <th class='grid-col-title'><span class='grid-col-title'>Approver Role</span></th>
+            <th style='display: none;' class='grid-col-title'><span class='grid-col-title'>Approver Role</span></th>
             <th style='width:100px;'><span class='grid-col-title'> Status</span></th>
             <th class='grid-col-title'><span class='grid-col-title'>Reviewed by/At</span></th>
             <th class='grid-col-title'><span class='grid-col-title'>Remarks</span></th>
@@ -127,15 +134,16 @@ namespace ExpressBase.Objects
 
             html += @"
         <tbody>";
-            FormStages.Reverse();
-            foreach (ApprovalStageAbstract FormStage in FormStages)
+            List<EbFormStage> _FormStages = JsonConvert.DeserializeObject<List<EbFormStage>>(JsonConvert.SerializeObject(FormStages));
+            _FormStages.Reverse();
+            foreach (ApprovalStageAbstract FormStage in _FormStages)
             {
                 EbFormStage _FormStage = (FormStage as EbFormStage);
                 html += string.Concat(@"
             <tr name='", _FormStage.Name, "'role='", _FormStage.ApproverRole.ToString(), "' style ='@bg@'>",
                     "<td class='row-no-td'>", SlNo++, "</td>",
                     "<td col='stage'><span class='fstd-div'>", _FormStage.Name, "</span></td>",
-                    "<td><span class='fstd-div'>", _FormStage.ApproverRole.ToString().Replace("_", " "), "</span></td>",
+                    "<td style='display: none;'><span class='fstd-div'>", _FormStage.ApproverRole.ToString().Replace("_", " "), "</span></td>",
                     @"<td col='status' class='fs-ctrl-td'><div class='fstd-div'>", @"
                     <select class='selectpicker'>
                         <option value='2'>Hold</option>
@@ -161,7 +169,7 @@ namespace ExpressBase.Objects
             html += @"
         </tbody>
     </table>
-    <button class='btn btn-success fs-submit'>Execute Review <i class='fa fa-check-square-o' aria-hidden='true'></i></button>
+    <div class='fs-submit-cont'><button class='btn btn-success fs-submit'>Execute Review <i class='fa fa-check-square-o' aria-hidden='true'></i></button></div>
 </div>";
 
             return html;

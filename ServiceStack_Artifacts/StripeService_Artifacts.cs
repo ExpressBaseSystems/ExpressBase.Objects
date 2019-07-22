@@ -532,9 +532,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-    public class StripewebhookRequest : IEbTenentRequest, IReturn<StripewebhookResponse>
+    public class StripewebhookRequest : EbServiceStackNoAuthRequest, IReturn<StripewebhookResponse>
     {
+        [DataMember(Order = 1)]
         public string Json { get; set; }
+
+         [DataMember(Order = 2)]
+        public string Header { get; set; }
 
         public int UserId { get; set; }
 

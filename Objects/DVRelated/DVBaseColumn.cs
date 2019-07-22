@@ -329,18 +329,7 @@ else if(this.FormMode === 2){
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.Collection)]
-        public List<StaticParam> StaticParameters { get; set; }
-
-        [PropertyGroup("Tooltip")]
-        [EnableInBuilder(BuilderType.DVBuilder)]
-        [OnChangeExec(@"
-if(this.AllowTooltip){
-    pg.ShowProperty('AllowedCharacterLength');
-}
-else {
-    pg.HideProperty('AllowedCharacterLength');
-}")]
-        public bool AllowTooltip { get; set; }
+        public List<StaticParam> StaticParameters { get; set; }        
 
         [PropertyGroup("Tooltip")]
         [EnableInBuilder(BuilderType.DVBuilder)]        
