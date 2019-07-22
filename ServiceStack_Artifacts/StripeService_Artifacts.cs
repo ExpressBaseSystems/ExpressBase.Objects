@@ -503,6 +503,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     public class StripewebhookRequest : EbServiceStackNoAuthRequest, IReturn<StripewebhookResponse>
     {
+        [DataMember(Order = 1)]
         public string Json { get; set; }
 
         public int UserId { get; set; }
