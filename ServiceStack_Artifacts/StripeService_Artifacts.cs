@@ -506,6 +506,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 1)]
         public string Json { get; set; }
 
+         [DataMember(Order = 2)]
+        public string Header { get; set; }
+
         public int UserId { get; set; }
 
         public string SolnId { get; set; }
