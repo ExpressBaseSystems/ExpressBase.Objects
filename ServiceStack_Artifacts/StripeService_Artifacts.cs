@@ -270,6 +270,37 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
+    public class EditCardExpRequest : IEbTenentRequest, IReturn<EditCardExpResponse>
+    {
+        public string CustId { get; set; }
+
+        public string CardId { get; set; }
+
+        public long? ExpMonth { get; set; }
+
+        public long? ExpYear { get; set; }
+
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
+    }
+
+    public class EditCardExpResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public Eb_StripeCardsList Cards { get; set; }
+
+        [DataMember(Order = 2)]
+        public int Count { get; set; }
+
+        [DataMember(Order = 3)]
+        public string DefaultSourceId { get; set; }
+        
+
+        [DataMember(Order = 5)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
     public class ChangeCardSourceRequest : IEbTenentRequest, IReturn<ChangeCardSourceResponse>
     {
         public string CustId { get; set; }
