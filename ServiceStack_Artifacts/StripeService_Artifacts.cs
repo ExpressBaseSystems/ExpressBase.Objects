@@ -501,7 +501,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-    public class StripewebhookRequest : IEbTenentRequest, IReturn<StripewebhookResponse>
+    public class StripewebhookRequest : EbServiceStackNoAuthRequest, IReturn<StripewebhookResponse>
     {
         public string Json { get; set; }
 
