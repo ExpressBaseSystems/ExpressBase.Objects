@@ -341,6 +341,10 @@ else if(this.FormMode === 2){
         public List<DVBaseColumn> InfoWindow { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        public List<ColumnCondition> ConditionalFormating { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
         [MetaOnly]
         public OrderByDirection Direction { get; set; }        
 
@@ -578,10 +582,11 @@ pg.HideProperty('FormMode');
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.Collection)]
-        public List<StringCondition> ConditionalFormat { get; set; }
+        public List<StringCondition> ConditionalFormat{ get; set; }
 
         public DVStringColumn()
         {
+            this.ConditionalFormating = new List<ColumnCondition>();
             this.ConditionalFormat = new List<StringCondition>();
         }
 
@@ -681,6 +686,7 @@ pg.HideProperty('FormMode');
 
         public DVNumericColumn()
         {
+            this.ConditionalFormating = new List<ColumnCondition>();
             this.ConditionalFormat = new List<NumericCondition>();
         }
 
@@ -749,6 +755,7 @@ pg.HideProperty('FormMode');
 
         public DVBooleanColumn()
         {
+            this.ConditionalFormating = new List<ColumnCondition>();
             this.ConditionalFormat = new List<BooleanCondition>();
         }
 
@@ -840,6 +847,7 @@ pg.HideProperty('FormMode');
 
         public DVDateTimeColumn()
         {
+            this.ConditionalFormating = new List<ColumnCondition>();
             this.ConditionalFormat = new List<DateCondition>();
         }
     }
@@ -887,8 +895,25 @@ pg.HideProperty('FormMode');
         public string EbSid { get; set; }
     }
 
+    public abstract class ColumnCondition : EbDataVisualizationObject
+    {
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.Color)]
+        public string FontColor { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.Color)]
+        public string BackGroundColor { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [HideInPropertyGrid]
+        public string EbSid { get; set; }
+
+        public abstract bool CompareValues(object _unformattedData);
+    }
+
     [EnableInBuilder(BuilderType.DVBuilder)]
-    public class NumericCondition : EbDataVisualizationObject
+    public class NumericCondition : ColumnCondition
     {
         public NumericCondition() { }
 
@@ -907,21 +932,27 @@ else
         [EnableInBuilder(BuilderType.DVBuilder)]
         public int Value1 { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
-        [PropertyEditor(PropertyEditorType.Color)]
-        public string FontColor { get; set; }
+        public override bool CompareValues(object _unformattedData)
+        {
+            if (this.Operator == NumericOperators.Equals)
+                return Convert.ToInt32(_unformattedData) == Convert.ToInt32(this.Value);
+            else if (this.Operator == NumericOperators.LessThan)
+                return Convert.ToInt32(_unformattedData) < Convert.ToInt32(this.Value);
+            else if (this.Operator == NumericOperators.GreaterThan)
+                return Convert.ToInt32(_unformattedData) > Convert.ToInt32(this.Value);
+            else if (this.Operator == NumericOperators.LessThanOrEqual)
+                return Convert.ToInt32(_unformattedData) <= Convert.ToInt32(this.Value);
+            else if (this.Operator == NumericOperators.GreaterThanOrEqual)
+                return Convert.ToInt32(_unformattedData) >= Convert.ToInt32(this.Value);
+            else if (this.Operator == NumericOperators.Between)
+                return Convert.ToInt32(_unformattedData) >= Convert.ToInt32(this.Value) && Convert.ToInt32(_unformattedData) <= Convert.ToInt32(this.Value1);
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
-        [PropertyEditor(PropertyEditorType.Color)]
-        public  string BackGroundColor { get; set; }
-
-        [EnableInBuilder(BuilderType.DVBuilder)]
-        [HideInPropertyGrid]
-        public string EbSid { get; set; }
+            return false;
+        }
     }
 
     [EnableInBuilder(BuilderType.DVBuilder)]
-    public class StringCondition : EbDataVisualizationObject
+    public class StringCondition : ColumnCondition
     {
         public StringCondition() { }
 
@@ -931,21 +962,26 @@ else
         [EnableInBuilder(BuilderType.DVBuilder)]
         public string Value { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
-        [PropertyEditor(PropertyEditorType.Color)]
-        public string FontColor { get; set; }
+        public override bool CompareValues(object _unformattedData)
+        {
+            string data = _unformattedData.ToString().Trim();
+            string searchval = this.Value.Trim();
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
-        [PropertyEditor(PropertyEditorType.Color)]
-        public string BackGroundColor { get; set; }
+            if (this.Operator == StringOperators.Startwith)
+                return data.StartsWith(searchval, StringComparison.OrdinalIgnoreCase);
+            else if (this.Operator == StringOperators.EndsWith)
+                return data.EndsWith(searchval, StringComparison.OrdinalIgnoreCase);
+            else if (this.Operator == StringOperators.Contains)
+                return data.Contains(searchval, StringComparison.OrdinalIgnoreCase);
+            else if (this.Operator == StringOperators.Equals)
+                return string.Equals(data, searchval, StringComparison.OrdinalIgnoreCase);
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
-        [HideInPropertyGrid]
-        public string EbSid { get; set; }
+            return false;
+        }
     }
 
     [EnableInBuilder(BuilderType.DVBuilder)]
-    public class BooleanCondition : EbDataVisualizationObject
+    public class BooleanCondition : ColumnCondition
     {
         public BooleanCondition() { }
 
@@ -955,21 +991,14 @@ else
         [EnableInBuilder(BuilderType.DVBuilder)]
         public bool Value { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
-        [PropertyEditor(PropertyEditorType.Color)]
-        public string FontColor { get; set; }
-
-        [EnableInBuilder(BuilderType.DVBuilder)]
-        [PropertyEditor(PropertyEditorType.Color)]
-        public string BackGroundColor { get; set; }
-
-        [EnableInBuilder(BuilderType.DVBuilder)]
-        [HideInPropertyGrid]
-        public string EbSid { get; set; }
+        public override bool CompareValues(object _unformattedData)
+        {
+            return false;
+        }
     }
 
     [EnableInBuilder(BuilderType.DVBuilder)]
-    public class DateCondition : EbDataVisualizationObject
+    public class DateCondition : ColumnCondition
     {
         public DateCondition() { }
 
@@ -989,16 +1018,22 @@ else
         [EnableInBuilder(BuilderType.DVBuilder)]
         public DateTime Value1 { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
-        [PropertyEditor(PropertyEditorType.Color)]
-        public string FontColor { get; set; }
+        public override bool CompareValues(object _unformattedData)
+        {
+            if (this.Operator == NumericOperators.Equals)
+                return Convert.ToDateTime(_unformattedData) == this.Value;
+            else if (this.Operator == NumericOperators.LessThan)
+                return Convert.ToDateTime(_unformattedData) < this.Value;
+            else if (this.Operator == NumericOperators.GreaterThan)
+                return Convert.ToDateTime(_unformattedData) > this.Value;
+            else if (this.Operator == NumericOperators.LessThanOrEqual)
+                return Convert.ToDateTime(_unformattedData) <= this.Value;
+            else if (this.Operator == NumericOperators.GreaterThanOrEqual)
+                return Convert.ToDateTime(_unformattedData) >= this.Value;
+            else if (this.Operator == NumericOperators.Between)
+                return (Convert.ToDateTime(_unformattedData) >= this.Value) && (Convert.ToDateTime(_unformattedData) <= Convert.ToDateTime(this.Value1));
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
-        [PropertyEditor(PropertyEditorType.Color)]
-        public string BackGroundColor { get; set; }
-
-        [EnableInBuilder(BuilderType.DVBuilder)]
-        [HideInPropertyGrid]
-        public string EbSid { get; set; }
+            return false;
+        }
     }
 }
