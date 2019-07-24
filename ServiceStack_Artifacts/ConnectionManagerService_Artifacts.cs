@@ -306,11 +306,24 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public string SolnId { get; set; }
     }
-
+    
     public class EbIntegrationResponse : IEbSSResponse
     {
         public ResponseStatus ResponseStatus { get; set; }
     }
+
+    public class CredientialBotRequest : IReturn<EbIntegrationResponse>, IEbTenentRequest
+    {
+        public int ConfId { get; set; }
+        public int UserId { get; set; }
+        public string SolnId { get; set; }
+    }
+    public class CredientialBotResponse : IEbSSResponse
+    {
+        public ResponseStatus ResponseStatus { get; set; }
+        public string ConnObj { get; set; }
+    }
+
 
     public class EbIntergationConfDeleteRequest : IReturn<EbIntegrationDeleteResponse>, IEbTenentRequest
     {
@@ -405,10 +418,11 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             Id = Convert.ToInt32(_row[0]);
             SolutionId = _row[1].ToString();
             NickName = _row[2].ToString();
-            ConObject = _row[4].ToString();
             Type = _row[3].ToString();
             CreatedOn = Convert.ToDateTime(_row[6]).ToString("dddd, dd MMMM yyyy");
         }
+
+        public EbIntegrationConfData() { }
 
         public int Id { get; set; }
 
