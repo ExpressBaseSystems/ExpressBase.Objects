@@ -38,12 +38,18 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         [DataMember(Order = 1)]
         public int Id { get; set; }
+
+        [DataMember(Order = 1)]
+        public bool IsDemoApp { get; set; }
     }
 
     public class ImportApplicationRequest : EbMqRequest
     {
         [DataMember(Order = 1)]
         public int Id { get; set; }
+
+        [DataMember(Order = 2)]
+        public bool IsDemoApp { get; set; }
     }
 
     public class ImportApplicationResponse : IEbSSResponse
