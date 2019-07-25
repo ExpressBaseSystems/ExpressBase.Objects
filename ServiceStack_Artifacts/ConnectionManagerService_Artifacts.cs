@@ -273,6 +273,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class AddGoogleMapRequest : IReturn<AddGoogleMapResponse>, IEbTenentRequest
     {
         public EbGoogleMapConfig Config { get; set; }
+
         public int UserId { get; set; }
 
         public string SolnId { get; set; }
@@ -286,6 +287,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class AddSendGridRequest : IReturn<AddGoogleMapResponse>, IEbTenentRequest
     {
         public EbSendGridConfig Config { get; set; }
+
         public int UserId { get; set; }
 
         public string SolnId { get; set; }
@@ -300,9 +302,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         public EbIntegration IntegrationO { get; set; }
 
-        public bool deploy { get; set; }
+        public bool Deploy { get; set; }
 
-        public bool drop { get; set; }
+        public bool Drop { get; set; }
 
         public int UserId { get; set; }
 
@@ -317,12 +319,15 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class CredientialBotRequest : IReturn<EbIntegrationResponse>, IEbTenentRequest
     {
         public int ConfId { get; set; }
+
         public int UserId { get; set; }
+
         public string SolnId { get; set; }
     }
     public class CredientialBotResponse : IEbSSResponse
     {
         public ResponseStatus ResponseStatus { get; set; }
+
         public string ConnObj { get; set; }
     }
 
@@ -330,6 +335,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class EbIntergationConfDeleteRequest : IReturn<EbIntegrationDeleteResponse>, IEbTenentRequest
     {
         public EbIntegrationConf IntegrationConfdelete { get; set; }
+
         public int UserId { get; set; }
 
         public string SolnId { get; set; }
@@ -343,6 +349,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class EbIntergationDeleteRequest : IReturn<EbIntegrationDeleteResponse>, IEbTenentRequest
     {
         public EbIntegration Integrationdelete { get; set; }
+
         public int UserId { get; set; }
 
         public string SolnId { get; set; }
@@ -356,6 +363,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class EbIntergationSwitchRequest : IReturn<EbIntegrationSwitchResponse>, IEbTenentRequest
     {
         public List<EbIntegration> Integrations { set; get; }
+
         public int UserId { get; set; }
 
         public string SolnId { get; set; }
