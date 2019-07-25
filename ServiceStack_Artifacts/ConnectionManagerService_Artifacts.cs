@@ -302,6 +302,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public bool deploy { get; set; }
 
+        public bool drop { get; set; }
+
         public int UserId { get; set; }
 
         public string SolnId { get; set; }
