@@ -25,7 +25,7 @@ namespace ExpressBase.Objects
     }
 
     [EnableInBuilder(BuilderType.WebForm)]
-    public class EbSysLocation : EbControlUI
+    public class EbSysLocation : EbControlUI, IEbPlaceHolderControl
     {
         public EbSysLocation() { }
 
@@ -140,9 +140,8 @@ namespace ExpressBase.Objects
         public override string DefaultValue { get => base.DefaultValue; set => base.DefaultValue = value; }
     }
 
-
     [EnableInBuilder(BuilderType.WebForm)]
-    public class EbSysCreatedBy : EbControlUI
+    public class EbSysCreatedBy : EbControlUI, IEbPlaceHolderControl
     {
         public EbSysCreatedBy() { }
 
@@ -224,7 +223,7 @@ namespace ExpressBase.Objects
         public override string EnableJSfn { get { return @""; } set { } }
 
         public override string GetValueJSfn { get { return @"return $('#' + this.EbSid_CtxId).attr('data-id');"; } set { } }
-        
+
         public override string SetValueJSfn
         {
             get
@@ -258,7 +257,7 @@ namespace ExpressBase.Objects
     }
 
     [EnableInBuilder(BuilderType.WebForm)]
-    public class EbSysModifiedBy : EbControlUI
+    public class EbSysModifiedBy : EbControlUI, IEbPlaceHolderControl
     {
         public EbSysModifiedBy() { }
 
@@ -374,7 +373,7 @@ namespace ExpressBase.Objects
     }
 
     [EnableInBuilder(BuilderType.WebForm)]
-    public class EbSysCreatedAt : EbControlUI
+    public class EbSysCreatedAt : EbControlUI, IEbPlaceHolderControl
     {
         public EbSysCreatedAt()
         {
@@ -519,7 +518,7 @@ namespace ExpressBase.Objects
     }
 
     [EnableInBuilder(BuilderType.WebForm)]
-    public class EbSysModifiedAt : EbControlUI
+    public class EbSysModifiedAt : EbControlUI, IEbPlaceHolderControl
     {
         public EbSysModifiedAt()
         {
