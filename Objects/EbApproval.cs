@@ -20,7 +20,7 @@ namespace ExpressBase.Objects
     }
 
     [EnableInBuilder(BuilderType.WebForm)]
-    public class EbApproval : EbControlContainer
+    public class EbApproval : EbControlContainer, IEbSpecialContainer
     {
         public EbApproval()
         {

@@ -1,4 +1,5 @@
-﻿using ExpressBase.Common.Extensions;
+﻿using ExpressBase.Common;
+using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Objects.Helpers;
@@ -51,7 +52,7 @@ namespace ExpressBase.Objects
 
 		public override string GetToolHtml()
 		{
-			return @"<div eb-type='@toolName' class='tool'><i class='fa fa-check-square'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
+			return @"<div eb-type='@toolName' class='tool'><i class='fa fa-check-square'></i> CheckBoxes </div>".Replace("@toolName", this.GetType().Name.Substring(2));
 		}
 
 		public override string GetBareHtml()

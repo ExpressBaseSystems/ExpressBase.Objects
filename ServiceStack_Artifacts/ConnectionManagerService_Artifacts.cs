@@ -273,6 +273,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class AddGoogleMapRequest : IReturn<AddGoogleMapResponse>, IEbTenentRequest
     {
         public EbGoogleMapConfig Config { get; set; }
+
         public int UserId { get; set; }
 
         public string SolnId { get; set; }
@@ -286,6 +287,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class AddSendGridRequest : IReturn<AddGoogleMapResponse>, IEbTenentRequest
     {
         public EbSendGridConfig Config { get; set; }
+
         public int UserId { get; set; }
 
         public string SolnId { get; set; }
@@ -300,21 +302,40 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         public EbIntegration IntegrationO { get; set; }
 
-        public bool deploy { get; set; }
+        public bool Deploy { get; set; }
+
+        public bool Drop { get; set; }
 
         public int UserId { get; set; }
 
         public string SolnId { get; set; }
     }
-
+    
     public class EbIntegrationResponse : IEbSSResponse
     {
         public ResponseStatus ResponseStatus { get; set; }
     }
 
+    public class CredientialBotRequest : IReturn<EbIntegrationResponse>, IEbTenentRequest
+    {
+        public int ConfId { get; set; }
+
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
+    }
+    public class CredientialBotResponse : IEbSSResponse
+    {
+        public ResponseStatus ResponseStatus { get; set; }
+
+        public string ConnObj { get; set; }
+    }
+
+
     public class EbIntergationConfDeleteRequest : IReturn<EbIntegrationDeleteResponse>, IEbTenentRequest
     {
         public EbIntegrationConf IntegrationConfdelete { get; set; }
+
         public int UserId { get; set; }
 
         public string SolnId { get; set; }
@@ -328,6 +349,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class EbIntergationDeleteRequest : IReturn<EbIntegrationDeleteResponse>, IEbTenentRequest
     {
         public EbIntegration Integrationdelete { get; set; }
+
         public int UserId { get; set; }
 
         public string SolnId { get; set; }
@@ -341,6 +363,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class EbIntergationSwitchRequest : IReturn<EbIntegrationSwitchResponse>, IEbTenentRequest
     {
         public List<EbIntegration> Integrations { set; get; }
+
         public int UserId { get; set; }
 
         public string SolnId { get; set; }
@@ -405,10 +428,11 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             Id = Convert.ToInt32(_row[0]);
             SolutionId = _row[1].ToString();
             NickName = _row[2].ToString();
-            ConObject = _row[4].ToString();
             Type = _row[3].ToString();
             CreatedOn = Convert.ToDateTime(_row[6]).ToString("dddd, dd MMMM yyyy");
         }
+
+        public EbIntegrationConfData() { }
 
         public int Id { get; set; }
 
