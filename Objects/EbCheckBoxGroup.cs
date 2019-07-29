@@ -69,7 +69,7 @@ namespace ExpressBase.Objects
 
 		public override string GetDesignHtml()
 		{
-            return HtmlConstants.CONTROL_WRAPER_HTML4WEB
+            string EbCtrlHTML = HtmlConstants.CONTROL_WRAPER_HTML4WEB
                 .Replace("@barehtml@", @"
                 <div style='padding:5px'>
                     <div class='check-wraper'>
@@ -83,6 +83,7 @@ namespace ExpressBase.Objects
                 </div>
                 ").RemoveCR().DoubleQuoted();
             //return GetHtml().RemoveCR().GraveAccentQuoted();
+            return ReplacePropsInHTML(EbCtrlHTML);
         }
 
 		public override string GetHtml()
