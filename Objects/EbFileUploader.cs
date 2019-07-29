@@ -68,8 +68,8 @@ namespace ExpressBase.Objects
         }
         public override string GetDesignHtml()
        {
-            return HtmlConstants.CONTROL_WRAPER_HTML4WEB
-                .Replace("@barehtml@", @"
+            string EbCtrlHTML = HtmlConstants.CONTROL_WRAPER_HTML4WEB
+                    .Replace("@barehtml@", @"
                     <div id='Wraper' class='ctrl-cover'>                             
                         <div class='input-group'style='width: 100 %; '> 
                                  <input id='' ui-inp='' data-ebtype='6' class='date' type='text' name=' tabindex='0' style='width: 100%; display: inline - block; background - color: rgb(255, 255, 255); color: rgb(51, 51, 51);' placeholder=''>
@@ -80,6 +80,7 @@ namespace ExpressBase.Objects
                     </div>
                 ").RemoveCR().DoubleQuoted();
             //return this.GetHtml().RemoveCR().GraveAccentQuoted();
+            return ReplacePropsInHTML(EbCtrlHTML);
         }
         public override string GetToolHtml()
         {
