@@ -63,9 +63,8 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.DVBuilder)]
     public class ChartColor : EbDataVisualizationObject
     {
-        public string name { get; set; }
-
-        public string color { get; set; }
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public string Color { get; set; }
     }
 
     [EnableInBuilder(BuilderType.DVBuilder)]
@@ -120,10 +119,7 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         public EbDataReader EbDataSource { get; set; }
 
-        //[PropertyEditor(PropertyEditorType.CollectionProp, "Columns", "bVisible")]
         [PropertyEditor(PropertyEditorType.CollectionABCpropToggle, "Columns", "bVisible", "_Formula")]
-        //[PropertyEditor(PropertyEditorType.CollectionABCpropToggle, "Columns", "Formula")]
-
         [CEOnSelectFn(@";
             this.bVisible = true;
             NonVC = Parent.NotVisibleColumns.$values;
@@ -634,7 +630,8 @@ namespace ExpressBase.Objects
     }
 
     [EnableInBuilder(BuilderType.DVBuilder)]
-    public class EbGoogleMap : EbChartVisualization
+    [BuilderTypeEnum(BuilderType.DVBuilder)]
+    public class EbGoogleMap : EbDataVisualization, IEBRootObject
     {
         [EnableInBuilder(BuilderType.DVBuilder)]
         [HideInPropertyGrid]
@@ -645,21 +642,10 @@ namespace ExpressBase.Objects
         public override bool IsPaging { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
-        [PropertyEditor(PropertyEditorType.DropDown)]        
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns",1)]
+        [Alias("LatLong")]
         [HideForUser]
-        public override ChartType Charttype { get { return ChartType.GoogleMap; } }
-
-        [EnableInBuilder(BuilderType.DVBuilder)]
-        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
-        [Alias("Longitude")]
-        [HideForUser]
-        public override List<DVBaseColumn> Xaxis { get; set; }
-
-        [EnableInBuilder(BuilderType.DVBuilder)]
-        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
-        [Alias("Lattitude")]
-        [HideForUser]
-        public override List<DVBaseColumn> Yaxis { get; set; }
+        public DVBaseColumn LatLong { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         public bool ShowRoute { get; set; }
@@ -699,7 +685,7 @@ namespace ExpressBase.Objects
 
         [PropertyGroup("Zoom")]
         [EnableInBuilder(BuilderType.DVBuilder)]
-        [DefaultPropValue("True")]
+        [DefaultPropValue("true")]
         [OnChangeExec(@"
         if(this.AutoZoom === true)
             pg.HideProperty('Zoomlevel');
@@ -715,40 +701,12 @@ namespace ExpressBase.Objects
 
         public EbGoogleMap()
         {
-            this.Xaxis = new List<DVBaseColumn>();
-            this.Yaxis = new List<DVBaseColumn>();
+            this.LatLong = new DVBaseColumn();
             this.MarkerLabel = new List<DVBaseColumn>();
             this.InfoWindow = new List<DVBaseColumn>();
             this.FormParameter = new List<DVBaseColumn>();
             this.AutoZoom = true;
         }
-
-
-        public override string XaxisTitle { get; set; }
-
-        
-        public override string YaxisTitle { get; set; }
-
-        
-        public override string XaxisTitleColor { get; set; }
-
-        
-        public override string YaxisTitleColor { get; set; }
-
-        
-        public override string XaxisLabelColor { get; set; }
-
-        
-        public override string YaxisLabelColor { get; set; }
-
-        
-        public override List<ChartColor> LegendColor { get; set; }
-
-        
-        public override bool ShowTooltip { get; set; }
-
-        
-        public override bool ShowValue { get; set; }
 
     }
 
