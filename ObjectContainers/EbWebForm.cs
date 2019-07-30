@@ -187,9 +187,10 @@ namespace ExpressBase.Objects
                         };
                         if (stringArr.Any(code.Contains))
                         {
-                            if (CalcFlds[i] == j)
-                                throw new FormException("Avoid circular reference by the following control in 'ValueExpression' : " + _dict[CalcFlds[i]].Control.Name);
-                            dpndcy.Add(new KeyValuePair<int, int>(CalcFlds[i], j));//<dependent, dominant>
+                            //if (CalcFlds[i] == j)
+                            //    throw new FormException("Avoid circular reference by the following control in 'ValueExpression' : " + _dict[CalcFlds[i]].Control.Name);
+                            if (CalcFlds[i] != j)//if a control refers itself treated as not circular reference
+                                dpndcy.Add(new KeyValuePair<int, int>(CalcFlds[i], j));//<dependent, dominant>
                         }
                     }
                 }

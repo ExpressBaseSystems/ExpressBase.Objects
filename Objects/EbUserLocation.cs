@@ -1,4 +1,5 @@
-﻿using ExpressBase.Common.Extensions;
+﻿using ExpressBase.Common;
+using ExpressBase.Common.Extensions;
 using ExpressBase.Common.LocationNSolution;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;

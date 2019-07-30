@@ -352,7 +352,7 @@ console.log(1000);
 
         private string GetHtmlHelper(RenderMode mode)
         {
-            string EbCtrlHTML = Helpers.HtmlConstants.CONTROL_WRAPER_HTML4WEB
+            string EbCtrlHTML = HtmlConstants.CONTROL_WRAPER_HTML4WEB
 .Replace("@Label@ ", ((this.Label != null) ? this.Label : "@Label@ "))
 .Replace("@tooltipText@", this.ToolTipText ?? string.Empty);
 

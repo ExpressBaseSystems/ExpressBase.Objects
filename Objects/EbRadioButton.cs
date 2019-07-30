@@ -1,4 +1,5 @@
 ﻿
+using ExpressBase.Common;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
@@ -65,17 +66,12 @@ namespace ExpressBase.Objects
 
         public override string GetHtml()
         {
-            string tt = @"<div id='cont_@ebsid@' ebsid='@ebsid@' name='@name@' class='Eb-ctrlContainer' @childOf@ ctype='RadioButton' eb-hidden='@isHidden@'>
-                        <div  id='@ebsid@Wraper' class=''>
-                            @barehtml@
-                        </div>
-                        <span class='helpText' ui-helptxt >@helpText@ </span>
-                    </div>"
+            string EbCtrlHTML = HtmlConstants.CONTROL_WRAPER_HTML4WEB
 //.Replace("@ebsid@", this.EbSid)
 //.Replace("@isHidden@", this.Hidden.ToString())
 //.Replace("@barehtml@", this.GetBareHtml());
 ;
-            return ReplacePropsInHTML(tt);
+            return ReplacePropsInHTML(EbCtrlHTML);
         }
 
         [JsonIgnore]

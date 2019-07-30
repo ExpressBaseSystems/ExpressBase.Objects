@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace ExpressBase.Objects
 {
-    [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+    //[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
     public class EbButton : EbControlUI
     {
         public EbButton() { }
