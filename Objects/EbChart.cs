@@ -7,8 +7,7 @@ using System.Threading.Tasks;
 
 namespace ExpressBase.Objects
 {
-    [ProtoBuf.ProtoContract]
-    [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+    //[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
     public class EbChart : EbControlUI
 	{
         [ProtoBuf.ProtoMember(1)]

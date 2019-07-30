@@ -1,4 +1,5 @@
-﻿using ExpressBase.Common.Extensions;
+﻿using ExpressBase.Common;
+using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
@@ -25,7 +26,7 @@ namespace ExpressBase.Objects
     }
 
     [EnableInBuilder(BuilderType.WebForm)]
-    public class EbSysLocation : EbControlUI
+    public class EbSysLocation : EbControlUI, IEbPlaceHolderControl
     {
         public EbSysLocation() { }
 
@@ -44,7 +45,7 @@ namespace ExpressBase.Objects
 
         public override string GetToolHtml()
         {
-            return @"<div eb-type='@toolName' class='tool'><i class='fa fa-desktop'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
+            return @"<div eb-type='@toolName' class='tool'><i class='fa fa-desktop'></i> Created From </div>".Replace("@toolName", this.GetType().Name.Substring(2));
         }
 
         public override string GetHtml()
@@ -140,9 +141,8 @@ namespace ExpressBase.Objects
         public override string DefaultValue { get => base.DefaultValue; set => base.DefaultValue = value; }
     }
 
-
     [EnableInBuilder(BuilderType.WebForm)]
-    public class EbSysCreatedBy : EbControlUI
+    public class EbSysCreatedBy : EbControlUI, IEbPlaceHolderControl
     {
         public EbSysCreatedBy() { }
 
@@ -161,7 +161,7 @@ namespace ExpressBase.Objects
 
         public override string GetToolHtml()
         {
-            return @"<div eb-type='@toolName' class='tool'><i class='fa fa-desktop'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
+            return @"<div eb-type='@toolName' class='tool'><i class='fa fa-desktop'></i>  Created By </div>".Replace("@toolName", this.GetType().Name.Substring(2));
         }
 
         public override string GetHtml()
@@ -224,7 +224,7 @@ namespace ExpressBase.Objects
         public override string EnableJSfn { get { return @""; } set { } }
 
         public override string GetValueJSfn { get { return @"return $('#' + this.EbSid_CtxId).attr('data-id');"; } set { } }
-        
+
         public override string SetValueJSfn
         {
             get
@@ -258,7 +258,7 @@ namespace ExpressBase.Objects
     }
 
     [EnableInBuilder(BuilderType.WebForm)]
-    public class EbSysModifiedBy : EbControlUI
+    public class EbSysModifiedBy : EbControlUI, IEbPlaceHolderControl
     {
         public EbSysModifiedBy() { }
 
@@ -277,7 +277,7 @@ namespace ExpressBase.Objects
 
         public override string GetToolHtml()
         {
-            return @"<div eb-type='@toolName' class='tool'><i class='fa fa-desktop'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
+            return @"<div eb-type='@toolName' class='tool'><i class='fa fa-desktop'></i> Modified By </div>".Replace("@toolName", this.GetType().Name.Substring(2));
         }
 
         public override string GetHtml()
@@ -374,7 +374,7 @@ namespace ExpressBase.Objects
     }
 
     [EnableInBuilder(BuilderType.WebForm)]
-    public class EbSysCreatedAt : EbControlUI
+    public class EbSysCreatedAt : EbControlUI, IEbPlaceHolderControl
     {
         public EbSysCreatedAt()
         {
@@ -435,7 +435,7 @@ namespace ExpressBase.Objects
 
         public override string GetToolHtml()
         {
-            return @"<div eb-type='@toolName' class='tool'><i class='fa fa-desktop'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
+            return @"<div eb-type='@toolName' class='tool'><i class='fa fa-desktop'></i> Created At </div>".Replace("@toolName", this.GetType().Name.Substring(2));
         }
 
         public override string GetHtml()
@@ -519,7 +519,7 @@ namespace ExpressBase.Objects
     }
 
     [EnableInBuilder(BuilderType.WebForm)]
-    public class EbSysModifiedAt : EbControlUI
+    public class EbSysModifiedAt : EbControlUI, IEbPlaceHolderControl
     {
         public EbSysModifiedAt()
         {
@@ -580,7 +580,7 @@ namespace ExpressBase.Objects
 
         public override string GetToolHtml()
         {
-            return @"<div eb-type='@toolName' class='tool'><i class='fa fa-desktop'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
+            return @"<div eb-type='@toolName' class='tool'><i class='fa fa-desktop'></i>  Modified At</div>".Replace("@toolName", this.GetType().Name.Substring(2));
         }
 
         public override string GetHtml()

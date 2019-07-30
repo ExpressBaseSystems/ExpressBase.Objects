@@ -1,4 +1,5 @@
-﻿using ExpressBase.Common.Extensions;
+﻿using ExpressBase.Common;
+using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
@@ -124,7 +125,7 @@ namespace ExpressBase.Objects
 
         public override string GetDesignHtml()
         {
-            return HtmlConstants.CONTROL_WRAPER_HTML4WEB
+            string EbCtrlHTML = HtmlConstants.CONTROL_WRAPER_HTML4WEB
                 .Replace("@barehtml@", @"
                             <div id='@ebsid@' class='radio-wrap @radio-wrap-block@'>
                                 <input type ='radio' id='@ebsid@' @defaultcheked@ value='@value@' name='@gname@'>
@@ -135,6 +136,8 @@ namespace ExpressBase.Objects
                                 <span id='@ebsid@Lbl' ui-label style='@LabelBackColor @LabelForeColor '> RadioButton2  </span>
                             </div>")
                             .RemoveCR().DoubleQuoted();
+
+            return ReplacePropsInHTML(EbCtrlHTML);
             //return GetHtml().RemoveCR().DoubleQuoted();
         }
 

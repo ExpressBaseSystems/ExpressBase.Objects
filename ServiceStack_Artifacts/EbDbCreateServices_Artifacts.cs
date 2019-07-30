@@ -32,7 +32,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class EbDbCreateResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
-        public bool Resp { get; set; }
+        public bool DeploymentCompled { get; set; }
 
         [DataMember(Order = 2)]
         public string DbName { get; set; }

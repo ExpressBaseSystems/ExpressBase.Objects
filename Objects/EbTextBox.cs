@@ -12,6 +12,7 @@ using ExpressBase.Common.Extensions;
 using System.Runtime.Serialization;
 using ExpressBase.Common.Structures;
 using ExpressBase.Objects.Helpers;
+using ExpressBase.Common;
 
 namespace ExpressBase.Objects
 {

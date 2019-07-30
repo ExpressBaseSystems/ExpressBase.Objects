@@ -45,7 +45,7 @@ namespace ExpressBase.Objects
         }
         public override string GetToolHtml()
         {
-            return @"<div eb-type='@toolName' class='tool'><i class='fa fa-map-marker'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
+            return @"<div eb-type='@toolName' class='tool'><i class='fa fa-map-marker'></i> Location Input </div>".Replace("@toolName", this.GetType().Name.Substring(2));
         }
 
         public override string GetBareHtml()

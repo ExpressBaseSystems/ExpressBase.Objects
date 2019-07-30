@@ -17,7 +17,7 @@ using System.Text;
 namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
-    public class EbDataGrid : EbControlContainer
+    public class EbDataGrid : EbControlContainer, IEbSpecialContainer
     {
         public EbDataGrid()
         {
