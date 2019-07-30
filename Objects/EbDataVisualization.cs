@@ -699,6 +699,8 @@ namespace ExpressBase.Objects
         [DefaultPropValue("10")]        
         public int Zoomlevel { get; set; }
 
+        public static EbOperations Operations = MapOperations.Instance;
+
         public EbGoogleMap()
         {
             this.LatLong = new DVBaseColumn();
