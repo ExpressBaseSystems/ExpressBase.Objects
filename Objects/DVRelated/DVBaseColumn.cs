@@ -580,14 +580,9 @@ pg.HideProperty('FormMode');
         [PropertyEditor(PropertyEditorType.DropDown)]
         public Align Align { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
-        [PropertyEditor(PropertyEditorType.Collection)]
-        public List<StringCondition> ConditionalFormat{ get; set; }
-
         public DVStringColumn()
         {
             this.ConditionalFormating = new List<ColumnCondition>();
-            this.ConditionalFormat = new List<StringCondition>();
         }
 
     }
@@ -680,14 +675,9 @@ pg.HideProperty('FormMode');
         [PropertyEditor(PropertyEditorType.DropDown)]
         public Align Align { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
-        [PropertyEditor(PropertyEditorType.Collection)]
-        public List<NumericCondition> ConditionalFormat { get; set; }
-
         public DVNumericColumn()
         {
             this.ConditionalFormating = new List<ColumnCondition>();
-            this.ConditionalFormat = new List<NumericCondition>();
         }
 
     }
@@ -749,14 +739,9 @@ pg.HideProperty('FormMode');
         [PropertyEditor(PropertyEditorType.DropDown)]
         public Align Align { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
-        [PropertyEditor(PropertyEditorType.Collection)]
-        public List<BooleanCondition> ConditionalFormat { get; set; }
-
         public DVBooleanColumn()
         {
             this.ConditionalFormating = new List<ColumnCondition>();
-            this.ConditionalFormat = new List<BooleanCondition>();
         }
 
 
@@ -841,14 +826,9 @@ pg.HideProperty('FormMode');
         [PropertyEditor(PropertyEditorType.DropDown)]
         public Align Align { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
-        [PropertyEditor(PropertyEditorType.Collection)]
-        public List<DateCondition> ConditionalFormat { get; set; }
-
         public DVDateTimeColumn()
         {
             this.ConditionalFormating = new List<ColumnCondition>();
-            this.ConditionalFormat = new List<DateCondition>();
         }
     }
 
