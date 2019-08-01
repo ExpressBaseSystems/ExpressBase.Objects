@@ -276,27 +276,21 @@ console.log(1000);
 
         public override string GetDesignHtml()
         {
-            return @"
-<div id='cont_@name@  ' class='Eb-ctrlContainer' Ctype='TextBox' eb-hidden='@isHidden@'>
-   <div role='form' data-toggle='validator' style=' width: inherit;'>
-    <div class='eb-ctrl-label' style='background-color:@LabelBackColor@; color:@LabelForeColor@ '> @Label@  </div>
-      <div class='combo-wrap' data-toggle='tooltip' title='' data-original-title=''>
+
+            string EbCtrlHTML = HtmlConstants.CONTROL_WRAPER_HTML4WEB
+                .Replace("@barehtml@", @"
          <div style='display: inline-block; width: 100%; margin-right: -4px;'>
             <div class='input-group'>
                <div class='dropdown v-select searchable' id='acmasterid0'>
                   <div type='button' class='dropdown-toggle clearfix' style='border-top-left-radius: 5px; border-bottom-left-radius: 5px;'>
-                     <input debounce='0' type='search'  readonly  placeholder='label0' class='form-control' id='acmaster1_xid' style='width: 100%; background-color: #fff;'> <i role='presentation' class='open-indicator' style='display: none;'></i> 
+                     <input debounce='0' ui-inp type='search'  readonly  placeholder='label0' class='form-control' id='acmaster1_xid' style='width: 100%; background-color: #fff;'> <i role='presentation' class='open-indicator' style='display: none;'></i> 
                      <div class='spinner' style='display: none;'>Loading...</div>
                   </div>
                </div>
                <span class='input-group-addon' style='border-radius: 0px;'><i id='acmasteridTglBtn' aria-hidden='true' class='fa  fa-search'></i></span>
-            </div>
-         </div>
-      </div>
-   </div>
-</div>"
-    .Replace("@name@", this.Name)
-    .RemoveCR().DoubleQuoted();//GetHtmlHelper(RenderMode.Developer).RemoveCR().DoubleQuoted();
+            </div>").RemoveCR().DoubleQuoted();
+            //return GetHtml().RemoveCR().GraveAccentQuoted();
+            return ReplacePropsInHTML(EbCtrlHTML);
         }
 
         public override string GetHtml()
