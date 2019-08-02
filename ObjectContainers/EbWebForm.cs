@@ -117,7 +117,7 @@ namespace ExpressBase.Objects
         }
         
         //Operations to be performed before form object save - table name required, table name repetition, calculate dependency
-        public override void BeforeSave()
+        public override void BeforeSave(IServiceClient serviceClient, IRedisClient redis)
         {
             Dictionary<string, string> tbls = new Dictionary<string, string>();
             if (string.IsNullOrEmpty(this.TableName))

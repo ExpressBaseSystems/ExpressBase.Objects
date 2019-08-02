@@ -107,13 +107,20 @@ this.Init = function(id)
 
         public override string GetHtml()
         {
-            string TabBtnHtml = "<div id='cont_@ebsid@' ebsid='@ebsid@' class='Eb-ctrlContainer' Ctype='TabControl'><ul class='nav nav-tabs'>".Replace("@ebsid@", EbSid);
-            string TabContentHtml = "<div class='tab-content'>";
+            string TabBtnHtml = @"
+<div id='cont_@ebsid@' ebsid='@ebsid@' class='Eb-ctrlContainer' Ctype='TabControl'>
+    <div class='tab-btn-cont'>
+        <ul class='nav nav-tabs'>".Replace("@ebsid@", EbSid);
+            string TabContentHtml = @"
+            <div class='tab-content'>";
 
             foreach (EbTabPane tab in Controls)
-                TabBtnHtml += "<li li-of='@ebsid@' @active><a data-toggle='tab' href='#@ebsid@'>@title@</a></li>".Replace("@title@", tab.Title).Replace("@ebsid@", tab.EbSid);
+                TabBtnHtml += @"
+            <li li-of='@ebsid@' @active><a data-toggle='tab' href='#@ebsid@'>@title@</a></li>".Replace("@title@", tab.Title).Replace("@ebsid@", tab.EbSid);
 
-            TabBtnHtml += "</ul>";
+            TabBtnHtml += @"
+        </ul>
+    </div>";
 
             Regex regex = new Regex(Regex.Escape("@active"));
             TabBtnHtml = regex.Replace(TabBtnHtml, "class='active'", 1).Replace("@active", "");

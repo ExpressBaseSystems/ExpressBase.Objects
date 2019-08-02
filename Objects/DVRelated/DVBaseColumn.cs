@@ -97,6 +97,13 @@ namespace ExpressBase.Objects.Objects.DVRelated
         Equals = 0
     }
 
+    public enum AdvancedBooleanOperators
+    {
+        IsTrue = 0,
+        IsFalse = 1,
+        IsNull = 2,
+    }
+
     public enum Align
     {
         Auto = 0,
@@ -109,9 +116,8 @@ namespace ExpressBase.Objects.Objects.DVRelated
     {
         ASC = 0,
         DESC = 1
-    }
+    }    
 
-    
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl)]
     public class DVBaseColumn : EbDataVisualizationObject
     {
@@ -178,7 +184,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
-        [Alias("Formula")]        
+        [Alias("Formula")]
         public EbScript _Formula { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
@@ -275,7 +281,7 @@ else if(this.FormMode === 2){
         [HideForUser]
         public bool HideLinkifNoData { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder,  BuilderType.BotForm)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [DefaultPropValue("0")]
         [HideForUser]
         public int HideDataRowMoreThan { get; set; }
@@ -329,10 +335,10 @@ else if(this.FormMode === 2){
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.Collection)]
-        public List<StaticParam> StaticParameters { get; set; }        
+        public List<StaticParam> StaticParameters { get; set; }
 
         [PropertyGroup("Tooltip")]
-        [EnableInBuilder(BuilderType.DVBuilder)]        
+        [EnableInBuilder(BuilderType.DVBuilder)]
         public int AllowedCharacterLength { get; set; }
 
         [PropertyGroup("Tooltip")]
@@ -346,7 +352,7 @@ else if(this.FormMode === 2){
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [MetaOnly]
-        public OrderByDirection Direction { get; set; }        
+        public OrderByDirection Direction { get; set; }
 
         [JsonIgnore]
         private List<string> __formulaDataFieldsUsed = null;
@@ -375,7 +381,7 @@ else if(this.FormMode === 2){
         {
             get
             {
-                if (__formulaParts .Count == 0)
+                if (__formulaParts.Count == 0)
                 {
                     foreach (string calcfd in this.FormulaDataFieldsUsed)
                     {
@@ -388,23 +394,6 @@ else if(this.FormMode === 2){
             }
         }
 
-        //[JsonIgnore]
-        //private Script __codeAnalysisScript = null;
-        //[JsonIgnore]
-        //public Script CodeAnalysisScript
-        //{
-        //    get
-        //    {
-        //        if (__codeAnalysisScript == null)
-        //        {
-        //            __codeAnalysisScript = CSharpScript.Create<dynamic>(this.Formula, ScriptOptions.Default.WithReferences("Microsoft.CSharp", "System.Core").WithImports("System.Dynamic"), globalsType: typeof(Globals));
-        //            __codeAnalysisScript.Compile();
-        //        }
-
-        //        return __codeAnalysisScript;
-        //    }
-        //}
-
         [JsonIgnore]
         private Script __codeAnalysisScript = null;
 
@@ -412,7 +401,7 @@ else if(this.FormMode === 2){
         {
             if (__codeAnalysisScript == null && !string.IsNullOrEmpty(this._Formula.Code))
             {
-                __codeAnalysisScript = CSharpScript.Create<dynamic>(this._Formula.Code, ScriptOptions.Default.WithReferences("Microsoft.CSharp", "System.Core").WithImports("System.Dynamic"), globalsType: typeof(Globals));
+                __codeAnalysisScript = CSharpScript.Create<dynamic>(this._Formula.Code, ScriptOptions.Default.WithReferences("Microsoft.CSharp", "System.Core").WithImports("System.Dynamic", "System", "System.Collections.Generic", "System.Diagnostics", "System.Linq"), globalsType: typeof(Globals));
                 __codeAnalysisScript.Compile();
             }
 
@@ -441,6 +430,15 @@ else if(this.FormMode === 2){
             this.ItemFormParameters = new List<DVBaseColumn>();
             this.ItemFormId = new List<DVBaseColumn>();
             this.InfoWindow = new List<DVBaseColumn>();
+        }
+
+        public bool Check4FormLink()
+        {
+            if (!string.IsNullOrEmpty(this.LinkRefId) && Convert.ToInt32(this.LinkRefId.Split("-")[2]) == (int)EbObjectTypes.WebForm)
+            {
+                return true;
+            }
+            return false;
         }
     }
 
@@ -1013,6 +1011,110 @@ else
             else if (this.Operator == NumericOperators.Between)
                 return (Convert.ToDateTime(_unformattedData) >= this.Value) && (Convert.ToDateTime(_unformattedData) <= Convert.ToDateTime(this.Value1));
 
+            return false;
+        }
+    }
+
+    [EnableInBuilder(BuilderType.DVBuilder)]
+    public class AdvancedCondition : ColumnCondition
+    {
+        public AdvancedCondition() { }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]        
+        public AdvancedBooleanOperators Operator { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
+        public EbScript Value { get; set; }
+
+        [JsonIgnore]
+        private List<string> __formulaDataFieldsUsed = null;
+
+        [JsonIgnore]
+        public List<string> FormulaDataFieldsUsed
+        {
+            get
+            {
+                if (__formulaDataFieldsUsed == null)
+                {
+                    var matches = Regex.Matches(this.Value.Code, @"T[0-9]{1}.\w+").OfType<Match>().Select(m => m.Groups[0].Value).Distinct();
+                    __formulaDataFieldsUsed = new List<string>(matches.Count());
+                    int j = 0;
+                    foreach (var match in matches)
+                        __formulaDataFieldsUsed.Add(match);
+                }
+
+                return __formulaDataFieldsUsed;
+            }
+        }
+
+        [JsonIgnore]
+        private List<FormulaPart> __formulaParts = new List<FormulaPart>();
+        [JsonIgnore]
+        public List<FormulaPart> FormulaParts
+        {
+            get
+            {
+                if (__formulaParts.Count == 0)
+                {
+                    foreach (string calcfd in this.FormulaDataFieldsUsed)
+                    {
+                        string[] splits = calcfd.Split('.');
+                        __formulaParts.Add(new FormulaPart { TableName = splits[0], FieldName = splits[1] });
+                    }
+                }
+
+                return __formulaParts;
+            }
+        }
+
+        [JsonIgnore]
+        private Script __codeAnalysisScript = null;
+
+        public Script GetCodeAnalysisScript()
+        {
+            if (__codeAnalysisScript == null && !string.IsNullOrEmpty(this.Value.Code))
+            {
+                __codeAnalysisScript = CSharpScript.Create<dynamic>(this.Value.Code, ScriptOptions.Default.WithReferences("Microsoft.CSharp", "System.Core").WithImports("System.Dynamic", "System", "System.Collections.Generic", "System.Diagnostics", "System.Linq"), globalsType: typeof(Globals));
+                __codeAnalysisScript.Compile();
+            }
+
+            return __codeAnalysisScript;
+        }
+
+        public bool EvaluateExpression(EbDataRow _datarow, ref Globals globals)
+        {
+            foreach (FormulaPart formulaPart in this.FormulaParts)
+            {
+                object __value = null;
+                var __partType = _datarow.Table.Columns[formulaPart.FieldName].Type;
+                if (__partType == EbDbTypes.Decimal || __partType == EbDbTypes.Int32)
+                    __value = (_datarow[formulaPart.FieldName] != DBNull.Value) ? _datarow[formulaPart.FieldName] : 0;
+                else
+                    __value = _datarow[formulaPart.FieldName];
+
+                globals[formulaPart.TableName].Add(formulaPart.FieldName, new NTV
+                {
+                    Name = formulaPart.FieldName,
+                    Type = __partType,
+                    Value = __value
+                });
+            }
+            return Convert.ToBoolean(this.GetCodeAnalysisScript().RunAsync(globals).Result.ReturnValue);
+        }
+
+        public bool GetBoolValue()
+        {
+            if(this.Operator == AdvancedBooleanOperators.IsTrue)
+                return true;
+            else if(this.Operator == AdvancedBooleanOperators.IsFalse)
+                return false;
+            else
+                return false;//for null
+        }
+
+        public override bool CompareValues(object _unformattedData)
+        {           
             return false;
         }
     }
