@@ -79,16 +79,15 @@ console.log(1000);
             }.bind(this));
         }.bind(this));
 
-        $.each(DMtable, function (j, r) {
-            $.each(r.Columns, function (j, item) {
-                if (!columnVals[item.Name]) {
-                    console.warn('Mismatch found in Colums in datasource and Colums in object');
-                    return true;
-                }
-                columnVals[item.Name].push(item.Value);
-            }.bind(this));
-        }.bind(this));
-
+        //$.each(DMtable, function (j, r) {
+        //    $.each(r.Columns, function (j, item) {
+        //        if (!columnVals[item.Name]) {
+        //            console.warn('Mismatch found in Colums in datasource and Colums in object');
+        //            return true;
+        //        }
+        //        columnVals[item.Name].push(item.Value);
+        //    }.bind(this));
+        //}.bind(this));
                 ";
             }
             set { }

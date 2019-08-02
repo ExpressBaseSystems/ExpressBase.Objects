@@ -26,6 +26,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 5)]
         public int UserId { get; set; }
+
+        [DataMember(Order = 5)]
+        public bool IsFurther { get; set; }
     }
 
     [DataContract]
