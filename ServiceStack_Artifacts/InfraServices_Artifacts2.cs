@@ -261,6 +261,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public bool DeployDB { get; set; }
 
         public string SolnId { get; set; }
+
+        public bool IsFurther { get; set; }
     }
 
     [DataContract]
