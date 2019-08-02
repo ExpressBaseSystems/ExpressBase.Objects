@@ -201,7 +201,7 @@ namespace ExpressBase.Objects
             {
                 Console.WriteLine("AfterRedisGet " + e.Message);
             }
-        }
+        }        
 
         //public EbDataSet DoQueries4DataVis(string sql, IEbConnectionFactory df, params DbParameter[] parameters)
         //{
@@ -414,6 +414,13 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
         public List<DVBaseColumn> OrderBy { get; set; }
 
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [HideInPropertyGrid]
+        public List<FormLink> FormLinks { get; set; }
+
+        [JsonIgnore]
+        public EbWebForm WebForm { get; set; }
+
         public static EbOperations Operations = TVOperations.Instance;
 
  //       public override string GetDesignHtml()
@@ -444,6 +451,7 @@ namespace ExpressBase.Objects
             //this.GroupingColumn = new List<DVBaseColumn>();
             this.ColumnsCollection = new List<DVColumnCollection>();
             this.ParamsList = new List<Param>();
+            this.FormLinks = new List<FormLink>();
         }
 
         public override string DiscoverRelatedRefids()
@@ -487,6 +495,37 @@ namespace ExpressBase.Objects
                         _col.LinkRefId = "failed-to-update-";
                 }
             }
+        }
+
+        public void AfterRedisGetBasicInfo(IServiceClient client, IRedisClient Redis)
+        {
+            this.FormLinks = new List<FormLink>();
+            foreach (DVBaseColumn col in this.Columns)
+            {
+                if (col.Check4FormLink())
+                {
+                    try
+                    {
+                        this.WebForm = Redis.Get<EbWebForm>(col.LinkRefId);
+                        if (this.WebForm == null)
+                        {
+                            var result = client.Get<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = col.LinkRefId });
+                            this.WebForm = EbSerializers.Json_Deserialize(result.Data[0].Json);
+                            Redis.Set<EbWebForm>(col.LinkRefId, this.WebForm);
+                        }
+                        this.FormLinks.Add(new FormLink { DisplayName = this.WebForm.DisplayName, Refid = col.LinkRefId, Params = col.FormParameters });
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("AfterRedisGetBasicInfo " + e.Message);
+                    }
+                }
+            }
+        }
+
+        public override void BeforeSave(IServiceClient serviceClient, IRedisClient redis)
+        {
+            this.AfterRedisGetBasicInfo(serviceClient, redis);
         }
     }
 
@@ -712,13 +751,6 @@ namespace ExpressBase.Objects
 
     }
 
-    public class axis
-    {
-        public string index { get; set; }
-
-        public string name { get; set; }
-    }
-
     [EnableInBuilder(BuilderType.DVBuilder)]
     [HideInToolBox]
     [HideInPropertyGrid]
@@ -759,5 +791,14 @@ namespace ExpressBase.Objects
     public class SingleLevelRowGroup : RowGroupParent
     {
 
+    }
+
+    public class FormLink
+    {
+        public string DisplayName { get; set; }
+
+        public string Refid { get; set; }
+
+        public List<DVBaseColumn> Params { get; set; }
     }
 }
