@@ -82,6 +82,12 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.Collection)]
         public List<EbRoutines> AfterSaveRoutines { get; set; }
 
+        [PropertyGroup("Miscellaneous")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [OSE_ObjectTypes(EbObjectTypes.iReport)]
+        public string PrintDoc { get; set; }
+
         public static EbOperations Operations = WFOperations.Instance;
 
         public override string GetHead()
