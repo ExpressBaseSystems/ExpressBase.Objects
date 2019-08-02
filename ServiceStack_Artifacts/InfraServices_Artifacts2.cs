@@ -463,21 +463,48 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public bool VerifyStatus { get; set; }
     }
 
-    //[DataContract]
-    //public class GetUsersResponse : IEbSSResponse
-    //{
 
-    //    [DataMember(Order = 1)]
-    //    public Dictionary<string, object> Data { get; set; }
 
-    //    [DataMember(Order = 2)]
-    //    public string Token { get; set; }
 
-    //    [DataMember(Order = 3)]
-    //    public ResponseStatus ResponseStatus { get; set; }
-    //}
 
-    public class GetVersioning : IEbSSRequest
+
+	[DataContract]
+	public class FacebookLoginRequest : EbServiceStackNoAuthRequest
+	{
+		[DataMember(Order = 1)]
+		public string Email { get; set; }
+
+		[DataMember(Order = 2)]
+		public string Fbid { get; set; }
+
+		[DataMember(Order = 3)]
+		public string Name { get; set; }
+	}
+
+	[DataContract]
+	public class FacebookLoginResponse
+	{
+		[DataMember(Order = 1)]
+		public string jsonval { get; set; }
+	}
+
+
+
+	//[DataContract]
+	//public class GetUsersResponse : IEbSSResponse
+	//{
+
+	//    [DataMember(Order = 1)]
+	//    public Dictionary<string, object> Data { get; set; }
+
+	//    [DataMember(Order = 2)]
+	//    public string Token { get; set; }
+
+	//    [DataMember(Order = 3)]
+	//    public ResponseStatus ResponseStatus { get; set; }
+	//}
+
+	public class GetVersioning : IEbSSRequest
     {
         public bool Versioning { get; set; }
 
