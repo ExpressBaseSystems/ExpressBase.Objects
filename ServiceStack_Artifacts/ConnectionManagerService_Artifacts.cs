@@ -292,8 +292,22 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public string SolnId { get; set; }
     }
-
+    
     public class AddSendGridResponse : IEbSSResponse
+    {
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    public class AddGoogleDriveRequest : IReturn<AddGoogleDriveResponse>, IEbTenentRequest
+    {
+        public EbGoogleDriveConfig Config { get; set; }
+
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
+    }
+
+    public class AddGoogleDriveResponse : IEbSSResponse
     {
         public ResponseStatus ResponseStatus { get; set; }
     }
