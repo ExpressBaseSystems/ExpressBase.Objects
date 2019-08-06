@@ -4,6 +4,7 @@ using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
 using ExpressBase.Objects.ServiceStack_Artifacts;
+using Newtonsoft.Json;
 using ServiceStack;
 using System;
 using System.Collections.Generic;
@@ -55,10 +56,15 @@ namespace ExpressBase.Objects
         {
             return this.GetHtml().RemoveCR().GraveAccentQuoted();
         }
-        public override string GetToolHtml()
-        {
-            return @"<div eb-type='@toolName' class='tool'><i class='fa fa-image'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
-        }
+
+        [HideInPropertyGrid]
+        [JsonIgnore]
+        public override string ToolIconHtml { get { return "<i class='fa fa-image'></i>"; } set { } }
+
+        //public override string GetToolHtml()
+        //{
+        //    return @"<div eb-type='@toolName' class='tool'><i class='fa fa-image'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
+        //}
 
         public override string GetBareHtml()
         {
@@ -67,7 +73,7 @@ namespace ExpressBase.Objects
             <img id='@name@' src='@src@'  style='width:100%;' alt='@alt@'>
         </div>"
 .Replace("@name@", this.Name)
-.Replace("@src@", String.IsNullOrWhiteSpace(this.ImageID) ? "https://www.gstatic.com/webp/gallery3/1_webp_ll.png" : this.ImageID)
+.Replace("@src@", String.IsNullOrWhiteSpace(this.ImageID) ? "/images/imageControlSampleImage.jpg" : this.ImageID)
 .Replace("@toolTipText@", this.ToolTipText)
 .Replace("@value@", "")//"value='" + this.Value + "'")
     .Replace("@alt@ ", this.Alt ?? "@alt@ ");
@@ -75,22 +81,12 @@ namespace ExpressBase.Objects
 
         public override string GetHtml()
         {
-            string EbCtrlHTML = @"
-    <div id='cont_@name@' Ctype='Image' class='Eb-ctrlContainer' eb-hidden='@isHidden@'>
-        <div class='eb-ctrl-label' id='@name@Lbl' style='@LabelBackColor  @LabelForeColor '> @Label </div>
-       @barehtml@
-        <span class='helpText'> @HelpText </span>
-    </div>
-"
-.Replace("@barehtml@", this.GetBareHtml())
-.Replace("@name@", this.Name)
-.Replace("@isHidden@", this.Hidden.ToString())
+            string EbCtrlHTML = HtmlConstants.CONTROL_WRAPER_HTML4WEB
 
     .Replace("@LabelForeColor ", "color:" + ((this.LabelForeColor != null) ? this.LabelForeColor : "@LabelForeColor ") + ";")
-    .Replace("@LabelBackColor ", "background-color:" + ((this.LabelBackColor != null) ? this.LabelBackColor : "@LabelBackColor ") + ";")
-    .Replace("@HelpText ", ((this.HelpText != null) ? this.HelpText : "@HelpText "))
-    .Replace("@Label ", ((this.Label != null) ? this.Label : "@Label "));
-            return EbCtrlHTML;
+    .Replace("@LabelBackColor ", "background-color:" + ((this.LabelBackColor != null) ? this.LabelBackColor : "@LabelBackColor ") + ";");
+
+            return ReplacePropsInHTML(EbCtrlHTML);
         }
     }
 }

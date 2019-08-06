@@ -3,6 +3,7 @@ using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
 using ExpressBase.Objects.Helpers;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
@@ -39,10 +40,14 @@ namespace ExpressBase.Objects
         //public override dynamic DefaultValue { get; set; }
         //public List<EbValidator> Validators { get; set; }
 
-        public override string GetToolHtml()
-        {
-            return @"<div eb-type='@toolName' class='tool'><i class='fa fa-id-card-o'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
-        }
+        [HideInPropertyGrid]
+        [JsonIgnore]
+        public override string ToolIconHtml { get { return "<i class='fa fa-id-card-o'></i>"; } set { } }
+
+        //public override string GetToolHtml()
+        //{
+        //    return @"<div eb-type='@toolName' class='tool'><i class='fa fa-id-card-o'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
+        //}
 
         public override string GetHtml()
         {

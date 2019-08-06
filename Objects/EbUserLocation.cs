@@ -6,6 +6,7 @@ using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
 using ExpressBase.Objects.Helpers;
 using ExpressBase.Security;
+using Newtonsoft.Json;
 using ServiceStack;
 using System;
 using System.Collections.Generic;
@@ -76,6 +77,14 @@ namespace ExpressBase.Objects.Objects
             }
             set { }
         }
+
+        [HideInPropertyGrid]
+        [JsonIgnore]
+        public override string ToolIconHtml { get { return "<i class='fa fa-user'></i><i class='fa fa-map-marker'></i>"; } set { } }
+        //public override string GetToolHtml()
+        //{
+        //    return @"<div eb-type='@toolName' class='tool'><i class='fa fa-user'></i><i class='fa fa-map-marker'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
+        //}
 
         public void InitFromDataBase(JsonServiceClient ServiceClient, User _user, Eb_Solution _sol, string ParentRefid)
         {

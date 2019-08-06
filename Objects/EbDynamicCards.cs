@@ -151,13 +151,17 @@ namespace ExpressBase.Objects
 				}
 				return true;
 			}
-		}
-		
-		public override string GetToolHtml()
-		{
-			return @"<div eb-type='@toolName' class='tool'><i class='fa fa-window-restore'></i>@toolName</div>"
-					.Replace("@toolName", this.GetType().Name.Substring(2));
-		}
+        }
+
+        [HideInPropertyGrid]
+        [JsonIgnore]
+        public override string ToolIconHtml { get { return "<i class='fa fa-window-restore'></i>"; } set { } }
+
+  //      public override string GetToolHtml()
+		//{
+		//	return @"<div eb-type='@toolName' class='tool'><i class='fa fa-window-restore'></i>@toolName</div>"
+		//			.Replace("@toolName", this.GetType().Name.Substring(2));
+		//}
 
 		public override string GetJsInitFunc()
 		{

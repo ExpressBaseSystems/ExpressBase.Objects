@@ -3,6 +3,7 @@ using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Objects.Helpers;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -33,10 +34,16 @@ namespace ExpressBase.Objects
         {
             return string.Empty;
         }
-        public override string GetToolHtml()
-        {
-            return @"<div eb-type='@toolName' class='tool'><i class='fa fa-image'></i><i class='fa fa-level-up'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
-        }
+
+        [HideInPropertyGrid]
+        [JsonIgnore]
+        public override string ToolIconHtml { get { return "<i class='fa fa-level-up'></i>"; } set { } }
+
+        //public override string GetToolHtml()
+        //{
+        //    return @"<div eb-type='@toolName' class='tool'><i class='fa fa-image'></i><i class='fa fa-level-up'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
+        //}
+
         public override string GetDesignHtml()
         {
             return HtmlConstants.CONTROL_WRAPER_HTML4WEB
