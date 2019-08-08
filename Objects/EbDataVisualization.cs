@@ -421,25 +421,7 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         public EbWebForm WebForm { get; set; }
 
-        public static EbOperations Operations = TVOperations.Instance;
-
- //       public override string GetDesignHtml()
- //       {
- //           return @"
- //           <div id='cont_@name@' Ctype='TableVisualization' class='Eb-ctrlContainer'>
- //               @GetBareHtml@
- //           </div>"
- //.Replace("@name@", (this.Name != null) ? this.Name : "@name@")
- //.Replace("@GetBareHtml@", this.GetBareHtml())
- //.RemoveCR().DoubleQuoted();
- //       }
-
- //       public override string GetBareHtml()
- //       {
- //           return "<table style='width:100%' class='table table-striped' eb-type='Table' id='@name@tbl'></table>"
-
- //.Replace("@name@", (this.EbSid != null) ? this.Name : "@name@");
- //       }
+        public static EbOperations Operations = TVOperations.Instance; 
 
         public EbTableVisualization()
         {
@@ -447,8 +429,6 @@ namespace ExpressBase.Objects
 			this.NotVisibleColumns = new List<DVBaseColumn>();
             this.CurrentRowGroup = new RowGroupParent();
             this.OrderBy = new List<DVBaseColumn>();
-            //this.ParentColumn = new List<DVBaseColumn>();
-            //this.GroupingColumn = new List<DVBaseColumn>();
             this.ColumnsCollection = new List<DVColumnCollection>();
             this.ParamsList = new List<Param>();
             this.FormLinks = new List<FormLink>();
@@ -533,12 +513,18 @@ namespace ExpressBase.Objects
     [BuilderTypeEnum(BuilderType.DVBuilder)]
     public class EbChartVisualization : EbDataVisualization, IEBRootObject
     {
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [HideInPropertyGrid]
+        public override DVColumnCollection Columns { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
-        [PropertyEditor(PropertyEditorType.DropDown)]
+        [HideInPropertyGrid]
+        public override bool IsPaging { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
         [DefaultPropValue("0")]        
-        [HideForUser]
-        public virtual ChartType Charttype { get; set; }
+        [HideInPropertyGrid]
+        public ChartType Charttype { get; set; }
 
         [OnDeserialized]
         public void OnDeserializedMethod(StreamingContext context)
@@ -562,14 +548,15 @@ namespace ExpressBase.Objects
  .Replace("@name@", (this.EbSid != null) ? this.EbSid : "@name@");
         }
 
+        [PropertyGroup("Xaxis")]
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
-        public virtual List<DVBaseColumn> Xaxis { get; set; }
+        public List<DVBaseColumn> Xaxis { get; set; }
 
-
+        [PropertyGroup("Yaxis")]
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
-        public virtual List<DVBaseColumn> Yaxis { get; set; }
+        public List<DVBaseColumn> Yaxis { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [HideInPropertyGrid]
@@ -593,45 +580,51 @@ namespace ExpressBase.Objects
         }")]
         public string Type { get; set; }
 
+        [PropertyGroup("Xaxis")]
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.Text)]
         [DefaultPropValue("XLabel")]
-        public virtual string XaxisTitle { get; set; }
+        public string XaxisTitle { get; set; }
 
+        [PropertyGroup("Yaxis")]
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.Text)]
         [DefaultPropValue("YLabel")]
-        public virtual string YaxisTitle { get; set; }
+        public string YaxisTitle { get; set; }
 
+        [PropertyGroup("Xaxis")]
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.Color)]
         [DefaultPropValue("#000000")]
-        public virtual string XaxisTitleColor { get; set; }
+        public string XaxisTitleColor { get; set; }
 
+        [PropertyGroup("Yaxis")]
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.Color)]
         [DefaultPropValue("#000000")]
-        public virtual string YaxisTitleColor { get; set; }
+        public string YaxisTitleColor { get; set; }
 
+        [PropertyGroup("Xaxis")]
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.Color)]
         [DefaultPropValue("#000000")]
-        public virtual string XaxisLabelColor { get; set; }
+        public string XaxisLabelColor { get; set; }
 
+        [PropertyGroup("Yaxis")]
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.Color)]
         [DefaultPropValue("#000000")]
-        public virtual string YaxisLabelColor { get; set; }
+        public string YaxisLabelColor { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [HideInPropertyGrid]
-        public virtual List<ChartColor> LegendColor { get; set; }
+        public List<ChartColor> LegendColor { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
-        public virtual  bool ShowTooltip { get; set; }
+        public bool ShowTooltip { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
-        public virtual bool ShowValue { get; set; }
+        public bool ShowValue { get; set; }
 
         //[EnableInBuilder(BuilderType.DVBuilder)]
         //public Position LegendPosition { get; set; }
