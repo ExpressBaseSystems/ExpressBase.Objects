@@ -1,6 +1,7 @@
 ﻿using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
@@ -8,7 +9,7 @@ using System.Text;
 
 namespace ExpressBase.Objects
 {
-    [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+    [EnableInBuilder(BuilderType.BotForm, BuilderType.UserControl)]
     public class EbLocations : EbControlUI
 	{
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
@@ -37,10 +38,14 @@ namespace ExpressBase.Objects
         }
 
         public override bool isFullViewContol { get => true; set => base.isFullViewContol = value; }
-        public override string GetToolHtml()
-        {
-            return @"<div eb-type='@toolName' class='tool'><i class='fa fa-map'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
-        }
+
+        [HideInPropertyGrid]
+        [JsonIgnore]
+        public override string ToolIconHtml { get { return "<i class='fa fa-map'></i>"; } set { } }
+        //public override string GetToolHtml()
+        //{
+        //    return @"<div eb-type='@toolName' class='tool'><i class='fa fa-map'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
+        //}
 
         public override string DesignHtml4Bot { get => @"
     <div class='location-cont'>

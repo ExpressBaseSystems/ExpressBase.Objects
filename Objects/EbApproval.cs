@@ -97,10 +97,18 @@ namespace ExpressBase.Objects
         [Alias("Columns")]
         public override List<EbControl> Controls { get; set; }
 
-        public override string GetToolHtml()
-        {
-            return @"<div eb-type='@toolName' class='tool'><i class='fa fa-stack-exchange'></i>  Review control </div>".Replace("@toolName", this.GetType().Name.Substring(2));
-        }
+        [HideInPropertyGrid]
+        [JsonIgnore]
+        public override string ToolIconHtml { get { return "<i class='fa fa-stack-exchange'></i>"; } set { } }
+
+        [HideInPropertyGrid]
+        [JsonIgnore]
+        public override string ToolNameAlias { get { return "Review control"; } set { } }
+
+        //public override string GetToolHtml()
+        //{
+        //    return @"<div eb-type='@toolName' class='tool'><i class='fa fa-stack-exchange'></i>  Review control </div>".Replace("@toolName", this.GetType().Name.Substring(2));
+        //}
 
 
         public override string GetBareHtml()

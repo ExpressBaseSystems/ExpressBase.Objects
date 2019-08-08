@@ -43,10 +43,19 @@ namespace ExpressBase.Objects
         {
             return GetHtml().RemoveCR().DoubleQuoted();
         }
-        public override string GetToolHtml()
-        {
-            return @"<div eb-type='@toolName' class='tool'><i class='fa fa-map-marker'></i> Location Input </div>".Replace("@toolName", this.GetType().Name.Substring(2));
-        }
+
+        [HideInPropertyGrid]
+        [JsonIgnore]
+        public override string ToolIconHtml { get { return "<i class='fa fa-map-marker'></i>"; } set { } }
+
+        [HideInPropertyGrid]
+        [JsonIgnore]
+        public override string ToolNameAlias { get { return "Location Input"; } set { } }
+
+        //public override string GetToolHtml()
+        //{
+        //    return @"<div eb-type='@toolName' class='tool'><i class='fa fa-map-marker'></i> Location Input </div>".Replace("@toolName", this.GetType().Name.Substring(2));
+        //}
 
         public override string GetBareHtml()
         {
@@ -66,10 +75,11 @@ namespace ExpressBase.Objects
                     </div>  
                 "
 .Replace("@EbSid@", (this.EbSid != null) ? this.EbSid : "@EbSid@")
-.Replace("@mapimgforbuilder@", (this.Name != null) ? string.Empty : "<img style='width:100%;height: 100%;' src='/images/LocMapImg2.png'>")
+.Replace("@mapimgforbuilder@", (this.Name != null) ? string.Empty : "<img style='width:100%;height: 100%;' src='/images/LocMapImg3.png'>")
 .Replace("@BackColor@ ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor@ ") + ";"))
 .Replace("@ForeColor@ ", "color:" + ((this.ForeColor != null) ? this.ForeColor : "@ForeColor@ ") + ";")
-.Replace("@Height@", this.Height == 0 ? "200px" : this.Height + "px");
+//.Replace("@Height@", this.Height == 0 ? "200px" : this.Height + "px"); // for bot
+.Replace("@Height@", this.Height == 0 ? "auto" : this.Height + "px");
         }
 
         public override string GetHtml()

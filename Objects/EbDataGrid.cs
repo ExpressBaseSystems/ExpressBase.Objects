@@ -16,7 +16,7 @@ using System.Text;
 
 namespace ExpressBase.Objects
 {
-    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
     public class EbDataGrid : EbControlContainer, IEbSpecialContainer
     {
         public EbDataGrid()
@@ -102,10 +102,14 @@ $.each(this.Controls.$values, function (i, col) {
         [DefaultPropValue("true")]
         public bool IsAddable { get; set; }
 
-        public override string GetToolHtml()
-        {
-            return @"<div eb-type='@toolName' class='tool'><i class='fa fa-table'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
-        }
+        [HideInPropertyGrid]
+        [JsonIgnore]
+        public override string ToolIconHtml { get { return "<i class='fa fa-table'></i>"; } set { } }
+
+        //public override string GetToolHtml()
+        //{
+        //    return @"<div eb-type='@toolName' class='tool'><i class='fa fa-table'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
+        //}
         public override string GetBareHtml()
         {
             string html = @"

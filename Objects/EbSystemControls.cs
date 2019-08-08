@@ -4,6 +4,7 @@ using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
 using ExpressBase.Objects.Helpers;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -43,10 +44,18 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         public EbSysLocDM DisplayMember { get; set; }
 
-        public override string GetToolHtml()
-        {
-            return @"<div eb-type='@toolName' class='tool'><i class='fa fa-desktop'></i> Created From </div>".Replace("@toolName", this.GetType().Name.Substring(2));
-        }
+        [HideInPropertyGrid]
+        [JsonIgnore]
+        public override string ToolIconHtml { get { return "<i class='fa fa-desktop'></i><i class='fa fa-map-marker'></i>"; } set { } }
+
+        [HideInPropertyGrid]
+        [JsonIgnore]
+        public override string ToolNameAlias { get { return "Created From"; } set { } }
+
+        //public override string GetToolHtml()
+        //{
+        //    return @"<div eb-type='@toolName' class='tool'><i class='fa fa-desktop'></i> Created From </div>".Replace("@toolName", this.GetType().Name.Substring(2));
+        //}
 
         public override string GetHtml()
         {
@@ -159,10 +168,18 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         public EbSysCreatedByDM DisplayMember { get; set; }
 
-        public override string GetToolHtml()
-        {
-            return @"<div eb-type='@toolName' class='tool'><i class='fa fa-desktop'></i>  Created By </div>".Replace("@toolName", this.GetType().Name.Substring(2));
-        }
+        [HideInPropertyGrid]
+        [JsonIgnore]
+        public override string ToolIconHtml { get { return "<i class='fa fa-desktop'></i><i class='fa fa-user'></i>"; } set { } }
+
+        [HideInPropertyGrid]
+        [JsonIgnore]
+        public override string ToolNameAlias { get { return "Created By"; } set { } }
+
+        //public override string GetToolHtml()
+        //{
+        //    return @"<div eb-type='@toolName' class='tool'><i class='fa fa-desktop'></i>  Created By </div>".Replace("@toolName", this.GetType().Name.Substring(2));
+        //}
 
         public override string GetHtml()
         {
@@ -275,10 +292,19 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         public EbSysCreatedByDM DisplayMember { get; set; }
 
-        public override string GetToolHtml()
-        {
-            return @"<div eb-type='@toolName' class='tool'><i class='fa fa-desktop'></i> Modified By </div>".Replace("@toolName", this.GetType().Name.Substring(2));
-        }
+        [HideInPropertyGrid]
+        [JsonIgnore]
+        public override string ToolIconHtml { get { return "<i class='fa fa-desktop'></i><i class='fa fa-pencil' aria-hidden='true'></i>"; } set { } }
+
+        [HideInPropertyGrid]
+        [JsonIgnore]
+        public override string ToolNameAlias { get { return "Modified By"; } set { } }
+
+
+        //public override string GetToolHtml()
+        //{
+        //    return @"<div eb-type='@toolName' class='tool'><i class='fa fa-desktop'></i> Modified By </div>".Replace("@toolName", this.GetType().Name.Substring(2));
+        //}
 
         public override string GetHtml()
         {
@@ -433,10 +459,19 @@ namespace ExpressBase.Objects
             set { }
         }
 
-        public override string GetToolHtml()
-        {
-            return @"<div eb-type='@toolName' class='tool'><i class='fa fa-desktop'></i> Created At </div>".Replace("@toolName", this.GetType().Name.Substring(2));
-        }
+
+        [HideInPropertyGrid]
+        [JsonIgnore]
+        public override string ToolIconHtml { get { return "<i class='fa fa-desktop'></i><i class='fa fa-clock-o'></i>"; } set { } }
+
+        [HideInPropertyGrid]
+        [JsonIgnore]
+        public override string ToolNameAlias { get { return " Created At"; } set { } }
+
+        //public override string GetToolHtml()
+        //{
+        //    return @"<div eb-type='@toolName' class='tool'><i class='fa fa-desktop'></i> Created At </div>".Replace("@toolName", this.GetType().Name.Substring(2));
+        //}
 
         public override string GetHtml()
         {
@@ -578,10 +613,19 @@ namespace ExpressBase.Objects
             set { }
         }
 
-        public override string GetToolHtml()
-        {
-            return @"<div eb-type='@toolName' class='tool'><i class='fa fa-desktop'></i>  Modified At</div>".Replace("@toolName", this.GetType().Name.Substring(2));
-        }
+        [HideInPropertyGrid]
+        [JsonIgnore]
+        public override string ToolIconHtml { get { return "<i class='fa fa-desktop'></i>"; } set { } }
+
+        [HideInPropertyGrid]
+        [JsonIgnore]
+        public override string ToolNameAlias { get { return " Modified At"; } set { } }
+
+
+        //public override string GetToolHtml()
+        //{
+        //    return @"<div eb-type='@toolName' class='tool'><i class='fa fa-desktop'></i>  Modified At</div>".Replace("@toolName", this.GetType().Name.Substring(2));
+        //}
 
         public override string GetHtml()
         {

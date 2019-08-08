@@ -1,5 +1,6 @@
 ﻿using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,11 +28,15 @@ namespace ExpressBase.Objects
         {
             return GetHtmlHelper(RenderMode.User);
         }
-       
-        public override string GetToolHtml()
-        {
-            return @"<div eb-type='@toolName' class='tool'> <i class='fa fa-pie-chart'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
-        }
+
+        [HideInPropertyGrid]
+        [JsonIgnore]
+        public override string ToolIconHtml { get { return "<i class='fa fa-pie-chart'></i>"; } set { } }
+
+        //public override string GetToolHtml()
+        //{
+        //    return @"<div eb-type='@toolName' class='tool'> <i class='fa fa-pie-chart'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
+        //}
 
         private string GetHtmlHelper(RenderMode mode)
         {
