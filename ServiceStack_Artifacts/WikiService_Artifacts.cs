@@ -26,6 +26,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Status { get; set; }
 
         public int Order { get; set; }
+
+        public int CatId { get; set; }
     }
 
     public class WikiCat
@@ -35,6 +37,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string WikiIconClass { get; set; }
 
         public string WikiDescription { get; set; }
+
+        public int WikiCatId { get; set; }
     }
 
     public class PersistWikiRequest : IEbTenentRequest, IReturn<PersistWikiResponse>
@@ -244,6 +248,18 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         public bool ResponseStatus { get; set; }
     }
+
+    public class WikiSaveRequest : EbServiceStackAuthRequest, IReturn<UpdateOrderResponse>
+    {
+        public object Wiki_id { get; set; }
+    }
+
+    public class WikiSaveResponse
+    {
+        public int WikiId { get; set; }
+    }
+
+
     public class UserReviewRateRequest : EbServiceStackNoAuthRequest, IReturn<UserReviewRateResponse>
     {
         public string UserReview { get; set; }
