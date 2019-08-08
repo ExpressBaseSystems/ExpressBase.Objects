@@ -69,23 +69,26 @@ namespace ExpressBase.Objects
         public override string GetDesignHtml()
        {
             string EbCtrlHTML = HtmlConstants.CONTROL_WRAPER_HTML4WEB
-                    .Replace("@barehtml@", @"
-                    <div id='Wraper' class='ctrl-cover'>                             
+                    .Replace("@barehtml@", @"                       
                         <div class='input-group'style='width: 100 %; '> 
                                  <input id='' ui-inp='' data-ebtype='6' class='date' type='text' name=' tabindex='0' style='width: 100%; display: inline - block; background - color: rgb(255, 255, 255); color: rgb(51, 51, 51);' placeholder=''>
                                  <span class='input-group-addon'>
                                 <i class='fa fa fa-upload' aria-hidden='true'  style='padding: 6px 12px;'></i>  
                             </span>
                         </div>
-                    </div>
                 ").RemoveCR().DoubleQuoted();
             //return this.GetHtml().RemoveCR().GraveAccentQuoted();
             return ReplacePropsInHTML(EbCtrlHTML);
         }
-        public override string GetToolHtml()
-        {
-            return @"<div eb-type='@toolName' class='tool'><i class='fa fa-upload'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
-        }
+
+        [HideInPropertyGrid]
+        [JsonIgnore]
+        public override string ToolIconHtml { get { return "<i class='fa fa-upload'></i>"; } set { } }
+
+        //public override string GetToolHtml()
+        //{
+        //    return @"<div eb-type='@toolName' class='tool'><i class='fa fa-upload'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
+        //}
 
         public override string GetBareHtml()
         {

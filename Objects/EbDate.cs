@@ -140,10 +140,14 @@ namespace ExpressBase.Objects
             return _vdbtype;
         }
 
-        public override string GetToolHtml()
-        {
-            return @"<div eb-type='@toolName' class='tool'><i class='fa fa-calendar'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
-        }
+        [HideInPropertyGrid]
+        [JsonIgnore]
+        public override string ToolIconHtml { get { return "<i class='fa fa-calendar'></i>"; } set { } }
+
+        //public override string GetToolHtml()
+        //{
+        //    return @"<div eb-type='@toolName' class='tool'><i class='fa fa-calendar'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
+        //}
         
         public string Wrap4Developer(string EbCtrlHTML)
         {

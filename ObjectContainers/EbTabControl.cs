@@ -87,6 +87,14 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         public override string LabelForeColor { get; set; }
 
+        [HideInPropertyGrid]
+        [JsonIgnore]
+        public override string ToolIconHtml { get { return "<i class='fa fa-clone'></i>"; } set { } }
+        //public override string GetToolHtml()
+        //{
+        //    return @"<div eb-type='@toolName' class='tool'><i class='fa fa-clone'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
+        //}
+
         public override string GetDesignHtml()
         {
             this.Controls = new List<EbControl>();

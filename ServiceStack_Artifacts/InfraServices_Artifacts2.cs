@@ -441,9 +441,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class ForgotPasswordResponse
     {
         [DataMember(Order = 1)]
-        public bool VerifyStatus { get; set; }
+        public bool VerifyStatus { get; set; } = false;
 
-    }
+	}
 
     [DataContract]
     public class ResetPasswordRequest : EbServiceStackNoAuthRequest

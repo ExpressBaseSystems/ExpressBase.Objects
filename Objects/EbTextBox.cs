@@ -54,20 +54,30 @@ namespace ExpressBase.Objects
         }
 
         [JsonIgnore]
-        public override string DisableJSfn { get {
+        public override string DisableJSfn
+        {
+            get
+            {
                 return @"$('#cont_' + this.EbSid_CtxId + ' *')
 .attr('disabled', 'disabled').css('pointer-events', 'none')
 .find('[ui-inp]').css('background-color', '#f3f3f3');
 $('#cont_' + this.EbSid_CtxId + ' .ctrl-cover').css('pointer-events', 'inherit')
 .find('[ui-inp]').css('pointer-events', 'inherit')";
-            } set { } }
+            }
+            set { }
+        }
 
         [JsonIgnore]
-        public override string EnableJSfn { get {
+        public override string EnableJSfn
+        {
+            get
+            {
                 return @"$('#cont_' + this.EbSid_CtxId + ' *')
 .removeAttr('disabled').css('pointer-events', 'inherit')
 .find('[ui-inp]').css('background-color', '#fff');";
-            } set { } }
+            }
+            set { }
+        }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [HelpText("To limit number of charecters")]
@@ -196,10 +206,14 @@ else {
             return this.Text;
         }
 
-        public override string GetToolHtml()
-        {
-            return @"<div eb-type='@toolName' class='tool'><i class='fa fa-i-cursor'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
-        }
+        [HideInPropertyGrid]
+        [JsonIgnore]
+        public override string ToolIconHtml { get { return "<i class='fa fa-i-cursor'></i>"; } set { } }
+
+        //public override string GetToolHtml()
+        //{
+        //    return @"<div eb-type='@toolName' class='tool'><i class='fa fa-i-cursor'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
+        //}
 
         public override string GetWrapedCtrlHtml4bot()
         {
@@ -315,7 +329,7 @@ else {
         //control html definition - for rendering side(without wrapper divs)
         public override string GetBareHtml()
         {
-            
+
             string Html = string.Empty;
             if (this.TextMode == TextMode.MultiLine)
                 Html = this.TextareaHtml;

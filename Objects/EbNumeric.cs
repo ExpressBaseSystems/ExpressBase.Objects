@@ -86,7 +86,11 @@ namespace ExpressBase.Objects
             return vDbTypes.Decimal;
         }
 
-        public override string GetToolHtml() { return @"<div eb-type='@toolName' class='tool'><b>0-9 </b></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2)); }
+        [HideInPropertyGrid]
+        [JsonIgnore]
+        public override string ToolIconHtml { get { return "<b style='letter-spacing: -0.7px;'>01</b>"; } set { } }
+
+        //public override string GetToolHtml() { return @"<div eb-type='@toolName' class='tool'><b>0-9 </b></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2)); }
 
         public override string GetDesignHtml()
         {

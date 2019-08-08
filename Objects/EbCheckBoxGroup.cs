@@ -50,10 +50,18 @@ namespace ExpressBase.Objects
 		[EnableInBuilder(BuilderType.BotForm)]
 		public override bool IsReadOnly { get => this.ReadOnly; }
 
-		public override string GetToolHtml()
-		{
-			return @"<div eb-type='@toolName' class='tool'><i class='fa fa-check-square'></i> CheckBoxes </div>".Replace("@toolName", this.GetType().Name.Substring(2));
-		}
+        [HideInPropertyGrid]
+        [JsonIgnore]
+        public override string ToolIconHtml { get { return "<i class='fa fa-check-square'></i>"; } set { } }
+
+        [HideInPropertyGrid]
+        [JsonIgnore]
+        public override string ToolNameAlias { get { return "CheckBoxes"; } set { } }
+
+  //      public override string GetToolHtml()
+		//{
+		//	return @"<div eb-type='@toolName' class='tool'><i class='fa fa-check-square'></i> CheckBoxes </div>".Replace("@toolName", this.GetType().Name.Substring(2));
+		//}
 
 		public override string GetBareHtml()
 		{

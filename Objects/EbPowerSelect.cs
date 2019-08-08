@@ -6,6 +6,7 @@ using ExpressBase.Common.Structures;
 using ExpressBase.Data;
 using ExpressBase.Objects.Objects.DVRelated;
 using ExpressBase.Objects.ServiceStack_Artifacts;
+using Newtonsoft.Json;
 using ServiceStack;
 using System;
 using System.Collections.Generic;
@@ -268,10 +269,14 @@ console.log(1000);
             }
         }
 
-        public override string GetToolHtml()
-        {
-            return @"<div eb-type='@toolName' class='tool'> &#9869; PowerSelect</div>".Replace("@toolName", this.GetType().Name.Substring(2));
-        }
+        [HideInPropertyGrid]
+        [JsonIgnore]
+        public override string ToolIconHtml { get { return "<i class='fa fa-search-plus'></i>"; } set { } }
+
+        //public override string GetToolHtml()
+        //{
+        //    return @"<div eb-type='@toolName' class='tool'><i class='fa fa-search-plus'></i> @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
+        //}
 
         public override string GetDesignHtml()
         {
