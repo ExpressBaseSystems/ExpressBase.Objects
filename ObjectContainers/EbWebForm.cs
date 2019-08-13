@@ -1991,7 +1991,7 @@ namespace ExpressBase.Objects
             }
         }
 
-        //Builder side - whole object get, table creation
+        //Builder side - whole object get, table create, data insert
         public static void AfterRedisGet(EbControlContainer _this, Service service)
         {
             try
@@ -2019,12 +2019,12 @@ namespace ExpressBase.Objects
                         else
                         {
                             (_this.Controls[i] as EbUserControl).Controls = _temp.Controls;
-                            foreach (EbControl Control in (_this.Controls[i] as EbUserControl).Controls)
-                            {
-                                RenameControlsRec(Control, _this.Controls[i].Name);
-                                //Control.ChildOf = "EbUserControl";
-                                //Control.Name = _this.Controls[i].Name + "_" + Control.Name;
-                            }
+                            //foreach (EbControl Control in (_this.Controls[i] as EbUserControl).Controls)
+                            //{
+                            //    RenameControlsRec(Control, _this.Controls[i].Name);
+                            //    //Control.ChildOf = "EbUserControl";
+                            //    //Control.Name = _this.Controls[i].Name + "_" + Control.Name;
+                            //}
                         //_this.Controls[i] = _temp;
                         (_this.Controls[i] as EbUserControl).AfterRedisGet(service);
                         }

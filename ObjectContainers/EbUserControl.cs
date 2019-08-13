@@ -41,6 +41,16 @@ namespace ExpressBase.Objects
 
         public bool IsRenderMode { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [HideInPropertyGrid]
+        public override string TableName { get { return this.TableName_Temp; } set { this.TableName_Temp = value; } }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyGroup("Data")]
+        [HelpText("Name Of database-table Which you want to store Data collected using this Form")]
+        [InputMask("[a-z][a-z0-9]*(_[a-z0-9]+)*")]
+        [Alias("TableName")]
+        public string TableName_Temp { get; set; }
 
         //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         //[HideInPropertyGrid]
@@ -170,7 +180,7 @@ namespace ExpressBase.Objects
                 return GetHtml();
         }
 
-        //builder side - now it is using to get design html 
+        //builder side - now it is using to get design html, rec call from AfterRedisGet
         public void AfterRedisGet(Service service)
         {
             EbFormHelper.AfterRedisGet(this, service);
