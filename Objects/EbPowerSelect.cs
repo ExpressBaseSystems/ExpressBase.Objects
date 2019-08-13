@@ -56,7 +56,7 @@ namespace ExpressBase.Objects
             get
             {
                 return @"
-console.log(1000);
+        console.log('SetDisplayMemberJSfn');
         let VMs = this.initializer.Vobj.valueMembers;
         let DMs = this.initializer.Vobj.displayMembers;
         let columnVals = this.initializer.columnVals;
@@ -80,16 +80,19 @@ console.log(1000);
             }.bind(this));
         }.bind(this));
 
-        //$.each(DMtable, function (j, r) {
-        //    $.each(r.Columns, function (j, item) {
-        //        if (!columnVals[item.Name]) {
-        //            console.warn('Mismatch found in Colums in datasource and Colums in object');
-        //            return true;
-        //        }
-        //        columnVals[item.Name].push(item.Value);
-        //    }.bind(this));
-        //}.bind(this));
-                ";
+
+        if (this.initializer.datatable === null) {//for aftersave actions
+            $.each(DMtable, function (j, r) {
+                $.each(r.Columns, function (j, item) {
+                    if (!columnVals[item.Name]) {
+                        console.warn('Mismatch found in Colums in datasource and Colums in object');
+                        return true;
+                    }
+                    columnVals[item.Name].push(item.Value);
+                }.bind(this));
+            }.bind(this));
+        }
+    ";
             }
             set { }
         }
