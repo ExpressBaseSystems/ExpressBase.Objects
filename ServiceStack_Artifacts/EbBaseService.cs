@@ -220,9 +220,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             parameter.Add(EbConnectionFactory.ObjectsDB.GetNewParameter("refid", EbDbTypes.String, _refId));
 
             EbDataTable dt = EbConnectionFactory.ObjectsDB.DoQuery(query, parameter.ToArray());
-
-            return ((dt.Rows[0][0].ToString()) == "T") ? true : false;
-
+            if (dt.Rows.Count > 0)
+                return ((dt.Rows[0][0].ToString()) == "T") ? true : false;
+            return false;
         }
 
         //private void LoadCache()
@@ -320,7 +320,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             get
             {
                 if (_infraConnectionFactory == null)
-                    _infraConnectionFactory = new EbConnectionFactory(EbConnectionsConfigProvider.InfraConnections,CoreConstants.EXPRESSBASE);
+                    _infraConnectionFactory = new EbConnectionFactory(EbConnectionsConfigProvider.InfraConnections, CoreConstants.EXPRESSBASE);
 
                 return _infraConnectionFactory;
             }
