@@ -90,29 +90,29 @@ namespace ExpressBase.Objects
             return html.RemoveCR().DoubleQuoted();
         }
 
-        public string GetInnerHtml()
-        {
-            string ctrlhtml = string.Empty;
-            foreach (EbControl c in this.Controls)
-            {
-                ctrlhtml += c.GetHtml();
-            }
-            string coverhtml = @"            
-                <div  id='@ebsid@Wraper' class='ctrl-cover'>
-                    <span class='eb-ctrl-label' ui-label id='@ebsid@Lbl' style='font-style: italic; font-weight: normal;'>@Label@</span>
-                    @barehtml@
-                </div>
-                <span class='helpText' ui-helptxt > @helpText@ </span>"
-                .Replace("@barehtml@", ctrlhtml)
-                .Replace("@name@", this.Name)
-                .Replace("@type@", this.ObjType)
-                .Replace("@ebsid@", this.EbSid)
-                .Replace("@rmode@", IsRenderMode.ToString())
-                .Replace("@id@", "cont_" + this.EbSid)
-                .Replace("@Label@", string.Concat(this.DisplayName, " - ", this.VersionNumber));
+        //public string GetInnerHtml()
+        //{
+        //    string ctrlhtml = string.Empty;
+        //    foreach (EbControl c in this.Controls)
+        //    {
+        //        ctrlhtml += c.GetHtml();
+        //    }
+        //    string coverhtml = @"            
+        //        <div  id='@ebsid@Wraper' class=''>
+        //            <span class='eb-ctrl-label' ui-label id='@ebsid@Lbl' style='font-style: italic; font-weight: normal;'>@Label@</span>
+        //            @barehtml@
+        //        </div>
+        //        <span class='helpText' ui-helptxt > @helpText@ </span>"
+        //        .Replace("@barehtml@", ctrlhtml)
+        //        .Replace("@name@", this.Name)
+        //        .Replace("@type@", this.ObjType)
+        //        .Replace("@ebsid@", this.EbSid)
+        //        .Replace("@rmode@", IsRenderMode ? "true" : "false")
+        //        .Replace("@id@", "cont_" + this.EbSid)
+        //        .Replace("@Label@", string.Concat(this.DisplayName, " - ", this.VersionNumber));
 
-            return ReplacePropsInHTML(coverhtml);
-        }
+        //    return ReplacePropsInHTML(coverhtml);
+        //}
 
         public override string GetHtml()
         {
@@ -122,18 +122,20 @@ namespace ExpressBase.Objects
                 ctrlhtml += c.GetHtml();
             }
             string coverhtml = @"
-            <div id='@id@' ebsid='@ebsid@' ctype='@type@' isrendermode='@rmode@' class='Eb-ctrlContainer ebcont-ctrl user-ctrl' eb-type='UserControl' tabindex='1'>
-                <div  id='@ebsid@Wraper' class='ctrl-cover'>
-                    
+            <div id='@id@' ebsid='@ebsid@' ctype='@type@' isrendermode='@rmode@' class='Eb-ctrlContainer ebcont-ctrl user-ctrl' eb-type='UserControl' @TabIndex@>
+                <div  id='@ebsid@Wraper' class=''>
+                    @UcDispName@
                     @barehtml@
                 </div>
                 <span class='helpText' ui-helptxt > @helpText@ </span>
             </div>"
+                .Replace("@UcDispName@", IsRenderMode? string.Empty: "<span class='eb-ctrl-label' ui-label id='@ebsid@Lbl' style='font-style: italic; font-weight: normal;'>@Label@</span>")
+                .Replace("@TabIndex@", IsRenderMode? string.Empty: "tabindex='1'")
                 .Replace("@barehtml@", ctrlhtml)
                 .Replace("@name@", this.Name)
                 .Replace("@type@", this.ObjType)
                 .Replace("@ebsid@", this.EbSid)
-                .Replace("@rmode@", IsRenderMode.ToString())
+                .Replace("@rmode@", IsRenderMode? "true": "false")
                 .Replace("@id@", "cont_" + this.EbSid)
                 .Replace("@Label@", string.Concat(this.DisplayName, " - ", this.VersionNumber));
 
@@ -152,7 +154,7 @@ namespace ExpressBase.Objects
                 }
 
                 string coverhtml = @"
-                <div id='@id@' ebsid='@ebsid@' eb-form='true' ctype='@type@' isrendermode='@rmode@' class='ebcont-ctrl user-ctrl' eb-type='UserControl' tabindex='1'>
+                <div id='@id@' ebsid='@ebsid@' eb-form='true' ctype='@type@' isrendermode='@rmode@' class='formB-box form-buider-form ebcont-ctrl' eb-type='UserControl' tabindex='1'>
                     @barehtml@                        
                     <span class='helpText' ui-helptxt >@helpText@ </span>
                 </div>"
@@ -160,7 +162,7 @@ namespace ExpressBase.Objects
                     .Replace("@name@", this.Name)
                     .Replace("@type@", this.ObjType)
                     .Replace("@ebsid@", this.EbSid)
-                    .Replace("@rmode@", IsRenderMode.ToString())
+                    .Replace("@rmode@", IsRenderMode ? "true" : "false")
                     .Replace("@id@", this.EbSid);
                 return ReplacePropsInHTML(coverhtml);
             }
@@ -168,11 +170,15 @@ namespace ExpressBase.Objects
                 return GetHtml();
         }
 
+        //builder side - now it is using to get design html 
         public void AfterRedisGet(Service service)
         {
             EbFormHelper.AfterRedisGet(this, service);
+            foreach(EbControl c in this.Controls)
+                EbFormHelper.RenameControlsRec(c, this.Name);
         }
 
+        //rendering side
         public override void AfterRedisGet(RedisClient Redis, IServiceClient client)
         {
             EbFormHelper.AfterRedisGet(this, Redis, client);
