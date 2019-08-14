@@ -91,9 +91,9 @@ namespace ExpressBase.Objects
     public class Margin
     {
         public float Left { get; set; }
-       
+
         public float Right { get; set; }
-       
+
         public float Top { get; set; }
 
         public float Bottom { get; set; }
@@ -181,7 +181,7 @@ namespace ExpressBase.Objects
         public override string Left { get; set; }
 
         public override string Top { get; set; }
-       
+
         public override string Title { get; set; }
 
         public override float LeftPt { get; set; }
@@ -461,9 +461,14 @@ namespace ExpressBase.Objects
         public dynamic GetDataFieldtValue(string column_name, int i, int tableIndex)
         {
             dynamic value = null;
-            int index = (DataSet.Tables[tableIndex].Rows.Count > 1) ? i : 0;
-            EbDbTypes type = (DataSet.Tables[tableIndex].Columns[column_name].Type);
-            return value = (type == EbDbTypes.Bytea) ? DataSet.Tables[tableIndex].Rows[index][column_name] : DataSet.Tables[tableIndex].Rows[index][column_name].ToString();
+            int index;
+            if (DataSet != null && DataSet.Tables.Count > 0 && DataSet.Tables[tableIndex].Rows != null)
+            {
+                index = (DataSet.Tables[tableIndex].Rows.Count > 1) ? i : 0;
+                EbDbTypes type = (DataSet.Tables[tableIndex].Columns[column_name].Type);
+                value = (type == EbDbTypes.Bytea) ? DataSet.Tables[tableIndex].Rows[index][column_name] : DataSet.Tables[tableIndex].Rows[index][column_name].ToString();
+            }
+            return value;
         }
 
         public void DrawWaterMark(Document d, PdfWriter writer)
@@ -965,7 +970,7 @@ namespace ExpressBase.Objects
         public List<EbReportField> Fields { get; set; }
 
         public override string Left { get; set; }
-      
+
         public override string Top { get; set; }
 
         public override float LeftPt { get; set; }
