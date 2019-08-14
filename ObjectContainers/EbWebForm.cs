@@ -115,7 +115,7 @@ namespace ExpressBase.Objects
                 .Replace("@rmode@", IsRenderMode.ToString().ToLower())
                 .Replace("@tabindex@", IsRenderMode ? string.Empty : " tabindex='1'");
         }
-        
+
         //Operations to be performed before form object save - table name required, table name repetition, calculate dependency
         public override void BeforeSave(IServiceClient serviceClient, IRedisClient redis)
         {
@@ -159,7 +159,7 @@ namespace ExpressBase.Objects
 
             CalcValueExprDependency();
         }
-        
+
         //Populate Property DependedValExp
         private void CalcValueExprDependency()
         {
@@ -470,7 +470,7 @@ namespace ExpressBase.Objects
                         }
                     }
                 }
-                else if(c is EbApproval)
+                else if (c is EbApproval)
                 {
                     if (!c.DoNotPersist)
                     {
@@ -1496,7 +1496,7 @@ namespace ExpressBase.Objects
             }
             return DataDB.DoNonQuery(lineQry.Substring(0, lineQry.Length - 1), parameters1.ToArray());
         }
-        
+
         public string GetAuditTrail(IDatabase DataDB, Service Service)
         {
             this.RefreshFormData(DataDB, Service);
@@ -1658,18 +1658,18 @@ namespace ExpressBase.Objects
                 EbDateType _type = _column.Control is EbDate ? (_column.Control as EbDate).EbDateType : (_column.Control as EbDGDateColumn).EbDateType;
                 DateShowFormat _showtype = _column.Control is EbDate ? (_column.Control as EbDate).ShowDateAs_ : (_column.Control as EbDGDateColumn).EbDate.ShowDateAs_;
                 if (!old_val.Equals("[null]"))
-                {                    
+                {
                     if (_type == EbDateType.Date)
                     {
                         if (_showtype != DateShowFormat.Year_Month)
                             old_val = DateTime.ParseExact(old_val, "yyyy-MM-dd", CultureInfo.InvariantCulture).ToString(this.UserObj.Preference.GetShortDatePattern(), CultureInfo.InvariantCulture);
                     }
-                    else if(_type == EbDateType.DateTime)
+                    else if (_type == EbDateType.DateTime)
                     {
                         old_val = DateTime.ParseExact(old_val, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture).ToString(this.UserObj.Preference.GetShortDatePattern() + " " + this.UserObj.Preference.GetShortTimePattern(), CultureInfo.InvariantCulture);
                         //old_val = dt.ConvertFromUtc(this.UserObj.Preference.TimeZone);
                     }
-                    else if(_type == EbDateType.Time)
+                    else if (_type == EbDateType.Time)
                     {
                         old_val = DateTime.ParseExact(old_val, "HH:mm:ss", CultureInfo.InvariantCulture).ToString(this.UserObj.Preference.GetShortTimePattern(), CultureInfo.InvariantCulture);
                         //old_val = dt.ConvertFromUtc(this.UserObj.Preference.TimeZone);
@@ -1938,6 +1938,7 @@ namespace ExpressBase.Objects
             return refids;
         }
 
+        //Rendering side
         public static void AfterRedisGet(EbControlContainer _this, RedisClient Redis, IServiceClient client)
         {
             try
@@ -1966,6 +1967,9 @@ namespace ExpressBase.Objects
                         else
                         {
                             (c as EbUserControl).Controls = _temp.Controls;
+                            (c as EbUserControl).DisplayName = _temp.DisplayName;
+                            (c as EbUserControl).VersionNumber = _temp.VersionNumber;
+                            (c as EbUserControl).IsRenderMode = _this is EbWebForm ? (_this as EbWebForm).IsRenderMode : (_this as EbUserControl).IsRenderMode;
                             foreach (EbControl Control in (c as EbUserControl).Controls)
                             {
                                 RenameControlsRec(Control, c.Name);
@@ -1988,6 +1992,7 @@ namespace ExpressBase.Objects
             }
         }
 
+        //Builder side - whole object get, table create, data insert
         public static void AfterRedisGet(EbControlContainer _this, Service service)
         {
             try
@@ -2015,12 +2020,12 @@ namespace ExpressBase.Objects
                         else
                         {
                             (_this.Controls[i] as EbUserControl).Controls = _temp.Controls;
-                            foreach (EbControl Control in (_this.Controls[i] as EbUserControl).Controls)
-                            {
-                                RenameControlsRec(Control, _this.Controls[i].Name);
-                                //Control.ChildOf = "EbUserControl";
-                                //Control.Name = _this.Controls[i].Name + "_" + Control.Name;
-                            }
+                            //foreach (EbControl Control in (_this.Controls[i] as EbUserControl).Controls)
+                            //{
+                            //    RenameControlsRec(Control, _this.Controls[i].Name);
+                            //    //Control.ChildOf = "EbUserControl";
+                            //    //Control.Name = _this.Controls[i].Name + "_" + Control.Name;
+                            //}
                         //_this.Controls[i] = _temp;
                         (_this.Controls[i] as EbUserControl).AfterRedisGet(service);
                         }
@@ -2037,7 +2042,7 @@ namespace ExpressBase.Objects
             }
         }
 
-        private static void RenameControlsRec(EbControl _control, string _ucName)
+        public static void RenameControlsRec(EbControl _control, string _ucName)
         {
             if (_control is EbControlContainer)
             {
