@@ -113,7 +113,7 @@ namespace ExpressBase.Objects
 
         public override string GetBareHtml()
         {
-            string html = "<div id='@ebsid@' data-ebtype='3' name='@name@' style='padding:5px' type='RadioGroup'>";
+            string html = "<div id='@ebsid@' data-ebtype='3' name='@name@' type='RadioGroup'>";
             foreach (EbRadioOption ec in this.Options)
             {
                 ec.GName = this.EbSid_CtxId;

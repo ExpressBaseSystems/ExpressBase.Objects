@@ -189,7 +189,8 @@ namespace ExpressBase.Objects
                             _dict[j].Path,
                             _dict[j].Root + ".currentrow." + _dict[j].Control.Name,
                             _dict[j].Root + ".currentrow['" + _dict[j].Control.Name + "']",
-                            _dict[j].Root + ".currentrow[\"" + _dict[j].Control.Name + "\"]"
+                            _dict[j].Root + ".currentrow[\"" + _dict[j].Control.Name + "\"]",
+                            _dict[j].Root + "." +  _dict[j].Control.Name + "_sum"
                         };
                         if (stringArr.Any(code.Contains))
                         {
