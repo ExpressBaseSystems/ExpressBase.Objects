@@ -12,6 +12,12 @@ using System.Threading.Tasks;
 
 namespace ExpressBase.Objects
 {
+    public enum VerticalAlign {
+        Top = 0,
+        Middle = 1,
+        Bottom = 2
+    }
+
     [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
     public class EbTableLayout : EbControlContainer
     {
@@ -23,6 +29,9 @@ namespace ExpressBase.Objects
                 return @"EbTable = {
                 padding : function(elementId, props) {
                     $(`#cont_${ elementId}>table>tbody>tr>td`).css('padding', `${props.Padding.Top}px ${props.Padding.Right}px ${props.Padding.Bottom}px ${props.Padding.Left}px`);
+                },
+                verticalAlign : function(elementId, props) {
+                     $(`#${props.EbSid}`).css('vertical-align',getKeyByVal(EbEnums.VerticalAlign,props.VerticalAlign.toString()));
                 }
             }";
             }
@@ -133,6 +142,11 @@ this.Init = function(id){
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         public float WidthPercentage { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [PropertyGroup("Behavior")]
+        [OnChangeUIFunction("EbTable.verticalAlign")]
+        public VerticalAlign VerticalAlign { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [HideInPropertyGrid]
