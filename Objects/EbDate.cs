@@ -148,7 +148,69 @@ namespace ExpressBase.Objects
         //{
         //    return @"<div eb-type='@toolName' class='tool'><i class='fa fa-calendar'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
         //}
-        
+
+        [JsonIgnore]
+        public override string GetValueJSfn
+        {
+            get
+            {
+                return
+                    @"if((this.IsNullable && !($('#' + this.EbSid_CtxId).siblings('.nullable-check').find('input[type=checkbox]').prop('checked'))) || $('#' + this.EbSid_CtxId).val() === '')
+                        return undefined;
+                    else if(this.ShowDateAs_ === 1) //month picker
+                        return $('#' + this.EbSid_CtxId).val();
+                    else if(this.EbDateType === 5) //Date
+                        return moment($('#' + this.EbSid_CtxId).val(), ebcontext.user.Preference.ShortDatePattern).format('YYYY-MM-DD');
+                    else if(this.EbDateType === 6) //DateTime
+                        return moment($('#' + this.EbSid_CtxId).val(), ebcontext.user.Preference.ShortDatePattern + ' ' + ebcontext.user.Preference.ShortTimePattern).format('YYYY-MM-DD HH:mm:ss');
+                    else if(this.EbDateType === 17) //Time
+                        return moment($('#' + this.EbSid_CtxId).val(), ebcontext.user.Preference.ShortTimePattern).format('YYYY-MM-DD HH:mm:ss');";
+            }
+            set { }
+        }
+
+        [JsonIgnore]
+        public override string SetValueJSfn
+        {
+            get
+            {
+                return
+                    @"console.log('setvalue');
+                    if(this.IsNullable && p1 !== null)
+                        $('#' + this.EbSid_CtxId).siblings('.nullable-check').find('input[type=checkbox]').prop('checked', true);
+                    if(this.ShowDateAs_ === 1) //month picker
+                        $('#' + this.EbSid_CtxId).val(p1).trigger('change');
+                    else if(p1 !== null && p1 !== undefined){
+                        if(this.EbDateType === 5) //Date
+                            $('#' + this.EbSid_CtxId).val(moment(p1, 'YYYY-MM-DD').format(ebcontext.user.Preference.ShortDatePattern));
+                        else if(this.EbDateType === 6) //DateTime
+                            $('#' + this.EbSid_CtxId).val(moment(p1, 'YYYY-MM-DD HH:mm:ss').format(ebcontext.user.Preference.ShortDatePattern + ' ' + ebcontext.user.Preference.ShortTimePattern));
+                        else if(this.EbDateType === 17) //Time
+                            $('#' + this.EbSid_CtxId).val(moment(p1, 'HH:mm:ss').format(ebcontext.user.Preference.ShortTimePattern));
+                        $('#' + this.EbSid_CtxId).trigger('change');
+                    }
+                    else 
+                        $('#' + this.EbSid_CtxId).val('');";
+            }
+            set { }
+        }
+
+        [JsonIgnore]
+        public override string GetDisplayMemberJSfn
+        {
+            get
+            {
+                return @"if((this.IsNullable && !($('#' + this.EbSid_CtxId).siblings('.nullable-check').find('input[type=checkbox]').prop('checked'))) || $('#' + this.EbSid_CtxId).val() === '')
+                        return undefined;
+                    else
+                        return $('#' + this.EbSid_CtxId).val();";
+            }
+            set { }
+        }
+
+        [JsonIgnore]
+        public override string OnChangeBindJSFn { get { return @"$('#' + this.EbSid_CtxId).on('change', p1); $('#' + this.EbSid_CtxId).siblings('.nullable-check').find('input[type=checkbox]').on('change', p1);"; } set { } }
+
         public string Wrap4Developer(string EbCtrlHTML)
         {
             return @"<div class='controlTile' tabindex='1' onclick='event.stopPropagation();$(this).focus()'>
@@ -204,84 +266,11 @@ namespace ExpressBase.Objects
 
         public override string GetHtml()
         {
-            return GetHtmlHelper();
-        }
-
-        private string GetHtmlHelper()
-        {
-            //            string EbCtrlHTML =
-            //                HtmlConstants.CONTROL_WRAPER_HTML4WEB
-            //.Replace("@barehtml@", this.GetBareHtml())
-            //.Replace("@name@", this.Name)
-            //.Replace("@ebsid@", EbSid_CtxId)
-            //.Replace("@type@", this.ObjType)
-
             string EbCtrlHTML = HtmlConstants.CONTROL_WRAPER_HTML4WEB
                .Replace("@LabelForeColor ", "color:" + (LabelForeColor ?? "@LabelForeColor ") + ";")
                .Replace("@LabelBackColor ", "background-color:" + (LabelBackColor ?? "@LabelBackColor ") + ";");
 
             return ReplacePropsInHTML(EbCtrlHTML);
         }
-
-        [JsonIgnore]
-        public override string GetValueJSfn
-        {
-            get
-            {
-                return
-                    @"if((this.IsNullable && !($('#' + this.EbSid_CtxId).siblings('.nullable-check').find('input[type=checkbox]').prop('checked'))) || $('#' + this.EbSid_CtxId).val() === '')
-                        return undefined;
-                    else if(this.ShowDateAs_ === 1) //month picker
-                        return $('#' + this.EbSid_CtxId).val();
-                    else if(this.EbDateType === 5) //Date
-                        return moment($('#' + this.EbSid_CtxId).val(), ebcontext.user.Preference.ShortDatePattern).format('YYYY-MM-DD');
-                    else if(this.EbDateType === 6) //DateTime
-                        return moment($('#' + this.EbSid_CtxId).val(), ebcontext.user.Preference.ShortDatePattern + ' ' + ebcontext.user.Preference.ShortTimePattern).format('YYYY-MM-DD HH:mm:ss');
-                    else if(this.EbDateType === 17) //Time
-                        return moment($('#' + this.EbSid_CtxId).val(), ebcontext.user.Preference.ShortTimePattern).format('YYYY-MM-DD HH:mm:ss');";
-            }
-            set { }
-        }
-
-        [JsonIgnore]
-        public override string SetValueJSfn
-        {
-            get
-            {
-                return
-                    @"console.log('setvalue');
-                    if(this.IsNullable && p1 !== null)
-                        $('#' + this.EbSid_CtxId).siblings('.nullable-check').find('input[type=checkbox]').prop('checked', true);
-                    if(this.ShowDateAs_ === 1) //month picker
-                        $('#' + this.EbSid_CtxId).val(p1).trigger('change');
-                    else if(p1 !== null && p1 !== undefined){
-                        if(this.EbDateType === 5) //Date
-                            $('#' + this.EbSid_CtxId).val(moment(p1, 'YYYY-MM-DD').format(ebcontext.user.Preference.ShortDatePattern));
-                        else if(this.EbDateType === 6) //DateTime
-                            $('#' + this.EbSid_CtxId).val(moment(p1, 'YYYY-MM-DD HH:mm:ss').format(ebcontext.user.Preference.ShortDatePattern + ' ' + ebcontext.user.Preference.ShortTimePattern));
-                        else if(this.EbDateType === 17) //Time
-                            $('#' + this.EbSid_CtxId).val(moment(p1, 'HH:mm:ss').format(ebcontext.user.Preference.ShortTimePattern));
-                        $('#' + this.EbSid_CtxId).trigger('change');
-                    }
-                    else 
-                        $('#' + this.EbSid_CtxId).val('');";
-            }
-            set { }
-        }
-
-        [JsonIgnore]
-        public override string GetDisplayMemberJSfn {
-            get
-            {
-                return @"if((this.IsNullable && !($('#' + this.EbSid_CtxId).siblings('.nullable-check').find('input[type=checkbox]').prop('checked'))) || $('#' + this.EbSid_CtxId).val() === '')
-                        return undefined;
-                    else
-                        return $('#' + this.EbSid_CtxId).val();";
-            }
-            set { }
-        }
-
-        [JsonIgnore]
-        public override string OnChangeBindJSFn { get { return @"$('#' + this.EbSid_CtxId).on('change', p1); $('#' + this.EbSid_CtxId).siblings('.nullable-check').find('input[type=checkbox]').on('change', p1);"; } set { } }
     }
 }
