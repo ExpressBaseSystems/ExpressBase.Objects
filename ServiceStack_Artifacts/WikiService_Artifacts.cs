@@ -28,6 +28,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int Order { get; set; }
 
         public int CatId { get; set; }
+
+        public string AuthorName { get; set; }
+
     }
 
     public class WikiCat
