@@ -284,11 +284,6 @@ else {
                                 (
                                     @"<div  class='input-group' style='width: 100%;'>
                                         <span class='input-group-addon' onclick='$(\'#@ebsid@\').click()'><i class='fa fa-$class aria-hidden='true'"
-                                        + (
-                                            (this.FontFamily != null) ?
-                                                ("style='font-size:" + this.FontSize + "px;'")
-                                            : string.Empty
-                                          )
                                         + "class='input-group-addon'></i></span>"
                                 )
                                 .Replace("$class", (this.TextMode == TextMode.Email) ?
