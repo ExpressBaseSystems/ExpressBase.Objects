@@ -45,7 +45,8 @@ namespace ExpressBase.Objects
         [ListType(typeof(EbTableTd))]
         public override List<EbControl> Controls { get; set; }
 
-        [JsonIgnore]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [HideInPropertyGrid]
         public override string TableName { get; set; }
 
         [JsonIgnore]
