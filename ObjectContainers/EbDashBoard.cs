@@ -28,6 +28,8 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.DashBoard)]
         public List<Tiles> Tiles { get; set; }
 
+        public static EbOperations Operations = DashBoardOperations.Instance;
+
         public EbDashBoard()
         {
             Tiles = new List<Tiles>();
