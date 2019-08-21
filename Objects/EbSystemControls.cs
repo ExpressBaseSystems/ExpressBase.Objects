@@ -146,8 +146,6 @@ namespace ExpressBase.Objects
         public override List<EbValidator> Validators { get => base.Validators; set => base.Validators = value; }
         public override EbScript ValueExpr { get => base.ValueExpr; set => base.ValueExpr = value; }
         public override EbScript VisibleExpr { get => base.VisibleExpr; set => base.VisibleExpr = value; }
-        public override bool IsDisable { get => base.IsDisable; set => base.IsDisable = value; }
-        public override string DefaultValue { get => base.DefaultValue; set => base.DefaultValue = value; }
     }
 
     [EnableInBuilder(BuilderType.WebForm)]
@@ -271,7 +269,6 @@ namespace ExpressBase.Objects
         public override EbScript ValueExpr { get => base.ValueExpr; set => base.ValueExpr = value; }
         public override EbScript VisibleExpr { get => base.VisibleExpr; set => base.VisibleExpr = value; }
         public override bool IsDisable { get => base.IsDisable; set => base.IsDisable = value; }
-        public override string DefaultValue { get => base.DefaultValue; set => base.DefaultValue = value; }
     }
 
     [EnableInBuilder(BuilderType.WebForm)]
@@ -396,7 +393,6 @@ namespace ExpressBase.Objects
         public override EbScript ValueExpr { get => base.ValueExpr; set => base.ValueExpr = value; }
         public override EbScript VisibleExpr { get => base.VisibleExpr; set => base.VisibleExpr = value; }
         public override bool IsDisable { get => base.IsDisable; set => base.IsDisable = value; }
-        public override string DefaultValue { get => base.DefaultValue; set => base.DefaultValue = value; }
     }
 
     [EnableInBuilder(BuilderType.WebForm)]
@@ -550,7 +546,6 @@ namespace ExpressBase.Objects
         public override EbScript ValueExpr { get => base.ValueExpr; set => base.ValueExpr = value; }
         public override EbScript VisibleExpr { get => base.VisibleExpr; set => base.VisibleExpr = value; }
         public override bool IsDisable { get => base.IsDisable; set => base.IsDisable = value; }
-        public override string DefaultValue { get => base.DefaultValue; set => base.DefaultValue = value; }
     }
 
     [EnableInBuilder(BuilderType.WebForm)]
@@ -704,6 +699,5 @@ namespace ExpressBase.Objects
         public override EbScript ValueExpr { get => base.ValueExpr; set => base.ValueExpr = value; }
         public override EbScript VisibleExpr { get => base.VisibleExpr; set => base.VisibleExpr = value; }
         public override bool IsDisable { get => base.IsDisable; set => base.IsDisable = value; }
-        public override string DefaultValue { get => base.DefaultValue; set => base.DefaultValue = value; }
     }
 }
