@@ -2,12 +2,14 @@
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
+using ExpressBase.Common.Structures;
 using ExpressBase.Objects.Helpers;
 using Newtonsoft.Json;
 using ServiceStack;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data.Common;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
@@ -137,7 +139,52 @@ WHERE
             return Qry;
         }
 
+        public static string GetUpdateQuery(IDatabase DataDB, List<DbParameter> param, Dictionary<string, SingleTable> Tables, string mastertbl, string EbObId, ref int i, int dataId)
+        {
+            List<string> InnerVals = new List<string>();
+            List<string> Innercxt = new List<string>();
+            List<string> InnerIds = new List<string>();
+            string fullqry = string.Empty;
+            foreach (KeyValuePair<string, SingleTable> entry in Tables)
+            {
+                foreach (SingleRow row in entry.Value)
+                {
+                    string cn = entry.Key + "_" + i.ToString();
+                    i++;
+                    if (dataId == 0)
+                        InnerVals.Add(string.Format("( CONCAT('{0}_', TRIM(CAST(eb_currval('{1}_id_seq') AS CHAR(32))), '_{2}'))", EbObId, mastertbl, entry.Key));
+                    else
+                        InnerVals.Add(string.Format("('{0}_{1}_{2}')", EbObId, dataId, entry.Key));
 
+                    param.Add(DataDB.GetNewParameter(cn, EbDbTypes.Decimal, row.Columns[0].Value));
+                    InnerIds.Add(":" + cn);
+                }
+                if (dataId == 0)
+                    Innercxt.Add(string.Format("context = CONCAT('{0}_', TRIM(CAST(eb_currval('{1}_id_seq') AS CHAR(32))), '_{2}')", EbObId, mastertbl, entry.Key));
+                else
+                    Innercxt.Add(string.Format("context = '{0}_{1}_{2}'", EbObId, dataId, entry.Key));
+            }
+
+            if (InnerVals.Count > 0)
+            {
+
+                for (int k = 0; k < InnerVals.Count; k++)
+                {
+                    fullqry += string.Format(@"UPDATE 
+                                            eb_files_ref AS t
+                                        SET
+                                            context = {0}                                        
+                                        WHERE
+                                           t.id = {1} AND t.eb_del = 'F';", InnerVals[k], InnerIds[k]);
+                }
+
+                fullqry += string.Format(@"UPDATE eb_files_ref 
+                                        SET eb_del='T' 
+                                        WHERE ({0}) AND eb_del='F' AND id NOT IN ({1});", Innercxt.Join(" OR "), InnerIds.Join(","));
+            }
+            return fullqry;
+        }
+        
         [JsonIgnore]
         public override string EnableJSfn { get { return @"$('#cont_' + this.EbSid_CtxId + ' .FUP_Head_W').prop('disabled',false).css('pointer-events', 'inherit');"; } set { } }
 

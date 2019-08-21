@@ -1,4 +1,5 @@
-﻿using ExpressBase.Common.Extensions;
+﻿using ExpressBase.Common;
+using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
@@ -6,8 +7,10 @@ using ExpressBase.Objects.Helpers;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Runtime.Serialization;
 using System.Text;
+using ExpressBase.Security;
 
 namespace ExpressBase.Objects
 {
@@ -117,6 +120,19 @@ namespace ExpressBase.Objects
         }
         
         public override string EnableJSfn { get { return @""; } set { } }
+
+        public override bool ParameterizeControl(IDatabase DataDB, List<DbParameter> param, string tbl, SingleColumn rField, bool ins, ref int i, ref string _col, ref string _val, ref string _extqry, User usr)
+        {
+            if (ins)
+            {
+                _col += string.Concat(rField.Name, ", ");
+                _val += string.Format("CONCAT(:{0}_{1}, (SELECT LPAD(CAST((COUNT(*) + 1) AS CHAR(12)), {2}, '0') FROM {3} WHERE {0} LIKE '{4}%')),", rField.Name, i, this.Pattern.SerialLength, tbl, rField.Value);
+                param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
+                i++;
+                return true;
+            }
+            return false;
+        }
     }
 
     [EnableInBuilder(BuilderType.WebForm)]
