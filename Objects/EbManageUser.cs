@@ -15,6 +15,7 @@ using ExpressBase.Objects.Objects;
 namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.WebForm)]
+    [HideInToolBox]
     class EbManageUser : EbControlUI, IEbPlaceHolderControl
     {
         public EbManageUser()
