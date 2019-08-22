@@ -68,7 +68,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.Collection)]
         [Alias("TabPanes")]
-        [PropertyGroup("test")]
+        [PropertyGroup("Core")]
         [UIproperty]
         [PropertyPriority(95)]
         [ListType(typeof(EbTabPane))]
@@ -89,6 +89,9 @@ namespace ExpressBase.Objects
 
         [JsonIgnore]
         public override string LabelForeColor { get; set; }
+
+        [JsonIgnore]
+        public override EbScript OnChangeFn { get; set; }
 
         [HideInPropertyGrid]
         [JsonIgnore]
@@ -155,6 +158,9 @@ this.Init = function(id)
     [HideInToolBox]
     public class EbTabPane : EbControlContainer
     {
+        [JsonIgnore]
+        public override EbScript OnChangeFn { get; set; }
+
         public EbTabPane()
         {
             this.Controls = new List<EbControl>();
