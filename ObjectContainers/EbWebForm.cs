@@ -254,11 +254,11 @@ namespace ExpressBase.Objects
             }
         }
 
-        private string GetSelectQuery(WebFormSchema _schema, Service _service, out string _queryExt)
+        private string GetSelectQuery(WebFormSchema _schema, Service _service, out string _queryPs)
         {
             string query = string.Empty;
-            string fupquery = string.Empty;
-            _queryExt = string.Empty;
+            string extquery = string.Empty;
+            _queryPs = string.Empty;
             if (_schema == null)
                 _schema = this.FormSchema;//this.GetWebFormSchema();
             foreach (TableSchema _table in _schema.Tables)
@@ -281,17 +281,20 @@ namespace ExpressBase.Objects
                 foreach (ColumnSchema Col in _table.Columns)
                 {
                     if (Col.Control is EbPowerSelect)
-                        _queryExt += (Col.Control as EbPowerSelect).GetSelectQuery(_service, Col.ColumnName, _table.TableName, _id);
+                        _queryPs += (Col.Control as EbPowerSelect).GetSelectQuery(_service, Col.ColumnName, _table.TableName, _id);
                     else if (Col.Control is EbDGPowerSelectColumn)
-                        _queryExt += (Col.Control as EbDGPowerSelectColumn).GetSelectQuery(_service, Col.ColumnName, _table.TableName, _id);
+                        _queryPs += (Col.Control as EbDGPowerSelectColumn).GetSelectQuery(_service, Col.ColumnName, _table.TableName, _id);
                 }
             }
             foreach (Object Ctrl in _schema.ExtendedControls)
             {
                 if (Ctrl is EbFileUploader)
-                    fupquery += (Ctrl as EbFileUploader).GetSelectQuery();
+                    extquery += (Ctrl as EbFileUploader).GetSelectQuery();
+                else if(Ctrl is EbManageUser)
+                    extquery += (Ctrl as EbManageUser).GetSelectQuery(Convert.ToInt32(this.RefId.Split("-")[4]));
+
             }
-            return query + fupquery;
+            return query + extquery;
         }
 
         public string GetDeleteQuery(IDatabase DataDB, WebFormSchema _schema = null)
@@ -337,7 +340,8 @@ namespace ExpressBase.Objects
             string _qry;
             if (tblName.Equals(masterTbl))
             {
-                _qry = string.Format("INSERT INTO {0} ({2} eb_created_by, eb_created_at, eb_loc_id) VALUES ({3} :eb_createdby, {1}, :eb_loc_id ); ", tblName, DataDB.EB_CURRENT_TIMESTAMP, "{0}", "{1}");
+                //_qry = string.Format("INSERT INTO {0} ({2} eb_created_by, eb_created_at, eb_loc_id, eb_ver_id) VALUES ({3} :eb_createdby, {1}, :eb_loc_id, :eb_ver_id); ", tblName, DataDB.EB_CURRENT_TIMESTAMP, "{0}", "{1}");
+                _qry = string.Format("INSERT INTO {0} ({2} eb_created_by, eb_created_at, eb_loc_id) VALUES ({3} :eb_createdby, {1}, :eb_loc_id); ", tblName, DataDB.EB_CURRENT_TIMESTAMP, "{0}", "{1}");
                 if (DataDB.Vendor == DatabaseVendors.MYSQL)
                     _qry += string.Format("SELECT eb_persist_currval('{0}_id_seq');", tblName);
             }
@@ -726,35 +730,54 @@ namespace ExpressBase.Objects
             if (dataset.Tables.Count > _schema.Tables.Count)
             {
                 int tableIndex = _schema.Tables.Count;
-                foreach (Object Ctrl in _schema.ExtendedControls)//FileUploader Controls
+                foreach (Object Ctrl in _schema.ExtendedControls)//FileUploader + ManageUser Controls
                 {
                     SingleTable Table = new SingleTable();
                     GetFormattedData(dataset.Tables[tableIndex], Table);
-                    //--------------
-                    List<FileMetaInfo> _list = new List<FileMetaInfo>();
-                    foreach (SingleRow dr in Table)
+                    if(Ctrl is EbFileUploader)
                     {
-                        FileMetaInfo info = new FileMetaInfo
+                        List<FileMetaInfo> _list = new List<FileMetaInfo>();
+                        foreach (SingleRow dr in Table)
                         {
-                            FileRefId = dr["id"],
-                            FileName = dr["filename"],
-                            Meta = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(dr["tags"] as string),
-                            UploadTime = dr["uploadts"],
-                            FileCategory = (EbFileCategory)Convert.ToInt32(dr["filecategory"])
-                        };
+                            FileMetaInfo info = new FileMetaInfo
+                            {
+                                FileRefId = dr["id"],
+                                FileName = dr["filename"],
+                                Meta = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(dr["tags"] as string),
+                                UploadTime = dr["uploadts"],
+                                FileCategory = (EbFileCategory)Convert.ToInt32(dr["filecategory"])
+                            };
 
-                        if (!_list.Contains(info))
-                            _list.Add(info);
+                            if (!_list.Contains(info))
+                                _list.Add(info);
+                        }
+                        SingleTable _Table = new SingleTable {
+                            new SingleRow() {
+                                Columns = new List<SingleColumn> {
+                                    new SingleColumn { Name = "Files", Type = (int)EbDbTypes.Json, Value = JsonConvert.SerializeObject(_list) }
+                                }
+                            }
+                        };
+                        _FormData.ExtendedTables.Add((Ctrl as EbControl).EbSid, _Table);
                     }
-                    SingleTable _Table = new SingleTable {
-                        new SingleRow() {
-                            Columns = new List<SingleColumn> {
-                                new SingleColumn { Name = "Files", Type = (int)EbDbTypes.Json, Value = JsonConvert.SerializeObject(_list) }
+                    else if (Ctrl is EbManageUser)
+                    {
+                        Dictionary<string, dynamic> _d = new Dictionary<string, dynamic>();
+                        if(Table.Count == 1)
+                        {
+                            _d.Add("id", Table[0]["id"]);
+                            foreach(MngUsrLocField _f in (Ctrl as EbManageUser).PersistingFields)
+                            {
+                                _d.Add(_f.Name, Table[0][_f.Name]);
                             }
                         }
-                    };
-                    //--------------
-                    _FormData.ExtendedTables.Add((Ctrl as EbControl).EbSid, _Table);
+                        _FormData.MultipleTables[(Ctrl as EbManageUser).VirtualTable][0].Columns.Add(new SingleColumn() {
+                            Name = (Ctrl as EbManageUser).Name,
+                            Type = (int)EbDbTypes.String,
+                            Value = JsonConvert.SerializeObject(_d)
+                        });
+                    }
+                    
                     tableIndex++;
                 }
             }
@@ -957,6 +980,8 @@ namespace ExpressBase.Objects
             param.Add(DataDB.GetNewParameter("eb_modified_by", EbDbTypes.Int32, this.UserObj.UserId));
 
             return DataDB.InsertTable(fullqry, param.ToArray());
+            //var zz = DataDB.DoQueries(fullqry, param.ToArray());
+            //return 1;
         }
 
         public int Insert(IDatabase DataDB)
@@ -990,9 +1015,11 @@ namespace ExpressBase.Objects
 
             param.Add(DataDB.GetNewParameter("eb_createdby", EbDbTypes.Int32, this.UserObj.UserId));
             param.Add(DataDB.GetNewParameter("eb_loc_id", EbDbTypes.Int32, this.LocationId));
+            param.Add(DataDB.GetNewParameter("eb_ver_id", EbDbTypes.Int32, this.RefId.Split("-")[4]));
             fullqry += string.Format("SELECT eb_currval('{0}_id_seq');", this.TableName);
 
-            EbDataTable temp = DataDB.DoQuery(fullqry, param.ToArray());
+            EbDataSet tem= DataDB.DoQueries(fullqry, param.ToArray());
+            EbDataTable temp = tem.Tables[tem.Tables.Count - 1];
             int _rowid = temp.Rows.Count > 0 ? Convert.ToInt32(temp.Rows[0][0]) : 0;
             return _rowid;
         }
@@ -1739,15 +1766,16 @@ namespace ExpressBase.Objects
         private WebFormSchema GetWebFormSchemaRec(WebFormSchema _schema, EbControlContainer _container, string _parentTable)
         {
             IEnumerable<EbControl> _flatControls = _container.Controls.Get1stLvlControls();
-            TableSchema _table = _schema.Tables.FirstOrDefault(tbl => tbl.TableName == _container.TableName);
+            string curTbl = _container.TableName.ToLower();
+            TableSchema _table = _schema.Tables.FirstOrDefault(tbl => tbl.TableName == curTbl);
             if (_table == null)
             {
                 if (_container is EbApproval)
-                    _table = new TableSchema { TableName = _container.TableName.ToLower(), ParentTable = _parentTable, TableType = WebFormTableTypes.Approval, Title = _container.Label };
+                    _table = new TableSchema { TableName = curTbl, ParentTable = _parentTable, TableType = WebFormTableTypes.Approval, Title = _container.Label };
                 else if (_container is EbDataGrid)
-                    _table = new TableSchema { TableName = _container.TableName.ToLower(), ParentTable = _parentTable, TableType = WebFormTableTypes.Grid, Title = _container.Label };
+                    _table = new TableSchema { TableName = curTbl, ParentTable = _parentTable, TableType = WebFormTableTypes.Grid, Title = _container.Label };
                 else
-                    _table = new TableSchema { TableName = _container.TableName.ToLower(), ParentTable = _parentTable, TableType = WebFormTableTypes.Normal };
+                    _table = new TableSchema { TableName = curTbl, ParentTable = _parentTable, TableType = WebFormTableTypes.Normal };
                 _schema.Tables.Add(_table);
             }
             foreach (EbControl control in _flatControls)
@@ -1756,6 +1784,11 @@ namespace ExpressBase.Objects
                 {
                     if (control is EbFileUploader)
                         _schema.ExtendedControls.Add(control);
+                    if (control is EbManageUser)
+                    {
+                        (control as EbManageUser).VirtualTable = curTbl;
+                        _schema.ExtendedControls.Add(control);
+                    }
                     else if (control is EbDGUserControlColumn)
                     {
                         foreach (EbControl _ctrl in (control as EbDGUserControlColumn).Columns)
@@ -1775,9 +1808,9 @@ namespace ExpressBase.Objects
                     EbControlContainer Container = _control as EbControlContainer;
                     string __parentTbl = _parentTable;
                     if (Container.TableName.IsNullOrEmpty())
-                        Container.TableName = _container.TableName;
+                        Container.TableName = curTbl;
                     else
-                        __parentTbl = _container.TableName;
+                        __parentTbl = curTbl;
                     _schema = GetWebFormSchemaRec(_schema, Container, __parentTbl);
                 }
             }
