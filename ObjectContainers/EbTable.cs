@@ -12,7 +12,8 @@ using System.Threading.Tasks;
 
 namespace ExpressBase.Objects
 {
-    public enum VerticalAlign {
+    public enum VerticalAlign
+    {
         Top = 0,
         Middle = 1,
         Bottom = 2
@@ -173,7 +174,8 @@ this.Init = function(id){
 
         public override string GetHtml()
         {
-            string html = "<td id='@name@' ebsid='@ebsid@' style='width:@wperc@;'; class='form-render-table-Td tdDropable ebcont-ctrl'> <div style='height: 100%; width: 100%; min-height: 30px;'>";
+            string html = "<td id='@name@' ebsid='@ebsid@' style='width:@wperc@;'; class='form-render-table-Td tdDropable ebResizable ebcont-ctrl ppbtn-cont'> <div style='height: 100%; width: 100%; min-height: 30px;'>" +
+                "@ppbtn@";
 
             foreach (EbControl ec in this.Controls)
                 html += ec.GetHtml();
@@ -181,7 +183,8 @@ this.Init = function(id){
             return (html + "</div></td>")
                 .Replace("@name@", this.Name)
                 .Replace("@wperc@", (this.WidthPercentage != 0) ? this.WidthPercentage.ToString() + "%" : "auto")
-                .Replace("@ebsid@", this.EbSid);
+                .Replace("@ebsid@", this.EbSid)
+                .Replace("@ppbtn@", Common.HtmlConstants.CONT_PROP_BTN);
         }
     }
 
