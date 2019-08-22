@@ -101,7 +101,7 @@ namespace ExpressBase.Objects
         public override string GetDesignHtml()
         {
             this.Controls = new List<EbControl>();
-            this.Controls.Add(new EbTabPane { Name = "EbTab0TabPane0" });
+            this.Controls.Add(new EbTabPane { Name = "EbTab0TabPane0", Title = "pane1" });
             return GetHtml().RemoveCR().DoubleQuoted(); ;
         }
 
@@ -112,6 +112,7 @@ this.Init = function(id)
 {
     let pane = new EbObjects.EbTabPane(this.EbSid + 'TabPane0');
     pane.Name = 'pane1';
+    pane.Title = 'pane1';
     this.Controls.$values.push(pane);
 };";
         }
@@ -127,16 +128,16 @@ this.Init = function(id)
 
             foreach (EbTabPane tab in Controls)
                 TabBtnHtml += @"
-            <li li-of='@ebsid@' ebsid='@ebsid@' @active><a data-toggle='tab' href='#@ebsid@'> <span class='eb-label-editable'>@title@</span><input id='@ebsid@lbltxtb' class='eb-lbltxtb' type='text'/> </a>
+            <li li-of='@ebsid@' ebsid='@ebsid@' class='@active ppbtn-cont'><a data-toggle='tab' href='#@ebsid@'><span class='eb-label-editable'>@title@</span><input id='@ebsid@lbltxtb' class='eb-lbltxtb' type='text'/>@ppbtn@</a>
                 
-            </li>".Replace("@title@", tab.Title).Replace("@ebsid@", tab.EbSid);
+            </li>".Replace("@title@", tab.Title).Replace("@ppbtn@", Common.HtmlConstants.CONT_PROP_BTN).Replace("@ebsid@", tab.EbSid);
 
             TabBtnHtml += @"
         </ul>
     </div>";
 
             Regex regex = new Regex(Regex.Escape("@active"));
-            TabBtnHtml = regex.Replace(TabBtnHtml, "class='active'", 1).Replace("@active", "");
+            TabBtnHtml = regex.Replace(TabBtnHtml, "active", 1).Replace("@active", "");
 
 
             foreach (EbControl tab in Controls)
