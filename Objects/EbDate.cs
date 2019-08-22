@@ -8,9 +8,12 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data.Common;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
+using ExpressBase.Security;
+using System.Globalization;
 
 namespace ExpressBase.Objects
 {
@@ -204,18 +207,6 @@ namespace ExpressBase.Objects
 
         public override string GetHtml()
         {
-            return GetHtmlHelper();
-        }
-
-        private string GetHtmlHelper()
-        {
-            //            string EbCtrlHTML =
-            //                HtmlConstants.CONTROL_WRAPER_HTML4WEB
-            //.Replace("@barehtml@", this.GetBareHtml())
-            //.Replace("@name@", this.Name)
-            //.Replace("@ebsid@", EbSid_CtxId)
-            //.Replace("@type@", this.ObjType)
-
             string EbCtrlHTML = HtmlConstants.CONTROL_WRAPER_HTML4WEB
                .Replace("@LabelForeColor ", "color:" + (LabelForeColor ?? "@LabelForeColor ") + ";")
                .Replace("@LabelBackColor ", "background-color:" + (LabelBackColor ?? "@LabelBackColor ") + ";");
@@ -283,5 +274,41 @@ namespace ExpressBase.Objects
 
         [JsonIgnore]
         public override string OnChangeBindJSFn { get { return @"$('#' + this.EbSid_CtxId).on('change', p1); $('#' + this.EbSid_CtxId).siblings('.nullable-check').find('input[type=checkbox]').on('change', p1);"; } set { } }
+
+        public override bool ParameterizeControl(IDatabase DataDB, List<DbParameter> param, string tbl, SingleColumn rField, bool ins, ref int i, ref string _col, ref string _val, ref string _extqry, User usr)
+        {
+            if (rField.Value == null)
+            {
+                var p = DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type);
+                p.Value = DBNull.Value;
+                param.Add(p);
+            }
+            else
+            {
+                if (this.EbDateType == EbDateType.Date)
+                {
+                    if (this.ShowDateAs_ == DateShowFormat.Year_Month)
+                        rField.Value = DateTime.ParseExact(rField.Value.ToString(), "MM/yyyy", CultureInfo.InvariantCulture);
+                    else
+                        rField.Value = DateTime.ParseExact(rField.Value.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
+                }
+                else
+                {
+                    DateTime dt = DateTime.ParseExact(rField.Value.ToString(), "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+                    rField.Value = dt.ConvertToUtc(usr.Preference.TimeZone);
+                }
+                param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, EbDbTypes.DateTime, rField.Value));
+            }
+
+            if (ins)
+            {
+                _col += string.Concat(rField.Name, ", ");
+                _val += string.Concat(":", rField.Name, "_", i, ", ");
+            }
+            else
+                _col += string.Concat(rField.Name, "=:", rField.Name, "_", i, ", ");
+            i++;
+            return true;
+        }
     }
 }

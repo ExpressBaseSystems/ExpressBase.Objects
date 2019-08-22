@@ -40,8 +40,14 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.Collection)]
         [Alias("Columns")]
+        [PropertyGroup("Behavior")]
+        [PropertyPriority(70)]
         [ListType(typeof(EbTableTd))]
         public override List<EbControl> Controls { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [HideInPropertyGrid]
+        public override string TableName { get; set; }
 
         [JsonIgnore]
         public override string Label { get; set; }

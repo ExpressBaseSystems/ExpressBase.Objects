@@ -379,6 +379,30 @@ namespace ExpressBase.Objects
             return query;
         }
 
+        private string GetInsertQuery(IDatabase DataDB, string tblName, string masterTbl)
+        {
+            string _qry;
+            if (tblName.Equals(masterTbl))
+            {
+                _qry = string.Format("INSERT INTO {0} ({2} eb_created_by, eb_created_at, eb_loc_id) VALUES ({3} :eb_createdby, {1}, :eb_loc_id ); ", tblName, DataDB.EB_CURRENT_TIMESTAMP, "{0}", "{1}");
+                if (DataDB.Vendor == DatabaseVendors.MYSQL)
+                    _qry += string.Format("SELECT eb_persist_currval('{0}_id_seq');", tblName);
+            }
+            else
+                _qry = string.Format("INSERT INTO {0} ({3} eb_created_by, eb_created_at, eb_loc_id, {2}_id) VALUES ({4} :eb_createdby, {1}, :eb_loc_id , (SELECT eb_currval('{2}_id_seq'" + ")));", tblName, DataDB.EB_CURRENT_TIMESTAMP, masterTbl, "{0}", "{1}");
+            return _qry;
+        }
+
+        private string GetUpdateQuery(IDatabase DataDB, string tblName, string masterTbl, bool isDel)
+        {
+            string _qry;
+            if (tblName.Equals(masterTbl))
+                _qry = string.Format("UPDATE {0} SET {2} eb_lastmodified_by = :eb_modified_by, eb_lastmodified_at = {1} WHERE id = {3} AND eb_del = 'F';", tblName, DataDB.EB_CURRENT_TIMESTAMP, "{0}", "{1}");
+            else
+                _qry = string.Format("UPDATE {0} SET {3} eb_lastmodified_by = :eb_modified_by, eb_lastmodified_at = {1} WHERE id = {4} AND {2}_id = :{2}_id AND eb_del = 'F';", tblName, DataDB.EB_CURRENT_TIMESTAMP, masterTbl, isDel ? "eb_del = 'T'" : "{0}", "{1}");
+            return _qry;
+        }
+
         //get formdata as globals for c# script engine
         public FormAsGlobal GetFormAsGlobal(WebformData _formData, EbControlContainer _container = null, FormAsGlobal _globals = null)
         {
@@ -930,139 +954,51 @@ namespace ExpressBase.Objects
         public int Update(IDatabase DataDB)
         {
             string fullqry = string.Empty;
+            string _extqry = string.Empty;
             List<DbParameter> param = new List<DbParameter>();
             int i = 0;
             foreach (KeyValuePair<string, SingleTable> entry in this.FormData.MultipleTables)
             {
                 foreach (SingleRow row in entry.Value)
                 {
-                    string _tblname = entry.Key;
-                    if (Convert.ToInt32(row.RowId) > 0)
-                    {
-                        string _qry = "UPDATE {0} SET {1} eb_lastmodified_by = :eb_modified_by, eb_lastmodified_at = " + DataDB.EB_CURRENT_TIMESTAMP + " WHERE id={2};";
-                        string _colvals = string.Empty;
-                        if (row.IsDelete && !_tblname.Equals(this.FormData.MasterTable))
+                    string _colvals = string.Empty;
+                    string _temp = string.Empty;
+                    int _rowId = Convert.ToInt32(row.RowId);
+                    if (_rowId > 0)
+                    {                        
+                        foreach (SingleColumn rField in row.Columns)
                         {
-                            _qry = "UPDATE {0} SET {1}, eb_lastmodified_by = :eb_modified_by, eb_lastmodified_at = " + DataDB.EB_CURRENT_TIMESTAMP + " WHERE id={2} AND eb_del='F';";
-                            _colvals = "eb_del='T'";
-                        }
-                        else
-                        {
-                            foreach (SingleColumn rField in row.Columns)
-                            {
-                                if (!(rField.Control is EbAutoId))
-                                {
-                                    _colvals += string.Concat(rField.Name, "=:", rField.Name, "_", i, ",");
-                                    if (rField.Value == null)
-                                    {
-                                        var p = DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type);
-                                        p.Value = DBNull.Value;
-                                        param.Add(p);
-                                    }
-                                    else if (rField.Control is EbDate || rField.Control is EbDGDateColumn)
-                                    {
-                                        EbDateType _type = rField.Control is EbDate ? (rField.Control as EbDate).EbDateType : (rField.Control as EbDGDateColumn).EbDateType;
-                                        DateShowFormat _showtype = rField.Control is EbDate ? (rField.Control as EbDate).ShowDateAs_ : (rField.Control as EbDGDateColumn).EbDate.ShowDateAs_;
-                                        if (_type == EbDateType.Date)
-                                        {
-                                            if (_showtype == DateShowFormat.Year_Month)
-                                                rField.Value = DateTime.ParseExact(rField.Value.ToString(), "MM/yyyy", CultureInfo.InvariantCulture);
-                                            else
-                                                rField.Value = DateTime.ParseExact(rField.Value.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
-                                        }
-                                        else
-                                        {
-                                            DateTime dt = DateTime.ParseExact(rField.Value.ToString(), "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
-                                            rField.Value = dt.ConvertToUtc(this.UserObj.Preference.TimeZone);
-                                        }
-                                        param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, EbDbTypes.DateTime, rField.Value));
-                                    }
-                                    else
-                                        param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
-                                }
-                            }
+                            if (rField.Control != null)
+                                rField.Control.ParameterizeControl(DataDB, param, this.TableName, rField, false, ref i, ref _colvals, ref _temp, ref _extqry, this.UserObj);
+                            else
+                                ParameterizeUnknown(DataDB, param, rField, false, ref i, ref _colvals, ref _temp);
                         }
 
-                        fullqry += string.Format(_qry, _tblname, _colvals, row.RowId);
+                        string _qry = this.GetUpdateQuery(DataDB, entry.Key, this.TableName, row.IsDelete);
+                        fullqry += string.Format(_qry, _colvals, row.RowId);
                     }
                     else
                     {
-                        string _qry = "INSERT INTO {0} ({1} eb_created_by, eb_created_at, eb_loc_id, {3}_id ) VALUES ({2} :eb_createdby, " + DataDB.EB_CURRENT_TIMESTAMP + ", :eb_loc_id, :{4}_id);";
-                        string _cols = string.Empty, _vals = string.Empty;
+                        string _cols = string.Empty;
+                        string _vals = string.Empty;
+
                         foreach (SingleColumn rField in row.Columns)
                         {
-                            _cols += string.Concat(rField.Name, ",");
-                            _vals += string.Concat(":", rField.Name, "_", i, ",");
-                            if (rField.Value == null)
-                            {
-                                var p = DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type);
-                                p.Value = DBNull.Value;
-                                param.Add(p);
-                            }
-                            else if (rField.Control is EbDate || rField.Control is EbDGDateColumn)
-                            {
-                                EbDateType _type = rField.Control is EbDate ? (rField.Control as EbDate).EbDateType : (rField.Control as EbDGDateColumn).EbDateType;
-                                DateShowFormat _showtype = rField.Control is EbDate ? (rField.Control as EbDate).ShowDateAs_ : (rField.Control as EbDGDateColumn).EbDate.ShowDateAs_;
-                                if (_type == EbDateType.Date)
-                                {
-                                    if (_showtype == DateShowFormat.Year_Month)
-                                        rField.Value = DateTime.ParseExact(rField.Value.ToString(), "MM/yyyy", CultureInfo.InvariantCulture);
-                                    else
-                                        rField.Value = DateTime.ParseExact(rField.Value.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
-                                }
-                                else
-                                {
-                                    DateTime dt = DateTime.ParseExact(rField.Value.ToString(), "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
-                                    rField.Value = dt.ConvertToUtc(this.UserObj.Preference.TimeZone);
-                                }
-                                param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, EbDbTypes.DateTime, rField.Value));
-                            }
+                            if (rField.Control != null)
+                                rField.Control.ParameterizeControl(DataDB, param, this.TableName, rField, true, ref i, ref _cols, ref _vals, ref _extqry, this.UserObj);
                             else
-                                param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
+                                ParameterizeUnknown(DataDB, param, rField, true, ref i, ref _cols, ref _vals);
                         }
-                        fullqry += string.Format(_qry, _tblname, _cols, _vals, this.FormData.MasterTable, this.FormData.MasterTable);
+                        string _qry = GetInsertQuery(DataDB, entry.Key, this.TableName);
+                        fullqry += string.Format(_qry, _cols, _vals);
                     }
-                    i++;
                 }
             }
 
-            //------------------
-            string EbObId = this.RefId.Split("-")[3];
-            List<string> InnerVals = new List<string>();
-            List<string> Innercxt = new List<string>();
-            List<string> InnerIds = new List<string>();
-            foreach (KeyValuePair<string, SingleTable> entry in this.FormData.ExtendedTables)
-            {
-                foreach (SingleRow row in entry.Value)
-                {
-                    string cn = entry.Key + "_" + i.ToString();
-                    i++;
-                    InnerVals.Add(string.Format("('{0}_{1}_{2}')", EbObId, this.TableRowId, entry.Key));
-                    param.Add(DataDB.GetNewParameter(cn, EbDbTypes.Decimal, row.Columns[0].Value));
-                    InnerIds.Add(":" + cn);
-                }
-                Innercxt.Add("context = '" + EbObId + "_" + this.TableRowId + "_" + entry.Key + "'");
-            }
-            if (InnerVals.Count > 0)
-            {
-                for (int k = 0; k < InnerVals.Count; k++)
-                {
-                    fullqry += string.Format(@"UPDATE 
-                                            eb_files_ref AS t
-                                        SET
-                                            context = {0}                                        
-                                        WHERE
-                                           t.id = {1} AND t.eb_del = 'F';", InnerVals[k], InnerIds[k]);
-                }
-
-                fullqry += string.Format(@"UPDATE eb_files_ref 
-                                        SET eb_del='T' 
-                                        WHERE ({0}) AND eb_del='F' AND id NOT IN ({1});", Innercxt.Join(" OR "), InnerIds.Join(","));
-            }
-
-            //-------------------------
-
-            param.Add(DataDB.GetNewParameter(this.FormData.MasterTable + "_id", EbDbTypes.Int32, this.FormData.MultipleTables[this.FormData.MasterTable][0].RowId));
+            fullqry += _extqry;
+            fullqry += EbFileUploader.GetUpdateQuery(DataDB, param, FormData.ExtendedTables, this.TableName, this.RefId.Split("-")[3], ref i, this.TableRowId);
+            
+            param.Add(DataDB.GetNewParameter(this.FormData.MasterTable + "_id", EbDbTypes.Int32, this.TableRowId));
             param.Add(DataDB.GetNewParameter("eb_loc_id", EbDbTypes.Int32, this.LocationId));
             param.Add(DataDB.GetNewParameter("eb_createdby", EbDbTypes.Int32, this.UserObj.UserId));
             param.Add(DataDB.GetNewParameter("eb_modified_by", EbDbTypes.Int32, this.UserObj.UserId));
@@ -1074,117 +1010,68 @@ namespace ExpressBase.Objects
         {
             string fullqry = string.Empty;
             List<DbParameter> param = new List<DbParameter>();
-            int count = 0;
             int i = 0;
+            string _extqry = string.Empty;
             foreach (KeyValuePair<string, SingleTable> entry in FormData.MultipleTables)
             {
                 foreach (SingleRow row in entry.Value)
                 {
-                    string _qry = "INSERT INTO {0} ({1} eb_created_by, eb_created_at, eb_loc_id {3} ) VALUES ({2} :eb_createdby, " + DataDB.EB_CURRENT_TIMESTAMP + ", :eb_loc_id {4});";
-                    if (DataDB.Vendor == DatabaseVendors.MYSQL && entry.Key == this.FormSchema.MasterTable)
-                    {
-                        _qry += "SELECT eb_persist_currval('" + entry.Key + "_id_seq');";
-                    }
-                    string _tblname = entry.Key;
                     string _cols = string.Empty;
                     string _values = string.Empty;
 
                     foreach (SingleColumn rField in row.Columns)
                     {
-                        if (rField.Control is EbAutoId)
-                        {
-                            _cols += string.Concat(rField.Name, ", ");
-                            _values += string.Format("CONCAT(:{0}_{1}, (SELECT LPAD(CAST((COUNT(*) + 1) AS CHAR(12)), {2}, '0') FROM {3} WHERE {0} LIKE '{4}%')),", rField.Name, i, (rField.Control as EbAutoId).Pattern.SerialLength, entry.Key, rField.Value);
-                            param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
-                        }
-                        else if (rField.Control != null)
-                        {
-                            _cols += string.Concat(rField.Name, ", ");
-                            _values += string.Concat(":", rField.Name, "_", i, ", ");
-                            if (rField.Value == null)
-                            {
-                                var p = DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type);
-                                p.Value = DBNull.Value;
-                                param.Add(p);
-                            }
-                            else if (rField.Control is EbDate || rField.Control is EbDGDateColumn)
-                            {
-                                EbDateType _type = rField.Control is EbDate ? (rField.Control as EbDate).EbDateType : (rField.Control as EbDGDateColumn).EbDateType;
-                                DateShowFormat _showtype = rField.Control is EbDate ? (rField.Control as EbDate).ShowDateAs_ : (rField.Control as EbDGDateColumn).EbDate.ShowDateAs_;
-                                if (_type == EbDateType.Date)
-                                {
-                                    if (_showtype == DateShowFormat.Year_Month)
-                                        rField.Value = DateTime.ParseExact(rField.Value.ToString(), "MM/yyyy", CultureInfo.InvariantCulture);
-                                    else
-                                        rField.Value = DateTime.ParseExact(rField.Value.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
-                                }
-                                else
-                                {
-                                    DateTime dt = DateTime.ParseExact(rField.Value.ToString(), "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
-                                    rField.Value = dt.ConvertToUtc(this.UserObj.Preference.TimeZone);
-                                }
-                                param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, EbDbTypes.DateTime, rField.Value));
-                            }
-                            else
-                                param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
-                        }
+                        if (rField.Control != null)
+                            rField.Control.ParameterizeControl(DataDB, param, this.TableName, rField, true, ref i, ref _cols, ref _values, ref _extqry, this.UserObj);
+                        else
+                            ParameterizeUnknown(DataDB, param, rField, true, ref i, ref _cols, ref _values);
                     }
-                    i++;
 
-                    if (count == 0)
-                        _qry = _qry.Replace("{3}", "").Replace("{4}", "");
-                    else
-                        _qry = _qry.Replace("{3}", string.Concat(",", this.TableName, "_id")).Replace("{4}", string.Concat(", (SELECT eb_currval('", this.TableName, "_id_seq'" + "))"));
-                    fullqry += string.Format(_qry, _tblname, _cols, _values);
+                    string _qry = GetInsertQuery(DataDB, entry.Key, this.TableName);
+                    fullqry += string.Format(_qry, _cols, _values);
                 }
-                count++;
-
             }
 
-            //------------------File Uploader entries------------------------------------
-            string EbObId = this.RefId.Split("-")[3];
-            List<string> InnerVals = new List<string>();
-            List<string> Innercxt = new List<string>();
-            List<string> InnerIds = new List<string>();
-            foreach (KeyValuePair<string, SingleTable> entry in FormData.ExtendedTables)
-            {
-                foreach (SingleRow row in entry.Value)
-                {
-                    string cn = entry.Key + "_" + i.ToString();
-                    i++;
-                    InnerVals.Add(string.Format("( CONCAT('{0}_', TRIM(CAST(eb_currval('{1}_id_seq') AS CHAR(32))), '_{2}'))", EbObId, this.TableName, entry.Key));
-                    param.Add(DataDB.GetNewParameter(cn, EbDbTypes.Decimal, row.Columns[0].Value));
-                    InnerIds.Add(":" + cn);
-                }
-                Innercxt.Add("context = CONCAT('" + EbObId + "_', TRIM(CAST(eb_currval('" + this.TableName + "_id_seq') AS CHAR(32))), '_" + entry.Key + "')");
-            }
-
-            if (InnerVals.Count > 0)
-            {
-
-                for (int k = 0; k < InnerVals.Count; k++)
-                {
-                    fullqry += string.Format(@"UPDATE 
-                                            eb_files_ref AS t
-                                        SET
-                                            context = {0}                                        
-                                        WHERE
-                                           t.id = {1} AND t.eb_del = 'F';", InnerVals[k], InnerIds[k]);
-                }
-
-                fullqry += string.Format(@"UPDATE eb_files_ref 
-                                        SET eb_del='T' 
-                                        WHERE ({0}) AND eb_del='F' AND id NOT IN ({1});", Innercxt.Join(" OR "), InnerIds.Join(","));
-            }
-            //-----------------------------------------------------------------------------
+            fullqry += _extqry;
+            fullqry += EbFileUploader.GetUpdateQuery(DataDB, param, FormData.ExtendedTables, this.TableName, this.RefId.Split("-")[3], ref i, 0);
 
             param.Add(DataDB.GetNewParameter("eb_createdby", EbDbTypes.Int32, this.UserObj.UserId));
             param.Add(DataDB.GetNewParameter("eb_loc_id", EbDbTypes.Int32, this.LocationId));
-            fullqry += string.Concat("SELECT eb_currval('", this.TableName, "_id_seq');");
+            fullqry += string.Format("SELECT eb_currval('{0}_id_seq');", this.TableName);
 
             EbDataTable temp = DataDB.DoQuery(fullqry, param.ToArray());
             int _rowid = temp.Rows.Count > 0 ? Convert.ToInt32(temp.Rows[0][0]) : 0;
             return _rowid;
+        }
+
+        private bool ParameterizeUnknown(IDatabase DataDB, List<DbParameter> param, SingleColumn rField, bool ins, ref int i, ref string _col, ref string _val)
+        {
+            if (rField.Name.Equals("eb_row_num"))
+            {
+                if (rField.Value == null)
+                {
+                    var p = DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type);
+                    p.Value = DBNull.Value;
+                    param.Add(p);
+                }
+                else
+                {
+                    int v = Convert.ToInt32(rField.Value);
+                    param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, EbDbTypes.Decimal, v));
+                }
+                if (ins)
+                {
+                    _col += string.Concat(rField.Name, ", ");
+                    _val += string.Concat(":", rField.Name, "_", i, ", ");
+                }
+                else
+                    _col += string.Concat(rField.Name, "=:", rField.Name, "_", i, ", ");
+                i++;
+                return true;
+            }
+            else
+                Console.WriteLine("Unknown parameter found in formdata... \nName : " + rField.Name + "\nType : " + rField.Type + "\nValue : " + rField.Value);
+            return false;
         }
 
         //execute sql queries after form data save

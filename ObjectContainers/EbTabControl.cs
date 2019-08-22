@@ -27,6 +27,9 @@ namespace ExpressBase.Objects
                 padding : function(elementId, props) {
                     $(`#cont_${ elementId}.Eb-ctrlContainer > .tab-content >.tab-pane`).css('padding', `${props.Padding.Top}px ${props.Padding.Right}px ${props.Padding.Bottom}px ${props.Padding.Left}px`);
                 },
+                label : function(elementId, props) {
+                    $(`li[ebsid='${elementId}'] .eb-label-editable`).text(props.Title);
+                },
                 adjustPanesHeightToHighest : function(elementId, props) {
                     var maxH = 0;
                     let $panes = $(`#cont_${ elementId}.Eb-ctrlContainer > .tab-content >.tab-pane`);
@@ -124,7 +127,9 @@ this.Init = function(id)
 
             foreach (EbTabPane tab in Controls)
                 TabBtnHtml += @"
-            <li li-of='@ebsid@' @active><a data-toggle='tab' href='#@ebsid@'>@title@</a></li>".Replace("@title@", tab.Title).Replace("@ebsid@", tab.EbSid);
+            <li li-of='@ebsid@' ebsid='@ebsid@' @active><a data-toggle='tab' href='#@ebsid@'> <span class='eb-label-editable'>@title@</span><input id='@ebsid@lbltxtb' class='eb-lbltxtb' type='text'/> </a>
+                
+            </li>".Replace("@title@", tab.Title).Replace("@ebsid@", tab.EbSid);
 
             TabBtnHtml += @"
         </ul>
@@ -160,7 +165,13 @@ this.Init = function(id)
         public override List<EbControl> Controls { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [PropertyGroup("Identity")]
+        [OnChangeUIFunction("EbTabControl.label")]
+        [PropertyPriority(70)]
         public string Title { get; set; }
+
+        [JsonIgnore]
+        public override string Label { get; set; }
 
         public override string GetHtml()
         {
