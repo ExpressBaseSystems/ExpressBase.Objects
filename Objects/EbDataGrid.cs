@@ -43,6 +43,9 @@ namespace ExpressBase.Objects
         public bool IsShowSerialNumber { get; set; }
 
         [JsonIgnore]
+        public override EbScript OnChangeFn { get; set; }
+
+        [JsonIgnore]
         public override string OnChangeBindJSFn
         {
             get
@@ -289,6 +292,7 @@ $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this
         public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
 
         [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
         public override string InputControlType { get { return "EbTextBox"; } }
 
         [OnDeserialized]
