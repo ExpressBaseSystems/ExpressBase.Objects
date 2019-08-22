@@ -20,8 +20,6 @@ namespace ExpressBase.Objects
         #region Hidden Properties
 
         [HideInPropertyGrid]
-        [Alias("Readonly")]
-        [HelpText("Control will be Disabled/Readonly")]
         public override bool IsDisable { get; set; }
 
         [HideInPropertyGrid]
