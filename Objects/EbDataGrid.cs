@@ -42,7 +42,8 @@ namespace ExpressBase.Objects
         [Alias("Serial numbered")]
         public bool IsShowSerialNumber { get; set; }
 
-        [JsonIgnore]
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         public override EbScript OnChangeFn { get; set; }
 
         [JsonIgnore]
