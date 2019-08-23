@@ -17,6 +17,31 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.WebForm)]
     public class EbAutoId : EbControlUI
     {
+        #region Hidden Properties
+
+        [HideInPropertyGrid]
+        public override bool IsDisable { get; set; }
+
+        [HideInPropertyGrid]
+        public override bool DoNotPersist { get; set; }
+
+        [HideInPropertyGrid]
+        public override EbScript ValueExpr { get; set; }
+
+        [HideInPropertyGrid]
+        public override EbScript DefaultValueExpression { get; set; }
+
+        [HideInPropertyGrid]
+        public override List<EbValidator> Validators { get; set; }
+
+        [HideInPropertyGrid]
+        public override EbScript OnChangeFn { get; set; }
+
+        [HideInPropertyGrid]
+        public override EbScript VisibleExpr { get; set; }
+
+        #endregion
+
         public EbAutoId()
         {
         }
@@ -33,6 +58,7 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.Expandable)]
         public EbAutoIdPattern Pattern { get; set; }
         
+        [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.String; } set { } }
 
         //HideInPropertyGrid

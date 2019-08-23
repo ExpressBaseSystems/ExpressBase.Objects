@@ -109,6 +109,7 @@ namespace ExpressBase.Objects
         }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [HideInPropertyGrid]
         public override EbDbTypes EbDbType
         {
             get
@@ -140,20 +141,25 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [DefaultPropValue("100")]
         [Alias("DropdownWidth(%)")]
+        [Category("Appearance")]
         public int DropdownWidth { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [DefaultPropValue("100")]
+        [Category("Appearance")]
         public int DropdownHeight { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [HideInPropertyGrid]
         public int Value { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [HelpText("Specify minimum number of charecters to initiate search")]
+        [Category("Search Settings")]
         public int MinSeachLength { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [HideInPropertyGrid]
         public string Text { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
@@ -228,6 +234,9 @@ namespace ExpressBase.Objects
 
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [Category("Search Settings")]
+        [Alias("Search Method")]
+        [HelpText("Select Search Method - StartsWith, EndsWith, Contains or Exact Match")]
         public DefaultSearchFor DefaultSearchFor { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]

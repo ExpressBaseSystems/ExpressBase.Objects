@@ -19,6 +19,30 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
     public class EbFileUploader : EbControlUI
 	{
+        #region Hide From PropertyGrid
+
+        [HideInPropertyGrid]
+        public override bool DoNotPersist { get; set; }
+
+        [HideInPropertyGrid]
+        public override EbScript ValueExpr { get; set; }
+
+        [HideInPropertyGrid]
+        public override EbScript DefaultValueExpression { get; set; }
+
+        [HideInPropertyGrid]
+        public override List<EbValidator> Validators { get; set; }
+
+        [HideInPropertyGrid]
+        public override EbScript OnChangeFn { get; set; }
+
+        [HideInPropertyGrid]
+        public override EbScript VisibleExpr { get; set; }
+
+        [HideInPropertyGrid]
+        public override bool Unique { get; set; }
+
+        #endregion
 
         public EbFileUploader()
         {
