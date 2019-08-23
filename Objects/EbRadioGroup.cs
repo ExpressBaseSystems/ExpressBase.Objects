@@ -9,6 +9,7 @@ using ProtoBuf;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
@@ -67,6 +68,7 @@ namespace ExpressBase.Objects
         }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
 
         [HideInPropertyGrid]
@@ -100,6 +102,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.Collection)]
+        [Category("Appearance")]
         public bool RenderHorizontally { get; set; }
 
         [HideInPropertyGrid]

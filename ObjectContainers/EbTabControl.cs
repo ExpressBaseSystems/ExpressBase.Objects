@@ -68,7 +68,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.Collection)]
         [Alias("TabPanes")]
-        [PropertyGroup("test")]
+        [PropertyGroup("Core")]
         [UIproperty]
         [PropertyPriority(95)]
         [ListType(typeof(EbTabPane))]
@@ -89,6 +89,9 @@ namespace ExpressBase.Objects
 
         [JsonIgnore]
         public override string LabelForeColor { get; set; }
+
+        [JsonIgnore]
+        public override EbScript OnChangeFn { get; set; }
 
         [HideInPropertyGrid]
         [JsonIgnore]
@@ -128,15 +131,20 @@ this.Init = function(id)
 
             foreach (EbTabPane tab in Controls)
                 TabBtnHtml += @"
-            <li li-of='@ebsid@' ebsid='@ebsid@' class='@active ppbtn-cont'><a data-toggle='tab' href='#@ebsid@'><span class='eb-label-editable'>@title@</span><input id='@ebsid@lbltxtb' class='eb-lbltxtb' type='text'/>@ppbtn@</a>
-                
+            <li li-of='@ebsid@' ebsid='@ebsid@' @active>
+                <a data-toggle='tab' class='ppbtn-cont' href='#@ebsid@'>
+                    <span class='eb-label-editable'>@title@</span>
+                    <input id='@ebsid@lbltxtb' class='eb-lbltxtb' type='text'/>@ppbtn@
+                    <div class='ebtab-close-btn eb-fb-icon'><i class='fa fa-times' aria-hidden='true'></i></div>
+                </a>
+                <div class='ebtab-add-btn eb-fb-icon'><i class='fa fa-plus' aria-hidden='true'></i></div>                
             </li>".Replace("@title@", tab.Title).Replace("@ppbtn@", Common.HtmlConstants.CONT_PROP_BTN).Replace("@ebsid@", tab.EbSid);
 
             TabBtnHtml += @"
         </ul>
     </div>";
 
-            Regex regex = new Regex(Regex.Escape("@active"));
+            Regex regex = new Regex(Regex.Escape("class='active'"));
             TabBtnHtml = regex.Replace(TabBtnHtml, "active", 1).Replace("@active", "");
 
 
@@ -155,6 +163,9 @@ this.Init = function(id)
     [HideInToolBox]
     public class EbTabPane : EbControlContainer
     {
+        [JsonIgnore]
+        public override EbScript OnChangeFn { get; set; }
+
         public EbTabPane()
         {
             this.Controls = new List<EbControl>();

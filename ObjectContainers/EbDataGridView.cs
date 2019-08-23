@@ -37,6 +37,9 @@ namespace ExpressBase.Objects
         public Dictionary<int, EbObjectWrapper> DslistAll { get; set; }
 
 
+        [JsonIgnore]
+        public override EbScript OnChangeFn { get; set; }
+
 
         public string Token { get; set; }
 

@@ -54,6 +54,7 @@ namespace ExpressBase.Objects
     public class EbDate : EbControlUI
     {
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return (EbDbTypes)this.EbDateType; } }
 
         public EbDate()

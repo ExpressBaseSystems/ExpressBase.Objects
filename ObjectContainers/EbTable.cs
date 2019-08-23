@@ -65,6 +65,9 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         public override string LabelForeColor { get; set; }
 
+        [JsonIgnore]
+        public override EbScript OnChangeFn { get; set; }
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.Expandable)]
         [OnChangeUIFunction("EbTable.padding")]

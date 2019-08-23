@@ -43,6 +43,9 @@ namespace ExpressBase.Objects
         public bool IsShowSerialNumber { get; set; }
 
         [JsonIgnore]
+        public override EbScript OnChangeFn { get; set; }
+
+        [JsonIgnore]
         public override string OnChangeBindJSFn
         {
             get
@@ -233,6 +236,7 @@ $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this
         public string DBareHtml { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
         public virtual string InputControlType { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
@@ -289,6 +293,7 @@ $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this
         public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
 
         [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
         public override string InputControlType { get { return "EbTextBox"; } }
 
         [OnDeserialized]
@@ -308,6 +313,7 @@ $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this
         public override EbDbTypes EbDbType { get { return EbDbTypes.Decimal; } }
 
         [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
         public override string InputControlType { get { return "EbNumeric"; } }
 
         [EnableInBuilder(BuilderType.WebForm)]
@@ -327,6 +333,7 @@ $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this
         public override EbDbTypes EbDbType { get { return EbDbTypes.Boolean; } }
 
         [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
         public override string InputControlType { get { return "EbCheckBox"; } }
     }
 
@@ -399,6 +406,7 @@ $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this
 $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, p2).siblings('.nullable-check').on('change', `input[type=checkbox]`, p2);"; } set { } }
 
         [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
         public override string InputControlType { get { return "EbDate"; } }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
@@ -466,6 +474,7 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, p2).
         public override string GetDisplayMemberJSfn { get { return @" return $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp] :selected`).text(); "; } set { } }
 
         [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
         public override string InputControlType { get { return "EbSimpleSelect"; } }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
@@ -573,6 +582,7 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, p2).
         }
 
         [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
         public override string InputControlType { get { return "EbUserControl"; } }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
@@ -697,6 +707,7 @@ else {pg.MakeReadWrite('ValueMember');}")]
         public DVBaseColumn ValueMember { get { return this.EbPowerSelect.ValueMember; } set { this.EbPowerSelect.ValueMember = value; } }
 
         [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
         public override string InputControlType { get { return "EbPowerSelect"; } }
 
         public override string GetBareHtml()
