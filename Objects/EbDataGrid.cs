@@ -432,9 +432,9 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, p2).
         }
 
 
-        public override bool ParameterizeControl(IDatabase DataDB, List<DbParameter> param, string tbl, SingleColumn rField, bool ins, ref int i, ref string _col, ref string _val, ref string _extqry, User usr)
+        public override bool ParameterizeControl(IDatabase DataDB, List<DbParameter> param, string tbl, SingleColumn cField, bool ins, ref int i, ref string _col, ref string _val, ref string _extqry, User usr, SingleColumn ocF)
         {
-            return this.EbDate.ParameterizeControl(DataDB, param, tbl, rField, ins, ref i, ref _col, ref _val, ref _extqry, usr);
+            return this.EbDate.ParameterizeControl(DataDB, param, tbl, cField, ins, ref i, ref _col, ref _val, ref _extqry, usr, ocF);
         }
     }
 

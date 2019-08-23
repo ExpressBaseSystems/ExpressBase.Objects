@@ -14,9 +14,14 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     [DataContract]
     public class GetDbTablesRequest : IReturn<GetDbTablesResponse>, IEbSSRequest
     {
+        [DataMember(Order = 1)]
         public string SolnId { get; set; }
-
+        [DataMember(Order = 2)]
         public int UserId { get; set; }
+        [DataMember(Order = 3)]
+        public bool IsAdminOwn { get; set; }
+        [DataMember(Order = 4)]
+        public string ClientSolnid  { get; set; }
     }
 
     [DataContract]
@@ -32,7 +37,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string DB_Name { get; set; }
 
         [DataMember(Order = 4)]
-        public int TableCount { get; set; }       
+        public int TableCount { get; set; }
+
+        [DataMember(Order = 5)]
+        public List<string> SolutionCollection { get; set; }       
 
     }
 
@@ -41,6 +49,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         [DataMember(Order = 1)]
         public string Query { get; set; }
+
+        [DataMember(Order = 2)]
+        public bool IsAdminOwn { get; set; }
+
+        [DataMember(Order = 3)]
+        public string ClientSolnid { get; set; }
     }
 
     [DataContract]
@@ -48,6 +62,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         [DataMember(Order = 1)]
         public string Query { get; set; }
+
+
+        [DataMember(Order = 2)]
+        public bool IsAdminOwn { get; set; }
+
+        [DataMember(Order = 3)]
+        public string ClientSolnid { get; set; }
     }
 
     [DataContract]
@@ -55,6 +76,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         [DataMember(Order = 1)]
         public string Query { get; set; }
+
+        [DataMember(Order = 2)]
+        public bool IsAdminOwn { get; set; }
+
+        [DataMember(Order = 3)]
+        public string ClientSolnid { get; set; }
     }
 
     [DataContract]
@@ -62,6 +89,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         [DataMember(Order = 1)]
         public string Query { get; set; }
+
+        [DataMember(Order = 2)]
+        public bool IsAdminOwn { get; set; }
+
+        [DataMember(Order = 3)]
+        public string ClientSolnid { get; set; }
     }
 
     [DataContract]
@@ -69,6 +102,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         [DataMember(Order = 1)]
         public string Query { get; set; }
+
+        [DataMember(Order = 2)]
+        public bool IsAdminOwn { get; set; }
+
+        [DataMember(Order = 3)]
+        public string ClientSolnid { get; set; }
     }
 
     [DataContract]
@@ -76,6 +115,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         [DataMember(Order = 1)]
         public string Query { get; set; }
+
+        [DataMember(Order = 2)]
+        public bool IsAdminOwn { get; set; }
+
+        [DataMember(Order = 3)]
+        public string ClientSolnid { get; set; }
     }
 
     [DataContract]
@@ -83,6 +128,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         [DataMember(Order = 1)]
         public string Query { get; set; }
+
+        [DataMember(Order = 2)]
+        public bool IsAdminOwn { get; set; }
+
+        [DataMember(Order = 3)]
+        public string ClientSolnid { get; set; }
     }
 
     [DataContract]
@@ -90,6 +141,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         [DataMember(Order = 1)]
         public string Query { get; set; }
+
+        [DataMember(Order = 2)]
+        public bool IsAdminOwn { get; set; }
+
+        [DataMember(Order = 3)]
+        public string ClientSolnid { get; set; }
     }
 
     [DataContract]
