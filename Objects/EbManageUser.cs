@@ -146,22 +146,43 @@ this.Init = function(id)
                 return string.Format("SELECT * FROM eb_security_user(:eb_createdby, {0});", param);
         }
 
-        public override bool ParameterizeControl(IDatabase DataDB, List<DbParameter> param, string tbl, SingleColumn rField, bool ins, ref int i, ref string _col, ref string _val, ref string _extqry, User usr)
+        public override bool ParameterizeControl(IDatabase DataDB, List<DbParameter> param, string tbl, SingleColumn cField, bool ins, ref int i, ref string _col, ref string _val, ref string _extqry, User usr, SingleColumn ocF)
         {
             string c = string.Empty;
             string ep = string.Empty;
-            Dictionary<string, string> _d = JsonConvert.DeserializeObject<Dictionary<string, string>>(rField.Value);
-
+            Dictionary<string, string> _d = JsonConvert.DeserializeObject<Dictionary<string, string>>(cField.Value);
+            if (ins)
+            {
+                string sql = "SELECT id FROM eb_users WHERE LOWER(email) LIKE LOWER(:email) AND eb_del = 'F' AND (statusid = 0 OR statusid = 1 OR statusid = 2);";
+                DbParameter[] parameters = new DbParameter[] { DataDB.GetNewParameter("email", EbDbTypes.String, _d["email"]) };
+                EbDataTable dt = DataDB.DoQuery(sql, parameters);
+                if (dt.Rows.Count > 0)
+                    return false;// raise an exception to notify email already exists
+            }
+            else
+            {
+                Dictionary<string, string> _od = JsonConvert.DeserializeObject<Dictionary<string, string>>(ocF.Value);
+                _d["id"] = _od["id"];
+                _d["email"] = _od["email"];
+            }
             for(int k = 0; k < this.FuncParam.Length; k++, i++)
             {
                 if (_d.ContainsKey(this.FuncParam[k].Name))
                 {
-                    this.FuncParam[k].Value = _d[this.FuncParam[k].Name]; //validation on this data must be done - imp
+                    this.FuncParam[k].Value = _d[this.FuncParam[k].Name];
                 }
                 c += string.Concat(":", this.FuncParam[k].Name, "_", i, ", ");
-                var p = DataDB.GetNewParameter(this.FuncParam[k].Name + "_" + i, this.FuncParam[k].Type);
-                p.Value = this.FuncParam[k].Value;
-                param.Add(p);
+                if(this.FuncParam[k].Value == DBNull.Value)
+                {
+                    var p = DataDB.GetNewParameter(this.FuncParam[k].Name + "_" + i, this.FuncParam[k].Type);
+                    p.Value = this.FuncParam[k].Value;
+                    param.Add(p);
+                }
+                else
+                {
+                    param.Add(DataDB.GetNewParameter(this.FuncParam[k].Name + "_" + i, this.FuncParam[k].Type, this.FuncParam[k].Value));
+                }
+                
                 if (this.FuncParam[k].Name.Equals("email"))
                     ep = string.Concat(":", this.FuncParam[k].Name, "_", i);
             }
