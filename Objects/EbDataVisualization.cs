@@ -158,6 +158,10 @@ namespace ExpressBase.Objects
         public string Pippedfrom { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
+        [HideInPropertyGrid]
+        public bool AutoGen { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
         [DefaultPropValue("true")]
         [PropertyGroup("Paging")]
         [OnChangeExec(@"
@@ -201,7 +205,27 @@ namespace ExpressBase.Objects
             {
                 Console.WriteLine("AfterRedisGet " + e.Message);
             }
-        }        
+        }
+
+        public void AfterRedisGet(IRedisClient Redis, Service service)
+        {
+            try
+            {
+                this.EbDataSource = Redis.Get<EbDataReader>(this.DataSourceRefId);
+                if (this.EbDataSource == null || this.EbDataSource.Sql == null || this.EbDataSource.Sql == string.Empty)
+                {
+                    var result = service.Gateway.Send<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = this.DataSourceRefId });
+                    this.EbDataSource = EbSerializers.Json_Deserialize(result.Data[0].Json);
+                    Redis.Set<EbDataReader>(this.DataSourceRefId, this.EbDataSource);
+                }
+                if (this.EbDataSource.FilterDialogRefId != string.Empty)
+                    this.EbDataSource.AfterRedisGet(Redis, service);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("AfterRedisGet " + e.Message);
+            }
+        }
 
         //public EbDataSet DoQueries4DataVis(string sql, IEbConnectionFactory df, params DbParameter[] parameters)
         //{
@@ -507,6 +531,37 @@ namespace ExpressBase.Objects
         {
             this.AfterRedisGetBasicInfo(serviceClient, redis);
         }
+
+        public  void BeforeSave(Service service)
+        {
+            this.AfterRedisGetBasicInfoByService(service);
+        }
+
+        public void AfterRedisGetBasicInfoByService(Service service)
+        {
+            this.FormLinks = new List<FormLink>();
+            foreach (DVBaseColumn col in this.Columns)
+            {
+                if (col.Check4FormLink())
+                {
+                    try
+                    {
+                        this.WebForm = Redis.Get<EbWebForm>(col.LinkRefId);
+                        if (this.WebForm == null)
+                        {
+                            var result = service.Gateway.Send<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = col.LinkRefId });
+                            this.WebForm = EbSerializers.Json_Deserialize(result.Data[0].Json);
+                            Redis.Set<EbWebForm>(col.LinkRefId, this.WebForm);
+                        }
+                        this.FormLinks.Add(new FormLink { DisplayName = this.WebForm.DisplayName, Refid = col.LinkRefId, Params = col.FormParameters });
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("AfterRedisGetBasicInfo " + e.Message);
+                    }
+                }
+            }
+        }
     }
 
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
@@ -732,6 +787,28 @@ namespace ExpressBase.Objects
         public int Zoomlevel { get; set; }
 
         public static EbOperations Operations = MapOperations.Instance;
+
+        public override string DiscoverRelatedRefids()
+        {
+            if (!DataSourceRefId.IsEmpty())
+            {
+                EbDataReader ds = EbDataSource;
+                if (ds is null)
+                    return DataSourceRefId;
+            }
+            return "";
+        }
+
+        public override void ReplaceRefid(Dictionary<string, string> RefidMap)
+        {
+            if (!DataSourceRefId.IsEmpty())
+            {
+                if (RefidMap.ContainsKey(DataSourceRefId))
+                    DataSourceRefId = RefidMap[DataSourceRefId];
+                else
+                    DataSourceRefId = "failed-to-update-";
+            }
+        }
 
         public EbGoogleMap()
         {

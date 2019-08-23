@@ -147,28 +147,10 @@ this.Init = function(id)
 		public EbCheckBox() { }
 
         [JsonIgnore]
-        public override string GetValueJSfn
-        {
-            get
-            {
-                return @"
-                    return $('#' + this.EbSid_CtxId).is(':checked');
-                ";
-            }
-            set { }
-        }
+        public override string GetValueJSfn { get { return @" return $('#' + this.EbSid_CtxId).is(':checked'); "; } set { } }
 
         [JsonIgnore]
-        public override string SetValueJSfn
-        {
-            get
-            {
-                return @"
-                    return $('#' + this.EbSid_CtxId).prop('checked', p1 ==='true').trigger('change');
-                ";
-            }
-            set { }
-        }
+        public override string SetValueJSfn { get { return @" return $('#' + this.EbSid_CtxId).prop('checked', p1 ==='true').trigger('change'); "; } set { } }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
 		public override string Label { get; set; }

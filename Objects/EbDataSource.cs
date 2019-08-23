@@ -104,6 +104,24 @@ namespace ExpressBase.Objects
             }
         }
 
+        public void AfterRedisGet(IRedisClient Redis, Service service)
+        {
+            try
+            {
+                this.FilterDialog = Redis.Get<EbFilterDialog>(this.FilterDialogRefId);
+                if (this.FilterDialog == null && this.FilterDialogRefId != "")
+                {
+                    var result = service.Gateway.Send<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = this.FilterDialogRefId });
+                    this.FilterDialog = EbSerializers.Json_Deserialize(result.Data[0].Json);
+                    Redis.Set<EbFilterDialog>(this.FilterDialogRefId, this.FilterDialog);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Exception:" + e.ToString());
+            }
+        }
+
         public override void ReplaceRefid(Dictionary<string, string> RefidMap)
         {
             if (!FilterDialogRefId.IsEmpty())
