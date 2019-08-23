@@ -989,12 +989,15 @@ namespace ExpressBase.Objects
                     int _rowId = Convert.ToInt32(row.RowId);
                     if (_rowId > 0)
                     {                        
-                        foreach (SingleColumn rField in row.Columns)
+                        foreach (SingleColumn cField in row.Columns)
                         {
-                            if (rField.Control != null)
-                                rField.Control.ParameterizeControl(DataDB, param, this.TableName, rField, false, ref i, ref _colvals, ref _temp, ref _extqry, this.UserObj);
+                            if (cField.Control != null)
+                            {
+                                SingleColumn ocF = this.FormDataBackup.MultipleTables[entry.Key].Find(e => e.RowId == row.RowId).Columns.Find(e => e.Name.Equals(cField.Name));
+                                cField.Control.ParameterizeControl(DataDB, param, this.TableName, cField, false, ref i, ref _colvals, ref _temp, ref _extqry, this.UserObj, ocF);
+                            }
                             else
-                                ParameterizeUnknown(DataDB, param, rField, false, ref i, ref _colvals, ref _temp);
+                                ParameterizeUnknown(DataDB, param, cField, false, ref i, ref _colvals, ref _temp);
                         }
 
                         string _qry = this.GetUpdateQuery(DataDB, entry.Key, this.TableName, row.IsDelete);
@@ -1005,12 +1008,12 @@ namespace ExpressBase.Objects
                         string _cols = string.Empty;
                         string _vals = string.Empty;
 
-                        foreach (SingleColumn rField in row.Columns)
+                        foreach (SingleColumn cField in row.Columns)
                         {
-                            if (rField.Control != null)
-                                rField.Control.ParameterizeControl(DataDB, param, this.TableName, rField, true, ref i, ref _cols, ref _vals, ref _extqry, this.UserObj);
+                            if (cField.Control != null)
+                                cField.Control.ParameterizeControl(DataDB, param, this.TableName, cField, true, ref i, ref _cols, ref _vals, ref _extqry, this.UserObj, null);
                             else
-                                ParameterizeUnknown(DataDB, param, rField, true, ref i, ref _cols, ref _vals);
+                                ParameterizeUnknown(DataDB, param, cField, true, ref i, ref _cols, ref _vals);
                         }
                         string _qry = GetInsertQuery(DataDB, entry.Key, this.TableName);
                         fullqry += string.Format(_qry, _cols, _vals);
@@ -1044,12 +1047,12 @@ namespace ExpressBase.Objects
                     string _cols = string.Empty;
                     string _values = string.Empty;
 
-                    foreach (SingleColumn rField in row.Columns)
+                    foreach (SingleColumn cField in row.Columns)
                     {
-                        if (rField.Control != null)
-                            rField.Control.ParameterizeControl(DataDB, param, this.TableName, rField, true, ref i, ref _cols, ref _values, ref _extqry, this.UserObj);
+                        if (cField.Control != null)
+                            cField.Control.ParameterizeControl(DataDB, param, this.TableName, cField, true, ref i, ref _cols, ref _values, ref _extqry, this.UserObj, null);
                         else
-                            ParameterizeUnknown(DataDB, param, rField, true, ref i, ref _cols, ref _values);
+                            ParameterizeUnknown(DataDB, param, cField, true, ref i, ref _cols, ref _values);
                     }
 
                     string _qry = GetInsertQuery(DataDB, entry.Key, this.TableName);
@@ -1071,33 +1074,33 @@ namespace ExpressBase.Objects
             return _rowid;
         }
 
-        private bool ParameterizeUnknown(IDatabase DataDB, List<DbParameter> param, SingleColumn rField, bool ins, ref int i, ref string _col, ref string _val)
+        private bool ParameterizeUnknown(IDatabase DataDB, List<DbParameter> param, SingleColumn cField, bool ins, ref int i, ref string _col, ref string _val)
         {
-            if (rField.Name.Equals("eb_row_num"))
+            if (cField.Name.Equals("eb_row_num"))
             {
-                if (rField.Value == null)
+                if (cField.Value == null)
                 {
-                    var p = DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type);
+                    var p = DataDB.GetNewParameter(cField.Name + "_" + i, (EbDbTypes)cField.Type);
                     p.Value = DBNull.Value;
                     param.Add(p);
                 }
                 else
                 {
-                    int v = Convert.ToInt32(rField.Value);
-                    param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, EbDbTypes.Decimal, v));
+                    int v = Convert.ToInt32(cField.Value);
+                    param.Add(DataDB.GetNewParameter(cField.Name + "_" + i, EbDbTypes.Decimal, v));
                 }
                 if (ins)
                 {
-                    _col += string.Concat(rField.Name, ", ");
-                    _val += string.Concat(":", rField.Name, "_", i, ", ");
+                    _col += string.Concat(cField.Name, ", ");
+                    _val += string.Concat(":", cField.Name, "_", i, ", ");
                 }
                 else
-                    _col += string.Concat(rField.Name, "=:", rField.Name, "_", i, ", ");
+                    _col += string.Concat(cField.Name, "=:", cField.Name, "_", i, ", ");
                 i++;
                 return true;
             }
             else
-                Console.WriteLine("Unknown parameter found in formdata... \nName : " + rField.Name + "\nType : " + rField.Type + "\nValue : " + rField.Value);
+                Console.WriteLine("Unknown parameter found in formdata... \nName : " + cField.Name + "\nType : " + cField.Type + "\nValue : " + cField.Value);
             return false;
         }
 
@@ -1122,18 +1125,18 @@ namespace ExpressBase.Objects
                 {
                     if (item.Value.Count == 0)
                         continue;
-                    foreach (SingleColumn rField in item.Value[item.Value.Count - 1].Columns)
+                    foreach (SingleColumn cField in item.Value[item.Value.Count - 1].Columns)
                     {
-                        if (q.Contains(":" + item.Key + "_" + rField.Name))
+                        if (q.Contains(":" + item.Key + "_" + cField.Name))
                         {
-                            if (rField.Value == null)
+                            if (cField.Value == null)
                             {
-                                var p = DataDB.GetNewParameter(item.Key + "_" + rField.Name, (EbDbTypes)rField.Type);
+                                var p = DataDB.GetNewParameter(item.Key + "_" + cField.Name, (EbDbTypes)cField.Type);
                                 p.Value = DBNull.Value;
                                 param.Add(p);
                             }
                             else
-                                param.Add(DataDB.GetNewParameter(item.Key + "_" + rField.Name, (EbDbTypes)rField.Type, rField.Value));
+                                param.Add(DataDB.GetNewParameter(item.Key + "_" + cField.Name, (EbDbTypes)cField.Type, cField.Value));
                         }
                     }
                 }
