@@ -382,7 +382,7 @@ namespace ExpressBase.Objects
             return query;
         }
 
-        private string GetInsertQuery(IDatabase DataDB, string tblName, string masterTbl)
+        private string GetInsertQuery(IDatabase DataDB, string tblName, string masterTbl, bool isIns)
         {
             string _qry;
             if (tblName.Equals(masterTbl))
@@ -392,8 +392,10 @@ namespace ExpressBase.Objects
                 if (DataDB.Vendor == DatabaseVendors.MYSQL)
                     _qry += string.Format("SELECT eb_persist_currval('{0}_id_seq');", tblName);
             }
+            else if(isIns)
+                _qry = string.Format("INSERT INTO {0} ({3} eb_created_by, eb_created_at, eb_loc_id, {2}_id) VALUES ({4} :eb_createdby, {1}, :eb_loc_id , (SELECT eb_currval('{2}_id_seq')));", tblName, DataDB.EB_CURRENT_TIMESTAMP, masterTbl, "{0}", "{1}");
             else
-                _qry = string.Format("INSERT INTO {0} ({3} eb_created_by, eb_created_at, eb_loc_id, {2}_id) VALUES ({4} :eb_createdby, {1}, :eb_loc_id , (SELECT eb_currval('{2}_id_seq'" + ")));", tblName, DataDB.EB_CURRENT_TIMESTAMP, masterTbl, "{0}", "{1}");
+                _qry = string.Format("INSERT INTO {0} ({3} eb_created_by, eb_created_at, eb_loc_id, {2}_id) VALUES ({4} :eb_createdby, {1}, :eb_loc_id , :{2}_id);", tblName, DataDB.EB_CURRENT_TIMESTAMP, masterTbl, "{0}", "{1}");
             return _qry;
         }
 
@@ -1015,7 +1017,7 @@ namespace ExpressBase.Objects
                             else
                                 ParameterizeUnknown(DataDB, param, cField, true, ref i, ref _cols, ref _vals);
                         }
-                        string _qry = GetInsertQuery(DataDB, entry.Key, this.TableName);
+                        string _qry = GetInsertQuery(DataDB, entry.Key, this.TableName, false);
                         fullqry += string.Format(_qry, _cols, _vals);
                     }
                 }
@@ -1055,7 +1057,7 @@ namespace ExpressBase.Objects
                             ParameterizeUnknown(DataDB, param, cField, true, ref i, ref _cols, ref _values);
                     }
 
-                    string _qry = GetInsertQuery(DataDB, entry.Key, this.TableName);
+                    string _qry = GetInsertQuery(DataDB, entry.Key, this.TableName, true);
                     fullqry += string.Format(_qry, _cols, _values);
                 }
             }
