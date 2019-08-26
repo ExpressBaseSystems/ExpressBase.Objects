@@ -144,8 +144,8 @@ this.Init = function(id)
         </ul>
     </div>";
 
-            Regex regex = new Regex(Regex.Escape("class='active'"));
-            TabBtnHtml = regex.Replace(TabBtnHtml, "active", 1).Replace("@active", "");
+            Regex regex = new Regex(Regex.Escape("@active"));
+            TabBtnHtml = regex.Replace(TabBtnHtml, "class='active'", 1).Replace("@active", "");
 
 
             foreach (EbControl tab in Controls)
