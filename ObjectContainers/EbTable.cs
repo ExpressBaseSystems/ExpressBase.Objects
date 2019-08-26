@@ -32,7 +32,7 @@ namespace ExpressBase.Objects
                     $(`#cont_${ elementId}>table>tbody>tr>td`).css('padding', `${props.Padding.Top}px ${props.Padding.Right}px ${props.Padding.Bottom}px ${props.Padding.Left}px`);
                 },
                 verticalAlign : function(elementId, props) {
-                     $(`#${props.EbSid}`).css('vertical-align',getKeyByVal(EbEnums.VerticalAlign,props.VerticalAlign.toString()));
+                     $(`[ebsid=${props.EbSid}].form-render-table-Td`).css('vertical-align',getKeyByVal(EbEnums.VerticalAlign,props.VerticalAlign.toString()));
                 }
             }";
             }
@@ -156,6 +156,7 @@ this.Init = function(id){
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyGroup("Behavior")]
         [OnChangeUIFunction("EbTable.verticalAlign")]
+        [UIproperty]
         public VerticalAlign VerticalAlign { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
