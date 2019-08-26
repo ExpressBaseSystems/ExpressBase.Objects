@@ -42,7 +42,8 @@ namespace ExpressBase.Objects
         [Alias("Serial numbered")]
         public bool IsShowSerialNumber { get; set; }
 
-        [JsonIgnore]
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         public override EbScript OnChangeFn { get; set; }
 
         [JsonIgnore]
@@ -106,6 +107,16 @@ $.each(this.Controls.$values, function (i, col) {
         [PropertyPriority(98)]
         [DefaultPropValue("true")]
         public bool IsAddable { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [PropertyGroup("Behavior")]
+        public override bool IsDisable { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup("Behavior")]
+        [PropertyPriority(99)]
+        [HelpText("Set true if you want to hide the control.")]
+        public override bool Hidden { get; set; }
 
         [HideInPropertyGrid]
         [JsonIgnore]
@@ -432,9 +443,9 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, p2).
         }
 
 
-        public override bool ParameterizeControl(IDatabase DataDB, List<DbParameter> param, string tbl, SingleColumn rField, bool ins, ref int i, ref string _col, ref string _val, ref string _extqry, User usr)
+        public override bool ParameterizeControl(IDatabase DataDB, List<DbParameter> param, string tbl, SingleColumn cField, bool ins, ref int i, ref string _col, ref string _val, ref string _extqry, User usr, SingleColumn ocF)
         {
-            return this.EbDate.ParameterizeControl(DataDB, param, tbl, rField, ins, ref i, ref _col, ref _val, ref _extqry, usr);
+            return this.EbDate.ParameterizeControl(DataDB, param, tbl, cField, ins, ref i, ref _col, ref _val, ref _extqry, usr, ocF);
         }
     }
 

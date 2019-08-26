@@ -104,7 +104,7 @@ namespace ExpressBase.Objects
         public override string GetDesignHtml()
         {
             this.Controls = new List<EbControl>();
-            this.Controls.Add(new EbTabPane { Name = "EbTab0TabPane0", Title = "pane1" });
+            this.Controls.Add(new EbTabPane { Name = "EbTab0TabPane0", Title = "pane0" });
             return GetHtml().RemoveCR().DoubleQuoted(); ;
         }
 
@@ -114,8 +114,8 @@ namespace ExpressBase.Objects
 this.Init = function(id)
 {
     let pane = new EbObjects.EbTabPane(this.EbSid + 'TabPane0');
-    pane.Name = 'pane1';
-    pane.Title = 'pane1';
+    pane.Name = 'pane0';
+    pane.Title = 'pane0';
     this.Controls.$values.push(pane);
 };";
         }
@@ -144,8 +144,8 @@ this.Init = function(id)
         </ul>
     </div>";
 
-            Regex regex = new Regex(Regex.Escape("class='active'"));
-            TabBtnHtml = regex.Replace(TabBtnHtml, "active", 1).Replace("@active", "");
+            Regex regex = new Regex(Regex.Escape("@active"));
+            TabBtnHtml = regex.Replace(TabBtnHtml, "class='active'", 1).Replace("@active", "");
 
 
             foreach (EbControl tab in Controls)

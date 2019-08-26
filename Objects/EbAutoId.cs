@@ -147,13 +147,13 @@ namespace ExpressBase.Objects
         
         public override string EnableJSfn { get { return @""; } set { } }
 
-        public override bool ParameterizeControl(IDatabase DataDB, List<DbParameter> param, string tbl, SingleColumn rField, bool ins, ref int i, ref string _col, ref string _val, ref string _extqry, User usr)
+        public override bool ParameterizeControl(IDatabase DataDB, List<DbParameter> param, string tbl, SingleColumn cField, bool ins, ref int i, ref string _col, ref string _val, ref string _extqry, User usr, SingleColumn ocF)
         {
             if (ins)
             {
-                _col += string.Concat(rField.Name, ", ");
-                _val += string.Format("CONCAT(:{0}_{1}, (SELECT LPAD(CAST((COUNT(*) + 1) AS CHAR(12)), {2}, '0') FROM {3} WHERE {0} LIKE '{4}%')),", rField.Name, i, this.Pattern.SerialLength, tbl, rField.Value);
-                param.Add(DataDB.GetNewParameter(rField.Name + "_" + i, (EbDbTypes)rField.Type, rField.Value));
+                _col += string.Concat(cField.Name, ", ");
+                _val += string.Format("CONCAT(:{0}_{1}, (SELECT LPAD(CAST((COUNT(*) + 1) AS CHAR(12)), {2}, '0') FROM {3} WHERE {0} LIKE '{4}%')),", cField.Name, i, this.Pattern.SerialLength, tbl, cField.Value);
+                param.Add(DataDB.GetNewParameter(cField.Name + "_" + i, (EbDbTypes)cField.Type, cField.Value));
                 i++;
                 return true;
             }
