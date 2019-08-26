@@ -27,6 +27,19 @@ namespace ExpressBase.Objects
             this.Validators = new List<EbValidator>();
         }
 
+        public override string UIchangeFns
+        {
+            get
+            {
+                return @"EbDataGrid = {
+                title : function(elementId, props) {
+                    console.log(454547777777777777);
+                    $(`[ebsid=${elementId}]th .eb-label-editable`).text(props.Title);
+                }
+            }";
+            }
+        }
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [DefaultPropValue("200")]
         [PropertyGroup("Identity")]
@@ -138,7 +151,11 @@ $.each(this.Controls.$values, function (i, col) {
             foreach (EbDGColumn col in Controls)
             {
                 if (!col.Hidden)
-                    html += string.Concat("<th class='ppbtn-cont ebResizable' ebsid='@ebsid@' style='width: @Width@; @bg@' @type@ title='", col.Title, "'><span class='grid-col-title'>", col.Title, "</span>@req@ @ppbtn@</th>")
+                    html += string.Concat("<th class='ppbtn-cont ebResizable' ebsid='@ebsid@' style='width: @Width@; @bg@' @type@ title='", col.Title, @"'>
+                                                <span class='grid-col-title eb-label-editable'>", col.Title, @"</span>
+                                                <input id='@ebsid@lbltxtb' class='eb-lbltxtb' type='text'/>
+                                                @req@ @ppbtn@" +
+                                            "</th>")
                         .Replace("@ppbtn@", Common.HtmlConstants.CONT_PROP_BTN)
                         .Replace("@req@", (col.Required ? "<sup style='color: red'>*</sup>" : string.Empty))
                         .Replace("@ebsid@", col.EbSid)
@@ -240,6 +257,8 @@ $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this
 
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [UIproperty]
+        [OnChangeUIFunction("EbDataGrid.title")]
         public string Title { get; set; }
 
         [HideInPropertyGrid]
