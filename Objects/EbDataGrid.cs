@@ -139,12 +139,12 @@ $.each(this.Controls.$values, function (i, col) {
             {
                 if (!col.Hidden)
                     html += string.Concat("<th class='ppbtn-cont ebResizable' ebsid='@ebsid@' style='width: @Width@; @bg@' @type@ title='", col.Title, "'><span class='grid-col-title'>", col.Title, "</span>@req@ @ppbtn@</th>")
+                        .Replace("@ppbtn@", Common.HtmlConstants.CONT_PROP_BTN)
                         .Replace("@req@", (col.Required ? "<sup style='color: red'>*</sup>" : string.Empty))
                         .Replace("@ebsid@", col.EbSid)
                         .Replace("@Width@", (col.Width <= 0) ? "auto" : col.Width.ToString() + "%")
                         .Replace("@type@", "type = '" + col.ObjType + "'")
-                        .Replace("@bg@", col.IsDisable ? "background-color:#fafafa; color:#555" : string.Empty)
-                        .Replace("@ppbtn@", Common.HtmlConstants.CONT_PROP_BTN);
+                        .Replace("@bg@", col.IsDisable ? "background-color:#fafafa; color:#555" : string.Empty);
             }
 
             html += @"

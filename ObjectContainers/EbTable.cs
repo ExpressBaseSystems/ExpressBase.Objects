@@ -185,10 +185,10 @@ this.Init = function(id){
                 html += ec.GetHtml();
 
             return (html + "</div></td>")
+                .Replace("@ppbtn@", Common.HtmlConstants.CONT_PROP_BTN)
                 .Replace("@name@", this.Name)
                 .Replace("@wperc@", (this.WidthPercentage != 0) ? this.WidthPercentage.ToString() + "%" : "auto")
-                .Replace("@ebsid@", this.EbSid)
-                .Replace("@ppbtn@", Common.HtmlConstants.CONT_PROP_BTN);
+                .Replace("@ebsid@", this.EbSid);
         }
     }
 
