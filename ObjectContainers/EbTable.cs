@@ -155,8 +155,8 @@ this.Init = function(id){
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyGroup("Behavior")]
-        [OnChangeUIFunction("EbTable.verticalAlign")]
         [UIproperty]
+        [OnChangeUIFunction("EbTable.verticalAlign")]
         public VerticalAlign VerticalAlign { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]

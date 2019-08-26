@@ -108,6 +108,16 @@ $.each(this.Controls.$values, function (i, col) {
         [DefaultPropValue("true")]
         public bool IsAddable { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [PropertyGroup("Behavior")]
+        public override bool IsDisable { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup("Behavior")]
+        [PropertyPriority(99)]
+        [HelpText("Set true if you want to hide the control.")]
+        public override bool Hidden { get; set; }
+
         [HideInPropertyGrid]
         [JsonIgnore]
         public override string ToolIconHtml { get { return "<i class='fa fa-table'></i>"; } set { } }
