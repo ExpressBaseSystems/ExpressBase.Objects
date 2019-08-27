@@ -133,12 +133,12 @@ this.Init = function(id)
             }
         }
 
-        public string GetSelectQuery(int verid)
+        public string GetSelectQuery()
         {
             string cols = string.Join(",", this.PersistingFields.Select(f => (f as MngUsrLocField).Name));
-            return string.Format("SELECT id,{0} FROM eb_users WHERE eb_ver_id = {1} AND eb_data_id = :id;", cols, verid);
+            return string.Format("SELECT id,{0} FROM eb_users WHERE eb_ver_id = :eb_ver_id AND eb_data_id = :id;", cols);
         }
-        public string GetSaveQuery(bool ins, string param, string mtbl, string pemail)
+        private string GetSaveQuery(bool ins, string param, string mtbl, string pemail)
         {
             if (ins)
                 return string.Format("SELECT * FROM eb_security_user(:eb_createdby, {0}); UPDATE eb_users SET eb_ver_id = :eb_ver_id, eb_data_id = eb_currval('{1}_id_seq') WHERE email = {2};", param, mtbl, pemail);
