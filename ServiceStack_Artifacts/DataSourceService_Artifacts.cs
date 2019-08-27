@@ -449,6 +449,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         {
             return SortIndex.CompareTo((obj as GroupingDetails).SortIndex);
         }
+
+        [JsonIgnore]
+        public bool IsAutoGen { get; set; }
     }
 
     public class HeaderGroupingDetails : GroupingDetails
@@ -663,6 +666,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
                             _tempFooterText += "<td>&nbsp;</td>";
                     }
                 }
+
+                if (IsAutoGen)
+                    _tempFooterPadding += "<td>&nbsp;</td>";
 
                 base.Html = string.Format("<tr class='group-sum' group='{0}'>{1}{2}</tr>", (this.IsMultiLevel) ? base.CurrentLevel.ToString() : 1.ToString(), _tempFooterPadding,
                     _tempFooterText);
