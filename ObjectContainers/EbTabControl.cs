@@ -27,6 +27,9 @@ namespace ExpressBase.Objects
                 padding : function(elementId, props) {
                     $(`#cont_${ elementId}.Eb-ctrlContainer > .tab-content >.tab-pane`).css('padding', `${props.Padding.Top}px ${props.Padding.Right}px ${props.Padding.Bottom}px ${props.Padding.Left}px`);
                 },
+                label : function(elementId, props) {
+                    $(`li[ebsid='${elementId}'] .eb-label-editable`).text(props.Title);
+                },
                 adjustPanesHeightToHighest : function(elementId, props) {
                     var maxH = 0;
                     let $panes = $(`#cont_${ elementId}.Eb-ctrlContainer > .tab-content >.tab-pane`);
@@ -65,7 +68,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.Collection)]
         [Alias("TabPanes")]
-        [PropertyGroup("test")]
+        [PropertyGroup("Core")]
         [UIproperty]
         [PropertyPriority(95)]
         [ListType(typeof(EbTabPane))]
@@ -87,6 +90,9 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         public override string LabelForeColor { get; set; }
 
+        [JsonIgnore]
+        public override EbScript OnChangeFn { get; set; }
+
         [HideInPropertyGrid]
         [JsonIgnore]
         public override string ToolIconHtml { get { return "<i class='fa fa-clone'></i>"; } set { } }
@@ -98,7 +104,7 @@ namespace ExpressBase.Objects
         public override string GetDesignHtml()
         {
             this.Controls = new List<EbControl>();
-            this.Controls.Add(new EbTabPane { Name = "EbTab0TabPane0" });
+            this.Controls.Add(new EbTabPane { Name = "EbTab0TabPane0", Title = "pane0" });
             return GetHtml().RemoveCR().DoubleQuoted(); ;
         }
 
@@ -108,7 +114,8 @@ namespace ExpressBase.Objects
 this.Init = function(id)
 {
     let pane = new EbObjects.EbTabPane(this.EbSid + 'TabPane0');
-    pane.Name = 'pane1';
+    pane.Name = 'pane0';
+    pane.Title = 'pane0';
     this.Controls.$values.push(pane);
 };";
         }
@@ -124,7 +131,14 @@ this.Init = function(id)
 
             foreach (EbTabPane tab in Controls)
                 TabBtnHtml += @"
-            <li li-of='@ebsid@' @active><a data-toggle='tab' href='#@ebsid@'>@title@</a></li>".Replace("@title@", tab.Title).Replace("@ebsid@", tab.EbSid);
+            <li li-of='@ebsid@' ebsid='@ebsid@' @active>
+                <a data-toggle='tab' class='ppbtn-cont' href='#@ebsid@'>
+                    <span class='eb-label-editable'>@title@</span>
+                    <input id='@ebsid@lbltxtb' class='eb-lbltxtb' type='text'/>@ppbtn@
+                    <div class='ebtab-close-btn eb-fb-icon'><i class='fa fa-times' aria-hidden='true'></i></div>
+                </a>
+                <div class='ebtab-add-btn eb-fb-icon'><i class='fa fa-plus' aria-hidden='true'></i></div>                
+            </li>".Replace("@title@", tab.Title).Replace("@ppbtn@", Common.HtmlConstants.CONT_PROP_BTN).Replace("@ebsid@", tab.EbSid);
 
             TabBtnHtml += @"
         </ul>
@@ -149,6 +163,9 @@ this.Init = function(id)
     [HideInToolBox]
     public class EbTabPane : EbControlContainer
     {
+        [JsonIgnore]
+        public override EbScript OnChangeFn { get; set; }
+
         public EbTabPane()
         {
             this.Controls = new List<EbControl>();
@@ -160,7 +177,13 @@ this.Init = function(id)
         public override List<EbControl> Controls { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [PropertyGroup("Identity")]
+        [OnChangeUIFunction("EbTabControl.label")]
+        [PropertyPriority(70)]
         public string Title { get; set; }
+
+        [JsonIgnore]
+        public override string Label { get; set; }
 
         public override string GetHtml()
         {

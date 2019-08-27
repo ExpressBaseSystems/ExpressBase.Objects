@@ -58,7 +58,8 @@ namespace ExpressBase.Objects
             string html = @"
             <div id='cont_@ebsid@' ebsid='@ebsid@' class='Eb-ctrlContainer ebcont-ctrl' ctype='@objtype@'>
                 <div class='gb-wraper'>
-                    <span class='gb-label' ui-label>@glabel@</span>
+                    <span class='gb-label eb-label-editable' ui-label>@glabel@</span>
+                    <input id='@ebsid@lbltxtb' class='eb-lbltxtb' type='text'/>
                     <div class='gb-border'>
                         <div class='group-box'>";
 

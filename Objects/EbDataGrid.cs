@@ -10,9 +10,11 @@ using Newtonsoft.Json;
 using ServiceStack;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
+using ExpressBase.Security;
 
 namespace ExpressBase.Objects
 {
@@ -23,6 +25,19 @@ namespace ExpressBase.Objects
         {
             this.Controls = new List<EbControl>();
             this.Validators = new List<EbValidator>();
+        }
+
+        public override string UIchangeFns
+        {
+            get
+            {
+                return @"EbDataGrid = {
+                title : function(elementId, props) {
+                    console.log(454547777777777777);
+                    $(`[ebsid=${elementId}]th .eb-label-editable`).text(props.Title);
+                }
+            }";
+            }
         }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
@@ -39,6 +54,10 @@ namespace ExpressBase.Objects
         [PropertyGroup("Behavior")]
         [Alias("Serial numbered")]
         public bool IsShowSerialNumber { get; set; }
+
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        public override EbScript OnChangeFn { get; set; }
 
         [JsonIgnore]
         public override string OnChangeBindJSFn
@@ -102,6 +121,16 @@ $.each(this.Controls.$values, function (i, col) {
         [DefaultPropValue("true")]
         public bool IsAddable { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [PropertyGroup("Behavior")]
+        public override bool IsDisable { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup("Behavior")]
+        [PropertyPriority(99)]
+        [HelpText("Set true if you want to hide the control.")]
+        public override bool Hidden { get; set; }
+
         [HideInPropertyGrid]
         [JsonIgnore]
         public override string ToolIconHtml { get { return "<i class='fa fa-table'></i>"; } set { } }
@@ -122,8 +151,14 @@ $.each(this.Controls.$values, function (i, col) {
             foreach (EbDGColumn col in Controls)
             {
                 if (!col.Hidden)
-                    html += string.Concat("<th style='width: @Width@; @bg@' @type@ title='", col.Title, "'><span class='grid-col-title'>", col.Title, "</span>@req@</th>")
+                    html += string.Concat("<th class='ppbtn-cont ebResizable' ebsid='@ebsid@' style='width: @Width@; @bg@' @type@ title='", col.Title, @"'>
+                                                <span class='grid-col-title eb-label-editable'>", col.Title, @"</span>
+                                                <input id='@ebsid@lbltxtb' class='eb-lbltxtb' type='text'/>
+                                                @req@ @ppbtn@" +
+                                            "</th>")
+                        .Replace("@ppbtn@", Common.HtmlConstants.CONT_PROP_BTN)
                         .Replace("@req@", (col.Required ? "<sup style='color: red'>*</sup>" : string.Empty))
+                        .Replace("@ebsid@", col.EbSid)
                         .Replace("@Width@", (col.Width <= 0) ? "auto" : col.Width.ToString() + "%")
                         .Replace("@type@", "type = '" + col.ObjType + "'")
                         .Replace("@bg@", col.IsDisable ? "background-color:#fafafa; color:#555" : string.Empty);
@@ -222,6 +257,8 @@ $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this
 
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [UIproperty]
+        [OnChangeUIFunction("EbDataGrid.title")]
         public string Title { get; set; }
 
         [HideInPropertyGrid]
@@ -229,6 +266,7 @@ $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this
         public string DBareHtml { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
         public virtual string InputControlType { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
@@ -285,6 +323,7 @@ $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this
         public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
 
         [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
         public override string InputControlType { get { return "EbTextBox"; } }
 
         [OnDeserialized]
@@ -304,6 +343,7 @@ $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this
         public override EbDbTypes EbDbType { get { return EbDbTypes.Decimal; } }
 
         [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
         public override string InputControlType { get { return "EbNumeric"; } }
 
         [EnableInBuilder(BuilderType.WebForm)]
@@ -323,6 +363,7 @@ $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this
         public override EbDbTypes EbDbType { get { return EbDbTypes.Boolean; } }
 
         [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
         public override string InputControlType { get { return "EbCheckBox"; } }
     }
 
@@ -395,6 +436,7 @@ $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this
 $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, p2).siblings('.nullable-check').on('change', `input[type=checkbox]`, p2);"; } set { } }
 
         [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
         public override string InputControlType { get { return "EbDate"; } }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
@@ -419,6 +461,11 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, p2).
             set { this.EbDate.IsNullable = value; }
         }
 
+
+        public override bool ParameterizeControl(IDatabase DataDB, List<DbParameter> param, string tbl, SingleColumn cField, bool ins, ref int i, ref string _col, ref string _val, ref string _extqry, User usr, SingleColumn ocF)
+        {
+            return this.EbDate.ParameterizeControl(DataDB, param, tbl, cField, ins, ref i, ref _col, ref _val, ref _extqry, usr, ocF);
+        }
     }
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
@@ -457,6 +504,7 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, p2).
         public override string GetDisplayMemberJSfn { get { return @" return $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp] :selected`).text(); "; } set { } }
 
         [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
         public override string InputControlType { get { return "EbSimpleSelect"; } }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
@@ -564,6 +612,7 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, p2).
         }
 
         [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
         public override string InputControlType { get { return "EbUserControl"; } }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
@@ -688,6 +737,7 @@ else {pg.MakeReadWrite('ValueMember');}")]
         public DVBaseColumn ValueMember { get { return this.EbPowerSelect.ValueMember; } set { this.EbPowerSelect.ValueMember = value; } }
 
         [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
         public override string InputControlType { get { return "EbPowerSelect"; } }
 
         public override string GetBareHtml()

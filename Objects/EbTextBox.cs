@@ -81,7 +81,7 @@ $('#cont_' + this.EbSid_CtxId + ' .ctrl-cover').css('pointer-events', 'inherit')
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [HelpText("To limit number of charecters")]
-        [PropertyGroup("Behavior")]
+        [PropertyGroup("Core")]
         [PropertyEditor(PropertyEditorType.Number)]
         [PropertyPriority(99)]
         [OnChangeExec(@"
@@ -95,9 +95,9 @@ else {
         public int MaxLength { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
-        [Alias("TextTransform-Alias")]
+        [Alias("Text Transform")]
         [DefaultPropValue("'UPPERCASE'")]
-        [PropertyGroup("Behavior")]
+        [PropertyGroup("Core")]
         [PropertyEditor(PropertyEditorType.DropDown)]
         [OnChangeExec(@"
 if (this.TextTransform === 'UPPERCASE' ){
@@ -110,7 +110,7 @@ else {
         public TextTransform TextTransform { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [PropertyGroup("Behavior")]
+        [PropertyGroup("Core")]
         [DefaultPropValue("'SingleLine'")]
         [OnChangeExec(@"
 if (this.TextMode === 4 ){
@@ -123,7 +123,7 @@ else {
         public TextMode TextMode { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [PropertyGroup("Behavior")]
+        [PropertyGroup("Core")]
         [DefaultPropValue("3")]
         public int RowsVisible { get; set; }
 
@@ -141,6 +141,7 @@ else {
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup("Appearance")]
         [PropertyEditor(PropertyEditorType.FontSelector)]
+        [Alias("Font Family")]
         public string FontFamilyT { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
@@ -151,7 +152,7 @@ else {
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup("Appearance")]
         [PropertyEditor(PropertyEditorType.FontSelector)]
-        //[HideForUser]
+        [HideInPropertyGrid]
         public string Only4Dev { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
@@ -166,10 +167,12 @@ else {
 
         [PropertyGroup("Behavior")]
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [HideInPropertyGrid]
         public string MaxDateExpression { get; set; }
 
         [PropertyGroup("Behavior")]
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [HideInPropertyGrid]
         public string MinDateExpression { get; set; }
 
         //[ProtoBuf.ProtoMember(9)]
@@ -180,6 +183,7 @@ else {
         //[Description("Identity")]
         //public override string Label { get; set; }
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
 
         [HideInPropertyGrid]
@@ -284,11 +288,6 @@ else {
                                 (
                                     @"<div  class='input-group' style='width: 100%;'>
                                         <span class='input-group-addon' onclick='$(\'#@ebsid@\').click()'><i class='fa fa-$class aria-hidden='true'"
-                                        + (
-                                            (this.FontFamily != null) ?
-                                                ("style='font-size:" + this.FontSize + "px;'")
-                                            : string.Empty
-                                          )
                                         + "class='input-group-addon'></i></span>"
                                 )
                                 .Replace("$class", (this.TextMode == TextMode.Email) ?

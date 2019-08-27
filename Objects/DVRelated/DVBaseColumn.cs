@@ -354,6 +354,15 @@ else if(this.FormMode === 2){
         [MetaOnly]
         public OrderByDirection Direction { get; set; }
 
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [HideInPropertyGrid]
+        public ControlClass ColumnQueryMapping { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public bool AutoResolve { get; set; }
+
+
+
         [JsonIgnore]
         private List<string> __formulaDataFieldsUsed = null;
         [JsonIgnore]
@@ -1116,6 +1125,33 @@ else
         public override bool CompareValues(object _unformattedData)
         {           
             return false;
+        }
+    }
+
+    [EnableInBuilder(BuilderType.DVBuilder)]
+    public class ControlClass : EbDataVisualizationObject
+    {
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [HideInPropertyGrid]
+        public string DataSourceId { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [HideInPropertyGrid]
+        public List<DVBaseColumn> DisplayMember { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [HideInPropertyGrid]
+        public DVBaseColumn ValueMember { get; set; }
+
+        [JsonIgnore]
+        public Dictionary<int, string> Values { get; set; }
+
+        public ControlClass()
+        {
+            this.DisplayMember = new List<DVBaseColumn>();
+            this.ValueMember = new DVBaseColumn();
+            this.Values = new Dictionary<int, string>();
+
         }
     }
 }
