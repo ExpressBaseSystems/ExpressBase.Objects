@@ -10,6 +10,8 @@ using Microsoft.CodeAnalysis.Scripting;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Globalization;
 using System.Linq;
@@ -74,6 +76,17 @@ namespace ExpressBase.Objects.Objects.DVRelated
         DateTimeWithoutSecondsAndTT,
     }
 
+    public enum DatePattern
+    {
+        Default,
+
+        [Description("Month Year")]
+        MMMM_yyyy,
+
+        [Description("MMM/yyyy")]
+        MMM_yyyy 
+    }
+
     public enum StringOperators
     {
         Equals = 0,
@@ -82,6 +95,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
         Between = 3,
         Contains = 4
     }
+
     public enum NumericOperators
     {
         Equals = 0,
@@ -762,6 +776,9 @@ else{
     pg.HideProperty('ConvretToUsersTimeZone');
     }")]
         public DateFormat Format { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public DatePattern Pattern { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         public bool ConvretToUsersTimeZone { get; set; }
