@@ -278,7 +278,7 @@ namespace ExpressBase.Objects
 
         public override bool ParameterizeControl(IDatabase DataDB, List<DbParameter> param, string tbl, SingleColumn cField, bool ins, ref int i, ref string _col, ref string _val, ref string _extqry, User usr, SingleColumn ocF)
         {
-            if (cField.Value == null)
+            if (cField.Value == null || cField.Value.ToString() == string.Empty)
             {
                 var p = DataDB.GetNewParameter(cField.Name + "_" + i, (EbDbTypes)cField.Type);
                 p.Value = DBNull.Value;
