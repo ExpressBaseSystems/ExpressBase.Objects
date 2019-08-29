@@ -10,7 +10,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 	//{
 	//}
 
-	public class SaveBugRequest: EbServiceStackAuthRequest, IReturn<SaveBugResponse>
+	public class SaveBugRequest : EbServiceStackAuthRequest, IReturn<SaveBugResponse>
 	{
 		public string title { get; set; }
 
@@ -40,35 +40,54 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 	public class TenantSolutionsRequest : EbServiceStackAuthRequest, IReturn<TenantSolutionsResponse>
 	{
 		public string usertype { get; set; }
-				
+
 	}
 
-		
+
 	public class TenantSolutionsResponse
 	{
 		public TenantSolutionsResponse()
 		{
 			solid = new List<string>();
 			solname = new List<string>();
+			soldispid= new List<string>();
 		}
 
-	public List<string> solid { get; set; }
+		public List<string> solid { get; set; }
 
 		public List<string> solname { get; set; }
+
+		public List<string> soldispid { get; set; }
 	}
 
-	public class FetchSupportRequest : EbServiceStackAuthRequest, IReturn<SaveBugResponse>
+	public class FetchSupportRequest : EbServiceStackAuthRequest, IReturn<FetchSupportResponse>
 	{
 		public int usrid { get; set; }
 	}
 	public class FetchSupportResponse
 	{
-		public  FetchSupportResponse()
+		public FetchSupportResponse()
 		{
 			supporttkt = new List<SupportTktCls>();
 		}
 		public List<SupportTktCls> supporttkt { get; set; }
 	}
+
+
+	public class SupportDetailsRequest : EbServiceStackAuthRequest, IReturn<SupportDetailsResponse>
+	{
+		public string ticketno { get; set; }
+	}
+
+	public class SupportDetailsResponse
+	{
+		public SupportDetailsResponse()
+		{
+			supporttkt = new List<SupportTktCls>();
+		}
+		public List<SupportTktCls> supporttkt { get; set; }
+	}
+
 
 	public class SupportTktCls
 	{
@@ -84,13 +103,15 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 		public string status { get; set; }
 
-		public string support { get; set; }
+		public string assignedto { get; set; }
 
 		public string type_b_f { get; set; }
 
 		public string lstmodified { get; set; }
 
+		public string createdat { get; set; }
+
 		public string remarks { get; set; }
 	}
-	
+
 }

@@ -1014,16 +1014,19 @@ namespace ExpressBase.Objects
                     string _temp = string.Empty;
                     int _rowId = Convert.ToInt32(row.RowId);
                     if (_rowId > 0)
-                    {                        
-                        foreach (SingleColumn cField in row.Columns)
+                    {
+                        if (!row.IsDelete)
                         {
-                            if (cField.Control != null)
+                            foreach (SingleColumn cField in row.Columns)
                             {
-                                SingleColumn ocF = this.FormDataBackup.MultipleTables[entry.Key].Find(e => e.RowId == row.RowId).Columns.Find(e => e.Name.Equals(cField.Name));
-                                cField.Control.ParameterizeControl(DataDB, param, this.TableName, cField, false, ref i, ref _colvals, ref _temp, ref _extqry, this.UserObj, ocF);
+                                if (cField.Control != null)
+                                {
+                                    SingleColumn ocF = this.FormDataBackup.MultipleTables[entry.Key].Find(e => e.RowId == row.RowId).Columns.Find(e => e.Name.Equals(cField.Name));
+                                    cField.Control.ParameterizeControl(DataDB, param, this.TableName, cField, false, ref i, ref _colvals, ref _temp, ref _extqry, this.UserObj, ocF);
+                                }
+                                else
+                                    ParameterizeUnknown(DataDB, param, cField, false, ref i, ref _colvals, ref _temp);
                             }
-                            else
-                                ParameterizeUnknown(DataDB, param, cField, false, ref i, ref _colvals, ref _temp);
                         }
 
                         string _qry = this.GetUpdateQuery(DataDB, entry.Key, this.TableName, row.IsDelete);
@@ -1105,7 +1108,7 @@ namespace ExpressBase.Objects
         {
             if (cField.Name.Equals("eb_row_num"))
             {
-                if (cField.Value == null)
+                if (cField.Value == null || cField.Value == string.Empty)
                 {
                     var p = DataDB.GetNewParameter(cField.Name + "_" + i, (EbDbTypes)cField.Type);
                     p.Value = DBNull.Value;
@@ -1127,7 +1130,7 @@ namespace ExpressBase.Objects
                 return true;
             }
             else
-                Console.WriteLine("Unknown parameter found in formdata... \nName : " + cField.Name + "\nType : " + cField.Type + "\nValue : " + cField.Value);
+                Console.WriteLine($"Unknown parameter found in formdata... \nForm RefId : {this.RefId}\nName : {cField.Name}\nType : {cField.Type}\nValue : {cField.Value}");
             return false;
         }
 
