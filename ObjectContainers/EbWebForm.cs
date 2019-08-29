@@ -410,7 +410,7 @@ namespace ExpressBase.Objects
             if (tblName.Equals(masterTbl))
                 _qry = string.Format("UPDATE {0} SET {2} eb_lastmodified_by = :eb_modified_by, eb_lastmodified_at = {1} WHERE id = {3} AND eb_del = 'F';", tblName, DataDB.EB_CURRENT_TIMESTAMP, "{0}", "{1}");
             else
-                _qry = string.Format("UPDATE {0} SET {3} eb_lastmodified_by = :eb_modified_by, eb_lastmodified_at = {1} WHERE id = {4} AND {2}_id = :{2}_id AND eb_del = 'F';", tblName, DataDB.EB_CURRENT_TIMESTAMP, masterTbl, isDel ? "eb_del = 'T'" : "{0}", "{1}");
+                _qry = string.Format("UPDATE {0} SET {3} eb_lastmodified_by = :eb_modified_by, eb_lastmodified_at = {1} WHERE id = {4} AND {2}_id = :{2}_id AND eb_del = 'F';", tblName, DataDB.EB_CURRENT_TIMESTAMP, masterTbl, isDel ? "eb_del = 'T', " : "{0}", "{1}");
             return _qry;
         }
 
