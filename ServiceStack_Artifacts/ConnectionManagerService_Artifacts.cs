@@ -10,7 +10,7 @@ using System.Runtime.Serialization;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
-    public class RefreshSolutionConnectionsRequestt : EbMqRequest
+    public class RefreshSolutionConnectionsRequest : EbMqRequest
     {
     }
 
