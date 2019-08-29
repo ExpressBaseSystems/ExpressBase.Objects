@@ -129,13 +129,9 @@ namespace ExpressBase.Objects.Objects.DVRelated
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [JsonProperty(PropertyName = "name")]
         [PropertyEditor(PropertyEditorType.Label)]
-        [OnChangeExec(@"this.Name = this.name;
-        if (this.IsCustomColumn){
-            pg.MakeReadWrite('name');// [JsonProperty(PropertyName = 'name')]
-        }
-        else {
+        [OnChangeExec(@"
             pg.MakeReadOnly('name');
-        }")]
+        ")]
         public override string Name { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl)]

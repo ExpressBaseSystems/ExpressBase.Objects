@@ -341,9 +341,10 @@ namespace ExpressBase.Objects
             {
                 if (Ctrl is EbFileUploader)
                     extquery += (Ctrl as EbFileUploader).GetSelectQuery();
-                else if(Ctrl is EbManageUser)
-                    extquery += (Ctrl as EbManageUser).GetSelectQuery(Convert.ToInt32(this.RefId.Split("-")[4]));
-
+                else if (Ctrl is EbManageUser)
+                    extquery += (Ctrl as EbManageUser).GetSelectQuery();
+                else if (Ctrl is EbManageLocation)
+                    extquery += (Ctrl as EbManageLocation).GetSelectQuery();
             }
             return query + extquery;
         }
@@ -757,7 +758,8 @@ namespace ExpressBase.Objects
             EbDataSet dataset = DataDB.DoQueries(query, new DbParameter[]
             {
                 DataDB.GetNewParameter("id", EbDbTypes.Int32, this.TableRowId),
-                DataDB.GetNewParameter("context", EbDbTypes.String, context)
+                DataDB.GetNewParameter("context", EbDbTypes.String, context),
+                DataDB.GetNewParameter("eb_ver_id", EbDbTypes.Int32, this.RefId.Split("-")[4])
             });
 
             Console.WriteLine("From RefreshFormData : Schema table count = " + _schema.Tables.Count + " Dataset count = " + dataset.Tables.Count);
@@ -825,6 +827,24 @@ namespace ExpressBase.Objects
                             }
                         }
                         _FormData.MultipleTables[(Ctrl as EbManageUser).VirtualTable][0].Columns.Add(new SingleColumn() {
+                            Name = (Ctrl as EbManageUser).Name,
+                            Type = (int)EbDbTypes.String,
+                            Value = JsonConvert.SerializeObject(_d)
+                        });
+                    }
+                    else if (Ctrl is EbManageLocation)
+                    {
+                        Dictionary<string, dynamic> _d = new Dictionary<string, dynamic>();
+                        if (Table.Count == 1)
+                        {
+                            _d.Add("id", Table[0]["id"]);
+                            _d.Add("longname", Table[0]["longname"]);
+                            _d.Add("shortname", Table[0]["shortname"]);
+                            _d.Add("image", Table[0]["image"]);
+                            _d.Add("meta_json", Table[0]["meta_json"]);
+                        }
+                        _FormData.MultipleTables[(Ctrl as EbManageLocation).VirtualTable][0].Columns.Add(new SingleColumn()
+                        {
                             Name = (Ctrl as EbManageUser).Name,
                             Type = (int)EbDbTypes.String,
                             Value = JsonConvert.SerializeObject(_d)
@@ -994,16 +1014,19 @@ namespace ExpressBase.Objects
                     string _temp = string.Empty;
                     int _rowId = Convert.ToInt32(row.RowId);
                     if (_rowId > 0)
-                    {                        
-                        foreach (SingleColumn cField in row.Columns)
+                    {
+                        if (!row.IsDelete)
                         {
-                            if (cField.Control != null)
+                            foreach (SingleColumn cField in row.Columns)
                             {
-                                SingleColumn ocF = this.FormDataBackup.MultipleTables[entry.Key].Find(e => e.RowId == row.RowId).Columns.Find(e => e.Name.Equals(cField.Name));
-                                cField.Control.ParameterizeControl(DataDB, param, this.TableName, cField, false, ref i, ref _colvals, ref _temp, ref _extqry, this.UserObj, ocF);
+                                if (cField.Control != null)
+                                {
+                                    SingleColumn ocF = this.FormDataBackup.MultipleTables[entry.Key].Find(e => e.RowId == row.RowId).Columns.Find(e => e.Name.Equals(cField.Name));
+                                    cField.Control.ParameterizeControl(DataDB, param, this.TableName, cField, false, ref i, ref _colvals, ref _temp, ref _extqry, this.UserObj, ocF);
+                                }
+                                else
+                                    ParameterizeUnknown(DataDB, param, cField, false, ref i, ref _colvals, ref _temp);
                             }
-                            else
-                                ParameterizeUnknown(DataDB, param, cField, false, ref i, ref _colvals, ref _temp);
                         }
 
                         string _qry = this.GetUpdateQuery(DataDB, entry.Key, this.TableName, row.IsDelete);
@@ -1032,6 +1055,7 @@ namespace ExpressBase.Objects
             
             param.Add(DataDB.GetNewParameter(this.FormData.MasterTable + "_id", EbDbTypes.Int32, this.TableRowId));
             param.Add(DataDB.GetNewParameter("eb_loc_id", EbDbTypes.Int32, this.LocationId));
+            param.Add(DataDB.GetNewParameter("eb_ver_id", EbDbTypes.Int32, this.RefId.Split("-")[4]));
             param.Add(DataDB.GetNewParameter("eb_createdby", EbDbTypes.Int32, this.UserObj.UserId));
             param.Add(DataDB.GetNewParameter("eb_modified_by", EbDbTypes.Int32, this.UserObj.UserId));
 
@@ -1084,7 +1108,7 @@ namespace ExpressBase.Objects
         {
             if (cField.Name.Equals("eb_row_num"))
             {
-                if (cField.Value == null)
+                if (cField.Value == null || cField.Value == string.Empty)
                 {
                     var p = DataDB.GetNewParameter(cField.Name + "_" + i, (EbDbTypes)cField.Type);
                     p.Value = DBNull.Value;
@@ -1106,7 +1130,7 @@ namespace ExpressBase.Objects
                 return true;
             }
             else
-                Console.WriteLine("Unknown parameter found in formdata... \nName : " + cField.Name + "\nType : " + cField.Type + "\nValue : " + cField.Value);
+                Console.WriteLine($"Unknown parameter found in formdata... \nForm RefId : {this.RefId}\nName : {cField.Name}\nType : {cField.Type}\nValue : {cField.Value}");
             return false;
         }
 
@@ -1843,6 +1867,11 @@ namespace ExpressBase.Objects
                     if (control is EbManageUser)
                     {
                         (control as EbManageUser).VirtualTable = curTbl;
+                        _schema.ExtendedControls.Add(control);
+                    }
+                    else if(control is EbManageLocation)
+                    {
+                        (control as EbManageLocation).VirtualTable = curTbl;
                         _schema.ExtendedControls.Add(control);
                     }
                     else if (control is EbDGUserControlColumn)
