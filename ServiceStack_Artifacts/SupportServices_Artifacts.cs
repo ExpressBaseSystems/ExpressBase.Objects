@@ -26,7 +26,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 		public string type_b_f { get; set; }
 
+		public string fullname { get; set; }
 
+		public string email { get; set; }
 
 
 
