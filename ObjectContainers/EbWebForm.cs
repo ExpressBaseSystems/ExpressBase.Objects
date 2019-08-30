@@ -1864,7 +1864,7 @@ namespace ExpressBase.Objects
                 {
                     if (control is EbFileUploader)
                         _schema.ExtendedControls.Add(control);
-                    if (control is EbManageUser)
+                    else if (control is EbManageUser)
                     {
                         (control as EbManageUser).VirtualTable = curTbl;
                         int idx = _schema.ExtendedControls.FindIndex(e => e is EbManageLocation);
