@@ -47,6 +47,7 @@ namespace ExpressBase.Objects
         public List<MngUsrLocFieldAbstract> Fields { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
 
         public NTV[] FuncParam = {
@@ -87,6 +88,14 @@ this.Init = function(id)
 	this.Fields.$values.push(new EbObjects.MngUsrLocField('email'));
 	this.Fields.$values.push(new EbObjects.MngUsrLocField('fullname'));
 	this.Fields.$values.push(new EbObjects.MngUsrLocField('nickname'));
+	this.Fields.$values.push(new EbObjects.MngUsrLocField('dob'));
+	this.Fields.$values.push(new EbObjects.MngUsrLocField('sex'));
+	this.Fields.$values.push(new EbObjects.MngUsrLocField('alternateemail'));
+	this.Fields.$values.push(new EbObjects.MngUsrLocField('phprimary'));
+	this.Fields.$values.push(new EbObjects.MngUsrLocField('roles'));
+	this.Fields.$values.push(new EbObjects.MngUsrLocField('groups'));
+	this.Fields.$values.push(new EbObjects.MngUsrLocField('preference'));
+	this.Fields.$values.push(new EbObjects.MngUsrLocField('consadd'));
 };";
         }
 
@@ -187,7 +196,7 @@ this.Init = function(id)
                     ep = string.Concat(":", this.FuncParam[k].Name, "_", i);
             }
 
-            _extqry += this.GetSaveQuery(ins, c.Substring(0, c.Length - 2), tbl, ep);
+            _extqry = this.GetSaveQuery(ins, c.Substring(0, c.Length - 2), tbl, ep) + _extqry;
             
             return true;
         }

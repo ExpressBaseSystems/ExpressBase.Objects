@@ -31,7 +31,7 @@ namespace ExpressBase.Objects
 
         public override string ToolIconHtml { get { return "<i class='fa fa-map-marker'></i>"; } set { } }
 
-        public override string ToolNameAlias { get { return "Manage Location"; } set { } }
+        public override string ToolNameAlias { get { return "Location"; } set { } }
 
         [EnableInBuilder(BuilderType.WebForm)]
         public override bool Hidden { get { return true; } }
@@ -46,6 +46,7 @@ namespace ExpressBase.Objects
         public List<MngUsrLocFieldAbstract> Fields { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
 
 
@@ -56,6 +57,9 @@ this.Init = function(id)
 {
 	this.Fields.$values.push(new EbObjects.MngUsrLocField('longname'));
 	this.Fields.$values.push(new EbObjects.MngUsrLocField('shortname'));
+	//this.Fields.$values.push(new EbObjects.MngUsrLocField('image'));
+    console.log('from init manage location');
+    commonO.ObjCollection['#vernav0'].GetLocationConfig(this);
 };";
         }
 
@@ -117,7 +121,23 @@ this.Init = function(id)
 
         public override bool ParameterizeControl(IDatabase DataDB, List<DbParameter> param, string tbl, SingleColumn cField, bool ins, ref int i, ref string _col, ref string _val, ref string _extqry, User usr, SingleColumn ocF)
         {
-            return false;
+            Dictionary<string, string> _d = JsonConvert.DeserializeObject<Dictionary<string, string>>(cField.Value);
+            param.Add(DataDB.GetNewParameter("shortname_" + i, EbDbTypes.String, _d["shortname"]));
+            param.Add(DataDB.GetNewParameter("longname_" + i, EbDbTypes.String, _d["longname"]));
+            param.Add(DataDB.GetNewParameter("image_" + i, EbDbTypes.String, string.Empty));////////////////
+            param.Add(DataDB.GetNewParameter("meta_json_" + i, EbDbTypes.String, _d["meta_json"]));
+            if (ins)
+            {
+                _extqry += $"INSERT INTO eb_locations(shortname, longname, image, meta_json, eb_ver_id, eb_data_id) VALUES(:shortname_{i}, :longname_{i}, :image_{i}, :meta_json_{i}, :eb_ver_id, eb_currval('{tbl}_id_seq'));";
+                if (DataDB.Vendor == DatabaseVendors.MYSQL)
+                    _extqry += "SELECT eb_persist_currval('eb_locations_id_seq');";
+            }
+            else
+            {
+                _extqry += $"UPDATE eb_locations SET shortname = :shortname_{i}, longname = :longname_{i}, image = :image_{i}, meta_json = :meta_json_{i} WHERE eb_ver_id = :eb_ver_id AND eb_data_id = :eb_data_id;";
+            }
+            i++;
+            return true;
         }
     }
 }
