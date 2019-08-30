@@ -97,15 +97,7 @@ this.Init = function(id)
         }
 
         public string VirtualTable { get; set; }
-
-        public IEnumerable<MngUsrLocFieldAbstract> PersistingFields
-        {
-            get
-            {
-                return this.Fields.Where(f => !string.IsNullOrEmpty((f as MngUsrLocField).ControlName));
-            }
-        }
-
+        
         public string GetSelectQuery()
         {
             return "SELECT id, longname, shortname, image, meta_json FROM eb_locations WHERE eb_ver_id = :eb_ver_id AND eb_data_id = :id;";
@@ -126,16 +118,18 @@ this.Init = function(id)
             param.Add(DataDB.GetNewParameter("longname_" + i, EbDbTypes.String, _d["longname"]));
             param.Add(DataDB.GetNewParameter("image_" + i, EbDbTypes.String, string.Empty));////////////////
             param.Add(DataDB.GetNewParameter("meta_json_" + i, EbDbTypes.String, _d["meta_json"]));
+            string temp = string.Empty;
             if (ins)
             {
-                _extqry += $"INSERT INTO eb_locations(shortname, longname, image, meta_json, eb_ver_id, eb_data_id) VALUES(:shortname_{i}, :longname_{i}, :image_{i}, :meta_json_{i}, :eb_ver_id, eb_currval('{tbl}_id_seq'));";
+                temp = $"INSERT INTO eb_locations(shortname, longname, image, meta_json, eb_ver_id, eb_data_id) VALUES(:shortname_{i}, :longname_{i}, :image_{i}, :meta_json_{i}, :eb_ver_id, eb_currval('{tbl}_id_seq'));";
                 if (DataDB.Vendor == DatabaseVendors.MYSQL)
-                    _extqry += "SELECT eb_persist_currval('eb_locations_id_seq');";
+                    temp += "SELECT eb_persist_currval('eb_locations_id_seq');";
             }
             else
             {
-                _extqry += $"UPDATE eb_locations SET shortname = :shortname_{i}, longname = :longname_{i}, image = :image_{i}, meta_json = :meta_json_{i} WHERE eb_ver_id = :eb_ver_id AND eb_data_id = :eb_data_id;";
+                temp += $"UPDATE eb_locations SET shortname = :shortname_{i}, longname = :longname_{i}, image = :image_{i}, meta_json = :meta_json_{i} WHERE eb_ver_id = :eb_ver_id AND eb_data_id = :{tbl}_id;";
             }
+            _extqry = temp + _extqry; //location must be created before user creation
             i++;
             return true;
         }

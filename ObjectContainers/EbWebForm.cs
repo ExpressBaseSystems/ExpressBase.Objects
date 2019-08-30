@@ -845,7 +845,7 @@ namespace ExpressBase.Objects
                         }
                         _FormData.MultipleTables[(Ctrl as EbManageLocation).VirtualTable][0].Columns.Add(new SingleColumn()
                         {
-                            Name = (Ctrl as EbManageUser).Name,
+                            Name = (Ctrl as EbManageLocation).Name,
                             Type = (int)EbDbTypes.String,
                             Value = JsonConvert.SerializeObject(_d)
                         });
@@ -1867,11 +1867,16 @@ namespace ExpressBase.Objects
                     if (control is EbManageUser)
                     {
                         (control as EbManageUser).VirtualTable = curTbl;
+                        int idx = _schema.ExtendedControls.FindIndex(e => e is EbManageLocation);
+                        if (idx >= 0)
+                            (control as EbManageUser).AddLocConstraint = true;
                         _schema.ExtendedControls.Add(control);
                     }
                     else if(control is EbManageLocation)
                     {
                         (control as EbManageLocation).VirtualTable = curTbl;
+                        foreach(object temp in _schema.ExtendedControls.FindAll(e => e is EbManageUser))
+                            (temp as EbManageUser).AddLocConstraint = true;
                         _schema.ExtendedControls.Add(control);
                     }
                     else if (control is EbDGUserControlColumn)
