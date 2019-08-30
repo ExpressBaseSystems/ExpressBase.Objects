@@ -420,6 +420,7 @@ namespace ExpressBase.Objects
         public int PageLength { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
+        [HideInPropertyGrid]
         public bool DisableRowGrouping { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
