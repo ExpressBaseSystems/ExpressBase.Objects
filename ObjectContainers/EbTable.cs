@@ -100,8 +100,8 @@ namespace ExpressBase.Objects
         public override string GetDesignHtml()
         {
             this.Controls = new List<EbControl>();
-            this.Controls.Add(new EbTableTd { Name = "EbTable0_Td0" });
-            this.Controls.Add(new EbTableTd { Name = "EbTable0_Td1" });
+            this.Controls.Add(new EbTableTd { Name = "EbTable0_Td0", EbSid = "EbTable0_Td0" });
+            this.Controls.Add(new EbTableTd { Name = "EbTable0_Td1", EbSid = "EbTable0_Td1" });
             return GetHtml().RemoveCR().DoubleQuoted();
         }
 
@@ -178,7 +178,7 @@ this.Init = function(id){
 
         public override string GetHtml()
         {
-            string html = "<td id='@name@' ebsid='@ebsid@' style='width:@wperc@;'; class='form-render-table-Td tdDropable ebResizable ebcont-ctrl ppbtn-cont'> <div style='height: 100%; width: 100%; min-height: 30px;'>" +
+            string html = "<td id='@name@' ctrl-ebsid='@ebsid@' ebsid='@ebsid@' style='width:@wperc@;'; class='form-render-table-Td tdDropable ebResizable ebcont-ctrl ppbtn-cont'> <div style='height: 100%; width: 100%; min-height: 30px;'>" +
                 "@ppbtn@";
 
             foreach (EbControl ec in this.Controls)
