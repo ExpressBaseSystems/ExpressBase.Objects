@@ -23,6 +23,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 		[DataMember(Order = 1)]
 		public string Apps { get; set; }
+
+        [DataMember(Order = 1)]
+        public bool IsImport { get; set; }
 	}
 
 	[DataContract]

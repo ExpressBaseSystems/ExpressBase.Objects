@@ -10,6 +10,8 @@ using Microsoft.CodeAnalysis.Scripting;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Globalization;
 using System.Linq;
@@ -74,6 +76,17 @@ namespace ExpressBase.Objects.Objects.DVRelated
         DateTimeWithoutSecondsAndTT,
     }
 
+    public enum DatePattern
+    {
+        Default,
+
+        [Description("Month Year")]
+        MMMM_yyyy,
+
+        [Description("MMM/yyyy")]
+        MMM_yyyy 
+    }
+
     public enum StringOperators
     {
         Equals = 0,
@@ -82,6 +95,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
         Between = 3,
         Contains = 4
     }
+
     public enum NumericOperators
     {
         Equals = 0,
@@ -129,13 +143,9 @@ namespace ExpressBase.Objects.Objects.DVRelated
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [JsonProperty(PropertyName = "name")]
         [PropertyEditor(PropertyEditorType.Label)]
-        [OnChangeExec(@"this.Name = this.name;
-        if (this.IsCustomColumn){
-            pg.MakeReadWrite('name');// [JsonProperty(PropertyName = 'name')]
-        }
-        else {
+        [OnChangeExec(@"
             pg.MakeReadOnly('name');
-        }")]
+        ")]
         public override string Name { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl)]
@@ -353,6 +363,15 @@ else if(this.FormMode === 2){
         [EnableInBuilder(BuilderType.DVBuilder)]
         [MetaOnly]
         public OrderByDirection Direction { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [HideInPropertyGrid]
+        public ControlClass ColumnQueryMapping { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public bool AutoResolve { get; set; }
+
+
 
         [JsonIgnore]
         private List<string> __formulaDataFieldsUsed = null;
@@ -758,6 +777,9 @@ else{
     }")]
         public DateFormat Format { get; set; }
 
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public DatePattern Pattern { get; set; }
+
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         public bool ConvretToUsersTimeZone { get; set; }
 
@@ -1116,6 +1138,33 @@ else
         public override bool CompareValues(object _unformattedData)
         {           
             return false;
+        }
+    }
+
+    [EnableInBuilder(BuilderType.DVBuilder)]
+    public class ControlClass : EbDataVisualizationObject
+    {
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [HideInPropertyGrid]
+        public string DataSourceId { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [HideInPropertyGrid]
+        public List<DVBaseColumn> DisplayMember { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [HideInPropertyGrid]
+        public DVBaseColumn ValueMember { get; set; }
+
+        [JsonIgnore]
+        public Dictionary<int, string> Values { get; set; }
+
+        public ControlClass()
+        {
+            this.DisplayMember = new List<DVBaseColumn>();
+            this.ValueMember = new DVBaseColumn();
+            this.Values = new Dictionary<int, string>();
+
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using ExpressBase.Common.Extensions;
+﻿using ExpressBase.Common;
+using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
@@ -6,14 +7,41 @@ using ExpressBase.Objects.Helpers;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Runtime.Serialization;
 using System.Text;
+using ExpressBase.Security;
 
 namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.WebForm)]
     public class EbAutoId : EbControlUI
     {
+        #region Hidden Properties
+
+        [HideInPropertyGrid]
+        public override bool IsDisable { get; set; }
+
+        [HideInPropertyGrid]
+        public override bool DoNotPersist { get; set; }
+
+        [HideInPropertyGrid]
+        public override EbScript ValueExpr { get; set; }
+
+        [HideInPropertyGrid]
+        public override EbScript DefaultValueExpression { get; set; }
+
+        [HideInPropertyGrid]
+        public override List<EbValidator> Validators { get; set; }
+
+        [HideInPropertyGrid]
+        public override EbScript OnChangeFn { get; set; }
+
+        [HideInPropertyGrid]
+        public override EbScript VisibleExpr { get; set; }
+
+        #endregion
+
         public EbAutoId()
         {
         }
@@ -30,6 +58,7 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.Expandable)]
         public EbAutoIdPattern Pattern { get; set; }
         
+        [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.String; } set { } }
 
         //HideInPropertyGrid
@@ -117,6 +146,19 @@ namespace ExpressBase.Objects
         }
         
         public override string EnableJSfn { get { return @""; } set { } }
+
+        public override bool ParameterizeControl(IDatabase DataDB, List<DbParameter> param, string tbl, SingleColumn cField, bool ins, ref int i, ref string _col, ref string _val, ref string _extqry, User usr, SingleColumn ocF)
+        {
+            if (ins)
+            {
+                _col += string.Concat(cField.Name, ", ");
+                _val += string.Format("CONCAT(:{0}_{1}, (SELECT LPAD(CAST((COUNT(*) + 1) AS CHAR(12)), {2}, '0') FROM {3} WHERE {0} LIKE '{4}%')),", cField.Name, i, this.Pattern.SerialLength, tbl, cField.Value);
+                param.Add(DataDB.GetNewParameter(cField.Name + "_" + i, (EbDbTypes)cField.Type, cField.Value));
+                i++;
+                return true;
+            }
+            return false;
+        }
     }
 
     [EnableInBuilder(BuilderType.WebForm)]

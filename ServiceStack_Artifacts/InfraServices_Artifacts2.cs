@@ -471,7 +471,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 
 	[DataContract]
-	public class FacebookLoginRequest : EbServiceStackNoAuthRequest
+	public class SocialLoginRequest : EbServiceStackNoAuthRequest
 	{
 		[DataMember(Order = 1)]
 		public string Email { get; set; }
@@ -481,10 +481,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 		[DataMember(Order = 3)]
 		public string Name { get; set; }
+
+		[DataMember(Order = 4)]
+		public string Goglid { get; set; }
 	}
 
 	[DataContract]
-	public class FacebookLoginResponse
+	public class SocialLoginResponse
 	{
 		[DataMember(Order = 1)]
 		public string jsonval { get; set; }

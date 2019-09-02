@@ -9,6 +9,7 @@ using ProtoBuf;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
@@ -67,6 +68,7 @@ namespace ExpressBase.Objects
         }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
 
         [HideInPropertyGrid]
@@ -100,6 +102,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.Collection)]
+        [Category("Appearance")]
         public bool RenderHorizontally { get; set; }
 
         [HideInPropertyGrid]
@@ -113,7 +116,7 @@ namespace ExpressBase.Objects
 
         public override string GetBareHtml()
         {
-            string html = "<div id='@ebsid@' data-ebtype='3' name='@name@' style='padding:5px' type='RadioGroup'>";
+            string html = "<div id='@ebsid@' data-ebtype='3' name='@name@' type='RadioGroup'>";
             foreach (EbRadioOption ec in this.Options)
             {
                 ec.GName = this.EbSid_CtxId;
@@ -132,12 +135,12 @@ namespace ExpressBase.Objects
             string EbCtrlHTML = HtmlConstants.CONTROL_WRAPER_HTML4WEB
                 .Replace("@barehtml@", @"
                             <div id='@ebsid@' class='radio-wrap @radio-wrap-block@'>
-                                <input type ='radio' id='@ebsid@' @defaultcheked@ value='@value@' name='@gname@'>
-                                <span id='@ebsid@Lbl' ui-label style='@LabelBackColor @LabelForeColor '> RadioButton1 </span>
+                                <input type ='radio' class='eb-radiobtn' id='@ebsid@' @defaultcheked@ value='@value@' name='@gname@'>
+                                <span id='@ebsid@Lbl' class='eb-radiospan' ui-label style='@LabelBackColor @LabelForeColor '> RadioButton1 </span>
                             </div>
                             <div id='@ebsid@' class='radio-wrap @radio-wrap-block@'>
-                                <input type ='radio' id='@ebsid@' @defaultcheked@ value='@value@' name='@gname@'>
-                                <span id='@ebsid@Lbl' ui-label style='@LabelBackColor @LabelForeColor '> RadioButton2  </span>
+                                <input type ='radio' class='eb-radiobtn' id='@ebsid@' @defaultcheked@ value='@value@' name='@gname@'>
+                                <span id='@ebsid@Lbl' class='eb-radiospan' ui-label style='@LabelBackColor @LabelForeColor '> RadioButton2  </span>
                             </div>")
                             .RemoveCR().DoubleQuoted();
 
@@ -219,9 +222,9 @@ this.Init = function(id)
 
         public override string GetBareHtml()
         {/*onclick=""event.stopPropagation();$('#@ebsid@').prop('checked', true);""*/
-            return @"<div id='@ebsid@' class='radio-wrap @radio-wrap-block@' style='padding:5px' onclick=""event.stopPropagation(); $(this).children('input[type=radio]').prop('checked', true); $(this).children('input[type=radio]').trigger('change');"">
-                        <input type ='radio' id='@ebsid@' @defaultcheked@ value='@value@' name='@gname@'>
-                        <span id='@ebsid@Lbl' ui-label style='@LabelBackColor @LabelForeColor '> @label@  </span>
+            return @"<div id='@ebsid@' class='radio-wrap @radio-wrap-block@' onclick=""event.stopPropagation(); $(this).children('input[type=radio]').prop('checked', true); $(this).children('input[type=radio]').trigger('change');"">
+                        <input type ='radio' class='eb-radiobtn' id='@ebsid@' @defaultcheked@ value='@value@' name='@gname@'>
+                        <span id='@ebsid@Lbl' class='eb-radiospan' ui-label> @label@  </span>
                     </div>"
 .Replace("@name@", this.Name)
 .Replace("@ebsid@", this.EbSid_CtxId)

@@ -12,6 +12,13 @@ using System.Threading.Tasks;
 
 namespace ExpressBase.Objects
 {
+    public enum VerticalAlign
+    {
+        Top = 0,
+        Middle = 1,
+        Bottom = 2
+    }
+
     [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
     public class EbTableLayout : EbControlContainer
     {
@@ -23,6 +30,9 @@ namespace ExpressBase.Objects
                 return @"EbTable = {
                 padding : function(elementId, props) {
                     $(`#cont_${ elementId}>table>tbody>tr>td`).css('padding', `${props.Padding.Top}px ${props.Padding.Right}px ${props.Padding.Bottom}px ${props.Padding.Left}px`);
+                },
+                verticalAlign : function(elementId, props) {
+                     $(`[ebsid=${props.EbSid}].form-render-table-Td`).css('vertical-align',getKeyByVal(EbEnums.VerticalAlign,props.VerticalAlign.toString()));
                 }
             }";
             }
@@ -31,8 +41,14 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.Collection)]
         [Alias("Columns")]
+        [PropertyGroup("Behavior")]
+        [PropertyPriority(70)]
         [ListType(typeof(EbTableTd))]
         public override List<EbControl> Controls { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [HideInPropertyGrid]
+        public override string TableName { get; set; }
 
         [JsonIgnore]
         public override string Label { get; set; }
@@ -48,6 +64,9 @@ namespace ExpressBase.Objects
 
         [JsonIgnore]
         public override string LabelForeColor { get; set; }
+
+        [JsonIgnore]
+        public override EbScript OnChangeFn { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.Expandable)]
@@ -81,8 +100,8 @@ namespace ExpressBase.Objects
         public override string GetDesignHtml()
         {
             this.Controls = new List<EbControl>();
-            this.Controls.Add(new EbTableTd { Name = "EbTable0_Td0" });
-            this.Controls.Add(new EbTableTd { Name = "EbTable0_Td1" });
+            this.Controls.Add(new EbTableTd { Name = "EbTable0_Td0", EbSid = "EbTable0_Td0" });
+            this.Controls.Add(new EbTableTd { Name = "EbTable0_Td1", EbSid = "EbTable0_Td1" });
             return GetHtml().RemoveCR().DoubleQuoted();
         }
 
@@ -135,6 +154,12 @@ this.Init = function(id){
         public float WidthPercentage { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [PropertyGroup("Behavior")]
+        [UIproperty]
+        [OnChangeUIFunction("EbTable.verticalAlign")]
+        public VerticalAlign VerticalAlign { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [HideInPropertyGrid]
         public override List<EbControl> Controls { get; set; }
 
@@ -153,12 +178,14 @@ this.Init = function(id){
 
         public override string GetHtml()
         {
-            string html = "<td id='@name@' ebsid='@ebsid@' style='width:@wperc@;'; class='form-render-table-Td tdDropable ebcont-ctrl'> <div style='height: 100%; width: 100%; min-height: 30px;'>";
+            string html = "<td id='@name@' ctrl-ebsid='@ebsid@' ebsid='@ebsid@' style='width:@wperc@;'; class='form-render-table-Td tdDropable ebResizable ebcont-ctrl ppbtn-cont'> <div style='height: 100%; width: 100%; min-height: 30px;'>" +
+                "@ppbtn@";
 
             foreach (EbControl ec in this.Controls)
                 html += ec.GetHtml();
 
             return (html + "</div></td>")
+                .Replace("@ppbtn@", Common.HtmlConstants.CONT_PROP_BTN)
                 .Replace("@name@", this.Name)
                 .Replace("@wperc@", (this.WidthPercentage != 0) ? this.WidthPercentage.ToString() + "%" : "auto")
                 .Replace("@ebsid@", this.EbSid);

@@ -2,12 +2,8 @@
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
 using System.Runtime.Serialization;
-using System.Threading.Tasks;
 
 namespace ExpressBase.Objects
 {
@@ -99,52 +95,6 @@ this.Init = function(id)
 .Replace("@barehtml@", this.GetBareHtml())
 .Replace("@name@", this.Name);
             return EbCtrlHTML;
-        }
-    }
-
-    [EnableInBuilder(BuilderType.BotForm)]
-    [HideInToolBox]
-    public class EbLabel : EbControlUI
-	{
-
-        public EbLabel() { }
-
-        [OnDeserialized]
-        public void OnDeserializedMethod(StreamingContext context)
-        {
-            this.BareControlHtml = this.GetBareHtml();
-            this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
-        }
-
-        public override string DesignHtml4Bot
-        {
-            get => @"
-    <div class='msg-cont'>
-      <div class='bot-icon'></div>
-      <div class='msg-cont-bot'>
-         <div class='msg-wraper-bot'>
-            @Label@
-            <div class='msg-time'>3:44pm</div>
-         </div>
-      </div>
-   </div>".Replace("@Label@", this.Label);
-            set => base.DesignHtml4Bot = value;
-        }
-
-        public override string GetBareHtml()
-        {
-            return @"
-    <div id='cont_@name@' Ctype='Labels' class='Eb-ctrlContainer' eb-hidden='@isHidden@'>
-        <div class='eb-ctrl-label' id='@name@Lbl' style='@LabelBackColor  @LabelForeColor '> @Label@ </div>
-    </div>
-"
-.Replace("@name@", this.Name)
-.Replace("@Label@", this.Label);
-        }
-
-        public override string GetHtml()
-        {
-            return this.GetBareHtml();
         }
     }
 }
