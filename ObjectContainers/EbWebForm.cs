@@ -337,12 +337,16 @@ namespace ExpressBase.Objects
                         _queryPs += (Col.Control as EbDGPowerSelectColumn).GetSelectQuery(_service, Col.ColumnName, _table.TableName, _id);
                 }
             }
+            bool MuCtrlFound = false;
             foreach (Object Ctrl in _schema.ExtendedControls)
             {
                 if (Ctrl is EbFileUploader)
                     extquery += (Ctrl as EbFileUploader).GetSelectQuery();
-                else if (Ctrl is EbManageUser)
+                else if (Ctrl is EbManageUser && !MuCtrlFound)
+                {
                     extquery += (Ctrl as EbManageUser).GetSelectQuery();
+                    MuCtrlFound = true;
+                }
                 else if (Ctrl is EbManageLocation)
                     extquery += (Ctrl as EbManageLocation).GetSelectQuery();
             }
@@ -785,10 +789,13 @@ namespace ExpressBase.Objects
             if (dataset.Tables.Count > _schema.Tables.Count)
             {
                 int tableIndex = _schema.Tables.Count;
-                foreach (Object Ctrl in _schema.ExtendedControls)//FileUploader + ManageUser Controls
+                int mngUsrCount = 0;
+                SingleTable UserTable = null;
+                foreach (Object Ctrl in _schema.ExtendedControls)//FileUploader + ManageUser Controls + Manage Location Control
                 {
                     SingleTable Table = new SingleTable();
-                    GetFormattedData(dataset.Tables[tableIndex], Table);
+                    if(!(UserTable != null && Ctrl is EbManageUser))
+                        GetFormattedData(dataset.Tables[tableIndex], Table);
                     if(Ctrl is EbFileUploader)
                     {
                         List<FileMetaInfo> _list = new List<FileMetaInfo>();
@@ -818,13 +825,18 @@ namespace ExpressBase.Objects
                     else if (Ctrl is EbManageUser)
                     {
                         Dictionary<string, dynamic> _d = new Dictionary<string, dynamic>();
-                        if(Table.Count == 1)
+                        if (UserTable == null)
+                            UserTable = Table;
+                        else
+                            tableIndex--; //one query is used to select required user records
+                        if (UserTable.Count > mngUsrCount)
                         {
-                            _d.Add("id", Table[0]["id"]);
+                            _d.Add("id", UserTable[mngUsrCount]["id"]);
                             foreach(MngUsrLocField _f in (Ctrl as EbManageUser).PersistingFields)
                             {
-                                _d.Add(_f.Name, Table[0][_f.Name]);
+                                _d.Add(_f.Name, UserTable[mngUsrCount][_f.Name]);
                             }
+                            mngUsrCount++;
                         }
                         _FormData.MultipleTables[(Ctrl as EbManageUser).VirtualTable][0].Columns.Add(new SingleColumn() {
                             Name = (Ctrl as EbManageUser).Name,
@@ -849,7 +861,7 @@ namespace ExpressBase.Objects
                             Type = (int)EbDbTypes.String,
                             Value = JsonConvert.SerializeObject(_d)
                         });
-                    }
+                    }    
                     
                     tableIndex++;
                 }
