@@ -278,13 +278,7 @@ namespace ExpressBase.Objects
 
         public override bool ParameterizeControl(IDatabase DataDB, List<DbParameter> param, string tbl, SingleColumn cField, bool ins, ref int i, ref string _col, ref string _val, ref string _extqry, User usr, SingleColumn ocF)
         {
-            if (cField.Value == null)
-            {
-                var p = DataDB.GetNewParameter(cField.Name + "_" + i, (EbDbTypes)cField.Type);
-                p.Value = DBNull.Value;
-                param.Add(p);
-            }
-            else
+            try
             {
                 if (this.EbDateType == EbDateType.Date)
                 {
@@ -299,6 +293,14 @@ namespace ExpressBase.Objects
                     cField.Value = dt.ConvertToUtc(usr.Preference.TimeZone);
                 }
                 param.Add(DataDB.GetNewParameter(cField.Name + "_" + i, EbDbTypes.DateTime, cField.Value));
+            }
+            catch(Exception e)
+            {
+                if (!this.IsNullable)
+                    Console.WriteLine($"Found unexpected value for EbDate control field...\nName : {cField.Name}\nValue : {cField.Value}\nMessage : {e.Message}"); ;
+                DbParameter p = DataDB.GetNewParameter(cField.Name + "_" + i, (EbDbTypes)cField.Type);
+                p.Value = DBNull.Value;
+                param.Add(p);
             }
 
             if (ins)

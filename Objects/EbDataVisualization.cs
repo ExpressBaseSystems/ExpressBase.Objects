@@ -420,6 +420,7 @@ namespace ExpressBase.Objects
         public int PageLength { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
+        [HideInPropertyGrid]
         public bool DisableRowGrouping { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
@@ -532,12 +533,12 @@ namespace ExpressBase.Objects
             this.AfterRedisGetBasicInfo(serviceClient, redis);
         }
 
-        public  void BeforeSave(Service service)
+        public  void BeforeSave(Service service, IRedisClient redis)
         {
-            this.AfterRedisGetBasicInfoByService(service);
+            this.AfterRedisGetBasicInfoByService(service, redis);
         }
 
-        public void AfterRedisGetBasicInfoByService(Service service)
+        public void AfterRedisGetBasicInfoByService(Service service, IRedisClient Redis)
         {
             this.FormLinks = new List<FormLink>();
             foreach (DVBaseColumn col in this.Columns)
