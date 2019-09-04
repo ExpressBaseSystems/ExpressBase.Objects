@@ -768,7 +768,10 @@ namespace ExpressBase.Objects
 
             Console.WriteLine("From RefreshFormData : Schema table count = " + _schema.Tables.Count + " Dataset count = " + dataset.Tables.Count);
 
-            WebformData _FormData = new WebformData();
+            WebformData _FormData = new WebformData()
+            {
+                MasterTable = _schema.MasterTable
+            };
 
             for (int i = 0; i < _schema.Tables.Count && dataset.Tables.Count >= _schema.Tables.Count; i++)
             {
@@ -783,8 +786,6 @@ namespace ExpressBase.Objects
                 if (!_FormData.MultipleTables.ContainsKey(_schema.Tables[i].TableName) && Table.Count > 0)
                     _FormData.MultipleTables.Add(_schema.Tables[i].TableName, Table);
             }
-            if (_FormData.MultipleTables.Count > 0)
-                _FormData.MasterTable = _schema.Tables[0].TableName;
 
             if (dataset.Tables.Count > _schema.Tables.Count)
             {
