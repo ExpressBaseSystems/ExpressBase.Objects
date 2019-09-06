@@ -71,6 +71,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 1)]
         public List<AppStore> Apps { get; set; }
 
+        [DataMember(Order = 1)]
+        public List<AppStore> PublicApps { get; set; }
+
         [DataMember(Order = 2)]
         public string Token { get; set; }
 
@@ -80,6 +83,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public GetAllFromAppstoreResponse()
         {
             Apps = new List<AppStore>();
+            PublicApps = new List<AppStore>();
         }
     }
 
