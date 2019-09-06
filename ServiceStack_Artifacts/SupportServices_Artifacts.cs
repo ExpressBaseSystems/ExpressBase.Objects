@@ -1,4 +1,5 @@
 ﻿using ExpressBase.Common.EbServiceStack.ReqNRes;
+using Microsoft.AspNetCore.Http;
 using ServiceStack;
 using System;
 using System.Collections.Generic;
@@ -29,6 +30,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public string fullname { get; set; }
 
 		public string email { get; set; }
+
+		public IFormFileCollection upload_files { get; set; }
 
 
 
@@ -88,6 +91,21 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 			supporttkt = new List<SupportTktCls>();
 		}
 		public List<SupportTktCls> supporttkt { get; set; }
+	}
+
+	public class UpdateTicketRequest : EbServiceStackAuthRequest, IReturn<UpdateTicketResponse>
+	{
+		public string title { get; set; }
+
+		public string description { get; set; }
+
+		public string priority { get; set; }
+
+		public string ticketid { get; set; }
+	}
+	public class UpdateTicketResponse
+	{
+		public bool status { get; set; }
 	}
 
 
