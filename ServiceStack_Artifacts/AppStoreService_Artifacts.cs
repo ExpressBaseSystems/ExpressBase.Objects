@@ -39,6 +39,26 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 3)]
         public ResponseStatus ResponseStatus { get; set; }
     }
+
+    public class GetAppStoreDetailedRequest: EbServiceStackNoAuthRequest, IReturn<GetAppStoreDetailedResponse>
+    {
+        public int Id { get; set; }
+    }
+
+    public class GetAppStoreDetailedResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public AppStore Store { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        public GetAppStoreDetailedResponse()
+        {
+            this.Store = new AppStore();
+        }
+    }
+
     public class GetAllFromAppStoreInternalRequest : EbServiceStackAuthRequest, IReturn<GetAllFromAppstoreResponse>
     {
     }
@@ -51,11 +71,20 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 1)]
         public List<AppStore> Apps { get; set; }
 
+        [DataMember(Order = 1)]
+        public List<AppStore> PublicApps { get; set; }
+
         [DataMember(Order = 2)]
         public string Token { get; set; }
 
         [DataMember(Order = 3)]
         public ResponseStatus ResponseStatus { get; set; }
+
+        public GetAllFromAppstoreResponse()
+        {
+            Apps = new List<AppStore>();
+            PublicApps = new List<AppStore>();
+        }
     }
 
     public class ShareToPublicRequest : EbServiceStackAuthRequest, IReturn<ShareToPublicResponse>

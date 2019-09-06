@@ -126,16 +126,19 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.WebForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.CollectionProp, "Columns", "bVisible")]
+        [PropertyGroup("Behavior")]
         //[HideInPropertyGrid]
         public DVColumnCollection Columns { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
+        [PropertyGroup("Behavior")]
         public DVColumnCollection DisplayMembers { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", 1)]
         [OnChangeExec(@"if (this.Columns.$values.length === 0 ){pg.MakeReadOnly('ValueMember');} else {pg.MakeReadWrite('ValueMember');}")]
+        [PropertyGroup("Behavior")]
         public DVBaseColumn ValueMember { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
@@ -146,7 +149,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [DefaultPropValue("100")]
-        [Category("Appearance")]
+        [PropertyGroup("Appearance")]
         public int DropdownHeight { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
@@ -156,6 +159,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [HelpText("Specify minimum number of charecters to initiate search")]
         [Category("Search Settings")]
+        [PropertyGroup("Behavior")]
         public int MinSeachLength { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
@@ -163,6 +167,7 @@ namespace ExpressBase.Objects
         public string Text { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup("Behavior")]
         [OnChangeExec(@"
             if (this.MultiSelect === true ){
                 pg.MakeReadWrite('MaxLimit');   
@@ -190,7 +195,7 @@ namespace ExpressBase.Objects
         public override bool Required { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [Category("Behavior")]
+        [PropertyGroup("Behavior")]
         [OnChangeExec(@"
             if (this.MultiSelect === true ){
                 pg.MakeReadWrite('MaxLimit');   
@@ -215,7 +220,6 @@ namespace ExpressBase.Objects
                     pg.setSimpleProperty('MinLimit', 0);
                 }
             }")]
-
         public bool MultiSelect
         {
             get
@@ -227,19 +231,22 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [DefaultPropValue("1")]
+        [PropertyGroup("Behavior")]
         public int MaxLimit { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup("Behavior")]
         public int MinLimit { get; set; }
 
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [Category("Search Settings")]
+        [PropertyGroup("Search Settings")]
         [Alias("Search Method")]
         [HelpText("Select Search Method - StartsWith, EndsWith, Contains or Exact Match")]
         public DefaultSearchFor DefaultSearchFor { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup("Behavior")]
         public int NumberOfFields { get; set; }
 
         //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]

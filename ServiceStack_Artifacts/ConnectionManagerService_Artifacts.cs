@@ -298,6 +298,20 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
+    public class AddAWSS3Request : IReturn<AddDropBoxResponse>, IEbTenentRequest
+    {
+        public EbAWSS3Config Config { get; set; }
+
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
+    }
+
+    public class AddAWSS3Response : IEbSSResponse
+    {
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
     public class AddSendGridRequest : IReturn<AddGoogleMapResponse>, IEbTenentRequest
     {
         public EbSendGridConfig Config { get; set; }

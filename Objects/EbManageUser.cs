@@ -15,7 +15,6 @@ using ExpressBase.Objects.Objects;
 namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.WebForm)]
-    [HideInToolBox]
     class EbManageUser : EbControlUI, IEbPlaceHolderControl
     {
         public EbManageUser()
@@ -35,6 +34,7 @@ namespace ExpressBase.Objects
         public override string ToolNameAlias { get { return "Manage User"; } set { } }
 
         [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
         public override bool Hidden { get { return true; } }
 
         [EnableInBuilder(BuilderType.WebForm)]
@@ -42,6 +42,7 @@ namespace ExpressBase.Objects
         public override bool IsSysControl { get { return true; } }
 
         [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyGroup("Identity")]
         [PropertyEditor(PropertyEditorType.Collection)]
         [ListType(typeof(MngUsrLocFieldAbstract))]
         public List<MngUsrLocFieldAbstract> Fields { get; set; }
@@ -49,6 +50,70 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
+
+        //--------Hide in property grid------------
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override string HelpText { get; set; }
+        
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override string ToolTipText { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override bool Unique { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override List<EbValidator> Validators { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override EbScript DefaultValueExpression { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override EbScript VisibleExpr { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override EbScript ValueExpr { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override bool IsDisable { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override bool Required { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override bool DoNotPersist { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override string BackColor { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override string ForeColor { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override string LabelBackColor { get; set; }
+        
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override string LabelForeColor { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override EbScript OnChangeFn { get; set; }
+
+        //-----------------------------------------------------
 
         public NTV[] FuncParam = {
             //new NTV (){ Name = "userid", Type = EbDbTypes.Int32, Value = DBNull.Value},//eb_createdby
@@ -95,7 +160,7 @@ this.Init = function(id)
 	this.Fields.$values.push(new EbObjects.MngUsrLocField('roles'));
 	this.Fields.$values.push(new EbObjects.MngUsrLocField('groups'));
 	this.Fields.$values.push(new EbObjects.MngUsrLocField('preference'));
-	this.Fields.$values.push(new EbObjects.MngUsrLocField('consadd'));
+	//this.Fields.$values.push(new EbObjects.MngUsrLocField('consadd'));
 };";
         }
 
@@ -134,6 +199,8 @@ this.Init = function(id)
 
         public string VirtualTable { get; set; }
 
+        public bool AddLocConstraint { get; set; }
+
         public IEnumerable<MngUsrLocFieldAbstract> PersistingFields
         {
             get
@@ -145,12 +212,18 @@ this.Init = function(id)
         public string GetSelectQuery()
         {
             string cols = string.Join(",", this.PersistingFields.Select(f => (f as MngUsrLocField).Name));
-            return string.Format("SELECT id,{0} FROM eb_users WHERE eb_ver_id = :eb_ver_id AND eb_data_id = :id;", cols);
+            return string.Format("SELECT id,{0} FROM eb_users WHERE eb_ver_id = :eb_ver_id AND eb_data_id = :id ORDER BY id;", cols);
+            //if multiple user ctrl placed in form then one select query is enough // imp
         }
         private string GetSaveQuery(bool ins, string param, string mtbl, string pemail)
         {
             if (ins)
-                return string.Format("SELECT * FROM eb_security_user(:eb_createdby, {0}); UPDATE eb_users SET eb_ver_id = :eb_ver_id, eb_data_id = eb_currval('{1}_id_seq') WHERE email = {2};", param, mtbl, pemail);
+            {
+                string consqry = string.Empty;
+                if (this.AddLocConstraint)
+                    consqry = "SELECT * FROM eb_security_constraints(:eb_createdby, eb_currval('eb_users_id_seq'), '1$no description$1;5;' || eb_currval('eb_locations_id_seq'), '');";
+                return string.Format("SELECT * FROM eb_security_user(:eb_createdby, {0}); UPDATE eb_users SET eb_ver_id = :eb_ver_id, eb_data_id = eb_currval('{1}_id_seq') WHERE email = {2};", param, mtbl, pemail) + consqry;
+            }
             else
                 return string.Format("SELECT * FROM eb_security_user(:eb_createdby, {0});", param);
         }
@@ -167,6 +240,11 @@ this.Init = function(id)
                 EbDataTable dt = DataDB.DoQuery(sql, parameters);
                 if (dt.Rows.Count > 0)
                     return false;// raise an exception to notify email already exists
+                //if (this.AddLocConstraint)
+                //{
+                    //EbConstraints consObj = new EbConstraints(new string[] { " eb_currval('eb_locations_id_seq') " }, EbConstraintKeyTypes.User, EbConstraintTypes.User_Location);
+                    //this.FuncParam[21].Value = consObj.GetDataAsString();// index of 'consadd' is 21
+                //}
             }
             else
             {
@@ -196,7 +274,7 @@ this.Init = function(id)
                     ep = string.Concat(":", this.FuncParam[k].Name, "_", i);
             }
 
-            _extqry = this.GetSaveQuery(ins, c.Substring(0, c.Length - 2), tbl, ep) + _extqry;
+            _extqry += this.GetSaveQuery(ins, c.Substring(0, c.Length - 2), tbl, ep);
             
             return true;
         }
@@ -216,6 +294,10 @@ this.Init = function(id)
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
         public string Name { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public string DisplayName { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
         public string ControlName { get; set; }

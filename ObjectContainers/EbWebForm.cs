@@ -337,12 +337,16 @@ namespace ExpressBase.Objects
                         _queryPs += (Col.Control as EbDGPowerSelectColumn).GetSelectQuery(_service, Col.ColumnName, _table.TableName, _id);
                 }
             }
+            bool MuCtrlFound = false;
             foreach (Object Ctrl in _schema.ExtendedControls)
             {
                 if (Ctrl is EbFileUploader)
                     extquery += (Ctrl as EbFileUploader).GetSelectQuery();
-                else if (Ctrl is EbManageUser)
+                else if (Ctrl is EbManageUser && !MuCtrlFound)
+                {
                     extquery += (Ctrl as EbManageUser).GetSelectQuery();
+                    MuCtrlFound = true;
+                }
                 else if (Ctrl is EbManageLocation)
                     extquery += (Ctrl as EbManageLocation).GetSelectQuery();
             }
@@ -764,7 +768,10 @@ namespace ExpressBase.Objects
 
             Console.WriteLine("From RefreshFormData : Schema table count = " + _schema.Tables.Count + " Dataset count = " + dataset.Tables.Count);
 
-            WebformData _FormData = new WebformData();
+            WebformData _FormData = new WebformData()
+            {
+                MasterTable = _schema.MasterTable
+            };
 
             for (int i = 0; i < _schema.Tables.Count && dataset.Tables.Count >= _schema.Tables.Count; i++)
             {
@@ -779,16 +786,17 @@ namespace ExpressBase.Objects
                 if (!_FormData.MultipleTables.ContainsKey(_schema.Tables[i].TableName) && Table.Count > 0)
                     _FormData.MultipleTables.Add(_schema.Tables[i].TableName, Table);
             }
-            if (_FormData.MultipleTables.Count > 0)
-                _FormData.MasterTable = _schema.Tables[0].TableName;
 
             if (dataset.Tables.Count > _schema.Tables.Count)
             {
                 int tableIndex = _schema.Tables.Count;
-                foreach (Object Ctrl in _schema.ExtendedControls)//FileUploader + ManageUser Controls
+                int mngUsrCount = 0;
+                SingleTable UserTable = null;
+                foreach (Object Ctrl in _schema.ExtendedControls)//FileUploader + ManageUser Controls + Manage Location Control
                 {
                     SingleTable Table = new SingleTable();
-                    GetFormattedData(dataset.Tables[tableIndex], Table);
+                    if(!(UserTable != null && Ctrl is EbManageUser))
+                        GetFormattedData(dataset.Tables[tableIndex], Table);
                     if(Ctrl is EbFileUploader)
                     {
                         List<FileMetaInfo> _list = new List<FileMetaInfo>();
@@ -818,13 +826,18 @@ namespace ExpressBase.Objects
                     else if (Ctrl is EbManageUser)
                     {
                         Dictionary<string, dynamic> _d = new Dictionary<string, dynamic>();
-                        if(Table.Count == 1)
+                        if (UserTable == null)
+                            UserTable = Table;
+                        else
+                            tableIndex--; //one query is used to select required user records
+                        if (UserTable.Count > mngUsrCount)
                         {
-                            _d.Add("id", Table[0]["id"]);
+                            _d.Add("id", UserTable[mngUsrCount]["id"]);
                             foreach(MngUsrLocField _f in (Ctrl as EbManageUser).PersistingFields)
                             {
-                                _d.Add(_f.Name, Table[0][_f.Name]);
+                                _d.Add(_f.Name, UserTable[mngUsrCount][_f.Name]);
                             }
+                            mngUsrCount++;
                         }
                         _FormData.MultipleTables[(Ctrl as EbManageUser).VirtualTable][0].Columns.Add(new SingleColumn() {
                             Name = (Ctrl as EbManageUser).Name,
@@ -845,11 +858,11 @@ namespace ExpressBase.Objects
                         }
                         _FormData.MultipleTables[(Ctrl as EbManageLocation).VirtualTable][0].Columns.Add(new SingleColumn()
                         {
-                            Name = (Ctrl as EbManageUser).Name,
+                            Name = (Ctrl as EbManageLocation).Name,
                             Type = (int)EbDbTypes.String,
                             Value = JsonConvert.SerializeObject(_d)
                         });
-                    }
+                    }    
                     
                     tableIndex++;
                 }
@@ -1864,14 +1877,19 @@ namespace ExpressBase.Objects
                 {
                     if (control is EbFileUploader)
                         _schema.ExtendedControls.Add(control);
-                    if (control is EbManageUser)
+                    else if (control is EbManageUser)
                     {
                         (control as EbManageUser).VirtualTable = curTbl;
+                        int idx = _schema.ExtendedControls.FindIndex(e => e is EbManageLocation);
+                        if (idx >= 0)
+                            (control as EbManageUser).AddLocConstraint = true;
                         _schema.ExtendedControls.Add(control);
                     }
                     else if(control is EbManageLocation)
                     {
                         (control as EbManageLocation).VirtualTable = curTbl;
+                        foreach(object temp in _schema.ExtendedControls.FindAll(e => e is EbManageUser))
+                            (temp as EbManageUser).AddLocConstraint = true;
                         _schema.ExtendedControls.Add(control);
                     }
                     else if (control is EbDGUserControlColumn)
