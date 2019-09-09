@@ -1,7 +1,9 @@
 ﻿using ExpressBase.Common.EbServiceStack.ReqNRes;
 using Microsoft.AspNetCore.Http;
 using ServiceStack;
+using ServiceStack.Text;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
@@ -31,11 +33,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 		public string email { get; set; }
 
-		public IFormFileCollection upload_files { get; set; }
-
-
-
+		public List<byte[]> Filecollection { set; get; } = new List<byte[]>();
 	}
+
 	public class SaveBugResponse
 	{
 		public int Id { get; set; }
@@ -132,6 +132,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public string createdat { get; set; }
 
 		public string remarks { get; set; }
+
+		public List<byte[]> Filecollection { set; get; } = new List<byte[]>();
+
+
 	}
 
 }
