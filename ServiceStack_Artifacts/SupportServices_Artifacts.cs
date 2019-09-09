@@ -40,6 +40,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 	{
 		public int Id { get; set; }
 		public string status { get; set; }
+
+		
 	}
 
 	public class TenantSolutionsRequest : EbServiceStackAuthRequest, IReturn<TenantSolutionsResponse>
@@ -91,6 +93,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 			supporttkt = new List<SupportTktCls>();
 		}
 		public List<SupportTktCls> supporttkt { get; set; }
+
+		public List<string> Filecollection1 { set; get; } = new List<string>();
 	}
 
 	public class UpdateTicketRequest : EbServiceStackAuthRequest, IReturn<UpdateTicketResponse>
