@@ -1,7 +1,9 @@
 ﻿using ExpressBase.Common.EbServiceStack.ReqNRes;
 using Microsoft.AspNetCore.Http;
 using ServiceStack;
+using ServiceStack.Text;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
@@ -31,15 +33,15 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 		public string email { get; set; }
 
-		public IFormFileCollection upload_files { get; set; }
-
-
-
+		public List<byte[]> Filecollection { set; get; } = new List<byte[]>();
 	}
+
 	public class SaveBugResponse
 	{
 		public int Id { get; set; }
 		public string status { get; set; }
+
+		
 	}
 
 	public class TenantSolutionsRequest : EbServiceStackAuthRequest, IReturn<TenantSolutionsResponse>
@@ -91,6 +93,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 			supporttkt = new List<SupportTktCls>();
 		}
 		public List<SupportTktCls> supporttkt { get; set; }
+
+		public List<string> Filecollection1 { set; get; } = new List<string>();
 	}
 
 	public class UpdateTicketRequest : EbServiceStackAuthRequest, IReturn<UpdateTicketResponse>
@@ -132,6 +136,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public string createdat { get; set; }
 
 		public string remarks { get; set; }
+
+		public List<byte[]> Filecollection { set; get; } = new List<byte[]>();
+
+
 	}
 
 }
