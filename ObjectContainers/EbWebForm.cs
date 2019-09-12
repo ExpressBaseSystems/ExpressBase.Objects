@@ -342,13 +342,13 @@ namespace ExpressBase.Objects
             {
                 if (Ctrl is EbFileUploader)
                     extquery += (Ctrl as EbFileUploader).GetSelectQuery();
-                else if (Ctrl is EbManageUser && !MuCtrlFound)
+                else if (Ctrl is EbProvisionUser && !MuCtrlFound)
                 {
-                    extquery += (Ctrl as EbManageUser).GetSelectQuery();
+                    extquery += (Ctrl as EbProvisionUser).GetSelectQuery();
                     MuCtrlFound = true;
                 }
-                else if (Ctrl is EbManageLocation)
-                    extquery += (Ctrl as EbManageLocation).GetSelectQuery();
+                else if (Ctrl is EbProvisionLocation)
+                    extquery += (Ctrl as EbProvisionLocation).GetSelectQuery();
             }
             return query + extquery;
         }
@@ -795,7 +795,7 @@ namespace ExpressBase.Objects
                 foreach (Object Ctrl in _schema.ExtendedControls)//FileUploader + ManageUser Controls + Manage Location Control
                 {
                     SingleTable Table = new SingleTable();
-                    if(!(UserTable != null && Ctrl is EbManageUser))
+                    if(!(UserTable != null && Ctrl is EbProvisionUser))
                         GetFormattedData(dataset.Tables[tableIndex], Table);
                     if(Ctrl is EbFileUploader)
                     {
@@ -823,7 +823,7 @@ namespace ExpressBase.Objects
                         };
                         _FormData.ExtendedTables.Add((Ctrl as EbControl).EbSid, _Table);
                     }
-                    else if (Ctrl is EbManageUser)
+                    else if (Ctrl is EbProvisionUser)
                     {
                         Dictionary<string, dynamic> _d = new Dictionary<string, dynamic>();
                         if (UserTable == null)
@@ -833,19 +833,19 @@ namespace ExpressBase.Objects
                         if (UserTable.Count > mngUsrCount)
                         {
                             _d.Add("id", UserTable[mngUsrCount]["id"]);
-                            foreach(MngUsrLocField _f in (Ctrl as EbManageUser).PersistingFields)
+                            foreach(UsrLocField _f in (Ctrl as EbProvisionUser).PersistingFields)
                             {
                                 _d.Add(_f.Name, UserTable[mngUsrCount][_f.Name]);
                             }
                             mngUsrCount++;
                         }
-                        _FormData.MultipleTables[(Ctrl as EbManageUser).VirtualTable][0].Columns.Add(new SingleColumn() {
-                            Name = (Ctrl as EbManageUser).Name,
+                        _FormData.MultipleTables[(Ctrl as EbProvisionUser).VirtualTable][0].Columns.Add(new SingleColumn() {
+                            Name = (Ctrl as EbProvisionUser).Name,
                             Type = (int)EbDbTypes.String,
                             Value = JsonConvert.SerializeObject(_d)
                         });
                     }
-                    else if (Ctrl is EbManageLocation)
+                    else if (Ctrl is EbProvisionLocation)
                     {
                         Dictionary<string, dynamic> _d = new Dictionary<string, dynamic>();
                         if (Table.Count == 1)
@@ -856,9 +856,9 @@ namespace ExpressBase.Objects
                             _d.Add("image", Table[0]["image"]);
                             _d.Add("meta_json", Table[0]["meta_json"]);
                         }
-                        _FormData.MultipleTables[(Ctrl as EbManageLocation).VirtualTable][0].Columns.Add(new SingleColumn()
+                        _FormData.MultipleTables[(Ctrl as EbProvisionLocation).VirtualTable][0].Columns.Add(new SingleColumn()
                         {
-                            Name = (Ctrl as EbManageLocation).Name,
+                            Name = (Ctrl as EbProvisionLocation).Name,
                             Type = (int)EbDbTypes.String,
                             Value = JsonConvert.SerializeObject(_d)
                         });
@@ -1877,19 +1877,19 @@ namespace ExpressBase.Objects
                 {
                     if (control is EbFileUploader)
                         _schema.ExtendedControls.Add(control);
-                    else if (control is EbManageUser)
+                    else if (control is EbProvisionUser)
                     {
-                        (control as EbManageUser).VirtualTable = curTbl;
-                        int idx = _schema.ExtendedControls.FindIndex(e => e is EbManageLocation);
+                        (control as EbProvisionUser).VirtualTable = curTbl;
+                        int idx = _schema.ExtendedControls.FindIndex(e => e is EbProvisionLocation);
                         if (idx >= 0)
-                            (control as EbManageUser).AddLocConstraint = true;
+                            (control as EbProvisionUser).AddLocConstraint = true;
                         _schema.ExtendedControls.Add(control);
                     }
-                    else if(control is EbManageLocation)
+                    else if(control is EbProvisionLocation)
                     {
-                        (control as EbManageLocation).VirtualTable = curTbl;
-                        foreach(object temp in _schema.ExtendedControls.FindAll(e => e is EbManageUser))
-                            (temp as EbManageUser).AddLocConstraint = true;
+                        (control as EbProvisionLocation).VirtualTable = curTbl;
+                        foreach(object temp in _schema.ExtendedControls.FindAll(e => e is EbProvisionUser))
+                            (temp as EbProvisionUser).AddLocConstraint = true;
                         _schema.ExtendedControls.Add(control);
                     }
                     else if (control is EbDGUserControlColumn)
@@ -1929,6 +1929,7 @@ namespace ExpressBase.Objects
         public override void AfterRedisGet(RedisClient Redis, IServiceClient client)
         {
             EbFormHelper.AfterRedisGet(this, Redis, client);
+            this.GetWebFormSchema();
         }
 
         public override string DiscoverRelatedRefids()
