@@ -88,7 +88,8 @@ namespace ExpressBase.Objects
                         console.warn('Mismatch found in Colums in datasource and Colums in object');
                         return true;
                     }
-                    columnVals[item.Name].push(item.Value);
+                    let val = EbConvertValue(item.Value, item.Type);
+                    columnVals[item.Name].push(val);
                 }.bind(this));
             }.bind(this));
         }
