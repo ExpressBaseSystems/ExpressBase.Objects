@@ -58,6 +58,70 @@ namespace ExpressBase.Objects
         //    set { }
         //}
 
+        public override string IsRequiredOKJSfn
+        {
+            get
+            {
+                return @"
+                    if(this.RenderAsSimpleSelect){"
+                        + this.EbSimpleSelect.IsRequiredOKJSfn +
+                    @"}
+                    else{"
+                        + new EbControl().IsRequiredOKJSfn +
+                    @"}
+                ";
+            }
+            set { }
+        }
+
+        public override string GetDisplayMemberJSfn
+        {
+            get
+            {
+                return @"
+                    if(this.RenderAsSimpleSelect){"
+                        + this.EbSimpleSelect.GetDisplayMemberJSfn +
+                    @"}
+                    else{"
+                        + new EbControl().IsRequiredOKJSfn +
+                    @"}
+                ";
+            }
+            set { }
+        }
+
+        public override string DisableJSfn
+        {
+            get
+            {
+                return @"
+                    if(this.RenderAsSimpleSelect){"
+                        + this.EbSimpleSelect.DisableJSfn +
+                    @"}
+                    else{"
+                        + new EbControl().DisableJSfn +
+                    @"}
+                ";
+            }
+            set { }
+        }
+
+        public override string EnableJSfn
+        {
+            get
+            {
+                return @"
+                    if(this.RenderAsSimpleSelect){"
+                        + this.EbSimpleSelect.EnableJSfn +
+                    @"}
+                    else{"
+                        + new EbControl().EnableJSfn +
+                    @"}
+                ";
+            }
+            set { }
+        }
+
         public override string SetValueJSfn
         {
             get
