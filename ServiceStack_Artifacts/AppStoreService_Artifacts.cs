@@ -40,7 +40,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-    public class GetAppStoreDetailedRequest: EbServiceStackNoAuthRequest, IReturn<GetAppStoreDetailedResponse>
+    public class GetAppStoreDetailedRequest : EbServiceStackNoAuthRequest, IReturn<GetAppStoreDetailedResponse>
     {
         public int Id { get; set; }
     }
@@ -121,6 +121,30 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public List<AppStore> StoreCollection { get; set; }
 
     }
+
+    public class AppAndsolutionInfoRequest : EbServiceStackAuthRequest, IReturn<AppAndsolutionInfoResponse>
+    {
+        [DataMember(Order = 1)]
+        public int AppId { set; get; }
+    }
+    public class AppAndsolutionInfoResponse: IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 2)]
+        public List<EbSolutionsWrapper> Solutions { get; set; }
+
+        [DataMember(Order = 3)]
+        public AppStore AppData { get; set; }
+
+        public AppAndsolutionInfoResponse()
+        {
+            this.AppData = new AppStore();
+            this.Solutions = new List<EbSolutionsWrapper>();
+        }
+    }
+
 
     public class AppStore
     {
