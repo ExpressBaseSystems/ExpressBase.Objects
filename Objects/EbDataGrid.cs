@@ -55,6 +55,10 @@ namespace ExpressBase.Objects
         [Alias("Serial numbered")]
         public bool IsShowSerialNumber { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [PropertyGroup("Behavior")]
+        public bool NewRowOnTop { get; set; }
+
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         public override EbScript OnChangeFn { get; set; }
