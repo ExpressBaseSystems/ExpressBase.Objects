@@ -76,19 +76,19 @@ namespace ExpressBase.Objects
             return html.Replace("@name@", this.Name);
         }
 
-        public override string DiscoverRelatedRefids()
+        public override List<string> DiscoverRelatedRefids()
         {
-            string refids = "";
+            List<string> refids = new List<string>();
             foreach (EbControl control in Controls)
             {
                 PropertyInfo[] _props = control.GetType().GetProperties();
                 foreach (PropertyInfo _prop in _props)
                 {
                     if (_prop.IsDefined(typeof(OSE_ObjectTypes)))
-                        refids+=_prop.GetValue(control, null).ToString()+",";
+                        refids.Add(_prop.GetValue(control, null).ToString());
                 }
             }
-            return "";
+            return refids;
         }
 
         public override void ReplaceRefid(Dictionary<string, string> RefidMap)

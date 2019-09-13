@@ -364,7 +364,7 @@ namespace ExpressBase.Objects
 
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
     [BuilderTypeEnum(BuilderType.DVBuilder)]
-    public class EbTableVisualization : EbDataVisualization,IEBRootObject
+    public class EbTableVisualization : EbDataVisualization, IEBRootObject
     {
 
         [OnDeserialized]
@@ -446,12 +446,12 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         public EbWebForm WebForm { get; set; }
 
-        public static EbOperations Operations = TVOperations.Instance; 
+        public static EbOperations Operations = TVOperations.Instance;
 
         public EbTableVisualization()
         {
             this.RowGroupCollection = new List<RowGroupParent>();
-			this.NotVisibleColumns = new List<DVBaseColumn>();
+            this.NotVisibleColumns = new List<DVBaseColumn>();
             this.CurrentRowGroup = new RowGroupParent();
             this.OrderBy = new List<DVBaseColumn>();
             this.ColumnsCollection = new List<DVColumnCollection>();
@@ -459,23 +459,25 @@ namespace ExpressBase.Objects
             this.FormLinks = new List<FormLink>();
         }
 
-        public override string DiscoverRelatedRefids()
+        public override List<string> DiscoverRelatedRefids()
         {
-            string refids = "";
+            List<string> refids = new List<string>();
             if (!DataSourceRefId.IsEmpty())
             {
                 EbDataReader ds = EbDataSource;
                 if (ds is null)
                 {
-                    refids += DataSourceRefId + ",";
+                    refids.Add(DataSourceRefId);
                 }
             }
             foreach (DVBaseColumn _col in Columns)
             {
                 if (!_col.LinkRefId.IsNullOrEmpty())
-                {
-                    refids += _col.LinkRefId + ",";
-                }
+                    refids.Add(_col.LinkRefId);
+                if (!_col.GroupFormLink.IsNullOrEmpty())
+                    refids.Add(_col.GroupFormLink);
+                if (!_col.ItemFormLink.IsNullOrEmpty())
+                    refids.Add(_col.ItemFormLink);
             }
             return refids;
         }
@@ -496,6 +498,10 @@ namespace ExpressBase.Objects
                 {
                     if (RefidMap.ContainsKey(_col.LinkRefId))
                         _col.LinkRefId = RefidMap[_col.LinkRefId];
+                    else if (RefidMap.ContainsKey(_col.GroupFormLink))
+                        _col.GroupFormLink = RefidMap[_col.GroupFormLink];
+                    else if (RefidMap.ContainsKey(_col.ItemFormLink))
+                        _col.ItemFormLink = RefidMap[_col.ItemFormLink];
                     else
                         _col.LinkRefId = "failed-to-update-";
                 }
@@ -533,7 +539,7 @@ namespace ExpressBase.Objects
             this.AfterRedisGetBasicInfo(serviceClient, redis);
         }
 
-        public  void BeforeSave(Service service, IRedisClient redis)
+        public void BeforeSave(Service service, IRedisClient redis)
         {
             this.AfterRedisGetBasicInfoByService(service, redis);
         }
@@ -578,7 +584,7 @@ namespace ExpressBase.Objects
         public override bool IsPaging { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
-        [DefaultPropValue("0")]        
+        [DefaultPropValue("0")]
         [HideInPropertyGrid]
         public ChartType Charttype { get; set; }
 
@@ -601,7 +607,7 @@ namespace ExpressBase.Objects
         {
             return "<canvas style='width:100%' eb-type='Table' id='@name@'></canvas>"
 
- .Replace("@name@", (this.EbSid != null) ? this.EbSid : "@name@");
+    .Replace("@name@", (this.EbSid != null) ? this.EbSid : "@name@");
         }
 
         [PropertyGroup("Xaxis")]
@@ -687,16 +693,17 @@ namespace ExpressBase.Objects
 
         public static EbOperations Operations = CVOperations.Instance;
 
-        public override string DiscoverRelatedRefids()
+        public override List<string> DiscoverRelatedRefids()
         {
+            List<string> _refids = new List<string>();
             if (!DataSourceRefId.IsEmpty())
             {
                 EbDataReader ds = EbDataSource;
                 if (ds is null)
-                    return DataSourceRefId;
+                    _refids.Add(DataSourceRefId);
             }
-            return "";
-        } 
+            return _refids;
+        }
 
         public override void ReplaceRefid(Dictionary<string, string> RefidMap)
         {
@@ -730,7 +737,7 @@ namespace ExpressBase.Objects
         public override bool IsPaging { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
-        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns",1)]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", 1)]
         [Alias("LatLong")]
         [HideForUser]
         public DVBaseColumn LatLong { get; set; }
@@ -784,20 +791,21 @@ namespace ExpressBase.Objects
 
         [PropertyGroup("Zoom")]
         [EnableInBuilder(BuilderType.DVBuilder)]
-        [DefaultPropValue("10")]        
+        [DefaultPropValue("10")]
         public int Zoomlevel { get; set; }
 
         public static EbOperations Operations = MapOperations.Instance;
 
-        public override string DiscoverRelatedRefids()
+        public override List<string> DiscoverRelatedRefids()
         {
+            List<string> _refids = new List<string>();
             if (!DataSourceRefId.IsEmpty())
             {
                 EbDataReader ds = EbDataSource;
                 if (ds is null)
-                    return DataSourceRefId;
+                    _refids.Add(DataSourceRefId);
             }
-            return "";
+            return _refids;
         }
 
         public override void ReplaceRefid(Dictionary<string, string> RefidMap)
