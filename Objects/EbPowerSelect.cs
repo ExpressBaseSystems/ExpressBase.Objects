@@ -395,30 +395,87 @@ namespace ExpressBase.Objects
         }
 
         //INCOMPLETE// to get the entire columns(vm+dm+others) in ps query
-        public string GetSelectQuery(Service service, string Col, string Tbl = null, string _id = null)
+        public string GetSelectQuery(IDatabase DataDB, Service service, string Col, string Tbl = null, string _id = null)
         {
             string Sql = this.GetSql(service);
 
             if (Tbl == null || _id == null)// prefill mode
-                return string.Format(@"SELECT __A.* FROM ({0}) __A 
+            {
+                string s = "";
+                if (DataDB.Vendor == DatabaseVendors.MYSQL)
+                {
+                    s = string.Format(@"
+                                DROP TEMPORARY TABLE IF EXISTS temp_array_table;
+		                        DROP TEMPORARY TABLE IF EXISTS temp_mem;
+		                        CREATE TEMPORARY TABLE temp_array_table(value text); 
+                                CALL STR_TO_TBL('{2}'); 
+                                CREATE TEMPORARY TABLE temp_mem SELECT `value` FROM temp_array_table;
+                                    SELECT __A.* FROM ({0}) __A 
+                                    WHERE __A.{1} = ANY(SELECT CAST(`value` AS UNSIGNED INTEGER) FROM temp_mem);",
+                                                        Sql, this.ValueMember.Name, Col);
+                }
+                else
+                {
+                    s = string.Format(@"SELECT __A.* FROM ({0}) __A 
                                     WHERE __A.{1} = ANY(STRING_TO_ARRAY('{2}'::TEXT, ',')::INT[]);",
-                                    Sql, this.ValueMember.Name, Col);
-            else// normal mode
-                return string.Format(@"SELECT __A.* FROM ({0}) __A, {1} __B
+                                                        Sql, this.ValueMember.Name, Col);
+                }
+                return s;
+            }
+            else
+            {
+                // normal mode
+                string s = "";
+                if (DataDB.Vendor == DatabaseVendors.MYSQL)
+                {
+                    s = string.Format(@"
+                                DROP TEMPORARY TABLE IF EXISTS temp_array_table;
+		                        DROP TEMPORARY TABLE IF EXISTS temp_mem;
+		                        CREATE TEMPORARY TABLE temp_array_table(value text); 
+                                CALL STR_TO_TBL('{3}'); 
+                                CREATE TEMPORARY TABLE temp_mem SELECT `value` FROM temp_array_table;
+                                SELECT __A.* FROM ({0}) __A, {1} __B
+                                    WHERE __A.{2} = ANY(SELECT CAST(`value` AS UNSIGNED INTEGER) FROM temp_mem) AND __B.{4} = :id;",
+                                        Sql, Tbl, this.ValueMember.Name, Col, _id);
+                }
+                else
+                {
+                    s = string.Format(@"SELECT __A.* FROM ({0}) __A, {1} __B
                                     WHERE __A.{2} = ANY(STRING_TO_ARRAY(__B.{3}::TEXT, ',')::INT[]) AND __B.{4} = :id;",
                                         Sql, Tbl, this.ValueMember.Name, Col, _id);
+                }
+                return s;
+            }
         }
 
         //to get vm+dm only for audit trail
-        public string GetDisplayMembersQuery(Service service, string vms)
+        public string GetDisplayMembersQuery(IDatabase DataDB, Service service, string vms)
         {
             string Sql = this.GetSql(service);
             string vm = this.ValueMember.Name;
             string dm = string.Join(',', this.DisplayMembers.Select(e => e.Name));
 
-            return string.Format(@"SELECT {0}, {1} FROM ({2}) __A
+            string s = "";
+            if (DataDB.Vendor == DatabaseVendors.MYSQL)
+            {
+                s = string.Format(@"
+                            DROP TEMPORARY TABLE IF EXISTS temp_array_table;
+                            DROP TEMPORARY TABLE IF EXISTS temp_mems;
+                            CREATE TEMPORARY TABLE temp_array_table(value text); 
+                            CALL STR_TO_TBL('{3}'); 
+                            CREATE TEMPORARY TABLE temp_mems SELECT `value` FROM temp_array_table;
+                            SELECT {0}, {1} FROM ({2}) __A
+                            WHERE __A.{0} = ANY(SELECT CAST(`value` AS UNSIGNED INTEGER) FROM temp_mems);",
+                            vm, dm, Sql, vms);
+            }
+            else
+            {
+                s = string.Format(@"SELECT {0}, {1} FROM ({2}) __A
                                         WHERE __A.{0} = ANY(STRING_TO_ARRAY('{3}'::TEXT, ',')::INT[]);",
                                             vm, dm, Sql, vms);
+            }
+
+            return s;
         }
     }
 }
