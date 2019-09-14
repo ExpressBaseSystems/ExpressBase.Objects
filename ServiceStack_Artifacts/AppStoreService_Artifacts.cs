@@ -39,6 +39,26 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 3)]
         public ResponseStatus ResponseStatus { get; set; }
     }
+
+    public class GetAppStoreDetailedRequest : EbServiceStackNoAuthRequest, IReturn<GetAppStoreDetailedResponse>
+    {
+        public int Id { get; set; }
+    }
+
+    public class GetAppStoreDetailedResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public AppStore Store { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        public GetAppStoreDetailedResponse()
+        {
+            this.Store = new AppStore();
+        }
+    }
+
     public class GetAllFromAppStoreInternalRequest : EbServiceStackAuthRequest, IReturn<GetAllFromAppstoreResponse>
     {
     }
@@ -51,6 +71,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 1)]
         public List<AppStore> Apps { get; set; }
 
+        [DataMember(Order = 1)]
+        public List<AppStore> PublicApps { get; set; }
+
         [DataMember(Order = 2)]
         public string Token { get; set; }
 
@@ -60,6 +83,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public GetAllFromAppstoreResponse()
         {
             Apps = new List<AppStore>();
+            PublicApps = new List<AppStore>();
         }
     }
 
@@ -97,6 +121,30 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public List<AppStore> StoreCollection { get; set; }
 
     }
+
+    public class AppAndsolutionInfoRequest : EbServiceStackAuthRequest, IReturn<AppAndsolutionInfoResponse>
+    {
+        [DataMember(Order = 1)]
+        public int AppId { set; get; }
+    }
+    public class AppAndsolutionInfoResponse: IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 2)]
+        public List<EbSolutionsWrapper> Solutions { get; set; }
+
+        [DataMember(Order = 3)]
+        public AppStore AppData { get; set; }
+
+        public AppAndsolutionInfoResponse()
+        {
+            this.AppData = new AppStore();
+            this.Solutions = new List<EbSolutionsWrapper>();
+        }
+    }
+
 
     public class AppStore
     {

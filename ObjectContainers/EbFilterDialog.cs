@@ -168,7 +168,7 @@ namespace ExpressBase.Objects
             EbFormHelper.AfterRedisGet(this, Redis, client);
         }
 
-        public override string DiscoverRelatedRefids()
+        public override List<string> DiscoverRelatedRefids()
         {
             return EbFormHelper.DiscoverRelatedRefids(this);
         }

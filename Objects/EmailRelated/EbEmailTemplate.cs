@@ -95,7 +95,33 @@ namespace ExpressBase.Objects.EmailRelated
         [OSE_ObjectTypes(EbObjectTypes.iReport)]
         public string AttachmentReportRefID { get; set; }
 
+        public override List<string> DiscoverRelatedRefids()
+        {
+            List<string> _refids = new List<string>();
+            if (!string.IsNullOrEmpty(this.DataSourceRefId))
+                _refids.Add(DataSourceRefId);
+            if (!string.IsNullOrEmpty(this.AttachmentReportRefID))
+                _refids.Add(AttachmentReportRefID);
+            return _refids;
+        }
 
+        public override void ReplaceRefid(Dictionary<string, string> RefidMap)
+        {
+            if (!string.IsNullOrEmpty(this.DataSourceRefId))
+            {
+                if (RefidMap.ContainsKey(DataSourceRefId))
+                    DataSourceRefId = RefidMap[DataSourceRefId];
+                else
+                    DataSourceRefId = "failed-to-update-";
+            }
+            if (!string.IsNullOrEmpty(this.AttachmentReportRefID))
+            {
+                if (RefidMap.ContainsKey(AttachmentReportRefID))
+                    AttachmentReportRefID = RefidMap[AttachmentReportRefID];
+                else
+                    AttachmentReportRefID = "failed-to-update-";
+            }
+        }
 
         [JsonIgnore]
         public EbDataReader EbDataSource { get; set; }

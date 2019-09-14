@@ -841,30 +841,24 @@ namespace ExpressBase.Objects
             }
         }
 
-        public override string DiscoverRelatedRefids()
+        public override List<string> DiscoverRelatedRefids()
         {
-            string refids = "";
+            List<string> refids = new List<string>();
             if (!DataSourceRefId.IsEmpty())
             {
                 EbDataReader ds = EbDataSource;
                 if (ds is null)
-                    refids += DataSourceRefId + ",";
+                    refids.Add(DataSourceRefId);
             }
             foreach (EbReportDetail dt in Detail)
-            {
                 foreach (EbReportField field in dt.Fields)
-                {
                     if (field is EbDataField)
                     {
                         EbDataField fd_org = field as EbDataField;
                         if (!fd_org.LinkRefId.IsEmpty())
-                        {
-                            refids += fd_org.LinkRefId + ",";
-                        }
+                            refids.Add(fd_org.LinkRefId);
                     }
-                }
-            }
-            return refids/*.Substring(0,refids.Length-1)*/;
+            return refids;
         }
 
         public override void ReplaceRefid(Dictionary<string, string> RefidMap)

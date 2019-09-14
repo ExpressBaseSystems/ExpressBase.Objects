@@ -31,13 +31,95 @@ namespace ExpressBase.Objects
     public class EbPowerSelect : EbControlUI
     {
 
-        public EbPowerSelect() { }
-
-        [OnDeserialized]
-        public void OnDeserializedMethod(StreamingContext context)
+        public EbPowerSelect()
         {
-            this.BareControlHtml = this.GetBareHtml();
-            this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
+            EbSimpleSelect = new EbSimpleSelect();
+            //{
+            //    EbSid = EbSid,
+            //    EbSid_CtxId = EbSid_CtxId,
+            //    Name = Name,
+            //    HelpText = HelpText,
+            //    DataSourceId = DataSourceId,
+            //    ValueMember = ValueMember,
+            //    DisplayMember = DisplayMember,
+            //    IsDynamic = IsDynamic,
+            //    IsMultiSelect = MultiSelect
+            //};
+        }
+
+        //public override string SetValueJSfn
+        //{
+        //    get
+        //    {
+        //        return @"
+        //             this.initializer.setValues(p1, p2);
+        //        ";
+        //    }
+        //    set { }
+        //}
+
+        public override string IsRequiredOKJSfn
+        {
+            get
+            {
+                return @"
+                    if(this.RenderAsSimpleSelect){"
+                        + this.EbSimpleSelect.IsRequiredOKJSfn +
+                    @"}
+                    else{"
+                        + new EbControl().IsRequiredOKJSfn +
+                    @"}
+                ";
+            }
+            set { }
+        }
+
+        public override string GetDisplayMemberJSfn
+        {
+            get
+            {
+                return @"
+                    if(this.RenderAsSimpleSelect){"
+                        + this.EbSimpleSelect.GetDisplayMemberJSfn +
+                    @"}
+                    else{"
+                        + new EbControl().IsRequiredOKJSfn +
+                    @"}
+                ";
+            }
+            set { }
+        }
+
+        public override string DisableJSfn
+        {
+            get
+            {
+                return @"
+                    if(this.RenderAsSimpleSelect){"
+                        + this.EbSimpleSelect.DisableJSfn +
+                    @"}
+                    else{"
+                        + new EbControl().DisableJSfn +
+                    @"}
+                ";
+            }
+            set { }
+        }
+
+        public override string EnableJSfn
+        {
+            get
+            {
+                return @"
+                    if(this.RenderAsSimpleSelect){"
+                        + this.EbSimpleSelect.EnableJSfn +
+                    @"}
+                    else{"
+                        + new EbControl().EnableJSfn +
+                    @"}
+                ";
+            }
+            set { }
         }
 
         public override string SetValueJSfn
@@ -45,11 +127,56 @@ namespace ExpressBase.Objects
             get
             {
                 return @"
-                     this.initializer.setValues(p1, p2);
+                    if(this.RenderAsSimpleSelect){"
+                        + this.EbSimpleSelect.SetValueJSfn +
+                    @"}
+                    else{
+                        this.initializer.setValues(p1, p2);
+                    }
                 ";
             }
             set { }
         }
+
+        public override string GetValueJSfn
+        {
+            get
+            {
+                return @"
+                    if(this.RenderAsSimpleSelect){"
+                        + this.EbSimpleSelect.GetValueJSfn +
+                    @"}
+                    else{"
+                        + new EbControl().GetValueJSfn +
+                    @"}
+                ";
+            }
+            set { }
+        }
+
+        [OnDeserialized]
+        public void OnDeserializedMethod(StreamingContext context)
+        {
+            this.BareControlHtml = this.GetBareHtml();
+            this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
+            if (this.RenderAsSimpleSelect)
+            {
+                EbSimpleSelect = new EbSimpleSelect()
+                {
+                    EbSid = EbSid,
+                    EbSid_CtxId = EbSid_CtxId,
+                    Name = Name,
+                    HelpText = HelpText,
+                    IsDynamic = IsDynamic,
+                    ValueMember = ValueMember,
+                    DisplayMember = DisplayMember,
+                    DataSourceId = DataSourceId,
+                    IsMultiSelect = MultiSelect
+                };
+            }
+        }
+
+        public EbSimpleSelect EbSimpleSelect { set; get; }
 
         public override string SetDisplayMemberJSfn
         {
@@ -88,7 +215,8 @@ namespace ExpressBase.Objects
                         console.warn('Mismatch found in Colums in datasource and Colums in object');
                         return true;
                     }
-                    columnVals[item.Name].push(item.Value);
+                    let val = EbConvertValue(item.Value, item.Type);
+                    columnVals[item.Name].push(val);
                 }.bind(this));
             }.bind(this));
         }
@@ -134,6 +262,11 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
         [PropertyGroup("Behavior")]
         public DVColumnCollection DisplayMembers { get; set; }
+
+        [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.WebForm, BuilderType.UserControl)]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", 1)]
+        [OnChangeExec(@"if (this.Columns && this.Columns.$values.length === 0 ){pg.MakeReadOnly('DisplayMember');} else {pg.MakeReadWrite('DisplayMember');}")]
+        public DVBaseColumn DisplayMember { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", 1)]
@@ -249,12 +382,23 @@ namespace ExpressBase.Objects
         [PropertyGroup("Behavior")]
         public int NumberOfFields { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyEditor(PropertyEditorType.Boolean)]
+        [OnChangeExec(@"if(this.IsDynamic === true){pg.ShowProperty('DataSourceId');pg.ShowProperty('ValueMember');pg.ShowProperty('DisplayMember');pg.HideProperty('Options');}
+		else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HideProperty('DisplayMember');pg.ShowProperty('Options');}")]
+        public bool IsDynamic { get; set; }
+
         //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public int[] values { get; set; }
 
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.BotForm)]
         public override bool IsReadOnly { get => this.ReadOnly; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog)]
+        [PropertyGroup("Behavior")]
+        [PropertyPriority(50)]
+        public bool RenderAsSimpleSelect { get; set; }
 
         private string VueSelectcode
         {
@@ -344,6 +488,11 @@ namespace ExpressBase.Objects
 
         public override string GetBareHtml()
         {
+            if (this.RenderAsSimpleSelect)
+            {
+                return EbSimpleSelect.GetBareHtml();
+            }
+
             if (this.DisplayMembers != null)
             {
                 return @"

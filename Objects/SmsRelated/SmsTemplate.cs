@@ -64,6 +64,25 @@ namespace ExpressBase.Objects.Objects.SmsRelated
         [HideInPropertyGrid]
         public List<DsColumns> DsColumnsCollection { get; set; }
 
+        public override List<string> DiscoverRelatedRefids()
+        {
+            List<string> _refids = new List<string>();
+            if (!string.IsNullOrEmpty(this.DataSourceRefId))
+                    _refids.Add(DataSourceRefId);
+            return _refids;
+        }
+
+        public override void ReplaceRefid(Dictionary<string, string> RefidMap)
+        {
+            if (!string.IsNullOrEmpty(this.DataSourceRefId))
+            {
+                if (RefidMap.ContainsKey(DataSourceRefId))
+                    DataSourceRefId = RefidMap[DataSourceRefId];
+                else
+                    DataSourceRefId = "failed-to-update-";
+            }
+        }
+
         public override void AfterRedisGet(RedisClient Redis)
         {
             try

@@ -15,11 +15,11 @@ using ExpressBase.Objects.Objects;
 namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.WebForm)]
-    class EbManageUser : EbControlUI, IEbPlaceHolderControl
+    class EbProvisionUser : EbControlUI, IEbPlaceHolderControl
     {
-        public EbManageUser()
+        public EbProvisionUser()
         {
-            Fields = new List<MngUsrLocFieldAbstract>();
+            Fields = new List<UsrLocFieldAbstract>();
         }
 
         [OnDeserialized]
@@ -31,7 +31,7 @@ namespace ExpressBase.Objects
 
         public override string ToolIconHtml { get { return "<i class='fa fa-user'></i>"; } set { } }
 
-        public override string ToolNameAlias { get { return "Manage User"; } set { } }
+        public override string ToolNameAlias { get { return "Provision User"; } set { } }
 
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
@@ -44,8 +44,8 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyGroup("Identity")]
         [PropertyEditor(PropertyEditorType.Collection)]
-        [ListType(typeof(MngUsrLocFieldAbstract))]
-        public List<MngUsrLocFieldAbstract> Fields { get; set; }
+        [ListType(typeof(UsrLocFieldAbstract))]
+        public List<UsrLocFieldAbstract> Fields { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
@@ -150,17 +150,17 @@ namespace ExpressBase.Objects
             return @"
 this.Init = function(id)
 {
-	this.Fields.$values.push(new EbObjects.MngUsrLocField('email'));
-	this.Fields.$values.push(new EbObjects.MngUsrLocField('fullname'));
-	this.Fields.$values.push(new EbObjects.MngUsrLocField('nickname'));
-	this.Fields.$values.push(new EbObjects.MngUsrLocField('dob'));
-	this.Fields.$values.push(new EbObjects.MngUsrLocField('sex'));
-	this.Fields.$values.push(new EbObjects.MngUsrLocField('alternateemail'));
-	this.Fields.$values.push(new EbObjects.MngUsrLocField('phprimary'));
-	this.Fields.$values.push(new EbObjects.MngUsrLocField('roles'));
-	this.Fields.$values.push(new EbObjects.MngUsrLocField('groups'));
-	this.Fields.$values.push(new EbObjects.MngUsrLocField('preference'));
-	//this.Fields.$values.push(new EbObjects.MngUsrLocField('consadd'));
+	this.Fields.$values.push(new EbObjects.UsrLocField('email'));
+	this.Fields.$values.push(new EbObjects.UsrLocField('fullname'));
+	this.Fields.$values.push(new EbObjects.UsrLocField('nickname'));
+	this.Fields.$values.push(new EbObjects.UsrLocField('dob'));
+	this.Fields.$values.push(new EbObjects.UsrLocField('sex'));
+	this.Fields.$values.push(new EbObjects.UsrLocField('alternateemail'));
+	this.Fields.$values.push(new EbObjects.UsrLocField('phprimary'));
+	this.Fields.$values.push(new EbObjects.UsrLocField('roles'));
+	this.Fields.$values.push(new EbObjects.UsrLocField('groups'));
+	this.Fields.$values.push(new EbObjects.UsrLocField('preference'));
+	//this.Fields.$values.push(new EbObjects.UsrLocField('consadd'));
 };";
         }
 
@@ -201,17 +201,17 @@ this.Init = function(id)
 
         public bool AddLocConstraint { get; set; }
 
-        public IEnumerable<MngUsrLocFieldAbstract> PersistingFields
+        public IEnumerable<UsrLocFieldAbstract> PersistingFields
         {
             get
             {
-                return this.Fields.Where(f => !string.IsNullOrEmpty((f as MngUsrLocField).ControlName));
+                return this.Fields.Where(f => !string.IsNullOrEmpty((f as UsrLocField).ControlName));
             }
         }
 
         public string GetSelectQuery()
         {
-            string cols = string.Join(",", this.PersistingFields.Select(f => (f as MngUsrLocField).Name));
+            string cols = string.Join(",", this.PersistingFields.Select(f => (f as UsrLocField).Name));
             return string.Format("SELECT id,{0} FROM eb_users WHERE eb_ver_id = :eb_ver_id AND eb_data_id = :id ORDER BY id;", cols);
             //if multiple user ctrl placed in form then one select query is enough // imp
         }
@@ -282,14 +282,14 @@ this.Init = function(id)
 
 
 
-    public abstract class MngUsrLocFieldAbstract { }
+    public abstract class UsrLocFieldAbstract { }
 
     [UsedWithTopObjectParent(typeof(EbObject))]
     [EnableInBuilder(BuilderType.WebForm)]
     [Alias("ControlField")]
-    public class MngUsrLocField : MngUsrLocFieldAbstract
+    public class UsrLocField : UsrLocFieldAbstract
     {
-        public MngUsrLocField() { }
+        public UsrLocField() { }
 
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
