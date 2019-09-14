@@ -133,18 +133,12 @@ namespace ExpressBase.Objects
             }
         }
 
-        public override string DiscoverRelatedRefids()
+        public override List<string> DiscoverRelatedRefids()
         {
-            if (!FilterDialogRefId.IsEmpty())
-            {
-                EbFilterDialog fd = FilterDialog;
-                if (fd is null)
-                {
-                    //  Console.WriteLine(this.RefId + "-->" + FilterDialogRefId);
-                    return FilterDialogRefId;
-                }
-            }
-            return "";
+            List<string> _refids = new List<string>();
+            if (string.IsNullOrEmpty(FilterDialogRefId))
+                _refids.Add(FilterDialogRefId);
+            return _refids;
         }
 
         //for api

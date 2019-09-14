@@ -81,6 +81,23 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.ApiBuilder)]
         public ApiMethods Method { set; get; }
+
+        public override List<string> DiscoverRelatedRefids()
+        {
+            List<string> refids = new List<string>();
+            foreach (ApiResources resource in this.Resources)
+                if (resource.Reference != null || resource.Reference != string.Empty)
+                    refids.Add(resource.Reference);
+            return refids;
+        }
+        public override void ReplaceRefid(Dictionary<string, string> RefidMap)
+        {
+            foreach (ApiResources resource in this.Resources)
+                if (resource.Reference != null || resource.Reference != string.Empty)
+                    if (RefidMap.ContainsKey(resource.Reference))
+                        resource.Reference = RefidMap[resource.Reference];
+                    else resource.Reference = "failed-to-update-";
+        }
     }
 
     public abstract class ApiResources : EbApiWrapper
@@ -333,14 +350,14 @@ namespace ExpressBase.Objects
 
             try
             {
-                ApiGlobals globals = new ApiGlobals(_ds,ref GlobalParams);
+                ApiGlobals globals = new ApiGlobals(_ds, ref GlobalParams);
 
                 foreach (KeyValuePair<string, object> kp in GlobalParams)
                 {
                     globals["Params"].Add(kp.Key, new NTV
                     {
                         Name = kp.Key,
-                        Type = (kp.Value.GetType() == typeof(JObject)) ? EbDbTypes.Object:(EbDbTypes)Enum.Parse(typeof(EbDbTypes), kp.Value.GetType().Name, true),
+                        Type = (kp.Value.GetType() == typeof(JObject)) ? EbDbTypes.Object : (EbDbTypes)Enum.Parse(typeof(EbDbTypes), kp.Value.GetType().Name, true),
                         Value = kp.Value
                     });
                 }
