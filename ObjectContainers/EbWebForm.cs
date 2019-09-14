@@ -13,6 +13,7 @@ using ExpressBase.Objects.ServiceStack_Artifacts;
 using ExpressBase.Security;
 using Newtonsoft.Json;
 using ServiceStack;
+using ServiceStack.RabbitMq;
 using ServiceStack.Redis;
 using System;
 using System.Collections.Generic;
@@ -143,7 +144,7 @@ namespace ExpressBase.Objects
                         throw new FormException(string.Format("Same table '{0}' not allowed for {1} and approval control {2}", _tn, tbls[_tn], Allctrls[i].Label));
                     tbls.Add(_tn, "approval control " + Allctrls[i].Label);
                 }
-                if (Allctrls[i] is EbDataGrid)
+                else if (Allctrls[i] is EbDataGrid)
                 {
                     string _tn = (Allctrls[i] as EbDataGrid).TableName;
                     if (string.IsNullOrEmpty((Allctrls[i] as EbDataGrid).TableName))
@@ -162,6 +163,12 @@ namespace ExpressBase.Objects
 
                         }
                     }
+                }
+                else if (Allctrls[i] is EbProvisionUser)
+                {
+                    CheckEmailConAvailableResponse Resp = serviceClient.Post<CheckEmailConAvailableResponse>(new CheckEmailConAvailableRequest { });
+                    if(!Resp.ConnectionAvailable)
+                        throw new FormException("Please configure a email connection, it is required for ProvisionUser control.");
                 }
             }
 
@@ -186,7 +193,7 @@ namespace ExpressBase.Objects
                         throw new FormException(string.Format("Same table '{0}' not allowed for {1} and approval control {2}", _tn, tbls[_tn], Allctrls[i].Label));
                     tbls.Add(_tn, "approval control " + Allctrls[i].Label);
                 }
-                if (Allctrls[i] is EbDataGrid)
+                else if (Allctrls[i] is EbDataGrid)
                 {
                     string _tn = (Allctrls[i] as EbDataGrid).TableName;
                     if (string.IsNullOrEmpty((Allctrls[i] as EbDataGrid).TableName))
@@ -206,6 +213,14 @@ namespace ExpressBase.Objects
                         }
                     }
                 }
+                //else if(Allctrls[i] is EbProvisionUser)
+                //{
+                //    if (service is EbBaseService)
+                //    {
+                //        if ((service as EbBaseService).EbConnectionFactory.EmailConnection.Primary == null)
+                //            throw new FormException("Please configure a email connection, it is required for EbProvisionUser control.");
+                //    }
+                //}
             }
 
             CalcValueExprDependency();
@@ -1186,6 +1201,15 @@ namespace ExpressBase.Objects
                 return DataDB.InsertTable(q, param.ToArray());
             }
             return -1;
+        }
+
+        public void SendMailIfUserCreated(RabbitMqProducer MessageProducer3)
+        {
+            foreach(EbControl c in this.FormSchema.ExtendedControls)
+            {
+                if (c is EbProvisionUser)
+                    (c as EbProvisionUser).SendMailIfUserCreated(MessageProducer3, this.UserObj.UserId, this.UserObj.FullName, this.UserObj.AuthId, this.SolutionObj.SolutionID);
+            }
         }
 
         //to check whether this form data entry can be delete by executing DisableDelete sql quries
