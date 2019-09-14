@@ -7,10 +7,34 @@ using System.Text;
 
 namespace ExpressBase.Objects
 {
+  
+
     [EnableInBuilder(BuilderType.DashBoard)]
     public class EbDashBoardWraper : EbObject 
     {
+        [EnableInBuilder(BuilderType.DashBoard)]
+        public override string Name { get; set; }
 
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.DashBoard)]
+        public override string RefId { get; set; }
+
+        [EnableInBuilder(BuilderType.DashBoard)]
+        public override string DisplayName { get; set; }
+
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.DashBoard)]
+        public override string Description { get; set; }
+
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.DashBoard)]
+        public override string VersionNumber { get; set; }
+        
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.DashBoard)]
+        public override string Status { get; set; }
+
+        // methods
         public EbDashBoardWraper()
         {
 
@@ -26,6 +50,7 @@ namespace ExpressBase.Objects
         public int TileCount { get; set; }
 
         [EnableInBuilder(BuilderType.DashBoard)]
+        [HideInPropertyGrid]
         public List<Tiles> Tiles { get; set; }
 
         public static EbOperations Operations = DashBoardOperations.Instance;
@@ -44,12 +69,34 @@ namespace ExpressBase.Objects
         [OSE_ObjectTypes(EbObjectTypes.iTableVisualization, EbObjectTypes.iChartVisualization, EbObjectTypes.iGoogleMap)]
         public string TileRefId { get; set; }
 
+        [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.DashBoard)]
         public EbObject TileObject { get; set; }
 
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.DashBoard)]
+        public TileDivRef TileDiv { get; set; }
+
         public Tiles()
         {
-
+            TileObject = new EbObject();
         }
+    }
+
+    [EnableInBuilder(BuilderType.DashBoard)]
+    public class TileDivRef : EbDashBoardWraper
+    {
+        [EnableInBuilder(BuilderType.DashBoard)]
+        public int Data_x { get; set; }
+
+        [EnableInBuilder(BuilderType.DashBoard)]
+        public int Data_y { get; set; }
+
+        [EnableInBuilder(BuilderType.DashBoard)]
+        public int Data_height { get; set; }
+
+        [EnableInBuilder(BuilderType.DashBoard)]
+        public int Data_width { get; set; }
+
     }
 }

@@ -55,6 +55,10 @@ namespace ExpressBase.Objects
         [Alias("Serial numbered")]
         public bool IsShowSerialNumber { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [PropertyGroup("Behavior")]
+        public bool NewRowOnTop { get; set; }
+
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         public override EbScript OnChangeFn { get; set; }
@@ -665,7 +669,6 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, p2).
     [UsedWithTopObjectParent(typeof(EbObject))]
     public class EbDGPowerSelectColumn : EbDGColumn
     {
-        public bool MultiSelect { get { return this.EbPowerSelect.MultiSelect; } set { this.EbPowerSelect.MultiSelect = value; } }
 
         [JsonIgnore]
         public override string SetDisplayMemberJSfn { get { return this.EbPowerSelect.SetDisplayMemberJSfn; } set { } }
@@ -691,10 +694,68 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, p2).
         public string DataSourceId { get { return this.EbPowerSelect.DataSourceId; } set { this.EbPowerSelect.DataSourceId = value; } }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup("Behavior")]
+        [OnChangeExec(@"
+            if (this.MultiSelect === true ){
+                pg.MakeReadWrite('MaxLimit');   
+                if (this.Required === true ){
+                    if(this.MinLimit < 1){
+                        pg.setSimpleProperty('MinLimit', 1);
+                    }
+                    pg.MakeReadWrite('MinLimit');
+                }
+                else{
+                    pg.setSimpleProperty('MinLimit', 0);
+                    pg.MakeReadOnly('MinLimit');                 
+                }
+            } 
+            else {
+                pg.setSimpleProperty('MaxLimit', 1);
+                pg.MakeReadOnly(['MaxLimit','MinLimit']);
+                if (this.Required === true ){
+                    pg.setSimpleProperty('MinLimit', 1);
+                }
+                else{
+                    pg.setSimpleProperty('MinLimit', 0);
+                }
+            }")]
+        public bool MultiSelect { get { return this.EbPowerSelect.MultiSelect; } set { this.EbPowerSelect.MultiSelect = value; } }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup("Behavior")]
+        [OnChangeExec(@"
+            if (this.MultiSelect === true ){
+                pg.MakeReadWrite('MaxLimit');   
+                if (this.Required === true ){
+                    if(this.MinLimit < 1){
+                        pg.setSimpleProperty('MinLimit', 1);
+                    }
+                    pg.MakeReadWrite('MinLimit');
+                }
+                else{
+                    pg.setSimpleProperty('MinLimit', 0);
+                    pg.MakeReadOnly('MinLimit');                 
+                }
+            } 
+            else {
+                pg.setSimpleProperty('MaxLimit', 1);
+                pg.MakeReadOnly(['MaxLimit','MinLimit']);
+                if (this.Required === true ){
+                    pg.setSimpleProperty('MinLimit', 1);
+                }
+                else{
+                    pg.setSimpleProperty('MinLimit', 0);
+                }
+            }")]
+        public override bool Required { get { return this.EbPowerSelect.Required; } set { this.EbPowerSelect.Required = value; } }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [DefaultPropValue("1")]
+        [PropertyGroup("Behavior")]
         public int MaxLimit { get { return this.EbPowerSelect.MaxLimit; } set { this.EbPowerSelect.MaxLimit = value; } }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup("Behavior")]
         public int MinLimit { get { return this.EbPowerSelect.MaxLimit; } set { this.EbPowerSelect.MinLimit = value; } }
 
         [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.WebForm)]
@@ -745,14 +806,14 @@ else {pg.MakeReadWrite('ValueMember');}")]
             return this.EbPowerSelect.GetBareHtml();
         }
 
-        public string GetSelectQuery(Service service, string Col, string Tbl = null, string _id = null)
+        public string GetSelectQuery(IDatabase DataDB, Service service, string Col, string Tbl = null, string _id = null)
         {
-            return this.EbPowerSelect.GetSelectQuery(service, Col, Tbl, _id);
+            return this.EbPowerSelect.GetSelectQuery(DataDB, service, Col, Tbl, _id);
         }
 
-        public string GetDisplayMembersQuery(Service service, string vms)
+        public string GetDisplayMembersQuery(IDatabase DataDB, Service service, string vms)
         {
-            return this.EbPowerSelect.GetDisplayMembersQuery(service, vms);
+            return this.EbPowerSelect.GetDisplayMembersQuery(DataDB, service, vms);
         }
     }
 }

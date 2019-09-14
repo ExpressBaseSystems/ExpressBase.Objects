@@ -31,13 +31,95 @@ namespace ExpressBase.Objects
     public class EbPowerSelect : EbControlUI
     {
 
-        public EbPowerSelect() { }
-
-        [OnDeserialized]
-        public void OnDeserializedMethod(StreamingContext context)
+        public EbPowerSelect()
         {
-            this.BareControlHtml = this.GetBareHtml();
-            this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
+            EbSimpleSelect = new EbSimpleSelect();
+            //{
+            //    EbSid = EbSid,
+            //    EbSid_CtxId = EbSid_CtxId,
+            //    Name = Name,
+            //    HelpText = HelpText,
+            //    DataSourceId = DataSourceId,
+            //    ValueMember = ValueMember,
+            //    DisplayMember = DisplayMember,
+            //    IsDynamic = IsDynamic,
+            //    IsMultiSelect = MultiSelect
+            //};
+        }
+
+        //public override string SetValueJSfn
+        //{
+        //    get
+        //    {
+        //        return @"
+        //             this.initializer.setValues(p1, p2);
+        //        ";
+        //    }
+        //    set { }
+        //}
+
+        public override string IsRequiredOKJSfn
+        {
+            get
+            {
+                return @"
+                    if(this.RenderAsSimpleSelect){"
+                        + this.EbSimpleSelect.IsRequiredOKJSfn +
+                    @"}
+                    else{"
+                        + new EbControl().IsRequiredOKJSfn +
+                    @"}
+                ";
+            }
+            set { }
+        }
+
+        public override string GetDisplayMemberJSfn
+        {
+            get
+            {
+                return @"
+                    if(this.RenderAsSimpleSelect){"
+                        + this.EbSimpleSelect.GetDisplayMemberJSfn +
+                    @"}
+                    else{"
+                        + new EbControl().IsRequiredOKJSfn +
+                    @"}
+                ";
+            }
+            set { }
+        }
+
+        public override string DisableJSfn
+        {
+            get
+            {
+                return @"
+                    if(this.RenderAsSimpleSelect){"
+                        + this.EbSimpleSelect.DisableJSfn +
+                    @"}
+                    else{"
+                        + new EbControl().DisableJSfn +
+                    @"}
+                ";
+            }
+            set { }
+        }
+
+        public override string EnableJSfn
+        {
+            get
+            {
+                return @"
+                    if(this.RenderAsSimpleSelect){"
+                        + this.EbSimpleSelect.EnableJSfn +
+                    @"}
+                    else{"
+                        + new EbControl().EnableJSfn +
+                    @"}
+                ";
+            }
+            set { }
         }
 
         public override string SetValueJSfn
@@ -45,11 +127,56 @@ namespace ExpressBase.Objects
             get
             {
                 return @"
-                     this.initializer.setValues(p1, p2);
+                    if(this.RenderAsSimpleSelect){"
+                        + this.EbSimpleSelect.SetValueJSfn +
+                    @"}
+                    else{
+                        this.initializer.setValues(p1, p2);
+                    }
                 ";
             }
             set { }
         }
+
+        public override string GetValueJSfn
+        {
+            get
+            {
+                return @"
+                    if(this.RenderAsSimpleSelect){"
+                        + this.EbSimpleSelect.GetValueJSfn +
+                    @"}
+                    else{"
+                        + new EbControl().GetValueJSfn +
+                    @"}
+                ";
+            }
+            set { }
+        }
+
+        [OnDeserialized]
+        public void OnDeserializedMethod(StreamingContext context)
+        {
+            this.BareControlHtml = this.GetBareHtml();
+            this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
+            if (this.RenderAsSimpleSelect)
+            {
+                EbSimpleSelect = new EbSimpleSelect()
+                {
+                    EbSid = EbSid,
+                    EbSid_CtxId = EbSid_CtxId,
+                    Name = Name,
+                    HelpText = HelpText,
+                    IsDynamic = IsDynamic,
+                    ValueMember = ValueMember,
+                    DisplayMember = DisplayMember,
+                    DataSourceId = DataSourceId,
+                    IsMultiSelect = MultiSelect
+                };
+            }
+        }
+
+        public EbSimpleSelect EbSimpleSelect { set; get; }
 
         public override string SetDisplayMemberJSfn
         {
@@ -88,7 +215,8 @@ namespace ExpressBase.Objects
                         console.warn('Mismatch found in Colums in datasource and Colums in object');
                         return true;
                     }
-                    columnVals[item.Name].push(item.Value);
+                    let val = EbConvertValue(item.Value, item.Type);
+                    columnVals[item.Name].push(val);
                 }.bind(this));
             }.bind(this));
         }
@@ -126,16 +254,24 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.WebForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.CollectionProp, "Columns", "bVisible")]
+        [PropertyGroup("Behavior")]
         //[HideInPropertyGrid]
         public DVColumnCollection Columns { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
+        [PropertyGroup("Behavior")]
         public DVColumnCollection DisplayMembers { get; set; }
+
+        [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.WebForm, BuilderType.UserControl)]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", 1)]
+        [OnChangeExec(@"if (this.Columns && this.Columns.$values.length === 0 ){pg.MakeReadOnly('DisplayMember');} else {pg.MakeReadWrite('DisplayMember');}")]
+        public DVBaseColumn DisplayMember { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", 1)]
         [OnChangeExec(@"if (this.Columns.$values.length === 0 ){pg.MakeReadOnly('ValueMember');} else {pg.MakeReadWrite('ValueMember');}")]
+        [PropertyGroup("Behavior")]
         public DVBaseColumn ValueMember { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
@@ -146,7 +282,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [DefaultPropValue("100")]
-        [Category("Appearance")]
+        [PropertyGroup("Appearance")]
         public int DropdownHeight { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
@@ -156,6 +292,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [HelpText("Specify minimum number of charecters to initiate search")]
         [Category("Search Settings")]
+        [PropertyGroup("Behavior")]
         public int MinSeachLength { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
@@ -163,6 +300,7 @@ namespace ExpressBase.Objects
         public string Text { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup("Behavior")]
         [OnChangeExec(@"
             if (this.MultiSelect === true ){
                 pg.MakeReadWrite('MaxLimit');   
@@ -190,7 +328,7 @@ namespace ExpressBase.Objects
         public override bool Required { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [Category("Behavior")]
+        [PropertyGroup("Behavior")]
         [OnChangeExec(@"
             if (this.MultiSelect === true ){
                 pg.MakeReadWrite('MaxLimit');   
@@ -215,7 +353,6 @@ namespace ExpressBase.Objects
                     pg.setSimpleProperty('MinLimit', 0);
                 }
             }")]
-
         public bool MultiSelect
         {
             get
@@ -227,20 +364,29 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [DefaultPropValue("1")]
+        [PropertyGroup("Behavior")]
         public int MaxLimit { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup("Behavior")]
         public int MinLimit { get; set; }
 
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [Category("Search Settings")]
+        [PropertyGroup("Search Settings")]
         [Alias("Search Method")]
         [HelpText("Select Search Method - StartsWith, EndsWith, Contains or Exact Match")]
         public DefaultSearchFor DefaultSearchFor { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup("Behavior")]
         public int NumberOfFields { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyEditor(PropertyEditorType.Boolean)]
+        [OnChangeExec(@"if(this.IsDynamic === true){pg.ShowProperty('DataSourceId');pg.ShowProperty('ValueMember');pg.ShowProperty('DisplayMember');pg.HideProperty('Options');}
+		else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HideProperty('DisplayMember');pg.ShowProperty('Options');}")]
+        public bool IsDynamic { get; set; }
 
         //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public int[] values { get; set; }
@@ -248,6 +394,11 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.BotForm)]
         public override bool IsReadOnly { get => this.ReadOnly; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog)]
+        [PropertyGroup("Behavior")]
+        [PropertyPriority(50)]
+        public bool RenderAsSimpleSelect { get; set; }
 
         private string VueSelectcode
         {
@@ -337,6 +488,11 @@ namespace ExpressBase.Objects
 
         public override string GetBareHtml()
         {
+            if (this.RenderAsSimpleSelect)
+            {
+                return EbSimpleSelect.GetBareHtml();
+            }
+
             if (this.DisplayMembers != null)
             {
                 return @"
@@ -388,30 +544,87 @@ namespace ExpressBase.Objects
         }
 
         //INCOMPLETE// to get the entire columns(vm+dm+others) in ps query
-        public string GetSelectQuery(Service service, string Col, string Tbl = null, string _id = null)
+        public string GetSelectQuery(IDatabase DataDB, Service service, string Col, string Tbl = null, string _id = null)
         {
             string Sql = this.GetSql(service);
 
             if (Tbl == null || _id == null)// prefill mode
-                return string.Format(@"SELECT __A.* FROM ({0}) __A 
+            {
+                string s = "";
+                if (DataDB.Vendor == DatabaseVendors.MYSQL)
+                {
+                    s = string.Format(@"
+                                DROP TEMPORARY TABLE IF EXISTS temp_array_table;
+		                        DROP TEMPORARY TABLE IF EXISTS temp_mem;
+		                        CREATE TEMPORARY TABLE temp_array_table(value text); 
+                                CALL STR_TO_TBL('{2}'); 
+                                CREATE TEMPORARY TABLE temp_mem SELECT `value` FROM temp_array_table;
+                                    SELECT __A.* FROM ({0}) __A 
+                                    WHERE __A.{1} = ANY(SELECT CAST(`value` AS UNSIGNED INTEGER) FROM temp_mem);",
+                                                        Sql, this.ValueMember.Name, Col);
+                }
+                else
+                {
+                    s = string.Format(@"SELECT __A.* FROM ({0}) __A 
                                     WHERE __A.{1} = ANY(STRING_TO_ARRAY('{2}'::TEXT, ',')::INT[]);",
-                                    Sql, this.ValueMember.Name, Col);
-            else// normal mode
-                return string.Format(@"SELECT __A.* FROM ({0}) __A, {1} __B
+                                                        Sql, this.ValueMember.Name, Col);
+                }
+                return s;
+            }
+            else
+            {
+                // normal mode
+                string s = "";
+                if (DataDB.Vendor == DatabaseVendors.MYSQL)
+                {
+                    s = string.Format(@"
+                                DROP TEMPORARY TABLE IF EXISTS temp_array_table;
+		                        DROP TEMPORARY TABLE IF EXISTS temp_mem;
+		                        CREATE TEMPORARY TABLE temp_array_table(value text); 
+                                CALL STR_TO_TBL('{3}'); 
+                                CREATE TEMPORARY TABLE temp_mem SELECT `value` FROM temp_array_table;
+                                SELECT __A.* FROM ({0}) __A, {1} __B
+                                    WHERE __A.{2} = ANY(SELECT CAST(`value` AS UNSIGNED INTEGER) FROM temp_mem) AND __B.{4} = :id;",
+                                        Sql, Tbl, this.ValueMember.Name, Col, _id);
+                }
+                else
+                {
+                    s = string.Format(@"SELECT __A.* FROM ({0}) __A, {1} __B
                                     WHERE __A.{2} = ANY(STRING_TO_ARRAY(__B.{3}::TEXT, ',')::INT[]) AND __B.{4} = :id;",
                                         Sql, Tbl, this.ValueMember.Name, Col, _id);
+                }
+                return s;
+            }
         }
 
         //to get vm+dm only for audit trail
-        public string GetDisplayMembersQuery(Service service, string vms)
+        public string GetDisplayMembersQuery(IDatabase DataDB, Service service, string vms)
         {
             string Sql = this.GetSql(service);
             string vm = this.ValueMember.Name;
             string dm = string.Join(',', this.DisplayMembers.Select(e => e.Name));
 
-            return string.Format(@"SELECT {0}, {1} FROM ({2}) __A
+            string s = "";
+            if (DataDB.Vendor == DatabaseVendors.MYSQL)
+            {
+                s = string.Format(@"
+                            DROP TEMPORARY TABLE IF EXISTS temp_array_table;
+                            DROP TEMPORARY TABLE IF EXISTS temp_mems;
+                            CREATE TEMPORARY TABLE temp_array_table(value text); 
+                            CALL STR_TO_TBL('{3}'); 
+                            CREATE TEMPORARY TABLE temp_mems SELECT `value` FROM temp_array_table;
+                            SELECT {0}, {1} FROM ({2}) __A
+                            WHERE __A.{0} = ANY(SELECT CAST(`value` AS UNSIGNED INTEGER) FROM temp_mems);",
+                            vm, dm, Sql, vms);
+            }
+            else
+            {
+                s = string.Format(@"SELECT {0}, {1} FROM ({2}) __A
                                         WHERE __A.{0} = ANY(STRING_TO_ARRAY('{3}'::TEXT, ',')::INT[]);",
                                             vm, dm, Sql, vms);
+            }
+
+            return s;
         }
     }
 }

@@ -14,12 +14,11 @@ using System.Runtime.Serialization;
 namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.WebForm)]
-    [HideInToolBox]
-    public class EbManageLocation : EbControlUI, IEbPlaceHolderControl
+    public class EbProvisionLocation : EbControlUI, IEbPlaceHolderControl
     {
-        public EbManageLocation()
+        public EbProvisionLocation()
         {
-            Fields = new List<MngUsrLocFieldAbstract>();
+            Fields = new List<UsrLocFieldAbstract>();
         }
 
         [OnDeserialized]
@@ -31,9 +30,10 @@ namespace ExpressBase.Objects
 
         public override string ToolIconHtml { get { return "<i class='fa fa-map-marker'></i>"; } set { } }
 
-        public override string ToolNameAlias { get { return "Location"; } set { } }
+        public override string ToolNameAlias { get { return "Provision Loc.."; } set { } }
 
         [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
         public override bool Hidden { get { return true; } }
 
         [EnableInBuilder(BuilderType.WebForm)]
@@ -41,24 +41,88 @@ namespace ExpressBase.Objects
         public override bool IsSysControl { get { return true; } }
 
         [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyGroup("Identity")]
         [PropertyEditor(PropertyEditorType.Collection)]
-        [ListType(typeof(MngUsrLocFieldAbstract))]
-        public List<MngUsrLocFieldAbstract> Fields { get; set; }
+        [ListType(typeof(UsrLocFieldAbstract))]
+        public List<UsrLocFieldAbstract> Fields { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
+        
+        //--------Hide in property grid------------
 
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override string HelpText { get; set; }
+        
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override string ToolTipText { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override bool Unique { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override List<EbValidator> Validators { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override EbScript DefaultValueExpression { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override EbScript VisibleExpr { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override EbScript ValueExpr { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override bool IsDisable { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override bool Required { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override bool DoNotPersist { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override string BackColor { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override string ForeColor { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override string LabelBackColor { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override string LabelForeColor { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override EbScript OnChangeFn { get; set; }
+
+        //-----------------------------------------------------
 
         public override string GetJsInitFunc()
         {
             return @"
 this.Init = function(id)
 {
-	this.Fields.$values.push(new EbObjects.MngUsrLocField('longname'));
-	this.Fields.$values.push(new EbObjects.MngUsrLocField('shortname'));
-	//this.Fields.$values.push(new EbObjects.MngUsrLocField('image'));
-    console.log('from init manage location');
+	this.Fields.$values.push(new EbObjects.UsrLocField('longname'));
+	this.Fields.$values.push(new EbObjects.UsrLocField('shortname'));
+	//this.Fields.$values.push(new EbObjects.UsrLocField('image'));
+    console.log('from init provision location');
     commonO.ObjCollection['#vernav0'].GetLocationConfig(this);
 };";
         }

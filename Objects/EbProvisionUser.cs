@@ -11,16 +11,18 @@ using ExpressBase.Security;
 using Newtonsoft.Json;
 using ExpressBase.Common.Structures;
 using ExpressBase.Objects.Objects;
+using System.Text;
+using ServiceStack.RabbitMq;
+using ExpressBase.Objects.ServiceStack_Artifacts;
 
 namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.WebForm)]
-    [HideInToolBox]
-    class EbManageUser : EbControlUI, IEbPlaceHolderControl
+    class EbProvisionUser : EbControlUI, IEbPlaceHolderControl
     {
-        public EbManageUser()
+        public EbProvisionUser()
         {
-            Fields = new List<MngUsrLocFieldAbstract>();
+            Fields = new List<UsrLocFieldAbstract>();
         }
 
         [OnDeserialized]
@@ -32,9 +34,10 @@ namespace ExpressBase.Objects
 
         public override string ToolIconHtml { get { return "<i class='fa fa-user'></i>"; } set { } }
 
-        public override string ToolNameAlias { get { return "Manage User"; } set { } }
+        public override string ToolNameAlias { get { return "Provision User"; } set { } }
 
         [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
         public override bool Hidden { get { return true; } }
 
         [EnableInBuilder(BuilderType.WebForm)]
@@ -42,13 +45,78 @@ namespace ExpressBase.Objects
         public override bool IsSysControl { get { return true; } }
 
         [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyGroup("Identity")]
         [PropertyEditor(PropertyEditorType.Collection)]
-        [ListType(typeof(MngUsrLocFieldAbstract))]
-        public List<MngUsrLocFieldAbstract> Fields { get; set; }
+        [ListType(typeof(UsrLocFieldAbstract))]
+        public List<UsrLocFieldAbstract> Fields { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
+
+        //--------Hide in property grid------------
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override string HelpText { get; set; }
+        
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override string ToolTipText { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override bool Unique { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override List<EbValidator> Validators { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override EbScript DefaultValueExpression { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override EbScript VisibleExpr { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override EbScript ValueExpr { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override bool IsDisable { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override bool Required { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override bool DoNotPersist { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override string BackColor { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override string ForeColor { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override string LabelBackColor { get; set; }
+        
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override string LabelForeColor { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override EbScript OnChangeFn { get; set; }
+
+        //-----------------------------------------------------
 
         public NTV[] FuncParam = {
             //new NTV (){ Name = "userid", Type = EbDbTypes.Int32, Value = DBNull.Value},//eb_createdby
@@ -75,7 +143,7 @@ namespace ExpressBase.Objects
             new NTV (){ Name = "hide", Type = EbDbTypes.String, Value = "no"},
             new NTV (){ Name = "anonymoususerid", Type = EbDbTypes.Int32, Value = DBNull.Value},
 
-            new NTV (){ Name = "preference", Type = EbDbTypes.String, Value = "{'Locale':'en-IN','TimeZone':'(UTC+05:30) Chennai, Kolkata, Mumbai, New Delhi'}"},
+            new NTV (){ Name = "preference", Type = EbDbTypes.String, Value = "{\"Locale\":\"en-IN\",\"TimeZone\":\"(UTC+05:30) Chennai, Kolkata, Mumbai, New Delhi\"}"},
             new NTV (){ Name = "consadd", Type = EbDbTypes.String, Value = string.Empty},
             new NTV (){ Name = "consdel", Type = EbDbTypes.String, Value = string.Empty}
         };
@@ -85,17 +153,17 @@ namespace ExpressBase.Objects
             return @"
 this.Init = function(id)
 {
-	this.Fields.$values.push(new EbObjects.MngUsrLocField('email'));
-	this.Fields.$values.push(new EbObjects.MngUsrLocField('fullname'));
-	this.Fields.$values.push(new EbObjects.MngUsrLocField('nickname'));
-	this.Fields.$values.push(new EbObjects.MngUsrLocField('dob'));
-	this.Fields.$values.push(new EbObjects.MngUsrLocField('sex'));
-	this.Fields.$values.push(new EbObjects.MngUsrLocField('alternateemail'));
-	this.Fields.$values.push(new EbObjects.MngUsrLocField('phprimary'));
-	this.Fields.$values.push(new EbObjects.MngUsrLocField('roles'));
-	this.Fields.$values.push(new EbObjects.MngUsrLocField('groups'));
-	this.Fields.$values.push(new EbObjects.MngUsrLocField('preference'));
-	//this.Fields.$values.push(new EbObjects.MngUsrLocField('consadd'));
+	this.Fields.$values.push(new EbObjects.UsrLocField('email'));
+	this.Fields.$values.push(new EbObjects.UsrLocField('fullname'));
+	this.Fields.$values.push(new EbObjects.UsrLocField('nickname'));
+	this.Fields.$values.push(new EbObjects.UsrLocField('dob'));
+	this.Fields.$values.push(new EbObjects.UsrLocField('sex'));
+	this.Fields.$values.push(new EbObjects.UsrLocField('alternateemail'));
+	this.Fields.$values.push(new EbObjects.UsrLocField('phprimary'));
+	this.Fields.$values.push(new EbObjects.UsrLocField('roles'));
+	this.Fields.$values.push(new EbObjects.UsrLocField('groups'));
+	this.Fields.$values.push(new EbObjects.UsrLocField('preference'));
+	//this.Fields.$values.push(new EbObjects.UsrLocField('consadd'));
 };";
         }
 
@@ -136,20 +204,21 @@ this.Init = function(id)
 
         public bool AddLocConstraint { get; set; }
 
-        public IEnumerable<MngUsrLocFieldAbstract> PersistingFields
+        public IEnumerable<UsrLocFieldAbstract> PersistingFields
         {
             get
             {
-                return this.Fields.Where(f => !string.IsNullOrEmpty((f as MngUsrLocField).ControlName));
+                return this.Fields.Where(f => !string.IsNullOrEmpty((f as UsrLocField).ControlName));
             }
         }
 
         public string GetSelectQuery()
         {
-            string cols = string.Join(",", this.PersistingFields.Select(f => (f as MngUsrLocField).Name));
+            string cols = string.Join(",", this.PersistingFields.Select(f => (f as UsrLocField).Name));
             return string.Format("SELECT id,{0} FROM eb_users WHERE eb_ver_id = :eb_ver_id AND eb_data_id = :id ORDER BY id;", cols);
             //if multiple user ctrl placed in form then one select query is enough // imp
         }
+
         private string GetSaveQuery(bool ins, string param, string mtbl, string pemail)
         {
             if (ins)
@@ -175,11 +244,15 @@ this.Init = function(id)
                 EbDataTable dt = DataDB.DoQuery(sql, parameters);
                 if (dt.Rows.Count > 0)
                     return false;// raise an exception to notify email already exists
-                //if (this.AddLocConstraint)
-                //{
-                    //EbConstraints consObj = new EbConstraints(new string[] { " eb_currval('eb_locations_id_seq') " }, EbConstraintKeyTypes.User, EbConstraintTypes.User_Location);
-                    //this.FuncParam[21].Value = consObj.GetDataAsString();// index of 'consadd' is 21
-                //}
+
+                this.UserCredentials = new UserCredentials()
+                {
+                    Email = _d["email"],
+                    Pwd = this.GetRandomPwd(),
+                    Name = _d.ContainsKey("fullname") ? _d["fullname"] : _d["email"]
+                };
+
+                _d.Add("pwd", (this.UserCredentials.Pwd + this.UserCredentials.Email).ToMD5Hash());
             }
             else
             {
@@ -213,18 +286,105 @@ this.Init = function(id)
             
             return true;
         }
+
+        private string GetRandomPwd()
+        {
+            StringBuilder builder = new StringBuilder();
+            Random random = new Random();
+            char ch;
+            for (int i = 0; i < 10; i++)
+            {
+                ch = Convert.ToChar(Convert.ToInt32(Math.Floor(26 * random.NextDouble() + 65)));
+                builder.Append(ch);
+            }
+            return builder.ToString();
+        }
+
+        private UserCredentials UserCredentials { get; set; }
+
+        private string MailHtml
+        {
+            get
+            {
+                return @"
+<html>
+    <head>
+        <title></title>
+    </head>
+    <body>
+        <div style='border: 1px solid #508bf9;padding:20px 40px 20px 40px; '>
+            <div style='text-align: center;'>
+                <img src='https://myaccount.expressbase.com/images/logo/{SolutionId}.png' />
+            </div>
+            <br />
+            <div style='line-height: 1.4;'>
+                Dear {UserName},<br />
+                <br />
+                You have been added as a user into {SolutionId} solution. Please find below credentials to log in.
+                <br />
+                <br />
+                Solution URL - https://{SolutionId}.expressbase.com <br />
+                User name - {Email} <br />
+                Password - {Password} <br />
+                <br />
+                Please make sure you change the password after logging in (in the <b>My Profile</b> page).
+            </div>
+            <br />
+            <br />
+            Thanks,<br />
+            {SolutionAdmin}<br />
+        </div>
+    </body>
+</html>";
+            }
+            set { }
+        }
+
+        public void SendMailIfUserCreated(RabbitMqProducer MessageProducer3, int UserId, string CreatedBy, string UserAuthId, string SolnId)
+        {
+            if(this.UserCredentials != null)
+            {
+                string Html = this.MailHtml
+                    .Replace("{SolutionId}", SolnId)
+                    .Replace("{UserName}", this.UserCredentials.Name)
+                    .Replace("{Email}", this.UserCredentials.Email)
+                    .Replace("{Password}", this.UserCredentials.Pwd)
+                    .Replace("{SolutionAdmin}", CreatedBy);
+                
+                //this.EbConnectionFactory.EmailConnection.Send("febincarlos@expressbase.com", "test", "Hiii", null, null, null, "");
+                
+                MessageProducer3.Publish(new EmailServicesRequest()
+                {
+                    To = this.UserCredentials.Email,
+                    Message = Html,
+                    Subject = $"Welcome to {SolnId} Solution",
+                    UserId = UserId,
+                    UserAuthId = UserAuthId,
+                    SolnId = SolnId
+                });
+            }
+        }
     }
 
+    public class UserCredentials
+    {
+        public UserCredentials() { }
+        
+        public string Email { get; set; }
 
+        public string Pwd { get; set; }
 
-    public abstract class MngUsrLocFieldAbstract { }
+        public string Name { get; set; }
+    }
+
+    public abstract class UsrLocFieldAbstract { }
 
     [UsedWithTopObjectParent(typeof(EbObject))]
     [EnableInBuilder(BuilderType.WebForm)]
     [Alias("ControlField")]
-    public class MngUsrLocField : MngUsrLocFieldAbstract
+    public class UsrLocField : UsrLocFieldAbstract
     {
-        public MngUsrLocField() { }
+        public UsrLocField() { }
 
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
