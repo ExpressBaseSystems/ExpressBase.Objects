@@ -39,7 +39,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 1)]
         public int Id { get; set; }
 
-        [DataMember(Order = 1)]
+        [DataMember(Order = 2)]
+        public string SolutionId { get; set; }
+
+        [DataMember(Order = 3)]
         public bool IsDemoApp { get; set; }
     }
 
