@@ -40,7 +40,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int Id { get; set; }
 
         [DataMember(Order = 2)]
-        public string SolutionId { get; set; }
+        public string SelectedSolutionId { get; set; }
 
         [DataMember(Order = 3)]
         public bool IsDemoApp { get; set; }
@@ -53,6 +53,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 2)]
         public bool IsDemoApp { get; set; }
+
+        [DataMember(Order = 3)]
+        public string SelectedSolutionId { get; set; }
     }
 
     public class ImportApplicationResponse : IEbSSResponse
