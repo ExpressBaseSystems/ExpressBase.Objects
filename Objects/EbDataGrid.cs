@@ -55,6 +55,10 @@ namespace ExpressBase.Objects
         [Alias("Serial numbered")]
         public bool IsShowSerialNumber { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [PropertyGroup("Behavior")]
+        public bool NewRowOnTop { get; set; }
+
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         public override EbScript OnChangeFn { get; set; }
@@ -802,14 +806,14 @@ else {pg.MakeReadWrite('ValueMember');}")]
             return this.EbPowerSelect.GetBareHtml();
         }
 
-        public string GetSelectQuery(Service service, string Col, string Tbl = null, string _id = null)
+        public string GetSelectQuery(IDatabase DataDB, Service service, string Col, string Tbl = null, string _id = null)
         {
-            return this.EbPowerSelect.GetSelectQuery(service, Col, Tbl, _id);
+            return this.EbPowerSelect.GetSelectQuery(DataDB, service, Col, Tbl, _id);
         }
 
-        public string GetDisplayMembersQuery(Service service, string vms)
+        public string GetDisplayMembersQuery(IDatabase DataDB, Service service, string vms)
         {
-            return this.EbPowerSelect.GetDisplayMembersQuery(service, vms);
+            return this.EbPowerSelect.GetDisplayMembersQuery(DataDB, service, vms);
         }
     }
 }
