@@ -33,7 +33,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 		public string email { get; set; }
 
-		public List<byte[]> Filecollection { set; get; } = new List<byte[]>();
+		public List<FileUploadCls> Fileuploadlst { get; set; } = new List<FileUploadCls>();
 	}
 
 	public class SaveBugResponse
@@ -106,6 +106,11 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public string priority { get; set; }
 
 		public string ticketid { get; set; }
+		public string solution_id { get; set; }
+
+		public int [] Filedel{ get; set; }
+
+		public List<FileUploadCls> Fileuploadlst { get; set; } = new List<FileUploadCls>();
 	}
 	public class UpdateTicketResponse
 	{
@@ -137,9 +142,22 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 		public string remarks { get; set; }
 
-		public List<byte[]> Filecollection { set; get; } = new List<byte[]>();
+		public List<FileUploadCls> Fileuploadlst { get; set; } = new List<FileUploadCls>();
 
 
+	}
+
+	public class FileUploadCls
+	{
+		public string FileName { get; set; }
+
+		public int FileId { get; set; }
+
+		public string ContentType { get; set; }
+
+		public byte[] Filecollection { set; get; }
+
+		public string FileDataURL { set; get; }
 	}
 
 }
