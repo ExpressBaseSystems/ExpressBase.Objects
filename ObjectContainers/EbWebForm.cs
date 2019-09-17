@@ -1977,15 +1977,20 @@ namespace ExpressBase.Objects
             {
                 if(_flatCtrls[i] is EbUserControl || _flatCtrls[i] is EbDGUserControlColumn)
                 {
-                    refids.Add(_flatCtrls[i].RefId);
+                    if(!string.IsNullOrEmpty(_flatCtrls[i].RefId))
+                        refids.Add(_flatCtrls[i].RefId);
                 }
                 else
                 {
-                    PropertyInfo[] _props = _this.Controls[i].GetType().GetProperties();
+                    PropertyInfo[] _props = _flatCtrls[i].GetType().GetProperties();
                     foreach (PropertyInfo _prop in _props)
                     {
                         if (_prop.IsDefined(typeof(OSE_ObjectTypes)))
-                            refids.Add(_prop.GetValue(_this.Controls[i], null).ToString());
+                        {
+                            string _val = _prop.GetValue(_flatCtrls[i], null).ToString();
+                            if (!string.IsNullOrEmpty(_val))
+                                refids.Add(_val);
+                        }
                     }
                 }
             }
@@ -2006,10 +2011,13 @@ namespace ExpressBase.Objects
             {
                 if (_flatCtrls[i] is EbUserControl || _flatCtrls[i] is EbDGUserControlColumn)
                 {
-                    if (RefidMap.ContainsKey(_flatCtrls[i].RefId))
-                        _flatCtrls[i].RefId = RefidMap[_flatCtrls[i].RefId];
-                    else
-                        _flatCtrls[i].RefId = "failed-to-update-";
+                    if (!string.IsNullOrEmpty(_flatCtrls[i].RefId))
+                    {
+                        if (RefidMap.ContainsKey(_flatCtrls[i].RefId))
+                            _flatCtrls[i].RefId = RefidMap[_flatCtrls[i].RefId];
+                        else
+                            _flatCtrls[i].RefId = "failed-to-update-";
+                    }
                 }
                 else
                 {
@@ -2019,10 +2027,13 @@ namespace ExpressBase.Objects
                         if (_prop.IsDefined(typeof(OSE_ObjectTypes)))
                         {
                             string _val = _prop.GetValue(_flatCtrls[i], null).ToString();
-                            if (RefidMap.ContainsKey(_val))
-                                _prop.SetValue(_flatCtrls[i], RefidMap[_val], null);
-                            else
-                                _prop.SetValue(_flatCtrls[i], "failed-to-update-");
+                            if (!string.IsNullOrEmpty(_val))
+                            {
+                                if (RefidMap.ContainsKey(_val))
+                                    _prop.SetValue(_flatCtrls[i], RefidMap[_val], null);
+                                else
+                                    _prop.SetValue(_flatCtrls[i], "failed-to-update-");
+                            }
                         }
                     }
                 }
@@ -2074,7 +2085,7 @@ namespace ExpressBase.Objects
                     else if (c is EbControlContainer)
                     {
                         AfterRedisGet(c as EbControlContainer, Redis, client);
-                    }
+                    }                   
                 }
             }
             catch (Exception e)
