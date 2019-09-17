@@ -136,7 +136,7 @@ namespace ExpressBase.Objects
         public override List<string> DiscoverRelatedRefids()
         {
             List<string> _refids = new List<string>();
-            if (string.IsNullOrEmpty(FilterDialogRefId))
+            if (!string.IsNullOrEmpty(FilterDialogRefId))
                 _refids.Add(FilterDialogRefId);
             return _refids;
         }
