@@ -289,7 +289,7 @@ else if(this.FormMode === 2){
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [HideForUser]
-        public bool HideLinkifNoData { get; set; }
+        public bool ShowLinkifNoData { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [DefaultPropValue("0")]

@@ -13,6 +13,7 @@ using ExpressBase.Objects.ServiceStack_Artifacts;
 using ExpressBase.Security;
 using Newtonsoft.Json;
 using ServiceStack;
+using ServiceStack.RabbitMq;
 using ServiceStack.Redis;
 using System;
 using System.Collections.Generic;
@@ -143,7 +144,7 @@ namespace ExpressBase.Objects
                         throw new FormException(string.Format("Same table '{0}' not allowed for {1} and approval control {2}", _tn, tbls[_tn], Allctrls[i].Label));
                     tbls.Add(_tn, "approval control " + Allctrls[i].Label);
                 }
-                if (Allctrls[i] is EbDataGrid)
+                else if (Allctrls[i] is EbDataGrid)
                 {
                     string _tn = (Allctrls[i] as EbDataGrid).TableName;
                     if (string.IsNullOrEmpty((Allctrls[i] as EbDataGrid).TableName))
@@ -162,6 +163,12 @@ namespace ExpressBase.Objects
 
                         }
                     }
+                }
+                else if (Allctrls[i] is EbProvisionUser)
+                {
+                    CheckEmailConAvailableResponse Resp = serviceClient.Post<CheckEmailConAvailableResponse>(new CheckEmailConAvailableRequest { });
+                    if(!Resp.ConnectionAvailable)
+                        throw new FormException("Please configure a email connection, it is required for ProvisionUser control.");
                 }
             }
 
@@ -186,7 +193,7 @@ namespace ExpressBase.Objects
                         throw new FormException(string.Format("Same table '{0}' not allowed for {1} and approval control {2}", _tn, tbls[_tn], Allctrls[i].Label));
                     tbls.Add(_tn, "approval control " + Allctrls[i].Label);
                 }
-                if (Allctrls[i] is EbDataGrid)
+                else if (Allctrls[i] is EbDataGrid)
                 {
                     string _tn = (Allctrls[i] as EbDataGrid).TableName;
                     if (string.IsNullOrEmpty((Allctrls[i] as EbDataGrid).TableName))
@@ -206,6 +213,14 @@ namespace ExpressBase.Objects
                         }
                     }
                 }
+                //else if(Allctrls[i] is EbProvisionUser)
+                //{
+                //    if (service is EbBaseService)
+                //    {
+                //        if ((service as EbBaseService).EbConnectionFactory.EmailConnection.Primary == null)
+                //            throw new FormException("Please configure a email connection, it is required for EbProvisionUser control.");
+                //    }
+                //}
             }
 
             CalcValueExprDependency();
@@ -305,7 +320,7 @@ namespace ExpressBase.Objects
             }
         }
 
-        private string GetSelectQuery(WebFormSchema _schema, Service _service, out string _queryPs)
+        private string GetSelectQuery(IDatabase DataDB, WebFormSchema _schema, Service _service, out string _queryPs)
         {
             string query = string.Empty;
             string extquery = string.Empty;
@@ -332,9 +347,9 @@ namespace ExpressBase.Objects
                 foreach (ColumnSchema Col in _table.Columns)
                 {
                     if (Col.Control is EbPowerSelect)
-                        _queryPs += (Col.Control as EbPowerSelect).GetSelectQuery(_service, Col.ColumnName, _table.TableName, _id);
+                        _queryPs += (Col.Control as EbPowerSelect).GetSelectQuery(DataDB, _service, Col.ColumnName, _table.TableName, _id);
                     else if (Col.Control is EbDGPowerSelectColumn)
-                        _queryPs += (Col.Control as EbDGPowerSelectColumn).GetSelectQuery(_service, Col.ColumnName, _table.TableName, _id);
+                        _queryPs += (Col.Control as EbDGPowerSelectColumn).GetSelectQuery(DataDB, _service, Col.ColumnName, _table.TableName, _id);
                 }
             }
             bool MuCtrlFound = false;
@@ -756,7 +771,7 @@ namespace ExpressBase.Objects
         {
             WebFormSchema _schema = this.FormSchema;//this.GetWebFormSchema();
             string psquery = null;
-            string query = this.GetSelectQuery(_schema, service, out psquery);
+            string query = this.GetSelectQuery(DataDB, _schema, service, out psquery);
             string context = this.RefId.Split("-")[3] + "_" + this.TableRowId.ToString();//context format = objectId_rowId_ControlId
 
             EbDataSet dataset = DataDB.DoQueries(query, new DbParameter[]
@@ -953,7 +968,7 @@ namespace ExpressBase.Objects
                         {
                             if (_schema.Tables[j].Columns[k].Control is EbPowerSelect)
                             {
-                                string t = (_schema.Tables[j].Columns[k].Control as EbPowerSelect).GetSelectQuery(service, _params[i].Value);
+                                string t = (_schema.Tables[j].Columns[k].Control as EbPowerSelect).GetSelectQuery(DataDB, service, _params[i].Value);
                                 QrsDict.Add((_schema.Tables[j].Columns[k].Control as EbPowerSelect).EbSid, t);
                             }
                             if (!this.FormData.MultipleTables.ContainsKey(_schema.Tables[j].TableName))
@@ -1187,6 +1202,15 @@ namespace ExpressBase.Objects
                 return DataDB.InsertTable(q, param.ToArray());
             }
             return -1;
+        }
+
+        public void SendMailIfUserCreated(RabbitMqProducer MessageProducer3)
+        {
+            foreach(EbControl c in this.FormSchema.ExtendedControls)
+            {
+                if (c is EbProvisionUser)
+                    (c as EbProvisionUser).SendMailIfUserCreated(MessageProducer3, this.UserObj.UserId, this.UserObj.FullName, this.UserObj.AuthId, this.SolutionObj.SolutionID);
+            }
         }
 
         //to check whether this form data entry can be delete by executing DisableDelete sql quries
@@ -1715,9 +1739,9 @@ namespace ExpressBase.Objects
                         if (DictVmAll.ContainsKey(key))
                         {
                             if (_column.Control is EbPowerSelect)
-                                Qry += (_column.Control as EbPowerSelect).GetDisplayMembersQuery(Service, DictVmAll[key].Substring(0, DictVmAll[key].Length - 1));
+                                Qry += (_column.Control as EbPowerSelect).GetDisplayMembersQuery(DataDB, Service, DictVmAll[key].Substring(0, DictVmAll[key].Length - 1));
                             else
-                                Qry += (_column.Control as EbDGPowerSelectColumn).GetDisplayMembersQuery(Service, DictVmAll[key].Substring(0, DictVmAll[key].Length - 1));
+                                Qry += (_column.Control as EbDGPowerSelectColumn).GetDisplayMembersQuery(DataDB, Service, DictVmAll[key].Substring(0, DictVmAll[key].Length - 1));
                         }
                     }
                 }

@@ -50,7 +50,7 @@ namespace ExpressBase.Objects
                 return @" 
                     isContained = false;
                     $('#' + this.EbSid_CtxId + ' option').each(function () {
-                        if ($(this).attr('value') === p1) {
+                        if ($(this).attr('value') == p1) {
                             isContained = true;
                             return false;
                         }

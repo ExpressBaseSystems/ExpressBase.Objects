@@ -11,6 +11,9 @@ using ExpressBase.Security;
 using Newtonsoft.Json;
 using ExpressBase.Common.Structures;
 using ExpressBase.Objects.Objects;
+using System.Text;
+using ServiceStack.RabbitMq;
+using ExpressBase.Objects.ServiceStack_Artifacts;
 
 namespace ExpressBase.Objects
 {
@@ -140,7 +143,7 @@ namespace ExpressBase.Objects
             new NTV (){ Name = "hide", Type = EbDbTypes.String, Value = "no"},
             new NTV (){ Name = "anonymoususerid", Type = EbDbTypes.Int32, Value = DBNull.Value},
 
-            new NTV (){ Name = "preference", Type = EbDbTypes.String, Value = "{'Locale':'en-IN','TimeZone':'(UTC+05:30) Chennai, Kolkata, Mumbai, New Delhi'}"},
+            new NTV (){ Name = "preference", Type = EbDbTypes.String, Value = "{\"Locale\":\"en-IN\",\"TimeZone\":\"(UTC+05:30) Chennai, Kolkata, Mumbai, New Delhi\"}"},
             new NTV (){ Name = "consadd", Type = EbDbTypes.String, Value = string.Empty},
             new NTV (){ Name = "consdel", Type = EbDbTypes.String, Value = string.Empty}
         };
@@ -215,6 +218,7 @@ this.Init = function(id)
             return string.Format("SELECT id,{0} FROM eb_users WHERE eb_ver_id = :eb_ver_id AND eb_data_id = :id ORDER BY id;", cols);
             //if multiple user ctrl placed in form then one select query is enough // imp
         }
+
         private string GetSaveQuery(bool ins, string param, string mtbl, string pemail)
         {
             if (ins)
@@ -240,11 +244,15 @@ this.Init = function(id)
                 EbDataTable dt = DataDB.DoQuery(sql, parameters);
                 if (dt.Rows.Count > 0)
                     return false;// raise an exception to notify email already exists
-                //if (this.AddLocConstraint)
-                //{
-                    //EbConstraints consObj = new EbConstraints(new string[] { " eb_currval('eb_locations_id_seq') " }, EbConstraintKeyTypes.User, EbConstraintTypes.User_Location);
-                    //this.FuncParam[21].Value = consObj.GetDataAsString();// index of 'consadd' is 21
-                //}
+
+                this.UserCredentials = new UserCredentials()
+                {
+                    Email = _d["email"],
+                    Pwd = this.GetRandomPwd(),
+                    Name = _d.ContainsKey("fullname") ? _d["fullname"] : _d["email"]
+                };
+
+                _d.Add("pwd", (this.UserCredentials.Pwd + this.UserCredentials.Email).ToMD5Hash());
             }
             else
             {
@@ -278,9 +286,96 @@ this.Init = function(id)
             
             return true;
         }
+
+        private string GetRandomPwd()
+        {
+            StringBuilder builder = new StringBuilder();
+            Random random = new Random();
+            char ch;
+            for (int i = 0; i < 10; i++)
+            {
+                ch = Convert.ToChar(Convert.ToInt32(Math.Floor(26 * random.NextDouble() + 65)));
+                builder.Append(ch);
+            }
+            return builder.ToString();
+        }
+
+        private UserCredentials UserCredentials { get; set; }
+
+        private string MailHtml
+        {
+            get
+            {
+                return @"
+<html>
+    <head>
+        <title></title>
+    </head>
+    <body>
+        <div style='border: 1px solid #508bf9;padding:20px 40px 20px 40px; '>
+            <div style='text-align: center;'>
+                <img src='https://myaccount.expressbase.com/images/logo/{SolutionId}.png' />
+            </div>
+            <br />
+            <div style='line-height: 1.4;'>
+                Dear {UserName},<br />
+                <br />
+                You have been added as a user into {SolutionId} solution. Please find below credentials to log in.
+                <br />
+                <br />
+                Solution URL - https://{SolutionId}.expressbase.com <br />
+                User name - {Email} <br />
+                Password - {Password} <br />
+                <br />
+                Please make sure you change the password after logging in (in the <b>My Profile</b> page).
+            </div>
+            <br />
+            <br />
+            Thanks,<br />
+            {SolutionAdmin}<br />
+        </div>
+    </body>
+</html>";
+            }
+            set { }
+        }
+
+        public void SendMailIfUserCreated(RabbitMqProducer MessageProducer3, int UserId, string CreatedBy, string UserAuthId, string SolnId)
+        {
+            if(this.UserCredentials != null)
+            {
+                string Html = this.MailHtml
+                    .Replace("{SolutionId}", SolnId)
+                    .Replace("{UserName}", this.UserCredentials.Name)
+                    .Replace("{Email}", this.UserCredentials.Email)
+                    .Replace("{Password}", this.UserCredentials.Pwd)
+                    .Replace("{SolutionAdmin}", CreatedBy);
+                
+                //this.EbConnectionFactory.EmailConnection.Send("febincarlos@expressbase.com", "test", "Hiii", null, null, null, "");
+                
+                MessageProducer3.Publish(new EmailServicesRequest()
+                {
+                    To = this.UserCredentials.Email,
+                    Message = Html,
+                    Subject = $"Welcome to {SolnId} Solution",
+                    UserId = UserId,
+                    UserAuthId = UserAuthId,
+                    SolnId = SolnId
+                });
+            }
+        }
     }
 
+    public class UserCredentials
+    {
+        public UserCredentials() { }
+        
+        public string Email { get; set; }
 
+        public string Pwd { get; set; }
+
+        public string Name { get; set; }
+    }
 
     public abstract class UsrLocFieldAbstract { }
 

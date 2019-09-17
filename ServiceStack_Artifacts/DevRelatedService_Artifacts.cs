@@ -124,6 +124,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 3)]
         public AppWrapper AppInfo { get; set; }
+
+        [DataMember(Order = 4)]
+        public int ObjectsCount { get; set; }
     }
 
     public class GetObjectRequest : EbServiceStackAuthRequest, IReturn<GetObjectResponse>
@@ -137,6 +140,21 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public Dictionary<int, TypeWrap> Data { get; set; }
 
         [DataMember(Order = 3)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    public class DeleteAppRequest : EbServiceStackAuthRequest, IReturn<DeleteAppResponse>
+    {
+        [DataMember(Order = 1)]
+        public int AppId { set; get; }
+    }
+
+    public class DeleteAppResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public bool Status { set; get; }
+
+        [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
     }
 
@@ -204,7 +222,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-   public class GetDefaultMapApiKeyFromConnectionRequest : EbServiceStackAuthRequest
+    public class GetDefaultMapApiKeyFromConnectionRequest : EbServiceStackAuthRequest
     {
 
     }
