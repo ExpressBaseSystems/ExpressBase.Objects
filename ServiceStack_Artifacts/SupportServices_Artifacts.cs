@@ -97,6 +97,20 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public List<string> Filecollection1 { set; get; } = new List<string>();
 	}
 
+
+	public class ChangeStatusRequest : EbServiceStackAuthRequest, IReturn<ChangeStatusResponse>
+	{
+		public string TicketNo { get; set; }
+
+		public string NewStatus { get; set; }
+	}
+
+	public class ChangeStatusResponse
+	{
+		public bool RtnStatus { get; set; } = false;
+	}
+
+
 	public class UpdateTicketRequest : EbServiceStackAuthRequest, IReturn<UpdateTicketResponse>
 	{
 		public string title { get; set; }
