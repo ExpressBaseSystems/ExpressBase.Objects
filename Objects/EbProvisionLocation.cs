@@ -122,7 +122,6 @@ this.Init = function(id)
 	this.Fields.$values.push(new EbObjects.UsrLocField('longname'));
 	this.Fields.$values.push(new EbObjects.UsrLocField('shortname'));
 	//this.Fields.$values.push(new EbObjects.UsrLocField('image'));
-    console.log('from init provision location');
     commonO.ObjCollection['#vernav0'].GetLocationConfig(this);
 };";
         }
