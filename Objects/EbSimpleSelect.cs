@@ -104,7 +104,7 @@ namespace ExpressBase.Objects
             get
             {
                 return @"
-                    return $('#' + this.EbSid_CtxId +'Wraper .dropdown-toggle').attr('disabled', 'disabled').css('pointer-events', 'none').find('[ui-inp]').css('background-color', '#f3f3f3');";
+                    return $('#' + this.EbSid_CtxId +'Wraper .dropdown-toggle').attr('disabled', 'disabled').css('pointer-events', 'none').css('background-color', '#f3f3f3');";
             }
             set { }
         }
@@ -114,7 +114,7 @@ namespace ExpressBase.Objects
             get
             {
                 return @"
-                    return $('#' + this.EbSid_CtxId +'Wraper .dropdown-toggle').prop('disabled',false).css('pointer-events', 'inherit').find('[ui-inp]').css('background-color', '#fff');";
+                    return $('#' + this.EbSid_CtxId +'Wraper .dropdown-toggle').prop('disabled',false).css('pointer-events', 'inherit').css('background-color', '#fff');";
             }
             set { }
         }
