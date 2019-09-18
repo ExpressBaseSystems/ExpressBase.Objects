@@ -183,7 +183,7 @@ namespace ExpressBase.Objects
             get
             {
                 return @"
-        console.log('SetDisplayMemberJSfn');
+        /*console.log('SetDisplayMemberJSfn');*/
         let VMs = this.initializer.Vobj.valueMembers;
         let DMs = this.initializer.Vobj.displayMembers;
         let columnVals = this.initializer.columnVals;

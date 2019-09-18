@@ -59,6 +59,7 @@ namespace ExpressBase.Objects
         {
             Tiles = new List<Tiles>();
         }
+        public override List<string> DiscoverRelatedRefids() { return new List<string>(); }
     }
 
     [EnableInBuilder(BuilderType.DashBoard)]
