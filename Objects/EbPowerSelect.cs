@@ -194,13 +194,12 @@ namespace ExpressBase.Objects
         let valMsArr = p1[0].split(',');
         let DMtable = p1[1];
 
-
         $.each(valMsArr, function (i, vm) {
             VMs.push(vm);
             $.each(this.DisplayMembers.$values, function (j, dm) {
-                $.each(DMtable, function (j, r) {
-                    if (getObjByval(r.Columns, 'Name', this.ValueMember.name).Value === vm) {
-                        let _dm = getObjByval(r.Columns, 'Name', dm.name).Value;
+                $.each(DMtable, function (j, row) {
+                    if (getObjByval(row.Columns, 'Name', this.ValueMember.name).Value === vm) {// to select row which includes ValueMember we are seeking for 
+                        let _dm = getObjByval(row.Columns, 'Name', dm.name).Value;
                         DMs[dm.name].push(_dm);
                     }
                 }.bind(this));
@@ -209,14 +208,18 @@ namespace ExpressBase.Objects
 
 
         if (this.initializer.datatable === null) {//for aftersave actions
-            $.each(DMtable, function (j, r) {
-                $.each(r.Columns, function (j, item) {
-                    if (!columnVals[item.Name]) {
-                        console.warn('Mismatch found in Colums in datasource and Colums in object');
-                        return true;
+            $.each(valMsArr, function (i, vm) {
+                $.each(DMtable, function (j, row) {
+                    if (getObjByval(row.Columns, 'Name', this.ValueMember.name).Value === vm) {// to select row which includes ValueMember we are seeking for 
+                        $.each(row.Columns, function (k, column) {
+                            if (!columnVals[column.Name]) {
+                                console.warn('Found mismatch in Columns from datasource and Colums in object');
+                                return true;
+                            }
+                            let val = EbConvertValue(column.Value, column.Type);
+                            columnVals[column.Name].push(val);
+                        }.bind(this));
                     }
-                    let val = EbConvertValue(item.Value, item.Type);
-                    columnVals[item.Name].push(val);
                 }.bind(this));
             }.bind(this));
         }
