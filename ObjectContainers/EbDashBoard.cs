@@ -34,6 +34,13 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.DashBoard)]
         public override string Status { get; set; }
 
+        [EnableInBuilder(BuilderType.DashBoard)]
+        [UIproperty]
+        [PropertyGroup("Appearance")]
+        [PropertyEditor(PropertyEditorType.Color)]
+        public virtual string BackgroundColor { get; set; }
+
+
         // methods
         public EbDashBoardWraper()
         {
@@ -49,6 +56,7 @@ namespace ExpressBase.Objects
         [DefaultPropValue("2")]
         public int TileCount { get; set; }
 
+      
         [EnableInBuilder(BuilderType.DashBoard)]
         [HideInPropertyGrid]
         public List<Tiles> Tiles { get; set; }
