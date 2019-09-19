@@ -2085,7 +2085,30 @@ namespace ExpressBase.Objects
                     else if (c is EbControlContainer)
                     {
                         AfterRedisGet(c as EbControlContainer, Redis, client);
-                    }                   
+                    }
+                    //else if (c is EbProvisionLocation)//add unmapped ctrls as DoNotPersist controls
+                    //{
+                    //    if (_this is EbWebForm ? (_this as EbWebForm).IsRenderMode : (_this as EbUserControl).IsRenderMode)
+                    //    {
+                    //        EbProvisionLocation prvnCtrl = c as EbProvisionLocation;
+                    //        for (int j = 0; i < prvnCtrl.Fields.Count; i++)
+                    //        {
+                    //            if ((prvnCtrl.Fields[j] as UsrLocField).ControlName.IsNullOrEmpty())
+                    //            {
+                    //                _this.Controls.Insert(i, new EbTextBox()
+                    //                {
+                    //                    Name = "namecustom" + i,
+                    //                    EbSid = "ebsidcustom" + i,
+                    //                    Label = "labelcustom" + i,
+                    //                    DoNotPersist = true
+                    //                });
+                    //                (prvnCtrl.Fields[j] as UsrLocField).ControlName = "namecustom" + i;
+                    //                i++;
+                    //            }
+                    //        }
+                    //    }
+
+                    //}
                 }
             }
             catch (Exception e)

@@ -364,6 +364,38 @@ this.Init = function(id)
                 });
             }
         }
+
+        public override string GetValueJSfn
+        {
+            get
+            {
+                return @"
+                if (!this.hasOwnProperty('_finalObj'))
+                    this._finalObj = {};
+                $.each(this.Fields.$values, function (i, obj) {
+                    if (obj.ControlName !== '') {
+                        this._finalObj[obj.Name] = obj.Control.getValue();
+                    }            
+                }.bind(this));
+                return JSON.stringify(this._finalObj);";
+            }
+            set { }
+        }
+
+        public override string SetValueJSfn
+        {
+            get
+            {
+                return @"
+                this._finalObj = JSON.parse(p1);
+                $.each(this.Fields.$values, function (i, obj) {
+                    if (obj.ControlName !== '') {
+                        obj.Control.setValue(this._finalObj[obj.Name]);
+                    }
+                }.bind(this));";
+            }
+            set { }
+        }
     }
 
     public class UserCredentials
