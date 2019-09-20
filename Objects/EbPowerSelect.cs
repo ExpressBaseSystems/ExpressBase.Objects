@@ -345,6 +345,9 @@ namespace ExpressBase.Objects
                     pg.setSimpleProperty('MinLimit', 0);
                     pg.MakeReadOnly('MinLimit');                 
                 }
+                if(this.MaxLimit === 1)
+                    pg.setSimpleProperty('MaxLimit', 0);
+                    
             } 
             else {
                 pg.setSimpleProperty('MaxLimit', 1);
@@ -355,6 +358,8 @@ namespace ExpressBase.Objects
                 else{
                     pg.setSimpleProperty('MinLimit', 0);
                 }
+                if(this.MaxLimit !== 1)
+                    pg.setSimpleProperty('MaxLimit', 1);
             }")]
         public bool MultiSelect
         {
