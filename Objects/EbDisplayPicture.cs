@@ -33,7 +33,7 @@ namespace ExpressBase.Objects
             {
                 return @"EbDisplayPicture = {
                 adjustMaxHeight : function(elementId, props) {
-                    $(`#cont_${elementId} #Wraper img`).css('max-height', `${props.MaxHeight}px`);
+                    $(`#cont_${elementId} .ebimg-cont img`).css('max-height', `${props.MaxHeight}px`);
                 }
             }";
             }
@@ -43,7 +43,18 @@ namespace ExpressBase.Objects
         {
             return @" 
         <div class='ebimg-cont' style='width:100%; text-align:center;'>
-            <img id='@name@' src='@src@'  style='opacity:0.5; max-width:100%; max-height:@maxheight@px;' alt='@alt@'>
+            <img id='@name@' class='dpctrl-img' src='@src@'  style='opacity:0.5; max-width:100%; max-height:@maxheight@px;' alt='@alt@'>
+        </div>
+        <div class='dpctrl-options-cont' style='text-align: right;width: 100%;position: absolute;bottom: 0;background: transparent; display:none;'>
+            <div style='height: 20px;width: 47px;display: none;text-align: center;border: 1px solid #ccc;border-radius: 20px;font-size: 12px;padding: 1px;background-color: #eee;cursor: pointer;'>
+                <i class='fa fa-plus' aria-hidden='true'></i> Add
+            </div>
+            <div style='height: 20px;width: 70px;display: none;text-align: center;border: 1px solid #ccc;border-radius: 20px;font-size: 12px;padding: 1px;background-color: #eee;cursor: pointer;'>
+                <i class='fa fa-trash' aria-hidden='true'></i> Remove
+            </div>
+            <div class='dpctrl-change' style='height: 20px;width: 70px;display: inline-block;text-align: center;border: 1px solid #ccc;border-radius: 20px;font-size: 12px;padding: 1px;background-color: #eee;cursor: pointer;'>
+                <i class='fa fa-pencil' aria-hidden='true'></i> Change
+            </div>
         </div>"
 .Replace("@name@", this.Name)
 .Replace("@src@", "/images/image.png")
@@ -81,19 +92,17 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         public bool Multiple { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
-        [OnChangeExec(@"if(this.CropResize === true){pg.ShowProperty('CropAspectRatio');}
-		else{pg.HideProperty('CropAspectRatio');}")]
-        public bool CropResize { get; set; }
+        //[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        //[OnChangeExec(@"if(this.CropResize === true){pg.ShowProperty('CropAspectRatio');}
+        //else{pg.HideProperty('CropAspectRatio');}")]
+        //public bool CropResize { get; set; }
 
         //[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         //[HideInPropertyGrid]
         //public List<string> AspectRatio { get { return new List<string> { "1:1", "4:3", "16:9" }; } }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
-        [DefaultPropValue("1:1")]
-        //[PropertyEditor(PropertyEditorType.CollectionFrmSrc, "AspectRatio", 1)]
-        public string CropAspectRatio { get; set; }
+        public DpAspectRatio CropAspectRatio { get; set; }
 
         //--------Hide in property grid------------start
 
@@ -130,5 +139,14 @@ namespace ExpressBase.Objects
         public override EbScript OnChangeFn { get; set; }
 
         //--------Hide in property grid------------end
+    }
+
+    public enum DpAspectRatio
+    {
+        Logo,
+        Dp,
+        Doc,
+        location,
+        Free
     }
 }
