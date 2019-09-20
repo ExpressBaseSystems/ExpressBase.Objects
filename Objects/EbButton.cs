@@ -11,7 +11,8 @@ using System.Threading.Tasks;
 
 namespace ExpressBase.Objects
 {
-    //[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+    [HideInToolBox]
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
     public class EbButton : EbControlUI
     {
         public EbButton() { }
@@ -24,8 +25,8 @@ namespace ExpressBase.Objects
         }
         
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+        [Alias("Text")]
         public override string Label { get; set; }
-
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
         public override bool DoNotPersist { get { return true; } }
