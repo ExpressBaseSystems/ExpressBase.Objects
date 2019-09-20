@@ -1,4 +1,5 @@
-﻿using ExpressBase.Common.Objects;
+﻿using ExpressBase.Common;
+using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
 using System;
@@ -12,6 +13,7 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.DashBoard)]
     public class EbDashBoardWraper : EbObject 
     {
+        [HideForUser]
         [EnableInBuilder(BuilderType.DashBoard)]
         public override string Name { get; set; }
 
@@ -19,6 +21,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.DashBoard)]
         public override string RefId { get; set; }
 
+        [HideForUser]
         [EnableInBuilder(BuilderType.DashBoard)]
         public override string DisplayName { get; set; }
 
@@ -34,12 +37,6 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.DashBoard)]
         public override string Status { get; set; }
 
-        [EnableInBuilder(BuilderType.DashBoard)]
-        [UIproperty]
-        [PropertyGroup("Appearance")]
-        [PropertyEditor(PropertyEditorType.Color)]
-        public virtual string BackgroundColor { get; set; }
-
 
         // methods
         public EbDashBoardWraper()
@@ -52,11 +49,24 @@ namespace ExpressBase.Objects
     [BuilderTypeEnum(BuilderType.DashBoard)]
     public class EbDashBoard : EbDashBoardWraper, IEBRootObject
     {
+        [HideForUser]
         [EnableInBuilder(BuilderType.DashBoard)]
         [DefaultPropValue("2")]
         public int TileCount { get; set; }
 
-      
+        [EnableInBuilder(BuilderType.DashBoard)]
+        [UIproperty]
+        [PropertyGroup("Appearance")]
+        [PropertyEditor(PropertyEditorType.Color)]
+        public virtual string BackgroundColor { get; set; }
+
+        
+        [EnableInBuilder(BuilderType.DashBoard)]
+        [PropertyGroup("Appearance")]
+        [UIproperty]
+        [PropertyEditor(PropertyEditorType.FontSelector)]
+        public virtual EbFont Font { get; set; }
+
         [EnableInBuilder(BuilderType.DashBoard)]
         [HideInPropertyGrid]
         public List<Tiles> Tiles { get; set; }

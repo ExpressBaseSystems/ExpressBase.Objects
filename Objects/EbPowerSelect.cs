@@ -268,6 +268,8 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.WebForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", 1)]
+        [PropertyGroup("Behavior")]
+        [PropertyPriority(98)]
         [OnChangeExec(@"if (this.Columns && this.Columns.$values.length === 0 ){pg.MakeReadOnly('DisplayMember');} else {pg.MakeReadWrite('DisplayMember');}")]
         public DVBaseColumn DisplayMember { get; set; }
 
@@ -275,6 +277,7 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", 1)]
         [OnChangeExec(@"if (this.Columns.$values.length === 0 ){pg.MakeReadOnly('ValueMember');} else {pg.MakeReadWrite('ValueMember');}")]
         [PropertyGroup("Behavior")]
+        [PropertyPriority(99)]
         public DVBaseColumn ValueMember { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
@@ -345,6 +348,9 @@ namespace ExpressBase.Objects
                     pg.setSimpleProperty('MinLimit', 0);
                     pg.MakeReadOnly('MinLimit');                 
                 }
+                if(this.MaxLimit === 1)
+                    pg.setSimpleProperty('MaxLimit', 0);
+                    
             } 
             else {
                 pg.setSimpleProperty('MaxLimit', 1);
@@ -355,6 +361,8 @@ namespace ExpressBase.Objects
                 else{
                     pg.setSimpleProperty('MinLimit', 0);
                 }
+                if(this.MaxLimit !== 1)
+                    pg.setSimpleProperty('MaxLimit', 1);
             }")]
         public bool MultiSelect
         {
