@@ -241,13 +241,13 @@ namespace ExpressBase.Objects
             get
             {
                 return
-                    @"console.log('setvalue');
+                    @"
                     if(this.IsNullable && p1 !== null)
                         $('#' + this.EbSid_CtxId).siblings('.nullable-check').find('input[type=checkbox]').prop('checked', true);
-                    if(this.ShowDateAs_ === 1) //month picker
-                        $('#' + this.EbSid_CtxId).val(p1).trigger('change');
-                    else if(p1 !== null && p1 !== undefined){
-                        if(this.EbDateType === 5) //Date
+                    if(p1 !== null && p1 !== undefined){
+                        if(this.ShowDateAs_ === 1) //month picker
+                            $('#' + this.EbSid_CtxId).val(p1);
+                        else if(this.EbDateType === 5) //Date
                             $('#' + this.EbSid_CtxId).val(moment(p1, 'YYYY-MM-DD').format(ebcontext.user.Preference.ShortDatePattern));
                         else if(this.EbDateType === 6) //DateTime
                             $('#' + this.EbSid_CtxId).val(moment(p1, 'YYYY-MM-DD HH:mm:ss').format(ebcontext.user.Preference.ShortDatePattern + ' ' + ebcontext.user.Preference.ShortTimePattern));

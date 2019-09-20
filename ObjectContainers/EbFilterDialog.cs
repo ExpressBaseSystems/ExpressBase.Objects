@@ -123,22 +123,7 @@ namespace ExpressBase.Objects
 
         public override void ReplaceRefid(Dictionary<string, string> RefidMap)
         {
-            foreach (EbControl control in Controls)
-            {
-                PropertyInfo[] _props = control.GetType().GetProperties();
-                foreach (PropertyInfo _prop in _props)
-                {
-                    if (_prop.IsDefined(typeof(OSE_ObjectTypes)))
-                    {
-                        string _val = _prop.GetValue(control, null).ToString();
-                        if (RefidMap.ContainsKey(_val))
-                            _prop.SetValue(control, RefidMap[_val], null);
-                        else
-                            _prop.SetValue(control, "failed-to-update-");
-                    }
-
-                }
-            }
+            EbFormHelper.ReplaceRefid(this, RefidMap);
         }
 
         //public override string DiscoverRelatedRefids()
