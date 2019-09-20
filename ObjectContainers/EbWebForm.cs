@@ -616,7 +616,7 @@ namespace ExpressBase.Objects
                 {
                     if (!c.DoNotPersist)
                     {
-                        if (FormData.MultipleTables[_container.TableName][0][c.Name] != null)
+                        if (FormData.MultipleTables[_container.TableName][0].GetColumn(c.Name) != null)
                         {
                             c.ValueFE = FormData.MultipleTables[_container.TableName][0][c.Name];
                             FormData.MultipleTables[_container.TableName][0].SetEbDbType(c.Name, c.EbDbType);
