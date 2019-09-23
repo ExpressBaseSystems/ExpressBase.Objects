@@ -888,6 +888,7 @@ namespace ExpressBase.Objects
                     this.ForeColor = '#201c1c';
                     this.Border = 1;
                     this.BorderColor = '#eae6e6';
+                    this.Title = 'slno';
                 };";
         }
         public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
