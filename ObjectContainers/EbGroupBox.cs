@@ -34,6 +34,11 @@ namespace ExpressBase.Objects
         [OnChangeUIFunction("Common.LABEL")]
         public override string Label { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [UIproperty]
+        [OnChangeUIFunction("Common.BORDER")]
+        public bool HideBorder { get; set; }
+
         [HideInPropertyGrid]
         [JsonIgnore]
         public override string ToolIconHtml { get { return "<i class='fa fa-square-o'></i>"; } set { } }

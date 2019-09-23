@@ -281,6 +281,39 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string ErrDbMessage { get; set; }
     }
 
+    [DataContract]
+    public class EditSolutionRequest : IReturn<EditSolutionResponse>, IEbSSRequest
+    {
+        [DataMember(Order = 1)]
+        public string NewESolutionId { get; set; }
+
+        [DataMember(Order = 2)]
+        public string OldESolutionId { get; set; }
+
+        [DataMember(Order = 3)]
+        public int UserId { get; set; }
+
+        [DataMember(Order = 4)]
+        public string SolutionName { get; set; }
+
+        [DataMember(Order = 5)]
+        public string Description { get; set; }
+
+        public string SolnId { get; set; }
+    }
+
+    [DataContract]
+    public class EditSolutionResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 2)]
+        public bool Status { get; set; }
+
+        [DataMember(Order = 3)]
+        public string Message { get; set; }
+    }
 
     [DataContract]
     public class CreateSolutionFurtherRequest : IReturn<CreateSolutionFurtherResponse>, IEbSSRequest
@@ -465,11 +498,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public bool VerifyStatus { get; set; }
     }
 
-
-
-
-
-
 	[DataContract]
 	public class SocialLoginRequest : EbServiceStackNoAuthRequest
 	{
@@ -492,8 +520,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		[DataMember(Order = 1)]
 		public string jsonval { get; set; }
 	}
-
-
 
 	//[DataContract]
 	//public class GetUsersResponse : IEbSSResponse
@@ -524,5 +550,43 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         public bool Versioning { get; set; }
         public string solution_id { get; set; }
+    }
+
+    public class UpdateSidMapRequest : EbServiceStackNoAuthRequest, IReturn<UpdateSidMapResponse>{}
+
+    public class UpdateSidMapResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    public class UpdateSidMapMqRequest : EbServiceStackNoAuthRequest, IReturn<UpdateSidMapMqResponse>{}
+
+    public class UpdateSidMapMqResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    public class CheckSolutionOwnerReq : EbServiceStackAuthRequest, IReturn<CheckSolutionOwnerResp> {
+        [DataMember(Order = 1)]
+        public string ESolutionId { get; set; }
+    }
+
+    public class CheckSolutionOwnerResp : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 2)]
+        public bool IsValid { get; set; }
+
+        [DataMember(Order = 3)]
+        public EbSolutionsWrapper SolutionInfo { get; set; }
+
+        public CheckSolutionOwnerResp()
+        {
+            SolutionInfo = new EbSolutionsWrapper();
+        }
     }
 }
