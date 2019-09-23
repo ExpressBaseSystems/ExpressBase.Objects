@@ -45,7 +45,7 @@ namespace ExpressBase.Objects
         <div class='ebimg-cont' style='width:100%; text-align:center;'>
             <img id='@name@' class='dpctrl-img' src='@src@'  style='opacity:0.5; max-width:100%; max-height:@maxheight@px;' alt='@alt@'>
         </div>
-        <div class='dpctrl-options-cont' style='text-align: right;width: 100%;position: absolute;bottom: 0;background: transparent; display:none;'>
+        <div class='dpctrl-options-cont' style='text-align: right;width: 100%;position: absolute;bottom: 0;background: transparent; visibility: hidden;'>
             <div style='height: 20px;width: 47px;display: none;text-align: center;border: 1px solid #ccc;border-radius: 20px;font-size: 12px;padding: 1px;background-color: #eee;cursor: pointer;'>
                 <i class='fa fa-plus' aria-hidden='true'></i> Add
             </div>
@@ -139,14 +139,19 @@ namespace ExpressBase.Objects
         public override EbScript OnChangeFn { get; set; }
 
         //--------Hide in property grid------------end
+
+
+        
+        public override string EnableJSfn { get { return @"$('#cont_' + this.EbSid_CtxId + ' *').prop('disabled',false).css('pointer-events', 'inherit').find('[ui-inp]').css('background-color', '#fff'); $('#cont_' + this.EbSid_CtxId).find('.dpctrl-options-cont').show();"; } set { } }
+
+        public override string DisableJSfn { get { return @"$('#cont_' + this.EbSid_CtxId + ' *').attr('disabled', 'disabled').css('pointer-events', 'none').find('[ui-inp]').css('background-color', '#f3f3f3'); $('#cont_' + this.EbSid_CtxId).find('.dpctrl-options-cont').hide()"; } set { } }
+
     }
 
     public enum DpAspectRatio
     {
-        Logo,
+        Free,
         Dp,
-        Doc,
-        location,
-        Free
+        Location
     }
 }
