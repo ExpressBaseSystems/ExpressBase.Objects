@@ -69,6 +69,22 @@ namespace ExpressBase.Objects
         JustifiedAll = 8,
         Undefined = -1
     }
+
+    public enum DateFormatReport
+    {
+        M_d_yyyy,
+        MM_dd_yyyy,
+        ddd_MMM_d_yyyy,
+        dddd_MMMM_d_yyyy,
+        MM_dd_yy,
+        dd_MM_yyyy,
+        dd_MM_yyyy_slashed,
+        from_culture
+        //Year_Month_Date,
+        //Year_Month,
+        //Year,
+    }
+
     public enum SummaryFunctionsNumeric
     {
         Average,
