@@ -26,7 +26,6 @@ namespace ExpressBase.Objects
         Contains,
     }
 
-    [ProtoBuf.ProtoContract]
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
     public class EbPowerSelect : EbControlUI
     {
@@ -34,17 +33,7 @@ namespace ExpressBase.Objects
         public EbPowerSelect()
         {
             EbSimpleSelect = new EbSimpleSelect();
-            //{
-            //    EbSid = EbSid,
-            //    EbSid_CtxId = EbSid_CtxId,
-            //    Name = Name,
-            //    HelpText = HelpText,
-            //    DataSourceId = DataSourceId,
-            //    ValueMember = ValueMember,
-            //    DisplayMember = DisplayMember,
-            //    IsDynamic = IsDynamic,
-            //    IsMultiSelect = MultiSelect
-            //};
+            AddButton = new EbButton();
         }
 
         //public override string SetValueJSfn
@@ -57,6 +46,11 @@ namespace ExpressBase.Objects
         //    }
         //    set { }
         //}
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [PropertyGroup("Behavior")]
+        [PropertyPriority(98)]
+        public bool IsInsertable{ get; set; }
 
         public override string IsRequiredOKJSfn
         {
@@ -174,9 +168,24 @@ namespace ExpressBase.Objects
                     IsMultiSelect = MultiSelect
                 };
             }
+            else if (this.IsInsertable)
+            {
+                AddButton = new EbButton()
+                {
+                    EbSid = EbSid + "_addbtn",
+                    EbSid_CtxId = EbSid_CtxId + "_addbtn",
+                    Name = Name + "_addbtn",
+                    FormRefId = FormRefId,
+                    Label = "<i class='fa fa-plus' aria-hidden='true'></i>"
+                };
+            }
         }
 
         public EbSimpleSelect EbSimpleSelect { set; get; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [HideInPropertyGrid]
+        public EbButton AddButton { set; get; }
 
         public override string SetDisplayMemberJSfn
         {
@@ -194,13 +203,12 @@ namespace ExpressBase.Objects
         let valMsArr = p1[0].split(',');
         let DMtable = p1[1];
 
-
         $.each(valMsArr, function (i, vm) {
             VMs.push(vm);
             $.each(this.DisplayMembers.$values, function (j, dm) {
-                $.each(DMtable, function (j, r) {
-                    if (getObjByval(r.Columns, 'Name', this.ValueMember.name).Value === vm) {
-                        let _dm = getObjByval(r.Columns, 'Name', dm.name).Value;
+                $.each(DMtable, function (j, row) {
+                    if (getObjByval(row.Columns, 'Name', this.ValueMember.name).Value === vm) {// to select row which includes ValueMember we are seeking for 
+                        let _dm = getObjByval(row.Columns, 'Name', dm.name).Value;
                         DMs[dm.name].push(_dm);
                     }
                 }.bind(this));
@@ -209,14 +217,18 @@ namespace ExpressBase.Objects
 
 
         if (this.initializer.datatable === null) {//for aftersave actions
-            $.each(DMtable, function (j, r) {
-                $.each(r.Columns, function (j, item) {
-                    if (!columnVals[item.Name]) {
-                        console.warn('Mismatch found in Colums in datasource and Colums in object');
-                        return true;
+            $.each(valMsArr, function (i, vm) {
+                $.each(DMtable, function (j, row) {
+                    if (getObjByval(row.Columns, 'Name', this.ValueMember.name).Value === vm) {// to select row which includes ValueMember we are seeking for 
+                        $.each(row.Columns, function (k, column) {
+                            if (!columnVals[column.Name]) {
+                                console.warn('Found mismatch in Columns from datasource and Colums in object');
+                                return true;
+                            }
+                            let val = EbConvertValue(column.Value, column.Type);
+                            columnVals[column.Name].push(val);
+                        }.bind(this));
                     }
-                    let val = EbConvertValue(item.Value, item.Type);
-                    columnVals[item.Name].push(val);
                 }.bind(this));
             }.bind(this));
         }
@@ -252,6 +264,11 @@ namespace ExpressBase.Objects
         [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
         public string DataSourceId { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [OSE_ObjectTypes(EbObjectTypes.iWebForm)]
+        public string FormRefId { get; set; }
+
         [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.WebForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.CollectionProp, "Columns", "bVisible")]
         [PropertyGroup("Behavior")]
@@ -265,6 +282,8 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.WebForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", 1)]
+        [PropertyGroup("Behavior")]
+        [PropertyPriority(98)]
         [OnChangeExec(@"if (this.Columns && this.Columns.$values.length === 0 ){pg.MakeReadOnly('DisplayMember');} else {pg.MakeReadWrite('DisplayMember');}")]
         public DVBaseColumn DisplayMember { get; set; }
 
@@ -272,6 +291,7 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", 1)]
         [OnChangeExec(@"if (this.Columns.$values.length === 0 ){pg.MakeReadOnly('ValueMember');} else {pg.MakeReadWrite('ValueMember');}")]
         [PropertyGroup("Behavior")]
+        [PropertyPriority(99)]
         public DVBaseColumn ValueMember { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
@@ -342,6 +362,9 @@ namespace ExpressBase.Objects
                     pg.setSimpleProperty('MinLimit', 0);
                     pg.MakeReadOnly('MinLimit');                 
                 }
+                if(this.MaxLimit === 1)
+                    pg.setSimpleProperty('MaxLimit', 0);
+                    
             } 
             else {
                 pg.setSimpleProperty('MaxLimit', 1);
@@ -352,6 +375,8 @@ namespace ExpressBase.Objects
                 else{
                     pg.setSimpleProperty('MinLimit', 0);
                 }
+                if(this.MaxLimit !== 1)
+                    pg.setSimpleProperty('MaxLimit', 1);
             }")]
         public bool MultiSelect
         {
@@ -488,6 +513,7 @@ namespace ExpressBase.Objects
         {
             if (this.RenderAsSimpleSelect)
             {
+                EbSimpleSelect.ContextId = this.ContextId;
                 return EbSimpleSelect.GetBareHtml();
             }
 
@@ -499,6 +525,7 @@ namespace ExpressBase.Objects
     @VueSelectCode
     <center class='pow-center'>
         <div id='@ebsid@DDdiv' v-show='DDstate' class='DDdiv expand-transition'  style='width:@DDwidth%;'> 
+            @addbtn@
             <table id='@ebsid@tbl' tabindex='1000' style='width:100%' class='table table-bordered'></table>
         </div>
     </center>
@@ -509,6 +536,7 @@ namespace ExpressBase.Objects
     .Replace("@width", 900.ToString())//this.Width.ToString())
     .Replace("@perWidth", (this.DisplayMembers.Count != 0) ? (900 / this.DisplayMembers.Count).ToString() : 900.ToString())
     .Replace("@DDwidth", (this.DropdownWidth == 0) ? "100" : this.DropdownWidth.ToString())
+    .Replace("@addbtn@", this.IsInsertable ? string.Concat("<div class='ps-addbtn-cont'>", this.AddButton.GetBareHtml(), "</div>") : string.Empty)
     .Replace("@tooltipText@", this.ToolTipText ?? string.Empty);
             }
             else
