@@ -11,7 +11,6 @@ using System.Text;
 namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
-    [HideInToolBox]
     public class EbDisplayPicture : EbControlUI
     {
         public EbDisplayPicture() { }
