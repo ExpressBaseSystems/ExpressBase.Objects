@@ -513,6 +513,7 @@ namespace ExpressBase.Objects
         {
             if (this.RenderAsSimpleSelect)
             {
+                EbSimpleSelect.ContextId = this.ContextId;
                 return EbSimpleSelect.GetBareHtml();
             }
 

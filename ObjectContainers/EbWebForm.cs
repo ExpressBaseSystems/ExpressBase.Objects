@@ -1987,9 +1987,9 @@ namespace ExpressBase.Objects
                     {
                         if (_prop.IsDefined(typeof(OSE_ObjectTypes)))
                         {
-                            string _val = _prop.GetValue(_flatCtrls[i], null).ToString();
-                            if (!string.IsNullOrEmpty(_val))
-                                refids.Add(_val);
+                            object _val = _prop.GetValue(_flatCtrls[i], null);
+                            if (_val != null && !_val.ToString().IsEmpty())
+                                refids.Add(_val.ToString());
                         }
                     }
                 }
@@ -2026,11 +2026,11 @@ namespace ExpressBase.Objects
                     {
                         if (_prop.IsDefined(typeof(OSE_ObjectTypes)))
                         {
-                            string _val = _prop.GetValue(_flatCtrls[i], null).ToString();
-                            if (!string.IsNullOrEmpty(_val))
+                            object _val = _prop.GetValue(_flatCtrls[i], null);
+                            if (_val != null && !_val.ToString().IsEmpty())
                             {
-                                if (RefidMap.ContainsKey(_val))
-                                    _prop.SetValue(_flatCtrls[i], RefidMap[_val], null);
+                                if (RefidMap.ContainsKey(_val.ToString()))
+                                    _prop.SetValue(_flatCtrls[i], RefidMap[_val.ToString()], null);
                                 else
                                     _prop.SetValue(_flatCtrls[i], "failed-to-update-");
                             }

@@ -80,10 +80,30 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public List<SupportTktCls> supporttkt { get; set; }
 	}
 
+	public class AdminSupportRequest : EbServiceStackAuthRequest, IReturn<AdminSupportResponse>
+	{
+		public int usrid { get; set; }
+	}
+
+	public class AdminSupportResponse
+	{
+		public AdminSupportResponse()
+		{
+			supporttkt = new List<SupportTktCls>();
+		}
+		public List<SupportTktCls> supporttkt { get; set; }
+	}
+
+
+
+
 
 	public class SupportDetailsRequest : EbServiceStackAuthRequest, IReturn<SupportDetailsResponse>
 	{
 		public string ticketno { get; set; }
+		public string Usertype { get; set; }
+
+
 	}
 
 	public class SupportDetailsResponse
@@ -121,6 +141,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 		public string ticketid { get; set; }
 		public string solution_id { get; set; }
+
+		public string type_f_b { get; set; }
 
 		public int [] Filedel{ get; set; }
 
