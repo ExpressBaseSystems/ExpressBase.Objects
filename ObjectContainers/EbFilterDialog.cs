@@ -150,7 +150,7 @@ namespace ExpressBase.Objects
 
         public override void AfterRedisGet(RedisClient Redis, IServiceClient client)
         {
-            EbFormHelper.AfterRedisGet(this, Redis, client);
+            EbFormHelper.AfterRedisGet(this, Redis, client, this.IsRenderMode);
         }
 
         public override List<string> DiscoverRelatedRefids()
