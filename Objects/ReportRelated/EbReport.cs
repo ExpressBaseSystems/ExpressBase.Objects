@@ -729,7 +729,7 @@ namespace ExpressBase.Objects
             ph_Yposition = (PageNumber == 1) ? ReportHeaderHeight : 0;
             dt_Yposition = ph_Yposition + PageHeaderHeight;
             //  pf_Yposition = dt_Yposition + DT_FillHeight;
-            pf_Yposition = (float)detailEnd + DetailHeight /*+ dt_Yposition*/;
+            pf_Yposition = (float)detailEnd + DetailHeight + dt_Yposition;
             foreach (EbPageFooter p_footer in PageFooters)
             {
                 foreach (EbReportField field in p_footer.Fields)
@@ -747,7 +747,7 @@ namespace ExpressBase.Objects
             detailprintingtop = 0;
             dt_Yposition = ph_Yposition + PageHeaderHeight;
             //pf_Yposition = dt_Yposition + DT_FillHeight;
-            pf_Yposition = (float)detailEnd + DetailHeight /*+ dt_Yposition*/;
+            pf_Yposition = (float)detailEnd + DetailHeight + dt_Yposition;
             rf_Yposition = pf_Yposition + PageFooterHeight;
 
             foreach (EbReportFooter r_footer in ReportFooters)
