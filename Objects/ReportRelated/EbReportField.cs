@@ -145,14 +145,6 @@ namespace ExpressBase.Objects
         [PropertyGroup("Image")]
         public string ImageColName { get; set; }
 
-        [EnableInBuilder(BuilderType.Report)]
-        [PropertyGroup("Image")]
-        public float ImageHeight { get; set; } = 50;
-
-        [EnableInBuilder(BuilderType.Report)]
-        [PropertyGroup("Image")]
-        public float ImageWidth { get; set; } = 50;
-
         public override string GetDesignHtml()
         {
             return "<div class='img-container dropped' eb-type='Img' id='@id' style='border: @Border px solid;border-color: @BorderColor ;width: @Width px; background: @Source ; background-size: cover; height: @Height px; left: @Left px; top: @Top px;'></div>".RemoveCR().DoubleQuoted();
@@ -187,7 +179,7 @@ namespace ExpressBase.Objects
             if (fileByte.Length != 0)
             {
                 iTextSharp.text.Image myImage = iTextSharp.text.Image.GetInstance(fileByte);
-                myImage.ScaleToFit(ImageWidth, ImageHeight);
+                myImage.ScaleToFit(WidthPt, HeightPt);
                 myImage.SetAbsolutePosition(LeftPt, Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop));
                 myImage.Alignment = (int)TextAlign;
                 Rep.Doc.Add(myImage);
