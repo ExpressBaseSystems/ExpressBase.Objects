@@ -75,7 +75,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Value { get; set; }
 
         [DataMember(Order = 3)]
-        public string Type { get; set; }
+        public EbDbTypes Type { get; set; }
     }
 
     [DataContract]
