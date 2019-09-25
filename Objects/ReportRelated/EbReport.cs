@@ -598,7 +598,7 @@ namespace ExpressBase.Objects
                         PageNumber = Writer.PageNumber;
                         DoLoopInDetail(iDetailRowPos);
                     }
-                }               
+                }
                 IsLastpage = true;
             }
             else
@@ -729,7 +729,7 @@ namespace ExpressBase.Objects
             ph_Yposition = (PageNumber == 1) ? ReportHeaderHeight : 0;
             dt_Yposition = ph_Yposition + PageHeaderHeight;
             //  pf_Yposition = dt_Yposition + DT_FillHeight;
-            pf_Yposition = (float)detailEnd + DetailHeight + dt_Yposition;
+            pf_Yposition = (float)detailEnd + /*DetailHeight +*/ dt_Yposition;
             foreach (EbPageFooter p_footer in PageFooters)
             {
                 foreach (EbReportField field in p_footer.Fields)
@@ -747,7 +747,7 @@ namespace ExpressBase.Objects
             detailprintingtop = 0;
             dt_Yposition = ph_Yposition + PageHeaderHeight;
             //pf_Yposition = dt_Yposition + DT_FillHeight;
-            pf_Yposition = (float)detailEnd + DetailHeight + dt_Yposition;
+            pf_Yposition = (float)detailEnd /*+ DetailHeight*/ + dt_Yposition;
             rf_Yposition = pf_Yposition + PageFooterHeight;
 
             foreach (EbReportFooter r_footer in ReportFooters)
@@ -759,14 +759,14 @@ namespace ExpressBase.Objects
                     for (int iSortPos = 0; iSortPos < SortedReportFields.Length; iSortPos++)
                     {
                         EbReportField field = SortedReportFields[iSortPos];
-                        if (HeightPt - rf_Yposition < field.TopPt)
+                        if (HeightPt - rf_Yposition < field.TopPt + 30)
                         {
                             detailprintingtop = 0;
                             Doc.NewPage();
                             PageNumber = Writer.PageNumber;
                             footer_diffrence = HeightPt - rf_Yposition;
                             FooterDrawn = true;
-                            rf_Yposition = 10;
+                            rf_Yposition = 30;
                         }
                         field.TopPt -= footer_diffrence;
                         DrawFields(field, rf_Yposition, 0);
