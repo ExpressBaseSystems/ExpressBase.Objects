@@ -69,6 +69,22 @@ namespace ExpressBase.Objects
         JustifiedAll = 8,
         Undefined = -1
     }
+
+    public enum DateFormatReport
+    {
+        M_d_yyyy,
+        MM_dd_yyyy,
+        ddd_MMM_d_yyyy,
+        dddd_MMMM_d_yyyy,
+        MM_dd_yy,
+        dd_MM_yyyy,
+        dd_MM_yyyy_slashed,
+        from_culture
+        //Year_Month_Date,
+        //Year_Month,
+        //Year,
+    }
+
     public enum SummaryFunctionsNumeric
     {
         Average,
@@ -453,6 +469,12 @@ namespace ExpressBase.Objects
         public float detailprintingtop = 0;
 
         [JsonIgnore]
+        public double detailEnd = 0;
+
+        [JsonIgnore]
+        public bool FooterDrawn = false;
+
+        [JsonIgnore]
         public Dictionary<string, List<EbControl>> LinkCollection { get; set; }
 
         [JsonIgnore]
@@ -576,8 +598,7 @@ namespace ExpressBase.Objects
                         PageNumber = Writer.PageNumber;
                         DoLoopInDetail(iDetailRowPos);
                     }
-                }
-
+                }               
                 IsLastpage = true;
             }
             else
@@ -618,6 +639,23 @@ namespace ExpressBase.Objects
                 return __reportFieldsSortedPerDetail;
             }
         }
+        private Dictionary<EbReportFooter, EbReportField[]> __reportFieldsSortedPerRFooter = null;
+        private Dictionary<EbReportFooter, EbReportField[]> ReportFieldsSortedPerRFooter
+        {
+            get
+            {
+                if (__reportFieldsSortedPerRFooter == null)
+                {
+                    __reportFieldsSortedPerRFooter = new Dictionary<EbReportFooter, EbReportField[]>();
+                    foreach (EbReportFooter _footer in ReportFooters)
+                    {
+                        __reportFieldsSortedPerRFooter[_footer] = _footer.Fields.OrderBy(o => o.TopPt).ToArray();
+                    }
+                }
+
+                return __reportFieldsSortedPerRFooter;
+            }
+        }
 
         public void DoLoopInDetail(int serialnumber)
         {
@@ -645,15 +683,17 @@ namespace ExpressBase.Objects
                         if (calculatedValueSize > field.WidthPt)
                         {
                             rowsneeded = (datatype == DbType.Decimal) ? 1 : Convert.ToInt32(Math.Floor(calculatedValueSize / field.WidthPt));
-
-                            if (MultiRowTop == 0)
+                            if (rowsneeded > 1)
                             {
-                                MultiRowTop = field.TopPt;
-                            }
-                            float k = (phrase.Font.CalculatedSize) * rowsneeded;
-                            if (k > RowHeight)
-                            {
-                                RowHeight = k;
+                                if (MultiRowTop == 0)
+                                {
+                                    MultiRowTop = field.TopPt;
+                                }
+                                float k = (phrase.Font.CalculatedSize) * (rowsneeded - 1);
+                                if (k > RowHeight)
+                                {
+                                    RowHeight = k;
+                                }
                             }
                         }
                     }
@@ -664,13 +704,16 @@ namespace ExpressBase.Objects
                     for (int iSortPos = 0; iSortPos < SortedReportFields.Length; iSortPos++)
                     {
                         EbReportField field = SortedReportFields[iSortPos];
-                        field.HeightPt += RowHeight;
+                        if (field is EbDataField)
+                            field.HeightPt += RowHeight;
                         DrawFields(field, dt_Yposition, serialnumber);
                     }
                     detailprintingtop += detail.HeightPt + RowHeight;
+                    detailEnd = detailprintingtop;
                 }
                 else
                 {
+                    detailEnd = detailprintingtop;
                     IsLastpage = true;
                     Writer.PageEvent.OnEndPage(Writer, Doc);
                     return;
@@ -685,7 +728,8 @@ namespace ExpressBase.Objects
             detailprintingtop = 0;
             ph_Yposition = (PageNumber == 1) ? ReportHeaderHeight : 0;
             dt_Yposition = ph_Yposition + PageHeaderHeight;
-            pf_Yposition = dt_Yposition + DT_FillHeight;
+            //  pf_Yposition = dt_Yposition + DT_FillHeight;
+            pf_Yposition = (float)detailEnd + DetailHeight /*+ dt_Yposition*/;
             foreach (EbPageFooter p_footer in PageFooters)
             {
                 foreach (EbReportField field in p_footer.Fields)
@@ -702,14 +746,44 @@ namespace ExpressBase.Objects
             MultiRowTop = 0;
             detailprintingtop = 0;
             dt_Yposition = ph_Yposition + PageHeaderHeight;
-            pf_Yposition = dt_Yposition + DT_FillHeight;
+            //pf_Yposition = dt_Yposition + DT_FillHeight;
+            pf_Yposition = (float)detailEnd + DetailHeight /*+ dt_Yposition*/;
             rf_Yposition = pf_Yposition + PageFooterHeight;
+
             foreach (EbReportFooter r_footer in ReportFooters)
             {
-                foreach (EbReportField field in r_footer.Fields)
+                float footer_diffrence = 0;
+                EbReportField[] SortedReportFields = this.ReportFieldsSortedPerRFooter[r_footer];
+                if (SortedReportFields.Length > 0)
                 {
-                    DrawFields(field, rf_Yposition, 0);
+                    for (int iSortPos = 0; iSortPos < SortedReportFields.Length; iSortPos++)
+                    {
+                        EbReportField field = SortedReportFields[iSortPos];
+                        if (HeightPt - rf_Yposition < field.TopPt)
+                        {
+                            detailprintingtop = 0;
+                            Doc.NewPage();
+                            PageNumber = Writer.PageNumber;
+                            footer_diffrence = HeightPt - rf_Yposition;
+                            FooterDrawn = true;
+                            rf_Yposition = 10;
+                        }
+                        field.TopPt -= footer_diffrence;
+                        DrawFields(field, rf_Yposition, 0);
+                    }
                 }
+
+                //foreach (EbReportField field in r_footer.Fields)
+                //{
+                //    if (HeightPt - rf_Yposition < field.TopPt)
+                //    {
+                //        detailprintingtop = 0;
+                //        Doc.NewPage();
+                //        PageNumber = Writer.PageNumber;
+                //        rf_Yposition = 10;
+                //    }
+                //    DrawFields(field, rf_Yposition, 0);
+                //}
                 rf_Yposition += r_footer.HeightPt;
             }
         }
