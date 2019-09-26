@@ -21,13 +21,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [HideInPropertyGrid]
-        public override EbDbTypes EbDbType
-        {
-            get
-            {
-                return EbDbTypes.BooleanOriginal;
-            }
-        }
+        public override EbDbTypes EbDbType { get { return EbDbTypes.BooleanOriginal; } }
 
         private EbSimpleSelect EbSimpleSelect { set; get; }
 
