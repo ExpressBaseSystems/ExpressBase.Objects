@@ -44,6 +44,20 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		
 	}
 
+	public class FetchAdminsRequest : EbServiceStackAuthRequest, IReturn<FetchAdminsResponse>
+	{
+		
+
+	}
+
+	public class FetchAdminsResponse
+	{
+		public List<string> AdminNames { get; set; } = new List<string>();
+
+	}
+
+
+
 	public class TenantSolutionsRequest : EbServiceStackAuthRequest, IReturn<TenantSolutionsResponse>
 	{
 		public string usertype { get; set; }
@@ -140,6 +154,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public string priority { get; set; }
 
 		public string ticketid { get; set; }
+
 		public string solution_id { get; set; }
 
 		public string type_f_b { get; set; }
@@ -152,6 +167,29 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 	{
 		public bool status { get; set; }
 	}
+
+
+	public class UpdateTicketAdminRequest : EbServiceStackAuthRequest, IReturn<UpdateTicketResponse>
+	{
+		public string Remarks { get; set; }
+
+		public string AssignTo { get; set; }
+
+		public string Status { get; set; }
+
+		public string Ticketid { get; set; }
+
+		public string Solution_id { get; set; }
+
+		public string Type_f_b { get; set; }
+
+		
+	}
+	public class UpdateTicketAdminResponse
+	{
+		public bool status { get; set; }
+	}
+
 
 
 	public class SupportTktCls
