@@ -28,7 +28,8 @@ namespace ExpressBase.Objects.Objects.DVRelated
         Marker = 3,
         Image = 4,
         Icon = 5,
-        Tree = 6
+        Tree = 6,
+        Boolean = 7
     }
 
     public enum NumericRenderType
@@ -36,7 +37,8 @@ namespace ExpressBase.Objects.Objects.DVRelated
         Default,
         ProgressBar,
         Link,
-        Tree
+        Tree,
+        Boolean
     }
 
     public enum BooleanRenderType
@@ -289,7 +291,7 @@ else if(this.FormMode === 2){
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [HideForUser]
-        public bool HideLinkifNoData { get; set; }
+        public bool ShowLinkifNoData { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [DefaultPropValue("0")]
@@ -371,7 +373,17 @@ else if(this.FormMode === 2){
         [EnableInBuilder(BuilderType.DVBuilder)]
         public bool AutoResolve { get; set; }
 
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [HideInPropertyGrid]
+        public EbDbTypes RenderType { get; set; }
 
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [DefaultPropValue("T")]
+        public string TrueValue { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [DefaultPropValue("F")]
+        public string FalseValue { get; set; }
 
         [JsonIgnore]
         private List<string> __formulaDataFieldsUsed = null;
@@ -528,10 +540,19 @@ else if(this.FormMode === 2){
     [Alias("DVStringColumnAlias")]
     public class DVStringColumn : DVBaseColumn
     {
+        [OnDeserialized]
+        public void OnDeserializedMethod(StreamingContext context)
+        {
+            if (this.RenderType == EbDbTypes.AnsiString)
+                this.RenderType = this.Type;
+        }
+
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [DefaultPropValue("0")]
         [PropertyEditor(PropertyEditorType.DropDown)]
         [OnChangeExec(@"
+pg.HideProperty('TrueValue');
+pg.HideProperty('FalseValue');
 if(this.RenderAs === 2){
 console.log('Render as link');
     pg.ShowProperty('LinkRefId');
@@ -566,6 +587,11 @@ console.log('Render as tree');
 }
 else{
 console.log('Render as other');
+if(this.RenderAs === 7){
+pg.setSimpleProperty('RenderType', 3);
+pg.ShowProperty('TrueValue');
+pg.ShowProperty('FalseValue');
+}
     pg.HideProperty('LinkRefId');
     pg.HideProperty('LinkType');
     pg.HideProperty('HideLinkifNoData');
@@ -607,6 +633,12 @@ pg.HideProperty('FormMode');
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl)]
     public class DVNumericColumn : DVBaseColumn
     {
+        [OnDeserialized]
+        public void OnDeserializedMethod(StreamingContext context)
+        {
+            if (this.RenderType == EbDbTypes.AnsiString)
+                this.RenderType = this.Type;
+        }
         [OnChangeExec(@"console.log('------------   this.Type')")]
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         public bool Aggregate { get; set; }
@@ -616,6 +648,8 @@ pg.HideProperty('FormMode');
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [OnChangeExec(@"
+pg.HideProperty('TrueValue');
+pg.HideProperty('FalseValue');
 if(this.RenderAs === 2){
     pg.ShowProperty('LinkRefId');
     pg.ShowProperty('LinkType');
@@ -647,6 +681,11 @@ else if(this.RenderAs === 3){
     pg.ShowProperty('FormMode');
 }
 else{
+if(this.RenderAs === 7){
+pg.setSimpleProperty('RenderType', 3);
+pg.ShowProperty('TrueValue');
+pg.ShowProperty('FalseValue');
+}
     pg.HideProperty('LinkRefId');
     pg.HideProperty('LinkType');
     pg.HideProperty('HideLinkifNoData');
@@ -702,8 +741,17 @@ pg.HideProperty('FormMode');
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl)]
     public class DVBooleanColumn : DVBaseColumn
     {
+
+        [OnDeserialized]
+        public void OnDeserializedMethod(StreamingContext context)
+        {
+            if (this.RenderType == EbDbTypes.AnsiString)
+                this.RenderType = this.Type;
+        }
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [OnChangeExec(@"
+pg.ShowProperty('TrueValue');
+pg.ShowProperty('FalseValue');
 if(this.RenderAs === 2){
     pg.ShowProperty('LinkRefId');
     pg.ShowProperty('LinkType');
@@ -767,6 +815,12 @@ pg.HideProperty('FormMode');
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl)]
     public class DVDateTimeColumn : DVBaseColumn
     {
+        [OnDeserialized]
+        public void OnDeserializedMethod(StreamingContext context)
+        {
+            if (this.RenderType == EbDbTypes.AnsiString)
+                this.RenderType = this.Type;
+        }
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [OnChangeExec(@"
 if(this.Format === 3){
@@ -785,6 +839,8 @@ else{
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
         [OnChangeExec(@"
+pg.HideProperty('TrueValue');
+pg.HideProperty('FalseValue');
 if(this.RenderAs === 1){
     pg.ShowProperty('LinkRefId');
     pg.ShowProperty('LinkType');
@@ -1150,7 +1206,7 @@ else
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [HideInPropertyGrid]
-        public List<DVBaseColumn> DisplayMember { get; set; }
+        public DVBaseColumn DisplayMember { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [HideInPropertyGrid]
@@ -1161,7 +1217,7 @@ else
 
         public ControlClass()
         {
-            this.DisplayMember = new List<DVBaseColumn>();
+            this.DisplayMember = new DVBaseColumn();
             this.ValueMember = new DVBaseColumn();
             this.Values = new Dictionary<int, string>();
 

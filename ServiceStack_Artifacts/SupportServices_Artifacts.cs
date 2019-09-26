@@ -33,7 +33,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 		public string email { get; set; }
 
-		public List<byte[]> Filecollection { set; get; } = new List<byte[]>();
+		public List<FileUploadCls> Fileuploadlst { get; set; } = new List<FileUploadCls>();
 	}
 
 	public class SaveBugResponse
@@ -43,6 +43,20 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 		
 	}
+
+	public class FetchAdminsRequest : EbServiceStackAuthRequest, IReturn<FetchAdminsResponse>
+	{
+		
+
+	}
+
+	public class FetchAdminsResponse
+	{
+		public List<string> AdminNames { get; set; } = new List<string>();
+
+	}
+
+
 
 	public class TenantSolutionsRequest : EbServiceStackAuthRequest, IReturn<TenantSolutionsResponse>
 	{
@@ -80,10 +94,30 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public List<SupportTktCls> supporttkt { get; set; }
 	}
 
+	public class AdminSupportRequest : EbServiceStackAuthRequest, IReturn<AdminSupportResponse>
+	{
+		public int usrid { get; set; }
+	}
+
+	public class AdminSupportResponse
+	{
+		public AdminSupportResponse()
+		{
+			supporttkt = new List<SupportTktCls>();
+		}
+		public List<SupportTktCls> supporttkt { get; set; }
+	}
+
+
+
+
 
 	public class SupportDetailsRequest : EbServiceStackAuthRequest, IReturn<SupportDetailsResponse>
 	{
 		public string ticketno { get; set; }
+		public string Usertype { get; set; }
+
+
 	}
 
 	public class SupportDetailsResponse
@@ -97,6 +131,20 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public List<string> Filecollection1 { set; get; } = new List<string>();
 	}
 
+
+	public class ChangeStatusRequest : EbServiceStackAuthRequest, IReturn<ChangeStatusResponse>
+	{
+		public string TicketNo { get; set; }
+
+		public string NewStatus { get; set; }
+	}
+
+	public class ChangeStatusResponse
+	{
+		public bool RtnStatus { get; set; } = false;
+	}
+
+
 	public class UpdateTicketRequest : EbServiceStackAuthRequest, IReturn<UpdateTicketResponse>
 	{
 		public string title { get; set; }
@@ -106,11 +154,42 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public string priority { get; set; }
 
 		public string ticketid { get; set; }
+
+		public string solution_id { get; set; }
+
+		public string type_f_b { get; set; }
+
+		public int [] Filedel{ get; set; }
+
+		public List<FileUploadCls> Fileuploadlst { get; set; } = new List<FileUploadCls>();
 	}
 	public class UpdateTicketResponse
 	{
 		public bool status { get; set; }
 	}
+
+
+	public class UpdateTicketAdminRequest : EbServiceStackAuthRequest, IReturn<UpdateTicketResponse>
+	{
+		public string Remarks { get; set; }
+
+		public string AssignTo { get; set; }
+
+		public string Status { get; set; }
+
+		public string Ticketid { get; set; }
+
+		public string Solution_id { get; set; }
+
+		public string Type_f_b { get; set; }
+
+		
+	}
+	public class UpdateTicketAdminResponse
+	{
+		public bool status { get; set; }
+	}
+
 
 
 	public class SupportTktCls
@@ -137,9 +216,22 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 		public string remarks { get; set; }
 
-		public List<byte[]> Filecollection { set; get; } = new List<byte[]>();
+		public List<FileUploadCls> Fileuploadlst { get; set; } = new List<FileUploadCls>();
 
 
+	}
+
+	public class FileUploadCls
+	{
+		public string FileName { get; set; }
+
+		public int FileId { get; set; }
+
+		public string ContentType { get; set; }
+
+		public byte[] Filecollection { set; get; }
+
+		public string FileDataURL { set; get; }
 	}
 
 }

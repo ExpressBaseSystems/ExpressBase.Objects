@@ -100,8 +100,8 @@ namespace ExpressBase.Objects
         public override string GetDesignHtml()
         {
             this.Controls = new List<EbControl>();
-            this.Controls.Add(new EbTableTd { Name = "EbTable0_Td0", EbSid = "EbTable0_Td0" });
-            this.Controls.Add(new EbTableTd { Name = "EbTable0_Td1", EbSid = "EbTable0_Td1" });
+            this.Controls.Add(new EbTableTd { Name = "EbTable0_Td0", EbSid = "TableLayout1_Td0" });
+            this.Controls.Add(new EbTableTd { Name = "EbTable0_Td1", EbSid = "TableLayout1_Td1" });
             return GetHtml().RemoveCR().DoubleQuoted();
         }
 

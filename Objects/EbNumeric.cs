@@ -88,6 +88,12 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public bool AutoCompleteOff { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup("Appearance")]
+        [UIproperty]
+        [OnChangeUIFunction("Common.CONTROL_ICON")]
+        public bool ShowIcon { get; set; }
+
         //private string MaxLengthString
         //{
         //    get { return ((this.MaxLength > 0) ? "$('#{0}').focus(function() {$(this).select();});".Replace("{0}", this.Name).Replace("{1}", this.Value.ToString()) : string.Empty); }
@@ -129,8 +135,8 @@ namespace ExpressBase.Objects
         {
             return @" 
                 <div class='input-group' style='width:100%;'>
-                        <span style='font-size: @fontSize@' class='input-group-addon'><i class='fa fa-sort-numeric-asc' aria-hidden='true'></i></span>   
-                        <input type='text' data-ebtype='@datetype@' class='numinput' ui-inp id='@ebsid@' name='@name@' value='@value@' @placeHolder autocomplete = '@autoComplete@' data-toggle='tooltip' title='@toolTipText@' style=' width:100%; @backColor@ @foreColor@ @fontStyle@ display:inline-block; @readOnlyString@ @required@ @tabIndex@ />
+                    <span style='font-size: @fontSize@' class='input-group-addon'><span style='font-size: 11px;font-weight: bold;margin: 0 6px;'>01</span></span>
+                    <input type='text' data-ebtype='@datetype@' class='numinput' ui-inp id='@ebsid@' name='@name@' value='@value@' @placeHolder autocomplete = '@autoComplete@' data-toggle='tooltip' title='@toolTipText@' style=' width:100%; @backColor@ @foreColor@ @fontStyle@ display:inline-block; @readOnlyString@ @required@ @tabIndex@ />
                 </div>"
 .Replace("@name@", this.Name)
 .Replace("@ebsid@", String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId)

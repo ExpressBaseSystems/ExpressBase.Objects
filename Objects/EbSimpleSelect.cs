@@ -33,6 +33,11 @@ namespace ExpressBase.Objects
     public class EbSimpleSelect : EbControlUI
     {
 
+        public EbSimpleSelect()
+        {
+            this.Options = new List<EbSimpleSelectOption>();
+        }
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [HideInPropertyGrid]
         public override EbDbTypes EbDbType
@@ -98,13 +103,12 @@ namespace ExpressBase.Objects
             set { }
         }
 
-        [JsonIgnore]
         public override string DisableJSfn
         {
             get
             {
                 return @"
-                    return $('#' + this.EbSid_CtxId +'Wraper .dropdown-toggle').attr('disabled', 'disabled').css('pointer-events', 'none').find('[ui-inp]').css('background-color', '#f3f3f3');";
+                    return $('#' + this.EbSid_CtxId +'Wraper .dropdown-toggle').attr('disabled', 'disabled').css('pointer-events', 'none').css('background-color', '#f3f3f3');";
             }
             set { }
         }
@@ -114,7 +118,7 @@ namespace ExpressBase.Objects
             get
             {
                 return @"
-                    return $('#' + this.EbSid_CtxId +'Wraper .dropdown-toggle').prop('disabled',false).css('pointer-events', 'inherit').find('[ui-inp]').css('background-color', '#fff');";
+                    return $('#' + this.EbSid_CtxId +'Wraper .dropdown-toggle').prop('disabled',false).css('pointer-events', 'inherit').css('background-color', '#fff');";
             }
             set { }
         }
@@ -189,11 +193,6 @@ namespace ExpressBase.Objects
 		else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HideProperty('DisplayMember');pg.ShowProperty('Options');}")]
         public bool IsDynamic { get; set; }
 
-        public EbSimpleSelect()
-        {
-            this.Options = new List<EbSimpleSelectOption>();
-        }
-
         private string _optionHtml = string.Empty;
         [JsonIgnore]
         public string OptionHtml
@@ -258,7 +257,11 @@ namespace ExpressBase.Objects
 
         public override string GetHtml()
         {
-            return GetHtmlHelper(RenderMode.User);
+            string EbCtrlHTML = HtmlConstants.CONTROL_WRAPER_HTML4WEB
+                 .Replace("@LabelForeColor ", "color:" + (LabelForeColor ?? "@LabelForeColor ") + ";")
+                 .Replace("@LabelBackColor ", "background-color:" + (LabelBackColor ?? "@LabelBackColor ") + ";");
+
+            return ReplacePropsInHTML(EbCtrlHTML);
         }
 
         public override string GetBareHtml()
@@ -282,16 +285,6 @@ namespace ExpressBase.Objects
 .Replace("@options@", this.OptionHtml)
 .Replace("@-sel-@", this.IsMultiSelect ? string.Empty : "<option selected value='-1' style='color: #6f6f6f;'> -- select -- </option>")
 .Replace("@data-ebtype@", "16");
-        }
-
-        private string GetHtmlHelper(RenderMode mode)
-        {
-            string EbCtrlHTML = HtmlConstants.CONTROL_WRAPER_HTML4WEB
-               .Replace("@LabelForeColor ", "color:" + (LabelForeColor ?? "@LabelForeColor ") + ";")
-               .Replace("@LabelBackColor ", "background-color:" + (LabelBackColor ?? "@LabelBackColor ") + ";");
-
-            return ReplacePropsInHTML(EbCtrlHTML);
-
         }
     }
 
