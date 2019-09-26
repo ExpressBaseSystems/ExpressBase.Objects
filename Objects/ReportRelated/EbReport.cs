@@ -237,6 +237,10 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public List<EbReportDetail> Detail { get; set; }
 
+        [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
+        public List<EbReportGroup> ReportGroups { set; get; }
+
         [JsonIgnore]
         public EbDataReader EbDataSource { get; set; }
 
@@ -598,7 +602,7 @@ namespace ExpressBase.Objects
                         PageNumber = Writer.PageNumber;
                         DoLoopInDetail(iDetailRowPos);
                     }
-                }               
+                }
                 IsLastpage = true;
             }
             else
@@ -729,7 +733,7 @@ namespace ExpressBase.Objects
             ph_Yposition = (PageNumber == 1) ? ReportHeaderHeight : 0;
             dt_Yposition = ph_Yposition + PageHeaderHeight;
             //  pf_Yposition = dt_Yposition + DT_FillHeight;
-            pf_Yposition = (float)detailEnd + DetailHeight + dt_Yposition;
+            pf_Yposition = (float)detailEnd + /*DetailHeight +*/ dt_Yposition;
             foreach (EbPageFooter p_footer in PageFooters)
             {
                 foreach (EbReportField field in p_footer.Fields)
@@ -747,7 +751,7 @@ namespace ExpressBase.Objects
             detailprintingtop = 0;
             dt_Yposition = ph_Yposition + PageHeaderHeight;
             //pf_Yposition = dt_Yposition + DT_FillHeight;
-            pf_Yposition = (float)detailEnd + DetailHeight + dt_Yposition;
+            pf_Yposition = (float)detailEnd /*+ DetailHeight*/ + dt_Yposition;
             rf_Yposition = pf_Yposition + PageFooterHeight;
 
             foreach (EbReportFooter r_footer in ReportFooters)
@@ -759,14 +763,14 @@ namespace ExpressBase.Objects
                     for (int iSortPos = 0; iSortPos < SortedReportFields.Length; iSortPos++)
                     {
                         EbReportField field = SortedReportFields[iSortPos];
-                        if (HeightPt - rf_Yposition < field.TopPt)
+                        if (HeightPt - rf_Yposition < field.TopPt + 30)
                         {
                             detailprintingtop = 0;
                             Doc.NewPage();
                             PageNumber = Writer.PageNumber;
                             footer_diffrence = HeightPt - rf_Yposition;
                             FooterDrawn = true;
-                            rf_Yposition = 10;
+                            rf_Yposition = 30;
                         }
                         field.TopPt -= footer_diffrence;
                         DrawFields(field, rf_Yposition, 0);
@@ -972,6 +976,8 @@ namespace ExpressBase.Objects
             PageFooters = new List<EbPageFooter>();
 
             ReportFooters = new List<EbReportFooter>();
+
+            ReportGroups = new List<EbReportGroup>();
         }
 
         public static EbOperations Operations = ReportOperations.Instance;
@@ -1144,6 +1150,84 @@ namespace ExpressBase.Objects
     this.Init = function(id)
         {
     this.BackColor = 'transparent';
+};";
+        }
+    }
+
+    [EnableInBuilder(BuilderType.Report)]
+    public class EbReportGroup : EbReportObject
+    {
+        [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
+        public EbGroupHeader GroupHeader { set; get; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
+        public EbGroupFooter GroupFooter { set; get; }
+
+        public override string Height { get; set; }
+
+        public override string Width { get; set; }
+
+        public override string Left { get; set; }
+
+        public override string Top { get; set; }
+
+        public override float LeftPt { get; set; }
+
+        public override float TopPt { get; set; }
+
+        public override string Title { get; set; }
+
+        public override string BackColor { get ; set ; }
+
+        public override float HeightPt { get ; set ; }
+
+        public override float WidthPt { get ; set ; }
+    }
+
+    [EnableInBuilder(BuilderType.Report)]
+    public class EbGroupHeader : EbReportSection
+    {
+        [EnableInBuilder(BuilderType.Report)]
+        [UIproperty]
+        [MetaOnly]
+        public int Order { set; get; }
+
+        public override string GetDesignHtml()
+        {
+            return "<div class='pageGroups_header' eb-type='GroupHeader' type='GroupHeader' g-order='@Order' tabindex='1' id='@id' style='width :100%;height: @SectionHeight ; position: relative'> </div>".RemoveCR().DoubleQuoted();
+        }
+
+        public override string GetJsInitFunc()
+        {
+            return @"
+    this.Init = function(id)
+        {
+    this.SectionHeight = '60px';
+};";
+        }
+    }
+
+    [EnableInBuilder(BuilderType.Report)]
+    public class EbGroupFooter : EbReportSection
+    {
+        [EnableInBuilder(BuilderType.Report)]
+        [UIproperty]
+        [MetaOnly]
+        public int Order { set; get; }
+
+        public override string GetDesignHtml()
+        {
+            return "<div class='pageGroups_footer' eb-type='GroupFooter' type='GroupFooter' g-order='@Order' tabindex='1' id='@id' style='width :100%;height: @SectionHeight ; position: relative'> </div>".RemoveCR().DoubleQuoted();
+        }
+
+        public override string GetJsInitFunc()
+        {
+            return @"
+    this.Init = function(id)
+        {
+    this.SectionHeight = '60px';
 };";
         }
     }
