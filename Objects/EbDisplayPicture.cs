@@ -103,6 +103,9 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         public DpAspectRatio CropAspectRatio { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        public bool EnableFullScreen { get; set; }
+
         //--------Hide in property grid------------start
 
         [EnableInBuilder(BuilderType.WebForm)]
@@ -141,9 +144,9 @@ namespace ExpressBase.Objects
 
 
         
-        public override string EnableJSfn { get { return @"$('#cont_' + this.EbSid_CtxId + ' *').prop('disabled',false).css('pointer-events', 'inherit').find('[ui-inp]').css('background-color', '#fff'); $('#cont_' + this.EbSid_CtxId).find('.dpctrl-options-cont').show();"; } set { } }
+        public override string EnableJSfn { get { return @"$('#cont_' + this.EbSid_CtxId + ' *').prop('disabled',false).find('[ui-inp]').css('background-color', '#fff'); $('#cont_' + this.EbSid_CtxId).find('.dpctrl-options-cont').show();"; } set { } }
 
-        public override string DisableJSfn { get { return @"$('#cont_' + this.EbSid_CtxId + ' *').attr('disabled', 'disabled').css('pointer-events', 'none').find('[ui-inp]').css('background-color', '#f3f3f3'); $('#cont_' + this.EbSid_CtxId).find('.dpctrl-options-cont').hide()"; } set { } }
+        public override string DisableJSfn { get { return @"$('#cont_' + this.EbSid_CtxId + ' *').attr('disabled', 'disabled').find('[ui-inp]').css('background-color', '#f3f3f3'); $('#cont_' + this.EbSid_CtxId).find('.dpctrl-options-cont').hide()"; } set { } }
 
     }
 
