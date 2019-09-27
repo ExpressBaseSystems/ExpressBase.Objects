@@ -76,14 +76,41 @@ namespace ExpressBase.Objects
             return new BaseColor(colr);
         }
 
+        public iTextSharp.text.Font GetItextFont(EbFont Font, EbReport report)
+        {
+            iTextSharp.text.Font iTextFont = null;
+          //  ReportFonts _fontname;
+            if (Font is null)
+            {
+                Font = report.Font;   
+              //  Font.FontName = "Century Gothic";
+                //(new EbFont { color = "#000000", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
+            }
+            //else
+            //{
+            //    _fontname = (ReportFonts)Enum.Parse(typeof(ReportFonts), Font.FontName);
+            //}
+          
+            iTextFont = FontFactory.GetFont(Font.FontName, Font.Size, (int)Font.Style);
+            iTextFont.Color = GetColor(Font.color);
+            if (Font.Caps)
+                Title = Title.ToUpper();
+            if (Font.Strikethrough)
+                iTextFont.SetStyle(iTextSharp.text.Font.STRIKETHRU);
+            if (Font.Underline)
+                iTextFont.SetStyle(iTextSharp.text.Font.UNDERLINE);
+            return iTextFont;
+        }
         private iTextSharp.text.Font iTextFont = null;
         public virtual iTextSharp.text.Font ITextFont
         {
             get
             {
                 if (Font == null)
+                {
                     Font = (new EbFont { color = "#000000", FontName = "Times-Roman", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
-                if (/*iTextFont == null &&*/ Font != null)
+                }
+                if (Font != null)
                 {
                     iTextFont = new iTextSharp.text.Font(BaseFont.CreateFont(Font.FontName, BaseFont.CP1252, BaseFont.EMBEDDED), Font.Size, (int)Font.Style, GetColor(Font.color));
                     if (Font.Caps)
@@ -239,7 +266,7 @@ namespace ExpressBase.Objects
             Phrase phrase = null;
             if (WaterMarkText != string.Empty)
             {
-                phrase = new Phrase(WaterMarkText, ITextFont);
+                phrase = new Phrase(WaterMarkText, GetItextFont(this.Font, Rep));
                 PdfContentByte canvas;
                 canvas = Rep.Writer.DirectContentUnder;
                 ColumnText.ShowTextAligned(canvas, (int)TextAlign, phrase, Rep.Doc.PageSize.Width / 2, Rep.Doc.PageSize.Height / 2, Rotation);
@@ -444,7 +471,7 @@ namespace ExpressBase.Objects
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop + Rep.RowHeight);
 
             ColumnText ct = new ColumnText(Rep.Canvas);
-            Phrase phrase = new Phrase(Title, ITextFont);
+            Phrase phrase = new Phrase(Title, GetItextFont(this.Font, Rep));
             ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, 15, (int)TextAlign);
             ct.Go();
         }

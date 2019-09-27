@@ -103,7 +103,7 @@ namespace ExpressBase.Objects
     {
         Count
     }
-
+       
     public class Margin
     {
         public float Left { get; set; }
@@ -245,6 +245,12 @@ namespace ExpressBase.Objects
         [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
         [PropertyGroup("Data")]
         public string DataSourceRefId { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup("Appearance")]
+        [UIproperty]
+        [PropertyEditor(PropertyEditorType.FontSelector)]
+        public EbFont Font { get; set; }
 
         //[JsonIgnore]
         //public ColumnColletion ColumnColletion { get; set; }
