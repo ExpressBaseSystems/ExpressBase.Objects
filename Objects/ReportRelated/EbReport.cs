@@ -103,7 +103,7 @@ namespace ExpressBase.Objects
     {
         Count
     }
-
+       
     public class Margin
     {
         public float Left { get; set; }
@@ -237,6 +237,10 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public List<EbReportDetail> Detail { get; set; }
 
+        [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
+        public List<EbReportGroup> ReportGroups { set; get; }
+
         [JsonIgnore]
         public EbDataReader EbDataSource { get; set; }
 
@@ -245,6 +249,12 @@ namespace ExpressBase.Objects
         [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
         [PropertyGroup("Data")]
         public string DataSourceRefId { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup("Appearance")]
+        [UIproperty]
+        [PropertyEditor(PropertyEditorType.FontSelector)]
+        public EbFont Font { get; set; }
 
         //[JsonIgnore]
         //public ColumnColletion ColumnColletion { get; set; }
@@ -972,6 +982,8 @@ namespace ExpressBase.Objects
             PageFooters = new List<EbPageFooter>();
 
             ReportFooters = new List<EbReportFooter>();
+
+            ReportGroups = new List<EbReportGroup>();
         }
 
         public static EbOperations Operations = ReportOperations.Instance;
@@ -1144,6 +1156,84 @@ namespace ExpressBase.Objects
     this.Init = function(id)
         {
     this.BackColor = 'transparent';
+};";
+        }
+    }
+
+    [EnableInBuilder(BuilderType.Report)]
+    public class EbReportGroup : EbReportObject
+    {
+        [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
+        public EbGroupHeader GroupHeader { set; get; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [HideInPropertyGrid]
+        public EbGroupFooter GroupFooter { set; get; }
+
+        public override string Height { get; set; }
+
+        public override string Width { get; set; }
+
+        public override string Left { get; set; }
+
+        public override string Top { get; set; }
+
+        public override float LeftPt { get; set; }
+
+        public override float TopPt { get; set; }
+
+        public override string Title { get; set; }
+
+        public override string BackColor { get ; set ; }
+
+        public override float HeightPt { get ; set ; }
+
+        public override float WidthPt { get ; set ; }
+    }
+
+    [EnableInBuilder(BuilderType.Report)]
+    public class EbGroupHeader : EbReportSection
+    {
+        [EnableInBuilder(BuilderType.Report)]
+        [UIproperty]
+        [MetaOnly]
+        public int Order { set; get; }
+
+        public override string GetDesignHtml()
+        {
+            return "<div class='pageGroups_header' eb-type='GroupHeader' type='GroupHeader' g-order='@Order' tabindex='1' id='@id' style='width :100%;height: @SectionHeight ; position: relative'> </div>".RemoveCR().DoubleQuoted();
+        }
+
+        public override string GetJsInitFunc()
+        {
+            return @"
+    this.Init = function(id)
+        {
+    this.SectionHeight = '60px';
+};";
+        }
+    }
+
+    [EnableInBuilder(BuilderType.Report)]
+    public class EbGroupFooter : EbReportSection
+    {
+        [EnableInBuilder(BuilderType.Report)]
+        [UIproperty]
+        [MetaOnly]
+        public int Order { set; get; }
+
+        public override string GetDesignHtml()
+        {
+            return "<div class='pageGroups_footer' eb-type='GroupFooter' type='GroupFooter' g-order='@Order' tabindex='1' id='@id' style='width :100%;height: @SectionHeight ; position: relative'> </div>".RemoveCR().DoubleQuoted();
+        }
+
+        public override string GetJsInitFunc()
+        {
+            return @"
+    this.Init = function(id)
+        {
+    this.SectionHeight = '60px';
 };";
         }
     }

@@ -1206,7 +1206,7 @@ else
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [HideInPropertyGrid]
-        public List<DVBaseColumn> DisplayMember { get; set; }
+        public DVBaseColumn DisplayMember { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [HideInPropertyGrid]
@@ -1217,7 +1217,7 @@ else
 
         public ControlClass()
         {
-            this.DisplayMember = new List<DVBaseColumn>();
+            this.DisplayMember = new DVBaseColumn();
             this.ValueMember = new DVBaseColumn();
             this.Values = new Dictionary<int, string>();
 
