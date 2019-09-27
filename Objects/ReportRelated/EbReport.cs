@@ -688,7 +688,7 @@ namespace ExpressBase.Objects
                     {
                         DbType datatype = (DbType)field.DbType;
                         int val_length = column_val.Length;
-                        phrase = new Phrase(column_val, field.ITextFont);
+                        phrase = new Phrase(column_val, field.GetItextFont(field.Font, this));
                         float calculatedValueSize = phrase.Font.CalculatedSize * val_length;
                         if (calculatedValueSize > field.WidthPt)
                         {
