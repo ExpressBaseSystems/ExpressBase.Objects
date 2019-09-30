@@ -79,7 +79,8 @@ namespace ExpressBase.Objects
         MM_dd_yy,
         dd_MM_yyyy,
         dd_MM_yyyy_slashed,
-        from_culture
+        from_culture,
+         dd_MMMM_yyyy 
         //Year_Month_Date,
         //Year_Month,
         //Year,
@@ -688,7 +689,7 @@ namespace ExpressBase.Objects
                     {
                         DbType datatype = (DbType)field.DbType;
                         int val_length = column_val.Length;
-                        phrase = new Phrase(column_val, field.GetItextFont(field.Font, this));
+                        phrase = new Phrase(column_val, field.GetItextFont(field.Font, this.Font));
                         float calculatedValueSize = phrase.Font.CalculatedSize * val_length;
                         if (calculatedValueSize > field.WidthPt)
                         {
