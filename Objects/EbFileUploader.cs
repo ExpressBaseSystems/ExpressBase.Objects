@@ -202,9 +202,13 @@ WHERE
                                            t.id = {1} AND t.eb_del = 'F';", InnerVals[k], InnerIds[k]);
                 }
 
-                fullqry += string.Format(@"UPDATE eb_files_ref 
-                                        SET eb_del='T' 
-                                        WHERE ({0}) AND eb_del='F' AND id NOT IN ({1});", Innercxt.Join(" OR "), InnerIds.Join(","));
+                fullqry += string.Format(@"UPDATE eb_files_ref SET eb_del='T' 
+                                            WHERE ({0}) AND eb_del='F' AND id NOT IN ({1});", Innercxt.Join(" OR "), InnerIds.Join(","));
+            }
+            else if(Innercxt.Count > 0)// if all files deleted
+            {
+                fullqry += string.Format(@"UPDATE eb_files_ref SET eb_del='T' 
+                                            WHERE ({0}) AND eb_del='F';", Innercxt.Join(" OR "));
             }
             return fullqry;
         }

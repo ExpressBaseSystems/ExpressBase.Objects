@@ -21,13 +21,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [HideInPropertyGrid]
-        public override EbDbTypes EbDbType
-        {
-            get
-            {
-                return EbDbTypes.BooleanOriginal;
-            }
-        }
+        public override EbDbTypes EbDbType { get { return EbDbTypes.BooleanOriginal; } }
 
         private EbSimpleSelect EbSimpleSelect { set; get; }
 
@@ -139,7 +133,7 @@ namespace ExpressBase.Objects
         public override string GetBareHtml()
         {
             return @"
-        <select id='@ebsid@' ui-inp class='selectpicker' title='@PlaceHolder@' @MaxLimit@ name='@ebsid@' @bootStrapStyle@ data-ebtype='@data-ebtype@' style='width: 100%;'>
+        <select id='@ebsid@' ui-inp class='selectpicker' name='@ebsid@' @bootStrapStyle@ data-ebtype='@data-ebtype@' style='width: 100%;'>
             <option value='true'>@TrueText@</option>
             <option value='false'>@FalseText@</option>
         </select>"

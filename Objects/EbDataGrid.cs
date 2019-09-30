@@ -56,7 +56,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [PropertyGroup("Behavior")]
-        public bool NewRowOnTop { get; set; }
+        public bool AscendingOrder { get; set; }
 
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]

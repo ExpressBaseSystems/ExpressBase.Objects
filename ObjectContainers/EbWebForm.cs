@@ -1953,7 +1953,7 @@ namespace ExpressBase.Objects
 
         public override void AfterRedisGet(RedisClient Redis, IServiceClient client)
         {
-            EbFormHelper.AfterRedisGet(this, Redis, client);
+            EbFormHelper.AfterRedisGet(this, Redis, client, this.IsRenderMode);
             this.GetWebFormSchema();
         }
 
@@ -1987,9 +1987,9 @@ namespace ExpressBase.Objects
                     {
                         if (_prop.IsDefined(typeof(OSE_ObjectTypes)))
                         {
-                            string _val = _prop.GetValue(_flatCtrls[i], null).ToString();
-                            if (!string.IsNullOrEmpty(_val))
-                                refids.Add(_val);
+                            object _val = _prop.GetValue(_flatCtrls[i], null);
+                            if (_val != null && !_val.ToString().IsEmpty())
+                                refids.Add(_val.ToString());
                         }
                     }
                 }
@@ -2026,11 +2026,11 @@ namespace ExpressBase.Objects
                     {
                         if (_prop.IsDefined(typeof(OSE_ObjectTypes)))
                         {
-                            string _val = _prop.GetValue(_flatCtrls[i], null).ToString();
-                            if (!string.IsNullOrEmpty(_val))
+                            object _val = _prop.GetValue(_flatCtrls[i], null);
+                            if (_val != null && !_val.ToString().IsEmpty())
                             {
-                                if (RefidMap.ContainsKey(_val))
-                                    _prop.SetValue(_flatCtrls[i], RefidMap[_val], null);
+                                if (RefidMap.ContainsKey(_val.ToString()))
+                                    _prop.SetValue(_flatCtrls[i], RefidMap[_val.ToString()], null);
                                 else
                                     _prop.SetValue(_flatCtrls[i], "failed-to-update-");
                             }
@@ -2041,7 +2041,7 @@ namespace ExpressBase.Objects
         }
 
         //Rendering side
-        public static void AfterRedisGet(EbControlContainer _this, RedisClient Redis, IServiceClient client)
+        public static void AfterRedisGet(EbControlContainer _this, RedisClient Redis, IServiceClient client, bool IsRenderMode)
         {
             try
             {
@@ -2071,7 +2071,7 @@ namespace ExpressBase.Objects
                             (c as EbUserControl).Controls = _temp.Controls;
                             (c as EbUserControl).DisplayName = _temp.DisplayName;
                             (c as EbUserControl).VersionNumber = _temp.VersionNumber;
-                            (c as EbUserControl).IsRenderMode = _this is EbWebForm ? (_this as EbWebForm).IsRenderMode : (_this as EbUserControl).IsRenderMode;
+                            (c as EbUserControl).IsRenderMode = IsRenderMode;
                             foreach (EbControl Control in (c as EbUserControl).Controls)
                             {
                                 RenameControlsRec(Control, c.Name);
@@ -2084,31 +2084,71 @@ namespace ExpressBase.Objects
                     }
                     else if (c is EbControlContainer)
                     {
-                        AfterRedisGet(c as EbControlContainer, Redis, client);
+                        AfterRedisGet(c as EbControlContainer, Redis, client, IsRenderMode);
                     }
-                    //else if (c is EbProvisionLocation)//add unmapped ctrls as DoNotPersist controls
-                    //{
-                    //    if (_this is EbWebForm ? (_this as EbWebForm).IsRenderMode : (_this as EbUserControl).IsRenderMode)
-                    //    {
-                    //        EbProvisionLocation prvnCtrl = c as EbProvisionLocation;
-                    //        for (int j = 0; i < prvnCtrl.Fields.Count; i++)
-                    //        {
-                    //            if ((prvnCtrl.Fields[j] as UsrLocField).ControlName.IsNullOrEmpty())
-                    //            {
-                    //                _this.Controls.Insert(i, new EbTextBox()
-                    //                {
-                    //                    Name = "namecustom" + i,
-                    //                    EbSid = "ebsidcustom" + i,
-                    //                    Label = "labelcustom" + i,
-                    //                    DoNotPersist = true
-                    //                });
-                    //                (prvnCtrl.Fields[j] as UsrLocField).ControlName = "namecustom" + i;
-                    //                i++;
-                    //            }
-                    //        }
-                    //    }
-
-                    //}
+                    else if (c is EbProvisionLocation)//add unmapped ctrls as DoNotPersist controls
+                    {
+                        if (IsRenderMode)
+                        {                            
+                            EbProvisionLocation prvnCtrl = c as EbProvisionLocation;
+                            for (int j = 0; j < prvnCtrl.Fields.Count; j++)
+                            {
+                                UsrLocField prvnFld = prvnCtrl.Fields[j] as UsrLocField;
+                                if (prvnFld.ControlName.IsNullOrEmpty() && prvnFld.IsRequired)
+                                {
+                                    if(prvnFld.Type == "image")
+                                    {
+                                        _this.Controls.Insert(i, new EbDisplayPicture()
+                                        {
+                                            Name = "namecustom" + i,
+                                            EbSid = "ebsidcustom" + i,
+                                            EbSid_CtxId = "ebsidcustom" + i,
+                                            Label = prvnFld.DisplayName,
+                                            DoNotPersist = true,
+                                            MaxHeight = 100
+                                        });
+                                    }
+                                    else
+                                    {
+                                        _this.Controls.Insert(i, new EbTextBox()
+                                        {
+                                            Name = "namecustom" + i,
+                                            EbSid = "ebsidcustom" + i,
+                                            EbSid_CtxId = "ebsidcustom" + i,
+                                            Label = prvnFld.DisplayName,
+                                            DoNotPersist = true
+                                        });
+                                    }
+                                    prvnFld.ControlName = "namecustom" + i;
+                                    i++;
+                                }
+                            }
+                        }
+                    }
+                    else if(c is EbProvisionUser)
+                    {
+                        if (IsRenderMode)
+                        {
+                            EbProvisionUser prvnCtrl = c as EbProvisionUser;
+                            for (int j = 0; j < prvnCtrl.Fields.Count; j++)
+                            {
+                                UsrLocField prvnFld = prvnCtrl.Fields[j] as UsrLocField;
+                                if (prvnFld.ControlName.IsNullOrEmpty() && prvnFld.IsRequired)
+                                {                                    
+                                    _this.Controls.Insert(i, new EbTextBox()
+                                    {
+                                        Name = "namecustom" + i,
+                                        EbSid = "ebsidcustom" + i,
+                                        EbSid_CtxId = "ebsidcustom" + i,
+                                        Label = prvnFld.DisplayName,
+                                        DoNotPersist = true
+                                    });                                    
+                                    prvnFld.ControlName = "namecustom" + i;
+                                    i++;
+                                }
+                            }
+                        }
+                    }
                 }
             }
             catch (Exception e)

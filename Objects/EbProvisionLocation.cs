@@ -39,13 +39,20 @@ namespace ExpressBase.Objects
                 return @"EbProvisionLocation = {
                 mapping : function(elementId, props) {
                     let html = '';
-                    $(`#cont_${elementId}`).html(`<span class='eb-ctrl-label' ui-label id='@ebsid@Lbl' style='font-style: italic; font-weight: normal;'>____ ProvisionLocation ____</span>`);
-                    $.each(ctrlObj.Fields.$values, function (i, field) {
-                        if (field.ControlName === '')
-                            html += `<div class = 'prov-loc-item'>
-                                        <span class='eb-ctrl-label'>${field.Name}</span>
-                                        <div class='ctrl-cover'><input type='text' autocomplete = 'off' style='width:100%; display:inline-block;' disabled /></div>
-                                    </div>`;
+                    $(`#cont_${elementId}`).html(`<span class='eb-ctrl-label' ui-label id='@ebsid@Lbl' style='font-style: italic; font-weight: normal;'> ProvisionLocation </span>`);
+                    $.each(props.Fields.$values, function (i, field) {
+                        if (field.ControlName === '' && field.IsRequired){
+                            if(field.Type === 'image')
+                                html += `<div class = 'prov-loc-item'>
+                                            <span class='eb-ctrl-label'>${field.DisplayName}</span>
+                                            <div class='ctrl-cover'><div style='text-align: center;'><img src='/images/image.png' style='height: 100px; opacity: 0.5;'></div></div>
+                                        </div>`;
+                            else
+                                html += `<div class = 'prov-loc-item'>
+                                            <span class='eb-ctrl-label'>${field.DisplayName}</span>
+                                            <div class='ctrl-cover'><input type='text' autocomplete = 'off' style='width:100%; display:inline-block;' disabled /></div>
+                                        </div>`;
+                        }
                     });
                     $(`#cont_${elementId}`).append(html);
                 }
@@ -63,6 +70,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyGroup("Identity")]
+        [UIproperty]
         [OnChangeUIFunction("EbProvisionLocation.mapping")]
         [PropertyEditor(PropertyEditorType.Collection)]
         [ListType(typeof(UsrLocFieldAbstract))]
@@ -141,16 +149,29 @@ namespace ExpressBase.Objects
             return @"
 this.Init = function(id)
 {
-	this.Fields.$values.push(new EbObjects.UsrLocField('longname'));
-	this.Fields.$values.push(new EbObjects.UsrLocField('shortname'));
-	//this.Fields.$values.push(new EbObjects.UsrLocField('image'));
+    let fields = [];
+    fields[0] = new EbObjects.UsrLocField('longname');
+    fields[1] = new EbObjects.UsrLocField('shortname');
+    fields[2] = new EbObjects.UsrLocField('image');
+
+    fields[0].DisplayName = 'Name';
+    fields[1].DisplayName = 'ShortName';
+    fields[2].DisplayName = 'Logo';
+    fields[0].Type = 'text';
+    fields[1].Type = 'text';
+    fields[2].Type = 'image';
+
+    for (let i = 0; i < 3; i++){
+        fields[i].IsRequired = true;
+	    this.Fields.$values.push(fields[i]);
+    }
     commonO.ObjCollection['#vernav0'].GetLocationConfig(this);
 };";
         }
 
         public override string GetBareHtml()
         {
-            return @"<span class='eb-ctrl-label' ui-label id='@ebsidLbl'>____ ProvisionLocation ____</span>";
+            return @"<span class='eb-ctrl-label' ui-label id='@ebsidLbl'> ProvisionLocation </span>";
 
 //            return @"
 //            <input id='@ebsid@' data-ebtype='@data-ebtype@'  data-toggle='tooltip' title='@toolTipText@' class='date' type='text' name='@name@' autocomplete = 'off' @value@ @tabIndex@ style='width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@ @readOnlyString@ @required@ @placeHolder@ disabled />
@@ -178,7 +199,7 @@ this.Init = function(id)
         {
             string EbCtrlHTML = @"
         <div id='cont_@ebsid@' ebsid='@ebsid@' name='@name@' class='Eb-ctrlContainer' @childOf@ ctype='@type@' eb-hidden='@isHidden@'>
-            <span class='eb-ctrl-label' ui-label id='@ebsidLbl'>____ ProvisionLocation ____</span>
+            <span class='eb-ctrl-label' ui-label id='@ebsidLbl'> ProvisionLocation </span>
             <i class='fa fa-spinner fa-pulse' aria-hidden='true'></i>
         </div>"
                .Replace("@LabelForeColor ", "color:" + (LabelForeColor ?? "@LabelForeColor ") + ";")
@@ -207,7 +228,7 @@ this.Init = function(id)
             Dictionary<string, string> _d = JsonConvert.DeserializeObject<Dictionary<string, string>>(cField.Value);
             param.Add(DataDB.GetNewParameter("shortname_" + i, EbDbTypes.String, _d["shortname"]));
             param.Add(DataDB.GetNewParameter("longname_" + i, EbDbTypes.String, _d["longname"]));
-            param.Add(DataDB.GetNewParameter("image_" + i, EbDbTypes.String, string.Empty));////////////////
+            param.Add(DataDB.GetNewParameter("image_" + i, EbDbTypes.String, _d["image"]));
             param.Add(DataDB.GetNewParameter("meta_json_" + i, EbDbTypes.String, _d["meta_json"]));
             string temp = string.Empty;
             if (ins)
@@ -235,7 +256,7 @@ this.Init = function(id)
                 let metaObj = {};
                 $.each(this.Fields.$values, function (i, obj) {
                     if (obj.ControlName !== '') {
-                        if (obj.Name === 'shortname' || obj.Name === 'longname')
+                        if (obj.Name === 'shortname' || obj.Name === 'longname' || obj.Name === 'image')
                             this._finalObj[obj.Name] = obj.Control.getValue();
                         else
                             metaObj[obj.DisplayName] = obj.Control.getValue();
@@ -256,7 +277,7 @@ this.Init = function(id)
                 let metaObj = JSON.parse(this._finalObj['meta_json']) || {};
                 $.each(this.Fields.$values, function (i, obj) {
                     if (obj.ControlName !== '') {
-                        if (obj.Name === 'shortname' || obj.Name === 'longname')
+                        if (obj.Name === 'shortname' || obj.Name === 'longname' || obj.Name === 'image')
                             obj.Control.setValue(this._finalObj[obj.Name]);
                         else if (metaObj.hasOwnProperty(obj.DisplayName))
                             obj.Control.setValue(metaObj[obj.DisplayName]);
