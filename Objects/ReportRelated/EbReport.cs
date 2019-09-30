@@ -103,7 +103,7 @@ namespace ExpressBase.Objects
     {
         Count
     }
-
+       
     public class Margin
     {
         public float Left { get; set; }
@@ -249,6 +249,12 @@ namespace ExpressBase.Objects
         [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
         [PropertyGroup("Data")]
         public string DataSourceRefId { get; set; }
+
+        [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup("Appearance")]
+        [UIproperty]
+        [PropertyEditor(PropertyEditorType.FontSelector)]
+        public EbFont Font { get; set; }
 
         //[JsonIgnore]
         //public ColumnColletion ColumnColletion { get; set; }
@@ -682,7 +688,7 @@ namespace ExpressBase.Objects
                     {
                         DbType datatype = (DbType)field.DbType;
                         int val_length = column_val.Length;
-                        phrase = new Phrase(column_val, field.ITextFont);
+                        phrase = new Phrase(column_val, field.GetItextFont(field.Font, this));
                         float calculatedValueSize = phrase.Font.CalculatedSize * val_length;
                         if (calculatedValueSize > field.WidthPt)
                         {

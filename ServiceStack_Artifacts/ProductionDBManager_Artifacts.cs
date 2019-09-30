@@ -12,6 +12,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         public int UserId { get; set; }
 
+        public bool IsUpdate { get; set; }
+
         public string SolnId { get; set; }
 
         public string SolutionId { get; set; }
@@ -23,7 +25,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
 
         [DataMember(Order = 2)]
-        public Dictionary<string, List<Eb_FileChanges>> Changes { get; set; }
+        public List<Eb_FileDetails> Changes { get; set; }
+
+        [DataMember(Order = 3)]
+        public string ModifiedDate { get; set; }
     }
 
     public class GetSolutionForIntegrityCheckRequest : IEbTenentRequest, IReturn<GetSolutionForIntegrityCheckResponse>
@@ -46,7 +51,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         public string DBName { get; set; }
 
-        public List<Eb_FileChanges> Changes { get; set; }
+        public List<Eb_FileDetails> Changes { get; set; }
 
         public string Solution { get; set; }
 
@@ -61,10 +66,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
 
         [DataMember(Order = 2)]
-        public Dictionary<string, List<Eb_FileChanges>> Changes { get; set; }
+        public List<Eb_FileDetails> Changes { get; set; }
 
         [DataMember(Order = 3)]
-        public DateTime ModifiedDate { get; set; }
+        public string ModifiedDate { get; set; }
     }
 
 
@@ -83,4 +88,5 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
         
     }
+    
 }
