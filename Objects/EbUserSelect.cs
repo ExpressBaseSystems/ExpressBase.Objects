@@ -9,8 +9,8 @@ using System.Runtime.Serialization;
 namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
-    [HideInToolBox]
-    public class EbUserSelect : EbControlUI
+    //[HideInToolBox]
+    public class EbUserSelect : EbControlUI, IEbPlaceHolderControl
     {
         public EbUserSelect() { }
 
@@ -21,7 +21,7 @@ namespace ExpressBase.Objects
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
 
-        public override string ToolIconHtml { get { return "<i class='fa fa-users'></i>"; } set { } }
+        public override string ToolIconHtml { get { return "<i class='fa fa-user'></i><i class='fa fa-check'></i>"; } set { } }
 
         public override string ToolNameAlias { get { return "User Select"; } set { } }
 
@@ -38,7 +38,20 @@ namespace ExpressBase.Objects
             .Replace("@name@", this.Name)
             .Replace("@toolTipText@", this.ToolTipText);
         }
-        
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [HideInPropertyGrid]
+        public List<UserSelectOption> UserList { get; set; }
+
+        public void InitOptions(Dictionary<int, string> Users)
+        {
+            this.UserList = new List<UserSelectOption>(); ;
+            foreach (KeyValuePair<int, string> item in Users)
+                if (item.Key > 1)
+                    this.UserList.Add(new UserSelectOption() { vm = item.Key, dm1 = item.Value, img = item.Key.ToString() });
+            this.UserList.Sort((pair1, pair2) => pair1.dm1.CompareTo(pair2.dm1));
+        }
+
         public override string GetHtml()
         {
             string EbCtrlHTML = HtmlConstants.CONTROL_WRAPER_HTML4WEB
@@ -96,4 +109,12 @@ namespace ExpressBase.Objects
         //--------Hide in property grid------------end
 
     }
+
+    public class UserSelectOption
+    {
+        public int vm { get; set; }
+        public string dm1 { get; set; }
+        public string img { get; set; }
+    }
+
 }

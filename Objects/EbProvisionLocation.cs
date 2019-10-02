@@ -28,7 +28,7 @@ namespace ExpressBase.Objects
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
 
-        public override string ToolIconHtml { get { return "<i class='fa fa-map-marker'></i>"; } set { } }
+        public override string ToolIconHtml { get { return "<i class='fa fa-map-marker'></i><i class='fa fa-plus'></i>"; } set { } }
 
         public override string ToolNameAlias { get { return "Provision Loc.."; } set { } }
 
