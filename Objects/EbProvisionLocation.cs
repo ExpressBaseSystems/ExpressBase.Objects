@@ -30,7 +30,9 @@ namespace ExpressBase.Objects
 
         public override string ToolIconHtml { get { return "<i class='fa fa-map-marker'></i><i class='fa fa-plus'></i>"; } set { } }
 
-        public override string ToolNameAlias { get { return "Provision Loc.."; } set { } }
+        public override string ToolNameAlias { get { return "Prov. Location"; } set { } }
+
+        public override string ToolHelpText { get { return "Provision Location"; } set { } }
 
         public override string UIchangeFns
         {

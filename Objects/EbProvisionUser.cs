@@ -34,7 +34,9 @@ namespace ExpressBase.Objects
 
         public override string ToolIconHtml { get { return "<i class='fa fa-user'></i><i class='fa fa-plus'></i>"; } set { } }
 
-        public override string ToolNameAlias { get { return "Provision User"; } set { } }
+        public override string ToolNameAlias { get { return "Prov. User"; } set { } }
+
+        public override string ToolHelpText { get { return "Provision User"; } set { } }
 
         public override string UIchangeFns
         {
