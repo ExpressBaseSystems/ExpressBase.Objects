@@ -16,7 +16,7 @@ namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.BotForm)]
     [HideInToolBox]
-    [BuilderTypeEnum(BuilderType.WebForm)]
+    [BuilderTypeEnum(BuilderType.BotForm)]
     public class EbBotForm : EbForm
     {
         [OnDeserialized]
@@ -33,7 +33,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.BotForm)]
         [PropertyGroup("Data")]
         [HelpText("Name Of database-table Which you want to store Data collected using this Form")]
-        public string TableName { get; set; }
+        public override string TableName { get; set; }
 
         public int FormId { get; set; }//equal to 0 for new mode, any other value indicate edit mode
 
