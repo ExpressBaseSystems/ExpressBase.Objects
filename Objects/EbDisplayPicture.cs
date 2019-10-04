@@ -66,9 +66,8 @@ namespace ExpressBase.Objects
         public override string GetHtml()
         {
             string EbCtrlHTML = HtmlConstants.CONTROL_WRAPER_HTML4WEB
-
-    .Replace("@LabelForeColor ", "color:" + ((this.LabelForeColor != null) ? this.LabelForeColor : "@LabelForeColor ") + ";")
-    .Replace("@LabelBackColor ", "background-color:" + ((this.LabelBackColor != null) ? this.LabelBackColor : "@LabelBackColor ") + ";");
+            .Replace("@LabelForeColor ", "color:" + ((this.LabelForeColor != null) ? this.LabelForeColor : "@LabelForeColor ") + ";")
+            .Replace("@LabelBackColor ", "background-color:" + ((this.LabelBackColor != null) ? this.LabelBackColor : "@LabelBackColor ") + ";");
 
             return ReplacePropsInHTML(EbCtrlHTML);
         }

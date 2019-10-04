@@ -109,6 +109,10 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         public override string ToolIconHtml { get { return " &#9673; "; } set { } }
 
+        [HideInPropertyGrid]
+        [JsonIgnore]
+        public override string ToolNameAlias { get { return "Radio Buttons"; } set { } }
+
         //public override string GetToolHtml()
         //{
         //    return @"<div eb-type='@toolName' class='tool'> &#9673;  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));

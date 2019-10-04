@@ -134,15 +134,15 @@ namespace ExpressBase.Objects.Objects.DVRelated
         DESC = 1
     }    
 
-    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard)]
     public class DVBaseColumn : EbDataVisualizationObject
     {
         [JsonProperty(PropertyName = "data")]
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard)]
         [HideInPropertyGrid]
         public int Data { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard)]
         [JsonProperty(PropertyName = "name")]
         [PropertyEditor(PropertyEditorType.Label)]
         [OnChangeExec(@"
@@ -150,11 +150,11 @@ namespace ExpressBase.Objects.Objects.DVRelated
         ")]
         public override string Name { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard)]
         [HideInPropertyGrid]
         public string EbSid { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard)]
         [HideInPropertyGrid]
         public virtual EbDbTypes Type { get; set; }
 
@@ -162,16 +162,16 @@ namespace ExpressBase.Objects.Objects.DVRelated
         [HideInPropertyGrid]
         public string sType { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard)]
         [Alias("Title")]
         [HideInPropertyGrid]
         public string sTitle { get; set; }
 
         [HideInPropertyGrid]
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard)]
         public bool bVisible { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard)]
         [HideInPropertyGrid]
         public int Pos { get; set; }
 
@@ -180,7 +180,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
         [JsonIgnore]
         public string sWidth { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard)]
         [JsonProperty(PropertyName = "className")]
         [HideInPropertyGrid]
         [DefaultPropValue("tdheight")]
@@ -536,7 +536,7 @@ else if(this.FormMode === 2){
         }
     }    
 
-    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard)]
     [Alias("DVStringColumnAlias")]
     public class DVStringColumn : DVBaseColumn
     {
@@ -547,7 +547,7 @@ else if(this.FormMode === 2){
                 this.RenderType = this.Type;
         }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.DashBoard)]
         [DefaultPropValue("0")]
         [PropertyEditor(PropertyEditorType.DropDown)]
         [OnChangeExec(@"
@@ -609,17 +609,17 @@ pg.HideProperty('FormMode');
     }")]
         public StringRenderType RenderAs { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard)]
         [DefaultPropValue("16")]
         [HideInPropertyGrid]
         public override EbDbTypes Type { get; set; }
 
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.DropDown)]
         public StringOperators DefaultOperator { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.DropDown)]
         public Align Align { get; set; }
 
@@ -630,7 +630,7 @@ pg.HideProperty('FormMode');
 
     }
 
-    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard)]
     public class DVNumericColumn : DVBaseColumn
     {
         [OnDeserialized]
@@ -640,13 +640,13 @@ pg.HideProperty('FormMode');
                 this.RenderType = this.Type;
         }
         [OnChangeExec(@"console.log('------------   this.Type')")]
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.DashBoard)]
         public bool Aggregate { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.DashBoard)]
         public int DecimalPlaces { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.DashBoard)]
         [OnChangeExec(@"
 pg.HideProperty('TrueValue');
 pg.HideProperty('FalseValue');
@@ -703,7 +703,7 @@ pg.HideProperty('FormMode');
     }")]
         public NumericRenderType RenderAs { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard)]
         [DefaultPropValue("7")]
         [HideInPropertyGrid]
         public override EbDbTypes Type { get; set; }
@@ -720,14 +720,14 @@ pg.HideProperty('FormMode');
             return cultureInfo;
         }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.DropDown)]
         public NumericOperators DefaultOperator { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.DashBoard)]
         public bool SuppresIfZero { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.DropDown)]
         public Align Align { get; set; }
 
@@ -738,7 +738,7 @@ pg.HideProperty('FormMode');
 
     }
 
-    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard)]
     public class DVBooleanColumn : DVBaseColumn
     {
 
@@ -748,7 +748,7 @@ pg.HideProperty('FormMode');
             if (this.RenderType == EbDbTypes.AnsiString)
                 this.RenderType = this.Type;
         }
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.DashBoard)]
         [OnChangeExec(@"
 pg.ShowProperty('TrueValue');
 pg.ShowProperty('FalseValue');
@@ -800,7 +800,7 @@ pg.HideProperty('FormMode');
     }")]
         public BooleanRenderType RenderAs { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.DropDown)]
         public Align Align { get; set; }
 
@@ -812,7 +812,7 @@ pg.HideProperty('FormMode');
 
     }
 
-    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard)]
     public class DVDateTimeColumn : DVBaseColumn
     {
         [OnDeserialized]
@@ -821,7 +821,7 @@ pg.HideProperty('FormMode');
             if (this.RenderType == EbDbTypes.AnsiString)
                 this.RenderType = this.Type;
         }
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.DashBoard)]
         [OnChangeExec(@"
 if(this.Format === 3){
     pg.ShowProperty('ConvretToUsersTimeZone');
@@ -831,13 +831,13 @@ else{
     }")]
         public DateFormat Format { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         public DatePattern Pattern { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.DashBoard)]
         public bool ConvretToUsersTimeZone { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.DashBoard)]
         [OnChangeExec(@"
 pg.HideProperty('TrueValue');
 pg.HideProperty('FalseValue');
@@ -889,16 +889,16 @@ pg.HideProperty('FormMode');
     }")]
         public DateTimeRenderType RenderAs { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard)]
         [DefaultPropValue("5")]
         [HideInPropertyGrid]
         public override EbDbTypes Type { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.DropDown)]
         public NumericOperators DefaultOperator { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.DropDown)]
         public Align Align { get; set; }
 
@@ -1206,7 +1206,7 @@ else
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [HideInPropertyGrid]
-        public DVBaseColumn DisplayMember { get; set; }
+        public List<DVBaseColumn> DisplayMember { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [HideInPropertyGrid]
@@ -1217,7 +1217,7 @@ else
 
         public ControlClass()
         {
-            this.DisplayMember = new DVBaseColumn();
+            this.DisplayMember = new List<DVBaseColumn>();
             this.ValueMember = new DVBaseColumn();
             this.Values = new Dictionary<int, string>();
 
