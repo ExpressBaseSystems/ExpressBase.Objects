@@ -17,7 +17,7 @@ using System.Text;
 namespace ExpressBase.Objects.Objects
 {
     [EnableInBuilder(BuilderType.FilterDialog, BuilderType.WebForm)]
-    public class EbUserLocation : EbControlUI
+    public class EbUserLocation : EbControlUI, IEbPlaceHolderControl
     {
         [EnableInBuilder(BuilderType.FilterDialog, BuilderType.WebForm)]
         [HideInPropertyGrid]
@@ -81,6 +81,10 @@ namespace ExpressBase.Objects.Objects
         [HideInPropertyGrid]
         [JsonIgnore]
         public override string ToolIconHtml { get { return "<i class='fa fa-user'></i><i class='fa fa-map-marker'></i>"; } set { } }
+
+        [HideInPropertyGrid]
+        [JsonIgnore]
+        public override string ToolNameAlias { get { return " Location List"; } set { } }
         //public override string GetToolHtml()
         //{
         //    return @"<div eb-type='@toolName' class='tool'><i class='fa fa-user'></i><i class='fa fa-map-marker'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));

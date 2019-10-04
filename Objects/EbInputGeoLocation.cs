@@ -78,7 +78,7 @@ namespace ExpressBase.Objects
 
         [HideInPropertyGrid]
         [JsonIgnore]
-        public override string ToolNameAlias { get { return "Location Input"; } set { } }
+        public override string ToolNameAlias { get { return "LatLng Input"; } set { } }
 
         //public override string GetToolHtml()
         //{
