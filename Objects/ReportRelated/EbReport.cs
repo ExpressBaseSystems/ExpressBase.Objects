@@ -40,6 +40,7 @@ namespace ExpressBase.Objects
         Detail,
         PageFooter,
         ReportFooter,
+        ReportGroups
     }
     public enum PaperSize
     {
@@ -80,7 +81,7 @@ namespace ExpressBase.Objects
         dd_MM_yyyy,
         dd_MM_yyyy_slashed,
         from_culture,
-         dd_MMMM_yyyy 
+        dd_MMMM_yyyy
         //Year_Month_Date,
         //Year_Month,
         //Year,
@@ -104,7 +105,7 @@ namespace ExpressBase.Objects
     {
         Count
     }
-       
+
     public class Margin
     {
         public float Left { get; set; }
@@ -286,8 +287,15 @@ namespace ExpressBase.Objects
 
         [JsonIgnore]
         public Dictionary<string, Script> ValueScriptCollection { get; set; }
+
         [JsonIgnore]
         public Dictionary<string, Script> AppearanceScriptCollection { get; set; }
+
+        [JsonIgnore]
+        public Dictionary<string, ReportGroupItem> Groupheaders { get; set; }
+
+        [JsonIgnore]
+        public Dictionary<string, ReportGroupItem> GroupFooters { get; set; }
 
         [JsonIgnore]
         public EbDataSet DataSet { get; set; }
@@ -598,6 +606,20 @@ namespace ExpressBase.Objects
             {
                 for (iDetailRowPos = 0; iDetailRowPos < rows.Count; iDetailRowPos++)
                 {
+                    if (Groupheaders != null && Groupheaders.Count > 0)
+                        foreach (KeyValuePair<string, ReportGroupItem> grp in Groupheaders)
+                        {
+                            ReportGroupItem grpitem = grp.Value;
+                            string column_val = GetDataFieldtValue(grpitem.field.ColumnName, iDetailRowPos, grpitem.field.TableIndex);
+                            if (grpitem.PreviousValue != column_val)
+                            {
+                                DrawGroupHeader(grpitem.order, iDetailRowPos);
+                                grpitem.PreviousValue = column_val;
+                                int i;
+                                for (i = grpitem.order + 1; i < Groupheaders.Count; i++)
+                                    Groupheaders.Values.ElementAt(i).PreviousValue = string.Empty;
+                            }
+                        }
                     if (detailprintingtop < DT_FillHeight && DT_FillHeight - detailprintingtop >= DetailHeight)
                     {
                         DoLoopInDetail(iDetailRowPos);
@@ -673,6 +695,7 @@ namespace ExpressBase.Objects
             int rowsneeded = 1;
             RowHeight = 0;
             MultiRowTop = 0;
+            string column_val = string.Empty;
 
             ph_Yposition = (PageNumber == 1) ? ReportHeaderHeight : 0;
             dt_Yposition = ph_Yposition + PageHeaderHeight;
@@ -684,7 +707,8 @@ namespace ExpressBase.Objects
                 {
                     EbDataField field = SortedList[iSortPos];
                     Phrase phrase;
-                    string column_val = GetDataFieldtValue(field.ColumnName, serialnumber, field.TableIndex);
+                    column_val = GetDataFieldtValue(field.ColumnName, serialnumber, field.TableIndex);
+
                     if ((field as EbDataField).RenderInMultiLine)
                     {
                         DbType datatype = (DbType)field.DbType;
@@ -730,6 +754,16 @@ namespace ExpressBase.Objects
                     return;
                 }
             }
+        }
+
+        public void DrawGroupHeader(int order, int serialnumber)
+        {
+
+            foreach (EbReportField field in ReportGroups[order].GroupHeader.Fields)
+            {
+                DrawFields(field, dt_Yposition, serialnumber);
+            }
+            detailprintingtop += ReportGroups[order].GroupHeader.HeightPt;
         }
 
         public void DrawPageFooter()
@@ -1186,11 +1220,11 @@ namespace ExpressBase.Objects
 
         public override string Title { get; set; }
 
-        public override string BackColor { get ; set ; }
+        public override string BackColor { get; set; }
 
-        public override float HeightPt { get ; set ; }
+        public override float HeightPt { get; set; }
 
-        public override float WidthPt { get ; set ; }
+        public override float WidthPt { get; set; }
     }
 
     [EnableInBuilder(BuilderType.Report)]
@@ -1237,5 +1271,11 @@ namespace ExpressBase.Objects
     this.SectionHeight = '60px';
 };";
         }
+    }
+    public class ReportGroupItem
+    {
+        public EbDataField field;
+        public string PreviousValue;
+        public int order;
     }
 }
