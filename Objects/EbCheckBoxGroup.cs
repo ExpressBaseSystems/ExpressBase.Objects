@@ -13,12 +13,12 @@ using System.Threading.Tasks;
 
 namespace ExpressBase.Objects
 {
-	[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-	public class EbCheckBoxGroup:EbControlUI
-	{
-		public EbCheckBoxGroup()
-		{
-			this.CheckBoxes = new List<EbCheckBox>();
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+    public class EbCheckBoxGroup : EbControlUI
+    {
+        public EbCheckBoxGroup()
+        {
+            this.CheckBoxes = new List<EbCheckBox>();
         }
 
         [JsonIgnore]
@@ -32,23 +32,24 @@ namespace ExpressBase.Objects
         }
 
         [OnDeserialized]
-		public void OnDeserializedMethod(StreamingContext context)
-		{
-			this.BareControlHtml = this.GetBareHtml();
-			this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
-		}
+        public void OnDeserializedMethod(StreamingContext context)
+        {
+            this.BareControlHtml = this.GetBareHtml();
+            this.BareControlHtml4Bot = this.BareControlHtml;
+            this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
+        }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-		public decimal Value { get; set; }
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        public decimal Value { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-		[PropertyEditor(PropertyEditorType.Collection)]
-		[Alias("CheckBoxes")]
-		public List<EbCheckBox> CheckBoxes { get; set; }
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        [Alias("CheckBoxes")]
+        public List<EbCheckBox> CheckBoxes { get; set; }
 
-		[HideInPropertyGrid]
-		[EnableInBuilder(BuilderType.BotForm)]
-		public override bool IsReadOnly { get => this.ReadOnly; }
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.BotForm)]
+        public override bool IsReadOnly { get => this.ReadOnly; }
 
         [HideInPropertyGrid]
         [JsonIgnore]
@@ -58,25 +59,25 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         public override string ToolNameAlias { get { return "CheckBoxes"; } set { } }
 
-  //      public override string GetToolHtml()
-		//{
-		//	return @"<div eb-type='@toolName' class='tool'><i class='fa fa-check-square'></i> CheckBoxes </div>".Replace("@toolName", this.GetType().Name.Substring(2));
-		//}
+        //      public override string GetToolHtml()
+        //{
+        //	return @"<div eb-type='@toolName' class='tool'><i class='fa fa-check-square'></i> CheckBoxes </div>".Replace("@toolName", this.GetType().Name.Substring(2));
+        //}
 
-		public override string GetBareHtml()
-		{
-			string html = "<div id='@name@' name='@name@'>";
-			foreach (EbCheckBox ec in this.CheckBoxes)
-			{
-				ec.GName = this.EbSid_CtxId;
-				html += ec.GetHtml();
-			}
-			html += "</div>";
-			return html.Replace("@name@", (this.Name != null) ? this.Name : "@name@");
-		}
+        public override string GetBareHtml()
+        {
+            string html = "<div id='@EbSid@' name='@name@'>".Replace("@EbSid@", (this.EbSid != null) ? this.EbSid : "@EbSid@");
+            foreach (EbCheckBox ec in this.CheckBoxes)
+            {
+                ec.GName = this.EbSid_CtxId;
+                html += ec.GetHtml();
+            }
+            html += "</div>";
+            return html.Replace("@name@", (this.Name != null) ? this.Name : "@name@");
+        }
 
-		public override string GetDesignHtml()
-		{
+        public override string GetDesignHtml()
+        {
             string EbCtrlHTML = HtmlConstants.CONTROL_WRAPER_HTML4WEB
                 .Replace("@barehtml@", @"
                 <div style='padding:5px'>
@@ -94,8 +95,8 @@ namespace ExpressBase.Objects
             return ReplacePropsInHTML(EbCtrlHTML);
         }
 
-		public override string GetHtml()
-		{
+        public override string GetHtml()
+        {
 
             //			string html = @"
             //			<div id='cont_@name@' class='Eb-ctrlContainer' ebsid='@ebsid@' Ctype='CheckBoxGroup'>
@@ -124,27 +125,27 @@ namespace ExpressBase.Objects
 
         }
 
-		public override string GetJsInitFunc()
-		{
-			return @"
+        public override string GetJsInitFunc()
+        {
+            return @"
 this.Init = function(id)
 {
 	this.CheckBoxes.$values.push(new EbObjects.EbCheckBox(id + '_Rd0'));
 	this.CheckBoxes.$values.push(new EbObjects.EbCheckBox(id + '_Rd1'));
 };";
-		}
-	}
+        }
+    }
 
-	public class EbCheckBoxAbstract : EbControlUI
-	{
+    public class EbCheckBoxAbstract : EbControlUI
+    {
 
-	}
+    }
 
-	[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-	[HideInToolBox]
-	public class EbCheckBox : EbCheckBoxAbstract
-	{
-		public EbCheckBox() { }
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+    [HideInToolBox]
+    public class EbCheckBox : EbCheckBoxAbstract
+    {
+        public EbCheckBox() { }
 
         [JsonIgnore]
         public override string GetValueJSfn { get { return @" return $('#' + this.EbSid_CtxId).is(':checked'); "; } set { } }
@@ -153,26 +154,26 @@ this.Init = function(id)
         public override string SetValueJSfn { get { return @" return $('#' + this.EbSid_CtxId).prop('checked', p1 ==='true').trigger('change'); "; } set { } }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-		public override string Label { get; set; }
+        public override string Label { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-		public string Value { get; set; }
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        public string Value { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-		public string GName { get; set; }
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        public string GName { get; set; }
 
-		public override string GetBareHtml()
-		{
-			return @"<div class='radio-wrap'><input ui-inp class='bot-checkbox eb-chckbx' type ='checkbox' value='@value@' id='@ebsid@' name='@gname@'> <span id='@name@Lbl' class='eb-chckbxspan'> @label@  </span><br></div>"
+        public override string GetBareHtml()
+        {
+            return @"<div class='radio-wrap'><input ui-inp class='bot-checkbox eb-chckbx' type ='checkbox' value='@value@' id='@ebsid@' name='@gname@'> <span id='@name@Lbl' class='eb-chckbxspan'> @label@  </span><br></div>"
 .Replace("@ebsid@", String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId)
 .Replace("@gname@", this.GName)
 .Replace("@label@", this.Label)
 .Replace("@value@", (this.Value == string.Empty ? "false" : this.Value));
-		}
+        }
 
-		public override string GetHtml()
-		{
-			return this.GetBareHtml(); ;
-		}
-	}
+        public override string GetHtml()
+        {
+            return this.GetBareHtml(); ;
+        }
+    }
 }

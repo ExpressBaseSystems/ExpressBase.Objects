@@ -77,7 +77,31 @@ namespace ExpressBase.Objects
         {
             Tiles = new List<Tiles>();
         }
-        public override List<string> DiscoverRelatedRefids() { return new List<string>(); }
+
+        public override void ReplaceRefid(Dictionary<string, string> RefidMap)
+        {
+            foreach (var Tile in this.Tiles)
+            {
+                if (!string.IsNullOrEmpty(Tile.TileRefId))
+                {
+                    if (RefidMap.ContainsKey(Tile.RefId))
+                        Tile.RefId = RefidMap[Tile.RefId];
+                    else
+                        Tile.RefId = "failed-to-update-";
+                }
+            }
+        }
+
+        public override List<string> DiscoverRelatedRefids()
+        {
+            List<string> _refids = new List<string>();
+            foreach(var Tile in this.Tiles)
+            {
+                if(!string.IsNullOrEmpty(Tile.TileRefId))
+                    _refids.Add(Tile.TileRefId);
+            }
+            return _refids;
+        }
     }
 
     [EnableInBuilder(BuilderType.DashBoard)]

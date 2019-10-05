@@ -16,6 +16,7 @@ using ExpressBase.Common;
 using ExpressBase.Common.Structures;
 using ExpressBase.Common.Data;
 using ExpressBase.Objects.Objects;
+using System.Globalization;
 
 namespace ExpressBase.Objects
 {
@@ -113,21 +114,17 @@ namespace ExpressBase.Objects
         {
 
             ColumnText ct = new ColumnText(Rep.Canvas);
-            Phrase phrase;
             string column_val = Rep.GetDataFieldtValue(ColumnName, slno, TableIndex);
             if (Prefix != "" || Suffix != "")
                 column_val = Prefix + " " + column_val + " " + Suffix;
-            phrase = new Phrase(column_val, ITextFont);
-            if (this.RenderInMultiLine)
-            {
-                column_val = RenderMultiLine(column_val, phrase, (DbType)DbType);
-                phrase = new Phrase(column_val, ITextFont);
-            }
+
+            Phrase phrase = GetPhrase(column_val, (DbType)DbType, Rep.Font);
+
             if (!string.IsNullOrEmpty(LinkRefId))
             {
                 Anchor a = CreateLink(phrase, LinkRefId, Rep.Doc, Params);
                 Paragraph p = new Paragraph { a };
-                p.Font = ITextFont;
+                p.Font = GetItextFont(this.Font, Rep.Font);
                 ct.AddText(p);
             }
             else
@@ -138,23 +135,39 @@ namespace ExpressBase.Objects
             ct.Go();
         }
 
-        public string RenderMultiLine(string column_val, Phrase phrase, DbType column_type)
+        public Phrase GetPhrase(string column_val, DbType column_type, EbFont _reportFont)
         {
-            if (column_val != string.Empty)
+            Phrase phrase = new Phrase(column_val, GetItextFont(this.Font, _reportFont));
+
+            if (this.RenderInMultiLine)
             {
-                BaseFont calcbasefont = phrase.Font.GetCalculatedBaseFont(false);
-                float stringwidth = calcbasefont.GetWidthPoint(column_val, phrase.Font.CalculatedSize);
-                float charwidth = stringwidth / column_val.Length;
-                int numberofCharsInALine = Convert.ToInt32(Math.Floor(WidthPt / charwidth));
-                if (numberofCharsInALine < column_val.Length)
+                if (column_val != string.Empty)
                 {
-                    if (column_type == System.Data.DbType.Decimal)
-                        column_val = "###";
-                    //else if (column_type == System.Data.DbType.String)
-                    //    column_val = column_val.Substring(0, numberofCharsInALine - 2) + "...";
+                    try
+                    {
+                        BaseFont calcbasefont = phrase.Font.GetCalculatedBaseFont(false);
+                        float stringwidth = calcbasefont.GetWidthPoint(column_val, phrase.Font.CalculatedSize);
+                        if (stringwidth > 0)
+                        {
+                            float charwidth = stringwidth / column_val.Length;
+                            Console.WriteLine(Math.Floor(WidthPt / charwidth));
+                            int numberofCharsInALine = Convert.ToInt32(Math.Floor(WidthPt / charwidth));
+                            if (numberofCharsInALine < column_val.Length)
+                            {
+                                if (column_type == System.Data.DbType.Decimal)
+                                    column_val = "###";
+                                //else if (column_type == System.Data.DbType.String)
+                                //    column_val = column_val.Substring(0, numberofCharsInALine - 2) + "...";
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        throw e;
+                    }
                 }
             }
-            return column_val;
+            return new Phrase(column_val, GetItextFont(this.Font, _reportFont)); ;
         }
 
         public Anchor CreateLink(Phrase phrase, string LinkRefid, Document doc, List<Param> Params)
@@ -172,6 +185,21 @@ namespace ExpressBase.Objects
                 Reference = _ref
             };
             return anchor;
+        }
+
+        public string FormatDecimals(string column_val, bool _inWords, int _decimalPlaces, NumberFormatInfo _numberFormat)
+        {
+            if (_inWords)
+            {
+                NumberToEnglish numToE = new NumberToEnglish();
+                column_val = numToE.changeCurrencyToWords(column_val);
+            }
+            else
+            {
+                column_val = Convert.ToDecimal(column_val).ToString("N", _numberFormat);
+                column_val = Convert.ToDecimal(column_val).ToString("F" + _decimalPlaces);
+            }
+            return column_val;
         }
     }
 
@@ -200,14 +228,8 @@ namespace ExpressBase.Objects
         public override void DrawMe(float printingTop, EbReport Rep, List<Param> Params, int slno)
         {
             ColumnText ct = new ColumnText(Rep.Canvas);
-            Phrase phrase;
             string column_val = Rep.GetDataFieldtValue(ColumnName, slno, TableIndex);
-            phrase = new Phrase(column_val, ITextFont);
-            if (this.RenderInMultiLine)
-            {
-                column_val = RenderMultiLine(column_val, phrase, (DbType)DbType);
-                phrase = new Phrase(column_val, ITextFont);
-            }
+            Phrase phrase = GetPhrase(column_val, (DbType)DbType, Rep.Font);
             if (!string.IsNullOrEmpty(LinkRefId))
             {
                 Anchor a = CreateLink(phrase, LinkRefId, Rep.Doc, Params);
@@ -215,7 +237,7 @@ namespace ExpressBase.Objects
                 {
                     a
                 };
-                p.Font = ITextFont;
+                p.Font = GetItextFont(this.Font, Rep.Font);
                 ct.AddText(p);
             }
             else
@@ -233,6 +255,10 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.Report)]
     public class EbDataFieldDateTime : EbDataField
     {
+        [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup("Data Settings")]
+        public DateFormatReport Format { get; set; } = DateFormatReport.from_culture;
+
         public override string GetDesignHtml()
         {
             return "<div class='EbCol dropped' $type='@type' eb-type='DataFieldDateTime' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; left: @Left px; top: @Top px;text-align: @TextAlign;'> @Title </div>".RemoveCR().DoubleQuoted();
@@ -255,17 +281,11 @@ namespace ExpressBase.Objects
         public override void DrawMe(float printingTop, EbReport Rep, List<Param> Params, int slno)
         {
             ColumnText ct = new ColumnText(Rep.Canvas);
-            Phrase phrase;
             string column_val = Rep.GetDataFieldtValue(ColumnName, slno, TableIndex);
-            column_val = String.Format(Rep.CultureInfo.DateTimeFormat, column_val);
+            column_val = FormatDate(column_val, Format, Rep);
             if (Prefix != "" || Suffix != "")
                 column_val = Prefix + " " + column_val + " " + Suffix;
-            phrase = new Phrase(column_val, ITextFont);
-            if (RenderInMultiLine)
-            {
-                column_val = RenderMultiLine(column_val, phrase, (DbType)DbType);
-                phrase = new Phrase(column_val, ITextFont);
-            }
+            Phrase phrase = GetPhrase(column_val, (DbType)DbType, Rep.Font);
             if (!string.IsNullOrEmpty(LinkRefId))
             {
                 Anchor a = CreateLink(phrase, LinkRefId, Rep.Doc, Params);
@@ -273,7 +293,7 @@ namespace ExpressBase.Objects
                 {
                     a
                 };
-                p.Font = ITextFont;
+                p.Font = GetItextFont(this.Font, Rep.Font);
                 ct.AddText(p);
             }
             else
@@ -315,12 +335,12 @@ namespace ExpressBase.Objects
             string column_val = Rep.GetDataFieldtValue(ColumnName, slno, TableIndex);
             if (Prefix != "" || Suffix != "")
                 column_val = Prefix + " " + column_val + " " + Suffix;
-            Phrase phrase = new Phrase(column_val, ITextFont);
+            Phrase phrase = new Phrase(column_val, GetItextFont(this.Font, Rep.Font));
             if (!string.IsNullOrEmpty(LinkRefId))
             {
                 Anchor a = CreateLink(phrase, LinkRefId, Rep.Doc, Params);
                 Paragraph p = new Paragraph { a };
-                p.Font = ITextFont;
+                p.Font = GetItextFont(this.Font, Rep.Font);
                 ct.AddText(p);
             }
             else
@@ -343,6 +363,12 @@ namespace ExpressBase.Objects
         [PropertyGroup("Data Settings")]
         public bool SuppressIfZero { get; set; }
 
+        [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup("Data Settings")]
+        public int DecimalPlaces { get; set; } = 2;
+
+
+
         public override string GetDesignHtml()
         {
             return "<div class='EbCol dropped' $type='@type' eb-type='DataFieldNumeric' id='@id' style='border: @Border px solid;border-color: @BorderColor ; width: @Width px; background-color:@BackColor ; color:@ForeColor ; height: @Height px; left: @Left px; top: @Top px;text-align: @TextAlign;'> @Title </div>".RemoveCR().DoubleQuoted();
@@ -358,39 +384,25 @@ namespace ExpressBase.Objects
                         this.ForeColor = '#201c1c';
                         this.Border = 1;
                         this.BorderColor = '#eae6e6';
+                        this.DecimalPlaces = 2;
                     };";
         }
 
         public override void DrawMe(float printingTop, EbReport Rep, List<Param> Params, int slno)
         {
-            Phrase phrase;
             ColumnText ct = new ColumnText(Rep.Canvas);
             string column_val = Rep.GetDataFieldtValue(ColumnName, slno, TableIndex);
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
-
-            if (AmountInWords)
-            {
-                NumberToEnglish numToE = new NumberToEnglish();
-                column_val = numToE.changeCurrencyToWords(column_val);
-            }
-            else
-            {
-                column_val = Convert.ToDecimal(column_val).ToString("N", Rep.CultureInfo.NumberFormat);
-            }
+            column_val = FormatDecimals(column_val, AmountInWords, DecimalPlaces, Rep.CultureInfo.NumberFormat);
             if (Prefix != "" || Suffix != "")
                 column_val = Prefix + " " + column_val + " " + Suffix;
-            phrase = new Phrase(column_val, ITextFont);
-            if (RenderInMultiLine)
-            {
-                column_val = RenderMultiLine(column_val, phrase, (DbType)DbType);
-                phrase = new Phrase(column_val, ITextFont);
-            }
+            Phrase phrase = GetPhrase(column_val, (DbType)DbType, Rep.Font);
             if (!string.IsNullOrEmpty(LinkRefId))
             {
                 Anchor a = CreateLink(phrase, LinkRefId, Rep.Doc, Params);
                 Paragraph p = new Paragraph { a };
-                p.Font = ITextFont;
+                p.Font = GetItextFont(this.Font, Rep.Font);
                 ct.AddText(p);
             }
             else
@@ -494,31 +506,17 @@ namespace ExpressBase.Objects
                     this.ForeColor = '#201c1c';
                     this.Border = 1;
                     this.BorderColor = '#eae6e6';
+                    this.DecimalPlaces = 2;
                 };";
         }
 
         public override void DrawMe(float printingTop, EbReport Rep, List<Param> Params, int slno)
         {
-            Phrase phrase;
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
             string column_val = SummarizedValue.ToString();
-
-            if (AmountInWords)
-            {
-                NumberToEnglish numToE = new NumberToEnglish();
-                column_val = numToE.changeCurrencyToWords(column_val);
-            }
-            else
-            {
-                column_val = Convert.ToDecimal(column_val).ToString("N", Rep.CultureInfo.NumberFormat);
-            }
-            phrase = new Phrase(column_val, ITextFont);
-            if (this.RenderInMultiLine)
-            {
-                column_val = RenderMultiLine(column_val, phrase, (DbType)DbType);
-                phrase = new Phrase(column_val, ITextFont);
-            }
+            column_val = FormatDecimals(column_val, AmountInWords, DecimalPlaces, Rep.CultureInfo.NumberFormat);
+            Phrase phrase = GetPhrase(column_val, (DbType)DbType, Rep.Font);
             ColumnText ct = new ColumnText(Rep.Canvas);
             ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, 15, (int)TextAlign);
             ct.Go();
@@ -600,12 +598,7 @@ namespace ExpressBase.Objects
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
             string column_val = SummarizedValue.ToString();
-            Phrase phrase = new Phrase(column_val, ITextFont);
-            if (this.RenderInMultiLine)
-            {
-                column_val = RenderMultiLine(column_val, phrase, (DbType)DbType);
-                phrase = new Phrase(column_val, ITextFont);
-            }
+            Phrase phrase = GetPhrase(column_val, (DbType)DbType, Rep.Font);
             ColumnText ct = new ColumnText(Rep.Canvas);
             ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, 15, (int)TextAlign);
             ct.Go();
@@ -685,19 +678,12 @@ namespace ExpressBase.Objects
         public override void DrawMe(float printingTop, EbReport Rep, List<Param> Params, int slno)
         {
             ColumnText ct = new ColumnText(Rep.Canvas);
-            string column_val = String.Format(Rep.CultureInfo.DateTimeFormat, SummarizedValue.ToString());
-
-            column_val = String.Format(Rep.CultureInfo.DateTimeFormat, column_val);
+            string column_val = FormatDate(SummarizedValue.ToString(), Format, Rep);
             if (Prefix != "" || Suffix != "")
                 column_val = Prefix + " " + column_val + " " + Suffix;
-            Phrase phrase = new Phrase(column_val, ITextFont);
-            if (RenderInMultiLine)
-            {
-                column_val = RenderMultiLine(column_val, phrase, (DbType)DbType);
-                phrase = new Phrase(column_val, ITextFont);
-            }
-            else
-                ct.AddText(phrase);
+            Phrase phrase = GetPhrase(column_val, (DbType)DbType, Rep.Font);
+
+            ct.AddText(phrase);
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
             ct.SetSimpleColumn(Llx, lly, Urx, ury, 15, (int)TextAlign);
@@ -758,13 +744,13 @@ namespace ExpressBase.Objects
             string column_val = SummarizedValue.ToString();
             if (Prefix != "" || Suffix != "")
                 column_val = Prefix + " " + column_val + " " + Suffix;
-            Phrase phrase = new Phrase(column_val, ITextFont);
+            Phrase phrase = new Phrase(column_val, GetItextFont(this.Font, Rep.Font));
 
             if (!string.IsNullOrEmpty(LinkRefId))
             {
                 Anchor a = CreateLink(phrase, LinkRefId, Rep.Doc, Params);
                 Paragraph p = new Paragraph { a };
-                p.Font = ITextFont;
+                p.Font = GetItextFont(this.Font, Rep.Font);
                 ct.AddText(p);
             }
             else
@@ -801,9 +787,9 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public int CalcFieldIntType { get; set; }
 
-        //[EnableInBuilder(BuilderType.Report)]
-        //[PropertyGroup("Data Settings")]
-        //public int DecimalPlaces { get; set; } = 2;
+        [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup("Data Settings")]
+        public int DecimalPlaces { get; set; } = 2;
 
         [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("Data Settings")]
@@ -846,6 +832,7 @@ namespace ExpressBase.Objects
         this.ForeColor = '#201c1c';
         this.Border = 1;
         this.BorderColor = '#eae6e6';
+        this.DecimalPlaces = 2;
         };";
         }
 
@@ -886,36 +873,21 @@ namespace ExpressBase.Objects
 
             }
 
-            column_val = (column_val == string.Empty) ? "-" : column_val;
-
-            if (AmountInWords)
-            {
-                NumberToEnglish numToE = new NumberToEnglish();
-                column_val = numToE.changeCurrencyToWords(column_val);
-            }
-            else
-            {
-                if (dbtype == EbDbTypes.Decimal)
-                    column_val = Convert.ToDecimal(column_val).ToString("N", Rep.CultureInfo.NumberFormat);
-            }
-
+            if (column_val == string.Empty)
+                column_val = "-";
+            if (dbtype == EbDbTypes.Decimal)
+                column_val = FormatDecimals(column_val, AmountInWords, DecimalPlaces, Rep.CultureInfo.NumberFormat);
             if (Prefix != "" || Suffix != "")
             {
                 column_val = Prefix + " " + column_val + " " + Suffix;
             }
-            Phrase phrase = new Phrase(column_val, ITextFont);
-
-            if (RenderInMultiLine)
-            {
-                column_val = RenderMultiLine(column_val, phrase, (DbType)DbType);
-                phrase = new Phrase(column_val, ITextFont);
-            }
+            Phrase phrase = GetPhrase(column_val, (DbType)DbType, Rep.Font);
 
             if (!string.IsNullOrEmpty(LinkRefId))
             {
                 Anchor a = CreateLink(phrase, LinkRefId, Rep.Doc, Params);
                 Paragraph p = new Paragraph { a };
-                p.Font = ITextFont;
+                p.Font = GetItextFont(this.Font, Rep.Font);
                 ct.AddText(p);
             }
             else
@@ -1016,6 +988,7 @@ namespace ExpressBase.Objects
                     this.ForeColor = '#201c1c';
                     this.Border = 1;
                     this.BorderColor = '#eae6e6';
+                    this.DecimalPlaces = 2;
                 };";
         }
 
@@ -1024,28 +997,14 @@ namespace ExpressBase.Objects
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
             string column_val = SummarizedValue.ToString();
-
-            if (AmountInWords)
-            {
-                NumberToEnglish numToE = new NumberToEnglish();
-                column_val = numToE.changeCurrencyToWords(column_val);
-            }
-            else
-            {
-                column_val = Convert.ToDecimal(column_val).ToString("N", Rep.CultureInfo.NumberFormat);
-            }
-            Phrase phrase = new Phrase(column_val, ITextFont);
-            if (RenderInMultiLine)
-            {
-                column_val = RenderMultiLine(column_val, phrase, (DbType)DbType);
-                phrase = new Phrase(column_val, ITextFont);
-            }
+            column_val = FormatDecimals(column_val, AmountInWords, DecimalPlaces, Rep.CultureInfo.NumberFormat);
+            Phrase phrase = GetPhrase(column_val, (DbType)DbType, Rep.Font);
             ColumnText ct = new ColumnText(Rep.Canvas);
             if (!string.IsNullOrEmpty(LinkRefId))
             {
                 Anchor a = CreateLink(phrase, LinkRefId, Rep.Doc, Params);
                 Paragraph p = new Paragraph { a };
-                p.Font = ITextFont;
+                p.Font = GetItextFont(this.Font, Rep.Font);
                 ct.AddText(p);
             }
             else
@@ -1130,18 +1089,13 @@ namespace ExpressBase.Objects
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
             string column_val = SummarizedValue.ToString();
-            Phrase phrase = new Phrase(column_val, ITextFont);
-            if (RenderInMultiLine)
-            {
-                column_val = RenderMultiLine(column_val, phrase, (DbType)DbType);
-                phrase = new Phrase(column_val, ITextFont);
-            }
+            Phrase phrase = GetPhrase(column_val, (DbType)DbType, Rep.Font);
             ColumnText ct = new ColumnText(Rep.Canvas);
             if (!string.IsNullOrEmpty(LinkRefId))
             {
                 Anchor a = CreateLink(phrase, LinkRefId, Rep.Doc, Params);
                 Paragraph p = new Paragraph { a };
-                p.Font = ITextFont;
+                p.Font = GetItextFont(this.Font, Rep.Font);
                 ct.AddText(p);
             }
             else
@@ -1226,18 +1180,14 @@ namespace ExpressBase.Objects
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
             string column_val = SummarizedValue.ToString();
-            Phrase phrase = new Phrase(column_val, ITextFont);
-            if (RenderInMultiLine)
-            {
-                column_val = RenderMultiLine(column_val, phrase, (DbType)DbType);
-                phrase = new Phrase(column_val, ITextFont);
-            }
+
+            Phrase phrase = GetPhrase(column_val, (DbType)DbType, Rep.Font);
             ColumnText ct = new ColumnText(Rep.Canvas);
             if (!string.IsNullOrEmpty(LinkRefId))
             {
                 Anchor a = CreateLink(phrase, LinkRefId, Rep.Doc, Params);
                 Paragraph p = new Paragraph { a };
-                p.Font = ITextFont;
+                p.Font = GetItextFont(this.Font, Rep.Font);
                 ct.AddText(p);
             }
             else
@@ -1298,13 +1248,13 @@ namespace ExpressBase.Objects
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
             string column_val = SummarizedValue.ToString();
-            Phrase phrase = new Phrase(column_val, ITextFont);
+            Phrase phrase = new Phrase(column_val, GetItextFont(this.Font, Rep.Font));
             ColumnText ct = new ColumnText(Rep.Canvas);
             if (!string.IsNullOrEmpty(LinkRefId))
             {
                 Anchor a = CreateLink(phrase, LinkRefId, Rep.Doc, Params);
                 Paragraph p = new Paragraph { a };
-                p.Font = ITextFont;
+                p.Font = GetItextFont(this.Font, Rep.Font);
                 ct.AddText(p);
             }
             else

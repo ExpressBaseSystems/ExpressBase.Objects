@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Text;
 
-namespace ExpressBase.Objects.Objects
+namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
     public class EbBooleanSelect : EbControlUI
@@ -21,13 +21,7 @@ namespace ExpressBase.Objects.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [HideInPropertyGrid]
-        public override EbDbTypes EbDbType
-        {
-            get
-            {
-                return EbDbTypes.BooleanOriginal;
-            }
-        }
+        public override EbDbTypes EbDbType { get { return EbDbTypes.BooleanOriginal; } }
 
         private EbSimpleSelect EbSimpleSelect { set; get; }
 
@@ -35,7 +29,11 @@ namespace ExpressBase.Objects.Objects
         {
             get
             {
-                return EbSimpleSelect.SetValueJSfn;
+                return @"if(p1 === true)
+                            p1 = 'true'
+                        else if(p1 === false)
+                            p1 = 'false'
+                       " + EbSimpleSelect.SetValueJSfn;
             }
             set { }
         }
@@ -44,7 +42,7 @@ namespace ExpressBase.Objects.Objects
         {
             get
             {
-                return EbSimpleSelect.GetValueJSfn;
+                return EbSimpleSelect.GetValueJSfn.Replace("return val;", "val = (val ==='true'); return val;");
             }
             set { }
         }
@@ -110,6 +108,7 @@ namespace ExpressBase.Objects.Objects
         public void OnDeserializedMethod(StreamingContext context)
         {
             this.BareControlHtml = this.GetBareHtml();
+            this.BareControlHtml4Bot = this.BareControlHtml;
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
 
@@ -135,8 +134,7 @@ namespace ExpressBase.Objects.Objects
         public override string GetBareHtml()
         {
             return @"
-        <select id='@ebsid@' ui-inp class='selectpicker' title='@PlaceHolder@' @MaxLimit@ name='@ebsid@' @bootStrapStyle@ data-ebtype='@data-ebtype@' style='width: 100%;'>
-            @-sel-@
+        <select id='@ebsid@' ui-inp class='selectpicker' name='@ebsid@' @bootStrapStyle@ data-ebtype='@data-ebtype@' style='width: 100%;'>
             <option value='true'>@TrueText@</option>
             <option value='false'>@FalseText@</option>
         </select>"
@@ -147,7 +145,7 @@ namespace ExpressBase.Objects.Objects
 .Replace("@HelpText@", this.HelpText)
 
 .Replace("@bootStrapStyle@", "data-style='btn-" + this.BootStrapStyle.ToString() + "'")
-.Replace("@-sel-@","<option selected value='-1' style='color: #6f6f6f;'> -- select -- </option>")
+//.Replace("@-sel-@","<option selected value='-1' style='color: #6f6f6f;'> -- select -- </option>")
 .Replace("@data-ebtype@", "30");
         }
     }

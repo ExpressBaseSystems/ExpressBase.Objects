@@ -76,48 +76,53 @@ namespace ExpressBase.Objects
             return new BaseColor(colr);
         }
 
-        private iTextSharp.text.Font iTextFont = null;
-        public virtual iTextSharp.text.Font ITextFont
+        public iTextSharp.text.Font GetItextFont(EbFont Font, EbFont _reportFont)
         {
-            get
+            iTextSharp.text.Font iTextFont = null;
+            if (Font is null)
             {
-                if (Font == null)
+                if (!(_reportFont is null))
+                    Font = _reportFont;
+                else
                     Font = (new EbFont { color = "#000000", FontName = "Times-Roman", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
-                if (/*iTextFont == null &&*/ Font != null)
-                {
-                    iTextFont = new iTextSharp.text.Font(BaseFont.CreateFont(Font.FontName, BaseFont.CP1252, BaseFont.EMBEDDED), Font.Size, (int)Font.Style, GetColor(Font.color));
-                    if (Font.Caps)
-                        Title = Title.ToUpper();
-                    if (Font.Strikethrough)
-                        iTextFont.SetStyle(iTextSharp.text.Font.STRIKETHRU);
-                    if (Font.Underline)
-                        iTextFont.SetStyle(iTextSharp.text.Font.UNDERLINE);
-                }
-                return iTextFont;
             }
+            iTextFont = FontFactory.GetFont(Font.FontName, Font.Size, (int)Font.Style);
+            iTextFont.Color = GetColor(Font.color);
+            if (Font.Caps)
+                Title = Title.ToUpper();
+            if (Font.Strikethrough)
+                iTextFont.SetStyle(iTextSharp.text.Font.STRIKETHRU);
+            if (Font.Underline)
+                iTextFont.SetStyle(iTextSharp.text.Font.UNDERLINE);
+            return iTextFont;
         }
+        private iTextSharp.text.Font iTextFont = null;
 
         public virtual void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno) { }
 
-        //public string FormatDate(string column_val, DateFormatReport format)
-        //{
-        //    DateTime dt = Convert.ToDateTime(column_val);
-        //    if (format == DateFormatReport.dddd_MMMM_d_yyyy)
-        //        return String.Format("{0:dddd, MMMM d, yyyy}", dt);
-        //    else if (format == DateFormatReport.M_d_yyyy)
-        //        return String.Format("{0:M/d/yyyy}", dt);
-        //    else if (format == DateFormatReport.ddd_MMM_d_yyyy)
-        //        return String.Format("{0:ddd, MMM d, yyyy}", dt);
-        //    else if (format == DateFormatReport.MM_dd_yy)
-        //        return String.Format("{0:MM/dd/yy}", dt);
-        //    else if (format == DateFormatReport.MM_dd_yyyy)
-        //        return String.Format("{0:MM/dd/yyyy}", dt);
-        //    else if (format == DateFormatReport.dd_MM_yyyy)
-        //        return String.Format("{0:dd-MM-yyyy}", dt);
-        //    else if (format == DateFormatReport.dd_slash_mm_slash_yy)
-        //        return string.Format("{0:dd/MM/yyyy}",dt);
-        //    return column_val;
-        //}
+        public string FormatDate(string column_val, DateFormatReport format, EbReport Rep)
+        {
+            DateTime dt = Convert.ToDateTime(column_val);
+            if (format == DateFormatReport.dddd_MMMM_d_yyyy)
+                return String.Format("{0:dddd, MMMM d, yyyy}", dt);
+            else if (format == DateFormatReport.M_d_yyyy)
+                return String.Format("{0:M/d/yyyy}", dt);
+            else if (format == DateFormatReport.ddd_MMM_d_yyyy)
+                return String.Format("{0:ddd, MMM d, yyyy}", dt);
+            else if (format == DateFormatReport.MM_dd_yy)
+                return String.Format("{0:MM/dd/yy}", dt);
+            else if (format == DateFormatReport.MM_dd_yyyy)
+                return String.Format("{0:MM/dd/yyyy}", dt);
+            else if (format == DateFormatReport.dd_MM_yyyy)
+                return String.Format("{0:dd-MM-yyyy}", dt);
+            else if (format == DateFormatReport.dd_MM_yyyy_slashed)
+                return string.Format("{0:dd/MM/yyyy}", dt);
+            else if (format == DateFormatReport.from_culture)
+                return String.Format(Rep.CultureInfo.DateTimeFormat, dt.ToString());
+            else if (format == DateFormatReport.dd_MMMM_yyyy)
+                return string.Format("{0:dd MMMM yyyy}", dt);
+            return column_val;
+        }
     }
 
     [EnableInBuilder(BuilderType.Report)]
@@ -141,7 +146,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.Report)]
         [PropertyGroup("Image")]
-        public string ImageColName { get; set; }  
+        public string ImageColName { get; set; }
 
         public override string GetDesignHtml()
         {
@@ -237,7 +242,7 @@ namespace ExpressBase.Objects
             Phrase phrase = null;
             if (WaterMarkText != string.Empty)
             {
-                phrase = new Phrase(WaterMarkText, ITextFont);
+                phrase = new Phrase(WaterMarkText, GetItextFont(this.Font, Rep.Font));
                 PdfContentByte canvas;
                 canvas = Rep.Writer.DirectContentUnder;
                 ColumnText.ShowTextAligned(canvas, (int)TextAlign, phrase, Rep.Doc.PageSize.Width / 2, Rep.Doc.PageSize.Height / 2, Rotation);
@@ -261,32 +266,16 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.Report)]
     public class EbDateTime : EbReportField
     {
-        //[EnableInBuilder(BuilderType.Report)]
-        //[UIproperty]
-        //[PropertyGroup("General")]
-        //public DateFormatReport Format { get; set; }
+        [EnableInBuilder(BuilderType.Report)]
+        [UIproperty]
+        [PropertyGroup("General")]
+        public DateFormatReport Format { get; set; } = DateFormatReport.from_culture;
 
         [OnChangeExec(@"
             pg.MakeReadOnly('Title');
         ")]
         [EnableInBuilder(BuilderType.Report)]
         public override string Title { set; get; }
-
-        //public string FormatDate(string column_val)
-        //{
-        //    DateTime dt = Convert.ToDateTime(column_val);
-        //    if (Format == DateFormatReport.dddd_MMMM_d_yyyy)
-        //        return String.Format("{0:dddd, MMMM d, yyyy}", dt);
-        //    else if (Format == DateFormatReport.M_d_yyyy)
-        //        return String.Format("{0:M/d/yyyy}", dt);
-        //    else if (Format == DateFormatReport.ddd_MMM_d_yyyy)
-        //        return String.Format("{0:ddd, MMM d, yyyy}", dt);
-        //    else if (Format == DateFormatReport.MM_dd_yy)
-        //        return String.Format("{0:MM/dd/yy}", dt);
-        //    else if (Format == DateFormatReport.MM_dd_yyyy)
-        //        return String.Format("{0:MM/dd/yyyy}", dt);
-        //    return column_val;
-        //}
 
         public override string GetDesignHtml()
         {
@@ -311,8 +300,8 @@ namespace ExpressBase.Objects
 
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
-            string column_val = String.Format(Rep.CultureInfo.DateTimeFormat, Rep.CurrentTimestamp.ToString());
-            Phrase phrase = new Phrase(column_val, ITextFont);
+            string column_val = FormatDate(Rep.CurrentTimestamp.ToString(), Format, Rep);
+            Phrase phrase = new Phrase(column_val, GetItextFont(this.Font, Rep.Font));
             ColumnText ct = new ColumnText(Rep.Canvas);
             ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, 15, (int)TextAlign);
             ct.Go();
@@ -351,7 +340,7 @@ namespace ExpressBase.Objects
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop + Rep.RowHeight);
 
             ColumnText ct = new ColumnText(Rep.Canvas);
-            Phrase phrase = new Phrase(Rep.PageNumber.ToString(), ITextFont);
+            Phrase phrase = new Phrase(Rep.PageNumber.ToString(), GetItextFont(this.Font, Rep.Font));
             ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, 15, (int)TextAlign);
             ct.Go();
         }
@@ -388,7 +377,7 @@ namespace ExpressBase.Objects
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop + Rep.RowHeight);
 
             ColumnText ct = new ColumnText(Rep.Canvas);
-            Phrase phrase = new Phrase(Rep.PageNumber + "/"/* + writer.PageCount*/, ITextFont);
+            Phrase phrase = new Phrase(Rep.PageNumber + "/"/* + writer.PageCount*/, GetItextFont(this.Font, Rep.Font));
             ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, 15, (int)TextAlign);
             ct.Go();
         }
@@ -425,7 +414,7 @@ namespace ExpressBase.Objects
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop + Rep.RowHeight);
 
             ColumnText ct = new ColumnText(Rep.Canvas);
-            Phrase phrase = new Phrase(Rep.RenderingUser.FullName, ITextFont);
+            Phrase phrase = new Phrase(Rep.RenderingUser.FullName, GetItextFont(this.Font, Rep.Font));
             ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, 15, (int)TextAlign);
             ct.Go();
         }
@@ -458,7 +447,7 @@ namespace ExpressBase.Objects
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop + Rep.RowHeight);
 
             ColumnText ct = new ColumnText(Rep.Canvas);
-            Phrase phrase = new Phrase(Title, ITextFont);
+            Phrase phrase = new Phrase(Title, GetItextFont(this.Font, Rep.Font));
             ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, 15, (int)TextAlign);
             ct.Go();
         }
@@ -498,7 +487,7 @@ namespace ExpressBase.Objects
                     column_val = p.Value;
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
-            Phrase phrase = new Phrase(column_val, ITextFont);
+            Phrase phrase = new Phrase(column_val, GetItextFont(this.Font, Rep.Font));
             ColumnText ct = new ColumnText(Rep.Canvas);
             ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, 15, (int)TextAlign);
             ct.Go();
@@ -539,7 +528,7 @@ namespace ExpressBase.Objects
                     column_val = p.Value;
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
-            Phrase phrase = new Phrase(column_val, ITextFont);
+            Phrase phrase = new Phrase(column_val, GetItextFont(this.Font, Rep.Font));
             ColumnText ct = new ColumnText(Rep.Canvas);
             ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, 15, (int)TextAlign);
             ct.Go();
@@ -580,7 +569,7 @@ namespace ExpressBase.Objects
                     column_val = p.Value;
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
-            Phrase phrase = new Phrase(column_val, ITextFont);
+            Phrase phrase = new Phrase(column_val, GetItextFont(this.Font, Rep.Font));
             ColumnText ct = new ColumnText(Rep.Canvas);
             ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, 15, (int)TextAlign);
             ct.Go();
@@ -596,9 +585,9 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.Report)]
         public override string Title { set; get; }
 
-        //[EnableInBuilder(BuilderType.Report)]
-        //[PropertyGroup("Data Settings")]
-        //public DateFormatReport Format { get; set; }
+        [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup("Data Settings")]
+        public DateFormatReport Format { get; set; } = DateFormatReport.from_culture;
 
         public override string GetDesignHtml()
         {
@@ -623,10 +612,10 @@ namespace ExpressBase.Objects
             foreach (Param p in Rep.Parameters)
                 if (p.Name == Title)
                     column_val = p.Value;
-            column_val = String.Format(Rep.CultureInfo.DateTimeFormat, column_val);
+            column_val = FormatDate(column_val, Format, Rep);
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
-            Phrase phrase = new Phrase(column_val, ITextFont);
+            Phrase phrase = new Phrase(column_val, GetItextFont(this.Font, Rep.Font));
             ColumnText ct = new ColumnText(Rep.Canvas);
             ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, 15, (int)TextAlign);
             ct.Go();
@@ -668,7 +657,7 @@ namespace ExpressBase.Objects
                     column_val = p.Value;
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
-            Phrase phrase = new Phrase(column_val, ITextFont);
+            Phrase phrase = new Phrase(column_val, GetItextFont(this.Font, Rep.Font));
             ColumnText ct = new ColumnText(Rep.Canvas);
             ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, 15, (int)TextAlign);
             ct.Go();
@@ -888,6 +877,7 @@ namespace ExpressBase.Objects
                     this.ForeColor = '#201c1c';
                     this.Border = 1;
                     this.BorderColor = '#eae6e6';
+                    this.Title = 'slno';
                 };";
         }
         public override void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno)
@@ -895,7 +885,7 @@ namespace ExpressBase.Objects
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
 
-            Phrase phrase = new Phrase((Rep.iDetailRowPos + 1).ToString(), ITextFont);
+            Phrase phrase = new Phrase((Rep.iDetailRowPos + 1).ToString(), GetItextFont(this.Font, Rep.Font));
             ColumnText ct = new ColumnText(Rep.Canvas);
             ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, 15, (int)TextAlign);
             ct.Go();
@@ -905,7 +895,7 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.Report)]
     public class EbLocFieldImage : EbReportField
     {
-        public override EbFont Font { get; set ; }
+        public override EbFont Font { get; set; }
 
         public override string GetDesignHtml()
         {
@@ -944,12 +934,7 @@ namespace ExpressBase.Objects
             pg.MakeReadOnly('Title');
         ")]
         [EnableInBuilder(BuilderType.Report)]
-        public override string Title { set; get; }
-
-        [EnableInBuilder(BuilderType.Report)]
-        [PropertyGroup("Data Settings")]
-        [UIproperty]
-        public Boolean RenderInMultiLine { get; set; } = true;
+        public override string Title { set; get; } 
 
         public override string GetDesignHtml()
         {
@@ -974,7 +959,7 @@ namespace ExpressBase.Objects
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
 
-            Phrase phrase = new Phrase(column_val, ITextFont);
+            Phrase phrase = new Phrase(column_val, GetItextFont(this.Font, Rep.Font)); 
             ColumnText ct = new ColumnText(Rep.Canvas);
             ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, 15, (int)TextAlign);
             ct.Go();

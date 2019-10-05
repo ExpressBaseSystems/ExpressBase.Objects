@@ -15,7 +15,7 @@ using ExpressBase.Security;
 namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.WebForm)]
-    public class EbAutoId : EbControlUI
+    public class EbAutoId : EbControlUI, IEbPlaceHolderControl
     {
         #region Hidden Properties
 

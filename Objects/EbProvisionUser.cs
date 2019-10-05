@@ -32,9 +32,33 @@ namespace ExpressBase.Objects
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
 
-        public override string ToolIconHtml { get { return "<i class='fa fa-user'></i>"; } set { } }
+        public override string ToolIconHtml { get { return "<i class='fa fa-user'></i><i class='fa fa-plus'></i>"; } set { } }
 
-        public override string ToolNameAlias { get { return "Provision User"; } set { } }
+        public override string ToolNameAlias { get { return "Prov. User"; } set { } }
+
+        public override string ToolHelpText { get { return "Provision User"; } set { } }
+
+        public override string UIchangeFns
+        {
+            get
+            {
+                return @"EbProvisionUser = {
+                mapping : function(elementId, props) {
+                    let html = '';
+                    $(`#cont_${elementId}`).html(`<span class='eb-ctrl-label' ui-label id='@ebsid@Lbl' style='font-style: italic; font-weight: normal;'>ProvisionUser</span>`);
+                    $.each(props.Fields.$values, function (i, field) {
+                        if (field.ControlName === '' && field.IsRequired){
+                            html += `<div class = 'prov-loc-item'>
+                                        <span class='eb-ctrl-label'>${field.DisplayName}</span>
+                                        <div class='ctrl-cover'><input type='text' autocomplete = 'off' style='width:100%; display:inline-block;' disabled /></div>
+                                    </div>`;
+                        }
+                    });
+                    $(`#cont_${elementId}`).append(html);
+                }
+            }";
+            }
+        }
 
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
@@ -46,6 +70,8 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyGroup("Identity")]
+        [UIproperty]
+        [OnChangeUIFunction("EbProvisionUser.mapping")]
         [PropertyEditor(PropertyEditorType.Collection)]
         [ListType(typeof(UsrLocFieldAbstract))]
         public List<UsrLocFieldAbstract> Fields { get; set; }
@@ -153,7 +179,10 @@ namespace ExpressBase.Objects
             return @"
 this.Init = function(id)
 {
-	this.Fields.$values.push(new EbObjects.UsrLocField('email'));
+    let efield = new EbObjects.UsrLocField('email');
+    efield.DisplayName = 'Email';
+    efield.IsRequired = true;
+	this.Fields.$values.push(efield);
 	this.Fields.$values.push(new EbObjects.UsrLocField('fullname'));
 	this.Fields.$values.push(new EbObjects.UsrLocField('nickname'));
 	this.Fields.$values.push(new EbObjects.UsrLocField('dob'));
@@ -433,9 +462,13 @@ this.Init = function(id)
         [HideInPropertyGrid]
         public bool IsRequired { get; set; }
 
+        //[EnableInBuilder(BuilderType.WebForm)]
+        //[HideInPropertyGrid]
+        //public EbDbTypes EbDbType { get; set; }
+
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
-        public EbDbTypes EbDbType { get; set; }
+        public string Type { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]

@@ -39,10 +39,11 @@ namespace ExpressBase.Objects
 						this.FilterValues.Add(Card.CustomFields[this.FilterField.Name].ToString().Trim());
 					}
 				}
-			
 
-			this.BareControlHtml = this.GetBareHtml();
-			this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
+
+            this.BareControlHtml = this.GetBareHtml();
+            this.BareControlHtml4Bot = this.BareControlHtml;
+            this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
 
 		}		     
     }	

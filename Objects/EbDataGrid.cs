@@ -56,7 +56,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [PropertyGroup("Behavior")]
-        public bool NewRowOnTop { get; set; }
+        public bool AscendingOrder { get; set; }
 
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
@@ -211,7 +211,7 @@ $.each(this.Controls.$values, function (i, col) {
     public abstract class EbDGColumn : EbControl
     {
         [JsonIgnore]
-        public override string OnChangeBindJSFn { get { return @"$(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, p2);";} set { } }
+        public override string OnChangeBindJSFn { get { return @"$(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, p2);"; } set { } }
 
         [JsonIgnore]
         public override string SetValueJSfn
@@ -227,7 +227,7 @@ $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this
         [JsonIgnore]
         public override string GetValueJSfn
         {
-            get { return @" return $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val(); "; }
+            get { return @"let val = $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val(); return val;"; }
 
             set { }
         }
@@ -478,7 +478,7 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, p2).
         {
             get
             {
-                return @"$('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] .ctrl-cover .dropdown-toggle`).attr('disabled', 'disabled').css('pointer-events', 'none').find('[ui-inp]').css('background-color', '#f3f3f3');";
+                return @"$('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] .ctrl-cover .dropdown-toggle`).attr('disabled', 'disabled').css('pointer-events', 'none').css('background-color', '#f3f3f3');";
             }
             set { }
         }
@@ -488,7 +488,7 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, p2).
         {
             get
             {
-                return @"$('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] .ctrl-cover .dropdown-toggle`).prop('disabled',false).css('pointer-events', 'inherit').find('[ui-inp]').css('background-color', '#fff');";
+                return @"$('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] .ctrl-cover .dropdown-toggle`).prop('disabled',false).css('pointer-events', 'inherit').css('background-color', '#fff');";
             }
             set { }
         }
@@ -591,6 +591,129 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, p2).
     }
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+    [Alias("BooleanSelect Column")]
+    [UsedWithTopObjectParent(typeof(EbObject))]
+    public class EbDGBooleanSelectColumn : EbDGColumn
+    {
+        [JsonIgnore]
+        public EbBooleanSelect EbBooleanSelect { get; set; }
+
+        [JsonIgnore]
+        private EbDGSimpleSelectColumn EbDGSimpleSelectColumn { set; get; }
+
+        public override string SetValueJSfn
+        {
+            get
+            {
+                return @"if(p1 === true)
+                            p1 = 'true'
+                        else if(p1 === false)
+                            p1 = 'false'
+                       " + EbDGSimpleSelectColumn.SetValueJSfn;
+            }
+            set { }
+        }
+
+        public override string GetValueJSfn
+        {
+            get
+            {
+                return EbDGSimpleSelectColumn.GetValueJSfn.Replace("return val;", "val = (val ==='true'); return val;");
+            }
+            set { }
+        }
+
+        public EbDGBooleanSelectColumn()
+        {
+            this.EbBooleanSelect = new EbBooleanSelect();
+            this.EbDGSimpleSelectColumn = new EbDGSimpleSelectColumn();
+        }
+
+        [JsonIgnore]
+        public override string DisableJSfn
+        {
+            get
+            {
+                return EbDGSimpleSelectColumn.DisableJSfn;
+            }
+            set { }
+        }
+
+        [JsonIgnore]
+        public override string EnableJSfn
+        {
+            get
+            {
+                return EbDGSimpleSelectColumn.EnableJSfn;
+            }
+            set { }
+        }
+
+        public override string GetDisplayMemberJSfn
+        {
+            get
+            {
+                return EbDGSimpleSelectColumn.GetDisplayMemberJSfn;
+            }
+            set { }
+        }
+        public override string IsRequiredOKJSfn
+        {
+            get
+            {
+                return EbDGSimpleSelectColumn.IsRequiredOKJSfn;
+            }
+            set { }
+        }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup("Behavior")]
+        [PropertyPriority(52)]
+        [DefaultPropValue("Yes")]
+        public string TrueText
+        {
+            get { return this.EbBooleanSelect.TrueText; }
+            set { this.EbBooleanSelect.TrueText = value; }
+        }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup("Behavior")]
+        [PropertyPriority(51)]
+        [DefaultPropValue("No")]
+        public string FalseText
+        {
+            get { return this.EbBooleanSelect.FalseText; }
+            set { this.EbBooleanSelect.FalseText = value; }
+        }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override string InputControlType { get { return "EbBooleanSelect"; } }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [HideInPropertyGrid]
+        public override EbDbTypes EbDbType
+        {
+            get { return this.EbBooleanSelect.EbDbType; }
+            set { this.EbBooleanSelect.EbDbType = value; }
+        }
+
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.BotForm)]
+        public override bool IsReadOnly
+        {
+            get { return this.EbBooleanSelect.IsReadOnly; }
+            set { this.EbBooleanSelect.IsReadOnly = value; }
+        }
+
+        [OnDeserialized]
+        public void OnDeserializedMethod(StreamingContext context)
+        {
+            DBareHtml = EbBooleanSelect.GetBareHtml();
+        }
+    }
+
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
     [UsedWithTopObjectParent(typeof(EbObject))]
     [Alias("UserControl Column")]
     public class EbDGUserControlColumn : EbDGColumn
@@ -664,12 +787,29 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, p2).
         [JsonIgnore]
         private EbPowerSelect EbPowerSelect { get; set; }
 
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [HideInPropertyGrid]
+        public EbButton AddButton { set; get; }
+
         public EbDGPowerSelectColumn()
         {
             this.EbPowerSelect = new EbPowerSelect();
+            this.AddButton = new EbButton();
         }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [OSE_ObjectTypes(EbObjectTypes.iWebForm)]
+        public string FormRefId { get { return this.AddButton.FormRefId; } set { this.AddButton.FormRefId = value; } }
+
         public override string SetValueJSfn { get { return EbPowerSelect.SetValueJSfn; } set { } }
+
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [PropertyGroup("Behavior")]
+        [PropertyPriority(98)]
+        public bool IsInsertable { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyGroup("Appearance")]
@@ -696,6 +836,9 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, p2).
                     pg.setSimpleProperty('MinLimit', 0);
                     pg.MakeReadOnly('MinLimit');                 
                 }
+                if(this.MaxLimit === 1)
+                    pg.setSimpleProperty('MaxLimit', 0);
+                    
             } 
             else {
                 pg.setSimpleProperty('MaxLimit', 1);
@@ -706,6 +849,8 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, p2).
                 else{
                     pg.setSimpleProperty('MinLimit', 0);
                 }
+                if(this.MaxLimit !== 1)
+                    pg.setSimpleProperty('MaxLimit', 1);
             }")]
         public bool MultiSelect { get { return this.EbPowerSelect.MultiSelect; } set { this.EbPowerSelect.MultiSelect = value; } }
 

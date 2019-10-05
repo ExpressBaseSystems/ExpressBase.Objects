@@ -13,7 +13,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class RefreshSolutionConnectionsRequest : EbMqRequest
     {
     }
-
+   
     public class RefreshSolutionConnectionsResponse : IEbSSResponse
     {
         public ResponseStatus ResponseStatus { get; set; }
@@ -336,6 +336,20 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     public class AddGoogleDriveResponse : IEbSSResponse
+    {
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    public class AddSlackRequest : IReturn<AddSlackResponse>, IEbTenentRequest
+    {
+        public EbSlackConfig Config { get; set; }
+
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
+    }
+
+    public class AddSlackResponse : IEbSSResponse
     {
         public ResponseStatus ResponseStatus { get; set; }
     }

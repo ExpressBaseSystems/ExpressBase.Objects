@@ -47,6 +47,7 @@ namespace ExpressBase.Objects
         public void OnDeserializedMethod(StreamingContext context)
         {
             this.BareControlHtml = this.GetBareHtml();
+            this.BareControlHtml4Bot = this.BareControlHtml;
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
 
@@ -78,7 +79,7 @@ namespace ExpressBase.Objects
 
         [HideInPropertyGrid]
         [JsonIgnore]
-        public override string ToolNameAlias { get { return "Location Input"; } set { } }
+        public override string ToolNameAlias { get { return "LatLng Input"; } set { } }
 
         //public override string GetToolHtml()
         //{
