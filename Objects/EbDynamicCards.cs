@@ -47,9 +47,10 @@ namespace ExpressBase.Objects
 
 		[OnDeserialized]
 		public void OnDeserializedMethod(StreamingContext context)
-		{
-			this.BareControlHtml = this.GetBareHtml();
-			this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
+        {
+            this.BareControlHtml = this.GetBareHtml();
+            this.BareControlHtml4Bot = this.BareControlHtml;
+            this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
 			//this.FilterField = "ftype";/////////Hard coding for test filter field //febin
 			//this.SearchField = "Title0";/////////Hard coding for test search field //febin
 		}
