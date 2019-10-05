@@ -233,6 +233,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 		public string usrname { get; set; }
 
+		public Dictionary<string, string> chngedtkt { set; get; } = new Dictionary<string, string>();
+
 		public Dictionary<SupportTicketFields, string> History_fv { set; get; } = new Dictionary<SupportTicketFields, string>();
 
 	}
