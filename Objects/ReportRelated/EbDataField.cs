@@ -143,16 +143,27 @@ namespace ExpressBase.Objects
             {
                 if (column_val != string.Empty)
                 {
-                    BaseFont calcbasefont = phrase.Font.GetCalculatedBaseFont(false);
-                    float stringwidth = calcbasefont.GetWidthPoint(column_val, phrase.Font.CalculatedSize);
-                    float charwidth = stringwidth / column_val.Length;
-                    int numberofCharsInALine = Convert.ToInt32(Math.Floor(WidthPt / charwidth));
-                    if (numberofCharsInALine < column_val.Length)
+                    try
                     {
-                        if (column_type == System.Data.DbType.Decimal)
-                            column_val = "###";
-                        //else if (column_type == System.Data.DbType.String)
-                        //    column_val = column_val.Substring(0, numberofCharsInALine - 2) + "...";
+                        BaseFont calcbasefont = phrase.Font.GetCalculatedBaseFont(false);
+                        float stringwidth = calcbasefont.GetWidthPoint(column_val, phrase.Font.CalculatedSize);
+                        if (stringwidth > 0)
+                        {
+                            float charwidth = stringwidth / column_val.Length;
+                            Console.WriteLine(Math.Floor(WidthPt / charwidth));
+                            int numberofCharsInALine = Convert.ToInt32(Math.Floor(WidthPt / charwidth));
+                            if (numberofCharsInALine < column_val.Length)
+                            {
+                                if (column_type == System.Data.DbType.Decimal)
+                                    column_val = "###";
+                                //else if (column_type == System.Data.DbType.String)
+                                //    column_val = column_val.Substring(0, numberofCharsInALine - 2) + "...";
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        throw e;
                     }
                 }
             }
@@ -383,7 +394,7 @@ namespace ExpressBase.Objects
             string column_val = Rep.GetDataFieldtValue(ColumnName, slno, TableIndex);
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
-            column_val= FormatDecimals(column_val, AmountInWords, DecimalPlaces, Rep.CultureInfo.NumberFormat);
+            column_val = FormatDecimals(column_val, AmountInWords, DecimalPlaces, Rep.CultureInfo.NumberFormat);
             if (Prefix != "" || Suffix != "")
                 column_val = Prefix + " " + column_val + " " + Suffix;
             Phrase phrase = GetPhrase(column_val, (DbType)DbType, Rep.Font);
@@ -865,7 +876,7 @@ namespace ExpressBase.Objects
             if (column_val == string.Empty)
                 column_val = "-";
             if (dbtype == EbDbTypes.Decimal)
-                column_val= FormatDecimals(column_val, AmountInWords, DecimalPlaces, Rep.CultureInfo.NumberFormat);
+                column_val = FormatDecimals(column_val, AmountInWords, DecimalPlaces, Rep.CultureInfo.NumberFormat);
             if (Prefix != "" || Suffix != "")
             {
                 column_val = Prefix + " " + column_val + " " + Suffix;
@@ -986,7 +997,7 @@ namespace ExpressBase.Objects
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
             string column_val = SummarizedValue.ToString();
-            column_val= FormatDecimals(column_val, AmountInWords, DecimalPlaces, Rep.CultureInfo.NumberFormat);
+            column_val = FormatDecimals(column_val, AmountInWords, DecimalPlaces, Rep.CultureInfo.NumberFormat);
             Phrase phrase = GetPhrase(column_val, (DbType)DbType, Rep.Font);
             ColumnText ct = new ColumnText(Rep.Canvas);
             if (!string.IsNullOrEmpty(LinkRefId))
