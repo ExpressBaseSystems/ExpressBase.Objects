@@ -321,6 +321,27 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
+    [DataContract]
+    public class GetDashBoardUserCtrlRequest : EbServiceStackAuthRequest, IReturn<GetDashBoardUserCtrlResponse>
+    {
+        [DataMember(Order = 1)]
+        public string RefId { get; set; }
+
+    }
+
+    [DataContract]
+    public class GetDashBoardUserCtrlResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public string UcObjJson { get; set; }
+
+        [DataMember(Order = 1)]
+        public string UcHtml { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
     [Serializable()]
     public class FormException : Exception
     {

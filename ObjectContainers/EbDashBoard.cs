@@ -85,7 +85,8 @@ namespace ExpressBase.Objects
     {
         [EnableInBuilder(BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
-        [OSE_ObjectTypes(EbObjectTypes.iTableVisualization, EbObjectTypes.iChartVisualization, EbObjectTypes.iGoogleMap)]
+        [OSE_ObjectTypes(EbObjectTypes.iTableVisualization, EbObjectTypes.iChartVisualization, EbObjectTypes.iGoogleMap, EbObjectTypes.iUserControl)]
+
         public string TileRefId { get; set; }
 
         [HideInPropertyGrid]
