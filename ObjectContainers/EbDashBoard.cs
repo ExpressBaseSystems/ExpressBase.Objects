@@ -80,9 +80,9 @@ namespace ExpressBase.Objects
 
         public override void ReplaceRefid(Dictionary<string, string> RefidMap)
         {
-            foreach (var Tile in this.Tiles)
+            foreach (Tiles Tile in this.Tiles)
             {
-                if (!string.IsNullOrEmpty(Tile.TileRefId))
+                if (!string.IsNullOrEmpty(Tile.RefId))
                 {
                     if (RefidMap.ContainsKey(Tile.RefId))
                         Tile.RefId = RefidMap[Tile.RefId];
