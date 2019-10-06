@@ -128,9 +128,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 4)]
         public Dictionary<string, string> BotForms { get; set; }
 
+        [DataMember(Order = 5)]
+        public Dictionary<string, string> BotFormsDisp { get; set; }
+
         public GetBotForm4UserResponse()
         {
             this.BotForms = new Dictionary<string, string>();
+            this.BotFormsDisp = new Dictionary<string, string>();
         }
     }
 

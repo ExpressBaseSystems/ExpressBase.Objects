@@ -936,7 +936,7 @@ else {pg.MakeReadWrite('ValueMember');}")]
 
         public override string GetBareHtml()
         {
-            return this.EbPowerSelect.GetBareHtml();
+            return this.EbPowerSelect.GetBareHtml("@ebsid@"); // temp
         }
 
         public string GetSelectQuery(IDatabase DataDB, Service service, string Col, string Tbl = null, string _id = null)
