@@ -342,7 +342,7 @@ namespace ExpressBase.Objects
                 if (_table.TableName != _schema.MasterTable)
                     _id = _schema.MasterTable + "_id";
 
-                query += string.Format("SELECT {0} FROM {1} WHERE {2} = :id AND eb_del='F' {3};", _cols, _table.TableName, _id, _table.TableType == WebFormTableTypes.Grid ? "ORDER BY eb_row_num" : "ORDER BY id");
+                query += string.Format("SELECT {0} FROM {1} WHERE {2} = :id AND (eb_del='F' OR eb_del IS null) {3};", _cols, _table.TableName, _id, _table.TableType == WebFormTableTypes.Grid ? "ORDER BY eb_row_num" : "ORDER BY id");
 
                 foreach (ColumnSchema Col in _table.Columns)
                 {
@@ -386,7 +386,7 @@ namespace ExpressBase.Objects
                         _dupcols += string.Format(", {0}_ebbkup = {0}, {0} = CONCAT({0}, '_ebbkup')", _column.ColumnName);
                     }
                 }
-                query += string.Format("UPDATE {0} SET eb_del='T',eb_lastmodified_by = :eb_lastmodified_by, eb_lastmodified_at = " + DataDB.EB_CURRENT_TIMESTAMP + " {1} WHERE {2} = :id AND eb_del='F';", _table.TableName, _dupcols, _id);
+                query += string.Format("UPDATE {0} SET eb_del='T',eb_lastmodified_by = :eb_lastmodified_by, eb_lastmodified_at = " + DataDB.EB_CURRENT_TIMESTAMP + " {1} WHERE {2} = :id AND (eb_del='F' OR eb_del IS null);", _table.TableName, _dupcols, _id);
             }
             return query;
         }
@@ -401,7 +401,7 @@ namespace ExpressBase.Objects
                 string _id = "id";
                 if (_table.TableName != _schema.MasterTable)
                     _id = _schema.MasterTable + "_id";
-                query += string.Format("UPDATE {0} SET eb_void='T',eb_lastmodified_by = :eb_lastmodified_by, eb_lastmodified_at = " + DataDB.EB_CURRENT_TIMESTAMP + " WHERE {1} = :id AND eb_void='F' AND eb_del='F';", _table.TableName, _id);
+                query += string.Format("UPDATE {0} SET eb_void='T',eb_lastmodified_by = :eb_lastmodified_by, eb_lastmodified_at = " + DataDB.EB_CURRENT_TIMESTAMP + " WHERE {1} = :id AND (eb_void='F' OR eb_void IS null) AND (eb_del='F' OR eb_del IS null);", _table.TableName, _id);
             }
             return query;
         }
@@ -427,9 +427,9 @@ namespace ExpressBase.Objects
         {
             string _qry;
             if (tblName.Equals(masterTbl))
-                _qry = string.Format("UPDATE {0} SET {2} eb_lastmodified_by = :eb_modified_by, eb_lastmodified_at = {1} WHERE id = {3} AND eb_del = 'F';", tblName, DataDB.EB_CURRENT_TIMESTAMP, "{0}", "{1}");
+                _qry = string.Format("UPDATE {0} SET {2} eb_lastmodified_by = :eb_modified_by, eb_lastmodified_at = {1} WHERE id = {3} AND (eb_del='F' OR eb_del IS null);", tblName, DataDB.EB_CURRENT_TIMESTAMP, "{0}", "{1}");
             else
-                _qry = string.Format("UPDATE {0} SET {3} eb_lastmodified_by = :eb_modified_by, eb_lastmodified_at = {1} WHERE id = {4} AND {2}_id = :{2}_id AND eb_del = 'F';", tblName, DataDB.EB_CURRENT_TIMESTAMP, masterTbl, isDel ? "eb_del = 'T', " : "{0}", "{1}");
+                _qry = string.Format("UPDATE {0} SET {3} eb_lastmodified_by = :eb_modified_by, eb_lastmodified_at = {1} WHERE id = {4} AND {2}_id = :{2}_id AND (eb_del='F' OR eb_del IS null);", tblName, DataDB.EB_CURRENT_TIMESTAMP, masterTbl, isDel ? "eb_del = 'T', " : "{0}", "{1}");
             return _qry;
         }
 
