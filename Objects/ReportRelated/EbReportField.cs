@@ -75,6 +75,26 @@ namespace ExpressBase.Objects
             int colr = ColorTranslator.FromHtml(Color).ToArgb();
             return new BaseColor(colr);
         }
+        public Phrase GetFormattedPhrase(EbFont Font, EbFont _reportFont, string text)
+        {
+            iTextSharp.text.Font iTextFont = null;
+            if (Font is null)
+            {
+                if (!(_reportFont is null))
+                    Font = _reportFont;
+                else
+                    Font = (new EbFont { color = "#000000", FontName = "Times-Roman", Caps = false, Size = 8, Strikethrough = false, Style = 0, Underline = false });
+            }
+            iTextFont = FontFactory.GetFont(Font.FontName, Font.Size, (int)Font.Style);
+            iTextFont.Color = GetColor(Font.color);
+            if (Font.Caps)
+                text = text.ToUpper();
+            if (Font.Strikethrough)
+                iTextFont.SetStyle(iTextSharp.text.Font.STRIKETHRU);
+            if (Font.Underline)
+                iTextFont.SetStyle(iTextSharp.text.Font.UNDERLINE);
+            return new Phrase(text, iTextFont);
+        }
 
         public iTextSharp.text.Font GetItextFont(EbFont Font, EbFont _reportFont)
         {
@@ -84,7 +104,7 @@ namespace ExpressBase.Objects
                 if (!(_reportFont is null))
                     Font = _reportFont;
                 else
-                    Font = (new EbFont { color = "#000000", FontName = "Times-Roman", Caps = false, Size = 10, Strikethrough = false, Style = 0, Underline = false });
+                    Font = (new EbFont { color = "#000000", FontName = "Times-Roman", Caps = false, Size = 8, Strikethrough = false, Style = 0, Underline = false });
             }
             iTextFont = FontFactory.GetFont(Font.FontName, Font.Size, (int)Font.Style);
             iTextFont.Color = GetColor(Font.color);
@@ -96,7 +116,6 @@ namespace ExpressBase.Objects
                 iTextFont.SetStyle(iTextSharp.text.Font.UNDERLINE);
             return iTextFont;
         }
-        private iTextSharp.text.Font iTextFont = null;
 
         public virtual void DrawMe(float printingTop, EbReport Rep, List<Param> Linkparams, int slno) { }
 
@@ -242,7 +261,7 @@ namespace ExpressBase.Objects
             Phrase phrase = null;
             if (WaterMarkText != string.Empty)
             {
-                phrase = new Phrase(WaterMarkText, GetItextFont(this.Font, Rep.Font));
+                phrase = GetFormattedPhrase(this.Font, Rep.Font, WaterMarkText);
                 PdfContentByte canvas;
                 canvas = Rep.Writer.DirectContentUnder;
                 ColumnText.ShowTextAligned(canvas, (int)TextAlign, phrase, Rep.Doc.PageSize.Width / 2, Rep.Doc.PageSize.Height / 2, Rotation);
@@ -301,7 +320,7 @@ namespace ExpressBase.Objects
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
             string column_val = FormatDate(Rep.CurrentTimestamp.ToString(), Format, Rep);
-            Phrase phrase = new Phrase(column_val, GetItextFont(this.Font, Rep.Font));
+            Phrase phrase = GetFormattedPhrase(this.Font, Rep.Font, column_val);
             ColumnText ct = new ColumnText(Rep.Canvas);
             ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, 15, (int)TextAlign);
             ct.Go();
@@ -340,7 +359,7 @@ namespace ExpressBase.Objects
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop + Rep.RowHeight);
 
             ColumnText ct = new ColumnText(Rep.Canvas);
-            Phrase phrase = new Phrase(Rep.PageNumber.ToString(), GetItextFont(this.Font, Rep.Font));
+            Phrase phrase = GetFormattedPhrase(this.Font, Rep.Font, Rep.PageNumber.ToString());
             ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, 15, (int)TextAlign);
             ct.Go();
         }
@@ -377,7 +396,7 @@ namespace ExpressBase.Objects
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop + Rep.RowHeight);
 
             ColumnText ct = new ColumnText(Rep.Canvas);
-            Phrase phrase = new Phrase(Rep.PageNumber + "/"/* + writer.PageCount*/, GetItextFont(this.Font, Rep.Font));
+            Phrase phrase = GetFormattedPhrase(this.Font, Rep.Font, Rep.PageNumber + "/"/* + writer.PageCount*/);
             ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, 15, (int)TextAlign);
             ct.Go();
         }
@@ -414,7 +433,7 @@ namespace ExpressBase.Objects
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop + Rep.RowHeight);
 
             ColumnText ct = new ColumnText(Rep.Canvas);
-            Phrase phrase = new Phrase(Rep.RenderingUser.FullName, GetItextFont(this.Font, Rep.Font));
+            Phrase phrase = GetFormattedPhrase(this.Font, Rep.Font, Rep.RenderingUser.FullName);
             ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, 15, (int)TextAlign);
             ct.Go();
         }
@@ -447,7 +466,7 @@ namespace ExpressBase.Objects
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop + Rep.RowHeight);
 
             ColumnText ct = new ColumnText(Rep.Canvas);
-            Phrase phrase = new Phrase(Title, GetItextFont(this.Font, Rep.Font));
+            Phrase phrase = GetFormattedPhrase(this.Font, Rep.Font, Title);
             ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, 15, (int)TextAlign);
             ct.Go();
         }
@@ -487,7 +506,7 @@ namespace ExpressBase.Objects
                     column_val = p.Value;
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
-            Phrase phrase = new Phrase(column_val, GetItextFont(this.Font, Rep.Font));
+            Phrase phrase = GetFormattedPhrase(this.Font, Rep.Font, column_val);
             ColumnText ct = new ColumnText(Rep.Canvas);
             ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, 15, (int)TextAlign);
             ct.Go();
@@ -528,7 +547,7 @@ namespace ExpressBase.Objects
                     column_val = p.Value;
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
-            Phrase phrase = new Phrase(column_val, GetItextFont(this.Font, Rep.Font));
+            Phrase phrase = GetFormattedPhrase(this.Font, Rep.Font, column_val);
             ColumnText ct = new ColumnText(Rep.Canvas);
             ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, 15, (int)TextAlign);
             ct.Go();
@@ -569,7 +588,7 @@ namespace ExpressBase.Objects
                     column_val = p.Value;
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
-            Phrase phrase = new Phrase(column_val, GetItextFont(this.Font, Rep.Font));
+            Phrase phrase = GetFormattedPhrase(this.Font, Rep.Font, column_val);
             ColumnText ct = new ColumnText(Rep.Canvas);
             ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, 15, (int)TextAlign);
             ct.Go();
@@ -615,7 +634,7 @@ namespace ExpressBase.Objects
             column_val = FormatDate(column_val, Format, Rep);
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
-            Phrase phrase = new Phrase(column_val, GetItextFont(this.Font, Rep.Font));
+            Phrase phrase = GetFormattedPhrase(this.Font, Rep.Font, column_val);
             ColumnText ct = new ColumnText(Rep.Canvas);
             ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, 15, (int)TextAlign);
             ct.Go();
@@ -657,7 +676,7 @@ namespace ExpressBase.Objects
                     column_val = p.Value;
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
-            Phrase phrase = new Phrase(column_val, GetItextFont(this.Font, Rep.Font));
+            Phrase phrase = GetFormattedPhrase(this.Font, Rep.Font, column_val);
             ColumnText ct = new ColumnText(Rep.Canvas);
             ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, 15, (int)TextAlign);
             ct.Go();
@@ -885,7 +904,7 @@ namespace ExpressBase.Objects
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
 
-            Phrase phrase = new Phrase((Rep.iDetailRowPos + 1).ToString(), GetItextFont(this.Font, Rep.Font));
+            Phrase phrase = GetFormattedPhrase(this.Font, Rep.Font, (Rep.iDetailRowPos + 1).ToString());
             ColumnText ct = new ColumnText(Rep.Canvas);
             ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, 15, (int)TextAlign);
             ct.Go();
@@ -934,7 +953,7 @@ namespace ExpressBase.Objects
             pg.MakeReadOnly('Title');
         ")]
         [EnableInBuilder(BuilderType.Report)]
-        public override string Title { set; get; } 
+        public override string Title { set; get; }
 
         public override string GetDesignHtml()
         {
@@ -959,7 +978,7 @@ namespace ExpressBase.Objects
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
 
-            Phrase phrase = new Phrase(column_val, GetItextFont(this.Font, Rep.Font)); 
+            Phrase phrase = GetFormattedPhrase(this.Font, Rep.Font, column_val);
             ColumnText ct = new ColumnText(Rep.Canvas);
             ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, 15, (int)TextAlign);
             ct.Go();
