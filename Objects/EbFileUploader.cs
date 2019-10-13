@@ -238,11 +238,13 @@ WHERE
             return fullqry;
         }
 
-        public string GetUpdateQuery2(IDatabase DataDB, List<DbParameter> param, SingleTable Table, string mastertbl, string EbObId, ref int i, int dataId, string cxt2)
+        public string GetUpdateQuery2(IDatabase DataDB, List<DbParameter> param, SingleTable Table, string mastertbl, string EbObId, ref int i, int dataId, string secCxtGet, string secCxtSet)
         {
-            string InnerVal = string.Empty;
-            string Innercxt = string.Empty;
-            List<string> InnerIds = new List<string>();
+            string pCxtVal = string.Empty;
+            string sCxtGetVal = string.Empty;
+            string sCxtSetVal = string.Empty;
+            //string priCxt = string.Empty;
+            List<string> refIds = new List<string>();
             string fullqry = string.Empty;
             
             foreach (SingleRow row in Table)
@@ -250,44 +252,46 @@ WHERE
                 string cn = this.Name + "_" + i.ToString();
                 i++;
                 param.Add(DataDB.GetNewParameter(cn, EbDbTypes.Decimal, row.Columns[0].Value));
-                InnerIds.Add(":" + cn);
+                refIds.Add(":" + cn);
             }
-            if (dataId == 0)
+            if (!secCxtGet.IsNullOrEmpty())
             {
-                Innercxt = string.Format("context = CONCAT('{0}_', TRIM(CAST(eb_currval('{1}_id_seq') AS CHAR(32))), '_{2}')", EbObId, mastertbl, this.Name);
-                InnerVal = string.Format("( CONCAT('{0}_', TRIM(CAST(eb_currval('{1}_id_seq') AS CHAR(32))), '_{2}'))", EbObId, mastertbl, this.Name);
-            }
-            else
-            {
-                Innercxt = string.Format("context = '{0}_{1}_{2}'", EbObId, dataId, this.Name);
-                InnerVal = string.Format("('{0}_{1}_{2}')", EbObId, dataId, this.Name);
-            }
-            if (!cxt2.IsNullOrEmpty())
-            {
-                InnerVal += ", context_sec = :context2_" + i;
-                param.Add(DataDB.GetNewParameter("context2_" + i, EbDbTypes.String, cxt2));
+                sCxtGetVal = "contextget_" + i;
                 i++;
+                param.Add(DataDB.GetNewParameter(sCxtGetVal, EbDbTypes.String, secCxtGet));
+            } 
+            if (!secCxtSet.IsNullOrEmpty())
+            {
+                sCxtSetVal = "contextset_" + i;
+                i++;
+                param.Add(DataDB.GetNewParameter(sCxtSetVal, EbDbTypes.String, secCxtSet));
             }
-            if (InnerIds.Count > 0)
+
+            if (dataId == 0)
+                pCxtVal = string.Format("CONCAT('{0}_', TRIM(CAST(eb_currval('{1}_id_seq') AS CHAR(32))), '_{2}')", EbObId, mastertbl, this.Name);
+            else
+                pCxtVal = string.Format("'{0}_{1}_{2}'", EbObId, dataId, this.Name);
+           
+            if (refIds.Count > 0)
             {
 
-                for (int k = 0; k < InnerIds.Count; k++)
+                for (int k = 0; k < refIds.Count; k++)
                 {
-                    fullqry += string.Format(@"UPDATE 
-                                            eb_files_ref AS t
-                                        SET
-                                            context = {0}                                        
-                                        WHERE
-                                           t.id = {1} AND t.eb_del = 'F';", InnerVal, InnerIds[k]);
+                    fullqry += string.Format(@" UPDATE eb_files_ref SET context = {0} @upCxt@ 
+                                                    WHERE id = {1} AND eb_del <> 'T' AND context = 'default' @secCxt@;"
+                                                .Replace("@secCxt@", !secCxtGet.IsNullOrEmpty() ? "AND context_sec IS NULL" : "")
+                                                .Replace("@upCxt@", !secCxtSet.IsNullOrEmpty()? ", context_sec = :{2}" : ""), pCxtVal, refIds[k], sCxtSetVal);
                 }
 
                 fullqry += string.Format(@"UPDATE eb_files_ref SET eb_del='T' 
-                                            WHERE ({0}) AND eb_del='F' AND id NOT IN ({1});", Innercxt, InnerIds.Join(","));
+                                            WHERE (context = {0} @secCxt@) AND eb_del='F' AND id NOT IN ({1});"
+                                            .Replace("@secCxt@", !secCxtGet.IsNullOrEmpty() ? "OR context_sec = :{2}" : ""), pCxtVal, refIds.Join(","), sCxtGetVal);
             }
             else // if all files deleted
             {
                 fullqry += string.Format(@"UPDATE eb_files_ref SET eb_del='T' 
-                                            WHERE ({0}) AND eb_del='F';", Innercxt);
+                                            WHERE (context = {0} @secCxt@) AND eb_del='F';"
+                                            .Replace("@secCxt@", !secCxtGet.IsNullOrEmpty() ? "OR context_sec = :{1}": ""), pCxtVal, sCxtGetVal);
             }
             return fullqry;
         }

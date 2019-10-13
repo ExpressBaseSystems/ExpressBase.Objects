@@ -1189,9 +1189,10 @@ namespace ExpressBase.Objects
                     if (this.FormGlobals == null)
                         this.FormGlobals = GetFormAsFlatGlobal(this.FormData);
                     EbFileUploader _c = control as EbFileUploader;
-                    string cxt2 = _c.ExeContextCode(this.FormGlobals, true);
+                    string secCxtGet = _c.ExeContextCode(this.FormGlobals, false);
+                    string secCxtSet = _c.ExeContextCode(this.FormGlobals, true);
 
-                    _qry = _c.GetUpdateQuery2(DataDB, param, this.FormData.ExtendedTables[_c.Name ?? _c.EbSid], this.TableName, this.RefId.Split("-")[3], ref i, this.TableRowId, cxt2);
+                    _qry = _c.GetUpdateQuery2(DataDB, param, this.FormData.ExtendedTables[_c.Name ?? _c.EbSid], this.TableName, this.RefId.Split("-")[3], ref i, this.TableRowId, secCxtGet, secCxtSet);
                 }
             }
             return _qry;
