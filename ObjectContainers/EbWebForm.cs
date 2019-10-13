@@ -59,6 +59,8 @@ namespace ExpressBase.Objects
 
         public Eb_Solution SolutionObj { get; set; }
 
+        public FormAsGlobal FormGlobals { get; set; }
+
         [PropertyGroup("Events")]
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.Collection)]
@@ -355,9 +357,16 @@ namespace ExpressBase.Objects
             bool MuCtrlFound = false;
             foreach (Object Ctrl in _schema.ExtendedControls)
             {
-                if (Ctrl is EbFileUploader)
-                    extquery += (Ctrl as EbFileUploader).GetSelectQuery();
-                else if (Ctrl is EbProvisionUser && !MuCtrlFound)
+                //if (Ctrl is EbFileUploader)
+                //{
+                //    if (this.FormGlobals == null)
+                //        this.FormGlobals = GetFormAsFlatGlobal();
+
+                //    string cxt2 = (Ctrl as EbFileUploader).ExeContextCode(this.FormGlobals, false);
+
+                //    extquery += (Ctrl as EbFileUploader).GetSelectQuery(cxt2);
+                //}else
+                if (Ctrl is EbProvisionUser && !MuCtrlFound)
                 {
                     extquery += (Ctrl as EbProvisionUser).GetSelectQuery();
                     MuCtrlFound = true;
@@ -431,6 +440,35 @@ namespace ExpressBase.Objects
             else
                 _qry = string.Format("UPDATE {0} SET {3} eb_lastmodified_by = :eb_modified_by, eb_lastmodified_at = {1} WHERE id = {4} AND {2}_id = :{2}_id AND (eb_del='F' OR eb_del IS null);", tblName, DataDB.EB_CURRENT_TIMESTAMP, masterTbl, isDel ? "eb_del = 'T', " : "{0}", "{1}");
             return _qry;
+        }
+
+        public FormAsGlobal GetFormAsFlatGlobal(WebformData _formdata)
+        {
+            FormAsGlobal _globals = new FormAsGlobal { Name = this.Name };
+            ListNTV listNTV = new ListNTV();
+            try
+            {
+                foreach (KeyValuePair<string, SingleTable> item in _formdata.MultipleTables)
+                {
+                    foreach (SingleColumn col in item.Value[0].Columns)
+                    {
+                        if (!(col.Name == "id" && item.Key != _formdata.MasterTable) && item.Value.Count == 1)
+                        {
+                            NTV n = GetNtvFromFormData(_formdata, item.Key, 0, col.Name);
+                            if (n != null)
+                                listNTV.Columns.Add(n);
+                        }
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine("Exception in GetFormAsFlatGlobal. Message : " + ex.Message);
+                Console.WriteLine(ex.StackTrace);
+            }
+            
+            _globals.Add(listNTV);
+            return _globals;
         }
 
         //get formdata as globals for c# script engine
@@ -812,33 +850,33 @@ namespace ExpressBase.Objects
                     SingleTable Table = new SingleTable();
                     if (!(UserTable != null && Ctrl is EbProvisionUser))
                         GetFormattedData(dataset.Tables[tableIndex], Table);
-                    if (Ctrl is EbFileUploader)
-                    {
-                        List<FileMetaInfo> _list = new List<FileMetaInfo>();
-                        foreach (SingleRow dr in Table)
-                        {
-                            FileMetaInfo info = new FileMetaInfo
-                            {
-                                FileRefId = dr["id"],
-                                FileName = dr["filename"],
-                                Meta = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(dr["tags"] as string),
-                                UploadTime = dr["uploadts"],
-                                FileCategory = (EbFileCategory)Convert.ToInt32(dr["filecategory"])
-                            };
+                    //if (Ctrl is EbFileUploader)
+                    //{
+                        //List<FileMetaInfo> _list = new List<FileMetaInfo>();
+                        //foreach (SingleRow dr in Table)
+                        //{
+                        //    FileMetaInfo info = new FileMetaInfo
+                        //    {
+                        //        FileRefId = dr["id"],
+                        //        FileName = dr["filename"],
+                        //        Meta = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(dr["tags"] as string),
+                        //        UploadTime = dr["uploadts"],
+                        //        FileCategory = (EbFileCategory)Convert.ToInt32(dr["filecategory"])
+                        //    };
 
-                            if (!_list.Contains(info))
-                                _list.Add(info);
-                        }
-                        SingleTable _Table = new SingleTable {
-                            new SingleRow() {
-                                Columns = new List<SingleColumn> {
-                                    new SingleColumn { Name = "Files", Type = (int)EbDbTypes.Json, Value = JsonConvert.SerializeObject(_list) }
-                                }
-                            }
-                        };
-                        _FormData.ExtendedTables.Add((Ctrl as EbControl).EbSid, _Table);
-                    }
-                    else if (Ctrl is EbProvisionUser)
+                        //    if (!_list.Contains(info))
+                        //        _list.Add(info);
+                        //}
+                        //SingleTable _Table = new SingleTable {
+                        //    new SingleRow() {
+                        //        Columns = new List<SingleColumn> {
+                        //            new SingleColumn { Name = "Files", Type = (int)EbDbTypes.Json, Value = JsonConvert.SerializeObject(_list) }
+                        //        }
+                        //    }
+                        //};
+                        //_FormData.ExtendedTables.Add((Ctrl as EbControl).EbSid, _Table);
+                    //}else
+                    if (Ctrl is EbProvisionUser)
                     {
                         Dictionary<string, dynamic> _d = new Dictionary<string, dynamic>();
                         if (UserTable == null)
@@ -883,6 +921,53 @@ namespace ExpressBase.Objects
                     tableIndex++;
                 }
             }
+
+            foreach (Object Ctrl in _schema.ExtendedControls)
+            {
+                if (Ctrl is EbFileUploader)
+                {
+                    if (this.FormGlobals == null)
+                        this.FormGlobals = GetFormAsFlatGlobal(_FormData);
+                    string cxt2 = (Ctrl as EbFileUploader).ExeContextCode(this.FormGlobals, false);
+                    string qry = (Ctrl as EbFileUploader).GetSelectQuery(string.IsNullOrEmpty(cxt2));
+
+                    EbDataTable dt = DataDB.DoQuery(qry, new DbParameter[]
+                    {
+                        DataDB.GetNewParameter("id", EbDbTypes.Int32, this.TableRowId),
+                        DataDB.GetNewParameter("context", EbDbTypes.String, context),
+                        DataDB.GetNewParameter("context_sec", EbDbTypes.String, cxt2 ?? string.Empty),
+                        DataDB.GetNewParameter("eb_ver_id", EbDbTypes.Int32, this.RefId.Split("-")[4])
+                    });
+
+                    SingleTable Table = new SingleTable();
+                    GetFormattedData(dt, Table);
+
+                    List<FileMetaInfo> _list = new List<FileMetaInfo>();
+                    foreach (SingleRow dr in Table)
+                    {
+                        FileMetaInfo info = new FileMetaInfo
+                        {
+                            FileRefId = dr["id"],
+                            FileName = dr["filename"],
+                            Meta = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(dr["tags"] as string),
+                            UploadTime = dr["uploadts"],
+                            FileCategory = (EbFileCategory)Convert.ToInt32(dr["filecategory"])
+                        };
+
+                        if (!_list.Contains(info))
+                            _list.Add(info);
+                    }
+                    SingleTable _Table = new SingleTable {
+                            new SingleRow() {
+                                Columns = new List<SingleColumn> {
+                                    new SingleColumn { Name = "Files", Type = (int)EbDbTypes.Json, Value = JsonConvert.SerializeObject(_list) }
+                                }
+                            }
+                        };
+                    _FormData.ExtendedTables.Add((Ctrl as EbControl).EbSid, _Table);
+                }
+            }
+
 
             if (!psquery.IsNullOrEmpty())
             {
@@ -1080,7 +1165,8 @@ namespace ExpressBase.Objects
             }
 
             fullqry += _extqry;
-            fullqry += EbFileUploader.GetUpdateQuery(DataDB, param, FormData.ExtendedTables, this.TableName, this.RefId.Split("-")[3], ref i, this.TableRowId);
+            //fullqry += EbFileUploader.GetUpdateQuery(DataDB, param, FormData.ExtendedTables, this.TableName, this.RefId.Split("-")[3], ref i, this.TableRowId);
+            fullqry += GetFileUploaderUpdateQuery(DataDB, param, ref i);
 
             param.Add(DataDB.GetNewParameter(this.FormData.MasterTable + "_id", EbDbTypes.Int32, this.TableRowId));
             param.Add(DataDB.GetNewParameter("eb_loc_id", EbDbTypes.Int32, this.LocationId));
@@ -1091,6 +1177,24 @@ namespace ExpressBase.Objects
             return DataDB.InsertTable(fullqry, param.ToArray());
             //var zz = DataDB.DoQueries(fullqry, param.ToArray());
             //return 1;
+        }
+
+        public string GetFileUploaderUpdateQuery(IDatabase DataDB, List<DbParameter> param, ref int i)
+        {
+            string _qry = string.Empty;
+            foreach(object control in this.FormSchema.ExtendedControls)
+            {
+                if(control is EbFileUploader)
+                {
+                    if (this.FormGlobals == null)
+                        this.FormGlobals = GetFormAsFlatGlobal(this.FormData);
+                    EbFileUploader _c = control as EbFileUploader;
+                    string cxt2 = _c.ExeContextCode(this.FormGlobals, true);
+
+                    _qry = _c.GetUpdateQuery2(DataDB, param, this.FormData.ExtendedTables[_c.Name ?? _c.EbSid], this.TableName, this.RefId.Split("-")[3], ref i, this.TableRowId, cxt2);
+                }
+            }
+            return _qry;
         }
 
         public int Insert(IDatabase DataDB)
@@ -1120,7 +1224,8 @@ namespace ExpressBase.Objects
             }
 
             fullqry += _extqry;
-            fullqry += EbFileUploader.GetUpdateQuery(DataDB, param, FormData.ExtendedTables, this.TableName, this.RefId.Split("-")[3], ref i, 0);
+            //fullqry += EbFileUploader.GetUpdateQuery(DataDB, param, FormData.ExtendedTables, this.TableName, this.RefId.Split("-")[3], ref i, 0);
+            fullqry += GetFileUploaderUpdateQuery(DataDB, param, ref i);
 
             param.Add(DataDB.GetNewParameter("eb_createdby", EbDbTypes.Int32, this.UserObj.UserId));
             param.Add(DataDB.GetNewParameter("eb_loc_id", EbDbTypes.Int32, this.LocationId));

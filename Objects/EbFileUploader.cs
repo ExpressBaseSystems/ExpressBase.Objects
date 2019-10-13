@@ -4,6 +4,9 @@ using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
 using ExpressBase.Objects.Helpers;
+using ExpressBase.Objects.Objects;
+using Microsoft.CodeAnalysis.CSharp.Scripting;
+using Microsoft.CodeAnalysis.Scripting;
 using Newtonsoft.Json;
 using ServiceStack;
 using System;
@@ -82,6 +85,15 @@ namespace ExpressBase.Objects
         [PropertyGroup("Crop Properties")]
         public bool ResizeViewPort { set; get; }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
+        public EbScript ContextGetExpr { set; get; }
+
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
+        public EbScript ContextSetExpr { set; get; }
+
         [OnDeserialized]
         public void OnDeserializedMethod(StreamingContext context)
         {
@@ -151,15 +163,27 @@ namespace ExpressBase.Objects
         }
 
         //INCOMPLETE
-        public string GetSelectQuery()
+        public string GetSelectQuery(bool pri_cxt_only = true)
         {
-            string Qry = @"
+            string Qry;
+            if(pri_cxt_only)
+            Qry = @"
 SELECT 
 	B.id, B.filename, B.tags, B.uploadts,B.filecategory
 FROM
 	eb_files_ref B
 WHERE
 	B.context = CONCAT(:context, '_@Name@') AND B.eb_del = 'F';".Replace("@Name@", this.Name?? this.EbSid);
+
+            else
+                Qry = @"
+SELECT 
+	B.id, B.filename, B.tags, B.uploadts,B.filecategory
+FROM
+	eb_files_ref B
+WHERE
+	(B.context = CONCAT(:context, '_@Name@') OR B.context_sec = :context_sec) AND B.eb_del = 'F';"
+        .Replace("@Name@", this.Name ?? this.EbSid);
 
             return Qry;
         }
@@ -213,7 +237,100 @@ WHERE
             }
             return fullqry;
         }
-        
+
+        public string GetUpdateQuery2(IDatabase DataDB, List<DbParameter> param, SingleTable Table, string mastertbl, string EbObId, ref int i, int dataId, string cxt2)
+        {
+            string InnerVal = string.Empty;
+            string Innercxt = string.Empty;
+            List<string> InnerIds = new List<string>();
+            string fullqry = string.Empty;
+            
+            foreach (SingleRow row in Table)
+            {
+                string cn = this.Name + "_" + i.ToString();
+                i++;
+                param.Add(DataDB.GetNewParameter(cn, EbDbTypes.Decimal, row.Columns[0].Value));
+                InnerIds.Add(":" + cn);
+            }
+            if (dataId == 0)
+            {
+                Innercxt = string.Format("context = CONCAT('{0}_', TRIM(CAST(eb_currval('{1}_id_seq') AS CHAR(32))), '_{2}')", EbObId, mastertbl, this.Name);
+                InnerVal = string.Format("( CONCAT('{0}_', TRIM(CAST(eb_currval('{1}_id_seq') AS CHAR(32))), '_{2}'))", EbObId, mastertbl, this.Name);
+            }
+            else
+            {
+                Innercxt = string.Format("context = '{0}_{1}_{2}'", EbObId, dataId, this.Name);
+                InnerVal = string.Format("('{0}_{1}_{2}')", EbObId, dataId, this.Name);
+            }
+            if (!cxt2.IsNullOrEmpty())
+            {
+                InnerVal += ", context_sec = :context2_" + i;
+                param.Add(DataDB.GetNewParameter("context2_" + i, EbDbTypes.String, cxt2));
+                i++;
+            }
+            if (InnerIds.Count > 0)
+            {
+
+                for (int k = 0; k < InnerIds.Count; k++)
+                {
+                    fullqry += string.Format(@"UPDATE 
+                                            eb_files_ref AS t
+                                        SET
+                                            context = {0}                                        
+                                        WHERE
+                                           t.id = {1} AND t.eb_del = 'F';", InnerVal, InnerIds[k]);
+                }
+
+                fullqry += string.Format(@"UPDATE eb_files_ref SET eb_del='T' 
+                                            WHERE ({0}) AND eb_del='F' AND id NOT IN ({1});", Innercxt, InnerIds.Join(","));
+            }
+            else // if all files deleted
+            {
+                fullqry += string.Format(@"UPDATE eb_files_ref SET eb_del='T' 
+                                            WHERE ({0}) AND eb_del='F';", Innercxt);
+            }
+            return fullqry;
+        }
+
+        public string ExeContextCode(FormAsGlobal globals, bool set)
+        {
+            string code = string.Empty;
+            string result = null;
+            if (set)
+            {
+                if (this.ContextSetExpr != null && !this.ContextSetExpr.Code.IsNullOrEmpty())
+                    code = this.ContextSetExpr.Code;
+            }
+            else
+            {
+                if (this.ContextGetExpr != null && !this.ContextGetExpr.Code.IsNullOrEmpty())
+                    code = this.ContextGetExpr.Code;
+            }
+            if(code != string.Empty)
+            {
+                try
+                {
+                    Script valscript = CSharpScript.Create<dynamic>(
+                        code,
+                        ScriptOptions.Default.WithReferences("Microsoft.CSharp", "System.Core").WithImports("System.Dynamic", "System", "System.Collections.Generic",
+                        "System.Diagnostics", "System.Linq"),
+                        globalsType: typeof(FormGlobals)
+                    );
+                    valscript.Compile();
+                    FormGlobals global = new FormGlobals() { form = globals };
+                    var r = (valscript.RunAsync(global)).Result.ReturnValue;
+                    result = r.ToString();
+                }
+                catch(Exception ex)
+                {
+                    Console.WriteLine("Exception in C# Expression evaluation. \nMessage : " + ex.Message);
+                    Console.WriteLine(ex.StackTrace);
+                }
+            }
+            return result;
+        }
+
+
         [JsonIgnore]
         public override string EnableJSfn { get { return @"$('#cont_' + this.EbSid_CtxId + ' .FUP_Head_W').prop('disabled',false).css('pointer-events', 'inherit');"; } set { } }
 
