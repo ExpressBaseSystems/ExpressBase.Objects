@@ -137,7 +137,8 @@ namespace ExpressBase.Objects
 
         public Phrase GetPhrase(string column_val, DbType column_type, EbFont _reportFont)
         {
-            Phrase phrase = new Phrase(column_val, GetItextFont(this.Font, _reportFont));
+          
+            Phrase phrase = GetFormattedPhrase(this.Font, _reportFont, column_val); 
 
             if (this.RenderInMultiLine)
             {
@@ -167,7 +168,7 @@ namespace ExpressBase.Objects
                     }
                 }
             }
-            return new Phrase(column_val, GetItextFont(this.Font, _reportFont)); ;
+            return GetFormattedPhrase(this.Font, _reportFont, column_val);
         }
 
         public Anchor CreateLink(Phrase phrase, string LinkRefid, Document doc, List<Param> Params)
@@ -335,7 +336,7 @@ namespace ExpressBase.Objects
             string column_val = Rep.GetDataFieldtValue(ColumnName, slno, TableIndex);
             if (Prefix != "" || Suffix != "")
                 column_val = Prefix + " " + column_val + " " + Suffix;
-            Phrase phrase = new Phrase(column_val, GetItextFont(this.Font, Rep.Font));
+            Phrase phrase = GetFormattedPhrase(this.Font, Rep.Font, column_val);
             if (!string.IsNullOrEmpty(LinkRefId))
             {
                 Anchor a = CreateLink(phrase, LinkRefId, Rep.Doc, Params);
@@ -744,7 +745,7 @@ namespace ExpressBase.Objects
             string column_val = SummarizedValue.ToString();
             if (Prefix != "" || Suffix != "")
                 column_val = Prefix + " " + column_val + " " + Suffix;
-            Phrase phrase = new Phrase(column_val, GetItextFont(this.Font, Rep.Font));
+            Phrase phrase = GetFormattedPhrase(this.Font, Rep.Font, column_val);
 
             if (!string.IsNullOrEmpty(LinkRefId))
             {
@@ -1248,7 +1249,7 @@ namespace ExpressBase.Objects
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
             string column_val = SummarizedValue.ToString();
-            Phrase phrase = new Phrase(column_val, GetItextFont(this.Font, Rep.Font));
+            Phrase phrase = GetFormattedPhrase(this.Font, Rep.Font, column_val);
             ColumnText ct = new ColumnText(Rep.Canvas);
             if (!string.IsNullOrEmpty(LinkRefId))
             {
