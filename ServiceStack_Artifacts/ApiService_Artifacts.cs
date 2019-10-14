@@ -222,6 +222,11 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 2)]
         public List<AppDataToMob> Applications { get; set; }
+
+        public GetMobMenuResonse()
+        {
+            Applications = new List<AppDataToMob>();
+        }
     }
 
     [RuntimeSerializable]
