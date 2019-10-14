@@ -200,13 +200,13 @@ namespace ExpressBase.Objects.Objects
 
     public class FormGlobals
     {
-        public dynamic FORM { get; set; }
+        public dynamic form { get; set; }
 
-        public dynamic USER { get; set; }
+        public dynamic user { get; set; }
 
         public FormGlobals()
         {
-            this.FORM = new FormAsGlobal();
+            this.form = new FormAsGlobal();
         }
     }
 

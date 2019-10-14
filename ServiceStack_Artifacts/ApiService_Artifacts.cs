@@ -206,6 +206,29 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public EbApi Api { get; set; }
     }
 
+    [DataContract]
+    public class GetMobMenuRequest : IReturn<GetMobMenuResonse>, IEbSSRequest
+    {
+        public string SolnId { get; set; }
+
+        public int UserId { get; set; }
+    }
+
+    [DataContract]
+    public class GetMobMenuResonse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 2)]
+        public List<AppDataToMob> Applications { get; set; }
+
+        public GetMobMenuResonse()
+        {
+            Applications = new List<AppDataToMob>();
+        }
+    }
+
     [RuntimeSerializable]
     public class JsonTableSet
     {
@@ -369,4 +392,14 @@ END;";
 
         public int FileRefId { set; get; }
     }
+
+    public class AppDataToMob
+    {
+        public int AppId { set; get; }
+
+        public string AppName { set; get; }
+
+        public string AppIcon { set; get; }
+    }
+    
 }

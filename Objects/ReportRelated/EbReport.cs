@@ -602,6 +602,9 @@ namespace ExpressBase.Objects
         public void DrawDetail()
         {
             RowColletion rows = (DataSourceRefId != string.Empty) ? DataSet.Tables[DetailTableIndex].Rows : null;
+
+            ph_Yposition = (PageNumber == 1) ? ReportHeaderHeight : 0;
+            dt_Yposition = ph_Yposition + PageHeaderHeight;
             if (rows != null && HasRows == true)
             {
                 for (iDetailRowPos = 0; iDetailRowPos < rows.Count; iDetailRowPos++)
@@ -696,10 +699,9 @@ namespace ExpressBase.Objects
             RowHeight = 0;
             MultiRowTop = 0;
             string column_val = string.Empty;
-
+            
             ph_Yposition = (PageNumber == 1) ? ReportHeaderHeight : 0;
             dt_Yposition = ph_Yposition + PageHeaderHeight;
-
             foreach (EbReportDetail detail in Detail)
             {
                 EbDataField[] SortedList = FieldsNotSummaryPerDetail[detail];

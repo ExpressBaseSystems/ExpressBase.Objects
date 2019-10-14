@@ -202,5 +202,39 @@ namespace ExpressBase.Objects
         {
             EbFormHelper.ReplaceRefid(this, RefidMap);
         }
+
+        public void SetDataObjectControl(IDatabase DataDB, Service Service)
+        {
+            Dictionary<string, EbDataTable> _tables = new Dictionary<string, EbDataTable>();
+            EbControl[] Allctrls = this.Controls.FlattenAllEbControls();
+            for (int i = 0; i < Allctrls.Length; i++)
+            {
+                if(Allctrls[i] is EbDataObject)
+                {
+                    EbDataObject c = Allctrls[i] as EbDataObject;
+                    EbDataReader _temp = Service.Redis.Get<EbDataReader>(c.DataSource);
+                    if (_temp == null)
+                    {
+                        var result = Service.Gateway.Send<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = c.DataSource });
+                        _temp = EbSerializers.Json_Deserialize(result.Data[0].Json);
+                        Service.Redis.Set<EbDataReader>(c.DataSource, _temp);
+                    }
+
+                    EbDataTable data = DataDB.DoQuery(_temp.Sql);
+                    _tables.Add(c.Name, data);
+                }
+            }
+
+            for (int i = 0; i < Allctrls.Length; i++)
+            {
+                if (Allctrls[i] is EbDataLabel)
+                {
+                    EbDataLabel c = Allctrls[i] as EbDataLabel;
+                    c.DynamicLabel = _tables[c.DataObjCtrlName].Rows[0][c.DataObjColName].ToString();
+                }
+            }
+
+        }
+
     }
 }
