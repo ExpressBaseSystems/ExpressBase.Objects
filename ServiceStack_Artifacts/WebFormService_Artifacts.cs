@@ -342,6 +342,29 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
+    [DataContract]
+    public class GetDistinctValuesRequest : EbServiceStackAuthRequest, IReturn<GetDistinctValuesResponse>
+    {
+        [DataMember(Order = 1)]
+        public string TableName { get; set; }  
+        
+        [DataMember(Order = 2)]
+        public string ColumnName { get; set; }
+
+    }
+
+    [DataContract]
+    public class GetDistinctValuesResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public List<string> Suggestions { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+
+
     [Serializable()]
     public class FormException : Exception
     {

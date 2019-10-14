@@ -174,7 +174,28 @@ namespace ExpressBase.Objects
                 }
             }
 
+            GetSuggestionTableName(this, this.TableName);
+
             CalcValueExprDependency();
+        }
+
+        public void GetSuggestionTableName(EbControlContainer _cont, string _tbl)
+        {
+            foreach(EbControl ctrl in _cont.Controls.Get1stLvlControls())
+            {
+                if(ctrl is EbTextBox)
+                {
+                    if ((ctrl as EbTextBox).AutoSuggestion)
+                        (ctrl as EbTextBox).TableName = _tbl;
+                }
+                else if(ctrl is EbControlContainer)
+                {
+                    string t = _tbl;
+                    if (!(ctrl as EbControlContainer).TableName.IsNullOrEmpty())
+                        t = (ctrl as EbControlContainer).TableName;
+                    GetSuggestionTableName(ctrl as EbControlContainer, t);
+                }
+            }
         }
 
         public void BeforeSave(Service service)
