@@ -193,6 +193,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 4)]
         public List<Param> Params { get; set; }
+
+        [DataMember(Order = 5)]
+        public List<string> Groupings { get; set; }
     }
 
     [DataContract]

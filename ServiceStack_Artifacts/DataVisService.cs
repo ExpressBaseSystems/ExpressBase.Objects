@@ -169,6 +169,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 19)]
         public bool ReplaceEbColumns { get; set; }
 
+        [DataMember(Order = 19)]
+        public string  TableId { get; set; }
+
     }
 
     [Route("/table")]
@@ -320,6 +323,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 16)]
         public bool ReplaceEbColumns { get; set; }
+
+        [DataMember(Order = 16)]
+        public string TableId { get; set; }
     }
 
     [DataContract]
