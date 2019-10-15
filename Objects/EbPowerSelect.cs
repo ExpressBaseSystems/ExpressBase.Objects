@@ -152,6 +152,7 @@ namespace ExpressBase.Objects
         public void OnDeserializedMethod(StreamingContext context)
         {
             this.BareControlHtml = this.GetBareHtml();
+            this.BareControlHtml4Bot = this.BareControlHtml;
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
             if (this.RenderAsSimpleSelect)
             {
@@ -532,7 +533,41 @@ namespace ExpressBase.Objects
 </div>"
     .Replace("@VueSelectCode", this.VueSelectcode)
     .Replace("@name@", this.Name)
-    //.Replace("@ebsid@", this.EbSid_CtxId)
+    .Replace("@ebsid@", this.EbSid_CtxId)
+    .Replace("@width", 900.ToString())//this.Width.ToString())
+    .Replace("@perWidth", (this.DisplayMembers.Count != 0) ? (900 / this.DisplayMembers.Count).ToString() : 900.ToString())
+    .Replace("@DDwidth", (this.DropdownWidth == 0) ? "100" : this.DropdownWidth.ToString())
+    .Replace("@addbtn@", this.IsInsertable ? string.Concat("<div class='ps-addbtn-cont'>", this.AddButton.GetBareHtml(), "</div>") : string.Empty)
+    .Replace("@tooltipText@", this.ToolTipText ?? string.Empty);
+            }
+            else
+                return string.Empty;
+        }
+
+        public string GetBareHtml( string ebsid)// temp
+        {
+            if (this.RenderAsSimpleSelect)
+            {
+                EbSimpleSelect.ContextId = this.ContextId;
+                return EbSimpleSelect.GetBareHtml();
+            }
+
+            if (this.DisplayMembers != null)
+            {
+                return @"
+<div id='@ebsid@Container'  role='form' data-toggle='validator' style='width:100%;'>
+    <input type='hidden' ui-inp name='@ebsid@Hidden4val' data-ebtype='8' id='@ebsid@'/>
+    @VueSelectCode
+    <center class='pow-center'>
+        <div id='@ebsid@DDdiv' v-show='DDstate' class='DDdiv expand-transition'  style='width:@DDwidth%;'> 
+            @addbtn@
+            <table id='@ebsid@tbl' tabindex='1000' style='width:100%' class='table table-bordered'></table>
+        </div>
+    </center>
+</div>"
+    .Replace("@VueSelectCode", this.VueSelectcode)
+    .Replace("@name@", this.Name)
+    .Replace("@ebsid@", ebsid)
     .Replace("@width", 900.ToString())//this.Width.ToString())
     .Replace("@perWidth", (this.DisplayMembers.Count != 0) ? (900 / this.DisplayMembers.Count).ToString() : 900.ToString())
     .Replace("@DDwidth", (this.DropdownWidth == 0) ? "100" : this.DropdownWidth.ToString())

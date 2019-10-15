@@ -8,7 +8,7 @@ using System.Runtime.Serialization;
 namespace ExpressBase.Objects
 {
 
-    [EnableInBuilder(BuilderType.BotForm, BuilderType.WebForm)]
+    [EnableInBuilder(BuilderType.BotForm, BuilderType.WebForm, BuilderType.UserControl)]
     public class EbLabel : EbControlUI
 	{
 

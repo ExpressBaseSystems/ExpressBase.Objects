@@ -54,20 +54,20 @@ namespace ExpressBase.Objects
         Tab
     }
 
-    [EnableInBuilder(BuilderType.BotForm)]
+    [EnableInBuilder(BuilderType.BotForm, BuilderType.DashBoard)]
     public class EbDataVisualizationObject : EbObject
     {
 
     }
 
-    [EnableInBuilder(BuilderType.DVBuilder)]
+    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
     public class ChartColor : EbDataVisualizationObject
     {
         [EnableInBuilder(BuilderType.DVBuilder)]
         public string Color { get; set; }
     }
 
-    [EnableInBuilder(BuilderType.DVBuilder)]
+    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
     public class EbDataVisualizationSet : EbDataVisualizationObject
     {
 

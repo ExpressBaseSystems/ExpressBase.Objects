@@ -66,6 +66,7 @@ namespace ExpressBase.Objects
         public void OnDeserializedMethod(StreamingContext context)
         {
             this.BareControlHtml = this.GetBareHtml();
+            this.BareControlHtml4Bot = this.BareControlHtml;
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
             //this.EbDbType = this.EbDbType;
         }
@@ -148,11 +149,15 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         public override string ToolIconHtml { get { return "<i class='fa fa-calendar'></i>"; } set { } }
 
+        [HideInPropertyGrid]
+        [JsonIgnore]
+        public override string ToolNameAlias { get { return "Date Time"; } set { } }
+
         //public override string GetToolHtml()
         //{
         //    return @"<div eb-type='@toolName' class='tool'><i class='fa fa-calendar'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
         //}
-        
+
         public string Wrap4Developer(string EbCtrlHTML)
         {
             return @"<div class='controlTile' tabindex='1' onclick='event.stopPropagation();$(this).focus()'>
