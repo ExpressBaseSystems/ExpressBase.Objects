@@ -65,6 +65,7 @@ namespace ExpressBase.Objects
         [PropertyGroup("Appearance")]
         [UIproperty]
         [PropertyEditor(PropertyEditorType.FontSelector)]
+        [HideInPropertyGrid]
         public virtual EbFont Font { get; set; }
 
         [EnableInBuilder(BuilderType.DashBoard)]
