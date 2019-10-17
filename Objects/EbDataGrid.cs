@@ -227,7 +227,7 @@ $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this
         [JsonIgnore]
         public override string GetValueJSfn
         {
-            get { return @"let val = $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val(); return val;"; }
+            get { return @"let val = $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val(); return (this.ObjType === 'Numeric') ?  (parseFloat($('#' + this.EbSid_CtxId).val()) || 0) :val;"; }
 
             set { }
         }
