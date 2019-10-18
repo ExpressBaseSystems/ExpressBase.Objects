@@ -55,6 +55,12 @@ namespace ExpressBase.Objects
         public bool IsShowSerialNumber { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [DefaultPropValue("true")]
+        [PropertyGroup("Behavior")]
+        [Alias("Resizable Columns")]
+        public bool IsColumnsResizable { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [PropertyGroup("Behavior")]
         public bool AscendingOrder { get; set; }
 
