@@ -61,6 +61,8 @@ namespace ExpressBase.Objects
 
         public FormAsGlobal FormGlobals { get; set; }
 
+        public bool IsLocEditable { get; set ; }
+
         [PropertyGroup("Events")]
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.Collection)]
@@ -446,6 +448,7 @@ namespace ExpressBase.Objects
 
         private string GetInsertQuery(IDatabase DataDB, string tblName, string masterTbl, bool isIns)
         {
+
             string _qry;
             if (tblName.Equals(masterTbl))
             {
@@ -453,11 +456,14 @@ namespace ExpressBase.Objects
                 _qry = string.Format("INSERT INTO {0} ({2} eb_created_by, eb_created_at, eb_loc_id) VALUES ({3} :eb_createdby, {1}, :eb_loc_id); ", tblName, DataDB.EB_CURRENT_TIMESTAMP, "{0}", "{1}");
                 if (DataDB.Vendor == DatabaseVendors.MYSQL)
                     _qry += string.Format("SELECT eb_persist_currval('{0}_id_seq');", tblName);
+                if (this.IsLocEditable)
+                    _qry = _qry.Replace(", eb_loc_id", string.Empty).Replace(", :eb_loc_id", string.Empty);
             }
             else if (isIns)
                 _qry = string.Format("INSERT INTO {0} ({3} eb_created_by, eb_created_at, eb_loc_id, {2}_id) VALUES ({4} :eb_createdby, {1}, :eb_loc_id , (SELECT eb_currval('{2}_id_seq')));", tblName, DataDB.EB_CURRENT_TIMESTAMP, masterTbl, "{0}", "{1}");
             else
                 _qry = string.Format("INSERT INTO {0} ({3} eb_created_by, eb_created_at, eb_loc_id, {2}_id) VALUES ({4} :eb_createdby, {1}, :eb_loc_id , :{2}_id);", tblName, DataDB.EB_CURRENT_TIMESTAMP, masterTbl, "{0}", "{1}");
+           
             return _qry;
         }
 
@@ -791,7 +797,7 @@ namespace ExpressBase.Objects
                                         _formattedData = dt.ConvertFromUtc(this.UserObj.Preference.TimeZone).ToString("HH:mm:ss", CultureInfo.InvariantCulture);
                                     }
                                 }
-                                else if (_column.Control is EbSysLocation)
+                                else if (_column.Control is EbSysLocation && (_column.Control as EbControl).IsDisable)
                                 {
                                     int loc_id = Convert.ToInt32(_unformattedData);
                                     EbSysLocDM dm = (_column.Control as EbSysLocation).DisplayMember;
@@ -799,7 +805,7 @@ namespace ExpressBase.Objects
                                     {
                                         if (dm == EbSysLocDM.LongName)
                                             _formattedData = loc_id + "$$" + this.SolutionObj.Locations[loc_id].LongName;
-                                        else if (dm == EbSysLocDM.ShortName)
+                                        else
                                             _formattedData = loc_id + "$$" + this.SolutionObj.Locations[loc_id].ShortName;
                                     }
                                 }
@@ -2058,6 +2064,11 @@ namespace ExpressBase.Objects
                         {
                             _table.Columns.Add(new ColumnSchema { ColumnName = _ctrl.Name, EbDbType = (int)_ctrl.EbDbType, Control = _ctrl });
                         }
+                    }
+                    else if(control is EbSysLocation && !control.IsDisable)
+                    {
+                        this.IsLocEditable = true;
+                        _table.Columns.Add(new ColumnSchema { ColumnName = control.Name, EbDbType = (int)control.EbDbType, Control = control });
                     }
                     else
                         _table.Columns.Add(new ColumnSchema { ColumnName = control.Name, EbDbType = (int)control.EbDbType, Control = control });
