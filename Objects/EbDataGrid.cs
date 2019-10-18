@@ -55,6 +55,12 @@ namespace ExpressBase.Objects
         public bool IsShowSerialNumber { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [DefaultPropValue("true")]
+        [PropertyGroup("Behavior")]
+        [Alias("Resizable Columns")]
+        public bool IsColumnsResizable { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [PropertyGroup("Behavior")]
         public bool AscendingOrder { get; set; }
 
@@ -152,7 +158,7 @@ $.each(this.Controls.$values, function (i, col) {
             foreach (EbDGColumn col in Controls)
             {
                 if (!col.Hidden)
-                    html += string.Concat("<th class='ppbtn-cont ebResizable' ebsid='@ebsid@' style='width: @Width@; @bg@' @type@ title='", col.Title, @"'>
+                    html += string.Concat("<th class='ppbtn-cont ebResizable' ebsid='@ebsid@' name='@name@' style='width: @Width@; @bg@' @type@ title='", col.Title, @"'>
                                                 <span class='grid-col-title eb-label-editable'>", col.Title, @"</span>
                                                 <input id='@ebsid@lbltxtb' class='eb-lbltxtb' type='text'/>
                                                 @req@ @ppbtn@" +
@@ -160,6 +166,7 @@ $.each(this.Controls.$values, function (i, col) {
                         .Replace("@ppbtn@", Common.HtmlConstants.CONT_PROP_BTN)
                         .Replace("@req@", (col.Required ? "<sup style='color: red'>*</sup>" : string.Empty))
                         .Replace("@ebsid@", col.EbSid)
+                        .Replace("@name@", col.Name)
                         .Replace("@Width@", (col.Width <= 0) ? "auto" : col.Width.ToString() + "%")
                         .Replace("@type@", "type = '" + col.ObjType + "'")
                         .Replace("@bg@", col.IsDisable ? "background-color:#fafafa; color:#555" : string.Empty);
