@@ -3,6 +3,7 @@ using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
+using ExpressBase.Common.Structures;
 using Newtonsoft.Json;
 using ServiceStack;
 using ServiceStack.Text;
@@ -11,6 +12,7 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Xml.Serialization;
+using ExpressBase.Security;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
@@ -229,6 +231,37 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         }
     }
 
+    [DataContract]
+    public class EbObjectToMobRequest : IReturn<EbObjectToMobResponse>, IEbSSRequest
+    {
+        public string SolnId { get; set; }
+
+        public int UserId { get; set; }
+
+        [DataMember(Order = 1)]
+        public string RefId { set; get; }
+
+        [DataMember(Order = 2)]
+        public User User { set; get; }
+    }
+
+    [DataContract]
+    public class EbObjectToMobResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public EbObjectWrapper ObjectWraper { set; get; }
+
+        [DataMember(Order = 2)]
+        public byte[] ReportResult { get; set; }
+
+        [DataMember(Order = 3)]
+        public EbDataSet TableResult { get; set; }
+
+        [DataMember(Order = 5)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+
     [RuntimeSerializable]
     public class JsonTableSet
     {
@@ -411,10 +444,12 @@ END;";
             Objects = new Dictionary<string, List<ObjWrap>>();
         }
 
-        public int Count { get
+        public int Count
+        {
+            get
             {
                 return Objects.Count;
-            } 
+            }
         }
     }
 }
