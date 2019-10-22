@@ -2,6 +2,7 @@
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -116,6 +117,7 @@ namespace ExpressBase.Objects
 
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.DashBoard)]
+        [JsonIgnore]
         public EbObject TileObject { get; set; }
 
         [HideInPropertyGrid]

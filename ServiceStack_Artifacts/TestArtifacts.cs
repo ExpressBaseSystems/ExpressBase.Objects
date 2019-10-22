@@ -3,6 +3,7 @@ using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
 using ExpressBase.Scheduler.Jobs;
 using ServiceStack;
+using ServiceStack.Auth;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
@@ -18,15 +19,19 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public EbSurveyQuery Query { get; set; }
     }
 
-    [Route("/apitest")]
-    public class ApiTestReq : IReturn<UnniTest>
+    [DataContract]
+    public class GenerateAPIKey : EbServiceStackAuthRequest, IReturn<GenerateAPIKeyResponse>
     {
-
+        
     }
 
-    public class UnniTest
+    [DataContract]
+    public class GenerateAPIKeyResponse : IEbSSResponse
     {
-        public string Name = "Unni";
+        [DataMember(Order = 1)]
+        public List<ApiKey> APIKeys { get; set; }
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set ; }
     }
 
     [DataContract]
