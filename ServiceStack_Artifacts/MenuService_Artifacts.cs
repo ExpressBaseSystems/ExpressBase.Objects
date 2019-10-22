@@ -11,9 +11,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
     public class SidebarUserRequest : EbServiceStackAuthRequest, IReturn<SidebarUserResponse>
     {
-        public string Ids { get; set; }
-
-        public List<string> SysRole { get; set; }
+        public int LocationId { set; get; }
     }
 
     public class SidebarUserResponse :IEbSSResponse
