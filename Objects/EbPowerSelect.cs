@@ -50,7 +50,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyGroup("Behavior")]
         [PropertyPriority(98)]
-        public bool IsInsertable{ get; set; }
+        public bool IsInsertable { get; set; }
 
         public override string IsRequiredOKJSfn
         {
@@ -277,8 +277,9 @@ namespace ExpressBase.Objects
         public DVColumnCollection Columns { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
         [PropertyGroup("Behavior")]
+        [PropertyEditor(PropertyEditorType.CollectionABCFrmSrc, "Columns")]
+        [OnChangeExec(@"if (this.Columns && this.Columns.$values.length === 0 ){pg.MakeReadOnly('DisplayMembers');} else {pg.MakeReadWrite('DisplayMembers');}")]
         public DVColumnCollection DisplayMembers { get; set; }
 
         [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.WebForm, BuilderType.UserControl)]
@@ -449,7 +450,7 @@ namespace ExpressBase.Objects
 .Replace("@ebsid@", this.EbSid_CtxId)
 .Replace("@type@", ((int)obj.Type).ToString())
 .Replace("@sTitle@", obj.sTitle.ToString())
-.Replace("@perWidth@", "style='width:" + ((int)(100 / noOfFileds)).ToString() + "%'")
+.Replace("@perWidth@", "style='width:" + ( (obj.Width == 0) ? (((int)(100 / noOfFileds)).ToString()) : obj.Width.ToString() ) + "%'")
 .Replace("@border-r" + i, (i != noOfFileds - 1) ? "style='border-radius: 0px;'" : "");
                     i++;
                 }
@@ -544,7 +545,7 @@ namespace ExpressBase.Objects
                 return string.Empty;
         }
 
-        public string GetBareHtml( string ebsid)// temp
+        public string GetBareHtml(string ebsid)// temp
         {
             if (this.RenderAsSimpleSelect)
             {

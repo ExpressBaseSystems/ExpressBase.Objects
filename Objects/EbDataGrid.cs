@@ -55,6 +55,11 @@ namespace ExpressBase.Objects
         public bool IsShowSerialNumber { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        public string DataSourceId { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [DefaultPropValue("true")]
         [PropertyGroup("Behavior")]
         [Alias("Resizable Columns")]
