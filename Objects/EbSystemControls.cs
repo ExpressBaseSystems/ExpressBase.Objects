@@ -97,9 +97,10 @@ namespace ExpressBase.Objects
 
         public override string GetBareHtml()
         {
-            return @"
-            <input id='@ebsid@' data-ebtype='@data-ebtype@'  data-toggle='tooltip' title='@toolTipText@' class='date' type='text' name='@name@' autocomplete = 'off' @value@ @tabIndex@ style='width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@ @readOnlyString@ @required@ @placeHolder@ disabled />
-            "
+            string htmlinput = "<input id='@ebsid@' data-ebtype='@data-ebtype@'  data-toggle='tooltip' title='@toolTipText@' class='date' type='text' name='@name@' autocomplete = 'off' @value@ @tabIndex@ style='width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@ @readOnlyString@ @required@ @placeHolder@ disabled />";
+            string htmlselect = @"<select id='@ebsid@' ui-inp class='' title='@toolTipText@' @selOpts@ @MaxLimit@ @multiple@ @IsSearchable@ name='@ebsid@' @bootStrapStyle@ data-ebtype='@data-ebtype@' style='width: 100%;'>
+                                 </select>";
+            return (this.IsDisable ? htmlinput : htmlselect)
 .Replace("@name@", (this.Name != null ? this.Name.Trim() : ""))
 .Replace("@data-ebtype@", "16")//( (int)this.EbDateType ).ToString())
 .Replace("@toolTipText@", this.ToolTipText)
@@ -114,17 +115,48 @@ namespace ExpressBase.Objects
 .Replace("@placeHolder@", "placeholder=''");
         }
 
-        public override string EnableJSfn { get { return @""; } set { } }
 
-        public override string GetValueJSfn { get { return @"return $('#' + this.EbSid_CtxId).attr('data-id');"; } set { } }
+        public override string EnableJSfn 
+        { get 
+            {
+                if (this.IsDisable)
+                {
+                    return @"";
+                }
+                else
+                {
+                    return @"$('#cont_' + this.EbSid_CtxId + ' *').prop('disabled',false).css('pointer-events', 'inherit').find('[ui-inp]').css('background-color', '#fff');";
+                }
+            } 
+            set { } 
+        }
+
+        public override string GetValueJSfn 
+        { get 
+            { 
+                return @"
+                if(this.IsDisable)
+                    return $('#' + this.EbSid_CtxId).attr('data-id');
+                else
+                    return $('#' + this.EbSid_CtxId).val();
+                "; 
+            } 
+            set { } 
+        }
 
         public override string SetValueJSfn
         {
             get
             {
-                return @"let arr = p1.split('$$');
+                return @"
+                    if(this.IsDisable){
+                        let arr = p1.split('$$');
                         $('#' + this.EbSid_CtxId).attr('data-id', arr[0]);
-                        $('#' + this.EbSid_CtxId).val(arr[1]).trigger('change');";
+                        $('#' + this.EbSid_CtxId).val(arr[1]).trigger('change');}
+                    else
+                        $('#' + this.EbSid_CtxId).val(p1).trigger('change');
+                        console.log('ivde vannittund');
+                    ";
             }
             set { }
         }
@@ -135,7 +167,20 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
-        public override bool DoNotPersist { get { return true; } }
+        public override bool DoNotPersist 
+        { get 
+            {
+                if (this.IsDisable == true)
+                    return true;
+                else
+                    return false;
+            } 
+        }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [DefaultPropValue("true")]
+        public override bool IsDisable { get; set; }
+
 
         public override bool Unique { get { return false; } }
         public override bool Required { get { return false; } }

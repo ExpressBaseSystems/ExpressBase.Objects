@@ -6,6 +6,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using ExpressBase.Security;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
@@ -90,6 +91,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 	public class FetchSupportRequest : EbServiceStackAuthRequest, IReturn<FetchSupportResponse>
 	{
 		public int usrid { get; set; }
+
+		
 	}
 	public class FetchSupportResponse
 	{
@@ -152,6 +155,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 	public class ChangeStatusRequest : EbServiceStackAuthRequest, IReturn<ChangeStatusResponse>
 	{
 		public string TicketNo { get; set; }
+		public string Reason { get; set; }
 
 		public string NewStatus { get; set; }
 		public string UserName { get; set; }
@@ -251,6 +255,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public string TicketNo { get; set; }
 		public string UserType { get; set; }
 
+		public User UserObject { get; set; }
 	}
 
 	public class SupportHistoryResponse
@@ -290,7 +295,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 		public string remarks { get; set; }
 
-		public string Age { get; set; }
+		public string NoDays { get; set; }
+
+		public string NoHour { get; set; }
 
 		public List<FileUploadCls> Fileuploadlst { get; set; } = new List<FileUploadCls>();
 
@@ -326,7 +333,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		description = 7,
 		comment = 8,
 		assigned_to = 9,
-		files = 10
+		files = 10,
+		reason=11
 	}
 
 	public class SupportHistory

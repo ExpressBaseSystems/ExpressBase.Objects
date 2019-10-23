@@ -59,6 +59,10 @@ namespace ExpressBase.Objects
 
         public Eb_Solution SolutionObj { get; set; }
 
+        public FormAsGlobal FormGlobals { get; set; }
+
+        public bool IsLocEditable { get; set ; }
+
         [PropertyGroup("Events")]
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.Collection)]
@@ -172,7 +176,36 @@ namespace ExpressBase.Objects
                 }
             }
 
+            GetSuggestionTableName(this, this.TableName);
+
             CalcValueExprDependency();
+        }
+
+        public void GetSuggestionTableName(EbControlContainer _cont, string _tbl)
+        {
+            foreach (EbControl ctrl in _cont.Controls)
+            {
+                try
+                {
+                    if (ctrl is EbTextBox)
+                    {
+                        if ((ctrl as EbTextBox).AutoSuggestion)
+                            (ctrl as EbTextBox).TableName = _tbl;
+                    }
+                    else if (ctrl is EbControlContainer)
+                    {
+                        string t = _tbl;
+                        if (!(ctrl as EbControlContainer).TableName.IsNullOrEmpty())
+                            t = (ctrl as EbControlContainer).TableName;
+                        GetSuggestionTableName(ctrl as EbControlContainer, t);
+                    }
+
+                }
+                catch (Exception e)
+                {
+                    ;
+                }
+            }
         }
 
         public void BeforeSave(Service service)
@@ -355,9 +388,16 @@ namespace ExpressBase.Objects
             bool MuCtrlFound = false;
             foreach (Object Ctrl in _schema.ExtendedControls)
             {
-                if (Ctrl is EbFileUploader)
-                    extquery += (Ctrl as EbFileUploader).GetSelectQuery();
-                else if (Ctrl is EbProvisionUser && !MuCtrlFound)
+                //if (Ctrl is EbFileUploader)
+                //{
+                //    if (this.FormGlobals == null)
+                //        this.FormGlobals = GetFormAsFlatGlobal();
+
+                //    string cxt2 = (Ctrl as EbFileUploader).ExeContextCode(this.FormGlobals, false);
+
+                //    extquery += (Ctrl as EbFileUploader).GetSelectQuery(cxt2);
+                //}else
+                if (Ctrl is EbProvisionUser && !MuCtrlFound)
                 {
                     extquery += (Ctrl as EbProvisionUser).GetSelectQuery();
                     MuCtrlFound = true;
@@ -408,6 +448,7 @@ namespace ExpressBase.Objects
 
         private string GetInsertQuery(IDatabase DataDB, string tblName, string masterTbl, bool isIns)
         {
+
             string _qry;
             if (tblName.Equals(masterTbl))
             {
@@ -415,11 +456,14 @@ namespace ExpressBase.Objects
                 _qry = string.Format("INSERT INTO {0} ({2} eb_created_by, eb_created_at, eb_loc_id) VALUES ({3} :eb_createdby, {1}, :eb_loc_id); ", tblName, DataDB.EB_CURRENT_TIMESTAMP, "{0}", "{1}");
                 if (DataDB.Vendor == DatabaseVendors.MYSQL)
                     _qry += string.Format("SELECT eb_persist_currval('{0}_id_seq');", tblName);
+                if (this.IsLocEditable)
+                    _qry = _qry.Replace(", eb_loc_id", string.Empty).Replace(", :eb_loc_id", string.Empty);
             }
             else if (isIns)
                 _qry = string.Format("INSERT INTO {0} ({3} eb_created_by, eb_created_at, eb_loc_id, {2}_id) VALUES ({4} :eb_createdby, {1}, :eb_loc_id , (SELECT eb_currval('{2}_id_seq')));", tblName, DataDB.EB_CURRENT_TIMESTAMP, masterTbl, "{0}", "{1}");
             else
                 _qry = string.Format("INSERT INTO {0} ({3} eb_created_by, eb_created_at, eb_loc_id, {2}_id) VALUES ({4} :eb_createdby, {1}, :eb_loc_id , :{2}_id);", tblName, DataDB.EB_CURRENT_TIMESTAMP, masterTbl, "{0}", "{1}");
+           
             return _qry;
         }
 
@@ -431,6 +475,35 @@ namespace ExpressBase.Objects
             else
                 _qry = string.Format("UPDATE {0} SET {3} eb_lastmodified_by = :eb_modified_by, eb_lastmodified_at = {1} WHERE id = {4} AND {2}_id = :{2}_id AND (eb_del='F' OR eb_del IS null);", tblName, DataDB.EB_CURRENT_TIMESTAMP, masterTbl, isDel ? "eb_del = 'T', " : "{0}", "{1}");
             return _qry;
+        }
+
+        public FormAsGlobal GetFormAsFlatGlobal(WebformData _formdata)
+        {
+            FormAsGlobal _globals = new FormAsGlobal { Name = this.Name };
+            ListNTV listNTV = new ListNTV();
+            try
+            {
+                foreach (KeyValuePair<string, SingleTable> item in _formdata.MultipleTables)
+                {
+                    foreach (SingleColumn col in item.Value[0].Columns)
+                    {
+                        if (!(col.Name == "id" && item.Key != _formdata.MasterTable) && item.Value.Count == 1)
+                        {
+                            NTV n = GetNtvFromFormData(_formdata, item.Key, 0, col.Name);
+                            if (n != null)
+                                listNTV.Columns.Add(n);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception in GetFormAsFlatGlobal. Message : " + ex.Message);
+                Console.WriteLine(ex.StackTrace);
+            }
+
+            _globals.Add(listNTV);
+            return _globals;
         }
 
         //get formdata as globals for c# script engine
@@ -724,7 +797,7 @@ namespace ExpressBase.Objects
                                         _formattedData = dt.ConvertFromUtc(this.UserObj.Preference.TimeZone).ToString("HH:mm:ss", CultureInfo.InvariantCulture);
                                     }
                                 }
-                                else if (_column.Control is EbSysLocation)
+                                else if (_column.Control is EbSysLocation && (_column.Control as EbControl).IsDisable)
                                 {
                                     int loc_id = Convert.ToInt32(_unformattedData);
                                     EbSysLocDM dm = (_column.Control as EbSysLocation).DisplayMember;
@@ -732,7 +805,7 @@ namespace ExpressBase.Objects
                                     {
                                         if (dm == EbSysLocDM.LongName)
                                             _formattedData = loc_id + "$$" + this.SolutionObj.Locations[loc_id].LongName;
-                                        else if (dm == EbSysLocDM.ShortName)
+                                        else
                                             _formattedData = loc_id + "$$" + this.SolutionObj.Locations[loc_id].ShortName;
                                     }
                                 }
@@ -812,33 +885,33 @@ namespace ExpressBase.Objects
                     SingleTable Table = new SingleTable();
                     if (!(UserTable != null && Ctrl is EbProvisionUser))
                         GetFormattedData(dataset.Tables[tableIndex], Table);
-                    if (Ctrl is EbFileUploader)
-                    {
-                        List<FileMetaInfo> _list = new List<FileMetaInfo>();
-                        foreach (SingleRow dr in Table)
-                        {
-                            FileMetaInfo info = new FileMetaInfo
-                            {
-                                FileRefId = dr["id"],
-                                FileName = dr["filename"],
-                                Meta = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(dr["tags"] as string),
-                                UploadTime = dr["uploadts"],
-                                FileCategory = (EbFileCategory)Convert.ToInt32(dr["filecategory"])
-                            };
+                    //if (Ctrl is EbFileUploader)
+                    //{
+                    //List<FileMetaInfo> _list = new List<FileMetaInfo>();
+                    //foreach (SingleRow dr in Table)
+                    //{
+                    //    FileMetaInfo info = new FileMetaInfo
+                    //    {
+                    //        FileRefId = dr["id"],
+                    //        FileName = dr["filename"],
+                    //        Meta = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(dr["tags"] as string),
+                    //        UploadTime = dr["uploadts"],
+                    //        FileCategory = (EbFileCategory)Convert.ToInt32(dr["filecategory"])
+                    //    };
 
-                            if (!_list.Contains(info))
-                                _list.Add(info);
-                        }
-                        SingleTable _Table = new SingleTable {
-                            new SingleRow() {
-                                Columns = new List<SingleColumn> {
-                                    new SingleColumn { Name = "Files", Type = (int)EbDbTypes.Json, Value = JsonConvert.SerializeObject(_list) }
-                                }
-                            }
-                        };
-                        _FormData.ExtendedTables.Add((Ctrl as EbControl).EbSid, _Table);
-                    }
-                    else if (Ctrl is EbProvisionUser)
+                    //    if (!_list.Contains(info))
+                    //        _list.Add(info);
+                    //}
+                    //SingleTable _Table = new SingleTable {
+                    //    new SingleRow() {
+                    //        Columns = new List<SingleColumn> {
+                    //            new SingleColumn { Name = "Files", Type = (int)EbDbTypes.Json, Value = JsonConvert.SerializeObject(_list) }
+                    //        }
+                    //    }
+                    //};
+                    //_FormData.ExtendedTables.Add((Ctrl as EbControl).EbSid, _Table);
+                    //}else
+                    if (Ctrl is EbProvisionUser)
                     {
                         Dictionary<string, dynamic> _d = new Dictionary<string, dynamic>();
                         if (UserTable == null)
@@ -883,6 +956,53 @@ namespace ExpressBase.Objects
                     tableIndex++;
                 }
             }
+
+            foreach (Object Ctrl in _schema.ExtendedControls)
+            {
+                if (Ctrl is EbFileUploader)
+                {
+                    if (this.FormGlobals == null)
+                        this.FormGlobals = GetFormAsFlatGlobal(_FormData);
+                    string cxt2 = (Ctrl as EbFileUploader).ExeContextCode(this.FormGlobals, false);
+                    string qry = (Ctrl as EbFileUploader).GetSelectQuery(string.IsNullOrEmpty(cxt2));
+
+                    EbDataTable dt = DataDB.DoQuery(qry, new DbParameter[]
+                    {
+                        DataDB.GetNewParameter("id", EbDbTypes.Int32, this.TableRowId),
+                        DataDB.GetNewParameter("context", EbDbTypes.String, context),
+                        DataDB.GetNewParameter("context_sec", EbDbTypes.String, cxt2 ?? string.Empty),
+                        DataDB.GetNewParameter("eb_ver_id", EbDbTypes.Int32, this.RefId.Split("-")[4])
+                    });
+
+                    SingleTable Table = new SingleTable();
+                    GetFormattedData(dt, Table);
+
+                    List<FileMetaInfo> _list = new List<FileMetaInfo>();
+                    foreach (SingleRow dr in Table)
+                    {
+                        FileMetaInfo info = new FileMetaInfo
+                        {
+                            FileRefId = dr["id"],
+                            FileName = dr["filename"],
+                            Meta = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(dr["tags"] as string),
+                            UploadTime = dr["uploadts"],
+                            FileCategory = (EbFileCategory)Convert.ToInt32(dr["filecategory"])
+                        };
+
+                        if (!_list.Contains(info))
+                            _list.Add(info);
+                    }
+                    SingleTable _Table = new SingleTable {
+                            new SingleRow() {
+                                Columns = new List<SingleColumn> {
+                                    new SingleColumn { Name = "Files", Type = (int)EbDbTypes.Json, Value = JsonConvert.SerializeObject(_list) }
+                                }
+                            }
+                        };
+                    _FormData.ExtendedTables.Add((Ctrl as EbControl).EbSid, _Table);
+                }
+            }
+
 
             if (!psquery.IsNullOrEmpty())
             {
@@ -1080,7 +1200,8 @@ namespace ExpressBase.Objects
             }
 
             fullqry += _extqry;
-            fullqry += EbFileUploader.GetUpdateQuery(DataDB, param, FormData.ExtendedTables, this.TableName, this.RefId.Split("-")[3], ref i, this.TableRowId);
+            //fullqry += EbFileUploader.GetUpdateQuery(DataDB, param, FormData.ExtendedTables, this.TableName, this.RefId.Split("-")[3], ref i, this.TableRowId);
+            fullqry += GetFileUploaderUpdateQuery(DataDB, param, ref i);
 
             param.Add(DataDB.GetNewParameter(this.FormData.MasterTable + "_id", EbDbTypes.Int32, this.TableRowId));
             param.Add(DataDB.GetNewParameter("eb_loc_id", EbDbTypes.Int32, this.LocationId));
@@ -1091,6 +1212,25 @@ namespace ExpressBase.Objects
             return DataDB.InsertTable(fullqry, param.ToArray());
             //var zz = DataDB.DoQueries(fullqry, param.ToArray());
             //return 1;
+        }
+
+        public string GetFileUploaderUpdateQuery(IDatabase DataDB, List<DbParameter> param, ref int i)
+        {
+            string _qry = string.Empty;
+            foreach (object control in this.FormSchema.ExtendedControls)
+            {
+                if (control is EbFileUploader)
+                {
+                    if (this.FormGlobals == null)
+                        this.FormGlobals = GetFormAsFlatGlobal(this.FormData);
+                    EbFileUploader _c = control as EbFileUploader;
+                    string secCxtGet = _c.ExeContextCode(this.FormGlobals, false);
+                    string secCxtSet = _c.ExeContextCode(this.FormGlobals, true);
+
+                    _qry = _c.GetUpdateQuery2(DataDB, param, this.FormData.ExtendedTables[_c.Name ?? _c.EbSid], this.TableName, this.RefId.Split("-")[3], ref i, this.TableRowId, secCxtGet, secCxtSet);
+                }
+            }
+            return _qry;
         }
 
         public int Insert(IDatabase DataDB)
@@ -1120,7 +1260,8 @@ namespace ExpressBase.Objects
             }
 
             fullqry += _extqry;
-            fullqry += EbFileUploader.GetUpdateQuery(DataDB, param, FormData.ExtendedTables, this.TableName, this.RefId.Split("-")[3], ref i, 0);
+            //fullqry += EbFileUploader.GetUpdateQuery(DataDB, param, FormData.ExtendedTables, this.TableName, this.RefId.Split("-")[3], ref i, 0);
+            fullqry += GetFileUploaderUpdateQuery(DataDB, param, ref i);
 
             param.Add(DataDB.GetNewParameter("eb_createdby", EbDbTypes.Int32, this.UserObj.UserId));
             param.Add(DataDB.GetNewParameter("eb_loc_id", EbDbTypes.Int32, this.LocationId));
@@ -1924,6 +2065,11 @@ namespace ExpressBase.Objects
                             _table.Columns.Add(new ColumnSchema { ColumnName = _ctrl.Name, EbDbType = (int)_ctrl.EbDbType, Control = _ctrl });
                         }
                     }
+                    else if(control is EbSysLocation && !control.IsDisable)
+                    {
+                        this.IsLocEditable = true;
+                        _table.Columns.Add(new ColumnSchema { ColumnName = control.Name, EbDbType = (int)control.EbDbType, Control = control });
+                    }
                     else
                         _table.Columns.Add(new ColumnSchema { ColumnName = control.Name, EbDbType = (int)control.EbDbType, Control = control });
                 }
@@ -2089,14 +2235,14 @@ namespace ExpressBase.Objects
                     else if (c is EbProvisionLocation)//add unmapped ctrls as DoNotPersist controls
                     {
                         if (IsRenderMode)
-                        {                            
+                        {
                             EbProvisionLocation prvnCtrl = c as EbProvisionLocation;
                             for (int j = 0; j < prvnCtrl.Fields.Count; j++)
                             {
                                 UsrLocField prvnFld = prvnCtrl.Fields[j] as UsrLocField;
                                 if (prvnFld.ControlName.IsNullOrEmpty() && prvnFld.IsRequired)
                                 {
-                                    if(prvnFld.Type == "image")
+                                    if (prvnFld.Type == "image")
                                     {
                                         _this.Controls.Insert(i, new EbDisplayPicture()
                                         {
@@ -2125,7 +2271,7 @@ namespace ExpressBase.Objects
                             }
                         }
                     }
-                    else if(c is EbProvisionUser)
+                    else if (c is EbProvisionUser)
                     {
                         if (IsRenderMode)
                         {
@@ -2134,7 +2280,7 @@ namespace ExpressBase.Objects
                             {
                                 UsrLocField prvnFld = prvnCtrl.Fields[j] as UsrLocField;
                                 if (prvnFld.ControlName.IsNullOrEmpty() && prvnFld.IsRequired)
-                                {                                    
+                                {
                                     _this.Controls.Insert(i, new EbTextBox()
                                     {
                                         Name = "namecustom" + i,
@@ -2142,7 +2288,7 @@ namespace ExpressBase.Objects
                                         EbSid_CtxId = "ebsidcustom" + i,
                                         Label = prvnFld.DisplayName,
                                         DoNotPersist = true
-                                    });                                    
+                                    });
                                     prvnFld.ControlName = "namecustom" + i;
                                     i++;
                                 }

@@ -180,6 +180,10 @@ namespace ExpressBase.Objects.Objects.DVRelated
         [JsonIgnore]
         public string sWidth { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog)]
+        [PropertyGroup("Appearance")]
+        public virtual int Width { get; set; }
+
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard)]
         [JsonProperty(PropertyName = "className")]
         [HideInPropertyGrid]
@@ -615,7 +619,7 @@ pg.HideProperty('FormMode');
         public override EbDbTypes Type { get; set; }
 
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.DropDown)]
         public StringOperators DefaultOperator { get; set; }
 
@@ -720,7 +724,7 @@ pg.HideProperty('FormMode');
             return cultureInfo;
         }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.DropDown)]
         public NumericOperators DefaultOperator { get; set; }
 

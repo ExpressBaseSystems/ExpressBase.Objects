@@ -13,6 +13,8 @@ using System.Runtime.Serialization;
 using ExpressBase.Common.Structures;
 using ExpressBase.Objects.Helpers;
 using ExpressBase.Common;
+using ServiceStack;
+using ExpressBase.Objects.ServiceStack_Artifacts;
 
 namespace ExpressBase.Objects
 {
@@ -166,6 +168,18 @@ else {
         [PropertyGroup("Behavior")]
         public bool AutoCompleteOff { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyGroup("Behavior")]
+        public bool AutoSuggestion { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public string TableName { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public List<string> Suggestions  { get; set; }
+
         [PropertyGroup("Behavior")]
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [HideInPropertyGrid]
@@ -220,6 +234,16 @@ else {
         //    return @"<div eb-type='@toolName' class='tool'><i class='fa fa-i-cursor'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
         //}
 
+
+        public void InitFromDataBase(JsonServiceClient ServiceClient)
+        {
+            if(this.TableName != "")
+            {
+                var result = ServiceClient.Get<GetDistinctValuesResponse>(new GetDistinctValuesRequest { TableName = this.TableName, ColumnName = this.Name });
+                this.Suggestions = result.Suggestions;
+            }
+                    
+        } 
         public override string GetWrapedCtrlHtml4bot()
         {
             return @"
