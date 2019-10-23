@@ -237,7 +237,7 @@ else {
 
         public void InitFromDataBase(JsonServiceClient ServiceClient)
         {
-            if(this.TableName != "")
+            if(this.AutoSuggestion)
             {
                 var result = ServiceClient.Get<GetDistinctValuesResponse>(new GetDistinctValuesRequest { TableName = this.TableName, ColumnName = this.Name });
                 this.Suggestions = result.Suggestions;
