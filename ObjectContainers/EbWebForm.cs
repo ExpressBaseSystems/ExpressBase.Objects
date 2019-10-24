@@ -854,7 +854,7 @@ namespace ExpressBase.Objects
                 DataDB.GetNewParameter("eb_ver_id", EbDbTypes.Int32, this.RefId.Split("-")[4])
             });
 
-            Console.WriteLine("From RefreshFormData : Schema table count = " + _schema.Tables.Count + " Dataset count = " + dataset.Tables.Count);
+            Console.WriteLine("From RefreshFormData : Schema table count = " + _schema.Tables.Count + " Dataset count = " + dataset.Tables.Count);            
 
             WebformData _FormData = new WebformData()
             {
@@ -873,6 +873,13 @@ namespace ExpressBase.Objects
 
                 if (!_FormData.MultipleTables.ContainsKey(_schema.Tables[i].TableName) && Table.Count > 0)
                     _FormData.MultipleTables.Add(_schema.Tables[i].TableName, Table);
+            }
+
+            if (!_FormData.MultipleTables.ContainsKey(_FormData.MasterTable))
+            {
+                string t = "From RefreshFormData - TABLE : " + _FormData.MasterTable + "   ID : " + this.TableRowId + "\nData Not Found";
+                Console.WriteLine(t);
+                throw new FormException(t);
             }
 
             if (dataset.Tables.Count > _schema.Tables.Count)
