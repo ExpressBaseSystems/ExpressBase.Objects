@@ -15,6 +15,9 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using ExpressBase.Security;
+using ServiceStack.Redis;
+using ExpressBase.Common.Data;
+using System.Collections;
 
 namespace ExpressBase.Objects
 {
@@ -151,6 +154,25 @@ $.each(this.Controls.$values, function (i, col) {
         //{
         //    return @"<div eb-type='@toolName' class='tool'><i class='fa fa-table'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
         //}
+
+        public void InitDSRelated(IServiceClient serviceClient, IRedisClient redis) {
+            EbDataReader DataReader = redis.Get<EbDataReader>(this.DataSourceId);
+            List<string> _params = new List<string>();
+            foreach (Param p in DataReader.InputParams)
+                _params.Add(p.Name);
+
+            this.Eb__paramControls = _params;
+            Eb__DSQuery = DataReader.Sql;
+        }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [HideInPropertyGrid]
+        public List<string> Eb__paramControls { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [HideInPropertyGrid]
+        public string Eb__DSQuery { get; set; }
+
         public override string GetBareHtml()
         {
             string html = @"
