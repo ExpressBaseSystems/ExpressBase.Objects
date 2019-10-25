@@ -8,7 +8,7 @@ using ExpressBase.Common.ProductionDBManager;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
-    public class CheckChangesInFunctionRequest : IEbTenentRequest, IReturn<CheckChangesInFunctionResponse>
+    public class CheckChangesInFilesRequest : IEbTenentRequest, IReturn<CheckChangesInFilesResponse>
     {
         public int UserId { get; set; }
 
@@ -19,7 +19,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string SolutionId { get; set; }
     }
 
-    public class CheckChangesInFunctionResponse : IEbSSResponse
+    public class CheckChangesInFilesResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
         public ResponseStatus ResponseStatus { get; set; }

@@ -15,6 +15,9 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using ExpressBase.Security;
+using ServiceStack.Redis;
+using ExpressBase.Common.Data;
+using System.Collections;
 
 namespace ExpressBase.Objects
 {
@@ -53,6 +56,17 @@ namespace ExpressBase.Objects
         [PropertyGroup("Behavior")]
         [Alias("Serial numbered")]
         public bool IsShowSerialNumber { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        public string DataSourceId { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [DefaultPropValue("true")]
+        [PropertyGroup("Behavior")]
+        [Alias("Resizable Columns")]
+        public bool IsColumnsResizable { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [PropertyGroup("Behavior")]
@@ -140,6 +154,25 @@ $.each(this.Controls.$values, function (i, col) {
         //{
         //    return @"<div eb-type='@toolName' class='tool'><i class='fa fa-table'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
         //}
+
+        public void InitDSRelated(IServiceClient serviceClient, IRedisClient redis) {
+            EbDataReader DataReader = redis.Get<EbDataReader>(this.DataSourceId);
+            List<string> _params = new List<string>();
+            foreach (Param p in DataReader.InputParams)
+                _params.Add(p.Name);
+
+            this.Eb__paramControls = _params;
+            Eb__DSQuery = DataReader.Sql;
+        }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [HideInPropertyGrid]
+        public List<string> Eb__paramControls { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [HideInPropertyGrid]
+        public string Eb__DSQuery { get; set; }
+
         public override string GetBareHtml()
         {
             string html = @"
@@ -152,7 +185,7 @@ $.each(this.Controls.$values, function (i, col) {
             foreach (EbDGColumn col in Controls)
             {
                 if (!col.Hidden)
-                    html += string.Concat("<th class='ppbtn-cont ebResizable' ebsid='@ebsid@' style='width: @Width@; @bg@' @type@ title='", col.Title, @"'>
+                    html += string.Concat("<th class='ppbtn-cont ebResizable' ebsid='@ebsid@' name='@name@' style='width: @Width@; @bg@' @type@ title='", col.Title, @"'>
                                                 <span class='grid-col-title eb-label-editable'>", col.Title, @"</span>
                                                 <input id='@ebsid@lbltxtb' class='eb-lbltxtb' type='text'/>
                                                 @req@ @ppbtn@" +
@@ -160,6 +193,7 @@ $.each(this.Controls.$values, function (i, col) {
                         .Replace("@ppbtn@", Common.HtmlConstants.CONT_PROP_BTN)
                         .Replace("@req@", (col.Required ? "<sup style='color: red'>*</sup>" : string.Empty))
                         .Replace("@ebsid@", col.EbSid)
+                        .Replace("@name@", col.Name)
                         .Replace("@Width@", (col.Width <= 0) ? "auto" : col.Width.ToString() + "%")
                         .Replace("@type@", "type = '" + col.ObjType + "'")
                         .Replace("@bg@", col.IsDisable ? "background-color:#fafafa; color:#555" : string.Empty);
@@ -227,7 +261,7 @@ $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this
         [JsonIgnore]
         public override string GetValueJSfn
         {
-            get { return @"let val = $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val(); return val;"; }
+            get { return @"let val = $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val(); return (this.ObjType === 'Numeric') ?  (parseFloat($('#' + this.EbSid_CtxId).val()) || 0) :val;"; }
 
             set { }
         }

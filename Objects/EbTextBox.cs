@@ -237,8 +237,12 @@ else {
 
         public void InitFromDataBase(JsonServiceClient ServiceClient)
         {
-            var result = ServiceClient.Get<GetDistinctValuesResponse>(new GetDistinctValuesRequest {TableName =this.TableName , ColumnName = this.Name });
-            this.Suggestions = result.Suggestions;
+            if(this.AutoSuggestion)
+            {
+                var result = ServiceClient.Get<GetDistinctValuesResponse>(new GetDistinctValuesRequest { TableName = this.TableName, ColumnName = this.Name });
+                this.Suggestions = result.Suggestions;
+            }
+                    
         } 
         public override string GetWrapedCtrlHtml4bot()
         {

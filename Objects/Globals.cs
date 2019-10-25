@@ -156,8 +156,10 @@ namespace ExpressBase.Objects.Objects
 
         public void SetParam(string name, object value)
         {
-            Parameters.Add(name, value);
-
+            if (!Parameters.ContainsKey(name))
+                Parameters.Add(name, value);
+            else
+                Parameters[name] = value;
             this.Globals["Params"].Add(name, new NTV
             {
                 Name = name,
@@ -332,6 +334,65 @@ namespace ExpressBase.Objects.Objects
             else
                 result = ntv.Value.ToString();
             return result;
+        }
+    }
+
+    public class SqlJobGlobals
+    {
+        public SqlJobScriptHelper Job { set; get; }
+
+        public dynamic Params { get; set; }
+
+        public List<EbDataTable> Tables { set; get; }
+
+        public SqlJobGlobals() { }
+
+        public SqlJobGlobals(EbDataSet _ds, ref Dictionary<string, object> global)
+        {
+            this.Tables = (_ds == null) ? null : _ds.Tables;
+
+            this.Job = new SqlJobScriptHelper(ref global, this);
+
+            Params = new NTVDict();
+        }
+
+        public dynamic this[string key]
+        {
+            get
+            {
+                if (key == "Params")
+                    return this.Params;
+                else
+                    return null;
+            }
+        }
+    }
+
+    public class SqlJobScriptHelper
+    {
+        public Dictionary<string, object> Parameters { set; get; }
+
+        public SqlJobGlobals Globals { set; get; }
+
+        public SqlJobScriptHelper(ref Dictionary<string, object> global, SqlJobGlobals sql_global)
+        {
+            Parameters = global;
+
+            Globals = sql_global;
+        }
+
+        public void SetParam(string name, object value)
+        {
+            if (!Parameters.ContainsKey(name))
+                Parameters.Add(name, value);
+            else
+                Parameters[name] = value;
+            this.Globals["Params"].Add(name, new NTV
+            {
+                Name = name,
+                Type = (value.GetType() == typeof(JObject) || value.GetType().Name == "JValue") ? EbDbTypes.Object : (EbDbTypes)Enum.Parse(typeof(EbDbTypes), value.GetType().Name, true),
+                Value = value as object
+            });
         }
     }
 }

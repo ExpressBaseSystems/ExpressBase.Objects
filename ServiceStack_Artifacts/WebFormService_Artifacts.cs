@@ -81,6 +81,26 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
+    public class GetImportDataRequest : EbServiceStackAuthRequest, IReturn<GetImportDataResponse>
+    {
+        [DataMember(Order = 1)]
+        public string RefId { get; set; }
+
+        [DataMember(Order = 2)]
+        public List<Param> Params { get; set; }
+    }
+
+    [DataContract]
+    public class GetImportDataResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public WebformData FormData { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    [DataContract]
 	public class DoUniqueCheckRequest : EbServiceStackAuthRequest, IReturn<GetRowDataResponse>
 	{
 		[DataMember(Order = 1)]
