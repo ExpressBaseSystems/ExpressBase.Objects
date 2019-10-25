@@ -117,7 +117,16 @@ namespace ExpressBase.Objects
                     return "false";
             } }
 
-        public override string DesignHtml4Bot { get => @"<div class='toggle btn btn-xs btn-primary' data-toggle='toggle' style='width: 34px; height: 22px;'><input type='checkbox' checked='' data-toggle='toggle' data-size='mini'><div class='toggle-group'><label class='btn btn-primary btn-xs toggle-on'>On</label><label class='btn btn-default btn-xs active toggle-off'>Off</label><span class='toggle-handle btn btn-default btn-xs'></span></div></div>"; set => base.DesignHtml4Bot = value; }
+        public override string DesignHtml4Bot
+		{ get => @"<div class='toggle btn btn-xs btn-primary' data-toggle='toggle' style='width: 34px; height: 22px;'>
+						<input type='checkbox' checked='' data-toggle='toggle' data-size='mini'>
+						<div class='toggle-group'>
+							<label class='btn btn-primary btn-xs toggle-on'>On</label>
+							<label class='btn btn-default btn-xs active toggle-off'>Off</label>
+							<span class='toggle-handle btn btn-default btn-xs'></span>
+						</div>
+					</div>";
+			set => base.DesignHtml4Bot = value; }
 
         [HideInPropertyGrid]
         [JsonIgnore]
