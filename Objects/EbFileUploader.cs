@@ -101,10 +101,23 @@ namespace ExpressBase.Objects
             this.BareControlHtml4Bot = this.BareControlHtml;
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
-        public override string GetHead()
+
+		public override string DesignHtml4Bot
+		{
+			get => @"<div class='input-group'style='width: 100 %; '> 
+                        <input id='' ui-inp='' data-ebtype='6' class='date' type='text' name=' tabindex='0' style='width: 100%; display: inline - block; background - color: rgb(255, 255, 255); color: rgb(51, 51, 51);' placeholder=''>
+                        <span class='input-group-addon'>
+							<i class='fa fa fa-upload' aria-hidden='true'  style='padding: 6px 12px;'></i>  
+                        </span>
+                    </div>";
+			set => base.DesignHtml4Bot = value;
+		}
+
+		public override string GetHead()
         {
             return string.Empty;
         }
+
         public override string GetDesignHtml()
        {
             string EbCtrlHTML = HtmlConstants.CONTROL_WRAPER_HTML4WEB

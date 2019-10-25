@@ -110,9 +110,15 @@ namespace ExpressBase.Objects
             this.BareControlHtml = this.GetBareHtml();
             this.BareControlHtml4Bot = this.BareControlHtml;
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
-        }
+		}
+		public override string DesignHtml4Bot
+		{
+			get => this.GetBareHtml();
+			set => base.DesignHtml4Bot = value;
+		}
 
-        public override string GetDesignHtml()
+
+		public override string GetDesignHtml()
         {
             //        return @"
 

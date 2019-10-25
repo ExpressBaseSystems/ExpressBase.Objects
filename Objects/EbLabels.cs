@@ -38,25 +38,29 @@ namespace ExpressBase.Objects
 
         public override string DesignHtml4Bot
         {
-            get
-            {
-                string html = string.Empty;
-                foreach (EbLabel ec in this.LabelCollection)
-                {
-                    html += ec.DesignHtml4Bot;
-                }
-                return html;
-            }
-            set => base.DesignHtml4Bot = value;
-        }
+			get => @"
+    <div class='msg-cont'>
+      <div class='bot-icon'></div>
+      <div class='msg-cont-bot'>
+         <div class='msg-wraper-bot'>
+            @Label@
+            <div class='msg-time'>4:21pm</div>
+         </div>
+      </div>
+   </div>".Replace("@Label@", this.Label);
+			set => base.DesignHtml4Bot = value;
+		}
 
         public override string GetJsInitFunc()
         {
             return @"
 this.Init = function(id)
 {
-    this.LabelCollection.$values.push(new EbObjects.EbLabel('default_label1'));
+	let label=new EbObjects.EbLabel('lbl_'+Date.now().toString(36));
+	label.Label = 'First label';
+    this.LabelCollection.$values.push(label);
 };";
+			
         }
 
         [HideInPropertyGrid]
