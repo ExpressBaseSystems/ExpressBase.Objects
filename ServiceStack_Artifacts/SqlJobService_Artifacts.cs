@@ -1,5 +1,7 @@
-﻿using ExpressBase.Common.Data;
+﻿using ExpressBase.Common;
+using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
+using ExpressBase.Objects.Objects.DVRelated;
 using ServiceStack;
 using System;
 using System.Collections.Generic;
@@ -25,5 +27,21 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         {
             Message = new ApiMessage();
         }
+    } 
+    
+
+    public class SqlJobsListGetRequest : IReturn<SqlJobsListGetResponse>
+    {
+        public string Refid { get; set; }
+
+        public string Date { get; set; }
+    }
+
+    public class SqlJobsListGetResponse
+    {
+        public ColumnColletion SqlJobsColumns { get; set; }
+        public RowColletion SqlJobsRows { get; set; }
+
+        public string SqlJobsDvColumns { get; set; }
     }
 }
