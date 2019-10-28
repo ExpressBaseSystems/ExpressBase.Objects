@@ -88,6 +88,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 2)]
         public List<Param> Params { get; set; }
+
+        [DataMember(Order = 3)]
+        public string Trigger { get; set; }
     }
 
     [DataContract]
@@ -95,6 +98,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         [DataMember(Order = 1)]
         public WebformData FormData { get; set; }
+
+        [DataMember(Order = 3)]
+        public WebformDataWrapper FormDataWrap { get; set; }
 
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }

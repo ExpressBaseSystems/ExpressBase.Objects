@@ -155,11 +155,28 @@ $.each(this.Controls.$values, function (i, col) {
         //    return @"<div eb-type='@toolName' class='tool'><i class='fa fa-table'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
         //}
 
-        public void InitDSRelated(IServiceClient serviceClient, IRedisClient redis) {
-            EbDataReader DataReader = redis.Get<EbDataReader>(this.DataSourceId);
+        public void InitDSRelated(IServiceClient serviceClient, IRedisClient redis, EbControl[] Allctrls) {
             List<string> _params = new List<string>();
+            EbDataReader DataReader = redis.Get<EbDataReader>(this.DataSourceId);
+            if (DataReader == null)
+            {
+                EbObjectParticularVersionResponse drObj = serviceClient.Get<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest() { RefId = this.DataSourceId });
+                DataReader = EbSerializers.Json_Deserialize(drObj.Data[0].Json);
+                this.Redis.Set<EbDataReader>(this.DataSourceId, DataReader);
+            }
             foreach (Param p in DataReader.InputParams)
+            {
                 _params.Add(p.Name);
+                for(int i = 0; i < Allctrls.Length; i++)
+                {
+                    if (p.Name == Allctrls[i].Name)
+                    {
+                        if (Allctrls[i].DependedDG == null)
+                            Allctrls[i].DependedDG = new List<string>();
+                        Allctrls[i].DependedDG.Add(this.Name);
+                    }
+                }
+            }
 
             this.Eb__paramControls = _params;
             Eb__DSQuery = DataReader.Sql;

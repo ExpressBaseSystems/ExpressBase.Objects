@@ -170,7 +170,7 @@ namespace ExpressBase.Objects
                     }
 
                     if (!DataGrid.DataSourceId.IsNullOrEmpty())
-                        DataGrid.InitDSRelated(serviceClient, redis);
+                        DataGrid.InitDSRelated(serviceClient, redis, Allctrls);
 
                 }
                 else if (Allctrls[i] is EbProvisionUser)
@@ -285,23 +285,40 @@ namespace ExpressBase.Objects
             for (int i = 0; i < CalcFlds.Count; i++)
             {
                 string code = _dict[CalcFlds[i]].Control.ValueExpr.Code.ToLower();
-                if (code.Contains("form"))
+                if (_dict[CalcFlds[i]].Control.ValueExpr.Lang == ScriptingLanguage.JS)
                 {
-                    for (int j = 0; j < _dict.Count; j++)
+                    if (code.Contains("form"))
                     {
-                        string[] stringArr = new string[] {
-                            _dict[j].Path,
-                            _dict[j].Root + ".currentrow." + _dict[j].Control.Name,
-                            _dict[j].Root + ".currentrow['" + _dict[j].Control.Name + "']",
-                            _dict[j].Root + ".currentrow[\"" + _dict[j].Control.Name + "\"]",
-                            _dict[j].Root + "." +  _dict[j].Control.Name + "_sum"
-                        };
-                        if (stringArr.Any(code.Contains))
+                        for (int j = 0; j < _dict.Count; j++)
                         {
-                            //if (CalcFlds[i] == j)
-                            //    throw new FormException("Avoid circular reference by the following control in 'ValueExpression' : " + _dict[CalcFlds[i]].Control.Name);
-                            if (CalcFlds[i] != j)//if a control refers itself treated as not circular reference
-                                dpndcy.Add(new KeyValuePair<int, int>(CalcFlds[i], j));//<dependent, dominant>
+                            string[] stringArr = new string[] {
+                                _dict[j].Path,
+                                _dict[j].Root + ".currentrow." + _dict[j].Control.Name,
+                                _dict[j].Root + ".currentrow['" + _dict[j].Control.Name + "']",
+                                _dict[j].Root + ".currentrow[\"" + _dict[j].Control.Name + "\"]",
+                                _dict[j].Root + "." +  _dict[j].Control.Name + "_sum"
+                            };
+                            if (stringArr.Any(code.Contains))
+                            {
+                                //if (CalcFlds[i] == j)
+                                //    throw new FormException("Avoid circular reference by the following control in 'ValueExpression' : " + _dict[CalcFlds[i]].Control.Name);
+                                if (CalcFlds[i] != j)//if a control refers itself treated as not circular reference
+                                    dpndcy.Add(new KeyValuePair<int, int>(CalcFlds[i], j));//<dependent, dominant>
+                            }
+                        }
+                    }
+                }
+                else if (_dict[CalcFlds[i]].Control.ValueExpr.Lang == ScriptingLanguage.SQL)
+                {
+                    if (code.Contains(":"))
+                    {
+                        for (int j = 0; j < _dict.Count; j++)
+                        {
+                            if (code.Contains(":" + _dict[j].Control.Name))
+                            {
+                                if (CalcFlds[i] != j)
+                                    dpndcy.Add(new KeyValuePair<int, int>(CalcFlds[i], j));//<dependent, dominant>
+                            }
                         }
                     }
                 }
@@ -615,6 +632,11 @@ namespace ExpressBase.Objects
             return _list;
         }
 
+        public void ImportData(IDatabase DataDB, Service Service, List<Param> Param, string Trigger)
+        {
+            
+        }
+
         //merge formdata and webform object
         public void MergeFormData()
         {
@@ -729,25 +751,30 @@ namespace ExpressBase.Objects
             }
         }
 
-        public void GetFormattedData(EbDataTable dataTable, SingleTable Table, TableSchema _table = null)
+        public void GetFormattedData(EbDataTable dataTable, SingleTable Table, TableSchema _table = null, bool _skipIds = false)
         {
             foreach (EbDataRow dataRow in dataTable.Rows)
             {
-                string _rowId = dataRow[dataTable.Columns[0].ColumnIndex].ToString();
-                bool _rowFound = false;
-                foreach (SingleRow r in Table)
+                bool skipFst = false;
+                string _rowId = "0";
+                if (!_skipIds)
                 {
-                    if (r.RowId.Equals(_rowId))
+                    _rowId = dataRow[dataTable.Columns[0].ColumnIndex].ToString();
+                    bool _rowFound = false;
+                    foreach (SingleRow r in Table)
                     {
-                        _rowFound = true;
-                        break;
+                        if (r.RowId.Equals(_rowId))
+                        {
+                            _rowFound = true;
+                            break;
+                        }
                     }
-                }
-                if (_rowFound)// skipping duplicate rows in dataTable
-                    continue;
+                    if (_rowFound)// skipping duplicate rows in dataTable
+                        continue;
 
+                    skipFst = true;
+                }
                 SingleRow Row = new SingleRow();
-                bool skipFst = true;
                 foreach (EbDataColumn dataColumn in dataTable.Columns)
                 {
                     if (dataColumn.ColumnName == "eb_loc_id" && skipFst)
