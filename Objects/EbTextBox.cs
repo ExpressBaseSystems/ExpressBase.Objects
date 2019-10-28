@@ -147,7 +147,7 @@ else {
         [Alias("Font Family")]
         public string FontFamilyT { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup("test")]
         [MetaOnly]
         public string MetaOnly { get; set; }
@@ -237,7 +237,7 @@ else {
 
         public void InitFromDataBase(JsonServiceClient ServiceClient)
         {
-            if(this.TableName != "")
+            if(this.AutoSuggestion)
             {
                 var result = ServiceClient.Get<GetDistinctValuesResponse>(new GetDistinctValuesRequest { TableName = this.TableName, ColumnName = this.Name });
                 this.Suggestions = result.Suggestions;

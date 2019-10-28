@@ -150,23 +150,28 @@ namespace ExpressBase.Objects
                 }
                 else if (Allctrls[i] is EbDataGrid)
                 {
-                    string _tn = (Allctrls[i] as EbDataGrid).TableName;
-                    if (string.IsNullOrEmpty((Allctrls[i] as EbDataGrid).TableName))
+                    EbDataGrid DataGrid = Allctrls[i] as EbDataGrid;
+                    string _tn = (DataGrid).TableName;
+                    if (string.IsNullOrEmpty((DataGrid).TableName))
                         throw new FormException("Please enter a valid table name for data grid : " + Allctrls[i].Label);
                     if (tbls.ContainsKey(_tn))
                         throw new FormException(string.Format("Same table '{0}' not allowed for {1} and data grid {2}", _tn, tbls[_tn], Allctrls[i].Label));
                     tbls.Add(_tn, "data grid " + Allctrls[i].Label);
 
-                    for (int j = 0; j < (Allctrls[i] as EbDataGrid).Controls.Count; j++)
+                    for (int j = 0; j < (DataGrid).Controls.Count; j++)
                     {
-                        if ((Allctrls[i] as EbDataGrid).Controls[j] is EbDGUserControlColumn)
+                        if (DataGrid.Controls[j] is EbDGUserControlColumn)
                         {
-                            EbDGColumn DGColumn = (Allctrls[i] as EbDataGrid).Controls[j] as EbDGColumn;
+                            EbDGColumn DGColumn = (DataGrid).Controls[j] as EbDGColumn;
 
-                            ((Allctrls[i] as EbDataGrid).Controls[j] as EbDGUserControlColumn).Columns = new List<EbControl>();
+                            (DataGrid.Controls[j] as EbDGUserControlColumn).Columns = new List<EbControl>();
 
                         }
                     }
+
+                    if (!DataGrid.DataSourceId.IsNullOrEmpty())
+                        DataGrid.InitDSRelated(serviceClient, redis);
+
                 }
                 else if (Allctrls[i] is EbProvisionUser)
                 {
@@ -724,7 +729,7 @@ namespace ExpressBase.Objects
             }
         }
 
-        private void GetFormattedData(EbDataTable dataTable, SingleTable Table, TableSchema _table = null)
+        public void GetFormattedData(EbDataTable dataTable, SingleTable Table, TableSchema _table = null)
         {
             foreach (EbDataRow dataRow in dataTable.Rows)
             {
@@ -854,7 +859,7 @@ namespace ExpressBase.Objects
                 DataDB.GetNewParameter("eb_ver_id", EbDbTypes.Int32, this.RefId.Split("-")[4])
             });
 
-            Console.WriteLine("From RefreshFormData : Schema table count = " + _schema.Tables.Count + " Dataset count = " + dataset.Tables.Count);
+            Console.WriteLine("From RefreshFormData : Schema table count = " + _schema.Tables.Count + " Dataset count = " + dataset.Tables.Count);            
 
             WebformData _FormData = new WebformData()
             {
@@ -873,6 +878,13 @@ namespace ExpressBase.Objects
 
                 if (!_FormData.MultipleTables.ContainsKey(_schema.Tables[i].TableName) && Table.Count > 0)
                     _FormData.MultipleTables.Add(_schema.Tables[i].TableName, Table);
+            }
+
+            if (!_FormData.MultipleTables.ContainsKey(_FormData.MasterTable))
+            {
+                string t = "From RefreshFormData - TABLE : " + _FormData.MasterTable + "   ID : " + this.TableRowId + "\nData Not Found";
+                Console.WriteLine(t);
+                throw new FormException(t);
             }
 
             if (dataset.Tables.Count > _schema.Tables.Count)
