@@ -634,7 +634,150 @@ namespace ExpressBase.Objects
 
         public void ImportData(IDatabase DataDB, Service Service, List<Param> Param, string Trigger)
         {
-            
+            EbControl[] Allctrls = this.Controls.FlattenAllEbControls();
+            EbControl TriggerCtrl = null;
+            List<EbDataGrid> DGs = new List<EbDataGrid>();
+            for (int i = 0; i < Allctrls.Length; i++)
+            {
+                if (Allctrls[i].Name.Equals(Trigger))
+                {
+                    TriggerCtrl = Allctrls[i];
+                }
+                if (Allctrls[i] is EbDataGrid)
+                {
+                    DGs.Add(Allctrls[i] as EbDataGrid);
+                }
+            }
+            if (TriggerCtrl == null)
+                return;
+
+            this.FormData = new WebformData();
+
+            if (TriggerCtrl.DependedDG != null && TriggerCtrl.DependedDG.Count > 0)
+            {
+                foreach (string dgName in TriggerCtrl.DependedDG)
+                {
+                    EbDataGrid _dg = DGs.Find(e => e.Name == dgName);
+                    if (_dg == null)
+                        break;
+                    TableSchema _sc = this.FormSchema.Tables.Find(tbl => tbl.TableName == _dg.TableName);
+                    if (_sc == null)
+                        break;
+
+                    EbDataReader dataReader = Service.Redis.Get<EbDataReader>(_dg.DataSourceId);
+                    if (dataReader == null)
+                    {
+                        EbObjectParticularVersionResponse result = Service.Gateway.Send<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = _dg.DataSourceId });
+                        dataReader = EbSerializers.Json_Deserialize(result.Data[0].Json);
+                        Service.Redis.Set<EbDataReader>(_dg.DataSourceId, dataReader);
+                    }
+                    foreach (Param item in dataReader.InputParams)
+                    {
+                        foreach (Param _p in Param)
+                        {
+                            if (item.Name == _p.Name)
+                                _p.Type = item.Type;
+                        }
+                    }
+                    DataSourceDataSetResponse response = Service.Gateway.Send<DataSourceDataSetResponse>(new DataSourceDataSetRequest { RefId = _dg.DataSourceId, Params = Param });
+
+                    SingleTable Table = new SingleTable();
+                    Dictionary<EbDGPowerSelectColumn, string> psDict = new Dictionary<EbDGPowerSelectColumn, string>();
+
+                    foreach (EbDataRow _row in response.DataSet.Tables[0].Rows)
+                    {
+                        SingleRow Row = new SingleRow();
+                        foreach (ColumnSchema _column in _sc.Columns)
+                        {
+                            EbDataColumn dc = response.DataSet.Tables[0].Rows.Table.Columns[_column.ColumnName];
+                            if (dc != null && !_row.IsDBNull(dc.ColumnIndex))
+                            {
+                                object _unformattedData = _row[dc.ColumnIndex];
+                                object _formattedData = _unformattedData;
+                                if (_column.Control is EbDGDateColumn)
+                                {
+                                    EbDateType _type = (_column.Control as EbDGDateColumn).EbDateType;
+                                    DateTime dt = Convert.ToDateTime(_unformattedData);
+                                    if (_type == EbDateType.Date)
+                                    {
+                                        DateShowFormat _showtype = (_column.Control as EbDGDateColumn).EbDate.ShowDateAs_;
+                                        if (_showtype == DateShowFormat.Year_Month)
+                                            _formattedData = dt.ToString("MM/yyyy", CultureInfo.InvariantCulture);
+                                        else
+                                            _formattedData = dt.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+                                    }
+                                    else if (_type == EbDateType.DateTime)
+                                    {
+                                        _formattedData = dt.ConvertFromUtc(this.UserObj.Preference.TimeZone).ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+                                    }
+                                    else
+                                    {
+                                        _formattedData = dt.ConvertFromUtc(this.UserObj.Preference.TimeZone).ToString("HH:mm:ss", CultureInfo.InvariantCulture);
+                                    }
+                                }
+                                else if(_column.Control is EbDGPowerSelectColumn)
+                                {
+                                    if (!_formattedData.ToString().IsNullOrEmpty())
+                                    {
+                                        if (!psDict.ContainsKey(_column.Control as EbDGPowerSelectColumn))
+                                        {
+                                            psDict.Add(_column.Control as EbDGPowerSelectColumn, _formattedData.ToString());
+                                        }
+                                        else
+                                        {
+                                            psDict[_column.Control as EbDGPowerSelectColumn] += "," + _formattedData.ToString();
+                                        }
+                                    }
+                                  
+                                }
+
+                                Row.Columns.Add(new SingleColumn()
+                                {
+                                    Name = _column.ColumnName,
+                                    Type = (int)_column.EbDbType,
+                                    Value = _formattedData
+                                });
+                            }
+                            else
+                            {
+                                Row.Columns.Add(new SingleColumn()
+                                {
+                                    Name = _column.ColumnName,
+                                    Type = (int)_column.EbDbType,
+                                    Value = null
+                                });
+                            }
+                        }
+                        Table.Add(Row);
+                    }
+                    this.FormData.MultipleTables.Add(_dg.TableName, Table);
+
+                    Dictionary<string, string> QrsDict = new Dictionary<string, string>();
+                    foreach (KeyValuePair<EbDGPowerSelectColumn, string> psItem in psDict)
+                    {
+                        string t = psItem.Key.GetSelectQuery(DataDB, Service, psItem.Value);
+                        QrsDict.Add(psItem.Key.EbSid, t);
+                    }
+                    if (QrsDict.Count > 0)
+                    {
+                        EbDataSet dataset = DataDB.DoQueries(string.Join(" ", QrsDict.Select(d => d.Value)));
+                        int i = 0;
+                        foreach (KeyValuePair<string, string> item in QrsDict)
+                        {
+                            SingleTable Tbl = new SingleTable();
+                            GetFormattedData(dataset.Tables[i++], Tbl);
+                            this.FormData.ExtendedTables.Add(item.Key, Tbl);
+                        }
+                    }
+                }
+            }
+
+            else if (TriggerCtrl is EbPowerSelect && !(TriggerCtrl as EbPowerSelect).DataImportId.IsNullOrEmpty())
+            {
+                Param[0].Type = "7";//Decimal
+                this.TableRowId = Param[0].ValueTo;
+                this.RefreshFormData(DataDB, Service);
+            }
         }
 
         //merge formdata and webform object
