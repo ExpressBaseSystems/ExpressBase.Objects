@@ -780,6 +780,33 @@ namespace ExpressBase.Objects
             }
         }
 
+        public string ExecuteSqlValueExpression(IDatabase DataDB, Service Service, List<Param> Param, string Trigger)
+        {
+            EbControl[] Allctrls = this.Controls.FlattenAllEbControls();
+            EbControl TriggerCtrl = null;
+            string val = string.Empty;
+            for (int i = 0; i < Allctrls.Length; i++)
+            {
+                if (Allctrls[i].Name.Equals(Trigger))
+                {
+                    TriggerCtrl = Allctrls[i];
+                    break;
+                }
+            }
+            if (TriggerCtrl != null && TriggerCtrl.ValueExpr != null && TriggerCtrl.ValueExpr.Lang == ScriptingLanguage.SQL && !TriggerCtrl.ValueExpr.Code.IsNullOrEmpty())
+            {
+                DbParameter[] parameters = new DbParameter[Param.Count];
+                for (int i = 0; i < Param.Count; i++)
+                {
+                    parameters[i] = DataDB.GetNewParameter(Param[i].Name, (EbDbTypes) Convert.ToInt32(Param[i].Type), Param[i].ValueTo);
+                }
+                EbDataTable table = DataDB.DoQuery(TriggerCtrl.ValueExpr.Code, parameters);
+                if (table.Rows.Count > 0)
+                    val = table.Rows[0][0].ToString();
+            }
+            return val;
+        }
+
         //merge formdata and webform object
         public void MergeFormData()
         {
