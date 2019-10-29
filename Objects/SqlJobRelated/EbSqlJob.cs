@@ -1,6 +1,7 @@
 ﻿using ExpressBase.Common;
 using ExpressBase.Common.Data;
 using ExpressBase.Common.Objects.Attributes;
+using ExpressBase.Common.Structures;
 using ExpressBase.Objects.ServiceStack_Artifacts;
 using ServiceStack.Text;
 using System;
@@ -67,22 +68,13 @@ namespace ExpressBase.Objects.Objects.SqlJobRelated
         {
         }
     }
+
     public class OrderedList : List<SqlJobResource>
     {
         public OrderedList()
         {
             this.Sort((x, y) => x.RouteIndex.CompareTo(y.RouteIndex));
         }
-
-        //public SqlJobResources GetPreviousResource(int index, int parentindex)
-        //{
-        //    SqlJobResources _prev;
-        //    if (index != 0)
-        //        if (this[parentindex] is EbLoop)
-        //            _prev = (this[parentindex] as EbLoop).InnerResources[index - 1];
-        //        else
-        //            _prev= 
-        //}
     }
 
     public enum SqlJobTypes
@@ -90,6 +82,7 @@ namespace ExpressBase.Objects.Objects.SqlJobRelated
         UserInitiated,
         Scheduled
     }
+
     public class EbLoop : SqlJobResource, ISqlJobCollection
     {
         public OrderedList InnerResources { get; set; }
@@ -100,11 +93,7 @@ namespace ExpressBase.Objects.Objects.SqlJobRelated
                 OutParams = ((this.InnerResources[0] as ISqlJobCollection).InnerResources[step - 1]).GetOutParams(_param, step);
             else
                 OutParams = this.InnerResources[step - 1].GetOutParams(_param, step);
-
-            //foreach (Param p in OutParams)
-            //{
-            //    p.Value = (this.Result as Param).Value;
-            //}
+ 
             return OutParams;
         }
     }
@@ -211,5 +200,12 @@ namespace ExpressBase.Objects.Objects.SqlJobRelated
         public Type ResultType { get { return this.Data.GetType(); } }
 
         public string Data { set; get; }
+    }
+
+    public class TV
+    {
+        public object Value { get; set; }
+
+        public string Type { get; set; }
     }
 }
