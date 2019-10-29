@@ -164,6 +164,10 @@ $.each(this.Controls.$values, function (i, col) {
                 DataReader = EbSerializers.Json_Deserialize(drObj.Data[0].Json);
                 this.Redis.Set<EbDataReader>(this.DataSourceId, DataReader);
             }
+            for(int i = 0; i < Allctrls.Length; i++)
+            {
+                Allctrls[i].DependedDG = new List<string>();
+            }
             foreach (Param p in DataReader.InputParams)
             {
                 _params.Add(p.Name);
@@ -171,8 +175,6 @@ $.each(this.Controls.$values, function (i, col) {
                 {
                     if (p.Name == Allctrls[i].Name)
                     {
-                        if (Allctrls[i].DependedDG == null)
-                            Allctrls[i].DependedDG = new List<string>();
                         Allctrls[i].DependedDG.Add(this.Name);
                     }
                 }

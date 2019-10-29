@@ -765,7 +765,7 @@ namespace ExpressBase.Objects
                         foreach (KeyValuePair<string, string> item in QrsDict)
                         {
                             SingleTable Tbl = new SingleTable();
-                            GetFormattedData(dataset.Tables[i++], Tbl);
+                            GetFormattedData(dataset.Tables[i++], Tbl, null, true);
                             this.FormData.ExtendedTables.Add(item.Key, Tbl);
                         }
                     }
