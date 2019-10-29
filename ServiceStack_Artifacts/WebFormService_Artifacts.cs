@@ -88,6 +88,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 2)]
         public List<Param> Params { get; set; }
+
+        [DataMember(Order = 3)]
+        public string Trigger { get; set; }
     }
 
     [DataContract]
@@ -96,9 +99,36 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 1)]
         public WebformData FormData { get; set; }
 
+        [DataMember(Order = 3)]
+        public WebformDataWrapper FormDataWrap { get; set; }
+
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
     }
+
+    [DataContract]
+    public class ExecuteSqlValueExprRequest : EbServiceStackAuthRequest, IReturn<ExecuteSqlValueExprResponse>
+    {
+        [DataMember(Order = 1)]
+        public string RefId { get; set; }
+
+        [DataMember(Order = 2)]
+        public List<Param> Params { get; set; }
+
+        [DataMember(Order = 3)]
+        public string Trigger { get; set; }
+    }
+
+    [DataContract]
+    public class ExecuteSqlValueExprResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public string Data { get; set; }
+        
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
 
     [DataContract]
 	public class DoUniqueCheckRequest : EbServiceStackAuthRequest, IReturn<GetRowDataResponse>
