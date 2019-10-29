@@ -54,7 +54,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public string Refid { get; set; }
 
-        public Dictionary<string, object> Params { get; set; }
+        public Dictionary<string, TV> Params { get; set; }
 
         public string Message { get; set; }
 
