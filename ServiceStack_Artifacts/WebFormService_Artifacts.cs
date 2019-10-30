@@ -81,6 +81,56 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
+    public class GetImportDataRequest : EbServiceStackAuthRequest, IReturn<GetImportDataResponse>
+    {
+        [DataMember(Order = 1)]
+        public string RefId { get; set; }
+
+        [DataMember(Order = 2)]
+        public List<Param> Params { get; set; }
+
+        [DataMember(Order = 3)]
+        public string Trigger { get; set; }
+    }
+
+    [DataContract]
+    public class GetImportDataResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public WebformData FormData { get; set; }
+
+        [DataMember(Order = 3)]
+        public WebformDataWrapper FormDataWrap { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    [DataContract]
+    public class ExecuteSqlValueExprRequest : EbServiceStackAuthRequest, IReturn<ExecuteSqlValueExprResponse>
+    {
+        [DataMember(Order = 1)]
+        public string RefId { get; set; }
+
+        [DataMember(Order = 2)]
+        public List<Param> Params { get; set; }
+
+        [DataMember(Order = 3)]
+        public string Trigger { get; set; }
+    }
+
+    [DataContract]
+    public class ExecuteSqlValueExprResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public string Data { get; set; }
+        
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+
+    [DataContract]
 	public class DoUniqueCheckRequest : EbServiceStackAuthRequest, IReturn<GetRowDataResponse>
 	{
 		[DataMember(Order = 1)]
@@ -342,11 +392,53 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
+    [DataContract]
+    public class GetDistinctValuesRequest : EbServiceStackAuthRequest, IReturn<GetDistinctValuesResponse>
+    {
+        [DataMember(Order = 1)]
+        public string TableName { get; set; }  
+        
+        [DataMember(Order = 2)]
+        public string ColumnName { get; set; }
+
+    }
+
+    [DataContract]
+    public class GetDistinctValuesResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public List<string> Suggestions { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+
+
     [Serializable()]
     public class FormException : Exception
     {
         public FormException() : base() { }
 
         public FormException(string message) : base(message) { }
+
+        public FormException(string message, int code) : base(message) 
+        {
+            this.ExceptionCode = code;
+        }
+
+        public FormException(string message, int code, string msg, string stacktrace) : base(message) 
+        {
+            this.ExceptionCode = code;
+            this.MessageInternal = msg;
+            this.StackTraceInternal = stacktrace;
+        }
+
+        // >100 = info; >200 = warning; >300 = error
+        public int ExceptionCode { get; set; }
+
+        public string MessageInternal { get; set; }
+
+        public string StackTraceInternal { get; set; }
     }
 }

@@ -3,6 +3,7 @@ using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
+using ExpressBase.Common.Structures;
 using Newtonsoft.Json;
 using ServiceStack;
 using ServiceStack.Text;
@@ -11,6 +12,7 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Xml.Serialization;
+using ExpressBase.Security;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
@@ -206,6 +208,60 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public EbApi Api { get; set; }
     }
 
+    [DataContract]
+    public class GetMobMenuRequest : IReturn<GetMobMenuResonse>, IEbSSRequest
+    {
+        public string SolnId { get; set; }
+
+        public int UserId { get; set; }
+    }
+
+    [DataContract]
+    public class GetMobMenuResonse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 2)]
+        public List<AppDataToMob> Applications { get; set; }
+
+        public GetMobMenuResonse()
+        {
+            Applications = new List<AppDataToMob>();
+        }
+    }
+
+    [DataContract]
+    public class EbObjectToMobRequest : IReturn<EbObjectToMobResponse>, IEbSSRequest
+    {
+        public string SolnId { get; set; }
+
+        public int UserId { get; set; }
+
+        [DataMember(Order = 1)]
+        public string RefId { set; get; }
+
+        [DataMember(Order = 2)]
+        public User User { set; get; }
+    }
+
+    [DataContract]
+    public class EbObjectToMobResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public EbObjectWrapper ObjectWraper { set; get; }
+
+        [DataMember(Order = 2)]
+        public byte[] ReportResult { get; set; }
+
+        [DataMember(Order = 3)]
+        public EbDataSet TableResult { get; set; }
+
+        [DataMember(Order = 5)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+
     [RuntimeSerializable]
     public class JsonTableSet
     {
@@ -250,9 +306,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     public static class SqlConstants
     {
-//        public const string SQL_FUNC_HEADER = @"CREATE OR REPLACE FUNCTION {0}(insert_json jsonb,update_json jsonb)
-//RETURNS void
-//LANGUAGE {1} AS $BODY$";
+        //        public const string SQL_FUNC_HEADER = @"CREATE OR REPLACE FUNCTION {0}(insert_json jsonb,update_json jsonb)
+        //RETURNS void
+        //LANGUAGE {1} AS $BODY$";
 
         public const string JSON_ROW_SELECT = @"CREATE OR REPLACE FUNCTION {0}(_json,table_name)
 RETURNS jsonb
@@ -368,5 +424,32 @@ END;";
         public string FileType { set; get; }
 
         public int FileRefId { set; get; }
+    }
+
+    public class AppDataToMob
+    {
+        public int AppId { set; get; }
+
+        public string AppName { set; get; }
+
+        public string AppIcon { set; get; }
+    }
+
+    public class ObjectListToMob
+    {
+        public Dictionary<string, List<ObjWrap>> Objects { set; get; }
+
+        public ObjectListToMob()
+        {
+            Objects = new Dictionary<string, List<ObjWrap>>();
+        }
+
+        public int Count
+        {
+            get
+            {
+                return Objects.Count;
+            }
+        }
     }
 }

@@ -50,7 +50,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyGroup("Behavior")]
         [PropertyPriority(98)]
-        public bool IsInsertable{ get; set; }
+        public bool IsInsertable { get; set; }
 
         public override string IsRequiredOKJSfn
         {
@@ -270,6 +270,11 @@ namespace ExpressBase.Objects
         [OSE_ObjectTypes(EbObjectTypes.iWebForm)]
         public string FormRefId { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [OSE_ObjectTypes(EbObjectTypes.iWebForm)]
+        public string DataImportId { get; set; }
+
         [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.WebForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.CollectionProp, "Columns", "bVisible")]
         [PropertyGroup("Behavior")]
@@ -277,8 +282,9 @@ namespace ExpressBase.Objects
         public DVColumnCollection Columns { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
         [PropertyGroup("Behavior")]
+        [PropertyEditor(PropertyEditorType.CollectionABCFrmSrc, "Columns")]
+        [OnChangeExec(@"if (this.Columns && this.Columns.$values.length === 0 ){pg.MakeReadOnly('DisplayMembers');} else {pg.MakeReadWrite('DisplayMembers');}")]
         public DVColumnCollection DisplayMembers { get; set; }
 
         [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.WebForm, BuilderType.UserControl)]
@@ -449,7 +455,7 @@ namespace ExpressBase.Objects
 .Replace("@ebsid@", this.EbSid_CtxId)
 .Replace("@type@", ((int)obj.Type).ToString())
 .Replace("@sTitle@", obj.sTitle.ToString())
-.Replace("@perWidth@", "style='width:" + ((int)(100 / noOfFileds)).ToString() + "%'")
+.Replace("@perWidth@", "style='width:" + ( (obj.Width == 0) ? (((int)(100 / noOfFileds)).ToString()) : obj.Width.ToString() ) + "%'")
 .Replace("@border-r" + i, (i != noOfFileds - 1) ? "style='border-radius: 0px;'" : "");
                     i++;
                 }
@@ -491,24 +497,19 @@ namespace ExpressBase.Objects
         }
 
         public override string DesignHtml4Bot { get => @"
-<div id='cont_@name@  ' class='Eb-ctrlContainer' Ctype='TextBox' eb-hidden='@isHidden@'>
-   <div role='form' data-toggle='validator' style=' width: inherit;'>
-    <span style='background-color:@LabelBackColor@; color:@LabelForeColor@ '> @Label@  </span>
-      <div class='combo-wrap' data-toggle='tooltip' title='' data-original-title=''>
-         <div style='display: inline-block; width: 100%; margin-right: -4px;'>
-            <div class='input-group'>
-               <div class='dropdown v-select searchable' id='acmasterid0'>
-                  <div type='button' class='dropdown-toggle clearfix' style='border-top-left-radius: 5px; border-bottom-left-radius: 5px;'>
-                     <input debounce='0' type='search'  readonly  placeholder='label0' class='form-control' id='acmaster1_xid' style='width: 100%; background-color: #fff;'> <i role='presentation' class='open-indicator' style='display: none;'></i> 
-                     <div class='spinner' style='display: none;'>Loading...</div>
-                  </div>
-               </div>
-               <span class='input-group-addon'><i id='acmasteridTglBtn' aria-hidden='true' class='fa  fa-search'></i></span>
-            </div>
-         </div>
-      </div>
-   </div>
-</div>"; set => base.DesignHtml4Bot = value; }
+	<div class='combo-wrap' data-toggle='tooltip' title='' data-original-title=''>
+		<div style='display: inline-block; width: 100%; margin-right: -4px;'>
+			<div class='input-group'>
+				<div class='dropdown v-select searchable' id='acmasterid0'>
+					<div type='button' class='dropdown-toggle clearfix' style='border-top-left-radius: 5px; border-bottom-left-radius: 5px;'>
+						<input debounce='0' type='search'  readonly  placeholder='label0' class='form-control' id='acmaster1_xid' style='width: 100%; background-color: #fff;'> <i role='presentation' class='open-indicator' style='display: none;'></i> 
+						<div class='spinner' style='display: none;'>Loading...</div>
+					</div>
+				</div>
+				<span class='input-group-addon'><i id='acmasteridTglBtn' aria-hidden='true' class='fa  fa-search'></i></span>
+			</div>
+		</div>
+	</div>"; set => base.DesignHtml4Bot = value; }
 
         public override string GetBareHtml()
         {
@@ -544,7 +545,7 @@ namespace ExpressBase.Objects
                 return string.Empty;
         }
 
-        public string GetBareHtml( string ebsid)// temp
+        public string GetBareHtml(string ebsid)// temp
         {
             if (this.RenderAsSimpleSelect)
             {

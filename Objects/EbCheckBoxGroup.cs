@@ -39,7 +39,24 @@ namespace ExpressBase.Objects
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+
+		public override string DesignHtml4Bot
+		{
+			get => @"	 <div style='padding:5px'>
+                    <div class='check-wraper'>
+                        <input class='bot-checkbox' type ='checkbox' value='@value@' id='@ebsid@' name='@gname@'> 
+                            <span id='@name@Lbl' style='@LabelBackColor @LabelForeColor '> CheckBox1  </span>
+                    </div>
+                    <div class='check-wraper'>
+                        <input class='bot-checkbox' type ='checkbox' value='@value@' id='@ebsid@' name='@gname@'> 
+                            <span id='@name@Lbl' style='@LabelBackColor @LabelForeColor '> CheckBox2  </span>
+                    </div>
+                </div>
+						";
+			set => base.DesignHtml4Bot = value;
+		}
+
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         public decimal Value { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]

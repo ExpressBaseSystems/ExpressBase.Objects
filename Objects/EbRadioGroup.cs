@@ -132,9 +132,22 @@ namespace ExpressBase.Objects
             return html
 .Replace("@name@", (this.Name != null) ? this.Name : "@name@")
 .Replace("@ebsid@", EbSid_CtxId);
-        }
+		}
 
-        public override string GetDesignHtml()
+		public override string DesignHtml4Bot
+		{
+			get => @"<div id='' class='radio-wrap @radio-wrap-block@' style='padding: 4px;'>
+						<input type ='radio' class='eb-radiobtn' id='' @defaultcheked@ value='@value@' name='@gname@'>
+						<span id='Lbl' class='eb-radiospan' ui-label style='@LabelBackColor @LabelForeColor '> RadioButton1 </span>
+					</div>
+					<div id='' class='radio-wrap @radio-wrap-block@' style='padding: 4px;'>
+						<input type ='radio' class='eb-radiobtn' id='' @defaultcheked@ value='@value@' name='@gname@'>
+						<span id='Lbl' class='eb-radiospan' ui-label style='@LabelBackColor @LabelForeColor '> RadioButton2  </span>
+                </div>";
+			set => base.DesignHtml4Bot = value;
+		}
+
+		public override string GetDesignHtml()
         {
             string EbCtrlHTML = HtmlConstants.CONTROL_WRAPER_HTML4WEB
                 .Replace("@barehtml@", @"

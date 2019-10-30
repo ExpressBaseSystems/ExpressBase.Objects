@@ -7,7 +7,7 @@ using System.Data;
 using System.Dynamic;
 using System.Text;
 using Newtonsoft.Json.Linq;
-
+using ExpressBase.Objects.Objects.SqlJobRelated;
 
 namespace ExpressBase.Objects.Objects
 {
@@ -156,8 +156,10 @@ namespace ExpressBase.Objects.Objects
 
         public void SetParam(string name, object value)
         {
-            Parameters.Add(name, value);
-
+            if (!Parameters.ContainsKey(name))
+                Parameters.Add(name, value);
+            else
+                Parameters[name] = value;
             this.Globals["Params"].Add(name, new NTV
             {
                 Name = name,
@@ -200,13 +202,13 @@ namespace ExpressBase.Objects.Objects
 
     public class FormGlobals
     {
-        public dynamic FORM { get; set; }
+        public dynamic form { get; set; }
 
-        public dynamic USER { get; set; }
+        public dynamic user { get; set; }
 
         public FormGlobals()
         {
-            this.FORM = new FormAsGlobal();
+            this.form = new FormAsGlobal();
         }
     }
 
@@ -332,6 +334,65 @@ namespace ExpressBase.Objects.Objects
             else
                 result = ntv.Value.ToString();
             return result;
+        }
+    }
+
+    public class SqlJobGlobals
+    {
+        public SqlJobScriptHelper Job { set; get; }
+
+        public dynamic Params { get; set; }
+
+        public List<EbDataTable> Tables { set; get; }
+
+        public SqlJobGlobals() { }
+
+        public SqlJobGlobals(EbDataSet _ds, ref Dictionary<string, TV> global)
+        {
+            this.Tables = (_ds == null) ? null : _ds.Tables;
+
+            this.Job = new SqlJobScriptHelper(ref global, this);
+
+            Params = new NTVDict();
+        }
+
+        public dynamic this[string key]
+        {
+            get
+            {
+                if (key == "Params")
+                    return this.Params;
+                else
+                    return null;
+            }
+        }
+    }
+
+    public class SqlJobScriptHelper
+    {
+        public Dictionary<string, TV> Parameters { set; get; }
+
+        public SqlJobGlobals Globals { set; get; }
+
+        public SqlJobScriptHelper(ref Dictionary<string, TV> global, SqlJobGlobals sql_global)
+        {
+            Parameters = global;
+
+            Globals = sql_global;
+        }
+
+        public void SetParam(string name, object value)
+        {
+            if (!Parameters.ContainsKey(name))
+                Parameters.Add(name,new TV { Value= value });
+            else
+                Parameters[name] = new TV { Value = value };
+            this.Globals["Params"].Add(name, new NTV
+            {
+                Name = name,
+                Type = (value.GetType() == typeof(JObject) || value.GetType().Name == "JValue") ? EbDbTypes.Object : (EbDbTypes)Enum.Parse(typeof(EbDbTypes), value.GetType().Name, true),
+                Value = value as object
+            });
         }
     }
 }
