@@ -54,20 +54,20 @@ namespace ExpressBase.Objects
         Tab
     }
 
-    [EnableInBuilder(BuilderType.BotForm, BuilderType.DashBoard)]
+    [EnableInBuilder(BuilderType.BotForm, BuilderType.DashBoard, BuilderType.Calendar)]
     public class EbDataVisualizationObject : EbObject
     {
 
     }
 
-    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
+    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
     public class ChartColor : EbDataVisualizationObject
     {
         [EnableInBuilder(BuilderType.DVBuilder)]
         public string Color { get; set; }
     }
 
-    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
+    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
     public class EbDataVisualizationSet : EbDataVisualizationObject
     {
 
@@ -87,37 +87,38 @@ namespace ExpressBase.Objects
 
     public abstract class EbDataVisualization : EbDataVisualizationObject
     {
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]
         [HideInPropertyGrid]
         public override string RefId { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]
         public override string DisplayName { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]
         public override string Description { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]
         [HideInPropertyGrid]
         public override string VersionNumber { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]
         [HideInPropertyGrid]
         public override string Status { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
         [HideForUser]
         [PropertyPriority(0)]
         public string DataSourceRefId { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]
         [HideInPropertyGrid]
         public string EbSid { get; set; }
 
         [JsonIgnore]
         public EbDataReader EbDataSource { get; set; }
+
 
         [PropertyEditor(PropertyEditorType.CollectionABCpropToggle, "Columns", "bVisible", "_Formula")]
         [CEOnSelectFn(@";
@@ -129,7 +130,7 @@ namespace ExpressBase.Objects
         [CEOnDeselectFn(@"
             this.bVisible = false;
             Parent.NotVisibleColumns.$values.push(this)")]
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]
         public virtual DVColumnCollection Columns { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
@@ -144,7 +145,7 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public List<Param> ParamsList { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]
         [HideInPropertyGrid]
         public List<DVBaseColumn> NotVisibleColumns { get; set; }
 
@@ -362,8 +363,9 @@ namespace ExpressBase.Objects
 
     }
 
-    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm)]
+    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.Calendar)]
     [BuilderTypeEnum(BuilderType.DVBuilder)]
+    [UsedWithTopObjectParent(typeof(EbObject))]
     public class EbTableVisualization : EbDataVisualization, IEBRootObject
     {
 
@@ -379,11 +381,11 @@ namespace ExpressBase.Objects
         public string BotData { get; set; }
 
         [HideInPropertyGrid]
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.Calendar)]
         public string ObjType { get; set; }
 
         [HideInPropertyGrid]
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.Calendar)]
         public string BareControlHtml { get; set; }
 
         [OnChangeExec(@"
@@ -396,13 +398,13 @@ namespace ExpressBase.Objects
             pg.ShowProperty('LeftFixedColumn')
             pg.ShowProperty('RightFixedColumn')
         }")]
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]
         [PropertyEditor(PropertyEditorType.Collection)]
         [HideForUser]
         [HideInPropertyGrid]
         public List<RowGroupParent> RowGroupCollection { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]
         [HideInPropertyGrid]
         public RowGroupParent CurrentRowGroup { get; set; }
 
@@ -419,7 +421,7 @@ namespace ExpressBase.Objects
         [PropertyGroup("Paging")]
         public int PageLength { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]
         [HideInPropertyGrid]
         public bool DisableRowGrouping { get; set; }
 
@@ -439,7 +441,7 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
         public List<DVBaseColumn> OrderBy { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]
         [HideInPropertyGrid]
         public List<FormLink> FormLinks { get; set; }
 
