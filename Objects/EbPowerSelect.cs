@@ -617,14 +617,8 @@ namespace ExpressBase.Objects
                 string s = "";
                 if (DataDB.Vendor == DatabaseVendors.MYSQL)
                 {
-                    s = string.Format(@"
-                                DROP TEMPORARY TABLE IF EXISTS temp_array_table;
-		                        DROP TEMPORARY TABLE IF EXISTS temp_mem;
-		                        CREATE TEMPORARY TABLE temp_array_table(value text); 
-                                CALL STR_TO_TBL('{2}'); 
-                                CREATE TEMPORARY TABLE temp_mem SELECT `value` FROM temp_array_table;
-                                    SELECT __A.* FROM ({0}) __A 
-                                    WHERE __A.{1} = ANY(SELECT CAST(`value` AS UNSIGNED INTEGER) FROM temp_mem);",
+                    s = string.Format(@"SELECT __A.* FROM ({0}) __A 
+                                    WHERE FIND_IN_SET(__A.{1}, '{2}');",
                                                         Sql, this.ValueMember.Name, Col);
                 }
                 else
@@ -641,15 +635,9 @@ namespace ExpressBase.Objects
                 string s = "";
                 if (DataDB.Vendor == DatabaseVendors.MYSQL)
                 {
-                    s = string.Format(@"
-                                DROP TEMPORARY TABLE IF EXISTS temp_array_table;
-		                        DROP TEMPORARY TABLE IF EXISTS temp_mem;
-		                        CREATE TEMPORARY TABLE temp_array_table(value text); 
-                                CALL STR_TO_TBL('{3}'); 
-                                CREATE TEMPORARY TABLE temp_mem SELECT `value` FROM temp_array_table;
-                                SELECT __A.* FROM ({0}) __A, {1} __B
-                                    WHERE __A.{2} = ANY(SELECT CAST(`value` AS UNSIGNED INTEGER) FROM temp_mem) AND __B.{4} = :id;",
-                                        Sql, Tbl, this.ValueMember.Name, Col, _id);
+                    s = string.Format(@"SELECT __A.* FROM ({0}) __A, {1} __B
+                                    WHERE FIND_IN_SET(__A.{2}, __B.{3}) AND __B.{4} = :id;",
+                                         Sql, Tbl, this.ValueMember.Name, Col, _id);
                 }
                 else
                 {
@@ -671,14 +659,8 @@ namespace ExpressBase.Objects
             string s = "";
             if (DataDB.Vendor == DatabaseVendors.MYSQL)
             {
-                s = string.Format(@"
-                            DROP TEMPORARY TABLE IF EXISTS temp_array_table;
-                            DROP TEMPORARY TABLE IF EXISTS temp_mems;
-                            CREATE TEMPORARY TABLE temp_array_table(value text); 
-                            CALL STR_TO_TBL('{3}'); 
-                            CREATE TEMPORARY TABLE temp_mems SELECT `value` FROM temp_array_table;
-                            SELECT {0}, {1} FROM ({2}) __A
-                            WHERE __A.{0} = ANY(SELECT CAST(`value` AS UNSIGNED INTEGER) FROM temp_mems);",
+                s = string.Format(@"SELECT {0}, {1} FROM ({2}) __A
+                                        WHERE FIND_IN_SET(__A.{0}, '{3}');",
                             vm, dm, Sql, vms);
             }
             else
