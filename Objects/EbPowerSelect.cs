@@ -83,6 +83,8 @@ namespace ExpressBase.Objects
             }
             set { }
         }
+        public override string IsEmptyJSfn { get { return @" return this.initializer.Vobj.valueMembers.length === 0;"; } set { } }
+
 
         public override string DisableJSfn
         {
