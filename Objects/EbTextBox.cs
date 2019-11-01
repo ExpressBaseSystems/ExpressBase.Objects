@@ -136,6 +136,10 @@ else {
         [HelpText("specifies a short hint that describes the expected value of an input field (e.g. a sample value or a short description of the expected format)")]
         public string PlaceHolder { get; set; }
 
+        //[PropertyGroup("Behavior")]
+        //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        //public string MaskPattern { get; set; }
+
         //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         //[PropertyGroup("Appearance")]
         //[PropertyEditor(PropertyEditorType.MultiLanguageKeySelector)]

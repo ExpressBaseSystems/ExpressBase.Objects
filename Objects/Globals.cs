@@ -7,7 +7,7 @@ using System.Data;
 using System.Dynamic;
 using System.Text;
 using Newtonsoft.Json.Linq;
-
+using ExpressBase.Objects.Objects.SqlJobRelated;
 
 namespace ExpressBase.Objects.Objects
 {
@@ -347,7 +347,7 @@ namespace ExpressBase.Objects.Objects
 
         public SqlJobGlobals() { }
 
-        public SqlJobGlobals(EbDataSet _ds, ref Dictionary<string, object> global)
+        public SqlJobGlobals(EbDataSet _ds, ref Dictionary<string, TV> global)
         {
             this.Tables = (_ds == null) ? null : _ds.Tables;
 
@@ -370,11 +370,11 @@ namespace ExpressBase.Objects.Objects
 
     public class SqlJobScriptHelper
     {
-        public Dictionary<string, object> Parameters { set; get; }
+        public Dictionary<string, TV> Parameters { set; get; }
 
         public SqlJobGlobals Globals { set; get; }
 
-        public SqlJobScriptHelper(ref Dictionary<string, object> global, SqlJobGlobals sql_global)
+        public SqlJobScriptHelper(ref Dictionary<string, TV> global, SqlJobGlobals sql_global)
         {
             Parameters = global;
 
@@ -384,9 +384,9 @@ namespace ExpressBase.Objects.Objects
         public void SetParam(string name, object value)
         {
             if (!Parameters.ContainsKey(name))
-                Parameters.Add(name, value);
+                Parameters.Add(name,new TV { Value= value });
             else
-                Parameters[name] = value;
+                Parameters[name] = new TV { Value = value };
             this.Globals["Params"].Add(name, new NTV
             {
                 Name = name,

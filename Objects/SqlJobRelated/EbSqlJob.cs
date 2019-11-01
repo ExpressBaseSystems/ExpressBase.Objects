@@ -1,6 +1,7 @@
 ﻿using ExpressBase.Common;
 using ExpressBase.Common.Data;
 using ExpressBase.Common.Objects.Attributes;
+using ExpressBase.Common.Structures;
 using ExpressBase.Objects.ServiceStack_Artifacts;
 using ServiceStack.Text;
 using System;
@@ -31,6 +32,32 @@ namespace ExpressBase.Objects.Objects.SqlJobRelated
 
         public OrderedList Resources { set; get; }
 
+        public List<string> FirstReaderKeyColumns { get; set; }
+
+        public List<string> ParameterKeyColumns { get; set; }
+
+        public LoopLocation GetLoop()
+        {
+            for (int i = 0; i < Resources.Count; i++)
+            {
+                if (Resources[i] is ISqlJobCollection)
+                {
+                    if (Resources[i] is EbLoop)
+                        return new LoopLocation { Loop = Resources[i] as EbLoop, Step = i, ParentIndex = i };
+                    else
+                    {
+                        for (int j = 0;  j < (Resources[i] as ISqlJobCollection).InnerResources.Count; j++)
+                       
+                        {
+                            if ((Resources[i] as ISqlJobCollection).InnerResources[j] is EbLoop)
+                                return new LoopLocation { Loop = (Resources[i] as ISqlJobCollection).InnerResources[j] as EbLoop, Step = j, ParentIndex = i };
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+
         public override List<string> DiscoverRelatedRefids()
         {
             List<string> refids = new List<string>();
@@ -41,22 +68,13 @@ namespace ExpressBase.Objects.Objects.SqlJobRelated
         {
         }
     }
-    public class OrderedList : List<SqlJobResources>
+
+    public class OrderedList : List<SqlJobResource>
     {
         public OrderedList()
         {
             this.Sort((x, y) => x.RouteIndex.CompareTo(y.RouteIndex));
         }
-
-        //public SqlJobResources GetPreviousResource(int index, int parentindex)
-        //{
-        //    SqlJobResources _prev;
-        //    if (index != 0)
-        //        if (this[parentindex] is EbLoop)
-        //            _prev = (this[parentindex] as EbLoop).InnerResources[index - 1];
-        //        else
-        //            _prev= 
-        //}
     }
 
     public enum SqlJobTypes
@@ -64,26 +82,23 @@ namespace ExpressBase.Objects.Objects.SqlJobRelated
         UserInitiated,
         Scheduled
     }
-    public class EbLoop : SqlJobResources, ISqlJobCollection
+
+    public class EbLoop : SqlJobResource, ISqlJobCollection
     {
         public OrderedList InnerResources { get; set; }
         public override List<Param> GetOutParams(List<Param> _param, int step)
         {
             List<Param> OutParams;
             if (this.InnerResources[0] is ISqlJobCollection)
-                OutParams = ((this.InnerResources[0] as ISqlJobCollection).InnerResources[step-1]).GetOutParams(_param, step);
+                OutParams = ((this.InnerResources[0] as ISqlJobCollection).InnerResources[step - 1]).GetOutParams(_param, step);
             else
                 OutParams = this.InnerResources[step - 1].GetOutParams(_param, step);
-
-            //foreach (Param p in OutParams)
-            //{
-            //    p.Value = (this.Result as Param).Value;
-            //}
+ 
             return OutParams;
         }
     }
 
-    public class EbTransaction : SqlJobResources, ISqlJobCollection
+    public class EbTransaction : SqlJobResource, ISqlJobCollection
     {
         public OrderedList InnerResources { get; set; }
 
@@ -103,7 +118,7 @@ namespace ExpressBase.Objects.Objects.SqlJobRelated
         }
     }
 
-    public abstract class SqlJobResources : EbSqlJobWrapper
+    public abstract class SqlJobResource : EbSqlJobWrapper
     {
 
         public int RouteIndex { set; get; }
@@ -123,7 +138,7 @@ namespace ExpressBase.Objects.Objects.SqlJobRelated
         public virtual object GetColVal(int index, string cname) { return null; }
     }
 
-    public class EbSqlJobReader : SqlJobResources
+    public class EbSqlJobReader : SqlJobResource
     {
         public override string Reference { get; set; }
 
@@ -165,7 +180,7 @@ namespace ExpressBase.Objects.Objects.SqlJobRelated
         }
     }
 
-    public class EbSqlJobWriter : SqlJobResources
+    public class EbSqlJobWriter : SqlJobResource
     {
         public override string Reference { get; set; }
 
@@ -185,5 +200,12 @@ namespace ExpressBase.Objects.Objects.SqlJobRelated
         public Type ResultType { get { return this.Data.GetType(); } }
 
         public string Data { set; get; }
+    }
+
+    public class TV
+    {
+        public object Value { get; set; }
+
+        public string Type { get; set; }
     }
 }

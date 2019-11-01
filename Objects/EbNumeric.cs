@@ -166,29 +166,5 @@ namespace ExpressBase.Objects
 
             return ReplacePropsInHTML(EbCtrlHTML);
         }
-
-        //        private string GetHtmlHelper(RenderMode mode)
-        //        {
-        //            return (@"
-        //<div id='cont_@name@' class='Eb-ctrlContainer' Ctype='Numeric' eb-hidden='@isHidden@'>
-        //    <div class='eb-ctrl-label' id='@nameLbl' style='@lblBackColor @LblForeColor'>@label@</div>
-        //       @barehtml@            
-        //    <span class='helpText'> @helpText </span>
-        //</div>"
-        //.Replace("@barehtml@", this.GetBareHtml())
-        //.Replace("@name@", this.Name)
-        //.Replace("@left", this.Left.ToString())
-        //.Replace("@top", this.Top.ToString())
-        //.Replace("@height", this.Height.ToString())
-        //.Replace("@label@", this.Label)//5
-        //.Replace("@isHidden@", this.Hidden.ToString())
-        //.Replace("@required", (this.Required && !this.Hidden ? " required" : string.Empty))
-        //.Replace("@readOnlyString", this.ReadOnlyString)
-        //.Replace("@toolTipText", this.ToolTipText)
-        //.Replace("@helpText", this.HelpText)//10
-        //.Replace("@placeHolder", "placeholder='" + this.PlaceHolder + "'")
-        //.Replace("@tabIndex", "tabindex='" + this.TabIndex + "'")
-        //.Replace("@autoComplete", this.AutoCompleteOff ? "off" : "on"));
-        //        }
     }
 }
