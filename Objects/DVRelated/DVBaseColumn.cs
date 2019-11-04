@@ -198,7 +198,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
         [PropertyGroup("Appearance")]
         public virtual int Width { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
         [JsonProperty(PropertyName = "className")]
         [HideInPropertyGrid]
         [DefaultPropValue("tdheight")]
