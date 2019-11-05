@@ -60,6 +60,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public string Status { get; set; }
 
+        public Dictionary<string, TV> Keyvalues { get; set; }
+
+        public int RetryOf { get; set; }
+
     }
 
     public class LoopLocation
@@ -85,5 +89,17 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public RowColletion SqlJobsRows { get; set; }
 
         public string SqlJobsDvColumns { get; set; }
+    }
+
+    public class ProcessorRequest:IReturn<ProcessorResponse>,IEbSSRequest
+    {
+        public string SolnId { get; set; }
+
+        public int UserId { get; set; }
+    }
+
+    public class ProcessorResponse:IEbSSResponse
+    {
+        public ResponseStatus ResponseStatus { get; set; }
     }
 }
