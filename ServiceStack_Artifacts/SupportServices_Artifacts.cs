@@ -74,16 +74,16 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 	{
 		public TenantSolutionsResponse()
 		{
-			solid = new List<string>();
+			sol_id = new List<string>();
 			solname = new List<string>();
-			soldispid = new List<string>();
+			sol_exid = new List<string>();
 		}
 
-		public List<string> solid { get; set; }
+		public List<string> sol_id { get; set; }
 
 		public List<string> solname { get; set; }
 
-		public List<string> soldispid { get; set; }
+		public List<string> sol_exid { get; set; }
 
 		public string ErMsg { get; set; }
 	}
@@ -297,7 +297,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 		public string NoDays { get; set; }
 
+		public string Solution_name { get; set; }
+
+		public string Esolution_id { get; set; }
+
+
 		public string NoHour { get; set; }
+
 
 		public List<FileUploadCls> Fileuploadlst { get; set; } = new List<FileUploadCls>();
 

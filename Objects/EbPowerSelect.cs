@@ -83,6 +83,8 @@ namespace ExpressBase.Objects
             }
             set { }
         }
+        public override string IsEmptyJSfn { get { return @" return this.initializer.Vobj.valueMembers.length === 0;"; } set { } }
+
 
         public override string DisableJSfn
         {
@@ -193,7 +195,6 @@ namespace ExpressBase.Objects
             get
             {
                 return @"
-        /*console.log('SetDisplayMemberJSfn');*/
         let VMs = this.initializer.Vobj.valueMembers;
         let DMs = this.initializer.Vobj.displayMembers;
         let columnVals = this.initializer.columnVals;
@@ -204,18 +205,20 @@ namespace ExpressBase.Objects
         let valMsArr = p1[0].split(',');
         let DMtable = p1[1];
 
-        $.each(valMsArr, function (i, vm) {
+        for (let i = 0; i < valMsArr.length; i++) {
+            let vm = valMsArr[i];
             VMs.push(vm);
-            $.each(this.DisplayMembers.$values, function (j, dm) {
-                $.each(DMtable, function (j, row) {
+            for (let j = 0; j < this.DisplayMembers.$values.length; j++) {
+                let dm = this.DisplayMembers.$values[j];
+                for (var k = 0; k < DMtable.length; k++) {
+                    let row = DMtable[k];
                     if (getObjByval(row.Columns, 'Name', this.ValueMember.name).Value === vm) {// to select row which includes ValueMember we are seeking for 
                         let _dm = getObjByval(row.Columns, 'Name', dm.name).Value;
                         DMs[dm.name].push(_dm);
                     }
-                }.bind(this));
-            }.bind(this));
-        }.bind(this));
-
+                }
+            }
+        }
 
         if (this.initializer.datatable === null) {//for aftersave actions
             $.each(valMsArr, function (i, vm) {
@@ -230,10 +233,19 @@ namespace ExpressBase.Objects
                             columnVals[column.Name].push(val);
                         }.bind(this));
                     }
+
+                    //$.each(r.Columns, function (j, column) {
+                    //    if (!columnVals[column.Name]) {
+                    //        console.warn('Mismatch found in Colums in datasource and Colums in object');
+                    //        return true;
+                    //    }
+                    //    let val = EbConvertValue(column.Value, column.Type);
+                    //    columnVals[column.Name].push(val);
+                    //}.bind(this));
+
                 }.bind(this));
             }.bind(this));
-        }
-    ";
+        }";
             }
             set { }
         }
@@ -615,14 +627,8 @@ namespace ExpressBase.Objects
                 string s = "";
                 if (DataDB.Vendor == DatabaseVendors.MYSQL)
                 {
-                    s = string.Format(@"
-                                DROP TEMPORARY TABLE IF EXISTS temp_array_table;
-		                        DROP TEMPORARY TABLE IF EXISTS temp_mem;
-		                        CREATE TEMPORARY TABLE temp_array_table(value text); 
-                                CALL STR_TO_TBL('{2}'); 
-                                CREATE TEMPORARY TABLE temp_mem SELECT `value` FROM temp_array_table;
-                                    SELECT __A.* FROM ({0}) __A 
-                                    WHERE __A.{1} = ANY(SELECT CAST(`value` AS UNSIGNED INTEGER) FROM temp_mem);",
+                    s = string.Format(@"SELECT __A.* FROM ({0}) __A 
+                                    WHERE FIND_IN_SET(__A.{1}, '{2}');",
                                                         Sql, this.ValueMember.Name, Col);
                 }
                 else
@@ -639,15 +645,9 @@ namespace ExpressBase.Objects
                 string s = "";
                 if (DataDB.Vendor == DatabaseVendors.MYSQL)
                 {
-                    s = string.Format(@"
-                                DROP TEMPORARY TABLE IF EXISTS temp_array_table;
-		                        DROP TEMPORARY TABLE IF EXISTS temp_mem;
-		                        CREATE TEMPORARY TABLE temp_array_table(value text); 
-                                CALL STR_TO_TBL('{3}'); 
-                                CREATE TEMPORARY TABLE temp_mem SELECT `value` FROM temp_array_table;
-                                SELECT __A.* FROM ({0}) __A, {1} __B
-                                    WHERE __A.{2} = ANY(SELECT CAST(`value` AS UNSIGNED INTEGER) FROM temp_mem) AND __B.{4} = :id;",
-                                        Sql, Tbl, this.ValueMember.Name, Col, _id);
+                    s = string.Format(@"SELECT __A.* FROM ({0}) __A, {1} __B
+                                    WHERE FIND_IN_SET(__A.{2}, __B.{3}) AND __B.{4} = :id;",
+                                         Sql, Tbl, this.ValueMember.Name, Col, _id);
                 }
                 else
                 {
@@ -669,14 +669,8 @@ namespace ExpressBase.Objects
             string s = "";
             if (DataDB.Vendor == DatabaseVendors.MYSQL)
             {
-                s = string.Format(@"
-                            DROP TEMPORARY TABLE IF EXISTS temp_array_table;
-                            DROP TEMPORARY TABLE IF EXISTS temp_mems;
-                            CREATE TEMPORARY TABLE temp_array_table(value text); 
-                            CALL STR_TO_TBL('{3}'); 
-                            CREATE TEMPORARY TABLE temp_mems SELECT `value` FROM temp_array_table;
-                            SELECT {0}, {1} FROM ({2}) __A
-                            WHERE __A.{0} = ANY(SELECT CAST(`value` AS UNSIGNED INTEGER) FROM temp_mems);",
+                s = string.Format(@"SELECT {0}, {1} FROM ({2}) __A
+                                        WHERE FIND_IN_SET(__A.{0}, '{3}');",
                             vm, dm, Sql, vms);
             }
             else
