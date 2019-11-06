@@ -44,6 +44,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class RetryJobResponse : IEbSSResponse
     {
         public ResponseStatus ResponseStatus { get; set; }
+        public bool Status { get; set; }
+
 
     }
     public class LogLine
