@@ -1,4 +1,5 @@
-﻿using ExpressBase.Common.Objects;
+﻿using ExpressBase.Common.Extensions;
+using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using System;
 using System.Collections.Generic;
@@ -13,8 +14,28 @@ namespace ExpressBase.Objects
 
     [EnableInBuilder(BuilderType.MobilePage)]
     [BuilderTypeEnum(BuilderType.MobilePage)]
-    public class EbMobilePage : EbMobilePageBase,IEBRootObject
+    public class EbMobilePage : EbMobilePageBase, IEBRootObject
     {
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
+        public override string RefId { get; set; }
 
+        [EnableInBuilder(BuilderType.MobilePage)]
+        public override string DisplayName { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        public override string Description { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
+        public override string VersionNumber { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
+        public override string Status { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
+        public EbMobileLayout Layout { set; get; }
     }
 }
