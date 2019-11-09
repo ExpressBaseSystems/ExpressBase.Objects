@@ -173,7 +173,7 @@ $.each(this.Controls.$values, function (i, col) {
                 _params.Add(p.Name);
                 for(int i = 0; i < Allctrls.Length; i++)
                 {
-                    if (p.Name == Allctrls[i].Name)
+                    if (p.Name == Allctrls[i].Name && !Allctrls[i].DependedDG.Contains(this.Name))
                     {
                         Allctrls[i].DependedDG.Add(this.Name);
                     }

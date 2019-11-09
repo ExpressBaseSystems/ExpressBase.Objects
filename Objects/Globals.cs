@@ -272,6 +272,16 @@ namespace ExpressBase.Objects.Objects
             result = null;
             return false;
         }
+
+        public Double Sum(string colName)
+        {
+            Double s = 0;
+            foreach(ListNTV listNTV in this.Rows)
+            {
+                s += Convert.ToDouble(listNTV[colName]);
+            }
+            return s;
+        }
     }
 
     public class ListNTV : DynamicObject
