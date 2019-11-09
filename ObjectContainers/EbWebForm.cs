@@ -778,14 +778,46 @@ namespace ExpressBase.Objects
             {
                 Param[0].Type = ((int)EbDbTypes.Int32).ToString();
                 EbWebForm _form = Service.Redis.Get<EbWebForm>((TriggerCtrl as EbPowerSelect).DataImportId);
+                if (_form == null)
+                {
+                    EbObjectParticularVersionResponse result = Service.Gateway.Send<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = (TriggerCtrl as EbPowerSelect).DataImportId });
+                    _form = EbSerializers.Json_Deserialize(result.Data[0].Json);
+                    Service.Redis.Set<EbWebForm>((TriggerCtrl as EbPowerSelect).DataImportId, _form);
+                }
                 _form.AfterRedisGet(Service);
                 _form.RefId = (TriggerCtrl as EbPowerSelect).DataImportId;
                 _form.UserObj = this.UserObj;
                 _form.SolutionObj = this.SolutionObj;
+                _form.TableRowId = Param[0].ValueTo;              
+                _form.GetImportData(DataDB, Service, this.Name);
+            }
+        }
 
-                _form.TableRowId = Param[0].ValueTo;
-                _form.RefreshFormData(DataDB, Service);
-                this.FormData = _form.FormData;
+        public void GetImportData(IDatabase DataDB, Service Service, string Destination)
+        {
+            this.RefreshFormData(DataDB, Service);
+
+            foreach (TableSchema _table in this.FormSchema.Tables)
+            {
+                SingleTable Table = this.FormData.MultipleTables[_table.TableName];
+                this.FormData.MultipleTables.Remove(_table.TableName);
+                if (_table.TableName == this.FormSchema.MasterTable)
+                {
+                    this.FormData.MultipleTables.Add(Destination, Table);
+                    this.FormData.MasterTable = Destination;
+                }
+                else
+                {
+                    if(_table.TableType == WebFormTableTypes.Normal)
+                    {
+                        Table[0].Columns.RemoveAll(e => e.Name == "id");
+                        this.FormData.MultipleTables[this.FormData.MasterTable][0].Columns.AddRange(Table[0].Columns);
+                    }
+                    else
+                    {
+                        this.FormData.MultipleTables.Add(_table.ContainerName, Table);
+                    }
+                }
             }
         }
 
@@ -2310,11 +2342,11 @@ namespace ExpressBase.Objects
             if (_table == null)
             {
                 if (_container is EbApproval)
-                    _table = new TableSchema { TableName = curTbl, ParentTable = _parentTable, TableType = WebFormTableTypes.Approval, Title = _container.Label };
+                    _table = new TableSchema { TableName = curTbl, ParentTable = _parentTable, TableType = WebFormTableTypes.Approval, Title = _container.Label, ContainerName = _container.Name };
                 else if (_container is EbDataGrid)
-                    _table = new TableSchema { TableName = curTbl, ParentTable = _parentTable, TableType = WebFormTableTypes.Grid, Title = _container.Label };
+                    _table = new TableSchema { TableName = curTbl, ParentTable = _parentTable, TableType = WebFormTableTypes.Grid, Title = _container.Label, ContainerName = _container.Name };
                 else
-                    _table = new TableSchema { TableName = curTbl, ParentTable = _parentTable, TableType = WebFormTableTypes.Normal };
+                    _table = new TableSchema { TableName = curTbl, ParentTable = _parentTable, TableType = WebFormTableTypes.Normal, ContainerName = _container.Name };
                 _schema.Tables.Add(_table);
             }
             foreach (EbControl control in _flatControls)
