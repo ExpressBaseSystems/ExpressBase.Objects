@@ -790,6 +790,7 @@ namespace ExpressBase.Objects
                 _form.SolutionObj = this.SolutionObj;
                 _form.TableRowId = Param[0].ValueTo;              
                 _form.GetImportData(DataDB, Service, this.Name);
+                this.FormData = _form.FormData;
             }
         }
 
