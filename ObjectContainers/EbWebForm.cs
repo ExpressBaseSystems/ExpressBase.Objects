@@ -799,23 +799,26 @@ namespace ExpressBase.Objects
 
             foreach (TableSchema _table in this.FormSchema.Tables)
             {
-                SingleTable Table = this.FormData.MultipleTables[_table.TableName];
-                this.FormData.MultipleTables.Remove(_table.TableName);
-                if (_table.TableName == this.FormSchema.MasterTable)
+                if (this.FormData.MultipleTables.ContainsKey(_table.TableName))
                 {
-                    this.FormData.MultipleTables.Add(Destination, Table);
-                    this.FormData.MasterTable = Destination;
-                }
-                else
-                {
-                    if(_table.TableType == WebFormTableTypes.Normal)
+                    SingleTable Table = this.FormData.MultipleTables[_table.TableName];
+                    this.FormData.MultipleTables.Remove(_table.TableName);
+                    if (_table.TableName == this.FormSchema.MasterTable)
                     {
-                        Table[0].Columns.RemoveAll(e => e.Name == "id");
-                        this.FormData.MultipleTables[this.FormData.MasterTable][0].Columns.AddRange(Table[0].Columns);
+                        this.FormData.MultipleTables.Add(Destination, Table);
+                        this.FormData.MasterTable = Destination;
                     }
                     else
                     {
-                        this.FormData.MultipleTables.Add(_table.ContainerName, Table);
+                        if (_table.TableType == WebFormTableTypes.Normal)
+                        {
+                            Table[0].Columns.RemoveAll(e => e.Name == "id");
+                            this.FormData.MultipleTables[this.FormData.MasterTable][0].Columns.AddRange(Table[0].Columns);
+                        }
+                        else
+                        {
+                            this.FormData.MultipleTables.Add(_table.ContainerName, Table);
+                        }
                     }
                 }
             }
