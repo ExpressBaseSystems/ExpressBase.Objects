@@ -776,9 +776,16 @@ namespace ExpressBase.Objects
 
             else if (TriggerCtrl is EbPowerSelect && !(TriggerCtrl as EbPowerSelect).DataImportId.IsNullOrEmpty())
             {
-                Param[0].Type = "7";//Decimal
-                this.TableRowId = Param[0].ValueTo;
-                this.RefreshFormData(DataDB, Service);
+                Param[0].Type = ((int)EbDbTypes.Int32).ToString();
+                EbWebForm _form = Service.Redis.Get<EbWebForm>((TriggerCtrl as EbPowerSelect).DataImportId);
+                _form.AfterRedisGet(Service);
+                _form.RefId = (TriggerCtrl as EbPowerSelect).DataImportId;
+                _form.UserObj = this.UserObj;
+                _form.SolutionObj = this.SolutionObj;
+
+                _form.TableRowId = Param[0].ValueTo;
+                _form.RefreshFormData(DataDB, Service);
+                this.FormData = _form.FormData;
             }
         }
 

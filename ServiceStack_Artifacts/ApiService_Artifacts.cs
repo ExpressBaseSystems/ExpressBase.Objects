@@ -358,6 +358,14 @@ END;";
         public ApiException(string message, Exception innerException) : base(message, innerException) { }
     }
 
+    [Serializable()]
+    public class ExplicitExitException : Exception
+    {
+        public ExplicitExitException() : base() { }
+
+        public ExplicitExitException(string message) : base(message) { }
+    }
+
     [RuntimeSerializable]
     public class ApiScript
     {
@@ -392,7 +400,8 @@ END;";
         NotFound = 404,
         Success = 1,
         Failed = -1,
-        ParamNFound = 0
+        ParamNFound = 0,
+        ExplicitExit = 255
     }
 
     public enum ApiMethods
