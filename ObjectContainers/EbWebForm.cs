@@ -774,7 +774,7 @@ namespace ExpressBase.Objects
 
             else if (TriggerCtrl is EbPowerSelect && !(TriggerCtrl as EbPowerSelect).DataImportId.IsNullOrEmpty())
             {
-                Param[0].Type = "7";//Decimal
+                Param[0].Type = ((int)EbDbTypes.Int32).ToString();
                 this.TableRowId = Param[0].ValueTo;
                 this.RefreshFormData(DataDB, Service);
             }
