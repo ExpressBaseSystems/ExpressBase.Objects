@@ -167,6 +167,10 @@ namespace ExpressBase.Objects.Objects
                 Value = value as object
             });
         }
+
+        public void Exit() {
+            throw new ExplicitExitException("Execution terminated explicitly!");
+        }
     }
 
     public class ApiGlobals
@@ -271,6 +275,16 @@ namespace ExpressBase.Objects.Objects
             }
             result = null;
             return false;
+        }
+
+        public Double Sum(string colName)
+        {
+            Double s = 0;
+            foreach(ListNTV listNTV in this.Rows)
+            {
+                s += Convert.ToDouble(listNTV[colName]);
+            }
+            return s;
         }
     }
 
