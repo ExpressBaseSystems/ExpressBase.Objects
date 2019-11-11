@@ -7,7 +7,7 @@ using System.Data;
 using System.Dynamic;
 using System.Text;
 using Newtonsoft.Json.Linq;
-using ExpressBase.Objects.Objects.SqlJobRelated;
+using ExpressBase.Objects;
 
 namespace ExpressBase.Objects.Objects
 {
