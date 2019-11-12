@@ -1,7 +1,7 @@
 ﻿using ExpressBase.Common;
 using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
-using ExpressBase.Objects.Objects.SqlJobRelated;
+using ExpressBase.Objects;
 using ExpressBase.Objects.Objects.DVRelated;
 using ServiceStack;
 using System;
@@ -44,6 +44,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class RetryJobResponse : IEbSSResponse
     {
         public ResponseStatus ResponseStatus { get; set; }
+        public bool Status { get; set; }
+
 
     }
     public class LogLine
