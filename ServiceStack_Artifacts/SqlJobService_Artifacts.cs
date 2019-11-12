@@ -1,7 +1,7 @@
 ﻿using ExpressBase.Common;
 using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
-using ExpressBase.Objects.Objects.SqlJobRelated;
+using ExpressBase.Objects;
 using ExpressBase.Objects.Objects.DVRelated;
 using ServiceStack;
 using System;
