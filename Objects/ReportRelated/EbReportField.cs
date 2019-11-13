@@ -192,10 +192,11 @@ namespace ExpressBase.Objects
             {
 
                 dynamic val = Rep.GetDataFieldtValue(ImageColName.Split(".")[1], slno, Convert.ToInt32(ImageColName.Split(".")[0].Substring(1)));
-                if (val is string)
-                    fileByte = Rep.GetImage(Convert.ToInt32(val));
-                else if (val is byte[])
-                    fileByte = val;
+                if (val != null && Convert.ToInt32(val) != 0)
+                    if (val is string)
+                        fileByte = Rep.GetImage(Convert.ToInt32(val));
+                    else if (val is byte[])
+                        fileByte = val;
             }
 
             if (fileByte.Length != 0)
