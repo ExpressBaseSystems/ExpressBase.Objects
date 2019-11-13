@@ -12,8 +12,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         public int UserId { get; set; }
 
-        public bool IsUpdate { get; set; }
-
         public string SolnId { get; set; }
 
         public string SolutionId { get; set; }
@@ -47,20 +45,16 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public List<Eb_Changes_Log> ChangesLog { get; set; }
     }
 
-    public class UpdateDBFunctionByDBRequest : IEbTenentRequest, IReturn<UpdateDBFunctionByDBResponse>
+    public class UpdateDBFileByDBRequest : IEbTenentRequest, IReturn<UpdateDBFilesByDBResponse>
     {
-        public string DBName { get; set; }
-
-        public List<Eb_FileDetails> Changes { get; set; }
-
-        public string Solution { get; set; }
-
         public int UserId { get; set; }
 
         public string SolnId { get; set; }
+
+        public string SolutionId { get; set; }
     }
 
-    public class UpdateDBFunctionByDBResponse : IEbSSResponse
+    public class UpdateDBFilesByDBResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
         public ResponseStatus ResponseStatus { get; set; }

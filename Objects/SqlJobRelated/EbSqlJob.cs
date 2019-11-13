@@ -257,7 +257,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.SqlJob)]
         public string Type { get; set; }
     }
-    enum InOutStatus
+    public enum InOutStatus
         {
             In,
             UnKnown,
@@ -265,143 +265,177 @@ namespace ExpressBase.Objects
             Ignored,
             Excluded,
             Error
+    }
+    internal class Attendance
+    {
+        internal int Empmaster_id { get; set; }
+        internal DateTime In_time { get; set; }
+        internal DateTime Out_time { get; set; }
+        internal int IWork { get; set; }
+        internal int IBreak { get; set; }
+        internal int IOverTime { get; set; }
+        internal int IOTHours { get; set; }
+        internal int IOTMinutes { get; set; }
+        internal string Notes { get; set; }
+        internal bool IsNightshift { get; set; }
+
+        internal int App_att_inout_id { get; set; }
+
+        internal Attendance(int empmaster_id)
+        {
+            this.Empmaster_id = empmaster_id;
         }
-    //public void Pp(dynamic Params)
-    //{
-    //    DateTime dateInQuestion = Convert.ToDateTime(Params.date_to_consolidate);
-    //    int empmaster_id = Convert.ToInt32(Params.empid);
 
-    //    DateTime dtFirstIn = dateInQuestion;
-    //    DateTime dtLastIn = dateInQuestion;
-    //    DateTime dtLastOut = dateInQuestion;
-    //    InOutStatus lastKnownStatus = InOutStatus.UnKnown;
-    //    InOutStatus lastKnownInOutStatus = InOutStatus.UnKnown;
-    //    InOutStatus currentStatus = InOutStatus.UnKnown;
-    //    int iPos = 0;
-    //    InOutStatus status = InOutStatus.In;
-    //    Attendance att = new Attendance(empmaster_id);
-    //    EbDataTable dt_devattlogs = Tables[0];
+        internal Attendance(int empmaster_id, DateTime in_time, DateTime out_time, int iWork, int iBreak, int iOverTime, int iOTHours, int iOTMinutes, string notes, bool bNightshift)
+        {
+            this.Empmaster_id = empmaster_id;
+            this.In_time = in_time;
+            this.Out_time = out_time;
+            this.IWork = iWork;
+            this.IBreak = iBreak;
+            this.IOverTime = iOverTime;
+            this.IOTHours = iOTHours;
+            this.IOTMinutes = iOTMinutes;
+            this.Notes = notes;
+            this.IsNightshift = bNightshift;
+        }
 
-    //    if (dt_devattlogs.Rows.Count > 1)
-    //    {
+        public void Pp(dynamic Params , TableColletion Tables)
+        {
+            DateTime dateInQuestion = Convert.ToDateTime(Params.date_to_consolidate);
+            int empmaster_id = Convert.ToInt32(Params.empid);
 
-    //        EbDataRow row = dt_devattlogs.Rows[0];
-    //        foreach (EbDataRow _row_devattlogs in dt_devattlogs.Rows)
-    //        {
-    //            if (iPos >= dt_devattlogs.Rows.IndexOf(row))
-    //            {
-    //                DateTime _punched_at = Convert.ToDateTime(_row_devattlogs[""punched_at""]);
+            DateTime dtFirstIn = dateInQuestion;
+            DateTime dtLastIn = dateInQuestion;
+            DateTime dtLastOut = dateInQuestion;
+            InOutStatus lastKnownStatus = InOutStatus.UnKnown;
+            InOutStatus lastKnownInOutStatus = InOutStatus.UnKnown;
+            InOutStatus currentStatus = InOutStatus.UnKnown;
+            int iPos = 0;
+            InOutStatus status = InOutStatus.In;
+            Attendance att = new Attendance(empmaster_id);
+            EbDataTable dt_devattlogs = Tables[0];
 
-    //                if (iPos == dt_devattlogs.Rows.IndexOf(row))
-    //                {
-    //                    currentStatus = status;
-    //                    //  if (!att.IsNightshift)
-    //                    dtFirstIn = _punched_at;
-    //                    att.In_time = dtFirstIn;
-    //                    dtLastIn = dtFirstIn;
-    //                }
-    //                if (iPos > dt_devattlogs.Rows.IndexOf(row))
-    //                {
-    //                    if (lastKnownStatus == InOutStatus.In)
-    //                    {
-    //                        if ((_punched_at - dtLastIn).TotalMinutes > 5)
-    //                        {
-    //                            currentStatus = InOutStatus.UnKnown;
-    //                            dtLastOut = _punched_at;
-    //                            att.Out_time = dtLastOut;
-    //                            att.IWork += Convert.ToInt32((dtLastOut - dtLastIn).TotalMinutes);
-    //                        }
-    //                        else
-    //                            currentStatus = InOutStatus.Ignored;
-    //                    }
-    //                    else if (lastKnownStatus == InOutStatus.Out)
-    //                    {
-    //                        if ((_punched_at - dtLastOut).TotalMinutes > 5)
-    //                        {
-    //                            currentStatus = InOutStatus.In;
-    //                            dtLastIn = _punched_at;
-    //                            att.IBreak += Convert.ToInt32((dtLastIn - dtLastOut).TotalMinutes);
-    //                        }
-    //                        else
-    //                            currentStatus = InOutStatus.Ignored;
-    //                    }
-    //                    else if (lastKnownStatus == InOutStatus.Ignored)
-    //                    {
-    //                        bool bDoneAnything = false;
-    //                        if (dtLastOut > dtLastIn && (_punched_at - dtLastOut).TotalMinutes > 5)
-    //                        {
-    //                            currentStatus = InOutStatus.In;
-    //                            dtLastIn = _punched_at;
-    //                            att.IBreak += Convert.ToInt32((dtLastIn - dtLastOut).TotalMinutes);
-    //                            bDoneAnything = true;
-    //                        }
+            if (dt_devattlogs.Rows.Count > 1)
+            {
 
-    //                        if (dtLastIn > dtLastOut && (_punched_at - dtLastIn).TotalMinutes > 5)
-    //                        {
-    //                            currentStatus = InOutStatus.Out;
-    //                            dtLastOut = _punched_at;
-    //                            att.Out_time = dtLastOut;
-    //                            att.IWork += Convert.ToInt32((dtLastOut - dtLastIn).TotalMinutes);
-    //                            bDoneAnything = true;
-    //                        }
+                EbDataRow row = dt_devattlogs.Rows[0];
+                foreach (EbDataRow _row_devattlogs in dt_devattlogs.Rows)
+                {
+                    if (iPos >= dt_devattlogs.Rows.IndexOf(row))
+                    {
+                        DateTime _punched_at = Convert.ToDateTime(_row_devattlogs["punched_at"]);
 
-    //                        if (!bDoneAnything)
-    //                            currentStatus = InOutStatus.Ignored;
-    //                    }
-    //                }
-    //                _row_devattlogs[""inout""] = currentStatus;
+                        if (iPos == dt_devattlogs.Rows.IndexOf(row))
+                        {
+                            currentStatus = status;
+                            //  if (!att.IsNightshift)
+                            dtFirstIn = _punched_at;
+                            att.In_time = dtFirstIn;
+                            dtLastIn = dtFirstIn;
+                        }
+                        if (iPos > dt_devattlogs.Rows.IndexOf(row))
+                        {
+                            if (lastKnownStatus == InOutStatus.In)
+                            {
+                                if ((_punched_at - dtLastIn).TotalMinutes > 5)
+                                {
+                                    currentStatus = InOutStatus.UnKnown;
+                                    dtLastOut = _punched_at;
+                                    att.Out_time = dtLastOut;
+                                    att.IWork += Convert.ToInt32((dtLastOut - dtLastIn).TotalMinutes);
+                                }
+                                else
+                                    currentStatus = InOutStatus.Ignored;
+                            }
+                            else if (lastKnownStatus == InOutStatus.Out)
+                            {
+                                if ((_punched_at - dtLastOut).TotalMinutes > 5)
+                                {
+                                    currentStatus = InOutStatus.In;
+                                    dtLastIn = _punched_at;
+                                    att.IBreak += Convert.ToInt32((dtLastIn - dtLastOut).TotalMinutes);
+                                }
+                                else
+                                    currentStatus = InOutStatus.Ignored;
+                            }
+                            else if (lastKnownStatus == InOutStatus.Ignored)
+                            {
+                                bool bDoneAnything = false;
+                                if (dtLastOut > dtLastIn && (_punched_at - dtLastOut).TotalMinutes > 5)
+                                {
+                                    currentStatus = InOutStatus.In;
+                                    dtLastIn = _punched_at;
+                                    att.IBreak += Convert.ToInt32((dtLastIn - dtLastOut).TotalMinutes);
+                                    bDoneAnything = true;
+                                }
 
-    //                //FillInOutString
-    //                if (currentStatus == InOutStatus.In)
-    //                    row[""inout_s""] = ""IN"";
-    //                    else if (currentStatus == InOutStatus.Out)
-    //                    row[""inout_s""] = ""OUT"";
-    //                    else if (currentStatus == InOutStatus.Ignored)
-    //                    row[""inout_s""] = ""Ignored"";
-    //                    else if (currentStatus == InOutStatus.Excluded)
-    //                    row[""inout_s""] = ""Excluded"";
-    //                    else if (currentStatus == InOutStatus)
-    //                    row[""inout_s""] = ""ERROR"";
+                                if (dtLastIn > dtLastOut && (_punched_at - dtLastIn).TotalMinutes > 5)
+                                {
+                                    currentStatus = InOutStatus.Out;
+                                    dtLastOut = _punched_at;
+                                    att.Out_time = dtLastOut;
+                                    att.IWork += Convert.ToInt32((dtLastOut - dtLastIn).TotalMinutes);
+                                    bDoneAnything = true;
+                                }
 
-    //                if (row[""machineno""] != DBNull.Value)
-    //                    row[""type""] = ""Device"";
-    //                    else
-    //                    row[""type""] = ""Manual"";
+                                if (!bDoneAnything)
+                                    currentStatus = InOutStatus.Ignored;
+                            }
+                        }
+                        _row_devattlogs["inout"] = currentStatus;
 
-    //                lastKnownStatus = currentStatus;
-    //                if (currentStatus == InOutStatus.In || currentStatus == InOutStatus.Out)
-    //                    lastKnownInOutStatus = currentStatus;
-    //            }
-    //            iPos++;
-    //        }
-    //        if (att.In_time != DateTime.MinValue && att.Out_time != DateTime.MinValue)
-    //        {
-    //            //this.MarkPresent(att.Empmaster_id, cell, null);
-    //            //this.Save(devattlogs, att, dateInQuestion, break_time, bonus_ot);
-    //        }
-    //        //  else
-    //        // this.MarkError(cell, att.Empmaster_id, dateInQuestion, devattlogs.Rows.Count, Convert.ToInt32(att.IWork / 60), devattlogs, string.Empty);
-    //        // this.SetWorkBreakOT(dt_devattlogs, true, att);
-    //    }
-    //    else
-    //    {
-    //        //var DateTime_Now = CacheHelper.Get<DateTime>(CacheKeys.SYSVARS_NOW_LOCALE);
-    //        //if (((DateTime)cell.OwningColumn.Tag).Date == DateTime_Now.Date)
-    //        //    this.MarkUnReviewed(cell, empmaster_id, dateInQuestion, devattlogs.Rows.Count, devattlogs);
-    //        //else
-    //        //    this.MarkAbsent(cell, empmaster_id, dateInQuestion);
-    //    }
+                        //FillInOutString
+                        if (currentStatus == InOutStatus.In)
+                            row["inout_s"] = "IN";
+                        else if (currentStatus == InOutStatus.Out)
+                            row["inout_s"] = "OUT";
+                        else if (currentStatus == InOutStatus.Ignored)
+                            row["inout_s"] = "Ignored";
+                        else if (currentStatus == InOutStatus.Excluded)
+                            row["inout_s"] = "Excluded";
+                        else if (currentStatus == InOutStatus.Error)
+                            row["inout_s"] = "ERROR";
 
-    //    Console.Write(JsonConvert.SerializeObject(att));
-    //    Job.SetParam(""in_time"", att.In_time.ToString(""yyyy - MM - dd HH: mm""));
-    //    Job.SetParam(""out_time"", att.Out_time.ToString(""yyyy - MM - dd HH: mm""));
-    //    Job.SetParam(""duration"", att.IWork);
-    //    Job.SetParam(""break_time"", att.IBreak);
-    //    Job.SetParam(""ot_time"", att.IOverTime);
-    //    Job.SetParam(""ot_time_approved"", (att.IOTHours * 60) + att.IOTMinutes);
-    //    Job.SetParam(""notes"", (att.Notes == """" || att.Notes == null) ? ""_"" : att.Notes);
-    //    Job.SetParam(""night_shift"", att.IsNightshift);
-    //    Job.SetParam(""att_date"", dateInQuestion.ToString(""yyyy - MM - dd HH: mm""));
-    //}
+                        if (row["machineno"] != DBNull.Value)
+                            row["type"] = "Device";
+                        else
+                            row["type"] = "Manual";
 
+                        lastKnownStatus = currentStatus;
+                        if (currentStatus == InOutStatus.In || currentStatus == InOutStatus.Out)
+                            lastKnownInOutStatus = currentStatus;
+                    }
+                    iPos++;
+                }
+                if (att.In_time != DateTime.MinValue && att.Out_time != DateTime.MinValue)
+                {
+                    //this.MarkPresent(att.Empmaster_id, cell, null);
+                    //this.Save(devattlogs, att, dateInQuestion, break_time, bonus_ot);
+                }
+                //  else
+                // this.MarkError(cell, att.Empmaster_id, dateInQuestion, devattlogs.Rows.Count, Convert.ToInt32(att.IWork / 60), devattlogs, string.Empty);
+                // this.SetWorkBreakOT(dt_devattlogs, true, att);
+            }
+            else
+            {
+                //var DateTime_Now = CacheHelper.Get<DateTime>(CacheKeys.SYSVARS_NOW_LOCALE);
+                //if (((DateTime)cell.OwningColumn.Tag).Date == DateTime_Now.Date)
+                //    this.MarkUnReviewed(cell, empmaster_id, dateInQuestion, devattlogs.Rows.Count, devattlogs);
+                //else
+                //    this.MarkAbsent(cell, empmaster_id, dateInQuestion);
+            }
+
+            //Console.Write(JsonConvert.SerializeObject(att));
+            //Job.SetParam(""in_time"", att.In_time.ToString(""yyyy - MM - dd HH: mm""));
+            //Job.SetParam(""out_time"", att.Out_time.ToString(""yyyy - MM - dd HH: mm""));
+            //Job.SetParam(""duration"", att.IWork);
+            //Job.SetParam(""break_time"", att.IBreak);
+            //Job.SetParam(""ot_time"", att.IOverTime);
+            //Job.SetParam(""ot_time_approved"", (att.IOTHours * 60) + att.IOTMinutes);
+            //Job.SetParam(""notes"", (att.Notes == """" || att.Notes == null) ? ""_"" : att.Notes);
+            //Job.SetParam(""night_shift"", att.IsNightshift);
+            //Job.SetParam(""att_date"", dateInQuestion.ToString(""yyyy - MM - dd HH: mm""));
+        }
+    }
 }
