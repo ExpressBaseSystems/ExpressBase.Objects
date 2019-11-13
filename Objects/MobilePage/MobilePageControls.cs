@@ -14,7 +14,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.MultiLanguageKeySelector)]
         [UIproperty]
-        public string Label { set; get; }
+        public virtual string Label { set; get; }
     }
 
     [EnableInBuilder(BuilderType.MobilePage)]
@@ -22,7 +22,7 @@ namespace ExpressBase.Objects
     {
         public override string GetDesignHtml()
         {
-            return @"<div class='eb_stacklayout control' id='@id' eb-type='EbMobileTextBox' tabindex='1' onclick='$(this).focus()'>
+            return @"<div class='eb_stacklayout control dropped' id='@id' eb-type='EbMobileTextBox' tabindex='1' onclick='$(this).focus()'>
                             <label class='ctrl_label'> @Label </label>
                             <div class='eb_ctrlhtml'>
                                <input type='text' class='eb_mob_textbox' />
@@ -36,7 +36,7 @@ namespace ExpressBase.Objects
     {
         public override string GetDesignHtml()
         {
-            return @"<div class='eb_stacklayout control' id='@id' eb-type='EbMobileNumericBox' tabindex='1' onclick='$(this).focus()'>
+            return @"<div class='eb_stacklayout control dropped' id='@id' eb-type='EbMobileNumericBox' tabindex='1' onclick='$(this).focus()'>
                             <label class='ctrl_label'> @Label </label>
                             <div class='eb_ctrlhtml'>
                                <input type='text' class='eb_mob_textbox' />
@@ -50,7 +50,7 @@ namespace ExpressBase.Objects
     {
         public override string GetDesignHtml()
         {
-            return @"<div class='eb_stacklayout control' id='@id' eb-type='EbMobileDateTime' tabindex='1' onclick='$(this).focus()'>
+            return @"<div class='eb_stacklayout control dropped' id='@id' eb-type='EbMobileDateTime' tabindex='1' onclick='$(this).focus()'>
                             <label class='ctrl_label'> @Label </label>
                             <div class='eb_ctrlhtml'>
                                <input type='text' class='eb_mob_textbox' placeholder='YYYY-MM-DD'/>
@@ -68,7 +68,7 @@ namespace ExpressBase.Objects
 
         public override string GetDesignHtml()
         {
-            return @"<div class='eb_stacklayout control' id='@id' eb-type='EbMobileSimpleSelect' tabindex='1' onclick='$(this).focus()'>
+            return @"<div class='eb_stacklayout control dropped' id='@id' eb-type='EbMobileSimpleSelect' tabindex='1' onclick='$(this).focus()'>
                             <label class='ctrl_label'> @Label </label>
                             <div class='eb_ctrlhtml'>
                                <select class='eb_mob_select'>
@@ -104,7 +104,7 @@ namespace ExpressBase.Objects
 
         public override string GetDesignHtml()
         {
-            return @"<div class='eb_stacklayout control' id='@id' eb-type='EbMobileFileUpload' tabindex='1' onclick='$(this).focus()'>
+            return @"<div class='eb_stacklayout control dropped' id='@id' eb-type='EbMobileFileUpload' tabindex='1' onclick='$(this).focus()'>
                             <label class='ctrl_label'> @Label </label>
                             <div class='eb_ctrlhtml'>
                                <button class='eb_mob_fupbtn filesbtn'> Files </button>
@@ -131,7 +131,7 @@ namespace ExpressBase.Objects
     {
         public override string GetDesignHtml()
         {
-            return @"<div class='eb_stacklayout control' id='@id' eb-type='EbMobileBoolean' tabindex='1' onclick='$(this).focus()'>
+            return @"<div class='eb_stacklayout control dropped' id='@id' eb-type='EbMobileBoolean' tabindex='1' onclick='$(this).focus()'>
                             <label class='ctrl_label'> @Label </label>
                             <div class='eb_ctrlhtml'>
                                <input type='checkbox' class='eb_mob_checkbox'/>
@@ -154,7 +154,7 @@ namespace ExpressBase.Objects
 
         public override string GetDesignHtml()
         {
-            return @"<div class='eb_mob_tablelayout control' eb-type='EbMobileGrid' id='@id'>
+            return @"<div class='eb_mob_tablelayout control dropped' eb-type='EbMobileTableLayout' id='@id'>
                         <div class='eb_mob_tablelayout_inner'>
                             
                         </div>
@@ -182,19 +182,38 @@ namespace ExpressBase.Objects
         public int CellIndex { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        public List<EbMobileDataColumn> ColumnCollection { set; get; }
+        public List<EbMobileControls> ControlCollection { set; get; }
     }
 
     [EnableInBuilder(BuilderType.MobilePage)]
-    public class EbMobileDataColumn : EbMobilePageBase
+    public class EbMobileDataColumn : EbMobileControls
     {
+        public override string Label { set; get; }
+
         [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
+        public int TableIndex { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
         public int ColumnIndex { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
+        [UIproperty]
+        [MetaOnly]
         public string ColumnName { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
         public EbDbTypes Type { get; set; }
+
+        public override string GetDesignHtml()
+        {
+            return @"<div class='data_column control dropped' tabindex='1' onclick='$(this).focus()' eb-type='EbMobileDataColumn' id='@id'>
+                        <div class='data_column_inner'>
+                            <span> @ColumnName </span>
+                        </div>
+                    </div>".RemoveCR().DoubleQuoted();
+        }
     }
 }
