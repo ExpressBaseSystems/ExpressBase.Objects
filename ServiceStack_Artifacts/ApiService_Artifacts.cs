@@ -209,11 +209,11 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class GetMobMenuRequest : IReturn<GetMobMenuResonse>, IEbSSRequest
+    public class GetMobMenuRequest : EbServiceStackAuthRequest, IReturn<GetMobMenuResonse>
     {
-        public string SolnId { get; set; }
-
-        public int UserId { get; set; }
+        //request to mobile menu
+        [DataMember(Order = 1)]
+        public int LocationId { get; set; }
     }
 
     [DataContract]
@@ -358,6 +358,14 @@ END;";
         public ApiException(string message, Exception innerException) : base(message, innerException) { }
     }
 
+    [Serializable()]
+    public class ExplicitExitException : Exception
+    {
+        public ExplicitExitException() : base() { }
+
+        public ExplicitExitException(string message) : base(message) { }
+    }
+
     [RuntimeSerializable]
     public class ApiScript
     {
@@ -392,7 +400,8 @@ END;";
         NotFound = 404,
         Success = 1,
         Failed = -1,
-        ParamNFound = 0
+        ParamNFound = 0,
+        ExplicitExit = 255
     }
 
     public enum ApiMethods
@@ -435,21 +444,22 @@ END;";
         public string AppIcon { set; get; }
     }
 
+    //objects to mobile
+    public class ObjectListToMobRequest : EbServiceStackAuthRequest, IReturn<ObjectListToMob>
+    {
+        public int LocationId { set; get; }
+
+        public int AppId { set; get; }
+    }
+
     public class ObjectListToMob
     {
-        public Dictionary<string, List<ObjWrap>> Objects { set; get; }
+        [DataMember(Order = 1)]
+        public Dictionary<int, List<ObjWrap>> ObjectTypes { set; get; }
 
         public ObjectListToMob()
         {
-            Objects = new Dictionary<string, List<ObjWrap>>();
-        }
-
-        public int Count
-        {
-            get
-            {
-                return Objects.Count;
-            }
+            ObjectTypes = new Dictionary<int, List<ObjWrap>>();
         }
     }
 }

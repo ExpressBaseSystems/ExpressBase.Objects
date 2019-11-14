@@ -11,7 +11,10 @@ using ExpressBase.Data;
 using ExpressBase.Objects.Objects;
 using ExpressBase.Objects.ServiceStack_Artifacts;
 using ExpressBase.Security;
+using Microsoft.CodeAnalysis.CSharp.Scripting;
+using Microsoft.CodeAnalysis.Scripting;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using ServiceStack;
 using ServiceStack.RabbitMq;
 using ServiceStack.Redis;
@@ -100,6 +103,15 @@ namespace ExpressBase.Objects
         [Alias("Auto deploy table view")]
         [EnableInBuilder(BuilderType.WebForm)]
         public bool AutoDeployTV { get; set; }
+
+        //[PropertyGroup("Data")]
+        //[EnableInBuilder(BuilderType.WebForm)]
+        //[PropertyEditor(PropertyEditorType.Collection)]
+        public List<EbDataPusher> DataPushers { get; set; }
+
+        public bool ExeDataPusher { get; set; }
+
+        public EbDataPusherConfig DataPusherConfig { get; set; }
 
         public static EbOperations Operations = WFOperations.Instance;
 
@@ -415,15 +427,6 @@ namespace ExpressBase.Objects
             bool MuCtrlFound = false;
             foreach (Object Ctrl in _schema.ExtendedControls)
             {
-                //if (Ctrl is EbFileUploader)
-                //{
-                //    if (this.FormGlobals == null)
-                //        this.FormGlobals = GetFormAsFlatGlobal();
-
-                //    string cxt2 = (Ctrl as EbFileUploader).ExeContextCode(this.FormGlobals, false);
-
-                //    extquery += (Ctrl as EbFileUploader).GetSelectQuery(cxt2);
-                //}else
                 if (Ctrl is EbProvisionUser && !MuCtrlFound)
                 {
                     extquery += (Ctrl as EbProvisionUser).GetSelectQuery();
@@ -475,11 +478,10 @@ namespace ExpressBase.Objects
 
         private string GetInsertQuery(IDatabase DataDB, string tblName, string masterTbl, bool isIns)
         {
-
             string _qry;
             if (tblName.Equals(masterTbl))
             {
-                //_qry = string.Format("INSERT INTO {0} ({2} eb_created_by, eb_created_at, eb_loc_id, eb_ver_id) VALUES ({3} :eb_createdby, {1}, :eb_loc_id, :eb_ver_id); ", tblName, DataDB.EB_CURRENT_TIMESTAMP, "{0}", "{1}");
+                //_qry = string.Format("INSERT INTO {0} ({2} eb_created_by, eb_created_at, eb_loc_id, eb_ver_id) VALUES ({3} :eb_createdby, {1}, :eb_loc_id, :eb_ver_id); ", tblName, DataDB.EB_CURRENT_TIMESTAMP, "{0}", "{1}");//eb_ver_id included
                 _qry = string.Format("INSERT INTO {0} ({2} eb_created_by, eb_created_at, eb_loc_id) VALUES ({3} :eb_createdby, {1}, :eb_loc_id); ", tblName, DataDB.EB_CURRENT_TIMESTAMP, "{0}", "{1}");
                 if (DataDB.Vendor == DatabaseVendors.MYSQL)
                     _qry += string.Format("SELECT eb_persist_currval('{0}_id_seq');", tblName);
@@ -779,9 +781,52 @@ namespace ExpressBase.Objects
 
             else if (TriggerCtrl is EbPowerSelect && !(TriggerCtrl as EbPowerSelect).DataImportId.IsNullOrEmpty())
             {
-                Param[0].Type = "7";//Decimal
-                this.TableRowId = Param[0].ValueTo;
-                this.RefreshFormData(DataDB, Service);
+                Param[0].Type = ((int)EbDbTypes.Int32).ToString();
+                EbWebForm _form = Service.Redis.Get<EbWebForm>((TriggerCtrl as EbPowerSelect).DataImportId);
+                if (_form == null)
+                {
+                    EbObjectParticularVersionResponse result = Service.Gateway.Send<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = (TriggerCtrl as EbPowerSelect).DataImportId });
+                    _form = EbSerializers.Json_Deserialize(result.Data[0].Json);
+                    Service.Redis.Set<EbWebForm>((TriggerCtrl as EbPowerSelect).DataImportId, _form);
+                }
+                _form.AfterRedisGet(Service);
+                _form.RefId = (TriggerCtrl as EbPowerSelect).DataImportId;
+                _form.UserObj = this.UserObj;
+                _form.SolutionObj = this.SolutionObj;
+                _form.TableRowId = Param[0].ValueTo;              
+                _form.GetImportData(DataDB, Service, this.Name);
+                this.FormData = _form.FormData;
+            }
+        }
+
+        public void GetImportData(IDatabase DataDB, Service Service, string Destination)
+        {
+            this.RefreshFormData(DataDB, Service);
+
+            foreach (TableSchema _table in this.FormSchema.Tables)
+            {
+                if (this.FormData.MultipleTables.ContainsKey(_table.TableName))
+                {
+                    SingleTable Table = this.FormData.MultipleTables[_table.TableName];
+                    this.FormData.MultipleTables.Remove(_table.TableName);
+                    if (_table.TableName == this.FormSchema.MasterTable)
+                    {
+                        this.FormData.MultipleTables.Add(Destination, Table);
+                        this.FormData.MasterTable = Destination;
+                    }
+                    else
+                    {
+                        if (_table.TableType == WebFormTableTypes.Normal)
+                        {
+                            Table[0].Columns.RemoveAll(e => e.Name == "id");
+                            this.FormData.MultipleTables[this.FormData.MasterTable][0].Columns.AddRange(Table[0].Columns);
+                        }
+                        else
+                        {
+                            this.FormData.MultipleTables.Add(_table.ContainerName, Table);
+                        }
+                    }
+                }
             }
         }
 
@@ -1094,37 +1139,12 @@ namespace ExpressBase.Objects
                 int tableIndex = _schema.Tables.Count;
                 int mngUsrCount = 0;
                 SingleTable UserTable = null;
-                foreach (Object Ctrl in _schema.ExtendedControls)//FileUploader + ManageUser Controls + Manage Location Control
+                foreach (Object Ctrl in _schema.ExtendedControls)//ManageUser Controls + Manage Location Control
                 {
                     SingleTable Table = new SingleTable();
                     if (!(UserTable != null && Ctrl is EbProvisionUser))
                         GetFormattedData(dataset.Tables[tableIndex], Table);
-                    //if (Ctrl is EbFileUploader)
-                    //{
-                    //List<FileMetaInfo> _list = new List<FileMetaInfo>();
-                    //foreach (SingleRow dr in Table)
-                    //{
-                    //    FileMetaInfo info = new FileMetaInfo
-                    //    {
-                    //        FileRefId = dr["id"],
-                    //        FileName = dr["filename"],
-                    //        Meta = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(dr["tags"] as string),
-                    //        UploadTime = dr["uploadts"],
-                    //        FileCategory = (EbFileCategory)Convert.ToInt32(dr["filecategory"])
-                    //    };
 
-                    //    if (!_list.Contains(info))
-                    //        _list.Add(info);
-                    //}
-                    //SingleTable _Table = new SingleTable {
-                    //    new SingleRow() {
-                    //        Columns = new List<SingleColumn> {
-                    //            new SingleColumn { Name = "Files", Type = (int)EbDbTypes.Json, Value = JsonConvert.SerializeObject(_list) }
-                    //        }
-                    //    }
-                    //};
-                    //_FormData.ExtendedTables.Add((Ctrl as EbControl).EbSid, _Table);
-                    //}else
                     if (Ctrl is EbProvisionUser)
                     {
                         Dictionary<string, dynamic> _d = new Dictionary<string, dynamic>();
@@ -1363,6 +1383,52 @@ namespace ExpressBase.Objects
             return r;
         }
 
+        public int Insert(IDatabase DataDB)
+        {
+            string fullqry = string.Empty;
+            List<DbParameter> param = new List<DbParameter>();
+            int i = 0;
+            string _extqry = string.Empty;
+            foreach (KeyValuePair<string, SingleTable> entry in FormData.MultipleTables)
+            {
+                foreach (SingleRow row in entry.Value)
+                {
+                    string _cols = string.Empty;
+                    string _values = string.Empty;
+
+                    foreach (SingleColumn cField in row.Columns)
+                    {
+                        if (cField.Control != null)
+                            cField.Control.ParameterizeControl(DataDB, param, this.TableName, cField, true, ref i, ref _cols, ref _values, ref _extqry, this.UserObj, null);
+                        else
+                            ParameterizeUnknown(DataDB, param, cField, true, ref i, ref _cols, ref _values);
+                    }
+
+                    string _qry = GetInsertQuery(DataDB, entry.Key, this.TableName, true);
+                    fullqry += string.Format(_qry, _cols, _values);
+                }
+            }
+            if (this.ExeDataPusher)
+            {
+
+            }
+
+            fullqry += _extqry;
+            fullqry += GetFileUploaderUpdateQuery(DataDB, param, ref i);
+
+            param.Add(DataDB.GetNewParameter("eb_createdby", EbDbTypes.Int32, this.UserObj.UserId));
+            param.Add(DataDB.GetNewParameter("eb_loc_id", EbDbTypes.Int32, this.LocationId));
+            param.Add(DataDB.GetNewParameter("eb_ver_id", EbDbTypes.Int32, this.RefId.Split("-")[4]));
+            fullqry += string.Format("SELECT eb_currval('{0}_id_seq');", this.TableName);
+
+            //PrepareWebFormData();////////////////data pusher test
+
+            EbDataSet tem = DataDB.DoQueries(fullqry, param.ToArray());
+            EbDataTable temp = tem.Tables[tem.Tables.Count - 1];
+            int _rowid = temp.Rows.Count > 0 ? Convert.ToInt32(temp.Rows[0][0]) : 0;
+            return _rowid;
+        }
+
         public int Update(IDatabase DataDB)
         {
             string fullqry = string.Empty;
@@ -1447,47 +1513,6 @@ namespace ExpressBase.Objects
             return _qry;
         }
 
-        public int Insert(IDatabase DataDB)
-        {
-            string fullqry = string.Empty;
-            List<DbParameter> param = new List<DbParameter>();
-            int i = 0;
-            string _extqry = string.Empty;
-            foreach (KeyValuePair<string, SingleTable> entry in FormData.MultipleTables)
-            {
-                foreach (SingleRow row in entry.Value)
-                {
-                    string _cols = string.Empty;
-                    string _values = string.Empty;
-
-                    foreach (SingleColumn cField in row.Columns)
-                    {
-                        if (cField.Control != null)
-                            cField.Control.ParameterizeControl(DataDB, param, this.TableName, cField, true, ref i, ref _cols, ref _values, ref _extqry, this.UserObj, null);
-                        else
-                            ParameterizeUnknown(DataDB, param, cField, true, ref i, ref _cols, ref _values);
-                    }
-
-                    string _qry = GetInsertQuery(DataDB, entry.Key, this.TableName, true);
-                    fullqry += string.Format(_qry, _cols, _values);
-                }
-            }
-
-            fullqry += _extqry;
-            //fullqry += EbFileUploader.GetUpdateQuery(DataDB, param, FormData.ExtendedTables, this.TableName, this.RefId.Split("-")[3], ref i, 0);
-            fullqry += GetFileUploaderUpdateQuery(DataDB, param, ref i);
-
-            param.Add(DataDB.GetNewParameter("eb_createdby", EbDbTypes.Int32, this.UserObj.UserId));
-            param.Add(DataDB.GetNewParameter("eb_loc_id", EbDbTypes.Int32, this.LocationId));
-            param.Add(DataDB.GetNewParameter("eb_ver_id", EbDbTypes.Int32, this.RefId.Split("-")[4]));
-            fullqry += string.Format("SELECT eb_currval('{0}_id_seq');", this.TableName);
-
-            EbDataSet tem = DataDB.DoQueries(fullqry, param.ToArray());
-            EbDataTable temp = tem.Tables[tem.Tables.Count - 1];
-            int _rowid = temp.Rows.Count > 0 ? Convert.ToInt32(temp.Rows[0][0]) : 0;
-            return _rowid;
-        }
-
         private bool ParameterizeUnknown(IDatabase DataDB, List<DbParameter> param, SingleColumn cField, bool ins, ref int i, ref string _col, ref string _val)
         {
             if (cField.Name.Equals("eb_row_num"))
@@ -1516,6 +1541,88 @@ namespace ExpressBase.Objects
             else
                 Console.WriteLine($"Unknown parameter found in formdata... \nForm RefId : {this.RefId}\nName : {cField.Name}\nType : {cField.Type}\nValue : {cField.Value}");
             return false;
+        }
+
+        private void PrepareWebFormData()
+        {
+            FormAsGlobal globals = this.GetFormAsFlatGlobal(this.FormData);
+            foreach (EbDataPusher pusher in this.DataPushers)
+            {
+                pusher.WebForm.ProcessPushJson(pusher, globals);
+
+                pusher.WebForm.RefId = pusher.FormRefId;
+                pusher.WebForm.UserObj = this.UserObj;
+                pusher.WebForm.LocationId = this.LocationId;
+                pusher.WebForm.SolutionObj = this.SolutionObj;
+
+                pusher.WebForm.MergeFormData();
+
+
+            }
+
+//            string Json = @"
+//{ 
+//    mastertbl : [ { name : 'Febin', age : '12'} ],
+//    gridtbl : [ { rowid : '22', item : 'item1' }, { rowid : '23', item : 'item2' } ]
+//}";
+//            JObject o = JObject.Parse(Json);
+
+        }
+
+        public void ProcessPushJson(EbDataPusher pusher, FormAsGlobal globals)
+        {
+            this.FormData = new WebformData() { MasterTable = this.FormSchema.MasterTable };
+            JObject JObj = JObject.Parse(pusher.Json);
+
+            foreach (TableSchema _table in this.FormSchema.Tables)
+            {
+                if (JObj[_table.TableName] != null)
+                {
+                    SingleTable Table = new SingleTable();                    
+                    foreach(JToken jRow in JObj[_table.TableName])
+                    {
+                        Table.Add(this.GetSingleRow(jRow, _table, globals));
+                    }
+                    this.FormData.MultipleTables.Add(_table.TableName, Table);
+                }
+            }
+        }
+
+        private SingleRow GetSingleRow(JToken JRow, TableSchema _table, FormAsGlobal globals)
+        {
+            SingleRow Row = new SingleRow();
+            foreach (ColumnSchema _column in _table.Columns)
+            {
+                if (JRow[_column.ColumnName] != null)
+                {
+                    try
+                    {
+                        Script valscript = CSharpScript.Create<dynamic>(
+                            JRow[_column.ColumnName].ToString(),
+                            ScriptOptions.Default.WithReferences("Microsoft.CSharp", "System.Core").WithImports("System.Dynamic", "System", "System.Collections.Generic",
+                            "System.Diagnostics", "System.Linq"),
+                            globalsType: typeof(FormGlobals)
+                        );
+                        valscript.Compile();
+                        FormGlobals global = new FormGlobals() { form = globals };
+                        var r = (valscript.RunAsync(global)).Result.ReturnValue;
+                        JRow[_column.ColumnName] = r.ToString();
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Exception in C# Expression evaluation. \nMessage : " + ex.Message);
+                        Console.WriteLine(ex.StackTrace);
+                    }
+
+                    Row.Columns.Add(new SingleColumn
+                    {
+                        Name = _column.ColumnName,
+                        Type = _column.EbDbType,
+                        Value = JRow[_column.ColumnName]
+                    });
+                }
+            }
+            return Row;
         }
 
         //execute sql queries after form data save
@@ -2244,11 +2351,11 @@ namespace ExpressBase.Objects
             if (_table == null)
             {
                 if (_container is EbApproval)
-                    _table = new TableSchema { TableName = curTbl, ParentTable = _parentTable, TableType = WebFormTableTypes.Approval, Title = _container.Label };
+                    _table = new TableSchema { TableName = curTbl, ParentTable = _parentTable, TableType = WebFormTableTypes.Approval, Title = _container.Label, ContainerName = _container.Name };
                 else if (_container is EbDataGrid)
-                    _table = new TableSchema { TableName = curTbl, ParentTable = _parentTable, TableType = WebFormTableTypes.Grid, Title = _container.Label };
+                    _table = new TableSchema { TableName = curTbl, ParentTable = _parentTable, TableType = WebFormTableTypes.Grid, Title = _container.Label, ContainerName = _container.Name };
                 else
-                    _table = new TableSchema { TableName = curTbl, ParentTable = _parentTable, TableType = WebFormTableTypes.Normal };
+                    _table = new TableSchema { TableName = curTbl, ParentTable = _parentTable, TableType = WebFormTableTypes.Normal, ContainerName = _container.Name };
                 _schema.Tables.Add(_table);
             }
             foreach (EbControl control in _flatControls)
@@ -2309,12 +2416,48 @@ namespace ExpressBase.Objects
         {
             EbFormHelper.AfterRedisGet(this, service);
             this.GetWebFormSchema();
+
+            if(this.DataPushers != null)
+            {
+                foreach(EbDataPusher pusher in this.DataPushers)
+                {
+                    EbWebForm _form = service.Redis.Get<EbWebForm>(pusher.FormRefId);
+                    if(_form == null)
+                    {
+                        EbObjectParticularVersionResponse result = service.Gateway.Send<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = pusher.FormRefId });
+                        _form = EbSerializers.Json_Deserialize(result.Data[0].Json);
+                        service.Redis.Set<EbWebForm>(pusher.FormRefId, _form);
+                    }
+                    _form.AfterRedisGet(service);
+                    _form.DataPusherConfig = new EbDataPusherConfig { SourceTable = this.FormSchema.MasterTable };
+                    pusher.WebForm = _form;
+                    this.ExeDataPusher = true;
+                }
+            }
         }
 
         public override void AfterRedisGet(RedisClient Redis, IServiceClient client)
         {
             EbFormHelper.AfterRedisGet(this, Redis, client, this.IsRenderMode);
             this.GetWebFormSchema();
+
+            if (this.DataPushers != null)
+            {
+                foreach (EbDataPusher pusher in this.DataPushers)
+                {
+                    EbWebForm _form = Redis.Get<EbWebForm>(pusher.FormRefId);
+                    if (_form == null)
+                    {
+                        EbObjectParticularVersionResponse result = client.Get<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = pusher.FormRefId });
+                        _form = EbSerializers.Json_Deserialize(result.Data[0].Json);
+                        Redis.Set<EbWebForm>(pusher.FormRefId, _form);
+                    }
+                    _form.AfterRedisGet(Redis, client);
+                    _form.DataPusherConfig = new EbDataPusherConfig { SourceTable = this.FormSchema.MasterTable };
+                    pusher.WebForm = _form;
+                    this.ExeDataPusher = true;
+                }
+            }
         }
 
         public override List<string> DiscoverRelatedRefids()
@@ -2627,6 +2770,43 @@ namespace ExpressBase.Objects
         public override string FailureMSG { get; set; }
 
         public override bool IsDisabled { get; set; }
+    }
+    
+    [UsedWithTopObjectParent(typeof(EbObject))]
+    [EnableInBuilder(BuilderType.WebForm)]
+    public class EbDataPusher
+    {
+        public EbDataPusher() { }
+
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [OSE_ObjectTypes(EbObjectTypes.iWebForm)]
+        public string FormRefId { get; set; }
+
+        [PropertyEditor(PropertyEditorType.Text)]
+        [EnableInBuilder(BuilderType.WebForm)]
+        public string Json { get; set; }
+        
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.WebForm)]
+        public string EbSid { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        public string PushOnlyIf { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        public string SkipLineItemIf { get; set; }
+
+        public EbWebForm WebForm { get; set; }
+    }
+
+    public class EbDataPusherConfig
+    {
+        public EbDataPusherConfig() { }
+
+        public string SourceTable { get; set; }
+
+        public int SourceId { get; set; }
     }
 
     public class FormTransaction

@@ -262,6 +262,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 15)]
         public string TableName { get; set; }
 
+        [DataMember(Order = 15)]
+        public string ReturnObjString { get; set; }
+
     }
 
     [DataContract]

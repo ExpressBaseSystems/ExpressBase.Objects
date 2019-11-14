@@ -172,6 +172,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 19)]
         public string  TableId { get; set; }
 
+        [DataMember(Order = 19)]
+        public bool Modifydv { get; set; }
+
+        [DataMember(Order = 19)]
+        public int LocId { get; set; }
+
     }
 
     [Route("/table")]

@@ -136,6 +136,10 @@ else {
         [HelpText("specifies a short hint that describes the expected value of an input field (e.g. a sample value or a short description of the expected format)")]
         public string PlaceHolder { get; set; }
 
+        //[PropertyGroup("Behavior")]
+        //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        //public string MaskPattern { get; set; }
+
         //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         //[PropertyGroup("Appearance")]
         //[PropertyEditor(PropertyEditorType.MultiLanguageKeySelector)]
@@ -272,10 +276,10 @@ else {
         {
             get
             {
-                return @"
+               return @"
             @attachedLbl@
             <input type='@TextMode '  data-ebtype='@data-ebtype@' ui-inp id='@ebsid@' name='@name@' @AutoCompleteOff@ ' data-toggle='tooltip' data-placement='top' title='@ToolTipText@' 
-@TabIndex@ @MaxLength@  style='width:100%; height:@heightpx; @BackColor @ForeColor display:inline-block; @fontStyle @ReadOnlyString  @Required  @PlaceHolder  @Text  />
+@TabIndex@ @MaxLength@  style='width:100%; height:@heightpx; @BackColor @ForeColor display:inline-block; @fontStyle @ReadOnlyString  @Required  @PlaceHolder  @Text@  />
         @attachedLblClose@"
 .Replace("@ebsid@", String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId)
 .Replace("@name@", this.EbSid_CtxId)
@@ -289,7 +293,7 @@ else {
 .Replace("@AutoCompleteOff@ ", " autocomplete = '" + ((this.AutoCompleteOff || this.TextMode.ToString().ToLower() == "password") ? "off" : "on") + "'")
     .Replace("@BackColor ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor ") + ";"))
     .Replace("@ForeColor ", "color:" + ((this.ForeColor != null) ? this.ForeColor : "@ForeColor ") + ";")
-    .Replace("@Text ", "value='" + (String.IsNullOrEmpty(this.Text) ? this.Text : "@Text ") + "' ")
+    .Replace("@Text@ ", "value='" + ((this.Text != null) ? this.Text : "") + "' ")
 
 .Replace("@attachedLblClose@", (this.TextMode == TextMode.SingleLine) ? string.Empty : "</div>")
 .Replace("@attachedLbl@", (this.TextMode != TextMode.SingleLine) ?

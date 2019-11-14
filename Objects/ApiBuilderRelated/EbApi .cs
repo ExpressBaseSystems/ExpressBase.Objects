@@ -366,7 +366,14 @@ namespace ExpressBase.Objects
             }
             catch (Exception e)
             {
-                throw new Exception("Execution Error: " + e.Message);
+                if(e.InnerException is ExplicitExitException)
+                {
+                    throw e.InnerException;
+                }
+                else
+                {
+                    throw new Exception("Execution Error: " + e.Message);
+                }
             }
             return script;
         }

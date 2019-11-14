@@ -173,7 +173,7 @@ $.each(this.Controls.$values, function (i, col) {
                 _params.Add(p.Name);
                 for(int i = 0; i < Allctrls.Length; i++)
                 {
-                    if (p.Name == Allctrls[i].Name)
+                    if (p.Name == Allctrls[i].Name && !Allctrls[i].DependedDG.Contains(this.Name))
                     {
                         Allctrls[i].DependedDG.Add(this.Name);
                     }
@@ -196,6 +196,7 @@ $.each(this.Controls.$values, function (i, col) {
         {
             string html = @"
 <div class='grid-cont'>
+    <div class='addrow-btn'>Add row</div>
     <div class='Dg_head'>
         <table id='tbl_@ebsid@_head' class='table table-bordered dgtbl'>
             <thead>
@@ -223,7 +224,7 @@ $.each(this.Controls.$values, function (i, col) {
               </tr>
             </thead>
         </table>
-    </div>".Replace("@cogs@", !this.IsDisable ? "<th class='ctrlth'><span class='fa fa-cog'></span></th>" : string.Empty);
+    </div>".Replace("@cogs@", !this.IsDisable ? "<th class='ctrlth'><span class='fa fa fa-pencil-square-o'></span></th>" : string.Empty);
 
             html += @"
     <div class='Dg_body' style='overflow-y:scroll;height:@_height@px ;'>
