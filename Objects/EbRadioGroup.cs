@@ -56,8 +56,18 @@ namespace ExpressBase.Objects
             }
             set { }
         }
+		public override string GetDisplayMemberJSfn
+		{
+			get
+			{
+				return @"
+					  return $('[name=' + this.EbSid_CtxId + ']:checked').next('span').text();
+                ";
+			}
+			set { }
+		}
 
-        [JsonIgnore]
+		[JsonIgnore]
         public override string OnChangeBindJSFn
         {
             get
@@ -79,7 +89,8 @@ namespace ExpressBase.Objects
         public void OnDeserializedMethod(StreamingContext context)
         {
             this.BareControlHtml = this.GetBareHtml();
-            this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
+			this.BareControlHtml4Bot = this.BareControlHtml;
+			this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
 
         private void Options_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -145,6 +156,11 @@ namespace ExpressBase.Objects
 						<span id='Lbl' class='eb-radiospan' ui-label style='@LabelBackColor @LabelForeColor '> RadioButton2  </span>
                 </div>";
 			set => base.DesignHtml4Bot = value;
+		}
+
+		public override string GetHtml4Bot()
+		{
+			return ReplacePropsInHTML((HtmlConstants.CONTROL_WRAPER_HTML4BOT).Replace("@barehtml@", DesignHtml4Bot));
 		}
 
 		public override string GetDesignHtml()

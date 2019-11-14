@@ -30,8 +30,36 @@ namespace ExpressBase.Objects
             }
             set { }
         }
+		public override string GetValueJSfn
+		{
+			get
+			{
+				return @"	
+							var cval=[];
+						$('[name=' + this.EbSid_CtxId + ']:checked').each(function(){
+							cval.push($(this).val());
+						});
+					return cval.join();
+                ";
+			}
+			set { }
+		}
+		public override string GetDisplayMemberJSfn
+		{
+			get
+			{
+				return @"	
+							var ctxt=[];
+						$('[name=' + this.EbSid_CtxId + ']:checked').each(function(){
+							ctxt.push($(this).next('span').text());
+						});
+					return ctxt.join('<br />');
+                ";
+			}
+			set { }
+		}
 
-        [OnDeserialized]
+		[OnDeserialized]
         public void OnDeserializedMethod(StreamingContext context)
         {
             this.BareControlHtml = this.GetBareHtml();
@@ -54,6 +82,12 @@ namespace ExpressBase.Objects
                 </div>
 						";
 			set => base.DesignHtml4Bot = value;
+		}
+
+
+		public override string GetHtml4Bot()
+		{
+			return ReplacePropsInHTML((HtmlConstants.CONTROL_WRAPER_HTML4BOT).Replace("@barehtml@", DesignHtml4Bot));
 		}
 
 		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
@@ -181,7 +215,11 @@ this.Init = function(id)
 
         public override string GetBareHtml()
         {
-            return @"<div class='radio-wrap'><input ui-inp class='bot-checkbox eb-chckbx' type ='checkbox' value='@value@' id='@ebsid@' name='@gname@'> <span id='@name@Lbl' class='eb-chckbxspan'> @label@  </span><br></div>"
+            return @"<div class='radio-wrap'>
+						<input ui-inp class='bot-checkbox eb-chckbx' type ='checkbox' value='@value@' id='@ebsid@' name='@gname@'> 
+						<span id='@name@Lbl' class='eb-chckbxspan'> @label@  </span>
+					<br>
+					</div>"
 .Replace("@ebsid@", String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId)
 .Replace("@gname@", this.GName)
 .Replace("@label@", this.Label)

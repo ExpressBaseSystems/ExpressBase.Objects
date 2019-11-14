@@ -284,7 +284,10 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup("Behavior")]
         [PropertyEditor(PropertyEditorType.CollectionABCFrmSrc, "Columns")]
-        [OnChangeExec(@"if (this.Columns && this.Columns.$values.length === 0 ){pg.MakeReadOnly('DisplayMembers');} else {pg.MakeReadWrite('DisplayMembers');}")]
+        [OnChangeExec(@"
+if (this.Columns && this.Columns.$values.length === 0 )
+{
+pg.MakeReadOnly('DisplayMembers');} else {pg.MakeReadWrite('DisplayMembers');}")]
         public DVColumnCollection DisplayMembers { get; set; }
 
         [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.WebForm, BuilderType.UserControl)]
@@ -428,6 +431,16 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog)]
         [PropertyGroup("Behavior")]
         [PropertyPriority(50)]
+		[OnChangeExec(@"
+if(this.RenderAsSimpleSelect == true)
+{ 
+	pg.ShowProperty('DisplayMember');
+}
+else
+{
+	pg.HideProperty('DisplayMember');
+}
+")]
         public bool RenderAsSimpleSelect { get; set; }
 
         private string VueSelectcode
@@ -511,7 +524,12 @@ namespace ExpressBase.Objects
 		</div>
 	</div>"; set => base.DesignHtml4Bot = value; }
 
-        public override string GetBareHtml()
+		public override string GetHtml4Bot()
+		{
+			return ReplacePropsInHTML((HtmlConstants.CONTROL_WRAPER_HTML4BOT).Replace("@barehtml@", DesignHtml4Bot));
+		}
+
+		public override string GetBareHtml()
         {
             if (this.RenderAsSimpleSelect)
             {

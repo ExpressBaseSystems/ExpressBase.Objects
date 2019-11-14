@@ -116,7 +116,10 @@ namespace ExpressBase.Objects
 			get => this.GetBareHtml();
 			set => base.DesignHtml4Bot = value;
 		}
-
+		public override string GetHtml4Bot()
+		{
+			return ReplacePropsInHTML(HtmlConstants.CONTROL_WRAPER_HTML4BOT);
+		}
 
 		public override string GetDesignHtml()
         {
