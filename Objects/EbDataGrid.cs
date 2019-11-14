@@ -196,6 +196,7 @@ $.each(this.Controls.$values, function (i, col) {
         {
             string html = @"
 <div class='grid-cont'>
+    <div class='addrow-btn'>Add row</div>
     <div class='Dg_head'>
         <table id='tbl_@ebsid@_head' class='table table-bordered dgtbl'>
             <thead>
@@ -363,7 +364,28 @@ $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this
             set { this.EbTextBox.ToolTipText = value; }
         }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+		[EnableInBuilder(BuilderType.WebForm)]
+		[PropertyGroup("Behavior")]
+		public bool AutoSuggestion {
+			get { return this.EbTextBox.AutoSuggestion; }
+			set { this.EbTextBox.AutoSuggestion = value; }
+		}
+
+		[EnableInBuilder(BuilderType.WebForm)]
+		[HideInPropertyGrid]
+		public string TableName {
+			get { return this.EbTextBox.TableName; }
+			set { this.EbTextBox.TableName = value; }
+		}
+
+		[EnableInBuilder(BuilderType.WebForm)]
+		[HideInPropertyGrid]
+		public List<string> Suggestions {
+			get { return this.EbTextBox.Suggestions; }
+			set { this.EbTextBox.Suggestions = value; }
+		}
+
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
 
@@ -376,7 +398,14 @@ $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this
         {
             DBareHtml = EbTextBox.GetBareHtml();
         }
-    }
+		public void InitFromDataBase(JsonServiceClient ServiceClient)
+		{
+			EbTextBox.Name = this.Name;
+			EbTextBox.TableName = this.TableName;
+			EbTextBox.AutoSuggestion = this.AutoSuggestion;
+			this.EbTextBox.InitFromDataBase(ServiceClient);		
+		}
+	}
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
     [Alias("Numeric Column")]

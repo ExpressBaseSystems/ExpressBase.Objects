@@ -64,19 +64,66 @@ namespace ExpressBase.Objects
             return head;
         }
 
-        public override string GetHtml()
+        public override string GetHtml4Bot()
         {
-            string html = "<form id='@name@' class='eb-form'>";
+            string html = string.Empty;
 
-            foreach (EbControl c in this.Controls)
-                html += c.GetHtml();
-
-            html += "</form>";
+			foreach (EbControl c in this.Controls)
+				if (c.ObjType == "TextBox")
+				{
+					html += c.GetHtml4Bot();
+				}
+				else if (c.ObjType == "Date")
+				{
+					html += c.GetHtml4Bot();
+				}
+				else if (c.ObjType == "CheckBoxGroup")
+				{
+					html += c.GetHtml4Bot();
+				}
+				else if (c.ObjType == "Numeric")
+				{
+					html += c.GetHtml4Bot();
+				}
+				else if (c.ObjType == "BooleanSelect")
+				{
+					html += c.GetHtml4Bot();
+				}
+				else if (c.ObjType == "FileUploader")
+				{
+					html += c.GetHtml4Bot();
+				}
+				else if (c.ObjType == "PowerSelect")
+				{
+					html += c.GetHtml4Bot();
+				}
+				else if (c.ObjType == "SimpleSelect")
+				{
+					html += c.GetHtml4Bot();
+				}
+				else if (c.ObjType == "RadioGroup")
+				{
+					html += c.GetHtml4Bot();
+				}
+				else if (c.ObjType == "DynamicCardSet")
+				{
+					html += c.GetHtml4Bot();
+				}
+				else if (c.ObjType == "StaticCardSet")
+				{
+					html += c.GetHtml4Bot();
+				}
+				else
+				{
+					html += c.GetHtml4Bot();
+					//html += c.GetHtml();
+				}
 
             return html.Replace("@name@", this.Name);
         }
 
-        public override List<string> DiscoverRelatedRefids()
+		
+		public override List<string> DiscoverRelatedRefids()
         {
             List<string> refids = new List<string>();
             foreach (EbControl control in Controls)

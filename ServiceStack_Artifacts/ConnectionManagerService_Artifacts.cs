@@ -41,6 +41,11 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int ConnectionType { get; set; }
     }
 
+    public class sampletest
+    {
+
+    }
+
     public class GetConnectionsResponse : IEbSSResponse
     {
         public EbConnectionsConfig EBSolutionConnections { get; set; }
@@ -213,6 +218,20 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
+    public class AddUnifonicRequest : IReturn<AddUnifonicResponse>, IEbTenentRequest
+    {
+        public EbUnifonicConfig Config { get; set; }
+
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
+    }
+
+    public class AddUnifonicResponse : IEbSSResponse
+    {
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
     public class AddETRequest : IReturn<AddETResponse>, IEbTenentRequest
     {
         public EbExpertTextingConfig Config { get; set; }
@@ -350,6 +369,20 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     public class AddSlackResponse : IEbSSResponse
+    {
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    public class AddfacebookRequest : IReturn<AddfacebookResponse>, IEbTenentRequest
+    {
+        public EbfacebbokConfig Config { get; set; }
+
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
+    }
+
+    public class AddfacebookResponse : IEbSSResponse
     {
         public ResponseStatus ResponseStatus { get; set; }
     }
