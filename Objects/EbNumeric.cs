@@ -121,18 +121,24 @@ namespace ExpressBase.Objects
             return GetHtmlHelper(RenderMode.User);
         }
 
-        //        public override string GetBareHtml()
-        //        {
-        //            return @" 
-        //        <div class='input-group' style='width:100%;'>
-        //                <span style='font-size: @fontSize@' class='input-group-addon'><i class='fa fa-sort-numeric-asc' aria-hidden='true'></i></span>   
-        //                <input type='text' class='numinput' ui-inp data-ebtype='@datetype@' id='@name@' name='@name@' data-toggle='tooltip' style=' width:100%; display:inline-block;'/>
-        //        </div>"
-        //.Replace("@name@", this.Name)
-        //.Replace("@datetype@", "11");
-        //        }
+		//        public override string GetBareHtml()
+		//        {
+		//            return @" 
+		//        <div class='input-group' style='width:100%;'>
+		//                <span style='font-size: @fontSize@' class='input-group-addon'><i class='fa fa-sort-numeric-asc' aria-hidden='true'></i></span>   
+		//                <input type='text' class='numinput' ui-inp data-ebtype='@datetype@' id='@name@' name='@name@' data-toggle='tooltip' style=' width:100%; display:inline-block;'/>
+		//        </div>"
+		//.Replace("@name@", this.Name)
+		//.Replace("@datetype@", "11");
+		//        }
 
-        public override string GetBareHtml()
+
+		public override string GetHtml4Bot()
+		{
+			return ReplacePropsInHTML(HtmlConstants.CONTROL_WRAPER_HTML4BOT);
+		}
+
+		public override string GetBareHtml()
         {
             return @" 
                 <div class='input-group' style='width:100%;'>

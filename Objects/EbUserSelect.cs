@@ -68,7 +68,10 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [HideInPropertyGrid]
-        public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
+        public override EbDbTypes EbDbType { get { return EbDbTypes.Decimal; } }
+
+        [EnableInBuilder(BuilderType.FilterDialog, BuilderType.WebForm)]
+        public bool LoadCurrentUser { get; set; }
 
 
 

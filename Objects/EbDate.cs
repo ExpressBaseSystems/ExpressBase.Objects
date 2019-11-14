@@ -70,8 +70,12 @@ namespace ExpressBase.Objects
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
             //this.EbDbType = this.EbDbType;
         }
-
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+				
+		public override string GetHtml4Bot()
+		{
+			return ReplacePropsInHTML(HtmlConstants.CONTROL_WRAPER_HTML4BOT);
+		}
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         public EbDateType EbDateType { get; set; }
 
         //[EnableInBuilder(BuilderType.BotForm)]
@@ -219,8 +223,8 @@ namespace ExpressBase.Objects
 
             return ReplacePropsInHTML(EbCtrlHTML);
         }
-
-        [JsonIgnore]
+		
+		[JsonIgnore]
         public override string GetValueJSfn
         {
             get
@@ -238,9 +242,9 @@ namespace ExpressBase.Objects
                         return moment($('#' + this.EbSid_CtxId).val(), ebcontext.user.Preference.ShortTimePattern).format('YYYY-MM-DD HH:mm:ss');";
             }
             set { }
-        }
-
-        [JsonIgnore]
+		}
+	
+		[JsonIgnore]
         public override string SetValueJSfn
         {
             get

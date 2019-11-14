@@ -23,7 +23,7 @@ namespace ExpressBase.Objects
 
         public override string GetDesignHtml()
         {
-            return @"<div class='eb_mob_formlayout layout' eb-type='EbMobileForm' id='@id'>
+            return @"<div class='eb_mob_formlayout layout dropped' eb-type='EbMobileForm' id='@id'>
                         <div class='eb_mob_layout_inner'>
                         </div>
                     </div>".RemoveCR().DoubleQuoted();
@@ -40,7 +40,7 @@ namespace ExpressBase.Objects
 
         public override string GetDesignHtml()
         {
-            return @"<div class='eb_mob_vislayout layout' eb-type='EbMobileVisualization' id='@id'>
+            return @"<div class='eb_mob_vislayout layout dropped' eb-type='EbMobileVisualization' id='@id'>
                         <div class='eb_mob_layout_inner'>
                         </div>
                     </div>".RemoveCR().DoubleQuoted();

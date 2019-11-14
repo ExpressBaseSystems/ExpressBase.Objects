@@ -1,4 +1,5 @@
-﻿using ExpressBase.Common.Extensions;
+﻿using ExpressBase.Common;
+using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using Newtonsoft.Json;
@@ -18,7 +19,8 @@ namespace ExpressBase.Objects
         public void OnDeserializedMethod(StreamingContext context)
         {
             this.BareControlHtml = this.GetBareHtml();
-            this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
+			this.BareControlHtml4Bot = this.BareControlHtml;
+			this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
 
         [PropertyGroup("Identity")]
@@ -31,22 +33,44 @@ namespace ExpressBase.Objects
         [Alias("Text")]
         public override string Label { get; set; }
 
-        public override string DesignHtml4Bot
-        {
-            get => @"
-    <div class='msg-cont'>
-      <div class='bot-icon'></div>
-      <div class='msg-cont-bot'>
-         <div class='msg-wraper-bot'>
-            @Label@
-            <div class='msg-time'>3:44pm</div>
-         </div>
-      </div>
-   </div>".Replace("@Label@", this.Label);
-            set => base.DesignHtml4Bot = value;
-        }
+		public override string DesignHtml4Bot
+		{
+			get => @"
+				<div id='cont_@ebsid@' ebsid='@ebsid@' name='@name@' ctype='@type@' eb-type='@type@' class='Eb-ctrlContainer iw-mTrigger' >
+					<div class='msg-cont '>
+						<div class='bot-icon'></div>
+						<div class='msg-cont-bot'>
+							<div class='msg-wraper-bot'>
+							@Label@
+							<div class='msg-time'>3:44pm</div>
+							</div>
+						</div>
+					</div>
+				</div>".Replace("@Label@", this.Label);
+			set => base.DesignHtml4Bot = value;
+		}
+		public override string GetHtml4Bot()
+		{
+			return GetWrapedCtrlHtml4bot();
+		}
+		public override string GetWrapedCtrlHtml4bot()
+		{
+			string jk = @"
+				<div id='cont_@ebsid@' ebsid='@ebsid@' name='@name@' ctype='@type@' eb-type='@type@' class='Eb-ctrlContainer iw-mTrigger' >
+					<div class='msg-cont 66666666'>
+						<div class='bot-icon'></div>
+						<div class='msg-cont-bot'>
+							<div class='msg-wraper-bot'>
+							@Label@
+							<div class='msg-time'>3:44pm</div>
+							</div>
+						</div>
+					</div>
+				</div>";
+			return ReplacePropsInHTML(jk);
 
-        [HideInPropertyGrid]
+		}
+		[HideInPropertyGrid]
         [JsonIgnore]
         public override string ToolIconHtml { get { return "<i class='fa fa-font'></i>"; } set { } }
 

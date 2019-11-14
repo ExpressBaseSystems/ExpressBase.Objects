@@ -270,7 +270,7 @@ else{
 }")]
         public string LinkRefId { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard)]
+        [EnableInBuilder(BuilderType.DVBuilder,  BuilderType.DashBoard, BuilderType.Calendar)]
         [PropertyEditor(PropertyEditorType.DropDown)]
         [OnChangeExec(@"
 console.log('onchange fired');
@@ -289,17 +289,16 @@ else if(this.FormMode === 2){
         [JsonIgnore]
         public DVColumnCollection ColumnsRef { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard)]
+        [EnableInBuilder(BuilderType.DVBuilder,  BuilderType.DashBoard, BuilderType.Calendar)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "ColumnsRef")]
         public List<DVBaseColumn> FormId { get; set; }
 
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard)]
-        //[PropertyEditor(PropertyEditorType.CollectionFrmSrc, "ColumnsRef")]
+        [EnableInBuilder(BuilderType.DVBuilder,  BuilderType.DashBoard, BuilderType.Calendar)]
         [PropertyEditor(PropertyEditorType.Mapper, "ColumnsRef", "LinkRefId", "FormControl")]
         public List<DVBaseColumn> FormParameters { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder,  BuilderType.DashBoard, BuilderType.Calendar)]
         [HideInPropertyGrid]
         public EbControl FormControl { get; set; }
 
