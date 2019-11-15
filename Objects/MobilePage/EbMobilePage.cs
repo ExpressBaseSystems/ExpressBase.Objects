@@ -39,38 +39,6 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public EbMobileContainer Container { set; get; }
 
-        public WebFormSchema ToWebFormSchema()
-        {
-            if (this.Container == null && !(this.Container is EbMobileForm))
-                return null;
-
-            WebFormSchema Schema = new WebFormSchema
-            {
-                FormName = this.Container.Name
-            };
-
-            TableSchema TableSchema = new TableSchema
-            {
-                TableName = this.Container.Name,
-                TableType = WebFormTableTypes.Normal
-            };
-            Schema.Tables.Add(TableSchema);
-
-            return Schema;
-        }
-
-        private void PushTableCols(TableSchema TableSchema)
-        {
-            EbMobileForm MobForm = this.Container as EbMobileForm;
-
-            foreach (EbMobileControl ctrl in MobForm.ChiledControls)
-            {
-                TableSchema.Columns.Add(new ColumnSchema
-                {
-                    ColumnName = ctrl.Name,
-                    EbDbType = (int)ctrl.EbDbType
-                });
-            }
-        }
+        public override List<string> DiscoverRelatedRefids() { return new List<string>(); }
     }
 }

@@ -19,7 +19,23 @@ namespace ExpressBase.Objects
     public class EbMobileForm : EbMobileContainer
     {
         [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
+        public override string Name { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
         public List<EbMobileControl> ChiledControls { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        public string TableName { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [Alias("Auto Deploy Visualization")]
+        public bool AutoDeployMV { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
+        public string AutoGenMVRefid { set; get; }
 
         public override string GetDesignHtml()
         {
@@ -27,6 +43,37 @@ namespace ExpressBase.Objects
                         <div class='eb_mob_container_inner'>
                         </div>
                     </div>".RemoveCR().DoubleQuoted();
+        }
+
+        public WebFormSchema ToWebFormSchema()
+        {
+            WebFormSchema Schema = new WebFormSchema
+            {
+                FormName = this.TableName
+            };
+
+            TableSchema TableSchema = new TableSchema
+            {
+                TableName = this.TableName,
+                TableType = WebFormTableTypes.Normal
+            };
+            this.PushTableCols(TableSchema);
+
+            Schema.Tables.Add(TableSchema);
+
+            return Schema;
+        }
+
+        private void PushTableCols(TableSchema TableSchema)
+        {
+            foreach (EbMobileControl ctrl in this.ChiledControls)
+            {
+                TableSchema.Columns.Add(new ColumnSchema
+                {
+                    ColumnName = ctrl.Name,
+                    EbDbType = (int)ctrl.EbDbType
+                });
+            }
         }
     }
 

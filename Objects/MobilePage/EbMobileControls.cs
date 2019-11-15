@@ -18,6 +18,13 @@ namespace ExpressBase.Objects
 
         [HideInPropertyGrid]
         public virtual EbDbTypes EbDbType { get { return EbDbTypes.String; } set { } }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        public virtual bool Hidden { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [HelpText("Set true if want unique value for this control on every form save.")]
+        public virtual bool Unique { get; set; }
     }
 
     [EnableInBuilder(BuilderType.MobilePage)]
@@ -46,7 +53,7 @@ namespace ExpressBase.Objects
             return @"<div class='eb_stacklayout mob_control dropped' id='@id' eb-type='EbMobileNumericBox' tabindex='1' onclick='$(this).focus()'>
                             <label class='ctrl_label'> @Label </label>
                             <div class='eb_ctrlhtml'>
-                               <input type='text' class='eb_mob_textbox' />
+                               <input type='number' class='eb_mob_textbox' />
                             </div>
                         </div>".RemoveCR().DoubleQuoted();
         }
@@ -159,6 +166,11 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.MobilePage)]
     public class EbMobileTableLayout : EbMobileControl
     {
+        public EbMobileTableLayout()
+        {
+            this.CellCollection = new List<EbMobileTableCell>();
+        }
+
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
         public int RowCount { set; get; }
@@ -170,6 +182,10 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
         public List<EbMobileTableCell> CellCollection { set; get; }
+
+        public override bool Hidden { set; get; }
+
+        public override bool Unique { get; set; }
 
         public override string GetDesignHtml()
         {
@@ -194,6 +210,11 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.MobilePage)]
     public class EbMobileTableCell : EbMobilePageBase
     {
+        public EbMobileTableCell()
+        {
+            this.ControlCollection = new List<EbMobileControl>();
+        }
+
         [EnableInBuilder(BuilderType.MobilePage)]
         public int RowIndex { set; get; }
 
@@ -212,6 +233,8 @@ namespace ExpressBase.Objects
     {
         public override string Label { set; get; }
 
+        public override bool Unique { get; set; }
+
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
         public int TableIndex { get; set; }
@@ -228,6 +251,8 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
         public EbDbTypes Type { get; set; }
+
+        public override bool Hidden { set; get; }
 
         public override string GetDesignHtml()
         {
