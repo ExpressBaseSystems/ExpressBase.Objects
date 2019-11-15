@@ -132,12 +132,12 @@ namespace ExpressBase.Objects
         }
         public override string GetDesignHtml()
         {
-            return @"<div id='@id' class='SqlJobItem dropped' eb-type='Loop'> <div>
-                        <div tabindex='1' class='drpboxInt' onclick='$(this).focus();'>  
+            return @"<div  class='SqlJobItem dropped' eb-type='Loop' id='@id'> <div class='sqljob-line-border'>
+                        <div tabindex='1' class='drpboxInt lineDrp' onclick='$(this).focus();' id='@id_LpStr' >  
                             <div class='CompLabel'> Loop Start</div>
                         </div>
-                        <div style='min-height:30px' class='Sql_Dropable'> </div>
-                        <div tabindex='1' class='drpbox' onclick='$(this).focus();'>  
+                        <div class='Sql_Dropable'> </div>
+                        <div tabindex='1' class='drpbox lineDrp' onclick='$(this).focus();' id='@id_LpEnd'>  
                             <div class='CompLabel'> Loop End</div>
                         </div>
                     </div></div>".RemoveCR().DoubleQuoted();
@@ -168,12 +168,12 @@ namespace ExpressBase.Objects
         }
         public override string GetDesignHtml()
         {
-            return @"<div id='@id' class='SqlJobItem dropped' eb-type='Transaction'> <div>
-                        <div tabindex='1' class='drpboxInt' onclick='$(this).focus();'>  
+            return @"<div id='@id' class='SqlJobItem dropped' eb-type='Transaction'> <div class='sqljob-line-border'>
+                        <div tabindex='1' class='drpboxInt lineDrp' onclick='$(this).focus();' id='@id_TrStr'>  
                             <div class='CompLabel'> Transaction Start</div>
                         </div>
-                        <div style='min-height:30px' class='Sql_Dropable'> </div>
-                        <div tabindex='1' class='drpbox' onclick='$(this).focus();'>  
+                        <div class='Sql_Dropable'> </div>
+                        <div tabindex='1' class='drpbox lineDrp' onclick='$(this).focus();' id='@id_TrEnd'>  
                             <div class='CompLabel'> Transaction End</div>
                         </div>
                     </div></div>".RemoveCR().DoubleQuoted();
@@ -258,7 +258,7 @@ namespace ExpressBase.Objects
         public override string GetDesignHtml()
         {
             return @"<div class='SqlJobItem dropped' eb-type='SqlJobReader' id='@id'>
-                        <div tabindex='1' class='drpbox' onclick='$(this).focus();'>  
+                        <div tabindex='1' class='drpbox lineDrp' onclick='$(this).focus();'  id='@id_JR'>  
                             <div class='CompLabel'> @Label </div>
                             <div class='CompName'> @RefName </div>
                             <div class='CompVersion'> @Version </div>
@@ -290,7 +290,7 @@ namespace ExpressBase.Objects
         public override string GetDesignHtml()
         {
             return @"<div class='SqlJobItem dropped' eb-type='SqlJobWriter' id='@id'>
-                        <div tabindex='1' class='drpbox' onclick='$(this).focus();'>  
+                        <div tabindex='1' class='drpbox lineDrp' onclick='$(this).focus();'  id='@id_JW'>  
                             <div class='CompLabel'> @Label </div>
                             <div class='CompName'> @RefName </div>
                             <div class='CompVersion'> @Version </div>
@@ -308,7 +308,7 @@ namespace ExpressBase.Objects
         public override string GetDesignHtml()
         {
             return @"<div class='SqlJobItem dropped' eb-type='SqlProcessor' id='@id'>
-                        <div tabindex='1' class='drpbox' onclick='$(this).focus();'>  
+                        <div tabindex='1' class='drpbox lineDrp' onclick='$(this).focus();' id='@id_Processor'>  
                             <div class='CompLabel'> @Label </div>
                         </div>
                     </div>".RemoveCR().DoubleQuoted();
