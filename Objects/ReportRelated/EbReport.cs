@@ -765,6 +765,7 @@ namespace ExpressBase.Objects
                 detailprintingtop = 0;
                 Doc.NewPage();
                 PageNumber = Writer.PageNumber;
+                dt_Yposition = ph_Yposition + PageHeaderHeight;
             }
 
             foreach (EbReportField field in ReportGroups[order].GroupHeader.Fields)

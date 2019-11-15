@@ -445,6 +445,11 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public List<FormLink> FormLinks { get; set; }
 
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [DefaultPropValue("15")]
+        [HideForUser]
+        public int RowHeight { get; set; }
+
         [JsonIgnore]
         public EbWebForm WebForm { get; set; }
 

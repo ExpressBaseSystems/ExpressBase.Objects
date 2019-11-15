@@ -10,38 +10,42 @@ using System.Text;
 namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.MobilePage)]
-    public class EbMobileLayout : EbMobilePageBase
+    public class EbMobileContainer : EbMobilePageBase
     {
        
     }
 
     [EnableInBuilder(BuilderType.MobilePage)]
-    public class EbMobileForm : EbMobileLayout
+    public class EbMobileForm : EbMobileContainer
     {
         [EnableInBuilder(BuilderType.MobilePage)]
-        public List<EbMobileControls> ChiledControls { get; set; }
+        public List<EbMobileControl> ChiledControls { get; set; }
 
         public override string GetDesignHtml()
         {
-            return @"<div class='eb_mob_formlayout layout dropped' eb-type='EbMobileForm' id='@id'>
-                        <div class='eb_mob_layout_inner'>
+            return @"<div class='eb_mob_form_container mob_container dropped' eb-type='EbMobileForm' id='@id'>
+                        <div class='eb_mob_container_inner'>
                         </div>
                     </div>".RemoveCR().DoubleQuoted();
         }
     }
 
     [EnableInBuilder(BuilderType.MobilePage)]
-    public class EbMobileVisualization : EbMobileLayout
+    public class EbMobileVisualization : EbMobileContainer
     {
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
         public string DataSourceRefId { set; get; }
 
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
+        public EbMobileTableLayout DataLayout { set; get; }
+
         public override string GetDesignHtml()
         {
-            return @"<div class='eb_mob_vislayout layout dropped' eb-type='EbMobileVisualization' id='@id'>
-                        <div class='eb_mob_layout_inner'>
+            return @"<div class='eb_mob_vis_container mob_container dropped' eb-type='EbMobileVisualization' id='@id'>
+                        <div class='eb_mob_container_inner'>
                         </div>
                     </div>".RemoveCR().DoubleQuoted();
         }
