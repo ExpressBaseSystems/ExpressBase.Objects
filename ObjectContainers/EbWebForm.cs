@@ -211,14 +211,19 @@ namespace ExpressBase.Objects
                         if ((ctrl as EbTextBox).AutoSuggestion)
                             (ctrl as EbTextBox).TableName = _tbl;
                     }
-                    else if (ctrl is EbControlContainer)
+					else if (ctrl is EbDGStringColumn)
+					{
+						if ((ctrl as EbDGStringColumn).AutoSuggestion)
+							(ctrl as EbDGStringColumn).TableName = _tbl;
+					}
+					else if (ctrl is EbControlContainer)
                     {
                         string t = _tbl;
                         if (!(ctrl as EbControlContainer).TableName.IsNullOrEmpty())
                             t = (ctrl as EbControlContainer).TableName;
                         GetSuggestionTableName(ctrl as EbControlContainer, t);
                     }
-
+					
                 }
                 catch (Exception e)
                 {
@@ -870,6 +875,7 @@ namespace ExpressBase.Objects
                 _form.SolutionObj = this.SolutionObj;
                 _form.TableRowId = Param[0].ValueTo;              
                 _form.GetImportData(DataDB, Service, this.Name);
+                this.FormData = _form.FormData;
             }
         }
 

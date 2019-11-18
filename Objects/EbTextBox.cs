@@ -250,32 +250,10 @@ else {
         } 
         public override string GetWrapedCtrlHtml4bot()
         {
-            return @"
-<div class='Eb-ctrlContainer iw-mTrigger' ctype='TextBox'  eb-type='TextBox'>
-   <div class='msg-cont'>
-      <div class='bot-icon'></div>
-      <div class='msg-cont-bot'>
-         <div class='msg-wraper-bot'>
-            @Label@
-            <div class='msg-time'>3:44pm</div>
-         </div>
-      </div>
-   </div>
-   <div class='msg-cont' for='TextBox1' form='LeaveJS'>
-      <div class='msg-cont-bot'>
-         <div class='msg-wraper-bot' style='border: none; background-color: transparent; width: 99%; padding-right: 3px;'>
-            <div class='chat-ctrl-cont'>
-               <div class='ctrl-wraper'>
-                    @barehtml@
-               </div>
-            </div>
-         </div>
-      </div>
-   </div>
-</div>"
-.Replace("@barehtml@", this.GetBareHtml())
-.RemoveCR().DoubleQuoted();
-        }
+			
+			return ReplacePropsInHTML(HtmlConstants.CONTROL_WRAPER_HTML4BOT);
+
+		}
 
         //control html definition- for builder side
         public override string GetDesignHtml()
@@ -288,12 +266,17 @@ else {
         {
             return GetHtmlHelper(RenderMode.User);
         }
+		 public override string GetHtml4Bot()
+        {
+			return GetWrapedCtrlHtml4bot();
+			
+		}
 
         public string TexboxHtml
         {
             get
             {
-                return @"
+               return @"
             @attachedLbl@
             <input type='@TextMode '  data-ebtype='@data-ebtype@' ui-inp id='@ebsid@' name='@name@' @AutoCompleteOff@ ' data-toggle='tooltip' data-placement='top' title='@ToolTipText@' 
 @TabIndex@ @MaxLength@  style='width:100%; height:@heightpx; @BackColor @ForeColor display:inline-block; @fontStyle @ReadOnlyString  @Required  @PlaceHolder  @Text@  />
@@ -310,7 +293,7 @@ else {
 .Replace("@AutoCompleteOff@ ", " autocomplete = '" + ((this.AutoCompleteOff || this.TextMode.ToString().ToLower() == "password") ? "off" : "on") + "'")
     .Replace("@BackColor ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor ") + ";"))
     .Replace("@ForeColor ", "color:" + ((this.ForeColor != null) ? this.ForeColor : "@ForeColor ") + ";")
-    .Replace("@Text@ ", "value='" + ((this.Text != null) ? this.Text : "@Text@") + "' ")
+    .Replace("@Text@ ", "value='" + ((this.Text != null) ? this.Text : "") + "' ")
 
 .Replace("@attachedLblClose@", (this.TextMode == TextMode.SingleLine) ? string.Empty : "</div>")
 .Replace("@attachedLbl@", (this.TextMode != TextMode.SingleLine) ?

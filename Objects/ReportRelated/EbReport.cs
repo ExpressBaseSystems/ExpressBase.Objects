@@ -760,6 +760,13 @@ namespace ExpressBase.Objects
 
         public void DrawGroupHeader(int order, int serialnumber)
         {
+             if(ReportGroups[order].GroupHeader.HeightPt + DetailHeight > DT_FillHeight - detailprintingtop)
+            {
+                detailprintingtop = 0;
+                Doc.NewPage();
+                PageNumber = Writer.PageNumber;
+                dt_Yposition = ph_Yposition + PageHeaderHeight;
+            }
 
             foreach (EbReportField field in ReportGroups[order].GroupHeader.Fields)
             {

@@ -1,4 +1,5 @@
-﻿using ExpressBase.Common.Extensions;
+﻿using ExpressBase.Common;
+using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using System;
@@ -36,6 +37,8 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
-        public EbMobileLayout Layout { set; get; }
+        public EbMobileContainer Container { set; get; }
+
+        public override List<string> DiscoverRelatedRefids() { return new List<string>(); }
     }
 }
