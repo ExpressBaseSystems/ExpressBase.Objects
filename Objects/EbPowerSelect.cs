@@ -618,7 +618,7 @@ namespace ExpressBase.Objects
         }
 
         //INCOMPLETE// to get the entire columns(vm+dm+others) in ps query
-        public string GetSelectQuery(IDatabase DataDB, Service service, string Col, string Tbl = null, string _id = null)
+        public string GetSelectQuery(IDatabase DataDB, Service service, string Col, string Tbl = null, string _id = null, string masterTbl = null)
         {
             string Sql = this.GetSql(service);
 
@@ -646,14 +646,14 @@ namespace ExpressBase.Objects
                 if (DataDB.Vendor == DatabaseVendors.MYSQL)
                 {
                     s = string.Format(@"SELECT __A.* FROM ({0}) __A, {1} __B
-                                    WHERE FIND_IN_SET(__A.{2}, __B.{3}) AND __B.{4} = :id;",
-                                         Sql, Tbl, this.ValueMember.Name, Col, _id);
+                                    WHERE FIND_IN_SET(__A.{2}, __B.{3}) AND __B.{4} = :{5}_id;",
+                                         Sql, Tbl, this.ValueMember.Name, Col, _id, masterTbl);
                 }
                 else
                 {
                     s = string.Format(@"SELECT __A.* FROM ({0}) __A, {1} __B
-                                    WHERE __A.{2} = ANY(STRING_TO_ARRAY(__B.{3}::TEXT, ',')::INT[]) AND __B.{4} = :id;",
-                                        Sql, Tbl, this.ValueMember.Name, Col, _id);
+                                    WHERE __A.{2} = ANY(STRING_TO_ARRAY(__B.{3}::TEXT, ',')::INT[]) AND __B.{4} = :{5}_id;",
+                                        Sql, Tbl, this.ValueMember.Name, Col, _id, masterTbl);
                 }
                 return s;
             }
