@@ -224,7 +224,7 @@ $.each(this.Controls.$values, function (i, col) {
               </tr>
             </thead>
         </table>
-    </div>".Replace("@cogs@", !this.IsDisable ? "<th class='ctrlth'><span class='fa fa fa-pencil-square-o'></span></th>" : string.Empty);
+    </div>".Replace("@cogs@", !this.IsDisable ? "<th class='ctrlth'><span class='fa fa fa-cog'></span></th>" : string.Empty);
 
             html += @"
     <div class='Dg_body' style='overflow-y:scroll;height:@_height@px ;'>
