@@ -74,7 +74,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class GetPrefillDataResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
-        public WebformData FormData { get; set; }
+        public WebformDataWrapper FormData { get; set; }
 
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }

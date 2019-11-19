@@ -224,7 +224,7 @@ $.each(this.Controls.$values, function (i, col) {
               </tr>
             </thead>
         </table>
-    </div>".Replace("@cogs@", !this.IsDisable ? "<th class='ctrlth'><span class='fa fa fa-pencil-square-o'></span></th>" : string.Empty);
+    </div>".Replace("@cogs@", !this.IsDisable ? "<th class='ctrlth'><span class='fa fa fa-cog'></span></th>" : string.Empty);
 
             html += @"
     <div class='Dg_body' style='overflow-y:scroll;height:@_height@px ;'>
@@ -1021,9 +1021,9 @@ else {pg.MakeReadWrite('ValueMember');}")]
             return this.EbPowerSelect.GetBareHtml("@ebsid@"); // temp
         }
 
-        public string GetSelectQuery(IDatabase DataDB, Service service, string Col, string Tbl = null, string _id = null)
+        public string GetSelectQuery(IDatabase DataDB, Service service, string Col, string Tbl = null, string _id = null, string masterTbl = null)
         {
-            return this.EbPowerSelect.GetSelectQuery(DataDB, service, Col, Tbl, _id);
+            return this.EbPowerSelect.GetSelectQuery(DataDB, service, Col, Tbl, _id, masterTbl);
         }
 
         public string GetDisplayMembersQuery(IDatabase DataDB, Service service, string vms)
