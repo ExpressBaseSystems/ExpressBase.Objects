@@ -219,6 +219,8 @@ namespace ExpressBase.Objects
 					else if (ctrl is EbControlContainer)
                     {
                         string t = _tbl;
+                        if (ctrl is EbTableLayout || ctrl is EbTableTd)///////EbTableLayout, EbTableTd - table name filling
+                            (ctrl as EbControlContainer).TableName = _tbl;
                         if (!(ctrl as EbControlContainer).TableName.IsNullOrEmpty())
                             t = (ctrl as EbControlContainer).TableName;
                         GetSuggestionTableName(ctrl as EbControlContainer, t);
