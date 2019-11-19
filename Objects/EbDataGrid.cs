@@ -320,7 +320,7 @@ $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [DefaultPropValue("true")]
-        public bool IsEditable { get; set; }
+        public virtual bool IsEditable { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyGroup("Appearance")]
@@ -1031,4 +1031,395 @@ else {pg.MakeReadWrite('ValueMember');}")]
             return this.EbPowerSelect.GetDisplayMembersQuery(DataDB, service, vms);
         }
     }
+
+
+
+
+
+
+
+
+
+	[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+	[Alias("Created By Column")]
+	[UsedWithTopObjectParent(typeof(EbObject))]
+	public class EbDGCreatedByColumn : EbDGColumn
+	{
+
+		[JsonIgnore]
+		public EbSysCreatedBy EbSysCreatedBy { get; set; }
+
+		public EbDGCreatedByColumn()
+		{
+			this.EbSysCreatedBy = new EbSysCreatedBy();
+		}
+
+		[OnDeserialized]
+		public void OnDeserializedMethod(StreamingContext context)
+		{
+			this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
+			DBareHtml = this.EbSysCreatedBy.GetBareHtml();
+			this.Name = "eb_created_by";
+		}
+
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+		[HideInPropertyGrid]
+		public override EbDbTypes EbDbType
+		{
+			get { return this.EbSysCreatedBy.EbDbType; }
+			set { this.EbSysCreatedBy.EbDbType = value; }
+		}
+
+		[EnableInBuilder(BuilderType.WebForm)]
+		[HideInPropertyGrid]
+		public override string InputControlType { get { return "EbSysCreatedBy"; } }
+
+		//[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+		//public override bool IsEditable
+		//{
+		//	get { return !this.EbSysCreatedBy.IsReadOnly; }
+		//	set { this.EbSysCreatedBy.IsReadOnly = !value; }
+		//}
+
+		[JsonIgnore]
+		public override string GetValueJSfn
+		{
+			get
+			{
+				return this.EbSysCreatedBy.GetValueJSfn;
+			}
+			set { }
+		}
+
+		[JsonIgnore]
+		public override string SetValueJSfn
+		{
+			get
+			{
+				return this.EbSysCreatedBy.SetValueJSfn;
+			}
+			set { }
+		}
+
+		[JsonIgnore]
+		public override string EnableJSfn
+		{
+			get
+			{
+				return this.EbSysCreatedBy.EnableJSfn;
+			}
+			set { }
+		}
+
+		[JsonIgnore]
+		public override string GetDisplayMemberJSfn
+		{
+			get
+			{
+				return this.EbSysCreatedBy.GetDisplayMemberJSfn;
+			}
+			set { }
+		}
+		
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+		[HideInPropertyGrid]
+		public override bool DoNotPersist { get { return true; } }
+
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+		[HideInToolBox]
+		public override bool IsSysControl { get { return true; } }
+	}
+
+
+
+	[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+	[Alias("Created At Column")]
+	[UsedWithTopObjectParent(typeof(EbObject))]
+	public class EbDGCreatedAtColumn : EbDGColumn
+	{
+
+		[JsonIgnore]
+		public EbSysCreatedAt EbSysCreatedAt { get; set; }
+
+		public EbDGCreatedAtColumn()
+		{
+			this.EbSysCreatedAt = new EbSysCreatedAt();
+		}
+
+		[OnDeserialized]
+		public void OnDeserializedMethod(StreamingContext context)
+		{
+			this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
+			DBareHtml = this.EbSysCreatedAt.GetBareHtml();
+			this.Name = "eb_created_at";
+		}
+
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+		[HideInPropertyGrid]
+		public override EbDbTypes EbDbType
+		{
+			get { return this.EbSysCreatedAt.EbDbType; }
+			set { this.EbSysCreatedAt.EbDbType = value; }
+		}
+
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+		public EbDateType EbDateType
+		{
+			get { return this.EbSysCreatedAt.EbDateType; }
+			set { this.EbSysCreatedAt.EbDateType = value; }
+		}
+
+		[EnableInBuilder(BuilderType.WebForm)]
+		[HideInPropertyGrid]
+		public override string InputControlType { get { return "EbSysCreatedAt"; } }
+
+		//[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+		//public override bool IsEditable
+		//{
+		//	get { return !this.EbSysCreatedAt.IsReadOnly; }
+		//	set { this.EbSysCreatedAt.IsReadOnly = !value; }
+		//}
+
+		[JsonIgnore]
+		public override string GetValueJSfn
+		{
+			get
+			{
+				return this.EbSysCreatedAt.GetValueJSfn;
+			}
+			set { }
+		}
+
+		[JsonIgnore]
+		public override string SetValueJSfn
+		{
+			get
+			{
+				return this.EbSysCreatedAt.SetValueJSfn;
+			}
+			set { }
+		}
+
+		[JsonIgnore]
+		public override string EnableJSfn
+		{
+			get
+			{
+				return this.EbSysCreatedAt.EnableJSfn;
+			}
+			set { }
+		}
+
+		public override string GetDisplayMemberJSfn
+		{
+			get
+			{
+				return this.EbSysCreatedAt.GetDisplayMemberJSfn;
+			}
+			set { }
+		}
+
+
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+		[HideInPropertyGrid]
+		public override bool DoNotPersist { get { return true; } }
+
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+		[HideInToolBox]
+		public override bool IsSysControl { get { return true; } }
+	}
+
+
+
+
+
+	[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+	[Alias("Modified By Column")]
+	[UsedWithTopObjectParent(typeof(EbObject))]
+	public class EbDGModifiedByColumn : EbDGColumn
+	{
+
+		[JsonIgnore]
+		public EbSysModifiedBy EbSysModifiedBy { get; set; }
+
+		public EbDGModifiedByColumn()
+		{
+			this.EbSysModifiedBy = new EbSysModifiedBy();
+		}
+
+		[OnDeserialized]
+		public void OnDeserializedMethod(StreamingContext context)
+		{
+			this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
+			DBareHtml = this.EbSysModifiedBy.GetBareHtml();
+			this.Name = "eb_lastmodified_by";
+		}
+
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+		[HideInPropertyGrid]
+		public override EbDbTypes EbDbType
+		{
+			get { return this.EbSysModifiedBy.EbDbType; }
+			set { this.EbSysModifiedBy.EbDbType = value; }
+		}
+		
+		[EnableInBuilder(BuilderType.WebForm)]
+		[HideInPropertyGrid]
+		public override string InputControlType { get { return "EbSysModifiedBy"; } }
+
+		//[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+		//public override bool IsEditable
+		//{
+		//	get { return !this.EbSysModifiedBy.IsReadOnly; }
+		//	set { this.EbSysModifiedBy.IsReadOnly = !value; }
+		//}
+
+		[JsonIgnore]
+		public override string GetValueJSfn
+		{
+			get
+			{
+				return this.EbSysModifiedBy.GetValueJSfn;
+			}
+			set { }
+		}
+
+		[JsonIgnore]
+		public override string SetValueJSfn
+		{
+			get
+			{
+				return this.EbSysModifiedBy.SetValueJSfn;
+			}
+			set { }
+		}
+
+		[JsonIgnore]
+		public override string EnableJSfn
+		{
+			get
+			{
+				return this.EbSysModifiedBy.EnableJSfn;
+			}
+			set { }
+		}
+
+		[JsonIgnore]
+		public override string GetDisplayMemberJSfn
+		{
+			get
+			{
+				return this.EbSysModifiedBy.GetDisplayMemberJSfn;
+			}
+			set { }
+		}
+
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+		[HideInPropertyGrid]
+		public override bool DoNotPersist { get { return true; } }
+
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+		[HideInToolBox]
+		public override bool IsSysControl { get { return true; } }
+	}
+
+
+
+
+	[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+	[Alias("Modified At Column")]
+	[UsedWithTopObjectParent(typeof(EbObject))]
+	public class EbDGModifiedAtColumn : EbDGColumn
+	{
+
+		[JsonIgnore]
+		public EbSysModifiedAt EbSysModifiedAt { get; set; }
+
+		public EbDGModifiedAtColumn()
+		{
+			this.EbSysModifiedAt = new EbSysModifiedAt();
+		}
+
+		[OnDeserialized]
+		public void OnDeserializedMethod(StreamingContext context)
+		{
+			this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
+			DBareHtml = this.EbSysModifiedAt.GetBareHtml();
+			this.Name = "eb_lastmodified_at";
+		}
+
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+		[HideInPropertyGrid]
+		public override EbDbTypes EbDbType
+		{
+			get { return this.EbSysModifiedAt.EbDbType; }
+			set { this.EbSysModifiedAt.EbDbType = value; }
+		}
+
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+		public EbDateType EbDateType
+		{
+			get { return this.EbSysModifiedAt.EbDateType; }
+			set { this.EbSysModifiedAt.EbDateType = value; }
+		}
+
+		[EnableInBuilder(BuilderType.WebForm)]
+		[HideInPropertyGrid]
+		public override string InputControlType { get { return "EbSysModifiedAt"; } }
+
+		//[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+		//public override bool IsEditable
+		//{
+		//	get { return !this.EbSysModifiedAt.IsReadOnly; }
+		//	set { this.EbSysModifiedAt.IsReadOnly = !value; }
+		//}
+
+		[JsonIgnore]
+		public override string GetValueJSfn
+		{
+			get
+			{
+				return this.EbSysModifiedAt.GetValueJSfn;
+			}
+			set { }
+		}
+
+		[JsonIgnore]
+		public override string SetValueJSfn
+		{
+			get
+			{
+				return this.EbSysModifiedAt.SetValueJSfn;
+			}
+			set { }
+		}
+
+		[JsonIgnore]
+		public override string EnableJSfn
+		{
+			get
+			{
+				return this.EbSysModifiedAt.EnableJSfn;
+			}
+			set { }
+		}
+
+		public override string GetDisplayMemberJSfn
+		{
+			get
+			{
+				return this.EbSysModifiedAt.GetDisplayMemberJSfn;
+			}
+			set { }
+		}
+
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+		[HideInPropertyGrid]
+		public override bool DoNotPersist { get { return true; } }
+
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+		[HideInToolBox]
+		public override bool IsSysControl { get { return true; } }
+	}
+
 }

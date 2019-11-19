@@ -1101,11 +1101,14 @@ namespace ExpressBase.Objects
                             ColumnSchema _column = _table.Columns.Find(c => c.ColumnName.Equals(dataColumn.ColumnName));
                             if (_column != null)
                             {
-                                if (_column.Control is EbDate || _column.Control is EbDGDateColumn || _column.Control is EbSysCreatedAt || _column.Control is EbSysModifiedAt)
+                                if (_column.Control is EbDate || _column.Control is EbDGDateColumn || _column.Control is EbSysCreatedAt || _column.Control is EbSysModifiedAt || _column.Control is EbDGCreatedAtColumn || _column.Control is EbDGModifiedAtColumn)
                                 {
                                     EbDateType _type = _column.Control is EbDate ? (_column.Control as EbDate).EbDateType :
                                         _column.Control is EbDGDateColumn ? (_column.Control as EbDGDateColumn).EbDateType :
-                                        _column.Control is EbSysCreatedAt ? (_column.Control as EbSysCreatedAt).EbDateType : (_column.Control as EbSysModifiedAt).EbDateType;
+                                        _column.Control is EbSysCreatedAt ? (_column.Control as EbSysCreatedAt).EbDateType :
+										_column.Control is EbSysModifiedAt ? (_column.Control as EbSysModifiedAt).EbDateType :
+										_column.Control is EbDGCreatedAtColumn ? (_column.Control as EbDGCreatedAtColumn).EbDateType :
+										(_column.Control as EbDGModifiedAtColumn).EbDateType;
                                     DateTime dt = Convert.ToDateTime(_unformattedData);
                                     if (_type == EbDateType.Date)
                                     {
@@ -1141,13 +1144,13 @@ namespace ExpressBase.Objects
                                             _formattedData = loc_id + "$$" + this.SolutionObj.Locations[loc_id].ShortName;
                                     }
                                 }
-                                else if (_column.Control is EbSysCreatedBy || _column.Control is EbSysModifiedBy)
+                                else if (_column.Control is EbSysCreatedBy || _column.Control is EbSysModifiedBy || _column.Control is EbDGCreatedByColumn || _column.Control is EbDGModifiedByColumn)
                                 {
                                     int user_id = Convert.ToInt32(_unformattedData);
-                                    EbSysCreatedByDM dm = (_column.Control is EbSysCreatedBy) ? (_column.Control as EbSysCreatedBy).DisplayMember : (_column.Control as EbSysModifiedBy).DisplayMember;
+                                    //EbSysCreatedByDM dm = (_column.Control is EbSysCreatedBy) ? (_column.Control as EbSysCreatedBy).DisplayMember : (_column.Control as EbSysModifiedBy).DisplayMember;
                                     if (this.SolutionObj.Users != null && this.SolutionObj.Users.ContainsKey(user_id))
                                     {
-                                        if (dm == EbSysCreatedByDM.FullName)
+                                        //if (dm == EbSysCreatedByDM.FullName)
                                             _formattedData = user_id + "$$" + this.SolutionObj.Users[user_id];
                                     }
                                 }
