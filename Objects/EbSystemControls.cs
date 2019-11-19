@@ -20,12 +20,7 @@ namespace ExpressBase.Objects
         LongName
     }
 
-    public enum EbSysCreatedByDM
-    {
-        UserId = 1,
-        FullName
-    }
-
+   
     [EnableInBuilder(BuilderType.WebForm)]
     public class EbSysLocation : EbControlUI, IEbPlaceHolderControl
     {
@@ -208,9 +203,6 @@ namespace ExpressBase.Objects
 
         public override EbDbTypes EbDbType { get { return EbDbTypes.Decimal; } }
 
-        [EnableInBuilder(BuilderType.WebForm)]
-        public EbSysCreatedByDM DisplayMember { get; set; }
-
         [HideInPropertyGrid]
         [JsonIgnore]
         public override string ToolIconHtml { get { return "<i class='fa fa-plus'></i><i class='fa fa-user'></i>"; } set { } }
@@ -292,6 +284,15 @@ namespace ExpressBase.Objects
                 return @"let arr = p1.split('$$');
                         $('#' + this.EbSid_CtxId).attr('data-id', arr[0]);
                         $('#' + this.EbSid_CtxId).val(arr[1]).trigger('change');";
+            }
+            set { }
+        }
+
+		public override string GetDisplayMemberJSfn
+		{
+            get
+            {
+                return @"return $('#' + this.EbSid_CtxId).val();";
             }
             set { }
         }
@@ -484,8 +485,8 @@ namespace ExpressBase.Objects
 
         public override EbDbTypes EbDbType { get { return EbDbTypes.Decimal; } }
 
-        [EnableInBuilder(BuilderType.WebForm)]
-        public EbSysCreatedByDM DisplayMember { get; set; }
+        //[EnableInBuilder(BuilderType.WebForm)]
+        //public EbSysCreatedByDM DisplayMember { get; set; }
 
         [HideInPropertyGrid]
         [JsonIgnore]
@@ -573,7 +574,16 @@ namespace ExpressBase.Objects
             set { }
         }
 
-        [EnableInBuilder(BuilderType.WebForm)]
+		public override string GetDisplayMemberJSfn
+		{
+			get
+			{
+				return @"return $('#' + this.EbSid_CtxId).val();";
+			}
+			set { }
+		}
+
+		[EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
         public override bool IsSysControl { get { return true; } }
 
