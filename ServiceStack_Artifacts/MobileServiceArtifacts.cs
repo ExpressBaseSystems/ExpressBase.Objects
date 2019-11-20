@@ -47,52 +47,33 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         }
     }
 
+    public class MobilePagesWraper
+    {
+        public string DisplayName { set; get; }
+
+        public string Name { set; get; }
+
+        public string Version { set; get; }
+
+        public EbMobilePage Page { set; get; }
+    }
+
     //objects to mobile
-    public class ObjectListToMobRequest : EbServiceStackAuthRequest, IReturn<ObjectListToMob>
+    public class GetMobilePagesRequest : EbServiceStackAuthRequest, IReturn<GetMobilePagesResponse>
     {
         public int LocationId { set; get; }
 
         public int AppId { set; get; }
     }
 
-    public class ObjectListToMob
+    public class GetMobilePagesResponse
     {
         [DataMember(Order = 1)]
-        public Dictionary<int, List<ObjWrap>> ObjectTypes { set; get; }
+        public List<MobilePagesWraper> Pages { set; get; }
 
-        public ObjectListToMob()
+        public GetMobilePagesResponse()
         {
-            ObjectTypes = new Dictionary<int, List<ObjWrap>>();
+            this.Pages = new List<MobilePagesWraper>();
         }
-    }
-
-    [DataContract]
-    public class EbObjectToMobRequest : IReturn<EbObjectToMobResponse>, IEbSSRequest
-    {
-        public string SolnId { get; set; }
-
-        public int UserId { get; set; }
-
-        [DataMember(Order = 1)]
-        public string RefId { set; get; }
-
-        [DataMember(Order = 2)]
-        public User User { set; get; }
-    }
-
-    [DataContract]
-    public class EbObjectToMobResponse : IEbSSResponse
-    {
-        [DataMember(Order = 1)]
-        public EbObjectWrapper ObjectWraper { set; get; }
-
-        [DataMember(Order = 2)]
-        public byte[] ReportResult { get; set; }
-
-        [DataMember(Order = 3)]
-        public EbDataSet TableResult { get; set; }
-
-        [DataMember(Order = 5)]
-        public ResponseStatus ResponseStatus { get; set; }
     }
 }
