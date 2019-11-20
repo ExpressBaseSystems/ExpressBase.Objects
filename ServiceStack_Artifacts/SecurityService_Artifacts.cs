@@ -433,6 +433,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int UserId { get; set; }
 
         public string Token { get; set; }
+
+        [DataMember(Order = 3)]
+        public List<int> DBIds { get; set; }
     }
 
     [DataContract]
@@ -443,6 +446,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 2)]
+        public Dictionary<string , string> RefIds { get; set; }
     }
 
     [DataContract]

@@ -618,4 +618,21 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
 
     }
+
+    public class GetUserDashBoardObjectsRequest : IReturn<DeleteLocResponse>, IEbSSRequest
+    {
+        public List<int> ObjectIds { get; set; }
+
+        public string SolnId { get; set; }
+
+        public int UserId { get; set; }
+    }
+    public class GetUserDashBoardObjectsResponse : IEbSSResponse
+    {
+        public Dictionary <string , EbDashBoard> DashBoardObjectIds { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+   
 }
