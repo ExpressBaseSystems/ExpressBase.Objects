@@ -379,13 +379,4 @@ END;";
 
         public int FileRefId { set; get; }
     }
-
-    public class AppDataToMob
-    {
-        public int AppId { set; get; }
-
-        public string AppName { set; get; }
-
-        public string AppIcon { set; get; }
-    }
 }

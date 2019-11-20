@@ -47,6 +47,15 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         }
     }
 
+    public class AppDataToMob
+    {
+        public int AppId { set; get; }
+
+        public string AppName { set; get; }
+
+        public string AppIcon { set; get; }
+    }
+
     public class MobilePagesWraper
     {
         public string DisplayName { set; get; }
@@ -55,7 +64,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public string Version { set; get; }
 
-        public EbMobilePage Page { set; get; }
+        public string Json { set; get; }
     }
 
     //objects to mobile
