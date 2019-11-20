@@ -241,10 +241,10 @@ this.Init = function(id)
             }
         }
 
-        public string GetSelectQuery()
+        public string GetSelectQuery(string masterTbl)
         {
             string cols = string.Join(",", this.PersistingFields.Select(f => (f as UsrLocField).Name));
-            return string.Format("SELECT id,{0} FROM eb_users WHERE eb_ver_id = :eb_ver_id AND eb_data_id = :id ORDER BY id;", cols);
+            return string.Format("SELECT id,{0} FROM eb_users WHERE eb_ver_id = :{1}_eb_ver_id AND eb_data_id = :{1}_id ORDER BY id;", cols, masterTbl);
             //if multiple user ctrl placed in form then one select query is enough // imp
         }
 
@@ -255,7 +255,7 @@ this.Init = function(id)
                 string consqry = string.Empty;
                 if (this.AddLocConstraint)
                     consqry = "SELECT * FROM eb_security_constraints(:eb_createdby, eb_currval('eb_users_id_seq'), '1$no description$1;5;' || eb_currval('eb_locations_id_seq'), '');";
-                return string.Format("SELECT * FROM eb_security_user(:eb_createdby, {0}); UPDATE eb_users SET eb_ver_id = :eb_ver_id, eb_data_id = eb_currval('{1}_id_seq') WHERE email = {2};", param, mtbl, pemail) + consqry;
+                return string.Format("SELECT * FROM eb_security_user(:eb_createdby, {0}); UPDATE eb_users SET eb_ver_id = :{1}_eb_ver_id, eb_data_id = eb_currval('{1}_id_seq') WHERE email = {2};", param, mtbl, pemail) + consqry;
             }
             else
                 return string.Format("SELECT * FROM eb_security_user(:eb_createdby, {0});", param);

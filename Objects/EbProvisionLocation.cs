@@ -212,17 +212,17 @@ this.Init = function(id)
 
         public string VirtualTable { get; set; }
         
-        public string GetSelectQuery()
+        public string GetSelectQuery(string masterTbl)
         {
-            return "SELECT id, longname, shortname, image, meta_json FROM eb_locations WHERE eb_ver_id = :eb_ver_id AND eb_data_id = :id;";
+            return string.Format("SELECT id, longname, shortname, image, meta_json FROM eb_locations WHERE eb_ver_id = :{0}_eb_ver_id AND eb_data_id = :{0}_id;", masterTbl);
         }
 
         private string GetSaveQuery(bool ins, string param, string mtbl)
         {
             if (ins)
-                return $"INSERT INTO eb_locations(longname, shortname, image, meta_json, eb_ver_id, eb_data_id) VALUES({param} :eb_ver_id, eb_currval('{mtbl}_id_seq'));";
+                return $"INSERT INTO eb_locations(longname, shortname, image, meta_json, eb_ver_id, eb_data_id) VALUES({param} :{mtbl}_eb_ver_id, eb_currval('{mtbl}_id_seq'));";
             else
-                return $"UPDATE eb_locations SET {param} WHERE eb_ver_id = :eb_ver_id AND eb_data_id = :{mtbl}_id;";
+                return $"UPDATE eb_locations SET {param} WHERE eb_ver_id = :{mtbl}_eb_ver_id AND eb_data_id = :{mtbl}_id;";
         }
 
         public override bool ParameterizeControl(IDatabase DataDB, List<DbParameter> param, string tbl, SingleColumn cField, bool ins, ref int i, ref string _col, ref string _val, ref string _extqry, User usr, SingleColumn ocF)
@@ -235,13 +235,13 @@ this.Init = function(id)
             string temp = string.Empty;
             if (ins)
             {
-                temp = $"INSERT INTO eb_locations(shortname, longname, image, meta_json, eb_ver_id, eb_data_id) VALUES(:shortname_{i}, :longname_{i}, :image_{i}, :meta_json_{i}, :eb_ver_id, eb_currval('{tbl}_id_seq'));";
+                temp = $"INSERT INTO eb_locations(shortname, longname, image, meta_json, eb_ver_id, eb_data_id) VALUES(:shortname_{i}, :longname_{i}, :image_{i}, :meta_json_{i}, :{tbl}_eb_ver_id, eb_currval('{tbl}_id_seq'));";
                 if (DataDB.Vendor == DatabaseVendors.MYSQL)
                     temp += "SELECT eb_persist_currval('eb_locations_id_seq');";
             }
             else
             {
-                temp += $"UPDATE eb_locations SET shortname = :shortname_{i}, longname = :longname_{i}, image = :image_{i}, meta_json = :meta_json_{i} WHERE eb_ver_id = :eb_ver_id AND eb_data_id = :{tbl}_id;";
+                temp += $"UPDATE eb_locations SET shortname = :shortname_{i}, longname = :longname_{i}, image = :image_{i}, meta_json = :meta_json_{i} WHERE eb_ver_id = :{tbl}_eb_ver_id AND eb_data_id = :{tbl}_id;";
             }
             _extqry = temp + _extqry; //location must be created before user creation
             i++;

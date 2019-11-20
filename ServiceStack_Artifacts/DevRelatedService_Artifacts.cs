@@ -1,4 +1,5 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Application;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
 using ServiceStack;
 using System;
@@ -225,5 +226,26 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class GetDefaultMapApiKeyFromConnectionRequest : EbServiceStackAuthRequest
     {
 
+    }
+
+    public class UpdateAppSettingsRequest : EbServiceStackAuthRequest ,IReturn<UpdateAppSettingsResponse>
+    {
+        [DataMember(Order = 1)]
+        public string Settings { get; set; }
+
+        [DataMember(Order = 2)]
+        public int AppId { get; set; }
+
+        [DataMember(Order = 3)]
+        public EbApplicationTypes AppType { get; set; }
+    }
+
+    public class UpdateAppSettingsResponse 
+    {
+        [DataMember(Order = 1)]
+        public bool Status { set; get; }
+
+        [DataMember(Order = 2)]
+        public string Message { set; get; }
     }
 }
