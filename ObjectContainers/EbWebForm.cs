@@ -157,20 +157,20 @@ namespace ExpressBase.Objects
                 {
                     string _tn = (Allctrls[i] as EbApproval).TableName;
                     if (string.IsNullOrEmpty(_tn))
-                        throw new FormException("Please enter a valid table name for approval control : " + Allctrls[i].Label);
+                        throw new FormException("Please enter a valid table name for " + Allctrls[i].Label + " (approval control)");
                     if (tbls.ContainsKey(_tn))
-                        throw new FormException(string.Format("Same table '{0}' not allowed for {1} and approval control {2}", _tn, tbls[_tn], Allctrls[i].Label));
-                    tbls.Add(_tn, "approval control " + Allctrls[i].Label);
+                        throw new FormException(string.Format("Same table not allowed for {1} and {2}(approval control) : {0}", _tn, tbls[_tn], Allctrls[i].Label));
+                    tbls.Add(_tn, Allctrls[i].Label + "(approval control)");
                 }
                 else if (Allctrls[i] is EbDataGrid)
                 {
                     EbDataGrid DataGrid = Allctrls[i] as EbDataGrid;
                     string _tn = (DataGrid).TableName;
                     if (string.IsNullOrEmpty((DataGrid).TableName))
-                        throw new FormException("Please enter a valid table name for data grid : " + Allctrls[i].Label);
+                        throw new FormException("Please enter a valid table name for " + Allctrls[i].Label + " (data grid)");
                     if (tbls.ContainsKey(_tn))
-                        throw new FormException(string.Format("Same table '{0}' not allowed for {1} and data grid {2}", _tn, tbls[_tn], Allctrls[i].Label));
-                    tbls.Add(_tn, "data grid " + Allctrls[i].Label);
+                        throw new FormException(string.Format("Same table not allowed for {1} and {2}(data grid) : {0}", _tn, tbls[_tn], Allctrls[i].Label));
+                    tbls.Add(_tn, Allctrls[i].Label + "(data grid)");
 
                     for (int j = 0; j < (DataGrid).Controls.Count; j++)
                     {
@@ -219,7 +219,7 @@ namespace ExpressBase.Objects
 					else if (ctrl is EbControlContainer)
                     {
                         string t = _tbl;
-                        if (ctrl is EbTableLayout || ctrl is EbTableTd)///////EbTableLayout, EbTableTd - table name filling
+                        if (ctrl is EbTableLayout || ctrl is EbTableTd || ctrl is EbTabControl || ctrl is EbTabPane)///////table name filling
                             (ctrl as EbControlContainer).TableName = _tbl;
                         if (!(ctrl as EbControlContainer).TableName.IsNullOrEmpty())
                             t = (ctrl as EbControlContainer).TableName;
@@ -1202,7 +1202,7 @@ namespace ExpressBase.Objects
                 DataDB.GetNewParameter(_schema.MasterTable + "_eb_ver_id", EbDbTypes.Int32, this.RefId.Split("-")[4])
             });
 
-            Console.WriteLine("From RefreshFormData : Query count = " + qrycount.Join(",") + " Dataset count = " + dataset.Tables.Count);            
+            Console.WriteLine("From RefreshFormData : Query count = " + qrycount.Join(",") + " DataTable count = " + dataset.Tables.Count);            
 
             for(int i = 0, start = 0; i < formCount; start += qrycount[i], i++)
             {
