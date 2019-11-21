@@ -1238,9 +1238,11 @@ namespace ExpressBase.Objects
 
             if (!_FormData.MultipleTables.ContainsKey(_FormData.MasterTable))
             {
+                if (this.DataPusherConfig != null)
+                    return;
                 string t = "From RefreshFormData - TABLE : " + _FormData.MasterTable + "   ID : " + this.TableRowId + "\nData Not Found";
                 Console.WriteLine(t);
-                throw new FormException(t);
+                throw new FormException("Error in loading data", (int)HttpStatusCodes.INTERNAL_SERVER_ERROR, t, string.Empty);
             }
             else
             {
@@ -2044,6 +2046,8 @@ namespace ExpressBase.Objects
                                     {
                                         if (cField.Name.Equals("id"))//skipping 'id' field
                                             continue;
+                                        if (cField.Name.Equals("eb_row_num") && IsGridTable)//skipping 'eb_row_num' field
+                                            continue;
                                         ColumnSchema _column = _table.Columns.Find(c => c.ColumnName.Equals(cField.Name));
                                         if (_column != null)
                                         {
@@ -2101,7 +2105,7 @@ namespace ExpressBase.Objects
                     }
                     if (FormFields.Count > 0)
                     {
-                        auditTrails.Add(new AuditTrailInsertData { Action = 2, Fields = FormFields, RefId = WebForm.RefId, TableRowId = this.TableRowId });
+                        auditTrails.Add(new AuditTrailInsertData { Action = 2, Fields = FormFields, RefId = WebForm.RefId, TableRowId = WebForm.TableRowId });
                     }
                 }
             }
@@ -2121,7 +2125,7 @@ namespace ExpressBase.Objects
                 Dictionary<string, string> dic = new Dictionary<string, string>();
                 foreach (SingleColumn cField in Row.Columns)
                 {
-                    if (cField.Name.Equals("id"))//skipping 'id' field
+                    if (cField.Name.Equals("id") || cField.Name.Equals("eb_row_num"))//skipping 'id' field
                         continue;
                     dic.Add(cField.Name, cField.Value == null ? "[null]" : cField.Value.ToString());
                 }
@@ -2160,32 +2164,32 @@ namespace ExpressBase.Objects
             }
         }
 
-        private int UpdateAuditTrail(IDatabase DataDB, int Action, List<AuditTrailEntry> _Fields)
-        {
-            List<DbParameter> parameters = new List<DbParameter>();
-            parameters.Add(DataDB.GetNewParameter("formid", EbDbTypes.String, this.RefId));
-            parameters.Add(DataDB.GetNewParameter("dataid", EbDbTypes.Int32, this.TableRowId));
-            parameters.Add(DataDB.GetNewParameter("actiontype", EbDbTypes.Int32, Action));
-            parameters.Add(DataDB.GetNewParameter("eb_createdby", EbDbTypes.Int32, this.UserObj.UserId));
-            string Qry = DataDB.EB_UPDATEAUDITTRAIL;
-            EbDataTable dt = DataDB.DoQuery(Qry, parameters.ToArray());
-            var id = Convert.ToInt32(dt.Rows[0][0]);
-            if (_Fields.Count == 0)
-                return id;
-            string lineQry = "INSERT INTO eb_audit_lines(masterid, fieldname, oldvalue, newvalue, idrelation, tablename) VALUES ";
-            List<DbParameter> parameters1 = new List<DbParameter>();
-            parameters1.Add(DataDB.GetNewParameter("masterid", EbDbTypes.Int32, id));
-            for (int i = 0; i < _Fields.Count; i++)
-            {
-                lineQry += string.Format("(:masterid, :{0}_{1}, :old{0}_{1}, :new{0}_{1}, :idrel{0}_{1}, :tblname{0}_{1}),", _Fields[i].Name, i);
-                parameters1.Add(DataDB.GetNewParameter(_Fields[i].Name + "_" + i, EbDbTypes.String, _Fields[i].Name));
-                parameters1.Add(DataDB.GetNewParameter("new" + _Fields[i].Name + "_" + i, EbDbTypes.String, _Fields[i].NewVal));
-                parameters1.Add(DataDB.GetNewParameter("old" + _Fields[i].Name + "_" + i, EbDbTypes.String, _Fields[i].OldVal));
-                parameters1.Add(DataDB.GetNewParameter("idrel" + _Fields[i].Name + "_" + i, EbDbTypes.String, _Fields[i].DataRel));
-                parameters1.Add(DataDB.GetNewParameter("tblname" + _Fields[i].Name + "_" + i, EbDbTypes.String, _Fields[i].TableName));
-            }
-            return DataDB.DoNonQuery(lineQry.Substring(0, lineQry.Length - 1), parameters1.ToArray());
-        }
+        //private int UpdateAuditTrail(IDatabase DataDB, int Action, List<AuditTrailEntry> _Fields)
+        //{
+        //    List<DbParameter> parameters = new List<DbParameter>();
+        //    parameters.Add(DataDB.GetNewParameter("formid", EbDbTypes.String, this.RefId));
+        //    parameters.Add(DataDB.GetNewParameter("dataid", EbDbTypes.Int32, this.TableRowId));
+        //    parameters.Add(DataDB.GetNewParameter("actiontype", EbDbTypes.Int32, Action));
+        //    parameters.Add(DataDB.GetNewParameter("eb_createdby", EbDbTypes.Int32, this.UserObj.UserId));
+        //    string Qry = DataDB.EB_UPDATEAUDITTRAIL;
+        //    EbDataTable dt = DataDB.DoQuery(Qry, parameters.ToArray());
+        //    var id = Convert.ToInt32(dt.Rows[0][0]);
+        //    if (_Fields.Count == 0)
+        //        return id;
+        //    string lineQry = "INSERT INTO eb_audit_lines(masterid, fieldname, oldvalue, newvalue, idrelation, tablename) VALUES ";
+        //    List<DbParameter> parameters1 = new List<DbParameter>();
+        //    parameters1.Add(DataDB.GetNewParameter("masterid", EbDbTypes.Int32, id));
+        //    for (int i = 0; i < _Fields.Count; i++)
+        //    {
+        //        lineQry += string.Format("(:masterid, :{0}_{1}, :old{0}_{1}, :new{0}_{1}, :idrel{0}_{1}, :tblname{0}_{1}),", _Fields[i].Name, i);
+        //        parameters1.Add(DataDB.GetNewParameter(_Fields[i].Name + "_" + i, EbDbTypes.String, _Fields[i].Name));
+        //        parameters1.Add(DataDB.GetNewParameter("new" + _Fields[i].Name + "_" + i, EbDbTypes.String, _Fields[i].NewVal));
+        //        parameters1.Add(DataDB.GetNewParameter("old" + _Fields[i].Name + "_" + i, EbDbTypes.String, _Fields[i].OldVal));
+        //        parameters1.Add(DataDB.GetNewParameter("idrel" + _Fields[i].Name + "_" + i, EbDbTypes.String, _Fields[i].DataRel));
+        //        parameters1.Add(DataDB.GetNewParameter("tblname" + _Fields[i].Name + "_" + i, EbDbTypes.String, _Fields[i].TableName));
+        //    }
+        //    return DataDB.DoNonQuery(lineQry.Substring(0, lineQry.Length - 1), parameters1.ToArray());
+        //}
 
         private int UpdateAuditTrail(IDatabase DataDB, List<AuditTrailInsertData> Data)
         {
@@ -2202,23 +2206,27 @@ namespace ExpressBase.Objects
 
                 fullQry += string.Format(@"INSERT INTO eb_audit_master(formid, dataid, actiontype, eb_createdby, eb_createdat) 
                         VALUES (:formid_{0}, :dataid_{0}, :actiontype_{0}, :eb_createdby, :eb_createdat);", i);
-
+                if (DataDB.Vendor == DatabaseVendors.MYSQL)
+                    fullQry += "SELECT eb_persist_currval('eb_audit_master_id_seq');";
                 if(data.Fields.Count != 0)
                 {
                     List<string> lineQry = new List<string>();
                     foreach(AuditTrailEntry _field in data.Fields)
                     {
-                        lineQry.Add(string.Format("(:masterid, :{0}_{1}, :old{0}_{1}, :new{0}_{1}, :idrel{0}_{1}, :tblname{0}_{1})", _field.Name, i));
+                        lineQry.Add(string.Format("((SELECT eb_currval('eb_audit_master_id_seq')), :{0}_{1}, :old{0}_{1}, :new{0}_{1}, :idrel{0}_{1}, :tblname{0}_{1})", _field.Name, i));
                         parameters.Add(DataDB.GetNewParameter(_field.Name + "_" + i, EbDbTypes.String, _field.Name));
                         parameters.Add(DataDB.GetNewParameter("new" + _field.Name + "_" + i, EbDbTypes.String, _field.NewVal));
                         parameters.Add(DataDB.GetNewParameter("old" + _field.Name + "_" + i, EbDbTypes.String, _field.OldVal));
                         parameters.Add(DataDB.GetNewParameter("idrel" + _field.Name + "_" + i, EbDbTypes.String, _field.DataRel));
                         parameters.Add(DataDB.GetNewParameter("tblname" + _field.Name + "_" + i, EbDbTypes.String, _field.TableName));
+                        i++;
                     }
                     fullQry += string.Format("INSERT INTO eb_audit_lines(masterid, fieldname, oldvalue, newvalue, idrelation, tablename) VALUES {0};", lineQry.Join(","));
                 }
                 i++;
             }
+            if (fullQry.IsEmpty())
+                return 0;
             return DataDB.DoNonQuery(fullQry, parameters.ToArray());
         }
 
@@ -2228,11 +2236,13 @@ namespace ExpressBase.Objects
             Dictionary<string, string> DictVmAll = new Dictionary<string, string>();
 
             string qry = @"	SELECT 
-            	m.id, u.fullname, m.eb_createdby, m.eb_createdat, m.actiontype, l.tablename, l.fieldname, l.idrelation, l.oldvalue, l.newvalue
+            	m.id, l.id, u.fullname, m.eb_createdby, m.eb_createdat, m.actiontype, l.tablename, l.fieldname, l.idrelation, l.oldvalue, l.newvalue
             FROM 
-            	eb_audit_master m, eb_audit_lines l, eb_users u
+            	eb_audit_master m 
+                LEFT JOIN eb_audit_lines l ON m.id = l.masterid
+                LEFT JOIN eb_users u ON m.eb_createdby = u.id
             WHERE
-            	m.id = l.masterid AND m.eb_createdby = u.id AND m.formid = :formid AND m.dataid = :dataid
+            	 m.formid = :formid AND m.dataid = :dataid
             ORDER BY
             	m.id DESC, l.tablename, l.idrelation;";
             DbParameter[] parameters = new DbParameter[] {
@@ -2242,28 +2252,36 @@ namespace ExpressBase.Objects
             EbDataTable dt = DataDB.DoQuery(qry, parameters);
 
             Dictionary<int, FormTransaction> Trans = new Dictionary<int, FormTransaction>();
+            Dictionary<int, int> temp_d = new Dictionary<int, int>();
+            int counter = 1;
             TableSchema _table = null;
             ColumnSchema _column = null;
 
             foreach (EbDataRow dr in dt.Rows)
             {
                 int m_id = Convert.ToInt32(dr["id"]);
+                if (!temp_d.ContainsKey(m_id))
+                    temp_d.Add(m_id, counter++);
+                m_id = temp_d[m_id];
                 string new_val = dr["newvalue"].ToString();
                 string old_val = dr["oldvalue"].ToString();
 
-                if (_table == null || !_table.TableName.Equals(dr["tablename"].ToString()))
+                if(Convert.ToInt32(dr["actiontype"]) != 1)
                 {
-                    _table = this.FormSchema.Tables.FirstOrDefault(tbl => tbl.TableName == dr["tablename"].ToString());
-                    if (_table == null)//skipping invalid Audit Trail entry
-                        continue;
-                }
+                    if (_table == null || !_table.TableName.Equals(dr["tablename"].ToString()))
+                    {
+                        _table = this.FormSchema.Tables.FirstOrDefault(tbl => tbl.TableName == dr["tablename"].ToString());
+                        if (_table == null)//skipping invalid Audit Trail entry
+                            continue;
+                    }
 
-                if (_table.TableType != WebFormTableTypes.Grid)
-                {
-                    _column = _table.Columns.FirstOrDefault(col => col.ColumnName == dr["fieldname"].ToString());
-                    if (_column == null)//skipping invalid Audit Trail entry
-                        continue;
-                }
+                    if (_table.TableType != WebFormTableTypes.Grid)
+                    {
+                        _column = _table.Columns.FirstOrDefault(col => col.ColumnName == dr["fieldname"].ToString());
+                        if (_column == null)//skipping invalid Audit Trail entry
+                            continue;
+                    }
+                }                
 
                 if (!Trans.ContainsKey(m_id))
                 {
@@ -2274,6 +2292,9 @@ namespace ExpressBase.Objects
                         CreatedById = dr["eb_createdby"].ToString(),
                         CreatedAt = Convert.ToDateTime(dr["eb_createdat"]).ConvertFromUtc(this.UserObj.Preference.TimeZone).ToString(this.UserObj.Preference.GetShortDatePattern() + " " + this.UserObj.Preference.GetShortTimePattern(), CultureInfo.InvariantCulture)
                     });
+
+                    if (Convert.ToInt32(dr["actiontype"]) == 1)
+                        continue;
                 }
 
                 string[] ids = dr["idrelation"].ToString().Split('-');
@@ -2334,7 +2355,8 @@ namespace ExpressBase.Objects
                         string a = old_val_dict[__column.ColumnName];
                         string b = new_val_dict[__column.ColumnName];
                         PreProcessTransationData(DictVmAll, _table, __column, ref a, ref b);
-                        TblRef.Rows[curid].Columns.Add(__column.ColumnName, new FormTransactionEntry() { OldValue = a, NewValue = b, IsModified = IsModified });
+                        if (!TblRef.Rows[curid].Columns.ContainsKey(__column.ColumnName))
+                            TblRef.Rows[curid].Columns.Add(__column.ColumnName, new FormTransactionEntry() { OldValue = a, NewValue = b, IsModified = IsModified });
                     }
                 }
                 else
@@ -2416,6 +2438,13 @@ namespace ExpressBase.Objects
                         new_val = DateTime.ParseExact(new_val, "HH:mm:ss", CultureInfo.InvariantCulture).ToString(this.UserObj.Preference.GetShortTimePattern(), CultureInfo.InvariantCulture);
                     }
                 }
+            }
+            else if (_column.Control is EbUserSelect)
+            {
+                if (int.TryParse(old_val, out int j))
+                    old_val = this.SolutionObj.Users.ContainsKey(j) ? this.SolutionObj.Users[j] : old_val;
+                if (int.TryParse(new_val, out int i))
+                    new_val = this.SolutionObj.Users.ContainsKey(i) ? this.SolutionObj.Users[i] : new_val;
             }
         }
 
@@ -2537,7 +2566,7 @@ namespace ExpressBase.Objects
             return _perm;
         }
 
-        private bool HasPermission(string ForWhat, int LocId)
+        public bool HasPermission(string ForWhat, int LocId)
         {
             if (this.UserObj.Roles.Contains(SystemRoles.SolutionOwner.ToString()) ||
                 this.UserObj.Roles.Contains(SystemRoles.SolutionAdmin.ToString()) ||
