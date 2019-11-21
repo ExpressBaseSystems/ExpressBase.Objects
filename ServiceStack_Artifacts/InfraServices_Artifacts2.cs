@@ -279,6 +279,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 4)]
         public string ErrDbMessage { get; set; }
+
+        [DataMember(Order = 5)]
+        public string SolURL { get; set; }
     }
 
     [DataContract]
@@ -316,11 +319,11 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class CreateSolutionFurtherRequest : IReturn<CreateSolutionFurtherResponse>, IEbSSRequest
+    public class CreateSolutionFurtherRequest : EbServiceStackAuthRequest,IReturn<CreateSolutionFurtherResponse>
     {
-        public int UserId { get; set; }
+    //    public int UserId { get; set; }
 
-        public string SolnId { get; set; }
+    //    public string SolnId { get; set; }
     }
 
     [DataContract]
