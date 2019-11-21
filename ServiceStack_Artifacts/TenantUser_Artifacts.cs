@@ -619,13 +619,14 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     }
 
-    public class GetUserDashBoardObjectsRequest : IReturn<DeleteLocResponse>, IEbSSRequest
+    public class GetUserDashBoardObjectsRequest : IReturn<GetUserDashBoardObjectsResponse>, IEbSSRequest
     {
         public List<int> ObjectIds { get; set; }
 
         public string SolnId { get; set; }
 
         public int UserId { get; set; }
+        public bool SolutionOwner { get; set; }
     }
     public class GetUserDashBoardObjectsResponse : IEbSSResponse
     {
