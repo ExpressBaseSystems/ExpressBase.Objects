@@ -546,6 +546,7 @@ else
             if (this.RenderAsSimpleSelect)
             {
                 EbSimpleSelect.ContextId = this.ContextId;
+                EbSimpleSelect.DropdownHeight = this.DropdownHeight;
                 return EbSimpleSelect.GetBareHtml();
             }
 

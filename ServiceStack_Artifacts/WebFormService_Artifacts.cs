@@ -218,7 +218,19 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 5)]
 		public ResponseStatus ResponseStatus { get; set; }
-	}
+
+        [DataMember(Order = 6)]
+        public int Status { get; set; }
+
+        [DataMember(Order = 7)]
+        public string Message { get; set; }
+
+        [DataMember(Order = 8)]
+        public string MessageInt { get; set; }
+
+        [DataMember(Order = 9)]
+        public string StackTraceInt { get; set; }
+    }
 
     [DataContract]
     public class DeleteDataFromWebformRequest : EbServiceStackAuthRequest, IReturn<DeleteDataFromWebformResponse>
@@ -434,7 +446,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             this.StackTraceInternal = stacktrace;
         }
 
-        // >100 = info; >200 = warning; >300 = error
         public int ExceptionCode { get; set; }
 
         public string MessageInternal { get; set; }
