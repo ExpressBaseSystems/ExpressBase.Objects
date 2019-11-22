@@ -1607,7 +1607,7 @@ namespace ExpressBase.Objects
                                 else
                                     WebForm.ParameterizeUnknown(DataDB, param, cField, true, ref i, ref _cols, ref _vals);
                             }
-                            string _qry = WebForm.GetInsertQuery(DataDB, entry.Key, false);
+                            string _qry = WebForm.GetInsertQuery(DataDB, entry.Key, WebForm.TableRowId == 0);
                             fullqry += string.Format(_qry, _cols, _vals);
                         }
                     }
@@ -1705,26 +1705,29 @@ namespace ExpressBase.Objects
                 {
                     if (pusher.WebForm.DataPusherConfig.AllowPush)
                     {
-                        foreach (KeyValuePair<string, SingleTable> entry in pusher.WebForm.FormDataBackup.MultipleTables)
+                        if (pusher.WebForm.FormDataBackup != null)
                         {
-                            if (pusher.WebForm.FormData.MultipleTables.ContainsKey(entry.Key))
+                            foreach (KeyValuePair<string, SingleTable> entry in pusher.WebForm.FormDataBackup.MultipleTables)
                             {
-                                for (int i = 0; i < entry.Value.Count; i++)
+                                if (pusher.WebForm.FormData.MultipleTables.ContainsKey(entry.Key))
                                 {
-                                    if (i < pusher.WebForm.FormData.MultipleTables[entry.Key].Count)
-                                        pusher.WebForm.FormData.MultipleTables[entry.Key][i].RowId = entry.Value[i].RowId;
-                                    else
+                                    for (int i = 0; i < entry.Value.Count; i++)
                                     {
-                                        pusher.WebForm.FormData.MultipleTables[entry.Key].Add(entry.Value[i]);
-                                        pusher.WebForm.FormData.MultipleTables[entry.Key][i].IsDelete = true;
+                                        if (i < pusher.WebForm.FormData.MultipleTables[entry.Key].Count)
+                                            pusher.WebForm.FormData.MultipleTables[entry.Key][i].RowId = entry.Value[i].RowId;
+                                        else
+                                        {
+                                            pusher.WebForm.FormData.MultipleTables[entry.Key].Add(entry.Value[i]);
+                                            pusher.WebForm.FormData.MultipleTables[entry.Key][i].IsDelete = true;
+                                        }
                                     }
                                 }
-                            }
-                            else
-                            {
-                                pusher.WebForm.FormData.MultipleTables.Add(entry.Key, entry.Value);
-                                foreach (SingleRow Row in pusher.WebForm.FormData.MultipleTables[entry.Key])
-                                    Row.IsDelete = true;
+                                else
+                                {
+                                    pusher.WebForm.FormData.MultipleTables.Add(entry.Key, entry.Value);
+                                    foreach (SingleRow Row in pusher.WebForm.FormData.MultipleTables[entry.Key])
+                                        Row.IsDelete = true;
+                                }
                             }
                         }
                     }
