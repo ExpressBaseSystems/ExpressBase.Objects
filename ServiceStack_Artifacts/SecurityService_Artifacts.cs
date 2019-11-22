@@ -436,6 +436,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 3)]
         public List<int> DBIds { get; set; }
+
+        [DataMember(Order = 4)]
+        public bool IsSolutionOwner { get; set; }
     }
 
     [DataContract]
