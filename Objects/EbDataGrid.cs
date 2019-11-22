@@ -246,10 +246,9 @@ $.each(this.Controls.$values, function (i, col) {
 
             string html = @"
 <div class='grid-cont'>
-    <div class='addrow-btn'>Add row</div>
-    <div class='Dg_head'>
-
-        <table class='table table-bordered dgtbl'>
+    <div class='addrow-btn' tabindex='0'>+  Row</div>
+	<div class='Dg_head'>
+        <table id='tbl_@ebsid@_head' class='table table-bordered dgtbl'>
             <thead>
               <tr>    
                 <th class='slno' style='width:34px'><span class='grid-col-title'>SL No</span></th>";
