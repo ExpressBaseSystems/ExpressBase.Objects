@@ -48,6 +48,7 @@ namespace ExpressBase.Objects
             this.BeforeSaveRoutines = new List<EbRoutines>();
             this.AfterSaveRoutines = new List<EbRoutines>();
             this.DataPushers = new List<EbDataPusher>();
+			this.TitleExpression = new EbScript();
         }
 
         public override int TableRowId { get; set; }
@@ -114,8 +115,15 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.Collection)]
         public List<EbDataPusher> DataPushers { get; set; }
-        
-        public static EbOperations Operations = WFOperations.Instance;
+
+
+		[PropertyGroup("Identity")]
+		[EnableInBuilder(BuilderType.WebForm)]
+		[PropertyEditor(PropertyEditorType.ScriptEditorJS)]
+		[HelpText("Define Title Expression")]
+		public EbScript TitleExpression { get; set; }
+
+		public static EbOperations Operations = WFOperations.Instance;
 
         public override string GetHead()
         {
