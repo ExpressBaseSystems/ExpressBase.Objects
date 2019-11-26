@@ -1683,6 +1683,7 @@ namespace ExpressBase.Objects
 
         private void PrepareWebFormData()
         {
+            DateTime startdt = DateTime.Now;
             FormAsGlobal globals = this.GetFormAsFlatGlobal(this.FormData);
             foreach (EbDataPusher pusher in this.DataPushers)
             {
@@ -1750,6 +1751,7 @@ namespace ExpressBase.Objects
                     }                    
                 }                
             }
+            Console.WriteLine("PrepareWebFormData for Data Pushers. Execution Time = " + (DateTime.Now - startdt).TotalMilliseconds);
         }
 
         public void ProcessPushJson(EbDataPusher pusher, FormAsGlobal globals)
