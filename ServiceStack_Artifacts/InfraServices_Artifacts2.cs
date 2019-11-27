@@ -40,7 +40,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 10)]
         public string PagePath { get; set; }
 
-        [DataMember(Order =11)]
+        [DataMember(Order = 11)]
         public string Account_type { get; set; }
     }
 
@@ -319,11 +319,11 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class CreateSolutionFurtherRequest : EbServiceStackAuthRequest,IReturn<CreateSolutionFurtherResponse>
+    public class CreateSolutionFurtherRequest : EbServiceStackAuthRequest, IReturn<CreateSolutionFurtherResponse>
     {
-    //    public int UserId { get; set; }
+        //    public int UserId { get; set; }
 
-    //    public string SolnId { get; set; }
+        //    public string SolnId { get; set; }
     }
 
     [DataContract]
@@ -344,28 +344,28 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         }
     }
 
-	[DataContract]
-	public class SocialAutoSignInRequest : EbServiceStackNoAuthRequest
-	{
-		[DataMember(Order = 1)]
-		public string Email { get; set; }
+    [DataContract]
+    public class SocialAutoSignInRequest : EbServiceStackNoAuthRequest
+    {
+        [DataMember(Order = 1)]
+        public string Email { get; set; }
 
-		[DataMember(Order = 2)]
-		public string Social_id { get; set; }
-	}
+        [DataMember(Order = 2)]
+        public string Social_id { get; set; }
+    }
 
-	[DataContract]
-	public class SocialAutoSignInResponse 
-	{
-		[DataMember(Order = 1)]
-		public int Id { get; set; }
+    [DataContract]
+    public class SocialAutoSignInResponse
+    {
+        [DataMember(Order = 1)]
+        public int Id { get; set; }
 
-		[DataMember(Order = 2)]
-		public string psw { get; set; }
+        [DataMember(Order = 2)]
+        public string psw { get; set; }
 
-	}
+    }
 
-	[DataContract]
+    [DataContract]
     public class GetSolutionRequest : IReturn<GetSolutionResponse>, IEbSSRequest
     {
         public string SolnId { get; set; }
@@ -479,7 +479,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 1)]
         public bool VerifyStatus { get; set; } = false;
 
-	}
+    }
 
     [DataContract]
     public class ResetPasswordRequest : EbServiceStackNoAuthRequest
@@ -501,44 +501,44 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public bool VerifyStatus { get; set; }
     }
 
-	[DataContract]
-	public class SocialLoginRequest : EbServiceStackNoAuthRequest
-	{
-		[DataMember(Order = 1)]
-		public string Email { get; set; }
+    [DataContract]
+    public class SocialLoginRequest : EbServiceStackNoAuthRequest
+    {
+        [DataMember(Order = 1)]
+        public string Email { get; set; }
 
-		[DataMember(Order = 2)]
-		public string Fbid { get; set; }
+        [DataMember(Order = 2)]
+        public string Fbid { get; set; }
 
-		[DataMember(Order = 3)]
-		public string Name { get; set; }
+        [DataMember(Order = 3)]
+        public string Name { get; set; }
 
-		[DataMember(Order = 4)]
-		public string Goglid { get; set; }
-	}
+        [DataMember(Order = 4)]
+        public string Goglid { get; set; }
+    }
 
-	[DataContract]
-	public class SocialLoginResponse
-	{
-		[DataMember(Order = 1)]
-		public string jsonval { get; set; }
-	}
+    [DataContract]
+    public class SocialLoginResponse
+    {
+        [DataMember(Order = 1)]
+        public string jsonval { get; set; }
+    }
 
-	//[DataContract]
-	//public class GetUsersResponse : IEbSSResponse
-	//{
+    //[DataContract]
+    //public class GetUsersResponse : IEbSSResponse
+    //{
 
-	//    [DataMember(Order = 1)]
-	//    public Dictionary<string, object> Data { get; set; }
+    //    [DataMember(Order = 1)]
+    //    public Dictionary<string, object> Data { get; set; }
 
-	//    [DataMember(Order = 2)]
-	//    public string Token { get; set; }
+    //    [DataMember(Order = 2)]
+    //    public string Token { get; set; }
 
-	//    [DataMember(Order = 3)]
-	//    public ResponseStatus ResponseStatus { get; set; }
-	//}
+    //    [DataMember(Order = 3)]
+    //    public ResponseStatus ResponseStatus { get; set; }
+    //}
 
-	public class GetVersioning : IEbSSRequest
+    public class GetVersioning : IEbSSRequest
     {
         public bool Versioning { get; set; }
 
@@ -555,7 +555,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string solution_id { get; set; }
     }
 
-    public class UpdateSidMapRequest : EbServiceStackNoAuthRequest, IReturn<UpdateSidMapResponse>{}
+    public class UpdateSidMapRequest : EbServiceStackNoAuthRequest, IReturn<UpdateSidMapResponse> { }
 
     public class UpdateSidMapResponse : IEbSSResponse
     {
@@ -563,15 +563,27 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-    public class UpdateSidMapMqRequest : EbServiceStackNoAuthRequest, IReturn<UpdateSidMapMqResponse>{}
+    public class UpdateSidMapMqRequest : EbServiceStackNoAuthRequest, IReturn<UpdateSidMapMqResponse> { }
 
     public class UpdateSidMapMqResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
         public ResponseStatus ResponseStatus { get; set; }
     }
-
-    public class CheckSolutionOwnerReq : EbServiceStackAuthRequest, IReturn<CheckSolutionOwnerResp> {
+    public class UpdateRedisConnectionsRequest : EbServiceStackNoAuthRequest, IReturn<UpdateRedisConnectionsResponse> { }
+    public class UpdateRedisConnectionsResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+    public class UpdateRedisConnectionsMqRequest : EbServiceStackNoAuthRequest, IReturn<UpdateRedisConnectionsMqResponse> { }
+    public class UpdateRedisConnectionsMqResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+    public class CheckSolutionOwnerReq : EbServiceStackAuthRequest, IReturn<CheckSolutionOwnerResp>
+    {
         [DataMember(Order = 1)]
         public string ESolutionId { get; set; }
     }
