@@ -414,18 +414,19 @@ namespace ExpressBase.Objects
                 _schema = this.FormSchema;//this.GetWebFormSchema();
             foreach (TableSchema _table in _schema.Tables)
             {
-                string _cols = "id, eb_loc_id";
+                string _cols = "eb_loc_id, id";
                 string _id = "id";
 
-                if (_table.Columns.Count > 0)
-                {
-                    if (_table.TableType == WebFormTableTypes.Grid)
-                        _cols = "id, eb_loc_id, eb_row_num, " + String.Join(", ", _table.Columns.Select(x => x.ColumnName));
-                    else
-                        _cols = "id, eb_loc_id, " + String.Join(", ", _table.Columns.Select(x => x.ColumnName));
-                }
-                if (_table.TableName != _schema.MasterTable)
+                if (_table.TableName == _schema.MasterTable)
+                    _cols = "eb_loc_id, eb_ver_id, eb_lock, eb_push_id, eb_src_id, id";
+                else
                     _id = _schema.MasterTable + "_id";
+
+                if (_table.TableType == WebFormTableTypes.Grid)
+                    _cols = "eb_loc_id, id, eb_row_num";
+
+                if (_table.Columns.Count > 0)
+                    _cols += ", " + String.Join(", ", _table.Columns.Select(x => x.ColumnName));
 
                 if (this.DataPusherConfig == null)
                 {
@@ -438,7 +439,7 @@ namespace ExpressBase.Objects
                         query += string.Format("SELECT {0} FROM {1} WHERE {2}_id = :{2}_id AND eb_push_id = '{3}' AND (eb_del='F' OR eb_del IS null);",
                             _cols, _table.TableName, this.DataPusherConfig.SourceTable, this.DataPusherConfig.MultiPushId);
                     else 
-                        query += string.Format("SELECT {0} FROM {1} WHERE {2}_id = (SELECT id FROM {2} WHERE {3}_id = :{3}_id AND eb_push_id = '{4}' AND (eb_del='F' OR eb_del IS null) LIMIT 1) AND (eb_del='F' OR eb_del IS null) {5}",
+                        query += string.Format("SELECT {0} FROM {1} WHERE {2}_id = (SELECT id FROM {2} WHERE {3}_id = :{3}_id AND eb_push_id = '{4}' AND (eb_del='F' OR eb_del IS null) LIMIT 1) AND (eb_del='F' OR eb_del IS null) {5};",
                             _cols, _table.TableName, _schema.MasterTable, this.DataPusherConfig.SourceTable, this.DataPusherConfig.MultiPushId, _table.TableType == WebFormTableTypes.Grid ? "ORDER BY eb_row_num" : "ORDER BY id");
                 }
                 _qryCount++;
@@ -862,7 +863,7 @@ namespace ExpressBase.Objects
                         foreach (KeyValuePair<string, string> item in QrsDict)
                         {
                             SingleTable Tbl = new SingleTable();
-                            GetFormattedData(dataset.Tables[i++], Tbl, null, true);
+                            this.GetFormattedData(dataset.Tables[i++], Tbl);
                             this.FormData.ExtendedTables.Add(item.Key, Tbl);
                         }
                     }
@@ -945,6 +946,24 @@ namespace ExpressBase.Objects
                     val = table.Rows[0][0].ToString();
             }
             return val;
+        }
+
+        public string GetDataPusherJson()
+        {
+            JObject Obj = new JObject();
+
+            foreach (TableSchema _table in this.FormSchema.Tables)
+            {                
+                JObject o = new JObject();
+                foreach (ColumnSchema _column in _table.Columns)
+                {
+                    o[_column.ColumnName] = "value";
+                }
+                JArray array = new JArray();
+                array.Add(o);
+                Obj[_table.TableName] = array;
+            }
+            return Obj.ToString();
         }
 
         //merge formdata and webform object
@@ -1061,54 +1080,62 @@ namespace ExpressBase.Objects
             }
         }
 
-        public void GetFormattedData(EbDataTable dataTable, SingleTable Table, TableSchema _table = null, bool _skipIds = false)
+        public void GetFormattedData(EbDataTable dataTable, SingleTable Table, TableSchema _table = null)
         {
+            //master table eb columns : eb_loc_id, eb_ver_id, eb_lock, eb_push_id, eb_src_id, id
+            //normal table eb columns : eb_loc_id, id
+            //grid table eb columns   : eb_loc_id, id, eb_row_num
+
             foreach (EbDataRow dataRow in dataTable.Rows)
             {
-                bool skipFst = false;
+                int _locId = 0, i = 0, j = 0;
                 string _rowId = "0";
-                if (!_skipIds)
+                if (_table != null)
                 {
-                    _rowId = dataRow[dataTable.Columns[0].ColumnIndex].ToString();
-                    bool _rowFound = false;
-                    foreach (SingleRow r in Table)
+                    _locId = Convert.ToInt32(dataRow[i++]);
+                    if (_table.TableName.Equals(this.FormSchema.MasterTable))
                     {
-                        if (r.RowId.Equals(_rowId))
+                        if (this.FormData != null)
                         {
-                            _rowFound = true;
-                            break;
+                            this.FormData.FormVersionId = Convert.ToInt32(dataRow[i++]);
+                            this.FormData.IsLocked = dataRow[i++].ToString().Equals("T");
+                            this.FormData.DataPushId = dataRow[i++].ToString();
+                            this.FormData.SourceId = Convert.ToInt32(dataRow[i++]);
                         }
+                        else
+                            i += 4;
                     }
-                    if (_rowFound)// skipping duplicate rows in dataTable
-                        continue;
-
-                    skipFst = true;
-                }
-                SingleRow Row = new SingleRow();
-                foreach (EbDataColumn dataColumn in dataTable.Columns)
-                {
-                    if (dataColumn.ColumnName == "eb_loc_id" && skipFst)
+                    _rowId = dataRow[i].ToString();
+                    for (; j < Table.Count; j++)
                     {
-                        Row.LocId = Convert.ToInt32(dataRow[dataColumn.ColumnIndex]);
-                        skipFst = false;
+                        if (Table[j].RowId.Equals(_rowId))
+                            break;
                     }
-                    else if (dataRow.IsDBNull(dataColumn.ColumnIndex))
+                    if (j < Table.Count)// skipping duplicate rows in dataTable
+                        continue;
+                }
+
+                SingleRow Row = new SingleRow() { RowId = _rowId, LocId = _locId };
+
+                for (; i < dataTable.Columns.Count; i++)
+                {
+                    if (dataRow.IsDBNull(i))
                     {
                         Row.Columns.Add(new SingleColumn()
                         {
-                            Name = dataColumn.ColumnName,
-                            Type = (int)dataColumn.Type,
+                            Name = dataTable.Columns[i].ColumnName,
+                            Type = (int)dataTable.Columns[i].Type,
                             Value = null
                         });
                     }
                     else
                     {
-                        object _unformattedData = dataRow[dataColumn.ColumnIndex];
+                        object _unformattedData = dataRow[i];
                         object _formattedData = _unformattedData;
 
                         if (_table != null)
                         {
-                            ColumnSchema _column = _table.Columns.Find(c => c.ColumnName.Equals(dataColumn.ColumnName));
+                            ColumnSchema _column = _table.Columns.Find(c => c.ColumnName.Equals(dataTable.Columns[i].ColumnName));
                             if (_column != null)
                             {
                                 if (_column.Control is EbDate || _column.Control is EbDGDateColumn || _column.Control is EbSysCreatedAt || _column.Control is EbSysModifiedAt || _column.Control is EbDGCreatedAtColumn || _column.Control is EbDGModifiedAtColumn)
@@ -1166,20 +1193,19 @@ namespace ExpressBase.Objects
                                 }
                             }
                         }
-                        else if (dataColumn.Type == EbDbTypes.Date)
+                        else if (dataTable.Columns[i].Type == EbDbTypes.Date)
                         {
                             _unformattedData = (_unformattedData == DBNull.Value) ? DateTime.MinValue : _unformattedData;
                             _formattedData = ((DateTime)_unformattedData).Date != DateTime.MinValue ? Convert.ToDateTime(_unformattedData).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) : string.Empty;
                         }
                         Row.Columns.Add(new SingleColumn()
                         {
-                            Name = dataColumn.ColumnName,
-                            Type = (int)dataColumn.Type,
+                            Name = dataTable.Columns[i].ColumnName,
+                            Type = (int)dataTable.Columns[i].Type,
                             Value = _formattedData
                         });
                     }
                 }
-                Row.RowId = _rowId;
                 Table.Add(Row);
             }
         }
@@ -1224,11 +1250,17 @@ namespace ExpressBase.Objects
         private void RefreshFormDataInner(EbDataSet dataset, IDatabase DataDB, string psquery, bool backup)
         {
             WebFormSchema _schema = this.FormSchema;
-
-            WebformData _FormData = new WebformData()
+            WebformData _FormData;
+            if (backup)
             {
-                MasterTable = _schema.MasterTable
-            };
+                this.FormDataBackup = new WebformData() { MasterTable = _schema.MasterTable };
+                _FormData = this.FormDataBackup;
+            }
+            else
+            {
+                this.FormData = new WebformData() { MasterTable = _schema.MasterTable };
+                _FormData = this.FormData;
+            }
 
             for (int i = 0; i < _schema.Tables.Count && dataset.Tables.Count >= _schema.Tables.Count; i++)
             {
@@ -1236,9 +1268,9 @@ namespace ExpressBase.Objects
                 SingleTable Table = new SingleTable();
 
                 if (_schema.Tables[i].TableType == WebFormTableTypes.Approval)
-                    GetFormattedDataApproval(dataTable, Table);
+                    this.GetFormattedDataApproval(dataTable, Table);
                 else
-                    GetFormattedData(dataTable, Table, _schema.Tables[i]);
+                    this.GetFormattedData(dataTable, Table, _schema.Tables[i]);
 
                 if (!_FormData.MultipleTables.ContainsKey(_schema.Tables[i].TableName) && Table.Count > 0)
                     _FormData.MultipleTables.Add(_schema.Tables[i].TableName, Table);
@@ -1267,7 +1299,7 @@ namespace ExpressBase.Objects
                 {
                     SingleTable Table = new SingleTable();
                     if (!(UserTable != null && Ctrl is EbProvisionUser))
-                        GetFormattedData(dataset.Tables[tableIndex], Table);
+                        this.GetFormattedData(dataset.Tables[tableIndex], Table);
 
                     if (Ctrl is EbProvisionUser)
                     {
@@ -1334,7 +1366,7 @@ namespace ExpressBase.Objects
                     });
 
                     SingleTable Table = new SingleTable();
-                    GetFormattedData(dt, Table);
+                    this.GetFormattedData(dt, Table);
 
                     List<FileMetaInfo> _list = new List<FileMetaInfo>();
                     foreach (SingleRow dr in Table)
@@ -1408,7 +1440,7 @@ namespace ExpressBase.Objects
                             if (Col.Control is EbPowerSelect || Col.Control is EbDGPowerSelectColumn)
                             {
                                 SingleTable Table = new SingleTable();
-                                GetFormattedData(ds.Tables[tblIdx], Table);
+                                this.GetFormattedData(ds.Tables[tblIdx], Table);
                                 _FormData.ExtendedTables.Add((Col.Control as EbControl).EbSid, Table);
                                 tblIdx++;
                             }
@@ -1417,13 +1449,8 @@ namespace ExpressBase.Objects
                 }
             }
 
-            if (backup)
-                this.FormDataBackup = _FormData;
-            else
-            {
-                this.FormData = _FormData;
+            if (!backup)
                 this.ExeDeleteCancelScript(DataDB);
-            }
         }
 
         //For Prefill Mode
@@ -1474,7 +1501,7 @@ namespace ExpressBase.Objects
                 foreach (KeyValuePair<string, string> item in QrsDict)
                 {
                     SingleTable Table = new SingleTable();
-                    GetFormattedData(dataset.Tables[i++], Table);
+                    this.GetFormattedData(dataset.Tables[i++], Table);
                     this.FormData.ExtendedTables.Add(item.Key, Table);
                 }
             }
@@ -1763,7 +1790,7 @@ namespace ExpressBase.Objects
             {
                 if (JObj[_table.TableName] != null)
                 {
-                    SingleTable Table = new SingleTable();                    
+                    SingleTable Table = new SingleTable();
                     foreach(JToken jRow in JObj[_table.TableName])
                     {
                         if(_table.TableType == WebFormTableTypes.Grid && !pusher.SkipLineItemIf.IsNullOrEmpty())
@@ -1810,7 +1837,7 @@ namespace ExpressBase.Objects
                     globalsType: typeof(FormGlobals)
                 );
                 valscript.Compile();
-                FormGlobals global = new FormGlobals() { form = globals };
+                FormGlobals global = new FormGlobals() { sourceform = globals };
                 var r = (valscript.RunAsync(global)).Result.ReturnValue;
                 return r.ToString();
             }
