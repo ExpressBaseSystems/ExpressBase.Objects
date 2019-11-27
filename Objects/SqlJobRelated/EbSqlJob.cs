@@ -60,9 +60,11 @@ namespace ExpressBase.Objects
         public OrderedList Resources { set; get; }
 
         [EnableInBuilder(BuilderType.SqlJob)]
+        [HideInPropertyGrid]
         public List<string> FirstReaderKeyColumns { get; set; }
 
         [EnableInBuilder(BuilderType.SqlJob)]
+        [HideInPropertyGrid]
         public List<string> ParameterKeyColumns { get; set; }
 
         public LoopLocation GetLoop()
@@ -302,7 +304,8 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.SqlJob)]
     public class EbSqlProcessor : SqlJobResource
     {
-        [EnableInBuilder(BuilderType.ApiBuilder)]
+        [EnableInBuilder(BuilderType.SqlJob)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
         public EbScript Script { get; set; }
 
         public override string GetDesignHtml()
