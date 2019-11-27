@@ -255,7 +255,10 @@ namespace ExpressBase.Objects
             get
             {
                 return @"
-                     this.initializer.clearValues();
+if (this.initializer)
+    this.initializer.clearValues();
+else
+    console.dev_log(`initializer not found for '${this.Name}'`);
                 ";
             }
             set { }
