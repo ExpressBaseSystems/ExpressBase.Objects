@@ -246,7 +246,7 @@ $.each(this.Controls.$values, function (i, col) {
 
             string html = @"
 <div class='grid-cont'>
-    <div class='addrow-btn' tabindex='0'>+  Row</div>
+    <div id='@ebsid@addrow' class='addrow-btn'  tabindex='0'>+  Row</div>
 	<div class='Dg_head'>
         <table id='tbl_@ebsid@_head' class='table table-bordered dgtbl'>
             <thead>
@@ -322,7 +322,7 @@ $.each(this.Controls.$values, function (i, col) {
         {
             get { return @"
 $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val(p1).trigger('change');
-$('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}]>.tdtxt>span`).html(p1);
+//$('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}]>.tdtxt>span`).html(p1);
 "; }
 
             set { }
