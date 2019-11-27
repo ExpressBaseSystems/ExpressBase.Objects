@@ -206,6 +206,8 @@ namespace ExpressBase.Objects.Objects
 
     public class FormGlobals
     {
+        public dynamic sourceform { get; set; }
+
         public dynamic form { get; set; }
 
         public dynamic user { get; set; }

@@ -60,9 +60,11 @@ namespace ExpressBase.Objects
         public OrderedList Resources { set; get; }
 
         [EnableInBuilder(BuilderType.SqlJob)]
+        [HideInPropertyGrid]
         public List<string> FirstReaderKeyColumns { get; set; }
 
         [EnableInBuilder(BuilderType.SqlJob)]
+        [HideInPropertyGrid]
         public List<string> ParameterKeyColumns { get; set; }
 
         public LoopLocation GetLoop()
@@ -132,7 +134,7 @@ namespace ExpressBase.Objects
         }
         public override string GetDesignHtml()
         {
-            return @"<div  class='SqlJobItem dropped' eb-type='Loop' id='@id'> <div class='sqljob-line-border'>
+            return @"<div  class='SqlJobItem dropped' eb-type='Loop' id='@id'> <div>
                         <div tabindex='1' class='drpboxInt lineDrp' onclick='$(this).focus();' id='@id_LpStr' >  
                             <div class='CompLabel'> Loop Start</div>
                         </div>
@@ -168,7 +170,7 @@ namespace ExpressBase.Objects
         }
         public override string GetDesignHtml()
         {
-            return @"<div id='@id' class='SqlJobItem dropped' eb-type='Transaction'> <div class='sqljob-line-border'>
+            return @"<div id='@id' class='SqlJobItem dropped' eb-type='Transaction'> <div>
                         <div tabindex='1' class='drpboxInt lineDrp' onclick='$(this).focus();' id='@id_TrStr'>  
                             <div class='CompLabel'> Transaction Start</div>
                         </div>
@@ -302,7 +304,8 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.SqlJob)]
     public class EbSqlProcessor : SqlJobResource
     {
-        [EnableInBuilder(BuilderType.ApiBuilder)]
+        [EnableInBuilder(BuilderType.SqlJob)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
         public EbScript Script { get; set; }
 
         public override string GetDesignHtml()

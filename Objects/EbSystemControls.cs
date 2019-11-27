@@ -150,7 +150,6 @@ namespace ExpressBase.Objects
                         $('#' + this.EbSid_CtxId).val(arr[1]).trigger('change');}
                     else
                         $('#' + this.EbSid_CtxId).val(p1).trigger('change');
-                        console.log('ivde vannittund');
                     ";
             }
             set { }
