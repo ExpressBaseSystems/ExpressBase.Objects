@@ -82,11 +82,17 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public override  DVColumnCollection Columns{ get; set; }
 
+        [EnableInBuilder(BuilderType.Calendar)]
+        [PropertyEditor(PropertyEditorType.ObjectSelectorCollection)]
+        [OSE_ObjectTypes(EbObjectTypes.iWebForm)]
+        public List<ObjectBasicInfo> FormLinks { get; set; }
+
         public EbCalendarView()
         {
             this.DataColumns = new List<DVBaseColumn>();
             this.KeyColumns = new List<DVBaseColumn>();
             this.DateColumns = new List<DVBaseColumn>();
+            this.FormLinks = new List<ObjectBasicInfo>();
            
         }
 
