@@ -252,11 +252,15 @@ namespace ExpressBase.Objects
                                     + EbCtrlHTML
                         + "</div>";
         }
-
-        public override string GetBareHtml()
+		
+		public override string GetBareHtml()
         {
             return @"
-            <input id='@ebsid@' data-ebtype='@data-ebtype@'  data-toggle='tooltip' title='@toolTipText@' class='date' type='text' name='@name@' autocomplete = 'off' @value@ @tabIndex@ style='width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@ @readOnlyString@ @required@ @placeHolder@ disabled />
+						<div style='display: flex;'>
+							<img id='@ebsid@_usrimg'class='ulstc-disp-img-c' src='/images/nulldp.png' alt='' onerror=this.onerror=null;this.src='/images/nulldp.png';>
+							<div id='@ebsid@' data-ebtype='@data-ebtype@'  data-toggle='tooltip' title='@toolTipText@' class=' ulstc-disp-txt'  name='@name@' autocomplete = 'off' @value@ @tabIndex@ style='width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@ @readOnlyString@ @required@ @placeHolder@ disabled ></div>
+						
+						</div>
             "
 .Replace("@name@", (this.Name != null ? this.Name.Trim() : ""))
 .Replace("@data-ebtype@", "16")//( (int)this.EbDateType ).ToString())
@@ -282,8 +286,10 @@ namespace ExpressBase.Objects
             {
                 return @"let arr = p1.split('$$');
                         $('#' + this.EbSid_CtxId).attr('data-id', arr[0]);
-                        $('#' + this.EbSid_CtxId).val(arr[1]).trigger('change');";
-            }
+                        $('#' + this.EbSid_CtxId).text(arr[1]).trigger('change');
+						let imgsrc='/images/dp/'+ arr[0] +'.png';
+						$('#' + this.EbSid_CtxId + '_usrimg').attr('src',imgsrc );";
+			}
             set { }
         }
 
@@ -291,8 +297,8 @@ namespace ExpressBase.Objects
 		{
             get
             {
-                return @"return $('#' + this.EbSid_CtxId).val();";
-            }
+				return @"return $('#' + this.EbSid_CtxId).text();";
+			}
             set { }
         }
 
@@ -541,8 +547,11 @@ namespace ExpressBase.Objects
 
         public override string GetBareHtml()
         {
-            return @"
-            <input id='@ebsid@' data-ebtype='@data-ebtype@'  data-toggle='tooltip' title='@toolTipText@' class='date' type='text' name='@name@' autocomplete = 'off' @value@ @tabIndex@ style='width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@ @readOnlyString@ @required@ @placeHolder@ disabled />
+            return @"<div style='display: flex;'>
+							<img id='@ebsid@_usrimg'class='ulstc-disp-img-c' src='/images/nulldp.png' alt='' onerror=this.onerror=null;this.src='/images/nulldp.png';>
+							<div id='@ebsid@' data-ebtype='@data-ebtype@'  data-toggle='tooltip' title='@toolTipText@' class=' ulstc-disp-txt'  name='@name@' autocomplete = 'off' @value@ @tabIndex@ style='width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@ @readOnlyString@ @required@ @placeHolder@ disabled ></div>
+						
+						</div>
             "
 .Replace("@name@", (this.Name != null ? this.Name.Trim() : ""))
 .Replace("@data-ebtype@", "16")//( (int)this.EbDateType ).ToString())
@@ -568,7 +577,9 @@ namespace ExpressBase.Objects
             {
                 return @"let arr = p1.split('$$');
                         $('#' + this.EbSid_CtxId).attr('data-id', arr[0]);
-                        $('#' + this.EbSid_CtxId).val(arr[1]).trigger('change');";
+                        $('#' + this.EbSid_CtxId).text(arr[1]).trigger('change');
+						let imgsrc='/images/dp/'+ arr[0] +'.png';
+						$('#' + this.EbSid_CtxId + '_usrimg').attr('src',imgsrc );";
             }
             set { }
         }
@@ -577,7 +588,7 @@ namespace ExpressBase.Objects
 		{
 			get
 			{
-				return @"return $('#' + this.EbSid_CtxId).val();";
+				return @"return $('#' + this.EbSid_CtxId).text();
 			}
 			set { }
 		}
