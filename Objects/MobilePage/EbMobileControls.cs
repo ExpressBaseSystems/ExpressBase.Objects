@@ -20,17 +20,46 @@ namespace ExpressBase.Objects
         public virtual EbDbTypes EbDbType { get { return EbDbTypes.String; } set { } }
 
         [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Behavior")]
         public virtual bool Hidden { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [HelpText("Set true if want unique value for this control on every form save.")]
+        [PropertyGroup("Behavior")]
         public virtual bool Unique { get; set; }
+
+        [PropertyGroup("Behavior")]
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [HelpText("Set true if you want to make this control read only.")]
+        public virtual bool ReadOnly { get; set; }
+
+        [PropertyGroup("Behavior")]
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [HelpText("Set true if you dont want to save value from this field.")]
+        public virtual bool DoNotPersist { get; set; }
     }
 
     [EnableInBuilder(BuilderType.MobilePage)]
     public class EbMobileTextBox : EbMobileControl
     {
         public override EbDbTypes EbDbType { get { return EbDbTypes.String; } set { } }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        public int MaxLength { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        public TextTransform TextTransform { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        public TextMode TextMode { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Behavior")]
+        public bool AutoCompleteOff { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Behavior")]
+        public bool AutoSuggestion { get; set; }
 
         public override string GetDesignHtml()
         {
@@ -48,6 +77,27 @@ namespace ExpressBase.Objects
     {
         public override EbDbTypes EbDbType { get { return EbDbTypes.Decimal; } set { } }
 
+        [EnableInBuilder(BuilderType.MobilePage)]
+        public int MaxLength { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [DefaultPropValue("2")]
+        [HelpText("Number of decimal places")]
+        public int DecimalPlaces { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [Alias("Maximum")]
+        [HelpText("Maximum value allowed")]
+        public int MaxLimit { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [Alias("Minimum")]
+        [HelpText("Minimum value allowed")]
+        public int MinLimit { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        public bool IsCurrency { get; set; }
+
         public override string GetDesignHtml()
         {
             return @"<div class='eb_stacklayout mob_control dropped' id='@id' eb-type='EbMobileNumericBox' tabindex='1' onclick='$(this).focus()'>
@@ -64,6 +114,15 @@ namespace ExpressBase.Objects
     {
         [EnableInBuilder(BuilderType.MobilePage)]
         public EbDateType EbDateType { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        public bool IsNullable { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        public TimeShowFormat ShowTimeAs_ { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        public DateShowFormat ShowDateAs_ { get; set; }
 
         public override EbDbTypes EbDbType { get { return (EbDbTypes)this.EbDateType; } set { } }
 
@@ -87,6 +146,9 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.Collection)]
         public List<EbMobileSSOption> Options { set; get; }
 
+        [EnableInBuilder(BuilderType.MobilePage)]
+        public bool IsMultiSelect { get; set; }
+
         public override string GetDesignHtml()
         {
             return @"<div class='eb_stacklayout mob_control dropped' id='@id' eb-type='EbMobileSimpleSelect' tabindex='1' onclick='$(this).focus()'>
@@ -106,6 +168,12 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.MobilePage)]
         public string EbSid { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        public override string DisplayName { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        public string Value { set; get; }
     }
 
     [EnableInBuilder(BuilderType.MobilePage)]

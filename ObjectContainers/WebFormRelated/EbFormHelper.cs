@@ -286,7 +286,7 @@ namespace ExpressBase.Objects
                         service.Redis.Set<EbWebForm>(pusher.FormRefId, _form);
                     }
                     _form.AfterRedisGet(service);
-                    _form.DataPusherConfig = new EbDataPusherConfig { SourceTable = _this.FormSchema.MasterTable, MultiPushId = pusher.Name };
+                    _form.DataPusherConfig = new EbDataPusherConfig { SourceTable = _this.FormSchema.MasterTable, MultiPushId = _this.RefId + "_" + pusher.Name };
                     pusher.WebForm = _form;
                     _this.ExeDataPusher = true;
                 }
@@ -307,7 +307,7 @@ namespace ExpressBase.Objects
                         Redis.Set<EbWebForm>(pusher.FormRefId, _form);
                     }
                     _form.AfterRedisGet(Redis, client);
-                    _form.DataPusherConfig = new EbDataPusherConfig { SourceTable = _this.FormSchema.MasterTable, MultiPushId = pusher.Name };
+                    _form.DataPusherConfig = new EbDataPusherConfig { SourceTable = _this.FormSchema.MasterTable, MultiPushId = _this.RefId + "_" + pusher.Name };
                     pusher.WebForm = _form;
                     _this.ExeDataPusher = true;
                 }
