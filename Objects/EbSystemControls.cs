@@ -588,7 +588,7 @@ namespace ExpressBase.Objects
 		{
 			get
 			{
-				return @"return $('#' + this.EbSid_CtxId).text();
+				return @"return $('#' + this.EbSid_CtxId).text();";
 			}
 			set { }
 		}
