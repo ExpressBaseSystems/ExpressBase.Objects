@@ -86,6 +86,12 @@ namespace ExpressBase.Objects
         public string DataSourceRefId { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
+        [HelpText("sql query to get data from offline database")]
+        public EbScript OfflineQuery { set; get; }
+        
+
+        [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
         public EbMobileTableLayout DataLayout { set; get; }
 
@@ -95,6 +101,11 @@ namespace ExpressBase.Objects
                         <div class='eb_mob_container_inner'>
                         </div>
                     </div>".RemoveCR().DoubleQuoted();
+        }
+
+        public EbMobileVisualization()
+        {
+            OfflineQuery = new EbScript();
         }
     }
 }

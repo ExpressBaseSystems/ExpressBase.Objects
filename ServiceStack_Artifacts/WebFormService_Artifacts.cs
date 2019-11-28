@@ -384,6 +384,23 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
     }
+
+    [DataContract]
+    public class UpdateAllFormTablesRequest : EbServiceStackAuthRequest, IReturn<UpdateAllFormTablesResponse>
+    {
+        [DataMember(Order = 1)]
+        public string InMsg { get; set; }
+    }
+    
+    [DataContract]
+    public class UpdateAllFormTablesResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public string Message { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
     
     [DataContract]
     public class CheckEmailConAvailableRequest : EbServiceStackAuthRequest, IReturn<CheckEmailConAvailableResponse>
