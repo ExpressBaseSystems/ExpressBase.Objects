@@ -142,7 +142,13 @@ namespace ExpressBase.Objects.Objects.DVRelated
     {
         ASC = 0,
         DESC = 1
-    }    
+    }
+
+    public enum ImageQuality
+    {
+        Small = 0,
+        Medium = 1
+    }
 
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
     public class DVBaseColumn : EbDataVisualizationObject
@@ -654,6 +660,9 @@ pg.HideProperty('FormMode');
         [EnableInBuilder(BuilderType.DVBuilder)]
         [DefaultPropValue("20")]
         public int ImageWidth { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public ImageQuality ImageQuality { get; set; }
 
         public DVStringColumn()
         {

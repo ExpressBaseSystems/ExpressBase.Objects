@@ -129,6 +129,23 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
+    [DataContract]
+    public class GetDataPusherJsonRequest : EbServiceStackAuthRequest, IReturn<GetDataPusherJsonResponse>
+    {
+        [DataMember(Order = 1)]
+        public string RefId { get; set; }
+    }
+
+    [DataContract]
+    public class GetDataPusherJsonResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public string Json { get; set; }
+        
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
 
     [DataContract]
 	public class DoUniqueCheckRequest : EbServiceStackAuthRequest, IReturn<GetRowDataResponse>
@@ -363,6 +380,23 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         [DataMember(Order = 1)]
         public List<EbControl> Controls { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    [DataContract]
+    public class UpdateAllFormTablesRequest : EbServiceStackAuthRequest, IReturn<UpdateAllFormTablesResponse>
+    {
+        [DataMember(Order = 1)]
+        public string InMsg { get; set; }
+    }
+    
+    [DataContract]
+    public class UpdateAllFormTablesResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public string Message { get; set; }
 
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }

@@ -138,12 +138,29 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 3)]
         public ResponseStatus ResponseStatus { get; set; }
     }
-     public class EbObjAllVerForDashBoardRqst : EbServiceStackAuthRequest, IReturn<EbObjAllVerForDashBoardResp>
+     public class GetAllLiveObjectsRqst : EbServiceStackAuthRequest, IReturn<GetAllLiveObjectsResp>
     {
-
+        public List<int> Typelist { get; set; }
+    }
+    
+    public class GetAllCommitedObjectsRqst : EbServiceStackAuthRequest, IReturn<GetAllLiveObjectsResp>
+    {
+        public List<int> Typelist { get; set; }
     }
 
-    public class EbObjAllVerForDashBoardResp : IEbSSResponse
+    public class GetAllLiveObjectsResp : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public Dictionary<string, List<EbObjectWrapper>> Data { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 3)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+    
+    public class GetAllCommitedObjectsResp : IEbSSResponse
     {
         [DataMember(Order = 1)]
         public Dictionary<string, List<EbObjectWrapper>> Data { get; set; }
