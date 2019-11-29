@@ -112,11 +112,6 @@ namespace ExpressBase.Objects
         [PropertyPriority(0)]
         public string DataSourceRefId { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
-        [PropertyEditor(PropertyEditorType.ObjectSelectorCollection)]
-        [OSE_ObjectTypes(EbObjectTypes.iDataReader, EbObjectTypes.iTableVisualization, EbObjectTypes.iChartVisualization, EbObjectTypes.iReport, EbObjectTypes.iWebForm)]
-        public List<ObjectBasicInfo> DataObjCollection { get; set; }
-
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
         [HideInPropertyGrid]
         public string EbSid { get; set; }
@@ -336,7 +331,6 @@ namespace ExpressBase.Objects
             this.ColumnsCollection = new List<DVColumnCollection>();
             this.ParamsList = new List<Param>();
             this.FormLinks = new List<FormLink>();
-            this.DataObjCollection = new List<ObjectBasicInfo>();
         }
 
         public override List<string> DiscoverRelatedRefids()
@@ -761,33 +755,69 @@ namespace ExpressBase.Objects
         public List<DVBaseColumn> Params { get; set; }
     }
 
-    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm)]
+    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.Calendar)]
     public class ObjectBasicInfo : EbDataVisualizationObject
     {
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.Calendar)]
+        [HideInPropertyGrid]
+        public override string Name { get; set; }
+
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.DVBuilder,BuilderType.Calendar)]
         public string ObjName { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]
         public string ObjDisplayName { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]
         public string Version { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]
         public string Refid { get; set; }
     }
 
-    [EnableInBuilder(BuilderType.WebForm, BuilderType.DVBuilder)]
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.DVBuilder, BuilderType.Calendar)]
     public class ObjectBasicForm : ObjectBasicInfo
     {
-        [EnableInBuilder(BuilderType.DVBuilder)]
-        public string xxxxxx { get; set; }
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]
+        [PropertyEditor(PropertyEditorType.DropDown)]
+        [OnChangeExec(@"
+if(this.FormMode === 1){
+    pg.ShowProperty('FormId');
+    pg.HideProperty('FormParameters');
+}
+else if(this.FormMode === 2){
+    pg.HideProperty('FormId');
+    pg.ShowProperty('FormParameters');
+}
+else {
+    pg.HideProperty('FormId');
+    pg.HideProperty('FormParameters');
+}")]
+        public WebFormDVModes FormMode { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm)]
-        public string yyyyyyyyy { get; set; }
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]
+        [PropertyEditor(PropertyEditorType.DropDown)]
+        public LinkTypeEnum LinkType { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder,  BuilderType.Calendar)]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Parent.Columns")]
+        public List<DVBaseColumn> FormId { get; set; }
+
+
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]
+        [PropertyEditor(PropertyEditorType.Mapper, "Parent.Columns", "Refid", "FormControl")]
+        public List<DVBaseColumn> FormParameters { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]
+        [HideInPropertyGrid]
+        public EbControl FormControl { get; set; }
     }
 
-    [EnableInBuilder(BuilderType.DVBuilder)]
+    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]
     public class ObjectBasicVis : ObjectBasicInfo
     {
 

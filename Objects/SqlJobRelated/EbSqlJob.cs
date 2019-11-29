@@ -322,6 +322,38 @@ namespace ExpressBase.Objects
         //}
     }
 
+
+    [EnableInBuilder(BuilderType.SqlJob)]
+    public class EmailNode : SqlJobResource
+    {
+        [EnableInBuilder(BuilderType.SqlJob)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [PropertyGroup("Data Settings")]
+        [OSE_ObjectTypes(EbObjectTypes.iEmailBuilder)]
+        public string Reference { get; set; }
+
+        [EnableInBuilder(BuilderType.SqlJob)]
+        [MetaOnly]
+        [UIproperty]
+        public string RefName { set; get; }
+
+        [EnableInBuilder(BuilderType.SqlJob)]
+        [MetaOnly]
+        [UIproperty]
+        public string Version { set; get; }
+
+        public override string GetDesignHtml()
+        {
+            return @"<div class='SqlJobItem dropped' eb-type='EmailNode' id='@id'>
+                        <div tabindex='1' class='drpbox lineDrp' onclick='$(this).focus();'  id='@id_EmailNode'>  
+                            <div class='CompLabel'> @Label </div>
+                            <div class='CompName'> @RefName </div>
+                            <div class='CompVersion'> @Version </div>
+                        </div>
+                    </div>".RemoveCR().DoubleQuoted();
+        }
+    }
+
     public interface ISqlJobCollection
     {
         [EnableInBuilder(BuilderType.SqlJob)]
