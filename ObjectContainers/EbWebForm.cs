@@ -1149,7 +1149,7 @@ namespace ExpressBase.Objects
                                     DateTime dt = Convert.ToDateTime(_unformattedData);
                                     if (_type == EbDateType.Date)
                                     {
-                                        if (_column.Control is EbSysCreatedAt || _column.Control is EbSysModifiedAt)
+                                        if (_column.Control is EbSysCreatedAt || _column.Control is EbSysModifiedAt || _column.Control is EbDGCreatedAtColumn || _column.Control is EbDGModifiedAtColumn)
                                             _formattedData = dt.ConvertFromUtc(this.UserObj.Preference.TimeZone).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
                                         else
                                         {
