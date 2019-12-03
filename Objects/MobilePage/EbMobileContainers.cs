@@ -37,6 +37,10 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public string AutoGenMVRefid { set; get; }
 
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
+        public string WebFormRefId { set; get; }
+
         public override string GetDesignHtml()
         {
             return @"<div class='eb_mob_form_container mob_container dropped' eb-type='EbMobileForm' id='@id'>
