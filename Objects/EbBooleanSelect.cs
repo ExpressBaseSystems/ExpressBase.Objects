@@ -3,6 +3,7 @@ using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
@@ -116,7 +117,10 @@ namespace ExpressBase.Objects
 			get => this.GetBareHtml();
 			set => base.DesignHtml4Bot = value;
 		}
-
+		public override string GetHtml4Bot()
+		{
+			return ReplacePropsInHTML(HtmlConstants.CONTROL_WRAPER_HTML4BOT);
+		}
 
 		public override string GetDesignHtml()
         {

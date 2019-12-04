@@ -106,14 +106,19 @@ namespace ExpressBase.Objects
         Count
     }
 
+    [EnableInBuilder(BuilderType.Report)]
     public class Margin
     {
+        [EnableInBuilder(BuilderType.Report)]
         public float Left { get; set; }
 
+        [EnableInBuilder(BuilderType.Report)]
         public float Right { get; set; }
 
+        [EnableInBuilder(BuilderType.Report)]
         public float Top { get; set; }
 
+        [EnableInBuilder(BuilderType.Report)]
         public float Bottom { get; set; }
     }
 
@@ -430,6 +435,36 @@ namespace ExpressBase.Objects
             }
         }
 
+        private float _ghHeight = 0;
+        public float GroupHeaderHeight
+        {
+            get
+            {
+                if (_ghHeight == 0)
+                {
+                    foreach (EbReportGroup grp in ReportGroups)
+                    {
+                        _ghHeight += grp.GroupHeader.HeightPt;
+                    }
+                }
+                return _ghHeight;
+            }
+        }
+        private float _gfHeight = 0;
+        public float GroupFooterHeight
+        {
+            get
+            {
+                if (_gfHeight == 0)
+                {
+                    foreach (EbReportGroup grp in ReportGroups)
+                    {
+                        _gfHeight += grp.GroupFooter.HeightPt;
+                    }
+                }
+                return _gfHeight;
+            }
+        }
         private float dt_fillheight = 0;
         [JsonIgnore]
         public float DT_FillHeight
@@ -437,25 +472,25 @@ namespace ExpressBase.Objects
             get
             {
                 RowColletion rows = (DataSourceRefId != string.Empty) ? DataSet.Tables[0].Rows : null;
-                if (rows != null)
-                {
-                    if (rows.Count > 0)
-                    {
-                        float a = rows.Count * DetailHeight;
-                        float b = HeightPt - (PageHeaderHeight + PageFooterHeight + ReportHeaderHeight + ReportFooterHeight);
-                        if (a < b && PageNumber == 1)
-                            IsLastpage = true;
-                    }
-                }
+                //if (rows != null)
+                //{
+                //    if (rows.Count > 0)
+                //    {
+                //        float a = rows.Count * DetailHeight;
+                //        float b = HeightPt - (PageHeaderHeight + PageFooterHeight + ReportHeaderHeight + ReportFooterHeight);
+                //        if (a < b && PageNumber == 1)
+                //            IsLastpage = true;
+                //    }
+                //}
 
                 if (PageNumber == 1 && IsLastpage)
-                    dt_fillheight = HeightPt - (PageHeaderHeight + PageFooterHeight + ReportHeaderHeight + ReportFooterHeight);
+                    dt_fillheight = HeightPt - (PageHeaderHeight + PageFooterHeight + ReportHeaderHeight + ReportFooterHeight + Margin.Top + Margin.Bottom);
                 else if (PageNumber == 1)
-                    dt_fillheight = HeightPt - (ReportHeaderHeight + PageHeaderHeight + PageFooterHeight);
+                    dt_fillheight = HeightPt - (ReportHeaderHeight + Margin.Top + PageHeaderHeight + PageFooterHeight + Margin.Bottom);
                 else if (IsLastpage == true)
-                    dt_fillheight = HeightPt - (PageHeaderHeight + PageFooterHeight + ReportFooterHeight);
+                    dt_fillheight = HeightPt - (PageHeaderHeight + PageFooterHeight + Margin.Bottom + Margin.Top + ReportFooterHeight);
                 else
-                    dt_fillheight = HeightPt - (PageHeaderHeight + PageFooterHeight);
+                    dt_fillheight = HeightPt - (PageHeaderHeight + PageFooterHeight + Margin.Bottom + Margin.Top);
                 return dt_fillheight;
             }
         }
@@ -492,6 +527,9 @@ namespace ExpressBase.Objects
 
         [JsonIgnore]
         public bool FooterDrawn = false;
+
+        [JsonIgnore]
+        private int PreviousGheadersSlNo { get; set; }
 
         [JsonIgnore]
         public Dictionary<string, List<EbControl>> LinkCollection { get; set; }
@@ -571,7 +609,7 @@ namespace ExpressBase.Objects
         {
             RowHeight = 0;
             MultiRowTop = 0;
-            rh_Yposition = 0;
+            rh_Yposition = this.Margin.Top;
             detailprintingtop = 0;
             foreach (EbReportHeader r_header in ReportHeaders)
             {
@@ -588,7 +626,7 @@ namespace ExpressBase.Objects
             RowHeight = 0;
             MultiRowTop = 0;
             detailprintingtop = 0;
-            ph_Yposition = (PageNumber == 1) ? ReportHeaderHeight : 0;
+            ph_Yposition = (PageNumber == 1) ? ReportHeaderHeight + this.Margin.Top : this.Margin.Top;
             foreach (EbPageHeader p_header in PageHeaders)
             {
                 foreach (EbReportField field in p_header.Fields)
@@ -603,7 +641,7 @@ namespace ExpressBase.Objects
         {
             RowColletion rows = (DataSourceRefId != string.Empty) ? DataSet.Tables[DetailTableIndex].Rows : null;
 
-            ph_Yposition = (PageNumber == 1) ? ReportHeaderHeight : 0;
+            ph_Yposition = (PageNumber == 1) ? ReportHeaderHeight + this.Margin.Top : this.Margin.Top;
             dt_Yposition = ph_Yposition + PageHeaderHeight;
             if (rows != null && HasRows == true)
             {
@@ -629,9 +667,7 @@ namespace ExpressBase.Objects
                     }
                     else
                     {
-                        detailprintingtop = 0;
-                        Doc.NewPage();
-                        PageNumber = Writer.PageNumber;
+                        AddNewPage();
                         DoLoopInDetail(iDetailRowPos);
                     }
                 }
@@ -693,14 +729,22 @@ namespace ExpressBase.Objects
             }
         }
 
+        public void AddNewPage()
+        {
+            detailprintingtop = 0;
+            Doc.NewPage();
+            ph_Yposition = this.Margin.Top;
+            PageNumber = Writer.PageNumber;
+        }
+
         public void DoLoopInDetail(int serialnumber)
         {
             int rowsneeded = 1;
             RowHeight = 0;
             MultiRowTop = 0;
             string column_val = string.Empty;
-            
-            ph_Yposition = (PageNumber == 1) ? ReportHeaderHeight : 0;
+
+            ph_Yposition = (PageNumber == 1) ? ReportHeaderHeight + this.Margin.Top : this.Margin.Top;
             dt_Yposition = ph_Yposition + PageHeaderHeight;
             foreach (EbReportDetail detail in Detail)
             {
@@ -760,11 +804,10 @@ namespace ExpressBase.Objects
 
         public void DrawGroupHeader(int order, int serialnumber)
         {
-             if(ReportGroups[order].GroupHeader.HeightPt + DetailHeight > DT_FillHeight - detailprintingtop)
+            if (PreviousGheadersSlNo != serialnumber && GroupHeaderHeight + DetailHeight > DT_FillHeight - detailprintingtop)
             {
-                detailprintingtop = 0;
-                Doc.NewPage();
-                PageNumber = Writer.PageNumber;
+                AddNewPage();
+                dt_Yposition = PageHeaderHeight + this.Margin.Top;
             }
 
             foreach (EbReportField field in ReportGroups[order].GroupHeader.Fields)
@@ -772,6 +815,7 @@ namespace ExpressBase.Objects
                 DrawFields(field, dt_Yposition, serialnumber);
             }
             detailprintingtop += ReportGroups[order].GroupHeader.HeightPt;
+            PreviousGheadersSlNo = serialnumber;
         }
 
         public void DrawPageFooter()
@@ -779,7 +823,7 @@ namespace ExpressBase.Objects
             RowHeight = 0;
             MultiRowTop = 0;
             detailprintingtop = 0;
-            ph_Yposition = (PageNumber == 1) ? ReportHeaderHeight : 0;
+            ph_Yposition = (PageNumber == 1) ? ReportHeaderHeight + this.Margin.Top : this.Margin.Top;
             dt_Yposition = ph_Yposition + PageHeaderHeight;
             //  pf_Yposition = dt_Yposition + DT_FillHeight;
             pf_Yposition = (float)detailEnd + /*DetailHeight +*/ dt_Yposition;
@@ -812,31 +856,19 @@ namespace ExpressBase.Objects
                     for (int iSortPos = 0; iSortPos < SortedReportFields.Length; iSortPos++)
                     {
                         EbReportField field = SortedReportFields[iSortPos];
-                        if (HeightPt - rf_Yposition < field.TopPt + 30)
+                        // if (HeightPt - rf_Yposition + Margin.Top < field.TopPt)
+                        if (HeightPt < field.TopPt + rf_Yposition + field.HeightPt + Margin.Bottom)
                         {
-                            detailprintingtop = 0;
-                            Doc.NewPage();
-                            PageNumber = Writer.PageNumber;
-                            footer_diffrence = HeightPt - rf_Yposition;
+                            AddNewPage();
+                            //footer_diffrence = HeightPt - rf_Yposition - Margin.Bottom;
+                            footer_diffrence = field.TopPt;
                             FooterDrawn = true;
-                            rf_Yposition = 30;
-                        }
-                        field.TopPt -= footer_diffrence;
+                            rf_Yposition = Margin.Top; 
+                        } 
+                            field.TopPt -= footer_diffrence;
                         DrawFields(field, rf_Yposition, 0);
                     }
                 }
-
-                //foreach (EbReportField field in r_footer.Fields)
-                //{
-                //    if (HeightPt - rf_Yposition < field.TopPt)
-                //    {
-                //        detailprintingtop = 0;
-                //        Doc.NewPage();
-                //        PageNumber = Writer.PageNumber;
-                //        rf_Yposition = 10;
-                //    }
-                //    DrawFields(field, rf_Yposition, 0);
-                //}
                 rf_Yposition += r_footer.HeightPt;
             }
         }
@@ -941,7 +973,7 @@ namespace ExpressBase.Objects
             ColumnText ct = new ColumnText(Canvas);
             Phrase phrase = new Phrase("page:" + PageNumber.ToString() + ", " + RenderingUser.FullName + ", " + timestamp);
             phrase.Font.Size = 6;
-            ct.SetSimpleColumn(phrase, 5, 2, WidthPt - 10, 20, 15, Element.ALIGN_RIGHT);
+            ct.SetSimpleColumn(phrase, 5, 2 + Margin.Bottom, (WidthPt - Margin.Right - Margin.Left) - Margin.Right, 20 + Margin.Bottom, 15, Element.ALIGN_RIGHT);
             ct.Go();
         }
 

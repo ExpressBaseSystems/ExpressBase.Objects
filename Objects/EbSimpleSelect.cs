@@ -46,9 +46,14 @@ namespace ExpressBase.Objects
             {
                 return IsDynamic ? ValueMember.Type : EbDbTypes.String;
             }
-        }
+		}
 
-        public override string SetValueJSfn
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+		[DefaultPropValue("100")]
+		[PropertyGroup("Appearance")]
+		public int DropdownHeight { get; set; }
+
+		public override string SetValueJSfn
         {
             get
             {
@@ -246,7 +251,12 @@ namespace ExpressBase.Objects
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
 
-        public override string GetDesignHtml()
+		public override string GetHtml4Bot()
+		{
+			return ReplacePropsInHTML(HtmlConstants.CONTROL_WRAPER_HTML4BOT);
+		}
+
+		public override string GetDesignHtml()
         {
             //        return @"
 

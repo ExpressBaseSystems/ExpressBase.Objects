@@ -31,7 +31,8 @@ namespace ExpressBase.Objects
         public void OnDeserializedMethod(StreamingContext context)
         {
             this.BareControlHtml = this.GetBareHtml();
-            this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
+			this.BareControlHtml4Bot = this.BareControlHtml;
+			this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
 
         [HideInPropertyGrid]
@@ -127,8 +128,12 @@ namespace ExpressBase.Objects
 						</div>
 					</div>";
 			set => base.DesignHtml4Bot = value; }
+		public override string GetHtml4Bot()
+		{
+			return ReplacePropsInHTML((HtmlConstants.CONTROL_WRAPER_HTML4BOT).Replace("@barehtml@", DesignHtml4Bot));
+		}
 
-        [HideInPropertyGrid]
+		[HideInPropertyGrid]
         [JsonIgnore]
         public override string ToolIconHtml { get { return "<i class='fa fa-toggle-on'></i>"; } set { } }
 

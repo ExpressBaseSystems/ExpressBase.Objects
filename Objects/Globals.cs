@@ -206,6 +206,8 @@ namespace ExpressBase.Objects.Objects
 
     public class FormGlobals
     {
+        public dynamic sourceform { get; set; }
+
         public dynamic form { get; set; }
 
         public dynamic user { get; set; }
@@ -285,6 +287,41 @@ namespace ExpressBase.Objects.Objects
                 s += Convert.ToDouble(listNTV[colName]);
             }
             return s;
+        }
+        public Double Avg(string colName)
+        {
+            Double s = 0;
+            foreach (ListNTV listNTV in this.Rows)
+            {
+                s += Convert.ToDouble(listNTV[colName]);
+            }
+            return this.Rows.Count > 0 ? s / this.Rows.Count : s;
+        }
+        public Double Min(string colName)
+        {
+            Double min = 0;
+            if (this.Rows.Count > 0)
+                min = Convert.ToDouble(this.Rows[0][colName]);
+            foreach (ListNTV listNTV in this.Rows)
+            {
+                Double t = Convert.ToDouble(listNTV[colName]);
+                if (min > t)
+                    min = t;
+            }
+            return min;
+        }
+        public Double Max(string colName)
+        {
+            Double max = 0;
+            if (this.Rows.Count > 0)
+                max = Convert.ToDouble(this.Rows[0][colName]);
+            foreach (ListNTV listNTV in this.Rows)
+            {
+                Double t = Convert.ToDouble(listNTV[colName]);
+                if (max < t)
+                    max = t;
+            }
+            return max;
         }
     }
 

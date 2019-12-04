@@ -20,12 +20,7 @@ namespace ExpressBase.Objects
         LongName
     }
 
-    public enum EbSysCreatedByDM
-    {
-        UserId = 1,
-        FullName
-    }
-
+   
     [EnableInBuilder(BuilderType.WebForm)]
     public class EbSysLocation : EbControlUI, IEbPlaceHolderControl
     {
@@ -155,7 +150,6 @@ namespace ExpressBase.Objects
                         $('#' + this.EbSid_CtxId).val(arr[1]).trigger('change');}
                     else
                         $('#' + this.EbSid_CtxId).val(p1).trigger('change');
-                        console.log('ivde vannittund');
                     ";
             }
             set { }
@@ -208,9 +202,6 @@ namespace ExpressBase.Objects
 
         public override EbDbTypes EbDbType { get { return EbDbTypes.Decimal; } }
 
-        [EnableInBuilder(BuilderType.WebForm)]
-        public EbSysCreatedByDM DisplayMember { get; set; }
-
         [HideInPropertyGrid]
         [JsonIgnore]
         public override string ToolIconHtml { get { return "<i class='fa fa-plus'></i><i class='fa fa-user'></i>"; } set { } }
@@ -261,11 +252,15 @@ namespace ExpressBase.Objects
                                     + EbCtrlHTML
                         + "</div>";
         }
-
-        public override string GetBareHtml()
+		
+		public override string GetBareHtml()
         {
             return @"
-            <input id='@ebsid@' data-ebtype='@data-ebtype@'  data-toggle='tooltip' title='@toolTipText@' class='date' type='text' name='@name@' autocomplete = 'off' @value@ @tabIndex@ style='width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@ @readOnlyString@ @required@ @placeHolder@ disabled />
+						<div style='display: flex;'>
+							<img id='@ebsid@_usrimg'class='sysctrl_usrimg' src='' alt='' onerror=this.onerror=null;this.src='/images/nulldp.png';>
+							<div id='@ebsid@' data-ebtype='@data-ebtype@'  data-toggle='tooltip' title='@toolTipText@' class=' sysctrl_usrname'  name='@name@' autocomplete = 'off' @value@ @tabIndex@ style='width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@ @readOnlyString@ @required@ @placeHolder@ disabled ></div>
+						
+						</div>
             "
 .Replace("@name@", (this.Name != null ? this.Name.Trim() : ""))
 .Replace("@data-ebtype@", "16")//( (int)this.EbDateType ).ToString())
@@ -291,8 +286,19 @@ namespace ExpressBase.Objects
             {
                 return @"let arr = p1.split('$$');
                         $('#' + this.EbSid_CtxId).attr('data-id', arr[0]);
-                        $('#' + this.EbSid_CtxId).val(arr[1]).trigger('change');";
-            }
+                        $('#' + this.EbSid_CtxId).text(arr[1]).trigger('change');
+						let imgsrc='/images/dp/'+ arr[0] +'.png';
+						$('#' + this.EbSid_CtxId + '_usrimg').attr('src',imgsrc );";
+			}
+            set { }
+        }
+
+		public override string GetDisplayMemberJSfn
+		{
+            get
+            {
+				return @"return $('#' + this.EbSid_CtxId).text();";
+			}
             set { }
         }
 
@@ -484,8 +490,8 @@ namespace ExpressBase.Objects
 
         public override EbDbTypes EbDbType { get { return EbDbTypes.Decimal; } }
 
-        [EnableInBuilder(BuilderType.WebForm)]
-        public EbSysCreatedByDM DisplayMember { get; set; }
+        //[EnableInBuilder(BuilderType.WebForm)]
+        //public EbSysCreatedByDM DisplayMember { get; set; }
 
         [HideInPropertyGrid]
         [JsonIgnore]
@@ -541,8 +547,11 @@ namespace ExpressBase.Objects
 
         public override string GetBareHtml()
         {
-            return @"
-            <input id='@ebsid@' data-ebtype='@data-ebtype@'  data-toggle='tooltip' title='@toolTipText@' class='date' type='text' name='@name@' autocomplete = 'off' @value@ @tabIndex@ style='width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@ @readOnlyString@ @required@ @placeHolder@ disabled />
+            return @"<div style='display: flex;'>
+							<img id='@ebsid@_usrimg'class='sysctrl_usrimg' src='' alt='' onerror=this.onerror=null;this.src='/images/nulldp.png';>
+							<div id='@ebsid@' data-ebtype='@data-ebtype@'  data-toggle='tooltip' title='@toolTipText@' class=' sysctrl_usrname'  name='@name@' autocomplete = 'off' @value@ @tabIndex@ style='width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@ @readOnlyString@ @required@ @placeHolder@ disabled ></div>
+						
+						</div>
             "
 .Replace("@name@", (this.Name != null ? this.Name.Trim() : ""))
 .Replace("@data-ebtype@", "16")//( (int)this.EbDateType ).ToString())
@@ -568,12 +577,23 @@ namespace ExpressBase.Objects
             {
                 return @"let arr = p1.split('$$');
                         $('#' + this.EbSid_CtxId).attr('data-id', arr[0]);
-                        $('#' + this.EbSid_CtxId).val(arr[1]).trigger('change');";
+                        $('#' + this.EbSid_CtxId).text(arr[1]).trigger('change');
+						let imgsrc='/images/dp/'+ arr[0] +'.png';
+						$('#' + this.EbSid_CtxId + '_usrimg').attr('src',imgsrc );";
             }
             set { }
         }
 
-        [EnableInBuilder(BuilderType.WebForm)]
+		public override string GetDisplayMemberJSfn
+		{
+			get
+			{
+				return @"return $('#' + this.EbSid_CtxId).text();";
+			}
+			set { }
+		}
+
+		[EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
         public override bool IsSysControl { get { return true; } }
 

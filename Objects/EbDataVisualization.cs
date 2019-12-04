@@ -226,140 +226,7 @@ namespace ExpressBase.Objects
             {
                 Console.WriteLine("AfterRedisGet " + e.Message);
             }
-        }
-
-        //public EbDataSet DoQueries4DataVis(string sql, IEbConnectionFactory df, params DbParameter[] parameters)
-        //{
-        //    EbDataSet ds = new EbDataSet();
-
-        //    using (var con = df.DataDBRO.GetNewConnection())
-        //    {
-        //        try
-        //        {
-        //            con.Open();
-        //            using (var cmd = df.DataDBRO.GetNewCommand(con, sql))
-        //            {
-        //                if (parameters != null && parameters.Length > 0)
-        //                    cmd.Parameters.AddRange(parameters);
-
-        //                using (var reader = cmd.ExecuteReader())
-        //                {
-        //                    do
-        //                    {
-        //                        EbDataTable dt = new EbDataTable();
-        //                        this.AddColumns(dt, reader as NpgsqlDataReader);
-        //                        PrepareDataTable4DataVis(reader, dt);
-        //                        ds.Tables.Add(dt);
-        //                    }
-        //                    while (reader.NextResult());
-        //                }
-        //            }
-        //        }
-        //        catch (Npgsql.NpgsqlException npgse)
-        //        {
-        //            Console.WriteLine("Exception: " + npgse.ToString());
-        //        }
-        //    }
-
-        //    return ds;
-        //}
-
-        //public void PrepareDataTable4DataVis(DbDataReader reader, EbDataTable dt)
-        //{
-        //    int _fieldCount = reader.FieldCount;
-        //    while (reader.Read())
-        //    {
-        //        EbDataRow dr = dt.NewDataRow();
-        //        for (int i = 0; i < _fieldCount; i++)
-        //        {
-        //            var _typ = reader.GetFieldType(i);
-        //            var _coln = dt.Columns[i].ColumnName;
-        //            if (_typ == typeof(DateTime))
-        //            {
-        //                var _val = reader.IsDBNull(i) ? DateTime.Now : reader.GetDateTime(i);
-        //                var _dvCol = this.Columns.Get(_coln) as DVDateTimeColumn;
-        //                if (_dvCol.Format == DateFormat.Date)
-        //                {
-        //                    dr[i] = _val.ToString("dd-MM-yyyy");
-        //                    continue;
-        //                }
-        //                else if (_dvCol.Format == DateFormat.Time)
-        //                {
-        //                    dr[i] = _val.ToString("HH:mm:ss tt");
-        //                    continue;
-        //                }
-        //                else if (_dvCol.Format == DateFormat.TimeWithoutTT)
-        //                {
-        //                    dr[i] = _val.ToString("HH:mm:ss");
-        //                    continue;
-        //                }
-        //            }
-        //            else if (_typ == typeof(string))
-        //            {
-        //                dr[i] = reader.IsDBNull(i) ? string.Empty : reader.GetString(i);
-        //                continue;
-        //            }
-        //            else if (_typ == typeof(bool))
-        //            {
-        //                dr[i] = reader.IsDBNull(i) ? false : reader.GetBoolean(i);
-        //                continue;
-        //            }
-        //            else if (_typ == typeof(decimal))
-        //            {
-        //                dr[i] = reader.IsDBNull(i) ? 0 : reader.GetDecimal(i);
-        //                continue;
-        //            }
-        //            else if (_typ == typeof(int) || _typ == typeof(Int32))
-        //            {
-        //                dr[i] = reader.IsDBNull(i) ? 0 : reader.GetInt32(i);
-        //                continue;
-        //            }
-        //            else if (_typ == typeof(Int64))
-        //            {
-        //                dr[i] = reader.IsDBNull(i) ? 0 : reader.GetInt64(i);
-        //                continue;
-        //            }
-        //            else
-        //            {
-        //                dr[i] = reader.GetValue(i);
-        //                continue;
-        //            }
-        //        }
-
-        //        dt.Rows.Add(dr);
-        //    }
-        //}
-
-        //private void AddColumns(EbDataTable dt, NpgsqlDataReader reader)
-        //{
-        //    int pos = 0;
-        //    foreach (NpgsqlDbColumn drow in reader.GetColumnSchema())
-        //    {
-        //        string columnName = System.Convert.ToString(drow["ColumnName"]);
-        //        EbDataColumn column = new EbDataColumn(columnName, ConvertToDbType((Type)(drow["DataType"])));
-        //        column.ColumnIndex = pos++;
-        //        dt.Columns.Add(column);
-        //    }
-        //}
-
-        //private EbDbTypes ConvertToDbType(Type _typ)
-        //{
-        //    if (_typ == typeof(DateTime))
-        //        return EbDbTypes.DateTime;
-        //    else if (_typ == typeof(string))
-        //        return EbDbTypes.String;
-        //    else if (_typ == typeof(bool))
-        //        return EbDbTypes.Boolean;
-        //    else if (_typ == typeof(decimal))
-        //        return EbDbTypes.Decimal;
-        //    else if (_typ == typeof(int) || _typ == typeof(Int32))
-        //        return EbDbTypes.Int32;
-        //    else if (_typ == typeof(Int64))
-        //        return EbDbTypes.Int64;
-
-        //    return EbDbTypes.String;
-        //}
-
+        }    
 
     }
 
@@ -444,6 +311,11 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
         [HideInPropertyGrid]
         public List<FormLink> FormLinks { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [DefaultPropValue("15")]
+        [HideForUser]
+        public int RowHeight { get; set; }
 
         [JsonIgnore]
         public EbWebForm WebForm { get; set; }
@@ -882,4 +754,73 @@ namespace ExpressBase.Objects
 
         public List<DVBaseColumn> Params { get; set; }
     }
+
+    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.Calendar)]
+    public class ObjectBasicInfo : EbDataVisualizationObject
+    {
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.Calendar)]
+        [HideInPropertyGrid]
+        public override string Name { get; set; }
+
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.DVBuilder,BuilderType.Calendar)]
+        public string ObjName { get; set; }
+
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]
+        public string ObjDisplayName { get; set; }
+
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]
+        public string Version { get; set; }
+
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]
+        public string Refid { get; set; }
+    }
+
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.DVBuilder, BuilderType.Calendar)]
+    public class ObjectBasicForm : ObjectBasicInfo
+    {
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]
+        [PropertyEditor(PropertyEditorType.DropDown)]
+        [OnChangeExec(@"
+if(this.FormMode === 1){
+    pg.ShowProperty('FormId');
+    pg.HideProperty('FormParameters');
+}
+else if(this.FormMode === 2){
+    pg.HideProperty('FormId');
+    pg.ShowProperty('FormParameters');
+}
+else {
+    pg.HideProperty('FormId');
+    pg.HideProperty('FormParameters');
+}")]
+        public WebFormDVModes FormMode { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]
+        [PropertyEditor(PropertyEditorType.DropDown)]
+        public LinkTypeEnum LinkType { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder,  BuilderType.Calendar)]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Parent.Columns")]
+        public List<DVBaseColumn> FormId { get; set; }
+
+
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]
+        [PropertyEditor(PropertyEditorType.Mapper, "Parent.Columns", "Refid", "FormControl")]
+        public List<DVBaseColumn> FormParameters { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]
+        [HideInPropertyGrid]
+        public EbControl FormControl { get; set; }
+    }
+
+    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]
+    public class ObjectBasicVis : ObjectBasicInfo
+    {
+
+    }
+
 }

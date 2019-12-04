@@ -1,5 +1,6 @@
 ﻿using ExpressBase.Common;
 using ExpressBase.Common.Data;
+using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
@@ -15,6 +16,15 @@ namespace ExpressBase.Objects
     public abstract class EbSqlJobWrapper : EbObject
     {
 
+    }
+
+    public interface IRefSelect
+    {
+        string RefName { set; get; }
+
+        string Version { set; get; }
+
+        string Reference { set; get; }
     }
 
     [EnableInBuilder(BuilderType.SqlJob)]
@@ -50,9 +60,11 @@ namespace ExpressBase.Objects
         public OrderedList Resources { set; get; }
 
         [EnableInBuilder(BuilderType.SqlJob)]
+        [HideInPropertyGrid]
         public List<string> FirstReaderKeyColumns { get; set; }
 
         [EnableInBuilder(BuilderType.SqlJob)]
+        [HideInPropertyGrid]
         public List<string> ParameterKeyColumns { get; set; }
 
         public LoopLocation GetLoop()
@@ -88,6 +100,7 @@ namespace ExpressBase.Objects
         }
     }
 
+    [EnableInBuilder(BuilderType.SqlJob)]
     public class OrderedList : List<SqlJobResource>
     {
         public OrderedList()
@@ -102,6 +115,8 @@ namespace ExpressBase.Objects
         Scheduled
     }
 
+
+    [EnableInBuilder(BuilderType.SqlJob)]
     public class EbLoop : SqlJobResource, ISqlJobCollection
     {
         [EnableInBuilder(BuilderType.SqlJob)]
@@ -117,8 +132,22 @@ namespace ExpressBase.Objects
  
             return OutParams;
         }
+        public override string GetDesignHtml()
+        {
+            return @"<div  class='SqlJobItem dropped' eb-type='Loop' id='@id'> <div>
+                        <div tabindex='1' class='drpboxInt lineDrp' onclick='$(this).focus();' id='@id_LpStr' >  
+                            <div class='CompLabel'> Loop Start</div>
+                        </div>
+                        <div class='Sql_Dropable'> </div>
+                        <div tabindex='1' class='drpbox lineDrp' onclick='$(this).focus();' id='@id_LpEnd'>  
+                            <div class='CompLabel'> Loop End</div>
+                        </div>
+                    </div></div>".RemoveCR().DoubleQuoted();
+        }
     }
 
+
+    [EnableInBuilder(BuilderType.SqlJob)]
     public class EbTransaction : SqlJobResource, ISqlJobCollection
     {
         [EnableInBuilder(BuilderType.SqlJob)]
@@ -139,6 +168,18 @@ namespace ExpressBase.Objects
             }
             return _param;
         }
+        public override string GetDesignHtml()
+        {
+            return @"<div id='@id' class='SqlJobItem dropped' eb-type='Transaction'> <div>
+                        <div tabindex='1' class='drpboxInt lineDrp' onclick='$(this).focus();' id='@id_TrStr'>  
+                            <div class='CompLabel'> Transaction Start</div>
+                        </div>
+                        <div class='Sql_Dropable'> </div>
+                        <div tabindex='1' class='drpbox lineDrp' onclick='$(this).focus();' id='@id_TrEnd'>  
+                            <div class='CompLabel'> Transaction End</div>
+                        </div>
+                    </div></div>".RemoveCR().DoubleQuoted();
+        }
     }
 
     public abstract class SqlJobResource : EbSqlJobWrapper
@@ -147,12 +188,9 @@ namespace ExpressBase.Objects
         public int RouteIndex { set; get; }
 
         [EnableInBuilder(BuilderType.SqlJob)]
-        [HideInPropertyGrid]
+        [UIproperty]
+        [MetaOnly]
         public string Label { set; get; }
-
-        [EnableInBuilder(BuilderType.SqlJob)]
-        [HideInPropertyGrid]
-        public virtual string Reference { set; get; }
 
         [EnableInBuilder(BuilderType.SqlJob)]
         [HideInPropertyGrid]
@@ -167,16 +205,25 @@ namespace ExpressBase.Objects
         public virtual object GetColVal(int index, string cname) { return null; }
     }
 
-    public class EbSqlJobReader : SqlJobResource
+    [EnableInBuilder(BuilderType.SqlJob)]
+    public class EbSqlJobReader : SqlJobResource, IRefSelect
     {
         [EnableInBuilder(BuilderType.SqlJob)]
-        public override string Reference { get; set; }
-
-        [EnableInBuilder(BuilderType.SqlJob)]
+        [MetaOnly]
+        [UIproperty]
         public string RefName { set; get; }
 
         [EnableInBuilder(BuilderType.SqlJob)]
+        [MetaOnly]
+        [UIproperty]
         public string Version { set; get; }
+
+
+
+        [EnableInBuilder(BuilderType.SqlJob)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
+        public string Reference { get; set; }
 
         public override List<Param> GetOutParams(List<Param> _param, int step)
         {
@@ -210,29 +257,103 @@ namespace ExpressBase.Objects
         {
             return (this.Result as EbDataSet).Tables[index].Rows;
         }
+        public override string GetDesignHtml()
+        {
+            return @"<div class='SqlJobItem dropped' eb-type='SqlJobReader' id='@id'>
+                        <div tabindex='1' class='drpbox lineDrp' onclick='$(this).focus();'  id='@id_JR'>  
+                            <div class='CompLabel'> @Label </div>
+                            <div class='CompName'> @RefName </div>
+                            <div class='CompVersion'> @Version </div>
+                        </div>
+                    </div>".RemoveCR().DoubleQuoted();
+        }
     }
 
-    public class EbSqlJobWriter : SqlJobResource
+
+    [EnableInBuilder(BuilderType.SqlJob)]
+    public class EbSqlJobWriter : SqlJobResource, IRefSelect
     {
-        [EnableInBuilder(BuilderType.SqlJob)]
-        public override string Reference { get; set; }
 
         [EnableInBuilder(BuilderType.SqlJob)]
+        [MetaOnly]
+        [UIproperty]
         public string RefName { set; get; }
 
         [EnableInBuilder(BuilderType.SqlJob)]
+        [MetaOnly]
+        [UIproperty]
         public string Version { set; get; }
+
+        [EnableInBuilder(BuilderType.SqlJob)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [OSE_ObjectTypes(EbObjectTypes.iDataWriter)]
+        public string Reference { get; set; }
+
+        public override string GetDesignHtml()
+        {
+            return @"<div class='SqlJobItem dropped' eb-type='SqlJobWriter' id='@id'>
+                        <div tabindex='1' class='drpbox lineDrp' onclick='$(this).focus();'  id='@id_JW'>  
+                            <div class='CompLabel'> @Label </div>
+                            <div class='CompName'> @RefName </div>
+                            <div class='CompVersion'> @Version </div>
+                        </div>
+                    </div>".RemoveCR().DoubleQuoted();
+        }
     }
+
+    [EnableInBuilder(BuilderType.SqlJob)]
     public class EbSqlProcessor : SqlJobResource
     {
+        [EnableInBuilder(BuilderType.SqlJob)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
         public EbScript Script { get; set; }
 
-
+        public override string GetDesignHtml()
+        {
+            return @"<div class='SqlJobItem dropped' eb-type='SqlProcessor' id='@id'>
+                        <div tabindex='1' class='drpbox lineDrp' onclick='$(this).focus();' id='@id_Processor'>  
+                            <div class='CompLabel'> @Label </div>
+                        </div>
+                    </div>".RemoveCR().DoubleQuoted();
+        }
         //public override List<Param> GetOutParams(List<Param> _param, int step)
         //{
         //    return _param;
         //}
     }
+
+
+    [EnableInBuilder(BuilderType.SqlJob)]
+    public class EmailNode : SqlJobResource
+    {
+        [EnableInBuilder(BuilderType.SqlJob)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [PropertyGroup("Data Settings")]
+        [OSE_ObjectTypes(EbObjectTypes.iEmailBuilder)]
+        public string Reference { get; set; }
+
+        [EnableInBuilder(BuilderType.SqlJob)]
+        [MetaOnly]
+        [UIproperty]
+        public string RefName { set; get; }
+
+        [EnableInBuilder(BuilderType.SqlJob)]
+        [MetaOnly]
+        [UIproperty]
+        public string Version { set; get; }
+
+        public override string GetDesignHtml()
+        {
+            return @"<div class='SqlJobItem dropped' eb-type='EmailNode' id='@id'>
+                        <div tabindex='1' class='drpbox lineDrp' onclick='$(this).focus();'  id='@id_EmailNode'>  
+                            <div class='CompLabel'> @Label </div>
+                            <div class='CompName'> @RefName </div>
+                            <div class='CompVersion'> @Version </div>
+                        </div>
+                    </div>".RemoveCR().DoubleQuoted();
+        }
+    }
+
     public interface ISqlJobCollection
     {
         [EnableInBuilder(BuilderType.SqlJob)]

@@ -255,7 +255,10 @@ namespace ExpressBase.Objects
             get
             {
                 return @"
-                     this.initializer.clearValues();
+if (this.initializer)
+    this.initializer.clearValues();
+else
+    console.dev_log(`initializer not found for '${this.Name}'`);
                 ";
             }
             set { }
@@ -296,7 +299,10 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup("Behavior")]
         [PropertyEditor(PropertyEditorType.CollectionABCFrmSrc, "Columns")]
-        [OnChangeExec(@"if (this.Columns && this.Columns.$values.length === 0 ){pg.MakeReadOnly('DisplayMembers');} else {pg.MakeReadWrite('DisplayMembers');}")]
+        [OnChangeExec(@"
+if (this.Columns && this.Columns.$values.length === 0 )
+{
+pg.MakeReadOnly('DisplayMembers');} else {pg.MakeReadWrite('DisplayMembers');}")]
         public DVColumnCollection DisplayMembers { get; set; }
 
         [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.WebForm, BuilderType.UserControl)]
@@ -440,6 +446,16 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog)]
         [PropertyGroup("Behavior")]
         [PropertyPriority(50)]
+		[OnChangeExec(@"
+if(this.RenderAsSimpleSelect == true)
+{ 
+	pg.ShowProperty('DisplayMember');
+}
+else
+{
+	pg.HideProperty('DisplayMember');
+}
+")]
         public bool RenderAsSimpleSelect { get; set; }
 
         private string VueSelectcode
@@ -523,11 +539,17 @@ namespace ExpressBase.Objects
 		</div>
 	</div>"; set => base.DesignHtml4Bot = value; }
 
-        public override string GetBareHtml()
+		public override string GetHtml4Bot()
+		{
+			return ReplacePropsInHTML((HtmlConstants.CONTROL_WRAPER_HTML4BOT).Replace("@barehtml@", DesignHtml4Bot));
+		}
+
+		public override string GetBareHtml()
         {
             if (this.RenderAsSimpleSelect)
             {
                 EbSimpleSelect.ContextId = this.ContextId;
+                EbSimpleSelect.DropdownHeight = this.DropdownHeight;
                 return EbSimpleSelect.GetBareHtml();
             }
 
@@ -618,7 +640,7 @@ namespace ExpressBase.Objects
         }
 
         //INCOMPLETE// to get the entire columns(vm+dm+others) in ps query
-        public string GetSelectQuery(IDatabase DataDB, Service service, string Col, string Tbl = null, string _id = null)
+        public string GetSelectQuery(IDatabase DataDB, Service service, string Col, string Tbl = null, string _id = null, string masterTbl = null)
         {
             string Sql = this.GetSql(service);
 
@@ -633,7 +655,7 @@ namespace ExpressBase.Objects
                 }
                 else
                 {
-                    s = string.Format(@"SELECT __A.* FROM ({0}) __A 
+                    s = string.Format(@"SELECT DISTINCT __A.* FROM ({0}) __A 
                                     WHERE __A.{1} = ANY(STRING_TO_ARRAY('{2}'::TEXT, ',')::INT[]);",
                                                         Sql, this.ValueMember.Name, Col);
                 }
@@ -646,14 +668,14 @@ namespace ExpressBase.Objects
                 if (DataDB.Vendor == DatabaseVendors.MYSQL)
                 {
                     s = string.Format(@"SELECT __A.* FROM ({0}) __A, {1} __B
-                                    WHERE FIND_IN_SET(__A.{2}, __B.{3}) AND __B.{4} = :id;",
-                                         Sql, Tbl, this.ValueMember.Name, Col, _id);
+                                    WHERE FIND_IN_SET(__A.{2}, __B.{3}) AND __B.{4} = :{5}_id;",
+                                         Sql, Tbl, this.ValueMember.Name, Col, _id, masterTbl);
                 }
                 else
                 {
-                    s = string.Format(@"SELECT __A.* FROM ({0}) __A, {1} __B
-                                    WHERE __A.{2} = ANY(STRING_TO_ARRAY(__B.{3}::TEXT, ',')::INT[]) AND __B.{4} = :id;",
-                                        Sql, Tbl, this.ValueMember.Name, Col, _id);
+                    s = string.Format(@"SELECT DISTINCT __A.* FROM ({0}) __A, {1} __B
+                                    WHERE __A.{2} = ANY(STRING_TO_ARRAY(__B.{3}::TEXT, ',')::INT[]) AND __B.{4} = :{5}_id;",
+                                        Sql, Tbl, this.ValueMember.Name, Col, _id, masterTbl);
                 }
                 return s;
             }

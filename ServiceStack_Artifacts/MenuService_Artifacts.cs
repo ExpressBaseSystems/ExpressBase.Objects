@@ -104,6 +104,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 10)]
         public bool Favourite { get; set; } = false;
+
+        [DataMember(Order = 11)]
+        public bool IsCommitted { get; set; }
     }
 
     public class SidebarDevRequest : EbServiceStackAuthRequest, IReturn<SidebarDevResponse>
