@@ -250,22 +250,7 @@ namespace ExpressBase.Objects
             get
             {
                 return
-                    @"
-                    if(this.IsNullable && p1 !== null)
-                        $('#' + this.EbSid_CtxId).siblings('.nullable-check').find('input[type=checkbox]').prop('checked', true);
-                    if(p1 !== null && p1 !== undefined){
-                        if(this.ShowDateAs_ === 1) //month picker
-                            $('#' + this.EbSid_CtxId).val(p1);
-                        else if(this.EbDateType === 5) //Date
-                            $('#' + this.EbSid_CtxId).val(moment(p1, 'YYYY-MM-DD').format(ebcontext.user.Preference.ShortDatePattern));
-                        else if(this.EbDateType === 6) //DateTime
-                            $('#' + this.EbSid_CtxId).val(moment(p1, 'YYYY-MM-DD HH:mm:ss').format(ebcontext.user.Preference.ShortDatePattern + ' ' + ebcontext.user.Preference.ShortTimePattern));
-                        else if(this.EbDateType === 17) //Time
-                            $('#' + this.EbSid_CtxId).val(moment(p1, 'HH:mm:ss').format(ebcontext.user.Preference.ShortTimePattern));
-                        $('#' + this.EbSid_CtxId).trigger('change');
-                    }
-                    else 
-                        $('#' + this.EbSid_CtxId).val('');";
+                    @" setDate_EB.bind(this)(p1, p2);";
             }
             set { }
         }
@@ -278,6 +263,23 @@ namespace ExpressBase.Objects
                         return undefined;
                     else
                         return $('#' + this.EbSid_CtxId).val();";
+            }
+            set { }
+        }
+
+        [JsonIgnore]
+        public override string ClearJSfn
+        {
+            get
+            {
+
+                return @"
+                    debugger;
+                    console.log(this.Label);
+                    if(this.IsNullable)
+                        $('#' + this.EbSid_CtxId).siblings('.nullable-check').find('input[type=checkbox]').prop('checked', false);
+                    else
+                        return;";// cannot clear none-nullable date
             }
             set { }
         }

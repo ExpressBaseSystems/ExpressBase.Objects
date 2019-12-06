@@ -369,6 +369,8 @@ END;";
         public int UserId { set; get; }
 
         public string DisplayName { set; get; }
+
+        public User User { set; get; }
     }
 
     public class ApiFileData
