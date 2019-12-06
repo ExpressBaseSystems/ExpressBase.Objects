@@ -78,7 +78,7 @@ namespace ExpressBase.Objects
                     @"}
                     else{"
                         + @"
-                        this.initializer.Vobj.displayMembers;
+                         return removePropsOfType($.extend(true, {}, this.initializer.Vobj.displayMembers), 'function');
 " +
                     @"}
                 ";
