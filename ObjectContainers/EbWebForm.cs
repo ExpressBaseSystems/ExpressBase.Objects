@@ -1274,7 +1274,7 @@ namespace ExpressBase.Objects
                                 DmsColl = (Column.Control as EbDGPowerSelectColumn).DisplayMembers;
                             }
 
-                            if (Column.Value == null || !this.FormData.PsDm_Tables.ContainsKey(EbSid))
+                            if (Column.Value == null || string.IsNullOrEmpty(Convert.ToString(Column.Value)) || !this.FormData.PsDm_Tables.ContainsKey(EbSid))
                                 continue;
 
                             List<SingleRow> Cols = new List<SingleRow>();
@@ -1301,8 +1301,8 @@ namespace ExpressBase.Objects
                                         Dictionary<string, string> __d = new Dictionary<string, string>();
                                         for (int j = 0; j < DmsColl.Count; j++)
                                         {
-                                            _dm[j] = _row[DmsColl[j].Name];
-                                            __d.Add(DmsColl[j].Name, _row[DmsColl[j].Name]);
+                                            _dm[j] = Convert.ToString(_row[DmsColl[j].Name]);
+                                            __d.Add(DmsColl[j].Name, Convert.ToString(_row[DmsColl[j].Name]));
                                         }
                                         //Disp.Add(vms[i], _dm);
                                         DispM_dup.Add(vms[i], __d);
