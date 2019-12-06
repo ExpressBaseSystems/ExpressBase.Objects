@@ -1794,18 +1794,17 @@ namespace ExpressBase.Objects
 
         private bool ParameterizeUnknown(IDatabase DataDB, List<DbParameter> param, SingleColumn cField, bool ins, ref int i, ref string _col, ref string _val)
         {
-            if (cField.Name.Equals("eb_row_num"))
+            if (EbColumnExtra.Params.ContainsKey(cField.Name))
             {
                 if (string.IsNullOrEmpty(cField.Value))
                 {
-                    var p = DataDB.GetNewParameter(cField.Name + "_" + i, (EbDbTypes)cField.Type);
+                    var p = DataDB.GetNewParameter(cField.Name + "_" + i, EbColumnExtra.Params[cField.Name]);
                     p.Value = DBNull.Value;
                     param.Add(p);
                 }
                 else
                 {
-                    int v = Convert.ToInt32(cField.Value);
-                    param.Add(DataDB.GetNewParameter(cField.Name + "_" + i, EbDbTypes.Decimal, v));
+                    param.Add(DataDB.GetNewParameter(cField.Name + "_" + i, EbColumnExtra.Params[cField.Name], cField.Value));
                 }
                 if (ins)
                 {
