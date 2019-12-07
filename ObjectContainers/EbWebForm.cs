@@ -991,6 +991,8 @@ namespace ExpressBase.Objects
             {
                 if (c is EbDataGrid)
                 {
+                    if (!FormData.MultipleTables.ContainsKey((c as EbDataGrid).TableName))
+                        continue;
                     foreach (EbControl control in (c as EbDataGrid).Controls)
                     {
                         if (!control.DoNotPersist)
@@ -1083,7 +1085,7 @@ namespace ExpressBase.Objects
                     new SingleColumn { Name = "eb_created_by_name", Type = (int)EbDbTypes.String, Value = this.SolutionObj.Users[Convert.ToInt32(dataRow["eb_created_by"])]},
                     new SingleColumn { Name = "eb_created_at", Type = (int)EbDbTypes.String, Value = dt.ConvertFromUtc(this.UserObj.TimeZone).ToString("dd-MM-yyyy hh:mm tt")}
                 },
-                    RowId = dataRow["id"].ToString(),
+                    RowId =Convert.ToInt32(dataRow["id"]),
                     LocId = Convert.ToInt32(dataRow["eb_loc_id"])
                 });
             }
@@ -1098,7 +1100,7 @@ namespace ExpressBase.Objects
             foreach (EbDataRow dataRow in dataTable.Rows)
             {
                 int _locId = 0, i = 0, j = 0;
-                string _rowId = "0";
+                int _rowId = 0;
                 if (_table != null)
                 {
                     _locId = Convert.ToInt32(dataRow[i++]);
@@ -1114,10 +1116,10 @@ namespace ExpressBase.Objects
                         else
                             i += 4;
                     }
-                    _rowId = dataRow[i].ToString();
+                    _rowId = Convert.ToInt32(dataRow[i]);
                     for (; j < Table.Count; j++)
                     {
-                        if (Table[j].RowId.Equals(_rowId))
+                        if (Table[j].RowId == _rowId)
                             break;
                     }
                     if (j < Table.Count)// skipping duplicate rows in dataTable
@@ -1388,8 +1390,8 @@ namespace ExpressBase.Objects
             }
             else
             {
-                this.TableRowId = Convert.ToInt32(_FormData.MultipleTables[_FormData.MasterTable][0].RowId);
-                this.LocationId = Convert.ToInt32(_FormData.MultipleTables[_FormData.MasterTable][0].LocId);
+                this.TableRowId = _FormData.MultipleTables[_FormData.MasterTable][0].RowId;
+                this.LocationId = _FormData.MultipleTables[_FormData.MasterTable][0].LocId;
             }
 
             if (dataset.Tables.Count > _schema.Tables.Count)
@@ -1718,7 +1720,7 @@ namespace ExpressBase.Objects
                     {
                         string _colvals = string.Empty;
                         string _temp = string.Empty;
-                        int _rowId = Convert.ToInt32(row.RowId);
+                        int _rowId = row.RowId;
                         if (_rowId > 0)
                         {
                             if (!row.IsDelete)
@@ -1755,8 +1757,8 @@ namespace ExpressBase.Objects
                         }
                     }
                 }
-                param.Add(DataDB.GetNewParameter(WebForm.FormData.MasterTable + "_id", EbDbTypes.Int32, WebForm.TableRowId));
-                param.Add(DataDB.GetNewParameter(WebForm.FormData.MasterTable + "_eb_ver_id", EbDbTypes.Int32, WebForm.RefId.Split("-")[4]));
+                param.Add(DataDB.GetNewParameter(WebForm.TableName + "_id", EbDbTypes.Int32, WebForm.TableRowId));
+                param.Add(DataDB.GetNewParameter(WebForm.TableName + "_eb_ver_id", EbDbTypes.Int32, WebForm.RefId.Split("-")[4]));
             }
 
             fullqry += _extqry;
@@ -1915,7 +1917,7 @@ namespace ExpressBase.Objects
 
         private SingleRow GetSingleRow(JToken JRow, TableSchema _table, FormAsGlobal globals)
         {
-            SingleRow Row = new SingleRow() { RowId = "0" };
+            SingleRow Row = new SingleRow() { RowId = 0 };
             foreach (ColumnSchema _column in _table.Columns)
             {
                 if (JRow[_column.ColumnName] != null)
@@ -2165,7 +2167,7 @@ namespace ExpressBase.Objects
                         }
                         else//update mode
                         {
-                            List<string> rids = new List<string>();
+                            List<int> rids = new List<int>();
                             foreach (SingleRow rField in entry.Value)
                             {
                                 rids.Add(rField.RowId);
