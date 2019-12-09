@@ -292,7 +292,7 @@ namespace ExpressBase.Objects
 .Replace("@selOpts@", IsMultiSelect ? "data-actions-box='true'" : string.Empty)
 .Replace("@bootStrapStyle@", "data-style='btn-" + this.BootStrapStyle.ToString() + "'")
 
-.Replace("@PlaceHolder@", (PlaceHolder ?? ""))
+.Replace("@PlaceHolder@", (PlaceHolder ?? " -- select -- "))
 .Replace("@options@", this.OptionHtml)
 .Replace("@-sel-@", this.IsMultiSelect ? string.Empty : "<option selected value='-1' style='color: #6f6f6f;'> -- select -- </option>")
 .Replace("@data-ebtype@", "16");
