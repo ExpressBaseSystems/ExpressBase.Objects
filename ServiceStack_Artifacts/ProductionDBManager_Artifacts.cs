@@ -82,5 +82,62 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
         
     }
-    
+
+    public class GetFunctionOrProcedureQueriesRequest : IEbTenentRequest, IReturn<GetFunctionOrProcedureQueriesResponse>
+    {
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
+
+        public string SolutionId { get; set; }
+
+        public Eb_FileDetails ChangeList { get; set; }
+    }
+
+    public class GetFunctionOrProcedureQueriesResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Query { get; set; }
+    }
+
+    public class GetTableQueriesRequest : IEbTenentRequest, IReturn<GetTableQueriesResponse>
+    {
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
+
+        public string SolutionId { get; set; }
+
+        public Eb_FileDetails ChangeList { get; set; }
+    }
+
+    public class GetTableQueriesResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Query { get; set; }
+    }
+
+    public class ExecuteQueriesRequest : IEbTenentRequest, IReturn<ExecuteQueriesResponse>
+    {
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
+
+        public string SolutionId { get; set; }
+
+        public string Query { get; set; }
+    }
+
+    public class ExecuteQueriesResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public ResponseStatus ResponseStatus { get; set; }
+        
+    }
 }
