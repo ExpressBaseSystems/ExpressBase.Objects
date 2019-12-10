@@ -281,7 +281,7 @@ else {
             <input type='@TextMode '  data-ebtype='@data-ebtype@' ui-inp id='@ebsid@' name='@name@' @AutoCompleteOff@ ' data-toggle='tooltip' data-placement='top' title='@ToolTipText@' 
 @TabIndex@ @MaxLength@  style='width:100%; height:@heightpx; @BackColor @ForeColor display:inline-block; @fontStyle @ReadOnlyString  @Required  @PlaceHolder  @Text@  />
         @attachedLblClose@"
-.Replace("@ebsid@", String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId)
+.Replace("@ebsid@", this.IsRenderMode && this.IsDynamicTabChild ? "@" + this.Name + "_ebsid@" : (String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId))
 .Replace("@name@", this.EbSid_CtxId)
 .Replace("@data-ebtype@", "16")//( (int)this.EbDateType ).ToString())
 .Replace("@MaxLength@", (this.MaxLength > 0) ? "maxlength='" + this.MaxLength.ToString() + "'" : "")
@@ -321,7 +321,7 @@ else {
             <textarea id='@ebsid@' class='eb-textarea' ui-inp name='@name@' rows='@RowsVisible@' '@AutoCompleteOff@' data-toggle='tooltip'  data-placement='top' title='@ToolTipText@' 
                 @tabIndex@ @MaxLength@  style='width:100%;' @Required@  @PlaceHolder@  @Text@  @TabIndex></textarea>"
 .Replace("@name@", this.Name)
-.Replace("@ebsid@", String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId)
+.Replace("@ebsid@", this.IsRenderMode && this.IsDynamicTabChild ? "@" + this.Name + "_ebsid@" : (String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId))
 .Replace("@MaxLength@", "maxlength='" + ((this.MaxLength > 0) ? this.MaxLength.ToString() : "@MaxLength") + "'")
 .Replace("@Required@", (this.Required && !this.Hidden ? " required" : string.Empty))
 .Replace("@ReadOnlyString@", this.ReadOnlyString)

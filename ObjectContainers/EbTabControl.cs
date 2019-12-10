@@ -131,14 +131,17 @@ this.Init = function(id)
 
             foreach (EbTabPane tab in Controls)
                 TabBtnHtml += @"
-            <li li-of='@ebsid@' ebsid='@ebsid@' @active>
+            <li li-of='@ebsid@' ebsid='@ebsid@' @active @style@>
                 <a data-toggle='tab' class='ppbtn-cont' href='#@ebsid@'>
                     <span class='eb-label-editable'>@title@</span>
                     <input id='@ebsid@lbltxtb' class='eb-lbltxtb' type='text'/>@ppbtn@
                     <div class='ebtab-close-btn eb-fb-icon'><i class='fa fa-times' aria-hidden='true'></i></div>
                 </a>
                 <div class='ebtab-add-btn eb-fb-icon'><i class='fa fa-plus' aria-hidden='true'></i></div>                
-            </li>".Replace("@title@", tab.Title).Replace("@ppbtn@", Common.HtmlConstants.CONT_PROP_BTN).Replace("@ebsid@", tab.EbSid);
+            </li>".Replace("@style@", tab.IsDynamic && tab.IsRenderMode ? "style='display : none;'": string.Empty)
+            .Replace("@title@", tab.IsDynamic && tab.IsRenderMode ? "@" + tab.Name + "_title@" : tab.Title)
+            .Replace("@ppbtn@", Common.HtmlConstants.CONT_PROP_BTN)
+            .Replace("@ebsid@", tab.IsDynamic && tab.IsRenderMode ? "@" + tab.Name + "_ebsid@" : tab.EbSid);
 
             TabBtnHtml += @"
         </ul>
@@ -185,6 +188,9 @@ this.Init = function(id)
         [JsonIgnore]
         public override string Label { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        public bool IsDynamic { get; set; }
+
         public override string GetHtml()
         {
             string html = "<div id='@ebsid@' ebsid='@ebsid@' ctype='@objtype@' class='tab-pane fade @inactive ebcont-ctrl'>";
@@ -194,7 +200,7 @@ this.Init = function(id)
 
             return (html + "</div>")
                 .Replace("@name@", this.Name)
-                .Replace("@ebsid@", this.EbSid)
+                .Replace("@ebsid@", this.IsRenderMode && this.IsDynamicTabChild ? "@" + this.Name + "_ebsid@" : this.EbSid)
                 .Replace("@objtype@", this.ObjType);
         }
     }

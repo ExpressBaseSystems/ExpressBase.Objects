@@ -87,13 +87,15 @@ namespace ExpressBase.Objects
         }
 
         //Rendering side
-        public static void AfterRedisGet(EbControlContainer _this, RedisClient Redis, IServiceClient client, bool IsRenderMode)
+        public static void AfterRedisGet(EbControlContainer _this, RedisClient Redis, IServiceClient client)
         {
             try
             {
                 for (int i = 0; i < _this.Controls.Count; i++)
                 {
                     EbControl c = _this.Controls[i];
+                    c.IsRenderMode = _this.IsRenderMode;
+                    c.IsDynamicTabChild = _this.IsDynamicTabChild;
                     if (c is EbUserControl || c is EbDGUserControlColumn)
                     {
                         EbUserControl _temp = Redis.Get<EbUserControl>(c.RefId);
@@ -117,7 +119,6 @@ namespace ExpressBase.Objects
                             (c as EbUserControl).Controls = _temp.Controls;
                             (c as EbUserControl).DisplayName = _temp.DisplayName;
                             (c as EbUserControl).VersionNumber = _temp.VersionNumber;
-                            (c as EbUserControl).IsRenderMode = IsRenderMode;
                             foreach (EbControl Control in (c as EbUserControl).Controls)
                             {
                                 RenameControlsRec(Control, c.Name);
@@ -130,11 +131,13 @@ namespace ExpressBase.Objects
                     }
                     else if (c is EbControlContainer)
                     {
-                        AfterRedisGet(c as EbControlContainer, Redis, client, IsRenderMode);
+                        if (c is EbTabPane && (c as EbTabPane).IsDynamic)
+                            c.IsDynamicTabChild = true;
+                        AfterRedisGet(c as EbControlContainer, Redis, client);
                     }
                     else if (c is EbProvisionLocation)//add unmapped ctrls as DoNotPersist controls
                     {
-                        if (IsRenderMode)
+                        if (_this.IsRenderMode)
                         {
                             EbProvisionLocation prvnCtrl = c as EbProvisionLocation;
                             for (int j = 0; j < prvnCtrl.Fields.Count; j++)
@@ -173,7 +176,7 @@ namespace ExpressBase.Objects
                     }
                     else if (c is EbProvisionUser)
                     {
-                        if (IsRenderMode)
+                        if (_this.IsRenderMode)
                         {
                             EbProvisionUser prvnCtrl = c as EbProvisionUser;
                             for (int j = 0; j < prvnCtrl.Fields.Count; j++)

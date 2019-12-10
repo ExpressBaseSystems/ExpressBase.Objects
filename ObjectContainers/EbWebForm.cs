@@ -33,9 +33,7 @@ namespace ExpressBase.Objects
     {
         [HideInPropertyGrid]
         public bool IsUpdate { get; set; }
-
-        public bool IsRenderMode { get; set; }
-
+        
         public EbWebForm()
         {
             this.DisableDelete = new List<EbSQLValidator>();
@@ -1629,6 +1627,7 @@ namespace ExpressBase.Objects
             else
             {
                 this.TableRowId = this.Insert(DataDB);
+                Console.WriteLine("New record inserted. Table :" + this.TableName +", Id : " + this.TableRowId);
                 r = 1;
             }
             this.RefreshFormData(DataDB, service, false, true);
@@ -2830,7 +2829,7 @@ namespace ExpressBase.Objects
 
         public override void AfterRedisGet(RedisClient Redis, IServiceClient client)
         {
-            EbFormHelper.AfterRedisGet(this, Redis, client, this.IsRenderMode);
+            EbFormHelper.AfterRedisGet(this, Redis, client);
             this.GetWebFormSchema();
             EbFormHelper.InitDataPushers(this, Redis, client);
         }
