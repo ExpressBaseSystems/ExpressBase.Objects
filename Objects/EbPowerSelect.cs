@@ -120,6 +120,15 @@ namespace ExpressBase.Objects
             set { }
         }
 
+        public override string JustSetValueJSfn
+        {
+            get
+            {
+                return @"this.initializer.justInit = true;" + SetValueJSfn;
+            }
+            set { }
+        }
+
         public override string SetValueJSfn
         {
             get
