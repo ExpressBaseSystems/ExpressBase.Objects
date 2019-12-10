@@ -653,15 +653,15 @@ pg.HideProperty('FormMode');
         [PropertyEditor(PropertyEditorType.DropDown)]
         public Align Align { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         [DefaultPropValue("20")]
         public int ImageHeight { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         [DefaultPropValue("20")]
         public int ImageWidth { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         public ImageQuality ImageQuality { get; set; }
 
         public DVStringColumn()

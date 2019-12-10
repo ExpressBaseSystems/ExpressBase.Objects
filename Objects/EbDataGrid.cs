@@ -106,16 +106,8 @@ namespace ExpressBase.Objects
         {
             get
             {
-                return @"
-$.each(this.Controls.$values, function (i, col) {
-    if ((col.OnChangeFn && col.OnChangeFn.Code && col.OnChangeFn.Code.trim() !== '') || col.DependedValExp.$values.length > 0){
-        let FnString = `/*console.log('${col.__path || col.Name}');*/` + atob(col.OnChangeFn.Code) + (col.DependedValExp.$values.length !== 0 ? ` ; form.updateDependentControls(form.__getCtrlByPath(this.__path))` : '');
-        let OnChangeFn = new Function('form', 'user', `event`, FnString).bind(col, this.formObject, this.__userObject);
-
-        col.bindOnChange({form:this.formObject, col:col, DG:this, user : this.__userObject},OnChangeFn);
-    }
-}.bind(this));
-               ";
+                return @"dgOnChangeBind.bind(this)();
+                        dgEBOnChangeBind.bind(this)()";
             }
             set { }
         }
@@ -246,12 +238,13 @@ $.each(this.Controls.$values, function (i, col) {
 
             string html = @"
 <div class='grid-cont'>
-    <div id='@ebsid@addrow' class='addrow-btn'  tabindex='0'>+  Row</div>
+    @addrowbtn@
 	<div class='Dg_head'>
         <table id='tbl_@ebsid@_head' class='table table-bordered dgtbl'>
             <thead>
               <tr>    
-                <th class='slno' style='width:34px'><span class='grid-col-title'>SL No</span></th>";
+                <th class='slno' style='width:34px'><span class='grid-col-title'>SL No</span></th>"
+.Replace("@addrowbtn@", this.IsAddable ? "<div id='@ebsid@addrow' class='addrow-btn' tabindex='0'>+ Row</div>" : string.Empty); ;
             foreach (EbDGColumn col in Controls)
             {
                 if (!col.Hidden)
@@ -276,7 +269,7 @@ $.each(this.Controls.$values, function (i, col) {
         </table>
     </div>".Replace("@cogs@", !this.IsDisable ? "<th class='ctrlth'><span class='fa fa fa-cog'></span></th>" : string.Empty);
 
-            html += @"
+			html += @"
     <div class='Dg_body' style='overflow-y:scroll;height:@_height@px ;'>
         <table id='tbl_@ebsid@' class='table table-bordered dgtbl'>
                 <tbody>
@@ -289,9 +282,10 @@ $.each(this.Controls.$values, function (i, col) {
             </tbody>
         </table>
      </div>
-</div>".Replace("@_height@", this.Height.ToString());
+</div>"
+.Replace("@_height@", this.Height.ToString());
 
-            return html;
+			return html;
         }
 
         public override string GetDesignHtml()
@@ -920,6 +914,9 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, p2).
         public override string SetDisplayMemberJSfn { get { return this.EbPowerSelect.SetDisplayMemberJSfn; } set { } }
 
         [JsonIgnore]
+        public override string GetDisplayMemberJSfn { get { return this.EbPowerSelect.GetDisplayMemberJSfn; } set { } }
+
+        [JsonIgnore]
         private EbPowerSelect EbPowerSelect { get; set; }
 
 
@@ -1085,13 +1082,7 @@ else {pg.MakeReadWrite('ValueMember');}")]
         }
     }
 
-
-
-
-
-
-
-
+	
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
     [Alias("Created By Column")]
@@ -1182,8 +1173,6 @@ else {pg.MakeReadWrite('ValueMember');}")]
         [HideInToolBox]
         public override bool IsSysControl { get { return true; } }
     }
-
-
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
     [Alias("Created At Column")]
@@ -1283,9 +1272,6 @@ else {pg.MakeReadWrite('ValueMember');}")]
     }
 
 
-
-
-
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
     [Alias("Modified By Column")]
     [UsedWithTopObjectParent(typeof(EbObject))]
@@ -1375,8 +1361,6 @@ else {pg.MakeReadWrite('ValueMember');}")]
         [HideInToolBox]
         public override bool IsSysControl { get { return true; } }
     }
-
-
 
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
@@ -1474,5 +1458,43 @@ else {pg.MakeReadWrite('ValueMember');}")]
         [HideInToolBox]
         public override bool IsSysControl { get { return true; } }
     }
+
+
+	[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+	[Alias("User Select Column")]
+	[UsedWithTopObjectParent(typeof(EbObject))]
+	public class EbDGUserSelectColumn : EbDGColumn
+	{
+
+		[JsonIgnore]
+		public EbUserSelect EbUserSelect { get; set; }
+
+		public EbDGUserSelectColumn()
+		{
+			this.EbUserSelect = new EbUserSelect();
+		}
+
+		[OnDeserialized]
+		public void OnDeserializedMethod(StreamingContext context)
+		{
+			this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
+			DBareHtml = this.EbUserSelect.GetBareHtml();
+		}
+
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+		[HideInPropertyGrid]
+		public override EbDbTypes EbDbType
+		{
+			get { return this.EbUserSelect.EbDbType; }
+			set { this.EbUserSelect.EbDbType = value; }
+		}
+
+		
+		[EnableInBuilder(BuilderType.WebForm)]
+		[HideInPropertyGrid]
+		public override string InputControlType { get { return "EbUserSelect"; } }
+
+		
+	}
 
 }

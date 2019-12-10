@@ -2,6 +2,7 @@
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
+using ExpressBase.Common.Structures;
 using ExpressBase.Objects.ServiceStack_Artifacts;
 using ServiceStack;
 using ServiceStack.Redis;
@@ -311,6 +312,22 @@ namespace ExpressBase.Objects
                     pusher.WebForm = _form;
                     _this.ExeDataPusher = true;
                 }
+            }
+        }
+    }
+
+    public class EbColumnExtra
+    {
+        public static Dictionary<string, EbDbTypes> Params
+        {
+            get
+            {
+                return new Dictionary<string, EbDbTypes> {
+                    { "eb_row_num",EbDbTypes.Decimal},
+                    { "eb_created_at_device",EbDbTypes.DateTime},
+                    { "eb_device_id",EbDbTypes.String},
+                    { "eb_appversion",EbDbTypes.String}
+                };
             }
         }
     }

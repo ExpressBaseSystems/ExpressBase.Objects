@@ -257,8 +257,8 @@ namespace ExpressBase.Objects
         {
             return @"
 						<div style='display: flex;'>
-							<img id='@ebsid@_usrimg'class='ulstc-disp-img-c' src='/images/nulldp.png' alt='' onerror=this.onerror=null;this.src='/images/nulldp.png';>
-							<div id='@ebsid@' data-ebtype='@data-ebtype@'  data-toggle='tooltip' title='@toolTipText@' class=' ulstc-disp-txt'  name='@name@' autocomplete = 'off' @value@ @tabIndex@ style='width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@ @readOnlyString@ @required@ @placeHolder@ disabled ></div>
+							<img id='@ebsid@_usrimg'class='sysctrl_usrimg' src='' alt='' onerror=this.onerror=null;this.src='/images/nulldp.png';>
+							<div id='@ebsid@' data-ebtype='@data-ebtype@'  data-toggle='tooltip' title='@toolTipText@' class=' sysctrl_usrname'  name='@name@' autocomplete = 'off' @value@ @tabIndex@ style='width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@ @readOnlyString@ @required@ @placeHolder@ disabled ></div>
 						
 						</div>
             "
@@ -548,8 +548,8 @@ namespace ExpressBase.Objects
         public override string GetBareHtml()
         {
             return @"<div style='display: flex;'>
-							<img id='@ebsid@_usrimg'class='ulstc-disp-img-c' src='/images/nulldp.png' alt='' onerror=this.onerror=null;this.src='/images/nulldp.png';>
-							<div id='@ebsid@' data-ebtype='@data-ebtype@'  data-toggle='tooltip' title='@toolTipText@' class=' ulstc-disp-txt'  name='@name@' autocomplete = 'off' @value@ @tabIndex@ style='width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@ @readOnlyString@ @required@ @placeHolder@ disabled ></div>
+							<img id='@ebsid@_usrimg'class='sysctrl_usrimg' src='' alt='' onerror=this.onerror=null;this.src='/images/nulldp.png';>
+							<div id='@ebsid@' data-ebtype='@data-ebtype@'  data-toggle='tooltip' title='@toolTipText@' class=' sysctrl_usrname'  name='@name@' autocomplete = 'off' @value@ @tabIndex@ style='width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@ @readOnlyString@ @required@ @placeHolder@ disabled ></div>
 						
 						</div>
             "

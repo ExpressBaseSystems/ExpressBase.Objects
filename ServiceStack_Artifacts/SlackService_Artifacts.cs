@@ -1,5 +1,7 @@
+using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
 using Newtonsoft.Json;
+using ServiceStack;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -79,7 +81,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     [DataContract]
     public class SlackPayload
     {
-    
+
         [DataMember(Order = 1)]
         public string Channel { get; set; }
 
@@ -89,7 +91,34 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 3)]
         public SlackFile SlackFile { get; set; }
     }
-    
+
+    public class SlackCreateRequest : EbServiceStackAuthRequest, IReturn<SlackAttachmenResponse>
+    {
+        [DataMember(Order = 1)]
+        public int ObjId { get; set; }
+
+        [DataMember(Order = 2)]
+        public List<Param> Params { get; set; }
+
+        [DataMember(Order = 3)]
+        public string Message { get; set; }
+
+        [DataMember(Order = 4)]
+        public byte[] AttachmentReport { get; set; }
+
+        [DataMember(Order = 5)]
+        public string AttachmentName { get; set; }
+
+        [DataMember(Order = 6)]
+        public string To { get; set; }
+    }
+
+    public class SlackAttachmenResponse
+    {
+        [DataMember(Order = 1)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
     public class SlackPostAsyncRequest : EbServiceStackAuthRequest
     {
         public SlackPayload Payload { get; set; }
