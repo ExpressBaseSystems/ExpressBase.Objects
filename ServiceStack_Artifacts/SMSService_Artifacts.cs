@@ -88,7 +88,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     }
     [DataContract]
-    public class SMSStatusLogMqRequest789456 : EbServiceStackAuthRequest
+    public class SMSStatusLogMqRequest : EbServiceStackAuthRequest
     {
         [DataMember(Order = 1)]
         public SMSSentStatus SMSSentStatus { get; set; }
