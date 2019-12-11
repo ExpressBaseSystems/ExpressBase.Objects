@@ -153,6 +153,22 @@ namespace ExpressBase.Objects.Objects.DVRelated
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
     public class DVBaseColumn : EbDataVisualizationObject
     {
+
+        public DVBaseColumn()
+        {
+            _Formula = new EbScript();
+            this.StaticParameters = new List<StaticParam>();
+            this.FormParameters = new List<DVBaseColumn>();
+            this.FormId = new List<DVBaseColumn>();
+            this.ParentColumn = new List<DVBaseColumn>();
+            this.GroupingColumn = new List<DVBaseColumn>();
+            this.GroupFormParameters = new List<DVBaseColumn>();
+            this.GroupFormId = new List<DVBaseColumn>();
+            this.ItemFormParameters = new List<DVBaseColumn>();
+            this.ItemFormId = new List<DVBaseColumn>();
+            this.InfoWindow = new List<DVBaseColumn>();
+        }
+
         [JsonProperty(PropertyName = "data")]
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
         [HideInPropertyGrid]
@@ -473,20 +489,6 @@ else if(this.FormMode === 2){
         public DVBaseColumn ShallowCopy()
         {
             return (DVBaseColumn)this.MemberwiseClone();
-        }
-
-        public DVBaseColumn()
-        {
-            this.StaticParameters = new List<StaticParam>();
-            this.FormParameters = new List<DVBaseColumn>();
-            this.FormId = new List<DVBaseColumn>();
-            this.ParentColumn = new List<DVBaseColumn>();
-            this.GroupingColumn = new List<DVBaseColumn>();
-            this.GroupFormParameters = new List<DVBaseColumn>();
-            this.GroupFormId = new List<DVBaseColumn>();
-            this.ItemFormParameters = new List<DVBaseColumn>();
-            this.ItemFormId = new List<DVBaseColumn>();
-            this.InfoWindow = new List<DVBaseColumn>();
         }
 
         public bool Check4FormLink()
