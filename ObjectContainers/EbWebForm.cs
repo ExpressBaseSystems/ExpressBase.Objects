@@ -42,6 +42,7 @@ namespace ExpressBase.Objects
             this.AfterSaveRoutines = new List<EbRoutines>();
             this.DataPushers = new List<EbDataPusher>();
             this.TitleExpression = new EbScript();
+            this.PrintDocs = new List<ObjectBasicInfo>();
         }
 
         public override int TableRowId { get; set; }
@@ -94,7 +95,14 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iReport)]
-        public string PrintDoc { get; set; }
+        [HideInPropertyGrid]
+        public string PrintDoc { get; set; }//deprecated 
+
+        [PropertyGroup("Miscellaneous")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.ObjectSelectorCollection)]
+        [OSE_ObjectTypes(EbObjectTypes.iReport)]
+        public List<ObjectBasicInfo> PrintDocs { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
@@ -869,7 +877,7 @@ namespace ExpressBase.Objects
                         {
                             SingleTable Tbl = new SingleTable();
                             this.GetFormattedData(dataset.Tables[i++], Tbl);
-                            this.FormData.ExtendedTables.Add(item.Key, Tbl);//ps//dup for backward compatibility
+                            //this.FormData.ExtendedTables.Add(item.Key, Tbl);//ps//dup for backward compatibility
                             this.FormData.PsDm_Tables.Add(item.Key, Tbl);
                         }
                         this.PostFormatFormData();
@@ -1543,7 +1551,7 @@ namespace ExpressBase.Objects
                             {
                                 SingleTable Table = new SingleTable();
                                 this.GetFormattedData(ds.Tables[tblIdx], Table);
-                                _FormData.ExtendedTables.Add((Col.Control as EbControl).EbSid, Table);//ps//dup for backward compatibility
+                                //_FormData.ExtendedTables.Add((Col.Control as EbControl).EbSid, Table);//ps//dup for backward compatibility
                                 _FormData.PsDm_Tables.Add((Col.Control as EbControl).EbSid, Table);
                                 tblIdx++;
                             }
@@ -1608,7 +1616,7 @@ namespace ExpressBase.Objects
                 {
                     SingleTable Table = new SingleTable();
                     this.GetFormattedData(dataset.Tables[i++], Table);
-                    this.FormData.ExtendedTables.Add(item.Key, Table);//ps//dup for backward compatibility
+                    //this.FormData.ExtendedTables.Add(item.Key, Table);//ps//dup for backward compatibility
                     this.FormData.PsDm_Tables.Add(item.Key, Table);
                 }
                 this.PostFormatFormData();

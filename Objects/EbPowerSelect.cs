@@ -77,8 +77,8 @@ namespace ExpressBase.Objects
                         + this.EbSimpleSelect.GetDisplayMemberJSfn +
                     @"}
                     else{"
-                        + @"
-                         return removePropsOfType($.extend(true, {}, this.initializer.Vobj.displayMembers), 'function');
+                        + @" 
+                         return this.initializer.getDisplayMemberModel();
 " +
                     @"}
                 ";
