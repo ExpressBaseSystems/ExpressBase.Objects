@@ -636,6 +636,15 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, p2).
             }
             set { }
         }
+        
+        public override string JustSetValueJSfn
+        {
+            get
+            {
+                return EbSimpleSelect.JustSetValueJSfn;
+            }
+            set { }
+        }
 
         public override string GetDisplayMemberJSfn { get { return @" return $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp] :selected`).text(); "; } set { } }
 
