@@ -139,9 +139,9 @@ this.Init = function(id)
                 </a>
                 <div class='ebtab-add-btn eb-fb-icon'><i class='fa fa-plus' aria-hidden='true'></i></div>                
             </li>".Replace("@style@", tab.IsDynamic && tab.IsRenderMode ? "style='display : none;'": string.Empty)
-            .Replace("@title@", tab.IsDynamic && tab.IsRenderMode ? "@" + tab.Name + "_title@" : tab.Title)
+            .Replace("@title@", tab.IsDynamic && tab.IsRenderMode ? "@" + tab.EbSid_CtxId + "_title@" : tab.Title)
             .Replace("@ppbtn@", Common.HtmlConstants.CONT_PROP_BTN)
-            .Replace("@ebsid@", tab.IsDynamic && tab.IsRenderMode ? "@" + tab.Name + "_ebsid@" : tab.EbSid);
+            .Replace("@ebsid@", tab.IsDynamic && tab.IsRenderMode ? "@" + tab.EbSid_CtxId + "_ebsid@" : tab.EbSid);
 
             TabBtnHtml += @"
         </ul>
@@ -189,6 +189,7 @@ this.Init = function(id)
         public override string Label { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [HideInPropertyGrid]
         public bool IsDynamic { get; set; }
 
         public override string GetHtml()
@@ -200,7 +201,7 @@ this.Init = function(id)
 
             return (html + "</div>")
                 .Replace("@name@", this.Name)
-                .Replace("@ebsid@", this.IsRenderMode && this.IsDynamicTabChild ? "@" + this.Name + "_ebsid@" : this.EbSid)
+                .Replace("@ebsid@", this.IsRenderMode && this.IsDynamicTabChild ? "@" + this.EbSid_CtxId + "_ebsid@" : this.EbSid)
                 .Replace("@objtype@", this.ObjType);
         }
     }
