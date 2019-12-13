@@ -296,14 +296,14 @@ namespace ExpressBase.Objects
 
 		public override string GetDisplayMemberJSfn
 		{
-            get
-            {
+			get
+			{
 				return @"return $('#' + this.EbSid_CtxId).text();";
 			}
-            set { }
-        }
+			set { }
+		}
 
-        [EnableInBuilder(BuilderType.WebForm)]
+		[EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
         public override bool IsSysControl { get { return true; } }
 

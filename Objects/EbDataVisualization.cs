@@ -276,11 +276,11 @@ namespace ExpressBase.Objects
         public RowGroupParent CurrentRowGroup { get; set; }
 
         [PropertyGroup("Fixed Column")]
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
         public int LeftFixedColumn { get; set; }
 
         [PropertyGroup("Fixed Column")]
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
         public int RightFixedColumn { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
@@ -304,7 +304,7 @@ namespace ExpressBase.Objects
         [HideForUser]
         public bool AllowMultilineHeader { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
         public List<DVBaseColumn> OrderBy { get; set; }
 
@@ -312,7 +312,7 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public List<FormLink> FormLinks { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]
         [DefaultPropValue("15")]
         [HideForUser]
         public int RowHeight { get; set; }
@@ -804,12 +804,12 @@ else {
         public LinkTypeEnum LinkType { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder,  BuilderType.Calendar)]
-        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Parent.Columns")]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Parent.LinesColumns")]
         public List<DVBaseColumn> FormId { get; set; }
 
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]
-        [PropertyEditor(PropertyEditorType.Mapper, "Parent.Columns", "Refid", "FormControl")]
+        [PropertyEditor(PropertyEditorType.Mapper, "Parent.LinesColumns", "Refid", "FormControl")]
         public List<DVBaseColumn> FormParameters { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]
