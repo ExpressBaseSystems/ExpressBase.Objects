@@ -28,14 +28,14 @@ namespace ExpressBase.Objects
         public override string GetBareHtml()
         {
             return @" 
-                <div id='@name@' class='ulstc-disp-c'>
+                <div id='@ebsid@' class='ulstc-disp-c'>
                     <div style='display: inherit;'>
-                        <div class='ulstc-disp-img-c'  style='background-image: url(/images/nulldp.png);'></div>
+                        <div class='ulstc-disp-img-c' style='background-image: url(/images/nulldp.png);'></div>
                         <div class='ulstc-disp-txt'>Jon Snow</div>
                     </div>
                     <div style='margin-left: auto; padding: 0px 10px;'><i class='fa fa-sort-desc' aria-hidden='true'></i></div>
                 </div>"
-            .Replace("@name@", this.Name)
+            .Replace("@ebsid@", this.EbSid_CtxId)
             .Replace("@toolTipText@", this.ToolTipText);
         }
 
@@ -66,7 +66,7 @@ namespace ExpressBase.Objects
             return this.GetHtml().RemoveCR().GraveAccentQuoted();
         }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.Decimal; } }
 

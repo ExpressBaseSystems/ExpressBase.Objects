@@ -114,12 +114,12 @@ namespace ExpressBase.Objects
         {
             return @"
         <div class='data-static-label'> @Label@ </div>
-        <div class='data-Description-label' > @Description@ </div>
+        @Description@
         <div class='data-dynamic-label' style= ' @style@ '> @PlaceHolder@ </div>
 "
 .Replace("@name@", this.Name)
 .Replace("@Label@", this.Label)
-.Replace("@Description@", this.Description)
+.Replace("@Description@", string.IsNullOrEmpty(this.Description) ? "" : $"<div class='data-Description-label'> {this.Description} </div>")
 .Replace("@PlaceHolder@", string.IsNullOrEmpty(this.DynamicLabel) ? "PlaceHolder" : this.DynamicLabel)
 .Replace("@style@", this.GetEbFontStyle());
         }
