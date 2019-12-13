@@ -11,10 +11,12 @@ namespace ExpressBase.Objects
     public enum AttendanceType
     {
         DayWise = 0,
-        Weekely = 1,
-        Monthly = 2,
-        HalfYearly = 3,
-        Yearly = 4,
+        Hourly = 1,
+        Weekely = 2,
+        fortnightly = 3,
+        Monthly = 4,
+        HalfYearly = 5,
+        Yearly = 6,
     }
 
     [EnableInBuilder(BuilderType.Calendar)]
@@ -47,9 +49,9 @@ namespace ExpressBase.Objects
 
     [EnableInBuilder(BuilderType.Calendar)]
     [BuilderTypeEnum(BuilderType.Calendar)]
-    public class EbCalendarView : EbDataVisualization, IEBRootObject
+    public class EbCalendarView : EbTableVisualization, IEBRootObject
     {
-        [PropertyEditor(PropertyEditorType.CollectionABCFrmSrc, "LinesColumns")]        
+        [PropertyEditor(PropertyEditorType.CollectionABCpropToggle, "DataColumns", "bVisible")]
         [EnableInBuilder(BuilderType.Calendar)]
         public List<DVBaseColumn> DataColumns { get; set; }
 
@@ -85,14 +87,23 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.Calendar)]
         [PropertyEditor(PropertyEditorType.ObjectSelectorCollection)]
         [OSE_ObjectTypes(EbObjectTypes.iWebForm)]
-        public List<ObjectBasicInfo> FormLinks { get; set; }
+        public List<ObjectBasicInfo> ObjectLinks { get; set; }
+
+        [EnableInBuilder(BuilderType.Calendar)]
+        [PropertyEditor(PropertyEditorType.DropDown)]
+        [HideForUser]
+        public AttendanceType AttendanceType { get; set; }        
+
+        //[EnableInBuilder(BuilderType.Calendar)]
+        //public override int LeftFixedColumn { get; set; }
+
 
         public EbCalendarView()
         {
             this.DataColumns = new List<DVBaseColumn>();
             this.KeyColumns = new List<DVBaseColumn>();
             this.DateColumns = new List<DVBaseColumn>();
-            this.FormLinks = new List<ObjectBasicInfo>();
+            this.ObjectLinks = new List<ObjectBasicInfo>();
            
         }
 
