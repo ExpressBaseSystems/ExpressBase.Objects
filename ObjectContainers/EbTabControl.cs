@@ -139,7 +139,7 @@ this.Init = function(id)
                 </a>
                 <div class='ebtab-add-btn eb-fb-icon'><i class='fa fa-plus' aria-hidden='true'></i></div>                
             </li>".Replace("@style@", tab.IsDynamic && tab.IsRenderMode ? "style='display : none;'": string.Empty)
-            .Replace("@title@", tab.IsDynamic && tab.IsRenderMode ? "@" + tab.EbSid_CtxId + "_title@" : tab.Title)
+            .Replace("@title@", tab.Title)
             .Replace("@ppbtn@", Common.HtmlConstants.CONT_PROP_BTN)
             .Replace("@ebsid@", tab.IsDynamic && tab.IsRenderMode ? "@" + tab.EbSid_CtxId + "_ebsid@" : tab.EbSid);
 
