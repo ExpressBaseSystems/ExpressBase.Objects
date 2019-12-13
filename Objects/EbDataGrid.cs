@@ -491,7 +491,35 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
         public override string InputControlType { get { return "EbCheckBox"; } }
-    }
+
+		public override string GetValueJSfn
+		{
+			get { return @"
+							if($('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).is(':checked'))
+							{
+							return true;
+							}
+							else{
+							return false;
+							}
+							"; }
+
+			set { }
+		}
+		public override string GetDisplayMemberJSfn
+		{
+			get { return @"
+							if($('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).is(':checked'))
+							{
+							return '✔';
+							}
+							else{
+							return '✖';
+							}
+							"; }
+			set { }
+		}
+	}
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
     [Alias("Date Column")]
@@ -1551,7 +1579,7 @@ else {pg.MakeReadWrite('ValueMember');}")]
             DBareHtml = this.EbUserSelect.GetBareHtml();
         }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [HideInPropertyGrid]
         public override EbDbTypes EbDbType
         {
@@ -1560,7 +1588,25 @@ else {pg.MakeReadWrite('ValueMember');}")]
         }
 
 
-        [EnableInBuilder(BuilderType.WebForm)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+		[HideInPropertyGrid]
+		public List<UserSelectOption> UserList
+		{
+			get { return this.EbUserSelect.UserList; }
+			set { this.EbUserSelect.UserList = value; }
+		}
+		public void InitOptions(Dictionary<int, string> Users)
+		{
+			this.EbUserSelect.InitOptions(Users);
+		}
+
+		//public override string GetDisplayMemberJSfn
+		//{
+		//	get { return @"this.getValue();"; }
+		//	set { }
+		//}
+
+		[EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
         public override string InputControlType { get { return "EbUserSelect"; } }
 
