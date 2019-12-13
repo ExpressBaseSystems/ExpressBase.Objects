@@ -34,6 +34,7 @@ namespace ExpressBase.Objects
             this.Name = "eb_loc_id";
         }
 
+        [EnableInBuilder(BuilderType.WebForm)]
         public override EbDbTypes EbDbType { get { return EbDbTypes.Decimal; } }
 
         [EnableInBuilder(BuilderType.WebForm)]
@@ -372,6 +373,15 @@ namespace ExpressBase.Objects
             }
             set { }
         }
+
+        //public override string JustSetValueJSfn
+        //{
+        //    get
+        //    {
+        //        return this.EbDate.JustSetValueJSfn;
+        //    }
+        //    set { }
+        //}
 
         public override string GetDisplayMemberJSfn
         {

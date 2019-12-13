@@ -34,6 +34,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 3)]
         public string MediaUrl { get; set; }
+
+        [DataMember(Order = 4)]
+        public string Message { get; set; }
+
+        [DataMember(Order = 5)]
+        public string To { get; set; }
+
     }
 
     [DataContract]

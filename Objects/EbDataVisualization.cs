@@ -756,27 +756,27 @@ namespace ExpressBase.Objects
     }
 
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.Calendar)]
-    public class ObjectBasicInfo : EbDataVisualizationObject
+    public class ObjectBasicInfo : EbObject
     {
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.Calendar)]
         [HideInPropertyGrid]
         public override string Name { get; set; }
 
         [HideInPropertyGrid]
-        [EnableInBuilder(BuilderType.DVBuilder,BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.Calendar)]
         public string ObjName { get; set; }
 
         [HideInPropertyGrid]
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.Calendar)]
         public string ObjDisplayName { get; set; }
 
         [HideInPropertyGrid]
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.Calendar)]
         public string Version { get; set; }
 
         [HideInPropertyGrid]
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]
-        public override string RefId { get; set; }
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.Calendar)]
+        public string ObjRefId { get; set; }
     }
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.DVBuilder, BuilderType.Calendar)]
@@ -821,6 +821,13 @@ else {
     public class ObjectBasicVis : ObjectBasicInfo
     {
 
+    }
+
+    [EnableInBuilder(BuilderType.WebForm)]
+    public class ObjectBasicReport : ObjectBasicInfo
+    {
+        [EnableInBuilder(BuilderType.WebForm)]
+        public string Title { get; set; }
     }
 
 }

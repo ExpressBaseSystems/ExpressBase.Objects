@@ -1,4 +1,5 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Application;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
 using ExpressBase.Security;
 using ServiceStack;
@@ -73,12 +74,20 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int LocationId { set; get; }
 
         public int AppId { set; get; }
+
+        public bool PullData { set; get; }
     }
 
     public class GetMobilePagesResponse
     {
         [DataMember(Order = 1)]
         public List<MobilePagesWraper> Pages { set; get; }
+
+        [DataMember(Order = 2)]
+        public EbDataSet Data { set; get; }
+
+        [DataMember(Order = 3)]
+        public List<string> TableNames { set; get; }
 
         public GetMobilePagesResponse()
         {

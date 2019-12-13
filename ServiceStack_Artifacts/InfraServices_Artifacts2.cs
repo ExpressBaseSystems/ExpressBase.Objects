@@ -555,7 +555,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string solution_id { get; set; }
     }
 
-    public class UpdateSidMapRequest : EbServiceStackAuthRequest, IReturn<UpdateSidMapResponse> { }
+    public class UpdateSidMapRequest : EbServiceStackNoAuthRequest, IReturn<UpdateSidMapResponse> { }
 
     public class UpdateSidMapResponse : IEbSSResponse
     {
@@ -576,7 +576,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 1)]
         public ResponseStatus ResponseStatus { get; set; }
     }
-    public class UpdateRedisConnectionsMqRequest : EbServiceStackAuthRequest, IReturn<UpdateRedisConnectionsMqResponse> { }
+    public class UpdateRedisConnectionsMqRequest : EbServiceStackNoAuthRequest, IReturn<UpdateRedisConnectionsMqResponse> { }
     public class UpdateRedisConnectionsMqResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]

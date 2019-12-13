@@ -1,7 +1,10 @@
-﻿using ExpressBase.Common.Extensions;
+﻿using ExpressBase.Common;
+using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
+using ExpressBase.Objects.Objects.DVRelated;
 using Newtonsoft.Json;
+using Org.BouncyCastle.Asn1.Cms;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
@@ -13,7 +16,7 @@ namespace ExpressBase.Objects
     public class EbDataLabel : EbControlUI
     {
 
-        public EbDataLabel() { }
+        public EbDataLabel() {}
 
         [OnDeserialized]
         public void OnDeserializedMethod(StreamingContext context)
@@ -21,6 +24,65 @@ namespace ExpressBase.Objects
             this.BareControlHtml = this.GetBareHtml();
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
+
+       
+
+        public override string UIchangeFns
+        {
+            get
+            {
+                return @"EbDataLabel = {
+                DescriptionLabel : function(elementId, props) {
+                 $(`#cont_${elementId} .eb-des-label`).text(props.Description);
+                },
+                Style4DataLabel : function(elementId, props) {
+                let styleVar=  getKeyByVal(EbEnums.Align , props.TextAlign.toString());
+                    if(styleVar === 'Right'){styleVar='flex-end'}
+                    else if(styleVar === 'Left'){styleVar='flex-start'}
+                $(`#cont_${elementId} .ctrl-cover`).css(`align-items`, styleVar);
+                },
+                Style4PlaceHolder : function(elementId , props){
+                 $(`#cont_${elementId} .data-dynamic-label`).css(getEbFontStyleObject(props.PlaceHolderFont));
+                }
+                }";
+            }
+        }
+
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [PropertyGroup("Identity")]
+        [OnChangeUIFunction("EbDataLabel.DescriptionLabel")]
+        public override string Description { get; set; }
+
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [PropertyGroup("Appearance")]
+        [OnChangeUIFunction("EbDataLabel.Style4DataLabel")]
+        public Align TextAlign { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+        [HideInPropertyGrid]
+        public override UISides Margin { get; set; }
+
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+        [HideInPropertyGrid]
+        public override string LabelForeColor { get; set; }
+
+        [EnableInBuilder(BuilderType.BotForm, BuilderType.UserControl)]
+        [HideInPropertyGrid]
+        public override float FontSize { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+        [HideInPropertyGrid]
+        public override string LabelBackColor { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup("Appearance")]
+        [UIproperty]
+        [PropertyEditor(PropertyEditorType.FontSelector)]
+        [OnChangeUIFunction("EbDataLabel.Style4PlaceHolder")]
+        public  EbFont PlaceHolderFont { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         public string StaticLabel { get; set; }
@@ -35,7 +97,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         public string DataObjColName { get; set; }
 
-        public bool IsRenderMode { get; set; }
+        public  override bool IsRenderMode { get; set; }
 
         [HideInPropertyGrid]
         [JsonIgnore]
@@ -46,15 +108,20 @@ namespace ExpressBase.Objects
             return new EbDataLabel() { EbSid = "Label1", Label = "Label1" }.GetDesignHtmlHelper().RemoveCR().GraveAccentQuoted(); ;
         }
 
+        //public string fontObj { get; set; }
+
         public override string GetBareHtml()
         {
             return @"
         <div class='data-static-label'> @Label@ </div>
-        <div class='data-dynamic-label'> @PlaceHolder@ </div>
+        <div class='data-Description-label' > @Description@ </div>
+        <div class='data-dynamic-label' style= ' @style@ '> @PlaceHolder@ </div>
 "
 .Replace("@name@", this.Name)
 .Replace("@Label@", this.Label)
-.Replace("@PlaceHolder@", string.IsNullOrEmpty(this.DynamicLabel) ? "PlaceHolder" : this.DynamicLabel);
+.Replace("@Description@", this.Description)
+.Replace("@PlaceHolder@", string.IsNullOrEmpty(this.DynamicLabel) ? "PlaceHolder" : this.DynamicLabel)
+.Replace("@style@", this.GetEbFontStyle());
         }
 
         public string GetDesignHtmlHelper()
@@ -62,9 +129,10 @@ namespace ExpressBase.Objects
 
             string EbCtrlHTML = @" 
             <div id='cont_@ebsid@' ebsid='@ebsid@' name='@name@' class='Eb-ctrlContainer' @childOf@ ctype='@type@' eb-hidden='@isHidden@'>
-                    <div  id='@ebsid@Wraper' class='ctrl-cover'>
+                    <div  id='@ebsid@Wraper' class='ctrl-cover' ui-inp style='align-items: @textalign@ '>
                         <div> <span class='eb-ctrl-label eb-label-editable' ui-label id='@ebsidLbl'>@Label@</span> 
                         <input id='@ebsid@lbltxtb' class='eb-lbltxtb' type='text'/> @req@  </div>
+                        <div class='eb-des-label' id='@ebLblDescription'> @Description@ </div> 
                         <div class='data-dynamic-label'> @PlaceHolder@ </div>
                     </div>
                 <span class='helpText' ui-helptxt>@helpText@ </span>
@@ -73,8 +141,11 @@ namespace ExpressBase.Objects
                .Replace("@LabelBackColor ", "background-color:" + (LabelBackColor ?? "@LabelBackColor ") + ";")
                .Replace("@name@", this.Name)
                .Replace("@Label@", this.Label)
+               .Replace("@Description@", this.Description)
+               .Replace("@textalign@", this.TextAlign.ToString())
+               .Replace("Right" , "flex-end")
+               .Replace("Left" , "flex-start")
                .Replace("@PlaceHolder@", string.IsNullOrEmpty(this.DynamicLabel) ? "PlaceHolder" : this.DynamicLabel); ;
-
             return ReplacePropsInHTML(EbCtrlHTML);
         }
 
@@ -82,17 +153,39 @@ namespace ExpressBase.Objects
         {
             string EbCtrlHTML = @" 
         <div id='cont_@ebsid@' ebsid='@ebsid@' name='@name@' class='Eb-ctrlContainer' @childOf@ ctype='@type@' eb-hidden='@isHidden@'>
-          
-           
-                <div  id='@ebsid@Wraper' class='ctrl-cover'>
+                <div  id='@ebsid@Wraper' class='ctrl-cover' ui-inp style='align-items: @style@ ;background-color: @bgColor@ ; color :@forecolor@'>        
+                 <link rel='stylesheet' type='text/css' href='@fontVal@'/>
                     @barehtml@
                 </div>
             <span class='helpText' ui-helptxt>@helpText@ </span>
         </div>"
                .Replace("@LabelForeColor ", "color:" + (LabelForeColor ?? "@LabelForeColor ") + ";")
+               .Replace("@style@", this.TextAlign.ToString())
+               .Replace("Right", "flex-end")
+               .Replace("Left", "flex-start")
+               .Replace("@bgColor@" , this.BackColor)
+               .Replace("@forecolor@", this.ForeColor)
+               .Replace("@fontVal@",(this.PlaceHolderFont==null) ? string.Empty : "https://fonts.googleapis.com/css?family=" + this.PlaceHolderFont.FontName)
                .Replace("@LabelBackColor ", "background-color:" + (LabelBackColor ?? "@LabelBackColor ") + ";");
 
             return ReplacePropsInHTML(EbCtrlHTML);
+        }
+
+        public string GetEbFontStyle()
+        {
+            string fontObj = "";
+            if (PlaceHolderFont != null) { 
+                fontObj = $"font-family : {PlaceHolderFont.FontName} ; font-size : {PlaceHolderFont.Size}px ;" +
+                    $"color : {PlaceHolderFont.color};";
+                if (PlaceHolderFont.Caps){ fontObj += "text-transform : line-through ;";}   
+                if (PlaceHolderFont.Strikethrough){ fontObj += "text-decoration : line-through ;"; }   
+                if (PlaceHolderFont.Underline){ fontObj += "text-decoration : underline ;";}
+                if (PlaceHolderFont.Style == FontStyle.BOLD) { fontObj += "font-weight : bold"; }
+                else if (PlaceHolderFont.Style == FontStyle.ITALIC) { fontObj += "font-style : italic"; }
+                else if (PlaceHolderFont.Style == FontStyle.BOLDITALIC) { fontObj += "font-weight : bold ; font-style : italic ;"; }
+
+            }
+            return fontObj;
         }
     }
 }

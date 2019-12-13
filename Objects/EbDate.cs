@@ -70,12 +70,12 @@ namespace ExpressBase.Objects
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
             //this.EbDbType = this.EbDbType;
         }
-				
-		public override string GetHtml4Bot()
-		{
-			return ReplacePropsInHTML(HtmlConstants.CONTROL_WRAPER_HTML4BOT);
-		}
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+
+        public override string GetHtml4Bot()
+        {
+            return ReplacePropsInHTML(HtmlConstants.CONTROL_WRAPER_HTML4BOT);
+        }
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         public EbDateType EbDateType { get; set; }
 
         //[EnableInBuilder(BuilderType.BotForm)]
@@ -188,7 +188,7 @@ namespace ExpressBase.Objects
 
         public override string GetBareHtml()
         {
-            return @" 
+            return @"
         <div class='input-group' style='width:100%;'>
             @IsNullable@
             <input id='@ebsid@' ui-inp data-ebtype='@data-ebtype@'  data-toggle='tooltip' title='@toolTipText@' class='date' type='text' name='@name@' autocomplete = '@autoComplete@' @value@ @tabIndex@ style='width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@ @readOnlyString@ @required@ @placeHolder@ />
@@ -208,11 +208,11 @@ namespace ExpressBase.Objects
 .Replace("@placeHolder@", "placeholder='" + this.PlaceHolder + "'")
 .Replace("@atchdLbl@", (this.EbDateType.ToString().ToLower() == "time") ? "fa-clock-o" : "fa-calendar")
 .Replace("@IsNullable@", (this.IsNullable) ? "<span class='input-group-addon nullable-check' style='padding: 0px 7px !important;'><input type='checkbox' style='min-height:unset;'></span>" : "");
-//.Replace("@fontStyle@", (this.FontSerialized != null) ?
-//                            (" font-family:" + this.FontSerialized.FontFamily + ";" + "font-style:" + this.FontSerialized.Style
-//                            + ";" + "font-size:" + this.FontSerialized.SizeInPoints + "px;")
-//                        : string.Empty)
-;
+            //.Replace("@fontStyle@", (this.FontSerialized != null) ?
+            //                            (" font-family:" + this.FontSerialized.FontFamily + ";" + "font-style:" + this.FontSerialized.Style
+            //                            + ";" + "font-size:" + this.FontSerialized.SizeInPoints + "px;")
+            //                        : string.Empty)
+            ;
         }
 
         public override string GetHtml()
@@ -223,8 +223,8 @@ namespace ExpressBase.Objects
 
             return ReplacePropsInHTML(EbCtrlHTML);
         }
-		
-		[JsonIgnore]
+
+        [JsonIgnore]
         public override string GetValueJSfn
         {
             get
@@ -242,42 +242,55 @@ namespace ExpressBase.Objects
                         return moment($('#' + this.EbSid_CtxId).val(), ebcontext.user.Preference.ShortTimePattern).format('YYYY-MM-DD HH:mm:ss');";
             }
             set { }
-		}
-	
-		[JsonIgnore]
+        }
+
+        [JsonIgnore]
         public override string SetValueJSfn
         {
             get
             {
-                return
-                    @"
-                    if(this.IsNullable && p1 !== null)
-                        $('#' + this.EbSid_CtxId).siblings('.nullable-check').find('input[type=checkbox]').prop('checked', true);
-                    if(p1 !== null && p1 !== undefined){
-                        if(this.ShowDateAs_ === 1) //month picker
-                            $('#' + this.EbSid_CtxId).val(p1);
-                        else if(this.EbDateType === 5) //Date
-                            $('#' + this.EbSid_CtxId).val(moment(p1, 'YYYY-MM-DD').format(ebcontext.user.Preference.ShortDatePattern));
-                        else if(this.EbDateType === 6) //DateTime
-                            $('#' + this.EbSid_CtxId).val(moment(p1, 'YYYY-MM-DD HH:mm:ss').format(ebcontext.user.Preference.ShortDatePattern + ' ' + ebcontext.user.Preference.ShortTimePattern));
-                        else if(this.EbDateType === 17) //Time
-                            $('#' + this.EbSid_CtxId).val(moment(p1, 'HH:mm:ss').format(ebcontext.user.Preference.ShortTimePattern));
-                        $('#' + this.EbSid_CtxId).trigger('change');
-                    }
-                    else 
-                        $('#' + this.EbSid_CtxId).val('');";
+                return @" setDate_EB.bind(this)(p1, p2);";
             }
             set { }
         }
 
         [JsonIgnore]
-        public override string GetDisplayMemberJSfn {
+        public override string JustSetValueJSfn
+        {
+            get
+            {
+                return
+                    @" justSetDate_EB.bind(this)(p1, p2);";
+            }
+            set { }
+        }
+
+        [JsonIgnore]
+        public override string GetDisplayMemberJSfn
+        {
             get
             {
                 return @"if((this.IsNullable && !($('#' + this.EbSid_CtxId).siblings('.nullable-check').find('input[type=checkbox]').prop('checked'))) || $('#' + this.EbSid_CtxId).val() === '')
                         return undefined;
                     else
                         return $('#' + this.EbSid_CtxId).val();";
+            }
+            set { }
+        }
+
+        [JsonIgnore]
+        public override string ClearJSfn
+        {
+            get
+            {
+
+                return @"
+                    debugger;
+                    console.log(this.Label);
+                    if(this.IsNullable)
+                        $('#' + this.EbSid_CtxId).siblings('.nullable-check').find('input[type=checkbox]').prop('checked', false);
+                    else
+                        return;";// cannot clear none-nullable date
             }
             set { }
         }
@@ -303,7 +316,7 @@ namespace ExpressBase.Objects
                 }
                 param.Add(DataDB.GetNewParameter(cField.Name + "_" + i, EbDbTypes.DateTime, cField.Value));
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 if (!this.IsNullable)
                     Console.WriteLine($"Found unexpected value for EbDate control field...\nName : {cField.Name}\nValue : {cField.Value}\nMessage : {e.Message}"); ;

@@ -38,9 +38,7 @@ namespace ExpressBase.Objects
         //{
         //    return @"<div eb-type='@toolName' class='tool'><i class='fa fa-puzzle-piece'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
         //}
-
-        public bool IsRenderMode { get; set; }
-
+        
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [HideInPropertyGrid]
         public override string TableName { get { return this.TableName_Temp; } set { this.TableName_Temp = value; } }
@@ -191,7 +189,7 @@ namespace ExpressBase.Objects
         //rendering side
         public override void AfterRedisGet(RedisClient Redis, IServiceClient client)
         {
-            EbFormHelper.AfterRedisGet(this, Redis, client, this.IsRenderMode);
+            EbFormHelper.AfterRedisGet(this, Redis, client);
         }
 
         public override List<string> DiscoverRelatedRefids()
