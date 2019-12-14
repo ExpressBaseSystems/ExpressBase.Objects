@@ -235,6 +235,30 @@ namespace ExpressBase.Objects
                     if ((ctrl as EbDGStringColumn).AutoSuggestion)
                         (ctrl as EbDGStringColumn).TableName = _tbl;
                 }
+                else if(ctrl is EbPowerSelect)
+                {
+                    EbPowerSelect _ctrl = ctrl as EbPowerSelect;
+                    if (_ctrl.DataSourceId.IsNullOrEmpty())
+                        throw new FormException("Set Data Reader for " + ctrl.Label);
+                    if (_ctrl.ValueMember == null)
+                        throw new FormException("Set Value Member for " + ctrl.Label);
+                    if (_ctrl.RenderAsSimpleSelect && _ctrl.DisplayMember == null)
+                        throw new FormException("Set Display Member for " + ctrl.Label);
+                    else if (_ctrl.DisplayMembers == null || _ctrl.DisplayMembers.Count == 0)
+                        throw new FormException("Set Display Members for " + ctrl.Label);
+                }
+                else if(ctrl is EbDGPowerSelectColumn)
+                {
+                    EbDGPowerSelectColumn _ctrl = ctrl as EbDGPowerSelectColumn;
+                    if (_ctrl.DataSourceId.IsNullOrEmpty())
+                        throw new FormException("Set Data Reader for " + ctrl.Label);
+                    if (_ctrl.ValueMember == null)
+                        throw new FormException("Set Value Member for " + ctrl.Label);
+                    if (_ctrl.RenderAsSimpleSelect && _ctrl.DisplayMember == null)
+                        throw new FormException("Set Display Member for " + ctrl.Label);
+                    else if (_ctrl.DisplayMembers == null || _ctrl.DisplayMembers.Count == 0)
+                        throw new FormException("Set Display Members for " + ctrl.Label);
+                }
                 else if (ctrl is EbControlContainer)
                 {
                     if(ctrl is EbTabPane && (ctrl as EbTabPane).IsDynamic)
