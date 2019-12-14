@@ -982,7 +982,29 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
         public override string GetDisplayMemberJSfn { get { return this.EbPowerSelect.GetDisplayMemberJSfn; } set { } }
 
         [JsonIgnore]
-        private EbPowerSelect EbPowerSelect { get; set; }
+        public EbPowerSelect EbPowerSelect { get; set; }
+
+        [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.WebForm, BuilderType.UserControl)]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", 1)]
+        [PropertyGroup("Behavior")]
+        [PropertyPriority(98)]
+        [OnChangeExec(@"if (this.Columns && this.Columns.$values.length === 0 ){pg.MakeReadOnly('DisplayMember');} else {pg.MakeReadWrite('DisplayMember');}")]
+        public DVBaseColumn DisplayMember { get { return this.EbPowerSelect.DisplayMember; } set { this.EbPowerSelect.DisplayMember = value; } }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+        [PropertyGroup("Behavior")]
+        [PropertyPriority(50)]
+        [OnChangeExec(@"
+if(this.RenderAsSimpleSelect == true)
+{ 
+	pg.ShowProperty('DisplayMember');
+}
+else
+{
+	pg.HideProperty('DisplayMember');
+}
+")]
+        public bool RenderAsSimpleSelect { get { return this.EbPowerSelect.RenderAsSimpleSelect; } set { this.EbPowerSelect.RenderAsSimpleSelect = value; } }
 
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
