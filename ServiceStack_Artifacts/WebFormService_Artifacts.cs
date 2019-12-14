@@ -222,7 +222,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 	public class InsertDataFromWebformResponse : IEbSSResponse
 	{
 		[DataMember(Order = 1)]
-		public string RowAffected { get; set; }
+		public int RowAffected { get; set; }
 
         [DataMember(Order = 2)]
         public int RowId { get; set; }
@@ -244,6 +244,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 8)]
         public string StackTraceInt { get; set; }
+        
+        [DataMember(Order = 9)]
+        public string AffectedEntries { get; set; }
     }
 
     [DataContract]
