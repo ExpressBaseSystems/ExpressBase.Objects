@@ -181,7 +181,7 @@ namespace ExpressBase.Objects
         //builder side - now it is using to get design html, rec call from AfterRedisGet
         public void AfterRedisGet(Service service)
         {
-            EbFormHelper.AfterRedisGet(this, service);
+            EbFormHelper.AfterRedisGet(this, service.Redis, null, service);
             foreach(EbControl c in this.Controls)
                 EbFormHelper.RenameControlsRec(c, this.Name);
         }
@@ -189,7 +189,7 @@ namespace ExpressBase.Objects
         //rendering side
         public override void AfterRedisGet(RedisClient Redis, IServiceClient client)
         {
-            EbFormHelper.AfterRedisGet(this, Redis, client);
+            EbFormHelper.AfterRedisGet(this, Redis, client, null);
         }
 
         public override List<string> DiscoverRelatedRefids()

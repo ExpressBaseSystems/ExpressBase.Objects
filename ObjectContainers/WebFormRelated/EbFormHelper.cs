@@ -86,8 +86,8 @@ namespace ExpressBase.Objects
             }
         }
 
-        //Rendering side
-        public static void AfterRedisGet(EbControlContainer _this, RedisClient Redis, IServiceClient client)
+        //Rendering side -> service = null
+        public static void AfterRedisGet(EbControlContainer _this, IRedisClient Redis, IServiceClient client, Service service)
         {
             try
             {
@@ -101,11 +101,14 @@ namespace ExpressBase.Objects
                         EbUserControl _temp = Redis.Get<EbUserControl>(c.RefId);
                         if (_temp == null)
                         {
-                            var result = client.Get<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = c.RefId });
+                            EbObjectParticularVersionResponse result = null;
+                            if (client != null)
+                                result = client.Get<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = c.RefId });
+                            else
+                                result = service.Gateway.Send<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = c.RefId });
                             _temp = EbSerializers.Json_Deserialize(result.Data[0].Json);
                             Redis.Set<EbUserControl>(c.RefId, _temp);
                         }
-                        //_temp.RefId = _this.Controls[i].RefId;
                         if (c is EbDGUserControlColumn)
                         {
                             foreach (EbControl Control in _temp.Controls)
@@ -122,18 +125,15 @@ namespace ExpressBase.Objects
                             foreach (EbControl Control in (c as EbUserControl).Controls)
                             {
                                 RenameControlsRec(Control, c.Name);
-                                //Control.ChildOf = "EbUserControl";
-                                //Control.Name = c.Name + "_" + Control.Name;
                             }
-                            //c = _temp;
-                            c.AfterRedisGet(Redis, client);
+                            c.AfterRedisGet(Redis as RedisClient, client);
                         }
                     }
                     else if (c is EbControlContainer)
                     {
                         if (c is EbTabPane && (c as EbTabPane).IsDynamic)
                             c.IsDynamicTabChild = true;
-                        AfterRedisGet(c as EbControlContainer, Redis, client);
+                        AfterRedisGet(c as EbControlContainer, Redis, client, null);
                     }
                     else if (c is EbProvisionLocation)//add unmapped ctrls as DoNotPersist controls
                     {
@@ -206,55 +206,55 @@ namespace ExpressBase.Objects
             }
         }
 
-        //Builder side - whole object get, table create, data insert
-        public static void AfterRedisGet(EbControlContainer _this, Service service)
-        {
-            try
-            {
-                for (int i = 0; i < _this.Controls.Count; i++)
-                {
-                    if (_this.Controls[i] is EbUserControl || _this.Controls[i] is EbDGUserControlColumn)
-                    {
-                        EbUserControl _temp = service.Redis.Get<EbUserControl>(_this.Controls[i].RefId);
-                        if (_temp == null)
-                        {
-                            var result = service.Gateway.Send<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = _this.Controls[i].RefId });
-                            _temp = EbSerializers.Json_Deserialize(result.Data[0].Json);
-                            service.Redis.Set<EbUserControl>(_this.Controls[i].RefId, _temp);
-                        }
-                        //_temp.RefId = _this.Controls[i].RefId;
-                        if (_this.Controls[i] is EbDGUserControlColumn)
-                        {
-                            foreach (EbControl Control in _temp.Controls)
-                            {
-                                RenameControlsRec(Control, _this.Controls[i].Name);
-                            }
-                            (_this.Controls[i] as EbDGUserControlColumn).InitUserControl(_temp);
-                        }
-                        else
-                        {
-                            (_this.Controls[i] as EbUserControl).Controls = _temp.Controls;
-                            //foreach (EbControl Control in (_this.Controls[i] as EbUserControl).Controls)
-                            //{
-                            //    RenameControlsRec(Control, _this.Controls[i].Name);
-                            //    //Control.ChildOf = "EbUserControl";
-                            //    //Control.Name = _this.Controls[i].Name + "_" + Control.Name;
-                            //}
-                            //_this.Controls[i] = _temp;
-                            (_this.Controls[i] as EbUserControl).AfterRedisGet(service);
-                        }
-                    }
-                    else if (_this.Controls[i] is EbControlContainer)
-                    {
-                        AfterRedisGet(_this.Controls[i] as EbControlContainer, service);
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("EXCEPTION : EbFormAfterRedisGet(service) " + e.Message);
-            }
-        }
+        ////Builder side - whole object get, table create, data insert
+        //public static void AfterRedisGet(EbControlContainer _this, Service service)
+        //{
+        //    try
+        //    {
+        //        for (int i = 0; i < _this.Controls.Count; i++)
+        //        {
+        //            if (_this.Controls[i] is EbUserControl || _this.Controls[i] is EbDGUserControlColumn)
+        //            {
+        //                EbUserControl _temp = service.Redis.Get<EbUserControl>(_this.Controls[i].RefId);
+        //                if (_temp == null)
+        //                {
+        //                    var result = service.Gateway.Send<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = _this.Controls[i].RefId });
+        //                    _temp = EbSerializers.Json_Deserialize(result.Data[0].Json);
+        //                    service.Redis.Set<EbUserControl>(_this.Controls[i].RefId, _temp);
+        //                }
+        //                //_temp.RefId = _this.Controls[i].RefId;
+        //                if (_this.Controls[i] is EbDGUserControlColumn)
+        //                {
+        //                    foreach (EbControl Control in _temp.Controls)
+        //                    {
+        //                        RenameControlsRec(Control, _this.Controls[i].Name);
+        //                    }
+        //                    (_this.Controls[i] as EbDGUserControlColumn).InitUserControl(_temp);
+        //                }
+        //                else
+        //                {
+        //                    (_this.Controls[i] as EbUserControl).Controls = _temp.Controls;
+        //                    //foreach (EbControl Control in (_this.Controls[i] as EbUserControl).Controls)
+        //                    //{
+        //                    //    RenameControlsRec(Control, _this.Controls[i].Name);
+        //                    //    //Control.ChildOf = "EbUserControl";
+        //                    //    //Control.Name = _this.Controls[i].Name + "_" + Control.Name;
+        //                    //}
+        //                    //_this.Controls[i] = _temp;
+        //                    (_this.Controls[i] as EbUserControl).AfterRedisGet(service);
+        //                }
+        //            }
+        //            else if (_this.Controls[i] is EbControlContainer)
+        //            {
+        //                AfterRedisGet(_this.Controls[i] as EbControlContainer, service);
+        //            }
+        //        }
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Console.WriteLine("EXCEPTION : EbFormAfterRedisGet(service) " + e.Message);
+        //    }
+        //}
 
         public static void RenameControlsRec(EbControl _control, string _ucName)
         {
@@ -276,28 +276,28 @@ namespace ExpressBase.Objects
             }
         }
 
-        public static void InitDataPushers(EbWebForm _this, Service service)
-        {
-            if (_this.DataPushers != null)
-            {
-                foreach (EbDataPusher pusher in _this.DataPushers)
-                {
-                    EbWebForm _form = service.Redis.Get<EbWebForm>(pusher.FormRefId);
-                    if (_form == null)
-                    {
-                        EbObjectParticularVersionResponse result = service.Gateway.Send<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = pusher.FormRefId });
-                        _form = EbSerializers.Json_Deserialize(result.Data[0].Json);
-                        service.Redis.Set<EbWebForm>(pusher.FormRefId, _form);
-                    }
-                    _form.AfterRedisGet(service);
-                    _form.DataPusherConfig = new EbDataPusherConfig { SourceTable = _this.FormSchema.MasterTable, MultiPushId = _this.RefId + "_" + pusher.Name };
-                    pusher.WebForm = _form;
-                    _this.ExeDataPusher = true;
-                }
-            }
-        }
+        //public static void InitDataPushers(EbWebForm _this, Service service)
+        //{
+        //    if (_this.DataPushers != null)
+        //    {
+        //        foreach (EbDataPusher pusher in _this.DataPushers)
+        //        {
+        //            EbWebForm _form = service.Redis.Get<EbWebForm>(pusher.FormRefId);
+        //            if (_form == null)
+        //            {
+        //                EbObjectParticularVersionResponse result = service.Gateway.Send<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = pusher.FormRefId });
+        //                _form = EbSerializers.Json_Deserialize(result.Data[0].Json);
+        //                service.Redis.Set<EbWebForm>(pusher.FormRefId, _form);
+        //            }
+        //            _form.AfterRedisGet(service);
+        //            _form.DataPusherConfig = new EbDataPusherConfig { SourceTable = _this.FormSchema.MasterTable, MultiPushId = _this.RefId + "_" + pusher.Name };
+        //            pusher.WebForm = _form;
+        //            _this.ExeDataPusher = true;
+        //        }
+        //    }
+        //}
 
-        public static void InitDataPushers(EbWebForm _this, RedisClient Redis, IServiceClient client)
+        public static void InitDataPushers(EbWebForm _this, IRedisClient Redis, IServiceClient client, Service service)
         {
             if (_this.DataPushers != null)
             {
@@ -306,11 +306,15 @@ namespace ExpressBase.Objects
                     EbWebForm _form = Redis.Get<EbWebForm>(pusher.FormRefId);
                     if (_form == null)
                     {
-                        EbObjectParticularVersionResponse result = client.Get<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = pusher.FormRefId });
+                        EbObjectParticularVersionResponse result;
+                        if (client != null)
+                            result = client.Get<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = pusher.FormRefId });
+                        else
+                            result = service.Gateway.Send<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = pusher.FormRefId });
                         _form = EbSerializers.Json_Deserialize(result.Data[0].Json);
                         Redis.Set<EbWebForm>(pusher.FormRefId, _form);
                     }
-                    _form.AfterRedisGet(Redis, client);
+                    _form.AfterRedisGet(Redis as RedisClient, client);
                     _form.DataPusherConfig = new EbDataPusherConfig { SourceTable = _this.FormSchema.MasterTable, MultiPushId = _this.RefId + "_" + pusher.Name };
                     pusher.WebForm = _form;
                     _this.ExeDataPusher = true;

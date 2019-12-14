@@ -192,11 +192,11 @@ namespace ExpressBase.Objects
                         }
                     }
 
-                    if (!DataGrid.DataSourceId.IsNullOrEmpty())
+                    if (!DataGrid.DataSourceId.IsNullOrEmpty() && serviceClient != null)
                         DataGrid.InitDSRelated(serviceClient, redis, Allctrls);
 
                 }
-                else if (Allctrls[i] is EbProvisionUser)
+                else if (Allctrls[i] is EbProvisionUser && serviceClient != null)
                 {
                     CheckEmailConAvailableResponse Resp = serviceClient.Post<CheckEmailConAvailableResponse>(new CheckEmailConAvailableRequest { });
                     if (!Resp.ConnectionAvailable)
@@ -204,96 +204,53 @@ namespace ExpressBase.Objects
                 }
             }
 
-            GetSuggestionTableName(this, this.TableName);
+            PerformRequirdUpdate(this, this.TableName);
 
             CalcValueExprDependency();
-        }
-
-        public void GetSuggestionTableName(EbControlContainer _cont, string _tbl)
-        {
-            foreach (EbControl ctrl in _cont.Controls)
-            {
-                try
-                {
-                    if (ctrl is EbTextBox)
-                    {
-                        if ((ctrl as EbTextBox).AutoSuggestion)
-                            (ctrl as EbTextBox).TableName = _tbl;
-                    }
-                    else if (ctrl is EbDGStringColumn)
-                    {
-                        if ((ctrl as EbDGStringColumn).AutoSuggestion)
-                            (ctrl as EbDGStringColumn).TableName = _tbl;
-                    }
-                    else if (ctrl is EbControlContainer)
-                    {
-                        string t = _tbl;
-                        if (ctrl is EbTableLayout || ctrl is EbTableTd || ctrl is EbTabControl || ctrl is EbTabPane)///////table name filling
-                            (ctrl as EbControlContainer).TableName = _tbl;
-                        if (!(ctrl as EbControlContainer).TableName.IsNullOrEmpty())
-                            t = (ctrl as EbControlContainer).TableName;
-                        GetSuggestionTableName(ctrl as EbControlContainer, t);
-                    }
-
-                }
-                catch (Exception e)
-                {
-                    ;
-                }
-            }
         }
 
         public void BeforeSave(Service service)
         {
-            Dictionary<string, string> tbls = new Dictionary<string, string>();
-            if (string.IsNullOrEmpty(this.TableName))
-                throw new FormException("Please enter a valid form table name");
-            tbls.Add(this.TableName, "form table");
-            EbControl[] Allctrls = this.Controls.FlattenAllEbControls();
-            for (int i = 0; i < Allctrls.Length; i++)
-            {
-                if (Allctrls[i] is EbApproval)
-                {
-                    string _tn = (Allctrls[i] as EbApproval).TableName;
-                    if (string.IsNullOrEmpty(_tn))
-                        throw new FormException("Please enter a valid table name for approval control : " + Allctrls[i].Label);
-                    if (tbls.ContainsKey(_tn))
-                        throw new FormException(string.Format("Same table '{0}' not allowed for {1} and approval control {2}", _tn, tbls[_tn], Allctrls[i].Label));
-                    tbls.Add(_tn, "approval control " + Allctrls[i].Label);
-                }
-                else if (Allctrls[i] is EbDataGrid)
-                {
-                    string _tn = (Allctrls[i] as EbDataGrid).TableName;
-                    if (string.IsNullOrEmpty((Allctrls[i] as EbDataGrid).TableName))
-                        throw new FormException("Please enter a valid table name for data grid : " + Allctrls[i].Label);
-                    if (tbls.ContainsKey(_tn))
-                        throw new FormException(string.Format("Same table '{0}' not allowed for {1} and data grid {2}", _tn, tbls[_tn], Allctrls[i].Label));
-                    tbls.Add(_tn, "data grid " + Allctrls[i].Label);
-
-                    for (int j = 0; j < (Allctrls[i] as EbDataGrid).Controls.Count; j++)
-                    {
-                        if ((Allctrls[i] as EbDataGrid).Controls[j] is EbDGUserControlColumn)
-                        {
-                            EbDGColumn DGColumn = (Allctrls[i] as EbDataGrid).Controls[j] as EbDGColumn;
-
-                            ((Allctrls[i] as EbDataGrid).Controls[j] as EbDGUserControlColumn).Columns = new List<EbControl>();
-
-                        }
-                    }
-                }
-                //else if(Allctrls[i] is EbProvisionUser)
-                //{
-                //    if (service is EbBaseService)
-                //    {
-                //        if ((service as EbBaseService).EbConnectionFactory.EmailConnection.Primary == null)
-                //            throw new FormException("Please configure a email connection, it is required for EbProvisionUser control.");
-                //    }
-                //}
-            }
-
-            CalcValueExprDependency();
+            this.BeforeSave(null, null);
         }
 
+        public void PerformRequirdUpdate(EbControlContainer _cont, string _tbl)
+        {
+            if (_cont is EbDataGrid && _cont.IsDynamicTabChild)
+            {
+                _cont.IsDynamicTabChild = false;
+            }
+            foreach (EbControl ctrl in _cont.Controls)
+            {
+                ctrl.IsDynamicTabChild = _cont.IsDynamicTabChild;
+                if (ctrl.IsDynamicTabChild && !(ctrl is EbDataGrid))
+                    ctrl.DoNotPersist = true;
+                if (ctrl is EbTextBox)
+                {
+                    if ((ctrl as EbTextBox).AutoSuggestion)
+                        (ctrl as EbTextBox).TableName = _tbl;
+                }
+                else if (ctrl is EbDGStringColumn)
+                {
+                    if ((ctrl as EbDGStringColumn).AutoSuggestion)
+                        (ctrl as EbDGStringColumn).TableName = _tbl;
+                }
+                else if (ctrl is EbControlContainer)
+                {
+                    if(ctrl is EbTabPane && (ctrl as EbTabPane).IsDynamic)
+                    {
+                        ctrl.IsDynamicTabChild = true;
+                    }
+                    string t = _tbl;
+                    if (ctrl is EbTableLayout || ctrl is EbTableTd || ctrl is EbTabControl || ctrl is EbTabPane)///////table name filling
+                        (ctrl as EbControlContainer).TableName = _tbl;
+                    if (!(ctrl as EbControlContainer).TableName.IsNullOrEmpty())
+                        t = (ctrl as EbControlContainer).TableName;
+                    this.PerformRequirdUpdate(ctrl as EbControlContainer, t);
+                }
+            }
+        }
+        
         //Populate Property DependedValExp
         private void CalcValueExprDependency()
         {
@@ -2851,16 +2808,16 @@ namespace ExpressBase.Objects
 
         public void AfterRedisGet(Service service)
         {
-            EbFormHelper.AfterRedisGet(this, service);
+            EbFormHelper.AfterRedisGet(this, service.Redis, null, service);
             this.GetWebFormSchema();
-            EbFormHelper.InitDataPushers(this, service);
+            EbFormHelper.InitDataPushers(this, service.Redis, null, service);
         }
 
         public override void AfterRedisGet(RedisClient Redis, IServiceClient client)
         {
-            EbFormHelper.AfterRedisGet(this, Redis, client);
+            EbFormHelper.AfterRedisGet(this, Redis, client, null);
             this.GetWebFormSchema();
-            EbFormHelper.InitDataPushers(this, Redis, client);
+            EbFormHelper.InitDataPushers(this, Redis, client, null);
         }
 
         public override List<string> DiscoverRelatedRefids()
