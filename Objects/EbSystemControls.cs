@@ -147,6 +147,8 @@ namespace ExpressBase.Objects
             {
                 return @"
                     if(this.IsDisable){
+                        if(!p1)
+                            return false;                        
                         let arr = p1.split('$$');
                         $('#' + this.EbSid_CtxId).attr('data-id', arr[0]);
                         $('#' + this.EbSid_CtxId).val(arr[1]).trigger('change');
@@ -292,7 +294,10 @@ namespace ExpressBase.Objects
         {
             get
             {
-                return @"let arr = p1.split('$$');
+                return @"
+                        if(!p1)
+                            return false;
+                        let arr = p1.split('$$');
                         $('#' + this.EbSid_CtxId).attr('data-id', arr[0]);
                         $('#' + this.EbSid_CtxId).text(arr[1]).trigger('change');
 						let imgsrc='/images/dp/'+ arr[0] +'.png';
@@ -614,7 +619,10 @@ namespace ExpressBase.Objects
         {
             get
             {
-                return @"let arr = p1.split('$$');
+                return @"
+                        if(!p1)
+                            return false;
+                        let arr = p1.split('$$');
                         $('#' + this.EbSid_CtxId).attr('data-id', arr[0]);
                         $('#' + this.EbSid_CtxId).text(arr[1]).trigger('change');
 						let imgsrc='/images/dp/'+ arr[0] +'.png';
