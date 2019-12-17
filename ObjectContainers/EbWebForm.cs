@@ -769,8 +769,10 @@ namespace ExpressBase.Objects
                     foreach (EbDataRow _row in response.DataSet.Tables[0].Rows)
                     {
                         SingleRow Row = new SingleRow();
-                        if (response.DataSet.Tables[0].Columns["id"] != null)
-                            Row.RowId = Convert.ToInt32(response.DataSet.Tables[0].Columns["id"]);// assuming id is RowId
+                        //if (response.DataSet.Tables[0].Columns["id"] != null)
+                        //    Row.RowId = Convert.ToInt32(response.DataSet.Tables[0].Columns["id"]);// assuming id is RowId
+                        //else
+                        Row.RowId = --RowId;
                         foreach (ColumnSchema _column in _sc.Columns)
                         {
                             EbDataColumn dc = response.DataSet.Tables[0].Columns[_column.ColumnName];
