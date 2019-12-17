@@ -113,7 +113,8 @@ namespace ExpressBase.Objects
 
 
         public override string EnableJSfn 
-        { get 
+        {
+            get 
             {
                 if (this.IsDisable)
                 {
@@ -148,13 +149,18 @@ namespace ExpressBase.Objects
                     if(this.IsDisable){
                         let arr = p1.split('$$');
                         $('#' + this.EbSid_CtxId).attr('data-id', arr[0]);
-                        $('#' + this.EbSid_CtxId).val(arr[1]).trigger('change');}
+                        $('#' + this.EbSid_CtxId).val(arr[1]).trigger('change');
+                    }
                     else
                         $('#' + this.EbSid_CtxId).val(p1).trigger('change');
                     ";
             }
             set { }
         }
+
+        public override string RefreshJSfn { get { return @""; } set { } }
+
+        public override string ClearJSfn { get { return @""; } set { } }
 
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
@@ -163,7 +169,8 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
         public override bool DoNotPersist 
-        { get 
+        {
+            get 
             {
                 if (this.IsDisable == true)
                     return true;
@@ -303,7 +310,11 @@ namespace ExpressBase.Objects
 			set { }
 		}
 
-		[EnableInBuilder(BuilderType.WebForm)]
+        public override string RefreshJSfn { get { return @""; } set { } }
+
+        public override string ClearJSfn { get { return @""; } set { } }
+
+        [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
         public override bool IsSysControl { get { return true; } }
 
@@ -388,6 +399,24 @@ namespace ExpressBase.Objects
             get
             {
                 return this.EbDate.GetDisplayMemberJSfn;
+            }
+            set { }
+        }
+
+        public override string RefreshJSfn
+        {
+            get
+            {
+                return this.EbDate.RefreshJSfn;
+            }
+            set { }
+        }
+
+        public override string ClearJSfn
+        {
+            get
+            {
+                return this.EbDate.ClearJSfn;
             }
             set { }
         }
@@ -603,7 +632,11 @@ namespace ExpressBase.Objects
 			set { }
 		}
 
-		[EnableInBuilder(BuilderType.WebForm)]
+        public override string RefreshJSfn { get { return @""; } set { } }
+
+        public override string ClearJSfn { get { return @""; } set { } }
+
+        [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
         public override bool IsSysControl { get { return true; } }
 
@@ -679,6 +712,24 @@ namespace ExpressBase.Objects
             get
             {
                 return this.EbDate.GetDisplayMemberJSfn;
+            }
+            set { }
+        }
+        
+        public override string RefreshJSfn
+        {
+            get
+            {
+                return this.EbDate.RefreshJSfn;
+            }
+            set { }
+        }
+
+        public override string ClearJSfn
+        {
+            get
+            {
+                return this.EbDate.ClearJSfn;
             }
             set { }
         }

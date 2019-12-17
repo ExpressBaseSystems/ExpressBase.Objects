@@ -1296,6 +1296,26 @@ else
             set { }
         }
 
+        [JsonIgnore]
+        public override string RefreshJSfn
+        {
+            get
+            {
+                return this.EbSysCreatedBy.RefreshJSfn;
+            }
+            set { }
+        }
+
+        [JsonIgnore]
+        public override string ClearJSfn
+        {
+            get
+            {
+                return this.EbSysCreatedBy.ClearJSfn;
+            }
+            set { }
+        }
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [HideInPropertyGrid]
         public override bool DoNotPersist { get { return true; } }
@@ -1402,6 +1422,23 @@ else
             set { }
         }
 
+        public override string RefreshJSfn
+        {
+            get
+            {
+                return this.EbSysCreatedAt.RefreshJSfn;
+            }
+            set { }
+        }
+
+        public override string ClearJSfn
+        {
+            get
+            {
+                return this.EbSysCreatedAt.ClearJSfn;
+            }
+            set { }
+        }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [HideInPropertyGrid]
@@ -1500,6 +1537,24 @@ else
             get
             {
                 return this.EbSysModifiedBy.GetDisplayMemberJSfn;
+            }
+            set { }
+        }
+
+        public override string RefreshJSfn
+        {
+            get
+            {
+                return this.EbSysModifiedBy.RefreshJSfn;
+            }
+            set { }
+        }
+
+        public override string ClearJSfn
+        {
+            get
+            {
+                return this.EbSysModifiedBy.ClearJSfn;
             }
             set { }
         }
@@ -1607,6 +1662,24 @@ else
             get
             {
                 return this.EbSysModifiedAt.GetDisplayMemberJSfn;
+            }
+            set { }
+        }
+
+        public override string RefreshJSfn
+        {
+            get
+            {
+                return this.EbSysModifiedAt.RefreshJSfn;
+            }
+            set { }
+        }
+
+        public override string ClearJSfn
+        {
+            get
+            {
+                return this.EbSysModifiedAt.ClearJSfn;
             }
             set { }
         }
