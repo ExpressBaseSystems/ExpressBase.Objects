@@ -219,6 +219,7 @@ namespace ExpressBase.Objects
             if (_cont is EbDataGrid && _cont.IsDynamicTabChild)
             {
                 _cont.IsDynamicTabChild = false;
+                (_cont as EbDataGrid).IsAddable = false;
             }
             foreach (EbControl ctrl in _cont.Controls)
             {
@@ -766,11 +767,15 @@ namespace ExpressBase.Objects
 
                     int RowId = 0;
                     foreach (EbDataRow _row in response.DataSet.Tables[0].Rows)
-                    {                        
-                        SingleRow Row = new SingleRow() { RowId = --RowId };
+                    {
+                        SingleRow Row = new SingleRow();
+                        //if (response.DataSet.Tables[0].Columns["id"] != null)
+                        //    Row.RowId = Convert.ToInt32(response.DataSet.Tables[0].Columns["id"]);// assuming id is RowId
+                        //else
+                        Row.RowId = --RowId;
                         foreach (ColumnSchema _column in _sc.Columns)
                         {
-                            EbDataColumn dc = response.DataSet.Tables[0].Rows.Table.Columns[_column.ColumnName];
+                            EbDataColumn dc = response.DataSet.Tables[0].Columns[_column.ColumnName];
                             if (dc != null && !_row.IsDBNull(dc.ColumnIndex))
                             {
                                 object _unformattedData = _row[dc.ColumnIndex];
