@@ -350,6 +350,12 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         public override string ShowJSfn { get { return @""; } set { } }
 
+        [JsonIgnore]
+        public override string AddInvalidStyleJSFn { get { return @"DGaddInvalidStyle.bind(this)(p1, p2, p3);"; } set { } }
+
+        [JsonIgnore]
+        public override string RemoveInvalidStyleJSFn { get { return @"DGremoveInvalidStyle.bind(this)(p1, p2);"; } set { } }
+
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [UIproperty]
