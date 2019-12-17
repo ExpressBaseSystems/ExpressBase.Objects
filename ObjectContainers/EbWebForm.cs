@@ -236,7 +236,7 @@ namespace ExpressBase.Objects
                     if ((ctrl as EbDGStringColumn).AutoSuggestion)
                         (ctrl as EbDGStringColumn).TableName = _tbl;
                 }
-                else if(ctrl is EbPowerSelect)
+                else if (ctrl is EbPowerSelect)
                 {
                     EbPowerSelect _ctrl = ctrl as EbPowerSelect;
                     if (_ctrl.DataSourceId.IsNullOrEmpty())
@@ -248,21 +248,21 @@ namespace ExpressBase.Objects
                     else if (_ctrl.DisplayMembers == null || _ctrl.DisplayMembers.Count == 0)
                         throw new FormException("Set Display Members for " + ctrl.Label);
                 }
-                else if(ctrl is EbDGPowerSelectColumn)
+                else if (ctrl is EbDGPowerSelectColumn)
                 {
                     EbDGPowerSelectColumn _ctrl = ctrl as EbDGPowerSelectColumn;
                     if (_ctrl.DataSourceId.IsNullOrEmpty())
-                        throw new FormException("Set Data Reader for " + ctrl.Label);
+                        throw new FormException("Set Data Reader for " + ctrl.Name);
                     if (_ctrl.ValueMember == null)
-                        throw new FormException("Set Value Member for " + ctrl.Label);
+                        throw new FormException("Set Value Member for " + ctrl.Name);
                     if (_ctrl.RenderAsSimpleSelect && _ctrl.DisplayMember == null)
-                        throw new FormException("Set Display Member for " + ctrl.Label);
-                    else if (_ctrl.DisplayMembers == null || _ctrl.DisplayMembers.Count == 0)
-                        throw new FormException("Set Display Members for " + ctrl.Label);
+                        throw new FormException("Set Display Member for " + ctrl.Name);
+                    else if (!_ctrl.RenderAsSimpleSelect && (_ctrl.DisplayMembers == null || _ctrl.DisplayMembers.Count == 0))
+                        throw new FormException("Set Display Members for " + ctrl.Name);
                 }
                 else if (ctrl is EbControlContainer)
                 {
-                    if(ctrl is EbTabPane && (ctrl as EbTabPane).IsDynamic)
+                    if (ctrl is EbTabPane && (ctrl as EbTabPane).IsDynamic)
                     {
                         ctrl.IsDynamicTabChild = true;
                     }
@@ -275,7 +275,7 @@ namespace ExpressBase.Objects
                 }
             }
         }
-        
+
         //Populate Property DependedValExp
         private void CalcValueExprDependency()
         {
@@ -765,6 +765,7 @@ namespace ExpressBase.Objects
                     SingleTable Table = new SingleTable();
                     Dictionary<EbDGPowerSelectColumn, string> psDict = new Dictionary<EbDGPowerSelectColumn, string>();
 
+                    int RowId = 0;
                     foreach (EbDataRow _row in response.DataSet.Tables[0].Rows)
                     {
                         SingleRow Row = new SingleRow();
@@ -1132,7 +1133,7 @@ namespace ExpressBase.Objects
                 }
                 else
                 {
-                    for(int k = 0; k < dataTable.Columns.Count; k++)
+                    for (int k = 0; k < dataTable.Columns.Count; k++)
                     {
                         this.GetFormattedColumn(dataTable.Columns[k], dataRow, Row, null);
                     }
@@ -1160,7 +1161,7 @@ namespace ExpressBase.Objects
 
             if (dataColumn == null || dataRow.IsDBNull(dataColumn.ColumnIndex))
             {
-                
+
             }
             else if (_control != null)
             {
@@ -1666,13 +1667,13 @@ namespace ExpressBase.Objects
                 resp += " - AfterSave: " + this.AfterSave(DataDB, IsUpdate);
                 this.DbTransaction.Commit();
             }
-            catch(Exception ex1)
+            catch (Exception ex1)
             {
                 try
                 {
                     this.DbTransaction.Rollback();
                 }
-                catch(Exception ex2)
+                catch (Exception ex2)
                 {
                     Console.WriteLine($"Rollback Exception Type: {ex2.GetType()}\nMessage: {ex2.Message}");
                 }
@@ -2349,7 +2350,7 @@ namespace ExpressBase.Objects
                 }
             }
         }
-        
+
         private int UpdateAuditTrail(IDatabase DataDB, List<AuditTrailInsertData> Data)
         {
             List<DbParameter> parameters = new List<DbParameter>
