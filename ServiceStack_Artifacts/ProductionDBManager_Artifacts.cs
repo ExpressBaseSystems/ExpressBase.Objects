@@ -140,4 +140,31 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
         
     }
+
+    public class GetScriptsForDiffViewRequest : IEbTenentRequest, IReturn<GetScriptsForDiffViewResponse>
+    {
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
+
+        public string SolutionId { get; set; }
+
+        public string FileHeader { get; set; }
+
+        public string FilePath { get; set; }
+
+        public string FileType { get; set; }
+    }
+
+    public class GetScriptsForDiffViewResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        public string InfraFileContent { get; set; }
+
+        public string TenantFileContent { get; set; }
+
+        public List<string> Result { get; set; }
+    }
 }
