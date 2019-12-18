@@ -330,10 +330,18 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         public override string GetValueJSfn
         {
-            get { return @"let val = $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val(); return (this.ObjType === 'Numeric') ?  (parseFloat($('#' + this.EbSid_CtxId).val()) || 0) :val;"; }
+            get { return @"return this.DataVals.Value"; }
 
             set { }
         }
+
+        //[JsonIgnore]
+        //public override string GetValueJSfn
+        //{
+        //    get { return @"let val = $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val(); return (this.ObjType === 'Numeric') ?  (parseFloat($('#' + this.EbSid_CtxId).val()) || 0) :val;"; }
+
+        //    set { }
+        //}
 
         [JsonIgnore]
         public override string EnableJSfn { get { return @"$('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] .ctrl-cover *`).prop('disabled',false).css('pointer-events', 'inherit').find('input').css('background-color','#fff');"; } set { } }
@@ -498,7 +506,7 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public override string InputControlType { get { return "EbCheckBox"; } }
 
-        public override string GetValueJSfn
+        public override string GetValueFromDOMJSfn
         {
             get { return @"
 							if($('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).is(':checked'))
@@ -512,6 +520,7 @@ namespace ExpressBase.Objects
 
             set { }
         }
+
         public override string GetDisplayMemberJSfn
         {
             get { return @"
@@ -562,7 +571,7 @@ namespace ExpressBase.Objects
         }
 
         [JsonIgnore]
-        public override string GetValueJSfn
+        public override string GetValueFromDOMJSfn
         {
             get
             {
@@ -814,7 +823,7 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
             set { }
         }
 
-        public override string GetValueJSfn
+        public override string GetValueFromDOMJSfn
         {
             get
             {
@@ -1253,7 +1262,7 @@ else
         //}
 
         [JsonIgnore]
-        public override string GetValueJSfn
+        public override string GetValueFromDOMJSfn
         {
             get
             {
@@ -1380,7 +1389,7 @@ else
         //}
 
         [JsonIgnore]
-        public override string GetValueJSfn
+        public override string GetValueFromDOMJSfn
         {
             get
             {
@@ -1498,7 +1507,7 @@ else
         //}
 
         [JsonIgnore]
-        public override string GetValueJSfn
+        public override string GetValueFromDOMJSfn
         {
             get
             {
@@ -1624,7 +1633,7 @@ else
         //}
 
         [JsonIgnore]
-        public override string GetValueJSfn
+        public override string GetValueFromDOMJSfn
         {
             get
             {
