@@ -563,14 +563,14 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-    public class UpdateSidMapMqRequest : EbServiceStackNoAuthRequest, IReturn<UpdateSidMapMqResponse> { }
+    public class UpdateSidMapMqRequest : EbServiceStackAuthRequest, IReturn<UpdateSidMapMqResponse> { }
 
     public class UpdateSidMapMqResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
         public ResponseStatus ResponseStatus { get; set; }
     }
-    public class UpdateRedisConnectionsRequest : EbServiceStackNoAuthRequest, IReturn<UpdateRedisConnectionsResponse> { }
+    public class UpdateRedisConnectionsRequest : EbServiceStackAuthRequest, IReturn<UpdateRedisConnectionsResponse> { }
     public class UpdateRedisConnectionsResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]

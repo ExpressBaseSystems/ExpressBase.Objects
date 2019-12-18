@@ -150,9 +150,31 @@ namespace ExpressBase.Objects.Objects.DVRelated
         Medium = 1
     }
 
+    public enum AggregateFun
+    {
+        Count = 0,
+        Sum = 1
+    }
+
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
     public class DVBaseColumn : EbDataVisualizationObject
     {
+
+        public DVBaseColumn()
+        {
+            _Formula = new EbScript();
+            this.StaticParameters = new List<StaticParam>();
+            this.FormParameters = new List<DVBaseColumn>();
+            this.FormId = new List<DVBaseColumn>();
+            this.ParentColumn = new List<DVBaseColumn>();
+            this.GroupingColumn = new List<DVBaseColumn>();
+            this.GroupFormParameters = new List<DVBaseColumn>();
+            this.GroupFormId = new List<DVBaseColumn>();
+            this.ItemFormParameters = new List<DVBaseColumn>();
+            this.ItemFormId = new List<DVBaseColumn>();
+            this.InfoWindow = new List<DVBaseColumn>();
+        }
+
         [JsonProperty(PropertyName = "data")]
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
         [HideInPropertyGrid]
@@ -411,6 +433,9 @@ else if(this.FormMode === 2){
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]        
         public string HeaderTooltipText { get; set; }
 
+        [EnableInBuilder(BuilderType.Calendar)]
+        public AggregateFun AggregateFun { get; set; }
+
         [JsonIgnore]
         private List<string> __formulaDataFieldsUsed = null;
         [JsonIgnore]
@@ -473,20 +498,6 @@ else if(this.FormMode === 2){
         public DVBaseColumn ShallowCopy()
         {
             return (DVBaseColumn)this.MemberwiseClone();
-        }
-
-        public DVBaseColumn()
-        {
-            this.StaticParameters = new List<StaticParam>();
-            this.FormParameters = new List<DVBaseColumn>();
-            this.FormId = new List<DVBaseColumn>();
-            this.ParentColumn = new List<DVBaseColumn>();
-            this.GroupingColumn = new List<DVBaseColumn>();
-            this.GroupFormParameters = new List<DVBaseColumn>();
-            this.GroupFormId = new List<DVBaseColumn>();
-            this.ItemFormParameters = new List<DVBaseColumn>();
-            this.ItemFormId = new List<DVBaseColumn>();
-            this.InfoWindow = new List<DVBaseColumn>();
         }
 
         public bool Check4FormLink()
@@ -949,6 +960,18 @@ pg.HideProperty('FormMode');
         {
             this.ConditionalFormating = new List<ColumnCondition>();
         }
+    }
+
+    [EnableInBuilder(BuilderType.Calendar)]
+    public class CalendarDynamicColumn: DVBaseColumn
+    {
+        [EnableInBuilder(BuilderType.Calendar)]
+        [HideInPropertyGrid]
+        public DateTime StartDT { get; set; }
+        
+        [EnableInBuilder(BuilderType.Calendar)]
+        [HideInPropertyGrid]
+        public DateTime EndDT { get; set; }
     }
 
     [EnableInBuilder(BuilderType.DVBuilder)]

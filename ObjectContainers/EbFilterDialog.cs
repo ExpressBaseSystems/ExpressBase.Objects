@@ -143,12 +143,12 @@ namespace ExpressBase.Objects
 
         public void AfterRedisGet(Service service)
         {
-            EbFormHelper.AfterRedisGet(this, service);
+            EbFormHelper.AfterRedisGet(this, service.Redis, null, service);
         }
 
         public override void AfterRedisGet(RedisClient Redis, IServiceClient client)
         {
-            EbFormHelper.AfterRedisGet(this, Redis, client);
+            EbFormHelper.AfterRedisGet(this, Redis, client, null);
         }
 
         public override List<string> DiscoverRelatedRefids()

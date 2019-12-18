@@ -57,18 +57,7 @@ namespace ExpressBase.Objects
         {
             get
             {
-                return @"
-                    isContained = false;
-                    $('#' + this.EbSid_CtxId + ' option').each(function () {
-                        if ($(this).attr('value') == p1) {
-                            isContained = true;
-                            return false;
-                        }
-                    });
-
-                    if(!isContained)
-                        return;
-                    $('#' + this.EbSid_CtxId).selectpicker('val', p1)";
+                return JSFnsConstants.EbSimpleSelect_JustSetValueJSfn;
             }
             set { }
         }
@@ -77,7 +66,7 @@ namespace ExpressBase.Objects
         {
             get
             {
-                return this.JustSetValueJSfn + ".trigger('change');";
+                return JSFnsConstants.SS_SetValueJSfn;
             }
             set { }
         }
@@ -86,11 +75,7 @@ namespace ExpressBase.Objects
         {
             get
             {
-                return @"
-                    let val = $('#' + this.EbSid_CtxId).selectpicker('val');
-                    val = (val === null) ? '-1' : val.toString();
-                    return val;
-                ";
+                return JSFnsConstants.EbSimpleSelect_GetValueJSfn;
             }
             set { }
         }
@@ -99,9 +84,7 @@ namespace ExpressBase.Objects
         {
             get
             {
-                return @"
-                    return !this.isInVisibleInUI ? (!isNaNOrEmpty(this.getValue()) && (this.getValue() !== '-1')) : true;
-                ";
+                return JSFnsConstants.SS_IsRequiredOKJSfn;
             }
             set { }
         }
@@ -110,9 +93,7 @@ namespace ExpressBase.Objects
         {
             get
             {
-                return @"
-                    return $('#' + this.EbSid_CtxId +' :selected').text();
-                ";
+                return JSFnsConstants.SS_GetDisplayMemberJSfn;
             }
             set { }
         }
@@ -121,8 +102,7 @@ namespace ExpressBase.Objects
         {
             get
             {
-                return @"
-                    return $('#' + this.EbSid_CtxId +'Wraper .dropdown-toggle').attr('disabled', 'disabled').css('pointer-events', 'none').css('background-color', '#f3f3f3');";
+                return JSFnsConstants.SS_DisableJSfn;
             }
             set { }
         }
@@ -131,8 +111,7 @@ namespace ExpressBase.Objects
         {
             get
             {
-                return @"
-                    return $('#' + this.EbSid_CtxId +'Wraper .dropdown-toggle').prop('disabled',false).css('pointer-events', 'inherit').css('background-color', '#fff');";
+                return JSFnsConstants.SS_EnableJSfn;
             }
             set { }
         }
