@@ -106,8 +106,8 @@ namespace ExpressBase.Objects
         {
             get
             {
-                return @"dgOnChangeBind.bind(this)();
-                        dgEBOnChangeBind.bind(this)()";
+                return @"dgEBOnChangeBind.bind(this)();
+                        dgOnChangeBind.bind(this)()";
             }
             set { }
         }
@@ -330,18 +330,32 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         public override string GetValueJSfn
         {
-            get { return @"return this.DataVals.Value"; }
+            get { return @"
+                    if(this.__isEditing)
+                        return this.curRowDataVals.Value
+                    else
+                        return this.DataVals.Value";
+
+            }
 
             set { }
         }
 
-        //[JsonIgnore]
-        //public override string GetValueJSfn
-        //{
-        //    get { return @"let val = $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val(); return (this.ObjType === 'Numeric') ?  (parseFloat($('#' + this.EbSid_CtxId).val()) || 0) :val;"; }
+        [JsonIgnore]
+        public override string GetValueFromDOMJSfn
+        {
+            get { return @"let val = $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val(); return (this.ObjType === 'Numeric') ?  (parseFloat($('#' + this.EbSid_CtxId).val()) || 0) :val;"; }
 
-        //    set { }
-        //}
+            set { }
+        }
+
+        [JsonIgnore]
+        public override string GetDisplayMemberFromDOMJSfn
+        {
+            get { return GetValueFromDOMJSfn; }
+
+            set { }
+        }
 
         [JsonIgnore]
         public override string EnableJSfn { get { return @"$('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] .ctrl-cover *`).prop('disabled',false).css('pointer-events', 'inherit').find('input').css('background-color','#fff');"; } set { } }
