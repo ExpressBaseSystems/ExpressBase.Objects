@@ -3,6 +3,8 @@ using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
+using ExpressBase.Objects.Objects.DVRelated;
+using ExpressBase.Objects.Objects.MobilePage;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -93,7 +95,16 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
         [HelpText("sql query to get data from offline database")]
         public EbScript OfflineQuery { set; get; }
-        
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Link Settings")]
+        public MobVisRenderType RenderAs { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [OSE_ObjectTypes(EbObjectTypes.iMobilePage)]
+        [PropertyGroup("Link Settings")]
+        public string LinkRefId { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
@@ -101,7 +112,7 @@ namespace ExpressBase.Objects
 
         public override string GetDesignHtml()
         {
-            return @"<div class='eb_mob_vis_container mob_container dropped' eb-type='EbMobileVisualization' id='@id'>
+            return @"<div class='eb_mob_vis_container mob_container dropped' tabindex='1' eb-type='EbMobileVisualization' id='@id'>
                         <div class='eb_mob_container_inner'>
                         </div>
                     </div>".RemoveCR().DoubleQuoted();
