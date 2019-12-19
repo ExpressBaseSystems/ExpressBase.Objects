@@ -1,4 +1,5 @@
-﻿using ExpressBase.Common.Extensions;
+﻿using ExpressBase.Common;
+using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
@@ -413,6 +414,11 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
         public EbDbTypes Type { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [UIproperty]
+        [PropertyEditor(PropertyEditorType.FontSelector)]
+        public virtual EbFont Font { get; set; }
 
         public override bool Hidden { set; get; }
 
