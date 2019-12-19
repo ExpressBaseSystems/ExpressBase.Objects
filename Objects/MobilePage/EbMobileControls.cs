@@ -418,7 +418,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [UIproperty]
         [PropertyEditor(PropertyEditorType.FontSelector)]
-        public virtual EbFont Font { get; set; }
+        public EbFont Font { get; set; }
 
         public override bool Hidden { set; get; }
 
