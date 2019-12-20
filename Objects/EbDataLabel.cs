@@ -165,7 +165,7 @@ namespace ExpressBase.Objects
                .Replace("Left", "flex-start")
                .Replace("@bgColor@" , this.BackColor)
                .Replace("@forecolor@", this.ForeColor)
-               .Replace("@fontVal@",(this.PlaceHolderFont==null) ? string.Empty : "https://fonts.googleapis.com/css?family=" + this.PlaceHolderFont.FontName)
+               .Replace("@fontVal@",(this.PlaceHolderFont==null) ? string.Empty : "https://fonts.googleapis.com/css?family=" + GetGoogleFontName(this.PlaceHolderFont.FontName))
                .Replace("@LabelBackColor ", "background-color:" + (LabelBackColor ?? "@LabelBackColor ") + ";");
 
             return ReplacePropsInHTML(EbCtrlHTML);
@@ -186,6 +186,32 @@ namespace ExpressBase.Objects
 
             }
             return fontObj;
+        }
+        public string GetGoogleFontName(string font)
+        {
+            Dictionary<string, string> GfontList = new Dictionary<string, string>();
+            GfontList.Add("Arapey" , "Arapey");
+            GfontList.Add("Arvo", "Arvo");
+            GfontList.Add("Baskerville", "Libre Baskerville");
+            GfontList.Add("Cabin Condensed", "Cabin Condensed");
+            GfontList.Add("Century Gothic", "Didact Gothic");
+            GfontList.Add("Courier", "Courier");
+            GfontList.Add("Crimson Text", "Crimson Text");
+            GfontList.Add("EB Garamond", "EB Garamond");
+            GfontList.Add("GFS Didot", "GFS Didot");
+            GfontList.Add("Gotham", "Montserrat");
+            GfontList.Add("Helvetica", "Helvetica");
+            GfontList.Add("Libre Franklin", "Libre Franklin");
+            GfontList.Add("Maven Pro", "Maven Pro");
+            GfontList.Add("Merriweather", "Merriweather");
+            GfontList.Add("News Cycle", "News Cycle");
+            GfontList.Add("Puritan", "Puritan");
+            GfontList.Add("Questrial", "Questrial");
+            GfontList.Add("Times-Roman", "Tinos");
+            GfontList.Add("Times", "Tinos");
+            GfontList.Add("ZapfDingbats", "Heebo");
+
+            return GfontList[font];
         }
     }
 }

@@ -106,8 +106,8 @@ namespace ExpressBase.Objects
         {
             get
             {
-                return @"dgOnChangeBind.bind(this)();
-                        dgEBOnChangeBind.bind(this)()";
+                return @"dgEBOnChangeBind.bind(this)();
+                        dgOnChangeBind.bind(this)()";
             }
             set { }
         }
@@ -330,7 +330,29 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         public override string GetValueJSfn
         {
+            get { return @"
+                    if(this.__isEditing)
+                        return this.curRowDataVals.Value
+                    else
+                        return this.DataVals.Value";
+
+            }
+
+            set { }
+        }
+
+        [JsonIgnore]
+        public override string GetValueFromDOMJSfn
+        {
             get { return @"let val = $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val(); return (this.ObjType === 'Numeric') ?  (parseFloat($('#' + this.EbSid_CtxId).val()) || 0) :val;"; }
+
+            set { }
+        }
+
+        [JsonIgnore]
+        public override string GetDisplayMemberFromDOMJSfn
+        {
+            get { return GetValueFromDOMJSfn; }
 
             set { }
         }
@@ -349,6 +371,12 @@ namespace ExpressBase.Objects
 
         [JsonIgnore]
         public override string ShowJSfn { get { return @""; } set { } }
+
+        [JsonIgnore]
+        public override string AddInvalidStyleJSFn { get { return @"DGaddInvalidStyle.bind(this)(p1, p2, p3);"; } set { } }
+
+        [JsonIgnore]
+        public override string RemoveInvalidStyleJSFn { get { return @"DGremoveInvalidStyle.bind(this)(p1, p2);"; } set { } }
 
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
@@ -492,7 +520,7 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public override string InputControlType { get { return "EbCheckBox"; } }
 
-        public override string GetValueJSfn
+        public override string GetValueFromDOMJSfn
         {
             get { return @"
 							if($('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).is(':checked'))
@@ -506,6 +534,7 @@ namespace ExpressBase.Objects
 
             set { }
         }
+
         public override string GetDisplayMemberJSfn
         {
             get { return @"
@@ -556,7 +585,7 @@ namespace ExpressBase.Objects
         }
 
         [JsonIgnore]
-        public override string GetValueJSfn
+        public override string GetValueFromDOMJSfn
         {
             get
             {
@@ -808,7 +837,7 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
             set { }
         }
 
-        public override string GetValueJSfn
+        public override string GetValueFromDOMJSfn
         {
             get
             {
@@ -1138,7 +1167,7 @@ else
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup("Behavior")]
-        public int MinLimit { get { return this.EbPowerSelect.MaxLimit; } set { this.EbPowerSelect.MinLimit = value; } }
+        public int MinLimit { get { return this.EbPowerSelect.MinLimit; } set { this.EbPowerSelect.MinLimit = value; } }
 
         [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.CollectionProp, "Columns", "bVisible")]
@@ -1247,7 +1276,7 @@ else
         //}
 
         [JsonIgnore]
-        public override string GetValueJSfn
+        public override string GetValueFromDOMJSfn
         {
             get
             {
@@ -1292,6 +1321,26 @@ else
             get
             {
                 return this.EbSysCreatedBy.GetDisplayMemberJSfn;
+            }
+            set { }
+        }
+
+        [JsonIgnore]
+        public override string RefreshJSfn
+        {
+            get
+            {
+                return this.EbSysCreatedBy.RefreshJSfn;
+            }
+            set { }
+        }
+
+        [JsonIgnore]
+        public override string ClearJSfn
+        {
+            get
+            {
+                return this.EbSysCreatedBy.ClearJSfn;
             }
             set { }
         }
@@ -1354,7 +1403,7 @@ else
         //}
 
         [JsonIgnore]
-        public override string GetValueJSfn
+        public override string GetValueFromDOMJSfn
         {
             get
             {
@@ -1402,6 +1451,23 @@ else
             set { }
         }
 
+        public override string RefreshJSfn
+        {
+            get
+            {
+                return this.EbSysCreatedAt.RefreshJSfn;
+            }
+            set { }
+        }
+
+        public override string ClearJSfn
+        {
+            get
+            {
+                return this.EbSysCreatedAt.ClearJSfn;
+            }
+            set { }
+        }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [HideInPropertyGrid]
@@ -1455,7 +1521,7 @@ else
         //}
 
         [JsonIgnore]
-        public override string GetValueJSfn
+        public override string GetValueFromDOMJSfn
         {
             get
             {
@@ -1500,6 +1566,24 @@ else
             get
             {
                 return this.EbSysModifiedBy.GetDisplayMemberJSfn;
+            }
+            set { }
+        }
+
+        public override string RefreshJSfn
+        {
+            get
+            {
+                return this.EbSysModifiedBy.RefreshJSfn;
+            }
+            set { }
+        }
+
+        public override string ClearJSfn
+        {
+            get
+            {
+                return this.EbSysModifiedBy.ClearJSfn;
             }
             set { }
         }
@@ -1563,7 +1647,7 @@ else
         //}
 
         [JsonIgnore]
-        public override string GetValueJSfn
+        public override string GetValueFromDOMJSfn
         {
             get
             {
@@ -1607,6 +1691,24 @@ else
             get
             {
                 return this.EbSysModifiedAt.GetDisplayMemberJSfn;
+            }
+            set { }
+        }
+
+        public override string RefreshJSfn
+        {
+            get
+            {
+                return this.EbSysModifiedAt.RefreshJSfn;
+            }
+            set { }
+        }
+
+        public override string ClearJSfn
+        {
+            get
+            {
+                return this.EbSysModifiedAt.ClearJSfn;
             }
             set { }
         }

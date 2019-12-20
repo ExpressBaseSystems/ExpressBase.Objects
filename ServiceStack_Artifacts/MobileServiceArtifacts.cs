@@ -65,6 +65,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public string Version { set; get; }
 
+        public string RefId { set; get; }
+
         public string Json { set; get; }
     }
 

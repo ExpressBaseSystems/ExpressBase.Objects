@@ -425,6 +425,10 @@ this.Init = function(id)
             }
             set { }
         }
+
+        public override string RefreshJSfn { get { return @""; } set { } }
+
+        public override string ClearJSfn { get { return @""; } set { } }
     }
 
     public class UserCredentials
