@@ -306,8 +306,8 @@ namespace ExpressBase.Objects
             set { }
         }
 
-		public override string GetDisplayMemberJSfn
-		{
+		public override string GetDisplayMemberFromDOMJSfn
+        {
 			get
 			{
 				return @"return $('#' + this.EbSid_CtxId).text();";
@@ -399,11 +399,11 @@ namespace ExpressBase.Objects
         //    set { }
         //}
 
-        public override string GetDisplayMemberJSfn
+        public override string GetDisplayMemberFromDOMJSfn
         {
             get
             {
-                return this.EbDate.GetDisplayMemberJSfn;
+                return this.EbDate.GetDisplayMemberFromDOMJSfn;
             }
             set { }
         }
@@ -631,8 +631,8 @@ namespace ExpressBase.Objects
             set { }
         }
 
-		public override string GetDisplayMemberJSfn
-		{
+		public override string GetDisplayMemberFromDOMJSfn
+        {
 			get
 			{
 				return @"return $('#' + this.EbSid_CtxId).text();";
@@ -715,11 +715,11 @@ namespace ExpressBase.Objects
             set { }
         }
 
-        public override string GetDisplayMemberJSfn
+        public override string GetDisplayMemberFromDOMJSfn
         {
             get
             {
-                return this.EbDate.GetDisplayMemberJSfn;
+                return this.EbDate.GetDisplayMemberFromDOMJSfn;
             }
             set { }
         }

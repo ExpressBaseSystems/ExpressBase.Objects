@@ -77,7 +77,8 @@ namespace ExpressBase.Objects
 
         //public EbSimpleSelect EbSimpleSelect;
 
-        public override string GetDisplayMemberJSfn
+        
+        public override string GetDisplayMemberFromDOMJSfn
         {
             get
             {

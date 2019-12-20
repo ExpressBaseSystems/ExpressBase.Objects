@@ -535,7 +535,7 @@ namespace ExpressBase.Objects
             set { }
         }
 
-        public override string GetDisplayMemberJSfn
+        public override string GetDisplayMemberFromDOMJSfn
         {
             get { return @"
 							if($('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).is(':checked'))
@@ -615,11 +615,11 @@ namespace ExpressBase.Objects
         }
 
         [JsonIgnore]
-        public override string GetDisplayMemberJSfn
+        public override string GetDisplayMemberFromDOMJSfn
         {
             get
             {
-                return this.EbDate.GetDisplayMemberJSfn;
+                return this.EbDate.GetDisplayMemberFromDOMJSfn;
             }
             set { }
         }
@@ -703,7 +703,7 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, p2).
             set { }
         }
 
-        public override string GetDisplayMemberJSfn { get { return @" return $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp] :selected`).text(); "; } set { } }
+        public override string GetDisplayMemberFromDOMJSfn { get { return @" return $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp] :selected`).text(); "; } set { } }
 
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
@@ -872,11 +872,11 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
             set { }
         }
 
-        public override string GetDisplayMemberJSfn
+        public override string GetDisplayMemberFromDOMJSfn
         {
             get
             {
-                return EbDGSimpleSelectColumn.GetDisplayMemberJSfn;
+                return EbDGSimpleSelectColumn.GetDisplayMemberFromDOMJSfn;
             }
             set { }
         }
@@ -1023,7 +1023,7 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
         public override string SetDisplayMemberJSfn { get { return this.EbPowerSelect.SetDisplayMemberJSfn; } set { } }
 
         [JsonIgnore]
-        public override string GetDisplayMemberJSfn { get { return this.EbPowerSelect.GetDisplayMemberJSfn; } set { } }
+        public override string GetDisplayMemberFromDOMJSfn { get { return this.EbPowerSelect.GetDisplayMemberFromDOMJSfn; } set { } }
 
         [JsonIgnore]
         public EbPowerSelect EbPowerSelect { get; set; }
@@ -1316,11 +1316,11 @@ else
         }
 
         [JsonIgnore]
-        public override string GetDisplayMemberJSfn
+        public override string GetDisplayMemberFromDOMJSfn
         {
             get
             {
-                return this.EbSysCreatedBy.GetDisplayMemberJSfn;
+                return this.EbSysCreatedBy.GetDisplayMemberFromDOMJSfn;
             }
             set { }
         }
@@ -1442,11 +1442,11 @@ else
             set { }
         }
 
-        public override string GetDisplayMemberJSfn
+        public override string GetDisplayMemberFromDOMJSfn
         {
             get
             {
-                return this.EbSysCreatedAt.GetDisplayMemberJSfn;
+                return this.EbSysCreatedAt.GetDisplayMemberFromDOMJSfn;
             }
             set { }
         }
@@ -1561,11 +1561,11 @@ else
         }
 
         [JsonIgnore]
-        public override string GetDisplayMemberJSfn
+        public override string GetDisplayMemberFromDOMJSfn
         {
             get
             {
-                return this.EbSysModifiedBy.GetDisplayMemberJSfn;
+                return this.EbSysModifiedBy.GetDisplayMemberFromDOMJSfn;
             }
             set { }
         }
@@ -1686,11 +1686,11 @@ else
             set { }
         }
 
-        public override string GetDisplayMemberJSfn
+        public override string GetDisplayMemberFromDOMJSfn
         {
             get
             {
-                return this.EbSysModifiedAt.GetDisplayMemberJSfn;
+                return this.EbSysModifiedAt.GetDisplayMemberFromDOMJSfn;
             }
             set { }
         }
