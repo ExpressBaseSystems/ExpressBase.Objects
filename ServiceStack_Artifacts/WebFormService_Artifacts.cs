@@ -423,6 +423,11 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 1)]
         public string RefId { get; set; }
 
+         [DataMember(Order = 2)]
+        public List<Param> Param { get; set; }
+
+
+
     }
 
     [DataContract]
