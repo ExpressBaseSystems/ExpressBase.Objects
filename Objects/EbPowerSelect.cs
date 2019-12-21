@@ -57,6 +57,15 @@ namespace ExpressBase.Objects
         [PropertyPriority(98)]
         public bool IsInsertable { get; set; }
 
+        public override string GetJsInitFunc()// should remove
+        {
+            return @"
+this.Init = function(id){
+    debugger;
+    this.getColumn = EBPSGetColummn;
+};";
+        }
+
         public override string IsRequiredOKJSfn
         {
             get
@@ -77,7 +86,8 @@ namespace ExpressBase.Objects
 
         //public EbSimpleSelect EbSimpleSelect;
 
-        public override string GetDisplayMemberJSfn
+        
+        public override string GetDisplayMemberFromDOMJSfn
         {
             get
             {

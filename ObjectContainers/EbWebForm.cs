@@ -1237,6 +1237,8 @@ namespace ExpressBase.Objects
                         _displayMember = this.SolutionObj.Users[user_id];
                     }
                 }
+                else if (_control.EbDbType == EbDbTypes.Decimal || _control.EbDbType == EbDbTypes.Int32)
+                    _formattedData = Convert.ToDouble(dataRow[dataColumn.ColumnIndex]);
                 else
                     _formattedData = dataRow[dataColumn.ColumnIndex];
             }
@@ -1246,6 +1248,8 @@ namespace ExpressBase.Objects
                 _formattedData = dt.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
                 _displayMember = dt.ToString(this.UserObj.Preference.GetShortDatePattern(), CultureInfo.InvariantCulture);
             }
+            else if (dataColumn.Type == EbDbTypes.Int32 || dataColumn.Type == EbDbTypes.Int64 || dataColumn.Type == EbDbTypes.Decimal || dataColumn.Type == EbDbTypes.Double)
+                _formattedData = Convert.ToDouble(dataRow[dataColumn.ColumnIndex]);
             else
                 _formattedData = dataRow[dataColumn.ColumnIndex];
 
@@ -1294,7 +1298,8 @@ namespace ExpressBase.Objects
                             if (Column.Value == null || string.IsNullOrEmpty(Convert.ToString(Column.Value)) || !this.FormData.PsDm_Tables.ContainsKey(EbSid))
                                 continue;
 
-                            List<SingleRow> Cols = new List<SingleRow>();
+                            //List<SingleRow> Cols = new List<SingleRow>();
+                            Dictionary<string, List<dynamic>> Rows = new Dictionary<string, List<dynamic>>();
                             //Dictionary<int, string[]> Disp = new Dictionary<int, string[]>();//original
                             Dictionary<int, Dictionary<string, string>> DispM_dup = new Dictionary<int, Dictionary<string, string>>();//duplicate
                             string[] temp = Convert.ToString(Column.Value).Split(",");
@@ -1306,7 +1311,14 @@ namespace ExpressBase.Objects
                                 SingleRow _row = tbl.FirstOrDefault(e => Convert.ToInt32(e[VmName]) == vms[i]);
                                 if (_row != null)
                                 {
-                                    Cols.Add(_row);
+                                    foreach(SingleColumn _col in _row.Columns)
+                                    {
+                                        if (!Rows.ContainsKey(_col.Name))
+                                            Rows.Add(_col.Name, new List<dynamic>());
+                                        Rows[_col.Name].Add(_col.Value);
+                                    }
+
+                                    //Cols.Add(_row);
                                     if (RenderAsSS)
                                     {
                                         //Disp.Add(vms[i], _row[DmName]);
@@ -1328,7 +1340,7 @@ namespace ExpressBase.Objects
                             }
                             //Column.D = Disp;//original
                             Column.D = DispM_dup;//duplicate
-                            Column.R = Cols;
+                            Column.R = Rows;
                         }
                     }
                 }
@@ -1558,7 +1570,11 @@ namespace ExpressBase.Objects
                 if (tt == null)
                     param.Add(DataDB.GetNewParameter("eb_loc_id", EbDbTypes.Decimal, this.LocationId));
 
-                EbDataSet ds = DataDB.DoQueries(psquery, param.ToArray());
+                EbDataSet ds;
+                if (this.DbConnection == null)
+                    ds = DataDB.DoQueries(psquery, param.ToArray());
+                else
+                    ds = DataDB.DoQueries(this.DbConnection, psquery, param.ToArray());
 
                 if (ds.Tables.Count > 0)
                 {

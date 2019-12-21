@@ -10,13 +10,14 @@ namespace ExpressBase.Objects
 {
     public enum AttendanceType
     {
-        DayWise = 0,
-        Hourly = 1,
+        Hourly = 0,
+        DayWise = 1,
         Weekely = 2,
-        fortnightly = 3,
+        Fortnightly = 3,
         Monthly = 4,
-        HalfYearly = 5,
-        Yearly = 6,
+        Quarterly = 5,
+        HalfYearly = 6,
+        Yearly = 7,
     }
 
     [EnableInBuilder(BuilderType.Calendar)]
@@ -104,6 +105,8 @@ namespace ExpressBase.Objects
             this.KeyColumns = new List<DVBaseColumn>();
             this.DateColumns = new List<DVBaseColumn>();
             this.ObjectLinks = new List<ObjectBasicInfo>();
+            this.PrimaryKey = new DVBaseColumn();
+            this.ForeignKey = new DVBaseColumn();
            
         }
 

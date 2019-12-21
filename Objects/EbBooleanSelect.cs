@@ -70,11 +70,11 @@ namespace ExpressBase.Objects
             set { }
         }
 
-        public override string GetDisplayMemberJSfn
+        public override string GetDisplayMemberFromDOMJSfn
         {
             get
             {
-                return EbSimpleSelect.GetDisplayMemberJSfn;
+                return EbSimpleSelect.GetDisplayMemberFromDOMJSfn;
             }
             set { }
         }

@@ -89,7 +89,7 @@ namespace ExpressBase.Objects
             set { }
         }
 
-        public override string GetDisplayMemberJSfn
+        public override string GetDisplayMemberFromDOMJSfn
         {
             get
             {

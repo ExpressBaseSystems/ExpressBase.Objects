@@ -266,7 +266,7 @@ namespace ExpressBase.Objects
         }
 
         [JsonIgnore]
-        public override string GetDisplayMemberJSfn
+        public override string GetDisplayMemberFromDOMJSfn
         {
             get
             {
