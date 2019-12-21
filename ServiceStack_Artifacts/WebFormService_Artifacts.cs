@@ -228,7 +228,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int RowId { get; set; }
 
         [DataMember(Order = 3)]
-        public WebformData FormData { get; set; }
+        //public WebformData FormData { get; set; }
+        public string FormData { get; set; }
         
         [DataMember(Order = 4)]
 		public ResponseStatus ResponseStatus { get; set; }
