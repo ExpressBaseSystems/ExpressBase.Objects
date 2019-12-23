@@ -13,9 +13,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class RefreshSolutionConnectionsRequest : EbMqRequest
     {
     }
-   
+
     public class RefreshSolutionConnectionsResponse : IEbSSResponse
     {
+        public bool Status { get; set; }
         public ResponseStatus ResponseStatus { get; set; }
     }
 
@@ -32,6 +33,16 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class RefreshSolutionConnectionsBySolutionIdAsyncRequest : EbServiceStackAuthRequest, IReturn<RefreshSolutionConnectionsAsyncResponse>
     {
         public string SolutionId { get; set; }
+    }
+
+    public class RefreshSolutionExtRequest : EbServiceStackNoAuthRequest
+    {
+        public string SolnId { get; set; }
+    }
+
+    public class RefreshSolutionExtResponse
+    {
+        public bool Status { get; set; }
     }
 
     public class GetConnectionsRequest : EbServiceStackAuthRequest, IReturn<GetConnectionsResponse>
@@ -339,7 +350,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public string SolnId { get; set; }
     }
-    
+
     public class AddSendGridResponse : IEbSSResponse
     {
         public ResponseStatus ResponseStatus { get; set; }
@@ -399,7 +410,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public string SolnId { get; set; }
     }
-    
+
     public class EbIntegrationResponse : IEbSSResponse
     {
         public ResponseStatus ResponseStatus { get; set; }
