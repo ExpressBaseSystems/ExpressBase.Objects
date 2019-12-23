@@ -54,7 +54,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 	public class GetRowDataResponse : IEbSSResponse
 	{
 		[DataMember(Order = 1)]
-		public WebformData FormData { get; set; }
+		public WebformDataWrapper FormDataWrap { get; set; }
 
 		[DataMember(Order = 2)]
 		public ResponseStatus ResponseStatus { get; set; }
@@ -228,25 +228,26 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int RowId { get; set; }
 
         [DataMember(Order = 3)]
-        public WebformData FormData { get; set; }
-
+        //public WebformData FormData { get; set; }
+        public string FormData { get; set; }
+        
         [DataMember(Order = 4)]
-        public int AfterSaveStatus { get; set; }
-
-        [DataMember(Order = 5)]
 		public ResponseStatus ResponseStatus { get; set; }
 
-        [DataMember(Order = 6)]
+        [DataMember(Order = 5)]
         public int Status { get; set; }
 
-        [DataMember(Order = 7)]
+        [DataMember(Order = 6)]
         public string Message { get; set; }
 
-        [DataMember(Order = 8)]
+        [DataMember(Order = 7)]
         public string MessageInt { get; set; }
 
-        [DataMember(Order = 9)]
+        [DataMember(Order = 8)]
         public string StackTraceInt { get; set; }
+        
+        [DataMember(Order = 9)]
+        public string AffectedEntries { get; set; }
     }
 
     [DataContract]
@@ -422,6 +423,11 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         [DataMember(Order = 1)]
         public string RefId { get; set; }
+
+         [DataMember(Order = 2)]
+        public List<Param> Param { get; set; }
+
+
 
     }
 

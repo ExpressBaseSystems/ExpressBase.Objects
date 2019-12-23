@@ -46,29 +46,27 @@ namespace ExpressBase.Objects
             {
                 return IsDynamic ? ValueMember.Type : EbDbTypes.String;
             }
-		}
+        }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-		[DefaultPropValue("100")]
-		[PropertyGroup("Appearance")]
-		public int DropdownHeight { get; set; }
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [DefaultPropValue("100")]
+        [PropertyGroup("Appearance")]
+        public int DropdownHeight { get; set; }
 
-		public override string SetValueJSfn
+        public override string JustSetValueJSfn
         {
             get
             {
-                return @" 
-                    isContained = false;
-                    $('#' + this.EbSid_CtxId + ' option').each(function () {
-                        if ($(this).attr('value') == p1) {
-                            isContained = true;
-                            return false;
-                        }
-                    });
+                return JSFnsConstants.EbSimpleSelect_JustSetValueJSfn;
+            }
+            set { }
+        }
 
-                    if(!isContained)
-                        return;
-                    $('#' + this.EbSid_CtxId).selectpicker('val', p1).trigger('change');";
+        public override string SetValueJSfn
+        {
+            get
+            {
+                return JSFnsConstants.SS_SetValueJSfn;
             }
             set { }
         }
@@ -77,11 +75,7 @@ namespace ExpressBase.Objects
         {
             get
             {
-                return @"
-                    let val = $('#' + this.EbSid_CtxId).selectpicker('val');
-                    val = (val === null) ? '-1' : val.toString();
-                    return val;
-                ";
+                return JSFnsConstants.EbSimpleSelect_GetValueJSfn;
             }
             set { }
         }
@@ -90,20 +84,16 @@ namespace ExpressBase.Objects
         {
             get
             {
-                return @"
-                    return !this.isInVisibleInUI ? (!isNaNOrEmpty(this.getValue()) && (this.getValue() !== '-1')) : true;
-                ";
+                return JSFnsConstants.SS_IsRequiredOKJSfn;
             }
             set { }
         }
 
-        public override string GetDisplayMemberJSfn
+        public override string GetDisplayMemberFromDOMJSfn
         {
             get
             {
-                return @"
-                    return $('#' + this.EbSid_CtxId +' :selected').text();
-                ";
+                return JSFnsConstants.SS_GetDisplayMemberJSfn;
             }
             set { }
         }
@@ -112,8 +102,7 @@ namespace ExpressBase.Objects
         {
             get
             {
-                return @"
-                    return $('#' + this.EbSid_CtxId +'Wraper .dropdown-toggle').attr('disabled', 'disabled').css('pointer-events', 'none').css('background-color', '#f3f3f3');";
+                return JSFnsConstants.SS_DisableJSfn;
             }
             set { }
         }
@@ -122,8 +111,7 @@ namespace ExpressBase.Objects
         {
             get
             {
-                return @"
-                    return $('#' + this.EbSid_CtxId +'Wraper .dropdown-toggle').prop('disabled',false).css('pointer-events', 'inherit').css('background-color', '#fff');";
+                return JSFnsConstants.SS_EnableJSfn;
             }
             set { }
         }
@@ -153,7 +141,7 @@ namespace ExpressBase.Objects
                 pg.ShowProperty('MaxLimit');
                 pg.ShowProperty('MinLimit');
             }
-		    else{
+    else{
                 pg.HideProperty('IsSearchable');
                 pg.HideProperty('MaxLimit');
                 pg.HideProperty('MinLimit');
@@ -195,7 +183,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.Boolean)]
         [OnChangeExec(@"if(this.IsDynamic === true){pg.ShowProperty('DataSourceId');pg.ShowProperty('ValueMember');pg.ShowProperty('DisplayMember');pg.HideProperty('Options');}
-		else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HideProperty('DisplayMember');pg.ShowProperty('Options');}")]
+else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HideProperty('DisplayMember');pg.ShowProperty('Options');}")]
         public bool IsDynamic { get; set; }
 
         private string _optionHtml = string.Empty;
@@ -251,12 +239,12 @@ namespace ExpressBase.Objects
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
 
-		public override string GetHtml4Bot()
-		{
-			return ReplacePropsInHTML(HtmlConstants.CONTROL_WRAPER_HTML4BOT);
-		}
+        public override string GetHtml4Bot()
+        {
+            return ReplacePropsInHTML(HtmlConstants.CONTROL_WRAPER_HTML4BOT);
+        }
 
-		public override string GetDesignHtml()
+        public override string GetDesignHtml()
         {
             //        return @"
 
@@ -292,9 +280,9 @@ namespace ExpressBase.Objects
 .Replace("@selOpts@", IsMultiSelect ? "data-actions-box='true'" : string.Empty)
 .Replace("@bootStrapStyle@", "data-style='btn-" + this.BootStrapStyle.ToString() + "'")
 
-.Replace("@PlaceHolder@", (PlaceHolder ?? ""))
+.Replace("@PlaceHolder@", (PlaceHolder ?? " - select - "))
 .Replace("@options@", this.OptionHtml)
-.Replace("@-sel-@", this.IsMultiSelect ? string.Empty : "<option selected value='-1' style='color: #6f6f6f;'> -- select -- </option>")
+.Replace("@-sel-@", this.IsMultiSelect ? string.Empty : "<option selected value='-1' style='color: #6f6f6f;'> - select - </option>")
 .Replace("@data-ebtype@", "16");
         }
     }

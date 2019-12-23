@@ -39,9 +39,16 @@ namespace ExpressBase.Objects
         {
             get
             {
-                return @"
-                    return $('[name=' + this.EbSid_CtxId + ']:checked').val();
-                ";
+                return @" return $('[name=' + this.EbSid_CtxId + ']:checked').val(); ";
+            }
+            set { }
+        }
+
+        public override string JustSetValueJSfn
+        {
+            get
+            {
+                return @" $('input[name = ' + this.EbSid_CtxId + '][value = ' + p1 + ']').prop('checked', true)";
             }
             set { }
         }
@@ -50,24 +57,22 @@ namespace ExpressBase.Objects
         {
             get
             {
+                return JustSetValueJSfn + @".trigger('change');";
+            }
+            set { }
+        }
+        public override string GetDisplayMemberFromDOMJSfn
+        {
+            get
+            {
                 return @"
-                     $('input[name = ' + this.EbSid_CtxId + '][value = ' + p1 + ']').prop('checked', true).trigger('change');
+  return $('[name=' + this.EbSid_CtxId + ']:checked').next('span').text();
                 ";
             }
             set { }
         }
-		public override string GetDisplayMemberJSfn
-		{
-			get
-			{
-				return @"
-					  return $('[name=' + this.EbSid_CtxId + ']:checked').next('span').text();
-                ";
-			}
-			set { }
-		}
 
-		[JsonIgnore]
+        [JsonIgnore]
         public override string OnChangeBindJSFn
         {
             get
@@ -89,8 +94,8 @@ namespace ExpressBase.Objects
         public void OnDeserializedMethod(StreamingContext context)
         {
             this.BareControlHtml = this.GetBareHtml();
-			this.BareControlHtml4Bot = this.BareControlHtml;
-			this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
+            this.BareControlHtml4Bot = this.BareControlHtml;
+            this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
 
         private void Options_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -143,27 +148,27 @@ namespace ExpressBase.Objects
             return html
 .Replace("@name@", (this.Name != null) ? this.Name : "@name@")
 .Replace("@ebsid@", EbSid_CtxId);
-		}
+        }
 
-		public override string DesignHtml4Bot
-		{
-			get => @"<div id='' class='radio-wrap @radio-wrap-block@' style='padding: 4px;'>
-						<input type ='radio' class='eb-radiobtn' id='' @defaultcheked@ value='@value@' name='@gname@'>
-						<span id='Lbl' class='eb-radiospan' ui-label style='@LabelBackColor @LabelForeColor '> RadioButton1 </span>
-					</div>
-					<div id='' class='radio-wrap @radio-wrap-block@' style='padding: 4px;'>
-						<input type ='radio' class='eb-radiobtn' id='' @defaultcheked@ value='@value@' name='@gname@'>
-						<span id='Lbl' class='eb-radiospan' ui-label style='@LabelBackColor @LabelForeColor '> RadioButton2  </span>
+        public override string DesignHtml4Bot
+        {
+            get => @"<div id='' class='radio-wrap @radio-wrap-block@' style='padding: 4px;'>
+<input type ='radio' class='eb-radiobtn' id='' @defaultcheked@ value='@value@' name='@gname@'>
+<span id='Lbl' class='eb-radiospan' ui-label style='@LabelBackColor @LabelForeColor '> RadioButton1 </span>
+</div>
+<div id='' class='radio-wrap @radio-wrap-block@' style='padding: 4px;'>
+<input type ='radio' class='eb-radiobtn' id='' @defaultcheked@ value='@value@' name='@gname@'>
+<span id='Lbl' class='eb-radiospan' ui-label style='@LabelBackColor @LabelForeColor '> RadioButton2  </span>
                 </div>";
-			set => base.DesignHtml4Bot = value;
-		}
+            set => base.DesignHtml4Bot = value;
+        }
 
-		public override string GetHtml4Bot()
-		{
-			return ReplacePropsInHTML((HtmlConstants.CONTROL_WRAPER_HTML4BOT).Replace("@barehtml@", DesignHtml4Bot));
-		}
+        public override string GetHtml4Bot()
+        {
+            return ReplacePropsInHTML((HtmlConstants.CONTROL_WRAPER_HTML4BOT).Replace("@barehtml@", DesignHtml4Bot));
+        }
 
-		public override string GetDesignHtml()
+        public override string GetDesignHtml()
         {
             string EbCtrlHTML = HtmlConstants.CONTROL_WRAPER_HTML4WEB
                 .Replace("@barehtml@", @"

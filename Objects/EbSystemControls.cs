@@ -34,6 +34,7 @@ namespace ExpressBase.Objects
             this.Name = "eb_loc_id";
         }
 
+        [EnableInBuilder(BuilderType.WebForm)]
         public override EbDbTypes EbDbType { get { return EbDbTypes.Decimal; } }
 
         [EnableInBuilder(BuilderType.WebForm)]
@@ -112,7 +113,8 @@ namespace ExpressBase.Objects
 
 
         public override string EnableJSfn 
-        { get 
+        {
+            get 
             {
                 if (this.IsDisable)
                 {
@@ -145,15 +147,22 @@ namespace ExpressBase.Objects
             {
                 return @"
                     if(this.IsDisable){
+                        if(!p1)
+                            return false;                        
                         let arr = p1.split('$$');
                         $('#' + this.EbSid_CtxId).attr('data-id', arr[0]);
-                        $('#' + this.EbSid_CtxId).val(arr[1]).trigger('change');}
+                        $('#' + this.EbSid_CtxId).val(arr[1]).trigger('change');
+                    }
                     else
                         $('#' + this.EbSid_CtxId).val(p1).trigger('change');
                     ";
             }
             set { }
         }
+
+        public override string RefreshJSfn { get { return @""; } set { } }
+
+        public override string ClearJSfn { get { return @""; } set { } }
 
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
@@ -162,7 +171,8 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
         public override bool DoNotPersist 
-        { get 
+        {
+            get 
             {
                 if (this.IsDisable == true)
                     return true;
@@ -284,7 +294,10 @@ namespace ExpressBase.Objects
         {
             get
             {
-                return @"let arr = p1.split('$$');
+                return @"
+                        if(!p1)
+                            return false;
+                        let arr = p1.split('$$');
                         $('#' + this.EbSid_CtxId).attr('data-id', arr[0]);
                         $('#' + this.EbSid_CtxId).text(arr[1]).trigger('change');
 						let imgsrc='/images/dp/'+ arr[0] +'.png';
@@ -293,14 +306,18 @@ namespace ExpressBase.Objects
             set { }
         }
 
-		public override string GetDisplayMemberJSfn
-		{
-            get
-            {
+		public override string GetDisplayMemberFromDOMJSfn
+        {
+			get
+			{
 				return @"return $('#' + this.EbSid_CtxId).text();";
 			}
-            set { }
-        }
+			set { }
+		}
+
+        public override string RefreshJSfn { get { return @""; } set { } }
+
+        public override string ClearJSfn { get { return @""; } set { } }
 
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
@@ -373,11 +390,38 @@ namespace ExpressBase.Objects
             set { }
         }
 
-        public override string GetDisplayMemberJSfn
+        //public override string JustSetValueJSfn
+        //{
+        //    get
+        //    {
+        //        return this.EbDate.JustSetValueJSfn;
+        //    }
+        //    set { }
+        //}
+
+        public override string GetDisplayMemberFromDOMJSfn
         {
             get
             {
-                return this.EbDate.GetDisplayMemberJSfn;
+                return this.EbDate.GetDisplayMemberFromDOMJSfn;
+            }
+            set { }
+        }
+
+        public override string RefreshJSfn
+        {
+            get
+            {
+                return this.EbDate.RefreshJSfn;
+            }
+            set { }
+        }
+
+        public override string ClearJSfn
+        {
+            get
+            {
+                return this.EbDate.ClearJSfn;
             }
             set { }
         }
@@ -575,7 +619,10 @@ namespace ExpressBase.Objects
         {
             get
             {
-                return @"let arr = p1.split('$$');
+                return @"
+                        if(!p1)
+                            return false;
+                        let arr = p1.split('$$');
                         $('#' + this.EbSid_CtxId).attr('data-id', arr[0]);
                         $('#' + this.EbSid_CtxId).text(arr[1]).trigger('change');
 						let imgsrc='/images/dp/'+ arr[0] +'.png';
@@ -584,8 +631,8 @@ namespace ExpressBase.Objects
             set { }
         }
 
-		public override string GetDisplayMemberJSfn
-		{
+		public override string GetDisplayMemberFromDOMJSfn
+        {
 			get
 			{
 				return @"return $('#' + this.EbSid_CtxId).text();";
@@ -593,7 +640,11 @@ namespace ExpressBase.Objects
 			set { }
 		}
 
-		[EnableInBuilder(BuilderType.WebForm)]
+        public override string RefreshJSfn { get { return @""; } set { } }
+
+        public override string ClearJSfn { get { return @""; } set { } }
+
+        [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
         public override bool IsSysControl { get { return true; } }
 
@@ -664,11 +715,29 @@ namespace ExpressBase.Objects
             set { }
         }
 
-        public override string GetDisplayMemberJSfn
+        public override string GetDisplayMemberFromDOMJSfn
         {
             get
             {
-                return this.EbDate.GetDisplayMemberJSfn;
+                return this.EbDate.GetDisplayMemberFromDOMJSfn;
+            }
+            set { }
+        }
+        
+        public override string RefreshJSfn
+        {
+            get
+            {
+                return this.EbDate.RefreshJSfn;
+            }
+            set { }
+        }
+
+        public override string ClearJSfn
+        {
+            get
+            {
+                return this.EbDate.ClearJSfn;
             }
             set { }
         }

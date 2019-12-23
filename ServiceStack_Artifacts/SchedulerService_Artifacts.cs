@@ -195,6 +195,11 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     }
 
+    public class GetAllSlackRequest : EbServiceStackAuthRequest, IReturn<GetAllUsersResponse>
+    {
+
+    }
+
     public class GetAllUsersResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
@@ -202,11 +207,40 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 2)]
         public Dictionary<int, string> UserGroups { get; set; }
-
+        
         [DataMember(Order = 3)]
+        public Dictionary<int, string> SlackUsers { get; set; }
+
+        [DataMember(Order = 4)]
+        public Dictionary<int, string> SlackChannels { get; set; }
+
+        [DataMember(Order = 5)]
         public ResponseStatus ResponseStatus { get; set; }
 
     }
+
+    public class AllUserCollection
+    {
+        public string EmailUser { get; set; }
+        public string SMSUser { get; set; }
+        public string SlackUser { get; set; }
+    }
+    
+    public class AllGroupCollection
+    {
+        public string EmailGroup { get; set; }
+        public string SMSGroup { get; set; }
+        public string SlackGroup { get; set; }
+    }
+
+    public class AllDelMessagaeCollection
+    {
+        public string EmailMessage { get; set; }
+        public string SMSMessage { get; set; }
+        public string SlackMessage { get; set; }
+    }
+
+
     public class GetSchedulesOfSolutionRequest : EbServiceStackAuthRequest, IReturn<GetSchedulesOfSolutionResponse>
     {
         [DataMember(Order = 1)]

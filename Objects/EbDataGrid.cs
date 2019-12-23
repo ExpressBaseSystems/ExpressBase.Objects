@@ -106,16 +106,8 @@ namespace ExpressBase.Objects
         {
             get
             {
-                return @"
-$.each(this.Controls.$values, function (i, col) {
-    if ((col.OnChangeFn && col.OnChangeFn.Code && col.OnChangeFn.Code.trim() !== '') || col.DependedValExp.$values.length > 0){
-        let FnString = `/*console.log('${col.__path || col.Name}');*/` + atob(col.OnChangeFn.Code) + (col.DependedValExp.$values.length !== 0 ? ` ; form.updateDependentControls(form.__getCtrlByPath(this.__path))` : '');
-        let OnChangeFn = new Function('form', 'user', `event`, FnString).bind(col, this.formObject, this.__userObject);
-
-        col.bindOnChange({form:this.formObject, col:col, DG:this, user : this.__userObject},OnChangeFn);
-    }
-}.bind(this));
-               ";
+                return @"dgEBOnChangeBind.bind(this)();
+                        dgOnChangeBind.bind(this)()";
             }
             set { }
         }
@@ -246,12 +238,13 @@ $.each(this.Controls.$values, function (i, col) {
 
             string html = @"
 <div class='grid-cont'>
-    <div id='@ebsid@addrow' class='addrow-btn'  tabindex='0'>+  Row</div>
-	<div class='Dg_head'>
+    @addrowbtn@
+<div class='Dg_head'>
         <table id='tbl_@ebsid@_head' class='table table-bordered dgtbl'>
             <thead>
-              <tr>    
-                <th class='slno' style='width:34px'><span class='grid-col-title'>SL No</span></th>";
+              <tr>   
+                <th class='slno' style='width:34px'><span class='grid-col-title'>SL No</span></th>"
+.Replace("@addrowbtn@", this.IsAddable ? "<div id='@ebsid@addrow' class='addrow-btn' tabindex='0'>+ Row</div>" : string.Empty); ;
             foreach (EbDGColumn col in Controls)
             {
                 if (!col.Hidden)
@@ -262,7 +255,7 @@ $.each(this.Controls.$values, function (i, col) {
                                             "</th>")
                         .Replace("@ppbtn@", Common.HtmlConstants.CONT_PROP_BTN)
                         .Replace("@req@", (col.Required ? "<sup style='color: red'>*</sup>" : string.Empty))
-                        .Replace("@ebsid@", col.EbSid)
+                        .Replace("@ebsid@", col.IsRenderMode && col.IsDynamicTabChild ? "@" + col.EbSid_CtxId + "_ebsid@" : col.EbSid)
                         .Replace("@name@", col.Name)
                         .Replace("@Width@", (col.Width <= 0) ? "auto" : col.Width.ToString() + "%")
                         .Replace("@type@", "type = '" + col.ObjType + "'")
@@ -289,7 +282,8 @@ $.each(this.Controls.$values, function (i, col) {
             </tbody>
         </table>
      </div>
-</div>".Replace("@_height@", this.Height.ToString());
+</div>"
+            .Replace("@_height@", this.Height.ToString());
 
             return html;
         }
@@ -318,12 +312,17 @@ $.each(this.Controls.$values, function (i, col) {
         public override string OnChangeBindJSFn { get { return @"$(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, p2);"; } set { } }
 
         [JsonIgnore]
+        public override string JustSetValueJSfn
+        {
+            get { return @"$('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val(p1)"; }
+
+            set { }
+        }
+
+        [JsonIgnore]
         public override string SetValueJSfn
         {
-            get { return @"
-$('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val(p1).trigger('change');
-//$('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}]>.tdtxt>span`).html(p1);
-"; }
+            get { return JustSetValueJSfn + ".trigger('change');"; }
 
             set { }
         }
@@ -331,7 +330,29 @@ $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this
         [JsonIgnore]
         public override string GetValueJSfn
         {
+            get { return @"
+                    if(this.__isEditing)
+                        return this.curRowDataVals.Value
+                    else
+                        return this.DataVals.Value";
+
+            }
+
+            set { }
+        }
+
+        [JsonIgnore]
+        public override string GetValueFromDOMJSfn
+        {
             get { return @"let val = $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val(); return (this.ObjType === 'Numeric') ?  (parseFloat($('#' + this.EbSid_CtxId).val()) || 0) :val;"; }
+
+            set { }
+        }
+
+        [JsonIgnore]
+        public override string GetDisplayMemberFromDOMJSfn
+        {
+            get { return GetValueFromDOMJSfn; }
 
             set { }
         }
@@ -350,6 +371,12 @@ $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this
 
         [JsonIgnore]
         public override string ShowJSfn { get { return @""; } set { } }
+
+        [JsonIgnore]
+        public override string AddInvalidStyleJSFn { get { return @"DGaddInvalidStyle.bind(this)(p1, p2, p3);"; } set { } }
+
+        [JsonIgnore]
+        public override string RemoveInvalidStyleJSFn { get { return @"DGremoveInvalidStyle.bind(this)(p1, p2);"; } set { } }
 
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
@@ -492,6 +519,35 @@ $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
         public override string InputControlType { get { return "EbCheckBox"; } }
+
+        public override string GetValueFromDOMJSfn
+        {
+            get { return @"
+							if($('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).is(':checked'))
+							{
+							return true;
+							}
+							else{
+							return false;
+							}
+							"; }
+
+            set { }
+        }
+
+        public override string GetDisplayMemberFromDOMJSfn
+        {
+            get { return @"
+							if($('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).is(':checked'))
+							{
+							return '✔';
+							}
+							else{
+							return '✖';
+							}
+							"; }
+            set { }
+        }
     }
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
@@ -529,11 +585,21 @@ $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this
         }
 
         [JsonIgnore]
-        public override string GetValueJSfn
+        public override string GetValueFromDOMJSfn
         {
             get
             {
                 return this.EbDate.GetValueJSfn;
+            }
+            set { }
+        }
+
+        [JsonIgnore]
+        public override string JustSetValueJSfn
+        {
+            get
+            {
+                return this.EbDate.JustSetValueJSfn;
             }
             set { }
         }
@@ -549,11 +615,11 @@ $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this
         }
 
         [JsonIgnore]
-        public override string GetDisplayMemberJSfn
+        public override string GetDisplayMemberFromDOMJSfn
         {
             get
             {
-                return this.EbDate.GetDisplayMemberJSfn;
+                return this.EbDate.GetDisplayMemberFromDOMJSfn;
             }
             set { }
         }
@@ -628,7 +694,16 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, p2).
             set { }
         }
 
-        public override string GetDisplayMemberJSfn { get { return @" return $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp] :selected`).text(); "; } set { } }
+        public override string JustSetValueJSfn
+        {
+            get
+            {
+                return EbSimpleSelect.JustSetValueJSfn;
+            }
+            set { }
+        }
+
+        public override string GetDisplayMemberFromDOMJSfn { get { return @" return $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp] :selected`).text(); "; } set { } }
 
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
@@ -704,7 +779,7 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, p2).
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.Boolean)]
         [OnChangeExec(@"if(this.IsDynamic === true){pg.ShowProperty('DataSourceId');pg.ShowProperty('ValueMember');pg.ShowProperty('DisplayMember');pg.HideProperty('Options');}
-		else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HideProperty('DisplayMember');pg.ShowProperty('Options');}")]
+else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HideProperty('DisplayMember');pg.ShowProperty('Options');}")]
         public bool IsDynamic
         {
             get { return this.EbSimpleSelect.IsDynamic; }
@@ -736,6 +811,19 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, p2).
         [JsonIgnore]
         private EbDGSimpleSelectColumn EbDGSimpleSelectColumn { set; get; }
 
+        public override string JustSetValueJSfn
+        {
+            get
+            {
+                return @"if(p1 === true)
+                            p1 = 'true'
+                        else if(p1 === false)
+                            p1 = 'false'
+                       " + EbDGSimpleSelectColumn.JustSetValueJSfn;
+            }
+            set { }
+        }
+
         public override string SetValueJSfn
         {
             get
@@ -749,7 +837,7 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, p2).
             set { }
         }
 
-        public override string GetValueJSfn
+        public override string GetValueFromDOMJSfn
         {
             get
             {
@@ -784,11 +872,11 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, p2).
             set { }
         }
 
-        public override string GetDisplayMemberJSfn
+        public override string GetDisplayMemberFromDOMJSfn
         {
             get
             {
-                return EbDGSimpleSelectColumn.GetDisplayMemberJSfn;
+                return EbDGSimpleSelectColumn.GetDisplayMemberFromDOMJSfn;
             }
             set { }
         }
@@ -900,7 +988,7 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, p2).
         {
             DBareHtml = (@"
 <div  id='@ebsid@_wrap'>
-    <div class='input-group' style='width:100%;'>            
+    <div class='input-group' style='width:100%;'>           
         <input id='@ebsid@_inp' ui-inp data-toggle='tooltip' title='' type='text' tabindex='0' style='width:100%; data-original-title='' disabled>
         <span id='@ebsid@_showbtn' class='input-group-addon ucspan' data-toggle='modal' data-target='#@colebsid@_usercontrolmodal' style='padding: 0px;'> <button type='button' id='Date1TglBtn' class='fa  fa-ellipsis-h ucbtn' aria-hidden='true' style='padding: 6px 12px;'></button> </span>
     </div>
@@ -916,11 +1004,68 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, p2).
     public class EbDGPowerSelectColumn : EbDGColumn
     {
 
+
+        //[OnDeserialized]
+        //public void OnDeserializedMethod(StreamingContext context)
+        //{
+        //    if (RenderAsSimpleSelect)
+        //    {
+        //        IsDynamic = true;
+        //        this.EbPowerSelect.Options = new List<EbSimpleSelectOption>();
+        //        this.DBareHtml = this.GetBareHtml();
+        //    }
+        //}
+
+        [JsonIgnore]
+        public bool IsDynamic { get; set; }
+
         [JsonIgnore]
         public override string SetDisplayMemberJSfn { get { return this.EbPowerSelect.SetDisplayMemberJSfn; } set { } }
 
         [JsonIgnore]
-        private EbPowerSelect EbPowerSelect { get; set; }
+        public override string GetDisplayMemberFromDOMJSfn { get { return this.EbPowerSelect.GetDisplayMemberFromDOMJSfn; } set { } }
+
+        [JsonIgnore]
+        public EbPowerSelect EbPowerSelect { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
+        public string DataSourceId
+        {
+            get { return this.EbPowerSelect.DataSourceId; }
+            set { this.EbPowerSelect.DataSourceId = value; }
+        }
+        
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", 1)]
+        [OnChangeExec(@"if (
+this.Columns.$values.length === 0 ){
+pg.MakeReadOnly('ValueMember');}
+else {pg.MakeReadWrite('ValueMember');}")]
+        public DVBaseColumn ValueMember { get { return this.EbPowerSelect.ValueMember; } set { this.EbPowerSelect.ValueMember = value; } }
+
+        [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.WebForm, BuilderType.UserControl)]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", 1)]
+        [PropertyGroup("Behavior")]
+        [PropertyPriority(98)]
+        [OnChangeExec(@"if (this.Columns && this.Columns.$values.length === 0 ){pg.MakeReadOnly('DisplayMember');} else {pg.MakeReadWrite('DisplayMember');}")]
+        public DVBaseColumn DisplayMember { get { return this.EbPowerSelect.DisplayMember; } set { this.EbPowerSelect.DisplayMember = value; } }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+        [PropertyGroup("Behavior")]
+        [PropertyPriority(50)]
+        [OnChangeExec(@"
+if(this.RenderAsSimpleSelect == true)
+{ 
+	pg.ShowProperty('DisplayMember');
+}
+else
+{
+	pg.HideProperty('DisplayMember');
+}
+")]
+        public bool RenderAsSimpleSelect { get { return this.EbPowerSelect.RenderAsSimpleSelect; } set { this.EbPowerSelect.RenderAsSimpleSelect = value; } }
 
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
@@ -931,12 +1076,15 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, p2).
         {
             this.EbPowerSelect = new EbPowerSelect();
             this.AddButton = new EbButton();
+            this.Options = new List<EbSimpleSelectOption>();
         }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iWebForm)]
         public string FormRefId { get { return this.AddButton.FormRefId; } set { this.AddButton.FormRefId = value; } }
+
+        public override string JustSetValueJSfn { get { return EbPowerSelect.JustSetValueJSfn; } set { } }
 
         public override string SetValueJSfn { get { return EbPowerSelect.SetValueJSfn; } set { } }
 
@@ -951,16 +1099,11 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, p2).
         [DefaultPropValue("100")]
         public override int Width { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
-        [PropertyEditor(PropertyEditorType.ObjectSelector)]
-        [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
-        public string DataSourceId { get { return this.EbPowerSelect.DataSourceId; } set { this.EbPowerSelect.DataSourceId = value; } }
-
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup("Behavior")]
         [OnChangeExec(@"
             if (this.MultiSelect === true ){
-                pg.MakeReadWrite('MaxLimit');   
+                pg.MakeReadWrite('MaxLimit');  
                 if (this.Required === true ){
                     if(this.MinLimit < 1){
                         pg.setSimpleProperty('MinLimit', 1);
@@ -969,12 +1112,12 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, p2).
                 }
                 else{
                     pg.setSimpleProperty('MinLimit', 0);
-                    pg.MakeReadOnly('MinLimit');                 
+                    pg.MakeReadOnly('MinLimit');                
                 }
                 if(this.MaxLimit === 1)
                     pg.setSimpleProperty('MaxLimit', 0);
-                    
-            } 
+                   
+            }
             else {
                 pg.setSimpleProperty('MaxLimit', 1);
                 pg.MakeReadOnly(['MaxLimit','MinLimit']);
@@ -993,7 +1136,7 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, p2).
         [PropertyGroup("Behavior")]
         [OnChangeExec(@"
             if (this.MultiSelect === true ){
-                pg.MakeReadWrite('MaxLimit');   
+                pg.MakeReadWrite('MaxLimit');  
                 if (this.Required === true ){
                     if(this.MinLimit < 1){
                         pg.setSimpleProperty('MinLimit', 1);
@@ -1002,9 +1145,9 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, p2).
                 }
                 else{
                     pg.setSimpleProperty('MinLimit', 0);
-                    pg.MakeReadOnly('MinLimit');                 
+                    pg.MakeReadOnly('MinLimit');                
                 }
-            } 
+            }
             else {
                 pg.setSimpleProperty('MaxLimit', 1);
                 pg.MakeReadOnly(['MaxLimit','MinLimit']);
@@ -1024,7 +1167,7 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, p2).
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup("Behavior")]
-        public int MinLimit { get { return this.EbPowerSelect.MaxLimit; } set { this.EbPowerSelect.MinLimit = value; } }
+        public int MinLimit { get { return this.EbPowerSelect.MinLimit; } set { this.EbPowerSelect.MinLimit = value; } }
 
         [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.CollectionProp, "Columns", "bVisible")]
@@ -1049,6 +1192,12 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, p2).
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
         public DVColumnCollection DisplayMembers { get { return this.EbPowerSelect.DisplayMembers; } set { this.EbPowerSelect.DisplayMembers = value; } }
 
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        [Alias("Options")]
+        public List<EbSimpleSelectOption> Options { get { return this.EbPowerSelect.Options; } set { this.EbPowerSelect.Options = value; } }
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public int DropdownHeight { get { return this.EbPowerSelect.DropdownHeight; } set { this.EbPowerSelect.DropdownHeight = value; } }
 
@@ -1056,14 +1205,6 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, p2).
         [Alias("DropdownWidth(%)")]
         [DefaultPropValue("100")]
         public int DropdownWidth { get { return this.EbPowerSelect.DropdownWidth; } set { this.EbPowerSelect.DropdownWidth = value; } }
-
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
-        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", 1)]
-        [OnChangeExec(@"if (
-this.Columns.$values.length === 0 ){
-pg.MakeReadOnly('ValueMember');} 
-else {pg.MakeReadWrite('ValueMember');}")]
-        public DVBaseColumn ValueMember { get { return this.EbPowerSelect.ValueMember; } set { this.EbPowerSelect.ValueMember = value; } }
 
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
@@ -1073,6 +1214,12 @@ else {pg.MakeReadWrite('ValueMember');}")]
         {
             return this.EbPowerSelect.GetBareHtml("@ebsid@"); // temp
         }
+        public void InitFromDataBase_SS(JsonServiceClient ServiceClient)
+        {
+            this.EbPowerSelect.InitFromDataBase_SS(ServiceClient);
+            this.DBareHtml = this.GetBareHtml();
+        }
+
 
         public string GetSelectQuery(IDatabase DataDB, Service service, string Col, string Tbl = null, string _id = null, string masterTbl = null)
         {
@@ -1084,12 +1231,6 @@ else {pg.MakeReadWrite('ValueMember');}")]
             return this.EbPowerSelect.GetDisplayMembersQuery(DataDB, service, vms);
         }
     }
-
-
-
-
-
-
 
 
 
@@ -1130,12 +1271,12 @@ else {pg.MakeReadWrite('ValueMember');}")]
         //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         //public override bool IsEditable
         //{
-        //	get { return !this.EbSysCreatedBy.IsReadOnly; }
-        //	set { this.EbSysCreatedBy.IsReadOnly = !value; }
+        // get { return !this.EbSysCreatedBy.IsReadOnly; }
+        // set { this.EbSysCreatedBy.IsReadOnly = !value; }
         //}
 
         [JsonIgnore]
-        public override string GetValueJSfn
+        public override string GetValueFromDOMJSfn
         {
             get
             {
@@ -1155,6 +1296,16 @@ else {pg.MakeReadWrite('ValueMember');}")]
         }
 
         [JsonIgnore]
+        public override string JustSetValueJSfn
+        {
+            get
+            {
+                return this.EbSysCreatedBy.JustSetValueJSfn;
+            }
+            set { }
+        }
+
+        [JsonIgnore]
         public override string EnableJSfn
         {
             get
@@ -1165,11 +1316,31 @@ else {pg.MakeReadWrite('ValueMember');}")]
         }
 
         [JsonIgnore]
-        public override string GetDisplayMemberJSfn
+        public override string GetDisplayMemberFromDOMJSfn
         {
             get
             {
-                return this.EbSysCreatedBy.GetDisplayMemberJSfn;
+                return this.EbSysCreatedBy.GetDisplayMemberFromDOMJSfn;
+            }
+            set { }
+        }
+
+        [JsonIgnore]
+        public override string RefreshJSfn
+        {
+            get
+            {
+                return this.EbSysCreatedBy.RefreshJSfn;
+            }
+            set { }
+        }
+
+        [JsonIgnore]
+        public override string ClearJSfn
+        {
+            get
+            {
+                return this.EbSysCreatedBy.ClearJSfn;
             }
             set { }
         }
@@ -1182,8 +1353,6 @@ else {pg.MakeReadWrite('ValueMember');}")]
         [HideInToolBox]
         public override bool IsSysControl { get { return true; } }
     }
-
-
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
     [Alias("Created At Column")]
@@ -1229,16 +1398,26 @@ else {pg.MakeReadWrite('ValueMember');}")]
         //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         //public override bool IsEditable
         //{
-        //	get { return !this.EbSysCreatedAt.IsReadOnly; }
-        //	set { this.EbSysCreatedAt.IsReadOnly = !value; }
+        // get { return !this.EbSysCreatedAt.IsReadOnly; }
+        // set { this.EbSysCreatedAt.IsReadOnly = !value; }
         //}
 
         [JsonIgnore]
-        public override string GetValueJSfn
+        public override string GetValueFromDOMJSfn
         {
             get
             {
                 return this.EbSysCreatedAt.GetValueJSfn;
+            }
+            set { }
+        }
+
+        [JsonIgnore]
+        public override string JustSetValueJSfn
+        {
+            get
+            {
+                return this.EbSysCreatedAt.JustSetValueJSfn;
             }
             set { }
         }
@@ -1263,15 +1442,32 @@ else {pg.MakeReadWrite('ValueMember');}")]
             set { }
         }
 
-        public override string GetDisplayMemberJSfn
+        public override string GetDisplayMemberFromDOMJSfn
         {
             get
             {
-                return this.EbSysCreatedAt.GetDisplayMemberJSfn;
+                return this.EbSysCreatedAt.GetDisplayMemberFromDOMJSfn;
             }
             set { }
         }
 
+        public override string RefreshJSfn
+        {
+            get
+            {
+                return this.EbSysCreatedAt.RefreshJSfn;
+            }
+            set { }
+        }
+
+        public override string ClearJSfn
+        {
+            get
+            {
+                return this.EbSysCreatedAt.ClearJSfn;
+            }
+            set { }
+        }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [HideInPropertyGrid]
@@ -1281,9 +1477,6 @@ else {pg.MakeReadWrite('ValueMember');}")]
         [HideInToolBox]
         public override bool IsSysControl { get { return true; } }
     }
-
-
-
 
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
@@ -1323,16 +1516,26 @@ else {pg.MakeReadWrite('ValueMember');}")]
         //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         //public override bool IsEditable
         //{
-        //	get { return !this.EbSysModifiedBy.IsReadOnly; }
-        //	set { this.EbSysModifiedBy.IsReadOnly = !value; }
+        // get { return !this.EbSysModifiedBy.IsReadOnly; }
+        // set { this.EbSysModifiedBy.IsReadOnly = !value; }
         //}
 
         [JsonIgnore]
-        public override string GetValueJSfn
+        public override string GetValueFromDOMJSfn
         {
             get
             {
                 return this.EbSysModifiedBy.GetValueJSfn;
+            }
+            set { }
+        }
+
+        [JsonIgnore]
+        public override string JustSetValueJSfn
+        {
+            get
+            {
+                return this.EbSysModifiedBy.JustSetValueJSfn;
             }
             set { }
         }
@@ -1358,11 +1561,29 @@ else {pg.MakeReadWrite('ValueMember');}")]
         }
 
         [JsonIgnore]
-        public override string GetDisplayMemberJSfn
+        public override string GetDisplayMemberFromDOMJSfn
         {
             get
             {
-                return this.EbSysModifiedBy.GetDisplayMemberJSfn;
+                return this.EbSysModifiedBy.GetDisplayMemberFromDOMJSfn;
+            }
+            set { }
+        }
+
+        public override string RefreshJSfn
+        {
+            get
+            {
+                return this.EbSysModifiedBy.RefreshJSfn;
+            }
+            set { }
+        }
+
+        public override string ClearJSfn
+        {
+            get
+            {
+                return this.EbSysModifiedBy.ClearJSfn;
             }
             set { }
         }
@@ -1375,8 +1596,6 @@ else {pg.MakeReadWrite('ValueMember');}")]
         [HideInToolBox]
         public override bool IsSysControl { get { return true; } }
     }
-
-
 
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
@@ -1423,16 +1642,26 @@ else {pg.MakeReadWrite('ValueMember');}")]
         //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         //public override bool IsEditable
         //{
-        //	get { return !this.EbSysModifiedAt.IsReadOnly; }
-        //	set { this.EbSysModifiedAt.IsReadOnly = !value; }
+        // get { return !this.EbSysModifiedAt.IsReadOnly; }
+        // set { this.EbSysModifiedAt.IsReadOnly = !value; }
         //}
 
         [JsonIgnore]
-        public override string GetValueJSfn
+        public override string GetValueFromDOMJSfn
         {
             get
             {
                 return this.EbSysModifiedAt.GetValueJSfn;
+            }
+            set { }
+        }
+
+        [JsonIgnore]
+        public override string JustSetValueJSfn
+        {
+            get
+            {
+                return this.EbSysModifiedAt.JustSetValueJSfn;
             }
             set { }
         }
@@ -1457,11 +1686,29 @@ else {pg.MakeReadWrite('ValueMember');}")]
             set { }
         }
 
-        public override string GetDisplayMemberJSfn
+        public override string GetDisplayMemberFromDOMJSfn
         {
             get
             {
-                return this.EbSysModifiedAt.GetDisplayMemberJSfn;
+                return this.EbSysModifiedAt.GetDisplayMemberFromDOMJSfn;
+            }
+            set { }
+        }
+
+        public override string RefreshJSfn
+        {
+            get
+            {
+                return this.EbSysModifiedAt.RefreshJSfn;
+            }
+            set { }
+        }
+
+        public override string ClearJSfn
+        {
+            get
+            {
+                return this.EbSysModifiedAt.ClearJSfn;
             }
             set { }
         }
@@ -1473,6 +1720,62 @@ else {pg.MakeReadWrite('ValueMember');}")]
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [HideInToolBox]
         public override bool IsSysControl { get { return true; } }
+    }
+
+
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+    [Alias("User Select Column")]
+    [UsedWithTopObjectParent(typeof(EbObject))]
+    public class EbDGUserSelectColumn : EbDGColumn
+    {
+
+        [JsonIgnore]
+        public EbUserSelect EbUserSelect { get; set; }
+
+        public EbDGUserSelectColumn()
+        {
+            this.EbUserSelect = new EbUserSelect();
+        }
+
+        [OnDeserialized]
+        public void OnDeserializedMethod(StreamingContext context)
+        {
+            this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
+            DBareHtml = this.EbUserSelect.GetBareHtml();
+        }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [HideInPropertyGrid]
+        public override EbDbTypes EbDbType
+        {
+            get { return this.EbUserSelect.EbDbType; }
+            set { this.EbUserSelect.EbDbType = value; }
+        }
+
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [HideInPropertyGrid]
+        public List<UserSelectOption> UserList
+        {
+            get { return this.EbUserSelect.UserList; }
+            set { this.EbUserSelect.UserList = value; }
+        }
+        public void InitOptions(Dictionary<int, string> Users)
+        {
+            this.EbUserSelect.InitOptions(Users);
+        }
+
+        //public override string GetDisplayMemberJSfn
+        //{
+        //	get { return @"this.getValue();"; }
+        //	set { }
+        //}
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override string InputControlType { get { return "EbUserSelect"; } }
+
+
     }
 
 }

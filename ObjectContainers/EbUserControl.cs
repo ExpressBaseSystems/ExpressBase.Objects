@@ -1,4 +1,5 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Data;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
@@ -38,9 +39,7 @@ namespace ExpressBase.Objects
         //{
         //    return @"<div eb-type='@toolName' class='tool'><i class='fa fa-puzzle-piece'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
         //}
-
-        public bool IsRenderMode { get; set; }
-
+        
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [HideInPropertyGrid]
         public override string TableName { get { return this.TableName_Temp; } set { this.TableName_Temp = value; } }
@@ -183,7 +182,7 @@ namespace ExpressBase.Objects
         //builder side - now it is using to get design html, rec call from AfterRedisGet
         public void AfterRedisGet(Service service)
         {
-            EbFormHelper.AfterRedisGet(this, service);
+            EbFormHelper.AfterRedisGet(this, service.Redis, null, service);
             foreach(EbControl c in this.Controls)
                 EbFormHelper.RenameControlsRec(c, this.Name);
         }
@@ -191,7 +190,7 @@ namespace ExpressBase.Objects
         //rendering side
         public override void AfterRedisGet(RedisClient Redis, IServiceClient client)
         {
-            EbFormHelper.AfterRedisGet(this, Redis, client, this.IsRenderMode);
+            EbFormHelper.AfterRedisGet(this, Redis, client, null);
         }
 
         public override List<string> DiscoverRelatedRefids()
@@ -203,7 +202,7 @@ namespace ExpressBase.Objects
             EbFormHelper.ReplaceRefid(this, RefidMap);
         }
 
-        public void SetDataObjectControl(IDatabase DataDB, Service Service)
+        public void SetDataObjectControl(IDatabase DataDB, Service Service , List<Param> param)
         {
             Dictionary<string, EbDataTable> _tables = new Dictionary<string, EbDataTable>();
             EbControl[] Allctrls = this.Controls.FlattenAllEbControls();
@@ -212,15 +211,18 @@ namespace ExpressBase.Objects
                 if(Allctrls[i] is EbDataObject)
                 {
                     EbDataObject c = Allctrls[i] as EbDataObject;
-                    EbDataReader _temp = Service.Redis.Get<EbDataReader>(c.DataSource);
-                    if (_temp == null)
-                    {
-                        var result = Service.Gateway.Send<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = c.DataSource });
-                        _temp = EbSerializers.Json_Deserialize(result.Data[0].Json);
-                        Service.Redis.Set<EbDataReader>(c.DataSource, _temp);
-                    }
+                    //EbDataReader _temp = Service.Redis.Get<EbDataReader>(c.DataSource);
+                    //if (_temp == null)
+                    //{
+                    //    var result = Service.Gateway.Send<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = c.DataSource });
+                    //    _temp = EbSerializers.Json_Deserialize(result.Data[0].Json);
+                    //    Service.Redis.Set<EbDataReader>(c.DataSource, _temp);
+                    //}
+                    DataSourceDataSetResponse response = Service.Gateway.Send<DataSourceDataSetResponse>(new DataSourceDataSetRequest { RefId = c.DataSource , Params = param });
 
-                    EbDataTable data = DataDB.DoQuery(_temp.Sql);
+                    //EbDataTable data = DataDB.DoQuery(_temp.Sql); 
+                    
+                    EbDataTable data = response.DataSet.Tables[0];
                     _tables.Add(c.Name, data);
                 }
             }

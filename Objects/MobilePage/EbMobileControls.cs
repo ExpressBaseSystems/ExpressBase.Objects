@@ -1,4 +1,5 @@
-﻿using ExpressBase.Common.Extensions;
+﻿using ExpressBase.Common;
+using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
@@ -37,6 +38,8 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [HelpText("Set true if you dont want to save value from this field.")]
         public virtual bool DoNotPersist { get; set; }
+
+        public virtual EbControl GetWebFormCtrl(int counter) { return null; }
     }
 
     [EnableInBuilder(BuilderType.MobilePage)]
@@ -69,6 +72,22 @@ namespace ExpressBase.Objects
                                <input type='text' class='eb_mob_textbox' />
                             </div>
                         </div>".RemoveCR().DoubleQuoted();
+        }
+
+        public override EbControl GetWebFormCtrl(int counter)
+        {
+            return new EbTextBox
+            {
+                EbSid = "TextBox" + counter,
+                Name = this.Name,
+                MaxLength = this.MaxLength,
+                TextTransform = this.TextTransform,
+                TextMode = this.TextMode,
+                AutoCompleteOff = this.AutoCompleteOff,
+                AutoSuggestion = this.AutoSuggestion,
+                Margin = new UISides { Top = 0, Bottom = 0, Left = 0, Right = 0 },
+                Label = this.Label
+            };
         }
     }
 
@@ -107,6 +126,22 @@ namespace ExpressBase.Objects
                             </div>
                         </div>".RemoveCR().DoubleQuoted();
         }
+
+        public override EbControl GetWebFormCtrl(int counter)
+        {
+            return new EbNumeric
+            {
+                EbSid = "Numeric" + counter,
+                Name = this.Name,
+                MaxLength = this.MaxLength,
+                DecimalPlaces = this.DecimalPlaces,
+                MaxLimit = this.MaxLimit,
+                MinLimit = this.MinLimit,
+                IsCurrency = this.IsCurrency,
+                Margin = new UISides { Top = 0, Bottom = 0, Left = 0, Right = 0 },
+                Label = this.Label
+            };
+        }
     }
 
     [EnableInBuilder(BuilderType.MobilePage)]
@@ -135,6 +170,21 @@ namespace ExpressBase.Objects
                             </div>
                         </div>".RemoveCR().DoubleQuoted();
         }
+
+        public override EbControl GetWebFormCtrl(int counter)
+        {
+            return new EbDate
+            {
+                EbSid = "Date" + counter,
+                Name = this.Name,
+                IsNullable = this.IsNullable,
+                EbDateType = this.EbDateType,
+                ShowTimeAs_ = this.ShowTimeAs_,
+                ShowDateAs_ = this.ShowDateAs_,
+                Margin = new UISides { Top = 0, Bottom = 0, Left = 0, Right = 0 },
+                Label = this.Label
+            };
+        }
     }
 
     [EnableInBuilder(BuilderType.MobilePage)]
@@ -159,6 +209,18 @@ namespace ExpressBase.Objects
                                 </select>
                             </div>
                         </div>".RemoveCR().DoubleQuoted();
+        }
+
+        public override EbControl GetWebFormCtrl(int counter)
+        {
+            return new EbSimpleSelect
+            {
+                EbSid = "SimpleSelect" + counter,
+                Name = this.Name,
+                IsMultiSelect = this.IsMultiSelect,
+                Margin = new UISides { Top = 0, Bottom = 0, Left = 0, Right = 0 },
+                Label = this.Label
+            };
         }
     }
 
@@ -213,6 +275,18 @@ namespace ExpressBase.Objects
                     this.EnableEdit= true;
                 };";
         }
+
+        public override EbControl GetWebFormCtrl(int counter)
+        {
+            return new EbFileUploader
+            {
+                EbSid = "FileUploader" + counter,
+                Name = this.Name,
+                IsMultipleUpload = this.MultiSelect,
+                Margin = new UISides { Top = 0, Bottom = 0, Left = 0, Right = 0 },
+                Label = this.Label
+            };
+        }
     }
 
     [EnableInBuilder(BuilderType.MobilePage)]
@@ -228,6 +302,17 @@ namespace ExpressBase.Objects
                                <input type='checkbox' class='eb_mob_checkbox'/>
                             </div>
                         </div>".RemoveCR().DoubleQuoted();
+        }
+
+        public override EbControl GetWebFormCtrl(int counter)
+        {
+            return new EbBooleanSelect
+            {
+                EbSid = "BooleanSelect" + counter,
+                Name = this.Name,
+                Margin = new UISides { Top = 0, Bottom = 0, Left = 0, Right = 0 },
+                Label = this.Label
+            };
         }
     }
 
@@ -272,6 +357,16 @@ namespace ExpressBase.Objects
                     this.RowCount = 2;
                     this.ColumCount= 2;
                 };";
+        }
+
+        public override EbControl GetWebFormCtrl(int counter)
+        {
+            return new EbTableLayout
+            {
+                EbSid = "TableLayout" + counter,
+                Name = this.Name,
+                Label = this.Label
+            };
         }
     }
 
@@ -319,6 +414,11 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
         public EbDbTypes Type { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [UIproperty]
+        [PropertyEditor(PropertyEditorType.FontSelector)]
+        public EbFont Font { get; set; }
 
         public override bool Hidden { set; get; }
 

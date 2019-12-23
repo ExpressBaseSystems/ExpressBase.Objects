@@ -13,6 +13,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Xml.Serialization;
 using ExpressBase.Security;
+using ExpressBase.Common.LocationNSolution;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
@@ -369,6 +370,15 @@ END;";
         public int UserId { set; get; }
 
         public string DisplayName { set; get; }
+
+        public User User { set; get; }
+
+        public List<EbLocation> Locations { get; set; }
+
+        public ApiAuthResponse()
+        {
+            Locations = new List<EbLocation>();
+        }
     }
 
     public class ApiFileData

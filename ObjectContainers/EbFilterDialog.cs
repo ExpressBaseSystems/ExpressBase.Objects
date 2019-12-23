@@ -25,9 +25,7 @@ namespace ExpressBase.Objects
         public EbFilterDialog() { }
 
         private List<Param> _paramlist = new List<Param>();
-
-        public bool IsRenderMode { get; set; }
-
+        
         public List<Param> GetDefaultParams()
         {
             foreach (EbControl c in this.Controls)
@@ -145,12 +143,12 @@ namespace ExpressBase.Objects
 
         public void AfterRedisGet(Service service)
         {
-            EbFormHelper.AfterRedisGet(this, service);
+            EbFormHelper.AfterRedisGet(this, service.Redis, null, service);
         }
 
         public override void AfterRedisGet(RedisClient Redis, IServiceClient client)
         {
-            EbFormHelper.AfterRedisGet(this, Redis, client, this.IsRenderMode);
+            EbFormHelper.AfterRedisGet(this, Redis, client, null);
         }
 
         public override List<string> DiscoverRelatedRefids()
