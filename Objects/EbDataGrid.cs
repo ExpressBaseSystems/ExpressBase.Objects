@@ -344,7 +344,7 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         public override string GetValueFromDOMJSfn
         {
-            get { return @"let val = $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val(); return (this.ObjType === 'Numeric') ?  (parseFloat($('#' + this.EbSid_CtxId).val()) || 0) :val;"; }
+            get { return @"return $('[ebsid=' + this.__DG.EbSid + ']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val();"; }
 
             set { }
         }
@@ -1024,6 +1024,9 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
 
         [JsonIgnore]
         public override string GetDisplayMemberFromDOMJSfn { get { return this.EbPowerSelect.GetDisplayMemberFromDOMJSfn; } set { } }
+
+        [JsonIgnore]
+        public override string GetColumnJSfn { get { return this.EbPowerSelect.GetColumnJSfn; } set { } }
 
         [JsonIgnore]
         public EbPowerSelect EbPowerSelect { get; set; }

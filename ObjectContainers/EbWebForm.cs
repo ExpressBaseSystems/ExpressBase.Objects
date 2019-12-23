@@ -1163,7 +1163,10 @@ namespace ExpressBase.Objects
 
             if (dataColumn == null || dataRow.IsDBNull(dataColumn.ColumnIndex))
             {
-
+                if (_control != null && (_control.EbDbType == EbDbTypes.Decimal || _control.EbDbType == EbDbTypes.Int32))
+                    _displayMember = "0.00";
+                else if (dataColumn.Type == EbDbTypes.Int32 || dataColumn.Type == EbDbTypes.Int64 || dataColumn.Type == EbDbTypes.Decimal || dataColumn.Type == EbDbTypes.Double)
+                    _displayMember = "0.00";
             }
             else if (_control != null)
             {
@@ -1238,7 +1241,10 @@ namespace ExpressBase.Objects
                     }
                 }
                 else if (_control.EbDbType == EbDbTypes.Decimal || _control.EbDbType == EbDbTypes.Int32)
+                {
                     _formattedData = Convert.ToDouble(dataRow[dataColumn.ColumnIndex]);
+                    _displayMember = string.Format("{0:0.00}", _formattedData);
+                }
                 else
                     _formattedData = dataRow[dataColumn.ColumnIndex];
             }
@@ -1249,7 +1255,10 @@ namespace ExpressBase.Objects
                 _displayMember = dt.ToString(this.UserObj.Preference.GetShortDatePattern(), CultureInfo.InvariantCulture);
             }
             else if (dataColumn.Type == EbDbTypes.Int32 || dataColumn.Type == EbDbTypes.Int64 || dataColumn.Type == EbDbTypes.Decimal || dataColumn.Type == EbDbTypes.Double)
+            {
                 _formattedData = Convert.ToDouble(dataRow[dataColumn.ColumnIndex]);
+                _displayMember = string.Format("{0:0.00}", _formattedData);
+            }
             else
                 _formattedData = dataRow[dataColumn.ColumnIndex];
 
