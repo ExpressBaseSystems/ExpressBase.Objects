@@ -57,15 +57,7 @@ namespace ExpressBase.Objects
         [PropertyPriority(98)]
         public bool IsInsertable { get; set; }
 
-        public override string GetJsInitFunc()// should remove
-        {
-            return @"
-this.Init = function(id){
-    debugger;
-    this.getColumn = EBPSGetColummn;
-};";
-        }
-
+        [JsonIgnore]
         public override string IsRequiredOKJSfn
         {
             get
@@ -86,7 +78,8 @@ this.Init = function(id){
 
         //public EbSimpleSelect EbSimpleSelect;
 
-        
+
+        [JsonIgnore]
         public override string GetDisplayMemberFromDOMJSfn
         {
             get
@@ -95,9 +88,20 @@ this.Init = function(id){
             }
             set { }
         }
+
+        [JsonIgnore]
+        public override string GetColumnJSfn { get { return @"
+if(this.DataVals.R)
+    return this.DataVals.R[p1];
+else
+    return []"
+; } set { } }
+
+        [JsonIgnore]
         public override string IsEmptyJSfn { get { return @" return this.initializer.Vobj.valueMembers.length === 0;"; } set { } }
 
 
+        [JsonIgnore]
         public override string DisableJSfn
         {
             get
@@ -114,6 +118,7 @@ this.Init = function(id){
             set { }
         }
 
+        [JsonIgnore]
         public override string EnableJSfn
         {
             get
@@ -123,10 +128,13 @@ this.Init = function(id){
             set { }
         }
 
+        [JsonIgnore]
         public override string JustSetValueJSfn { get { return JSFnsConstants.PS_JustSetValueJSfn; } set { } }
 
+        [JsonIgnore]
         public override string SetValueJSfn { get { return JSFnsConstants.PS_SetValueJSfn; } set { } }
 
+        [JsonIgnore]
         public override string GetValueJSfn
         {
             get
