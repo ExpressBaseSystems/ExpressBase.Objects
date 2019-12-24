@@ -5,12 +5,6 @@ using System.Text;
 
 namespace ExpressBase.Objects.Objects.MobilePage
 {
-    public enum MobVisRenderType
-    {
-        Link = 0,
-        Info = 1,
-        Referencing = 3
-    }
 
     public class MobileFormData
     {

@@ -97,10 +97,6 @@ namespace ExpressBase.Objects
         public EbScript OfflineQuery { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("Link Settings")]
-        public MobVisRenderType RenderAs { get; set; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iMobilePage)]
         [PropertyGroup("Link Settings")]
