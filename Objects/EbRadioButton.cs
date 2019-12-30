@@ -194,7 +194,7 @@ return val"; } set { } }
         //public override string GetValueJSfn { get { return @"return $('#' + this.EbSid_CtxId).prop('checked')? 'true': 'false';"; } set { } }
 
         [JsonIgnore]
-        public override string SetValueJSfn { get { return @"$('#' + this.EbSid_CtxId).prop('checked', (p1 === 'T'? true: false)).trigger('change');"; } set { } }
+        public override string SetValueJSfn { get { return @"$('#' + this.EbSid_CtxId).prop('checked', (p1 === this.Tv ? true: false)).trigger('change');"; } set { } }
 
     }
 }
