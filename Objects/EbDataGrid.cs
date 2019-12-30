@@ -589,7 +589,7 @@ namespace ExpressBase.Objects
         {
             get
             {
-                return this.EbDate.GetValueJSfn;
+                return this.EbDate.GetValueFromDOMJSfn;
             }
             set { }
         }
@@ -841,7 +841,7 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
         {
             get
             {
-                return EbDGSimpleSelectColumn.GetValueJSfn.Replace("return val;", "val = (val ==='true'); return val;");
+                return EbDGSimpleSelectColumn.GetValueFromDOMJSfn.Replace("return val;", "val = (val ==='true'); return val;");
             }
             set { }
         }
@@ -1283,7 +1283,7 @@ else
         {
             get
             {
-                return this.EbSysCreatedBy.GetValueJSfn;
+                return this.EbSysCreatedBy.GetValueFromDOMJSfn;
             }
             set { }
         }
@@ -1410,7 +1410,7 @@ else
         {
             get
             {
-                return this.EbSysCreatedAt.GetValueJSfn;
+                return this.EbSysCreatedAt.GetValueFromDOMJSfn;
             }
             set { }
         }
@@ -1528,7 +1528,7 @@ else
         {
             get
             {
-                return this.EbSysModifiedBy.GetValueJSfn;
+                return this.EbSysModifiedBy.GetValueFromDOMJSfn;
             }
             set { }
         }
@@ -1654,7 +1654,7 @@ else
         {
             get
             {
-                return this.EbSysModifiedAt.GetValueJSfn;
+                return this.EbSysModifiedAt.GetValueFromDOMJSfn;
             }
             set { }
         }

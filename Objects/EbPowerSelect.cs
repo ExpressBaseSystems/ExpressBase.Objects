@@ -135,16 +135,16 @@ else
         public override string SetValueJSfn { get { return JSFnsConstants.PS_SetValueJSfn; } set { } }
 
         [JsonIgnore]
-        public override string GetValueJSfn
+        public override string GetValueFromDOMJSfn
         {
             get
             {
                 return @"
                     if(this.RenderAsSimpleSelect){"
-                        + JSFnsConstants.EbSimpleSelect_GetValueJSfn +
+                        + JSFnsConstants.EbSimpleSelect_GetValueFromDOMJSfn +
                     @"}
                     else{"
-                        + new EbControl().GetValueJSfn +
+                        + new EbControl().GetValueFromDOMJSfn +
                     @"}
                 ";
             }

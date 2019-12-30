@@ -30,7 +30,7 @@ namespace ExpressBase.Objects
             }
             set { }
         }
-		public override string GetValueJSfn
+        public override string GetValueFromDOMJSfn
 		{
 			get
 			{
@@ -199,7 +199,7 @@ this.Init = function(id)
         public EbCheckBox() { }
 
         [JsonIgnore]
-        public override string GetValueJSfn { get { return @" return $('#' + this.EbSid_CtxId).is(':checked'); "; } set { } }
+        public override string GetValueFromDOMJSfn { get { return @" return $('#' + this.EbSid_CtxId).is(':checked'); "; } set { } }
 
         [JsonIgnore]
         public override string SetValueJSfn { get { return @" return $('#' + this.EbSid_CtxId).prop('checked', p1 ==='true').trigger('change'); "; } set { } }
