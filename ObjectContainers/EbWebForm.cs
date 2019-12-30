@@ -1520,13 +1520,19 @@ namespace ExpressBase.Objects
                     string cxt2 = (Ctrl as EbFileUploader).ExeContextCode(this.FormGlobals, false);
                     string qry = (Ctrl as EbFileUploader).GetSelectQuery(DataDB, string.IsNullOrEmpty(cxt2));
 
-                    EbDataTable dt = DataDB.DoQuery(qry, new DbParameter[]
+                    DbParameter[] param = new DbParameter[]
                     {
                         DataDB.GetNewParameter("id", EbDbTypes.Int32, this.TableRowId),
                         DataDB.GetNewParameter("context", EbDbTypes.String, context),
                         DataDB.GetNewParameter("context_sec", EbDbTypes.String, cxt2 ?? string.Empty),
                         DataDB.GetNewParameter("eb_ver_id", EbDbTypes.Int32, this.RefId.Split("-")[4])
-                    });
+                    };
+
+                    EbDataTable dt;
+                    if (this.DbConnection == null)
+                        dt = DataDB.DoQuery(qry, param);
+                    else
+                        dt = DataDB.DoQuery(this.DbConnection, qry, param);
 
                     SingleTable Table = new SingleTable();
                     this.GetFormattedData(dt, Table);
@@ -1536,7 +1542,7 @@ namespace ExpressBase.Objects
                     {
                         FileMetaInfo info = new FileMetaInfo
                         {
-                            FileRefId = dr["id"],
+                            FileRefId = Convert.ToInt32(dr["id"]),
                             FileName = dr["filename"],
                             Meta = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(dr["tags"] as string),
                             UploadTime = dr["uploadts"],
