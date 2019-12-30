@@ -35,7 +35,7 @@ namespace ExpressBase.Objects
             this.ValueType = EbRadioValueType.Boolean;
         }
 
-        public override string GetValueJSfn
+        public override string GetValueFromDOMJSfn
         {
             get
             {

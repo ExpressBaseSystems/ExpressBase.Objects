@@ -225,7 +225,7 @@ namespace ExpressBase.Objects
         }
 
         [JsonIgnore]
-        public override string GetValueJSfn
+        public override string GetValueFromDOMJSfn
         {
             get
             {

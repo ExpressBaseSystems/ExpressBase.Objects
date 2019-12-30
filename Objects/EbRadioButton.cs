@@ -183,7 +183,7 @@ namespace ExpressBase.Objects
         }
 
         [JsonIgnore]
-        public override string GetValueJSfn { get { return @"
+        public override string GetValueFromDOMJSfn { get { return @"
 let $ctrl = $('#' + this.EbSid_CtxId);
 let val = ($ctrl.prop('checked') == true) ? $ctrl.attr('true-val') :$ctrl.attr('false-val');
 if($ctrl.attr('value-type') === '11')
