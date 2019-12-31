@@ -197,6 +197,28 @@ namespace ExpressBase.Objects
         public List<EbMobileSSOption> Options { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
+        public string DataSourceRefId { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
+        [HelpText("sql query to get data from offline database")]
+        public EbScript OfflineQuery { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
+        public List<EbMobileDataColumn> Columns { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.CollectionABCFrmSrc, "Columns")]
+        public EbMobileDataColumn DisplayMember { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.CollectionABCFrmSrc, "Columns")]
+        public EbMobileDataColumn ValueMember { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
         public bool IsMultiSelect { get; set; }
 
         public override string GetDesignHtml()

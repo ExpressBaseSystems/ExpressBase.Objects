@@ -45,7 +45,7 @@ namespace ExpressBase.Objects
 
         public override string GetDesignHtml()
         {
-            return @"<div class='eb_mob_form_container mob_container dropped' eb-type='EbMobileForm' id='@id'>
+            return @"<div class='eb_mob_form_container mob_container dropped' tabindex='1' eb-type='EbMobileForm' id='@id'>
                         <div class='eb_mob_container_inner'>
                         </div>
                     </div>".RemoveCR().DoubleQuoted();
@@ -90,6 +90,10 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
         public string DataSourceRefId { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
+        public string SourceFormRefId { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
