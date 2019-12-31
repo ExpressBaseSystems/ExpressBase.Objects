@@ -42,7 +42,7 @@ namespace ExpressBase.Objects.Objects
 
         public string OptionHtml { get; set; }
 
-        public override string GetValueJSfn
+        public override string GetValueFromDOMJSfn
         {
             get
             {

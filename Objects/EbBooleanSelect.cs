@@ -52,11 +52,11 @@ namespace ExpressBase.Objects
             set { }
         }
 
-        public override string GetValueJSfn
+        public override string GetValueFromDOMJSfn
         {
             get
             {
-                return EbSimpleSelect.GetValueJSfn.Replace("return val;", "val = (val ==='true'); return val;");
+                return EbSimpleSelect.GetValueFromDOMJSfn.Replace("return val;", "val = (val ==='true'); return val;");
             }
             set { }
         }
