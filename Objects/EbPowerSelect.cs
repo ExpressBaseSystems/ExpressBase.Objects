@@ -402,17 +402,17 @@ else
         public bool RenderAsSimpleSelect { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [OnChangeExec(@"
-            if(this.IsMultiSelect === true){
-                pg.ShowProperty('IsSearchable');
-                pg.ShowProperty('MaxLimit');
-                pg.ShowProperty('MinLimit');
-            }
-            else{
-                pg.HideProperty('IsSearchable');
-                pg.HideProperty('MaxLimit');
-                pg.HideProperty('MinLimit');
-            }")]
+        //[OnChangeExec(@"
+        //    if(this.IsMultiSelect === true){
+        //        pg.ShowProperty('IsSearchable');
+        //        pg.ShowProperty('MaxLimit');
+        //        pg.ShowProperty('MinLimit');
+        //    }
+        //    else{
+        //        pg.HideProperty('IsSearchable');
+        //        pg.HideProperty('MaxLimit');
+        //        pg.HideProperty('MinLimit');
+        //    }")]
         public bool IsSearchable { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
