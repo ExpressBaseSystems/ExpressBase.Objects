@@ -21,7 +21,7 @@ namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
     public class EbFileUploader : EbControlUI
-	{
+    {
         #region Hide From PropertyGrid
 
         [HideInPropertyGrid]
@@ -52,9 +52,9 @@ namespace ExpressBase.Objects
             this.Categories = new List<EbFupCategories>();
         }
 
-		[HideInPropertyGrid]
-		[EnableInBuilder(BuilderType.BotForm)]
-		public override bool IsReadOnly { get => this.ReadOnly; }
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.BotForm)]
+        public override bool IsReadOnly { get => this.ReadOnly; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup("General")]
@@ -106,24 +106,24 @@ namespace ExpressBase.Objects
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
 
-		public override string DesignHtml4Bot
-		{
-			get => @"<div class='input-group'style='width: 100 %; '> 
+        public override string DesignHtml4Bot
+        {
+            get => @"<div class='input-group'style='width: 100 %; '> 
                         <input id='' ui-inp='' data-ebtype='6' class='date' type='text' name=' tabindex='0' style='width: 100%; display: inline - block; background - color: rgb(255, 255, 255); color: rgb(51, 51, 51);' placeholder=''>
                         <span class='input-group-addon'>
 							<i class='fa fa fa-upload' aria-hidden='true'  style='padding: 6px 12px;'></i>  
                         </span>
                     </div>";
-			set => base.DesignHtml4Bot = value;
-		}
+            set => base.DesignHtml4Bot = value;
+        }
 
-		public override string GetHead()
+        public override string GetHead()
         {
             return string.Empty;
         }
 
         public override string GetDesignHtml()
-       {
+        {
             string EbCtrlHTML = HtmlConstants.CONTROL_WRAPER_HTML4WEB
                     .Replace("@barehtml@", @"                       
                         <div class='input-group'style='width: 100 %; '> 
@@ -180,27 +180,13 @@ namespace ExpressBase.Objects
         }
 
         //INCOMPLETE
-        public string GetSelectQuery(bool pri_cxt_only = true)
+        public string GetSelectQuery(IDatabase DataDB, bool pri_cxt_only = true)
         {
             string Qry;
-            if(pri_cxt_only)
-            Qry = @"
-SELECT 
-	B.id, B.filename, B.tags, B.uploadts,B.filecategory
-FROM
-	eb_files_ref B
-WHERE
-	B.context = CONCAT(:context, '_@Name@') AND B.eb_del = 'F';".Replace("@Name@", this.Name?? this.EbSid);
-
+            if (pri_cxt_only)
+                Qry = DataDB.EB_GET_SELECT_FILE_UPLOADER_CXT.Replace("@Name@", this.Name ?? this.EbSid);
             else
-                Qry = @"
-SELECT 
-	B.id, B.filename, B.tags, B.uploadts,B.filecategory
-FROM
-	eb_files_ref B
-WHERE
-	(B.context = CONCAT(:context, '_@Name@') OR B.context_sec = :context_sec) AND B.eb_del = 'F';"
-        .Replace("@Name@", this.Name ?? this.EbSid);
+                Qry = DataDB.EB_GET_SELECT_FILE_UPLOADER_CXT_SEC.Replace("@Name@", this.Name ?? this.EbSid);
 
             return Qry;
         }
@@ -223,7 +209,7 @@ WHERE
                         InnerVals.Add(string.Format("('{0}_{1}_{2}')", EbObId, dataId, entry.Key));
 
                     param.Add(DataDB.GetNewParameter(cn, EbDbTypes.Decimal, row.Columns[0].Value));
-                    InnerIds.Add(":" + cn);
+                    InnerIds.Add("@" + cn);
                 }
                 if (dataId == 0)
                     Innercxt.Add(string.Format("context = CONCAT('{0}_', TRIM(CAST(eb_currval('{1}_id_seq') AS CHAR(32))), '_{2}')", EbObId, mastertbl, entry.Key));
@@ -247,7 +233,7 @@ WHERE
                 fullqry += string.Format(@"UPDATE eb_files_ref SET eb_del='T' 
                                             WHERE ({0}) AND eb_del='F' AND id NOT IN ({1});", Innercxt.Join(" OR "), InnerIds.Join(","));
             }
-            else if(Innercxt.Count > 0)// if all files deleted
+            else if (Innercxt.Count > 0)// if all files deleted
             {
                 fullqry += string.Format(@"UPDATE eb_files_ref SET eb_del='T' 
                                             WHERE ({0}) AND eb_del='F';", Innercxt.Join(" OR "));
@@ -263,20 +249,20 @@ WHERE
             //string priCxt = string.Empty;
             List<string> refIds = new List<string>();
             string fullqry = string.Empty;
-            
+
             foreach (SingleRow row in Table)
             {
                 string cn = this.Name + "_" + i.ToString();
                 i++;
                 param.Add(DataDB.GetNewParameter(cn, EbDbTypes.Decimal, row.Columns[0].Value));
-                refIds.Add(":" + cn);
+                refIds.Add("@" + cn);
             }
             if (!secCxtGet.IsNullOrEmpty())
             {
                 sCxtGetVal = "contextget_" + i;
                 i++;
                 param.Add(DataDB.GetNewParameter(sCxtGetVal, EbDbTypes.String, secCxtGet));
-            } 
+            }
             if (!secCxtSet.IsNullOrEmpty())
             {
                 sCxtSetVal = "contextset_" + i;
@@ -288,7 +274,7 @@ WHERE
                 pCxtVal = string.Format("CONCAT('{0}_', TRIM(CAST(eb_currval('{1}_id_seq') AS CHAR(32))), '_{2}')", EbObId, mastertbl, this.Name);
             else
                 pCxtVal = string.Format("'{0}_{1}_{2}'", EbObId, dataId, this.Name);
-           
+
             if (refIds.Count > 0)
             {
 
@@ -297,18 +283,18 @@ WHERE
                     fullqry += string.Format(@" UPDATE eb_files_ref SET context = {0} @upCxt@ 
                                                     WHERE id = {1} AND eb_del <> 'T' AND context = 'default' @secCxt@;"
                                                 .Replace("@secCxt@", !secCxtGet.IsNullOrEmpty() ? "AND context_sec IS NULL" : "")
-                                                .Replace("@upCxt@", !secCxtSet.IsNullOrEmpty()? ", context_sec = :{2}" : ""), pCxtVal, refIds[k], sCxtSetVal);
+                                                .Replace("@upCxt@", !secCxtSet.IsNullOrEmpty() ? ", context_sec = @{2}" : ""), pCxtVal, refIds[k], sCxtSetVal);
                 }
 
                 fullqry += string.Format(@"UPDATE eb_files_ref SET eb_del='T' 
                                             WHERE (context = {0} @secCxt@) AND eb_del='F' AND id NOT IN ({1});"
-                                            .Replace("@secCxt@", !secCxtGet.IsNullOrEmpty() ? "OR context_sec = :{2}" : ""), pCxtVal, refIds.Join(","), sCxtGetVal);
+                                            .Replace("@secCxt@", !secCxtGet.IsNullOrEmpty() ? "OR context_sec = @{2}" : ""), pCxtVal, refIds.Join(","), sCxtGetVal);
             }
             else // if all files deleted
             {
                 fullqry += string.Format(@"UPDATE eb_files_ref SET eb_del='T' 
                                             WHERE (context = {0} @secCxt@) AND eb_del='F';"
-                                            .Replace("@secCxt@", !secCxtGet.IsNullOrEmpty() ? "OR context_sec = :{1}": ""), pCxtVal, sCxtGetVal);
+                                            .Replace("@secCxt@", !secCxtGet.IsNullOrEmpty() ? "OR context_sec = @{1}" : ""), pCxtVal, sCxtGetVal);
             }
             return fullqry;
         }
@@ -327,7 +313,7 @@ WHERE
                 if (this.ContextGetExpr != null && !this.ContextGetExpr.Code.IsNullOrEmpty())
                     code = this.ContextGetExpr.Code;
             }
-            if(code != string.Empty)
+            if (code != string.Empty)
             {
                 try
                 {
@@ -342,7 +328,7 @@ WHERE
                     var r = (valscript.RunAsync(global)).Result.ReturnValue;
                     result = r.ToString();
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     Console.WriteLine("Exception in C# Expression evaluation. \nMessage : " + ex.Message);
                     Console.WriteLine(ex.StackTrace);

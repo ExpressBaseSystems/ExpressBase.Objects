@@ -71,11 +71,11 @@ namespace ExpressBase.Objects
             set { }
         }
 
-        public override string GetValueJSfn
+        public override string GetValueFromDOMJSfn
         {
             get
             {
-                return JSFnsConstants.EbSimpleSelect_GetValueJSfn;
+                return JSFnsConstants.EbSimpleSelect_GetValueFromDOMJSfn;
             }
             set { }
         }

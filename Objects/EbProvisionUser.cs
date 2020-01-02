@@ -394,7 +394,7 @@ this.Init = function(id)
             }
         }
 
-        public override string GetValueJSfn
+        public override string GetValueFromDOMJSfn
         {
             get
             {

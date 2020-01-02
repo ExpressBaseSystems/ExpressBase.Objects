@@ -40,5 +40,8 @@ namespace ExpressBase.Objects
         public EbMobileContainer Container { set; get; }
 
         public override List<string> DiscoverRelatedRefids() { return new List<string>(); }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        public bool HideFromMenu { set; get; }
     }
 }

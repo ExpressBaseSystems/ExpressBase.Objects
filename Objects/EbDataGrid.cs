@@ -18,6 +18,7 @@ using ExpressBase.Security;
 using ServiceStack.Redis;
 using ExpressBase.Common.Data;
 using System.Collections;
+using System.ComponentModel;
 
 namespace ExpressBase.Objects
 {
@@ -589,7 +590,7 @@ namespace ExpressBase.Objects
         {
             get
             {
-                return this.EbDate.GetValueJSfn;
+                return this.EbDate.GetValueFromDOMJSfn;
             }
             set { }
         }
@@ -841,7 +842,7 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
         {
             get
             {
-                return EbDGSimpleSelectColumn.GetValueJSfn.Replace("return val;", "val = (val ==='true'); return val;");
+                return EbDGSimpleSelectColumn.GetValueFromDOMJSfn.Replace("return val;", "val = (val ==='true'); return val;");
             }
             set { }
         }
@@ -1103,6 +1104,12 @@ else
         public override int Width { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [HelpText("Specify minimum number of charecters to initiate search")]
+        [Category("Search Settings")]
+        [PropertyGroup("Behavior")]
+        public int MinSeachLength { get { return this.EbPowerSelect.MinSeachLength; } set { this.EbPowerSelect.MinSeachLength = value; } }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup("Behavior")]
         [OnChangeExec(@"
             if (this.MultiSelect === true ){
@@ -1283,7 +1290,7 @@ else
         {
             get
             {
-                return this.EbSysCreatedBy.GetValueJSfn;
+                return this.EbSysCreatedBy.GetValueFromDOMJSfn;
             }
             set { }
         }
@@ -1410,7 +1417,7 @@ else
         {
             get
             {
-                return this.EbSysCreatedAt.GetValueJSfn;
+                return this.EbSysCreatedAt.GetValueFromDOMJSfn;
             }
             set { }
         }
@@ -1528,7 +1535,7 @@ else
         {
             get
             {
-                return this.EbSysModifiedBy.GetValueJSfn;
+                return this.EbSysModifiedBy.GetValueFromDOMJSfn;
             }
             set { }
         }
@@ -1654,7 +1661,7 @@ else
         {
             get
             {
-                return this.EbSysModifiedAt.GetValueJSfn;
+                return this.EbSysModifiedAt.GetValueFromDOMJSfn;
             }
             set { }
         }

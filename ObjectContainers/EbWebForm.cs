@@ -322,11 +322,11 @@ namespace ExpressBase.Objects
                 }
                 else if (_dict[CalcFlds[i]].Control.ValueExpr.Lang == ScriptingLanguage.SQL)
                 {
-                    if (code.Contains(":"))
+                    if (code.Contains("@") || code.Contains(":"))
                     {
                         for (int j = 0; j < _dict.Count; j++)
                         {
-                            if (code.Contains(":" + _dict[j].Control.Name))
+                            if (code.Contains("@" + _dict[j].Control.Name) || code.Contains(":" + _dict[j].Control.Name))
                             {
                                 if (CalcFlds[i] != j)
                                     dpndcy.Add(new KeyValuePair<int, int>(CalcFlds[i], j));//<dependent, dominant>
@@ -413,16 +413,16 @@ namespace ExpressBase.Objects
 
                 if (this.DataPusherConfig == null)
                 {
-                    query += string.Format("SELECT {0} FROM {1} WHERE {2} = :{3}_id AND (eb_del='F' OR eb_del IS null) {4};",
+                    query += string.Format("SELECT {0} FROM {1} WHERE {2} = @{3}_id AND COALESCE(eb_del, 'F') = 'F' {4};",
                         _cols, _table.TableName, _id, _schema.MasterTable, _table.TableType == WebFormTableTypes.Grid ? "ORDER BY eb_row_num" : "ORDER BY id");
                 }
                 else
                 {
                     if (_table.TableName == _schema.MasterTable)
-                        query += string.Format("SELECT {0} FROM {1} WHERE {2}_id = :{2}_id AND eb_push_id = '{3}' AND (eb_del='F' OR eb_del IS null);",
+                        query += string.Format("SELECT {0} FROM {1} WHERE {2}_id = @{2}_id AND eb_push_id = '{3}' AND COALESCE(eb_del, 'F') = 'F';",
                             _cols, _table.TableName, this.DataPusherConfig.SourceTable, this.DataPusherConfig.MultiPushId);
                     else
-                        query += string.Format("SELECT {0} FROM {1} WHERE {2}_id = (SELECT id FROM {2} WHERE {3}_id = :{3}_id AND eb_push_id = '{4}' AND (eb_del='F' OR eb_del IS null) LIMIT 1) AND (eb_del='F' OR eb_del IS null) {5};",
+                        query += string.Format("SELECT {0} FROM {1} WHERE {2}_id = (SELECT id FROM {2} WHERE {3}_id = @{3}_id AND eb_push_id = '{4}' AND COALESCE(eb_del, 'F') = 'F' LIMIT 1) AND COALESCE(eb_del, 'F') = 'F' {5};",
                             _cols, _table.TableName, _schema.MasterTable, this.DataPusherConfig.SourceTable, this.DataPusherConfig.MultiPushId, _table.TableType == WebFormTableTypes.Grid ? "ORDER BY eb_row_num" : "ORDER BY id");
                 }
                 _qryCount++;
@@ -472,7 +472,7 @@ namespace ExpressBase.Objects
                         _dupcols += string.Format(", {0}_ebbkup = {0}, {0} = CONCAT({0}, '_ebbkup')", _column.ColumnName);
                     }
                 }
-                query += string.Format("UPDATE {0} SET eb_del='T',eb_lastmodified_by = :eb_lastmodified_by, eb_lastmodified_at = " + DataDB.EB_CURRENT_TIMESTAMP + " {1} WHERE {2} = :id AND (eb_del='F' OR eb_del IS null);", _table.TableName, _dupcols, _id);
+                query += string.Format("UPDATE {0} SET eb_del='T',eb_lastmodified_by = @eb_lastmodified_by, eb_lastmodified_at = " + DataDB.EB_CURRENT_TIMESTAMP + " {1} WHERE {2} = @id AND COALESCE(eb_del, 'F') = 'F';", _table.TableName, _dupcols, _id);
             }
             return query;
         }
@@ -487,7 +487,7 @@ namespace ExpressBase.Objects
                 string _id = "id";
                 if (_table.TableName != _schema.MasterTable)
                     _id = _schema.MasterTable + "_id";
-                query += string.Format("UPDATE {0} SET eb_void='T',eb_lastmodified_by = :eb_lastmodified_by, eb_lastmodified_at = " + DataDB.EB_CURRENT_TIMESTAMP + " WHERE {1} = :id AND (eb_void='F' OR eb_void IS null) AND (eb_del='F' OR eb_del IS null);", _table.TableName, _id);
+                query += string.Format("UPDATE {0} SET eb_void='T',eb_lastmodified_by = @eb_lastmodified_by, eb_lastmodified_at = " + DataDB.EB_CURRENT_TIMESTAMP + " WHERE {1} = @id AND COALESCE(eb_void, 'F') = 'F' AND COALESCE(eb_del, 'F') = 'F';", _table.TableName, _id);
             }
             return query;
         }
@@ -499,35 +499,35 @@ namespace ExpressBase.Objects
             {
                 if (tblName.Equals(this.TableName))
                 {
-                    _qry = string.Format("INSERT INTO {0} ({2} eb_created_by, eb_created_at, eb_loc_id, eb_ver_id) VALUES ({3} :eb_createdby, {1}, :eb_loc_id, :{0}_eb_ver_id); ", tblName, DataDB.EB_CURRENT_TIMESTAMP, "{0}", "{1}");//eb_ver_id included
+                    _qry = string.Format("INSERT INTO {0} ({2} eb_created_by, eb_created_at, eb_loc_id, eb_ver_id) VALUES ({3} @eb_createdby, {1}, @eb_loc_id, @{0}_eb_ver_id); ", tblName, DataDB.EB_CURRENT_TIMESTAMP, "{0}", "{1}");//eb_ver_id included
                     //_qry = string.Format("INSERT INTO {0} ({2} eb_created_by, eb_created_at, eb_loc_id) VALUES ({3} :eb_createdby, {1}, :eb_loc_id); ", tblName, DataDB.EB_CURRENT_TIMESTAMP, "{0}", "{1}");
                     if (DataDB.Vendor == DatabaseVendors.MYSQL)
                         _qry += string.Format("SELECT eb_persist_currval('{0}_id_seq');", tblName);
                     if (this.IsLocEditable)
-                        _qry = _qry.Replace(", eb_loc_id", string.Empty).Replace(", :eb_loc_id", string.Empty);
+                        _qry = _qry.Replace(", eb_loc_id", string.Empty).Replace(", @eb_loc_id", string.Empty);
                 }
                 else if (isIns)
-                    _qry = string.Format("INSERT INTO {0} ({3} eb_created_by, eb_created_at, eb_loc_id, {2}_id) VALUES ({4} :eb_createdby, {1}, :eb_loc_id , (SELECT eb_currval('{2}_id_seq')));", tblName, DataDB.EB_CURRENT_TIMESTAMP, this.TableName, "{0}", "{1}");
+                    _qry = string.Format("INSERT INTO {0} ({3} eb_created_by, eb_created_at, eb_loc_id, {2}_id) VALUES ({4} @eb_createdby, {1}, @eb_loc_id , (SELECT eb_currval('{2}_id_seq')));", tblName, DataDB.EB_CURRENT_TIMESTAMP, this.TableName, "{0}", "{1}");
                 else
-                    _qry = string.Format("INSERT INTO {0} ({3} eb_created_by, eb_created_at, eb_loc_id, {2}_id) VALUES ({4} :eb_createdby, {1}, :eb_loc_id , :{2}_id);", tblName, DataDB.EB_CURRENT_TIMESTAMP, this.TableName, "{0}", "{1}");
+                    _qry = string.Format("INSERT INTO {0} ({3} eb_created_by, eb_created_at, eb_loc_id, {2}_id) VALUES ({4} @eb_createdby, {1}, @eb_loc_id , @{2}_id);", tblName, DataDB.EB_CURRENT_TIMESTAMP, this.TableName, "{0}", "{1}");
             }
             else
             {
                 if (tblName.Equals(this.TableName))
                 {
                     if (this.DataPusherConfig.SourceRecId <= 0)
-                        _qry = string.Format("INSERT INTO {0} ({4} eb_created_by, eb_created_at, eb_loc_id, eb_ver_id, {2}_id, eb_push_id, eb_lock) VALUES ({5} :eb_createdby, {1}, :eb_loc_id, :{0}_eb_ver_id, (SELECT eb_currval('{2}_id_seq')), '{3}', 'T'); ", tblName, DataDB.EB_CURRENT_TIMESTAMP, this.DataPusherConfig.SourceTable, this.DataPusherConfig.MultiPushId, "{0}", "{1}");
+                        _qry = string.Format("INSERT INTO {0} ({4} eb_created_by, eb_created_at, eb_loc_id, eb_ver_id, {2}_id, eb_push_id, eb_lock) VALUES ({5} @eb_createdby, {1}, @eb_loc_id, @{0}_eb_ver_id, (SELECT eb_currval('{2}_id_seq')), '{3}', 'T'); ", tblName, DataDB.EB_CURRENT_TIMESTAMP, this.DataPusherConfig.SourceTable, this.DataPusherConfig.MultiPushId, "{0}", "{1}");
                     else
-                        _qry = string.Format("INSERT INTO {0} ({4} eb_created_by, eb_created_at, eb_loc_id, eb_ver_id, {2}_id, eb_push_id, eb_lock) VALUES ({5} :eb_createdby, {1}, :eb_loc_id, :{0}_eb_ver_id, :{2}_id, '{3}', 'T'); ", tblName, DataDB.EB_CURRENT_TIMESTAMP, this.DataPusherConfig.SourceTable, this.DataPusherConfig.MultiPushId, "{0}", "{1}");
+                        _qry = string.Format("INSERT INTO {0} ({4} eb_created_by, eb_created_at, eb_loc_id, eb_ver_id, {2}_id, eb_push_id, eb_lock) VALUES ({5} @eb_createdby, {1}, @eb_loc_id, @{0}_eb_ver_id, @{2}_id, '{3}', 'T'); ", tblName, DataDB.EB_CURRENT_TIMESTAMP, this.DataPusherConfig.SourceTable, this.DataPusherConfig.MultiPushId, "{0}", "{1}");
                     if (DataDB.Vendor == DatabaseVendors.MYSQL)
                         _qry += string.Format("SELECT eb_persist_currval('{0}_id_seq');", tblName);
                     if (this.IsLocEditable)
-                        _qry = _qry.Replace(", eb_loc_id", string.Empty).Replace(", :eb_loc_id", string.Empty);
+                        _qry = _qry.Replace(", eb_loc_id", string.Empty).Replace(", @eb_loc_id", string.Empty);
                 }
                 else if (isIns)
-                    _qry = string.Format("INSERT INTO {0} ({3} eb_created_by, eb_created_at, eb_loc_id, {2}_id) VALUES ({4} :eb_createdby, {1}, :eb_loc_id , (SELECT eb_currval('{2}_id_seq')));", tblName, DataDB.EB_CURRENT_TIMESTAMP, this.TableName, "{0}", "{1}");
+                    _qry = string.Format("INSERT INTO {0} ({3} eb_created_by, eb_created_at, eb_loc_id, {2}_id) VALUES ({4} @eb_createdby, {1}, @eb_loc_id , (SELECT eb_currval('{2}_id_seq')));", tblName, DataDB.EB_CURRENT_TIMESTAMP, this.TableName, "{0}", "{1}");
                 else
-                    _qry = string.Format("INSERT INTO {0} ({3} eb_created_by, eb_created_at, eb_loc_id, {2}_id) VALUES ({4} :eb_createdby, {1}, :eb_loc_id , :{2}_id);", tblName, DataDB.EB_CURRENT_TIMESTAMP, this.TableName, "{0}", "{1}");
+                    _qry = string.Format("INSERT INTO {0} ({3} eb_created_by, eb_created_at, eb_loc_id, {2}_id) VALUES ({4} @eb_createdby, {1}, @eb_loc_id , @{2}_id);", tblName, DataDB.EB_CURRENT_TIMESTAMP, this.TableName, "{0}", "{1}");
             }
             return _qry;
         }
@@ -538,13 +538,13 @@ namespace ExpressBase.Objects
             if (this.DataPusherConfig == null)
             {
                 if (tblName.Equals(this.TableName))
-                    _qry = string.Format("UPDATE {0} SET {2} eb_lastmodified_by = :eb_modified_by, eb_lastmodified_at = {1} WHERE id = {3} AND (eb_del='F' OR eb_del IS null);", tblName, DataDB.EB_CURRENT_TIMESTAMP, "{0}", "{1}");
+                    _qry = string.Format("UPDATE {0} SET {2} eb_lastmodified_by = @eb_modified_by, eb_lastmodified_at = {1} WHERE id = {3} AND COALESCE(eb_del, 'F') = 'F';", tblName, DataDB.EB_CURRENT_TIMESTAMP, "{0}", "{1}");
                 else
-                    _qry = string.Format("UPDATE {0} SET {3} eb_lastmodified_by = :eb_modified_by, eb_lastmodified_at = {1} WHERE id = {4} AND {2}_id = :{2}_id AND (eb_del='F' OR eb_del IS null);", tblName, DataDB.EB_CURRENT_TIMESTAMP, this.TableName, isDel ? "eb_del = 'T', " : "{0}", "{1}");
+                    _qry = string.Format("UPDATE {0} SET {3} eb_lastmodified_by = @eb_modified_by, eb_lastmodified_at = {1} WHERE id = {4} AND {2}_id = @{2}_id AND COALESCE(eb_del, 'F') = 'F';", tblName, DataDB.EB_CURRENT_TIMESTAMP, this.TableName, isDel ? "eb_del = 'T', " : "{0}", "{1}");
             }
             else
             {
-                _qry = string.Format("UPDATE {0} SET {4} eb_lastmodified_by = :eb_modified_by, eb_lastmodified_at = {1} WHERE id = {5} AND {2}_id = :{2}_id AND (eb_del='F' OR eb_del IS null) {3};",
+                _qry = string.Format("UPDATE {0} SET {4} eb_lastmodified_by = @eb_modified_by, eb_lastmodified_at = {1} WHERE id = {5} AND {2}_id = @{2}_id AND COALESCE(eb_del, 'F') = 'F' {3};",
                     tblName, DataDB.EB_CURRENT_TIMESTAMP, tblName.Equals(this.TableName) ? this.DataPusherConfig.SourceTable : this.TableName, tblName.Equals(this.TableName) ? "AND eb_push_id = '" + this.DataPusherConfig.MultiPushId + "'" : string.Empty, isDel ? "eb_del = 'T', " : "{0}", "{1}");
             }
             return _qry;
@@ -1240,6 +1240,18 @@ namespace ExpressBase.Objects
                         _displayMember = this.SolutionObj.Users[user_id];
                     }
                 }
+                else if (_control is EbRadioButton)
+                {
+                    EbRadioButton btn = _control as EbRadioButton;
+                    if (btn.ValueType == EbValueType.Boolean)
+                    {
+                        if (dataRow[dataColumn.ColumnIndex].ToString() == "T")
+                            _formattedData = "true";
+                        else
+                            _formattedData = "false";
+
+                    }
+                }
                 else if (_control.EbDbType == EbDbTypes.Decimal || _control.EbDbType == EbDbTypes.Int32)
                 {
                     _formattedData = Convert.ToDouble(dataRow[dataColumn.ColumnIndex]);
@@ -1265,7 +1277,7 @@ namespace ExpressBase.Objects
             Row.Columns.Add(new SingleColumn()
             {
                 Name = dataColumn.ColumnName,
-                Type = (int)dataColumn.Type,
+                Type = _control == null ? (int)dataColumn.Type : (int)_control.EbDbType,
                 Value = _formattedData,
                 Control = _control,
                 F = _displayMember ?? (_formattedData == null ? string.Empty : _formattedData.ToString()),
@@ -1320,7 +1332,7 @@ namespace ExpressBase.Objects
                                 SingleRow _row = tbl.FirstOrDefault(e => Convert.ToInt32(e[VmName]) == vms[i]);
                                 if (_row != null)
                                 {
-                                    foreach(SingleColumn _col in _row.Columns)
+                                    foreach (SingleColumn _col in _row.Columns)
                                     {
                                         if (!Rows.ContainsKey(_col.Name))
                                             Rows.Add(_col.Name, new List<dynamic>());
@@ -1506,15 +1518,21 @@ namespace ExpressBase.Objects
                         this.FormGlobals = GetFormAsFlatGlobal(_FormData);
                     string context = this.RefId.Split("-")[3] + "_" + this.TableRowId.ToString();//context format = objectId_rowId_ControlId
                     string cxt2 = (Ctrl as EbFileUploader).ExeContextCode(this.FormGlobals, false);
-                    string qry = (Ctrl as EbFileUploader).GetSelectQuery(string.IsNullOrEmpty(cxt2));
+                    string qry = (Ctrl as EbFileUploader).GetSelectQuery(DataDB, string.IsNullOrEmpty(cxt2));
 
-                    EbDataTable dt = DataDB.DoQuery(qry, new DbParameter[]
+                    DbParameter[] param = new DbParameter[]
                     {
                         DataDB.GetNewParameter("id", EbDbTypes.Int32, this.TableRowId),
                         DataDB.GetNewParameter("context", EbDbTypes.String, context),
                         DataDB.GetNewParameter("context_sec", EbDbTypes.String, cxt2 ?? string.Empty),
                         DataDB.GetNewParameter("eb_ver_id", EbDbTypes.Int32, this.RefId.Split("-")[4])
-                    });
+                    };
+
+                    EbDataTable dt;
+                    if (this.DbConnection == null)
+                        dt = DataDB.DoQuery(qry, param);
+                    else
+                        dt = DataDB.DoQuery(this.DbConnection, qry, param);
 
                     SingleTable Table = new SingleTable();
                     this.GetFormattedData(dt, Table);
@@ -1524,7 +1542,7 @@ namespace ExpressBase.Objects
                     {
                         FileMetaInfo info = new FileMetaInfo
                         {
-                            FileRefId = dr["id"],
+                            FileRefId = Convert.ToInt32(dr["id"]),
                             FileName = dr["filename"],
                             Meta = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(dr["tags"] as string),
                             UploadTime = dr["uploadts"],
@@ -1870,10 +1888,10 @@ namespace ExpressBase.Objects
                 if (ins)
                 {
                     _col += string.Concat(cField.Name, ", ");
-                    _val += string.Concat(":", cField.Name, "_", i, ", ");
+                    _val += string.Concat("@", cField.Name, "_", i, ", ");
                 }
                 else
-                    _col += string.Concat(cField.Name, "=:", cField.Name, "_", i, ", ");
+                    _col += string.Concat(cField.Name, "=@", cField.Name, "_", i, ", ");
                 i++;
                 return true;
             }
@@ -2046,7 +2064,7 @@ namespace ExpressBase.Objects
                         continue;
                     foreach (SingleColumn cField in item.Value[item.Value.Count - 1].Columns)
                     {
-                        if (q.Contains(":" + item.Key + "_" + cField.Name))
+                        if (q.Contains("@" + item.Key + "_" + cField.Name) || q.Contains(":" + item.Key + "_" + cField.Name))
                         {
                             if (cField.Value == null)
                             {
@@ -2394,7 +2412,7 @@ namespace ExpressBase.Objects
                 parameters.Add(DataDB.GetNewParameter("actiontype_" + i, EbDbTypes.Int32, data.Action));
 
                 fullQry += string.Format(@"INSERT INTO eb_audit_master(formid, dataid, actiontype, eb_createdby, eb_createdat) 
-                        VALUES (:formid_{0}, :dataid_{0}, :actiontype_{0}, :eb_createdby, :eb_createdat);", i);
+                        VALUES (@formid_{0}, @dataid_{0}, @actiontype_{0}, @eb_createdby, @eb_createdat);", i);
                 if (DataDB.Vendor == DatabaseVendors.MYSQL)
                     fullQry += "SELECT eb_persist_currval('eb_audit_master_id_seq');";
                 if (data.Fields.Count != 0)
@@ -2402,7 +2420,7 @@ namespace ExpressBase.Objects
                     List<string> lineQry = new List<string>();
                     foreach (AuditTrailEntry _field in data.Fields)
                     {
-                        lineQry.Add(string.Format("((SELECT eb_currval('eb_audit_master_id_seq')), :{0}_{1}, :old{0}_{1}, :new{0}_{1}, :idrel{0}_{1}, :tblname{0}_{1})", _field.Name, i));
+                        lineQry.Add(string.Format("((SELECT eb_currval('eb_audit_master_id_seq')), @{0}_{1}, @old{0}_{1}, @new{0}_{1}, @idrel{0}_{1}, @tblname{0}_{1})", _field.Name, i));
                         parameters.Add(DataDB.GetNewParameter(_field.Name + "_" + i, EbDbTypes.String, _field.Name));
                         parameters.Add(DataDB.GetNewParameter("new" + _field.Name + "_" + i, EbDbTypes.String, _field.NewVal));
                         parameters.Add(DataDB.GetNewParameter("old" + _field.Name + "_" + i, EbDbTypes.String, _field.OldVal));
@@ -2431,7 +2449,7 @@ namespace ExpressBase.Objects
                 LEFT JOIN eb_audit_lines l ON m.id = l.masterid
                 LEFT JOIN eb_users u ON m.eb_createdby = u.id
             WHERE
-            	 m.formid = :formid AND m.dataid = :dataid
+            	 m.formid = @formid AND m.dataid = @dataid
             ORDER BY
             	m.id DESC, l.tablename, l.idrelation;";
             DbParameter[] parameters = new DbParameter[] {

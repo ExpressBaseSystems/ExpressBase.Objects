@@ -24,7 +24,7 @@ namespace ExpressBase.Objects
         public override EbDbTypes EbDbType { get { return EbDbTypes.Decimal; } }
 
         [JsonIgnore]
-        public override string GetValueJSfn { get { return @" return parseFloat($('#' + this.EbSid_CtxId).val()) || 0; "; } set { } }
+        public override string GetValueFromDOMJSfn { get { return @" return parseFloat($('#' + this.EbSid_CtxId).val()) || 0; "; } set { } }
 
         [OnDeserialized]
         public void OnDeserializedMethod(StreamingContext context)
