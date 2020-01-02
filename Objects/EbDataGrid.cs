@@ -18,6 +18,7 @@ using ExpressBase.Security;
 using ServiceStack.Redis;
 using ExpressBase.Common.Data;
 using System.Collections;
+using System.ComponentModel;
 
 namespace ExpressBase.Objects
 {
@@ -1101,6 +1102,12 @@ else
         [PropertyGroup("Appearance")]
         [DefaultPropValue("100")]
         public override int Width { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [HelpText("Specify minimum number of charecters to initiate search")]
+        [Category("Search Settings")]
+        [PropertyGroup("Behavior")]
+        public int MinSeachLength { get { return this.EbPowerSelect.MinSeachLength; } set { this.EbPowerSelect.MinSeachLength = value; } }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup("Behavior")]

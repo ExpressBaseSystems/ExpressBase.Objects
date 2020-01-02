@@ -8,6 +8,7 @@ using System.Dynamic;
 using System.Text;
 using Newtonsoft.Json.Linq;
 using ExpressBase.Objects;
+using ServiceStack.Text;
 
 namespace ExpressBase.Objects.Objects
 {
@@ -204,6 +205,7 @@ namespace ExpressBase.Objects.Objects
         }
     }
 
+    [RuntimeSerializable]
     public class FormGlobals
     {
         public dynamic sourceform { get; set; }
@@ -218,6 +220,7 @@ namespace ExpressBase.Objects.Objects
         }
     }
 
+    [RuntimeSerializable]
     public class FormAsGlobal : DynamicObject
     {
         public dynamic Rows { get; set; }
@@ -325,6 +328,7 @@ namespace ExpressBase.Objects.Objects
         }
     }
 
+    [RuntimeSerializable]
     public class ListNTV : DynamicObject
     {
         public List<NTV> Columns { get; set; }
