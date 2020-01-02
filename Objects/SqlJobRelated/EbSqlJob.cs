@@ -5,6 +5,9 @@ using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
 using ExpressBase.Objects.ServiceStack_Artifacts;
+using Newtonsoft.Json;
+using ServiceStack;
+using ServiceStack.Redis;
 using ServiceStack.Text;
 using System;
 using System.Collections.Generic;
@@ -46,6 +49,12 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public override string VersionNumber { get; set; }
 
+        [EnableInBuilder(BuilderType.SqlJob)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [PropertyGroup("Data Settings")]
+        [OSE_ObjectTypes(EbObjectTypes.iFilterDialog)]
+        public string Filter_Dialogue { get; set; }
+
 
         [EnableInBuilder(BuilderType.SqlJob)]
         [HideInPropertyGrid]
@@ -66,6 +75,27 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.SqlJob)]
         [HideInPropertyGrid]
         public List<string> ParameterKeyColumns { get; set; }
+
+        [JsonIgnore]
+        public EbFilterDialog FilterDialog { get; set; }
+
+        public override void AfterRedisGet(RedisClient Redis, IServiceClient client)
+        {
+            try
+            {
+                this.FilterDialog = Redis.Get<EbFilterDialog>(this.Filter_Dialogue);
+                if (this.FilterDialog == null && this.Filter_Dialogue != "")
+                {
+                    var result = client.Get<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = this.Filter_Dialogue });
+                    this.FilterDialog = EbSerializers.Json_Deserialize(result.Data[0].Json);
+                    Redis.Set<EbFilterDialog>(this.Filter_Dialogue, this.FilterDialog);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Exception:" + e.ToString());
+            }
+        }
 
         public LoopLocation GetLoop()
         {
