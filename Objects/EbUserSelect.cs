@@ -73,6 +73,13 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.FilterDialog, BuilderType.WebForm)]
         public bool LoadCurrentUser { get; set; }
 
+        public override string GetValueFromDOMJSfn { get { return @"
+        let itemO = $(`#${this.EbSid_CtxId}`).data('data-obj');
+        if (itemO)
+            return itemO['vm'];
+        else
+            return '';"; } set { } }
+
 
 
         //--------Hide in property grid------------start

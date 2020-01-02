@@ -555,7 +555,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string solution_id { get; set; }
     }
 
-    public class UpdateSidMapRequest : EbServiceStackNoAuthRequest, IReturn<UpdateSidMapResponse> { }
+    public class UpdateSidMapRequest : EbServiceStackNoAuthRequest, IReturn<UpdateSidMapResponse> 
+    {
+        public string ExtSolutionId { get; set; }
+    }
 
     public class UpdateSidMapResponse : IEbSSResponse
     {

@@ -183,7 +183,7 @@ namespace ExpressBase.Objects
         }
 
         [JsonIgnore]
-        public override string GetValueJSfn { get { return @"
+        public override string GetValueFromDOMJSfn { get { return @"
 let $ctrl = $('#' + this.EbSid_CtxId);
 let val = ($ctrl.prop('checked') == true) ? $ctrl.attr('true-val') :$ctrl.attr('false-val');
 if($ctrl.attr('value-type') === '11')
@@ -194,7 +194,7 @@ return val"; } set { } }
         //public override string GetValueJSfn { get { return @"return $('#' + this.EbSid_CtxId).prop('checked')? 'true': 'false';"; } set { } }
 
         [JsonIgnore]
-        public override string SetValueJSfn { get { return @"$('#' + this.EbSid_CtxId).prop('checked', (p1 === 'T'? true: false)).trigger('change');"; } set { } }
+        public override string SetValueJSfn { get { return @"$('#' + this.EbSid_CtxId).prop('checked', (p1 === this.Tv ? true: false)).trigger('change');"; } set { } }
 
     }
 }

@@ -709,23 +709,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 4)]
         public string u_token { get; set; }
     }
-
-    public class IpConstraint
-    {
-        public string Ip { get; set; }
-        public string Description { get; set; }
-    }
-
-    public class DateTimeConstraint
-    {
-        public string Title { get; set; }
-        public string Description { get; set; }
-        public int Type { get; set; }
-        public string Start { get; set; }
-        public string End { get; set; }
-        public int DaysCoded { get; set; }
-    }
-
+    
     //ROLES START---------------------------------------------
     [DataContract]
     public class GetManageRolesRequest : IReturn<GetManageRolesResponse>, IEbSSRequest

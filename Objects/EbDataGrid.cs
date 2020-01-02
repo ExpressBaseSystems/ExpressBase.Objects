@@ -18,6 +18,7 @@ using ExpressBase.Security;
 using ServiceStack.Redis;
 using ExpressBase.Common.Data;
 using System.Collections;
+using System.ComponentModel;
 
 namespace ExpressBase.Objects
 {
@@ -344,7 +345,7 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         public override string GetValueFromDOMJSfn
         {
-            get { return @"let val = $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val(); return (this.ObjType === 'Numeric') ?  (parseFloat($('#' + this.EbSid_CtxId).val()) || 0) :val;"; }
+            get { return @"return $('[ebsid=' + this.__DG.EbSid + ']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val();"; }
 
             set { }
         }
@@ -589,7 +590,7 @@ namespace ExpressBase.Objects
         {
             get
             {
-                return this.EbDate.GetValueJSfn;
+                return this.EbDate.GetValueFromDOMJSfn;
             }
             set { }
         }
@@ -841,7 +842,7 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
         {
             get
             {
-                return EbDGSimpleSelectColumn.GetValueJSfn.Replace("return val;", "val = (val ==='true'); return val;");
+                return EbDGSimpleSelectColumn.GetValueFromDOMJSfn.Replace("return val;", "val = (val ==='true'); return val;");
             }
             set { }
         }
@@ -1026,6 +1027,9 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
         public override string GetDisplayMemberFromDOMJSfn { get { return this.EbPowerSelect.GetDisplayMemberFromDOMJSfn; } set { } }
 
         [JsonIgnore]
+        public override string GetColumnJSfn { get { return this.EbPowerSelect.GetColumnJSfn; } set { } }
+
+        [JsonIgnore]
         public EbPowerSelect EbPowerSelect { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
@@ -1098,6 +1102,12 @@ else
         [PropertyGroup("Appearance")]
         [DefaultPropValue("100")]
         public override int Width { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [HelpText("Specify minimum number of charecters to initiate search")]
+        [Category("Search Settings")]
+        [PropertyGroup("Behavior")]
+        public int MinSeachLength { get { return this.EbPowerSelect.MinSeachLength; } set { this.EbPowerSelect.MinSeachLength = value; } }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup("Behavior")]
@@ -1280,7 +1290,7 @@ else
         {
             get
             {
-                return this.EbSysCreatedBy.GetValueJSfn;
+                return this.EbSysCreatedBy.GetValueFromDOMJSfn;
             }
             set { }
         }
@@ -1407,7 +1417,7 @@ else
         {
             get
             {
-                return this.EbSysCreatedAt.GetValueJSfn;
+                return this.EbSysCreatedAt.GetValueFromDOMJSfn;
             }
             set { }
         }
@@ -1525,7 +1535,7 @@ else
         {
             get
             {
-                return this.EbSysModifiedBy.GetValueJSfn;
+                return this.EbSysModifiedBy.GetValueFromDOMJSfn;
             }
             set { }
         }
@@ -1651,7 +1661,7 @@ else
         {
             get
             {
-                return this.EbSysModifiedAt.GetValueJSfn;
+                return this.EbSysModifiedAt.GetValueFromDOMJSfn;
             }
             set { }
         }

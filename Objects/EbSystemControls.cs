@@ -128,7 +128,7 @@ namespace ExpressBase.Objects
             set { } 
         }
 
-        public override string GetValueJSfn 
+        public override string GetValueFromDOMJSfn
         { get 
             { 
                 return @"
@@ -288,7 +288,7 @@ namespace ExpressBase.Objects
 
         public override string EnableJSfn { get { return @""; } set { } }
 
-        public override string GetValueJSfn { get { return @"return $('#' + this.EbSid_CtxId).attr('data-id');"; } set { } }
+        public override string GetValueFromDOMJSfn { get { return @"return $('#' + this.EbSid_CtxId).attr('data-id');"; } set { } }
 
         public override string SetValueJSfn
         {
@@ -372,11 +372,11 @@ namespace ExpressBase.Objects
             set { this.EbDate.EbDateType = value; }
         }
 
-        public override string GetValueJSfn
+        public override string GetValueFromDOMJSfn
         {
             get
             {
-                return this.EbDate.GetValueJSfn;
+                return this.EbDate.GetValueFromDOMJSfn;
             }
             set { }
         }
@@ -613,7 +613,7 @@ namespace ExpressBase.Objects
 
         public override string EnableJSfn { get { return @""; } set { } }
 
-        public override string GetValueJSfn { get { return @"return $('#' + this.EbSid_CtxId).attr('data-id');"; } set { } }
+        public override string GetValueFromDOMJSfn { get { return @"return $('#' + this.EbSid_CtxId).attr('data-id');"; } set { } }
 
         public override string SetValueJSfn
         {
@@ -697,11 +697,11 @@ namespace ExpressBase.Objects
             set { this.EbDate.EbDateType = value; }
         }
 
-        public override string GetValueJSfn
+        public override string GetValueFromDOMJSfn
         {
             get
             {
-                return this.EbDate.GetValueJSfn;
+                return this.EbDate.GetValueFromDOMJSfn;
             }
             set { }
         }

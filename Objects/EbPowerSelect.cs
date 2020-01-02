@@ -32,10 +32,13 @@ namespace ExpressBase.Objects
 
         public EbPowerSelect()
         {
+            if (this.Options == null)
+            {
+                this.Options = new List<EbSimpleSelectOption>();
+            }
             if (RenderAsSimpleSelect)
             {
                 IsDynamic = true;
-                this.Options = new List<EbSimpleSelectOption>();
             }
             else if (IsInsertable)
                 AddButton = new EbButton();
@@ -57,15 +60,7 @@ namespace ExpressBase.Objects
         [PropertyPriority(98)]
         public bool IsInsertable { get; set; }
 
-        public override string GetJsInitFunc()// should remove
-        {
-            return @"
-this.Init = function(id){
-    debugger;
-    this.getColumn = EBPSGetColummn;
-};";
-        }
-
+        [JsonIgnore]
         public override string IsRequiredOKJSfn
         {
             get
@@ -86,7 +81,8 @@ this.Init = function(id){
 
         //public EbSimpleSelect EbSimpleSelect;
 
-        
+
+        [JsonIgnore]
         public override string GetDisplayMemberFromDOMJSfn
         {
             get
@@ -95,9 +91,27 @@ this.Init = function(id){
             }
             set { }
         }
+
+        [JsonIgnore]
+        public override string GetColumnJSfn
+        {
+            get
+            {
+                return @"
+if(this.DataVals.R)
+    return this.DataVals.R[p1];
+else
+    return []"
+;
+            }
+            set { }
+        }
+
+        [JsonIgnore]
         public override string IsEmptyJSfn { get { return @" return this.initializer.Vobj.valueMembers.length === 0;"; } set { } }
 
 
+        [JsonIgnore]
         public override string DisableJSfn
         {
             get
@@ -114,6 +128,7 @@ this.Init = function(id){
             set { }
         }
 
+        [JsonIgnore]
         public override string EnableJSfn
         {
             get
@@ -123,20 +138,23 @@ this.Init = function(id){
             set { }
         }
 
+        [JsonIgnore]
         public override string JustSetValueJSfn { get { return JSFnsConstants.PS_JustSetValueJSfn; } set { } }
 
+        [JsonIgnore]
         public override string SetValueJSfn { get { return JSFnsConstants.PS_SetValueJSfn; } set { } }
 
-        public override string GetValueJSfn
+        [JsonIgnore]
+        public override string GetValueFromDOMJSfn
         {
             get
             {
                 return @"
                     if(this.RenderAsSimpleSelect){"
-                        + JSFnsConstants.EbSimpleSelect_GetValueJSfn +
+                        + JSFnsConstants.EbSimpleSelect_GetValueFromDOMJSfn +
                     @"}
                     else{"
-                        + new EbControl().GetValueJSfn +
+                        + new EbControl().GetValueFromDOMJSfn +
                     @"}
                 ";
             }
@@ -384,17 +402,17 @@ else
         public bool RenderAsSimpleSelect { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [OnChangeExec(@"
-            if(this.IsMultiSelect === true){
-                pg.ShowProperty('IsSearchable');
-                pg.ShowProperty('MaxLimit');
-                pg.ShowProperty('MinLimit');
-            }
-            else{
-                pg.HideProperty('IsSearchable');
-                pg.HideProperty('MaxLimit');
-                pg.HideProperty('MinLimit');
-            }")]
+        //[OnChangeExec(@"
+        //    if(this.IsMultiSelect === true){
+        //        pg.ShowProperty('IsSearchable');
+        //        pg.ShowProperty('MaxLimit');
+        //        pg.ShowProperty('MinLimit');
+        //    }
+        //    else{
+        //        pg.HideProperty('IsSearchable');
+        //        pg.HideProperty('MaxLimit');
+        //        pg.HideProperty('MinLimit');
+        //    }")]
         public bool IsSearchable { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
@@ -578,6 +596,7 @@ else
             //this.DataSourceId = "eb_roby_dev-eb_roby_dev-2-1015-1739";
             string _html = string.Empty;
             var result = ServiceClient.Get<FDDataResponse>(new FDDataRequest { RefId = this.DataSourceId });
+
             foreach (EbDataRow option in result.Data)
             {
                 string val = option[this.ValueMember.Data].ToString();
