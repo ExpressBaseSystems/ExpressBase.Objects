@@ -6,6 +6,7 @@ using ExpressBase.Common.LocationNSolution;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
+using ExpressBase.Objects.WebFormRelated;
 using ExpressBase.Objects.Objects;
 using ExpressBase.Objects.Objects.DVRelated;
 using ExpressBase.Objects.ServiceStack_Artifacts;
@@ -67,7 +68,7 @@ namespace ExpressBase.Objects
 
         public static EbOperations Operations = WFOperations.Instance;
 
-        private DbConnection DbConnection { get; set; }
+        internal DbConnection DbConnection { get; set; }
 
         private DbTransaction DbTransaction { get; set; }
 
@@ -386,169 +387,6 @@ namespace ExpressBase.Objects
                 }
                 _dict[ExeOrd[i]].Control.DependedValExp.AddRange(extList);
             }
-        }
-
-        private string GetSelectQuery(IDatabase DataDB, WebFormSchema _schema, Service _service, out string _queryPs, out int _qryCount)
-        {
-            string query = string.Empty;
-            string extquery = string.Empty;
-            _queryPs = string.Empty;
-            _qryCount = 0;
-            if (_schema == null)
-                _schema = this.FormSchema;//this.GetWebFormSchema();
-            foreach (TableSchema _table in _schema.Tables)
-            {
-                string _cols = "eb_loc_id, id";
-                string _id = "id";
-
-                if (_table.TableName == _schema.MasterTable)
-                    _cols = "eb_loc_id, eb_ver_id, eb_lock, eb_push_id, eb_src_id, id";
-                else
-                    _id = _schema.MasterTable + "_id";
-
-                if (_table.TableType == WebFormTableTypes.Grid)
-                    _cols = "eb_loc_id, id, eb_row_num";
-
-                if (_table.Columns.Count > 0)
-                    _cols += ", " + String.Join(", ", _table.Columns.Where(x => !x.Control.DoNotPersist).Select(x => x.ColumnName));
-
-                if (this.DataPusherConfig == null)
-                {
-                    query += string.Format("SELECT {0} FROM {1} WHERE {2} = @{3}_id AND COALESCE(eb_del, 'F') = 'F' {4};",
-                        _cols, _table.TableName, _id, _schema.MasterTable, _table.TableType == WebFormTableTypes.Grid ? "ORDER BY eb_row_num" : "ORDER BY id");
-                }
-                else
-                {
-                    if (_table.TableName == _schema.MasterTable)
-                        query += string.Format("SELECT {0} FROM {1} WHERE {2}_id = @{2}_id AND eb_push_id = '{3}' AND COALESCE(eb_del, 'F') = 'F';",
-                            _cols, _table.TableName, this.DataPusherConfig.SourceTable, this.DataPusherConfig.MultiPushId);
-                    else
-                        query += string.Format("SELECT {0} FROM {1} WHERE {2}_id = (SELECT id FROM {2} WHERE {3}_id = @{3}_id AND eb_push_id = '{4}' AND COALESCE(eb_del, 'F') = 'F' LIMIT 1) AND COALESCE(eb_del, 'F') = 'F' {5};",
-                            _cols, _table.TableName, _schema.MasterTable, this.DataPusherConfig.SourceTable, this.DataPusherConfig.MultiPushId, _table.TableType == WebFormTableTypes.Grid ? "ORDER BY eb_row_num" : "ORDER BY id");
-                }
-                _qryCount++;
-                foreach (ColumnSchema Col in _table.Columns)
-                {
-                    if (Col.Control.DoNotPersist)
-                        continue;
-                    if (Col.Control is EbPowerSelect)
-                        _queryPs += (Col.Control as EbPowerSelect).GetSelectQuery(DataDB, _service, Col.ColumnName, _table.TableName, _id, _schema.MasterTable);
-                    else if (Col.Control is EbDGPowerSelectColumn)
-                        _queryPs += (Col.Control as EbDGPowerSelectColumn).GetSelectQuery(DataDB, _service, Col.ColumnName, _table.TableName, _id, _schema.MasterTable);
-                }
-            }
-            bool MuCtrlFound = false;
-            foreach (Object Ctrl in _schema.ExtendedControls)
-            {
-                if (Ctrl is EbProvisionUser && !MuCtrlFound)
-                {
-                    extquery += (Ctrl as EbProvisionUser).GetSelectQuery(_schema.MasterTable);
-                    MuCtrlFound = true;
-                    _qryCount++;
-                }
-                else if (Ctrl is EbProvisionLocation)
-                {
-                    extquery += (Ctrl as EbProvisionLocation).GetSelectQuery(_schema.MasterTable);
-                    _qryCount++;
-                }
-            }
-            return query + extquery;
-        }
-
-        public string GetDeleteQuery(IDatabase DataDB, WebFormSchema _schema = null)
-        {
-            string query = string.Empty;
-            if (_schema == null)
-                _schema = this.FormSchema;//this.GetWebFormSchema();
-            foreach (TableSchema _table in _schema.Tables)
-            {
-                string _id = "id";
-                string _dupcols = string.Empty;
-                if (_table.TableName != _schema.MasterTable)
-                    _id = _schema.MasterTable + "_id";
-                foreach (ColumnSchema _column in _table.Columns)
-                {
-                    if (_column.Control is EbAutoId)
-                    {
-                        _dupcols += string.Format(", {0}_ebbkup = {0}, {0} = CONCAT({0}, '_ebbkup')", _column.ColumnName);
-                    }
-                }
-                query += string.Format("UPDATE {0} SET eb_del='T',eb_lastmodified_by = @eb_lastmodified_by, eb_lastmodified_at = " + DataDB.EB_CURRENT_TIMESTAMP + " {1} WHERE {2} = @id AND COALESCE(eb_del, 'F') = 'F';", _table.TableName, _dupcols, _id);
-            }
-            return query;
-        }
-
-        public string GetCancelQuery(IDatabase DataDB, WebFormSchema _schema = null)
-        {
-            string query = string.Empty;
-            if (_schema == null)
-                _schema = this.FormSchema;//this.GetWebFormSchema();
-            foreach (TableSchema _table in _schema.Tables)
-            {
-                string _id = "id";
-                if (_table.TableName != _schema.MasterTable)
-                    _id = _schema.MasterTable + "_id";
-                query += string.Format("UPDATE {0} SET eb_void='T',eb_lastmodified_by = @eb_lastmodified_by, eb_lastmodified_at = " + DataDB.EB_CURRENT_TIMESTAMP + " WHERE {1} = @id AND COALESCE(eb_void, 'F') = 'F' AND COALESCE(eb_del, 'F') = 'F';", _table.TableName, _id);
-            }
-            return query;
-        }
-
-        private string GetInsertQuery(IDatabase DataDB, string tblName, bool isIns)
-        {
-            string _qry;
-            if (this.DataPusherConfig == null)
-            {
-                if (tblName.Equals(this.TableName))
-                {
-                    _qry = string.Format("INSERT INTO {0} ({2} eb_created_by, eb_created_at, eb_loc_id, eb_ver_id) VALUES ({3} @eb_createdby, {1}, @eb_loc_id, @{0}_eb_ver_id); ", tblName, DataDB.EB_CURRENT_TIMESTAMP, "{0}", "{1}");//eb_ver_id included
-                    //_qry = string.Format("INSERT INTO {0} ({2} eb_created_by, eb_created_at, eb_loc_id) VALUES ({3} :eb_createdby, {1}, :eb_loc_id); ", tblName, DataDB.EB_CURRENT_TIMESTAMP, "{0}", "{1}");
-                    if (DataDB.Vendor == DatabaseVendors.MYSQL)
-                        _qry += string.Format("SELECT eb_persist_currval('{0}_id_seq');", tblName);
-                    if (this.IsLocEditable)
-                        _qry = _qry.Replace(", eb_loc_id", string.Empty).Replace(", @eb_loc_id", string.Empty);
-                }
-                else if (isIns)
-                    _qry = string.Format("INSERT INTO {0} ({3} eb_created_by, eb_created_at, eb_loc_id, {2}_id) VALUES ({4} @eb_createdby, {1}, @eb_loc_id , (SELECT eb_currval('{2}_id_seq')));", tblName, DataDB.EB_CURRENT_TIMESTAMP, this.TableName, "{0}", "{1}");
-                else
-                    _qry = string.Format("INSERT INTO {0} ({3} eb_created_by, eb_created_at, eb_loc_id, {2}_id) VALUES ({4} @eb_createdby, {1}, @eb_loc_id , @{2}_id);", tblName, DataDB.EB_CURRENT_TIMESTAMP, this.TableName, "{0}", "{1}");
-            }
-            else
-            {
-                if (tblName.Equals(this.TableName))
-                {
-                    if (this.DataPusherConfig.SourceRecId <= 0)
-                        _qry = string.Format("INSERT INTO {0} ({4} eb_created_by, eb_created_at, eb_loc_id, eb_ver_id, {2}_id, eb_push_id, eb_lock) VALUES ({5} @eb_createdby, {1}, @eb_loc_id, @{0}_eb_ver_id, (SELECT eb_currval('{2}_id_seq')), '{3}', 'T'); ", tblName, DataDB.EB_CURRENT_TIMESTAMP, this.DataPusherConfig.SourceTable, this.DataPusherConfig.MultiPushId, "{0}", "{1}");
-                    else
-                        _qry = string.Format("INSERT INTO {0} ({4} eb_created_by, eb_created_at, eb_loc_id, eb_ver_id, {2}_id, eb_push_id, eb_lock) VALUES ({5} @eb_createdby, {1}, @eb_loc_id, @{0}_eb_ver_id, @{2}_id, '{3}', 'T'); ", tblName, DataDB.EB_CURRENT_TIMESTAMP, this.DataPusherConfig.SourceTable, this.DataPusherConfig.MultiPushId, "{0}", "{1}");
-                    if (DataDB.Vendor == DatabaseVendors.MYSQL)
-                        _qry += string.Format("SELECT eb_persist_currval('{0}_id_seq');", tblName);
-                    if (this.IsLocEditable)
-                        _qry = _qry.Replace(", eb_loc_id", string.Empty).Replace(", @eb_loc_id", string.Empty);
-                }
-                else if (isIns)
-                    _qry = string.Format("INSERT INTO {0} ({3} eb_created_by, eb_created_at, eb_loc_id, {2}_id) VALUES ({4} @eb_createdby, {1}, @eb_loc_id , (SELECT eb_currval('{2}_id_seq')));", tblName, DataDB.EB_CURRENT_TIMESTAMP, this.TableName, "{0}", "{1}");
-                else
-                    _qry = string.Format("INSERT INTO {0} ({3} eb_created_by, eb_created_at, eb_loc_id, {2}_id) VALUES ({4} @eb_createdby, {1}, @eb_loc_id , @{2}_id);", tblName, DataDB.EB_CURRENT_TIMESTAMP, this.TableName, "{0}", "{1}");
-            }
-            return _qry;
-        }
-
-        private string GetUpdateQuery(IDatabase DataDB, string tblName, bool isDel)
-        {
-            string _qry;
-            if (this.DataPusherConfig == null)
-            {
-                if (tblName.Equals(this.TableName))
-                    _qry = string.Format("UPDATE {0} SET {2} eb_lastmodified_by = @eb_modified_by, eb_lastmodified_at = {1} WHERE id = {3} AND COALESCE(eb_del, 'F') = 'F';", tblName, DataDB.EB_CURRENT_TIMESTAMP, "{0}", "{1}");
-                else
-                    _qry = string.Format("UPDATE {0} SET {3} eb_lastmodified_by = @eb_modified_by, eb_lastmodified_at = {1} WHERE id = {4} AND {2}_id = @{2}_id AND COALESCE(eb_del, 'F') = 'F';", tblName, DataDB.EB_CURRENT_TIMESTAMP, this.TableName, isDel ? "eb_del = 'T', " : "{0}", "{1}");
-            }
-            else
-            {
-                _qry = string.Format("UPDATE {0} SET {4} eb_lastmodified_by = @eb_modified_by, eb_lastmodified_at = {1} WHERE id = {5} AND {2}_id = @{2}_id AND COALESCE(eb_del, 'F') = 'F' {3};",
-                    tblName, DataDB.EB_CURRENT_TIMESTAMP, tblName.Equals(this.TableName) ? this.DataPusherConfig.SourceTable : this.TableName, tblName.Equals(this.TableName) ? "AND eb_push_id = '" + this.DataPusherConfig.MultiPushId + "'" : string.Empty, isDel ? "eb_del = 'T', " : "{0}", "{1}");
-            }
-            return _qry;
         }
 
         public FormAsGlobal GetFormAsFlatGlobal(WebformData _formdata)
@@ -1147,17 +985,20 @@ namespace ExpressBase.Objects
 
         private void GetFormattedColumn(EbDataColumn dataColumn, EbDataRow dataRow, SingleRow Row, EbControl _control)
         {
-            if (_control != null && _control.DoNotPersist)
+            if (_control != null)
             {
-                Row.Columns.Add(new SingleColumn()
+                if (_control.DoNotPersist && !_control.IsSysControl)
                 {
-                    Name = _control.Name,
-                    Type = (int)_control.EbDbType,
-                    Value = null,
-                    Control = _control,
-                    ObjType = _control.ObjType
-                });
-                return;
+                    Row.Columns.Add(new SingleColumn()
+                    {
+                        Name = _control.Name,
+                        Type = (int)_control.EbDbType,
+                        Value = null,
+                        Control = _control,
+                        ObjType = _control.ObjType
+                    });
+                    return;
+                }
             }
             object _formattedData = null;
             string _displayMember = null;
@@ -1214,22 +1055,29 @@ namespace ExpressBase.Objects
                         _displayMember = dt_cov.ToString(this.UserObj.Preference.GetShortTimePattern(), CultureInfo.InvariantCulture);
                     }
                 }
-                else if (_control is EbSysLocation && (_control as EbControl).IsDisable)
+                else if (_control is EbSysLocation)
                 {
                     int loc_id = Convert.ToInt32(dataRow[dataColumn.ColumnIndex]);
-                    EbSysLocDM dm = (_control as EbSysLocation).DisplayMember;
-                    if (this.SolutionObj.Locations.ContainsKey(loc_id))
+                    if ((_control as EbControl).IsDisable)
                     {
-                        if (dm == EbSysLocDM.LongName)
+                        EbSysLocDM dm = (_control as EbSysLocation).DisplayMember;
+                        if (this.SolutionObj.Locations.ContainsKey(loc_id))
                         {
-                            _formattedData = loc_id + "$$" + this.SolutionObj.Locations[loc_id].LongName;
-                            _displayMember = this.SolutionObj.Locations[loc_id].LongName;
+                            if (dm == EbSysLocDM.LongName)
+                            {
+                                _formattedData = loc_id + "$$" + this.SolutionObj.Locations[loc_id].LongName;
+                                _displayMember = this.SolutionObj.Locations[loc_id].LongName;
+                            }
+                            else
+                            {
+                                _formattedData = loc_id + "$$" + this.SolutionObj.Locations[loc_id].ShortName;
+                                _displayMember = this.SolutionObj.Locations[loc_id].ShortName;
+                            }
                         }
-                        else
-                        {
-                            _formattedData = loc_id + "$$" + this.SolutionObj.Locations[loc_id].ShortName;
-                            _displayMember = this.SolutionObj.Locations[loc_id].ShortName;
-                        }
+                    }
+                    else
+                    {
+                        _formattedData = loc_id;
                     }
                 }
                 else if (_control is EbSysCreatedBy || _control is EbSysModifiedBy || _control is EbDGCreatedByColumn || _control is EbDGModifiedByColumn)
@@ -1372,27 +1220,26 @@ namespace ExpressBase.Objects
         //For Normal Mode
         public void RefreshFormData(IDatabase DataDB, Service service, bool backup = false, bool includePushData = false)
         {
-            WebFormSchema _schema = this.FormSchema;//this.GetWebFormSchema();
             int formCount = (this.ExeDataPusher && includePushData) ? this.DataPushers.Count + 1 : 1;
             string[] psquery = new string[formCount];
             int[] qrycount = new int[formCount];
             EbWebForm[] FormCollection = new EbWebForm[formCount];
-            string query = this.GetSelectQuery(DataDB, _schema, service, out psquery[0], out qrycount[0]);
+            string query = QueryGetter.GetSelectQuery(this, DataDB, service, out psquery[0], out qrycount[0]);
             FormCollection[0] = this;
 
             if (this.ExeDataPusher && includePushData)
             {
                 for (int i = 0; i < this.DataPushers.Count; i++)
                 {
-                    query += this.DataPushers[i].WebForm.GetSelectQuery(DataDB, this.DataPushers[i].WebForm.FormSchema, service, out psquery[i + 1], out qrycount[i + 1]);
+                    query += QueryGetter.GetSelectQuery(this.DataPushers[i].WebForm, DataDB, service, out psquery[i + 1], out qrycount[i + 1]);
                     FormCollection[i + 1] = this.DataPushers[i].WebForm;
                 }
             }
 
             DbParameter[] param = new DbParameter[]
             {
-                DataDB.GetNewParameter(_schema.MasterTable + "_id", EbDbTypes.Int32, this.TableRowId),
-                DataDB.GetNewParameter(_schema.MasterTable + "_eb_ver_id", EbDbTypes.Int32, this.RefId.Split("-")[4])
+                DataDB.GetNewParameter(this.FormSchema.MasterTable + "_id", EbDbTypes.Int32, this.TableRowId),
+                DataDB.GetNewParameter(this.FormSchema.MasterTable + "_eb_ver_id", EbDbTypes.Int32, this.RefId.Split("-")[4])
             };
             EbDataSet dataset = null;
             if (this.DbConnection == null)
@@ -1709,7 +1556,7 @@ namespace ExpressBase.Objects
                     Console.WriteLine("New record inserted. Table :" + this.TableName + ", Id : " + this.TableRowId);
                 }
                 this.RefreshFormData(DataDB, service, false, true);
-                resp += " - AuditTrail: " + this.UpdateAuditTrail(DataDB);
+                resp += " - AuditTrail: " + EbAuditTrail.UpdateAuditTrail(this, DataDB);
                 resp += " - AfterSave: " + this.AfterSave(DataDB, IsUpdate);
                 this.DbTransaction.Commit();
             }
@@ -1760,7 +1607,7 @@ namespace ExpressBase.Objects
                                 WebForm.ParameterizeUnknown(DataDB, param, cField, true, ref i, ref _cols, ref _values);
                         }
 
-                        string _qry = WebForm.GetInsertQuery(DataDB, entry.Key, true);
+                        string _qry = QueryGetter.GetInsertQuery(WebForm, DataDB, entry.Key, true);
                         fullqry += string.Format(_qry, _cols, _values);
                     }
                 }
@@ -1821,7 +1668,7 @@ namespace ExpressBase.Objects
                                 }
                             }
 
-                            string _qry = WebForm.GetUpdateQuery(DataDB, entry.Key, row.IsDelete);
+                            string _qry = QueryGetter.GetUpdateQuery(WebForm, DataDB, entry.Key, row.IsDelete);
                             fullqry += string.Format(_qry, _colvals, row.RowId);
                         }
                         else
@@ -1836,7 +1683,7 @@ namespace ExpressBase.Objects
                                 else
                                     WebForm.ParameterizeUnknown(DataDB, param, cField, true, ref i, ref _cols, ref _vals);
                             }
-                            string _qry = WebForm.GetInsertQuery(DataDB, entry.Key, WebForm.TableRowId == 0);
+                            string _qry = QueryGetter.GetInsertQuery(WebForm, DataDB, entry.Key, WebForm.TableRowId == 0);
                             fullqry += string.Format(_qry, _cols, _vals);
                         }
                     }
@@ -1971,7 +1818,7 @@ namespace ExpressBase.Objects
                     resp = "Inserted: " + this.TableRowId;
                     Console.WriteLine("New record inserted. Table :" + this.TableName + ", Id : " + this.TableRowId);
                 }
-                resp += " - AuditTrail: " + this.UpdateAuditTrail(DataDB);
+                resp += " - AuditTrail: " + EbAuditTrail.UpdateAuditTrail(this, DataDB);
                 resp += " - AfterSave: " + this.AfterSave(DataDB, IsUpdate);
                 this.DbTransaction.Commit();
             }
@@ -2212,7 +2059,7 @@ namespace ExpressBase.Objects
         {
             if (this.CanDelete(DataDB))
             {
-                string query = this.GetDeleteQuery(DataDB);
+                string query = QueryGetter.GetDeleteQuery(this, DataDB);
                 DbParameter[] param = new DbParameter[] {
                     DataDB.GetNewParameter("eb_lastmodified_by", EbDbTypes.Int32, this.UserObj.UserId),
                     DataDB.GetNewParameter("id", EbDbTypes.Int32, this.TableRowId)
@@ -2249,7 +2096,7 @@ namespace ExpressBase.Objects
         {
             if (this.CanCancel(DataDB))
             {
-                string query = this.GetCancelQuery(DataDB);
+                string query = QueryGetter.GetCancelQuery(this, DataDB);
                 DbParameter[] param = new DbParameter[] {
                     DataDB.GetNewParameter("eb_lastmodified_by", EbDbTypes.Int32, this.UserObj.UserId),
                     DataDB.GetNewParameter("id", EbDbTypes.Int32, this.TableRowId)
@@ -2309,547 +2156,9 @@ namespace ExpressBase.Objects
             }
         }
 
-        private int UpdateAuditTrail(IDatabase DataDB)
-        {
-            List<EbWebForm> FormCollection = new List<EbWebForm> { this };
-            if (this.ExeDataPusher)
-            {
-                foreach (EbDataPusher pusher in this.DataPushers)
-                    FormCollection.Add(pusher.WebForm);
-            }
-            List<AuditTrailInsertData> auditTrails = new List<AuditTrailInsertData>();
-
-            foreach (EbWebForm WebForm in FormCollection)
-            {
-                List<AuditTrailEntry> FormFields = new List<AuditTrailEntry>();
-                if (WebForm.FormDataBackup == null)
-                {
-                    auditTrails.Add(new AuditTrailInsertData { Action = 1, Fields = FormFields, RefId = WebForm.RefId, TableRowId = WebForm.TableRowId });
-                }
-                else
-                {
-                    foreach (KeyValuePair<string, SingleTable> entry in WebForm.FormData.MultipleTables)
-                    {
-                        bool IsGridTable = false;
-                        TableSchema _table = WebForm.FormSchema.Tables.FirstOrDefault(tbl => tbl.TableName.Equals(entry.Key));
-                        if (_table != null)
-                            IsGridTable = _table.TableType == WebFormTableTypes.Grid;
-
-                        if (!WebForm.FormDataBackup.MultipleTables.ContainsKey(entry.Key))//insert mode
-                        {
-                            foreach (SingleRow rField in entry.Value)
-                            {
-                                WebForm.PushAuditTrailEntry(entry.Key, rField, FormFields, true, IsGridTable, _table);
-                            }
-                        }
-                        else//update mode
-                        {
-                            List<int> rids = new List<int>();
-                            foreach (SingleRow rField in entry.Value)
-                            {
-                                rids.Add(rField.RowId);
-                                SingleRow orF = WebForm.FormDataBackup.MultipleTables[entry.Key].Find(e => e.RowId == rField.RowId);
-                                if (orF == null)//if it is new row
-                                {
-                                    WebForm.PushAuditTrailEntry(entry.Key, rField, FormFields, true, IsGridTable, _table);
-                                }
-                                else//row edited
-                                {
-                                    string relation = string.Concat(WebForm.TableRowId, "-", rField.RowId);
-
-                                    if (WebForm.FormSchema.MasterTable.Equals(entry.Key))
-                                        relation = WebForm.TableRowId.ToString();
-
-                                    bool IsRowEdited = false;
-                                    Dictionary<string, string> dic1 = null;
-                                    Dictionary<string, string> dic2 = null;
-                                    if (IsGridTable)
-                                    {
-                                        dic1 = new Dictionary<string, string>();
-                                        dic2 = new Dictionary<string, string>();
-                                    }
-                                    foreach (SingleColumn cField in rField.Columns)
-                                    {
-                                        if (cField.Name.Equals("id"))//skipping 'id' field
-                                            continue;
-                                        if (cField.Name.Equals("eb_row_num") && IsGridTable)//skipping 'eb_row_num' field
-                                            continue;
-                                        ColumnSchema _column = _table.Columns.Find(c => c.ColumnName.Equals(cField.Name));
-                                        if (_column != null)
-                                        {
-                                            if (_column.Control.DoNotPersist)//skip DoNotPersist field from audit entry// written for EbSystemControls
-                                                continue;
-                                        }
-                                        SingleColumn ocf = orF.Columns.Find(e => e.Name == cField.Name);
-
-                                        if (ocf == null)
-                                        {
-                                            ocf = new SingleColumn() { Name = cField.Name, Value = "[null]" };
-                                        }
-                                        if (IsGridTable)
-                                        {
-                                            dic1.Add(cField.Name, cField.Value == null ? "[null]" : cField.Value.ToString());
-                                            dic2.Add(ocf.Name, ocf.Value == null ? "[null]" : ocf.Value.ToString());
-                                        }
-                                        if (ocf.Value != cField.Value)//checking for changes /////// modifications required
-                                        {
-                                            IsRowEdited = true;
-                                            if (IsGridTable)
-                                                continue;
-
-                                            FormFields.Add(new AuditTrailEntry
-                                            {
-                                                Name = cField.Name,
-                                                NewVal = cField.Value == null ? "[null]" : cField.Value.ToString(),
-                                                OldVal = ocf.Value == null ? "[null]" : ocf.Value.ToString(),
-                                                DataRel = relation,
-                                                TableName = entry.Key
-                                            });
-                                        }
-                                    }
-                                    if (IsGridTable && IsRowEdited)
-                                    {
-                                        FormFields.Add(new AuditTrailEntry
-                                        {
-                                            Name = "dgrow",
-                                            NewVal = JsonConvert.SerializeObject(dic1),
-                                            OldVal = JsonConvert.SerializeObject(dic2),
-                                            DataRel = relation,
-                                            TableName = entry.Key
-                                        });
-                                    }
-                                }
-                            }
-                            foreach (SingleRow Row in WebForm.FormDataBackup.MultipleTables[entry.Key])//looking for deleted rows
-                            {
-                                if (!rids.Contains(Row.RowId))
-                                {
-                                    WebForm.PushAuditTrailEntry(entry.Key, Row, FormFields, false, IsGridTable, _table);
-                                }
-                            }
-                        }
-                    }
-                    if (FormFields.Count > 0)
-                    {
-                        auditTrails.Add(new AuditTrailInsertData { Action = 2, Fields = FormFields, RefId = WebForm.RefId, TableRowId = WebForm.TableRowId });
-                    }
-                }
-            }
-            return this.UpdateAuditTrail(DataDB, auditTrails);
-        }
-
-        //managing new or deleted row
-        private void PushAuditTrailEntry(string Table, SingleRow Row, List<AuditTrailEntry> FormFields, bool IsIns, bool IsGridRow, TableSchema _table)
-        {
-            string relation = string.Concat(this.TableRowId, "-", Row.RowId);
-
-            if (this.FormSchema.MasterTable.Equals(Table))
-                relation = this.TableRowId.ToString();
-
-            if (IsGridRow)
-            {
-                Dictionary<string, string> dic = new Dictionary<string, string>();
-                foreach (SingleColumn cField in Row.Columns)
-                {
-                    if (cField.Name.Equals("id") || cField.Name.Equals("eb_row_num"))//skipping 'id' field
-                        continue;
-                    dic.Add(cField.Name, cField.Value == null ? "[null]" : cField.Value.ToString());
-                }
-                string val = JsonConvert.SerializeObject(dic);
-                FormFields.Add(new AuditTrailEntry
-                {
-                    Name = "dgrow",
-                    NewVal = IsIns ? val : "[null]",
-                    OldVal = IsIns ? "[null]" : val,
-                    DataRel = relation,
-                    TableName = Table
-                });
-            }
-            else
-            {
-                foreach (SingleColumn cField in Row.Columns)
-                {
-                    if (cField.Name.Equals("id"))//skipping 'id' field
-                        continue;
-                    ColumnSchema _column = _table.Columns.Find(c => c.ColumnName.Equals(cField.Name));
-                    if (_column != null)
-                    {
-                        if (_column.Control.DoNotPersist)//skip DoNotPersist field from audit entry// written for EbSystemControls
-                            continue;
-                    }
-
-                    FormFields.Add(new AuditTrailEntry
-                    {
-                        Name = cField.Name,
-                        NewVal = IsIns && cField.Value != null ? cField.Value.ToString() : "[null]",
-                        OldVal = !IsIns && cField.Value != null ? cField.Value.ToString() : "[null]",
-                        DataRel = relation,
-                        TableName = Table
-                    });
-                }
-            }
-        }
-
-        private int UpdateAuditTrail(IDatabase DataDB, List<AuditTrailInsertData> Data)
-        {
-            List<DbParameter> parameters = new List<DbParameter>
-            {
-                DataDB.GetNewParameter("eb_createdby", EbDbTypes.Int32, this.UserObj.UserId),
-                DataDB.GetNewParameter("eb_createdat", EbDbTypes.DateTime, DateTime.UtcNow)
-            };
-            int i = 0;
-            string fullQry = string.Empty;
-            foreach (AuditTrailInsertData data in Data)
-            {
-                parameters.Add(DataDB.GetNewParameter("formid_" + i, EbDbTypes.String, data.RefId));
-                parameters.Add(DataDB.GetNewParameter("dataid_" + i, EbDbTypes.Int32, data.TableRowId));
-                parameters.Add(DataDB.GetNewParameter("actiontype_" + i, EbDbTypes.Int32, data.Action));
-
-                fullQry += string.Format(@"INSERT INTO eb_audit_master(formid, dataid, actiontype, eb_createdby, eb_createdat) 
-                        VALUES (@formid_{0}, @dataid_{0}, @actiontype_{0}, @eb_createdby, @eb_createdat);", i);
-                if (DataDB.Vendor == DatabaseVendors.MYSQL)
-                    fullQry += "SELECT eb_persist_currval('eb_audit_master_id_seq');";
-                if (data.Fields.Count != 0)
-                {
-                    List<string> lineQry = new List<string>();
-                    foreach (AuditTrailEntry _field in data.Fields)
-                    {
-                        lineQry.Add(string.Format("((SELECT eb_currval('eb_audit_master_id_seq')), @{0}_{1}, @old{0}_{1}, @new{0}_{1}, @idrel{0}_{1}, @tblname{0}_{1})", _field.Name, i));
-                        parameters.Add(DataDB.GetNewParameter(_field.Name + "_" + i, EbDbTypes.String, _field.Name));
-                        parameters.Add(DataDB.GetNewParameter("new" + _field.Name + "_" + i, EbDbTypes.String, _field.NewVal));
-                        parameters.Add(DataDB.GetNewParameter("old" + _field.Name + "_" + i, EbDbTypes.String, _field.OldVal));
-                        parameters.Add(DataDB.GetNewParameter("idrel" + _field.Name + "_" + i, EbDbTypes.String, _field.DataRel));
-                        parameters.Add(DataDB.GetNewParameter("tblname" + _field.Name + "_" + i, EbDbTypes.String, _field.TableName));
-                        i++;
-                    }
-                    fullQry += string.Format("INSERT INTO eb_audit_lines(masterid, fieldname, oldvalue, newvalue, idrelation, tablename) VALUES {0};", lineQry.Join(","));
-                }
-                i++;
-            }
-            if (fullQry.IsEmpty())
-                return 0;
-            return DataDB.DoNonQuery(this.DbConnection, fullQry, parameters.ToArray());
-        }
-
         public string GetAuditTrail(IDatabase DataDB, Service Service)
         {
-            this.RefreshFormData(DataDB, Service);
-            Dictionary<string, string> DictVmAll = new Dictionary<string, string>();
-
-            string qry = @"	SELECT 
-            	m.id, l.id, u.fullname, m.eb_createdby, m.eb_createdat, m.actiontype, l.tablename, l.fieldname, l.idrelation, l.oldvalue, l.newvalue
-            FROM 
-            	eb_audit_master m 
-                LEFT JOIN eb_audit_lines l ON m.id = l.masterid
-                LEFT JOIN eb_users u ON m.eb_createdby = u.id
-            WHERE
-            	 m.formid = @formid AND m.dataid = @dataid
-            ORDER BY
-            	m.id DESC, l.tablename, l.idrelation;";
-            DbParameter[] parameters = new DbParameter[] {
-                     DataDB.GetNewParameter("formid", EbDbTypes.String, this.RefId),
-                     DataDB.GetNewParameter("dataid", EbDbTypes.Int32, this.TableRowId)
-                 };
-            EbDataTable dt = DataDB.DoQuery(qry, parameters);
-
-            Dictionary<int, FormTransaction> Trans = new Dictionary<int, FormTransaction>();
-            Dictionary<int, int> temp_d = new Dictionary<int, int>();
-            int counter = 1;
-            TableSchema _table = null;
-            ColumnSchema _column = null;
-
-            foreach (EbDataRow dr in dt.Rows)
-            {
-                int m_id = Convert.ToInt32(dr["id"]);
-                if (!temp_d.ContainsKey(m_id))
-                    temp_d.Add(m_id, counter++);
-                m_id = temp_d[m_id];
-                string new_val = dr["newvalue"].ToString();
-                string old_val = dr["oldvalue"].ToString();
-
-                if (Convert.ToInt32(dr["actiontype"]) != 1)
-                {
-                    if (_table == null || !_table.TableName.Equals(dr["tablename"].ToString()))
-                    {
-                        _table = this.FormSchema.Tables.FirstOrDefault(tbl => tbl.TableName == dr["tablename"].ToString());
-                        if (_table == null)//skipping invalid Audit Trail entry
-                            continue;
-                    }
-
-                    if (_table.TableType != WebFormTableTypes.Grid)
-                    {
-                        _column = _table.Columns.FirstOrDefault(col => col.ColumnName == dr["fieldname"].ToString());
-                        if (_column == null)//skipping invalid Audit Trail entry
-                            continue;
-                    }
-                }
-
-                if (!Trans.ContainsKey(m_id))
-                {
-                    Trans.Add(m_id, new FormTransaction()
-                    {
-                        ActionType = Convert.ToInt32(dr["actiontype"]) == 1 ? "Insert" : "Update",
-                        CreatedBy = dr["fullname"].ToString(),
-                        CreatedById = dr["eb_createdby"].ToString(),
-                        CreatedAt = Convert.ToDateTime(dr["eb_createdat"]).ConvertFromUtc(this.UserObj.Preference.TimeZone).ToString(this.UserObj.Preference.GetShortDatePattern() + " " + this.UserObj.Preference.GetShortTimePattern(), CultureInfo.InvariantCulture)
-                    });
-
-                    if (Convert.ToInt32(dr["actiontype"]) == 1)
-                        continue;
-                }
-
-                string[] ids = dr["idrelation"].ToString().Split('-');
-
-                if (_table.TableType == WebFormTableTypes.Grid)
-                {
-                    Dictionary<string, string> new_val_dict = new_val == "[null]" ? null : JsonConvert.DeserializeObject<Dictionary<string, string>>(new_val);
-                    Dictionary<string, string> old_val_dict = old_val == "[null]" ? null : JsonConvert.DeserializeObject<Dictionary<string, string>>(old_val);
-                    if (new_val_dict == null)
-                    {
-                        new_val_dict = new Dictionary<string, string>();
-                        foreach (KeyValuePair<string, string> entry in old_val_dict)
-                        {
-                            new_val_dict.Add(entry.Key, "[null]");
-                        }
-                    }
-                    else if (old_val_dict == null)
-                    {
-                        old_val_dict = new Dictionary<string, string>();
-                        foreach (KeyValuePair<string, string> entry in new_val_dict)
-                        {
-                            old_val_dict.Add(entry.Key, "[null]");
-                        }
-                    }
-
-                    foreach (ColumnSchema __column in _table.Columns)
-                    {
-                        if (!Trans[m_id].GridTables.ContainsKey(_table.TableName))
-                        {
-                            Trans[m_id].GridTables.Add(_table.TableName, new FormTransactionTable() { Title = _table.Title });
-                            for (int i = 0; i < _table.Columns.Count; i++)
-                            {
-                                EbControl _control = _table.Columns.ElementAt(i).Control;
-                                if (_control.DoNotPersist)
-                                    continue;
-                                if (_control is EbDGColumn)
-                                {
-                                    if (_control is EbDGUserControlColumn)
-                                        continue;
-                                    else
-                                        Trans[m_id].GridTables[_table.TableName].ColumnMeta.Add(i, (_control as EbDGColumn).Title);
-                                }
-                                else
-                                    Trans[m_id].GridTables[_table.TableName].ColumnMeta.Add(i, _control.Label);
-                            }
-                        }
-                        int curid = Convert.ToInt32(ids[1]);
-                        FormTransactionTable TblRef = Trans[m_id].GridTables[_table.TableName];
-                        if (!TblRef.Rows.ContainsKey(curid))
-                        {
-                            TblRef.Rows.Add(curid, new FormTransactionRow() { });
-                        }
-                        bool IsModified = false;
-                        if (!new_val_dict.ContainsKey(__column.ColumnName))
-                            new_val_dict.Add(__column.ColumnName, "[null]");
-                        if (!old_val_dict.ContainsKey(__column.ColumnName))
-                            old_val_dict.Add(__column.ColumnName, "[null]");
-
-                        if (new_val_dict[__column.ColumnName] != old_val_dict[__column.ColumnName])
-                            IsModified = true;
-                        string a = old_val_dict[__column.ColumnName];
-                        string b = new_val_dict[__column.ColumnName];
-                        PreProcessTransationData(DictVmAll, _table, __column, ref a, ref b);
-                        if (!TblRef.Rows[curid].Columns.ContainsKey(__column.ColumnName))
-                            TblRef.Rows[curid].Columns.Add(__column.ColumnName, new FormTransactionEntry() { OldValue = a, NewValue = b, IsModified = IsModified });
-                    }
-                }
-                else
-                {
-                    if (!Trans[m_id].Tables.ContainsKey(_table.TableName))
-                        Trans[m_id].Tables.Add(_table.TableName, new FormTransactionRow() { });
-
-                    PreProcessTransationData(DictVmAll, _table, _column, ref old_val, ref new_val);
-
-                    FormTransactionEntry curtrans = new FormTransactionEntry()
-                    {
-                        OldValue = old_val,
-                        NewValue = new_val,
-                        IsModified = true,
-                        Title = _column.Control.Label
-                    };
-                    Trans[m_id].Tables[_table.TableName].Columns.Add(_column.ColumnName, curtrans);
-                }
-            }
-            PostProcessTransationData(DataDB, Service, Trans, DictVmAll);
-
-            return JsonConvert.SerializeObject(Trans);
-        }
-
-        private void PreProcessTransationData(Dictionary<string, string> DictVmAll, TableSchema _table, ColumnSchema _column, ref string old_val, ref string new_val)
-        {
-            if (_column.Control is EbPowerSelect || _column.Control is EbDGPowerSelectColumn)//copy vm for dm
-            {
-                string key = string.Concat(_table.TableName, "_", _column.ColumnName);
-                string temp = string.Empty;
-                if (!(new_val.Equals(string.Empty) || new_val.Equals("[null]")))/////
-                    temp = string.Concat(new_val, ",");
-                if (!(old_val.Equals(string.Empty) || old_val.Equals("[null]")))/////
-                    temp += string.Concat(old_val, ",");
-
-                if (!temp.Equals(string.Empty))
-                {
-                    if (!DictVmAll.ContainsKey(key))
-                        DictVmAll.Add(key, temp);
-                    else
-                        DictVmAll[key] = string.Concat(DictVmAll[key], temp);
-                }
-            }
-            else if (_column.Control is EbDate || _column.Control is EbDGDateColumn)
-            {
-                EbDateType _type = _column.Control is EbDate ? (_column.Control as EbDate).EbDateType : (_column.Control as EbDGDateColumn).EbDateType;
-                DateShowFormat _showtype = _column.Control is EbDate ? (_column.Control as EbDate).ShowDateAs_ : (_column.Control as EbDGDateColumn).EbDate.ShowDateAs_;
-                if (!old_val.Equals("[null]"))
-                {
-                    if (_type == EbDateType.Date)
-                    {
-                        if (_showtype != DateShowFormat.Year_Month)
-                            old_val = DateTime.ParseExact(old_val, "yyyy-MM-dd", CultureInfo.InvariantCulture).ToString(this.UserObj.Preference.GetShortDatePattern(), CultureInfo.InvariantCulture);
-                    }
-                    else if (_type == EbDateType.DateTime)
-                    {
-                        old_val = DateTime.ParseExact(old_val, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture).ToString(this.UserObj.Preference.GetShortDatePattern() + " " + this.UserObj.Preference.GetShortTimePattern(), CultureInfo.InvariantCulture);
-                        //old_val = dt.ConvertFromUtc(this.UserObj.Preference.TimeZone);
-                    }
-                    else if (_type == EbDateType.Time)
-                    {
-                        old_val = DateTime.ParseExact(old_val, "HH:mm:ss", CultureInfo.InvariantCulture).ToString(this.UserObj.Preference.GetShortTimePattern(), CultureInfo.InvariantCulture);
-                        //old_val = dt.ConvertFromUtc(this.UserObj.Preference.TimeZone);
-                    }
-                }
-                if (!new_val.Equals("[null]"))
-                {
-                    if (_type == EbDateType.Date)
-                    {
-                        if (_showtype != DateShowFormat.Year_Month)
-                            new_val = DateTime.ParseExact(new_val, "yyyy-MM-dd", CultureInfo.InvariantCulture).ToString(this.UserObj.Preference.GetShortDatePattern(), CultureInfo.InvariantCulture);
-                    }
-                    else if (_type == EbDateType.DateTime)
-                    {
-                        new_val = DateTime.ParseExact(new_val, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture).ToString(this.UserObj.Preference.GetShortDatePattern() + " " + this.UserObj.Preference.GetShortTimePattern(), CultureInfo.InvariantCulture);
-                    }
-                    else if (_type == EbDateType.Time)
-                    {
-                        new_val = DateTime.ParseExact(new_val, "HH:mm:ss", CultureInfo.InvariantCulture).ToString(this.UserObj.Preference.GetShortTimePattern(), CultureInfo.InvariantCulture);
-                    }
-                }
-            }
-            else if (_column.Control is EbUserSelect)
-            {
-                if (int.TryParse(old_val, out int j))
-                    old_val = this.SolutionObj.Users.ContainsKey(j) ? this.SolutionObj.Users[j] : old_val;
-                if (int.TryParse(new_val, out int i))
-                    new_val = this.SolutionObj.Users.ContainsKey(i) ? this.SolutionObj.Users[i] : new_val;
-            }
-        }
-
-        private void PostProcessTransationData(IDatabase DataDB, Service Service, Dictionary<int, FormTransaction> Trans, Dictionary<string, string> DictVmAll)
-        {
-            string Qry = string.Empty;
-            foreach (TableSchema _table in this.FormSchema.Tables)
-            {
-                foreach (ColumnSchema _column in _table.Columns)
-                {
-                    if (_column.Control is EbPowerSelect || _column.Control is EbDGPowerSelectColumn)
-                    {
-                        string key = string.Concat(_table.TableName, "_", _column.ColumnName);
-                        if (DictVmAll.ContainsKey(key))
-                        {
-                            if (_column.Control is EbPowerSelect)
-                                Qry += (_column.Control as EbPowerSelect).GetDisplayMembersQuery(DataDB, Service, DictVmAll[key].Substring(0, DictVmAll[key].Length - 1));
-                            else
-                                Qry += (_column.Control as EbDGPowerSelectColumn).GetDisplayMembersQuery(DataDB, Service, DictVmAll[key].Substring(0, DictVmAll[key].Length - 1));
-                        }
-                    }
-                }
-            }
-
-            EbDataSet ds = DataDB.DoQueries(Qry);
-
-            Dictionary<string, Dictionary<string, List<string>>> DictDm = new Dictionary<string, Dictionary<string, List<string>>>();
-            foreach (string key in DictVmAll.Keys)
-                DictDm.Add(key, new Dictionary<string, List<string>>());
-
-            for (int i = 0; i < ds.Tables.Count; i++)
-            {
-                foreach (EbDataRow row in ds.Tables[i].Rows)
-                {
-                    List<string> list = new List<string>();
-                    for (int j = 1; j < row.Count; j++)
-                    {
-                        list.Add(row[j].ToString());
-                    }
-                    if (!DictDm.ElementAt(i).Value.ContainsKey(row[0].ToString()))
-                        DictDm.ElementAt(i).Value.Add(row[0].ToString(), list);
-                }
-            }
-
-            foreach (KeyValuePair<int, FormTransaction> trans in Trans)
-            {
-                foreach (KeyValuePair<string, FormTransactionRow> table in trans.Value.Tables)
-                {
-                    ReplaceVmWithDm(table.Value.Columns, DictDm, table.Key);
-                }
-
-                foreach (KeyValuePair<string, FormTransactionTable> table in trans.Value.GridTables)
-                {
-                    foreach (KeyValuePair<int, FormTransactionRow> row in table.Value.Rows)
-                    {
-                        ReplaceVmWithDm(row.Value.Columns, DictDm, table.Key);
-                    }
-                }
-            }
-        }
-
-        private void ReplaceVmWithDm(Dictionary<string, FormTransactionEntry> Columns, Dictionary<string, Dictionary<string, List<string>>> DictDm, string tablename)
-        {
-            foreach (KeyValuePair<string, FormTransactionEntry> column in Columns)
-            {
-                if (DictDm.ContainsKey(tablename + "_" + column.Key))
-                {
-                    if (column.Value.OldValue != "[null]")
-                    {
-                        string[] vm_arr = column.Value.OldValue.Split(',');
-                        string dm = string.Empty;
-                        for (int i = 0; i < vm_arr.Length; i++)
-                        {
-                            List<string> dmlist = DictDm[tablename + "_" + column.Key][vm_arr[i]];
-                            foreach (string d in dmlist)
-                            {
-                                dm += " " + d;
-                            }
-                            if (i < vm_arr.Length - 1)
-                                dm += "<br>";
-                        }
-                        column.Value.OldValue = dm;
-                    }
-                    if (column.Value.NewValue != "[null]")
-                    {
-                        string[] vm_arr = column.Value.NewValue.Split(',');
-                        string dm = string.Empty;
-                        for (int i = 0; i < vm_arr.Length; i++)
-                        {
-                            List<string> dmlist = DictDm[tablename + "_" + column.Key][vm_arr[i]];
-                            foreach (string d in dmlist)
-                            {
-                                dm += " " + d;
-                            }
-                            if (i < vm_arr.Length - 1)
-                                dm += "<br>";
-                        }
-                        column.Value.NewValue = dm;
-                    }
-                }
-            }
+            return EbAuditTrail.GetAuditTrail(this, DataDB, Service);
         }
 
         public Dictionary<int, List<string>> GetLocBasedPermissions()
@@ -2897,93 +2206,17 @@ namespace ExpressBase.Objects
             return false;
         }
 
-        private WebFormSchema GetWebFormSchema()
-        {
-            WebFormSchema _formSchema = new WebFormSchema();
-            _formSchema.FormName = this.Name;
-            _formSchema.MasterTable = this.TableName.ToLower();
-            _formSchema = GetWebFormSchemaRec(_formSchema, this, this.TableName.ToLower());
-            this.FormSchema = _formSchema;
-            return _formSchema;
-        }
-
-        private WebFormSchema GetWebFormSchemaRec(WebFormSchema _schema, EbControlContainer _container, string _parentTable)
-        {
-            IEnumerable<EbControl> _flatControls = _container.Controls.Get1stLvlControls();
-            string curTbl = _container.TableName.ToLower();
-            TableSchema _table = _schema.Tables.FirstOrDefault(tbl => tbl.TableName == curTbl);
-            if (_table == null)
-            {
-                if (_container is EbApproval)
-                    _table = new TableSchema { TableName = curTbl, ParentTable = _parentTable, TableType = WebFormTableTypes.Approval, Title = _container.Label, ContainerName = _container.Name };
-                else if (_container is EbDataGrid)
-                    _table = new TableSchema { TableName = curTbl, ParentTable = _parentTable, TableType = WebFormTableTypes.Grid, Title = _container.Label, ContainerName = _container.Name };
-                else
-                    _table = new TableSchema { TableName = curTbl, ParentTable = _parentTable, TableType = WebFormTableTypes.Normal, ContainerName = _container.Name };
-                _schema.Tables.Add(_table);
-            }
-            foreach (EbControl control in _flatControls)
-            {
-                if (control is EbFileUploader)
-                    _schema.ExtendedControls.Add(control);
-                else if (control is EbProvisionUser)
-                {
-                    (control as EbProvisionUser).VirtualTable = curTbl;
-                    int idx = _schema.ExtendedControls.FindIndex(e => e is EbProvisionLocation);
-                    if (idx >= 0)
-                        (control as EbProvisionUser).AddLocConstraint = true;
-                    _schema.ExtendedControls.Add(control);
-                }
-                else if (control is EbProvisionLocation)
-                {
-                    (control as EbProvisionLocation).VirtualTable = curTbl;
-                    foreach (object temp in _schema.ExtendedControls.FindAll(e => e is EbProvisionUser))
-                        (temp as EbProvisionUser).AddLocConstraint = true;
-                    _schema.ExtendedControls.Add(control);
-                }
-                else if (control is EbDGUserControlColumn)
-                {
-                    foreach (EbControl _ctrl in (control as EbDGUserControlColumn).Columns)
-                    {
-                        _table.Columns.Add(new ColumnSchema { ColumnName = _ctrl.Name, EbDbType = (int)_ctrl.EbDbType, Control = _ctrl });
-                    }
-                }
-                else if (control is EbSysLocation && !control.IsDisable)
-                {
-                    this.IsLocEditable = true;
-                    _table.Columns.Add(new ColumnSchema { ColumnName = control.Name, EbDbType = (int)control.EbDbType, Control = control });
-                }
-                else
-                    _table.Columns.Add(new ColumnSchema { ColumnName = control.Name, EbDbType = (int)control.EbDbType, Control = control });
-            }
-
-            foreach (EbControl _control in _container.Controls)
-            {
-                if (_control is EbControlContainer)
-                {
-                    EbControlContainer Container = _control as EbControlContainer;
-                    string __parentTbl = _parentTable;
-                    if (Container.TableName.IsNullOrEmpty())
-                        Container.TableName = curTbl;
-                    else
-                        __parentTbl = curTbl;
-                    _schema = GetWebFormSchemaRec(_schema, Container, __parentTbl);
-                }
-            }
-            return _schema;
-        }
-
         public void AfterRedisGet(Service service)
         {
             EbFormHelper.AfterRedisGet(this, service.Redis, null, service);
-            this.GetWebFormSchema();
+            SchemaHelper.GetWebFormSchema(this);
             EbFormHelper.InitDataPushers(this, service.Redis, null, service);
         }
 
         public override void AfterRedisGet(RedisClient Redis, IServiceClient client)
         {
             EbFormHelper.AfterRedisGet(this, Redis, client, null);
-            this.GetWebFormSchema();
+            SchemaHelper.GetWebFormSchema(this);
             EbFormHelper.InitDataPushers(this, Redis, client, null);
         }
 
