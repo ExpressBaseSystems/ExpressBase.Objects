@@ -210,6 +210,8 @@ namespace ExpressBase.Objects.Objects
     {
         public dynamic sourceform { get; set; }
 
+        public dynamic Params { get; set; }
+
         public dynamic form { get; set; }
 
         public dynamic user { get; set; }
@@ -217,6 +219,7 @@ namespace ExpressBase.Objects.Objects
         public FormGlobals()
         {
             this.form = new FormAsGlobal();
+             Params = new NTVDict();
         }
     }
 
