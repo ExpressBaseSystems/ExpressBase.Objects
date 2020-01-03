@@ -3,6 +3,7 @@ using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
 using ExpressBase.Common.LocationNSolution;
 using ExpressBase.Common.Objects;
+using ExpressBase.Objects.Objects;
 using ExpressBase.Security;
 using ServiceStack;
 using System;
@@ -248,6 +249,44 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         
         [DataMember(Order = 9)]
         public string AffectedEntries { get; set; }
+    }
+    
+	[DataContract]
+	public class InsertOrUpdateFormDataRqst : EbServiceStackAuthRequest, IReturn<InsertOrUpdateFormDataResp>
+	{
+		[DataMember(Order = 1)]
+		public FormGlobals FormGlobals { get; set; }
+
+        [DataMember(Order = 2)]
+		public string PushJson { get; set; }
+
+		[DataMember(Order = 3)]
+		public string RefId { get; set; }
+
+		[DataMember(Order = 4)]
+		public int RecordId { get; set; }
+
+        [DataMember(Order = 5)]
+        public int LocId { get; set; }
+
+        [DataMember(Order = 6)]
+        public User UserObj { get; set; }
+    }
+	
+	[DataContract]
+	public class InsertOrUpdateFormDataResp : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public int Status { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Message { get; set; }
+
+        [DataMember(Order = 3)]
+        public int RecordId { get; set; }
+
+        [DataMember(Order = 4)]
+		public ResponseStatus ResponseStatus { get; set; }
     }
 
     [DataContract]

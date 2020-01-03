@@ -1,4 +1,5 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Data;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
@@ -236,6 +237,10 @@ namespace ExpressBase.Objects
         public EbScript OfflineQuery { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
+        public List<Param> Parameters { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
         public bool IsMultiSelect { get; set; }
 
         public override string GetDesignHtml()
@@ -260,6 +265,11 @@ namespace ExpressBase.Objects
                 Margin = new UISides { Top = 0, Bottom = 0, Left = 0, Right = 0 },
                 Label = this.Label
             };
+        }
+
+        public EbMobileSimpleSelect()
+        {
+            Parameters = new List<Param>();
         }
     }
 

@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -138,7 +139,7 @@ namespace ExpressBase.Objects
 
         public override string GetHtml()
         {
-            string html = "<form id='@ebsid@' isrendermode='@rmode@' ebsid='@ebsid@' class='formB-box form-buider-form ebcont-ctrl' eb-form='true' ui-inp eb-type='WebForm' @tabindex@>";
+            string html = "<form id='@ebsid@' isrendermode='@rmode@' ebsid='@ebsid@' class='formB-box form-buider-form ebcont-ctrl' eb-form='true'  eb-root-obj-container ui-inp eb-type='WebForm' @tabindex@>";
 
             foreach (EbControl c in this.Controls)
                 html += c.GetHtml();
@@ -1722,7 +1723,7 @@ namespace ExpressBase.Objects
                 {
                     Console.WriteLine($"Rollback Exception Type: {ex2.GetType()}\nMessage: {ex2.Message}");
                 }
-                throw ex1;
+                throw new FormException("Exception in Form data save", (int)HttpStatusCodes.INTERNAL_SERVER_ERROR, ex1.Message, ex1.StackTrace);
             }
             return resp;
         }
@@ -1900,10 +1901,100 @@ namespace ExpressBase.Objects
             return false;
         }
 
+        //form data submission using PushJson and FormGlobals - SQL Job
+        public void PrepareWebFormData(IDatabase DataDB, Service service, string PushJson, FormGlobals FormGlobals)
+        {
+            this.FormData = new WebformData() { MasterTable = this.FormSchema.MasterTable };
+            JObject JObj = JObject.Parse(PushJson);
+
+            foreach (TableSchema _table in this.FormSchema.Tables)
+            {
+                if (JObj[_table.TableName] != null)
+                {
+                    SingleTable Table = new SingleTable();
+                    foreach (JToken jRow in JObj[_table.TableName])
+                    {
+                        Table.Add(this.GetSingleRow(jRow, _table, FormGlobals));
+                    }
+                    this.FormData.MultipleTables.Add(_table.TableName, Table);
+                }
+            }
+            this.MergeFormData();
+
+            if (this.TableRowId > 0)//if edit mode then fill or map id by refering FormDataBackup
+            {
+                this.RefreshFormData(DataDB, service, true, true);
+
+                foreach (KeyValuePair<string, SingleTable> entry in this.FormDataBackup.MultipleTables)
+                {
+                    if (this.FormData.MultipleTables.ContainsKey(entry.Key))
+                    {
+                        for (int i = 0; i < entry.Value.Count; i++)
+                        {
+                            if (i < this.FormData.MultipleTables[entry.Key].Count)
+                                this.FormData.MultipleTables[entry.Key][i].RowId = entry.Value[i].RowId;
+                            else
+                            {
+                                this.FormData.MultipleTables[entry.Key].Add(entry.Value[i]);
+                                this.FormData.MultipleTables[entry.Key][i].IsDelete = true;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        this.FormData.MultipleTables.Add(entry.Key, entry.Value);
+                        foreach (SingleRow Row in this.FormData.MultipleTables[entry.Key])
+                            Row.IsDelete = true;
+                    }
+                }
+            }
+        }
+
+        //form data submission using PushJson and FormGlobals - SQL Job
+        public string Save(IDatabase DataDB)
+        {
+            this.DbConnection = DataDB.GetNewConnection();
+            string resp = string.Empty;
+            try
+            {
+                this.DbConnection.Open();
+                this.DbTransaction = this.DbConnection.BeginTransaction();
+
+                bool IsUpdate = this.TableRowId > 0;
+                if (IsUpdate)
+                {
+                    resp = "Updated: " + this.Update(DataDB);
+                }
+                else
+                {
+                    this.TableRowId = this.Insert(DataDB);
+                    resp = "Inserted: " + this.TableRowId;
+                    Console.WriteLine("New record inserted. Table :" + this.TableName + ", Id : " + this.TableRowId);
+                }
+                resp += " - AuditTrail: " + this.UpdateAuditTrail(DataDB);
+                resp += " - AfterSave: " + this.AfterSave(DataDB, IsUpdate);
+                this.DbTransaction.Commit();
+            }
+            catch (Exception ex1)
+            {
+                try
+                {
+                    this.DbTransaction.Rollback();
+                }
+                catch (Exception ex2)
+                {
+                    Console.WriteLine($"Rollback Exception Type: {ex2.GetType()}\nMessage: {ex2.Message}");
+                }
+                throw new FormException("Exception in Form data save", (int)HttpStatusCodes.INTERNAL_SERVER_ERROR, ex1.Message, ex1.StackTrace);
+            }
+            return resp;
+        }
+
         private void PrepareWebFormData()
         {
             DateTime startdt = DateTime.Now;
-            FormAsGlobal globals = this.GetFormAsFlatGlobal(this.FormData);
+            FormAsGlobal global = this.GetFormAsFlatGlobal(this.FormData);
+            FormGlobals globals = new FormGlobals() { sourceform = global };
             foreach (EbDataPusher pusher in this.DataPushers)
             {
                 pusher.WebForm.DataPusherConfig.SourceRecId = this.TableRowId;
@@ -1973,7 +2064,7 @@ namespace ExpressBase.Objects
             Console.WriteLine("PrepareWebFormData for Data Pushers. Execution Time = " + (DateTime.Now - startdt).TotalMilliseconds);
         }
 
-        public void ProcessPushJson(EbDataPusher pusher, FormAsGlobal globals)
+        public void ProcessPushJson(EbDataPusher pusher, FormGlobals globals)
         {
             this.FormData = new WebformData() { MasterTable = this.FormSchema.MasterTable };
             JObject JObj = JObject.Parse(pusher.Json);
@@ -1998,7 +2089,7 @@ namespace ExpressBase.Objects
             }
         }
 
-        private SingleRow GetSingleRow(JToken JRow, TableSchema _table, FormAsGlobal globals)
+        private SingleRow GetSingleRow(JToken JRow, TableSchema _table, FormGlobals globals)
         {
             SingleRow Row = new SingleRow() { RowId = 0 };
             foreach (ColumnSchema _column in _table.Columns)
@@ -2018,7 +2109,7 @@ namespace ExpressBase.Objects
             return Row;
         }
 
-        private string ExecuteCSharpScript(string code, FormAsGlobal globals)
+        private string ExecuteCSharpScript(string code, FormGlobals globals)
         {
             try
             {
@@ -2028,9 +2119,12 @@ namespace ExpressBase.Objects
                     "System.Diagnostics", "System.Linq"),
                     globalsType: typeof(FormGlobals)
                 );
+                //var compilation = valscript.GetCompilation();
+                //var ilstream = new MemoryStream();
+                //var pdbstream = new MemoryStream();
+                //compilation.Emit(ilstream, pdbstream);
                 valscript.Compile();
-                FormGlobals global = new FormGlobals() { sourceform = globals };
-                var r = (valscript.RunAsync(global)).Result.ReturnValue;
+                var r = (valscript.RunAsync(globals)).Result.ReturnValue;
                 return r.ToString();
             }
             catch (Exception ex)
