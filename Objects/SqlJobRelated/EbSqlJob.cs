@@ -107,8 +107,8 @@ namespace ExpressBase.Objects
                         return new LoopLocation { Loop = Resources[i] as EbLoop, Step = i, ParentIndex = i };
                     else
                     {
-                        for (int j = 0;  j < (Resources[i] as ISqlJobCollection).InnerResources.Count; j++)
-                       
+                        for (int j = 0; j < (Resources[i] as ISqlJobCollection).InnerResources.Count; j++)
+
                         {
                             if ((Resources[i] as ISqlJobCollection).InnerResources[j] is EbLoop)
                                 return new LoopLocation { Loop = (Resources[i] as ISqlJobCollection).InnerResources[j] as EbLoop, Step = j, ParentIndex = i };
@@ -159,7 +159,7 @@ namespace ExpressBase.Objects
                 OutParams = ((this.InnerResources[0] as ISqlJobCollection).InnerResources[step - 1]).GetOutParams(_param, step);
             else
                 OutParams = this.InnerResources[step - 1].GetOutParams(_param, step);
- 
+
             return OutParams;
         }
         public override string GetDesignHtml()
@@ -352,6 +352,14 @@ namespace ExpressBase.Objects
         //}
     }
 
+    [EnableInBuilder(BuilderType.SqlJob)]
+    public class EbSqlFormDataPusher : SqlJobResource
+    {
+        [EnableInBuilder(BuilderType.SqlJob)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [OSE_ObjectTypes(EbObjectTypes.iWebForm)]
+        public string Reference { get; set; }
+    }
 
     [EnableInBuilder(BuilderType.SqlJob)]
     public class EmailNode : SqlJobResource
@@ -407,16 +415,18 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.SqlJob)]
         public string Type { get; set; }
-    }
+    } 
+
     public enum InOutStatus
-        {
-            In,
-            UnKnown,
-            Out,
-            Ignored,
-            Excluded,
-            Error
+    {
+        In,
+        UnKnown,
+        Out,
+        Ignored,
+        Excluded,
+        Error
     }
+
     internal class Attendance
     {
         internal int Empmaster_id { get; set; }
@@ -451,7 +461,7 @@ namespace ExpressBase.Objects
             this.IsNightshift = bNightshift;
         }
 
-        public void Pp(dynamic Params , TableColletion Tables)
+        public void Pp(dynamic Params, TableColletion Tables)
         {
             DateTime dateInQuestion = Convert.ToDateTime(Params.date_to_consolidate);
             int empmaster_id = Convert.ToInt32(Params.empid);
