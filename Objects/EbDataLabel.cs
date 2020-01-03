@@ -219,6 +219,7 @@ namespace ExpressBase.Objects
             return GfontList[font];
         }
            public override string GetValueFromDOMJSfn { get { return @"return this.DynamicLabel"; } set { } }
-        public override string StyleJSFn { get { return @"return $('#cont_' + this.EbSid).find('.ctrl-cover').css(p1, p2);"; } set { } }
+           public override string StyleJSFn { get { return @"return $('#cont_' + this.EbSid).find('.ctrl-cover').css(p1, p2);"; } set { } }
+           public override string GetValueJSfn { get { return @"return this.DynamicLabel"; } set { } }
     }
 }

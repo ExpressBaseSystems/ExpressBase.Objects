@@ -59,7 +59,14 @@ namespace ExpressBase.Objects.Objects
 
         
         [JsonIgnore]// roby
-        public override string OnChangeBindJSFn { get { return @"$('#' + this.EbSid_CtxId).on('change', p1);"; } set { } }
+        public override string OnChangeBindJSFn 
+        { 
+            get 
+            { 
+                return @"$('#' + this.EbSid_CtxId).on('change', p1);";
+            } 
+            set { } 
+        }
 
         public override string SetValueJSfn 
         {
