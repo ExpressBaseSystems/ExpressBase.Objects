@@ -164,7 +164,7 @@ namespace ExpressBase.Objects
         {
             BeforeSaveHelper.BeforeSave(this, null, null);
         }
-        
+
         //get all control container as flat structure
         public List<EbControlContainer> GetAllContainers(EbControlContainer _container, List<EbControlContainer> _list = null)
         {
@@ -528,6 +528,25 @@ namespace ExpressBase.Objects
             }
         }
 
+        public void GetEmptyModel()
+        {
+            this.FormData = new WebformData() { MasterTable = this.FormSchema.MasterTable };            
+            foreach (TableSchema _table in this.FormSchema.Tables)
+            {
+                if (_table.TableType == WebFormTableTypes.Normal)
+                {
+                    SingleTable Table = new SingleTable();
+                    SingleRow Row = new SingleRow();
+                    foreach (ColumnSchema _column in _table.Columns)
+                    {
+                        Row.Columns.Add(_column.Control.GetDefaultSingleColumn(this.UserObj, this.SolutionObj));
+                    }
+                    Table.Add(Row);
+                    FormData.MultipleTables.Add(_table.TableName, Table);
+                }
+            }
+        }
+
         private void GetFormattedDataApproval(EbDataTable dataTable, SingleTable Table)
         {
             foreach (EbDataRow dataRow in dataTable.Rows)
@@ -634,7 +653,7 @@ namespace ExpressBase.Objects
             {
                 if (_control != null && (_control.EbDbType == EbDbTypes.Decimal || _control.EbDbType == EbDbTypes.Int32))
                     _displayMember = "0.00";
-                else if (dataColumn.Type == EbDbTypes.Int32 || dataColumn.Type == EbDbTypes.Int64 || dataColumn.Type == EbDbTypes.Decimal || dataColumn.Type == EbDbTypes.Double)
+                else if (dataColumn != null && (dataColumn.Type == EbDbTypes.Int32 || dataColumn.Type == EbDbTypes.Int64 || dataColumn.Type == EbDbTypes.Decimal || dataColumn.Type == EbDbTypes.Double))
                     _displayMember = "0.00";
             }
             else if (_control != null)
