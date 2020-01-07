@@ -1,6 +1,7 @@
 ﻿using ExpressBase.Common;
 using ServiceStack;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace ExpressBase.Objects.WebFormRelated
@@ -26,8 +27,9 @@ namespace ExpressBase.Objects.WebFormRelated
                 if (_table.TableType == WebFormTableTypes.Grid)
                     _cols = "eb_loc_id, id, eb_row_num";
 
-                if (_table.Columns.Count > 0)
-                    _cols += ", " + String.Join(", ", _table.Columns.Where(x => (!x.Control.DoNotPersist || x.Control.IsSysControl)).Select(x => x.ColumnName));
+                IEnumerable<ColumnSchema> _columns = _table.Columns.Where(x => (!x.Control.DoNotPersist || x.Control.IsSysControl));
+                if (_columns.Count() > 0)
+                    _cols += ", " + String.Join(", ", _columns.Select(x => x.ColumnName));
 
                 if (_this.DataPusherConfig == null)
                 {
