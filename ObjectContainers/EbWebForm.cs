@@ -535,6 +535,15 @@ namespace ExpressBase.Objects
             {               
                 SingleTable Table = new SingleTable();
                 SingleRow Row = new SingleRow();
+                if (_table.TableType == WebFormTableTypes.Grid)
+                {
+                    Row.Columns.Add(new SingleColumn()
+                    {
+                        Name = "eb_row_num",
+                        Type = (int)EbDbTypes.Decimal,
+                        Value = 0
+                    });
+                }
                 foreach (ColumnSchema _column in _table.Columns)
                 {
                     Row.Columns.Add(_column.Control.GetDefaultSingleColumn(this.UserObj, this.SolutionObj));
