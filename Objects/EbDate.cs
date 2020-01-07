@@ -285,7 +285,6 @@ namespace ExpressBase.Objects
             {
 
                 return @"
-                    debugger;
                     console.log(this.Label);
                     if(this.IsNullable)
                         $('#' + this.EbSid_CtxId).siblings('.nullable-check').find('input[type=checkbox]').prop('checked', false);
