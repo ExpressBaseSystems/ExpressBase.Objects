@@ -19,6 +19,7 @@ using ServiceStack.Redis;
 using ExpressBase.Common.Data;
 using System.Collections;
 using System.ComponentModel;
+using ExpressBase.Common.LocationNSolution;
 
 namespace ExpressBase.Objects
 {
@@ -660,6 +661,12 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, p2).
         {
             return this.EbDate.ParameterizeControl(DataDB, param, tbl, cField, ins, ref i, ref _col, ref _val, ref _extqry, usr, ocF);
         }
+
+        public override SingleColumn GetDefaultSingleColumn(User UserObj, Eb_Solution SoluObj)
+        {
+            this.EbDate.Name = this.Name;
+            return this.EbDate.GetDefaultSingleColumn(UserObj, SoluObj);
+        }
     }
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
@@ -934,6 +941,12 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
         public void OnDeserializedMethod(StreamingContext context)
         {
             DBareHtml = EbBooleanSelect.GetBareHtml();
+        }
+
+        public override SingleColumn GetDefaultSingleColumn(User UserObj, Eb_Solution SoluObj)
+        {
+            this.EbBooleanSelect.Name = this.Name;
+            return this.EbBooleanSelect.GetDefaultSingleColumn(UserObj, SoluObj);
         }
     }
 
@@ -1240,6 +1253,12 @@ else
         {
             return this.EbPowerSelect.GetDisplayMembersQuery(DataDB, service, vms);
         }
+
+        public override SingleColumn GetDefaultSingleColumn(User UserObj, Eb_Solution SoluObj)
+        {
+            this.EbPowerSelect.Name = this.Name;
+            return this.EbPowerSelect.GetDefaultSingleColumn(UserObj, SoluObj);
+        }
     }
 
 
@@ -1362,6 +1381,13 @@ else
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [HideInToolBox]
         public override bool IsSysControl { get { return true; } }
+
+
+        public override SingleColumn GetDefaultSingleColumn(User UserObj, Eb_Solution SoluObj)
+        {
+            this.EbSysCreatedBy.Name = this.Name;
+            return EbSysCreatedBy.GetDefaultSingleColumn(this.EbSysCreatedBy, UserObj, SoluObj);
+        }
     }
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
@@ -1486,6 +1512,12 @@ else
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [HideInToolBox]
         public override bool IsSysControl { get { return true; } }
+
+        public override SingleColumn GetDefaultSingleColumn(User UserObj, Eb_Solution SoluObj)
+        {
+            this.EbSysCreatedAt.Name = this.Name;
+            return this.EbSysCreatedAt.GetDefaultSingleColumn(UserObj, SoluObj);
+        }
     }
 
 
@@ -1605,6 +1637,13 @@ else
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [HideInToolBox]
         public override bool IsSysControl { get { return true; } }
+
+
+        public override SingleColumn GetDefaultSingleColumn(User UserObj, Eb_Solution SoluObj)
+        {
+            this.EbSysModifiedBy.Name = this.Name;
+            return EbSysCreatedBy.GetDefaultSingleColumn(this.EbSysModifiedBy, UserObj, SoluObj);
+        }
     }
 
 
@@ -1730,6 +1769,12 @@ else
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [HideInToolBox]
         public override bool IsSysControl { get { return true; } }
+
+        public override SingleColumn GetDefaultSingleColumn(User UserObj, Eb_Solution SoluObj)
+        {
+            this.EbSysModifiedAt.Name = this.Name;
+            return this.EbSysModifiedAt.GetDefaultSingleColumn(UserObj, SoluObj);
+        }
     }
 
 

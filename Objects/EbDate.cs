@@ -14,6 +14,7 @@ using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using ExpressBase.Security;
 using System.Globalization;
+using ExpressBase.Common.LocationNSolution;
 
 namespace ExpressBase.Objects
 {
@@ -333,6 +334,45 @@ namespace ExpressBase.Objects
                 _col += string.Concat(cField.Name, "=@", cField.Name, "_", i, ", ");
             i++;
             return true;
+        }
+
+        public override SingleColumn GetDefaultSingleColumn(User UserObj, Eb_Solution SoluObj)
+        {
+            dynamic value = null;
+            string formatted = string.Empty;
+
+            if (!this.IsNullable)
+            {
+                DateTime dt = DateTime.UtcNow.ConvertFromUtc(UserObj.Preference.TimeZone);
+                if (this.EbDateType == EbDateType.Date)
+                {
+                    if (this.ShowDateAs_ == DateShowFormat.Year_Month)
+                    {
+                        formatted = dt.ToString("MM/yyyy", CultureInfo.InvariantCulture);
+                        value = formatted;
+                    }
+                    else
+                    {
+                        value = dt.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+                        formatted = dt.ToString(UserObj.Preference.GetShortDatePattern(), CultureInfo.InvariantCulture);
+                    }
+                }
+                else
+                {
+                    value = dt.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+                    formatted = dt.ToString(UserObj.Preference.GetShortDatePattern() + " " + UserObj.Preference.GetShortTimePattern(), CultureInfo.InvariantCulture);
+                }
+            }
+
+            return new SingleColumn()
+            {
+                Name = this.Name,
+                Type = (int)this.EbDbType,
+                Value = value,
+                Control = this,
+                ObjType = this.ObjType,
+                F = formatted
+            };
         }
     }
 }

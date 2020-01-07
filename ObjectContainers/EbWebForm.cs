@@ -532,18 +532,15 @@ namespace ExpressBase.Objects
         {
             this.FormData = new WebformData() { MasterTable = this.FormSchema.MasterTable };            
             foreach (TableSchema _table in this.FormSchema.Tables)
-            {
-                if (_table.TableType == WebFormTableTypes.Normal)
+            {               
+                SingleTable Table = new SingleTable();
+                SingleRow Row = new SingleRow();
+                foreach (ColumnSchema _column in _table.Columns)
                 {
-                    SingleTable Table = new SingleTable();
-                    SingleRow Row = new SingleRow();
-                    foreach (ColumnSchema _column in _table.Columns)
-                    {
-                        Row.Columns.Add(_column.Control.GetDefaultSingleColumn(this.UserObj, this.SolutionObj));
-                    }
-                    Table.Add(Row);
-                    FormData.MultipleTables.Add(_table.TableName, Table);
+                    Row.Columns.Add(_column.Control.GetDefaultSingleColumn(this.UserObj, this.SolutionObj));
                 }
+                Table.Add(Row);
+                FormData.MultipleTables.Add(_table.TableName, Table);
             }
         }
 

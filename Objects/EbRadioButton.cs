@@ -1,9 +1,10 @@
-﻿
-using ExpressBase.Common;
+﻿using ExpressBase.Common;
 using ExpressBase.Common.Extensions;
+using ExpressBase.Common.LocationNSolution;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
+using ExpressBase.Security;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -195,6 +196,29 @@ return val"; } set { } }
 
         [JsonIgnore]
         public override string SetValueJSfn { get { return @"$('#' + this.EbSid_CtxId).prop('checked', (p1 === this.Tv ? true: false)).trigger('change');"; } set { } }
+
+
+        public override SingleColumn GetDefaultSingleColumn(User UserObj, Eb_Solution SoluObj)
+        {
+            dynamic value = null;
+
+            if (this.ValueType == EbValueType.Boolean)
+                value = false;
+            else if (this.ValueType == EbValueType.Integer)
+                value = this.FalseValue_I;
+            else
+                value = this.FalseValue_S;
+
+            return new SingleColumn()
+            {
+                Name = this.Name,
+                Type = (int)this.EbDbType,
+                Value = value,
+                Control = this,
+                ObjType = this.ObjType,
+                F = "false"
+            };
+        }
 
     }
 }
