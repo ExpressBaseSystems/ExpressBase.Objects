@@ -1,4 +1,6 @@
-﻿using ExpressBase.Common.Extensions;
+﻿using ExpressBase.Common;
+using ExpressBase.Common.Data;
+using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
@@ -193,7 +195,50 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.Collection)]
+        [PropertyGroup("Data")]
         public List<EbMobileSSOption> Options { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
+        [PropertyGroup("Data")]
+        [OnChangeExec(@"
+                if (this.DataSourceRefId !== null && this.DataSourceRefId !== ''){ 
+                        pg.ShowProperty('DisplayMember');
+                        pg.ShowProperty('ValueMember');
+                        pg.ShowProperty('OfflineQuery');
+                }
+                else {
+                        pg.HideProperty('DisplayMember');
+                        pg.HideProperty('ValueMember');
+                        pg.HideProperty('OfflineQuery');
+                }
+            ")]
+        public string DataSourceRefId { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
+        public List<EbMobileDataColumn> Columns { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns",1)]
+        [PropertyGroup("Data")]
+        public EbMobileDataColumn DisplayMember { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns",1)]
+        [PropertyGroup("Data")]
+        public EbMobileDataColumn ValueMember { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
+        [HelpText("sql query to get data from offline database")]
+        [PropertyGroup("Data")]
+        public EbScript OfflineQuery { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
+        public List<Param> Parameters { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         public bool IsMultiSelect { get; set; }
@@ -220,6 +265,11 @@ namespace ExpressBase.Objects
                 Margin = new UISides { Top = 0, Bottom = 0, Left = 0, Right = 0 },
                 Label = this.Label
             };
+        }
+
+        public EbMobileSimpleSelect()
+        {
+            Parameters = new List<Param>();
         }
     }
 
@@ -397,6 +447,14 @@ namespace ExpressBase.Objects
 
         public override bool Unique { get; set; }
 
+        public override bool ReadOnly { get; set ; }
+
+        public override bool DoNotPersist { get; set ; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("UI")]
+        public string TextFormat { get; set; }
+
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
         public int TableIndex { get; set; }
@@ -413,6 +471,12 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
         public EbDbTypes Type { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [UIproperty]
+        [PropertyGroup("UI")]
+        [PropertyEditor(PropertyEditorType.FontSelector)]
+        public EbFont Font { get; set; }
 
         public override bool Hidden { set; get; }
 

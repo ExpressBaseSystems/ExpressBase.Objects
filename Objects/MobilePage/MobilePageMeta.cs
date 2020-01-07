@@ -5,6 +5,7 @@ using System.Text;
 
 namespace ExpressBase.Objects.Objects.MobilePage
 {
+
     public class MobileFormData
     {
         public string MasterTable { set; get; }

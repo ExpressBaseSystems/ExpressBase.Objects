@@ -99,6 +99,11 @@ namespace ExpressBase.Objects
 
         public  override bool IsRenderMode { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorJS)]
+        [HelpText("Define default value of the control.")]
+        public override EbScript DefaultValueExpression { get; set; }
+
         [HideInPropertyGrid]
         [JsonIgnore]
         public override string ToolIconHtml { get { return "<i class='fa fa-font'></i>"; } set { } }
@@ -213,5 +218,8 @@ namespace ExpressBase.Objects
 
             return GfontList[font];
         }
+           public override string GetValueFromDOMJSfn { get { return @"return this.DynamicLabel"; } set { } }
+           public override string StyleJSFn { get { return @"return $('#cont_' + this.EbSid).find('.ctrl-cover').css(p1, p2);"; } set { } }
+           public override string GetValueJSfn { get { return @"return this.DynamicLabel"; } set { } }
     }
 }

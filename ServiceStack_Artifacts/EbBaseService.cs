@@ -4,6 +4,7 @@ using ExpressBase.Common.Constants;
 using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
+using ExpressBase.Common.LocationNSolution;
 using ExpressBase.Common.ServiceClients;
 using ExpressBase.Common.SqlProfiler;
 using ExpressBase.Common.Structures;
@@ -210,12 +211,11 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         }
 
         public bool GetLogEnabled(string _refId)
-
         {
 
             List<DbParameter> parameter = new List<DbParameter>();
 
-            string query = @"SELECT is_logenabled FROM eb_objects WHERE id = (SELECT eb_objects_id FROM eb_objects_ver WHERE refid = @refid)";
+            string query = EbConnectionFactory.ObjectsDB.EB_GET_LOG_ENABLED;
 
             parameter.Add(EbConnectionFactory.ObjectsDB.GetNewParameter("refid", EbDbTypes.String, _refId));
 
@@ -223,6 +223,26 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             if (dt.Rows.Count > 0)
                 return ((dt.Rows[0][0].ToString()) == "T") ? true : false;
             return false;
+        }
+
+        public Eb_Solution GetSolutionObject(string cid)
+        {
+            Eb_Solution s_obj = null;
+            try
+            {
+                s_obj = this.Redis.Get<Eb_Solution>(String.Format("solution_{0}", cid));
+
+                if (s_obj == null)
+                {
+                    Gateway.Send<UpdateSolutionObjectResponse>(new UpdateSolutionObjectRequest() { SolnId = cid });
+                    s_obj = this.Redis.Get<Eb_Solution>(String.Format("solution_{0}", cid));
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message + e.StackTrace);
+            }
+            return s_obj;
         }
 
         //private void LoadCache()

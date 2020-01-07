@@ -131,10 +131,12 @@ namespace ExpressBase.Objects
 .Replace("@GetBareHtml@", this.GetBareHtml());
         }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.String; } set { } }
 
         [JsonIgnore]
-        public override string GetValueJSfn
+        public override string GetValueFromDOMJSfn
         {
             get
             {
@@ -157,6 +159,9 @@ namespace ExpressBase.Objects
             }
             set { }
         }
+
+        [JsonIgnore]
+        public override string OnChangeBindJSFn { get { return @"$('#' + this.EbSid_CtxId + 'address').on('change', p1);"; } set { } }
 
     }
 }

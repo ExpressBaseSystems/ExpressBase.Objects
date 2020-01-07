@@ -225,7 +225,7 @@ namespace ExpressBase.Objects
         }
 
         [JsonIgnore]
-        public override string GetValueJSfn
+        public override string GetValueFromDOMJSfn
         {
             get
             {
@@ -266,7 +266,7 @@ namespace ExpressBase.Objects
         }
 
         [JsonIgnore]
-        public override string GetDisplayMemberJSfn
+        public override string GetDisplayMemberFromDOMJSfn
         {
             get
             {
@@ -285,7 +285,6 @@ namespace ExpressBase.Objects
             {
 
                 return @"
-                    debugger;
                     console.log(this.Label);
                     if(this.IsNullable)
                         $('#' + this.EbSid_CtxId).siblings('.nullable-check').find('input[type=checkbox]').prop('checked', false);
@@ -328,10 +327,10 @@ namespace ExpressBase.Objects
             if (ins)
             {
                 _col += string.Concat(cField.Name, ", ");
-                _val += string.Concat(":", cField.Name, "_", i, ", ");
+                _val += string.Concat("@", cField.Name, "_", i, ", ");
             }
             else
-                _col += string.Concat(cField.Name, "=:", cField.Name, "_", i, ", ");
+                _col += string.Concat(cField.Name, "=@", cField.Name, "_", i, ", ");
             i++;
             return true;
         }

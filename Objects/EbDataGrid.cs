@@ -18,6 +18,7 @@ using ExpressBase.Security;
 using ServiceStack.Redis;
 using ExpressBase.Common.Data;
 using System.Collections;
+using System.ComponentModel;
 
 namespace ExpressBase.Objects
 {
@@ -106,8 +107,8 @@ namespace ExpressBase.Objects
         {
             get
             {
-                return @"dgOnChangeBind.bind(this)();
-                        dgEBOnChangeBind.bind(this)()";
+                return @"dgEBOnChangeBind.bind(this)();
+                        dgOnChangeBind.bind(this)()";
             }
             set { }
         }
@@ -330,7 +331,29 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         public override string GetValueJSfn
         {
-            get { return @"let val = $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val(); return (this.ObjType === 'Numeric') ?  (parseFloat($('#' + this.EbSid_CtxId).val()) || 0) :val;"; }
+            get { return @"
+                    if(this.__isEditing)
+                        return this.curRowDataVals.Value
+                    else
+                        return this.DataVals.Value";
+
+            }
+
+            set { }
+        }
+
+        [JsonIgnore]
+        public override string GetValueFromDOMJSfn
+        {
+            get { return @"return $('[ebsid=' + this.__DG.EbSid + ']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val();"; }
+
+            set { }
+        }
+
+        [JsonIgnore]
+        public override string GetDisplayMemberFromDOMJSfn
+        {
+            get { return GetValueFromDOMJSfn; }
 
             set { }
         }
@@ -498,7 +521,7 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public override string InputControlType { get { return "EbCheckBox"; } }
 
-        public override string GetValueJSfn
+        public override string GetValueFromDOMJSfn
         {
             get { return @"
 							if($('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).is(':checked'))
@@ -512,7 +535,8 @@ namespace ExpressBase.Objects
 
             set { }
         }
-        public override string GetDisplayMemberJSfn
+
+        public override string GetDisplayMemberFromDOMJSfn
         {
             get { return @"
 							if($('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).is(':checked'))
@@ -562,11 +586,11 @@ namespace ExpressBase.Objects
         }
 
         [JsonIgnore]
-        public override string GetValueJSfn
+        public override string GetValueFromDOMJSfn
         {
             get
             {
-                return this.EbDate.GetValueJSfn;
+                return this.EbDate.GetValueFromDOMJSfn;
             }
             set { }
         }
@@ -592,11 +616,11 @@ namespace ExpressBase.Objects
         }
 
         [JsonIgnore]
-        public override string GetDisplayMemberJSfn
+        public override string GetDisplayMemberFromDOMJSfn
         {
             get
             {
-                return this.EbDate.GetDisplayMemberJSfn;
+                return this.EbDate.GetDisplayMemberFromDOMJSfn;
             }
             set { }
         }
@@ -680,7 +704,7 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, p2).
             set { }
         }
 
-        public override string GetDisplayMemberJSfn { get { return @" return $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp] :selected`).text(); "; } set { } }
+        public override string GetDisplayMemberFromDOMJSfn { get { return @" return $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp] :selected`).text(); "; } set { } }
 
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
@@ -814,11 +838,11 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
             set { }
         }
 
-        public override string GetValueJSfn
+        public override string GetValueFromDOMJSfn
         {
             get
             {
-                return EbDGSimpleSelectColumn.GetValueJSfn.Replace("return val;", "val = (val ==='true'); return val;");
+                return EbDGSimpleSelectColumn.GetValueFromDOMJSfn.Replace("return val;", "val = (val ==='true'); return val;");
             }
             set { }
         }
@@ -849,11 +873,11 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
             set { }
         }
 
-        public override string GetDisplayMemberJSfn
+        public override string GetDisplayMemberFromDOMJSfn
         {
             get
             {
-                return EbDGSimpleSelectColumn.GetDisplayMemberJSfn;
+                return EbDGSimpleSelectColumn.GetDisplayMemberFromDOMJSfn;
             }
             set { }
         }
@@ -1000,7 +1024,10 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
         public override string SetDisplayMemberJSfn { get { return this.EbPowerSelect.SetDisplayMemberJSfn; } set { } }
 
         [JsonIgnore]
-        public override string GetDisplayMemberJSfn { get { return this.EbPowerSelect.GetDisplayMemberJSfn; } set { } }
+        public override string GetDisplayMemberFromDOMJSfn { get { return this.EbPowerSelect.GetDisplayMemberFromDOMJSfn; } set { } }
+
+        [JsonIgnore]
+        public override string GetColumnJSfn { get { return this.EbPowerSelect.GetColumnJSfn; } set { } }
 
         [JsonIgnore]
         public EbPowerSelect EbPowerSelect { get; set; }
@@ -1075,6 +1102,12 @@ else
         [PropertyGroup("Appearance")]
         [DefaultPropValue("100")]
         public override int Width { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [HelpText("Specify minimum number of charecters to initiate search")]
+        [Category("Search Settings")]
+        [PropertyGroup("Behavior")]
+        public int MinSeachLength { get { return this.EbPowerSelect.MinSeachLength; } set { this.EbPowerSelect.MinSeachLength = value; } }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup("Behavior")]
@@ -1253,11 +1286,11 @@ else
         //}
 
         [JsonIgnore]
-        public override string GetValueJSfn
+        public override string GetValueFromDOMJSfn
         {
             get
             {
-                return this.EbSysCreatedBy.GetValueJSfn;
+                return this.EbSysCreatedBy.GetValueFromDOMJSfn;
             }
             set { }
         }
@@ -1293,11 +1326,11 @@ else
         }
 
         [JsonIgnore]
-        public override string GetDisplayMemberJSfn
+        public override string GetDisplayMemberFromDOMJSfn
         {
             get
             {
-                return this.EbSysCreatedBy.GetDisplayMemberJSfn;
+                return this.EbSysCreatedBy.GetDisplayMemberFromDOMJSfn;
             }
             set { }
         }
@@ -1380,11 +1413,11 @@ else
         //}
 
         [JsonIgnore]
-        public override string GetValueJSfn
+        public override string GetValueFromDOMJSfn
         {
             get
             {
-                return this.EbSysCreatedAt.GetValueJSfn;
+                return this.EbSysCreatedAt.GetValueFromDOMJSfn;
             }
             set { }
         }
@@ -1419,11 +1452,11 @@ else
             set { }
         }
 
-        public override string GetDisplayMemberJSfn
+        public override string GetDisplayMemberFromDOMJSfn
         {
             get
             {
-                return this.EbSysCreatedAt.GetDisplayMemberJSfn;
+                return this.EbSysCreatedAt.GetDisplayMemberFromDOMJSfn;
             }
             set { }
         }
@@ -1498,11 +1531,11 @@ else
         //}
 
         [JsonIgnore]
-        public override string GetValueJSfn
+        public override string GetValueFromDOMJSfn
         {
             get
             {
-                return this.EbSysModifiedBy.GetValueJSfn;
+                return this.EbSysModifiedBy.GetValueFromDOMJSfn;
             }
             set { }
         }
@@ -1538,11 +1571,11 @@ else
         }
 
         [JsonIgnore]
-        public override string GetDisplayMemberJSfn
+        public override string GetDisplayMemberFromDOMJSfn
         {
             get
             {
-                return this.EbSysModifiedBy.GetDisplayMemberJSfn;
+                return this.EbSysModifiedBy.GetDisplayMemberFromDOMJSfn;
             }
             set { }
         }
@@ -1624,11 +1657,11 @@ else
         //}
 
         [JsonIgnore]
-        public override string GetValueJSfn
+        public override string GetValueFromDOMJSfn
         {
             get
             {
-                return this.EbSysModifiedAt.GetValueJSfn;
+                return this.EbSysModifiedAt.GetValueFromDOMJSfn;
             }
             set { }
         }
@@ -1663,11 +1696,11 @@ else
             set { }
         }
 
-        public override string GetDisplayMemberJSfn
+        public override string GetDisplayMemberFromDOMJSfn
         {
             get
             {
-                return this.EbSysModifiedAt.GetDisplayMemberJSfn;
+                return this.EbSysModifiedAt.GetDisplayMemberFromDOMJSfn;
             }
             set { }
         }

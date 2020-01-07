@@ -16,6 +16,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public int UserId { get; set; }
 
+        public string RefId { get; set; }
+
         public List<Param> GlobalParams { get; set; }
     }
 
@@ -33,6 +35,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class RetryJobRequest : IEbSSRequest, IReturn<RetryJobResponse>
     {
 
+        public string RefId { get; set; }
+
         public int JoblogId { get; set; }
 
         public string SolnId { get; set; }
@@ -45,7 +49,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         public ResponseStatus ResponseStatus { get; set; }
         public bool Status { get; set; }
-
 
     }
     public class LogLine
@@ -80,7 +83,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     public class SqlJobsListGetRequest : IReturn<SqlJobsListGetResponse>
     {
-        public string Refid { get; set; }
+        public string RefId { get; set; }
 
         public string Date { get; set; }
     }

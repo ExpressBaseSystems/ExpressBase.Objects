@@ -152,8 +152,9 @@ namespace ExpressBase.Objects.Objects.DVRelated
 
     public enum AggregateFun
     {
-        Count = 0,
-        Sum = 1
+        Default = 0,
+        Count = 1,
+        Sum = 2
     }
 
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
@@ -436,6 +437,10 @@ else if(this.FormMode === 2){
         [EnableInBuilder(BuilderType.Calendar)]
         public AggregateFun AggregateFun { get; set; }
 
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
+        [PropertyEditor(PropertyEditorType.DropDown)]
+        public Align Align { get; set; }
+
         [JsonIgnore]
         private List<string> __formulaDataFieldsUsed = null;
         [JsonIgnore]
@@ -660,10 +665,6 @@ pg.HideProperty('FormMode');
         [PropertyEditor(PropertyEditorType.DropDown)]
         public StringOperators DefaultOperator { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
-        [PropertyEditor(PropertyEditorType.DropDown)]
-        public Align Align { get; set; }
-
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         [DefaultPropValue("20")]
         public int ImageHeight { get; set; }
@@ -779,10 +780,6 @@ pg.HideProperty('FormMode');
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
         public bool SuppresIfZero { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
-        [PropertyEditor(PropertyEditorType.DropDown)]
-        public Align Align { get; set; }
-
         public DVNumericColumn()
         {
             this.ConditionalFormating = new List<ColumnCondition>();
@@ -852,10 +849,6 @@ pg.setSimpleProperty('IsTree', false);
 pg.HideProperty('FormMode');
     }")]
         public BooleanRenderType RenderAs { get; set; }
-
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
-        [PropertyEditor(PropertyEditorType.DropDown)]
-        public Align Align { get; set; }
 
         public DVBooleanColumn()
         {
@@ -950,11 +943,7 @@ pg.HideProperty('FormMode');
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
         [PropertyEditor(PropertyEditorType.DropDown)]
-        public NumericOperators DefaultOperator { get; set; }
-
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
-        [PropertyEditor(PropertyEditorType.DropDown)]
-        public Align Align { get; set; }
+        public NumericOperators DefaultOperator { get; set; }        
 
         public DVDateTimeColumn()
         {
@@ -972,6 +961,15 @@ pg.HideProperty('FormMode');
         [EnableInBuilder(BuilderType.Calendar)]
         [HideInPropertyGrid]
         public DateTime EndDT { get; set; }
+
+        [EnableInBuilder(BuilderType.Calendar)]
+        [HideInPropertyGrid]
+        public NumericRenderType RenderAs { get; set; }
+
+        public CalendarDynamicColumn()
+        {
+            this.ConditionalFormating = new List<ColumnCondition>();
+        }
     }
 
     [EnableInBuilder(BuilderType.DVBuilder)]

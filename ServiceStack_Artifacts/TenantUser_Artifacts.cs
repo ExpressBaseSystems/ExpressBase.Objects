@@ -579,7 +579,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class UpdateSolutionRequest : IReturn<UpdateSolutionResponse>, IEbSSRequest
+    public class UpdateSolutionObjectRequest : IReturn<UpdateSolutionObjectResponse>, IEbSSRequest
     {
         public string SolnId { get; set; }
 
@@ -587,7 +587,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class UpdateSolutionResponse : IEbSSResponse
+    public class UpdateSolutionObjectResponse : IEbSSResponse
     {
 
         [DataMember(Order = 1)]

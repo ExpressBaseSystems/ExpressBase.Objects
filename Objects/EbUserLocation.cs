@@ -42,7 +42,7 @@ namespace ExpressBase.Objects.Objects
 
         public string OptionHtml { get; set; }
 
-        public override string GetValueJSfn
+        public override string GetValueFromDOMJSfn
         {
             get
             {
@@ -55,6 +55,17 @@ namespace ExpressBase.Objects.Objects
                 ";
             }
             set { }
+        }
+
+        
+        [JsonIgnore]// roby
+        public override string OnChangeBindJSFn 
+        { 
+            get 
+            { 
+                return @"$('#' + this.EbSid_CtxId).on('change', p1);";
+            } 
+            set { } 
         }
 
         public override string SetValueJSfn 

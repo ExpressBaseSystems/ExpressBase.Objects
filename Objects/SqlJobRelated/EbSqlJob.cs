@@ -5,6 +5,9 @@ using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
 using ExpressBase.Objects.ServiceStack_Artifacts;
+using Newtonsoft.Json;
+using ServiceStack;
+using ServiceStack.Redis;
 using ServiceStack.Text;
 using System;
 using System.Collections.Generic;
@@ -46,6 +49,12 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public override string VersionNumber { get; set; }
 
+        [EnableInBuilder(BuilderType.SqlJob)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [PropertyGroup("Data Settings")]
+        [OSE_ObjectTypes(EbObjectTypes.iFilterDialog)]
+        public string Filter_Dialogue { get; set; }
+
 
         [EnableInBuilder(BuilderType.SqlJob)]
         [HideInPropertyGrid]
@@ -67,6 +76,27 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public List<string> ParameterKeyColumns { get; set; }
 
+        [JsonIgnore]
+        public EbFilterDialog FilterDialog { get; set; }
+
+        public override void AfterRedisGet(RedisClient Redis, IServiceClient client)
+        {
+            try
+            {
+                this.FilterDialog = Redis.Get<EbFilterDialog>(this.Filter_Dialogue);
+                if (this.FilterDialog == null && this.Filter_Dialogue != "")
+                {
+                    var result = client.Get<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = this.Filter_Dialogue });
+                    this.FilterDialog = EbSerializers.Json_Deserialize(result.Data[0].Json);
+                    Redis.Set<EbFilterDialog>(this.Filter_Dialogue, this.FilterDialog);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Exception:" + e.ToString());
+            }
+        }
+
         public LoopLocation GetLoop()
         {
             for (int i = 0; i < Resources.Count; i++)
@@ -77,8 +107,8 @@ namespace ExpressBase.Objects
                         return new LoopLocation { Loop = Resources[i] as EbLoop, Step = i, ParentIndex = i };
                     else
                     {
-                        for (int j = 0;  j < (Resources[i] as ISqlJobCollection).InnerResources.Count; j++)
-                       
+                        for (int j = 0; j < (Resources[i] as ISqlJobCollection).InnerResources.Count; j++)
+
                         {
                             if ((Resources[i] as ISqlJobCollection).InnerResources[j] is EbLoop)
                                 return new LoopLocation { Loop = (Resources[i] as ISqlJobCollection).InnerResources[j] as EbLoop, Step = j, ParentIndex = i };
@@ -129,12 +159,12 @@ namespace ExpressBase.Objects
                 OutParams = ((this.InnerResources[0] as ISqlJobCollection).InnerResources[step - 1]).GetOutParams(_param, step);
             else
                 OutParams = this.InnerResources[step - 1].GetOutParams(_param, step);
- 
+
             return OutParams;
         }
         public override string GetDesignHtml()
         {
-            return @"<div  class='SqlJobItem dropped' eb-type='Loop' id='@id'> <div>
+            return @"<div  class='SqlJobItem dropped sql-item-border' eb-type='Loop' id='@id'> <div class='sqljob-item-inner'>
                         <div tabindex='1' class='drpboxInt lineDrp' onclick='$(this).focus();' id='@id_LpStr' >  
                             <div class='CompLabel'> Loop Start</div>
                         </div>
@@ -170,7 +200,7 @@ namespace ExpressBase.Objects
         }
         public override string GetDesignHtml()
         {
-            return @"<div id='@id' class='SqlJobItem dropped' eb-type='Transaction'> <div>
+            return @"<div id='@id' class='SqlJobItem dropped sql-item-border' eb-type='Transaction'> <div class='sqljob-item-inner'>
                         <div tabindex='1' class='drpboxInt lineDrp' onclick='$(this).focus();' id='@id_TrStr'>  
                             <div class='CompLabel'> Transaction Start</div>
                         </div>
@@ -322,6 +352,22 @@ namespace ExpressBase.Objects
         //}
     }
 
+    [EnableInBuilder(BuilderType.SqlJob)]
+    public class EbSqlFormDataPusher : SqlJobResource
+    {
+        [EnableInBuilder(BuilderType.SqlJob)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [OSE_ObjectTypes(EbObjectTypes.iWebForm)]
+        public string Reference { get; set; }
+        public override string GetDesignHtml()
+        {
+            return @"<div class='SqlJobItem dropped' eb-type='SqlFormDataPusher' id='@id'>
+                        <div tabindex='1' class='drpbox lineDrp' onclick='$(this).focus();'  id='@id_FDP'>  
+                            <div class='CompLabel'> @Label </div>
+                        </div>
+                    </div>".RemoveCR().DoubleQuoted();
+        }
+    }
 
     [EnableInBuilder(BuilderType.SqlJob)]
     public class EmailNode : SqlJobResource
@@ -377,16 +423,18 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.SqlJob)]
         public string Type { get; set; }
-    }
+    } 
+
     public enum InOutStatus
-        {
-            In,
-            UnKnown,
-            Out,
-            Ignored,
-            Excluded,
-            Error
+    {
+        In,
+        UnKnown,
+        Out,
+        Ignored,
+        Excluded,
+        Error
     }
+
     internal class Attendance
     {
         internal int Empmaster_id { get; set; }
@@ -421,7 +469,7 @@ namespace ExpressBase.Objects
             this.IsNightshift = bNightshift;
         }
 
-        public void Pp(dynamic Params , TableColletion Tables)
+        public void Pp(dynamic Params, TableColletion Tables)
         {
             DateTime dateInQuestion = Convert.ToDateTime(Params.date_to_consolidate);
             int empmaster_id = Convert.ToInt32(Params.empid);
