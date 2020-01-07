@@ -1086,9 +1086,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 	{
 		[DataMember(Order = 1)]
 
-		public string SolnId { get; set; }
+		
 
-		public int UserId { get; set; }
 
 		public bool Alluser { get; set; }
 

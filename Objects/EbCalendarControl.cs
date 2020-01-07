@@ -49,10 +49,19 @@ namespace ExpressBase.Objects.Objects
         public override string GetBareHtml()
         {
             return @"
-        <select id='@ebsid@' name='@name@' data-ebtype='@data-ebtype@' style='width: 100%;' class='multiselect-ui form-control' multiple='multiple'>
+        <select id='@ebsid@' name='@name@' data-ebtype='@data-ebtype@' style='width: 100%;' class='selectpicker'>
             @options@
         </select>
-        <div id='@ebsid@_checkbox_div'></div>"
+        <div class='input-group' style='width:100%;'>
+            <input id='date' ui-inp data-toggle='tooltip'  class='date' type='text'  style='width:100%; display:inline-block;/>
+            <span class='input-group-addon' style='padding: 0px;'> <i  class='fa  fa-calendar' aria-hidden='true'></i> </span>
+        </div>
+        <div class='input-group' style='width:100%;'>
+            <input id='month' ui-inp data-toggle='tooltip'  class='date' type='text'  style='width:100%; display:inline-block;/>
+            <span class='input-group-addon' style='padding: 0px;'> <i  class='fa fa-calendar' aria-hidden='true'></i> </span>
+        </div>
+        <input type='text' class='date' id='datefrom' hidden/><input type='text' class='date' id='dateto' hidden/>
+        "
 .Replace("@name@", this.Name)
 .Replace("@ebsid@", this.EbSid_CtxId)
 .Replace("@options@", this.GetOptionHtml())

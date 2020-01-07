@@ -55,7 +55,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 	public class GetRowDataResponse : IEbSSResponse
 	{
 		[DataMember(Order = 1)]
-		public WebformDataWrapper FormDataWrap { get; set; }
+		public string FormDataWrap { get; set; }
 
 		[DataMember(Order = 2)]
 		public ResponseStatus ResponseStatus { get; set; }
