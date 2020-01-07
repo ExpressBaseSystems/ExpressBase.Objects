@@ -27,6 +27,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 3)]
         public string ModifiedDate { get; set; }
+
+        [DataMember(Order = 4)]
+        public string ErrorMessage { get; set; }
     }
 
     public class GetSolutionForIntegrityCheckRequest : IEbTenentRequest, IReturn<GetSolutionForIntegrityCheckResponse>
@@ -80,7 +83,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         [DataMember(Order = 1)]
         public ResponseStatus ResponseStatus { get; set; }
-        
+
+        [DataMember(Order = 2)]
+        public string ErrorMessage { get; set; }
+
+        [DataMember(Order = 3)]
+        public bool isOwner { get; set; }
     }
 
     public class GetFunctionOrProcedureQueriesRequest : IEbTenentRequest, IReturn<GetFunctionOrProcedureQueriesResponse>
@@ -101,6 +109,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 2)]
         public string Query { get; set; }
+
+        public string ErrorMessage { get; set; }
     }
 
     public class GetTableQueriesRequest : IEbTenentRequest, IReturn<GetTableQueriesResponse>
@@ -121,6 +131,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 2)]
         public string Query { get; set; }
+
+        public string ErrorMessage { get; set; }
     }
 
     public class ExecuteQueriesRequest : IEbTenentRequest, IReturn<ExecuteQueriesResponse>
@@ -132,13 +144,23 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string SolutionId { get; set; }
 
         public string Query { get; set; }
+
+        public string FileName { get; set; }
+
+        public string FileType { get; set; }
     }
 
     public class ExecuteQueriesResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
         public ResponseStatus ResponseStatus { get; set; }
-        
+
+        [DataMember(Order = 2)]
+        public string ErrorMessage { get; set; }
+
+        [DataMember(Order = 3)]
+        public List<Eb_FileDetails> Changes { get; set; }
+
     }
 
     public class GetScriptsForDiffViewRequest : IEbTenentRequest, IReturn<GetScriptsForDiffViewResponse>
@@ -166,5 +188,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string TenantFileContent { get; set; }
 
         public List<string> Result { get; set; }
+
+        public string ErrorMessage { get; set; }
     }
 }
