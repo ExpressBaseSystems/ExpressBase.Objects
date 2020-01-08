@@ -404,6 +404,28 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyGroup("Appearance")]
         public virtual int Width { get; set; }
+
+        public override SingleColumn GetDefaultSingleColumn(User UserObj, Eb_Solution SoluObj)
+        {
+            dynamic value = null;
+            string formatted = string.Empty;
+
+            if (this.EbDbType == EbDbTypes.Decimal || this.EbDbType == EbDbTypes.Int32)
+            {
+                value = 0;
+                formatted = "0.00";
+            }
+
+            return new SingleColumn()
+            {
+                Name = this.Name,
+                Type = (int)this.EbDbType,
+                Value = value,
+                Control = this,
+                ObjType = this.InputControlType.Substring(2),
+                F = formatted
+            };
+        }
     }
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
