@@ -10,7 +10,7 @@ using System.Text;
 
 namespace ExpressBase.Objects
 {
-    [EnableInBuilder(BuilderType.UserControl)]
+    [EnableInBuilder(BuilderType.UserControl, BuilderType.WebForm)]
     public class EbDataObject : EbControlUI
     {
         public EbDataObject() { }

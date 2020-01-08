@@ -49,13 +49,16 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         
         [DataMember(Order = 3)]
         public User UserObj { get; set; }
+
+        [DataMember(Order = 4)]
+        public int CurrentLoc { get; set; }
     }
 
 	[DataContract]
 	public class GetRowDataResponse : IEbSSResponse
 	{
 		[DataMember(Order = 1)]
-		public WebformDataWrapper FormDataWrap { get; set; }
+		public string FormDataWrap { get; set; }
 
 		[DataMember(Order = 2)]
 		public ResponseStatus ResponseStatus { get; set; }

@@ -1,9 +1,10 @@
 ﻿using ExpressBase.Common;
 using ExpressBase.Common.Extensions;
+using ExpressBase.Common.LocationNSolution;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
-using ExpressBase.Objects.Helpers;
+using ExpressBase.Security;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -195,6 +196,42 @@ namespace ExpressBase.Objects
         public override List<EbValidator> Validators { get => base.Validators; set => base.Validators = value; }
         public override EbScript ValueExpr { get => base.ValueExpr; set => base.ValueExpr = value; }
         public override EbScript VisibleExpr { get => base.VisibleExpr; set => base.VisibleExpr = value; }
+
+
+        public override SingleColumn GetDefaultSingleColumn(User UserObj, Eb_Solution SoluObj)
+        {
+            int loc_id = UserObj.Preference.DefaultLocation;
+            dynamic value = loc_id;
+            string formatted = loc_id.ToString();
+
+            if (this.IsDisable)
+            {
+                EbSysLocDM dm = this.DisplayMember;
+                if (SoluObj.Locations.ContainsKey(loc_id))
+                {
+                    if (dm == EbSysLocDM.LongName)
+                    {
+                        value = loc_id + "$$" + SoluObj.Locations[loc_id].LongName;
+                        formatted = SoluObj.Locations[loc_id].LongName;
+                    }
+                    else
+                    {
+                        value = loc_id + "$$" + SoluObj.Locations[loc_id].ShortName;
+                        formatted = SoluObj.Locations[loc_id].ShortName;
+                    }
+                }
+            }
+
+            return new SingleColumn()
+            {
+                Name = this.Name,
+                Type = (int)this.EbDbType,
+                Value = value,
+                Control = this,
+                ObjType = this.ObjType,
+                F = formatted
+            };
+        }
     }
 
     [EnableInBuilder(BuilderType.WebForm)]
@@ -337,6 +374,34 @@ namespace ExpressBase.Objects
         public override EbScript ValueExpr { get => base.ValueExpr; set => base.ValueExpr = value; }
         public override EbScript VisibleExpr { get => base.VisibleExpr; set => base.VisibleExpr = value; }
         public override bool IsDisable { get => base.IsDisable; set => base.IsDisable = value; }
+
+
+        public override SingleColumn GetDefaultSingleColumn(User UserObj, Eb_Solution SoluObj)
+        {
+            return EbSysCreatedBy.GetDefaultSingleColumn(this, UserObj, SoluObj);
+        }
+
+        public static SingleColumn GetDefaultSingleColumn(EbControl _this, User UserObj, Eb_Solution SoluObj)
+        {
+            dynamic value = null;
+            string formatted = string.Empty;
+
+            if (SoluObj.Users != null && SoluObj.Users.ContainsKey(UserObj.UserId))
+            {
+                value = UserObj.UserId + "$$" + SoluObj.Users[UserObj.UserId];
+                formatted = SoluObj.Users[UserObj.UserId];
+            }
+
+            return new SingleColumn()
+            {
+                Name = _this.Name,
+                Type = (int)_this.EbDbType,
+                Value = value,
+                Control = _this,
+                ObjType = _this.ObjType,
+                F = formatted
+            };
+        }
     }
 
     [EnableInBuilder(BuilderType.WebForm)]
@@ -517,6 +582,13 @@ namespace ExpressBase.Objects
         public override EbScript ValueExpr { get => base.ValueExpr; set => base.ValueExpr = value; }
         public override EbScript VisibleExpr { get => base.VisibleExpr; set => base.VisibleExpr = value; }
         public override bool IsDisable { get => base.IsDisable; set => base.IsDisable = value; }
+
+
+        public override SingleColumn GetDefaultSingleColumn(User UserObj, Eb_Solution SoluObj)
+        {
+            this.EbDate.Name = this.Name;
+            return this.EbDate.GetDefaultSingleColumn(UserObj, SoluObj);
+        }
     }
 
     [EnableInBuilder(BuilderType.WebForm)]
@@ -662,6 +734,12 @@ namespace ExpressBase.Objects
         public override EbScript ValueExpr { get => base.ValueExpr; set => base.ValueExpr = value; }
         public override EbScript VisibleExpr { get => base.VisibleExpr; set => base.VisibleExpr = value; }
         public override bool IsDisable { get => base.IsDisable; set => base.IsDisable = value; }
+
+
+        public override SingleColumn GetDefaultSingleColumn(User UserObj, Eb_Solution SoluObj)
+        {
+            return EbSysCreatedBy.GetDefaultSingleColumn(this, UserObj, SoluObj);
+        }
     }
 
     [EnableInBuilder(BuilderType.WebForm)]
@@ -833,5 +911,11 @@ namespace ExpressBase.Objects
         public override EbScript ValueExpr { get => base.ValueExpr; set => base.ValueExpr = value; }
         public override EbScript VisibleExpr { get => base.VisibleExpr; set => base.VisibleExpr = value; }
         public override bool IsDisable { get => base.IsDisable; set => base.IsDisable = value; }
+
+        public override SingleColumn GetDefaultSingleColumn(User UserObj, Eb_Solution SoluObj)
+        {
+            this.EbDate.Name = this.Name;
+            return this.EbDate.GetDefaultSingleColumn(UserObj, SoluObj);
+        }
     }
 }

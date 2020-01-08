@@ -1,9 +1,10 @@
 ﻿using ExpressBase.Common;
 using ExpressBase.Common.Extensions;
+using ExpressBase.Common.LocationNSolution;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
-using ExpressBase.Data;
+using ExpressBase.Security;
 using ExpressBase.Objects.Helpers;
 using ExpressBase.Objects.Objects.DVRelated;
 using ExpressBase.Objects.ServiceStack_Artifacts;
@@ -284,6 +285,19 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
 .Replace("@options@", this.OptionHtml)
 .Replace("@-sel-@", this.IsMultiSelect ? string.Empty : "<option selected value='-1' style='color: #6f6f6f;'> - select - </option>")
 .Replace("@data-ebtype@", "16");
+        }
+        
+        public override SingleColumn GetDefaultSingleColumn(User UserObj, Eb_Solution SoluObj)
+        {
+            return new SingleColumn()
+            {
+                Name = this.Name,
+                Type = (int)this.EbDbType,
+                Value = "-1",
+                Control = this,
+                ObjType = this.ObjType,
+                F = " - select - "
+            };
         }
     }
 

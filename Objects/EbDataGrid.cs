@@ -19,6 +19,7 @@ using ServiceStack.Redis;
 using ExpressBase.Common.Data;
 using System.Collections;
 using System.ComponentModel;
+using ExpressBase.Common.LocationNSolution;
 
 namespace ExpressBase.Objects
 {
@@ -403,6 +404,28 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyGroup("Appearance")]
         public virtual int Width { get; set; }
+
+        public override SingleColumn GetDefaultSingleColumn(User UserObj, Eb_Solution SoluObj)
+        {
+            dynamic value = null;
+            string formatted = string.Empty;
+
+            if (this.EbDbType == EbDbTypes.Decimal || this.EbDbType == EbDbTypes.Int32)
+            {
+                value = 0;
+                formatted = "0.00";
+            }
+
+            return new SingleColumn()
+            {
+                Name = this.Name,
+                Type = (int)this.EbDbType,
+                Value = value,
+                Control = this,
+                ObjType = this.InputControlType.Substring(2),
+                F = formatted
+            };
+        }
     }
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
@@ -659,6 +682,12 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, p2).
         public override bool ParameterizeControl(IDatabase DataDB, List<DbParameter> param, string tbl, SingleColumn cField, bool ins, ref int i, ref string _col, ref string _val, ref string _extqry, User usr, SingleColumn ocF)
         {
             return this.EbDate.ParameterizeControl(DataDB, param, tbl, cField, ins, ref i, ref _col, ref _val, ref _extqry, usr, ocF);
+        }
+
+        public override SingleColumn GetDefaultSingleColumn(User UserObj, Eb_Solution SoluObj)
+        {
+            this.EbDate.Name = this.Name;
+            return this.EbDate.GetDefaultSingleColumn(UserObj, SoluObj);
         }
     }
 
@@ -934,6 +963,12 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
         public void OnDeserializedMethod(StreamingContext context)
         {
             DBareHtml = EbBooleanSelect.GetBareHtml();
+        }
+
+        public override SingleColumn GetDefaultSingleColumn(User UserObj, Eb_Solution SoluObj)
+        {
+            this.EbBooleanSelect.Name = this.Name;
+            return this.EbBooleanSelect.GetDefaultSingleColumn(UserObj, SoluObj);
         }
     }
 
@@ -1240,6 +1275,12 @@ else
         {
             return this.EbPowerSelect.GetDisplayMembersQuery(DataDB, service, vms);
         }
+
+        public override SingleColumn GetDefaultSingleColumn(User UserObj, Eb_Solution SoluObj)
+        {
+            this.EbPowerSelect.Name = this.Name;
+            return this.EbPowerSelect.GetDefaultSingleColumn(UserObj, SoluObj);
+        }
     }
 
 
@@ -1362,6 +1403,13 @@ else
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [HideInToolBox]
         public override bool IsSysControl { get { return true; } }
+
+
+        public override SingleColumn GetDefaultSingleColumn(User UserObj, Eb_Solution SoluObj)
+        {
+            this.EbSysCreatedBy.Name = this.Name;
+            return EbSysCreatedBy.GetDefaultSingleColumn(this.EbSysCreatedBy, UserObj, SoluObj);
+        }
     }
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
@@ -1486,6 +1534,12 @@ else
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [HideInToolBox]
         public override bool IsSysControl { get { return true; } }
+
+        public override SingleColumn GetDefaultSingleColumn(User UserObj, Eb_Solution SoluObj)
+        {
+            this.EbSysCreatedAt.Name = this.Name;
+            return this.EbSysCreatedAt.GetDefaultSingleColumn(UserObj, SoluObj);
+        }
     }
 
 
@@ -1605,6 +1659,13 @@ else
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [HideInToolBox]
         public override bool IsSysControl { get { return true; } }
+
+
+        public override SingleColumn GetDefaultSingleColumn(User UserObj, Eb_Solution SoluObj)
+        {
+            this.EbSysModifiedBy.Name = this.Name;
+            return EbSysCreatedBy.GetDefaultSingleColumn(this.EbSysModifiedBy, UserObj, SoluObj);
+        }
     }
 
 
@@ -1730,6 +1791,12 @@ else
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [HideInToolBox]
         public override bool IsSysControl { get { return true; } }
+
+        public override SingleColumn GetDefaultSingleColumn(User UserObj, Eb_Solution SoluObj)
+        {
+            this.EbSysModifiedAt.Name = this.Name;
+            return this.EbSysModifiedAt.GetDefaultSingleColumn(UserObj, SoluObj);
+        }
     }
 
 
