@@ -535,14 +535,37 @@ namespace ExpressBase.Objects
             {
                 if (_table.TableType == WebFormTableTypes.Normal)
                 {
-                    SingleTable Table = new SingleTable();
                     SingleRow Row = new SingleRow();
+                    SingleTable Table = new SingleTable();
                     foreach (ColumnSchema _column in _table.Columns)
                     {
                         Row.Columns.Add(_column.Control.GetDefaultSingleColumn(this.UserObj, this.SolutionObj));
                     }
                     Table.Add(Row);
-                    FormData.MultipleTables.Add(_table.TableName, Table);
+                    this.FormData.MultipleTables.Add(_table.TableName, Table);
+                }               
+            }
+            this.GetDGsEmptyModel();
+        }
+
+        private void GetDGsEmptyModel()
+        {
+            foreach (TableSchema _table in this.FormSchema.Tables)
+            {
+                if (_table.TableType == WebFormTableTypes.Grid)
+                {
+                    SingleRow Row = new SingleRow();
+                    Row.Columns.Add(new SingleColumn()
+                    {
+                        Name = "eb_row_num",
+                        Type = (int)EbDbTypes.Decimal,
+                        Value = 0
+                    });
+                    foreach (ColumnSchema _column in _table.Columns)
+                    {
+                        Row.Columns.Add(_column.Control.GetDefaultSingleColumn(this.UserObj, this.SolutionObj));
+                    }
+                    this.FormData.DGsRowDataModel.Add(_table.TableName, Row);
                 }
             }
         }
@@ -917,6 +940,7 @@ namespace ExpressBase.Objects
             {
                 this.FormData = new WebformData() { MasterTable = _schema.MasterTable };
                 _FormData = this.FormData;
+                this.GetDGsEmptyModel();
             }
 
             for (int i = 0; i < _schema.Tables.Count && dataset.Tables.Count >= _schema.Tables.Count; i++)

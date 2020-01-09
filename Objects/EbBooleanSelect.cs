@@ -1,9 +1,10 @@
 ﻿using ExpressBase.Common;
 using ExpressBase.Common.Extensions;
+using ExpressBase.Common.LocationNSolution;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
-using Newtonsoft.Json;
+using ExpressBase.Security;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
@@ -170,6 +171,19 @@ namespace ExpressBase.Objects
 .Replace("@bootStrapStyle@", "data-style='btn-" + this.BootStrapStyle.ToString() + "'")
 //.Replace("@-sel-@","<option selected value='-1' style='color: #6f6f6f;'> -- select -- </option>")
 .Replace("@data-ebtype@", "30");
+        }
+
+        public override SingleColumn GetDefaultSingleColumn(User UserObj, Eb_Solution SoluObj)
+        {
+            return new SingleColumn()
+            {
+                Name = this.Name,
+                Type = (int)this.EbDbType,
+                Value = false,
+                Control = this,
+                ObjType = this.ObjType,
+                F = this.FalseText
+            };
         }
     }
 }

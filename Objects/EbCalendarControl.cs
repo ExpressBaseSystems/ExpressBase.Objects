@@ -2,6 +2,7 @@
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
+using ExpressBase.Common.Structures;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,9 @@ namespace ExpressBase.Objects.Objects
         [HideInPropertyGrid]
         [JsonIgnore]
         public override string ToolNameAlias { get { return " Calendar "; } set { } }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+        public override EbDbTypes EbDbType { get { return EbDbTypes.Date; } }
 
         public string GetOptionHtml()
         {
@@ -32,6 +36,35 @@ namespace ExpressBase.Objects.Objects
             }
             return _html;
         }
+
+        public override string GetValueFromDOMJSfn
+        {
+            get
+            {
+                return @"
+                    console.log('datefrom     :'+$('#datefrom').val());
+                    console.log('dateto     :'+$('#dateto').val());
+                    var value = $('#datefrom').val() + ',' + $('#dateto').val();
+                    if(value !== null)
+                        return value.toString();
+                    else
+                        return null;
+                ";
+            }
+            set { }
+        }
+
+        public override string OnChangeBindJSFn
+        {
+            get
+            {
+                return @"
+                    $('#dateto').on('change', p1);
+";
+            }
+            set { }
+        }
+
         public override string GetDesignHtml()
         {
             return @"
@@ -49,18 +82,45 @@ namespace ExpressBase.Objects.Objects
         public override string GetBareHtml()
         {
             return @"
-        <select id='@ebsid@' name='@name@' data-ebtype='@data-ebtype@' style='width: 100%;' class='selectpicker'>
+<div id='@ebsid@' name='@name@' data-ebtype='@data-ebtype@' style='width: 100%;'>
+        <select id='@ebsid@_dd'  class='selectpicker' style='width: 100%;'>
             @options@
         </select>
-        <div class='input-group' style='width:100%;'>
-            <input id='date' ui-inp data-toggle='tooltip'  class='date' type='text'  style='width:100%; display:inline-block;/>
-            <span class='input-group-addon' style='padding: 0px;'> <i  class='fa  fa-calendar' aria-hidden='true'></i> </span>
+        <div id='@ebsid@_date' name='date' class='Eb-ctrlContainer' ctype='Date' eb-hidden='false'>
+            <span class='eb-ctrl-label eb-label-editable' ui-label=''>Date</span>
+            <input id='@ebsid@_datelbltxtb' class='eb-lbltxtb' type='text'> 
+            <div id='@ebsid@_dateWraper' class='ctrl-cover' eb-readonly='false'>                    
+                <div class='input-group' style='width:100%;'>            
+                    <input id='date' ui-inp='' data-ebtype='6' data-toggle='tooltip' title='' class='date month-year-input' type='text' name='date' autocomplete='on' tabindex='0' style='width:100%; background-color:@BackColor@ ;color:@ForeColor@ ;display:inline-block; @fontStyle@ ' placeholder='' data-original-title=''>
+                    <span class='input-group-addon' style='padding: 0px;'> <i id='@ebsid@_dateTglBtn' class='fa  fa-calendar' aria-hidden='true'></i> </span>
+                </div>
+            </div>
+            <span class='helpText' ui-helptxt=''> </span>
         </div>
-        <div class='input-group' style='width:100%;'>
-            <input id='month' ui-inp data-toggle='tooltip'  class='date' type='text'  style='width:100%; display:inline-block;/>
-            <span class='input-group-addon' style='padding: 0px;'> <i  class='fa fa-calendar' aria-hidden='true'></i> </span>
+        <div id='@ebsid@_month' name='month' class='Eb-ctrlContainer' ctype='Date' eb-hidden='false'>
+            <span class='eb-ctrl-label eb-label-editable' ui-label=''>month</span>
+            <input id='@ebsid@_monthlbltxtb' class='eb-lbltxtb' type='text'> 
+            <div id='@ebsid@_monthWraper' class='ctrl-cover' eb-readonly='false'>                    
+                <div class='input-group' style='width:100%;'>            
+                    <input id='month' ui-inp='' data-ebtype='6' data-toggle='tooltip' title='' class='date month-year-input' type='text' name='month' autocomplete='on' tabindex='0' style='width:100%; background-color:@BackColor@ ;color:@ForeColor@ ;display:inline-block; @fontStyle@ ' placeholder='' data-original-title=''>
+                    <span class='input-group-addon' style='padding: 0px;'> <i id='@ebsid@_monthTglBtn' class='fa  fa-calendar' aria-hidden='true'></i> </span>
+                </div>
+            </div>
+            <span class='helpText' ui-helptxt=''> </span>
+        </div>
+        <div id='@ebsid@_year' name='year' class='Eb-ctrlContainer' ctype='Date' eb-hidden='false'>
+            <span class='eb-ctrl-label eb-label-editable' ui-label=''>Year</span>
+            <input id='@ebsid@_yearlbltxtb' class='eb-lbltxtb' type='text'> 
+            <div id='@ebsid@_yearWraper' class='ctrl-cover' eb-readonly='false'>                    
+                <div class='input-group' style='width:100%;'>            
+                    <input id='year' ui-inp='' data-ebtype='6' data-toggle='tooltip' title='' class='date month-year-input yearpicker' type='text' name='year' autocomplete='on' tabindex='0' style='width:100%; background-color:@BackColor@ ;color:@ForeColor@ ;display:inline-block; @fontStyle@ ' placeholder='' data-original-title=''>
+                    <span class='input-group-addon' style='padding: 0px;'> <i id='@ebsid@_yearTglBtn' class='fa  fa-calendar' aria-hidden='true'></i> </span>
+                </div>
+            </div>
+            <span class='helpText' ui-helptxt=''> </span>
         </div>
         <input type='text' class='date' id='datefrom' hidden/><input type='text' class='date' id='dateto' hidden/>
+</div>
         "
 .Replace("@name@", this.Name)
 .Replace("@ebsid@", this.EbSid_CtxId)

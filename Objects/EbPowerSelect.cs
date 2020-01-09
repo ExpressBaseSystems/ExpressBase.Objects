@@ -1,9 +1,10 @@
 ﻿using ExpressBase.Common;
 using ExpressBase.Common.Extensions;
+using ExpressBase.Common.LocationNSolution;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
-using ExpressBase.Data;
+using ExpressBase.Security;
 using ExpressBase.Objects.Objects.DVRelated;
 using ExpressBase.Objects.ServiceStack_Artifacts;
 using Newtonsoft.Json;
@@ -732,6 +733,21 @@ else
             }
 
             return s;
+        }
+        
+        public override SingleColumn GetDefaultSingleColumn(User UserObj, Eb_Solution SoluObj)
+        {
+            return new SingleColumn()
+            {
+                Name = this.Name,
+                Type = (int)this.EbDbType,
+                Value = null,
+                Control = this,
+                ObjType = this.ObjType,
+                F = string.Empty,
+                D = new Dictionary<int, Dictionary<string, string>>(),
+                R = new Dictionary<string, List<dynamic>>()
+            };
         }
     }
 }
