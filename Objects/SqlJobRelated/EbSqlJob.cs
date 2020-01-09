@@ -70,11 +70,43 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.SqlJob)]
         [HideInPropertyGrid]
-        public List<string> FirstReaderKeyColumns { get; set; }
+        public ColumnColletion FirstReaderKeyColumnsColl { get; set; }
 
         [EnableInBuilder(BuilderType.SqlJob)]
         [HideInPropertyGrid]
+        //[PropertyEditor(PropertyEditorType.CollectionFrmSrc,"FirstReaderKeyColumnsColl")]
+        public List<string> FirstReaderKeyColumns { get; set; }
+
+        [EnableInBuilder(BuilderType.SqlJob)]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc,"FirstReaderKeyColumnsColl")]
+        [Alias("First Reader Key Column")]
+        public ColumnColletion FirstReaderKeyColumnsTemp { get; set; }
+
+        [EnableInBuilder(BuilderType.SqlJob)]
+        [HideInPropertyGrid]
+        public List<Param> ParameterKeyColumnsColl { get; set; }
+
+        [EnableInBuilder(BuilderType.SqlJob)]
+        [HideInPropertyGrid]
+        //[PropertyEditor(PropertyEditorType.CollectionFrmSrc, "ParameterKeyColumnsColl")]
         public List<string> ParameterKeyColumns { get; set; }
+
+        [EnableInBuilder(BuilderType.SqlJob)]
+        [Alias("Parameter Key Column")]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "ParameterKeyColumnsColl")]
+        public List<Param> ParameterKeyColumnsTemp { get; set; }
+
+
+        public EbSqlJob()
+        {
+            ParameterKeyColumnsTemp = new List<Param>();
+
+            //ParameterKeyColumns = new List<string>();
+
+            FirstReaderKeyColumnsTemp = new ColumnColletion();
+
+            //FirstReaderKeyColumns = new List<string>();
+        }
 
         [JsonIgnore]
         public EbFilterDialog FilterDialog { get; set; }
@@ -215,6 +247,7 @@ namespace ExpressBase.Objects
     public abstract class SqlJobResource : EbSqlJobWrapper
     {
         [EnableInBuilder(BuilderType.SqlJob)]
+        [HideInPropertyGrid]
         public int RouteIndex { set; get; }
 
         [EnableInBuilder(BuilderType.SqlJob)]
@@ -359,11 +392,24 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iWebForm)]
         public string Reference { get; set; }
+
+        [EnableInBuilder(BuilderType.SqlJob)]
+        [MetaOnly]
+        [UIproperty]
+        public string RefName { set; get; }
+
+        [EnableInBuilder(BuilderType.SqlJob)]
+        [MetaOnly]
+        [UIproperty]
+        public string Version { set; get; }
+
         public override string GetDesignHtml()
         {
             return @"<div class='SqlJobItem dropped' eb-type='SqlFormDataPusher' id='@id'>
                         <div tabindex='1' class='drpbox lineDrp' onclick='$(this).focus();'  id='@id_FDP'>  
                             <div class='CompLabel'> @Label </div>
+                            <div class='CompName'> @RefName </div>
+                            <div class='CompVersion'> @Version </div>
                         </div>
                     </div>".RemoveCR().DoubleQuoted();
         }
