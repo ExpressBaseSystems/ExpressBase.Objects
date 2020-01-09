@@ -173,16 +173,32 @@ namespace ExpressBase.Objects
 .Replace("@data-ebtype@", "30");
         }
 
-        public override SingleColumn GetDefaultSingleColumn(User UserObj, Eb_Solution SoluObj)
+        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
         {
+            return EbBooleanSelect.GetSingleColumn(this, UserObj, SoluObj, Value);
+        }
+
+        public static SingleColumn GetSingleColumn(dynamic _this, User UserObj, Eb_Solution SoluObj, object Value)
+        {
+            object _formattedData = false;
+            string _displayMember = _this.FalseText;
+            if (Value != null)
+            {
+                if (Value.ToString() == "True")
+                {
+                    _formattedData = true;
+                    _displayMember = _this.TrueText;
+                }
+            }
+
             return new SingleColumn()
             {
-                Name = this.Name,
-                Type = (int)this.EbDbType,
-                Value = false,
-                Control = this,
-                ObjType = this.ObjType,
-                F = this.FalseText
+                Name = _this.Name,
+                Type = (int)_this.EbDbType,
+                Value = _formattedData,
+                Control = _this,
+                ObjType = _this.ObjType,
+                F = _displayMember
             };
         }
     }

@@ -539,7 +539,7 @@ namespace ExpressBase.Objects
                     SingleTable Table = new SingleTable();
                     foreach (ColumnSchema _column in _table.Columns)
                     {
-                        Row.Columns.Add(_column.Control.GetDefaultSingleColumn(this.UserObj, this.SolutionObj));
+                        Row.Columns.Add(_column.Control.GetSingleColumn(this.UserObj, this.SolutionObj, null));
                     }
                     Table.Add(Row);
                     this.FormData.MultipleTables.Add(_table.TableName, Table);
@@ -563,7 +563,7 @@ namespace ExpressBase.Objects
                     });
                     foreach (ColumnSchema _column in _table.Columns)
                     {
-                        Row.Columns.Add(_column.Control.GetDefaultSingleColumn(this.UserObj, this.SolutionObj));
+                        Row.Columns.Add(_column.Control.GetSingleColumn(this.UserObj, this.SolutionObj, null));
                     }
                     this.FormData.DGsRowDataModel.Add(_table.TableName, Row);
                 }
@@ -1150,45 +1150,71 @@ namespace ExpressBase.Objects
         //For Prefill Mode
         public void RefreshFormData(IDatabase DataDB, Service service, List<Param> _params)
         {
-            WebFormSchema _schema = this.FormSchema;//this.GetWebFormSchema();
-            this.FormData = new WebformData
-            {
-                MasterTable = _schema.MasterTable
-            };
+            GetEmptyModel();
             Dictionary<string, string> QrsDict = new Dictionary<string, string>();
             List<DbParameter> param = new List<DbParameter>();
-            for (int i = 0; i < _params.Count; i++)
+            foreach (KeyValuePair<string, SingleTable> Table in this.FormData.MultipleTables)
             {
-                for (int j = 0; j < _schema.Tables.Count; j++)
+                foreach(SingleRow Row in Table.Value)
                 {
-                    for (int k = 0; k < _schema.Tables[j].Columns.Count; k++)
+                    foreach(SingleColumn Column in Row.Columns)
                     {
-                        if (_schema.Tables[j].Columns[k].ColumnName.Equals(_params[i].Name))
+                        Param p = _params.Find(e => e.Name == Column.Name);
+                        if(p != null)
                         {
-                            if (_schema.Tables[j].Columns[k].Control is EbPowerSelect)
+                            SingleColumn NwCol = Column.Control.GetSingleColumn(this.UserObj, this.SolutionObj, p.ValueTo);
+                            Column.Value = NwCol.Value;
+                            Column.F = NwCol.F;
+                            param.Add(DataDB.GetNewParameter(Column.Name, (EbDbTypes)Column.Type, Column.Value));
+                            if (Column.Control is EbPowerSelect)
                             {
-                                string t = (_schema.Tables[j].Columns[k].Control as EbPowerSelect).GetSelectQuery(DataDB, service, _params[i].Value);
-                                QrsDict.Add((_schema.Tables[j].Columns[k].Control as EbPowerSelect).EbSid, t);
+                                string t = (Column.Control as EbPowerSelect).GetSelectQuery(DataDB, service, p.Value);
+                                QrsDict.Add((Column.Control as EbPowerSelect).EbSid, t);
                             }
-                            if (!this.FormData.MultipleTables.ContainsKey(_schema.Tables[j].TableName))
-                            {
-                                SingleTable tbl = new SingleTable();
-                                tbl.Add(new SingleRow());
-                                this.FormData.MultipleTables.Add(_schema.Tables[j].TableName, tbl);
-                            }
-                            SingleColumn col = new SingleColumn()
-                            {
-                                Name = _params[i].Name,
-                                Type = _schema.Tables[j].Columns[k].EbDbType,
-                                Value = _params[i].ValueTo,
-                                Control = _schema.Tables[j].Columns[k].Control
-                            };
-                            param.Add(DataDB.GetNewParameter(col.Name, (EbDbTypes)col.Type, col.Value));
-                            this.FormData.MultipleTables[_schema.Tables[j].TableName][0].Columns.Add(col);
                         }
                     }
                 }
             }
+
+            //WebFormSchema _schema = this.FormSchema;//this.GetWebFormSchema();
+            //this.FormData = new WebformData
+            //{
+            //    MasterTable = _schema.MasterTable
+            //};
+            //List<DbParameter> param = new List<DbParameter>();
+            //for (int i = 0; i < _params.Count; i++)
+            //{
+            //    for (int j = 0; j < _schema.Tables.Count; j++)
+            //    {
+            //        for (int k = 0; k < _schema.Tables[j].Columns.Count; k++)
+            //        {
+            //            if (_schema.Tables[j].Columns[k].ColumnName.Equals(_params[i].Name))
+            //            {
+            //                if (_schema.Tables[j].Columns[k].Control is EbPowerSelect)
+            //                {
+            //                    string t = (_schema.Tables[j].Columns[k].Control as EbPowerSelect).GetSelectQuery(DataDB, service, _params[i].Value);
+            //                    QrsDict.Add((_schema.Tables[j].Columns[k].Control as EbPowerSelect).EbSid, t);
+            //                }
+            //                if (!this.FormData.MultipleTables.ContainsKey(_schema.Tables[j].TableName))
+            //                {
+            //                    SingleTable tbl = new SingleTable();
+            //                    tbl.Add(new SingleRow());
+            //                    this.FormData.MultipleTables.Add(_schema.Tables[j].TableName, tbl);
+            //                }
+            //                SingleColumn col = new SingleColumn()
+            //                {
+            //                    Name = _params[i].Name,
+            //                    Type = _schema.Tables[j].Columns[k].EbDbType,
+            //                    Value = _params[i].ValueTo,
+            //                    Control = _schema.Tables[j].Columns[k].Control
+            //                };
+            //                param.Add(DataDB.GetNewParameter(col.Name, (EbDbTypes)col.Type, col.Value));
+            //                this.FormData.MultipleTables[_schema.Tables[j].TableName][0].Columns.Add(col);
+            //            }
+            //        }
+            //    }
+            //}
+
             if (QrsDict.Count > 0)
             {
                 EbDataSet dataset = DataDB.DoQueries(string.Join(" ", QrsDict.Select(d => d.Value)), param.ToArray());

@@ -198,25 +198,56 @@ return val"; } set { } }
         public override string SetValueJSfn { get { return @"$('#' + this.EbSid_CtxId).prop('checked', (p1 === this.Tv ? true: false)).trigger('change');"; } set { } }
 
 
-        public override SingleColumn GetDefaultSingleColumn(User UserObj, Eb_Solution SoluObj)
+        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
         {
-            dynamic value = null;
+            object _formattedData = null;
+            string _displayMember = "false";
 
             if (this.ValueType == EbValueType.Boolean)
-                value = false;
+            {
+                _formattedData = false;
+                if (Value != null)
+                {
+                    if (Value.ToString() == "T")
+                    {
+                        _formattedData = true;
+                        _displayMember = "true";
+                    }
+                }
+            }
             else if (this.ValueType == EbValueType.Integer)
-                value = this.FalseValue_I;
+            {
+                _formattedData = this.FalseValue_I;
+                if (Value != null)
+                {
+                    if (Convert.ToInt32(Value) == this.TrueValue_I)
+                    {
+                        _formattedData = this.TrueValue_I;
+                        _displayMember = "true";
+                    }
+                }
+            }
             else
-                value = this.FalseValue_S;
+            {
+                _formattedData = this.FalseValue_S;
+                if (Value != null)
+                {
+                    if (Value.ToString() == this.TrueValue_S)
+                    {
+                        _formattedData = this.TrueValue_S;
+                        _displayMember = "true";
+                    }
+                }
+            }
 
             return new SingleColumn()
             {
                 Name = this.Name,
                 Type = (int)this.EbDbType,
-                Value = value,
+                Value = _formattedData,
                 Control = this,
                 ObjType = this.ObjType,
-                F = "false"
+                F = _displayMember
             };
         }
 

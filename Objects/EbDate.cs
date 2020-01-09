@@ -336,42 +336,73 @@ namespace ExpressBase.Objects
             return true;
         }
 
-        public override SingleColumn GetDefaultSingleColumn(User UserObj, Eb_Solution SoluObj)
+        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
         {
-            dynamic value = null;
-            string formatted = string.Empty;
+            return EbDate.GetSingleColumn(this, UserObj, SoluObj, Value);
+        }
 
-            if (!this.IsNullable)
+        public static SingleColumn GetSingleColumn(dynamic _this, User UserObj, Eb_Solution SoluObj, object Value)
+        {
+            object _formattedData = Value;
+            string _displayMember = Value == null ? string.Empty : Value.ToString();
+            bool skip = false;
+
+            if(_this is EbDate || _this is EbDGDateColumn)
             {
-                DateTime dt = DateTime.UtcNow.ConvertFromUtc(UserObj.Preference.TimeZone);
-                if (this.EbDateType == EbDateType.Date)
+                if (Value == null && _this.IsNullable)
+                    skip = true;
+            }
+
+            if (!skip)
+            {
+                DateTime dt;
+                if (Value == null)
+                    dt = DateTime.UtcNow;
+                else
+                    dt = Convert.ToDateTime(Value);
+                DateTime dt_cov = dt.ConvertFromUtc(UserObj.Preference.TimeZone);
+                
+                if (_this.EbDateType == EbDateType.Date)
                 {
-                    if (this.ShowDateAs_ == DateShowFormat.Year_Month)
+                    if (!(_this is EbDate))
                     {
-                        formatted = dt.ToString("MM/yyyy", CultureInfo.InvariantCulture);
-                        value = formatted;
+                        _formattedData = dt_cov.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+                        _displayMember = dt_cov.ToString(UserObj.Preference.GetShortDatePattern(), CultureInfo.InvariantCulture);
                     }
-                    else
+                    else //EbSysCreatedAt EbSysModifiedAt EbDGDateColumn EbDGCreatedAtColumn EbDGModifiedAtColumn
                     {
-                        value = dt.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
-                        formatted = dt.ToString(UserObj.Preference.GetShortDatePattern(), CultureInfo.InvariantCulture);
+                        if (_this.ShowDateAs_ == DateShowFormat.Year_Month)
+                        {
+                            _formattedData = dt.ToString("MM/yyyy", CultureInfo.InvariantCulture);
+                            _displayMember = _formattedData.ToString();
+                        }
+                        else
+                        {
+                            _formattedData = dt.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+                            _displayMember = dt.ToString(UserObj.Preference.GetShortDatePattern(), CultureInfo.InvariantCulture);
+                        }
                     }
+                }
+                else if(_this.EbDateType == EbDateType.DateTime)
+                {
+                    _formattedData = dt_cov.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+                    _displayMember = dt_cov.ToString(UserObj.Preference.GetShortDatePattern() + " " + UserObj.Preference.GetShortTimePattern(), CultureInfo.InvariantCulture);
                 }
                 else
                 {
-                    value = dt.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
-                    formatted = dt.ToString(UserObj.Preference.GetShortDatePattern() + " " + UserObj.Preference.GetShortTimePattern(), CultureInfo.InvariantCulture);
+                    _formattedData = dt_cov.ToString("HH:mm:ss", CultureInfo.InvariantCulture);
+                    _displayMember = dt_cov.ToString(UserObj.Preference.GetShortTimePattern(), CultureInfo.InvariantCulture);
                 }
             }
 
             return new SingleColumn()
             {
-                Name = this.Name,
-                Type = (int)this.EbDbType,
-                Value = value,
-                Control = this,
-                ObjType = this.ObjType,
-                F = formatted
+                Name = _this.Name,
+                Type = (int)_this.EbDbType,
+                Value = _formattedData,
+                Control = _this,
+                ObjType = _this.ObjType,
+                F = _displayMember
             };
         }
     }
