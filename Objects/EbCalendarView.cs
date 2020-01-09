@@ -13,11 +13,10 @@ namespace ExpressBase.Objects
         Hourly = 0,
         DayWise = 1,
         Weekely = 2,
-        Fortnightly = 3,
-        Monthly = 4,
-        Quarterly = 5,
-        HalfYearly = 6,
-        Yearly = 7,
+        Monthly = 3,
+        Quarterly = 4,
+        HalfYearly = 5,
+        Yearly = 6,
     }
 
     [EnableInBuilder(BuilderType.Calendar)]
@@ -92,8 +91,13 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.Calendar)]
         [PropertyEditor(PropertyEditorType.DropDown)]
+        [HideInPropertyGrid]
+        public AttendanceType CalendarType { get; set; }
+
+        [EnableInBuilder(BuilderType.Calendar)]
+        [PropertyEditor(PropertyEditorType.DropDown)]
         [HideForUser]
-        public AttendanceType AttendanceType { get; set; }        
+        public AttendanceType DefaultCalendarType { get; set; }
 
         //[EnableInBuilder(BuilderType.Calendar)]
         //public override int LeftFixedColumn { get; set; }

@@ -1,5 +1,6 @@
 ﻿using ExpressBase.Common;
 using ExpressBase.Common.Application;
+using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
 using ExpressBase.Security;
 using ServiceStack;
@@ -23,6 +24,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class CreateMobileFormTableResponse
     {
 
+    }
+
+    public class ValidateSidResponse 
+    {
+        public bool IsValid { set; get; }
+
+        public byte[] Logo { set; get; }
     }
 
     [DataContract]
@@ -95,5 +103,36 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         {
             this.Pages = new List<MobilePagesWraper>();
         }
+    }
+
+    [DataContract]
+    public class GetMobileVisDataRequest : EbServiceStackAuthRequest, IReturn<GetMobileVisDataResponse>
+    {
+        [DataMember(Order = 1)]
+        public string DataSourceRefId { set; get; }
+
+        [DataMember(Order = 2)]
+        public List<Param> Params { get; set; }
+
+        [DataMember(Order = 3)]
+        public int Limit { set; get; }
+
+        [DataMember(Order = 4)]
+        public int Offset { set; get; }
+
+        public GetMobileVisDataRequest()
+        {
+            Params = new List<Param>();
+        }
+    }
+
+    [DataContract]
+    public class GetMobileVisDataResponse
+    {
+        [DataMember(Order = 1)]
+        public string Message { set; get; }
+
+        [DataMember(Order = 2)]
+        public EbDataSet Data { set; get; }
     }
 }
