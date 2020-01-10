@@ -39,9 +39,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
         ProgressBar,
         Link,
         Tree,
-        Boolean,
-        Hours
-
+        Boolean
     }
 
     public enum BooleanRenderType
@@ -152,9 +150,22 @@ namespace ExpressBase.Objects.Objects.DVRelated
 
     public enum AggregateFun
     {
-        Default = 0,
-        Count = 1,
-        Sum = 2
+        Count = 0,
+        Sum = 1
+    }
+
+    public enum NumericSubType
+    {
+        None = 0,
+        Time_Interval_In_Hour = 1,
+        Time_Interval_In_Minute = 2,
+        Time_Interval_In_Second = 3
+    }
+
+    public enum NumericSubTypeFromat
+    {
+        Days = 0,
+        Hours = 1
     }
 
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
@@ -205,20 +216,20 @@ namespace ExpressBase.Objects.Objects.DVRelated
         [HideInPropertyGrid]
         public string sType { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
         [Alias("Title")]
         [HideInPropertyGrid]
         public string sTitle { get; set; }
 
         [HideInPropertyGrid]
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
         public bool bVisible { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         [HideInPropertyGrid]
         public int Pos { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
         [Alias("Width")]
         [JsonIgnore]
         public string sWidth { get; set; }
@@ -227,33 +238,33 @@ namespace ExpressBase.Objects.Objects.DVRelated
         [PropertyGroup("Appearance")]
         public virtual int Width { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
         [JsonProperty(PropertyName = "className")]
         [HideInPropertyGrid]
         [DefaultPropValue("tdheight")]
         public string ClassName { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
         [PropertyEditor(PropertyEditorType.FontSelector)]
         public EbFont Font { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.DropDown)]
         public ControlType FilterControl { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
         [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
         [Alias("Formula")]
         public EbScript _Formula { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
         [JsonConverter(typeof(Base64Converter))]
         [Alias("Formula old")]
         [HideInPropertyGrid]
         public string Formula { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
         [HideInPropertyGrid]
         [OnChangeExec(@"
 console.log('IsCustomColumn');
@@ -265,7 +276,7 @@ else {
 }")]
         public bool IsCustomColumn { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iTableVisualization, EbObjectTypes.iChartVisualization, EbObjectTypes.iReport, EbObjectTypes.iWebForm , EbObjectTypes.iDashBoard)]
         [OnChangeExec(@"
@@ -299,7 +310,7 @@ else{
 }")]
         public string LinkRefId { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder,  BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder,  BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.DropDown)]
         [OnChangeExec(@"
 console.log('onchange fired');
@@ -313,131 +324,132 @@ else if(this.FormMode === 2){
 }")]
         public WebFormDVModes FormMode { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         [HideInPropertyGrid]
         [JsonIgnore]
         public DVColumnCollection ColumnsRef { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder,  BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder,  BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "ColumnsRef")]
         public List<DVBaseColumn> FormId { get; set; }
 
 
-        [EnableInBuilder(BuilderType.DVBuilder,  BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder,  BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.Mapper, "ColumnsRef", "LinkRefId", "FormControl")]
         public List<DVBaseColumn> FormParameters { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder,  BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder,  BuilderType.DashBoard)]
         [HideInPropertyGrid]
         public EbControl FormControl { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.DropDown)]
         public LinkTypeEnum LinkType { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         [HideForUser]
         public bool ShowLinkifNoData { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         [DefaultPropValue("0")]
         [HideForUser]
         public int HideDataRowMoreThan { get; set; }
 
         [PropertyGroup("TreeVisualization")]
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "ColumnsRef")]
         public List<DVBaseColumn> ParentColumn { get; set; }
 
         [PropertyGroup("TreeVisualization")]
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "ColumnsRef")]
         public List<DVBaseColumn> GroupingColumn { get; set; }
 
         [PropertyGroup("TreeVisualization")]
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iWebForm)]
         public string GroupFormLink { get; set; }
 
         [PropertyGroup("TreeVisualization")]
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iWebForm)]
         public string ItemFormLink { get; set; }
 
         [PropertyGroup("TreeVisualization")]
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "ColumnsRef")]
         public List<DVBaseColumn> GroupFormId { get; set; }
 
         [PropertyGroup("TreeVisualization")]
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.Mapper, "ColumnsRef", "GroupFormLink", "FormControl")]
         public List<DVBaseColumn> GroupFormParameters { get; set; }
 
         [PropertyGroup("TreeVisualization")]
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "ColumnsRef")]
         public List<DVBaseColumn> ItemFormId { get; set; }
 
         [PropertyGroup("TreeVisualization")]
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.Mapper, "ColumnsRef", "ItemFormLink", "FormControl")]
         public List<DVBaseColumn> ItemFormParameters { get; set; }
 
         [PropertyGroup("TreeVisualization")]
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         [HideInPropertyGrid]
         public bool IsTree { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.Collection)]
         public List<StaticParam> StaticParameters { get; set; }
 
         [PropertyGroup("Tooltip")]
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         public int AllowedCharacterLength { get; set; }
 
         [PropertyGroup("Tooltip")]
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "ColumnsRef")]
         public List<DVBaseColumn> InfoWindow { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.Collection)]
         public List<ColumnCondition> ConditionalFormating { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         [MetaOnly]
         public OrderByDirection Direction { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         [HideInPropertyGrid]
         public ControlClass ColumnQueryMapping { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         public bool AutoResolve { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
         [HideInPropertyGrid]
         public EbDbTypes RenderType { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         [DefaultPropValue("T")]
         public string TrueValue { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         [DefaultPropValue("F")]
         public string FalseValue { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]        
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]
+        [HideInPropertyGrid]
         public string HeaderTooltipText { get; set; }
 
         [EnableInBuilder(BuilderType.Calendar)]
         public AggregateFun AggregateFun { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
         [PropertyEditor(PropertyEditorType.DropDown)]
         public Align Align { get; set; }
 
@@ -965,6 +977,18 @@ pg.HideProperty('FormMode');
         [EnableInBuilder(BuilderType.Calendar)]
         [HideInPropertyGrid]
         public NumericRenderType RenderAs { get; set; }
+
+        [EnableInBuilder(BuilderType.Calendar)]
+        [OnChangeExec(@"
+if(this.SubType === 0)
+pg.HideProperty('SubTypeFormat');
+else
+pg.ShowProperty('SubTypeFormat');
+")]
+        public NumericSubType SubType { get; set; }
+
+        [EnableInBuilder(BuilderType.Calendar)]
+        public NumericSubTypeFromat SubTypeFormat { get; set; }
 
         public CalendarDynamicColumn()
         {
