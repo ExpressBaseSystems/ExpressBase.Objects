@@ -8,6 +8,7 @@ using ExpressBase.Security;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Runtime.Serialization;
 using System.Text;
 
@@ -197,6 +198,30 @@ return val"; } set { } }
         [JsonIgnore]
         public override string SetValueJSfn { get { return @"$('#' + this.EbSid_CtxId).prop('checked', (p1 === this.Tv ? true: false)).trigger('change');"; } set { } }
 
+        public override bool ParameterizeControl(IDatabase DataDB, List<DbParameter> param, string tbl, SingleColumn cField, bool ins, ref int i, ref string _col, ref string _val, ref string _extqry, User usr, SingleColumn ocF)
+        {
+            EbDbTypes ebDbTypes = this.EbDbType == EbDbTypes.Int32 ? EbDbTypes.Int32 : EbDbTypes.String;
+            if (string.IsNullOrEmpty(cField.Value))
+            {
+                var p = DataDB.GetNewParameter(cField.Name + "_" + i, ebDbTypes);
+                p.Value = DBNull.Value;
+                param.Add(p);
+            }
+            else
+            {
+                param.Add(DataDB.GetNewParameter(cField.Name + "_" + i, ebDbTypes, cField.Value.ToString() == "true" ? "T" : "F"));
+            }
+
+            if (ins)
+            {
+                _col += string.Concat(cField.Name, ", ");
+                _val += string.Concat("@", cField.Name, "_", i, ", ");
+            }
+            else
+                _col += string.Concat(cField.Name, "=@", cField.Name, "_", i, ", ");
+            i++;
+            return true;
+        }
 
         public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
         {
@@ -205,12 +230,12 @@ return val"; } set { } }
 
             if (this.ValueType == EbValueType.Boolean)
             {
-                _formattedData = false;
+                _formattedData = "false";
                 if (Value != null)
                 {
                     if (Value.ToString() == "T")
                     {
-                        _formattedData = true;
+                        _formattedData = "true";
                         _displayMember = "true";
                     }
                 }
