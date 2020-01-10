@@ -244,65 +244,22 @@ namespace ExpressBase.Objects
                             EbDataColumn dc = response.DataSet.Tables[0].Columns[_column.ColumnName];
                             if (dc != null && !_row.IsDBNull(dc.ColumnIndex))
                             {
-                                object _unformattedData = _row[dc.ColumnIndex];
-                                object _formattedData = _unformattedData.ToString();
-                                string _displayMember = null;
-                                if (_column.Control is EbDGDateColumn)
+                                string _formattedData = _row[dc.ColumnIndex].ToString();
+                                if (_column.Control is EbDGPowerSelectColumn)
                                 {
-                                    EbDateType _type = (_column.Control as EbDGDateColumn).EbDateType;
-                                    DateTime dt = Convert.ToDateTime(_unformattedData);
-                                    if (_type == EbDateType.Date)
-                                    {
-                                        DateShowFormat _showtype = (_column.Control as EbDGDateColumn).EbDate.ShowDateAs_;
-                                        if (_showtype == DateShowFormat.Year_Month)
-                                        {
-                                            _formattedData = dt.ToString("MM/yyyy", CultureInfo.InvariantCulture);
-                                            _displayMember = dt.ToString("MM/yyyy", CultureInfo.InvariantCulture);
-                                        }
-                                        else
-                                        {
-                                            _formattedData = dt.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
-                                            _displayMember = dt.ToString(this.UserObj.Preference.GetShortDatePattern(), CultureInfo.InvariantCulture);
-                                        }
-                                    }
-                                    else if (_type == EbDateType.DateTime)
-                                    {
-                                        DateTime __dt = dt.ConvertFromUtc(this.UserObj.Preference.TimeZone);
-                                        _formattedData = __dt.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
-                                        _displayMember = __dt.ToString(this.UserObj.Preference.GetShortDatePattern() + " " + this.UserObj.Preference.GetShortTimePattern(), CultureInfo.InvariantCulture);
-                                    }
-                                    else
-                                    {
-                                        DateTime __dt = dt.ConvertFromUtc(this.UserObj.Preference.TimeZone);
-                                        _formattedData = __dt.ToString("HH:mm:ss", CultureInfo.InvariantCulture);
-                                        _displayMember = __dt.ToString(this.UserObj.Preference.GetShortTimePattern(), CultureInfo.InvariantCulture);
-                                    }
-                                }
-                                else if (_column.Control is EbDGPowerSelectColumn)
-                                {
-                                    if (!_formattedData.ToString().IsNullOrEmpty())
+                                    if (!_formattedData.IsNullOrEmpty())
                                     {
                                         if (!psDict.ContainsKey(_column.Control as EbDGPowerSelectColumn))
                                         {
-                                            psDict.Add(_column.Control as EbDGPowerSelectColumn, _formattedData.ToString());
+                                            psDict.Add(_column.Control as EbDGPowerSelectColumn, _formattedData);
                                         }
                                         else
                                         {
-                                            psDict[_column.Control as EbDGPowerSelectColumn] += "," + _formattedData.ToString();
+                                            psDict[_column.Control as EbDGPowerSelectColumn] += "," + _formattedData;
                                         }
                                     }
-
                                 }
-
-                                Row.Columns.Add(new SingleColumn()
-                                {
-                                    Name = _column.ColumnName,
-                                    Type = (int)_column.EbDbType,
-                                    Value = _formattedData,
-                                    Control = _column.Control,
-                                    F = _displayMember ?? (_formattedData == null ? string.Empty : _formattedData.ToString()),
-                                    ObjType = _column.Control.ObjType
-                                });
+                                Row.Columns.Add(_column.Control.GetSingleColumn(this.UserObj, this.SolutionObj, _formattedData));
                             }
                             else
                             {
@@ -530,7 +487,7 @@ namespace ExpressBase.Objects
 
         public void GetEmptyModel()
         {
-            this.FormData = new WebformData() { MasterTable = this.FormSchema.MasterTable };            
+            this.FormData = new WebformData() { MasterTable = this.FormSchema.MasterTable };
             foreach (TableSchema _table in this.FormSchema.Tables)
             {
                 if (_table.TableType == WebFormTableTypes.Normal)
@@ -543,7 +500,7 @@ namespace ExpressBase.Objects
                     }
                     Table.Add(Row);
                     this.FormData.MultipleTables.Add(_table.TableName, Table);
-                }               
+                }
             }
             this.GetDGsEmptyModel();
         }
@@ -681,102 +638,105 @@ namespace ExpressBase.Objects
             }
             else if (_control != null)
             {
-                if (_control is EbDate || _control is EbDGDateColumn || _control is EbSysCreatedAt || _control is EbSysModifiedAt || _control is EbDGCreatedAtColumn || _control is EbDGModifiedAtColumn)
-                {
-                    EbDateType _type = _control is EbDate ? (_control as EbDate).EbDateType :
-                        _control is EbDGDateColumn ? (_control as EbDGDateColumn).EbDateType :
-                        _control is EbSysCreatedAt ? (_control as EbSysCreatedAt).EbDateType :
-                        _control is EbSysModifiedAt ? (_control as EbSysModifiedAt).EbDateType :
-                        _control is EbDGCreatedAtColumn ? (_control as EbDGCreatedAtColumn).EbDateType :
-                        (_control as EbDGModifiedAtColumn).EbDateType;
-                    DateTime dt = Convert.ToDateTime(dataRow[dataColumn.ColumnIndex]);
-                    DateTime dt_cov = dt.ConvertFromUtc(this.UserObj.Preference.TimeZone);
-                    if (_type == EbDateType.Date)
-                    {
-                        if (_control is EbSysCreatedAt || _control is EbSysModifiedAt || _control is EbDGCreatedAtColumn || _control is EbDGModifiedAtColumn)
-                        {
-                            _formattedData = dt_cov.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
-                            _displayMember = dt_cov.ToString(this.UserObj.Preference.GetShortDatePattern(), CultureInfo.InvariantCulture);
-                        }
-                        else
-                        {
-                            DateShowFormat _showtype = _control is EbDate ? (_control as EbDate).ShowDateAs_ : (_control as EbDGDateColumn).EbDate.ShowDateAs_;
-                            if (_showtype == DateShowFormat.Year_Month)
-                            {
-                                _formattedData = dt.ToString("MM/yyyy", CultureInfo.InvariantCulture);
-                                _displayMember = _formattedData.ToString();
-                            }
-                            else
-                            {
-                                _formattedData = dt.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
-                                _displayMember = dt.ToString(this.UserObj.Preference.GetShortDatePattern(), CultureInfo.InvariantCulture);
-                            }
-                        }
-                    }
-                    else if (_type == EbDateType.DateTime)
-                    {
-                        _formattedData = dt_cov.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
-                        _displayMember = dt_cov.ToString(this.UserObj.Preference.GetShortDatePattern() + " " + this.UserObj.Preference.GetShortTimePattern(), CultureInfo.InvariantCulture);
-                    }
-                    else
-                    {
-                        _formattedData = dt_cov.ToString("HH:mm:ss", CultureInfo.InvariantCulture);
-                        _displayMember = dt_cov.ToString(this.UserObj.Preference.GetShortTimePattern(), CultureInfo.InvariantCulture);
-                    }
-                }
-                else if (_control is EbSysLocation)
-                {
-                    int loc_id = Convert.ToInt32(dataRow[dataColumn.ColumnIndex]);
-                    if (_control.IsDisable)
-                    {
-                        EbSysLocDM dm = (_control as EbSysLocation).DisplayMember;
-                        if (this.SolutionObj.Locations.ContainsKey(loc_id))
-                        {
-                            if (dm == EbSysLocDM.LongName)
-                            {
-                                _formattedData = loc_id + "$$" + this.SolutionObj.Locations[loc_id].LongName;
-                                _displayMember = this.SolutionObj.Locations[loc_id].LongName;
-                            }
-                            else
-                            {
-                                _formattedData = loc_id + "$$" + this.SolutionObj.Locations[loc_id].ShortName;
-                                _displayMember = this.SolutionObj.Locations[loc_id].ShortName;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        _formattedData = loc_id;
-                    }
-                }
-                else if (_control is EbSysCreatedBy || _control is EbSysModifiedBy || _control is EbDGCreatedByColumn || _control is EbDGModifiedByColumn)
-                {
-                    int user_id = Convert.ToInt32(dataRow[dataColumn.ColumnIndex]);
-                    if (this.SolutionObj.Users != null && this.SolutionObj.Users.ContainsKey(user_id))
-                    {
-                        _formattedData = user_id + "$$" + this.SolutionObj.Users[user_id];
-                        _displayMember = this.SolutionObj.Users[user_id];
-                    }
-                }
-                else if (_control is EbRadioButton)
-                {
-                    EbRadioButton btn = _control as EbRadioButton;
-                    if (btn.ValueType == EbValueType.Boolean)
-                    {
-                        if (dataRow[dataColumn.ColumnIndex].ToString() == "T")
-                            _formattedData = "true";
-                        else
-                            _formattedData = "false";
+                Row.Columns.Add(_control.GetSingleColumn(this.UserObj, this.SolutionObj, dataRow[dataColumn.ColumnIndex]));
+                return;
 
-                    }
-                }
-                else if (_control.EbDbType == EbDbTypes.Decimal || _control.EbDbType == EbDbTypes.Int32)
-                {
-                    _formattedData = Convert.ToDouble(dataRow[dataColumn.ColumnIndex]);
-                    _displayMember = string.Format("{0:0.00}", _formattedData);
-                }
-                else
-                    _formattedData = dataRow[dataColumn.ColumnIndex];
+                //if (_control is EbDate || _control is EbDGDateColumn || _control is EbSysCreatedAt || _control is EbSysModifiedAt || _control is EbDGCreatedAtColumn || _control is EbDGModifiedAtColumn)
+                //{
+                //    EbDateType _type = _control is EbDate ? (_control as EbDate).EbDateType :
+                //        _control is EbDGDateColumn ? (_control as EbDGDateColumn).EbDateType :
+                //        _control is EbSysCreatedAt ? (_control as EbSysCreatedAt).EbDateType :
+                //        _control is EbSysModifiedAt ? (_control as EbSysModifiedAt).EbDateType :
+                //        _control is EbDGCreatedAtColumn ? (_control as EbDGCreatedAtColumn).EbDateType :
+                //        (_control as EbDGModifiedAtColumn).EbDateType;
+                //    DateTime dt = Convert.ToDateTime(dataRow[dataColumn.ColumnIndex]);
+                //    DateTime dt_cov = dt.ConvertFromUtc(this.UserObj.Preference.TimeZone);
+                //    if (_type == EbDateType.Date)
+                //    {
+                //        if (_control is EbSysCreatedAt || _control is EbSysModifiedAt || _control is EbDGCreatedAtColumn || _control is EbDGModifiedAtColumn)
+                //        {
+                //            _formattedData = dt_cov.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+                //            _displayMember = dt_cov.ToString(this.UserObj.Preference.GetShortDatePattern(), CultureInfo.InvariantCulture);
+                //        }
+                //        else
+                //        {
+                //            DateShowFormat _showtype = _control is EbDate ? (_control as EbDate).ShowDateAs_ : (_control as EbDGDateColumn).EbDate.ShowDateAs_;
+                //            if (_showtype == DateShowFormat.Year_Month)
+                //            {
+                //                _formattedData = dt.ToString("MM/yyyy", CultureInfo.InvariantCulture);
+                //                _displayMember = _formattedData.ToString();
+                //            }
+                //            else
+                //            {
+                //                _formattedData = dt.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+                //                _displayMember = dt.ToString(this.UserObj.Preference.GetShortDatePattern(), CultureInfo.InvariantCulture);
+                //            }
+                //        }
+                //    }
+                //    else if (_type == EbDateType.DateTime)
+                //    {
+                //        _formattedData = dt_cov.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+                //        _displayMember = dt_cov.ToString(this.UserObj.Preference.GetShortDatePattern() + " " + this.UserObj.Preference.GetShortTimePattern(), CultureInfo.InvariantCulture);
+                //    }
+                //    else
+                //    {
+                //        _formattedData = dt_cov.ToString("HH:mm:ss", CultureInfo.InvariantCulture);
+                //        _displayMember = dt_cov.ToString(this.UserObj.Preference.GetShortTimePattern(), CultureInfo.InvariantCulture);
+                //    }
+                //}
+                //else if (_control is EbSysLocation)
+                //{
+                //    int loc_id = Convert.ToInt32(dataRow[dataColumn.ColumnIndex]);
+                //    if (_control.IsDisable)
+                //    {
+                //        EbSysLocDM dm = (_control as EbSysLocation).DisplayMember;
+                //        if (this.SolutionObj.Locations.ContainsKey(loc_id))
+                //        {
+                //            if (dm == EbSysLocDM.LongName)
+                //            {
+                //                _formattedData = loc_id + "$$" + this.SolutionObj.Locations[loc_id].LongName;
+                //                _displayMember = this.SolutionObj.Locations[loc_id].LongName;
+                //            }
+                //            else
+                //            {
+                //                _formattedData = loc_id + "$$" + this.SolutionObj.Locations[loc_id].ShortName;
+                //                _displayMember = this.SolutionObj.Locations[loc_id].ShortName;
+                //            }
+                //        }
+                //    }
+                //    else
+                //    {
+                //        _formattedData = loc_id;
+                //    }
+                //}
+                //else if (_control is EbSysCreatedBy || _control is EbSysModifiedBy || _control is EbDGCreatedByColumn || _control is EbDGModifiedByColumn)
+                //{
+                //    int user_id = Convert.ToInt32(dataRow[dataColumn.ColumnIndex]);
+                //    if (this.SolutionObj.Users != null && this.SolutionObj.Users.ContainsKey(user_id))
+                //    {
+                //        _formattedData = user_id + "$$" + this.SolutionObj.Users[user_id];
+                //        _displayMember = this.SolutionObj.Users[user_id];
+                //    }
+                //}
+                //else if (_control is EbRadioButton)
+                //{
+                //    EbRadioButton btn = _control as EbRadioButton;
+                //    if (btn.ValueType == EbValueType.Boolean)
+                //    {
+                //        if (dataRow[dataColumn.ColumnIndex].ToString() == "T")
+                //            _formattedData = "true";
+                //        else
+                //            _formattedData = "false";
+
+                //    }
+                //}
+                //else if (_control.EbDbType == EbDbTypes.Decimal || _control.EbDbType == EbDbTypes.Int32)
+                //{
+                //    _formattedData = Convert.ToDouble(dataRow[dataColumn.ColumnIndex]);
+                //    _displayMember = string.Format("{0:0.00}", _formattedData);
+                //}
+                //else
+                //    _formattedData = dataRow[dataColumn.ColumnIndex];
             }
             else if (dataColumn.Type == EbDbTypes.Date)
             {
@@ -1155,12 +1115,12 @@ namespace ExpressBase.Objects
             List<DbParameter> param = new List<DbParameter>();
             foreach (KeyValuePair<string, SingleTable> Table in this.FormData.MultipleTables)
             {
-                foreach(SingleRow Row in Table.Value)
+                foreach (SingleRow Row in Table.Value)
                 {
-                    foreach(SingleColumn Column in Row.Columns)
+                    foreach (SingleColumn Column in Row.Columns)
                     {
                         Param p = _params.Find(e => e.Name == Column.Name);
-                        if(p != null)
+                        if (p != null)
                         {
                             SingleColumn NwCol = Column.Control.GetSingleColumn(this.UserObj, this.SolutionObj, p.ValueTo);
                             Column.Value = NwCol.Value;
