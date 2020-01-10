@@ -287,16 +287,24 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
 .Replace("@data-ebtype@", "16");
         }
         
-        public override SingleColumn GetDefaultSingleColumn(User UserObj, Eb_Solution SoluObj)
+        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
         {
+            object _formattedData = "-1";
+            string _displayMember = " - select - ";
+            if(Value != null)
+            {
+                _formattedData = Value;
+                _displayMember = string.Empty;
+            }
+
             return new SingleColumn()
             {
                 Name = this.Name,
                 Type = (int)this.EbDbType,
-                Value = "-1",
+                Value = _formattedData,
                 Control = this,
                 ObjType = this.ObjType,
-                F = " - select - "
+                F = _displayMember
             };
         }
     }

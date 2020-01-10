@@ -198,11 +198,13 @@ namespace ExpressBase.Objects
         public override EbScript VisibleExpr { get => base.VisibleExpr; set => base.VisibleExpr = value; }
 
 
-        public override SingleColumn GetDefaultSingleColumn(User UserObj, Eb_Solution SoluObj)
+        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
         {
+            object _formattedData = Value;
+            string _displayMember = string.Empty;
             int loc_id = UserObj.Preference.DefaultLocation;
-            dynamic value = loc_id;
-            string formatted = loc_id.ToString();
+            if (Value != null)
+                loc_id = Convert.ToInt32(Value);
 
             if (this.IsDisable)
             {
@@ -211,25 +213,27 @@ namespace ExpressBase.Objects
                 {
                     if (dm == EbSysLocDM.LongName)
                     {
-                        value = loc_id + "$$" + SoluObj.Locations[loc_id].LongName;
-                        formatted = SoluObj.Locations[loc_id].LongName;
+                        _formattedData = loc_id + "$$" + SoluObj.Locations[loc_id].LongName;
+                        _displayMember = SoluObj.Locations[loc_id].LongName;
                     }
                     else
                     {
-                        value = loc_id + "$$" + SoluObj.Locations[loc_id].ShortName;
-                        formatted = SoluObj.Locations[loc_id].ShortName;
+                        _formattedData = loc_id + "$$" + SoluObj.Locations[loc_id].ShortName;
+                        _displayMember = SoluObj.Locations[loc_id].ShortName;
                     }
                 }
             }
+            else
+                _formattedData = loc_id;
 
             return new SingleColumn()
             {
                 Name = this.Name,
                 Type = (int)this.EbDbType,
-                Value = value,
+                Value = _formattedData,
                 Control = this,
                 ObjType = this.ObjType,
-                F = formatted
+                F = _displayMember
             };
         }
     }
@@ -375,31 +379,35 @@ namespace ExpressBase.Objects
         public override EbScript VisibleExpr { get => base.VisibleExpr; set => base.VisibleExpr = value; }
         public override bool IsDisable { get => base.IsDisable; set => base.IsDisable = value; }
 
-
-        public override SingleColumn GetDefaultSingleColumn(User UserObj, Eb_Solution SoluObj)
+        //EbSysCreatedBy
+        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
         {
-            return EbSysCreatedBy.GetDefaultSingleColumn(this, UserObj, SoluObj);
+            return EbSysCreatedBy.GetSingleColumn(this, UserObj, SoluObj, Value);
         }
 
-        public static SingleColumn GetDefaultSingleColumn(EbControl _this, User UserObj, Eb_Solution SoluObj)
+        public static SingleColumn GetSingleColumn(EbControl _this, User UserObj, Eb_Solution SoluObj, object Value)
         {
-            dynamic value = null;
-            string formatted = string.Empty;
-
-            if (SoluObj.Users != null && SoluObj.Users.ContainsKey(UserObj.UserId))
+            object _formattedData = null;
+            string _displayMember = string.Empty;
+            int user_id = UserObj.UserId;
+            if (Value != null)
             {
-                value = UserObj.UserId + "$$" + SoluObj.Users[UserObj.UserId];
-                formatted = SoluObj.Users[UserObj.UserId];
+                int.TryParse(Value.ToString(), out user_id);
+            }
+            else if (SoluObj.Users != null && SoluObj.Users.ContainsKey(user_id))
+            {
+                _formattedData = UserObj.UserId + "$$" + SoluObj.Users[user_id];
+                _displayMember = SoluObj.Users[user_id];
             }
 
             return new SingleColumn()
             {
                 Name = _this.Name,
                 Type = (int)_this.EbDbType,
-                Value = value,
+                Value = _formattedData,
                 Control = _this,
                 ObjType = _this.ObjType,
-                F = formatted
+                F = _displayMember
             };
         }
     }
@@ -583,11 +591,10 @@ namespace ExpressBase.Objects
         public override EbScript VisibleExpr { get => base.VisibleExpr; set => base.VisibleExpr = value; }
         public override bool IsDisable { get => base.IsDisable; set => base.IsDisable = value; }
 
-
-        public override SingleColumn GetDefaultSingleColumn(User UserObj, Eb_Solution SoluObj)
+        //EbSysCreatedAt
+        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
         {
-            this.EbDate.Name = this.Name;
-            return this.EbDate.GetDefaultSingleColumn(UserObj, SoluObj);
+            return EbDate.GetSingleColumn(this, UserObj, SoluObj, Value);
         }
     }
 
@@ -735,10 +742,10 @@ namespace ExpressBase.Objects
         public override EbScript VisibleExpr { get => base.VisibleExpr; set => base.VisibleExpr = value; }
         public override bool IsDisable { get => base.IsDisable; set => base.IsDisable = value; }
 
-
-        public override SingleColumn GetDefaultSingleColumn(User UserObj, Eb_Solution SoluObj)
+        //EbSysModifiedBy
+        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
         {
-            return EbSysCreatedBy.GetDefaultSingleColumn(this, UserObj, SoluObj);
+            return EbSysCreatedBy.GetSingleColumn(this, UserObj, SoluObj, Value);
         }
     }
 
@@ -912,10 +919,10 @@ namespace ExpressBase.Objects
         public override EbScript VisibleExpr { get => base.VisibleExpr; set => base.VisibleExpr = value; }
         public override bool IsDisable { get => base.IsDisable; set => base.IsDisable = value; }
 
-        public override SingleColumn GetDefaultSingleColumn(User UserObj, Eb_Solution SoluObj)
+        //EbSysModifiedAt
+        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
         {
-            this.EbDate.Name = this.Name;
-            return this.EbDate.GetDefaultSingleColumn(UserObj, SoluObj);
+            return EbDate.GetSingleColumn(this, UserObj, SoluObj, Value);
         }
     }
 }

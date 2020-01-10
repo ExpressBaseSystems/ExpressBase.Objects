@@ -735,13 +735,13 @@ else
             return s;
         }
         
-        public override SingleColumn GetDefaultSingleColumn(User UserObj, Eb_Solution SoluObj)
+        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
         {
             return new SingleColumn()
             {
                 Name = this.Name,
                 Type = (int)this.EbDbType,
-                Value = null,
+                Value = Value,
                 Control = this,
                 ObjType = this.ObjType,
                 F = string.Empty,

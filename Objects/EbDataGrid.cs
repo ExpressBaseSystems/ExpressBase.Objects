@@ -405,26 +405,9 @@ namespace ExpressBase.Objects
         [PropertyGroup("Appearance")]
         public virtual int Width { get; set; }
 
-        public override SingleColumn GetDefaultSingleColumn(User UserObj, Eb_Solution SoluObj)
+        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
         {
-            dynamic value = null;
-            string formatted = string.Empty;
-
-            if (this.EbDbType == EbDbTypes.Decimal || this.EbDbType == EbDbTypes.Int32)
-            {
-                value = 0;
-                formatted = "0.00";
-            }
-
-            return new SingleColumn()
-            {
-                Name = this.Name,
-                Type = (int)this.EbDbType,
-                Value = value,
-                Control = this,
-                ObjType = this.InputControlType.Substring(2),
-                F = formatted
-            };
+            return EbControl.GetSingleColumn(this, UserObj, SoluObj, Value);
         }
     }
 
@@ -684,10 +667,10 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, p2).
             return this.EbDate.ParameterizeControl(DataDB, param, tbl, cField, ins, ref i, ref _col, ref _val, ref _extqry, usr, ocF);
         }
 
-        public override SingleColumn GetDefaultSingleColumn(User UserObj, Eb_Solution SoluObj)
+        //EbDGDateColumn
+        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
         {
-            this.EbDate.Name = this.Name;
-            return this.EbDate.GetDefaultSingleColumn(UserObj, SoluObj);
+            return EbDate.GetSingleColumn(this, UserObj, SoluObj, Value);
         }
     }
 
@@ -965,10 +948,10 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
             DBareHtml = EbBooleanSelect.GetBareHtml();
         }
 
-        public override SingleColumn GetDefaultSingleColumn(User UserObj, Eb_Solution SoluObj)
+        //EbDGBooleanSelectColumn
+        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
         {
-            this.EbBooleanSelect.Name = this.Name;
-            return this.EbBooleanSelect.GetDefaultSingleColumn(UserObj, SoluObj);
+            return EbBooleanSelect.GetSingleColumn(this, UserObj, SoluObj, Value);
         }
     }
 
@@ -1276,10 +1259,10 @@ else
             return this.EbPowerSelect.GetDisplayMembersQuery(DataDB, service, vms);
         }
 
-        public override SingleColumn GetDefaultSingleColumn(User UserObj, Eb_Solution SoluObj)
+        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
         {
             this.EbPowerSelect.Name = this.Name;
-            return this.EbPowerSelect.GetDefaultSingleColumn(UserObj, SoluObj);
+            return this.EbPowerSelect.GetSingleColumn(UserObj, SoluObj, Value);
         }
     }
 
@@ -1404,11 +1387,10 @@ else
         [HideInToolBox]
         public override bool IsSysControl { get { return true; } }
 
-
-        public override SingleColumn GetDefaultSingleColumn(User UserObj, Eb_Solution SoluObj)
+        //EbDGCreatedByColumn
+        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
         {
-            this.EbSysCreatedBy.Name = this.Name;
-            return EbSysCreatedBy.GetDefaultSingleColumn(this.EbSysCreatedBy, UserObj, SoluObj);
+            return EbSysCreatedBy.GetSingleColumn(this, UserObj, SoluObj, Value);
         }
     }
 
@@ -1535,10 +1517,10 @@ else
         [HideInToolBox]
         public override bool IsSysControl { get { return true; } }
 
-        public override SingleColumn GetDefaultSingleColumn(User UserObj, Eb_Solution SoluObj)
+        //EbDGCreatedAtColumn
+        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
         {
-            this.EbSysCreatedAt.Name = this.Name;
-            return this.EbSysCreatedAt.GetDefaultSingleColumn(UserObj, SoluObj);
+            return EbDate.GetSingleColumn(this, UserObj, SoluObj, Value);
         }
     }
 
@@ -1660,11 +1642,10 @@ else
         [HideInToolBox]
         public override bool IsSysControl { get { return true; } }
 
-
-        public override SingleColumn GetDefaultSingleColumn(User UserObj, Eb_Solution SoluObj)
+        //EbDGModifiedByColumn
+        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
         {
-            this.EbSysModifiedBy.Name = this.Name;
-            return EbSysCreatedBy.GetDefaultSingleColumn(this.EbSysModifiedBy, UserObj, SoluObj);
+            return EbSysCreatedBy.GetSingleColumn(this, UserObj, SoluObj, Value);
         }
     }
 
@@ -1792,10 +1773,10 @@ else
         [HideInToolBox]
         public override bool IsSysControl { get { return true; } }
 
-        public override SingleColumn GetDefaultSingleColumn(User UserObj, Eb_Solution SoluObj)
+        //EbDGModifiedAtColumn
+        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
         {
-            this.EbSysModifiedAt.Name = this.Name;
-            return this.EbSysModifiedAt.GetDefaultSingleColumn(UserObj, SoluObj);
+            return EbDate.GetSingleColumn(this, UserObj, SoluObj, Value);
         }
     }
 
