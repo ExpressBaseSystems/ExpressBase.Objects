@@ -501,6 +501,9 @@ namespace ExpressBase.Objects
                     Table.Add(Row);
                     this.FormData.MultipleTables.Add(_table.TableName, Table);
                 }
+                else if (_table.TableType == WebFormTableTypes.Grid){
+                    this.FormData.MultipleTables.Add(_table.TableName, new SingleTable());
+                }
             }
             this.GetDGsEmptyModel();
         }
@@ -913,7 +916,7 @@ namespace ExpressBase.Objects
                 else
                     this.GetFormattedData(dataTable, Table, _schema.Tables[i]);
 
-                if (!_FormData.MultipleTables.ContainsKey(_schema.Tables[i].TableName) && Table.Count > 0)
+                if (!_FormData.MultipleTables.ContainsKey(_schema.Tables[i].TableName))
                     _FormData.MultipleTables.Add(_schema.Tables[i].TableName, Table);
             }
 
