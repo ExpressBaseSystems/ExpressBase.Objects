@@ -70,13 +70,23 @@ namespace ExpressBase.Objects
                     if(this.RenderAsSimpleSelect){"
                         + JSFnsConstants.SS_IsRequiredOKJSfn +
                     @"}
-                    else{"
-                        + JSFnsConstants.Ctrl_IsRequiredOKJSfn +
-                    @"}
+                    else{
+                        let val = this.getValue();
+                        if(this.MultiSelect){
+                            return Number.isInteger(val);
+                        }
+                        else
+                            return !(val === "" || val === undefined || typeof !== 'string');
+                    }
                 ";
             }
             set { }
         }
+
+        [JsonIgnore]
+        public override string IsRequiredOKJSfn { get { return @"
+
+"; } set { } }
 
 
 
