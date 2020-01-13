@@ -1048,6 +1048,9 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
         public override string GetColumnJSfn { get { return this.EbPowerSelect.GetColumnJSfn; } set { } }
 
         [JsonIgnore]
+        public override string IsRequiredOKJSfn { get { return this.EbPowerSelect.IsRequiredOKJSfn; } set { } }
+
+        [JsonIgnore]
         public EbPowerSelect EbPowerSelect { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]

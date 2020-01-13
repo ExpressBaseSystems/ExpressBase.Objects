@@ -70,14 +70,18 @@ namespace ExpressBase.Objects
                     if(this.RenderAsSimpleSelect){"
                         + JSFnsConstants.SS_IsRequiredOKJSfn +
                     @"}
-                    else{"
-                        + JSFnsConstants.Ctrl_IsRequiredOKJSfn +
-                    @"}
+                    else{
+                        let val = this.getValue();
+                        if(this.MultiSelect){
+                            return Number.isInteger(val);
+                        }
+                        else
+                            return !(val === '' || val === undefined || typeof val !== 'string');
+                    }
                 ";
             }
             set { }
         }
-
 
 
         //public EbSimpleSelect EbSimpleSelect;
