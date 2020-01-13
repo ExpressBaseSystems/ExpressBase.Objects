@@ -76,18 +76,12 @@ namespace ExpressBase.Objects
                             return Number.isInteger(val);
                         }
                         else
-                            return !(val === "" || val === undefined || typeof !== 'string');
+                            return !(val === '' || val === undefined || typeof val !== 'string');
                     }
                 ";
             }
             set { }
         }
-
-        [JsonIgnore]
-        public override string IsRequiredOKJSfn { get { return @"
-
-"; } set { } }
-
 
 
         //public EbSimpleSelect EbSimpleSelect;
