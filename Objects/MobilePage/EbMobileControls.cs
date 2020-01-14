@@ -4,6 +4,7 @@ using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
+using ExpressBase.Objects.Objects.DVRelated;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -257,14 +258,49 @@ namespace ExpressBase.Objects
 
         public override EbControl GetWebFormCtrl(int counter)
         {
-            return new EbSimpleSelect
+            EbPowerSelect Ps = new EbPowerSelect
             {
-                EbSid = "SimpleSelect" + counter,
+                EbSid = "PowerSelect" + counter,
                 Name = this.Name,
-                IsMultiSelect = this.IsMultiSelect,
                 Margin = new UISides { Top = 0, Bottom = 0, Left = 0, Right = 0 },
                 Label = this.Label
             };
+
+            foreach(EbMobileSSOption so in this.Options)
+            {
+                Ps.Options.Add(new EbSimpleSelectOption
+                {
+                    Name = so.Name,
+                    Value = so.Value,
+                    DisplayName = so.DisplayName
+                });
+            }
+
+            Ps.DataSourceId = this.DataSourceRefId;
+
+            if(this.DisplayMember != null)
+            {
+                Ps.DisplayMember = new DVBaseColumn
+                {
+                    Name = this.DisplayMember.Name,
+                    Type = this.DisplayMember.Type,
+                    sTitle = this.DisplayMember.Name,
+                    Data = this.DisplayMember.ColumnIndex
+                };
+            }
+
+            if (this.ValueMember != null)
+            {
+                Ps.ValueMember = new DVBaseColumn
+                {
+                    Name = this.ValueMember.Name,
+                    Type = this.ValueMember.Type,
+                    sTitle = this.ValueMember.Name,
+                    Data = this.ValueMember.ColumnIndex
+                };
+            }
+
+            return Ps;
         }
 
         public EbMobileSimpleSelect()
