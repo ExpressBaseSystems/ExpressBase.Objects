@@ -53,6 +53,16 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [PropertyGroup("Data Settings")]
         [OSE_ObjectTypes(EbObjectTypes.iFilterDialog)]
+        //[OnChangeExec(@"
+        //    if(this.Filter_Dialogue == true)
+        //    { 
+	       //     pg.ShowProperty('ParameterKeyColumnsTemp');
+        //    }
+        //    else
+        //    {
+	       //     pg.HideProperty('ParameterKeyColumnsTemp');
+        //    }
+        //    ")]
         public string Filter_Dialogue { get; set; }
 
 
@@ -94,18 +104,23 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.SqlJob)]
         [Alias("Parameter Key Column")]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "ParameterKeyColumnsColl")]
+       
         public List<Param> ParameterKeyColumnsTemp { get; set; }
 
 
         public EbSqlJob()
         {
+            ParameterKeyColumnsColl = new List<Param>();
+
             ParameterKeyColumnsTemp = new List<Param>();
 
             //ParameterKeyColumns = new List<string>();
 
             FirstReaderKeyColumnsTemp = new ColumnColletion();
 
-            //FirstReaderKeyColumns = new List<string>();
+           // FirstReaderKeyColumns = new List<string>();
+
+            FirstReaderKeyColumnsColl = new ColumnColletion();
         }
 
         [JsonIgnore]
