@@ -824,7 +824,7 @@ namespace ExpressBase.Objects
                                     if (RenderAsSS)
                                     {
                                         //Disp.Add(vms[i], _row[DmName]);
-                                        DispM_dup.Add(vms[i], new Dictionary<string, string> { { VmName, _row[DmName] } });
+                                        DispM_dup.Add(vms[i], new Dictionary<string, string> { { VmName, Convert.ToString(_row[DmName]) } });
                                     }
                                     else
                                     {

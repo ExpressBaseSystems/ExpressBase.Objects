@@ -40,7 +40,8 @@ namespace ExpressBase.Objects
         public string AutoGenMVRefid { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [HideInPropertyGrid]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [OSE_ObjectTypes(EbObjectTypes.iWebForm)]
         public string WebFormRefId { set; get; }
 
         public override string GetDesignHtml()
@@ -74,11 +75,28 @@ namespace ExpressBase.Objects
         {
             foreach (EbMobileControl ctrl in this.ChiledControls)
             {
-                TableSchema.Columns.Add(new ColumnSchema
+                if(ctrl is EbMobileTableLayout)
                 {
-                    ColumnName = ctrl.Name,
-                    EbDbType = (int)ctrl.EbDbType
-                });
+                    foreach (EbMobileTableCell cell in (ctrl as EbMobileTableLayout).CellCollection)
+                    {
+                        foreach (EbMobileControl tctrl in cell.ControlCollection)
+                        {
+                            TableSchema.Columns.Add(new ColumnSchema
+                            {
+                                ColumnName = tctrl.Name,
+                                EbDbType = (int)tctrl.EbDbType
+                            });
+                        }
+                    }
+                }
+                else
+                {
+                    TableSchema.Columns.Add(new ColumnSchema
+                    {
+                        ColumnName = ctrl.Name,
+                        EbDbType = (int)ctrl.EbDbType
+                    });
+                }
             }
         }
     }
