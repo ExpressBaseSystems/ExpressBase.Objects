@@ -824,7 +824,7 @@ namespace ExpressBase.Objects
                                     if (RenderAsSS)
                                     {
                                         //Disp.Add(vms[i], _row[DmName]);
-                                        DispM_dup.Add(vms[i], new Dictionary<string, string> { { VmName, _row[DmName] } });
+                                        DispM_dup.Add(vms[i], new Dictionary<string, string> { { VmName, Convert.ToString(_row[DmName]) } });
                                     }
                                     else
                                     {
@@ -1366,13 +1366,16 @@ namespace ExpressBase.Objects
             {
                 if (control is EbFileUploader)
                 {
-                    if (this.FormGlobals == null)
-                        this.FormGlobals = GlobalsGenerator.GetFormAsFlatGlobal(this, this.FormData);
                     EbFileUploader _c = control as EbFileUploader;
-                    string secCxtGet = _c.ExeContextCode(this.FormGlobals, false);
-                    string secCxtSet = _c.ExeContextCode(this.FormGlobals, true);
+                    if (this.FormData.ExtendedTables.ContainsKey(_c.Name ?? _c.EbSid))
+                    {
+                        if (this.FormGlobals == null)
+                            this.FormGlobals = GlobalsGenerator.GetFormAsFlatGlobal(this, this.FormData);
+                        string secCxtGet = _c.ExeContextCode(this.FormGlobals, false);
+                        string secCxtSet = _c.ExeContextCode(this.FormGlobals, true);
 
-                    _qry = _c.GetUpdateQuery2(DataDB, param, this.FormData.ExtendedTables[_c.Name ?? _c.EbSid], this.TableName, this.RefId.Split("-")[3], ref i, this.TableRowId, secCxtGet, secCxtSet);
+                        _qry = _c.GetUpdateQuery2(DataDB, param, this.FormData.ExtendedTables[_c.Name ?? _c.EbSid], this.TableName, this.RefId.Split("-")[3], ref i, this.TableRowId, secCxtGet, secCxtSet);
+                    }
                 }
             }
             return _qry;

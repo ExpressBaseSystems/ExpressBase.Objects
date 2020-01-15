@@ -1043,9 +1043,14 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
 
         [JsonIgnore]
         public override string GetDisplayMemberFromDOMJSfn { get { return this.EbPowerSelect.GetDisplayMemberFromDOMJSfn; } set { } }
+        [JsonIgnore]
+        public override string GetValueFromDOMJSfn { get { return this.EbPowerSelect.GetValueFromDOMJSfn; } set { } }
 
         [JsonIgnore]
         public override string GetColumnJSfn { get { return this.EbPowerSelect.GetColumnJSfn; } set { } }
+
+        [JsonIgnore]
+        public override string IsRequiredOKJSfn { get { return this.EbPowerSelect.IsRequiredOKJSfn; } set { } }
 
         [JsonIgnore]
         public EbPowerSelect EbPowerSelect { get; set; }

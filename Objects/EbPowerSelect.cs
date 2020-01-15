@@ -70,14 +70,18 @@ namespace ExpressBase.Objects
                     if(this.RenderAsSimpleSelect){"
                         + JSFnsConstants.SS_IsRequiredOKJSfn +
                     @"}
-                    else{"
-                        + JSFnsConstants.Ctrl_IsRequiredOKJSfn +
-                    @"}
+                    else{
+                        let val = this.getValue();
+                        if(this.MultiSelect){
+                            return Number.isInteger(val);
+                        }
+                        else
+                            return !(val === '' || val === undefined|| val === null || isNaN(val) || typeof val !== 'number');
+                    }
                 ";
             }
             set { }
         }
-
 
 
         //public EbSimpleSelect EbSimpleSelect;
@@ -154,9 +158,10 @@ else
                     if(this.RenderAsSimpleSelect){"
                         + JSFnsConstants.EbSimpleSelect_GetValueFromDOMJSfn +
                     @"}
-                    else{"
-                        + new EbControl().GetValueFromDOMJSfn +
-                    @"}
+                    else{
+                        let val = $('#' + this.EbSid_CtxId).val();
+                        return this.MultiSelect ? val : parseInt(val);
+                    }
                 ";
             }
             set { }
