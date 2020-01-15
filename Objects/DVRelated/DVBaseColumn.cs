@@ -216,13 +216,13 @@ namespace ExpressBase.Objects.Objects.DVRelated
         [HideInPropertyGrid]
         public string sType { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog)]
         [Alias("Title")]
         [HideInPropertyGrid]
         public string sTitle { get; set; }
 
         [HideInPropertyGrid]
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog)]
         public bool bVisible { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
@@ -238,7 +238,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
         [PropertyGroup("Appearance")]
         public virtual int Width { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog)]
         [JsonProperty(PropertyName = "className")]
         [HideInPropertyGrid]
         [DefaultPropValue("tdheight")]
@@ -415,7 +415,7 @@ else if(this.FormMode === 2){
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "ColumnsRef")]
         public List<DVBaseColumn> InfoWindow { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
         [PropertyEditor(PropertyEditorType.Collection)]
         public List<ColumnCondition> ConditionalFormating { get; set; }
 
