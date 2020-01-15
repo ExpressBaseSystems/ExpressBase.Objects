@@ -72,13 +72,25 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public ColumnColletion FirstReaderKeyColumnsColl { get; set; }
 
-        [EnableInBuilder(BuilderType.SqlJob)]
-        [HideInPropertyGrid]
-        //[PropertyEditor(PropertyEditorType.CollectionFrmSrc,"FirstReaderKeyColumnsColl")]
-        public List<string> FirstReaderKeyColumns { get; set; }
+        private List<string> _firstReaderKeyColumns = null;
+        public List<string> FirstReaderKeyColumns
+
+        {
+            get
+            {
+                if (_firstReaderKeyColumns == null)
+                {
+                    _firstReaderKeyColumns = new List<string>();
+                    foreach (EbDataColumn c in FirstReaderKeyColumnsTemp)
+                        if (c != null)
+                            _firstReaderKeyColumns.Add(c.ColumnName);
+                }
+                return _firstReaderKeyColumns;
+            }
+        }
 
         [EnableInBuilder(BuilderType.SqlJob)]
-        [PropertyEditor(PropertyEditorType.CollectionFrmSrc,"FirstReaderKeyColumnsColl")]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "FirstReaderKeyColumnsColl")]
         [Alias("First Reader Key Column")]
         public ColumnColletion FirstReaderKeyColumnsTemp { get; set; }
 
@@ -86,10 +98,24 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public List<Param> ParameterKeyColumnsColl { get; set; }
 
-        [EnableInBuilder(BuilderType.SqlJob)]
-        [HideInPropertyGrid]
-        //[PropertyEditor(PropertyEditorType.CollectionFrmSrc, "ParameterKeyColumnsColl")]
-        public List<string> ParameterKeyColumns { get; set; }
+
+        private List<string> _parameterKeyColumns = null;
+        public List<string> ParameterKeyColumns
+        {
+            get
+            {
+                if (_parameterKeyColumns == null)
+                {
+                    _parameterKeyColumns = new List<string>();
+                    foreach (Param _p in ParameterKeyColumnsTemp)
+                    {
+                        if (_p != null)
+                            _parameterKeyColumns.Add(_p.Name);
+                    }
+                }
+                return _parameterKeyColumns;
+            }
+        }
 
         [EnableInBuilder(BuilderType.SqlJob)]
         [Alias("Parameter Key Column")]
@@ -391,7 +417,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.SqlJob)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iWebForm)]
-        public string Reference { get; set; }
+        public string Pusher { get; set; }
 
         [EnableInBuilder(BuilderType.SqlJob)]
         [MetaOnly]
@@ -402,6 +428,12 @@ namespace ExpressBase.Objects
         [MetaOnly]
         [UIproperty]
         public string Version { set; get; }
+
+        [EnableInBuilder(BuilderType.SqlJob)]
+        [PropertyEditor(PropertyEditorType.String)]
+        public string PushJson { get; set; }
+
+
 
         public override string GetDesignHtml()
         {
@@ -469,7 +501,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.SqlJob)]
         public string Type { get; set; }
-    } 
+    }
 
     public enum InOutStatus
     {
