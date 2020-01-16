@@ -427,21 +427,15 @@ namespace ExpressBase.Objects
                             }
                             control.ValueFE = val;
                         }
-                    }
-                    if ((c as EbDataGrid).AscendingOrder)
+                    }                   
+                    int count = FormData.MultipleTables[(c as EbDataGrid).TableName].Count;
+                    for (int i = 0, j = count; i < count; i++, j--)
                     {
-                        for (int i = 0; i < FormData.MultipleTables[(c as EbDataGrid).TableName].Count;)
-                        {
-                            FormData.MultipleTables[(c as EbDataGrid).TableName][i]["eb_row_num"] = ++i;
-                        }
-                    }
-                    else
-                    {
-                        for (int i = FormData.MultipleTables[(c as EbDataGrid).TableName].Count; i > 0;)
-                        {
-                            FormData.MultipleTables[(c as EbDataGrid).TableName][i]["eb_row_num"] = i--;
-                        }
-                    }                    
+                        if ((c as EbDataGrid).AscendingOrder)
+                            FormData.MultipleTables[(c as EbDataGrid).TableName][i]["eb_row_num"] = i + 1;
+                        else
+                            FormData.MultipleTables[(c as EbDataGrid).TableName][i]["eb_row_num"] = j;
+                    }                  
                 }
                 else if (c is EbApproval)
                 {
