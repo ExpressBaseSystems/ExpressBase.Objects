@@ -29,7 +29,7 @@ namespace ExpressBase.Objects.WebFormRelated
                 if (_container is EbApproval)
                     _table = new TableSchema { TableName = curTbl, ParentTable = _parentTable, TableType = WebFormTableTypes.Approval, Title = _container.Label, ContainerName = _container.Name };
                 else if (_container is EbDataGrid)
-                    _table = new TableSchema { TableName = curTbl, ParentTable = _parentTable, TableType = WebFormTableTypes.Grid, Title = _container.Label, ContainerName = _container.Name };
+                    _table = new TableSchema { TableName = curTbl, ParentTable = _parentTable, TableType = WebFormTableTypes.Grid, Title = _container.Label, ContainerName = _container.Name, IsDynamic = _container.IsDynamicTabChild, DescOdr = !(_container as EbDataGrid).AscendingOrder };
                 else
                     _table = new TableSchema { TableName = curTbl, ParentTable = _parentTable, TableType = WebFormTableTypes.Normal, ContainerName = _container.Name };
                 _schema.Tables.Add(_table);

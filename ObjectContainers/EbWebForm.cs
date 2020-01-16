@@ -428,6 +428,20 @@ namespace ExpressBase.Objects
                             control.ValueFE = val;
                         }
                     }
+                    if ((c as EbDataGrid).AscendingOrder)
+                    {
+                        for (int i = 0; i < FormData.MultipleTables[(c as EbDataGrid).TableName].Count;)
+                        {
+                            FormData.MultipleTables[(c as EbDataGrid).TableName][i]["eb_row_num"] = ++i;
+                        }
+                    }
+                    else
+                    {
+                        for (int i = FormData.MultipleTables[(c as EbDataGrid).TableName].Count; i > 0;)
+                        {
+                            FormData.MultipleTables[(c as EbDataGrid).TableName][i]["eb_row_num"] = i--;
+                        }
+                    }                    
                 }
                 else if (c is EbApproval)
                 {
@@ -1385,7 +1399,7 @@ namespace ExpressBase.Objects
         {
             if (EbColumnExtra.Params.ContainsKey(cField.Name))
             {
-                if (string.IsNullOrEmpty(cField.Value))
+                if (cField.Value == null)
                 {
                     var p = DataDB.GetNewParameter(cField.Name + "_" + i, EbColumnExtra.Params[cField.Name]);
                     p.Value = DBNull.Value;
