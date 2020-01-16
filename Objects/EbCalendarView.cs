@@ -91,13 +91,40 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.Calendar)]
         [PropertyEditor(PropertyEditorType.DropDown)]
-        [HideInPropertyGrid]
+        [HideInPropertyGrid]        
         public AttendanceType CalendarType { get; set; }
 
         [EnableInBuilder(BuilderType.Calendar)]
         [PropertyEditor(PropertyEditorType.DropDown)]
         [HideForUser]
+        [OnChangeExec(@"
+        if(this.DefaultCalendarType == 0){
+        pg.ShowProperty('StartTime');
+        pg.ShowProperty('EndTime');
+        pg.ShowProperty('Interval');
+        }
+        else{
+        pg.HideProperty('StartTime');
+        pg.HideProperty('EndTime');
+        pg.HideProperty('Interval');
+        }
+        ")]
         public AttendanceType DefaultCalendarType { get; set; }
+
+        [EnableInBuilder(BuilderType.Calendar)]
+        [HideForUser]
+        [DefaultPropValue("9")]
+        public int StartTime { get; set; }
+
+        [EnableInBuilder(BuilderType.Calendar)]
+        [HideForUser]
+        [DefaultPropValue("7")]
+        public int EndTime { get; set; }
+
+        [EnableInBuilder(BuilderType.Calendar)]
+        [HideForUser]
+        [DefaultPropValue("1")]
+        public int Interval { get; set; }
 
         //[EnableInBuilder(BuilderType.Calendar)]
         //public override int LeftFixedColumn { get; set; }

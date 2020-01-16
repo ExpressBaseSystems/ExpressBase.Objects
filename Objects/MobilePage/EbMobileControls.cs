@@ -192,7 +192,21 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.MobilePage)]
     public class EbMobileSimpleSelect : EbMobileControl
     {
-        public override EbDbTypes EbDbType { get { return EbDbTypes.String; } set { } }
+        public override EbDbTypes EbDbType
+        {
+            get
+            {
+                if (this.ValueMember != null)
+                {
+                    return this.ValueMember.Type;
+                }
+                else
+                {
+                    return EbDbTypes.String;
+                }
+            }
+            set { }
+        }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.Collection)]
@@ -222,12 +236,12 @@ namespace ExpressBase.Objects
         public List<EbMobileDataColumn> Columns { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns",1)]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", 1)]
         [PropertyGroup("Data")]
         public EbMobileDataColumn DisplayMember { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns",1)]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", 1)]
         [PropertyGroup("Data")]
         public EbMobileDataColumn ValueMember { set; get; }
 
@@ -266,7 +280,7 @@ namespace ExpressBase.Objects
                 Label = this.Label
             };
 
-            foreach(EbMobileSSOption so in this.Options)
+            foreach (EbMobileSSOption so in this.Options)
             {
                 Ps.Options.Add(new EbSimpleSelectOption
                 {
@@ -278,7 +292,7 @@ namespace ExpressBase.Objects
 
             Ps.DataSourceId = this.DataSourceRefId;
 
-            if(this.DisplayMember != null)
+            if (this.DisplayMember != null)
             {
                 Ps.DisplayMember = new DVBaseColumn
                 {
@@ -483,9 +497,9 @@ namespace ExpressBase.Objects
 
         public override bool Unique { get; set; }
 
-        public override bool ReadOnly { get; set ; }
+        public override bool ReadOnly { get; set; }
 
-        public override bool DoNotPersist { get; set ; }
+        public override bool DoNotPersist { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("UI")]
@@ -523,6 +537,41 @@ namespace ExpressBase.Objects
                             <span> @ColumnName </span>
                         </div>
                     </div>".RemoveCR().DoubleQuoted();
+        }
+    }
+
+    [EnableInBuilder(BuilderType.MobilePage)]
+    public class EbMobileGeoLocation : EbMobileControl
+    {
+        public override EbDbTypes EbDbType { get { return EbDbTypes.String; } set { } }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        public bool HideSearchBox { set; get; }
+
+        public override string GetDesignHtml()
+        {
+            return @"<div class='eb_stacklayout mob_control dropped' id='@id' eb-type='EbMobileGeoLocation' tabindex='1' onclick='$(this).focus()'>
+                            <label class='ctrl_label'> @Label </label>
+                            <div class='eb_ctrlhtml'>
+                               <div class='geoloc-ctrlwrapr'>
+                                    <input type='text' style='display: @display' placeholder='Search place' class='eb_mob_textbox' />
+                                    <div class='map-container'>
+                                        
+                                    </div>
+                               </div>
+                            </div>
+                        </div>".Replace("@display", (this.HideSearchBox) ? "none" : "block").RemoveCR().DoubleQuoted();
+        }
+
+        public override EbControl GetWebFormCtrl(int counter)
+        {
+            return new EbInputGeoLocation
+            {
+                EbSid = "InputGeoLocation" + counter,
+                Name = this.Name,
+                Margin = new UISides { Top = 0, Bottom = 0, Left = 0, Right = 0 },
+                Label = this.Label
+            };
         }
     }
 }
