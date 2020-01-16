@@ -262,8 +262,11 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 15)]
         public string TableName { get; set; }
 
-        [DataMember(Order = 15)]
+        [DataMember(Order = 16)]
         public string ReturnObjString { get; set; }
+
+        [DataMember(Order = 17)]
+        public string ImageList { get; set; }
 
     }
 
