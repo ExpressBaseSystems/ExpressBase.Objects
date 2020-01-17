@@ -202,7 +202,17 @@ this.Init = function(id)
         public override string GetValueFromDOMJSfn { get { return @" return $('#' + this.EbSid_CtxId).is(':checked'); "; } set { } }
 
         [JsonIgnore]
-        public override string SetValueJSfn { get { return @" return $('#' + this.EbSid_CtxId).prop('checked', p1 ==='true').trigger('change'); "; } set { } }
+        public override string SetValueJSfn { get { return JustSetValueJSfn+  @".trigger('change'); "; } set { } }
+
+        [JsonIgnore]
+        public override string JustSetValueJSfn
+        {
+            get
+            {
+                return JSFnsConstants.CB_JustSetValueJSfn;
+            }
+            set { }
+        }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         public override string Label { get; set; }
