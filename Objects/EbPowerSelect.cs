@@ -73,10 +73,10 @@ namespace ExpressBase.Objects
                     else{
                         let val = this.getValue();
                         if(this.MultiSelect){
-                            return Number.isInteger(val);
+                            return !(val === '' || val === undefined|| val === null || isNaN(val) || typeof val === 'number');
                         }
                         else
-                            return !(val === '' || val === undefined|| val === null || isNaN(val) || typeof val !== 'number');
+                            return Number.isInteger(val);
                     }
                 ";
             }
