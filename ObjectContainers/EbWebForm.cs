@@ -640,7 +640,7 @@ namespace ExpressBase.Objects
             object _formattedData = null;
             string _displayMember = null;
 
-            if (dataColumn == null || dataRow.IsDBNull(dataColumn.ColumnIndex))
+            if (dataColumn == null || (dataRow.IsDBNull(dataColumn.ColumnIndex) && _control == null))
             {
                 if (_control != null && (_control.EbDbType == EbDbTypes.Decimal || _control.EbDbType == EbDbTypes.Int32))
                     _displayMember = "0.00";
@@ -649,7 +649,10 @@ namespace ExpressBase.Objects
             }
             else if (_control != null)
             {
-                Row.Columns.Add(_control.GetSingleColumn(this.UserObj, this.SolutionObj, dataRow[dataColumn.ColumnIndex]));
+                object val = dataRow[dataColumn.ColumnIndex];
+                if (dataRow.IsDBNull(dataColumn.ColumnIndex))
+                    val = null;
+                Row.Columns.Add(_control.GetSingleColumn(this.UserObj, this.SolutionObj, val));
                 return;
 
                 //if (_control is EbDate || _control is EbDGDateColumn || _control is EbSysCreatedAt || _control is EbSysModifiedAt || _control is EbDGCreatedAtColumn || _control is EbDGModifiedAtColumn)
