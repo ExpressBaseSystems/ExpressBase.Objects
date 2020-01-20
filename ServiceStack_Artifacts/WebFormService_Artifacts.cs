@@ -101,10 +101,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class GetImportDataResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
-        public WebformData FormData { get; set; }
-
-        [DataMember(Order = 3)]
-        public WebformDataWrapper FormDataWrap { get; set; }
+        public string FormDataWrap { get; set; }
 
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
