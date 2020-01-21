@@ -76,6 +76,38 @@ namespace ExpressBase.Objects.WebFormRelated
             return query + extquery;
         }
 
+        public static string GetDynamicGridSelectQuery(EbWebForm _this, IDatabase DataDB, Service _service, string _prntTbl, string[] _targetTbls, out string _queryPs, out int _qryCount)
+        {
+            string query = string.Empty;
+            _queryPs = string.Empty;
+            _qryCount = 0;
+
+            for (int i = 0; i < _targetTbls.Length; i++)
+            {
+                TableSchema _table = _this.FormSchema.Tables.Find(e => e.TableName == _targetTbls[i] && e.IsDynamic && e.TableType == WebFormTableTypes.Grid);
+                string _cols = "eb_loc_id, id, eb_row_num";
+                IEnumerable<ColumnSchema> _columns = _table.Columns.Where(x => (!x.Control.DoNotPersist || x.Control.IsSysControl));
+                if (_columns.Count() > 0)
+                    _cols += ", " + String.Join(", ", _columns.Select(x => x.ColumnName));
+
+                query += $@"SELECT {_cols} FROM {_table.TableName} WHERE {_this.FormSchema.MasterTable}_id = @{_this.FormSchema.MasterTable}_id AND
+                             {_prntTbl}_id = @{_prntTbl}_id AND COALESCE(eb_del, 'F') = 'F' {(_table.DescOdr ? "ORDER BY eb_row_num DESC" : "ORDER BY eb_row_num")}; ";
+
+                _qryCount++;
+
+                //foreach (ColumnSchema Col in _table.Columns)
+                //{
+                //    if (Col.Control.DoNotPersist)
+                //        continue;
+                //    if (Col.Control is EbPowerSelect)
+                //        _queryPs += (Col.Control as EbPowerSelect).GetSelectQuery(DataDB, _service, Col.ColumnName, _table.TableName, _id, _this.FormSchema.MasterTable);
+                //    else if (Col.Control is EbDGPowerSelectColumn)
+                //        _queryPs += (Col.Control as EbDGPowerSelectColumn).GetSelectQuery(DataDB, _service, Col.ColumnName, _table.TableName, _id, _this.FormSchema.MasterTable);
+                //}
+            }
+            return query;
+        }
+
         public static string GetDeleteQuery(EbWebForm _this, IDatabase DataDB)
         {
             string query = string.Empty;
