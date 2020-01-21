@@ -25,6 +25,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using ExpressBase.Common.Constants;
 
 namespace ExpressBase.Objects
 {
@@ -397,6 +398,36 @@ namespace ExpressBase.Objects
         public void MergeFormData()
         {
             MergeFormDataInner(this);
+
+            foreach (TableSchema _table in this.FormSchema.Tables)
+            {
+                if (!_table.IsDynamic)
+                    continue;
+                if (!this.FormData.MultipleTables.ContainsKey(_table.TableName))
+                    continue;
+                foreach (SingleRow Row in this.FormData.MultipleTables[_table.TableName])
+                {
+                    if (string.IsNullOrEmpty(Row.pId))
+                        throw new FormException("Parent id missing in dynamic entry", (int)HttpStatusCodes.NO_CONTENT, "Table : " + _table.TableName + ", Row Id : " + Row.RowId, "From EbWebForm.MergeFormData()");
+
+                    int id = Convert.ToInt32(Row.pId.Substring(0, Row.pId.IndexOf(CharConstants.UNDERSCORE)));
+                    string tbl = Row.pId.Substring(Row.pId.IndexOf(CharConstants.UNDERSCORE) + 1);
+
+                    //if (tbl == this.FormSchema.MasterTable)
+                    //    throw new FormException("Invalid table. Master table is not allowed for dynamic entry.", (int)HttpStatusCodes.BAD_REQUEST, "Table : " + _table.TableName + ", Row Id : " + Row.RowId, "From EbWebForm.MergeFormData()");
+
+                    SingleRow _row = this.FormData.MultipleTables[tbl].Find(e => e.RowId == id);
+
+                    if (_row == null)
+                        throw new FormException("Invalid data found in dynamic entry", (int)HttpStatusCodes.BAD_REQUEST, "Table : " + _table.TableName + ", Row Id : " + Row.RowId, "From EbWebForm.MergeFormData()");
+
+                    if (_row.LinesTable.Key == null)
+                        _row.LinesTable = new KeyValuePair<string, SingleTable>(_table.TableName, new SingleTable());
+
+                    _row.LinesTable.Value.Add(Row);
+                }
+                this.FormData.MultipleTables.Remove(_table.TableName);
+            }
         }
 
         private void MergeFormDataInner(EbControlContainer _container)
@@ -427,7 +458,7 @@ namespace ExpressBase.Objects
                             }
                             control.ValueFE = val;
                         }
-                    }
+                    }                   
                 }
                 else if (c is EbApproval)
                 {
@@ -906,20 +937,24 @@ namespace ExpressBase.Objects
                 this.GetDGsEmptyModel();
             }
 
-            for (int i = 0; i < _schema.Tables.Count && dataset.Tables.Count >= _schema.Tables.Count; i++)
+            int count = 0;
+            foreach (TableSchema _table in _schema.Tables)
             {
-                EbDataTable dataTable = dataset.Tables[i];////
                 SingleTable Table = new SingleTable();
+                if (!_table.IsDynamic)
+                {
+                    EbDataTable dataTable = dataset.Tables[count++];////                
 
-                if (_schema.Tables[i].TableType == WebFormTableTypes.Approval)
-                    this.GetFormattedDataApproval(dataTable, Table);
-                else
-                    this.GetFormattedData(dataTable, Table, _schema.Tables[i]);
+                    if (_table.TableType == WebFormTableTypes.Approval)
+                        this.GetFormattedDataApproval(dataTable, Table);
+                    else
+                        this.GetFormattedData(dataTable, Table, _table);
+                }
+                if (!_FormData.MultipleTables.ContainsKey(_table.TableName))
+                    _FormData.MultipleTables.Add(_table.TableName, Table);
 
-                if (!_FormData.MultipleTables.ContainsKey(_schema.Tables[i].TableName))
-                    _FormData.MultipleTables.Add(_schema.Tables[i].TableName, Table);
             }
-
+            
             if (!_FormData.MultipleTables.ContainsKey(_FormData.MasterTable))
             {
                 if (this.DataPusherConfig != null)
@@ -1268,6 +1303,9 @@ namespace ExpressBase.Objects
 
                         string _qry = QueryGetter.GetInsertQuery(WebForm, DataDB, entry.Key, true);
                         fullqry += string.Format(_qry, _cols, _values);
+
+                        fullqry += WebForm.InsertUpdateLines(entry.Key, row, DataDB, param, ref i);
+                        
                     }
                 }
                 param.Add(DataDB.GetNewParameter(WebForm.TableName + "_eb_ver_id", EbDbTypes.Int32, WebForm.RefId.Split("-")[4]));
@@ -1284,6 +1322,58 @@ namespace ExpressBase.Objects
             EbDataTable temp = tem.Tables[tem.Tables.Count - 1];
             int _rowid = temp.Rows.Count > 0 ? Convert.ToInt32(temp.Rows[0][0]) : 0;
             return _rowid;
+        }
+
+        //pTable => Parent Table, pRow => Parent Row
+        private string InsertUpdateLines(string pTable, SingleRow parentRow, IDatabase DataDB, List<DbParameter> param, ref int i)
+        {
+            string fullqry = string.Empty;
+            if (parentRow.LinesTable.Key != null)// Lines table of the grid
+            {
+                foreach (SingleRow _lineRow in parentRow.LinesTable.Value)
+                {
+                    string _cols = string.Empty;
+                    string _values = string.Empty;
+                    string tempStr = string.Empty;////////////////////warning
+
+                    if (!_lineRow.IsDelete)
+                    {
+                        foreach (SingleColumn cField in _lineRow.Columns)
+                        {
+                            if (cField.Control != null)
+                                cField.Control.ParameterizeControl(DataDB, param, this.TableName, cField, true, ref i, ref _cols, ref _values, ref tempStr, this.UserObj, null);
+                            else
+                                this.ParameterizeUnknown(DataDB, param, cField, true, ref i, ref _cols, ref _values);
+                        }
+                    }                    
+
+                    if (this.TableRowId <= 0 && parentRow.RowId <= 0 && _lineRow.RowId <= 0)//III
+                    {
+                        string _qry = QueryGetter.GetInsertQuery(this, DataDB, parentRow.LinesTable.Key, true);
+                        _qry = string.Format(_qry, $"{{0}} {pTable}_id,", $"{{1}} (SELECT eb_currval('{pTable}_id_seq')),");
+                        fullqry += string.Format(_qry, _cols, _values);
+                    }
+                    else if (this.TableRowId > 0 && parentRow.RowId <= 0 && _lineRow.RowId <= 0)//EII
+                    {
+                        string _qry = QueryGetter.GetInsertQuery(this, DataDB, parentRow.LinesTable.Key, false);
+                        _qry = string.Format(_qry, $"{{0}} {pTable}_id,", $"{{1}} (SELECT eb_currval('{pTable}_id_seq')),");
+                        fullqry += string.Format(_qry, _cols, _values);
+                    }
+                    else if (this.TableRowId > 0 && parentRow.RowId > 0 && _lineRow.RowId <= 0)//EEI
+                    {
+                        string _qry = QueryGetter.GetInsertQuery(this, DataDB, parentRow.LinesTable.Key, false);
+                        _qry = string.Format(_qry, $"{{0}} {pTable}_id,", $"{{1}} {parentRow.RowId},");
+                        fullqry += string.Format(_qry, _cols, _values);
+                    }
+                    else if (this.TableRowId > 0 && parentRow.RowId > 0 && _lineRow.RowId > 0)//EEE
+                    {
+                        string _qry = QueryGetter.GetUpdateQuery(this, DataDB, parentRow.LinesTable.Key, _lineRow.IsDelete);
+                        _qry = string.Format(_qry, "{0}", $"{{1}} AND {pTable}_id = {parentRow.RowId} ");
+                        fullqry += string.Format(_qry, _cols, _lineRow.RowId);                       
+                    }                    
+                }
+            }
+            return fullqry;
         }
 
         public int Update(IDatabase DataDB)
@@ -1345,6 +1435,9 @@ namespace ExpressBase.Objects
                             string _qry = QueryGetter.GetInsertQuery(WebForm, DataDB, entry.Key, WebForm.TableRowId == 0);
                             fullqry += string.Format(_qry, _cols, _vals);
                         }
+
+                        fullqry += WebForm.InsertUpdateLines(entry.Key, row, DataDB, param, ref i);
+
                     }
                 }
                 param.Add(DataDB.GetNewParameter(WebForm.TableName + "_id", EbDbTypes.Int32, WebForm.TableRowId));

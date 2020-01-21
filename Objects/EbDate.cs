@@ -309,11 +309,16 @@ namespace ExpressBase.Objects
                     else
                         cField.Value = DateTime.ParseExact(cField.Value.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
                 }
-                else
+                else 
                 {
-                    DateTime dt = DateTime.ParseExact(cField.Value.ToString(), "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+                    DateTime dt;
+                    if (this.EbDateType == EbDateType.DateTime)
+                        dt = DateTime.ParseExact(cField.Value.ToString(), "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+                    else
+                        dt = DateTime.ParseExact(cField.Value.ToString(), "HH:mm:ss", CultureInfo.InvariantCulture);
                     cField.Value = dt.ConvertToUtc(usr.Preference.TimeZone);
                 }
+
                 param.Add(DataDB.GetNewParameter(cField.Name + "_" + i, EbDbTypes.DateTime, cField.Value));
             }
             catch (Exception e)

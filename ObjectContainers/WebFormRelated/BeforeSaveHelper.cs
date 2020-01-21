@@ -73,7 +73,7 @@ namespace ExpressBase.Objects.WebFormRelated
             if (_cont is EbDataGrid && _cont.IsDynamicTabChild)
             {
                 _cont.IsDynamicTabChild = false;
-                (_cont as EbDataGrid).IsAddable = false;
+                //(_cont as EbDataGrid).IsAddable = false;
             }
             foreach (EbControl ctrl in _cont.Controls)
             {
@@ -146,6 +146,13 @@ namespace ExpressBase.Objects.WebFormRelated
                     CalcFlds.Add(i);
                     ExeOrd.Add(i);
                 }
+                if (_dict[i].Control.OnChangeFn != null && !string.IsNullOrEmpty(_dict[i].Control.OnChangeFn.Code))
+                {
+                    if (_dict[i].Control.OnChangeFn.Code.Contains(".setValue("))
+                    {
+                        throw new FormException("SetValue is not allowed in OnChange expression of " + _dict[i].Control.Name);
+                    }
+                }
             }
 
             for (int i = 0; i < CalcFlds.Count; i++)
@@ -159,7 +166,7 @@ namespace ExpressBase.Objects.WebFormRelated
                         {
                             string[] stringArr = new string[] {
                                 _dict[j].Path,
-                                _dict[j].Root + ".currentrow." + _dict[j].Control.Name,
+                                _dict[j].Root + ".currentrow." + _dict[j].Control.Name + ".",
                                 _dict[j].Root + ".currentrow['" + _dict[j].Control.Name + "']",
                                 _dict[j].Root + ".currentrow[\"" + _dict[j].Control.Name + "\"]",
                                 _dict[j].Root + "." +  _dict[j].Control.Name + "_sum"
