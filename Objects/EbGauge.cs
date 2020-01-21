@@ -12,7 +12,6 @@ namespace ExpressBase.Objects
 {
 
     [EnableInBuilder(BuilderType.BotForm, BuilderType.WebForm, BuilderType.UserControl ,BuilderType.DashBoard)]
-    [HideInToolBox]
     class EbGauge : EbControlUI
     {
 
@@ -25,7 +24,12 @@ namespace ExpressBase.Objects
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
 
-        [EnableInBuilder(BuilderType.BotForm, BuilderType.WebForm, BuilderType.UserControl, BuilderType.DashBoard)]
+        public override string ToolIconHtml { get { return "<i class='fa fa-tachometer'></i>"; } set { } }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        public string DataObjCtrlName { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         public string DataObjColName { get; set; }
 
         public override string UIchangeFns
