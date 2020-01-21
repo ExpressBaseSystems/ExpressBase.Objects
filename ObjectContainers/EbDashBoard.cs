@@ -151,7 +151,14 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.DashBoard)]
         public TileDivRef TileDiv { get; set; }
 
-        
+        [EnableInBuilder(BuilderType.DashBoard)]
+        [HideInPropertyGrid]
+        public List<EbControl> ControlsColl { get; set; }
+
+        [EnableInBuilder(BuilderType.DashBoard)]
+        [HideInPropertyGrid]
+        public List<EbControl> ComponentsColl { get; set; }
+
     }
 
     [EnableInBuilder(BuilderType.DashBoard)]

@@ -10,11 +10,11 @@ using System.Text;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
-    public class SqlJobRequest : IReturn<SqlJobResponse>, IEbSSRequest
+    public class SqlJobRequest : EbServiceStackAuthRequest, IReturn<SqlJobResponse> 
     {
-        public string SolnId { get; set; }
+    //    public string SolnId { get; set; }
 
-        public int UserId { get; set; }
+    //    public int UserId { get; set; }
 
         public string RefId { get; set; }
 

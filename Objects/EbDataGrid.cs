@@ -555,6 +555,63 @@ namespace ExpressBase.Objects
 							"; }
             set { }
         }
+
+        [JsonIgnore]
+        public override string JustSetValueJSfn
+        {
+            get
+            {
+                return JSFnsConstants.CB_JustSetValueJSfn;
+            }
+            set { }
+        }
+        public override bool ParameterizeControl(IDatabase DataDB, List<DbParameter> param, string tbl, SingleColumn cField, bool ins, ref int i, ref string _col, ref string _val, ref string _extqry, User usr, SingleColumn ocF)
+        {
+            if (cField.Value == null)
+            {
+                param.Add(DataDB.GetNewParameter(cField.Name + "_" + i, this.EbDbType, false));
+            }
+            else
+            {
+                param.Add(DataDB.GetNewParameter(cField.Name + "_" + i, this.EbDbType, cField.Value.ToString().ToLower() == "true" ? true : false));
+            }
+
+            if (ins)
+            {
+                _col += string.Concat(cField.Name, ", ");
+                _val += string.Concat("@", cField.Name, "_", i, ", ");
+            }
+            else
+                _col += string.Concat(cField.Name, "=@", cField.Name, "_", i, ", ");
+            i++;
+            return true;
+        }
+
+        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
+        {
+            object _formattedData = false;
+            string _displayMember = "false";
+                        
+            if (Value != null)
+            {
+                if (Value.ToString() == "T")
+                {
+                    _formattedData = true;
+                    _displayMember = "true";
+                }
+            }
+
+            return new SingleColumn()
+            {
+                Name = this.Name,
+                Type = (int)this.EbDbType,
+                Value = _formattedData,
+                Control = this,
+                ObjType = this.ObjType,
+                F = _displayMember
+            };
+        }
+
     }
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
@@ -707,6 +764,7 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, p2).
             set { }
         }
 
+        [JsonIgnore]
         public override string JustSetValueJSfn
         {
             get
@@ -1043,6 +1101,8 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
 
         [JsonIgnore]
         public override string GetDisplayMemberFromDOMJSfn { get { return this.EbPowerSelect.GetDisplayMemberFromDOMJSfn; } set { } }
+        [JsonIgnore]
+        public override string GetValueFromDOMJSfn { get { return this.EbPowerSelect.GetValueFromDOMJSfn; } set { } }
 
         [JsonIgnore]
         public override string GetColumnJSfn { get { return this.EbPowerSelect.GetColumnJSfn; } set { } }

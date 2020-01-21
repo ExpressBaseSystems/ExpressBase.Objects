@@ -487,7 +487,15 @@ namespace ExpressBase.Objects
                             }
                             control.ValueFE = val;
                         }
-                    }
+                    }                   
+                    int count = FormData.MultipleTables[(c as EbDataGrid).TableName].Count;
+                    for (int i = 0, j = count; i < count; i++, j--)
+                    {
+                        if ((c as EbDataGrid).AscendingOrder)
+                            FormData.MultipleTables[(c as EbDataGrid).TableName][i]["eb_row_num"] = i + 1;
+                        else
+                            FormData.MultipleTables[(c as EbDataGrid).TableName][i]["eb_row_num"] = j;
+                    }                  
                 }
                 else if (c is EbApproval)
                 {
@@ -693,7 +701,7 @@ namespace ExpressBase.Objects
             object _formattedData = null;
             string _displayMember = null;
 
-            if (dataColumn == null || dataRow.IsDBNull(dataColumn.ColumnIndex))
+            if (dataColumn == null || (dataRow.IsDBNull(dataColumn.ColumnIndex) && _control == null))
             {
                 if (_control != null && (_control.EbDbType == EbDbTypes.Decimal || _control.EbDbType == EbDbTypes.Int32))
                     _displayMember = "0.00";
@@ -702,7 +710,10 @@ namespace ExpressBase.Objects
             }
             else if (_control != null)
             {
-                Row.Columns.Add(_control.GetSingleColumn(this.UserObj, this.SolutionObj, dataRow[dataColumn.ColumnIndex]));
+                object val = dataRow[dataColumn.ColumnIndex];
+                if (dataRow.IsDBNull(dataColumn.ColumnIndex))
+                    val = null;
+                Row.Columns.Add(_control.GetSingleColumn(this.UserObj, this.SolutionObj, val));
                 return;
 
                 //if (_control is EbDate || _control is EbDGDateColumn || _control is EbSysCreatedAt || _control is EbSysModifiedAt || _control is EbDGCreatedAtColumn || _control is EbDGModifiedAtColumn)
@@ -1508,7 +1519,7 @@ namespace ExpressBase.Objects
         {
             if (EbColumnExtra.Params.ContainsKey(cField.Name))
             {
-                if (string.IsNullOrEmpty(cField.Value))
+                if (cField.Value == null)
                 {
                     var p = DataDB.GetNewParameter(cField.Name + "_" + i, EbColumnExtra.Params[cField.Name]);
                     p.Value = DBNull.Value;
