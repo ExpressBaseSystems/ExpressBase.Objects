@@ -32,7 +32,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         }
     }
 
-    public class RetryJobRequest : IEbSSRequest, IReturn<RetryJobResponse>
+    public class RetryJobRequest : EbServiceStackAuthRequest, IReturn<RetryJobResponse>
     {
 
         public string RefId { get; set; }
