@@ -194,6 +194,7 @@ namespace ExpressBase.Objects.WebFormRelated
             }
             else
             {
+                // if isDel is true then consider lines table also
                 string parentTbl = _this.TableName;
                 string pushIdChk = string.Empty;
                 if (tblName.Equals(_this.TableName))

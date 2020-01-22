@@ -236,10 +236,10 @@ namespace ExpressBase.Objects
                     foreach (EbDataRow _row in response.DataSet.Tables[0].Rows)
                     {
                         SingleRow Row = new SingleRow();
-                        //if (response.DataSet.Tables[0].Columns["id"] != null)
-                        //    Row.RowId = Convert.ToInt32(response.DataSet.Tables[0].Columns["id"]);// assuming id is RowId
-                        //else
-                        Row.RowId = --RowId;
+                        if (_row["id"] != null)
+                            Row.RowId = Convert.ToInt32(_row["id"]);// assuming id is RowId /////
+                        else
+                            Row.RowId = --RowId;
                         foreach (ColumnSchema _column in _sc.Columns)
                         {
                             EbDataColumn dc = response.DataSet.Tables[0].Columns[_column.ColumnName];
@@ -1444,6 +1444,7 @@ namespace ExpressBase.Objects
                         int _rowId = row.RowId;
                         if (_rowId > 0)
                         {
+                            string t = string.Empty;
                             if (!row.IsDelete)
                             {
                                 foreach (SingleColumn cField in row.Columns)
@@ -1457,9 +1458,21 @@ namespace ExpressBase.Objects
                                         WebForm.ParameterizeUnknown(DataDB, param, cField, false, ref i, ref _colvals, ref _temp);
                                 }
                             }
+                            else if (WebForm.DataPusherConfig == null && !entry.Key.Equals(WebForm.TableName))
+                            {
+                                List<TableSchema> _tables = WebForm.FormSchema.Tables.FindAll(e => e.IsDynamic && e.TableType == WebFormTableTypes.Grid);
+                                foreach (TableSchema _table in _tables)
+                                {
+                                    t += $@"UPDATE {_table.TableName} SET eb_del = 'T' eb_lastmodified_by = @eb_modified_by, eb_lastmodified_at = {DataDB.EB_CURRENT_TIMESTAMP} WHERE
+                                        {entry.Key}_id = @{entry.Key}_id_{i} AND {WebForm.TableName}_id = @{WebForm.TableName}_id AND COALESCE(eb_del, 'F') = 'F'; ";
+                                    param.Add(DataDB.GetNewParameter(entry.Key + "_id_" + i, EbDbTypes.Int32, _rowId));
+                                    i++;
+                                }
+                            }
 
                             string _qry = QueryGetter.GetUpdateQuery(WebForm, DataDB, entry.Key, row.IsDelete);
                             fullqry += string.Format(_qry, _colvals, row.RowId);
+                            fullqry += t;
                         }
                         else
                         {
@@ -1860,7 +1873,7 @@ namespace ExpressBase.Objects
                     DataDB.GetNewParameter("eb_lastmodified_by", EbDbTypes.Int32, this.UserObj.UserId),
                     DataDB.GetNewParameter("id", EbDbTypes.Int32, this.TableRowId)
                 };
-                return DataDB.UpdateTable(query, param);
+                return DataDB.DoNonQuery(query, param);
             }
             return -1;
         }
@@ -1897,7 +1910,7 @@ namespace ExpressBase.Objects
                     DataDB.GetNewParameter("eb_lastmodified_by", EbDbTypes.Int32, this.UserObj.UserId),
                     DataDB.GetNewParameter("id", EbDbTypes.Int32, this.TableRowId)
                 };
-                return DataDB.UpdateTable(query, param);
+                return DataDB.DoNonQuery(query, param);
             }
             return -1;
         }
