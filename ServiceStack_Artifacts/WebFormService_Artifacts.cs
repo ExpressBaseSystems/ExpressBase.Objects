@@ -108,6 +108,32 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
+    public class GetDynamicGridDataRequest : EbServiceStackAuthRequest, IReturn<GetDynamicGridDataResponse>
+    {
+        [DataMember(Order = 1)]
+        public string RefId { get; set; }
+
+        [DataMember(Order = 2)]
+        public int RowId { get; set; }
+
+        [DataMember(Order = 3)]
+        public string SourceId { get; set; }
+
+        [DataMember(Order = 4)]
+        public string[] Target { get; set; }
+    }
+
+    [DataContract]
+    public class GetDynamicGridDataResponse : IEbSSResponse
+    {
+        [DataMember(Order = 3)]
+        public string FormDataWrap { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    [DataContract]
     public class ExecuteSqlValueExprRequest : EbServiceStackAuthRequest, IReturn<ExecuteSqlValueExprResponse>
     {
         [DataMember(Order = 1)]

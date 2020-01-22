@@ -189,7 +189,6 @@ this.Init = function(id)
         public override string Label { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
-        [HideInPropertyGrid]
         public bool IsDynamic { get; set; }
 
         public override string GetHtml()
