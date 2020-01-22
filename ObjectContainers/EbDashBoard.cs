@@ -144,7 +144,6 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iTableVisualization, EbObjectTypes.iChartVisualization, EbObjectTypes.iGoogleMap, EbObjectTypes.iUserControl)]
-
         public string TileRefId { get; set; }
 
         [HideInPropertyGrid]
@@ -158,6 +157,12 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.DashBoard)]
         [HideInPropertyGrid]
         public List<EbControl> ComponentsColl { get; set; }
+
+        public Tiles()
+        {
+            this.ControlsColl = new List<EbControl>();
+            this.ComponentsColl = new List<EbControl>();
+        }
 
     }
 
