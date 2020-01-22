@@ -53,8 +53,10 @@ namespace ExpressBase.Objects
 
         public override string GetHtml()
         {
-            return @"<div class='gaugeChart' style='border:solid 1px' eb-type='Gauge' id='@id'>
-                    </div>".RemoveCR();
+            string EbCtrlHTML = @"
+        <div id='@ebsid@' ebsid='@ebsid@' name='@name@' class='gaugeChart' style='border:solid 1px' eb-type='Gauge'>
+        </div>";    
+            return ReplacePropsInHTML(EbCtrlHTML);
         }
     }
 }
