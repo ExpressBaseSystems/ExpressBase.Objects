@@ -160,7 +160,7 @@ else
                     @"}
                     else{
                         let val = $('#' + this.EbSid_CtxId).val();
-                        return this.MultiSelect ? val : parseInt(val);
+                        return (val === '') ? null : (this.MultiSelect ? val : parseInt(val));
                     }
                 ";
             }

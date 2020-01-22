@@ -43,7 +43,7 @@ namespace ExpressBase.Objects
             }
         }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl, BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [PropertyGroup("Data")]
         [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
@@ -52,14 +52,14 @@ namespace ExpressBase.Objects
         [PropertyPriority(99)]
         public string DataSource { get; set; }
 
-        [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.WebForm, BuilderType.UserControl)]
+        [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.WebForm, BuilderType.UserControl, BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.CollectionProp, "Columns", "bVisible")]
         [PropertyGroup("Behavior")]        
         //[HideInPropertyGrid]
         public DVColumnCollection Columns { get; set; }
 
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.DashBoard)]
         [HideInPropertyGrid]
         public override bool Hidden { get { return true; } }
 
