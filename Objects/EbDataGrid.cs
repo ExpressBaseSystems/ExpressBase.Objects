@@ -1327,6 +1327,11 @@ else
             return this.EbPowerSelect.GetSelectQuery(DataDB, service, Col, Tbl, _id, masterTbl);
         }
 
+        public string GetSelectQuery123(IDatabase DataDB, Service service, string table, string column, string parentTbl, string masterTbl)
+        {
+            return this.EbPowerSelect.GetSelectQuery123(DataDB, service, table, column, parentTbl, masterTbl);
+        }
+
         public string GetDisplayMembersQuery(IDatabase DataDB, Service service, string vms)
         {
             return this.EbPowerSelect.GetDisplayMembersQuery(DataDB, service, vms);

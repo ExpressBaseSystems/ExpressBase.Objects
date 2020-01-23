@@ -716,6 +716,16 @@ else
             }
         }
 
+        //for grid lines
+        public string GetSelectQuery123(IDatabase DataDB, Service service, string table, string column, string parentTbl, string masterTbl)
+        {
+            string psSql = this.GetSql(service);
+            string s = $@"SELECT __A.* FROM ({psSql}) __A, {table} __B
+                            WHERE __A.{this.ValueMember.Name} = ANY(STRING_TO_ARRAY(__B.{column}::TEXT, ',')::INT[]) 
+                            AND __B.{parentTbl}_id = @{parentTbl}_id AND __B.{masterTbl}_id = @{masterTbl}_id; ";
+            return s;
+        }
+
         //to get vm+dm only for audit trail
         public string GetDisplayMembersQuery(IDatabase DataDB, Service service, string vms)
         {
