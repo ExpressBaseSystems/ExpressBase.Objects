@@ -95,15 +95,13 @@ namespace ExpressBase.Objects.WebFormRelated
 
                 _qryCount++;
 
-                //foreach (ColumnSchema Col in _table.Columns)
-                //{
-                //    if (Col.Control.DoNotPersist)
-                //        continue;
-                //    if (Col.Control is EbPowerSelect)
-                //        _queryPs += (Col.Control as EbPowerSelect).GetSelectQuery(DataDB, _service, Col.ColumnName, _table.TableName, _id, _this.FormSchema.MasterTable);
-                //    else if (Col.Control is EbDGPowerSelectColumn)
-                //        _queryPs += (Col.Control as EbDGPowerSelectColumn).GetSelectQuery(DataDB, _service, Col.ColumnName, _table.TableName, _id, _this.FormSchema.MasterTable);
-                //}
+                foreach (ColumnSchema Col in _table.Columns)
+                {
+                    if (Col.Control.DoNotPersist)
+                        continue;
+                    if (Col.Control is EbDGPowerSelectColumn)
+                        _queryPs += (Col.Control as EbDGPowerSelectColumn).GetSelectQuery123(DataDB, _service, _table.TableName, Col.ColumnName, _prntTbl, _this.FormSchema.MasterTable);
+                }
             }
             return query;
         }
