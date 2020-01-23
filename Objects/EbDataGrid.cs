@@ -103,6 +103,13 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         public override EbScript OnChangeFn { get; set; }
 
+
+        [PropertyGroup("Behavior")]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorJS)]
+        [HelpText("Define actions to do after a datagrid row painted on screen.")]
+        public EbScript OnRowPaint{ get; set; }
+
         [JsonIgnore]
         public override string OnChangeBindJSFn
         {
@@ -121,6 +128,9 @@ namespace ExpressBase.Objects
         [OnDeserialized]
         public new void OnDeserializedMethod(StreamingContext context)
         {
+            if (this.OnRowPaint== null)
+                this.OnRowPaint = new EbScript();
+
             this.BareControlHtml = this.GetBareHtml();
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
             foreach (EbControl contol in Controls)
