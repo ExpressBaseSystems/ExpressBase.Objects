@@ -87,7 +87,19 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [OnChangeExec(@"
+                if (this.DataSourceId){
+                    pg.ShowProperty('IsLoadDataSourceInEditMode');
+                }
+                else {
+                    pg.HideProperty('IsLoadDataSourceInEditMode');
+                }
+            ")]
         public string DataSourceId { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [Alias("Load datasource in edit mode ")]
+        public bool IsLoadDataSourceInEditMode { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [DefaultPropValue("true")]
