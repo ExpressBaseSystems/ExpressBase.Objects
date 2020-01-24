@@ -120,7 +120,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.ScriptEditorJS)]
         [HelpText("Define actions to do after a datagrid row painted on screen.")]
-        public EbScript OnRowPaint{ get; set; }
+        public EbScript OnRowPaint { get; set; }
 
         [JsonIgnore]
         public override string OnChangeBindJSFn
@@ -140,7 +140,7 @@ namespace ExpressBase.Objects
         [OnDeserialized]
         public new void OnDeserializedMethod(StreamingContext context)
         {
-            if (this.OnRowPaint== null)
+            if (this.OnRowPaint == null)
                 this.OnRowPaint = new EbScript();
 
             this.BareControlHtml = this.GetBareHtml();
@@ -354,7 +354,9 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         public override string GetValueJSfn
         {
-            get { return @"
+            get
+            {
+                return @"
                     if(this.__isEditing)
                         return this.curRowDataVals.Value
                     else
@@ -534,6 +536,14 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm)]
         public bool AllowNegative { get; set; }
+
+        [JsonIgnore]
+        public override string GetValueFromDOMJSfn
+        {
+            get { return "return parseInt(" + base.GetValueFromDOMJSfn.Replace("return", "").Replace(";", "") + ")"; }
+
+            set { }
+        }
     }
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
@@ -613,7 +623,7 @@ namespace ExpressBase.Objects
         {
             object _formattedData = false;
             string _displayMember = "false";
-                        
+
             if (Value != null)
             {
                 if (Value.ToString() == "T")
@@ -1143,7 +1153,7 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
             get { return this.EbPowerSelect.DataSourceId; }
             set { this.EbPowerSelect.DataSourceId = value; }
         }
-        
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", 1)]
         [OnChangeExec(@"if (
