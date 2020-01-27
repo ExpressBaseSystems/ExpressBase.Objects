@@ -54,8 +54,8 @@ namespace ExpressBase.Objects
         public override string GetHtml()
         {
             string EbCtrlHTML = @"
-        <div id='@ebsid@' ebsid='@ebsid@' name='@name@' class='gaugeChart' style='border:solid 1px' eb-type='Gauge'>
-        </div>";    
+        <canvas id='@ebsid@' ebsid='@ebsid@' name='@name@' class='gaugeChart' style='border:solid 1px' eb-type='Gauge'>
+        </canvas>";    
             return ReplacePropsInHTML(EbCtrlHTML);
         }
     }
