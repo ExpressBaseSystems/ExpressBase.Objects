@@ -210,6 +210,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 7)]
         public EbDataSet DataSet { get; set; }
+
+        [DataMember(Order = 7)]
+        public List<ColumnColletion> Columns { get; set; }
     }
 
     [DataContract]

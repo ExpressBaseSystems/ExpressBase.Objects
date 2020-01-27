@@ -39,17 +39,24 @@ namespace ExpressBase.Objects
                 return @"";
             }
         }
-        //public override string GetBareHtml()
-        //{
-        //    return @"`<div id='gaugeChart' style='border:solid 1px'></div>`";
-        //}
-        //public override string GetDesignHtml()
-        //{
-        //    return @"`<div id='gaugeChart' style='border:solid 1px'></div>`";
-        //}
+
+        public override string GetBareHtml()
+        {
+            return @"<div class='gaugeChart' style='border:solid 1px'></div>";
+
+        }
+
+        public override string GetDesignHtml()
+        {
+            return GetHtml().RemoveCR().DoubleQuoted();
+        }
+
         public override string GetHtml()
         {
-            return @"`<div id='gaugeChart' style='border:solid 1px'></div>`";
+            string EbCtrlHTML = @"
+        <div id='@ebsid@' ebsid='@ebsid@' name='@name@' class='gaugeChart' style='border:solid 1px' eb-type='Gauge'>
+        </div>";    
+            return ReplacePropsInHTML(EbCtrlHTML);
         }
     }
 }
