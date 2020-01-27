@@ -10,40 +10,59 @@ using System.Text;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
-    public class SqlJobRequest : EbServiceStackAuthRequest, IReturn<SqlJobResponse> 
+    public class ExecuteSqlJobRequest : EbServiceStackAuthRequest, IReturn<ExecuteSqlJobResponse> 
     {
-    //    public string SolnId { get; set; }
-
-    //    public int UserId { get; set; }
-
         public string RefId { get; set; }
+
+        public int ObjId { get; set; }
 
         public List<Param> GlobalParams { get; set; }
     }
 
-    public class SqlJobResponse : IEbSSResponse
+    public class ExecuteSqlJobResponse : IEbSSResponse
     {
         public ApiMessage Message { get; set; }
         public ResponseStatus ResponseStatus { get; set; }
 
-        public SqlJobResponse()
+        public ExecuteSqlJobResponse()
         {
             Message = new ApiMessage();
         }
     }
 
+    public class SqlJobInternalRequest:EbServiceStackAuthRequest
+    {
+        public int ObjId { get; set; }
+
+        public List<Param> GlobalParams { get; set; }
+    }
+
     public class RetryJobRequest : EbServiceStackAuthRequest, IReturn<RetryJobResponse>
     {
-
         public string RefId { get; set; }
 
-        public int JoblogId { get; set; }
-
-        public string SolnId { get; set; }
-
-        public int UserId { get; set; }
+        public int JoblogId { get; set; } 
 
     };
+
+
+    public class ListSqlJobsRequest : EbServiceStackAuthRequest, IReturn<ListSqlJobsResponse>
+    {
+        public string RefId { get; set; }
+
+        public string Date { get; set; }
+    }
+
+    public class ListSqlJobsResponse
+    {
+        public ColumnColletion SqlJobsColumns { get; set; }
+        public RowColletion SqlJobsRows { get; set; }
+
+        public string SqlJobsDvColumns { get; set; }
+
+        public List<GroupingDetails> Levels { get; set; }
+    }
+
 
     public class RetryJobResponse : IEbSSResponse
     {
@@ -79,32 +98,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public int ParentIndex { get; set; }
     } 
-    
-
-    public class SqlJobsListGetRequest : IReturn<SqlJobsListGetResponse>
-    {
-        public string RefId { get; set; }
-
-        public string Date { get; set; }
-    }
-
-    public class SqlJobsListGetResponse
-    {
-        public ColumnColletion SqlJobsColumns { get; set; }
-        public RowColletion SqlJobsRows { get; set; }
-
-        public string SqlJobsDvColumns { get; set; }
-    }
-
-    public class ProcessorRequest:IReturn<ProcessorResponse>,IEbSSRequest
-    {
-        public string SolnId { get; set; }
-
-        public int UserId { get; set; }
-    }
-
-    public class ProcessorResponse:IEbSSResponse
-    {
-        public ResponseStatus ResponseStatus { get; set; }
-    }
+       
+   
 }
