@@ -99,15 +99,5 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int ParentIndex { get; set; }
     } 
        
-    public class ProcessorRequest:IReturn<ProcessorResponse>,IEbSSRequest
-    {
-        public string SolnId { get; set; }
-
-        public int UserId { get; set; }
-    }
-
-    public class ProcessorResponse:IEbSSResponse
-    {
-        public ResponseStatus ResponseStatus { get; set; }
-    }
+   
 }
