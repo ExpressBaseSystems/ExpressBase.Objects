@@ -236,10 +236,10 @@ namespace ExpressBase.Objects
                     foreach (EbDataRow _row in response.DataSet.Tables[0].Rows)
                     {
                         SingleRow Row = new SingleRow();
-                        if (_row["id"] != null)
-                            Row.RowId = Convert.ToInt32(_row["id"]);// assuming id is RowId /////
-                        else
-                            Row.RowId = --RowId;
+                        //if (_row["id"] != null)
+                        //    Row.RowId = Convert.ToInt32(_row["id"]);// assuming id is RowId /////
+                        //else
+                        Row.RowId = --RowId;
                         foreach (ColumnSchema _column in _sc.Columns)
                         {
                             EbDataColumn dc = response.DataSet.Tables[0].Columns[_column.ColumnName];
@@ -355,14 +355,15 @@ namespace ExpressBase.Objects
             string ptbl = SrcId.Substring(SrcId.IndexOf(CharConstants.UNDERSCORE) + 1);
 
             string query = QueryGetter.GetDynamicGridSelectQuery(this, DataDB, Service, ptbl, Target, out string psQry, out int qryCnt);
+            //psQry => /////// parameterization required to execute this
 
-            EbDataSet dataset = DataDB.DoQueries(query, new DbParameter[]
+            EbDataSet dataset = DataDB.DoQueries(query + psQry, new DbParameter[]
             {
                 DataDB.GetNewParameter(this.FormSchema.MasterTable + "_id", EbDbTypes.Int32, this.TableRowId),
                 DataDB.GetNewParameter(ptbl + "_id", EbDbTypes.Int32, pid)
             });
 
-            WebformData formData = new WebformData() { MasterTable = this.FormSchema.MasterTable };
+            this.FormData = new WebformData() { MasterTable = this.FormSchema.MasterTable };
 
             for (int i = 0; i < Target.Length; i++)
             {
@@ -371,11 +372,32 @@ namespace ExpressBase.Objects
                 SingleTable Table = new SingleTable();
                 EbDataTable dataTable = dataset.Tables[i];//
                 this.GetFormattedData(dataTable, Table, _table);                
-                if (!formData.MultipleTables.ContainsKey(_table.TableName))
-                    formData.MultipleTables.Add(_table.TableName, Table);
+                if (!this.FormData.MultipleTables.ContainsKey(_table.TableName))
+                    this.FormData.MultipleTables.Add(_table.TableName, Table);
             }
 
-            return formData;
+            if (!psQry.IsNullOrEmpty())
+            {
+                for (int i = 0, j = Target.Length; i < Target.Length && j < dataset.Tables.Count; i++)
+                {
+                    TableSchema _table = this.FormSchema.Tables.Find(e => e.TableName == Target[i] && e.IsDynamic && e.TableType == WebFormTableTypes.Grid);
+                    foreach (ColumnSchema Col in _table.Columns)
+                    {
+                        if (Col.Control.DoNotPersist)
+                            continue;
+                        if (Col.Control is EbDGPowerSelectColumn)
+                        {
+                            SingleTable Tbl = new SingleTable();
+                            this.GetFormattedData(dataset.Tables[j++], Tbl);
+                            if (!this.FormData.PsDm_Tables.ContainsKey(Col.Control.EbSid))
+                                this.FormData.PsDm_Tables.Add(Col.Control.EbSid, Tbl);
+                        }
+                    }
+                }
+                this.PostFormatFormData();
+            }
+
+            return this.FormData;
         }
 
         public string ExecuteSqlValueExpression(IDatabase DataDB, Service Service, List<Param> Param, string Trigger)
@@ -449,6 +471,8 @@ namespace ExpressBase.Objects
 
                     if (_row == null)
                         throw new FormException("Invalid data found in dynamic entry", (int)HttpStatusCodes.BAD_REQUEST, "Table : " + _table.TableName + ", Row Id : " + Row.RowId, "From EbWebForm.MergeFormData()");
+                    if (_row.IsDelete)
+                        continue;
 
                     if (_row.LinesTable.Key == null)
                         _row.LinesTable = new KeyValuePair<string, SingleTable>(_table.TableName, new SingleTable());
@@ -491,6 +515,12 @@ namespace ExpressBase.Objects
                     int count = FormData.MultipleTables[(c as EbDataGrid).TableName].Count;
                     for (int i = 0, j = count; i < count; i++, j--)
                     {
+                        if (FormData.MultipleTables[(c as EbDataGrid).TableName][i].GetColumn("eb_row_num") == null)
+                            FormData.MultipleTables[(c as EbDataGrid).TableName][i].Columns.Add(new SingleColumn {
+                                Name = "eb_row_num",
+                                Type = (int)EbDbTypes.Decimal,
+                                Value = 0
+                            });
                         if ((c as EbDataGrid).AscendingOrder)
                             FormData.MultipleTables[(c as EbDataGrid).TableName][i]["eb_row_num"] = i + 1;
                         else
@@ -1463,7 +1493,7 @@ namespace ExpressBase.Objects
                                 List<TableSchema> _tables = WebForm.FormSchema.Tables.FindAll(e => e.IsDynamic && e.TableType == WebFormTableTypes.Grid);
                                 foreach (TableSchema _table in _tables)
                                 {
-                                    t += $@"UPDATE {_table.TableName} SET eb_del = 'T' eb_lastmodified_by = @eb_modified_by, eb_lastmodified_at = {DataDB.EB_CURRENT_TIMESTAMP} WHERE
+                                    t += $@"UPDATE {_table.TableName} SET eb_del = 'T', eb_lastmodified_by = @eb_modified_by, eb_lastmodified_at = {DataDB.EB_CURRENT_TIMESTAMP} WHERE
                                         {entry.Key}_id = @{entry.Key}_id_{i} AND {WebForm.TableName}_id = @{WebForm.TableName}_id AND COALESCE(eb_del, 'F') = 'F'; ";
                                     param.Add(DataDB.GetNewParameter(entry.Key + "_id_" + i, EbDbTypes.Int32, _rowId));
                                     i++;
@@ -1552,8 +1582,8 @@ namespace ExpressBase.Objects
                 i++;
                 return true;
             }
-            else
-                Console.WriteLine($"Unknown parameter found in formdata... \nForm RefId : {this.RefId}\nName : {cField.Name}\nType : {cField.Type}\nValue : {cField.Value}");
+            else if (!cField.Name.Equals("id"))
+                Console.WriteLine($"Unknown parameter found in formdata... \nForm RefId : {this.RefId}\tName : {cField.Name}\tType : {cField.Type}\tValue : {cField.Value}");
             return false;
         }
 

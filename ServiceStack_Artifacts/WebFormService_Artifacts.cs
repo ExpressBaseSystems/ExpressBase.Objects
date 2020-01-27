@@ -8,6 +8,7 @@ using ExpressBase.Security;
 using ServiceStack;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Runtime.Serialization;
 using System.Text;
 
@@ -297,6 +298,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 6)]
         public User UserObj { get; set; }
+
+        [DataMember(Order =7) ]
+        public DbConnection TransactionConnection { get; set; }
     }
 	
 	[DataContract]
