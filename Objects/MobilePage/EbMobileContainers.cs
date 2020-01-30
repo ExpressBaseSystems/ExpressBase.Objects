@@ -14,7 +14,7 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.MobilePage)]
     public class EbMobileContainer : EbMobilePageBase
     {
-       
+
     }
 
     [EnableInBuilder(BuilderType.MobilePage)]
@@ -75,7 +75,7 @@ namespace ExpressBase.Objects
         {
             foreach (EbMobileControl ctrl in this.ChiledControls)
             {
-                if(ctrl is EbMobileTableLayout)
+                if (ctrl is EbMobileTableLayout)
                 {
                     foreach (EbMobileTableCell cell in (ctrl as EbMobileTableLayout).CellCollection)
                     {
@@ -139,6 +139,26 @@ namespace ExpressBase.Objects
         public EbMobileVisualization()
         {
             OfflineQuery = new EbScript();
+        }
+    }
+
+    [EnableInBuilder(BuilderType.MobilePage)]
+    public class EbMobileDashBoard : EbMobileContainer
+    {
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
+        public override string Name { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
+        public List<EbMobileDashBoardControls> ChiledControls { set; get; }
+
+        public override string GetDesignHtml()
+        {
+            return @"<div class='eb_mob_dashboard_container mob_container dropped' tabindex='1' eb-type='EbMobileDashBoard' id='@id'>
+                        <div class='eb_mob_container_inner'>
+                        </div>
+                    </div>".RemoveCR().DoubleQuoted();
         }
     }
 }
