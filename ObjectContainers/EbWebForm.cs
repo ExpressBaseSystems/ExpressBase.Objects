@@ -183,7 +183,7 @@ namespace ExpressBase.Objects
         }
 
         //import data - using data reader in dg - from another form linked in ps 
-        public void ImportData(IDatabase DataDB, Service Service, List<Param> Param, string Trigger)
+        public void ImportData(IDatabase DataDB, Service Service, List<Param> Param, string Trigger, int RowId)
         {
             EbControl[] Allctrls = this.Controls.FlattenAllEbControls();
             EbControl TriggerCtrl = null;
@@ -232,14 +232,14 @@ namespace ExpressBase.Objects
                     SingleTable Table = new SingleTable();
                     Dictionary<EbDGPowerSelectColumn, string> psDict = new Dictionary<EbDGPowerSelectColumn, string>();
 
-                    int RowId = 0;
+                    int rowCounter = -501;
                     foreach (EbDataRow _row in response.DataSet.Tables[0].Rows)
                     {
                         SingleRow Row = new SingleRow();
-                        //if (_row["id"] != null)
-                        //    Row.RowId = Convert.ToInt32(_row["id"]);// assuming id is RowId /////
-                        //else
-                        Row.RowId = --RowId;
+                        if (_dg.IsLoadDataSourceInEditMode && RowId > 0 && _row["id"] != null)
+                            Row.RowId = Convert.ToInt32(_row["id"]);// assuming id is RowId /////
+                        else
+                            Row.RowId = rowCounter--;
                         foreach (ColumnSchema _column in _sc.Columns)
                         {
                             EbDataColumn dc = response.DataSet.Tables[0].Columns[_column.ColumnName];
@@ -327,6 +327,14 @@ namespace ExpressBase.Objects
                 if (this.FormData.MultipleTables.ContainsKey(_table.TableName))
                 {
                     SingleTable Table = this.FormData.MultipleTables[_table.TableName];
+                    
+                    int rowCounter = -501;
+                    foreach (SingleRow Row in Table)
+                    {
+                        Row.Columns.RemoveAll(e => e.Name == "id");
+                        Row.RowId = rowCounter--;
+                    }
+
                     this.FormData.MultipleTables.Remove(_table.TableName);
                     if (_table.TableName == this.FormSchema.MasterTable)
                     {
@@ -336,14 +344,9 @@ namespace ExpressBase.Objects
                     else
                     {
                         if (_table.TableType == WebFormTableTypes.Normal)
-                        {
-                            Table[0].Columns.RemoveAll(e => e.Name == "id");
                             this.FormData.MultipleTables[this.FormData.MasterTable][0].Columns.AddRange(Table[0].Columns);
-                        }
                         else
-                        {
                             this.FormData.MultipleTables.Add(_table.ContainerName, Table);
-                        }
                     }
                 }
             }
