@@ -926,7 +926,7 @@ namespace ExpressBase.Objects
                                     if (RenderAsSS)
                                     {
                                         //Disp.Add(vms[i], _row[DmName]);
-                                        DispM_dup.Add(vms[i], new Dictionary<string, string> { { VmName, Convert.ToString(_row[DmName]) } });
+                                        DispM_dup.Add(vms[i], new Dictionary<string, string> { { VmName, Convert.ToString(_row[DmName])?? string.Empty } });
                                     }
                                     else
                                     {
@@ -934,8 +934,8 @@ namespace ExpressBase.Objects
                                         Dictionary<string, string> __d = new Dictionary<string, string>();
                                         for (int j = 0; j < DmsColl.Count; j++)
                                         {
-                                            _dm[j] = Convert.ToString(_row[DmsColl[j].Name]);
-                                            __d.Add(DmsColl[j].Name, Convert.ToString(_row[DmsColl[j].Name]));
+                                            _dm[j] = Convert.ToString(_row[DmsColl[j].Name])?? string.Empty;
+                                            __d.Add(DmsColl[j].Name, Convert.ToString(_row[DmsColl[j].Name])?? string.Empty);
                                         }
                                         //Disp.Add(vms[i], _dm);
                                         DispM_dup.Add(vms[i], __d);

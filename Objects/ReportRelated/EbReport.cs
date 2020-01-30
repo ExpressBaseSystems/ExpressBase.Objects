@@ -1073,7 +1073,8 @@ namespace ExpressBase.Objects
                  {
                      ImageInfo = new ImageMeta
                      {
-                         FileRefId = refId
+                         FileRefId = refId,
+                         FileCategory =Common.Enums.EbFileCategory.Images
                      }
                  });
             if (dfs.StreamWrapper != null)
