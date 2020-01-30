@@ -290,11 +290,10 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
         public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
         {
             object _formattedData = null;
-            string _displayMember = " - select - ";
+            string _displayMember = string.Empty;
             if(Value != null)
             {
                 _formattedData = Value;
-                _displayMember = string.Empty;
             }
 
             return new SingleColumn()
