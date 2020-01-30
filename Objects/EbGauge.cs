@@ -26,10 +26,10 @@ namespace ExpressBase.Objects
 
         public override string ToolIconHtml { get { return "<i class='fa fa-tachometer'></i>"; } set { } }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.DashBoard)]
         public string DataObjCtrlName { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl , BuilderType.DashBoard)]
         public string DataObjColName { get; set; }
 
         public override string UIchangeFns
@@ -54,8 +54,8 @@ namespace ExpressBase.Objects
         public override string GetHtml()
         {
             string EbCtrlHTML = @"
-        <canvas id='@ebsid@' ebsid='@ebsid@' name='@name@' class='gaugeChart' style='border:solid 1px' eb-type='Gauge'>
-        </canvas>";    
+        <div id='@id' ebsid='@id' name='@name@' class='gaugeChart' eb-type='Gauge'>
+        </div>";    
             return ReplacePropsInHTML(EbCtrlHTML);
         }
     }
