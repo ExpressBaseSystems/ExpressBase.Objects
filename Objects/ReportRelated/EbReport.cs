@@ -25,14 +25,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data;
-using System.Drawing;
-using System.Drawing.Imaging;
+using System.DrawingCore.Imaging;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
-using Image = System.Drawing.Image;
-
+using System.Text; 
 namespace ExpressBase.Objects
 {
     public enum EbReportSectionType
@@ -1084,26 +1081,32 @@ namespace ExpressBase.Objects
                 dfs.StreamWrapper.Memorystream.Position = 0;
                 fileByte = dfs.StreamWrapper.Memorystream.ToBytes();
             }
-
-            var jpegQuality = 10;
-            //jpegQuality = (int)(153600 / fileByte.Length);  //Avg size*100 to get the const int (this case 500kb * 100%)
-
-            //jpegQuality = jpegQuality < 15 ? 15 : jpegQuality;
-            Image image;
-            Byte[] outputBytes;
-
-            using (var inputStream = new MemoryStream(fileByte))
+            try
             {
-                image = Image.FromStream(inputStream);
-                var jpegEncoder = ImageCodecInfo.GetImageDecoders()
-                  .First(c => c.FormatID == ImageFormat.Jpeg.Guid);
-                var encoderParameters = new EncoderParameters(1);
-                encoderParameters.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, jpegQuality);
-                using (var outputStream = new MemoryStream())
+                var jpegQuality = 10;
+                //jpegQuality = (int)(153600 / fileByte.Length);  //Avg size*100 to get the const int (this case 500kb * 100%)
+
+                //jpegQuality = jpegQuality < 15 ? 15 : jpegQuality;
+               System.DrawingCore.Image image;
+                Byte[] outputBytes;
+
+                using (var inputStream = new MemoryStream(fileByte))
                 {
-                    image.Save(outputStream, jpegEncoder, encoderParameters);
-                    outputBytes = outputStream.ToArray();
+                    image = System.DrawingCore.Image.FromStream(inputStream);
+                    var jpegEncoder = ImageCodecInfo.GetImageDecoders()
+                      .First(c => c.FormatID == ImageFormat.Jpeg.Guid);
+                    var encoderParameters = new EncoderParameters(1);
+                    encoderParameters.Param[0] = new EncoderParameter(System.DrawingCore.Imaging.Encoder.Quality, jpegQuality);
+                    using (var outputStream = new MemoryStream())
+                    {
+                        image.Save(outputStream, jpegEncoder, encoderParameters);
+                        outputBytes = outputStream.ToArray();
+                    }
                 }
+            }
+            catch (Exception e)
+            {
+                Console.Write("In Image Compression" + e.Message + e.StackTrace);
             }
 
             return fileByte;

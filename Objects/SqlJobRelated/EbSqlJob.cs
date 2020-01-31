@@ -139,6 +139,7 @@ namespace ExpressBase.Objects
 
         public List<Param> ParameterKeyColumnsTemp { get; set; }
 
+        public static EbOperations Operations = SqlJobOperations.Instance;
 
         public EbSqlJob()
         {
