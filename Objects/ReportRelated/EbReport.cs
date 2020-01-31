@@ -26,10 +26,12 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Image = System.Drawing.Image;
 
 namespace ExpressBase.Objects
 {
@@ -863,9 +865,9 @@ namespace ExpressBase.Objects
                             //footer_diffrence = HeightPt - rf_Yposition - Margin.Bottom;
                             footer_diffrence = field.TopPt;
                             FooterDrawn = true;
-                            rf_Yposition = Margin.Top; 
-                        } 
-                            field.TopPt -= footer_diffrence;
+                            rf_Yposition = Margin.Top;
+                        }
+                        field.TopPt -= footer_diffrence;
                         DrawFields(field, rf_Yposition, 0);
                     }
                 }
@@ -1074,13 +1076,34 @@ namespace ExpressBase.Objects
                      ImageInfo = new ImageMeta
                      {
                          FileRefId = refId,
-                         FileCategory =Common.Enums.EbFileCategory.Images
+                         FileCategory = Common.Enums.EbFileCategory.Images
                      }
                  });
             if (dfs.StreamWrapper != null)
             {
                 dfs.StreamWrapper.Memorystream.Position = 0;
                 fileByte = dfs.StreamWrapper.Memorystream.ToBytes();
+            }
+
+            var jpegQuality = 10;
+            //jpegQuality = (int)(153600 / fileByte.Length);  //Avg size*100 to get the const int (this case 500kb * 100%)
+
+            //jpegQuality = jpegQuality < 15 ? 15 : jpegQuality;
+            Image image;
+            Byte[] outputBytes;
+
+            using (var inputStream = new MemoryStream(fileByte))
+            {
+                image = Image.FromStream(inputStream);
+                var jpegEncoder = ImageCodecInfo.GetImageDecoders()
+                  .First(c => c.FormatID == ImageFormat.Jpeg.Guid);
+                var encoderParameters = new EncoderParameters(1);
+                encoderParameters.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, jpegQuality);
+                using (var outputStream = new MemoryStream())
+                {
+                    image.Save(outputStream, jpegEncoder, encoderParameters);
+                    outputBytes = outputStream.ToArray();
+                }
             }
 
             return fileByte;
