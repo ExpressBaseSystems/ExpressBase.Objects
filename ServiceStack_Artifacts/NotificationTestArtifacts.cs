@@ -18,4 +18,16 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
 
     }
+
+    public class Notifications : List<NotificationContents>
+    {
+
+    }
+
+    public class NotificationContents
+    {
+        public string Title { get; set; }
+
+        public string Link { get; set; }
+    }
 }

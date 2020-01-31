@@ -183,7 +183,7 @@ namespace ExpressBase.Objects
         }
 
         //import data - using data reader in dg - from another form linked in ps 
-        public void ImportData(IDatabase DataDB, Service Service, List<Param> Param, string Trigger)
+        public void ImportData(IDatabase DataDB, Service Service, List<Param> Param, string Trigger, int RowId)
         {
             EbControl[] Allctrls = this.Controls.FlattenAllEbControls();
             EbControl TriggerCtrl = null;
@@ -232,14 +232,14 @@ namespace ExpressBase.Objects
                     SingleTable Table = new SingleTable();
                     Dictionary<EbDGPowerSelectColumn, string> psDict = new Dictionary<EbDGPowerSelectColumn, string>();
 
-                    int RowId = 0;
+                    int rowCounter = -501;
                     foreach (EbDataRow _row in response.DataSet.Tables[0].Rows)
                     {
                         SingleRow Row = new SingleRow();
-                        //if (_row["id"] != null)
-                        //    Row.RowId = Convert.ToInt32(_row["id"]);// assuming id is RowId /////
-                        //else
-                        Row.RowId = --RowId;
+                        if (_dg.IsLoadDataSourceInEditMode && RowId > 0 && _row["id"] != null)
+                            Row.RowId = Convert.ToInt32(_row["id"]);// assuming id is RowId /////
+                        else
+                            Row.RowId = rowCounter--;
                         foreach (ColumnSchema _column in _sc.Columns)
                         {
                             EbDataColumn dc = response.DataSet.Tables[0].Columns[_column.ColumnName];
@@ -327,6 +327,14 @@ namespace ExpressBase.Objects
                 if (this.FormData.MultipleTables.ContainsKey(_table.TableName))
                 {
                     SingleTable Table = this.FormData.MultipleTables[_table.TableName];
+                    
+                    int rowCounter = -501;
+                    foreach (SingleRow Row in Table)
+                    {
+                        Row.Columns.RemoveAll(e => e.Name == "id");
+                        Row.RowId = rowCounter--;
+                    }
+
                     this.FormData.MultipleTables.Remove(_table.TableName);
                     if (_table.TableName == this.FormSchema.MasterTable)
                     {
@@ -336,14 +344,9 @@ namespace ExpressBase.Objects
                     else
                     {
                         if (_table.TableType == WebFormTableTypes.Normal)
-                        {
-                            Table[0].Columns.RemoveAll(e => e.Name == "id");
                             this.FormData.MultipleTables[this.FormData.MasterTable][0].Columns.AddRange(Table[0].Columns);
-                        }
                         else
-                        {
                             this.FormData.MultipleTables.Add(_table.ContainerName, Table);
-                        }
                     }
                 }
             }
@@ -1337,6 +1340,7 @@ namespace ExpressBase.Objects
                 }
                 throw new FormException("Exception in Form data save", (int)HttpStatusCodes.INTERNAL_SERVER_ERROR, ex1.Message, ex1.StackTrace);
             }
+            this.DbConnection.Close();
             return resp;
         }
 
@@ -1637,18 +1641,26 @@ namespace ExpressBase.Objects
         }
 
         //form data submission using PushJson and FormGlobals - SQL Job
-        public string Save(IDatabase DataDB)
+        public string Save(IDatabase DataDB, Service service, DbConnection DbCon)
         {
-            this.DbConnection = DataDB.GetNewConnection();
+            if (DbCon == null)
+                this.DbConnection = DataDB.GetNewConnection();
+            else
+                this.DbConnection = DbCon;
+
             string resp = string.Empty;
             try
             {
-                this.DbConnection.Open();
-                this.DbTransaction = this.DbConnection.BeginTransaction();
+                if (DbCon == null)
+                {
+                    this.DbConnection.Open();
+                    this.DbTransaction = this.DbConnection.BeginTransaction();
+                }
 
                 bool IsUpdate = this.TableRowId > 0;
                 if (IsUpdate)
                 {
+                    this.RefreshFormData(DataDB, service, true, false);
                     resp = "Updated: " + this.Update(DataDB);
                 }
                 else
@@ -1659,13 +1671,16 @@ namespace ExpressBase.Objects
                 }
                 resp += " - AuditTrail: " + EbAuditTrail.UpdateAuditTrail(this, DataDB);
                 resp += " - AfterSave: " + this.AfterSave(DataDB, IsUpdate);
-                this.DbTransaction.Commit();
+
+                if (DbCon == null)
+                    this.DbTransaction.Commit();
             }
             catch (Exception ex1)
             {
                 try
                 {
-                    this.DbTransaction.Rollback();
+                    if (DbCon == null)
+                        this.DbTransaction.Rollback();
                 }
                 catch (Exception ex2)
                 {
@@ -1673,6 +1688,8 @@ namespace ExpressBase.Objects
                 }
                 throw new FormException("Exception in Form data save", (int)HttpStatusCodes.INTERNAL_SERVER_ERROR, ex1.Message, ex1.StackTrace);
             }
+            if (DbCon == null)
+                this.DbConnection.Close();
             return resp;
         }
 
