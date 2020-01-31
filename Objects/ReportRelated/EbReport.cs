@@ -1080,34 +1080,7 @@ namespace ExpressBase.Objects
             {
                 dfs.StreamWrapper.Memorystream.Position = 0;
                 fileByte = dfs.StreamWrapper.Memorystream.ToBytes();
-            }
-            try
-            {
-                var jpegQuality = 10;
-                //jpegQuality = (int)(153600 / fileByte.Length);  //Avg size*100 to get the const int (this case 500kb * 100%)
-
-                //jpegQuality = jpegQuality < 15 ? 15 : jpegQuality;
-               System.DrawingCore.Image image;
-                Byte[] outputBytes;
-
-                using (var inputStream = new MemoryStream(fileByte))
-                {
-                    image = System.DrawingCore.Image.FromStream(inputStream);
-                    var jpegEncoder = ImageCodecInfo.GetImageDecoders()
-                      .First(c => c.FormatID == ImageFormat.Jpeg.Guid);
-                    var encoderParameters = new EncoderParameters(1);
-                    encoderParameters.Param[0] = new EncoderParameter(System.DrawingCore.Imaging.Encoder.Quality, jpegQuality);
-                    using (var outputStream = new MemoryStream())
-                    {
-                        image.Save(outputStream, jpegEncoder, encoderParameters);
-                        outputBytes = outputStream.ToArray();
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Console.Write("In Image Compression" + e.Message + e.StackTrace);
-            }
+            }           
 
             return fileByte;
         }
