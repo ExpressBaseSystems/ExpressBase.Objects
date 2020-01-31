@@ -1340,6 +1340,7 @@ namespace ExpressBase.Objects
                 }
                 throw new FormException("Exception in Form data save", (int)HttpStatusCodes.INTERNAL_SERVER_ERROR, ex1.Message, ex1.StackTrace);
             }
+            this.DbConnection.Close();
             return resp;
         }
 
@@ -1640,18 +1641,26 @@ namespace ExpressBase.Objects
         }
 
         //form data submission using PushJson and FormGlobals - SQL Job
-        public string Save(IDatabase DataDB)
+        public string Save(IDatabase DataDB, Service service, DbConnection DbCon)
         {
-            this.DbConnection = DataDB.GetNewConnection();
+            if (DbCon == null)
+                this.DbConnection = DataDB.GetNewConnection();
+            else
+                this.DbConnection = DbCon;
+
             string resp = string.Empty;
             try
             {
-                this.DbConnection.Open();
-                this.DbTransaction = this.DbConnection.BeginTransaction();
+                if (DbCon == null)
+                {
+                    this.DbConnection.Open();
+                    this.DbTransaction = this.DbConnection.BeginTransaction();
+                }
 
                 bool IsUpdate = this.TableRowId > 0;
                 if (IsUpdate)
                 {
+                    this.RefreshFormData(DataDB, service, true, false);
                     resp = "Updated: " + this.Update(DataDB);
                 }
                 else
@@ -1662,13 +1671,16 @@ namespace ExpressBase.Objects
                 }
                 resp += " - AuditTrail: " + EbAuditTrail.UpdateAuditTrail(this, DataDB);
                 resp += " - AfterSave: " + this.AfterSave(DataDB, IsUpdate);
-                this.DbTransaction.Commit();
+
+                if (DbCon == null)
+                    this.DbTransaction.Commit();
             }
             catch (Exception ex1)
             {
                 try
                 {
-                    this.DbTransaction.Rollback();
+                    if (DbCon == null)
+                        this.DbTransaction.Rollback();
                 }
                 catch (Exception ex2)
                 {
@@ -1676,6 +1688,8 @@ namespace ExpressBase.Objects
                 }
                 throw new FormException("Exception in Form data save", (int)HttpStatusCodes.INTERNAL_SERVER_ERROR, ex1.Message, ex1.StackTrace);
             }
+            if (DbCon == null)
+                this.DbConnection.Close();
             return resp;
         }
 
