@@ -92,9 +92,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string RefId { get; set; }
 
         [DataMember(Order = 2)]
-        public List<Param> Params { get; set; }
+        public int RowId { get; set; }
 
         [DataMember(Order = 3)]
+        public List<Param> Params { get; set; }
+
+        [DataMember(Order = 4)]
         public string Trigger { get; set; }
     }
 
