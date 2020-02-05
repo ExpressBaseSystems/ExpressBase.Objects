@@ -394,9 +394,9 @@ namespace ExpressBase.Objects
             {
                 int.TryParse(Value.ToString(), out user_id);
             }
-            else if (SoluObj.Users != null && SoluObj.Users.ContainsKey(user_id))
+            if (SoluObj.Users != null && SoluObj.Users.ContainsKey(user_id))
             {
-                _formattedData = UserObj.UserId + "$$" + SoluObj.Users[user_id];
+                _formattedData = user_id + "$$" + SoluObj.Users[user_id];
                 _displayMember = SoluObj.Users[user_id];
             }
 
