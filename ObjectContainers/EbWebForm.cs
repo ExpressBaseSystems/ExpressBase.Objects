@@ -505,7 +505,7 @@ namespace ExpressBase.Objects
                             List<object> val = new List<object>();
                             for (int i = 0; i < FormData.MultipleTables[(c as EbDataGrid).TableName].Count; i++)
                             {
-                                if (FormData.MultipleTables[(c as EbDataGrid).TableName][i][control.Name] != null)
+                                if (FormData.MultipleTables[(c as EbDataGrid).TableName][i].GetColumn(control.Name) != null)
                                 {
                                     val.Add(FormData.MultipleTables[(c as EbDataGrid).TableName][i][control.Name]);
                                     FormData.MultipleTables[(c as EbDataGrid).TableName][i].SetEbDbType(control.Name, control.EbDbType);
@@ -566,21 +566,22 @@ namespace ExpressBase.Objects
                         if (dict.ContainsKey(m.Value))
                             (c as EbAutoId).Pattern.sPattern = (c as EbAutoId).Pattern.sPattern.Replace(m.Value, dict[m.Value]);
                     }
+
+                    if (FormData.MultipleTables[_container.TableName][0].GetColumn(c.Name) == null)
+                        FormData.MultipleTables[_container.TableName][0].Columns.Add(new SingleColumn { Name = c.Name });
+
                     FormData.MultipleTables[_container.TableName][0].SetEbDbType(c.Name, c.EbDbType);
                     FormData.MultipleTables[_container.TableName][0].SetControl(c.Name, c);
                     FormData.MultipleTables[_container.TableName][0][c.Name] = (c as EbAutoId).Pattern.sPattern;
                     c.ValueFE = FormData.MultipleTables[_container.TableName][0][c.Name];
                 }
-                else if (!(c is EbFileUploader))
+                else if (!(c is EbFileUploader) && !c.DoNotPersist)
                 {
-                    if (!c.DoNotPersist)
+                    if (FormData.MultipleTables[_container.TableName][0].GetColumn(c.Name) != null)
                     {
-                        if (FormData.MultipleTables[_container.TableName][0].GetColumn(c.Name) != null)
-                        {
-                            c.ValueFE = FormData.MultipleTables[_container.TableName][0][c.Name];
-                            FormData.MultipleTables[_container.TableName][0].SetEbDbType(c.Name, c.EbDbType);
-                            FormData.MultipleTables[_container.TableName][0].SetControl(c.Name, c);
-                        }
+                        c.ValueFE = FormData.MultipleTables[_container.TableName][0][c.Name];
+                        FormData.MultipleTables[_container.TableName][0].SetEbDbType(c.Name, c.EbDbType);
+                        FormData.MultipleTables[_container.TableName][0].SetControl(c.Name, c);
                     }
                 }
             }
@@ -969,6 +970,8 @@ namespace ExpressBase.Objects
                 for (int i = 0; i < this.DataPushers.Count; i++)
                 {
                     query += QueryGetter.GetSelectQuery(this.DataPushers[i].WebForm, DataDB, service, out psquery[i + 1], out qrycount[i + 1]);
+                    this.DataPushers[i].WebForm.UserObj = this.UserObj;
+                    this.DataPushers[i].WebForm.SolutionObj = this.SolutionObj;
                     FormCollection[i + 1] = this.DataPushers[i].WebForm;
                 }
             }
@@ -1029,7 +1032,7 @@ namespace ExpressBase.Objects
 
             }
 
-            if (!_FormData.MultipleTables.ContainsKey(_FormData.MasterTable))
+            if (!_FormData.MultipleTables.ContainsKey(_FormData.MasterTable) || _FormData.MultipleTables[_FormData.MasterTable].Count == 0)
             {
                 if (this.DataPusherConfig != null)
                     return;
@@ -1353,11 +1356,13 @@ namespace ExpressBase.Objects
             List<EbWebForm> FormCollection = new List<EbWebForm>() { this };
             if (this.ExeDataPusher)
             {
-                this.PrepareWebFormData();
                 foreach (EbDataPusher pusher in this.DataPushers)
                 {
+                    pusher.WebForm.UserObj = this.UserObj;
+                    pusher.WebForm.SolutionObj = this.SolutionObj;
                     FormCollection.Add(pusher.WebForm);
                 }
+                this.PrepareWebFormData();                
             }
             foreach (EbWebForm WebForm in FormCollection)
             {
@@ -1460,11 +1465,13 @@ namespace ExpressBase.Objects
             List<EbWebForm> FormCollection = new List<EbWebForm>() { this };
             if (this.ExeDataPusher)
             {
-                this.PrepareWebFormData();
                 foreach (EbDataPusher pusher in this.DataPushers)
                 {
+                    pusher.WebForm.UserObj = this.UserObj;
+                    pusher.WebForm.SolutionObj = this.SolutionObj;
                     FormCollection.Add(pusher.WebForm);
                 }
+                this.PrepareWebFormData();                
             }
 
             foreach (EbWebForm WebForm in FormCollection)
