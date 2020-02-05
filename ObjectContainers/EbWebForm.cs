@@ -203,6 +203,7 @@ namespace ExpressBase.Objects
 
             if (TriggerCtrl.DependedDG != null && TriggerCtrl.DependedDG.Count > 0)
             {
+                this.GetDGsEmptyModel();
                 foreach (string dgName in TriggerCtrl.DependedDG)
                 {
                     EbDataGrid _dg = DGs.Find(e => e.Name == dgName);
@@ -264,12 +265,7 @@ namespace ExpressBase.Objects
                             }
                             else
                             {
-                                Row.Columns.Add(new SingleColumn()
-                                {
-                                    Name = _column.ColumnName,
-                                    Type = (int)_column.EbDbType,
-                                    Value = null
-                                });
+                                Row.Columns.Add(this.FormData.DGsRowDataModel[_sc.TableName][_column.ColumnName]);
                             }
                         }
                         Table.Add(Row);
@@ -313,42 +309,101 @@ namespace ExpressBase.Objects
                 _form.UserObj = this.UserObj;
                 _form.SolutionObj = this.SolutionObj;
                 _form.TableRowId = Param[0].ValueTo;
-                _form.GetImportData(DataDB, Service, this.Name);
-                this.FormData = _form.FormData;
+                _form.GetImportData(DataDB, Service, this);
+                //this.FormData = _form.FormData;
             }
         }
 
-        public void GetImportData(IDatabase DataDB, Service Service, string Destination)
+        //public void GetImportData123(IDatabase DataDB, Service Service, EbWebForm Form)
+        //{
+        //    this.RefreshFormData(DataDB, Service);
+
+        //    foreach (TableSchema _table in this.FormSchema.Tables)
+        //    {
+        //        if (this.FormData.MultipleTables.ContainsKey(_table.TableName))
+        //        {
+        //            SingleTable Table = this.FormData.MultipleTables[_table.TableName];
+                    
+        //            int rowCounter = -501;
+        //            foreach (SingleRow Row in Table)
+        //            {
+        //                Row.Columns.RemoveAll(e => e.Name == "id");
+        //                Row.RowId = rowCounter--;
+        //            }
+
+        //            this.FormData.MultipleTables.Remove(_table.TableName);
+        //            if (_table.TableName == this.FormSchema.MasterTable)
+        //            {
+        //                this.FormData.MultipleTables.Add(Form.Name, Table);
+        //                this.FormData.MasterTable = Form.Name;
+        //            }
+        //            else
+        //            {
+        //                if (_table.TableType == WebFormTableTypes.Normal)
+        //                    this.FormData.MultipleTables[this.FormData.MasterTable][0].Columns.AddRange(Table[0].Columns);
+        //                else
+        //                    this.FormData.MultipleTables.Add(_table.ContainerName, Table);
+        //            }
+        //        }
+        //    }
+        //}
+
+        public void GetImportData(IDatabase DataDB, Service Service, EbWebForm Form)//COPY this TO Form
         {
             this.RefreshFormData(DataDB, Service);
 
-            foreach (TableSchema _table in this.FormSchema.Tables)
+            foreach (TableSchema _t in this.FormSchema.Tables)
             {
-                if (this.FormData.MultipleTables.ContainsKey(_table.TableName))
+                SingleTable Table = this.FormData.MultipleTables[_t.TableName];
+                if (_t.TableName == this.FormSchema.MasterTable)
+                    continue;
+                if (_t.TableType == WebFormTableTypes.Normal && Table.Count > 0)
                 {
-                    SingleTable Table = this.FormData.MultipleTables[_table.TableName];
-                    
-                    int rowCounter = -501;
-                    foreach (SingleRow Row in Table)
-                    {
-                        Row.Columns.RemoveAll(e => e.Name == "id");
-                        Row.RowId = rowCounter--;
-                    }
+                    this.FormData.MultipleTables[this.FormData.MasterTable][0].Columns.AddRange(Table[0].Columns);
+                }
+            }
 
-                    this.FormData.MultipleTables.Remove(_table.TableName);
-                    if (_table.TableName == this.FormSchema.MasterTable)
+            Form.GetEmptyModel();
+            foreach (TableSchema _table in Form.FormSchema.Tables)
+            {
+                if (_table.TableType == WebFormTableTypes.Grid)
+                {
+                    TableSchema _t = this.FormSchema.Tables.Find(e => e.ContainerName == _table.ContainerName);
+                    if (_t != null)
                     {
-                        this.FormData.MultipleTables.Add(Destination, Table);
-                        this.FormData.MasterTable = Destination;
-                    }
-                    else
-                    {
-                        if (_table.TableType == WebFormTableTypes.Normal)
-                            this.FormData.MultipleTables[this.FormData.MasterTable][0].Columns.AddRange(Table[0].Columns);
-                        else
-                            this.FormData.MultipleTables.Add(_table.ContainerName, Table);
+                        int rc = -501;
+                        string rmodel = JsonConvert.SerializeObject(Form.FormData.DGsRowDataModel[_table.TableName]);
+                        foreach (SingleRow _R in this.FormData.MultipleTables[_t.TableName])
+                        {
+                            SingleRow _Row = JsonConvert.DeserializeObject<SingleRow>(rmodel);
+                            _Row.RowId = rc--;
+                            foreach (ColumnSchema _column in _table.Columns)
+                            {
+                                SingleColumn _c = _R.GetColumn(_column.ColumnName);
+                                if (_c != null)
+                                {
+                                    _Row.SetColumn(_column.ColumnName, _c);
+                                }
+                            }
+                            Form.FormData.MultipleTables[_table.TableName].Add(_Row);
+                        }
                     }
                 }
+                else if (_table.TableType == WebFormTableTypes.Normal)
+                {
+                    SingleTable Table = Form.FormData.MultipleTables[_table.TableName];
+                    if (Table.Count > 0)
+                    {
+                        foreach (ColumnSchema _column in _table.Columns)
+                        {
+                            SingleColumn _c = this.FormData.MultipleTables[this.FormData.MasterTable][0].GetColumn(_column.ColumnName);
+                            if (_c != null && !(_column.Control is EbAutoId))
+                            {
+                                Form.FormData.MultipleTables[_table.TableName][0].SetColumn(_column.ColumnName, _c);
+                            }
+                        }
+                    }
+                }                
             }
         }
 
