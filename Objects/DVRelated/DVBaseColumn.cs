@@ -231,7 +231,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
         [Alias("Width")]
-        [JsonIgnore]
+        [HideForUser]
         public string sWidth { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog)]
@@ -687,6 +687,9 @@ pg.HideProperty('FormMode');
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         public ImageQuality ImageQuality { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
+        public bool AllowMultilineText { get; set; }
 
         public DVStringColumn()
         {
