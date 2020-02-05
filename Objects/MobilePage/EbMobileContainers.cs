@@ -29,6 +29,10 @@ namespace ExpressBase.Objects
         public List<EbMobileControl> ChiledControls { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
+        public List<EbMobileControl> ChildControls { get { return ChiledControls; } set { } }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
         public string TableName { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
@@ -128,10 +132,26 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public EbMobileTableLayout DataLayout { set; get; }
 
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
+        public List<EbMobileDataColumn> Filters { set; get; }
+
         public override string GetDesignHtml()
         {
             return @"<div class='eb_mob_vis_container mob_container dropped' tabindex='1' eb-type='EbMobileVisualization' id='@id'>
                         <div class='eb_mob_container_inner'>
+                            <label class='vis-group-label'>Design</label>
+                            <div class='vis-table-container'>
+
+                            </div>
+                            <label class='vis-group-label'>Filter Columns </label>
+                            <div class='vis-filter-container'>
+
+                            </div>
+                            <label class='vis-group-label'>Preview</label>
+                            <div class='vis-preview-container'>
+
+                            </div>
                         </div>
                     </div>".RemoveCR().DoubleQuoted();
         }
@@ -139,6 +159,7 @@ namespace ExpressBase.Objects
         public EbMobileVisualization()
         {
             OfflineQuery = new EbScript();
+            Filters = new List<EbMobileDataColumn>();
         }
     }
 
@@ -152,6 +173,10 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
         public List<EbMobileDashBoardControls> ChiledControls { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
+        public List<EbMobileDashBoardControls> ChildControls { get { return ChiledControls; } set { } }
 
         public override string GetDesignHtml()
         {
