@@ -87,7 +87,19 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [OnChangeExec(@"
+                if (this.DataSourceId){
+                    pg.ShowProperty('IsLoadDataSourceInEditMode');
+                }
+                else {
+                    pg.HideProperty('IsLoadDataSourceInEditMode');
+                }
+            ")]
         public string DataSourceId { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [Alias("Load datasource in edit mode ")]
+        public bool IsLoadDataSourceInEditMode { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [DefaultPropValue("true")]
@@ -102,6 +114,13 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         public override EbScript OnChangeFn { get; set; }
+
+
+        [PropertyGroup("Behavior")]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorJS)]
+        [HelpText("Define actions to do after a datagrid row painted on screen.")]
+        public EbScript OnRowPaint { get; set; }
 
         [JsonIgnore]
         public override string OnChangeBindJSFn
@@ -121,6 +140,9 @@ namespace ExpressBase.Objects
         [OnDeserialized]
         public new void OnDeserializedMethod(StreamingContext context)
         {
+            if (this.OnRowPaint == null)
+                this.OnRowPaint = new EbScript();
+
             this.BareControlHtml = this.GetBareHtml();
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
             foreach (EbControl contol in Controls)
@@ -332,7 +354,9 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         public override string GetValueJSfn
         {
-            get { return @"
+            get
+            {
+                return @"
                     if(this.__isEditing)
                         return this.curRowDataVals.Value
                     else
@@ -512,6 +536,14 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm)]
         public bool AllowNegative { get; set; }
+
+        [JsonIgnore]
+        public override string GetValueFromDOMJSfn
+        {
+            get { return "return parseInt(" + base.GetValueFromDOMJSfn.Replace("return", "").Replace(";", "") + ")"; }
+
+            set { }
+        }
     }
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
@@ -591,7 +623,7 @@ namespace ExpressBase.Objects
         {
             object _formattedData = false;
             string _displayMember = "false";
-                        
+
             if (Value != null)
             {
                 if (Value.ToString() == "T")
@@ -1121,7 +1153,7 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
             get { return this.EbPowerSelect.DataSourceId; }
             set { this.EbPowerSelect.DataSourceId = value; }
         }
-        
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", 1)]
         [OnChangeExec(@"if (
@@ -1315,6 +1347,11 @@ else
         public string GetSelectQuery(IDatabase DataDB, Service service, string Col, string Tbl = null, string _id = null, string masterTbl = null)
         {
             return this.EbPowerSelect.GetSelectQuery(DataDB, service, Col, Tbl, _id, masterTbl);
+        }
+
+        public string GetSelectQuery123(IDatabase DataDB, Service service, string table, string column, string parentTbl, string masterTbl)
+        {
+            return this.EbPowerSelect.GetSelectQuery123(DataDB, service, table, column, parentTbl, masterTbl);
         }
 
         public string GetDisplayMembersQuery(IDatabase DataDB, Service service, string vms)

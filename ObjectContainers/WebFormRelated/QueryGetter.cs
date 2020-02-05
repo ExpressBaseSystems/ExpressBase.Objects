@@ -16,6 +16,8 @@ namespace ExpressBase.Objects.WebFormRelated
             _qryCount = 0;
             foreach (TableSchema _table in _this.FormSchema.Tables)
             {
+                if (_table.IsDynamic)
+                    continue;
                 string _cols = "eb_loc_id, id";
                 string _id = "id";
 
@@ -74,6 +76,36 @@ namespace ExpressBase.Objects.WebFormRelated
             return query + extquery;
         }
 
+        public static string GetDynamicGridSelectQuery(EbWebForm _this, IDatabase DataDB, Service _service, string _prntTbl, string[] _targetTbls, out string _queryPs, out int _qryCount)
+        {
+            string query = string.Empty;
+            _queryPs = string.Empty;
+            _qryCount = 0;
+
+            for (int i = 0; i < _targetTbls.Length; i++)
+            {
+                TableSchema _table = _this.FormSchema.Tables.Find(e => e.TableName == _targetTbls[i] && e.IsDynamic && e.TableType == WebFormTableTypes.Grid);
+                string _cols = "eb_loc_id, id, eb_row_num";
+                IEnumerable<ColumnSchema> _columns = _table.Columns.Where(x => (!x.Control.DoNotPersist || x.Control.IsSysControl));
+                if (_columns.Count() > 0)
+                    _cols += ", " + String.Join(", ", _columns.Select(x => x.ColumnName));
+
+                query += $@"SELECT {_cols} FROM {_table.TableName} WHERE {_this.FormSchema.MasterTable}_id = @{_this.FormSchema.MasterTable}_id AND
+                             {_prntTbl}_id = @{_prntTbl}_id AND COALESCE(eb_del, 'F') = 'F' {(_table.DescOdr ? "ORDER BY eb_row_num DESC" : "ORDER BY eb_row_num")}; ";
+
+                _qryCount++;
+
+                foreach (ColumnSchema Col in _table.Columns)
+                {
+                    if (Col.Control.DoNotPersist)
+                        continue;
+                    if (Col.Control is EbDGPowerSelectColumn)
+                        _queryPs += (Col.Control as EbDGPowerSelectColumn).GetSelectQuery123(DataDB, _service, _table.TableName, Col.ColumnName, _prntTbl, _this.FormSchema.MasterTable);
+                }
+            }
+            return query;
+        }
+
         public static string GetDeleteQuery(EbWebForm _this, IDatabase DataDB)
         {
             string query = string.Empty;
@@ -111,40 +143,40 @@ namespace ExpressBase.Objects.WebFormRelated
         public static string GetInsertQuery(EbWebForm _this, IDatabase DataDB, string tblName, bool isIns)
         {
             string _qry;
-            if (_this.DataPusherConfig == null)
+
+            if (tblName.Equals(_this.TableName))
             {
-                if (tblName.Equals(_this.TableName))
+                if (_this.DataPusherConfig == null)
                 {
-                    _qry = string.Format("INSERT INTO {0} ({2} eb_created_by, eb_created_at, eb_loc_id, eb_ver_id) VALUES ({3} @eb_createdby, {1}, @eb_loc_id, @{0}_eb_ver_id); ", tblName, DataDB.EB_CURRENT_TIMESTAMP, "{0}", "{1}");//eb_ver_id included
-                    //_qry = string.Format("INSERT INTO {0} ({2} eb_created_by, eb_created_at, eb_loc_id) VALUES ({3} :eb_createdby, {1}, :eb_loc_id); ", tblName, DataDB.EB_CURRENT_TIMESTAMP, "{0}", "{1}");
-                    if (DataDB.Vendor == DatabaseVendors.MYSQL)
-                        _qry += string.Format("SELECT eb_persist_currval('{0}_id_seq');", tblName);
-                    if (_this.IsLocEditable)
-                        _qry = _qry.Replace(", eb_loc_id", string.Empty).Replace(", @eb_loc_id", string.Empty);
+                    _qry = $@"INSERT INTO {tblName} ({{0}} eb_created_by, eb_created_at, eb_loc_id, eb_ver_id) 
+                                VALUES ({{1}} @eb_createdby, {DataDB.EB_CURRENT_TIMESTAMP}, @eb_loc_id, @{_this.TableName}_eb_ver_id); ";
                 }
-                else if (isIns)
-                    _qry = string.Format("INSERT INTO {0} ({3} eb_created_by, eb_created_at, eb_loc_id, {2}_id) VALUES ({4} @eb_createdby, {1}, @eb_loc_id , (SELECT eb_currval('{2}_id_seq')));", tblName, DataDB.EB_CURRENT_TIMESTAMP, _this.TableName, "{0}", "{1}");
                 else
-                    _qry = string.Format("INSERT INTO {0} ({3} eb_created_by, eb_created_at, eb_loc_id, {2}_id) VALUES ({4} @eb_createdby, {1}, @eb_loc_id , @{2}_id);", tblName, DataDB.EB_CURRENT_TIMESTAMP, _this.TableName, "{0}", "{1}");
-            }
-            else
-            {
-                if (tblName.Equals(_this.TableName))
                 {
                     if (_this.DataPusherConfig.SourceRecId <= 0)
-                        _qry = string.Format("INSERT INTO {0} ({4} eb_created_by, eb_created_at, eb_loc_id, eb_ver_id, {2}_id, eb_push_id, eb_lock) VALUES ({5} @eb_createdby, {1}, @eb_loc_id, @{0}_eb_ver_id, (SELECT eb_currval('{2}_id_seq')), '{3}', 'T'); ", tblName, DataDB.EB_CURRENT_TIMESTAMP, _this.DataPusherConfig.SourceTable, _this.DataPusherConfig.MultiPushId, "{0}", "{1}");
+                        _qry = $@"INSERT INTO {tblName} ({{0}} eb_created_by, eb_created_at, eb_loc_id, eb_ver_id, {_this.DataPusherConfig.SourceTable}_id, eb_push_id, eb_lock) 
+                                    VALUES ({{1}} @eb_createdby, {DataDB.EB_CURRENT_TIMESTAMP}, @eb_loc_id, @{_this.TableName}_eb_ver_id, (SELECT eb_currval('{_this.DataPusherConfig.SourceTable}_id_seq')), '{_this.DataPusherConfig.MultiPushId}', 'T'); ";
                     else
-                        _qry = string.Format("INSERT INTO {0} ({4} eb_created_by, eb_created_at, eb_loc_id, eb_ver_id, {2}_id, eb_push_id, eb_lock) VALUES ({5} @eb_createdby, {1}, @eb_loc_id, @{0}_eb_ver_id, @{2}_id, '{3}', 'T'); ", tblName, DataDB.EB_CURRENT_TIMESTAMP, _this.DataPusherConfig.SourceTable, _this.DataPusherConfig.MultiPushId, "{0}", "{1}");
-                    if (DataDB.Vendor == DatabaseVendors.MYSQL)
-                        _qry += string.Format("SELECT eb_persist_currval('{0}_id_seq');", tblName);
-                    if (_this.IsLocEditable)
-                        _qry = _qry.Replace(", eb_loc_id", string.Empty).Replace(", @eb_loc_id", string.Empty);
+                        _qry = $@"INSERT INTO {tblName} ({{0}} eb_created_by, eb_created_at, eb_loc_id, eb_ver_id, {_this.DataPusherConfig.SourceTable}_id, eb_push_id, eb_lock) 
+                                    VALUES ({{1}} @eb_createdby, {DataDB.EB_CURRENT_TIMESTAMP}, @eb_loc_id, @{_this.TableName}_eb_ver_id, @{_this.DataPusherConfig.SourceTable}_id, '{_this.DataPusherConfig.MultiPushId}', 'T'); ";
                 }
-                else if (isIns)
-                    _qry = string.Format("INSERT INTO {0} ({3} eb_created_by, eb_created_at, eb_loc_id, {2}_id) VALUES ({4} @eb_createdby, {1}, @eb_loc_id , (SELECT eb_currval('{2}_id_seq')));", tblName, DataDB.EB_CURRENT_TIMESTAMP, _this.TableName, "{0}", "{1}");
-                else
-                    _qry = string.Format("INSERT INTO {0} ({3} eb_created_by, eb_created_at, eb_loc_id, {2}_id) VALUES ({4} @eb_createdby, {1}, @eb_loc_id , @{2}_id);", tblName, DataDB.EB_CURRENT_TIMESTAMP, _this.TableName, "{0}", "{1}");
+
+                if (DataDB.Vendor == DatabaseVendors.MYSQL)
+                    _qry += $"SELECT eb_persist_currval('{tblName}_id_seq'); ";
+                if (_this.IsLocEditable)
+                    _qry = _qry.Replace(", eb_loc_id", string.Empty).Replace(", @eb_loc_id", string.Empty);
             }
+            else if (isIns)
+            {
+                _qry = $@"INSERT INTO {tblName} ({{0}} eb_created_by, eb_created_at, eb_loc_id, {_this.TableName}_id) 
+                            VALUES ({{1}} @eb_createdby, {DataDB.EB_CURRENT_TIMESTAMP}, @eb_loc_id , (SELECT eb_currval('{_this.TableName}_id_seq'))); ";
+                if (DataDB.Vendor == DatabaseVendors.MYSQL)
+                    _qry += $"SELECT eb_persist_currval('{tblName}_id_seq'); ";
+            }
+            else
+                _qry = $@"INSERT INTO {tblName} ({{0}} eb_created_by, eb_created_at, eb_loc_id, {_this.TableName}_id) 
+                            VALUES ({{1}} @eb_createdby, {DataDB.EB_CURRENT_TIMESTAMP}, @eb_loc_id , @{_this.TableName}_id); ";
+
             return _qry;
         }
 
@@ -154,14 +186,22 @@ namespace ExpressBase.Objects.WebFormRelated
             if (_this.DataPusherConfig == null)
             {
                 if (tblName.Equals(_this.TableName))
-                    _qry = string.Format("UPDATE {0} SET {2} eb_lastmodified_by = @eb_modified_by, eb_lastmodified_at = {1} WHERE id = {3} AND COALESCE(eb_del, 'F') = 'F';", tblName, DataDB.EB_CURRENT_TIMESTAMP, "{0}", "{1}");
+                    _qry = $"UPDATE {tblName} SET {{0}} eb_lastmodified_by = @eb_modified_by, eb_lastmodified_at = {DataDB.EB_CURRENT_TIMESTAMP} WHERE id = {{1}} AND COALESCE(eb_del, 'F') = 'F'; ";
                 else
-                    _qry = string.Format("UPDATE {0} SET {3} eb_lastmodified_by = @eb_modified_by, eb_lastmodified_at = {1} WHERE id = {4} AND {2}_id = @{2}_id AND COALESCE(eb_del, 'F') = 'F';", tblName, DataDB.EB_CURRENT_TIMESTAMP, _this.TableName, isDel ? "eb_del = 'T', " : "{0}", "{1}");
+                    _qry = $"UPDATE {tblName} SET {(isDel ? "eb_del = 'T', " : "{0}")} eb_lastmodified_by = @eb_modified_by, eb_lastmodified_at = {DataDB.EB_CURRENT_TIMESTAMP} WHERE id = {{1}} AND {_this.TableName}_id = @{_this.TableName}_id AND COALESCE(eb_del, 'F') = 'F'; ";
             }
             else
             {
-                _qry = string.Format("UPDATE {0} SET {4} eb_lastmodified_by = @eb_modified_by, eb_lastmodified_at = {1} WHERE id = {5} AND {2}_id = @{2}_id AND COALESCE(eb_del, 'F') = 'F' {3};",
-                    tblName, DataDB.EB_CURRENT_TIMESTAMP, tblName.Equals(_this.TableName) ? _this.DataPusherConfig.SourceTable : _this.TableName, tblName.Equals(_this.TableName) ? "AND eb_push_id = '" + _this.DataPusherConfig.MultiPushId + "'" : string.Empty, isDel ? "eb_del = 'T', " : "{0}", "{1}");
+                // if isDel is true then consider lines table also
+                string parentTbl = _this.TableName;
+                string pushIdChk = string.Empty;
+                if (tblName.Equals(_this.TableName))
+                {
+                    parentTbl = _this.DataPusherConfig.SourceTable;
+                    pushIdChk = $"AND eb_push_id = '{_this.DataPusherConfig.MultiPushId}'";
+                }
+                _qry = $@"UPDATE {tblName} SET {(isDel ? "eb_del = 'T', " : "{0}")} eb_lastmodified_by = @eb_modified_by, eb_lastmodified_at = {DataDB.EB_CURRENT_TIMESTAMP} 
+                            WHERE id = {{1}} AND {parentTbl}_id = @{parentTbl}_id AND COALESCE(eb_del, 'F') = 'F' {pushIdChk}; ";
             }
             return _qry;
         }

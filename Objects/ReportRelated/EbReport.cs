@@ -25,12 +25,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data;
-using System.Drawing;
+using System.DrawingCore.Imaging;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
-
+using System.Text; 
 namespace ExpressBase.Objects
 {
     public enum EbReportSectionType
@@ -863,9 +862,9 @@ namespace ExpressBase.Objects
                             //footer_diffrence = HeightPt - rf_Yposition - Margin.Bottom;
                             footer_diffrence = field.TopPt;
                             FooterDrawn = true;
-                            rf_Yposition = Margin.Top; 
-                        } 
-                            field.TopPt -= footer_diffrence;
+                            rf_Yposition = Margin.Top;
+                        }
+                        field.TopPt -= footer_diffrence;
                         DrawFields(field, rf_Yposition, 0);
                     }
                 }
@@ -1073,14 +1072,15 @@ namespace ExpressBase.Objects
                  {
                      ImageInfo = new ImageMeta
                      {
-                         FileRefId = refId
+                         FileRefId = refId,
+                         FileCategory = Common.Enums.EbFileCategory.Images
                      }
                  });
             if (dfs.StreamWrapper != null)
             {
                 dfs.StreamWrapper.Memorystream.Position = 0;
                 fileByte = dfs.StreamWrapper.Memorystream.ToBytes();
-            }
+            }           
 
             return fileByte;
         }

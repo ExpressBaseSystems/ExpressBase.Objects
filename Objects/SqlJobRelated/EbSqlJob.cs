@@ -30,6 +30,12 @@ namespace ExpressBase.Objects
         string Reference { set; get; }
     }
 
+
+    public interface IJobFinishingControl
+    {
+
+    }
+
     [EnableInBuilder(BuilderType.SqlJob)]
     [BuilderTypeEnum(BuilderType.SqlJob)]
     public class EbSqlJob : EbSqlJobWrapper, IEBRootObject
@@ -56,11 +62,11 @@ namespace ExpressBase.Objects
         //[OnChangeExec(@"
         //    if(this.Filter_Dialogue == true)
         //    { 
-	       //     pg.ShowProperty('ParameterKeyColumnsTemp');
+        //     pg.ShowProperty('ParameterKeyColumnsTemp');
         //    }
         //    else
         //    {
-	       //     pg.HideProperty('ParameterKeyColumnsTemp');
+        //     pg.HideProperty('ParameterKeyColumnsTemp');
         //    }
         //    ")]
         public string Filter_Dialogue { get; set; }
@@ -130,9 +136,10 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.SqlJob)]
         [Alias("Parameter Key Column")]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "ParameterKeyColumnsColl")]
-       
+
         public List<Param> ParameterKeyColumnsTemp { get; set; }
 
+        public static EbOperations Operations = SqlJobOperations.Instance;
 
         public EbSqlJob()
         {
@@ -144,7 +151,7 @@ namespace ExpressBase.Objects
 
             FirstReaderKeyColumnsTemp = new ColumnColletion();
 
-           // FirstReaderKeyColumns = new List<string>();
+            // FirstReaderKeyColumns = new List<string>();
 
             FirstReaderKeyColumnsColl = new ColumnColletion();
         }
@@ -172,24 +179,25 @@ namespace ExpressBase.Objects
 
         public LoopLocation GetLoop()
         {
+            LoopLocation LoopLocation = null;
             for (int i = 0; i < Resources.Count; i++)
             {
                 if (Resources[i] is ISqlJobCollection)
                 {
                     if (Resources[i] is EbLoop)
-                        return new LoopLocation { Loop = Resources[i] as EbLoop, Step = i, ParentIndex = i };
+                        LoopLocation = new LoopLocation { Loop = Resources[i] as EbLoop, Step = i, ParentIndex = i };
                     else
                     {
                         for (int j = 0; j < (Resources[i] as ISqlJobCollection).InnerResources.Count; j++)
 
                         {
                             if ((Resources[i] as ISqlJobCollection).InnerResources[j] is EbLoop)
-                                return new LoopLocation { Loop = (Resources[i] as ISqlJobCollection).InnerResources[j] as EbLoop, Step = j, ParentIndex = i };
+                                LoopLocation = new LoopLocation { Loop = (Resources[i] as ISqlJobCollection).InnerResources[j] as EbLoop, Step = j, ParentIndex = i };
                         }
                     }
                 }
             }
-            return null;
+            return LoopLocation;
         }
 
         public override List<string> DiscoverRelatedRefids()
@@ -375,7 +383,7 @@ namespace ExpressBase.Objects
 
 
     [EnableInBuilder(BuilderType.SqlJob)]
-    public class EbSqlJobWriter : SqlJobResource, IRefSelect
+    public class EbSqlJobWriter : SqlJobResource, IRefSelect, IJobFinishingControl
     {
 
         [EnableInBuilder(BuilderType.SqlJob)]
@@ -427,7 +435,7 @@ namespace ExpressBase.Objects
     }
 
     [EnableInBuilder(BuilderType.SqlJob)]
-    public class EbSqlFormDataPusher : SqlJobResource
+    public class EbSqlFormDataPusher : SqlJobResource, IJobFinishingControl
     {
         [EnableInBuilder(BuilderType.SqlJob)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]

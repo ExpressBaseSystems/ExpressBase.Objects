@@ -8,6 +8,7 @@ using ExpressBase.Security;
 using ServiceStack;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Runtime.Serialization;
 using System.Text;
 
@@ -91,9 +92,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string RefId { get; set; }
 
         [DataMember(Order = 2)]
-        public List<Param> Params { get; set; }
+        public int RowId { get; set; }
 
         [DataMember(Order = 3)]
+        public List<Param> Params { get; set; }
+
+        [DataMember(Order = 4)]
         public string Trigger { get; set; }
     }
 
@@ -101,6 +105,32 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class GetImportDataResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
+        public string FormDataWrap { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    [DataContract]
+    public class GetDynamicGridDataRequest : EbServiceStackAuthRequest, IReturn<GetDynamicGridDataResponse>
+    {
+        [DataMember(Order = 1)]
+        public string RefId { get; set; }
+
+        [DataMember(Order = 2)]
+        public int RowId { get; set; }
+
+        [DataMember(Order = 3)]
+        public string SourceId { get; set; }
+
+        [DataMember(Order = 4)]
+        public string[] Target { get; set; }
+    }
+
+    [DataContract]
+    public class GetDynamicGridDataResponse : IEbSSResponse
+    {
+        [DataMember(Order = 3)]
         public string FormDataWrap { get; set; }
 
         [DataMember(Order = 2)]
@@ -271,6 +301,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 6)]
         public User UserObj { get; set; }
+
+        [DataMember(Order =7) ]
+        public DbConnection TransactionConnection { get; set; }
     }
 	
 	[DataContract]
