@@ -2,6 +2,7 @@
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
+using ExpressBase.Common.Structures;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -17,6 +18,9 @@ namespace ExpressBase.Objects
     [BuilderTypeEnum(BuilderType.MobilePage)]
     public class EbMobilePage : EbMobilePageBase, IEBRootObject
     {
+        //security model
+        public static EbOperations Operations = MobilePageOperations.Instance;
+
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
         public override string RefId { get; set; }
@@ -42,6 +46,12 @@ namespace ExpressBase.Objects
         public override List<string> DiscoverRelatedRefids() { return new List<string>(); }
 
         [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Behavior")]
         public bool HideFromMenu { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Behavior")]
+        [HelpText("FontAwesome unicode string eg: f2b9 ")]
+        public string Icon { set; get; }
     }
 }

@@ -348,6 +348,8 @@ namespace ExpressBase.Objects.WebFormRelated
                                     Trans[m_id].GridTables[_table.TableName].ColumnMeta.Add(i, _control.Label);
                             }
                         }
+                        if (__column.Control.DoNotPersist)
+                            continue;
                         int curid = Convert.ToInt32(ids[1]);
                         FormTransactionTable TblRef = Trans[m_id].GridTables[_table.TableName];
                         if (!TblRef.Rows.ContainsKey(curid))
