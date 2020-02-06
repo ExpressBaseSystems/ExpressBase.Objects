@@ -126,6 +126,7 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iMobilePage)]
         [PropertyGroup("Link Settings")]
+        [Alias("Link")]
         public string LinkRefId { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
@@ -135,6 +136,10 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
         public List<EbMobileDataColumn> Filters { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Link Settings")]
+        public WebFormDVModes FormMode { set; get; }
 
         public override string GetDesignHtml()
         {

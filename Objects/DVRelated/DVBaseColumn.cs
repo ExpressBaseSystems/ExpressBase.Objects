@@ -689,7 +689,22 @@ pg.HideProperty('FormMode');
         public ImageQuality ImageQuality { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
+        [OnChangeExec(@"
+if(this.AllowMultilineText){
+    pg.ShowProperty('NoOfLines');
+    pg.ShowProperty('NoOfCharactersPerLine');
+}
+else {
+    pg.HideProperty('NoOfCharactersPerLine');
+    pg.HideProperty('NoOfLines');
+}")]
         public bool AllowMultilineText { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public int NoOfLines { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public int NoOfCharactersPerLine { get; set; }
 
         public DVStringColumn()
         {
@@ -1318,4 +1333,5 @@ else
 
         }
     }
+
 }
