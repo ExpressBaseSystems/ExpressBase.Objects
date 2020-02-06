@@ -658,7 +658,7 @@ namespace ExpressBase.Objects
                     Table.Add(Row);
                     this.FormData.MultipleTables.Add(_table.TableName, Table);
                 }
-                else if (_table.TableType == WebFormTableTypes.Grid)
+                else if (_table.TableType == WebFormTableTypes.Grid || _table.TableType == WebFormTableTypes.Approval)
                 {
                     this.FormData.MultipleTables.Add(_table.TableName, new SingleTable());
                 }
@@ -684,6 +684,14 @@ namespace ExpressBase.Objects
                         Row.Columns.Add(_column.Control.GetSingleColumn(this.UserObj, this.SolutionObj, null));
                     }
                     this.FormData.DGsRowDataModel.Add(_table.TableName, Row);
+                }
+                else if (_table.TableType == WebFormTableTypes.Approval)
+                {
+                    this.FormData.ApprovalRowDataModel = new SingleRow();
+                    foreach (ColumnSchema _column in _table.Columns)
+                    {
+                        this.FormData.ApprovalRowDataModel.Columns.Add(_column.Control.GetSingleColumn(this.UserObj, this.SolutionObj, null));
+                    }
                 }
             }
         }
