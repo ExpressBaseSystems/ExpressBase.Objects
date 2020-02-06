@@ -240,7 +240,7 @@ namespace ExpressBase.Objects
                     else if(this.EbDateType === 6) //DateTime
                         return moment($('#' + this.EbSid_CtxId).val(), ebcontext.user.Preference.ShortDatePattern + ' ' + ebcontext.user.Preference.ShortTimePattern).format('YYYY-MM-DD HH:mm:ss');
                     else if(this.EbDateType === 17) //Time
-                        return moment($('#' + this.EbSid_CtxId).val(), ebcontext.user.Preference.ShortTimePattern).format('YYYY-MM-DD HH:mm:ss');";
+                        return moment($('#' + this.EbSid_CtxId).val(), ebcontext.user.Preference.ShortTimePattern).format('HH:mm:ss');";
             }
             set { }
         }
@@ -364,17 +364,22 @@ namespace ExpressBase.Objects
                 if (Value == null)
                     dt = DateTime.UtcNow;
                 else
-                    dt = Convert.ToDateTime(Value);
+                {
+                    if (Value.GetType() == typeof(TimeSpan))
+                        dt = DateTime.MinValue + (TimeSpan)Value;
+                    else
+                        dt = Convert.ToDateTime(Value);
+                }
                 DateTime dt_cov = dt.ConvertFromUtc(UserObj.Preference.TimeZone);
                 
                 if (_this.EbDateType == EbDateType.Date)
                 {
-                    if (!(_this is EbDate))
+                    if (!(_this is EbDate)) //EbSysCreatedAt EbSysModifiedAt EbDGDateColumn EbDGCreatedAtColumn EbDGModifiedAtColumn
                     {
                         _formattedData = dt_cov.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
                         _displayMember = dt_cov.ToString(UserObj.Preference.GetShortDatePattern(), CultureInfo.InvariantCulture);
                     }
-                    else //EbSysCreatedAt EbSysModifiedAt EbDGDateColumn EbDGCreatedAtColumn EbDGModifiedAtColumn
+                    else //EbDate
                     {
                         if (_this.ShowDateAs_ == DateShowFormat.Year_Month)
                         {
