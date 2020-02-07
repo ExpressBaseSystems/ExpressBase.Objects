@@ -329,7 +329,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string RefId { get; set; }
 
         [DataMember(Order = 2)]
-        public int RowId { get; set; }
+        public List<int> RowId { get; set; }
 
         [DataMember(Order = 3)]
         public User UserObj { get; set; }
