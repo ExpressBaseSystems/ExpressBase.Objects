@@ -46,6 +46,12 @@ namespace ExpressBase.Objects
         public override List<string> DiscoverRelatedRefids() { return new List<string>(); }
 
         [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Behavior")]
         public bool HideFromMenu { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Behavior")]
+        [HelpText("FontAwesome unicode string eg: f2b9 ")]
+        public string Icon { set; get; }
     }
 }

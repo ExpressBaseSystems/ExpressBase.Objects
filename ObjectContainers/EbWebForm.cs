@@ -590,7 +590,7 @@ namespace ExpressBase.Objects
                     if (!c.DoNotPersist)
                     {
                         EbApproval ebApproval = (c as EbApproval);
-                        if (FormData.MultipleTables.ContainsKey(ebApproval.TableName))
+                        if (FormData.MultipleTables.ContainsKey(ebApproval.TableName) && FormData.MultipleTables[ebApproval.TableName].Count > 0)
                         {
                             string lastStage = (ebApproval.FormStages[ebApproval.FormStages.Count - 1] as EbFormStage).Name;
                             string stage = Convert.ToString(FormData.MultipleTables[ebApproval.TableName][0][FormConstants.stage]);
@@ -598,6 +598,13 @@ namespace ExpressBase.Objects
                             if (lastStage.Equals(stage) && status == 1)
                             {
                                 this.AfterSaveRoutines.AddRange(ebApproval.OnApprovalRoutines);
+                            }
+                            string[] str_t = { "stage", "approver_role", "status", "remarks" };
+                            for (int i = 0; i < str_t.Length; i++)
+                            {
+                                EbControl con = ebApproval.Controls.Find(e => e.Name == str_t[i]);
+                                FormData.MultipleTables[ebApproval.TableName][0].SetEbDbType(con.Name, con.EbDbType);
+                                FormData.MultipleTables[ebApproval.TableName][0].SetControl(con.Name, con);
                             }
                         }
                     }
@@ -658,7 +665,7 @@ namespace ExpressBase.Objects
                     Table.Add(Row);
                     this.FormData.MultipleTables.Add(_table.TableName, Table);
                 }
-                else if (_table.TableType == WebFormTableTypes.Grid)
+                else if (_table.TableType == WebFormTableTypes.Grid || _table.TableType == WebFormTableTypes.Approval)
                 {
                     this.FormData.MultipleTables.Add(_table.TableName, new SingleTable());
                 }
@@ -684,6 +691,14 @@ namespace ExpressBase.Objects
                         Row.Columns.Add(_column.Control.GetSingleColumn(this.UserObj, this.SolutionObj, null));
                     }
                     this.FormData.DGsRowDataModel.Add(_table.TableName, Row);
+                }
+                else if (_table.TableType == WebFormTableTypes.Approval)
+                {
+                    this.FormData.ApprovalRowDataModel = new SingleRow();
+                    foreach (ColumnSchema _column in _table.Columns)
+                    {
+                        this.FormData.ApprovalRowDataModel.Columns.Add(_column.Control.GetSingleColumn(this.UserObj, this.SolutionObj, null));
+                    }
                 }
             }
         }

@@ -219,6 +219,9 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm)]
         [Unique]
+        [PropDataSourceJsFn("return ebcontext.Roles")]
+        [PropertyEditor(PropertyEditorType.DropDown)]
+        
         public KuSApproverRole ApproverRole { get; set; }
 
 
