@@ -711,6 +711,16 @@ else {
             this.ConditionalFormating = new List<ColumnCondition>();
         }
 
+        public DVStringColumn(EbDataColumn col)
+        {
+            this.Data = col.ColumnIndex;
+            this.Name = col.ColumnName;
+            this.sTitle = col.ColumnName;
+            this.Type = col.Type;
+            this.bVisible = true;
+            this.ClassName = "tdheight";
+        }
+
     }
 
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
@@ -815,6 +825,16 @@ pg.HideProperty('FormMode');
             this.ConditionalFormating = new List<ColumnCondition>();
         }
 
+        public DVNumericColumn(EbDataColumn col)
+        {
+            this.Data = col.ColumnIndex;
+            this.Name = col.ColumnName;
+            this.sTitle = col.ColumnName;
+            this.Type = col.Type;
+            this.bVisible = true;
+            this.ClassName = "tdheight";
+        }
+
     }
 
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
@@ -885,6 +905,15 @@ pg.HideProperty('FormMode');
             this.ConditionalFormating = new List<ColumnCondition>();
         }
 
+        public DVBooleanColumn(EbDataColumn col)
+        {
+            this.Data = col.ColumnIndex;
+            this.Name = col.ColumnName;
+            this.sTitle = col.ColumnName;
+            this.Type = col.Type;
+            this.bVisible = true;
+            this.ClassName = "tdheight";
+        }
 
     }
 
@@ -979,6 +1008,17 @@ pg.HideProperty('FormMode');
         {
             this.ConditionalFormating = new List<ColumnCondition>();
         }
+
+        public DVDateTimeColumn(EbDataColumn col)
+        {
+            this.Data = col.ColumnIndex;
+            this.Name = col.ColumnName;
+            this.sTitle = col.ColumnName;
+            this.Type = col.Type;
+            this.bVisible = true;
+            this.ClassName = "tdheight";
+        }
+
     }
 
     [EnableInBuilder(BuilderType.Calendar)]
