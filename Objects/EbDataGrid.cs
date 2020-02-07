@@ -1933,7 +1933,11 @@ else
         [HideInPropertyGrid]
         public override string InputControlType { get { return "EbUserSelect"; } }
 
-
+        //EbDGUserSelectColumn
+        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
+        {
+            return this.EbUserSelect.GetSingleColumn(UserObj, SoluObj, Value);
+        }
     }
 
 }
