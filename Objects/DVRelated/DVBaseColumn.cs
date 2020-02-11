@@ -1022,6 +1022,20 @@ pg.HideProperty('FormMode');
 
     }
 
+    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
+    public class DVButtonColumn : DVBaseColumn
+    {
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
+        public string ButtonText { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
+        public string ButtonClassName { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
+        public AdvancedCondition RenderCondition { get; set; }
+
+    }
+
     [EnableInBuilder(BuilderType.Calendar)]
     public class CalendarDynamicColumn: DVBaseColumn
     {
