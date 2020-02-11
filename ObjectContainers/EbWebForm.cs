@@ -719,7 +719,7 @@ namespace ExpressBase.Objects
                     new SingleColumn { Name = FormConstants.remarks, Type = (int)EbDbTypes.String, Value = dataRow[FormConstants.remarks].ToString()},
                     new SingleColumn { Name = FormConstants.eb_created_by_id, Type = (int)EbDbTypes.Decimal, Value = Convert.ToInt32(dataRow[FormConstants.eb_created_by])},
                     new SingleColumn { Name = FormConstants.eb_created_by_name, Type = (int)EbDbTypes.String, Value = this.SolutionObj.Users[Convert.ToInt32(dataRow[FormConstants.eb_created_by])]},
-                    new SingleColumn { Name = FormConstants.eb_created_at, Type = (int)EbDbTypes.String, Value = dt.ConvertFromUtc(this.UserObj.TimeZone).ToString("dd-MM-yyyy hh:mm tt")}
+                    new SingleColumn { Name = FormConstants.eb_created_at, Type = (int)EbDbTypes.String, Value = dt.ConvertFromUtc(this.UserObj.Preference.TimeZone).ToString("dd-MM-yyyy hh:mm tt")}
                 },
                     RowId = Convert.ToInt32(dataRow[FormConstants.id]),
                     LocId = Convert.ToInt32(dataRow[FormConstants.eb_loc_id])

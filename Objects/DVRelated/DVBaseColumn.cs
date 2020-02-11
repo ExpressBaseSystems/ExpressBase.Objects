@@ -231,7 +231,8 @@ namespace ExpressBase.Objects.Objects.DVRelated
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
         [Alias("Width")]
-        [HideForUser]
+        [HideInPropertyGrid]
+        [JsonIgnore]
         public string sWidth { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog)]
