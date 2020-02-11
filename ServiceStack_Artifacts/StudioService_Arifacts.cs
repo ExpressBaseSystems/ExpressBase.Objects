@@ -133,7 +133,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public Dictionary<string, List<EbObjectWrapper>> Data { get; set; }
 
          [DataMember(Order = 2)]
-        public List<string> Roles { get; set; }
+        public Dictionary<int, string> Roles { get; set; }
 
         [DataMember(Order = 3)]
         public string Token { get; set; }

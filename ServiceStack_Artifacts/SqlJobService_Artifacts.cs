@@ -136,7 +136,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public string Message { get; set; }
 
-        public int ObjType { get; set; }
+        public string Type { get; set; }
     }
 
     public class SqlJobResults : List<SqlJobResult>

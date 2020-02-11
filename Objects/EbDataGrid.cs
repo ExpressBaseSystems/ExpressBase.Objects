@@ -1936,6 +1936,7 @@ else
         //EbDGUserSelectColumn
         public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
         {
+            this.EbUserSelect.Name = this.Name;
             return this.EbUserSelect.GetSingleColumn(UserObj, SoluObj, Value);
         }
     }
