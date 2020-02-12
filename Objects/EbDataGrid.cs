@@ -339,7 +339,7 @@ namespace ExpressBase.Objects
         public override string JustSetValueJSfn
         {
             get { return JSFnsConstants.DG_hiddenColCheckCode + @"
-    $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val(p1)"; }
+    $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val(p1);"; }
 
             set { }
         }
@@ -347,7 +347,7 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         public override string SetValueJSfn
         {
-            get { return JustSetValueJSfn + ".trigger('change');"; }
+            get { return JustSetValueJSfn + " $('#' + this.EbSid_CtxId).trigger('change');"; }
 
             set { }
         }
