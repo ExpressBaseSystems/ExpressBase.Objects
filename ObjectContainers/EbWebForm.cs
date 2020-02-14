@@ -237,8 +237,8 @@ namespace ExpressBase.Objects
                     foreach (EbDataRow _row in response.DataSet.Tables[0].Rows)
                     {
                         SingleRow Row = new SingleRow();
-                        if (_dg.IsLoadDataSourceInEditMode && RowId > 0 && _row["id"] != null)
-                            Row.RowId = Convert.ToInt32(_row["id"]);// assuming id is RowId /////
+                        if (_dg.IsLoadDataSourceInEditMode && RowId > 0 && _row[FormConstants.id] != null)
+                            Row.RowId = Convert.ToInt32(_row[FormConstants.id]);// assuming id is RowId /////
                         else
                             Row.RowId = rowCounter--;
                         foreach (ColumnSchema _column in _sc.Columns)
@@ -257,7 +257,7 @@ namespace ExpressBase.Objects
                                         }
                                         else
                                         {
-                                            psDict[_column.Control as EbDGPowerSelectColumn] += "," + _formattedData;
+                                            psDict[_column.Control as EbDGPowerSelectColumn] += CharConstants.COMMA + _formattedData;
                                         }
                                     }
                                 }
@@ -280,7 +280,7 @@ namespace ExpressBase.Objects
                     }
                     if (QrsDict.Count > 0)
                     {
-                        EbDataSet dataset = DataDB.DoQueries(string.Join(" ", QrsDict.Select(d => d.Value)));
+                        EbDataSet dataset = DataDB.DoQueries(string.Join(CharConstants.SPACE, QrsDict.Select(d => d.Value)));
                         int i = 0;
                         foreach (KeyValuePair<string, string> item in QrsDict)
                         {
@@ -417,8 +417,8 @@ namespace ExpressBase.Objects
 
             EbDataSet dataset = DataDB.DoQueries(query + psQry, new DbParameter[]
             {
-                DataDB.GetNewParameter(this.FormSchema.MasterTable + "_id", EbDbTypes.Int32, this.TableRowId),
-                DataDB.GetNewParameter(ptbl + "_id", EbDbTypes.Int32, pid)
+                DataDB.GetNewParameter(this.FormSchema.MasterTable + FormConstants._id, EbDbTypes.Int32, this.TableRowId),
+                DataDB.GetNewParameter(ptbl + FormConstants._id, EbDbTypes.Int32, pid)
             });
 
             this.FormData = new WebformData() { MasterTable = this.FormSchema.MasterTable };
@@ -573,16 +573,16 @@ namespace ExpressBase.Objects
                     int count = FormData.MultipleTables[(c as EbDataGrid).TableName].Count;
                     for (int i = 0, j = count; i < count; i++, j--)
                     {
-                        if (FormData.MultipleTables[(c as EbDataGrid).TableName][i].GetColumn("eb_row_num") == null)
+                        if (FormData.MultipleTables[(c as EbDataGrid).TableName][i].GetColumn(FormConstants.eb_row_num) == null)
                             FormData.MultipleTables[(c as EbDataGrid).TableName][i].Columns.Add(new SingleColumn {
-                                Name = "eb_row_num",
+                                Name = FormConstants.eb_row_num,
                                 Type = (int)EbDbTypes.Decimal,
                                 Value = 0
                             });
                         if ((c as EbDataGrid).AscendingOrder)
-                            FormData.MultipleTables[(c as EbDataGrid).TableName][i]["eb_row_num"] = i + 1;
+                            FormData.MultipleTables[(c as EbDataGrid).TableName][i][FormConstants.eb_row_num] = i + 1;
                         else
-                            FormData.MultipleTables[(c as EbDataGrid).TableName][i]["eb_row_num"] = j;
+                            FormData.MultipleTables[(c as EbDataGrid).TableName][i][FormConstants.eb_row_num] = j;
                     }                  
                 }
                 else if (c is EbApproval)
@@ -590,14 +590,21 @@ namespace ExpressBase.Objects
                     if (!c.DoNotPersist)
                     {
                         EbApproval ebApproval = (c as EbApproval);
-                        if (FormData.MultipleTables.ContainsKey(ebApproval.TableName))
+                        if (FormData.MultipleTables.ContainsKey(ebApproval.TableName) && FormData.MultipleTables[ebApproval.TableName].Count > 0)
                         {
                             string lastStage = (ebApproval.FormStages[ebApproval.FormStages.Count - 1] as EbFormStage).Name;
-                            string stage = Convert.ToString(FormData.MultipleTables[ebApproval.TableName][0]["stage"]);
-                            int status = Convert.ToInt32(FormData.MultipleTables[ebApproval.TableName][0]["status"]);
+                            string stage = Convert.ToString(FormData.MultipleTables[ebApproval.TableName][0][FormConstants.stage]);
+                            int status = Convert.ToInt32(FormData.MultipleTables[ebApproval.TableName][0][FormConstants.status]);
                             if (lastStage.Equals(stage) && status == 1)
                             {
                                 this.AfterSaveRoutines.AddRange(ebApproval.OnApprovalRoutines);
+                            }
+                            string[] str_t = { "stage", "approver_role", "status", "remarks" };
+                            for (int i = 0; i < str_t.Length; i++)
+                            {
+                                EbControl con = ebApproval.Controls.Find(e => e.Name == str_t[i]);
+                                FormData.MultipleTables[ebApproval.TableName][0].SetEbDbType(con.Name, con.EbDbType);
+                                FormData.MultipleTables[ebApproval.TableName][0].SetControl(con.Name, con);
                             }
                         }
                     }
@@ -658,7 +665,7 @@ namespace ExpressBase.Objects
                     Table.Add(Row);
                     this.FormData.MultipleTables.Add(_table.TableName, Table);
                 }
-                else if (_table.TableType == WebFormTableTypes.Grid)
+                else if (_table.TableType == WebFormTableTypes.Grid || _table.TableType == WebFormTableTypes.Approval)
                 {
                     this.FormData.MultipleTables.Add(_table.TableName, new SingleTable());
                 }
@@ -675,7 +682,7 @@ namespace ExpressBase.Objects
                     SingleRow Row = new SingleRow();
                     Row.Columns.Add(new SingleColumn()
                     {
-                        Name = "eb_row_num",
+                        Name = FormConstants.eb_row_num,
                         Type = (int)EbDbTypes.Decimal,
                         Value = 0
                     });
@@ -685,6 +692,14 @@ namespace ExpressBase.Objects
                     }
                     this.FormData.DGsRowDataModel.Add(_table.TableName, Row);
                 }
+                else if (_table.TableType == WebFormTableTypes.Approval)
+                {
+                    this.FormData.ApprovalRowDataModel = new SingleRow();
+                    foreach (ColumnSchema _column in _table.Columns)
+                    {
+                        this.FormData.ApprovalRowDataModel.Columns.Add(_column.Control.GetSingleColumn(this.UserObj, this.SolutionObj, null));
+                    }
+                }
             }
         }
 
@@ -692,22 +707,22 @@ namespace ExpressBase.Objects
         {
             foreach (EbDataRow dataRow in dataTable.Rows)
             {
-                DateTime dt = Convert.ToDateTime(dataRow["eb_created_at"]);
+                DateTime dt = Convert.ToDateTime(dataRow[FormConstants.eb_created_at]);
                 Table.Add(new SingleRow
                 {
                     Columns = new List<SingleColumn>
                 {
-                    new SingleColumn { Name = "id", Type = (int)EbDbTypes.Decimal, Value = Convert.ToInt32(dataRow["id"])},
-                    new SingleColumn { Name = "stage", Type = (int)EbDbTypes.String, Value = dataRow["stage"].ToString()},
-                    new SingleColumn { Name = "approver_role", Type = (int)EbDbTypes.String, Value = dataRow["approver_role"].ToString()},
-                    new SingleColumn { Name = "status", Type = (int)EbDbTypes.Decimal, Value = Convert.ToInt32(dataRow["status"])},
-                    new SingleColumn { Name = "remarks", Type = (int)EbDbTypes.String, Value = dataRow["remarks"].ToString()},
-                    new SingleColumn { Name = "eb_created_by_id", Type = (int)EbDbTypes.Decimal, Value = Convert.ToInt32(dataRow["eb_created_by"])},
-                    new SingleColumn { Name = "eb_created_by_name", Type = (int)EbDbTypes.String, Value = this.SolutionObj.Users[Convert.ToInt32(dataRow["eb_created_by"])]},
-                    new SingleColumn { Name = "eb_created_at", Type = (int)EbDbTypes.String, Value = dt.ConvertFromUtc(this.UserObj.TimeZone).ToString("dd-MM-yyyy hh:mm tt")}
+                    new SingleColumn { Name = FormConstants.id, Type = (int)EbDbTypes.Decimal, Value = Convert.ToInt32(dataRow[FormConstants.id])},
+                    new SingleColumn { Name = FormConstants.stage, Type = (int)EbDbTypes.String, Value = dataRow[FormConstants.stage].ToString()},
+                    new SingleColumn { Name = FormConstants.approver_role, Type = (int)EbDbTypes.String, Value = dataRow[FormConstants.approver_role].ToString()},
+                    new SingleColumn { Name = FormConstants.status, Type = (int)EbDbTypes.Decimal, Value = Convert.ToInt32(dataRow[FormConstants.status])},
+                    new SingleColumn { Name = FormConstants.remarks, Type = (int)EbDbTypes.String, Value = dataRow[FormConstants.remarks].ToString()},
+                    new SingleColumn { Name = FormConstants.eb_created_by_id, Type = (int)EbDbTypes.Decimal, Value = Convert.ToInt32(dataRow[FormConstants.eb_created_by])},
+                    new SingleColumn { Name = FormConstants.eb_created_by_name, Type = (int)EbDbTypes.String, Value = this.SolutionObj.Users[Convert.ToInt32(dataRow[FormConstants.eb_created_by])]},
+                    new SingleColumn { Name = FormConstants.eb_created_at, Type = (int)EbDbTypes.String, Value = dt.ConvertFromUtc(this.UserObj.Preference.TimeZone).ToString("dd-MM-yyyy hh:mm tt")}
                 },
-                    RowId = Convert.ToInt32(dataRow["id"]),
-                    LocId = Convert.ToInt32(dataRow["eb_loc_id"])
+                    RowId = Convert.ToInt32(dataRow[FormConstants.id]),
+                    LocId = Convert.ToInt32(dataRow[FormConstants.eb_loc_id])
                 });
             }
         }
@@ -750,9 +765,9 @@ namespace ExpressBase.Objects
                 SingleRow Row = new SingleRow() { RowId = _rowId, LocId = _locId };
                 if (_table != null)
                 {
-                    this.GetFormattedColumn(dataTable.Columns["id"], dataRow, Row, null);
+                    this.GetFormattedColumn(dataTable.Columns[FormConstants.id], dataRow, Row, null);
                     if (_table.TableType == WebFormTableTypes.Grid)
-                        this.GetFormattedColumn(dataTable.Columns["eb_row_num"], dataRow, Row, null);
+                        this.GetFormattedColumn(dataTable.Columns[FormConstants.eb_row_num], dataRow, Row, null);
                     for (int k = 0; k < _table.Columns.Count; k++)
                     {
                         EbControl _control = _table.Columns[k].Control;
@@ -1033,8 +1048,8 @@ namespace ExpressBase.Objects
 
             DbParameter[] param = new DbParameter[]
             {
-                DataDB.GetNewParameter(this.FormSchema.MasterTable + "_id", EbDbTypes.Int32, this.TableRowId),
-                DataDB.GetNewParameter(this.FormSchema.MasterTable + "_eb_ver_id", EbDbTypes.Int32, this.RefId.Split("-")[4])
+                DataDB.GetNewParameter(this.FormSchema.MasterTable + FormConstants._id, EbDbTypes.Int32, this.TableRowId),
+                DataDB.GetNewParameter(this.FormSchema.MasterTable + FormConstants._eb_ver_id, EbDbTypes.Int32, this.RefId.Split(CharConstants.DASH)[4])
             };
             EbDataSet dataset = null;
             if (this.DbConnection == null)
@@ -1121,7 +1136,7 @@ namespace ExpressBase.Objects
                             tableIndex--; //one query is used to select required user records
                         if (UserTable.Count > mngUsrCount)
                         {
-                            _d.Add("id", UserTable[mngUsrCount]["id"]);
+                            _d.Add(FormConstants.id, UserTable[mngUsrCount][FormConstants.id]);
                             foreach (UsrLocField _f in (Ctrl as EbProvisionUser).PersistingFields)
                             {
                                 _d.Add(_f.Name, UserTable[mngUsrCount][_f.Name]);
@@ -1140,11 +1155,11 @@ namespace ExpressBase.Objects
                         Dictionary<string, dynamic> _d = new Dictionary<string, dynamic>();
                         if (Table.Count == 1)
                         {
-                            _d.Add("id", Table[0]["id"]);
-                            _d.Add("longname", Table[0]["longname"]);
-                            _d.Add("shortname", Table[0]["shortname"]);
-                            _d.Add("image", Table[0]["image"]);
-                            _d.Add("meta_json", Table[0]["meta_json"]);
+                            _d.Add(FormConstants.id, Table[0][FormConstants.id]);
+                            _d.Add(FormConstants.longname, Table[0][FormConstants.longname]);
+                            _d.Add(FormConstants.shortname, Table[0][FormConstants.shortname]);
+                            _d.Add(FormConstants.image, Table[0][FormConstants.image]);
+                            _d.Add(FormConstants.meta_json, Table[0][FormConstants.meta_json]);
                         }
                         _FormData.MultipleTables[(Ctrl as EbProvisionLocation).VirtualTable][0].Columns.Add(new SingleColumn()
                         {
@@ -1164,16 +1179,16 @@ namespace ExpressBase.Objects
                 {
                     if (this.FormGlobals == null)
                         this.FormGlobals = GlobalsGenerator.GetFormAsFlatGlobal(this, _FormData);
-                    string context = this.RefId.Split("-")[3] + "_" + this.TableRowId.ToString();//context format = objectId_rowId_ControlId
+                    string context = this.RefId.Split(CharConstants.DASH)[3] + CharConstants.UNDERSCORE + this.TableRowId.ToString();//context format = objectId_rowId_ControlId
                     string cxt2 = (Ctrl as EbFileUploader).ExeContextCode(this.FormGlobals, false);
                     string qry = (Ctrl as EbFileUploader).GetSelectQuery(DataDB, string.IsNullOrEmpty(cxt2));
 
                     DbParameter[] param = new DbParameter[]
                     {
-                        DataDB.GetNewParameter("id", EbDbTypes.Int32, this.TableRowId),
-                        DataDB.GetNewParameter("context", EbDbTypes.String, context),
-                        DataDB.GetNewParameter("context_sec", EbDbTypes.String, cxt2 ?? string.Empty),
-                        DataDB.GetNewParameter("eb_ver_id", EbDbTypes.Int32, this.RefId.Split("-")[4])
+                        DataDB.GetNewParameter(FormConstants.id, EbDbTypes.Int32, this.TableRowId),
+                        DataDB.GetNewParameter(FormConstants.context, EbDbTypes.String, context),
+                        DataDB.GetNewParameter(FormConstants.context_sec, EbDbTypes.String, cxt2 ?? string.Empty),
+                        DataDB.GetNewParameter(FormConstants.eb_ver_id, EbDbTypes.Int32, this.RefId.Split(CharConstants.DASH)[4])
                     };
 
                     EbDataTable dt;
@@ -1190,11 +1205,11 @@ namespace ExpressBase.Objects
                     {
                         FileMetaInfo info = new FileMetaInfo
                         {
-                            FileRefId = Convert.ToInt32(dr["id"]),
-                            FileName = dr["filename"],
-                            Meta = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(dr["tags"] as string),
-                            UploadTime = dr["uploadts"],
-                            FileCategory = (EbFileCategory)Convert.ToInt32(dr["filecategory"])
+                            FileRefId = Convert.ToInt32(dr[FormConstants.id]),
+                            FileName = dr[FormConstants.filename],
+                            Meta = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(dr[FormConstants.tags] as string),
+                            UploadTime = dr[FormConstants.uploadts],
+                            FileCategory = (EbFileCategory)Convert.ToInt32(dr[FormConstants.filecategory])
                         };
 
                         if (!_list.Contains(info))
@@ -1203,7 +1218,7 @@ namespace ExpressBase.Objects
                     SingleTable _Table = new SingleTable {
                             new SingleRow() {
                                 Columns = new List<SingleColumn> {
-                                    new SingleColumn { Name = "Files", Type = (int)EbDbTypes.Json, Value = JsonConvert.SerializeObject(_list) }
+                                    new SingleColumn { Name = FormConstants.Files, Type = (int)EbDbTypes.Json, Value = JsonConvert.SerializeObject(_list) }
                                 }
                             }
                         };
@@ -1215,7 +1230,7 @@ namespace ExpressBase.Objects
             if (!psquery.IsNullOrEmpty() && !backup)
             {
                 List<DbParameter> param = new List<DbParameter>();
-                param.Add(DataDB.GetNewParameter(_FormData.MasterTable + "_id", EbDbTypes.Int32, this.TableRowId));
+                param.Add(DataDB.GetNewParameter(_FormData.MasterTable + FormConstants._id, EbDbTypes.Int32, this.TableRowId));
                 this.LocationId = _FormData.MultipleTables[_FormData.MasterTable][0].LocId;
 
                 for (int i = 0; i < _schema.Tables.Count && dataset.Tables.Count >= _schema.Tables.Count; i++)
@@ -1241,9 +1256,9 @@ namespace ExpressBase.Objects
                     }
                 }
                 //if eb_loc_id control is not present then form data entered location adding as 'eb_loc_id' 
-                DbParameter tt = param.Find(e => e.ParameterName == "eb_loc_id");
+                DbParameter tt = param.Find(e => e.ParameterName == FormConstants.eb_loc_id);
                 if (tt == null)
-                    param.Add(DataDB.GetNewParameter("eb_loc_id", EbDbTypes.Decimal, this.LocationId));
+                    param.Add(DataDB.GetNewParameter(FormConstants.eb_loc_id, EbDbTypes.Decimal, this.LocationId));
 
                 EbDataSet ds;
                 if (this.DbConnection == null)
@@ -1347,7 +1362,7 @@ namespace ExpressBase.Objects
 
             if (QrsDict.Count > 0)
             {
-                EbDataSet dataset = DataDB.DoQueries(string.Join(" ", QrsDict.Select(d => d.Value)), param.ToArray());
+                EbDataSet dataset = DataDB.DoQueries(string.Join(CharConstants.SPACE, QrsDict.Select(d => d.Value)), param.ToArray());
                 int i = 0;
                 foreach (KeyValuePair<string, string> item in QrsDict)
                 {
@@ -1443,14 +1458,14 @@ namespace ExpressBase.Objects
 
                     }
                 }
-                param.Add(DataDB.GetNewParameter(WebForm.TableName + "_eb_ver_id", EbDbTypes.Int32, WebForm.RefId.Split("-")[4]));
+                param.Add(DataDB.GetNewParameter(WebForm.TableName + FormConstants._eb_ver_id, EbDbTypes.Int32, WebForm.RefId.Split(CharConstants.DASH)[4]));
             }
 
             fullqry += _extqry;
             fullqry += this.GetFileUploaderUpdateQuery(DataDB, param, ref i);
 
-            param.Add(DataDB.GetNewParameter("eb_createdby", EbDbTypes.Int32, this.UserObj.UserId));
-            param.Add(DataDB.GetNewParameter("eb_loc_id", EbDbTypes.Int32, this.LocationId));
+            param.Add(DataDB.GetNewParameter(FormConstants.eb_createdby, EbDbTypes.Int32, this.UserObj.UserId));
+            param.Add(DataDB.GetNewParameter(FormConstants.eb_loc_id, EbDbTypes.Int32, this.LocationId));
             fullqry += string.Format("SELECT eb_currval('{0}_id_seq');", this.TableName);
 
             EbDataSet tem = DataDB.DoQueries(this.DbConnection, fullqry, param.ToArray());
@@ -1590,15 +1605,15 @@ namespace ExpressBase.Objects
 
                     }
                 }
-                param.Add(DataDB.GetNewParameter(WebForm.TableName + "_id", EbDbTypes.Int32, WebForm.TableRowId));
-                param.Add(DataDB.GetNewParameter(WebForm.TableName + "_eb_ver_id", EbDbTypes.Int32, WebForm.RefId.Split("-")[4]));
+                param.Add(DataDB.GetNewParameter(WebForm.TableName + FormConstants._id, EbDbTypes.Int32, WebForm.TableRowId));
+                param.Add(DataDB.GetNewParameter(WebForm.TableName + FormConstants._eb_ver_id, EbDbTypes.Int32, WebForm.RefId.Split(CharConstants.DASH)[4]));
             }
 
             fullqry += _extqry;
             fullqry += GetFileUploaderUpdateQuery(DataDB, param, ref i);
-            param.Add(DataDB.GetNewParameter("eb_loc_id", EbDbTypes.Int32, this.LocationId));
-            param.Add(DataDB.GetNewParameter("eb_createdby", EbDbTypes.Int32, this.UserObj.UserId));
-            param.Add(DataDB.GetNewParameter("eb_modified_by", EbDbTypes.Int32, this.UserObj.UserId));
+            param.Add(DataDB.GetNewParameter(FormConstants.eb_loc_id, EbDbTypes.Int32, this.LocationId));
+            param.Add(DataDB.GetNewParameter(FormConstants.eb_createdby, EbDbTypes.Int32, this.UserObj.UserId));
+            param.Add(DataDB.GetNewParameter(FormConstants.eb_modified_by, EbDbTypes.Int32, this.UserObj.UserId));
             return DataDB.DoNonQuery(this.DbConnection, fullqry, param.ToArray());
         }
 
@@ -1957,7 +1972,7 @@ namespace ExpressBase.Objects
             {
                 string q = string.Join(";", this.DisableDelete.Select(e => e.Script.Code));
                 DbParameter[] p = new DbParameter[] {
-                    DataDB.GetNewParameter("id", EbDbTypes.Int32, this.TableRowId)
+                    DataDB.GetNewParameter(FormConstants.id, EbDbTypes.Int32, this.TableRowId)
                 };
                 EbDataSet ds = DataDB.DoQueries(q, p);
 
@@ -1979,8 +1994,8 @@ namespace ExpressBase.Objects
             {
                 string query = QueryGetter.GetDeleteQuery(this, DataDB);
                 DbParameter[] param = new DbParameter[] {
-                    DataDB.GetNewParameter("eb_lastmodified_by", EbDbTypes.Int32, this.UserObj.UserId),
-                    DataDB.GetNewParameter("id", EbDbTypes.Int32, this.TableRowId)
+                    DataDB.GetNewParameter(FormConstants.eb_lastmodified_by, EbDbTypes.Int32, this.UserObj.UserId),
+                    DataDB.GetNewParameter(FormConstants.id, EbDbTypes.Int32, this.TableRowId)
                 };
                 return DataDB.DoNonQuery(query, param);
             }
@@ -1994,7 +2009,7 @@ namespace ExpressBase.Objects
             {
                 string q = string.Join(";", this.DisableCancel.Select(e => e.Script.Code));
                 DbParameter[] p = new DbParameter[] {
-                    DataDB.GetNewParameter("id", EbDbTypes.Int32, this.TableRowId)
+                    DataDB.GetNewParameter(FormConstants.id, EbDbTypes.Int32, this.TableRowId)
                 };
                 EbDataSet ds = DataDB.DoQueries(q, p);
 
@@ -2016,8 +2031,8 @@ namespace ExpressBase.Objects
             {
                 string query = QueryGetter.GetCancelQuery(this, DataDB);
                 DbParameter[] param = new DbParameter[] {
-                    DataDB.GetNewParameter("eb_lastmodified_by", EbDbTypes.Int32, this.UserObj.UserId),
-                    DataDB.GetNewParameter("id", EbDbTypes.Int32, this.TableRowId)
+                    DataDB.GetNewParameter(FormConstants.eb_lastmodified_by, EbDbTypes.Int32, this.UserObj.UserId),
+                    DataDB.GetNewParameter(FormConstants.id, EbDbTypes.Int32, this.TableRowId)
                 };
                 return DataDB.DoNonQuery(query, param);
             }

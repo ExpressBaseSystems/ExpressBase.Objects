@@ -14,6 +14,14 @@ using System.Threading.Tasks;
 
 namespace ExpressBase.Objects
 {
+
+    public enum NumInpMode
+    {
+        Numeric = 0,
+        Currency = 1,
+        Phone = 2,
+    }
+
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
     public class EbNumeric : EbControlUI
     {
@@ -95,6 +103,19 @@ namespace ExpressBase.Objects
         [OnChangeUIFunction("Common.CONTROL_ICON")]
         public bool ShowIcon { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup("Core")]
+        [DefaultPropValue("'SingleLine'")]
+        [OnChangeExec(@"
+if (this.TextMode === 4 ){
+    pg.ShowProperty('RowsVisible');
+}
+else {
+    pg.HideProperty('RowsVisible');
+}
+            ")]
+        public NumInpMode InputMode { get; set; }
+
         //private string MaxLengthString
         //{
         //    get { return ((this.MaxLength > 0) ? "$('#{0}').focus(function() {$(this).select();});".Replace("{0}", this.Name).Replace("{1}", this.Value.ToString()) : string.Empty); }
@@ -140,10 +161,10 @@ namespace ExpressBase.Objects
 
 		public override string GetBareHtml()
         {
-            return @" 
+            string html = @" 
                 <div class='input-group' style='width:100%;'>
                     <span style='font-size: @fontSize@' class='input-group-addon'><span style='font-size: 11px;font-weight: bold;margin: 0 6px;'>01</span></span>
-                    <input type='text' data-ebtype='@datetype@' class='numinput' ui-inp id='@ebsid@' name='@name@' value='@value@' @placeHolder autocomplete = '@autoComplete@' data-toggle='tooltip' title='@toolTipText@' style=' width:100%; @backColor@ @foreColor@ @fontStyle@ display:inline-block; @readOnlyString@ @required@ @tabIndex@ />
+                    <input type='text' data-ebtype='@datetype@' class='numinput' ui-inp id='@ebsid@' name='@name@' @max@ @min@ value='@value@' @placeHolder autocomplete = '@autoComplete@' data-toggle='tooltip' title='@toolTipText@' style=' width:100%; @backColor@ @foreColor@ @fontStyle@ display:inline-block; @readOnlyString@ @required@ @tabIndex@ />
                 </div>"
 .Replace("@name@", this.Name)
 .Replace("@ebsid@", this.IsRenderMode && this.IsDynamicTabChild ? "@" + this.EbSid_CtxId + "_ebsid@" : (String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId))
@@ -155,13 +176,35 @@ namespace ExpressBase.Objects
     .Replace("@ForeColor@ ", "color:" + ((this.ForeColor != null) ? this.ForeColor : "@ForeColor@ ") + ";")
 .Replace("@required@", " required")//(this.Required && !this.Hidden ? " required" : string.Empty))
 .Replace("@readOnlyString@", this.ReadOnlyString)
+.Replace("@max@", this.MaxLimit != 0 ? "max='" + this.MaxLimit + "'" : string.Empty)
+.Replace("@min@", this.MinLimit != 0 ? "min='" + this.MinLimit + "'" : string.Empty)
 .Replace("@placeHolder@", "placeholder='" + this.PlaceHolder + "'")
-.Replace("@datetype@", "11")
+.Replace("@datetype@", "11");
 //.Replace("@fontStyle@", (this.FontSerialized != null) ?
 //                            (" font-family:" + this.FontSerialized.FontFamily + ";" + "font-style:" + this.FontSerialized.Style
 //                            + ";" + "font-size:" + this.FontSerialized.SizeInPoints + "px;")
 //                        : string.Empty)
-;
+            html = AddIcon2Html(html);
+            return html;
+        }
+
+        private string AddIcon2Html(string html)
+        {
+            if (this.InputMode != NumInpMode.Numeric)
+            {
+                string attachedLableHtml = @"<div  class='input-group' style='width: 100%;'>
+                                    <span class='input-group-addon' onclick='$(\'#@ebsid@\').click()'><i class='fa fa-$class aria-hidden='true'
+                                             class='input-group-addon'></i></span>";
+                if (this.InputMode == NumInpMode.Currency)
+                    attachedLableHtml = attachedLableHtml.Replace("$class", "envelope");
+                else if (this.InputMode == NumInpMode.Phone)
+                    attachedLableHtml = attachedLableHtml.Replace("$class", "phone");
+
+                html = html.Replace("@attachedLbl@", attachedLableHtml);
+            }
+            else
+                html = html.Replace("@attachedLbl@", string.Empty);
+            return html;
         }
 
         private string GetHtmlHelper(RenderMode mode)

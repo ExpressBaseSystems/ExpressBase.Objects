@@ -132,10 +132,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 1)]
         public Dictionary<string, List<EbObjectWrapper>> Data { get; set; }
 
-        [DataMember(Order = 2)]
-        public string Token { get; set; }
+         [DataMember(Order = 2)]
+        public Dictionary<int, string> Roles { get; set; }
 
         [DataMember(Order = 3)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 4)]
         public ResponseStatus ResponseStatus { get; set; }
     }
      public class GetAllLiveObjectsRqst : EbServiceStackAuthRequest, IReturn<GetAllLiveObjectsResp>

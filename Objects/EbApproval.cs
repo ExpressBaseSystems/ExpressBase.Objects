@@ -3,10 +3,14 @@ using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
-using ExpressBase.Objects.Helpers;
+using ExpressBase.Security;
+using ExpressBase.Objects.ServiceStack_Artifacts;
 using Newtonsoft.Json;
+using ServiceStack;
+using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using System.Linq;
 
 namespace ExpressBase.Objects
 {
@@ -43,6 +47,8 @@ namespace ExpressBase.Objects
                 new EbDGStringColumn() { Name = "approver_role", EbDbType = EbDbTypes.String, Label = "Approver Role"}
             };
         }
+
+
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [HideInPropertyGrid]
@@ -183,6 +189,24 @@ namespace ExpressBase.Objects
             return html;
         }
 
+        public void InitRoles(JsonServiceClient serviceClient, User user)
+        {
+            var result = serviceClient.Get<GetAllRolesResponse>(new GetAllRolesRequest());
+            this.Roles = new Dictionary<int, string>();
+            foreach (string r in user.Roles)
+            {                
+                var s = result.Roles.FirstOrDefault(kvp => kvp.Value == r);
+                if (s.Value != null)
+                {
+                    this.Roles.Add(s.Key, s.Value);
+                }
+            }
+        }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public Dictionary<int, string> Roles { get; set; }
+
         public override string GetDesignHtml()
         {
             return GetHtml().RemoveCR().DoubleQuoted();
@@ -219,7 +243,10 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm)]
         [Unique]
-        public KuSApproverRole ApproverRole { get; set; }
+        [PropDataSourceJsFn("return ebcontext.Roles")]
+        [PropertyEditor(PropertyEditorType.DropDown)]
+        
+        public int ApproverRole { get; set; }
 
 
     }

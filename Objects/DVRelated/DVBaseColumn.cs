@@ -231,7 +231,8 @@ namespace ExpressBase.Objects.Objects.DVRelated
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
         [Alias("Width")]
-        [HideForUser]
+        [HideInPropertyGrid]
+        [JsonIgnore]
         public string sWidth { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog)]
@@ -689,11 +690,36 @@ pg.HideProperty('FormMode');
         public ImageQuality ImageQuality { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
+        [OnChangeExec(@"
+if(this.AllowMultilineText){
+    pg.ShowProperty('NoOfLines');
+    pg.ShowProperty('NoOfCharactersPerLine');
+}
+else {
+    pg.HideProperty('NoOfCharactersPerLine');
+    pg.HideProperty('NoOfLines');
+}")]
         public bool AllowMultilineText { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public int NoOfLines { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        public int NoOfCharactersPerLine { get; set; }
 
         public DVStringColumn()
         {
             this.ConditionalFormating = new List<ColumnCondition>();
+        }
+
+        public DVStringColumn(EbDataColumn col)
+        {
+            this.Data = col.ColumnIndex;
+            this.Name = col.ColumnName;
+            this.sTitle = col.ColumnName;
+            this.Type = col.Type;
+            this.bVisible = true;
+            this.ClassName = "tdheight";
         }
 
     }
@@ -800,6 +826,16 @@ pg.HideProperty('FormMode');
             this.ConditionalFormating = new List<ColumnCondition>();
         }
 
+        public DVNumericColumn(EbDataColumn col)
+        {
+            this.Data = col.ColumnIndex;
+            this.Name = col.ColumnName;
+            this.sTitle = col.ColumnName;
+            this.Type = col.Type;
+            this.bVisible = true;
+            this.ClassName = "tdheight";
+        }
+
     }
 
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
@@ -870,6 +906,15 @@ pg.HideProperty('FormMode');
             this.ConditionalFormating = new List<ColumnCondition>();
         }
 
+        public DVBooleanColumn(EbDataColumn col)
+        {
+            this.Data = col.ColumnIndex;
+            this.Name = col.ColumnName;
+            this.sTitle = col.ColumnName;
+            this.Type = col.Type;
+            this.bVisible = true;
+            this.ClassName = "tdheight";
+        }
 
     }
 
@@ -964,6 +1009,31 @@ pg.HideProperty('FormMode');
         {
             this.ConditionalFormating = new List<ColumnCondition>();
         }
+
+        public DVDateTimeColumn(EbDataColumn col)
+        {
+            this.Data = col.ColumnIndex;
+            this.Name = col.ColumnName;
+            this.sTitle = col.ColumnName;
+            this.Type = col.Type;
+            this.bVisible = true;
+            this.ClassName = "tdheight";
+        }
+
+    }
+
+    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
+    public class DVButtonColumn : DVBaseColumn
+    {
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
+        public string ButtonText { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
+        public string ButtonClassName { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
+        public AdvancedCondition RenderCondition { get; set; }
+
     }
 
     [EnableInBuilder(BuilderType.Calendar)]
@@ -1318,4 +1388,5 @@ else
 
         }
     }
+
 }

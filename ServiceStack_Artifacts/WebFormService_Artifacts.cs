@@ -329,7 +329,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string RefId { get; set; }
 
         [DataMember(Order = 2)]
-        public int RowId { get; set; }
+        public List<int> RowId { get; set; }
 
         [DataMember(Order = 3)]
         public User UserObj { get; set; }
@@ -532,6 +532,22 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         [DataMember(Order = 1)]
         public List<string> Suggestions { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    [DataContract]
+    public class GetAllRolesRequest : EbServiceStackAuthRequest, IReturn<GetAllRolesResponse>
+    {
+
+    }
+
+    [DataContract]
+    public class GetAllRolesResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public Dictionary<int, string> Roles { get; set; }
 
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }

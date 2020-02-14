@@ -31,7 +31,9 @@ namespace ExpressBase.Objects
         Email = 2,
         Password = 1,
         Color = 3,
-        MultiLine = 4
+        MultiLine = 4,
+        Link = 5,
+        Name = 6,
     }
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
@@ -151,7 +153,7 @@ else {
         [Alias("Font Family")]
         public string FontFamilyT { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup("test")]
         [MetaOnly]
         public string MetaOnly { get; set; }
@@ -182,7 +184,7 @@ else {
 
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
-        public List<string> Suggestions  { get; set; }
+        public List<string> Suggestions { get; set; }
 
         [PropertyGroup("Behavior")]
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
@@ -241,19 +243,19 @@ else {
 
         public void InitFromDataBase(JsonServiceClient ServiceClient)
         {
-            if(this.AutoSuggestion)
+            if (this.AutoSuggestion)
             {
                 var result = ServiceClient.Get<GetDistinctValuesResponse>(new GetDistinctValuesRequest { TableName = this.TableName, ColumnName = this.Name });
                 this.Suggestions = result.Suggestions;
             }
-                    
-        } 
+
+        }
         public override string GetWrapedCtrlHtml4bot()
         {
-			
-			return ReplacePropsInHTML(HtmlConstants.CONTROL_WRAPER_HTML4BOT);
 
-		}
+            return ReplacePropsInHTML(HtmlConstants.CONTROL_WRAPER_HTML4BOT);
+
+        }
 
         //control html definition- for builder side
         public override string GetDesignHtml()
@@ -266,51 +268,67 @@ else {
         {
             return GetHtmlHelper(RenderMode.User);
         }
-		 public override string GetHtml4Bot()
+        public override string GetHtml4Bot()
         {
-			return GetWrapedCtrlHtml4bot();
-			
-		}
+            return GetWrapedCtrlHtml4bot();
+
+        }
 
         public string TexboxHtml
         {
             get
             {
-               return @"
+                string html = @"
             @attachedLbl@
             <input type='@TextMode '  data-ebtype='@data-ebtype@' ui-inp id='@ebsid@' name='@name@' @AutoCompleteOff@ ' data-toggle='tooltip' data-placement='top' title='@ToolTipText@' 
 @TabIndex@ @MaxLength@  style='width:100%; height:@heightpx; @BackColor @ForeColor display:inline-block; @fontStyle @ReadOnlyString  @Required  @PlaceHolder  @Text@  />
         @attachedLblClose@"
-.Replace("@ebsid@", this.IsRenderMode && this.IsDynamicTabChild ? "@" + this.EbSid_CtxId + "_ebsid@" : (String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId))
-.Replace("@name@", this.EbSid_CtxId)
-.Replace("@data-ebtype@", "16")//( (int)this.EbDateType ).ToString())
-.Replace("@MaxLength@", (this.MaxLength > 0) ? "maxlength='" + this.MaxLength.ToString() + "'" : "")
-.Replace("@TextMode ", (this.TextMode == TextMode.SingleLine) ? "text" : this.TextMode.ToString().ToLower())
-.Replace("@Required ", (this.Required && !this.Hidden ? " required" : string.Empty))
-.Replace("@ReadOnlyString ", this.ReadOnlyString)
-.Replace("@PlaceHolder ", "placeholder='" + this.PlaceHolder + "'")
-.Replace("@TabIndex@ ", "tabindex='" + this.TabIndex + "' ")
-.Replace("@AutoCompleteOff@ ", " autocomplete = '" + ((this.AutoCompleteOff || this.TextMode.ToString().ToLower() == "password") ? "off" : "on") + "'")
-    .Replace("@BackColor ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor ") + ";"))
-    .Replace("@ForeColor ", "color:" + ((this.ForeColor != null) ? this.ForeColor : "@ForeColor ") + ";")
-    .Replace("@Text@ ", "value='" + ((this.Text != null) ? this.Text : "") + "' ")
+ .Replace("@ebsid@", this.IsRenderMode && this.IsDynamicTabChild ? "@" + this.EbSid_CtxId + "_ebsid@" : (String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId))
+ .Replace("@name@", this.EbSid_CtxId)
+ .Replace("@data-ebtype@", "16")//( (int)this.EbDateType ).ToString())
+ .Replace("@MaxLength@", (this.MaxLength > 0) ? "maxlength='" + this.MaxLength.ToString() + "'" : "")
+ .Replace("@TextMode ", (this.TextMode == TextMode.SingleLine) ? "text" : this.TextMode.ToString().ToLower())
+ .Replace("@Required ", (this.Required && !this.Hidden ? " required" : string.Empty))
+ .Replace("@ReadOnlyString ", this.ReadOnlyString)
+ .Replace("@PlaceHolder ", "placeholder='" + this.PlaceHolder + "'")
+ .Replace("@TabIndex@ ", "tabindex='" + this.TabIndex + "' ")
+ .Replace("@AutoCompleteOff@ ", " autocomplete = '" + ((this.AutoCompleteOff || this.TextMode.ToString().ToLower() == "password") ? "off" : "on") + "'")
+     .Replace("@BackColor ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor ") + ";"))
+     .Replace("@ForeColor ", "color:" + ((this.ForeColor != null) ? this.ForeColor : "@ForeColor ") + ";")
+     .Replace("@Text@ ", "value='" + ((this.Text != null) ? this.Text : "") + "' ")
 
-.Replace("@attachedLblClose@", (this.TextMode == TextMode.SingleLine) ? string.Empty : "</div>")
-.Replace("@attachedLbl@", (this.TextMode != TextMode.SingleLine) ?
-                                (
-                                    @"<div  class='input-group' style='width: 100%;'>
-                                        <span class='input-group-addon' onclick='$(\'#@ebsid@\').click()'><i class='fa fa-$class aria-hidden='true'"
-                                        + "class='input-group-addon'></i></span>"
-                                )
-                                .Replace("$class", (this.TextMode == TextMode.Email) ?
-                                                            ("envelope")
-                                                        : (this.TextMode == TextMode.Password) ?
-                                                            "key"
-                                                        : ("eyedropper")
-                                )
-                        : string.Empty);
+ .Replace("@attachedLblClose@", (this.TextMode == TextMode.SingleLine) ? string.Empty : "</div>");
+
+                html = AddIcon2Html(html);
+
+                return html;
             }
             set { }
+        }
+
+        private string AddIcon2Html(string html)
+        {
+            if (this.TextMode != TextMode.SingleLine)
+            {
+                string attachedLableHtml = @"<div  class='input-group' style='width: 100%;'>
+                                    <span class='input-group-addon' onclick='$(\'#@ebsid@\').click()'><i class='fa fa-$class aria-hidden='true'
+                                             class='input-group-addon'></i></span>";
+                if (this.TextMode == TextMode.Email)
+                    attachedLableHtml = attachedLableHtml.Replace("$class", "envelope");
+                else if (this.TextMode == TextMode.Password)
+                    attachedLableHtml = attachedLableHtml.Replace("$class", "key");
+                else if (this.TextMode == TextMode.Color)
+                    attachedLableHtml = attachedLableHtml.Replace("$class", "phone");
+                else if (this.TextMode == TextMode.Name)
+                    attachedLableHtml = attachedLableHtml.Replace("$class", "user");
+                else if (this.TextMode == TextMode.Link)
+                    attachedLableHtml = attachedLableHtml.Replace("$class", "link");
+
+                html = html.Replace("@attachedLbl@", attachedLableHtml);
+            }
+            else
+                html = html.Replace("@attachedLbl@", string.Empty);
+            return html;
         }
 
         public string TextareaHtml
