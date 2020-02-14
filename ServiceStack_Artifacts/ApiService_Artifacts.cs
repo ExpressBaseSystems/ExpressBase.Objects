@@ -373,6 +373,8 @@ END;";
 
         public User User { set; get; }
 
+        public byte[] DisplayPicture { set; get; }
+
         public List<EbLocation> Locations { get; set; }
 
         public ApiAuthResponse()
