@@ -2,6 +2,7 @@
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
+using ExpressBase.Common.Structures;
 using Newtonsoft.Json;
 using ServiceStack;
 using ServiceStack.Redis;
@@ -49,6 +50,8 @@ namespace ExpressBase.Objects
 		}
 
 
+		[EnableInBuilder(BuilderType.WebForm)]
+		public string TableName { get; set; }
 
 		//--------Hide in property grid------------
 		[EnableInBuilder(BuilderType.WebForm)]
@@ -113,18 +116,27 @@ namespace ExpressBase.Objects
 		[HideInPropertyGrid]
 		public override EbScript OnChangeFn { get; set; }
 
+		[EnableInBuilder(BuilderType.WebForm)]
+		[HideInPropertyGrid]
+		public int BlueprintId  { get; set; }
+
+		[EnableInBuilder(BuilderType.WebForm)]
+		[HideInPropertyGrid]
+		public override EbDbTypes EbDbType { get { return EbDbTypes.String; } set { } }
+
+
 		public override string GetBareHtml()
 		{
 
 
 			return @" 
- <div id='@ebsid@' > 
+ <div id='@ebsid@'  > 
         <div class='ebimg-cont' style='width:100%; text-align:center;'>
             <img id='@name@' class='dpctrl-img' src='@src@'  style='opacity:0.5; max-width:100%; max-height:@maxheight@px;' alt='@alt@'>
         </div>
         <div class='edit_bp_btn-cont' style='width: 100%;position: absolute;bottom: 0;background: transparent; ;'>
                 <div id='edit_buleprintbtn' class='edit_bp@ebsid@' style='height: 20px;width: 70px;display: inline-block;text-align: center;border: 1px solid #ccc;border-radius: 20px;font-size: 12px;padding: 1px;background-color: #eee;cursor: pointer;'>
-                <i class='fa fa-pencil' aria-hidden='true'></i> Change
+                <i class='fa fa-cog' aria-hidden='true'></i> Config
             </div>
         </div>
 </div>"
