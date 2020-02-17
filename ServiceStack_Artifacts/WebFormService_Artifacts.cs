@@ -333,6 +333,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 3)]
         public User UserObj { get; set; }
+
+        [DataMember(Order = 4)]
+        public DbConnection TransactionConnection { get; set; }
     }
 
     [DataContract]
