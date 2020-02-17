@@ -52,10 +52,12 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [DefaultPropValue("1")]
         [PropertyGroup("Behavior")]
+        [HideInPropertyGrid]
         public int LeftFixedColumnCount { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [PropertyGroup("Behavior")]
+        [HideInPropertyGrid]
         public int RightFixedColumnCount { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
