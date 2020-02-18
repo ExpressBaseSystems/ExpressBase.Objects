@@ -32,9 +32,8 @@ namespace ExpressBase.Objects
         Password = 1,
         Color = 3,
         MultiLine = 4,
-        Phone = 5,
-        Link = 6,
-        Name = 7,
+        Link = 5,
+        Name = 6,
     }
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
@@ -300,34 +299,36 @@ else {
 
  .Replace("@attachedLblClose@", (this.TextMode == TextMode.SingleLine) ? string.Empty : "</div>");
 
-
-
-                    if (this.TextMode != TextMode.SingleLine)
-                    {
-                        string attachedLableHtml = @"<div  class='input-group' style='width: 100%;'>
-                                    <span class='input-group-addon' onclick='$(\'#@ebsid@\').click()'><i class='fa fa-$class aria-hidden='true'
-                                             class='input-group-addon'></i></span>";
-                        if (this.TextMode == TextMode.Email)
-                            attachedLableHtml = attachedLableHtml.Replace("$class", "envelope");
-                        else if(this.TextMode == TextMode.Password)
-                            attachedLableHtml = attachedLableHtml.Replace("$class", "key");
-                        else if(this.TextMode == TextMode.Color)
-                            attachedLableHtml = attachedLableHtml.Replace("$class", "eyedropper");
-                        else if(this.TextMode == TextMode.Phone)
-                            attachedLableHtml = attachedLableHtml.Replace("$class", "phone");
-                        else if(this.TextMode == TextMode.Name)
-                            attachedLableHtml = attachedLableHtml.Replace("$class", "user");
-                        else if(this.TextMode == TextMode.Link)
-                            attachedLableHtml = attachedLableHtml.Replace("$class", "link");
-
-                        html = html.Replace("@attachedLbl@", attachedLableHtml);
-                    }
-                    else
-                        html = html.Replace("@attachedLbl@", string.Empty);                    
+                html = AddIcon2Html(html);
 
                 return html;
             }
             set { }
+        }
+
+        private string AddIcon2Html(string html)
+        {
+            if (this.TextMode != TextMode.SingleLine)
+            {
+                string attachedLableHtml = @"<div  class='input-group' style='width: 100%;'>
+                                    <span class='input-group-addon' onclick='$(\'#@ebsid@\').click()'><i class='fa fa-$class aria-hidden='true'
+                                             class='input-group-addon'></i></span>";
+                if (this.TextMode == TextMode.Email)
+                    attachedLableHtml = attachedLableHtml.Replace("$class", "envelope");
+                else if (this.TextMode == TextMode.Password)
+                    attachedLableHtml = attachedLableHtml.Replace("$class", "key");
+                else if (this.TextMode == TextMode.Color)
+                    attachedLableHtml = attachedLableHtml.Replace("$class", "phone");
+                else if (this.TextMode == TextMode.Name)
+                    attachedLableHtml = attachedLableHtml.Replace("$class", "user");
+                else if (this.TextMode == TextMode.Link)
+                    attachedLableHtml = attachedLableHtml.Replace("$class", "link");
+
+                html = html.Replace("@attachedLbl@", attachedLableHtml);
+            }
+            else
+                html = html.Replace("@attachedLbl@", string.Empty);
+            return html;
         }
 
         public string TextareaHtml
