@@ -253,7 +253,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.Report)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
-        [PropertyGroup("Data")]
+        [PropertyGroup(PGConstants.DATA)]
         public string DataSourceRefId { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]

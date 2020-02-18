@@ -15,6 +15,7 @@ using ExpressBase.Common;
 using ExpressBase.Common.Data;
 using Newtonsoft.Json;
 using ServiceStack;
+using ExpressBase.Common.Constants;
 
 namespace ExpressBase.Objects
 {
@@ -700,7 +701,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
-        [PropertyGroup("Data")]
+        [PropertyGroup(PGConstants.DATA)]
         public string Code { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
@@ -828,7 +829,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
-        [PropertyGroup("Data")]
+        [PropertyGroup(PGConstants.DATA)]
         public string Code { get; set; }
 
         public override string GetDesignHtml()

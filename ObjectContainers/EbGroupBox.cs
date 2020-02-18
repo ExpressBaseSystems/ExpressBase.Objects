@@ -46,6 +46,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [UIproperty]
+        [PropertyGroup("Appearance")]
         [OnChangeUIFunction("Common.BORDER")]
         public bool HideBorder { get; set; }
 

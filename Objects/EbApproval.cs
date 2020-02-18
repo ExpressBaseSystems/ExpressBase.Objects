@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Linq;
+using ExpressBase.Common.Constants;
 
 namespace ExpressBase.Objects
 {
@@ -81,7 +82,7 @@ namespace ExpressBase.Objects
         public bool IsShowSerialNumber { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
-        [PropertyGroup("Data")]
+        [PropertyGroup(PGConstants.DATA)]
         [HelpText("Name Of database-table Which you want to store Data collected using this Form")]
         [InputMask("[a-z][a-z0-9]*(_[a-z0-9]+)*")]
         [EbRequired]

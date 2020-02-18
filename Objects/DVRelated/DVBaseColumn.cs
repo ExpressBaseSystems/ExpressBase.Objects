@@ -1,4 +1,5 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Constants;
 using ExpressBase.Common.Data;
 using ExpressBase.Common.JsonConverters;
 using ExpressBase.Common.Objects;
@@ -355,7 +356,7 @@ else if(this.FormMode === 2){
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         [DefaultPropValue("0")]
         [HideForUser]
-        [PropertyGroup("Extended")]
+        [PropertyGroup(PGConstants.EXTENDED)]
         public int HideDataRowMoreThan { get; set; }
 
         [PropertyGroup("TreeVisualization")]
@@ -421,7 +422,7 @@ else if(this.FormMode === 2){
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
         [PropertyEditor(PropertyEditorType.Collection)]
-        [PropertyGroup("Core")]
+        [PropertyGroup(PGConstants.CORE)]
         public List<ColumnCondition> ConditionalFormating { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
@@ -611,7 +612,7 @@ else if(this.FormMode === 2){
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
         [DefaultPropValue("0")]
         [PropertyEditor(PropertyEditorType.DropDown)]
-        [PropertyGroup("Core")]
+        [PropertyGroup(PGConstants.CORE)]
         [PropertyPriority(10)]
         [OnChangeExec(@"
 pg.HideProperty('TrueValue');
@@ -688,15 +689,15 @@ else {
     pg.HideProperty('NoOfCharactersPerLine');
     pg.HideProperty('NoOfLines');
 }")]
-        [PropertyGroup("Extended")]
+        [PropertyGroup(PGConstants.EXTENDED)]
         public bool AllowMultilineText { get; set; }
 
-        [PropertyGroup("Extended")]
+        [PropertyGroup(PGConstants.EXTENDED)]
         [EnableInBuilder(BuilderType.DVBuilder)]
         public int NoOfLines { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
-        [PropertyGroup("Extended")]
+        [PropertyGroup(PGConstants.EXTENDED)]
         public int NoOfCharactersPerLine { get; set; }
 
         public DVStringColumn()
@@ -727,11 +728,11 @@ else {
         }
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
         [OnChangeExec(@"console.log('------------   this.Type')")]
-        [PropertyGroup("Core")]
+        [PropertyGroup(PGConstants.CORE)]
         public bool Aggregate { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
-        [PropertyGroup("Core")]
+        [PropertyGroup(PGConstants.CORE)]
         public int DecimalPlaces { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
@@ -767,7 +768,7 @@ if(this.RenderAs === 4){
     pg.setSimpleProperty('IsTree', false);
     }")]
         [PropertyPriority(10)]
-        [PropertyGroup("Core")]
+        [PropertyGroup(PGConstants.CORE)]
         public NumericRenderType RenderAs { get; set; }
 
         [DefaultPropValue("7")]
@@ -793,7 +794,7 @@ if(this.RenderAs === 4){
         public NumericOperators DefaultOperator { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
-        [PropertyGroup("Extended")]
+        [PropertyGroup(PGConstants.EXTENDED)]
         public bool SuppresIfZero { get; set; }
 
         public DVNumericColumn()
@@ -851,7 +852,7 @@ else{
     pg.HideGroup('TreeVisualization');
     pg.setSimpleProperty('IsTree', false);
 }")]
-        [PropertyGroup("Core")]
+        [PropertyGroup(PGConstants.CORE)]
         [PropertyPriority(10)]
         public BooleanRenderType RenderAs { get; set; }
 
@@ -890,15 +891,15 @@ if(this.Format === 3){
 else{
     pg.HideProperty('ConvretToUsersTimeZone');
     }")]
-        [PropertyGroup("Extended")]
+        [PropertyGroup(PGConstants.EXTENDED)]
         public DateFormat Format { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
-        [PropertyGroup("Extended")]
+        [PropertyGroup(PGConstants.EXTENDED)]
         public DatePattern Pattern { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
-        [PropertyGroup("Extended")]
+        [PropertyGroup(PGConstants.EXTENDED)]
         public bool ConvretToUsersTimeZone { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
@@ -929,7 +930,7 @@ else{
     pg.setSimpleProperty('IsTree', false);
 }")]
         [PropertyPriority(10)]
-        [PropertyGroup("Core")]
+        [PropertyGroup(PGConstants.CORE)]
         public DateTimeRenderType RenderAs { get; set; }
 
         [DefaultPropValue("5")]

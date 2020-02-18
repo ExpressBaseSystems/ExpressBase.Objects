@@ -1,4 +1,5 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Constants;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
@@ -71,7 +72,7 @@ namespace ExpressBase.Objects
         public override bool IsSysControl { get { return true; } }
 
         [EnableInBuilder(BuilderType.WebForm)]
-        [PropertyGroup("Core")]
+        [PropertyGroup(PGConstants.CORE)]
         [UIproperty]
         [OnChangeUIFunction("EbProvisionLocation.mapping")]
         [PropertyEditor(PropertyEditorType.Collection)]
