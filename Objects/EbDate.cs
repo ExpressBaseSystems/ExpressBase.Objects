@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using ExpressBase.Security;
 using System.Globalization;
 using ExpressBase.Common.LocationNSolution;
+using ExpressBase.Common.Constants;
 
 namespace ExpressBase.Objects
 {
@@ -76,7 +77,12 @@ namespace ExpressBase.Objects
         {
             return ReplacePropsInHTML(HtmlConstants.CONTROL_WRAPER_HTML4BOT);
         }
+
+        [HideInPropertyGrid]
+        public override bool Unique { get; set; }
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.CORE)]
         public EbDateType EbDateType { get; set; }
 
         //[EnableInBuilder(BuilderType.BotForm)]
@@ -92,6 +98,7 @@ namespace ExpressBase.Objects
         public string PlaceHolder { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.EXTENDED)]
         public bool AutoCompleteOff { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
@@ -106,9 +113,11 @@ namespace ExpressBase.Objects
         public override bool DoNotPersist { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.EXTENDED)]
         public bool IsNullable { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.EXTENDED)]
         private string maskPattern
         {
             get
@@ -125,9 +134,11 @@ namespace ExpressBase.Objects
         }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.EXTENDED)]
         public TimeShowFormat ShowTimeAs_ { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.EXTENDED)]
         public DateShowFormat ShowDateAs_ { get; set; }
 
         //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]

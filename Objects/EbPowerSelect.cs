@@ -58,8 +58,14 @@ namespace ExpressBase.Objects
         //}
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
-        [PropertyGroup("Behavior")]
-        [PropertyPriority(98)]
+        [PropertyGroup(PGConstants.DATA_INSERT)]
+        [OnChangeExec(@"
+            if (this.IsInsertable === true ){
+	            pg.ShowProperty('FormRefId');
+            } 
+            else {
+	            pg.HideProperty('FormRefId');
+            }")]
         public bool IsInsertable { get; set; }
 
         [JsonIgnore]
@@ -228,51 +234,58 @@ else
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
+        [PropertyPriority(98)]
+        [PropertyGroup(PGConstants.DATA_SETTINGS)]
+        [Alias("Data Reader")]
         public string DataSourceId { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [PropertyGroup(PGConstants.DATA_INSERT)]
         [OSE_ObjectTypes(EbObjectTypes.iWebForm)]
+        [Alias("Form")]
         public string FormRefId { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [PropertyGroup(PGConstants.DATA)]
         [OSE_ObjectTypes(EbObjectTypes.iWebForm)]
         public string DataImportId { get; set; }
 
         [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.WebForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.CollectionProp, "Columns", "bVisible")]
-        [PropertyGroup("Behavior")]
+        [PropertyGroup(PGConstants.DATA_SETTINGS)]
         //[HideInPropertyGrid]
         public DVColumnCollection Columns { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [PropertyGroup("Behavior")]
         [PropertyEditor(PropertyEditorType.CollectionABCFrmSrc, "Columns")]
         [OnChangeExec(@"
 if (this.Columns && this.Columns.$values.length === 0 )
 {
 pg.MakeReadOnly('DisplayMembers');} else {pg.MakeReadWrite('DisplayMembers');}")]
+        [PropertyGroup(PGConstants.DATA_SETTINGS)]
+        [PropertyPriority(68)]
         public DVColumnCollection DisplayMembers { get; set; }
 
         [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.WebForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", 1)]
-        [PropertyGroup("Behavior")]
-        [PropertyPriority(98)]
+        [PropertyPriority(68)]
+        [PropertyGroup(PGConstants.DATA_SETTINGS)]
         [OnChangeExec(@"if (this.Columns && this.Columns.$values.length === 0 ){pg.MakeReadOnly('DisplayMember');} else {pg.MakeReadWrite('DisplayMember');}")]
         public DVBaseColumn DisplayMember { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", 1)]
         [OnChangeExec(@"if (this.Columns.$values.length === 0 ){pg.MakeReadOnly('ValueMember');} else {pg.MakeReadWrite('ValueMember');}")]
-        [PropertyGroup("Behavior")]
-        [PropertyPriority(99)]
+        [PropertyPriority(69)]
+        [PropertyGroup(PGConstants.DATA_SETTINGS)]
         public DVBaseColumn ValueMember { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [DefaultPropValue("100")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [Alias("DropdownWidth(%)")]
-        [Category("Appearance")]
         public int DropdownWidth { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
@@ -287,7 +300,7 @@ pg.MakeReadOnly('DisplayMembers');} else {pg.MakeReadWrite('DisplayMembers');}")
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [HelpText("Specify minimum number of charecters to initiate search")]
         [Category("Search Settings")]
-        [PropertyGroup("Behavior")]
+        [PropertyGroup(PGConstants.SEARCH)]
         public int MinSeachLength { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
@@ -295,7 +308,7 @@ pg.MakeReadOnly('DisplayMembers');} else {pg.MakeReadWrite('DisplayMembers');}")
         public string Text { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [PropertyGroup("Behavior")]
+        [PropertyGroup(PGConstants.VALIDATIONS)]
         [OnChangeExec(@"
             if (this.MultiSelect === true ){
                 pg.MakeReadWrite('MaxLimit');   
@@ -323,12 +336,13 @@ pg.MakeReadOnly('DisplayMembers');} else {pg.MakeReadWrite('DisplayMembers');}")
         public override bool Required { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [PropertyGroup("Behavior")]
+        [PropertyGroup(PGConstants.EXTENDED)]
+        [PropertyPriority(65)]
         [OnChangeExec(@"
             if (this.MultiSelect === true ){
                 pg.MakeReadWrite('MaxLimit');   
                 if (this.Required === true ){
-                    if(this.MinLimit < 1){
+                    if(this.MinLimit < 1){s
                         pg.setSimpleProperty('MinLimit', 1);
                     }
                     pg.MakeReadWrite('MinLimit');
@@ -363,27 +377,45 @@ pg.MakeReadOnly('DisplayMembers');} else {pg.MakeReadWrite('DisplayMembers');}")
         }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [DefaultPropValue("1")]
-        [PropertyGroup("Behavior")]
+        //[DefaultPropValue(1)]
+        [PropertyGroup(PGConstants.EXTENDED)]
         public int MaxLimit { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [PropertyGroup("Behavior")]
+        [PropertyGroup(PGConstants.EXTENDED)]
         public int MinLimit { get; set; }
 
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [PropertyGroup("Search Settings")]
         [Alias("Search Method")]
+        [PropertyGroup(PGConstants.SEARCH)]
         [HelpText("Select Search Method - StartsWith, EndsWith, Contains or Exact Match")]
         public DefaultSearchFor DefaultSearchFor { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [PropertyGroup("Behavior")]
-        public int NumberOfFields { get; set; }
+        //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        //[PropertyGroup("Behavior")]
+        //public int NumberOfFields { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.Boolean)]
+        [PropertyGroup(PGConstants.EXTENDED)]
+        [DefaultPropValue("true")]
+        [OnChangeExec(@"
+if(this.IsDynamic == false)
+{ 
+	pg.ShowProperty('Options');
+	pg.HideProperty('ValueMember');
+	pg.HideProperty('DisplayMember');
+	pg.HideProperty('DisplayMembers');
+}
+else
+{
+	pg.HideProperty('Options');
+	pg.ShowProperty('ValueMember');
+	pg.ShowProperty('DisplayMember');
+	pg.ShowProperty('DisplayMembers');
+}
+")]
         public bool IsDynamic { get; set; }
 
         //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
@@ -394,16 +426,23 @@ pg.MakeReadOnly('DisplayMembers');} else {pg.MakeReadWrite('DisplayMembers');}")
         public override bool IsReadOnly { get => this.ReadOnly; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog)]
-        [PropertyGroup("Behavior")]
+        [PropertyGroup(PGConstants.CORE)]
         [PropertyPriority(50)]
         [OnChangeExec(@"
 if(this.RenderAsSimpleSelect == true)
 { 
 	pg.ShowProperty('DisplayMember');
+	pg.HideProperty('DisplayMembers');
+	pg.HideProperty('Columns');
+	pg.ShowProperty('IsDynamic');
 }
 else
 {
 	pg.HideProperty('DisplayMember');
+	pg.ShowProperty('DisplayMembers');
+	pg.ShowProperty('Columns');
+	pg.HideProperty('Options');
+	pg.HideProperty('IsDynamic');
 }
 ")]
         public bool RenderAsSimpleSelect { get; set; }
@@ -420,12 +459,15 @@ else
         //        pg.HideProperty('MaxLimit');
         //        pg.HideProperty('MinLimit');
         //    }")]
+        [PropertyGroup(PGConstants.SEARCH)]
         public bool IsSearchable { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         public BootStrapClass BootStrapStyle { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.HELP)]
         public string PlaceHolder { get; set; }
 
         private string _optionHtml = string.Empty;

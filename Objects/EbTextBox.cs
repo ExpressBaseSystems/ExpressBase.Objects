@@ -175,7 +175,7 @@ else {
         public bool AutoCompleteOff { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
-        [PropertyGroup("Behavior")]
+        [PropertyGroup(PGConstants.EXTENDED)]
         public bool AutoSuggestion { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
