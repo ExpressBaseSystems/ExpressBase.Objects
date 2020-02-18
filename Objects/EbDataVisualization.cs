@@ -113,12 +113,17 @@ namespace ExpressBase.Objects
         public string DataSourceRefId { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
+        public string Url { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
+        public string Sql { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
         [HideInPropertyGrid]
         public string EbSid { get; set; }
 
         [JsonIgnore]
         public EbDataReader EbDataSource { get; set; }
-
 
         [PropertyEditor(PropertyEditorType.CollectionABCpropToggle, "Columns", "bVisible", "_Formula")]
         [CEOnSelectFn(@";

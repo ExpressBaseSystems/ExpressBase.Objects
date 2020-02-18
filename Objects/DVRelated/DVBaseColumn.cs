@@ -1034,6 +1034,12 @@ pg.HideProperty('FormMode');
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
         public AdvancedCondition RenderCondition { get; set; }
 
+        public DVButtonColumn()
+        {
+            this.ConditionalFormating = new List<ColumnCondition>();
+        }
+
+
     }
 
     [EnableInBuilder(BuilderType.Calendar)]

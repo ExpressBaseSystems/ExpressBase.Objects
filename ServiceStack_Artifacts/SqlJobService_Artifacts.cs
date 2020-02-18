@@ -70,6 +70,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public RowColletion FormattedData { get; set; }
         public string Visualization { get; set; }
+        public EbDataVisualization Visobject { get; set; }
     }
 
     public class RetryMasterRequest : EbServiceStackAuthRequest, IReturn<RetryMasterResponse>
