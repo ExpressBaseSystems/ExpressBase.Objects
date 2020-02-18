@@ -247,10 +247,12 @@ namespace ExpressBase.Objects.Objects.DVRelated
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
         [PropertyEditor(PropertyEditorType.FontSelector)]
+        [PropertyGroup("Appearance")]
         public EbFont Font { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.DropDown)]
+        [PropertyGroup("Search")]
         public ControlType FilterControl { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
@@ -268,7 +270,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
         [HideInPropertyGrid]
         [OnChangeExec(@"
-console.log('IsCustomColumn');
+console.log('ggggggg ----------- IsCustomColumn');
 if(this.IsCustomColumn){
     pg.ShowProperty('_Formula');
 }
@@ -281,34 +283,28 @@ else {
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iTableVisualization, EbObjectTypes.iChartVisualization, EbObjectTypes.iReport, EbObjectTypes.iWebForm , EbObjectTypes.iDashBoard)]
         [OnChangeExec(@"
-    pg.HideProperty('ParentColumn');
-    pg.HideProperty('GroupingColumn');
-    pg.HideProperty('GroupFormLink');
-    pg.HideProperty('ItemFormLink');
-    pg.HideProperty('GroupFormParameters');
-    pg.HideProperty('GroupFormId');
-    pg.HideProperty('ItemFormParameters');
-    pg.HideProperty('ItemFormId');
+    pg.HideGroup('TreeVisualization');
 if(this.LinkRefId !== null){
     console.log(this.LinkRefId);
+        pg.ShowProperty('LinkType');
     if(this.LinkRefId.split('-')[2] === '0'){
         console.log('Link to form');
+        pg.ShowGroup('FormSettings');
         pg.ShowProperty('FormMode');
         pg.HideProperty('FormParameters');
         pg.HideProperty('FormId');
     }
     else{
         console.log('Link to Other');
-        pg.HideProperty('FormMode');
-        pg.HideProperty('FormParameters');
-        pg.HideProperty('FormId');
+        pg.HideGroup('FormSettings');
     }
 }
 else{
-    pg.HideProperty('FormMode');
- pg.HideProperty('FormParameters');
-    pg.HideProperty('FormId');
+    pg.HideGroup('FormSettings');
+    pg.HideProperty('LinkType');
 }")]
+        [PropertyGroup("Link")]
+        [Alias("Object")]
         public string LinkRefId { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder,  BuilderType.DashBoard)]
@@ -323,6 +319,7 @@ else if(this.FormMode === 2){
     pg.HideProperty('FormId');
     pg.ShowProperty('FormParameters');
 }")]
+        [PropertyGroup("FormSettings")]
         public WebFormDVModes FormMode { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
@@ -332,11 +329,13 @@ else if(this.FormMode === 2){
 
         [EnableInBuilder(BuilderType.DVBuilder,  BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "ColumnsRef")]
+        [PropertyGroup("FormSettings")]
         public List<DVBaseColumn> FormId { get; set; }
 
 
         [EnableInBuilder(BuilderType.DVBuilder,  BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.Mapper, "ColumnsRef", "LinkRefId", "FormControl")]
+        [PropertyGroup("FormSettings")]
         public List<DVBaseColumn> FormParameters { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder,  BuilderType.DashBoard)]
@@ -345,15 +344,18 @@ else if(this.FormMode === 2){
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.DropDown)]
+        [PropertyGroup("Appearance")]
         public LinkTypeEnum LinkType { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         [HideForUser]
+        [PropertyGroup("Link")]
         public bool ShowLinkifNoData { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         [DefaultPropValue("0")]
         [HideForUser]
+        [PropertyGroup("Extended")]
         public int HideDataRowMoreThan { get; set; }
 
         [PropertyGroup("TreeVisualization")]
@@ -405,6 +407,7 @@ else if(this.FormMode === 2){
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.Collection)]
+        [HideInPropertyGrid]
         public List<StaticParam> StaticParameters { get; set; }
 
         [PropertyGroup("Tooltip")]
@@ -418,6 +421,7 @@ else if(this.FormMode === 2){
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
         [PropertyEditor(PropertyEditorType.Collection)]
+        [PropertyGroup("Core")]
         public List<ColumnCondition> ConditionalFormating { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
@@ -429,6 +433,7 @@ else if(this.FormMode === 2){
         public ControlClass ColumnQueryMapping { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
+        [HideInPropertyGrid]
         public bool AutoResolve { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
@@ -452,6 +457,7 @@ else if(this.FormMode === 2){
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
         [PropertyEditor(PropertyEditorType.DropDown)]
+        [PropertyGroup("Appearance")]
         public Align Align { get; set; }
 
         [JsonIgnore]
@@ -605,40 +611,27 @@ else if(this.FormMode === 2){
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
         [DefaultPropValue("0")]
         [PropertyEditor(PropertyEditorType.DropDown)]
+        [PropertyGroup("Appearance")]
         [OnChangeExec(@"
 pg.HideProperty('TrueValue');
 pg.HideProperty('FalseValue');
+pg.HideGroup('FormSettings');
+pg.HideGroup('Image');
 if(this.RenderAs === 2){
 console.log('Render as link');
-    pg.ShowProperty('LinkRefId');
+    pg.ShowGroup('Link');
     pg.ShowProperty('LinkType');
     pg.ShowProperty('HideLinkifNoData');
-    pg.HideProperty('ParentColumn');
-    pg.HideProperty('GroupingColumn');
-    pg.HideProperty('GroupFormLink');
-    pg.HideProperty('ItemFormLink');
-    pg.HideProperty('GroupFormParameters');
-    pg.HideProperty('GroupFormId');
-    pg.HideProperty('ItemFormParameters');
-    pg.HideProperty('ItemFormId');
+    pg.HideGroup('TreeVisualization');
     pg.setSimpleProperty('IsTree', false);
-pg.HideProperty('FormMode');
 }
 else if(this.RenderAs === 6){
 console.log('Render as tree');
-    pg.ShowProperty('ParentColumn');
-    pg.ShowProperty('GroupingColumn');
-    pg.ShowProperty('GroupFormLink');
-    pg.ShowProperty('ItemFormLink');
-    pg.ShowProperty('GroupFormParameters');
-    pg.ShowProperty('GroupFormId');
-    pg.ShowProperty('ItemFormParameters');
-    pg.ShowProperty('ItemFormId');
+    pg.ShowGroup('TreeVisualization');
     pg.setSimpleProperty('IsTree', true);
-    pg.HideProperty('LinkRefId');
+    pg.HideGroup('Link');
     pg.HideProperty('HideLinkifNoData');
     pg.ShowProperty('LinkType');
-    pg.ShowProperty('FormMode');
 }
 else{
 console.log('Render as other');
@@ -648,23 +641,14 @@ pg.ShowProperty('TrueValue');
 pg.ShowProperty('FalseValue');
 }
 if(this.RenderAs === 4){
-    pg.ShowProperty('ImageHeight');
-    pg.ShowProperty('ImageWidth');
+    pg.ShowGroup('Image');
 }
-    pg.HideProperty('LinkRefId');
+    pg.HideGroup('Link');
     pg.HideProperty('LinkType');
     pg.HideProperty('HideLinkifNoData');
     pg.setSimpleProperty('LinkRefId', null);
-    pg.HideProperty('ParentColumn');
-    pg.HideProperty('GroupingColumn');
-    pg.HideProperty('GroupFormLink');
-    pg.HideProperty('ItemFormLink');
-    pg.HideProperty('GroupFormParameters');
-    pg.HideProperty('GroupFormId');
-    pg.HideProperty('ItemFormParameters');
-    pg.HideProperty('ItemFormId');
+    pg.HideGroup('TreeVisualization');
     pg.setSimpleProperty('IsTree', false);
-pg.HideProperty('FormMode');
     }")]
         public StringRenderType RenderAs { get; set; }
 
@@ -676,17 +660,21 @@ pg.HideProperty('FormMode');
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.DropDown)]
+        [PropertyGroup("Search")]
         public StringOperators DefaultOperator { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         [DefaultPropValue("20")]
+        [PropertyGroup("Image")]
         public int ImageHeight { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
+        [PropertyGroup("Image")]
         [DefaultPropValue("20")]
         public int ImageWidth { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
+        [PropertyGroup("Image")]
         public ImageQuality ImageQuality { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
@@ -699,12 +687,15 @@ else {
     pg.HideProperty('NoOfCharactersPerLine');
     pg.HideProperty('NoOfLines');
 }")]
+        [PropertyGroup("Extended")]
         public bool AllowMultilineText { get; set; }
 
+        [PropertyGroup("Extended")]
         [EnableInBuilder(BuilderType.DVBuilder)]
         public int NoOfLines { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyGroup("Extended")]
         public int NoOfCharactersPerLine { get; set; }
 
         public DVStringColumn()
@@ -735,66 +726,46 @@ else {
         }
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
         [OnChangeExec(@"console.log('------------   this.Type')")]
+        [PropertyGroup("Core")]
         public bool Aggregate { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
+        [PropertyGroup("Core")]
         public int DecimalPlaces { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
         [OnChangeExec(@"
 pg.HideProperty('TrueValue');
 pg.HideProperty('FalseValue');
+pg.HideGroup('FormSettings');
 if(this.RenderAs === 2){
-    pg.ShowProperty('LinkRefId');
+    pg.ShowGroup('Link');
     pg.ShowProperty('LinkType');
     pg.ShowProperty('HideLinkifNoData');
-    pg.HideProperty('ParentColumn');
-    pg.HideProperty('GroupingColumn');
-    pg.HideProperty('GroupFormLink');
-    pg.HideProperty('ItemFormLink');
-    pg.HideProperty('GroupFormParameters');
-    pg.HideProperty('GroupFormId');
-    pg.HideProperty('ItemFormParameters');
-    pg.HideProperty('ItemFormId');
+    pg.HideGroup('TreeVisualization');
     pg.setSimpleProperty('IsTree', false);
-pg.HideProperty('FormMode');
 }
 else if(this.RenderAs === 3){
-    pg.ShowProperty('ParentColumn');
-    pg.ShowProperty('GroupingColumn');
-    pg.ShowProperty('GroupFormLink');
-    pg.ShowProperty('ItemFormLink');
-    pg.ShowProperty('GroupFormParameters');
-    pg.ShowProperty('GroupFormId');
-    pg.ShowProperty('ItemFormParameters');
-    pg.ShowProperty('ItemFormId');
+    pg.ShowGroup('TreeVisualization');
     pg.setSimpleProperty('IsTree', true);
-    pg.HideProperty('LinkRefId');
+    pg.HideGroup('Link');
     pg.HideProperty('HideLinkifNoData');
     pg.ShowProperty('LinkType');
-    pg.ShowProperty('FormMode');
 }
 else{
-if(this.RenderAs === 7){
-pg.setSimpleProperty('RenderType', 3);
-pg.ShowProperty('TrueValue');
-pg.ShowProperty('FalseValue');
+if(this.RenderAs === 4){
+    pg.setSimpleProperty('RenderType', 3);
+    pg.ShowProperty('TrueValue');
+    pg.ShowProperty('FalseValue');
 }
-    pg.HideProperty('LinkRefId');
+    pg.HideGroup('Link');
     pg.HideProperty('LinkType');
     pg.HideProperty('HideLinkifNoData');
     pg.setSimpleProperty('LinkRefId', null);
-    pg.HideProperty('ParentColumn');
-    pg.HideProperty('GroupingColumn');
-    pg.HideProperty('GroupFormLink');
-    pg.HideProperty('ItemFormLink');
-    pg.HideProperty('GroupFormParameters');
-    pg.HideProperty('GroupFormId');
-    pg.HideProperty('ItemFormParameters');
-    pg.HideProperty('ItemFormId');
-pg.setSimpleProperty('IsTree', false);
-pg.HideProperty('FormMode');
+    pg.HideGroup('TreeVisualization');
+    pg.setSimpleProperty('IsTree', false);
     }")]
+        [PropertyGroup("Core")]
         public NumericRenderType RenderAs { get; set; }
 
         [DefaultPropValue("7")]
@@ -816,9 +787,11 @@ pg.HideProperty('FormMode');
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.DropDown)]
+        [PropertyGroup("Search")]
         public NumericOperators DefaultOperator { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
+        [PropertyGroup("Extended")]
         public bool SuppresIfZero { get; set; }
 
         public DVNumericColumn()
@@ -853,52 +826,30 @@ pg.HideProperty('FormMode');
         [OnChangeExec(@"
 pg.ShowProperty('TrueValue');
 pg.ShowProperty('FalseValue');
+pg.HideGroup('FormSettings');
 if(this.RenderAs === 2){
-    pg.ShowProperty('LinkRefId');
+    pg.ShowGroup('Link');
     pg.ShowProperty('LinkType');
     pg.ShowProperty('HideLinkifNoData');
-    pg.HideProperty('ParentColumn');
-    pg.HideProperty('GroupingColumn');
-    pg.HideProperty('GroupFormLink');
-    pg.HideProperty('ItemFormLink');
-    pg.HideProperty('GroupFormParameters');
-    pg.HideProperty('GroupFormId');
-    pg.HideProperty('ItemFormParameters');
-    pg.HideProperty('ItemFormId');
+    pg.HideGroup('TreeVisualization');
     pg.setSimpleProperty('IsTree', false);
-pg.HideProperty('FormMode');
 }
 else if(this.RenderAs === 4){
-    pg.ShowProperty('ParentColumn');
-    pg.ShowProperty('GroupingColumn');
-    pg.ShowProperty('GroupFormLink');
-    pg.ShowProperty('ItemFormLink');
-    pg.ShowProperty('GroupFormParameters');
-    pg.ShowProperty('GroupFormId');
-    pg.ShowProperty('ItemFormParameters');
-    pg.ShowProperty('ItemFormId');
+   pg.ShowGroup('TreeVisualization');
     pg.setSimpleProperty('IsTree', true);
-    pg.HideProperty('LinkRefId');
+    pg.HideGroup('Link');
     pg.HideProperty('HideLinkifNoData');
     pg.ShowProperty('LinkType');
-    pg.ShowProperty('FormMode');
 }
 else{
-    pg.HideProperty('LinkRefId');
+    pg.HideGroup('Link');
     pg.HideProperty('LinkType');
     pg.HideProperty('HideLinkifNoData');
     pg.setSimpleProperty('LinkRefId', null);
-    pg.HideProperty('ParentColumn');
-    pg.HideProperty('GroupingColumn');
-    pg.HideProperty('GroupFormLink');
-    pg.HideProperty('ItemFormLink');
-pg.HideProperty('GroupFormParameters');
-    pg.HideProperty('GroupFormId');
-    pg.HideProperty('ItemFormParameters');
-    pg.HideProperty('ItemFormId');
-pg.setSimpleProperty('IsTree', false);
-pg.HideProperty('FormMode');
-    }")]
+    pg.HideGroup('TreeVisualization');
+    pg.setSimpleProperty('IsTree', false);
+}")]
+        [PropertyGroup("Core")]
         public BooleanRenderType RenderAs { get; set; }
 
         public DVBooleanColumn()
@@ -936,64 +887,45 @@ if(this.Format === 3){
 else{
     pg.HideProperty('ConvretToUsersTimeZone');
     }")]
+        [PropertyGroup("Extended")]
         public DateFormat Format { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
+        [PropertyGroup("Extended")]
         public DatePattern Pattern { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
+        [PropertyGroup("Extended")]
         public bool ConvretToUsersTimeZone { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
         [OnChangeExec(@"
 pg.HideProperty('TrueValue');
 pg.HideProperty('FalseValue');
+pg.HideGroup('FormSettings');
 if(this.RenderAs === 1){
-    pg.ShowProperty('LinkRefId');
+    pg.ShowGroup('Link');
     pg.ShowProperty('LinkType');
     pg.ShowProperty('HideLinkifNoData');
-    pg.HideProperty('ParentColumn');
-    pg.HideProperty('GroupingColumn');
-    pg.HideProperty('GroupFormLink');
-    pg.HideProperty('ItemFormLink');
-    pg.HideProperty('GroupFormParameters');
-    pg.HideProperty('GroupFormId');
-    pg.HideProperty('ItemFormParameters');
-    pg.HideProperty('ItemFormId');
+    pg.HideGroup('TreeVisualization');
     pg.setSimpleProperty('IsTree', false);
-    pg.HideProperty('FormMode');
 }
 else if(this.RenderAs === 2){
-    pg.ShowProperty('ParentColumn');
-    pg.ShowProperty('GroupingColumn');
-    pg.ShowProperty('GroupFormLink');
-    pg.ShowProperty('ItemFormLink');
-    pg.ShowProperty('GroupFormParameters');
-    pg.ShowProperty('GroupFormId');
-    pg.ShowProperty('ItemFormParameters');
-    pg.ShowProperty('ItemFormId');
+    pg.ShowGroup('TreeVisualization');
     pg.setSimpleProperty('IsTree', true);
-    pg.HideProperty('LinkRefId');
+    pg.HideGroup('Link');
     pg.HideProperty('HideLinkifNoData');
     pg.ShowProperty('LinkType');
-    pg.ShowProperty('FormMode');
 }
 else{
-    pg.HideProperty('LinkRefId');
+    pg.HideGroup('Link');
     pg.HideProperty('LinkType');
     pg.HideProperty('HideLinkifNoData');
     pg.setSimpleProperty('LinkRefId', null);
-    pg.HideProperty('ParentColumn');
-    pg.HideProperty('GroupingColumn');
-    pg.HideProperty('GroupFormLink');
-    pg.HideProperty('ItemFormLink');
-pg.HideProperty('GroupFormParameters');
-    pg.HideProperty('GroupFormId');
-    pg.HideProperty('ItemFormParameters');
-    pg.HideProperty('ItemFormId');
-pg.setSimpleProperty('IsTree', false);
-pg.HideProperty('FormMode');
-    }")]
+    pg.HideGroup('TreeVisualization');
+    pg.setSimpleProperty('IsTree', false);
+}")]
+        [PropertyGroup("Core")]
         public DateTimeRenderType RenderAs { get; set; }
 
         [DefaultPropValue("5")]
@@ -1003,6 +935,7 @@ pg.HideProperty('FormMode');
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
         [PropertyEditor(PropertyEditorType.DropDown)]
+        [PropertyGroup("Search")]
         public NumericOperators DefaultOperator { get; set; }        
 
         public DVDateTimeColumn()
