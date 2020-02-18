@@ -50,7 +50,7 @@ namespace ExpressBase.Objects
 
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
-        [PropertyGroup("Identity")]
+        [PropertyGroup("Core")]
         [OnChangeUIFunction("EbDataLabel.DescriptionLabel")]
         public override string Description { get; set; }
 

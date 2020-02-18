@@ -24,6 +24,9 @@ namespace ExpressBase.Objects
                 return @"EbGroupBox = {
                     padding : function(elementId, props) {
                         $(`#cont_${ elementId}.Eb-ctrlContainer`).closestInner('.group-box').css('padding', `${props.Padding.Top}px ${props.Padding.Right}px ${props.Padding.Bottom}px ${props.Padding.Left}px`);
+                    },
+                    backColor : function(elementId, props) {
+                         $(`#cont_${elementId}.Eb-ctrlContainer`).closestInner('.gb-border').css('background-color',props.BackColor);
                     }
                 }";
             }
@@ -33,6 +36,13 @@ namespace ExpressBase.Objects
         [UIproperty]
         [OnChangeUIFunction("Common.LABEL")]
         public override string Label { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+        [OnChangeUIFunction("EbGroupBox.backColor")]
+        [PropertyGroup("Appearance")]
+        [UIproperty]
+        [PropertyEditor(PropertyEditorType.Color)]
+        public override string BackColor { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [UIproperty]

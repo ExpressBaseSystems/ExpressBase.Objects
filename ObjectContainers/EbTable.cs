@@ -150,11 +150,27 @@ this.Init = function(id){
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
 
+        [HideInPropertyGrid]
+        public override string Name { get; set; }
+
+        [HideInPropertyGrid]
+        public override string Label { get; set; }
+
+        [JsonIgnore]
+        public override string LabelBackColor { get; set; }
+
+        [JsonIgnore]
+        public override string LabelForeColor { get; set; }
+
+        [JsonIgnore]
+        public override EbScript OnChangeFn { get; set; }
+
+        [PropertyGroup("Appearance")]
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         public float WidthPercentage { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
-        [PropertyGroup("Behavior")]
+        [PropertyGroup("Appearance")]
         [UIproperty]
         [OnChangeUIFunction("EbTable.verticalAlign")]
         public VerticalAlign VerticalAlign { get; set; }

@@ -17,8 +17,8 @@ namespace ExpressBase.Objects
 
     public enum NumInpMode
     {
-        Numeric = 0,
         Currency = 1,
+        Numeric = 0,
         Phone = 2,
     }
 
@@ -89,9 +89,9 @@ namespace ExpressBase.Objects
         [PropertyGroup("Core")]
         public int MinLimit { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [PropertyGroup("Core")]
-        public bool IsCurrency { get; set; }
+        //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        //[PropertyGroup("Core")]
+        //public bool IsCurrency { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [HideInPropertyGrid]
@@ -101,7 +101,7 @@ namespace ExpressBase.Objects
         [PropertyGroup("Appearance")]
         [UIproperty]
         [OnChangeUIFunction("Common.CONTROL_ICON")]
-        public bool ShowIcon { get; set; }
+        public bool HideInputIcon { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup("Core")]
