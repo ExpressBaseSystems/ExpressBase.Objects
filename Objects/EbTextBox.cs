@@ -20,9 +20,9 @@ namespace ExpressBase.Objects
 {
     public enum TextTransform
     {
-        Normal,
-        lowercase,
-        UPPERCASE,
+        Normal = 0,
+        lowercase = 1,
+        UPPERCASE = 2,
     }
 
     public enum TextMode

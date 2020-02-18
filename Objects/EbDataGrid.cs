@@ -46,7 +46,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [DefaultPropValue("200")]
-        [PropertyGroup("Identity")]
+        [PropertyGroup("Appearance")]
         public override int Height { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
@@ -88,6 +88,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
+        [PropertyGroup("Behavior")]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OnChangeExec(@"
                 if (this.DataSourceId){
@@ -118,7 +119,7 @@ namespace ExpressBase.Objects
         public override EbScript OnChangeFn { get; set; }
 
 
-        [PropertyGroup("Behavior")]
+        [PropertyGroup("Events")]
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.ScriptEditorJS)]
         [HelpText("Define actions to do after a datagrid row painted on screen.")]

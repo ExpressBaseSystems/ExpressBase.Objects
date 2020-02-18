@@ -101,7 +101,7 @@ namespace ExpressBase.Objects
         [PropertyGroup("Appearance")]
         [UIproperty]
         [OnChangeUIFunction("Common.CONTROL_ICON")]
-        public bool ShowIcon { get; set; }
+        public bool HideInputIcon { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup("Core")]
