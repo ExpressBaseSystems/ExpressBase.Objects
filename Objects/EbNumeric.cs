@@ -17,8 +17,8 @@ namespace ExpressBase.Objects
 
     public enum NumInpMode
     {
-        Numeric = 0,
         Currency = 1,
+        Numeric = 0,
         Phone = 2,
     }
 

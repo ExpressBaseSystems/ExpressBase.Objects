@@ -180,7 +180,7 @@ this.Init = function(id)
         public override List<EbControl> Controls { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
-        [PropertyGroup("Identity")]
+        [PropertyGroup("Core")]
         [OnChangeUIFunction("EbTabControl.label")]
         [PropertyPriority(70)]
         public string Title { get; set; }

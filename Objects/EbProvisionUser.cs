@@ -69,7 +69,7 @@ namespace ExpressBase.Objects
         public override bool IsSysControl { get { return true; } }
 
         [EnableInBuilder(BuilderType.WebForm)]
-        [PropertyGroup("Identity")]
+        [PropertyGroup("Core")]
         [UIproperty]
         [OnChangeUIFunction("EbProvisionUser.mapping")]
         [PropertyEditor(PropertyEditorType.Collection)]

@@ -23,7 +23,7 @@ namespace ExpressBase.Objects
 			this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
 
-        [PropertyGroup("Identity")]
+        [PropertyGroup("Core")]
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [UIproperty]
         [Unique]

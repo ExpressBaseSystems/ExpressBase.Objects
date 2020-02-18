@@ -66,6 +66,7 @@ namespace ExpressBase.Objects
         public List<EbRoutines> OnApprovalRoutines { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
+        [Alias("Label")]
         public override string Label { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]

@@ -20,20 +20,19 @@ namespace ExpressBase.Objects
 {
     public enum TextTransform
     {
-        Normal = 0,
         lowercase = 1,
+        Normal = 0,
         UPPERCASE = 2,
     }
 
     public enum TextMode
     {
-        SingleLine = 0,
-        Email = 2,
-        Password = 1,
         Color = 3,
+        Email = 2,
         MultiLine = 4,
-        Link = 5,
-        Name = 6,
+        Name = 5,
+        Password = 1,
+        SingleLine = 0,
     }
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
@@ -197,11 +196,11 @@ else {
         public string MinDateExpression { get; set; }
 
         //[ProtoBuf.ProtoMember(9)]
-        //[Description("Identity")]
+        //[Description("Core")]
         //public override string Name { get; set; }
 
         //[ProtoBuf.ProtoMember(10)]
-        //[Description("Identity")]
+        //[Description("Core")]
         //public override string Label { get; set; }
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [HideInPropertyGrid]
@@ -321,8 +320,8 @@ else {
                     attachedLableHtml = attachedLableHtml.Replace("$class", "phone");
                 else if (this.TextMode == TextMode.Name)
                     attachedLableHtml = attachedLableHtml.Replace("$class", "user");
-                else if (this.TextMode == TextMode.Link)
-                    attachedLableHtml = attachedLableHtml.Replace("$class", "link");
+                //else if (this.TextMode == TextMode.Link)
+                //    attachedLableHtml = attachedLableHtml.Replace("$class", "link");
 
                 html = html.Replace("@attachedLbl@", attachedLableHtml);
             }
