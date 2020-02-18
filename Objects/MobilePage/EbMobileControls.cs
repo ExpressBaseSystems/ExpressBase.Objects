@@ -139,7 +139,7 @@ namespace ExpressBase.Objects
                 DecimalPlaces = this.DecimalPlaces,
                 MaxLimit = this.MaxLimit,
                 MinLimit = this.MinLimit,
-                IsCurrency = this.IsCurrency,
+                //IsCurrency = this.IsCurrency,
                 Margin = new UISides { Top = 0, Bottom = 0, Left = 0, Right = 0 },
                 Label = this.Label
             };
