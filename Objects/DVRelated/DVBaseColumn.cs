@@ -611,7 +611,8 @@ else if(this.FormMode === 2){
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
         [DefaultPropValue("0")]
         [PropertyEditor(PropertyEditorType.DropDown)]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup("Core")]
+        [PropertyPriority(10)]
         [OnChangeExec(@"
 pg.HideProperty('TrueValue');
 pg.HideProperty('FalseValue');
@@ -765,6 +766,7 @@ if(this.RenderAs === 4){
     pg.HideGroup('TreeVisualization');
     pg.setSimpleProperty('IsTree', false);
     }")]
+        [PropertyPriority(10)]
         [PropertyGroup("Core")]
         public NumericRenderType RenderAs { get; set; }
 
@@ -850,6 +852,7 @@ else{
     pg.setSimpleProperty('IsTree', false);
 }")]
         [PropertyGroup("Core")]
+        [PropertyPriority(10)]
         public BooleanRenderType RenderAs { get; set; }
 
         public DVBooleanColumn()
@@ -925,6 +928,7 @@ else{
     pg.HideGroup('TreeVisualization');
     pg.setSimpleProperty('IsTree', false);
 }")]
+        [PropertyPriority(10)]
         [PropertyGroup("Core")]
         public DateTimeRenderType RenderAs { get; set; }
 
