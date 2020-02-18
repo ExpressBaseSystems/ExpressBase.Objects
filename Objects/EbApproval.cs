@@ -72,7 +72,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm)]
         [DefaultPropValue("200")]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         public override int Height { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]

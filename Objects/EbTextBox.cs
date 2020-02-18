@@ -143,12 +143,12 @@ else {
         //public string MaskPattern { get; set; }
 
         //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        //[PropertyGroup("Appearance")]
+        //[PropertyGroup(PGConstants.APPEARANCE)]
         //[PropertyEditor(PropertyEditorType.MultiLanguageKeySelector)]
         public string LabelT { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [PropertyEditor(PropertyEditorType.FontSelector)]
         [Alias("Font Family")]
         public string FontFamilyT { get; set; }
@@ -159,13 +159,13 @@ else {
         public string MetaOnly { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [PropertyEditor(PropertyEditorType.FontSelector)]
         [HideInPropertyGrid]
         public string Only4Dev { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [EbRequired]
         [Unique]
         public string Text { get; set; }

@@ -237,7 +237,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
         public string sWidth { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog)]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         public virtual int Width { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog)]
@@ -248,7 +248,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
         [PropertyEditor(PropertyEditorType.FontSelector)]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         public EbFont Font { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
@@ -345,7 +345,7 @@ else if(this.FormMode === 2){
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.DropDown)]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         public LinkTypeEnum LinkType { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
@@ -458,7 +458,7 @@ else if(this.FormMode === 2){
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
         [PropertyEditor(PropertyEditorType.DropDown)]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         public Align Align { get; set; }
 
         [JsonIgnore]

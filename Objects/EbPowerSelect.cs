@@ -16,6 +16,7 @@ using System.Data.Common;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
+using ExpressBase.Common.Constants;
 
 namespace ExpressBase.Objects
 {
@@ -276,7 +277,7 @@ pg.MakeReadOnly('DisplayMembers');} else {pg.MakeReadWrite('DisplayMembers');}")
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [DefaultPropValue("100")]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         public int DropdownHeight { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]

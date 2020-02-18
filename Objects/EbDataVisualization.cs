@@ -317,12 +317,12 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         [HideForUser]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         public bool DisableCopy { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         [HideForUser]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         public bool AllowMultilineHeader { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
@@ -339,7 +339,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]
         [DefaultPropValue("15")]
         [HideForUser]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         public int RowHeight { get; set; }
 
         [JsonIgnore]

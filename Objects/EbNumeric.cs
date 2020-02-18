@@ -97,7 +97,7 @@ namespace ExpressBase.Objects
         public bool AutoCompleteOff { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [UIproperty]
         [OnChangeUIFunction("Common.CONTROL_ICON")]
         public bool HideInputIcon { get; set; }

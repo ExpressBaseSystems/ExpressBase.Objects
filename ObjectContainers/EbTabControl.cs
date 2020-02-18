@@ -55,14 +55,14 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [OnChangeUIFunction("EbTabControl.padding")]
         [DefaultPropValue(8, 8, 8, 8)]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [PropertyEditor(PropertyEditorType.Expandable)]
         public new UISides Padding { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [OnChangeUIFunction("EbTabControl.adjustPanesHeightToHighest")]
         [DefaultPropValue("150")]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [Alias("Minimum height")]
         public int MinHeight { get; set; }
 

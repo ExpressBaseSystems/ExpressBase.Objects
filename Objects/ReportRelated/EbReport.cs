@@ -211,12 +211,12 @@ namespace ExpressBase.Objects
         public override float TopPt { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         public bool IsLandscape { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [PropertyEditor(PropertyEditorType.ImageSeletor)]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         public string BackgroundImage { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
@@ -257,7 +257,7 @@ namespace ExpressBase.Objects
         public string DataSourceRefId { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [UIproperty]
         [PropertyEditor(PropertyEditorType.FontSelector)]
         public EbFont Font { get; set; }

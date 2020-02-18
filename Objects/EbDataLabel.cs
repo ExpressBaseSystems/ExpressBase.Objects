@@ -57,7 +57,7 @@ namespace ExpressBase.Objects
 
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [OnChangeUIFunction("EbDataLabel.Style4DataLabel")]
         public Align TextAlign { get; set; }
 
@@ -79,7 +79,7 @@ namespace ExpressBase.Objects
         public override string LabelBackColor { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [UIproperty]
         [PropertyEditor(PropertyEditorType.FontSelector)]
         [OnChangeUIFunction("EbDataLabel.Style4PlaceHolder")]

@@ -20,6 +20,7 @@ using ExpressBase.Common.Data;
 using System.Collections;
 using System.ComponentModel;
 using ExpressBase.Common.LocationNSolution;
+using ExpressBase.Common.Constants;
 
 namespace ExpressBase.Objects
 {
@@ -46,7 +47,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [DefaultPropValue("200")]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         public override int Height { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
@@ -430,7 +431,7 @@ namespace ExpressBase.Objects
         public virtual bool IsEditable { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         public virtual int Width { get; set; }
 
         public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
@@ -1223,7 +1224,7 @@ else
         public bool IsInsertable { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [DefaultPropValue("100")]
         public override int Width { get; set; }
 
