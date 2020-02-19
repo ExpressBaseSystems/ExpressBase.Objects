@@ -1,4 +1,5 @@
-﻿using ExpressBase.Common.Extensions;
+﻿using ExpressBase.Common.Constants;
+using ExpressBase.Common.Extensions;
 using ExpressBase.Common.JsonConverters;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
@@ -122,17 +123,17 @@ namespace ExpressBase.Objects.Objects.SmsRelated
 
             [EnableInBuilder(BuilderType.SmsBuilder)]
             [UIproperty]
-            [PropertyGroup("Appearance")]
+            [PropertyGroup(PGConstants.APPEARANCE)]
             public float Width { get; set; }
 
             [EnableInBuilder(BuilderType.SmsBuilder)]
             [UIproperty]
-            [PropertyGroup("Appearance")]
+            [PropertyGroup(PGConstants.APPEARANCE)]
             public float Left { get; set; }
 
             [EnableInBuilder(BuilderType.SmsBuilder)]
             [UIproperty]
-            [PropertyGroup("Appearance")]
+            [PropertyGroup(PGConstants.APPEARANCE)]
             public float Right { get; set; }
 
 
@@ -143,13 +144,13 @@ namespace ExpressBase.Objects.Objects.SmsRelated
 
             //[EnableInBuilder(BuilderType.EmailBuilder)]
             //[UIproperty]
-            //[PropertyGroup("Appearance")]
+            //[PropertyGroup(PGConstants.APPEARANCE)]
             //public int Border { get; set; }
 
             [EnableInBuilder(BuilderType.SmsBuilder)]
             [UIproperty]
             [PropertyEditor(PropertyEditorType.Color)]
-            [PropertyGroup("Appearance")]
+            [PropertyGroup(PGConstants.APPEARANCE)]
             public string BorderColor { get; set; }
         }
     }

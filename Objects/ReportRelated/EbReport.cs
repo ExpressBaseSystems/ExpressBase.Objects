@@ -25,12 +25,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data;
-using System.Drawing;
+using System.DrawingCore.Imaging;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
-
+using System.Text; 
 namespace ExpressBase.Objects
 {
     public enum EbReportSectionType
@@ -212,12 +211,12 @@ namespace ExpressBase.Objects
         public override float TopPt { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         public bool IsLandscape { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [PropertyEditor(PropertyEditorType.ImageSeletor)]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         public string BackgroundImage { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
@@ -254,11 +253,11 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.Report)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
-        [PropertyGroup("Data")]
+        [PropertyGroup(PGConstants.DATA)]
         public string DataSourceRefId { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [UIproperty]
         [PropertyEditor(PropertyEditorType.FontSelector)]
         public EbFont Font { get; set; }
@@ -863,9 +862,9 @@ namespace ExpressBase.Objects
                             //footer_diffrence = HeightPt - rf_Yposition - Margin.Bottom;
                             footer_diffrence = field.TopPt;
                             FooterDrawn = true;
-                            rf_Yposition = Margin.Top; 
-                        } 
-                            field.TopPt -= footer_diffrence;
+                            rf_Yposition = Margin.Top;
+                        }
+                        field.TopPt -= footer_diffrence;
                         DrawFields(field, rf_Yposition, 0);
                     }
                 }
@@ -1074,14 +1073,14 @@ namespace ExpressBase.Objects
                      ImageInfo = new ImageMeta
                      {
                          FileRefId = refId,
-                         FileCategory =Common.Enums.EbFileCategory.Images
+                         FileCategory = Common.Enums.EbFileCategory.Images
                      }
                  });
             if (dfs.StreamWrapper != null)
             {
                 dfs.StreamWrapper.Memorystream.Position = 0;
                 fileByte = dfs.StreamWrapper.Memorystream.ToBytes();
-            }
+            }           
 
             return fileByte;
         }

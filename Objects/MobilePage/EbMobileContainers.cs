@@ -14,7 +14,7 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.MobilePage)]
     public class EbMobileContainer : EbMobilePageBase
     {
-       
+
     }
 
     [EnableInBuilder(BuilderType.MobilePage)]
@@ -27,6 +27,10 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
         public List<EbMobileControl> ChiledControls { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
+        public List<EbMobileControl> ChildControls { get { return ChiledControls; } set { } }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         public string TableName { set; get; }
@@ -42,6 +46,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iWebForm)]
+        [Alias("Web Form")]
         public string WebFormRefId { set; get; }
 
         public override string GetDesignHtml()
@@ -75,7 +80,7 @@ namespace ExpressBase.Objects
         {
             foreach (EbMobileControl ctrl in this.ChiledControls)
             {
-                if(ctrl is EbMobileTableLayout)
+                if (ctrl is EbMobileTableLayout)
                 {
                     foreach (EbMobileTableCell cell in (ctrl as EbMobileTableLayout).CellCollection)
                     {
@@ -107,6 +112,8 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
+        [Alias("Data Source")]
+        [PropertyGroup("Data")]
         public string DataSourceRefId { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
@@ -116,22 +123,45 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
         [HelpText("sql query to get data from offline database")]
+        [Alias("Offline Query")]
+        [PropertyGroup("Data")]
         public EbScript OfflineQuery { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iMobilePage)]
         [PropertyGroup("Link Settings")]
+        [Alias("Link")]
         public string LinkRefId { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
         public EbMobileTableLayout DataLayout { set; get; }
 
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
+        public List<EbMobileDataColumn> Filters { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Link Settings")]
+        public WebFormDVModes FormMode { set; get; }
+
         public override string GetDesignHtml()
         {
             return @"<div class='eb_mob_vis_container mob_container dropped' tabindex='1' eb-type='EbMobileVisualization' id='@id'>
                         <div class='eb_mob_container_inner'>
+                            <label class='vis-group-label'>Design</label>
+                            <div class='vis-table-container'>
+
+                            </div>
+                            <label class='vis-group-label'>Filter Columns </label>
+                            <div class='vis-filter-container'>
+
+                            </div>
+                            <label class='vis-group-label'>Preview</label>
+                            <div class='vis-preview-container'>
+
+                            </div>
                         </div>
                     </div>".RemoveCR().DoubleQuoted();
         }
@@ -139,6 +169,58 @@ namespace ExpressBase.Objects
         public EbMobileVisualization()
         {
             OfflineQuery = new EbScript();
+            Filters = new List<EbMobileDataColumn>();
+        }
+    }
+
+    [EnableInBuilder(BuilderType.MobilePage)]
+    public class EbMobileDashBoard : EbMobileContainer
+    {
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
+        public override string Name { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
+        public List<EbMobileDashBoardControls> ChiledControls { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
+        public List<EbMobileDashBoardControls> ChildControls { get { return ChiledControls; } set { } }
+
+        public override string GetDesignHtml()
+        {
+            return @"<div class='eb_mob_dashboard_container mob_container dropped' tabindex='1' eb-type='EbMobileDashBoard' id='@id'>
+                        <div class='eb_mob_container_inner'>
+                        </div>
+                    </div>".RemoveCR().DoubleQuoted();
+        }
+    }
+
+    [EnableInBuilder(BuilderType.MobilePage)]
+    public class EbMobilePdf : EbMobileContainer
+    {
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
+        public override string Name { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [OSE_ObjectTypes(EbObjectTypes.iReport)]
+        public string Template { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
+        [HelpText("sql query to get data from offline database")]
+        [Alias("Offline Query")]
+        public EbScript OfflineQuery { set; get; }
+
+        public override string GetDesignHtml()
+        {
+            return @"<div class='eb_mob_pdf_container mob_container dropped' tabindex='1' eb-type='EbMobilePdf' id='@id'>
+                        <div class='eb_mob_container_inner'>
+                        </div>
+                    </div>".RemoveCR().DoubleQuoted();
         }
     }
 }

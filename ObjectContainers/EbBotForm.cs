@@ -1,4 +1,5 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Constants;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
@@ -31,7 +32,7 @@ namespace ExpressBase.Objects
         public bool RenderAsForm { get; set; }
 
         [EnableInBuilder(BuilderType.BotForm)]
-        [PropertyGroup("Data")]
+        [PropertyGroup(PGConstants.DATA)]
         [HelpText("Name Of database-table Which you want to store Data collected using this Form")]
         public override string TableName { get; set; }
 

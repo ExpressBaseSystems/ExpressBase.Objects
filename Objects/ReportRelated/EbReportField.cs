@@ -15,6 +15,7 @@ using ExpressBase.Common;
 using ExpressBase.Common.Data;
 using Newtonsoft.Json;
 using ServiceStack;
+using ExpressBase.Common.Constants;
 
 namespace ExpressBase.Objects
 {
@@ -22,13 +23,13 @@ namespace ExpressBase.Objects
     {
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [PropertyEditor(PropertyEditorType.Color)]
         public virtual string ForeColor { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         public virtual EbTextAlign TextAlign { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
@@ -38,17 +39,17 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         public int Border { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
         [PropertyEditor(PropertyEditorType.Color)]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         public string BorderColor { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [UIproperty]
         [PropertyEditor(PropertyEditorType.FontSelector)]
         public virtual EbFont Font { get; set; }
@@ -237,7 +238,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         public new EbTextAlign TextAlign { get; set; } = EbTextAlign.Center;
 
         public override string GetDesignHtml()
@@ -700,7 +701,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
-        [PropertyGroup("Data")]
+        [PropertyGroup(PGConstants.DATA)]
         public string Code { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
@@ -710,12 +711,12 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         public bool GuardBars { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         public float BaseLine { get; set; }
 
         public override string GetDesignHtml()
@@ -828,7 +829,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
-        [PropertyGroup("Data")]
+        [PropertyGroup(PGConstants.DATA)]
         public string Code { get; set; }
 
         public override string GetDesignHtml()

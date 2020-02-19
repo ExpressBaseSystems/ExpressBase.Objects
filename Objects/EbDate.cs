@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using ExpressBase.Security;
 using System.Globalization;
 using ExpressBase.Common.LocationNSolution;
+using ExpressBase.Common.Constants;
 
 namespace ExpressBase.Objects
 {
@@ -76,7 +77,12 @@ namespace ExpressBase.Objects
         {
             return ReplacePropsInHTML(HtmlConstants.CONTROL_WRAPER_HTML4BOT);
         }
+
+        [HideInPropertyGrid]
+        public override bool Unique { get; set; }
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.CORE)]
         public EbDateType EbDateType { get; set; }
 
         //[EnableInBuilder(BuilderType.BotForm)]
@@ -92,6 +98,7 @@ namespace ExpressBase.Objects
         public string PlaceHolder { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.EXTENDED)]
         public bool AutoCompleteOff { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
@@ -106,9 +113,11 @@ namespace ExpressBase.Objects
         public override bool DoNotPersist { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.EXTENDED)]
         public bool IsNullable { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.EXTENDED)]
         private string maskPattern
         {
             get
@@ -125,9 +134,11 @@ namespace ExpressBase.Objects
         }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.EXTENDED)]
         public TimeShowFormat ShowTimeAs_ { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.EXTENDED)]
         public DateShowFormat ShowDateAs_ { get; set; }
 
         //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
@@ -240,7 +251,7 @@ namespace ExpressBase.Objects
                     else if(this.EbDateType === 6) //DateTime
                         return moment($('#' + this.EbSid_CtxId).val(), ebcontext.user.Preference.ShortDatePattern + ' ' + ebcontext.user.Preference.ShortTimePattern).format('YYYY-MM-DD HH:mm:ss');
                     else if(this.EbDateType === 17) //Time
-                        return moment($('#' + this.EbSid_CtxId).val(), ebcontext.user.Preference.ShortTimePattern).format('YYYY-MM-DD HH:mm:ss');";
+                        return moment($('#' + this.EbSid_CtxId).val(), ebcontext.user.Preference.ShortTimePattern).format('HH:mm:ss');";
             }
             set { }
         }
@@ -364,17 +375,22 @@ namespace ExpressBase.Objects
                 if (Value == null)
                     dt = DateTime.UtcNow;
                 else
-                    dt = Convert.ToDateTime(Value);
+                {
+                    if (Value.GetType() == typeof(TimeSpan))
+                        dt = DateTime.MinValue + (TimeSpan)Value;
+                    else
+                        dt = Convert.ToDateTime(Value);
+                }
                 DateTime dt_cov = dt.ConvertFromUtc(UserObj.Preference.TimeZone);
                 
                 if (_this.EbDateType == EbDateType.Date)
                 {
-                    if (!(_this is EbDate))
+                    if (!(_this is EbDate)) //EbSysCreatedAt EbSysModifiedAt EbDGDateColumn EbDGCreatedAtColumn EbDGModifiedAtColumn
                     {
                         _formattedData = dt_cov.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
                         _displayMember = dt_cov.ToString(UserObj.Preference.GetShortDatePattern(), CultureInfo.InvariantCulture);
                     }
-                    else //EbSysCreatedAt EbSysModifiedAt EbDGDateColumn EbDGCreatedAtColumn EbDGModifiedAtColumn
+                    else //EbDate
                     {
                         if (_this.ShowDateAs_ == DateShowFormat.Year_Month)
                         {

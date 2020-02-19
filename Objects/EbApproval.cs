@@ -3,10 +3,15 @@ using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
-using ExpressBase.Objects.Helpers;
+using ExpressBase.Security;
+using ExpressBase.Objects.ServiceStack_Artifacts;
 using Newtonsoft.Json;
+using ServiceStack;
+using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using System.Linq;
+using ExpressBase.Common.Constants;
 
 namespace ExpressBase.Objects
 {
@@ -44,6 +49,8 @@ namespace ExpressBase.Objects
             };
         }
 
+
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [HideInPropertyGrid]
         public override bool IsSpecialContainer { get { return true; } set { } }
@@ -60,11 +67,12 @@ namespace ExpressBase.Objects
         public List<EbRoutines> OnApprovalRoutines { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
+        [Alias("Label")]
         public override string Label { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
         [DefaultPropValue("200")]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         public override int Height { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
@@ -74,7 +82,7 @@ namespace ExpressBase.Objects
         public bool IsShowSerialNumber { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
-        [PropertyGroup("Data")]
+        [PropertyGroup(PGConstants.DATA)]
         [HelpText("Name Of database-table Which you want to store Data collected using this Form")]
         [InputMask("[a-z][a-z0-9]*(_[a-z0-9]+)*")]
         [EbRequired]
@@ -183,6 +191,24 @@ namespace ExpressBase.Objects
             return html;
         }
 
+        public void InitRoles(JsonServiceClient serviceClient, User user)
+        {
+            var result = serviceClient.Get<GetAllRolesResponse>(new GetAllRolesRequest());
+            this.Roles = new Dictionary<int, string>();
+            foreach (string r in user.Roles)
+            {                
+                var s = result.Roles.FirstOrDefault(kvp => kvp.Value == r);
+                if (s.Value != null)
+                {
+                    this.Roles.Add(s.Key, s.Value);
+                }
+            }
+        }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public Dictionary<int, string> Roles { get; set; }
+
         public override string GetDesignHtml()
         {
             return GetHtml().RemoveCR().DoubleQuoted();
@@ -219,7 +245,10 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm)]
         [Unique]
-        public KuSApproverRole ApproverRole { get; set; }
+        [PropDataSourceJsFn("return ebcontext.Roles")]
+        [PropertyEditor(PropertyEditorType.DropDown)]
+        
+        public int ApproverRole { get; set; }
 
 
     }
