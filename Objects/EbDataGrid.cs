@@ -455,6 +455,14 @@ namespace ExpressBase.Objects
         }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [OnChangeExec(@"
+if (this.TextMode === 4 ){
+    pg.ShowProperty('RowsVisible');
+}
+else {
+    pg.HideProperty('RowsVisible');
+}
+            ")]
         public TextMode TextMode
         {
             get { return this.EbTextBox.TextMode; }
