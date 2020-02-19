@@ -9,6 +9,13 @@ using System.Text;
 
 namespace ExpressBase.Objects
 {
+    public enum NetworkMode
+    {
+        Online,
+        Offline,
+        Mixed
+    }
+
     public abstract class EbMobilePageBase : EbObject
     {
 
@@ -29,7 +36,14 @@ namespace ExpressBase.Objects
         public override string DisplayName { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Identity")]
         public override string Description { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Identity")]
+        [Alias("Mode")]
+        [HelpText("Should the page work online or offline or in mixed")]
+        public NetworkMode NetworkMode { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]

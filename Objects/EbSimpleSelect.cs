@@ -16,6 +16,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
+using ExpressBase.Common.Constants;
 
 namespace ExpressBase.Objects
 {
@@ -51,7 +52,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [DefaultPropValue("100")]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         public int DropdownHeight { get; set; }
 
         public override string JustSetValueJSfn

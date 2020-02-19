@@ -15,6 +15,7 @@ using ExpressBase.Objects.Helpers;
 using ExpressBase.Common;
 using ServiceStack;
 using ExpressBase.Objects.ServiceStack_Artifacts;
+using ExpressBase.Common.Constants;
 
 namespace ExpressBase.Objects
 {
@@ -85,7 +86,7 @@ $('#cont_' + this.EbSid_CtxId + ' .ctrl-cover').css('pointer-events', 'inherit')
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [HelpText("To limit number of charecters")]
-        [PropertyGroup("Core")]
+        [PropertyGroup(PGConstants.EXTENDED)]
         [PropertyEditor(PropertyEditorType.Number)]
         [PropertyPriority(99)]
         [OnChangeExec(@"
@@ -101,7 +102,7 @@ else {
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [Alias("Text Transform")]
         [DefaultPropValue("'UPPERCASE'")]
-        [PropertyGroup("Core")]
+        [PropertyGroup(PGConstants.CORE)]
         [PropertyEditor(PropertyEditorType.DropDown)]
         [OnChangeExec(@"
 if (this.TextTransform === 'UPPERCASE' ){
@@ -114,7 +115,7 @@ else {
         public TextTransform TextTransform { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [PropertyGroup("Core")]
+        [PropertyGroup(PGConstants.CORE)]
         [DefaultPropValue("'SingleLine'")]
         [OnChangeExec(@"
 if (this.TextMode === 4 ){
@@ -127,7 +128,7 @@ else {
         public TextMode TextMode { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [PropertyGroup("Core")]
+        [PropertyGroup(PGConstants.CORE)]
         [DefaultPropValue("3")]
         public int RowsVisible { get; set; }
 
@@ -142,12 +143,12 @@ else {
         //public string MaskPattern { get; set; }
 
         //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        //[PropertyGroup("Appearance")]
+        //[PropertyGroup(PGConstants.APPEARANCE)]
         //[PropertyEditor(PropertyEditorType.MultiLanguageKeySelector)]
         public string LabelT { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [PropertyEditor(PropertyEditorType.FontSelector)]
         [Alias("Font Family")]
         public string FontFamilyT { get; set; }
@@ -158,13 +159,13 @@ else {
         public string MetaOnly { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [PropertyEditor(PropertyEditorType.FontSelector)]
         [HideInPropertyGrid]
         public string Only4Dev { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [EbRequired]
         [Unique]
         public string Text { get; set; }
@@ -174,7 +175,7 @@ else {
         public bool AutoCompleteOff { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
-        [PropertyGroup("Behavior")]
+        [PropertyGroup(PGConstants.EXTENDED)]
         public bool AutoSuggestion { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]

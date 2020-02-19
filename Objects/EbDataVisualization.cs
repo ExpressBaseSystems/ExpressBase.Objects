@@ -1,4 +1,5 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Constants;
 using ExpressBase.Common.Data;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
@@ -92,11 +93,11 @@ namespace ExpressBase.Objects
         public override string RefId { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
-        [PropertyGroup("Core")]
+        [PropertyGroup(PGConstants.CORE)]
         public override string DisplayName { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
-        [PropertyGroup("Core")]
+        [PropertyGroup(PGConstants.CORE)]
         [HideInPropertyGrid]
         public override string Name { get; set; }
 
@@ -117,7 +118,7 @@ namespace ExpressBase.Objects
         [HideForUser]
         [PropertyPriority(0)]
         [Alias("Data Reader")]
-        [PropertyGroup("Core")]
+        [PropertyGroup(PGConstants.CORE)]
         public string DataSourceRefId { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
@@ -316,12 +317,12 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         [HideForUser]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         public bool DisableCopy { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         [HideForUser]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         public bool AllowMultilineHeader { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
@@ -338,7 +339,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]
         [DefaultPropValue("15")]
         [HideForUser]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         public int RowHeight { get; set; }
 
         [JsonIgnore]
