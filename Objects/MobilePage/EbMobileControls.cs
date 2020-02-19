@@ -1,4 +1,5 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Constants;
 using ExpressBase.Common.Data;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
@@ -135,7 +136,7 @@ namespace ExpressBase.Objects
             {
                 EbSid = "Numeric" + counter,
                 Name = this.Name,
-                MaxLength = this.MaxLength,
+                //MaxLength = this.MaxLength,
                 DecimalPlaces = this.DecimalPlaces,
                 MaxLimit = this.MaxLimit,
                 MinLimit = this.MinLimit,
@@ -210,13 +211,13 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.Collection)]
-        [PropertyGroup("Data")]
+        [PropertyGroup(PGConstants.DATA)]
         public List<EbMobileSSOption> Options { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
-        [PropertyGroup("Data")]
+        [PropertyGroup(PGConstants.DATA)]
         [OnChangeExec(@"
                 if (this.DataSourceRefId !== null && this.DataSourceRefId !== ''){ 
                         pg.ShowProperty('DisplayMember');
@@ -237,18 +238,18 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", 1)]
-        [PropertyGroup("Data")]
+        [PropertyGroup(PGConstants.DATA)]
         public EbMobileDataColumn DisplayMember { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", 1)]
-        [PropertyGroup("Data")]
+        [PropertyGroup(PGConstants.DATA)]
         public EbMobileDataColumn ValueMember { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
         [HelpText("sql query to get data from offline database")]
-        [PropertyGroup("Data")]
+        [PropertyGroup(PGConstants.DATA)]
         public EbScript OfflineQuery { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]

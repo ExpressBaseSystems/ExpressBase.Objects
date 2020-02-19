@@ -1,4 +1,5 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Constants;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
@@ -204,7 +205,7 @@ namespace ExpressBase.Objects
 
         [HideForUser]
         [EnableInBuilder(BuilderType.DashBoard)]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [DefaultPropValue("90")]
         [OnChangeExec(@"if(this.Angle > 50){
             this.Angle = 50;
@@ -220,7 +221,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.DashBoard)]
         [UIproperty]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [DefaultPropValue("20")]
         [OnChangeExec(@"if(this.LineWidth > 70){
             this.LineWidth = 70;
@@ -235,7 +236,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.DashBoard)]
         [UIproperty]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [OnChangeExec(@"if(this.RadiusScale > 100){
             this.RadiusScale = 100;
             $('#' + pg.wraperId + 'RadiusScale').val(100);
@@ -252,14 +253,14 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.DashBoard)]
         [UIproperty]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [PropertyEditor(PropertyEditorType.Color)]
         public string ColorStart { get; set; }
 
 
         [EnableInBuilder(BuilderType.DashBoard)]
         [UIproperty]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [PropertyEditor(PropertyEditorType.Color)]
         [DefaultPropValue("#2b2b2b")]
         public string ColorStop { get; set; }
@@ -267,7 +268,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.DashBoard)]
         [UIproperty]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [PropertyEditor(PropertyEditorType.Color)]
         public string StrokeColor { get; set; }
 
@@ -287,19 +288,19 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.DashBoard)]
         [UIproperty]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         public int PointerLength { get; set; }
 
         [EnableInBuilder(BuilderType.DashBoard)]
         [UIproperty]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [DefaultPropValue("50")]
         public int PointerStrokeWidth { get; set; }
 
 
         [EnableInBuilder(BuilderType.DashBoard)]
         [UIproperty]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [PropertyEditor(PropertyEditorType.Color)]
         public string PointerColor { get; set; }
     }
@@ -346,7 +347,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.DashBoard)]
         [UIproperty]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [PropertyEditor(PropertyEditorType.Color)]
         public string DivColor { get; set; }
 
@@ -388,7 +389,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.DashBoard)]
         [UIproperty]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [PropertyEditor(PropertyEditorType.Color)]
         public string SubColor { get; set; }
     }

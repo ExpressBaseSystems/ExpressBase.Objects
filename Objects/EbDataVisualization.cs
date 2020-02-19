@@ -1,4 +1,5 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Constants;
 using ExpressBase.Common.Data;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
@@ -92,7 +93,13 @@ namespace ExpressBase.Objects
         public override string RefId { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
+        [PropertyGroup(PGConstants.CORE)]
         public override string DisplayName { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
+        [PropertyGroup(PGConstants.CORE)]
+        [HideInPropertyGrid]
+        public override string Name { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
         public override string Description { get; set; }
@@ -110,12 +117,16 @@ namespace ExpressBase.Objects
         [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
         [HideForUser]
         [PropertyPriority(0)]
+        [Alias("Data Reader")]
+        [PropertyGroup(PGConstants.CORE)]
         public string DataSourceRefId { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
+        [HideInPropertyGrid]
         public string Url { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
+        [HideInPropertyGrid]
         public string Sql { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
@@ -136,6 +147,9 @@ namespace ExpressBase.Objects
             this.bVisible = false;
             Parent.NotVisibleColumns.$values.push(this)")]
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
+        [PropertyGroup("User Actions")]
+        [PropertyPriority(2)]
+        [HideInPropertyGrid]
         public virtual DVColumnCollection Columns { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
@@ -298,19 +312,24 @@ namespace ExpressBase.Objects
         public bool DisableRowGrouping { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
-        [HideForUser]
+        [HideInPropertyGrid]
         public string SecondaryTableMapField { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         [HideForUser]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         public bool DisableCopy { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         [HideForUser]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         public bool AllowMultilineHeader { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
+        [PropertyGroup("User Actions")]
+        [PropertyPriority(1)]
+        [HideInPropertyGrid]
         public List<DVBaseColumn> OrderBy { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
@@ -320,6 +339,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]
         [DefaultPropValue("15")]
         [HideForUser]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         public int RowHeight { get; set; }
 
         [JsonIgnore]

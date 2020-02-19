@@ -1,4 +1,5 @@
-﻿using ExpressBase.Common.Extensions;
+﻿using ExpressBase.Common.Constants;
+using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using Newtonsoft.Json;
@@ -54,21 +55,21 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [OnChangeUIFunction("EbTabControl.padding")]
         [DefaultPropValue(8, 8, 8, 8)]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [PropertyEditor(PropertyEditorType.Expandable)]
         public new UISides Padding { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [OnChangeUIFunction("EbTabControl.adjustPanesHeightToHighest")]
         [DefaultPropValue("150")]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [Alias("Minimum height")]
         public int MinHeight { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.Collection)]
         [Alias("TabPanes")]
-        [PropertyGroup("Core")]
+        [PropertyGroup(PGConstants.CORE)]
         [UIproperty]
         [PropertyPriority(95)]
         [ListType(typeof(EbTabPane))]
@@ -180,7 +181,7 @@ this.Init = function(id)
         public override List<EbControl> Controls { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
-        [PropertyGroup("Core")]
+        [PropertyGroup(PGConstants.CORE)]
         [OnChangeUIFunction("EbTabControl.label")]
         [PropertyPriority(70)]
         public string Title { get; set; }

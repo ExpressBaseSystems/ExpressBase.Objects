@@ -14,6 +14,7 @@ using ExpressBase.Objects.Objects;
 using System.Text;
 using ServiceStack.RabbitMq;
 using ExpressBase.Objects.ServiceStack_Artifacts;
+using ExpressBase.Common.Constants;
 
 namespace ExpressBase.Objects
 {
@@ -69,7 +70,7 @@ namespace ExpressBase.Objects
         public override bool IsSysControl { get { return true; } }
 
         [EnableInBuilder(BuilderType.WebForm)]
-        [PropertyGroup("Core")]
+        [PropertyGroup(PGConstants.CORE)]
         [UIproperty]
         [OnChangeUIFunction("EbProvisionUser.mapping")]
         [PropertyEditor(PropertyEditorType.Collection)]
