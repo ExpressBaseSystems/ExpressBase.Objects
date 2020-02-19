@@ -553,7 +553,7 @@ else {
         [JsonIgnore]
         public override string GetValueFromDOMJSfn
         {
-            get { return "return parseInt(" + base.GetValueFromDOMJSfn.Replace("return", "").Replace(";", "") + ")"; }
+            get { return "return parseFloat(" + base.GetValueFromDOMJSfn.Replace("return", "").Replace(";", "") + ")"; }
 
             set { }
         }
