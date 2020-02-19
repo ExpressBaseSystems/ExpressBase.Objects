@@ -284,7 +284,6 @@ else {
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iTableVisualization, EbObjectTypes.iChartVisualization, EbObjectTypes.iReport, EbObjectTypes.iWebForm , EbObjectTypes.iDashBoard)]
         [OnChangeExec(@"
-    pg.HideGroup('TreeVisualization');
 if(this.LinkRefId !== null){
     console.log(this.LinkRefId);
         pg.ShowProperty('LinkType');
@@ -319,7 +318,12 @@ if(this.FormMode === 1){
 else if(this.FormMode === 2){
     pg.HideProperty('FormId');
     pg.ShowProperty('FormParameters');
-}")]
+}
+else{
+    pg.HideProperty('FormId');
+    pg.HideProperty('FormParameters');
+}
+")]
         [PropertyGroup("FormSettings")]
         public WebFormDVModes FormMode { get; set; }
 
