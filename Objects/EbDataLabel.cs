@@ -53,10 +53,10 @@ namespace ExpressBase.Objects
         }
 
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
-        [PropertyGroup(PGConstants.CORE)]
-        [OnChangeUIFunction("EbDataLabel.DescriptionLabel")]
-        public override string Description { get; set; }
+        //[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        //[PropertyGroup(PGConstants.CORE)]
+        //[OnChangeUIFunction("EbDataLabel.DescriptionLabel")]
+        //public override string Description { get; set; }
 
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
