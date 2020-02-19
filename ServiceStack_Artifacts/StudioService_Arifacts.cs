@@ -699,7 +699,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public EbObj_Dashboard() { }
     }
 
-    public class EbObjectTaggedRequest : EbServiceStackAuthRequest, IReturn<EbObjectRelationsResponse>
+    public class EbObjectTaggedRequest : EbServiceStackAuthRequest, IReturn<EbObjectTaggedResponse>
     {
         public string Tags { get; set; }
 
@@ -718,7 +718,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-    public class EbObjectGetAllTagsRequest : EbServiceStackAuthRequest, IReturn<EbObjectExploreObjectResponse>
+    public class EbObjectGetAllTagsRequest : EbServiceStackAuthRequest, IReturn<EbObjectGetAllTagsResponse>
     {
 
     }
@@ -734,6 +734,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 3)]
         public ResponseStatus ResponseStatus { get; set; }
     }
+
     public class UniqueObjectNameCheckRequest : EbServiceStackAuthRequest, IReturn<UniqueObjectNameCheckResponse>
     {
         public string ObjName { get; set; }
