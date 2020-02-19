@@ -181,7 +181,7 @@ namespace ExpressBase.Objects
 
         public override string GetBareHtml()
         {
-            return @" < div class='gaugeChart' style='border:solid 1px'></div>";
+            return @" < div class='gaugeChart guage' style='border:solid 1px'></div>";
 
         }
 
@@ -193,7 +193,7 @@ namespace ExpressBase.Objects
         public override string GetHtml()
         {
             string EbCtrlHTML = @"
-        <div id='@id' ebsid='@id' name='@name@' class='gaugeChart' eb-type='Gauge'>
+        <div id='@id' ebsid='@id' name='@name@' class='gaugeChart guage' eb-type='Gauge'>
         </div>";
             return ReplacePropsInHTML(EbCtrlHTML);
         }
@@ -205,7 +205,7 @@ namespace ExpressBase.Objects
         [HideForUser]
         [EnableInBuilder(BuilderType.DashBoard)]
         [PropertyGroup("Appearance")]
-        [DefaultPropValue("90")]
+        [DefaultPropValue("0")]
         [OnChangeExec(@"if(this.Angle > 50){
             this.Angle = 50;
             $('#' + pg.wraperId + 'Angle').val(50);
@@ -236,6 +236,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.DashBoard)]
         [UIproperty]
         [PropertyGroup("Appearance")]
+        [DefaultPropValue("100")]
         [OnChangeExec(@"if(this.RadiusScale > 100){
             this.RadiusScale = 100;
             $('#' + pg.wraperId + 'RadiusScale').val(100);
@@ -254,6 +255,7 @@ namespace ExpressBase.Objects
         [UIproperty]
         [PropertyGroup("Appearance")]
         [PropertyEditor(PropertyEditorType.Color)]
+        [DefaultPropValue("#FE1A1A")]
         public string ColorStart { get; set; }
 
 
@@ -288,12 +290,13 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.DashBoard)]
         [UIproperty]
         [PropertyGroup("Appearance")]
+        [DefaultPropValue("50")]
         public int PointerLength { get; set; }
 
         [EnableInBuilder(BuilderType.DashBoard)]
         [UIproperty]
         [PropertyGroup("Appearance")]
-        [DefaultPropValue("50")]
+        [DefaultPropValue("5")]
         public int PointerStrokeWidth { get; set; }
 
 
@@ -301,6 +304,7 @@ namespace ExpressBase.Objects
         [UIproperty]
         [PropertyGroup("Appearance")]
         [PropertyEditor(PropertyEditorType.Color)]
+        [DefaultPropValue("#191717")]
         public string PointerColor { get; set; }
     }
 
