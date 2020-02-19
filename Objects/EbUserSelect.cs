@@ -1,8 +1,10 @@
 ﻿using ExpressBase.Common;
 using ExpressBase.Common.Extensions;
+using ExpressBase.Common.LocationNSolution;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
+using ExpressBase.Security;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
@@ -117,6 +119,28 @@ namespace ExpressBase.Objects
         public override EbScript OnChangeFn { get; set; }
 
         //--------Hide in property grid------------end
+
+
+        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
+        {
+            object _formattedData = Value;
+            string _displayMember = string.Empty;
+            
+            if (Value == null && this.LoadCurrentUser)
+            {
+                _formattedData = UserObj.UserId.ToString();
+            }
+
+            return new SingleColumn()
+            {
+                Name = this.Name,
+                Type = (int)this.EbDbType,
+                Value = _formattedData,
+                Control = this,
+                ObjType = this.ObjType,
+                F = _displayMember
+            };
+        }
 
     }
 

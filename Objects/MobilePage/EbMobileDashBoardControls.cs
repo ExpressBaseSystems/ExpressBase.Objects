@@ -1,4 +1,5 @@
-﻿using ExpressBase.Common.Extensions;
+﻿using ExpressBase.Common.Constants;
+using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
@@ -22,13 +23,13 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
-        [PropertyGroup("Data")]
+        [PropertyGroup(PGConstants.DATA)]
         public string DataSourceRefId { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
         [HelpText("sql query to get data from offline database")]
-        [PropertyGroup("Data")]
+        [PropertyGroup(PGConstants.DATA)]
         public EbScript OfflineQuery { set; get; }
 
         public override string GetDesignHtml()

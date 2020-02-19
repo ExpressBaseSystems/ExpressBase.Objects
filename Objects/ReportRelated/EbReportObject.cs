@@ -1,4 +1,5 @@
-﻿using ExpressBase.Common.Objects;
+﻿using ExpressBase.Common.Constants;
+using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
@@ -25,7 +26,7 @@ namespace ExpressBase.Objects
         public virtual string Title { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [UIproperty]
         public virtual string Left { get; set; }
 
@@ -35,7 +36,7 @@ namespace ExpressBase.Objects
 
         [UIproperty]
         [EnableInBuilder(BuilderType.Report)]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         public virtual string Width { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
@@ -44,7 +45,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         public virtual string Top { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
@@ -53,7 +54,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         public virtual string Height { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
@@ -63,7 +64,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.Report)]
         [UIproperty]
         [PropertyEditor(PropertyEditorType.Color)]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         public virtual string BackColor { get; set; }
     }
 }

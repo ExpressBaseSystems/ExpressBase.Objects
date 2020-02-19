@@ -1,4 +1,5 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Constants;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
@@ -66,13 +67,13 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.DashBoard)]
         [UIproperty]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [PropertyEditor(PropertyEditorType.Color)]
         public virtual string BackgroundColor { get; set; }
 
 
         [EnableInBuilder(BuilderType.DashBoard)]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [UIproperty]
         [PropertyEditor(PropertyEditorType.FontSelector)]
         [HideInPropertyGrid]

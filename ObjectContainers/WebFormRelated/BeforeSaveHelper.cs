@@ -191,6 +191,7 @@ namespace ExpressBase.Objects.WebFormRelated
                             {
                                 if (CalcFlds[i] != j)
                                     dpndcy.Add(new KeyValuePair<int, int>(CalcFlds[i], j));//<dependent, dominant>
+                                _dict[CalcFlds[i]].Control.ValExpParams.Add(_dict[j].Path);
                             }
                         }
                     }
@@ -256,6 +257,7 @@ namespace ExpressBase.Objects.WebFormRelated
             foreach (EbControl control in FlatCtrls)
             {
                 control.DependedValExp.Clear();
+                control.ValExpParams.Clear();
                 string path = _path == "" ? control.Name : _path + "." + control.Name;
                 control.__path = path;
                 _dict.Add(_counter++, new EbControlWrapper

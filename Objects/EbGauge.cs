@@ -1,4 +1,5 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Constants;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
@@ -235,8 +236,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.DashBoard)]
         [UIproperty]
-        [PropertyGroup("Appearance")]
-        [DefaultPropValue("100")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [OnChangeExec(@"if(this.RadiusScale > 100){
             this.RadiusScale = 100;
             $('#' + pg.wraperId + 'RadiusScale').val(100);
@@ -253,7 +253,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.DashBoard)]
         [UIproperty]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [PropertyEditor(PropertyEditorType.Color)]
         [DefaultPropValue("#FE1A1A")]
         public string ColorStart { get; set; }
@@ -261,7 +261,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.DashBoard)]
         [UIproperty]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [PropertyEditor(PropertyEditorType.Color)]
         [DefaultPropValue("#2b2b2b")]
         public string ColorStop { get; set; }
@@ -269,7 +269,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.DashBoard)]
         [UIproperty]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [PropertyEditor(PropertyEditorType.Color)]
         public string StrokeColor { get; set; }
 
@@ -302,7 +302,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.DashBoard)]
         [UIproperty]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [PropertyEditor(PropertyEditorType.Color)]
         [DefaultPropValue("#191717")]
         public string PointerColor { get; set; }
@@ -350,7 +350,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.DashBoard)]
         [UIproperty]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [PropertyEditor(PropertyEditorType.Color)]
         public string DivColor { get; set; }
 
@@ -392,7 +392,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.DashBoard)]
         [UIproperty]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [PropertyEditor(PropertyEditorType.Color)]
         public string SubColor { get; set; }
     }

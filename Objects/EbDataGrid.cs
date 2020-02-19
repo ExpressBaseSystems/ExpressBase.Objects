@@ -20,6 +20,7 @@ using ExpressBase.Common.Data;
 using System.Collections;
 using System.ComponentModel;
 using ExpressBase.Common.LocationNSolution;
+using ExpressBase.Common.Constants;
 
 namespace ExpressBase.Objects
 {
@@ -46,16 +47,18 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [DefaultPropValue("200")]
-        [PropertyGroup("Identity")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         public override int Height { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [DefaultPropValue("1")]
         [PropertyGroup("Behavior")]
+        [HideInPropertyGrid]
         public int LeftFixedColumnCount { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [PropertyGroup("Behavior")]
+        [HideInPropertyGrid]
         public int RightFixedColumnCount { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
@@ -86,6 +89,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
+        [PropertyGroup("Behavior")]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OnChangeExec(@"
                 if (this.DataSourceId){
@@ -116,7 +120,7 @@ namespace ExpressBase.Objects
         public override EbScript OnChangeFn { get; set; }
 
 
-        [PropertyGroup("Behavior")]
+        [PropertyGroup("Events")]
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.ScriptEditorJS)]
         [HelpText("Define actions to do after a datagrid row painted on screen.")]
@@ -338,7 +342,8 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         public override string JustSetValueJSfn
         {
-            get { return @"$('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val(p1)"; }
+            get { return JSFnsConstants.DG_hiddenColCheckCode + @"
+    $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val(p1);"; }
 
             set { }
         }
@@ -346,7 +351,7 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         public override string SetValueJSfn
         {
-            get { return JustSetValueJSfn + ".trigger('change');"; }
+            get { return JustSetValueJSfn + " $('#' + this.EbSid_CtxId).trigger('change');"; }
 
             set { }
         }
@@ -426,7 +431,7 @@ namespace ExpressBase.Objects
         public virtual bool IsEditable { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         public virtual int Width { get; set; }
 
         public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
@@ -450,6 +455,14 @@ namespace ExpressBase.Objects
         }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [OnChangeExec(@"
+if (this.TextMode === 4 ){
+    pg.ShowProperty('RowsVisible');
+}
+else {
+    pg.HideProperty('RowsVisible');
+}
+            ")]
         public TextMode TextMode
         {
             get { return this.EbTextBox.TextMode; }
@@ -540,7 +553,7 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         public override string GetValueFromDOMJSfn
         {
-            get { return "return parseInt(" + base.GetValueFromDOMJSfn.Replace("return", "").Replace(";", "") + ")"; }
+            get { return "return parseFloat(" + base.GetValueFromDOMJSfn.Replace("return", "").Replace(";", "") + ")"; }
 
             set { }
         }
@@ -593,7 +606,7 @@ namespace ExpressBase.Objects
         {
             get
             {
-                return JSFnsConstants.CB_JustSetValueJSfn;
+                return JSFnsConstants.DG_hiddenColCheckCode + JSFnsConstants.CB_JustSetValueJSfn;
             }
             set { }
         }
@@ -695,7 +708,7 @@ namespace ExpressBase.Objects
         {
             get
             {
-                return this.EbDate.JustSetValueJSfn;
+                return JSFnsConstants.DG_hiddenColCheckCode + this.EbDate.JustSetValueJSfn;
             }
             set { }
         }
@@ -801,7 +814,7 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, p2).
         {
             get
             {
-                return EbSimpleSelect.JustSetValueJSfn;
+                return JSFnsConstants.DG_hiddenColCheckCode + EbSimpleSelect.JustSetValueJSfn;
             }
             set { }
         }
@@ -918,11 +931,14 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
         {
             get
             {
-                return @"if(p1 === true)
-                            p1 = 'true'
-                        else if(p1 === false)
-                            p1 = 'false'
-                       " + EbDGSimpleSelectColumn.JustSetValueJSfn;
+                return JSFnsConstants.DG_hiddenColCheckCode + @"
+                        {
+                            if(p1 === true)
+                                p1 = 'true'
+                            else if(p1 === false)
+                                p1 = 'false'
+                           " + EbDGSimpleSelectColumn.JustSetValueJSfn+
+                        "}";
             }
             set { }
         }
@@ -931,11 +947,15 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
         {
             get
             {
-                return @"if(p1 === true)
+                return JSFnsConstants.DG_hiddenColCheckCode + 
+                    @"
+                    {
+                        if(p1 === true)
                             p1 = 'true'
                         else if(p1 === false)
                             p1 = 'false'
-                       " + EbDGSimpleSelectColumn.SetValueJSfn;
+                       " + EbDGSimpleSelectColumn.SetValueJSfn + 
+                    "}";
             }
             set { }
         }
@@ -1201,7 +1221,7 @@ else
         [OSE_ObjectTypes(EbObjectTypes.iWebForm)]
         public string FormRefId { get { return this.AddButton.FormRefId; } set { this.AddButton.FormRefId = value; } }
 
-        public override string JustSetValueJSfn { get { return EbPowerSelect.JustSetValueJSfn; } set { } }
+        public override string JustSetValueJSfn { get { return JSFnsConstants.DG_hiddenColCheckCode + EbPowerSelect.JustSetValueJSfn; } set { } }
 
         public override string SetValueJSfn { get { return EbPowerSelect.SetValueJSfn; } set { } }
 
@@ -1212,7 +1232,7 @@ else
         public bool IsInsertable { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [DefaultPropValue("100")]
         public override int Width { get; set; }
 
@@ -1434,7 +1454,7 @@ else
         {
             get
             {
-                return this.EbSysCreatedBy.JustSetValueJSfn;
+                return JSFnsConstants.DG_hiddenColCheckCode + this.EbSysCreatedBy.JustSetValueJSfn;
             }
             set { }
         }
@@ -1557,7 +1577,7 @@ else
         {
             get
             {
-                return this.EbSysCreatedAt.JustSetValueJSfn;
+                return JSFnsConstants.DG_hiddenColCheckCode + this.EbSysCreatedAt.JustSetValueJSfn;
             }
             set { }
         }
@@ -1681,7 +1701,7 @@ else
         {
             get
             {
-                return this.EbSysModifiedBy.JustSetValueJSfn;
+                return JSFnsConstants.DG_hiddenColCheckCode + this.EbSysModifiedBy.JustSetValueJSfn;
             }
             set { }
         }
@@ -1813,7 +1833,7 @@ else
         {
             get
             {
-                return this.EbSysModifiedAt.JustSetValueJSfn;
+                return JSFnsConstants.DG_hiddenColCheckCode + this.EbSysModifiedAt.JustSetValueJSfn;
             }
             set { }
         }
@@ -1933,7 +1953,12 @@ else
         [HideInPropertyGrid]
         public override string InputControlType { get { return "EbUserSelect"; } }
 
-
+        //EbDGUserSelectColumn
+        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
+        {
+            this.EbUserSelect.Name = this.Name;
+            return this.EbUserSelect.GetSingleColumn(UserObj, SoluObj, Value);
+        }
     }
 
 }

@@ -1,4 +1,5 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Constants;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
@@ -53,7 +54,13 @@ namespace ExpressBase.Objects
 
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.CORE)]
+        [OnChangeUIFunction("EbDataLabel.DescriptionLabel")]
+        public override string Description { get; set; }
+
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [OnChangeUIFunction("EbDataLabel.Style4DataLabel")]
         public Align TextAlign { get; set; }
 

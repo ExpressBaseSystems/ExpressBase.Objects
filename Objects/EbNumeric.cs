@@ -1,4 +1,5 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Constants;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
@@ -14,6 +15,14 @@ using System.Threading.Tasks;
 
 namespace ExpressBase.Objects
 {
+
+    public enum NumInpMode
+    {
+        Currency = 1,
+        Numeric = 0,
+        Phone = 2,
+    }
+
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
     public class EbNumeric : EbControlUI
     {
@@ -34,18 +43,16 @@ namespace ExpressBase.Objects
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        public int MaxLength { get; set; }
+        //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        //[PropertyGroup(PGConstants.EXTENDED)]
+        //public int MaxLength { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [DefaultPropValue("2")]
-        [PropertyGroup("Core")]
+        [PropertyGroup(PGConstants.EXTENDED)]
         [Alias("Decimal Places")]
         [HelpText("Number of decimal places")]
         public int DecimalPlaces { get; set; }
-
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        public decimal Value { get; set; }
 
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.BotForm)]
@@ -66,34 +73,47 @@ namespace ExpressBase.Objects
         }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [PropertyGroup("Core")]
+        [PropertyGroup(PGConstants.EXTENDED)]
         public bool AllowNegative { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [Alias("Maximum")]
         [HelpText("Maximum value allowed")]
-        [PropertyGroup("Core")]
+        [PropertyGroup("Validations")]
         public int MaxLimit { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [Alias("Minimum")]
         [HelpText("Minimum value allowed")]
-        [PropertyGroup("Core")]
+        [PropertyGroup("Validations")]
         public int MinLimit { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [PropertyGroup("Core")]
-        public bool IsCurrency { get; set; }
+        //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        //[PropertyGroup(PGConstants.EXTENDED)]
+        //public bool IsCurrency { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [HideInPropertyGrid]
         public bool AutoCompleteOff { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [UIproperty]
         [OnChangeUIFunction("Common.CONTROL_ICON")]
-        public bool ShowIcon { get; set; }
+        public bool HideInputIcon { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.CORE)]
+        [DefaultPropValue("'SingleLine'")]
+        [OnChangeExec(@"
+if (this.TextMode === 4 ){
+    pg.ShowProperty('RowsVisible');
+}
+else {
+    pg.HideProperty('RowsVisible');
+}
+            ")]
+        public NumInpMode InputMode { get; set; }
 
         //private string MaxLengthString
         //{
@@ -121,30 +141,30 @@ namespace ExpressBase.Objects
             return GetHtmlHelper(RenderMode.User);
         }
 
-		//        public override string GetBareHtml()
-		//        {
-		//            return @" 
-		//        <div class='input-group' style='width:100%;'>
-		//                <span style='font-size: @fontSize@' class='input-group-addon'><i class='fa fa-sort-numeric-asc' aria-hidden='true'></i></span>   
-		//                <input type='text' class='numinput' ui-inp data-ebtype='@datetype@' id='@name@' name='@name@' data-toggle='tooltip' style=' width:100%; display:inline-block;'/>
-		//        </div>"
-		//.Replace("@name@", this.Name)
-		//.Replace("@datetype@", "11");
-		//        }
+        //        public override string GetBareHtml()
+        //        {
+        //            return @" 
+        //        <div class='input-group' style='width:100%;'>
+        //                <span style='font-size: @fontSize@' class='input-group-addon'><i class='fa fa-sort-numeric-asc' aria-hidden='true'></i></span>   
+        //                <input type='text' class='numinput' ui-inp data-ebtype='@datetype@' id='@name@' name='@name@' data-toggle='tooltip' style=' width:100%; display:inline-block;'/>
+        //        </div>"
+        //.Replace("@name@", this.Name)
+        //.Replace("@datetype@", "11");
+        //        }
 
 
-		public override string GetHtml4Bot()
-		{
-			return ReplacePropsInHTML(HtmlConstants.CONTROL_WRAPER_HTML4BOT);
-		}
-
-		public override string GetBareHtml()
+        public override string GetHtml4Bot()
         {
-            return @" 
-                <div class='input-group' style='width:100%;'>
-                    <span style='font-size: @fontSize@' class='input-group-addon'><span style='font-size: 11px;font-weight: bold;margin: 0 6px;'>01</span></span>
-                    <input type='text' data-ebtype='@datetype@' class='numinput' ui-inp id='@ebsid@' name='@name@' value='@value@' @placeHolder autocomplete = '@autoComplete@' data-toggle='tooltip' title='@toolTipText@' style=' width:100%; @backColor@ @foreColor@ @fontStyle@ display:inline-block; @readOnlyString@ @required@ @tabIndex@ />
-                </div>"
+            return ReplacePropsInHTML(HtmlConstants.CONTROL_WRAPER_HTML4BOT);
+        }
+
+        public override string GetBareHtml()
+        {
+            string html = @"
+        <div class='input-group' style='width:100%;'>
+            <span class='input-group-addon'> @attachedLbl@ </span>
+            <input type='text' data-ebtype='@datetype@' class='numinput' ui-inp id='@ebsid@' name='@name@' @max@ @min@ value='@value@' @placeHolder autocomplete = '@autoComplete@' data-toggle='tooltip' title='@toolTipText@' style=' width:100%; @backColor@ @foreColor@ @fontStyle@ display:inline-block; @readOnlyString@ @required@ @tabIndex@ />
+        </div>"
 .Replace("@name@", this.Name)
 .Replace("@ebsid@", this.IsRenderMode && this.IsDynamicTabChild ? "@" + this.EbSid_CtxId + "_ebsid@" : (String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId))
 .Replace("@toolTipText@", this.ToolTipText)
@@ -155,13 +175,32 @@ namespace ExpressBase.Objects
     .Replace("@ForeColor@ ", "color:" + ((this.ForeColor != null) ? this.ForeColor : "@ForeColor@ ") + ";")
 .Replace("@required@", " required")//(this.Required && !this.Hidden ? " required" : string.Empty))
 .Replace("@readOnlyString@", this.ReadOnlyString)
+.Replace("@max@", this.MaxLimit != 0 ? "max='" + this.MaxLimit + "'" : string.Empty)
+.Replace("@min@", this.MinLimit != 0 ? "min='" + this.MinLimit + "'" : string.Empty)
 .Replace("@placeHolder@", "placeholder='" + this.PlaceHolder + "'")
-.Replace("@datetype@", "11")
-//.Replace("@fontStyle@", (this.FontSerialized != null) ?
-//                            (" font-family:" + this.FontSerialized.FontFamily + ";" + "font-style:" + this.FontSerialized.Style
-//                            + ";" + "font-size:" + this.FontSerialized.SizeInPoints + "px;")
-//                        : string.Empty)
-;
+.Replace("@datetype@", "11");
+            //.Replace("@fontStyle@", (this.FontSerialized != null) ?
+            //                            (" font-family:" + this.FontSerialized.FontFamily + ";" + "font-style:" + this.FontSerialized.Style
+            //                            + ";" + "font-size:" + this.FontSerialized.SizeInPoints + "px;")
+            //                        : string.Empty)
+            html = AddIcon2Html(html);
+            return html;
+        }
+
+        private string AddIcon2Html(string html)
+        {
+
+            string attachedLableHtml = @"<span class='input-group-addon'>@icon@</span>";
+            if (this.InputMode == NumInpMode.Currency)
+                attachedLableHtml = attachedLableHtml.Replace("@icon@", @"<i class='fa fa-money aria-hidden='true' class='input-group-addon'></i>");
+            else if (this.InputMode == NumInpMode.Phone)
+                attachedLableHtml = attachedLableHtml.Replace("@icon@", @"<i class='fa fa-phone aria-hidden='true' class='input-group-addon'></i>");
+            else if (this.InputMode == NumInpMode.Numeric)
+                attachedLableHtml = attachedLableHtml.Replace("@icon@", "<span style='font-size: 11px;font-weight: bold;margin: 0 6px;'>01</span>");
+
+            html = html.Replace("@attachedLbl@", attachedLableHtml);
+
+            return html;
         }
 
         private string GetHtmlHelper(RenderMode mode)

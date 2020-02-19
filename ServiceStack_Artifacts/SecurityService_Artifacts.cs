@@ -1087,7 +1087,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		[DataMember(Order = 1)]
 
 		
-
+		public int TargetUser { get; set; }
 
 		public bool Alluser { get; set; }
 
