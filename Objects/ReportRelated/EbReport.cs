@@ -29,7 +29,7 @@ using System.DrawingCore.Imaging;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text; 
+using System.Text;
 namespace ExpressBase.Objects
 {
     public enum EbReportSectionType
@@ -536,6 +536,9 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         public Dictionary<string, NTV> CalcValInRow { get; set; } = new Dictionary<string, NTV>();
 
+        [JsonIgnore]
+        public Dictionary<string, NTV> SummaryValInRow { get; set; } = new Dictionary<string, NTV>();
+
         public dynamic GetDataFieldtValue(string column_name, int i, int tableIndex)
         {
             dynamic value = null;
@@ -567,11 +570,12 @@ namespace ExpressBase.Objects
             {
                 CurrentField = field
             };
+
             AddParamsNCalcsInGlobal(globals);
             if (field is EbCalcField)
             {
                 EbCalcField field_orig = field as EbCalcField;
-                foreach (string calcfd in field_orig.DataFieldsUsedCalc)
+                foreach (string calcfd in field_orig.DataFieldsUsedInCalc)
                 {
                     string TName = calcfd.Split('.')[0];
                     string fName = calcfd.Split('.')[1];
@@ -704,7 +708,7 @@ namespace ExpressBase.Objects
                 {
                     __reportFieldsSortedPerDetail = new Dictionary<EbReportDetail, EbReportField[]>();
                     foreach (EbReportDetail detail in Detail)
-                        __reportFieldsSortedPerDetail[detail] = detail.Fields.OrderBy(o => o.Top).ToArray();
+                        __reportFieldsSortedPerDetail[detail] = detail.Fields.OrderBy(o => o.Left).ToArray();
                 }
 
                 return __reportFieldsSortedPerDetail;
@@ -1080,7 +1084,7 @@ namespace ExpressBase.Objects
             {
                 dfs.StreamWrapper.Memorystream.Position = 0;
                 fileByte = dfs.StreamWrapper.Memorystream.ToBytes();
-            }           
+            }
 
             return fileByte;
         }
@@ -1091,10 +1095,17 @@ namespace ExpressBase.Objects
             {
                 globals["Calc"].Add(key, CalcValInRow[key]);
             }
+
             if (Parameters != null)
                 foreach (Param p in Parameters) //adding Params to global
                 {
                     globals["Params"].Add(p.Name, new NTV { Name = p.Name, Type = (EbDbTypes)Convert.ToInt32(p.Type), Value = p.Value });
+                }
+
+            if (SummaryValInRow.Count > 0)
+                foreach (string key in SummaryValInRow.Keys)
+                {
+                    globals["Summary"].Add(key, SummaryValInRow[key]);
                 }
         }
     }
