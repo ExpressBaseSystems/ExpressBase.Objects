@@ -1,4 +1,5 @@
-﻿using ExpressBase.Common.Extensions;
+﻿using ExpressBase.Common.Constants;
+using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
@@ -45,7 +46,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl, BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
-        [PropertyGroup("Data")]
+        [PropertyGroup(PGConstants.DATA)]
         [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
         [UIproperty]
         [OnChangeUIFunction("EbDataObject.dschanged")]

@@ -436,7 +436,7 @@ namespace ExpressBase.Objects
 
 		public string DesignHtml { get; set; }
 
-		//[PropertyGroup("Appearance")]
+		//[PropertyGroup(PGConstants.APPEARANCE)]
 		//[EnableInBuilder(BuilderType.BotForm)]
 		//[PropertyEditor(PropertyEditorType.FontSelector)]
 		//public EbFont Font { get; set; }

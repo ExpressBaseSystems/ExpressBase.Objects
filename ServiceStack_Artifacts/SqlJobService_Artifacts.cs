@@ -69,6 +69,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public List<GroupingDetails> Levels { get; set; }
 
         public RowColletion FormattedData { get; set; }
+
         public string Visualization { get; set; }
     }
 

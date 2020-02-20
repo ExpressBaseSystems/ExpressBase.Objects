@@ -20,6 +20,7 @@ using ExpressBase.Common.Data;
 using System.Collections;
 using System.ComponentModel;
 using ExpressBase.Common.LocationNSolution;
+using ExpressBase.Common.Constants;
 
 namespace ExpressBase.Objects
 {
@@ -46,16 +47,18 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [DefaultPropValue("200")]
-        [PropertyGroup("Identity")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         public override int Height { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [DefaultPropValue("1")]
         [PropertyGroup("Behavior")]
+        [HideInPropertyGrid]
         public int LeftFixedColumnCount { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [PropertyGroup("Behavior")]
+        [HideInPropertyGrid]
         public int RightFixedColumnCount { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
@@ -86,6 +89,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
+        [PropertyGroup("Behavior")]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OnChangeExec(@"
                 if (this.DataSourceId){
@@ -116,7 +120,7 @@ namespace ExpressBase.Objects
         public override EbScript OnChangeFn { get; set; }
 
 
-        [PropertyGroup("Behavior")]
+        [PropertyGroup("Events")]
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.ScriptEditorJS)]
         [HelpText("Define actions to do after a datagrid row painted on screen.")]
@@ -427,7 +431,7 @@ namespace ExpressBase.Objects
         public virtual bool IsEditable { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         public virtual int Width { get; set; }
 
         public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
@@ -451,6 +455,14 @@ namespace ExpressBase.Objects
         }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [OnChangeExec(@"
+if (this.TextMode === 4 ){
+    pg.ShowProperty('RowsVisible');
+}
+else {
+    pg.HideProperty('RowsVisible');
+}
+            ")]
         public TextMode TextMode
         {
             get { return this.EbTextBox.TextMode; }
@@ -541,7 +553,7 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         public override string GetValueFromDOMJSfn
         {
-            get { return "return parseInt(" + base.GetValueFromDOMJSfn.Replace("return", "").Replace(";", "") + ")"; }
+            get { return "return parseFloat(" + base.GetValueFromDOMJSfn.Replace("return", "").Replace(";", "") + ")"; }
 
             set { }
         }
@@ -1220,7 +1232,7 @@ else
         public bool IsInsertable { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [DefaultPropValue("100")]
         public override int Width { get; set; }
 

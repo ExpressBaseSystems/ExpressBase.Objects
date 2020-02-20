@@ -1,4 +1,5 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Constants;
 using ExpressBase.Common.Data;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
@@ -45,7 +46,7 @@ namespace ExpressBase.Objects
         public override string TableName { get { return this.TableName_Temp; } set { this.TableName_Temp = value; } }
 
         [EnableInBuilder(BuilderType.WebForm)]
-        [PropertyGroup("Data")]
+        [PropertyGroup(PGConstants.DATA)]
         [HelpText("Name Of database-table Which you want to store Data collected using this Form")]
         [InputMask("[a-z][a-z0-9]*(_[a-z0-9]+)*")]
         [Alias("TableName")]

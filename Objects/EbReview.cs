@@ -11,25 +11,16 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Linq;
-using ExpressBase.Common.Constants;
 
 namespace ExpressBase.Objects
 {
-    public enum KuSApproverRole
-    {
-        NHG_President = 0,
-        ADS_Committee = 1,
-        CDS_Committee = 2,
-        Block_Coordinator = 3
-        //test_role = 3
-    }
-
+    [HideInToolBox]
     [EnableInBuilder(BuilderType.WebForm)]
-    public class EbApproval : EbControlContainer, IEbSpecialContainer
+    public class EbReview : EbControlContainer, IEbSpecialContainer
     {
-        public EbApproval()
+        public EbReview()
         {
-            FormStages = new List<ApprovalStageAbstract>();
+            FormStages = new List<ReviewStageAbstract>();
             Controls = new List<EbControl>();
             this.OnApprovalRoutines = new List<EbRoutines>();
         }
@@ -40,16 +31,15 @@ namespace ExpressBase.Objects
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
             //this.EbDbType = this.EbDbType;    
             Controls = new List<EbControl>() {
-                new EbDGStringColumn() { Name = "stage", EbDbType = EbDbTypes.String, Label = "Stage"},
-                new EbDGSimpleSelectColumn() { Name = "status",IsDynamic = false, EbDbType = EbDbTypes.Decimal, Label = "Status"},
-                new EbDGStringColumn() { Name = "remarks", EbDbType = EbDbTypes.String, Label = "Remarks"},
+                new EbDGStringColumn() { Name = "stage_unique_id", EbDbType = EbDbTypes.String, Label = "Stage"},
+                new EbDGStringColumn() { Name = "action_unique_id", EbDbType = EbDbTypes.String, Label = "Action"},
+                new EbDGNumericColumn() { Name = "eb_my_actions_id", EbDbType = EbDbTypes.Decimal, Label = "My_Action_Id"},
+                new EbDGStringColumn() { Name = "comments", EbDbType = EbDbTypes.String, Label = "Comments"},
                 new EbDGDateColumn() { Name = "eb_created_at", EbDbType = EbDbTypes.DateTime, DoNotPersist = true, IsSysControl = true},
                 new EbDGStringColumn() { Name = "eb_created_by", EbDbType = EbDbTypes.String, DoNotPersist = true, IsSysControl = true},
-                new EbDGStringColumn() { Name = "approver_role", EbDbType = EbDbTypes.String, Label = "Approver Role"}
+                //new EbDGStringColumn() { Name = "approver_role", EbDbType = EbDbTypes.String, Label = "Approver Role"}
             };
-        }
-
-
+        }   
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [HideInPropertyGrid]
@@ -67,12 +57,11 @@ namespace ExpressBase.Objects
         public List<EbRoutines> OnApprovalRoutines { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
-        [Alias("Label")]
         public override string Label { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
         [DefaultPropValue("200")]
-        [PropertyGroup(PGConstants.APPEARANCE)]
+        [PropertyGroup("Appearance")]
         public override int Height { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
@@ -82,19 +71,16 @@ namespace ExpressBase.Objects
         public bool IsShowSerialNumber { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
-        [PropertyGroup(PGConstants.DATA)]
-        [HelpText("Name Of database-table Which you want to store Data collected using this Form")]
-        [InputMask("[a-z][a-z0-9]*(_[a-z0-9]+)*")]
-        [EbRequired]
-        public override string TableName { get; set; }
+        [HideInPropertyGrid]
+        public override string TableName { get { return "eb_approval_lines"; } }
 
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.Collection)]
         [PropertyGroup("Behavior")]
         [Alias("Approval stages")]
-        [ListType(typeof(ApprovalStageAbstract))]
+        [ListType(typeof(ReviewStageAbstract))]
         [PropertyPriority(99)]
-        public List<ApprovalStageAbstract> FormStages { get; set; }
+        public List<ReviewStageAbstract> FormStages { get; set; }
 
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.WebForm)]
@@ -111,7 +97,7 @@ namespace ExpressBase.Objects
 
         [HideInPropertyGrid]
         [JsonIgnore]
-        public override string ToolNameAlias { get { return "Review control"; } set { } }
+        public override string ToolNameAlias { get { return "Review New"; } set { } }
 
         //public override string GetToolHtml()
         //{
@@ -196,7 +182,7 @@ namespace ExpressBase.Objects
             var result = serviceClient.Get<GetAllRolesResponse>(new GetAllRolesRequest());
             this.Roles = new Dictionary<int, string>();
             foreach (string r in user.Roles)
-            {                
+            {
                 var s = result.Roles.FirstOrDefault(kvp => kvp.Value == r);
                 if (s.Value != null)
                 {
@@ -225,18 +211,18 @@ namespace ExpressBase.Objects
 
     }
 
-    public abstract class ApprovalStageAbstract { }
+    public abstract class ReviewStageAbstract { }
 
     [UsedWithTopObjectParent(typeof(EbObject))]
     [EnableInBuilder(BuilderType.WebForm)]
     [Alias("Approval Stage")]
-    public class EbFormStage : ApprovalStageAbstract
+    public class EbReviewStage : ReviewStageAbstract
     {
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
         public string EbSid { get; set; }
 
-        public EbFormStage() { }
+        public EbReviewStage() { }
         public string ObjType { get { return this.GetType().Name.Substring(2, this.GetType().Name.Length - 2); } set { } }
 
         [EnableInBuilder(BuilderType.WebForm)]
@@ -244,12 +230,71 @@ namespace ExpressBase.Objects
         public string Name { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
+        [OnChangeExec(@"
+if(this.ApproverEntity === 1){
+    pg.MakeReadWrite('ApproverRole');
+    pg.MakeReadOnly('ApproverUserGroup');
+    pg.MakeReadOnly('ApproverUsers');
+}
+else if(this.ApproverEntity === 2){
+    pg.MakeReadOnly('ApproverRole');
+    pg.MakeReadWrite('ApproverUserGroup');
+    pg.MakeReadOnly('ApproverUsers');
+}
+else if(this.ApproverEntity === 3){
+    pg.MakeReadOnly('ApproverRole');
+    pg.MakeReadOnly('ApproverUserGroup');
+    pg.MakeReadWrite('ApproverUsers');
+}")]
+        public ApproverEntityTypes ApproverEntity { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
         [Unique]
         [PropDataSourceJsFn("return ebcontext.Roles")]
         [PropertyEditor(PropertyEditorType.DropDown)]
-        
         public int ApproverRole { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm)]
+        public int ApproverUserGroup { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]//required ScriptEditorSQ
+        public EbScript ApproverUsers { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        [ListType(typeof(ReviewActionAbstract))]
+        public List<ReviewActionAbstract> StageActions { get; set; }
+        
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
+        public EbScript NextStage { get; set; }
+
+    }
+
+    public abstract class ReviewActionAbstract { }
+
+    [UsedWithTopObjectParent(typeof(EbObject))]
+    [EnableInBuilder(BuilderType.WebForm)]
+    [Alias("Approval Action")]
+    public class EbReviewAction : ReviewActionAbstract
+    {
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public string EbSid { get; set; }
+
+        public EbReviewAction() { }
+        public string ObjType { get { return this.GetType().Name.Substring(2, this.GetType().Name.Length - 2); } set { } }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [Unique]
+        public string Name { get; set; }
+    }
+    
+    public enum ApproverEntityTypes
+    {
+        Role = 1,
+        UserGroup,
+        Users
     }
 }
