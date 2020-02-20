@@ -1,4 +1,5 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Constants;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
@@ -40,6 +41,9 @@ namespace ExpressBase.Objects
                     if(styleVar === 'Right'){styleVar='flex-end'}
                     else if(styleVar === 'Left'){styleVar='flex-start'}
                 $(`#cont_${elementId} .ctrl-cover`).css(`align-items`, styleVar);
+                }, 
+                LabelBackgroudColor : function(elementId, props) {
+                console.log('Hello world!');
                 },
                 Style4PlaceHolder : function(elementId , props){
                  $(`#cont_${elementId} .data-dynamic-label`).css(getEbFontStyleObject(props.PlaceHolderFont));
@@ -49,14 +53,14 @@ namespace ExpressBase.Objects
         }
 
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
-        [PropertyGroup("Identity")]
-        [OnChangeUIFunction("EbDataLabel.DescriptionLabel")]
-        public override string Description { get; set; }
+        //[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        //[PropertyGroup(PGConstants.CORE)]
+        //[OnChangeUIFunction("EbDataLabel.DescriptionLabel")]
+        //public override string Description { get; set; }
 
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [OnChangeUIFunction("EbDataLabel.Style4DataLabel")]
         public Align TextAlign { get; set; }
 
@@ -66,40 +70,234 @@ namespace ExpressBase.Objects
 
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
-        [HideInPropertyGrid]
-        public override string LabelForeColor { get; set; }
-
-        [EnableInBuilder(BuilderType.BotForm, BuilderType.UserControl)]
-        [HideInPropertyGrid]
-        public override float FontSize { get; set; }
-
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
-        [HideInPropertyGrid]
-        public override string LabelBackColor { get; set; }
-
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup("Appearance")]
         [UIproperty]
         [PropertyEditor(PropertyEditorType.FontSelector)]
         [OnChangeUIFunction("EbDataLabel.Style4PlaceHolder")]
-        public  EbFont PlaceHolderFont { get; set; }
+        public EbFont PlaceHolderFont { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+
+
+        [EnableInBuilder(BuilderType.DashBoard)]
+        [PropertyGroup("LabelConfig")]
+        [DefaultPropValue("4")]
+        [OnChangeExec(@"if(this.LabelborderRadius > 50){
+            this.LabelborderRadius = 50;
+            $('#' + pg.wraperId + 'LabelborderRadius').val(50);
+            console.log('hhh');
+            }
+            else if(this.LabelborderRadius < 0){
+            this.LabelborderRadius = 0;
+            $('#' + pg.wraperId + 'LabelborderRadius').val(0);
+            }
+            ")]
+        public int LabelBorderRadius { get; set; }
+
+
+        [EnableInBuilder(BuilderType.DashBoard)]
+        [PropertyEditor(PropertyEditorType.Color)]
+        [PropertyGroup("LabelConfig")]
+        [DefaultPropValue("#7093ff")]
+        public string LabelBorderColor { get; set; }
+
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.DashBoard, BuilderType.UserControl)]
+        [PropertyGroup("LabelConfig")]
+        [OnChangeUIFunction("EbDataLabel.LabelBackgroudColor")]
+        [PropertyEditor(PropertyEditorType.Color)]
+        [DefaultPropValue("#7093ff")]
+        public override string LabelBackColor { get; set; }
+
+        [EnableInBuilder(BuilderType.DashBoard)]
+        [PropertyGroup("LabelConfig")]
+        [DefaultPropValue("true")]
+        [OnChangeExec(@"
+                if (this.IsGradient === true ){      
+                        pg.ShowProperty('GradientColor1');     
+                        pg.ShowProperty('GradientColor2');     
+                        pg.ShowProperty('Direction');
+                        pg.HideProperty('LabelBackColor');
+                }
+                else {
+                        pg.ShowProperty('LabelBackColor');    
+                        pg.HideProperty('GradientColor1');     
+                        pg.HideProperty('GradientColor2');     
+                        pg.HideProperty('Direction');      
+                }
+            ")]
+        public bool IsGradient { get; set; }
+
+        [EnableInBuilder(BuilderType.DashBoard)]
+        [PropertyEditor(PropertyEditorType.Color)]
+        [PropertyGroup("LabelConfig")]
+        [OnChangeUIFunction("EbDataLabel.LabelGradientColor")]
+        [DefaultPropValue("#78cafb")]
+        public string GradientColor1 { get; set; }
+
+        [EnableInBuilder(BuilderType.DashBoard)]
+        [PropertyEditor(PropertyEditorType.Color)]
+        [PropertyGroup("LabelConfig")]
+        [OnChangeUIFunction("EbDataLabel.LabelGradientColor")]
+        [DefaultPropValue("#7093ff")]
+        public string GradientColor2 { get; set; }
+
+
+        [EnableInBuilder(BuilderType.DashBoard)]
+        [PropertyGroup("LabelConfig")]
+        public GradientDirection Direction { get; set; }
+
+
+        [EnableInBuilder(BuilderType.DashBoard)]
+        [PropertyGroup("LabelConfig")]
+        [UIproperty]
+        [Alias("ChangeTextPositon")]
+        [OnChangeExec(@"if (this.ChangeTextPositon === true ){      
+                        pg.ShowProperty('StaticLabelPosition');     
+                        pg.ShowProperty('DynamicLabelPositon');     
+                        pg.ShowProperty('DescriptionPosition');     
+                        pg.ShowProperty('Left');    
+                        pg.ShowProperty('Top');    
+                }
+                else {
+                        pg.HideProperty('StaticLabelPosition');      
+                        pg.HideProperty('DynamicLabelPositon');      
+                        pg.HideProperty('DescriptionPosition');  
+                        pg.HideProperty('Left');    
+                        pg.HideProperty('Top');    
+                }
+            ")]
+        public bool ChangeTextPositon { get; set; }
+
+        //[EnableInBuilder(BuilderType.DashBoard)]
+        //[HideInPropertyGrid]
+        //public string LabelValue { get; set; }
+
+        //[EnableInBuilder(BuilderType.DashBoard)]
+        //[HideInPropertyGrid]
+        //public string LabelCtrlName { get; set; }
+
+
+        //[EnableInBuilder(BuilderType.BotForm, BuilderType.UserControl)]
+        //[HideInPropertyGrid]
+        //public override float FontSize { get; set; }
+
+        //Static Label
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.DashBoard)]
+        [PropertyGroup("StaticLabel")]
+        [UIproperty]
         public string StaticLabel { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [EnableInBuilder(BuilderType.DashBoard)]
+        [PropertyGroup("StaticLabel")]
+        [UIproperty]
+        [PropertyEditor(PropertyEditorType.FontSelector)]
+        [OnChangeUIFunction("EbDataLabel.Style4StaticLabel")]
+         public EbFont StaticLabelFont { get; set; }
+
+
+
+
+        [EnableInBuilder(BuilderType.DashBoard)]
+        [PropertyGroup("StaticLabel")]
+        [UIproperty]
+        [PropertyEditor(PropertyEditorType.Expandable)]
+        [OnChangeExec(@"if(this.StaticLabelPadding > 100){
+            this.StaticLabelPadding = 100;
+            $('#' + pg.wraperId + 'StaticLabelPadding').val(100);
+            }
+            else if(this.StaticLabelPadding < 0){
+            this.StaticLabelPadding = 0;
+            $('#' + pg.wraperId + 'StaticLabelPadding').val(0);
+            }
+            ")]
+        public TextPositon StaticLabelPosition { get; set; }
+
+
+        //dynamic label config
+
+        [EnableInBuilder(BuilderType.DashBoard)]
+        [PropertyGroup("DynamicLabel")]
+        [UIproperty]
+        [PropertyEditor(PropertyEditorType.FontSelector)]
+        public EbFont DynamicLabelFont { get; set; }
+
+
+        [EnableInBuilder(BuilderType.DashBoard)]
+        [PropertyGroup("DynamicLabel")]
+        [PropertyEditor(PropertyEditorType.Expandable)]
+        [UIproperty]
+        [OnChangeExec(@"if(this.DynamicLabelPadding > 100){
+            this.DynamicLabelPadding = 100;
+            $('#' + pg.wraperId + 'DynamicLabelPadding').val(100);
+            console.log('hhh');
+            }
+            else if(this.DynamicLabelPadding < 0){
+            this.DynamicLabelPadding = 0;
+            $('#' + pg.wraperId + 'DynamicLabelPadding').val(0);
+            }
+            ")]
+        public TextPositon DynamicLabelPositon { get; set; }
+
+
+
+        //Description of Label
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.DashBoard)]
+        [PropertyGroup("Description")]
+        public override string Description { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl, BuilderType.DashBoard)]
+        [PropertyGroup("Description")]
+        [UIproperty]
+        [PropertyEditor(PropertyEditorType.FontSelector)]
+        public EbFont DescriptionFont { get; set; }
+
+        [EnableInBuilder(BuilderType.DashBoard)]
+        [PropertyGroup("Description")]
+        [PropertyEditor(PropertyEditorType.Expandable)]
+        [UIproperty]
+        [OnChangeExec(@"if(this.DescriptionPadding > 100){
+            this.DescriptionPadding = 100;
+            $('#' + pg.wraperId + 'DescriptionPadding').val(100);
+            }
+            else if(this.DescriptionPadding < 0){
+            this.DescriptionPadding = 0;
+            $('#' + pg.wraperId + 'DescriptionPadding').val(0);
+            }
+            ")]
+        public TextPositon DescriptionPosition { get; set; }
+
+        
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl , BuilderType.DashBoard)]
+        [HideInPropertyGrid]
         [HideInToolBox]
         public string DynamicLabel { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl , BuilderType.DashBoard)]
+        [HideInPropertyGrid]
         public string DataObjCtrlName { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl , BuilderType.DashBoard )]
+        [HideInPropertyGrid]
         public string DataObjColName { get; set; }
+
+
+        [EnableInBuilder(BuilderType.DashBoard)]
+        [HideInPropertyGrid]
+        public string LabelValue { get; set; }
+
+
+        [EnableInBuilder(BuilderType.DashBoard)]
+        [HideInPropertyGrid]
+        public string LabelContainer { get; set; }
 
         public  override bool IsRenderMode { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl , BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.ScriptEditorJS)]
         [HelpText("Define default value of the control.")]
         public override EbScript DefaultValueExpression { get; set; }
@@ -118,7 +316,7 @@ namespace ExpressBase.Objects
         public override string GetBareHtml()
         {
             return @"
-        <div class='data-static-label'> @Label@ </div>
+       < div class='data-static-label'> @Label@ </div>
         @Description@
         <div class='data-dynamic-label' style= ' @style@ '> @PlaceHolder@ </div>
 "
@@ -221,5 +419,30 @@ namespace ExpressBase.Objects
            public override string GetValueFromDOMJSfn { get { return @"return this.DynamicLabel"; } set { } }
            public override string StyleJSFn { get { return @"return $('#cont_' + this.EbSid).find('.ctrl-cover').css(p1, p2);"; } set { } }
            public override string GetValueJSfn { get { return @"return this.DynamicLabel"; } set { } }
+    }
+    public class LabelAppearance
+    {
+       
+
+    }
+    public class GradientLabel
+    {
+      
+    }
+    public enum GradientDirection
+    {
+        to_right = 0,
+        to_left = 1,
+        to_bottom= 2,
+        to_top = 3,
+        to_bottom_right = 4,
+        to_bottom_left = 5,
+        to_top_right = 6,
+        to_top_left = 7,
+    }
+    public enum FlexType
+    {
+        row = 0 ,
+        colomn = 1 ,
     }
 }

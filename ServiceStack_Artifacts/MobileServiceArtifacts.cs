@@ -2,6 +2,7 @@
 using ExpressBase.Common.Application;
 using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
+using ExpressBase.Common.Structures;
 using ExpressBase.Security;
 using ServiceStack;
 using System;
@@ -78,6 +79,21 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Json { set; get; }
     }
 
+    public class WebObjectsWraper
+    {
+        public string DisplayName { set; get; }
+
+        public string Name { set; get; }
+
+        public string Version { set; get; }
+
+        public string RefId { set; get; }
+
+        public string Json { set; get; }
+
+        public int ObjectType { set; get; }
+    }
+
     //objects to mobile
     public class GetMobilePagesRequest : EbServiceStackAuthRequest, IReturn<GetMobilePagesResponse>
     {
@@ -94,14 +110,18 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public List<MobilePagesWraper> Pages { set; get; }
 
         [DataMember(Order = 2)]
-        public EbDataSet Data { set; get; }
+        public List<WebObjectsWraper> WebObjects { set; get; }
 
         [DataMember(Order = 3)]
+        public EbDataSet Data { set; get; }
+
+        [DataMember(Order = 4)]
         public List<string> TableNames { set; get; }
 
         public GetMobilePagesResponse()
         {
             this.Pages = new List<MobilePagesWraper>();
+            WebObjects = new List<WebObjectsWraper>();
         }
     }
 

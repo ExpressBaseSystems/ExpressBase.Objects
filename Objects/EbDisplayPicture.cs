@@ -1,4 +1,5 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Constants;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
@@ -82,7 +83,7 @@ namespace ExpressBase.Objects
         public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [OnChangeUIFunction("EbDisplayPicture.adjustMaxHeight")]
         [DefaultPropValue("200")]
         public int MaxHeight { get; set; }

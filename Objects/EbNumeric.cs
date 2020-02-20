@@ -1,4 +1,5 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Constants;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
@@ -17,8 +18,8 @@ namespace ExpressBase.Objects
 
     public enum NumInpMode
     {
-        Numeric = 0,
         Currency = 1,
+        Numeric = 0,
         Phone = 2,
     }
 
@@ -42,18 +43,16 @@ namespace ExpressBase.Objects
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        public int MaxLength { get; set; }
+        //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        //[PropertyGroup(PGConstants.EXTENDED)]
+        //public int MaxLength { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [DefaultPropValue("2")]
-        [PropertyGroup("Core")]
+        [PropertyGroup(PGConstants.EXTENDED)]
         [Alias("Decimal Places")]
         [HelpText("Number of decimal places")]
         public int DecimalPlaces { get; set; }
-
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        public decimal Value { get; set; }
 
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.BotForm)]
@@ -74,37 +73,37 @@ namespace ExpressBase.Objects
         }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [PropertyGroup("Core")]
+        [PropertyGroup(PGConstants.EXTENDED)]
         public bool AllowNegative { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [Alias("Maximum")]
         [HelpText("Maximum value allowed")]
-        [PropertyGroup("Core")]
+        [PropertyGroup("Validations")]
         public int MaxLimit { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [Alias("Minimum")]
         [HelpText("Minimum value allowed")]
-        [PropertyGroup("Core")]
+        [PropertyGroup("Validations")]
         public int MinLimit { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [PropertyGroup("Core")]
-        public bool IsCurrency { get; set; }
+        //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        //[PropertyGroup(PGConstants.EXTENDED)]
+        //public bool IsCurrency { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [HideInPropertyGrid]
         public bool AutoCompleteOff { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [UIproperty]
         [OnChangeUIFunction("Common.CONTROL_ICON")]
-        public bool ShowIcon { get; set; }
+        public bool HideInputIcon { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [PropertyGroup("Core")]
+        [PropertyGroup(PGConstants.CORE)]
         [DefaultPropValue("'SingleLine'")]
         [OnChangeExec(@"
 if (this.TextMode === 4 ){

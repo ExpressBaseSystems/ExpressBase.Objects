@@ -15,25 +15,25 @@ using ExpressBase.Objects.Helpers;
 using ExpressBase.Common;
 using ServiceStack;
 using ExpressBase.Objects.ServiceStack_Artifacts;
+using ExpressBase.Common.Constants;
 
 namespace ExpressBase.Objects
 {
     public enum TextTransform
     {
-        Normal,
-        lowercase,
-        UPPERCASE,
+        lowercase = 1,
+        Normal = 0,
+        UPPERCASE = 2,
     }
 
     public enum TextMode
     {
-        SingleLine = 0,
-        Email = 2,
-        Password = 1,
         Color = 3,
+        Email = 2,
         MultiLine = 4,
-        Link = 5,
-        Name = 6,
+        Name = 5,
+        Password = 1,
+        SingleLine = 0,
     }
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
@@ -86,7 +86,7 @@ $('#cont_' + this.EbSid_CtxId + ' .ctrl-cover').css('pointer-events', 'inherit')
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [HelpText("To limit number of charecters")]
-        [PropertyGroup("Core")]
+        [PropertyGroup(PGConstants.EXTENDED)]
         [PropertyEditor(PropertyEditorType.Number)]
         [PropertyPriority(99)]
         [OnChangeExec(@"
@@ -102,7 +102,7 @@ else {
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [Alias("Text Transform")]
         [DefaultPropValue("'UPPERCASE'")]
-        [PropertyGroup("Core")]
+        [PropertyGroup(PGConstants.CORE)]
         [PropertyEditor(PropertyEditorType.DropDown)]
         [OnChangeExec(@"
 if (this.TextTransform === 'UPPERCASE' ){
@@ -115,7 +115,7 @@ else {
         public TextTransform TextTransform { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [PropertyGroup("Core")]
+        [PropertyGroup(PGConstants.CORE)]
         [DefaultPropValue("'SingleLine'")]
         [OnChangeExec(@"
 if (this.TextMode === 4 ){
@@ -128,7 +128,7 @@ else {
         public TextMode TextMode { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [PropertyGroup("Core")]
+        [PropertyGroup(PGConstants.CORE)]
         [DefaultPropValue("3")]
         public int RowsVisible { get; set; }
 
@@ -143,12 +143,12 @@ else {
         //public string MaskPattern { get; set; }
 
         //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        //[PropertyGroup("Appearance")]
+        //[PropertyGroup(PGConstants.APPEARANCE)]
         //[PropertyEditor(PropertyEditorType.MultiLanguageKeySelector)]
         public string LabelT { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [PropertyEditor(PropertyEditorType.FontSelector)]
         [Alias("Font Family")]
         public string FontFamilyT { get; set; }
@@ -159,13 +159,13 @@ else {
         public string MetaOnly { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [PropertyEditor(PropertyEditorType.FontSelector)]
         [HideInPropertyGrid]
         public string Only4Dev { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [EbRequired]
         [Unique]
         public string Text { get; set; }
@@ -175,7 +175,7 @@ else {
         public bool AutoCompleteOff { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
-        [PropertyGroup("Behavior")]
+        [PropertyGroup(PGConstants.EXTENDED)]
         public bool AutoSuggestion { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
@@ -197,11 +197,11 @@ else {
         public string MinDateExpression { get; set; }
 
         //[ProtoBuf.ProtoMember(9)]
-        //[Description("Identity")]
+        //[Description("Core")]
         //public override string Name { get; set; }
 
         //[ProtoBuf.ProtoMember(10)]
-        //[Description("Identity")]
+        //[Description("Core")]
         //public override string Label { get; set; }
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [HideInPropertyGrid]
@@ -321,8 +321,8 @@ else {
                     attachedLableHtml = attachedLableHtml.Replace("$class", "phone");
                 else if (this.TextMode == TextMode.Name)
                     attachedLableHtml = attachedLableHtml.Replace("$class", "user");
-                else if (this.TextMode == TextMode.Link)
-                    attachedLableHtml = attachedLableHtml.Replace("$class", "link");
+                //else if (this.TextMode == TextMode.Link)
+                //    attachedLableHtml = attachedLableHtml.Replace("$class", "link");
 
                 html = html.Replace("@attachedLbl@", attachedLableHtml);
             }

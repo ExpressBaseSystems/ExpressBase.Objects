@@ -1,4 +1,5 @@
-﻿using ExpressBase.Common.Extensions;
+﻿using ExpressBase.Common.Constants;
+using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using Newtonsoft.Json;
@@ -24,6 +25,9 @@ namespace ExpressBase.Objects
                 return @"EbGroupBox = {
                     padding : function(elementId, props) {
                         $(`#cont_${ elementId}.Eb-ctrlContainer`).closestInner('.group-box').css('padding', `${props.Padding.Top}px ${props.Padding.Right}px ${props.Padding.Bottom}px ${props.Padding.Left}px`);
+                    },
+                    backColor : function(elementId, props) {
+                         $(`#cont_${elementId}.Eb-ctrlContainer`).closestInner('.gb-border').css('background-color',props.BackColor);
                     }
                 }";
             }
@@ -34,8 +38,16 @@ namespace ExpressBase.Objects
         [OnChangeUIFunction("Common.LABEL")]
         public override string Label { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+        [OnChangeUIFunction("EbGroupBox.backColor")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        [UIproperty]
+        [PropertyEditor(PropertyEditorType.Color)]
+        public override string BackColor { get; set; }
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [UIproperty]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [OnChangeUIFunction("Common.BORDER")]
         public bool HideBorder { get; set; }
 

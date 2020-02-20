@@ -27,7 +27,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public String Message { get; set; }
         public ResponseStatus ResponseStatus { get; set; }
 
-       
+
     }
 
     public class SqlJobInternalRequest : EbServiceStackAuthRequest
@@ -69,6 +69,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public List<GroupingDetails> Levels { get; set; }
 
         public RowColletion FormattedData { get; set; }
+
         public string Visualization { get; set; }
     }
 
@@ -87,9 +88,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     public class DeleteJobExecutionRequest : EbServiceStackAuthRequest, IReturn<DeleteJobExecutionResponse>
-    {
-        public string RefId { get; set; }
-
+    { 
         public int MasterId { get; set; }
     }
 
@@ -136,11 +135,32 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public string Message { get; set; }
 
-        public string Type { get; set; }
+        public ResourceType Type { get; set; }
     }
 
     public class SqlJobResults : List<SqlJobResult>
     {
         public string Message { get; set; }
+
+        public SqlJobResult GetDataPusher()
+        {
+            SqlJobResult result = null;
+            foreach (SqlJobResult res in this)
+            {
+                if (res.Type == ResourceType.DataPusher)
+                    result = res;
+            }
+            return result;
+        }
+    }
+
+    public enum ResourceType
+    {
+        DataReader,
+        DataWriter,
+        Loop,
+        Processor,
+        Transaction,
+        DataPusher
     }
 }
