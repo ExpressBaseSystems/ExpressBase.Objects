@@ -517,6 +517,12 @@ namespace ExpressBase.Objects
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
             string column_val = SummarizedValue.ToString();
             column_val = FormatDecimals(column_val, AmountInWords, DecimalPlaces, Rep.CultureInfo.NumberFormat);
+
+            if (Rep.SummaryValInRow.ContainsKey(Title))
+                Rep.SummaryValInRow[Title] = new NTV { Name = Title, Type = EbDbTypes.Int32, Value = column_val };
+            else
+                Rep.SummaryValInRow.Add(Title, new NTV { Name = Title, Type = EbDbTypes.Int32, Value = column_val });
+
             Phrase phrase = GetPhrase(column_val, (DbType)DbType, Rep.Font);
             ColumnText ct = new ColumnText(Rep.Canvas);
             ct.SetSimpleColumn(phrase, Llx, lly, Urx, ury, 15, (int)TextAlign);
@@ -797,7 +803,7 @@ namespace ExpressBase.Objects
         public bool AmountInWords { get; set; }
 
         private string[] _dataFieldsUsed;
-        public string[] DataFieldsUsedCalc
+        public string[] DataFieldsUsedInCalc
         {
             get
             {
@@ -816,7 +822,7 @@ namespace ExpressBase.Objects
                     }
                 return _dataFieldsUsed;
             }
-        }
+        }        
 
         public override string GetDesignHtml()
         {
@@ -850,12 +856,12 @@ namespace ExpressBase.Objects
             Rep.AddParamsNCalcsInGlobal(globals);
             try
             {
-                if (DataFieldsUsedCalc != null && DataFieldsUsedCalc.Count() > 0)
-                    foreach (string calcfd in DataFieldsUsedCalc)
+                if (DataFieldsUsedInCalc != null && DataFieldsUsedInCalc.Count() > 0)
+                    foreach (string datafd in DataFieldsUsedInCalc)
                     {
-                        string TName = calcfd.Split('.')[0];
+                        string TName = datafd.Split('.')[0];
                         int TableIndex = Convert.ToInt32(TName.Substring(1));
-                        string fName = calcfd.Split('.')[1];
+                        string fName = datafd.Split('.')[1];
                         int RowIndex = (TableIndex == Rep.DetailTableIndex) ? slno : 0;
                         globals[TName].Add(fName, new NTV { Name = fName, Type = Rep.DataSet.Tables[TableIndex].Columns[fName].Type, Value = Rep.DataSet.Tables[TableIndex].Rows[RowIndex][fName] });
                     }
@@ -867,6 +873,7 @@ namespace ExpressBase.Objects
                     Rep.CalcValInRow[Title] = new NTV { Name = Title, Type = dbtype, Value = column_val };
                 else
                     Rep.CalcValInRow.Add(Title, new NTV { Name = Title, Type = dbtype, Value = column_val });
+                Rep.AddParamsNCalcsInGlobal(globals);
             }
             catch (Exception e)
             {
@@ -999,6 +1006,12 @@ namespace ExpressBase.Objects
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
             string column_val = SummarizedValue.ToString();
             column_val = FormatDecimals(column_val, AmountInWords, DecimalPlaces, Rep.CultureInfo.NumberFormat);
+
+            if (Rep.SummaryValInRow.ContainsKey(Title))
+                Rep.SummaryValInRow[Title] = new NTV { Name = Title, Type = EbDbTypes.Int32, Value = column_val };
+            else
+                Rep.SummaryValInRow.Add(Title, new NTV { Name = Title, Type = EbDbTypes.Int32, Value = column_val }); 
+
             Phrase phrase = GetPhrase(column_val, (DbType)DbType, Rep.Font);
             ColumnText ct = new ColumnText(Rep.Canvas);
             if (!string.IsNullOrEmpty(LinkRefId))
