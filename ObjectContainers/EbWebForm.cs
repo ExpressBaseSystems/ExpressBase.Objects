@@ -1493,6 +1493,7 @@ namespace ExpressBase.Objects
 
             fullqry += _extqry;
             fullqry += this.GetFileUploaderUpdateQuery(DataDB, param, ref i);
+            //fullqry += this.GetFirstMyActionInsertQuery(DataDB, param, ref i);
 
             param.Add(DataDB.GetNewParameter(FormConstants.eb_createdby, EbDbTypes.Int32, this.UserObj.UserId));
             param.Add(DataDB.GetNewParameter(FormConstants.eb_loc_id, EbDbTypes.Int32, this.LocationId));
@@ -1503,7 +1504,7 @@ namespace ExpressBase.Objects
             int _rowid = temp.Rows.Count > 0 ? Convert.ToInt32(temp.Rows[0][0]) : 0;
             return _rowid;
         }
-
+        
         //pTable => Parent Table, pRow => Parent Row
         private string InsertUpdateLines(string pTable, SingleRow parentRow, IDatabase DataDB, List<DbParameter> param, ref int i)
         {
@@ -1645,6 +1646,65 @@ namespace ExpressBase.Objects
             param.Add(DataDB.GetNewParameter(FormConstants.eb_createdby, EbDbTypes.Int32, this.UserObj.UserId));
             param.Add(DataDB.GetNewParameter(FormConstants.eb_modified_by, EbDbTypes.Int32, this.UserObj.UserId));
             return DataDB.DoNonQuery(this.DbConnection, fullqry, param.ToArray());
+        }
+
+        private string GetFirstMyActionInsertQuery(IDatabase DataDB, List<DbParameter> param, ref int i)
+        {
+            EbReview ebReview = (EbReview)this.FormSchema.ExtendedControls.FirstOrDefault(e => e is EbReview);
+            if (ebReview == null || ebReview.FormStages.Count == 0)
+                return string.Empty;
+            EbReviewStage firstStage = ebReview.FormStages[0] as EbReviewStage;
+            string _col = string.Empty, _val = string.Empty;
+            if (firstStage.ApproverEntity == ApproverEntityTypes.Role)
+            {
+                _col = "role_id";
+                _val = $"@role_id_{i}";
+                param.Add(DataDB.GetNewParameter($"@role_id_{i++}", EbDbTypes.Int32, firstStage.ApproverRole));
+            }
+            else if (firstStage.ApproverEntity == ApproverEntityTypes.UserGroup)
+            {
+                _col = "usergroup_id";
+                _val = $"@usergroup_id_{i}";
+                param.Add(DataDB.GetNewParameter($"@usergroup_id_{i++}", EbDbTypes.Int32, firstStage.ApproverUserGroup));
+            }
+            else if (firstStage.ApproverEntity == ApproverEntityTypes.Users)
+            {
+                string t1 = string.Empty, t2 = string.Empty, t3 = string.Empty;
+                List<DbParameter> _params = new List<DbParameter>();
+                int _idx = 0;
+                foreach (KeyValuePair<string, string> p in firstStage.QryParams)
+                {
+                    if (!this.FormData.MultipleTables.ContainsKey(p.Value))
+                        new FormException($"Review control parameter {p.Key} is not idetified", (int)HttpStatusCodes.BAD_REQUEST, "GetFirstMyActionInsertQuery", $"{p.Value} not found in MultipleTables");
+                    TableSchema _table = this.FormSchema.Tables.Find(e => e.TableName == p.Value);
+                    if (_table.TableType != WebFormTableTypes.Normal)
+                        new FormException($"Review control parameter {p.Key} is not idetified", (int)HttpStatusCodes.BAD_REQUEST, "GetFirstMyActionInsertQuery", $"{p.Value} found in MultipleTables but it is not a normal table");
+                    if (this.FormData.MultipleTables[p.Value].Count != 1)
+                        new FormException($"Review control parameter {p.Key} is not idetified", (int)HttpStatusCodes.BAD_REQUEST, "GetFirstMyActionInsertQuery", $"{p.Value} found in MultipleTables but table is empty");
+                    SingleColumn Column = this.FormData.MultipleTables[p.Value][0].Columns.Find(e => e.Control.Name == p.Key);
+                    if (Column == null || Column.Control == null)
+                        new FormException($"Review control parameter {p.Key} is not idetified", (int)HttpStatusCodes.BAD_REQUEST, "GetFirstMyActionInsertQuery", $"{p.Value} found in MultipleTables but data not available");
+
+                    Column.Control.ParameterizeControl(DataDB, _params, null, Column, true, ref _idx, ref t1, ref t2, ref t3, this.UserObj, null);
+                    _params[i - 1].ParameterName = p.Key;
+                }
+                List<int> uids = new List<int>();
+                EbDataTable dt = DataDB.DoQuery(firstStage.ApproverUsers.Code, _params.ToArray());
+                foreach (EbDataRow dr in dt.Rows)
+                {
+                    int.TryParse(dr[0].ToString(), out int temp);
+                    if (!uids.Contains(temp))
+                        uids.Add(temp);
+                }
+                _col = "user_ids";
+                _val = $"'{uids.Join(",")}'";
+            }
+
+            string insQ = $@"INSERT INTO eb_my_actions({_col}, from_datetime, is_completed, eb_stages_id, form_ref_id, form_data_id, eb_del, description)
+                            VALUES ({_val}, {DataDB.EB_CURRENT_TIMESTAMP}, 'F', (SELECT id FROM eb_stages WHERE stage_unique_id = '{firstStage.EbSid}' AND form_ref_id = '{this.RefId}' AND eb_del = 'F'), 
+                            '{this.RefId}', (SELECT eb_currval('{this.TableName}_id_seq')), 'F', 'Review required in {this.DisplayName}'); ";
+            
+            return insQ;
         }
 
         public string GetFileUploaderUpdateQuery(IDatabase DataDB, List<DbParameter> param, ref int i)

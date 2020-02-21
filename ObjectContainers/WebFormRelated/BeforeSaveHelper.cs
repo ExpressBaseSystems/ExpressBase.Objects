@@ -1,4 +1,5 @@
-﻿using ExpressBase.Common.Extensions;
+﻿using ExpressBase.Common.Constants;
+using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Objects.ServiceStack_Artifacts;
 using ServiceStack;
@@ -6,6 +7,7 @@ using ServiceStack.Redis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace ExpressBase.Objects.WebFormRelated
 {
@@ -15,6 +17,7 @@ namespace ExpressBase.Objects.WebFormRelated
         public static void BeforeSave(EbWebForm _this, IServiceClient serviceClient, IRedisClient redis)
         {
             Dictionary<string, string> tbls = new Dictionary<string, string>();
+            EbReview ebReviewCtrl = null;
             if (string.IsNullOrEmpty(_this.TableName))
                 throw new FormException("Please enter a valid form table name");
             tbls.Add(_this.TableName, "form table");
@@ -29,6 +32,12 @@ namespace ExpressBase.Objects.WebFormRelated
                     if (tbls.ContainsKey(_tn))
                         throw new FormException(string.Format("Same table not allowed for {1} and {2}(approval control) : {0}", _tn, tbls[_tn], Allctrls[i].Label));
                     tbls.Add(_tn, Allctrls[i].Label + "(approval control)");
+                }
+                else if (Allctrls[i] is EbReview)
+                {
+                    if (ebReviewCtrl != null)
+                        throw new FormException("Only one review control is allowed");
+                    ebReviewCtrl = Allctrls[i] as EbReview;
                 }
                 else if (Allctrls[i] is EbDataGrid)
                 {
@@ -65,7 +74,33 @@ namespace ExpressBase.Objects.WebFormRelated
 
             PerformRequirdUpdate(_this, _this.TableName);
 
-            CalcValueExprDependency(_this);
+            Dictionary<int, EbControlWrapper> _dict = new Dictionary<int, EbControlWrapper>();
+            GetControlsAsDict(_this, "form", _dict);
+            CalcValueExprDependency(_this, _dict);
+
+            if (ebReviewCtrl != null)
+            {
+                foreach (EbReviewStage stage in ebReviewCtrl.FormStages)
+                {
+                    if (stage.ApproverEntity == ApproverEntityTypes.Users)
+                    {
+                        Dictionary<string, string> QryParms = new Dictionary<string, string>();//<param, table>
+                        string code = stage.ApproverUsers.Code;
+                        if (code.IsNullOrEmpty())
+                            throw new FormException($"Required SQL query for {ebReviewCtrl.Name}(review) control stage {stage.Name}");
+                        MatchCollection matchColl = Regex.Matches(code, @"(?<=@)(\w+)|(?<=:)(\w+)");
+                        foreach (Match match in matchColl)
+                        {
+                            KeyValuePair<int, EbControlWrapper> item = _dict.FirstOrDefault(e => e.Value.Control.Name == match.Value);
+                            if (item.Value == null)
+                                throw new FormException($"Can't resolve {match.Value} in {ebReviewCtrl.Name}(review) control's SQL query of stage {stage.Name}");
+                            if (QryParms.ContainsKey(item.Value.Control.Name))
+                                QryParms.Add(item.Value.Control.Name, item.Value.TableName);
+                        }
+                        stage.QryParams = QryParms;
+                    }
+                }
+            }
         }
         
         private static void PerformRequirdUpdate(EbControlContainer _cont, string _tbl)
@@ -131,16 +166,17 @@ namespace ExpressBase.Objects.WebFormRelated
         }
 
         //Populate Property DependedValExp
-        private static void CalcValueExprDependency(EbWebForm _this)
+        private static void CalcValueExprDependency(EbWebForm _this, Dictionary<int, EbControlWrapper> _dict)
         {
-            Dictionary<int, EbControlWrapper> _dict = new Dictionary<int, EbControlWrapper>();
-            GetControlsAsDict(_this, "form", _dict);
             List<int> CalcFlds = new List<int>();
             List<KeyValuePair<int, int>> dpndcy = new List<KeyValuePair<int, int>>();
             List<int> ExeOrd = new List<int>();
 
             for (int i = 0; i < _dict.Count; i++)
             {
+                _dict[i].Control.DependedValExp.Clear();
+                _dict[i].Control.ValExpParams.Clear();
+
                 if (_dict[i].Control.ValueExpr != null && !string.IsNullOrEmpty(_dict[i].Control.ValueExpr.Code))
                 {
                     CalcFlds.Add(i);
@@ -160,6 +196,8 @@ namespace ExpressBase.Objects.WebFormRelated
                 string code = _dict[CalcFlds[i]].Control.ValueExpr.Code.ToLower();
                 if (_dict[CalcFlds[i]].Control.ValueExpr.Lang == ScriptingLanguage.JS)
                 {
+                    //MatchCollection matchColl = Regex.Matches(code, $@"(form.(\w+.currentrow\[""\w + ""\]|\w+.currentrow\['\w+'\]|\w+.currentrow.\w+|\w+))"); 
+
                     if (code.Contains("form"))
                     {
                         for (int j = 0; j < _dict.Count; j++)
@@ -183,18 +221,27 @@ namespace ExpressBase.Objects.WebFormRelated
                 }
                 else if (_dict[CalcFlds[i]].Control.ValueExpr.Lang == ScriptingLanguage.SQL)
                 {
-                    if (code.Contains("@") || code.Contains(":"))
+                    MatchCollection matchColl = Regex.Matches(code, @"(?<=@)(\w+)|(?<=:)(\w+)");
+                    foreach (Match match in matchColl)
                     {
-                        for (int j = 0; j < _dict.Count; j++)
-                        {
-                            if (code.Contains("@" + _dict[j].Control.Name) || code.Contains(":" + _dict[j].Control.Name))
-                            {
-                                if (CalcFlds[i] != j)
-                                    dpndcy.Add(new KeyValuePair<int, int>(CalcFlds[i], j));//<dependent, dominant>
-                                _dict[CalcFlds[i]].Control.ValExpParams.Add(_dict[j].Path);
-                            }
-                        }
+                        KeyValuePair<int, EbControlWrapper> item = _dict.FirstOrDefault(e => e.Value.Control.Name == match.Value);
+                        if (item.Value == null)
+                            throw new FormException($"Can't resolve {match.Value} in SQL Value expression of {_dict[CalcFlds[i]].Control.Name}");
+
+                        if (CalcFlds[i] != item.Key)
+                            dpndcy.Add(new KeyValuePair<int, int>(CalcFlds[i], item.Key));//<dependent, dominant>
+                        _dict[CalcFlds[i]].Control.ValExpParams.Add(item.Value.Path);
                     }
+
+                    //for (int j = 0; j < _dict.Count; j++)
+                    //{
+                    //    if (code.Contains("@" + _dict[j].Control.Name) || code.Contains(":" + _dict[j].Control.Name))
+                    //    {
+                    //        if (CalcFlds[i] != j)
+                    //            dpndcy.Add(new KeyValuePair<int, int>(CalcFlds[i], j));//<dependent, dominant>
+                    //        _dict[CalcFlds[i]].Control.ValExpParams.Add(_dict[j].Path);
+                    //    }
+                    //}
                 }
             }
 
@@ -256,9 +303,7 @@ namespace ExpressBase.Objects.WebFormRelated
             IEnumerable<EbControl> FlatCtrls = _container.Controls.Get1stLvlControls();
             foreach (EbControl control in FlatCtrls)
             {
-                control.DependedValExp.Clear();
-                control.ValExpParams.Clear();
-                string path = _path == "" ? control.Name : _path + "." + control.Name;
+                string path = _path == string.Empty ? control.Name : _path + CharConstants.DOT  + control.Name;
                 control.__path = path;
                 _dict.Add(_counter++, new EbControlWrapper
                 {
@@ -274,7 +319,7 @@ namespace ExpressBase.Objects.WebFormRelated
                 {
                     string path = _path;
                     if (control is EbDataGrid)
-                        path = _path + "." + (control as EbControlContainer).Name;
+                        path = _path + CharConstants.DOT + (control as EbControlContainer).Name;
                     GetControlsAsDict(control as EbControlContainer, path, _dict);
                 }
             }
