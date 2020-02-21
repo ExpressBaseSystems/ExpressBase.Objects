@@ -819,6 +819,20 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, p2).
             set { }
         }
 
+        public override string GetValueFromDOMJSfn
+        {
+            get
+            {
+                return @"
+let val = $('[ebsid=' + this.__DG.EbSid + ']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val();
+if(ebcontext.renderContext === 'WebForm' && val === '-1')
+    val = null;
+return val;
+";
+            }
+            set { }
+        }
+
         public override string GetDisplayMemberFromDOMJSfn { get { return @" return $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp] :selected`).text(); "; } set { } }
 
         [EnableInBuilder(BuilderType.WebForm)]
