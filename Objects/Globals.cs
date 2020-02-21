@@ -26,6 +26,7 @@ namespace ExpressBase.Objects.Objects
         public dynamic T9 { get; set; }
         public dynamic Params { get; set; }
         public dynamic Calc { get; set; }
+        public dynamic Summary { get; set; }
 
         public dynamic CurrentField { get; set; }
 
@@ -43,6 +44,7 @@ namespace ExpressBase.Objects.Objects
             T9 = new NTVDict();
             Params = new NTVDict();
             Calc = new NTVDict();
+            Summary = new NTVDict();
         }
 
         public dynamic this[string tableIndex]
@@ -73,6 +75,8 @@ namespace ExpressBase.Objects.Objects
                     return this.Params;
                 else if (tableIndex == "Calc")
                     return this.Calc;
+                else if (tableIndex == "Summary")
+                    return this.Summary;
                 else
                     return this.T0;
             }

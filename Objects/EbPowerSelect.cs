@@ -338,11 +338,12 @@ pg.MakeReadOnly('DisplayMembers');} else {pg.MakeReadWrite('DisplayMembers');}")
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup(PGConstants.EXTENDED)]
         [PropertyPriority(65)]
+        //[DefaultPropValue("1")]
         [OnChangeExec(@"
             if (this.MultiSelect === true ){
                 pg.MakeReadWrite('MaxLimit');   
                 if (this.Required === true ){
-                    if(this.MinLimit < 1){s
+                    if(this.MinLimit < 1){
                         pg.setSimpleProperty('MinLimit', 1);
                     }
                     pg.MakeReadWrite('MinLimit');

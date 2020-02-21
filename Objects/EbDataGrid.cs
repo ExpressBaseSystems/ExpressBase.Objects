@@ -1193,13 +1193,20 @@ else {pg.MakeReadWrite('ValueMember');}")]
         [PropertyGroup("Behavior")]
         [PropertyPriority(50)]
         [OnChangeExec(@"
-if(this.RenderAsSimpleSelect == true)
+if(this.RenderAsSimpleSelect == true)// SS
 { 
 	pg.ShowProperty('DisplayMember');
+	pg.HideProperty('DisplayMembers');
+	pg.HideProperty('Columns');
+	pg.ShowProperty('IsDynamic');    
 }
-else
+else// PS
 {
 	pg.HideProperty('DisplayMember');
+	pg.ShowProperty('DisplayMembers');
+	pg.ShowProperty('Columns');
+	pg.HideProperty('Options');
+	pg.HideProperty('IsDynamic');
 }
 ")]
         public bool RenderAsSimpleSelect { get { return this.EbPowerSelect.RenderAsSimpleSelect; } set { this.EbPowerSelect.RenderAsSimpleSelect = value; } }
