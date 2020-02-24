@@ -891,12 +891,12 @@ return val;
             set { this.EbSimpleSelect.DisplayMember = value; }
         }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        public int Value
-        {
-            get { return this.EbSimpleSelect.Value; }
-            set { this.EbSimpleSelect.Value = value; }
-        }
+        //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        //public int Value
+        //{
+        //    get { return this.EbSimpleSelect.Value; }
+        //    set { this.EbSimpleSelect.Value = value; }
+        //}
 
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.BotForm)]
