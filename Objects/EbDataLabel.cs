@@ -146,11 +146,15 @@ namespace ExpressBase.Objects
         [PropertyGroup("LabelConfig")]
         public GradientDirection Direction { get; set; }
 
+        [EnableInBuilder(BuilderType.DashBoard)]
+        [PropertyGroup("LabelConfig")]
+        public LabelTextPosition TextPosition { get; set; }
+
 
         [EnableInBuilder(BuilderType.DashBoard)]
         [PropertyGroup("LabelConfig")]
         [UIproperty]
-        [Alias("ChangeTextPositon")]
+        [Alias("CustomTextPosition")]
         [OnChangeExec(@"if (this.ChangeTextPositon === true ){      
                         pg.ShowProperty('StaticLabelPosition');     
                         pg.ShowProperty('DynamicLabelPositon');     
@@ -444,5 +448,11 @@ namespace ExpressBase.Objects
     {
         row = 0 ,
         colomn = 1 ,
+    }
+    public enum LabelTextPosition
+    {
+        left =0,
+        center =1,
+        right = 2
     }
 }
