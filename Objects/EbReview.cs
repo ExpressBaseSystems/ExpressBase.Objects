@@ -270,6 +270,9 @@ else if(this.ApproverEntity === 3){
         [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
         public EbScript NextStage { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public Dictionary<string, string> QryParams { get; set; }//<param, table>
     }
 
     public abstract class ReviewActionAbstract { }

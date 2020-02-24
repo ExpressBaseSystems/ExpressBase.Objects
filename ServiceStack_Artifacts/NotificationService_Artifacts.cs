@@ -39,7 +39,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     public class NotifyByUserRoleRequest : EbServiceStackAuthRequest, IReturn<NotifyByUserRoleResponse>
     {
-        public List<string> RoleName { get; set; }
+        public List<int> RoleID { get; set; }
 
         public string Link { get; set; }
 
