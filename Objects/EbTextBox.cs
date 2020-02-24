@@ -133,7 +133,7 @@ else {
         public int RowsVisible { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [PropertyGroup(@"Behavior")]
+        [PropertyGroup(PGConstants.HELP)]
         [PropertyPriority(8)]
         [HelpText("specifies a short hint that describes the expected value of an input field (e.g. a sample value or a short description of the expected format)")]
         public string PlaceHolder { get; set; }

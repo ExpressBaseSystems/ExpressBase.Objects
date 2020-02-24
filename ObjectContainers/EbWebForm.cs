@@ -610,6 +610,35 @@ namespace ExpressBase.Objects
                         }
                     }
                 }
+                else if (c is EbReview)
+                {
+                    if (!c.DoNotPersist || this.TableRowId <= 0)// merge in edit mode only
+                    {
+                        EbReview ebReview = (c as EbReview);
+                        if (FormData.MultipleTables.ContainsKey(ebReview.TableName) && FormData.MultipleTables[ebReview.TableName].Count > 0)
+                        {
+                            SingleTable rows = FormData.MultipleTables[ebReview.TableName];
+                            for (int i = 0; i < rows.Count; i++)
+                            {
+                                if (rows[i].RowId > 0)
+                                {
+                                    rows.RemoveAt(i--);
+                                }
+                            }
+                            if (rows.Count == 1)//one new entry// need to write code for 'AfterSaveRoutines'
+                            {
+                                string[] str_t = { "stage_unique_id", "action_unique_id", "eb_my_actions_id", "comments" };
+                                for (int i = 0; i < str_t.Length; i++)
+                                {
+                                    EbControl con = ebReview.Controls.Find(e => e.Name == str_t[i]);
+                                    FormData.MultipleTables[ebReview.TableName][0].SetEbDbType(con.Name, con.EbDbType);
+                                    FormData.MultipleTables[ebReview.TableName][0].SetControl(con.Name, con);
+                                }
+                            }
+
+                        }
+                    }
+                }
                 else if (c is EbControlContainer)
                 {
                     if (string.IsNullOrEmpty((c as EbControlContainer).TableName))
@@ -666,7 +695,7 @@ namespace ExpressBase.Objects
                     Table.Add(Row);
                     this.FormData.MultipleTables.Add(_table.TableName, Table);
                 }
-                else if (_table.TableType == WebFormTableTypes.Grid || _table.TableType == WebFormTableTypes.Approval)
+                else if (_table.TableType == WebFormTableTypes.Grid || _table.TableType == WebFormTableTypes.Approval || _table.TableType == WebFormTableTypes.Review)
                 {
                     this.FormData.MultipleTables.Add(_table.TableName, new SingleTable());
                 }
@@ -693,7 +722,7 @@ namespace ExpressBase.Objects
                     }
                     this.FormData.DGsRowDataModel.Add(_table.TableName, Row);
                 }
-                else if (_table.TableType == WebFormTableTypes.Approval)
+                else if (_table.TableType == WebFormTableTypes.Approval || _table.TableType == WebFormTableTypes.Review)
                 {
                     this.FormData.ApprovalRowDataModel = new SingleRow();
                     foreach (ColumnSchema _column in _table.Columns)
@@ -1122,7 +1151,7 @@ namespace ExpressBase.Objects
                 int tableIndex = _schema.Tables.Count;
                 int mngUsrCount = 0;
                 SingleTable UserTable = null;
-                foreach (Object Ctrl in _schema.ExtendedControls)//ManageUser Controls + Manage Location Control
+                foreach (EbControl Ctrl in _schema.ExtendedControls)//ManageUser Controls + Manage Location Control
                 {
                     SingleTable Table = new SingleTable();
                     if (!(UserTable != null && Ctrl is EbProvisionUser))
@@ -1146,7 +1175,7 @@ namespace ExpressBase.Objects
                         }
                         _FormData.MultipleTables[(Ctrl as EbProvisionUser).VirtualTable][0].Columns.Add(new SingleColumn()
                         {
-                            Name = (Ctrl as EbProvisionUser).Name,
+                            Name = Ctrl.Name,
                             Type = (int)EbDbTypes.String,
                             Value = JsonConvert.SerializeObject(_d)
                         });
@@ -1164,7 +1193,7 @@ namespace ExpressBase.Objects
                         }
                         _FormData.MultipleTables[(Ctrl as EbProvisionLocation).VirtualTable][0].Columns.Add(new SingleColumn()
                         {
-                            Name = (Ctrl as EbProvisionLocation).Name,
+                            Name = Ctrl.Name,
                             Type = (int)EbDbTypes.String,
                             Value = JsonConvert.SerializeObject(_d)
                         });
@@ -1174,7 +1203,7 @@ namespace ExpressBase.Objects
                 }
             }
 
-            foreach (Object Ctrl in _schema.ExtendedControls)
+            foreach (EbControl Ctrl in _schema.ExtendedControls)
             {
                 if (Ctrl is EbFileUploader)
                 {
@@ -1223,7 +1252,7 @@ namespace ExpressBase.Objects
                                 }
                             }
                         };
-                    _FormData.ExtendedTables.Add((Ctrl as EbControl).EbSid, _Table);//fup
+                    _FormData.ExtendedTables.Add(Ctrl.EbSid, _Table);//fup
                 }
             }
 
@@ -1464,6 +1493,7 @@ namespace ExpressBase.Objects
 
             fullqry += _extqry;
             fullqry += this.GetFileUploaderUpdateQuery(DataDB, param, ref i);
+            //fullqry += this.GetFirstMyActionInsertQuery(DataDB, param, ref i);
 
             param.Add(DataDB.GetNewParameter(FormConstants.eb_createdby, EbDbTypes.Int32, this.UserObj.UserId));
             param.Add(DataDB.GetNewParameter(FormConstants.eb_loc_id, EbDbTypes.Int32, this.LocationId));
@@ -1474,7 +1504,7 @@ namespace ExpressBase.Objects
             int _rowid = temp.Rows.Count > 0 ? Convert.ToInt32(temp.Rows[0][0]) : 0;
             return _rowid;
         }
-
+        
         //pTable => Parent Table, pRow => Parent Row
         private string InsertUpdateLines(string pTable, SingleRow parentRow, IDatabase DataDB, List<DbParameter> param, ref int i)
         {
@@ -1618,10 +1648,69 @@ namespace ExpressBase.Objects
             return DataDB.DoNonQuery(this.DbConnection, fullqry, param.ToArray());
         }
 
+        private string GetFirstMyActionInsertQuery(IDatabase DataDB, List<DbParameter> param, ref int i)
+        {
+            EbReview ebReview = (EbReview)this.FormSchema.ExtendedControls.FirstOrDefault(e => e is EbReview);
+            if (ebReview == null || ebReview.FormStages.Count == 0)
+                return string.Empty;
+            EbReviewStage firstStage = ebReview.FormStages[0] as EbReviewStage;
+            string _col = string.Empty, _val = string.Empty;
+            if (firstStage.ApproverEntity == ApproverEntityTypes.Role)
+            {
+                _col = "role_id";
+                _val = $"@role_id_{i}";
+                param.Add(DataDB.GetNewParameter($"@role_id_{i++}", EbDbTypes.Int32, firstStage.ApproverRole));
+            }
+            else if (firstStage.ApproverEntity == ApproverEntityTypes.UserGroup)
+            {
+                _col = "usergroup_id";
+                _val = $"@usergroup_id_{i}";
+                param.Add(DataDB.GetNewParameter($"@usergroup_id_{i++}", EbDbTypes.Int32, firstStage.ApproverUserGroup));
+            }
+            else if (firstStage.ApproverEntity == ApproverEntityTypes.Users)
+            {
+                string t1 = string.Empty, t2 = string.Empty, t3 = string.Empty;
+                List<DbParameter> _params = new List<DbParameter>();
+                int _idx = 0;
+                foreach (KeyValuePair<string, string> p in firstStage.QryParams)
+                {
+                    if (!this.FormData.MultipleTables.ContainsKey(p.Value))
+                        new FormException($"Review control parameter {p.Key} is not idetified", (int)HttpStatusCodes.BAD_REQUEST, "GetFirstMyActionInsertQuery", $"{p.Value} not found in MultipleTables");
+                    TableSchema _table = this.FormSchema.Tables.Find(e => e.TableName == p.Value);
+                    if (_table.TableType != WebFormTableTypes.Normal)
+                        new FormException($"Review control parameter {p.Key} is not idetified", (int)HttpStatusCodes.BAD_REQUEST, "GetFirstMyActionInsertQuery", $"{p.Value} found in MultipleTables but it is not a normal table");
+                    if (this.FormData.MultipleTables[p.Value].Count != 1)
+                        new FormException($"Review control parameter {p.Key} is not idetified", (int)HttpStatusCodes.BAD_REQUEST, "GetFirstMyActionInsertQuery", $"{p.Value} found in MultipleTables but table is empty");
+                    SingleColumn Column = this.FormData.MultipleTables[p.Value][0].Columns.Find(e => e.Control.Name == p.Key);
+                    if (Column == null || Column.Control == null)
+                        new FormException($"Review control parameter {p.Key} is not idetified", (int)HttpStatusCodes.BAD_REQUEST, "GetFirstMyActionInsertQuery", $"{p.Value} found in MultipleTables but data not available");
+
+                    Column.Control.ParameterizeControl(DataDB, _params, null, Column, true, ref _idx, ref t1, ref t2, ref t3, this.UserObj, null);
+                    _params[i - 1].ParameterName = p.Key;
+                }
+                List<int> uids = new List<int>();
+                EbDataTable dt = DataDB.DoQuery(firstStage.ApproverUsers.Code, _params.ToArray());
+                foreach (EbDataRow dr in dt.Rows)
+                {
+                    int.TryParse(dr[0].ToString(), out int temp);
+                    if (!uids.Contains(temp))
+                        uids.Add(temp);
+                }
+                _col = "user_ids";
+                _val = $"'{uids.Join(",")}'";
+            }
+
+            string insQ = $@"INSERT INTO eb_my_actions({_col}, from_datetime, is_completed, eb_stages_id, form_ref_id, form_data_id, eb_del, description)
+                            VALUES ({_val}, {DataDB.EB_CURRENT_TIMESTAMP}, 'F', (SELECT id FROM eb_stages WHERE stage_unique_id = '{firstStage.EbSid}' AND form_ref_id = '{this.RefId}' AND eb_del = 'F'), 
+                            '{this.RefId}', (SELECT eb_currval('{this.TableName}_id_seq')), 'F', 'Review required in {this.DisplayName}'); ";
+            
+            return insQ;
+        }
+
         public string GetFileUploaderUpdateQuery(IDatabase DataDB, List<DbParameter> param, ref int i)
         {
             string _qry = string.Empty;
-            foreach (object control in this.FormSchema.ExtendedControls)
+            foreach (EbControl control in this.FormSchema.ExtendedControls)
             {
                 if (control is EbFileUploader)
                 {
