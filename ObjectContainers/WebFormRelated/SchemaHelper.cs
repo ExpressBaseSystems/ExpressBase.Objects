@@ -50,6 +50,7 @@ namespace ExpressBase.Objects.WebFormRelated
                     if (idx >= 0)
                         (control as EbProvisionUser).AddLocConstraint = true;
                     _schema.ExtendedControls.Add(control);
+                    _table.Columns.Add(new ColumnSchema { ColumnName = control.Name, EbDbType = (int)control.EbDbType, Control = control });
                 }
                 else if (control is EbProvisionLocation)
                 {
@@ -57,6 +58,7 @@ namespace ExpressBase.Objects.WebFormRelated
                     foreach (object temp in _schema.ExtendedControls.FindAll(e => e is EbProvisionUser))
                         (temp as EbProvisionUser).AddLocConstraint = true;
                     _schema.ExtendedControls.Add(control);
+                    _table.Columns.Add(new ColumnSchema { ColumnName = control.Name, EbDbType = (int)control.EbDbType, Control = control });
                 }
                 else if (control is EbDGUserControlColumn)
                 {

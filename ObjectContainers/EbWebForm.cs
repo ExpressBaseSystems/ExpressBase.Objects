@@ -667,7 +667,7 @@ namespace ExpressBase.Objects
                     FormData.MultipleTables[_container.TableName][0][c.Name] = (c as EbAutoId).Pattern.sPattern;
                     c.ValueFE = FormData.MultipleTables[_container.TableName][0][c.Name];
                 }
-                else if (!(c is EbFileUploader) && !c.DoNotPersist)
+                else if ((!(c is EbFileUploader) && !c.DoNotPersist) || c is EbProvisionUser || c is EbProvisionLocation)
                 {
                     if (FormData.MultipleTables[_container.TableName][0].GetColumn(c.Name) != null)
                     {
@@ -849,103 +849,6 @@ namespace ExpressBase.Objects
                     val = null;
                 Row.Columns.Add(_control.GetSingleColumn(this.UserObj, this.SolutionObj, val));
                 return;
-
-                //if (_control is EbDate || _control is EbDGDateColumn || _control is EbSysCreatedAt || _control is EbSysModifiedAt || _control is EbDGCreatedAtColumn || _control is EbDGModifiedAtColumn)
-                //{
-                //    EbDateType _type = _control is EbDate ? (_control as EbDate).EbDateType :
-                //        _control is EbDGDateColumn ? (_control as EbDGDateColumn).EbDateType :
-                //        _control is EbSysCreatedAt ? (_control as EbSysCreatedAt).EbDateType :
-                //        _control is EbSysModifiedAt ? (_control as EbSysModifiedAt).EbDateType :
-                //        _control is EbDGCreatedAtColumn ? (_control as EbDGCreatedAtColumn).EbDateType :
-                //        (_control as EbDGModifiedAtColumn).EbDateType;
-                //    DateTime dt = Convert.ToDateTime(dataRow[dataColumn.ColumnIndex]);
-                //    DateTime dt_cov = dt.ConvertFromUtc(this.UserObj.Preference.TimeZone);
-                //    if (_type == EbDateType.Date)
-                //    {
-                //        if (_control is EbSysCreatedAt || _control is EbSysModifiedAt || _control is EbDGCreatedAtColumn || _control is EbDGModifiedAtColumn)
-                //        {
-                //            _formattedData = dt_cov.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
-                //            _displayMember = dt_cov.ToString(this.UserObj.Preference.GetShortDatePattern(), CultureInfo.InvariantCulture);
-                //        }
-                //        else
-                //        {
-                //            DateShowFormat _showtype = _control is EbDate ? (_control as EbDate).ShowDateAs_ : (_control as EbDGDateColumn).EbDate.ShowDateAs_;
-                //            if (_showtype == DateShowFormat.Year_Month)
-                //            {
-                //                _formattedData = dt.ToString("MM/yyyy", CultureInfo.InvariantCulture);
-                //                _displayMember = _formattedData.ToString();
-                //            }
-                //            else
-                //            {
-                //                _formattedData = dt.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
-                //                _displayMember = dt.ToString(this.UserObj.Preference.GetShortDatePattern(), CultureInfo.InvariantCulture);
-                //            }
-                //        }
-                //    }
-                //    else if (_type == EbDateType.DateTime)
-                //    {
-                //        _formattedData = dt_cov.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
-                //        _displayMember = dt_cov.ToString(this.UserObj.Preference.GetShortDatePattern() + " " + this.UserObj.Preference.GetShortTimePattern(), CultureInfo.InvariantCulture);
-                //    }
-                //    else
-                //    {
-                //        _formattedData = dt_cov.ToString("HH:mm:ss", CultureInfo.InvariantCulture);
-                //        _displayMember = dt_cov.ToString(this.UserObj.Preference.GetShortTimePattern(), CultureInfo.InvariantCulture);
-                //    }
-                //}
-                //else if (_control is EbSysLocation)
-                //{
-                //    int loc_id = Convert.ToInt32(dataRow[dataColumn.ColumnIndex]);
-                //    if (_control.IsDisable)
-                //    {
-                //        EbSysLocDM dm = (_control as EbSysLocation).DisplayMember;
-                //        if (this.SolutionObj.Locations.ContainsKey(loc_id))
-                //        {
-                //            if (dm == EbSysLocDM.LongName)
-                //            {
-                //                _formattedData = loc_id + "$$" + this.SolutionObj.Locations[loc_id].LongName;
-                //                _displayMember = this.SolutionObj.Locations[loc_id].LongName;
-                //            }
-                //            else
-                //            {
-                //                _formattedData = loc_id + "$$" + this.SolutionObj.Locations[loc_id].ShortName;
-                //                _displayMember = this.SolutionObj.Locations[loc_id].ShortName;
-                //            }
-                //        }
-                //    }
-                //    else
-                //    {
-                //        _formattedData = loc_id;
-                //    }
-                //}
-                //else if (_control is EbSysCreatedBy || _control is EbSysModifiedBy || _control is EbDGCreatedByColumn || _control is EbDGModifiedByColumn)
-                //{
-                //    int user_id = Convert.ToInt32(dataRow[dataColumn.ColumnIndex]);
-                //    if (this.SolutionObj.Users != null && this.SolutionObj.Users.ContainsKey(user_id))
-                //    {
-                //        _formattedData = user_id + "$$" + this.SolutionObj.Users[user_id];
-                //        _displayMember = this.SolutionObj.Users[user_id];
-                //    }
-                //}
-                //else if (_control is EbRadioButton)
-                //{
-                //    EbRadioButton btn = _control as EbRadioButton;
-                //    if (btn.ValueType == EbValueType.Boolean)
-                //    {
-                //        if (dataRow[dataColumn.ColumnIndex].ToString() == "T")
-                //            _formattedData = "true";
-                //        else
-                //            _formattedData = "false";
-
-                //    }
-                //}
-                //else if (_control.EbDbType == EbDbTypes.Decimal || _control.EbDbType == EbDbTypes.Int32)
-                //{
-                //    _formattedData = Convert.ToDouble(dataRow[dataColumn.ColumnIndex]);
-                //    _displayMember = string.Format("{0:0.00}", _formattedData);
-                //}
-                //else
-                //    _formattedData = dataRow[dataColumn.ColumnIndex];
             }
             else if (dataColumn.Type == EbDbTypes.Date)
             {
@@ -953,11 +856,13 @@ namespace ExpressBase.Objects
                 _formattedData = dt.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
                 _displayMember = dt.ToString(this.UserObj.Preference.GetShortDatePattern(), CultureInfo.InvariantCulture);
             }
-            else if (dataColumn.Type == EbDbTypes.Int32 || dataColumn.Type == EbDbTypes.Int64 || dataColumn.Type == EbDbTypes.Decimal || dataColumn.Type == EbDbTypes.Double)
+            else if (dataColumn.Type == EbDbTypes.Decimal || dataColumn.Type == EbDbTypes.Double)
             {
                 _formattedData = Convert.ToDouble(dataRow[dataColumn.ColumnIndex]);
                 _displayMember = string.Format("{0:0.00}", _formattedData);
             }
+            else if (dataColumn.Type == EbDbTypes.Int32 || dataColumn.Type == EbDbTypes.Int64)
+                _formattedData = Convert.ToInt64(dataRow[dataColumn.ColumnIndex]);
             else
                 _formattedData = dataRow[dataColumn.ColumnIndex];
 
@@ -1173,12 +1078,13 @@ namespace ExpressBase.Objects
                             }
                             mngUsrCount++;
                         }
-                        _FormData.MultipleTables[(Ctrl as EbProvisionUser).VirtualTable][0].Columns.Add(new SingleColumn()
-                        {
-                            Name = Ctrl.Name,
-                            Type = (int)EbDbTypes.String,
-                            Value = JsonConvert.SerializeObject(_d)
-                        });
+                        _FormData.MultipleTables[(Ctrl as EbProvisionUser).VirtualTable][0][Ctrl.Name] = JsonConvert.SerializeObject(_d);
+                        //_FormData.MultipleTables[(Ctrl as EbProvisionUser).VirtualTable][0].Columns.Add(new SingleColumn()
+                        //{
+                        //    Name = Ctrl.Name,
+                        //    Type = (int)EbDbTypes.String,
+                        //    Value = JsonConvert.SerializeObject(_d)
+                        //});
                     }
                     else if (Ctrl is EbProvisionLocation)
                     {
@@ -1191,12 +1097,13 @@ namespace ExpressBase.Objects
                             _d.Add(FormConstants.image, Table[0][FormConstants.image]);
                             _d.Add(FormConstants.meta_json, Table[0][FormConstants.meta_json]);
                         }
-                        _FormData.MultipleTables[(Ctrl as EbProvisionLocation).VirtualTable][0].Columns.Add(new SingleColumn()
-                        {
-                            Name = Ctrl.Name,
-                            Type = (int)EbDbTypes.String,
-                            Value = JsonConvert.SerializeObject(_d)
-                        });
+                        _FormData.MultipleTables[(Ctrl as EbProvisionUser).VirtualTable][0][Ctrl.Name] = JsonConvert.SerializeObject(_d);
+                        //_FormData.MultipleTables[(Ctrl as EbProvisionLocation).VirtualTable][0].Columns.Add(new SingleColumn()
+                        //{
+                        //    Name = Ctrl.Name,
+                        //    Type = (int)EbDbTypes.String,
+                        //    Value = JsonConvert.SerializeObject(_d)
+                        //});
                     }
 
                     tableIndex++;
@@ -1350,45 +1257,6 @@ namespace ExpressBase.Objects
                     }
                 }
             }
-
-            //WebFormSchema _schema = this.FormSchema;//this.GetWebFormSchema();
-            //this.FormData = new WebformData
-            //{
-            //    MasterTable = _schema.MasterTable
-            //};
-            //List<DbParameter> param = new List<DbParameter>();
-            //for (int i = 0; i < _params.Count; i++)
-            //{
-            //    for (int j = 0; j < _schema.Tables.Count; j++)
-            //    {
-            //        for (int k = 0; k < _schema.Tables[j].Columns.Count; k++)
-            //        {
-            //            if (_schema.Tables[j].Columns[k].ColumnName.Equals(_params[i].Name))
-            //            {
-            //                if (_schema.Tables[j].Columns[k].Control is EbPowerSelect)
-            //                {
-            //                    string t = (_schema.Tables[j].Columns[k].Control as EbPowerSelect).GetSelectQuery(DataDB, service, _params[i].Value);
-            //                    QrsDict.Add((_schema.Tables[j].Columns[k].Control as EbPowerSelect).EbSid, t);
-            //                }
-            //                if (!this.FormData.MultipleTables.ContainsKey(_schema.Tables[j].TableName))
-            //                {
-            //                    SingleTable tbl = new SingleTable();
-            //                    tbl.Add(new SingleRow());
-            //                    this.FormData.MultipleTables.Add(_schema.Tables[j].TableName, tbl);
-            //                }
-            //                SingleColumn col = new SingleColumn()
-            //                {
-            //                    Name = _params[i].Name,
-            //                    Type = _schema.Tables[j].Columns[k].EbDbType,
-            //                    Value = _params[i].ValueTo,
-            //                    Control = _schema.Tables[j].Columns[k].Control
-            //                };
-            //                param.Add(DataDB.GetNewParameter(col.Name, (EbDbTypes)col.Type, col.Value));
-            //                this.FormData.MultipleTables[_schema.Tables[j].TableName][0].Columns.Add(col);
-            //            }
-            //        }
-            //    }
-            //}
 
             if (QrsDict.Count > 0)
             {
@@ -1648,31 +1516,40 @@ namespace ExpressBase.Objects
             return DataDB.DoNonQuery(this.DbConnection, fullqry, param.ToArray());
         }
 
-        private string GetFirstMyActionInsertQuery(IDatabase DataDB, List<DbParameter> param, ref int i)
+        private string GetMyActionInsertUpdateQuery(IDatabase DataDB, List<DbParameter> param, ref int i, bool isInsert)
         {
             EbReview ebReview = (EbReview)this.FormSchema.ExtendedControls.FirstOrDefault(e => e is EbReview);
             if (ebReview == null || ebReview.FormStages.Count == 0)
                 return string.Empty;
-            EbReviewStage firstStage = ebReview.FormStages[0] as EbReviewStage;
+
+            EbReviewStage nextStage = null;
+            if (isInsert)
+                nextStage = ebReview.FormStages[0] as EbReviewStage;
+            else
+            {
+
+            }
+
+
             string _col = string.Empty, _val = string.Empty;
-            if (firstStage.ApproverEntity == ApproverEntityTypes.Role)
+            if (nextStage.ApproverEntity == ApproverEntityTypes.Role)
             {
                 _col = "role_id";
                 _val = $"@role_id_{i}";
-                param.Add(DataDB.GetNewParameter($"@role_id_{i++}", EbDbTypes.Int32, firstStage.ApproverRole));
+                param.Add(DataDB.GetNewParameter($"@role_id_{i++}", EbDbTypes.Int32, nextStage.ApproverRole));
             }
-            else if (firstStage.ApproverEntity == ApproverEntityTypes.UserGroup)
+            else if (nextStage.ApproverEntity == ApproverEntityTypes.UserGroup)
             {
                 _col = "usergroup_id";
                 _val = $"@usergroup_id_{i}";
-                param.Add(DataDB.GetNewParameter($"@usergroup_id_{i++}", EbDbTypes.Int32, firstStage.ApproverUserGroup));
+                param.Add(DataDB.GetNewParameter($"@usergroup_id_{i++}", EbDbTypes.Int32, nextStage.ApproverUserGroup));
             }
-            else if (firstStage.ApproverEntity == ApproverEntityTypes.Users)
+            else if (nextStage.ApproverEntity == ApproverEntityTypes.Users)
             {
                 string t1 = string.Empty, t2 = string.Empty, t3 = string.Empty;
                 List<DbParameter> _params = new List<DbParameter>();
                 int _idx = 0;
-                foreach (KeyValuePair<string, string> p in firstStage.QryParams)
+                foreach (KeyValuePair<string, string> p in nextStage.QryParams)
                 {
                     if (!this.FormData.MultipleTables.ContainsKey(p.Value))
                         new FormException($"Review control parameter {p.Key} is not idetified", (int)HttpStatusCodes.BAD_REQUEST, "GetFirstMyActionInsertQuery", $"{p.Value} not found in MultipleTables");
@@ -1689,7 +1566,7 @@ namespace ExpressBase.Objects
                     _params[i - 1].ParameterName = p.Key;
                 }
                 List<int> uids = new List<int>();
-                EbDataTable dt = DataDB.DoQuery(firstStage.ApproverUsers.Code, _params.ToArray());
+                EbDataTable dt = DataDB.DoQuery(nextStage.ApproverUsers.Code, _params.ToArray());
                 foreach (EbDataRow dr in dt.Rows)
                 {
                     int.TryParse(dr[0].ToString(), out int temp);
@@ -1701,7 +1578,7 @@ namespace ExpressBase.Objects
             }
 
             string insQ = $@"INSERT INTO eb_my_actions({_col}, from_datetime, is_completed, eb_stages_id, form_ref_id, form_data_id, eb_del, description)
-                            VALUES ({_val}, {DataDB.EB_CURRENT_TIMESTAMP}, 'F', (SELECT id FROM eb_stages WHERE stage_unique_id = '{firstStage.EbSid}' AND form_ref_id = '{this.RefId}' AND eb_del = 'F'), 
+                            VALUES ({_val}, {DataDB.EB_CURRENT_TIMESTAMP}, 'F', (SELECT id FROM eb_stages WHERE stage_unique_id = '{nextStage.EbSid}' AND form_ref_id = '{this.RefId}' AND eb_del = 'F'), 
                             '{this.RefId}', (SELECT eb_currval('{this.TableName}_id_seq')), 'F', 'Review required in {this.DisplayName}'); ";
             
             return insQ;
