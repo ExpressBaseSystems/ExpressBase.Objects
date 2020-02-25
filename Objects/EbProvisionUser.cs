@@ -274,7 +274,9 @@ this.Init = function(id)
                 DbParameter[] parameters = new DbParameter[] { DataDB.GetNewParameter("email", EbDbTypes.String, _d["email"]) };
                 EbDataTable dt = DataDB.DoQuery(sql, parameters);
                 if (dt.Rows.Count > 0)
-                    return false;// raise an exception to notify email already exists
+                {
+                    throw new FormException($"{_d["email"]} already exists", (int)HttpStatusCodes.BAD_REQUEST, $"Email already exists : {_d["email"]}", "EbProvisionUser => ParameterizeControl");
+                }
 
                 this.UserCredentials = new UserCredentials()
                 {
