@@ -15,6 +15,7 @@ using System.Text;
 using ServiceStack.RabbitMq;
 using ExpressBase.Objects.ServiceStack_Artifacts;
 using ExpressBase.Common.Constants;
+using ExpressBase.Common.LocationNSolution;
 
 namespace ExpressBase.Objects
 {
@@ -67,7 +68,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
-        public override bool IsSysControl { get { return true; } }
+        public override bool IsSysControl { get { return false; } }
 
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyGroup(PGConstants.CORE)]
@@ -121,7 +122,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
-        public override bool DoNotPersist { get; set; }
+        public override bool DoNotPersist { get { return true; } }
 
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
@@ -317,6 +318,18 @@ this.Init = function(id)
             return true;
         }
 
+        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
+        {
+            return new SingleColumn()
+            {
+                Name = this.Name,
+                Type = (int)this.EbDbType,
+                Value = "{}",
+                Control = this,
+                ObjType = this.ObjType
+            };
+        }
+
         private string GetRandomPwd()
         {
             StringBuilder builder = new StringBuilder();
@@ -427,9 +440,24 @@ this.Init = function(id)
             set { }
         }
 
+        public override string OnChangeBindJSFn 
+        { 
+            get 
+            {
+                return @"
+                    $.each(this.Fields.$values, function (i, obj) {
+                        if (obj.ControlName !== '') {
+                            $('#' + obj.Control.EbSid_CtxId).on('change', p1);
+                        }
+                    }.bind(this));";
+            } 
+            set { } 
+        }
+
         public override string RefreshJSfn { get { return @""; } set { } }
 
         public override string ClearJSfn { get { return @""; } set { } }
+        
     }
 
     public class UserCredentials

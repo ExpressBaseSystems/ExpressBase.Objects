@@ -55,7 +55,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     public class NotifyByUserGroupRequest : EbServiceStackAuthRequest, IReturn<NotifyByUserGroupResponse>
     {
-        public List<string> GroupName { get; set; }
+        public List<int> GroupId { get; set; }
 
         public string Link { get; set; }
 
