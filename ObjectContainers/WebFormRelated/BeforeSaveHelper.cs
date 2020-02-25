@@ -208,23 +208,37 @@ namespace ExpressBase.Objects.WebFormRelated
 
                     if (code.Contains("form"))
                     {
+                        bool IsAnythingResolved = false;
                         for (int j = 0; j < _dict.Count; j++)
                         {
-                            string[] stringArr = new string[] {
-                                _dict[j].Path,
-                                _dict[j].Root + ".currentrow." + _dict[j].Control.Name + ".",
-                                _dict[j].Root + ".currentrow['" + _dict[j].Control.Name + "']",
-                                _dict[j].Root + ".currentrow[\"" + _dict[j].Control.Name + "\"]",
-                                _dict[j].Root + "." +  _dict[j].Control.Name + "_sum"
-                            };
-                            if (stringArr.Any(code.Contains))
+                            string p = _dict[j].Path, r = _dict[j].Root, n = _dict[j].Control.Name;
+                            //string regex = $@"{r}.currentrow\[""{n}""\]|{r}.currentrow\['{n}'\]|{r}.currentrow.{n}|{r}.getrowbyindex\(\w+\)\[""{n}""\]|{r}.getrowbyindex\(\w+\)|{p}";
+                            string regex = $@"{r}.currentrow\[""{n}""\]|{r}.currentrow\['{n}'\]|{r}.currentrow.{n}|{r}.getrowbyindex\(\w+\)\[""{n}""\]|{p}";
+
+                            if (Regex.IsMatch(code, regex))
                             {
-                                //if (CalcFlds[i] == j)
-                                //    throw new FormException("Avoid circular reference by the following control in 'ValueExpression' : " + _dict[CalcFlds[i]].Control.Name);
                                 if (CalcFlds[i] != j)//if a control refers itself treated as not circular reference
                                     dpndcy.Add(new KeyValuePair<int, int>(CalcFlds[i], j));//<dependent, dominant>
+                                IsAnythingResolved = true;
                             }
+
+                            //string[] stringArr = new string[] {
+                            //    _dict[j].Path,
+                            //    _dict[j].Root + ".currentrow." + _dict[j].Control.Name + ".",
+                            //    _dict[j].Root + ".currentrow['" + _dict[j].Control.Name + "']",
+                            //    _dict[j].Root + ".currentrow[\"" + _dict[j].Control.Name + "\"]",
+                            //    _dict[j].Root + "." +  _dict[j].Control.Name + "_sum"
+                            //};
+                            //if (stringArr.Any(code.Contains))
+                            //{
+                            //    //if (CalcFlds[i] == j)
+                            //    //    throw new FormException("Avoid circular reference by the following control in 'ValueExpression' : " + _dict[CalcFlds[i]].Control.Name);
+                            //    if (CalcFlds[i] != j)//if a control refers itself treated as not circular reference
+                            //        dpndcy.Add(new KeyValuePair<int, int>(CalcFlds[i], j));//<dependent, dominant>
+                            //}
                         }
+                        if (!IsAnythingResolved)
+                            throw new FormException($"Can't resolve some form variables in Js Value expression of {_dict[CalcFlds[i]].Control.Name}");
                     }
                 }
                 else if (_dict[CalcFlds[i]].Control.ValueExpr.Lang == ScriptingLanguage.SQL)
