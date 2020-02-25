@@ -438,6 +438,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public PricingTiers PricingTier { get; set; }
 
         public bool IsVersioningEnabled { get; set; }
+
+        public SolutionSettings SolutionSettings { get; set; }
     }
 
     [DataContract]

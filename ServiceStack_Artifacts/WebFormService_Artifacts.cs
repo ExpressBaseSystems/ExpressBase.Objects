@@ -53,6 +53,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 4)]
         public int CurrentLoc { get; set; }
+
+        [DataMember(Order = 4)]
+        public WebFormRenderModes RenderMode { get; set; }
     }
 
 	[DataContract]
