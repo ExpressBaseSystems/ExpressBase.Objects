@@ -15,6 +15,7 @@ using System.Text;
 using ServiceStack.RabbitMq;
 using ExpressBase.Objects.ServiceStack_Artifacts;
 using ExpressBase.Common.Constants;
+using ExpressBase.Common.LocationNSolution;
 
 namespace ExpressBase.Objects
 {
@@ -67,7 +68,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
-        public override bool IsSysControl { get { return true; } }
+        public override bool IsSysControl { get { return false; } }
 
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyGroup(PGConstants.CORE)]
@@ -121,7 +122,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
-        public override bool DoNotPersist { get; set; }
+        public override bool DoNotPersist { get { return true; } }
 
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
@@ -273,7 +274,9 @@ this.Init = function(id)
                 DbParameter[] parameters = new DbParameter[] { DataDB.GetNewParameter("email", EbDbTypes.String, _d["email"]) };
                 EbDataTable dt = DataDB.DoQuery(sql, parameters);
                 if (dt.Rows.Count > 0)
-                    return false;// raise an exception to notify email already exists
+                {
+                    throw new FormException($"{_d["email"]} already exists", (int)HttpStatusCodes.BAD_REQUEST, $"Email already exists : {_d["email"]}", "EbProvisionUser => ParameterizeControl");
+                }
 
                 this.UserCredentials = new UserCredentials()
                 {
@@ -317,6 +320,18 @@ this.Init = function(id)
             return true;
         }
 
+        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
+        {
+            return new SingleColumn()
+            {
+                Name = this.Name,
+                Type = (int)this.EbDbType,
+                Value = "{}",
+                Control = this,
+                ObjType = this.ObjType
+            };
+        }
+
         private string GetRandomPwd()
         {
             StringBuilder builder = new StringBuilder();
@@ -344,16 +359,16 @@ this.Init = function(id)
     <body>
         <div style='border: 1px solid #508bf9;padding:20px 40px 20px 40px; '>
             <div style='text-align: center;'>
-                <img src='https://myaccount.expressbase.com/images/logo/{SolutionId}.png' />
+                <img src='https://myaccount.expressbase.com/images/logo/{iSolutionId}.png' />
             </div>
             <br />
             <div style='line-height: 1.4;'>
                 Dear {UserName},<br />
                 <br />
-                You have been added as a user into {SolutionId} solution. Please find below credentials to log in.
+                You have been added as a user into {SolutionName} solution. Please find below credentials to log in.
                 <br />
                 <br />
-                Solution URL - https://{SolutionId}.expressbase.com <br />
+                Solution URL - https://{eSolutionId}.expressbase.com <br />
                 User name - {Email} <br />
                 Password - {Password} <br />
                 <br />
@@ -370,16 +385,18 @@ this.Init = function(id)
             set { }
         }
 
-        public void SendMailIfUserCreated(RabbitMqProducer MessageProducer3, int UserId, string CreatedBy, string UserAuthId, string SolnId)
+        public void SendMailIfUserCreated(RabbitMqProducer MessageProducer3,User user,Eb_Solution solution)
         {
             if(this.UserCredentials != null)
             {
                 string Html = this.MailHtml
-                    .Replace("{SolutionId}", SolnId)
+                    .Replace("{SolutionName}", solution.SolutionName)
+                    .Replace("{eSolutionId}", solution.ExtSolutionID)
+                    .Replace("{iSolutionId}", solution.SolutionID)
                     .Replace("{UserName}", this.UserCredentials.Name)
                     .Replace("{Email}", this.UserCredentials.Email)
                     .Replace("{Password}", this.UserCredentials.Pwd)
-                    .Replace("{SolutionAdmin}", CreatedBy);
+                    .Replace("{SolutionAdmin}", string.IsNullOrEmpty(user.FullName) ? $"{solution.SolutionName} Team" : user.FullName);
                 
                 //this.EbConnectionFactory.EmailConnection.Send("febincarlos@expressbase.com", "test", "Hiii", null, null, null, "");
                 
@@ -387,10 +404,10 @@ this.Init = function(id)
                 {
                     To = this.UserCredentials.Email,
                     Message = Html,
-                    Subject = $"Welcome to {SolnId} Solution",
-                    UserId = UserId,
-                    UserAuthId = UserAuthId,
-                    SolnId = SolnId
+                    Subject = $"Welcome to {solution.SolutionName} Solution",
+                    UserId = user.UserId,
+                    UserAuthId = user.AuthId,
+                    SolnId = solution.SolutionID
                 });
             }
         }
@@ -427,9 +444,24 @@ this.Init = function(id)
             set { }
         }
 
+        public override string OnChangeBindJSFn 
+        { 
+            get 
+            {
+                return @"
+                    $.each(this.Fields.$values, function (i, obj) {
+                        if (obj.ControlName !== '') {
+                            $('#' + obj.Control.EbSid_CtxId).on('change', p1);
+                        }
+                    }.bind(this));";
+            } 
+            set { } 
+        }
+
         public override string RefreshJSfn { get { return @""; } set { } }
 
         public override string ClearJSfn { get { return @""; } set { } }
+        
     }
 
     public class UserCredentials

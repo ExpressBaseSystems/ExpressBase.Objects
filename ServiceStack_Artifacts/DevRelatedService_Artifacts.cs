@@ -228,7 +228,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     }
 
-    public class UpdateAppSettingsRequest : EbServiceStackAuthRequest ,IReturn<UpdateAppSettingsResponse>
+    public class UpdateAppSettingsRequest : EbServiceStackAuthRequest, IReturn<UpdateAppSettingsResponse>
     {
         [DataMember(Order = 1)]
         public string Settings { get; set; }
@@ -240,12 +240,26 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public EbApplicationTypes AppType { get; set; }
     }
 
-    public class UpdateAppSettingsResponse 
+    public class UpdateAppSettingsResponse
     {
         [DataMember(Order = 1)]
         public bool Status { set; get; }
 
         [DataMember(Order = 2)]
         public string Message { set; get; }
+    }
+
+    public class SaveSolutionSettingsRequest : EbServiceStackAuthRequest, IReturn<SaveSolutionSettingsResponse>
+    {
+        public string SolutionSettings { get; set; }
+    }
+
+    public class SaveSolutionSettingsResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        public string Message { get; set; }
+
     }
 }
