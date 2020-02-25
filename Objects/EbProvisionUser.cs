@@ -392,7 +392,7 @@ this.Init = function(id)
                     .Replace("{UserName}", this.UserCredentials.Name)
                     .Replace("{Email}", this.UserCredentials.Email)
                     .Replace("{Password}", this.UserCredentials.Pwd)
-                    .Replace("{SolutionAdmin}", CreatedBy);
+                    .Replace("{SolutionAdmin}", string.IsNullOrEmpty(CreatedBy) ? $"{SolnId} Team" : CreatedBy);
                 
                 //this.EbConnectionFactory.EmailConnection.Send("febincarlos@expressbase.com", "test", "Hiii", null, null, null, "");
                 
