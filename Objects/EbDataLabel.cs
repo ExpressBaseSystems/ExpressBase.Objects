@@ -97,7 +97,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.Color)]
         [PropertyGroup("LabelConfig")]
-        [DefaultPropValue("#7093ff")]
+        [DefaultPropValue("#2f2f51")]
         public string LabelBorderColor { get; set; }
 
 
@@ -131,14 +131,14 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.Color)]
         [PropertyGroup("LabelConfig")]
         [OnChangeUIFunction("EbDataLabel.LabelGradientColor")]
-        [DefaultPropValue("#78cafb")]
+        [DefaultPropValue("#2f2f51")]
         public string GradientColor1 { get; set; }
 
         [EnableInBuilder(BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.Color)]
         [PropertyGroup("LabelConfig")]
         [OnChangeUIFunction("EbDataLabel.LabelGradientColor")]
-        [DefaultPropValue("#7093ff")]
+        [DefaultPropValue("#59a4a6")]
         public string GradientColor2 { get; set; }
 
 
