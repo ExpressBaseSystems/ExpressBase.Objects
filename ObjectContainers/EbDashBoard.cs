@@ -218,7 +218,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.Color)]
         [PropertyGroup("TileConfig")]
-        [DefaultPropValue("#1f1f33")]
+        [DefaultPropValue("#3d3d5a")]
         [OnChangeUIFunction("EbDataLabel.LabelGradientColor")]
         public string GradientColor1 { get; set; }
 
@@ -235,7 +235,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.DashBoard)]
         [PropertyGroup("TileConfig")]
-        [DefaultPropValue("#1f1f33")]
+        [DefaultPropValue("#3d3d5a")]
         [PropertyEditor(PropertyEditorType.Color)]
         public string BorderColor { get; set; }
 
@@ -258,6 +258,13 @@ namespace ExpressBase.Objects
         [PropertyGroup("TileConfig")]
         [OnChangeUIFunction("EbDataLabel.LabelGradientColor")]
         public string FontColor { get; set; }
+
+        [EnableInBuilder(BuilderType.DashBoard)]
+        [PropertyEditor(PropertyEditorType.Color)]
+        [PropertyGroup("TileConfig")]
+        [OnChangeUIFunction("EbDataLabel.LabelGradientColor")]
+        [DefaultPropValue("#26b3f7")]
+        public string LinkColor { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.DashBoard)]
         [PropertyGroup("Label")]
