@@ -97,7 +97,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.Color)]
         [PropertyGroup("LabelConfig")]
-        [DefaultPropValue("#7093ff")]
+        [DefaultPropValue("#2f2f51")]
         public string LabelBorderColor { get; set; }
 
 
@@ -131,14 +131,14 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.Color)]
         [PropertyGroup("LabelConfig")]
         [OnChangeUIFunction("EbDataLabel.LabelGradientColor")]
-        [DefaultPropValue("#78cafb")]
+        [DefaultPropValue("#2f2f51")]
         public string GradientColor1 { get; set; }
 
         [EnableInBuilder(BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.Color)]
         [PropertyGroup("LabelConfig")]
         [OnChangeUIFunction("EbDataLabel.LabelGradientColor")]
-        [DefaultPropValue("#7093ff")]
+        [DefaultPropValue("#59a4a6")]
         public string GradientColor2 { get; set; }
 
 
@@ -146,11 +146,15 @@ namespace ExpressBase.Objects
         [PropertyGroup("LabelConfig")]
         public GradientDirection Direction { get; set; }
 
+        [EnableInBuilder(BuilderType.DashBoard)]
+        [PropertyGroup("LabelConfig")]
+        public LabelTextPosition TextPosition { get; set; }
+
 
         [EnableInBuilder(BuilderType.DashBoard)]
         [PropertyGroup("LabelConfig")]
         [UIproperty]
-        [Alias("ChangeTextPositon")]
+        [Alias("CustomTextPosition")]
         [OnChangeExec(@"if (this.ChangeTextPositon === true ){      
                         pg.ShowProperty('StaticLabelPosition');     
                         pg.ShowProperty('DynamicLabelPositon');     
@@ -444,5 +448,11 @@ namespace ExpressBase.Objects
     {
         row = 0 ,
         colomn = 1 ,
+    }
+    public enum LabelTextPosition
+    {
+        left =0,
+        center =1,
+        right = 2
     }
 }

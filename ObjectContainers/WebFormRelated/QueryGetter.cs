@@ -1,4 +1,5 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Objects;
 using ServiceStack;
 using System;
 using System.Collections.Generic;
@@ -59,7 +60,7 @@ namespace ExpressBase.Objects.WebFormRelated
                 }
             }
             bool MuCtrlFound = false;
-            foreach (Object Ctrl in _this.FormSchema.ExtendedControls)
+            foreach (EbControl Ctrl in _this.FormSchema.ExtendedControls)
             {
                 if (Ctrl is EbProvisionUser && !MuCtrlFound)
                 {

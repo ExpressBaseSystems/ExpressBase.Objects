@@ -28,6 +28,11 @@ namespace ExpressBase.Objects.WebFormRelated
             {
                 if (_container is EbApproval)
                     _table = new TableSchema { TableName = curTbl, ParentTable = _parentTable, TableType = WebFormTableTypes.Approval, Title = _container.Label, ContainerName = _container.Name };
+                else if (_container is EbReview)
+                {
+                    _table = new TableSchema { TableName = curTbl, ParentTable = _parentTable, TableType = WebFormTableTypes.Review, Title = _container.Label, ContainerName = _container.Name };
+                    _schema.ExtendedControls.Add(_container);
+                }
                 else if (_container is EbDataGrid)
                     _table = new TableSchema { TableName = curTbl, ParentTable = _parentTable, TableType = WebFormTableTypes.Grid, Title = _container.Label, ContainerName = _container.Name, IsDynamic = _container.IsDynamicTabChild, DescOdr = !(_container as EbDataGrid).AscendingOrder };
                 else
@@ -45,6 +50,7 @@ namespace ExpressBase.Objects.WebFormRelated
                     if (idx >= 0)
                         (control as EbProvisionUser).AddLocConstraint = true;
                     _schema.ExtendedControls.Add(control);
+                    _table.Columns.Add(new ColumnSchema { ColumnName = control.Name, EbDbType = (int)control.EbDbType, Control = control });
                 }
                 else if (control is EbProvisionLocation)
                 {
@@ -52,6 +58,7 @@ namespace ExpressBase.Objects.WebFormRelated
                     foreach (object temp in _schema.ExtendedControls.FindAll(e => e is EbProvisionUser))
                         (temp as EbProvisionUser).AddLocConstraint = true;
                     _schema.ExtendedControls.Add(control);
+                    _table.Columns.Add(new ColumnSchema { ColumnName = control.Name, EbDbType = (int)control.EbDbType, Control = control });
                 }
                 else if (control is EbDGUserControlColumn)
                 {

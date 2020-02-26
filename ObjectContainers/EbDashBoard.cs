@@ -71,6 +71,43 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.Color)]
         public virtual string BackgroundColor { get; set; }
 
+        [EnableInBuilder(BuilderType.DashBoard)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        [DefaultPropValue("false")]
+        [OnChangeExec(@"
+                if (this.IsGradient === true ){      
+                        pg.ShowProperty('GradientColor1');     
+                        pg.ShowProperty('GradientColor2');     
+                        pg.ShowProperty('Direction');
+                        pg.HideProperty('BackgroundColor');
+                }
+                else {
+                        pg.ShowProperty('BackgroundColor');    
+                        pg.HideProperty('GradientColor1');     
+                        pg.HideProperty('GradientColor2');     
+                        pg.HideProperty('Direction');      
+                }
+            ")]
+        public bool IsGradient { get; set; }
+
+        [EnableInBuilder(BuilderType.DashBoard)]
+        [PropertyEditor(PropertyEditorType.Color)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        [DefaultPropValue("#1f1f33")]
+        [OnChangeUIFunction("EbDataLabel.LabelGradientColor")]
+        public string GradientColor1 { get; set; }
+
+        [EnableInBuilder(BuilderType.DashBoard)]
+        [PropertyEditor(PropertyEditorType.Color)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        [OnChangeUIFunction("EbDataLabel.LabelGradientColor")]
+        [DefaultPropValue("#3b7273")]
+        public string GradientColor2 { get; set; }
+
+
+        [EnableInBuilder(BuilderType.DashBoard)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        public GradientDirection Direction { get; set; }
 
         [EnableInBuilder(BuilderType.DashBoard)]
         [PropertyGroup(PGConstants.APPEARANCE)]
@@ -161,6 +198,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.DashBoard)]
         [PropertyGroup("TileConfig")]
+        [DefaultPropValue("true")]
         [OnChangeExec(@"
                 if (this.IsGradient === true ){      
                         pg.ShowProperty('GradientColor1');     
@@ -180,6 +218,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.Color)]
         [PropertyGroup("TileConfig")]
+        [DefaultPropValue("#1f1f33")]
         [OnChangeUIFunction("EbDataLabel.LabelGradientColor")]
         public string GradientColor1 { get; set; }
 
@@ -187,6 +226,7 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.Color)]
         [PropertyGroup("TileConfig")]
         [OnChangeUIFunction("EbDataLabel.LabelGradientColor")]
+        [DefaultPropValue("#3b7273")]
         public string GradientColor2 { get; set; }
 
         [EnableInBuilder(BuilderType.DashBoard)]
@@ -195,7 +235,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.DashBoard)]
         [PropertyGroup("TileConfig")]
-        [DefaultPropValue("#c3c3c3")]
+        [DefaultPropValue("#1f1f33")]
         [PropertyEditor(PropertyEditorType.Color)]
         public string BorderColor { get; set; }
 
@@ -213,6 +253,11 @@ namespace ExpressBase.Objects
             ")]
         public int BorderRadius { get; set; }
 
+        [EnableInBuilder(BuilderType.DashBoard)]
+        [PropertyEditor(PropertyEditorType.Color)]
+        [PropertyGroup("TileConfig")]
+        [OnChangeUIFunction("EbDataLabel.LabelGradientColor")]
+        public string FontColor { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.DashBoard)]
         [PropertyGroup("Label")]

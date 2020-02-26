@@ -338,11 +338,12 @@ pg.MakeReadOnly('DisplayMembers');} else {pg.MakeReadWrite('DisplayMembers');}")
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup(PGConstants.EXTENDED)]
         [PropertyPriority(65)]
+        //[DefaultPropValue("1")]
         [OnChangeExec(@"
             if (this.MultiSelect === true ){
                 pg.MakeReadWrite('MaxLimit');   
                 if (this.Required === true ){
-                    if(this.MinLimit < 1){s
+                    if(this.MinLimit < 1){
                         pg.setSimpleProperty('MinLimit', 1);
                     }
                     pg.MakeReadWrite('MinLimit');
@@ -401,19 +402,26 @@ pg.MakeReadOnly('DisplayMembers');} else {pg.MakeReadWrite('DisplayMembers');}")
         [PropertyGroup(PGConstants.EXTENDED)]
         [DefaultPropValue("true")]
         [OnChangeExec(@"
-if(this.IsDynamic == false)
-{ 
-	pg.ShowProperty('Options');
-	pg.HideProperty('ValueMember');
-	pg.HideProperty('DisplayMember');
-	pg.HideProperty('DisplayMembers');
+
+if(this.RenderAsSimpleSelect == true){ //SS
+    if(this.IsDynamic == false){// SS static
+	    pg.ShowProperty('Options');
+	    pg.HideProperty('ValueMember');
+	    pg.HideProperty('DisplayMember'); 
+    }
+    else{// SS dynamic
+	    pg.HideProperty('Options');
+	    pg.ShowProperty('ValueMember');
+	    pg.ShowProperty('DisplayMember');
+    }
 }
-else
+else// PS
 {
-	pg.HideProperty('Options');
 	pg.ShowProperty('ValueMember');
-	pg.ShowProperty('DisplayMember');
 	pg.ShowProperty('DisplayMembers');
+	pg.ShowProperty('Columns');
+	pg.HideProperty('DisplayMember');
+	pg.HideProperty('Options');
 }
 ")]
         public bool IsDynamic { get; set; }
@@ -429,14 +437,14 @@ else
         [PropertyGroup(PGConstants.CORE)]
         [PropertyPriority(50)]
         [OnChangeExec(@"
-if(this.RenderAsSimpleSelect == true)
+if(this.RenderAsSimpleSelect == true)// SS
 { 
 	pg.ShowProperty('DisplayMember');
 	pg.HideProperty('DisplayMembers');
 	pg.HideProperty('Columns');
-	pg.ShowProperty('IsDynamic');
+	pg.ShowProperty('IsDynamic');    
 }
-else
+else// PS
 {
 	pg.HideProperty('DisplayMember');
 	pg.ShowProperty('DisplayMembers');

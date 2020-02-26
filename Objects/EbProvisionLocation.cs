@@ -1,6 +1,7 @@
 ﻿using ExpressBase.Common;
 using ExpressBase.Common.Constants;
 using ExpressBase.Common.Extensions;
+using ExpressBase.Common.LocationNSolution;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
@@ -69,7 +70,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
-        public override bool IsSysControl { get { return true; } }
+        public override bool IsSysControl { get { return false; } }
 
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyGroup(PGConstants.CORE)]
@@ -123,7 +124,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
-        public override bool DoNotPersist { get; set; }
+        public override bool DoNotPersist { get { return true; } }
 
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
@@ -249,6 +250,18 @@ this.Init = function(id)
             return true;
         }
 
+        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
+        {
+            return new SingleColumn()
+            {
+                Name = this.Name,
+                Type = (int)this.EbDbType,
+                Value = "{}",
+                Control = this,
+                ObjType = this.ObjType
+            };
+        }
+
         public override string GetValueFromDOMJSfn
         {
             get
@@ -286,6 +299,20 @@ this.Init = function(id)
                             obj.Control.setValue(metaObj[obj.DisplayName]);
                     }
                 }.bind(this));";
+            }
+            set { }
+        }
+
+        public override string OnChangeBindJSFn
+        {
+            get
+            {
+                return @"
+                    $.each(this.Fields.$values, function (i, obj) {
+                        if (obj.ControlName !== '') {
+                            $('#' + obj.Control.EbSid_CtxId).on('change', p1);
+                        }
+                    }.bind(this));";
             }
             set { }
         }

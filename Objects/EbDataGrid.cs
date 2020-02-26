@@ -819,6 +819,20 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, p2).
             set { }
         }
 
+        public override string GetValueFromDOMJSfn
+        {
+            get
+            {
+                return @"
+let val = $('[ebsid=' + this.__DG.EbSid + ']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val();
+if(ebcontext.renderContext === 'WebForm' && val === '-1')
+    val = null;
+return val;
+";
+            }
+            set { }
+        }
+
         public override string GetDisplayMemberFromDOMJSfn { get { return @" return $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp] :selected`).text(); "; } set { } }
 
         [EnableInBuilder(BuilderType.WebForm)]
@@ -877,12 +891,12 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, p2).
             set { this.EbSimpleSelect.DisplayMember = value; }
         }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        public int Value
-        {
-            get { return this.EbSimpleSelect.Value; }
-            set { this.EbSimpleSelect.Value = value; }
-        }
+        //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        //public int Value
+        //{
+        //    get { return this.EbSimpleSelect.Value; }
+        //    set { this.EbSimpleSelect.Value = value; }
+        //}
 
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.BotForm)]
@@ -1193,13 +1207,20 @@ else {pg.MakeReadWrite('ValueMember');}")]
         [PropertyGroup("Behavior")]
         [PropertyPriority(50)]
         [OnChangeExec(@"
-if(this.RenderAsSimpleSelect == true)
+if(this.RenderAsSimpleSelect == true)// SS
 { 
 	pg.ShowProperty('DisplayMember');
+	pg.HideProperty('DisplayMembers');
+	pg.HideProperty('Columns');
+	pg.ShowProperty('IsDynamic');    
 }
-else
+else// PS
 {
 	pg.HideProperty('DisplayMember');
+	pg.ShowProperty('DisplayMembers');
+	pg.ShowProperty('Columns');
+	pg.HideProperty('Options');
+	pg.HideProperty('IsDynamic');
 }
 ")]
         public bool RenderAsSimpleSelect { get { return this.EbPowerSelect.RenderAsSimpleSelect; } set { this.EbPowerSelect.RenderAsSimpleSelect = value; } }

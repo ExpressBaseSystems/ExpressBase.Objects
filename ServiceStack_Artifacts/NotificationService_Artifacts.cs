@@ -24,6 +24,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class NotifyByUserIDRequest : EbServiceStackAuthRequest, IReturn<NotifyByUserIDResponse>
     {
         public int UsersID { get; set; }
+
+        public string Link { get; set; }
+
+        public string Title { get; set; }
     }
 
     public class NotifyByUserIDResponse : IEbSSResponse
@@ -35,7 +39,11 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     public class NotifyByUserRoleRequest : EbServiceStackAuthRequest, IReturn<NotifyByUserRoleResponse>
     {
-        public string RoleName { get; set; }
+        public List<int> RoleID { get; set; }
+
+        public string Link { get; set; }
+
+        public string Title { get; set; }
     }
 
     public class NotifyByUserRoleResponse : IEbSSResponse
@@ -47,7 +55,11 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     public class NotifyByUserGroupRequest : EbServiceStackAuthRequest, IReturn<NotifyByUserGroupResponse>
     {
-        public string GroupName { get; set; }
+        public List<int> GroupId { get; set; }
+
+        public string Link { get; set; }
+
+        public string Title { get; set; }
     }
 
     public class NotifyByUserGroupResponse : IEbSSResponse
