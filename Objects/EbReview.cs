@@ -14,7 +14,7 @@ using System.Linq;
 
 namespace ExpressBase.Objects
 {
-    [HideInToolBox]
+    //[HideInToolBox]
     [EnableInBuilder(BuilderType.WebForm)]
     public class EbReview : EbControlContainer, IEbSpecialContainer
     {
@@ -39,7 +39,7 @@ namespace ExpressBase.Objects
                 new EbDGStringColumn() { Name = "eb_created_by", EbDbType = EbDbTypes.String, DoNotPersist = true, IsSysControl = true},
                 //new EbDGStringColumn() { Name = "approver_role", EbDbType = EbDbTypes.String, Label = "Approver Role"}
             };
-        }   
+        }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [HideInPropertyGrid]
@@ -138,19 +138,27 @@ namespace ExpressBase.Objects
         <tbody>";
             List<EbFormStage> _FormStages = JsonConvert.DeserializeObject<List<EbFormStage>>(JsonConvert.SerializeObject(FormStages));
             _FormStages.Reverse();
+            int i = 0;
+            string FormStageTrHtml = string.Empty;
+
             foreach (ApprovalStageAbstract FormStage in _FormStages)
             {
                 EbFormStage _FormStage = (FormStage as EbFormStage);
-                html += string.Concat(@"
-            <tr name='", _FormStage.Name, "'role='", _FormStage.ApproverRole.ToString(), "' style ='@bg@'>",
+                EbReviewStage _FormStage_RS = (FormStages[i++] as EbReviewStage);
+
+                string _html = string.Concat(@"
+            <tr name='", _FormStage.Name, "' stage-ebsid='", _FormStage.EbSid, "' role='", _FormStage.ApproverRole.ToString(), "' style ='@bg@'>",
                     "<td class='row-no-td'>", SlNo++, "</td>",
                     "<td col='stage'><span class='fstd-div'>", _FormStage.Name, "</span></td>",
                     "<td style='display: none;'><span class='fstd-div'>", _FormStage.ApproverRole.ToString().Replace("_", " "), "</span></td>",
                     @"<td col='status' class='fs-ctrl-td'><div class='fstd-div'>", @"
-                    <select class='selectpicker'>
-                        <option value='2'>Hold</option>
-                        <option value='1'>Accepted</option>
-                        <option value='0'>Rejected</option>
+                    <select class='selectpicker'>");
+
+                foreach (EbReviewAction stageAction in _FormStage_RS.StageActions) {
+                    string stageActionName = stageAction.Name;
+                    _html += ("<option value='"+ stageAction.EbSid + "'>"+ stageAction.Name + "</option>");
+                }
+                _html += @"
                     </select></div>
                 </td>
                 <td col='review-dtls' class='fs-ctrl-td'>
@@ -163,9 +171,11 @@ namespace ExpressBase.Objects
                             </div>
                         </div>
                     </div>
-                </td>",
-                    "<td col='remarks' class='fs-ctrl-td'><div class='fstd-div'>", "<textarea class='fs-textarea'></textarea>", "</div></td>",
-                "</tr>");
+                </td>
+                <td col='remarks' class='fs-ctrl-td'><div class='fstd-div'> <textarea class='fs-textarea'></textarea> </div></td>
+            </tr>";
+
+                _FormStage_RS.Html = _html;
             }
 
             html += @"
@@ -222,6 +232,9 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public string EbSid { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm)]
+        public string Html { get; set; }
+
         public EbReviewStage() { }
         public string ObjType { get { return this.GetType().Name.Substring(2, this.GetType().Name.Length - 2); } set { } }
 
@@ -255,6 +268,8 @@ else if(this.ApproverEntity === 3){
         public int ApproverRole { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
+        [PropDataSourceJsFn("return ebcontext.UserGroups")]
+        [PropertyEditor(PropertyEditorType.DropDown)]
         public int ApproverUserGroup { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
@@ -265,7 +280,7 @@ else if(this.ApproverEntity === 3){
         [PropertyEditor(PropertyEditorType.Collection)]
         [ListType(typeof(ReviewActionAbstract))]
         public List<ReviewActionAbstract> StageActions { get; set; }
-        
+
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
         public EbScript NextStage { get; set; }
@@ -293,7 +308,7 @@ else if(this.ApproverEntity === 3){
         [Unique]
         public string Name { get; set; }
     }
-    
+
     public enum ApproverEntityTypes
     {
         Role = 1,

@@ -132,20 +132,23 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 1)]
         public Dictionary<string, List<EbObjectWrapper>> Data { get; set; }
 
-         [DataMember(Order = 2)]
+        [DataMember(Order = 2)]
         public Dictionary<int, string> Roles { get; set; }
 
         [DataMember(Order = 3)]
-        public string Token { get; set; }
+        public Dictionary<int, string> UserGroups { get; set; }
 
         [DataMember(Order = 4)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 5)]
         public ResponseStatus ResponseStatus { get; set; }
     }
-     public class GetAllLiveObjectsRqst : EbServiceStackAuthRequest, IReturn<GetAllLiveObjectsResp>
+    public class GetAllLiveObjectsRqst : EbServiceStackAuthRequest, IReturn<GetAllLiveObjectsResp>
     {
         public List<int> Typelist { get; set; }
     }
-    
+
     public class GetAllCommitedObjectsRqst : EbServiceStackAuthRequest, IReturn<GetAllLiveObjectsResp>
     {
         public List<int> Typelist { get; set; }
@@ -162,7 +165,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 3)]
         public ResponseStatus ResponseStatus { get; set; }
     }
-    
+
     public class GetAllCommitedObjectsResp : IEbSSResponse
     {
         [DataMember(Order = 1)]

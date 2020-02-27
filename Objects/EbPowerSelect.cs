@@ -368,14 +368,7 @@ pg.MakeReadOnly('DisplayMembers');} else {pg.MakeReadWrite('DisplayMembers');}")
                 if(this.MaxLimit !== 1)
                     pg.setSimpleProperty('MaxLimit', 1);
             }")]
-        public bool MultiSelect
-        {
-            get
-            {
-                return this.MaxLimit != 1;
-            }
-            set { }
-        }
+        public bool MultiSelect { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         //[DefaultPropValue(1)]
