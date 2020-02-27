@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Runtime.Serialization;
 using System.Text;
+using ExpressBase.Security;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
@@ -90,6 +91,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     
     public class GetNotificationsRequest : EbServiceStackAuthRequest, IReturn<GetNotificationsResponse>
     {
+        public User user { get; set; }
     }
 
     public class GetNotificationsResponse : IEbSSResponse
@@ -99,6 +101,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 2)]
         public List<NotificationInfo> Notifications { get; set; }
+
+        [DataMember(Order = 2)]
+        public List<string> PendingActions { get; set; }
     }
     
 }
