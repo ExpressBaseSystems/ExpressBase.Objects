@@ -1106,6 +1106,29 @@ namespace ExpressBase.Objects
                         //    Value = JsonConvert.SerializeObject(_d)
                         //});
                     }
+                    else if (Ctrl is EbReview)
+                    {
+                        if (Table.Count == 1)
+                        {
+                            //Table[0]["id"]
+                            string stageEbSid = Table[0]["stage_unique_id"];
+                            EbReviewStage activeStage = (EbReviewStage)(Ctrl as EbReview).FormStages.Find(e => (e as EbReviewStage).EbSid == stageEbSid);
+
+                            if (activeStage != null)
+                            {
+                                string stAction = activeStage.StageActions.Count > 0 ? (activeStage.StageActions[0] as EbReviewAction).EbSid : string.Empty;
+                                _FormData.MultipleTables["eb_approval_lines"].Add(new SingleRow() { RowId = 0, Columns = new List<SingleColumn> { 
+                                    new SingleColumn{ Name = "stage_unique_id", Type = (int)EbDbTypes.String, Value = activeStage.EbSid},
+                                    new SingleColumn{ Name = "action_unique_id", Type = (int)EbDbTypes.String, Value = stAction},
+                                    new SingleColumn{ Name = "eb_my_actions_id", Type = (int)EbDbTypes.Decimal, Value = Table[0]["id"]},
+                                    new SingleColumn{ Name = "comments", Type = (int)EbDbTypes.String, Value = ""},
+                                    new SingleColumn{ Name = "eb_created_at", Type = (int)EbDbTypes.DateTime, Value = DateTime.UtcNow.ToString("yyyy-MM-dd")},
+                                    new SingleColumn{ Name = "eb_created_by", Type = (int)EbDbTypes.String, Value = ""}
+                                } });
+                            }
+
+                        }
+                    }
 
                     tableIndex++;
                 }
@@ -1374,7 +1397,7 @@ namespace ExpressBase.Objects
 
             fullqry += _extqry;
             fullqry += this.GetFileUploaderUpdateQuery(DataDB, param, ref i);
-            //fullqry += this.GetFirstMyActionInsertQuery(DataDB, param, ref i);
+            fullqry += this.GetMyActionInsertUpdateQuery(DataDB, param, ref i, true);
 
             param.Add(DataDB.GetNewParameter(FormConstants.eb_createdby, EbDbTypes.Int32, this.UserObj.UserId));
             param.Add(DataDB.GetNewParameter(FormConstants.eb_loc_id, EbDbTypes.Int32, this.LocationId));
@@ -1523,6 +1546,7 @@ namespace ExpressBase.Objects
 
             fullqry += _extqry;
             fullqry += GetFileUploaderUpdateQuery(DataDB, param, ref i);
+            fullqry += this.GetMyActionInsertUpdateQuery(DataDB, param, ref i, false);
             param.Add(DataDB.GetNewParameter(FormConstants.eb_loc_id, EbDbTypes.Int32, this.LocationId));
             param.Add(DataDB.GetNewParameter(FormConstants.eb_createdby, EbDbTypes.Int32, this.UserObj.UserId));
             param.Add(DataDB.GetNewParameter(FormConstants.eb_modified_by, EbDbTypes.Int32, this.UserObj.UserId));
@@ -1534,13 +1558,47 @@ namespace ExpressBase.Objects
             EbReview ebReview = (EbReview)this.FormSchema.ExtendedControls.FirstOrDefault(e => e is EbReview);
             if (ebReview == null || ebReview.FormStages.Count == 0)
                 return string.Empty;
-
+            string insUpQ = string.Empty;
+            string masterId = $"@{this.TableName}_id";
             EbReviewStage nextStage = null;
             if (isInsert)
+            {
+                masterId = $"(SELECT eb_currval('{this.TableName}_id_seq'))";
                 nextStage = ebReview.FormStages[0] as EbReviewStage;
+            }
             else
             {
+                int reviewRowCount = this.FormData.MultipleTables[ebReview.TableName].Count;
 
+                if (reviewRowCount == 1)
+                {
+                    insUpQ = $@"UPDATE eb_my_actions SET completed_at = {DataDB.EB_CURRENT_TIMESTAMP}, completed_by = @eb_createdby, is_completed = 'T',
+					    eb_approval_lines_id = (SELECT eb_currval('eb_approval_lines_id_seq')) WHERE id = @eb_my_actions_id_{i} AND eb_del = 'F'; ";
+                    param.Add(DataDB.GetNewParameter($"@eb_my_actions_id_{i++}", EbDbTypes.Int32, this.FormData.MultipleTables[ebReview.TableName][0]["eb_my_actions_id"]));
+                    Console.WriteLine("Will try to UPDATE eb_my_actions");
+
+                    if (!(ebReview.FormStages.Find(e => (e as EbReviewStage).EbSid == this.FormData.MultipleTables[ebReview.TableName][0]["stage_unique_id"]) is EbReviewStage currentStage))
+                        throw new FormException("Bad Request", (int)HttpStatusCodes.BAD_REQUEST, $"eb_approval_lines contains an invalid stage_unique_id: {this.FormData.MultipleTables[ebReview.TableName][0]["stage_unique_id"]} ", "From GetMyActionInsertUpdateQuery");
+                    
+                    FormAsGlobal global = GlobalsGenerator.GetFormAsFlatGlobal(this, this.FormDataBackup);
+                    FormGlobals globals = new FormGlobals() { form = global };
+                    string nextttt = Convert.ToString(this.ExecuteCSharpScript(currentStage.NextStage.Code, globals));
+                    EbReviewStage t = currentStage;
+                    if (!nextttt.IsNullOrEmpty())
+                        t = (EbReviewStage)ebReview.FormStages.Find(e => (e as EbReviewStage).Name == nextttt);
+
+                    if (t != null)
+                        nextStage = t;
+                    else
+                        throw new FormException("Unable to decide next stage", (int)HttpStatusCodes.INTERNAL_SERVER_ERROR, "NextStage C# script returned a value that is not recognized as a stage", "Return value : " + nextttt);
+                }
+                else if (reviewRowCount == 0)
+                {
+                    Console.WriteLine("No items reviewed in this form data save");
+                    return string.Empty;
+                }
+                else
+                    throw new FormException("Bad Request for review control", (int)HttpStatusCodes.BAD_REQUEST, "eb_approval_lines contains more than one rows, only one review allowed at a time", "From GetMyActionInsertUpdateQuery");
             }
 
 
@@ -1590,11 +1648,15 @@ namespace ExpressBase.Objects
                 _val = $"'{uids.Join(",")}'";
             }
 
-            string insQ = $@"INSERT INTO eb_my_actions({_col}, from_datetime, is_completed, eb_stages_id, form_ref_id, form_data_id, eb_del, description)
-                            VALUES ({_val}, {DataDB.EB_CURRENT_TIMESTAMP}, 'F', (SELECT id FROM eb_stages WHERE stage_unique_id = '{nextStage.EbSid}' AND form_ref_id = '{this.RefId}' AND eb_del = 'F'), 
-                            '{this.RefId}', (SELECT eb_currval('{this.TableName}_id_seq')), 'F', 'Review required in {this.DisplayName}'); ";
-
-            return insQ;
+            if (isInsert || !insUpQ.IsEmpty())// first save or action executed
+            {
+                insUpQ += $@"INSERT INTO eb_my_actions({_col}, from_datetime, is_completed, eb_stages_id, form_ref_id, form_data_id, eb_del, description)
+                                VALUES ({_val}, {DataDB.EB_CURRENT_TIMESTAMP}, 'F', (SELECT id FROM eb_stages WHERE stage_unique_id = '{nextStage.EbSid}' AND form_ref_id = '{this.RefId}' AND eb_del = 'F'), 
+                                '{this.RefId}', {masterId}, 'F', 'Review required in {this.DisplayName}'); ";
+                Console.WriteLine("Will try to INSERT eb_my_actions");
+            }
+            
+            return insUpQ;
         }
 
         public string GetFileUploaderUpdateQuery(IDatabase DataDB, List<DbParameter> param, ref int i)
@@ -1765,7 +1827,7 @@ namespace ExpressBase.Objects
 
                 if (!pusher.PushOnlyIf.IsNullOrEmpty())
                 {
-                    string status = pusher.WebForm.ExecuteCSharpScript(pusher.PushOnlyIf, globals);
+                    string status = Convert.ToString(pusher.WebForm.ExecuteCSharpScript(pusher.PushOnlyIf, globals));
                     if (status.Equals(true.ToString()))
                         pusher.WebForm.DataPusherConfig.AllowPush = true;
                 }
@@ -1838,7 +1900,7 @@ namespace ExpressBase.Objects
                     {
                         if (_table.TableType == WebFormTableTypes.Grid && !pusher.SkipLineItemIf.IsNullOrEmpty())
                         {
-                            string status = this.ExecuteCSharpScript(pusher.SkipLineItemIf, globals);
+                            string status = Convert.ToString(this.ExecuteCSharpScript(pusher.SkipLineItemIf, globals));
                             if (status.Equals(true.ToString()))
                                 continue;
                         }
@@ -1856,7 +1918,7 @@ namespace ExpressBase.Objects
             {
                 if (JRow[_column.ColumnName] != null)
                 {
-                    JRow[_column.ColumnName] = this.ExecuteCSharpScript(JRow[_column.ColumnName].ToString(), globals);
+                    JRow[_column.ColumnName] = Convert.ToString(this.ExecuteCSharpScript(JRow[_column.ColumnName].ToString(), globals));
 
                     Row.Columns.Add(new SingleColumn
                     {
@@ -1869,7 +1931,7 @@ namespace ExpressBase.Objects
             return Row;
         }
 
-        private string ExecuteCSharpScript(string code, FormGlobals globals)
+        private object ExecuteCSharpScript(string code, FormGlobals globals)
         {
             try
             {
@@ -1884,14 +1946,13 @@ namespace ExpressBase.Objects
                 //var pdbstream = new MemoryStream();
                 //compilation.Emit(ilstream, pdbstream);
                 valscript.Compile();
-                var r = (valscript.RunAsync(globals)).Result.ReturnValue;
-                return r.ToString();
+                return (valscript.RunAsync(globals)).Result.ReturnValue;
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Exception in C# Expression evaluation:" + code + " \nMessage : " + ex.Message);
                 Console.WriteLine(ex.StackTrace);
-                return code;
+                throw new FormException("Exception in C# code evaluation", (int)HttpStatusCodes.INTERNAL_SERVER_ERROR, ex.Message, $"C# code : {code} \n StackTrace : {ex.Message}");
             }
         }
 

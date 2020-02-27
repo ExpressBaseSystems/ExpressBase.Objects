@@ -288,6 +288,9 @@ else if(this.ApproverEntity === 3){
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
         public Dictionary<string, string> QryParams { get; set; }//<param, table>
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        public bool IsFormEditable { get; set; }
     }
 
     public abstract class ReviewActionAbstract { }

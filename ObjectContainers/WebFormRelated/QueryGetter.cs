@@ -24,6 +24,8 @@ namespace ExpressBase.Objects.WebFormRelated
 
                 if (_table.TableName == _this.FormSchema.MasterTable)
                     _cols = "eb_loc_id, eb_ver_id, eb_lock, eb_push_id, eb_src_id, id";
+                else if (_table.TableType == WebFormTableTypes.Review)
+                    _id = $"eb_ver_id = @{_this.FormSchema.MasterTable}_eb_ver_id AND eb_src_id";
                 else
                     _id = _this.FormSchema.MasterTable + "_id";
 
@@ -71,6 +73,16 @@ namespace ExpressBase.Objects.WebFormRelated
                 else if (Ctrl is EbProvisionLocation)
                 {
                     extquery += (Ctrl as EbProvisionLocation).GetSelectQuery(_this.FormSchema.MasterTable);
+                    _qryCount++;
+                }
+                else if (Ctrl is EbReview)
+                {
+                    extquery += $@"SELECT A.id, S.stage_unique_id FROM eb_my_actions A, eb_stages S
+                                    WHERE A.form_ref_id = '{_this.RefId}' AND A.form_data_id = @{_this.FormSchema.MasterTable}_id AND A.is_completed = 'F' AND A.eb_del = 'F' AND 
+                                    A.eb_stages_id = S.id AND S.eb_del = 'F' AND
+                                    ('{_this.UserObj.UserId}' = ANY(STRING_TO_ARRAY(A.user_ids, ',')) OR 
+                                    A.role_id = ANY(STRING_TO_ARRAY ('{_this.UserObj.RoleIds.Join(",")}', ',')::INTEGER[]) OR
+                                    A.usergroup_id = ANY(STRING_TO_ARRAY ('{_this.UserObj.UserGroupIds.Join(",")}', ',')::INTEGER[]));";
                     _qryCount++;
                 }
             }
@@ -174,6 +186,9 @@ namespace ExpressBase.Objects.WebFormRelated
                 if (DataDB.Vendor == DatabaseVendors.MYSQL)
                     _qry += $"SELECT eb_persist_currval('{tblName}_id_seq'); ";
             }
+            else if (tblName.Equals("eb_approval_lines"))
+                _qry = $@"INSERT INTO eb_approval_lines ({{0}} eb_created_by, eb_created_at, eb_loc_id, eb_src_id, eb_ver_id) 
+                            VALUES ({{1}} @eb_createdby, {DataDB.EB_CURRENT_TIMESTAMP}, @eb_loc_id, @{_this.TableName}_id, @{_this.TableName}_eb_ver_id); ";
             else
                 _qry = $@"INSERT INTO {tblName} ({{0}} eb_created_by, eb_created_at, eb_loc_id, {_this.TableName}_id) 
                             VALUES ({{1}} @eb_createdby, {DataDB.EB_CURRENT_TIMESTAMP}, @eb_loc_id , @{_this.TableName}_id); ";
