@@ -137,8 +137,8 @@ namespace ExpressBase.Objects
 
         public Phrase GetPhrase(string column_val, DbType column_type, EbFont _reportFont)
         {
-          
-            Phrase phrase = GetFormattedPhrase(this.Font, _reportFont, column_val); 
+
+            Phrase phrase = GetFormattedPhrase(this.Font, _reportFont, column_val);
 
             if (this.RenderInMultiLine)
             {
@@ -395,9 +395,15 @@ namespace ExpressBase.Objects
             string column_val = Rep.GetDataFieldtValue(ColumnName, slno, TableIndex);
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
-            column_val = FormatDecimals(column_val, AmountInWords, DecimalPlaces, Rep.CultureInfo.NumberFormat);
-            if (Prefix != "" || Suffix != "")
-                column_val = Prefix + " " + column_val + " " + Suffix;
+
+            if (SuppressIfZero && !(Convert.ToDecimal(column_val) > 0))
+                column_val = String.Empty;
+            else
+            {
+                column_val = FormatDecimals(column_val, AmountInWords, DecimalPlaces, Rep.CultureInfo.NumberFormat);
+                if (Prefix != "" || Suffix != "")
+                    column_val = Prefix + " " + column_val + " " + Suffix;
+            }
             Phrase phrase = GetPhrase(column_val, (DbType)DbType, Rep.Font);
             if (!string.IsNullOrEmpty(LinkRefId))
             {
@@ -429,7 +435,7 @@ namespace ExpressBase.Objects
         public SummaryFunctionsNumeric Function { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
-        [HideInPropertyGrid]
+        [PropertyGroup("Data Settings")]
         public bool ResetOnNewPage { get; set; }
 
         private int Count { get; set; }
@@ -538,7 +544,7 @@ namespace ExpressBase.Objects
         public SummaryFunctionsText Function { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
-        [HideInPropertyGrid]
+        [PropertyGroup("Data Settings")]
         public bool ResetOnNewPage { get; set; }
 
         private int Count { get; set; }
@@ -620,7 +626,7 @@ namespace ExpressBase.Objects
         public SummaryFunctionsDateTime Function { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
-        [HideInPropertyGrid]
+        [PropertyGroup("Data Settings")]
         public bool ResetOnNewPage { get; set; }
 
         private int Count { get; set; }
@@ -706,7 +712,7 @@ namespace ExpressBase.Objects
         public SummaryFunctionsBoolean Function { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
-        [HideInPropertyGrid]
+        [PropertyGroup("Data Settings")]
         public bool ResetOnNewPage { get; set; }
 
         private int Count { get; set; }
@@ -802,6 +808,10 @@ namespace ExpressBase.Objects
         [PropertyGroup("Data Settings")]
         public bool AmountInWords { get; set; }
 
+        [EnableInBuilder(BuilderType.Report)]
+        [PropertyGroup("Data Settings")]
+        public bool SuppressIfZero { get; set; }
+
         private string[] _dataFieldsUsed;
         public string[] DataFieldsUsedInCalc
         {
@@ -822,7 +832,7 @@ namespace ExpressBase.Objects
                     }
                 return _dataFieldsUsed;
             }
-        }        
+        }
 
         public override string GetDesignHtml()
         {
@@ -880,14 +890,16 @@ namespace ExpressBase.Objects
                 Console.WriteLine(e.Message + e.StackTrace);
 
             }
-
-            if (column_val == string.Empty)
-                column_val = "-";
-            if (dbtype == EbDbTypes.Decimal)
-                column_val = FormatDecimals(column_val, AmountInWords, DecimalPlaces, Rep.CultureInfo.NumberFormat);
-            if (Prefix != "" || Suffix != "")
+            if (SuppressIfZero && !(Convert.ToDecimal(column_val) > 0))
+                column_val = String.Empty;
+            else
             {
-                column_val = Prefix + " " + column_val + " " + Suffix;
+                if (dbtype == EbDbTypes.Decimal)
+                    column_val = FormatDecimals(column_val, AmountInWords, DecimalPlaces, Rep.CultureInfo.NumberFormat);
+                if (Prefix != "" || Suffix != "")
+                {
+                    column_val = Prefix + " " + column_val + " " + Suffix;
+                }
             }
             Phrase phrase = GetPhrase(column_val, (DbType)DbType, Rep.Font);
 
@@ -916,9 +928,9 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.Report)]
         [MetaOnly]
         public SummaryFunctionsNumeric Function { get; set; }
-
+         
         [EnableInBuilder(BuilderType.Report)]
-        [HideInPropertyGrid]
+        [PropertyGroup("Data Settings")]
         public bool ResetOnNewPage { get; set; }
 
         private int Count { get; set; }
@@ -1005,13 +1017,16 @@ namespace ExpressBase.Objects
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
             string column_val = SummarizedValue.ToString();
-            column_val = FormatDecimals(column_val, AmountInWords, DecimalPlaces, Rep.CultureInfo.NumberFormat);
+
+            if (SuppressIfZero && !(Convert.ToDecimal(column_val) > 0))
+                column_val = String.Empty;
+            else
+                column_val = FormatDecimals(column_val, AmountInWords, DecimalPlaces, Rep.CultureInfo.NumberFormat);
 
             if (Rep.SummaryValInRow.ContainsKey(Title))
                 Rep.SummaryValInRow[Title] = new NTV { Name = Title, Type = EbDbTypes.Int32, Value = column_val };
             else
-                Rep.SummaryValInRow.Add(Title, new NTV { Name = Title, Type = EbDbTypes.Int32, Value = column_val }); 
-
+                Rep.SummaryValInRow.Add(Title, new NTV { Name = Title, Type = EbDbTypes.Int32, Value = column_val });
             Phrase phrase = GetPhrase(column_val, (DbType)DbType, Rep.Font);
             ColumnText ct = new ColumnText(Rep.Canvas);
             if (!string.IsNullOrEmpty(LinkRefId))
@@ -1036,7 +1051,7 @@ namespace ExpressBase.Objects
         public SummaryFunctionsText Function { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
-        [HideInPropertyGrid]
+        [PropertyGroup("Data Settings")]
         public bool ResetOnNewPage { get; set; }
 
         private int Count { get; set; }
@@ -1127,7 +1142,7 @@ namespace ExpressBase.Objects
         public SummaryFunctionsDateTime Function { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
-        [HideInPropertyGrid]
+        [PropertyGroup("Data Settings")]
         public bool ResetOnNewPage { get; set; }
 
         private int Count { get; set; }
@@ -1219,7 +1234,7 @@ namespace ExpressBase.Objects
         public SummaryFunctionsBoolean Function { get; set; }
 
         [EnableInBuilder(BuilderType.Report)]
-        [HideInPropertyGrid]
+        [PropertyGroup("Data Settings")]
         public bool ResetOnNewPage { get; set; }
 
         private int Count { get; set; }

@@ -40,6 +40,17 @@ namespace ExpressBase.Objects
         public override string DisplayName { get; set; }
 
         [EnableInBuilder(BuilderType.DashBoard)]
+        [PropertyGroup("GaugeStyle")]
+        [DefaultPropValue("100")]
+        public int MaxValue { get; set; }
+
+        [EnableInBuilder(BuilderType.DashBoard)]
+        [PropertyGroup("GaugeStyle")]
+        [DefaultPropValue("0")]
+        public int MinValue { get; set; }
+
+
+        [EnableInBuilder(BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.Expandable)]
         [PropertyGroup("GaugeStyle")]
         public EbGaugeConfig GaugeConfig { get; set; }
@@ -104,11 +115,38 @@ namespace ExpressBase.Objects
         [PropertyGroup("GaugeStyle")]
         public GaugeTicks TicksConfig { get; set; }
 
+
+
+        [EnableInBuilder(BuilderType.DashBoard)]
+        [PropertyGroup("GaugeStyle")]
+        [OnChangeExec(@"
+                if (this.RenderDigitPoints === true ){  
+                        pg.ShowProperty('DigitPointConfig');
+                        pg.ShowProperty('DigitCount');
+                        pg.ShowProperty('DigitFontSize');
+                        pg.ShowProperty('DigitFontColor');
+                        pg.ShowProperty('FractionalDigit');
+                }
+                else {
+                        pg.HideProperty('DigitPointConfig');
+                        pg.HideProperty('DigitCount');
+                        pg.HideProperty('DigitFontSize');
+                        pg.HideProperty('DigitFontColor');
+                        pg.HideProperty('FractionalDigit');                  
+                }
+            ")]
+        public bool RenderDigitPoints { get; set; }
+
+        [EnableInBuilder(BuilderType.DashBoard)]
+        [PropertyEditor(PropertyEditorType.Expandable)]
+        [PropertyGroup("GaugeStyle")]
+        public DigitConfig DigitPointConfig { get; set; }
+
+
         [EnableInBuilder(BuilderType.DashBoard)]
         [UIproperty]
         [PropertyGroup("GaugeStyle")]
         public bool LimitMax { get; set; }
-
 
 
         [EnableInBuilder(BuilderType.DashBoard)]
@@ -221,14 +259,14 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.DashBoard)]
         [UIproperty]
-        [PropertyGroup("Appearance")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [DefaultPropValue("20")]
         [OnChangeExec(@"if(this.LineWidth > 70){
             this.LineWidth = 70;
             $('#' + pg.wraperId + 'LineWidth').val(50);
             }
             else if(this.LineWidth < 0){
-            this.LineWidth = 0;
+            this.LineWidth = 10;
             $('#' + pg.wraperId + 'LineWidth').val(0);
             }
             ")]
@@ -247,8 +285,6 @@ namespace ExpressBase.Objects
             }
             ")]
         public int RadiusScale { get; set; }
-
-
 
 
         [EnableInBuilder(BuilderType.DashBoard)]
@@ -310,8 +346,6 @@ namespace ExpressBase.Objects
 
     public class GaugeTicks
     {
-
-
         [EnableInBuilder(BuilderType.DashBoard)]
         [OnChangeExec(@"if(this.Divisions > 20){
             this.Divisions = 20;
@@ -396,11 +430,30 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.Color)]
         public string SubColor { get; set; }
     }
-    public class GaugeLabelConfig
+
+    public class DigitConfig
     {
 
-      
+        [EnableInBuilder(BuilderType.DashBoard)]
+        [PropertyGroup("GaugeStyle")]
+        [DefaultPropValue("5")]
+        public int DigitCount { get; set; }
 
+        [EnableInBuilder(BuilderType.DashBoard)]
+        [PropertyGroup("GaugeStyle")]
+        [DefaultPropValue("12")]
+        public int DigitFontSize { get; set; }
+
+        [EnableInBuilder(BuilderType.DashBoard)]
+        [PropertyGroup("GaugeStyle")]
+        [PropertyEditor(PropertyEditorType.Color)]
+        [DefaultPropValue("#000000")]
+        public string DigitFontColor { get; set; }
+
+        [EnableInBuilder(BuilderType.DashBoard)]
+        [PropertyGroup("GaugeStyle")]
+        [DefaultPropValue("0")]
+        public int FractionalDigit { get; set; }
     }
     public class TextPositon
     {
