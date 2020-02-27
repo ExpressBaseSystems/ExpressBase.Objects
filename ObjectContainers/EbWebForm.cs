@@ -324,7 +324,7 @@ namespace ExpressBase.Objects
         //        if (this.FormData.MultipleTables.ContainsKey(_table.TableName))
         //        {
         //            SingleTable Table = this.FormData.MultipleTables[_table.TableName];
-                    
+
         //            int rowCounter = -501;
         //            foreach (SingleRow Row in Table)
         //            {
@@ -404,7 +404,7 @@ namespace ExpressBase.Objects
                             }
                         }
                     }
-                }                
+                }
             }
         }
 
@@ -430,7 +430,7 @@ namespace ExpressBase.Objects
 
                 SingleTable Table = new SingleTable();
                 EbDataTable dataTable = dataset.Tables[i];//
-                this.GetFormattedData(dataTable, Table, _table);                
+                this.GetFormattedData(dataTable, Table, _table);
                 if (!this.FormData.MultipleTables.ContainsKey(_table.TableName))
                     this.FormData.MultipleTables.Add(_table.TableName, Table);
             }
@@ -570,12 +570,13 @@ namespace ExpressBase.Objects
                             }
                             control.ValueFE = val;
                         }
-                    }                   
+                    }
                     int count = FormData.MultipleTables[(c as EbDataGrid).TableName].Count;
                     for (int i = 0, j = count; i < count; i++, j--)
                     {
                         if (FormData.MultipleTables[(c as EbDataGrid).TableName][i].GetColumn(FormConstants.eb_row_num) == null)
-                            FormData.MultipleTables[(c as EbDataGrid).TableName][i].Columns.Add(new SingleColumn {
+                            FormData.MultipleTables[(c as EbDataGrid).TableName][i].Columns.Add(new SingleColumn
+                            {
                                 Name = FormConstants.eb_row_num,
                                 Type = (int)EbDbTypes.Decimal,
                                 Value = 0
@@ -584,7 +585,7 @@ namespace ExpressBase.Objects
                             FormData.MultipleTables[(c as EbDataGrid).TableName][i][FormConstants.eb_row_num] = i + 1;
                         else
                             FormData.MultipleTables[(c as EbDataGrid).TableName][i][FormConstants.eb_row_num] = j;
-                    }                  
+                    }
                 }
                 else if (c is EbApproval)
                 {
@@ -935,7 +936,7 @@ namespace ExpressBase.Objects
                                     if (RenderAsSS)
                                     {
                                         //Disp.Add(vms[i], _row[DmName]);
-                                        DispM_dup.Add(vms[i], new Dictionary<string, string> { { VmName, Convert.ToString(_row[DmName])?? string.Empty } });
+                                        DispM_dup.Add(vms[i], new Dictionary<string, string> { { VmName, Convert.ToString(_row[DmName]) ?? string.Empty } });
                                     }
                                     else
                                     {
@@ -943,8 +944,8 @@ namespace ExpressBase.Objects
                                         Dictionary<string, string> __d = new Dictionary<string, string>();
                                         for (int j = 0; j < DmsColl.Count; j++)
                                         {
-                                            _dm[j] = Convert.ToString(_row[DmsColl[j].Name])?? string.Empty;
-                                            __d.Add(DmsColl[j].Name, Convert.ToString(_row[DmsColl[j].Name])?? string.Empty);
+                                            _dm[j] = Convert.ToString(_row[DmsColl[j].Name]) ?? string.Empty;
+                                            __d.Add(DmsColl[j].Name, Convert.ToString(_row[DmsColl[j].Name]) ?? string.Empty);
                                         }
                                         //Disp.Add(vms[i], _dm);
                                         DispM_dup.Add(vms[i], __d);
@@ -1322,6 +1323,18 @@ namespace ExpressBase.Objects
                 resp += " - AfterSave: " + this.AfterSave(DataDB, IsUpdate);
                 this.DbTransaction.Commit();
             }
+            catch (FormException ex1)
+            {
+                try
+                {
+                    this.DbTransaction.Rollback();
+                }
+                catch (Exception ex2)
+                {
+                    Console.WriteLine($"Rollback Exception Type: {ex2.GetType()}\nMessage: {ex2.Message}");
+                }
+                throw ex1;
+            }
             catch (Exception ex1)
             {
                 try
@@ -1353,7 +1366,7 @@ namespace ExpressBase.Objects
                     pusher.WebForm.SolutionObj = this.SolutionObj;
                     FormCollection.Add(pusher.WebForm);
                 }
-                this.PrepareWebFormData();                
+                this.PrepareWebFormData();
             }
             foreach (EbWebForm WebForm in FormCollection)
             {
@@ -1395,7 +1408,7 @@ namespace ExpressBase.Objects
             int _rowid = temp.Rows.Count > 0 ? Convert.ToInt32(temp.Rows[0][0]) : 0;
             return _rowid;
         }
-        
+
         //pTable => Parent Table, pRow => Parent Row
         private string InsertUpdateLines(string pTable, SingleRow parentRow, IDatabase DataDB, List<DbParameter> param, ref int i)
         {
@@ -1463,7 +1476,7 @@ namespace ExpressBase.Objects
                     pusher.WebForm.SolutionObj = this.SolutionObj;
                     FormCollection.Add(pusher.WebForm);
                 }
-                this.PrepareWebFormData();                
+                this.PrepareWebFormData();
             }
 
             foreach (EbWebForm WebForm in FormCollection)
@@ -1989,7 +2002,7 @@ namespace ExpressBase.Objects
             foreach (EbControl c in this.FormSchema.ExtendedControls)
             {
                 if (c is EbProvisionUser)
-                    (c as EbProvisionUser).SendMailIfUserCreated(MessageProducer3, this.UserObj.UserId, this.UserObj.FullName, this.UserObj.AuthId, this.SolutionObj.SolutionID);
+                    (c as EbProvisionUser).SendMailIfUserCreated(MessageProducer3, this.UserObj, this.SolutionObj);
             }
         }
 

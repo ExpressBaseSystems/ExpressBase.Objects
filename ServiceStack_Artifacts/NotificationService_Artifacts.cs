@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Runtime.Serialization;
 using System.Text;
+using ExpressBase.Security;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
@@ -44,6 +45,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Link { get; set; }
 
         public string Title { get; set; }
+
+        public string SolutionId { get; set; }
     }
 
     public class NotifyByUserRoleResponse : IEbSSResponse
@@ -60,6 +63,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Link { get; set; }
 
         public string Title { get; set; }
+
+        public string SolutionId { get; set; }
     }
 
     public class NotifyByUserGroupResponse : IEbSSResponse
@@ -90,6 +95,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     
     public class GetNotificationsRequest : EbServiceStackAuthRequest, IReturn<GetNotificationsResponse>
     {
+        public User user { get; set; }
     }
 
     public class GetNotificationsResponse : IEbSSResponse
@@ -99,6 +105,33 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 2)]
         public List<NotificationInfo> Notifications { get; set; }
+
+        [DataMember(Order = 2)]
+        public List<PendingActionInfo> PendingActions { get; set; }
     }
-    
+
+    public class GetPendingActionRequest : EbServiceStackAuthRequest, IReturn<GetPendingActionResponse>
+    {
+        public User user { get; set; }
+    }
+
+    public class GetPendingActionResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 2)]
+        public List<PendingActionInfo> PendingActions { get; set; }
+    }
+
+    public class PendingActionInfo
+    {
+        public string Description { get; set; }
+
+        public string Link { get; set; }
+
+        public string DataId { get; set; }
+
+        public string CreatedDate { get; set; }
+    }
 }

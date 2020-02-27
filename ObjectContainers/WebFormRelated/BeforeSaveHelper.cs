@@ -1,6 +1,7 @@
 ﻿using ExpressBase.Common.Constants;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
+using ExpressBase.Objects.Objects;
 using ExpressBase.Objects.ServiceStack_Artifacts;
 using ServiceStack;
 using ServiceStack.Redis;
@@ -22,6 +23,7 @@ namespace ExpressBase.Objects.WebFormRelated
                 throw new FormException("Please enter a valid form table name");
             tbls.Add(_this.TableName, "form table");
             EbControl[] Allctrls = _this.Controls.FlattenAllEbControls();
+            bool HasSubmitButton = false;
             for (int i = 0; i < Allctrls.Length; i++)
             {
                 if (Allctrls[i] is EbApproval)
@@ -69,6 +71,12 @@ namespace ExpressBase.Objects.WebFormRelated
                     CheckEmailConAvailableResponse Resp = serviceClient.Post<CheckEmailConAvailableResponse>(new CheckEmailConAvailableRequest { });
                     if (!Resp.ConnectionAvailable)
                         throw new FormException("Please configure a email connection, it is required for ProvisionUser control.");
+                }
+                else if (Allctrls[i] is EbSubmitButton)
+                {
+                    if (HasSubmitButton)
+                        throw new FormException("Only one Submit Button is allowed");
+                    HasSubmitButton = true;
                 }
             }
 

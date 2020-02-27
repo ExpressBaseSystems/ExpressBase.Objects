@@ -976,6 +976,7 @@ namespace ExpressBase.Objects
             ColumnText ct = new ColumnText(Canvas);
             Phrase phrase = new Phrase("page:" + PageNumber.ToString() + ", " + RenderingUser.FullName + ", " + timestamp);
             phrase.Font.Size = 6;
+            phrase.Font.Color = BaseColor.Gray;
             ct.SetSimpleColumn(phrase, 5, 2 + Margin.Bottom, (WidthPt - Margin.Right - Margin.Left) - Margin.Right, 20 + Margin.Bottom, 15, Element.ALIGN_RIGHT);
             ct.Go();
         }
