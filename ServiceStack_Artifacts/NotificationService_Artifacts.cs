@@ -45,6 +45,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Link { get; set; }
 
         public string Title { get; set; }
+
+        public string SolutionId { get; set; }
     }
 
     public class NotifyByUserRoleResponse : IEbSSResponse
@@ -61,6 +63,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Link { get; set; }
 
         public string Title { get; set; }
+
+        public string SolutionId { get; set; }
     }
 
     public class NotifyByUserGroupResponse : IEbSSResponse
