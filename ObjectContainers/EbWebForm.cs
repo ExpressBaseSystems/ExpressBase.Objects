@@ -1952,7 +1952,7 @@ namespace ExpressBase.Objects
             {
                 Console.WriteLine("Exception in C# Expression evaluation:" + code + " \nMessage : " + ex.Message);
                 Console.WriteLine(ex.StackTrace);
-                throw new FormException("Exception in C# code evaluation", (int)HttpStatusCodes.INTERNAL_SERVER_ERROR, ex.Message, $"C# code : {code} \n StackTrace : {ex.Message}");
+                throw new FormException("Exception in C# code evaluation", (int)HttpStatusCodes.INTERNAL_SERVER_ERROR, $"{ex.Message} \n C# code : {code}", $"StackTrace : {ex.StackTrace}");
             }
         }
 
