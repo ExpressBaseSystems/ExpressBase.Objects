@@ -31,7 +31,8 @@ namespace ExpressBase.Objects.Objects.DVRelated
         Icon = 5,
         Tree = 6,
         Boolean = 7,
-        Table = 8
+        Table = 8,
+        LinkFromColumn = 9,
     }
 
     public enum NumericRenderType
@@ -358,6 +359,18 @@ else{
         public bool ShowLinkifNoData { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "ColumnsRef")]
+        [PropertyGroup("LinkFromColumn")]
+        [HideInPropertyGrid]
+        public DVBaseColumn RefidColumn { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "ColumnsRef")]
+        [PropertyGroup("LinkFromColumn")]
+        [HideInPropertyGrid]
+        public DVBaseColumn IdColumn { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         [DefaultPropValue("0")]
         [HideForUser]
         [PropertyGroup(PGConstants.EXTENDED)]
@@ -623,6 +636,7 @@ pg.HideProperty('TrueValue');
 pg.HideProperty('FalseValue');
 pg.HideGroup('FormSettings');
 pg.HideGroup('Image');
+pg.HideGroup('LinkFromColumn');
 if(this.RenderAs === 2){
 console.log('Render as link');
     pg.ShowGroup('Link');
@@ -648,6 +662,9 @@ pg.ShowProperty('FalseValue');
 }
 if(this.RenderAs === 4){
     pg.ShowGroup('Image');
+}
+if(this.RenderAs === 9){
+    pg.ShowGroup('LinkFromColumn');
 }
     pg.HideGroup('Link');
     pg.HideProperty('LinkType');
@@ -744,6 +761,7 @@ else {
 pg.HideProperty('TrueValue');
 pg.HideProperty('FalseValue');
 pg.HideGroup('FormSettings');
+pg.HideGroup('LinkFromColumn');
 if(this.RenderAs === 2){
     pg.ShowGroup('Link');
     pg.ShowProperty('LinkType');
@@ -834,6 +852,7 @@ if(this.RenderAs === 4){
 pg.ShowProperty('TrueValue');
 pg.ShowProperty('FalseValue');
 pg.HideGroup('FormSettings');
+pg.HideGroup('LinkFromColumn');
 if(this.RenderAs === 2){
     pg.ShowGroup('Link');
     pg.ShowProperty('LinkType');
@@ -911,6 +930,7 @@ else{
 pg.HideProperty('TrueValue');
 pg.HideProperty('FalseValue');
 pg.HideGroup('FormSettings');
+pg.HideGroup('LinkFromColumn');
 if(this.RenderAs === 1){
     pg.ShowGroup('Link');
     pg.ShowProperty('LinkType');
