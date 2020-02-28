@@ -213,7 +213,7 @@ namespace ExpressBase.Objects.WebFormRelated
                         {
                             string p = _dict[j].Path, r = _dict[j].Root, n = _dict[j].Control.Name;
                             //string regex = $@"{r}.currentrow\[""{n}""\]|{r}.currentrow\['{n}'\]|{r}.currentrow.{n}|{r}.getrowbyindex\(\w+\)\[""{n}""\]|{r}.getrowbyindex\(\w+\)|{p}";
-                            string regex = $@"{r}.currentrow\[""{n}""\]|{r}.currentrow\['{n}'\]|{r}.currentrow.{n}|{r}.getrowbyindex\(\w+\)\[""{n}""\]|{p}";
+                            string regex = $@"{r}.currentRow\[""{n}""\]|{r}.currentRow\['{n}'\]|{r}.currentRow.{n}|{r}.getRowByIndex\(\w+\)\[""{n}""\]|{r}.getRowByIndex\(\w+\)\['{n}'\]|{r}.RowCount|{p}";
 
                             if (Regex.IsMatch(code, regex))
                             {

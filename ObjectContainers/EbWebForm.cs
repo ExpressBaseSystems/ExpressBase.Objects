@@ -1116,14 +1116,16 @@ namespace ExpressBase.Objects
 
                             if (activeStage != null)
                             {
+                                DateTime dt_con = DateTime.UtcNow.ConvertFromUtc(this.UserObj.Preference.TimeZone);
+                                string dt = dt_con.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
                                 string stAction = activeStage.StageActions.Count > 0 ? (activeStage.StageActions[0] as EbReviewAction).EbSid : string.Empty;
                                 _FormData.MultipleTables["eb_approval_lines"].Add(new SingleRow() { RowId = 0, Columns = new List<SingleColumn> { 
                                     new SingleColumn{ Name = "stage_unique_id", Type = (int)EbDbTypes.String, Value = activeStage.EbSid},
                                     new SingleColumn{ Name = "action_unique_id", Type = (int)EbDbTypes.String, Value = stAction},
                                     new SingleColumn{ Name = "eb_my_actions_id", Type = (int)EbDbTypes.Decimal, Value = Table[0]["id"]},
                                     new SingleColumn{ Name = "comments", Type = (int)EbDbTypes.String, Value = ""},
-                                    new SingleColumn{ Name = "eb_created_at", Type = (int)EbDbTypes.DateTime, Value = DateTime.UtcNow.ToString("yyyy-MM-dd")},
-                                    new SingleColumn{ Name = "eb_created_by", Type = (int)EbDbTypes.String, Value = ""}
+                                    new SingleColumn{ Name = "eb_created_at", Type = (int)EbDbTypes.DateTime, Value = dt},
+                                    new SingleColumn{ Name = "eb_created_by", Type = (int)EbDbTypes.Decimal, Value = this.UserObj.UserId + "$$" + this.UserObj.FullName}
                                 } });
                             }
 
@@ -1952,7 +1954,7 @@ namespace ExpressBase.Objects
             {
                 Console.WriteLine("Exception in C# Expression evaluation:" + code + " \nMessage : " + ex.Message);
                 Console.WriteLine(ex.StackTrace);
-                throw new FormException("Exception in C# code evaluation", (int)HttpStatusCodes.INTERNAL_SERVER_ERROR, ex.Message, $"C# code : {code} \n StackTrace : {ex.Message}");
+                throw new FormException("Exception in C# code evaluation", (int)HttpStatusCodes.INTERNAL_SERVER_ERROR, $"{ex.Message} \n C# code : {code}", $"StackTrace : {ex.StackTrace}");
             }
         }
 
