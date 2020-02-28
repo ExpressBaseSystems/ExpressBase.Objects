@@ -273,9 +273,9 @@ this.Init = function(id)
                 $.each(this.Fields.$values, function (i, obj) {
                     if (obj.ControlName !== '') {
                         if (obj.Name === 'shortname' || obj.Name === 'longname' || obj.Name === 'image')
-                            this._finalObj[obj.Name] = obj.Control.getValue();
+                            this._finalObj[obj.Name] = obj.Control.getValueFromDOM();
                         else
-                            metaObj[obj.DisplayName] = obj.Control.getValue();
+                            metaObj[obj.DisplayName] = obj.Control.getValueFromDOM();
                     }
                 }.bind(this));
                 this._finalObj['meta_json'] = JSON.stringify(metaObj);
