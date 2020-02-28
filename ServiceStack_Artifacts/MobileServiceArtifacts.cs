@@ -137,14 +137,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 4)]
         public List<string> TableNames { set; get; }
 
-        [DataMember(Order = 5)]
-        public List<EbMyActionsMobile> MyActions { set; get; }
-
         public GetMobilePagesResponse()
         {
             Pages = new List<MobilePagesWraper>();
             WebObjects = new List<WebObjectsWraper>();
-            MyActions = new List<EbMyActionsMobile>();
         }
     }
 
@@ -177,5 +173,22 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 2)]
         public EbDataSet Data { set; get; }
+    }
+
+    public class GetMyActionsRequest : EbServiceStackAuthRequest, IReturn<GetMyActionsResponse>
+    {
+
+    }
+
+    [DataContract]
+    public class GetMyActionsResponse
+    {
+        [DataMember(Order = 1)]
+        public List<EbMyActionsMobile> Actions { get; set; }
+
+        public GetMyActionsResponse()
+        {
+            Actions = new List<EbMyActionsMobile>();
+        }
     }
 }
