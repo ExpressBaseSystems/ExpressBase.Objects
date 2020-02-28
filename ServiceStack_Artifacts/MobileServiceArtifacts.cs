@@ -94,6 +94,25 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int ObjectType { set; get; }
     }
 
+    public class EbMyActionsMobile
+    {
+        public int Id { set; get; }
+
+        public DateTime StartDate { set; get; }
+
+        public DateTime EndDate { set; get; }
+
+        public int StageId { set; get; }
+
+        public string WebFormRefId { set; get; }
+
+        public int WebFormDataId { set; get; }
+
+        public int ApprovalLinesId { set; get; }
+
+        public string Description { set; get; }
+    }
+
     //objects to mobile
     public class GetMobilePagesRequest : EbServiceStackAuthRequest, IReturn<GetMobilePagesResponse>
     {
@@ -118,10 +137,14 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 4)]
         public List<string> TableNames { set; get; }
 
+        [DataMember(Order = 5)]
+        public List<EbMyActionsMobile> MyActions { set; get; }
+
         public GetMobilePagesResponse()
         {
-            this.Pages = new List<MobilePagesWraper>();
+            Pages = new List<MobilePagesWraper>();
             WebObjects = new List<WebObjectsWraper>();
+            MyActions = new List<EbMyActionsMobile>();
         }
     }
 
