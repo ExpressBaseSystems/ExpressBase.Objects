@@ -421,7 +421,7 @@ this.Init = function(id)
                     this._finalObj = {};
                 $.each(this.Fields.$values, function (i, obj) {
                     if (obj.ControlName !== '') {
-                        this._finalObj[obj.Name] = obj.Control.getValue();
+                        this._finalObj[obj.Name] = obj.Control.getValueFromDOM();
                     }            
                 }.bind(this));
                 return JSON.stringify(this._finalObj);";
