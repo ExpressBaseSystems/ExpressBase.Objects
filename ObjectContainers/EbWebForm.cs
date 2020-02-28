@@ -1119,14 +1119,19 @@ namespace ExpressBase.Objects
                                 DateTime dt_con = DateTime.UtcNow.ConvertFromUtc(this.UserObj.Preference.TimeZone);
                                 string dt = dt_con.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
                                 string stAction = activeStage.StageActions.Count > 0 ? (activeStage.StageActions[0] as EbReviewAction).EbSid : string.Empty;
-                                _FormData.MultipleTables["eb_approval_lines"].Add(new SingleRow() { RowId = 0, Columns = new List<SingleColumn> { 
-                                    new SingleColumn{ Name = "stage_unique_id", Type = (int)EbDbTypes.String, Value = activeStage.EbSid},
-                                    new SingleColumn{ Name = "action_unique_id", Type = (int)EbDbTypes.String, Value = stAction},
-                                    new SingleColumn{ Name = "eb_my_actions_id", Type = (int)EbDbTypes.Decimal, Value = Table[0]["id"]},
-                                    new SingleColumn{ Name = "comments", Type = (int)EbDbTypes.String, Value = ""},
-                                    new SingleColumn{ Name = "eb_created_at", Type = (int)EbDbTypes.DateTime, Value = dt},
-                                    new SingleColumn{ Name = "eb_created_by", Type = (int)EbDbTypes.Decimal, Value = this.UserObj.UserId + "$$" + this.UserObj.FullName}
-                                } });
+                                _FormData.MultipleTables["eb_approval_lines"].Add(new SingleRow()
+                                {
+                                    RowId = 0,
+                                    Columns = new List<SingleColumn> 
+                                    {
+                                        new SingleColumn{ Name = "stage_unique_id", Type = (int)EbDbTypes.String, Value = activeStage.EbSid},
+                                        new SingleColumn{ Name = "action_unique_id", Type = (int)EbDbTypes.String, Value = stAction},
+                                        new SingleColumn{ Name = "eb_my_actions_id", Type = (int)EbDbTypes.Decimal, Value = Table[0]["id"]},
+                                        new SingleColumn{ Name = "comments", Type = (int)EbDbTypes.String, Value = ""},
+                                        new SingleColumn{ Name = "eb_created_at", Type = (int)EbDbTypes.DateTime, Value = dt},
+                                        new SingleColumn{ Name = "eb_created_by", Type = (int)EbDbTypes.Decimal, Value = this.UserObj.UserId + "$$" + this.UserObj.FullName}
+                                    }
+                                });
                             }
 
                         }
@@ -1563,6 +1568,7 @@ namespace ExpressBase.Objects
             string insUpQ = string.Empty;
             string masterId = $"@{this.TableName}_id";
             EbReviewStage nextStage = null;
+            bool insMyActRequired = false;
             if (isInsert)
             {
                 masterId = $"(SELECT eb_currval('{this.TableName}_id_seq'))";
@@ -1581,18 +1587,29 @@ namespace ExpressBase.Objects
 
                     if (!(ebReview.FormStages.Find(e => (e as EbReviewStage).EbSid == this.FormData.MultipleTables[ebReview.TableName][0]["stage_unique_id"]) is EbReviewStage currentStage))
                         throw new FormException("Bad Request", (int)HttpStatusCodes.BAD_REQUEST, $"eb_approval_lines contains an invalid stage_unique_id: {this.FormData.MultipleTables[ebReview.TableName][0]["stage_unique_id"]} ", "From GetMyActionInsertUpdateQuery");
-                    
+
                     FormAsGlobal global = GlobalsGenerator.GetFormAsFlatGlobal(this, this.FormDataBackup);
                     FormGlobals globals = new FormGlobals() { form = global };
-                    string nextttt = Convert.ToString(this.ExecuteCSharpScript(currentStage.NextStage.Code, globals));
-                    EbReviewStage t = currentStage;
-                    if (!nextttt.IsNullOrEmpty())
-                        t = (EbReviewStage)ebReview.FormStages.Find(e => (e as EbReviewStage).Name == nextttt);
-
-                    if (t != null)
-                        nextStage = t;
+                    string nxtStName = Convert.ToString(this.ExecuteCSharpScript(currentStage.NextStage.Code, globals));
+                    if (nxtStName.Equals("finalApproval") || nxtStName.Equals("finalRejection"))
+                    {
+                        this.AfterSaveRoutines.AddRange(ebReview.OnApprovalRoutines);
+                        insMyActRequired = false;
+                    }
                     else
-                        throw new FormException("Unable to decide next stage", (int)HttpStatusCodes.INTERNAL_SERVER_ERROR, "NextStage C# script returned a value that is not recognized as a stage", "Return value : " + nextttt);
+                    {
+                        EbReviewStage nxtSt = currentStage;
+                        if (!nxtStName.IsNullOrEmpty())
+                            nxtSt = (EbReviewStage)ebReview.FormStages.Find(e => (e as EbReviewStage).Name == nxtStName);
+
+                        if (nxtSt != null)
+                        {
+                            nextStage = nxtSt;
+                            insMyActRequired = true;
+                        }
+                        else
+                            throw new FormException("Unable to decide next stage", (int)HttpStatusCodes.INTERNAL_SERVER_ERROR, "NextStage C# script returned a value that is not recognized as a stage", "Return value : " + nxtStName);
+                    }                    
                 }
                 else if (reviewRowCount == 0)
                 {
@@ -1603,61 +1620,60 @@ namespace ExpressBase.Objects
                     throw new FormException("Bad Request for review control", (int)HttpStatusCodes.BAD_REQUEST, "eb_approval_lines contains more than one rows, only one review allowed at a time", "From GetMyActionInsertUpdateQuery");
             }
 
-
-            string _col = string.Empty, _val = string.Empty;
-            if (nextStage.ApproverEntity == ApproverEntityTypes.Role)
+            if (isInsert || insMyActRequired)// first save or insert myaction required in edit
             {
-                _col = "role_id";
-                _val = $"@role_id_{i}";
-                param.Add(DataDB.GetNewParameter($"@role_id_{i++}", EbDbTypes.Int32, nextStage.ApproverRole));
-            }
-            else if (nextStage.ApproverEntity == ApproverEntityTypes.UserGroup)
-            {
-                _col = "usergroup_id";
-                _val = $"@usergroup_id_{i}";
-                param.Add(DataDB.GetNewParameter($"@usergroup_id_{i++}", EbDbTypes.Int32, nextStage.ApproverUserGroup));
-            }
-            else if (nextStage.ApproverEntity == ApproverEntityTypes.Users)
-            {
-                string t1 = string.Empty, t2 = string.Empty, t3 = string.Empty;
-                List<DbParameter> _params = new List<DbParameter>();
-                int _idx = 0;
-                foreach (KeyValuePair<string, string> p in nextStage.QryParams)
+                string _col = string.Empty, _val = string.Empty;
+                if (nextStage.ApproverEntity == ApproverEntityTypes.Role)
                 {
-                    if (!this.FormData.MultipleTables.ContainsKey(p.Value))
-                        new FormException($"Review control parameter {p.Key} is not idetified", (int)HttpStatusCodes.BAD_REQUEST, "GetFirstMyActionInsertQuery", $"{p.Value} not found in MultipleTables");
-                    TableSchema _table = this.FormSchema.Tables.Find(e => e.TableName == p.Value);
-                    if (_table.TableType != WebFormTableTypes.Normal)
-                        new FormException($"Review control parameter {p.Key} is not idetified", (int)HttpStatusCodes.BAD_REQUEST, "GetFirstMyActionInsertQuery", $"{p.Value} found in MultipleTables but it is not a normal table");
-                    if (this.FormData.MultipleTables[p.Value].Count != 1)
-                        new FormException($"Review control parameter {p.Key} is not idetified", (int)HttpStatusCodes.BAD_REQUEST, "GetFirstMyActionInsertQuery", $"{p.Value} found in MultipleTables but table is empty");
-                    SingleColumn Column = this.FormData.MultipleTables[p.Value][0].Columns.Find(e => e.Control.Name == p.Key);
-                    if (Column == null || Column.Control == null)
-                        new FormException($"Review control parameter {p.Key} is not idetified", (int)HttpStatusCodes.BAD_REQUEST, "GetFirstMyActionInsertQuery", $"{p.Value} found in MultipleTables but data not available");
-
-                    Column.Control.ParameterizeControl(DataDB, _params, null, Column, true, ref _idx, ref t1, ref t2, ref t3, this.UserObj, null);
-                    _params[i - 1].ParameterName = p.Key;
+                    _col = "role_id";
+                    _val = $"@role_id_{i}";
+                    param.Add(DataDB.GetNewParameter($"@role_id_{i++}", EbDbTypes.Int32, nextStage.ApproverRole));
                 }
-                List<int> uids = new List<int>();
-                EbDataTable dt = DataDB.DoQuery(nextStage.ApproverUsers.Code, _params.ToArray());
-                foreach (EbDataRow dr in dt.Rows)
+                else if (nextStage.ApproverEntity == ApproverEntityTypes.UserGroup)
                 {
-                    int.TryParse(dr[0].ToString(), out int temp);
-                    if (!uids.Contains(temp))
-                        uids.Add(temp);
+                    _col = "usergroup_id";
+                    _val = $"@usergroup_id_{i}";
+                    param.Add(DataDB.GetNewParameter($"@usergroup_id_{i++}", EbDbTypes.Int32, nextStage.ApproverUserGroup));
                 }
-                _col = "user_ids";
-                _val = $"'{uids.Join(",")}'";
-            }
+                else if (nextStage.ApproverEntity == ApproverEntityTypes.Users)
+                {
+                    string t1 = string.Empty, t2 = string.Empty, t3 = string.Empty;
+                    List<DbParameter> _params = new List<DbParameter>();
+                    int _idx = 0;
+                    foreach (KeyValuePair<string, string> p in nextStage.QryParams)
+                    {
+                        if (!this.FormData.MultipleTables.ContainsKey(p.Value))
+                            new FormException($"Review control parameter {p.Key} is not idetified", (int)HttpStatusCodes.BAD_REQUEST, "GetFirstMyActionInsertQuery", $"{p.Value} not found in MultipleTables");
+                        TableSchema _table = this.FormSchema.Tables.Find(e => e.TableName == p.Value);
+                        if (_table.TableType != WebFormTableTypes.Normal)
+                            new FormException($"Review control parameter {p.Key} is not idetified", (int)HttpStatusCodes.BAD_REQUEST, "GetFirstMyActionInsertQuery", $"{p.Value} found in MultipleTables but it is not a normal table");
+                        if (this.FormData.MultipleTables[p.Value].Count != 1)
+                            new FormException($"Review control parameter {p.Key} is not idetified", (int)HttpStatusCodes.BAD_REQUEST, "GetFirstMyActionInsertQuery", $"{p.Value} found in MultipleTables but table is empty");
+                        SingleColumn Column = this.FormData.MultipleTables[p.Value][0].Columns.Find(e => e.Control.Name == p.Key);
+                        if (Column == null || Column.Control == null)
+                            new FormException($"Review control parameter {p.Key} is not idetified", (int)HttpStatusCodes.BAD_REQUEST, "GetFirstMyActionInsertQuery", $"{p.Value} found in MultipleTables but data not available");
 
-            if (isInsert || !insUpQ.IsEmpty())// first save or action executed
-            {
+                        Column.Control.ParameterizeControl(DataDB, _params, null, Column, true, ref _idx, ref t1, ref t2, ref t3, this.UserObj, null);
+                        _params[i - 1].ParameterName = p.Key;
+                    }
+                    List<int> uids = new List<int>();
+                    EbDataTable dt = DataDB.DoQuery(nextStage.ApproverUsers.Code, _params.ToArray());
+                    foreach (EbDataRow dr in dt.Rows)
+                    {
+                        int.TryParse(dr[0].ToString(), out int temp);
+                        if (!uids.Contains(temp))
+                            uids.Add(temp);
+                    }
+                    _col = "user_ids";
+                    _val = $"'{uids.Join(",")}'";
+                }
+
                 insUpQ += $@"INSERT INTO eb_my_actions({_col}, from_datetime, is_completed, eb_stages_id, form_ref_id, form_data_id, eb_del, description)
                                 VALUES ({_val}, {DataDB.EB_CURRENT_TIMESTAMP}, 'F', (SELECT id FROM eb_stages WHERE stage_unique_id = '{nextStage.EbSid}' AND form_ref_id = '{this.RefId}' AND eb_del = 'F'), 
                                 '{this.RefId}', {masterId}, 'F', 'Review required in {this.DisplayName}'); ";
                 Console.WriteLine("Will try to INSERT eb_my_actions");
             }
-            
+
             return insUpQ;
         }
 
