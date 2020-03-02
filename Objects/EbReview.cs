@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Linq;
+using ExpressBase.Common.Constants;
 
 namespace ExpressBase.Objects
 {
@@ -40,7 +41,7 @@ namespace ExpressBase.Objects
                 //new EbDGStringColumn() { Name = "eb_created_by_s", EbDbType = EbDbTypes.String, DoNotPersist = true}
             };
         }
-
+        
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [HideInPropertyGrid]
         public override bool IsSpecialContainer { get { return true; } set { } }
@@ -49,6 +50,8 @@ namespace ExpressBase.Objects
         public override UISides Padding { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.Label)]
+        [ReservedValues()]
         public override string Name { get; set; }
 
         [PropertyGroup("Events")]
