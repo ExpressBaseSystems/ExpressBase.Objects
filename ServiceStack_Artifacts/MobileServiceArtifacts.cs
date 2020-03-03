@@ -94,6 +94,24 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int ObjectType { set; get; }
     }
 
+    public class EbStageInfoMobile
+    {
+        public string StageUniqueId { set; get; }
+        public List<EbStageActionsMobile> StageActions { set; get; }
+
+        public EbStageInfoMobile()
+        {
+            StageActions = new List<EbStageActionsMobile>();
+        }
+    }
+
+    public class EbStageActionsMobile
+    {
+        public string ActionName { set; get; }
+
+        public string ActionUniqueId { set; get; }
+    }
+
     public class EbMyActionsMobile
     {
         public int Id { set; get; }
@@ -111,6 +129,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int ApprovalLinesId { set; get; }
 
         public string Description { set; get; }
+
+        public EbStageInfoMobile StageInfo { set; get; }
     }
 
     //objects to mobile
