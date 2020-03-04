@@ -71,6 +71,42 @@ namespace ExpressBase.Objects.WebFormRelated
             return _globals;
         }
 
+        public static FG_WebForm GetCSharpFormGlobals(EbWebForm _this, WebformData _formdata)
+        {
+            FG_WebForm fG_WebForm = new FG_WebForm();
+            GetCSharpFormGlobalsRec(fG_WebForm, _this, _formdata);
+            return fG_WebForm;
+        }
+
+        private static void GetCSharpFormGlobalsRec(FG_WebForm fG_WebForm, EbControlContainer _container, WebformData _formdata)
+        {
+            if (_container is EbDataGrid)
+            {
+                FG_DataGrid fG_DataGrid = new FG_DataGrid(_container as EbDataGrid, _formdata.MultipleTables[_container.TableName]);
+                fG_WebForm.DataGrids.Add(fG_DataGrid);
+            }
+            else if (_container is EbReview)
+            {
+                fG_WebForm.Review = new FG_Review(_container as EbReview, _formdata.MultipleTables[_container.TableName]);
+            }
+            else
+            {
+                foreach (EbControl _control in _container.Controls)
+                {
+                    if (_control is EbControlContainer)
+                    {
+                        GetCSharpFormGlobalsRec(fG_WebForm, _control as EbControlContainer, _formdata);
+                    }
+                    else
+                    {
+                        object data = _formdata.MultipleTables[_container.TableName][0][_control.Name];
+                        fG_WebForm.FlatCtrls.Controls.Add(new FG_Control(_control, data));
+                    }
+                }
+            }
+            
+        }
+
         //get formdata as globals for c# script engine
         public static FormAsGlobal GetFormAsGlobal(EbWebForm _this, WebformData _formData, EbControlContainer _container = null, FormAsGlobal _globals = null)
         {

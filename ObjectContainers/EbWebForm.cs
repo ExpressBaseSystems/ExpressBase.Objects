@@ -1588,10 +1588,12 @@ namespace ExpressBase.Objects
                     if (!(ebReview.FormStages.Find(e => (e as EbReviewStage).EbSid == this.FormData.MultipleTables[ebReview.TableName][0]["stage_unique_id"]) is EbReviewStage currentStage))
                         throw new FormException("Bad Request", (int)HttpStatusCodes.BAD_REQUEST, $"eb_approval_lines contains an invalid stage_unique_id: {this.FormData.MultipleTables[ebReview.TableName][0]["stage_unique_id"]} ", "From GetMyActionInsertUpdateQuery");
 
-                    FormAsGlobal global = GlobalsGenerator.GetFormAsFlatGlobal(this, this.FormDataBackup);
-                    FormGlobals globals = new FormGlobals() { form = global };
-                    string nxtStName = Convert.ToString(this.ExecuteCSharpScript(currentStage.NextStage.Code, globals));
-                    if (nxtStName.Equals("finalApproval") || nxtStName.Equals("finalRejection"))
+                    FG_WebForm global = GlobalsGenerator.GetCSharpFormGlobals(this, this.FormData);
+                    FG_Root globals = new FG_Root(global, this.UserObj);
+                    ebReview.ReviewStatus = string.Empty;
+                    string nxtStName = Convert.ToString(this.ExecuteCSharpScriptNew(currentStage.NextStage.Code, globals));
+
+                    if (ebReview.ReviewStatus == "Approved" || ebReview.ReviewStatus == "Rejected")
                     {
                         this.AfterSaveRoutines.AddRange(ebReview.OnApprovalRoutines);
                         insMyActRequired = false;
@@ -1604,6 +1606,7 @@ namespace ExpressBase.Objects
 
                         if (nxtSt != null)
                         {
+                            //backtrack to the same user - code here if needed
                             nextStage = nxtSt;
                             insMyActRequired = true;
                         }
@@ -1963,6 +1966,27 @@ namespace ExpressBase.Objects
                 //var ilstream = new MemoryStream();
                 //var pdbstream = new MemoryStream();
                 //compilation.Emit(ilstream, pdbstream);
+                valscript.Compile();
+                return (valscript.RunAsync(globals)).Result.ReturnValue;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception in C# Expression evaluation:" + code + " \nMessage : " + ex.Message);
+                Console.WriteLine(ex.StackTrace);
+                throw new FormException("Exception in C# code evaluation", (int)HttpStatusCodes.INTERNAL_SERVER_ERROR, $"{ex.Message} \n C# code : {code}", $"StackTrace : {ex.StackTrace}");
+            }
+        }
+
+        private object ExecuteCSharpScriptNew(string code, FG_Root globals)
+        {
+            try
+            {
+                Script valscript = CSharpScript.Create<dynamic>(
+                    code,
+                    ScriptOptions.Default.WithReferences("Microsoft.CSharp", "System.Core").WithImports("System.Dynamic", "System", "System.Collections.Generic",
+                    "System.Diagnostics", "System.Linq"),
+                    globalsType: typeof(FG_Root)
+                );
                 valscript.Compile();
                 return (valscript.RunAsync(globals)).Result.ReturnValue;
             }
