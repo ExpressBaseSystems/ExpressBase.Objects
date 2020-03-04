@@ -1,4 +1,5 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Constants;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
@@ -110,6 +111,12 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup("Behavior")]
         public EbRadioValueType ValueType { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm,BuilderType.DashBoard,BuilderType.Report)]
+        [PropertyEditor(PropertyEditorType.IconPicker)]
+        [PropertyPriority(100)]
+        [PropertyGroup(PGConstants.CORE)]
+        public string IconTestProp { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.Collection)]
@@ -249,9 +256,13 @@ this.Init = function(id)
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [OnChangeUIFunction("EbTextBox.Label")]
+        [Alias("Option Text")]
+        [PropertyGroup(PGConstants.CORE)]
         public override string Label { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [Alias("Option Value")]
+        [PropertyGroup(PGConstants.CORE)]
         public string Value { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]

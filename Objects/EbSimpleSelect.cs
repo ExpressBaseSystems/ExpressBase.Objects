@@ -329,8 +329,6 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
     [UsedWithTopObjectParent(typeof(EbObject))]
     public class EbSimpleSelectOption
     {
-
-
         public EbSimpleSelectOption() { }
 
         [HideInPropertyGrid]
@@ -338,12 +336,16 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
         public string EbSid { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.CORE)]
         public string Name { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.CORE)]
         public string Value { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.CORE)]
+        [Alias("Option Text")]
         public string DisplayName { get; set; }
     }
 }
