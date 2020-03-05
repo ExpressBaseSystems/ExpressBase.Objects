@@ -274,6 +274,12 @@ else if(this.ApproverEntity === 3){
         public int ApproverRole { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
+        [Unique]
+        [PropDataSourceJsFn("return ebcontext.UserGroups")]
+        [PropertyEditor(PropertyEditorType.DropDown, true)]
+        public List<Int32> ApproverRoles { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
         [PropDataSourceJsFn("return ebcontext.UserGroups")]
         [PropertyEditor(PropertyEditorType.DropDown)]
         public int ApproverUserGroup { get; set; }
