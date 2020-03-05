@@ -20,6 +20,7 @@ namespace ExpressBase.Objects
         [UIproperty]
         public virtual string Label { set; get; }
 
+        [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
         public virtual EbDbTypes EbDbType { get { return EbDbTypes.String; } set { } }
 
@@ -48,6 +49,8 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.MobilePage)]
     public class EbMobileTextBox : EbMobileControl
     {
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.String; } set { } }
 
         [EnableInBuilder(BuilderType.MobilePage)]
@@ -97,6 +100,8 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.MobilePage)]
     public class EbMobileNumericBox : EbMobileControl
     {
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.Decimal; } set { } }
 
         [EnableInBuilder(BuilderType.MobilePage)]
@@ -151,7 +156,7 @@ namespace ExpressBase.Objects
     public class EbMobileDateTime : EbMobileControl
     {
         [EnableInBuilder(BuilderType.MobilePage)]
-        public EbDateType EbDateType { get; set; }
+        public EbDateType EbDateType { get; set; } = EbDateType.DateTime;
 
         [EnableInBuilder(BuilderType.MobilePage)]
         public bool IsNullable { get; set; }
@@ -162,6 +167,8 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         public DateShowFormat ShowDateAs_ { get; set; }
 
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return (EbDbTypes)this.EbDateType; } set { } }
 
         public override string GetDesignHtml()
@@ -193,6 +200,8 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.MobilePage)]
     public class EbMobileSimpleSelect : EbMobileControl
     {
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
         public override EbDbTypes EbDbType
         {
             get
@@ -392,6 +401,8 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.MobilePage)]
     public class EbMobileBoolean : EbMobileControl
     {
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.BooleanOriginal; } set { } }
 
         public override string GetDesignHtml()
@@ -544,6 +555,8 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.MobilePage)]
     public class EbMobileGeoLocation : EbMobileControl
     {
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.String; } set { } }
 
         [EnableInBuilder(BuilderType.MobilePage)]
@@ -569,6 +582,42 @@ namespace ExpressBase.Objects
             return new EbInputGeoLocation
             {
                 EbSid = "InputGeoLocation" + counter,
+                Name = this.Name,
+                Margin = new UISides { Top = 0, Bottom = 0, Left = 0, Right = 0 },
+                Label = this.Label
+            };
+        }
+    }
+
+    public class EbMobileDataGrid : EbMobileControl
+    {
+        public override bool DoNotPersist { get; set; }
+        public override bool Unique { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
+        public List<EbMobileControl> ChildControls { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Data")]
+        public string TableName { set; get; }
+
+        public override string GetDesignHtml()
+        {
+            return @"<div class='eb_stacklayout mob_control dropped' id='@id' eb-type='EbMobileDataGrid' tabindex='1' onclick='$(this).focus()'>
+                            <label class='ctrl_label'> @Label </label>
+                            <div class='eb_ctrlhtml ctrl_as_container'>
+                               <div class='data_layout'></div>
+                               <div class='control_container'></div>
+                            </div>
+                        </div>".RemoveCR().DoubleQuoted();
+        }
+
+        public override EbControl GetWebFormCtrl(int counter)
+        {
+            return new EbDataGrid
+            {
+                EbSid = "DataGrid" + counter,
                 Name = this.Name,
                 Margin = new UISides { Top = 0, Bottom = 0, Left = 0, Right = 0 },
                 Label = this.Label

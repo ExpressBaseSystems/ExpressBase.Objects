@@ -518,7 +518,7 @@ namespace ExpressBase.Objects
                 foreach (SingleRow Row in this.FormData.MultipleTables[_table.TableName])
                 {
                     if (string.IsNullOrEmpty(Row.pId))
-                        throw new FormException("Parent id missing in dynamic entry", (int)HttpStatusCodes.NO_CONTENT, "Table : " + _table.TableName + ", Row Id : " + Row.RowId, "From EbWebForm.MergeFormData()");
+                        throw new FormException("Parent id missing in dynamic entry", (int)HttpStatusCodes.BAD_REQUEST, "Table : " + _table.TableName + ", Row Id : " + Row.RowId, "From EbWebForm.MergeFormData()");
 
                     int id = Convert.ToInt32(Row.pId.Substring(0, Row.pId.IndexOf(CharConstants.UNDERSCORE)));
                     string tbl = Row.pId.Substring(Row.pId.IndexOf(CharConstants.UNDERSCORE) + 1);
@@ -544,10 +544,6 @@ namespace ExpressBase.Objects
 
         private void MergeFormDataInner(EbControlContainer _container)
         {
-            //if (!FormData.MultipleTables.ContainsKey(_container.TableName))
-            //{
-            //    return;
-            //}
             foreach (EbControl c in _container.Controls)
             {
                 if (c is EbDataGrid)
@@ -1128,7 +1124,7 @@ namespace ExpressBase.Objects
                                 _FormData.MultipleTables["eb_approval_lines"].Add(new SingleRow()
                                 {
                                     RowId = 0,
-                                    Columns = new List<SingleColumn> 
+                                    Columns = new List<SingleColumn>
                                     {
                                         new SingleColumn{ Name = "stage_unique_id", Type = (int)EbDbTypes.String, Value = activeStage.EbSid},
                                         new SingleColumn{ Name = "action_unique_id", Type = (int)EbDbTypes.String, Value = stAction},
@@ -1310,6 +1306,44 @@ namespace ExpressBase.Objects
             }
         }
 
+        public List<Param> GetFormData4Mobile(IDatabase DataDB, Service service)
+        {
+            List<Param> data = new List<Param>();
+            this.RefreshFormData(DataDB, service);
+            foreach (TableSchema _table in this.FormSchema.Tables.FindAll(e => e.TableType == WebFormTableTypes.Normal))
+            {
+                if (this.FormData.MultipleTables.ContainsKey(_table.TableName) && this.FormData.MultipleTables[_table.TableName].Count > 0)
+                {
+                    foreach (SingleColumn Column in this.FormData.MultipleTables[_table.TableName][0].Columns)
+                    {
+                        if (Column.Control != null && !Column.Control.DoNotPersist)
+                        {
+                            if (Column.Control is EbPowerSelect)
+                            {
+                                string dm = string.Empty;
+                                foreach (KeyValuePair<int, Dictionary<string, string>> dp in Column.D)
+                                {
+                                    foreach (KeyValuePair<string, string> dc in dp.Value)
+                                        dm += dc.Value + CharConstants.SPACE;
+                                }
+                                data.Add(new Param { Name = Column.Control.Label, Type = ((int)EbDbTypes.String).ToString(), Value = dm });
+                            }
+                            else
+                            {
+                                data.Add(new Param
+                                {
+                                    Name = Column.Control.Label,
+                                    Type = ((int)EbDbTypes.String).ToString(),
+                                    Value = string.IsNullOrEmpty(Column.F) ? Column.Value : Column.F
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            return data;
+        }
+
         public string Save(IDatabase DataDB, Service service)
         {
             this.DbConnection = DataDB.GetNewConnection();
@@ -1383,6 +1417,11 @@ namespace ExpressBase.Objects
             }
             foreach (EbWebForm WebForm in FormCollection)
             {
+                if (!(WebForm.FormData.MultipleTables.ContainsKey(WebForm.FormSchema.MasterTable) && WebForm.FormData.MultipleTables[WebForm.FormSchema.MasterTable].Count > 0))
+                {
+                    string _q = QueryGetter.GetInsertQuery(WebForm, DataDB, WebForm.FormSchema.MasterTable, true);
+                    fullqry += string.Format(_q, string.Empty, string.Empty);
+                }
                 foreach (KeyValuePair<string, SingleTable> entry in WebForm.FormData.MultipleTables)
                 {
                     foreach (SingleRow row in entry.Value)
@@ -1618,7 +1657,7 @@ namespace ExpressBase.Objects
                         }
                         else
                             throw new FormException("Unable to decide next stage", (int)HttpStatusCodes.INTERNAL_SERVER_ERROR, "NextStage C# script returned a value that is not recognized as a stage", "Return value : " + nxtStName);
-                    }                    
+                    }
                 }
                 else if (reviewRowCount == 0)
                 {
