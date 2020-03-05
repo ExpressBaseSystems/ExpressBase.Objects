@@ -518,7 +518,7 @@ namespace ExpressBase.Objects
                 foreach (SingleRow Row in this.FormData.MultipleTables[_table.TableName])
                 {
                     if (string.IsNullOrEmpty(Row.pId))
-                        throw new FormException("Parent id missing in dynamic entry", (int)HttpStatusCodes.NO_CONTENT, "Table : " + _table.TableName + ", Row Id : " + Row.RowId, "From EbWebForm.MergeFormData()");
+                        throw new FormException("Parent id missing in dynamic entry", (int)HttpStatusCodes.BAD_REQUEST, "Table : " + _table.TableName + ", Row Id : " + Row.RowId, "From EbWebForm.MergeFormData()");
 
                     int id = Convert.ToInt32(Row.pId.Substring(0, Row.pId.IndexOf(CharConstants.UNDERSCORE)));
                     string tbl = Row.pId.Substring(Row.pId.IndexOf(CharConstants.UNDERSCORE) + 1);
@@ -544,10 +544,6 @@ namespace ExpressBase.Objects
 
         private void MergeFormDataInner(EbControlContainer _container)
         {
-            //if (!FormData.MultipleTables.ContainsKey(_container.TableName))
-            //{
-            //    return;
-            //}
             foreach (EbControl c in _container.Controls)
             {
                 if (c is EbDataGrid)
@@ -1383,6 +1379,11 @@ namespace ExpressBase.Objects
             }
             foreach (EbWebForm WebForm in FormCollection)
             {
+                if (!(WebForm.FormData.MultipleTables.ContainsKey(WebForm.FormSchema.MasterTable) && WebForm.FormData.MultipleTables[WebForm.FormSchema.MasterTable].Count > 0))
+                {
+                    string _q = QueryGetter.GetInsertQuery(WebForm, DataDB, WebForm.FormSchema.MasterTable, true);
+                    fullqry += string.Format(_q, string.Empty, string.Empty);
+                }
                 foreach (KeyValuePair<string, SingleTable> entry in WebForm.FormData.MultipleTables)
                 {
                     foreach (SingleRow row in entry.Value)
