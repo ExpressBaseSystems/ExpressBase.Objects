@@ -177,7 +177,7 @@ namespace ExpressBase.Objects
                         </div>
                     </div>
                 </td>
-                <td col='remarks' class='fs-ctrl-td'><div class='fstd-div'> <textarea class='fs-textarea'></textarea> </div></td>
+                <td col='remarks' class='fs-ctrl-td'><div class='fstd-div'> <textarea class='fs-textarea'>@comment@</textarea> </div></td>
             </tr>";
 
                 _FormStage_RS.Html = _html;
