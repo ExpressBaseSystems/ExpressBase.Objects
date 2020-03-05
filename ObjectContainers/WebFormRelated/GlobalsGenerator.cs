@@ -80,14 +80,15 @@ namespace ExpressBase.Objects.WebFormRelated
 
         private static void GetCSharpFormGlobalsRec(FG_WebForm fG_WebForm, EbControlContainer _container, WebformData _formdata)
         {
+            SingleTable Table = _formdata.MultipleTables.ContainsKey(_container.TableName) ? _formdata.MultipleTables[_container.TableName] : new SingleTable();
             if (_container is EbDataGrid)
             {
-                FG_DataGrid fG_DataGrid = new FG_DataGrid(_container as EbDataGrid, _formdata.MultipleTables[_container.TableName]);
+                FG_DataGrid fG_DataGrid = new FG_DataGrid(_container as EbDataGrid, Table);
                 fG_WebForm.DataGrids.Add(fG_DataGrid);
             }
             else if (_container is EbReview)
             {
-                fG_WebForm.Review = new FG_Review(_container as EbReview, _formdata.MultipleTables[_container.TableName]);
+                fG_WebForm.Review = new FG_Review(_container as EbReview, Table);
             }
             else
             {
@@ -99,7 +100,9 @@ namespace ExpressBase.Objects.WebFormRelated
                     }
                     else
                     {
-                        object data = _formdata.MultipleTables[_container.TableName][0][_control.Name];
+                        object data = null;
+                        if (_formdata.MultipleTables.ContainsKey(_container.TableName) && _formdata.MultipleTables[_container.TableName].Count > 0)
+                            data = _formdata.MultipleTables[_container.TableName][0][_control.Name];
                         fG_WebForm.FlatCtrls.Controls.Add(new FG_Control(_control, data));
                     }
                 }

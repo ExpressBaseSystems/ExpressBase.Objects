@@ -544,10 +544,10 @@ namespace ExpressBase.Objects
 
         private void MergeFormDataInner(EbControlContainer _container)
         {
-            if (!FormData.MultipleTables.ContainsKey(_container.TableName))
-            {
-                return;
-            }
+            //if (!FormData.MultipleTables.ContainsKey(_container.TableName))
+            //{
+            //    return;
+            //}
             foreach (EbControl c in _container.Controls)
             {
                 if (c is EbDataGrid)
@@ -648,33 +648,39 @@ namespace ExpressBase.Objects
                 }
                 else if (c is EbAutoId)
                 {
-                    Dictionary<string, string> dict = new Dictionary<string, string>();
-                    dict.Add("{currentlocation.id}", this.LocationId.ToString());
-                    dict.Add("{user.id}", this.UserObj.UserId.ToString());
-                    dict.Add("{currentlocation.shortname}", this.SolutionObj.Locations[this.LocationId].ShortName);
-
-                    MatchCollection mc = Regex.Matches((c as EbAutoId).Pattern.sPattern, @"{(.*?)}");
-                    foreach (Match m in mc)
+                    if (FormData.MultipleTables.ContainsKey(_container.TableName) && FormData.MultipleTables[_container.TableName].Count > 0)
                     {
-                        if (dict.ContainsKey(m.Value))
-                            (c as EbAutoId).Pattern.sPattern = (c as EbAutoId).Pattern.sPattern.Replace(m.Value, dict[m.Value]);
+                        Dictionary<string, string> dict = new Dictionary<string, string>();
+                        dict.Add("{currentlocation.id}", this.LocationId.ToString());
+                        dict.Add("{user.id}", this.UserObj.UserId.ToString());
+                        dict.Add("{currentlocation.shortname}", this.SolutionObj.Locations[this.LocationId].ShortName);
+
+                        MatchCollection mc = Regex.Matches((c as EbAutoId).Pattern.sPattern, @"{(.*?)}");
+                        foreach (Match m in mc)
+                        {
+                            if (dict.ContainsKey(m.Value))
+                                (c as EbAutoId).Pattern.sPattern = (c as EbAutoId).Pattern.sPattern.Replace(m.Value, dict[m.Value]);
+                        }
+
+                        if (FormData.MultipleTables[_container.TableName][0].GetColumn(c.Name) == null)
+                            FormData.MultipleTables[_container.TableName][0].Columns.Add(new SingleColumn { Name = c.Name });
+
+                        FormData.MultipleTables[_container.TableName][0].SetEbDbType(c.Name, c.EbDbType);
+                        FormData.MultipleTables[_container.TableName][0].SetControl(c.Name, c);
+                        FormData.MultipleTables[_container.TableName][0][c.Name] = (c as EbAutoId).Pattern.sPattern;
+                        c.ValueFE = FormData.MultipleTables[_container.TableName][0][c.Name];
                     }
-
-                    if (FormData.MultipleTables[_container.TableName][0].GetColumn(c.Name) == null)
-                        FormData.MultipleTables[_container.TableName][0].Columns.Add(new SingleColumn { Name = c.Name });
-
-                    FormData.MultipleTables[_container.TableName][0].SetEbDbType(c.Name, c.EbDbType);
-                    FormData.MultipleTables[_container.TableName][0].SetControl(c.Name, c);
-                    FormData.MultipleTables[_container.TableName][0][c.Name] = (c as EbAutoId).Pattern.sPattern;
-                    c.ValueFE = FormData.MultipleTables[_container.TableName][0][c.Name];
                 }
                 else if ((!(c is EbFileUploader) && !c.DoNotPersist) || c is EbProvisionUser || c is EbProvisionLocation)
                 {
-                    if (FormData.MultipleTables[_container.TableName][0].GetColumn(c.Name) != null)
+                    if (FormData.MultipleTables.ContainsKey(_container.TableName) && FormData.MultipleTables[_container.TableName].Count > 0)
                     {
-                        c.ValueFE = FormData.MultipleTables[_container.TableName][0][c.Name];
-                        FormData.MultipleTables[_container.TableName][0].SetEbDbType(c.Name, c.EbDbType);
-                        FormData.MultipleTables[_container.TableName][0].SetControl(c.Name, c);
+                        if (FormData.MultipleTables[_container.TableName][0].GetColumn(c.Name) != null)
+                        {
+                            c.ValueFE = FormData.MultipleTables[_container.TableName][0][c.Name];
+                            FormData.MultipleTables[_container.TableName][0].SetEbDbType(c.Name, c.EbDbType);
+                            FormData.MultipleTables[_container.TableName][0].SetControl(c.Name, c);
+                        }
                     }
                 }
             }
