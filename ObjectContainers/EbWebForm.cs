@@ -1124,7 +1124,7 @@ namespace ExpressBase.Objects
                                 _FormData.MultipleTables["eb_approval_lines"].Add(new SingleRow()
                                 {
                                     RowId = 0,
-                                    Columns = new List<SingleColumn> 
+                                    Columns = new List<SingleColumn>
                                     {
                                         new SingleColumn{ Name = "stage_unique_id", Type = (int)EbDbTypes.String, Value = activeStage.EbSid},
                                         new SingleColumn{ Name = "action_unique_id", Type = (int)EbDbTypes.String, Value = stAction},
@@ -1304,6 +1304,44 @@ namespace ExpressBase.Objects
                 }
                 this.PostFormatFormData();
             }
+        }
+
+        public List<Param> GetFormData4Mobile(IDatabase DataDB, Service service)
+        {
+            List<Param> data = new List<Param>();
+            this.RefreshFormData(DataDB, service);
+            foreach (TableSchema _table in this.FormSchema.Tables.FindAll(e => e.TableType == WebFormTableTypes.Normal))
+            {
+                if (this.FormData.MultipleTables.ContainsKey(_table.TableName) && this.FormData.MultipleTables[_table.TableName].Count > 0)
+                {
+                    foreach (SingleColumn Column in this.FormData.MultipleTables[_table.TableName][0].Columns)
+                    {
+                        if (Column.Control != null && !Column.Control.DoNotPersist)
+                        {
+                            if (Column.Control is EbPowerSelect)
+                            {
+                                string dm = string.Empty;
+                                foreach (KeyValuePair<int, Dictionary<string, string>> dp in Column.D)
+                                {
+                                    foreach (KeyValuePair<string, string> dc in dp.Value)
+                                        dm += dc.Value + CharConstants.SPACE;
+                                }
+                                data.Add(new Param { Name = Column.Control.Label, Type = ((int)EbDbTypes.String).ToString(), Value = dm });
+                            }
+                            else
+                            {
+                                data.Add(new Param
+                                {
+                                    Name = Column.Control.Label,
+                                    Type = ((int)EbDbTypes.String).ToString(),
+                                    Value = string.IsNullOrEmpty(Column.F) ? Column.Value : Column.F
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            return data;
         }
 
         public string Save(IDatabase DataDB, Service service)
@@ -1619,7 +1657,7 @@ namespace ExpressBase.Objects
                         }
                         else
                             throw new FormException("Unable to decide next stage", (int)HttpStatusCodes.INTERNAL_SERVER_ERROR, "NextStage C# script returned a value that is not recognized as a stage", "Return value : " + nxtStName);
-                    }                    
+                    }
                 }
                 else if (reviewRowCount == 0)
                 {
