@@ -599,6 +599,10 @@ namespace ExpressBase.Objects
         public List<EbMobileControl> ChildControls { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
+        public EbMobileTableLayout DataLayout { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("Data")]
         public string TableName { set; get; }
 
