@@ -1673,9 +1673,10 @@ namespace ExpressBase.Objects
                 string _col = string.Empty, _val = string.Empty;
                 if (nextStage.ApproverEntity == ApproverEntityTypes.Role)
                 {
-                    _col = "role_id";
-                    _val = $"@role_id_{i}";
-                    param.Add(DataDB.GetNewParameter($"@role_id_{i++}", EbDbTypes.Int32, nextStage.ApproverRole));
+                    _col = "role_ids";
+                    _val = $"@role_ids_{i}";
+                    string roles = nextStage.ApproverRoles == null ? string.Empty : nextStage.ApproverRoles.Join(",");
+                    param.Add(DataDB.GetNewParameter($"@role_ids_{i++}", EbDbTypes.String, roles));
                 }
                 else if (nextStage.ApproverEntity == ApproverEntityTypes.UserGroup)
                 {

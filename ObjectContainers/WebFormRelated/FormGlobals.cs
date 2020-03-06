@@ -51,7 +51,7 @@ namespace ExpressBase.Objects.WebFormRelated
             if (result == null)
             {
                 result = this.DataGrids.Find(e => e.Name == name);
-                if (result == null && this.Review != null && name == this.Review.Name)
+                if (result == null && this.Review != null && name == "review")
                     result = this.Review;
             }
             if (result == null)
@@ -85,11 +85,52 @@ namespace ExpressBase.Objects.WebFormRelated
 
         private SingleTable Table { get; set; }
 
+        public Dictionary<string, FG_Review_Stage> stages { get; private set; }
+
+        public FG_Review_Stage currentStage { get; private set; }
+
         public FG_Review(EbReview CtrlObj, SingleTable Table)
         {
             this.Name = CtrlObj.Name;
             this.CtrlObj = CtrlObj;
             this.Table = Table;
+
+            SingleRow _Row = null;
+            foreach(SingleRow Row in this.Table)
+            {
+                if (Row.RowId <= 0 && Row.Columns.Count > 0)
+                {
+                    _Row = Row;
+                    break;
+                }
+            }
+
+            this.stages = new Dictionary<string, FG_Review_Stage>();
+
+            foreach(ReviewStageAbstract stage in this.CtrlObj.FormStages)
+            {
+                EbReviewStage _eb_stage = stage as EbReviewStage;
+                List<FG_Review_Action> fg_actions = new List<FG_Review_Action>();
+                foreach (ReviewActionAbstract action in _eb_stage.StageActions)
+                {
+                    fg_actions.Add(new FG_Review_Action((action as EbReviewAction).Name));
+                }
+                if (_Row != null && Convert.ToString(_Row["stage_unique_id"]) == _eb_stage.EbSid)
+                {
+                    EbReviewAction eb_curAct = (EbReviewAction)_eb_stage.StageActions.Find(e => (e as EbReviewAction).EbSid == Convert.ToString(_Row["action_unique_id"]));
+                    FG_Review_Action fg_curAct = null;
+                    if (eb_curAct != null)
+                    {
+                        fg_curAct = fg_actions.Find(e => e.name == eb_curAct.Name);
+                    }
+                    this.stages.Add(_eb_stage.Name, new FG_Review_Stage(_eb_stage.Name, fg_actions, fg_curAct));
+                    this.currentStage = this.stages[_eb_stage.Name];
+                }
+                else
+                {
+                    this.stages.Add(_eb_stage.Name, new FG_Review_Stage(_eb_stage.Name, fg_actions, null));
+                }
+            }
         }
 
         public string getCurrentAction()
@@ -122,17 +163,43 @@ namespace ExpressBase.Objects.WebFormRelated
         //    return stageId;
         //}
 
-        public void approve() 
+        public void complete() 
         {
             this.CtrlObj.ReviewStatus = "Appoved";
         }
 
-        public void reject() 
+        public void abandon() 
         {
             this.CtrlObj.ReviewStatus = "Rejected";
         }
 
         public void setNextStageDataEditable() { }
+    }
+
+    public class FG_Review_Stage
+    {
+        public string name { get; private set; }
+
+        public List<FG_Review_Action> actions { get; private set; }
+
+        public FG_Review_Action currentAction { get; private set; }
+
+        public FG_Review_Stage(string Name, List<FG_Review_Action> Actions, FG_Review_Action currentAction)
+        {
+            this.name = Name;
+            this.actions = Actions;
+            this.currentAction = currentAction;
+        }
+    }
+
+    public class FG_Review_Action
+    {
+        public string name { get; private set; }
+
+        public FG_Review_Action(string Name)
+        {
+            this.name = Name;
+        }
     }
 
     [RuntimeSerializable]
