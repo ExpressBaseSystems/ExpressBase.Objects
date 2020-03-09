@@ -94,6 +94,45 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int ObjectType { set; get; }
     }
 
+    public class EbStageInfoMobile
+    {
+        public string StageUniqueId { set; get; }
+        public List<EbStageActionsMobile> StageActions { set; get; }
+
+        public EbStageInfoMobile()
+        {
+            StageActions = new List<EbStageActionsMobile>();
+        }
+    }
+
+    public class EbStageActionsMobile
+    {
+        public string ActionName { set; get; }
+
+        public string ActionUniqueId { set; get; }
+    }
+
+    public class EbMyActionsMobile
+    {
+        public int Id { set; get; }
+
+        public DateTime StartDate { set; get; }
+
+        public DateTime EndDate { set; get; }
+
+        public int StageId { set; get; }
+
+        public string WebFormRefId { set; get; }
+
+        public int WebFormDataId { set; get; }
+
+        public int ApprovalLinesId { set; get; }
+
+        public string Description { set; get; }
+
+        public EbStageInfoMobile StageInfo { set; get; }
+    }
+
     //objects to mobile
     public class GetMobilePagesRequest : EbServiceStackAuthRequest, IReturn<GetMobilePagesResponse>
     {
@@ -120,7 +159,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public GetMobilePagesResponse()
         {
-            this.Pages = new List<MobilePagesWraper>();
+            Pages = new List<MobilePagesWraper>();
             WebObjects = new List<WebObjectsWraper>();
         }
     }
@@ -154,5 +193,22 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 2)]
         public EbDataSet Data { set; get; }
+    }
+
+    public class GetMyActionsRequest : EbServiceStackAuthRequest, IReturn<GetMyActionsResponse>
+    {
+
+    }
+
+    [DataContract]
+    public class GetMyActionsResponse
+    {
+        [DataMember(Order = 1)]
+        public List<EbMyActionsMobile> Actions { get; set; }
+
+        public GetMyActionsResponse()
+        {
+            Actions = new List<EbMyActionsMobile>();
+        }
     }
 }

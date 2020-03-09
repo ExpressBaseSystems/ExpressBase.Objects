@@ -26,11 +26,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
-        public List<EbMobileControl> ChiledControls { get; set; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [HideInPropertyGrid]
-        public List<EbMobileControl> ChildControls { get { return ChiledControls; } set { } }
+        public List<EbMobileControl> ChildControls { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         public string TableName { set; get; }
@@ -57,51 +53,79 @@ namespace ExpressBase.Objects
                     </div>".RemoveCR().DoubleQuoted();
         }
 
-        public WebFormSchema ToWebFormSchema()
+        public Dictionary<string, List<TableColumnMeta>> GetTableMetaCollection(IVendorDbTypes vDbTypes)
         {
-            WebFormSchema Schema = new WebFormSchema
+            Dictionary<string, List<TableColumnMeta>> meta = new Dictionary<string, List<TableColumnMeta>>();
+            try
             {
-                FormName = this.TableName
-            };
+                meta.Add(this.TableName, new List<TableColumnMeta>());
 
-            TableSchema TableSchema = new TableSchema
-            {
-                TableName = this.TableName,
-                TableType = WebFormTableTypes.Normal
-            };
-            this.PushTableCols(TableSchema);
-
-            Schema.Tables.Add(TableSchema);
-
-            return Schema;
-        }
-
-        private void PushTableCols(TableSchema TableSchema)
-        {
-            foreach (EbMobileControl ctrl in this.ChiledControls)
-            {
-                if (ctrl is EbMobileTableLayout)
+                foreach (EbMobileControl ctrl in this.ChildControls)
                 {
-                    foreach (EbMobileTableCell cell in (ctrl as EbMobileTableLayout).CellCollection)
+                    if (ctrl is EbMobileFileUpload)
+                        continue;
+                    else if (ctrl is EbMobileTableLayout)
                     {
-                        foreach (EbMobileControl tctrl in cell.ControlCollection)
+                        foreach (EbMobileTableCell cell in (ctrl as EbMobileTableLayout).CellCollection)
                         {
-                            TableSchema.Columns.Add(new ColumnSchema
-                            {
-                                ColumnName = tctrl.Name,
-                                EbDbType = (int)tctrl.EbDbType
-                            });
+                            foreach (EbMobileControl tctrl in cell.ControlCollection)
+                                AppendMeta(meta[this.TableName], tctrl, vDbTypes);
                         }
                     }
-                }
-                else
-                {
-                    TableSchema.Columns.Add(new ColumnSchema
+                    else if (ctrl is EbMobileDataGrid)
                     {
-                        ColumnName = ctrl.Name,
-                        EbDbType = (int)ctrl.EbDbType
-                    });
+                        var grid = (ctrl as EbMobileDataGrid);
+                        meta.Add(grid.TableName, new List<TableColumnMeta>());
+                        meta[grid.TableName].Add(new TableColumnMeta
+                        {
+                            Name = this.TableName + "_id",
+                            Type = vDbTypes.GetVendorDbTypeStruct(EbDbTypes.Int32)
+                        });
+
+                        foreach (EbMobileControl gctrl in grid.ChildControls)
+                            AppendMeta(meta[grid.TableName], gctrl, vDbTypes);
+
+                        AppendDefaultMeta(meta[grid.TableName], vDbTypes);
+                    }
+                    else
+                        AppendMeta(meta[this.TableName], ctrl, vDbTypes);
                 }
+                AppendDefaultMeta(meta[this.TableName], vDbTypes);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            return meta;
+        }
+
+        private void AppendMeta(List<TableColumnMeta> source, EbMobileControl control, IVendorDbTypes vDbTypes)
+        {
+            source.Add(new TableColumnMeta
+            {
+                Name = control.Name,
+                Type = vDbTypes.GetVendorDbTypeStruct((EbDbTypes)control.EbDbType)
+            });
+        }
+
+        private void AppendDefaultMeta(List<TableColumnMeta> metaList, IVendorDbTypes vDbTypes)
+        {
+            try
+            {
+                metaList.Add(new TableColumnMeta { Name = "eb_created_by", Type = vDbTypes.Decimal, Label = "Created By" });
+                metaList.Add(new TableColumnMeta { Name = "eb_created_at", Type = vDbTypes.DateTime, Label = "Created At" });
+                metaList.Add(new TableColumnMeta { Name = "eb_lastmodified_by", Type = vDbTypes.Decimal, Label = "Last Modified By" });
+                metaList.Add(new TableColumnMeta { Name = "eb_lastmodified_at", Type = vDbTypes.DateTime, Label = "Last Modified At" });
+                metaList.Add(new TableColumnMeta { Name = "eb_del", Type = vDbTypes.Boolean, Default = "F" });
+                metaList.Add(new TableColumnMeta { Name = "eb_void", Type = vDbTypes.Boolean, Default = "F", Label = "Void ?" });
+                metaList.Add(new TableColumnMeta { Name = "eb_loc_id", Type = vDbTypes.Int32, Label = "Location" });
+                metaList.Add(new TableColumnMeta { Name = "eb_device_id", Type = vDbTypes.String, Label = "Device Id" });
+                metaList.Add(new TableColumnMeta { Name = "eb_appversion", Type = vDbTypes.String, Label = "App Version" });
+                metaList.Add(new TableColumnMeta { Name = "eb_created_at_device", Type = vDbTypes.DateTime, Label = "Sync Time" });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
             }
         }
     }
@@ -182,11 +206,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
-        public List<EbMobileDashBoardControls> ChiledControls { set; get; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [HideInPropertyGrid]
-        public List<EbMobileDashBoardControls> ChildControls { get { return ChiledControls; } set { } }
+        public List<EbMobileDashBoardControls> ChildControls { get; set; }
 
         public override string GetDesignHtml()
         {
