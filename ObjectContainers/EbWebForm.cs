@@ -1112,12 +1112,26 @@ namespace ExpressBase.Objects
                     {
                         if (Table.Count == 1)
                         {
-                            //Table[0]["id"]
                             string stageEbSid = Table[0]["stage_unique_id"];
                             EbReviewStage activeStage = (EbReviewStage)(Ctrl as EbReview).FormStages.Find(e => (e as EbReviewStage).EbSid == stageEbSid);
 
                             if (activeStage != null)
                             {
+                                List<int> user_ids = new List<int>();
+                                List<int> role_ids = new List<int>();
+                                string sUserIds = Table[0]["user_ids"];
+                                string sRoleIds = Table[0]["role_ids"];
+                                int.TryParse(Convert.ToString(Table[0]["usergroup_id"]), out int ugId);
+                                if (!sUserIds.IsNullOrEmpty())
+                                    user_ids = Array.ConvertAll(sUserIds.Split(','), int.Parse).ToList();
+                                if (!sRoleIds.IsNullOrEmpty())
+                                    role_ids = Array.ConvertAll(sRoleIds.Split(','), int.Parse).ToList();
+
+                                bool hasRoleMatch = this.UserObj.RoleIds.Select(x => x).Intersect(role_ids).Any();
+                                bool hasPerm = false;
+                                if (hasRoleMatch || user_ids.Contains(this.UserObj.UserId) || this.UserObj.UserGroupIds.Contains(ugId))
+                                    hasPerm = true;
+
                                 DateTime dt_con = DateTime.UtcNow.ConvertFromUtc(this.UserObj.Preference.TimeZone);
                                 string dt = dt_con.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
                                 string stAction = activeStage.StageActions.Count > 0 ? (activeStage.StageActions[0] as EbReviewAction).EbSid : string.Empty;
@@ -1128,12 +1142,14 @@ namespace ExpressBase.Objects
                                     {
                                         new SingleColumn{ Name = "stage_unique_id", Type = (int)EbDbTypes.String, Value = activeStage.EbSid},
                                         new SingleColumn{ Name = "action_unique_id", Type = (int)EbDbTypes.String, Value = stAction},
-                                        new SingleColumn{ Name = "eb_my_actions_id", Type = (int)EbDbTypes.Decimal, Value = Table[0]["id"]},
+                                        new SingleColumn{ Name = "eb_my_actions_id", Type = (int)EbDbTypes.Decimal, Value = hasPerm ? Table[0]["id"] : 0},
                                         new SingleColumn{ Name = "comments", Type = (int)EbDbTypes.String, Value = ""},
-                                        new SingleColumn{ Name = "eb_created_at", Type = (int)EbDbTypes.DateTime, Value = dt},
-                                        new SingleColumn{ Name = "eb_created_by", Type = (int)EbDbTypes.Decimal, Value = this.UserObj.UserId + "$$" + this.UserObj.FullName}
+                                        new SingleColumn{ Name = "eb_created_at", Type = (int)EbDbTypes.DateTime, Value = hasPerm ? dt : null},
+                                        new SingleColumn{ Name = "eb_created_by", Type = (int)EbDbTypes.Decimal, Value = hasPerm ? this.UserObj.UserId + "$$" + this.UserObj.FullName : ""},
+                                        new SingleColumn{ Name = "is_form_data_editable", Type = (int)EbDbTypes.String, Value = Convert.ToString(Table[0]["is_form_data_editable"])},
+                                        new SingleColumn{ Name = "has_permission", Type = (int)EbDbTypes.String, Value = hasPerm ? "T" : "F"}
                                     }
-                                });
+                                }); ;
                             }
 
                         }
@@ -1357,11 +1373,11 @@ namespace ExpressBase.Objects
                 if (IsUpdate)
                 {
                     this.RefreshFormData(DataDB, service, true, true);
-                    resp = "Updated: " + this.Update(DataDB);
+                    resp = "Updated: " + this.Update(DataDB, service);
                 }
                 else
                 {
-                    this.TableRowId = this.Insert(DataDB);
+                    this.TableRowId = this.Insert(DataDB, service);
                     resp = "Inserted: " + this.TableRowId;
                     Console.WriteLine("New record inserted. Table :" + this.TableName + ", Id : " + this.TableRowId);
                 }
@@ -1398,7 +1414,7 @@ namespace ExpressBase.Objects
             return resp;
         }
 
-        public int Insert(IDatabase DataDB)
+        public int Insert(IDatabase DataDB, Service service)
         {
             string fullqry = string.Empty;
             string _extqry = string.Empty;
@@ -1449,7 +1465,7 @@ namespace ExpressBase.Objects
 
             fullqry += _extqry;
             fullqry += this.GetFileUploaderUpdateQuery(DataDB, param, ref i);
-            fullqry += this.GetMyActionInsertUpdateQuery(DataDB, param, ref i, true);
+            fullqry += this.GetMyActionInsertUpdateQuery(DataDB, param, ref i, true, service);
 
             param.Add(DataDB.GetNewParameter(FormConstants.eb_createdby, EbDbTypes.Int32, this.UserObj.UserId));
             param.Add(DataDB.GetNewParameter(FormConstants.eb_loc_id, EbDbTypes.Int32, this.LocationId));
@@ -1513,7 +1529,7 @@ namespace ExpressBase.Objects
             return fullqry;
         }
 
-        public int Update(IDatabase DataDB)
+        public int Update(IDatabase DataDB, Service service)
         {
             string fullqry = string.Empty;
             string _extqry = string.Empty;
@@ -1598,14 +1614,14 @@ namespace ExpressBase.Objects
 
             fullqry += _extqry;
             fullqry += GetFileUploaderUpdateQuery(DataDB, param, ref i);
-            fullqry += this.GetMyActionInsertUpdateQuery(DataDB, param, ref i, false);
+            fullqry += this.GetMyActionInsertUpdateQuery(DataDB, param, ref i, false, service);
             param.Add(DataDB.GetNewParameter(FormConstants.eb_loc_id, EbDbTypes.Int32, this.LocationId));
             param.Add(DataDB.GetNewParameter(FormConstants.eb_createdby, EbDbTypes.Int32, this.UserObj.UserId));
             param.Add(DataDB.GetNewParameter(FormConstants.eb_modified_by, EbDbTypes.Int32, this.UserObj.UserId));
             return DataDB.DoNonQuery(this.DbConnection, fullqry, param.ToArray());
         }
 
-        private string GetMyActionInsertUpdateQuery(IDatabase DataDB, List<DbParameter> param, ref int i, bool isInsert)
+        private string GetMyActionInsertUpdateQuery(IDatabase DataDB, List<DbParameter> param, ref int i, bool isInsert, Service service)
         {
             EbReview ebReview = (EbReview)this.FormSchema.ExtendedControls.FirstOrDefault(e => e is EbReview);
             if (ebReview == null || ebReview.FormStages.Count == 0)
@@ -1634,11 +1650,11 @@ namespace ExpressBase.Objects
                         throw new FormException("Bad Request", (int)HttpStatusCodes.BAD_REQUEST, $"eb_approval_lines contains an invalid stage_unique_id: {this.FormData.MultipleTables[ebReview.TableName][0]["stage_unique_id"]} ", "From GetMyActionInsertUpdateQuery");
 
                     FG_WebForm global = GlobalsGenerator.GetCSharpFormGlobals(this, this.FormData);
-                    FG_Root globals = new FG_Root(global, this.UserObj);
+                    FG_Root globals = new FG_Root(global, this, service);
                     ebReview.ReviewStatus = string.Empty;
                     string nxtStName = Convert.ToString(this.ExecuteCSharpScriptNew(currentStage.NextStage.Code, globals));
 
-                    if (ebReview.ReviewStatus == "Approved" || ebReview.ReviewStatus == "Rejected")
+                    if (ebReview.ReviewStatus == "complete" || ebReview.ReviewStatus == "abandon")
                     {
                         this.AfterSaveRoutines.AddRange(ebReview.OnApprovalRoutines);
                         insMyActRequired = false;
@@ -1717,9 +1733,10 @@ namespace ExpressBase.Objects
                     _val = $"'{uids.Join(",")}'";
                 }
 
-                insUpQ += $@"INSERT INTO eb_my_actions({_col}, from_datetime, is_completed, eb_stages_id, form_ref_id, form_data_id, eb_del, description)
+                insUpQ += $@"INSERT INTO eb_my_actions({_col}, from_datetime, is_completed, eb_stages_id, form_ref_id, form_data_id, eb_del, description, is_form_data_editable)
                                 VALUES ({_val}, {DataDB.EB_CURRENT_TIMESTAMP}, 'F', (SELECT id FROM eb_stages WHERE stage_unique_id = '{nextStage.EbSid}' AND form_ref_id = '{this.RefId}' AND eb_del = 'F'), 
-                                '{this.RefId}', {masterId}, 'F', 'Review required in {this.DisplayName}'); ";
+                                '{this.RefId}', {masterId}, 'F', 'Review required in {this.DisplayName}', '{(nextStage.IsFormEditable ? "T" : "F")}'); ";
+
                 Console.WriteLine("Will try to INSERT eb_my_actions");
             }
 
@@ -1847,11 +1864,11 @@ namespace ExpressBase.Objects
                 if (IsUpdate)
                 {
                     this.RefreshFormData(DataDB, service, true, false);
-                    resp = "Updated: " + this.Update(DataDB);
+                    resp = "Updated: " + this.Update(DataDB, service);
                 }
                 else
                 {
-                    this.TableRowId = this.Insert(DataDB);
+                    this.TableRowId = this.Insert(DataDB, service);
                     resp = "Inserted: " + this.TableRowId;
                     Console.WriteLine("New record inserted. Table :" + this.TableName + ", Id : " + this.TableRowId);
                 }

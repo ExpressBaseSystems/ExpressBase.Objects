@@ -275,7 +275,7 @@ else if(this.ApproverEntity === 3){
 
         [EnableInBuilder(BuilderType.WebForm)]
         [Unique]
-        [PropDataSourceJsFn("return ebcontext.UserGroups")]
+        [PropDataSourceJsFn("return ebcontext.Roles")]
         [PropertyEditor(PropertyEditorType.DropDown, true)]
         public List<Int32> ApproverRoles { get; set; }
 

@@ -1,7 +1,12 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Data;
+using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Structures;
+using ExpressBase.Objects.ServiceStack_Artifacts;
 using ExpressBase.Security;
+using Newtonsoft.Json;
+using ServiceStack;
 using ServiceStack.Text;
 using System;
 using System.Collections.Generic;
@@ -17,15 +22,53 @@ namespace ExpressBase.Objects.WebFormRelated
 
         public User user { get; private set; }
 
+        public FG_System system { get; private set; }
+
         public FG_Root(FG_WebForm fG_WebForm) 
         {
             this.form = fG_WebForm;
         }
 
-        public FG_Root(FG_WebForm fG_WebForm, User User)
+        public FG_Root(FG_WebForm fG_WebForm, EbWebForm ebWebForm, Service service)
         {
             this.form = fG_WebForm;
-            this.user = User;
+            this.user = ebWebForm.UserObj;
+            this.system = new FG_System(ebWebForm, service);
+        }
+    }
+
+    public class FG_System
+    {
+        private Service Service { get; set; }
+        
+        private EbWebForm WebForm { get; set; }
+
+        public FG_System(EbWebForm ebWebForm, Service service)
+        {
+            this.Service = service;
+            this.WebForm = WebForm;
+        }
+
+        public void sendNotificationByUserId(int userId, string title = null)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(this.WebForm.RefId) || this.WebForm.TableRowId <= 0)
+                    return;
+                List<Param> p = new List<Param> { { new Param { Name = "id", Type = ((int)EbDbTypes.Int32).ToString(), Value = this.WebForm.TableRowId.ToString() } } };
+                string pp = JsonConvert.SerializeObject(p).ToBase64();
+                NotifyByUserIDResponse result = Service.Gateway.Send<NotifyByUserIDResponse>(new NotifyByUserIDRequest
+                {
+                    Link = $"/WebForm/Index?refId={this.WebForm.RefId}&_params={pp}&_mode=1",
+                    Title = title ?? this.WebForm.DisplayName + " notification",
+                    UsersID = userId
+                });
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message + e.StackTrace);
+            }
         }
     }
 
@@ -133,23 +176,39 @@ namespace ExpressBase.Objects.WebFormRelated
             }
         }
 
-        public string getCurrentAction()
+        public void complete()
         {
-            string actionId = null;
-            SingleRow Row = this.Table.Find(e => e.RowId <= 0);
-            if (Row != null)
-            {
-                EbReviewStage curStage = (EbReviewStage)this.CtrlObj.FormStages.Find(e => (e as EbReviewStage).EbSid == Convert.ToString(Row["stage_unique_id"]));
-                if (curStage != null)
-                {                    
-                    EbReviewAction curAction = (EbReviewAction)curStage.StageActions.Find(e => (e as EbReviewAction).EbSid == Convert.ToString(Row["action_unique_id"]));
-                    if (curAction != null)
-                        actionId = curAction.Name;
-                }
-            }
-            return actionId;
+            this.CtrlObj.ReviewStatus = "complete";
         }
 
+        public void abandon()
+        {
+            this.CtrlObj.ReviewStatus = "abandon";
+        }
+
+        public void setCurrentStageDataEditable() 
+        {
+            EbReviewStage curS = (EbReviewStage)this.CtrlObj.FormStages.Find(e => (e as EbReviewStage).Name == this.currentStage.name);
+            if (curS != null)
+                curS.IsFormEditable = true;
+        }
+
+        //public string getCurrentAction()
+        //{
+        //    string actionId = null;
+        //    SingleRow Row = this.Table.Find(e => e.RowId <= 0);
+        //    if (Row != null)
+        //    {
+        //        EbReviewStage curStage = (EbReviewStage)this.CtrlObj.FormStages.Find(e => (e as EbReviewStage).EbSid == Convert.ToString(Row["stage_unique_id"]));
+        //        if (curStage != null)
+        //        {                    
+        //            EbReviewAction curAction = (EbReviewAction)curStage.StageActions.Find(e => (e as EbReviewAction).EbSid == Convert.ToString(Row["action_unique_id"]));
+        //            if (curAction != null)
+        //                actionId = curAction.Name;
+        //        }
+        //    }
+        //    return actionId;
+        //}
         //public string getCurrentStage()//not usable
         //{
         //    string stageId = null;
@@ -162,18 +221,6 @@ namespace ExpressBase.Objects.WebFormRelated
         //    }
         //    return stageId;
         //}
-
-        public void complete() 
-        {
-            this.CtrlObj.ReviewStatus = "Appoved";
-        }
-
-        public void abandon() 
-        {
-            this.CtrlObj.ReviewStatus = "Rejected";
-        }
-
-        public void setNextStageDataEditable() { }
     }
 
     public class FG_Review_Stage
