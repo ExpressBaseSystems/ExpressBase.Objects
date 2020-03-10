@@ -624,11 +624,10 @@ namespace ExpressBase.Objects
                             }
                             if (rows.Count == 1)//one new entry// need to write code for 'AfterSaveRoutines'
                             {
-                                var keys = FormData.MultipleTables.Keys;
-                                foreach(string e in keys)
+                                foreach (TableSchema t in this.FormSchema.Tables)
                                 {
-                                    if (e != ebReview.TableName)
-                                        FormData.MultipleTables.Remove(e);// approval execution, hence removing formdata if present
+                                    if (t.TableName != ebReview.TableName)
+                                        FormData.MultipleTables.Remove(t.TableName);// approval execution, hence removing other data if present
                                 }
                                 string[] str_t = { "stage_unique_id", "action_unique_id", "eb_my_actions_id", "comments" };
                                 for (int i = 0; i < str_t.Length; i++)
@@ -1651,7 +1650,7 @@ namespace ExpressBase.Objects
                     if (this.FormDataBackup != null && this.FormDataBackup.MultipleTables.ContainsKey(ebReview.TableName))
                     {
                         SingleRow Row = this.FormDataBackup.MultipleTables[ebReview.TableName].Find(e => e.RowId <= 0);
-                        if (Row != null && Row["eb_my_actions_id"] == this.FormData.MultipleTables[ebReview.TableName][0]["eb_my_actions_id"])
+                        if (Row != null && Convert.ToString(Row["eb_my_actions_id"]) == Convert.ToString(this.FormData.MultipleTables[ebReview.TableName][0]["eb_my_actions_id"]))
                             permissionGranted = true;
                     }
                     if (!permissionGranted)
