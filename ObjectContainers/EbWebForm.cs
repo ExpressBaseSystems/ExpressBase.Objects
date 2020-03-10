@@ -624,6 +624,12 @@ namespace ExpressBase.Objects
                             }
                             if (rows.Count == 1)//one new entry// need to write code for 'AfterSaveRoutines'
                             {
+                                var keys = FormData.MultipleTables.Keys;
+                                foreach(string e in keys)
+                                {
+                                    if (e != ebReview.TableName)
+                                        FormData.MultipleTables.Remove(e);// approval execution, hence removing formdata if present
+                                }
                                 string[] str_t = { "stage_unique_id", "action_unique_id", "eb_my_actions_id", "comments" };
                                 for (int i = 0; i < str_t.Length; i++)
                                 {
@@ -1641,6 +1647,16 @@ namespace ExpressBase.Objects
 
                 if (reviewRowCount == 1)
                 {
+                    bool permissionGranted = false;
+                    if (this.FormDataBackup != null && this.FormDataBackup.MultipleTables.ContainsKey(ebReview.TableName))
+                    {
+                        SingleRow Row = this.FormDataBackup.MultipleTables[ebReview.TableName].Find(e => e.RowId <= 0);
+                        if (Row != null && Row["eb_my_actions_id"] == this.FormData.MultipleTables[ebReview.TableName][0]["eb_my_actions_id"])
+                            permissionGranted = true;
+                    }
+                    if (!permissionGranted)
+                        throw new FormException("Access denied to execute review", (int)HttpStatusCodes.UNAUTHORIZED, $"Following entry is not present in FormDataBackup. eb_my_actions_id: {this.FormData.MultipleTables[ebReview.TableName][0]["eb_my_actions_id"]} ", "From GetMyActionInsertUpdateQuery");
+
                     insUpQ = $@"UPDATE eb_my_actions SET completed_at = {DataDB.EB_CURRENT_TIMESTAMP}, completed_by = @eb_createdby, is_completed = 'T',
 					    eb_approval_lines_id = (SELECT eb_currval('eb_approval_lines_id_seq')) WHERE id = @eb_my_actions_id_{i} AND eb_del = 'F'; ";
                     param.Add(DataDB.GetNewParameter($"@eb_my_actions_id_{i++}", EbDbTypes.Int32, this.FormData.MultipleTables[ebReview.TableName][0]["eb_my_actions_id"]));
