@@ -41,6 +41,9 @@ namespace ExpressBase.Objects
                 //new EbDGStringColumn() { Name = "eb_created_by_s", EbDbType = EbDbTypes.String, DoNotPersist = true}
             };
         }
+
+        //C# script variable
+        public string ReviewStatus { get; set; }
         
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [HideInPropertyGrid]
@@ -174,7 +177,7 @@ namespace ExpressBase.Objects
                         </div>
                     </div>
                 </td>
-                <td col='remarks' class='fs-ctrl-td'><div class='fstd-div'> <textarea class='fs-textarea'></textarea> </div></td>
+                <td col='remarks' class='fs-ctrl-td'><div class='fstd-div'> <textarea class='fs-textarea'>@comment@</textarea> </div></td>
             </tr>";
 
                 _FormStage_RS.Html = _html;
@@ -269,6 +272,12 @@ else if(this.ApproverEntity === 3){
         [PropDataSourceJsFn("return ebcontext.Roles")]
         [PropertyEditor(PropertyEditorType.DropDown)]
         public int ApproverRole { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [Unique]
+        [PropDataSourceJsFn("return ebcontext.Roles")]
+        [PropertyEditor(PropertyEditorType.DropDown, true)]
+        public List<Int32> ApproverRoles { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
         [PropDataSourceJsFn("return ebcontext.UserGroups")]
