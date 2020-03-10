@@ -97,7 +97,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.Color)]
         [PropertyGroup("LabelConfig")]
-        [DefaultPropValue("#2f2f51")]
+        [DefaultPropValue("#d2d2d7")]
         public string LabelBorderColor { get; set; }
 
 
@@ -105,12 +105,10 @@ namespace ExpressBase.Objects
         [PropertyGroup("LabelConfig")]
         [OnChangeUIFunction("EbDataLabel.LabelBackgroudColor")]
         [PropertyEditor(PropertyEditorType.Color)]
-        [DefaultPropValue("#7093ff")]
         public override string LabelBackColor { get; set; }
 
         [EnableInBuilder(BuilderType.DashBoard)]
         [PropertyGroup("LabelConfig")]
-        [DefaultPropValue("true")]
         [OnChangeExec(@"
                 if (this.IsGradient === true ){      
                         pg.ShowProperty('GradientColor1');     
@@ -197,10 +195,7 @@ namespace ExpressBase.Objects
         [UIproperty]
         [PropertyEditor(PropertyEditorType.FontSelector)]
         [OnChangeUIFunction("EbDataLabel.Style4StaticLabel")]
-         public EbFont StaticLabelFont { get; set; }
-
-
-
+        public EbFont StaticLabelFont { get; set; }
 
         [EnableInBuilder(BuilderType.DashBoard)]
         [PropertyGroup("StaticLabel")]
@@ -272,7 +267,100 @@ namespace ExpressBase.Objects
             ")]
         public TextPositon DescriptionPosition { get; set; }
 
+        //Icon
+
+        [EnableInBuilder(BuilderType.DashBoard)]
+        [PropertyGroup("Icon")]
+        [UIproperty]
+        [DefaultPropValue("true")]
+        [OnChangeExec(@"if (this.RenderIcon === true ){      
+                        pg.ShowProperty('Icon');     
+                        pg.ShowProperty('IconColor');     
+                        pg.ShowProperty('IconGradientColor1');     
+                        pg.ShowProperty('IconGradientColor2');    
+                        pg.ShowProperty('IconDirection');    
+                        pg.ShowProperty('FooterText');    
+                        pg.ShowProperty('FooterTextColor');    
+                }
+                else {     
+                        pg.HideProperty('Icon');     
+                        pg.HideProperty('IconColor');     
+                        pg.HideProperty('IconGradientColor1');     
+                        pg.HideProperty('IconGradientColor2');    
+                        pg.HideProperty('IconDirection');    
+                        pg.HideProperty('FooterText');    
+                        pg.HideProperty('FooterTextColor');    
+                }
+            ")]
+        public bool RenderIcon { get; set; }
+
+
+        [EnableInBuilder(BuilderType.DashBoard)]
+        [PropertyGroup("Icon")]
+        [UIproperty]
+        [PropertyEditor(PropertyEditorType.IconPicker)]
+        [DefaultPropValue("fa-building-o")]
+        public string Icon { get; set; }
+
+
+        [EnableInBuilder(BuilderType.DashBoard)]
+        [PropertyGroup("Icon")]
+        [UIproperty]
+        [PropertyEditor(PropertyEditorType.Color)]
+        public string IconColor { get; set; } 
         
+        [EnableInBuilder(BuilderType.DashBoard)]
+        [PropertyGroup("Icon")]
+        [UIproperty]
+        [PropertyEditor(PropertyEditorType.Color)]
+        [Alias("GradientColor1")]
+        [DefaultPropValue("#0202ff")]
+        public string IconGradientColor1 { get; set; }
+
+
+        [EnableInBuilder(BuilderType.DashBoard)]
+        [PropertyGroup("Icon")]
+        [UIproperty]
+        [PropertyEditor(PropertyEditorType.Color)]
+        [DefaultPropValue("#0000a0")]
+        [Alias("GradientColor2")]
+        public string IconGradientColor2 { get; set; }
+
+
+        [EnableInBuilder(BuilderType.DashBoard)]
+        [PropertyGroup("Icon")]
+        public GradientDirection IconDirection { get; set; }
+
+        [EnableInBuilder(BuilderType.DashBoard)]
+        [PropertyGroup("Icon")]
+        [UIproperty]
+        [PropertyEditor(PropertyEditorType.IconPicker)]
+        [DefaultPropValue("fa-calendar-o")]
+        public string FooterIcon { get; set; }
+
+        [EnableInBuilder(BuilderType.DashBoard)]
+        [PropertyGroup("Icon")]
+        [UIproperty]
+        [PropertyEditor(PropertyEditorType.Color)]
+        [DefaultPropValue("#000000")]
+        public string FooterIconColor { get; set; }
+
+
+        [EnableInBuilder(BuilderType.DashBoard)]
+        [PropertyGroup("Icon")]
+        [UIproperty]
+        [DefaultPropValue("Today")]
+        public string FooterText { get; set; }
+
+        [EnableInBuilder(BuilderType.DashBoard)]
+        [PropertyGroup("Icon")]
+        [UIproperty]
+        [PropertyEditor(PropertyEditorType.Color)]
+        [DefaultPropValue("#000000")]
+        public string FooterTextColor { get; set; }
+
+
+
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl , BuilderType.DashBoard)]
         [HideInPropertyGrid]
