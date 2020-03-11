@@ -69,6 +69,10 @@ namespace ExpressBase.Objects
         [PropertyGroup("General")]
         public bool IsMultipleUpload { set; get; }
 
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup("General")]
+        public bool HideEmptyCategory { set; get; }
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup("General")]
         public bool EnableTag { set; get; }
