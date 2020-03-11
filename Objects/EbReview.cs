@@ -21,7 +21,7 @@ namespace ExpressBase.Objects
     {
         public EbReview()
         {
-            FormStages = new List<ReviewStageAbstract>();
+            FormStages = new List<EbReviewStage>();
             Controls = new List<EbControl>();
             this.OnApprovalRoutines = new List<EbRoutines>();
         }
@@ -84,9 +84,9 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.Collection)]
         [PropertyGroup("Behavior")]
         [Alias("Approval stages")]
-        [ListType(typeof(ReviewStageAbstract))]
+        [ListType(typeof(EbReviewStage))]
         [PropertyPriority(99)]
-        public List<ReviewStageAbstract> FormStages { get; set; }
+        public List<EbReviewStage> FormStages { get; set; }
 
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.WebForm)]
@@ -141,21 +141,20 @@ namespace ExpressBase.Objects
 
             html += @"
         <tbody>";
-            List<EbFormStage> _FormStages = JsonConvert.DeserializeObject<List<EbFormStage>>(JsonConvert.SerializeObject(FormStages));
+            List<EbReviewStage> _FormStages = JsonConvert.DeserializeObject<List<EbReviewStage>>(JsonConvert.SerializeObject(FormStages));
             //_FormStages.Reverse();
             int i = 0;
             string FormStageTrHtml = string.Empty;
 
-            foreach (ApprovalStageAbstract FormStage in _FormStages)
+            foreach (EbReviewStage FormStage in _FormStages)
             {
-                EbFormStage _FormStage = (FormStage as EbFormStage);
+                EbReviewStage _FormStage = (FormStage as EbReviewStage);
                 EbReviewStage _FormStage_RS = (FormStages[i++] as EbReviewStage);
 
                 string _html = string.Concat(@"
-            <tr name='", _FormStage.Name, "' stage-ebsid='", _FormStage.EbSid, "' rowid='@rowid@' role='", _FormStage.ApproverRole.ToString(), "' style ='@bg@'>",
+            <tr name='", _FormStage.Name, "' stage-ebsid='", _FormStage.EbSid, "' rowid='@rowid@' style ='@bg@'>",
                     "<td class='row-no-td'>@slno@</td>",
                     "<td col='stage'><span class='fstd-div'>", _FormStage.Name, "</span></td>",
-                    "<td style='display: none;'><span class='fstd-div'>", _FormStage.ApproverRole.ToString().Replace("_", " "), "</span></td>",
                     @"<td col='status' class='fs-ctrl-td'><div class='fstd-div'>", @"
                     <select class='selectpicker'>");
 
@@ -251,27 +250,27 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         [OnChangeExec(@"
 if(this.ApproverEntity === 1){
-    pg.MakeReadWrite('ApproverRole');
+    pg.MakeReadWrite('ApproverRoles');
     pg.MakeReadOnly('ApproverUserGroup');
     pg.MakeReadOnly('ApproverUsers');
 }
 else if(this.ApproverEntity === 2){
-    pg.MakeReadOnly('ApproverRole');
+    pg.MakeReadOnly('ApproverRoles');
     pg.MakeReadWrite('ApproverUserGroup');
     pg.MakeReadOnly('ApproverUsers');
 }
 else if(this.ApproverEntity === 3){
-    pg.MakeReadOnly('ApproverRole');
+    pg.MakeReadOnly('ApproverRoles');
     pg.MakeReadOnly('ApproverUserGroup');
     pg.MakeReadWrite('ApproverUsers');
 }")]
         public ApproverEntityTypes ApproverEntity { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm)]
-        [Unique]
-        [PropDataSourceJsFn("return ebcontext.Roles")]
-        [PropertyEditor(PropertyEditorType.DropDown)]
-        public int ApproverRole { get; set; }
+        //[EnableInBuilder(BuilderType.WebForm)]
+        //[Unique]
+        //[PropDataSourceJsFn("return ebcontext.Roles")]
+        //[PropertyEditor(PropertyEditorType.DropDown)]
+        //public int ApproverRole { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
         [Unique]
@@ -290,8 +289,8 @@ else if(this.ApproverEntity === 3){
 
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.Collection)]
-        [ListType(typeof(ReviewActionAbstract))]
-        public List<ReviewActionAbstract> StageActions { get; set; }
+        [ListType(typeof(EbReviewAction))]
+        public List<EbReviewAction> StageActions { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
