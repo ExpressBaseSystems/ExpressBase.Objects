@@ -94,17 +94,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int ObjectType { set; get; }
     }
 
-    public class EbStageInfoMobile
-    {
-        public string StageUniqueId { set; get; }
-        public List<EbStageActionsMobile> StageActions { set; get; }
-
-        public EbStageInfoMobile()
-        {
-            StageActions = new List<EbStageActionsMobile>();
-        }
-    }
-
     public class EbStageActionsMobile
     {
         public string ActionName { set; get; }
@@ -129,8 +118,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int ApprovalLinesId { set; get; }
 
         public string Description { set; get; }
-
-        public EbStageInfoMobile StageInfo { set; get; }
     }
 
     //objects to mobile
@@ -209,6 +196,36 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public GetMyActionsResponse()
         {
             Actions = new List<EbMyActionsMobile>();
+        }
+    }
+
+    public class GetMyActionInfoRequest : EbServiceStackAuthRequest, IReturn<GetMyActionInfoResponse>
+    {
+        public int StageId { set; get; }
+
+        public string WebFormRefId { set; get; }
+
+        public int WebFormDataId { set; get; }
+    }
+
+    [DataContract]
+    public class GetMyActionInfoResponse
+    {
+        [DataMember(Order = 1)]
+        public string StageUniqueId { set; get; }
+
+        [DataMember(Order = 2)]
+        public string StageName { set; get; }
+
+        [DataMember(Order = 3)]
+        public List<EbStageActionsMobile> StageActions { set; get; }
+
+        [DataMember(Order = 4)]
+        public List<Param> Data { set; get; }
+
+        public GetMyActionInfoResponse()
+        {
+            StageActions = new List<EbStageActionsMobile>();
         }
     }
 }
