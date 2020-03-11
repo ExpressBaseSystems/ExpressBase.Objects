@@ -49,7 +49,7 @@ namespace ExpressBase.Objects
         {
             get
             {
-                return @" $('input[name = ' + this.EbSid_CtxId + '][value = ' + p1 + ']').prop('checked', true)";
+                return @" $('input[name = ' + this.EbSid_CtxId + '][value = ""' + p1 + '""]').prop('checked', true)";
             }
             set { }
         }
