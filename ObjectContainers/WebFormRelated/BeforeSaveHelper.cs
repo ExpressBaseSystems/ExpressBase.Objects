@@ -201,7 +201,7 @@ namespace ExpressBase.Objects.WebFormRelated
 
             for (int i = 0; i < CalcFlds.Count; i++)
             {
-                string code = _dict[CalcFlds[i]].Control.ValueExpr.Code.ToLower();
+                string code = _dict[CalcFlds[i]].Control.ValueExpr.Code;
                 if (_dict[CalcFlds[i]].Control.ValueExpr.Lang == ScriptingLanguage.JS)
                 {
                     //MatchCollection matchColl = Regex.Matches(code, $@"(form.(\w+.currentrow\[""\w + ""\]|\w+.currentrow\['\w+'\]|\w+.currentrow.\w+|\w+))"); 
