@@ -45,6 +45,8 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public override bool Unique { get; set; }
 
+        [JsonIgnore]
+        public override string IsRequiredOKJSfn { get { return "return true"; } set { } }
         #endregion
 
         public EbFileUploader()
