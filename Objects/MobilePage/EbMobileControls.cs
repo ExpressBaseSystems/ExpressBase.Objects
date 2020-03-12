@@ -372,10 +372,6 @@ namespace ExpressBase.Objects
         [PropertyGroup("Behavior")]
         public bool EnableEdit { set; get; }
 
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("Core")]
-        public EbMobileFupRenderType RenderAs { set; get; }
-
         public override string GetDesignHtml()
         {
             return @"<div class='eb_stacklayout mob_control dropped' id='@id' eb-type='EbMobileFileUpload' tabindex='1' onclick='$(this).focus()'>
@@ -401,27 +397,14 @@ namespace ExpressBase.Objects
 
         public override EbControl GetWebFormCtrl(int counter)
         {
-            if (this.RenderAs == EbMobileFupRenderType.DisplayPicture)
+            return new EbFileUploader
             {
-                return new EbDisplayPicture
-                {
-                    EbSid = "FileUploader" + counter,
-                    Name = this.Name,
-                    Margin = new UISides { Top = 0, Bottom = 0, Left = 0, Right = 0 },
-                    Label = this.Label
-                };
-            }
-            else
-            {
-                return new EbFileUploader
-                {
-                    EbSid = "FileUploader" + counter,
-                    Name = this.Name,
-                    IsMultipleUpload = this.MultiSelect,
-                    Margin = new UISides { Top = 0, Bottom = 0, Left = 0, Right = 0 },
-                    Label = this.Label
-                };
-            }
+                EbSid = "FileUploader" + counter,
+                Name = this.Name,
+                IsMultipleUpload = this.MultiSelect,
+                Margin = new UISides { Top = 0, Bottom = 0, Left = 0, Right = 0 },
+                Label = this.Label
+            };
         }
     }
 

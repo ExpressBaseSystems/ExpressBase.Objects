@@ -62,19 +62,19 @@ namespace ExpressBase.Objects
 
                 foreach (EbMobileControl ctrl in this.ChildControls)
                 {
-                    if (ctrl is EbMobileFileUpload && (ctrl as EbMobileFileUpload).RenderAs == EbMobileFupRenderType.DisplayPicture)
-                            AppendMeta(meta[this.TableName],ctrl, vDbTypes);
+                    if (ctrl is EbMobileFileUpload)
+                        continue;
                     else if (ctrl is EbMobileTableLayout)
                     {
                         foreach (EbMobileTableCell cell in (ctrl as EbMobileTableLayout).CellCollection)
                         {
                             foreach (EbMobileControl tctrl in cell.ControlCollection)
                             {
-                                if (tctrl is EbMobileFileUpload && (tctrl as EbMobileFileUpload).RenderAs == EbMobileFupRenderType.DisplayPicture)
-                                    AppendMeta(meta[this.TableName], tctrl, vDbTypes);
+                                if (tctrl is EbMobileFileUpload)
+                                    continue;
                                 else
                                     AppendMeta(meta[this.TableName], tctrl, vDbTypes);
-                            } 
+                            }
                         }
                     }
                     else if (ctrl is EbMobileDataGrid)
@@ -88,12 +88,8 @@ namespace ExpressBase.Objects
                         });
 
                         foreach (EbMobileControl gctrl in grid.ChildControls)
-                        {
-                            if (gctrl is EbMobileFileUpload && (gctrl as EbMobileFileUpload).RenderAs == EbMobileFupRenderType.DisplayPicture)
                                 AppendMeta(meta[grid.TableName], gctrl, vDbTypes);
-                            else
-                                AppendMeta(meta[grid.TableName], gctrl, vDbTypes);
-                        }
+
                         AppendDefaultMeta(meta[grid.TableName], vDbTypes);
                     }
                     else

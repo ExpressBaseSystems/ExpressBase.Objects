@@ -15,11 +15,6 @@ namespace ExpressBase.Objects
         Offline,
         Mixed
     }
-    public enum EbMobileFupRenderType
-    {
-        Normal = 1,
-        DisplayPicture = 2
-    }
 
     public abstract class EbMobilePageBase : EbObject
     {
