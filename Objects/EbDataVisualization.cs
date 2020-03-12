@@ -344,6 +344,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]
         [HideForUser]
+        [HideInPropertyGrid]
         public bool AllowLocalSearch { get; set; }
 
         [JsonIgnore]
