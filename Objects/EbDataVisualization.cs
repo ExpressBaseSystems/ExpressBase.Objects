@@ -342,6 +342,10 @@ namespace ExpressBase.Objects
         [PropertyGroup(PGConstants.APPEARANCE)]
         public int RowHeight { get; set; }
 
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]
+        [HideForUser]
+        public bool AllowLocalSearch { get; set; }
+
         [JsonIgnore]
         public EbWebForm WebForm { get; set; }
 
