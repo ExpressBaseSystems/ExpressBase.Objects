@@ -1,4 +1,5 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Constants;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
@@ -12,9 +13,9 @@ using System.Reflection;
 using System.Runtime.Serialization;
 namespace ExpressBase.Objects
 {
-    //[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
-    public class EbImage: EbControlUI
-	{
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+    public class EbImage : EbControlUI
+    {
 
         public EbImage() { }
 
@@ -26,7 +27,8 @@ namespace ExpressBase.Objects
         }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
-        public string ImageID { get; set; }
+        [PropertyEditor(PropertyEditorType.ImageSeletor)]
+        public int ImageId { get; set; }
 
         [EnableInBuilder(BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
@@ -34,14 +36,39 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
         public string Alt { get; set; }
-
+        
         public override bool isFullViewContol { get => true; set => base.isFullViewContol = value; }
 
-		[HideInPropertyGrid]
-		[EnableInBuilder(BuilderType.BotForm)]		
-		public override bool IsReadOnly { get => true;}
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.BotForm)]
+        public override bool IsReadOnly { get => true; }
 
-		public void InitFromDataBase(JsonServiceClient ServiceClient)
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        [OnChangeUIFunction("EbImage.adjustMaxHeight")]
+        [DefaultPropValue("200")]
+        public int MaxHeight { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+        [OnChangeUIFunction("EbImage.adjustMaxWidth")] 
+        public int MaxWidth { get; set; }
+
+        public override string UIchangeFns
+        {
+            get
+            {
+                return @"EbImage = {
+                adjustMaxHeight : function(elementId, props) {
+                    $(`#cont_${elementId} .ebimg-cont img`).css('max-height', `${props.MaxHeight}px`);
+                },
+                adjustMaxWidth : function(elementId, props){
+                    $(`#cont_${elementId} .ebimg-cont img`).css('max-width', `${props.MaxWidth}px`);
+                }
+                }";
+            }
+        }
+
+        public void InitFromDataBase(JsonServiceClient ServiceClient)
         {
             //this.DataSourceId = "eb_roby_dev-eb_roby_dev-2-1015-1739";
             var result = ServiceClient.Get<DataSourceDataResponse>(new DataSourceDataRequest { RefId = this.DataSourceId });
@@ -59,7 +86,7 @@ namespace ExpressBase.Objects
 
         [HideInPropertyGrid]
         [JsonIgnore]
-        public override string ToolIconHtml { get { return "<i class='fa fa-image'></i>"; } set { } }
+        public override string ToolIconHtml { get { return "<i class='fa fa-file-image-o'></i>"; } set { } }
 
         //public override string GetToolHtml()
         //{
@@ -69,14 +96,15 @@ namespace ExpressBase.Objects
         public override string GetBareHtml()
         {
             return @" 
-        <div class='ebimg-cont' style='width:100%;'>
-            <img id='@name@' src='@src@'  style='width:100%;' alt='@alt@'>
+        <div class='ebimg-cont'>
+            <img id='@name@' src='@src@' style='max-width:@maxwidth@px; max-height:@maxheight@px;'>
         </div>"
-.Replace("@name@", this.Name)
-.Replace("@src@", String.IsNullOrWhiteSpace(this.ImageID) ? "/images/imageControlSampleImage.jpg" : this.ImageID)
-.Replace("@toolTipText@", this.ToolTipText)
-.Replace("@value@", "")//"value='" + this.Value + "'")
-    .Replace("@alt@ ", this.Alt ?? "@alt@ ");
+    .Replace("@name@", this.Name)
+    .Replace("@src@", (this.ImageId > 0) ? "../images/"+this.ImageId+".jpg" : "/images/image.png")
+    .Replace("@toolTipText@", this.ToolTipText)
+    .Replace("@value@", "")//"value='" + this.Value + "'")
+    .Replace("@maxwidth@", this.MaxWidth > 0 ? this.MaxWidth.ToString() : "200")
+    .Replace("@maxheight@", this.MaxHeight > 0 ? this.MaxHeight.ToString() : "200"); ;
         }
 
         public override string GetHtml()
@@ -88,5 +116,46 @@ namespace ExpressBase.Objects
 
             return ReplacePropsInHTML(EbCtrlHTML);
         }
+
+        //--------Hide in property grid------------start
+
+        [HideInPropertyGrid]
+        public override bool Unique { get; set; }
+
+        [HideInPropertyGrid]
+        public override List<EbValidator> Validators { get; set; }
+
+        [HideInPropertyGrid]
+        public override EbScript DefaultValueExpression { get; set; }
+
+        [HideInPropertyGrid]
+        public override EbScript VisibleExpr { get; set; }
+
+        [HideInPropertyGrid]
+        public override EbScript ValueExpr { get; set; }
+
+        [HideInPropertyGrid]
+        public override string BackColor { get; set; }
+
+        [HideInPropertyGrid]
+        public override string ForeColor { get; set; }
+
+        [HideInPropertyGrid]
+        public override EbScript OnChangeFn { get; set; }
+
+        [HideInPropertyGrid]
+        public override bool Hidden { get; set; }
+
+        [HideInPropertyGrid]
+        public override bool IsDisable { get; set; }
+
+        [HideInPropertyGrid]
+        public override bool Required { get; set; }
+
+        [HideInPropertyGrid]
+        public override string ToolTipText { get; set; }
+
+        [HideInPropertyGrid]
+        public override string HelpText { get; set; }
     }
 }

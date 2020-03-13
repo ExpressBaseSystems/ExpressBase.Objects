@@ -69,7 +69,12 @@ namespace ExpressBase.Objects
                         foreach (EbMobileTableCell cell in (ctrl as EbMobileTableLayout).CellCollection)
                         {
                             foreach (EbMobileControl tctrl in cell.ControlCollection)
-                                AppendMeta(meta[this.TableName], tctrl, vDbTypes);
+                            {
+                                if (tctrl is EbMobileFileUpload)
+                                    continue;
+                                else
+                                    AppendMeta(meta[this.TableName], tctrl, vDbTypes);
+                            }
                         }
                     }
                     else if (ctrl is EbMobileDataGrid)
@@ -83,7 +88,7 @@ namespace ExpressBase.Objects
                         });
 
                         foreach (EbMobileControl gctrl in grid.ChildControls)
-                            AppendMeta(meta[grid.TableName], gctrl, vDbTypes);
+                                AppendMeta(meta[grid.TableName], gctrl, vDbTypes);
 
                         AppendDefaultMeta(meta[grid.TableName], vDbTypes);
                     }
