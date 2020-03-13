@@ -103,7 +103,7 @@ namespace ExpressBase.Objects
 
         [HideInPropertyGrid]
         [JsonIgnore]
-        public override string ToolNameAlias { get { return "Review New"; } set { } }
+        public override string ToolNameAlias { get { return "Review"; } set { } }
 
         //public override string GetToolHtml()
         //{
