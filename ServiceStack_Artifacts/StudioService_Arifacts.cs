@@ -138,6 +138,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 3)]
         public Dictionary<int, string> UserGroups { get; set; }
 
+        [DataMember(Order = 6)]
+        public Dictionary<int, string> UserTypes { get; set; }
+
         [DataMember(Order = 4)]
         public string Token { get; set; }
 

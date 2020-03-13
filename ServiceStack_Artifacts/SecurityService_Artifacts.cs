@@ -263,6 +263,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 		[DataMember(Order = 10)]
 		public Dictionary<int, int> LocConstraint { get; set; }
+		
+		[DataMember(Order = 11)]
+		public Dictionary<int, string> UserTypes { get; set; }
 	}
 
 	[DataContract]
@@ -336,6 +339,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 		[DataMember(Order = 24)]
 		public string SolnId { get; set; }
+		
+		[DataMember(Order = 25)]
+		public int UserType { get; set; }
 
 		public int UserId { get; set; }
 
