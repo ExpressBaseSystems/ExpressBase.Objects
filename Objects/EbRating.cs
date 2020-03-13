@@ -56,7 +56,7 @@ namespace ExpressBase.Objects.Objects
 			for (var i = this.MaxVal; i> 0; i--)
 			{
 				htmlstring += @"<input type='radio' name='@ebsid@' value='@valuei@' id='@ebsid@ratingID@valuei@' class='rtngStarInpt'> 
-								<label for='@ebsid@ratingID@valuei@' class='ratingLbl'>
+								<label for='@ebsid@ratingID@valuei@' class=''>
 								<i class='fa fa-star'></i>
 								</label>".Replace("@valuei@",i.ToString());
 			}
@@ -178,10 +178,6 @@ namespace ExpressBase.Objects.Objects
 
 		[EnableInBuilder(BuilderType.WebForm)]
 		[HideInPropertyGrid]
-		public override string ForeColor { get; set; }
-
-		[EnableInBuilder(BuilderType.WebForm)]
-		[HideInPropertyGrid]
 		public override string LabelBackColor { get; set; }
 
 		[EnableInBuilder(BuilderType.WebForm)]
@@ -204,13 +200,25 @@ namespace ExpressBase.Objects.Objects
 
 		[EnableInBuilder(BuilderType.WebForm)]
 		[OnChangeUIFunction("EbRating.starCount")]
-		[DefaultPropValue("3")]
+		[DefaultPropValue("5")]
 		[Alias("Maximum Star")]
 		public int MaxVal { get; set; }
 
 		[EnableInBuilder(BuilderType.WebForm)]
 		[PropertyEditor(PropertyEditorType.Color)]
-		public string Color { get; set; }
+		public string IconColor { get; set; }
+
+		[EnableInBuilder(BuilderType.WebForm)]
+		[PropertyEditor(PropertyEditorType.Color)]
+		[Alias("Remove border")]
+		public bool RemoveBorder { get; set; }
+
+		[EnableInBuilder(BuilderType.WebForm)]
+		[Alias("Icon size")]
+		public int IconSize  { get; set; }
+
+		[EnableInBuilder(BuilderType.WebForm)]
+		public override string ForeColor { get; set; }
 
 
 	}
