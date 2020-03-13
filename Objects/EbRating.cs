@@ -200,7 +200,7 @@ namespace ExpressBase.Objects.Objects
 
 		[EnableInBuilder(BuilderType.WebForm)]
 		[OnChangeUIFunction("EbRating.starCount")]
-		[DefaultPropValue("3")]
+		[DefaultPropValue("5")]
 		[Alias("Maximum Star")]
 		public int MaxVal { get; set; }
 
