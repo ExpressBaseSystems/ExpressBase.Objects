@@ -41,7 +41,8 @@ namespace ExpressBase.Objects.Objects.DVRelated
         ProgressBar,
         Link,
         Tree,
-        Boolean
+        Boolean,
+        Rating
     }
 
     public enum BooleanRenderType
@@ -762,6 +763,7 @@ pg.HideProperty('TrueValue');
 pg.HideProperty('FalseValue');
 pg.HideGroup('FormSettings');
 pg.HideGroup('LinkFromColumn');
+    pg.HideGroup('Rating');
 if(this.RenderAs === 2){
     pg.ShowGroup('Link');
     pg.ShowProperty('LinkType');
@@ -782,6 +784,9 @@ if(this.RenderAs === 4){
     pg.ShowProperty('TrueValue');
     pg.ShowProperty('FalseValue');
 }
+else if(this.RenderAs === 5){
+    pg.ShowGroup('Rating');
+}
     pg.HideGroup('Link');
     pg.HideProperty('LinkType');
     pg.HideProperty('HideLinkifNoData');
@@ -792,6 +797,11 @@ if(this.RenderAs === 4){
         [PropertyPriority(10)]
         [PropertyGroup(PGConstants.CORE)]
         public NumericRenderType RenderAs { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
+        [PropertyGroup("Rating")]
+        [DefaultPropValue("5")]
+        public int MaxLimit { get; set; }
 
         [DefaultPropValue("7")]
         [HideInPropertyGrid]

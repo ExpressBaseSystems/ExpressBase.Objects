@@ -107,6 +107,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         public int EbObjectType { get; set; }
     }
+    public class PublicObjListAllVerRequest : EbServiceStackAuthRequest, IReturn<EbObjectObjListAllVerResponse>
+    {
+        public int EbObjectType { get; set; }
+    }
 
     public class EbObjectObjListAllVerResponse : IEbSSResponse
     {
@@ -137,6 +141,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 3)]
         public Dictionary<int, string> UserGroups { get; set; }
+
+        [DataMember(Order = 6)]
+        public Dictionary<int, string> UserTypes { get; set; }
 
         [DataMember(Order = 4)]
         public string Token { get; set; }
@@ -541,6 +548,21 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
+    public class ChangeObjectAccessRequest : EbServiceStackAuthRequest, IReturn<ChangeObjectAccessResponse>
+    {
+        public int ObjId { get; set; }
+
+        public int Status { get; set; }
+    }
+
+    public class ChangeObjectAccessResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public bool Status { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
     public class DeleteEbObjectRequest : EbServiceStackAuthRequest, IReturn<DeleteObjectResponse>
     {
         public int ObjId { get; set; }
@@ -638,6 +660,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 22)]
         public bool IsLogEnabled { get; set; }
+
+        [DataMember(Order =23)]
+
+        public bool IsPublic { get; set; }
 
         public EbObjectWrapper() { }
     }

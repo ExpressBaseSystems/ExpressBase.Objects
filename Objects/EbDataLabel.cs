@@ -17,7 +17,7 @@ namespace ExpressBase.Objects
     public class EbDataLabel : EbControlUI
     {
 
-        public EbDataLabel() {}
+        public EbDataLabel() { }
 
         [OnDeserialized]
         public void OnDeserializedMethod(StreamingContext context)
@@ -26,7 +26,7 @@ namespace ExpressBase.Objects
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
 
-       
+
 
         public override string UIchangeFns
         {
@@ -147,6 +147,11 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.DashBoard)]
         [PropertyGroup("LabelConfig")]
         public LabelTextPosition TextPosition { get; set; }
+
+        [EnableInBuilder(BuilderType.DashBoard)]
+        [PropertyGroup("LabelConfig")]
+        [PropertyEditor(PropertyEditorType.ShadowEditor)]
+        public string Shadow { get; set; }
 
 
         [EnableInBuilder(BuilderType.DashBoard)]
@@ -307,8 +312,8 @@ namespace ExpressBase.Objects
         [PropertyGroup("Icon")]
         [UIproperty]
         [PropertyEditor(PropertyEditorType.Color)]
-        public string IconColor { get; set; } 
-        
+        public string IconColor { get; set; }
+
         [EnableInBuilder(BuilderType.DashBoard)]
         [PropertyGroup("Icon")]
         [UIproperty]
@@ -330,6 +335,25 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.DashBoard)]
         [PropertyGroup("Icon")]
         public GradientDirection IconDirection { get; set; }
+
+        [EnableInBuilder(BuilderType.DashBoard)]
+        [PropertyGroup("Icon")]
+        [UIproperty]
+        [DefaultPropValue("true")]
+        [OnChangeExec(@"if (this.HideFooter === false ){      
+                        pg.ShowProperty('FooterIcon');     
+                        pg.ShowProperty('FooterIconColor');     
+                        pg.ShowProperty('FooterText');     
+                        pg.ShowProperty('FooterTextColor');    
+                }
+                else {     
+                        pg.HideProperty('FooterIcon');     
+                        pg.HideProperty('FooterIconColor');     
+                        pg.HideProperty('FooterText');     
+                        pg.HideProperty('FooterTextColor');                           
+                }
+            ")]
+        public bool HideFooter { get; set; }
 
         [EnableInBuilder(BuilderType.DashBoard)]
         [PropertyGroup("Icon")]
@@ -362,16 +386,16 @@ namespace ExpressBase.Objects
 
 
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl , BuilderType.DashBoard)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.DashBoard)]
         [HideInPropertyGrid]
         [HideInToolBox]
         public string DynamicLabel { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl , BuilderType.DashBoard)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.DashBoard)]
         [HideInPropertyGrid]
         public string DataObjCtrlName { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl , BuilderType.DashBoard )]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.DashBoard)]
         [HideInPropertyGrid]
         public string DataObjColName { get; set; }
 
@@ -385,11 +409,11 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public string LabelContainer { get; set; }
 
-        public  override bool IsRenderMode { get; set; }
+        public override bool IsRenderMode { get; set; }
 
 
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl , BuilderType.DashBoard)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.ScriptEditorJS)]
         [HelpText("Define default value of the control.")]
         public override EbScript DefaultValueExpression { get; set; }
@@ -438,8 +462,8 @@ namespace ExpressBase.Objects
                .Replace("@Label@", this.Label)
                .Replace("@Description@", this.Description)
                .Replace("@textalign@", this.TextAlign.ToString())
-               .Replace("Right" , "flex-end")
-               .Replace("Left" , "flex-start")
+               .Replace("Right", "flex-end")
+               .Replace("Left", "flex-start")
                .Replace("@PlaceHolder@", string.IsNullOrEmpty(this.DynamicLabel) ? "PlaceHolder" : this.DynamicLabel); ;
             return ReplacePropsInHTML(EbCtrlHTML);
         }
@@ -458,9 +482,9 @@ namespace ExpressBase.Objects
                .Replace("@style@", this.TextAlign.ToString())
                .Replace("Right", "flex-end")
                .Replace("Left", "flex-start")
-               .Replace("@bgColor@" , this.BackColor)
+               .Replace("@bgColor@", this.BackColor)
                .Replace("@forecolor@", this.ForeColor)
-               .Replace("@fontVal@",(this.PlaceHolderFont==null) ? string.Empty : "https://fonts.googleapis.com/css?family=" + GetGoogleFontName(this.PlaceHolderFont.FontName))
+               .Replace("@fontVal@", (this.PlaceHolderFont == null) ? string.Empty : "https://fonts.googleapis.com/css?family=" + GetGoogleFontName(this.PlaceHolderFont.FontName))
                .Replace("@LabelBackColor ", "background-color:" + (LabelBackColor ?? "@LabelBackColor ") + ";");
 
             return ReplacePropsInHTML(EbCtrlHTML);
@@ -469,12 +493,13 @@ namespace ExpressBase.Objects
         public string GetEbFontStyle()
         {
             string fontObj = "";
-            if (PlaceHolderFont != null) { 
+            if (PlaceHolderFont != null)
+            {
                 fontObj = $"font-family : {PlaceHolderFont.FontName} ; font-size : {PlaceHolderFont.Size}px ;" +
                     $"color : {PlaceHolderFont.color};";
-                if (PlaceHolderFont.Caps){ fontObj += "text-transform : line-through ;";}   
-                if (PlaceHolderFont.Strikethrough){ fontObj += "text-decoration : line-through ;"; }   
-                if (PlaceHolderFont.Underline){ fontObj += "text-decoration : underline ;";}
+                if (PlaceHolderFont.Caps) { fontObj += "text-transform : line-through ;"; }
+                if (PlaceHolderFont.Strikethrough) { fontObj += "text-decoration : line-through ;"; }
+                if (PlaceHolderFont.Underline) { fontObj += "text-decoration : underline ;"; }
                 if (PlaceHolderFont.Style == FontStyle.BOLD) { fontObj += "font-weight : bold"; }
                 else if (PlaceHolderFont.Style == FontStyle.ITALIC) { fontObj += "font-style : italic"; }
                 else if (PlaceHolderFont.Style == FontStyle.BOLDITALIC) { fontObj += "font-weight : bold ; font-style : italic ;"; }
@@ -485,7 +510,7 @@ namespace ExpressBase.Objects
         public string GetGoogleFontName(string font)
         {
             Dictionary<string, string> GfontList = new Dictionary<string, string>();
-            GfontList.Add("Arapey" , "Arapey");
+            GfontList.Add("Arapey", "Arapey");
             GfontList.Add("Arvo", "Arvo");
             GfontList.Add("Baskerville", "Libre Baskerville");
             GfontList.Add("Cabin Condensed", "Cabin Condensed");
@@ -508,24 +533,24 @@ namespace ExpressBase.Objects
 
             return GfontList[font];
         }
-           public override string GetValueFromDOMJSfn { get { return @"return this.DynamicLabel"; } set { } }
-           public override string StyleJSFn { get { return @"return $('#cont_' + this.EbSid).find('.ctrl-cover').css(p1, p2);"; } set { } }
-           public override string GetValueJSfn { get { return @"return this.DynamicLabel"; } set { } }
+        public override string GetValueFromDOMJSfn { get { return @"return this.DynamicLabel"; } set { } }
+        public override string StyleJSFn { get { return @"return $('#cont_' + this.EbSid).find('.ctrl-cover').css(p1, p2);"; } set { } }
+        public override string GetValueJSfn { get { return @"return this.DynamicLabel"; } set { } }
     }
     public class LabelAppearance
     {
-       
+
 
     }
     public class GradientLabel
     {
-      
+
     }
     public enum GradientDirection
     {
         to_right = 0,
         to_left = 1,
-        to_bottom= 2,
+        to_bottom = 2,
         to_top = 3,
         to_bottom_right = 4,
         to_bottom_left = 5,
@@ -534,13 +559,13 @@ namespace ExpressBase.Objects
     }
     public enum FlexType
     {
-        row = 0 ,
-        colomn = 1 ,
+        row = 0,
+        colomn = 1,
     }
     public enum LabelTextPosition
     {
-        left =0,
-        center =1,
+        left = 0,
+        center = 1,
         right = 2
     }
 }

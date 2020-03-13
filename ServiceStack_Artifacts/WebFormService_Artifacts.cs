@@ -76,6 +76,15 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 2)]
         public List<Param> Params { get; set; }
+
+        [DataMember(Order = 3)]
+        public User UserObj { get; set; }
+
+        [DataMember(Order = 4)]
+        public int CurrentLoc { get; set; }
+
+        [DataMember(Order = 4)]
+        public WebFormRenderModes RenderMode { get; set; }
     }
 
     [DataContract]

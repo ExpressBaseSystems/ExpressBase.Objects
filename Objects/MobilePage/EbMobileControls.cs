@@ -8,6 +8,7 @@ using ExpressBase.Common.Structures;
 using ExpressBase.Objects.Objects.DVRelated;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace ExpressBase.Objects
@@ -18,6 +19,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.MultiLanguageKeySelector)]
         [UIproperty]
+        [PropertyGroup("Core")]
         public virtual string Label { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
@@ -350,16 +352,24 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.MobilePage)]
     public class EbMobileFileUpload : EbMobileControl
     {
+        public override bool DoNotPersist { get; set; }
+        public override bool Unique { get; set; }
+        public override bool ReadOnly { get; set; }
+
         [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Behavior")]
         public bool EnableCameraSelect { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Behavior")]
         public bool EnableFileSelect { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Behavior")]
         public bool MultiSelect { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Behavior")]
         public bool EnableEdit { set; get; }
 
         public override string GetDesignHtml()
@@ -617,15 +627,87 @@ namespace ExpressBase.Objects
                         </div>".RemoveCR().DoubleQuoted();
         }
 
+        public EbDGColumn GetGridControl(EbMobileControl ctrl, int counter)
+        {
+            EbDGColumn dgColumn = null;
+            switch (ctrl)
+            {
+                case EbMobileTextBox tx:
+                    dgColumn = new EbDGStringColumn();
+                    break;
+                case EbMobileNumericBox txn:
+                    dgColumn = new EbDGNumericColumn();
+                    break;
+                case EbMobileBoolean bl:
+                    dgColumn = new EbDGBooleanColumn();
+                    break;
+                case EbMobileDateTime dt:
+                    dgColumn = new EbDGDateColumn
+                    {
+                        EbDateType = dt.EbDateType
+                    };
+                    break;
+                case EbMobileSimpleSelect ss:
+                    if (string.IsNullOrEmpty(ss.DataSourceRefId))
+                    {
+                        dgColumn = new EbDGSimpleSelectColumn
+                        {
+                            Options = ss.Options.Select(item => new EbSimpleSelectOption
+                            {
+                                EbSid = item.EbSid,
+                                Name = item.Name,
+                                Value = item.Value,
+                                DisplayName = item.DisplayName
+                            }).ToList()
+                        };
+                    }
+                    else
+                    {
+                        dgColumn = new EbDGPowerSelectColumn
+                        {
+                            DataSourceId = ss.DataSourceRefId,
+                            ValueMember = new DVBaseColumn
+                            {
+                                Name = ss.ValueMember.Name,
+                                Type = ss.ValueMember.Type,
+                                sTitle = ss.ValueMember.Name,
+                                Data = ss.ValueMember.ColumnIndex
+                            },
+                            DisplayMember = new DVBaseColumn
+                            {
+                                Name = ss.DisplayMember.Name,
+                                Type = ss.DisplayMember.Type,
+                                sTitle = ss.DisplayMember.Name,
+                                Data = ss.DisplayMember.ColumnIndex
+                            }
+                        };
+                    }
+                    break;
+                default:
+                    dgColumn = new EbDGStringColumn();
+                    break;
+            }
+            dgColumn.Title = ctrl.Label;
+            dgColumn.Name = ctrl.Name;
+            dgColumn.EbSid = ctrl.GetType().Name + counter;
+            return dgColumn;
+        }
+
         public override EbControl GetWebFormCtrl(int counter)
         {
-            return new EbDataGrid
+            EbDataGrid dg = new EbDataGrid
             {
                 EbSid = "DataGrid" + counter,
                 Name = this.Name,
                 Margin = new UISides { Top = 0, Bottom = 0, Left = 0, Right = 0 },
-                Label = this.Label
+                Label = this.Label,
+                TableName = this.TableName
             };
+
+            foreach (EbMobileControl ctrl in this.ChildControls)
+                dg.Controls.Add(this.GetGridControl(ctrl, counter++));
+
+            return dg;
         }
     }
 }
