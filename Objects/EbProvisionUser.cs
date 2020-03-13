@@ -24,7 +24,8 @@ namespace ExpressBase.Objects
     {
         public EbProvisionUser()
         {
-            Fields = new List<UsrLocFieldAbstract>();
+            this.Fields = new List<UsrLocFieldAbstract>();
+            this.UserTypeToRole = new List<EbUserType>();
         }
 
         [OnDeserialized]
@@ -81,6 +82,15 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.CollectionProp, "UserTypeToRole", "bVisible")]
+        [OnChangeExec(@"if (this.UserTypeToRole && this.UserTypeToRole.$values.length === 0 ){
+            $.each(ebcontext.UserTypes, function(i, o){
+                 this.UserTypeToRole.$values.push($.extend(new EbObjects.EbUserType, {iValue: i, sValue: o, name: o, EbSid: 'usrTyp_' + Date.now().toString(36).substring(3) + i}));
+            }.bind(this));            
+        }")]
+        public List<EbUserType> UserTypeToRole { get; set; }
 
         //--------Hide in property grid------------
 
@@ -172,6 +182,7 @@ namespace ExpressBase.Objects
             new NTV (){ Name = "anonymoususerid", Type = EbDbTypes.Int32, Value = DBNull.Value},
 
             new NTV (){ Name = "preference", Type = EbDbTypes.String, Value = "{\"Locale\":\"en-IN\",\"TimeZone\":\"(UTC+05:30) Chennai, Kolkata, Mumbai, New Delhi\"}"},
+            new NTV (){ Name = "usertype", Type = EbDbTypes.Int32, Value = 1},
             new NTV (){ Name = "consadd", Type = EbDbTypes.String, Value = string.Empty},
             new NTV (){ Name = "consdel", Type = EbDbTypes.String, Value = string.Empty}
         };
@@ -191,7 +202,7 @@ this.Init = function(id)
 	this.Fields.$values.push(new EbObjects.UsrLocField('sex'));
 	this.Fields.$values.push(new EbObjects.UsrLocField('alternateemail'));
 	this.Fields.$values.push(new EbObjects.UsrLocField('phprimary'));
-	this.Fields.$values.push(new EbObjects.UsrLocField('roles'));
+	this.Fields.$values.push(new EbObjects.UsrLocField('usertype'));
 	this.Fields.$values.push(new EbObjects.UsrLocField('groups'));
 	this.Fields.$values.push(new EbObjects.UsrLocField('preference'));
 	//this.Fields.$values.push(new EbObjects.UsrLocField('consadd'));
@@ -246,7 +257,7 @@ this.Init = function(id)
         public string GetSelectQuery(string masterTbl)
         {
             //if multiple user ctrl placed in form then one select query is enough // imp
-            return $@"SELECT u.id, u.fullname, u.nickname, u.dob, u.sex, u.alternateemail, u.phnoprimary AS phprimary, u.preferencesjson AS preference,
+            return $@"SELECT u.id, u.email, u.fullname, u.nickname, u.dob, u.sex, u.alternateemail, u.phnoprimary AS phprimary, u.preferencesjson AS preference, eb_user_types_id AS usertype, u.statusid,
                             STRING_AGG(r2u.role_id::TEXT, ',') AS roles, STRING_AGG(g2u.groupid::TEXT, ',') AS usergroups
                         FROM eb_users u LEFT JOIN eb_role2user r2u ON u.id = r2u.user_id LEFT JOIN eb_user2usergroup g2u ON u.id = g2u.userid
                         WHERE eb_ver_id = @{masterTbl}_eb_ver_id AND eb_data_id = @{masterTbl}_id GROUP BY u.id";
@@ -286,14 +297,37 @@ this.Init = function(id)
                     Pwd = this.GetRandomPwd(),
                     Name = _d.ContainsKey("fullname") ? _d["fullname"] : _d["email"]
                 };
-
                 _d.Add("pwd", (this.UserCredentials.Pwd + this.UserCredentials.Email).ToMD5Hash());
+
+                int u_type = Convert.ToInt32(_d["usertype"]);
+                EbUserType ebTyp = this.UserTypeToRole.Find(e => e.iValue == u_type && e.bVisible);
+                if (ebTyp != null && ebTyp.ApprovalRequired)
+                {
+                    _d["statusid"] = ((int)EbUserStatus.Unapproved).ToString();
+                }
             }
             else
             {
                 Dictionary<string, string> _od = JsonConvert.DeserializeObject<Dictionary<string, string>>(ocF.Value);
                 _d["id"] = _od["id"];
                 _d["email"] = _od["email"];
+                _d["usertype"] = _od["usertype"];
+                int oldStatus = Convert.ToInt32(_od["statusid"]);
+                _d["statusid"] = Convert.ToString(oldStatus + 100);
+
+                if (oldStatus == (int)EbUserStatus.Unapproved)
+                {
+                    if (usr.Roles.Contains(SystemRoles.SolutionOwner.ToString()) || usr.Roles.Contains(SystemRoles.SolutionAdmin.ToString()))
+                    {
+                        int u_type = Convert.ToInt32(_od["usertype"]);
+                        EbUserType ebTyp = this.UserTypeToRole.Find(e => e.iValue == u_type && e.bVisible);
+                        if (ebTyp != null && ebTyp.Roles != null && ebTyp.Roles.Count > 0)
+                        {
+                            _d["roles"] = string.Join(',', ebTyp.Roles);
+                            _d["statusid"] = ((int)EbUserStatus.Active).ToString();
+                        }
+                    }
+                }
             }
             for(int k = 0; k < this.FuncParam.Length; k++, i++)
             {
@@ -500,11 +534,7 @@ this.Init = function(id)
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
         public bool IsRequired { get; set; }
-
-        //[EnableInBuilder(BuilderType.WebForm)]
-        //[HideInPropertyGrid]
-        //public EbDbTypes EbDbType { get; set; }
-
+        
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
         public string Type { get; set; }
@@ -512,5 +542,44 @@ this.Init = function(id)
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
         public EbControl Control { get; set; }
+    }
+
+    [UsedWithTopObjectParent(typeof(EbObject))]
+    [EnableInBuilder(BuilderType.WebForm)]
+    [Alias("ControlField")]
+    public class EbUserType
+    {
+        public EbUserType() { }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        [JsonProperty(PropertyName = "name")]
+        public string Name { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public string EbSid { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public int iValue { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public string sValue { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public bool bVisible { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [Unique]
+        [PropDataSourceJsFn("return ebcontext.Roles")]
+        [PropertyEditor(PropertyEditorType.DropDown, true)]
+        public List<Int32> Roles { get; set; }
+        
+        [EnableInBuilder(BuilderType.WebForm)]
+        public bool ApprovalRequired { get; set; }
+
     }
 }

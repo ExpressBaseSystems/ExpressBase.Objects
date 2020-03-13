@@ -1080,10 +1080,13 @@ namespace ExpressBase.Objects
                         if (UserTable.Count > mngUsrCount)
                         {
                             _d.Add(FormConstants.id, UserTable[mngUsrCount][FormConstants.id]);
+                            _d.Add("statusid", UserTable[mngUsrCount]["statusid"]);
                             foreach (UsrLocField _f in (Ctrl as EbProvisionUser).PersistingFields)
                             {
                                 _d.Add(_f.Name, UserTable[mngUsrCount][_f.Name]);
                             }
+                            if (!_d.ContainsKey("usertype"))
+                                _d.Add("usertype", UserTable[mngUsrCount]["usertype"]);
                             mngUsrCount++;
                         }
                         _FormData.MultipleTables[(Ctrl as EbProvisionUser).VirtualTable][0][Ctrl.Name] = JsonConvert.SerializeObject(_d);
