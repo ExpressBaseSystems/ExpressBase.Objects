@@ -53,7 +53,7 @@ namespace ExpressBase.Objects.Objects
 
 
 			var htmlstring = "";
-			for (var i = 1; i<= this.MaxVal; i--)
+			for (var i = this.MaxVal; i> 0; i--)
 			{
 				htmlstring += @"<input type='radio' name='@ebsid@' value='@valuei@' id='@ebsid@ratingID@valuei@' class='rtngStarInpt'> 
 								<label for='@ebsid@ratingID@valuei@' class='ratingLbl'>
