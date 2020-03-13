@@ -24,7 +24,8 @@ namespace ExpressBase.Objects
         //test_role = 3
     }
 
-    [EnableInBuilder(BuilderType.WebForm)]
+    //[EnableInBuilder(BuilderType.WebForm)]
+    [HideInToolBox]
     public class EbApproval : EbControlContainer, IEbSpecialContainer
     {
         public EbApproval()
