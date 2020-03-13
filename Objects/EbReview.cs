@@ -115,76 +115,69 @@ namespace ExpressBase.Objects
         {
             string html = @"
 <div id='cont_@ebsid@' class='fs-grid-cont' style='height:@_height@px;'>
-    <table id='tbl_@ebsid@' class='table table-bordered fs-tbl'>
-        <thead>
-            <tr>
-            <th class='slno' style='width:50px'><span class='grid-col-title'>SL No</span></th>
-            <th class='grid-col-title'><span class='grid-col-title'>Stage</span></th>
-            <th style='display: none;' class='grid-col-title'><span class='grid-col-title'>Approver Role</span></th>
-            <th style='width:100px;'><span class='grid-col-title'> Status</span></th>
-            <th class='grid-col-title'><span class='grid-col-title'>Reviewed by/At</span></th>
-            <th class='grid-col-title'><span class='grid-col-title'>Remarks</span></th>
-            ".Replace("@_height@", (this.Height + 74).ToString());
-            //foreach (EbFormStage FormStage in FormStages)
-            //{
-            //    if (!FormStage.Hidden)
-            //        html += string.Concat("<th style='width: @Width@; @bg@' @type@ title='", FormStage.Title, "'><span class='grid-col-title'>", FormStage.Title, "</span>@req@</th>")
-            //            .Replace("@req@", (FormStage.Required ? "<sup style='color: red'>*</sup>" : string.Empty))
-            //            .Replace("@Width@", (FormStage.Width <= 0) ? "auto" : FormStage.Width.ToString() + "%")
-            //            .Replace("@type@", "type = '" + FormStage.ObjType + "'")
-            //            .Replace("@bg@", FormStage.IsDisable ? "background-color:#fafafa; color:#555" : string.Empty);
-            //}
-
+    <div class='rc-tbl-thead-cont'>
+        <table class='table table-bordered fs-tblhead'>
+            <thead>
+                <tr>
+                <th class='slno rc-slno' style='width:50px'><span class='grid-col-title'>SL No</span></th>
+                <th class='grid-col-title rc-stage'><span class='grid-col-title'>Stage</span></th>
+                <th class='grid-col-title rc-status'><span class='grid-col-title'> Status</span></th>
+                <th class='grid-col-title rc-by'><span class='grid-col-title'>Reviewed by/At</span></th>
+                <th class='grid-col-title rc-remarks'><span class='grid-col-title'>Remarks</span></th>
+                ".Replace("@_height@", (this.Height + 74).ToString());
             html += @"
-            </tr>
-        </thead>";
+                </tr>
+            </thead>
+        </table>
+    </div>
+    <div class='rc-tbl-tbody-cont'>
+        <table id='tbl_@ebsid@' class='table table-bordered fs-tbl'>
+            <tbody>";
+                List<EbReviewStage> _FormStages = JsonConvert.DeserializeObject<List<EbReviewStage>>(JsonConvert.SerializeObject(FormStages));
+                //_FormStages.Reverse();
+                int i = 0;
+                string FormStageTrHtml = string.Empty;
 
-            html += @"
-        <tbody>";
-            List<EbReviewStage> _FormStages = JsonConvert.DeserializeObject<List<EbReviewStage>>(JsonConvert.SerializeObject(FormStages));
-            //_FormStages.Reverse();
-            int i = 0;
-            string FormStageTrHtml = string.Empty;
+                foreach (EbReviewStage FormStage in _FormStages)
+                {
+                    EbReviewStage _FormStage = (FormStage as EbReviewStage);
+                    EbReviewStage _FormStage_RS = (FormStages[i++] as EbReviewStage);
 
-            foreach (EbReviewStage FormStage in _FormStages)
-            {
-                EbReviewStage _FormStage = (FormStage as EbReviewStage);
-                EbReviewStage _FormStage_RS = (FormStages[i++] as EbReviewStage);
+                    string _html = string.Concat(@"
+                <tr name='", _FormStage.Name, "' stage-ebsid='", _FormStage.EbSid, "' rowid='@rowid@' style ='@bg@'>",
+                        "<td class='row-no-td rc-slno'>@slno@</td>",
+                        "<td class='row-no-td rc-stage' col='stage'><span class='fstd-div'>", _FormStage.Name, "</span></td>",
+                        @"<td class='row-no-td rc-status' col='status' class='fs-ctrl-td'><div class='fstd-div'>", @"
+                        <select class='selectpicker'>");
 
-                string _html = string.Concat(@"
-            <tr name='", _FormStage.Name, "' stage-ebsid='", _FormStage.EbSid, "' rowid='@rowid@' style ='@bg@'>",
-                    "<td class='row-no-td'>@slno@</td>",
-                    "<td col='stage'><span class='fstd-div'>", _FormStage.Name, "</span></td>",
-                    @"<td col='status' class='fs-ctrl-td'><div class='fstd-div'>", @"
-                    <select class='selectpicker'>");
-
-                foreach (EbReviewAction stageAction in _FormStage_RS.StageActions) {
-                    string stageActionName = stageAction.Name;
-                    _html += ("<option value='"+ stageAction.EbSid + "'>"+ stageAction.Name + "</option>");
-                }
-                _html += @"
-                    </select></div>
-                </td>
-                <td col='review-dtls' class='fs-ctrl-td'>
-                    <div class='fstd-div'>
-                        <div class='fs-user-cont'>
-                            <div class='fs-dp' @dpstyle@></div>
-                            <div class='fs-udtls-cont'>
-                                <span class='fs-uname'> @uname@ </span>
-                                <span class='fs-time'> @time@ </span>
+                    foreach (EbReviewAction stageAction in _FormStage_RS.StageActions) {
+                        string stageActionName = stageAction.Name;
+                        _html += ("<option value='"+ stageAction.EbSid + "'>"+ stageAction.Name + "</option>");
+                    }
+                    _html += @"
+                        </select></div>
+                    </td>
+                    <td class='fs-ctrl-td rc-by' col='review-dtls'>
+                        <div class='fstd-div'>
+                            <div class='fs-user-cont'>
+                                <div class='fs-dp' @dpstyle@></div>
+                                <div class='fs-udtls-cont'>
+                                    <span class='fs-uname'> @uname@ </span>
+                                    <span class='fs-time'> @time@ </span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </td>
-                <td col='remarks' class='fs-ctrl-td'><div class='fstd-div'> <textarea class='fs-textarea'>@comment@</textarea> </div></td>
-            </tr>";
+                    </td>
+                    <td class='fs-ctrl-td rc-remarks' col='remarks'><div class='fstd-div'> <textarea class='fs-textarea'>@comment@</textarea> </div></td>
+                </tr>";
 
-                _FormStage_RS.Html = _html;
-            }
+                    _FormStage_RS.Html = _html;
+                }
 
-            html += @"
-        </tbody>
-    </table>
+                html += @"
+            </tbody>
+        </table>
+    </div>
     <div class='fs-submit-cont'><button class='btn btn-success fs-submit'>Execute Review <i class='fa fa-check-square-o' aria-hidden='true'></i></button></div>
 </div>";
 
