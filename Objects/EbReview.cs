@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Linq;
+using ExpressBase.Common.Constants;
 
 namespace ExpressBase.Objects
 {
@@ -20,7 +21,7 @@ namespace ExpressBase.Objects
     {
         public EbReview()
         {
-            FormStages = new List<ReviewStageAbstract>();
+            FormStages = new List<EbReviewStage>();
             Controls = new List<EbControl>();
             this.OnApprovalRoutines = new List<EbRoutines>();
         }
@@ -35,12 +36,15 @@ namespace ExpressBase.Objects
                 new EbDGStringColumn() { Name = "action_unique_id", EbDbType = EbDbTypes.String, Label = "Action"},
                 new EbDGNumericColumn() { Name = "eb_my_actions_id", EbDbType = EbDbTypes.Decimal, Label = "My_Action_Id"},
                 new EbDGStringColumn() { Name = "comments", EbDbType = EbDbTypes.String, Label = "Comments"},
-                new EbDGDateColumn() { Name = "eb_created_at", EbDbType = EbDbTypes.DateTime, DoNotPersist = true, IsSysControl = true},
-                new EbDGStringColumn() { Name = "eb_created_by", EbDbType = EbDbTypes.String, DoNotPersist = true, IsSysControl = true},
-                //new EbDGStringColumn() { Name = "approver_role", EbDbType = EbDbTypes.String, Label = "Approver Role"}
+                new EbDGDateColumn() { Name = "eb_created_at", EbDbType = EbDbTypes.DateTime, EbDateType = EbDateType.DateTime, DoNotPersist = true, IsSysControl = true},
+                new EbDGCreatedByColumn() { Name = "eb_created_by", EbDbType = EbDbTypes.Decimal, DoNotPersist = true, IsSysControl = true}//,
+                //new EbDGStringColumn() { Name = "eb_created_by_s", EbDbType = EbDbTypes.String, DoNotPersist = true}
             };
         }
 
+        //C# script variable
+        public string ReviewStatus { get; set; }
+        
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [HideInPropertyGrid]
         public override bool IsSpecialContainer { get { return true; } set { } }
@@ -49,6 +53,8 @@ namespace ExpressBase.Objects
         public override UISides Padding { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.Label)]
+        [ReservedValues()]
         public override string Name { get; set; }
 
         [PropertyGroup("Events")]
@@ -78,9 +84,9 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.Collection)]
         [PropertyGroup("Behavior")]
         [Alias("Approval stages")]
-        [ListType(typeof(ReviewStageAbstract))]
+        [ListType(typeof(EbReviewStage))]
         [PropertyPriority(99)]
-        public List<ReviewStageAbstract> FormStages { get; set; }
+        public List<EbReviewStage> FormStages { get; set; }
 
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.WebForm)]
@@ -107,10 +113,9 @@ namespace ExpressBase.Objects
 
         public override string GetBareHtml()
         {
-            int SlNo = 1;
             string html = @"
-<div id='cont_@ebsid@' class='fs-grid-cont'>
-    <table id='tbl_@ebsid@' class='table table-bordered fs-tbl' style='height:@_height@px;'>
+<div id='cont_@ebsid@' class='fs-grid-cont' style='height:@_height@px;'>
+    <table id='tbl_@ebsid@' class='table table-bordered fs-tbl'>
         <thead>
             <tr>
             <th class='slno' style='width:50px'><span class='grid-col-title'>SL No</span></th>
@@ -119,7 +124,7 @@ namespace ExpressBase.Objects
             <th style='width:100px;'><span class='grid-col-title'> Status</span></th>
             <th class='grid-col-title'><span class='grid-col-title'>Reviewed by/At</span></th>
             <th class='grid-col-title'><span class='grid-col-title'>Remarks</span></th>
-            ".Replace("@_height@", this.Height.ToString());
+            ".Replace("@_height@", (this.Height + 74).ToString());
             //foreach (EbFormStage FormStage in FormStages)
             //{
             //    if (!FormStage.Hidden)
@@ -136,21 +141,20 @@ namespace ExpressBase.Objects
 
             html += @"
         <tbody>";
-            List<EbFormStage> _FormStages = JsonConvert.DeserializeObject<List<EbFormStage>>(JsonConvert.SerializeObject(FormStages));
-            _FormStages.Reverse();
+            List<EbReviewStage> _FormStages = JsonConvert.DeserializeObject<List<EbReviewStage>>(JsonConvert.SerializeObject(FormStages));
+            //_FormStages.Reverse();
             int i = 0;
             string FormStageTrHtml = string.Empty;
 
-            foreach (ApprovalStageAbstract FormStage in _FormStages)
+            foreach (EbReviewStage FormStage in _FormStages)
             {
-                EbFormStage _FormStage = (FormStage as EbFormStage);
+                EbReviewStage _FormStage = (FormStage as EbReviewStage);
                 EbReviewStage _FormStage_RS = (FormStages[i++] as EbReviewStage);
 
                 string _html = string.Concat(@"
-            <tr name='", _FormStage.Name, "' stage-ebsid='", _FormStage.EbSid, "' role='", _FormStage.ApproverRole.ToString(), "' style ='@bg@'>",
-                    "<td class='row-no-td'>", SlNo++, "</td>",
+            <tr name='", _FormStage.Name, "' stage-ebsid='", _FormStage.EbSid, "' rowid='@rowid@' style ='@bg@'>",
+                    "<td class='row-no-td'>@slno@</td>",
                     "<td col='stage'><span class='fstd-div'>", _FormStage.Name, "</span></td>",
-                    "<td style='display: none;'><span class='fstd-div'>", _FormStage.ApproverRole.ToString().Replace("_", " "), "</span></td>",
                     @"<td col='status' class='fs-ctrl-td'><div class='fstd-div'>", @"
                     <select class='selectpicker'>");
 
@@ -164,15 +168,15 @@ namespace ExpressBase.Objects
                 <td col='review-dtls' class='fs-ctrl-td'>
                     <div class='fstd-div'>
                         <div class='fs-user-cont'>
-                            <div class='fs-dp'></div>
+                            <div class='fs-dp' @dpstyle@></div>
                             <div class='fs-udtls-cont'>
-                                <span class='fs-uname'>-----</span>
-                                <span class='fs-time'>-----</span>
+                                <span class='fs-uname'> @uname@ </span>
+                                <span class='fs-time'> @time@ </span>
                             </div>
                         </div>
                     </div>
                 </td>
-                <td col='remarks' class='fs-ctrl-td'><div class='fstd-div'> <textarea class='fs-textarea'></textarea> </div></td>
+                <td col='remarks' class='fs-ctrl-td'><div class='fstd-div'> <textarea class='fs-textarea'>@comment@</textarea> </div></td>
             </tr>";
 
                 _FormStage_RS.Html = _html;
@@ -233,6 +237,7 @@ namespace ExpressBase.Objects
         public string EbSid { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
         public string Html { get; set; }
 
         public EbReviewStage() { }
@@ -245,27 +250,33 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         [OnChangeExec(@"
 if(this.ApproverEntity === 1){
-    pg.MakeReadWrite('ApproverRole');
+    pg.MakeReadWrite('ApproverRoles');
     pg.MakeReadOnly('ApproverUserGroup');
     pg.MakeReadOnly('ApproverUsers');
 }
 else if(this.ApproverEntity === 2){
-    pg.MakeReadOnly('ApproverRole');
+    pg.MakeReadOnly('ApproverRoles');
     pg.MakeReadWrite('ApproverUserGroup');
     pg.MakeReadOnly('ApproverUsers');
 }
 else if(this.ApproverEntity === 3){
-    pg.MakeReadOnly('ApproverRole');
+    pg.MakeReadOnly('ApproverRoles');
     pg.MakeReadOnly('ApproverUserGroup');
     pg.MakeReadWrite('ApproverUsers');
 }")]
         public ApproverEntityTypes ApproverEntity { get; set; }
 
+        //[EnableInBuilder(BuilderType.WebForm)]
+        //[Unique]
+        //[PropDataSourceJsFn("return ebcontext.Roles")]
+        //[PropertyEditor(PropertyEditorType.DropDown)]
+        //public int ApproverRole { get; set; }
+
         [EnableInBuilder(BuilderType.WebForm)]
         [Unique]
         [PropDataSourceJsFn("return ebcontext.Roles")]
-        [PropertyEditor(PropertyEditorType.DropDown)]
-        public int ApproverRole { get; set; }
+        [PropertyEditor(PropertyEditorType.DropDown, true)]
+        public List<Int32> ApproverRoles { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
         [PropDataSourceJsFn("return ebcontext.UserGroups")]
@@ -278,8 +289,8 @@ else if(this.ApproverEntity === 3){
 
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.Collection)]
-        [ListType(typeof(ReviewActionAbstract))]
-        public List<ReviewActionAbstract> StageActions { get; set; }
+        [ListType(typeof(EbReviewAction))]
+        public List<EbReviewAction> StageActions { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.ScriptEditorCS)]

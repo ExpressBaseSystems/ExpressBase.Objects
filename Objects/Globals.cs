@@ -390,11 +390,11 @@ namespace ExpressBase.Objects.Objects
             else if (ntv.Type == EbDbTypes.Decimal)
                 result = Convert.ToDecimal(ntv.Value);
             else if (ntv.Type == EbDbTypes.String)
-                result = (ntv.Value).ToString();
+                result = Convert.ToString(ntv.Value);
             else if (ntv.Type == EbDbTypes.DateTime)
                 result = Convert.ToDateTime(ntv.Value);
             else
-                result = ntv.Value.ToString();
+                result = Convert.ToString(ntv.Value);
             return result;
         }
     }

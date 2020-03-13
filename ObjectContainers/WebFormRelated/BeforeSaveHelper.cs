@@ -201,7 +201,7 @@ namespace ExpressBase.Objects.WebFormRelated
 
             for (int i = 0; i < CalcFlds.Count; i++)
             {
-                string code = _dict[CalcFlds[i]].Control.ValueExpr.Code.ToLower();
+                string code = _dict[CalcFlds[i]].Control.ValueExpr.Code;
                 if (_dict[CalcFlds[i]].Control.ValueExpr.Lang == ScriptingLanguage.JS)
                 {
                     //MatchCollection matchColl = Regex.Matches(code, $@"(form.(\w+.currentrow\[""\w + ""\]|\w+.currentrow\['\w+'\]|\w+.currentrow.\w+|\w+))"); 
@@ -213,7 +213,7 @@ namespace ExpressBase.Objects.WebFormRelated
                         {
                             string p = _dict[j].Path, r = _dict[j].Root, n = _dict[j].Control.Name;
                             //string regex = $@"{r}.currentrow\[""{n}""\]|{r}.currentrow\['{n}'\]|{r}.currentrow.{n}|{r}.getrowbyindex\(\w+\)\[""{n}""\]|{r}.getrowbyindex\(\w+\)|{p}";
-                            string regex = $@"{r}.currentrow\[""{n}""\]|{r}.currentrow\['{n}'\]|{r}.currentrow.{n}|{r}.getrowbyindex\(\w+\)\[""{n}""\]|{p}";
+                            string regex = $@"{r}.currentRow\[""{n}""\]|{r}.currentRow\['{n}'\]|{r}.currentRow.{n}|{r}.getRowByIndex\(\w+\)\[""{n}""\]|{r}.getRowByIndex\(\w+\)\['{n}'\]|{r}.RowCount|{p}";
 
                             if (Regex.IsMatch(code, regex))
                             {

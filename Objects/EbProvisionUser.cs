@@ -245,9 +245,11 @@ this.Init = function(id)
 
         public string GetSelectQuery(string masterTbl)
         {
-            string cols = string.Join(",", this.PersistingFields.Select(f => (f as UsrLocField).Name));
-            return string.Format("SELECT id,{0} FROM eb_users WHERE eb_ver_id = :{1}_eb_ver_id AND eb_data_id = :{1}_id ORDER BY id;", cols, masterTbl);
             //if multiple user ctrl placed in form then one select query is enough // imp
+            return $@"SELECT u.id, u.fullname, u.nickname, u.dob, u.sex, u.alternateemail, u.phnoprimary AS phprimary, u.preferencesjson AS preference,
+                            STRING_AGG(r2u.role_id::TEXT, ',') AS roles, STRING_AGG(g2u.groupid::TEXT, ',') AS usergroups
+                        FROM eb_users u LEFT JOIN eb_role2user r2u ON u.id = r2u.user_id LEFT JOIN eb_user2usergroup g2u ON u.id = g2u.userid
+                        WHERE eb_ver_id = @{masterTbl}_eb_ver_id AND eb_data_id = @{masterTbl}_id GROUP BY u.id";
         }
 
         private string GetSaveQuery(bool ins, string param, string mtbl, string pemail)
@@ -421,7 +423,7 @@ this.Init = function(id)
                     this._finalObj = {};
                 $.each(this.Fields.$values, function (i, obj) {
                     if (obj.ControlName !== '') {
-                        this._finalObj[obj.Name] = obj.Control.getValue();
+                        this._finalObj[obj.Name] = obj.Control.getValueFromDOM();
                     }            
                 }.bind(this));
                 return JSON.stringify(this._finalObj);";
