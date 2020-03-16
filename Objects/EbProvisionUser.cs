@@ -159,15 +159,15 @@ namespace ExpressBase.Objects
         public NTV[] FuncParam = {
             //new NTV (){ Name = "userid", Type = EbDbTypes.Int32, Value = DBNull.Value},//eb_createdby
             new NTV (){ Name = "id", Type = EbDbTypes.Int32, Value = 0},
-            new NTV (){ Name = "fullname", Type = EbDbTypes.String, Value = DBNull.Value},
-            new NTV (){ Name = "nickname", Type = EbDbTypes.String, Value = DBNull.Value},
-            new NTV (){ Name = "email", Type = EbDbTypes.String, Value = DBNull.Value},
+            new NTV (){ Name = "fullname", Type = EbDbTypes.String, Value = DBNull.Value},/////
+            new NTV (){ Name = "nickname", Type = EbDbTypes.String, Value = DBNull.Value},/////
+            new NTV (){ Name = "email", Type = EbDbTypes.String, Value = DBNull.Value},//////
 
             new NTV (){ Name = "pwd", Type = EbDbTypes.String, Value = DBNull.Value},
-            new NTV (){ Name = "dob", Type = EbDbTypes.Date, Value = DBNull.Value},
-            new NTV (){ Name = "sex", Type = EbDbTypes.String, Value = DBNull.Value},
-            new NTV (){ Name = "alternateemail", Type = EbDbTypes.String, Value = DBNull.Value},
-            new NTV (){ Name = "phprimary", Type = EbDbTypes.String, Value = DBNull.Value},
+            new NTV (){ Name = "dob", Type = EbDbTypes.Date, Value = DBNull.Value},//////
+            new NTV (){ Name = "sex", Type = EbDbTypes.String, Value = DBNull.Value},/////
+            new NTV (){ Name = "alternateemail", Type = EbDbTypes.String, Value = DBNull.Value},///////
+            new NTV (){ Name = "phprimary", Type = EbDbTypes.String, Value = DBNull.Value},/////
 
             new NTV (){ Name = "phsecondary", Type = EbDbTypes.String, Value = DBNull.Value},
             new NTV (){ Name = "phlandphone", Type = EbDbTypes.String, Value = DBNull.Value},
@@ -176,13 +176,13 @@ namespace ExpressBase.Objects
             new NTV (){ Name = "fbname", Type = EbDbTypes.String, Value = DBNull.Value},
 
             new NTV (){ Name = "roles", Type = EbDbTypes.String, Value = DBNull.Value},
-            new NTV (){ Name = "groups", Type = EbDbTypes.String, Value = DBNull.Value},
+            new NTV (){ Name = "groups", Type = EbDbTypes.String, Value = DBNull.Value},//////
             new NTV (){ Name = "statusid", Type = EbDbTypes.Int32, Value = 0},
             new NTV (){ Name = "hide", Type = EbDbTypes.String, Value = "no"},
             new NTV (){ Name = "anonymoususerid", Type = EbDbTypes.Int32, Value = DBNull.Value},
 
-            new NTV (){ Name = "preference", Type = EbDbTypes.String, Value = "{\"Locale\":\"en-IN\",\"TimeZone\":\"(UTC+05:30) Chennai, Kolkata, Mumbai, New Delhi\"}"},
-            new NTV (){ Name = "usertype", Type = EbDbTypes.Int32, Value = 1},
+            new NTV (){ Name = "preference", Type = EbDbTypes.String, Value = "{\"Locale\":\"en-IN\",\"TimeZone\":\"(UTC+05:30) Chennai, Kolkata, Mumbai, New Delhi\"}"},/////
+            new NTV (){ Name = "usertype", Type = EbDbTypes.Int32, Value = 1},//////
             new NTV (){ Name = "consadd", Type = EbDbTypes.String, Value = string.Empty},
             new NTV (){ Name = "consdel", Type = EbDbTypes.String, Value = string.Empty}
         };
@@ -301,9 +301,12 @@ this.Init = function(id)
 
                 int u_type = Convert.ToInt32(_d["usertype"]);
                 EbUserType ebTyp = this.UserTypeToRole.Find(e => e.iValue == u_type && e.bVisible);
-                if (ebTyp != null && ebTyp.ApprovalRequired)
+                if (ebTyp != null)
                 {
-                    _d["statusid"] = ((int)EbUserStatus.Unapproved).ToString();
+                    if (ebTyp.ApprovalRequired)
+                        _d["statusid"] = ((int)EbUserStatus.Unapproved).ToString();
+                    else if (ebTyp.Roles != null && ebTyp.Roles.Count > 0)
+                        _d["roles"] = string.Join(',', ebTyp.Roles);
                 }
             }
             else
@@ -327,6 +330,12 @@ this.Init = function(id)
                             _d["statusid"] = ((int)EbUserStatus.Active).ToString();
                         }
                     }
+                }
+
+                foreach (KeyValuePair<string, string> item in _od)
+                {
+                    if (!_d.ContainsKey(item.Key))
+                        _d[item.Key] = item.Value;
                 }
             }
             for(int k = 0; k < this.FuncParam.Length; k++, i++)

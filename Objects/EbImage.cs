@@ -50,7 +50,8 @@ namespace ExpressBase.Objects
         public int MaxHeight { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
-        [OnChangeUIFunction("EbImage.adjustMaxWidth")] 
+        [OnChangeUIFunction("EbImage.adjustMaxWidth")]
+        [DefaultPropValue("200")]
         public int MaxWidth { get; set; }
 
         public override string UIchangeFns
