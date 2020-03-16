@@ -303,7 +303,11 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.DashBoard)]
         [HideInPropertyGrid]
-        public List<EbControl> LabelColl { get; set; }
+        public List<EbControl> LabelColl { get; set; } 
+        
+        [EnableInBuilder(BuilderType.DashBoard)]
+        [HideInPropertyGrid]
+        public List<EbLinks> LinksColl { get; set; }
 
         public Tiles()
         {
