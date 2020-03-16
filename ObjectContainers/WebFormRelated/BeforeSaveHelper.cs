@@ -86,10 +86,12 @@ namespace ExpressBase.Objects.WebFormRelated
             GetControlsAsDict(_this, "form", _dict);
             CalcValueExprDependency(_this, _dict);
 
+            //review ctrl related
             if (ebReviewCtrl != null)
             {
-                foreach (EbReviewStage stage in ebReviewCtrl.FormStages)
+                for (int i = 0; i < ebReviewCtrl.FormStages.Count; i++)
                 {
+                    EbReviewStage stage = ebReviewCtrl.FormStages[i];
                     if (stage.ApproverEntity == ApproverEntityTypes.Users)
                     {
                         Dictionary<string, string> QryParms = new Dictionary<string, string>();//<param, table>
@@ -107,10 +109,47 @@ namespace ExpressBase.Objects.WebFormRelated
                         }
                         stage.QryParams = QryParms;
                     }
+                    else if (stage.ApproverEntity == ApproverEntityTypes.UserGroup)
+                    {
+                        if (stage.ApproverUserGroup <= 0)
+                            throw new FormException($"Required a usergroup for stage {stage.Name} of {ebReviewCtrl.Name}(review) control");
+                    }
+                    else if (stage.ApproverEntity == ApproverEntityTypes.Role)
+                    {
+                        if (stage.ApproverRoles == null || stage.ApproverRoles?.FindAll(e => e > 0).Count() == 0)
+                            throw new FormException($"Required roles for stage {stage.Name} of {ebReviewCtrl.Name}(review) control");
+                    }
+
+                    if (stage.IsAdvanced)
+                    {
+                        //if (stage.StageActions == null || stage.StageActions?.Count == 0)
+                        //    throw new FormException($"Required actions for stage {stage.Name} of {ebReviewCtrl.Name}(review) control");
+                        //if (stage.NextStage == null || string.IsNullOrEmpty(stage.NextStage.Code))
+                        //    throw new FormException($"Required next stage script for stage {stage.Name} of {ebReviewCtrl.Name}(review) control");
+                    }
+                    else
+                    {
+                        stage.StageActions = new List<EbReviewAction>() {
+                            new EbReviewAction(){ EbSid = stage.Name + "_ebreviewaction1", Name = "Hold"},
+                            new EbReviewAction(){ EbSid = stage.Name + "_ebreviewaction2", Name = "Accept"},
+                            new EbReviewAction(){ EbSid = stage.Name + "_ebreviewaction3", Name = "Reject"}
+                        };
+                        string nxtStage = ebReviewCtrl.FormStages.Count == i + 1 ? "form.review.complete()" : $@"return ""{ebReviewCtrl.FormStages[i + 1].Name}""";
+
+                        string code = $@"
+if (form.review.currentStage.currentAction.name == ""Hold"")
+    return ""{stage.Name}"";
+if (form.review.currentStage.currentAction.name == ""Accept"")
+    {nxtStage};
+if (form.review.currentStage.currentAction.name == ""Reject"")
+    form.review.abandon();
+";
+                        stage.NextStage = new EbScript() { Lang = ScriptingLanguage.CSharp, Code = code };
+                    }
                 }
             }
         }
-        
+
         private static void PerformRequirdUpdate(EbControlContainer _cont, string _tbl)
         {
             if (_cont is EbDataGrid && _cont.IsDynamicTabChild)
@@ -325,7 +364,7 @@ namespace ExpressBase.Objects.WebFormRelated
             IEnumerable<EbControl> FlatCtrls = _container.Controls.Get1stLvlControls();
             foreach (EbControl control in FlatCtrls)
             {
-                string path = _path == string.Empty ? control.Name : _path + CharConstants.DOT  + control.Name;
+                string path = _path == string.Empty ? control.Name : _path + CharConstants.DOT + control.Name;
                 control.__path = path;
                 _dict.Add(_counter++, new EbControlWrapper
                 {
