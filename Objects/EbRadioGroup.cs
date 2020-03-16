@@ -255,7 +255,6 @@ this.Init = function(id)
         }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [OnChangeUIFunction("EbTextBox.Label")]
         [Alias("Option Text")]
         [PropertyGroup(PGConstants.CORE)]
         public override string Label { get; set; }

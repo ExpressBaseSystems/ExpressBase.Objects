@@ -266,7 +266,7 @@ namespace ExpressBase.Objects
                             }
                             else
                             {
-                                Row.Columns.Add(this.FormData.DGsRowDataModel[_sc.TableName][_column.ColumnName]);
+                                Row.Columns.Add(this.FormData.DGsRowDataModel[_sc.TableName].GetColumn(_column.ColumnName));
                             }
                         }
                         Table.Add(Row);
@@ -1079,11 +1079,22 @@ namespace ExpressBase.Objects
                             tableIndex--; //one query is used to select required user records
                         if (UserTable.Count > mngUsrCount)
                         {
-                            _d.Add(FormConstants.id, UserTable[mngUsrCount][FormConstants.id]);
-                            foreach (UsrLocField _f in (Ctrl as EbProvisionUser).PersistingFields)
+                            NTV[] pArr = (Ctrl as EbProvisionUser).FuncParam;
+                            for (int k = 0; k < pArr.Length; k++)
                             {
-                                _d.Add(_f.Name, UserTable[mngUsrCount][_f.Name]);
+                                if (UserTable[mngUsrCount][pArr[k].Name] != null)
+                                    _d.Add(pArr[k].Name, UserTable[mngUsrCount][pArr[k].Name]);
                             }
+
+                            //_d.Add(FormConstants.id, UserTable[mngUsrCount][FormConstants.id]);
+                            //_d.Add("statusid", UserTable[mngUsrCount]["statusid"]);
+                            //foreach (UsrLocField _f in (Ctrl as EbProvisionUser).PersistingFields)
+                            //{
+                            //    _d.Add(_f.Name, UserTable[mngUsrCount][_f.Name]);
+                            //}
+                            //if (!_d.ContainsKey("usertype"))
+                            //    _d.Add("usertype", UserTable[mngUsrCount]["usertype"]);
+
                             mngUsrCount++;
                         }
                         _FormData.MultipleTables[(Ctrl as EbProvisionUser).VirtualTable][0][Ctrl.Name] = JsonConvert.SerializeObject(_d);

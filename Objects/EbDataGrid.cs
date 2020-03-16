@@ -230,7 +230,7 @@ namespace ExpressBase.Objects
             {
                 EbObjectParticularVersionResponse drObj = serviceClient.Get<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest() { RefId = this.DataSourceId });
                 DataReader = EbSerializers.Json_Deserialize(drObj.Data[0].Json);
-                this.Redis.Set<EbDataReader>(this.DataSourceId, DataReader);
+                redis.Set<EbDataReader>(this.DataSourceId, DataReader);
             }
             for (int i = 0; i < Allctrls.Length; i++)
             {

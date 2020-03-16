@@ -142,7 +142,7 @@ namespace ExpressBase.Objects.WebFormRelated
                         throw new FormException("Set Value Member for " + ctrl.Label);
                     if (_ctrl.RenderAsSimpleSelect && _ctrl.DisplayMember == null)
                         throw new FormException("Set Display Member for " + ctrl.Label);
-                    else if (_ctrl.DisplayMembers == null || _ctrl.DisplayMembers.Count == 0)
+                    if (!_ctrl.RenderAsSimpleSelect && (_ctrl.DisplayMembers == null || _ctrl.DisplayMembers.Count == 0))
                         throw new FormException("Set Display Members for " + ctrl.Label);
                 }
                 else if (ctrl is EbDGPowerSelectColumn)
@@ -154,7 +154,7 @@ namespace ExpressBase.Objects.WebFormRelated
                         throw new FormException("Set Value Member for " + ctrl.Name);
                     if (_ctrl.RenderAsSimpleSelect && _ctrl.DisplayMember == null)
                         throw new FormException("Set Display Member for " + ctrl.Name);
-                    else if (!_ctrl.RenderAsSimpleSelect && (_ctrl.DisplayMembers == null || _ctrl.DisplayMembers.Count == 0))
+                    if (!_ctrl.RenderAsSimpleSelect && (_ctrl.DisplayMembers == null || _ctrl.DisplayMembers.Count == 0))
                         throw new FormException("Set Display Members for " + ctrl.Name);
                 }
                 else if (ctrl is EbControlContainer)

@@ -23,11 +23,14 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		[DataMember(Order = 1)]
 		public EbControlContainer WebObj { get; set; }
 
-		[DataMember(Order = 1)]
+		[DataMember(Order = 2)]
 		public string Apps { get; set; }
 
-        [DataMember(Order = 1)]
+        [DataMember(Order = 3)]
         public bool IsImport { get; set; }
+
+        [DataMember(Order = 4)]
+        public bool DontThrowException { get; set; }
 	}
 
 	[DataContract]
@@ -37,9 +40,23 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public ResponseStatus ResponseStatus { get; set; }
 	}
 
-	//================================== GET RECORD FOR RENDERING ================================================
+    [DataContract]
+    public class CreateMyProfileTableRequest : EbServiceStackAuthRequest, IReturn<CreateMyProfileTableResponse>
+    {
+        [DataMember(Order = 1)]
+        public List<EbProfileUserType> UserTypeForms { get; set; }
+    }
 
-	[DataContract]
+    [DataContract]
+    public class CreateMyProfileTableResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    //================================== GET RECORD FOR RENDERING ================================================
+
+    [DataContract]
 	public class GetRowDataRequest : EbServiceStackAuthRequest, IReturn<GetRowDataResponse>
 	{
 		[DataMember(Order = 1)]
@@ -576,6 +593,21 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         [DataMember(Order = 1)]
         public List<string> Suggestions { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+
+    public class GetMyProfileEntryRequest : EbServiceStackAuthRequest, IReturn<GetMyProfileEntryResponse>
+    {
+        public string TableName { get; set; }
+    }
+
+    public class GetMyProfileEntryResponse:IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public int RowId { get; set; }
 
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }

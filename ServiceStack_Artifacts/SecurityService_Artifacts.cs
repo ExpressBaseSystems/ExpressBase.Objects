@@ -262,9 +262,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 9)]
         public string u_token { get; set; }
 
-        [DataMember(Order = 10)]
-        public Dictionary<int, int> LocConstraint { get; set; }
-    }
+		[DataMember(Order = 10)]
+		public Dictionary<int, int> LocConstraint { get; set; }
+		
+		[DataMember(Order = 11)]
+		public Dictionary<int, string> UserTypes { get; set; }
+	}
 
     [DataContract]
     public class SaveUserRequest : IReturn<SaveUserResponse>, IEbSSRequest
@@ -335,10 +338,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 23)]
         public string LocationDelete { get; set; }
 
-        [DataMember(Order = 24)]
-        public string SolnId { get; set; }
+		[DataMember(Order = 24)]
+		public string SolnId { get; set; }
+		
+		[DataMember(Order = 25)]
+		public int UserType { get; set; }
 
-        public int UserId { get; set; }
+		public int UserId { get; set; }
 
         public string Token { get; set; }
     }
