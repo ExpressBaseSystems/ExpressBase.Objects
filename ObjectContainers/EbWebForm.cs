@@ -36,6 +36,7 @@ namespace ExpressBase.Objects
     {
         public EbWebForm()
         {
+            this.Validators = new List<EbValidator>();
             this.DisableDelete = new List<EbSQLValidator>();
             this.DisableCancel = new List<EbSQLValidator>();
             this.BeforeSaveRoutines = new List<EbRoutines>();
@@ -1262,6 +1263,11 @@ namespace ExpressBase.Objects
                 if (tt == null)
                     param.Add(DataDB.GetNewParameter(FormConstants.eb_loc_id, EbDbTypes.Decimal, this.LocationId));
 
+                //if eb_currentuser_id control is not present then UserObj.UserId adding as 'eb_currentuser_id' 
+                DbParameter ttt = param.Find(e => e.ParameterName == "eb_currentuser_id");
+                if (ttt == null)
+                    param.Add(DataDB.GetNewParameter("eb_currentuser_id", EbDbTypes.Decimal, this.UserObj.UserId));
+
                 EbDataSet ds;
                 if (this.DbConnection == null)
                     ds = DataDB.DoQueries(psquery, param.ToArray());
@@ -1324,7 +1330,13 @@ namespace ExpressBase.Objects
             }
 
             if (QrsDict.Count > 0)
-            {
+            { 
+                if (param.Find(e => e.ParameterName == FormConstants.eb_loc_id) == null)
+                    param.Add(DataDB.GetNewParameter(FormConstants.eb_loc_id, EbDbTypes.Decimal, this.LocationId));
+ 
+                if (param.Find(e => e.ParameterName == "eb_currentuser_id") == null)
+                    param.Add(DataDB.GetNewParameter("eb_currentuser_id", EbDbTypes.Decimal, this.UserObj.UserId));
+                
                 EbDataSet dataset = DataDB.DoQueries(string.Join(CharConstants.SPACE, QrsDict.Select(d => d.Value)), param.ToArray());
                 int i = 0;
                 foreach (KeyValuePair<string, string> item in QrsDict)
