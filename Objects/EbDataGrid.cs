@@ -550,6 +550,19 @@ else {
         [EnableInBuilder(BuilderType.WebForm)]
         public bool AllowNegative { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [DefaultPropValue("2")]
+        [PropertyGroup(PGConstants.EXTENDED)]
+        [Alias("Decimal Places")]
+        [HelpText("Number of decimal places")]
+        public int DecimalPlaces { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        [UIproperty]
+        [OnChangeUIFunction("Common.CONTROL_ICON")]
+        public bool HideInputIcon { get; set; }
+
         [JsonIgnore]
         public override string GetValueFromDOMJSfn
         {
