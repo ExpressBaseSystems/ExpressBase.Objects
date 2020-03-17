@@ -11,12 +11,9 @@ using System.Text;
 namespace ExpressBase.Objects.Objects
 {
 	[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-	public class EbTagInput: EbControlUI
+	public class EbRichText: EbControlUI
 	{
-		public EbTagInput()
-		{
-
-		}
+		public EbRichText() { }
 
 		[OnDeserialized]
 		public void OnDeserializedMethod(StreamingContext context)
@@ -25,11 +22,10 @@ namespace ExpressBase.Objects.Objects
 			this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
 		}
 
-		public override string ToolIconHtml { get { return "<i class='fa fa-tags'></i>"; } set { } }
+		public override string ToolIconHtml { get { return "<i class='fa fa-align-center'></i><i class='fa fa-font'></i>"; } set { } }
+		public override string ToolNameAlias { get { return "Rich Text"; } set { } }
 
-		public override string ToolNameAlias { get { return "Tag Input"; } set { } }
-
-		public override string ToolHelpText { get { return "Tag Input"; } set { } }
+		public override string ToolHelpText { get { return "Rich Text"; } set { } }
 
 		public override string UIchangeFns
 		{
@@ -40,9 +36,6 @@ namespace ExpressBase.Objects.Objects
             }";
 			}
 		}
-
-
-
 
 
 		//--------Hide in property grid------------
@@ -112,18 +105,6 @@ namespace ExpressBase.Objects.Objects
 
 
 
-		[EnableInBuilder(BuilderType.WebForm)]
-		[HideInPropertyGrid]
-		public bool Textareas { get; set; }
-
-		[EnableInBuilder(BuilderType.WebForm)]
-		[HideInPropertyGrid]
-		[PropertyEditor(PropertyEditorType.Color)]
-		public string TagColor { get; set; }
-
-
-
-
 
 
 		public override string GetBareHtml()
@@ -131,8 +112,8 @@ namespace ExpressBase.Objects.Objects
 
 
 			return @" 
- <div id='@ebsid@_TagDiv'  >  
-	<input type='text' name='@ebsid@_tags' value='' data-role='tagsinput'  />
+ <div id='@ebsid@_RichTextDiv'  >  
+	<textarea    id='@ebsid@_RichText' style='width:100%; resize: none'  ></textarea >
 </div>"
 .Replace("@ebsid@", String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId)
 .Replace("@name@", this.Name)
@@ -158,7 +139,7 @@ namespace ExpressBase.Objects.Objects
 		{
 			get
 			{
-				return @" return $('input[name = ' + this.EbSid_CtxId +'_tags]').val();";
+				return @" return $(`#${this.EbSid}_RichText`).summernote('code');";
 			}
 			set { }
 		}
@@ -167,7 +148,7 @@ namespace ExpressBase.Objects.Objects
 		{
 			get
 			{
-				return @"$('input[name = ' + this.EbSid_CtxId + '_tags]').on('change', p1);";
+				return @"$(`#${this.EbSid}_RichText`).on('summernote.blur', p1);";
 			}
 			set { }
 		}
@@ -176,22 +157,20 @@ namespace ExpressBase.Objects.Objects
 		{
 			get
 			{
-				return @"$('input[name = ' + this.EbSid_CtxId + '_tags]').tagsinput('refresh');
-							$('input[name = ' + this.EbSid_CtxId + '_tags]').tagsinput('add', p1);
-						$(`[ebsid=${this.EbSid}]`).find('#' + this.EbSid + '_TagDiv').find('.bootstrap-tagsinput').css({ 'border': 'none' });";
+				return @" $(`#${this.EbSid}_RichText`).summernote('focus');
+							$(`#${this.EbSid}_RichText`).summernote('code',p1);";
 			}
 			set { }
 		}
 
-		public override string ClearJSfn
-		{
-			get
-			{
-				return @"$('input[name = ' + this.EbSid_CtxId + '_tags]').val('');";
-			}
-			set { }
-		}
+		//public override string ClearJSfn
+		//{
+		//	get
+		//	{
+		//		return @"$('input[name = ' + this.EbSid_CtxId + '_tags]').va('');";
+		//	}
+		//	set { }
+		//}
 
-		
 	}
 }
