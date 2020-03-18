@@ -131,6 +131,16 @@ namespace ExpressBase.Objects.Objects
 			}
 			set { }
 		}
+		public override string ClearJSfn 
+		{
+			get
+			{
+				return @" $('input[name = ' + this.EbSid_CtxId + ']').prop('checked', false);";
+			}
+			set { }
+		}
+
+
 		//--------Hide in property grid------------
 		[EnableInBuilder(BuilderType.WebForm)]
 		[HideInPropertyGrid]
