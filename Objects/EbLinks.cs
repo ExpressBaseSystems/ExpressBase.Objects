@@ -77,6 +77,26 @@ namespace ExpressBase.Objects
         [PropertyGroup("Data Settings")]
         public string LinkName { get; set; }
 
+        //[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl, BuilderType.DashBoard)]
+        //[PropertyGroup("Data Settings")]
+        //[UIproperty]
+        //[PropertyEditor(PropertyEditorType.FontSelector)]
+        //public EbFont Font { get; set; }
+
+        [EnableInBuilder(BuilderType.DashBoard)]
+        [PropertyGroup("Icon")]
+        [UIproperty]
+        [PropertyEditor(PropertyEditorType.IconPicker)]
+        [DefaultPropValue("fa-external-link-square")]
+        public string Icon { get; set; }
+
+        [EnableInBuilder(BuilderType.DashBoard)]
+        [PropertyGroup("Icon")]
+        [UIproperty]
+        [DefaultPropValue("fa-link")]
+        public string HoverText { get; set; }
+
+
     }
 
 }
