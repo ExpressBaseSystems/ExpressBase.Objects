@@ -1466,9 +1466,12 @@ namespace ExpressBase.Objects
                     string _q = QueryGetter.GetInsertQuery(WebForm, DataDB, WebForm.FormSchema.MasterTable, true);
                     fullqry += string.Format(_q, string.Empty, string.Empty);
                 }
-                foreach (KeyValuePair<string, SingleTable> entry in WebForm.FormData.MultipleTables)
+                foreach (TableSchema _table in WebForm.FormSchema.Tables)
                 {
-                    foreach (SingleRow row in entry.Value)
+                    if (!WebForm.FormData.MultipleTables.ContainsKey(_table.TableName))
+                        continue;
+
+                    foreach (SingleRow row in WebForm.FormData.MultipleTables[_table.TableName])
                     {
                         string _cols = string.Empty;
                         string _values = string.Empty;
@@ -1481,11 +1484,10 @@ namespace ExpressBase.Objects
                                 WebForm.ParameterizeUnknown(DataDB, param, cField, true, ref i, ref _cols, ref _values);
                         }
 
-                        string _qry = QueryGetter.GetInsertQuery(WebForm, DataDB, entry.Key, true);
+                        string _qry = QueryGetter.GetInsertQuery(WebForm, DataDB, _table.TableName, true);
                         fullqry += string.Format(_qry, _cols, _values);
 
-                        fullqry += WebForm.InsertUpdateLines(entry.Key, row, DataDB, param, ref i);
-
+                        fullqry += WebForm.InsertUpdateLines(_table.TableName, row, DataDB, param, ref i);
                     }
                 }
                 param.Add(DataDB.GetNewParameter(WebForm.TableName + FormConstants._eb_ver_id, EbDbTypes.Int32, WebForm.RefId.Split(CharConstants.DASH)[4]));
