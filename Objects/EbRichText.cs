@@ -105,6 +105,9 @@ namespace ExpressBase.Objects.Objects
 
 
 
+		[EnableInBuilder(BuilderType.WebForm)]
+		[DefaultPropValue("100")]
+		public int Height { get; set; }
 
 
 		public override string GetBareHtml()
