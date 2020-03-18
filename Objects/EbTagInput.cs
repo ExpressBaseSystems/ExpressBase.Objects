@@ -131,7 +131,7 @@ namespace ExpressBase.Objects.Objects
 
 
 			return @" 
- <div id='@ebsid@_TagDiv'  >  
+ <div id='@ebsid@_TagDiv' class='tagInputDiv'  >  
 	<input type='text' name='@ebsid@_tags' value='' data-role='tagsinput'  />
 </div>"
 .Replace("@ebsid@", String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId)
@@ -177,8 +177,7 @@ namespace ExpressBase.Objects.Objects
 			get
 			{
 				return @"$('input[name = ' + this.EbSid_CtxId + '_tags]').tagsinput('refresh');
-							$('input[name = ' + this.EbSid_CtxId + '_tags]').tagsinput('add', p1);
-						$(`[ebsid=${this.EbSid}]`).find('#' + this.EbSid + '_TagDiv').find('.bootstrap-tagsinput').css({ 'border': 'none' });";
+							$('input[name = ' + this.EbSid_CtxId + '_tags]').tagsinput('add', p1);";
 			}
 			set { }
 		}
