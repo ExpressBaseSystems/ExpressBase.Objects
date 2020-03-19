@@ -366,7 +366,7 @@ namespace ExpressBase.Objects
             }
             catch (Exception e)
             {
-                if(e.InnerException is ExplicitExitException)
+                if (e.InnerException is ExplicitExitException)
                 {
                     throw e.InnerException;
                 }
@@ -480,6 +480,47 @@ namespace ExpressBase.Objects
                 }
             }
             return response.Content.ReadAsStringAsync().Result;
+        }
+    }
+
+    [EnableInBuilder(BuilderType.ApiBuilder)]
+    public class EbFormResource : ApiResources
+    {
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [PropertyGroup("Data Settings")]
+        [OSE_ObjectTypes(EbObjectTypes.iWebForm)]
+        public override string Reference { get; set; }
+
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        [MetaOnly]
+        [UIproperty]
+        public string RefName { set; get; }
+
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        [MetaOnly]
+        [UIproperty]
+        public string Version { set; get; }
+
+        public override string GetDesignHtml()
+        {
+            return @"<div class='apiPrcItem dropped' eb-type='FormResource' id='@id'>
+                        <div tabindex='1' class='drpbox' onclick='$(this).focus();'>  
+                            <div class='CompLabel'> @Label </div>
+                            <div class='CompName'> @RefName </div>
+                            <div class='CompVersion'> @Version </div>
+                        </div>
+                    </div>".RemoveCR().DoubleQuoted();
+        }
+
+        public override List<Param> GetOutParams(List<Param> _param)
+        {
+            return new List<Param>();
+        }
+
+        public override object GetResult()
+        {
+            return this.Result;
         }
     }
 
