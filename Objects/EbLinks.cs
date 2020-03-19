@@ -77,11 +77,11 @@ namespace ExpressBase.Objects
         [PropertyGroup("Data Settings")]
         public string LinkName { get; set; }
 
-        //[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl, BuilderType.DashBoard)]
-        //[PropertyGroup("Data Settings")]
-        //[UIproperty]
-        //[PropertyEditor(PropertyEditorType.FontSelector)]
-        //public EbFont Font { get; set; }
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl, BuilderType.DashBoard)]
+        [PropertyGroup("Data Settings")]
+        [UIproperty]
+        [PropertyEditor(PropertyEditorType.GradientColorPicker)]
+        public string BackgroundColor { get; set; }
 
         [EnableInBuilder(BuilderType.DashBoard)]
         [PropertyGroup("Icon")]
