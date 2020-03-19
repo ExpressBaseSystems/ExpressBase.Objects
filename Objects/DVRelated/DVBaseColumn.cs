@@ -33,6 +33,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
         Boolean = 7,
         Table = 8,
         LinkFromColumn = 9,
+        Tag = 10
     }
 
     public enum NumericRenderType
