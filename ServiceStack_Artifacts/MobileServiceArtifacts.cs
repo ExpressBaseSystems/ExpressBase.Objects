@@ -166,6 +166,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 4)]
         public int Offset { set; get; }
 
+        [DataMember(Order = 5)]
+        public bool IsPowerSelect { set; get; }
+
         public GetMobileVisDataRequest()
         {
             Params = new List<Param>();

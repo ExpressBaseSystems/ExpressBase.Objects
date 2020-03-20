@@ -79,6 +79,11 @@ namespace ExpressBase.Objects
 
 
         [EnableInBuilder(BuilderType.DashBoard)]
+        [PropertyGroup("Core")]  
+        public LabelStyle LabelStyle { get; set; }
+
+
+        [EnableInBuilder(BuilderType.DashBoard)]
         [PropertyGroup("LabelConfig")]
         [DefaultPropValue("4")]
         [OnChangeExec(@"if(this.LabelborderRadius > 50){
@@ -569,3 +574,9 @@ namespace ExpressBase.Objects
         right = 2
     }
 }
+
+public enum LabelStyle
+{
+    Label_1 = 0,
+    Label_2 = 1,
+} 

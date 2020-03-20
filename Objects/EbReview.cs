@@ -295,6 +295,18 @@ else if(this.ApproverEntity === 3){
 
         [EnableInBuilder(BuilderType.WebForm)]
         public bool IsFormEditable { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [OnChangeExec(@"
+if(this.IsAdvanced === true){
+    pg.MakeReadWrite('NextStage');
+    pg.MakeReadWrite('StageActions');
+}
+else{
+    pg.MakeReadOnly('NextStage');
+    pg.MakeReadOnly('StageActions');
+}")]
+        public bool IsAdvanced { get; set; }
     }
 
     public abstract class ReviewActionAbstract { }

@@ -131,6 +131,16 @@ namespace ExpressBase.Objects.Objects
 			}
 			set { }
 		}
+		public override string ClearJSfn 
+		{
+			get
+			{
+				return @" $('input[name = ' + this.EbSid_CtxId + ']').prop('checked', false);";
+			}
+			set { }
+		}
+
+
 		//--------Hide in property grid------------
 		[EnableInBuilder(BuilderType.WebForm)]
 		[HideInPropertyGrid]
@@ -178,6 +188,10 @@ namespace ExpressBase.Objects.Objects
 
 		[EnableInBuilder(BuilderType.WebForm)]
 		[HideInPropertyGrid]
+		public override string ForeColor { get; set; }
+
+		[EnableInBuilder(BuilderType.WebForm)]
+		[HideInPropertyGrid]
 		public override string LabelBackColor { get; set; }
 
 		[EnableInBuilder(BuilderType.WebForm)]
@@ -190,13 +204,13 @@ namespace ExpressBase.Objects.Objects
 
 		[EnableInBuilder(BuilderType.WebForm)]
 		[HideInPropertyGrid]
-		public int RatingCount { get; set; }
-
-		[EnableInBuilder(BuilderType.WebForm)]
-		[HideInPropertyGrid]
 		public override EbDbTypes EbDbType { get { return EbDbTypes.Decimal; } set { } }
 
 
+		
+		[EnableInBuilder(BuilderType.WebForm)]
+		[HideInPropertyGrid]
+		public int RatingCount { get; set; }
 
 		[EnableInBuilder(BuilderType.WebForm)]
 		[OnChangeUIFunction("EbRating.starCount")]
@@ -205,6 +219,7 @@ namespace ExpressBase.Objects.Objects
 		public int MaxVal { get; set; }
 
 		[EnableInBuilder(BuilderType.WebForm)]
+		[HideInPropertyGrid]
 		[PropertyEditor(PropertyEditorType.Color)]
 		public string IconColor { get; set; }
 
@@ -214,11 +229,11 @@ namespace ExpressBase.Objects.Objects
 		public bool RemoveBorder { get; set; }
 
 		[EnableInBuilder(BuilderType.WebForm)]
+		[HideInPropertyGrid]
 		[Alias("Icon size")]
 		public int IconSize  { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm)]
-		public override string ForeColor { get; set; }
+
 
 
 	}
