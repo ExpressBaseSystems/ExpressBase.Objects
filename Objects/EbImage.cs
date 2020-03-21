@@ -28,6 +28,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.ImageSeletor)]
+        [OnChangeUIFunction("EbImage.changeSource")]
         public int ImageId { get; set; }
 
         [EnableInBuilder(BuilderType.BotForm)]
@@ -68,10 +69,16 @@ namespace ExpressBase.Objects
                 },
                 adjustMaxWidth : function(elementId, props){
                     $(`#cont_${elementId} .ebimg-cont img`).css('max-width', `${props.MaxWidth}px`);
+                },
+            changeSource : function(elementId, props){
+                    debugger;
+                    if( props.ImageId > 0){
+                       $(`#${elementId.toLowerCase()}`).attr('src', '../images/'+ `${props.ImageId}` +'.jpg'); 
+                        }
                 }
                 }";
             }
-        }
+        } 
 
         public override string SetValueJSfn
         {
