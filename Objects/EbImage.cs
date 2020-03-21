@@ -71,7 +71,6 @@ namespace ExpressBase.Objects
                     $(`#cont_${elementId} .ebimg-cont img`).css('max-width', `${props.MaxWidth}px`);
                 },
             changeSource : function(elementId, props){
-                    debugger;
                     if( props.ImageId > 0){
                        $(`#${elementId.toLowerCase()}`).attr('src', '../images/'+ `${props.ImageId}` +'.jpg'); 
                         }
@@ -84,9 +83,8 @@ namespace ExpressBase.Objects
         {
             get
             {
-                return @" debugger;
-alert( this.EbSid_CtxId.toLowerCase() + '../images/'+ p1 +'.jpg');
-$('#' + this.EbSid_CtxId.toLowerCase()).attr('src', '../images/'+ p1 +'.jpg');";
+                return @"
+                $('#' + this.EbSid_CtxId.toLowerCase()).attr('src', '../images/'+ p1 +'.jpg');";
             }
             set { }
         }
