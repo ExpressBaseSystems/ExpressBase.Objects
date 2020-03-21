@@ -36,7 +36,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
         public string Alt { get; set; }
-        
+
         public override bool isFullViewContol { get => true; set => base.isFullViewContol = value; }
 
         [HideInPropertyGrid]
@@ -54,6 +54,10 @@ namespace ExpressBase.Objects
         [DefaultPropValue("200")]
         public int MaxWidth { get; set; }
 
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        public override EbScript ValueExpr { get; set; }
+
         public override string UIchangeFns
         {
             get
@@ -67,6 +71,17 @@ namespace ExpressBase.Objects
                 }
                 }";
             }
+        }
+
+        public override string SetValueJSfn
+        {
+            get
+            {
+                return @" debugger;
+alert( this.EbSid_CtxId.toLowerCase() + '../images/'+ p1 +'.jpg');
+$('#' + this.EbSid_CtxId.toLowerCase()).attr('src', '../images/'+ p1 +'.jpg');";
+            }
+            set { }
         }
 
         public void InitFromDataBase(JsonServiceClient ServiceClient)
@@ -101,7 +116,7 @@ namespace ExpressBase.Objects
             <img id='@name@' src='@src@' style='max-width:@maxwidth@px; max-height:@maxheight@px;'>
         </div>"
     .Replace("@name@", this.Name)
-    .Replace("@src@", (this.ImageId > 0) ? "../images/"+this.ImageId+".jpg" : "/images/image.png")
+    .Replace("@src@", (this.ImageId > 0) ? "../images/" + this.ImageId + ".jpg" : "/images/image.png")
     .Replace("@toolTipText@", this.ToolTipText)
     .Replace("@value@", "")//"value='" + this.Value + "'")
     .Replace("@maxwidth@", this.MaxWidth > 0 ? this.MaxWidth.ToString() : "200")
@@ -131,9 +146,6 @@ namespace ExpressBase.Objects
 
         [HideInPropertyGrid]
         public override EbScript VisibleExpr { get; set; }
-
-        [HideInPropertyGrid]
-        public override EbScript ValueExpr { get; set; }
 
         [HideInPropertyGrid]
         public override string BackColor { get; set; }
