@@ -351,7 +351,7 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         public override string SetValueJSfn
         {
-            get { return JustSetValueJSfn + " $('#' + this.EbSid_CtxId).trigger('change');"; }
+            get { return JustSetValueJSfn + "$('#' + this.EbSid_CtxId).data('ctrl_ref', this); $('#' + this.EbSid_CtxId).trigger('change');"; }
 
             set { }
         }
