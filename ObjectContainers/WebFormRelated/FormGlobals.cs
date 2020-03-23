@@ -16,34 +16,34 @@ using System.Text;
 namespace ExpressBase.Objects.WebFormRelated
 {
     [RuntimeSerializable]
-    public class FG_Root
+    public class _FG_Root
     {
         public dynamic form { get; set; }
 
         public User user { get; private set; }
 
-        public FG_System system { get; private set; }
+        public _FG_System system { get; private set; }
 
-        public FG_Root(FG_WebForm fG_WebForm) 
+        public _FG_Root(_FG_WebForm fG_WebForm) 
         {
             this.form = fG_WebForm;
         }
 
-        public FG_Root(FG_WebForm fG_WebForm, EbWebForm ebWebForm, Service service)
+        public _FG_Root(_FG_WebForm fG_WebForm, EbWebForm ebWebForm, Service service)
         {
             this.form = fG_WebForm;
             this.user = ebWebForm.UserObj;
-            this.system = new FG_System(ebWebForm, service);
+            this.system = new _FG_System(ebWebForm, service);
         }
     }
 
-    public class FG_System
+    public class _FG_System
     {
         private Service Service { get; set; }
         
         private EbWebForm WebForm { get; set; }
 
-        public FG_System(EbWebForm ebWebForm, Service service)
+        public _FG_System(EbWebForm ebWebForm, Service service)
         {
             this.Service = service;
             this.WebForm = WebForm;
@@ -73,18 +73,18 @@ namespace ExpressBase.Objects.WebFormRelated
     }
 
     [RuntimeSerializable]
-    public class FG_WebForm : DynamicObject
+    public class _FG_WebForm : DynamicObject
     {
-        public FG_Row FlatCtrls { get; set; }
+        public _FG_Row FlatCtrls { get; set; }
         
-        public List<FG_DataGrid> DataGrids { get; set; }
+        public List<_FG_DataGrid> DataGrids { get; set; }
 
-        public FG_Review Review { get; set; }
+        public _FG_Review Review { get; set; }
 
-        public FG_WebForm() 
+        public _FG_WebForm() 
         {
-            this.FlatCtrls = new FG_Row();
-            this.DataGrids = new List<FG_DataGrid>();
+            this.FlatCtrls = new _FG_Row();
+            this.DataGrids = new List<_FG_DataGrid>();
         }
 
         public override bool TryGetMember(GetMemberBinder binder, out object result)
@@ -104,7 +104,7 @@ namespace ExpressBase.Objects.WebFormRelated
 
     }
 
-    public class FG_DataGrid
+    public class _FG_DataGrid
     {
         public string Name { get; set; }
 
@@ -112,7 +112,7 @@ namespace ExpressBase.Objects.WebFormRelated
 
         private SingleTable Table { get; set; }
 
-        public FG_DataGrid(EbDataGrid CtrlObj, SingleTable Table)
+        public _FG_DataGrid(EbDataGrid CtrlObj, SingleTable Table)
         {
             this.Name = CtrlObj.Name;
             this.CtrlObj = CtrlObj;
@@ -120,7 +120,7 @@ namespace ExpressBase.Objects.WebFormRelated
         }
     }
 
-    public class FG_Review
+    public class _FG_Review
     {
         public string Name { get; set; }
 
@@ -128,11 +128,11 @@ namespace ExpressBase.Objects.WebFormRelated
 
         private SingleTable Table { get; set; }
 
-        public Dictionary<string, FG_Review_Stage> stages { get; private set; }
+        public Dictionary<string, _FG_Review_Stage> stages { get; private set; }
 
-        public FG_Review_Stage currentStage { get; private set; }
+        public _FG_Review_Stage currentStage { get; private set; }
 
-        public FG_Review(EbReview CtrlObj, SingleTable Table)
+        public _FG_Review(EbReview CtrlObj, SingleTable Table)
         {
             this.Name = CtrlObj.Name;
             this.CtrlObj = CtrlObj;
@@ -148,42 +148,42 @@ namespace ExpressBase.Objects.WebFormRelated
                 }
             }
 
-            this.stages = new Dictionary<string, FG_Review_Stage>();
+            this.stages = new Dictionary<string, _FG_Review_Stage>();
 
             foreach(ReviewStageAbstract stage in this.CtrlObj.FormStages)
             {
                 EbReviewStage _eb_stage = stage as EbReviewStage;
-                List<FG_Review_Action> fg_actions = new List<FG_Review_Action>();
+                List<_FG_Review_Action> fg_actions = new List<_FG_Review_Action>();
                 foreach (ReviewActionAbstract action in _eb_stage.StageActions)
                 {
-                    fg_actions.Add(new FG_Review_Action((action as EbReviewAction).Name));
+                    fg_actions.Add(new _FG_Review_Action((action as EbReviewAction).Name));
                 }
                 if (_Row != null && Convert.ToString(_Row["stage_unique_id"]) == _eb_stage.EbSid)
                 {
                     EbReviewAction eb_curAct = (EbReviewAction)_eb_stage.StageActions.Find(e => (e as EbReviewAction).EbSid == Convert.ToString(_Row["action_unique_id"]));
-                    FG_Review_Action fg_curAct = null;
+                    _FG_Review_Action fg_curAct = null;
                     if (eb_curAct != null)
                     {
                         fg_curAct = fg_actions.Find(e => e.name == eb_curAct.Name);
                     }
-                    this.stages.Add(_eb_stage.Name, new FG_Review_Stage(_eb_stage.Name, fg_actions, fg_curAct));
+                    this.stages.Add(_eb_stage.Name, new _FG_Review_Stage(_eb_stage.Name, fg_actions, fg_curAct));
                     this.currentStage = this.stages[_eb_stage.Name];
                 }
                 else
                 {
-                    this.stages.Add(_eb_stage.Name, new FG_Review_Stage(_eb_stage.Name, fg_actions, null));
+                    this.stages.Add(_eb_stage.Name, new _FG_Review_Stage(_eb_stage.Name, fg_actions, null));
                 }
             }
         }
 
         public void complete()
         {
-            this.CtrlObj.ReviewStatus = "complete";
+            //this.CtrlObj.ReviewStatus = "complete";
         }
 
         public void abandon()
         {
-            this.CtrlObj.ReviewStatus = "abandon";
+            //this.CtrlObj.ReviewStatus = "abandon";
         }
 
         public void setCurrentStageDataEditable() 
@@ -223,15 +223,15 @@ namespace ExpressBase.Objects.WebFormRelated
         //}
     }
 
-    public class FG_Review_Stage
+    public class _FG_Review_Stage
     {
         public string name { get; private set; }
 
-        public List<FG_Review_Action> actions { get; private set; }
+        public List<_FG_Review_Action> actions { get; private set; }
 
-        public FG_Review_Action currentAction { get; private set; }
+        public _FG_Review_Action currentAction { get; private set; }
 
-        public FG_Review_Stage(string Name, List<FG_Review_Action> Actions, FG_Review_Action currentAction)
+        public _FG_Review_Stage(string Name, List<_FG_Review_Action> Actions, _FG_Review_Action currentAction)
         {
             this.name = Name;
             this.actions = Actions;
@@ -239,31 +239,31 @@ namespace ExpressBase.Objects.WebFormRelated
         }
     }
 
-    public class FG_Review_Action
+    public class _FG_Review_Action
     {
         public string name { get; private set; }
 
-        public FG_Review_Action(string Name)
+        public _FG_Review_Action(string Name)
         {
             this.name = Name;
         }
     }
 
     [RuntimeSerializable]
-    public class FG_Row : DynamicObject
+    public class _FG_Row : DynamicObject
     {
-        public List<FG_Control> Controls { get; set; }
+        public List<_FG_Control> Controls { get; set; }
 
-        public FG_Row()
+        public _FG_Row()
         {
-            this.Controls = new List<FG_Control>();
+            this.Controls = new List<_FG_Control>();
         }
 
-        public FG_Control this[string name]
+        public _FG_Control this[string name]
         {
             get
             {
-                FG_Control ctrl = this.Controls.Find(e => e.Name.Equals(name));
+                _FG_Control ctrl = this.Controls.Find(e => e.Name.Equals(name));
                 if (ctrl == null)
                     Console.WriteLine("Null ref for control - form globals");
                 return ctrl;
@@ -279,7 +279,7 @@ namespace ExpressBase.Objects.WebFormRelated
         }
     }
 
-    public class FG_Control
+    public class _FG_Control
     {
         public string Name { get; private set; }
 
@@ -289,7 +289,7 @@ namespace ExpressBase.Objects.WebFormRelated
 
         private EbControl Control { get; set; }
 
-        public FG_Control(EbControl Control, object Value)
+        public _FG_Control(EbControl Control, object Value)
         {
             this.Control = Control;
             this.Name = Control.Name;
