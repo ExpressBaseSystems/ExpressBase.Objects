@@ -212,11 +212,40 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
                 if (_optionHtml.Equals(string.Empty))
                 {
                     _optionHtml = string.Empty;
+					string OptGrpNmae = string.Empty;
                     if (!this.IsDynamic)
                     {
-                        foreach (EbSimpleSelectOption opt in this.Options)
+						List<EbSimpleSelectOption> GrpList= this.Options.OrderBy(o => o.OptGroupNmae).ToList();
+
+						foreach (EbSimpleSelectOption opt in GrpList)
                         {
-                            _optionHtml += string.Format("<option  value='{0}'>{1}</option>", opt.Value, opt.DisplayName);
+							if (opt.OptGroupNmae != null)
+							{
+								if (opt.OptGroupNmae.Equals(string.Empty))
+								{
+									_optionHtml += string.Format("<option  value='{0}'>{1}</option>", opt.Value, opt.DisplayName);
+								}
+								else
+								{
+									if (opt.OptGroupNmae != OptGrpNmae)
+									{
+										_optionHtml += string.Format("<optgroup label='{0}'>", opt.OptGroupNmae);
+									}
+									OptGrpNmae = opt.OptGroupNmae;
+
+									if (opt.OptGroupNmae.Equals(OptGrpNmae))
+									{
+										_optionHtml += string.Format("<option  value='{0}'>{1}</option>", opt.Value, opt.DisplayName);
+									}
+
+								}
+							}
+							else
+							{
+								_optionHtml += string.Format("<option  value='{0}'>{1}</option>", opt.Value, opt.DisplayName);
+							}
+								
+								
                         }
                     }
                 }
@@ -343,7 +372,12 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
         [PropertyGroup(PGConstants.CORE)]
         public string Value { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+		[PropertyGroup(PGConstants.CORE)]
+		[Alias("Group Nmae")]
+		public string OptGroupNmae { get; set; }
+
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup(PGConstants.CORE)]
         [Alias("Option Text")]
         public string DisplayName { get; set; }
