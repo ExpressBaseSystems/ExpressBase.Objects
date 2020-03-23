@@ -3,6 +3,7 @@ using ExpressBase.Common.Constants;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
@@ -33,7 +34,7 @@ namespace ExpressBase.Objects.Objects
 		{
 
 
-			return @"<button id='@ebsid@' class='btn btn-default' style='width:100%; cursor: pointer; @backColor @foreColor @fontStyle' disabled >@Label@</button>"
+			return @"<button id='@ebsid@' class='btn btn-default' style='width:100%; cursor: pointer; @backColor @foreColor @fontStyle'>@Label@</button>"
 				.Replace("@ebsid@", this.EbSid)
 				.Replace("@Label@", this.Label ?? "Button")
 .Replace("@tabIndex", "tabindex='" + this.TabIndex + "'")
@@ -97,7 +98,8 @@ namespace ExpressBase.Objects.Objects
 		public override string LabelForeColor { get; set; }
 
 		[EnableInBuilder(BuilderType.WebForm)]
-		[HideInPropertyGrid]
+		[PropertyGroup(PGConstants.EVENTS)]
+		[Alias("OnClick")]
 		public override EbScript OnChangeFn { get; set; }
 
 
@@ -114,14 +116,24 @@ namespace ExpressBase.Objects.Objects
 		[EnableInBuilder(BuilderType.WebForm)]
 		public override string HelpText { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm)]
-		public override string ToolTipText { get; set; }
+		//[EnableInBuilder(BuilderType.WebForm)]
+		//public override string ToolTipText { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-		[PropertyGroup(PGConstants.EVENTS)]
-		[PropertyEditor(PropertyEditorType.ScriptEditorJS)]
-		[Alias("OnClick")]
-		[HelpText("Define onClick function.")]
-		public EbScript OnClickFn { get; set; }
+		//[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+		//[PropertyGroup(PGConstants.EVENTS)]
+		//[PropertyEditor(PropertyEditorType.ScriptEditorJS)]
+		//[HelpText("Define onClick function.")]
+		//public EbScript OnClickFn { get; set; }
+
+
+		[JsonIgnore]
+		public override string OnChangeBindJSFn
+		{
+			get
+			{
+				return @"$('#' + this.EbSid_CtxId).on('click', p1);";
+			}
+			set { }
+		}
 	}
 }
