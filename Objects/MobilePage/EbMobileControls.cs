@@ -202,6 +202,8 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.MobilePage)]
     public class EbMobileSimpleSelect : EbMobileControl
     {
+        public override bool Unique { get; set; }
+
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
         public override EbDbTypes EbDbType
@@ -258,6 +260,9 @@ namespace ExpressBase.Objects
         public EbMobileDataColumn ValueMember { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
+        public int MinSearchLength { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
         [HelpText("sql query to get data from offline database")]
         [PropertyGroup(PGConstants.DATA)]
@@ -280,6 +285,15 @@ namespace ExpressBase.Objects
                                 </select>
                             </div>
                         </div>".RemoveCR().DoubleQuoted();
+        }
+
+        public override string GetJsInitFunc()
+        {
+            return @"
+                this.Init = function(id)
+                    {
+                        this.MinSearchLength = 3;
+                    };";
         }
 
         public override EbControl GetWebFormCtrl(int counter)

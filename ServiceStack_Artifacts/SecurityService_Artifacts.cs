@@ -262,12 +262,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 9)]
         public string u_token { get; set; }
 
-		[DataMember(Order = 10)]
-		public Dictionary<int, int> LocConstraint { get; set; }
-		
-		[DataMember(Order = 11)]
-		public Dictionary<int, string> UserTypes { get; set; }
-	}
+        [DataMember(Order = 10)]
+        public Dictionary<int, int> LocConstraint { get; set; }
+
+        [DataMember(Order = 11)]
+        public Dictionary<int, string> UserTypes { get; set; }
+    }
 
     [DataContract]
     public class SaveUserRequest : IReturn<SaveUserResponse>, IEbSSRequest
@@ -338,13 +338,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 23)]
         public string LocationDelete { get; set; }
 
-		[DataMember(Order = 24)]
-		public string SolnId { get; set; }
-		
-		[DataMember(Order = 25)]
-		public int UserType { get; set; }
+        [DataMember(Order = 24)]
+        public string SolnId { get; set; }
 
-		public int UserId { get; set; }
+        [DataMember(Order = 25)]
+        public int UserType { get; set; }
+
+        public int UserId { get; set; }
 
         public string Token { get; set; }
     }
@@ -1119,6 +1119,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     public class GetUserTypesRequest : EbServiceStackAuthRequest, IReturn<GetUserTypesResponse>
     {
+        public int Id { get; set; }
     }
 
     public class GetUserTypesResponse
@@ -1126,6 +1127,16 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public List<EbProfileUserType> UserTypes { get; set; }
     }
 
+    public class UpdateUserTypeRequset : EbServiceStackAuthRequest, IReturn<UpdateUserTypeResponse>
+    {
+        public int Id { get; set; }
+
+        public string Name { get; set; }
+    }
+    public class UpdateUserTypeResponse
+    {
+        public bool Status { get; set; }
+    }
     public class LoginLogCls
     {
         public string UserName { get; set; }
@@ -1133,5 +1144,5 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string SignInAt { get; set; }
         public string SignOutAt { get; set; }
         public string SignOutDate { get; set; }
-    }    
+    }
 }

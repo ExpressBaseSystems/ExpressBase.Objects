@@ -28,6 +28,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.ImageSeletor)]
+        [OnChangeUIFunction("EbImage.changeSource")]
         public int ImageId { get; set; }
 
         [EnableInBuilder(BuilderType.BotForm)]
@@ -36,7 +37,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
         public string Alt { get; set; }
-        
+
         public override bool isFullViewContol { get => true; set => base.isFullViewContol = value; }
 
         [HideInPropertyGrid]
@@ -54,6 +55,10 @@ namespace ExpressBase.Objects
         [DefaultPropValue("200")]
         public int MaxWidth { get; set; }
 
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        public override EbScript ValueExpr { get; set; }
+
         public override string UIchangeFns
         {
             get
@@ -64,9 +69,24 @@ namespace ExpressBase.Objects
                 },
                 adjustMaxWidth : function(elementId, props){
                     $(`#cont_${elementId} .ebimg-cont img`).css('max-width', `${props.MaxWidth}px`);
+                },
+            changeSource : function(elementId, props){
+                    if( props.ImageId > 0){
+                       $(`#${elementId.toLowerCase()}`).attr('src', '../images/'+ `${props.ImageId}` +'.jpg'); 
+                        }
                 }
                 }";
             }
+        } 
+
+        public override string SetValueJSfn
+        {
+            get
+            {
+                return @"
+                $('#' + this.EbSid_CtxId.toLowerCase()).attr('src', '../images/'+ p1 +'.jpg');";
+            }
+            set { }
         }
 
         public void InitFromDataBase(JsonServiceClient ServiceClient)
@@ -101,7 +121,7 @@ namespace ExpressBase.Objects
             <img id='@name@' src='@src@' style='max-width:@maxwidth@px; max-height:@maxheight@px;'>
         </div>"
     .Replace("@name@", this.Name)
-    .Replace("@src@", (this.ImageId > 0) ? "../images/"+this.ImageId+".jpg" : "/images/image.png")
+    .Replace("@src@", (this.ImageId > 0) ? "../images/" + this.ImageId + ".jpg" : "/images/image.png")
     .Replace("@toolTipText@", this.ToolTipText)
     .Replace("@value@", "")//"value='" + this.Value + "'")
     .Replace("@maxwidth@", this.MaxWidth > 0 ? this.MaxWidth.ToString() : "200")
@@ -131,9 +151,6 @@ namespace ExpressBase.Objects
 
         [HideInPropertyGrid]
         public override EbScript VisibleExpr { get; set; }
-
-        [HideInPropertyGrid]
-        public override EbScript ValueExpr { get; set; }
 
         [HideInPropertyGrid]
         public override string BackColor { get; set; }
