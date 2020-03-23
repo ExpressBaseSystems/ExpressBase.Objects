@@ -231,7 +231,7 @@ if (form.review.currentStage.currentAction.name == ""Reject"")
                 }
                 if (_dict[i].Control.OnChangeFn != null && !string.IsNullOrEmpty(_dict[i].Control.OnChangeFn.Code))
                 {
-                    if (_dict[i].Control.OnChangeFn.Code.Contains(".setValue("))
+                    if (_dict[i].Control.OnChangeFn.Code.Contains(".setValue(") && !(_dict[i].Control is EbScriptButton))
                     {
                         throw new FormException("SetValue is not allowed in OnChange expression of " + _dict[i].Control.Name);
                     }
