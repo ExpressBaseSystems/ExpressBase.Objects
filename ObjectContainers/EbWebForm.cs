@@ -1379,7 +1379,7 @@ namespace ExpressBase.Objects
                                 {
                                     Name = Column.Control.Label,
                                     Type = ((int)EbDbTypes.String).ToString(),
-                                    Value = string.IsNullOrEmpty(Column.F) ? Column.Value : Column.F
+                                    Value = string.IsNullOrEmpty(Column.F) ? Convert.ToString(Column.Value) : Column.F
                                 });
                             }
                         }
@@ -1693,7 +1693,7 @@ namespace ExpressBase.Objects
                     //_FG_WebForm global = GlobalsGenerator.GetCSharpFormGlobals(this, this.FormData);
                     //_FG_Root globals = new _FG_Root(global, this, service);
 
-                    FG_Root globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, this.FormData);
+                    FG_Root globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, this.FormData, this.FormDataBackup);
 
                     object x = this.ExecuteCSharpScriptNew(currentStage.NextStage.Code, globals);
                     string nxtStName = Convert.ToString(x);
@@ -1945,8 +1945,7 @@ namespace ExpressBase.Objects
         private void PrepareWebFormData()
         {
             DateTime startdt = DateTime.Now;
-            FormAsGlobal global = GlobalsGenerator.GetFormAsFlatGlobal(this, this.FormData);
-            FormGlobals globals = new FormGlobals() { sourceform = global };
+            FG_Root globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, this.FormData, this.FormDataBackup);
             foreach (EbDataPusher pusher in this.DataPushers)
             {
                 pusher.WebForm.DataPusherConfig.SourceRecId = this.TableRowId;
@@ -1957,7 +1956,7 @@ namespace ExpressBase.Objects
 
                 if (!pusher.PushOnlyIf.IsNullOrEmpty())
                 {
-                    string status = Convert.ToString(pusher.WebForm.ExecuteCSharpScript(pusher.PushOnlyIf, globals));
+                    string status = Convert.ToString(pusher.WebForm.ExecuteCSharpScriptNew(pusher.PushOnlyIf, globals));
                     if (status.Equals(true.ToString()))
                         pusher.WebForm.DataPusherConfig.AllowPush = true;
                 }
@@ -2016,7 +2015,7 @@ namespace ExpressBase.Objects
             Console.WriteLine("PrepareWebFormData for Data Pushers. Execution Time = " + (DateTime.Now - startdt).TotalMilliseconds);
         }
 
-        public void ProcessPushJson(EbDataPusher pusher, FormGlobals globals)
+        public void ProcessPushJson(EbDataPusher pusher, FG_Root globals)
         {
             this.FormData = new WebformData() { MasterTable = this.FormSchema.MasterTable };
             JObject JObj = JObject.Parse(pusher.Json);
@@ -2030,7 +2029,7 @@ namespace ExpressBase.Objects
                     {
                         if (_table.TableType == WebFormTableTypes.Grid && !pusher.SkipLineItemIf.IsNullOrEmpty())
                         {
-                            string status = Convert.ToString(this.ExecuteCSharpScript(pusher.SkipLineItemIf, globals));
+                            string status = Convert.ToString(this.ExecuteCSharpScriptNew(pusher.SkipLineItemIf, globals));
                             if (status.Equals(true.ToString()))
                                 continue;
                         }
@@ -2041,22 +2040,41 @@ namespace ExpressBase.Objects
             }
         }
 
+        private SingleRow GetSingleRow(JToken JRow, TableSchema _table, FG_Root globals)
+        {
+            SingleRow Row = new SingleRow() { RowId = 0 };
+            foreach (ColumnSchema _column in _table.Columns)
+            {
+                object val = null;
+                if (JRow[_column.ColumnName] != null)
+                    val = this.ExecuteCSharpScriptNew(JRow[_column.ColumnName].ToString(), globals);
+
+                Row.Columns.Add(new SingleColumn
+                {
+                    Name = _column.ColumnName,
+                    Type = _column.EbDbType,
+                    Value = val
+                });
+            }
+            return Row;
+        }
+
+        //duplicate for SQL job - remove this fn if globals conversion is completed
         private SingleRow GetSingleRow(JToken JRow, TableSchema _table, FormGlobals globals)
         {
             SingleRow Row = new SingleRow() { RowId = 0 };
             foreach (ColumnSchema _column in _table.Columns)
             {
+                object val = null;
                 if (JRow[_column.ColumnName] != null)
-                {
-                    JRow[_column.ColumnName] = Convert.ToString(this.ExecuteCSharpScript(JRow[_column.ColumnName].ToString(), globals));
+                    val = this.ExecuteCSharpScript(JRow[_column.ColumnName].ToString(), globals);
 
-                    Row.Columns.Add(new SingleColumn
-                    {
-                        Name = _column.ColumnName,
-                        Type = _column.EbDbType,
-                        Value = JRow[_column.ColumnName].ToString()
-                    });
-                }
+                Row.Columns.Add(new SingleColumn
+                {
+                    Name = _column.ColumnName,
+                    Type = _column.EbDbType,
+                    Value = val
+                });
             }
             return Row;
         }
@@ -2092,8 +2110,7 @@ namespace ExpressBase.Objects
             {
                 Script valscript = CSharpScript.Create<dynamic>(
                     code,
-                    ScriptOptions.Default.WithReferences("Microsoft.CSharp", "System.Core").WithImports("System.Dynamic", "System", "System.Collections.Generic",
-                    "System.Diagnostics", "System.Linq"),
+                    ScriptOptions.Default.WithReferences("Microsoft.CSharp", "System.Core").WithImports("System", "System.Collections.Generic", "System.Linq"),
                     globalsType: typeof(FG_Root)
                 );
                 valscript.Compile();

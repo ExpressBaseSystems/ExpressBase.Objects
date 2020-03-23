@@ -175,25 +175,27 @@ namespace ExpressBase.Objects.WebFormRelated
         }
 
 
-        public static FG_Root GetCSharpFormGlobals_NEW(EbWebForm _this, WebformData _formdata)
+        public static FG_Root GetCSharpFormGlobals_NEW(EbWebForm _this, WebformData _formdata, WebformData _formdataBkUp)
         {
-            FG_User fG_User = new FG_User(_this.UserObj.Id, _this.UserObj.FullName, _this.UserObj.Email, _this.UserObj.Roles);
+            FG_User fG_User = new FG_User(_this.UserObj.UserId, _this.UserObj.FullName, _this.UserObj.Email, _this.UserObj.Roles);
             FG_System fG_System = new FG_System();
             FG_WebForm fG_WebForm = new FG_WebForm();
-            GetCSharpFormGlobalsRec_NEW(fG_WebForm, _this, _formdata);
-            return new FG_Root(fG_WebForm, fG_User, fG_System);
+            GetCSharpFormGlobalsRec_NEW(fG_WebForm, _this, _formdata, _formdataBkUp);
+            int mode = _this.ExeDataPusher ? 1 : 2;
+            return new FG_Root(fG_WebForm, fG_User, fG_System, mode);
         }
 
-        private static void GetCSharpFormGlobalsRec_NEW(FG_WebForm fG_WebForm, EbControlContainer _container, WebformData _formdata)
+        private static void GetCSharpFormGlobalsRec_NEW(FG_WebForm fG_WebForm, EbControlContainer _container, WebformData _formdata, WebformData _formdataBkUp)
         {
             SingleTable Table = _formdata.MultipleTables.ContainsKey(_container.TableName) ? _formdata.MultipleTables[_container.TableName] : new SingleTable();
+            SingleTable TableBkUp = _formdataBkUp != null && _formdataBkUp.MultipleTables.ContainsKey(_container.TableName) ? _formdataBkUp.MultipleTables[_container.TableName] : new SingleTable();
             if (_container is EbDataGrid)
             {
-                fG_WebForm.DataGrids.Add(GetDataGridGlobal(_container as EbDataGrid, Table));
+                fG_WebForm.DataGrids.Add(GetDataGridGlobal(_container as EbDataGrid, Table, TableBkUp));
             }
             else if (_container is EbReview)
             {
-                fG_WebForm.Review = GetReviewGlobal(_container as EbReview, Table);
+                fG_WebForm.Review = GetReviewGlobal(_container as EbReview, Table, TableBkUp);
             }
             else
             {
@@ -201,20 +203,22 @@ namespace ExpressBase.Objects.WebFormRelated
                 {
                     if (_control is EbControlContainer)
                     {
-                        GetCSharpFormGlobalsRec_NEW(fG_WebForm, _control as EbControlContainer, _formdata);
+                        GetCSharpFormGlobalsRec_NEW(fG_WebForm, _control as EbControlContainer, _formdata, _formdataBkUp);
                     }
                     else
                     {
                         object data = null;
-                        if (_formdata.MultipleTables.ContainsKey(_container.TableName) && _formdata.MultipleTables[_container.TableName].Count > 0)
-                            data = _formdata.MultipleTables[_container.TableName][0][_control.Name];
+                        if (Table.Count > 0 && Table[0].GetColumn(_control.Name) != null)
+                            data = Table[0][_control.Name];
+                        else if (TableBkUp.Count > 0 && TableBkUp[0].GetColumn(_control.Name) != null)
+                            data = TableBkUp[0][_control.Name];
                         fG_WebForm.FlatCtrls.Controls.Add(new FG_Control(_control.Name, data));
                     }
                 }
             }
         }
 
-        private static FG_DataGrid GetDataGridGlobal(EbDataGrid DG, SingleTable Table)
+        private static FG_DataGrid GetDataGridGlobal(EbDataGrid DG, SingleTable Table, SingleTable TableBkUp)
         {
             List<FG_Row> Rows = new List<FG_Row>();
             foreach (SingleRow Row in Table)
@@ -229,7 +233,7 @@ namespace ExpressBase.Objects.WebFormRelated
             return new FG_DataGrid(DG.Name, Rows);
         }
 
-        private static FG_Review GetReviewGlobal(EbReview Rev, SingleTable Table)
+        private static FG_Review GetReviewGlobal(EbReview Rev, SingleTable Table, SingleTable TableBkUp)
         {
             Dictionary<string, FG_Review_Stage> stages = new Dictionary<string, FG_Review_Stage>();
             FG_Review_Stage currentStage = null;
@@ -281,7 +285,7 @@ namespace ExpressBase.Objects.WebFormRelated
 
             List<Param> p = new List<Param> { { new Param { Name = "id", Type = ((int)EbDbTypes.Int32).ToString(), Value = _this.TableRowId.ToString() } } };
             string _params = JsonConvert.SerializeObject(p).ToBase64();
-            string link = $"/WebForm/Index?refId={_this.RefId}&_params={_params}&_mode=1";            
+            string link = $"/WebForm/Index?refId={_this.RefId}&_params={_params}&_mode=1";
 
             foreach (FG_Notification notification in _globals.system.Notifications)
             {

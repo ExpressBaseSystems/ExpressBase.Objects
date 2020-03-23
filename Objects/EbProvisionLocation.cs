@@ -229,7 +229,7 @@ this.Init = function(id)
 
         public override bool ParameterizeControl(IDatabase DataDB, List<DbParameter> param, string tbl, SingleColumn cField, bool ins, ref int i, ref string _col, ref string _val, ref string _extqry, User usr, SingleColumn ocF)
         {
-            Dictionary<string, string> _d = JsonConvert.DeserializeObject<Dictionary<string, string>>(cField.Value);
+            Dictionary<string, string> _d = JsonConvert.DeserializeObject<Dictionary<string, string>>(Convert.ToString(cField.Value));
             param.Add(DataDB.GetNewParameter("shortname_" + i, EbDbTypes.String, _d["shortname"]));
             param.Add(DataDB.GetNewParameter("longname_" + i, EbDbTypes.String, _d["longname"]));
             param.Add(DataDB.GetNewParameter("image_" + i, EbDbTypes.String, _d["image"]));
