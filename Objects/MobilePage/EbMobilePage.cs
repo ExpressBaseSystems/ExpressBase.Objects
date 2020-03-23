@@ -41,7 +41,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("Identity")]
-        [Alias("Mode")]
+        [Alias("Behavior")]
         [HelpText("Should the page work online or offline or in mixed")]
         public NetworkMode NetworkMode { get; set; }
 
@@ -64,8 +64,18 @@ namespace ExpressBase.Objects
         public bool HideFromMenu { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("Behavior")]
+        [PropertyGroup("Link Style")]
         [HelpText("FontAwesome unicode string eg: f2b9 ")]
         public string Icon { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Link Style")]
+        [PropertyEditor(PropertyEditorType.Color)]
+        public string IconColor { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Link Style")]
+        [PropertyEditor(PropertyEditorType.Color)]
+        public string IconBackground { get; set; }
     }
 }
