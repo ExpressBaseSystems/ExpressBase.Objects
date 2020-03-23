@@ -53,12 +53,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class ApiRequest : IReturn<ApiResponse>, IEbSSRequest
+    public class ApiRequest : EbServiceStackAuthRequest, IReturn<ApiResponse>
     {
-        public string SolnId { get; set; }
-
-        public int UserId { get; set; }
-
         [DataMember(Order = 1)]
         public string Version { set; get; }
 
