@@ -3,6 +3,7 @@ using ExpressBase.Common.Constants;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
+using ExpressBase.Common.Structures;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -12,9 +13,9 @@ using System.Text;
 namespace ExpressBase.Objects.Objects
 {
 	[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-	public class EbScriptButton: EbControlUI
+	public class EbExportButton : EbControlUI
 	{
-		public EbScriptButton() { }
+		public EbExportButton() { }
 
 		[OnDeserialized]
 		public void OnDeserializedMethod(StreamingContext context)
@@ -23,11 +24,18 @@ namespace ExpressBase.Objects.Objects
 			this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
 		}
 
-		public override string ToolIconHtml { get { return "<i class='fa fa-square-o'></i>"; } set { } }
+		public override string ToolIconHtml { get { return "<i class='fa fa-external-link'></i>"; } set { } }
 
-		public override string ToolNameAlias { get { return "Script Button"; } set { } }
+		public override string ToolNameAlias { get { return "Export Button"; } set { } }
 
-		public override string ToolHelpText { get { return "Script Button"; } set { } }
+		public override string ToolHelpText { get { return "Export Button"; } set { } }
+
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+		[PropertyEditor(PropertyEditorType.ObjectSelector)]
+		[PropertyGroup(PGConstants.CORE)]
+		[OSE_ObjectTypes(EbObjectTypes.iWebForm)]
+		[Alias("Destination Form")]
+		public string FormRefId { get; set; }
 
 
 		public override string GetBareHtml()
@@ -98,8 +106,7 @@ namespace ExpressBase.Objects.Objects
 		public override string LabelForeColor { get; set; }
 
 		[EnableInBuilder(BuilderType.WebForm)]
-		[PropertyGroup(PGConstants.EVENTS)]
-		[Alias("OnClick")]
+		[HideInPropertyGrid]
 		public override EbScript OnChangeFn { get; set; }
 
 
@@ -112,7 +119,7 @@ namespace ExpressBase.Objects.Objects
 
 		[EnableInBuilder(BuilderType.WebForm)]
 		public override bool IsDisable { get; set; }
-		
+
 		[EnableInBuilder(BuilderType.WebForm)]
 		public override string HelpText { get; set; }
 
@@ -126,14 +133,14 @@ namespace ExpressBase.Objects.Objects
 		//public EbScript OnClickFn { get; set; }
 
 
-		[JsonIgnore]
-		public override string OnChangeBindJSFn
-		{
-			get
-			{
-				return @"$('#' + this.EbSid_CtxId).on('click', p1);";
-			}
-			set { }
-		}
+		//[JsonIgnore]
+		//public override string OnChangeBindJSFn
+		//{
+		//	get
+		//	{
+		//		return @"$('#' + this.EbSid_CtxId).on('click', p1);";
+		//	}
+		//	set { }
+		//}
 	}
 }

@@ -36,14 +36,18 @@ namespace ExpressBase.Objects.Objects
 			{
 				return @"EbRating = {
                 starCount : function(elementId, props) {
-                    console.log('ebrating');
-				var rtngHtml='';
-					for(var i=props.MaxVal; i>0; i--){
-						rtngHtml += `<span class='fa fa-star-o wrd_spacing'></span>`;
-					}
-	
-                  let rtg =  $(`[ebsid = ${elementId}]`).find('.ratingDiv').empty().append(rtngHtml);
-                }
+								let rtngHtml='';
+									for(let i=props.MaxVal; i>0; i--){
+										rtngHtml += `<span class='fa fa-star-o wrd_spacing'></span>`;
+									}
+								let rtg =  $(`[ebsid = ${elementId}]`).find('.ratingDiv_dc').empty().append(rtngHtml);
+							},
+				fullStarFn : function(elementId, props) {
+							props.HalfStar=!props.FullStar;
+							},
+				halfStarFn:function(elementId, props) {
+							props.FullStar=!props.HalfStar;
+							}
             }";
 			}
 		}
@@ -51,17 +55,13 @@ namespace ExpressBase.Objects.Objects
 		public override string GetBareHtml()
 		{
 
-
 			var htmlstring = "";
-			for (var i = this.MaxVal; i> 0; i--)
+			for (var i = this.MaxVal; i > 0; i--)
 			{
-				htmlstring += @"<input type='radio' name='@ebsid@' value='@valuei@' id='@ebsid@ratingID@valuei@' class='rtngStarInpt'> 
-								<label for='@ebsid@ratingID@valuei@' class=''>
-								<i class='fa fa-star'></i>
-								</label>".Replace("@valuei@",i.ToString());
+				htmlstring += @"<span class='fa fa-star-o wrd_spacing'>";
 			}
-			return @"<div>
-					<div class='rating-container ' id='@ebsid@_ratingDiv'>
+			return @"<div class='rating-container ' id='@ebsid@_ratingDiv'>
+					<div class='ratingDiv_dc'>
 						@rtngstarHtml@
 
 					</div>
@@ -74,15 +74,15 @@ namespace ExpressBase.Objects.Objects
 		public override string GetDesignHtml()
 		{
 			string ratingHtml = @"
-					<div class='ratingDiv' id='@ebsid@_ratingDiv' style='width:100%;'>
+					<div class='ratingDiv_dc' id='@ebsid@_ratingDiv' style='width:100%;'>
 						<span class='fa fa-star-o wrd_spacing'></span><span class='fa fa-star-o wrd_spacing'></span><span class='fa fa-star-o wrd_spacing'></span><span class='fa fa-star-o wrd_spacing'></span><span class='fa fa-star-o wrd_spacing'></span>
 					</div>";
 
-			 string _html= HtmlConstants.CONTROL_WRAPER_HTML4WEB
-			   .Replace("@LabelForeColor ", "color:" + (LabelForeColor ?? "@LabelForeColor ") + ";")
-			   .Replace("@LabelBackColor ", "background-color:" + (LabelBackColor ?? "@LabelBackColor ") + ";")
-			   .Replace("@barehtml@", ratingHtml)
-					.RemoveCR().DoubleQuoted();
+			string _html = HtmlConstants.CONTROL_WRAPER_HTML4WEB
+			  .Replace("@LabelForeColor ", "color:" + (LabelForeColor ?? "@LabelForeColor ") + ";")
+			  .Replace("@LabelBackColor ", "background-color:" + (LabelBackColor ?? "@LabelBackColor ") + ";")
+			  .Replace("@barehtml@", ratingHtml)
+				   .RemoveCR().DoubleQuoted();
 			return ReplacePropsInHTML(_html);
 
 			//.Replace("@ebsid@", String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId)
@@ -101,7 +101,7 @@ namespace ExpressBase.Objects.Objects
 		{
 			get
 			{
-				return @" return this.RatingCount = $('[name=' + this.EbSid_CtxId + ']:checked').val();";
+				return @" return $(`#${this.EbSid}_ratingDiv`).rateYo('rating');";
 			}
 			set { }
 		}
@@ -110,15 +110,7 @@ namespace ExpressBase.Objects.Objects
 		{
 			get
 			{
-				return @"$('input[name = ' + this.EbSid_CtxId + ']').on('change', p1);";
-			}
-			set { }
-		}
-		public override string JustSetValueJSfn
-		{
-			get
-			{
-				return @" $('input[name = ' + this.EbSid_CtxId + '][value = ' + p1 + ']').prop('checked', true)";
+				return @"$('#' + this.EbSid + '_ratingDiv').rateYo().on('rateyo.set', p1);";
 			}
 			set { }
 		}
@@ -127,15 +119,15 @@ namespace ExpressBase.Objects.Objects
 		{
 			get
 			{
-				return JustSetValueJSfn + @".trigger('change');";
+				return @" $(`#${this.EbSid}_ratingDiv`).rateYo('rating', p1);";
 			}
 			set { }
 		}
-		public override string ClearJSfn 
+		public override string ClearJSfn
 		{
 			get
 			{
-				return @" $('input[name = ' + this.EbSid_CtxId + ']').prop('checked', false);";
+				return @" $(`#${this.EbSid}_ratingDiv`).rateYo('rating', 0);";
 			}
 			set { }
 		}
@@ -207,7 +199,7 @@ namespace ExpressBase.Objects.Objects
 		public override EbDbTypes EbDbType { get { return EbDbTypes.Decimal; } set { } }
 
 
-		
+
 		[EnableInBuilder(BuilderType.WebForm)]
 		[HideInPropertyGrid]
 		public int RatingCount { get; set; }
@@ -219,20 +211,36 @@ namespace ExpressBase.Objects.Objects
 		public int MaxVal { get; set; }
 
 		[EnableInBuilder(BuilderType.WebForm)]
-		[HideInPropertyGrid]
 		[PropertyEditor(PropertyEditorType.Color)]
-		public string IconColor { get; set; }
+		[Alias("Rating Color")]
+		[DefaultPropValue("#F39C12")]
+		public string RatingColor { get; set; }
 
 		[EnableInBuilder(BuilderType.WebForm)]
-		[PropertyEditor(PropertyEditorType.Color)]
 		[Alias("Remove border")]
 		public bool RemoveBorder { get; set; }
 
 		[EnableInBuilder(BuilderType.WebForm)]
-		[HideInPropertyGrid]
-		[Alias("Icon size")]
-		public int IconSize  { get; set; }
+		[DefaultPropValue("true")]
+		[OnChangeUIFunction("EbRating.fullStarFn")]
+		[Alias("Full Star")]
+		public bool FullStar { get; set; }
 
+		[EnableInBuilder(BuilderType.WebForm)]
+		[OnChangeUIFunction("EbRating.halfStarFn")]
+		[DefaultPropValue("false")]
+		[Alias("Half Star")]
+		public bool HalfStar { get; set; }
+
+		[EnableInBuilder(BuilderType.WebForm)]
+		[DefaultPropValue("24")]
+		[Alias("Star Size")]
+		public int StarWidth { get; set; }
+
+		[EnableInBuilder(BuilderType.WebForm)]
+		[DefaultPropValue("8")]
+		[Alias("Spacing")]
+		public int Spacing { get; set; }
 
 
 

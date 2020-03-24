@@ -201,7 +201,7 @@ return val"; } set { } }
         public override bool ParameterizeControl(IDatabase DataDB, List<DbParameter> param, string tbl, SingleColumn cField, bool ins, ref int i, ref string _col, ref string _val, ref string _extqry, User usr, SingleColumn ocF)
         {
             EbDbTypes ebDbTypes = this.EbDbType == EbDbTypes.Int32 ? EbDbTypes.Int32 : EbDbTypes.String;
-            if (string.IsNullOrEmpty(cField.Value))
+            if (cField.Value == null || Convert.ToString(cField.Value) == string.Empty)
             {
                 var p = DataDB.GetNewParameter(cField.Name + "_" + i, ebDbTypes);
                 p.Value = DBNull.Value;

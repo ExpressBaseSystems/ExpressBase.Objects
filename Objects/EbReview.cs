@@ -41,10 +41,7 @@ namespace ExpressBase.Objects
                 //new EbDGStringColumn() { Name = "eb_created_by_s", EbDbType = EbDbTypes.String, DoNotPersist = true}
             };
         }
-
-        //C# script variable
-        public string ReviewStatus { get; set; }
-        
+                
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [HideInPropertyGrid]
         public override bool IsSpecialContainer { get { return true; } set { } }
