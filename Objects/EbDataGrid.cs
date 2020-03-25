@@ -964,7 +964,7 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
                                 p1 = 'true'
                             else if(p1 === false)
                                 p1 = 'false'
-                           " + EbDGSimpleSelectColumn.JustSetValueJSfn+
+                           " + EbDGSimpleSelectColumn.JustSetValueJSfn +
                         "}";
             }
             set { }
@@ -974,14 +974,14 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
         {
             get
             {
-                return JSFnsConstants.DG_hiddenColCheckCode + 
+                return JSFnsConstants.DG_hiddenColCheckCode +
                     @"
                     {
                         if(p1 === true)
                             p1 = 'true'
                         else if(p1 === false)
                             p1 = 'false'
-                       " + EbDGSimpleSelectColumn.SetValueJSfn + 
+                       " + EbDGSimpleSelectColumn.SetValueJSfn +
                     "}";
             }
             set { }
@@ -1977,15 +1977,17 @@ else// PS
             this.EbUserSelect.InitOptions(Users);
         }
 
-        //public override string GetDisplayMemberJSfn
-        //{
-        //	get { return @"this.getValue();"; }
-        //	set { }
-        //}
-
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
         public override string InputControlType { get { return "EbUserSelect"; } }
+
+        public override string GetValueFromDOMJSfn { get { return this.EbUserSelect.GetValueFromDOMJSfn; } }
+        public override string OnChangeBindJSFn { get { return @"$(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] input[type=hidden]`, p2);"; } set { } }
+        public override string JustSetValueJSfn { get { return this.EbUserSelect.JustSetValueJSfn; } }
+        public override string SetValueJSfn { get { return @"$('#' + this.EbSid_CtxId + ' input[type=hidden]').data('ctrl_ref', this); this._JsCtrlMng.setValue(p1, p2, false);"; } }
+        public override string GetDisplayMemberFromDOMJSfn { get { return this.EbUserSelect.GetDisplayMemberFromDOMJSfn; } }
+        public override string RefreshJSfn { get { return this.EbUserSelect.RefreshJSfn; } }
+        public override string ClearJSfn { get { return this.EbUserSelect.ClearJSfn; } }
 
         //EbDGUserSelectColumn
         public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)

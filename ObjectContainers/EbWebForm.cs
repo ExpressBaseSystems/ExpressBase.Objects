@@ -61,7 +61,7 @@ namespace ExpressBase.Objects
 
         public Eb_Solution SolutionObj { get; set; }
 
-        public FormAsGlobal FormGlobals { get; set; }
+        public FG_Root FormGlobals { get; set; }
 
         public bool IsLocEditable { get; set; }
 
@@ -1182,9 +1182,13 @@ namespace ExpressBase.Objects
                 if (Ctrl is EbFileUploader)
                 {
                     if (this.FormGlobals == null)
-                        this.FormGlobals = GlobalsGenerator.GetFormAsFlatGlobal(this, _FormData);
+                        this.FormGlobals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, _FormData, null);
                     string context = this.RefId.Split(CharConstants.DASH)[3] + CharConstants.UNDERSCORE + this.TableRowId.ToString();//context format = objectId_rowId_ControlId
-                    string cxt2 = (Ctrl as EbFileUploader).ExeContextCode(this.FormGlobals, false);
+                    EbFileUploader _ctrl = Ctrl as EbFileUploader;
+                    string cxt2 = null;
+                    if (_ctrl.ContextGetExpr != null && !_ctrl.ContextGetExpr.Code.IsNullOrEmpty())
+                        cxt2 = Convert.ToString(this.ExecuteCSharpScriptNew(_ctrl.ContextGetExpr.Code, this.FormGlobals));
+
                     string qry = (Ctrl as EbFileUploader).GetSelectQuery(DataDB, string.IsNullOrEmpty(cxt2));
 
                     DbParameter[] param = new DbParameter[]
@@ -1331,13 +1335,13 @@ namespace ExpressBase.Objects
             }
 
             if (QrsDict.Count > 0)
-            { 
+            {
                 if (param.Find(e => e.ParameterName == FormConstants.eb_loc_id) == null)
                     param.Add(DataDB.GetNewParameter(FormConstants.eb_loc_id, EbDbTypes.Decimal, this.LocationId));
- 
+
                 if (param.Find(e => e.ParameterName == "eb_currentuser_id") == null)
                     param.Add(DataDB.GetNewParameter("eb_currentuser_id", EbDbTypes.Decimal, this.UserObj.UserId));
-                
+
                 EbDataSet dataset = DataDB.DoQueries(string.Join(CharConstants.SPACE, QrsDict.Select(d => d.Value)), param.ToArray());
                 int i = 0;
                 foreach (KeyValuePair<string, string> item in QrsDict)
@@ -1800,10 +1804,12 @@ namespace ExpressBase.Objects
                     if (this.FormData.ExtendedTables.ContainsKey(_c.Name ?? _c.EbSid))
                     {
                         if (this.FormGlobals == null)
-                            this.FormGlobals = GlobalsGenerator.GetFormAsFlatGlobal(this, this.FormData);
-                        string secCxtGet = _c.ExeContextCode(this.FormGlobals, false);
-                        string secCxtSet = _c.ExeContextCode(this.FormGlobals, true);
-
+                            this.FormGlobals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, this.FormData, null);
+                        string secCxtGet = null, secCxtSet = null;
+                        if (_c.ContextGetExpr != null && !_c.ContextGetExpr.Code.IsNullOrEmpty())
+                            secCxtGet = Convert.ToString(this.ExecuteCSharpScriptNew(_c.ContextGetExpr.Code, this.FormGlobals));
+                        if (_c.ContextSetExpr != null && !_c.ContextSetExpr.Code.IsNullOrEmpty())
+                            secCxtSet = Convert.ToString(this.ExecuteCSharpScriptNew(_c.ContextSetExpr.Code, this.FormGlobals));
                         _qry = _c.GetUpdateQuery2(DataDB, param, this.FormData.ExtendedTables[_c.Name ?? _c.EbSid], this.TableName, this.RefId.Split("-")[3], ref i, this.TableRowId, secCxtGet, secCxtSet);
                     }
                 }
