@@ -148,12 +148,6 @@ else {
         public string LabelT { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [PropertyGroup(PGConstants.APPEARANCE)]
-        [PropertyEditor(PropertyEditorType.FontSelector)]
-        [Alias("Font Family")]
-        public string FontFamilyT { get; set; }
-
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup("test")]
         [MetaOnly]
         public string MetaOnly { get; set; }
