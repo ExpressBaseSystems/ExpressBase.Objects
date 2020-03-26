@@ -24,9 +24,25 @@ namespace ExpressBase.Objects
     }
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-    public class EbNumeric : EbControlUI
+    public class EbNumeric : EbControlUI, IEbInputControls
     {
         public EbNumeric() { }
+
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyEditor(PropertyEditorType.Expandable)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        [UIproperty]
+        [DefaultPropValue(7, 7, 7, 7)]
+        [OnChangeUIFunction("Common.INP_PADDING")]
+        public UISides Padding { get; set; }
+
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        [PropertyEditor(PropertyEditorType.FontSelector)]
+        [OnChangeUIFunction("Common.INP_FONT_STYLE")]
+        public EbFont FontStyle { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [HideInPropertyGrid]
@@ -40,6 +56,8 @@ namespace ExpressBase.Objects
         {
             this.BareControlHtml = this.GetBareHtml();
             this.BareControlHtml4Bot = this.BareControlHtml;
+            if (this.Padding == null)
+                this.Padding = new UISides() { Bottom = 7, Left = 7, Right = 7, Top = 7 };
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
 
