@@ -1703,11 +1703,14 @@ namespace ExpressBase.Objects
                     string nxtStName = Convert.ToString(x);
 
                     GlobalsGenerator.PostProcessGlobals(this, globals, service);
-
-                    if (globals.form.review._ReviewStatus == "complete" || globals.form.review._ReviewStatus == "abandon")
+                    string _reviewStatus = globals.form.review._ReviewStatus;
+                    if (_reviewStatus == "complete" || _reviewStatus == "abandon")
                     {
                         this.AfterSaveRoutines.AddRange(ebReview.OnApprovalRoutines);
                         insMyActRequired = false;
+                        // eb_approval - update review_status
+                        insUpQ += $@"UPDATE eb_approval SET review_status = '{_reviewStatus}', eb_lastmodified_by = @eb_modified_by, eb_lastmodified_at = {DataDB.EB_CURRENT_TIMESTAMP} 
+                                    WHERE eb_src_id = @{this.TableName}_id AND eb_ver_id =  @{this.TableName}_eb_ver_id AND COALESCE(eb_del, 'F') = 'F'; ";
                     }
                     else
                     {
@@ -1786,8 +1789,22 @@ namespace ExpressBase.Objects
                 insUpQ += $@"INSERT INTO eb_my_actions({_col}, from_datetime, is_completed, eb_stages_id, form_ref_id, form_data_id, eb_del, description, is_form_data_editable)
                                 VALUES ({_val}, {DataDB.EB_CURRENT_TIMESTAMP}, 'F', (SELECT id FROM eb_stages WHERE stage_unique_id = '{nextStage.EbSid}' AND form_ref_id = '{this.RefId}' AND eb_del = 'F'), 
                                 '{this.RefId}', {masterId}, 'F', 'Review required in {this.DisplayName}', '{(nextStage.IsFormEditable ? "T" : "F")}'); ";
+                if (DataDB.Vendor == DatabaseVendors.MYSQL)
+                    insUpQ += "SELECT eb_persist_currval('eb_my_actions_id_seq'); ";
 
                 Console.WriteLine("Will try to INSERT eb_my_actions");
+
+                if (isInsert)// eb_approval - insert entry here
+                {                   
+                    insUpQ += $@"INSERT INTO eb_approval(review_status, eb_my_actions_id, eb_src_id, eb_ver_id, eb_created_by, eb_created_at, eb_del)
+                                    VALUES('processing', (SELECT eb_currval('eb_my_actions_id_seq')), (SELECT eb_currval('{this.TableName}_id_seq')), 
+                                    @{this.TableName}_eb_ver_id, @eb_createdby, {DataDB.EB_CURRENT_TIMESTAMP}, 'F'); ";
+                }
+                else // eb_approval - update eb_my_actions_id
+                {
+                    insUpQ += $@"UPDATE eb_approval SET eb_my_actions_id = (SELECT eb_currval('eb_my_actions_id_seq')), eb_lastmodified_by = @eb_modified_by, eb_lastmodified_at = {DataDB.EB_CURRENT_TIMESTAMP} 
+                                    WHERE eb_src_id = @{this.TableName}_id AND eb_ver_id =  @{this.TableName}_eb_ver_id AND COALESCE(eb_del, 'F') = 'F'; ";
+                }                    
             }
 
             return insUpQ;
