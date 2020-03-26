@@ -16,6 +16,12 @@ namespace ExpressBase.Objects
         Mixed
     }
 
+    public enum NumericBoxTypes
+    {
+        TextType = 0,
+        ButtonType = 1
+    }
+
     public abstract class EbMobilePageBase : EbObject
     {
 
