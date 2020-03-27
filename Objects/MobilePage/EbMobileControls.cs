@@ -45,6 +45,10 @@ namespace ExpressBase.Objects
         [HelpText("Set true if you dont want to save value from this field.")]
         public virtual bool DoNotPersist { get; set; }
 
+        [PropertyGroup("Behavior")]
+        [EnableInBuilder(BuilderType.MobilePage)]
+        public virtual bool Required { get; set; }
+
         public virtual EbControl GetWebFormCtrl(int counter) { return null; }
     }
 
@@ -631,6 +635,8 @@ namespace ExpressBase.Objects
         public override bool DoNotPersist { get; set; }
 
         public override bool Unique { get; set; }
+
+        public override bool Required { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
