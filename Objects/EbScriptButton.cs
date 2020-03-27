@@ -35,7 +35,7 @@ namespace ExpressBase.Objects.Objects
 
 
 			return @"<button id='@ebsid@' class='btn btn-default' style='width:100%; cursor: pointer; @backColor @foreColor @fontStyle'>@Label@</button>"
-				.Replace("@ebsid@", this.EbSid)
+				.Replace("@ebsid@", this.EbSid_CtxId)
 				.Replace("@Label@", this.Label ?? "Button")
 .Replace("@tabIndex", "tabindex='" + this.TabIndex + "'")
 .Replace("@backColor", "background-color:" + this.BackColor + ";")
