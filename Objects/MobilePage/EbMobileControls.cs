@@ -636,6 +636,8 @@ namespace ExpressBase.Objects
 
         public override bool Unique { get; set; }
 
+        public override bool Required { get; set; }
+
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
         public List<EbMobileControl> ChildControls { set; get; }
