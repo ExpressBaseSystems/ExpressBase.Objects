@@ -1965,6 +1965,19 @@ namespace ExpressBase.Objects
             return resp;
         }
 
+        //New implementation using less memory utilization// under testing
+        private void PrepareWebFormDataNew()
+        {
+            FG_Root globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, this.FormData, this.FormDataBackup);
+            EbDataPushHelper ebDataPushHelper = new EbDataPushHelper(this);
+            string code = ebDataPushHelper.GetProcessedSingleCode();
+            if (code != string.Empty)
+            {
+                object out_dict = this.ExecuteCSharpScriptNew(code, globals);
+                ebDataPushHelper.CreateWebFormData(out_dict);
+            }
+        }
+
         private void PrepareWebFormData()
         {
             DateTime startdt = DateTime.Now;
