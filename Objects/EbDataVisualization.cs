@@ -436,6 +436,35 @@ namespace ExpressBase.Objects
                     }
                 }
             }
+            DVBaseColumn Col = this.Columns.Get("eb_action");
+            if (Col != null)
+            {
+                foreach (DVColumnCollection _colcoll in this.ColumnsCollection)
+                {
+                    DVBaseColumn __col = _colcoll.Pop(Col.Name, EbDbTypes.String, false);
+                }
+                if (Col is DVStringColumn && this.AutoGen)
+                {
+                    DVBaseColumn actcol = new DVActionColumn
+                    {
+                        Data = Col.Data,
+                        Name = Col.Name,
+                        sTitle = Col.sTitle,
+                        Type = EbDbTypes.String,
+                        bVisible = true,
+                        sWidth = "100px",
+                        ClassName = Col.ClassName,
+                        LinkRefId = Col.LinkRefId,
+                        LinkType = Col.LinkType,
+                        FormMode = Col.FormMode,
+                        FormId = Col.FormId,
+                        Align = Align.Center,
+                        IsCustomColumn = true
+                    };
+                    this.Columns.Remove(Col);
+                    this.Columns.Add(actcol);
+                }
+            }
         }
 
         public override void BeforeSave(IServiceClient serviceClient, IRedisClient redis)
