@@ -45,6 +45,10 @@ namespace ExpressBase.Objects
         [HelpText("Set true if you dont want to save value from this field.")]
         public virtual bool DoNotPersist { get; set; }
 
+        [PropertyGroup("Behavior")]
+        [EnableInBuilder(BuilderType.MobilePage)]
+        public virtual bool Required { get; set; }
+
         public virtual EbControl GetWebFormCtrl(int counter) { return null; }
     }
 
@@ -127,12 +131,25 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         public bool IsCurrency { get; set; }
 
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Behavior")]
+        public NumericBoxTypes RenderType { get; set; }
+
         public override string GetDesignHtml()
         {
             return @"<div class='eb_stacklayout mob_control dropped' id='@id' eb-type='EbMobileNumericBox' tabindex='1' onclick='$(this).focus()'>
                             <label class='ctrl_label'> @Label </label>
                             <div class='eb_ctrlhtml'>
-                               <input type='number' class='eb_mob_textbox' />
+                                <input type='number' class='eb_mob_numericbox' />
+                                <div class='eb_mob_numericbox-btntype'>
+                                    <div class='wraper'>
+                                        <button class='numeric-btn'><i class='fa fa-minus'></i></button>
+                                        <div class='nemric-text'>
+                                            <input type='text'/>
+                                        </div>
+                                        <button class='numeric-btn'><i class='fa fa-plus'></i></button>
+                                    </div>
+                                </div>
                             </div>
                         </div>".RemoveCR().DoubleQuoted();
         }
@@ -616,7 +633,10 @@ namespace ExpressBase.Objects
     public class EbMobileDataGrid : EbMobileControl
     {
         public override bool DoNotPersist { get; set; }
+
         public override bool Unique { get; set; }
+
+        public override bool Required { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
@@ -629,6 +649,20 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("Data")]
         public string TableName { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
+        [Alias("Data Source")]
+        [PropertyGroup("Data")]
+        public string DataSourceRefId { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
+        [HelpText("sql query to get data from offline database")]
+        [Alias("Offline Query")]
+        [PropertyGroup("Data")]
+        public EbScript OfflineQuery { set; get; }
 
         public override string GetDesignHtml()
         {

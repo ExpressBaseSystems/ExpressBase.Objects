@@ -115,6 +115,38 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
+    public class GetExportFormDataRequest : EbServiceStackAuthRequest, IReturn<GetExportFormDataResponse>
+    {
+        [DataMember(Order = 1)]
+        public string SourceRefId { get; set; }
+
+        [DataMember(Order = 2)]
+        public int SourceRowId { get; set; }
+
+        [DataMember(Order = 3)]
+        public User UserObj { get; set; }
+
+        [DataMember(Order = 4)]
+        public int CurrentLoc { get; set; }
+
+        [DataMember(Order = 5)]
+        public WebFormRenderModes RenderMode { get; set; }
+
+        [DataMember(Order = 6)]
+        public string DestRefId { get; set; }
+    }
+
+    [DataContract]
+    public class GetExportFormDataResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public string FormDataWrap { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    [DataContract]
     public class GetFormData4MobileRequest : EbServiceStackAuthRequest, IReturn<GetFormData4MobileResponse>
     {
         [DataMember(Order = 1)]

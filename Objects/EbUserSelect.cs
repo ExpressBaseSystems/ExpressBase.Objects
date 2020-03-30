@@ -75,12 +75,29 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.FilterDialog, BuilderType.WebForm)]
         public bool LoadCurrentUser { get; set; }
 
-        public override string GetValueFromDOMJSfn { get { return @"
-        let itemO = $(`#${this.EbSid_CtxId}`).data('data-obj');
-        if (itemO)
-            return itemO['vm'];
-        else
-            return '';"; } set { } }
+        public override string GetValueFromDOMJSfn
+        {
+            get
+            {
+                return @"let itemO = $('#' + this.EbSid_CtxId).data('data-obj');
+                         if (itemO)
+                            return itemO['vm'];
+                         else
+                            return '';";
+            }
+        }
+
+        public override string OnChangeBindJSFn { get { return @"$('#' + this.EbSid_CtxId + ' input[type=hidden]').on('change', p1);"; } set { } }
+
+        public override string JustSetValueJSfn { get { return "this._JsCtrlMng.setValue(p1, p2, true);"; } }
+
+        public override string SetValueJSfn { get { return "this._JsCtrlMng.setValue(p1, p2, false);"; } }
+
+        public override string GetDisplayMemberFromDOMJSfn { get { return "return this._JsCtrlMng.getDisplayMember();"; } }
+
+        public override string RefreshJSfn { get { return "this._JsCtrlMng.refresh();"; } }
+
+        public override string ClearJSfn { get { return "this._JsCtrlMng.clear();"; } }
 
 
 

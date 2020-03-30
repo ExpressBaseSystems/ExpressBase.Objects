@@ -280,7 +280,7 @@ this.Init = function(id)
         {
             string c = string.Empty;
             string ep = string.Empty;
-            Dictionary<string, string> _d = JsonConvert.DeserializeObject<Dictionary<string, string>>(cField.Value);
+            Dictionary<string, string> _d = JsonConvert.DeserializeObject<Dictionary<string, string>>(Convert.ToString(cField.Value));
             if (ins)
             {
                 string sql = "SELECT id FROM eb_users WHERE LOWER(email) LIKE LOWER(:email) AND eb_del = 'F' AND (statusid = 0 OR statusid = 1 OR statusid = 2);";
@@ -311,7 +311,7 @@ this.Init = function(id)
             }
             else
             {
-                Dictionary<string, string> _od = JsonConvert.DeserializeObject<Dictionary<string, string>>(ocF.Value);
+                Dictionary<string, string> _od = JsonConvert.DeserializeObject<Dictionary<string, string>>(Convert.ToString(ocF.Value));
                 _d["id"] = _od["id"];
                 _d["email"] = _od["email"];
                 _d["usertype"] = _od["usertype"];

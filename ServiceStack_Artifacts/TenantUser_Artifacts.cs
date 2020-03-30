@@ -547,10 +547,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 1)]
         public Dictionary<int, EbLocation> Locations { get; set; }
 
-        [DataMember(Order = 1)]
+        [DataMember(Order = 2)]
         public List<EbLocationCustomField> Config { get; set; }
 
         [DataMember(Order = 3)]
+        public List<EbLocationType> LocationTypes { get; set; }
+
+        [DataMember(Order = 4)]
         public ResponseStatus ResponseStatus { get; set; }
     }
 
@@ -619,6 +622,33 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     }
 
+    public class CreateLocationTypeRequest : EbServiceStackAuthRequest, IReturn<CreateLocationTypeResponse>
+    {
+        public EbLocationType LocationType { get; set; }
+    }
+
+    public class CreateLocationTypeResponse : EbServiceStackResponse
+    {
+        [DataMember(Order = 1)]
+        public int Id { get; set; }
+
+        [DataMember(Order = 2)]
+        public bool Status { get; set; }
+    }
+
+    public class DeleteLocationTypeRequest : EbServiceStackAuthRequest, IReturn<DeleteLocationTypeResponse>
+    {
+        [DataMember(Order = 1)]
+        public int Id { get; set; }
+    }
+    public class DeleteLocationTypeResponse : EbServiceStackResponse
+    {
+        [DataMember(Order = 1)]
+        public int Id { get; set; }
+
+        [DataMember(Order = 2)]
+        public bool Status { get; set; }
+    }
     public class GetUserDashBoardObjectsRequest : IReturn<GetUserDashBoardObjectsResponse>, IEbSSRequest
     {
         public List<int> ObjectIds { get; set; }
@@ -630,10 +660,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
     public class GetUserDashBoardObjectsResponse : IEbSSResponse
     {
-        public Dictionary <string , EbDashBoard> DashBoardObjectIds { get; set; }
+        public Dictionary<string, EbDashBoard> DashBoardObjectIds { get; set; }
 
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
     }
-   
+
 }

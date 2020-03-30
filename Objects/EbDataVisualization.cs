@@ -245,7 +245,7 @@ namespace ExpressBase.Objects
             {
                 Console.WriteLine("AfterRedisGet " + e.Message);
             }
-        }    
+        }
 
     }
 
@@ -659,15 +659,17 @@ namespace ExpressBase.Objects
 
     [EnableInBuilder(BuilderType.DVBuilder)]
     [BuilderTypeEnum(BuilderType.DVBuilder)]
-    public class EbGoogleMap : EbDataVisualization, IEBRootObject
+    public class EbMapView : EbDataVisualization, IEBRootObject
     {
+
         [EnableInBuilder(BuilderType.DVBuilder)]
-        [HideInPropertyGrid]
-        public override DVColumnCollection Columns { get; set; }
+        [PropertyGroup("Core")]
+        public MapsType Maptype { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [HideInPropertyGrid]
-        public override bool IsPaging { get; set; }
+        [PropertyGroup("Core")]
+        public override DVColumnCollection Columns { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", 1)]
@@ -700,7 +702,7 @@ namespace ExpressBase.Objects
         [OnChangeExec(@"
             if(this.MarkerLink !== null)
                 pg.ShowProperty('FormParameter');
-            else 
+            else
                 pg.HideProperty('FormParameter');
         ")]
         public string MarkerLink { get; set; }
@@ -727,6 +729,16 @@ namespace ExpressBase.Objects
         [DefaultPropValue("10")]
         public int Zoomlevel { get; set; }
 
+        public EbMapView()
+        {
+            this.LatLong = new DVBaseColumn();
+            this.MarkerLabel = new List<DVBaseColumn>();
+            this.InfoWindow = new List<DVBaseColumn>();
+            this.FormParameter = new List<DVBaseColumn>();
+            this.AutoZoom = true;
+        }
+
+
         public static EbOperations Operations = MapOperations.Instance;
 
         public override List<string> DiscoverRelatedRefids()
@@ -752,15 +764,23 @@ namespace ExpressBase.Objects
             }
         }
 
-        public EbGoogleMap()
-        {
-            this.LatLong = new DVBaseColumn();
-            this.MarkerLabel = new List<DVBaseColumn>();
-            this.InfoWindow = new List<DVBaseColumn>();
-            this.FormParameter = new List<DVBaseColumn>();
-            this.AutoZoom = true;
-        }
+    }
 
+    public enum MapsType
+    {
+        OpenStreetMap = 0,
+        GoogleMap =1,
+    }
+
+    [EnableInBuilder(BuilderType.DVBuilder)]
+    public class EbGoogleMap : EbMapView
+    {
+       
+    }
+
+    [EnableInBuilder(BuilderType.DVBuilder)]
+    public class EbOpenStreetMap : EbMapView
+    {
     }
 
     [EnableInBuilder(BuilderType.DVBuilder)]
@@ -862,7 +882,7 @@ else {
         [PropertyEditor(PropertyEditorType.DropDown)]
         public LinkTypeEnum LinkType { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder,  BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Parent.LinesColumns")]
         public List<DVBaseColumn> FormId { get; set; }
 
