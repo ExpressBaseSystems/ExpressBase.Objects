@@ -630,6 +630,7 @@ namespace ExpressBase.Objects
         }
     }
 
+    [EnableInBuilder(BuilderType.MobilePage)]
     public class EbMobileDataGrid : EbMobileControl
     {
         public override bool DoNotPersist { get; set; }
@@ -756,6 +757,43 @@ namespace ExpressBase.Objects
                 dg.Controls.Add(this.GetGridControl(ctrl, counter++));
 
             return dg;
+        }
+    }
+
+    [EnableInBuilder(BuilderType.MobilePage)]
+    public class EbMobileAutoId : EbMobileControl
+    {
+        public override bool DoNotPersist { get; set; }
+
+        public override bool Unique { get; set; }
+
+        public override bool Required { get; set; }
+
+        public override bool ReadOnly { get { return true; } }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
+        public override EbDbTypes EbDbType { get { return EbDbTypes.String; } set { } }
+
+        public override string GetDesignHtml()
+        {
+            return @"<div class='eb_stacklayout mob_control dropped' id='@id' eb-type='EbMobileAutoId' tabindex='1' onclick='$(this).focus()'>
+                            <label class='ctrl_label'> @Label </label>
+                            <div class='eb_ctrlhtml'>
+                               <input type='text' class='eb_mob_autoid' />
+                            </div>
+                        </div>".RemoveCR().DoubleQuoted();
+        }
+
+        public override EbControl GetWebFormCtrl(int counter)
+        {
+            return new EbAutoId
+            {
+                EbSid = "AutoId" + counter,
+                Name = this.Name,
+                Margin = new UISides { Top = 0, Bottom = 0, Left = 0, Right = 0 },
+                Label = this.Label
+            };
         }
     }
 }
