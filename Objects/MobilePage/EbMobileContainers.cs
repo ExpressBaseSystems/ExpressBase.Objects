@@ -1,4 +1,5 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Data;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
@@ -88,7 +89,7 @@ namespace ExpressBase.Objects
                         });
 
                         foreach (EbMobileControl gctrl in grid.ChildControls)
-                                AppendMeta(meta[grid.TableName], gctrl, vDbTypes);
+                            AppendMeta(meta[grid.TableName], gctrl, vDbTypes);
 
                         AppendDefaultMeta(meta[grid.TableName], vDbTypes);
                     }
@@ -147,6 +148,10 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
+        public List<Param> DataSourceParams { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
         public string SourceFormRefId { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
@@ -199,6 +204,7 @@ namespace ExpressBase.Objects
         {
             OfflineQuery = new EbScript();
             Filters = new List<EbMobileDataColumn>();
+            DataSourceParams = new List<Param>();
         }
     }
 

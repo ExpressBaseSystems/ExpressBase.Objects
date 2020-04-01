@@ -69,6 +69,10 @@ namespace ExpressBase.Objects
         //public string VersionNumber { get; set; }
 
         //public string Status { get; set; }
+        public EbDataReader()
+        {
+            this.InputParams = new List<Param>();
+        }
 
         [JsonIgnore]
         public EbFilterDialog FilterDialog { get; set; }
