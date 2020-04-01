@@ -1792,6 +1792,8 @@ namespace ExpressBase.Objects
                     _col = "user_ids";
                     _val = $"'{uids.Join(",")}'";
                 }
+                else
+                    throw new FormException("Unable to process review control", (int)HttpStatusCodes.INTERNAL_SERVER_ERROR, "Invalid value for ApproverEntity : " + nextStage.ApproverEntity, "From GetMyActionInsertUpdateQuery");
 
                 insUpQ += $@"INSERT INTO eb_my_actions({_col}, from_datetime, is_completed, eb_stages_id, form_ref_id, form_data_id, eb_del, description, is_form_data_editable)
                                 VALUES ({_val}, {DataDB.EB_CURRENT_TIMESTAMP}, 'F', (SELECT id FROM eb_stages WHERE stage_unique_id = '{nextStage.EbSid}' AND form_ref_id = '{this.RefId}' AND eb_del = 'F'), 

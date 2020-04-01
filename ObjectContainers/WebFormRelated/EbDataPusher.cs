@@ -179,7 +179,7 @@ namespace ExpressBase.Objects
 
         private object GetValueFormOutDict(Dictionary<int, object[]> OutDict, ref int Index)
         {
-            int StopCounter = 500;// to avoid infinite loop in case if any unexpected error/exception
+            int StopCounter = 500;// to avoid infinite loop in case of any unexpected error/exception
             //assuming that maximum cs expressions in a data pusher is 500
             while (StopCounter > 0 && !OutDict.ContainsKey(Index))
             {
