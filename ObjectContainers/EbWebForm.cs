@@ -153,7 +153,7 @@ namespace ExpressBase.Objects
 
             return html
                 .Replace("@name@", this.Name)
-                .Replace("@ebsid@", this.EbSid)
+                .Replace("@ebsid@", this.EbSid_CtxId)
                 .Replace("@rmode@", IsRenderMode.ToString().ToLower())
                 .Replace("@tabindex@", IsRenderMode ? string.Empty : " tabindex='1'");
         }
@@ -1024,9 +1024,9 @@ namespace ExpressBase.Objects
             }
             else
             {
-                this.FormData = new WebformData() { MasterTable = _schema.MasterTable };
+                //this.FormData = new WebformData() { MasterTable = _schema.MasterTable };
+                this.GetEmptyModel();
                 _FormData = this.FormData;
-                this.GetDGsEmptyModel();
             }
 
             int count = 0;
@@ -1042,7 +1042,12 @@ namespace ExpressBase.Objects
                     else
                         this.GetFormattedData(dataTable, Table, _table);
                 }
-                if (!_FormData.MultipleTables.ContainsKey(_table.TableName))
+                //if (!_FormData.MultipleTables.ContainsKey(_table.TableName))
+                //    _FormData.MultipleTables.Add(_table.TableName, Table);
+
+                if (!(_table.TableType == WebFormTableTypes.Normal && Table.Count == 0) && _FormData.MultipleTables.ContainsKey(_table.TableName))
+                    _FormData.MultipleTables[_table.TableName] = Table;
+                else if (backup)
                     _FormData.MultipleTables.Add(_table.TableName, Table);
 
             }
@@ -1466,6 +1471,8 @@ namespace ExpressBase.Objects
             }
             foreach (EbWebForm WebForm in FormCollection)
             {
+                if (WebForm.DataPusherConfig?.AllowPush == false)
+                    continue;
                 if (!(WebForm.FormData.MultipleTables.ContainsKey(WebForm.FormSchema.MasterTable) && WebForm.FormData.MultipleTables[WebForm.FormSchema.MasterTable].Count > 0))
                 {
                     string _q = QueryGetter.GetInsertQuery(WebForm, DataDB, WebForm.FormSchema.MasterTable, true);
@@ -1785,6 +1792,8 @@ namespace ExpressBase.Objects
                     _col = "user_ids";
                     _val = $"'{uids.Join(",")}'";
                 }
+                else
+                    throw new FormException("Unable to process review control", (int)HttpStatusCodes.INTERNAL_SERVER_ERROR, "Invalid value for ApproverEntity : " + nextStage.ApproverEntity, "From GetMyActionInsertUpdateQuery");
 
                 insUpQ += $@"INSERT INTO eb_my_actions({_col}, from_datetime, is_completed, eb_stages_id, form_ref_id, form_data_id, eb_del, description, is_form_data_editable)
                                 VALUES ({_val}, {DataDB.EB_CURRENT_TIMESTAMP}, 'F', (SELECT id FROM eb_stages WHERE stage_unique_id = '{nextStage.EbSid}' AND form_ref_id = '{this.RefId}' AND eb_del = 'F'), 
@@ -1965,7 +1974,7 @@ namespace ExpressBase.Objects
             return resp;
         }
 
-        //New implementation using less memory utilization// under testing
+        //Combined CS script creation and execution// under testing
         private void PrepareWebFormDataNew()
         {
             FG_Root globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, this.FormData, this.FormDataBackup);

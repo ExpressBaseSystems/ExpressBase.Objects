@@ -36,8 +36,12 @@ namespace ExpressBase.Objects
         [HelpText("Name Of database-table Which you want to store Data collected using this Form")]
         public override string TableName { get; set; }
 
-        public int FormId { get; set; }//equal to 0 for new mode, any other value indicate edit mode
-
+        [EnableInBuilder(BuilderType.BotForm)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [OSE_ObjectTypes(EbObjectTypes.iWebForm)]
+        [Alias("Web Form")]
+        public string WebFormRefId { set; get; }
+        
         public override bool IsReadOnly//to identify a bot form is readonly or not
         {
             get

@@ -200,7 +200,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class CreateBotFormTableRequest : EbServiceStackAuthRequest, IReturn<CreateBotResponse>
     {
         [DataMember(Order = 1)]
-        public dynamic BotObj { get; set; }
+        public EbBotForm BotObj { get; set; }
 
         [DataMember(Order = 1)]
         public string Apps { get; set; }

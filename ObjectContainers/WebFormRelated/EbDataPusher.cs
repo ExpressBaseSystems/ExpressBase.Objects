@@ -84,7 +84,7 @@ namespace ExpressBase.Objects
 
                 if (!string.IsNullOrEmpty(pusher.PushOnlyIf))
                 {
-                    object status = this.GetValueFormOutDict(OutputDict, Index++);
+                    object status = this.GetValueFormOutDict(OutputDict, ref Index);
                     if (Convert.ToBoolean(status))
                         pusher.WebForm.DataPusherConfig.AllowPush = true;
                 }
@@ -105,7 +105,7 @@ namespace ExpressBase.Objects
                             {
                                 if (_table.TableType == WebFormTableTypes.Grid && !string.IsNullOrEmpty(pusher.SkipLineItemIf))
                                 {
-                                    object status = this.GetValueFormOutDict(OutputDict, Index++);
+                                    object status = this.GetValueFormOutDict(OutputDict, ref Index);
                                     if (Convert.ToBoolean(status))
                                         continue;
                                 }
@@ -114,7 +114,7 @@ namespace ExpressBase.Objects
                                 {
                                     object val = null;
                                     if (jRow[_column.ColumnName] != null)
-                                        val = this.GetValueFormOutDict(OutputDict, Index++);
+                                        val = this.GetValueFormOutDict(OutputDict, ref Index);
 
                                     Row.Columns.Add(new SingleColumn
                                     {
@@ -177,11 +177,21 @@ namespace ExpressBase.Objects
             }
         }
 
-        private object GetValueFormOutDict(Dictionary<int, object[]> OutDict, int Index)
+        private object GetValueFormOutDict(Dictionary<int, object[]> OutDict, ref int Index)
         {
+            int StopCounter = 500;// to avoid infinite loop in case of any unexpected error/exception
+            //assuming that maximum cs expressions in a data pusher is 500
+            while (StopCounter > 0 && !OutDict.ContainsKey(Index))
+            {
+                StopCounter--;
+                Index++;
+            }
+            if (!OutDict.ContainsKey(Index))
+                throw new FormException("Exception in C# code evaluation", (int)HttpStatusCodes.INTERNAL_SERVER_ERROR, "Malformed OutputDict from combined cs script evaluation", "Stopped by StopCounter500");
+
             if (Convert.ToInt32(OutDict[Index][0]) == 1)// 1 = success, 2 = exception
             {
-                return OutDict[Index][1];
+                return OutDict[Index++][1];
             }
             throw new FormException("Exception in C# code evaluation", (int)HttpStatusCodes.INTERNAL_SERVER_ERROR, $"{OutDict[Index][1]} \n C# code : {CodeDict[Index]}", "");
         }
