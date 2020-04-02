@@ -479,6 +479,10 @@ else{
         [PropertyGroup(PGConstants.APPEARANCE)]
         public Align Align { get; set; }
 
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
+        [JsonIgnore]
+        public EbDataSet ApprovalData { get; set; }
+
         [JsonIgnore]
         private List<string> __formulaDataFieldsUsed = null;
         [JsonIgnore]
