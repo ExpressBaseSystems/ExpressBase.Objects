@@ -129,7 +129,9 @@ namespace ExpressBase.Objects
 		[EnableInBuilder(BuilderType.BotForm)]
 		public string ButtonText { get; set; }
 
-		public override bool isFullViewContol { get => true; set => base.isFullViewContol = value; }
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+		[HideInPropertyGrid]
+		public override bool IsFullViewContol { get => true; set => base.IsFullViewContol = value; }
 
 		[EnableInBuilder(BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.DDfromDictProp, "CardFields")]
