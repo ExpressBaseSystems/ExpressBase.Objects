@@ -107,7 +107,7 @@ namespace ExpressBase.Objects
 
 		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
 		[HideInPropertyGrid]
-		public override EbDbTypes EbDbType { get { return EbDbTypes.Json; } }
+		public override EbDbTypes EbDbType { get { return EbDbTypes.Decimal; } }
 
 		[EnableInBuilder(BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.Collection)]
