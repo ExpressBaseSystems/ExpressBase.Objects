@@ -32,6 +32,7 @@ namespace ExpressBase.Objects
         public bool RenderAsForm { get; set; }
 
 		[EnableInBuilder(BuilderType.BotForm)]
+		[PropertyEditor(PropertyEditorType.IconPicker)]
 		public string IconPicker { get; set; }
 
 		[EnableInBuilder(BuilderType.BotForm)]
