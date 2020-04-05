@@ -31,7 +31,11 @@ namespace ExpressBase.Objects
         [HelpText("Set false if want to render controls like a conversation")]
         public bool RenderAsForm { get; set; }
 
-        [EnableInBuilder(BuilderType.BotForm)]
+		[EnableInBuilder(BuilderType.BotForm)]
+		[PropertyEditor(PropertyEditorType.IconPicker)]
+		public string IconPicker { get; set; }
+
+		[EnableInBuilder(BuilderType.BotForm)]
         [PropertyGroup(PGConstants.DATA)]
         [HelpText("Name Of database-table Which you want to store Data collected using this Form")]
         public override string TableName { get; set; }
