@@ -135,6 +135,9 @@ namespace ExpressBase.Objects
         [PropertyGroup("Behavior")]
         public NumericBoxTypes RenderType { get; set; }
 
+        [EnableInBuilder(BuilderType.MobilePage)]
+        public bool IsAggragate { get; set; }
+
         public override string GetDesignHtml()
         {
             return @"<div class='eb_stacklayout mob_control dropped' id='@id' eb-type='EbMobileNumericBox' tabindex='1' onclick='$(this).focus()'>
