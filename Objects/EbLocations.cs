@@ -136,8 +136,8 @@ this.Init = function(id)
         public override string GetBareHtml()
         {
             string html = @"
-                <div id='@ebsid@' class='location-cont''>
-                    <div class='loc-opt-cont' loc-count='@loccount@>
+                <div id='@ebsid@' class='location-cont'>
+                    <div class='loc-opt-cont' loc-count='@loccount@'>
                             @options@
                     </div>"
 .Replace("@ebsid@", (this.EbSid != null) ? this.EbSid: "@ebsid@")
