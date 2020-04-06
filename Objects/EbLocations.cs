@@ -136,11 +136,12 @@ this.Init = function(id)
         public override string GetBareHtml()
         {
             string html = @"
-                <div id='@ebsid@' class='location-cont'>
+                <div id='@ebsid@' class='location-cont' loc-count='@loccount@'>
                     <div class='loc-opt-cont'>
                             @options@
                     </div>"
 .Replace("@ebsid@", (this.EbSid != null) ? this.EbSid: "@ebsid@")
+.Replace("@loccount@", this.LocationCollection.Count.ToString())
 .Replace("@name@", (this.Name != null) ? this.Name : "@name@")
 .Replace("@options@", (this.showTabed == true) ? this.getOptButtons() : this.getOptDD());
 
