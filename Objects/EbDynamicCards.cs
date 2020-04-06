@@ -217,7 +217,7 @@ namespace ExpressBase.Objects
 					html += "<div class='card-btn-cont' style='@BtnDisplay@'><button id='' class='btn btn-default'  data-toggle='tooltip' title='' style='width:100%;'>Select</button></div></div>".Replace("@BtnDisplay@", this.MultiSelect ? "" : "display:none;");
 				}
 			}			
-			html += "</div>@SummarizeHtml@  <div class='card-btn-cont' style='margin-top: 20px;'> <button id='' class='btn btn-default ctrl-submit-btn'  data-toggle='tooltip' title=''> @ButtonText@ </button> </div> </div>"
+			html += "</div>@SummarizeHtml@  <div class='cards-btn-cont' style='margin-top: 20px;'> <button id='' class='btn btn-default ctrl-submit-btn'  data-toggle='tooltip' title=''> @ButtonText@ </button> </div> </div>"
 				.Replace("@SummarizeHtml@", (this.getCartHtml().IsNullOrEmpty() || !this.MultiSelect) ? "" : this.getCartHtml())
 				.Replace("@ButtonText@", this.ButtonText.IsNullOrEmpty() ? (this.IsReadOnly? "OK": "Submit") : this.ButtonText);
 			return html;
