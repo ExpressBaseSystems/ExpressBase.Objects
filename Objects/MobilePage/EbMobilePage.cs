@@ -77,6 +77,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("Link Style")]
         [PropertyEditor(PropertyEditorType.Color)]
+        [DefaultPropValue("#333333")]
         public string IconColor { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
