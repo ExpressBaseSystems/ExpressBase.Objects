@@ -494,7 +494,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class SaveLocationMetaRequest : IReturn<GetUserGroupResponse>, IEbSSRequest
+    public class SaveLocationMetaRequest : IReturn<SaveLocationMetaResponse>, IEbSSRequest
     {
         [DataMember(Order = 1)]
         public string ConfMeta { get; set; }
@@ -529,6 +529,24 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 2)]
         public int Id { get; set; }
+    }
+
+    [DataContract]
+    public class SaveLocationRequest : EbServiceStackAuthRequest, IReturn<SaveLocationResponse>
+    {
+        [DataMember(Order = 1)]
+        public EbLocation Location { get; set; }
+
+    }
+
+    [DataContract]
+    public class SaveLocationResponse : EbServiceStackResponse
+    {
+        [DataMember(Order = 1)]
+        public int Id { get; set; }
+
+        [DataMember(Order = 2)]
+        public List<string> Data { get; set; }
     }
 
     [DataContract]
