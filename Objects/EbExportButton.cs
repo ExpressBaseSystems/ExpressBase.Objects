@@ -12,7 +12,7 @@ using System.Text;
 
 namespace ExpressBase.Objects.Objects
 {
-	[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+	[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
 	public class EbExportButton : EbControlUI
 	{
 		public EbExportButton() { }
