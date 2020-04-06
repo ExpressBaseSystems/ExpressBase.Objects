@@ -97,6 +97,7 @@ namespace ExpressBase.Objects
         {
             return @" 
                     <div id='@EbSid@_Cont' class='location-box picker-box' style='display:block;'>
+                        <div id='@EbSid@' class='map-div' style='height: @Height@;'>@mapimgforbuilder@</div>
                         <div class='locinp-cont'>
                             <div class='locinp-wraper-address'>
                                 <div style='display: inline-block; min-width: 50px;'>Address</div>
@@ -109,7 +110,9 @@ namespace ExpressBase.Objects
                                 <div class='locinp-wraper' style='display: inline-block;'><span class='locinp-span'>Longitude</span><input id='@EbSid@long' class='locinp' type='text'/></div>
                             </div>
                         </div>
-                        <div id='@EbSid@' class='map-div' style='height: @Height@;'>@mapimgforbuilder@</div>                        
+                        <div class='card-btn-cont' style='margin-top: 8px; margin-bottom: 8px;'>
+                            <button id='@EbSid@_subbtn' class='btn btn-default ctrl-submit-btn'  data-toggle='tooltip' title=''> OK </button>
+                        </div>
                     </div>  
                 "
 .Replace("@EbSid@", (this.EbSid != null) ? this.EbSid : "@EbSid@")
@@ -145,7 +148,7 @@ namespace ExpressBase.Objects
             get
             {
                 return @"let loc = $('#' + this.EbSid_CtxId).locationpicker('location');
-                        return loc.latitude + ',' + loc.longitude;";
+                        return loc.name + '(' + loc.latitude + ',' + loc.longitude + ')';";
             }
             set { }
         }
