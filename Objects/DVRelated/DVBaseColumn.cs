@@ -308,7 +308,7 @@ else{
 }")]
         [PropertyGroup("Link")]
         [Alias("Object")]
-        public string LinkRefId { get; set; }
+        public virtual string LinkRefId { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder,  BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.DropDown)]
@@ -363,7 +363,6 @@ else{
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "ColumnsRef")]
         [PropertyGroup("LinkFromColumn")]
-        [HideInPropertyGrid]
         public DVBaseColumn RefidColumn { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
@@ -479,6 +478,10 @@ else{
         [PropertyEditor(PropertyEditorType.DropDown)]
         [PropertyGroup(PGConstants.APPEARANCE)]
         public Align Align { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
+        [JsonIgnore]
+        public EbDataSet ApprovalData { get; set; }
 
         [JsonIgnore]
         private List<string> __formulaDataFieldsUsed = null;
@@ -1046,6 +1049,47 @@ pg.ShowProperty('SubTypeFormat');
         {
             this.ConditionalFormating = new List<ColumnCondition>();
         }
+    }
+
+    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
+    public class DVApprovalColumn : DVBaseColumn
+    {
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [OSE_ObjectTypes(EbObjectTypes.iWebForm)]
+        [PropertyGroup(PGConstants.CORE)]
+        public string FormRefid { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "ColumnsRef")]
+        [PropertyGroup(PGConstants.CORE)]
+        public List<DVBaseColumn> FormDataId { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
+        [HideInPropertyGrid]
+        public StringRenderType RenderAs { get; set; }
+
+        public DVApprovalColumn()
+        {
+            this.FormDataId = new List<DVBaseColumn>();
+            this.ConditionalFormating = new List<ColumnCondition>();
+        }
+
+    }
+
+    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
+    public class DVActionColumn : DVBaseColumn
+    {
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [OSE_ObjectTypes(EbObjectTypes.iWebForm)]
+        public override string LinkRefId { get; set; }
+
+        public DVActionColumn()
+        {
+            this.ConditionalFormating = new List<ColumnCondition>();
+        }
+
     }
 
     [EnableInBuilder(BuilderType.DVBuilder)]

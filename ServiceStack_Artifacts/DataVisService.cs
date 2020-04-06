@@ -444,4 +444,31 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 1)]
         public ResponseStatus ResponseStatus { get; set; }
     }
+
+    [DataContract]
+    public class ParticularApprovalColumnRequest : EbServiceStackAuthRequest, IReturn<ParticularApprovalColumnResponse>
+    {
+
+        [DataMember(Order = 3)]
+        public string RefId { get; set; }
+
+        [DataMember(Order = 4)]
+        public int RowId { get; set; }
+
+        [DataMember(Order = 5)]
+        public int CurrentLoc { get; set; }
+
+        [DataMember(Order = 6)]
+        public User UserObj { get; set; }
+    }
+
+    [DataContract]
+    public class ParticularApprovalColumnResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 7)]
+        public string _data { get; set; }
+    }
 }

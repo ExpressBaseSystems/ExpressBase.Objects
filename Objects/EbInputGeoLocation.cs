@@ -67,7 +67,9 @@ namespace ExpressBase.Objects
         [DefaultPropValue("200")]
         public override int Height { get; set; }
 
-        public override bool isFullViewContol { get => true; set => base.isFullViewContol = value; }
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+        [HideInPropertyGrid]
+        public override bool IsFullViewContol { get => true; set => base.IsFullViewContol = value; }
 
 		[HideInPropertyGrid]
 		[EnableInBuilder(BuilderType.BotForm)]
@@ -98,7 +100,9 @@ namespace ExpressBase.Objects
                         <div class='locinp-cont'>
                             <div class='locinp-wraper-address'>
                                 <div style='display: inline-block; min-width: 50px;'>Address</div>
-                                <div style='display: inline-block; min-width: calc(100% - 54px); border: 1px solid rgba(34,36,38,.15);' ><input id='@EbSid@address' type='text' style='width: 100%;' /> </div>
+                                <div style='display: inline-block; min-width: calc(100% - 54px);'>
+                                    <input id='@EbSid@address' class='locinp' type='text' style='width: 100%;' />
+                                </div>
                             </div>
                             <div>
                                 <div class='locinp-wraper' style='display: inline-block;'><span class='locinp-span'>Latitude</span><input id='@EbSid@lat' class='locinp' type='text'/></div>

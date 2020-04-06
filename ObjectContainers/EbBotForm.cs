@@ -31,13 +31,21 @@ namespace ExpressBase.Objects
         [HelpText("Set false if want to render controls like a conversation")]
         public bool RenderAsForm { get; set; }
 
-        [EnableInBuilder(BuilderType.BotForm)]
+		[EnableInBuilder(BuilderType.BotForm)]
+		[PropertyEditor(PropertyEditorType.IconPicker)]
+		public string IconPicker { get; set; }
+
+		[EnableInBuilder(BuilderType.BotForm)]
         [PropertyGroup(PGConstants.DATA)]
         [HelpText("Name Of database-table Which you want to store Data collected using this Form")]
         public override string TableName { get; set; }
 
-        public int FormId { get; set; }//equal to 0 for new mode, any other value indicate edit mode
-
+        [EnableInBuilder(BuilderType.BotForm)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [OSE_ObjectTypes(EbObjectTypes.iWebForm)]
+        [Alias("Web Form")]
+        public string WebFormRefId { set; get; }
+        
         public override bool IsReadOnly//to identify a bot form is readonly or not
         {
             get
@@ -69,56 +77,59 @@ namespace ExpressBase.Objects
         {
             string html = string.Empty;
 
-			foreach (EbControl c in this.Controls)
-				if (c.ObjType == "TextBox")
-				{
-					html += c.GetHtml4Bot();
-				}
-				else if (c.ObjType == "Date")
-				{
-					html += c.GetHtml4Bot();
-				}
-				else if (c.ObjType == "CheckBoxGroup")
-				{
-					html += c.GetHtml4Bot();
-				}
-				else if (c.ObjType == "Numeric")
-				{
-					html += c.GetHtml4Bot();
-				}
-				else if (c.ObjType == "BooleanSelect")
-				{
-					html += c.GetHtml4Bot();
-				}
-				else if (c.ObjType == "FileUploader")
-				{
-					html += c.GetHtml4Bot();
-				}
-				else if (c.ObjType == "PowerSelect")
-				{
-					html += c.GetHtml4Bot();
-				}
-				else if (c.ObjType == "SimpleSelect")
-				{
-					html += c.GetHtml4Bot();
-				}
-				else if (c.ObjType == "RadioGroup")
-				{
-					html += c.GetHtml4Bot();
-				}
-				else if (c.ObjType == "DynamicCardSet")
-				{
-					html += c.GetHtml4Bot();
-				}
-				else if (c.ObjType == "StaticCardSet")
-				{
-					html += c.GetHtml4Bot();
-				}
-				else
-				{
-					html += c.GetHtml4Bot();
-					//html += c.GetHtml();
-				}
+            foreach (EbControl c in this.Controls)
+            {
+                //if (c.ObjType == "TextBox")
+                //{
+                //	html += c.GetHtml4Bot();
+                //}
+                //else if (c.ObjType == "Date")
+                //{
+                //	html += c.GetHtml4Bot();
+                //}
+                //else if (c.ObjType == "CheckBoxGroup")
+                //{
+                //	html += c.GetHtml4Bot();
+                //}
+                //else if (c.ObjType == "Numeric")
+                //{
+                //	html += c.GetHtml4Bot();
+                //}
+                //else if (c.ObjType == "BooleanSelect")
+                //{
+                //	html += c.GetHtml4Bot();
+                //}
+                //else if (c.ObjType == "FileUploader")
+                //{
+                //	html += c.GetHtml4Bot();
+                //}
+                //else if (c.ObjType == "PowerSelect")
+                //{
+                //	html += c.GetHtml4Bot();
+                //}
+                //else if (c.ObjType == "SimpleSelect")
+                //{
+                //	html += c.GetHtml4Bot();
+                //}
+                //else if (c.ObjType == "RadioGroup")
+                //{
+                //	html += c.GetHtml4Bot();
+                //}
+                //else if (c.ObjType == "DynamicCardSet")
+                //{
+                //	html += c.GetHtml4Bot();
+                //}
+                //else if (c.ObjType == "StaticCardSet")
+                //{
+                //	html += c.GetHtml4Bot();
+                //}
+                //else
+                //{
+                //	html += c.GetHtml4Bot();
+                //	//html += c.GetHtml();
+                //}
+                html += c.GetHtml4Bot();
+            }
 
             return html.Replace("@name@", this.Name);
         }

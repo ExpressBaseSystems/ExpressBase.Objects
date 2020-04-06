@@ -270,7 +270,7 @@ namespace ExpressBase.Objects
 <div class='Dg_head'>
         <table id='tbl_@ebsid@_head' class='table table-bordered dgtbl'>
             <thead>
-              <tr>   
+              <tr>  
                 <th class='slno' style='width:34px'><span class='grid-col-title'>SL No</span></th>"
 .Replace("@addrowbtn@", this.IsAddable ? "<div id='@ebsid@addrow' class='addrow-btn' tabindex='0'>+ Row</div>" : string.Empty); ;
             foreach (EbDGColumn col in Controls)
@@ -337,13 +337,13 @@ namespace ExpressBase.Objects
     public abstract class EbDGColumn : EbControl
     {
         [JsonIgnore]
-        public override string OnChangeBindJSFn { get { return @"$(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, p2);"; } set { } }
+        public override string OnChangeBindJSFn { get { return @"$(`[ebsid=${p1.DG.EbSid_CtxId }]`).on('change', `[colname=${this.Name}] [ui-inp]`, p2);"; } set { } }
 
         [JsonIgnore]
         public override string JustSetValueJSfn
         {
             get { return JSFnsConstants.DG_hiddenColCheckCode + @"
-    $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val(p1);"; }
+    $('[ebsid='+this.__DG.EbSid_CtxId +']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val(p1);"; }
 
             set { }
         }
@@ -375,7 +375,7 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         public override string GetValueFromDOMJSfn
         {
-            get { return @"return $('[ebsid=' + this.__DG.EbSid + ']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val();"; }
+            get { return @"return $('[ebsid=' + this.__DG.EbSid_CtxId + ']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val();"; }
 
             set { }
         }
@@ -389,13 +389,13 @@ namespace ExpressBase.Objects
         }
 
         [JsonIgnore]
-        public override string EnableJSfn { get { return @"$('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] .ctrl-cover *`).prop('disabled',false).css('pointer-events', 'inherit').find('input').css('background-color','#fff');"; } set { } }
+        public override string EnableJSfn { get { return @"$('[ebsid='+this.__DG.EbSid_CtxId +']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] .ctrl-cover *`).prop('disabled',false).css('pointer-events', 'inherit').find('input').css('background-color','#fff');"; } set { } }
 
         [JsonIgnore]
-        public override string DisableJSfn { get { return @"$('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] .ctrl-cover *`).attr('disabled', 'disabled').css('pointer-events', 'none').find('input').css('background-color','#eee');"; } set { } }
+        public override string DisableJSfn { get { return @"$('[ebsid='+this.__DG.EbSid_CtxId +']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] .ctrl-cover *`).attr('disabled', 'disabled').css('pointer-events', 'none').find('input').css('background-color','#eee');"; } set { } }
 
         [JsonIgnore]
-        public override string ClearJSfn { get { return @"$('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val('');"; } set { } }
+        public override string ClearJSfn { get { return @"$('[ebsid='+this.__DG.EbSid_CtxId +']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val('');"; } set { } }
 
         [JsonIgnore]
         public override string HideJSfn { get { return @""; } set { } }
@@ -588,14 +588,14 @@ else {
         public override string GetValueFromDOMJSfn
         {
             get { return @"
-							if($('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).is(':checked'))
-							{
-							return true;
-							}
-							else{
-							return false;
-							}
-							"; }
+if($('[ebsid='+this.__DG.EbSid_CtxId +']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).is(':checked'))
+{
+return true;
+}
+else{
+return false;
+}
+"; }
 
             set { }
         }
@@ -603,14 +603,14 @@ else {
         public override string GetDisplayMemberFromDOMJSfn
         {
             get { return @"
-							if($('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).is(':checked'))
-							{
-							return '✔';
-							}
-							else{
-							return '✖';
-							}
-							"; }
+if($('[ebsid='+this.__DG.EbSid_CtxId +']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).is(':checked'))
+{
+return '✔';
+}
+else{
+return '✖';
+}
+"; }
             set { }
         }
 
@@ -748,7 +748,7 @@ else {
 
         [JsonIgnore]
         public override string OnChangeBindJSFn { get { return @"
-$(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, p2).siblings('.nullable-check').on('change', `input[type=checkbox]`, p2);"; } set { } }
+$(`[ebsid=${p1.DG.EbSid_CtxId}]`).on('change', `[colname=${this.Name}] [ui-inp]`, p2).siblings('.nullable-check').on('change', `input[type=checkbox]`, p2);"; } set { } }
 
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
@@ -807,7 +807,7 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, p2).
         {
             get
             {
-                return @"$('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] .ctrl-cover .dropdown-toggle`).attr('disabled', 'disabled').css('pointer-events', 'none').css('background-color', '#f3f3f3');";
+                return @"$('[ebsid='+this.__DG.EbSid_CtxId +']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] .ctrl-cover .dropdown-toggle`).attr('disabled', 'disabled').css('pointer-events', 'none').css('background-color', '#f3f3f3');";
             }
             set { }
         }
@@ -817,7 +817,7 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, p2).
         {
             get
             {
-                return @"$('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] .ctrl-cover .dropdown-toggle`).prop('disabled',false).css('pointer-events', 'inherit').css('background-color', '#fff');";
+                return @"$('[ebsid='+this.__DG.EbSid_CtxId +']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] .ctrl-cover .dropdown-toggle`).prop('disabled',false).css('pointer-events', 'inherit').css('background-color', '#fff');";
             }
             set { }
         }
@@ -837,7 +837,7 @@ $(`[ebsid=${p1.DG.EbSid}]`).on('change', `[colname=${this.Name}] [ui-inp]`, p2).
             get
             {
                 return @"
-let val = $('[ebsid=' + this.__DG.EbSid + ']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val();
+let val = $('[ebsid=' + this.__DG.EbSid_CtxId  + ']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val();
 if(ebcontext.renderContext === 'WebForm' && val === '-1')
     val = null;
 return val;
@@ -846,7 +846,7 @@ return val;
             set { }
         }
 
-        public override string GetDisplayMemberFromDOMJSfn { get { return @" return $('[ebsid='+this.__DG.EbSid+']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp] :selected`).text(); "; } set { } }
+        public override string GetDisplayMemberFromDOMJSfn { get { return @" return $('[ebsid='+this.__DG.EbSid_CtxId +']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp] :selected`).text(); "; } set { } }
 
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
@@ -964,7 +964,7 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
                                 p1 = 'true'
                             else if(p1 === false)
                                 p1 = 'false'
-                           " + EbDGSimpleSelectColumn.JustSetValueJSfn+
+                           " + EbDGSimpleSelectColumn.JustSetValueJSfn +
                         "}";
             }
             set { }
@@ -974,14 +974,14 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
         {
             get
             {
-                return JSFnsConstants.DG_hiddenColCheckCode + 
+                return JSFnsConstants.DG_hiddenColCheckCode +
                     @"
                     {
                         if(p1 === true)
                             p1 = 'true'
                         else if(p1 === false)
                             p1 = 'false'
-                       " + EbDGSimpleSelectColumn.SetValueJSfn + 
+                       " + EbDGSimpleSelectColumn.SetValueJSfn +
                     "}";
             }
             set { }
@@ -1144,7 +1144,7 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
         {
             DBareHtml = (@"
 <div  id='@ebsid@_wrap'>
-    <div class='input-group' style='width:100%;'>           
+    <div class='input-group' style='width:100%;'>          
         <input id='@ebsid@_inp' ui-inp data-toggle='tooltip' title='' type='text' tabindex='0' style='width:100%; data-original-title='' disabled>
         <span id='@ebsid@_showbtn' class='input-group-addon ucspan' data-toggle='modal' data-target='#@colebsid@_usercontrolmodal' style='padding: 0px;'> <button type='button' id='Date1TglBtn' class='fa  fa-ellipsis-h ucbtn' aria-hidden='true' style='padding: 6px 12px;'></button> </span>
     </div>
@@ -1221,19 +1221,19 @@ else {pg.MakeReadWrite('ValueMember');}")]
         [PropertyPriority(50)]
         [OnChangeExec(@"
 if(this.RenderAsSimpleSelect == true)// SS
-{ 
-	pg.ShowProperty('DisplayMember');
-	pg.HideProperty('DisplayMembers');
-	pg.HideProperty('Columns');
-	pg.ShowProperty('IsDynamic');    
+{
+pg.ShowProperty('DisplayMember');
+pg.HideProperty('DisplayMembers');
+pg.HideProperty('Columns');
+pg.ShowProperty('IsDynamic');   
 }
 else// PS
 {
-	pg.HideProperty('DisplayMember');
-	pg.ShowProperty('DisplayMembers');
-	pg.ShowProperty('Columns');
-	pg.HideProperty('Options');
-	pg.HideProperty('IsDynamic');
+pg.HideProperty('DisplayMember');
+pg.ShowProperty('DisplayMembers');
+pg.ShowProperty('Columns');
+pg.HideProperty('Options');
+pg.HideProperty('IsDynamic');
 }
 ")]
         public bool RenderAsSimpleSelect { get { return this.EbPowerSelect.RenderAsSimpleSelect; } set { this.EbPowerSelect.RenderAsSimpleSelect = value; } }
@@ -1280,7 +1280,7 @@ else// PS
         [PropertyGroup("Behavior")]
         [OnChangeExec(@"
             if (this.MultiSelect === true ){
-                pg.MakeReadWrite('MaxLimit');  
+                pg.MakeReadWrite('MaxLimit'); 
                 if (this.Required === true ){
                     if(this.MinLimit < 1){
                         pg.setSimpleProperty('MinLimit', 1);
@@ -1289,11 +1289,11 @@ else// PS
                 }
                 else{
                     pg.setSimpleProperty('MinLimit', 0);
-                    pg.MakeReadOnly('MinLimit');                
+                    pg.MakeReadOnly('MinLimit');               
                 }
                 if(this.MaxLimit === 1)
                     pg.setSimpleProperty('MaxLimit', 0);
-                   
+                  
             }
             else {
                 pg.setSimpleProperty('MaxLimit', 1);
@@ -1313,7 +1313,7 @@ else// PS
         [PropertyGroup("Behavior")]
         [OnChangeExec(@"
             if (this.MultiSelect === true ){
-                pg.MakeReadWrite('MaxLimit');  
+                pg.MakeReadWrite('MaxLimit'); 
                 if (this.Required === true ){
                     if(this.MinLimit < 1){
                         pg.setSimpleProperty('MinLimit', 1);
@@ -1322,7 +1322,7 @@ else// PS
                 }
                 else{
                     pg.setSimpleProperty('MinLimit', 0);
-                    pg.MakeReadOnly('MinLimit');                
+                    pg.MakeReadOnly('MinLimit');               
                 }
             }
             else {
@@ -1977,15 +1977,17 @@ else// PS
             this.EbUserSelect.InitOptions(Users);
         }
 
-        //public override string GetDisplayMemberJSfn
-        //{
-        //	get { return @"this.getValue();"; }
-        //	set { }
-        //}
-
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
         public override string InputControlType { get { return "EbUserSelect"; } }
+
+        public override string GetValueFromDOMJSfn { get { return this.EbUserSelect.GetValueFromDOMJSfn; } }
+        public override string OnChangeBindJSFn { get { return @"$(`[ebsid=${p1.DG.EbSid_CtxId }]`).on('change', `[colname=${this.Name}] input[type=hidden]`, p2);"; } set { } }
+        public override string JustSetValueJSfn { get { return this.EbUserSelect.JustSetValueJSfn; } }
+        public override string SetValueJSfn { get { return @"$('#' + this.EbSid_CtxId + ' input[type=hidden]').data('ctrl_ref', this); this._JsCtrlMng.setValue(p1, p2, false);"; } }
+        public override string GetDisplayMemberFromDOMJSfn { get { return this.EbUserSelect.GetDisplayMemberFromDOMJSfn; } }
+        public override string RefreshJSfn { get { return this.EbUserSelect.RefreshJSfn; } }
+        public override string ClearJSfn { get { return this.EbUserSelect.ClearJSfn; } }
 
         //EbDGUserSelectColumn
         public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)

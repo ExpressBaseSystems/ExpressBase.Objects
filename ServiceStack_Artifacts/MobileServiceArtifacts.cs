@@ -185,6 +185,29 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public EbDataSet Data { set; get; }
     }
 
+    [DataContract]
+    public class GetMobileFormDataRequest : EbServiceStackAuthRequest, IReturn<GetMobileFormDataResponse>
+    {
+        [DataMember(Order = 1)]
+        public string MobilePageRefId { set; get; }
+
+        [DataMember(Order = 2)]
+        public int RowId { get; set; }
+
+        [DataMember(Order = 3)]
+        public int LocId { get; set; }
+    }
+
+    [DataContract]
+    public class GetMobileFormDataResponse
+    {
+        [DataMember(Order = 1)]
+        public string Message { set; get; }
+
+        [DataMember(Order = 2)]
+        public WebformData Data { set; get; }
+    }
+
     public class GetMyActionsRequest : EbServiceStackAuthRequest, IReturn<GetMyActionsResponse>
     {
 

@@ -38,7 +38,9 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
         public string Alt { get; set; }
 
-        public override bool isFullViewContol { get => true; set => base.isFullViewContol = value; }
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+        [HideInPropertyGrid]
+        public override bool IsFullViewContol { get => true; set => base.IsFullViewContol = value; }
 
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.BotForm)]

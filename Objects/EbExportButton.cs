@@ -42,8 +42,8 @@ namespace ExpressBase.Objects.Objects
 		{
 
 
-			return @"<button id='@ebsid@' class='btn btn-default' style='width:100%; cursor: pointer; @backColor @foreColor @fontStyle'>@Label@</button>"
-				.Replace("@ebsid@", this.EbSid)
+			return @"<button id='@ebsid@' class='btn btn-success' style='width:100%; cursor: pointer; @backColor @foreColor @fontStyle'>@Label@ <i class='fa fa-external-link'></i></button>"
+				.Replace("@ebsid@", this.EbSid_CtxId)
 				.Replace("@Label@", this.Label ?? "Button")
 .Replace("@tabIndex", "tabindex='" + this.TabIndex + "'")
 .Replace("@backColor", "background-color:" + this.BackColor + ";")
@@ -112,9 +112,14 @@ namespace ExpressBase.Objects.Objects
 
 
 		[EnableInBuilder(BuilderType.WebForm)]
+		[DefaultPropValue("#0f43d6")]
 		public override string BackColor { get; set; }
 
 		[EnableInBuilder(BuilderType.WebForm)]
+		public override string Label { get; set; }
+
+		[EnableInBuilder(BuilderType.WebForm)]
+		[DefaultPropValue("#ffffff")]
 		public override string ForeColor { get; set; }
 
 		[EnableInBuilder(BuilderType.WebForm)]

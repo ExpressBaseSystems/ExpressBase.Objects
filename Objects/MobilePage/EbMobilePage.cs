@@ -16,6 +16,12 @@ namespace ExpressBase.Objects
         Mixed
     }
 
+    public enum NumericBoxTypes
+    {
+        TextType = 0,
+        ButtonType = 1
+    }
+
     public abstract class EbMobilePageBase : EbObject
     {
 
@@ -71,6 +77,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("Link Style")]
         [PropertyEditor(PropertyEditorType.Color)]
+        [DefaultPropValue("#333333")]
         public string IconColor { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]

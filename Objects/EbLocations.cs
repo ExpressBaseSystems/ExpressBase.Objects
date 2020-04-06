@@ -38,7 +38,9 @@ namespace ExpressBase.Objects
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
 
-        public override bool isFullViewContol { get => true; set => base.isFullViewContol = value; }
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+        [HideInPropertyGrid]
+        public override bool IsFullViewContol { get => true; set => base.IsFullViewContol = value; }
 
         [HideInPropertyGrid]
         [JsonIgnore]
@@ -134,10 +136,12 @@ this.Init = function(id)
         public override string GetBareHtml()
         {
             string html = @"
-                <div id='@name@' class='location-cont'>
-                    <div class='loc-opt-cont'>
+                <div id='@ebsid@' class='location-cont'>
+                    <div class='loc-opt-cont' loc-count='@loccount@'>
                             @options@
                     </div>"
+.Replace("@ebsid@", (this.EbSid != null) ? this.EbSid: "@ebsid@")
+.Replace("@loccount@", this.LocationCollection.Count.ToString())
 .Replace("@name@", (this.Name != null) ? this.Name : "@name@")
 .Replace("@options@", (this.showTabed == true) ? this.getOptButtons() : this.getOptDD());
 

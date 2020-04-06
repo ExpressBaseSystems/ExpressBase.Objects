@@ -3,19 +3,12 @@ using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
-using ExpressBase.Objects.Helpers;
-using ExpressBase.Objects.Objects;
-using Microsoft.CodeAnalysis.CSharp.Scripting;
-using Microsoft.CodeAnalysis.Scripting;
 using Newtonsoft.Json;
 using ServiceStack;
-using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data.Common;
 using System.Linq;
 using System.Runtime.Serialization;
-using System.Threading.Tasks;
 
 namespace ExpressBase.Objects
 {
@@ -303,44 +296,6 @@ namespace ExpressBase.Objects
                                             .Replace("@secCxt@", !secCxtGet.IsNullOrEmpty() ? "OR context_sec = @{1}" : ""), pCxtVal, sCxtGetVal);
             }
             return fullqry;
-        }
-
-        public string ExeContextCode(FormAsGlobal globals, bool set)
-        {
-            string code = string.Empty;
-            string result = null;
-            if (set)
-            {
-                if (this.ContextSetExpr != null && !this.ContextSetExpr.Code.IsNullOrEmpty())
-                    code = this.ContextSetExpr.Code;
-            }
-            else
-            {
-                if (this.ContextGetExpr != null && !this.ContextGetExpr.Code.IsNullOrEmpty())
-                    code = this.ContextGetExpr.Code;
-            }
-            if (code != string.Empty)
-            {
-                try
-                {
-                    Script valscript = CSharpScript.Create<dynamic>(
-                        code,
-                        ScriptOptions.Default.WithReferences("Microsoft.CSharp", "System.Core").WithImports("System.Dynamic", "System", "System.Collections.Generic",
-                        "System.Diagnostics", "System.Linq"),
-                        globalsType: typeof(FormGlobals)
-                    );
-                    valscript.Compile();
-                    FormGlobals global = new FormGlobals() { form = globals };
-                    var r = (valscript.RunAsync(global)).Result.ReturnValue;
-                    result = r.ToString();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("Exception in C# Expression evaluation. \nMessage : " + ex.Message);
-                    Console.WriteLine(ex.StackTrace);
-                }
-            }
-            return result;
         }
 
 
