@@ -9,7 +9,7 @@ using System.Text;
 
 namespace ExpressBase.Objects.Objects
 {
-    [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
     public class EbSubmitButton : EbControlUI
     {
         public EbSubmitButton() { }
