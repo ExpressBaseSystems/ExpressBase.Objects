@@ -134,15 +134,15 @@ namespace ExpressBase.Objects
 		public override bool IsFullViewContol { get => true; set => base.IsFullViewContol = value; }
 
 		[EnableInBuilder(BuilderType.BotForm)]
-		[HideInPropertyGrid]//
-        //[PropertyEditor(PropertyEditorType.DDfromDictProp, "CardFields")]
+		//[HideInPropertyGrid]//
+        [PropertyEditor(PropertyEditorType.DDfromDictProp, "CardFields", 1)]
 		public EbControl FilterField { get; set; }
 
 		public List<string> FilterValues { get; set; }
 
 		[EnableInBuilder(BuilderType.BotForm)]
-		[HideInPropertyGrid]//
-		//[PropertyEditor(PropertyEditorType.DDfromDictProp, "CardFields")]
+		//[HideInPropertyGrid]//
+		[PropertyEditor(PropertyEditorType.DDfromDictProp, "CardFields", 1)]
 		public EbControl SearchField { get; set; }
 
 		[HideInPropertyGrid]
@@ -538,7 +538,7 @@ namespace ExpressBase.Objects
     public class EbCardHtmlField : EbCardField
     {
         [EnableInBuilder(BuilderType.BotForm)]
-        [PropertyEditor(PropertyEditorType.String)]
+        [PropertyEditor(PropertyEditorType.String64)]
         [Alias("ContentHTML")]
 		[MetaOnly]
 		public override dynamic FieldValue { get; set; }
