@@ -60,7 +60,7 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.Expandable)]
         [PropertyGroup(PGConstants.APPEARANCE)]
         [UIproperty]
-        [DefaultPropValue(7, 7, 7, 7)]
+        [DefaultPropValue(7, 10, 7, 10)]
         [OnChangeUIFunction("Common.INP_PADDING")]
         public UISides Padding { get; set; }
 
@@ -87,7 +87,7 @@ namespace ExpressBase.Objects
             this.BareControlHtml4Bot = this.BareControlHtml;
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
             if (this.Padding == null)
-                this.Padding = new UISides() { Bottom = 7, Left = 7, Right = 7, Top = 7 };
+                this.Padding = new UISides() { Bottom = 7, Left = 10, Top = 7, Right = 10 };
             //this.EbDbType = this.EbDbType;
         }
 

@@ -188,6 +188,8 @@ else
                     Label = "<i class='fa fa-plus' aria-hidden='true'></i>"
                 };
             }
+            if (this.Padding == null)
+                this.Padding = new UISides() { Bottom = 7, Left = 10, Top = 7, Right = 10 };
             this.BareControlHtml = this.GetBareHtml();
             this.BareControlHtml4Bot = this.BareControlHtml;
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
@@ -219,6 +221,16 @@ else
             }
             set { }
         }
+
+
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyEditor(PropertyEditorType.Expandable)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        [UIproperty]
+        [DefaultPropValue(7, 10, 7, 10)]
+        [OnChangeUIFunction("Common.INP_PADDING")]
+        public UISides Padding { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [HideInPropertyGrid]
