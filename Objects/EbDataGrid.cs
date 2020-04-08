@@ -570,6 +570,11 @@ else {
 
             set { }
         }
+
+        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
+        {
+            return EbNumeric.GetSingleColumn(this, UserObj, SoluObj, Value);
+        }
     }
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
