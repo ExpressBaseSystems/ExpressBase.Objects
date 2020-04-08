@@ -1,10 +1,11 @@
 ﻿using ExpressBase.Common;
 using ExpressBase.Common.Constants;
 using ExpressBase.Common.Extensions;
+using ExpressBase.Common.LocationNSolution;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
-using ExpressBase.Objects.Helpers;
+using ExpressBase.Security;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -228,6 +229,39 @@ else {
                .Replace("@LabelBackColor ", "background-color:" + (LabelBackColor ?? "@LabelBackColor ") + ";");
 
             return ReplacePropsInHTML(EbCtrlHTML);
+        }
+
+        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
+        {
+            return EbNumeric.GetSingleColumn(this, UserObj, SoluObj, Value);
+        }
+
+        public static SingleColumn GetSingleColumn(dynamic _this, User UserObj, Eb_Solution SoluObj, object Value)
+        {
+            object _formattedData;
+            string _displayMember;
+            string padding = _this.DecimalPlaces > 0 ? ".".PadRight(_this.DecimalPlaces, '0') : string.Empty;
+
+            if (Value == null)
+            {
+                _formattedData = 0;
+                _displayMember = "0" + padding;
+            }
+            else
+            {
+                _formattedData = Convert.ToDouble(Value);
+                _displayMember = string.Format("{0:0" + padding + "}", _formattedData);
+            }
+
+            return new SingleColumn()
+            {
+                Name = _this.Name,
+                Type = (int)_this.EbDbType,
+                Value = _formattedData,
+                Control = _this,
+                ObjType = _this.ObjType,
+                F = _displayMember
+            };
         }
     }
 }
