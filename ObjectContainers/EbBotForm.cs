@@ -31,11 +31,33 @@ namespace ExpressBase.Objects
         [HelpText("Set false if want to render controls like a conversation")]
         public bool RenderAsForm { get; set; }
 
-		[EnableInBuilder(BuilderType.BotForm)]
-		[PropertyEditor(PropertyEditorType.IconPicker)]
-		public string IconPicker { get; set; }
 
-		[EnableInBuilder(BuilderType.BotForm)]
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.BotForm)]
+        public bool HaveInputControls
+        {
+            get
+            {
+                bool res = false;
+                for (int i = 0; i < this.Controls.Count; i++)
+                {
+                    EbControl control = this.Controls[i];
+                    if (!(control.IsReadOnly || control.IsDisable))
+                    {
+                        res = true;
+                        break;
+                    }
+                }
+                return res;
+            }
+            set { }
+        }
+
+        [EnableInBuilder(BuilderType.BotForm)]
+        [PropertyEditor(PropertyEditorType.IconPicker)]
+        public string IconPicker { get; set; }
+
+        [EnableInBuilder(BuilderType.BotForm)]
         [PropertyGroup(PGConstants.DATA)]
         [HelpText("Name Of database-table Which you want to store Data collected using this Form")]
         public override string TableName { get; set; }
@@ -45,7 +67,7 @@ namespace ExpressBase.Objects
         [OSE_ObjectTypes(EbObjectTypes.iWebForm)]
         [Alias("Web Form")]
         public string WebFormRefId { set; get; }
-        
+
         public override bool IsReadOnly//to identify a bot form is readonly or not
         {
             get
@@ -134,8 +156,8 @@ namespace ExpressBase.Objects
             return html.Replace("@name@", this.Name);
         }
 
-		
-		public override List<string> DiscoverRelatedRefids()
+
+        public override List<string> DiscoverRelatedRefids()
         {
             List<string> refids = new List<string>();
             foreach (EbControl control in Controls)
@@ -161,7 +183,7 @@ namespace ExpressBase.Objects
                     {
                         string _val = _prop.GetValue(control, null).ToString();
                         if (RefidMap.ContainsKey(_val))
-                            _prop.SetValue(control, RefidMap[_val],null);
+                            _prop.SetValue(control, RefidMap[_val], null);
                         else
                             _prop.SetValue(control, "failed-to-update-");
                     }
