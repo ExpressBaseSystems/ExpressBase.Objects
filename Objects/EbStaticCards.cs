@@ -15,6 +15,7 @@ using System.Runtime.Serialization;
 namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.BotForm)]
+	[ShowInToolBox]
     public class EbStaticCardSet : EbCardSetParent
     {
 		[EnableInBuilder(BuilderType.BotForm)]
