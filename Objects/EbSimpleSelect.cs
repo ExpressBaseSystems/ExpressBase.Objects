@@ -212,28 +212,28 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
                 if (_optionHtml.Equals(string.Empty))
                 {
                     _optionHtml = string.Empty;
-					string OptGrpNmae = string.Empty;
+					string OptGrpName = string.Empty;
                     if (!this.IsDynamic)
                     {
-						List<EbSimpleSelectOption> GrpList= this.Options.OrderBy(o => o.OptGroupNmae).ToList();
+						List<EbSimpleSelectOption> GrpList= this.Options.OrderBy(o => o.OptGroupName).ToList();
 
 						foreach (EbSimpleSelectOption opt in GrpList)
                         {
-							if (opt.OptGroupNmae != null)
+							if (opt.OptGroupName != null)
 							{
-								if (opt.OptGroupNmae.Equals(string.Empty))
+								if (opt.OptGroupName.Equals(string.Empty))
 								{
 									_optionHtml += string.Format("<option  value='{0}'>{1}</option>", opt.Value, opt.DisplayName);
 								}
 								else
 								{
-									if (opt.OptGroupNmae != OptGrpNmae)
+									if (opt.OptGroupName != OptGrpName)
 									{
-										_optionHtml += string.Format("<optgroup label='{0}'>", opt.OptGroupNmae);
+										_optionHtml += string.Format("<optgroup label='{0}'>", opt.OptGroupName);
 									}
-									OptGrpNmae = opt.OptGroupNmae;
+									OptGrpName = opt.OptGroupName;
 
-									if (opt.OptGroupNmae.Equals(OptGrpNmae))
+									if (opt.OptGroupName.Equals(OptGrpName))
 									{
 										_optionHtml += string.Format("<option  value='{0}'>{1}</option>", opt.Value, opt.DisplayName);
 									}
@@ -374,8 +374,8 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
 
 		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
 		[PropertyGroup(PGConstants.CORE)]
-		[Alias("Group Nmae")]
-		public string OptGroupNmae { get; set; }
+		[Alias("Group Name")]
+		public string OptGroupName { get; set; }
 
 		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup(PGConstants.CORE)]
