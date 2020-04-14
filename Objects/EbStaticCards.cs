@@ -6,6 +6,7 @@ using System.Runtime.Serialization;
 namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.BotForm)]
+	[ShowInToolBox]
     public class EbStaticCardSet : EbCardSetParent
     {
 		public override string ToolNameAlias { get { return "Static Cards"; } set { } }

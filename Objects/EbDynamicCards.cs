@@ -14,6 +14,7 @@ using System.Runtime.Serialization;
 namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.BotForm)]
+	[ShowInToolBox]
 	public class EbDynamicCardSet : EbCardSetParent
     {
 		public override string ToolNameAlias { get { return "Dynamic Cards"; } set { } }
@@ -86,7 +87,7 @@ namespace ExpressBase.Objects
 	//------------------------------------------------PARENT CLASS------------------------------------------------
 
 	[EnableInBuilder(BuilderType.BotForm)]
-    //[HideInToolBox]
+    [HideInToolBox]
     public class EbCardSetParent : EbControlUI
     {
         public EbCardSetParent()

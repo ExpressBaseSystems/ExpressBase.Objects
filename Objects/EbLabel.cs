@@ -22,9 +22,13 @@ namespace ExpressBase.Objects
             this.BareControlHtml = this.GetBareHtml();
 			this.BareControlHtml4Bot = this.BareControlHtml;
 			this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
-        }
+		}
 
-        [PropertyGroup(PGConstants.CORE)]
+		[HideInPropertyGrid]
+		[EnableInBuilder(BuilderType.BotForm)]
+		public override bool IsReadOnly { get => true; }
+
+		[PropertyGroup(PGConstants.CORE)]
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [UIproperty]
         [Unique]
