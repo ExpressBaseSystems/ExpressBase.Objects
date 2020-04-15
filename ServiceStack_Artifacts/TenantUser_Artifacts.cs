@@ -592,7 +592,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 1)]
         public Dictionary<int, EbLocation> Locations { get; set; }
 
-        [DataMember(Order = 1)]
+        [DataMember(Order = 2)]
         public List<EbLocationCustomField> Config { get; set; }
 
         [DataMember(Order = 3)]
@@ -600,10 +600,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class UpdateSolutionObjectRequest : IReturn<UpdateSolutionObjectResponse>, IEbSSRequest
+    public class UpdateSolutionObjectRequest : EbServiceStackNoAuthRequest, IReturn<UpdateSolutionObjectResponse>
     {
+        [DataMember(Order = 1)]
         public string SolnId { get; set; }
 
+        [DataMember(Order = 2)]
         public int UserId { get; set; }
     }
 
