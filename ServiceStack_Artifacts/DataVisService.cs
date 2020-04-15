@@ -468,6 +468,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 1)]
         public ResponseStatus ResponseStatus { get; set; }
 
+        [DataMember(Order = 1)]
+        public string Messaage { get; set; }
+
         [DataMember(Order = 7)]
         public string _data { get; set; }
     }
