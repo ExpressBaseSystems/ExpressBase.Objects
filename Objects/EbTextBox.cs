@@ -117,7 +117,7 @@ else {
             ")]
         public int MaxLength { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm)]
         [Alias("Text Transform")]
         [DefaultPropValue("'UPPERCASE'")]
         [PropertyGroup(PGConstants.CORE)]
