@@ -226,8 +226,8 @@ this.Init = function(id)
 
         public override string GetBareHtml()
         {
-            return @"<div class='radio-wrap'>
-						<input ui-inp class='bot-checkbox eb-chckbx' type ='checkbox' value='@value@' id='@ebsid@' name='@gname@'> 
+            return @"<div class='radio-wrap' tabindex='1'  onclick=""event.stopPropagation(); $(this).children('[ui-inp]').trigger('click').trigger('change');"">
+						<input ui-inp onclick=""event.stopPropagation();"" class='bot-checkbox eb-chckbx' type ='checkbox' value='@value@' id='@ebsid@' name='@gname@'> 
 						<span id='@name@Lbl' class='eb-chckbxspan'> @label@  </span>
 					<br>
 					</div>"
