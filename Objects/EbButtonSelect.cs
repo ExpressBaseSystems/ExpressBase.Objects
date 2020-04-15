@@ -58,7 +58,7 @@ namespace ExpressBase.Objects
         {
             get
             {
-                return JSFnsConstants.EbSimpleSelect_GetValueFromDOMJSfn;
+                return @"return $('#' + this.EbSid_CtxId).find('[active=true]').attr('value');";
             }
             set { }
         }
@@ -67,7 +67,7 @@ namespace ExpressBase.Objects
         {
             get
             {
-                return JSFnsConstants.SS_IsRequiredOKJSfn;
+                return @"return true;";
             }
             set { }
         }
@@ -76,7 +76,7 @@ namespace ExpressBase.Objects
         {
             get
             {
-                return JSFnsConstants.SS_GetDisplayMemberJSfn;
+                return @"return $('#' + this.EbSid_CtxId).find('[active=true]').attr('dm');";
             }
             set { }
         }
@@ -159,7 +159,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.BotForm)]
         [HideInPropertyGrid]
-        public override bool IsFullViewContol { get => true; set => base.IsFullViewContol = value; }
+        public override bool IsFullViewContol { get => false; set => base.IsFullViewContol = value; }
 
         [EnableInBuilder(BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.Boolean)]
@@ -183,13 +183,8 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
                         {
                             EbButtonSelectOption button = this.Buttons[i];
                             _buttonsHtml += string.Format(@"
-<div  value='{0}' class='bs-btn' active='false' tabindex='1'>
-    <div class='bs-txt-wrap'>
-        <div class='bs-text'>{1}</div>
-    </div>
-    <div class='bs-ckbx-wrap'>
-        <input type='checkbox'>
-    </div>
+<div  value='{0}' dm='{1}' class='bs-btn' active='false' tabindex='1'>
+    {1}
 </div>
 ", button.Value, button.DisplayName);
                         }
@@ -197,18 +192,49 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
                     }
                 }
                 return _buttonsHtml;
-//                    + @"
-//<div class='bs-btn bs-btn-send' tabindex='1'>
-//    <div class='bs-txt-wrap'>
-//        <div class='bs-text'>OK</div>
-//    </div>
-//    <div class='bs-ckbx-wrap'>
-//       <i class='fa fa-check' aria-hidden='true'></i>
-//    </div>
-//</div>";
             }
             set { }
         }
+
+        //        [JsonIgnore]
+        //        public string ButtonsHtml
+        //        {
+        //            get
+        //            {
+        //                if (_buttonsHtml.Equals(string.Empty))
+        //                {
+        //                    _buttonsHtml = string.Empty;
+        //                    if (!this.IsDynamic)
+        //                    {
+        //                        for (int i = 0; i < this.Buttons.Count; i++)
+        //                        {
+        //                            EbButtonSelectOption button = this.Buttons[i];
+        //                            _buttonsHtml += string.Format(@"
+        //<div  value='{0}' class='bs-btn' active='false' tabindex='1'>
+        //    <div class='bs-txt-wrap'>
+        //        <div class='bs-text'>{1}</div>
+        //    </div>
+        //    <div class='bs-ckbx-wrap'>
+        //        <input type='checkbox'>
+        //    </div>
+        //</div>
+        //", button.Value, button.DisplayName);
+        //                        }
+
+        //                    }
+        //                }
+        //                return _buttonsHtml + @"
+        //<div class='bs-btn bs-btn-send' tabindex='1'>
+        //    <div class='bs-txt-wrap'>
+        //        <div class='bs-text'>OK</div>
+        //    </div>
+        //    <div class='bs-ckbx-wrap'>
+        //       <i class='fa fa-check' aria-hidden='true'></i>
+        //    </div>
+        //</div>";
+        //            }
+        //            set { }
+        //        }
 
         public void InitFromDataBase(JsonServiceClient ServiceClient)
         {
