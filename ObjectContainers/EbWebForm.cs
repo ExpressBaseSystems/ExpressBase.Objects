@@ -1037,9 +1037,9 @@ namespace ExpressBase.Objects
                 {
                     EbDataTable dataTable = dataset.Tables[count++];////                
 
-                    if (_table.TableType == WebFormTableTypes.Review)
+                    if (_table.TableType == WebFormTableTypes.Approval)
                         this.GetFormattedDataApproval(dataTable, Table);
-                    else if(_table.TableType != WebFormTableTypes.Approval)
+                    else
                         this.GetFormattedData(dataTable, Table, _table);
                 }
                 //if (!_FormData.MultipleTables.ContainsKey(_table.TableName))
