@@ -1,43 +1,29 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Constants;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.LocationNSolution;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
-using ExpressBase.Security;
-using ExpressBase.Objects.Helpers;
 using ExpressBase.Objects.Objects.DVRelated;
 using ExpressBase.Objects.ServiceStack_Artifacts;
 using Newtonsoft.Json;
 using ServiceStack;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
 using System.Runtime.Serialization;
-using System.Threading.Tasks;
-using ExpressBase.Common.Constants;
+using System.Text;
+using static Dropbox.Api.FileProperties.TemplateOwnerType;
 
 namespace ExpressBase.Objects
 {
-
-    public enum BootStrapClass
-    {
-        Default = 0,// 'default' is a key word
-        primary = 1,
-        info = 2,
-        success = 3,
-        warning = 4,
-        danger = 5
-    }
-
-    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-    public class EbSimpleSelect : EbControlUI
+    [EnableInBuilder(BuilderType.BotForm)]
+    public class EbButtonSelect : EbControlUI
     {
 
-        public EbSimpleSelect()
+        public EbButtonSelect()
         {
-            this.Options = new List<EbSimpleSelectOption>();
+            this.Buttons = new List<EbButtonSelectOption>();
         }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
@@ -49,11 +35,6 @@ namespace ExpressBase.Objects
                 return IsDynamic ? ValueMember.Type : EbDbTypes.String;
             }
         }
-
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [DefaultPropValue("100")]
-        [PropertyGroup(PGConstants.APPEARANCE)]
-        public int DropdownHeight { get; set; }
 
         public override string JustSetValueJSfn
         {
@@ -120,69 +101,49 @@ namespace ExpressBase.Objects
 
         [HideInPropertyGrid]
         [JsonIgnore]
-        public override string ToolIconHtml { get { return "<i class='fa fa-caret-down'></i>"; } set { } }
+        public override string ToolIconHtml { get { return "<i class='fa fa-tasks'></i>"; } set { } }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [EnableInBuilder(BuilderType.BotForm)]
         [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [PropertyGroup(PGConstants.DATA_SETTINGS)]
         [Alias("Data Reader")]
         public string DataSourceId { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [PropertyGroup(PGConstants.APPEARANCE)]
-        public BootStrapClass BootStrapStyle { get; set; }
+        [EnableInBuilder(BuilderType.BotForm)]
+        [PropertyGroup(PGConstants.EXTENDED)]
+        public bool IsMultiSelect { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [EnableInBuilder(BuilderType.BotForm)]
+        [PropertyGroup(PGConstants.EXTENDED)]
+        public int MaxLimit { get; set; }
+
+        [EnableInBuilder(BuilderType.BotForm)]
+        [PropertyGroup(PGConstants.EXTENDED)]
+        public int MinLimit { get; set; }
+
+        [EnableInBuilder(BuilderType.BotForm)]
         [PropertyGroup(PGConstants.HELP)]
         [HelpText("specifies a short hint that describes the expected value of an input field (e.g. a sample value or a short description of the expected format)")]
         public string PlaceHolder { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [PropertyGroup(PGConstants.EXTENDED)]
-        public bool IsMultiSelect { get; set; }
-
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [PropertyGroup(PGConstants.EXTENDED)]
-        [OnChangeExec(@"
-            if(this.IsMultiSelect === true){
-                pg.ShowProperty('IsSearchable');
-                pg.ShowProperty('MaxLimit');
-                pg.ShowProperty('MinLimit');
-            }
-    else{
-                pg.HideProperty('IsSearchable');
-                pg.HideProperty('MaxLimit');
-                pg.HideProperty('MinLimit');
-            }")]
-        public bool IsSearchable { get; set; }
-
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [PropertyGroup(PGConstants.EXTENDED)]
-        public int MaxLimit { get; set; }
-
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [PropertyGroup(PGConstants.EXTENDED)]
-        public int MinLimit { get; set; }
-
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [EnableInBuilder(BuilderType.BotForm)]
         [HideInPropertyGrid]
         public DVColumnCollection Columns { get; set; }
 
-        [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.WebForm, BuilderType.UserControl)]
+        [EnableInBuilder(BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", 1)]
         [OnChangeExec(@"if (this.Columns && this.Columns.$values.length === 0 ){pg.MakeReadOnly('ValueMember');} else {pg.MakeReadWrite('ValueMember');}")]
         [PropertyPriority(69)]
         [PropertyGroup(PGConstants.DATA_SETTINGS)]
         public DVBaseColumn ValueMember { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [EnableInBuilder(BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.Collection)]
-        [Alias("Options")]
         [PropertyGroup(PGConstants.CORE)]
-        public List<EbSimpleSelectOption> Options { get; set; }
+        public List<EbButtonSelectOption> Buttons { get; set; }
 
-        [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.WebForm, BuilderType.UserControl)]
+        [EnableInBuilder(BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", 1)]
         [PropertyPriority(68)]
         [PropertyGroup(PGConstants.DATA_SETTINGS)]
@@ -196,72 +157,61 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.BotForm)]
         public override bool IsReadOnly { get => this.ReadOnly; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [EnableInBuilder(BuilderType.BotForm)]
+        [HideInPropertyGrid]
+        public override bool IsFullViewContol { get => true; set => base.IsFullViewContol = value; }
+
+        [EnableInBuilder(BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.Boolean)]
         [PropertyGroup(PGConstants.CORE)]
         [OnChangeExec(@"if(this.IsDynamic === true){pg.ShowProperty('DataSourceId');pg.ShowProperty('ValueMember');pg.ShowProperty('DisplayMember');pg.HideProperty('Options');}
 else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HideProperty('DisplayMember');pg.ShowProperty('Options');}")]
         public bool IsDynamic { get; set; }
 
-        private string _optionHtml = string.Empty;
+        private string _buttonsHtml = string.Empty;
         [JsonIgnore]
-        public string OptionHtml
+        public string ButtonsHtml
         {
             get
             {
-                if (_optionHtml.Equals(string.Empty))
+                if (_buttonsHtml.Equals(string.Empty))
                 {
-                    _optionHtml = string.Empty;
-					string OptGrpName = string.Empty;
+                    _buttonsHtml = string.Empty;
                     if (!this.IsDynamic)
                     {
-						List<EbSimpleSelectOption> GrpList= this.Options.OrderBy(o => o.OptGroupName).ToList();
-
-						foreach (EbSimpleSelectOption opt in GrpList)
+                        for (int i = 0; i < this.Buttons.Count; i++)
                         {
-							if (opt.OptGroupName != null)
-							{
-								if (opt.OptGroupName.Equals(string.Empty))
-								{
-									_optionHtml += string.Format("<option  value='{0}'>{1}</option>", opt.Value, opt.DisplayName);
-								}
-								else
-								{
-									if (opt.OptGroupName != OptGrpName)
-									{
-										_optionHtml += string.Format("<optgroup label='{0}'>", opt.OptGroupName);
-									}
-									OptGrpName = opt.OptGroupName;
-
-									if (opt.OptGroupName.Equals(OptGrpName))
-									{
-										_optionHtml += string.Format("<option  value='{0}'>{1}</option>", opt.Value, opt.DisplayName);
-									}
-
-								}
-							}
-							else
-							{
-								_optionHtml += string.Format("<option  value='{0}'>{1}</option>", opt.Value, opt.DisplayName);
-							}
-								
-								
+                            EbButtonSelectOption button = this.Buttons[i];
+                            _buttonsHtml += string.Format(@"
+<div  value='{0}' class='bs-btn' active='false' tabindex='1'>
+    <div class='bs-txt-wrap'>
+        <div class='bs-text'>{1}</div>
+    </div>
+    <div class='bs-ckbx-wrap'>
+        <input type='checkbox'>
+    </div>
+</div>
+", button.Value, button.DisplayName);
                         }
+
                     }
                 }
-                return _optionHtml;
+                return _buttonsHtml;
+//                    + @"
+//<div class='bs-btn bs-btn-send' tabindex='1'>
+//    <div class='bs-txt-wrap'>
+//        <div class='bs-text'>OK</div>
+//    </div>
+//    <div class='bs-ckbx-wrap'>
+//       <i class='fa fa-check' aria-hidden='true'></i>
+//    </div>
+//</div>";
             }
             set { }
         }
 
-        //public override string GetToolHtml()
-        //{
-        //    return @"<div eb-type='@toolName' class='tool'><i class='fa fa-caret-down'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
-        //}
-
         public void InitFromDataBase(JsonServiceClient ServiceClient)
         {
-            //this.DataSourceId = "eb_roby_dev-eb_roby_dev-2-1015-1739";
             string _html = string.Empty;
             if (this.IsDynamic)
             {
@@ -269,11 +219,10 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
                 foreach (EbDataRow option in result.Data)
                 {
                     _html += string.Format("<option value='{0}'>{1}</option>", option[this.ValueMember.Data], option[this.DisplayMember.Data]);
-                    //_html += string.Format("<option value='{0}'>{1}</option>", option[0].ToString().Trim(), option[0]);
                 }
             }
-            _optionHtml = _html;
-            this.OptionHtml = _html;
+            _buttonsHtml = _html;
+            this.ButtonsHtml = _html;
         }
 
 
@@ -312,74 +261,41 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
         public override string GetBareHtml()
         {
             return @"
-        <select id='@ebsid@' ui-inp class='selectpicker' title='@PlaceHolder@' @selOpts@ @MaxLimit@ @multiple@ @IsSearchable@ name='@ebsid@' @bootStrapStyle@ data-ebtype='@data-ebtype@' style='width: 100%;'>
-            @-sel-@
-            @options@
-        </select>"
+        <div id='@ebsid@' class='buttonselect-cont' title='@PlaceHolder@' @multiple@  name='@ebsid@' data-ebtype='@data-ebtype@'>
+            @buttons@
+        </div>"
 .Replace("@ebsid@", String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId)
 .Replace("@name@", this.Name)
-.Replace("@HelpText@", this.HelpText)
-
 .Replace("@multiple@", this.IsMultiSelect ? "multiple" : "")
-.Replace("@MaxLimit@", IsMultiSelect ? "data-max-options='" + (!IsMultiSelect ? 1 : MaxLimit) + "'" : string.Empty)
-.Replace("@IsSearchable@", IsMultiSelect ? "data-live-search='" + this.IsSearchable + "'" : string.Empty)
-.Replace("@selOpts@", IsMultiSelect ? "data-actions-box='true'" : string.Empty)
-.Replace("@bootStrapStyle@", "data-style='btn-" + this.BootStrapStyle.ToString() + "'")
-
-.Replace("@PlaceHolder@", (PlaceHolder ?? " - select - "))
-.Replace("@options@", this.OptionHtml)
-.Replace("@-sel-@", this.IsMultiSelect ? string.Empty : "<option selected value='-1' style='color: #6f6f6f;'> - select - </option>")
+.Replace("@buttons@", this.ButtonsHtml)
+.Replace("@PlaceHolder@", this.PlaceHolder)
 .Replace("@data-ebtype@", "16");
-        }
-        
-        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
-        {
-            object _formattedData = null;
-            string _displayMember = string.Empty;
-            if(Value != null)
-            {
-                _formattedData = Value;
-            }
-
-            return new SingleColumn()
-            {
-                Name = this.Name,
-                Type = (int)this.EbDbType,
-                Value = _formattedData,
-                Control = this,
-                ObjType = this.ObjType,
-                F = _displayMember
-            };
         }
     }
 
-    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+
+    [EnableInBuilder(BuilderType.BotForm)]
     [HideInToolBox]
     [UsedWithTopObjectParent(typeof(EbObject))]
-    public class EbSimpleSelectOption
+    public class EbButtonSelectOption
     {
-        public EbSimpleSelectOption() { }
+        public EbButtonSelectOption() { }
 
         [HideInPropertyGrid]
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [EnableInBuilder(BuilderType.BotForm)]
         public string EbSid { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [EnableInBuilder(BuilderType.BotForm)]
         [PropertyGroup(PGConstants.CORE)]
         public string Name { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [EnableInBuilder(BuilderType.BotForm)]
         [PropertyGroup(PGConstants.CORE)]
         public string Value { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-		[PropertyGroup(PGConstants.CORE)]
-		[Alias("Group Name")]
-		public string OptGroupName { get; set; }
-
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [EnableInBuilder(BuilderType.BotForm)]
         [PropertyGroup(PGConstants.CORE)]
-        [Alias("Option Text")]
+        [Alias("Button Text")]
         public string DisplayName { get; set; }
     }
 }
