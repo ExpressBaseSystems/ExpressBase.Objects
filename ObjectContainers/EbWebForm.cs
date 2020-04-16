@@ -1156,7 +1156,11 @@ namespace ExpressBase.Objects
                                     bool hasPerm = false;
                                     if (hasRoleMatch || user_ids.Contains(this.UserObj.UserId) || this.UserObj.UserGroupIds.Contains(ugId))
                                         hasPerm = true;
-
+                                    else if (this.UserObj.Roles.Contains(SystemRoles.SolutionOwner.ToString()) || this.UserObj.Roles.Contains(SystemRoles.SolutionAdmin.ToString()))
+                                    {
+                                        hasPerm = true;
+                                        Console.WriteLine("Permission granted to Solu Owner/Admin to execute Review");
+                                    }
                                     DateTime dt_con = DateTime.UtcNow.ConvertFromUtc(this.UserObj.Preference.TimeZone);
                                     string dt = dt_con.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
                                     string stAction = activeStage.StageActions.Count > 0 ? (activeStage.StageActions[0] as EbReviewAction).EbSid : string.Empty;
