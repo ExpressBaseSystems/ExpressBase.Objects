@@ -37,7 +37,6 @@ namespace ExpressBase.Objects.Objects
 			{
 				return @"EbRating = {
                 starCount : function(elementId, props) {
-console.log('xxxxxxxxxxxxxx');
 								let rtngHtml='';
 									for(let i=props.MaxVal; i>0; i--){
 										rtngHtml += `<span class='fa fa-star-o wrd_spacing'></span>`;

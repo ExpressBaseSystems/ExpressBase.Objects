@@ -18,10 +18,7 @@ namespace ExpressBase.Objects
 	[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
 	public class EbBluePrint : EbControlUI, IEbSpecialContainer
 	{
-		public EbBluePrint()
-		{
-			
-		}
+		public EbBluePrint(){}
 
 
 
@@ -95,8 +92,6 @@ namespace ExpressBase.Objects
 		public override bool DoNotPersist { get; set; }
 
 		[EnableInBuilder(BuilderType.WebForm)]
-
-
 		[HideInPropertyGrid]
 		public override string BackColor { get; set; }
 
@@ -123,6 +118,32 @@ namespace ExpressBase.Objects
 		[EnableInBuilder(BuilderType.WebForm)]
 		[HideInPropertyGrid]
 		public override EbDbTypes EbDbType { get { return EbDbTypes.String; } set { } }
+
+		//objects to store BP details
+
+		[EnableInBuilder(BuilderType.WebForm)]
+		[HideInPropertyGrid]
+		public string Blueprint_UniqueID { get; set; }
+
+		[EnableInBuilder(BuilderType.WebForm)]
+		[HideInPropertyGrid]
+		public string BP_ImageRefid { get; set; }
+
+		//[EnableInBuilder(BuilderType.WebForm)]
+		//[HideInPropertyGrid]
+		//public string Form_RefID { get; set; }
+
+		//[EnableInBuilder(BuilderType.WebForm)]
+		//[HideInPropertyGrid]
+		//public string Form_DataID { get; set; }
+
+		[EnableInBuilder(BuilderType.WebForm)]
+		[HideInPropertyGrid]
+		public List<AreaMarked> AreaMarkedList { get; set; }
+
+
+		//objects to store BP Area details
+
 
 
 		public override string GetBareHtml()
@@ -164,6 +185,25 @@ namespace ExpressBase.Objects
 
 			return ReplacePropsInHTML(EbCtrlHTML);
 		}
+
+		
+	}
+
+	public class AreaMarked
+	{
+		public string BP_AreaMarkedID { get; set; }
+
+		public string AreaMarkedColour { get; set; }
+		
+		public string Area_DispalyName { get; set; }
+
+		public string Area_Name { get; set; }
+
+		public string Area_ParentFormID { get; set; }
+
+		public string Area_FormID { get; set; }
+
+		public string Area_HTMLtext { get; set; }
 
 	}
 }
