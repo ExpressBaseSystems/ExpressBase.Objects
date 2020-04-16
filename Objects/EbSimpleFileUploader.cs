@@ -151,7 +151,7 @@ namespace ExpressBase.Objects
 
 
 		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
-		[DefaultPropValue("0")]
+		[DefaultPropValue("1")]
 		[Alias("Maximum Files")]
 		public int MaxFiles { get; set; }
 
@@ -167,8 +167,8 @@ namespace ExpressBase.Objects
 		public int MaxSize { get; set; }
 
 		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
-		[DefaultPropValue(".jpg,.png")]
-		[Alias(" File Types")]
+		[DefaultPropValue("image/jpeg,image/png,image/jpg")]
+		[Alias("File Types")]
 		public string FileTypes { get; set; }
 	}
 }
