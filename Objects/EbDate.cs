@@ -262,7 +262,7 @@ namespace ExpressBase.Objects
                 return
                     @"if((this.IsNullable && !($('#' + this.EbSid_CtxId).siblings('.nullable-check').find('input[type=checkbox]').prop('checked'))) || $('#' + this.EbSid_CtxId).val() === '')
                         return undefined;
-                    else if(this.ShowDateAs_ === 1) //month picker
+                    else if(this.ShowDateAs_ === 1 || this.ShowDateAs_ === 2) //month picker or year picker
                         return $('#' + this.EbSid_CtxId).val();
                     else if(this.EbDateType === 5) //Date
                         return moment($('#' + this.EbSid_CtxId).val(), ebcontext.user.Preference.ShortDatePattern).format('YYYY-MM-DD');
@@ -333,7 +333,9 @@ namespace ExpressBase.Objects
             {
                 if (this.EbDateType == EbDateType.Date)
                 {
-                    if (this.ShowDateAs_ == DateShowFormat.Year_Month)
+                    if (this.ShowDateAs_ == DateShowFormat.Year)
+                        cField.Value = DateTime.ParseExact(cField.Value.ToString(), "yyyy", CultureInfo.InvariantCulture);
+                    else if(this.ShowDateAs_ == DateShowFormat.Year_Month)
                         cField.Value = DateTime.ParseExact(cField.Value.ToString(), "MM/yyyy", CultureInfo.InvariantCulture);
                     else
                         cField.Value = DateTime.ParseExact(cField.Value.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
@@ -410,7 +412,12 @@ namespace ExpressBase.Objects
                     }
                     else //EbDate
                     {
-                        if (_this.ShowDateAs_ == DateShowFormat.Year_Month)
+                        if (_this.ShowDateAs_ == DateShowFormat.Year)
+                        {
+                            _formattedData = dt.ToString("yyyy", CultureInfo.InvariantCulture);
+                            _displayMember = _formattedData.ToString();
+                        }
+                        else if (_this.ShowDateAs_ == DateShowFormat.Year_Month)
                         {
                             _formattedData = dt.ToString("MM/yyyy", CultureInfo.InvariantCulture);
                             _displayMember = _formattedData.ToString();
