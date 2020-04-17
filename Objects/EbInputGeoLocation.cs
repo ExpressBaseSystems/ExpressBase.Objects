@@ -102,7 +102,7 @@ namespace ExpressBase.Objects
                             <div class='locinp-wraper-address'>
                                 <div style='display: inline-block; min-width: 50px;'>Address</div>
                                 <div style='display: inline-block; min-width: calc(100% - 54px);'>
-                                    <input id='@EbSid@address' class='locinp' type='text' style='width: 100%;' />
+                                    <input id='@EbSid@address' class='locinp' type='text' style='width: calc( 100% - 3.5em );' />
                                 </div>
                             </div>
                             <div>
