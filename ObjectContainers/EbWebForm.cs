@@ -1071,97 +1071,103 @@ namespace ExpressBase.Objects
                 int tableIndex = _schema.Tables.Count;
                 int mngUsrCount = 0;
                 SingleTable UserTable = null;
-                foreach (EbControl Ctrl in _schema.ExtendedControls)//ManageUser Controls + Manage Location Control
+                foreach (EbControl Ctrl in _schema.ExtendedControls)// EbProvisionUser + EbProvisionLocation + EbReview
                 {
-                    SingleTable Table = new SingleTable();
-                    if (!(UserTable != null && Ctrl is EbProvisionUser))
-                        this.GetFormattedData(dataset.Tables[tableIndex], Table);
-
-                    if (Ctrl is EbProvisionUser)
+                    if (Ctrl is EbProvisionUser || Ctrl is EbProvisionLocation || Ctrl is EbReview)
                     {
-                        Dictionary<string, dynamic> _d = new Dictionary<string, dynamic>();
-                        if (UserTable == null)
-                            UserTable = Table;
-                        else
-                            tableIndex--; //one query is used to select required user records
-                        if (UserTable.Count > mngUsrCount)
+                        SingleTable Table = new SingleTable();
+                        if (!(UserTable != null && Ctrl is EbProvisionUser))
+                            this.GetFormattedData(dataset.Tables[tableIndex], Table);
+
+                        if (Ctrl is EbProvisionUser)
                         {
-                            NTV[] pArr = (Ctrl as EbProvisionUser).FuncParam;
-                            for (int k = 0; k < pArr.Length; k++)
+                            Dictionary<string, dynamic> _d = new Dictionary<string, dynamic>();
+                            if (UserTable == null)
+                                UserTable = Table;
+                            else
+                                tableIndex--; //one query is used to select required user records
+                            if (UserTable.Count > mngUsrCount)
                             {
-                                if (UserTable[mngUsrCount][pArr[k].Name] != null)
-                                    _d.Add(pArr[k].Name, UserTable[mngUsrCount][pArr[k].Name]);
-                            }
-
-                            //_d.Add(FormConstants.id, UserTable[mngUsrCount][FormConstants.id]);
-                            //_d.Add("statusid", UserTable[mngUsrCount]["statusid"]);
-                            //foreach (UsrLocField _f in (Ctrl as EbProvisionUser).PersistingFields)
-                            //{
-                            //    _d.Add(_f.Name, UserTable[mngUsrCount][_f.Name]);
-                            //}
-                            //if (!_d.ContainsKey("usertype"))
-                            //    _d.Add("usertype", UserTable[mngUsrCount]["usertype"]);
-
-                            mngUsrCount++;
-                        }
-                        _FormData.MultipleTables[(Ctrl as EbProvisionUser).VirtualTable][0][Ctrl.Name] = JsonConvert.SerializeObject(_d);
-                        //_FormData.MultipleTables[(Ctrl as EbProvisionUser).VirtualTable][0].Columns.Add(new SingleColumn()
-                        //{
-                        //    Name = Ctrl.Name,
-                        //    Type = (int)EbDbTypes.String,
-                        //    Value = JsonConvert.SerializeObject(_d)
-                        //});
-                    }
-                    else if (Ctrl is EbProvisionLocation)
-                    {
-                        Dictionary<string, dynamic> _d = new Dictionary<string, dynamic>();
-                        if (Table.Count == 1)
-                        {
-                            _d.Add(FormConstants.id, Table[0][FormConstants.id]);
-                            _d.Add(FormConstants.longname, Table[0][FormConstants.longname]);
-                            _d.Add(FormConstants.shortname, Table[0][FormConstants.shortname]);
-                            _d.Add(FormConstants.image, Table[0][FormConstants.image]);
-                            _d.Add(FormConstants.meta_json, Table[0][FormConstants.meta_json]);
-                        }
-                        _FormData.MultipleTables[(Ctrl as EbProvisionUser).VirtualTable][0][Ctrl.Name] = JsonConvert.SerializeObject(_d);
-                        //_FormData.MultipleTables[(Ctrl as EbProvisionLocation).VirtualTable][0].Columns.Add(new SingleColumn()
-                        //{
-                        //    Name = Ctrl.Name,
-                        //    Type = (int)EbDbTypes.String,
-                        //    Value = JsonConvert.SerializeObject(_d)
-                        //});
-                    }
-                    else if (Ctrl is EbReview)
-                    {
-                        if (Table.Count == 1)
-                        {
-                            string stageEbSid = Table[0]["stage_unique_id"];
-                            EbReviewStage activeStage = (EbReviewStage)(Ctrl as EbReview).FormStages.Find(e => (e as EbReviewStage).EbSid == stageEbSid);
-
-                            if (activeStage != null)
-                            {
-                                List<int> user_ids = new List<int>();
-                                List<int> role_ids = new List<int>();
-                                string sUserIds = Table[0]["user_ids"];
-                                string sRoleIds = Table[0]["role_ids"];
-                                int.TryParse(Convert.ToString(Table[0]["usergroup_id"]), out int ugId);
-                                if (!sUserIds.IsNullOrEmpty())
-                                    user_ids = Array.ConvertAll(sUserIds.Split(','), int.Parse).ToList();
-                                if (!sRoleIds.IsNullOrEmpty())
-                                    role_ids = Array.ConvertAll(sRoleIds.Split(','), int.Parse).ToList();
-
-                                bool hasRoleMatch = this.UserObj.RoleIds.Select(x => x).Intersect(role_ids).Any();
-                                bool hasPerm = false;
-                                if (hasRoleMatch || user_ids.Contains(this.UserObj.UserId) || this.UserObj.UserGroupIds.Contains(ugId))
-                                    hasPerm = true;
-
-                                DateTime dt_con = DateTime.UtcNow.ConvertFromUtc(this.UserObj.Preference.TimeZone);
-                                string dt = dt_con.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
-                                string stAction = activeStage.StageActions.Count > 0 ? (activeStage.StageActions[0] as EbReviewAction).EbSid : string.Empty;
-                                _FormData.MultipleTables["eb_approval_lines"].Add(new SingleRow()
+                                NTV[] pArr = (Ctrl as EbProvisionUser).FuncParam;
+                                for (int k = 0; k < pArr.Length; k++)
                                 {
-                                    RowId = 0,
-                                    Columns = new List<SingleColumn>
+                                    if (UserTable[mngUsrCount][pArr[k].Name] != null)
+                                        _d.Add(pArr[k].Name, UserTable[mngUsrCount][pArr[k].Name]);
+                                }
+
+                                //_d.Add(FormConstants.id, UserTable[mngUsrCount][FormConstants.id]);
+                                //_d.Add("statusid", UserTable[mngUsrCount]["statusid"]);
+                                //foreach (UsrLocField _f in (Ctrl as EbProvisionUser).PersistingFields)
+                                //{
+                                //    _d.Add(_f.Name, UserTable[mngUsrCount][_f.Name]);
+                                //}
+                                //if (!_d.ContainsKey("usertype"))
+                                //    _d.Add("usertype", UserTable[mngUsrCount]["usertype"]);
+
+                                mngUsrCount++;
+                            }
+                            _FormData.MultipleTables[(Ctrl as EbProvisionUser).VirtualTable][0][Ctrl.Name] = JsonConvert.SerializeObject(_d);
+                            //_FormData.MultipleTables[(Ctrl as EbProvisionUser).VirtualTable][0].Columns.Add(new SingleColumn()
+                            //{
+                            //    Name = Ctrl.Name,
+                            //    Type = (int)EbDbTypes.String,
+                            //    Value = JsonConvert.SerializeObject(_d)
+                            //});
+                        }
+                        else if (Ctrl is EbProvisionLocation)
+                        {
+                            Dictionary<string, dynamic> _d = new Dictionary<string, dynamic>();
+                            if (Table.Count == 1)
+                            {
+                                _d.Add(FormConstants.id, Table[0][FormConstants.id]);
+                                _d.Add(FormConstants.longname, Table[0][FormConstants.longname]);
+                                _d.Add(FormConstants.shortname, Table[0][FormConstants.shortname]);
+                                _d.Add(FormConstants.image, Table[0][FormConstants.image]);
+                                _d.Add(FormConstants.meta_json, Table[0][FormConstants.meta_json]);
+                            }
+                            _FormData.MultipleTables[(Ctrl as EbProvisionUser).VirtualTable][0][Ctrl.Name] = JsonConvert.SerializeObject(_d);
+                            //_FormData.MultipleTables[(Ctrl as EbProvisionLocation).VirtualTable][0].Columns.Add(new SingleColumn()
+                            //{
+                            //    Name = Ctrl.Name,
+                            //    Type = (int)EbDbTypes.String,
+                            //    Value = JsonConvert.SerializeObject(_d)
+                            //});
+                        }
+                        else if (Ctrl is EbReview)
+                        {
+                            if (Table.Count == 1)
+                            {
+                                string stageEbSid = Table[0]["stage_unique_id"];
+                                EbReviewStage activeStage = (EbReviewStage)(Ctrl as EbReview).FormStages.Find(e => (e as EbReviewStage).EbSid == stageEbSid);
+
+                                if (activeStage != null)
+                                {
+                                    List<int> user_ids = new List<int>();
+                                    List<int> role_ids = new List<int>();
+                                    string sUserIds = Table[0]["user_ids"];
+                                    string sRoleIds = Table[0]["role_ids"];
+                                    int.TryParse(Convert.ToString(Table[0]["usergroup_id"]), out int ugId);
+                                    if (!sUserIds.IsNullOrEmpty())
+                                        user_ids = Array.ConvertAll(sUserIds.Split(','), int.Parse).ToList();
+                                    if (!sRoleIds.IsNullOrEmpty())
+                                        role_ids = Array.ConvertAll(sRoleIds.Split(','), int.Parse).ToList();
+
+                                    bool hasRoleMatch = this.UserObj.RoleIds.Select(x => x).Intersect(role_ids).Any();
+                                    bool hasPerm = false;
+                                    if (hasRoleMatch || user_ids.Contains(this.UserObj.UserId) || this.UserObj.UserGroupIds.Contains(ugId))
+                                        hasPerm = true;
+                                    else if (this.UserObj.Roles.Contains(SystemRoles.SolutionOwner.ToString()) || this.UserObj.Roles.Contains(SystemRoles.SolutionAdmin.ToString()))
+                                    {
+                                        hasPerm = true;
+                                        Console.WriteLine("Permission granted to Solu Owner/Admin to execute Review");
+                                    }
+                                    DateTime dt_con = DateTime.UtcNow.ConvertFromUtc(this.UserObj.Preference.TimeZone);
+                                    string dt = dt_con.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+                                    string stAction = activeStage.StageActions.Count > 0 ? (activeStage.StageActions[0] as EbReviewAction).EbSid : string.Empty;
+                                    _FormData.MultipleTables["eb_approval_lines"].Add(new SingleRow()
+                                    {
+                                        RowId = 0,
+                                        Columns = new List<SingleColumn>
                                     {
                                         new SingleColumn{ Name = "stage_unique_id", Type = (int)EbDbTypes.String, Value = activeStage.EbSid},
                                         new SingleColumn{ Name = "action_unique_id", Type = (int)EbDbTypes.String, Value = stAction},
@@ -1172,27 +1178,30 @@ namespace ExpressBase.Objects
                                         new SingleColumn{ Name = "is_form_data_editable", Type = (int)EbDbTypes.String, Value = Convert.ToString(Table[0]["is_form_data_editable"])},
                                         new SingleColumn{ Name = "has_permission", Type = (int)EbDbTypes.String, Value = hasPerm ? "T" : "F"}
                                     }
-                                }); ;
+                                    });
+                                }
+
                             }
-
                         }
-                    }
 
-                    tableIndex++;
+                        tableIndex++;
+                    }
                 }
             }
 
-            foreach (EbControl Ctrl in _schema.ExtendedControls)
+            foreach (EbControl Ctrl in _schema.ExtendedControls)// EbFileUploader
             {
                 if (Ctrl is EbFileUploader)
                 {
-                    if (this.FormGlobals == null)
-                        this.FormGlobals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, _FormData, null);
                     string context = this.RefId.Split(CharConstants.DASH)[3] + CharConstants.UNDERSCORE + this.TableRowId.ToString();//context format = objectId_rowId_ControlId
                     EbFileUploader _ctrl = Ctrl as EbFileUploader;
                     string cxt2 = null;
                     if (_ctrl.ContextGetExpr != null && !_ctrl.ContextGetExpr.Code.IsNullOrEmpty())
+                    {
+                        if (this.FormGlobals == null)
+                            this.FormGlobals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, _FormData, null);
                         cxt2 = Convert.ToString(this.ExecuteCSharpScriptNew(_ctrl.ContextGetExpr.Code, this.FormGlobals));
+                    }
 
                     string qry = (Ctrl as EbFileUploader).GetSelectQuery(DataDB, string.IsNullOrEmpty(cxt2));
 
@@ -1804,7 +1813,7 @@ namespace ExpressBase.Objects
                 Console.WriteLine("Will try to INSERT eb_my_actions");
 
                 if (isInsert)// eb_approval - insert entry here
-                {                   
+                {
                     insUpQ += $@"INSERT INTO eb_approval(review_status, eb_my_actions_id, eb_src_id, eb_ver_id, eb_created_by, eb_created_at, eb_del)
                                     VALUES('processing', (SELECT eb_currval('eb_my_actions_id_seq')), (SELECT eb_currval('{this.TableName}_id_seq')), 
                                     @{this.TableName}_eb_ver_id, @eb_createdby, {DataDB.EB_CURRENT_TIMESTAMP}, 'F'); ";
@@ -1813,7 +1822,7 @@ namespace ExpressBase.Objects
                 {
                     insUpQ += $@"UPDATE eb_approval SET eb_my_actions_id = (SELECT eb_currval('eb_my_actions_id_seq')), eb_lastmodified_by = @eb_modified_by, eb_lastmodified_at = {DataDB.EB_CURRENT_TIMESTAMP} 
                                     WHERE eb_src_id = @{this.TableName}_id AND eb_ver_id =  @{this.TableName}_eb_ver_id AND COALESCE(eb_del, 'F') = 'F'; ";
-                }                    
+                }
             }
 
             return insUpQ;
