@@ -148,7 +148,7 @@ namespace ExpressBase.Objects
             get
             {
                 return @"let loc = $('#' + this.EbSid_CtxId).locationpicker('location');
-                        return loc.name + '(' + loc.latitude + ',' + loc.longitude + ')';";
+                        return loc.latitude + ',' + loc.longitude;";
             }
             set { }
         }
@@ -162,13 +162,48 @@ namespace ExpressBase.Objects
                             let tmp = p1.split(',');
                             if(tmp.length === 2 && parseFloat(tmp[0]) && parseFloat(tmp[1]))
                                 $('#' + this.EbSid_CtxId).locationpicker('location', { latitude : parseFloat(tmp[0]), longitude : parseFloat(tmp[1])});
-                        }";
+                        };";
             }
             set { }
         }
 
         [JsonIgnore]
-        public override string OnChangeBindJSFn { get { return @"$('#' + this.EbSid_CtxId + 'address').on('change', p1);"; } set { } }
+        public override string JustSetValueJSfn
+        {
+            get
+            {
+                return
+                    @"this.__isJustSetValue = true; " + SetValueJSfn + ";";
+            }
+            set { }
+        }
+
+        [JsonIgnore]
+        public override string GetDisplayMemberFromDOMJSfn
+        {
+            get
+            {
+                return @"return $('#' + this.EbSid_CtxId).locationpicker('location').name;";
+            }
+            set { }
+        }
+
+        [JsonIgnore]
+        public override string ClearJSfn
+        {
+            get
+            {
+                return @"p1 = '0,0';" + SetValueJSfn;
+            }
+            set { }
+        }
+
+        [JsonIgnore]
+        public override string OnChangeBindJSFn { get { return @"
+if(!this.__ebonchangeFns)
+    this.__ebonchangeFns = [];
+this.__ebonchangeFns.push(p1);
+"; } set { } }
 
     }
 }
