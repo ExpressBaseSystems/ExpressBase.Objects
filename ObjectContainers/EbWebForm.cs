@@ -1146,16 +1146,16 @@ namespace ExpressBase.Objects
                                     {
                                         RowId = 0,
                                         Columns = new List<SingleColumn>
-                                    {
-                                        new SingleColumn{ Name = "stage_unique_id", Type = (int)EbDbTypes.String, Value = activeStage.EbSid},
-                                        new SingleColumn{ Name = "action_unique_id", Type = (int)EbDbTypes.String, Value = stAction},
-                                        new SingleColumn{ Name = "eb_my_actions_id", Type = (int)EbDbTypes.Decimal, Value = hasPerm ? Table[0]["id"] : 0},
-                                        new SingleColumn{ Name = "comments", Type = (int)EbDbTypes.String, Value = ""},
-                                        new SingleColumn{ Name = "eb_created_at", Type = (int)EbDbTypes.DateTime, Value = hasPerm ? dt : null},
-                                        new SingleColumn{ Name = "eb_created_by", Type = (int)EbDbTypes.Decimal, Value = hasPerm ? this.UserObj.UserId + "$$" + this.UserObj.FullName : ""},
-                                        new SingleColumn{ Name = "is_form_data_editable", Type = (int)EbDbTypes.String, Value = Convert.ToString(Table[0]["is_form_data_editable"])},
-                                        new SingleColumn{ Name = "has_permission", Type = (int)EbDbTypes.String, Value = hasPerm ? "T" : "F"}
-                                    }
+                                        {
+                                            new SingleColumn{ Name = "stage_unique_id", Type = (int)EbDbTypes.String, Value = activeStage.EbSid},
+                                            new SingleColumn{ Name = "action_unique_id", Type = (int)EbDbTypes.String, Value = stAction},
+                                            new SingleColumn{ Name = "eb_my_actions_id", Type = (int)EbDbTypes.Decimal, Value = hasPerm ? Table[0]["id"] : 0},
+                                            new SingleColumn{ Name = "comments", Type = (int)EbDbTypes.String, Value = ""},
+                                            new SingleColumn{ Name = "eb_created_at", Type = (int)EbDbTypes.DateTime, Value = hasPerm ? dt : null},
+                                            new SingleColumn{ Name = "eb_created_by", Type = (int)EbDbTypes.Decimal, Value = hasPerm ? this.UserObj.UserId + "$$" + this.UserObj.FullName : "", F = hasPerm ? this.UserObj.FullName : ""},
+                                            new SingleColumn{ Name = "is_form_data_editable", Type = (int)EbDbTypes.String, Value = Convert.ToString(Table[0]["is_form_data_editable"])},
+                                            new SingleColumn{ Name = "has_permission", Type = (int)EbDbTypes.String, Value = hasPerm ? "T" : "F"}
+                                        }
                                     });
                                 }
 
@@ -1707,7 +1707,7 @@ namespace ExpressBase.Objects
                     param.Add(DataDB.GetNewParameter($"@eb_my_actions_id_{i++}", EbDbTypes.Int32, this.FormData.MultipleTables[ebReview.TableName][0]["eb_my_actions_id"]));
                     Console.WriteLine("Will try to UPDATE eb_my_actions");
 
-                    if (!(ebReview.FormStages.Find(e => e.EbSid == this.FormData.MultipleTables[ebReview.TableName][0]["stage_unique_id"]) is EbReviewStage currentStage))
+                    if (!(ebReview.FormStages.Find(e => e.EbSid == Convert.ToString(this.FormData.MultipleTables[ebReview.TableName][0]["stage_unique_id"])) is EbReviewStage currentStage))
                         throw new FormException("Bad Request", (int)HttpStatusCodes.BAD_REQUEST, $"eb_approval_lines contains an invalid stage_unique_id: {this.FormData.MultipleTables[ebReview.TableName][0]["stage_unique_id"]} ", "From GetMyActionInsertUpdateQuery");
 
                     //_FG_WebForm global = GlobalsGenerator.GetCSharpFormGlobals(this, this.FormData);

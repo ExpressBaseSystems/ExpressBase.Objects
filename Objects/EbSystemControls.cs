@@ -394,10 +394,20 @@ namespace ExpressBase.Objects
             {
                 int.TryParse(Value.ToString(), out user_id);
             }
-            if (SoluObj.Users != null && SoluObj.Users.ContainsKey(user_id))
+            if (user_id == UserObj.UserId)
+            {
+                _formattedData = UserObj.UserId + "$$" + UserObj.FullName;
+                _displayMember = UserObj.FullName;
+            }
+            else if (SoluObj.Users != null && SoluObj.Users.ContainsKey(user_id))
             {
                 _formattedData = user_id + "$$" + SoluObj.Users[user_id];
                 _displayMember = SoluObj.Users[user_id];
+            }
+            else
+            {
+                _formattedData = user_id + "$$No Name";
+                _displayMember = "No Name";
             }
 
             return new SingleColumn()

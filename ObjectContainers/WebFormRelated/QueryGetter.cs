@@ -77,7 +77,7 @@ namespace ExpressBase.Objects.WebFormRelated
                 }
                 else if (Ctrl is EbReview)
                 {
-                    (Ctrl as EbReview).GetSelectQuery(_this.RefId, _this.FormSchema.MasterTable);
+                    extquery += (Ctrl as EbReview).GetSelectQuery(_this.RefId, _this.FormSchema.MasterTable);
                     _qryCount++;
                 }
                 else if (Ctrl is EbDisplayPicture)

@@ -404,7 +404,7 @@ this.Init = function(id)
     <body>
         <div style='border: 1px solid #508bf9;padding:20px 40px 20px 40px; '>
             <div style='text-align: center;'>
-                <img src='https://myaccount.expressbase.com/images/logo/{iSolutionId}.png' />
+                <img src='https://myaccount.expressbase.com/images/logo/{iSolutionId}.png' style='max-height: 100px; max-width: 300px; ' />
             </div>
             <br />
             <div style='line-height: 1.4;'>
