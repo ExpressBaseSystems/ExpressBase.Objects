@@ -2220,12 +2220,26 @@ namespace ExpressBase.Objects
             return 0;
         }
 
-        public void SendMailIfUserCreated(RabbitMqProducer MessageProducer3)
+        public void AfterExecutionIfUserCreated(Service Service, Common.Connections.EbMailConCollection EmailCon, RabbitMqProducer MessageProducer3)
         {
+            bool UpdateSoluObj = false;
             foreach (EbControl c in this.FormSchema.ExtendedControls)
             {
-                if (c is EbProvisionUser)
-                    (c as EbProvisionUser).SendMailIfUserCreated(MessageProducer3, this.UserObj, this.SolutionObj);
+                if (c is EbProvisionUser && (c as EbProvisionUser).IsUserCreated()) 
+                {
+                    UpdateSoluObj = true;
+                    Console.WriteLine("AfterExecutionIfUserCreated - New User creation found");
+                    if (EmailCon?.Primary != null)
+                    {
+                        Console.WriteLine("AfterExecutionIfUserCreated - SendWelcomeMail start");
+                        (c as EbProvisionUser).SendWelcomeMail(MessageProducer3, this.UserObj, this.SolutionObj);
+                    }
+                }
+            }
+            if (UpdateSoluObj)
+            {
+                Console.WriteLine("AfterExecutionIfUserCreated - UpdateSolutionObjectRequest start");
+                var temp = Service.Gateway.Send<UpdateSolutionObjectResponse>(new UpdateSolutionObjectRequest { SolnId = this.SolutionObj.SolutionID, UserId = this.UserObj.UserId });
             }
         }
 

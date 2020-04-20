@@ -379,12 +379,13 @@ this.Init = function(id)
 
         private string GetRandomPwd()
         {
+            string validChars = "ABCDEFGHJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*?_-";
             StringBuilder builder = new StringBuilder();
             Random random = new Random();
             char ch;
             for (int i = 0; i < 10; i++)
             {
-                ch = Convert.ToChar(Convert.ToInt32(Math.Floor(26 * random.NextDouble() + 65)));
+                ch = validChars[Convert.ToInt32(Math.Floor(72 * random.NextDouble()))];
                 builder.Append(ch);
             }
             return builder.ToString();
@@ -430,31 +431,33 @@ this.Init = function(id)
             set { }
         }
 
-        public void SendMailIfUserCreated(RabbitMqProducer MessageProducer3,User user,Eb_Solution solution)
-        {
-            if(this.UserCredentials != null)
+        public void SendWelcomeMail(RabbitMqProducer MessageProducer3,User user,Eb_Solution solution)
+        {            
+            string Html = this.MailHtml
+                .Replace("{SolutionName}", solution.SolutionName)
+                .Replace("{eSolutionId}", solution.ExtSolutionID)
+                .Replace("{iSolutionId}", solution.SolutionID)
+                .Replace("{UserName}", this.UserCredentials.Name)
+                .Replace("{Email}", this.UserCredentials.Email)
+                .Replace("{Password}", this.UserCredentials.Pwd)
+                .Replace("{SolutionAdmin}", string.IsNullOrEmpty(user.FullName) ? $"{solution.SolutionName} Team" : user.FullName);
+                
+            //this.EbConnectionFactory.EmailConnection.Send("febincarlos@expressbase.com", "test", "Hiii", null, null, null, "");
+                
+            MessageProducer3.Publish(new EmailServicesRequest()
             {
-                string Html = this.MailHtml
-                    .Replace("{SolutionName}", solution.SolutionName)
-                    .Replace("{eSolutionId}", solution.ExtSolutionID)
-                    .Replace("{iSolutionId}", solution.SolutionID)
-                    .Replace("{UserName}", this.UserCredentials.Name)
-                    .Replace("{Email}", this.UserCredentials.Email)
-                    .Replace("{Password}", this.UserCredentials.Pwd)
-                    .Replace("{SolutionAdmin}", string.IsNullOrEmpty(user.FullName) ? $"{solution.SolutionName} Team" : user.FullName);
-                
-                //this.EbConnectionFactory.EmailConnection.Send("febincarlos@expressbase.com", "test", "Hiii", null, null, null, "");
-                
-                MessageProducer3.Publish(new EmailServicesRequest()
-                {
-                    To = this.UserCredentials.Email,
-                    Message = Html,
-                    Subject = $"Welcome to {solution.SolutionName} Solution",
-                    UserId = user.UserId,
-                    UserAuthId = user.AuthId,
-                    SolnId = solution.SolutionID
-                });
-            }
+                To = this.UserCredentials.Email,
+                Message = Html,
+                Subject = $"Welcome to {solution.SolutionName} Solution",
+                UserId = user.UserId,
+                UserAuthId = user.AuthId,
+                SolnId = solution.SolutionID
+            });
+        }
+
+        public bool IsUserCreated()
+        {
+            return this.UserCredentials != null;
         }
 
         public override string GetValueFromDOMJSfn
