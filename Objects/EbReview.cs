@@ -213,6 +213,14 @@ namespace ExpressBase.Objects
             return ReplacePropsInHTML(EbCtrlHTML);
         }
 
+        public string GetSelectQuery(string RefId, string MasterTable)
+        {            
+            return $@"SELECT A.id, S.stage_unique_id, A.is_form_data_editable, A.user_ids, A.role_ids, A.usergroup_id
+                FROM eb_my_actions A, eb_stages S
+                WHERE A.form_ref_id = '{RefId}' AND A.form_data_id = @{MasterTable}_id AND 
+                A.is_completed = 'F' AND A.eb_del = 'F' AND A.eb_stages_id = S.id AND S.eb_del = 'F'; ";
+        }
+
     }
 
     public abstract class ReviewStageAbstract { }

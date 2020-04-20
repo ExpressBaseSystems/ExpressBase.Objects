@@ -74,6 +74,17 @@ namespace ExpressBase.Objects.WebFormRelated
                 }
                 else
                     _table.Columns.Add(new ColumnSchema { ColumnName = control.Name, EbDbType = (int)control.EbDbType, Control = control });
+
+                if (control is EbDisplayPicture)
+                {
+                    (control as EbDisplayPicture).TableName = curTbl;
+                    _schema.ExtendedControls.Add(control);
+                }
+                else if (control is EbSimpleFileUploader)
+                {
+                    (control as EbSimpleFileUploader).TableName = curTbl;
+                    _schema.ExtendedControls.Add(control);
+                }
             }
 
             foreach (EbControl _control in _container.Controls)

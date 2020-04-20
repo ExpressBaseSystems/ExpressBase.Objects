@@ -223,7 +223,7 @@ namespace ExpressBase.Objects.WebFormRelated
             List<FG_Row> Rows = new List<FG_Row>();
             foreach (SingleRow Row in Table)
             {
-                FG_Row fG_Row = new FG_Row() { id = Row[FormConstants.id] };
+                FG_Row fG_Row = new FG_Row() { id = Convert.ToInt32(Row[FormConstants.id]) };
                 foreach (EbControl _control in DG.Controls)
                 {
                     fG_Row.Controls.Add(new FG_Control(_control.Name, Row[_control.Name]));

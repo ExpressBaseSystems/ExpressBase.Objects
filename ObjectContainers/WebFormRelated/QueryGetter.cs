@@ -77,16 +77,17 @@ namespace ExpressBase.Objects.WebFormRelated
                 }
                 else if (Ctrl is EbReview)
                 {
-                    //extquery += $@"SELECT A.id, S.stage_unique_id FROM eb_my_actions A, eb_stages S
-                    //                WHERE A.form_ref_id = '{_this.RefId}' AND A.form_data_id = @{_this.FormSchema.MasterTable}_id AND A.is_completed = 'F' AND A.eb_del = 'F' AND 
-                    //                A.eb_stages_id = S.id AND S.eb_del = 'F' AND
-                    //                ('{_this.UserObj.UserId}' = ANY(STRING_TO_ARRAY(A.user_ids, ',')) OR 
-                    //                STRING_TO_ARRAY (A.role_ids, ',') && STRING_TO_ARRAY ('{_this.UserObj.RoleIds.Join(",")}', ',') OR
-                    //                A.usergroup_id = ANY(STRING_TO_ARRAY ('{_this.UserObj.UserGroupIds.Join(",")}', ',')::INTEGER[]));";
-                    extquery += $@"SELECT A.id, S.stage_unique_id, A.is_form_data_editable, A.user_ids, A.role_ids, A.usergroup_id
-                                    FROM eb_my_actions A, eb_stages S
-                                    WHERE A.form_ref_id = '{_this.RefId}' AND A.form_data_id = @{_this.FormSchema.MasterTable}_id AND 
-                                    A.is_completed = 'F' AND A.eb_del = 'F' AND A.eb_stages_id = S.id AND S.eb_del = 'F';";
+                    (Ctrl as EbReview).GetSelectQuery(_this.RefId, _this.FormSchema.MasterTable);
+                    _qryCount++;
+                }
+                else if (Ctrl is EbDisplayPicture)
+                {
+                    extquery += (Ctrl as EbDisplayPicture).GetSelectQuery(DataDB, _this.FormSchema.MasterTable);
+                    _qryCount++;
+                }
+                else if (Ctrl is EbSimpleFileUploader)
+                {
+                    extquery += (Ctrl as EbSimpleFileUploader).GetSelectQuery(DataDB, _this.FormSchema.MasterTable);
                     _qryCount++;
                 }
             }

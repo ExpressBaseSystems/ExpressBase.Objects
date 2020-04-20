@@ -922,7 +922,7 @@ namespace ExpressBase.Objects
                                 continue;
 
                             //List<SingleRow> Cols = new List<SingleRow>();
-                            Dictionary<string, List<dynamic>> Rows = new Dictionary<string, List<dynamic>>();
+                            Dictionary<string, List<object>> Rows = new Dictionary<string, List<object>>();
                             //Dictionary<int, string[]> Disp = new Dictionary<int, string[]>();//original
                             Dictionary<int, Dictionary<string, string>> DispM_dup = new Dictionary<int, Dictionary<string, string>>();//duplicate
                             string[] temp = Convert.ToString(Column.Value).Split(",");
@@ -937,7 +937,7 @@ namespace ExpressBase.Objects
                                     foreach (SingleColumn _col in _row.Columns)
                                     {
                                         if (!Rows.ContainsKey(_col.Name))
-                                            Rows.Add(_col.Name, new List<dynamic>());
+                                            Rows.Add(_col.Name, new List<object>());
                                         Rows[_col.Name].Add(_col.Value);
                                     }
 
@@ -1073,7 +1073,7 @@ namespace ExpressBase.Objects
                 SingleTable UserTable = null;
                 foreach (EbControl Ctrl in _schema.ExtendedControls)// EbProvisionUser + EbProvisionLocation + EbReview
                 {
-                    if (Ctrl is EbProvisionUser || Ctrl is EbProvisionLocation || Ctrl is EbReview)
+                    if (Ctrl is EbProvisionUser || Ctrl is EbProvisionLocation || Ctrl is EbReview || Ctrl is EbDisplayPicture || Ctrl is EbSimpleFileUploader)
                     {
                         SingleTable Table = new SingleTable();
                         if (!(UserTable != null && Ctrl is EbProvisionUser))
@@ -1081,7 +1081,7 @@ namespace ExpressBase.Objects
 
                         if (Ctrl is EbProvisionUser)
                         {
-                            Dictionary<string, dynamic> _d = new Dictionary<string, dynamic>();
+                            Dictionary<string, object> _d = new Dictionary<string, object>();
                             if (UserTable == null)
                                 UserTable = Table;
                             else
@@ -1094,29 +1094,13 @@ namespace ExpressBase.Objects
                                     if (UserTable[mngUsrCount][pArr[k].Name] != null)
                                         _d.Add(pArr[k].Name, UserTable[mngUsrCount][pArr[k].Name]);
                                 }
-
-                                //_d.Add(FormConstants.id, UserTable[mngUsrCount][FormConstants.id]);
-                                //_d.Add("statusid", UserTable[mngUsrCount]["statusid"]);
-                                //foreach (UsrLocField _f in (Ctrl as EbProvisionUser).PersistingFields)
-                                //{
-                                //    _d.Add(_f.Name, UserTable[mngUsrCount][_f.Name]);
-                                //}
-                                //if (!_d.ContainsKey("usertype"))
-                                //    _d.Add("usertype", UserTable[mngUsrCount]["usertype"]);
-
                                 mngUsrCount++;
                             }
                             _FormData.MultipleTables[(Ctrl as EbProvisionUser).VirtualTable][0][Ctrl.Name] = JsonConvert.SerializeObject(_d);
-                            //_FormData.MultipleTables[(Ctrl as EbProvisionUser).VirtualTable][0].Columns.Add(new SingleColumn()
-                            //{
-                            //    Name = Ctrl.Name,
-                            //    Type = (int)EbDbTypes.String,
-                            //    Value = JsonConvert.SerializeObject(_d)
-                            //});
                         }
                         else if (Ctrl is EbProvisionLocation)
                         {
-                            Dictionary<string, dynamic> _d = new Dictionary<string, dynamic>();
+                            Dictionary<string, object> _d = new Dictionary<string, object>();
                             if (Table.Count == 1)
                             {
                                 _d.Add(FormConstants.id, Table[0][FormConstants.id]);
@@ -1126,26 +1110,20 @@ namespace ExpressBase.Objects
                                 _d.Add(FormConstants.meta_json, Table[0][FormConstants.meta_json]);
                             }
                             _FormData.MultipleTables[(Ctrl as EbProvisionUser).VirtualTable][0][Ctrl.Name] = JsonConvert.SerializeObject(_d);
-                            //_FormData.MultipleTables[(Ctrl as EbProvisionLocation).VirtualTable][0].Columns.Add(new SingleColumn()
-                            //{
-                            //    Name = Ctrl.Name,
-                            //    Type = (int)EbDbTypes.String,
-                            //    Value = JsonConvert.SerializeObject(_d)
-                            //});
                         }
                         else if (Ctrl is EbReview)
                         {
                             if (Table.Count == 1)
                             {
-                                string stageEbSid = Table[0]["stage_unique_id"];
+                                string stageEbSid = Convert.ToString(Table[0]["stage_unique_id"]);
                                 EbReviewStage activeStage = (EbReviewStage)(Ctrl as EbReview).FormStages.Find(e => (e as EbReviewStage).EbSid == stageEbSid);
 
                                 if (activeStage != null)
                                 {
                                     List<int> user_ids = new List<int>();
                                     List<int> role_ids = new List<int>();
-                                    string sUserIds = Table[0]["user_ids"];
-                                    string sRoleIds = Table[0]["role_ids"];
+                                    string sUserIds = Convert.ToString(Table[0]["user_ids"]);
+                                    string sRoleIds = Convert.ToString(Table[0]["role_ids"]);
                                     int.TryParse(Convert.ToString(Table[0]["usergroup_id"]), out int ugId);
                                     if (!sUserIds.IsNullOrEmpty())
                                         user_ids = Array.ConvertAll(sUserIds.Split(','), int.Parse).ToList();
@@ -1182,6 +1160,28 @@ namespace ExpressBase.Objects
                                 }
 
                             }
+                        }
+                        else if (Ctrl is EbDisplayPicture || Ctrl is EbSimpleFileUploader)
+                        {
+                            List<FileMetaInfo> _list = new List<FileMetaInfo>();
+                            foreach (SingleRow dr in Table)
+                            {
+                                FileMetaInfo info = new FileMetaInfo
+                                {
+                                    FileRefId = Convert.ToInt32(dr[FormConstants.id]),
+                                    FileName = Convert.ToString(dr[FormConstants.filename]),
+                                    Meta = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(dr[FormConstants.tags] as string),
+                                    UploadTime = Convert.ToString(dr[FormConstants.uploadts]),
+                                    FileCategory = (EbFileCategory)Convert.ToInt32(dr[FormConstants.filecategory])
+                                };
+
+                                if (!_list.Contains(info))
+                                    _list.Add(info);
+                            }
+                            if (Ctrl is EbDisplayPicture)
+                                _FormData.MultipleTables[(Ctrl as EbDisplayPicture).TableName][0].GetColumn(Ctrl.Name).F = JsonConvert.SerializeObject(_list);
+                            else if (Ctrl is EbSimpleFileUploader)
+                                _FormData.MultipleTables[(Ctrl as EbSimpleFileUploader).TableName][0].GetColumn(Ctrl.Name).F = JsonConvert.SerializeObject(_list);
                         }
 
                         tableIndex++;
@@ -1228,9 +1228,9 @@ namespace ExpressBase.Objects
                         FileMetaInfo info = new FileMetaInfo
                         {
                             FileRefId = Convert.ToInt32(dr[FormConstants.id]),
-                            FileName = dr[FormConstants.filename],
+                            FileName = Convert.ToString(dr[FormConstants.filename]),
                             Meta = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(dr[FormConstants.tags] as string),
-                            UploadTime = dr[FormConstants.uploadts],
+                            UploadTime = Convert.ToString(dr[FormConstants.uploadts]),
                             FileCategory = (EbFileCategory)Convert.ToInt32(dr[FormConstants.filecategory])
                         };
 
