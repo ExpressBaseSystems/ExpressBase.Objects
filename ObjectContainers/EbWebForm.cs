@@ -1141,6 +1141,7 @@ namespace ExpressBase.Objects
                                     }
                                     DateTime dt_con = DateTime.UtcNow.ConvertFromUtc(this.UserObj.Preference.TimeZone);
                                     string dt = dt_con.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+                                    string f_dt = dt_con.ToString(this.UserObj.Preference.GetShortDatePattern() + " " + this.UserObj.Preference.GetShortTimePattern(), CultureInfo.InvariantCulture);
                                     string stAction = activeStage.StageActions.Count > 0 ? (activeStage.StageActions[0] as EbReviewAction).EbSid : string.Empty;
                                     _FormData.MultipleTables["eb_approval_lines"].Add(new SingleRow()
                                     {
@@ -1151,7 +1152,7 @@ namespace ExpressBase.Objects
                                             new SingleColumn{ Name = "action_unique_id", Type = (int)EbDbTypes.String, Value = stAction},
                                             new SingleColumn{ Name = "eb_my_actions_id", Type = (int)EbDbTypes.Decimal, Value = hasPerm ? Table[0]["id"] : 0},
                                             new SingleColumn{ Name = "comments", Type = (int)EbDbTypes.String, Value = ""},
-                                            new SingleColumn{ Name = "eb_created_at", Type = (int)EbDbTypes.DateTime, Value = hasPerm ? dt : null},
+                                            new SingleColumn{ Name = "eb_created_at", Type = (int)EbDbTypes.DateTime, Value = hasPerm ? dt : null, F = hasPerm ? f_dt : null},
                                             new SingleColumn{ Name = "eb_created_by", Type = (int)EbDbTypes.Decimal, Value = hasPerm ? this.UserObj.UserId + "$$" + this.UserObj.FullName : "", F = hasPerm ? this.UserObj.FullName : ""},
                                             new SingleColumn{ Name = "is_form_data_editable", Type = (int)EbDbTypes.String, Value = Convert.ToString(Table[0]["is_form_data_editable"])},
                                             new SingleColumn{ Name = "has_permission", Type = (int)EbDbTypes.String, Value = hasPerm ? "T" : "F"}
