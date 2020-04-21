@@ -1380,8 +1380,12 @@ namespace ExpressBase.Objects
                 {
                     foreach (SingleColumn Column in this.FormData.MultipleTables[_table.TableName][0].Columns)
                     {
-                        if (Column.Control != null && !Column.Control.DoNotPersist)
+                        if (Column.Control != null && !Column.Control.DoNotPersist && !Column.Control.Hidden)
                         {
+                            EbControl _c = Column.Control;
+                            if (!(_c is EbTextBox || _c is EbBooleanSelect || _c is EbCheckBoxGroup || _c is EbDate || _c is EbNumeric || _c is EbPowerSelect || _c is EbRadioButton || _c is EbSimpleSelect || _c is EbRichText || _c is EbAutoId || _c is EbUserSelect || _c is EbTagInput))
+                                continue;
+                            string _value = string.IsNullOrEmpty(Column.F) ? Convert.ToString(Column.Value) : Column.F;
                             if (Column.Control is EbPowerSelect)
                             {
                                 string dm = string.Empty;
@@ -1390,17 +1394,18 @@ namespace ExpressBase.Objects
                                     foreach (KeyValuePair<string, string> dc in dp.Value)
                                         dm += dc.Value + CharConstants.SPACE;
                                 }
-                                data.Add(new Param { Name = Column.Control.Label, Type = ((int)EbDbTypes.String).ToString(), Value = dm });
+                                _value = dm;
                             }
-                            else
+                            else if (Column.Control is EbRichText)
                             {
-                                data.Add(new Param
-                                {
-                                    Name = Column.Control.Label,
-                                    Type = ((int)EbDbTypes.String).ToString(),
-                                    Value = string.IsNullOrEmpty(Column.F) ? Convert.ToString(Column.Value) : Column.F
-                                });
+                                _value = Regex.Replace(_value, "<[^>]*>", "");
                             }
+                            data.Add(new Param
+                            {
+                                Name = string.IsNullOrEmpty(Column.Control.Label) ? Column.Control.Name : Column.Control.Label,
+                                Type = ((int)EbDbTypes.String).ToString(),
+                                Value = _value
+                            });
                         }
                     }
                 }
