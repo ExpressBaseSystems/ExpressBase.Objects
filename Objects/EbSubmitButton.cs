@@ -21,10 +21,10 @@ namespace ExpressBase.Objects.Objects
                 return @"EbSubmitButton = {
                 ChangeBg : function(elementId, props) {
                 console.log('haiii');
-                $('#webformsave').css('background-color' , props.BackColor);
+                $('#webform_submit').css('background-color' , props.BackColor);
                 },
                 ChangeTextColor : function(elementId, props) {
-                $('#webformsave').css('color' , props.ForeColor);
+                $('#webform_submit').css('color' , props.ForeColor);
                 },
                 }";
             }
@@ -116,7 +116,7 @@ namespace ExpressBase.Objects.Objects
 
         public override string GetBareHtml()
         {
-            return @"<button id='webformsave' class='btn btn-default' style='width:100%; @backColor @foreColor @fontStyle' disabled >@Label@</button>"
+            return @"<button id='webform_submit' class='btn btn-default' style='width:100%; @backColor @foreColor @fontStyle' disabled >@Label@</button>"
                 .Replace("@ebsid@", this.EbSid_CtxId)
                 .Replace("@Label@", this.Label ?? "@Text@")
 .Replace("@tabIndex", "tabindex='" + this.TabIndex + "'")

@@ -104,7 +104,7 @@ namespace ExpressBase.Objects.WebFormRelated
                             KeyValuePair<int, EbControlWrapper> item = _dict.FirstOrDefault(e => e.Value.Control.Name == match.Value);
                             if (item.Value == null)
                                 throw new FormException($"Can't resolve {match.Value} in {ebReviewCtrl.Name}(review) control's SQL query of stage {stage.Name}");
-                            if (QryParms.ContainsKey(item.Value.Control.Name))
+                            if (!QryParms.ContainsKey(item.Value.Control.Name))
                                 QryParms.Add(item.Value.Control.Name, item.Value.TableName);
                         }
                         stage.QryParams = QryParms;
@@ -243,16 +243,13 @@ if (form.review.currentStage.currentAction.name == ""Reject"")
                 string code = _dict[CalcFlds[i]].Control.ValueExpr.Code;
                 if (_dict[CalcFlds[i]].Control.ValueExpr.Lang == ScriptingLanguage.JS)
                 {
-                    //MatchCollection matchColl = Regex.Matches(code, $@"(form.(\w+.currentrow\[""\w + ""\]|\w+.currentrow\['\w+'\]|\w+.currentrow.\w+|\w+))"); 
-
                     if (code.Contains("form"))
                     {
                         bool IsAnythingResolved = false;
                         for (int j = 0; j < _dict.Count; j++)
                         {
                             string p = _dict[j].Path, r = _dict[j].Root, n = _dict[j].Control.Name;
-                            //string regex = $@"{r}.currentrow\[""{n}""\]|{r}.currentrow\['{n}'\]|{r}.currentrow.{n}|{r}.getrowbyindex\(\w+\)\[""{n}""\]|{r}.getrowbyindex\(\w+\)|{p}";
-                            string regex = $@"{r}.currentRow\[""{n}""\]|{r}.currentRow\['{n}'\]|{r}.currentRow.{n}|{r}.getRowByIndex\(\w+\)\[""{n}""\]|{r}.getRowByIndex\(\w+\)\['{n}'\]|{r}.RowCount|{p}";
+                            string regex = $@"{r}.currentRow\[""{n}""\]|{r}.currentRow\['{n}'\]|{r}.currentRow.{n}|{r}.getRowByIndex\((.*?)\)\[""{n}""\]|{r}.getRowByIndex\((.*?)\)\['{n}'\]|{p}";
 
                             if (Regex.IsMatch(code, regex))
                             {
@@ -260,21 +257,6 @@ if (form.review.currentStage.currentAction.name == ""Reject"")
                                     dpndcy.Add(new KeyValuePair<int, int>(CalcFlds[i], j));//<dependent, dominant>
                                 IsAnythingResolved = true;
                             }
-
-                            //string[] stringArr = new string[] {
-                            //    _dict[j].Path,
-                            //    _dict[j].Root + ".currentrow." + _dict[j].Control.Name + ".",
-                            //    _dict[j].Root + ".currentrow['" + _dict[j].Control.Name + "']",
-                            //    _dict[j].Root + ".currentrow[\"" + _dict[j].Control.Name + "\"]",
-                            //    _dict[j].Root + "." +  _dict[j].Control.Name + "_sum"
-                            //};
-                            //if (stringArr.Any(code.Contains))
-                            //{
-                            //    //if (CalcFlds[i] == j)
-                            //    //    throw new FormException("Avoid circular reference by the following control in 'ValueExpression' : " + _dict[CalcFlds[i]].Control.Name);
-                            //    if (CalcFlds[i] != j)//if a control refers itself treated as not circular reference
-                            //        dpndcy.Add(new KeyValuePair<int, int>(CalcFlds[i], j));//<dependent, dominant>
-                            //}
                         }
                         if (!IsAnythingResolved)
                             throw new FormException($"Can't resolve some form variables in Js Value expression of {_dict[CalcFlds[i]].Control.Name}");
@@ -293,16 +275,6 @@ if (form.review.currentStage.currentAction.name == ""Reject"")
                             dpndcy.Add(new KeyValuePair<int, int>(CalcFlds[i], item.Key));//<dependent, dominant>
                         _dict[CalcFlds[i]].Control.ValExpParams.Add(item.Value.Path);
                     }
-
-                    //for (int j = 0; j < _dict.Count; j++)
-                    //{
-                    //    if (code.Contains("@" + _dict[j].Control.Name) || code.Contains(":" + _dict[j].Control.Name))
-                    //    {
-                    //        if (CalcFlds[i] != j)
-                    //            dpndcy.Add(new KeyValuePair<int, int>(CalcFlds[i], j));//<dependent, dominant>
-                    //        _dict[CalcFlds[i]].Control.ValExpParams.Add(_dict[j].Path);
-                    //    }
-                    //}
                 }
             }
 
@@ -330,6 +302,10 @@ if (form.review.currentStage.currentAction.name == ""Reject"")
             }
             if (dpndcy.Count > 0)
             {
+                //value expression of KEY conatins VALUE 
+                //List<KeyValuePair<string, string>> dpInStr = new List<KeyValuePair<string, string>>();// debug - help
+                //foreach (KeyValuePair<int, int> it in dpndcy)
+                //    dpInStr.Add(new KeyValuePair<string, string>(_dict[it.Key].Path, _dict[it.Value].Path));
                 throw new FormException("Avoid circular reference by the following controls in 'ValueExpression' : " + string.Join(',', dpndcy.Select(e => _dict[e.Key].Control.Name).Distinct()));
             }
             else

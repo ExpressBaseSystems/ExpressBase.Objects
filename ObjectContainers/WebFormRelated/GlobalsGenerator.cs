@@ -179,7 +179,7 @@ namespace ExpressBase.Objects.WebFormRelated
         {
             FG_User fG_User = new FG_User(_this.UserObj.UserId, _this.UserObj.FullName, _this.UserObj.Email, _this.UserObj.Roles);
             FG_System fG_System = new FG_System();
-            FG_WebForm fG_WebForm = new FG_WebForm();
+            FG_WebForm fG_WebForm = new FG_WebForm() { id = _this.TableRowId, eb_loc_id = _this.LocationId, eb_ref_id = _this.RefId };
             GetCSharpFormGlobalsRec_NEW(fG_WebForm, _this, _formdata, _formdataBkUp);
             int mode = _this.ExeDataPusher ? 1 : 2;
             return new FG_Root(fG_WebForm, fG_User, fG_System, mode);
@@ -223,7 +223,7 @@ namespace ExpressBase.Objects.WebFormRelated
             List<FG_Row> Rows = new List<FG_Row>();
             foreach (SingleRow Row in Table)
             {
-                FG_Row fG_Row = new FG_Row();
+                FG_Row fG_Row = new FG_Row() { id = Convert.ToInt32(Row[FormConstants.id]) };
                 foreach (EbControl _control in DG.Controls)
                 {
                     fG_Row.Controls.Add(new FG_Control(_control.Name, Row[_control.Name]));
