@@ -1721,7 +1721,7 @@ namespace ExpressBase.Objects
 
                     GlobalsGenerator.PostProcessGlobals(this, globals, service);
                     string _reviewStatus = globals.form.review._ReviewStatus;
-                    if (_reviewStatus == "complete" || _reviewStatus == "abandon")
+                    if (_reviewStatus == "Completed" || _reviewStatus == "Abandoned")
                     {
                         this.AfterSaveRoutines.AddRange(ebReview.OnApprovalRoutines);
                         insMyActRequired = false;
@@ -1821,7 +1821,7 @@ namespace ExpressBase.Objects
                 if (isInsert)// eb_approval - insert entry here
                 {
                     insUpQ += $@"INSERT INTO eb_approval(review_status, eb_my_actions_id, eb_src_id, eb_ver_id, eb_created_by, eb_created_at, eb_del)
-                                    VALUES('processing', (SELECT eb_currval('eb_my_actions_id_seq')), (SELECT eb_currval('{this.TableName}_id_seq')), 
+                                    VALUES('In Process', (SELECT eb_currval('eb_my_actions_id_seq')), (SELECT eb_currval('{this.TableName}_id_seq')), 
                                     @{this.TableName}_eb_ver_id, @eb_createdby, {DataDB.EB_CURRENT_TIMESTAMP}, 'F'); ";
                 }
                 else // eb_approval - update eb_my_actions_id
