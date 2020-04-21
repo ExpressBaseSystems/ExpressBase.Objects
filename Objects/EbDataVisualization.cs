@@ -436,6 +436,7 @@ namespace ExpressBase.Objects
                     }
                 }
             }
+            this.FormLinks = this.FormLinks.GroupBy(x => x.Refid).Select(x => x.First()).ToList();
             DVBaseColumn Col = this.Columns.Get("eb_action");
             if (Col != null)
             {
