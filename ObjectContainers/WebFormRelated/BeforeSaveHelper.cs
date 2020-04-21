@@ -104,7 +104,7 @@ namespace ExpressBase.Objects.WebFormRelated
                             KeyValuePair<int, EbControlWrapper> item = _dict.FirstOrDefault(e => e.Value.Control.Name == match.Value);
                             if (item.Value == null)
                                 throw new FormException($"Can't resolve {match.Value} in {ebReviewCtrl.Name}(review) control's SQL query of stage {stage.Name}");
-                            if (QryParms.ContainsKey(item.Value.Control.Name))
+                            if (!QryParms.ContainsKey(item.Value.Control.Name))
                                 QryParms.Add(item.Value.Control.Name, item.Value.TableName);
                         }
                         stage.QryParams = QryParms;
