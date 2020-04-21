@@ -64,7 +64,7 @@ namespace ExpressBase.Objects
 		//public string ContentHTML { get; set; }
 
 		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
-        [DefaultPropValue("200")]
+        [DefaultPropValue("250")]
         public override int Height { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
