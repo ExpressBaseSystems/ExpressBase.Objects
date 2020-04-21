@@ -1777,19 +1777,24 @@ namespace ExpressBase.Objects
                     int _idx = 0;
                     foreach (KeyValuePair<string, string> p in nextStage.QryParams)
                     {
-                        if (!this.FormData.MultipleTables.ContainsKey(p.Value))
+                        SingleTable Table = null;
+                        if (this.FormData.MultipleTables.ContainsKey(p.Value))
+                            Table = this.FormData.MultipleTables[p.Value];
+                        else if (this.FormDataBackup != null && this.FormDataBackup.MultipleTables.ContainsKey(p.Value))
+                            Table = this.FormDataBackup.MultipleTables[p.Value];
+                        else
                             new FormException($"Review control parameter {p.Key} is not idetified", (int)HttpStatusCodes.BAD_REQUEST, "GetFirstMyActionInsertQuery", $"{p.Value} not found in MultipleTables");
                         TableSchema _table = this.FormSchema.Tables.Find(e => e.TableName == p.Value);
                         if (_table.TableType != WebFormTableTypes.Normal)
                             new FormException($"Review control parameter {p.Key} is not idetified", (int)HttpStatusCodes.BAD_REQUEST, "GetFirstMyActionInsertQuery", $"{p.Value} found in MultipleTables but it is not a normal table");
-                        if (this.FormData.MultipleTables[p.Value].Count != 1)
+                        if (Table.Count != 1)
                             new FormException($"Review control parameter {p.Key} is not idetified", (int)HttpStatusCodes.BAD_REQUEST, "GetFirstMyActionInsertQuery", $"{p.Value} found in MultipleTables but table is empty");
-                        SingleColumn Column = this.FormData.MultipleTables[p.Value][0].Columns.Find(e => e.Control.Name == p.Key);
+                        SingleColumn Column = Table[0].Columns.Find(e => e.Control?.Name == p.Key);
                         if (Column == null || Column.Control == null)
                             new FormException($"Review control parameter {p.Key} is not idetified", (int)HttpStatusCodes.BAD_REQUEST, "GetFirstMyActionInsertQuery", $"{p.Value} found in MultipleTables but data not available");
 
                         Column.Control.ParameterizeControl(DataDB, _params, null, Column, true, ref _idx, ref t1, ref t2, ref t3, this.UserObj, null);
-                        _params[i - 1].ParameterName = p.Key;
+                        _params[_idx - 1].ParameterName = p.Key;
                     }
                     List<int> uids = new List<int>();
                     EbDataTable dt = DataDB.DoQuery(nextStage.ApproverUsers.Code, _params.ToArray());
@@ -2225,7 +2230,7 @@ namespace ExpressBase.Objects
             bool UpdateSoluObj = false;
             foreach (EbControl c in this.FormSchema.ExtendedControls)
             {
-                if (c is EbProvisionUser && (c as EbProvisionUser).IsUserCreated()) 
+                if (c is EbProvisionUser && (c as EbProvisionUser).IsUserCreated())
                 {
                     UpdateSoluObj = true;
                     Console.WriteLine("AfterExecutionIfUserCreated - New User creation found");
