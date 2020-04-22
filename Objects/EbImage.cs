@@ -88,7 +88,11 @@ namespace ExpressBase.Objects
                 return @" 
                 if(parseInt(p1)>0){
                             $('#' + this.EbSid_CtxId.toLowerCase()).attr('src', '../images/'+ p1 +'.jpg');
-                }";
+                }
+                else{
+                            $('#' + this.EbSid_CtxId.toLowerCase()).attr('src', '/images/image.png');
+                }
+                ";
             }
             set { }
         }
