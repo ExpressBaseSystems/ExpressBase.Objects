@@ -64,7 +64,7 @@ namespace ExpressBase.Objects
 		//public string ContentHTML { get; set; }
 
 		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
-        [DefaultPropValue("250")]
+        [DefaultPropValue("400")]
         public override int Height { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
@@ -120,7 +120,7 @@ namespace ExpressBase.Objects
 .Replace("@BackColor@ ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor@ ") + ";"))
 .Replace("@ForeColor@ ", "color:" + ((this.ForeColor != null) ? this.ForeColor : "@ForeColor@ ") + ";")
 //.Replace("@Height@", this.Height == 0 ? "200px" : this.Height + "px"); // for bot
-.Replace("@Height@", this.Height == 0 ? "auto" : this.Height + "px");
+.Replace("@Height@", this.Height == 0 ? "auto" : this.Height - 61.7 + "px");
         }
 
         public override string GetHtml()

@@ -249,7 +249,7 @@ namespace ExpressBase.Objects
 
     }
 
-    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.DashBoard, BuilderType.Calendar)]
+    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.DashBoard, BuilderType.Calendar)]
     [BuilderTypeEnum(BuilderType.DVBuilder)]
     [UsedWithTopObjectParent(typeof(EbObject))]
     public class EbTableVisualization : EbDataVisualization, IEBRootObject
