@@ -1817,7 +1817,7 @@ namespace ExpressBase.Objects
 
                 insUpQ += $@"INSERT INTO eb_my_actions({_col}, from_datetime, is_completed, eb_stages_id, form_ref_id, form_data_id, eb_del, description, is_form_data_editable)
                                 VALUES ({_val}, {DataDB.EB_CURRENT_TIMESTAMP}, 'F', (SELECT id FROM eb_stages WHERE stage_unique_id = '{nextStage.EbSid}' AND form_ref_id = '{this.RefId}' AND eb_del = 'F'), 
-                                '{this.RefId}', {masterId}, 'F', 'Review required in {this.DisplayName}', '{(nextStage.IsFormEditable ? "T" : "F")}'); ";
+                                '{this.RefId}', {masterId}, 'F', 'Review required for {this.DisplayName} in {nextStage.Name}', '{(nextStage.IsFormEditable ? "T" : "F")}'); ";
                 if (DataDB.Vendor == DatabaseVendors.MYSQL)
                     insUpQ += "SELECT eb_persist_currval('eb_my_actions_id_seq'); ";
 
