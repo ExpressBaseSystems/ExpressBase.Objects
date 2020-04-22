@@ -689,7 +689,7 @@ namespace ExpressBase.Objects
             }
         }
 
-        public void GetEmptyModel()
+        public WebformData GetEmptyModel()
         {
             this.FormData = new WebformData() { MasterTable = this.FormSchema.MasterTable };
             foreach (TableSchema _table in this.FormSchema.Tables)
@@ -711,6 +711,7 @@ namespace ExpressBase.Objects
                 }
             }
             this.GetDGsEmptyModel();
+            return this.FormData;
         }
 
         private void GetDGsEmptyModel()
@@ -1301,7 +1302,7 @@ namespace ExpressBase.Objects
                     {
                         foreach (ColumnSchema Col in Tbl.Columns)
                         {
-                            if (Col.Control is EbPowerSelect || Col.Control is EbDGPowerSelectColumn)
+                            if ((Col.Control is EbPowerSelect || Col.Control is EbDGPowerSelectColumn) && !Col.Control.DoNotPersist)
                             {
                                 SingleTable Table = new SingleTable();
                                 this.GetFormattedData(ds.Tables[tblIdx], Table);
@@ -1815,9 +1816,20 @@ namespace ExpressBase.Objects
                 else
                     throw new FormException("Unable to process review control", (int)HttpStatusCodes.INTERNAL_SERVER_ERROR, "Invalid value for ApproverEntity : " + nextStage.ApproverEntity, "From GetMyActionInsertUpdateQuery");
 
+                string autoId = string.Empty;
+                //this.FormSchema.Tables[0] = master table; asumption - EbAutoId is in master table
+                ColumnSchema _columnAutoId = this.FormSchema.Tables[0].Columns.Find(e => e.Control is EbAutoId);
+                if (_columnAutoId != null)
+                {
+                    if (isInsert)
+                        autoId = $" - ' || (SELECT {_columnAutoId.Control.Name} FROM {this.FormSchema.MasterTable} WHERE id = {masterId}) || '";
+                    else
+                        autoId = " - " + Convert.ToString(this.FormDataBackup.MultipleTables[this.FormSchema.MasterTable][0][_columnAutoId.Control.Name]);
+                }
+
                 insUpQ += $@"INSERT INTO eb_my_actions({_col}, from_datetime, is_completed, eb_stages_id, form_ref_id, form_data_id, eb_del, description, is_form_data_editable)
                                 VALUES ({_val}, {DataDB.EB_CURRENT_TIMESTAMP}, 'F', (SELECT id FROM eb_stages WHERE stage_unique_id = '{nextStage.EbSid}' AND form_ref_id = '{this.RefId}' AND eb_del = 'F'), 
-                                '{this.RefId}', {masterId}, 'F', 'Review required for {this.DisplayName} in {nextStage.Name}', '{(nextStage.IsFormEditable ? "T" : "F")}'); ";
+                                '{this.RefId}', {masterId}, 'F', 'Review required for {this.DisplayName}{autoId} in {nextStage.Name}', '{(nextStage.IsFormEditable ? "T" : "F")}'); ";
                 if (DataDB.Vendor == DatabaseVendors.MYSQL)
                     insUpQ += "SELECT eb_persist_currval('eb_my_actions_id_seq'); ";
 
@@ -2005,6 +2017,42 @@ namespace ExpressBase.Objects
                 object out_dict = this.ExecuteCSharpScriptNew(code, globals);
                 ebDataPushHelper.CreateWebFormData(out_dict);
             }
+        }
+
+        //Excel Import
+        public List<int> ProcessBatchRequest(EbDataTable Data, IDatabase DataDB, Service service, DbConnection TransactionConnection)
+        {
+            EbDataPushHelper DataPushHelper = new EbDataPushHelper(this);
+            string Json = DataPushHelper.GetPusherJson(Data);
+            string Code = DataPushHelper.GetProcessedCode(Json);            
+            Script _script = CSharpScript.Create<dynamic>(
+                Code,
+                ScriptOptions.Default.WithReferences("Microsoft.CSharp", "System.Core").WithImports("System", "System.Collections.Generic", "System.Linq"),
+                globalsType: typeof(FG_Root)
+            );
+            _script.Compile();
+
+            List<int> DataIds = new List<int>();
+            for (int i = 0; i < Data.Rows.Count; i++)
+            {
+                FG_Root fG_Root = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, Data, i);
+                object out_dict = null;
+                try
+                {
+                    out_dict = _script.RunAsync(fG_Root).Result.ReturnValue;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Exception in C# Expression evaluation:" + Code + " \nMessage : " + ex.Message);
+                    Console.WriteLine(ex.StackTrace);
+                    throw new FormException("Exception in C# code evaluation", (int)HttpStatusCodes.INTERNAL_SERVER_ERROR, $"{ex.Message} \n C# code : {Code}", $"StackTrace : {ex.StackTrace}");
+                }
+                DataPushHelper.CreateWebFormData_Demo(out_dict, Json);
+                this.TableRowId = 0;//insert
+                this.Save(DataDB, service, TransactionConnection);
+                DataIds.Add(this.TableRowId);
+            }
+            return DataIds;
         }
 
         private void PrepareWebFormData()

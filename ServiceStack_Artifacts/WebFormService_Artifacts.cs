@@ -413,6 +413,39 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
+    public class InsertBatchDataRequest : EbServiceStackAuthRequest, IReturn<InsertBatchDataResponse>
+    {
+        [DataMember(Order = 1)]
+        public string RefId { get; set; }
+        
+        [DataMember(Order = 2)]
+        public int LocId { get; set; }
+
+        [DataMember(Order = 3)]
+        public EbDataTable Data { get; set; }
+
+        [DataMember(Order = 4)]
+        public DbConnection TransactionConnection { get; set; }
+    }
+
+    [DataContract]
+    public class InsertBatchDataResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public int Status { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Message { get; set; }
+
+        [DataMember(Order = 3)]
+        public List<int> RecordIds { get; set; }
+
+        [DataMember(Order = 4)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+
+    [DataContract]
     public class DeleteDataFromWebformRequest : EbServiceStackAuthRequest, IReturn<DeleteDataFromWebformResponse>
     {
         [DataMember(Order = 1)]
