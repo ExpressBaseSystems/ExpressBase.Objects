@@ -474,7 +474,7 @@ else{
         [EnableInBuilder(BuilderType.Calendar)]
         public AggregateFun AggregateFun { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.DashBoard, BuilderType.Calendar)]
         [PropertyEditor(PropertyEditorType.DropDown)]
         [PropertyGroup(PGConstants.APPEARANCE)]
         public Align Align { get; set; }

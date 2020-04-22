@@ -96,7 +96,8 @@ namespace ExpressBase.Objects
     <div id='content_@ebsid@' class='wrapper-cont'>
         <table id='@ebsid@' class=table display table-bordered compact'></table>
     </div>
-</div>";
+</div>"
+    .Replace("@ebsid@", this.EbSid_CtxId);
 
             return html;
         }
