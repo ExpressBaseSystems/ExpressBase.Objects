@@ -56,6 +56,14 @@ namespace ExpressBase.Objects
         public override int Height { get; set; }
 
         [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.BotForm)]
+        public override bool IsReadOnly { get => true; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+        [HideInPropertyGrid]
+        public override bool IsFullViewContol { get => true; set => base.IsFullViewContol = value; }
+
+        [HideInPropertyGrid]
         [JsonIgnore]
         public override string ToolIconHtml { get { return "<i class='fa fa-bar-chart'></i>"; } set { } }
 
