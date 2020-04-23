@@ -287,5 +287,100 @@ catch (Exception e)
 
             return s;
         }
+
+        //============================== Excel Import start ===============================
+
+        public string GetPusherJson(EbDataTable Data)
+        {
+            JObject Obj = new JObject();
+
+            foreach (TableSchema _table in this.WebForm.FormSchema.Tables)
+            {
+                JObject o = new JObject();
+                foreach (ColumnSchema _column in _table.Columns)
+                {
+                    if (Data.Columns.Find(e => e.ColumnName == _column.ColumnName && e.TableName == _table.TableName) != null)
+                        o[_column.ColumnName] = "parameters." + _table.TableName + "." + _column.ColumnName;
+                }
+                if (o.Count > 0)
+                {
+                    JArray array = new JArray();
+                    array.Add(o);
+                    Obj[_table.TableName] = array;
+                }                
+            }
+            return Obj.ToString();
+        }
+
+        public string GetProcessedCode(string Json)
+        {
+            int Index = 1;
+            string FnDef = string.Empty, FnCall = string.Empty;
+            Dictionary<int, string>  _codeDict = new Dictionary<int, string>();
+            JObject JObj = JObject.Parse(Json);
+            foreach (TableSchema _table in this.WebForm.FormSchema.Tables)
+            {
+                if (JObj[_table.TableName] != null)
+                {
+                    foreach (JToken jRow in JObj[_table.TableName])
+                    {                        
+                        foreach (ColumnSchema _column in _table.Columns)
+                        {
+                            if (jRow[_column.ColumnName] != null)
+                            {
+                                _codeDict.Add(Index, jRow[_column.ColumnName].ToString());
+                                FnDef += GetFunctionDefinition(jRow[_column.ColumnName].ToString(), Index);
+                                FnCall += GetFunctionCall(Index);
+                                Index++;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (FnDef == string.Empty)
+                return string.Empty;
+
+            return FnDef + "Dictionary<int, object[]> out_dict = new Dictionary<int, object[]>();\n" + FnCall + "return out_dict;";
+        }
+
+        public void CreateWebFormData_Demo(object out_dict, string Json)
+        {
+            Dictionary<int, object[]> OutputDict = (Dictionary<int, object[]>)out_dict;
+            int Index = 1;
+                
+            this.WebForm.FormData = new WebformData() { MasterTable = this.WebForm.FormSchema.MasterTable };
+            JObject JObj = JObject.Parse(Json);
+
+            foreach (TableSchema _table in this.WebForm.FormSchema.Tables)
+            {
+                if (JObj[_table.TableName] != null)
+                {
+                    SingleTable Table = new SingleTable();
+                    foreach (JToken jRow in JObj[_table.TableName])
+                    {                        
+                        SingleRow Row = new SingleRow() { RowId = 0 };
+                        foreach (ColumnSchema _column in _table.Columns)
+                        {
+                            object val = null;
+                            if (jRow[_column.ColumnName] != null)
+                                val = this.GetValueFormOutDict(OutputDict, ref Index);
+
+                            Row.Columns.Add(new SingleColumn
+                            {
+                                Name = _column.ColumnName,
+                                Type = _column.EbDbType,
+                                Value = val
+                            });
+                        }
+                        Table.Add(Row);
+                    }
+                    this.WebForm.FormData.MultipleTables.Add(_table.TableName, Table);
+                }
+            }
+            this.WebForm.MergeFormData();                
+        }
+
+        //============================== Excel Import end ===============================
     }
 }

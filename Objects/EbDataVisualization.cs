@@ -249,7 +249,7 @@ namespace ExpressBase.Objects
 
     }
 
-    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.DashBoard, BuilderType.Calendar)]
+    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.DashBoard, BuilderType.Calendar)]
     [BuilderTypeEnum(BuilderType.DVBuilder)]
     [UsedWithTopObjectParent(typeof(EbObject))]
     public class EbTableVisualization : EbDataVisualization, IEBRootObject
@@ -436,6 +436,7 @@ namespace ExpressBase.Objects
                     }
                 }
             }
+            this.FormLinks = this.FormLinks.GroupBy(x => x.Refid).Select(x => x.First()).ToList();
             DVBaseColumn Col = this.Columns.Get("eb_action");
             if (Col != null)
             {

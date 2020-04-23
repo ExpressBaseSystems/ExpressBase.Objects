@@ -174,6 +174,18 @@ namespace ExpressBase.Objects.WebFormRelated
             return ntv;
         }
 
+        //Excel Import
+        public static FG_Root GetCSharpFormGlobals_NEW(EbWebForm _this, EbDataTable Data, int index)
+        {
+            Dictionary<string, FG_NV_List> dict = new Dictionary<string, FG_NV_List>();
+            foreach(EbDataColumn dc in Data.Columns)
+            {
+                if (!dict.ContainsKey(dc.TableName))
+                    dict.Add(dc.TableName, new FG_NV_List());
+                dict[dc.TableName].Add(new FG_NV(dc.ColumnName, Data.Rows[index][dc.ColumnIndex]));
+            }
+            return new FG_Root(new FG_Params(dict));
+        }
 
         public static FG_Root GetCSharpFormGlobals_NEW(EbWebForm _this, WebformData _formdata, WebformData _formdataBkUp)
         {
