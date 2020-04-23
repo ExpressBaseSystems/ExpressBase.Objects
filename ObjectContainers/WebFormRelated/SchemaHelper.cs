@@ -85,6 +85,11 @@ namespace ExpressBase.Objects.WebFormRelated
                     (control as EbSimpleFileUploader).TableName = curTbl;
                     _schema.ExtendedControls.Add(control);
                 }
+                else if (control is EbMeetingPicker)
+                {
+                    (control as EbMeetingPicker).TableName = curTbl;
+                    _schema.ExtendedControls.Add(control);
+                }
             }
 
             foreach (EbControl _control in _container.Controls)

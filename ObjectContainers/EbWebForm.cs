@@ -1074,7 +1074,7 @@ namespace ExpressBase.Objects
                 SingleTable UserTable = null;
                 foreach (EbControl Ctrl in _schema.ExtendedControls)// EbProvisionUser + EbProvisionLocation + EbReview
                 {
-                    if (Ctrl is EbProvisionUser || Ctrl is EbProvisionLocation || Ctrl is EbReview || Ctrl is EbDisplayPicture || Ctrl is EbSimpleFileUploader)
+                    if (Ctrl is EbProvisionUser || Ctrl is EbProvisionLocation || Ctrl is EbReview || Ctrl is EbDisplayPicture || Ctrl is EbSimpleFileUploader/* || Ctrl is  EbMeetingPicker*/)
                     {
                         SingleTable Table = new SingleTable();
                         if (!(UserTable != null && Ctrl is EbProvisionUser))
@@ -1185,6 +1185,10 @@ namespace ExpressBase.Objects
                             else if (Ctrl is EbSimpleFileUploader)
                                 _FormData.MultipleTables[(Ctrl as EbSimpleFileUploader).TableName][0].GetColumn(Ctrl.Name).F = JsonConvert.SerializeObject(_list);
                         }
+                        //else if (Ctrl is EbMeetingPicker)
+                        //{
+                        //    //process Table here
+                        //}
 
                         tableIndex++;
                     }

@@ -1,16 +1,19 @@
-﻿using ExpressBase.Common.Constants;
+﻿using ExpressBase.Common;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
 using ExpressBase.Common.Extensions;
+using ExpressBase.Common.LocationNSolution;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
-using Newtonsoft.Json;
+using ExpressBase.Common.Structures;
+using ExpressBase.Objects.ServiceStack_Artifacts;
+using ExpressBase.Security;
 using ServiceStack;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Runtime.Serialization;
-using System.Text;
 
-namespace ExpressBase.Objects.Objects
+namespace ExpressBase.Objects
 {
 
     [EnableInBuilder(BuilderType.WebForm)]
@@ -18,6 +21,12 @@ namespace ExpressBase.Objects.Objects
     {
         public EbMeetingPicker() { }
         public override string ToolIconHtml { get { return "<i class='fa fa-i-cursor'></i>"; } set { } }
+
+        public string TableName { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
 
         [EnableInBuilder(BuilderType.WebForm)]
         [DefaultPropValue("1")]
@@ -76,6 +85,156 @@ namespace ExpressBase.Objects.Objects
                .Replace("@Label@", this.Label);
             return ReplacePropsInHTML(EbCtrlHTML);
         }
+
+        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
+        {
+            return new SingleColumn()
+            {
+                Name = this.Name,
+                Type = (int)this.EbDbType,
+                Value = Value,
+                Control = this,
+                ObjType = this.ObjType,
+                F = "[]"
+            };
+        }
+
+        public string GetSelectQuery(IDatabase DataDB, string MasterTable)
+        {
+            return string.Empty;
+        }
+
+        private string SlotDetailsGetQuery
+        {
+            get
+            {
+                return @" 
+            SELECT 
+		     A.id as slot_id , A.eb_meeting_schedule_id, A.is_approved,
+			 B.no_of_attendee, B.no_of_hosts,
+			 COALESCE (C.slot_host, 0) as slot_host_count,
+		     COALESCE (C.slot_host_attendee, 0) as slot_attendee_count,
+			 COALESCE (D.id, 0) as meeting_id,
+			 COALESCE (E.id, 0) as participant_id
+	            FROM
+				(SELECT 
+						id, eb_meeting_schedule_id , title , description , is_approved, 
+					meeting_date, time_from, time_to , venue, integration 
+	                     FROM 
+		                     eb_meeting_slots 
+	                     WHERE 
+		                     eb_del = 'F' and id = {0})A
+						LEFT JOIN	 
+							 (SELECT id, no_of_attendee, no_of_hosts FROM  eb_meeting_schedule)B
+							 ON
+ 	                     B.id = A.eb_meeting_schedule_id
+						LEFT JOIN	
+						(SELECT 
+		                     eb_meeting_schedule_id,approved_slot_id ,type_of_user, COUNT(approved_slot_id)filter(where type_of_user = 1) as slot_host,
+						 		                    COUNT(approved_slot_id)filter(where type_of_user = 2) as slot_host_attendee
+	                     FROM 
+		                     eb_meeting_slot_participants
+	                     GROUP BY
+		                     eb_meeting_schedule_id, approved_slot_id, type_of_user, eb_del
+	                     Having
+		                     eb_del = 'F')C	
+                     ON
+ 	                     C.eb_meeting_schedule_id = B.id and C.approved_slot_id = A.id
+                     LEFT JOIN 
+                     (SELECT 
+		                     id, eb_meeting_slots_id
+	                     FROM 
+		                     eb_meetings
+	                     where
+		                     eb_del = 'F') D
+		                     ON
+ 	                     D.eb_meeting_slots_id = A.id
+						 LEFT JOIN (
+						 SELECT id , eb_meeting_schedule_id , approved_slot_id ,type_of_user, COUNT(approved_slot_id)filter(where type_of_user = 1) as slot_host,
+					COUNT(approved_slot_id)filter(where type_of_user = 2) as slot_host_attendee
+	                     FROM 
+		                     eb_meeting_slot_participants
+							  GROUP BY
+		                        eb_meeting_schedule_id, approved_slot_id, type_of_user, eb_del , id)E
+								  ON
+ 	                     E.approved_slot_id = A.id						 
+                                        ";
+            }
+        }
+
+        public override bool ParameterizeControl(IDatabase DataDB, List<DbParameter> param, string tbl, SingleColumn cField, bool ins, ref int i, ref string _col, ref string _val, ref string _extqry, User usr, SingleColumn ocF)
+        {
+            if (!ins)
+                return false;
+            int.TryParse(Convert.ToString(cField.Value), out int ApprovedSlotId);
+            if (ApprovedSlotId < 1)
+                return false;
+
+            if (cField.Value == null)
+            {
+                var p = DataDB.GetNewParameter(cField.Name + "_" + i, (EbDbTypes)cField.Type);
+                p.Value = DBNull.Value;
+                param.Add(p);
+            }
+            else
+                param.Add(DataDB.GetNewParameter(cField.Name + "_" + i, (EbDbTypes)cField.Type, cField.Value));
+
+            _col += string.Concat(cField.Name, ", ");
+            _val += string.Concat("@", cField.Name, "_", i, ", ");
+            i++;
+
+            List<DetailsBySlotid> SlotObj = new List<DetailsBySlotid>();
+           
+            String _query = string.Format(this.SlotDetailsGetQuery, ApprovedSlotId);
+            EbDataTable dt = DataDB.DoQuery(_query);
+            if (dt.Rows.Count == 0)
+                throw new FormException("Requested meeting slot is invalid", (int)HttpStatusCodes.BAD_REQUEST, "Query returned 0 rows for Meeting slot : " + ApprovedSlotId, "From EbMeetingPicker.ParameterizeControl()");
+
+            for (int k = 0; k < dt.Rows.Count; k++)
+            {
+                SlotObj.Add(new DetailsBySlotid()
+                {
+                    Slot_id = Convert.ToInt32(dt.Rows[k]["slot_id"]),
+                    Meeting_schedule_id = Convert.ToInt32(dt.Rows[k]["eb_meeting_schedule_id"]),
+                    MeetingId = Convert.ToInt32(dt.Rows[k]["eb_meeting_id"]),
+                    No_Attendee = Convert.ToInt32(dt.Rows[k]["no_of_attendee"]),
+                    No_Host = Convert.ToInt32(dt.Rows[k]["no_of_host"]),
+                    SlotHostCount = Convert.ToInt32(dt.Rows[k]["slot_host_count"]),
+                    SlotAttendeeCount = Convert.ToInt32(dt.Rows[k]["slot_attendee_count"]),
+                    Is_approved = Convert.ToString(dt.Rows[k]["is_approved"]),
+                    Participant_id = Convert.ToInt32(dt.Rows[k]["participant_id"]),
+                });
+            }
+            
+            if (SlotObj[0].No_Attendee <= SlotObj[0].SlotAttendeeCount)// assuming user in an attendee
+                throw new FormException("Unable to continue. Reached maximum attendee limit.", (int)HttpStatusCodes.BAD_REQUEST, $"Max no of attendee : {SlotObj[0].No_Attendee}, Current attendee count : {SlotObj[0].SlotAttendeeCount}", "From EbMeetingPicker.ParameterizeControl()");
+
+            string query = string.Empty;
+
+            if (SlotObj[0].Is_approved == "T")
+            {
+                query = $@"insert into eb_meeting_slot_participants(user_id, confirmation, eb_meeting_schedule_id, approved_slot_id, name, email, type_of_user, participant_type) 
+                            values ({usr.UserId}, 1, {SlotObj[0].Meeting_schedule_id}, {ApprovedSlotId}, '{usr.FullName}', '{usr.Email}', 1, 2);
+                        insert into eb_meeting_participants(eb_meeting_id, eb_slot_participant_id) 
+                            values({SlotObj[0].MeetingId}, eb_currval('eb_meeting_slot_participants_id_seq')); ";
+            }
+            else if (SlotObj[0].Is_approved == "F")
+            {
+                query = $@"insert into eb_meetings (eb_meeting_slots_id, eb_created_by)
+                            values({SlotObj[0].Slot_id}, 1);
+                        insert into eb_meeting_slot_participants(user_id, confirmation, eb_meeting_schedule_id, approved_slot_id, name, email, type_of_user, participant_type) 
+                            values ({usr.UserId}, 1, {SlotObj[0].Meeting_schedule_id}, {ApprovedSlotId}, '{usr.FullName}', '{usr.Email}', 1, 2); ";
+                
+                for (int k = 0; k < SlotObj.Count; k++)
+                    query += $"insert into eb_meeting_participants(eb_meeting_id, eb_slot_participant_id) values ( eb_currval('eb_meetings_id_seq'),{SlotObj[k].Participant_id}); ";
+                
+                query += $"insert into eb_meeting_participants(eb_meeting_id, eb_slot_participant_id ) values (eb_currval('eb_meetings_id_seq'), eb_currval('eb_meeting_slot_participants_id_seq'));";
+                query += $"update eb_meeting_slots set is_approved = 'T' where  id = {ApprovedSlotId}; ";
+            }
+            _extqry += query;
+            return true;
+        }
+
     }
 
     public class MeetingSlots
