@@ -90,6 +90,11 @@ namespace ExpressBase.Objects.WebFormRelated
                     extquery += (Ctrl as EbSimpleFileUploader).GetSelectQuery(DataDB, _this.FormSchema.MasterTable);
                     _qryCount++;
                 }
+                else if (Ctrl is EbMeetingPicker)
+                {
+                    extquery += (Ctrl as EbMeetingPicker).GetSelectQuery(DataDB, _this.FormSchema.MasterTable);
+                    //_qryCount++;
+                }
             }
             return query + extquery;
         }
