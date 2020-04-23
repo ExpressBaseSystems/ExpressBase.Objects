@@ -36,7 +36,7 @@ namespace ExpressBase.Objects.Objects
         {
             string EbCtrlHTML = @" <div id='cont_@ebsid@' ebsid='@ebsid@' name='@name@' class='Eb-ctrlContainer meeting-picker-outer' @childOf@ ctype='@type@'>
                         <div class='head-cont' > @Label@ </div>
-                        <div class='date-cont' > <input type='text' id='datepicker'class='form-control'/> </div>
+                        <div class='date-cont' > <div id='datepicker'></div> </div>
                         <div class='picker-cont'> </div>
                 </div>"
                 .Replace("@name@", this.Name)
@@ -47,10 +47,13 @@ namespace ExpressBase.Objects.Objects
 
         public override string GetHtml()
         {
-            string EbCtrlHTML = @" <div id='cont_@ebsid@' ebsid='@ebsid@' name='@name@' class='Eb-ctrlContainer meeting-picker-outer' @childOf@ ctype='@type@'>
-                        <div class='head-cont' > @Label@ </div>
-                        <div class='date-cont'> <input type='text' id='@ebsid@_datepicker' class='form-control'/> </div>
-                        <div class='picker-cont' > </div>
+            string EbCtrlHTML = @"<div id='cont_@ebsid@' ebsid='@ebsid@' name='@name@' class='Eb-ctrlContainer meeting-picker-outer' @childOf@ ctype='@type@'>
+                        <div class='head-cont' >   <i class='fa fa-calendar' aria-hidden='true'></i>
+                        <div>@Label@ </div> </div>
+                        <div class='sub-head'>Pick a date</div>
+                        <div class='date-cont'> <div id='@ebsid@_datepicker'></div> </div>
+                        <div class='sub-head'>Pick a timeslot</div>
+                        <div class='picker-cont' id='@ebsid@_picker-cont'> </div>
                 </div>"
                .Replace("@name@", this.Name)
                .Replace("@Label@", this.Label);
@@ -66,7 +69,7 @@ namespace ExpressBase.Objects.Objects
         {
             string EbCtrlHTML = @" <div id='cont_@ebsid@' ebsid='@ebsid@' name='@name@' class='Eb-ctrlContainer meeting-picker-outer'   @childOf@ ctype='@type@'>
                         <div class='head-cont' > @Label@ </div>
-                        <div class='date-cont'> <input type='text' id='datepicker' class='form-control'/> </div>
+                        <div class='date-cont'> <div id='datepicker'></div> </div>
                         <div class='picker-cont' > </div>
                 </div>"
                .Replace("@name@", this.Name)
