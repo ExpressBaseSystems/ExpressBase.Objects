@@ -1,14 +1,15 @@
 ﻿using ExpressBase.Common;
 using ExpressBase.Common.Constants;
 using ExpressBase.Common.Extensions;
+using ExpressBase.Common.LocationNSolution;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
 using Newtonsoft.Json;
+using ExpressBase.Security;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-using System.Text;
 
 namespace ExpressBase.Objects
 {
@@ -27,6 +28,9 @@ namespace ExpressBase.Objects
 			this.BareControlHtml4Bot = this.BareControlHtml;
 			this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
 		}
+
+		public string TableName { get; set; } 
+
 		public override string ToolIconHtml { get { return "<i class='fa fa-cloud-upload'></i>"; } set { } }
 		public override string ToolNameAlias { get { return "Simple FileUpload"; } set { } }
 		public override string ToolHelpText { get { return "Simple FileUploader"; } set { } }
@@ -191,5 +195,35 @@ namespace ExpressBase.Objects
 		[DefaultPropValue("image/jpeg,image/png,image/jpg")]
 		[Alias("File Types")]
 		public string FileTypes { get; set; }
+
+		public string GetSelectQuery(IDatabase DataDB, string MasterTable)
+		{
+			string idCol = this.TableName == MasterTable ? "id" : MasterTable + "_id";
+			if (DataDB.Vendor == DatabaseVendors.MYSQL)
+			{
+				return $@"SELECT B.id, B.filename, B.tags, B.uploadts,B.filecategory
+                    FROM {this.TableName} A, eb_files_ref B
+                    WHERE FIND_IN_SET(B.id, A.{this.Name}) AND A.{idCol} = @{MasterTable}_id AND B.eb_del = 'F'; ";
+			}
+			else
+			{
+				return $@"SELECT B.id, B.filename, B.tags, B.uploadts,B.filecategory
+                    FROM {this.TableName} A, eb_files_ref B
+                    WHERE B.id = ANY(STRING_TO_ARRAY(A.{this.Name}::TEXT, ',')::INT[]) AND A.{idCol} = @{MasterTable}_id AND B.eb_del = 'F'; ";
+			}
+		}
+
+		public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
+		{
+			return new SingleColumn()
+			{
+				Name = this.Name,
+				Type = (int)this.EbDbType,
+				Value = Value,
+				Control = this,
+				ObjType = this.ObjType,
+				F = "[]"
+			};
+		}
 	}
 }

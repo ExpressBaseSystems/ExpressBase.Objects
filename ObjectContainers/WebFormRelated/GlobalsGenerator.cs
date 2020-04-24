@@ -174,6 +174,18 @@ namespace ExpressBase.Objects.WebFormRelated
             return ntv;
         }
 
+        //Excel Import
+        public static FG_Root GetCSharpFormGlobals_NEW(EbWebForm _this, EbDataTable Data, int index)
+        {
+            Dictionary<string, FG_NV_List> dict = new Dictionary<string, FG_NV_List>();
+            foreach(EbDataColumn dc in Data.Columns)
+            {
+                if (!dict.ContainsKey(dc.TableName))
+                    dict.Add(dc.TableName, new FG_NV_List());
+                dict[dc.TableName].Add(new FG_NV(dc.ColumnName, Data.Rows[index][dc.ColumnIndex]));
+            }
+            return new FG_Root(new FG_Params(dict));
+        }
 
         public static FG_Root GetCSharpFormGlobals_NEW(EbWebForm _this, WebformData _formdata, WebformData _formdataBkUp)
         {
@@ -223,7 +235,7 @@ namespace ExpressBase.Objects.WebFormRelated
             List<FG_Row> Rows = new List<FG_Row>();
             foreach (SingleRow Row in Table)
             {
-                FG_Row fG_Row = new FG_Row() { id = Row[FormConstants.id] };
+                FG_Row fG_Row = new FG_Row() { id = Convert.ToInt32(Row[FormConstants.id]) };
                 foreach (EbControl _control in DG.Controls)
                 {
                     fG_Row.Controls.Add(new FG_Control(_control.Name, Row[_control.Name]));

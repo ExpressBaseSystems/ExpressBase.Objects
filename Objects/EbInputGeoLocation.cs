@@ -64,7 +64,7 @@ namespace ExpressBase.Objects
 		//public string ContentHTML { get; set; }
 
 		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
-        [DefaultPropValue("200")]
+        [DefaultPropValue("400")]
         public override int Height { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
@@ -102,7 +102,7 @@ namespace ExpressBase.Objects
                             <div class='locinp-wraper-address'>
                                 <div style='display: inline-block; min-width: 50px;'>Address</div>
                                 <div style='display: inline-block; min-width: calc(100% - 54px);'>
-                                    <input id='@EbSid@address' class='locinp' type='text' style='width: 100%;' />
+                                    <input id='@EbSid@address' class='locinp' type='text' style='width: calc( 100% - 3.5em );' />
                                 </div>
                             </div>
                             <div>
@@ -120,7 +120,7 @@ namespace ExpressBase.Objects
 .Replace("@BackColor@ ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor@ ") + ";"))
 .Replace("@ForeColor@ ", "color:" + ((this.ForeColor != null) ? this.ForeColor : "@ForeColor@ ") + ";")
 //.Replace("@Height@", this.Height == 0 ? "200px" : this.Height + "px"); // for bot
-.Replace("@Height@", this.Height == 0 ? "auto" : this.Height + "px");
+.Replace("@Height@", this.Height == 0 ? "auto" : this.Height - 61.7 + "px");
         }
 
         public override string GetHtml()
@@ -148,7 +148,7 @@ namespace ExpressBase.Objects
             get
             {
                 return @"let loc = $('#' + this.EbSid_CtxId).locationpicker('location');
-                        return loc.name + '(' + loc.latitude + ',' + loc.longitude + ')';";
+                        return loc.latitude + ',' + loc.longitude;";
             }
             set { }
         }
@@ -162,13 +162,48 @@ namespace ExpressBase.Objects
                             let tmp = p1.split(',');
                             if(tmp.length === 2 && parseFloat(tmp[0]) && parseFloat(tmp[1]))
                                 $('#' + this.EbSid_CtxId).locationpicker('location', { latitude : parseFloat(tmp[0]), longitude : parseFloat(tmp[1])});
-                        }";
+                        };";
             }
             set { }
         }
 
         [JsonIgnore]
-        public override string OnChangeBindJSFn { get { return @"$('#' + this.EbSid_CtxId + 'address').on('change', p1);"; } set { } }
+        public override string JustSetValueJSfn
+        {
+            get
+            {
+                return
+                    @"this.__isJustSetValue = true; " + SetValueJSfn + ";";
+            }
+            set { }
+        }
+
+        [JsonIgnore]
+        public override string GetDisplayMemberFromDOMJSfn
+        {
+            get
+            {
+                return @"return $('#' + this.EbSid_CtxId).locationpicker('location').name;";
+            }
+            set { }
+        }
+
+        [JsonIgnore]
+        public override string ClearJSfn
+        {
+            get
+            {
+                return @"p1 = '0,0';" + SetValueJSfn;
+            }
+            set { }
+        }
+
+        [JsonIgnore]
+        public override string OnChangeBindJSFn { get { return @"
+if(!this.__ebonchangeFns)
+    this.__ebonchangeFns = [];
+this.__ebonchangeFns.push(p1);
+"; } set { } }
 
     }
 }
