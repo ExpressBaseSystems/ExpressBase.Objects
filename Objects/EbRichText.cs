@@ -3,6 +3,7 @@ using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
@@ -117,7 +118,7 @@ namespace ExpressBase.Objects.Objects
 
 			return @" 
  <div id='@ebsid@_RichTextDiv'  >  
-	<textarea    id='@ebsid@_RichText' style='width:100%; resize: none'  ></textarea >
+	<textarea    id='@ebsid@' style='width:100%; resize: none'  ></textarea >
 </div>"
 .Replace("@ebsid@", String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId)
 .Replace("@name@", this.Name)
@@ -143,7 +144,7 @@ namespace ExpressBase.Objects.Objects
 		{
 			get
 			{
-				return @" return $(`#${this.EbSid}_RichText`).summernote('code');";
+				return @" return $(`#${this.EbSid}`).summernote('code');";
 			}
 			set { }
 		}
@@ -152,7 +153,7 @@ namespace ExpressBase.Objects.Objects
 		{
 			get
 			{
-				return @"$(`#${this.EbSid}_RichText`).on('summernote.blur', p1);";
+				return @"$(`#${this.EbSid}`).on('summernote.blur', p1);";
 			}
 			set { }
 		}
@@ -161,12 +162,18 @@ namespace ExpressBase.Objects.Objects
 		{
 			get
 			{
-				return @" $(`#${this.EbSid}_RichText`).summernote('focus');
-							$(`#${this.EbSid}_RichText`).summernote('code',p1);";
+				return @" $(`#${this.EbSid}`).summernote('focus');
+							$(`#${this.EbSid}`).summernote('code',p1);";
 			}
 			set { }
 		}
 
+
+		[JsonIgnore]
+		public override string EnableJSfn { get { return @"$(`#${this.EbSid}`).summernote('enable');"; } set { } }
+
+		[JsonIgnore]
+		public override string DisableJSfn { get { return @" $(`#${this.EbSid}`).summernote('disable');"; } set { } }
 		//public override string ClearJSfn
 		//{
 		//	get

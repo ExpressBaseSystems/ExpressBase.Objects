@@ -121,7 +121,10 @@ namespace ExpressBase.Objects.Objects
 		[PropertyEditor(PropertyEditorType.Color)]
 		public string TagColor { get; set; }
 
-
+		//[EnableInBuilder(BuilderType.WebForm)]
+		//[DefaultPropValue("12")]
+		//[Alias("Font size")]
+		//public  int FontSizes { get; set; }
 
 
 
@@ -131,8 +134,8 @@ namespace ExpressBase.Objects.Objects
 
 
 			return @" 
- <div id='@ebsid@_TagDiv' class='tagInputDiv'  >  
-	<input type='text' name='@ebsid@_tags' value='' data-role='tagsinput'  />
+ <div id='@ebsid@' class='tagInputDiv'  >  
+	<input type='text' name='@ebsid@_tags' value='' size='42' data-role='tagsinput'  />
 </div>"
 .Replace("@ebsid@", String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId)
 .Replace("@name@", this.Name)

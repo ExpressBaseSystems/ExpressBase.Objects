@@ -1,8 +1,10 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Constants;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
@@ -84,6 +86,26 @@ namespace ExpressBase.Objects
 
 
 
+		[JsonIgnore]
+		public override string IsRequiredOKJSfn
+		{
+			get
+			{
+				return @"
+						let count= $('#' + this.EbSid).attr('fileCount');
+                        if(this.MinFiles<=count){
+                            return true;
+                        }
+                        else{
+                            return false;
+                    }
+                ";
+			}
+			set { }
+		}
+
+
+
 		//--------Hide in property grid------------
 		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
 		[HideInPropertyGrid]
@@ -119,10 +141,6 @@ namespace ExpressBase.Objects
 
 		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
 		[HideInPropertyGrid]
-		public override bool Required { get; set; }
-
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
-		[HideInPropertyGrid]
 		public override bool DoNotPersist { get; set; }
 
 		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
@@ -148,7 +166,10 @@ namespace ExpressBase.Objects
 		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
 		[HideInPropertyGrid]
 		public override EbDbTypes EbDbType { get { return EbDbTypes.String; } set { } }
-
+		
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+		[PropertyGroup(PGConstants.VALIDATIONS)]
+		public override bool Required { get; set; }
 
 		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
 		[DefaultPropValue("1")]
