@@ -71,6 +71,18 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         public override string ToolNameAlias { get { return "Datatable"; } set { } }
 
+        [JsonIgnore]
+        public override string SetValueJSfn { get { return @""; } set { } }
+        [JsonIgnore]
+        public override string GetValueFromDOMJSfn
+        {
+            get
+            {
+                return SetValueJSfn;
+            }
+            set { }
+        }
+
 
         public void InitFromDataBase(JsonServiceClient ServiceClient)
         {
