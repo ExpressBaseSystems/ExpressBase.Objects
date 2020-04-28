@@ -59,6 +59,9 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.BotForm)]
         public override bool IsReadOnly { get => true; }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        public override bool IsNonDataInputControl { get => true; }
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
         [HideInPropertyGrid]
         public override bool IsFullViewContol { get => true; set => base.IsFullViewContol = value; }
