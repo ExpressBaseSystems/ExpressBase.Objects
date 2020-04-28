@@ -812,7 +812,7 @@ namespace ExpressBase.Objects
                     for (int k = 0; k < _table.Columns.Count; k++)
                     {
                         EbControl _control = _table.Columns[k].Control;
-                        this.GetFormattedColumn(dataTable.Columns[_control.Name], dataRow, Row, _control);
+                        this.GetFormattedColumn(dataTable.Columns[_control.Name.ToLower()], dataRow, Row, _control);// card field has uppercase name, but datatable contains lower case column name
                     }
                 }
                 else
@@ -1831,9 +1831,9 @@ namespace ExpressBase.Objects
                         autoId = " - " + Convert.ToString(this.FormDataBackup.MultipleTables[this.FormSchema.MasterTable][0][_columnAutoId.Control.Name]);
                 }
 
-                insUpQ += $@"INSERT INTO eb_my_actions({_col}, from_datetime, is_completed, eb_stages_id, form_ref_id, form_data_id, eb_del, description, is_form_data_editable)
+                insUpQ += $@"INSERT INTO eb_my_actions({_col}, from_datetime, is_completed, eb_stages_id, form_ref_id, form_data_id, eb_del, description, is_form_data_editable, my_action_type)
                                 VALUES ({_val}, {DataDB.EB_CURRENT_TIMESTAMP}, 'F', (SELECT id FROM eb_stages WHERE stage_unique_id = '{nextStage.EbSid}' AND form_ref_id = '{this.RefId}' AND eb_del = 'F'), 
-                                '{this.RefId}', {masterId}, 'F', 'Review required for {this.DisplayName}{autoId} in {nextStage.Name}', '{(nextStage.IsFormEditable ? "T" : "F")}'); ";
+                                '{this.RefId}', {masterId}, 'F', '{this.DisplayName}{autoId} in {nextStage.Name}', '{(nextStage.IsFormEditable ? "T" : "F")}', '{MyActionTypes.Approval}'); ";
                 if (DataDB.Vendor == DatabaseVendors.MYSQL)
                     insUpQ += "SELECT eb_persist_currval('eb_my_actions_id_seq'); ";
 
