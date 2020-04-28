@@ -41,7 +41,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
         [HideInPropertyGrid]
-        public string TableVisualizationJson{ get; set; }
+        public string TableVisualizationJson { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup(PGConstants.CORE)]
@@ -86,9 +86,23 @@ namespace ExpressBase.Objects
 
         public void InitFromDataBase(JsonServiceClient ServiceClient)
         {
-            EbObjectParticularVersionResponse result= ServiceClient.Get<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = TVRefId });
+            EbObjectParticularVersionResponse result = ServiceClient.Get<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = TVRefId });
             this.TableVisualizationJson = result.Data[0].Json;
         }
+
+        public void FetchParamsMeta(IServiceClient ServiceClient)
+        {
+            EbObjectParticularVersionResponse result1 = ServiceClient.Get<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = TVRefId });
+            EbTableVisualization TvObj = EbSerializers.Json_Deserialize<EbTableVisualization>(result1.Data[0].Json);
+            if (string.IsNullOrEmpty(TvObj.DataSourceRefId))
+                throw new FormException($"Missing Data Reader of table view that is connected to {this.Label}.");
+            EbObjectParticularVersionResponse result2 = ServiceClient.Get<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = TvObj.DataSourceRefId });
+            EbDataReader DrObj = EbSerializers.Json_Deserialize<EbDataReader>(result2.Data[0].Json);
+            this.ParamsList = DrObj.InputParams;
+        }
+
+        [JsonIgnore]
+        public List<Param> ParamsList { get; set; }
 
         public override string GetDesignHtml()
         {
