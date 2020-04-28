@@ -40,7 +40,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int TableCount { get; set; }
 
         [DataMember(Order = 5)]
-        public List<string> SolutionCollection { get; set; }       
+        public List<string> SolutionCollection { get; set; }
+
+        [DataMember(Order = 6)]
+        public string Message { get; set; }     
 
     }
 
