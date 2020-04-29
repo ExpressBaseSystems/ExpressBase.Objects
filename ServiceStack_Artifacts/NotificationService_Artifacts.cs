@@ -119,5 +119,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string DataId { get; set; }
 
         public string CreatedDate { get; set; }
+
+        public string DateInString { get; set; }
+
+        public string ActionType { get; set; }
     }
 }
