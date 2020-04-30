@@ -1,4 +1,5 @@
 ﻿using ExpressBase.Common.Constants;
+using ExpressBase.Common.Data;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Objects.Objects;
@@ -45,7 +46,7 @@ namespace ExpressBase.Objects.WebFormRelated
                 {
                     EbDataGrid DataGrid = Allctrls[i] as EbDataGrid;
                     string _tn = (DataGrid).TableName;
-                    if (string.IsNullOrEmpty((DataGrid).TableName))
+                    if (string.IsNullOrEmpty(DataGrid.TableName))
                         throw new FormException("Please enter a valid table name for " + Allctrls[i].Label + " (data grid)");
                     if (tbls.ContainsKey(_tn))
                         throw new FormException(string.Format("Same table not allowed for {1} and {2}(data grid) : {0}", _tn, tbls[_tn], Allctrls[i].Label));
@@ -62,7 +63,7 @@ namespace ExpressBase.Objects.WebFormRelated
                         }
                     }
 
-                    if (!DataGrid.DataSourceId.IsNullOrEmpty() && serviceClient != null)
+                    if (!string.IsNullOrEmpty(DataGrid.DataSourceId) && serviceClient != null)
                         DataGrid.InitDSRelated(serviceClient, redis, Allctrls);
 
                 }
@@ -77,6 +78,12 @@ namespace ExpressBase.Objects.WebFormRelated
                     if (HasSubmitButton)
                         throw new FormException("Only one Submit Button is allowed");
                     HasSubmitButton = true;
+                }
+                else if (Allctrls[i] is EbTVcontrol && serviceClient != null)
+                {
+                    if (string.IsNullOrEmpty((Allctrls[i] as EbTVcontrol).TVRefId))
+                        throw new FormException($"Please set a Table View for {Allctrls[i].Label}.");
+                    (Allctrls[i] as EbTVcontrol).FetchParamsMeta(serviceClient);
                 }
             }
 
@@ -96,7 +103,7 @@ namespace ExpressBase.Objects.WebFormRelated
                     {
                         Dictionary<string, string> QryParms = new Dictionary<string, string>();//<param, table>
                         string code = stage.ApproverUsers.Code;
-                        if (code.IsNullOrEmpty())
+                        if (string.IsNullOrEmpty(code))
                             throw new FormException($"Required SQL query for {ebReviewCtrl.Name}(review) control stage {stage.Name}");
                         MatchCollection matchColl = Regex.Matches(code, @"(?<=@)(\w+)|(?<=:)(\w+)");
                         foreach (Match match in matchColl)
@@ -130,18 +137,18 @@ namespace ExpressBase.Objects.WebFormRelated
                     else
                     {
                         stage.StageActions = new List<EbReviewAction>() {
-                            new EbReviewAction(){ EbSid = stage.Name + "_ebreviewaction1", Name = "Hold"},
-                            new EbReviewAction(){ EbSid = stage.Name + "_ebreviewaction2", Name = "Accept"},
-                            new EbReviewAction(){ EbSid = stage.Name + "_ebreviewaction3", Name = "Reject"}
+                            new EbReviewAction(){ EbSid = stage.Name + "_ebreviewaction1", Name = "On Hold"},
+                            new EbReviewAction(){ EbSid = stage.Name + "_ebreviewaction2", Name = "Accepted"},
+                            new EbReviewAction(){ EbSid = stage.Name + "_ebreviewaction3", Name = "Rejected"}
                         };
                         string nxtStage = ebReviewCtrl.FormStages.Count == i + 1 ? "form.review.complete()" : $@"return ""{ebReviewCtrl.FormStages[i + 1].Name}""";
 
                         string code = $@"
-if (form.review.currentStage.currentAction.name == ""Hold"")
+if (form.review.currentStage.currentAction.name == ""On Hold"")
     return ""{stage.Name}"";
-if (form.review.currentStage.currentAction.name == ""Accept"")
+if (form.review.currentStage.currentAction.name == ""Accepted"")
     {nxtStage};
-if (form.review.currentStage.currentAction.name == ""Reject"")
+if (form.review.currentStage.currentAction.name == ""Rejected"")
     form.review.abandon();
 ";
                         stage.NextStage = new EbScript() { Lang = ScriptingLanguage.CSharp, Code = code };
@@ -175,7 +182,7 @@ if (form.review.currentStage.currentAction.name == ""Reject"")
                 else if (ctrl is EbPowerSelect)
                 {
                     EbPowerSelect _ctrl = ctrl as EbPowerSelect;
-                    if (_ctrl.DataSourceId.IsNullOrEmpty())
+                    if (string.IsNullOrEmpty(_ctrl.DataSourceId))
                         throw new FormException("Set Data Reader for " + ctrl.Label);
                     if (_ctrl.ValueMember == null)
                         throw new FormException("Set Value Member for " + ctrl.Label);
@@ -187,7 +194,7 @@ if (form.review.currentStage.currentAction.name == ""Reject"")
                 else if (ctrl is EbDGPowerSelectColumn)
                 {
                     EbDGPowerSelectColumn _ctrl = ctrl as EbDGPowerSelectColumn;
-                    if (_ctrl.DataSourceId.IsNullOrEmpty())
+                    if (string.IsNullOrEmpty(_ctrl.DataSourceId))
                         throw new FormException("Set Data Reader for " + ctrl.Name);
                     if (_ctrl.ValueMember == null)
                         throw new FormException("Set Value Member for " + ctrl.Name);
@@ -205,7 +212,7 @@ if (form.review.currentStage.currentAction.name == ""Reject"")
                     string t = _tbl;
                     if (ctrl is EbTableLayout || ctrl is EbTableTd || ctrl is EbTabControl || ctrl is EbTabPane)///////table name filling
                         (ctrl as EbControlContainer).TableName = _tbl;
-                    if (!(ctrl as EbControlContainer).TableName.IsNullOrEmpty())
+                    if (!string.IsNullOrEmpty((ctrl as EbControlContainer).TableName))
                         t = (ctrl as EbControlContainer).TableName;
                     PerformRequirdUpdate(ctrl as EbControlContainer, t);
                 }
@@ -229,6 +236,11 @@ if (form.review.currentStage.currentAction.name == ""Reject"")
                     CalcFlds.Add(i);
                     ExeOrd.Add(i);
                 }
+                if (_dict[i].Control is EbTVcontrol && (_dict[i].Control as EbTVcontrol).ParamsList?.Count > 0)
+                {
+                    CalcFlds.Add(i);
+                    ExeOrd.Add(i);
+                }
                 if (_dict[i].Control.OnChangeFn != null && !string.IsNullOrEmpty(_dict[i].Control.OnChangeFn.Code))
                 {
                     if (_dict[i].Control.OnChangeFn.Code.Contains(".setValue(") && !(_dict[i].Control is EbScriptButton))
@@ -241,7 +253,19 @@ if (form.review.currentStage.currentAction.name == ""Reject"")
             for (int i = 0; i < CalcFlds.Count; i++)
             {
                 string code = _dict[CalcFlds[i]].Control.ValueExpr.Code;
-                if (_dict[CalcFlds[i]].Control.ValueExpr.Lang == ScriptingLanguage.JS)
+                if (_dict[CalcFlds[i]].Control is EbTVcontrol)// +ex
+                {
+                    List<Param> ParamsList = (_dict[CalcFlds[i]].Control as EbTVcontrol).ParamsList;
+                    foreach (Param _p in ParamsList)
+                    {
+                        KeyValuePair<int, EbControlWrapper> item = _dict.FirstOrDefault(e => !(e.Value.Control is EbDGColumn) && e.Value.Control.Name == _p.Name);
+                        if (item.Value != null)
+                            dpndcy.Add(new KeyValuePair<int, int>(CalcFlds[i], item.Key));
+                        else if (_p.Name != "eb_loc_id" && _p.Name != "eb_currentuser_id")
+                            throw new FormException($"Can't resolve parameter {_p.Name} in table view of {_dict[CalcFlds[i]].Control.Name}");
+                    }
+                }
+                else if (_dict[CalcFlds[i]].Control.ValueExpr.Lang == ScriptingLanguage.JS)
                 {
                     if (code.Contains("form"))
                     {
@@ -276,6 +300,7 @@ if (form.review.currentStage.currentAction.name == ""Reject"")
                         _dict[CalcFlds[i]].Control.ValExpParams.Add(item.Value.Path);
                     }
                 }
+
             }
 
             int stopCounter = 0;

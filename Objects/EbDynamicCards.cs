@@ -131,6 +131,9 @@ namespace ExpressBase.Objects
 		public virtual List<EbCard> CardCollection { get; set; }
 
 		[EnableInBuilder(BuilderType.BotForm, BuilderType.WebForm)]
+		public string TableName { get; set; }
+
+		[EnableInBuilder(BuilderType.BotForm, BuilderType.WebForm)]
 		[HideInPropertyGrid]
 		public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
 
@@ -233,7 +236,7 @@ namespace ExpressBase.Objects
 						html += cardField.GetBareHtml();
 					}
 
-					html += "<div class='card-btn-cont' style='@BtnDisplay@'><button id='' class='btn btn-default'  data-toggle='tooltip' title='' style='width:100%;'>Select</button></div></div>".Replace("@BtnDisplay@", this.MultiSelect ? "" : "display:none;");
+					html += "<div class='card-btn-cont' style='@BtnDisplay@'><button id='' class='btn btn-default'  data-toggle='tooltip' title='' style='width:100%;'>Select</button></div></div>".Replace("@BtnDisplay@", this.MultiSelect ? "" : "display:none !important;");
 				}
 			}			
 			html += "</div>@SummarizeHtml@  <div class='cards-btn-cont' style='margin-top: 20px;'> <button id='' class='btn btn-default ctrl-submit-btn'  data-toggle='tooltip' title=''> @ButtonText@ </button> </div> </div>"
