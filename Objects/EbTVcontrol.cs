@@ -104,7 +104,8 @@ namespace ExpressBase.Objects
             this.ParamsList = DrObj.InputParams;
         }
 
-        [JsonIgnore]
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
         public List<Param> ParamsList { get; set; }
 
         public override string GetDesignHtml()

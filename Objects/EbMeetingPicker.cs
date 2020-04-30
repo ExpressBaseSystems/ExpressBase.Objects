@@ -16,7 +16,7 @@ using System.Runtime.Serialization;
 namespace ExpressBase.Objects
 {
 
-    [EnableInBuilder(BuilderType.WebForm)]
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
     public class EbMeetingPicker : EbControlUI
     {
         public EbMeetingPicker() { }
@@ -41,20 +41,24 @@ namespace ExpressBase.Objects
             }
         }
 
-        public override string GetBareHtml()
+        public override string DesignHtml4Bot
         {
-            string EbCtrlHTML = @" <div id='cont_@ebsid@' ebsid='@ebsid@' name='@name@' class='Eb-ctrlContainer meeting-picker-outer' @childOf@ ctype='@type@'>
-                        <div class='head-cont' > @Label@ </div>
-                        <div class='date-cont' > <div id='datepicker'></div> </div>
-                        <div class='picker-cont'> </div>
+            get => @"<div id='cont_@ebsid@' ebsid='@ebsid@' name='@name@' class='Eb-ctrlContainer meeting-picker-outer' @childOf@ ctype='@type@'>
+                        <div class='head-cont' >   <i class='fa fa-calendar' aria-hidden='true'></i>
+                        <div>@Label@ </div> </div>
+                        <div class='sub-head'>Pick a date</div>
+                        <div class='date-cont'> <div id='@ebsid@_datepicker'></div> </div>
+                        <div class='sub-head'>Pick a timeslot</div>
+                        <input type='text' id='@ebsid@_slot_val' hidden/>
+                        <div class='picker-cont' id='@ebsid@_picker-cont'> </div>
                 </div>"
                 .Replace("@name@", this.Name)
                 .Replace("@Label@", this.Label)
-                .Replace("@ebsid@", this.EbSid);
-            return EbCtrlHTML;
+                .Replace("@ebsid@", this.EbSid_CtxId);
+            set => base.DesignHtml4Bot = value;
         }
 
-        public override string GetHtml()
+        public override string GetBareHtml()
         {
             string EbCtrlHTML = @"<div id='cont_@ebsid@' ebsid='@ebsid@' name='@name@' class='Eb-ctrlContainer meeting-picker-outer' @childOf@ ctype='@type@'>
                         <div class='head-cont' >   <i class='fa fa-calendar' aria-hidden='true'></i>
@@ -62,9 +66,46 @@ namespace ExpressBase.Objects
                         <div class='sub-head'>Pick a date</div>
                         <div class='date-cont'> <div id='@ebsid@_datepicker'></div> </div>
                         <div class='sub-head'>Pick a timeslot</div>
+                        <input type='text' id='@ebsid@_slot_val' hidden/>
+                        <div class='picker-cont' id='@ebsid@_picker-cont'> </div>
+                </div>"
+                .Replace("@name@", this.Name)
+                .Replace("@Label@", this.Label)
+                .Replace("@ebsid@", this.EbSid_CtxId);
+            return EbCtrlHTML;
+        }
+
+
+        public override string GetHtml()
+        {
+            string EbCtrlHTML = @"<div id='cont_@ebsid@' ebsid='@ebsid@' name='@name@' class='Eb-ctrlContainer meeting-picker-outer' @childOf@ ctype='@type@'>
+                        <div class='head-cont' >   <i class='fa fa-calendar' aria-hidden='true'></i>
+                        <div>@Label@ </div> </div>
+                        <div class='sub-head'>Pick a date</div>
+                        <div class='date-cont'> 
+                        <div class='input-group'>
+                                <input type='text' class='form-control' id='@ebsid@_date' value='@date_val@' readonly/>
+                                <div class='input-group-btn'>
+                                  <button class='btn btn-primary' type='submit' id='@ebsid@_date_change'>
+                                    <i class='fa fa-calendar'></i>
+                                  </button>
+                                </div>
+                        </div>
+                        <div id='@ebsid@_datepicker' hidden></div></div>
+                        <div class='sub-head'>Pick a timeslot</div>
+                        <input type='text' ids='@ebsid@_slot_val' hidden/>
+                          <div class='input-group'>
+                                <input type='text' class='form-control' id='@ebsid@_slot_val' readonly/>
+                                <div class='input-group-btn'>
+                                  <button class='btn btn-primary' type='submit' id='@ebsid@_slot_change'>
+                                    <i class='fa fa-clock-o'></i>
+                                  </button>
+                                </div>
+                        </div>
                         <div class='picker-cont' id='@ebsid@_picker-cont'> </div>
                 </div>"
                .Replace("@name@", this.Name)
+               .Replace("@date_val@", DateTime.Today.ToString("yyyy-MM-dd"))
                .Replace("@Label@", this.Label);
             return ReplacePropsInHTML(EbCtrlHTML);
         }
@@ -76,15 +117,27 @@ namespace ExpressBase.Objects
 
         public string GetDesignHtmlHelper()
         {
-            string EbCtrlHTML = @" <div id='cont_@ebsid@' ebsid='@ebsid@' name='@name@' class='Eb-ctrlContainer meeting-picker-outer'   @childOf@ ctype='@type@'>
-                        <div class='head-cont' > @Label@ </div>
-                        <div class='date-cont'> <div id='datepicker'></div> </div>
-                        <div class='picker-cont' > </div>
+            string EbCtrlHTML = @"<div id='cont_@ebsid@' ebsid='@ebsid@' name='@name@' class='Eb-ctrlContainer meeting-picker-outer' @childOf@ ctype='@type@'>
+                        <div class='head-cont' >   <i class='fa fa-calendar' aria-hidden='true'></i>
+                        <div>@Label@ </div> </div>
+                        <div class='sub-head'>Pick a date</div>
+                        <div class='date-cont'> <div id='@ebsid@_datepicker'></div> </div>
+                        <div class='sub-head'>Pick a timeslot</div>
+                        <input type='text' id='@ebsid@_slot_val' hidden/>
+                        <div class='picker-cont' id='@ebsid@_picker-cont'> </div>
                 </div>"
                .Replace("@name@", this.Name)
                .Replace("@Label@", this.Label);
             return ReplacePropsInHTML(EbCtrlHTML);
         }
+
+        public override string GetValueFromDOMJSfn { get { return @"return $('#' + this.EbSid_CtxId +'_slot_val').val();"; } set { } }
+
+        public override string OnChangeBindJSFn { get { return @" debugger; $('#' +  this.EbSid_CtxId +'_slot_val').on('change', p1);"; } set { } }
+
+        public override string SetValueJSfn { get { return @"$('#' + this.EbSid_CtxId +'_slot_val').val(p1).trigger('change');"; } set { } }
+
+        public override string JustSetValueJSfn { get { return @"$('#' + this.EbSid_CtxId +'_slot_val').val(p1)"; } set { } }
 
         public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
         {
@@ -118,8 +171,8 @@ namespace ExpressBase.Objects
 			 COALESCE (E.id, 0) as participant_id
 	            FROM
 				(SELECT 
-						id, eb_meeting_schedule_id , title , description , is_approved, 
-					meeting_date, time_from, time_to , venue, integration 
+						id, eb_meeting_schedule_id , is_approved, 
+					meeting_date, time_from, time_to
 	                     FROM 
 		                     eb_meeting_slots 
 	                     WHERE 
@@ -157,7 +210,17 @@ namespace ExpressBase.Objects
 							  GROUP BY
 		                        eb_meeting_schedule_id, approved_slot_id, type_of_user, eb_del , id)E
 								  ON
- 	                     E.approved_slot_id = A.id						 
+ 	                     E.approved_slot_id = A.id;
+                          SELECT 
+		             A.id as slot_id , A.eb_meeting_schedule_id,
+			         B.user_id, B.role_id, B.user_group_id,B.participant_type FROM
+				        (SELECT 
+						id, eb_meeting_schedule_id FROM  eb_meeting_slots 
+	                     WHERE  eb_del = 'F' and id = {0})A
+						LEFT JOIN	 
+							 (SELECT id, user_id, role_id,user_group_id,participant_type 
+							  FROM  eb_meeting_scheduled_participants)B
+							 ON B.id = A.eb_meeting_schedule_id
                                         ";
             }
         }
@@ -184,52 +247,73 @@ namespace ExpressBase.Objects
             i++;
 
             List<DetailsBySlotid> SlotObj = new List<DetailsBySlotid>();
-           
+            List<ScheduledParticipants> ScheduledParticipants = new List<ScheduledParticipants>();
+
             String _query = string.Format(this.SlotDetailsGetQuery, ApprovedSlotId);
-            EbDataTable dt = DataDB.DoQuery(_query);
-            if (dt.Rows.Count == 0)
+            EbDataSet ds = DataDB.DoQueries(_query);
+            if (ds.Tables[0].Rows.Count == 0)
                 throw new FormException("Requested meeting slot is invalid", (int)HttpStatusCodes.BAD_REQUEST, "Query returned 0 rows for Meeting slot : " + ApprovedSlotId, "From EbMeetingPicker.ParameterizeControl()");
 
-            for (int k = 0; k < dt.Rows.Count; k++)
+            for (int k = 0; k < ds.Tables[0].Rows.Count; k++)
             {
                 SlotObj.Add(new DetailsBySlotid()
                 {
-                    Slot_id = Convert.ToInt32(dt.Rows[k]["slot_id"]),
-                    Meeting_schedule_id = Convert.ToInt32(dt.Rows[k]["eb_meeting_schedule_id"]),
-                    MeetingId = Convert.ToInt32(dt.Rows[k]["eb_meeting_id"]),
-                    No_Attendee = Convert.ToInt32(dt.Rows[k]["no_of_attendee"]),
-                    No_Host = Convert.ToInt32(dt.Rows[k]["no_of_host"]),
-                    SlotHostCount = Convert.ToInt32(dt.Rows[k]["slot_host_count"]),
-                    SlotAttendeeCount = Convert.ToInt32(dt.Rows[k]["slot_attendee_count"]),
-                    Is_approved = Convert.ToString(dt.Rows[k]["is_approved"]),
-                    Participant_id = Convert.ToInt32(dt.Rows[k]["participant_id"]),
+                    Slot_id = Convert.ToInt32(ds.Tables[0].Rows[k]["slot_id"]),
+                    Meeting_schedule_id = Convert.ToInt32(ds.Tables[0].Rows[k]["eb_meeting_schedule_id"]),
+                    MeetingId = Convert.ToInt32(ds.Tables[0].Rows[k]["eb_meeting_id"]),
+                    No_Attendee = Convert.ToInt32(ds.Tables[0].Rows[k]["no_of_attendee"]),
+                    No_Host = Convert.ToInt32(ds.Tables[0].Rows[k]["no_of_host"]),
+                    SlotHostCount = Convert.ToInt32(ds.Tables[0].Rows[k]["slot_host_count"]),
+                    SlotAttendeeCount = Convert.ToInt32(ds.Tables[0].Rows[k]["slot_attendee_count"]),
+                    Is_approved = Convert.ToString(ds.Tables[0].Rows[k]["is_approved"]),
+                    Participant_id = Convert.ToInt32(ds.Tables[0].Rows[k]["participant_id"]),
                 });
             }
-            
+            for (int k = 0; k < ds.Tables[1].Rows.Count; k++)
+            {
+                ScheduledParticipants.Add(new ScheduledParticipants()
+                {
+                    Id = Convert.ToInt32(ds.Tables[0].Rows[k]["id"]),
+                    SlotId = Convert.ToInt32(ds.Tables[0].Rows[k]["slot_id"]),
+                    ScheduleId = Convert.ToInt32(ds.Tables[0].Rows[k]["eb_meeting_schedule_id"]),
+                    UserId = Convert.ToInt32(ds.Tables[0].Rows[k]["user_id"]),
+                    RoleId = Convert.ToInt32(ds.Tables[0].Rows[k]["role_id"]),
+                    UserGroupId = Convert.ToInt32(ds.Tables[0].Rows[k]["user_group_id"]),
+                    ParticipantType = Convert.ToInt32(ds.Tables[0].Rows[k]["participant_type"]),
+                });
+            }
+
+
             if (SlotObj[0].No_Attendee <= SlotObj[0].SlotAttendeeCount)// assuming user in an attendee
                 throw new FormException("Unable to continue. Reached maximum attendee limit.", (int)HttpStatusCodes.BAD_REQUEST, $"Max no of attendee : {SlotObj[0].No_Attendee}, Current attendee count : {SlotObj[0].SlotAttendeeCount}", "From EbMeetingPicker.ParameterizeControl()");
 
             string query = string.Empty;
-
-            if (SlotObj[0].Is_approved == "T")
+            if (ScheduledParticipants.Count == 0)
             {
-                query = $@"insert into eb_meeting_slot_participants(user_id, confirmation, eb_meeting_schedule_id, approved_slot_id, name, email, type_of_user, participant_type) 
+                if (SlotObj[0].Is_approved == "T")
+                {
+                    query = $@"insert into eb_meeting_slot_participants(user_id, confirmation, eb_meeting_schedule_id, approved_slot_id, name, email, type_of_user, participant_type) 
                             values ({usr.UserId}, 1, {SlotObj[0].Meeting_schedule_id}, {ApprovedSlotId}, '{usr.FullName}', '{usr.Email}', 1, 2);
                         insert into eb_meeting_participants(eb_meeting_id, eb_slot_participant_id) 
                             values({SlotObj[0].MeetingId}, eb_currval('eb_meeting_slot_participants_id_seq')); ";
-            }
-            else if (SlotObj[0].Is_approved == "F")
-            {
-                query = $@"insert into eb_meetings (eb_meeting_slots_id, eb_created_by)
+                }
+                else if (SlotObj[0].Is_approved == "F")
+                {
+                    query = $@"insert into eb_meetings (eb_meeting_slots_id, eb_created_by)
                             values({SlotObj[0].Slot_id}, 1);
                         insert into eb_meeting_slot_participants(user_id, confirmation, eb_meeting_schedule_id, approved_slot_id, name, email, type_of_user, participant_type) 
                             values ({usr.UserId}, 1, {SlotObj[0].Meeting_schedule_id}, {ApprovedSlotId}, '{usr.FullName}', '{usr.Email}', 1, 2); ";
-                
-                for (int k = 0; k < SlotObj.Count; k++)
-                    query += $"insert into eb_meeting_participants(eb_meeting_id, eb_slot_participant_id) values ( eb_currval('eb_meetings_id_seq'),{SlotObj[k].Participant_id}); ";
-                
-                query += $"insert into eb_meeting_participants(eb_meeting_id, eb_slot_participant_id ) values (eb_currval('eb_meetings_id_seq'), eb_currval('eb_meeting_slot_participants_id_seq'));";
-                query += $"update eb_meeting_slots set is_approved = 'T' where  id = {ApprovedSlotId}; ";
+
+                    for (int k = 0; k < SlotObj.Count; k++)
+                        query += $"insert into eb_meeting_participants(eb_meeting_id, eb_slot_participant_id) values ( eb_currval('eb_meetings_id_seq'),{SlotObj[k].Participant_id}); ";
+
+                    query += $"insert into eb_meeting_participants(eb_meeting_id, eb_slot_participant_id ) values (eb_currval('eb_meetings_id_seq'), eb_currval('eb_meeting_slot_participants_id_seq'));";
+                    query += $"update eb_meeting_slots set is_approved = 'T' where  id = {ApprovedSlotId}; ";
+                }
+            }
+            else
+            {
+
             }
             _extqry += query;
             return true;
@@ -250,6 +334,8 @@ namespace ExpressBase.Objects
         public string Time_to { get; set; }
         public int UserType { get; set; }
         public bool IsHide { get; set; }
+        public int Attendee_count { get; set; }
+        public int Host_count { get; set; }
 
     }
 
@@ -339,6 +425,17 @@ namespace ExpressBase.Objects
         public int Participant_id { get; set; }
     }
 
+    public class ScheduledParticipants
+    {
+        public int Id { get; set; }
+        public int SlotId { get; set; }
+        public int ScheduleId { get; set; }
+        public int UserId { get; set; }
+        public int RoleId { get; set; }
+        public int UserGroupId { get; set; }
+        public int ParticipantType { get; set; }
+    }
+
     [DataContract]
     public class MeetingSaveValidateResponse
     {
@@ -347,5 +444,13 @@ namespace ExpressBase.Objects
 
         [DataMember(Order = 1)]
         public int UserId { get; set; }
+    }
+    public class AddMeetingSlotRequest
+    {
+        public string Date { get; set; }
+    }
+    public class AddMeetingSlotResponse
+    {
+        public bool Status { get; set; }
     }
 }
