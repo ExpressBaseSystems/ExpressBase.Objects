@@ -20,7 +20,7 @@ using ExpressBase.Common.LocationNSolution;
 namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.WebForm)]
-    class EbProvisionUser : EbControlUI, IEbPlaceHolderControl
+    public class EbProvisionUser : EbControlUI, IEbPlaceHolderControl
     {
         public EbProvisionUser()
         {
