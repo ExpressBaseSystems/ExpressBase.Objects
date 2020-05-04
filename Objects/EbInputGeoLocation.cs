@@ -100,14 +100,14 @@ namespace ExpressBase.Objects
                         <div id='@EbSid@' class='map-div' style='height: @Height@;'>@mapimgforbuilder@</div>
                         <div class='locinp-cont'>
                             <div class='locinp-wraper-address'>
-                                <div style='display: inline-block; min-width: 50px;'>Address</div>
-                                <div style='display: inline-block; min-width: calc(100% - 54px);'>
-                                    <input id='@EbSid@address' class='locinp' type='text' style='width: calc( 100% - 3.5em );' />
+                                <div style='display: inline-block; min-width: 5em;'>Address</div>
+                                <div class='locinp-address'>
+                                    <input id='@EbSid@address' class='locinp' type='text'/>
                                 </div>
                             </div>
                             <div>
-                                <div class='locinp-wraper' style='display: inline-block;'><span class='locinp-span'>Latitude</span><input id='@EbSid@lat' class='locinp' type='text'/></div>
-                                <div class='locinp-wraper' style='display: inline-block;'><span class='locinp-span'>Longitude</span><input id='@EbSid@long' class='locinp' type='text'/></div>
+                                <div class='locinp-wraper'><div class='locinp-span'>Latitude</div><input id='@EbSid@lat' class='locinp' type='text'/></div>
+                                <div class='locinp-wraper'><div class='locinp-span'>Longitude</div><input id='@EbSid@long' class='locinp' type='text'/></div>
                             </div>
                         </div>
                         <div class='card-btn-cont' style='margin-top: 8px; margin-bottom: 8px;'>
