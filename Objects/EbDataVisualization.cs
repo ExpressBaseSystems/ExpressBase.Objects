@@ -294,11 +294,11 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public RowGroupParent CurrentRowGroup { get; set; }
 
-        [PropertyGroup("Fixed Column")]
+        [PropertyGroup("FixedColumn")]
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
         public int LeftFixedColumn { get; set; }
 
-        [PropertyGroup("Fixed Column")]
+        [PropertyGroup("FixedColumn")]
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
         public int RightFixedColumn { get; set; }
 
@@ -346,6 +346,75 @@ namespace ExpressBase.Objects
         [HideForUser]
         [HideInPropertyGrid]
         public bool AllowLocalSearch { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.DashBoard, BuilderType.UserControl, BuilderType.DVBuilder)]
+        [PropertyGroup("TableStyles")]
+        [PropertyEditor(PropertyEditorType.Color)]
+        public string BackColor { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.DashBoard, BuilderType.UserControl, BuilderType.DVBuilder)]
+        [PropertyGroup("TableStyles")]
+        [DefaultPropValue("true")]
+        [OnChangeExec(@"
+                if (this.IsGradient === true ){      
+                        pg.ShowProperty('GradientColor1');     
+                        pg.ShowProperty('GradientColor2');     
+                        pg.ShowProperty('Direction');
+                }
+                else {
+                        pg.HideProperty('GradientColor1');     
+                        pg.HideProperty('GradientColor2');     
+                        pg.HideProperty('Direction');      
+                }
+            ")]
+        public bool IsGradient { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.DashBoard, BuilderType.UserControl, BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.Color)]
+        [PropertyGroup("TableStyles")]
+        [DefaultPropValue("#3d3d5a")]
+        public string GradientColor1 { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.DashBoard, BuilderType.UserControl, BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.Color)]
+        [PropertyGroup("TableStyles")]
+        [DefaultPropValue("#3b7273")]
+        public string GradientColor2 { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.DashBoard, BuilderType.UserControl, BuilderType.DVBuilder)]
+        [PropertyGroup("TableStyles")]
+        public GradientDirection Direction { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.DashBoard, BuilderType.UserControl, BuilderType.DVBuilder)]
+        [PropertyGroup("TableStyles")]
+        [DefaultPropValue("#3d3d5a")]
+        [PropertyEditor(PropertyEditorType.Color)]
+        public string BorderColor { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.DashBoard, BuilderType.UserControl, BuilderType.DVBuilder)]
+        [PropertyGroup("TableStyles")]
+        [DefaultPropValue("4")]
+        [OnChangeExec(@"if(this.BorderRadius > 50){
+            this.BorderRadius = 50;
+            $('#' + pg.wraperId + 'BorderRadius').val(50);
+            }
+            else if(this.BorderRadius < 0){
+            this.DivWidth = 0;
+            $('#' + pg.wraperId + 'BorderRadius').val(0);
+            }
+            ")]
+        public int BorderRadius { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.DashBoard, BuilderType.UserControl, BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.Color)]
+        [PropertyGroup("TableStyles")]
+        public string FontColor { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.DashBoard, BuilderType.UserControl, BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.Color)]
+        [PropertyGroup("TableStyles")]
+        [DefaultPropValue("#26b3f7")]
+        public string LinkColor { get; set; }
 
         [JsonIgnore]
         public EbWebForm WebForm { get; set; }
@@ -909,5 +978,5 @@ else {
         [EnableInBuilder(BuilderType.WebForm)]
         public string Title { get; set; }
     }
-
+    
 }
