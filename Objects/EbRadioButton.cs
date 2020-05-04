@@ -14,7 +14,8 @@ using System.Text;
 
 namespace ExpressBase.Objects
 {
-    public enum EbValueType {
+    public enum EbValueType
+    {
         Boolean = 3,
         Integer = 11,
         String = 16,
@@ -33,8 +34,8 @@ namespace ExpressBase.Objects
         public void OnDeserializedMethod(StreamingContext context)
         {
             this.BareControlHtml = this.GetBareHtml();
-			this.BareControlHtml4Bot = this.BareControlHtml;
-			this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
+            this.BareControlHtml4Bot = this.BareControlHtml;
+            this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
 
         [HideInPropertyGrid]
@@ -111,17 +112,22 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [HideInPropertyGrid]
-        public string Fv { get {
+        public string Fv
+        {
+            get
+            {
                 if (EbDbType == EbDbTypes.Int32)
                     return FalseValue_I.ToString();
                 else if (EbDbType == EbDbTypes.String)
                     return FalseValue_S;
                 else
                     return "false";
-            } }
+            }
+        }
 
         public override string DesignHtml4Bot
-		{ get => @"<div class='toggle btn btn-xs btn-primary' data-toggle='toggle' style='width: 34px; height: 22px;'>
+        {
+            get => @"<div class='toggle btn btn-xs btn-primary' data-toggle='toggle' style='width: 34px; height: 22px;'>
 						<input type='checkbox' checked='' data-toggle='toggle' data-size='mini'>
 						<div class='toggle-group'>
 							<label class='btn btn-primary btn-xs toggle-on'>On</label>
@@ -129,13 +135,14 @@ namespace ExpressBase.Objects
 							<span class='toggle-handle btn btn-default btn-xs'></span>
 						</div>
 					</div>";
-			set => base.DesignHtml4Bot = value; }
-		public override string GetHtml4Bot()
-		{
-			return ReplacePropsInHTML((HtmlConstants.CONTROL_WRAPER_HTML4BOT).Replace("@barehtml@", DesignHtml4Bot));
-		}
+            set => base.DesignHtml4Bot = value;
+        }
+        public override string GetHtml4Bot()
+        {
+            return ReplacePropsInHTML((HtmlConstants.CONTROL_WRAPER_HTML4BOT).Replace("@barehtml@", DesignHtml4Bot));
+        }
 
-		[HideInPropertyGrid]
+        [HideInPropertyGrid]
         [JsonIgnore]
         public override string ToolIconHtml { get { return "<i class='fa fa-toggle-on'></i>"; } set { } }
 
@@ -166,17 +173,17 @@ namespace ExpressBase.Objects
 .Replace("@Fv@", this.Fv);
         }
 
-//        public override string GetBareHtml()
-//        {
-//            return new EbCheckBox() { Label = this.Label, EbSid_CtxId = this.EbSid_CtxId , EbSid = this.EbSid }.GetBareHtml();
-//            //return @"<div class='checkbox'>
-//                    //    <label>
-//                    //        <input type='radio' id='@ebsid@' ui-inp data-ebtype='@data-ebtype@' style='vertical-align: bottom;' data-toggle='tooltip'>
-//                    //        <span class='eb-ctrl-label' ui-label id='@ebsidLbl'>@Label@ @req@ </span>
-//                    //    </label>
-//                    //</div>"
-//;
-//        }
+        //        public override string GetBareHtml()
+        //        {
+        //            return new EbCheckBox() { Label = this.Label, EbSid_CtxId = this.EbSid_CtxId , EbSid = this.EbSid }.GetBareHtml();
+        //            //return @"<div class='checkbox'>
+        //                    //    <label>
+        //                    //        <input type='radio' id='@ebsid@' ui-inp data-ebtype='@data-ebtype@' style='vertical-align: bottom;' data-toggle='tooltip'>
+        //                    //        <span class='eb-ctrl-label' ui-label id='@ebsidLbl'>@Label@ @req@ </span>
+        //                    //    </label>
+        //                    //</div>"
+        //;
+        //        }
 
         public override string GetHtml()
         {
@@ -201,7 +208,7 @@ return val"; } set { } }
         public override bool ParameterizeControl(IDatabase DataDB, List<DbParameter> param, string tbl, SingleColumn cField, bool ins, ref int i, ref string _col, ref string _val, ref string _extqry, User usr, SingleColumn ocF)
         {
             EbDbTypes ebDbTypes = this.EbDbType == EbDbTypes.Int32 ? EbDbTypes.Int32 : EbDbTypes.String;
-            if (cField.Value == null || Convert.ToString(cField.Value) == string.Empty)
+            if (cField.Value == null)
             {
                 var p = DataDB.GetNewParameter(cField.Name + "_" + i, ebDbTypes);
                 p.Value = DBNull.Value;
@@ -209,7 +216,12 @@ return val"; } set { } }
             }
             else
             {
-                param.Add(DataDB.GetNewParameter(cField.Name + "_" + i, ebDbTypes, cField.Value.ToString() == "true" ? "T" : "F"));
+                if (this.ValueType == EbValueType.Boolean)
+                    param.Add(DataDB.GetNewParameter(cField.Name + "_" + i, EbDbTypes.String, Convert.ToString(cField.Value) == "true" ? "T" : "F"));
+                else if (this.ValueType == EbValueType.Integer)
+                    param.Add(DataDB.GetNewParameter(cField.Name + "_" + i, EbDbTypes.Int32, Convert.ToInt32(cField.Value) == this.TrueValue_I ? this.TrueValue_I : this.FalseValue_I));
+                else
+                    param.Add(DataDB.GetNewParameter(cField.Name + "_" + i, EbDbTypes.String, Convert.ToString(cField.Value) == this.TrueValue_S ? this.TrueValue_S : this.FalseValue_S));
             }
 
             if (ins)
