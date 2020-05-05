@@ -14,7 +14,6 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
     public class EbInputGeoLocation : EbControlUI
 	{
-        #region Hide from PropertyGrid
 
         [HideInPropertyGrid]
         public override bool Unique { get; set; }
@@ -39,8 +38,6 @@ namespace ExpressBase.Objects
 
         [HideInPropertyGrid]
         public override EbScript VisibleExpr { get; set; }
-
-        #endregion
 
         public EbInputGeoLocation() { }
 

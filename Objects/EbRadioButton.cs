@@ -203,7 +203,7 @@ return val"; } set { } }
         //public override string GetValueJSfn { get { return @"return $('#' + this.EbSid_CtxId).prop('checked')? 'true': 'false';"; } set { } }
 
         [JsonIgnore]
-        public override string SetValueJSfn { get { return @"$('#' + this.EbSid_CtxId).prop('checked', (p1 === this.Tv ? true: false)).trigger('change');"; } set { } }
+        public override string SetValueJSfn { get { return @"$('#' + this.EbSid_CtxId).prop('checked', p1 == this.Tv).trigger('change');"; } set { } }
 
         public override bool ParameterizeControl(IDatabase DataDB, List<DbParameter> param, string tbl, SingleColumn cField, bool ins, ref int i, ref string _col, ref string _val, ref string _extqry, User usr, SingleColumn ocF)
         {
