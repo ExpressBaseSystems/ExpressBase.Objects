@@ -24,11 +24,11 @@ namespace ExpressBase.Objects
 
         public string TableName { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
         [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
 
-        [EnableInBuilder(BuilderType.WebForm)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
         [DefaultPropValue("1")]
         public int MeetingId { get; set; }
 
@@ -41,15 +41,40 @@ namespace ExpressBase.Objects
             }
         }
 
+        [OnDeserialized]
+        public void OnDeserializedMethod(StreamingContext context)
+        {
+            this.BareControlHtml = this.GetBareHtml();
+            this.BareControlHtml4Bot = this.GetWrapedCtrlHtml4bot();
+            this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
+        }
+
         public override string DesignHtml4Bot
         {
-            get => @"<div id='cont_@ebsid@' ebsid='@ebsid@' name='@name@' class='Eb-ctrlContainer meeting-picker-outer' @childOf@ ctype='@type@'>
+            get => @"<div id='@ebsid@' ebsid='@ebsid@' name='@name@' class='Eb-ctrlContainer meeting-picker-outer' @childOf@ ctype='@type@'>
                         <div class='head-cont' >   <i class='fa fa-calendar' aria-hidden='true'></i>
                         <div>@Label@ </div> </div>
                         <div class='sub-head'>Pick a date</div>
-                        <div class='date-cont'> <div id='@ebsid@_datepicker'></div> </div>
+                        <div class='date-cont'> 
+                        <div class='input-group'>
+                                <input type='text' class='form-control' id='@ebsid@_date' value='@date_val@' readonly/>
+                                <div class='input-group-btn'>
+                                  <button class='btn btn-primary' type='submit' id='@ebsid@_date_change'>
+                                    <i class='fa fa-calendar'></i>
+                                  </button>
+                                </div>
+                        </div>
+                        <div id='@ebsid@_datepicker' hidden></div></div>
                         <div class='sub-head'>Pick a timeslot</div>
-                        <input type='text' id='@ebsid@_slot_val' hidden/>
+                        <input type='text' ids='@ebsid@_slot_val' hidden/>
+                          <div class='input-group'>
+                                <input type='text' class='form-control' id='@ebsid@_slot_val' readonly/>
+                                <div class='input-group-btn'>
+                                  <button class='btn btn-primary' type='submit' id='@ebsid@_slot_change'>
+                                    <i class='fa fa-clock-o'></i>
+                                  </button>
+                                </div>
+                        </div>
                         <div class='picker-cont' id='@ebsid@_picker-cont'> </div>
                 </div>"
                 .Replace("@name@", this.Name)
@@ -58,19 +83,72 @@ namespace ExpressBase.Objects
             set => base.DesignHtml4Bot = value;
         }
 
-        public override string GetBareHtml()
+        public override string GetHtml4Bot()
         {
-            string EbCtrlHTML = @"<div id='cont_@ebsid@' ebsid='@ebsid@' name='@name@' class='Eb-ctrlContainer meeting-picker-outer' @childOf@ ctype='@type@'>
+            return GetWrapedCtrlHtml4bot();
+        }
+        public override string GetWrapedCtrlHtml4bot()
+        {
+            string jk = @"<div id='@ebsid@' ebsid='@ebsid@' name='@name@' class='Eb-ctrlContainer meeting-picker-outer eb-meeting-bot' @childOf@ ctype='@type@'>
                         <div class='head-cont' >   <i class='fa fa-calendar' aria-hidden='true'></i>
                         <div>@Label@ </div> </div>
                         <div class='sub-head'>Pick a date</div>
-                        <div class='date-cont'> <div id='@ebsid@_datepicker'></div> </div>
+                        <div class='date-cont'> 
+                        <div class='input-group'>
+                                <input type='text' class='form-control' id='@ebsid@_date' value='@date_val@' readonly/>
+                                <div class='input-group-btn'>
+                                  <button class='btn btn-primary' type='submit' id='@ebsid@_date_change'>
+                                    <i class='fa fa-calendar'></i>
+                                  </button>
+                                </div>
+                        </div>
+                        <div id='@ebsid@_datepicker' hidden></div></div>
                         <div class='sub-head'>Pick a timeslot</div>
-                        <input type='text' id='@ebsid@_slot_val' hidden/>
+                        <input type='text' id='@ebsid@_slot_val' hidden readonly/>
+                          <div class='input-group'>
+                                <input type='text' class='form-control' id='@ebsid@_slot_time' readonly/>
+                                <div class='input-group-btn'>
+                                  <button class='btn btn-primary' type='submit' id='@ebsid@_slot_change'>
+                                    <i class='fa fa-clock-o'></i>
+                                  </button>
+                                </div>
+                        </div>
+                        <div class='picker-cont' id='@ebsid@_picker-cont'> </div>
+                </div>".Replace("@date_val@", DateTime.Today.ToString("yyyy-MM-dd"));
+            return ReplacePropsInHTML(jk);
+        }
+
+        public override string GetBareHtml()
+        {
+            string EbCtrlHTML = @"<div id='@ebsid@' ebsid='@ebsid@' name='@name@' class='Eb-ctrlContainer meeting-picker-outer' @childOf@ ctype='@type@'>
+                        <div class='head-cont' >   <i class='fa fa-calendar' aria-hidden='true'></i>
+                        <div>@Label@ </div> </div>
+                        <div class='sub-head'>Pick a date</div>
+                        <div class='date-cont'> 
+                        <div class='input-group'>
+                                <input type='text' class='form-control' id='@ebsid@_date' value='@date_val@' readonly/>
+                                <div class='input-group-btn'>
+                                  <button class='btn btn-primary' type='submit' id='@ebsid@_date_change'>
+                                    <i class='fa fa-calendar'></i>
+                                  </button>
+                                </div>
+                        </div>
+                        <div id='@ebsid@_datepicker' hidden></div></div>
+                        <div class='sub-head'>Pick a timeslot</div>
+                        <input type='text' ids='@ebsid@_slot_val' hidden/>
+                          <div class='input-group'>
+                                <input type='text' class='form-control' id='@ebsid@_slot_val' readonly/>
+                                <div class='input-group-btn'>
+                                  <button class='btn btn-primary' type='submit' id='@ebsid@_slot_change'>
+                                    <i class='fa fa-clock-o'></i>
+                                  </button>
+                                </div>
+                        </div>
                         <div class='picker-cont' id='@ebsid@_picker-cont'> </div>
                 </div>"
                 .Replace("@name@", this.Name)
                 .Replace("@Label@", this.Label)
+                .Replace("@date_val@", DateTime.Today.ToString("yyyy-MM-dd"))
                 .Replace("@ebsid@", this.EbSid_CtxId);
             return EbCtrlHTML;
         }
@@ -78,7 +156,7 @@ namespace ExpressBase.Objects
 
         public override string GetHtml()
         {
-            string EbCtrlHTML = @"<div id='cont_@ebsid@' ebsid='@ebsid@' name='@name@' class='Eb-ctrlContainer meeting-picker-outer' @childOf@ ctype='@type@'>
+            string EbCtrlHTML = @"<div id='@ebsid@' ebsid='@ebsid@' name='@name@' class='Eb-ctrlContainer meeting-picker-outer' @childOf@ ctype='@type@'>
                         <div class='head-cont' >   <i class='fa fa-calendar' aria-hidden='true'></i>
                         <div>@Label@ </div> </div>
                         <div class='sub-head'>Pick a date</div>
@@ -117,16 +195,34 @@ namespace ExpressBase.Objects
 
         public string GetDesignHtmlHelper()
         {
-            string EbCtrlHTML = @"<div id='cont_@ebsid@' ebsid='@ebsid@' name='@name@' class='Eb-ctrlContainer meeting-picker-outer' @childOf@ ctype='@type@'>
+            string EbCtrlHTML = @"<div id='@ebsid@' ebsid='@ebsid@' name='@name@' class='Eb-ctrlContainer meeting-picker-outer' @childOf@ ctype='@type@'>
                         <div class='head-cont' >   <i class='fa fa-calendar' aria-hidden='true'></i>
                         <div>@Label@ </div> </div>
                         <div class='sub-head'>Pick a date</div>
-                        <div class='date-cont'> <div id='@ebsid@_datepicker'></div> </div>
+                        <div class='date-cont'> 
+                        <div class='input-group'>
+                                <input type='text' class='form-control' id='@ebsid@_date' value='@date_val@' readonly/>
+                                <div class='input-group-btn'>
+                                  <button class='btn btn-primary' type='submit' id='@ebsid@_date_change'>
+                                    <i class='fa fa-calendar'></i>
+                                  </button>
+                                </div>
+                        </div>
+                        <div id='@ebsid@_datepicker' hidden></div></div>
                         <div class='sub-head'>Pick a timeslot</div>
-                        <input type='text' id='@ebsid@_slot_val' hidden/>
+                        <input type='text' ids='@ebsid@_slot_val' hidden/>
+                          <div class='input-group'>
+                                <input type='text' class='form-control' id='@ebsid@_slot_val' readonly/>
+                                <div class='input-group-btn'>
+                                  <button class='btn btn-primary' type='submit' id='@ebsid@_slot_change'>
+                                    <i class='fa fa-clock-o'></i>
+                                  </button>
+                                </div>
+                        </div>
                         <div class='picker-cont' id='@ebsid@_picker-cont'> </div>
                 </div>"
                .Replace("@name@", this.Name)
+               .Replace("@date_val@", DateTime.Today.ToString("yyyy-MM-dd"))
                .Replace("@Label@", this.Label);
             return ReplacePropsInHTML(EbCtrlHTML);
         }
@@ -135,7 +231,7 @@ namespace ExpressBase.Objects
 
         public override string OnChangeBindJSFn { get { return @" debugger; $('#' +  this.EbSid_CtxId +'_slot_val').on('change', p1);"; } set { } }
 
-        public override string SetValueJSfn { get { return @"$('#' + this.EbSid_CtxId +'_slot_val').val(p1).trigger('change');"; } set { } }
+        public override string SetValueJSfn { get { return @" debugger $('#' + this.EbSid_CtxId +'_slot_val').val(p1).trigger('change');"; } set { } }
 
         public override string JustSetValueJSfn { get { return @"$('#' + this.EbSid_CtxId +'_slot_val').val(p1)"; } set { } }
 
