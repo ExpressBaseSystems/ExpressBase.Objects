@@ -229,9 +229,9 @@ namespace ExpressBase.Objects
 
         public override string GetValueFromDOMJSfn { get { return @"return $('#' + this.EbSid_CtxId +'_slot_val').val();"; } set { } }
 
-        public override string OnChangeBindJSFn { get { return @" debugger; $('#' +  this.EbSid_CtxId +'_slot_val').on('change', p1);"; } set { } }
+        public override string OnChangeBindJSFn { get { return @" $('#' +  this.EbSid_CtxId +'_slot_val').on('change', p1);"; } set { } }
 
-        public override string SetValueJSfn { get { return @" debugger $('#' + this.EbSid_CtxId +'_slot_val').val(p1).trigger('change');"; } set { } }
+        public override string SetValueJSfn { get { return @"  $('#' + this.EbSid_CtxId +'_slot_val').val(p1).trigger('change');"; } set { } }
 
         public override string JustSetValueJSfn { get { return @"$('#' + this.EbSid_CtxId +'_slot_val').val(p1)"; } set { } }
 
