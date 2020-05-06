@@ -1726,8 +1726,10 @@ namespace ExpressBase.Objects
 
                     FG_Root globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, this.FormData, this.FormDataBackup);
 
-                    object x = this.ExecuteCSharpScriptNew(currentStage.NextStage.Code, globals);
-                    string nxtStName = Convert.ToString(x);
+                    object stageObj = this.ExecuteCSharpScriptNew(currentStage.NextStage.Code, globals);
+                    string nxtStName = string.Empty;
+                    if (stageObj is FG_Review_Stage)
+                        nxtStName = (stageObj as FG_Review_Stage).name;
 
                     GlobalsGenerator.PostProcessGlobals(this, globals, service);
                     string _reviewStatus = globals.form.review._ReviewStatus;
