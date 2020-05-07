@@ -68,10 +68,7 @@ namespace ExpressBase.Objects.Objects
 
 		public override string GetDesignHtml()
 		{
-			string ratingHtml = @"
-					<div class='ratingDiv_dc' id='@ebsid@' style='width:100%;'>
-						<span class='fa fa-star-o wrd_spacing'></span><span class='fa fa-star-o wrd_spacing'></span><span class='fa fa-star-o wrd_spacing'></span><span class='fa fa-star-o wrd_spacing'></span><span class='fa fa-star-o wrd_spacing'></span>
-					</div>";
+			string ratingHtml = DesignHtml4Bot;
 
 			string _html = HtmlConstants.CONTROL_WRAPER_HTML4WEB
 			  .Replace("@LabelForeColor ", "color:" + (LabelForeColor ?? "@LabelForeColor ") + ";")
@@ -86,9 +83,13 @@ namespace ExpressBase.Objects.Objects
 		public override string DesignHtml4Bot
 		{
 			get => @"
-					<div class='ratingDiv_dc' id='@ebsid@' style='width:100%;'>
-						<span class='fa fa-star-o wrd_spacing'></span><span class='fa fa-star-o wrd_spacing'></span><span class='fa fa-star-o wrd_spacing'></span><span class='fa fa-star-o wrd_spacing'></span><span class='fa fa-star-o wrd_spacing'></span>
-					</div>";
+<div class='ratingDiv_dc' id='@ebsid@' style='width:100%;'>
+	<span class='fa fa-star-o wrd_spacing'></span>
+	<span class='fa fa-star-o wrd_spacing'></span>
+	<span class='fa fa-star-o wrd_spacing'></span>
+	<span class='fa fa-star-o wrd_spacing'></span>
+	<span class='fa fa-star-o wrd_spacing'></span>
+</div>";
 			set => base.DesignHtml4Bot = value;
 		}
 
