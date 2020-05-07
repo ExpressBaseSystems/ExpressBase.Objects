@@ -411,8 +411,8 @@ namespace ExpressBase.Objects
             return @"<div class='eb_stacklayout mob_control dropped' id='@id' eb-type='EbMobileFileUpload' tabindex='1' onclick='$(this).focus()'>
                             <label class='ctrl_label'> @Label </label>
                             <div class='eb_ctrlhtml'>
-                               <button class='eb_mob_fupbtn filesbtn'> Files </button>
-                               <button class='eb_mob_fupbtn camerabtn'> Camera </button>
+                               <button class='eb_mob_fupbtn filesbtn'><i class='fa fa-folder-open-o'></i></button>
+                               <button class='eb_mob_fupbtn camerabtn'><i class='fa fa-camera'></i></button>
                             </div>
                         </div>".RemoveCR().DoubleQuoted();
         }
