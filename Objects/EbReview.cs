@@ -241,26 +241,31 @@ namespace ExpressBase.Objects
         public EbReviewStage() { }
         public string ObjType { get { return this.GetType().Name.Substring(2, this.GetType().Name.Length - 2); } set { } }
 
+        [PropertyGroup("Core")]
+        [PropertyPriority(20)]
         [EnableInBuilder(BuilderType.WebForm)]
         [Unique]
         public string Name { get; set; }
 
+        [PropertyGroup("Behavior")]
+        [PropertyPriority(10)]
         [EnableInBuilder(BuilderType.WebForm)]
+        //MakeReadOnly MakeReadWrite ShowProperty HideProperty
         [OnChangeExec(@"
 if(this.ApproverEntity === 1){
-    pg.MakeReadWrite('ApproverRoles');
-    pg.MakeReadOnly('ApproverUserGroup');
-    pg.MakeReadOnly('ApproverUsers');
+    pg.ShowProperty('ApproverRoles');
+    pg.HideProperty('ApproverUserGroup');
+    pg.HideProperty('ApproverUsers');
 }
 else if(this.ApproverEntity === 2){
-    pg.MakeReadOnly('ApproverRoles');
-    pg.MakeReadWrite('ApproverUserGroup');
-    pg.MakeReadOnly('ApproverUsers');
+    pg.HideProperty('ApproverRoles');
+    pg.ShowProperty('ApproverUserGroup');
+    pg.HideProperty('ApproverUsers');
 }
 else if(this.ApproverEntity === 3){
-    pg.MakeReadOnly('ApproverRoles');
-    pg.MakeReadOnly('ApproverUserGroup');
-    pg.MakeReadWrite('ApproverUsers');
+    pg.HideProperty('ApproverRoles');
+    pg.HideProperty('ApproverUserGroup');
+    pg.ShowProperty('ApproverUsers');
 }")]
         public ApproverEntityTypes ApproverEntity { get; set; }
 
@@ -270,26 +275,36 @@ else if(this.ApproverEntity === 3){
         //[PropertyEditor(PropertyEditorType.DropDown)]
         //public int ApproverRole { get; set; }
 
+        [PropertyGroup("Behavior")]
+        [PropertyPriority(9)]
         [EnableInBuilder(BuilderType.WebForm)]
         [Unique]
         [PropDataSourceJsFn("return ebcontext.Roles")]
         [PropertyEditor(PropertyEditorType.DropDown, true)]
         public List<Int32> ApproverRoles { get; set; }
 
+        [PropertyGroup("Behavior")]
+        [PropertyPriority(7)]
         [EnableInBuilder(BuilderType.WebForm)]
         [PropDataSourceJsFn("return ebcontext.UserGroups")]
         [PropertyEditor(PropertyEditorType.DropDown)]
         public int ApproverUserGroup { get; set; }
 
+        [PropertyGroup("Behavior")]
+        [PropertyPriority(8)]
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.ScriptEditorCS)]//required ScriptEditorSQ
         public EbScript ApproverUsers { get; set; }
 
+        [PropertyGroup("Behavior")]
+        [PropertyPriority(4)]
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.Collection)]
         [ListType(typeof(EbReviewAction))]
         public List<EbReviewAction> StageActions { get; set; }
 
+        [PropertyGroup("Behavior")]
+        [PropertyPriority(3)]
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
         public EbScript NextStage { get; set; }
@@ -298,18 +313,22 @@ else if(this.ApproverEntity === 3){
         [HideInPropertyGrid]
         public Dictionary<string, string> QryParams { get; set; }//<param, table>
 
+        [PropertyGroup("Behavior")]
+        [PropertyPriority(6)]
         [EnableInBuilder(BuilderType.WebForm)]
         public bool IsFormEditable { get; set; }
 
+        [PropertyGroup("Behavior")]
+        [PropertyPriority(5)]
         [EnableInBuilder(BuilderType.WebForm)]
         [OnChangeExec(@"
 if(this.IsAdvanced === true){
-    pg.MakeReadWrite('NextStage');
-    pg.MakeReadWrite('StageActions');
+    pg.ShowProperty('NextStage');
+    pg.ShowProperty('StageActions');
 }
 else{
-    pg.MakeReadOnly('NextStage');
-    pg.MakeReadOnly('StageActions');
+    pg.HideProperty('NextStage');
+    pg.HideProperty('StageActions');
 }")]
         public bool IsAdvanced { get; set; }
     }
@@ -328,6 +347,7 @@ else{
         public EbReviewAction() { }
         public string ObjType { get { return this.GetType().Name.Substring(2, this.GetType().Name.Length - 2); } set { } }
 
+        [PropertyGroup("Core")]
         [EnableInBuilder(BuilderType.WebForm)]
         [Unique]
         public string Name { get; set; }
