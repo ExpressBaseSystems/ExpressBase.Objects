@@ -1726,8 +1726,10 @@ namespace ExpressBase.Objects
 
                     FG_Root globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, this.FormData, this.FormDataBackup);
 
-                    object x = this.ExecuteCSharpScriptNew(currentStage.NextStage.Code, globals);
-                    string nxtStName = Convert.ToString(x);
+                    object stageObj = this.ExecuteCSharpScriptNew(currentStage.NextStage.Code, globals);
+                    string nxtStName = string.Empty;
+                    if (stageObj is FG_Review_Stage)
+                        nxtStName = (stageObj as FG_Review_Stage).name;
 
                     GlobalsGenerator.PostProcessGlobals(this, globals, service);
                     string _reviewStatus = globals.form.review._ReviewStatus;
@@ -1872,7 +1874,7 @@ namespace ExpressBase.Objects
                             secCxtGet = Convert.ToString(this.ExecuteCSharpScriptNew(_c.ContextGetExpr.Code, this.FormGlobals));
                         if (_c.ContextSetExpr != null && !_c.ContextSetExpr.Code.IsNullOrEmpty())
                             secCxtSet = Convert.ToString(this.ExecuteCSharpScriptNew(_c.ContextSetExpr.Code, this.FormGlobals));
-                        _qry = _c.GetUpdateQuery2(DataDB, param, this.FormData.ExtendedTables[_c.Name ?? _c.EbSid], this.TableName, this.RefId.Split("-")[3], ref i, this.TableRowId, secCxtGet, secCxtSet);
+                        _qry += _c.GetUpdateQuery2(DataDB, param, this.FormData.ExtendedTables[_c.Name ?? _c.EbSid], this.TableName, this.RefId.Split("-")[3], ref i, this.TableRowId, secCxtGet, secCxtSet);
                     }
                 }
             }
