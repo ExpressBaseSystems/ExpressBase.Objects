@@ -22,10 +22,22 @@ namespace ExpressBase.Objects
         ButtonType = 1
     }
 
+    public enum SortOrder
+    {
+        Ascending = 0,
+        Descending = 1
+    }
+
     public abstract class EbMobilePageBase : EbObject
     {
 
     }
+
+    public interface ILinesEnabled { }
+
+    public interface INonPersistControl { }
+
+    public interface ILayoutControl { }
 
     [EnableInBuilder(BuilderType.MobilePage)]
     [BuilderTypeEnum(BuilderType.MobilePage)]
