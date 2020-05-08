@@ -307,16 +307,17 @@ namespace ExpressBase.Objects
 		                        eb_meeting_schedule_id, approved_slot_id, type_of_user, eb_del , id)E
 								  ON
  	                     E.approved_slot_id = A.id;
-                          SELECT 
-		             A.id as slot_id , A.eb_meeting_schedule_id,
-			         B.user_id, B.role_id, B.user_group_id,B.participant_type FROM
+                                       SELECT 
+			         B.user_id, B.role_id, B.user_group_id,B.participant_type
+					 FROM
 				        (SELECT 
 						id, eb_meeting_schedule_id FROM  eb_meeting_slots 
-	                     WHERE  eb_del = 'F' and id = {0})A
+	                     WHERE  eb_del = 'F' and id = 1)A
 						LEFT JOIN	 
-							 (SELECT id, user_id, role_id,user_group_id,participant_type 
-							  FROM  eb_meeting_scheduled_participants)B
-							 ON B.id = A.eb_meeting_schedule_id
+							 (SELECT id, user_id, role_id,user_group_id,participant_type,eb_meeting_schedule_id  
+							  FROM  eb_meeting_scheduled_participants )B
+							 ON B.eb_meeting_schedule_id = A.eb_meeting_schedule_id
+							 where participant_type is NOT NULL                                   
                                         ";
             }
         }
@@ -376,6 +377,7 @@ namespace ExpressBase.Objects
                     RoleId = Convert.ToInt32(ds.Tables[0].Rows[k]["role_id"]),
                     UserGroupId = Convert.ToInt32(ds.Tables[0].Rows[k]["user_group_id"]),
                     ParticipantType = Convert.ToInt32(ds.Tables[0].Rows[k]["participant_type"]),
+                    Count = Convert.ToInt32(ds.Tables[0].Rows[k]["count"]),
                 });
             }
 
@@ -384,7 +386,7 @@ namespace ExpressBase.Objects
                 throw new FormException("Unable to continue. Reached maximum attendee limit.", (int)HttpStatusCodes.BAD_REQUEST, $"Max no of attendee : {SlotObj[0].No_Attendee}, Current attendee count : {SlotObj[0].SlotAttendeeCount}", "From EbMeetingPicker.ParameterizeControl()");
 
             string query = string.Empty;
-            if (ScheduledParticipants.Count == 0)
+            if (ScheduledParticipants.Count == 0 )
             {
                 if (SlotObj[0].Is_approved == "T")
                 {
@@ -431,7 +433,8 @@ namespace ExpressBase.Objects
         public int UserType { get; set; }
         public bool IsHide { get; set; }
         public int Attendee_count { get; set; }
-        public int Host_count { get; set; }
+        public int Host_count { get; set; }    
+        public int Duration { get; set; }
 
     }
 
@@ -448,6 +451,7 @@ namespace ExpressBase.Objects
         public int SlotHostCount { get; set; }
         public int SlotAttendeeCount { get; set; }
         public int MeetingId { get; set; }
+        public int Duration { get; set; }
 
     }
     public class GetMeetingSlotsRequest : EbServiceStackAuthRequest, IReturn<GetMeetingSlotsResponse>
@@ -530,6 +534,7 @@ namespace ExpressBase.Objects
         public int RoleId { get; set; }
         public int UserGroupId { get; set; }
         public int ParticipantType { get; set; }
+        public int Count { get; set; }
     }
 
     [DataContract]
