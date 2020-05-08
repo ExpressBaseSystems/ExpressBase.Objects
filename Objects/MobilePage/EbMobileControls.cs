@@ -49,6 +49,10 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         public virtual bool Required { get; set; }
 
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
+        public virtual string Icon { get { return string.Empty; } }
+
         public virtual EbControl GetWebFormCtrl(int counter) { return null; }
     }
 
@@ -75,6 +79,10 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("Behavior")]
         public bool AutoSuggestion { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
+        public override string Icon { get { return "fa-i-cursor"; } }
 
         public override string GetDesignHtml()
         {
@@ -138,6 +146,10 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         public bool IsAggragate { get; set; }
 
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
+        public override string Icon { get { return "fa-i-cursor"; } }
+
         public override string GetDesignHtml()
         {
             return @"<div class='eb_stacklayout mob_control dropped' id='@id' eb-type='EbMobileNumericBox' tabindex='1' onclick='$(this).focus()'>
@@ -192,6 +204,10 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return (EbDbTypes)this.EbDateType; } set { } }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
+        public override string Icon { get { return "fa-calendar"; } }
 
         public override string GetDesignHtml()
         {
@@ -295,6 +311,10 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         public bool IsMultiSelect { get; set; }
 
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
+        public override string Icon { get { return "fa-caret-down"; } }
+
         public override string GetDesignHtml()
         {
             return @"<div class='eb_stacklayout mob_control dropped' id='@id' eb-type='EbMobileSimpleSelect' tabindex='1' onclick='$(this).focus()'>
@@ -384,7 +404,7 @@ namespace ExpressBase.Objects
     }
 
     [EnableInBuilder(BuilderType.MobilePage)]
-    public class EbMobileFileUpload : EbMobileControl
+    public class EbMobileFileUpload : EbMobileControl, INonPersistControl
     {
         public override bool DoNotPersist { get; set; }
         public override bool Unique { get; set; }
@@ -449,6 +469,10 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.BooleanOriginal; } set { } }
 
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
+        public override string Icon { get { return "fa-toggle-on"; } }
+
         public override string GetDesignHtml()
         {
             return @"<div class='eb_stacklayout mob_control dropped' id='@id' eb-type='EbMobileBoolean' tabindex='1' onclick='$(this).focus()'>
@@ -472,7 +496,7 @@ namespace ExpressBase.Objects
     }
 
     [EnableInBuilder(BuilderType.MobilePage)]
-    public class EbMobileTableLayout : EbMobileControl
+    public class EbMobileTableLayout : EbMobileControl, ILayoutControl
     {
         public EbMobileTableLayout()
         {
@@ -547,7 +571,7 @@ namespace ExpressBase.Objects
     }
 
     [EnableInBuilder(BuilderType.MobilePage)]
-    public class EbMobileDataColumn : EbMobileControl
+    public class EbMobileDataColumn : EbMobileControl, INonPersistControl
     {
         public override string Label { set; get; }
 
@@ -584,6 +608,9 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.FontSelector)]
         public EbFont Font { get; set; }
 
+        [EnableInBuilder(BuilderType.MobilePage)]
+        public SortOrder SortOrder { set; get; }
+
         public override bool Hidden { set; get; }
 
         public override string GetDesignHtml()
@@ -605,6 +632,10 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.MobilePage)]
         public bool HideSearchBox { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
+        public override string Icon { get { return "fa-map-marker"; } }
 
         public override string GetDesignHtml()
         {
@@ -634,7 +665,7 @@ namespace ExpressBase.Objects
     }
 
     [EnableInBuilder(BuilderType.MobilePage)]
-    public class EbMobileDataGrid : EbMobileControl
+    public class EbMobileDataGrid : EbMobileControl, ILinesEnabled
     {
         public override bool DoNotPersist { get; set; }
 
@@ -777,6 +808,10 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.String; } set { } }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
+        public override string Icon { get { return "fa-key"; } }
 
         public override string GetDesignHtml()
         {
