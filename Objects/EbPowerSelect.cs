@@ -80,7 +80,7 @@ namespace ExpressBase.Objects
                     else{
                         let val = this.getValueFromDOM();
                         if(this.MultiSelect){
-                            return !(val === '' || val === undefined|| val === null || isNaN(val) || typeof val === 'number');
+                            return !(val === '' || val === undefined|| val === null || typeof val === 'number');
                         }
                         else
                             return Number.isInteger(val);

@@ -174,37 +174,62 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
-        public List<EbMobileDataColumn> Filters { set; get; }
+        public List<EbMobileControl> FilterControls { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
+        public List<EbMobileDataColumn> SortColumns { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("Link Settings")]
         public WebFormDVModes FormMode { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [DefaultPropValue("30")]
+        public int PageLength { set; get; }
+
+        public EbMobileVisualization()
+        {
+            OfflineQuery = new EbScript();
+            DataSourceParams = new List<Param>();
+            FilterControls = new List<EbMobileControl>();
+            SortColumns = new List<EbMobileDataColumn>();
+        }
 
         public override string GetDesignHtml()
         {
             return @"<div class='eb_mob_vis_container mob_container dropped' tabindex='1' eb-type='EbMobileVisualization' id='@id'>
                         <div class='eb_mob_container_inner'>
                             <label class='vis-group-label'>Design</label>
-                            <div class='vis-table-container'>
-
-                            </div>
-                            <label class='vis-group-label'>Filter Columns </label>
-                            <div class='vis-filter-container'>
-
-                            </div>
-                            <label class='vis-group-label'>Preview</label>
-                            <div class='vis-preview-container'>
-
+                            <div class='vis-table-container'></div>
+                            <div class='filter_sort-tab'>
+	                            <ul class='nav nav-tabs eb-styledTab filter_sort-tab-tabhead'>
+		                            <li class='nav-item active'>
+			                            <a class='nav-link' data-toggle='tab' role='tab' href='#filter-tab-@visname@'>
+				                            Filter
+			                            </a>
+		                            </li>
+		                            <li class='nav-item'>
+			                            <a class='nav-link' data-toggle='tab' role='tab' href='#sort-tab-@visname@'>
+				                            Sort
+			                            </a>
+		                            </li>
+	                            </ul>
+	                            <div class='tab-content filter_sort-tab-content'>
+		                            <div id='filter-tab-@visname@' class='tab-pane h-100 active'>
+			                            <div class='vis-filter-container'>
+				
+			                            </div>
+		                            </div>
+		                            <div id='sort-tab-@visname@' class='tab-pane h-100'>
+			                            <div class='vis-sort-container'>
+				
+			                            </div>
+		                            </div>
+	                            </div>
                             </div>
                         </div>
-                    </div>".RemoveCR().DoubleQuoted();
-        }
-
-        public EbMobileVisualization()
-        {
-            OfflineQuery = new EbScript();
-            Filters = new List<EbMobileDataColumn>();
-            DataSourceParams = new List<Param>();
+                    </div>".RemoveCR().DoubleQuoted().Replace("@visname@", Guid.NewGuid().ToString());
         }
     }
 

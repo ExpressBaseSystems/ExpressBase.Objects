@@ -48,7 +48,7 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iTableVisualization)]
         [Alias("Table Visualization")]
-        public string TVRefId { get; set; }
+        public virtual string TVRefId { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
         [DefaultPropValue("400")]
