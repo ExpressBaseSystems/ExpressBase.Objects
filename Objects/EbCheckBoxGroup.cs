@@ -115,7 +115,7 @@ namespace ExpressBase.Objects
 
         public override string GetBareHtml()
         {
-            string html = "<div id='@EbSid@' name='@name@'>".Replace("@EbSid@", (this.EbSid != null) ? this.EbSid : "@EbSid@");
+            string html = "<div id='@EbSid@' class='list-ctrl-box' name='@name@'>".Replace("@EbSid@", (this.EbSid != null) ? this.EbSid : "@EbSid@");
             foreach (EbCheckBox ec in this.CheckBoxes)
             {
                 ec.GName = this.EbSid_CtxId;

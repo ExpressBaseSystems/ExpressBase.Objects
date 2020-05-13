@@ -181,7 +181,7 @@ else {
         {
             string html = @"
         <div class='input-group' style='width:100%;'>
-            <span class='input-group-addon'> @attachedLbl@ </span>
+             @attachedLbl@
             <input type='text' data-ebtype='@datetype@' class='numinput' ui-inp id='@ebsid@' name='@name@' @max@ @min@ value='@value@' @placeHolder autocomplete = '@autoComplete@' data-toggle='tooltip' title='@toolTipText@' style=' width:100%; @backColor@ @foreColor@ @fontStyle@ display:inline-block; @readOnlyString@ @required@ @tabIndex@ />
         </div>"
 .Replace("@name@", this.Name)
