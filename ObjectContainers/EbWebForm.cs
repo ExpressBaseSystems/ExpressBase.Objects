@@ -1250,7 +1250,7 @@ namespace ExpressBase.Objects
                                 }
                             }
                         };
-                    _FormData.ExtendedTables.Add(Ctrl.EbSid, _Table);//fup
+                    _FormData.ExtendedTables.Add(Ctrl.Name ?? Ctrl.EbSid, _Table);//fup
                 }
             }
 
