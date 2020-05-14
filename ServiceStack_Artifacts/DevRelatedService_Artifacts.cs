@@ -209,7 +209,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int ResStatus { get; set; }
     }
 
-    public class UniqueApplicationNameCheckRequest : EbServiceStackAuthRequest, IReturn<UniqueObjectNameCheckResponse>
+	public class UniqueApplicationNameCheckRequest : EbServiceStackAuthRequest, IReturn<UniqueObjectNameCheckResponse>
     {
         public string AppName { get; set; }
     }

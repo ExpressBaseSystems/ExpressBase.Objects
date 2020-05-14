@@ -184,6 +184,18 @@ namespace ExpressBase.Objects
         [PropertyGroup("Link Settings")]
         public WebFormDVModes FormMode { set; get; }
 
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [DefaultPropValue("30")]
+        public int PageLength { set; get; }
+
+        public EbMobileVisualization()
+        {
+            OfflineQuery = new EbScript();
+            DataSourceParams = new List<Param>();
+            FilterControls = new List<EbMobileControl>();
+            SortColumns = new List<EbMobileDataColumn>();
+        }
+
         public override string GetDesignHtml()
         {
             return @"<div class='eb_mob_vis_container mob_container dropped' tabindex='1' eb-type='EbMobileVisualization' id='@id'>
@@ -218,14 +230,6 @@ namespace ExpressBase.Objects
                             </div>
                         </div>
                     </div>".RemoveCR().DoubleQuoted().Replace("@visname@", Guid.NewGuid().ToString());
-        }
-
-        public EbMobileVisualization()
-        {
-            OfflineQuery = new EbScript();
-            DataSourceParams = new List<Param>();
-            FilterControls = new List<EbMobileControl>();
-            SortColumns = new List<EbMobileDataColumn>();
         }
     }
 

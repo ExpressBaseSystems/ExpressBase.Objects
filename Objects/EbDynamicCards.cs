@@ -10,6 +10,7 @@ using ServiceStack;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using System.Text;
 
 namespace ExpressBase.Objects
 {
@@ -562,11 +563,34 @@ namespace ExpressBase.Objects
     [Alias("Html")]
     public class EbCardHtmlField : EbCardField
     {
-        [EnableInBuilder(BuilderType.BotForm, BuilderType.WebForm)]
+
+		private string _FieldValue { get; set; }
+
+
+		[EnableInBuilder(BuilderType.BotForm, BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.String64)]
         [Alias("ContentHTML")]
 		[MetaOnly]
-		public override object FieldValue { get; set; }
+		public override object FieldValue {
+			get {
+				if (_FieldValue == null)
+					return null;
+
+				Span<byte> buffer = new Span<byte>(new byte[_FieldValue.Length]);
+				bool isBase64 =  Convert.TryFromBase64String(_FieldValue, buffer, out int bytesParsed);
+				if (isBase64)
+				{
+					byte[] data = Convert.FromBase64String(_FieldValue);
+					string decodedString = Encoding.UTF8.GetString(data);
+					return decodedString;
+				}
+				else
+					return _FieldValue;
+			}
+			set { 
+				_FieldValue = (string)value; 
+			} 
+		}
 
 		[HideInPropertyGrid]
 		public override string Label { get; set; }

@@ -55,10 +55,10 @@ namespace ExpressBase.Objects
         public void FetchParamsMeta(IServiceClient ServiceClient)
         {
             EbObjectParticularVersionResponse result1 = ServiceClient.Get<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = TVRefId });
-            EbTableVisualization TvObj = EbSerializers.Json_Deserialize<EbTableVisualization>(result1.Data[0].Json);
-            if (string.IsNullOrEmpty(TvObj.DataSourceRefId))
+            EbChartVisualization ChartVisualization = EbSerializers.Json_Deserialize<EbChartVisualization>(result1.Data[0].Json);
+            if (string.IsNullOrEmpty(ChartVisualization.DataSourceRefId))
                 throw new FormException($"Missing Data Reader of Chart control view that is connected to {this.Label}.");
-            EbObjectParticularVersionResponse result2 = ServiceClient.Get<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = TvObj.DataSourceRefId });
+            EbObjectParticularVersionResponse result2 = ServiceClient.Get<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = ChartVisualization.DataSourceRefId });
             EbDataReader DrObj = EbSerializers.Json_Deserialize<EbDataReader>(result2.Data[0].Json);
             this.ParamsList = DrObj.InputParams;
         }

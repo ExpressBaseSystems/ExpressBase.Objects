@@ -350,4 +350,30 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public EbBotSettings Settings { get; set; }
     }
 
+	[DataContract]
+	public class RedisBotSettingsRequest : EbServiceStackNoAuthRequest, IReturn<RedisBotSettingsResponse>
+	{
+		[DataMember(Order = 1)]
+		public int AppId { get; set; }
+
+		[DataMember(Order = 2)]
+		public int AppType { get; set; }
+
+		[DataMember(Order = 3)]
+		public string SolnId { get; set; }
+
+
+	}
+
+	[DataContract]
+	public class RedisBotSettingsResponse
+	{
+		[DataMember(Order = 1)]
+		public int ResStatus { get; set; } = 0;
+
+		[DataMember(Order = 2)]
+		public string Settings { get; set; }
+	}
+
+
 }
