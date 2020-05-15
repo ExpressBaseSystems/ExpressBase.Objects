@@ -123,5 +123,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string DateInString { get; set; }
 
         public string ActionType { get; set; }
+
+        public int MyActionId { get; set; }
+
     }
 }

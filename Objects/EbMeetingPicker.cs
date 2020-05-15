@@ -120,7 +120,7 @@ namespace ExpressBase.Objects
 
         public override string GetBareHtml()
         {
-            string EbCtrlHTML = @"<div id='@ebsid@' ebsid='@ebsid@' name='@name@' class='Eb-ctrlContainer meeting-picker-outer' @childOf@ ctype='@type@'>
+            string EbCtrlHTML = @"<div id='cont_@ebsid@' ebsid='@ebsid@' name='@name@' class='Eb-ctrlContainer meeting-picker-outer' @childOf@ ctype='@type@'>
                         <div class='head-cont' >   <i class='fa fa-calendar' aria-hidden='true'></i>
                         <div>@Label@ </div> </div>
                         <div class='sub-head'>Pick a date</div>
@@ -156,7 +156,7 @@ namespace ExpressBase.Objects
 
         public override string GetHtml()
         {
-            string EbCtrlHTML = @"<div id='@ebsid@' ebsid='@ebsid@' name='@name@' class='Eb-ctrlContainer meeting-picker-outer' @childOf@ ctype='@type@'>
+            string EbCtrlHTML = @"<div id='cont_@ebsid@' ebsid='@ebsid@' name='@name@' class='Eb-ctrlContainer meeting-picker-outer' @childOf@ ctype='@type@'>
                         <div class='head-cont' >   <i class='fa fa-calendar' aria-hidden='true'></i>
                         <div>@Label@ </div> </div>
                         <div class='sub-head'>Pick a date</div>
@@ -312,7 +312,7 @@ namespace ExpressBase.Objects
 					 FROM
 				        (SELECT 
 						id, eb_meeting_schedule_id FROM  eb_meeting_slots 
-	                     WHERE  eb_del = 'F' and id = 1)A
+	                     WHERE  eb_del = 'F' and id = {0})A
 						LEFT JOIN	 
 							 (SELECT id, user_id, role_id,user_group_id,participant_type,eb_meeting_schedule_id  
 							  FROM  eb_meeting_scheduled_participants )B
@@ -370,14 +370,10 @@ namespace ExpressBase.Objects
             {
                 ScheduledParticipants.Add(new ScheduledParticipants()
                 {
-                    Id = Convert.ToInt32(ds.Tables[0].Rows[k]["id"]),
-                    SlotId = Convert.ToInt32(ds.Tables[0].Rows[k]["slot_id"]),
-                    ScheduleId = Convert.ToInt32(ds.Tables[0].Rows[k]["eb_meeting_schedule_id"]),
-                    UserId = Convert.ToInt32(ds.Tables[0].Rows[k]["user_id"]),
-                    RoleId = Convert.ToInt32(ds.Tables[0].Rows[k]["role_id"]),
-                    UserGroupId = Convert.ToInt32(ds.Tables[0].Rows[k]["user_group_id"]),
-                    ParticipantType = Convert.ToInt32(ds.Tables[0].Rows[k]["participant_type"]),
-                    Count = Convert.ToInt32(ds.Tables[0].Rows[k]["count"]),
+                    UserId = Convert.ToInt32(ds.Tables[1].Rows[k]["user_id"]),
+                    RoleId = Convert.ToInt32(ds.Tables[1].Rows[k]["role_id"]),
+                    UserGroupId = Convert.ToInt32(ds.Tables[1].Rows[k]["user_group_id"]),
+                    ParticipantType = Convert.ToInt32(ds.Tables[1].Rows[k]["participant_type"]),
                 });
             }
 
@@ -411,7 +407,15 @@ namespace ExpressBase.Objects
             }
             else
             {
-
+                query = $@"insert into eb_meeting_slot_participants(user_id, confirmation, eb_meeting_schedule_id, approved_slot_id, name, email, type_of_user, participant_type) 
+                            values ({usr.UserId}, 1, {SlotObj[0].Meeting_schedule_id}, {ApprovedSlotId}, '{usr.FullName}', '{usr.Email}', 1, 2);      
+                        ";
+                for(i=0;i< ScheduledParticipants.Count; i++)
+                {
+                    query += $@"insert into eb_my_actions (user_ids,usergroup_id,role_ids,from_datetime,form_ref_id,form_data_id,description,my_action_type , eb_meeting_slots_id)
+                        values('{ScheduledParticipants[i].UserId}',{ScheduledParticipants[i].UserGroupId},'{ScheduledParticipants[i].RoleId}',
+                        NOW(),@refid, eb_currval('{tbl}_id_seq'), 'Meeting Request','{MyActionTypes.Meeting}',{ApprovedSlotId});";
+                }
             }
             _extqry += query;
             return true;

@@ -147,15 +147,17 @@ namespace ExpressBase.Objects.WebFormRelated
                             new EbReviewAction(){ EbSid = stage.Name + "_ebreviewaction2", Name = "Accepted"},
                             new EbReviewAction(){ EbSid = stage.Name + "_ebreviewaction3", Name = "Rejected"}
                         };
-                        string nxtStage = ebReviewCtrl.FormStages.Count == i + 1 ? "form.review.complete()" : $@"return form.review.stages[""{ebReviewCtrl.FormStages[i + 1].Name}""]";
+                        string nxtStage = ebReviewCtrl.FormStages.Count == i + 1 ? $"form.review.complete(); \n\tsystem.sendNotificationByUserId(form.eb_created_by, \"Accepted your request for '{_this.DisplayName}'\")" : $@"return form.review.stages[""{ebReviewCtrl.FormStages[i + 1].Name}""]";
 
                         string code = $@"
 if (form.review.currentStage.currentAction.name == ""On Hold"")
     return form.review.stages[""{stage.Name}""];
 if (form.review.currentStage.currentAction.name == ""Accepted"")
     {nxtStage};
-if (form.review.currentStage.currentAction.name == ""Rejected"")
+if (form.review.currentStage.currentAction.name == ""Rejected""){{
     form.review.abandon();
+    system.sendNotificationByUserId(form.eb_created_by, ""Rejected your request for '{_this.DisplayName}'"");
+}}
 ";
                         stage.NextStage = new EbScript() { Lang = ScriptingLanguage.CSharp, Code = code };
                     }

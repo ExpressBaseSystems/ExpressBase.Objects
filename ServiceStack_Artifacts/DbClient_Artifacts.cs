@@ -22,6 +22,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public bool IsAdminOwn { get; set; }
         [DataMember(Order = 4)]
         public string ClientSolnid  { get; set; }
+        
+        [DataMember(Order = 5)]
+        public Boolean SupportLogin  { get; set; }
     }
 
     [DataContract]
@@ -177,11 +180,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class EbDbExplorerTablesDict
     {
         public Dictionary<string, EbDbExplorerTable> TableCollection { set; get; }
+        public List<EbDbExplorerFunctions> FunctionCollection { set; get; }
 
         public EbDbExplorerTablesDict()
         {
             this.TableCollection = new Dictionary<string, EbDbExplorerTable>();
-        }
+            this.FunctionCollection = new List<EbDbExplorerFunctions>();
+        }        
     }
 
     public class EbDbExplorerColumn
@@ -197,6 +202,15 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 4)]
         public string ColumnTable { get; set; }
+    }
+    
+    public class EbDbExplorerFunctions
+    {
+        [DataMember(Order = 1)]
+        public string FunctionName { get; set; }
+
+        [DataMember(Order = 2)]
+        public string FunctionQuery { get; set; }
     }
 
     //public class MyColumnCollection: List<MyColumn>

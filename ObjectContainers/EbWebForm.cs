@@ -770,7 +770,7 @@ namespace ExpressBase.Objects
 
         public void GetFormattedData(EbDataTable dataTable, SingleTable Table, TableSchema _table = null)
         {
-            //master table eb columns : eb_loc_id, eb_ver_id, eb_lock, eb_push_id, eb_src_id, id
+            //master table eb columns : eb_loc_id, eb_ver_id, eb_lock, eb_push_id, eb_src_id, eb_created_by, id
             //normal table eb columns : eb_loc_id, id
             //grid table eb columns   : eb_loc_id, id, eb_row_num
 
@@ -789,9 +789,10 @@ namespace ExpressBase.Objects
                             this.FormData.IsLocked = dataRow[i++].ToString().Equals("T");
                             this.FormData.DataPushId = dataRow[i++].ToString();
                             this.FormData.SourceId = Convert.ToInt32(dataRow[i++]);
+                            this.FormData.CreatedBy = Convert.ToInt32(dataRow[i++]);
                         }
                         else
-                            i += 4;
+                            i += 5;
                     }
                     _rowId = Convert.ToInt32(dataRow[i]);
                     for (; j < Table.Count; j++)
@@ -1523,6 +1524,7 @@ namespace ExpressBase.Objects
                     }
                 }
                 param.Add(DataDB.GetNewParameter(WebForm.TableName + FormConstants._eb_ver_id, EbDbTypes.Int32, WebForm.RefId.Split(CharConstants.DASH)[4]));
+                param.Add(DataDB.GetNewParameter("refid", EbDbTypes.String, WebForm.RefId));
             }
 
             fullqry += _extqry;
