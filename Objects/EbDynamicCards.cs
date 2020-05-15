@@ -240,7 +240,10 @@ namespace ExpressBase.Objects
                         html += cardField.GetBareHtml();
                     }
 
-                    html += "<div class='card-btn-cont' style='@BtnDisplay@'><button id='' class='btn btn-default'  data-toggle='tooltip' title='' style='width:100%;'>Select</button></div></div>".Replace("@BtnDisplay@", this.MultiSelect ? "" : "display:none !important;");
+                    html += "<div class='card-selbtn-cont' style='@BtnDisplay@'>" +
+                                "<button id='' class='btn btn-default btn-sm'  data-toggle='tooltip' title=''>Select</button>" +
+                            "</div>" +
+                        "</div>".Replace("@BtnDisplay@", this.MultiSelect ? "" : "display:none !important;");
                 }
             }
             html += @"	</div>@SummarizeHtml@  <div class='cards-btn-cont' style='margin-top: 20px;'> <button id='' class='btn btn-default ctrl-submit-btn'  data-toggle='tooltip' title=''> @ButtonText@ </button> </div> </div>
@@ -350,7 +353,7 @@ namespace ExpressBase.Objects
 	<div class='cards-cont'>
 		<div class='card-cont' style='width: 100%;'>			
 			@fieldHtml@
-			<div class='card-btn-cont'><button class='btn btn-default' style='width:100%;' disabled>Select</button></div>
+			<div class='card-selbtn-cont'><button class='btn btn-default' disabled>Select</button></div>
 		</div>		
 	</div>
 	<div class='card-summary-cont' style='background-color: #eee;'><div style='font-size: 15px; padding:22px 5px 8px 5px; text-align:center;'><b> @Summary@ </b></div>
@@ -378,7 +381,7 @@ namespace ExpressBase.Objects
         {
             return @"`<div id=@id class='Eb-ctrlContainer'><div class='cards-cont'>
 						<div class='card-cont' style='width: 100%; min-height: 100px; box-shadow: 0px 0px 20px #ccc; border-radius: 1.3em;'>
-							<div class='card-btn-cont'><button class='btn btn-default' style='width:100%;' disabled>Select</button></div>
+							<div class='card-selbtn-cont'><button class='btn btn-default' disabled>Select</button></div>
 						</div>
 						<div class='card-summary-cont' style='box-shadow: 0px 0px 20px #ccc; border-radius: 0; margin: 20px -4px 0 6px;'><div style='font-size: 15px; padding:5px 5px 0px 5px; text-align:center;'><b> Summary </b></div>
 							<table class='table card-summary-table'>
@@ -410,7 +413,7 @@ namespace ExpressBase.Objects
         //{
         //	return @"`<div id=@id class='Eb-ctrlContainer'><div class='cards-cont'>
         //				<div class='card-cont' style='width: 100%; min-height: 100px; box-shadow: 0px 0px 20px #ccc; border-radius: 1.3em;'>
-        //					<div class='card-btn-cont'><button class='btn btn-default' style='width:100%;' disabled>Select</button></div>
+        //					<div class='card-selbtn-cont'><button class='btn btn-default' style='width:100%;' disabled>Select</button></div>
         //				</div>
         //				<div class='card-summary-cont' style='box-shadow: 0px 0px 20px #ccc; border-radius: 0; margin: 20px -4px 0 6px;'><div style='font-size: 15px; padding:5px 5px 0px 5px; text-align:center;'><b> Summary </b></div>
         //					<table class='table card-summary-table'>
@@ -457,7 +460,7 @@ namespace ExpressBase.Objects
                 //{
                 //    html += CardField.GetBareHtml();
                 //}
-                html += "<div class='card-btn-cont'>" + " <button id='' class='btn btn-default'  data-toggle='tooltip' title='' style='width:100%;'>Select</button>" + "</div></div>";
+                html += "<div class='card-selbtn-cont'>" + " <button id='' class='btn btn-default'  data-toggle='tooltip' title=''>Select</button>" + "</div></div>";
                 return html;
             }
             return string.Empty;
@@ -712,13 +715,13 @@ namespace ExpressBase.Objects
         public override string GetDesignHtml()
         {
             return @"`<div class='card-numeric-cont data-@Name@' style='@display@' data-value='@Value@'>
-						<div style='display: inline-block; width: 38%;'> <b> &nbsp&nbsp Numeric Field </b> </div> 
-						<div style='display: inline-block; width: 58%;'>
+						<div style='display: inline-block; width: 38%;'> <span class='card-inp-title'>Numeric Field </span> </div> 
+						<div class='inp-wrap'>
 							<button style='padding: 0px; border: none; background-color: transparent; font-size: 14px;' disabled>
 								<i class='fa fa-minus' aria-hidden='true' style=' padding: 5px; color: darkblue;'></i>
 							</button>
-							<div style='display:inline-block; border: 1px solid #eee;'>
-								<input class='removeArrows' type='number' style='text-align: center; border: none; background: transparent; width: 120px;' value='12345' readonly>
+							<div class='cart-inp-wraper'>
+								<input class='cart-inp' type='number' readonly>
 							</div>
 							<button style='padding: 0px; border: none; background-color: transparent; font-size: 14px;' disabled>
 								<i class='fa fa-plus' aria-hidden='true' style=' padding: 5px; color: darkblue;'></i>
@@ -744,19 +747,13 @@ namespace ExpressBase.Objects
                 tempvar = this.FieldValue;
             //Console.WriteLine(this.FieldValue.ToString() + "----" + this.FieldValue.GetType().ToString());
             return @"<div class='card-numeric-cont data-@Name@' style='@display@' data-value='@Value@'>
-						<div style='display: inline-block; width: 38%;'> <b> &nbsp &nbsp @Label@ </b> </div> 
-						<div style='display: inline-block; width: 58%;'>
-							<button style='@PlusMinusDisplay@ padding: 0px; border: none; background-color: transparent; font-size: 14px;' 
-										onclick='	var num = parseFloat($($(event.target).parent().next().children()[0]).val());
-													if(num > @MinValue@){
-														$($(event.target).parent().next().children()[0]).val(num - 1);
-														$(event.target).parents(&quot;.card-numeric-cont&quot;).attr(&quot;data-value&quot;, num - 1);
-													}
-							'>
-								<i class='fa fa-minus' aria-hidden='true' style=' padding: 5px; color: darkblue;'></i>
+						<div style='display: inline-block; width: 38%;'> <span class='card-inp-title'> @Label@ </span> </div> 
+						<div class='inp-wrap'>
+							<button limit='@MinValue@' class='card-pls-mns mns'>
+								<i class='fa fa-minus' aria-hidden='true'></i>
 							</button>
-							<div style='display:inline-block; @DivBorder@'>
-								<input class='removeArrows' type='number' style='text-align: center; border: none; background: transparent; min-width: 90px;' value='@Value@' min='@MinValue@' max='@MaxValue@' @ReadOnly@  
+							<div class='cart-inp-wraper'>
+								<input class='cart-inp' type='number' value='@Value@' min='@MinValue@' max='@MaxValue@' @ReadOnly@  
 										onchange='	var mn=parseFloat($(event.target).attr(&quot;min&quot;));
 													var mx=parseFloat($(event.target).attr(&quot;max&quot;));
 													var va=parseFloat($(event.target).val());
@@ -767,14 +764,8 @@ namespace ExpressBase.Objects
 														$(event.target).val($(event.target).parents(&quot;.card-numeric-cont&quot;).attr(&quot;data-value&quot;));
 								'>
 							</div>
-							<button style='@PlusMinusDisplay@ padding: 0px; border: none; background-color: transparent; font-size: 14px;' 
-										onclick='	var num = parseFloat($($(event.target).parent().prev().children()[0]).val());
-													if(num < @MaxValue@) {
-														$($(event.target).parent().prev().children()[0]).val(num + 1);
-														$(event.target).parents(&quot;.card-numeric-cont&quot;).attr(&quot;data-value&quot;, num + 1);
-													}
-							'>
-								<i class='fa fa-plus' aria-hidden='true' style=' padding: 5px; color: darkblue;'></i>
+							<button limit='@MaxValue@' class='card-pls-mns pls'>
+								<i class='fa fa-plus' aria-hidden='true'></i>
 							</button>
 						</div>
 					</div>"
@@ -783,7 +774,6 @@ namespace ExpressBase.Objects
                         .Replace("@Label@", this.Label.IsNullOrEmpty() ? this.Name : this.Label)
                         .Replace("@ReadOnly@", this.ReadOnly ? "readonly" : "")
                         .Replace("@PlusMinusDisplay@", this.ReadOnly ? "visibility: hidden;" : "display:inline-block;")
-                        .Replace("@DivBorder@", this.ReadOnly ? "" : "border: 1px solid #eee;")
                         .Replace("@MinValue@", this.MinimumValue.ToString())
                         .Replace("@MaxValue@", this.MaximumValue.ToString());
         }
@@ -832,9 +822,9 @@ namespace ExpressBase.Objects
         {
             return @"`<div class='card-text-cont'>
 						<div style='display: inline-block; width: 38%;'> 
-							<b>&nbsp&nbsp Text Field </b>  
+							<span class='card-inp-title'>Text Field </span>  
 						</div>
-						<div style='display: inline-block; width: 58%;'>
+						<div class='inp-wrap'>
 							<input type='text' value='@Text@' style='text-align: center;' readonly> 
 						</div>
 					</div>`";
@@ -844,10 +834,10 @@ namespace ExpressBase.Objects
         {
             return @"<div class='card-text-cont data-@Name@' style='@display@'>
 						<div style='display: inline-block; width: 38%;'> 
-							<b>&nbsp&nbsp @Label@ </b>  
+							<span class='card-inp-title'>@Label@ </span>  
 						</div>
-						<div style='display: inline-block; width: 58%;'>
-							<input type='text' value='@Text@' style='text-align: center; width: 100%;' @ReadOnly@> 
+						<div class='card-txt-wraper inp-wrap'>
+							<input class='card-txt' type='text' value='@Text@' @ReadOnly@> 
 						</div>
 					</div>"
                     .Replace("@Text@", (this.FieldValue == null) ? "" : this.FieldValue.ToString())
@@ -965,13 +955,13 @@ namespace ExpressBase.Objects
         public const string contenthtml = @"<div class='card-contenthtml-cont' style='padding:5px; text-align: center; width: 100%; min-height: 50px;'> HTML Content </div>";
 
         public const string numeric = @"<div class='card-numeric-cont data-@Name@' style='@display@' data-value='@Value@'>
-			<div style='display: inline-block; width: 38%;'> <b> &nbsp&nbsp Numeric Field </b> </div> 
-			<div style='display: inline-block; width: 58%;'>
+			<div style='display: inline-block; width: 38%;'> <span class='card-inp-title'>Numeric Field </span> </div> 
+			<div class='inp-wrap'>
 				<button style='padding: 0px; border: none; background-color: transparent; font-size: 14px;' disabled>
 					<i class='fa fa-minus' aria-hidden='true' style=' padding: 5px; color: darkblue;'></i>
 				</button>
-				<div style='display:inline-block; border: 1px solid #eee;'>
-					<input class='removeArrows' type='number' style='text-align: center; border: none; background: transparent; width: 120px;' value='12345' readonly>
+				<div class='cart-inp-wraper'>
+					<input class='cart-inp' type='number' style='text-align: center; border: none; background: transparent; width: 120px;' value='12345' readonly>
 				</div>
 				<button style='padding: 0px; border: none; background-color: transparent; font-size: 14px;' disabled>
 					<i class='fa fa-plus' aria-hidden='true' style=' padding: 5px; color: darkblue;'></i>
@@ -981,9 +971,9 @@ namespace ExpressBase.Objects
 
         public const string text = @"<div class='card-text-cont'>
 			<div style='display: inline-block; width: 38%;'> 
-				<b>&nbsp&nbsp Text Field </b>  
+				<span class='card-inp-title'>Text Field </span>  
 			</div>
-			<div style='display: inline-block; width: 58%;'>
+			<div class='inp-wrap'>
 				<input type='text' value='@Text@' style='text-align: center;' readonly> 
 			</div>
 		</div>";
