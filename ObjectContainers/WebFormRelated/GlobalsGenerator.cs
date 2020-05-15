@@ -192,6 +192,7 @@ namespace ExpressBase.Objects.WebFormRelated
             FG_User fG_User = new FG_User(_this.UserObj.UserId, _this.UserObj.FullName, _this.UserObj.Email, _this.UserObj.Roles);
             FG_System fG_System = new FG_System();
             FG_WebForm fG_WebForm = new FG_WebForm() { id = _this.TableRowId, eb_loc_id = _this.LocationId, eb_ref_id = _this.RefId };
+            fG_WebForm.eb_created_by = _this.TableRowId <= 0 ? _this.UserObj.UserId : _formdata.CreatedBy;            
             GetCSharpFormGlobalsRec_NEW(fG_WebForm, _this, _formdata, _formdataBkUp);
             int mode = _this.ExeDataPusher ? 1 : 2;
             return new FG_Root(fG_WebForm, fG_User, fG_System, mode);

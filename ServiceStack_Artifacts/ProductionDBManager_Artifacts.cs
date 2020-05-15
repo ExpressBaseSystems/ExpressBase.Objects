@@ -191,4 +191,19 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public string ErrorMessage { get; set; }
     }
+
+    public class LastSolnAccessRequest : IEbTenentRequest, IReturn<LastSolnAccessResponse>
+    {
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
+
+    }
+    public class LastSolnAccessResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        public string LastDbAccess { get; set; }
+    }
 }
