@@ -1523,6 +1523,7 @@ namespace ExpressBase.Objects
                     }
                 }
                 param.Add(DataDB.GetNewParameter(WebForm.TableName + FormConstants._eb_ver_id, EbDbTypes.Int32, WebForm.RefId.Split(CharConstants.DASH)[4]));
+                param.Add(DataDB.GetNewParameter("refid", EbDbTypes.String, WebForm.RefId));
             }
 
             fullqry += _extqry;
