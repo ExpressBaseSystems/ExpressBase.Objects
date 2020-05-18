@@ -328,7 +328,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 3)]
         public string icon { get; set; }
 
-        [DataMember(Order = 4)]
+		[DataMember(Order = 4)]
+        public string Description { get; set; }
+
+        [DataMember(Order = 5)]
         public EbBotSettings botsettings { get; set; }
     }
 
