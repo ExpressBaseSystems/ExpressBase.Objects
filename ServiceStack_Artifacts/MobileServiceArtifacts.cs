@@ -27,7 +27,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     }
 
-    public class ValidateSidResponse 
+    public class ValidateSidResponse
     {
         public bool IsValid { set; get; }
 
@@ -120,6 +120,18 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Description { set; get; }
     }
 
+    public class SortColumn
+    {
+        public string Name { set; get; }
+
+        public SortOrder Order { set; get; }
+
+        public string GetString()
+        {
+            return Order == SortOrder.Ascending ? "ASC" : "DESC";
+        }
+    }
+
     //objects to mobile
     public class GetMobilePagesRequest : EbServiceStackAuthRequest, IReturn<GetMobilePagesResponse>
     {
@@ -161,17 +173,21 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public List<Param> Params { get; set; }
 
         [DataMember(Order = 3)]
-        public int Limit { set; get; }
+        public List<SortColumn> SortOrder { set; get; }
 
         [DataMember(Order = 4)]
-        public int Offset { set; get; }
+        public int Limit { set; get; }
 
         [DataMember(Order = 5)]
+        public int Offset { set; get; }
+
+        [DataMember(Order = 6)]
         public bool IsPowerSelect { set; get; }
 
         public GetMobileVisDataRequest()
         {
             Params = new List<Param>();
+            SortOrder = new List<SortColumn>();
         }
     }
 

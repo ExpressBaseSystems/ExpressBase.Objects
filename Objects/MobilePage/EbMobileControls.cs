@@ -608,9 +608,6 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.FontSelector)]
         public EbFont Font { get; set; }
 
-        [EnableInBuilder(BuilderType.MobilePage)]
-        public SortOrder SortOrder { set; get; }
-
         public override bool Hidden { set; get; }
 
         public override string GetDesignHtml()
