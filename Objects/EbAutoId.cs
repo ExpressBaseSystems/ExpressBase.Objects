@@ -87,7 +87,7 @@ namespace ExpressBase.Objects
         {
             string WraperHtml = @"
         <div id='cont_@ebsid@' ebsid='@ebsid@' name='@name@' class='Eb-ctrlContainer' @childOf@ ctype='@type@' eb-hidden='@isHidden@'>            
-            <span class='eb-ctrl-label' ui-label id='@ebsidLbl' style='font-weight: bold;'>@Label@ </span> @req@ 
+            <span class='eb-ctrl-label' ui-label id='@ebsidLbl' style='font-weight: 500;'>@Label@ </span> @req@ 
                 <div  id='@ebsid@Wraper' class='ctrl-cover'>
                     @barehtml@
                 </div>
@@ -130,7 +130,7 @@ namespace ExpressBase.Objects
             return @"
             <div class='input-group' style='width:100%;'>
                 <span class='input-group-addon' style='@BackColor@ font-size: 18px; color: #aaa;'> <i class='fa fa-key' aria-hidden='true'></i> </span>
-                <input id='@ebsid@' data-ebtype='@data-ebtype@'  data-toggle='tooltip' title='@toolTipText@' class='date' type='text' name='@name@' autocomplete = 'off' @value@ @tabIndex@ style='font-weight: bold; width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@ @readOnlyString@ @required@ @placeHolder@ disabled />
+                <input id='@ebsid@' data-ebtype='@data-ebtype@'  data-toggle='tooltip' title='@toolTipText@' class='date' type='text' name='@name@' autocomplete = 'off' @value@ @tabIndex@ style='font-weight: 500; width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@ @readOnlyString@ @required@ @placeHolder@ disabled />
             </div>
             "
 .Replace("@name@", (this.Name != null ? this.Name.Trim() : ""))
