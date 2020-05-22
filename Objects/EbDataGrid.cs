@@ -285,7 +285,7 @@ namespace ExpressBase.Objects
                         .Replace("@req@", (col.Required ? "<sup style='color: red'>*</sup>" : string.Empty))
                         .Replace("@ebsid@", col.IsRenderMode && col.IsDynamicTabChild ? "@" + col.EbSid_CtxId + "_ebsid@" : col.EbSid)
                         .Replace("@name@", col.Name)
-                        .Replace("@Width@", (col.Width <= 0) ? "auto" : col.Width.ToString() + "%")
+                        .Replace("@Width@", (col.Width <= 0 || (Controls[Controls.Count-1] == col)) ? "auto" : col.Width.ToString() + "%")
                         .Replace("@type@", "type = '" + col.ObjType + "'")
                         .Replace("@bg@", col.IsDisable ? "background-color:#fafafa; color:#555" : string.Empty);
             }
