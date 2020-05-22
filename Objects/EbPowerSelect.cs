@@ -630,7 +630,7 @@ else// PS
             if (this.DisplayMembers != null)
             {
                 return @"
-<div id='@ebsid@Container'  role='form' data-toggle='validator' style='width:100%;'>
+<div id='@ebsid@Container' class='ps-cont'  role='form' data-toggle='validator' style='width:100%;'>
     <input type='hidden' ui-inp name='@ebsid@Hidden4val' data-ebtype='8' id='@ebsid@'/>
     @VueSelectCode
     <center class='pow-center'>
