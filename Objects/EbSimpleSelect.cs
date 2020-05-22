@@ -136,6 +136,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup(PGConstants.HELP)]
         [HelpText("specifies a short hint that describes the expected value of an input field (e.g. a sample value or a short description of the expected format)")]
+        [DefaultPropValue(" - select - ")]
         public string PlaceHolder { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
@@ -212,40 +213,40 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
                 if (_optionHtml.Equals(string.Empty))
                 {
                     _optionHtml = string.Empty;
-					string OptGrpName = string.Empty;
+                    string OptGrpName = string.Empty;
                     if (!this.IsDynamic)
                     {
-						List<EbSimpleSelectOption> GrpList= this.Options.OrderBy(o => o.OptGroupName).ToList();
+                        List<EbSimpleSelectOption> GrpList = this.Options.OrderBy(o => o.OptGroupName).ToList();
 
-						foreach (EbSimpleSelectOption opt in GrpList)
+                        foreach (EbSimpleSelectOption opt in GrpList)
                         {
-							if (opt.OptGroupName != null)
-							{
-								if (opt.OptGroupName.Equals(string.Empty))
-								{
-									_optionHtml += string.Format("<option  value='{0}'>{1}</option>", opt.Value, opt.DisplayName);
-								}
-								else
-								{
-									if (opt.OptGroupName != OptGrpName)
-									{
-										_optionHtml += string.Format("<optgroup label='{0}'>", opt.OptGroupName);
-									}
-									OptGrpName = opt.OptGroupName;
+                            if (opt.OptGroupName != null)
+                            {
+                                if (opt.OptGroupName.Equals(string.Empty))
+                                {
+                                    _optionHtml += string.Format("<option  value='{0}'>{1}</option>", opt.Value, opt.DisplayName);
+                                }
+                                else
+                                {
+                                    if (opt.OptGroupName != OptGrpName)
+                                    {
+                                        _optionHtml += string.Format("<optgroup label='{0}'>", opt.OptGroupName);
+                                    }
+                                    OptGrpName = opt.OptGroupName;
 
-									if (opt.OptGroupName.Equals(OptGrpName))
-									{
-										_optionHtml += string.Format("<option  value='{0}'>{1}</option>", opt.Value, opt.DisplayName);
-									}
+                                    if (opt.OptGroupName.Equals(OptGrpName))
+                                    {
+                                        _optionHtml += string.Format("<option  value='{0}'>{1}</option>", opt.Value, opt.DisplayName);
+                                    }
 
-								}
-							}
-							else
-							{
-								_optionHtml += string.Format("<option  value='{0}'>{1}</option>", opt.Value, opt.DisplayName);
-							}
-								
-								
+                                }
+                            }
+                            else
+                            {
+                                _optionHtml += string.Format("<option  value='{0}'>{1}</option>", opt.Value, opt.DisplayName);
+                            }
+
+
                         }
                     }
                 }
@@ -326,17 +327,17 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
 .Replace("@selOpts@", IsMultiSelect ? "data-actions-box='true'" : string.Empty)
 .Replace("@bootStrapStyle@", "data-style='btn-" + this.BootStrapStyle.ToString() + "'")
 
-.Replace("@PlaceHolder@", (PlaceHolder ?? " - select - "))
+.Replace("@PlaceHolder@", (PlaceHolder ?? string.Empty))
 .Replace("@options@", this.OptionHtml)
-.Replace("@-sel-@", this.IsMultiSelect ? string.Empty : "<option selected value='-1' style='color: #6f6f6f;'> - select - </option>")
+.Replace("@-sel-@", this.IsMultiSelect ? string.Empty : "<option selected value='-1' style='color: #6f6f6f;'>" + PlaceHolder + "</option>")
 .Replace("@data-ebtype@", "16");
         }
-        
+
         public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
         {
             object _formattedData = null;
             string _displayMember = string.Empty;
-            if(Value != null)
+            if (Value != null)
             {
                 _formattedData = Value;
             }
@@ -372,12 +373,12 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
         [PropertyGroup(PGConstants.CORE)]
         public string Value { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-		[PropertyGroup(PGConstants.CORE)]
-		[Alias("Group Name")]
-		public string OptGroupName { get; set; }
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.CORE)]
+        [Alias("Group Name")]
+        public string OptGroupName { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup(PGConstants.CORE)]
         [Alias("Option Text")]
         public string DisplayName { get; set; }

@@ -481,6 +481,7 @@ else// PS
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup(PGConstants.HELP)]
+        [DefaultPropValue(" - select - ")]
         public string PlaceHolder { get; set; }
 
         private string _optionHtml = string.Empty;
@@ -613,9 +614,9 @@ else// PS
    .Replace("@selOpts@", MultiSelect ? "data-actions-box='true'" : string.Empty)
    .Replace("@bootStrapStyle@", "data-style='btn-" + this.BootStrapStyle.ToString() + "'")
 
-   .Replace("@PlaceHolder@", (PlaceHolder ?? " - select - "))
+   .Replace("@PlaceHolder@", (PlaceHolder ?? string.Empty))
    .Replace("@options@", this.OptionHtml)
-   .Replace("@-sel-@", this.MultiSelect ? string.Empty : "<option selected value='-1' style='color: #6f6f6f;'> - select - </option>")
+   .Replace("@-sel-@", this.MultiSelect ? string.Empty : "<option selected value='-1' style='color: #6f6f6f;'>" + PlaceHolder + "</option>")
    .Replace("@data-ebtype@", "16");
         }
 
