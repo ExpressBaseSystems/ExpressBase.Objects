@@ -129,6 +129,7 @@ else
             get
             {
                 return @"
+                    this.IsDisable = true;
                     if(this.RenderAsSimpleSelect){"
                         + JSFnsConstants.SS_DisableJSfn +
                     @"}
