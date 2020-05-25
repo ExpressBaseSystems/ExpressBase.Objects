@@ -1,4 +1,5 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Constants;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.LocationNSolution;
 using ExpressBase.Common.Objects;
@@ -32,8 +33,18 @@ namespace ExpressBase.Objects
         {
             this.BareControlHtml = this.GetBareHtml();
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
-            this.Name = "eb_loc_id";
+            //this.Name = "eb_loc_id";
         }
+        
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [DefaultPropValue("eb_loc_id")]
+        public override string Name { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        public override EbScript ValueExpr { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        public override EbScript DefaultValueExpression { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
         public override EbDbTypes EbDbType { get { return EbDbTypes.Decimal; } }
@@ -194,7 +205,6 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
         public override List<EbValidator> Validators { get => base.Validators; set => base.Validators = value; }
-        public override EbScript ValueExpr { get => base.ValueExpr; set => base.ValueExpr = value; }
         public override EbScript VisibleExpr { get => base.VisibleExpr; set => base.VisibleExpr = value; }
 
 

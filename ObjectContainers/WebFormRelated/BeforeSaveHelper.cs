@@ -79,6 +79,12 @@ namespace ExpressBase.Objects.WebFormRelated
                         throw new FormException("Only one Submit Button is allowed");
                     HasSubmitButton = true;
                 }
+                else if (Allctrls[i] is EbChartControl && serviceClient != null)
+                {
+                    if (string.IsNullOrEmpty((Allctrls[i] as EbChartControl).TVRefId))
+                        throw new FormException($"Please set a Chart View for {Allctrls[i].Label}.");
+                    (Allctrls[i] as EbChartControl).FetchParamsMeta(serviceClient);
+                }
                 else if (Allctrls[i] is EbTVcontrol && serviceClient != null)
                 {
                     if (string.IsNullOrEmpty((Allctrls[i] as EbTVcontrol).TVRefId))

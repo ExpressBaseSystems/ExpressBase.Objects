@@ -276,7 +276,7 @@ namespace ExpressBase.Objects
             foreach (EbDGColumn col in Controls)
             {
                 if (!col.Hidden)
-                    html += string.Concat("<th class='ppbtn-cont ebResizable' ebsid='@ebsid@' name='@name@' style='width: @Width@; @bg@' @type@ title='", col.Title, @"'>
+                    html += string.Concat("<th class='ppbtn-cont ebResizable dg-th' ebsid='@ebsid@' name='@name@' style='width: @Width@; @type@ title='", col.Title, @"'>
                                                 <span class='grid-col-title eb-label-editable'>", col.Title, @"</span>
                                                 <input id='@ebsid@lbltxtb' class='eb-lbltxtb' type='text'/>
                                                 @req@ @ppbtn@" +
@@ -285,17 +285,16 @@ namespace ExpressBase.Objects
                         .Replace("@req@", (col.Required ? "<sup style='color: red'>*</sup>" : string.Empty))
                         .Replace("@ebsid@", col.IsRenderMode && col.IsDynamicTabChild ? "@" + col.EbSid_CtxId + "_ebsid@" : col.EbSid)
                         .Replace("@name@", col.Name)
-                        .Replace("@Width@", (col.Width <= 0) ? "auto" : col.Width.ToString() + "%")
-                        .Replace("@type@", "type = '" + col.ObjType + "'")
-                        .Replace("@bg@", col.IsDisable ? "background-color:#fafafa; color:#555" : string.Empty);
+                        .Replace("@Width@", (col.Width <= 0 || (Controls[Controls.Count - 1] == col)) ? "auto" : col.Width.ToString() + "%")
+                        .Replace("@type@", "type = '" + col.ObjType + "'");
             }
 
             html += @"
-                @cogs@
+                <th class='ctrlth'><span class='fa fa fa-cog'></span></th>
               </tr>
             </thead>
         </table>
-    </div>".Replace("@cogs@", !this.IsDisable ? "<th class='ctrlth'><span class='fa fa fa-cog'></span></th>" : string.Empty);
+    </div>";
 
             html += @"
     <div class='Dg_body' style='overflow-y:scroll;height:@_height@px ;'>

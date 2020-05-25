@@ -257,6 +257,20 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
+    public class AddTLRequest : IReturn<AddTLResponse>, IEbTenentRequest
+    {
+        public EbTextLocalConfig Config { get; set; }
+
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
+    }
+
+    public class AddTLResponse : IEbSSResponse
+    {
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
     public class AddMongoRequest : IReturn<AddMongoResponse>, IEbTenentRequest
     {
         public EbMongoConfig Config { get; set; }
