@@ -37,6 +37,28 @@ namespace ExpressBase.Objects.Objects
 		[Alias("Destination Form")]
 		public string FormRefId { get; set; }
 
+		[JsonIgnore]
+		public override string DisableJSfn
+		{
+			get
+			{
+				return JSFnsConstants.Ctrl_DisableJSfn + @"
+     $('#cont_' + this.EbSid_CtxId + ' .ctrl-cover').css('filter', 'contrast(0.6)');";
+			}
+			set { }
+		}
+
+		[JsonIgnore]
+		public override string EnableJSfn
+		{
+			get
+			{
+				return JSFnsConstants.Ctrl_EnableJSfn + @"
+     $('#cont_' + this.EbSid_CtxId + ' .ctrl-cover').css('filter', 'none');";
+			}
+			set { }
+		}
+
 
 		public override string GetBareHtml()
 		{
