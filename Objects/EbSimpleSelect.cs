@@ -329,7 +329,7 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
 
 .Replace("@PlaceHolder@", (PlaceHolder ?? string.Empty))
 .Replace("@options@", this.OptionHtml)
-.Replace("@-sel-@", this.IsMultiSelect ? string.Empty : "<option selected value='-1' style='color: #6f6f6f;'>" + PlaceHolder + "</option>")
+.Replace("@-sel-@", this.IsMultiSelect ? string.Empty : "<option selected value='-1' style='color: #6f6f6f;'>" + (PlaceHolder.Trim() == "" ? "--": PlaceHolder) + "</option>")
 .Replace("@data-ebtype@", "16");
         }
 
