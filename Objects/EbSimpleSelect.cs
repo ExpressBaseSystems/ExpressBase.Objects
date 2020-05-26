@@ -53,6 +53,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [DefaultPropValue("100")]
         [PropertyGroup(PGConstants.APPEARANCE)]
+        [Alias("DropdownMaxHeight")]
         public int DropdownHeight { get; set; }
 
         public override string JustSetValueJSfn
@@ -329,7 +330,7 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
 
 .Replace("@PlaceHolder@", (PlaceHolder ?? string.Empty))
 .Replace("@options@", this.OptionHtml)
-.Replace("@-sel-@", this.IsMultiSelect ? string.Empty : "<option selected value='-1' style='color: #6f6f6f;'>" + (PlaceHolder.Trim() == "" ? "--": PlaceHolder) + "</option>")
+.Replace("@-sel-@", this.IsMultiSelect ? string.Empty : "<option selected value='-1' style='color: #6f6f6f;'>" + (PlaceHolder.IsNullOrEmpty() || PlaceHolder.Trim() == string.Empty ? "--": PlaceHolder) + "</option>")
 .Replace("@data-ebtype@", "16");
         }
 

@@ -617,7 +617,7 @@ else// PS
 
    .Replace("@PlaceHolder@", (PlaceHolder ?? string.Empty))
    .Replace("@options@", this.OptionHtml)
-   .Replace("@-sel-@", this.MultiSelect ? string.Empty : "<option selected value='-1' style='color: #6f6f6f;'>" + (PlaceHolder.Trim() == "" ? "--" : PlaceHolder) + "</option>")
+   .Replace("@-sel-@", this.MultiSelect ? string.Empty : "<option selected value='-1' style='color: #6f6f6f;'>" + (PlaceHolder.IsNullOrEmpty() || PlaceHolder.Trim() == string.Empty ? "--" : PlaceHolder) + "</option>")
    .Replace("@data-ebtype@", "16");
         }
 
