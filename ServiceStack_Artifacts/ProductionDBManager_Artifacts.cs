@@ -192,18 +192,48 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string ErrorMessage { get; set; }
     }
 
-    public class LastSolnAccessRequest : IEbTenentRequest, IReturn<LastSolnAccessResponse>
+    public class LastSolnAccessRequest : IEbTenentRequest
     {
         public int UserId { get; set; }
 
         public string SolnId { get; set; }
 
     }
-    public class LastSolnAccessResponse : IEbSSResponse
-    {
-        [DataMember(Order = 1)]
-        public ResponseStatus ResponseStatus { get; set; }
 
-        public string LastDbAccess { get; set; }
+    public class LastDbAccess
+    {
+        public string ISolution { get; set; }
+
+        public string ESolution { get; set; }
+
+        public string ObjCount { get; set; }
+
+        public string LastObject { get; set; }
+
+        public string UsrCount { get; set; }
+
+        public string LastUser { get; set; }
+
+        public string LastLogin { get; set; }
+
+        public string AppCount { get; set; }
+
+        public string Applications { get; set; }
+
+        public string DbName { get; set; }
+
+        public string DbVendor { get; set; }
+
+        public string AdminUserName { get; set; }
+
+        public string AdminPassword { get; set; }
+
+        public string ReadWriteUserName { get; set; }
+
+        public string ReadWritePassword { get; set; }
+
+        public string ReadOnlyUserName { get; set; }
+
+        public string ReadOnlyPassword { get; set; }
     }
 }
