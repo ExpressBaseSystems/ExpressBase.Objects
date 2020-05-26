@@ -276,7 +276,7 @@ namespace ExpressBase.Objects
             foreach (EbDGColumn col in Controls)
             {
                 if (!col.Hidden)
-                    html += string.Concat("<th class='ppbtn-cont ebResizable' ebsid='@ebsid@' name='@name@' style='width: @Width@; @bg@' @type@ title='", col.Title, @"'>
+                    html += string.Concat("<th class='ppbtn-cont ebResizable dg-th' ebsid='@ebsid@' name='@name@' style='width: @Width@; @type@ title='", col.Title, @"'>
                                                 <span class='grid-col-title eb-label-editable'>", col.Title, @"</span>
                                                 <input id='@ebsid@lbltxtb' class='eb-lbltxtb' type='text'/>
                                                 @req@ @ppbtn@" +
@@ -285,17 +285,16 @@ namespace ExpressBase.Objects
                         .Replace("@req@", (col.Required ? "<sup style='color: red'>*</sup>" : string.Empty))
                         .Replace("@ebsid@", col.IsRenderMode && col.IsDynamicTabChild ? "@" + col.EbSid_CtxId + "_ebsid@" : col.EbSid)
                         .Replace("@name@", col.Name)
-                        .Replace("@Width@", (col.Width <= 0) ? "auto" : col.Width.ToString() + "%")
-                        .Replace("@type@", "type = '" + col.ObjType + "'")
-                        .Replace("@bg@", col.IsDisable ? "background-color:#fafafa; color:#555" : string.Empty);
+                        .Replace("@Width@", (col.Width <= 0 || (Controls[Controls.Count - 1] == col)) ? "auto" : col.Width.ToString() + "%")
+                        .Replace("@type@", "type = '" + col.ObjType + "'");
             }
 
             html += @"
-                @cogs@
+                <th class='ctrlth'><span class='fa fa fa-cog'></span></th>
               </tr>
             </thead>
         </table>
-    </div>".Replace("@cogs@", !this.IsDisable ? "<th class='ctrlth'><span class='fa fa fa-cog'></span></th>" : string.Empty);
+    </div>";
 
             html += @"
     <div class='Dg_body' style='overflow-y:scroll;height:@_height@px ;'>
@@ -389,10 +388,10 @@ namespace ExpressBase.Objects
         }
 
         [JsonIgnore]
-        public override string EnableJSfn { get { return @"$('[ebsid='+this.__DG.EbSid_CtxId +']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] .ctrl-cover *`).prop('disabled',false).css('pointer-events', 'inherit').find('input').css('background-color','#fff');"; } set { } }
+        public override string EnableJSfn { get { return @"this.IsDisable = false; $('[ebsid='+this.__DG.EbSid_CtxId +']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] .ctrl-cover *`).prop('disabled',false).css('pointer-events', 'inherit').find('input').css('background-color','#fff');"; } set { } }
 
         [JsonIgnore]
-        public override string DisableJSfn { get { return @"$('[ebsid='+this.__DG.EbSid_CtxId +']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] .ctrl-cover *`).attr('disabled', 'disabled').css('pointer-events', 'none').find('input').css('background-color','#eee');"; } set { } }
+        public override string DisableJSfn { get { return @"this.IsDisable = true; $('[ebsid='+this.__DG.EbSid_CtxId +']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] .ctrl-cover *`).attr('disabled', 'disabled').css('pointer-events', 'none').find('input').css('background-color','#eee');"; } set { } }
 
         [JsonIgnore]
         public override string ClearJSfn { get { return @"$('[ebsid='+this.__DG.EbSid_CtxId +']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val('');"; } set { } }
@@ -812,7 +811,7 @@ $(`[ebsid=${p1.DG.EbSid_CtxId}]`).on('change', `[colname=${this.Name}] [ui-inp]`
         {
             get
             {
-                return @"$('[ebsid='+this.__DG.EbSid_CtxId +']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] .ctrl-cover .dropdown-toggle`).attr('disabled', 'disabled').css('pointer-events', 'none').css('background-color', '#f3f3f3');";
+                return @"this.IsDisable = true; $('[ebsid='+this.__DG.EbSid_CtxId +']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] .ctrl-cover .dropdown-toggle`).attr('disabled', 'disabled').css('pointer-events', 'none').css('background-color', '#f3f3f3');";
             }
             set { }
         }
@@ -822,7 +821,7 @@ $(`[ebsid=${p1.DG.EbSid_CtxId}]`).on('change', `[colname=${this.Name}] [ui-inp]`
         {
             get
             {
-                return @"$('[ebsid='+this.__DG.EbSid_CtxId +']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] .ctrl-cover .dropdown-toggle`).prop('disabled',false).css('pointer-events', 'inherit').css('background-color', '#fff');";
+                return @"this.IsDisable = false; $('[ebsid='+this.__DG.EbSid_CtxId +']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] .ctrl-cover .dropdown-toggle`).prop('disabled',false).css('pointer-events', 'inherit').css('background-color', '#fff');";
             }
             set { }
         }

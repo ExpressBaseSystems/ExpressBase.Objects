@@ -170,10 +170,10 @@ namespace ExpressBase.Objects.Objects
 
 
 		[JsonIgnore]
-		public override string EnableJSfn { get { return @"$(`#${this.EbSid}`).summernote('enable');"; } set { } }
+		public override string EnableJSfn { get { return @"this.IsDisable = false; $(`#${this.EbSid}`).summernote('enable');"; } set { } }
 
 		[JsonIgnore]
-		public override string DisableJSfn { get { return @" $(`#${this.EbSid}`).summernote('disable');"; } set { } }
+		public override string DisableJSfn { get { return @"this.IsDisable = true; $(`#${this.EbSid}`).summernote('disable');"; } set { } }
 		//public override string ClearJSfn
 		//{
 		//	get
