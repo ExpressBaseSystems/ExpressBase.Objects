@@ -129,6 +129,7 @@ else
             get
             {
                 return @"
+                    this.__IsDisable = true;
                     if(this.RenderAsSimpleSelect){"
                         + JSFnsConstants.SS_DisableJSfn +
                     @"}
@@ -481,6 +482,7 @@ else// PS
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup(PGConstants.HELP)]
+        [DefaultPropValue(" - select - ")]
         public string PlaceHolder { get; set; }
 
         private string _optionHtml = string.Empty;
@@ -613,9 +615,9 @@ else// PS
    .Replace("@selOpts@", MultiSelect ? "data-actions-box='true'" : string.Empty)
    .Replace("@bootStrapStyle@", "data-style='btn-" + this.BootStrapStyle.ToString() + "'")
 
-   .Replace("@PlaceHolder@", (PlaceHolder ?? " - select - "))
+   .Replace("@PlaceHolder@", (PlaceHolder ?? string.Empty))
    .Replace("@options@", this.OptionHtml)
-   .Replace("@-sel-@", this.MultiSelect ? string.Empty : "<option selected value='-1' style='color: #6f6f6f;'> - select - </option>")
+   .Replace("@-sel-@", this.MultiSelect ? string.Empty : "<option selected value='-1' style='color: #6f6f6f;'>" + (PlaceHolder.IsNullOrEmpty() || PlaceHolder.Trim() == string.Empty ? "--" : PlaceHolder) + "</option>")
    .Replace("@data-ebtype@", "16");
         }
 
@@ -630,7 +632,7 @@ else// PS
             if (this.DisplayMembers != null)
             {
                 return @"
-<div id='@ebsid@Container'  role='form' data-toggle='validator' style='width:100%;'>
+<div id='@ebsid@Container' class='ps-cont'  role='form' data-toggle='validator' style='width:100%;'>
     <input type='hidden' ui-inp name='@ebsid@Hidden4val' data-ebtype='8' id='@ebsid@'/>
     @VueSelectCode
     <center class='pow-center'>

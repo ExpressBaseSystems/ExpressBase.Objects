@@ -300,10 +300,10 @@ namespace ExpressBase.Objects
 
 
         [JsonIgnore]
-        public override string EnableJSfn { get { return @"$('#cont_' + this.EbSid_CtxId + ' .FUP_Head_W').prop('disabled',false).css('pointer-events', 'inherit');"; } set { } }
+        public override string EnableJSfn { get { return @"this.__IsDisable = false; $('#cont_' + this.EbSid_CtxId + ' .FUP_Head_W').prop('disabled',false).css('pointer-events', 'inherit');"; } set { } }
 
         [JsonIgnore]
-        public override string DisableJSfn { get { return @"$('#cont_' + this.EbSid_CtxId + ' .FUP_Head_W').attr('disabled', 'disabled').css('pointer-events', 'none');"; } set { } }
+        public override string DisableJSfn { get { return @"this.__IsDisable = true; $('#cont_' + this.EbSid_CtxId + ' .FUP_Head_W').attr('disabled', 'disabled').css('pointer-events', 'none');"; } set { } }
 
     }
 
