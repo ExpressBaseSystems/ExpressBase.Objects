@@ -594,8 +594,11 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 2)]
         public List<EbLocationCustomField> Config { get; set; }
-
+        
         [DataMember(Order = 3)]
+        public Dictionary<int, EbLocation> LocationTree { get; set; }
+
+        [DataMember(Order = 4)]
         public ResponseStatus ResponseStatus { get; set; }
     }
 
