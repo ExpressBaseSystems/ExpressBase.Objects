@@ -68,12 +68,14 @@ namespace ExpressBase.Objects.Objects
             {
                 return @"
                     if(p1 !== '-1'){
-                        $('.sim-tree-checkbox').toArray().map(el => $(el).hasClass('checked') ? $(el).trigger('click') : console.log('Unchecked'));
+                        console.log('hhhhhh');
+                        //$('#' + this.EbSid_CtxId + '_checkbox').trigger('click');
+                        $('#' + this.EbSid_CtxId+' .sim-tree-checkbox').toArray().map(el => $(el).hasClass('checked') ? $(el).trigger('click') : console.log('Unchecked'));
                         let xx = p1.split(',');
-                        xx.map(qq =>$(`[data-id='${qq}']`).find('.sim-tree-checkbox').eq(0).trigger('click'));
+                        xx.map(qq =>$(`#${this.EbSid_CtxId} [data-id='${qq}']`).find('.sim-tree-checkbox').eq(0).trigger('click'));
                     }
                     else{
-                        $('#' + ctrl.EbSid_CtxId + '_checkbox').trigger('click');                          
+                        $('#' + this.EbSid_CtxId + '_checkbox').trigger('click');                          
                     }
                 ";
             }
