@@ -69,13 +69,15 @@ namespace ExpressBase.Objects.Objects
                 return @"
                     if(p1 !== '-1'){
                         console.log('hhhhhh');
-                        //$('#' + this.EbSid_CtxId + '_checkbox').trigger('click');
+                        if($('#' + this.EbSid_CtxId + '_checkbox').is(':checked'))
+                            $('#' + this.EbSid_CtxId + '_checkbox').trigger('click');
                         $('#' + this.EbSid_CtxId+' .sim-tree-checkbox').toArray().map(el => $(el).hasClass('checked') ? $(el).trigger('click') : console.log('Unchecked'));
                         let xx = p1.split(',');
                         xx.map(qq =>$(`#${this.EbSid_CtxId} [data-id='${qq}']`).find('.sim-tree-checkbox').eq(0).trigger('click'));
                     }
                     else{
-                        $('#' + this.EbSid_CtxId + '_checkbox').trigger('click');                          
+                        if(!$('#' + this.EbSid_CtxId + '_checkbox').is(':checked'))
+                            $('#' + this.EbSid_CtxId + '_checkbox').trigger('click');                          
                     }
                 ";
             }
@@ -155,7 +157,7 @@ namespace ExpressBase.Objects.Objects
                     </div>
                     <div class=''>
                         <button id='@ebsid@_button' type='button' class='btn-block text-left btn btn-default'>
-                            <span class='multiselect-selected-text' disabled='disabled'>All selected (68)</span> 
+                            <span class='multiselect-selected-text' disabled='disabled' id='@ebsid@_text'>All selected (68)</span> 
                             <b class='caret' disabled='disabled'></b>
                         </button>
                     <div id='@ebsid@' name='@name@' data-ebtype='@data-ebtype@'></div>
