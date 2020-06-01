@@ -308,7 +308,17 @@ namespace ExpressBase.Objects
 							 (SELECT id, user_id, role_id,user_group_id,participant_type,eb_meeting_schedule_id  
 							  FROM  eb_meeting_scheduled_participants )B
 							 ON B.eb_meeting_schedule_id = A.eb_meeting_schedule_id
-							 where participant_type is NOT NULL                                   
+							 where participant_type is NOT NULL   ;
+                     SELECT 
+	                  A.id as slot_id,A.eb_meeting_schedule_id,C.id as user_id,C.fullname,C.email,C.phnoprimary as phone
+			        FROM 
+					(SELECT id , eb_meeting_schedule_id FROM  eb_meeting_slots where id= {0} AND  eb_del = 'F')A	
+							 LEFT JOIN	
+							 (SELECT id,eb_created_by FROM  eb_meeting_schedule )B
+							 ON B.id = A.eb_meeting_schedule_id	
+							 LEFT JOIN
+							 (select id, fullname,email,phnoprimary from eb_users where eb_del = 'F')C
+							 ON C.id = B.eb_created_by where c.id is not  null  ;
                                         ";
             }
         }
@@ -318,7 +328,6 @@ namespace ExpressBase.Objects
             get
             {
                 return @"
-               
             SELECT 
 		     A.id as slot_id , A.eb_meeting_schedule_id, A.is_approved,
 			 B.no_of_attendee, B.no_of_hosts,B.max_hosts,B.max_attendees,
@@ -373,9 +382,8 @@ namespace ExpressBase.Objects
 						LEFT JOIN	 
 							 (SELECT id, user_id, role_id,user_group_id,participant_type,eb_meeting_schedule_id  
 							  FROM  eb_meeting_scheduled_participants )B
-							 ON B.eb_meeting_schedule_id = A.eb_meeting_schedule_id
-							 where participant_type is NOT NULL     
-
+							 ON B.eb_meeting_schedule_id = A.eb_meeting_schedule_id and B.participant_type ='1'
+							 where participant_type is NOT NULL ;
 ";
             }
         }
@@ -406,7 +414,7 @@ namespace ExpressBase.Objects
             List<MeetingScheduleDetails> MSD = new List<MeetingScheduleDetails>(); //MSD Meeting Schedule Details
             List<SlotParticipantsDetails> SPL = new List<SlotParticipantsDetails>(); //SPL Slot Participant List
             SlotParticipantCount SPC = new SlotParticipantCount(); //SPL Slot Participant Count
-
+            HostInfo HostInfo = new HostInfo(); //if there is no eligible hosts
             String _query = string.Format(this.ValidateQuery, ApprovedSlotId);
             EbDataSet ds = DataDB.DoQueries(_query);
             if (ds.Tables[0].Rows.Count == 0)
@@ -450,7 +458,12 @@ namespace ExpressBase.Objects
                     ParticipantType = Convert.ToInt32(ds.Tables[4].Rows[k]["participant_type"]),
                 });
             }
-
+            //HostInfo.SlotId = Convert.ToInt32(ds.Tables[5].Rows[0]["slot_id"]);
+            //HostInfo.MeetingScheduleId = Convert.ToInt32(ds.Tables[5].Rows[0]["eb_meeting_schedule_id"]);
+            //HostInfo.UserId = Convert.ToInt32(ds.Tables[5].Rows[0]["user_id"]);
+            //HostInfo.FullName = Convert.ToString(ds.Tables[5].Rows[0]["fullname"]);
+            //HostInfo.Email = Convert.ToString(ds.Tables[5].Rows[0]["email"]);
+            //HostInfo.Phone = Convert.ToString(ds.Tables[5].Rows[0]["phone"]);
 
             if (MSD[0].MaxAttendees <= SPC.SlotAttendeeCount)// assuming user in an attendee
                 throw new FormException("Unable to continue. Reached maximum attendee limit.", (int)HttpStatusCodes.BAD_REQUEST, $"Max no of attendee : {MSD[0].MinAttendees}, Current attendee count : {SPC.SlotAttendeeCount}", "From EbMeetingPicker.ParameterizeControl()");
@@ -716,6 +729,46 @@ namespace ExpressBase.Objects
         public int SlotAttendeeCount { get; set; }
         public int SlotHostCount { get; set; }
     }
+
+    public class MeetingCancelByHostResponse
+    {
+        public bool ResponseStatus { get; set; }
+    }
+    public class MeetingCancelByHostRequest
+    {
+        public int SlotId { get; set; }
+        public int MyActionId { get; set; }
+        public User UserInfo { get; set; }
+    }
+    public class MeetingRejectByHostResponse
+    {
+        public bool ResponseStatus { get; set; }
+    }
+    public class MeetingRejectByHostRequest
+    {
+        public int SlotId { get; set; }
+        public int MyActionId { get; set; }
+        public User UserInfo { get; set; }
+    }
+    public class HostInfo
+    {
+        public int SlotId { get; set; }
+        public int MeetingScheduleId { get; set; }
+        public int UserId { get; set; }
+        public string FullName { get; set; }
+        public string Email { get; set; }
+        public string Phone { get; set; }
+    }
+
+    public class MeetingRequestByEligibleAttendeeRequest
+    {
+
+    }
+    public class MeetingRequestByEligibleAttendeeResponse
+    {
+
+    }
+
     public enum ParticipantType
     {
         Host = 1,
