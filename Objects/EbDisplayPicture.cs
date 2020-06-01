@@ -175,9 +175,9 @@ namespace ExpressBase.Objects
             };
         }
 
-        public override string EnableJSfn { get { return @"$('#cont_' + this.EbSid_CtxId + ' *').prop('disabled',false).find('[ui-inp]').css('background-color', '#fff'); $('#cont_' + this.EbSid_CtxId).find('.dpctrl-options-cont').show();"; } set { } }
+        public override string EnableJSfn { get { return @"this.__IsDisable = false; $('#cont_' + this.EbSid_CtxId + ' *').prop('disabled',false).find('[ui-inp]').css('background-color', '#fff'); $('#cont_' + this.EbSid_CtxId).find('.dpctrl-options-cont').show();"; } set { } }
 
-        public override string DisableJSfn { get { return @"$('#cont_' + this.EbSid_CtxId + ' *').attr('disabled', 'disabled').find('[ui-inp]').css('background-color', '#f3f3f3'); $('#cont_' + this.EbSid_CtxId).find('.dpctrl-options-cont').hide()"; } set { } }
+        public override string DisableJSfn { get { return @"this.__IsDisable = true; $('#cont_' + this.EbSid_CtxId + ' *').attr('disabled', 'disabled').find('[ui-inp]').css('background-color', '#f3f3f3'); $('#cont_' + this.EbSid_CtxId).find('.dpctrl-options-cont').hide()"; } set { } }
 
     }
 

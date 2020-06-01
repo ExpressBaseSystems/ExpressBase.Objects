@@ -129,6 +129,7 @@ else
             get
             {
                 return @"
+                    this.__IsDisable = true;
                     if(this.RenderAsSimpleSelect){"
                         + JSFnsConstants.SS_DisableJSfn +
                     @"}
@@ -521,7 +522,7 @@ else// PS
                 foreach (DVBaseColumn obj in this.DisplayMembers)
                 {
                     rs += @"
-<div class='search-block'>
+<div class='search-block' @perWidth@>
     <div class='input-group'>
         <v-select maped-column='$$' column-type='@type@' id='@ebsid@$$' style='width:{3}px;' 
             multiple
@@ -536,7 +537,7 @@ else// PS
 .Replace("@ebsid@", this.EbSid_CtxId)
 .Replace("@type@", ((int)obj.Type).ToString())
 .Replace("@sTitle@", obj.sTitle.ToString())
-//.Replace("@perWidth@", "style='width:" + ( (obj.Width == 0) ? (((int)(100 / noOfFileds)).ToString()) : obj.Width.ToString() ) + "%'")
+.Replace("@perWidth@", "style='width:" + ( (obj.Width == 0) ? (((int)(100 / noOfFileds)).ToString()) : obj.Width.ToString() ) + "%'")
 .Replace("@border-r" + i, (i != noOfFileds - 1) ? "style='border-radius: 0px;'" : "");
                     i++;
                 }
@@ -616,7 +617,7 @@ else// PS
 
    .Replace("@PlaceHolder@", (PlaceHolder ?? string.Empty))
    .Replace("@options@", this.OptionHtml)
-   .Replace("@-sel-@", this.MultiSelect ? string.Empty : "<option selected value='-1' style='color: #6f6f6f;'>" + PlaceHolder + "</option>")
+   .Replace("@-sel-@", this.MultiSelect ? string.Empty : "<option selected value='-1' style='color: #6f6f6f;'>" + (PlaceHolder.IsNullOrEmpty() || PlaceHolder.Trim() == string.Empty ? "--" : PlaceHolder) + "</option>")
    .Replace("@data-ebtype@", "16");
         }
 

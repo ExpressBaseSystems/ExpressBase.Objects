@@ -240,10 +240,10 @@ namespace ExpressBase.Objects
                         html += cardField.GetBareHtml();
                     }
 
-                    html += "<div class='card-selbtn-cont' style='@BtnDisplay@'>" +
-                                "<button id='' class='btn btn-default btn-sm'  data-toggle='tooltip' title=''>Select</button>" +
-                            "</div>" +
-                        "</div>".Replace("@BtnDisplay@", this.MultiSelect ? "" : "display:none !important;");
+                    html += @"<div class='card-selbtn-cont' style='@BtnDisplay@'>
+                                <button id='' class='btn btn-default btn-sm'  data-toggle='tooltip' title=''>Select</button>
+                            </div>
+                        </div>".Replace("@BtnDisplay@", (this.MultiSelect) ? "" : "display:none !important;");
                 }
             }
             html += @"	</div>@SummarizeHtml@  <div class='cards-btn-cont' style='margin-top: 20px;'> <button id='' class='btn btn-default ctrl-submit-btn'  data-toggle='tooltip' title=''> @ButtonText@ </button> </div> </div>
@@ -257,7 +257,7 @@ namespace ExpressBase.Objects
         {
             this.IsSummaryRequired = false;
             int tcols = 1;
-            string html = @"<div class='card-summary-cont'><div><b> @Summary@ </b></div>
+            string html = @"<div class='card-summary-cont'><div class='card_sumry_tle' ><b> @Summary@ </b></div>
 							<table class='table card-summary-table' style='table-layout: fixed; margin-bottom: 0px;'>
 								<thead style='font-size:12px;'><tr>".Replace("@Summary@", this.SummaryTitle.IsNullOrEmpty() ? "Summary" : this.SummaryTitle);
             foreach (EbCardField F in this.CardFields)
@@ -356,7 +356,7 @@ namespace ExpressBase.Objects
 			<div class='card-selbtn-cont'><button class='btn btn-default' disabled>Select</button></div>
 		</div>		
 	</div>
-	<div class='card-summary-cont' style='background-color: #eee;'><div style='font-size: 15px; padding:22px 5px 8px 5px; text-align:center;'><b> @Summary@ </b></div>
+	<div class='card-summary-cont' style='background-color: #eee;'><div class='card_sumry_tle'><b> @Summary@ </b></div>
 		<table class='table card-summary-table'>
 			<thead style='font-size:12px;'>
 				<tr>
@@ -383,7 +383,7 @@ namespace ExpressBase.Objects
 						<div class='card-cont' style='width: 100%; min-height: 100px; box-shadow: 0px 0px 20px #ccc; border-radius: 1.3em;'>
 							<div class='card-selbtn-cont'><button class='btn btn-default' disabled>Select</button></div>
 						</div>
-						<div class='card-summary-cont' style='box-shadow: 0px 0px 20px #ccc; border-radius: 0; margin: 20px -4px 0 6px;'><div style='font-size: 15px; padding:5px 5px 0px 5px; text-align:center;'><b> Summary </b></div>
+						<div class='card-summary-cont' style='box-shadow: 0px 0px 20px #ccc; border-radius: 0; margin: 20px -4px 0 6px;'><div class='card_sumry_tle' ><b> Summary </b></div>
 							<table class='table card-summary-table'>
 								<thead style='font-size:12px;'>
 									<tr>
@@ -433,7 +433,9 @@ namespace ExpressBase.Objects
     }
 
 
-    [EnableInBuilder(BuilderType.BotForm)]
+	//------------------------------------------------CARD ------------------------------------------------
+
+	[EnableInBuilder(BuilderType.BotForm)]
     [HideInToolBox]
     public class EbCard : EbControl
     {
@@ -558,9 +560,9 @@ namespace ExpressBase.Objects
 
         public override string GetBareHtml()
         {
-            return @"<div style='@divstyle@' class='data-@Name@'><img class='card-img' src='@ImageID@'/></div>"
+            return @"<div style='@divstyle@' class='card-img-cont data-@Name@'><img class='card-img' src='@ImageID@'/></div>"
                 .Replace("@ImageID@", (String.IsNullOrEmpty(Convert.ToString(this.FieldValue))) ? "../images/image.png" : this.FieldValue.ToString())
-                .Replace("@divstyle@", (this.HeigthInPixel == 0) ? "margin: 10px 0px;" : "height: " + this.HeigthInPixel + "px; display: flex; justify-content: center; margin: 10px 0px;")
+                .Replace("@divstyle@", (this.HeigthInPixel == 0) ? "margin: 10px 0px;" : "height: " + this.HeigthInPixel + "px; ")
                 .Replace("@Name@", this.Name ?? "@Name@");
         }
     }
@@ -880,12 +882,12 @@ namespace ExpressBase.Objects
 
         public override string GetDesignHtml()
         {
-            return @"`<div class='card-title-cont' style='font-weight: 600; font-size: 20px; padding: 5px;'>&nbsp&nbspTitle Field</div>`";
+            return @"`<div class='card-title-cont' >&nbsp&nbspTitle Field</div>`";
         }
 
         public override string GetBareHtml()
         {
-            return @"<div class='card-title-cont data-@Name@' style='font-weight: 600; font-size: 20px; padding: 5px;'> &nbsp @Text@ &nbsp <i class='fa fa-check' style='color: green;display: none;' aria-hidden='true'></i></div>"
+            return @"<div class='card-title-cont data-@Name@' > &nbsp @Text@ &nbsp <i class='fa fa-check' style='color: green;display: none;' aria-hidden='true'></i></div>"
                     .Replace("@Text@", (this.FieldValue == null) ? "" : this.FieldValue.ToString()).Replace("@Name@", this.Name ?? "@Name@");
         }
     }
@@ -954,16 +956,16 @@ namespace ExpressBase.Objects
 
         public const string contenthtml = @"<div class='card-contenthtml-cont' style='padding:5px; text-align: center; width: 100%; min-height: 50px;'> HTML Content </div>";
 
-        public const string numeric = @"<div class='card-numeric-cont data-@Name@' style='@display@' data-value='@Value@'>
+        public const string numeric = @"<div class='card-numeric-cont data-@Name@'  style='@display@' data-value='@Value@'>
 			<div style='display: inline-block; width: 38%;'> <span class='card-inp-title'>Numeric Field </span> </div> 
 			<div class='inp-wrap'>
-				<button style='padding: 0px; border: none; background-color: transparent; font-size: 14px;' disabled>
+				<button class='card-pls-mns'  disabled>
 					<i class='fa fa-minus' aria-hidden='true' style=' padding: 5px; color: darkblue;'></i>
 				</button>
 				<div class='cart-inp-wraper'>
 					<input class='cart-inp' type='number' style='text-align: center; border: none; background: transparent; width: 120px;' value='12345' readonly>
 				</div>
-				<button style='padding: 0px; border: none; background-color: transparent; font-size: 14px;' disabled>
+				<button class='card-pls-mns'  disabled>
 					<i class='fa fa-plus' aria-hidden='true' style=' padding: 5px; color: darkblue;'></i>
 				</button>
 			</div>

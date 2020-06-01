@@ -52,6 +52,9 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         public override string GetValueFromDOMJSfn { get { return @" return parseFloat($('#' + this.EbSid_CtxId).val()) || 0; "; } set { } }
 
+        [JsonIgnore]
+        public override string GetDisplayMemberFromDOMJSfn { get { return @"return $('#' + this.EbSid_CtxId).val();"; } set { } }
+
         [OnDeserialized]
         public void OnDeserializedMethod(StreamingContext context)
         {

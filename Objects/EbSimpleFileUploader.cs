@@ -109,6 +109,12 @@ namespace ExpressBase.Objects
 		}
 
 
+		[JsonIgnore]
+		public override string DisableJSfn { get { return @"this.__IsDisable = true;
+            $(`#cont_${this.EbSid_CtxId}*`).attr('disabled', 'disabled').css('pointer-events', 'none').find('[ui-inp]').css('background-color', '#f3f3f3');
+            $(`#${this.EbSid_CtxId}`).find('.filethumb').attr('disabled', false).css('pointer-events', 'all');"; } set { }
+		}
+
 
 		//--------Hide in property grid------------
 		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
