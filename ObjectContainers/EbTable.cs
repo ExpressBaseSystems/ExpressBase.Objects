@@ -195,7 +195,7 @@ this.Init = function(id){
 
         public override string GetHtml()
         {
-            string html = "<td id='@name@' ctrl-ebsid='@ebsid@' ebsid='@ebsid@' style='width:@wperc@;'; class='form-render-table-Td tdDropable ebResizable ebcont-ctrl ppbtn-cont'> <div style='height: 100%; width: 100%; min-height: 30px;'>" +
+            string html = "<td id='@name@' ctrl-ebsid='@ebsid@' ebsid='@ebsid@' style='width:@wperc@;'; class='form-render-table-Td tdDropable ebResizable ebcont-ctrl ppbtn-cont'> <div class='tdInnerDiv'>" +
                 "@ppbtn@";
 
             foreach (EbControl ec in this.Controls)
