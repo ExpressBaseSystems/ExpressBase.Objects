@@ -9,7 +9,7 @@ using System.Text;
 
 namespace ExpressBase.Objects
 {
-	[EnableInBuilder(BuilderType.BotForm)]
+	[EnableInBuilder()]
 	public class EbSurvey : EbControl
 	{
 		[EnableInBuilder(BuilderType.BotForm)]
