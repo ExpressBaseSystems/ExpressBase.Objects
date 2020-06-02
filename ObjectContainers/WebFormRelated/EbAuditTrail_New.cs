@@ -118,7 +118,7 @@ namespace ExpressBase.Objects.WebFormRelated/////////////
             string _newVal, _oldVal;
             bool isUpdate = RowBkup != null && Row != null;
             List<AuditTrailEntry> trailEntries = new List<AuditTrailEntry>();
-            string relation = string.Concat(_webForm.TableRowId, "-", Row.RowId);
+            string relation = string.Concat(_webForm.TableRowId, "-", Row != null ? Row.RowId : RowBkup.RowId);
 
             if (_webForm.FormSchema.MasterTable.Equals(_table.TableName))
                 relation = _webForm.TableRowId.ToString();
