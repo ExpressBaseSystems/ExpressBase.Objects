@@ -351,6 +351,7 @@ namespace ExpressBase.Objects
         //    }
         //}
 
+        //missing: ps column
         public void GetImportData(IDatabase DataDB, Service Service, EbWebForm Form)//COPY this TO Form
         {
             this.RefreshFormData(DataDB, Service);
@@ -1441,7 +1442,8 @@ namespace ExpressBase.Objects
                     Console.WriteLine("New record inserted. Table :" + this.TableName + ", Id : " + this.TableRowId);
                 }
                 this.RefreshFormData(DataDB, service, false, true);
-                resp += " - AuditTrail: " + EbAuditTrail.UpdateAuditTrail(this, DataDB);
+                EbAuditTrail ebAuditTrail = new EbAuditTrail(this, DataDB);
+                resp += " - AuditTrail: " + ebAuditTrail.UpdateAuditTrail();
                 resp += " - AfterSave: " + this.AfterSave(DataDB, IsUpdate);
                 this.DbTransaction.Commit();
             }
@@ -1990,7 +1992,8 @@ namespace ExpressBase.Objects
                     resp = "Inserted: " + this.TableRowId;
                     Console.WriteLine("New record inserted. Table :" + this.TableName + ", Id : " + this.TableRowId);
                 }
-                resp += " - AuditTrail: " + EbAuditTrail.UpdateAuditTrail(this, DataDB);
+                EbAuditTrail ebAuditTrail = new EbAuditTrail(this, DataDB);
+                resp += " - AuditTrail: " + ebAuditTrail.UpdateAuditTrail();
                 resp += " - AfterSave: " + this.AfterSave(DataDB, IsUpdate);
 
                 if (DbCon == null)
@@ -2435,7 +2438,8 @@ namespace ExpressBase.Objects
 
         public string GetAuditTrail(IDatabase DataDB, Service Service)
         {
-            return EbAuditTrail.GetAuditTrail(this, DataDB, Service);
+            EbAuditTrail ebAuditTrail = new EbAuditTrail(this, DataDB, Service);
+            return ebAuditTrail.GetAuditTrail();
         }
 
         public Dictionary<int, List<string>> GetLocBasedPermissions()

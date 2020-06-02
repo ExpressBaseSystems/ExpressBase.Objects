@@ -115,6 +115,9 @@ namespace ExpressBase.Objects
             $(`#${this.EbSid_CtxId}`).find('.filethumb').attr('disabled', false).css('pointer-events', 'all');"; } set { }
 		}
 
+		[JsonIgnore]
+		public override string EnableJSfn { get { return @"this.__IsDisable = false; $('#cont_' + this.EbSid_CtxId + ' *').prop('disabled',false).css('pointer-events', 'all');"; } set { } }
+
 
 		//--------Hide in property grid------------
 		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
