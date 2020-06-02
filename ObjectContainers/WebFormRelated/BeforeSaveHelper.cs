@@ -24,10 +24,30 @@ namespace ExpressBase.Objects.WebFormRelated
                 throw new FormException("Please enter a valid form table name");
             tbls.Add(_this.TableName, "form table");
             EbControl[] Allctrls = _this.Controls.FlattenAllEbControls();
-            bool HasSubmitButton = false;
+            Dictionary<Type, bool> OneCtrls = new Dictionary<Type, bool>() // Limit more than one ctrl
+            {
+                { typeof(EbAutoId), false }, 
+                { typeof(EbReview), false }, 
+                { typeof(EbSubmitButton), false }, 
+                { typeof(EbProvisionLocation), false }, 
+                { typeof(EbSysLocation), false } 
+            };
+
             for (int i = 0; i < Allctrls.Length; i++)
             {
-                if (Allctrls[i] is EbApproval)
+                if (OneCtrls.ContainsKey(Allctrls[i].GetType()))
+                {
+                    Type _type = Allctrls[i].GetType();
+                    if (OneCtrls[_type])
+                    {
+                        string st = string.IsNullOrEmpty(Allctrls[i].ToolNameAlias) ? _type.Name.Substring(2) : Allctrls[i].ToolNameAlias;
+                        throw new FormException($"Not allowed more than one {st} control");
+                    }
+                    OneCtrls[_type] = true;
+                    if (Allctrls[i] is EbReview)
+                        ebReviewCtrl = Allctrls[i] as EbReview;
+                }
+                else if (Allctrls[i] is EbApproval)//deprecated
                 {
                     string _tn = (Allctrls[i] as EbApproval).TableName;
                     if (string.IsNullOrEmpty(_tn))
@@ -36,48 +56,34 @@ namespace ExpressBase.Objects.WebFormRelated
                         throw new FormException(string.Format("Same table not allowed for {1} and {2}(approval control) : {0}", _tn, tbls[_tn], Allctrls[i].Label));
                     tbls.Add(_tn, Allctrls[i].Label + "(approval control)");
                 }
-                else if (Allctrls[i] is EbReview)
-                {
-                    if (ebReviewCtrl != null)
-                        throw new FormException("Only one review control is allowed");
-                    ebReviewCtrl = Allctrls[i] as EbReview;
-                }
                 else if (Allctrls[i] is EbDataGrid)
                 {
                     EbDataGrid DataGrid = Allctrls[i] as EbDataGrid;
-                    string _tn = (DataGrid).TableName;
+                    string _tn = DataGrid.TableName;
                     if (string.IsNullOrEmpty(DataGrid.TableName))
                         throw new FormException("Please enter a valid table name for " + Allctrls[i].Label + " (data grid)");
                     if (tbls.ContainsKey(_tn))
                         throw new FormException(string.Format("Same table not allowed for {1} and {2}(data grid) : {0}", _tn, tbls[_tn], Allctrls[i].Label));
                     tbls.Add(_tn, Allctrls[i].Label + "(data grid)");
 
-                    for (int j = 0; j < (DataGrid).Controls.Count; j++)
+                    for (int j = 0; j < DataGrid.Controls.Count; j++)
                     {
                         if (DataGrid.Controls[j] is EbDGUserControlColumn)
                         {
-                            EbDGColumn DGColumn = (DataGrid).Controls[j] as EbDGColumn;
-
+                            if (string.IsNullOrEmpty(DataGrid.Controls[j].RefId))
+                                throw new FormException($"User control reference is missing for {(DataGrid.Controls[j] as EbDGColumn).Title} in {DataGrid.Label}.");
+                            EbDGColumn DGColumn = DataGrid.Controls[j] as EbDGColumn;
                             (DataGrid.Controls[j] as EbDGUserControlColumn).Columns = new List<EbControl>();
-
                         }
                     }
-
                     if (!string.IsNullOrEmpty(DataGrid.DataSourceId) && serviceClient != null)
                         DataGrid.InitDSRelated(serviceClient, redis, Allctrls);
-
                 }
                 else if (Allctrls[i] is EbProvisionUser && serviceClient != null)
                 {
                     CheckEmailConAvailableResponse Resp = serviceClient.Post<CheckEmailConAvailableResponse>(new CheckEmailConAvailableRequest { });
                     if (!Resp.ConnectionAvailable)
                         throw new FormException("Please configure a email connection, it is required for ProvisionUser control.");
-                }
-                else if (Allctrls[i] is EbSubmitButton)
-                {
-                    if (HasSubmitButton)
-                        throw new FormException("Only one Submit Button is allowed");
-                    HasSubmitButton = true;
                 }
                 else if (Allctrls[i] is EbChartControl && serviceClient != null)
                 {
@@ -90,6 +96,35 @@ namespace ExpressBase.Objects.WebFormRelated
                     if (string.IsNullOrEmpty((Allctrls[i] as EbTVcontrol).TVRefId))
                         throw new FormException($"Please set a Table View for {Allctrls[i].Label}.");
                     (Allctrls[i] as EbTVcontrol).FetchParamsMeta(serviceClient);
+                }
+                else if (Allctrls[i] is EbPowerSelect)
+                {
+                    EbPowerSelect _ctrl = Allctrls[i] as EbPowerSelect;
+                    if (string.IsNullOrEmpty(_ctrl.DataSourceId))
+                        throw new FormException("Set Data Reader for " + _ctrl.Label);
+                    if (_ctrl.ValueMember == null)
+                        throw new FormException("Set Value Member for " + _ctrl.Label);
+                    if (_ctrl.RenderAsSimpleSelect && _ctrl.DisplayMember == null)
+                        throw new FormException("Set Display Member for " + _ctrl.Label);
+                    if (!_ctrl.RenderAsSimpleSelect && (_ctrl.DisplayMembers == null || _ctrl.DisplayMembers.Count == 0))
+                        throw new FormException("Set Display Members for " + _ctrl.Label);
+                }
+                else if (Allctrls[i] is EbDGPowerSelectColumn)
+                {
+                    EbDGPowerSelectColumn _ctrl = Allctrls[i] as EbDGPowerSelectColumn;
+                    if (string.IsNullOrEmpty(_ctrl.DataSourceId))
+                        throw new FormException("Set Data Reader for " + _ctrl.Name);
+                    if (_ctrl.ValueMember == null)
+                        throw new FormException("Set Value Member for " + _ctrl.Name);
+                    if (_ctrl.RenderAsSimpleSelect && _ctrl.DisplayMember == null)
+                        throw new FormException("Set Display Member for " + _ctrl.Name);
+                    if (!_ctrl.RenderAsSimpleSelect && (_ctrl.DisplayMembers == null || _ctrl.DisplayMembers.Count == 0))
+                        throw new FormException("Set Display Members for " + _ctrl.Name);
+                }
+                else if (Allctrls[i] is EbUserControl)
+                {
+                    if (string.IsNullOrEmpty(Allctrls[i].RefId))
+                        throw new FormException($"User control reference is missing for {Allctrls[i].Label}.");
                 }
             }
 
@@ -186,30 +221,6 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                 {
                     if ((ctrl as EbDGStringColumn).AutoSuggestion)
                         (ctrl as EbDGStringColumn).TableName = _tbl;
-                }
-                else if (ctrl is EbPowerSelect)
-                {
-                    EbPowerSelect _ctrl = ctrl as EbPowerSelect;
-                    if (string.IsNullOrEmpty(_ctrl.DataSourceId))
-                        throw new FormException("Set Data Reader for " + ctrl.Label);
-                    if (_ctrl.ValueMember == null)
-                        throw new FormException("Set Value Member for " + ctrl.Label);
-                    if (_ctrl.RenderAsSimpleSelect && _ctrl.DisplayMember == null)
-                        throw new FormException("Set Display Member for " + ctrl.Label);
-                    if (!_ctrl.RenderAsSimpleSelect && (_ctrl.DisplayMembers == null || _ctrl.DisplayMembers.Count == 0))
-                        throw new FormException("Set Display Members for " + ctrl.Label);
-                }
-                else if (ctrl is EbDGPowerSelectColumn)
-                {
-                    EbDGPowerSelectColumn _ctrl = ctrl as EbDGPowerSelectColumn;
-                    if (string.IsNullOrEmpty(_ctrl.DataSourceId))
-                        throw new FormException("Set Data Reader for " + ctrl.Name);
-                    if (_ctrl.ValueMember == null)
-                        throw new FormException("Set Value Member for " + ctrl.Name);
-                    if (_ctrl.RenderAsSimpleSelect && _ctrl.DisplayMember == null)
-                        throw new FormException("Set Display Member for " + ctrl.Name);
-                    if (!_ctrl.RenderAsSimpleSelect && (_ctrl.DisplayMembers == null || _ctrl.DisplayMembers.Count == 0))
-                        throw new FormException("Set Display Members for " + ctrl.Name);
                 }
                 else if (ctrl is EbControlContainer)
                 {

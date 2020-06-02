@@ -11,9 +11,7 @@ namespace ExpressBase.Objects
         public string CreatedAt { get; set; }
 
         public string ActionType { get; set; }
-
-        public bool MissingEntry { get; set; }
-
+        
         public Dictionary<string, FormTransactionRow> Tables { get; set; }//Key = Table name
 
         public Dictionary<string, FormTransactionTable> GridTables { get; set; }//Key = Table name
@@ -27,7 +25,11 @@ namespace ExpressBase.Objects
 
     public class FormTransactionTable
     {
-        public Dictionary<int, FormTransactionRow> Rows { get; set; }//Key = Row id
+        public Dictionary<int, FormTransactionRow> NewRows { get; set; }//Key = Row id
+
+        public Dictionary<int, FormTransactionRow> EditedRows { get; set; }//Key = Row id
+        
+        public Dictionary<int, FormTransactionRow> DeletedRows { get; set; }//Key = Row id
 
         public Dictionary<int, string> ColumnMeta { get; set; }
 
@@ -35,7 +37,9 @@ namespace ExpressBase.Objects
 
         public FormTransactionTable()
         {
-            this.Rows = new Dictionary<int, FormTransactionRow>();
+            this.NewRows = new Dictionary<int, FormTransactionRow>();
+            this.EditedRows = new Dictionary<int, FormTransactionRow>();
+            this.DeletedRows = new Dictionary<int, FormTransactionRow>();
             this.ColumnMeta = new Dictionary<int, string>();
         }
     }
@@ -47,19 +51,6 @@ namespace ExpressBase.Objects
         public FormTransactionRow()
         {
             this.Columns = new Dictionary<string, FormTransactionEntry>();
-        }
-
-        public bool IsRowModified
-        {
-            get
-            {
-                foreach (KeyValuePair<string, FormTransactionEntry> col in this.Columns)
-                {
-                    if (col.Value.IsModified)
-                        return true;
-                }
-                return false;
-            }
         }
     }
 
