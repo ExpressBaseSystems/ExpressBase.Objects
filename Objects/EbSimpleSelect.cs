@@ -83,6 +83,14 @@ namespace ExpressBase.Objects
             set { }
         }
 
+        [JsonIgnore]
+        public override string ClearJSfn { get { return @"
+if(ebcontext.renderContext === 'WebForm')
+    this.setValue(null);
+else
+    this.setValue(-1);
+"; } set { } }
+
         public override string IsRequiredOKJSfn
         {
             get
