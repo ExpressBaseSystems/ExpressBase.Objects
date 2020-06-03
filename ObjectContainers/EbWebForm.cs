@@ -45,6 +45,7 @@ namespace ExpressBase.Objects
             this.DataPushers = new List<EbDataPusher>();
             this.TitleExpression = new EbScript();
             this.PrintDocs = new List<ObjectBasicInfo>();
+            this.Notifications = new List<EbFormNotification>();
         }
 
         public override int TableRowId { get; set; }
@@ -132,6 +133,11 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.ScriptEditorJS)]
         [HelpText("Define Title Expression")]
         public EbScript TitleExpression { get; set; }
+
+        [PropertyGroup("Events")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        public List<EbFormNotification> Notifications { get; set; }
 
         public override string GetHead()
         {

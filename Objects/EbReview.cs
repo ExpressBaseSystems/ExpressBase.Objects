@@ -252,21 +252,17 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         //MakeReadOnly MakeReadWrite ShowProperty HideProperty
         [OnChangeExec(@"
-if(this.ApproverEntity === 1){
+if (this.ApproverEntity === 0) this.ApproverEntity = 1;
+pg.HideProperty('ApproverRoles');
+pg.HideProperty('ApproverUserGroup');
+pg.HideProperty('ApproverUsers');
+if (this.ApproverEntity === 1)
     pg.ShowProperty('ApproverRoles');
-    pg.HideProperty('ApproverUserGroup');
-    pg.HideProperty('ApproverUsers');
-}
-else if(this.ApproverEntity === 2){
-    pg.HideProperty('ApproverRoles');
+else if (this.ApproverEntity === 2)
     pg.ShowProperty('ApproverUserGroup');
-    pg.HideProperty('ApproverUsers');
-}
-else if(this.ApproverEntity === 3){
-    pg.HideProperty('ApproverRoles');
-    pg.HideProperty('ApproverUserGroup');
+else if (this.ApproverEntity === 3)
     pg.ShowProperty('ApproverUsers');
-}")]
+")]
         public ApproverEntityTypes ApproverEntity { get; set; }
 
         //[EnableInBuilder(BuilderType.WebForm)]

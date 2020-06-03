@@ -23,6 +23,8 @@ namespace ExpressBase.Objects.WebFormRelated
             if (string.IsNullOrEmpty(_this.TableName))
                 throw new FormException("Please enter a valid form table name");
             tbls.Add(_this.TableName, "form table");
+            if (_this.Notifications.Count > 0)
+                throw new FormException($"Notifications not allowed. Error code: 8714");
             EbControl[] Allctrls = _this.Controls.FlattenAllEbControls();
             Dictionary<Type, bool> OneCtrls = new Dictionary<Type, bool>() // Limit more than one ctrl
             {
