@@ -34,7 +34,6 @@ namespace ExpressBase.Objects
 
         [PropertyGroup("Behavior")]
         [EnableInBuilder(BuilderType.WebForm)]
-        [DefaultPropValue("100")]
         [OnChangeExec(@"
 if (this.NotifyBy === 0) this.NotifyBy = 1;
 pg.HideProperty('Users');
