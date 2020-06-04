@@ -14,6 +14,7 @@ using System.Text;
 using System.Xml.Serialization;
 using ExpressBase.Security;
 using ExpressBase.Common.LocationNSolution;
+using System.Net;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
@@ -386,5 +387,15 @@ END;";
         public string FileType { set; get; }
 
         public int FileRefId { set; get; }
+    }
+
+
+    public class ApiFileResponse
+    {
+        public string ContentType { set; get; }
+
+        public byte[] Bytea { set; get; }
+
+        public HttpStatusCode StatusCode { set; get; }
     }
 }
