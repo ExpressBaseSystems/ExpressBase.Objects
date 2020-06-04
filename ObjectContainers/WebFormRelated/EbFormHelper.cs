@@ -34,8 +34,22 @@ namespace ExpressBase.Objects
                         if (_prop.IsDefined(typeof(OSE_ObjectTypes)))
                         {
                             object _val = _prop.GetValue(_flatCtrls[i], null);
-                            if (_val != null && !_val.ToString().IsEmpty())
-                                refids.Add(_val.ToString());
+                            if (_val != null)
+                            {
+                                if (_prop.PropertyType == typeof(string))
+                                {
+                                    if (!_val.ToString().IsEmpty())
+                                        refids.Add(_val.ToString());
+                                }
+                                else if(_prop.PropertyType == typeof(List<ObjectBasicInfo>))
+                                {
+                                    foreach(ObjectBasicInfo info in _val as List<ObjectBasicInfo>)
+                                    {
+                                        if (!string.IsNullOrEmpty(info.ObjRefId))
+                                            refids.Add(info.ObjRefId);
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -66,12 +80,32 @@ namespace ExpressBase.Objects
                         if (_prop.IsDefined(typeof(OSE_ObjectTypes)))
                         {
                             object _val = _prop.GetValue(_flatCtrls[i], null);
-                            if (_val != null && !_val.ToString().IsEmpty())
+                            if (_val != null)
                             {
-                                if (RefidMap.ContainsKey(_val.ToString()))
-                                    _prop.SetValue(_flatCtrls[i], RefidMap[_val.ToString()], null);
-                                else
-                                    _prop.SetValue(_flatCtrls[i], "failed-to-update-");
+                                if (_prop.PropertyType == typeof(string))
+                                {
+                                    string st_val = _val.ToString();
+                                    if (!st_val.IsEmpty())
+                                    {
+                                        if (RefidMap.ContainsKey(st_val))
+                                            _prop.SetValue(_flatCtrls[i], RefidMap[st_val], null);
+                                        else
+                                            _prop.SetValue(_flatCtrls[i], "failed-to-update-");
+                                    }
+                                }
+                                else if (_prop.PropertyType == typeof(List<ObjectBasicInfo>))
+                                {
+                                    foreach (ObjectBasicInfo info in _val as List<ObjectBasicInfo>)
+                                    {
+                                        if (!string.IsNullOrEmpty(info.ObjRefId))
+                                        {
+                                            if (RefidMap.ContainsKey(info.ObjRefId))
+                                                info.ObjRefId = info.ObjRefId;
+                                            else
+                                                info.ObjRefId = "failed-to-update-";
+                                        }
+                                    }
+                                }
                             }
                         }
                     }

@@ -56,6 +56,7 @@ namespace ExpressBase.Objects
         [Alias("DropdownMaxHeight")]
         public int DropdownHeight { get; set; }
 
+        [JsonIgnore]
         public override string JustSetValueJSfn
         {
             get
@@ -65,6 +66,7 @@ namespace ExpressBase.Objects
             set { }
         }
 
+        [JsonIgnore]
         public override string SetValueJSfn
         {
             get
@@ -74,6 +76,7 @@ namespace ExpressBase.Objects
             set { }
         }
 
+        [JsonIgnore]
         public override string GetValueFromDOMJSfn
         {
             get
