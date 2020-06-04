@@ -853,8 +853,8 @@ namespace ExpressBase.Objects
         //[PropertyEditor(PropertyEditorType.String)]
         public override object FieldValue { get; set; }
 
-        [HideInPropertyGrid]
-        public override string Label { get; set; }
+		[EnableInBuilder(BuilderType.BotForm, BuilderType.WebForm)]
+		public override string Label { get; set; }
 
         [EnableInBuilder(BuilderType.BotForm, BuilderType.WebForm)]
         [HideInPropertyGrid]
