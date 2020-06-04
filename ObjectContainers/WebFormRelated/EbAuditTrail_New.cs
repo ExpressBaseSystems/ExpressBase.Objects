@@ -308,8 +308,8 @@ namespace ExpressBase.Objects.WebFormRelated/////////////
 
                 if (_table.TableType != WebFormTableTypes.Normal)
                 {
-                    Dictionary<string, string> new_val_dict = new_val == null ? null : JsonConvert.DeserializeObject<Dictionary<string, string>>(new_val);
-                    Dictionary<string, string> old_val_dict = old_val == null ? null : JsonConvert.DeserializeObject<Dictionary<string, string>>(old_val);
+                    Dictionary<string, string> new_val_dict = (new_val == null || new_val == "[null]") ? null : JsonConvert.DeserializeObject<Dictionary<string, string>>(new_val);
+                    Dictionary<string, string> old_val_dict = (old_val == null || old_val == "[null]") ? null : JsonConvert.DeserializeObject<Dictionary<string, string>>(old_val);
 
                     if (!Trans[m_id].GridTables.ContainsKey(_table.TableName))
                     {
