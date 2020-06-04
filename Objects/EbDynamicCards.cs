@@ -661,9 +661,6 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.Number)]
         public override object FieldValue { get; set; }
 
-        [EnableInBuilder(BuilderType.BotForm, BuilderType.WebForm)]
-        [PropertyEditor(PropertyEditorType.ScriptEditorJS)]
-        public EbScript ValueExpression { get; set; }
 
         [EnableInBuilder(BuilderType.BotForm, BuilderType.WebForm)]
         public bool Sum { get; set; }
@@ -673,8 +670,8 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.BotForm, BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.Number)]
-        [DefaultPropValue("1000000")]
-        [OnChangeExec(@"
+		[DefaultPropValue("0")]
+		[OnChangeExec(@"
 		if($(event.target).val() > this.MaximumValue){
 			$(event.target).val('0');
 			this.MinimumValue = 0 ;
@@ -684,10 +681,11 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.BotForm, BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.Number)]
-        [OnChangeExec(@"
+		[DefaultPropValue("999999")]
+		[OnChangeExec(@"
 		if($(event.target).val() <= this.MinimumValue){
 			$(event.target).val('999999');
-			this.MinimumValue = 999999 ;
+			this.MaximumValue = 999999 ;
 		}
 			")]
         public int MaximumValue { get; set; }
@@ -793,10 +791,6 @@ namespace ExpressBase.Objects
         public override object FieldValue { get; set; }
 
         [EnableInBuilder(BuilderType.BotForm, BuilderType.WebForm)]
-        [PropertyEditor(PropertyEditorType.ScriptEditorJS)]
-        public EbScript ValueExpression { get; set; }
-
-        [EnableInBuilder(BuilderType.BotForm, BuilderType.WebForm)]
         public override bool ReadOnly { get; set; }
 
         [EnableInBuilder(BuilderType.BotForm, BuilderType.WebForm)]
@@ -859,8 +853,8 @@ namespace ExpressBase.Objects
         //[PropertyEditor(PropertyEditorType.String)]
         public override object FieldValue { get; set; }
 
-        [HideInPropertyGrid]
-        public override string Label { get; set; }
+		[EnableInBuilder(BuilderType.BotForm, BuilderType.WebForm)]
+		public override string Label { get; set; }
 
         [EnableInBuilder(BuilderType.BotForm, BuilderType.WebForm)]
         [HideInPropertyGrid]

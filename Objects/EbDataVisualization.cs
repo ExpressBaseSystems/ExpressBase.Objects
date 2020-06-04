@@ -535,6 +535,12 @@ namespace ExpressBase.Objects
                     this.Columns.Add(actcol);
                 }
             }
+            if(this.Columns.Get("eb_created_by") != null)
+                this.Columns.Get("eb_created_by").RenderType = EbDbTypes.String;
+            if (this.Columns.Get("eb_lastmodified_by") != null)
+                this.Columns.Get("eb_lastmodified_by").RenderType = EbDbTypes.String;
+            if (this.Columns.Get("eb_loc_id") != null)
+                this.Columns.Get("eb_loc_id").RenderType = EbDbTypes.String;
         }
 
         public override void BeforeSave(IServiceClient serviceClient, IRedisClient redis)

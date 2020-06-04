@@ -77,7 +77,20 @@ namespace ExpressBase.Objects
 
         public EbDate()
         {
+        }
 
+        [JsonIgnore]
+        public override string EnableJSfn
+        {
+            get
+            {
+                return JSFnsConstants.Ctrl_EnableJSfn
++ @"
+if(this.IsNullable && !($('#' + this.EbSid_CtxId).closest('.input-group').find(`input[type='checkbox']`).is(':checked')))
+    $('#' + this.EbSid_CtxId).prop('disabled', true).next('.input-group-addon').css('pointer-events', 'none');"
+;
+            }
+            set { }
         }
 
         [OnDeserialized]
@@ -335,12 +348,12 @@ namespace ExpressBase.Objects
                 {
                     if (this.ShowDateAs_ == DateShowFormat.Year)
                         cField.Value = DateTime.ParseExact(cField.Value.ToString(), "yyyy", CultureInfo.InvariantCulture);
-                    else if(this.ShowDateAs_ == DateShowFormat.Year_Month)
+                    else if (this.ShowDateAs_ == DateShowFormat.Year_Month)
                         cField.Value = DateTime.ParseExact(cField.Value.ToString(), "MM/yyyy", CultureInfo.InvariantCulture);
                     else
                         cField.Value = DateTime.ParseExact(cField.Value.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
                 }
-                else 
+                else
                 {
                     DateTime dt;
                     if (this.EbDateType == EbDateType.DateTime)
@@ -383,7 +396,7 @@ namespace ExpressBase.Objects
             string _displayMember = Value == null ? string.Empty : Value.ToString();
             bool skip = false;
 
-            if(_this is EbDate || _this is EbDGDateColumn)
+            if (_this is EbDate || _this is EbDGDateColumn)
             {
                 if (Value == null && _this.IsNullable)
                     skip = true;
@@ -402,7 +415,7 @@ namespace ExpressBase.Objects
                         dt = Convert.ToDateTime(Value);
                 }
                 DateTime dt_cov = dt.ConvertFromUtc(UserObj.Preference.TimeZone);
-                
+
                 if (_this.EbDateType == EbDateType.Date)
                 {
                     if (!(_this is EbDate)) //EbSysCreatedAt EbSysModifiedAt EbDGDateColumn EbDGCreatedAtColumn EbDGModifiedAtColumn
@@ -429,7 +442,7 @@ namespace ExpressBase.Objects
                         }
                     }
                 }
-                else if(_this.EbDateType == EbDateType.DateTime)
+                else if (_this.EbDateType == EbDateType.DateTime)
                 {
                     _formattedData = dt_cov.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
                     _displayMember = dt_cov.ToString(UserObj.Preference.GetShortDatePattern() + " " + UserObj.Preference.GetShortTimePattern(), CultureInfo.InvariantCulture);

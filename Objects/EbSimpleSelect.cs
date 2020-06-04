@@ -56,6 +56,7 @@ namespace ExpressBase.Objects
         [Alias("DropdownMaxHeight")]
         public int DropdownHeight { get; set; }
 
+        [JsonIgnore]
         public override string JustSetValueJSfn
         {
             get
@@ -65,6 +66,7 @@ namespace ExpressBase.Objects
             set { }
         }
 
+        [JsonIgnore]
         public override string SetValueJSfn
         {
             get
@@ -74,6 +76,7 @@ namespace ExpressBase.Objects
             set { }
         }
 
+        [JsonIgnore]
         public override string GetValueFromDOMJSfn
         {
             get
@@ -82,6 +85,14 @@ namespace ExpressBase.Objects
             }
             set { }
         }
+
+        [JsonIgnore]
+        public override string ClearJSfn { get { return @"
+if(ebcontext.renderContext === 'WebForm')
+    this.setValue(null);
+else
+    this.setValue(-1);
+"; } set { } }
 
         public override string IsRequiredOKJSfn
         {
