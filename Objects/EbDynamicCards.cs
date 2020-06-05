@@ -772,8 +772,8 @@ namespace ExpressBase.Objects
                         .Replace("@Value@", (this.FieldValue == null) ? "1" : ((tempvar is Double) ? tempvar.ToString("0.00") : tempvar.ToString()))
                         .Replace("@display@", this.HideInCard ? "display:none;" : "").Replace("@Name@", this.Name ?? "@Name@")
                         .Replace("@Label@", this.Label.IsNullOrEmpty() ? this.Name : this.Label)
-                        .Replace("@ReadOnly@", this.ReadOnly ? "readonly" : "")
-                        .Replace("@PlusMinusDisplay@", this.ReadOnly ? "visibility: hidden;" : "display:inline-block;")
+                        .Replace("@ReadOnly@", this.IsDisable ? "readonly" : "")
+                        .Replace("@PlusMinusDisplay@", this.IsDisable ? "visibility: hidden;" : "display:inline-block;")
                         .Replace("@MinValue@", this.MinimumValue.ToString())
                         .Replace("@MaxValue@", this.MaximumValue.ToString());
         }
