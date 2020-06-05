@@ -711,10 +711,12 @@ namespace ExpressBase.Objects
         public int MeetingScheduleId { get; set; }
         public int ParticipantType { get; set; }
         public int TypeOfUser { get; set; }
+        public int Confirmation { get; set; }
         public int UserId { get; set; }
     }
     public class MeetingScheduleDetails
     {
+        public int SlotParticipantId { get; set; }
         public int SlotId { get; set; }
         public int MeetingScheduleId { get; set; }
         public string IsApproved { get; set; }
