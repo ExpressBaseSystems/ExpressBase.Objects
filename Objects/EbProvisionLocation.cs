@@ -178,7 +178,7 @@ this.Init = function(id)
             return @"<span class='eb-ctrl-label' ui-label id='@ebsidLbl'> ProvisionLocation </span>";
 
 //            return @"
-//            <input id='@ebsid@' data-ebtype='@data-ebtype@'  data-toggle='tooltip' title='@toolTipText@' class='date' type='text' name='@name@' autocomplete = 'off' @value@ @tabIndex@ style='width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@ @readOnlyString@ @required@ @placeHolder@ disabled />
+//            <input id='@ebsid@' data-ebtype='@data-ebtype@'  data-toggle='tooltip' title='@toolTipText@' class='date' type='text' name='@name@' autocomplete = 'off' @value@ @tabIndex@ style='width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@' @required@ @placeHolder@ disabled />
 //            "
 //.Replace("@name@", (this.Name != null ? this.Name.Trim() : ""))
 //.Replace("@data-ebtype@", "16")//( (int)this.EbDateType ).ToString())
@@ -190,7 +190,6 @@ this.Init = function(id)
 //    //.Replace("@BackColor@ ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor@ ") + ";"))
 //    .Replace("@ForeColor@ ", "color:" + ((this.ForeColor != null) ? this.ForeColor : "@ForeColor@ ") + ";")
 //.Replace("@required@", (this.Required && !this.Hidden ? " required" : string.Empty))
-//.Replace("@readOnlyString@", this.ReadOnlyString)
 //.Replace("@placeHolder@", "placeholder=''");
         }
 

@@ -98,7 +98,7 @@ namespace ExpressBase.Objects
 
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.BotForm)]
-        public override bool IsReadOnly { get => this.ReadOnly; }
+        public override bool IsReadOnly { get => this.IsDisable; }
 
         [HideInPropertyGrid]
         [JsonIgnore]
