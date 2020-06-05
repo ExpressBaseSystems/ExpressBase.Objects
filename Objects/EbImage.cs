@@ -178,10 +178,7 @@ namespace ExpressBase.Objects
 
         [HideInPropertyGrid]
         public override bool Hidden { get; set; }
-
-        [HideInPropertyGrid]
-        public override bool IsDisable { get; set; }
-
+		
         [HideInPropertyGrid]
         public override bool Required { get; set; }
 
