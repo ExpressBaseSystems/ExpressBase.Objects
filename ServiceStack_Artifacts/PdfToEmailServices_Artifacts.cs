@@ -27,6 +27,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order =2)]
         public List<Param> Params { get; set; }
+
+        [DataMember(Order =3)]
+        public string RefId { get; set; }
     }
     public  class EmailAttachmenResponse
     {
