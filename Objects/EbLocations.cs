@@ -25,10 +25,9 @@ namespace ExpressBase.Objects
 		[EnableInBuilder(BuilderType.BotForm)]
 		public override bool IsDisable { get => true; }
 
-		[EnableInBuilder( BuilderType.BotForm)]
-		[DefaultPropValue("Ok")]
-		[Alias("Proceed Button text")]
-		public string ProceedBtnTxt { get; set; }
+		[HideInPropertyGrid]
+		[EnableInBuilder(BuilderType.BotForm)]
+		public override bool IsDisable { get => true; }
 
 		public EbLocations()
         {

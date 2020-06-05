@@ -46,10 +46,9 @@ namespace ExpressBase.Objects
         //[EnableInBuilder(BuilderType.BotForm)]
         //public override bool IsReadOnly { get => true; }
 
-		[EnableInBuilder(BuilderType.BotForm)]
-		[DefaultPropValue("Ok")]
-		[Alias("Proceed Button text")]
-		public string ProceedBtnTxt { get; set; }
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.BotForm)]
+        public override bool IsDisable { get => true; }
 
 		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         public override bool IsNonDataInputControl { get => true; }
@@ -179,10 +178,7 @@ namespace ExpressBase.Objects
 
         [HideInPropertyGrid]
         public override bool Hidden { get; set; }
-
-        [HideInPropertyGrid]
-        public override bool IsDisable { get; set; }
-
+		
         [HideInPropertyGrid]
         public override bool Required { get; set; }
 
