@@ -25,6 +25,11 @@ namespace ExpressBase.Objects
 		[EnableInBuilder(BuilderType.BotForm)]
 		public override bool IsReadOnly { get => true; }
 
+		[EnableInBuilder( BuilderType.BotForm)]
+		[DefaultPropValue("Ok")]
+		[Alias("Proceed Button text")]
+		public string ProceedBtnTxt { get; set; }
+
 		public EbLocations()
         {
             this.LocationCollection = new List<EbLocationCard>();
