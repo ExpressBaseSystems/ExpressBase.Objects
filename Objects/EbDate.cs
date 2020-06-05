@@ -175,9 +175,9 @@ if(this.IsNullable && !($('#' + this.EbSid_CtxId).closest('.input-group').find(`
         //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         //public DateFormat DateFormat { get; set; }
 
-        [HideInPropertyGrid]
-        [EnableInBuilder(BuilderType.BotForm)]
-        public override bool IsReadOnly { get => this.IsDisable; }
+        //[HideInPropertyGrid]
+        //[EnableInBuilder(BuilderType.BotForm)]
+        //public override bool IsReadOnly { get => this.IsDisable; }
 
         public override VendorDbType GetvDbType(IVendorDbTypes vDbTypes)
         {

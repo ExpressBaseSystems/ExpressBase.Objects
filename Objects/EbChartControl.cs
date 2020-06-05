@@ -45,6 +45,10 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         public override string ToolNameAlias { get { return "Chart"; } set { } }
 
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.BotForm)]
+        public override bool IsDisable { get => true; }
+
 
         public void InitFromDataBase(JsonServiceClient ServiceClient)
         {

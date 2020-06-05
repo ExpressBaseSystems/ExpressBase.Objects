@@ -87,9 +87,9 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
 
-        [HideInPropertyGrid]
-        [EnableInBuilder(BuilderType.BotForm)]
-        public override bool IsReadOnly { get => this.IsDisable; }
+        //[HideInPropertyGrid]
+        //[EnableInBuilder(BuilderType.BotForm)]
+        //public override bool IsReadOnly { get => this.IsDisable; }
 
         [OnDeserialized]
         public void OnDeserializedMethod(StreamingContext context)

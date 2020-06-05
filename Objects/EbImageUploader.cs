@@ -20,9 +20,9 @@ namespace ExpressBase.Objects
 
         public EbImageUploader() { }
 
-		[HideInPropertyGrid]
-		[EnableInBuilder(BuilderType.BotForm)]
-		public override bool IsReadOnly { get => this.IsDisable; }
+		//[HideInPropertyGrid]
+		//[EnableInBuilder(BuilderType.BotForm)]
+		//public override bool IsReadOnly { get => this.IsDisable; }
 
 		[OnDeserialized]
         public void OnDeserializedMethod(StreamingContext context)

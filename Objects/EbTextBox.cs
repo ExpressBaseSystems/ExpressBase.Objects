@@ -223,9 +223,9 @@ else {
         [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
 
-        [HideInPropertyGrid]
-        [EnableInBuilder(BuilderType.BotForm)]
-        public override bool IsReadOnly { get => this.IsDisable; }
+        //[HideInPropertyGrid]
+        //[EnableInBuilder(BuilderType.BotForm)]
+        //public override bool IsReadOnly { get => this.IsDisable; }
 
         //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         //[PropertyEditor(PropertyEditorType.JS)]

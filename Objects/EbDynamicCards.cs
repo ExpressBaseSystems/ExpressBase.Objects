@@ -170,7 +170,7 @@ namespace ExpressBase.Objects
         public EbControl SearchField { get; set; }
 
         [HideInPropertyGrid]
-        public override bool IsReadOnly
+        public override bool IsDisable
         {
             get
             {
@@ -249,7 +249,7 @@ namespace ExpressBase.Objects
             html += @"	</div>@SummarizeHtml@  <div class='cards-btn-cont' style='margin-top: 20px;'> <button id='' class='btn btn-default ctrl-submit-btn'  data-toggle='tooltip' title=''> @ButtonText@ </button> </div> </div>
 					</div>"
                 .Replace("@SummarizeHtml@", (this.getCartHtml().IsNullOrEmpty() || !this.MultiSelect) ? "" : this.getCartHtml())
-                .Replace("@ButtonText@", this.ButtonText.IsNullOrEmpty() ? (this.IsReadOnly ? "OK" : "Submit") : this.ButtonText);
+                .Replace("@ButtonText@", this.ButtonText.IsNullOrEmpty() ? (this.IsDisable ? "OK" : "Submit") : this.ButtonText);
             return html;
         }
 

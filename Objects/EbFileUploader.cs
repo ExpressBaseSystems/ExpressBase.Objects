@@ -15,7 +15,6 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
     public class EbFileUploader : EbControlUI
     {
-        #region Hide From PropertyGrid
 
         [HideInPropertyGrid]
         public override bool DoNotPersist { get; set; }
@@ -40,16 +39,15 @@ namespace ExpressBase.Objects
 
         [JsonIgnore]
         public override string IsRequiredOKJSfn { get { return "return true"; } set { } }
-        #endregion
 
         public EbFileUploader()
         {
             this.Categories = new List<EbFupCategories>();
         }
 
-        [HideInPropertyGrid]
-        [EnableInBuilder(BuilderType.BotForm)]
-        public override bool IsReadOnly { get => this.IsDisable; }
+        //[HideInPropertyGrid]
+        //[EnableInBuilder(BuilderType.BotForm)]
+        //public override bool IsReadOnly { get => this.IsDisable; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup("General")]
