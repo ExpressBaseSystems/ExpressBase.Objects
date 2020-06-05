@@ -43,7 +43,7 @@ namespace ExpressBase.Objects
                 for (int i = 0; i < this.Controls.Count; i++)
                 {
                     EbControl control = this.Controls[i];
-                    if (!(control.IsReadOnly || control.IsDisable))
+                    if (!control.IsDisable)
                     {
                         res = true;
                         break;
@@ -75,7 +75,7 @@ namespace ExpressBase.Objects
             {
                 foreach (EbControl ctrl in this.Controls)
                 {
-                    if (!ctrl.IsReadOnly)
+                    if (!ctrl.IsDisable)
                         return false;
                 }
                 return true;
@@ -156,7 +156,7 @@ namespace ExpressBase.Objects
 
             return html.Replace("@name@", this.Name);
         }
-        
+
         public override void BeforeSave(IServiceClient serviceClient, IRedisClient redis)
         {
             Dictionary<string, string> tbls = new Dictionary<string, string>();
@@ -203,37 +203,12 @@ namespace ExpressBase.Objects
 
         public override List<string> DiscoverRelatedRefids()
         {
-            List<string> refids = new List<string>();
-            foreach (EbControl control in Controls)
-            {
-                PropertyInfo[] _props = control.GetType().GetProperties();
-                foreach (PropertyInfo _prop in _props)
-                {
-                    if (_prop.IsDefined(typeof(OSE_ObjectTypes)))
-                        refids.Add(_prop.GetValue(control, null).ToString());
-                }
-            }
-            return refids;
+            return EbFormHelper.DiscoverRelatedRefids(this);
         }
 
         public override void ReplaceRefid(Dictionary<string, string> RefidMap)
         {
-            foreach (EbControl control in Controls)
-            {
-                PropertyInfo[] _props = control.GetType().GetProperties();
-                foreach (PropertyInfo _prop in _props)
-                {
-                    if (_prop.IsDefined(typeof(OSE_ObjectTypes)))
-                    {
-                        string _val = _prop.GetValue(control, null).ToString();
-                        if (RefidMap.ContainsKey(_val))
-                            _prop.SetValue(control, RefidMap[_val], null);
-                        else
-                            _prop.SetValue(control, "failed-to-update-");
-                    }
-
-                }
-            }
+            EbFormHelper.ReplaceRefid(this, RefidMap);
         }
     }
 }

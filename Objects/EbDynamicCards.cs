@@ -170,7 +170,7 @@ namespace ExpressBase.Objects
         public EbControl SearchField { get; set; }
 
         [HideInPropertyGrid]
-        public override bool IsReadOnly
+        public override bool IsDisable
         {
             get
             {
@@ -249,7 +249,7 @@ namespace ExpressBase.Objects
             html += @"	</div>@SummarizeHtml@  <div class='cards-btn-cont' style='margin-top: 20px;'> <button id='' class='btn btn-default ctrl-submit-btn'  data-toggle='tooltip' title=''> @ButtonText@ </button> </div> </div>
 					</div>"
                 .Replace("@SummarizeHtml@", (this.getCartHtml().IsNullOrEmpty() || !this.MultiSelect) ? "" : this.getCartHtml())
-                .Replace("@ButtonText@", this.ButtonText.IsNullOrEmpty() ? (this.IsReadOnly ? "OK" : "Submit") : this.ButtonText);
+                .Replace("@ButtonText@", this.ButtonText.IsNullOrEmpty() ? (this.IsDisable ? "OK" : "Submit") : this.ButtonText);
             return html;
         }
 
@@ -661,20 +661,17 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.Number)]
         public override object FieldValue { get; set; }
 
-        [EnableInBuilder(BuilderType.BotForm, BuilderType.WebForm)]
-        [PropertyEditor(PropertyEditorType.ScriptEditorJS)]
-        public EbScript ValueExpression { get; set; }
 
         [EnableInBuilder(BuilderType.BotForm, BuilderType.WebForm)]
         public bool Sum { get; set; }
 
         [EnableInBuilder(BuilderType.BotForm, BuilderType.WebForm)]
-        public override bool ReadOnly { get; set; }
+        public override bool IsDisable { get; set; }
 
         [EnableInBuilder(BuilderType.BotForm, BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.Number)]
-        [DefaultPropValue("1000000")]
-        [OnChangeExec(@"
+		[DefaultPropValue("0")]
+		[OnChangeExec(@"
 		if($(event.target).val() > this.MaximumValue){
 			$(event.target).val('0');
 			this.MinimumValue = 0 ;
@@ -684,10 +681,11 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.BotForm, BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.Number)]
-        [OnChangeExec(@"
+		[DefaultPropValue("999999")]
+		[OnChangeExec(@"
 		if($(event.target).val() <= this.MinimumValue){
 			$(event.target).val('999999');
-			this.MinimumValue = 999999 ;
+			this.MaximumValue = 999999 ;
 		}
 			")]
         public int MaximumValue { get; set; }
@@ -774,8 +772,8 @@ namespace ExpressBase.Objects
                         .Replace("@Value@", (this.FieldValue == null) ? "1" : ((tempvar is Double) ? tempvar.ToString("0.00") : tempvar.ToString()))
                         .Replace("@display@", this.HideInCard ? "display:none;" : "").Replace("@Name@", this.Name ?? "@Name@")
                         .Replace("@Label@", this.Label.IsNullOrEmpty() ? this.Name : this.Label)
-                        .Replace("@ReadOnly@", this.ReadOnly ? "readonly" : "")
-                        .Replace("@PlusMinusDisplay@", this.ReadOnly ? "visibility: hidden;" : "display:inline-block;")
+                        .Replace("@ReadOnly@", this.IsDisable ? "readonly" : "")
+                        .Replace("@PlusMinusDisplay@", this.IsDisable ? "visibility: hidden;" : "display:inline-block;")
                         .Replace("@MinValue@", this.MinimumValue.ToString())
                         .Replace("@MaxValue@", this.MaximumValue.ToString());
         }
@@ -793,11 +791,7 @@ namespace ExpressBase.Objects
         public override object FieldValue { get; set; }
 
         [EnableInBuilder(BuilderType.BotForm, BuilderType.WebForm)]
-        [PropertyEditor(PropertyEditorType.ScriptEditorJS)]
-        public EbScript ValueExpression { get; set; }
-
-        [EnableInBuilder(BuilderType.BotForm, BuilderType.WebForm)]
-        public override bool ReadOnly { get; set; }
+        public override bool IsDisable { get; set; }
 
         [EnableInBuilder(BuilderType.BotForm, BuilderType.WebForm)]
         public override string Label { get; set; }
@@ -844,7 +838,7 @@ namespace ExpressBase.Objects
 					</div>"
                     .Replace("@Text@", (this.FieldValue == null) ? "" : this.FieldValue.ToString())
                     .Replace("@display@", this.HideInCard ? "display:none;" : "").Replace("@Name@", this.Name ?? "@Name@")
-                    .Replace("@Label@", this.Label.IsNullOrEmpty() ? this.Name : this.Label).Replace("@ReadOnly@", this.ReadOnly ? "readonly" : "");
+                    .Replace("@Label@", this.Label.IsNullOrEmpty() ? this.Name : this.Label).Replace("@ReadOnly@", this.IsDisable ? "readonly" : "");
         }
     }
 
@@ -859,8 +853,8 @@ namespace ExpressBase.Objects
         //[PropertyEditor(PropertyEditorType.String)]
         public override object FieldValue { get; set; }
 
-        [HideInPropertyGrid]
-        public override string Label { get; set; }
+		[EnableInBuilder(BuilderType.BotForm, BuilderType.WebForm)]
+		public override string Label { get; set; }
 
         [EnableInBuilder(BuilderType.BotForm, BuilderType.WebForm)]
         [HideInPropertyGrid]

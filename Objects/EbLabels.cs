@@ -7,7 +7,7 @@ using System.Runtime.Serialization;
 
 namespace ExpressBase.Objects
 {
-    [EnableInBuilder(BuilderType.BotForm)]
+    [EnableInBuilder()]
     public class EbLabels : EbControlUI
 	{
 
@@ -22,7 +22,7 @@ namespace ExpressBase.Objects
 
 		[HideInPropertyGrid]
 		[EnableInBuilder(BuilderType.BotForm)]
-		public override bool IsReadOnly { get => true; }
+		public override bool IsDisable { get => true; }
 
 		[OnDeserialized]
         public void OnDeserializedMethod(StreamingContext context)

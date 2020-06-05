@@ -10,7 +10,7 @@ using System.Runtime.Serialization;
 namespace ExpressBase.Objects
 {
 
-    [EnableInBuilder(BuilderType.BotForm, BuilderType.WebForm, BuilderType.UserControl)]
+    [EnableInBuilder( BuilderType.WebForm, BuilderType.UserControl)]
     public class EbLabel : EbControlUI
 	{
 
@@ -26,7 +26,7 @@ namespace ExpressBase.Objects
 
 		[HideInPropertyGrid]
 		[EnableInBuilder(BuilderType.BotForm)]
-		public override bool IsReadOnly { get => true; }
+		public override bool IsDisable { get => true; }
 
 		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
 		public override bool IsNonDataInputControl { get => true; }

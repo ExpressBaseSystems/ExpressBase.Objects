@@ -223,9 +223,9 @@ else {
         [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
 
-        [HideInPropertyGrid]
-        [EnableInBuilder(BuilderType.BotForm)]
-        public override bool IsReadOnly { get => this.ReadOnly; }
+        //[HideInPropertyGrid]
+        //[EnableInBuilder(BuilderType.BotForm)]
+        //public override bool IsReadOnly { get => this.IsDisable; }
 
         //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         //[PropertyEditor(PropertyEditorType.JS)]
@@ -297,7 +297,7 @@ else {
                 string html = @"
             @attachedLbl@
             <input type='@TextMode '  data-ebtype='@data-ebtype@' ui-inp id='@ebsid@' name='@name@' @AutoCompleteOff@ ' data-toggle='tooltip' data-placement='top' title='@ToolTipText@' 
-@TabIndex@ @MaxLength@  style='width:100%; height:@heightpx; @BackColor @ForeColor display:inline-block; @fontStyle @ReadOnlyString  @Required  @PlaceHolder  @Text@  />
+@TabIndex@ @MaxLength@  style='width:100%; height:@heightpx; @BackColor @ForeColor display:inline-block; @fontStyle'  @Required  @PlaceHolder  @Text@  />
         @attachedLblClose@"
  .Replace("@ebsid@", this.IsRenderMode && this.IsDynamicTabChild ? "@" + this.EbSid_CtxId + "_ebsid@" : (String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId))
  .Replace("@name@", this.EbSid_CtxId)
@@ -305,7 +305,6 @@ else {
  .Replace("@MaxLength@", (this.MaxLength > 0) ? "maxlength='" + this.MaxLength.ToString() + "'" : "")
  .Replace("@TextMode ", (this.TextMode == TextMode.SingleLine) ? "text" : this.TextMode.ToString().ToLower())
  .Replace("@Required ", (this.Required && !this.Hidden ? " required" : string.Empty))
- .Replace("@ReadOnlyString ", this.ReadOnlyString)
  .Replace("@PlaceHolder ", "placeholder='" + this.PlaceHolder + "'")
  .Replace("@TabIndex@ ", "tabindex='" + this.TabIndex + "' ")
  .Replace("@AutoCompleteOff@ ", " autocomplete = '" + ((this.AutoCompleteOff || this.TextMode.ToString().ToLower() == "password") ? "off" : "on") + "'")
@@ -358,7 +357,6 @@ else {
 .Replace("@ebsid@", this.IsRenderMode && this.IsDynamicTabChild ? "@" + this.EbSid_CtxId + "_ebsid@" : (String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId))
 .Replace("@MaxLength@", "maxlength='" + ((this.MaxLength > 0) ? this.MaxLength.ToString() : "@MaxLength") + "'")
 .Replace("@Required@", (this.Required && !this.Hidden ? " required" : string.Empty))
-.Replace("@ReadOnlyString@", this.ReadOnlyString)
 .Replace("@PlaceHolder@", "placeholder='" + this.PlaceHolder + "'")
 .Replace("@TabIndex@", "tabindex='" + this.TabIndex + "' ")
 .Replace("@AutoCompleteOff@ ", "autocomplete = " + ((this.AutoCompleteOff || this.TextMode.ToString().ToLower() == "password") ? "off" : "on") + "'")
