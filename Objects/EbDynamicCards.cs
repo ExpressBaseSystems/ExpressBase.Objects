@@ -666,7 +666,7 @@ namespace ExpressBase.Objects
         public bool Sum { get; set; }
 
         [EnableInBuilder(BuilderType.BotForm, BuilderType.WebForm)]
-        public override bool ReadOnly { get; set; }
+        public override bool IsDisable { get; set; }
 
         [EnableInBuilder(BuilderType.BotForm, BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.Number)]
@@ -791,7 +791,7 @@ namespace ExpressBase.Objects
         public override object FieldValue { get; set; }
 
         [EnableInBuilder(BuilderType.BotForm, BuilderType.WebForm)]
-        public override bool ReadOnly { get; set; }
+        public override bool IsDisable { get; set; }
 
         [EnableInBuilder(BuilderType.BotForm, BuilderType.WebForm)]
         public override string Label { get; set; }
@@ -838,7 +838,7 @@ namespace ExpressBase.Objects
 					</div>"
                     .Replace("@Text@", (this.FieldValue == null) ? "" : this.FieldValue.ToString())
                     .Replace("@display@", this.HideInCard ? "display:none;" : "").Replace("@Name@", this.Name ?? "@Name@")
-                    .Replace("@Label@", this.Label.IsNullOrEmpty() ? this.Name : this.Label).Replace("@ReadOnly@", this.ReadOnly ? "readonly" : "");
+                    .Replace("@Label@", this.Label.IsNullOrEmpty() ? this.Name : this.Label).Replace("@ReadOnly@", this.IsDisable ? "readonly" : "");
         }
     }
 

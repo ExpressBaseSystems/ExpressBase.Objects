@@ -207,7 +207,7 @@ else
 
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.BotForm)]
-        public override bool IsReadOnly { get => this.ReadOnly; }
+        public override bool IsReadOnly { get => this.IsDisable; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.Boolean)]

@@ -177,7 +177,7 @@ if(this.IsNullable && !($('#' + this.EbSid_CtxId).closest('.input-group').find(`
 
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.BotForm)]
-        public override bool IsReadOnly { get => this.ReadOnly; }
+        public override bool IsReadOnly { get => this.IsDisable; }
 
         public override VendorDbType GetvDbType(IVendorDbTypes vDbTypes)
         {
