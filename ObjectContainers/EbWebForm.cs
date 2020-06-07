@@ -22,7 +22,6 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using ExpressBase.Common.Constants;
@@ -70,12 +69,14 @@ namespace ExpressBase.Objects
 
         public EbDataPusherConfig DataPusherConfig { get; set; }
 
-        public static EbOperations Operations = WFOperations.Instance;
+        public EbWebFormCollection FormCollection { get; set; }
 
         internal DbConnection DbConnection { get; set; }
 
         private DbTransaction DbTransaction { get; set; }
 
+        public static EbOperations Operations = WFOperations.Instance;
+        
         [PropertyGroup("Events")]
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.Collection)]
@@ -175,23 +176,7 @@ namespace ExpressBase.Objects
         {
             BeforeSaveHelper.BeforeSave(this, null, null);
         }
-
-        //get all control container as flat structure
-        public List<EbControlContainer> GetAllContainers(EbControlContainer _container, List<EbControlContainer> _list = null)
-        {
-            if (_list == null)
-                _list = new List<EbControlContainer>();
-            _list.Add(_container);
-            foreach (EbControl c in this.Controls)
-            {
-                if (c is EbControlContainer)
-                {
-                    _list = GetAllContainers(_container, _list);
-                }
-            }
-            return _list;
-        }
-
+        
         //import data - using data reader in dg - from another form linked in ps 
         public void ImportData(IDatabase DataDB, Service Service, List<Param> Param, string Trigger, int RowId)
         {
@@ -323,40 +308,6 @@ namespace ExpressBase.Objects
                 //this.FormData = _form.FormData;
             }
         }
-
-        //public void GetImportData123(IDatabase DataDB, Service Service, EbWebForm Form)
-        //{
-        //    this.RefreshFormData(DataDB, Service);
-
-        //    foreach (TableSchema _table in this.FormSchema.Tables)
-        //    {
-        //        if (this.FormData.MultipleTables.ContainsKey(_table.TableName))
-        //        {
-        //            SingleTable Table = this.FormData.MultipleTables[_table.TableName];
-
-        //            int rowCounter = -501;
-        //            foreach (SingleRow Row in Table)
-        //            {
-        //                Row.Columns.RemoveAll(e => e.Name == "id");
-        //                Row.RowId = rowCounter--;
-        //            }
-
-        //            this.FormData.MultipleTables.Remove(_table.TableName);
-        //            if (_table.TableName == this.FormSchema.MasterTable)
-        //            {
-        //                this.FormData.MultipleTables.Add(Form.Name, Table);
-        //                this.FormData.MasterTable = Form.Name;
-        //            }
-        //            else
-        //            {
-        //                if (_table.TableType == WebFormTableTypes.Normal)
-        //                    this.FormData.MultipleTables[this.FormData.MasterTable][0].Columns.AddRange(Table[0].Columns);
-        //                else
-        //                    this.FormData.MultipleTables.Add(_table.ContainerName, Table);
-        //            }
-        //        }
-        //    }
-        //}
 
         //missing: ps column
         public void GetImportData(IDatabase DataDB, Service Service, EbWebForm Form)//COPY this TO Form
@@ -986,9 +937,9 @@ namespace ExpressBase.Objects
             int formCount = (this.ExeDataPusher && includePushData) ? this.DataPushers.Count + 1 : 1;
             string[] psquery = new string[formCount];
             int[] qrycount = new int[formCount];
-            EbWebForm[] FormCollection = new EbWebForm[formCount];
+            EbWebForm[] _FormCollection = new EbWebForm[formCount];
             string query = QueryGetter.GetSelectQuery(this, DataDB, service, out psquery[0], out qrycount[0]);
-            FormCollection[0] = this;
+            _FormCollection[0] = this;
 
             if (this.ExeDataPusher && includePushData)
             {
@@ -997,7 +948,7 @@ namespace ExpressBase.Objects
                     query += QueryGetter.GetSelectQuery(this.DataPushers[i].WebForm, DataDB, service, out psquery[i + 1], out qrycount[i + 1]);
                     this.DataPushers[i].WebForm.UserObj = this.UserObj;
                     this.DataPushers[i].WebForm.SolutionObj = this.SolutionObj;
-                    FormCollection[i + 1] = this.DataPushers[i].WebForm;
+                    _FormCollection[i + 1] = this.DataPushers[i].WebForm;
                 }
             }
 
@@ -1018,7 +969,7 @@ namespace ExpressBase.Objects
             {
                 EbDataSet ds = new EbDataSet();
                 ds.Tables.AddRange(dataset.Tables.GetRange(start, qrycount[i]));
-                FormCollection[i].RefreshFormDataInner(ds, DataDB, i == 0 ? psquery[i] : string.Empty, backup);
+                _FormCollection[i].RefreshFormDataInner(ds, DataDB, i == 0 ? psquery[i] : string.Empty, backup);
             }
             Console.WriteLine("No Exception in RefreshFormData");
         }
@@ -1427,6 +1378,7 @@ namespace ExpressBase.Objects
             return data;
         }
 
+        //Normal save
         public string Save(IDatabase DataDB, Service service)
         {
             this.DbConnection = DataDB.GetNewConnection();
@@ -1452,6 +1404,7 @@ namespace ExpressBase.Objects
                 EbAuditTrail ebAuditTrail = new EbAuditTrail(this, DataDB);
                 resp += " - AuditTrail: " + ebAuditTrail.UpdateAuditTrail();
                 resp += " - AfterSave: " + this.AfterSave(DataDB, IsUpdate);
+                resp += " - Notifications: " + EbFnGateway.SendNotifications(this, DataDB, service);
                 this.DbTransaction.Commit();
             }
             catch (FormException ex1)
@@ -1490,51 +1443,9 @@ namespace ExpressBase.Objects
             int i = 0;
             List<EbWebForm> FormCollection = new List<EbWebForm>() { this };
             if (this.ExeDataPusher)
-            {
-                foreach (EbDataPusher pusher in this.DataPushers)
-                {
-                    pusher.WebForm.UserObj = this.UserObj;
-                    pusher.WebForm.SolutionObj = this.SolutionObj;
-                    FormCollection.Add(pusher.WebForm);
-                }
-                this.PrepareWebFormData();
-            }
-            foreach (EbWebForm WebForm in FormCollection)
-            {
-                if (WebForm.DataPusherConfig?.AllowPush == false)
-                    continue;
-                if (!(WebForm.FormData.MultipleTables.ContainsKey(WebForm.FormSchema.MasterTable) && WebForm.FormData.MultipleTables[WebForm.FormSchema.MasterTable].Count > 0))
-                {
-                    string _q = QueryGetter.GetInsertQuery(WebForm, DataDB, WebForm.FormSchema.MasterTable, true);
-                    fullqry += string.Format(_q, string.Empty, string.Empty);
-                }
-                foreach (TableSchema _table in WebForm.FormSchema.Tables)
-                {
-                    if (!WebForm.FormData.MultipleTables.ContainsKey(_table.TableName))
-                        continue;
+                this.PrepareWebFormData();            
 
-                    foreach (SingleRow row in WebForm.FormData.MultipleTables[_table.TableName])
-                    {
-                        string _cols = string.Empty;
-                        string _values = string.Empty;
-
-                        foreach (SingleColumn cField in row.Columns)
-                        {
-                            if (cField.Control != null)
-                                cField.Control.ParameterizeControl(DataDB, param, WebForm.TableName, cField, true, ref i, ref _cols, ref _values, ref _extqry, WebForm.UserObj, null);
-                            else
-                                WebForm.ParameterizeUnknown(DataDB, param, cField, true, ref i, ref _cols, ref _values);
-                        }
-
-                        string _qry = QueryGetter.GetInsertQuery(WebForm, DataDB, _table.TableName, true);
-                        fullqry += string.Format(_qry, _cols, _values);
-
-                        fullqry += WebForm.InsertUpdateLines(_table.TableName, row, DataDB, param, ref i);
-                    }
-                }
-                param.Add(DataDB.GetNewParameter(WebForm.TableName + FormConstants._eb_ver_id, EbDbTypes.Int32, WebForm.RefId.Split(CharConstants.DASH)[4]));
-                param.Add(DataDB.GetNewParameter("refid", EbDbTypes.String, WebForm.RefId));
-            }
+            this.FormCollection.Insert(DataDB, param, ref fullqry, ref _extqry, ref i);
 
             fullqry += _extqry;
             fullqry += this.GetFileUploaderUpdateQuery(DataDB, param, ref i);
@@ -1551,7 +1462,7 @@ namespace ExpressBase.Objects
         }
 
         //pTable => Parent Table, pRow => Parent Row
-        private string InsertUpdateLines(string pTable, SingleRow parentRow, IDatabase DataDB, List<DbParameter> param, ref int i)
+        public string InsertUpdateLines(string pTable, SingleRow parentRow, IDatabase DataDB, List<DbParameter> param, ref int i)
         {
             string fullqry = string.Empty;
             if (parentRow.LinesTable.Key != null)// Lines table of the grid
@@ -1608,82 +1519,10 @@ namespace ExpressBase.Objects
             string _extqry = string.Empty;
             List<DbParameter> param = new List<DbParameter>();
             int i = 0;
-            List<EbWebForm> FormCollection = new List<EbWebForm>() { this };
             if (this.ExeDataPusher)
-            {
-                foreach (EbDataPusher pusher in this.DataPushers)
-                {
-                    pusher.WebForm.UserObj = this.UserObj;
-                    pusher.WebForm.SolutionObj = this.SolutionObj;
-                    FormCollection.Add(pusher.WebForm);
-                }
                 this.PrepareWebFormData();
-            }
 
-            foreach (EbWebForm WebForm in FormCollection)
-            {
-                foreach (KeyValuePair<string, SingleTable> entry in WebForm.FormData.MultipleTables)
-                {
-                    foreach (SingleRow row in entry.Value)
-                    {
-                        string _colvals = string.Empty;
-                        string _temp = string.Empty;
-                        int _rowId = row.RowId;
-                        if (_rowId > 0)
-                        {
-                            string t = string.Empty;
-                            if (!row.IsDelete)
-                            {
-                                foreach (SingleColumn cField in row.Columns)
-                                {
-                                    if (cField.Control != null)
-                                    {
-                                        SingleColumn ocF = WebForm.FormDataBackup.MultipleTables[entry.Key].Find(e => e.RowId == row.RowId).Columns.Find(e => e.Name.Equals(cField.Name));
-                                        cField.Control.ParameterizeControl(DataDB, param, WebForm.TableName, cField, false, ref i, ref _colvals, ref _temp, ref _extqry, WebForm.UserObj, ocF);
-                                    }
-                                    else
-                                        WebForm.ParameterizeUnknown(DataDB, param, cField, false, ref i, ref _colvals, ref _temp);
-                                }
-                            }
-                            else if (WebForm.DataPusherConfig == null && !entry.Key.Equals(WebForm.TableName))
-                            {
-                                List<TableSchema> _tables = WebForm.FormSchema.Tables.FindAll(e => e.IsDynamic && e.TableType == WebFormTableTypes.Grid);
-                                foreach (TableSchema _table in _tables)
-                                {
-                                    t += $@"UPDATE {_table.TableName} SET eb_del = 'T', eb_lastmodified_by = @eb_modified_by, eb_lastmodified_at = {DataDB.EB_CURRENT_TIMESTAMP} WHERE
-                                        {entry.Key}_id = @{entry.Key}_id_{i} AND {WebForm.TableName}_id = @{WebForm.TableName}_id AND COALESCE(eb_del, 'F') = 'F'; ";
-                                    param.Add(DataDB.GetNewParameter(entry.Key + "_id_" + i, EbDbTypes.Int32, _rowId));
-                                    i++;
-                                }
-                            }
-
-                            string _qry = QueryGetter.GetUpdateQuery(WebForm, DataDB, entry.Key, row.IsDelete);
-                            fullqry += string.Format(_qry, _colvals, row.RowId);
-                            fullqry += t;
-                        }
-                        else
-                        {
-                            string _cols = string.Empty;
-                            string _vals = string.Empty;
-
-                            foreach (SingleColumn cField in row.Columns)
-                            {
-                                if (cField.Control != null)
-                                    cField.Control.ParameterizeControl(DataDB, param, WebForm.TableName, cField, true, ref i, ref _cols, ref _vals, ref _extqry, WebForm.UserObj, null);
-                                else
-                                    WebForm.ParameterizeUnknown(DataDB, param, cField, true, ref i, ref _cols, ref _vals);
-                            }
-                            string _qry = QueryGetter.GetInsertQuery(WebForm, DataDB, entry.Key, WebForm.TableRowId == 0);
-                            fullqry += string.Format(_qry, _cols, _vals);
-                        }
-
-                        fullqry += WebForm.InsertUpdateLines(entry.Key, row, DataDB, param, ref i);
-
-                    }
-                }
-                param.Add(DataDB.GetNewParameter(WebForm.TableName + FormConstants._id, EbDbTypes.Int32, WebForm.TableRowId));
-                param.Add(DataDB.GetNewParameter(WebForm.TableName + FormConstants._eb_ver_id, EbDbTypes.Int32, WebForm.RefId.Split(CharConstants.DASH)[4]));
-            }
+            this.FormCollection.Update(DataDB, param, ref fullqry, ref _extqry, ref i);
 
             fullqry += _extqry;
             fullqry += GetFileUploaderUpdateQuery(DataDB, param, ref i);
@@ -1892,7 +1731,7 @@ namespace ExpressBase.Objects
             return _qry;
         }
 
-        private bool ParameterizeUnknown(IDatabase DataDB, List<DbParameter> param, SingleColumn cField, bool ins, ref int i, ref string _col, ref string _val)
+        public bool ParameterizeUnknown(IDatabase DataDB, List<DbParameter> param, SingleColumn cField, bool ins, ref int i, ref string _col, ref string _val)
         {
             if (EbColumnExtra.Params.ContainsKey(cField.Name))
             {
@@ -2025,7 +1864,7 @@ namespace ExpressBase.Objects
         }
 
         //Combined CS script creation and execution// under testing
-        private void PrepareWebFormDataNew()
+        private void PrepareWebFormData()
         {
             FG_Root globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, this.FormData, this.FormDataBackup);
             EbDataPushHelper ebDataPushHelper = new EbDataPushHelper(this);
@@ -2072,124 +1911,7 @@ namespace ExpressBase.Objects
             }
             return DataIds;
         }
-
-        private void PrepareWebFormData()
-        {
-            DateTime startdt = DateTime.Now;
-            FG_Root globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, this.FormData, this.FormDataBackup);
-            foreach (EbDataPusher pusher in this.DataPushers)
-            {
-                pusher.WebForm.DataPusherConfig.SourceRecId = this.TableRowId;
-                pusher.WebForm.RefId = pusher.FormRefId;
-                pusher.WebForm.UserObj = this.UserObj;
-                pusher.WebForm.LocationId = this.LocationId;
-                pusher.WebForm.SolutionObj = this.SolutionObj;
-
-                if (!pusher.PushOnlyIf.IsNullOrEmpty())
-                {
-                    string status = Convert.ToString(pusher.WebForm.ExecuteCSharpScriptNew(pusher.PushOnlyIf, globals));
-                    if (status.Equals(true.ToString()))
-                        pusher.WebForm.DataPusherConfig.AllowPush = true;
-                }
-                else
-                    pusher.WebForm.DataPusherConfig.AllowPush = true;
-
-                if (pusher.WebForm.DataPusherConfig.AllowPush)
-                {
-                    pusher.WebForm.ProcessPushJson(pusher, globals);
-                    pusher.WebForm.MergeFormData();
-                }
-                else
-                    pusher.WebForm.FormData = new WebformData();
-
-                if (this.TableRowId > 0)//if edit mode then fill or map the id by refering FormDataBackup
-                {
-                    if (pusher.WebForm.DataPusherConfig.AllowPush)
-                    {
-                        if (pusher.WebForm.FormDataBackup != null)
-                        {
-                            foreach (KeyValuePair<string, SingleTable> entry in pusher.WebForm.FormDataBackup.MultipleTables)
-                            {
-                                if (pusher.WebForm.FormData.MultipleTables.ContainsKey(entry.Key))
-                                {
-                                    for (int i = 0; i < entry.Value.Count; i++)
-                                    {
-                                        if (i < pusher.WebForm.FormData.MultipleTables[entry.Key].Count)
-                                            pusher.WebForm.FormData.MultipleTables[entry.Key][i].RowId = entry.Value[i].RowId;
-                                        else
-                                        {
-                                            pusher.WebForm.FormData.MultipleTables[entry.Key].Add(entry.Value[i]);
-                                            pusher.WebForm.FormData.MultipleTables[entry.Key][i].IsDelete = true;
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    pusher.WebForm.FormData.MultipleTables.Add(entry.Key, entry.Value);
-                                    foreach (SingleRow Row in pusher.WebForm.FormData.MultipleTables[entry.Key])
-                                        Row.IsDelete = true;
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        pusher.WebForm.FormData = pusher.WebForm.FormDataBackup;
-                        foreach (KeyValuePair<string, SingleTable> entry in pusher.WebForm.FormData.MultipleTables)
-                        {
-                            foreach (SingleRow Row in entry.Value)
-                                Row.IsDelete = true;
-                        }
-                    }
-                }
-            }
-            Console.WriteLine("PrepareWebFormData for Data Pushers. Execution Time = " + (DateTime.Now - startdt).TotalMilliseconds);
-        }
-
-        public void ProcessPushJson(EbDataPusher pusher, FG_Root globals)
-        {
-            this.FormData = new WebformData() { MasterTable = this.FormSchema.MasterTable };
-            JObject JObj = JObject.Parse(pusher.Json);
-
-            foreach (TableSchema _table in this.FormSchema.Tables)
-            {
-                if (JObj[_table.TableName] != null)
-                {
-                    SingleTable Table = new SingleTable();
-                    foreach (JToken jRow in JObj[_table.TableName])
-                    {
-                        if (_table.TableType == WebFormTableTypes.Grid && !pusher.SkipLineItemIf.IsNullOrEmpty())
-                        {
-                            string status = Convert.ToString(this.ExecuteCSharpScriptNew(pusher.SkipLineItemIf, globals));
-                            if (status.Equals(true.ToString()))
-                                continue;
-                        }
-                        Table.Add(this.GetSingleRow(jRow, _table, globals));
-                    }
-                    this.FormData.MultipleTables.Add(_table.TableName, Table);
-                }
-            }
-        }
-
-        private SingleRow GetSingleRow(JToken JRow, TableSchema _table, FG_Root globals)
-        {
-            SingleRow Row = new SingleRow() { RowId = 0 };
-            foreach (ColumnSchema _column in _table.Columns)
-            {
-                object val = null;
-                if (JRow[_column.ColumnName] != null)
-                    val = this.ExecuteCSharpScriptNew(JRow[_column.ColumnName].ToString(), globals);
-
-                Row.Columns.Add(new SingleColumn
-                {
-                    Name = _column.ColumnName,
-                    Type = _column.EbDbType,
-                    Value = val
-                });
-            }
-            return Row;
-        }
-
+        
         //duplicate for SQL job - remove this fn if globals conversion is completed
         private SingleRow GetSingleRow(JToken JRow, TableSchema _table, FormGlobals globals)
         {
@@ -2235,7 +1957,7 @@ namespace ExpressBase.Objects
             }
         }
 
-        private object ExecuteCSharpScriptNew(string code, FG_Root globals)
+        public object ExecuteCSharpScriptNew(string code, FG_Root globals)
         {
             try
             {
@@ -2516,5 +2238,152 @@ namespace ExpressBase.Objects
         {
             EbFormHelper.ReplaceRefid(this, RefidMap);
         }
+
+        //-------------Backup------------
+        //private void PrepareWebFormData()
+        //{
+        //    DateTime startdt = DateTime.Now;
+        //    FG_Root globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, this.FormData, this.FormDataBackup);
+        //    foreach (EbDataPusher pusher in this.DataPushers)
+        //    {
+        //        pusher.WebForm.DataPusherConfig.SourceRecId = this.TableRowId;
+        //        pusher.WebForm.RefId = pusher.FormRefId;
+        //        pusher.WebForm.UserObj = this.UserObj;
+        //        pusher.WebForm.LocationId = this.LocationId;
+        //        pusher.WebForm.SolutionObj = this.SolutionObj;
+
+        //        if (!pusher.PushOnlyIf.IsNullOrEmpty())
+        //        {
+        //            string status = Convert.ToString(pusher.WebForm.ExecuteCSharpScriptNew(pusher.PushOnlyIf, globals));
+        //            if (status.Equals(true.ToString()))
+        //                pusher.WebForm.DataPusherConfig.AllowPush = true;
+        //        }
+        //        else
+        //            pusher.WebForm.DataPusherConfig.AllowPush = true;
+
+        //        if (pusher.WebForm.DataPusherConfig.AllowPush)
+        //        {
+        //            pusher.WebForm.ProcessPushJson(pusher, globals);
+        //            pusher.WebForm.MergeFormData();
+        //        }
+        //        else
+        //            pusher.WebForm.FormData = new WebformData();
+
+        //        if (this.TableRowId > 0)//if edit mode then fill or map the id by refering FormDataBackup
+        //        {
+        //            if (pusher.WebForm.DataPusherConfig.AllowPush)
+        //            {
+        //                if (pusher.WebForm.FormDataBackup != null)
+        //                {
+        //                    foreach (KeyValuePair<string, SingleTable> entry in pusher.WebForm.FormDataBackup.MultipleTables)
+        //                    {
+        //                        if (pusher.WebForm.FormData.MultipleTables.ContainsKey(entry.Key))
+        //                        {
+        //                            for (int i = 0; i < entry.Value.Count; i++)
+        //                            {
+        //                                if (i < pusher.WebForm.FormData.MultipleTables[entry.Key].Count)
+        //                                    pusher.WebForm.FormData.MultipleTables[entry.Key][i].RowId = entry.Value[i].RowId;
+        //                                else
+        //                                {
+        //                                    pusher.WebForm.FormData.MultipleTables[entry.Key].Add(entry.Value[i]);
+        //                                    pusher.WebForm.FormData.MultipleTables[entry.Key][i].IsDelete = true;
+        //                                }
+        //                            }
+        //                        }
+        //                        else
+        //                        {
+        //                            pusher.WebForm.FormData.MultipleTables.Add(entry.Key, entry.Value);
+        //                            foreach (SingleRow Row in pusher.WebForm.FormData.MultipleTables[entry.Key])
+        //                                Row.IsDelete = true;
+        //                        }
+        //                    }
+        //                }
+        //            }
+        //            else
+        //            {
+        //                pusher.WebForm.FormData = pusher.WebForm.FormDataBackup;
+        //                foreach (KeyValuePair<string, SingleTable> entry in pusher.WebForm.FormData.MultipleTables)
+        //                {
+        //                    foreach (SingleRow Row in entry.Value)
+        //                        Row.IsDelete = true;
+        //                }
+        //            }
+        //        }
+        //    }
+        //    Console.WriteLine("PrepareWebFormData for Data Pushers. Execution Time = " + (DateTime.Now - startdt).TotalMilliseconds);
+        //}
+
+        //public void ProcessPushJson(EbDataPusher pusher, FG_Root globals)
+        //{
+        //    this.FormData = new WebformData() { MasterTable = this.FormSchema.MasterTable };
+        //    JObject JObj = JObject.Parse(pusher.Json);
+        //    foreach (TableSchema _table in this.FormSchema.Tables)
+        //    {
+        //        if (JObj[_table.TableName] != null)
+        //        {
+        //            SingleTable Table = new SingleTable();
+        //            foreach (JToken jRow in JObj[_table.TableName])
+        //            {
+        //                if (_table.TableType == WebFormTableTypes.Grid && !pusher.SkipLineItemIf.IsNullOrEmpty())
+        //                {
+        //                    string status = Convert.ToString(this.ExecuteCSharpScriptNew(pusher.SkipLineItemIf, globals));
+        //                    if (status.Equals(true.ToString()))
+        //                        continue;
+        //                }
+        //                Table.Add(this.GetSingleRow(jRow, _table, globals));
+        //            }
+        //            this.FormData.MultipleTables.Add(_table.TableName, Table);
+        //        }
+        //    }
+        //}
+
+        //private SingleRow GetSingleRow(JToken JRow, TableSchema _table, FG_Root globals)
+        //{
+        //    SingleRow Row = new SingleRow() { RowId = 0 };
+        //    foreach (ColumnSchema _column in _table.Columns)
+        //    {
+        //        object val = null;
+        //        if (JRow[_column.ColumnName] != null)
+        //            val = this.ExecuteCSharpScriptNew(JRow[_column.ColumnName].ToString(), globals);
+        //        Row.Columns.Add(new SingleColumn
+        //        {
+        //            Name = _column.ColumnName,
+        //            Type = _column.EbDbType,
+        //            Value = val
+        //        });
+        //    }
+        //    return Row;
+        //}
+
+        //public void GetImportData123(IDatabase DataDB, Service Service, EbWebForm Form)
+        //{
+        //    this.RefreshFormData(DataDB, Service);
+        //    foreach (TableSchema _table in this.FormSchema.Tables)
+        //    {
+        //        if (this.FormData.MultipleTables.ContainsKey(_table.TableName))
+        //        {
+        //            SingleTable Table = this.FormData.MultipleTables[_table.TableName];
+        //            int rowCounter = -501;
+        //            foreach (SingleRow Row in Table)
+        //            {
+        //                Row.Columns.RemoveAll(e => e.Name == "id");
+        //                Row.RowId = rowCounter--;
+        //            }
+        //            this.FormData.MultipleTables.Remove(_table.TableName);
+        //            if (_table.TableName == this.FormSchema.MasterTable)
+        //            {
+        //                this.FormData.MultipleTables.Add(Form.Name, Table);
+        //                this.FormData.MasterTable = Form.Name;
+        //            }
+        //            else
+        //            {
+        //                if (_table.TableType == WebFormTableTypes.Normal)
+        //                    this.FormData.MultipleTables[this.FormData.MasterTable][0].Columns.AddRange(Table[0].Columns);
+        //                else
+        //                    this.FormData.MultipleTables.Add(_table.ContainerName, Table);
+        //            }
+        //        }
+        //    }
+        //}
     }
 }
