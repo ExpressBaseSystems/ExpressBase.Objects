@@ -68,9 +68,9 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public override bool IsFullViewContol { get => true; set => base.IsFullViewContol = value; }
 
-		[HideInPropertyGrid]
-		[EnableInBuilder(BuilderType.BotForm)]
-		public override bool IsReadOnly { get => this.ReadOnly; }
+		//[HideInPropertyGrid]
+		//[EnableInBuilder(BuilderType.BotForm)]
+		//public override bool IsReadOnly { get => this.IsDisable; }
 
 		public override string GetDesignHtml()
         {

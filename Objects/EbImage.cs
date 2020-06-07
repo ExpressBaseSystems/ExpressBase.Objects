@@ -42,11 +42,15 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public override bool IsFullViewContol { get => true; set => base.IsFullViewContol = value; }
 
+        //[HideInPropertyGrid]
+        //[EnableInBuilder(BuilderType.BotForm)]
+        //public override bool IsReadOnly { get => true; }
+
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.BotForm)]
-        public override bool IsReadOnly { get => true; }
+        public override bool IsDisable { get => true; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         public override bool IsNonDataInputControl { get => true; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
@@ -174,10 +178,7 @@ namespace ExpressBase.Objects
 
         [HideInPropertyGrid]
         public override bool Hidden { get; set; }
-
-        [HideInPropertyGrid]
-        public override bool IsDisable { get; set; }
-
+		
         [HideInPropertyGrid]
         public override bool Required { get; set; }
 
