@@ -25,10 +25,6 @@ namespace ExpressBase.Objects
 		[EnableInBuilder(BuilderType.BotForm)]
 		public override bool IsDisable { get => true; }
 
-		[HideInPropertyGrid]
-		[EnableInBuilder(BuilderType.BotForm)]
-		public override bool IsDisable { get => true; }
-
 		public EbLocations()
         {
             this.LocationCollection = new List<EbLocationCard>();
