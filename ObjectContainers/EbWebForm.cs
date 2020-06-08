@@ -71,6 +71,8 @@ namespace ExpressBase.Objects
 
         public EbWebFormCollection FormCollection { get; set; }
 
+        public string __mode { get; set; }
+
         internal DbConnection DbConnection { get; set; }
 
         private DbTransaction DbTransaction { get; set; }
@@ -468,6 +470,8 @@ namespace ExpressBase.Objects
         //merge formdata and webform object
         public void MergeFormData()
         {
+            this.__mode = this.TableRowId > 0 ? "edit" : "new";
+
             MergeFormDataInner(this);
 
             foreach (TableSchema _table in this.FormSchema.Tables)
