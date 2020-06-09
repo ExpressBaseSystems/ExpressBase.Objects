@@ -23,7 +23,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     }
     [DataContract]
-    public class EmailAttachmenRequest : EbServiceStackAuthRequest, IReturn<EmailAttachmenResponse>
+    public class EmailAttachmentRequest : EbServiceStackAuthRequest, IReturn<EmailAttachmenResponse>
     {
         [DataMember(Order = 1)]
         public int ObjId { get; set; }

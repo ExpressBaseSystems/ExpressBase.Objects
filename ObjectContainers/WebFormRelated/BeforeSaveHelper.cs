@@ -244,8 +244,8 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                     else
                         throw new FormException("Invalid NotifyBy found for system notification");
                 }
-                else
-                    throw new FormException($"Email/SMS notifications are not allowed. Error code: 8714");
+                //else
+                //    throw new FormException($"Email/SMS notifications are not allowed. Error code: 8714");
             }
         }
 
