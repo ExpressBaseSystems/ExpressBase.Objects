@@ -917,10 +917,10 @@ return val;
 
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.BotForm)]
-        public override bool IsReadOnly
+        public override bool IsDisable
         {
-            get { return this.EbSimpleSelect.IsReadOnly; }
-            set { this.EbSimpleSelect.IsReadOnly = value; }
+            get { return this.EbSimpleSelect.IsDisable; }
+            set { this.EbSimpleSelect.IsDisable = value; }
         }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
@@ -1077,10 +1077,10 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
 
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.BotForm)]
-        public override bool IsReadOnly
+        public override bool IsDisable
         {
-            get { return this.EbBooleanSelect.IsReadOnly; }
-            set { this.EbBooleanSelect.IsReadOnly = value; }
+            get { return this.EbBooleanSelect.IsDisable; }
+            set { this.EbBooleanSelect.IsDisable = value; }
         }
 
         [OnDeserialized]
@@ -1463,8 +1463,8 @@ pg.HideProperty('IsDynamic');
         //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         //public override bool IsEditable
         //{
-        // get { return !this.EbSysCreatedBy.IsReadOnly; }
-        // set { this.EbSysCreatedBy.IsReadOnly = !value; }
+        // get { return !this.EbSysCreatedBy.IsDisable; }
+        // set { this.EbSysCreatedBy.IsDisable = !value; }
         //}
 
         [JsonIgnore]
@@ -1596,8 +1596,8 @@ pg.HideProperty('IsDynamic');
         //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         //public override bool IsEditable
         //{
-        // get { return !this.EbSysCreatedAt.IsReadOnly; }
-        // set { this.EbSysCreatedAt.IsReadOnly = !value; }
+        // get { return !this.EbSysCreatedAt.IsDisable; }
+        // set { this.EbSysCreatedAt.IsDisable = !value; }
         //}
 
         [JsonIgnore]
@@ -1720,8 +1720,8 @@ pg.HideProperty('IsDynamic');
         //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         //public override bool IsEditable
         //{
-        // get { return !this.EbSysModifiedBy.IsReadOnly; }
-        // set { this.EbSysModifiedBy.IsReadOnly = !value; }
+        // get { return !this.EbSysModifiedBy.IsDisable; }
+        // set { this.EbSysModifiedBy.IsDisable = !value; }
         //}
 
         [JsonIgnore]
@@ -1852,8 +1852,8 @@ pg.HideProperty('IsDynamic');
         //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         //public override bool IsEditable
         //{
-        // get { return !this.EbSysModifiedAt.IsReadOnly; }
-        // set { this.EbSysModifiedAt.IsReadOnly = !value; }
+        // get { return !this.EbSysModifiedAt.IsDisable; }
+        // set { this.EbSysModifiedAt.IsDisable = !value; }
         //}
 
         [JsonIgnore]

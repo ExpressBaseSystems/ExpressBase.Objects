@@ -76,9 +76,9 @@ namespace ExpressBase.Objects
         [HelpText("Number of decimal places")]
         public int DecimalPlaces { get; set; }
 
-        [HideInPropertyGrid]
-        [EnableInBuilder(BuilderType.BotForm)]
-        public override bool IsReadOnly { get => this.ReadOnly; }
+        //[HideInPropertyGrid]
+        //[EnableInBuilder(BuilderType.BotForm)]
+        //public override bool IsReadOnly { get => this.IsDisable; }
 
         [EnableInBuilder(BuilderType.BotForm)]
         public bool AutoIncrement { get; set; }
@@ -185,7 +185,7 @@ else {
             string html = @"
         <div class='input-group' style='width:100%;'>
              @attachedLbl@
-            <input type='text' data-ebtype='@datetype@' class='numinput' ui-inp id='@ebsid@' name='@name@' @max@ @min@ value='@value@' @placeHolder autocomplete = '@autoComplete@' data-toggle='tooltip' title='@toolTipText@' style=' width:100%; @backColor@ @foreColor@ @fontStyle@ display:inline-block; @readOnlyString@ @required@ @tabIndex@ />
+            <input type='text' data-ebtype='@datetype@' class='numinput' ui-inp id='@ebsid@' name='@name@' @max@ @min@ value='@value@' @placeHolder autocomplete = '@autoComplete@' data-toggle='tooltip' title='@toolTipText@' style=' width:100%; @backColor@ @foreColor@ @fontStyle@ display:inline-block;' @required@ @tabIndex@ />
         </div>"
 .Replace("@name@", this.Name)
 .Replace("@ebsid@", this.IsRenderMode && this.IsDynamicTabChild ? "@" + this.EbSid_CtxId + "_ebsid@" : (String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId))
@@ -196,7 +196,6 @@ else {
     .Replace("@BackColor@ ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor@ ") + ";"))
     .Replace("@ForeColor@ ", "color:" + ((this.ForeColor != null) ? this.ForeColor : "@ForeColor@ ") + ";")
 .Replace("@required@", " required")//(this.Required && !this.Hidden ? " required" : string.Empty))
-.Replace("@readOnlyString@", this.ReadOnlyString)
 .Replace("@max@", this.MaxLimit != 0 ? "max='" + this.MaxLimit + "'" : string.Empty)
 .Replace("@min@", this.MinLimit != 0 ? "min='" + this.MinLimit + "'" : string.Empty)
 .Replace("@placeHolder@", "placeholder='" + this.PlaceHolder + "'")

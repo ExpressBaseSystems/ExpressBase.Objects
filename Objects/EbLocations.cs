@@ -23,7 +23,7 @@ namespace ExpressBase.Objects
 
 		[HideInPropertyGrid]
 		[EnableInBuilder(BuilderType.BotForm)]
-		public override bool IsReadOnly { get => true; }
+		public override bool IsDisable { get => true; }
 
 		public EbLocations()
         {

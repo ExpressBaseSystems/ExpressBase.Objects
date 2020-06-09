@@ -43,7 +43,7 @@ namespace ExpressBase.Objects
                 for (int i = 0; i < this.Controls.Count; i++)
                 {
                     EbControl control = this.Controls[i];
-                    if (!(control.IsReadOnly || control.IsDisable))
+                    if (!control.IsDisable)
                     {
                         res = true;
                         break;
@@ -75,7 +75,7 @@ namespace ExpressBase.Objects
             {
                 foreach (EbControl ctrl in this.Controls)
                 {
-                    if (!ctrl.IsReadOnly)
+                    if (!ctrl.IsDisable)
                         return false;
                 }
                 return true;
@@ -156,7 +156,7 @@ namespace ExpressBase.Objects
 
             return html.Replace("@name@", this.Name);
         }
-        
+
         public override void BeforeSave(IServiceClient serviceClient, IRedisClient redis)
         {
             Dictionary<string, string> tbls = new Dictionary<string, string>();
