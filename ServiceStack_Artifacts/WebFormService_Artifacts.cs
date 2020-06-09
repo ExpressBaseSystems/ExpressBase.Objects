@@ -66,9 +66,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public int RowId { get; set; }
         
         [DataMember(Order = 3)]
-        public User UserObj { get; set; }
-
-        [DataMember(Order = 4)]
         public int CurrentLoc { get; set; }
 
         [DataMember(Order = 4)]
@@ -93,11 +90,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 2)]
         public List<Param> Params { get; set; }
-
+        
         [DataMember(Order = 3)]
-        public User UserObj { get; set; }
-
-        [DataMember(Order = 4)]
         public int CurrentLoc { get; set; }
 
         [DataMember(Order = 4)]
@@ -154,9 +148,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         
         [DataMember(Order = 2)]
         public int DataId { get; set; }
-
-        [DataMember(Order = 3)]
-        public User UserObj { get; set; }
     }
 
     [DataContract]
@@ -321,22 +312,16 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 	public class InsertDataFromWebformRequest : EbServiceStackAuthRequest, IReturn<InsertDataFromWebformResponse>
 	{
 		[DataMember(Order = 1)]
-		public string TableName { get; set; }
-
-		[DataMember(Order = 2)]
 		public WebformData FormData { get; set; }
 
-		[DataMember(Order = 3)]
+		[DataMember(Order = 2)]
 		public string RefId { get; set; }
 
-		[DataMember(Order = 4)]
+		[DataMember(Order = 3)]
 		public int RowId { get; set; }
 
-        [DataMember(Order = 5)]
+        [DataMember(Order = 4)]
         public int CurrentLoc { get; set; }
-
-        [DataMember(Order = 6)]
-        public User UserObj { get; set; }
     }
 	
 	[DataContract]
@@ -389,10 +374,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 5)]
         public int LocId { get; set; }
 
-        [DataMember(Order = 6)]
-        public User UserObj { get; set; }
-
-        [DataMember(Order =7) ]
+        [DataMember(Order = 6) ]
         public DbConnection TransactionConnection { get; set; }
     }
 	
@@ -455,9 +437,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public List<int> RowId { get; set; }
 
         [DataMember(Order = 3)]
-        public User UserObj { get; set; }
-
-        [DataMember(Order = 4)]
         public DbConnection TransactionConnection { get; set; }
     }
 
@@ -479,9 +458,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 2)]
         public int RowId { get; set; }
-        
-        [DataMember(Order = 3)]
-        public User UserObj { get; set; }
     }
 
     [DataContract]
@@ -506,9 +482,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 		[DataMember(Order = 2)]
 		public int RowId { get; set; }
-
-        [DataMember(Order = 3)]
-        public User UserObj { get; set; }
     }
 
 	[DataContract]
