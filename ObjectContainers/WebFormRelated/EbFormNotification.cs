@@ -9,6 +9,7 @@ using ExpressBase.Objects.ServiceStack_Artifacts;
 using ExpressBase.Objects.WebFormRelated;
 using Newtonsoft.Json;
 using ServiceStack;
+using ExpressBase.Common.Structures;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -91,6 +92,10 @@ else if(this.NotifyBy === 3)
     public class EbFnEmail : EbFormNotification
     {
         public EbFnEmail() { }
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [OSE_ObjectTypes(EbObjectTypes.iEmailBuilder)]
+        [EnableInBuilder(BuilderType.WebForm)]
+        public string RefId { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
         public string Test2 { get; set; }
