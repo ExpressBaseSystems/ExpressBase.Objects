@@ -102,15 +102,14 @@ namespace ExpressBase.Objects
                 <label for='single'>Single Meeting</label>
                 <input type='radio' id='@ebsid@_multiple' name='meeting-type' value='female' class='mc-input'>
                 <label for='multiple'>Multiple Meetings</label>
-                </div>
+                </div><div class='time' style='display: flex;'>
                 <div class='meeting-date-time'>
-                <span>Start</span> <input type='text' id='@ebsid@_meeting-date' val='@date_val@' class='mc-input'>
-                <input type='time' id='@ebsid@_time-from' class='mc-input'> <span> to </span>
-                <input type='time' id='@ebsid@_time-to' class='mc-input'>
-                </div> 
-                <div class='meeting-duration'> 
-                <span>Duration</span> <input type='text' id='@ebsid@_duration' data-format='HH:mm' data-template='HH : mm' name='datetime' class='mc-input'>
-                </div>
+                <div style='margin-right:15px;'><h5>Date</h5> <input type='text' id='@ebsid@_meeting-date' val='@date_val@' class='mc-input'></div>
+                <div style='margin-right:15px;'><h5>Time from</h5><input type='time' id='@ebsid@_time-from' class='mc-input'></div>
+                <div style='margin-right:15px;'><h5>Time to</h5><input type='time' id='@ebsid@_time-to' class='mc-input'></div>
+                <div class='meeting-duration' style='display:none'>
+                <h5>Duration</h5> <input type='text' id='@ebsid@_duration' data-format='HH:mm' data-template='HH : mm' name='datetime' class='mc-input'>
+                </div></div></div>
                 <div class='meeting-count'>
                 Max-host : <input type='number' id='@ebsid@_max-host' class='meeting-spinner mc-input' min='1' max='5' value='1' >
                 Min-host : <input type='number' id='@ebsid@_min-host' class='meeting-spinner mc-input' min='1' max='5' value='1'>
@@ -143,7 +142,6 @@ namespace ExpressBase.Objects
                 </div>
             <input type='text' id='@ebsid@_MeetingJson' readonly hidden/>
                 </div>
-               
                     "
                .Replace("@name@", this.Name)
                .Replace("@date_val@", DateTime.Today.ToString("yyyy-MM-dd"))
@@ -169,11 +167,11 @@ namespace ExpressBase.Objects
 
         public override string GetValueFromDOMJSfn { get { return @"return $('#' + this.EbSid_CtxId +'_MeetingJson').val();"; } set { } }
 
-        public override string OnChangeBindJSFn { get { return @" debugger; $('#' +  this.EbSid_CtxId +'_MeetingJson').on('change', p1);"; } set { } }
+        public override string OnChangeBindJSFn { get { return @" $('#' +  this.EbSid_CtxId +'_MeetingJson').on('change', p1);"; } set { } }
 
-        public override string SetValueJSfn { get { return @" debugger; $('#' + this.EbSid_CtxId +'_MeetingJson').val(p1).trigger('change');"; } set { } }
+        public override string SetValueJSfn { get { return @"  $('#' + this.EbSid_CtxId +'_MeetingJson').val(p1).trigger('change');"; } set { } }
 
-        public override string JustSetValueJSfn { get { return @" debugger; $('#' + this.EbSid_CtxId +'_MeetingJson').val(p1)"; } set { } }
+        public override string JustSetValueJSfn { get { return @"$('#' + this.EbSid_CtxId +'_MeetingJson').val(p1)"; } set { } }
 
         public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
         {
