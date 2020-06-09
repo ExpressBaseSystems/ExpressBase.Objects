@@ -92,13 +92,12 @@ else if(this.NotifyBy === 3)
     public class EbFnEmail : EbFormNotification
     {
         public EbFnEmail() { }
+
+        [PropertyGroup("Behavior")]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iEmailBuilder)]
         [EnableInBuilder(BuilderType.WebForm)]
         public string RefId { get; set; }
-
-        [EnableInBuilder(BuilderType.WebForm)]
-        public string Test2 { get; set; }
     }
 
     [Alias("Sms")]
@@ -131,11 +130,12 @@ else if(this.NotifyBy === 3)
                 if (ebFn is EbFnSystem)
                 {
                     EbFnSystem ebFnSys = ebFn as EbFnSystem;
-                    if (string.IsNullOrEmpty(ebFnSys.SendOnlyIf?.Code))
-                        continue;
-                    object soi = _this.ExecuteCSharpScriptNew(ebFnSys.SendOnlyIf.Code, globals);
-                    if (!(soi is bool && Convert.ToBoolean(soi)))
-                        continue;
+                    if (!string.IsNullOrEmpty(ebFnSys.SendOnlyIf?.Code))
+                    {
+                        object soi = _this.ExecuteCSharpScriptNew(ebFnSys.SendOnlyIf.Code, globals);
+                        if (!(soi is bool && Convert.ToBoolean(soi)))
+                            continue;
+                    }                    
                     string message = "Notification from " + _this.DisplayName;
                     if (!string.IsNullOrEmpty(ebFnSys.Message?.Code))
                     {
@@ -213,16 +213,26 @@ else if(this.NotifyBy === 3)
                             resp++;
                     }
                 }
-                if (ebFn is EbFnEmail && (ebFn as EbFnEmail).RefId != String.Empty)
+                else if (ebFn is EbFnEmail)
                 {
+                    EbFnEmail ebFnEmail = ebFn as EbFnEmail;
+                    if (string.IsNullOrEmpty(ebFnEmail.RefId))
+                        continue;
+                    if (!string.IsNullOrEmpty(ebFnEmail.SendOnlyIf?.Code))
+                    {
+                        object soi = _this.ExecuteCSharpScriptNew(ebFnEmail.SendOnlyIf.Code, globals);
+                        if (!(soi is bool && Convert.ToBoolean(soi)))
+                            continue;
+                    }
                     service.Gateway.Send<EmailAttachmenResponse>(new EmailTemplateWithAttachmentMqRequest
                     {
-                        RefId = (ebFn as EbFnEmail).RefId,
+                        RefId = ebFnEmail.RefId,
                         Params = new List<Param> { { new Param { Name = "id", Type = ((int)EbDbTypes.Int32).ToString(), Value = _this.TableRowId.ToString() } } },
                         SolnId = _this.SolutionObj.SolutionID,
                         UserAuthId = _this.UserObj.AuthId,
                         UserId = _this.UserObj.UserId
                     });
+                    resp++;
                 }
             }
             return resp;
