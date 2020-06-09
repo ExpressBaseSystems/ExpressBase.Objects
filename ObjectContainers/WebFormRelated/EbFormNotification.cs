@@ -12,6 +12,7 @@ using ServiceStack;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using Oracle.ManagedDataAccess.Client;
 
 namespace ExpressBase.Objects
 {
@@ -57,7 +58,7 @@ else if(this.NotifyBy === 3)
     pg.ShowProperty('UserGroup');
 ")]
         public EbFnSys_NotifyBy NotifyBy { get; set; }
-        
+
         [PropertyGroup("Behavior")]
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.ScriptEditorCS)]//required ScriptEditorSQ
@@ -91,6 +92,10 @@ else if(this.NotifyBy === 3)
     public class EbFnEmail : EbFormNotification
     {
         public EbFnEmail() { }
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [OSE_ObjectTypes(EbObjectTypes.iEmailBuilder)]
+        [EnableInBuilder(BuilderType.WebForm)]
+        public string RefId { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
         public string Test2 { get; set; }
@@ -207,6 +212,17 @@ else if(this.NotifyBy === 3)
                         if (uids.Count > 0)
                             resp++;
                     }
+                }
+                if (ebFn is EbFnEmail && (ebFn as EbFnEmail).RefId != String.Empty)
+                {
+                    service.Gateway.Send<EmailAttachmenResponse>(new EmailTemplateWithAttachmentMqRequest
+                    {
+                        RefId = (ebFn as EbFnEmail).RefId,
+                        Params = new List<Param> { { new Param { Name = "id", Type = ((int)EbDbTypes.Int32).ToString(), Value = _this.TableRowId.ToString() } } },
+                        SolnId = _this.SolutionObj.SolutionID,
+                        UserAuthId = _this.UserObj.AuthId,
+                        UserId = _this.UserObj.UserId
+                    });
                 }
             }
             return resp;

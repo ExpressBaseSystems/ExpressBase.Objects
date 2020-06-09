@@ -12,7 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace ExpressBase.Objects.EmailRelated
+namespace ExpressBase.Objects
 {
     public enum EmailPriority
     {
@@ -20,7 +20,7 @@ namespace ExpressBase.Objects.EmailRelated
         Low,
         Medium
     }
-    public enum DateFormat
+    public enum DateFormatEmail
     {
         ddmmyy,
         mmddyy
@@ -37,14 +37,17 @@ namespace ExpressBase.Objects.EmailRelated
     public class EbEmailTemplate : EbEmailTemplateBase,IEBRootObject
     {
         [EnableInBuilder(BuilderType.EmailBuilder)]
-        [HideInPropertyGrid]
-        public override string RefId { get; set; }
-
-        [EnableInBuilder(BuilderType.EmailBuilder)]
         public override string DisplayName { get; set; }
 
         [EnableInBuilder(BuilderType.EmailBuilder)]
+        public override string Name { get; set; }
+
+        [EnableInBuilder(BuilderType.EmailBuilder)]
         public override string Description { get; set; }
+
+        [EnableInBuilder(BuilderType.EmailBuilder)]
+        [HideInPropertyGrid]
+        public override string RefId { get; set; }
 
         [EnableInBuilder(BuilderType.EmailBuilder)]
         [HideInPropertyGrid]
@@ -145,7 +148,7 @@ namespace ExpressBase.Objects.EmailRelated
     public class DsColumnsDetails : EbEmailTemplateBase
     {
         [EnableInBuilder(BuilderType.EmailBuilder)]
-        public DateFormat DateFormat { get; set; }
+        public DateFormatEmail DateFormat { get; set; }
 
         [EnableInBuilder(BuilderType.EmailBuilder)]
         [UIproperty]

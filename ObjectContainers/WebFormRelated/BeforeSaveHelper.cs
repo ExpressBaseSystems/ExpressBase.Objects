@@ -95,7 +95,7 @@ namespace ExpressBase.Objects.WebFormRelated
                 {
                     if (string.IsNullOrEmpty((Allctrls[i] as EbTVcontrol).TVRefId))
                         throw new FormException($"Please set a Table View for {Allctrls[i].Label}.");
-                    (Allctrls[i] as EbTVcontrol).FetchParamsMeta(serviceClient);
+                    (Allctrls[i] as EbTVcontrol).FetchParamsMeta(serviceClient, redis);
                 }
                 else if (Allctrls[i] is EbPowerSelect)
                 {
@@ -244,8 +244,8 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                     else
                         throw new FormException("Invalid NotifyBy found for system notification");
                 }
-                else
-                    throw new FormException($"Email/SMS notifications are not allowed. Error code: 8714");
+                //else
+                //    throw new FormException($"Email/SMS notifications are not allowed. Error code: 8714");
             }
         }
 
