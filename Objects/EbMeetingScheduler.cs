@@ -34,6 +34,10 @@ namespace ExpressBase.Objects
         [DefaultPropValue("1")]
         public int MeetingId { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+        [HideInPropertyGrid]
+        public Dictionary<int, string> UsersList { get; set; }
+
         public override string UIchangeFns
         {
             get
@@ -113,13 +117,13 @@ namespace ExpressBase.Objects
                 Max-Attendee<input type='number' id='@ebsid@_max-attendee' class='meeting-spinner mc-input' min='1' max='5' value='1'>
                 Min-Attendee<input type='number' id='@ebsid@_min-attendee' class='meeting-spinner mc-input' min='1' max='5' value='1'>
                 </div>
-                <div class='eligible-participant'>
-                Eligible Host : <textarea id='@ebsid@_eligible_host_list' class='mc-input'> </textarea>
-                Eligible Attendee : <textarea id='@ebsid@_eligible_attendee_list' class='mc-input'> </textarea>
+                <div class='eligible-participant'><div style='width:100%'>
+                <h5>Eligible Host</h5> <input type='text' id='@ebsid@_eligible_host_list' class='mc-input'/> </div>
+                <div  style='width:100%'><h5>Eligible Attendee</h5><input type='text' id='@ebsid@_eligible_attendee_list' class='mc-input'/></div>
                 </div>
-                <div class='direct-participant'>
-                Host : <textarea id='@ebsid@_host_list' class='mc-input'></textarea>
-                Attendee : <textarea id='@ebsid@_attendee_list' class='mc-input'> </textarea>
+                <div class='direct-participant'><div  style='width:100%'>
+                <h5>Host</h5><input type='text' id='@ebsid@_host_list' class='mc-input'/></div>
+                <div  style='width:100%'><h5>Attendee </h5> <input type='text'  id='@ebsid@_attendee_list' class='mc-input'/></div>
                 </div>
                 <div class='meeting-recurance'>
                 <div class='is-recuring'><input type='checkbox' id='@ebsid@_recuring_meeting' name='recuring' value='recuring'>
@@ -137,8 +141,9 @@ namespace ExpressBase.Objects
                 Cron Exp : <input type='text' id='@ebsid@_crone-exp'>
                 Cron Exp End Date :<input type='text' id='@ebsid@_crone-exp-end'></div>
                 </div>
+            <input type='text' id='@ebsid@_MeetingJson' readonly hidden/>
                 </div>
-                <input type='text' id='@ebsid@_MeetingJson'/>
+               
                     "
                .Replace("@name@", this.Name)
                .Replace("@date_val@", DateTime.Today.ToString("yyyy-MM-dd"))
@@ -208,14 +213,14 @@ namespace ExpressBase.Objects
             {
                 query += $@"
             insert into eb_meeting_schedule (title,description,meeting_date,time_from,time_to,duration,is_recuring,is_multiple,venue,
-			 integration,max_hosts,max_attendees,no_of_attendee,no_of_hosts,eb_created_by,eb_created_at)
+			integration,max_hosts,max_attendees,no_of_attendee,no_of_hosts,eb_created_by,eb_created_at)
 			values('{Mobj.Title}','{Mobj.Description}','{Mobj.Date}','{Mobj.TimeFrom}:00','{Mobj.TimeTo}:00', 0,'{Mobj.IsRecuring}',
             '{Mobj.IsMultipleMeeting}','{Mobj.Location}','',{Mobj.MaxHost},{Mobj.MaxAttendee},{Mobj.MinAttendee},{Mobj.MinHost},{usr.UserId},now());
             insert into eb_meeting_slots (eb_meeting_schedule_id,meeting_date,time_from,time_to,eb_created_by,eb_created_at) values 
             (eb_currval('eb_meeting_schedule_id_seq'),'{Mobj.Date}','{Mobj.TimeFrom}','{Mobj.TimeTo}', {usr.UserId},now() );
             insert into eb_my_actions (user_ids,from_datetime,form_ref_id,form_data_id,description,my_action_type , eb_meeting_slots_id, 
             is_completed,eb_del) values('{Mobj.Host}',NOW(),@refid, eb_currval('{tbl}_id_seq'), 'Meeting Request',
-            '{MyActionTypes.Meeting}',eb_currval('eb_meeting_slots_id_seq') , 'F','F');      
+            '{MyActionTypes.Meeting}',eb_currval('eb_meeting_slots_id_seq') , 'F','F');  
             insert into eb_my_actions (user_ids,from_datetime,form_ref_id,form_data_id,description,my_action_type , eb_meeting_slots_id, 
             is_completed,eb_del) values('{Mobj.Attendee}',NOW(),@refid, eb_currval('{tbl}_id_seq'), 'Meeting Request',
             '{MyActionTypes.Meeting}',eb_currval('eb_meeting_slots_id_seq') , 'F','F');
