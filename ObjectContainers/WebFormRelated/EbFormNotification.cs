@@ -1,5 +1,6 @@
 ﻿using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
+using ExpressBase.Common.Structures;
 using System;
 using System.Collections.Generic;
 
@@ -77,6 +78,10 @@ else if(this.NotifyBy === 3)
     public class EbFnEmail : EbFormNotification
     {
         public EbFnEmail() { }
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [OSE_ObjectTypes(EbObjectTypes.iEmailBuilder)]
+        [EnableInBuilder(BuilderType.WebForm)]
+        public string RefId { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
         public string Test2 { get; set; }
