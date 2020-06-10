@@ -17,34 +17,34 @@ using Oracle.ManagedDataAccess.Client;
 namespace ExpressBase.Objects
 {
     [UsedWithTopObjectParent(typeof(EbObject))]
-    [EnableInBuilder(BuilderType.WebForm)]
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
     [HideInPropertyGrid]
     public class EbFormNotification
     {
         public EbFormNotification() { }
 
-        [EnableInBuilder(BuilderType.WebForm)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
         [HideInPropertyGrid]
         public string Name { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
         [HideInPropertyGrid]
         public string EbSid { get; set; }
 
         [PropertyGroup("Behavior")]
-        [EnableInBuilder(BuilderType.WebForm)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
         public EbScript SendOnlyIf { get; set; }
     }
 
     [Alias("System")]
-    [EnableInBuilder(BuilderType.WebForm)]
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
     public class EbFnSystem : EbFormNotification
     {
         public EbFnSystem() { }
 
         [PropertyGroup("Behavior")]
-        [EnableInBuilder(BuilderType.WebForm)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
         [OnChangeExec(@"
 if (this.NotifyBy === 0) this.NotifyBy = 1;
 pg.HideProperty('Users');
@@ -60,49 +60,48 @@ else if(this.NotifyBy === 3)
         public EbFnSys_NotifyBy NotifyBy { get; set; }
 
         [PropertyGroup("Behavior")]
-        [EnableInBuilder(BuilderType.WebForm)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.ScriptEditorCS)]//required ScriptEditorSQ
         public EbScript Users { get; set; }
 
         [PropertyGroup("Behavior")]
-        [EnableInBuilder(BuilderType.WebForm)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
         [Unique]
         [PropDataSourceJsFn("return ebcontext.Roles")]
         [PropertyEditor(PropertyEditorType.DropDown, true)]
         public List<Int32> Roles { get; set; }
 
         [PropertyGroup("Behavior")]
-        [EnableInBuilder(BuilderType.WebForm)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
         [PropDataSourceJsFn("return ebcontext.UserGroups")]
         [PropertyEditor(PropertyEditorType.DropDown)]
         public int UserGroup { get; set; }
 
         [PropertyGroup("Data")]
-        [EnableInBuilder(BuilderType.WebForm)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
         public EbScript Message { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
         [HideInPropertyGrid]
         public Dictionary<string, string> QryParams { get; set; }//<param, table>
     }
 
     [Alias("Email")]
-    [EnableInBuilder(BuilderType.WebForm)]
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
     public class EbFnEmail : EbFormNotification
     {
         public EbFnEmail() { }
+
+        [PropertyGroup("Behavior")]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iEmailBuilder)]
-        [EnableInBuilder(BuilderType.WebForm)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
         public string RefId { get; set; }
-
-        [EnableInBuilder(BuilderType.WebForm)]
-        public string Test2 { get; set; }
     }
 
     [Alias("Sms")]
-    [EnableInBuilder(BuilderType.WebForm)]
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
     public class EbFnSms : EbFormNotification
     {
         public EbFnSms() { }
@@ -112,7 +111,8 @@ else if(this.NotifyBy === 3)
         [EnableInBuilder(BuilderType.WebForm)]
         public string RefId { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm)]
+        
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
         public string Test3 { get; set; }
     }
 
@@ -136,11 +136,12 @@ else if(this.NotifyBy === 3)
                 if (ebFn is EbFnSystem)
                 {
                     EbFnSystem ebFnSys = ebFn as EbFnSystem;
-                    if (string.IsNullOrEmpty(ebFnSys.SendOnlyIf?.Code))
-                        continue;
-                    object soi = _this.ExecuteCSharpScriptNew(ebFnSys.SendOnlyIf.Code, globals);
-                    if (!(soi is bool && Convert.ToBoolean(soi)))
-                        continue;
+                    if (!string.IsNullOrEmpty(ebFnSys.SendOnlyIf?.Code))
+                    {
+                        object soi = _this.ExecuteCSharpScriptNew(ebFnSys.SendOnlyIf.Code, globals);
+                        if (!(soi is bool && Convert.ToBoolean(soi)))
+                            continue;
+                    }                    
                     string message = "Notification from " + _this.DisplayName;
                     if (!string.IsNullOrEmpty(ebFnSys.Message?.Code))
                     {
@@ -218,16 +219,26 @@ else if(this.NotifyBy === 3)
                             resp++;
                     }
                 }
-                if (ebFn is EbFnEmail && (ebFn as EbFnEmail).RefId != String.Empty)
+                else if (ebFn is EbFnEmail)
                 {
+                    EbFnEmail ebFnEmail = ebFn as EbFnEmail;
+                    if (string.IsNullOrEmpty(ebFnEmail.RefId))
+                        continue;
+                    if (!string.IsNullOrEmpty(ebFnEmail.SendOnlyIf?.Code))
+                    {
+                        object soi = _this.ExecuteCSharpScriptNew(ebFnEmail.SendOnlyIf.Code, globals);
+                        if (!(soi is bool && Convert.ToBoolean(soi)))
+                            continue;
+                    }
                     service.Gateway.Send<EmailAttachmenResponse>(new EmailTemplateWithAttachmentMqRequest
                     {
-                        RefId = (ebFn as EbFnEmail).RefId,
+                        RefId = ebFnEmail.RefId,
                         Params = new List<Param> { { new Param { Name = "id", Type = ((int)EbDbTypes.Int32).ToString(), Value = _this.TableRowId.ToString() } } },
                         SolnId = _this.SolutionObj.SolutionID,
                         UserAuthId = _this.UserObj.AuthId,
                         UserId = _this.UserObj.UserId
                     });
+                    resp++;
                 }
                 if (ebFn is EbFnSms && (ebFn as EbFnSms).RefId != string.Empty)
                 {

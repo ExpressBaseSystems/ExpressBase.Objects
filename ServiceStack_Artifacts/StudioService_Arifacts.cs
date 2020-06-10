@@ -124,14 +124,14 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-    public class EbObjAllVerWithoutCircularRefRqst : EbServiceStackAuthRequest, IReturn<EbObjAllVerWithoutCircularRefResp>
+    public class GetFormBuilderRelatedDataRqst : EbServiceStackAuthRequest, IReturn<GetFormBuilderRelatedDataResp>
     {
         public string EbObjectRefId { get; set; }
 
         public int EbObjType { get; set; }
     }
 
-    public class EbObjAllVerWithoutCircularRefResp : IEbSSResponse
+    public class GetFormBuilderRelatedDataResp : IEbSSResponse
     {
         [DataMember(Order = 1)]
         public Dictionary<string, List<EbObjectWrapper>> Data { get; set; }
