@@ -11,7 +11,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
 
     [DataContract]
-    public class SMSSentRequest : EbMqRequest
+    public class SMSSentRequest : EbServiceStackAuthRequest
     {
         [DataMember(Order = 1)]
         public string To { get; set; }
@@ -24,7 +24,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class SMSCreateRequest : EbServiceStackAuthRequest
+    public class SMSPrepareRequest : EbServiceStackAuthRequest
     {
         [DataMember(Order = 1)]
         public int ObjId { get; set; }
@@ -41,6 +41,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 5)]
         public string To { get; set; }
 
+        [DataMember(Order = 6)]
+        public string RefId { get; set; }
+
     }
 
     [DataContract]
@@ -54,6 +57,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 3)]
         public string MediaUrl { get; set; }
+
+        [DataMember(Order = 4)]
+        public string RefId { get; set; }
     }
 
     [DataContract]
