@@ -107,6 +107,11 @@ else if(this.NotifyBy === 3)
     {
         public EbFnSms() { }
 
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [OSE_ObjectTypes(EbObjectTypes.iSmsBuilder)]
+        [EnableInBuilder(BuilderType.WebForm)]
+        public string RefId { get; set; }
+
         [EnableInBuilder(BuilderType.WebForm)]
         public string Test3 { get; set; }
     }
@@ -223,6 +228,18 @@ else if(this.NotifyBy === 3)
                         UserAuthId = _this.UserObj.AuthId,
                         UserId = _this.UserObj.UserId
                     });
+                }
+                if (ebFn is EbFnSms && (ebFn as EbFnSms).RefId != string.Empty)
+                {
+                    service.Gateway.Send<EmailAttachmenResponse>(new SMSInitialRequest
+                    {
+                        RefId = (ebFn as EbFnSms).RefId,
+                        Params = new List<Param> { { new Param { Name = "id", Type = ((int)EbDbTypes.Int32).ToString(), Value = _this.TableRowId.ToString() } } },
+                        SolnId = _this.SolutionObj.SolutionID,
+                        UserAuthId = _this.UserObj.AuthId,
+                        UserId = _this.UserObj.UserId
+                    });
+
                 }
             }
             return resp;
