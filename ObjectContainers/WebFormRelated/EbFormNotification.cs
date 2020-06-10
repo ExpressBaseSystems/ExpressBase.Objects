@@ -111,7 +111,7 @@ else if(this.NotifyBy === 3)
         [EnableInBuilder(BuilderType.WebForm)]
         public string RefId { get; set; }
 
-        
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
         public string Test3 { get; set; }
     }
@@ -141,7 +141,7 @@ else if(this.NotifyBy === 3)
                         object soi = _this.ExecuteCSharpScriptNew(ebFnSys.SendOnlyIf.Code, globals);
                         if (!(soi is bool && Convert.ToBoolean(soi)))
                             continue;
-                    }                    
+                    }
                     string message = "Notification from " + _this.DisplayName;
                     if (!string.IsNullOrEmpty(ebFnSys.Message?.Code))
                     {
@@ -219,11 +219,10 @@ else if(this.NotifyBy === 3)
                             resp++;
                     }
                 }
-                else if (ebFn is EbFnEmail)
+                else if (ebFn is EbFnEmail && string.IsNullOrEmpty((ebFn as EbFnEmail).RefId))
                 {
                     EbFnEmail ebFnEmail = ebFn as EbFnEmail;
-                    if (string.IsNullOrEmpty(ebFnEmail.RefId))
-                        continue;
+
                     if (!string.IsNullOrEmpty(ebFnEmail.SendOnlyIf?.Code))
                     {
                         object soi = _this.ExecuteCSharpScriptNew(ebFnEmail.SendOnlyIf.Code, globals);
@@ -240,17 +239,25 @@ else if(this.NotifyBy === 3)
                     });
                     resp++;
                 }
-                if (ebFn is EbFnSms && (ebFn as EbFnSms).RefId != string.Empty)
+                if (ebFn is EbFnSms && string.IsNullOrEmpty((ebFn as EbFnSms).RefId))
                 {
+                    EbFnSms ebFnSms = ebFn as EbFnSms;
+
+                    if (!string.IsNullOrEmpty(ebFnSms.SendOnlyIf?.Code))
+                    {
+                        object soi = _this.ExecuteCSharpScriptNew(ebFnSms.SendOnlyIf.Code, globals);
+                        if (!(soi is bool && Convert.ToBoolean(soi)))
+                            continue;
+                    }
                     service.Gateway.Send<EmailAttachmenResponse>(new SMSInitialRequest
                     {
-                        RefId = (ebFn as EbFnSms).RefId,
+                        RefId = ebFnSms.RefId,
                         Params = new List<Param> { { new Param { Name = "id", Type = ((int)EbDbTypes.Int32).ToString(), Value = _this.TableRowId.ToString() } } },
                         SolnId = _this.SolutionObj.SolutionID,
                         UserAuthId = _this.UserObj.AuthId,
                         UserId = _this.UserObj.UserId
                     });
-
+                    resp++;
                 }
             }
             return resp;
