@@ -20,9 +20,9 @@ namespace ExpressBase.Objects
 
         public EbImageUploader() { }
 
-		[HideInPropertyGrid]
-		[EnableInBuilder(BuilderType.BotForm)]
-		public override bool IsReadOnly { get => this.ReadOnly; }
+		//[HideInPropertyGrid]
+		//[EnableInBuilder(BuilderType.BotForm)]
+		//public override bool IsReadOnly { get => this.IsDisable; }
 
 		[OnDeserialized]
         public void OnDeserializedMethod(StreamingContext context)
@@ -68,7 +68,7 @@ namespace ExpressBase.Objects
             return @" 
         <div class='input-group' style='width:100%;'>
             <input id='@name@txt' type='text' style='width:100%;' onclick=""$('#@name@').click()"" />
-            <input id='@name@' data-toggle='tooltip' title='@toolTipText@' type='file' onchange=""$('#@name@txt').val($(this).val())""  accept='image/*' name='@name@' @value@ @tabIndex@ style='display:none; width:100%; @BackColor@ @ForeColor@ @fontStyle@ @readOnlyString@ @required@ />
+            <input id='@name@' data-toggle='tooltip' title='@toolTipText@' type='file' onchange=""$('#@name@txt').val($(this).val())""  accept='image/*' name='@name@' @value@ @tabIndex@ style='display:none; width:100%; @BackColor@ @ForeColor@ @fontStyle@' @required@ />
             <span class='input-group-addon' onclick=""$('#@name@').click()""> <i id='@name@TglBtn' class='fa  fa-picture-o' aria-hidden='true'></i> </span>
         </div>"
 .Replace("@name@", this.Name)
@@ -78,7 +78,7 @@ namespace ExpressBase.Objects
     .Replace("@BackColor@ ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor@ ") + ";"))
     .Replace("@ForeColor@ ", "color:" + ((this.ForeColor != null) ? this.ForeColor : "@ForeColor@ ") + ";")
 .Replace("@required@", " required")//(this.Required && !this.Hidden ? " required" : string.Empty))
-.Replace("@readOnlyString@", this.ReadOnlyString);
+;
         }
 
         public override string GetHtml()

@@ -4,7 +4,7 @@ using ExpressBase.Common.JsonConverters;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
-using ExpressBase.Objects.EmailRelated;
+using ExpressBase.Objects;
 using Newtonsoft.Json;
 using ServiceStack.Redis;
 using System;
@@ -41,6 +41,7 @@ namespace ExpressBase.Objects.Objects.SmsRelated
         [HideInPropertyGrid]
         public override string Status { get; set; }
 
+        [EnableInBuilder(BuilderType.SmsBuilder)]
         [HideInPropertyGrid]
         public string To { get; set; }
 

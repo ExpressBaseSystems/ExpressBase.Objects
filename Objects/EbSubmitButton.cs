@@ -116,7 +116,7 @@ namespace ExpressBase.Objects.Objects
 
         public override string GetBareHtml()
         {
-            return @"<button id='webform_submit' class='btn btn-default' style='width:100%; @backColor @foreColor @fontStyle' disabled >@Label@</button>"
+            return @"<button id='webform_submit' class='btn btn-default' style='width:100%; @backColor @foreColor @fontStyle'>@Label@</button>"
                 .Replace("@ebsid@", this.EbSid_CtxId)
                 .Replace("@Label@", this.Label ?? "@Text@")
 .Replace("@tabIndex", "tabindex='" + this.TabIndex + "'")

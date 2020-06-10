@@ -23,18 +23,142 @@ namespace ExpressBase.Objects.WebFormRelated
             if (string.IsNullOrEmpty(_this.TableName))
                 throw new FormException("Please enter a valid form table name");
             tbls.Add(_this.TableName, "form table");
-            if (_this.Notifications.Count > 0)
-                throw new FormException($"Notifications not allowed. Error code: 8714");
             EbControl[] Allctrls = _this.Controls.FlattenAllEbControls();
             Dictionary<Type, bool> OneCtrls = new Dictionary<Type, bool>() // Limit more than one ctrl
             {
-                { typeof(EbAutoId), false }, 
-                { typeof(EbReview), false }, 
-                { typeof(EbSubmitButton), false }, 
-                { typeof(EbProvisionLocation), false }, 
-                { typeof(EbSysLocation), false } 
+                { typeof(EbAutoId), false },
+                { typeof(EbReview), false },
+                { typeof(EbSubmitButton), false },
+                { typeof(EbProvisionLocation), false },
+                { typeof(EbSysLocation), false }
             };
+            PerformRequirdCheck(Allctrls, OneCtrls, tbls, serviceClient, redis, ebReviewCtrl);
+            PerformRequirdUpdate(_this, _this.TableName);
+            Dictionary<int, EbControlWrapper> _dict = new Dictionary<int, EbControlWrapper>();
+            GetControlsAsDict(_this, "form", _dict);
+            CalcValueExprDependency(_dict);
+            ValidateAndUpdateReviewCtrl(_this, ebReviewCtrl, _dict);
+            ValidateNotificationProp(_this.Notifications, _dict);
+        }
 
+        private static void ValidateAndUpdateReviewCtrl(EbWebForm _this, EbReview ebReviewCtrl, Dictionary<int, EbControlWrapper> _dict)
+        {
+            if (ebReviewCtrl == null)
+                return;
+
+            for (int i = 0; i < ebReviewCtrl.FormStages.Count; i++)
+            {
+                EbReviewStage stage = ebReviewCtrl.FormStages[i];
+                if (stage.ApproverEntity == ApproverEntityTypes.Users)
+                {
+                    Dictionary<string, string> QryParms = new Dictionary<string, string>();//<param, table>
+                    string code = stage.ApproverUsers.Code;
+                    if (string.IsNullOrEmpty(code))
+                        throw new FormException($"Required SQL query for {ebReviewCtrl.Name}(review) control stage {stage.Name}");
+                    MatchCollection matchColl = Regex.Matches(code, @"(?<=@)(\w+)|(?<=:)(\w+)");
+                    foreach (Match match in matchColl)
+                    {
+                        KeyValuePair<int, EbControlWrapper> item = _dict.FirstOrDefault(e => e.Value.Control.Name == match.Value);
+                        if (item.Value == null)
+                            throw new FormException($"Can't resolve {match.Value} in {ebReviewCtrl.Name}(review) control's SQL query of stage {stage.Name}");
+                        if (!QryParms.ContainsKey(item.Value.Control.Name))
+                            QryParms.Add(item.Value.Control.Name, item.Value.TableName);
+                    }
+                    stage.QryParams = QryParms;
+                }
+                else if (stage.ApproverEntity == ApproverEntityTypes.UserGroup)
+                {
+                    if (stage.ApproverUserGroup <= 0)
+                        throw new FormException($"Required a usergroup for stage {stage.Name} of {ebReviewCtrl.Name}(review) control");
+                }
+                else if (stage.ApproverEntity == ApproverEntityTypes.Role)
+                {
+                    if (stage.ApproverRoles == null || stage.ApproverRoles?.FindAll(e => e > 0).Count() == 0)
+                        throw new FormException($"Required roles for stage {stage.Name} of {ebReviewCtrl.Name}(review) control");
+                }
+                else
+                    throw new FormException($"Invalid ApproverEntity found for stage {stage.Name} of {ebReviewCtrl.Name}(review) control: " + stage.ApproverEntity);
+
+                if (stage.IsAdvanced)
+                {
+                    //if (stage.StageActions == null || stage.StageActions?.Count == 0)
+                    //    throw new FormException($"Required actions for stage {stage.Name} of {ebReviewCtrl.Name}(review) control");
+                    //if (stage.NextStage == null || string.IsNullOrEmpty(stage.NextStage.Code))
+                    //    throw new FormException($"Required next stage script for stage {stage.Name} of {ebReviewCtrl.Name}(review) control");
+                }
+                else
+                {
+                    stage.StageActions = new List<EbReviewAction>() {
+                        new EbReviewAction(){ EbSid = stage.Name + "_ebreviewaction1", Name = "On Hold"},
+                        new EbReviewAction(){ EbSid = stage.Name + "_ebreviewaction2", Name = "Accepted"},
+                        new EbReviewAction(){ EbSid = stage.Name + "_ebreviewaction3", Name = "Rejected"}
+                    };
+                    string nxtStage = ebReviewCtrl.FormStages.Count == i + 1 ? $"form.review.complete(); \n\tsystem.sendNotificationByUserId(form.eb_created_by, \"Accepted your request for '{_this.DisplayName}'\")" : $@"return form.review.stages[""{ebReviewCtrl.FormStages[i + 1].Name}""]";
+
+                    string code = $@"
+if (form.review.currentStage.currentAction.name == ""On Hold""){{
+    return form.review.stages[""{stage.Name}""];
+}}
+if (form.review.currentStage.currentAction.name == ""Accepted""){{
+    {nxtStage};
+}}
+if (form.review.currentStage.currentAction.name == ""Rejected""){{
+    form.review.abandon();
+    system.sendNotificationByUserId(form.eb_created_by, ""Rejected your request for '{_this.DisplayName}'"");
+}}
+";
+                    stage.NextStage = new EbScript() { Lang = ScriptingLanguage.CSharp, Code = code };
+                }
+            }
+        }
+
+        private static void ValidateNotificationProp(List<EbFormNotification> _Notifications, Dictionary<int, EbControlWrapper> _dict)
+        {
+            if (_Notifications?.Count <= 0)
+                return;
+            for (int i = 0; i < _Notifications.Count; i++)
+            {
+                if (_Notifications[i] is EbFnSystem)
+                {
+                    EbFnSystem ebFnSys = _Notifications[i] as EbFnSystem;
+                    if (ebFnSys.NotifyBy == EbFnSys_NotifyBy.Roles)
+                    {
+                        if (!(ebFnSys.Roles?.FindAll(e => e > 0).Count() > 0))
+                            throw new FormException("Invalid roles found for system notification");
+                    }
+                    else if (ebFnSys.NotifyBy == EbFnSys_NotifyBy.UserGroup)
+                    {
+                        if (ebFnSys.UserGroup <= 0)
+                            throw new FormException("Invalid user group found for system notification");
+                    }
+                    else if (ebFnSys.NotifyBy == EbFnSys_NotifyBy.Users)
+                    {
+                        ebFnSys.QryParams = new Dictionary<string, string>();//<param, table>
+                        if (string.IsNullOrEmpty(ebFnSys.Users?.Code))
+                            throw new FormException("Required SQL query for system notification");
+                        MatchCollection matchColl = Regex.Matches(ebFnSys.Users.Code, @"(?<=@)(\w+)|(?<=:)(\w+)");
+                        foreach (Match match in matchColl)
+                        {
+                            KeyValuePair<int, EbControlWrapper> item = _dict.FirstOrDefault(e => e.Value.Control.Name == match.Value);
+                            if (item.Value == null)
+                                throw new FormException($"Can't resolve {match.Value} in SQL query of system notification");
+                            if (!ebFnSys.QryParams.ContainsKey(item.Value.Control.Name))
+                                ebFnSys.QryParams.Add(item.Value.Control.Name, item.Value.TableName);
+                        }
+                    }
+                    else
+                        throw new FormException("Invalid NotifyBy found for system notification");
+                }
+                else if (_Notifications[i] is EbFnEmail)
+                {
+                    if (string.IsNullOrEmpty((_Notifications[i] as EbFnEmail).RefId))
+                        throw new FormException($"Invalid Ref id found for email notification");
+                }
+            }
+        }
+
+        private static void PerformRequirdCheck(EbControl[] Allctrls, Dictionary<Type, bool> OneCtrls, Dictionary<string, string> tbls, IServiceClient serviceClient, IRedisClient redis, EbReview ebReviewCtrl)
+        {
             for (int i = 0; i < Allctrls.Length; i++)
             {
                 if (OneCtrls.ContainsKey(Allctrls[i].GetType()))
@@ -91,13 +215,13 @@ namespace ExpressBase.Objects.WebFormRelated
                 {
                     if (string.IsNullOrEmpty((Allctrls[i] as EbChartControl).TVRefId))
                         throw new FormException($"Please set a Chart View for {Allctrls[i].Label}.");
-                    (Allctrls[i] as EbChartControl).FetchParamsMeta(serviceClient);
+                    (Allctrls[i] as EbChartControl).FetchParamsMeta(serviceClient, redis);
                 }
                 else if (Allctrls[i] is EbTVcontrol && serviceClient != null)
                 {
                     if (string.IsNullOrEmpty((Allctrls[i] as EbTVcontrol).TVRefId))
                         throw new FormException($"Please set a Table View for {Allctrls[i].Label}.");
-                    (Allctrls[i] as EbTVcontrol).FetchParamsMeta(serviceClient);
+                    (Allctrls[i] as EbTVcontrol).FetchParamsMeta(serviceClient, redis);
                 }
                 else if (Allctrls[i] is EbPowerSelect)
                 {
@@ -128,78 +252,32 @@ namespace ExpressBase.Objects.WebFormRelated
                     if (string.IsNullOrEmpty(Allctrls[i].RefId))
                         throw new FormException($"User control reference is missing for {Allctrls[i].Label}.");
                 }
-            }
-
-            PerformRequirdUpdate(_this, _this.TableName);
-
-            Dictionary<int, EbControlWrapper> _dict = new Dictionary<int, EbControlWrapper>();
-            GetControlsAsDict(_this, "form", _dict);
-            CalcValueExprDependency(_this, _dict);
-
-            //review ctrl related
-            if (ebReviewCtrl != null)
-            {
-                for (int i = 0; i < ebReviewCtrl.FormStages.Count; i++)
+                if (Allctrls[i] is EbDynamicCardSet)
                 {
-                    EbReviewStage stage = ebReviewCtrl.FormStages[i];
-                    if (stage.ApproverEntity == ApproverEntityTypes.Users)
-                    {
-                        Dictionary<string, string> QryParms = new Dictionary<string, string>();//<param, table>
-                        string code = stage.ApproverUsers.Code;
-                        if (string.IsNullOrEmpty(code))
-                            throw new FormException($"Required SQL query for {ebReviewCtrl.Name}(review) control stage {stage.Name}");
-                        MatchCollection matchColl = Regex.Matches(code, @"(?<=@)(\w+)|(?<=:)(\w+)");
-                        foreach (Match match in matchColl)
-                        {
-                            KeyValuePair<int, EbControlWrapper> item = _dict.FirstOrDefault(e => e.Value.Control.Name == match.Value);
-                            if (item.Value == null)
-                                throw new FormException($"Can't resolve {match.Value} in {ebReviewCtrl.Name}(review) control's SQL query of stage {stage.Name}");
-                            if (!QryParms.ContainsKey(item.Value.Control.Name))
-                                QryParms.Add(item.Value.Control.Name, item.Value.TableName);
-                        }
-                        stage.QryParams = QryParms;
-                    }
-                    else if (stage.ApproverEntity == ApproverEntityTypes.UserGroup)
-                    {
-                        if (stage.ApproverUserGroup <= 0)
-                            throw new FormException($"Required a usergroup for stage {stage.Name} of {ebReviewCtrl.Name}(review) control");
-                    }
-                    else if (stage.ApproverEntity == ApproverEntityTypes.Role)
-                    {
-                        if (stage.ApproverRoles == null || stage.ApproverRoles?.FindAll(e => e > 0).Count() == 0)
-                            throw new FormException($"Required roles for stage {stage.Name} of {ebReviewCtrl.Name}(review) control");
-                    }
+                    EbDynamicCardSet _ctrl = Allctrls[i] as EbDynamicCardSet;
+                    if (string.IsNullOrEmpty(_ctrl.DataSourceId))
+                        throw new FormException("Set Data Reader for Dynamic Card - " + _ctrl.Label ?? _ctrl.Name);
+                    if (_ctrl.ValueMember == null)
+                        throw new FormException("Set Value Member for Dynamic Card - " + _ctrl.Label ?? _ctrl.Name);
+                    if (_ctrl.CardFields?.Count == 0)
+                        throw new FormException("Set Card Fields for Dynamic Card - " + _ctrl.Label ?? _ctrl.Name);
+                    if (string.IsNullOrEmpty(_ctrl.TableName))
+                        throw new FormException("Please enter a valid Dynamic Card table name");
 
-                    if (stage.IsAdvanced)
-                    {
-                        //if (stage.StageActions == null || stage.StageActions?.Count == 0)
-                        //    throw new FormException($"Required actions for stage {stage.Name} of {ebReviewCtrl.Name}(review) control");
-                        //if (stage.NextStage == null || string.IsNullOrEmpty(stage.NextStage.Code))
-                        //    throw new FormException($"Required next stage script for stage {stage.Name} of {ebReviewCtrl.Name}(review) control");
-                    }
-                    else
-                    {
-                        stage.StageActions = new List<EbReviewAction>() {
-                            new EbReviewAction(){ EbSid = stage.Name + "_ebreviewaction1", Name = "On Hold"},
-                            new EbReviewAction(){ EbSid = stage.Name + "_ebreviewaction2", Name = "Accepted"},
-                            new EbReviewAction(){ EbSid = stage.Name + "_ebreviewaction3", Name = "Rejected"}
-                        };
-                        string nxtStage = ebReviewCtrl.FormStages.Count == i + 1 ? $"form.review.complete(); \n\tsystem.sendNotificationByUserId(form.eb_created_by, \"Accepted your request for '{_this.DisplayName}'\")" : $@"return form.review.stages[""{ebReviewCtrl.FormStages[i + 1].Name}""]";
-
-                        string code = $@"
-if (form.review.currentStage.currentAction.name == ""On Hold""){{
-    return form.review.stages[""{stage.Name}""];
-}}
-if (form.review.currentStage.currentAction.name == ""Accepted""){{
-    {nxtStage};
-}}
-if (form.review.currentStage.currentAction.name == ""Rejected""){{
-    form.review.abandon();
-    system.sendNotificationByUserId(form.eb_created_by, ""Rejected your request for '{_this.DisplayName}'"");
-}}
-";
-                        stage.NextStage = new EbScript() { Lang = ScriptingLanguage.CSharp, Code = code };
-                    }
+                    string _tn = _ctrl.TableName;
+                    if (string.IsNullOrEmpty(_ctrl.TableName))
+                        throw new FormException("Please enter a valid table name for " + _ctrl.Label + " (dynamic card)");
+                    if (tbls.ContainsKey(_tn))
+                        throw new FormException(string.Format("Same table not allowed for {1} and {2}(dynamic card) : {0}", _tn, tbls[_tn], _ctrl.Label));
+                    tbls.Add(_tn, _ctrl.Label + "(dynamic card)");
+                }
+                else if (Allctrls[i] is EbStaticCardSet)
+                {
+                    EbStaticCardSet _ctrl = Allctrls[i] as EbStaticCardSet;
+                    if (_ctrl.CardFields?.Count == 0)
+                        throw new FormException("Set Card Fields for Static Card - " + _ctrl.Label ?? _ctrl.Name);
+                    if (string.IsNullOrEmpty(_ctrl.TableName))
+                        throw new FormException("Please enter a valid Static Card table name");
                 }
             }
         }
@@ -243,7 +321,7 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
         }
 
         //Populate Property DependedValExp
-        private static void CalcValueExprDependency(EbWebForm _this, Dictionary<int, EbControlWrapper> _dict)
+        private static void CalcValueExprDependency(Dictionary<int, EbControlWrapper> _dict)
         {
             List<int> CalcFlds = new List<int>();
             List<KeyValuePair<int, int>> dpndcy = new List<KeyValuePair<int, int>>();
@@ -410,5 +488,22 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
             }
         }
 
+        public static void BeforeSave_BotForm(EbBotForm _this, IServiceClient serviceClient, IRedisClient redis)
+        {
+            Dictionary<string, string> tbls = new Dictionary<string, string>();
+            if (string.IsNullOrEmpty(_this.TableName))
+                throw new FormException("Please enter a valid form table name");
+            tbls.Add(_this.TableName, "form table");
+            EbControl[] Allctrls = _this.Controls.FlattenAllEbControls();
+            Dictionary<Type, bool> OneCtrls = new Dictionary<Type, bool>() // Limit more than one ctrl
+            {
+                { typeof(EbAutoId), false }
+            };
+            PerformRequirdCheck(Allctrls, OneCtrls, tbls, serviceClient, redis, null);
+            Dictionary<int, EbControlWrapper> _dict = new Dictionary<int, EbControlWrapper>();
+            GetControlsAsDict(_this, "form", _dict);
+            CalcValueExprDependency(_dict);
+            ValidateNotificationProp(_this.Notifications, _dict);
+        }
     }
 }

@@ -581,6 +581,8 @@ namespace ExpressBase.Objects
 
         public override bool DoNotPersist { get; set; }
 
+        public override bool Required { get; set; }
+
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("UI")]
         public string TextFormat { get; set; }
@@ -607,6 +609,14 @@ namespace ExpressBase.Objects
         [PropertyGroup("UI")]
         [PropertyEditor(PropertyEditorType.FontSelector)]
         public EbFont Font { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("UI")]
+        public int RowSpan { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("UI")]
+        public int ColumnSpan { set; get; }
 
         public override bool Hidden { set; get; }
 

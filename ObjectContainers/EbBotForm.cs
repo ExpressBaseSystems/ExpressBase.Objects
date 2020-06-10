@@ -4,6 +4,7 @@ using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
 using ExpressBase.Objects.ServiceStack_Artifacts;
+using ExpressBase.Objects.WebFormRelated;
 using ServiceStack;
 using ServiceStack.Redis;
 using System;
@@ -21,6 +22,11 @@ namespace ExpressBase.Objects
     [BuilderTypeEnum(BuilderType.BotForm)]
     public class EbBotForm : EbForm
     {
+        public EbBotForm()
+        {
+            this.Notifications = new List<EbFormNotification>();
+        }
+
         [OnDeserialized]
         public new void OnDeserializedMethod(StreamingContext context)
         {
@@ -43,7 +49,7 @@ namespace ExpressBase.Objects
                 for (int i = 0; i < this.Controls.Count; i++)
                 {
                     EbControl control = this.Controls[i];
-                    if (!(control.IsReadOnly || control.IsDisable))
+                    if (!control.IsDisable)
                     {
                         res = true;
                         break;
@@ -69,21 +75,24 @@ namespace ExpressBase.Objects
         [Alias("Web Form")]
         public string WebFormRefId { set; get; }
 
+        [PropertyGroup("Events")]
+        [EnableInBuilder(BuilderType.BotForm)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        public List<EbFormNotification> Notifications { get; set; }
+
         public override bool IsReadOnly//to identify a bot form is readonly or not
         {
             get
             {
                 foreach (EbControl ctrl in this.Controls)
                 {
-                    if (!ctrl.IsReadOnly)
+                    if (!ctrl.IsDisable)
                         return false;
                 }
                 return true;
             }
         }
-
-        public EbBotForm() { }
-
+        
         public static EbOperations Operations = BFOperations.Instance;
 
         public override string GetHead()
@@ -156,49 +165,10 @@ namespace ExpressBase.Objects
 
             return html.Replace("@name@", this.Name);
         }
-        
+
         public override void BeforeSave(IServiceClient serviceClient, IRedisClient redis)
         {
-            Dictionary<string, string> tbls = new Dictionary<string, string>();
-            if (string.IsNullOrEmpty(this.TableName))
-                throw new FormException("Please enter a valid form table name");
-            tbls.Add(this.TableName, "form table");
-
-            foreach (EbControl _control in this.Controls)
-            {
-                if (_control is EbDynamicCardSet)
-                {
-                    EbDynamicCardSet ctrl = _control as EbDynamicCardSet;
-                    if (string.IsNullOrEmpty(ctrl.DataSourceId))
-                        throw new FormException("Set Data Reader for Dynamic Card - " + ctrl.Label ?? ctrl.Name);
-                    if (ctrl.ValueMember == null)
-                        throw new FormException("Set Value Member for Dynamic Card - " + ctrl.Label ?? ctrl.Name);
-                    if (ctrl.CardFields?.Count == 0)
-                        throw new FormException("Set Card Fields for Dynamic Card - " + ctrl.Label ?? ctrl.Name);
-                    if (string.IsNullOrEmpty(ctrl.TableName))
-                        throw new FormException("Please enter a valid Dynamic Card table name");
-                }
-                else if (_control is EbStaticCardSet)
-                {
-                    EbStaticCardSet ctrl = _control as EbStaticCardSet;
-                    if (ctrl.CardFields?.Count == 0)
-                        throw new FormException("Set Card Fields for Static Card - " + ctrl.Label ?? ctrl.Name);
-                    if (string.IsNullOrEmpty(ctrl.TableName))
-                        throw new FormException("Please enter a valid Static Card table name");
-                }
-                else if (_control is EbPowerSelect)
-                {
-                    EbPowerSelect ctrl = _control as EbPowerSelect;
-                    if (string.IsNullOrEmpty(ctrl.DataSourceId))
-                        throw new FormException("Set Data Reader for " + ctrl.Label);
-                    if (ctrl.ValueMember == null)
-                        throw new FormException("Set Value Member for " + ctrl.Label);
-                    if (ctrl.RenderAsSimpleSelect && ctrl.DisplayMember == null)
-                        throw new FormException("Set Display Member for " + ctrl.Label);
-                    if (!ctrl.RenderAsSimpleSelect && (ctrl.DisplayMembers == null || ctrl.DisplayMembers.Count == 0))
-                        throw new FormException("Set Display Members for " + ctrl.Label);
-                }
-            }
+            BeforeSaveHelper.BeforeSave_BotForm(this, serviceClient, redis);
         }
 
         public override List<string> DiscoverRelatedRefids()

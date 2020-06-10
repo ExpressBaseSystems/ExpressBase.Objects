@@ -1,6 +1,6 @@
 ﻿using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
-using ExpressBase.Objects.EmailRelated;
+using ExpressBase.Objects;
 using ServiceStack;
 using System;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ using System.Text;
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
     [DataContract]
-    public class EmailAttachmentMqRequest : EbServiceStackAuthRequest, IReturn<EmailAttachmenResponse>
+    public class EmailTemplateWithAttachmentMqRequest : EbServiceStackAuthRequest, IReturn<EmailAttachmenResponse>
     {
         [DataMember(Order = 1)]
         public int ObjId  { get; set; }
@@ -18,15 +18,21 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 2)]
         public List<Param> Params { get; set; }
 
+        [DataMember(Order = 3)]
+        public string RefId { get; set; }
+
     }
     [DataContract]
-    public class EmailAttachmenRequest : EbServiceStackAuthRequest, IReturn<EmailAttachmenResponse>
+    public class EmailAttachmentRequest : EbServiceStackAuthRequest, IReturn<EmailAttachmenResponse>
     {
         [DataMember(Order = 1)]
         public int ObjId { get; set; }
 
         [DataMember(Order =2)]
         public List<Param> Params { get; set; }
+
+        [DataMember(Order =3)]
+        public string RefId { get; set; }
     }
     public  class EmailAttachmenResponse
     {

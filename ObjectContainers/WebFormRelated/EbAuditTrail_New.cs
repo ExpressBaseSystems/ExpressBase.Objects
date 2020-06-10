@@ -26,8 +26,6 @@ namespace ExpressBase.Objects.WebFormRelated/////////////
     {
         private EbWebForm WebForm { get; set; }
 
-        private List<EbWebForm> FormCollection { get; set; }
-
         private IDatabase DataDB { get; set; }
 
         private Service Service { get; set; }
@@ -37,18 +35,12 @@ namespace ExpressBase.Objects.WebFormRelated/////////////
             this.WebForm = ebWebForm;
             this.DataDB = dataDB;
             this.Service = service;
-            this.FormCollection = new List<EbWebForm> { this.WebForm };
-            if (this.WebForm.ExeDataPusher)
-            {
-                foreach (EbDataPusher pusher in this.WebForm.DataPushers)
-                    this.FormCollection.Add(pusher.WebForm);
-            }
         }
 
         public int UpdateAuditTrail()
         {
             List<AuditTrailInsertData> auditTrails = new List<AuditTrailInsertData>();
-            foreach (EbWebForm _webForm in this.FormCollection)
+            foreach (EbWebForm _webForm in this.WebForm.FormCollection)
             {
                 if (_webForm.FormDataBackup == null || (_webForm.DataPusherConfig == null && _webForm.FormDataBackup.MultipleTables.Count == 0))// Created
                 {
@@ -308,8 +300,8 @@ namespace ExpressBase.Objects.WebFormRelated/////////////
 
                 if (_table.TableType != WebFormTableTypes.Normal)
                 {
-                    Dictionary<string, string> new_val_dict = new_val == null ? null : JsonConvert.DeserializeObject<Dictionary<string, string>>(new_val);
-                    Dictionary<string, string> old_val_dict = old_val == null ? null : JsonConvert.DeserializeObject<Dictionary<string, string>>(old_val);
+                    Dictionary<string, string> new_val_dict = (new_val == null || new_val == "[null]") ? null : JsonConvert.DeserializeObject<Dictionary<string, string>>(new_val);
+                    Dictionary<string, string> old_val_dict = (old_val == null || old_val == "[null]") ? null : JsonConvert.DeserializeObject<Dictionary<string, string>>(old_val);
 
                     if (!Trans[m_id].GridTables.ContainsKey(_table.TableName))
                     {
@@ -360,6 +352,8 @@ namespace ExpressBase.Objects.WebFormRelated/////////////
                 }
                 else
                 {
+                    if (old_val == new_val)
+                        continue;
                     if (!Trans[m_id].Tables.ContainsKey(_table.TableName))
                         Trans[m_id].Tables.Add(_table.TableName, new FormTransactionRow() { });
 
@@ -390,6 +384,8 @@ namespace ExpressBase.Objects.WebFormRelated/////////////
 
         private void PreProcessTransationData(Dictionary<string, string> DictVmAll, TableSchema _table, ColumnSchema _column, ref string old_val, ref string new_val)
         {
+            if (old_val == "[null]") old_val = null;
+            if (new_val == "[null]") new_val = null;
             if (_column.Control is EbPowerSelect || _column.Control is EbDGPowerSelectColumn)//copy vm for dm
             {
                 string key = string.Concat(_table.TableName, "_", _column.ColumnName);
@@ -430,10 +426,30 @@ namespace ExpressBase.Objects.WebFormRelated/////////////
             }
             else
             {
-                SingleColumn singleColumn = _column.Control.GetSingleColumn(this.WebForm.UserObj, this.WebForm.SolutionObj, old_val);
-                old_val = singleColumn.F;
-                singleColumn = _column.Control.GetSingleColumn(this.WebForm.UserObj, this.WebForm.SolutionObj, new_val);
-                new_val = singleColumn.F;
+                if (old_val != null)
+                {
+                    try
+                    {
+                        SingleColumn singleColumn = _column.Control.GetSingleColumn(this.WebForm.UserObj, this.WebForm.SolutionObj, old_val);
+                        old_val = singleColumn.F;
+                    }
+                    catch(Exception e)
+                    {
+                        Console.WriteLine("Exception in GetAuditTrail -> PreProcessTransationData -> GetSingleColumn\nControl Name: " + _column.Control.Name + "\nold_val Value: " + old_val + "\nMessage: " + e.Message);
+                    }
+                }
+                if (new_val != null)
+                {
+                    try
+                    {
+                        SingleColumn singleColumn = _column.Control.GetSingleColumn(this.WebForm.UserObj, this.WebForm.SolutionObj, new_val);
+                        new_val = singleColumn.F;
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("Exception in GetAuditTrail -> PreProcessTransationData -> GetSingleColumn\nControl Name: " + _column.Control.Name + "\nnew_val Value: " + new_val + "\nMessage: " + e.Message);
+                    }
+                }
             }
         }
 

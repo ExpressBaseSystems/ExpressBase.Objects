@@ -77,7 +77,20 @@ namespace ExpressBase.Objects
 
         public EbDate()
         {
+        }
 
+        [JsonIgnore]
+        public override string EnableJSfn
+        {
+            get
+            {
+                return JSFnsConstants.Ctrl_EnableJSfn
++ @"
+if(this.IsNullable && !($('#' + this.EbSid_CtxId).closest('.input-group').find(`input[type='checkbox']`).is(':checked')))
+    $('#' + this.EbSid_CtxId).prop('disabled', true).next('.input-group-addon').css('pointer-events', 'none');"
+;
+            }
+            set { }
         }
 
         [OnDeserialized]
@@ -162,9 +175,9 @@ namespace ExpressBase.Objects
         //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         //public DateFormat DateFormat { get; set; }
 
-        [HideInPropertyGrid]
-        [EnableInBuilder(BuilderType.BotForm)]
-        public override bool IsReadOnly { get => this.ReadOnly; }
+        //[HideInPropertyGrid]
+        //[EnableInBuilder(BuilderType.BotForm)]
+        //public override bool IsReadOnly { get => this.IsDisable; }
 
         public override VendorDbType GetvDbType(IVendorDbTypes vDbTypes)
         {
@@ -221,7 +234,7 @@ namespace ExpressBase.Objects
             return @"
         <div class='input-group' style='width:100%;'>
             @IsNullable@
-            <input id='@ebsid@' ui-inp data-ebtype='@data-ebtype@'  data-toggle='tooltip' title='@toolTipText@' class='date' type='text' name='@name@' autocomplete = '@autoComplete@' @value@ @tabIndex@ style='width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@ @readOnlyString@ @required@ @placeHolder@ />
+            <input id='@ebsid@' ui-inp data-ebtype='@data-ebtype@'  data-toggle='tooltip' title='@toolTipText@' class='date' type='text' name='@name@' autocomplete = '@autoComplete@' @value@ @tabIndex@ style='width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@' @required@ @placeHolder@ />
             <span class='input-group-addon' style='padding: 0px;'> <i id='@ebsid@TglBtn' class='fa  @atchdLbl@' aria-hidden='true'></i> </span>
         </div>"
 .Replace("@name@", (this.Name != null ? this.Name.Trim() : ""))
@@ -234,7 +247,6 @@ namespace ExpressBase.Objects
     .Replace("@BackColor@ ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor@ ") + ";"))
     .Replace("@ForeColor@ ", "color:" + ((this.ForeColor != null) ? this.ForeColor : "@ForeColor@ ") + ";")
 .Replace("@required@", (this.Required && !this.Hidden ? " required" : string.Empty))
-.Replace("@readOnlyString@", this.ReadOnlyString)
 .Replace("@placeHolder@", "placeholder='" + this.PlaceHolder + "'")
 .Replace("@atchdLbl@", (this.EbDateType.ToString().ToLower() == "time") ? "fa-clock-o" : "fa-calendar")
 .Replace("@IsNullable@", (this.IsNullable) ? "<span class='input-group-addon nullable-check' style='padding: 0px 7px !important;'><input type='checkbox' style='min-height:unset;'></span>" : "");
@@ -335,12 +347,12 @@ namespace ExpressBase.Objects
                 {
                     if (this.ShowDateAs_ == DateShowFormat.Year)
                         cField.Value = DateTime.ParseExact(cField.Value.ToString(), "yyyy", CultureInfo.InvariantCulture);
-                    else if(this.ShowDateAs_ == DateShowFormat.Year_Month)
+                    else if (this.ShowDateAs_ == DateShowFormat.Year_Month)
                         cField.Value = DateTime.ParseExact(cField.Value.ToString(), "MM/yyyy", CultureInfo.InvariantCulture);
                     else
                         cField.Value = DateTime.ParseExact(cField.Value.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
                 }
-                else 
+                else
                 {
                     DateTime dt;
                     if (this.EbDateType == EbDateType.DateTime)
@@ -383,7 +395,7 @@ namespace ExpressBase.Objects
             string _displayMember = Value == null ? string.Empty : Value.ToString();
             bool skip = false;
 
-            if(_this is EbDate || _this is EbDGDateColumn)
+            if (_this is EbDate || _this is EbDGDateColumn)
             {
                 if (Value == null && _this.IsNullable)
                     skip = true;
@@ -402,7 +414,7 @@ namespace ExpressBase.Objects
                         dt = Convert.ToDateTime(Value);
                 }
                 DateTime dt_cov = dt.ConvertFromUtc(UserObj.Preference.TimeZone);
-                
+
                 if (_this.EbDateType == EbDateType.Date)
                 {
                     if (!(_this is EbDate)) //EbSysCreatedAt EbSysModifiedAt EbDGDateColumn EbDGCreatedAtColumn EbDGModifiedAtColumn
@@ -429,7 +441,7 @@ namespace ExpressBase.Objects
                         }
                     }
                 }
-                else if(_this.EbDateType == EbDateType.DateTime)
+                else if (_this.EbDateType == EbDateType.DateTime)
                 {
                     _formattedData = dt_cov.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
                     _displayMember = dt_cov.ToString(UserObj.Preference.GetShortDatePattern() + " " + UserObj.Preference.GetShortTimePattern(), CultureInfo.InvariantCulture);

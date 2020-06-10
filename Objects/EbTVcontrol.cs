@@ -57,7 +57,7 @@ namespace ExpressBase.Objects
 
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.BotForm)]
-        public override bool IsReadOnly { get => true; }
+        public override bool IsDisable { get => true; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         public override bool IsNonDataInputControl { get => true; }
@@ -93,7 +93,7 @@ namespace ExpressBase.Objects
             this.TableVisualizationJson = result.Data[0].Json;
         }
 
-        public void FetchParamsMeta(IServiceClient ServiceClient)
+        public void FetchParamsMeta(IServiceClient ServiceClient, IRedisClient redis)
         {
             EbObjectParticularVersionResponse result1 = ServiceClient.Get<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = TVRefId });
             EbTableVisualization TvObj = EbSerializers.Json_Deserialize<EbTableVisualization>(result1.Data[0].Json);
@@ -101,7 +101,7 @@ namespace ExpressBase.Objects
                 throw new FormException($"Missing Data Reader of table view that is connected to {this.Label}.");
             EbObjectParticularVersionResponse result2 = ServiceClient.Get<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = TvObj.DataSourceRefId });
             EbDataReader DrObj = EbSerializers.Json_Deserialize<EbDataReader>(result2.Data[0].Json);
-            this.ParamsList = DrObj.InputParams;
+            this.ParamsList = DrObj.GetParams(redis as RedisClient);
         }
 
         [HideInPropertyGrid]

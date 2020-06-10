@@ -34,8 +34,22 @@ namespace ExpressBase.Objects
                         if (_prop.IsDefined(typeof(OSE_ObjectTypes)))
                         {
                             object _val = _prop.GetValue(_flatCtrls[i], null);
-                            if (_val != null && !_val.ToString().IsEmpty())
-                                refids.Add(_val.ToString());
+                            if (_val != null)
+                            {
+                                if (_prop.PropertyType == typeof(string))
+                                {
+                                    if (!_val.ToString().IsEmpty())
+                                        refids.Add(_val.ToString());
+                                }
+                                else if(_prop.PropertyType == typeof(List<ObjectBasicInfo>))
+                                {
+                                    foreach(ObjectBasicInfo info in _val as List<ObjectBasicInfo>)
+                                    {
+                                        if (!string.IsNullOrEmpty(info.ObjRefId))
+                                            refids.Add(info.ObjRefId);
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -66,12 +80,32 @@ namespace ExpressBase.Objects
                         if (_prop.IsDefined(typeof(OSE_ObjectTypes)))
                         {
                             object _val = _prop.GetValue(_flatCtrls[i], null);
-                            if (_val != null && !_val.ToString().IsEmpty())
+                            if (_val != null)
                             {
-                                if (RefidMap.ContainsKey(_val.ToString()))
-                                    _prop.SetValue(_flatCtrls[i], RefidMap[_val.ToString()], null);
-                                else
-                                    _prop.SetValue(_flatCtrls[i], "failed-to-update-");
+                                if (_prop.PropertyType == typeof(string))
+                                {
+                                    string st_val = _val.ToString();
+                                    if (!st_val.IsEmpty())
+                                    {
+                                        if (RefidMap.ContainsKey(st_val))
+                                            _prop.SetValue(_flatCtrls[i], RefidMap[st_val], null);
+                                        else
+                                            _prop.SetValue(_flatCtrls[i], "failed-to-update-");
+                                    }
+                                }
+                                else if (_prop.PropertyType == typeof(List<ObjectBasicInfo>))
+                                {
+                                    foreach (ObjectBasicInfo info in _val as List<ObjectBasicInfo>)
+                                    {
+                                        if (!string.IsNullOrEmpty(info.ObjRefId))
+                                        {
+                                            if (RefidMap.ContainsKey(info.ObjRefId))
+                                                info.ObjRefId = info.ObjRefId;
+                                            else
+                                                info.ObjRefId = "failed-to-update-";
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -292,6 +326,7 @@ namespace ExpressBase.Objects
 
         public static void InitDataPushers(EbWebForm _this, IRedisClient Redis, IServiceClient client, Service service)
         {
+            _this.FormCollection = new EbWebFormCollection(_this);
             if (_this.DataPushers != null)
             {
                 foreach (EbDataPusher pusher in _this.DataPushers)
@@ -307,9 +342,13 @@ namespace ExpressBase.Objects
                         _form = EbSerializers.Json_Deserialize(result.Data[0].Json);
                         Redis.Set<EbWebForm>(pusher.FormRefId, _form);
                     }
+                    _form.RefId = pusher.FormRefId;
+                    _form.UserObj = _this.UserObj;
+                    _form.SolutionObj = _this.SolutionObj;
                     _form.AfterRedisGet(Redis as RedisClient, client);
                     _form.DataPusherConfig = new EbDataPusherConfig { SourceTable = _this.FormSchema.MasterTable, MultiPushId = _this.RefId + "_" + pusher.Name };
                     pusher.WebForm = _form;
+                    _this.FormCollection.Add(_form);
                     _this.ExeDataPusher = true;
                 }
             }
