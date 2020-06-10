@@ -219,7 +219,7 @@ else if(this.NotifyBy === 3)
                             resp++;
                     }
                 }
-                else if (ebFn is EbFnEmail && string.IsNullOrEmpty((ebFn as EbFnEmail).RefId))
+                else if (ebFn is EbFnEmail && !string.IsNullOrEmpty((ebFn as EbFnEmail).RefId))
                 {
                     EbFnEmail ebFnEmail = ebFn as EbFnEmail;
 
@@ -239,7 +239,7 @@ else if(this.NotifyBy === 3)
                     });
                     resp++;
                 }
-                if (ebFn is EbFnSms && string.IsNullOrEmpty((ebFn as EbFnSms).RefId))
+                if (ebFn is EbFnSms && !string.IsNullOrEmpty((ebFn as EbFnSms).RefId))
                 {
                     EbFnSms ebFnSms = ebFn as EbFnSms;
 
