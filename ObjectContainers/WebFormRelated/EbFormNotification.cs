@@ -17,34 +17,34 @@ using Oracle.ManagedDataAccess.Client;
 namespace ExpressBase.Objects
 {
     [UsedWithTopObjectParent(typeof(EbObject))]
-    [EnableInBuilder(BuilderType.WebForm)]
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
     [HideInPropertyGrid]
     public class EbFormNotification
     {
         public EbFormNotification() { }
 
-        [EnableInBuilder(BuilderType.WebForm)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
         [HideInPropertyGrid]
         public string Name { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
         [HideInPropertyGrid]
         public string EbSid { get; set; }
 
         [PropertyGroup("Behavior")]
-        [EnableInBuilder(BuilderType.WebForm)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
         public EbScript SendOnlyIf { get; set; }
     }
 
     [Alias("System")]
-    [EnableInBuilder(BuilderType.WebForm)]
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
     public class EbFnSystem : EbFormNotification
     {
         public EbFnSystem() { }
 
         [PropertyGroup("Behavior")]
-        [EnableInBuilder(BuilderType.WebForm)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
         [OnChangeExec(@"
 if (this.NotifyBy === 0) this.NotifyBy = 1;
 pg.HideProperty('Users');
@@ -60,35 +60,35 @@ else if(this.NotifyBy === 3)
         public EbFnSys_NotifyBy NotifyBy { get; set; }
 
         [PropertyGroup("Behavior")]
-        [EnableInBuilder(BuilderType.WebForm)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.ScriptEditorCS)]//required ScriptEditorSQ
         public EbScript Users { get; set; }
 
         [PropertyGroup("Behavior")]
-        [EnableInBuilder(BuilderType.WebForm)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
         [Unique]
         [PropDataSourceJsFn("return ebcontext.Roles")]
         [PropertyEditor(PropertyEditorType.DropDown, true)]
         public List<Int32> Roles { get; set; }
 
         [PropertyGroup("Behavior")]
-        [EnableInBuilder(BuilderType.WebForm)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
         [PropDataSourceJsFn("return ebcontext.UserGroups")]
         [PropertyEditor(PropertyEditorType.DropDown)]
         public int UserGroup { get; set; }
 
         [PropertyGroup("Data")]
-        [EnableInBuilder(BuilderType.WebForm)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
         public EbScript Message { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
         [HideInPropertyGrid]
         public Dictionary<string, string> QryParams { get; set; }//<param, table>
     }
 
     [Alias("Email")]
-    [EnableInBuilder(BuilderType.WebForm)]
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
     public class EbFnEmail : EbFormNotification
     {
         public EbFnEmail() { }
@@ -96,17 +96,17 @@ else if(this.NotifyBy === 3)
         [PropertyGroup("Behavior")]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iEmailBuilder)]
-        [EnableInBuilder(BuilderType.WebForm)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
         public string RefId { get; set; }
     }
 
     [Alias("Sms")]
-    [EnableInBuilder(BuilderType.WebForm)]
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
     public class EbFnSms : EbFormNotification
     {
         public EbFnSms() { }
 
-        [EnableInBuilder(BuilderType.WebForm)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
         public string Test3 { get; set; }
     }
 

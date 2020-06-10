@@ -6,6 +6,7 @@ using ExpressBase.Common.Structures;
 using ExpressBase.Objects.ServiceStack_Artifacts;
 using Newtonsoft.Json;
 using ServiceStack;
+using ServiceStack.Redis;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
@@ -56,7 +57,7 @@ namespace ExpressBase.Objects
             this.ChartVisualizationJson = result.Data[0].Json;
         }
 
-        public void FetchParamsMeta(IServiceClient ServiceClient)
+        public void FetchParamsMeta(IServiceClient ServiceClient, IRedisClient redis)
         {
             EbObjectParticularVersionResponse result1 = ServiceClient.Get<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = TVRefId });
             EbChartVisualization ChartVisualization = EbSerializers.Json_Deserialize<EbChartVisualization>(result1.Data[0].Json);
@@ -64,7 +65,7 @@ namespace ExpressBase.Objects
                 throw new FormException($"Missing Data Reader of Chart control view that is connected to {this.Label}.");
             EbObjectParticularVersionResponse result2 = ServiceClient.Get<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = ChartVisualization.DataSourceRefId });
             EbDataReader DrObj = EbSerializers.Json_Deserialize<EbDataReader>(result2.Data[0].Json);
-            this.ParamsList = DrObj.InputParams;
+            this.ParamsList = DrObj.GetParams(redis as RedisClient);
         }
 
         public override string GetBareHtml()
