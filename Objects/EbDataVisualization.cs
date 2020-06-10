@@ -123,6 +123,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
         [PropertyGroup(PGConstants.CORE)]
+        [HideForUser]
         [OnChangeExec(@"
         if(this.IsDataFromApi){
             pg.ShowGroup('Api');
@@ -136,20 +137,24 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
         [PropertyGroup("Api")]
+        [HideForUser]
         public string Url { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
         [PropertyGroup("Api")]
+        [HideForUser]
         public ApiMethods Method { set; get; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
         [PropertyEditor(PropertyEditorType.Collection)]
         [PropertyGroup("Api")]
+        [HideForUser]
         public List<ApiRequestHeader> Headers { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
         [PropertyEditor(PropertyEditorType.Collection)]
         [PropertyGroup("Api")]
+        [HideForUser]
         public List<ApiRequestParam> Parameters { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
