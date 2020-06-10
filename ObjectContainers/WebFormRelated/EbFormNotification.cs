@@ -108,7 +108,7 @@ else if(this.NotifyBy === 3)
 
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iSmsBuilder)]
-        [EnableInBuilder(BuilderType.WebForm)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
         public string RefId { get; set; }
 
 
