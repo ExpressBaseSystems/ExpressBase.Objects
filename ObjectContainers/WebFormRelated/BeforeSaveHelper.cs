@@ -19,7 +19,6 @@ namespace ExpressBase.Objects.WebFormRelated
         public static void BeforeSave(EbWebForm _this, IServiceClient serviceClient, IRedisClient redis)
         {
             Dictionary<string, string> tbls = new Dictionary<string, string>();
-            EbReview ebReviewCtrl = null;
             if (string.IsNullOrEmpty(_this.TableName))
                 throw new FormException("Please enter a valid form table name");
             tbls.Add(_this.TableName, "form table");
@@ -32,7 +31,7 @@ namespace ExpressBase.Objects.WebFormRelated
                 { typeof(EbProvisionLocation), false },
                 { typeof(EbSysLocation), false }
             };
-            PerformRequirdCheck(Allctrls, OneCtrls, tbls, serviceClient, redis, ebReviewCtrl);
+            PerformRequirdCheck(Allctrls, OneCtrls, tbls, serviceClient, redis, out EbReview ebReviewCtrl);
             PerformRequirdUpdate(_this, _this.TableName);
             Dictionary<int, EbControlWrapper> _dict = new Dictionary<int, EbControlWrapper>();
             GetControlsAsDict(_this, "form", _dict);
@@ -157,8 +156,9 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
             }
         }
 
-        private static void PerformRequirdCheck(EbControl[] Allctrls, Dictionary<Type, bool> OneCtrls, Dictionary<string, string> tbls, IServiceClient serviceClient, IRedisClient redis, EbReview ebReviewCtrl)
+        private static void PerformRequirdCheck(EbControl[] Allctrls, Dictionary<Type, bool> OneCtrls, Dictionary<string, string> tbls, IServiceClient serviceClient, IRedisClient redis, out EbReview ebReviewCtrl)
         {
+            ebReviewCtrl = null;
             for (int i = 0; i < Allctrls.Length; i++)
             {
                 if (OneCtrls.ContainsKey(Allctrls[i].GetType()))
@@ -499,7 +499,7 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
             {
                 { typeof(EbAutoId), false }
             };
-            PerformRequirdCheck(Allctrls, OneCtrls, tbls, serviceClient, redis, null);
+            PerformRequirdCheck(Allctrls, OneCtrls, tbls, serviceClient, redis, out EbReview ebReviewCtrl);
             Dictionary<int, EbControlWrapper> _dict = new Dictionary<int, EbControlWrapper>();
             GetControlsAsDict(_this, "form", _dict);
             CalcValueExprDependency(_dict);

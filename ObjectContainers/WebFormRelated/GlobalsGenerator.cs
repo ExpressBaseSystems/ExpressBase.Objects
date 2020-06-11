@@ -307,6 +307,7 @@ namespace ExpressBase.Objects.WebFormRelated
                     string title = notification.Title ?? _this.DisplayName + " notification";
                     if (notification.NotifyBy == FG_NotifyBy.UserId)
                     {
+                        Console.WriteLine($"PostProcessGlobals -> NotifyByUserIDRequest. Tilte: {title}, UserId: {notification.UserId}");
                         NotifyByUserIDResponse result = services.Gateway.Send<NotifyByUserIDResponse>(new NotifyByUserIDRequest
                         {
                             Link = link,
@@ -316,6 +317,7 @@ namespace ExpressBase.Objects.WebFormRelated
                     }
                     else if (notification.NotifyBy == FG_NotifyBy.RoleIds)
                     {
+                        Console.WriteLine($"PostProcessGlobals -> NotifyByUserRoleRequest. Tilte: {title}, RoleIds: {notification.RoleIds}");
                         NotifyByUserRoleResponse result = services.Gateway.Send<NotifyByUserRoleResponse>(new NotifyByUserRoleRequest
                         {
                             Link = link,
@@ -325,6 +327,7 @@ namespace ExpressBase.Objects.WebFormRelated
                     }
                     else if (notification.NotifyBy == FG_NotifyBy.UserGroupIds)
                     {
+                        Console.WriteLine($"PostProcessGlobals -> NotifyByUserGroupRequest. Tilte: {title}, UserGroupId: {notification.UserGroupIds}");
                         NotifyByUserGroupResponse result = services.Gateway.Send<NotifyByUserGroupResponse>(new NotifyByUserGroupRequest
                         {
                             Link = link,
@@ -335,7 +338,7 @@ namespace ExpressBase.Objects.WebFormRelated
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e.Message + e.StackTrace);
+                    Console.WriteLine("Exception in PostProcessGlobals\nMessage: " + e.Message + "\nStackTrace: " + e.StackTrace);
                 }
             }
         }
