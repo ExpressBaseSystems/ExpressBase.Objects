@@ -620,7 +620,7 @@ namespace ExpressBase.Objects
     public class EbChartVisualization : EbDataVisualization, IEBRootObject
     {
         [EnableInBuilder(BuilderType.DVBuilder)]
-        [HideInPropertyGrid]
+        [MetaOnly]
         public override DVColumnCollection Columns { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
@@ -778,7 +778,7 @@ namespace ExpressBase.Objects
         public MapsType Maptype { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
-        [HideInPropertyGrid]
+        [MetaOnly]
         [PropertyGroup("Core")]
         public override DVColumnCollection Columns { get; set; }
 
