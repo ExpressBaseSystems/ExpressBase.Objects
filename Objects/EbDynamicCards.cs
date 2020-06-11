@@ -604,7 +604,7 @@ namespace ExpressBase.Objects
                 {
                     _FieldValue = (string)value;
                 }
-                catch (Exception e)
+                catch
                 {
                     _FieldValue = String.Empty;
                 }
