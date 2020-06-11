@@ -122,17 +122,20 @@ namespace ExpressBase.Objects
 
         public override string GetHtml()
         {
-            return @"
-            <div id='cont_@EbSid@' Ctype='InputGeoLocation' ebsid='@EbSid@' class='Eb-ctrlContainer' eb-hidden='@isHidden@'>
-                <span class='eb-ctrl-label' ui-label='' id='@EbSidLbl' style=' @BackColor@ @ForeColor@ '>@Label@</span>
-                    @GetBareHtml@
-            </div>"
-.Replace("@EbSid@", (this.EbSid != null) ? this.EbSid : "@EbSid@")
-.Replace("@Label@", this.Label)
-.Replace("@LabelBackColor@", this.LabelBackColor)
-.Replace("@LabelForeColor@", this.LabelForeColor)
-.Replace("@isHidden@", this.Hidden.ToString())
-.Replace("@GetBareHtml@", this.GetBareHtml());
+            string EbCtrlHTML = HtmlConstants.CONTROL_WRAPER_HTML4WEB;
+            return ReplacePropsInHTML(EbCtrlHTML);
+
+//            return @"
+//            <div id='cont_@EbSid@' Ctype='InputGeoLocation' ebsid='@EbSid@' class='Eb-ctrlContainer' eb-hidden='@isHidden@'>
+//                <span class='eb-ctrl-label' ui-label='' id='@EbSidLbl' style=' @BackColor@ @ForeColor@ '>@Label@</span>
+//                    @GetBareHtml@
+//            </div>"
+//.Replace("@EbSid@", (this.EbSid != null) ? this.EbSid : "@EbSid@")
+//.Replace("@Label@", this.Label)
+//.Replace("@LabelBackColor@", this.LabelBackColor)
+//.Replace("@LabelForeColor@", this.LabelForeColor)
+//.Replace("@isHidden@", this.Hidden.ToString())
+//.Replace("@GetBareHtml@", this.GetBareHtml());
         }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
