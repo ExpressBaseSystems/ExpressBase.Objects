@@ -122,8 +122,40 @@ namespace ExpressBase.Objects
         public string DataSourceRefId { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
-        [HideInPropertyGrid]
+        [PropertyGroup(PGConstants.CORE)]
+        [HideForUser]
+        [OnChangeExec(@"
+        if(this.IsDataFromApi){
+            pg.ShowGroup('Api');
+            pg.HideProperty('DataSourceRefId');
+        }
+        else{
+            pg.HideGroup('Api');
+            pg.ShowProperty('DataSourceRefId');
+        }")]
+        public bool IsDataFromApi { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
+        [PropertyGroup("Api")]
+        [HideForUser]
         public string Url { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
+        [PropertyGroup("Api")]
+        [HideForUser]
+        public ApiMethods Method { set; get; }
+
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        [PropertyGroup("Api")]
+        [HideForUser]
+        public List<ApiRequestHeader> Headers { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        [PropertyGroup("Api")]
+        [HideForUser]
+        public List<ApiRequestParam> Parameters { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
         [HideInPropertyGrid]
@@ -296,6 +328,7 @@ namespace ExpressBase.Objects
 
         [PropertyGroup("FixedColumn")]
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
+        [OnChangeExec(@"pg.HideGroup('TableStyles');")]
         public int LeftFixedColumn { get; set; }
 
         [PropertyGroup("FixedColumn")]
@@ -430,6 +463,8 @@ namespace ExpressBase.Objects
             this.ColumnsCollection = new List<DVColumnCollection>();
             this.ParamsList = new List<Param>();
             this.FormLinks = new List<FormLink>();
+            this.Headers = new List<ApiRequestHeader>();
+            this.Parameters = new List<ApiRequestParam>();
         }
 
         public override List<string> DiscoverRelatedRefids()
@@ -984,5 +1019,41 @@ else {
         [EnableInBuilder(BuilderType.WebForm)]
         public string Title { get; set; }
     }
-    
+
+    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
+    public class ApiRequestParam : EbDataVisualizationObject
+    {
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
+        [HideInPropertyGrid]
+        public override string Name { set; get; }
+
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
+        [Alias("Name")]
+        public string ParamName { set; get; }
+
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
+        public string Value { set; get; }
+
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
+        public EbDbTypes Type { set; get; }
+
+        [EnableInBuilder( BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
+        public bool UseThisVal { set; get; }
+    }
+
+    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
+    public class ApiRequestHeader : EbDataVisualizationObject
+    {
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
+        [HideInPropertyGrid]
+        public override string Name { set; get; }
+
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
+        [Alias("Name")]
+        public string HeaderName { set; get; }
+
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
+        public string Value { set; get; }
+    }
+
 }

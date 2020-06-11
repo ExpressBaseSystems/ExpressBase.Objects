@@ -96,10 +96,6 @@ namespace ExpressBase.Objects
         [Alias("CheckBoxes")]
         public List<EbCheckBox> CheckBoxes { get; set; }
 
-        //[HideInPropertyGrid]
-        //[EnableInBuilder(BuilderType.BotForm)]
-        //public override bool IsReadOnly { get => this.IsDisable; }
-
         [HideInPropertyGrid]
         [JsonIgnore]
         public override string ToolIconHtml { get { return "<i class='fa fa-check-square'></i>"; } set { } }

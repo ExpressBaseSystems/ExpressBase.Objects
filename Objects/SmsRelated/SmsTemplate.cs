@@ -41,6 +41,7 @@ namespace ExpressBase.Objects.Objects.SmsRelated
         [HideInPropertyGrid]
         public override string Status { get; set; }
 
+        [EnableInBuilder(BuilderType.SmsBuilder)]
         [HideInPropertyGrid]
         public string To { get; set; }
 
