@@ -54,7 +54,7 @@ namespace ExpressBase.Objects
 
         private int FilterBH = 0;
 
-        private EbWebForm __filterForm;
+       // private EbWebForm __filterForm;
 
         private string script;
 
