@@ -670,6 +670,7 @@ namespace ExpressBase.Objects
         public int ParticipantType { get; set; }
         public string fullname { get; set; }
         public int UserId { get; set; }
+        public int MeetingId { get; set; }
     }
     public class SlotDetailsResponse
     {
@@ -769,6 +770,18 @@ namespace ExpressBase.Objects
     public class MeetingRequestByEligibleAttendeeResponse
     {
 
+    }
+    public class GetMeetingDetailRequest
+    {
+        public int MeetingId { get; set; }
+    }
+    public class GetMeetingDetailsResponse
+    {
+        public List<MeetingRequest> MeetingRequest { get; set; }
+        public GetMeetingDetailsResponse()
+        {
+            this.MeetingRequest = new List<MeetingRequest>();
+        }
     }
 
     public enum ParticipantType
