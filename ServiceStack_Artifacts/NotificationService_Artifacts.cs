@@ -107,10 +107,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public List<NotificationInfo> Notifications { get; set; }
 
         [DataMember(Order = 2)]
-        public List<PendingActionInfo> PendingActions { get; set; }
+        public List<PendingActionAndMeetingInfo> PendingActions { get; set; }
+        
+        [DataMember(Order = 2)]
+        public List<PendingActionAndMeetingInfo> MyMeetings { get; set; }
     }
 
-    public class PendingActionInfo
+    public class PendingActionAndMeetingInfo
     {
         public string Description { get; set; }
 

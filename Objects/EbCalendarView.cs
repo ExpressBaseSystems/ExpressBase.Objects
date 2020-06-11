@@ -55,7 +55,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.Calendar)]
         public List<DVBaseColumn> DataColumns { get; set; }
 
-        [HideInPropertyGrid]
+        [MetaOnly]
         [EnableInBuilder(BuilderType.Calendar)]
         public List<DVBaseColumn> LinesColumns { get; set; }
 
@@ -81,7 +81,7 @@ namespace ExpressBase.Objects
         public DVBaseColumn ForeignKey { get; set; }
 
         [EnableInBuilder(BuilderType.Calendar)]
-        [HideInPropertyGrid]
+        [MetaOnly]
         public override  DVColumnCollection Columns{ get; set; }
 
         [EnableInBuilder(BuilderType.Calendar)]

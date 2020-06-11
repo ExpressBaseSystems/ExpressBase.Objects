@@ -493,8 +493,7 @@ else{
                 if (__formulaDataFieldsUsed == null)
                 {
                     var matches = Regex.Matches(this._Formula.Code, @"T[0-9]{1}.\w+").OfType<Match>().Select(m => m.Groups[0].Value).Distinct();
-                    __formulaDataFieldsUsed = new List<string>(matches.Count());
-                    int j = 0;
+                    __formulaDataFieldsUsed = new List<string>(matches.Count()); 
                     foreach (var match in matches)
                         __formulaDataFieldsUsed.Add(match);
                 }
@@ -1305,7 +1304,6 @@ else
                 {
                     var matches = Regex.Matches(this.Value.Code, @"T[0-9]{1}.\w+").OfType<Match>().Select(m => m.Groups[0].Value).Distinct();
                     __formulaDataFieldsUsed = new List<string>(matches.Count());
-                    int j = 0;
                     foreach (var match in matches)
                         __formulaDataFieldsUsed.Add(match);
                 }
