@@ -2,6 +2,7 @@
 using ExpressBase.Common.Data;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
+using ExpressBase.Common.Structures;
 using ExpressBase.Objects.Objects;
 using ExpressBase.Objects.ServiceStack_Artifacts;
 using ServiceStack;
@@ -234,6 +235,9 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                         throw new FormException("Set Display Member for " + _ctrl.Label);
                     if (!_ctrl.RenderAsSimpleSelect && (_ctrl.DisplayMembers == null || _ctrl.DisplayMembers.Count == 0))
                         throw new FormException("Set Display Members for " + _ctrl.Label);
+                    EbDbTypes _t = _ctrl.ValueMember.Type;
+                    if (!(_t == EbDbTypes.Int || _t == EbDbTypes.Int || _t == EbDbTypes.UInt32 || _t == EbDbTypes.UInt64 || _t == EbDbTypes.Int32 || _t == EbDbTypes.Int64 || _t == EbDbTypes.Decimal || _t == EbDbTypes.Double))
+                        throw new FormException("Set numeric value member for " + _ctrl.Label);
                 }
                 else if (Allctrls[i] is EbDGPowerSelectColumn)
                 {
@@ -246,6 +250,9 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                         throw new FormException("Set Display Member for " + _ctrl.Name);
                     if (!_ctrl.RenderAsSimpleSelect && (_ctrl.DisplayMembers == null || _ctrl.DisplayMembers.Count == 0))
                         throw new FormException("Set Display Members for " + _ctrl.Name);
+                    EbDbTypes _t = _ctrl.ValueMember.Type;
+                    if (!(_t == EbDbTypes.Int || _t == EbDbTypes.Int || _t == EbDbTypes.UInt32 || _t == EbDbTypes.UInt64 || _t == EbDbTypes.Int32 || _t == EbDbTypes.Int64 || _t == EbDbTypes.Decimal || _t == EbDbTypes.Double))
+                        throw new FormException("Set numeric value member for " + _ctrl.Name);
                 }
                 else if (Allctrls[i] is EbUserControl)
                 {
