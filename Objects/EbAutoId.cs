@@ -80,25 +80,26 @@ namespace ExpressBase.Objects
 
         public override string GetHtml()
         {
-            return GetHtmlHelper();
-        }
-
-        private string GetHtmlHelper()
-        {
-            string WraperHtml = @"
-        <div id='cont_@ebsid@' ebsid='@ebsid@' name='@name@' class='Eb-ctrlContainer' @childOf@ ctype='@type@' eb-hidden='@isHidden@'>            
-            <span class='eb-ctrl-label' ui-label id='@ebsidLbl' style='font-weight: 500;'>@Label@ </span> @req@ 
-                <div  id='@ebsid@Wraper' class='ctrl-cover'>
-                    @barehtml@
-                </div>
-            <span class='helpText' ui-helptxt >@helpText@ </span>
-        </div>";
-
-            string EbCtrlHTML = WraperHtml
+            string EbCtrlHTML = HtmlConstants.CONTROL_WRAPER_HTML4WEB
                .Replace("@LabelForeColor ", "color:" + (LabelForeColor ?? "@LabelForeColor ") + ";")
                .Replace("@LabelBackColor ", "background-color:" + (LabelBackColor ?? "@LabelBackColor ") + ";");
 
             return ReplacePropsInHTML(EbCtrlHTML);
+
+        //    string WraperHtml = @"
+        //<div id='cont_@ebsid@' ebsid='@ebsid@' name='@name@' class='Eb-ctrlContainer' @childOf@ ctype='@type@' eb-hidden='@isHidden@'>            
+        //    <span class='eb-ctrl-label' ui-label id='@ebsidLbl' style='font-weight: 500;'>@Label@ </span> @req@ 
+        //        <div  id='@ebsid@Wraper' class='ctrl-cover'>
+        //            @barehtml@
+        //        </div>
+        //    <span class='helpText' ui-helptxt >@helpText@ </span>
+        //</div>";
+
+        //    string EbCtrlHTML = WraperHtml
+        //       .Replace("@LabelForeColor ", "color:" + (LabelForeColor ?? "@LabelForeColor ") + ";")
+        //       .Replace("@LabelBackColor ", "background-color:" + (LabelBackColor ?? "@LabelBackColor ") + ";");
+
+        //    return ReplacePropsInHTML(EbCtrlHTML);
         }
 
         public override string GetDesignHtml()
