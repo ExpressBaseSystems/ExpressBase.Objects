@@ -90,23 +90,23 @@ namespace ExpressBase.Objects
 
 
 
-		[JsonIgnore]
-		public override string IsRequiredOKJSfn
-		{
-			get
-			{
-				return @"
-						let count= $('#' + this.EbSid).attr('fileCount');
-                        if(this.MinFiles<=count){
-                            return true;
-                        }
-                        else{
-                            return false;
-                    }
-                ";
-			}
-			set { }
-		}
+		//[JsonIgnore]
+		//public override string IsRequiredOKJSfn
+		//{
+		//	get
+		//	{
+		//		return @"
+		//				let count= $('#' + this.EbSid).attr('fileCount');
+  //                      if(this.MinFiles<=count){
+  //                          return true;
+  //                      }
+  //                      else{
+  //                          return false;
+  //                  }
+  //              ";
+		//	}
+		//	set { }
+		//}
 
 
 		[JsonIgnore]
