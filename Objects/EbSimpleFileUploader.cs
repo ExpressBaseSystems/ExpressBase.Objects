@@ -192,6 +192,7 @@ namespace ExpressBase.Objects
 		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
 		[OnChangeUIFunction("EbSimpleFileUploader.minFilesFn")]
 		[DefaultPropValue("0")]
+		[HideInPropertyGrid]
 		[Alias("Minimum Files")]
 		public int MinFiles { get; set; }
 
