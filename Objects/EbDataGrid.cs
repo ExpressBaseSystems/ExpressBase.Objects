@@ -873,8 +873,8 @@ return val;
             set { this.EbSimpleSelect.DataSourceId = value; }
         }
 
-        [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [MetaOnly]
         public DVColumnCollection Columns
         {
             get { return this.EbSimpleSelect.Columns; }
