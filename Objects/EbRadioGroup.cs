@@ -124,6 +124,12 @@ namespace ExpressBase.Objects
         public List<EbRadioOptionAbstract> Options { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [UIproperty]
+        [OnChangeUIFunction("Common.RENDER_INLINE")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        public bool RenderInline { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.Collection)]
         [Category("Appearance")]
         public bool RenderHorizontally { get; set; }
@@ -148,7 +154,7 @@ namespace ExpressBase.Objects
             {
                 ec.GName = this.EbSid_CtxId;
                 html += ec.GetHtml()
-                    .Replace("@radio-wrap-block@", (this.RenderHorizontally ? "radio-wrap-block" : String.Empty))
+                    //.Replace("@radio-wrap-block@", (this.RenderHorizontally ? "radio-wrap-block" : String.Empty))
                     .Replace("@defaultcheked@", ((this.Options.IndexOf(ec) == 0) ? " checked='checked' " : ""));
             }
             html += "</div>";
@@ -159,11 +165,11 @@ namespace ExpressBase.Objects
 
         public override string DesignHtml4Bot
         {
-            get => @"<div id='' class='radio-wrap @radio-wrap-block@' style='padding: 4px;'>
+            get => @"<div id='' class='radio-wrap' style='padding: 4px;'>
 <input type ='radio' class='eb-radiobtn' id='' @defaultcheked@ value='@value@' name='@gname@'>
 <span id='Lbl' class='eb-radiospan' ui-label style='@LabelBackColor @LabelForeColor '> RadioButton1 </span>
 </div>
-<div id='' class='radio-wrap @radio-wrap-block@' style='padding: 4px;'>
+<div id='' class='radio-wrap' style='padding: 4px;'>
 <input type ='radio' class='eb-radiobtn' id='' @defaultcheked@ value='@value@' name='@gname@'>
 <span id='Lbl' class='eb-radiospan' ui-label style='@LabelBackColor @LabelForeColor '> RadioButton2  </span>
                 </div>";
@@ -179,11 +185,11 @@ namespace ExpressBase.Objects
         {
             string EbCtrlHTML = HtmlConstants.CONTROL_WRAPER_HTML4WEB
                 .Replace("@barehtml@", @"
-                            <div id='@ebsid@' class='radio-wrap @radio-wrap-block@'>
+                            <div id='@ebsid@' class='radio-wrap'>
                                 <input type ='radio' class='eb-radiobtn' id='@ebsid@' @defaultcheked@ value='@value@' name='@gname@'>
                                 <span id='@ebsid@Lbl' class='eb-radiospan' ui-label style='@LabelBackColor @LabelForeColor '> RadioButton1 </span>
                             </div>
-                            <div id='@ebsid@' class='radio-wrap @radio-wrap-block@'>
+                            <div id='@ebsid@' class='radio-wrap'>
                                 <input type ='radio' class='eb-radiobtn' id='@ebsid@' @defaultcheked@ value='@value@' name='@gname@'>
                                 <span id='@ebsid@Lbl' class='eb-radiospan' ui-label style='@LabelBackColor @LabelForeColor '> RadioButton2  </span>
                             </div>")
@@ -269,8 +275,8 @@ this.Init = function(id)
         public string GName { get; set; }
 
         public override string GetBareHtml()
-        {/*onclick=""event.stopPropagation();$('#@ebsid@').prop('checked', true);""*/
-            return @"<div id='@ebsid@' class='radio-wrap @radio-wrap-block@' onclick=""event.stopPropagation(); $(this).children('input[type=radio]').prop('checked', true); $(this).children('input[type=radio]').trigger('change');"">
+        {/*onclick=""event.stopPropagation();$('#@ebsid@').prop('checked', true);""*/ /* @radio-wrap-block@*/
+            return @"<div id='@ebsid@' class='radio-wrap' onclick=""event.stopPropagation(); $(this).children('input[type=radio]').prop('checked', true); $(this).children('input[type=radio]').trigger('change');"">
                         <input type ='radio' class='eb-radiobtn' id='@ebsid@' @defaultcheked@ value='@value@' name='@gname@'>
                         <span id='@ebsid@Lbl' class='eb-radiospan' ui-label> @label@  </span>
                     </div>"
