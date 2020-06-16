@@ -132,7 +132,11 @@ if(this.IsNullable && !($('#' + this.EbSid_CtxId).closest('.input-group').find(`
         [PropertyGroup(PGConstants.EXTENDED)]
         public bool AutoCompleteOff { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+		[EnableInBuilder(BuilderType.BotForm)]
+		[HideInPropertyGrid]
+		public bool IsBasicControl { get => true; }
+
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [OnChangeExec(@"
                 if (this.DoNotPersist){
                         pg.HideProperty('IsNullable');

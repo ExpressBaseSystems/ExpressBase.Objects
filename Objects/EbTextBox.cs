@@ -223,15 +223,19 @@ else {
         [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
 
-        //[HideInPropertyGrid]
-        //[EnableInBuilder(BuilderType.BotForm)]
-        //public override bool IsReadOnly { get => this.IsDisable; }
+		//[HideInPropertyGrid]
+		//[EnableInBuilder(BuilderType.BotForm)]
+		//public override bool IsReadOnly { get => this.IsDisable; }
 
-        //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        //[PropertyEditor(PropertyEditorType.JS)]
-        //public string OnChangeExe { get; set; }
+		//[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+		//[PropertyEditor(PropertyEditorType.JS)]
+		//public string OnChangeExe { get; set; }
 
-        private string TextTransformString
+		[EnableInBuilder(BuilderType.BotForm)]
+		[HideInPropertyGrid]
+		public bool IsBasicControl { get => true; }
+
+		private string TextTransformString
         {
             get { return (((int)this.TextTransform > 0) ? "$('#{0}').keydown(function(event) { textTransform(this, {1}); }); $('#{0}').on('paste', function(event) { textTransform(this, {1}); });".Replace("{0}", this.Name).Replace("{1}", ((int)this.TextTransform).ToString()) : string.Empty); }
         }

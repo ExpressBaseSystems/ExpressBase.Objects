@@ -179,7 +179,7 @@ else
         public int MinLimit { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [HideInPropertyGrid]
+        [MetaOnly]
         public DVColumnCollection Columns { get; set; }
 
         [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.WebForm, BuilderType.UserControl)]

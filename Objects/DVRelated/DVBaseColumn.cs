@@ -331,7 +331,7 @@ else{
         public WebFormDVModes FormMode { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
-        [HideInPropertyGrid]
+        [MetaOnly]
         [JsonIgnore]
         public DVColumnCollection ColumnsRef { get; set; }
 

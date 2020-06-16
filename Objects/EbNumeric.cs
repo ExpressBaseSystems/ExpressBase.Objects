@@ -76,11 +76,15 @@ namespace ExpressBase.Objects
         [HelpText("Number of decimal places")]
         public int DecimalPlaces { get; set; }
 
-        //[HideInPropertyGrid]
-        //[EnableInBuilder(BuilderType.BotForm)]
-        //public override bool IsReadOnly { get => this.IsDisable; }
+		[EnableInBuilder(BuilderType.BotForm)]
+		[HideInPropertyGrid]
+		public bool IsBasicControl { get => true; }
 
-        [EnableInBuilder(BuilderType.BotForm)]
+		//[HideInPropertyGrid]
+		//[EnableInBuilder(BuilderType.BotForm)]
+		//public override bool IsReadOnly { get => this.IsDisable; }
+
+		[EnableInBuilder(BuilderType.BotForm)]
         public bool AutoIncrement { get; set; }
 
         //[ProtoBuf.ProtoMember(4)]
