@@ -153,12 +153,12 @@ else
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup(PGConstants.EXTENDED)]
-        public bool IsMultiSelect { get; set; }
+        public bool MultiSelect { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup(PGConstants.EXTENDED)]
         [OnChangeExec(@"
-            if(this.IsMultiSelect === true){
+            if(this.MultiSelect === true){
                 pg.ShowProperty('IsSearchable');
                 pg.ShowProperty('MaxLimit');
                 pg.ShowProperty('MinLimit');
@@ -333,15 +333,15 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
 .Replace("@name@", this.Name)
 .Replace("@HelpText@", this.HelpText)
 
-.Replace("@multiple@", this.IsMultiSelect ? "multiple" : "")
-.Replace("@MaxLimit@", IsMultiSelect ? "data-max-options='" + (!IsMultiSelect ? 1 : MaxLimit) + "'" : string.Empty)
-.Replace("@IsSearchable@", IsMultiSelect ? "data-live-search='" + this.IsSearchable + "'" : string.Empty)
-.Replace("@selOpts@", IsMultiSelect ? "data-actions-box='true'" : string.Empty)
+.Replace("@multiple@", this.MultiSelect ? "multiple" : "")
+.Replace("@MaxLimit@", MultiSelect ? "data-max-options='" + (!MultiSelect ? 1 : MaxLimit) + "'" : string.Empty)
+.Replace("@IsSearchable@", MultiSelect ? "data-live-search='" + this.IsSearchable + "'" : string.Empty)
+.Replace("@selOpts@", MultiSelect ? "data-actions-box='true'" : string.Empty)
 .Replace("@bootStrapStyle@", "data-style='btn-" + this.BootStrapStyle.ToString() + "'")
 
 .Replace("@PlaceHolder@", (PlaceHolder ?? string.Empty))
 .Replace("@options@", this.OptionHtml)
-.Replace("@-sel-@", this.IsMultiSelect ? string.Empty : "<option selected value='-1' style='color: #6f6f6f;'>" + (PlaceHolder.IsNullOrEmpty() || PlaceHolder.Trim() == string.Empty ? "--": PlaceHolder) + "</option>")
+.Replace("@-sel-@", this.MultiSelect ? string.Empty : "<option selected value='-1' style='color: #6f6f6f;'>" + (PlaceHolder.IsNullOrEmpty() || PlaceHolder.Trim() == string.Empty ? "--": PlaceHolder) + "</option>")
 .Replace("@data-ebtype@", "16");
         }
 

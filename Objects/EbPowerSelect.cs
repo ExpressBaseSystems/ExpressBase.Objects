@@ -463,7 +463,7 @@ else// PS
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         //[OnChangeExec(@"
-        //    if(this.IsMultiSelect === true){
+        //    if(this.MultiSelect === true){
         //        pg.ShowProperty('IsSearchable');
         //        pg.ShowProperty('MaxLimit');
         //        pg.ShowProperty('MinLimit');
@@ -537,7 +537,7 @@ else// PS
 .Replace("@ebsid@", this.EbSid_CtxId)
 .Replace("@type@", ((int)obj.Type).ToString())
 .Replace("@sTitle@", obj.sTitle.ToString())
-.Replace("@perWidth@", "style='width:" + ( (obj.Width == 0) ? (((int)(100 / noOfFileds)).ToString()) : obj.Width.ToString() ) + "%'")
+.Replace("@perWidth@", "style='width:" + ((obj.Width == 0) ? (((int)(100 / noOfFileds)).ToString()) : obj.Width.ToString()) + "%'")
 .Replace("@border-r" + i, (i != noOfFileds - 1) ? "style='border-radius: 0px;'" : "");
                     i++;
                 }
@@ -807,7 +807,7 @@ else// PS
 
             return s;
         }
-        
+
         public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
         {
             return new SingleColumn()
