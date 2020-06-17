@@ -112,7 +112,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.BotForm)]
         [PropertyGroup(PGConstants.EXTENDED)]
-        public bool IsMultiSelect { get; set; }
+        public bool MultiSelect { get; set; }
 
         [EnableInBuilder(BuilderType.BotForm)]
         [PropertyGroup(PGConstants.EXTENDED)]
@@ -292,7 +292,7 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
         </div>"
 .Replace("@ebsid@", String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId)
 .Replace("@name@", this.Name)
-.Replace("@multiple@", this.IsMultiSelect ? "multiple" : "")
+.Replace("@multiple@", this.MultiSelect ? "multiple" : "")
 .Replace("@buttons@", this.ButtonsHtml)
 .Replace("@PlaceHolder@", this.PlaceHolder)
 .Replace("@data-ebtype@", "16");

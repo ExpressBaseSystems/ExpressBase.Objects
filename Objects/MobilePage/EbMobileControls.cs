@@ -309,7 +309,7 @@ namespace ExpressBase.Objects
         public List<Param> Parameters { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        public bool IsMultiSelect { get; set; }
+        public bool MultiSelect { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
