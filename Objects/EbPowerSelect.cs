@@ -22,10 +22,10 @@ namespace ExpressBase.Objects
 {
     public enum DefaultSearchFor
     {
-        BeginingWithKeyword,
-        EndingWithKeyword,
-        ExactMatch,
-        Contains,
+        BeginingWithKeyword = 0,
+        EndingWithKeyword = 1,
+        ExactMatch = 2,
+        Contains = 3,
     }
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
