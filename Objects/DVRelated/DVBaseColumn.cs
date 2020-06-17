@@ -98,7 +98,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
         MMMM_yyyy,
 
         [Description("MMM/yyyy")]
-        MMM_yyyy 
+        MMM_yyyy
     }
 
     public enum StringOperators
@@ -285,7 +285,7 @@ else {
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
-        [OSE_ObjectTypes(EbObjectTypes.iTableVisualization, EbObjectTypes.iChartVisualization, EbObjectTypes.iReport, EbObjectTypes.iWebForm , EbObjectTypes.iDashBoard)]
+        [OSE_ObjectTypes(EbObjectTypes.iTableVisualization, EbObjectTypes.iChartVisualization, EbObjectTypes.iReport, EbObjectTypes.iWebForm, EbObjectTypes.iDashBoard)]
         [OnChangeExec(@"
 if(this.LinkRefId !== null){
     console.log(this.LinkRefId);
@@ -310,7 +310,7 @@ else{
         [Alias("Object")]
         public virtual string LinkRefId { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder,  BuilderType.DashBoard)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.DropDown)]
         [OnChangeExec(@"
 console.log('onchange fired');
@@ -335,18 +335,18 @@ else{
         [JsonIgnore]
         public DVColumnCollection ColumnsRef { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder,  BuilderType.DashBoard)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "ColumnsRef")]
         [PropertyGroup("FormSettings")]
         public List<DVBaseColumn> FormId { get; set; }
 
 
-        [EnableInBuilder(BuilderType.DVBuilder,  BuilderType.DashBoard)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.Mapper, "ColumnsRef", "LinkRefId", "FormControl")]
         [PropertyGroup("FormSettings")]
         public List<DVBaseColumn> FormParameters { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder,  BuilderType.DashBoard)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         [HideInPropertyGrid]
         public EbControl FormControl { get; set; }
 
@@ -493,7 +493,7 @@ else{
                 if (__formulaDataFieldsUsed == null)
                 {
                     var matches = Regex.Matches(this._Formula.Code, @"T[0-9]{1}.\w+").OfType<Match>().Select(m => m.Groups[0].Value).Distinct();
-                    __formulaDataFieldsUsed = new List<string>(matches.Count()); 
+                    __formulaDataFieldsUsed = new List<string>(matches.Count());
                     foreach (var match in matches)
                         __formulaDataFieldsUsed.Add(match);
                 }
@@ -608,11 +608,11 @@ else{
             return tempCol;
         }
 
-        public DVColumnCollection(){}
+        public DVColumnCollection() { }
 
-        public DVColumnCollection (DVColumnCollection other)
+        public DVColumnCollection(DVColumnCollection other)
         {
-            foreach(var aa in other)
+            foreach (var aa in other)
             {
                 this.Add(aa.ShallowCopy());
             }
@@ -685,7 +685,7 @@ if(this.RenderAs === 9){
         public override EbDbTypes Type { get; set; }
 
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.DropDown)]
         [PropertyGroup("Search")]
         public StringOperators DefaultOperator { get; set; }
@@ -978,7 +978,7 @@ else{
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
         [PropertyEditor(PropertyEditorType.DropDown)]
         [PropertyGroup("Search")]
-        public NumericOperators DefaultOperator { get; set; }        
+        public NumericOperators DefaultOperator { get; set; }
 
         public DVDateTimeColumn()
         {
@@ -1018,12 +1018,12 @@ else{
     }
 
     [EnableInBuilder(BuilderType.Calendar)]
-    public class CalendarDynamicColumn: DVBaseColumn
+    public class CalendarDynamicColumn : DVBaseColumn
     {
         [EnableInBuilder(BuilderType.Calendar)]
         [HideInPropertyGrid]
         public DateTime StartDT { get; set; }
-        
+
         [EnableInBuilder(BuilderType.Calendar)]
         [HideInPropertyGrid]
         public DateTime EndDT { get; set; }
@@ -1150,7 +1150,7 @@ pg.ShowProperty('SubTypeFormat');
         public abstract bool CompareValues(object _unformattedData);
     }
 
-    [EnableInBuilder(BuilderType.DVBuilder,BuilderType.Calendar)]
+    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]
     public class NumericCondition : ColumnCondition
     {
         public NumericCondition() { }
@@ -1290,7 +1290,7 @@ else
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]
         public AdvancedRenderType RenderAS { get; set; }
-        
+
 
         [JsonIgnore]
         private List<string> __formulaDataFieldsUsed = null;
@@ -1369,16 +1369,16 @@ else
 
         public bool GetBoolValue()
         {
-            if(this.Operator == AdvancedBooleanOperators.IsTrue)
+            if (this.Operator == AdvancedBooleanOperators.IsTrue)
                 return true;
-            else if(this.Operator == AdvancedBooleanOperators.IsFalse)
+            else if (this.Operator == AdvancedBooleanOperators.IsFalse)
                 return false;
             else
                 return false;//for null
         }
 
         public override bool CompareValues(object _unformattedData)
-        {           
+        {
             return false;
         }
     }
