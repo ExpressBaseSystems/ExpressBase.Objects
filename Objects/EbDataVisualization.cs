@@ -1020,6 +1020,13 @@ else {
         public string Title { get; set; }
     }
 
+    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]
+    public class ObjectBasicSMS : ObjectBasicInfo
+    {
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]
+        public string Title { get; set; }
+    }
+
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
     public class ApiRequestParam : EbDataVisualizationObject
     {
