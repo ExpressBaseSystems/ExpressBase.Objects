@@ -16,6 +16,8 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.MobilePage)]
     public class EbMobileControl : EbMobilePageBase
     {
+        public string EbSid { set; get; }
+
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.MultiLanguageKeySelector)]
         [UIproperty]
@@ -309,7 +311,7 @@ namespace ExpressBase.Objects
         public List<Param> Parameters { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        public bool IsMultiSelect { get; set; }
+        public bool MultiSelect { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
@@ -617,6 +619,13 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("UI")]
         public int ColumnSpan { set; get; }
+
+        /// <summary>
+        /// only for column to control mapping
+        /// </summary>
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
+        public EbMobileControl MappedControl { set; get; }
 
         public override bool Hidden { set; get; }
 

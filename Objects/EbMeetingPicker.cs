@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Runtime.Serialization;
+using static ExpressBase.Objects.EbMeetingScheduler;
 
 namespace ExpressBase.Objects
 {
@@ -726,6 +727,7 @@ namespace ExpressBase.Objects
         public int MaxAttendees { get; set; }
         public int MaxHosts { get; set; }
         public int MeetingId { get; set; }
+        public MeetingOptions MeetingOpts { get; set; }
     }
     public class SlotParticipantCount
     {

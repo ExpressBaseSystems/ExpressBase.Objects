@@ -30,7 +30,7 @@ namespace ExpressBase.Objects
 
     public abstract class EbMobilePageBase : EbObject
     {
-
+        
     }
 
     public interface ILinesEnabled { }

@@ -9,7 +9,7 @@ using System.Text;
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
     [DataContract]
-    public class ApiConversionRequest :  IReturn<ApiResponse>, IEbSSRequest
+    public class ApiConversionRequest : IReturn<ApiResponse>, IEbSSRequest
     {
         [DataMember(Order = 8)]
         public string Url { get; set; }
@@ -31,15 +31,36 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class ApiConversionResponse: IEbSSResponse
+    public class ApiConversionResponse : IEbSSResponse
     {
         [DataMember(Order = 6)]
         public EbDataSet dataset { get; set; }
 
         [DataMember(Order = 6)]
-        public string Message { get; set; }
+        public ResponseStatus ResponseStatus { get; set; }
 
         [DataMember(Order = 6)]
-        public ResponseStatus ResponseStatus { get; set; }
+        public int statusCode { get; set; }
+
+        public string Message
+        {
+            get
+            {
+                switch (this.statusCode)
+                {
+                    case 200:
+                        return string.Empty;
+                    case 201:
+                        return "201 Created";
+                    case 404:
+                        return "Resource not found";
+                    case 500:
+                        return "An unhandled error occurred";
+                    default:
+                        return "Invalid URI";
+                }
+            }
+
+        }
     }
 }

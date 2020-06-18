@@ -1,4 +1,5 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Constants;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
@@ -95,6 +96,12 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.Collection)]
         [Alias("CheckBoxes")]
         public List<EbCheckBox> CheckBoxes { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [UIproperty]
+        [OnChangeUIFunction("Common.RENDER_INLINE")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        public bool RenderInline { get; set; }
 
         [HideInPropertyGrid]
         [JsonIgnore]
