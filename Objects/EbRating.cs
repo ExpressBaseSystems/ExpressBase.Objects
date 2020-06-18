@@ -10,7 +10,7 @@ using System.Text;
 
 namespace ExpressBase.Objects.Objects
 {
-	[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+	[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 	public class EbRating : EbControlUI
 	{
 		public EbRating()

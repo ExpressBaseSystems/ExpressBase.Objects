@@ -10,7 +10,7 @@ using System.Text;
 
 namespace ExpressBase.Objects.Objects
 {
-	[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+	[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
 	public class EbTagInput: EbControlUI
 	{
 		public EbTagInput()

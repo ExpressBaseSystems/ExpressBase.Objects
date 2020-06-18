@@ -12,7 +12,7 @@ using System.Runtime.Serialization;
 
 namespace ExpressBase.Objects
 {
-    [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
     public class EbFileUploader : EbControlUI
     {
 
