@@ -1091,6 +1091,29 @@ pg.ShowProperty('SubTypeFormat');
 
     }
 
+    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
+    public class DVPhoneColumn : DVBaseColumn
+    {
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyEditor(PropertyEditorType.ObjectSelectorCollection)]
+        [OSE_ObjectTypes(EbObjectTypes.iSmsBuilder)]
+        [PropertyGroup(PGConstants.CORE)]
+        public List<ObjectBasicInfo> Templates { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "ColumnsRef", 1)]
+        [PropertyGroup(PGConstants.CORE)]
+        public DVBaseColumn MappingColumn { get; set; }
+
+        public DVPhoneColumn()
+        {
+            this.ConditionalFormating = new List<ColumnCondition>();
+            this.Templates = new List<ObjectBasicInfo>();
+            this.MappingColumn = new DVBaseColumn();
+        }
+
+    }
+
     [EnableInBuilder(BuilderType.DVBuilder)]
     public class HideColumnData
     {
