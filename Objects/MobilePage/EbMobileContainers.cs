@@ -4,11 +4,9 @@ using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
-using ExpressBase.Objects.Objects.DVRelated;
-using ExpressBase.Objects.Objects.MobilePage;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace ExpressBase.Objects
 {
@@ -184,6 +182,30 @@ namespace ExpressBase.Objects
         [PropertyGroup("Link Settings")]
         public WebFormDVModes FormMode { set; get; }
 
+        /// <summary>
+        /// START
+        /// Properties for column and form control maping
+        /// </summary>
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [MetaOnly]
+        [JsonIgnore]
+        public List<EbMobileDataColumn> ColumnsRef { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [MetaOnly]
+        [JsonIgnore]
+        public List<EbMobileControl> MobileFormControls { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Link Settings")]
+        [PropertyEditor(PropertyEditorType.Mapper, "ColumnsRef", "MobileFormControls", "MappedControl")]
+        public List<EbMobileDataColumn> FormParameters { get; set; }
+
+        /// <summary>
+        /// END Mapping property
+        /// </summary>
+
         [EnableInBuilder(BuilderType.MobilePage)]
         [DefaultPropValue("30")]
         public int PageLength { set; get; }
@@ -194,6 +216,7 @@ namespace ExpressBase.Objects
             DataSourceParams = new List<Param>();
             FilterControls = new List<EbMobileControl>();
             SortColumns = new List<EbMobileDataColumn>();
+            FormParameters = new List<EbMobileDataColumn>();
         }
 
         public override string GetDesignHtml()
