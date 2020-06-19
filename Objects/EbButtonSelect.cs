@@ -128,7 +128,7 @@ namespace ExpressBase.Objects
         public string PlaceHolder { get; set; }
 
         [EnableInBuilder(BuilderType.BotForm)]
-        [HideInPropertyGrid]
+        [MetaOnly]
         public DVColumnCollection Columns { get; set; }
 
         [EnableInBuilder(BuilderType.BotForm)]
