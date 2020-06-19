@@ -284,7 +284,7 @@ namespace ExpressBase.Objects
         public string DataSourceRefId { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [HideInPropertyGrid]
+        [MetaOnly]
         public List<EbMobileDataColumn> Columns { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
