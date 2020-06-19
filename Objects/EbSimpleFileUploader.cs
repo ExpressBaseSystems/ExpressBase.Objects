@@ -54,7 +54,7 @@ namespace ExpressBase.Objects
 		{
 
 
-			return @"<div class='simpleFUPdiv ' id='@ebsid@' name='@name@' style='border: 2px dashed ;border-radius: 4px;min-height:100px;'>
+			return @"<div class='simpleFUPdiv ' id='@ebsid@' name='@name@'>
 						<div id='@ebsid@_SFUP' class='SFUPcontainer' >						
 							<div class='SFUPcontent'>
 								<i class='fa fa-cloud-upload'></i><span>Drag &amp; Drop files here or click to browse</span>
