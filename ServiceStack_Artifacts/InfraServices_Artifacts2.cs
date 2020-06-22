@@ -439,6 +439,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public bool IsVersioningEnabled { get; set; }
 
+        public bool Is2faEnabled { get; set; }
+
         public SolutionSettings SolutionSettings { get; set; }
     }
 
@@ -542,7 +544,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     public class GetVersioning : IEbSSRequest
     {
-        public bool Versioning { get; set; }
+        public bool res { get; set; }
 
         public ResponseStatus status { get; set; }
 
@@ -551,13 +553,20 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int UserId { get; set; }
     }
 
-    public class SetVersioning
+    public class SolutionEditRequest
     {
-        public bool Versioning { get; set; }
-        public string solution_id { get; set; }
-    }
+        public bool Value { get; set; }
 
-    public class UpdateSidMapRequest : EbServiceStackNoAuthRequest, IReturn<UpdateSidMapResponse> 
+        public string solution_id { get; set; } 
+
+        public solutionChangeColumn ChangeColumn { get; set; }
+    }
+    public enum solutionChangeColumn
+    {
+        version = 1,
+        TwoFa = 2
+    }
+    public class UpdateSidMapRequest : EbServiceStackNoAuthRequest, IReturn<UpdateSidMapResponse>
     {
         public string ExtSolutionId { get; set; }
     }
