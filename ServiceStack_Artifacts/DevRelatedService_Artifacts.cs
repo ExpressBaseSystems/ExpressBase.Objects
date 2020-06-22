@@ -269,6 +269,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public List<EbMobileControlMeta> ControlMetas { set; get; }
 
+        public bool IsForm { set; get; }
+
         public MobileFormControlInfo()
         {
             Controls = new List<EbMobileControl>();
