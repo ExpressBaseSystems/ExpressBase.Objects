@@ -16,7 +16,7 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.MobilePage)]
     public class EbMobileControl : EbMobilePageBase
     {
-        public string EbSid { set; get; }
+        public virtual string EbSid { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.MultiLanguageKeySelector)]
@@ -284,7 +284,7 @@ namespace ExpressBase.Objects
         public string DataSourceRefId { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [HideInPropertyGrid]
+        [MetaOnly]
         public List<EbMobileDataColumn> Columns { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
@@ -570,73 +570,6 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.MobilePage)]
         public List<EbMobileControl> ControlCollection { set; get; }
-    }
-
-    [EnableInBuilder(BuilderType.MobilePage)]
-    public class EbMobileDataColumn : EbMobileControl, INonPersistControl
-    {
-        public override string Label { set; get; }
-
-        public override bool Unique { get; set; }
-
-        public override bool ReadOnly { get; set; }
-
-        public override bool DoNotPersist { get; set; }
-
-        public override bool Required { get; set; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("UI")]
-        public string TextFormat { get; set; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [HideInPropertyGrid]
-        public int TableIndex { get; set; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [HideInPropertyGrid]
-        public int ColumnIndex { get; set; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [UIproperty]
-        [MetaOnly]
-        public string ColumnName { get; set; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [HideInPropertyGrid]
-        public EbDbTypes Type { get; set; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [UIproperty]
-        [PropertyGroup("UI")]
-        [PropertyEditor(PropertyEditorType.FontSelector)]
-        public EbFont Font { get; set; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("UI")]
-        public int RowSpan { set; get; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("UI")]
-        public int ColumnSpan { set; get; }
-
-        /// <summary>
-        /// only for column to control mapping
-        /// </summary>
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [HideInPropertyGrid]
-        public EbMobileControl MappedControl { set; get; }
-
-        public override bool Hidden { set; get; }
-
-        public override string GetDesignHtml()
-        {
-            return @"<div class='data_column mob_control dropped' title=' @ColumnName' tabindex='1' onclick='$(this).focus()' eb-type='EbMobileDataColumn' id='@id'>
-                        <div class='data_column_inner'>
-                            <span> @ColumnName </span>
-                        </div>
-                    </div>".RemoveCR().DoubleQuoted();
-        }
     }
 
     [EnableInBuilder(BuilderType.MobilePage)]

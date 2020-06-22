@@ -189,18 +189,16 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [MetaOnly]
-        [JsonIgnore]
-        public List<EbMobileDataColumn> ColumnsRef { set; get; }
+        public List<EbMobileDataColToControlMap> DataColumns => new List<EbMobileDataColToControlMap>();
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [MetaOnly]
-        [JsonIgnore]
-        public List<EbMobileControl> MobileFormControls { set; get; }
+        public List<EbMobileControlMeta> FormControlMetas => new List<EbMobileControlMeta>();
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("Link Settings")]
-        [PropertyEditor(PropertyEditorType.Mapper, "ColumnsRef", "MobileFormControls", "MappedControl")]
-        public List<EbMobileDataColumn> FormParameters { get; set; }
+        [PropertyEditor(PropertyEditorType.Mapper, "DataColumns", "FormControlMetas", "FormControl")]
+        public List<EbMobileDataColToControlMap> LinkFormParameters { get; set; }
 
         /// <summary>
         /// END Mapping property
@@ -216,7 +214,7 @@ namespace ExpressBase.Objects
             DataSourceParams = new List<Param>();
             FilterControls = new List<EbMobileControl>();
             SortColumns = new List<EbMobileDataColumn>();
-            FormParameters = new List<EbMobileDataColumn>();
+            LinkFormParameters = new List<EbMobileDataColToControlMap>();
         }
 
         public override string GetDesignHtml()

@@ -209,7 +209,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int ResStatus { get; set; }
     }
 
-	public class UniqueApplicationNameCheckRequest : EbServiceStackAuthRequest, IReturn<UniqueObjectNameCheckResponse>
+    public class UniqueApplicationNameCheckRequest : EbServiceStackAuthRequest, IReturn<UniqueObjectNameCheckResponse>
     {
         public string AppName { get; set; }
     }
@@ -261,5 +261,18 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public string Message { get; set; }
 
+    }
+
+    public class MobileFormControlInfo
+    {
+        public List<EbMobileControl> Controls { set; get; }
+
+        public List<EbMobileControlMeta> ControlMetas { set; get; }
+
+        public MobileFormControlInfo()
+        {
+            Controls = new List<EbMobileControl>();
+            ControlMetas = new List<EbMobileControlMeta>();
+        }
     }
 }
