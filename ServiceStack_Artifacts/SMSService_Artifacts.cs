@@ -1,5 +1,6 @@
 ﻿using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
+using ServiceStack;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
@@ -21,6 +22,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 3)]
         public string MediaUrl { get; set; }
+
+        [DataMember(Order = 4)]
+        public string RefId { get; set; }
+
+        [DataMember(Order = 5)]
+        public List<Param> Params { get; set; }
     }
 
     [DataContract]
@@ -92,6 +99,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 9)]
         public string Uri { get; set; }
 
+        [DataMember(Order = 10)]
+        public string Result { get; set; }
+
+        [DataMember(Order = 11)]
+        public int ConId { get; set; }
+
     }
     [DataContract]
     public class SMSStatusLogMqRequest : EbServiceStackAuthRequest
@@ -100,6 +113,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public SMSSentStatus SMSSentStatus { get; set; }
 
         [DataMember(Order = 2)]
-        public int ContextId { get; set; }
+        public string RefId { get; set; }   
+        
+        [DataMember(Order = 3)]
+        public string MetaData { get; set; }
     }
 }
