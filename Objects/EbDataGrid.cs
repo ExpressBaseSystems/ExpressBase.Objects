@@ -570,6 +570,14 @@ else {
             set { }
         }
 
+        [JsonIgnore]
+        public override string GetDisplayMemberFromDOMJSfn
+        {
+            get { return "let val = parseFloat(" + base.GetValueFromDOMJSfn.Replace("return", "").Replace(";", "") + "); return val.toFixed(this.DecimalPlaces);"; }
+
+            set { }
+        }
+
         public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
         {
             return EbNumeric.GetSingleColumn(this, UserObj, SoluObj, Value);
@@ -1271,7 +1279,7 @@ pg.HideProperty('IsDynamic');
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyGroup(PGConstants.APPEARANCE)]
-        [DefaultPropValue("100")]
+        //[DefaultPropValue("100")]
         public override int Width { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
