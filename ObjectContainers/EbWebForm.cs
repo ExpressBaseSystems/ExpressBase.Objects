@@ -161,11 +161,12 @@ namespace ExpressBase.Objects
 
             html += "</form>";
 
-            return html
+            html = html
                 .Replace("@name@", this.Name)
                 .Replace("@ebsid@", this.EbSid_CtxId)
                 .Replace("@rmode@", IsRenderMode.ToString().ToLower())
                 .Replace("@tabindex@", IsRenderMode ? string.Empty : " tabindex='1'");
+            return  Regex.Replace(html, @"( |\r?\n)\1+", "$1");
         }
 
         //Operations to be performed before form object save - table name required, table name repetition, calculate dependency
