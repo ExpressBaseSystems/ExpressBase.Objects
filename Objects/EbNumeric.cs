@@ -246,7 +246,7 @@ else {
         {
             object _formattedData;
             string _displayMember;
-            string padding = _this.DecimalPlaces > 0 ? ".".PadRight(_this.DecimalPlaces, '0') : string.Empty;
+            string padding = _this.DecimalPlaces > 0 ? ".".PadRight(_this.DecimalPlaces + 1, '0') : string.Empty;
 
             if (Value == null)
             {
