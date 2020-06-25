@@ -1,5 +1,4 @@
 ﻿using ExpressBase.Common;
-using ExpressBase.Common.Constants;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
@@ -12,12 +11,10 @@ using System.Text;
 namespace ExpressBase.Objects
 {
 	[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
-	public class EbPhone : EbControlUI
+	public class EbEmail: EbControlUI
 	{
-
-		public EbPhone()
+		public EbEmail()
 		{
-			//this.Templates = new List<ObjectBasicInfo>();
 		}
 		[OnDeserialized]
 		public void OnDeserializedMethod(StreamingContext context)
@@ -26,11 +23,11 @@ namespace ExpressBase.Objects
 			this.BareControlHtml4Bot = this.BareControlHtml;
 			this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
 		}
-		public override string ToolIconHtml { get { return "<i class='fa fa-phone'></i>"; } set { } }
+		public override string ToolIconHtml { get { return "<i class='fa fa-envelope '></i>"; } set { } }
 
-		public override string ToolNameAlias { get { return "Phone"; } set { } }
+		public override string ToolNameAlias { get { return "Email"; } set { } }
 
-		public override string ToolHelpText { get { return "Phone"; } set { } }
+		public override string ToolHelpText { get { return "Email"; } set { } }
 		public override string UIchangeFns
 		{
 			get
@@ -40,7 +37,6 @@ namespace ExpressBase.Objects
             }";
 			}
 		}
-
 		//--------Hide in property grid------------
 		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
 		[HideInPropertyGrid]
@@ -106,33 +102,11 @@ namespace ExpressBase.Objects
 		[HideInPropertyGrid]
 		public override EbDbTypes EbDbType { get { return EbDbTypes.String; } set { } }
 
-
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
-		[DefaultPropValue("100")]
-		[Alias("Dropdown Height")]
-		public int DropdownHeight { get; set; }
-
-		//[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
-		//[PropertyEditor(PropertyEditorType.ObjectSelectorCollection)]
-		//[OSE_ObjectTypes(EbObjectTypes.iSmsBuilder)]
-		//[PropertyGroup(PGConstants.CORE)]
-		//public List<ObjectBasicInfo> Templates { get; set; }
-
-		//[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
-		//[DefaultPropValue("false")]
-		//[Alias("Send message")]
-		//[OnChangeExec(@"if (this.SendMessage === true ){
-		//						pg.ShowProperty('Templates');
-		//					} 
-		//					else {
-		//						pg.HideProperty('Templates');
-		//					}")]
-		//public bool SendMessage { get; set; }
-
 		public override string GetBareHtml()
 		{
-			return @"<div class='PhnCtrlCont' id='@ebsid@_Phnctrl' name='@name@'>
-					 <input type='tel' placeholder='' id='@ebsid@' style='width:100%; display:inline-block;'>
+			return @"<div class='input-group @ebsid@_cont'>
+						  <span class='input-group-addon'> <i class='fa fa-envelope aria-hidden='true' class='input-group-addon'></i> </span>
+						  <input type='email' placeholder='' id='@ebsid@' style='width:100%; display:inline-block;'>
 					</div>"
 .Replace("@ebsid@", String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId)
 .Replace("@name@", this.Name)
@@ -159,6 +133,33 @@ namespace ExpressBase.Objects
 		{
 			get => this.GetBareHtml();
 			set => base.DesignHtml4Bot = value;
+		}
+
+		public override string GetValueFromDOMJSfn
+		{
+			get
+			{
+				return @" return $(`#${this.EbSid}`).val();";
+			}
+			set { }
+		}
+
+		public override string OnChangeBindJSFn
+		{
+			get
+			{
+				return @"$(`#${this.EbSid}`).on('change', p1);";
+			}
+			set { }
+		}
+
+		public override string SetValueJSfn
+		{
+			get
+			{
+				return @" $(`#${this.EbSid}`).val(p1);";
+			}
+			set { }
 		}
 
 
