@@ -526,7 +526,7 @@ else// PS
     <div class='input-group'>
         <v-select maped-column='$$' column-type='@type@' id='@ebsid@$$' style='width:{3}px;' 
             multiple
-            v-model='displayMembers[`$$`]'
+            v-model='displayMembers[""$$""]'
             :on-change='updateCk'
             placeholder = '@sTitle@'>
         </v-select>

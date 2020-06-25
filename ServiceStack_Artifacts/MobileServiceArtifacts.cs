@@ -270,4 +270,48 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             StageActions = new List<EbStageActionsMobile>();
         }
     }
+
+    //bulk data
+
+    public class EbApplicationDataMobile
+    {
+        public int AppId { set; get; }
+
+        public string AppName { set; get; }
+
+        public string AppIcon { set; get; }
+
+        public EbMobileSettings AppSettings { set; get; }
+
+        public List<MobilePagesWraper> MobilePages { set; get; }
+
+        public List<WebObjectsWraper> WebObjects { set; get; }
+
+        public EbApplicationDataMobile()
+        {
+            MobilePages = new List<MobilePagesWraper>();
+            WebObjects = new List<WebObjectsWraper>();
+        }
+    }
+
+    [DataContract]
+    public class EbMobileSolutionData
+    {
+        [DataMember(Order = 1)]
+        public List<EbApplicationDataMobile> Applications { set; get; }
+
+        [DataMember(Order = 2)]
+        public EbDataSet OfflineData { set; get; }
+
+        public EbMobileSolutionData()
+        {
+            Applications = new List<EbApplicationDataMobile>();
+            OfflineData = new EbDataSet();
+        }
+    }
+
+    public class MobileSolutionDataRequest : EbServiceStackAuthRequest, IReturn<EbMobileSolutionData>
+    {
+        
+    }
 }
