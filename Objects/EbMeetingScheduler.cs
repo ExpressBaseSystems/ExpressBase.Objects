@@ -113,7 +113,11 @@ namespace ExpressBase.Objects
                 <div style='margin-right:15px;'><h5>Time to</h5><input type='time' id='@ebsid@_time-to' class='mc-input' required/></div>
                 <div class='meeting-duration' style='display:none'>
                 <h5>Duration</h5> <input type='text' id='@ebsid@_duration' data-format='HH:mm' data-template='HH : mm' name='datetime' class='mc-input'>
-                </div></div></div>
+                </div></div> 
+                <div class='meeting-slots'> 
+                 <h5>Duration</h5><div id='@ebsid@_meeting_slots'> </div>
+                 </div>
+                </div>
                 <div class='meeting-count'>
                 Max-host : <input type='number' id='@ebsid@_max-host' class='meeting-spinner mc-input' min='1' max='5' value='1' >
                 Min-host : <input type='number' id='@ebsid@_min-host' class='meeting-spinner mc-input' min='1' max='5' value='1'>
@@ -235,60 +239,119 @@ namespace ExpressBase.Objects
                     ";
                 }
             }
-            else if (Mobj.MeetingOpts == MeetingOptions.F_H_E_A && Mobj.IsMultipleMeeting == "F")
+            else if (Mobj.MeetingOpts == MeetingOptions.F_H_F_A)
             {
                 query += AddMeetingSchedule(Mobj, usr);
-                query += $@"
-            insert into eb_meeting_slots (eb_meeting_schedule_id,meeting_date,time_from,time_to,eb_created_by,eb_created_at) values 
-            (eb_currval('eb_meeting_schedule_id_seq'),'{Mobj.Date}','{Mobj.TimeFrom}','{Mobj.TimeTo}', {usr.UserId},now() );
-            insert into eb_my_actions (user_ids,from_datetime,form_ref_id,form_data_id,description,my_action_type , eb_meeting_slots_id, 
-            is_completed,eb_del) values('{Mobj.Host}',NOW(),@refid, eb_currval('{tbl}_id_seq'), 'Meeting Request',
-            '{MyActionTypes.Meeting}',eb_currval('eb_meeting_slots_id_seq') , 'F','F');  
-            insert into eb_my_actions (user_ids,from_datetime,form_ref_id,form_data_id,description,my_action_type , eb_meeting_slots_id, 
-            is_completed,eb_del) values('{Mobj.Attendee}',NOW(),@refid, eb_currval('{tbl}_id_seq'), 'Meeting Request',
-            '{MyActionTypes.Meeting}',eb_currval('eb_meeting_slots_id_seq') , 'F','F');
-             ";
-                for (i = 0; i < Host.Length; i++)
+                for (i = 0; i < Mobj.SlotList.Count; i++)
                 {
-                    query += $@"
-                     insert into eb_meeting_slot_participants(user_id, confirmation, eb_meeting_schedule_id, approved_slot_id, name, email, type_of_user, participant_type) 
-                     values ({Host[i]}, 2, eb_currval('eb_meeting_schedule_id_seq'), eb_currval('eb_meeting_slots_id_seq'), '', '', 1, 1);
+                    string[] Hosts = Mobj.SlotList[i].FixedHost.Split(',').Select(sValue => sValue.Trim()).ToArray();
+                    string[] Attendees = Mobj.SlotList[i].EligibleAttendees.Split(',').Select(sValue => sValue.Trim()).ToArray();
+                    query += $@"insert into eb_meeting_slots (eb_meeting_schedule_id,meeting_date,time_from,time_to,eb_created_by,eb_created_at) values 
+                    (eb_currval('eb_meeting_schedule_id_seq'),'{Mobj.Date}','{Mobj.SlotList[i].TimeFrom}:00','{Mobj.SlotList[i].TimeTo}:00', {usr.UserId},now() );";
+                    for (int j = 0; j < Hosts.Length; j++)
+                    {
+                        query += $@"
+                     insert into eb_meeting_slot_participants(user_id, confirmation, eb_meeting_schedule_id, approved_slot_id, name, email, type_of_user, participant_type,
+                       eb_created_at,eb_created_by) 
+                     values ({Hosts[j]}, 2, eb_currval('eb_meeting_schedule_id_seq'), eb_currval('eb_meeting_slots_id_seq'), '', '', 1, 1,now(),{usr.UserId});
                     ";
+                    }
+                    for (i = 0; i < Attendees.Length; i++)
+                    {
+                        query += $@"insert into eb_meeting_slot_participants(user_id, confirmation, eb_meeting_schedule_id, approved_slot_id, name, email, type_of_user, participant_type,
+                    eb_created_at,eb_created_by) 
+                     values ({Attendees[i]}, 2, eb_currval('eb_meeting_schedule_id_seq'), eb_currval('eb_meeting_slots_id_seq'), '', '', 1, 2,now(),{usr.UserId});
+                    ";
+                    }
+                    query += $@" insert into eb_my_actions (user_ids,from_datetime,form_ref_id,form_data_id,description,my_action_type , eb_meeting_slots_id, 
+                    is_completed,eb_del) values('{Mobj.SlotList[i].FixedHost}',NOW(),@refid, eb_currval('{tbl}_id_seq'), 'Meeting Request',
+                    '{MyActionTypes.Meeting}',eb_currval('eb_meeting_slots_id_seq') , 'F','F');
+                    insert into eb_my_actions (user_ids,from_datetime,form_ref_id,form_data_id,description,my_action_type , eb_meeting_slots_id, 
+                    is_completed,eb_del) values('{Mobj.SlotList[i].FixedAttendee}',NOW(),@refid, eb_currval('{tbl}_id_seq'), 'Meeting Request',
+                    '{MyActionTypes.Meeting}',eb_currval('eb_meeting_slots_id_seq') , 'F','F');";
                 }
-                for (i = 0; i < Attendee.Length; i++)
+            }
+            else if (Mobj.MeetingOpts == MeetingOptions.F_H_E_A)
+            {
+                query += AddMeetingSchedule(Mobj, usr);
+                for (i = 0; i < Mobj.SlotList.Count; i++)
                 {
-                    query += $@"
-                     insert into eb_meeting_slot_participants(user_id, confirmation, eb_meeting_schedule_id, approved_slot_id, name, email, type_of_user, participant_type) 
-                     values ({Attendee[i]}, 2, eb_currval('eb_meeting_schedule_id_seq'), eb_currval('eb_meeting_slots_id_seq'), '', '', 1, 2);
+                    string[] Hosts = Mobj.SlotList[i].FixedHost.Split(',').Select(sValue => sValue.Trim()).ToArray();
+                    string[] Attendees = Mobj.SlotList[i].EligibleAttendees.Split(',').Select(sValue => sValue.Trim()).ToArray();
+                    query += $@"insert into eb_meeting_slots (eb_meeting_schedule_id,meeting_date,time_from,time_to,eb_created_by,eb_created_at) values 
+                    (eb_currval('eb_meeting_schedule_id_seq'),'{Mobj.Date}','{Mobj.SlotList[i].TimeFrom}:00','{Mobj.SlotList[i].TimeTo}:00', {usr.UserId},now() );";
+                    for (int j = 0; j < Hosts.Length; j++)
+                    {
+                        query += $@"
+                     insert into eb_meeting_slot_participants(user_id, confirmation, eb_meeting_schedule_id, approved_slot_id, name, email, type_of_user, participant_type,
+                       eb_created_at,eb_created_by) 
+                     values ({Hosts[j]}, 2, eb_currval('eb_meeting_schedule_id_seq'), eb_currval('eb_meeting_slots_id_seq'), '', '', 1, 1,now(),{usr.UserId});
                     ";
+                    }
+                    query += $@" insert into eb_my_actions (user_ids,from_datetime,form_ref_id,form_data_id,description,my_action_type , eb_meeting_slots_id, 
+                    is_completed,eb_del) values('{Mobj.SlotList[i].FixedHost}',NOW(),@refid, eb_currval('{tbl}_id_seq'), 'Meeting Request',
+                    '{MyActionTypes.Meeting}',eb_currval('eb_meeting_slots_id_seq') , 'F','F');";
                 }
+                query += $@"
+                    insert into eb_meeting_scheduled_participants (user_ids,role_ids,eb_meeting_schedule_id,participant_type,type_of_user,
+		            eb_created_at,eb_created_by)values('{ Mobj.EligibleAttendees}','',eb_currval('eb_meeting_schedule_id_seq') , 2 ,1,now(),{usr.UserId});
+                    ";
+                query += $@"insert into eb_my_actions (user_ids,from_datetime,form_ref_id,form_data_id,description,my_action_type , eb_meeting_schedule_id, 
+                is_completed,eb_del) values('{Mobj.EligibleAttendees}',NOW(),@refid, eb_currval('{tbl}_id_seq'), 'Meeting Request',
+                '{MyActionTypes.Meeting}',eb_currval('eb_meeting_schedule_id_seq') , 'F','F');";
             }
-            else if (Mobj.MeetingOpts == MeetingOptions.E_H_F_A && Mobj.IsMultipleMeeting == "F")
+            else if (Mobj.MeetingOpts == MeetingOptions.E_H_F_A)
             {
                 query += AddMeetingSchedule(Mobj, usr);
+                for (i = 0; i < Mobj.SlotList.Count; i++)
+                {
+                    string[] Hosts = Mobj.SlotList[i].FixedHost.Split(',').Select(sValue => sValue.Trim()).ToArray();
+                    string[] Attendees = Mobj.SlotList[i].EligibleAttendees.Split(',').Select(sValue => sValue.Trim()).ToArray();
+                    query += $@"insert into eb_meeting_slots (eb_meeting_schedule_id,meeting_date,time_from,time_to,eb_created_by,eb_created_at) values 
+                    (eb_currval('eb_meeting_schedule_id_seq'),'{Mobj.Date}','{Mobj.SlotList[i].TimeFrom}:00','{Mobj.SlotList[i].TimeTo}:00', {usr.UserId},now() );";
+                    for (int j = 0; j < Attendees.Length; j++)
+                    {
+                        query += $@"
+                     insert into eb_meeting_slot_participants(user_id, confirmation, eb_meeting_schedule_id, approved_slot_id, name, email, type_of_user, participant_type,
+                       eb_created_at,eb_created_by) 
+                     values ({Attendees[j]}, 2, eb_currval('eb_meeting_schedule_id_seq'), eb_currval('eb_meeting_slots_id_seq'), '', '', 1, 2,now(),{usr.UserId});
+                    ";
+                    }
+                    query += $@" insert into eb_my_actions (user_ids,from_datetime,form_ref_id,form_data_id,description,my_action_type , eb_meeting_slots_id, 
+                    is_completed,eb_del) values('{Mobj.SlotList[i].FixedAttendee}',NOW(),@refid, eb_currval('{tbl}_id_seq'), 'Meeting Request',
+                    '{MyActionTypes.Meeting}',eb_currval('eb_meeting_slots_id_seq') , 'F','F');";
+                }
                 query += $@"
-            insert into eb_meeting_slots (eb_meeting_schedule_id,meeting_date,time_from,time_to,eb_created_by,eb_created_at) values 
-            (eb_currval('eb_meeting_schedule_id_seq'),'{Mobj.Date}','{Mobj.TimeFrom}','{Mobj.TimeTo}', {usr.UserId},now() );
-            insert into eb_my_actions (user_ids,from_datetime,form_ref_id,form_data_id,description,my_action_type , eb_meeting_slots_id, 
-            is_completed,eb_del) values('{Mobj.Host}',NOW(),@refid, eb_currval('{tbl}_id_seq'), 'Meeting Request',
-            '{MyActionTypes.Meeting}',eb_currval('eb_meeting_slots_id_seq') , 'F','F');  
-            insert into eb_my_actions (user_ids,from_datetime,form_ref_id,form_data_id,description,my_action_type , eb_meeting_slots_id, 
-            is_completed,eb_del) values('{Mobj.Attendee}',NOW(),@refid, eb_currval('{tbl}_id_seq'), 'Meeting Request',
-            '{MyActionTypes.Meeting}',eb_currval('eb_meeting_slots_id_seq') , 'F','F');
-             ";
+                    insert into eb_meeting_scheduled_participants (user_ids,role_ids,eb_meeting_schedule_id,participant_type,type_of_user,
+		            eb_created_at,eb_created_by)values('{ Mobj.EligibleHosts}','',eb_currval('eb_meeting_schedule_id_seq') , 1 ,1,now(),{usr.UserId});
+                    ";
+                query += $@" insert into eb_my_actions (user_ids,from_datetime,form_ref_id,form_data_id,description,my_action_type , eb_meeting_schedule_id, 
+                    is_completed,eb_del) values('{Mobj.EligibleHosts}',NOW(),@refid, eb_currval('{tbl}_id_seq'), 'Meeting Request',
+                    '{MyActionTypes.Meeting}',eb_currval('eb_meeting_schedule_id_seq') , 'F','F');";
+
             }
-            else if (Mobj.MeetingOpts == MeetingOptions.E_H_E_A && Mobj.IsMultipleMeeting == "F")
+            else if (Mobj.MeetingOpts == MeetingOptions.E_H_E_A)
             {
                 query += AddMeetingSchedule(Mobj, usr);
-                query += AddMeetingSlots(Mobj, usr);
-                query += AddMyAction(Mobj, usr,tbl);
+                for (i = 0; i < Mobj.SlotList.Count; i++)
+                {
+                    query += $@"insert into eb_meeting_slots (eb_meeting_schedule_id,meeting_date,time_from,time_to,eb_created_by,eb_created_at) values 
+                    (eb_currval('eb_meeting_schedule_id_seq'),'{Mobj.Date}','{Mobj.SlotList[i].TimeFrom}:00','{Mobj.SlotList[i].TimeTo}:00', {usr.UserId},now() );";
+                }
                 query += $@"
-                insert into eb_meeting_scheduled_participants (user_ids,role_ids,eb_meeting_schedule_id,participant_type,
-		        eb_created_at,eb_created_by)values('{Mobj.EligibleHosts}','',eb_currval('eb_meeting_schedule_id_seq') , 1 ,now(),{usr.UserId});
-                insert into eb_meeting_scheduled_participants (user_ids,role_ids,eb_meeting_schedule_id,participant_type,
-		        eb_created_at,eb_created_by)values('{Mobj.EligibleHosts}','',eb_currval('eb_meeting_schedule_id_seq') , 2 ,now(),{usr.UserId});
-             ";
+                    insert into eb_meeting_scheduled_participants (user_ids,role_ids,eb_meeting_schedule_id,participant_type,type_of_user,
+		            eb_created_at,eb_created_by)values('{ Mobj.EligibleHosts}','',eb_currval('eb_meeting_schedule_id_seq') , 1 ,1,now(),{usr.UserId});
+                    insert into eb_meeting_scheduled_participants (user_ids,role_ids,eb_meeting_schedule_id,participant_type,type_of_user,
+		            eb_created_at,eb_created_by)values('{ Mobj.EligibleAttendees}','',eb_currval('eb_meeting_schedule_id_seq') , 2 ,1,now(),{usr.UserId});
+                    ";
+                query += $@" insert into eb_my_actions (user_ids,from_datetime,form_ref_id,form_data_id,description,my_action_type , eb_meeting_schedule_id, 
+                    is_completed,eb_del) values('{Mobj.SlotList[0].EligibleHosts}',NOW(),@refid, eb_currval('{tbl}_id_seq'), 'Meeting Request',
+                    '{MyActionTypes.Meeting}',eb_currval('eb_meeting_schedule_id_seq') , 'F','F');
+                    insert into eb_my_actions (user_ids,from_datetime,form_ref_id,form_data_id,description,my_action_type , eb_meeting_schedule_id, 
+                    is_completed,eb_del) values('{Mobj.EligibleAttendees}',NOW(),@refid, eb_currval('{tbl}_id_seq'), 'Meeting Request',
+                    '{MyActionTypes.Meeting}',eb_currval('eb_meeting_schedule_id_seq') , 'F','F');";
             }
+    
             _extqry += query;
             return true;
         }
@@ -350,6 +413,21 @@ namespace ExpressBase.Objects
             public string Host { get; set; }
             public string Attendee { get; set; }
             public MeetingOptions MeetingOpts { get; set; }
+            public List<Slots> SlotList { get; set; }
+            public MeetingSchedule()
+            {
+                this.SlotList = new List<Slots>();
+            }
+        }
+        public class Slots
+        {
+            public int Position { get; set; }
+            public string TimeFrom { get; set; }
+            public string TimeTo { get; set; }
+            public string EligibleHosts { get; set; }
+            public string EligibleAttendees { get; set; }
+            public string FixedHost { get; set; }
+            public string FixedAttendee { get; set; }
         }
         public enum MeetingOptions
         {

@@ -625,12 +625,14 @@ namespace ExpressBase.Objects
     {
         public int Id { get; set; }
         public int SlotId { get; set; }
-        public int ScheduleId { get; set; }
+        public int MeetingScheduleId { get; set; }
         public int UserId { get; set; }
         public int RoleId { get; set; }
         public int UserGroupId { get; set; }
         public int ParticipantType { get; set; }
-        public int Count { get; set; }
+        public int TypeOfUser { get; set; }
+        public string UserIds { get; set; }
+        public string RoleIds { get; set; }
     }
 
     [DataContract]
@@ -695,6 +697,7 @@ namespace ExpressBase.Objects
     {
         public int Id { get; set; }
         public int SlotId { get; set; }
+        public int MeetingScheduleId { get; set; }
         public string UserIds { get; set; }
         public int UserGroupId { get; set; }
         public string RoleIds { get; set; }
@@ -786,6 +789,50 @@ namespace ExpressBase.Objects
         }
     }
 
+    public class SlotsRequest
+    {
+        public int MyActionId { get; set; }
+        public int MeetingScheduleId { get; set; }
+        public int SlotId { get; set; }
+        public string TimeFrom { get; set; }
+        public string TimeTo { get; set; }
+        public string IsApproved { get; set; }
+        public string Title { get; set; }
+        public string Description { get; set; }
+        public string Venue { get; set; }
+        public string Integration { get; set; }
+        public string MeetingDate { get; set; }
+    }
+
+    //Get Meeting Details - display modal
+    public class GetMeetingsDetailsResponse
+    {
+        public MyAction MyActionDetails { get; set; }
+        public List<MeetingRequest> MeetingRequest { get; set; }
+        public List<SlotsRequest> SlotsRequest { get; set; }
+        public GetMeetingsDetailsResponse()
+        {
+            this.MeetingRequest = new List<MeetingRequest>();
+            this.SlotsRequest = new List<SlotsRequest>();
+            this.MyActionDetails = new MyAction();
+        }
+
+    }
+    public class GetMeetingsDetailsRequest
+    {
+        public int MyActionId { get; set; }
+    }
+
+    public class PickMeetingSLotResponse
+    {
+        public bool ResponseStatus {get;set;}
+    }  
+    public class PickMeetingSLotRequest
+    {
+        public int MyActionId { get; set; }
+        public int SlotId { get; set; }
+        public User UserInfo { get; set; }
+    }
     public enum ParticipantType
     {
         Host = 1,
