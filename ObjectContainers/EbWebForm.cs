@@ -188,7 +188,7 @@ namespace ExpressBase.Objects
             List<EbDataGrid> DGs = new List<EbDataGrid>();
             for (int i = 0; i < Allctrls.Length; i++)
             {
-                if (Allctrls[i].Name.Equals(Trigger))
+                if (Allctrls[i].Name == Trigger)
                     TriggerCtrl = Allctrls[i];
 
                 if (Allctrls[i] is EbDataGrid)
@@ -430,7 +430,7 @@ namespace ExpressBase.Objects
             string val = string.Empty;
             for (int i = 0; i < Allctrls.Length; i++)
             {
-                if (Allctrls[i].Name.Equals(Trigger))
+                if (Allctrls[i].Name == Trigger)
                 {
                     TriggerCtrl = Allctrls[i];
                     break;
@@ -1402,11 +1402,15 @@ namespace ExpressBase.Objects
                     Console.WriteLine("New record inserted. Table :" + this.TableName + ", Id : " + this.TableRowId);
                 }
                 this.RefreshFormData(DataDB, service, false, true);
+                Console.WriteLine("EbWebForm.Save.UpdateAuditTrail start");
                 EbAuditTrail ebAuditTrail = new EbAuditTrail(this, DataDB);
                 resp += " - AuditTrail: " + ebAuditTrail.UpdateAuditTrail();
+                Console.WriteLine("EbWebForm.Save.AfterSave start");
                 resp += " - AfterSave: " + this.AfterSave(DataDB, IsUpdate);
+                Console.WriteLine("EbWebForm.Save.SendNotifications start");
                 resp += " - Notifications: " + EbFnGateway.SendNotifications(this, DataDB, service);
                 this.DbTransaction.Commit();
+                Console.WriteLine("EbWebForm.Save.DbTransaction Commited");
             }
             catch (FormException ex1)
             {
