@@ -154,8 +154,19 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
         [PropertyEditor(PropertyEditorType.Collection)]
         [PropertyGroup("Api")]
-        [HideForUser]
+        [MetaOnly]
         public List<ApiRequestParam> Parameters { get; set; }
+
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [OSE_ObjectTypes(EbObjectTypes.iFilterDialog)]
+        [HideForUser]
+        [Alias("Filter Dialog")]
+        [PropertyGroup("Api")]
+        public string FilterDialogRefId { get; set; }
+
+        [JsonIgnore]
+        public EbFilterDialog EbFilterDialog { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
         [HideInPropertyGrid]
@@ -276,6 +287,24 @@ namespace ExpressBase.Objects
             catch (Exception e)
             {
                 Console.WriteLine("AfterRedisGet " + e.Message);
+            }
+        }
+
+        public void AfterRedisGetforFilter(RedisClient Redis, IServiceClient client)
+        {
+            try
+            {
+                this.EbFilterDialog = Redis.Get<EbFilterDialog>(this.FilterDialogRefId);
+                if (this.EbFilterDialog == null)
+                {
+                    var result = client.Get<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = this.FilterDialogRefId });
+                    this.EbFilterDialog = EbSerializers.Json_Deserialize(result.Data[0].Json);
+                    Redis.Set<EbFilterDialog>(this.FilterDialogRefId, this.EbFilterDialog);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("AfterRedisGetforFilter " + e.Message);
             }
         }
 
@@ -1020,7 +1049,7 @@ else {
         public string Title { get; set; }
     }
 
-    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]
+    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar, BuilderType.WebForm)]
     public class ObjectBasicSMS : ObjectBasicInfo
     {
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.Calendar)]

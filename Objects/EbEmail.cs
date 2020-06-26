@@ -38,67 +38,59 @@ namespace ExpressBase.Objects
 			}
 		}
 		//--------Hide in property grid------------
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override string HelpText { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override string ToolTipText { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override bool Unique { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override List<EbValidator> Validators { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override EbScript DefaultValueExpression { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override EbScript VisibleExpr { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override EbScript ValueExpr { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
-		[HideInPropertyGrid]
-		public override bool IsDisable { get; set; }
-
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override bool Required { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override bool DoNotPersist { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override string BackColor { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override string ForeColor { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override string LabelBackColor { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override string LabelForeColor { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
-		[HideInPropertyGrid]
-		public override EbScript OnChangeFn { get; set; }
-
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override EbDbTypes EbDbType { get { return EbDbTypes.String; } set { } }
 
@@ -106,7 +98,7 @@ namespace ExpressBase.Objects
 		{
 			return @"<div class='input-group @ebsid@_cont'>
 						  <span class='input-group-addon'> <i class='fa fa-envelope aria-hidden='true' class='input-group-addon'></i> </span>
-						  <input type='email' placeholder='' id='@ebsid@' style='width:100%; display:inline-block;'>
+						  <input type='email' placeholder='' id='@ebsid@' name='@name@' style='width:100%; display:inline-block;'>
 					</div>"
 .Replace("@ebsid@", String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId)
 .Replace("@name@", this.Name)
