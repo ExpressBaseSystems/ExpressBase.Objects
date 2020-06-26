@@ -78,7 +78,7 @@ namespace ExpressBase.Objects
         private DbTransaction DbTransaction { get; set; }
 
         public static EbOperations Operations = WFOperations.Instance;
-        
+
         [PropertyGroup("Events")]
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.Collection)]
@@ -166,7 +166,7 @@ namespace ExpressBase.Objects
                 .Replace("@ebsid@", this.EbSid_CtxId)
                 .Replace("@rmode@", IsRenderMode.ToString().ToLower())
                 .Replace("@tabindex@", IsRenderMode ? string.Empty : " tabindex='1'");
-            return  Regex.Replace(html, @"( |\r?\n)\1+", "$1");
+            return Regex.Replace(html, @"( |\r?\n)\1+", "$1");
         }
 
         //Operations to be performed before form object save - table name required, table name repetition, calculate dependency
@@ -179,11 +179,12 @@ namespace ExpressBase.Objects
         {
             BeforeSaveHelper.BeforeSave(this, null, null);
         }
-        
+
         //import data - using data reader in dg - from another form linked in ps 
         public void ImportData(IDatabase DataDB, Service Service, List<Param> Param, string Trigger, int RowId)
         {
             EbControl[] Allctrls = this.Controls.FlattenAllEbControls();
+            Allctrls =  Array.FindAll(Allctrls, c => !(c is EbControlContainer && (c as EbDataGrid == null)));
             EbControl TriggerCtrl = null;
             List<EbDataGrid> DGs = new List<EbDataGrid>();
             for (int i = 0; i < Allctrls.Length; i++)
@@ -793,9 +794,9 @@ namespace ExpressBase.Objects
 
         private void GetFormattedColumn(EbDataColumn dataColumn, EbDataRow dataRow, SingleRow Row, EbControl _control)
         {
-            if (dataColumn == null && _control == null) 
+            if (dataColumn == null && _control == null)
                 throw new FormException("Something went wrong in our end", (int)HttpStatusCodes.INTERNAL_SERVER_ERROR, "EbWebForm.GetFormattedColumn: dataColumn and _control is null", "RowId: " + Row.RowId);
-            
+
             if (_control != null)
             {
                 if (_control.DoNotPersist && !_control.IsSysControl)
@@ -862,6 +863,7 @@ namespace ExpressBase.Objects
                             string EbSid, VmName, DmName = string.Empty;
                             DVColumnCollection DmsColl;
                             bool RenderAsSS = false;
+                            DVColumnCollection ColColl;
 
                             if (Column.Control is EbPowerSelect)
                             {
@@ -871,6 +873,7 @@ namespace ExpressBase.Objects
                                 RenderAsSS = psCtrl.RenderAsSimpleSelect;
                                 DmName = RenderAsSS ? psCtrl.DisplayMember.Name : string.Empty;
                                 DmsColl = psCtrl.DisplayMembers;
+                                ColColl = psCtrl.Columns;
                             }
                             else
                             {
@@ -878,6 +881,7 @@ namespace ExpressBase.Objects
                                 EbSid = psColCtrl.EbSid;
                                 VmName = psColCtrl.ValueMember.Name;
                                 DmsColl = psColCtrl.DisplayMembers;
+                                ColColl = psColCtrl.Columns;
                             }
 
                             if (Column.Value == null || string.IsNullOrEmpty(Convert.ToString(Column.Value)) || !this.FormData.PsDm_Tables.ContainsKey(EbSid))
@@ -919,6 +923,26 @@ namespace ExpressBase.Objects
                                             __d.Add(DmsColl[j].Name, Convert.ToString(_row[DmsColl[j].Name]) ?? string.Empty);
                                         }
                                         //Disp.Add(vms[i], _dm);
+                                        DispM_dup.Add(vms[i], __d);
+                                    }
+                                }
+                                else
+                                {
+                                    foreach (DVBaseColumn _dvCol in ColColl)
+                                    {
+                                        if (!Rows.ContainsKey(_dvCol.Name))
+                                            Rows.Add(_dvCol.Name, new List<object>());
+                                        Rows[_dvCol.Name].Add(string.Empty);
+                                    }
+                                    if (RenderAsSS)
+                                    {
+                                        DispM_dup.Add(vms[i], new Dictionary<string, string> { { VmName, string.Empty } });
+                                    }
+                                    else
+                                    {
+                                        Dictionary<string, string> __d = new Dictionary<string, string>();
+                                        for (int j = 0; j < DmsColl.Count; j++)
+                                            __d.Add(DmsColl[j].Name, string.Empty);
                                         DispM_dup.Add(vms[i], __d);
                                     }
                                 }
@@ -1444,7 +1468,7 @@ namespace ExpressBase.Objects
             int i = 0;
             List<EbWebForm> FormCollection = new List<EbWebForm>() { this };
             if (this.ExeDataPusher)
-                this.PrepareWebFormData();            
+                this.PrepareWebFormData();
 
             this.FormCollection.Insert(DataDB, param, ref fullqry, ref _extqry, ref i);
 
@@ -1882,7 +1906,7 @@ namespace ExpressBase.Objects
         {
             EbDataPushHelper DataPushHelper = new EbDataPushHelper(this);
             string Json = DataPushHelper.GetPusherJson(Data);
-            string Code = DataPushHelper.GetProcessedCode(Json);            
+            string Code = DataPushHelper.GetProcessedCode(Json);
             Script _script = CSharpScript.Create<dynamic>(
                 Code,
                 ScriptOptions.Default.WithReferences("Microsoft.CSharp", "System.Core").WithImports("System", "System.Collections.Generic", "System.Linq"),
@@ -1912,7 +1936,7 @@ namespace ExpressBase.Objects
             }
             return DataIds;
         }
-        
+
         //duplicate for SQL job - remove this fn if globals conversion is completed
         private SingleRow GetSingleRow(JToken JRow, TableSchema _table, FormGlobals globals)
         {
