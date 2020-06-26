@@ -1105,6 +1105,11 @@ pg.ShowProperty('SubTypeFormat');
         [PropertyGroup(PGConstants.CORE)]
         public DVBaseColumn MappingColumn { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.DVBuilder, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard)]
+        [PropertyEditor(PropertyEditorType.DropDown)]
+        [PropertyGroup("Search")]
+        public StringOperators DefaultOperator { get; set; }
+
         public DVPhoneColumn()
         {
             this.ConditionalFormating = new List<ColumnCondition>();
