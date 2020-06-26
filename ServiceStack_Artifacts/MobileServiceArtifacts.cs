@@ -64,6 +64,21 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string AppName { set; get; }
 
         public string AppIcon { set; get; }
+
+        public EbMobileSettings AppSettings { set; get; }
+
+        public List<MobilePagesWraper> MobilePages { set; get; }
+
+        public List<WebObjectsWraper> WebObjects { set; get; }
+
+        public EbDataSet OfflineData { set; get; }
+
+        public AppDataToMob()
+        {
+            MobilePages = new List<MobilePagesWraper>();
+            WebObjects = new List<WebObjectsWraper>();
+            OfflineData = new EbDataSet();
+        }
     }
 
     public class MobilePagesWraper
@@ -272,41 +287,15 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     //bulk data
-
-    public class EbApplicationDataMobile
-    {
-        public int AppId { set; get; }
-
-        public string AppName { set; get; }
-
-        public string AppIcon { set; get; }
-
-        public EbMobileSettings AppSettings { set; get; }
-
-        public List<MobilePagesWraper> MobilePages { set; get; }
-
-        public List<WebObjectsWraper> WebObjects { set; get; }
-
-        public EbApplicationDataMobile()
-        {
-            MobilePages = new List<MobilePagesWraper>();
-            WebObjects = new List<WebObjectsWraper>();
-        }
-    }
-
     [DataContract]
     public class EbMobileSolutionData
     {
         [DataMember(Order = 1)]
-        public List<EbApplicationDataMobile> Applications { set; get; }
-
-        [DataMember(Order = 2)]
-        public EbDataSet OfflineData { set; get; }
+        public List<AppDataToMob> Applications { set; get; }
 
         public EbMobileSolutionData()
         {
-            Applications = new List<EbApplicationDataMobile>();
-            OfflineData = new EbDataSet();
+            Applications = new List<AppDataToMob>();
         }
     }
 
