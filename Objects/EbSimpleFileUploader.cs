@@ -150,10 +150,6 @@ namespace ExpressBase.Objects
 
 		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
-		public override bool IsDisable { get; set; }
-
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
-		[HideInPropertyGrid]
 		public override bool DoNotPersist { get; set; }
 
 		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
