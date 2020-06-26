@@ -793,18 +793,14 @@ namespace ExpressBase.Objects
 
         private void GetFormattedColumn(EbDataColumn dataColumn, EbDataRow dataRow, SingleRow Row, EbControl _control)
         {
+            if (dataColumn == null && _control == null) 
+                throw new FormException("Something went wrong in our end", (int)HttpStatusCodes.INTERNAL_SERVER_ERROR, "EbWebForm.GetFormattedColumn: dataColumn and _control is null", "RowId: " + Row.RowId);
+            
             if (_control != null)
             {
                 if (_control.DoNotPersist && !_control.IsSysControl)
                 {
-                    Row.Columns.Add(new SingleColumn()
-                    {
-                        Name = _control.Name,
-                        Type = (int)_control.EbDbType,
-                        Value = null,
-                        Control = _control,
-                        ObjType = _control.ObjType
-                    });
+                    Row.Columns.Add(_control.GetSingleColumn(this.UserObj, this.SolutionObj, null));
                     return;
                 }
             }
@@ -844,7 +840,7 @@ namespace ExpressBase.Objects
 
             Row.Columns.Add(new SingleColumn()
             {
-                Name = dataColumn.ColumnName,
+                Name = _control == null ? dataColumn.ColumnName : _control.Name,
                 Type = _control == null ? (int)dataColumn.Type : (int)_control.EbDbType,
                 Value = _formattedData,
                 Control = _control,
