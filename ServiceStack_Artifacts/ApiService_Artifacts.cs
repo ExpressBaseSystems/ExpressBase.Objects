@@ -14,7 +14,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
     public interface IEbApiStatusCode
     {
-        HttpStatusCodes StatusCode { set; get; }
+        HttpStatusCode StatusCode { set; get; }
     }
 
     [DataContract]
