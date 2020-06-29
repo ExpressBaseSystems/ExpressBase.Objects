@@ -286,12 +286,14 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         }
     }
 
-    //bulk data
     [DataContract]
-    public class EbMobileSolutionData
+    public class EbMobileSolutionData : IEbApiStatusCode
     {
         [DataMember(Order = 1)]
         public List<AppDataToMob> Applications { set; get; }
+
+        [DataMember(Order = 2)]
+        public HttpStatusCodes StatusCode { get; set; }
 
         public EbMobileSolutionData()
         {
@@ -301,6 +303,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     public class MobileSolutionDataRequest : EbServiceStackAuthRequest, IReturn<EbMobileSolutionData>
     {
-        
+        public bool Export { set; get; }
     }
 }
