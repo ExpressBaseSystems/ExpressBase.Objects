@@ -112,11 +112,14 @@ namespace ExpressBase.Objects
 		[JsonIgnore]
 		public override string DisableJSfn { get { return @"this.__IsDisable = true;
             $(`#cont_${this.EbSid_CtxId}*`).attr('disabled', 'disabled').css('pointer-events', 'none').find('[ui-inp]').css('background-color', '#f3f3f3');
-            $(`#${this.EbSid_CtxId}`).find('.filethumb').attr('disabled', false).css('pointer-events', 'all');"; } set { }
+            $(`#${this.EbSid_CtxId}`).find('.filethumb').attr('disabled', false).css('pointer-events', 'all');
+			 $(`#${this.EbSid_CtxId}`).find('.delete-image').css('display', 'none');"; } set { }
 		}
 
 		[JsonIgnore]
-		public override string EnableJSfn { get { return @"this.__IsDisable = false; $('#cont_' + this.EbSid_CtxId + ' *').prop('disabled',false).css('pointer-events', 'all');"; } set { } }
+		public override string EnableJSfn { get { return @"this.__IsDisable = false; 
+			$('#cont_' + this.EbSid_CtxId + ' *').prop('disabled',false).css('pointer-events', 'all');
+			$(`#${this.EbSid_CtxId}`).find('.delete-image').css('display', '');"; } set { } }
 
 
 		//--------Hide in property grid------------
