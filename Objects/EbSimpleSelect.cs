@@ -46,7 +46,7 @@ namespace ExpressBase.Objects
         {
             get
             {
-                return IsDynamic ? ValueMember.Type : EbDbTypes.String;
+                return MultiSelect ? EbDbTypes.String : (IsDynamic ? ValueMember.Type : EbDbTypes.String);
             }
         }
 

@@ -30,7 +30,7 @@ namespace ExpressBase.Objects
         public string DataSourceId { get; set; }
 
         [EnableInBuilder(BuilderType.BotForm, BuilderType.WebForm)]
-        [HideInPropertyGrid]
+        [MetaOnly]
         public DVColumnCollection Columns { get; set; }
 
         [EnableInBuilder(BuilderType.BotForm, BuilderType.WebForm)]
@@ -477,7 +477,7 @@ namespace ExpressBase.Objects
     public abstract class EbCardField : EbControl
     {
         [EnableInBuilder(BuilderType.BotForm, BuilderType.WebForm)]
-        [HideInPropertyGrid]
+        [MetaOnly]
         public DVColumnCollection Columns { get; set; }
 
         public virtual object FieldValue { get; set; }
