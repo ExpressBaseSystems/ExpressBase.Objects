@@ -11,6 +11,7 @@ using ServiceStack;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Net;
 using System.Runtime.Serialization;
 using static ExpressBase.Objects.EbMeetingScheduler;
 
@@ -419,7 +420,7 @@ namespace ExpressBase.Objects
             String _query = string.Format(this.ValidateQuery, ApprovedSlotId);
             EbDataSet ds = DataDB.DoQueries(_query);
             if (ds.Tables[0].Rows.Count == 0)
-                throw new FormException("Requested meeting slot is invalid", (int)HttpStatusCodes.BAD_REQUEST, "Query returned 0 rows for Meeting slot : " + ApprovedSlotId, "From EbMeetingPicker.ParameterizeControl()");
+                throw new FormException("Requested meeting slot is invalid", (int)HttpStatusCode.BadRequest, "Query returned 0 rows for Meeting slot : " + ApprovedSlotId, "From EbMeetingPicker.ParameterizeControl()");
 
             for (int k = 0; k < ds.Tables[0].Rows.Count; k++)
             {
@@ -467,7 +468,7 @@ namespace ExpressBase.Objects
             //HostInfo.Phone = Convert.ToString(ds.Tables[5].Rows[0]["phone"]);
 
             if (MSD[0].MaxAttendees <= SPC.SlotAttendeeCount)// assuming user in an attendee
-                throw new FormException("Unable to continue. Reached maximum attendee limit.", (int)HttpStatusCodes.BAD_REQUEST, $"Max no of attendee : {MSD[0].MinAttendees}, Current attendee count : {SPC.SlotAttendeeCount}", "From EbMeetingPicker.ParameterizeControl()");
+                throw new FormException("Unable to continue. Reached maximum attendee limit.", (int)HttpStatusCode.BadRequest, $"Max no of attendee : {MSD[0].MinAttendees}, Current attendee count : {SPC.SlotAttendeeCount}", "From EbMeetingPicker.ParameterizeControl()");
 
             string query = string.Empty;
             if (ScheduledParticipants.Count == 0 && MSD[0].MaxAttendees > SPC.SlotAttendeeCount)

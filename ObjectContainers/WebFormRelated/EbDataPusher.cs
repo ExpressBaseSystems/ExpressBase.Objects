@@ -8,6 +8,7 @@ using ExpressBase.Common;
 using System;
 using ExpressBase.Objects.ServiceStack_Artifacts;
 using System.Text.RegularExpressions;
+using System.Net;
 
 namespace ExpressBase.Objects
 {
@@ -187,13 +188,13 @@ namespace ExpressBase.Objects
                 Index++;
             }
             if (!OutDict.ContainsKey(Index))
-                throw new FormException("Exception in C# code evaluation", (int)HttpStatusCodes.INTERNAL_SERVER_ERROR, "Malformed OutputDict from combined cs script evaluation", "Stopped by StopCounter500");
+                throw new FormException("Exception in C# code evaluation", (int)HttpStatusCode.InternalServerError, "Malformed OutputDict from combined cs script evaluation", "Stopped by StopCounter500");
 
             if (Convert.ToInt32(OutDict[Index][0]) == 1)// 1 = success, 2 = exception
             {
                 return OutDict[Index++][1];
             }
-            throw new FormException("Exception in C# code evaluation", (int)HttpStatusCodes.INTERNAL_SERVER_ERROR, $"{OutDict[Index][1]} \n C# code : {CodeDict[Index]}", "");
+            throw new FormException("Exception in C# code evaluation", (int)HttpStatusCode.InternalServerError, $"{OutDict[Index][1]} \n C# code : {CodeDict[Index]}", "");
         }
 
         //Combining all c sharp scripts to be executed as a single program

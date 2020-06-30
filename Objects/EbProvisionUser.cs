@@ -16,6 +16,7 @@ using ServiceStack.RabbitMq;
 using ExpressBase.Objects.ServiceStack_Artifacts;
 using ExpressBase.Common.Constants;
 using ExpressBase.Common.LocationNSolution;
+using System.Net;
 
 namespace ExpressBase.Objects
 {
@@ -287,7 +288,7 @@ this.Init = function(id)
                 EbDataTable dt = DataDB.DoQuery(sql, parameters);
                 if (dt.Rows.Count > 0)
                 {
-                    throw new FormException($"{_d["email"]} already exists", (int)HttpStatusCodes.BAD_REQUEST, $"Email already exists : {_d["email"]}", "EbProvisionUser => ParameterizeControl");
+                    throw new FormException($"{_d["email"]} already exists", (int)HttpStatusCode.BadRequest, $"Email already exists : {_d["email"]}", "EbProvisionUser => ParameterizeControl");
                 }
 
                 this.UserCredentials = new UserCredentials()
