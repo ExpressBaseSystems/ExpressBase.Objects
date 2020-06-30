@@ -11,9 +11,9 @@ using System.Text;
 namespace ExpressBase.Objects
 {
 	[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
-	public class EbEmail: EbControlUI
+	public class EbEmailControl: EbControlUI
 	{
-		public EbEmail()
+		public EbEmailControl()
 		{
 		}
 		[OnDeserialized]
@@ -25,7 +25,7 @@ namespace ExpressBase.Objects
 		}
 		public override string ToolIconHtml { get { return "<i class='fa fa-envelope '></i>"; } set { } }
 
-		public override string ToolNameAlias { get { return "Email"; } set { } }
+		public override string ToolNameAlias { get { return "EmailControl"; } set { } }
 
 		public override string ToolHelpText { get { return "Email"; } set { } }
 		public override string UIchangeFns
