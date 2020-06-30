@@ -133,9 +133,10 @@ namespace ExpressBase.Objects
         {
             return @" 
         <div class='ebimg-cont'>
-            <img id='@name@' src='@src@' style='max-width:@maxwidth@px; max-height:@maxheight@px;'>
+            <img id='@ebsid@' name='@name@' src='@src@' style='max-width:@maxwidth@px; max-height:@maxheight@px;'>
         </div>"
-    .Replace("@name@", this.Name)
+	.Replace("@name@", this.Name)
+	.Replace("@ebsid@", this.EbSid)
     .Replace("@src@", (this.ImageId > 0) ? "../images/" + this.ImageId + ".jpg" : "/images/image.png")
     .Replace("@toolTipText@", this.ToolTipText)
     .Replace("@value@", "")//"value='" + this.Value + "'")
