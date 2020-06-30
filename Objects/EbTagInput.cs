@@ -68,7 +68,7 @@ namespace ExpressBase.Objects.Objects
 
 		[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
-		public override EbScript VisibleExpr { get; set; }
+		public override EbScript HideExpr { get; set; }
 
 		[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]

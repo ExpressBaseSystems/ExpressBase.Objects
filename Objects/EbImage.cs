@@ -165,7 +165,7 @@ namespace ExpressBase.Objects
         public override EbScript DefaultValueExpression { get; set; }
 
         [HideInPropertyGrid]
-        public override EbScript VisibleExpr { get; set; }
+        public override EbScript HideExpr { get; set; }
 
         [HideInPropertyGrid]
         public override string BackColor { get; set; }
