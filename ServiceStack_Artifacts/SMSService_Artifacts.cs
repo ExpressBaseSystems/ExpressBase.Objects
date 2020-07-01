@@ -1,4 +1,5 @@
-﻿using ExpressBase.Common.Data;
+﻿using ExpressBase.Common;
+using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
 using ServiceStack;
 using System;
@@ -117,5 +118,27 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         
         [DataMember(Order = 3)]
         public string MetaData { get; set; }
+    }
+
+    [DataContract]
+    public class ListSMSLogsResponse
+    {
+        [DataMember(Order = 1)]
+        public ColumnColletion SMSLogsColumns { get; set; }
+
+        [DataMember(Order = 2)]
+        public RowColletion SMSLogsRows { get; set; }
+
+        [DataMember(Order = 3)]
+        public string SMSLogsDvColumns { get; set; }
+
+        [DataMember(Order = 4)]
+        public List<GroupingDetails> Levels { get; set; }
+
+        [DataMember(Order = 5)]
+        public RowColletion FormattedData { get; set; }
+
+        [DataMember(Order = 6)]
+        public string Visualization { get; set; }
     }
 }
