@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Text;
 
-namespace ExpressBase.Objects.Objects
+namespace ExpressBase.Objects
 {
 	[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
 	public class EbTagInput: EbControlUI
