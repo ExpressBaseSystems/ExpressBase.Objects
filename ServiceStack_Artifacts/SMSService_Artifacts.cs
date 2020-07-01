@@ -31,6 +31,19 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
+    public class SmsDirectRequest : EbServiceStackAuthRequest
+    {
+        [DataMember(Order = 1)]
+        public string To { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Body { get; set; }
+
+        [DataMember(Order = 3)]
+        public string MediaUrl { get; set; }       
+        
+    }
+    [DataContract]
     public class SMSPrepareRequest : EbServiceStackAuthRequest
     {
         [DataMember(Order = 1)]
