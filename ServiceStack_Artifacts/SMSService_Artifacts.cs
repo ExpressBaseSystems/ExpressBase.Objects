@@ -1,5 +1,6 @@
 ﻿using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
+using ExpressBase.Objects.Objects.SmsRelated;
 using ServiceStack;
 using System;
 using System.Collections.Generic;
@@ -40,8 +41,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Body { get; set; }
 
         [DataMember(Order = 3)]
-        public string MediaUrl { get; set; }       
-        
+        public string MediaUrl { get; set; }
+
     }
     [DataContract]
     public class SMSPrepareRequest : EbServiceStackAuthRequest
@@ -80,6 +81,32 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 4)]
         public string RefId { get; set; }
+    }
+
+
+    [DataContract]
+    public class GetFilledSmsTemplateRequest : EbServiceStackAuthRequest, IReturn<GetFilledSmsTemplateResponse>
+    {
+        [DataMember(Order = 1)]
+        public int ObjId { get; set; }
+
+        [DataMember(Order = 2)]
+        public List<Param> Params { get; set; }
+
+        [DataMember(Order = 4)]
+        public string RefId { get; set; }
+    }
+
+    public class GetFilledSmsTemplateResponse
+    {
+        public FilledSmsTemplate FilledSmsTemplate { get; set; }
+    }
+
+    public class FilledSmsTemplate
+    {
+        public string SmsTo { get; set; }
+
+        public EbSmsTemplate SmsTemplate { get; set; }
     }
 
     [DataContract]
@@ -126,8 +153,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public SMSSentStatus SMSSentStatus { get; set; }
 
         [DataMember(Order = 2)]
-        public string RefId { get; set; }   
-        
+        public string RefId { get; set; }
+
         [DataMember(Order = 3)]
         public string MetaData { get; set; }
     }
