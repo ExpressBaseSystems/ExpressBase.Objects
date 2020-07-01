@@ -1,4 +1,5 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Constants;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
@@ -11,10 +12,11 @@ using System.Text;
 namespace ExpressBase.Objects
 {
 	[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
-	public class EbEmail: EbControlUI
+	public class EbVideo: EbControlUI
 	{
-		public EbEmail()
+		public EbVideo()
 		{
+
 		}
 		[OnDeserialized]
 		public void OnDeserializedMethod(StreamingContext context)
@@ -23,20 +25,13 @@ namespace ExpressBase.Objects
 			this.BareControlHtml4Bot = this.BareControlHtml;
 			this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
 		}
-		public override string ToolIconHtml { get { return "<i class='fa fa-envelope '></i>"; } set { } }
 
-		public override string ToolNameAlias { get { return "Email"; } set { } }
+		public override string ToolIconHtml { get { return "<i class='fa fa-video-camera'></i>"; } set { } }
 
-		public override string ToolHelpText { get { return "Email"; } set { } }
-		public override string UIchangeFns
-		{
-			get
-			{
-				return @"EbTagInput = {
-                
-            }";
-			}
-		}
+		public override string ToolNameAlias { get { return "Video"; } set { } }
+
+		public override string ToolHelpText { get { return "Video"; } set { } }
+
 		//--------Hide in property grid------------
 		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
@@ -60,7 +55,7 @@ namespace ExpressBase.Objects
 
 		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
-		public override EbScript VisibleExpr { get; set; }
+		public override EbScript HideExpr { get; set; }
 
 		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
@@ -92,24 +87,67 @@ namespace ExpressBase.Objects
 
 		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
-		public override EbDbTypes EbDbType { get { return EbDbTypes.String; } set { } }
+		public override EbScript OnChangeFn { get; set; }
+
+		//[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+		//[HideInPropertyGrid]
+		//public override EbDbTypes EbDbType { get { return EbDbTypes.String; } set { } }
+
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+		[HideInPropertyGrid]
+		public override bool IsFullViewContol { get => true; set => base.IsFullViewContol = value; }
+
+		//[HideInPropertyGrid]
+		//[EnableInBuilder(BuilderType.BotForm)]
+		//public override bool IsReadOnly { get => true; }
+
+		[HideInPropertyGrid]
+		[EnableInBuilder(BuilderType.BotForm)]
+		public override bool IsDisable { get => true; }
+
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+		public override bool IsNonDataInputControl { get => true; }
+
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+		[PropertyGroup(PGConstants.APPEARANCE)]
+		[DefaultPropValue("150")]
+		public int MaxHeight { get; set; }
+
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+		[PropertyGroup(PGConstants.APPEARANCE)]
+		[DefaultPropValue("300")]
+		public int MaxWidth { get; set; }
+
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+		[Alias("Video Url")]
+		public string VideoUrl { get; set; }
 
 		public override string GetBareHtml()
 		{
-			return @"<div class='input-group @ebsid@_cont'>
-						  <span class='input-group-addon'> <i class='fa fa-envelope aria-hidden='true' class='input-group-addon'></i> </span>
-						  <input type='email' placeholder='' id='@ebsid@' name='@name@' style='width:100%; display:inline-block;'>
+			return @"<div class=' @ebsid@_cont'>
+						  <iframe id='@ebsid@' name='@name@'  width='@framewidth@' height='@frameheight@' controls src='@VideoUrl@'>
+							</iframe>
 					</div>"
 .Replace("@ebsid@", String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId)
 .Replace("@name@", this.Name)
 .Replace("@toolTipText@", this.ToolTipText)
-.Replace("@value@", "");
+.Replace("@value@", "")
+.Replace("@VideoUrl@", this.VideoUrl)
+.Replace("@framewidth@", this.MaxWidth.ToString())
+.Replace("@frameheight@", this.MaxHeight.ToString());
 
 		}
 
 		public override string GetDesignHtml()
 		{
-			return GetHtml().RemoveCR().DoubleQuoted();
+			string EbCtrlHTML = HtmlConstants.CONTROL_WRAPER_HTML4WEB
+			  .Replace("@barehtml@", @"                       
+                        <div class='videoframecont' style='width:100%; '> 
+                             <img id='@ebsid@' name='@name@' src='/images/video_thump.jpg' style='max-width:200px; max-height:150px;'>
+                        </div>
+                ").RemoveCR().DoubleQuoted();
+			
+			return ReplacePropsInHTML(EbCtrlHTML); 
 		}
 
 		public override string GetHtml()
@@ -126,34 +164,5 @@ namespace ExpressBase.Objects
 			get => this.GetBareHtml();
 			set => base.DesignHtml4Bot = value;
 		}
-
-		public override string GetValueFromDOMJSfn
-		{
-			get
-			{
-				return @" return $(`#${this.EbSid}`).val();";
-			}
-			set { }
-		}
-
-		public override string OnChangeBindJSFn
-		{
-			get
-			{
-				return @"$(`#${this.EbSid}`).on('change', p1);";
-			}
-			set { }
-		}
-
-		public override string SetValueJSfn
-		{
-			get
-			{
-				return @" $(`#${this.EbSid}`).val(p1);";
-			}
-			set { }
-		}
-
-
 	}
 }

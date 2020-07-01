@@ -1110,6 +1110,55 @@ pg.ShowProperty('SubTypeFormat');
         [PropertyGroup("Search")]
         public StringOperators DefaultOperator { get; set; }
 
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
+        [DefaultPropValue("0")]
+        [PropertyEditor(PropertyEditorType.DropDown)]
+        [PropertyGroup(PGConstants.CORE)]
+        [PropertyPriority(10)]
+        [OnChangeExec(@"
+pg.HideProperty('TrueValue');
+pg.HideProperty('FalseValue');
+pg.HideGroup('FormSettings');
+pg.HideGroup('Image');
+pg.HideGroup('LinkFromColumn');
+if(this.RenderAs === 2){
+console.log('Render as link');
+    pg.ShowGroup('Link');
+    pg.ShowProperty('LinkType');
+    pg.ShowProperty('HideLinkifNoData');
+    pg.HideGroup('TreeVisualization');
+    pg.setSimpleProperty('IsTree', false);
+}
+else if(this.RenderAs === 6){
+console.log('Render as tree');
+    pg.ShowGroup('TreeVisualization');
+    pg.setSimpleProperty('IsTree', true);
+    pg.HideGroup('Link');
+    pg.HideProperty('HideLinkifNoData');
+    pg.ShowProperty('LinkType');
+}
+else{
+console.log('Render as other');
+if(this.RenderAs === 7){
+pg.setSimpleProperty('RenderType', 3);
+pg.ShowProperty('TrueValue');
+pg.ShowProperty('FalseValue');
+}
+if(this.RenderAs === 4){
+    pg.ShowGroup('Image');
+}
+if(this.RenderAs === 9){
+    pg.ShowGroup('LinkFromColumn');
+}
+    pg.HideGroup('Link');
+    pg.HideProperty('LinkType');
+    pg.HideProperty('HideLinkifNoData');
+    pg.setSimpleProperty('LinkRefId', null);
+    pg.HideGroup('TreeVisualization');
+    pg.setSimpleProperty('IsTree', false);
+    }")]
+        public StringRenderType RenderAs { get; set; }
+
         public DVPhoneColumn()
         {
             this.ConditionalFormating = new List<ColumnCondition>();

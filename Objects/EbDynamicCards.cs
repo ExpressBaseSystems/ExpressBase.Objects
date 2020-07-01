@@ -749,7 +749,7 @@ namespace ExpressBase.Objects
             return @"<div class='card-numeric-cont data-@Name@' style='@display@' data-value='@Value@'>
 						<div style='display: inline-block; width: 38%;'> <span class='card-inp-title'> @Label@ </span> </div> 
 						<div class='inp-wrap'>
-							<button limit='@MinValue@' class='card-pls-mns mns'>
+							<button limit='@MinValue@' class='card-pls-mns mns' @btnNumHide@>
 								<i class='fa fa-minus' aria-hidden='true'></i>
 							</button>
 							<div class='cart-inp-wraper'>
@@ -764,15 +764,16 @@ namespace ExpressBase.Objects
 														$(event.target).val($(event.target).parents(&quot;.card-numeric-cont&quot;).attr(&quot;data-value&quot;));
 								'>
 							</div>
-							<button limit='@MaxValue@' class='card-pls-mns pls'>
+							<button limit='@MaxValue@' class='card-pls-mns pls' @btnNumHide@>
 								<i class='fa fa-plus' aria-hidden='true'></i>
 							</button>
 						</div>
 					</div>"
-                        .Replace("@Value@", (this.FieldValue == null) ? "1" : ((tempvar is Double) ? tempvar.ToString("0.00") : tempvar.ToString()))
+						.Replace("@Value@", (this.FieldValue == null) ? "1" : ((tempvar is Double) ? tempvar.ToString("0.00") : tempvar.ToString()))
                         .Replace("@display@", this.HideInCard ? "display:none;" : "").Replace("@Name@", this.Name ?? "@Name@")
                         .Replace("@Label@", this.Label.IsNullOrEmpty() ? this.Name : this.Label)
                         .Replace("@ReadOnly@", this.IsDisable ? "readonly" : "")
+                        .Replace("@btnNumHide@", this.IsDisable ? "hidden" : "")
                         .Replace("@PlusMinusDisplay@", this.IsDisable ? "visibility: hidden;" : "display:inline-block;")
                         .Replace("@MinValue@", this.MinimumValue.ToString())
                         .Replace("@MaxValue@", this.MaximumValue.ToString());

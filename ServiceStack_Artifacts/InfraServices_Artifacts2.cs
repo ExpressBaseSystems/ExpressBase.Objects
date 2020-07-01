@@ -441,6 +441,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public bool Is2faEnabled { get; set; }
 
+        public string OtpDelivery { get; set; }
+
         public SolutionSettings SolutionSettings { get; set; }
     }
 
@@ -557,7 +559,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         public bool Value { get; set; }
 
-        public string solution_id { get; set; } 
+        public string DeliveryMethod { get; set; }
+
+        public string solution_id { get; set; }
 
         public solutionChangeColumn ChangeColumn { get; set; }
     }

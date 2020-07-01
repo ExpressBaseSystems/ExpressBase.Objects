@@ -15,6 +15,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		
 		[DataMember(Order = 2)]
 		public int AnonId { get; set; }
-	}
+    }
 
 }
