@@ -8,29 +8,26 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Text;
 
-namespace ExpressBase.Objects.Objects
+namespace ExpressBase.Objects
 {
-	[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
-	public class EbTagInput: EbControlUI
+	[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+	public class EbEmailControl: EbControlUI
 	{
-		public EbTagInput()
+		public EbEmailControl()
 		{
-
 		}
-
 		[OnDeserialized]
 		public void OnDeserializedMethod(StreamingContext context)
 		{
 			this.BareControlHtml = this.GetBareHtml();
+			this.BareControlHtml4Bot = this.BareControlHtml;
 			this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
 		}
+		public override string ToolIconHtml { get { return "<i class='fa fa-envelope '></i>"; } set { } }
 
-		public override string ToolIconHtml { get { return "<i class='fa fa-tags'></i>"; } set { } }
+		public override string ToolNameAlias { get { return "EmailControl"; } set { } }
 
-		public override string ToolNameAlias { get { return "Tag Input"; } set { } }
-
-		public override string ToolHelpText { get { return "Tag Input"; } set { } }
-
+		public override string ToolHelpText { get { return "Email"; } set { } }
 		public override string UIchangeFns
 		{
 			get
@@ -40,99 +37,69 @@ namespace ExpressBase.Objects.Objects
             }";
 			}
 		}
-
-
-
-
-
 		//--------Hide in property grid------------
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override string HelpText { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override string ToolTipText { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override bool Unique { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override List<EbValidator> Validators { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override EbScript DefaultValueExpression { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override EbScript HideExpr { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override EbScript ValueExpr { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override bool Required { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override bool DoNotPersist { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override string BackColor { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override string ForeColor { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override string LabelBackColor { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override string LabelForeColor { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
-		[HideInPropertyGrid]
-		public override EbScript OnChangeFn { get; set; }
-
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override EbDbTypes EbDbType { get { return EbDbTypes.String; } set { } }
 
-
-
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
-		[HideInPropertyGrid]
-		public bool Textareas { get; set; }
-
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
-		[HideInPropertyGrid]
-		[PropertyEditor(PropertyEditorType.Color)]
-		public string TagColor { get; set; }
-
-		//[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
-		//[DefaultPropValue("12")]
-		//[Alias("Font size")]
-		//public  int FontSizes { get; set; }
-
-
-
-
 		public override string GetBareHtml()
 		{
-
-
-			return @" 
- <div id='@ebsid@' class='tagInputDiv'  >  
-	<input type='text' name='@ebsid@_tags' value='' size='42' data-role='tagsinput'  />
-</div>"
+			return @"<div class='input-group @ebsid@_cont'>
+						  <span class='input-group-addon'> <i class='fa fa-envelope aria-hidden='true' class='input-group-addon'></i> </span>
+						  <input type='email' placeholder='' id='@ebsid@' name='@name@' style='width:100%; display:inline-block;'>
+					</div>"
 .Replace("@ebsid@", String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId)
 .Replace("@name@", this.Name)
 .Replace("@toolTipText@", this.ToolTipText)
@@ -153,11 +120,18 @@ namespace ExpressBase.Objects.Objects
 
 			return ReplacePropsInHTML(EbCtrlHTML);
 		}
+
+		public override string DesignHtml4Bot
+		{
+			get => this.GetBareHtml();
+			set => base.DesignHtml4Bot = value;
+		}
+
 		public override string GetValueFromDOMJSfn
 		{
 			get
 			{
-				return @" return $('input[name = ' + this.EbSid_CtxId +'_tags]').val();";
+				return @" return $(`#${this.EbSid}`).val();";
 			}
 			set { }
 		}
@@ -166,7 +140,7 @@ namespace ExpressBase.Objects.Objects
 		{
 			get
 			{
-				return @"$('input[name = ' + this.EbSid_CtxId + '_tags]').on('change', p1);";
+				return @"$(`#${this.EbSid}`).on('change', p1);";
 			}
 			set { }
 		}
@@ -175,21 +149,11 @@ namespace ExpressBase.Objects.Objects
 		{
 			get
 			{
-				return @"$('input[name = ' + this.EbSid_CtxId + '_tags]').tagsinput('refresh');
-							$('input[name = ' + this.EbSid_CtxId + '_tags]').tagsinput('add', p1);";
+				return @" $(`#${this.EbSid}`).val(p1);";
 			}
 			set { }
 		}
 
-		public override string ClearJSfn
-		{
-			get
-			{
-				return @"$('input[name = ' + this.EbSid_CtxId + '_tags]').val('');";
-			}
-			set { }
-		}
 
-		
 	}
 }
