@@ -39,6 +39,16 @@ namespace ExpressBase.Objects.WebFormRelated
             CalcValueExprDependency(_dict);
             ValidateAndUpdateReviewCtrl(_this, ebReviewCtrl, _dict);
             ValidateNotificationProp(_this.Notifications, _dict);
+
+            _this.DefaultValsExecOrder = new List<string>();
+            for (int i = 0; i < _dict.Count; i++)
+            {
+                EbControl ctrl = _dict[i].Control;
+                if (!string.IsNullOrEmpty(ctrl.DefaultValueExpression?.Code))
+                    _this.DefaultValsExecOrder.Add(_dict[i].Path);
+            }
+
+
         }
 
         private static void ValidateAndUpdateReviewCtrl(EbWebForm _this, EbReview ebReviewCtrl, Dictionary<int, EbControlWrapper> _dict)

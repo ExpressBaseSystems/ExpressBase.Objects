@@ -534,6 +534,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 6)]
         public Dictionary<string, List<EbIntegrationData>> Integrations { set; get; }
 
+        [DataMember(Order = 7)]
+        public bool IsSmsIntegrated { set; get; }
+
+        [DataMember(Order = 8)]
+        public bool IsEmailIntegrated { set; get; }
+
+
     }
     public class EbIntegrationConfData
     {
