@@ -39,16 +39,8 @@ namespace ExpressBase.Objects.WebFormRelated
             CalcValueExprDependency(_dict);
             ValidateAndUpdateReviewCtrl(_this, ebReviewCtrl, _dict);
             ValidateNotificationProp(_this.Notifications, _dict);
-
-            _this.DefaultValsExecOrder = new List<string>();
-            for (int i = 0; i < _dict.Count; i++)
-            {
-                EbControl ctrl = _dict[i].Control;
-                if (!string.IsNullOrEmpty(ctrl.DefaultValueExpression?.Code))
-                    _this.DefaultValsExecOrder.Add(_dict[i].Path);
-            }
-
-
+            SetDefaultValueExprExecOrder(_this, _dict);
+            CalcHideAndDisableExprDependency(_dict);
         }
 
         private static void ValidateAndUpdateReviewCtrl(EbWebForm _this, EbReview ebReviewCtrl, Dictionary<int, EbControlWrapper> _dict)
@@ -346,10 +338,10 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
 
             for (int i = 0; i < _dict.Count; i++)
             {
-                _dict[i].Control.DependedValExp.Clear();
-                _dict[i].Control.ValExpParams.Clear();
+                _dict[i].Control.DependedValExp = new List<string>();
+                _dict[i].Control.ValExpParams = new List<string>();
 
-                if (_dict[i].Control.ValueExpr != null && !string.IsNullOrEmpty(_dict[i].Control.ValueExpr.Code))
+                if (!string.IsNullOrEmpty(_dict[i].Control.ValueExpr?.Code))
                 {
                     CalcFlds.Add(i);
                     ExeOrd.Add(i);
@@ -359,7 +351,7 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                     CalcFlds.Add(i);
                     ExeOrd.Add(i);
                 }
-                if (_dict[i].Control.OnChangeFn != null && !string.IsNullOrEmpty(_dict[i].Control.OnChangeFn.Code))
+                if (!string.IsNullOrEmpty(_dict[i].Control.OnChangeFn?.Code))
                 {
                     if (_dict[i].Control.OnChangeFn.Code.Contains(".setValue(") && !(_dict[i].Control is EbScriptButton))
                     {
@@ -473,6 +465,105 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                     }
                 }
                 _dict[ExeOrd[i]].Control.DependedValExp.AddRange(extList);
+            }
+        }
+
+        //Populate Property DefaultValsExecOrder
+        private static void SetDefaultValueExprExecOrder(EbWebForm _this, Dictionary<int, EbControlWrapper> _dict)
+        {
+            _this.DefaultValsExecOrder = new List<string>();//cleared the old values
+            List<int> CalcFlds = new List<int>();
+            List<KeyValuePair<int, int>> dpndcy = new List<KeyValuePair<int, int>>();
+            List<int> ExecOrd = new List<int>();
+
+            for (int i = 0; i < _dict.Count; i++)
+            {
+                if (!string.IsNullOrEmpty(_dict[i].Control.DefaultValueExpression?.Code))
+                    CalcFlds.Add(i);
+            }
+
+            for (int i = 0; i < CalcFlds.Count; i++)
+            {
+                string code = _dict[CalcFlds[i]].Control.DefaultValueExpression.Code;
+                if (_dict[CalcFlds[i]].Control.DefaultValueExpression.Lang == ScriptingLanguage.JS)
+                {
+                    if (code.Contains("form"))
+                    {
+                        bool IsAnythingResolved = false;
+                        for (int j = 0; j < _dict.Count; j++)
+                        {
+                            string p = _dict[j].Path, r = _dict[j].Root, n = _dict[j].Control.Name;
+                            string regex = $@"{r}.currentRow\[""{n}""\]|{r}.currentRow\['{n}'\]|{r}.currentRow.{n}|{r}.getRowByIndex\((.*?)\)\[""{n}""\]|{r}.getRowByIndex\((.*?)\)\['{n}'\]|{p}";
+
+                            if (Regex.IsMatch(code, regex))
+                            {
+                                if (CalcFlds[i] != j)//if a control refers itself treated as not circular reference
+                                    dpndcy.Add(new KeyValuePair<int, int>(CalcFlds[i], j));//<dependent, dominant>
+                                IsAnythingResolved = true;
+                            }
+                        }
+                        if (!IsAnythingResolved)
+                            throw new FormException($"Can't resolve some form variables in Js Default value expression of {_dict[CalcFlds[i]].Control.Name}");
+                    }
+                }
+            }
+            int stopCounter = 0;
+            while (CalcFlds.Count > ExecOrd.Count && stopCounter < CalcFlds.Count)
+            {
+                for (int i = 0; i < CalcFlds.Count; i++)
+                {
+                    if (dpndcy.FindIndex(x => x.Key == CalcFlds[i]) == -1 && !ExecOrd.Contains(CalcFlds[i]))
+                    {
+                        ExecOrd.Add(CalcFlds[i]);
+                        dpndcy.RemoveAll(x => x.Value == CalcFlds[i]);
+                    }
+                }
+                stopCounter++;
+            }
+            if (dpndcy.Count > 0)
+                throw new FormException("Avoid circular reference by the following controls in 'DefaultValueExpression' : " + string.Join(',', dpndcy.Select(e => _dict[e.Key].Control.Name).Distinct()));
+
+            foreach (int i in ExecOrd)
+                _this.DefaultValsExecOrder.Add(_dict[i].Path);
+        }
+
+        private static void CalcHideAndDisableExprDependency(Dictionary<int, EbControlWrapper> _dict)
+        {
+            for (int i = 0; i < _dict.Count; i++)
+            {
+                _dict[i].Control.DependedHideExp = new List<string>();
+                _dict[i].Control.DependedDisableExp = new List<string>();
+            }
+            for (int i = 0; i < _dict.Count; i++)
+            {
+                CheckHideAndDisableCode(_dict[i], _dict, _dict[i].Control.HideExpr, _dict[i].Control.DependedHideExp, "Hide expression");
+                CheckHideAndDisableCode(_dict[i], _dict, _dict[i].Control.DisableExpr, _dict[i].Control.DependedDisableExp, "Disable expression");
+            }
+        }
+
+        private static void CheckHideAndDisableCode(EbControlWrapper ctrlWrap, Dictionary<int, EbControlWrapper> _dict, EbScript ebScript, List<string> dependant, string msg)
+        {
+            if (string.IsNullOrEmpty(ebScript?.Code))
+                return;
+            if (ebScript.Lang == ScriptingLanguage.JS)
+            {
+                if (ebScript.Code.Contains("form"))
+                {
+                    bool IsAnythingResolved = false;
+                    for (int j = 0; j < _dict.Count; j++)
+                    {
+                        string p = _dict[j].Path, r = _dict[j].Root, n = _dict[j].Control.Name;
+                        string regex = $@"{r}.currentRow\[""{n}""\]|{r}.currentRow\['{n}'\]|{r}.currentRow.{n}|{r}.getRowByIndex\((.*?)\)\[""{n}""\]|{r}.getRowByIndex\((.*?)\)\['{n}'\]|{p}";
+
+                        if (Regex.IsMatch(ebScript.Code, regex))
+                        {
+                            dependant.Add(ctrlWrap.Path);
+                            IsAnythingResolved = true;
+                        }
+                    }
+                    if (!IsAnythingResolved)
+                        throw new FormException($"Can't resolve some form variables in Js {msg} of {ctrlWrap.Control.Name}");
+                }
             }
         }
 
