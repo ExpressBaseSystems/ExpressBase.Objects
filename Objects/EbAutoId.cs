@@ -39,6 +39,9 @@ namespace ExpressBase.Objects
 
         [HideInPropertyGrid]
         public override EbScript HideExpr { get; set; }
+        
+        [HideInPropertyGrid]
+        public override EbScript DisableExpr { get; set; }
 
         #endregion
 

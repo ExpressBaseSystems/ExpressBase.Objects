@@ -205,6 +205,7 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public override List<EbValidator> Validators { get => base.Validators; set => base.Validators = value; }
         public override EbScript HideExpr { get => base.HideExpr; set => base.HideExpr = value; }
+        public override EbScript DisableExpr { get => base.DisableExpr; set => base.DisableExpr = value; }
 
 
         public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
@@ -385,6 +386,7 @@ namespace ExpressBase.Objects
         public override List<EbValidator> Validators { get => base.Validators; set => base.Validators = value; }
         public override EbScript ValueExpr { get => base.ValueExpr; set => base.ValueExpr = value; }
         public override EbScript HideExpr { get => base.HideExpr; set => base.HideExpr = value; }
+        public override EbScript DisableExpr { get => base.DisableExpr; set => base.DisableExpr = value; }
         public override bool IsDisable { get => base.IsDisable; set => base.IsDisable = value; }
 
         //EbSysCreatedBy
@@ -606,6 +608,7 @@ namespace ExpressBase.Objects
         public override List<EbValidator> Validators { get => base.Validators; set => base.Validators = value; }
         public override EbScript ValueExpr { get => base.ValueExpr; set => base.ValueExpr = value; }
         public override EbScript HideExpr { get => base.HideExpr; set => base.HideExpr = value; }
+        public override EbScript DisableExpr { get => base.DisableExpr; set => base.DisableExpr = value; }
         public override bool IsDisable { get => base.IsDisable; set => base.IsDisable = value; }
 
         //EbSysCreatedAt
@@ -756,6 +759,7 @@ namespace ExpressBase.Objects
         public override List<EbValidator> Validators { get => base.Validators; set => base.Validators = value; }
         public override EbScript ValueExpr { get => base.ValueExpr; set => base.ValueExpr = value; }
         public override EbScript HideExpr { get => base.HideExpr; set => base.HideExpr = value; }
+        public override EbScript DisableExpr { get => base.DisableExpr; set => base.DisableExpr = value; }
         public override bool IsDisable { get => base.IsDisable; set => base.IsDisable = value; }
 
         //EbSysModifiedBy
@@ -932,6 +936,7 @@ namespace ExpressBase.Objects
         public override List<EbValidator> Validators { get => base.Validators; set => base.Validators = value; }
         public override EbScript ValueExpr { get => base.ValueExpr; set => base.ValueExpr = value; }
         public override EbScript HideExpr { get => base.HideExpr; set => base.HideExpr = value; }
+        public override EbScript DisableExpr { get => base.DisableExpr; set => base.DisableExpr = value; }
         public override bool IsDisable { get => base.IsDisable; set => base.IsDisable = value; }
 
         //EbSysModifiedAt

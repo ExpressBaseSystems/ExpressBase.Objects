@@ -39,16 +39,8 @@ namespace ExpressBase.Objects.WebFormRelated
             CalcValueExprDependency(_dict);
             ValidateAndUpdateReviewCtrl(_this, ebReviewCtrl, _dict);
             ValidateNotificationProp(_this.Notifications, _dict);
-
-            _this.DefaultValsExecOrder = new List<string>();
-            for (int i = 0; i < _dict.Count; i++)
-            {
-                EbControl ctrl = _dict[i].Control;
-                if (!string.IsNullOrEmpty(ctrl.DefaultValueExpression?.Code))
-                    _this.DefaultValsExecOrder.Add(_dict[i].Path);
-            }
-
-
+            SetDefaultValueExprExecOrder(_this, _dict);
+            CalcHideAndDisableExprDependency(_dict);
         }
 
         private static void ValidateAndUpdateReviewCtrl(EbWebForm _this, EbReview ebReviewCtrl, Dictionary<int, EbControlWrapper> _dict)
@@ -342,29 +334,20 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
         {
             List<int> CalcFlds = new List<int>();
             List<KeyValuePair<int, int>> dpndcy = new List<KeyValuePair<int, int>>();
-            List<int> ExeOrd = new List<int>();
 
             for (int i = 0; i < _dict.Count; i++)
             {
-                _dict[i].Control.DependedValExp.Clear();
-                _dict[i].Control.ValExpParams.Clear();
+                _dict[i].Control.DependedValExp = new List<string>();
+                _dict[i].Control.ValExpParams = new List<string>();
 
-                if (_dict[i].Control.ValueExpr != null && !string.IsNullOrEmpty(_dict[i].Control.ValueExpr.Code))
-                {
+                if (!string.IsNullOrEmpty(_dict[i].Control.ValueExpr?.Code))
                     CalcFlds.Add(i);
-                    ExeOrd.Add(i);
-                }
                 if (_dict[i].Control is EbTVcontrol && (_dict[i].Control as EbTVcontrol).ParamsList?.Count > 0)
-                {
                     CalcFlds.Add(i);
-                    ExeOrd.Add(i);
-                }
-                if (_dict[i].Control.OnChangeFn != null && !string.IsNullOrEmpty(_dict[i].Control.OnChangeFn.Code))
+                if (!string.IsNullOrEmpty(_dict[i].Control.OnChangeFn?.Code))
                 {
                     if (_dict[i].Control.OnChangeFn.Code.Contains(".setValue(") && !(_dict[i].Control is EbScriptButton))
-                    {
                         throw new FormException("SetValue is not allowed in OnChange expression of " + _dict[i].Control.Name);
-                    }
                 }
             }
 
@@ -395,8 +378,7 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
 
                             if (Regex.IsMatch(code, regex))
                             {
-                                if (CalcFlds[i] != j)//if a control refers itself treated as not circular reference
-                                    dpndcy.Add(new KeyValuePair<int, int>(CalcFlds[i], j));//<dependent, dominant>
+                                dpndcy.Add(new KeyValuePair<int, int>(CalcFlds[i], j));//<dependent, dominant>
                                 IsAnythingResolved = true;
                             }
                         }
@@ -413,66 +395,131 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                         if (item.Value == null)
                             throw new FormException($"Can't resolve {match.Value} in SQL Value expression of {_dict[CalcFlds[i]].Control.Name}");
 
-                        if (CalcFlds[i] != item.Key)
-                            dpndcy.Add(new KeyValuePair<int, int>(CalcFlds[i], item.Key));//<dependent, dominant>
+                        dpndcy.Add(new KeyValuePair<int, int>(CalcFlds[i], item.Key));//<dependent, dominant>
                         _dict[CalcFlds[i]].Control.ValExpParams.Add(item.Value.Path);
                     }
                 }
-
             }
 
+            for (int i = 0; i < CalcFlds.Count; i++)
+            {
+                List<int> execOrder = new List<int> { CalcFlds[i] };
+                GetValExpDependentsRec(execOrder, dpndcy, CalcFlds[i]);
+                if (dpndcy.FindIndex(x => x.Key == CalcFlds[i] && x.Value == CalcFlds[i]) == -1)
+                    execOrder.Remove(CalcFlds[i]);
+                foreach (int key in execOrder)
+                    _dict[CalcFlds[i]].Control.DependedValExp.Add(_dict[key].Path);
+            }
+        }
+
+        private static void GetValExpDependentsRec(List<int> execOrder, List<KeyValuePair<int, int>> dpndcy, int seeker)
+        {
+            foreach (KeyValuePair<int, int> item in dpndcy.Where(e => e.Value == seeker))
+            {
+                if (!execOrder.Contains(item.Key))
+                {
+                    execOrder.Add(item.Key);
+                    GetValExpDependentsRec(execOrder, dpndcy, item.Key);
+                }
+            }
+        }
+
+        //Populate Property DefaultValsExecOrder
+        private static void SetDefaultValueExprExecOrder(EbWebForm _this, Dictionary<int, EbControlWrapper> _dict)
+        {
+            _this.DefaultValsExecOrder = new List<string>();//cleared the old values
+            List<int> CalcFlds = new List<int>();
+            List<KeyValuePair<int, int>> dpndcy = new List<KeyValuePair<int, int>>();
+            List<int> ExecOrd = new List<int>();
+
+            for (int i = 0; i < _dict.Count; i++)
+            {
+                if (!string.IsNullOrEmpty(_dict[i].Control.DefaultValueExpression?.Code))
+                    CalcFlds.Add(i);
+            }
+
+            for (int i = 0; i < CalcFlds.Count; i++)
+            {
+                string code = _dict[CalcFlds[i]].Control.DefaultValueExpression.Code;
+                if (_dict[CalcFlds[i]].Control.DefaultValueExpression.Lang == ScriptingLanguage.JS)
+                {
+                    if (code.Contains("form"))
+                    {
+                        bool IsAnythingResolved = false;
+                        for (int j = 0; j < _dict.Count; j++)
+                        {
+                            string p = _dict[j].Path, r = _dict[j].Root, n = _dict[j].Control.Name;
+                            string regex = $@"{r}.currentRow\[""{n}""\]|{r}.currentRow\['{n}'\]|{r}.currentRow.{n}|{r}.getRowByIndex\((.*?)\)\[""{n}""\]|{r}.getRowByIndex\((.*?)\)\['{n}'\]|{p}";
+
+                            if (Regex.IsMatch(code, regex))
+                            {
+                                if (CalcFlds[i] != j)//if a control refers itself treated as not circular reference
+                                    dpndcy.Add(new KeyValuePair<int, int>(CalcFlds[i], j));//<dependent, dominant>
+                                IsAnythingResolved = true;
+                            }
+                        }
+                        if (!IsAnythingResolved)
+                            throw new FormException($"Can't resolve some form variables in Js Default value expression of {_dict[CalcFlds[i]].Control.Name}");
+                    }
+                }
+            }
             int stopCounter = 0;
-            while (dpndcy.Count > 0 && stopCounter < CalcFlds.Count)
+            while (CalcFlds.Count > ExecOrd.Count && stopCounter < CalcFlds.Count)
             {
                 for (int i = 0; i < CalcFlds.Count; i++)
                 {
-                    if (dpndcy.FindIndex(x => x.Value == CalcFlds[i]) == -1)
+                    if (dpndcy.FindIndex(x => x.Value == CalcFlds[i]) == -1 && !ExecOrd.Contains(CalcFlds[i]))
                     {
-                        bool isProcessed = false;
-                        foreach (KeyValuePair<int, int> item in dpndcy.Where(e => e.Key == CalcFlds[i]))
-                        {
-                            _dict[item.Value].Control.DependedValExp.Remove(_dict[item.Key].Path);
-                            _dict[item.Value].Control.DependedValExp.Insert(0, _dict[item.Key].Path);
-                            ExeOrd.Remove(item.Value);
-                            ExeOrd.Insert(0, item.Value);
-                            isProcessed = true;
-                        }
-                        if (isProcessed)
-                            dpndcy.RemoveAll(x => x.Key == CalcFlds[i]);
+                        ExecOrd.Add(CalcFlds[i]);
+                        dpndcy.RemoveAll(x => x.Key == CalcFlds[i]);
                     }
                 }
                 stopCounter++;
             }
             if (dpndcy.Count > 0)
+                throw new FormException("Avoid circular reference by the following controls in 'DefaultValueExpression' : " + string.Join(',', dpndcy.Select(e => _dict[e.Key].Control.Name).Distinct()));
+
+            foreach (int i in ExecOrd)
+                _this.DefaultValsExecOrder.Add(_dict[i].Path);
+        }
+
+        private static void CalcHideAndDisableExprDependency(Dictionary<int, EbControlWrapper> _dict)
+        {
+            for (int i = 0; i < _dict.Count; i++)
             {
-                //value expression of KEY conatins VALUE 
-                //List<KeyValuePair<string, string>> dpInStr = new List<KeyValuePair<string, string>>();// debug - help
-                //foreach (KeyValuePair<int, int> it in dpndcy)
-                //    dpInStr.Add(new KeyValuePair<string, string>(_dict[it.Key].Path, _dict[it.Value].Path));
-                throw new FormException("Avoid circular reference by the following controls in 'ValueExpression' : " + string.Join(',', dpndcy.Select(e => _dict[e.Key].Control.Name).Distinct()));
+                _dict[i].Control.DependedHideExp = new List<string>();
+                _dict[i].Control.DependedDisableExp = new List<string>();
             }
-            else
+            for (int i = 0; i < _dict.Count; i++)
             {
-                FillDependedCtrlRec(_dict, ExeOrd);
+                CheckHideAndDisableCode(_dict[i], _dict, _dict[i].Control.HideExpr, _dict[i].Control.DependedHideExp, "Hide expression");
+                CheckHideAndDisableCode(_dict[i], _dict, _dict[i].Control.DisableExpr, _dict[i].Control.DependedDisableExp, "Disable expression");
             }
         }
 
-        //To populate multilevel DependedValExp property
-        private static void FillDependedCtrlRec(Dictionary<int, EbControlWrapper> _dict, List<int> ExeOrd)
+        private static void CheckHideAndDisableCode(EbControlWrapper ctrlWrap, Dictionary<int, EbControlWrapper> _dict, EbScript ebScript, List<string> dependant, string msg)
         {
-            for (int i = ExeOrd.Count - 1; i >= 0; i--)
+            if (string.IsNullOrEmpty(ebScript?.Code))
+                return;
+            if (ebScript.Lang == ScriptingLanguage.JS)
             {
-                List<string> extList = new List<string>();
-                foreach (string item in _dict[ExeOrd[i]].Control.DependedValExp)
+                if (ebScript.Code.Contains("form"))
                 {
-                    EbControlWrapper ctrlWrap = _dict.Values.FirstOrDefault(e => e.Path.Equals(item));
-                    foreach (var path in ctrlWrap.Control.DependedValExp)
+                    bool IsAnythingResolved = false;
+                    for (int j = 0; j < _dict.Count; j++)
                     {
-                        if (!_dict[ExeOrd[i]].Control.DependedValExp.Contains(path) && !extList.Contains(path))
-                            extList.Add(path);
+                        string p = _dict[j].Path, r = _dict[j].Root, n = _dict[j].Control.Name;
+                        string regex = $@"{r}.currentRow\[""{n}""\]|{r}.currentRow\['{n}'\]|{r}.currentRow.{n}|{r}.getRowByIndex\((.*?)\)\[""{n}""\]|{r}.getRowByIndex\((.*?)\)\['{n}'\]|{p}";
+
+                        if (Regex.IsMatch(ebScript.Code, regex))
+                        {
+                            dependant.Add(ctrlWrap.Path);
+                            IsAnythingResolved = true;
+                        }
                     }
+                    if (!IsAnythingResolved)
+                        throw new FormException($"Can't resolve some form variables in Js {msg} of {ctrlWrap.Control.Name}");
                 }
-                _dict[ExeOrd[i]].Control.DependedValExp.AddRange(extList);
             }
         }
 
