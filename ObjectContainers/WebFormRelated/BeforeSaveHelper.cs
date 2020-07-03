@@ -474,10 +474,10 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
             {
                 for (int i = 0; i < CalcFlds.Count; i++)
                 {
-                    if (dpndcy.FindIndex(x => x.Value == CalcFlds[i]) == -1 && !ExecOrd.Contains(CalcFlds[i]))
+                    if (dpndcy.FindIndex(x => x.Key == CalcFlds[i]) == -1 && !ExecOrd.Contains(CalcFlds[i]))
                     {
                         ExecOrd.Add(CalcFlds[i]);
-                        dpndcy.RemoveAll(x => x.Key == CalcFlds[i]);
+                        dpndcy.RemoveAll(x => x.Value == CalcFlds[i]);
                     }
                 }
                 stopCounter++;
