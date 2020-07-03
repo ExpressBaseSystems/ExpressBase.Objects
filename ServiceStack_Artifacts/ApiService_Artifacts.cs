@@ -373,10 +373,23 @@ END;";
 
         public List<EbLocation> Locations { get; set; }
 
+        public bool Is2FEnabled { get; set; }
+
+        public string TwoFAToken { set; get; }
+
+        public bool TwoFAStatus { set; get; }
+
         public ApiAuthResponse()
         {
             Locations = new List<EbLocation>();
         }
+    }
+
+    public class ApiTwoFactorResponse : IEbApiStatusCode
+    {
+        public bool IsValid { set; get; }
+
+        public HttpStatusCode StatusCode { get; set ; }
     }
 
     public class ApiFileData
