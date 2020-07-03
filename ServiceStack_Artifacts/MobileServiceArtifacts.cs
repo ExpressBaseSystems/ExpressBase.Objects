@@ -2,6 +2,7 @@
 using ExpressBase.Common.Application;
 using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
+using ExpressBase.Common.LocationNSolution;
 using ExpressBase.Common.Structures;
 using ExpressBase.Security;
 using ServiceStack;
@@ -294,11 +295,16 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public List<AppDataToMob> Applications { set; get; }
 
         [DataMember(Order = 2)]
+        public List<EbLocation> Locations { get; set; }
+
+        [DataMember(Order = 3)]
         public HttpStatusCode StatusCode { get; set; }
 
         public EbMobileSolutionData()
         {
             Applications = new List<AppDataToMob>();
+
+            Locations = new List<EbLocation>();
         }
     }
 
