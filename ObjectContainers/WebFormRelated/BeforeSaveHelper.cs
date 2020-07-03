@@ -401,15 +401,21 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                 }
             }
 
-            for (int i = 0; i < CalcFlds.Count; i++)
+            foreach(int i in dpndcy.Select(e => e.Value).Distinct())
             {
-                List<int> execOrder = new List<int> { CalcFlds[i] };
-                GetValExpDependentsRec(execOrder, dpndcy, CalcFlds[i]);
-                if (dpndcy.FindIndex(x => x.Key == CalcFlds[i] && x.Value == CalcFlds[i]) == -1)
-                    execOrder.Remove(CalcFlds[i]);
+                List<int> execOrder = new List<int> { i };
+                GetValExpDependentsRec(execOrder, dpndcy, i);
+                if (dpndcy.FindIndex(x => x.Key == i && x.Value == i) == -1)
+                    execOrder.Remove(i);
                 foreach (int key in execOrder)
-                    _dict[CalcFlds[i]].Control.DependedValExp.Add(_dict[key].Path);
+                    _dict[i].Control.DependedValExp.Add(_dict[key].Path);
             }
+
+            // **** Hint ****
+            // A; B = A + 10; C = B + 5;
+            // _dict = { { 0, A}, { 1, B}, { 2, C} }
+            // dpndcy = { (B, A) (C, B) } => { (1, 0) (2, 1) }
+            // A => [B, C]; B => [C];
         }
 
         private static void GetValExpDependentsRec(List<int> execOrder, List<KeyValuePair<int, int>> dpndcy, int seeker)
