@@ -37,7 +37,7 @@ namespace ExpressBase.Objects
         public override EbScript OnChangeFn { get; set; }
 
         [HideInPropertyGrid]
-        public override EbScript HideExpr { get; set; }
+        public override EbScript HiddenExpr { get; set; }
         
         [HideInPropertyGrid]
         public override EbScript DisableExpr { get; set; }

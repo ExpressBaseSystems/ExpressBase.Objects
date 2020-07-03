@@ -531,17 +531,17 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
         {
             for (int i = 0; i < _dict.Count; i++)
             {
-                _dict[i].Control.DependedHideExp = new List<string>();
-                _dict[i].Control.DependedDisableExp = new List<string>();
+                _dict[i].Control.HiddenExpDependants = new List<string>();
+                _dict[i].Control.DisableExpDependants = new List<string>();
             }
             for (int i = 0; i < _dict.Count; i++)
             {
-                CheckHideAndDisableCode(_dict[i], _dict, _dict[i].Control.HideExpr, _dict[i].Control.DependedHideExp, "Hide expression");
-                CheckHideAndDisableCode(_dict[i], _dict, _dict[i].Control.DisableExpr, _dict[i].Control.DependedDisableExp, "Disable expression");
+                CheckHideAndDisableCode(_dict[i], _dict, _dict[i].Control.HiddenExpr, true);
+                CheckHideAndDisableCode(_dict[i], _dict, _dict[i].Control.DisableExpr, false);
             }
         }
 
-        private static void CheckHideAndDisableCode(EbControlWrapper ctrlWrap, Dictionary<int, EbControlWrapper> _dict, EbScript ebScript, List<string> dependant, string msg)
+        private static void CheckHideAndDisableCode(EbControlWrapper ctrlWrap, Dictionary<int, EbControlWrapper> _dict, EbScript ebScript, bool is4Hide)
         {
             if (string.IsNullOrEmpty(ebScript?.Code))
                 return;
@@ -557,12 +557,16 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
 
                         if (Regex.IsMatch(ebScript.Code, regex))
                         {
-                            dependant.Add(ctrlWrap.Path);
+                            if(is4Hide)
+                                _dict[j].Control.HiddenExpDependants.Add(ctrlWrap.Path);
+                            else
+                                _dict[j].Control.DisableExpDependants.Add(ctrlWrap.Path);
+
                             IsAnythingResolved = true;
                         }
                     }
                     if (!IsAnythingResolved)
-                        throw new FormException($"Can't resolve some form variables in Js {msg} of {ctrlWrap.Control.Name}");
+                        throw new FormException($"Can't resolve some form variables in Js {(is4Hide ? "Hide expression" : "Disable expression")} of {ctrlWrap.Control.Name}");
                 }
             }
         }
