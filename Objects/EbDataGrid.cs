@@ -339,9 +339,9 @@ namespace ExpressBase.Objects
         public override string OnChangeBindJSFn { get { return @"$(`[ebsid=${p1.DG.EbSid_CtxId }]`).on('change', `[colname=${this.Name}] [ui-inp]`, p2);"; } set { } }
 
         [JsonIgnore]
-        public override string JustSetValueJSfn
+        public override string SetDisplayMemberJSfn
         {
-            get { return JSFnsConstants.DG_hiddenColCheckCode + @"
+            get { return JSFnsConstants.DG_hiddenColCheckCode + @" 
     $('[ebsid='+this.__DG.EbSid_CtxId +']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val(p1);"; }
 
             set { }
@@ -350,7 +350,7 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         public override string SetValueJSfn
         {
-            get { return JustSetValueJSfn + "$('#' + this.EbSid_CtxId).data('ctrl_ref', this); $('#' + this.EbSid_CtxId).trigger('change');"; }
+            get { return SetDisplayMemberJSfn + "$('#' + this.EbSid_CtxId).data('ctrl_ref', this); $('#' + this.EbSid_CtxId).trigger('change');"; }
 
             set { }
         }
@@ -627,7 +627,7 @@ return '✖';
         }
 
         [JsonIgnore]
-        public override string JustSetValueJSfn
+        public override string SetDisplayMemberJSfn
         {
             get
             {
@@ -729,11 +729,11 @@ return '✖';
         }
 
         [JsonIgnore]
-        public override string JustSetValueJSfn
+        public override string SetDisplayMemberJSfn
         {
             get
             {
-                return JSFnsConstants.DG_hiddenColCheckCode + this.EbDate.JustSetValueJSfn;
+                return JSFnsConstants.DG_hiddenColCheckCode + this.EbDate.SetDisplayMemberJSfn;
             }
             set { }
         }
@@ -835,11 +835,11 @@ $(`[ebsid=${p1.DG.EbSid_CtxId}]`).on('change', `[colname=${this.Name}] [ui-inp]`
         }
 
         [JsonIgnore]
-        public override string JustSetValueJSfn
+        public override string SetDisplayMemberJSfn
         {
             get
             {
-                return JSFnsConstants.DG_hiddenColCheckCode + EbSimpleSelect.JustSetValueJSfn;
+                return JSFnsConstants.DG_hiddenColCheckCode + EbSimpleSelect.SetDisplayMemberJSfn;
             }
             set { }
         }
@@ -966,7 +966,7 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
         [JsonIgnore]
         private EbDGSimpleSelectColumn EbDGSimpleSelectColumn { set; get; }
 
-        public override string JustSetValueJSfn
+        public override string SetDisplayMemberJSfn
         {
             get
             {
@@ -976,7 +976,7 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
                                 p1 = 'true'
                             else if(p1 === false)
                                 p1 = 'false'
-                           " + EbDGSimpleSelectColumn.JustSetValueJSfn +
+                           " + EbDGSimpleSelectColumn.SetDisplayMemberJSfn +
                         "}";
             }
             set { }
@@ -1188,7 +1188,7 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
         public bool IsDynamic { get; set; }
 
         [JsonIgnore]
-        public override string SetDisplayMemberJSfn { get { return this.EbPowerSelect.SetDisplayMemberJSfn; } set { } }
+        public override string JustSetValueJSfn { get { return this.EbPowerSelect.JustSetValueJSfn; } set { } }
 
         [JsonIgnore]
         public override string GetDisplayMemberFromDOMJSfn { get { return this.EbPowerSelect.GetDisplayMemberFromDOMJSfn; } set { } }
@@ -1267,7 +1267,7 @@ pg.HideProperty('IsDynamic');
         [OSE_ObjectTypes(EbObjectTypes.iWebForm)]
         public string FormRefId { get { return this.AddButton.FormRefId; } set { this.AddButton.FormRefId = value; } }
 
-        public override string JustSetValueJSfn { get { return JSFnsConstants.DG_hiddenColCheckCode + EbPowerSelect.JustSetValueJSfn; } set { } }
+        public override string SetDisplayMemberJSfn { get { return JSFnsConstants.DG_hiddenColCheckCode + EbPowerSelect.SetDisplayMemberJSfn; } set { } }
 
         public override string SetValueJSfn { get { return EbPowerSelect.SetValueJSfn; } set { } }
 
@@ -1496,11 +1496,11 @@ pg.HideProperty('IsDynamic');
         }
 
         [JsonIgnore]
-        public override string JustSetValueJSfn
+        public override string SetDisplayMemberJSfn
         {
             get
             {
-                return JSFnsConstants.DG_hiddenColCheckCode + this.EbSysCreatedBy.JustSetValueJSfn;
+                return JSFnsConstants.DG_hiddenColCheckCode + this.EbSysCreatedBy.SetDisplayMemberJSfn;
             }
             set { }
         }
@@ -1619,11 +1619,11 @@ pg.HideProperty('IsDynamic');
         }
 
         [JsonIgnore]
-        public override string JustSetValueJSfn
+        public override string SetDisplayMemberJSfn
         {
             get
             {
-                return JSFnsConstants.DG_hiddenColCheckCode + this.EbSysCreatedAt.JustSetValueJSfn;
+                return JSFnsConstants.DG_hiddenColCheckCode + this.EbSysCreatedAt.SetDisplayMemberJSfn;
             }
             set { }
         }
@@ -1743,11 +1743,11 @@ pg.HideProperty('IsDynamic');
         }
 
         [JsonIgnore]
-        public override string JustSetValueJSfn
+        public override string SetDisplayMemberJSfn
         {
             get
             {
-                return JSFnsConstants.DG_hiddenColCheckCode + this.EbSysModifiedBy.JustSetValueJSfn;
+                return JSFnsConstants.DG_hiddenColCheckCode + this.EbSysModifiedBy.SetDisplayMemberJSfn;
             }
             set { }
         }
@@ -1875,11 +1875,11 @@ pg.HideProperty('IsDynamic');
         }
 
         [JsonIgnore]
-        public override string JustSetValueJSfn
+        public override string SetDisplayMemberJSfn
         {
             get
             {
-                return JSFnsConstants.DG_hiddenColCheckCode + this.EbSysModifiedAt.JustSetValueJSfn;
+                return JSFnsConstants.DG_hiddenColCheckCode + this.EbSysModifiedAt.SetDisplayMemberJSfn;
             }
             set { }
         }
@@ -1995,7 +1995,7 @@ pg.HideProperty('IsDynamic');
 
         public override string GetValueFromDOMJSfn { get { return this.EbUserSelect.GetValueFromDOMJSfn; } }
         public override string OnChangeBindJSFn { get { return @"$(`[ebsid=${p1.DG.EbSid_CtxId }]`).on('change', `[colname=${this.Name}] input[type=hidden]`, p2);"; } set { } }
-        public override string JustSetValueJSfn { get { return this.EbUserSelect.JustSetValueJSfn; } }
+        public override string SetDisplayMemberJSfn { get { return this.EbUserSelect.SetDisplayMemberJSfn; } }
         public override string SetValueJSfn { get { return @"$('#' + this.EbSid_CtxId + ' input[type=hidden]').data('ctrl_ref', this); this._JsCtrlMng.setValue(p1, p2, false);"; } }
         public override string GetDisplayMemberFromDOMJSfn { get { return this.EbUserSelect.GetDisplayMemberFromDOMJSfn; } }
         public override string RefreshJSfn { get { return this.EbUserSelect.RefreshJSfn; } }

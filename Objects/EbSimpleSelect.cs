@@ -57,7 +57,7 @@ namespace ExpressBase.Objects
         public int DropdownHeight { get; set; }
 
         [JsonIgnore]
-        public override string JustSetValueJSfn
+        public override string SetDisplayMemberJSfn
         {
             get
             {

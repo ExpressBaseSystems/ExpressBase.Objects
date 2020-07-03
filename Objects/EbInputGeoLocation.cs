@@ -171,7 +171,7 @@ namespace ExpressBase.Objects
         }
 
         [JsonIgnore]
-        public override string JustSetValueJSfn
+        public override string SetDisplayMemberJSfn
         {
             get
             {
