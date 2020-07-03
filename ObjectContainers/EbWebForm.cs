@@ -185,7 +185,7 @@ namespace ExpressBase.Objects
         public void ImportData(IDatabase DataDB, Service Service, List<Param> Param, string Trigger, int RowId)
         {
             EbControl[] Allctrls = this.Controls.FlattenAllEbControls();
-            Allctrls =  Array.FindAll(Allctrls, c => !(c is EbControlContainer && (c as EbDataGrid == null)));
+            Allctrls = Array.FindAll(Allctrls, c => !(c is EbControlContainer && (c as EbDataGrid == null)));
             EbControl TriggerCtrl = null;
             List<EbDataGrid> DGs = new List<EbDataGrid>();
             for (int i = 0; i < Allctrls.Length; i++)
@@ -761,6 +761,8 @@ namespace ExpressBase.Objects
                             i += 5;
                     }
                     _rowId = Convert.ToInt32(dataRow[i]);
+                    if (_rowId <= 0)
+                        throw new FormException("Something went wrong in our end.", (int)HttpStatusCode.InternalServerError, $"Invalid data found. TableName: {_table.TableName}, RowId: {_rowId}, LocId: {_locId}", "EbWebForm -> GetFormattedData");
                     for (; j < Table.Count; j++)
                     {
                         if (Table[j].RowId == _rowId)
@@ -1483,11 +1485,13 @@ namespace ExpressBase.Objects
 
             param.Add(DataDB.GetNewParameter(FormConstants.eb_createdby, EbDbTypes.Int32, this.UserObj.UserId));
             param.Add(DataDB.GetNewParameter(FormConstants.eb_loc_id, EbDbTypes.Int32, this.LocationId));
-            fullqry += string.Format("SELECT eb_currval('{0}_id_seq');", this.TableName);
+            fullqry += $"SELECT eb_currval('{this.TableName}_id_seq');";
 
             EbDataSet tem = DataDB.DoQueries(this.DbConnection, fullqry, param.ToArray());
             EbDataTable temp = tem.Tables[tem.Tables.Count - 1];
             int _rowid = temp.Rows.Count > 0 ? Convert.ToInt32(temp.Rows[0][0]) : 0;
+            if (_rowid <= 0)
+                throw new FormException("Something went wrong in our end.", (int)HttpStatusCode.InternalServerError, $"SELECT eb_currval('{this.TableName}_id_seq') returned an invalid data: {_rowid}", "EbWebForm -> Insert");
             return _rowid;
         }
 

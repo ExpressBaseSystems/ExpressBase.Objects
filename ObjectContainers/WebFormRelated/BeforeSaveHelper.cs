@@ -334,7 +334,6 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
         {
             List<int> CalcFlds = new List<int>();
             List<KeyValuePair<int, int>> dpndcy = new List<KeyValuePair<int, int>>();
-            List<int> ExeOrd = new List<int>();
 
             for (int i = 0; i < _dict.Count; i++)
             {
@@ -342,21 +341,13 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                 _dict[i].Control.ValExpParams = new List<string>();
 
                 if (!string.IsNullOrEmpty(_dict[i].Control.ValueExpr?.Code))
-                {
                     CalcFlds.Add(i);
-                    ExeOrd.Add(i);
-                }
                 if (_dict[i].Control is EbTVcontrol && (_dict[i].Control as EbTVcontrol).ParamsList?.Count > 0)
-                {
                     CalcFlds.Add(i);
-                    ExeOrd.Add(i);
-                }
                 if (!string.IsNullOrEmpty(_dict[i].Control.OnChangeFn?.Code))
                 {
                     if (_dict[i].Control.OnChangeFn.Code.Contains(".setValue(") && !(_dict[i].Control is EbScriptButton))
-                    {
                         throw new FormException("SetValue is not allowed in OnChange expression of " + _dict[i].Control.Name);
-                    }
                 }
             }
 
@@ -387,8 +378,7 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
 
                             if (Regex.IsMatch(code, regex))
                             {
-                                if (CalcFlds[i] != j)//if a control refers itself treated as not circular reference
-                                    dpndcy.Add(new KeyValuePair<int, int>(CalcFlds[i], j));//<dependent, dominant>
+                                dpndcy.Add(new KeyValuePair<int, int>(CalcFlds[i], j));//<dependent, dominant>
                                 IsAnythingResolved = true;
                             }
                         }
@@ -405,66 +395,32 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                         if (item.Value == null)
                             throw new FormException($"Can't resolve {match.Value} in SQL Value expression of {_dict[CalcFlds[i]].Control.Name}");
 
-                        if (CalcFlds[i] != item.Key)
-                            dpndcy.Add(new KeyValuePair<int, int>(CalcFlds[i], item.Key));//<dependent, dominant>
+                        dpndcy.Add(new KeyValuePair<int, int>(CalcFlds[i], item.Key));//<dependent, dominant>
                         _dict[CalcFlds[i]].Control.ValExpParams.Add(item.Value.Path);
                     }
                 }
-
             }
 
-            int stopCounter = 0;
-            while (dpndcy.Count > 0 && stopCounter < CalcFlds.Count)
+            for (int i = 0; i < CalcFlds.Count; i++)
             {
-                for (int i = 0; i < CalcFlds.Count; i++)
-                {
-                    if (dpndcy.FindIndex(x => x.Value == CalcFlds[i]) == -1)
-                    {
-                        bool isProcessed = false;
-                        foreach (KeyValuePair<int, int> item in dpndcy.Where(e => e.Key == CalcFlds[i]))
-                        {
-                            _dict[item.Value].Control.DependedValExp.Remove(_dict[item.Key].Path);
-                            _dict[item.Value].Control.DependedValExp.Insert(0, _dict[item.Key].Path);
-                            ExeOrd.Remove(item.Value);
-                            ExeOrd.Insert(0, item.Value);
-                            isProcessed = true;
-                        }
-                        if (isProcessed)
-                            dpndcy.RemoveAll(x => x.Key == CalcFlds[i]);
-                    }
-                }
-                stopCounter++;
-            }
-            if (dpndcy.Count > 0)
-            {
-                //value expression of KEY conatins VALUE 
-                //List<KeyValuePair<string, string>> dpInStr = new List<KeyValuePair<string, string>>();// debug - help
-                //foreach (KeyValuePair<int, int> it in dpndcy)
-                //    dpInStr.Add(new KeyValuePair<string, string>(_dict[it.Key].Path, _dict[it.Value].Path));
-                throw new FormException("Avoid circular reference by the following controls in 'ValueExpression' : " + string.Join(',', dpndcy.Select(e => _dict[e.Key].Control.Name).Distinct()));
-            }
-            else
-            {
-                FillDependedCtrlRec(_dict, ExeOrd);
+                List<int> execOrder = new List<int> { CalcFlds[i] };
+                GetValExpDependentsRec(execOrder, dpndcy, CalcFlds[i]);
+                if (dpndcy.FindIndex(x => x.Key == CalcFlds[i] && x.Value == CalcFlds[i]) == -1)
+                    execOrder.Remove(CalcFlds[i]);
+                foreach (int key in execOrder)
+                    _dict[CalcFlds[i]].Control.DependedValExp.Add(_dict[key].Path);
             }
         }
 
-        //To populate multilevel DependedValExp property
-        private static void FillDependedCtrlRec(Dictionary<int, EbControlWrapper> _dict, List<int> ExeOrd)
+        private static void GetValExpDependentsRec(List<int> execOrder, List<KeyValuePair<int, int>> dpndcy, int seeker)
         {
-            for (int i = ExeOrd.Count - 1; i >= 0; i--)
+            foreach (KeyValuePair<int, int> item in dpndcy.Where(e => e.Value == seeker))
             {
-                List<string> extList = new List<string>();
-                foreach (string item in _dict[ExeOrd[i]].Control.DependedValExp)
+                if (!execOrder.Contains(item.Key))
                 {
-                    EbControlWrapper ctrlWrap = _dict.Values.FirstOrDefault(e => e.Path.Equals(item));
-                    foreach (var path in ctrlWrap.Control.DependedValExp)
-                    {
-                        if (!_dict[ExeOrd[i]].Control.DependedValExp.Contains(path) && !extList.Contains(path))
-                            extList.Add(path);
-                    }
+                    execOrder.Add(item.Key);
+                    GetValExpDependentsRec(execOrder, dpndcy, item.Key);
                 }
-                _dict[ExeOrd[i]].Control.DependedValExp.AddRange(extList);
             }
         }
 
@@ -512,10 +468,10 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
             {
                 for (int i = 0; i < CalcFlds.Count; i++)
                 {
-                    if (dpndcy.FindIndex(x => x.Key == CalcFlds[i]) == -1 && !ExecOrd.Contains(CalcFlds[i]))
+                    if (dpndcy.FindIndex(x => x.Value == CalcFlds[i]) == -1 && !ExecOrd.Contains(CalcFlds[i]))
                     {
                         ExecOrd.Add(CalcFlds[i]);
-                        dpndcy.RemoveAll(x => x.Value == CalcFlds[i]);
+                        dpndcy.RemoveAll(x => x.Key == CalcFlds[i]);
                     }
                 }
                 stopCounter++;
