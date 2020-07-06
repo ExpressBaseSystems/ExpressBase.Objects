@@ -386,7 +386,11 @@ namespace ExpressBase.Objects.WebFormRelated/////////////
         {
             if (old_val == "[null]") old_val = null;
             if (new_val == "[null]") new_val = null;
-            if (_column.Control is EbPowerSelect || _column.Control is EbDGPowerSelectColumn)//copy vm for dm
+            bool fetchVm = _column.Control is EbPowerSelect || _column.Control is EbDGPowerSelectColumn;
+            fetchVm = fetchVm || (_column.Control is EbSimpleSelect && (_column.Control as EbSimpleSelect).IsDynamic);
+            fetchVm = fetchVm || (_column.Control is EbDGSimpleSelectColumn && (_column.Control as EbDGSimpleSelectColumn).IsDynamic);
+
+            if (fetchVm)//copy vm for dm
             {
                 string key = string.Concat(_table.TableName, "_", _column.ColumnName);
                 string temp = string.Empty;
@@ -431,7 +435,7 @@ namespace ExpressBase.Objects.WebFormRelated/////////////
             }
         }
 
-        private string GetFormattedData(EbControl ctrl, string value)
+        private string GetFormattedData(EbControl ctrl, string value)// missing: ss !IsDynamic
         {
             try
             {
@@ -455,29 +459,40 @@ namespace ExpressBase.Objects.WebFormRelated/////////////
         private void PostProcessTransationData(Dictionary<int, FormTransaction> Trans, Dictionary<string, string> DictVmAll)
         {
             string Qry = string.Empty;
+            Dictionary<string, Dictionary<string, List<string>>> DictDm = new Dictionary<string, Dictionary<string, List<string>>>();
+
             foreach (TableSchema _table in this.WebForm.FormSchema.Tables)
             {
                 foreach (ColumnSchema _column in _table.Columns)
                 {
-                    if (_column.Control is EbPowerSelect || _column.Control is EbDGPowerSelectColumn)
+                    bool fetchVm = _column.Control is EbPowerSelect || _column.Control is EbDGPowerSelectColumn;
+                    fetchVm = fetchVm || (_column.Control is EbSimpleSelect && (_column.Control as EbSimpleSelect).IsDynamic);
+                    fetchVm = fetchVm || (_column.Control is EbDGSimpleSelectColumn && (_column.Control as EbDGSimpleSelectColumn).IsDynamic);
+
+                    if (fetchVm)
                     {
                         string key = string.Concat(_table.TableName, "_", _column.ColumnName);
                         if (DictVmAll.ContainsKey(key))
                         {
-                            if (_column.Control is EbPowerSelect)
-                                Qry += (_column.Control as EbPowerSelect).GetDisplayMembersQuery(this.DataDB, this.Service, DictVmAll[key].Substring(0, DictVmAll[key].Length - 1));
-                            else
-                                Qry += (_column.Control as EbDGPowerSelectColumn).GetDisplayMembersQuery(this.DataDB, this.Service, DictVmAll[key].Substring(0, DictVmAll[key].Length - 1));
+                            if (!DictDm.ContainsKey(key))
+                            {
+                                if (_column.Control is EbPowerSelect)
+                                    Qry += (_column.Control as EbPowerSelect).GetDisplayMembersQuery(this.DataDB, this.Service, DictVmAll[key].Substring(0, DictVmAll[key].Length - 1));
+                                else if (_column.Control is EbDGPowerSelectColumn)
+                                    Qry += (_column.Control as EbDGPowerSelectColumn).GetDisplayMembersQuery(this.DataDB, this.Service, DictVmAll[key].Substring(0, DictVmAll[key].Length - 1));
+                                else if (_column.Control is EbSimpleSelect)
+                                    Qry += (_column.Control as EbSimpleSelect).GetDisplayMembersQuery(this.DataDB, this.Service, DictVmAll[key].Substring(0, DictVmAll[key].Length - 1));
+                                else
+                                    Qry += (_column.Control as EbDGSimpleSelectColumn).GetDisplayMembersQuery(this.DataDB, this.Service, DictVmAll[key].Substring(0, DictVmAll[key].Length - 1));
+
+                                DictDm.Add(key, new Dictionary<string, List<string>>());
+                            }
                         }
                     }
                 }
             }
 
             EbDataSet ds = DataDB.DoQueries(Qry);
-
-            Dictionary<string, Dictionary<string, List<string>>> DictDm = new Dictionary<string, Dictionary<string, List<string>>>();
-            foreach (string key in DictVmAll.Keys)
-                DictDm.Add(key, new Dictionary<string, List<string>>());
 
             for (int i = 0; i < ds.Tables.Count; i++)
             {
@@ -524,40 +539,34 @@ namespace ExpressBase.Objects.WebFormRelated/////////////
             {
                 if (DictDm.ContainsKey(tablename + "_" + column.Key))
                 {
-                    if (!string.IsNullOrEmpty(column.Value.OldValue))
-                    {
-                        string[] vm_arr = column.Value.OldValue.Split(',');
-                        string dm = string.Empty;
-                        for (int i = 0; i < vm_arr.Length; i++)
-                        {
-                            List<string> dmlist = DictDm[tablename + "_" + column.Key][vm_arr[i]];
-                            foreach (string d in dmlist)
-                            {
-                                dm += " " + d;
-                            }
-                            if (i < vm_arr.Length - 1)
-                                dm += "<br>";
-                        }
-                        column.Value.OldValue = dm;
-                    }
-                    if (!string.IsNullOrEmpty(column.Value.NewValue))
-                    {
-                        string[] vm_arr = column.Value.NewValue.Split(',');
-                        string dm = string.Empty;
-                        for (int i = 0; i < vm_arr.Length; i++)
-                        {
-                            List<string> dmlist = DictDm[tablename + "_" + column.Key][vm_arr[i]];
-                            foreach (string d in dmlist)
-                            {
-                                dm += " " + d;
-                            }
-                            if (i < vm_arr.Length - 1)
-                                dm += "<br>";
-                        }
-                        column.Value.NewValue = dm;
-                    }
+                    column.Value.OldValue = this.GetRowVm(DictDm, tablename, column.Key, column.Value.OldValue);
+                    column.Value.NewValue = this.GetRowVm(DictDm, tablename, column.Key, column.Value.NewValue);
                 }
             }
+        }
+
+        private string GetRowVm(Dictionary<string, Dictionary<string, List<string>>> DictDm, string tablename, string columnname, string Value)
+        {
+            if (!string.IsNullOrEmpty(Value))
+            {
+                string[] vm_arr = Value.Split(',');
+                string dm = string.Empty;
+                for (int i = 0; i < vm_arr.Length; i++)
+                {
+                    List<string> dmlist = DictDm[tablename + "_" + columnname].ContainsKey(vm_arr[i]) ? DictDm[tablename + "_" + columnname][vm_arr[i]] : null;
+                    if (dmlist != null)
+                    {
+                        foreach (string d in dmlist)
+                            dm += " " + d;
+                    }
+                    else
+                        dm = vm_arr[i];
+                    if (i < vm_arr.Length - 1)
+                        dm += "<br>";
+                }
+                Value = dm;
+            }
+            return Value;
         }
     }
 }

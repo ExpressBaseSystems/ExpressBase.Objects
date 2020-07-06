@@ -345,6 +345,41 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
 .Replace("@data-ebtype@", "16");
         }
 
+        private string GetSql(Service service)// duplicate
+        {
+            EbDataReader dr = service.Redis.Get<EbDataReader>(this.DataSourceId);
+            if (dr == null)
+            {
+                var result = service.Gateway.Send<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = this.DataSourceId });
+                dr = EbSerializers.Json_Deserialize(result.Data[0].Json);
+                service.Redis.Set<EbDataReader>(this.DataSourceId, dr);
+            }
+
+            string Sql = dr.Sql.Trim();
+            if (Sql.LastIndexOf(";") == Sql.Length - 1)
+                Sql = Sql.Substring(0, Sql.Length - 1);
+
+            return Sql;
+        }
+
+        //to get vm+dm only for audit trail
+        public string GetDisplayMembersQuery(IDatabase DataDB, Service service, string vms)
+        {
+            string s = string.Empty;
+            if (this.IsDynamic)
+            {
+                string Sql = this.GetSql(service);
+
+                if (DataDB.Vendor == DatabaseVendors.MYSQL)
+                    s = string.Format(@"SELECT {0}, {1} FROM ({2}) __A WHERE FIND_IN_SET(__A.{0}, '{3}');",
+                            this.ValueMember.Name, this.DisplayMember.Name, Sql, vms);
+                else
+                    s = string.Format(@"SELECT {0}, {1} FROM ({2}) __A WHERE __A.{0} = ANY(STRING_TO_ARRAY('{3}'::TEXT, ',')::INT[]);",
+                        this.ValueMember.Name, this.DisplayMember.Name, Sql, vms);
+            }
+            return s;
+        }
+
         public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
         {
             object _formattedData = null;
