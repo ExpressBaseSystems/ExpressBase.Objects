@@ -789,7 +789,11 @@ else// PS
         {
             string Sql = this.GetSql(service);
             string vm = this.ValueMember.Name;
-            string dm = string.Join(',', this.DisplayMembers.Select(e => e.Name));
+            string dm;
+            if (this.RenderAsSimpleSelect)
+                dm = this.DisplayMember.Name;
+            else
+                dm = string.Join(',', this.DisplayMembers.Select(e => e.Name));
 
             string s = "";
             if (DataDB.Vendor == DatabaseVendors.MYSQL)

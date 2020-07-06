@@ -81,7 +81,7 @@ namespace ExpressBase.Objects.WebFormRelated/////////////
                         }
 
                         foreach (SingleRow RowBkup in _webForm.FormDataBackup.MultipleTables[_table.TableName])
-                        {                            
+                        {
                             if (!rowIds.Contains(RowBkup.RowId) && RowBkup.RowId > 0)
                             {
                                 entries = this.GetTrailEntries(_webForm, _table, null, RowBkup);
@@ -373,11 +373,11 @@ namespace ExpressBase.Objects.WebFormRelated/////////////
             {
                 this.PostProcessTransationData(Trans, DictVmAll);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Console.WriteLine("Exception in AuditTrail.PostProcessTransationData. Message : " + e.Message + "\nStackTrace : " + e.StackTrace);
             }
-            
+
             return JsonConvert.SerializeObject(Trans);
         }
 
@@ -413,7 +413,7 @@ namespace ExpressBase.Objects.WebFormRelated/////////////
                 }
                 else if (_column.ColumnName == "action_unique_id")
                 {
-                    foreach(EbReviewStage st in reviewCtrl.FormStages)
+                    foreach (EbReviewStage st in reviewCtrl.FormStages)
                     {
                         EbReviewAction act = st.StageActions.Find(e => e.EbSid == val);
                         if (act != null)
@@ -426,33 +426,31 @@ namespace ExpressBase.Objects.WebFormRelated/////////////
             }
             else
             {
-                if (old_val != null)
-                {
-                    try
-                    {
-                        SingleColumn singleColumn = _column.Control.GetSingleColumn(this.WebForm.UserObj, this.WebForm.SolutionObj, old_val);
-                        old_val = singleColumn.F;
-                    }
-                    catch(Exception e)
-                    {
-                        Console.WriteLine("Exception in GetAuditTrail -> PreProcessTransationData -> GetSingleColumn\nControl Name: " + _column.Control.Name + "\nold_val Value: " + old_val + "\nMessage: " + e.Message);
-                    }
-                }
-                if (new_val != null)
-                {
-                    try
-                    {
-                        SingleColumn singleColumn = _column.Control.GetSingleColumn(this.WebForm.UserObj, this.WebForm.SolutionObj, new_val);
-                        new_val = singleColumn.F;
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine("Exception in GetAuditTrail -> PreProcessTransationData -> GetSingleColumn\nControl Name: " + _column.Control.Name + "\nnew_val Value: " + new_val + "\nMessage: " + e.Message);
-                    }
-                }
+                old_val = this.GetFormattedData(_column.Control, old_val);
+                new_val = this.GetFormattedData(_column.Control, new_val);
             }
         }
 
+        private string GetFormattedData(EbControl ctrl, string value)
+        {
+            try
+            {
+                if (ctrl is EbNumeric || ctrl is EbDGNumericColumn ||
+                    ctrl is EbBooleanSelect || ctrl is EbDGBooleanSelectColumn ||
+                    ctrl is EbDGBooleanColumn || ctrl is EbRadioButton)
+                    value = ctrl.GetSingleColumn(this.WebForm.UserObj, this.WebForm.SolutionObj, value).F;
+                else if (value != null)
+                {
+                    if (ctrl is EbDate || ctrl is EbDGDateColumn)
+                        value = ctrl.GetSingleColumn(this.WebForm.UserObj, this.WebForm.SolutionObj, value).F;
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Exception in GetAuditTrail -> PreProcessTransationData -> GetFormattedData -> GetSingleColumn\nControl Name: " + ctrl.Name + "\nold_val/new_value Value: " + value + "\nMessage: " + e.Message);
+            }
+            return value;
+        }
 
         private void PostProcessTransationData(Dictionary<int, FormTransaction> Trans, Dictionary<string, string> DictVmAll)
         {
