@@ -318,6 +318,23 @@ namespace ExpressBase.Objects
         public void GetImportData(IDatabase DataDB, Service Service, EbWebForm Form)//COPY this TO Form
         {
             this.RefreshFormData(DataDB, Service);
+            if (this.RefId == Form.RefId)
+            {
+                Form.FormData = this.FormData;
+                foreach (KeyValuePair<string, SingleTable> entry in Form.FormData.MultipleTables)
+                {
+                    if (entry.Value.Count > 0)
+                    {
+                        SingleColumn c = entry.Value[0].Columns.Find(e => e.Control is EbAutoId);
+                        if (c != null)
+                            c.Value = null;
+                    }
+                    int id = 0;
+                    foreach (SingleRow Row in entry.Value)
+                        Row.RowId = --id;
+                }
+                return;
+            }
 
             foreach (TableSchema _t in this.FormSchema.Tables)
             {

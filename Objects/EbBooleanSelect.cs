@@ -28,7 +28,7 @@ namespace ExpressBase.Objects
 
         private EbSimpleSelect EbSimpleSelect { set; get; }
 
-        public override string JustSetValueJSfn
+        public override string SetDisplayMemberJSfn
         {
             get
             {
@@ -36,7 +36,7 @@ namespace ExpressBase.Objects
                             p1 = 'true'
                         else if(p1 === false)
                             p1 = 'false'
-                       " + EbSimpleSelect.JustSetValueJSfn;
+                       " + EbSimpleSelect.SetDisplayMemberJSfn;
             }
             set { }
         }

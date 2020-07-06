@@ -203,10 +203,10 @@ this.Init = function(id)
         public override string GetValueFromDOMJSfn { get { return @" return $('#' + this.EbSid_CtxId).is(':checked'); "; } set { } }
 
         [JsonIgnore]
-        public override string SetValueJSfn { get { return JustSetValueJSfn+ @"$('#' + this.EbSid_CtxId).trigger('change'); "; } set { } }
+        public override string SetValueJSfn { get { return SetDisplayMemberJSfn+ @"$('#' + this.EbSid_CtxId).trigger('change'); "; } set { } }
 
         [JsonIgnore]
-        public override string JustSetValueJSfn
+        public override string SetDisplayMemberJSfn
         {
             get
             {

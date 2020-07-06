@@ -45,7 +45,7 @@ namespace ExpressBase.Objects
             set { }
         }
 
-        public override string JustSetValueJSfn
+        public override string SetDisplayMemberJSfn
         {
             get
             {
@@ -58,7 +58,7 @@ namespace ExpressBase.Objects
         {
             get
             {
-                return JustSetValueJSfn + @".trigger('change');";
+                return SetDisplayMemberJSfn + @".trigger('change');";
             }
             set { }
         }
