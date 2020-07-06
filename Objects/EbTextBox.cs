@@ -356,7 +356,7 @@ else {
             {
                 return @"
             <textarea id='@ebsid@' class='eb-textarea' ui-inp name='@name@' rows='@RowsVisible@' '@AutoCompleteOff@' data-toggle='tooltip'  data-placement='top' title='@ToolTipText@' 
-                @tabIndex@ @MaxLength@  style='width:100%;' @Required@  @PlaceHolder@  @Text@  @TabIndex></textarea>"
+                @tabIndex@ @MaxLength@  style='width:100%;resize: none;' @Required@  @PlaceHolder@  @Text@  @TabIndex></textarea>"
 .Replace("@name@", this.Name)
 .Replace("@ebsid@", this.IsRenderMode && this.IsDynamicTabChild ? "@" + this.EbSid_CtxId + "_ebsid@" : (String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId))
 .Replace("@MaxLength@", "maxlength='" + ((this.MaxLength > 0) ? this.MaxLength.ToString() : "@MaxLength") + "'")
