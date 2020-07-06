@@ -389,6 +389,8 @@ END;";
     {
         public bool IsValid { set; get; }
 
+        public bool IsVerification { set; get; }
+
         public HttpStatusCode StatusCode { get; set ; }
     }
 
