@@ -36,7 +36,7 @@ namespace ExpressBase.Objects
             }
         }
 
-        public override string JustSetValueJSfn
+        public override string SetDisplayMemberJSfn
         {
             get
             {

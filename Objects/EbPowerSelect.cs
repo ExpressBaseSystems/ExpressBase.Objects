@@ -152,7 +152,7 @@ else
         }
 
         [JsonIgnore]
-        public override string JustSetValueJSfn { get { return JSFnsConstants.PS_JustSetValueJSfn; } set { } }
+        public override string SetDisplayMemberJSfn { get { return JSFnsConstants.PS_JustSetValueJSfn; } set { } }
 
         [JsonIgnore]
         public override string SetValueJSfn { get { return JSFnsConstants.PS_SetValueJSfn; } set { } }
@@ -200,7 +200,7 @@ else
         [HideInPropertyGrid]
         public EbButton AddButton { set; get; }
 
-        public override string SetDisplayMemberJSfn
+        public override string JustSetValueJSfn
         {
             get
             {

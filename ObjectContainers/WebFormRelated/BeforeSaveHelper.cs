@@ -401,15 +401,21 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                 }
             }
 
-            for (int i = 0; i < CalcFlds.Count; i++)
+            foreach(int i in dpndcy.Select(e => e.Value).Distinct())
             {
-                List<int> execOrder = new List<int> { CalcFlds[i] };
-                GetValExpDependentsRec(execOrder, dpndcy, CalcFlds[i]);
-                if (dpndcy.FindIndex(x => x.Key == CalcFlds[i] && x.Value == CalcFlds[i]) == -1)
-                    execOrder.Remove(CalcFlds[i]);
+                List<int> execOrder = new List<int> { i };
+                GetValExpDependentsRec(execOrder, dpndcy, i);
+                if (dpndcy.FindIndex(x => x.Key == i && x.Value == i) == -1)
+                    execOrder.Remove(i);
                 foreach (int key in execOrder)
-                    _dict[CalcFlds[i]].Control.DependedValExp.Add(_dict[key].Path);
+                    _dict[i].Control.DependedValExp.Add(_dict[key].Path);
             }
+
+            // **** Hint ****
+            // A; B = A + 10; C = B + 5;
+            // _dict = { { 0, A}, { 1, B}, { 2, C} }
+            // dpndcy = { (B, A) (C, B) } => { (1, 0) (2, 1) }
+            // A => [B, C]; B => [C];
         }
 
         private static void GetValExpDependentsRec(List<int> execOrder, List<KeyValuePair<int, int>> dpndcy, int seeker)
@@ -468,10 +474,10 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
             {
                 for (int i = 0; i < CalcFlds.Count; i++)
                 {
-                    if (dpndcy.FindIndex(x => x.Value == CalcFlds[i]) == -1 && !ExecOrd.Contains(CalcFlds[i]))
+                    if (dpndcy.FindIndex(x => x.Key == CalcFlds[i]) == -1 && !ExecOrd.Contains(CalcFlds[i]))
                     {
                         ExecOrd.Add(CalcFlds[i]);
-                        dpndcy.RemoveAll(x => x.Key == CalcFlds[i]);
+                        dpndcy.RemoveAll(x => x.Value == CalcFlds[i]);
                     }
                 }
                 stopCounter++;
@@ -487,17 +493,17 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
         {
             for (int i = 0; i < _dict.Count; i++)
             {
-                _dict[i].Control.DependedHideExp = new List<string>();
-                _dict[i].Control.DependedDisableExp = new List<string>();
+                _dict[i].Control.HiddenExpDependants = new List<string>();
+                _dict[i].Control.DisableExpDependants = new List<string>();
             }
             for (int i = 0; i < _dict.Count; i++)
             {
-                CheckHideAndDisableCode(_dict[i], _dict, _dict[i].Control.HideExpr, _dict[i].Control.DependedHideExp, "Hide expression");
-                CheckHideAndDisableCode(_dict[i], _dict, _dict[i].Control.DisableExpr, _dict[i].Control.DependedDisableExp, "Disable expression");
+                CheckHideAndDisableCode(_dict[i], _dict, _dict[i].Control.HiddenExpr, true);
+                CheckHideAndDisableCode(_dict[i], _dict, _dict[i].Control.DisableExpr, false);
             }
         }
 
-        private static void CheckHideAndDisableCode(EbControlWrapper ctrlWrap, Dictionary<int, EbControlWrapper> _dict, EbScript ebScript, List<string> dependant, string msg)
+        private static void CheckHideAndDisableCode(EbControlWrapper ctrlWrap, Dictionary<int, EbControlWrapper> _dict, EbScript ebScript, bool is4Hide)
         {
             if (string.IsNullOrEmpty(ebScript?.Code))
                 return;
@@ -513,12 +519,16 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
 
                         if (Regex.IsMatch(ebScript.Code, regex))
                         {
-                            dependant.Add(ctrlWrap.Path);
+                            if(is4Hide)
+                                _dict[j].Control.HiddenExpDependants.Add(ctrlWrap.Path);
+                            else
+                                _dict[j].Control.DisableExpDependants.Add(ctrlWrap.Path);
+
                             IsAnythingResolved = true;
                         }
                     }
                     if (!IsAnythingResolved)
-                        throw new FormException($"Can't resolve some form variables in Js {msg} of {ctrlWrap.Control.Name}");
+                        throw new FormException($"Can't resolve some form variables in Js {(is4Hide ? "Hide expression" : "Disable expression")} of {ctrlWrap.Control.Name}");
                 }
             }
         }

@@ -235,7 +235,7 @@ namespace ExpressBase.Objects
 
         public override string SetValueJSfn { get { return @"  $('#' + this.EbSid_CtxId +'_slot_val').val(p1).trigger('change');"; } set { } }
 
-        public override string JustSetValueJSfn { get { return @"$('#' + this.EbSid_CtxId +'_slot_val').val(p1)"; } set { } }
+        public override string SetDisplayMemberJSfn { get { return @"$('#' + this.EbSid_CtxId +'_slot_val').val(p1)"; } set { } }
 
         public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
         {
