@@ -78,7 +78,7 @@ namespace ExpressBase.Objects
                         + JSFnsConstants.SS_IsRequiredOKJSfn +
                     @"}
                     else{
-                        let val = this.getValueFromDOM();
+                        let val = this.getValue();
                         if(this.MultiSelect){
                             return !(val === '' || val === undefined|| val === null || typeof val === 'number');
                         }
