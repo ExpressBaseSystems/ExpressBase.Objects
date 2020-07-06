@@ -379,6 +379,8 @@ END;";
 
         public bool TwoFAStatus { set; get; }
 
+        public string TwoFAToAddress { set; get; }
+
         public ApiAuthResponse()
         {
             Locations = new List<EbLocation>();
