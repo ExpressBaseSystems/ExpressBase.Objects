@@ -329,8 +329,9 @@ namespace ExpressBase.Objects
                         if (c != null)
                             c.Value = null;
                     }
+                    int id = 0;
                     foreach (SingleRow Row in entry.Value)
-                        Row.RowId = 0;
+                        Row.RowId = --id;
                 }
                 return;
             }
