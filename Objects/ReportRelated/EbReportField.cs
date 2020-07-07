@@ -191,7 +191,7 @@ namespace ExpressBase.Objects
                 fileByte = Rep.GetImage(ImageRefId);
             else if (!string.IsNullOrEmpty(ImageColName))
             {
-                dynamic val = Rep.GetDataFieldtValue(ImageColName.Split(".")[1], slno, Convert.ToInt32(ImageColName.Split(".")[0].Substring(1)));
+                dynamic val = Rep.GetDataFieldValue(ImageColName.Split(".")[1], slno, Convert.ToInt32(ImageColName.Split(".")[0].Substring(1)));
                 Console.WriteLine("Image DrawMe val = " + ImageColName + ":" + val);
                 if (val != null)
                     if (val is byte[])
@@ -739,7 +739,7 @@ namespace ExpressBase.Objects
         {
             int tableIndex = Convert.ToInt32(Code.Split('.')[0].Substring(1));
             string column_name = Code.Split('.')[1];
-            string column_val = Rep.GetDataFieldtValue(column_name, slno, tableIndex);
+            string column_val = Rep.GetDataFieldValue(column_name, slno, tableIndex);
             //** BarcodeEan(& BarcodeEansupp)
             //public const int EAN13 = 1;
             //public const int EAN8 = 2;
@@ -854,7 +854,7 @@ namespace ExpressBase.Objects
             {
                 int tableIndex = Convert.ToInt32(Code.Split('.')[0].Substring(1));
                 string column_name = Code.Split('.')[1];
-                string column_val = Rep.GetDataFieldtValue(column_name, slno, tableIndex);
+                string column_val = Rep.GetDataFieldValue(column_name, slno, tableIndex);
                 QRCodeGenerator qrGenerator = new QRCodeGenerator();
                 QRCodeData qrCodeData = qrGenerator.CreateQrCode(column_val, QRCodeGenerator.ECCLevel.Q);
                 BitmapByteQRCode qrCode = new BitmapByteQRCode(qrCodeData);

@@ -89,7 +89,7 @@ namespace ExpressBase.Objects
 
         public override string OnChangeBindJSFn { get { return @"$('#' + this.EbSid_CtxId + ' input[type=hidden]').on('change', p1);"; } set { } }
 
-        public override string JustSetValueJSfn { get { return "this._JsCtrlMng.setValue(p1, p2, true);"; } }
+        public override string SetDisplayMemberJSfn { get { return "this._JsCtrlMng.setValue(p1, p2, true);"; } }
 
         public override string SetValueJSfn { get { return "this._JsCtrlMng.setValue(p1, p2, false);"; } }
 
@@ -117,7 +117,11 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
-        public override EbScript VisibleExpr { get; set; }
+        public override EbScript HiddenExpr { get; set; }
+        
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override EbScript DisableExpr { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]

@@ -26,6 +26,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using ExpressBase.Common.Constants;
 using ExpressBase.CoreBase.Globals;
+using System.Net;
 
 namespace ExpressBase.Objects
 {
@@ -78,7 +79,7 @@ namespace ExpressBase.Objects
         private DbTransaction DbTransaction { get; set; }
 
         public static EbOperations Operations = WFOperations.Instance;
-        
+
         [PropertyGroup("Events")]
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.Collection)]
@@ -166,7 +167,7 @@ namespace ExpressBase.Objects
                 .Replace("@ebsid@", this.EbSid_CtxId)
                 .Replace("@rmode@", IsRenderMode.ToString().ToLower())
                 .Replace("@tabindex@", IsRenderMode ? string.Empty : " tabindex='1'");
-            return  Regex.Replace(html, @"( |\r?\n)\1+", "$1");
+            return Regex.Replace(html, @"( |\r?\n)\1+", "$1");
         }
 
         //Operations to be performed before form object save - table name required, table name repetition, calculate dependency
@@ -179,16 +180,17 @@ namespace ExpressBase.Objects
         {
             BeforeSaveHelper.BeforeSave(this, null, null);
         }
-        
+
         //import data - using data reader in dg - from another form linked in ps 
         public void ImportData(IDatabase DataDB, Service Service, List<Param> Param, string Trigger, int RowId)
         {
             EbControl[] Allctrls = this.Controls.FlattenAllEbControls();
+            Allctrls = Array.FindAll(Allctrls, c => !(c is EbControlContainer && (c as EbDataGrid == null)));
             EbControl TriggerCtrl = null;
             List<EbDataGrid> DGs = new List<EbDataGrid>();
             for (int i = 0; i < Allctrls.Length; i++)
             {
-                if (Allctrls[i].Name.Equals(Trigger))
+                if (Allctrls[i].Name == Trigger)
                     TriggerCtrl = Allctrls[i];
 
                 if (Allctrls[i] is EbDataGrid)
@@ -316,6 +318,41 @@ namespace ExpressBase.Objects
         public void GetImportData(IDatabase DataDB, Service Service, EbWebForm Form)//COPY this TO Form
         {
             this.RefreshFormData(DataDB, Service);
+            if (this.RefId == Form.RefId)
+            {
+                WebformData newFormData = new WebformData() { MasterTable = this.FormSchema.MasterTable };
+                foreach (TableSchema _t in this.FormSchema.Tables)
+                {
+                    if (_t.TableType == WebFormTableTypes.Normal || _t.TableType == WebFormTableTypes.Grid)
+                    {
+                        newFormData.MultipleTables.Add(_t.TableName, this.FormData.MultipleTables[_t.TableName]);
+                        SingleTable Table = newFormData.MultipleTables[_t.TableName];
+                        if (_t.TableType == WebFormTableTypes.Normal)
+                        {
+                            if (Table.Count > 0)
+                            {
+                                SingleColumn c = Table[0].Columns.Find(e => e.Control is EbAutoId);
+                                if (c != null)
+                                    c.Value = null;
+                                Table[0].RowId = 0;
+                            }
+                        }
+                        else
+                        {
+                            int id = -1;
+                            foreach (SingleRow Row in Table)
+                                Row.RowId = id--;
+                        }
+                    }
+                    else if (_t.TableType == WebFormTableTypes.Review)
+                    {
+                        newFormData.MultipleTables.Add(_t.TableName, new SingleTable());
+                    }
+                }
+                newFormData.DGsRowDataModel = this.FormData.DGsRowDataModel;
+                Form.FormData = newFormData;
+                return;
+            }
 
             foreach (TableSchema _t in this.FormSchema.Tables)
             {
@@ -430,7 +467,7 @@ namespace ExpressBase.Objects
             string val = string.Empty;
             for (int i = 0; i < Allctrls.Length; i++)
             {
-                if (Allctrls[i].Name.Equals(Trigger))
+                if (Allctrls[i].Name == Trigger)
                 {
                     TriggerCtrl = Allctrls[i];
                     break;
@@ -484,18 +521,18 @@ namespace ExpressBase.Objects
                 foreach (SingleRow Row in this.FormData.MultipleTables[_table.TableName])
                 {
                     if (string.IsNullOrEmpty(Row.pId))
-                        throw new FormException("Parent id missing in dynamic entry", (int)HttpStatusCodes.BAD_REQUEST, "Table : " + _table.TableName + ", Row Id : " + Row.RowId, "From EbWebForm.MergeFormData()");
+                        throw new FormException("Parent id missing in dynamic entry", (int)HttpStatusCode.BadRequest, "Table : " + _table.TableName + ", Row Id : " + Row.RowId, "From EbWebForm.MergeFormData()");
 
                     int id = Convert.ToInt32(Row.pId.Substring(0, Row.pId.IndexOf(CharConstants.UNDERSCORE)));
                     string tbl = Row.pId.Substring(Row.pId.IndexOf(CharConstants.UNDERSCORE) + 1);
 
                     //if (tbl == this.FormSchema.MasterTable)
-                    //    throw new FormException("Invalid table. Master table is not allowed for dynamic entry.", (int)HttpStatusCodes.BAD_REQUEST, "Table : " + _table.TableName + ", Row Id : " + Row.RowId, "From EbWebForm.MergeFormData()");
+                    //    throw new FormException("Invalid table. Master table is not allowed for dynamic entry.", (int)HttpStatusCode.BadRequest, "Table : " + _table.TableName + ", Row Id : " + Row.RowId, "From EbWebForm.MergeFormData()");
 
                     SingleRow _row = this.FormData.MultipleTables[tbl].Find(e => e.RowId == id);
 
                     if (_row == null)
-                        throw new FormException("Invalid data found in dynamic entry", (int)HttpStatusCodes.BAD_REQUEST, "Table : " + _table.TableName + ", Row Id : " + Row.RowId, "From EbWebForm.MergeFormData()");
+                        throw new FormException("Invalid data found in dynamic entry", (int)HttpStatusCode.BadRequest, "Table : " + _table.TableName + ", Row Id : " + Row.RowId, "From EbWebForm.MergeFormData()");
                     if (_row.IsDelete)
                         continue;
 
@@ -759,6 +796,8 @@ namespace ExpressBase.Objects
                             i += 5;
                     }
                     _rowId = Convert.ToInt32(dataRow[i]);
+                    if (_rowId <= 0)
+                        throw new FormException("Something went wrong in our end.", (int)HttpStatusCode.InternalServerError, $"Invalid data found. TableName: {_table.TableName}, RowId: {_rowId}, LocId: {_locId}", "EbWebForm -> GetFormattedData");
                     for (; j < Table.Count; j++)
                     {
                         if (Table[j].RowId == _rowId)
@@ -793,18 +832,14 @@ namespace ExpressBase.Objects
 
         private void GetFormattedColumn(EbDataColumn dataColumn, EbDataRow dataRow, SingleRow Row, EbControl _control)
         {
+            if (dataColumn == null && _control == null)
+                throw new FormException("Something went wrong in our end", (int)HttpStatusCode.InternalServerError, "EbWebForm.GetFormattedColumn: dataColumn and _control is null", "RowId: " + Row.RowId);
+
             if (_control != null)
             {
                 if (_control.DoNotPersist && !_control.IsSysControl)
                 {
-                    Row.Columns.Add(new SingleColumn()
-                    {
-                        Name = _control.Name,
-                        Type = (int)_control.EbDbType,
-                        Value = null,
-                        Control = _control,
-                        ObjType = _control.ObjType
-                    });
+                    Row.Columns.Add(_control.GetSingleColumn(this.UserObj, this.SolutionObj, null));
                     return;
                 }
             }
@@ -844,7 +879,7 @@ namespace ExpressBase.Objects
 
             Row.Columns.Add(new SingleColumn()
             {
-                Name = dataColumn.ColumnName,
+                Name = _control == null ? dataColumn.ColumnName : _control.Name,
                 Type = _control == null ? (int)dataColumn.Type : (int)_control.EbDbType,
                 Value = _formattedData,
                 Control = _control,
@@ -866,6 +901,7 @@ namespace ExpressBase.Objects
                             string EbSid, VmName, DmName = string.Empty;
                             DVColumnCollection DmsColl;
                             bool RenderAsSS = false;
+                            DVColumnCollection ColColl;
 
                             if (Column.Control is EbPowerSelect)
                             {
@@ -875,6 +911,7 @@ namespace ExpressBase.Objects
                                 RenderAsSS = psCtrl.RenderAsSimpleSelect;
                                 DmName = RenderAsSS ? psCtrl.DisplayMember.Name : string.Empty;
                                 DmsColl = psCtrl.DisplayMembers;
+                                ColColl = psCtrl.Columns;
                             }
                             else
                             {
@@ -882,6 +919,7 @@ namespace ExpressBase.Objects
                                 EbSid = psColCtrl.EbSid;
                                 VmName = psColCtrl.ValueMember.Name;
                                 DmsColl = psColCtrl.DisplayMembers;
+                                ColColl = psColCtrl.Columns;
                             }
 
                             if (Column.Value == null || string.IsNullOrEmpty(Convert.ToString(Column.Value)) || !this.FormData.PsDm_Tables.ContainsKey(EbSid))
@@ -923,6 +961,26 @@ namespace ExpressBase.Objects
                                             __d.Add(DmsColl[j].Name, Convert.ToString(_row[DmsColl[j].Name]) ?? string.Empty);
                                         }
                                         //Disp.Add(vms[i], _dm);
+                                        DispM_dup.Add(vms[i], __d);
+                                    }
+                                }
+                                else
+                                {
+                                    foreach (DVBaseColumn _dvCol in ColColl)
+                                    {
+                                        if (!Rows.ContainsKey(_dvCol.Name))
+                                            Rows.Add(_dvCol.Name, new List<object>());
+                                        Rows[_dvCol.Name].Add(string.Empty);
+                                    }
+                                    if (RenderAsSS)
+                                    {
+                                        DispM_dup.Add(vms[i], new Dictionary<string, string> { { VmName, string.Empty } });
+                                    }
+                                    else
+                                    {
+                                        Dictionary<string, string> __d = new Dictionary<string, string>();
+                                        for (int j = 0; j < DmsColl.Count; j++)
+                                            __d.Add(DmsColl[j].Name, string.Empty);
                                         DispM_dup.Add(vms[i], __d);
                                     }
                                 }
@@ -1024,7 +1082,7 @@ namespace ExpressBase.Objects
                     return;
                 string t = "From RefreshFormData - TABLE : " + _FormData.MasterTable + "   ID : " + this.TableRowId + "\nData Not Found";
                 Console.WriteLine(t);
-                throw new FormException("Error in loading data", (int)HttpStatusCodes.INTERNAL_SERVER_ERROR, t, string.Empty);
+                throw new FormException("Error in loading data", (int)HttpStatusCode.InternalServerError, t, string.Empty);
             }
             else
             {
@@ -1406,11 +1464,15 @@ namespace ExpressBase.Objects
                     Console.WriteLine("New record inserted. Table :" + this.TableName + ", Id : " + this.TableRowId);
                 }
                 this.RefreshFormData(DataDB, service, false, true);
+                Console.WriteLine("EbWebForm.Save.UpdateAuditTrail start");
                 EbAuditTrail ebAuditTrail = new EbAuditTrail(this, DataDB);
                 resp += " - AuditTrail: " + ebAuditTrail.UpdateAuditTrail();
+                Console.WriteLine("EbWebForm.Save.AfterSave start");
                 resp += " - AfterSave: " + this.AfterSave(DataDB, IsUpdate);
+                Console.WriteLine("EbWebForm.Save.SendNotifications start");
                 resp += " - Notifications: " + EbFnGateway.SendNotifications(this, DataDB, service);
                 this.DbTransaction.Commit();
+                Console.WriteLine("EbWebForm.Save.DbTransaction Committed");
             }
             catch (FormException ex1)
             {
@@ -1434,7 +1496,7 @@ namespace ExpressBase.Objects
                 {
                     Console.WriteLine($"Rollback Exception Type: {ex2.GetType()}\nMessage: {ex2.Message}");
                 }
-                throw new FormException("Exception in Form data save", (int)HttpStatusCodes.INTERNAL_SERVER_ERROR, ex1.Message, ex1.StackTrace);
+                throw new FormException("Exception in Form data save", (int)HttpStatusCode.InternalServerError, ex1.Message, ex1.StackTrace);
             }
             this.DbConnection.Close();
             return resp;
@@ -1448,7 +1510,7 @@ namespace ExpressBase.Objects
             int i = 0;
             List<EbWebForm> FormCollection = new List<EbWebForm>() { this };
             if (this.ExeDataPusher)
-                this.PrepareWebFormData();            
+                this.PrepareWebFormData();
 
             this.FormCollection.Insert(DataDB, param, ref fullqry, ref _extqry, ref i);
 
@@ -1458,11 +1520,13 @@ namespace ExpressBase.Objects
 
             param.Add(DataDB.GetNewParameter(FormConstants.eb_createdby, EbDbTypes.Int32, this.UserObj.UserId));
             param.Add(DataDB.GetNewParameter(FormConstants.eb_loc_id, EbDbTypes.Int32, this.LocationId));
-            fullqry += string.Format("SELECT eb_currval('{0}_id_seq');", this.TableName);
+            fullqry += $"SELECT eb_currval('{this.TableName}_id_seq');";
 
             EbDataSet tem = DataDB.DoQueries(this.DbConnection, fullqry, param.ToArray());
             EbDataTable temp = tem.Tables[tem.Tables.Count - 1];
             int _rowid = temp.Rows.Count > 0 ? Convert.ToInt32(temp.Rows[0][0]) : 0;
+            if (_rowid <= 0)
+                throw new FormException("Something went wrong in our end.", (int)HttpStatusCode.InternalServerError, $"SELECT eb_currval('{this.TableName}_id_seq') returned an invalid data: {_rowid}", "EbWebForm -> Insert");
             return _rowid;
         }
 
@@ -1566,7 +1630,7 @@ namespace ExpressBase.Objects
                             permissionGranted = true;
                     }
                     if (!permissionGranted)
-                        throw new FormException("Access denied to execute review", (int)HttpStatusCodes.UNAUTHORIZED, $"Following entry is not present in FormDataBackup. eb_my_actions_id: {this.FormData.MultipleTables[ebReview.TableName][0]["eb_my_actions_id"]} ", "From GetMyActionInsertUpdateQuery");
+                        throw new FormException("Access denied to execute review", (int)HttpStatusCode.Unauthorized, $"Following entry is not present in FormDataBackup. eb_my_actions_id: {this.FormData.MultipleTables[ebReview.TableName][0]["eb_my_actions_id"]} ", "From GetMyActionInsertUpdateQuery");
 
                     insUpQ = $@"UPDATE eb_my_actions SET completed_at = {DataDB.EB_CURRENT_TIMESTAMP}, completed_by = @eb_createdby, is_completed = 'T',
 					    eb_approval_lines_id = (SELECT eb_currval('eb_approval_lines_id_seq')) WHERE id = @eb_my_actions_id_{i} AND eb_del = 'F'; ";
@@ -1574,7 +1638,7 @@ namespace ExpressBase.Objects
                     Console.WriteLine("Will try to UPDATE eb_my_actions");
 
                     if (!(ebReview.FormStages.Find(e => e.EbSid == Convert.ToString(this.FormData.MultipleTables[ebReview.TableName][0]["stage_unique_id"])) is EbReviewStage currentStage))
-                        throw new FormException("Bad Request", (int)HttpStatusCodes.BAD_REQUEST, $"eb_approval_lines contains an invalid stage_unique_id: {this.FormData.MultipleTables[ebReview.TableName][0]["stage_unique_id"]} ", "From GetMyActionInsertUpdateQuery");
+                        throw new FormException("Bad Request", (int)HttpStatusCode.BadRequest, $"eb_approval_lines contains an invalid stage_unique_id: {this.FormData.MultipleTables[ebReview.TableName][0]["stage_unique_id"]} ", "From GetMyActionInsertUpdateQuery");
 
                     //_FG_WebForm global = GlobalsGenerator.GetCSharpFormGlobals(this, this.FormData);
                     //_FG_Root globals = new _FG_Root(global, this, service);
@@ -1609,7 +1673,7 @@ namespace ExpressBase.Objects
                             insMyActRequired = true;
                         }
                         else
-                            throw new FormException("Unable to decide next stage", (int)HttpStatusCodes.INTERNAL_SERVER_ERROR, "NextStage C# script returned a value that is not recognized as a stage", "Return value : " + nxtStName);
+                            throw new FormException("Unable to decide next stage", (int)HttpStatusCode.InternalServerError, "NextStage C# script returned a value that is not recognized as a stage", "Return value : " + nxtStName);
                     }
                 }
                 else if (reviewRowCount == 0)
@@ -1618,7 +1682,7 @@ namespace ExpressBase.Objects
                     return string.Empty;
                 }
                 else
-                    throw new FormException("Bad Request for review control", (int)HttpStatusCodes.BAD_REQUEST, "eb_approval_lines contains more than one rows, only one review allowed at a time", "From GetMyActionInsertUpdateQuery");
+                    throw new FormException("Bad Request for review control", (int)HttpStatusCode.BadRequest, "eb_approval_lines contains more than one rows, only one review allowed at a time", "From GetMyActionInsertUpdateQuery");
             }
 
             if (isInsert || insMyActRequired)// first save or insert myaction required in edit
@@ -1650,15 +1714,15 @@ namespace ExpressBase.Objects
                         else if (this.FormDataBackup != null && this.FormDataBackup.MultipleTables.ContainsKey(p.Value))
                             Table = this.FormDataBackup.MultipleTables[p.Value];
                         else
-                            new FormException($"Review control parameter {p.Key} is not idetified", (int)HttpStatusCodes.BAD_REQUEST, "GetFirstMyActionInsertQuery", $"{p.Value} not found in MultipleTables");
+                            throw new FormException($"Bad Request", (int)HttpStatusCode.BadRequest, $"GetFirstMyActionInsertQuery: Review control parameter {p.Key} is not idetified", $"{p.Value} not found in MultipleTables");
                         TableSchema _table = this.FormSchema.Tables.Find(e => e.TableName == p.Value);
                         if (_table.TableType != WebFormTableTypes.Normal)
-                            new FormException($"Review control parameter {p.Key} is not idetified", (int)HttpStatusCodes.BAD_REQUEST, "GetFirstMyActionInsertQuery", $"{p.Value} found in MultipleTables but it is not a normal table");
+                            throw new FormException($"Bad Request", (int)HttpStatusCode.BadRequest, $"GetFirstMyActionInsertQuery: Review control parameter {p.Key} is not idetified", $"{p.Value} found in MultipleTables but it is not a normal table");
                         if (Table.Count != 1)
-                            new FormException($"Review control parameter {p.Key} is not idetified", (int)HttpStatusCodes.BAD_REQUEST, "GetFirstMyActionInsertQuery", $"{p.Value} found in MultipleTables but table is empty");
+                            throw new FormException($"Bad Request", (int)HttpStatusCode.BadRequest, $"GetFirstMyActionInsertQuery: Review control parameter {p.Key} is not idetified", $"{p.Value} found in MultipleTables but table is empty");
                         SingleColumn Column = Table[0].Columns.Find(e => e.Control?.Name == p.Key);
                         if (Column == null || Column.Control == null)
-                            new FormException($"Review control parameter {p.Key} is not idetified", (int)HttpStatusCodes.BAD_REQUEST, "GetFirstMyActionInsertQuery", $"{p.Value} found in MultipleTables but data not available");
+                            throw new FormException($"Bad Request", (int)HttpStatusCode.BadRequest, $"GetFirstMyActionInsertQuery: Review control parameter {p.Key} is not idetified", $"{p.Value} found in MultipleTables but data not available");
 
                         Column.Control.ParameterizeControl(DataDB, _params, null, Column, true, ref _idx, ref t1, ref t2, ref t3, this.UserObj, null);
                         _params[_idx - 1].ParameterName = p.Key;
@@ -1675,7 +1739,7 @@ namespace ExpressBase.Objects
                     _val = $"'{uids.Join(",")}'";
                 }
                 else
-                    throw new FormException("Unable to process review control", (int)HttpStatusCodes.INTERNAL_SERVER_ERROR, "Invalid value for ApproverEntity : " + nextStage.ApproverEntity, "From GetMyActionInsertUpdateQuery");
+                    throw new FormException("Unable to process review control", (int)HttpStatusCode.InternalServerError, "Invalid value for ApproverEntity : " + nextStage.ApproverEntity, "From GetMyActionInsertUpdateQuery");
 
                 string autoId = string.Empty;
                 //this.FormSchema.Tables[0] = master table; asumption - EbAutoId is in master table
@@ -1861,7 +1925,7 @@ namespace ExpressBase.Objects
                 {
                     Console.WriteLine($"Rollback Exception Type: {ex2.GetType()}\nMessage: {ex2.Message}");
                 }
-                throw new FormException("Exception in Form data save", (int)HttpStatusCodes.INTERNAL_SERVER_ERROR, ex1.Message, ex1.StackTrace);
+                throw new FormException("Exception in Form data save", (int)HttpStatusCode.InternalServerError, ex1.Message, ex1.StackTrace);
             }
             if (DbCon == null)
                 this.DbConnection.Close();
@@ -1886,7 +1950,7 @@ namespace ExpressBase.Objects
         {
             EbDataPushHelper DataPushHelper = new EbDataPushHelper(this);
             string Json = DataPushHelper.GetPusherJson(Data);
-            string Code = DataPushHelper.GetProcessedCode(Json);            
+            string Code = DataPushHelper.GetProcessedCode(Json);
             Script _script = CSharpScript.Create<dynamic>(
                 Code,
                 ScriptOptions.Default.WithReferences("Microsoft.CSharp", "System.Core").WithImports("System", "System.Collections.Generic", "System.Linq"),
@@ -1907,7 +1971,7 @@ namespace ExpressBase.Objects
                 {
                     Console.WriteLine("Exception in C# Expression evaluation:" + Code + " \nMessage : " + ex.Message);
                     Console.WriteLine(ex.StackTrace);
-                    throw new FormException("Exception in C# code evaluation", (int)HttpStatusCodes.INTERNAL_SERVER_ERROR, $"{ex.Message} \n C# code : {Code}", $"StackTrace : {ex.StackTrace}");
+                    throw new FormException("Exception in C# code evaluation", (int)HttpStatusCode.InternalServerError, $"{ex.Message} \n C# code : {Code}", $"StackTrace : {ex.StackTrace}");
                 }
                 DataPushHelper.CreateWebFormData_Demo(out_dict, Json);
                 this.TableRowId = 0;//insert
@@ -1916,7 +1980,7 @@ namespace ExpressBase.Objects
             }
             return DataIds;
         }
-        
+
         //duplicate for SQL job - remove this fn if globals conversion is completed
         private SingleRow GetSingleRow(JToken JRow, TableSchema _table, FormGlobals globals)
         {
@@ -1958,7 +2022,7 @@ namespace ExpressBase.Objects
             {
                 Console.WriteLine("Exception in C# Expression evaluation:" + code + " \nMessage : " + ex.Message);
                 Console.WriteLine(ex.StackTrace);
-                throw new FormException("Exception in C# code evaluation", (int)HttpStatusCodes.INTERNAL_SERVER_ERROR, $"{ex.Message} \n C# code : {code}", $"StackTrace : {ex.StackTrace}");
+                throw new FormException("Exception in C# code evaluation", (int)HttpStatusCode.InternalServerError, $"{ex.Message} \n C# code : {code}", $"StackTrace : {ex.StackTrace}");
             }
         }
 
@@ -1978,7 +2042,7 @@ namespace ExpressBase.Objects
             {
                 Console.WriteLine("Exception in C# Expression evaluation:" + code + " \nMessage : " + ex.Message);
                 Console.WriteLine(ex.StackTrace);
-                throw new FormException("Exception in C# code evaluation", (int)HttpStatusCodes.INTERNAL_SERVER_ERROR, $"{ex.Message} \n C# code : {code}", $"StackTrace : {ex.StackTrace}");
+                throw new FormException("Exception in C# code evaluation", (int)HttpStatusCode.InternalServerError, $"{ex.Message} \n C# code : {code}", $"StackTrace : {ex.StackTrace}");
             }
         }
 

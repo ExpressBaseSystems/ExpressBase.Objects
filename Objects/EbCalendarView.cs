@@ -129,6 +129,7 @@ namespace ExpressBase.Objects
         //[EnableInBuilder(BuilderType.Calendar)]
         //public override int LeftFixedColumn { get; set; }
 
+        public static EbOperations Operations = CalendarOperations.Instance;
 
         public EbCalendarView()
         {

@@ -114,7 +114,7 @@ namespace ExpressBase.Objects
         {
 
             ColumnText ct = new ColumnText(Rep.Canvas);
-            string column_val = Rep.GetDataFieldtValue(ColumnName, slno, TableIndex);
+            string column_val = Rep.GetDataFieldValue(ColumnName, slno, TableIndex);
             if (Prefix != "" || Suffix != "")
                 column_val = Prefix + " " + column_val + " " + Suffix;
 
@@ -229,7 +229,7 @@ namespace ExpressBase.Objects
         public override void DrawMe(float printingTop, EbReport Rep, List<Param> Params, int slno)
         {
             ColumnText ct = new ColumnText(Rep.Canvas);
-            string column_val = Rep.GetDataFieldtValue(ColumnName, slno, TableIndex);
+            string column_val = Rep.GetDataFieldValue(ColumnName, slno, TableIndex);
             Phrase phrase = GetPhrase(column_val, (DbType)DbType, Rep.Font);
             if (!string.IsNullOrEmpty(LinkRefId))
             {
@@ -282,7 +282,7 @@ namespace ExpressBase.Objects
         public override void DrawMe(float printingTop, EbReport Rep, List<Param> Params, int slno)
         {
             ColumnText ct = new ColumnText(Rep.Canvas);
-            string column_val = Rep.GetDataFieldtValue(ColumnName, slno, TableIndex);
+            string column_val = Rep.GetDataFieldValue(ColumnName, slno, TableIndex);
             column_val = FormatDate(column_val, Format, Rep);
             if (Prefix != "" || Suffix != "")
                 column_val = Prefix + " " + column_val + " " + Suffix;
@@ -333,7 +333,7 @@ namespace ExpressBase.Objects
         {
 
             ColumnText ct = new ColumnText(Rep.Canvas);
-            string column_val = Rep.GetDataFieldtValue(ColumnName, slno, TableIndex);
+            string column_val = Rep.GetDataFieldValue(ColumnName, slno, TableIndex);
             if (Prefix != "" || Suffix != "")
                 column_val = Prefix + " " + column_val + " " + Suffix;
             Phrase phrase = GetFormattedPhrase(this.Font, Rep.Font, column_val);
@@ -392,7 +392,7 @@ namespace ExpressBase.Objects
         public override void DrawMe(float printingTop, EbReport Rep, List<Param> Params, int slno)
         {
             ColumnText ct = new ColumnText(Rep.Canvas);
-            string column_val = Rep.GetDataFieldtValue(ColumnName, slno, TableIndex);
+            string column_val = Rep.GetDataFieldValue(ColumnName, slno, TableIndex);
             float ury = Rep.HeightPt - (printingTop + TopPt + Rep.detailprintingtop);
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
 
@@ -919,6 +919,20 @@ namespace ExpressBase.Objects
             float lly = Rep.HeightPt - (printingTop + TopPt + HeightPt + Rep.detailprintingtop);
             ct.SetSimpleColumn(Llx, lly, Urx, ury, 15, (int)TextAlign);
             ct.Go();
+        }
+
+        public dynamic GetCalcFieldValue(Globals globals,EbDataSet DataSet, int serialnumber, EbReport Rep)
+        {
+            dynamic value = null; 
+            foreach (string calcfd in this.DataFieldsUsedInCalc)
+            {
+                string TName = calcfd.Split('.')[0];
+                string fName = calcfd.Split('.')[1];
+                int tableindex = Convert.ToInt32(TName.Substring(1));
+                globals[TName].Add(fName, new NTV { Name = fName, Type = DataSet.Tables[tableindex].Columns[fName].Type, Value = DataSet.Tables[tableindex].Rows[serialnumber][fName] });
+            }
+            value = (Rep.ValueScriptCollection[this.Name].RunAsync(globals)).Result.ReturnValue.ToString();
+            return value;
         }
     }
 

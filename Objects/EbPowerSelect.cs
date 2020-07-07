@@ -78,7 +78,7 @@ namespace ExpressBase.Objects
                         + JSFnsConstants.SS_IsRequiredOKJSfn +
                     @"}
                     else{
-                        let val = this.getValueFromDOM();
+                        let val = this.getValue();
                         if(this.MultiSelect){
                             return !(val === '' || val === undefined|| val === null || typeof val === 'number');
                         }
@@ -152,7 +152,7 @@ else
         }
 
         [JsonIgnore]
-        public override string JustSetValueJSfn { get { return JSFnsConstants.PS_JustSetValueJSfn; } set { } }
+        public override string SetDisplayMemberJSfn { get { return JSFnsConstants.PS_JustSetValueJSfn; } set { } }
 
         [JsonIgnore]
         public override string SetValueJSfn { get { return JSFnsConstants.PS_SetValueJSfn; } set { } }
@@ -200,7 +200,7 @@ else
         [HideInPropertyGrid]
         public EbButton AddButton { set; get; }
 
-        public override string SetDisplayMemberJSfn
+        public override string JustSetValueJSfn
         {
             get
             {
@@ -789,7 +789,11 @@ else// PS
         {
             string Sql = this.GetSql(service);
             string vm = this.ValueMember.Name;
-            string dm = string.Join(',', this.DisplayMembers.Select(e => e.Name));
+            string dm;
+            if (this.RenderAsSimpleSelect)
+                dm = this.DisplayMember.Name;
+            else
+                dm = string.Join(',', this.DisplayMembers.Select(e => e.Name));
 
             string s = "";
             if (DataDB.Vendor == DatabaseVendors.MYSQL)

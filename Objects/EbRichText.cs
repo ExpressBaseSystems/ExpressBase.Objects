@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Text;
 
-namespace ExpressBase.Objects.Objects
+namespace ExpressBase.Objects
 {
 	[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
 	public class EbRichText: EbControlUI
@@ -40,73 +40,73 @@ namespace ExpressBase.Objects.Objects
 
 
 		//--------Hide in property grid------------
-		[EnableInBuilder(BuilderType.WebForm)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override string HelpText { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override string ToolTipText { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override bool Unique { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override List<EbValidator> Validators { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override EbScript DefaultValueExpression { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
-		public override EbScript VisibleExpr { get; set; }
+		public override EbScript HiddenExpr { get; set; }
+		
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+		[HideInPropertyGrid]
+		public override EbScript DisableExpr { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override EbScript ValueExpr { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm)]
-		[HideInPropertyGrid]
-		public override bool IsDisable { get; set; }
-
-		[EnableInBuilder(BuilderType.WebForm)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override bool Required { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override bool DoNotPersist { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override string BackColor { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override string ForeColor { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override string LabelBackColor { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override string LabelForeColor { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override EbScript OnChangeFn { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override EbDbTypes EbDbType { get { return EbDbTypes.String; } set { } }
 
 
 
-		[EnableInBuilder(BuilderType.WebForm)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
 		[DefaultPropValue("100")]
 		[Alias("Textarea Height")]
 		public int TextBoxHeight { get; set; }

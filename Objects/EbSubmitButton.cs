@@ -87,7 +87,10 @@ namespace ExpressBase.Objects.Objects
         public override bool IsDisable { get; set; }
 
         [HideInPropertyGrid]
-        public override EbScript VisibleExpr { get; set; }
+        public override EbScript HiddenExpr { get; set; }
+        
+        [HideInPropertyGrid]
+        public override EbScript DisableExpr { get; set; }
 
         [HideInPropertyGrid]
         public override List<EbValidator> Validators { get; set; }

@@ -594,7 +594,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 2)]
         public List<EbLocationCustomField> Config { get; set; }
-        
+
         [DataMember(Order = 3)]
         public Dictionary<int, EbLocation> LocationTree { get; set; }
 
@@ -672,13 +672,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 2)]
         public bool Status { get; set; }
     }
-    public class GetUserDashBoardObjectsRequest : IReturn<GetUserDashBoardObjectsResponse>, IEbSSRequest
+    public class GetUserDashBoardObjectsRequest : EbServiceStackAuthRequest, IReturn<GetUserDashBoardObjectsResponse>
     {
-        public List<int> ObjectIds { get; set; }
-
-        public string SolnId { get; set; }
-
-        public int UserId { get; set; }
+        public List<int> ObjectIds { get; set; } 
         public bool SolutionOwner { get; set; }
     }
     public class GetUserDashBoardObjectsResponse : IEbSSResponse

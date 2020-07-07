@@ -16,6 +16,7 @@ using ServiceStack.RabbitMq;
 using ExpressBase.Objects.ServiceStack_Artifacts;
 using ExpressBase.Common.Constants;
 using ExpressBase.Common.LocationNSolution;
+using System.Net;
 
 namespace ExpressBase.Objects
 {
@@ -116,7 +117,11 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
-        public override EbScript VisibleExpr { get; set; }
+        public override EbScript HiddenExpr { get; set; }
+        
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override EbScript DisableExpr { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
@@ -287,7 +292,7 @@ this.Init = function(id)
                 EbDataTable dt = DataDB.DoQuery(sql, parameters);
                 if (dt.Rows.Count > 0)
                 {
-                    throw new FormException($"{_d["email"]} already exists", (int)HttpStatusCodes.BAD_REQUEST, $"Email already exists : {_d["email"]}", "EbProvisionUser => ParameterizeControl");
+                    throw new FormException($"{_d["email"]} already exists", (int)HttpStatusCode.BadRequest, $"Email already exists : {_d["email"]}", "EbProvisionUser => ParameterizeControl");
                 }
 
                 this.UserCredentials = new UserCredentials()

@@ -112,96 +112,99 @@ namespace ExpressBase.Objects
 		[JsonIgnore]
 		public override string DisableJSfn { get { return @"this.__IsDisable = true;
             $(`#cont_${this.EbSid_CtxId}*`).attr('disabled', 'disabled').css('pointer-events', 'none').find('[ui-inp]').css('background-color', '#f3f3f3');
-            $(`#${this.EbSid_CtxId}`).find('.filethumb').attr('disabled', false).css('pointer-events', 'all');"; } set { }
+            $(`#${this.EbSid_CtxId}`).find('.filethumb').attr('disabled', false).css('pointer-events', 'all');
+			 $(`#${this.EbSid_CtxId}`).find('.delete-image').css('display', 'none');"; } set { }
 		}
 
 		[JsonIgnore]
-		public override string EnableJSfn { get { return @"this.__IsDisable = false; $('#cont_' + this.EbSid_CtxId + ' *').prop('disabled',false).css('pointer-events', 'all');"; } set { } }
+		public override string EnableJSfn { get { return @"this.__IsDisable = false; 
+			$('#cont_' + this.EbSid_CtxId + ' *').prop('disabled',false).css('pointer-events', 'all');
+			$(`#${this.EbSid_CtxId}`).find('.delete-image').css('display', '');"; } set { } }
 
 
 		//--------Hide in property grid------------
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override string HelpText { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override string ToolTipText { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override bool Unique { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override List<EbValidator> Validators { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override EbScript DefaultValueExpression { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
-		public override EbScript VisibleExpr { get; set; }
+		public override EbScript HiddenExpr { get; set; }
+		
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+		[HideInPropertyGrid]
+		public override EbScript DisableExpr { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override EbScript ValueExpr { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
-		[HideInPropertyGrid]
-		public override bool IsDisable { get; set; }
-
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override bool DoNotPersist { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override string BackColor { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override string ForeColor { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override string LabelBackColor { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override string LabelForeColor { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override EbScript OnChangeFn { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override EbDbTypes EbDbType { get { return EbDbTypes.String; } set { } }
 		
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[PropertyGroup(PGConstants.VALIDATIONS)]
 		public override bool Required { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[DefaultPropValue("1")]
 		[Alias("Maximum Files")]
 		public int MaxFiles { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[OnChangeUIFunction("EbSimpleFileUploader.minFilesFn")]
 		[DefaultPropValue("0")]
 		[HideInPropertyGrid]
 		[Alias("Minimum Files")]
 		public int MinFiles { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[DefaultPropValue("2")]
 		[Alias("Maximum File Size(MB)")]
 		public int MaxSize { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[DefaultPropValue("image/jpeg,image/png,image/jpg")]
 		[Alias("File Types")]
 		public string FileTypes { get; set; }

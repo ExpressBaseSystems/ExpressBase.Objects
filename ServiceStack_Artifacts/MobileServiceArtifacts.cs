@@ -2,11 +2,13 @@
 using ExpressBase.Common.Application;
 using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
+using ExpressBase.Common.LocationNSolution;
 using ExpressBase.Common.Structures;
 using ExpressBase.Security;
 using ServiceStack;
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Runtime.Serialization;
 using System.Text;
 
@@ -64,6 +66,21 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string AppName { set; get; }
 
         public string AppIcon { set; get; }
+
+        public EbMobileSettings AppSettings { set; get; }
+
+        public List<MobilePagesWraper> MobilePages { set; get; }
+
+        public List<WebObjectsWraper> WebObjects { set; get; }
+
+        public EbDataSet OfflineData { set; get; }
+
+        public AppDataToMob()
+        {
+            MobilePages = new List<MobilePagesWraper>();
+            WebObjects = new List<WebObjectsWraper>();
+            OfflineData = new EbDataSet();
+        }
     }
 
     public class MobilePagesWraper
@@ -271,47 +288,28 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         }
     }
 
-    //bulk data
-
-    public class EbApplicationDataMobile
-    {
-        public int AppId { set; get; }
-
-        public string AppName { set; get; }
-
-        public string AppIcon { set; get; }
-
-        public EbMobileSettings AppSettings { set; get; }
-
-        public List<MobilePagesWraper> MobilePages { set; get; }
-
-        public List<WebObjectsWraper> WebObjects { set; get; }
-
-        public EbApplicationDataMobile()
-        {
-            MobilePages = new List<MobilePagesWraper>();
-            WebObjects = new List<WebObjectsWraper>();
-        }
-    }
-
     [DataContract]
-    public class EbMobileSolutionData
+    public class EbMobileSolutionData : IEbApiStatusCode
     {
         [DataMember(Order = 1)]
-        public List<EbApplicationDataMobile> Applications { set; get; }
+        public List<AppDataToMob> Applications { set; get; }
 
         [DataMember(Order = 2)]
-        public EbDataSet OfflineData { set; get; }
+        public List<EbLocation> Locations { get; set; }
+
+        [DataMember(Order = 3)]
+        public HttpStatusCode StatusCode { get; set; }
 
         public EbMobileSolutionData()
         {
-            Applications = new List<EbApplicationDataMobile>();
-            OfflineData = new EbDataSet();
+            Applications = new List<AppDataToMob>();
+
+            Locations = new List<EbLocation>();
         }
     }
 
     public class MobileSolutionDataRequest : EbServiceStackAuthRequest, IReturn<EbMobileSolutionData>
     {
-        
+        public bool Export { set; get; }
     }
 }

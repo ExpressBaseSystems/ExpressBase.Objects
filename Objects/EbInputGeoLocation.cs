@@ -37,7 +37,10 @@ namespace ExpressBase.Objects
         public override EbScript OnChangeFn { get; set; }
 
         [HideInPropertyGrid]
-        public override EbScript VisibleExpr { get; set; }
+        public override EbScript HiddenExpr { get; set; }
+        
+        [HideInPropertyGrid]
+        public override EbScript DisableExpr { get; set; }
 
         public EbInputGeoLocation() { }
 
@@ -168,7 +171,7 @@ namespace ExpressBase.Objects
         }
 
         [JsonIgnore]
-        public override string JustSetValueJSfn
+        public override string SetDisplayMemberJSfn
         {
             get
             {

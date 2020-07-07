@@ -1,23 +1,22 @@
 ﻿using ExpressBase.Common;
 using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
-using ExpressBase.Common.Objects;
-using ExpressBase.Common.Objects.Attributes;
-using ExpressBase.Common.Structures;
-using Newtonsoft.Json;
 using ServiceStack;
 using ServiceStack.Text;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-using System.Text;
-using System.Xml.Serialization;
 using ExpressBase.Security;
 using ExpressBase.Common.LocationNSolution;
 using System.Net;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
+    public interface IEbApiStatusCode
+    {
+        HttpStatusCode StatusCode { set; get; }
+    }
+
     [DataContract]
     public class FormDataJsonRequest : IReturn<FormDataJsonResponse>, IEbSSRequest
     {
@@ -374,10 +373,27 @@ END;";
 
         public List<EbLocation> Locations { get; set; }
 
+        public bool Is2FEnabled { get; set; }
+
+        public string TwoFAToken { set; get; }
+
+        public bool TwoFAStatus { set; get; }
+
+        public string TwoFAToAddress { set; get; }
+
         public ApiAuthResponse()
         {
             Locations = new List<EbLocation>();
         }
+    }
+
+    public class ApiTwoFactorResponse : IEbApiStatusCode
+    {
+        public bool IsValid { set; get; }
+
+        public bool IsVerification { set; get; }
+
+        public HttpStatusCode StatusCode { get; set ; }
     }
 
     public class ApiFileData
