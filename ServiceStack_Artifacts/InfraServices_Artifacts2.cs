@@ -581,7 +581,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-    public class UpdateSidMapMqRequest : EbServiceStackAuthRequest, IReturn<UpdateSidMapMqResponse> { }
+    //public class UpdateSidMapMqRequest : EbServiceStackAuthRequest, IReturn<UpdateSidMapMqResponse> { }
 
     public class UpdateSidMapMqResponse : IEbSSResponse
     {

@@ -200,8 +200,7 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                         if (DataGrid.Controls[j] is EbDGUserControlColumn)
                         {
                             if (string.IsNullOrEmpty(DataGrid.Controls[j].RefId))
-                                throw new FormException($"User control reference is missing for {(DataGrid.Controls[j] as EbDGColumn).Title} in {DataGrid.Label}.");
-                            EbDGColumn DGColumn = DataGrid.Controls[j] as EbDGColumn;
+                                throw new FormException($"User control reference is missing for {(DataGrid.Controls[j] as EbDGColumn).Title} in {DataGrid.Label}.");// DataGrid.Label
                             (DataGrid.Controls[j] as EbDGUserControlColumn).Columns = new List<EbControl>();
                         }
                     }
@@ -260,6 +259,42 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                 {
                     if (string.IsNullOrEmpty(Allctrls[i].RefId))
                         throw new FormException($"User control reference is missing for {Allctrls[i].Label}.");
+                }
+                else if (Allctrls[i] is EbSimpleSelect)
+                {
+                    EbSimpleSelect _ctrl = Allctrls[i] as EbSimpleSelect;
+                    if (_ctrl.IsDynamic)
+                    {
+                        if (string.IsNullOrEmpty(_ctrl.DataSourceId))
+                            throw new FormException("Set 'data reader' for simple select - " + _ctrl.Label ?? _ctrl.Name);
+                        if (_ctrl.ValueMember == null)
+                            throw new FormException("Set 'value member' for simple select - " + _ctrl.Label ?? _ctrl.Name);
+                        if (_ctrl.DisplayMember == null)
+                            throw new FormException("Set 'display member' for simple select - " + _ctrl.Label ?? _ctrl.Name);
+                    }
+                    else
+                    {
+                        if (!(_ctrl.Options?.Count > 0))
+                            throw new FormException("Set 'options' for simple select - " + _ctrl.Label ?? _ctrl.Name);
+                    }
+                }
+                else if (Allctrls[i] is EbDGSimpleSelectColumn)
+                {
+                    EbDGSimpleSelectColumn _ctrl = Allctrls[i] as EbDGSimpleSelectColumn;
+                    if (_ctrl.IsDynamic)
+                    {
+                        if (string.IsNullOrEmpty(_ctrl.DataSourceId))
+                            throw new FormException("Set 'data reader' for simple select column - " + _ctrl.Title ?? _ctrl.Name);
+                        if (_ctrl.ValueMember == null)
+                            throw new FormException("Set 'value member' for simple select column - " + _ctrl.Title ?? _ctrl.Name);
+                        if (_ctrl.DisplayMember == null)
+                            throw new FormException("Set 'display member' for simple select column - " + _ctrl.Title ?? _ctrl.Name);
+                    }
+                    else
+                    {
+                        if (!(_ctrl.Options?.Count > 0))
+                            throw new FormException("Set 'options' for simple select column - " + _ctrl.Title ?? _ctrl.Name);
+                    }
                 }
                 if (Allctrls[i] is EbDynamicCardSet)
                 {

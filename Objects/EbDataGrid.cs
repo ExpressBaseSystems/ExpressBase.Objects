@@ -953,6 +953,11 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
         {
             DBareHtml = EbSimpleSelect.GetBareHtml();
         }
+
+        public string GetDisplayMembersQuery(IDatabase DataDB, Service service, string vms)
+        {
+            return this.EbSimpleSelect.GetDisplayMembersQuery(DataDB, service, vms);
+        }
     }
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
