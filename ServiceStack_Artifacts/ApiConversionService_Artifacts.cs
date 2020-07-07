@@ -9,7 +9,7 @@ using System.Text;
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
     [DataContract]
-    public class ApiConversionRequest : IReturn<ApiResponse>, IEbSSRequest
+    public class ApiConversionRequest : EbServiceStackAuthRequest, IReturn<ApiResponse>
     {
         [DataMember(Order = 8)]
         public string Url { get; set; }

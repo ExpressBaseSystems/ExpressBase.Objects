@@ -193,16 +193,16 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public Dictionary<string, object> Emailvals { get; set; }
     }
 
-    [DataContract]
-    public class JoinbetaReq : EbServiceStackNoAuthRequest
-    {
-        [DataMember(Order = 1)]
-        public string Email { set; get; }
-    }
-    [DataContract]
-    public class JoinbetaResponse
-    {
-        [DataMember(Order = 1)]
-        public bool Status { set; get; }
-    }
+    //[DataContract]
+    //public class JoinbetaReq : EbServiceStackNoAuthRequest
+    //{
+    //    [DataMember(Order = 1)]
+    //    public string Email { set; get; }
+    //}
+    //[DataContract]
+    //public class JoinbetaResponse
+    //{
+    //    [DataMember(Order = 1)]
+    //    public bool Status { set; get; }
+    //}
 }

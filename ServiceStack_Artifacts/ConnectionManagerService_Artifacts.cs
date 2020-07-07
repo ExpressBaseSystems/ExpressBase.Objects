@@ -35,10 +35,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string SolutionId { get; set; }
     }
 
-    public class RefreshSolutionExtRequest : EbServiceStackNoAuthRequest
-    {
-        public string SolnId { get; set; }
-    }
+    //public class RefreshSolutionExtRequest : EbServiceStackNoAuthRequest
+    //{
+    //    public string SolnId { get; set; }
+    //}
 
     public class RefreshSolutionExtResponse
     {
