@@ -363,6 +363,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 16)]
         public bool IsExcel { get; set; }
+
+        [DataMember(Order = 16)]
+        public Eb_Solution eb_Solution { get; set; }
     }
 
     [DataContract]
@@ -401,6 +404,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 16)]
         public string RToken { get; set; }
+
+        [DataMember(Order = 16)]
+        public Eb_Solution eb_solution { get; set; }
     }
 
     [DataContract]

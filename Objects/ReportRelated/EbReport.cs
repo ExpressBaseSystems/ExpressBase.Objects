@@ -539,7 +539,7 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         public Dictionary<string, NTV> SummaryValInRow { get; set; } = new Dictionary<string, NTV>();
 
-        public dynamic GetDataFieldtValue(string column_name, int i, int tableIndex)
+        public dynamic GetDataFieldValue(string column_name, int i, int tableIndex)
         {
             dynamic value = null;
             int index;
@@ -574,19 +574,11 @@ namespace ExpressBase.Objects
             AddParamsNCalcsInGlobal(globals);
             if (field is EbCalcField)
             {
-                EbCalcField field_orig = field as EbCalcField;
-                foreach (string calcfd in field_orig.DataFieldsUsedInCalc)
-                {
-                    string TName = calcfd.Split('.')[0];
-                    string fName = calcfd.Split('.')[1];
-                    int tableindex = Convert.ToInt32(TName.Substring(1));
-                    globals[TName].Add(fName, new NTV { Name = fName, Type = DataSet.Tables[tableindex].Columns[fName].Type, Value = DataSet.Tables[tableindex].Rows[serialnumber][fName] });
-                }
-                column_val = (ValueScriptCollection[field_orig.Name].RunAsync(globals)).Result.ReturnValue.ToString();
+                column_val = (field as EbCalcField).GetCalcFieldValue(globals, DataSet, serialnumber, this);
             }
             else
             {
-                column_val = GetDataFieldtValue(field.ColumnName, serialnumber, field.TableIndex);
+                column_val = GetDataFieldValue(field.ColumnName, serialnumber, field.TableIndex);
             }
             List<EbDataField> SummaryList;
             if (PageSummaryFields.ContainsKey(field.Name))
@@ -654,7 +646,7 @@ namespace ExpressBase.Objects
                         foreach (KeyValuePair<string, ReportGroupItem> grp in Groupheaders)
                         {
                             ReportGroupItem grpitem = grp.Value;
-                            string column_val = GetDataFieldtValue(grpitem.field.ColumnName, iDetailRowPos, grpitem.field.TableIndex);
+                            string column_val = GetDataFieldValue(grpitem.field.ColumnName, iDetailRowPos, grpitem.field.TableIndex);
                             if (grpitem.PreviousValue != column_val)
                             {
                                 DrawGroupHeader(grpitem.order, iDetailRowPos);
@@ -692,7 +684,7 @@ namespace ExpressBase.Objects
                 {
                     __fieldsNotSummaryPerDetail = new Dictionary<EbReportDetail, EbDataField[]>();
                     foreach (EbReportDetail detail in Detail)
-                        __fieldsNotSummaryPerDetail[detail] = detail.Fields.Where(x => (x is EbDataField && !(x is IEbDataFieldSummary) && !(x is EbCalcField))).OrderBy(o => o.Top).Cast<EbDataField>().ToArray();
+                        __fieldsNotSummaryPerDetail[detail] = detail.Fields.Where(x => (x is EbDataField && !(x is IEbDataFieldSummary))).OrderBy(o => o.Top).Cast<EbDataField>().ToArray();
                 }
 
                 return __fieldsNotSummaryPerDetail;
@@ -756,7 +748,18 @@ namespace ExpressBase.Objects
                 {
                     EbDataField field = SortedList[iSortPos];
                     Phrase phrase;
-                    column_val = GetDataFieldtValue(field.ColumnName, serialnumber, field.TableIndex);
+                    if (field is EbCalcField)
+                    {
+                        Globals globals = new Globals
+                        {
+                            CurrentField = field
+                        };
+                        column_val = (field as EbCalcField).GetCalcFieldValue(globals, DataSet, serialnumber, this);
+                    }
+                    else
+                    {
+                        column_val = GetDataFieldValue(field.ColumnName, serialnumber, field.TableIndex);
+                    }
 
                     if ((field as EbDataField).RenderInMultiLine)
                     {

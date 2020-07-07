@@ -318,6 +318,41 @@ namespace ExpressBase.Objects
         public void GetImportData(IDatabase DataDB, Service Service, EbWebForm Form)//COPY this TO Form
         {
             this.RefreshFormData(DataDB, Service);
+            if (this.RefId == Form.RefId)
+            {
+                WebformData newFormData = new WebformData() { MasterTable = this.FormSchema.MasterTable };
+                foreach (TableSchema _t in this.FormSchema.Tables)
+                {
+                    if (_t.TableType == WebFormTableTypes.Normal || _t.TableType == WebFormTableTypes.Grid)
+                    {
+                        newFormData.MultipleTables.Add(_t.TableName, this.FormData.MultipleTables[_t.TableName]);
+                        SingleTable Table = newFormData.MultipleTables[_t.TableName];
+                        if (_t.TableType == WebFormTableTypes.Normal)
+                        {
+                            if (Table.Count > 0)
+                            {
+                                SingleColumn c = Table[0].Columns.Find(e => e.Control is EbAutoId);
+                                if (c != null)
+                                    c.Value = null;
+                                Table[0].RowId = 0;
+                            }
+                        }
+                        else
+                        {
+                            int id = -1;
+                            foreach (SingleRow Row in Table)
+                                Row.RowId = id--;
+                        }
+                    }
+                    else if (_t.TableType == WebFormTableTypes.Review)
+                    {
+                        newFormData.MultipleTables.Add(_t.TableName, new SingleTable());
+                    }
+                }
+                newFormData.DGsRowDataModel = this.FormData.DGsRowDataModel;
+                Form.FormData = newFormData;
+                return;
+            }
 
             foreach (TableSchema _t in this.FormSchema.Tables)
             {

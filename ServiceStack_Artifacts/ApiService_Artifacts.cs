@@ -379,6 +379,8 @@ END;";
 
         public bool TwoFAStatus { set; get; }
 
+        public string TwoFAToAddress { set; get; }
+
         public ApiAuthResponse()
         {
             Locations = new List<EbLocation>();
@@ -388,6 +390,8 @@ END;";
     public class ApiTwoFactorResponse : IEbApiStatusCode
     {
         public bool IsValid { set; get; }
+
+        public bool IsVerification { set; get; }
 
         public HttpStatusCode StatusCode { get; set ; }
     }
