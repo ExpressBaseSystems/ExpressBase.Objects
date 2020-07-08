@@ -570,7 +570,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         version = 1,
         TwoFa = 2
     }
-    public class UpdateSidMapRequest : EbServiceStackNoAuthRequest, IReturn<UpdateSidMapResponse>
+    public class UpdateSidMapRequest : EbServiceStackAuthRequest, IReturn<UpdateSidMapResponse>
     {
         public string ExtSolutionId { get; set; }
     }

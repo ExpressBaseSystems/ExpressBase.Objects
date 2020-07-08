@@ -62,7 +62,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class GetAllFromAppStoreInternalRequest : EbServiceStackAuthRequest, IReturn<GetAllFromAppstoreResponse>
     {
     }
-    public class GetAllFromAppStoreExternalRequest : EbServiceStackAuthRequest, IReturn<GetAllFromAppstoreResponse>
+    public class GetAllFromAppStoreExternalRequest : EbServiceStackNoAuthRequest, IReturn<GetAllFromAppstoreResponse>
     {
     }
 
