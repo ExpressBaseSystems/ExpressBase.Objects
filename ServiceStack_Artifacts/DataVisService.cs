@@ -178,6 +178,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 19)]
         public int LocId { get; set; }
 
+        [DataMember(Order = 20)]
+        public string SubscriptionId { get; set; }
+
     }
 
     [Route("/table")]
@@ -369,6 +372,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 16)]
         public List<TFilters> TFilters { get; set; }
+
+        [DataMember(Order = 17)]
+        public string SubscriptionId { get; set; }
     }
 
     [DataContract]
@@ -413,6 +419,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 16)]
         public List<TFilters> TFilters { get; set; }
+
+        [DataMember(Order = 17)]
+        public string SubscriptionId { get; set; }
     }
 
     [DataContract]

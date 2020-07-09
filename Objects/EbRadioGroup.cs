@@ -112,11 +112,11 @@ namespace ExpressBase.Objects
         [PropertyGroup("Behavior")]
         public EbRadioValueType ValueType { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm,BuilderType.DashBoard,BuilderType.Report)]
-        [PropertyEditor(PropertyEditorType.IconPicker)]
-        [PropertyPriority(100)]
-        [PropertyGroup(PGConstants.CORE)]
-        public string IconTestProp { get; set; }
+        //[EnableInBuilder(BuilderType.WebForm,BuilderType.DashBoard,BuilderType.Report)]
+        //[PropertyEditor(PropertyEditorType.IconPicker)]
+        //[PropertyPriority(100)]
+        //[PropertyGroup(PGConstants.CORE)]
+        //public string IconTestProp { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.Collection)]
@@ -129,10 +129,10 @@ namespace ExpressBase.Objects
         [PropertyGroup(PGConstants.APPEARANCE)]
         public bool RenderInline { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [PropertyEditor(PropertyEditorType.Collection)]
-        [Category("Appearance")]
-        public bool RenderHorizontally { get; set; }
+        //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        //[PropertyEditor(PropertyEditorType.Collection)]
+        //[Category("Appearance")]
+        //public bool RenderHorizontally { get; set; }
 
         [HideInPropertyGrid]
         [JsonIgnore]
