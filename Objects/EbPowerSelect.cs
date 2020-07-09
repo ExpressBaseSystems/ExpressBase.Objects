@@ -111,7 +111,7 @@ namespace ExpressBase.Objects
             {
                 return @"
 if(this.DataVals.R)
-    return this.DataVals.R[p1];
+    return this.MultiSelect ? this.DataVals.R[p1] :  this.DataVals.R[p1][0];
 else
     return []"
 ;
