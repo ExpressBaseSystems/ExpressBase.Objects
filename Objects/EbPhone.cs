@@ -170,7 +170,9 @@ namespace ExpressBase.Objects
 			get { return @"this.__IsDisable = true;
             $('#' + this.EbSid_CtxId ).attr('disabled', 'disabled').css('pointer-events', 'none').find('[ui-inp]').css('background-color', '#f3f3f3');
             $('#' + this.EbSid + '_Phnctrl').find('.iti__flag-container').attr('disabled', 'disabled').css('pointer-events', 'none').css('background-color', '#f3f3f3');
-            $('#cont_' + this.EbSid_CtxId).find('.phnContextBtn').show();"; }
+           if(this.SendMessage){
+			$('#cont_' + this.EbSid_CtxId).find('.phnContextBtn').show();
+			}"; }
 			set { }
 		}
                   
