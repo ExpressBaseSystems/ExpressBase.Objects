@@ -958,6 +958,12 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
         {
             return this.EbSimpleSelect.GetDisplayMembersQuery(DataDB, service, vms);
         }
+
+        public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
+        {
+            this.EbSimpleSelect.Name = this.Name;
+            return this.EbSimpleSelect.GetSingleColumn(UserObj, SoluObj, Value);
+        }
     }
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]

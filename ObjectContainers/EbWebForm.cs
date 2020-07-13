@@ -837,31 +837,22 @@ namespace ExpressBase.Objects
 
             if (_control != null)
             {
-                if (_control.DoNotPersist && !_control.IsSysControl)
-                {
+                if ((_control.DoNotPersist && !_control.IsSysControl) || dataColumn == null)
                     Row.Columns.Add(_control.GetSingleColumn(this.UserObj, this.SolutionObj, null));
-                    return;
+                else
+                {
+                    object val = dataRow[dataColumn.ColumnIndex];
+                    if (dataRow.IsDBNull(dataColumn.ColumnIndex))
+                        val = null;
+                    Row.Columns.Add(_control.GetSingleColumn(this.UserObj, this.SolutionObj, val));
                 }
-            }
-            object _formattedData = null;
-            string _displayMember = null;
-
-            if (dataColumn == null || (dataRow.IsDBNull(dataColumn.ColumnIndex) && _control == null))
-            {
-                if (_control != null && (_control.EbDbType == EbDbTypes.Decimal || _control.EbDbType == EbDbTypes.Int32))
-                    _displayMember = "0.00";
-                else if (dataColumn != null && (dataColumn.Type == EbDbTypes.Int32 || dataColumn.Type == EbDbTypes.Int64 || dataColumn.Type == EbDbTypes.Decimal || dataColumn.Type == EbDbTypes.Double))
-                    _displayMember = "0.00";
-            }
-            else if (_control != null)
-            {
-                object val = dataRow[dataColumn.ColumnIndex];
-                if (dataRow.IsDBNull(dataColumn.ColumnIndex))
-                    val = null;
-                Row.Columns.Add(_control.GetSingleColumn(this.UserObj, this.SolutionObj, val));
                 return;
             }
-            else if (dataColumn.Type == EbDbTypes.Date)
+
+            object _formattedData;
+            string _displayMember = null;
+
+            if (dataColumn.Type == EbDbTypes.Date)
             {
                 DateTime dt = Convert.ToDateTime(dataRow[dataColumn.ColumnIndex]);
                 _formattedData = dt.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
@@ -873,18 +864,21 @@ namespace ExpressBase.Objects
                 _displayMember = string.Format("{0:0.00}", _formattedData);
             }
             else if (dataColumn.Type == EbDbTypes.Int32 || dataColumn.Type == EbDbTypes.Int64)
+            {
                 _formattedData = Convert.ToInt64(dataRow[dataColumn.ColumnIndex]);
+                _displayMember = "0";
+            }
             else
                 _formattedData = dataRow[dataColumn.ColumnIndex];
 
             Row.Columns.Add(new SingleColumn()
             {
-                Name = _control == null ? dataColumn.ColumnName : _control.Name,
-                Type = _control == null ? (int)dataColumn.Type : (int)_control.EbDbType,
+                Name = dataColumn.ColumnName,
+                Type = (int)dataColumn.Type,
                 Value = _formattedData,
-                Control = _control,
+                Control = null,
                 F = _displayMember ?? (_formattedData == null ? string.Empty : _formattedData.ToString()),
-                ObjType = _control == null ? string.Empty : _control.ObjType
+                ObjType = string.Empty
             });
         }
 

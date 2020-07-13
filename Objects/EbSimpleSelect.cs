@@ -387,6 +387,8 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
             if (Value != null)
             {
                 _formattedData = Value;
+                if (!this.IsDynamic && !this.MultiSelect)
+                    _displayMember = this.Options.Find(e => e.Value == Convert.ToString(Value))?.DisplayName ?? string.Empty;
             }
 
             return new SingleColumn()
