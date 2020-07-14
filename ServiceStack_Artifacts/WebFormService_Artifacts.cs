@@ -261,6 +261,14 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     [DataContract]
 	public class DoUniqueCheckRequest : EbServiceStackAuthRequest, IReturn<GetRowDataResponse>
+    {
+        [DataMember(Order = 1)]
+        public UniqCheckParam[] UniqCheckParam { get; set; }
+    }
+
+
+    [DataContract]
+	public class UniqCheckParam
 	{
 		[DataMember(Order = 1)]
 		public string TableName { get; set; }
@@ -272,14 +280,14 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public string Value { get; set; }
 
 		[DataMember(Order = 4)]
-		public string TypeS { get; set; }
+		public int TypeI { get; set; }
 	}
 
 	[DataContract]
 	public class DoUniqueCheckResponse : IEbSSResponse
 	{
 		[DataMember(Order = 1)]
-		public int NoRowsWithSameValue { get; set; }
+		public Dictionary<string, bool> Response { get; set; }
 
 		[DataMember(Order = 2)]
 		public ResponseStatus ResponseStatus { get; set; }

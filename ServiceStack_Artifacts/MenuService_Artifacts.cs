@@ -14,7 +14,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int LocationId { set; get; }
     }
 
-    public class SidebarUserResponse :IEbSSResponse
+    public class SidebarUserResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
         public Dictionary<int, AppWrap> Data { get; set; }
@@ -125,14 +125,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-    public class AddFavouriteRequest : IEbSSRequest, IReturn<AddFavouriteResponse>
+    public class AddFavouriteRequest : EbServiceStackAuthRequest, IReturn<AddFavouriteResponse>
     {
         [DataMember(Order = 1)]
         public int ObjId { set; get; }
-
-        public string SolnId { get; set; }
-
-        public int UserId { get; set; }
     }
     public class AddFavouriteResponse : IEbSSResponse
     {
@@ -143,14 +139,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
-    public class RemoveFavouriteRequest : IEbSSRequest, IReturn<RemoveFavouriteResponse>
+    public class RemoveFavouriteRequest : EbServiceStackAuthRequest, IReturn<RemoveFavouriteResponse>
     {
         [DataMember(Order = 1)]
         public int ObjId { set; get; }
-
-        public string SolnId { get; set; }
-
-        public int UserId { get; set; }
     }
     public class RemoveFavouriteResponse : IEbSSResponse
     {

@@ -6,13 +6,9 @@ using System.Runtime.Serialization;
 using System.Text;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
-{ 
-    public class IoTDataRequest : IReturn<IoTDataResponse>, IEbSSRequest
+{
+    public class IoTDataRequest : EbServiceStackAuthRequest, IReturn<IoTDataResponse>
     {
-        public string SolnId { get; set; }
-
-        public int UserId { get; set; }
-
         public string Data { get; set; }
     }
 

@@ -4,6 +4,7 @@ using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
@@ -17,7 +18,7 @@ namespace ExpressBase.Objects
 
 		public EbPhone()
 		{
-			//this.Templates = new List<ObjectBasicInfo>();
+			this.Templates = new List<ObjectBasicInfo>();
 		}
 		[OnDeserialized]
 		public void OnDeserializedMethod(StreamingContext context)
@@ -112,31 +113,32 @@ namespace ExpressBase.Objects
 		[Alias("Dropdown Height")]
 		public int DropdownHeight { get; set; }
 
-		//	[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
-		//[PropertyEditor(PropertyEditorType.ObjectSelectorCollection)]
-		//[OSE_ObjectTypes(EbObjectTypes.iSmsBuilder)]
-		//[PropertyGroup(PGConstants.CORE)]
-		//public List<ObjectBasicInfo> Templates { get; set; }
+		[EnableInBuilder(BuilderType.WebForm,  BuilderType.UserControl)]
+		[PropertyEditor(PropertyEditorType.ObjectSelectorCollection)]
+		[OSE_ObjectTypes(EbObjectTypes.iSmsBuilder)]
+		public List<ObjectBasicInfo> Templates { get; set; }
 
-		//	[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
-		//[DefaultPropValue("false")]
-		//[Alias("Send message")]
-		//[OnChangeExec(@"if (this.SendMessage === true ){
-		//						pg.ShowProperty('Templates');
-		//					} 
-		//					else {
-		//						pg.HideProperty('Templates');
-		//					}")]
-		//public bool SendMessage { get; set; }
+		[EnableInBuilder(BuilderType.WebForm,  BuilderType.UserControl)]
+		[DefaultPropValue("false")]
+		[Alias("Send message")]
+		[OnChangeExec(@"if (this.SendMessage === true ){
+								pg.ShowProperty('Templates');
+							} 
+							else {
+								pg.HideProperty('Templates');
+							}")]
+		public bool SendMessage { get; set; }
 
 		public override string GetBareHtml()
 		{
 			return @"<div class='PhnCtrlCont' id='@ebsid@_Phnctrl' name='@name@'>
-					 <input type='tel' placeholder='' id='@ebsid@' style='width:100%; display:inline-block;'>
+					 <input type='tel' placeholder='' class='phnctrl' id='@ebsid@' style='width:100%; display:inline-block;'>
+						<button class='phnContextBtn'><i class='fa fa-bars' style='color:#2980b9' @SendMessagebtn@></i></button>
 					</div>"
 .Replace("@ebsid@", String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId)
 .Replace("@name@", this.Name)
 .Replace("@toolTipText@", this.ToolTipText)
+.Replace("@SendMessagebtn@", this.SendMessage ? "hidden" : "")
 .Replace("@value@", "");
 
 		}
@@ -146,6 +148,13 @@ namespace ExpressBase.Objects
 			return GetHtml().RemoveCR().DoubleQuoted();
 		}
 
+		public override string DesignHtml4Bot
+		{
+			get => @"<div class='PhnCtrlCont' id='@ebsid@_Phnctrl' name='@name@'>
+					 <input type='tel' placeholder='' class='phnctrl' id='@ebsid@' style='width:100%; display:inline-block;'>
+					</div>";
+			set => base.DesignHtml4Bot = value;
+		}
 		public override string GetHtml()
 		{
 			string EbCtrlHTML = HtmlConstants.CONTROL_WRAPER_HTML4WEB
@@ -155,10 +164,24 @@ namespace ExpressBase.Objects
 			return ReplacePropsInHTML(EbCtrlHTML);
 		}
 
-		public override string DesignHtml4Bot
+		[JsonIgnore]
+		public override string DisableJSfn
 		{
-			get => this.GetBareHtml();
-			set => base.DesignHtml4Bot = value;
+			get { return @"this.__IsDisable = true;
+            $('#' + this.EbSid_CtxId ).attr('disabled', 'disabled').css('pointer-events', 'none').find('[ui-inp]').css('background-color', '#f3f3f3');
+            $('#' + this.EbSid + '_Phnctrl').find('.iti__flag-container').attr('disabled', 'disabled').css('pointer-events', 'none').css('background-color', '#f3f3f3');
+           if(this.SendMessage){
+			$('#cont_' + this.EbSid_CtxId).find('.phnContextBtn').show();
+			}"; }
+			set { }
+		}
+                  
+
+		[JsonIgnore]
+		public override string EnableJSfn { get { return @"this.__IsDisable = false; 
+			  $('#cont_' + this.EbSid_CtxId + ' *').prop('disabled', false).css('pointer-events', 'inherit').find('[ui-inp]').css('background-color', '#fff');
+					$('#cont_' + this.EbSid_CtxId).find('.phnContextBtn').hide();"; }
+			set { }
 		}
 
 

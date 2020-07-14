@@ -39,11 +39,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class ApiComponetRequest : IReturn<ApiResponse>, IEbSSRequest
+    public class ApiComponetRequest : EbServiceStackAuthRequest, IReturn<ApiResponse>
     {
-        public string SolnId { get; set; }
-
-        public int UserId { get; set; }
 
         [DataMember(Order = 1)]
         public ApiResources Component { set; get; }
@@ -132,12 +129,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class ApiReqJsonRequest : IReturn<ApiReqJsonResponse>, IEbSSRequest
+    public class ApiReqJsonRequest : EbServiceStackAuthRequest, IReturn<ApiReqJsonResponse>
     {
-        public string SolnId { get; set; }
-
-        public int UserId { get; set; }
-
         [DataMember(Order = 1)]
         public ListOrdered Components { set; get; }
     }
@@ -181,12 +174,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class ApiByNameRequest : IReturn<ApiByNameResponse>, IEbSSRequest
+    public class ApiByNameRequest : EbServiceStackAuthRequest, IReturn<ApiByNameResponse>
     {
-        public string SolnId { get; set; }
-
-        public int UserId { get; set; }
-
         [DataMember(Order = 1)]
         public string Version { set; get; }
 
@@ -393,7 +382,7 @@ END;";
 
         public bool IsVerification { set; get; }
 
-        public HttpStatusCode StatusCode { get; set ; }
+        public HttpStatusCode StatusCode { get; set; }
     }
 
     public class ApiFileData
