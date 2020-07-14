@@ -36,7 +36,7 @@ namespace ExpressBase.Objects.WebFormRelated
             PerformRequirdUpdate(_this, _this.TableName);
             Dictionary<int, EbControlWrapper> _dict = new Dictionary<int, EbControlWrapper>();
             GetControlsAsDict(_this, "form", _dict);
-            CalcValueExprDependency(_dict);
+            CalcValueExprDependency(_this, _dict);
             ValidateAndUpdateReviewCtrl(_this, ebReviewCtrl, _dict);
             ValidateNotificationProp(_this.Notifications, _dict);
             SetDefaultValueExprExecOrder(_this, _dict);
@@ -365,7 +365,7 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
         }
 
         //Populate Property DependedValExp
-        private static void CalcValueExprDependency(Dictionary<int, EbControlWrapper> _dict)
+        private static void CalcValueExprDependency(EbForm _Form, Dictionary<int, EbControlWrapper> _dict)
         {
             List<int> CalcFlds = new List<int>();
             List<KeyValuePair<int, int>> dpndcy = new List<KeyValuePair<int, int>>();
@@ -451,6 +451,39 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
             // _dict = { { 0, A}, { 1, B}, { 2, C} }
             // dpndcy = { (B, A) (C, B) } => { (1, 0) (2, 1) }
             // A => [B, C]; B => [C];
+
+            
+            //Value expression execution order for DoNotPersist ctrls
+            _Form.DoNotPersistExecOrder = new List<string>();//cleared the old values
+            List<int> DnpFlds = new List<int>();
+            List<int> ExecOrd = new List<int>();
+            for (int i = 0; i < CalcFlds.Count; i++)
+            {
+                if (_dict[CalcFlds[i]].Control.DoNotPersist)
+                    DnpFlds.Add(CalcFlds[i]);
+                else
+                    dpndcy.RemoveAll(x => x.Value == CalcFlds[i]);
+            }
+
+            int stopCounter = 0;
+            while (DnpFlds.Count > ExecOrd.Count && stopCounter < DnpFlds.Count)
+            {
+                for (int i = 0; i < DnpFlds.Count; i++)
+                {
+                    if (dpndcy.FindIndex(x => x.Key == DnpFlds[i]) == -1 && !ExecOrd.Contains(DnpFlds[i]))
+                    {
+                        ExecOrd.Add(DnpFlds[i]);
+                        dpndcy.RemoveAll(x => x.Value == DnpFlds[i]);
+                    }
+                }
+                stopCounter++;
+            }
+
+            if (dpndcy.Count > 0)
+                throw new FormException("Avoid circular reference by the following controls in 'ValueExpression' : " + string.Join(',', dpndcy.Select(e => _dict[e.Key].Control.Name).Distinct()));
+
+            foreach (int i in ExecOrd)
+                _Form.DoNotPersistExecOrder.Add(_dict[i].Path);
         }
 
         private static void GetValExpDependentsRec(List<int> execOrder, List<KeyValuePair<int, int>> dpndcy, int seeker)
@@ -611,7 +644,7 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
             PerformRequirdCheck(Allctrls, OneCtrls, tbls, serviceClient, redis, out EbReview ebReviewCtrl);
             Dictionary<int, EbControlWrapper> _dict = new Dictionary<int, EbControlWrapper>();
             GetControlsAsDict(_this, "form", _dict);
-            CalcValueExprDependency(_dict);
+            CalcValueExprDependency(_this, _dict);
             ValidateNotificationProp(_this.Notifications, _dict);
         }
     }
