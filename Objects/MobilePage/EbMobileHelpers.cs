@@ -9,6 +9,12 @@ using System.Text;
 
 namespace ExpressBase.Objects
 {
+    public enum DataColumnRenderType
+    {
+        Text = 1,
+        Image = 2
+    }
+
     [EnableInBuilder(BuilderType.MobilePage)]
     public class EbMobileDataColumn : EbMobileControl, INonPersistControl
     {
@@ -23,10 +29,6 @@ namespace ExpressBase.Objects
         public override bool Required { get; set; }
 
         public override bool Hidden { set; get; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("UI")]
-        public string TextFormat { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
@@ -46,18 +48,36 @@ namespace ExpressBase.Objects
         public EbDbTypes Type { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [UIproperty]
-        [PropertyGroup("UI")]
-        [PropertyEditor(PropertyEditorType.FontSelector)]
-        public EbFont Font { get; set; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("UI")]
         public int RowSpan { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("UI")]
         public int ColumnSpan { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("UI")]
+        [OnChangeExec(@"
+                if (this.RenderAs === 1 ){ 
+                        pg.ShowProperty('TextFormat');
+                        pg.ShowProperty('Font');
+                }
+                else {
+                        pg.HideProperty('TextFormat');
+                        pg.HideProperty('Font');
+                }
+            ")]
+        public DataColumnRenderType RenderAs { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("UI")]
+        public string TextFormat { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [UIproperty]
+        [PropertyGroup("UI")]
+        [PropertyEditor(PropertyEditorType.FontSelector)]
+        public EbFont Font { get; set; }
 
         public override string GetDesignHtml()
         {
