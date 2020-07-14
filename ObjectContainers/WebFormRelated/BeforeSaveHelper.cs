@@ -455,32 +455,26 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
             
             //Value expression execution order for DoNotPersist ctrls
             _Form.DoNotPersistExecOrder = new List<string>();//cleared the old values
-            List<int> DnpFlds = new List<int>();
+            List<KeyValuePair<int, int>> DnpDpndcy = dpndcy.FindAll(x => _dict[x.Key].Control.DoNotPersist && _dict[x.Value].Control.DoNotPersist && x.Key != x.Value);
+            List<int> DnpFlds = CalcFlds.FindAll(x => _dict[x].Control.DoNotPersist);
             List<int> ExecOrd = new List<int>();
-            for (int i = 0; i < CalcFlds.Count; i++)
-            {
-                if (_dict[CalcFlds[i]].Control.DoNotPersist)
-                    DnpFlds.Add(CalcFlds[i]);
-                else
-                    dpndcy.RemoveAll(x => x.Value == CalcFlds[i]);
-            }
-
+            
             int stopCounter = 0;
             while (DnpFlds.Count > ExecOrd.Count && stopCounter < DnpFlds.Count)
             {
                 for (int i = 0; i < DnpFlds.Count; i++)
                 {
-                    if (dpndcy.FindIndex(x => x.Key == DnpFlds[i]) == -1 && !ExecOrd.Contains(DnpFlds[i]))
+                    if (DnpDpndcy.FindIndex(x => x.Key == DnpFlds[i]) == -1 && !ExecOrd.Contains(DnpFlds[i]))
                     {
                         ExecOrd.Add(DnpFlds[i]);
-                        dpndcy.RemoveAll(x => x.Value == DnpFlds[i]);
+                        DnpDpndcy.RemoveAll(x => x.Value == DnpFlds[i]);
                     }
                 }
                 stopCounter++;
             }
 
-            if (dpndcy.Count > 0)
-                throw new FormException("Avoid circular reference by the following controls in 'ValueExpression' : " + string.Join(',', dpndcy.Select(e => _dict[e.Key].Control.Name).Distinct()));
+            if (DnpDpndcy.Count > 0)
+                throw new FormException("Avoid circular reference by the following controls in 'ValueExpression' : " + string.Join(',', DnpDpndcy.Select(e => _dict[e.Key].Control.Name).Distinct()));
 
             foreach (int i in ExecOrd)
                 _Form.DoNotPersistExecOrder.Add(_dict[i].Path);
