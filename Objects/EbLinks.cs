@@ -81,6 +81,7 @@ namespace ExpressBase.Objects
         [PropertyGroup("Data Settings")]
         [UIproperty]
         [PropertyEditor(PropertyEditorType.GradientColorPicker)]
+        [DefaultPropValue("")]
         public string BackgroundColor { get; set; }
 
         [EnableInBuilder(BuilderType.DashBoard)]

@@ -34,13 +34,21 @@ namespace ExpressBase.Objects
         [DefaultPropValue("1")]
         public int MeetingId { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
-        [HideInPropertyGrid]
-        public Dictionary<int, string> UsersList { get; set; }
+        //[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+        //[HideInPropertyGrid]
+        //public Dictionary<int, string> UsersList { get; set; }
+
+        //[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+        //[HideInPropertyGrid]
+        //public string ParticipantsList { get; set; }       
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
         [HideInPropertyGrid]
-        public string ParticipantsList { get; set; }
+        public string HostParticipantsList { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+        [HideInPropertyGrid]
+        public string AttendeeParticipantsList { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
         [HideInPropertyGrid]
@@ -51,6 +59,104 @@ namespace ExpressBase.Objects
         public MeetingType MeetingType { get; set; }
 
 
+
+        //[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+        //public MeetingEntityTypes MeetingConfig  { get; set; }     
+
+        //[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+        //[PropDataSourceJsFn("return ebcontext.Roles")]
+        //[PropertyEditor(PropertyEditorType.DropDown, true)]
+        //public List<Int32> MeetingRoles { get; set; } 
+
+        //[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+        //public int MeetingUserGroup { get; set; }
+
+        //[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+        //public EbScript MeetingUsers { get; set; }
+
+
+        [PropertyGroup("Host")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        //MakeReadOnly MakeReadWrite ShowProperty HideProperty
+        [OnChangeExec(@"
+    if (this.HostConfig === 0) this.HostConfig = 1;
+    pg.HideProperty('HostRoles');
+    pg.HideProperty('HostUserGroup');
+    pg.HideProperty('HostUsers');
+    if (this.HostConfig === 1)
+        pg.ShowProperty('HostRoles');
+    else if (this.HostConfig === 2)
+        pg.ShowProperty('HostUserGroup');
+    else if (this.HostConfig === 3)
+        pg.ShowProperty('HostUsers');
+    ")]
+        public UsersType HostConfig { get; set; }
+
+        //[EnableInBuilder(BuilderType.WebForm)]
+        //[Unique]
+        //[PropDataSourceJsFn("return ebcontext.Roles")]
+        //[PropertyEditor(PropertyEditorType.DropDown)]
+        //public int ApproverRole { get; set; }
+
+        [PropertyGroup("Host")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [Unique]
+        [PropDataSourceJsFn("return ebcontext.Roles")]
+        [PropertyEditor(PropertyEditorType.DropDown, true)]
+        public List<Int32> HostRoles { get; set; }
+
+        [PropertyGroup("Host")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropDataSourceJsFn("return ebcontext.UserGroups")]
+        [PropertyEditor(PropertyEditorType.DropDown)]
+        public int HostUserGroup { get; set; }
+
+        [PropertyGroup("Host")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]//required ScriptEditorSQ
+        public EbScript HostUsers { get; set; }
+
+
+        [PropertyGroup("Attendee")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        //MakeReadOnly MakeReadWrite ShowProperty HideProperty
+        [OnChangeExec(@"
+    if (this.AttendeeConfig === 0) this.AttendeeConfig = 1;
+    pg.HideProperty('AttendeeRoles');
+    pg.HideProperty('AttendeeUserGroup');
+    pg.HideProperty('AttendeeUsers');
+    if (this.AttendeeConfig === 1)
+        pg.ShowProperty('AttendeeRoles');
+    else if (this.AttendeeConfig === 2)
+        pg.ShowProperty('AttendeeUserGroup');
+    else if (this.AttendeeConfig === 3)
+        pg.ShowProperty('AttendeeUsers');
+    ")]
+        public UsersType AttendeeConfig { get; set; }
+
+        //[EnableInBuilder(BuilderType.WebForm)]
+        //[Unique]
+        //[PropDataSourceJsFn("return ebcontext.Roles")]
+        //[PropertyEditor(PropertyEditorType.DropDown)]
+        //public int ApproverRole { get; set; }
+
+        [PropertyGroup("Attendee")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [Unique]
+        [PropDataSourceJsFn("return ebcontext.Roles")]
+        [PropertyEditor(PropertyEditorType.DropDown, true)]
+        public List<Int32> AttendeeRoles { get; set; }
+
+        [PropertyGroup("Attendee")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropDataSourceJsFn("return ebcontext.UserGroups")]
+        [PropertyEditor(PropertyEditorType.DropDown)]
+        public int AttendeeUserGroup { get; set; }
+
+        [PropertyGroup("Attendee")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]//required ScriptEditorSQ
+        public EbScript AttendeeUsers { get; set; }
         public override string UIchangeFns
         {
             get
@@ -82,8 +188,25 @@ namespace ExpressBase.Objects
         public void InitParticipantsList(JsonServiceClient ServiceClient)
         {
             ParticipantsListResponse abc = new ParticipantsListResponse();
-            abc = ServiceClient.Post<ParticipantsListResponse>(new ParticipantsListRequest { });
-            this.ParticipantsList = JsonConvert.SerializeObject(abc.ParticipantsList);
+            ParticipantsListRequest request = new ParticipantsListRequest();
+            List<MeetingSuggestion> Opts = new List<MeetingSuggestion>();
+            Opts.Add(new MeetingSuggestion()
+            {
+                MeetingConfig = this.HostConfig,
+                MeetingRoles = this.HostRoles,
+                MeetingUserGroup = this.HostUserGroup,
+                MeetingUsers = this.HostUsers
+            });
+            Opts.Add(new MeetingSuggestion()
+            {
+                MeetingConfig = this.AttendeeConfig,
+                MeetingRoles = this.AttendeeRoles,
+                MeetingUserGroup = this.AttendeeUserGroup,
+                MeetingUsers = this.AttendeeUsers
+            });
+            abc = ServiceClient.Post<ParticipantsListResponse>(new ParticipantsListRequest { MeetingConfig = Opts });
+            this.HostParticipantsList = JsonConvert.SerializeObject(abc.HostParticipantsList);
+            this.AttendeeParticipantsList = JsonConvert.SerializeObject(abc.AttendeeParticipantsList);
         }
 
         public override string GetHtml4Bot()
@@ -136,21 +259,22 @@ namespace ExpressBase.Objects
 
         public string GetHtml4singleMeeting()
         {
-            string Html = @"Title : <input type='text' placeholder='title' id='@ebsid@_meeting-title' class='mc-input' required/>
-            Description : <textarea id='@ebsid@_description' class='mc-input' required> </textarea>
-            Location : <input type='text' placeholder='location' id='@ebsid@_meeting-title' class='mc-input' required/>
-            Integration : <input type='text' placeholder='integration' id='@ebsid@_meeting-title' class='mc-input' required/>
-            Date :<input type='text' id='@ebsid@_meeting-date' val='@date_val@' class='mc-input' required/>
+            string Html = @"<div class='single-meeting'><div class='title'> <p>Title</p><input type='text' placeholder='title' id='@ebsid@_meeting-title' class='mc-input'/> </div>
+            <div class='description'><p>Description</p><textarea id='@ebsid@_description' class='mc-input' rows='10' cols='10' placeholder='Describe about the event...'></textarea><div>
+            <div class='location'><p>Location</p><input type='text' placeholder='location' id='@ebsid@_meeting-title' class='mc-input' /><div>
+            <div class='integration'><p>Integrations</p><input type='text' placeholder='integration' id='@ebsid@_meeting-title' class='mc-input' /></div>
+            <div class='date'><p>Date</p><input type='text' placeholder='Date' id='@ebsid@_meeting-date' val='@date_val@' class='mc-input' /></div>
             <div class='slots-table' id='@ebsid@_slots'>
             <table> <thead><tr><th>Sl.No</th><th>Start Time</th><th>End Time</th><th>Host</th><th>Attendee</th></tr>
             <tbody>
             <tr><th>1</th>
-            <th><input type='time' id='@ebsid@_time-from' data-id='0' class='mc-input time-from' required/></th>
-            <th><input type='time' id='@ebsid@_time-to' data-id='0'  class='mc-input time-to' required/></th>
+            <th><input type='time' id='@ebsid@_time-from' data-id='0' class='mc-input time-from' /></th>
+            <th><input type='time' id='@ebsid@_time-to' data-id='0'  class='mc-input time-to' /></th>
             <th><input type='text' id='@ebsid@_host_0' data-id='0' class='meeting-participants tb-host'/></th>
             <th><input type='text' id='@ebsid@_attendee_0' data-id='0' class='meeting-participants tb-attendee'/></th></tr>
             </tbody>
             </table>
+            </div>
             </div>
         ";
             return Html;
@@ -159,21 +283,30 @@ namespace ExpressBase.Objects
         public string GetHtml4MultipleMeeting()
         {
             string Html = @"
-            Title : <input type='text' placeholder='title' id='@ebsid@_meeting-title' class='mc-input' required/>
-            Description : <textarea id='@ebsid@_description' class='mc-input' required> </textarea>
-            Location : <input type='text' placeholder='location' id='@ebsid@_meeting-title' class='mc-input' required/>
-            Integration : <input type='text' placeholder='integration' id='@ebsid@_meeting-title' class='mc-input' required/>
-            Date :<input type='text' id='@ebsid@_meeting-date' val='@date_val@' class='mc-input' required/>
+            <div class='single-meeting'><div class='title'> <input type='text' placeholder='Title' id='@ebsid@_meeting-title' class='mc-input'/> </div>
+            <div class='description'><textarea id='@ebsid@_description' placeholder='Describe about the event...' rows='10' cols='10' class='mc-input' ></textarea></div>
+            <div class='location'><input type='text'  placeholder='Location' id='@ebsid@_meeting-title' class='mc-input' /></div>
+            <div class='integration'><input type='text' placeholder='Integration' id='@ebsid@_meeting-title' class='mc-input' /></div>
+            <div class='date'><input type='text' placeholder='Date' id='@ebsid@_meeting-date' val='@date_val@' class='mc-input' /></div>
             <div class='slots-table' id='@ebsid@_slots'>
-            <table> <thead><tr><th>Sl.No</th><th>Start Time</th><th>End Time</th><th>Host</th><th>Attendee</th></tr>
+            <table id='@ebsid@_slot-table' class='slot-tbl'> <thead><tr><th>Sl.No</th><th>Time</th><th>Host</th><th>Attendee</th><th>Action</th></tr>
             <tbody>
             <tr><th>1</th>
-            <th><input type='time' id='@ebsid@_time-from' class='mc-input' required/></th>
-            <th><input type='time' id='@ebsid@_time-to' class='mc-input' required/></th>
-            <th><input type='text' id='@ebsid@_host_0' class='meeting-participants tb-host'/></th>
-            <th><input type='text' id='@ebsid@_attendee_0' class='meeting-participants tb-attendee'/></th></tr>
+            <td><div>Time From : <input type='time' id='@ebsid@_time-from' data-id='0' class='mc-input time-from' /></div>
+            <div>Time to : <input type='time' id='@ebsid@_time-to' data-id='0' class='mc-input time-to' /></div></td>
+            <td><input type='text' id='@ebsid@_host_0' data-id='0' class='meeting-participants tb-host'/></td>
+            <td><input type='text' id='@ebsid@_attendee_0' data-id='0' class='meeting-participants tb-attendee'/></td>
+            <td><button id='@ebsid@_remove-slot'  data-id='0'>-</button></td></td></tr>
             </tbody>
+            <tfoot>
+            <tr><td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td><div> <button id='@ebsid@_add-new-slot'>+</button></td></tr>
+              </tfoot>
             </table>
+            </div>
             </div>
 
         ";
@@ -181,21 +314,15 @@ namespace ExpressBase.Objects
         }
         public string AdvancedMeeting()
         {
-            string Html = @"<div class='meeting-info'>
-                Title : <input type='text' placeholder='Title' id='@ebsid@_meeting-title' class='mc-input' required/>
-                Description : <textarea id='@ebsid@_description' class='mc-input' required> </textarea> </div>
-                <div class='time' style='display: flex;'>
-                <div class='meeting-date'>
-                <div style='margin-right:15px;'><h5>Date</h5> <input type='text' id='@ebsid@_meeting-date' val='@date_val@' class='mc-input' required/></div>
-                <div class='meeting-duration'>
-                <h5>Duration</h5> <input type='text' id='@ebsid@_duration' data-format='HH:mm' data-template='HH : mm' name='datetime' class='mc-input'>
-                </div></div></div>
-                <div class='meeting-count'>
+            string Html = @"
+                Title : <input type='text' placeholder='Title' id='@ebsid@_meeting-title' class='mc-input' />
+                Description : <textarea id='@ebsid@_description' class='mc-input' > </textarea> 
+                <input type='text' id='@ebsid@_meeting-date' val='@date_val@' class='mc-input' />
+                <input type='text' id='@ebsid@_duration' data-format='HH:mm' data-template='HH : mm' name='datetime' class='mc-input'>
                 Max-host : <input type='number' id='@ebsid@_max-host' class='meeting-spinner mc-input' min='1' max='5' value='1' >
                 Min-host : <input type='number' id='@ebsid@_min-host' class='meeting-spinner mc-input' min='1' max='5' value='1'>
-                Max-Attendee<input type='number' id='@ebsid@_max-attendee' class='meeting-spinner mc-input' min='1' max='5' value='1'>
-                Min-Attendee<input type='number' id='@ebsid@_min-attendee' class='meeting-spinner mc-input' min='1' max='5' value='1'>
-                </div>
+                Max-Attendee : <input type='number' id='@ebsid@_max-attendee' class='meeting-spinner mc-input' min='1' max='5' value='1'>
+                Min-Attendee : <input type='number' id='@ebsid@_min-attendee' class='meeting-spinner mc-input' min='1' max='5' value='1'>
                 <div class='eligible-participant'><div style='width:100%'>
                 <h5>Eligible Host</h5> <input type='text' id='@ebsid@_eligible_host_list' class='mc-input eligible-userids'/> </div>
                 <div  style='width:100%'><h5>Eligible Attendee</h5><input type='text' id='@ebsid@_eligible_attendee_list' class='mc-input eligible-userids'/></div>
@@ -287,17 +414,58 @@ namespace ExpressBase.Objects
                 insert into eb_meeting_slots (eb_meeting_schedule_id,meeting_date,time_from,time_to,eb_created_by,eb_created_at) values 
                 (eb_currval('eb_meeting_schedule_id_seq'),'{Mobj.Date}','{Mobj.SlotList[i].TimeFrom}','{Mobj.SlotList[i].TimeTo}', {usr.UserId},now() );";
 
-                    int HostUserIdsCount = Mobj.SlotList[i].Hosts.Where(Item => Item.Type == UsersType.UserIds).Count();
-                    int AttendeeUserIdsCount = Mobj.SlotList[i].Attendees.Where(Item => Item.Type == UsersType.UserIds).Count();
+                    int HostUserIdsCount = Mobj.SlotList[i].Hosts.Where(Item => Item.Type == UsersType.Users).Count();
+                    int AttendeeUserIdsCount = Mobj.SlotList[i].Attendees.Where(Item => Item.Type == UsersType.Users).Count();
                     if (HostUserIdsCount == Mobj.MaxHost && HostUserIdsCount == Mobj.SlotList[i].Hosts.Count)
                     {
                         query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Hosts, usr, ParticipantOpt.Fixed, ParticipantType.Host, tbl);
+                    }
+                    else
+                    {
+                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Hosts, usr, ParticipantOpt.Eligible, ParticipantType.Host, tbl);
                     }
                     if (AttendeeUserIdsCount == Mobj.MaxAttendee && AttendeeUserIdsCount == Mobj.SlotList[i].Attendees.Count)
                     {
                         query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Attendees, usr, ParticipantOpt.Fixed, ParticipantType.Attendee, tbl);
                     }
+                    else
+                    {
+                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Hosts, usr, ParticipantOpt.Eligible, ParticipantType.Attendee, tbl);
+                    }
                 }
+            }
+            else if (Mobj.MeetingType == MeetingType.MultipleMeeting)
+            {
+                query += AddMeetingSchedule(Mobj, usr);
+                for (i = 0; i < Mobj.SlotList.Count; i++)
+                {
+                    query += $@"
+                insert into eb_meeting_slots (eb_meeting_schedule_id,meeting_date,time_from,time_to,eb_created_by,eb_created_at) values 
+                (eb_currval('eb_meeting_schedule_id_seq'),'{Mobj.Date}','{Mobj.SlotList[i].TimeFrom}','{Mobj.SlotList[i].TimeTo}', {usr.UserId},now() );";
+
+                    int HostUserIdsCount = Mobj.SlotList[i].Hosts.Where(Item => Item.Type == UsersType.Role).Count();
+                    int AttendeeUserIdsCount = Mobj.SlotList[i].Attendees.Where(Item => Item.Type == UsersType.Role).Count();
+                    if (HostUserIdsCount == Mobj.MaxHost && HostUserIdsCount == Mobj.SlotList[i].Hosts.Count)
+                    {
+                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Hosts, usr, ParticipantOpt.Fixed, ParticipantType.Host, tbl);
+                    }
+                    else
+                    {
+                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Hosts, usr, ParticipantOpt.Eligible, ParticipantType.Host, tbl);
+                    }
+                    if (AttendeeUserIdsCount == Mobj.MaxAttendee && AttendeeUserIdsCount == Mobj.SlotList[i].Attendees.Count)
+                    {
+                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Attendees, usr, ParticipantOpt.Fixed, ParticipantType.Attendee, tbl);
+                    }
+                    else
+                    {
+                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Hosts, usr, ParticipantOpt.Eligible, ParticipantType.Attendee, tbl);
+                    }
+                }
+            }
+            else if (Mobj.MeetingType == MeetingType.AdvancedMeeting)
+            {
+
             }
             //else if (Mobj.MeetingOpts == MeetingOptions.F_H_F_A && Mobj.IsMultipleMeeting == "F")
             //{
@@ -444,7 +612,7 @@ namespace ExpressBase.Objects
             return true;
         }
 
-        public string MeetingSlotParticipantsQry(List<Participants> Participants, User usr , ParticipantOpt Opt, ParticipantType ParticipantType,string tbl)
+        public string MeetingSlotParticipantsQry(List<Participants> Participants, User usr, ParticipantOpt Opt, ParticipantType ParticipantType, string tbl)
         {
             string query = "";
             if (Opt == ParticipantOpt.Fixed)
@@ -454,11 +622,11 @@ namespace ExpressBase.Objects
                 int UserGroup;
                 for (int j = 0; j < Participants.Count; j++)
                 {
-                    
-                    if (Participants[j].Type == UsersType.UserIds)
-                        userids +=  Participants[j].Id + "," ;
-                    else if (Participants[j].Type == UsersType.RoleId)
-                        Roles += Participants[j].Id + "," ;
+
+                    if (Participants[j].Type == UsersType.Users)
+                        userids += Participants[j].Id + ",";
+                    else if (Participants[j].Type == UsersType.Role)
+                        Roles += Participants[j].Id + ",";
                     else
                         UserGroup = Participants[j].Id;
                     query += $@"
@@ -467,26 +635,28 @@ namespace ExpressBase.Objects
                 values ({Participants[j].Id}, 2, eb_currval('eb_meeting_schedule_id_seq'), eb_currval('eb_meeting_slots_id_seq'), '', '', 1, {(int)ParticipantType},now(),{usr.UserId});
                ";
                 }
-                query += $@" insert into eb_my_actions (user_ids,from_datetime,form_ref_id,form_data_id,description,my_action_type , eb_meeting_slots_id, 
-            is_completed,eb_del) values('{userids}',NOW(),@refid, eb_currval('{tbl}_id_seq'), 'Meeting Request',
-            '{MyActionTypes.Meeting}',eb_currval('eb_meeting_slots_id_seq') , 'F','F');
-            insert into eb_my_actions (role_ids,from_datetime,form_ref_id,form_data_id,description,my_action_type , eb_meeting_slots_id, 
-            is_completed,eb_del) values('{Roles}',NOW(),@refid, eb_currval('{tbl}_id_seq'), 'Meeting Request',
-            '{MyActionTypes.Meeting}',eb_currval('eb_meeting_slots_id_seq') , 'F','F');";
+                if (userids != "")
+                    query += $@" insert into eb_my_actions (user_ids,from_datetime,form_ref_id,form_data_id,description,my_action_type , eb_meeting_slots_id, 
+                is_completed,eb_del) values('{userids}',NOW(),@refid, eb_currval('{tbl}_id_seq'), 'Meeting Request',
+                     '{MyActionTypes.Meeting}',eb_currval('eb_meeting_slots_id_seq') , 'F','F'); ";
+                if (Roles != "")
+                    query += $@"insert into eb_my_actions (role_ids,from_datetime,form_ref_id,form_data_id,description,my_action_type , eb_meeting_slots_id, 
+                    is_completed,eb_del) values('{Roles}',NOW(),@refid, eb_currval('{tbl}_id_seq'), 'Meeting Request',
+                     '{MyActionTypes.Meeting}',eb_currval('eb_meeting_slots_id_seq') , 'F','F');";
             }
 
             if (Opt == ParticipantOpt.Eligible)
             {
-                string userids ="";
-                string Roles ="";
+                string userids = "";
+                string Roles = "";
                 int UserGroup;
                 for (int j = 0; j < Participants.Count; j++)
                 {
-                    if(Participants[j].Type == UsersType.UserIds)
+                    if (Participants[j].Type == UsersType.Users)
                     {
                         userids += Participants[j].Id;
-                    } 
-                    else if(Participants[j].Type == UsersType.RoleId)
+                    }
+                    else if (Participants[j].Type == UsersType.Role)
                     {
                         Roles += Participants[j].Id;
                     }
@@ -499,7 +669,7 @@ namespace ExpressBase.Objects
             eb_created_at,eb_created_by)values('{userids}','{Roles}',eb_currval('eb_meeting_schedule_id_seq') , 1 ,1,now(),{usr.UserId});
              insert into eb_meeting_scheduled_participants (user_ids,role_ids,eb_meeting_schedule_id,{(int)ParticipantType},type_of_user,
                   ";
-            query += $@" insert into eb_my_actions (user_ids,from_datetime,form_ref_id,form_data_id,description,my_action_type , eb_meeting_schedule_id, 
+                    query += $@" insert into eb_my_actions (user_ids,from_datetime,form_ref_id,form_data_id,description,my_action_type , eb_meeting_schedule_id, 
             is_completed,eb_del) values('{userids}',NOW(),@refid, eb_currval('{tbl}_id_seq'), 'Meeting Request',
             '{MyActionTypes.Meeting}',eb_currval('eb_meeting_schedule_id_seq') , 'F','F');
             insert into eb_my_actions (role_ids,from_datetime,form_ref_id,form_data_id,description,my_action_type , eb_meeting_schedule_id, 
@@ -510,6 +680,16 @@ namespace ExpressBase.Objects
             return query;
         }
 
+        //public string MeetingEligibleParticipantsQry(List<Participants> Participants, User usr, ParticipantOpt Opt, ParticipantType ParticipantType, string tbl)
+        //{
+        //    string str = "";
+
+        //    str += $@"
+        //    //        insert into eb_meeting_scheduled_participants (user_ids,role_ids,eb_meeting_schedule_id,participant_type,type_of_user,
+        //    //  eb_created_at,eb_created_by)values('{ Mobj.EligibleAttendees}','',eb_currval('eb_meeting_schedule_id_seq') , 2 ,1,now(),{usr.UserId});
+        //    //        ";
+        //    return str;
+        //}
         public string SingleMeeting()
         {
 
@@ -517,10 +697,22 @@ namespace ExpressBase.Objects
         }
         public string AddMeetingSchedule(MeetingSchedule Mobj, User usr)
         {
-            string qry = $@"insert into eb_meeting_schedule (title,description,meeting_date,time_from,time_to,duration,is_recuring,is_multiple,venue,
+            string qry = "";
+            if (Mobj.MeetingType == MeetingType.SingleMeeting || Mobj.MeetingType == MeetingType.MultipleMeeting)
+            {
+                qry = $@"insert into eb_meeting_schedule (title,description,meeting_date,time_from,time_to,duration,is_recuring,is_multiple,venue,
+			integration,max_hosts,max_attendees,no_of_attendee,no_of_hosts,eb_created_by,eb_created_at,meeting_opts)
+			values('{Mobj.Title}','{Mobj.Description}','{Mobj.Date}','{Mobj.SlotList[0].TimeFrom}:00','{Mobj.SlotList[Mobj.SlotList.Count - 1].TimeTo}:00', 0,'{Mobj.IsRecuring}',
+            '{Mobj.IsMultipleMeeting}','{Mobj.Location}','',{Mobj.MaxHost},{Mobj.MaxAttendee},{Mobj.MinAttendee},{Mobj.MinHost},{usr.UserId},now(),{(int)Mobj.MeetingType});";
+
+            }
+            else if (Mobj.MeetingType == MeetingType.AdvancedMeeting)
+            {
+                qry = $@"insert into eb_meeting_schedule (title,description,meeting_date,time_from,time_to,duration,is_recuring,is_multiple,venue,
 			integration,max_hosts,max_attendees,no_of_attendee,no_of_hosts,eb_created_by,eb_created_at,meeting_opts)
 			values('{Mobj.Title}','{Mobj.Description}','{Mobj.Date}','{Mobj.TimeFrom}:00','{Mobj.TimeTo}:00', 0,'{Mobj.IsRecuring}',
             '{Mobj.IsMultipleMeeting}','{Mobj.Location}','',{Mobj.MaxHost},{Mobj.MaxAttendee},{Mobj.MinAttendee},{Mobj.MinHost},{usr.UserId},now(),{(int)Mobj.MeetingType});";
+            }
             return qry;
         }
         public string AddMeetingSlots(MeetingSchedule Mobj, User usr)
@@ -601,9 +793,9 @@ namespace ExpressBase.Objects
     }
     public enum UsersType
     {
-        UserIds = 1,
-        UserGroupId = 2,
-        RoleId = 3,
+        Role = 1,
+        UserGroup ,
+        Users   ,
     }
     public enum MeetingOptions
     {
@@ -631,16 +823,34 @@ namespace ExpressBase.Objects
 
     public class ParticipantsListResponse
     {
-        public List<Participants> ParticipantsList { get; set; }
+        public List<Participants> HostParticipantsList { get; set; }
+        public List<Participants> AttendeeParticipantsList { get; set; }
 
         public ParticipantsListResponse()
         {
-            this.ParticipantsList = new List<Participants>();
+            this.HostParticipantsList = new List<Participants>();
+            this.AttendeeParticipantsList = new List<Participants>();
         }
     }
     public class ParticipantsListRequest
     {
-
+        public List<MeetingSuggestion> MeetingConfig { get; set; }
+        public ParticipantsListRequest()
+        {
+            this.MeetingConfig = new List<MeetingSuggestion>();
+        }
+    }
+    public enum MeetingEntityTypes
+    {
+        Role = 1,
+        UserGroup,
+        Users
+    }
+    public class MeetingSuggestion
+    {
+        public UsersType MeetingConfig { get; set; }
+        public List<Int32> MeetingRoles { get; set; }
+        public int MeetingUserGroup { get; set; }
+        public EbScript MeetingUsers { get; set; }
     }
 }
-
