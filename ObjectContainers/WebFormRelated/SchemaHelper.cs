@@ -26,9 +26,7 @@ namespace ExpressBase.Objects.WebFormRelated
             TableSchema _table = _schema.Tables.FirstOrDefault(tbl => tbl.TableName == curTbl);
             if (_table == null)
             {
-                if (_container is EbApproval)
-                    _table = new TableSchema { TableName = curTbl, ParentTable = _parentTable, TableType = WebFormTableTypes.Approval, Title = _container.Label, ContainerName = _container.Name };
-                else if (_container is EbReview)
+                if (_container is EbReview)
                 {
                     _table = new TableSchema { TableName = curTbl, ParentTable = _parentTable, TableType = WebFormTableTypes.Review, Title = _container.Label, ContainerName = _container.Name };
                     _schema.ExtendedControls.Add(_container);

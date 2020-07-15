@@ -427,7 +427,7 @@ namespace ExpressBase.Objects
                             if (ColumnSrc != null && !(_columnDes.Control is EbAutoId))
                             {
                                 FormDes.FormData.MultipleTables[_tableDes.TableName][0].SetColumn(_columnDes.ColumnName, ColumnSrc);
-                                _formattedData = Convert.ToString(ColumnSrc.Value);                                
+                                _formattedData = Convert.ToString(ColumnSrc.Value);
                             }
                             if (_columnDes.Control is EbPowerSelect && !string.IsNullOrEmpty(_formattedData))
                             {
@@ -645,30 +645,6 @@ namespace ExpressBase.Objects
                             FormData.MultipleTables[(c as EbDataGrid).TableName][i][FormConstants.eb_row_num] = j;
                     }
                 }
-                else if (c is EbApproval)
-                {
-                    if (!c.DoNotPersist)
-                    {
-                        EbApproval ebApproval = (c as EbApproval);
-                        if (FormData.MultipleTables.ContainsKey(ebApproval.TableName) && FormData.MultipleTables[ebApproval.TableName].Count > 0)
-                        {
-                            string lastStage = (ebApproval.FormStages[ebApproval.FormStages.Count - 1] as EbFormStage).Name;
-                            string stage = Convert.ToString(FormData.MultipleTables[ebApproval.TableName][0][FormConstants.stage]);
-                            int status = Convert.ToInt32(FormData.MultipleTables[ebApproval.TableName][0][FormConstants.status]);
-                            if (lastStage.Equals(stage) && status == 1)
-                            {
-                                this.AfterSaveRoutines.AddRange(ebApproval.OnApprovalRoutines);
-                            }
-                            string[] str_t = { "stage", "approver_role", "status", "remarks" };
-                            for (int i = 0; i < str_t.Length; i++)
-                            {
-                                EbControl con = ebApproval.Controls.Find(e => e.Name == str_t[i]);
-                                FormData.MultipleTables[ebApproval.TableName][0].SetEbDbType(con.Name, con.EbDbType);
-                                FormData.MultipleTables[ebApproval.TableName][0].SetControl(con.Name, con);
-                            }
-                        }
-                    }
-                }
                 else if (c is EbReview)
                 {
                     if (!c.DoNotPersist || this.TableRowId <= 0)// merge in edit mode only
@@ -765,7 +741,7 @@ namespace ExpressBase.Objects
                     Table.Add(Row);
                     this.FormData.MultipleTables.Add(_table.TableName, Table);
                 }
-                else if (_table.TableType == WebFormTableTypes.Grid || _table.TableType == WebFormTableTypes.Approval || _table.TableType == WebFormTableTypes.Review)
+                else if (_table.TableType == WebFormTableTypes.Grid || _table.TableType == WebFormTableTypes.Review)
                 {
                     this.FormData.MultipleTables.Add(_table.TableName, new SingleTable());
                 }
@@ -793,38 +769,6 @@ namespace ExpressBase.Objects
                     }
                     this.FormData.DGsRowDataModel.Add(_table.TableName, Row);
                 }
-                else if (_table.TableType == WebFormTableTypes.Approval || _table.TableType == WebFormTableTypes.Review)
-                {
-                    this.FormData.ApprovalRowDataModel = new SingleRow();
-                    foreach (ColumnSchema _column in _table.Columns)
-                    {
-                        this.FormData.ApprovalRowDataModel.Columns.Add(_column.Control.GetSingleColumn(this.UserObj, this.SolutionObj, null));
-                    }
-                }
-            }
-        }
-
-        private void GetFormattedDataApproval(EbDataTable dataTable, SingleTable Table)
-        {
-            foreach (EbDataRow dataRow in dataTable.Rows)
-            {
-                DateTime dt = Convert.ToDateTime(dataRow[FormConstants.eb_created_at]);
-                Table.Add(new SingleRow
-                {
-                    Columns = new List<SingleColumn>
-                {
-                    new SingleColumn { Name = FormConstants.id, Type = (int)EbDbTypes.Decimal, Value = Convert.ToInt32(dataRow[FormConstants.id])},
-                    new SingleColumn { Name = FormConstants.stage, Type = (int)EbDbTypes.String, Value = dataRow[FormConstants.stage].ToString()},
-                    new SingleColumn { Name = FormConstants.approver_role, Type = (int)EbDbTypes.String, Value = dataRow[FormConstants.approver_role].ToString()},
-                    new SingleColumn { Name = FormConstants.status, Type = (int)EbDbTypes.Decimal, Value = Convert.ToInt32(dataRow[FormConstants.status])},
-                    new SingleColumn { Name = FormConstants.remarks, Type = (int)EbDbTypes.String, Value = dataRow[FormConstants.remarks].ToString()},
-                    new SingleColumn { Name = FormConstants.eb_created_by_id, Type = (int)EbDbTypes.Decimal, Value = Convert.ToInt32(dataRow[FormConstants.eb_created_by])},
-                    new SingleColumn { Name = FormConstants.eb_created_by_name, Type = (int)EbDbTypes.String, Value = this.SolutionObj.Users[Convert.ToInt32(dataRow[FormConstants.eb_created_by])]},
-                    new SingleColumn { Name = FormConstants.eb_created_at, Type = (int)EbDbTypes.String, Value = dt.ConvertFromUtc(this.UserObj.Preference.TimeZone).ToString("dd-MM-yyyy hh:mm tt")}
-                },
-                    RowId = Convert.ToInt32(dataRow[FormConstants.id]),
-                    LocId = Convert.ToInt32(dataRow[FormConstants.eb_loc_id])
-                });
             }
         }
 
@@ -1113,11 +1057,7 @@ namespace ExpressBase.Objects
                 if (!_table.IsDynamic)
                 {
                     EbDataTable dataTable = dataset.Tables[count++];////                
-
-                    if (_table.TableType == WebFormTableTypes.Approval)
-                        this.GetFormattedDataApproval(dataTable, Table);
-                    else
-                        this.GetFormattedData(dataTable, Table, _table);
+                    this.GetFormattedData(dataTable, Table, _table);
                 }
                 //if (!_FormData.MultipleTables.ContainsKey(_table.TableName))
                 //    _FormData.MultipleTables.Add(_table.TableName, Table);
