@@ -259,19 +259,21 @@ namespace ExpressBase.Objects
 
         public string GetHtml4singleMeeting()
         {
-            string Html = @"<div class='single-meeting'><div class='title'> <p>Title</p><input type='text' placeholder='title' id='@ebsid@_meeting-title' class='mc-input'/> </div>
-            <div class='description'><p>Description</p><textarea id='@ebsid@_description' class='mc-input' rows='10' cols='10' placeholder='Describe about the event...'></textarea><div>
-            <div class='location'><p>Location</p><input type='text' placeholder='location' id='@ebsid@_meeting-title' class='mc-input' /><div>
-            <div class='integration'><p>Integrations</p><input type='text' placeholder='integration' id='@ebsid@_meeting-title' class='mc-input' /></div>
-            <div class='date'><p>Date</p><input type='text' placeholder='Date' id='@ebsid@_meeting-date' val='@date_val@' class='mc-input' /></div>
+            string Html = @"
+            <div class='single-meeting'><div style='display:flex'><div style='width: 100%;margin-right: 2rem;'><div class='title'> <input type='text' placeholder='Title' id='@ebsid@_meeting-title' class='mc-input'/> </div>
+            <div class='location'><input type='text'  placeholder='Location' id='@ebsid@_location' class='mc-input' /></div>
+            <div class='date'><input type='text' placeholder='Date' id='@ebsid@_meeting-date' val='@date_val@' class='mc-input' /></div> </div>
+            <div style='width: 100%;'><div class='description'><textarea id='@ebsid@_description' placeholder='Describe about the event...' rows='10' cols='10' class='mc-input' ></textarea></div>
+            <div class='integration'><input type='text' placeholder='Integration' id='@ebsid@_integration' class='mc-input' /></div></div></div>
             <div class='slots-table' id='@ebsid@_slots'>
-            <table> <thead><tr><th>Sl.No</th><th>Start Time</th><th>End Time</th><th>Host</th><th>Attendee</th></tr>
+            <table id='@ebsid@_slot-table' class='slot-tbl'> <thead><tr><th>Time From</th><th>Time To</th><th>Host</th><th>Attendee</th><th></th></tr>
             <tbody>
-            <tr><th>1</th>
-            <th><input type='time' id='@ebsid@_time-from' data-id='0' class='mc-input time-from' /></th>
-            <th><input type='time' id='@ebsid@_time-to' data-id='0'  class='mc-input time-to' /></th>
-            <th><input type='text' id='@ebsid@_host_0' data-id='0' class='meeting-participants tb-host'/></th>
-            <th><input type='text' id='@ebsid@_attendee_0' data-id='0' class='meeting-participants tb-attendee'/></th></tr>
+            <tr data-id='0'>
+            <td class='time'><input type='time' id='@ebsid@_time-from'  class='mc-input time-from' /></td>
+            <td class='time'><input type='time' id='@ebsid@_time-to'  class='mc-input time-to' /></td>
+            <td><input type='text' id='@ebsid@_host_0'  class='meeting-participants tb-host'/></td>
+            <td><input type='text' id='@ebsid@_attendee_0' class='meeting-participants tb-attendee'/></td>
+            <td style='width:5rem;'></td></td></tr>
             </tbody>
             </table>
             </div>
@@ -283,29 +285,23 @@ namespace ExpressBase.Objects
         public string GetHtml4MultipleMeeting()
         {
             string Html = @"
-            <div class='single-meeting'><div class='title'> <input type='text' placeholder='Title' id='@ebsid@_meeting-title' class='mc-input'/> </div>
-            <div class='description'><textarea id='@ebsid@_description' placeholder='Describe about the event...' rows='10' cols='10' class='mc-input' ></textarea></div>
-            <div class='location'><input type='text'  placeholder='Location' id='@ebsid@_meeting-title' class='mc-input' /></div>
-            <div class='integration'><input type='text' placeholder='Integration' id='@ebsid@_meeting-title' class='mc-input' /></div>
-            <div class='date'><input type='text' placeholder='Date' id='@ebsid@_meeting-date' val='@date_val@' class='mc-input' /></div>
+            <div class='single-meeting'><div style='display:flex'><div style='width: 100%;margin-right: 2rem;'><div class='title'> <input type='text' placeholder='Title' id='@ebsid@_meeting-title' class='mc-input'/> </div>
+            <div class='location'><input type='text'  placeholder='Location' id='@ebsid@_location' class='mc-input' /></div>
+            <div class='date'><input type='text' placeholder='Date' id='@ebsid@_meeting-date' val='@date_val@' class='mc-input' /></div> </div>
+            <div style='width: 100%;'><div class='description'><textarea id='@ebsid@_description' placeholder='Describe about the event...' rows='10' cols='10' class='mc-input' ></textarea></div>
+            <div class='integration'><input type='text' placeholder='Integration' id='@ebsid@_integration' class='mc-input' /></div></div></div>
             <div class='slots-table' id='@ebsid@_slots'>
-            <table id='@ebsid@_slot-table' class='slot-tbl'> <thead><tr><th>Sl.No</th><th>Time</th><th>Host</th><th>Attendee</th><th>Action</th></tr>
+            <table id='@ebsid@_slot-table' class='slot-tbl'> <thead><tr><th>Time From</th><th>Time To</th><th>Host</th><th>Attendee</th><th></th></tr>
             <tbody>
-            <tr><th>1</th>
-            <td><div>Time From : <input type='time' id='@ebsid@_time-from' data-id='0' class='mc-input time-from' /></div>
-            <div>Time to : <input type='time' id='@ebsid@_time-to' data-id='0' class='mc-input time-to' /></div></td>
-            <td><input type='text' id='@ebsid@_host_0' data-id='0' class='meeting-participants tb-host'/></td>
-            <td><input type='text' id='@ebsid@_attendee_0' data-id='0' class='meeting-participants tb-attendee'/></td>
-            <td><button id='@ebsid@_remove-slot'  data-id='0'>-</button></td></td></tr>
+            <tr data-id='0'>
+            <td class='time'><input type='time' id='@ebsid@_time-from'  class='mc-input time-from' /></td>
+            <td class='time'><input type='time' id='@ebsid@_time-to'  class='mc-input time-to' /></td>
+            <td><input type='text' id='@ebsid@_host_0'  class='meeting-participants tb-host'/></td>
+            <td><input type='text' id='@ebsid@_attendee_0' class='meeting-participants tb-attendee'/></td>
+            <td style='width:5rem;'><button id='@ebsid@_remove-slot' class='remove-slot' > <i class='fa fa-window-close'></i></button></td></td></tr>
             </tbody>
-            <tfoot>
-            <tr><td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td><div> <button id='@ebsid@_add-new-slot'>+</button></td></tr>
-              </tfoot>
             </table>
+            <button id='@ebsid@_add-new-slot'> <i class='fa fa-plus-square'></i> Add Slots </button>
             </div>
             </div>
 
@@ -314,40 +310,51 @@ namespace ExpressBase.Objects
         }
         public string AdvancedMeeting()
         {
-            string Html = @"
-                Title : <input type='text' placeholder='Title' id='@ebsid@_meeting-title' class='mc-input' />
-                Description : <textarea id='@ebsid@_description' class='mc-input' > </textarea> 
-                <input type='text' id='@ebsid@_meeting-date' val='@date_val@' class='mc-input' />
-                <input type='text' id='@ebsid@_duration' data-format='HH:mm' data-template='HH : mm' name='datetime' class='mc-input'>
-                Max-host : <input type='number' id='@ebsid@_max-host' class='meeting-spinner mc-input' min='1' max='5' value='1' >
-                Min-host : <input type='number' id='@ebsid@_min-host' class='meeting-spinner mc-input' min='1' max='5' value='1'>
-                Max-Attendee : <input type='number' id='@ebsid@_max-attendee' class='meeting-spinner mc-input' min='1' max='5' value='1'>
-                Min-Attendee : <input type='number' id='@ebsid@_min-attendee' class='meeting-spinner mc-input' min='1' max='5' value='1'>
-                <div class='eligible-participant'><div style='width:100%'>
-                <h5>Eligible Host</h5> <input type='text' id='@ebsid@_eligible_host_list' class='mc-input eligible-userids'/> </div>
-                <div  style='width:100%'><h5>Eligible Attendee</h5><input type='text' id='@ebsid@_eligible_attendee_list' class='mc-input eligible-userids'/></div>
-                </div>
-                <div class='slots-table' id='@ebsid@_slots'>
-                <table> <thead><tr><th>Sl.No</th><th>Start Time</th><th>End Time</th><th>Host</th><th>Attendee</th></tr>
-                <tbody></tbody>
-                </table>
-                </div>
-                <div class='meeting-recurance'>
-                <div class='is-recuring'><input type='checkbox' id='@ebsid@_recuring_meeting' name='recuring' value='recuring'>
-                <label for='@ebsid@_recuring_meeting'> Is recuring</label></div>    
-                <div class='recuring-days' id='@ebsid@_recuring-days'>
-                  <label class='checkbox-inline' ><input type='checkbox' data-label='Sun' data-code='0' checked>Sunday</label>
-                  <label class='checkbox-inline' ><input type='checkbox' data-label='Mon' data-code='1' checked>Monday</label>
-                  <label class='checkbox-inline' ><input type='checkbox' data-label='Tue' data-code='2' checked>Tuesday</label>
-                  <label class='checkbox-inline' ><input type='checkbox' data-label='Wed' data-code='3' checked>Wednesday</label>
-                  <label class='checkbox-inline' ><input type='checkbox' data-label='Thu' data-code='4' checked>Thursday</label>
-                  <label class='checkbox-inline' ><input type='checkbox' data-label='Fri' data-code='5' checked>Friday</label>
-                  <label class='checkbox-inline' ><input type='checkbox' data-label='Sat' data-code='6' checked>Saturday</label>
-                </div>
-                <div>
-                Cron Exp : <input type='text' id='@ebsid@_crone-exp'>
-                Cron Exp End Date :<input type='text' id='@ebsid@_crone-exp-end'></div>
-                </div>";
+            //string Html = @"
+            //    Title : <input type='text' placeholder='Title' id='@ebsid@_meeting-title' class='mc-input' />
+            //    Description : <textarea id='@ebsid@_description' class='mc-input' > </textarea> 
+            //    <input type='text' id='@ebsid@_meeting-date' val='@date_val@' class='mc-input' />
+            //    <input type='text' id='@ebsid@_duration' data-format='HH:mm' data-template='HH : mm' name='datetime' class='mc-input'>
+            //    Max-host : <input type='number' id='@ebsid@_max-host' class='meeting-spinner mc-input' min='1' max='5' value='1' >
+            //    Min-host : <input type='number' id='@ebsid@_min-host' class='meeting-spinner mc-input' min='1' max='5' value='1'>
+            //    Max-Attendee : <input type='number' id='@ebsid@_max-attendee' class='meeting-spinner mc-input' min='1' max='5' value='1'>
+            //    Min-Attendee : <input type='number' id='@ebsid@_min-attendee' class='meeting-spinner mc-input' min='1' max='5' value='1'>
+            //    <div class='eligible-participant'><div style='width:100%'>
+            //    <h5>Eligible Host</h5> <input type='text' id='@ebsid@_eligible_host_list' class='mc-input eligible-userids'/> </div>
+            //    <div  style='width:100%'><h5>Eligible Attendee</h5><input type='text' id='@ebsid@_eligible_attendee_list' class='mc-input eligible-userids'/></div>
+            //    </div>
+            //    <div class='slots-table' id='@ebsid@_slots'>
+            //    <table> <thead><tr><th>Sl.No</th><th>Start Time</th><th>End Time</th><th>Host</th><th>Attendee</th></tr>
+            //    <tbody></tbody>
+            //    </table>
+            //    </div>
+            //    <div class='meeting-recurance'>
+            //    <div class='is-recuring'><input type='checkbox' id='@ebsid@_recuring_meeting' name='recuring' value='recuring'>
+            //    <label for='@ebsid@_recuring_meeting'> Is recuring</label></div>    
+            //    <div class='recuring-days' id='@ebsid@_recuring-days'>
+            //      <label class='checkbox-inline' ><input type='checkbox' data-label='Sun' data-code='0' checked>Sunday</label>
+            //      <label class='checkbox-inline' ><input type='checkbox' data-label='Mon' data-code='1' checked>Monday</label>
+            //      <label class='checkbox-inline' ><input type='checkbox' data-label='Tue' data-code='2' checked>Tuesday</label>
+            //      <label class='checkbox-inline' ><input type='checkbox' data-label='Wed' data-code='3' checked>Wednesday</label>
+            //      <label class='checkbox-inline' ><input type='checkbox' data-label='Thu' data-code='4' checked>Thursday</label>
+            //      <label class='checkbox-inline' ><input type='checkbox' data-label='Fri' data-code='5' checked>Friday</label>
+            //      <label class='checkbox-inline' ><input type='checkbox' data-label='Sat' data-code='6' checked>Saturday</label>
+            //    </div>
+            //    <div>
+            //    Cron Exp : <input type='text' id='@ebsid@_crone-exp'>
+            //    Cron Exp End Date :<input type='text' id='@ebsid@_crone-exp-end'></div>
+            //    </div>";
+            string Html = $@"     
+            <div class='single-meeting'><div style='display:flex'><div style='width: 100%;margin-right: 2rem;'><div class='title'> <input type='text' placeholder='Title' id='@ebsid@_meeting-title' class='mc-input'/> </div>
+            <div class='location'><input type='text'  placeholder='Location' id='@ebsid@_location' class='mc-input' /></div>
+            <div class='date'><input type='text' placeholder='Date' id='@ebsid@_meeting-date' val='@date_val@' class='mc-input' /></div> </div>
+            <div style='width: 100%;'><div class='description'><textarea id='@ebsid@_description' placeholder='Describe about the event...' rows='10' cols='10' class='mc-input' ></textarea></div>
+            <div class='integration'><input type='text' placeholder='Integration' id='@ebsid@_integration' class='mc-input' /></div></div></div>
+            <div class='slots-table' id='@ebsid@_slots'>
+            <table id='@ebsid@_slot-table' class='slot-tbl'> <thead><tr><th>Time From</th><th>Time To</th><th>Host</th><th>Attendee</th><th></th></tr>
+            <tbody>
+            </tbody>
+            </table>";
             return Html;
         }
         public override string GetDesignHtml()
@@ -402,7 +409,7 @@ namespace ExpressBase.Objects
                 return false;
             MeetingSchedule Mobj = new MeetingSchedule();
             Mobj = JsonConvert.DeserializeObject<MeetingSchedule>(cField.Value.ToString());
-            string[] Host = Mobj.Host.Split(',').Select(sValue => sValue.Trim()).ToArray();
+            //string[] Host = Mobj.Host.Split(',').Select(sValue => sValue.Trim()).ToArray();
 
             string query = "";
             if (Mobj.MeetingType == MeetingType.SingleMeeting)
@@ -430,7 +437,7 @@ namespace ExpressBase.Objects
                     }
                     else
                     {
-                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Hosts, usr, ParticipantOpt.Eligible, ParticipantType.Attendee, tbl);
+                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Attendees, usr, ParticipantOpt.Eligible, ParticipantType.Attendee, tbl);
                     }
                 }
             }
@@ -443,8 +450,8 @@ namespace ExpressBase.Objects
                 insert into eb_meeting_slots (eb_meeting_schedule_id,meeting_date,time_from,time_to,eb_created_by,eb_created_at) values 
                 (eb_currval('eb_meeting_schedule_id_seq'),'{Mobj.Date}','{Mobj.SlotList[i].TimeFrom}','{Mobj.SlotList[i].TimeTo}', {usr.UserId},now() );";
 
-                    int HostUserIdsCount = Mobj.SlotList[i].Hosts.Where(Item => Item.Type == UsersType.Role).Count();
-                    int AttendeeUserIdsCount = Mobj.SlotList[i].Attendees.Where(Item => Item.Type == UsersType.Role).Count();
+                    int HostUserIdsCount = Mobj.SlotList[i].Hosts.Where(Item => Item.Type == UsersType.Users).Count();
+                    int AttendeeUserIdsCount = Mobj.SlotList[i].Attendees.Where(Item => Item.Type == UsersType.Users).Count();
                     if (HostUserIdsCount == Mobj.MaxHost && HostUserIdsCount == Mobj.SlotList[i].Hosts.Count)
                     {
                         query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Hosts, usr, ParticipantOpt.Fixed, ParticipantType.Host, tbl);
@@ -459,7 +466,7 @@ namespace ExpressBase.Objects
                     }
                     else
                     {
-                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Hosts, usr, ParticipantOpt.Eligible, ParticipantType.Attendee, tbl);
+                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Attendees, usr, ParticipantOpt.Eligible, ParticipantType.Attendee, tbl);
                     }
                 }
             }
@@ -649,7 +656,7 @@ namespace ExpressBase.Objects
             {
                 string userids = "";
                 string Roles = "";
-                int UserGroup;
+                int UserGroup =0;
                 for (int j = 0; j < Participants.Count; j++)
                 {
                     if (Participants[j].Type == UsersType.Users)
@@ -666,13 +673,18 @@ namespace ExpressBase.Objects
                     }
                     query += $@"
             insert into eb_meeting_scheduled_participants (user_ids,role_ids,eb_meeting_schedule_id,participant_type,type_of_user,
-            eb_created_at,eb_created_by)values('{userids}','{Roles}',eb_currval('eb_meeting_schedule_id_seq') , 1 ,1,now(),{usr.UserId});
-             insert into eb_meeting_scheduled_participants (user_ids,role_ids,eb_meeting_schedule_id,{(int)ParticipantType},type_of_user,
+            eb_created_at,eb_created_by)values('{userids}','{Roles}',eb_currval('eb_meeting_schedule_id_seq') , {(int)ParticipantType} ,1,now(),{usr.UserId});
                   ";
-                    query += $@" insert into eb_my_actions (user_ids,from_datetime,form_ref_id,form_data_id,description,my_action_type , eb_meeting_schedule_id, 
+                    if (userids != "")
+                        query += $@" insert into eb_my_actions (user_ids,from_datetime,form_ref_id,form_data_id,description,my_action_type , eb_meeting_schedule_id, 
             is_completed,eb_del) values('{userids}',NOW(),@refid, eb_currval('{tbl}_id_seq'), 'Meeting Request',
-            '{MyActionTypes.Meeting}',eb_currval('eb_meeting_schedule_id_seq') , 'F','F');
-            insert into eb_my_actions (role_ids,from_datetime,form_ref_id,form_data_id,description,my_action_type , eb_meeting_schedule_id, 
+            '{MyActionTypes.Meeting}',eb_currval('eb_meeting_schedule_id_seq') , 'F','F');";
+                    if (Roles != "")
+                        query += $@" insert into eb_my_actions (role_ids,from_datetime,form_ref_id,form_data_id,description,my_action_type , eb_meeting_schedule_id, 
+            is_completed,eb_del) values('{Roles}',NOW(),@refid, eb_currval('{tbl}_id_seq'), 'Meeting Request',
+            '{MyActionTypes.Meeting}',eb_currval('eb_meeting_schedule_id_seq') , 'F','F');";
+                    if (UserGroup > 0)
+                        query += $@" insert into eb_my_actions (role_ids,from_datetime,form_ref_id,form_data_id,description,my_action_type , eb_meeting_schedule_id, 
             is_completed,eb_del) values('{Roles}',NOW(),@refid, eb_currval('{tbl}_id_seq'), 'Meeting Request',
             '{MyActionTypes.Meeting}',eb_currval('eb_meeting_schedule_id_seq') , 'F','F');";
                 }
@@ -723,16 +735,16 @@ namespace ExpressBase.Objects
             ";
             return qry;
         }
-        public string AddMyAction(MeetingSchedule Mobj, User usr, string tbl)
-        {
-            string qry = $@" insert into eb_my_actions (user_ids,from_datetime,form_ref_id,form_data_id,description,my_action_type , eb_meeting_slots_id, 
-            is_completed,eb_del) values('{Mobj.EligibleHosts}',NOW(),@refid, eb_currval('{tbl}_id_seq'), 'Meeting Request',
-            '{MyActionTypes.Meeting}',eb_currval('eb_meeting_slots_id_seq') , 'F','F');  
-            insert into eb_my_actions (user_ids,from_datetime,form_ref_id,form_data_id,description,my_action_type , eb_meeting_slots_id, 
-            is_completed,eb_del) values('{Mobj.EligibleAttendees}',NOW(),@refid, eb_currval('{tbl}_id_seq'), 'Meeting Request',
-            '{MyActionTypes.Meeting}',eb_currval('eb_meeting_slots_id_seq') , 'F','F');";
-            return qry;
-        }
+        //public string AddMyAction(MeetingSchedule Mobj, User usr, string tbl)
+        //{
+        //    string qry = $@" insert into eb_my_actions (user_ids,from_datetime,form_ref_id,form_data_id,description,my_action_type , eb_meeting_slots_id, 
+        //    is_completed,eb_del) values('{Mobj.EligibleHosts}',NOW(),@refid, eb_currval('{tbl}_id_seq'), 'Meeting Request',
+        //    '{MyActionTypes.Meeting}',eb_currval('eb_meeting_slots_id_seq') , 'F','F');  
+        //    insert into eb_my_actions (user_ids,from_datetime,form_ref_id,form_data_id,description,my_action_type , eb_meeting_slots_id, 
+        //    is_completed,eb_del) values('{Mobj.EligibleAttendees}',NOW(),@refid, eb_currval('{tbl}_id_seq'), 'Meeting Request',
+        //    '{MyActionTypes.Meeting}',eb_currval('eb_meeting_slots_id_seq') , 'F','F');";
+        //    return qry;
+        //}
         public string AddEligibleParticipants(MeetingSchedule Mobj, User usr)
         {
             string qry = $@"
@@ -745,6 +757,7 @@ namespace ExpressBase.Objects
         public string Title { get; set; }
         public string Description { get; set; }
         public string Location { get; set; }
+        public string Integration { get; set; }
         public string IsSingleMeeting { get; set; }
         public string IsMultipleMeeting { get; set; }
         public string IsRecuring { get; set; }
@@ -757,10 +770,6 @@ namespace ExpressBase.Objects
         public int MinHost { get; set; }
         public int MaxAttendee { get; set; }
         public int MinAttendee { get; set; }
-        public string EligibleHosts { get; set; }
-        public string EligibleAttendees { get; set; }
-        public string Host { get; set; }
-        public string Attendee { get; set; }
         public MeetingType MeetingType { get; set; }
         public List<Slots> SlotList { get; set; }
         public MeetingSchedule()
