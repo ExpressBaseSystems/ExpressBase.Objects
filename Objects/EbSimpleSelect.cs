@@ -274,7 +274,6 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
 
         public void InitFromDataBase(JsonServiceClient ServiceClient)
         {
-            //this.DataSourceId = "eb_roby_dev-eb_roby_dev-2-1015-1739";
             string _html = string.Empty;
             if (this.IsDynamic)
             {

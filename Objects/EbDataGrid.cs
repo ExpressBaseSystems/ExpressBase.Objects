@@ -52,12 +52,12 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [DefaultPropValue("1")]
-        [PropertyGroup("Behavior")]
+        [PropertyGroup(PGConstants.BEHAVIOR)]
         [HideInPropertyGrid]
         public int LeftFixedColumnCount { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
-        [PropertyGroup("Behavior")]
+        [PropertyGroup(PGConstants.BEHAVIOR)]
         [HideInPropertyGrid]
         public int RightFixedColumnCount { get; set; }
 
@@ -83,13 +83,13 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [DefaultPropValue("true")]
-        [PropertyGroup("Behavior")]
+        [PropertyGroup(PGConstants.BEHAVIOR)]
         [Alias("Serial numbered")]
         public bool IsShowSerialNumber { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
-        [PropertyGroup("Behavior")]
+        [PropertyGroup(PGConstants.BEHAVIOR)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OnChangeExec(@"
                 if (this.DataSourceId){
@@ -107,12 +107,18 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [DefaultPropValue("true")]
-        [PropertyGroup("Behavior")]
+        [PropertyGroup(PGConstants.BEHAVIOR)]
         [Alias("Resizable Columns")]
         public bool IsColumnsResizable { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
-        [PropertyGroup("Behavior")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        [DefaultPropValue("+ Row")]
+        [Alias("AddRow Button Text")]
+        public string AddRowBtnTxt{ get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.BEHAVIOR)]
         public bool AscendingOrder { get; set; }
 
         [HideInPropertyGrid]
@@ -165,7 +171,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.Collection)]
         [Alias("Columns")]
-        [PropertyGroup("Behavior")]
+        [PropertyGroup(PGConstants.BEHAVIOR)]
         [ListType(typeof(EbDGColumn))]
         [PropertyPriority(99)]
         public override List<EbControl> Controls { get; set; }
@@ -193,22 +199,22 @@ namespace ExpressBase.Objects
         }
 
         //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
-        //[PropertyGroup("Behavior")]
+        //[PropertyGroup(PGConstants.BEHAVIOR)]
         //[DefaultPropValue("true")]
         //public bool IsEditable { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
-        [PropertyGroup("Behavior")]
+        [PropertyGroup(PGConstants.BEHAVIOR)]
         [PropertyPriority(98)]
         [DefaultPropValue("true")]
         public bool IsAddable { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
-        [PropertyGroup("Behavior")]
+        [PropertyGroup(PGConstants.BEHAVIOR)]
         public override bool IsDisable { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [PropertyGroup("Behavior")]
+        [PropertyGroup(PGConstants.BEHAVIOR)]
         [PropertyPriority(99)]
         [HelpText("Set true if you want to hide the control.")]
         public override bool Hidden { get; set; }
@@ -272,7 +278,7 @@ namespace ExpressBase.Objects
             <thead>
               <tr>  
                 <th class='slno' style='width:34px'><span class='grid-col-title'>SL No</span></th>"
-.Replace("@addrowbtn@", this.IsAddable ? "<div id='@ebsid@addrow' class='addrow-btn' tabindex='0'>+ Row</div>" : string.Empty); ;
+.Replace("@addrowbtn@", this.IsAddable ? ("<div id='@ebsid@addrow' class='addrow-btn' tabindex='0'>"+ (string.IsNullOrEmpty(AddRowBtnTxt) ? "+ Row" : AddRowBtnTxt) + "</div>") : string.Empty); ;
             foreach (EbDGColumn col in Controls)
             {
                 if (!col.Hidden)
@@ -469,7 +475,7 @@ else {
         }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [PropertyGroup("Behavior")]
+        [PropertyGroup(PGConstants.BEHAVIOR)]
         [DefaultPropValue("3")]
         public int RowsVisible
         {
@@ -485,7 +491,7 @@ else {
         }
 
         [EnableInBuilder(BuilderType.WebForm)]
-        [PropertyGroup("Behavior")]
+        [PropertyGroup(PGConstants.BEHAVIOR)]
         public bool AutoSuggestion
         {
             get { return this.EbTextBox.AutoSuggestion; }
@@ -1063,7 +1069,7 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
         }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [PropertyGroup("Behavior")]
+        [PropertyGroup(PGConstants.BEHAVIOR)]
         [PropertyPriority(52)]
         [DefaultPropValue("Yes")]
         public string TrueText
@@ -1073,7 +1079,7 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
         }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [PropertyGroup("Behavior")]
+        [PropertyGroup(PGConstants.BEHAVIOR)]
         [PropertyPriority(51)]
         [DefaultPropValue("No")]
         public string FalseText
@@ -1234,13 +1240,13 @@ else {pg.MakeReadWrite('ValueMember');}")]
 
         [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.WebForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", 1)]
-        [PropertyGroup("Behavior")]
+        [PropertyGroup(PGConstants.BEHAVIOR)]
         [PropertyPriority(98)]
         [OnChangeExec(@"if (this.Columns && this.Columns.$values.length === 0 ){pg.MakeReadOnly('DisplayMember');} else {pg.MakeReadWrite('DisplayMember');}")]
         public DVBaseColumn DisplayMember { get { return this.EbPowerSelect.DisplayMember; } set { this.EbPowerSelect.DisplayMember = value; } }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
-        [PropertyGroup("Behavior")]
+        [PropertyGroup(PGConstants.BEHAVIOR)]
         [PropertyPriority(50)]
         [OnChangeExec(@"
 if(this.RenderAsSimpleSelect == true)// SS
@@ -1284,7 +1290,7 @@ pg.HideProperty('IsDynamic');
 
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
-        [PropertyGroup("Behavior")]
+        [PropertyGroup(PGConstants.BEHAVIOR)]
         [PropertyPriority(98)]
         public bool IsInsertable { get; set; }
 
@@ -1296,11 +1302,11 @@ pg.HideProperty('IsDynamic');
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [HelpText("Specify minimum number of charecters to initiate search")]
         [Category("Search Settings")]
-        [PropertyGroup("Behavior")]
+        [PropertyGroup(PGConstants.BEHAVIOR)]
         public int MinSeachLength { get { return this.EbPowerSelect.MinSeachLength; } set { this.EbPowerSelect.MinSeachLength = value; } }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [PropertyGroup("Behavior")]
+        [PropertyGroup(PGConstants.BEHAVIOR)]
         [OnChangeExec(@"
             if (this.MultiSelect === true ){
                 pg.MakeReadWrite('MaxLimit'); 
@@ -1333,7 +1339,7 @@ pg.HideProperty('IsDynamic');
         public bool MultiSelect { get { return this.EbPowerSelect.MultiSelect; } set { this.EbPowerSelect.MultiSelect = value; } }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [PropertyGroup("Behavior")]
+        [PropertyGroup(PGConstants.BEHAVIOR)]
         [OnChangeExec(@"
             if (this.MultiSelect === true ){
                 pg.MakeReadWrite('MaxLimit'); 
@@ -1362,11 +1368,11 @@ pg.HideProperty('IsDynamic');
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [DefaultPropValue("1")]
-        [PropertyGroup("Behavior")]
+        [PropertyGroup(PGConstants.BEHAVIOR)]
         public int MaxLimit { get { return this.EbPowerSelect.MaxLimit; } set { this.EbPowerSelect.MaxLimit = value; } }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [PropertyGroup("Behavior")]
+        [PropertyGroup(PGConstants.BEHAVIOR)]
         public int MinLimit { get { return this.EbPowerSelect.MinLimit; } set { this.EbPowerSelect.MinLimit = value; } }
 
         [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.WebForm)]
