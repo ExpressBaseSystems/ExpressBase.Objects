@@ -603,8 +603,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class UpdateSolutionObjectRequest : EbServiceStackAuthRequest, IReturn<UpdateSolutionObjectResponse>
-    {       
+    public class UpdateSolutionObjectRequest : EbServiceStackNoAuthRequest, IReturn<UpdateSolutionObjectResponse>
+    {
+        [DataMember(Order = 1)]
+        public string SolnId { get; set; }
+
+        [DataMember(Order = 2)]
+        public int UserId { get; set; }
     }
 
     [DataContract]
