@@ -189,7 +189,7 @@ namespace ExpressBase.Objects
         [CEOnDeselectFn(@"
             this.bVisible = false;
             Parent.NotVisibleColumns.$values.push(this)")]
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar, BuilderType.WebForm)]
         [PropertyGroup("User Actions")]
         [PropertyPriority(2)]
         [HideInPropertyGrid]
