@@ -125,12 +125,17 @@ namespace ExpressBase.Objects
     pg.HideProperty('AttendeeRoles');
     pg.HideProperty('AttendeeUserGroup');
     pg.HideProperty('AttendeeUsers');
+    pg.HideProperty('AttendeeContacts');
+    pg.HideProperty('AttendeeContactFilter');
     if (this.AttendeeConfig === 1)
         pg.ShowProperty('AttendeeRoles');
     else if (this.AttendeeConfig === 2)
         pg.ShowProperty('AttendeeUserGroup');
     else if (this.AttendeeConfig === 3)
         pg.ShowProperty('AttendeeUsers');
+else if (this.AttendeeConfig === 4)
+        pg.ShowProperty('AttendeeContactFilter');
+        pg.ShowProperty('AttendeeContacts');
     ")]
         public UsersType AttendeeConfig { get; set; }
 
@@ -157,6 +162,17 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.ScriptEditorCS)]//required ScriptEditorSQ
         public EbScript AttendeeUsers { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [PropertyGroup("Attendee")]
+        [OSE_ObjectTypes(EbObjectTypes.iWebForm)]
+        public string AttendeeContactFilter { get; set; }
+
+        [PropertyGroup("Attendee")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]//required ScriptEditorSQ
+        public EbScript AttendeeContacts { get; set; }
         public override string UIchangeFns
         {
             get
@@ -195,14 +211,18 @@ namespace ExpressBase.Objects
                 MeetingConfig = this.HostConfig,
                 MeetingRoles = this.HostRoles,
                 MeetingUserGroup = this.HostUserGroup,
-                MeetingUsers = this.HostUsers
+                MeetingUsers = this.HostUsers,
+                ContactFilter = "",
+                Contacts = null,
             });
             Opts.Add(new MeetingSuggestion()
             {
                 MeetingConfig = this.AttendeeConfig,
                 MeetingRoles = this.AttendeeRoles,
                 MeetingUserGroup = this.AttendeeUserGroup,
-                MeetingUsers = this.AttendeeUsers
+                MeetingUsers = this.AttendeeUsers,
+                ContactFilter = this.AttendeeContactFilter,
+                Contacts = this.AttendeeContacts
             });
             abc = ServiceClient.Post<ParticipantsListResponse>(new ParticipantsListRequest { MeetingConfig = Opts });
             this.HostParticipantsList = JsonConvert.SerializeObject(abc.HostParticipantsList);
@@ -805,6 +825,7 @@ namespace ExpressBase.Objects
         Role = 1,
         UserGroup ,
         Users   ,
+        Contact,
     }
     public enum MeetingOptions
     {
@@ -860,6 +881,8 @@ namespace ExpressBase.Objects
         public UsersType MeetingConfig { get; set; }
         public List<Int32> MeetingRoles { get; set; }
         public int MeetingUserGroup { get; set; }
+        public string ContactFilter { get; set; }
         public EbScript MeetingUsers { get; set; }
+        public EbScript Contacts { get; set; }
     }
 }
