@@ -176,15 +176,6 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                     if (Allctrls[i] is EbReview)
                         ebReviewCtrl = Allctrls[i] as EbReview;
                 }
-                else if (Allctrls[i] is EbApproval)//deprecated
-                {
-                    string _tn = (Allctrls[i] as EbApproval).TableName;
-                    if (string.IsNullOrEmpty(_tn))
-                        throw new FormException("Please enter a valid table name for " + Allctrls[i].Label + " (approval control)");
-                    if (tbls.ContainsKey(_tn))
-                        throw new FormException(string.Format("Same table not allowed for {1} and {2}(approval control) : {0}", _tn, tbls[_tn], Allctrls[i].Label));
-                    tbls.Add(_tn, Allctrls[i].Label + "(approval control)");
-                }
                 else if (Allctrls[i] is EbDataGrid)
                 {
                     EbDataGrid DataGrid = Allctrls[i] as EbDataGrid;
