@@ -86,6 +86,12 @@ namespace ExpressBase.Objects
             set { }
         }
 
+        [JsonIgnore]
+        public override string DisableJSfn { get { return string.Empty; } set { } }
+
+        [JsonIgnore]
+        public override string EnableJSfn { get { return string.Empty; } set { } }
+
 
         public void InitFromDataBase(JsonServiceClient ServiceClient)
         {
