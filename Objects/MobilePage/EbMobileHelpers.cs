@@ -12,7 +12,8 @@ namespace ExpressBase.Objects
     public enum DataColumnRenderType
     {
         Text = 1,
-        Image = 2
+        Image = 2,
+        MobileNumber = 3
     }
 
     [EnableInBuilder(BuilderType.MobilePage)]
@@ -120,5 +121,19 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.MobilePage)]
         public string ControlType { set; get; }
+    }
+
+    [EnableInBuilder(BuilderType.MobilePage)]
+    public class EbCTCMapper : EbMobilePageBase
+    {
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
+        public string EbSid { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        public string ColumnName { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        public string ControlName { set; get; }
     }
 }

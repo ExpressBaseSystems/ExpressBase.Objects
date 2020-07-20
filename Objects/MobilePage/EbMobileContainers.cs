@@ -182,11 +182,6 @@ namespace ExpressBase.Objects
         [PropertyGroup("Link Settings")]
         public WebFormDVModes FormMode { set; get; }
 
-        /// <summary>
-        /// START
-        /// Properties for column and form control maping
-        /// </summary>
-
         [EnableInBuilder(BuilderType.MobilePage)]
         [MetaOnly]
         public List<EbMobileDataColToControlMap> DataColumns => new List<EbMobileDataColToControlMap>();
@@ -200,9 +195,10 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.Mapper, "DataColumns", "FormControlMetas", "FormControl")]
         public List<EbMobileDataColToControlMap> LinkFormParameters { get; set; }
 
-        /// <summary>
-        /// END Mapping property
-        /// </summary>
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        [PropertyGroup("Link Settings")]
+        public List<EbCTCMapper> ContextToControlMap { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [DefaultPropValue("30")]
@@ -215,6 +211,7 @@ namespace ExpressBase.Objects
             FilterControls = new List<EbMobileControl>();
             SortColumns = new List<EbMobileDataColumn>();
             LinkFormParameters = new List<EbMobileDataColToControlMap>();
+            ContextToControlMap = new List<EbCTCMapper>();
         }
 
         public override string GetDesignHtml()
