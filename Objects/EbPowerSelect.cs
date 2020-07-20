@@ -152,7 +152,7 @@ else
         }
 
         [JsonIgnore]
-        public override string SetDisplayMemberJSfn { get { return JSFnsConstants.PS_JustSetValueJSfn; } set { } }
+        public override string SetDisplayMemberJSfn { get { return JSFnsConstants.PS_SetDisplayMemberJSfn; } set { } }
 
         [JsonIgnore]
         public override string SetValueJSfn { get { return JSFnsConstants.PS_SetValueJSfn; } set { } }
@@ -204,7 +204,7 @@ else
         {
             get
             {
-                return JSFnsConstants.PS_SetDisplayMemberJSfn;
+                return JSFnsConstants.PS_JustSetValueJSfn;
             }
             set { }
         }
