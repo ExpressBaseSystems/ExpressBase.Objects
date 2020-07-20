@@ -297,6 +297,16 @@ pg.MakeReadOnly('DisplayMembers');} else {pg.MakeReadWrite('DisplayMembers');}")
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [DefaultPropValue("100")]
+        [PropertyGroup(PGConstants.BEHAVIOR)]
+        public int DropDownItemLimit { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [DefaultPropValue("500")]
+        [PropertyGroup(PGConstants.BEHAVIOR)]
+        public int PreloadItemLimit { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [DefaultPropValue("100")]
         [PropertyGroup(PGConstants.APPEARANCE)]
         [Alias("DropdownWidth(%)")]
         public int DropdownWidth { get; set; }
