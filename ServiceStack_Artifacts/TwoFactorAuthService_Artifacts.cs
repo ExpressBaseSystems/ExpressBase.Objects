@@ -11,14 +11,34 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public MyAuthenticateResponse MyAuthenticateResponse { get; set; }
     }
 
-    public class Validate2FARequest : EbServiceStackAuthRequest, IReturn<Authenticate2FAResponse> 
+    public class ValidateOtpRequest : EbServiceStackNoAuthRequest, IReturn<Authenticate2FAResponse>
     {
-        public string Token  { get; set; }         
+        public string Token { get; set; }
+
+        public string UserAuthId { get; set; }
     }
 
     public class ResendOTP2FARequest : EbServiceStackAuthRequest, IReturn<Authenticate2FAResponse>
     {
         public string Token { get; set; }
+    }
+
+    public class ResendOTPSignInRequest : EbServiceStackNoAuthRequest, IReturn<Authenticate2FAResponse>
+    {
+        public string Token { get; set; }
+
+        public string UserAuthId { get; set; }
+
+        public string SolnId { get; set; }
+    }
+
+    public class SendSignInOtpRequest : EbServiceStackNoAuthRequest, IReturn<Authenticate2FAResponse>
+    {
+        public SignInOtpType SignInOtpType { get; set; }
+
+        public string UName { get; set; }
+
+        public string SolutionId { get; set; }
     }
 
     public class Authenticate2FAResponse
@@ -33,5 +53,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public string OtpTo { get; set; }
 
+        public string UserAuthId { get; set; }
+    }
+
+    public enum SignInOtpType
+    {
+        Sms = 1,
+        Email = 2
     }
 }
