@@ -311,6 +311,9 @@ namespace ExpressBase.Objects
         public bool MultiSelect { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
+        public bool EnablePreload { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
         public override string Icon { get { return "fa-caret-down"; } }
 

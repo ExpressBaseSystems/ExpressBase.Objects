@@ -152,7 +152,7 @@ else
         }
 
         [JsonIgnore]
-        public override string SetDisplayMemberJSfn { get { return JSFnsConstants.PS_JustSetValueJSfn; } set { } }
+        public override string SetDisplayMemberJSfn { get { return JSFnsConstants.PS_SetDisplayMemberJSfn; } set { } }
 
         [JsonIgnore]
         public override string SetValueJSfn { get { return JSFnsConstants.PS_SetValueJSfn; } set { } }
@@ -204,7 +204,7 @@ else
         {
             get
             {
-                return JSFnsConstants.PS_SetDisplayMemberJSfn;
+                return JSFnsConstants.PS_JustSetValueJSfn;
             }
             set { }
         }
@@ -294,6 +294,16 @@ pg.MakeReadOnly('DisplayMembers');} else {pg.MakeReadWrite('DisplayMembers');}")
         [PropertyPriority(69)]
         [PropertyGroup(PGConstants.DATA_SETTINGS)]
         public DVBaseColumn ValueMember { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [DefaultPropValue("100")]
+        [PropertyGroup(PGConstants.BEHAVIOR)]
+        public int DropDownItemLimit { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [DefaultPropValue("500")]
+        [PropertyGroup(PGConstants.BEHAVIOR)]
+        public int PreloadItemLimit { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [DefaultPropValue("100")]
