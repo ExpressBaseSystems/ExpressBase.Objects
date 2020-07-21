@@ -301,7 +301,7 @@ else {
                 string html = @"
             @attachedLbl@
             <input type='@TextMode '  data-ebtype='@data-ebtype@' ui-inp id='@ebsid@' name='@name@' @AutoCompleteOff@ ' data-toggle='tooltip' data-placement='top' title='@ToolTipText@' 
-@TabIndex@ @MaxLength@  style='width:100%; height:@heightpx; @BackColor @ForeColor display:inline-block; @fontStyle'  @Required  @PlaceHolder  @Text@  />
+@TabIndex@ @MaxLength@  style='width:100%;'  @Required  @PlaceHolder  @Text@  />
         @attachedLblClose@"
  .Replace("@ebsid@", this.IsRenderMode && this.IsDynamicTabChild ? "@" + this.EbSid_CtxId + "_ebsid@" : (String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId))
  .Replace("@name@", this.EbSid_CtxId)
@@ -312,8 +312,6 @@ else {
  .Replace("@PlaceHolder ", "placeholder='" + this.PlaceHolder + "'")
  .Replace("@TabIndex@ ", "tabindex='" + this.TabIndex + "' ")
  .Replace("@AutoCompleteOff@ ", " autocomplete = '" + ((this.AutoCompleteOff || this.TextMode.ToString().ToLower() == "password") ? "off" : "on") + "'")
-     .Replace("@BackColor ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor ") + ";"))
-     .Replace("@ForeColor ", "color:" + ((this.ForeColor != null) ? this.ForeColor : "@ForeColor ") + ";")
      .Replace("@Text@ ", "value='" + ((this.Text != null) ? this.Text : "") + "' ")
 
  .Replace("@attachedLblClose@", (this.TextMode == TextMode.SingleLine) ? string.Empty : "</div>");
@@ -364,8 +362,6 @@ else {
 .Replace("@PlaceHolder@", "placeholder='" + this.PlaceHolder + "'")
 .Replace("@TabIndex@", "tabindex='" + this.TabIndex + "' ")
 .Replace("@AutoCompleteOff@ ", "autocomplete = " + ((this.AutoCompleteOff || this.TextMode.ToString().ToLower() == "password") ? "off" : "on") + "'")
-    .Replace("@BackColor@", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor ") + ";"))
-    .Replace("@ForeColor@", "color:" + ((this.ForeColor != null) ? this.ForeColor : "@ForeColor ") + ";")
     .Replace("@Text@ ", "value='" + ((this.Text != null) ? this.Text : "@Text@") + "' ")
     .Replace("@RowsVisible@", (this.RowsVisible != 0) ? this.RowsVisible.ToString() : "3");
             }
