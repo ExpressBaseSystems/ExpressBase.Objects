@@ -347,8 +347,7 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         public override string SetDisplayMemberJSfn
         {
-            get { return JSFnsConstants.DG_hiddenColCheckCode + @" 
-    $('[ebsid='+this.__DG.EbSid_CtxId +']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val(p1);"; }
+            get { return JSFnsConstants.DG_hiddenColCheckCode + @"document.getElementById(this.EbSid_CtxId).value = p1;"; }
 
             set { }
         }
@@ -356,7 +355,7 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         public override string SetValueJSfn
         {
-            get { return SetDisplayMemberJSfn + "$('#' + this.EbSid_CtxId).data('ctrl_ref', this); $('#' + this.EbSid_CtxId).trigger('change');"; }
+            get { return SetDisplayMemberJSfn + "$(document.getElementById(this.EbSid_CtxId)).data('ctrl_ref', this).trigger('change');"; }
 
             set { }
         }
@@ -380,7 +379,7 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         public override string GetValueFromDOMJSfn
         {
-            get { return @"return $('[ebsid=' + this.__DG.EbSid_CtxId + ']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val();"; }
+            get { return @"return document.getElementById(this.EbSid_CtxId).value;"; }
 
             set { }
         }

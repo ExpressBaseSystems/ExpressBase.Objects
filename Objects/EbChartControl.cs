@@ -50,6 +50,12 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.BotForm)]
         public override bool IsDisable { get => true; }
 
+        [JsonIgnore]
+        public override string DisableJSfn { get { return string.Empty; } set { } }
+
+        [JsonIgnore]
+        public override string EnableJSfn { get { return string.Empty; } set { } }
+
 
         public void InitFromDataBase(JsonServiceClient ServiceClient)
         {
