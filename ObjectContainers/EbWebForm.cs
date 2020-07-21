@@ -193,7 +193,7 @@ namespace ExpressBase.Objects
 
             this.FormData = new WebformData();
 
-            if (TriggerCtrl.DependedDG != null && TriggerCtrl.DependedDG.Count > 0)
+            if (TriggerCtrl.DependedDG != null && TriggerCtrl.DependedDG.Count > 0)// dg dr
             {
                 //this.GetDGsEmptyModel();
                 foreach (string dgName in TriggerCtrl.DependedDG)
@@ -294,7 +294,7 @@ namespace ExpressBase.Objects
                 }
             }
 
-            else if (TriggerCtrl is EbPowerSelect && !string.IsNullOrEmpty((TriggerCtrl as EbPowerSelect).DataImportId))
+            else if (TriggerCtrl is EbPowerSelect && !string.IsNullOrEmpty((TriggerCtrl as EbPowerSelect).DataImportId))// ps import
             {
                 Param[0].Type = ((int)EbDbTypes.Int32).ToString();
                 EbWebForm _form = Service.Redis.Get<EbWebForm>((TriggerCtrl as EbPowerSelect).DataImportId);
@@ -333,6 +333,11 @@ namespace ExpressBase.Objects
                                 SingleColumn c = Table[0].Columns.Find(e => e.Control is EbAutoId);
                                 if (c != null)
                                     c.Value = null;
+                                foreach (SingleColumn c_ in Table[0].Columns.FindAll(e => e.Control.IsSysControl))
+                                {
+                                    SingleColumn t = c_.Control.GetSingleColumn(this.UserObj, this.SolutionObj, null);
+                                    c_.Value = t.Value; c_.F = t.F;
+                                }
                                 Table[0].RowId = 0;
                             }
                         }
@@ -424,7 +429,7 @@ namespace ExpressBase.Objects
                         {
                             SingleColumn ColumnSrc = this.FormData.MultipleTables[this.FormData.MasterTable][0].GetColumn(_columnDes.ColumnName);
                             string _formattedData = Convert.ToString(FormDes.FormData.MultipleTables[_tableDes.TableName][0][_columnDes.ColumnName]);
-                            if (ColumnSrc != null && !(_columnDes.Control is EbAutoId))
+                            if (ColumnSrc != null && !(_columnDes.Control is EbAutoId) && !_columnDes.Control.IsSysControl)
                             {
                                 FormDes.FormData.MultipleTables[_tableDes.TableName][0].SetColumn(_columnDes.ColumnName, ColumnSrc);
                                 _formattedData = Convert.ToString(ColumnSrc.Value);
@@ -436,7 +441,14 @@ namespace ExpressBase.Objects
                                 else
                                     psDict.Add(_columnDes.Control, _formattedData);
                             }
-                            psParams.Add(DataDB.GetNewParameter(_columnDes.ColumnName, (EbDbTypes)_columnDes.EbDbType, _formattedData));
+                            try//temporary solution to avoid exception : 1$$text 
+                            {
+                                psParams.Add(DataDB.GetNewParameter(_columnDes.ColumnName, (EbDbTypes)_columnDes.EbDbType, _formattedData));
+                            }
+                            catch(Exception ex)
+                            {
+                                Console.WriteLine($"Exception catched: WebForm -> GetImportData\nMessage: {ex.Message}\nStackTrace: {ex.StackTrace}");
+                            }
                         }
                     }
                 }
