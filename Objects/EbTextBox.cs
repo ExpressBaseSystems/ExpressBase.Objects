@@ -301,7 +301,7 @@ else {
                 string html = @"
             @attachedLbl@
             <input type='@TextMode '  data-ebtype='@data-ebtype@' ui-inp id='@ebsid@' name='@name@' @AutoCompleteOff@ ' data-toggle='tooltip' data-placement='top' title='@ToolTipText@' 
-@TabIndex@ @MaxLength@  style='width:100%;'  @Required  @PlaceHolder  @Text@  />
+@TabIndex@ @MaxLength@  style='width:100%; display:inline-block;'  @Required  @PlaceHolder  @Text@  />
         @attachedLblClose@"
  .Replace("@ebsid@", this.IsRenderMode && this.IsDynamicTabChild ? "@" + this.EbSid_CtxId + "_ebsid@" : (String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId))
  .Replace("@name@", this.EbSid_CtxId)
