@@ -17,6 +17,8 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using ExpressBase.Common.Constants;
+using ServiceStack.Redis;
+using ExpressBase.Common.Data;
 
 namespace ExpressBase.Objects
 {
@@ -526,6 +528,10 @@ else// PS
         [PropertyEditor(PropertyEditorType.Collection)]
         [Alias("Options")]
         public List<EbSimpleSelectOption> Options { get; set; }
+        
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        public List<Param> ParamsList { get; set; }
 
         private string VueSelectcode
         {
@@ -714,6 +720,18 @@ else// PS
             }
             else
                 return string.Empty;
+        }
+
+        public void FetchParamsMeta(IServiceClient ServiceClient, IRedisClient Redis)
+        {
+            EbDataReader DrObj = Redis.Get<EbDataReader>(this.DataSourceId);
+            if (DrObj == null)
+            {
+                EbObjectParticularVersionResponse result = ServiceClient.Get<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = this.DataSourceId });
+                DrObj = EbSerializers.Json_Deserialize(result.Data[0].Json);
+                Redis.Set<EbDataReader>(this.DataSourceId, DrObj);
+            }
+            this.ParamsList = DrObj.GetParams(Redis as RedisClient); 
         }
 
         private string GetSql(Service service)
