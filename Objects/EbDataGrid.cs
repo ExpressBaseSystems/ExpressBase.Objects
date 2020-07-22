@@ -347,8 +347,7 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         public override string SetDisplayMemberJSfn
         {
-            get { return JSFnsConstants.DG_hiddenColCheckCode + @" 
-    $('[ebsid='+this.__DG.EbSid_CtxId +']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val(p1);"; }
+            get { return JSFnsConstants.DG_hiddenColCheckCode + @"document.getElementById(this.EbSid_CtxId).value = p1;"; }
 
             set { }
         }
@@ -356,7 +355,7 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         public override string SetValueJSfn
         {
-            get { return SetDisplayMemberJSfn + "$('#' + this.EbSid_CtxId).data('ctrl_ref', this); $('#' + this.EbSid_CtxId).trigger('change');"; }
+            get { return SetDisplayMemberJSfn + "$(document.getElementById(this.EbSid_CtxId)).data('ctrl_ref', this).trigger('change');"; }
 
             set { }
         }
@@ -380,7 +379,7 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         public override string GetValueFromDOMJSfn
         {
-            get { return @"return $('[ebsid=' + this.__DG.EbSid_CtxId + ']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val();"; }
+            get { return @"return document.getElementById(this.EbSid_CtxId).value;"; }
 
             set { }
         }
@@ -394,13 +393,25 @@ namespace ExpressBase.Objects
         }
 
         [JsonIgnore]
-        public override string EnableJSfn { get { return @"this.__IsDisable = false; $('[ebsid='+this.__DG.EbSid_CtxId +']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] .ctrl-cover *`).prop('disabled',false).css('pointer-events', 'inherit').find('input').css('background-color','#fff');"; } set { } }
+        //public override string EnableJSfn { get { return @"this.__IsDisable = false; $('[ebsid='+this.__DG.EbSid_CtxId +']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] .ctrl-cover *`).prop('disabled',false).css('pointer-events', 'inherit').find('input').css('background-color','#fff');"; } set { } }
+        public override string EnableJSfn { get { return @"
+    if(this.__IsDisable){
+        $(document.getElementById('td_' + this.EbSid_CtxId)).css('background-color','inherit').find('.ctrl-cover').attr('eb-readonly','false');
+    }
+    this.__IsDisable = false;
+"; } set { } }
 
         [JsonIgnore]
-        public override string DisableJSfn { get { return @"this.__IsDisable = true; $('[ebsid='+this.__DG.EbSid_CtxId +']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] .ctrl-cover *`).attr('disabled', 'disabled').css('pointer-events', 'none').find('input').css('background-color','#eee');"; } set { } }
+        //public override string DisableJSfn { get { return @"this.__IsDisable = true; $('[ebsid='+this.__DG.EbSid_CtxId +']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] .ctrl-cover *`).attr('disabled', 'disabled').css('pointer-events', 'none').find('input').css('background-color','#eee');"; } set { } }
+        public override string DisableJSfn { get { return @"
+    if(!this.__IsDisable){
+        $(document.getElementById('td_' + this.EbSid_CtxId)).css('background-color','#eee').find('.ctrl-cover').attr('eb-readonly','true');
+    }
+    this.__IsDisable = true;
+"; } set { } }
 
         [JsonIgnore]
-        public override string ClearJSfn { get { return @"$('[ebsid='+this.__DG.EbSid_CtxId +']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val('');"; } set { } }
+        public override string ClearJSfn { get { return @"document.getElementById(this.EbSid_CtxId).value = '';"; } set { } }
 
         [JsonIgnore]
         public override string HideJSfn { get { return @""; } set { } }
@@ -820,25 +831,25 @@ $(`[ebsid=${p1.DG.EbSid_CtxId}]`).on('change', `[colname=${this.Name}] [ui-inp]`
             this.EbSimpleSelect = new EbSimpleSelect();
         }
 
-        [JsonIgnore]
-        public override string DisableJSfn
-        {
-            get
-            {
-                return @"this.__IsDisable = true; $('[ebsid='+this.__DG.EbSid_CtxId +']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] .ctrl-cover .dropdown-toggle`).attr('disabled', 'disabled').css('pointer-events', 'none').css('background-color', '#f3f3f3');";
-            }
-            set { }
-        }
+        //[JsonIgnore]
+        //public override string DisableJSfn
+        //{
+        //    get
+        //    {
+        //        return @"this.__IsDisable = true; $('[ebsid='+this.__DG.EbSid_CtxId +']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] .ctrl-cover .dropdown-toggle`).attr('disabled', 'disabled').css('pointer-events', 'none').css('background-color', '#f3f3f3');";
+        //    }
+        //    set { }
+        //}
 
-        [JsonIgnore]
-        public override string EnableJSfn
-        {
-            get
-            {
-                return @"this.__IsDisable = false; $('[ebsid='+this.__DG.EbSid_CtxId +']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] .ctrl-cover .dropdown-toggle`).prop('disabled',false).css('pointer-events', 'inherit').css('background-color', '#fff');";
-            }
-            set { }
-        }
+        //[JsonIgnore]
+        //public override string EnableJSfn
+        //{
+        //    get
+        //    {
+        //        return @"this.__IsDisable = false; $('[ebsid='+this.__DG.EbSid_CtxId +']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] .ctrl-cover .dropdown-toggle`).prop('disabled',false).css('pointer-events', 'inherit').css('background-color', '#fff');";
+        //    }
+        //    set { }
+        //}
 
         [JsonIgnore]
         public override string SetDisplayMemberJSfn
@@ -1031,25 +1042,25 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
             this.EbDGSimpleSelectColumn = new EbDGSimpleSelectColumn();
         }
 
-        [JsonIgnore]
-        public override string DisableJSfn
-        {
-            get
-            {
-                return EbDGSimpleSelectColumn.DisableJSfn;
-            }
-            set { }
-        }
+        //[JsonIgnore]
+        //public override string DisableJSfn
+        //{
+        //    get
+        //    {
+        //        return EbDGSimpleSelectColumn.DisableJSfn;
+        //    }
+        //    set { }
+        //}
 
-        [JsonIgnore]
-        public override string EnableJSfn
-        {
-            get
-            {
-                return EbDGSimpleSelectColumn.EnableJSfn;
-            }
-            set { }
-        }
+        //[JsonIgnore]
+        //public override string EnableJSfn
+        //{
+        //    get
+        //    {
+        //        return EbDGSimpleSelectColumn.EnableJSfn;
+        //    }
+        //    set { }
+        //}
 
         public override string GetDisplayMemberFromDOMJSfn
         {

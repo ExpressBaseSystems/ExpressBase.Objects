@@ -209,28 +209,9 @@ if(this.IsNullable && !($('#' + this.EbSid_CtxId).closest('.input-group').find(`
         //    return @"<div eb-type='@toolName' class='tool'><i class='fa fa-calendar'></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2));
         //}
 
-        public string Wrap4Developer(string EbCtrlHTML)
-        {
-            return @"<div class='controlTile' tabindex='1' onclick='event.stopPropagation();$(this).focus()'>
-                                <div class='ctrlHead' style='display:none;'>
-                                    <i class='fa fa-arrows moveBtn' aria-hidden='true'></i>
-                                    <a href='#' class='close' style='cursor:default' data-dismiss='alert' aria-label='close' title='close'>×</a>
-                                </div>"
-                                    + EbCtrlHTML
-                        + "</div>";
-        }
-
         public override string GetDesignHtml()
         {
-            string _html = null;
-
-            if (this.Name == null) //if in new mode
-                _html = GetHtml();
-
-            else //if edit mode
-                _html = Wrap4Developer(GetHtml());
-
-            return _html.RemoveCR().GraveAccentQuoted();
+            return GetHtml().RemoveCR().GraveAccentQuoted();
         }
 
         public override string GetBareHtml()
@@ -238,7 +219,7 @@ if(this.IsNullable && !($('#' + this.EbSid_CtxId).closest('.input-group').find(`
             return @"
         <div class='input-group' style='width:100%;'>
             @IsNullable@
-            <input id='@ebsid@' ui-inp data-ebtype='@data-ebtype@'  data-toggle='tooltip' title='@toolTipText@' class='date' type='text' name='@name@' autocomplete = '@autoComplete@' @value@ @tabIndex@ style='width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@' @required@ @placeHolder@ />
+            <input id='@ebsid@' ui-inp data-ebtype='@data-ebtype@'  data-toggle='tooltip' title='@toolTipText@' class='date' type='text' name='@name@' autocomplete = '@autoComplete@' @value@ @tabIndex@ style='width:100%; display:inline-block;' @required@ @placeHolder@ />
             <span class='input-group-addon' style='padding: 0px;'> <i id='@ebsid@TglBtn' class='fa  @atchdLbl@' aria-hidden='true'></i> </span>
         </div>"
 .Replace("@name@", (this.Name != null ? this.Name.Trim() : ""))
@@ -248,26 +229,10 @@ if(this.IsNullable && !($('#' + this.EbSid_CtxId).closest('.input-group').find(`
 .Replace("@autoComplete@", this.AutoCompleteOff ? "off" : "on")
 .Replace("@value@", "")//"value='" + this.Value + "'")
 .Replace("@tabIndex@", "tabindex='" + this.TabIndex + "'")
-    .Replace("@BackColor@ ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor@ ") + ";"))
-    .Replace("@ForeColor@ ", "color:" + ((this.ForeColor != null) ? this.ForeColor : "@ForeColor@ ") + ";")
 .Replace("@required@", (this.Required && !this.Hidden ? " required" : string.Empty))
 .Replace("@placeHolder@", "placeholder='" + this.PlaceHolder + "'")
 .Replace("@atchdLbl@", (this.EbDateType.ToString().ToLower() == "time") ? "fa-clock-o" : "fa-calendar")
 .Replace("@IsNullable@", (this.IsNullable) ? "<span class='input-group-addon nullable-check' style='padding: 0px 7px !important;'><input type='checkbox' style='min-height:unset;'></span>" : "");
-            //.Replace("@fontStyle@", (this.FontSerialized != null) ?
-            //                            (" font-family:" + this.FontSerialized.FontFamily + ";" + "font-style:" + this.FontSerialized.Style
-            //                            + ";" + "font-size:" + this.FontSerialized.SizeInPoints + "px;")
-            //                        : string.Empty)
-            ;
-        }
-
-        public override string GetHtml()
-        {
-            string EbCtrlHTML = HtmlConstants.CONTROL_WRAPER_HTML4WEB
-               .Replace("@LabelForeColor ", "color:" + (LabelForeColor ?? "@LabelForeColor ") + ";")
-               .Replace("@LabelBackColor ", "background-color:" + (LabelBackColor ?? "@LabelBackColor ") + ";");
-
-            return ReplacePropsInHTML(EbCtrlHTML);
         }
 
         [JsonIgnore]

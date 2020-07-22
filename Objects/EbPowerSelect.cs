@@ -152,7 +152,7 @@ else
         }
 
         [JsonIgnore]
-        public override string SetDisplayMemberJSfn { get { return JSFnsConstants.PS_JustSetValueJSfn; } set { } }
+        public override string SetDisplayMemberJSfn { get { return JSFnsConstants.PS_SetDisplayMemberJSfn; } set { } }
 
         [JsonIgnore]
         public override string SetValueJSfn { get { return JSFnsConstants.PS_SetValueJSfn; } set { } }
@@ -204,7 +204,7 @@ else
         {
             get
             {
-                return JSFnsConstants.PS_SetDisplayMemberJSfn;
+                return JSFnsConstants.PS_JustSetValueJSfn;
             }
             set { }
         }
@@ -583,11 +583,6 @@ else// PS
             return ReplacePropsInHTML(EbCtrlHTML);
         }
 
-        public override string GetHtml()
-        {
-            return GetHtmlHelper(RenderMode.User);
-        }
-
         public override string DesignHtml4Bot { get => @"
 	<div class='combo-wrap' data-toggle='tooltip' title='' data-original-title=''>
 		<div style='display: inline-block; width: 100%; margin-right: -4px;'>
@@ -714,15 +709,6 @@ else// PS
             }
             else
                 return string.Empty;
-        }
-
-        private string GetHtmlHelper(RenderMode mode)
-        {
-            string EbCtrlHTML = HtmlConstants.CONTROL_WRAPER_HTML4WEB
-.Replace("@Label@ ", ((this.Label != null) ? this.Label : "@Label@ "))
-.Replace("@tooltipText@", this.ToolTipText ?? string.Empty);
-
-            return ReplacePropsInHTML(EbCtrlHTML);
         }
 
         private string GetSql(Service service)

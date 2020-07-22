@@ -147,36 +147,6 @@ namespace ExpressBase.Objects
             return ReplacePropsInHTML(EbCtrlHTML);
         }
 
-        public override string GetHtml()
-        {
-
-            //			string html = @"
-            //			<div id='cont_@name@' class='Eb-ctrlContainer' ebsid='@ebsid@' Ctype='CheckBoxGroup'>
-            //				<div class='radiog-cont'  style='@BackColor '>
-            //				 <div class='eb-ctrl-label' id='@name@Lbl' style='@LabelBackColor @LabelForeColor '> @Label@  </div>
-            //						@barehtml@
-            //				<span class='helpText'> @HelpText </span></div>
-            //			</div>"
-            //.Replace("@barehtml@", this.GetBareHtml())
-            //.Replace("@name@", (this.Name != null) ? this.Name : "@name@")
-            //.Replace("@ebsid@", this.EbSid)
-            //.Replace("@label@", this.Label)
-            //.Replace("@LabelForeColor ", "color:" + ((this.LabelForeColor != null) ? this.LabelForeColor : "@LabelForeColor ") + ";")
-            //.Replace("@LabelBackColor ", "background-color:" + ((this.LabelBackColor != null) ? this.LabelBackColor : "@LabelBackColor ") + ";")
-            //.Replace("@BackColor ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor ") + ";"));
-            //            Console.WriteLine("==================================================================");
-            //            Console.WriteLine(html.RemoveCR());
-            //            return html;
-
-
-            string EbCtrlHTML = HtmlConstants.CONTROL_WRAPER_HTML4WEB
-               .Replace("@LabelForeColor ", "color:" + (LabelForeColor ?? "@LabelForeColor ") + ";")
-               .Replace("@LabelBackColor ", "background-color:" + (LabelBackColor ?? "@LabelBackColor ") + ";");
-
-            return ReplacePropsInHTML(EbCtrlHTML);
-
-        }
-
         public override string GetJsInitFunc()
         {
             return @"
