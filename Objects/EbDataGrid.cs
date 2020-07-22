@@ -1423,6 +1423,10 @@ pg.HideProperty('IsDynamic');
         [DefaultPropValue("100")]
         public int DropdownWidth { get { return this.EbPowerSelect.DropdownWidth; } set { this.EbPowerSelect.DropdownWidth = value; } }
 
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        public List<Param> ParamsList { get { return this.EbPowerSelect.ParamsList; } set { this.EbPowerSelect.ParamsList = value; } }
+
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
         public override string InputControlType { get { return "EbPowerSelect"; } }
@@ -1437,6 +1441,10 @@ pg.HideProperty('IsDynamic');
             this.DBareHtml = this.GetBareHtml();
         }
 
+        public void FetchParamsMeta(IServiceClient ServiceClient, IRedisClient Redis)
+        {
+            this.EbPowerSelect.FetchParamsMeta(ServiceClient, Redis);
+        }
 
         public string GetSelectQuery(IDatabase DataDB, Service service, string Col, string Tbl = null, string _id = null, string masterTbl = null)
         {

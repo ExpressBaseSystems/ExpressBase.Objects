@@ -37,6 +37,7 @@ namespace ExpressBase.Objects.WebFormRelated
             Dictionary<int, EbControlWrapper> _dict = new Dictionary<int, EbControlWrapper>();
             GetControlsAsDict(_this, "form", _dict);
             CalcValueExprDependency(_this, _dict);
+            CalcDataReaderDependency(_this, _dict);
             ValidateAndUpdateReviewCtrl(_this, ebReviewCtrl, _dict);
             ValidateNotificationProp(_this.Notifications, _dict);
             SetDefaultValueExprExecOrder(_this, _dict);
@@ -230,6 +231,7 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                     EbDbTypes _t = _ctrl.ValueMember.Type;
                     if (!(_t == EbDbTypes.Int || _t == EbDbTypes.Int || _t == EbDbTypes.UInt32 || _t == EbDbTypes.UInt64 || _t == EbDbTypes.Int32 || _t == EbDbTypes.Int64 || _t == EbDbTypes.Decimal || _t == EbDbTypes.Double))
                         throw new FormException("Set numeric value member for " + _ctrl.Label);
+                    _ctrl.FetchParamsMeta(serviceClient, redis);
                 }
                 else if (Allctrls[i] is EbDGPowerSelectColumn)
                 {
@@ -245,6 +247,7 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                     EbDbTypes _t = _ctrl.ValueMember.Type;
                     if (!(_t == EbDbTypes.Int || _t == EbDbTypes.Int || _t == EbDbTypes.UInt32 || _t == EbDbTypes.UInt64 || _t == EbDbTypes.Int32 || _t == EbDbTypes.Int64 || _t == EbDbTypes.Decimal || _t == EbDbTypes.Double))
                         throw new FormException("Set numeric value member for " + _ctrl.Name);
+                    _ctrl.FetchParamsMeta(serviceClient, redis);
                 }
                 else if (Allctrls[i] is EbUserControl)
                 {
@@ -368,8 +371,7 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
 
                 if (!string.IsNullOrEmpty(_dict[i].Control.ValueExpr?.Code))
                     CalcFlds.Add(i);
-                if (_dict[i].Control is EbTVcontrol && (_dict[i].Control as EbTVcontrol).ParamsList?.Count > 0)
-                    CalcFlds.Add(i);
+                
                 if (!string.IsNullOrEmpty(_dict[i].Control.OnChangeFn?.Code))
                 {
                     if (_dict[i].Control.OnChangeFn.Code.Contains(".setValue(") && !(_dict[i].Control is EbScriptButton))
@@ -380,19 +382,7 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
             for (int i = 0; i < CalcFlds.Count; i++)
             {
                 string code = _dict[CalcFlds[i]].Control.ValueExpr.Code;
-                if (_dict[CalcFlds[i]].Control is EbTVcontrol)// +ex
-                {
-                    List<Param> ParamsList = (_dict[CalcFlds[i]].Control as EbTVcontrol).ParamsList;
-                    foreach (Param _p in ParamsList)
-                    {
-                        KeyValuePair<int, EbControlWrapper> item = _dict.FirstOrDefault(e => !(e.Value.Control is EbDGColumn) && e.Value.Control.Name == _p.Name);
-                        if (item.Value != null)
-                            dpndcy.Add(new KeyValuePair<int, int>(CalcFlds[i], item.Key));
-                        else if (_p.Name != "eb_loc_id" && _p.Name != "eb_currentuser_id")
-                            throw new FormException($"Can't resolve parameter {_p.Name} in table view of {_dict[CalcFlds[i]].Control.Name}");
-                    }
-                }
-                else if (_dict[CalcFlds[i]].Control.ValueExpr.Lang == ScriptingLanguage.JS)
+                if (_dict[CalcFlds[i]].Control.ValueExpr.Lang == ScriptingLanguage.JS)
                 {
                     if (code.Contains("form"))
                     {
@@ -469,6 +459,41 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
 
             foreach (int i in ExecOrd)
                 _Form.DoNotPersistExecOrder.Add(_dict[i].Path);
+        }
+
+        private static void CalcDataReaderDependency(EbForm _Form, Dictionary<int, EbControlWrapper> _dict)
+        {
+            List<int> ctrlsWithDr = new List<int>();
+
+            for (int i = 0; i < _dict.Count; i++)
+            {
+                _dict[i].Control.DrDependents = new List<string>();
+
+                if ((_dict[i].Control is EbTVcontrol && (_dict[i].Control as EbTVcontrol).ParamsList?.Count > 0) ||
+                    (_dict[i].Control is EbPowerSelect && (_dict[i].Control as EbPowerSelect).ParamsList?.Count > 0) ||
+                    (_dict[i].Control is EbDGPowerSelectColumn && (_dict[i].Control as EbDGPowerSelectColumn).ParamsList?.Count > 0))
+                    ctrlsWithDr.Add(i);                
+            }
+
+            for (int i = 0; i < ctrlsWithDr.Count; i++)
+            {
+                List<Param> ParamsList;
+                if (_dict[ctrlsWithDr[i]].Control is EbTVcontrol)
+                    ParamsList = (_dict[ctrlsWithDr[i]].Control as EbTVcontrol).ParamsList;
+                else if (_dict[ctrlsWithDr[i]].Control is EbPowerSelect)
+                    ParamsList = (_dict[ctrlsWithDr[i]].Control as EbPowerSelect).ParamsList;
+                else
+                    ParamsList = (_dict[ctrlsWithDr[i]].Control as EbDGPowerSelectColumn).ParamsList;
+
+                foreach (Param _p in ParamsList)
+                {
+                    KeyValuePair<int, EbControlWrapper> item = _dict.FirstOrDefault(e => !(e.Value.Control is EbDGColumn) && e.Value.Control.Name == _p.Name);
+                    if (item.Value != null)
+                        item.Value.Control.DrDependents.Add(_dict[ctrlsWithDr[i]].Path);
+                    else if (_p.Name != "eb_loc_id" && _p.Name != "eb_currentuser_id" && _p.Name != "id")
+                        throw new FormException($"Can't resolve parameter {_p.Name} in data reader of {_dict[ctrlsWithDr[i]].Control.Name}");
+                }
+            }
         }
 
         private static void GetValExpDependentsRec(List<int> execOrder, List<KeyValuePair<int, int>> dpndcy, int seeker)
@@ -630,6 +655,7 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
             Dictionary<int, EbControlWrapper> _dict = new Dictionary<int, EbControlWrapper>();
             GetControlsAsDict(_this, "form", _dict);
             CalcValueExprDependency(_this, _dict);
+            CalcDataReaderDependency(_this, _dict);
             ValidateNotificationProp(_this.Notifications, _dict);
         }
     }
