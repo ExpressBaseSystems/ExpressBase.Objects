@@ -30,6 +30,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 5)]
         public List<Param> Params { get; set; }
+
+        [DataMember(Order = 6)]
+        public Int32 RetryOf { get; set; }
     }
 
     [DataContract]
@@ -44,6 +47,11 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 3)]
         public string MediaUrl { get; set; }
 
+        [DataMember(Order = 4)]
+        public Int32 Retryof { get; set; }
+
+        [DataMember(Order = 5)]
+        public string RefId { get; set; }
     }
     [DataContract]
     public class SMSPrepareRequest : EbServiceStackAuthRequest
@@ -158,6 +166,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 3)]
         public string MetaData { get; set; }
+
+        [DataMember(Order = 4)]
+        public Int32 RetryOf { get; set; }
     }
 
     [DataContract]
@@ -181,4 +192,19 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 6)]
         public string Visualization { get; set; }
     }
+
+    [DataContract]
+    public class RetrySmsResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public ResponseStatus ResponseStatus { get; set; }       
+    }
+
+    public class RetrySmsRequest : EbServiceStackAuthRequest, IReturn<RetrySmsResponse>
+    {
+        public string RefId { get; set; }
+
+        public int SmslogId { get; set; }
+
+    };
 }
