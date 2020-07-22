@@ -39,6 +39,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string UName { get; set; }
 
         public string SolutionId { get; set; }
+
+        public string WhichConsole { get; set; }
     }
 
     public class Authenticate2FAResponse

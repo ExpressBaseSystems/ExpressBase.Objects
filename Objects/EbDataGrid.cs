@@ -393,13 +393,25 @@ namespace ExpressBase.Objects
         }
 
         [JsonIgnore]
-        public override string EnableJSfn { get { return @"this.__IsDisable = false; $('[ebsid='+this.__DG.EbSid_CtxId +']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] .ctrl-cover *`).prop('disabled',false).css('pointer-events', 'inherit').find('input').css('background-color','#fff');"; } set { } }
+        //public override string EnableJSfn { get { return @"this.__IsDisable = false; $('[ebsid='+this.__DG.EbSid_CtxId +']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] .ctrl-cover *`).prop('disabled',false).css('pointer-events', 'inherit').find('input').css('background-color','#fff');"; } set { } }
+        public override string EnableJSfn { get { return @"
+    if(this.__IsDisable){
+        $(document.getElementById('td_' + this.EbSid_CtxId)).css('background-color','inherit').find('.ctrl-cover').attr('eb-readonly','false');
+    }
+    this.__IsDisable = false;
+"; } set { } }
 
         [JsonIgnore]
-        public override string DisableJSfn { get { return @"this.__IsDisable = true; $('[ebsid='+this.__DG.EbSid_CtxId +']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] .ctrl-cover *`).attr('disabled', 'disabled').css('pointer-events', 'none').find('input').css('background-color','#eee');"; } set { } }
+        //public override string DisableJSfn { get { return @"this.__IsDisable = true; $('[ebsid='+this.__DG.EbSid_CtxId +']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] .ctrl-cover *`).attr('disabled', 'disabled').css('pointer-events', 'none').find('input').css('background-color','#eee');"; } set { } }
+        public override string DisableJSfn { get { return @"
+    if(!this.__IsDisable){
+        $(document.getElementById('td_' + this.EbSid_CtxId)).css('background-color','#eee').find('.ctrl-cover').attr('eb-readonly','true');
+    }
+    this.__IsDisable = true;
+"; } set { } }
 
         [JsonIgnore]
-        public override string ClearJSfn { get { return @"$('[ebsid='+this.__DG.EbSid_CtxId +']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] [ui-inp]`).val('');"; } set { } }
+        public override string ClearJSfn { get { return @"document.getElementById(this.EbSid_CtxId).value = '';"; } set { } }
 
         [JsonIgnore]
         public override string HideJSfn { get { return @""; } set { } }
@@ -819,25 +831,25 @@ $(`[ebsid=${p1.DG.EbSid_CtxId}]`).on('change', `[colname=${this.Name}] [ui-inp]`
             this.EbSimpleSelect = new EbSimpleSelect();
         }
 
-        [JsonIgnore]
-        public override string DisableJSfn
-        {
-            get
-            {
-                return @"this.__IsDisable = true; $('[ebsid='+this.__DG.EbSid_CtxId +']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] .ctrl-cover .dropdown-toggle`).attr('disabled', 'disabled').css('pointer-events', 'none').css('background-color', '#f3f3f3');";
-            }
-            set { }
-        }
+        //[JsonIgnore]
+        //public override string DisableJSfn
+        //{
+        //    get
+        //    {
+        //        return @"this.__IsDisable = true; $('[ebsid='+this.__DG.EbSid_CtxId +']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] .ctrl-cover .dropdown-toggle`).attr('disabled', 'disabled').css('pointer-events', 'none').css('background-color', '#f3f3f3');";
+        //    }
+        //    set { }
+        //}
 
-        [JsonIgnore]
-        public override string EnableJSfn
-        {
-            get
-            {
-                return @"this.__IsDisable = false; $('[ebsid='+this.__DG.EbSid_CtxId +']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] .ctrl-cover .dropdown-toggle`).prop('disabled',false).css('pointer-events', 'inherit').css('background-color', '#fff');";
-            }
-            set { }
-        }
+        //[JsonIgnore]
+        //public override string EnableJSfn
+        //{
+        //    get
+        //    {
+        //        return @"this.__IsDisable = false; $('[ebsid='+this.__DG.EbSid_CtxId +']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] .ctrl-cover .dropdown-toggle`).prop('disabled',false).css('pointer-events', 'inherit').css('background-color', '#fff');";
+        //    }
+        //    set { }
+        //}
 
         [JsonIgnore]
         public override string SetDisplayMemberJSfn
@@ -1030,25 +1042,25 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
             this.EbDGSimpleSelectColumn = new EbDGSimpleSelectColumn();
         }
 
-        [JsonIgnore]
-        public override string DisableJSfn
-        {
-            get
-            {
-                return EbDGSimpleSelectColumn.DisableJSfn;
-            }
-            set { }
-        }
+        //[JsonIgnore]
+        //public override string DisableJSfn
+        //{
+        //    get
+        //    {
+        //        return EbDGSimpleSelectColumn.DisableJSfn;
+        //    }
+        //    set { }
+        //}
 
-        [JsonIgnore]
-        public override string EnableJSfn
-        {
-            get
-            {
-                return EbDGSimpleSelectColumn.EnableJSfn;
-            }
-            set { }
-        }
+        //[JsonIgnore]
+        //public override string EnableJSfn
+        //{
+        //    get
+        //    {
+        //        return EbDGSimpleSelectColumn.EnableJSfn;
+        //    }
+        //    set { }
+        //}
 
         public override string GetDisplayMemberFromDOMJSfn
         {
@@ -1411,6 +1423,10 @@ pg.HideProperty('IsDynamic');
         [DefaultPropValue("100")]
         public int DropdownWidth { get { return this.EbPowerSelect.DropdownWidth; } set { this.EbPowerSelect.DropdownWidth = value; } }
 
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        public List<Param> ParamsList { get { return this.EbPowerSelect.ParamsList; } set { this.EbPowerSelect.ParamsList = value; } }
+
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
         public override string InputControlType { get { return "EbPowerSelect"; } }
@@ -1425,6 +1441,10 @@ pg.HideProperty('IsDynamic');
             this.DBareHtml = this.GetBareHtml();
         }
 
+        public void FetchParamsMeta(IServiceClient ServiceClient, IRedisClient Redis)
+        {
+            this.EbPowerSelect.FetchParamsMeta(ServiceClient, Redis);
+        }
 
         public string GetSelectQuery(IDatabase DataDB, Service service, string Col, string Tbl = null, string _id = null, string masterTbl = null)
         {

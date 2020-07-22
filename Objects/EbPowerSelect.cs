@@ -17,6 +17,8 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using ExpressBase.Common.Constants;
+using ServiceStack.Redis;
+using ExpressBase.Common.Data;
 
 namespace ExpressBase.Objects
 {
@@ -521,6 +523,10 @@ else// PS
         [PropertyEditor(PropertyEditorType.Collection)]
         [Alias("Options")]
         public List<EbSimpleSelectOption> Options { get; set; }
+        
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        public List<Param> ParamsList { get; set; }
 
         private string VueSelectcode
         {
@@ -581,11 +587,6 @@ else// PS
             </div>").RemoveCR().DoubleQuoted();
             //return GetHtml().RemoveCR().GraveAccentQuoted();
             return ReplacePropsInHTML(EbCtrlHTML);
-        }
-
-        public override string GetHtml()
-        {
-            return GetHtmlHelper(RenderMode.User);
         }
 
         public override string DesignHtml4Bot { get => @"
@@ -716,13 +717,16 @@ else// PS
                 return string.Empty;
         }
 
-        private string GetHtmlHelper(RenderMode mode)
+        public void FetchParamsMeta(IServiceClient ServiceClient, IRedisClient Redis)
         {
-            string EbCtrlHTML = HtmlConstants.CONTROL_WRAPER_HTML4WEB
-.Replace("@Label@ ", ((this.Label != null) ? this.Label : "@Label@ "))
-.Replace("@tooltipText@", this.ToolTipText ?? string.Empty);
-
-            return ReplacePropsInHTML(EbCtrlHTML);
+            EbDataReader DrObj = Redis.Get<EbDataReader>(this.DataSourceId);
+            if (DrObj == null)
+            {
+                EbObjectParticularVersionResponse result = ServiceClient.Get<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = this.DataSourceId });
+                DrObj = EbSerializers.Json_Deserialize(result.Data[0].Json);
+                Redis.Set<EbDataReader>(this.DataSourceId, DrObj);
+            }
+            this.ParamsList = DrObj.GetParams(Redis as RedisClient); 
         }
 
         private string GetSql(Service service)

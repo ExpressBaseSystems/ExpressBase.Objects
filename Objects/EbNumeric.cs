@@ -159,24 +159,8 @@ else {
 
         public override string GetDesignHtml()
         {
-            return GetHtmlHelper(RenderMode.Developer).RemoveCR().DoubleQuoted();
+            return GetHtml().RemoveCR().DoubleQuoted();
         }
-
-        public override string GetHtml()
-        {
-            return GetHtmlHelper(RenderMode.User);
-        }
-
-        //        public override string GetBareHtml()
-        //        {
-        //            return @" 
-        //        <div class='input-group' style='width:100%;'>
-        //                <span style='font-size: @fontSize@' class='input-group-addon'><i class='fa fa-sort-numeric-asc' aria-hidden='true'></i></span>   
-        //                <input type='text' class='numinput' ui-inp data-ebtype='@datetype@' id='@name@' name='@name@' data-toggle='tooltip' style=' width:100%; display:inline-block;'/>
-        //        </div>"
-        //.Replace("@name@", this.Name)
-        //.Replace("@datetype@", "11");
-        //        }
 
 
         public override string GetHtml4Bot()
@@ -226,15 +210,6 @@ else {
             html = html.Replace("@attachedLbl@", attachedLableHtml);
 
             return html;
-        }
-
-        private string GetHtmlHelper(RenderMode mode)
-        {
-            string EbCtrlHTML = HtmlConstants.CONTROL_WRAPER_HTML4WEB
-               .Replace("@LabelForeColor ", "color:" + (LabelForeColor ?? "@LabelForeColor ") + ";")
-               .Replace("@LabelBackColor ", "background-color:" + (LabelBackColor ?? "@LabelBackColor ") + ";");
-
-            return ReplacePropsInHTML(EbCtrlHTML);
         }
 
         public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
