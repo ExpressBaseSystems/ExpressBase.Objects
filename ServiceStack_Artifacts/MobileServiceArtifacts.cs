@@ -36,29 +36,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public byte[] Logo { set; get; }
     }
 
-    [DataContract]
-    public class GetMobMenuRequest : EbServiceStackAuthRequest, IReturn<GetMobMenuResonse>
-    {
-        //request to mobile menu
-        [DataMember(Order = 1)]
-        public int LocationId { get; set; }
-    }
-
-    [DataContract]
-    public class GetMobMenuResonse : IEbSSResponse
-    {
-        [DataMember(Order = 1)]
-        public ResponseStatus ResponseStatus { get; set; }
-
-        [DataMember(Order = 2)]
-        public List<AppDataToMob> Applications { get; set; }
-
-        public GetMobMenuResonse()
-        {
-            Applications = new List<AppDataToMob>();
-        }
-    }
-
     public class AppDataToMob
     {
         public int AppId { set; get; }
@@ -146,37 +123,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string GetString()
         {
             return Order == SortOrder.Ascending ? "ASC" : "DESC";
-        }
-    }
-
-    //objects to mobile
-    public class GetMobilePagesRequest : EbServiceStackAuthRequest, IReturn<GetMobilePagesResponse>
-    {
-        public int LocationId { set; get; }
-
-        public int AppId { set; get; }
-
-        public bool PullData { set; get; }
-    }
-
-    public class GetMobilePagesResponse
-    {
-        [DataMember(Order = 1)]
-        public List<MobilePagesWraper> Pages { set; get; }
-
-        [DataMember(Order = 2)]
-        public List<WebObjectsWraper> WebObjects { set; get; }
-
-        [DataMember(Order = 3)]
-        public EbDataSet Data { set; get; }
-
-        [DataMember(Order = 4)]
-        public List<string> TableNames { set; get; }
-
-        public GetMobilePagesResponse()
-        {
-            Pages = new List<MobilePagesWraper>();
-            WebObjects = new List<WebObjectsWraper>();
         }
     }
 

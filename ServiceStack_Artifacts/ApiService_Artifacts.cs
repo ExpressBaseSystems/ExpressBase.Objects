@@ -360,8 +360,6 @@ END;";
 
         public byte[] DisplayPicture { set; get; }
 
-        public List<EbLocation> Locations { get; set; }
-
         public bool Is2FEnabled { get; set; }
 
         public string TwoFAToken { set; get; }
@@ -369,18 +367,11 @@ END;";
         public bool TwoFAStatus { set; get; }
 
         public string TwoFAToAddress { set; get; }
-
-        public ApiAuthResponse()
-        {
-            Locations = new List<EbLocation>();
-        }
     }
 
-    public class ApiTwoFactorResponse : IEbApiStatusCode
+    public class ApiGenerateOTPResponse : IEbApiStatusCode
     {
         public bool IsValid { set; get; }
-
-        public bool IsVerification { set; get; }
 
         public HttpStatusCode StatusCode { get; set; }
     }
