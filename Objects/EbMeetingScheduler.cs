@@ -461,8 +461,11 @@ else if (this.AttendeeConfig === 4)
 
                     int HostUserIdsCount = Mobj.SlotList[i].Hosts.Where(Item => Item.Type == UsersType.Users).Count();
                     int AttendeeUserIdsCount = Mobj.SlotList[i].Attendees.Where(Item => Item.Type == UsersType.Users).Count();
+                    bool IsFixedHost = false;
+                    bool IsFixedAttendee = false;
                     if (HostUserIdsCount == Mobj.MaxHost && HostUserIdsCount == Mobj.SlotList[i].Hosts.Count)
                     {
+                        IsFixedHost = true;
                         query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Hosts, usr, ParticipantOpt.Fixed, ParticipantType.Host, tbl, Mobj.SlotList[i], Mobj.Date, DataDB);
                     }
                     else
@@ -471,12 +474,14 @@ else if (this.AttendeeConfig === 4)
                     }
                     if (AttendeeUserIdsCount == Mobj.MaxAttendee && AttendeeUserIdsCount == Mobj.SlotList[i].Attendees.Count)
                     {
+                        IsFixedAttendee = true;
                         query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Attendees, usr, ParticipantOpt.Fixed, ParticipantType.Attendee, tbl, Mobj.SlotList[i], Mobj.Date, DataDB);
                     }
                     else
                     {
                         query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Attendees, usr, ParticipantOpt.Eligible, ParticipantType.Attendee, tbl, Mobj.SlotList[i], Mobj.Date, DataDB);
                     }
+                    query += $@"update eb_meeting_slots set meeting_opts = {SetMeetingOpts(IsFixedHost, IsFixedAttendee)} where id = eb_currval('eb_meeting_slots_id_seq') ;";
                 }
             }
             else if (Mobj.MeetingType == MeetingType.MultipleMeeting)
@@ -695,10 +700,10 @@ else if (this.AttendeeConfig === 4)
                            ";
                     }
                 }
-                //if (userids != "")
-                //    query += $@" insert into eb_my_actions (user_ids,from_datetime,form_ref_id,form_data_id,description,my_action_type , eb_meeting_slots_id, 
-                //is_completed,eb_del) values('{userids}',NOW(),@refid, eb_currval('{tbl}_id_seq'), 'Meeting Request',
-                //     '{MyActionTypes.Meeting}',eb_currval('eb_meeting_slots_id_seq') , 'F','F'); ";
+                if (userids != "")
+                    query += $@" insert into eb_my_actions (user_ids,from_datetime,form_ref_id,form_data_id,description,my_action_type , eb_meeting_slots_id, 
+                is_completed,eb_del) values('{userids}',NOW(),@refid, eb_currval('{tbl}_id_seq'), 'Meeting Request',
+                     '{MyActionTypes.Meeting}',eb_currval('eb_meeting_slots_id_seq') , 'F','F'); ";
                 ////if (Roles != "")
                 ////    query += $@"insert into eb_my_actions (role_ids,from_datetime,form_ref_id,form_data_id,description,my_action_type , eb_meeting_slots_id, 
                 ////    is_completed,eb_del) values('{Roles}',NOW(),@refid, eb_currval('{tbl}_id_seq'), 'Meeting Request',
@@ -741,11 +746,6 @@ else if (this.AttendeeConfig === 4)
                     insert into eb_meeting_scheduled_participants (user_ids,role_ids,eb_meeting_schedule_id,participant_type,type_of_user,
                     eb_created_at,eb_created_by)values('{userids}','{Roles}',eb_currval('eb_meeting_schedule_id_seq') , {(int)ParticipantType} ,1,now(),{usr.UserId});";
 
-            }
-            if (ExceptUserNames != "")
-                throw new FormException("Schedule Meeting Failed :" + ExceptUserNames + "(" + ParticipantType + ")" + "have another Meeting");
-            else
-            {
                 if (userids != "")
                     query += $@" insert into eb_my_actions (user_ids,from_datetime,form_ref_id,form_data_id,description,my_action_type , eb_meeting_schedule_id, 
                     is_completed,eb_del) values('{userids}',NOW(),@refid, eb_currval('{tbl}_id_seq'), 'Meeting Request',
@@ -759,9 +759,11 @@ else if (this.AttendeeConfig === 4)
                     is_completed,eb_del) values('{UserGroup}',NOW(),@refid, eb_currval('{tbl}_id_seq'), 'Meeting Request',
                     '{MyActionTypes.Meeting}',eb_currval('eb_meeting_schedule_id_seq') , 'F','F');";
             }
+            if (ExceptUserNames != "")
+                throw new FormException("Schedule Meeting Failed :" + ExceptUserNames + "(" + ParticipantType + ")" + "have another Meeting");
             return query;
         }
-
+        
         //public string MeetingEligibleParticipantsQry(List<Participants> Participants, User usr, ParticipantOpt Opt, ParticipantType ParticipantType, string tbl)
         //{
         //    string str = "";
@@ -772,10 +774,19 @@ else if (this.AttendeeConfig === 4)
         //    //        ";
         //    return str;
         //}
-        public string SingleMeeting()
-        {
 
-            return string.Empty;
+        public int SetMeetingOpts(bool Host , bool Attendee)
+        {
+            int val =0;
+            if(Host && Attendee)
+                val =(int) MeetingOptions.F_H_F_A;
+            else if( Host && !Attendee)
+                val = (int) MeetingOptions.F_H_E_A;
+            else if( !Host && Attendee)
+                val = (int) MeetingOptions.E_H_F_A;
+            else if( !Host && !Attendee)
+                val = (int) MeetingOptions.E_H_E_A;
+            return val;
         }
         public string AddMeetingSchedule(MeetingSchedule Mobj, User usr)
         {
