@@ -72,6 +72,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyGroup(PGConstants.CORE)]
+        [DefaultPropValue("true")]
         [Alias("Preload items")]
         public bool IsPreload { get; set; }
 
@@ -307,10 +308,10 @@ pg.MakeReadOnly('DisplayMembers');} else {pg.MakeReadWrite('DisplayMembers');}")
         [PropertyGroup(PGConstants.BEHAVIOR)]
         public int DropDownItemLimit { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [DefaultPropValue("500")]
-        [PropertyGroup(PGConstants.BEHAVIOR)]
-        public int PreloadItemLimit { get; set; }
+        //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        //[DefaultPropValue("500")]
+        //[PropertyGroup(PGConstants.BEHAVIOR)]
+        //public int PreloadItemLimit { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [DefaultPropValue("100")]
