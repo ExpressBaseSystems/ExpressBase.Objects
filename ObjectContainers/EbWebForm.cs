@@ -211,13 +211,7 @@ namespace ExpressBase.Objects
                         break;
                     }
 
-                    EbDataReader dataReader = Service.Redis.Get<EbDataReader>(_dg.DataSourceId);
-                    if (dataReader == null)
-                    {
-                        EbObjectParticularVersionResponse result = Service.Gateway.Send<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = _dg.DataSourceId });
-                        dataReader = EbSerializers.Json_Deserialize(result.Data[0].Json);
-                        Service.Redis.Set<EbDataReader>(_dg.DataSourceId, dataReader);
-                    }
+                    EbDataReader dataReader = EbFormHelper.GetEbObject<EbDataReader>(_dg.DataSourceId, null, Service.Redis, Service);                    
                     foreach (Param item in dataReader.GetParams(Service.Redis as RedisClient))
                     {
                         Param _p = Param.Find(p => p.Name == item.Name);
@@ -297,13 +291,7 @@ namespace ExpressBase.Objects
             else if (TriggerCtrl is EbPowerSelect && !string.IsNullOrEmpty((TriggerCtrl as EbPowerSelect).DataImportId))// ps import
             {
                 Param[0].Type = ((int)EbDbTypes.Int32).ToString();
-                EbWebForm _form = Service.Redis.Get<EbWebForm>((TriggerCtrl as EbPowerSelect).DataImportId);
-                if (_form == null)
-                {
-                    EbObjectParticularVersionResponse result = Service.Gateway.Send<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = (TriggerCtrl as EbPowerSelect).DataImportId });
-                    _form = EbSerializers.Json_Deserialize(result.Data[0].Json);
-                    Service.Redis.Set<EbWebForm>((TriggerCtrl as EbPowerSelect).DataImportId, _form);
-                }
+                EbWebForm _form = EbFormHelper.GetEbObject<EbWebForm>((TriggerCtrl as EbPowerSelect).DataImportId, null, Service.Redis, Service);                
                 _form.AfterRedisGet(Service);
                 _form.RefId = (TriggerCtrl as EbPowerSelect).DataImportId;
                 _form.UserObj = this.UserObj;
