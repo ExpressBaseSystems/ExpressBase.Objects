@@ -308,10 +308,10 @@ pg.MakeReadOnly('DisplayMembers');} else {pg.MakeReadWrite('DisplayMembers');}")
         [PropertyGroup(PGConstants.BEHAVIOR)]
         public int DropDownItemLimit { get; set; }
 
-        //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        //[DefaultPropValue("500")]
-        //[PropertyGroup(PGConstants.BEHAVIOR)]
-        //public int PreloadItemLimit { get; set; }
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [DefaultPropValue("500")]
+        [PropertyGroup(PGConstants.BEHAVIOR)]
+        public int PreloadItemLimit { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [DefaultPropValue("100")]
@@ -658,6 +658,7 @@ else// PS
             <table id='@ebsid@tbl' tabindex='1000' style='width:100%' class='table table-bordered'></table>
         </div>
     </center>
+    <div id='@ebsid@_pb'></div>
 </div>"
     .Replace("@VueSelectCode", this.VueSelectcode)
     .Replace("@name@", this.Name)
