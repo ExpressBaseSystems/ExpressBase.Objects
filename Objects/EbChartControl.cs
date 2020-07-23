@@ -65,12 +65,10 @@ namespace ExpressBase.Objects
 
         public void FetchParamsMeta(IServiceClient ServiceClient, IRedisClient redis)
         {
-            EbObjectParticularVersionResponse result1 = ServiceClient.Get<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = TVRefId });
-            EbChartVisualization ChartVisualization = EbSerializers.Json_Deserialize<EbChartVisualization>(result1.Data[0].Json);
+            EbChartVisualization ChartVisualization = EbFormHelper.GetEbObject<EbChartVisualization>(TVRefId, ServiceClient, redis, null);
             if (string.IsNullOrEmpty(ChartVisualization.DataSourceRefId))
                 throw new FormException($"Missing Data Reader of Chart control view that is connected to {this.Label}.");
-            EbObjectParticularVersionResponse result2 = ServiceClient.Get<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = ChartVisualization.DataSourceRefId });
-            EbDataReader DrObj = EbSerializers.Json_Deserialize<EbDataReader>(result2.Data[0].Json);
+            EbDataReader DrObj = EbFormHelper.GetEbObject<EbDataReader>(ChartVisualization.DataSourceRefId, ServiceClient, redis, null);
             this.ParamsList = DrObj.GetParams(redis as RedisClient);
         }
 

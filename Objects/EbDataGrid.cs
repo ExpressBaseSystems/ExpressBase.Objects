@@ -231,13 +231,8 @@ namespace ExpressBase.Objects
         public void InitDSRelated(IServiceClient serviceClient, IRedisClient redis, EbControl[] Allctrls)
         {
             List<string> _params = new List<string>();
-            EbDataReader DataReader = redis.Get<EbDataReader>(this.DataSourceId);
-            if (DataReader == null)
-            {
-                EbObjectParticularVersionResponse drObj = serviceClient.Get<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest() { RefId = this.DataSourceId });
-                DataReader = EbSerializers.Json_Deserialize(drObj.Data[0].Json);
-                redis.Set<EbDataReader>(this.DataSourceId, DataReader);
-            }
+            EbDataReader DataReader = EbFormHelper.GetEbObject<EbDataReader>(this.DataSourceId, serviceClient, redis, null);
+            
             for (int i = 0; i < Allctrls.Length; i++)
             {
                 Allctrls[i].DependedDG = new List<string>();
