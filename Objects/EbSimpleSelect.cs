@@ -346,14 +346,7 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
 
         private string GetSql(Service service)// duplicate
         {
-            EbDataReader dr = service.Redis.Get<EbDataReader>(this.DataSourceId);
-            if (dr == null)
-            {
-                var result = service.Gateway.Send<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = this.DataSourceId });
-                dr = EbSerializers.Json_Deserialize(result.Data[0].Json);
-                service.Redis.Set<EbDataReader>(this.DataSourceId, dr);
-            }
-
+            EbDataReader dr = EbFormHelper.GetEbObject<EbDataReader>(this.DataSourceId, null, service.Redis, service);
             string Sql = dr.Sql.Trim();
             if (Sql.LastIndexOf(";") == Sql.Length - 1)
                 Sql = Sql.Substring(0, Sql.Length - 1);

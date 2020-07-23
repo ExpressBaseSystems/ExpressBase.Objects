@@ -41,9 +41,9 @@ namespace ExpressBase.Objects
                                     if (!_val.ToString().IsEmpty())
                                         refids.Add(_val.ToString());
                                 }
-                                else if(_prop.PropertyType == typeof(List<ObjectBasicInfo>))
+                                else if (_prop.PropertyType == typeof(List<ObjectBasicInfo>))
                                 {
-                                    foreach(ObjectBasicInfo info in _val as List<ObjectBasicInfo>)
+                                    foreach (ObjectBasicInfo info in _val as List<ObjectBasicInfo>)
                                     {
                                         if (!string.IsNullOrEmpty(info.ObjRefId))
                                             refids.Add(info.ObjRefId);
@@ -125,17 +125,7 @@ namespace ExpressBase.Objects
                     c.IsDynamicTabChild = _this.IsDynamicTabChild;
                     if (c is EbUserControl || c is EbDGUserControlColumn)
                     {
-                        EbUserControl _temp = Redis.Get<EbUserControl>(c.RefId);
-                        if (_temp == null)
-                        {
-                            EbObjectParticularVersionResponse result = null;
-                            if (client != null)
-                                result = client.Get<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = c.RefId });
-                            else
-                                result = service.Gateway.Send<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = c.RefId });
-                            _temp = EbSerializers.Json_Deserialize(result.Data[0].Json);
-                            Redis.Set<EbUserControl>(c.RefId, _temp);
-                        }
+                        EbUserControl _temp = GetEbObject<EbUserControl>(c.RefId, client, Redis, service);
                         if (c is EbDGUserControlColumn)
                         {
                             foreach (EbControl Control in _temp.Controls)
@@ -233,56 +223,6 @@ namespace ExpressBase.Objects
             }
         }
 
-        ////Builder side - whole object get, table create, data insert
-        //public static void AfterRedisGet(EbControlContainer _this, Service service)
-        //{
-        //    try
-        //    {
-        //        for (int i = 0; i < _this.Controls.Count; i++)
-        //        {
-        //            if (_this.Controls[i] is EbUserControl || _this.Controls[i] is EbDGUserControlColumn)
-        //            {
-        //                EbUserControl _temp = service.Redis.Get<EbUserControl>(_this.Controls[i].RefId);
-        //                if (_temp == null)
-        //                {
-        //                    var result = service.Gateway.Send<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = _this.Controls[i].RefId });
-        //                    _temp = EbSerializers.Json_Deserialize(result.Data[0].Json);
-        //                    service.Redis.Set<EbUserControl>(_this.Controls[i].RefId, _temp);
-        //                }
-        //                //_temp.RefId = _this.Controls[i].RefId;
-        //                if (_this.Controls[i] is EbDGUserControlColumn)
-        //                {
-        //                    foreach (EbControl Control in _temp.Controls)
-        //                    {
-        //                        RenameControlsRec(Control, _this.Controls[i].Name);
-        //                    }
-        //                    (_this.Controls[i] as EbDGUserControlColumn).InitUserControl(_temp);
-        //                }
-        //                else
-        //                {
-        //                    (_this.Controls[i] as EbUserControl).Controls = _temp.Controls;
-        //                    //foreach (EbControl Control in (_this.Controls[i] as EbUserControl).Controls)
-        //                    //{
-        //                    //    RenameControlsRec(Control, _this.Controls[i].Name);
-        //                    //    //Control.ChildOf = "EbUserControl";
-        //                    //    //Control.Name = _this.Controls[i].Name + "_" + Control.Name;
-        //                    //}
-        //                    //_this.Controls[i] = _temp;
-        //                    (_this.Controls[i] as EbUserControl).AfterRedisGet(service);
-        //                }
-        //            }
-        //            else if (_this.Controls[i] is EbControlContainer)
-        //            {
-        //                AfterRedisGet(_this.Controls[i] as EbControlContainer, service);
-        //            }
-        //        }
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        Console.WriteLine("EXCEPTION : EbFormAfterRedisGet(service) " + e.Message);
-        //    }
-        //}
-
         public static void RenameControlsRec(EbControl _control, string _ucName)
         {
             if (_control is EbControlContainer)
@@ -303,27 +243,6 @@ namespace ExpressBase.Objects
             }
         }
 
-        //public static void InitDataPushers(EbWebForm _this, Service service)
-        //{
-        //    if (_this.DataPushers != null)
-        //    {
-        //        foreach (EbDataPusher pusher in _this.DataPushers)
-        //        {
-        //            EbWebForm _form = service.Redis.Get<EbWebForm>(pusher.FormRefId);
-        //            if (_form == null)
-        //            {
-        //                EbObjectParticularVersionResponse result = service.Gateway.Send<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = pusher.FormRefId });
-        //                _form = EbSerializers.Json_Deserialize(result.Data[0].Json);
-        //                service.Redis.Set<EbWebForm>(pusher.FormRefId, _form);
-        //            }
-        //            _form.AfterRedisGet(service);
-        //            _form.DataPusherConfig = new EbDataPusherConfig { SourceTable = _this.FormSchema.MasterTable, MultiPushId = _this.RefId + "_" + pusher.Name };
-        //            pusher.WebForm = _form;
-        //            _this.ExeDataPusher = true;
-        //        }
-        //    }
-        //}
-
         public static void InitDataPushers(EbWebForm _this, IRedisClient Redis, IServiceClient client, Service service)
         {
             _this.FormCollection = new EbWebFormCollection(_this);
@@ -331,17 +250,7 @@ namespace ExpressBase.Objects
             {
                 foreach (EbDataPusher pusher in _this.DataPushers)
                 {
-                    EbWebForm _form = Redis.Get<EbWebForm>(pusher.FormRefId);
-                    if (_form == null)
-                    {
-                        EbObjectParticularVersionResponse result;
-                        if (client != null)
-                            result = client.Get<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = pusher.FormRefId });
-                        else
-                            result = service.Gateway.Send<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = pusher.FormRefId });
-                        _form = EbSerializers.Json_Deserialize(result.Data[0].Json);
-                        Redis.Set<EbWebForm>(pusher.FormRefId, _form);
-                    }
+                    EbWebForm _form = GetEbObject<EbWebForm>(pusher.FormRefId, client, Redis, service);
                     _form.RefId = pusher.FormRefId;
                     _form.UserObj = _this.UserObj;
                     _form.SolutionObj = _this.SolutionObj;
@@ -352,6 +261,33 @@ namespace ExpressBase.Objects
                     _this.ExeDataPusher = true;
                 }
             }
+        }
+
+        public static T GetEbObject<T>(string RefId, IServiceClient ServiceClient, IRedisClient Redis, Service Service)
+        {
+            if (string.IsNullOrEmpty(RefId))
+                throw new Exception("RefId is null or empty. FormHelper >GetEbObject. Type: " + typeof(T).Name);
+
+            T _ebObject = default;
+            if (Redis != null) _ebObject = Redis.Get<T>(RefId);
+
+            if (_ebObject == null)
+            {
+                EbObjectParticularVersionResponse resp;
+                if (ServiceClient != null)
+                    resp = ServiceClient.Get(new EbObjectParticularVersionRequest { RefId = RefId });
+                else if (Service != null)
+                    resp = Service.Gateway.Send<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = RefId });
+                else
+                    throw new Exception($"ServiceClient and Service is null. FormHelper >GetEbObject. RefId: {RefId}, Type: {typeof(T).Name}");
+
+                if (resp.Data == null || resp.Data.Count == 0)
+                    throw new Exception($"EbObject not found. FormHelper >GetEbObject. RefId: {RefId}, Type: {typeof(T).Name}");
+
+                _ebObject = EbSerializers.Json_Deserialize(resp.Data[0].Json);
+                if (Redis != null) Redis.Set<T>(RefId, _ebObject);
+            }
+            return _ebObject;
         }
     }
 

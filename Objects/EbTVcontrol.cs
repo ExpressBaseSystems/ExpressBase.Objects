@@ -101,12 +101,10 @@ namespace ExpressBase.Objects
 
         public void FetchParamsMeta(IServiceClient ServiceClient, IRedisClient redis)
         {
-            EbObjectParticularVersionResponse result1 = ServiceClient.Get<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = TVRefId });
-            EbTableVisualization TvObj = EbSerializers.Json_Deserialize<EbTableVisualization>(result1.Data[0].Json);
+            EbTableVisualization TvObj = EbFormHelper.GetEbObject<EbTableVisualization>(TVRefId, ServiceClient, redis, null);
             if (string.IsNullOrEmpty(TvObj.DataSourceRefId))
                 throw new FormException($"Missing Data Reader of table view that is connected to {this.Label}.");
-            EbObjectParticularVersionResponse result2 = ServiceClient.Get<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = TvObj.DataSourceRefId });
-            EbDataReader DrObj = EbSerializers.Json_Deserialize<EbDataReader>(result2.Data[0].Json);
+            EbDataReader DrObj = EbFormHelper.GetEbObject<EbDataReader>(TvObj.DataSourceRefId, ServiceClient, redis, null);
             this.ParamsList = DrObj.GetParams(redis as RedisClient);
         }
 
