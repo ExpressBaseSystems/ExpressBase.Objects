@@ -70,6 +70,11 @@ namespace ExpressBase.Objects
             }")]
         public bool IsInsertable { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.CORE)]
+        [Alias("Preload items")]
+        public bool IsPreload { get; set; }
+
         [JsonIgnore]
         public override string IsRequiredOKJSfn
         {
