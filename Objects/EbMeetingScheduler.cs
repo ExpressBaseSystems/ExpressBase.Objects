@@ -462,20 +462,40 @@ else if (this.AttendeeConfig === 4)
                     int HostUserIdsCount = Mobj.SlotList[i].Hosts.Where(Item => Item.Type == UsersType.Users).Count();
                     int AttendeeUserIdsCount = Mobj.SlotList[i].Attendees.Where(Item => Item.Type == UsersType.Users).Count();
                     bool IsFixedHost = false;
+                    int AttendeeContactIdsCount = Mobj.SlotList[i].Attendees.Where(Item => Item.Type == UsersType.Contact).Count();
                     bool IsFixedAttendee = false;
-                    if (HostUserIdsCount == Mobj.MaxHost && HostUserIdsCount == Mobj.SlotList[i].Hosts.Count)
+                    if (this.HostConfig == UsersType.Users && HostUserIdsCount >= Mobj.MinHost && HostUserIdsCount == Mobj.SlotList[i].Hosts.Count && HostUserIdsCount <= Mobj.MaxHost)
                     {
                         IsFixedHost = true;
                         query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Hosts, usr, ParticipantOpt.Fixed, ParticipantType.Host, tbl, Mobj.SlotList[i], Mobj.Date, DataDB);
+                    } 
+                    else if (this.HostConfig == UsersType.Users && HostUserIdsCount < Mobj.MinHost)
+                    {
+                        throw new FormException("Schedule Meeting Failed : Minimum Host(s) Required");
                     }
                     else
                     {
                         query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Hosts, usr, ParticipantOpt.Eligible, ParticipantType.Host, tbl, Mobj.SlotList[i], Mobj.Date, DataDB);
                     }
-                    if (AttendeeUserIdsCount == Mobj.MaxAttendee && AttendeeUserIdsCount == Mobj.SlotList[i].Attendees.Count)
+
+
+                    if (this.AttendeeConfig == UsersType.Users && AttendeeUserIdsCount >= Mobj.MinAttendee && AttendeeUserIdsCount == Mobj.SlotList[i].Attendees.Count && AttendeeUserIdsCount <= Mobj.MaxAttendee)
                     {
                         IsFixedAttendee = true;
                         query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Attendees, usr, ParticipantOpt.Fixed, ParticipantType.Attendee, tbl, Mobj.SlotList[i], Mobj.Date, DataDB);
+                    }
+                    else if( this.AttendeeConfig == UsersType.Contact && AttendeeContactIdsCount >= Mobj.MinAttendee && AttendeeContactIdsCount == Mobj.SlotList[i].Attendees.Count && AttendeeContactIdsCount <= Mobj.MaxAttendee)
+                    {
+                        IsFixedAttendee = true;
+                        query += AddPersons(Mobj.SlotList[i].Attendees, usr, ParticipantOpt.Fixed, ParticipantType.Attendee, tbl, Mobj.SlotList[i], Mobj.Date, DataDB);
+                    } 
+                    else if(this.AttendeeConfig == UsersType.Users && HostUserIdsCount < Mobj.MinAttendee)
+                    {
+                        throw new FormException("Schedule Meeting Failed : Minimum Attendee(s) Required");
+                    }
+                    else if(this.AttendeeConfig == UsersType.Contact && AttendeeContactIdsCount < Mobj.MinAttendee)
+                    {
+                        throw new FormException("Schedule Meeting Failed : Minimum Attendee(s) Required");
                     }
                     else
                     {
@@ -662,6 +682,39 @@ else if (this.AttendeeConfig === 4)
             return true;
         }
 
+        public string AddPersons(List<Participants> Participants, User usr, ParticipantOpt Opt, ParticipantType ParticipantType, string tbl, Slots Mobj, string Date, IDatabase DataDB)
+        {
+            List<Participants> ParticipantsList = new List<Participants>();
+            String _query = string.Format(this.ValidateQuery, Mobj.TimeFrom, Mobj.TimeTo, Date);
+            EbDataSet ds = DataDB.DoQueries(_query);
+            for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+            {
+                ParticipantsList.Add(new Participants()
+                {
+                    Id = Convert.ToInt32(ds.Tables[0].Rows[i]["user_id"]),
+                });
+            }
+            string ExceptUserNames = "";
+            string query = "";
+            for (int j = 0; j < Participants.Count; j++)
+            {
+                if (Participants[j].Type == UsersType.Contact)
+                {
+                    for (int k = 0; k < ParticipantsList.Count; k++)
+                    {
+                        if (ParticipantsList[k].Id == Participants[j].Id && ParticipantsList[k].Name == Participants[j].Name)
+                            ExceptUserNames += Participants[j].Name + " ";
+                    }
+                    query += $@"
+                            insert into eb_meeting_slot_participants(user_id, confirmation, eb_meeting_schedule_id, approved_slot_id, name, email, type_of_user, participant_type,
+                            eb_created_at,eb_created_by) 
+                            values ({Participants[j].Id}, 1, eb_currval('eb_meeting_schedule_id_seq'), eb_currval('eb_meeting_slots_id_seq'), '', '', 2, {(int)ParticipantType},now(),{usr.UserId});
+                           ";
+                }
+            }
+            return query;
+        }
+
         public string MeetingSlotParticipantsQry(List<Participants> Participants, User usr, ParticipantOpt Opt, ParticipantType ParticipantType, string tbl, Slots Mobj, string Date, IDatabase DataDB)
         {
             List<Participants> ParticipantsList = new List<Participants>();
@@ -763,7 +816,7 @@ else if (this.AttendeeConfig === 4)
                 throw new FormException("Schedule Meeting Failed :" + ExceptUserNames + "(" + ParticipantType + ")" + "have another Meeting");
             return query;
         }
-        
+
         //public string MeetingEligibleParticipantsQry(List<Participants> Participants, User usr, ParticipantOpt Opt, ParticipantType ParticipantType, string tbl)
         //{
         //    string str = "";
@@ -775,17 +828,17 @@ else if (this.AttendeeConfig === 4)
         //    return str;
         //}
 
-        public int SetMeetingOpts(bool Host , bool Attendee)
+        public int SetMeetingOpts(bool Host, bool Attendee)
         {
-            int val =0;
-            if(Host && Attendee)
-                val =(int) MeetingOptions.F_H_F_A;
-            else if( Host && !Attendee)
-                val = (int) MeetingOptions.F_H_E_A;
-            else if( !Host && Attendee)
-                val = (int) MeetingOptions.E_H_F_A;
-            else if( !Host && !Attendee)
-                val = (int) MeetingOptions.E_H_E_A;
+            int val = 0;
+            if (Host && Attendee)
+                val = (int)MeetingOptions.F_H_F_A;
+            else if (Host && !Attendee)
+                val = (int)MeetingOptions.F_H_E_A;
+            else if (!Host && Attendee)
+                val = (int)MeetingOptions.E_H_F_A;
+            else if (!Host && !Attendee)
+                val = (int)MeetingOptions.E_H_E_A;
             return val;
         }
         public string AddMeetingSchedule(MeetingSchedule Mobj, User usr)
