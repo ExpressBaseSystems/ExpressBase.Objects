@@ -1309,7 +1309,25 @@ pg.HideProperty('IsDynamic');
         [HelpText("Specify minimum number of charecters to initiate search")]
         [Category("Search Settings")]
         [PropertyGroup(PGConstants.BEHAVIOR)]
-        public int MinSeachLength { get { return this.EbPowerSelect.MinSeachLength; } set { this.EbPowerSelect.MinSeachLength = value; } }
+        public int MinSearchLength { get { return this.EbPowerSelect.MinSearchLength; } set { this.EbPowerSelect.MinSearchLength = value; } }
+
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [DefaultPropValue("100")]
+        [PropertyGroup(PGConstants.BEHAVIOR)]
+        public int DropDownItemLimit { get { return this.EbPowerSelect.DropDownItemLimit; } set { this.EbPowerSelect.DropDownItemLimit = value; } }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.BEHAVIOR)]
+        [Alias("Search result limit")]
+        public int SearchLimit { get { return this.EbPowerSelect.SearchLimit; } set { this.EbPowerSelect.SearchLimit = value; } }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.CORE)]
+        [DefaultPropValue("true")]
+        [OnChangeExec(@"if (this.IsPreload){pg.MakeReadOnly('SearchLimit');} else {pg.MakeReadWrite('SearchLimit');}")]
+        [Alias("Preload items")]
+        public bool IsPreload { get { return this.EbPowerSelect.IsPreload; } set { this.EbPowerSelect.IsPreload = value; } }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup(PGConstants.BEHAVIOR)]
