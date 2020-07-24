@@ -333,7 +333,7 @@ pg.MakeReadOnly('DisplayMembers');} else {pg.MakeReadWrite('DisplayMembers');}")
         [HelpText("Specify minimum number of charecters to initiate search")]
         [Category("Search Settings")]
         [PropertyGroup(PGConstants.SEARCH)]
-        public int MinSeachLength { get; set; }
+        public int MinSearchLength { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [HideInPropertyGrid]
