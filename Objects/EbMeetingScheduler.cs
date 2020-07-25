@@ -447,8 +447,6 @@ else if (this.AttendeeConfig === 4)
             Mobj = JsonConvert.DeserializeObject<MeetingSchedule>(cField.Value.ToString());
             //string[] Host = Mobj.Host.Split(',').Select(sValue => sValue.Trim()).ToArray();
 
-
-
             string query = "";
             if (Mobj.MeetingType == MeetingType.SingleMeeting)
             {
@@ -477,8 +475,6 @@ else if (this.AttendeeConfig === 4)
                     {
                         query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Hosts, usr, ParticipantOpt.Eligible, ParticipantType.Host, tbl, Mobj.SlotList[i], Mobj.Date, DataDB);
                     }
-
-
                     if (this.AttendeeConfig == UsersType.Users && AttendeeUserIdsCount >= Mobj.MinAttendee && AttendeeUserIdsCount == Mobj.SlotList[i].Attendees.Count && AttendeeUserIdsCount <= Mobj.MaxAttendee)
                     {
                         IsFixedAttendee = true;
@@ -886,6 +882,7 @@ else if (this.AttendeeConfig === 4)
             return qry;
         }
     }
+ 
     public class MeetingSchedule
     {
         public string Title { get; set; }

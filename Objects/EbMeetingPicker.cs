@@ -672,9 +672,12 @@ namespace ExpressBase.Objects
         public string Integration { get; set; }
         public int TypeofUser { get; set; }
         public int ParticipantType { get; set; }
-        public string fullname { get; set; }
+        public string Fullname { get; set; }
         public int UserId { get; set; }
         public int MeetingId { get; set; }
+        public string FormRefid { get; set; }
+        public int FormDataId { get; set; }
+        public string Email { get; set; }
     }
     public class SlotDetailsResponse
     {
@@ -808,15 +811,60 @@ namespace ExpressBase.Objects
     //Get Meeting Details - display modal
     public class GetMeetingsDetailsResponse
     {
-        public MyAction MyActionDetails { get; set; }
-        public List<MeetingRequest> MeetingRequest { get; set; }
-        public List<SlotsRequest> SlotsRequest { get; set; }
+        public bool IsDirectMeeting { get; set; }
+        public List<SlotTable> SlotList { get; set; }
+        public List<MeetingParticipants> ParticipantList { get; set; }
+        public ScheduleTable MeetingScheduleDetails { get; set; }
+        //public MyAction MyActionDetails { get; set; }
+        //public List<MeetingRequest> MeetingRequest { get; set; }
+        //public List<SlotsRequest> SlotsRequest { get; set; }
+        //public List<MeetingParticipants> SlotContacts { get; set; }
         public GetMeetingsDetailsResponse()
         {
-            this.MeetingRequest = new List<MeetingRequest>();
-            this.SlotsRequest = new List<SlotsRequest>();
-            this.MyActionDetails = new MyAction();
+            this.SlotList = new List<SlotTable>();
+            this.ParticipantList = new List<MeetingParticipants>();
+            this.MeetingScheduleDetails = new ScheduleTable();
         }
+
+    }
+    public class SlotTable
+    {
+        public int SlotId { get; set; }
+        public int MeetingScheduleId { get; set; }
+        public string IsApproved { get; set; }
+        public string Date { get; set; }
+        public string TimeFrom { get; set; }
+        public string TimeTo { get; set; }
+    }  
+    public class ScheduleTable
+    {
+        public int MeetingScheduleId { get; set; }
+        public string Title { get; set; }
+        public string Description { get; set; }
+        public string Location { get; set; }
+        public string Integration { get; set; }
+        public string IsRecuring { get; set; }
+        public int DayCode { get; set; }
+        public string Date { get; set; }
+        public string TimeFrom { get; set; }
+        public string TimeTo { get; set; }
+        //public string Duration { get; set; }
+    }
+    public class MeetingParticipants
+    {
+        public int Id { get; set; }
+        public int UserId { get; set; }
+        public int MeetingScheduleId { get; set; }
+        public int ApprovedSlotId { get; set; }
+        public string Name { get; set; }
+        public string Email { get; set; }
+        public string Phone { get; set; }
+        public int Confirmation { get; set; }
+        public int TypeOfUser { get; set; }
+        public int ParticipantType { get; set; }
+        public string DpRefid { get; set; }
+        public string FormRefid { get; set; }
+        public int FormDataId { get; set; }
 
     }
     public class GetMeetingsDetailsRequest
