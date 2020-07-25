@@ -415,6 +415,7 @@ pg.MakeReadOnly('DisplayMembers');} else {pg.MakeReadWrite('DisplayMembers');}")
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [Alias("Search Method")]
         [PropertyGroup(PGConstants.SEARCH)]
+        [HideInPropertyGrid]
         [HelpText("Select Search Method - StartsWith, EndsWith, Contains or Exact Match")]
         public DefaultSearchFor DefaultSearchFor { get; set; }
 
