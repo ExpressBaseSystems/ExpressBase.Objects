@@ -70,12 +70,6 @@ namespace ExpressBase.Objects
             }")]
         public bool IsInsertable { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
-        [PropertyGroup(PGConstants.CORE)]
-        [DefaultPropValue("true")]
-        [Alias("Preload items")]
-        public bool IsPreload { get; set; }
-
         [JsonIgnore]
         public override string IsRequiredOKJSfn
         {
@@ -309,9 +303,16 @@ pg.MakeReadOnly('DisplayMembers');} else {pg.MakeReadWrite('DisplayMembers');}")
         public int DropDownItemLimit { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [DefaultPropValue("500")]
         [PropertyGroup(PGConstants.BEHAVIOR)]
-        public int PreloadItemLimit { get; set; }
+        [Alias("Search result limit")]
+        public int SearchLimit { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.CORE)]
+        [DefaultPropValue("true")]
+        [OnChangeExec(@"if (this.IsPreload){pg.MakeReadOnly('SearchLimit');} else {pg.MakeReadWrite('SearchLimit');}")]
+        [Alias("Preload items")]
+        public bool IsPreload { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [DefaultPropValue("100")]
@@ -332,7 +333,7 @@ pg.MakeReadOnly('DisplayMembers');} else {pg.MakeReadWrite('DisplayMembers');}")
         [HelpText("Specify minimum number of charecters to initiate search")]
         [Category("Search Settings")]
         [PropertyGroup(PGConstants.SEARCH)]
-        public int MinSeachLength { get; set; }
+        public int MinSearchLength { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [HideInPropertyGrid]
@@ -414,6 +415,7 @@ pg.MakeReadOnly('DisplayMembers');} else {pg.MakeReadWrite('DisplayMembers');}")
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [Alias("Search Method")]
         [PropertyGroup(PGConstants.SEARCH)]
+        [HideInPropertyGrid]
         [HelpText("Select Search Method - StartsWith, EndsWith, Contains or Exact Match")]
         public DefaultSearchFor DefaultSearchFor { get; set; }
 
@@ -658,7 +660,7 @@ else// PS
             <table id='@ebsid@tbl' tabindex='1000' style='width:100%' class='table table-bordered'></table>
         </div>
     </center>
-    <div id='@ebsid@_pb'></div>
+    <div id='@ebsid@_pb' class='ps-pb'></div>
 </div>"
     .Replace("@VueSelectCode", this.VueSelectcode)
     .Replace("@name@", this.Name)
