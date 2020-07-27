@@ -211,7 +211,7 @@ namespace ExpressBase.Objects
                         break;
                     }
 
-                    EbDataReader dataReader = EbFormHelper.GetEbObject<EbDataReader>(_dg.DataSourceId, null, Service.Redis, Service);                    
+                    EbDataReader dataReader = EbFormHelper.GetEbObject<EbDataReader>(_dg.DataSourceId, null, Service.Redis, Service);
                     foreach (Param item in dataReader.GetParams(Service.Redis as RedisClient))
                     {
                         Param _p = Param.Find(p => p.Name == item.Name);
@@ -291,7 +291,7 @@ namespace ExpressBase.Objects
             else if (TriggerCtrl is EbPowerSelect && !string.IsNullOrEmpty((TriggerCtrl as EbPowerSelect).DataImportId))// ps import
             {
                 Param[0].Type = ((int)EbDbTypes.Int32).ToString();
-                EbWebForm _form = EbFormHelper.GetEbObject<EbWebForm>((TriggerCtrl as EbPowerSelect).DataImportId, null, Service.Redis, Service);                
+                EbWebForm _form = EbFormHelper.GetEbObject<EbWebForm>((TriggerCtrl as EbPowerSelect).DataImportId, null, Service.Redis, Service);
                 _form.AfterRedisGet(Service);
                 _form.RefId = (TriggerCtrl as EbPowerSelect).DataImportId;
                 _form.UserObj = this.UserObj;
@@ -319,13 +319,14 @@ namespace ExpressBase.Objects
                             if (Table.Count > 0)
                             {
                                 SingleColumn c = Table[0].Columns.Find(e => e.Control is EbAutoId);
-                                if (c != null)
-                                    c.Value = null;
-                                foreach (SingleColumn c_ in Table[0].Columns.FindAll(e => e.Control.IsSysControl))
+                                if (c != null) c.Value = null;
+                                foreach (SingleColumn c_ in Table[0].Columns.FindAll(e => e.Control?.IsSysControl == true))
                                 {
                                     SingleColumn t = c_.Control.GetSingleColumn(this.UserObj, this.SolutionObj, null);
                                     c_.Value = t.Value; c_.F = t.F;
                                 }
+                                c = Table[0].Columns.Find(e => e.Name == FormConstants.id);
+                                if (c != null) c.Value = 0;
                                 Table[0].RowId = 0;
                             }
                         }
@@ -333,7 +334,11 @@ namespace ExpressBase.Objects
                         {
                             int id = -1;
                             foreach (SingleRow Row in Table)
+                            {
                                 Row.RowId = id--;
+                                SingleColumn c = Row.Columns.Find(e => e.Name == FormConstants.id);
+                                if (c != null) c.Value = 0;
+                            }
                         }
                     }
                     else if (_t.TableType == WebFormTableTypes.Review)
@@ -433,7 +438,7 @@ namespace ExpressBase.Objects
                             {
                                 psParams.Add(DataDB.GetNewParameter(_columnDes.ColumnName, (EbDbTypes)_columnDes.EbDbType, _formattedData));
                             }
-                            catch(Exception ex)
+                            catch (Exception ex)
                             {
                                 Console.WriteLine($"Exception catched: WebForm -> GetImportData\nMessage: {ex.Message}\nStackTrace: {ex.StackTrace}");
                             }
