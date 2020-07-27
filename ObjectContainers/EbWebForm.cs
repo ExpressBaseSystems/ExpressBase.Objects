@@ -211,7 +211,7 @@ namespace ExpressBase.Objects
                         break;
                     }
 
-                    EbDataReader dataReader = EbFormHelper.GetEbObject<EbDataReader>(_dg.DataSourceId, null, Service.Redis, Service);                    
+                    EbDataReader dataReader = EbFormHelper.GetEbObject<EbDataReader>(_dg.DataSourceId, null, Service.Redis, Service);
                     foreach (Param item in dataReader.GetParams(Service.Redis as RedisClient))
                     {
                         Param _p = Param.Find(p => p.Name == item.Name);
@@ -291,7 +291,7 @@ namespace ExpressBase.Objects
             else if (TriggerCtrl is EbPowerSelect && !string.IsNullOrEmpty((TriggerCtrl as EbPowerSelect).DataImportId))// ps import
             {
                 Param[0].Type = ((int)EbDbTypes.Int32).ToString();
-                EbWebForm _form = EbFormHelper.GetEbObject<EbWebForm>((TriggerCtrl as EbPowerSelect).DataImportId, null, Service.Redis, Service);                
+                EbWebForm _form = EbFormHelper.GetEbObject<EbWebForm>((TriggerCtrl as EbPowerSelect).DataImportId, null, Service.Redis, Service);
                 _form.AfterRedisGet(Service);
                 _form.RefId = (TriggerCtrl as EbPowerSelect).DataImportId;
                 _form.UserObj = this.UserObj;
@@ -319,13 +319,14 @@ namespace ExpressBase.Objects
                             if (Table.Count > 0)
                             {
                                 SingleColumn c = Table[0].Columns.Find(e => e.Control is EbAutoId);
-                                if (c != null)
-                                    c.Value = null;
-                                foreach (SingleColumn c_ in Table[0].Columns.FindAll(e => e.Control.IsSysControl))
+                                if (c != null) c.Value = null;
+                                foreach (SingleColumn c_ in Table[0].Columns.FindAll(e => e.Control?.IsSysControl == true))
                                 {
                                     SingleColumn t = c_.Control.GetSingleColumn(this.UserObj, this.SolutionObj, null);
                                     c_.Value = t.Value; c_.F = t.F;
                                 }
+                                c = Table[0].Columns.Find(e => e.Name == FormConstants.id);
+                                if (c != null) c.Value = 0;
                                 Table[0].RowId = 0;
                             }
                         }
@@ -333,7 +334,11 @@ namespace ExpressBase.Objects
                         {
                             int id = -1;
                             foreach (SingleRow Row in Table)
+                            {
                                 Row.RowId = id--;
+                                SingleColumn c = Row.Columns.Find(e => e.Name == FormConstants.id);
+                                if (c != null) c.Value = 0;
+                            }
                         }
                     }
                     else if (_t.TableType == WebFormTableTypes.Review)
@@ -433,7 +438,7 @@ namespace ExpressBase.Objects
                             {
                                 psParams.Add(DataDB.GetNewParameter(_columnDes.ColumnName, (EbDbTypes)_columnDes.EbDbType, _formattedData));
                             }
-                            catch(Exception ex)
+                            catch (Exception ex)
                             {
                                 Console.WriteLine($"Exception catched: WebForm -> GetImportData\nMessage: {ex.Message}\nStackTrace: {ex.StackTrace}");
                             }
@@ -610,39 +615,40 @@ namespace ExpressBase.Objects
             {
                 if (c is EbDataGrid)
                 {
-                    if (!FormData.MultipleTables.ContainsKey((c as EbDataGrid).TableName))
+                    EbDataGrid dgCtrl = c as EbDataGrid;
+                    if (!FormData.MultipleTables.ContainsKey(dgCtrl.TableName))
                         continue;
-                    foreach (EbControl control in (c as EbDataGrid).Controls)
+                    foreach (EbControl control in dgCtrl.Controls)
                     {
                         if (!control.DoNotPersist)
                         {
                             List<object> val = new List<object>();
-                            for (int i = 0; i < FormData.MultipleTables[(c as EbDataGrid).TableName].Count; i++)
+                            for (int i = 0; i < FormData.MultipleTables[dgCtrl.TableName].Count; i++)
                             {
-                                if (FormData.MultipleTables[(c as EbDataGrid).TableName][i].GetColumn(control.Name) != null)
+                                if (FormData.MultipleTables[dgCtrl.TableName][i].GetColumn(control.Name) != null)
                                 {
-                                    val.Add(FormData.MultipleTables[(c as EbDataGrid).TableName][i][control.Name]);
-                                    FormData.MultipleTables[(c as EbDataGrid).TableName][i].SetEbDbType(control.Name, control.EbDbType);
-                                    FormData.MultipleTables[(c as EbDataGrid).TableName][i].SetControl(control.Name, control);
+                                    val.Add(FormData.MultipleTables[dgCtrl.TableName][i][control.Name]);
+                                    FormData.MultipleTables[dgCtrl.TableName][i].SetEbDbType(control.Name, control.EbDbType);
+                                    FormData.MultipleTables[dgCtrl.TableName][i].SetControl(control.Name, control);
                                 }
                             }
                             control.ValueFE = val;
                         }
                     }
-                    int count = FormData.MultipleTables[(c as EbDataGrid).TableName].Count;
+                    int count = FormData.MultipleTables[dgCtrl.TableName].Count;
                     for (int i = 0, j = count; i < count; i++, j--)
                     {
-                        if (FormData.MultipleTables[(c as EbDataGrid).TableName][i].GetColumn(FormConstants.eb_row_num) == null)
-                            FormData.MultipleTables[(c as EbDataGrid).TableName][i].Columns.Add(new SingleColumn
+                        if (FormData.MultipleTables[dgCtrl.TableName][i].GetColumn(FormConstants.eb_row_num) == null)
+                            FormData.MultipleTables[dgCtrl.TableName][i].Columns.Add(new SingleColumn
                             {
                                 Name = FormConstants.eb_row_num,
                                 Type = (int)EbDbTypes.Decimal,
                                 Value = 0
                             });
-                        if ((c as EbDataGrid).AscendingOrder)
-                            FormData.MultipleTables[(c as EbDataGrid).TableName][i][FormConstants.eb_row_num] = i + 1;
+                        if (dgCtrl.AscendingOrder)
+                            FormData.MultipleTables[dgCtrl.TableName][i][FormConstants.eb_row_num] = i + 1;
                         else
-                            FormData.MultipleTables[(c as EbDataGrid).TableName][i][FormConstants.eb_row_num] = j;
+                            FormData.MultipleTables[dgCtrl.TableName][i][FormConstants.eb_row_num] = j;
                     }
                 }
                 else if (c is EbReview)
