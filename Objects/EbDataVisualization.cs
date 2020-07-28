@@ -207,7 +207,7 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public List<Param> ParamsList { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar, BuilderType.WebForm)]
         [HideInPropertyGrid]
         public List<DVBaseColumn> NotVisibleColumns { get; set; }
 
@@ -345,7 +345,7 @@ namespace ExpressBase.Objects
             pg.ShowProperty('LeftFixedColumn')
             pg.ShowProperty('RightFixedColumn')
         }")]
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar, BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.Collection)]
         [HideForUser]
         [HideInPropertyGrid]
