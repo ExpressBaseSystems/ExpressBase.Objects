@@ -268,7 +268,7 @@ namespace ExpressBase.Objects
                     if (QrsDict.Count > 0)
                     {
                         List<DbParameter> param = new List<DbParameter>();
-                        this.AddExtraParamsForPs(param, DataDB, RowId);                        
+                        EbFormHelper.AddExtraSqlParams(param, DataDB, this.TableName, RowId, this.LocationId, this.UserObj.UserId);
 
                         EbDataSet dataset = DataDB.DoQueries(string.Join(CharConstants.SPACE, QrsDict.Select(d => d.Value)), param.ToArray());
                         int i = 0;
@@ -450,7 +450,7 @@ namespace ExpressBase.Objects
             }
             if (QrsDict.Count > 0)
             {
-                this.AddExtraParamsForPs(psParams, DataDB, 0);
+                EbFormHelper.AddExtraSqlParams(psParams, DataDB, this.TableName, 0, this.LocationId, this.UserObj.UserId);
                 EbDataSet dataset = DataDB.DoQueries(string.Join(CharConstants.SPACE, QrsDict.Select(d => d.Value)), psParams.ToArray());
                 int i = 0;
                 foreach (KeyValuePair<string, string> item in QrsDict)
@@ -1295,7 +1295,7 @@ namespace ExpressBase.Objects
                     }
                 }
 
-                this.AddExtraParamsForPs(param, DataDB, this.TableRowId);
+                EbFormHelper.AddExtraSqlParams(param, DataDB, this.TableName, this.TableRowId, this.LocationId, this.UserObj.UserId);
 
                 EbDataSet ds;
                 if (this.DbConnection == null)
@@ -1359,7 +1359,7 @@ namespace ExpressBase.Objects
 
             if (QrsDict.Count > 0)
             {
-                this.AddExtraParamsForPs(param, DataDB, this.TableRowId);
+                EbFormHelper.AddExtraSqlParams(param, DataDB, this.TableName, this.TableRowId, this.LocationId, this.UserObj.UserId);
 
                 EbDataSet dataset = DataDB.DoQueries(string.Join(CharConstants.SPACE, QrsDict.Select(d => d.Value)), param.ToArray());
                 int i = 0;
@@ -1371,18 +1371,6 @@ namespace ExpressBase.Objects
                 }
                 this.PostFormatFormData();
             }
-        }
-
-        private void AddExtraParamsForPs(List<DbParameter> param, IDatabase DataDB, int rowId)
-        {
-            //if eb_loc_id control is not present then form data entered location adding as 'eb_loc_id' 
-            if (param.Find(e => e.ParameterName == FormConstants.eb_loc_id) == null)
-                param.Add(DataDB.GetNewParameter(FormConstants.eb_loc_id, EbDbTypes.Decimal, this.LocationId));
-            if (param.Find(e => e.ParameterName == "eb_currentuser_id") == null)
-                param.Add(DataDB.GetNewParameter("eb_currentuser_id", EbDbTypes.Decimal, this.UserObj.UserId));
-            if (param.Find(e => e.ParameterName == this.TableName + FormConstants._id) == null)
-                param.Add(DataDB.GetNewParameter(this.TableName + FormConstants._id, EbDbTypes.Int32, rowId));
-            param.Add(DataDB.GetNewParameter(FormConstants.id, EbDbTypes.Int32, rowId));
         }
 
         public List<Param> GetFormData4Mobile(IDatabase DataDB, Service service)
@@ -1695,6 +1683,8 @@ namespace ExpressBase.Objects
                     int _idx = 0;
                     foreach (KeyValuePair<string, string> p in nextStage.QryParams)
                     {
+                        if (EbFormHelper.IsExtraSqlParam(p.Key, this.TableName))
+                            continue;
                         SingleTable Table = null;
                         if (this.FormData.MultipleTables.ContainsKey(p.Value))
                             Table = this.FormData.MultipleTables[p.Value];
@@ -1715,6 +1705,7 @@ namespace ExpressBase.Objects
                         _params[_idx - 1].ParameterName = p.Key;
                     }
                     List<int> uids = new List<int>();
+                    EbFormHelper.AddExtraSqlParams(_params, DataDB, this.TableName, this.TableRowId, this.LocationId, this.UserObj.UserId);
                     EbDataTable dt = DataDB.DoQuery(nextStage.ApproverUsers.Code, _params.ToArray());
                     foreach (EbDataRow dr in dt.Rows)
                     {
