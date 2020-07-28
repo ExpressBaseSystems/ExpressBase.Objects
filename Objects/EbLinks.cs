@@ -85,6 +85,12 @@ namespace ExpressBase.Objects
         public string BackgroundColor { get; set; }
 
         [EnableInBuilder(BuilderType.DashBoard)]
+        [PropertyGroup("Data Settings")]
+        [UIproperty]
+        [PropertyEditor(PropertyEditorType.FontSelector)]
+        public EbFont FontStyle { get; set; }
+
+        [EnableInBuilder(BuilderType.DashBoard)]
         [PropertyGroup("Icon")]
         [UIproperty]
         [PropertyEditor(PropertyEditorType.IconPicker)]
@@ -97,6 +103,12 @@ namespace ExpressBase.Objects
         [DefaultPropValue("fa-link")]
         public string HoverText { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl, BuilderType.DashBoard)]
+        [PropertyGroup("Icon")]
+        [UIproperty]
+        [PropertyEditor(PropertyEditorType.GradientColorPicker)]
+        [DefaultPropValue("")]
+        public string IconBackgroundColor { get; set; }
 
     }
 

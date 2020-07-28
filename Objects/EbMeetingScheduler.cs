@@ -280,17 +280,18 @@ else if (this.AttendeeConfig === 4)
         public string GetHtml4singleMeeting()
         {
             string Html = @"
-            <div class='single-meeting'><div style='display:flex'><div style='width: 100%;margin-right: 2rem;'><div class='title'> <input type='text' placeholder='Title' id='@ebsid@_meeting-title' class='mc-input'/> </div>
-            <div class='location'><input type='text'  placeholder='Location' id='@ebsid@_location' class='mc-input' /></div>
-            <div class='date'><input type='text' placeholder='Date' id='@ebsid@_meeting-date' val='@date_val@' class='mc-input' /></div> </div>
-            <div style='width: 100%;'><div class='description'><textarea id='@ebsid@_description' placeholder='Describe about the event...' rows='10' cols='10' class='mc-input' ></textarea></div>
+            <div class='single-meeting'><div style='display:flex'><div style='width: 100%;margin-right: 2rem;'><div class='title'> 
+            <input type='text' placeholder='Title' id='@ebsid@_meeting-title' class='mc-input m-validate'/> </div>
+            <div class='location'><input type='text'  placeholder='Location' id='@ebsid@_location' class='mc-input m-validate' /></div>
+            <div class='date'><input type='text' placeholder='Date' id='@ebsid@_meeting-date' val='@date_val@' class='mc-input m-validate' /></div> </div>
+            <div style='width: 100%;'><div class='description'><textarea id='@ebsid@_description' placeholder='Describe about the event...' rows='10' cols='10' class='mc-input m-validate' ></textarea></div>
             <div class='integration'><input type='text' placeholder='Integration' id='@ebsid@_integration' class='mc-input' /></div></div></div>
             <div class='slots-table' id='@ebsid@_slots'>
             <table id='@ebsid@_slot-table' class='slot-tbl'> <thead><tr><th>Time From</th><th>Time To</th><th>Host</th><th>Attendee</th><th></th></tr>
             <tbody>
             <tr data-id='0'>
-            <td class='time'><input type='time' id='@ebsid@_time-from'  class='mc-input time-from' /></td>
-            <td class='time'><input type='time' id='@ebsid@_time-to'  class='mc-input time-to' /></td>
+            <td class='time'><input type='time' id='@ebsid@_time-from'  class='mc-input time-from m-validate' /></td>
+            <td class='time'><input type='time' id='@ebsid@_time-to'  class='mc-input time-to m-validate' /></td>
             <td><input type='text' id='@ebsid@_host_0'  class='meeting-participants tb-host'/></td>
             <td><input type='text' id='@ebsid@_attendee_0' class='meeting-participants tb-attendee'/></td>
             <td style='width:5rem;'></td></td></tr>
@@ -305,17 +306,18 @@ else if (this.AttendeeConfig === 4)
         public string GetHtml4MultipleMeeting()
         {
             string Html = @"
-            <div class='single-meeting'><div style='display:flex'><div style='width: 100%;margin-right: 2rem;'><div class='title'> <input type='text' placeholder='Title' id='@ebsid@_meeting-title' class='mc-input'/> </div>
-            <div class='location'><input type='text'  placeholder='Location' id='@ebsid@_location' class='mc-input' /></div>
-            <div class='date'><input type='text' placeholder='Date' id='@ebsid@_meeting-date' val='@date_val@' class='mc-input' /></div> </div>
-            <div style='width: 100%;'><div class='description'><textarea id='@ebsid@_description' placeholder='Describe about the event...' rows='10' cols='10' class='mc-input' ></textarea></div>
+            <div class='single-meeting'><div style='display:flex'><div style='width: 100%;margin-right: 2rem;'><div class='title'> 
+            <input type='text' placeholder='Title' id='@ebsid@_meeting-title' class='mc-input m-validate'/> </div>
+            <div class='location'><input type='text'  placeholder='Location' id='@ebsid@_location' class='mc-input m-validate' /></div>
+            <div class='date'><input type='text' placeholder='Date' id='@ebsid@_meeting-date' val='@date_val@' class='mc-input m-validate' /></div> </div>
+            <div style='width: 100%;'><div class='description'><textarea id='@ebsid@_description' placeholder='Describe about the event...' rows='10' cols='10' class='mc-input m-validate' ></textarea></div>
             <div class='integration'><input type='text' placeholder='Integration' id='@ebsid@_integration' class='mc-input' /></div></div></div>
             <div class='slots-table' id='@ebsid@_slots'>
             <table id='@ebsid@_slot-table' class='slot-tbl'> <thead><tr><th>Time From</th><th>Time To</th><th>Host</th><th>Attendee</th><th></th></tr>
             <tbody>
             <tr data-id='0'>
-            <td class='time'><input type='time' id='@ebsid@_time-from'  class='mc-input time-from' /></td>
-            <td class='time'><input type='time' id='@ebsid@_time-to'  class='mc-input time-to' /></td>
+            <td class='time'><input type='time' id='@ebsid@_time-from'  class='mc-input time-from m-validate'  /></td>
+            <td class='time'><input type='time' id='@ebsid@_time-to'  class='mc-input time-to m-validate' /></td>
             <td><input type='text' id='@ebsid@_host_0'  class='meeting-participants tb-host'/></td>
             <td><input type='text' id='@ebsid@_attendee_0' class='meeting-participants tb-attendee'/></td>
             <td style='width:5rem;'><button id='@ebsid@_remove-slot' class='remove-slot' > <i class='fa fa-window-close'></i></button></td></td></tr>

@@ -211,7 +211,7 @@ namespace ExpressBase.Objects
                         break;
                     }
 
-                    EbDataReader dataReader = EbFormHelper.GetEbObject<EbDataReader>(_dg.DataSourceId, null, Service.Redis, Service);                    
+                    EbDataReader dataReader = EbFormHelper.GetEbObject<EbDataReader>(_dg.DataSourceId, null, Service.Redis, Service);
                     foreach (Param item in dataReader.GetParams(Service.Redis as RedisClient))
                     {
                         Param _p = Param.Find(p => p.Name == item.Name);
@@ -268,12 +268,7 @@ namespace ExpressBase.Objects
                     if (QrsDict.Count > 0)
                     {
                         List<DbParameter> param = new List<DbParameter>();
-
-                        if (param.Find(e => e.ParameterName == FormConstants.eb_loc_id) == null)
-                            param.Add(DataDB.GetNewParameter(FormConstants.eb_loc_id, EbDbTypes.Decimal, this.LocationId));
-
-                        if (param.Find(e => e.ParameterName == "eb_currentuser_id") == null)
-                            param.Add(DataDB.GetNewParameter("eb_currentuser_id", EbDbTypes.Decimal, this.UserObj.UserId));
+                        this.AddExtraParamsForPs(param, DataDB, RowId);                        
 
                         EbDataSet dataset = DataDB.DoQueries(string.Join(CharConstants.SPACE, QrsDict.Select(d => d.Value)), param.ToArray());
                         int i = 0;
@@ -291,7 +286,7 @@ namespace ExpressBase.Objects
             else if (TriggerCtrl is EbPowerSelect && !string.IsNullOrEmpty((TriggerCtrl as EbPowerSelect).DataImportId))// ps import
             {
                 Param[0].Type = ((int)EbDbTypes.Int32).ToString();
-                EbWebForm _form = EbFormHelper.GetEbObject<EbWebForm>((TriggerCtrl as EbPowerSelect).DataImportId, null, Service.Redis, Service);                
+                EbWebForm _form = EbFormHelper.GetEbObject<EbWebForm>((TriggerCtrl as EbPowerSelect).DataImportId, null, Service.Redis, Service);
                 _form.AfterRedisGet(Service);
                 _form.RefId = (TriggerCtrl as EbPowerSelect).DataImportId;
                 _form.UserObj = this.UserObj;
@@ -319,13 +314,14 @@ namespace ExpressBase.Objects
                             if (Table.Count > 0)
                             {
                                 SingleColumn c = Table[0].Columns.Find(e => e.Control is EbAutoId);
-                                if (c != null)
-                                    c.Value = null;
-                                foreach (SingleColumn c_ in Table[0].Columns.FindAll(e => e.Control.IsSysControl))
+                                if (c != null) c.Value = null;
+                                foreach (SingleColumn c_ in Table[0].Columns.FindAll(e => e.Control?.IsSysControl == true))
                                 {
                                     SingleColumn t = c_.Control.GetSingleColumn(this.UserObj, this.SolutionObj, null);
                                     c_.Value = t.Value; c_.F = t.F;
                                 }
+                                c = Table[0].Columns.Find(e => e.Name == FormConstants.id);
+                                if (c != null) c.Value = 0;
                                 Table[0].RowId = 0;
                             }
                         }
@@ -333,7 +329,11 @@ namespace ExpressBase.Objects
                         {
                             int id = -1;
                             foreach (SingleRow Row in Table)
+                            {
                                 Row.RowId = id--;
+                                SingleColumn c = Row.Columns.Find(e => e.Name == FormConstants.id);
+                                if (c != null) c.Value = 0;
+                            }
                         }
                     }
                     else if (_t.TableType == WebFormTableTypes.Review)
@@ -433,7 +433,7 @@ namespace ExpressBase.Objects
                             {
                                 psParams.Add(DataDB.GetNewParameter(_columnDes.ColumnName, (EbDbTypes)_columnDes.EbDbType, _formattedData));
                             }
-                            catch(Exception ex)
+                            catch (Exception ex)
                             {
                                 Console.WriteLine($"Exception catched: WebForm -> GetImportData\nMessage: {ex.Message}\nStackTrace: {ex.StackTrace}");
                             }
@@ -450,12 +450,7 @@ namespace ExpressBase.Objects
             }
             if (QrsDict.Count > 0)
             {
-                if (psParams.Find(e => e.ParameterName == FormConstants.eb_loc_id) == null)
-                    psParams.Add(DataDB.GetNewParameter(FormConstants.eb_loc_id, EbDbTypes.Decimal, this.LocationId));
-
-                if (psParams.Find(e => e.ParameterName == "eb_currentuser_id") == null)
-                    psParams.Add(DataDB.GetNewParameter("eb_currentuser_id", EbDbTypes.Decimal, this.UserObj.UserId));
-
+                this.AddExtraParamsForPs(psParams, DataDB, 0);
                 EbDataSet dataset = DataDB.DoQueries(string.Join(CharConstants.SPACE, QrsDict.Select(d => d.Value)), psParams.ToArray());
                 int i = 0;
                 foreach (KeyValuePair<string, string> item in QrsDict)
@@ -1275,7 +1270,6 @@ namespace ExpressBase.Objects
             if (!psquery.IsNullOrEmpty() && !backup)
             {
                 List<DbParameter> param = new List<DbParameter>();
-                param.Add(DataDB.GetNewParameter(_FormData.MasterTable + FormConstants._id, EbDbTypes.Int32, this.TableRowId));
                 this.LocationId = _FormData.MultipleTables[_FormData.MasterTable][0].LocId;
 
                 for (int i = 0; i < _schema.Tables.Count && dataset.Tables.Count >= _schema.Tables.Count; i++)
@@ -1301,12 +1295,7 @@ namespace ExpressBase.Objects
                     }
                 }
 
-                //if eb_loc_id control is not present then form data entered location adding as 'eb_loc_id' 
-                if (param.Find(e => e.ParameterName == FormConstants.eb_loc_id) == null)
-                    param.Add(DataDB.GetNewParameter(FormConstants.eb_loc_id, EbDbTypes.Decimal, this.LocationId));
-
-                if (param.Find(e => e.ParameterName == "eb_currentuser_id") == null)
-                    param.Add(DataDB.GetNewParameter("eb_currentuser_id", EbDbTypes.Decimal, this.UserObj.UserId));
+                this.AddExtraParamsForPs(param, DataDB, this.TableRowId);
 
                 EbDataSet ds;
                 if (this.DbConnection == null)
@@ -1370,11 +1359,7 @@ namespace ExpressBase.Objects
 
             if (QrsDict.Count > 0)
             {
-                if (param.Find(e => e.ParameterName == FormConstants.eb_loc_id) == null)
-                    param.Add(DataDB.GetNewParameter(FormConstants.eb_loc_id, EbDbTypes.Decimal, this.LocationId));
-
-                if (param.Find(e => e.ParameterName == "eb_currentuser_id") == null)
-                    param.Add(DataDB.GetNewParameter("eb_currentuser_id", EbDbTypes.Decimal, this.UserObj.UserId));
+                this.AddExtraParamsForPs(param, DataDB, this.TableRowId);
 
                 EbDataSet dataset = DataDB.DoQueries(string.Join(CharConstants.SPACE, QrsDict.Select(d => d.Value)), param.ToArray());
                 int i = 0;
@@ -1386,6 +1371,18 @@ namespace ExpressBase.Objects
                 }
                 this.PostFormatFormData();
             }
+        }
+
+        private void AddExtraParamsForPs(List<DbParameter> param, IDatabase DataDB, int rowId)
+        {
+            //if eb_loc_id control is not present then form data entered location adding as 'eb_loc_id' 
+            if (param.Find(e => e.ParameterName == FormConstants.eb_loc_id) == null)
+                param.Add(DataDB.GetNewParameter(FormConstants.eb_loc_id, EbDbTypes.Decimal, this.LocationId));
+            if (param.Find(e => e.ParameterName == "eb_currentuser_id") == null)
+                param.Add(DataDB.GetNewParameter("eb_currentuser_id", EbDbTypes.Decimal, this.UserObj.UserId));
+            if (param.Find(e => e.ParameterName == this.TableName + FormConstants._id) == null)
+                param.Add(DataDB.GetNewParameter(this.TableName + FormConstants._id, EbDbTypes.Int32, rowId));
+            param.Add(DataDB.GetNewParameter(FormConstants.id, EbDbTypes.Int32, rowId));
         }
 
         public List<Param> GetFormData4Mobile(IDatabase DataDB, Service service)
