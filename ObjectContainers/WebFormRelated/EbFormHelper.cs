@@ -4,10 +4,12 @@ using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
 using ExpressBase.Objects.ServiceStack_Artifacts;
+using ExpressBase.Objects.WebFormRelated;
 using ServiceStack;
 using ServiceStack.Redis;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Reflection;
 using System.Text;
 
@@ -288,6 +290,30 @@ namespace ExpressBase.Objects
                 if (Redis != null) Redis.Set<T>(RefId, _ebObject);
             }
             return _ebObject;
+        }
+
+        public static void AddExtraSqlParams(List<DbParameter> param, IDatabase DataDB, string tableName, int rowId, int locId, int userId)
+        {
+            if (param.Find(e => e.ParameterName == FormConstants.eb_loc_id) == null)
+                param.Add(DataDB.GetNewParameter(FormConstants.eb_loc_id, EbDbTypes.Decimal, locId));
+            if (param.Find(e => e.ParameterName == FormConstants.eb_currentuser_id) == null)
+                param.Add(DataDB.GetNewParameter(FormConstants.eb_currentuser_id, EbDbTypes.Decimal, userId));
+            if (param.Find(e => e.ParameterName == tableName + FormConstants._id) == null)
+                param.Add(DataDB.GetNewParameter(tableName + FormConstants._id, EbDbTypes.Int32, rowId));
+            if (param.Find(e => e.ParameterName == FormConstants.id) == null)
+                param.Add(DataDB.GetNewParameter(FormConstants.id, EbDbTypes.Int32, rowId));
+        }
+
+        public static bool IsExtraSqlParam(string paramName, string tableName)
+        {
+            List<string> _params = new List<string> 
+            {
+                { FormConstants.eb_loc_id},
+                { FormConstants.eb_currentuser_id},
+                { tableName + FormConstants._id},
+                { FormConstants.id}
+            };
+            return _params.Contains(paramName);
         }
     }
 
