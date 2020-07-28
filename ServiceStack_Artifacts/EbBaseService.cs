@@ -2,14 +2,12 @@
 using ExpressBase.Common.Connections;
 using ExpressBase.Common.Constants;
 using ExpressBase.Common.Data;
-using ExpressBase.Common.EbServiceStack;
-using ExpressBase.Common.EbServiceStack.ReqNRes;
+using ExpressBase.Security;
 using ExpressBase.Common.LocationNSolution;
 using ExpressBase.Common.ServiceClients;
 using ExpressBase.Common.SqlProfiler;
 using ExpressBase.Common.Structures;
 using Newtonsoft.Json;
-using Npgsql;
 using RestSharp;
 using ServiceStack;
 using ServiceStack.Logging;
@@ -18,7 +16,6 @@ using ServiceStack.RabbitMq;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
-using System.Globalization;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
@@ -244,6 +241,44 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             }
             return s_obj;
         }
+
+        public User GetUserObject(string userAuthId)
+        {
+            User user = null;
+            try
+            {
+                if (userAuthId != string.Empty)
+                {
+                    string[] parts = userAuthId.Split(":"); // iSolutionId:UserId:WhichConsole
+                    if (parts.Length == 3)
+                    {
+                        user = this.Redis.Get<User>(userAuthId);
+                        if (user == null)
+                        {
+                            int uid = 0;
+                            string query = String.Format("SELECT id FROM eb_users WHERE email = '{0}';", parts[1]);
+                            this.EbConnectionFactory = new EbConnectionFactory(parts[0], this.Redis);
+                            EbDataTable dt = this.EbConnectionFactory.DataDB.DoQuery(query);
+                            if (dt.Rows.Count > 0)
+                            {
+                                uid = Convert.ToInt32(dt.Rows[0][0]);
+
+                                Gateway.Send<UpdateUserObjectResponse>(new UpdateUserObjectRequest() { SolnId = parts[0], UserId = uid /*Convert.ToInt32(parts[1])*/, UserAuthId = userAuthId, WC = parts[2] });
+                                user = this.Redis.Get<User>(userAuthId);
+                            }
+
+                        }
+                    }
+                    else
+                    { Console.WriteLine("userAuthId incorrect" + userAuthId); }
+                }
+                else
+                { Console.WriteLine("userAuthId incorrect" + userAuthId); }
+            }
+            catch (Exception e) { Console.WriteLine(e.Message + e.StackTrace); }
+            return user;
+        }
+
 
         //private void LoadCache()
         //{
