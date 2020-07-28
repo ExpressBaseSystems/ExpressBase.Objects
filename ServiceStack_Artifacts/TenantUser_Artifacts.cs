@@ -620,6 +620,36 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
 
     }
+    [DataContract]
+    public class UpdateUserObjectRequest : EbServiceStackNoAuthRequest, IReturn<UpdateUserObjectResponse>
+    {
+        [DataMember(Order = 1)]
+        public string SolnId { get; set; }
+
+        [DataMember(Order = 2)]
+        public int UserId { get; set; }
+
+        [DataMember(Order = 3)]
+        public string WC { get; set; }
+
+        [DataMember(Order = 4)]
+        public string UserAuthId { get; set; }
+        
+        [DataMember(Order = 5)]
+        public string UserIp { get; set; }
+        
+        [DataMember(Order = 6)]
+        public string DeviceId { get; set; }
+    }
+
+    [DataContract]
+    public class UpdateUserObjectResponse : IEbSSResponse
+    {
+
+        [DataMember(Order = 1)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+    }
 
     [DataContract]
     public class DeleteLocRequest : IReturn<DeleteLocResponse>, IEbSSRequest

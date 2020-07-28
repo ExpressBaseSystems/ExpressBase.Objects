@@ -44,8 +44,8 @@ namespace ExpressBase.Objects
             {
                 IsDynamic = true;
             }
-            else if (IsInsertable)
-                AddButton = new EbButton();
+            //else if (IsInsertable)
+            //AddButton = new EbButton();
         }
 
         //public override string SetValueJSfn
@@ -182,14 +182,14 @@ else
         {
             if (this.IsInsertable)
             {
-                AddButton = new EbButton()
-                {
-                    EbSid = EbSid + "_addbtn",
-                    EbSid_CtxId = EbSid_CtxId + "_addbtn",
-                    Name = Name + "_addbtn",
-                    FormRefId = FormRefId,
-                    Label = "<i class='fa fa-plus' aria-hidden='true'></i>"
-                };
+                //AddButton = new EbButton()
+                //{
+                //    EbSid = EbSid + "_addbtn",
+                //    EbSid_CtxId = EbSid_CtxId + "_addbtn",
+                //    Name = Name + "_addbtn",
+                //    FormRefId = FormRefId,
+                //    Label = "<i class='fa fa-plus' aria-hidden='true'></i>"
+                //};
             }
             if (this.Padding == null)
                 this.Padding = new UISides() { Bottom = 7, Left = 10, Top = 7, Right = 10 };
@@ -198,9 +198,9 @@ else
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [HideInPropertyGrid]
-        public EbButton AddButton { set; get; }
+        //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        //[HideInPropertyGrid]
+        //public EbButton AddButton { set; get; }
 
         public override string JustSetValueJSfn
         {
@@ -531,7 +531,7 @@ else// PS
         [PropertyEditor(PropertyEditorType.Collection)]
         [Alias("Options")]
         public List<EbSimpleSelectOption> Options { get; set; }
-        
+
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         public List<Param> ParamsList { get; set; }
@@ -543,7 +543,7 @@ else// PS
                 int noOfFileds = this.DisplayMembers.Count;
                 int i = 0;
                 string rs = "<div id='@ebsid@Wraper' class='search-wraper' data-toggle='tooltip' @addBtnRealtedWidthChange@ title='@tooltipText@'>"
-.Replace("@addBtnRealtedWidthChange@", IsInsertable ? "style='width: calc( 100% - 33px)'" : string.Empty);
+.Replace("@addBtnRealtedWidthChange@", IsInsertable ? "style='width: calc( 100% - 32px)'" : string.Empty);
                 foreach (DVBaseColumn obj in this.DisplayMembers)
                 {
                     rs += @"
@@ -670,7 +670,7 @@ else// PS
     .Replace("@width", 900.ToString())//this.Width.ToString())
     .Replace("@perWidth", (this.DisplayMembers.Count != 0) ? (900 / this.DisplayMembers.Count).ToString() : 900.ToString())
     .Replace("@DDwidth", (this.DropdownWidth == 0) ? "100" : this.DropdownWidth.ToString())
-    .Replace("@addbtn@", this.IsInsertable ? string.Concat("<div class='ps-addbtn-cont'>", this.AddButton.GetBareHtml(), "</div>") : string.Empty)
+    .Replace("@addbtn@", this.IsInsertable ? string.Concat("<div class='ps-addbtn' id='" + EbSid_CtxId + "_addbtn'><i class='fa fa-plus' aria-hidden='true'></i></div>") : string.Empty)
     .Replace("@tooltipText@", this.ToolTipText ?? string.Empty);
             }
             else
@@ -705,15 +705,17 @@ else// PS
             if (this.DisplayMembers != null)
             {
                 return @"
-<div id='@ebsid@Container'  role='form' data-toggle='validator' style='width:100%;'>
+<div id='@ebsid@Container' class='ps-cont'  role='form' data-toggle='validator' style='width:100%;'>    
+    @addbtn@
     <input type='hidden' ui-inp name='@ebsid@Hidden4val' data-ebtype='8' id='@ebsid@'/>
     @VueSelectCode
     <center class='pow-center'>
         <div id='@ebsid@DDdiv' v-show='DDstate' class='DDdiv expand-transition'  style='width:@DDwidth%;'> 
-            @addbtn@
+            <div class='DDclose'><i class='fa fa-close' aria-hidden='true'></i></div>
             <table id='@ebsid@tbl' tabindex='1000' style='width:100%' class='table table-bordered'></table>
         </div>
     </center>
+    <div id='@ebsid@_pb' class='ps-pb'></div>
 </div>"
     .Replace("@VueSelectCode", this.VueSelectcode)
     .Replace("@name@", this.Name)
@@ -721,7 +723,7 @@ else// PS
     .Replace("@width", 900.ToString())//this.Width.ToString())
     .Replace("@perWidth", (this.DisplayMembers.Count != 0) ? (900 / this.DisplayMembers.Count).ToString() : 900.ToString())
     .Replace("@DDwidth", (this.DropdownWidth == 0) ? "100" : this.DropdownWidth.ToString())
-    .Replace("@addbtn@", this.IsInsertable ? string.Concat("<div class='ps-addbtn-cont'>", this.AddButton.GetBareHtml(), "</div>") : string.Empty)
+    .Replace("@addbtn@", this.IsInsertable ? string.Concat("<div class='ps-addbtn' id='" + ebsid + "_addbtn'><i class='fa fa-plus' aria-hidden='true'></i></div>") : string.Empty)
     .Replace("@tooltipText@", this.ToolTipText ?? string.Empty);
             }
             else
@@ -730,8 +732,8 @@ else// PS
 
         public void FetchParamsMeta(IServiceClient ServiceClient, IRedisClient Redis)
         {
-            EbDataReader DrObj = EbFormHelper.GetEbObject<EbDataReader>(this.DataSourceId, ServiceClient, Redis, null);            
-            this.ParamsList = DrObj.GetParams(Redis as RedisClient); 
+            EbDataReader DrObj = EbFormHelper.GetEbObject<EbDataReader>(this.DataSourceId, ServiceClient, Redis, null);
+            this.ParamsList = DrObj.GetParams(Redis as RedisClient);
         }
 
         private string GetSql(Service service)

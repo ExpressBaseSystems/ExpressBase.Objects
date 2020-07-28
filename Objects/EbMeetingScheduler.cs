@@ -464,11 +464,15 @@ else if (this.AttendeeConfig === 4)
                     bool IsFixedHost = false;
                     int AttendeeContactIdsCount = Mobj.SlotList[i].Attendees.Where(Item => Item.Type == UsersType.Contact).Count();
                     bool IsFixedAttendee = false;
-                    if (this.HostConfig == UsersType.Users && HostUserIdsCount >= Mobj.MinHost && HostUserIdsCount == Mobj.SlotList[i].Hosts.Count && HostUserIdsCount <= Mobj.MaxHost)
+                    if (Mobj.MaxHost == 0)
+                    {
+                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Hosts, usr, ParticipantOpt.Eligible, ParticipantType.Host, tbl, Mobj.SlotList[i], Mobj.Date, DataDB);
+                    }
+                    else if (this.HostConfig == UsersType.Users && HostUserIdsCount >= Mobj.MinHost && HostUserIdsCount == Mobj.SlotList[i].Hosts.Count && HostUserIdsCount <= Mobj.MaxHost)
                     {
                         IsFixedHost = true;
                         query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Hosts, usr, ParticipantOpt.Fixed, ParticipantType.Host, tbl, Mobj.SlotList[i], Mobj.Date, DataDB);
-                    } 
+                    }
                     else if (this.HostConfig == UsersType.Users && HostUserIdsCount < Mobj.MinHost)
                     {
                         throw new FormException("Schedule Meeting Failed : Minimum Host(s) Required");
@@ -477,21 +481,30 @@ else if (this.AttendeeConfig === 4)
                     {
                         query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Hosts, usr, ParticipantOpt.Eligible, ParticipantType.Host, tbl, Mobj.SlotList[i], Mobj.Date, DataDB);
                     }
-                    if (this.AttendeeConfig == UsersType.Users && AttendeeUserIdsCount >= Mobj.MinAttendee && AttendeeUserIdsCount == Mobj.SlotList[i].Attendees.Count && AttendeeUserIdsCount <= Mobj.MaxAttendee)
+                    if (Mobj.MaxAttendee == 0 && this.AttendeeConfig == UsersType.Contact )
+                    {
+                        query += AddPersons(Mobj.SlotList[i].Attendees, usr, ParticipantOpt.Fixed, ParticipantType.Attendee, tbl, Mobj.SlotList[i], Mobj.Date, DataDB);
+                    }
+                    else if (Mobj.MaxAttendee == 0)
+                    {
+                        IsFixedAttendee = true;
+                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Attendees, usr, ParticipantOpt.Eligible, ParticipantType.Attendee, tbl, Mobj.SlotList[i], Mobj.Date, DataDB);
+                    }
+                    else if (this.AttendeeConfig == UsersType.Users && AttendeeUserIdsCount >= Mobj.MinAttendee && AttendeeUserIdsCount == Mobj.SlotList[i].Attendees.Count && AttendeeUserIdsCount <= Mobj.MaxAttendee)
                     {
                         IsFixedAttendee = true;
                         query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Attendees, usr, ParticipantOpt.Fixed, ParticipantType.Attendee, tbl, Mobj.SlotList[i], Mobj.Date, DataDB);
                     }
-                    else if( this.AttendeeConfig == UsersType.Contact && AttendeeContactIdsCount >= Mobj.MinAttendee && AttendeeContactIdsCount == Mobj.SlotList[i].Attendees.Count && AttendeeContactIdsCount <= Mobj.MaxAttendee)
+                    else if (this.AttendeeConfig == UsersType.Contact && AttendeeContactIdsCount >= Mobj.MinAttendee && AttendeeContactIdsCount == Mobj.SlotList[i].Attendees.Count && AttendeeContactIdsCount <= Mobj.MaxAttendee)
                     {
                         IsFixedAttendee = true;
                         query += AddPersons(Mobj.SlotList[i].Attendees, usr, ParticipantOpt.Fixed, ParticipantType.Attendee, tbl, Mobj.SlotList[i], Mobj.Date, DataDB);
-                    } 
-                    else if(this.AttendeeConfig == UsersType.Users && HostUserIdsCount < Mobj.MinAttendee)
+                    }
+                    else if (this.AttendeeConfig == UsersType.Users && HostUserIdsCount < Mobj.MinAttendee)
                     {
                         throw new FormException("Schedule Meeting Failed : Minimum Attendee(s) Required");
                     }
-                    else if(this.AttendeeConfig == UsersType.Contact && AttendeeContactIdsCount < Mobj.MinAttendee)
+                    else if (this.AttendeeConfig == UsersType.Contact && AttendeeContactIdsCount < Mobj.MinAttendee)
                     {
                         throw new FormException("Schedule Meeting Failed : Minimum Attendee(s) Required");
                     }
@@ -513,22 +526,59 @@ else if (this.AttendeeConfig === 4)
 
                     int HostUserIdsCount = Mobj.SlotList[i].Hosts.Where(Item => Item.Type == UsersType.Users).Count();
                     int AttendeeUserIdsCount = Mobj.SlotList[i].Attendees.Where(Item => Item.Type == UsersType.Users).Count();
-                    if (HostUserIdsCount == Mobj.MaxHost && HostUserIdsCount == Mobj.SlotList[i].Hosts.Count)
+                    bool IsFixedHost = false;
+                    int AttendeeContactIdsCount = Mobj.SlotList[i].Attendees.Where(Item => Item.Type == UsersType.Contact).Count();
+                    bool IsFixedAttendee = false;
+                    if (Mobj.MaxHost == 0)
                     {
+                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Attendees, usr, ParticipantOpt.Eligible, ParticipantType.Host, tbl, Mobj.SlotList[i], Mobj.Date, DataDB);
+                    }
+                    else if (this.HostConfig == UsersType.Users && HostUserIdsCount >= Mobj.MinHost && HostUserIdsCount == Mobj.SlotList[i].Hosts.Count && HostUserIdsCount <= Mobj.MaxHost)
+                    {
+                        IsFixedHost = true;
                         query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Hosts, usr, ParticipantOpt.Fixed, ParticipantType.Host, tbl, Mobj.SlotList[i], Mobj.Date, DataDB);
+                    }
+                    else if (this.HostConfig == UsersType.Users && HostUserIdsCount < Mobj.MinHost)
+                    {
+                        throw new FormException("Schedule Meeting Failed : Minimum Host(s) Required");
                     }
                     else
                     {
                         query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Hosts, usr, ParticipantOpt.Eligible, ParticipantType.Host, tbl, Mobj.SlotList[i], Mobj.Date, DataDB);
                     }
-                    if (AttendeeUserIdsCount == Mobj.MaxAttendee && AttendeeUserIdsCount == Mobj.SlotList[i].Attendees.Count)
+                    if (Mobj.MaxAttendee == 0 && this.AttendeeConfig != UsersType.Contact)
                     {
+                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Attendees, usr, ParticipantOpt.Eligible, ParticipantType.Attendee, tbl, Mobj.SlotList[i], Mobj.Date, DataDB);
+                    }
+                    else if(Mobj.MaxAttendee == 0 && this.AttendeeConfig == UsersType.Contact)
+                    {
+                        IsFixedAttendee = true;
+                        query += AddPersons(Mobj.SlotList[i].Attendees, usr, ParticipantOpt.Fixed, ParticipantType.Attendee, tbl, Mobj.SlotList[i], Mobj.Date, DataDB);
+
+                    }
+                    else if (this.AttendeeConfig == UsersType.Users && AttendeeUserIdsCount >= Mobj.MinAttendee && AttendeeUserIdsCount == Mobj.SlotList[i].Attendees.Count && AttendeeUserIdsCount <= Mobj.MaxAttendee)
+                    {
+                        IsFixedAttendee = true;
                         query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Attendees, usr, ParticipantOpt.Fixed, ParticipantType.Attendee, tbl, Mobj.SlotList[i], Mobj.Date, DataDB);
+                    }
+                    else if (this.AttendeeConfig == UsersType.Contact && AttendeeContactIdsCount >= Mobj.MinAttendee && AttendeeContactIdsCount == Mobj.SlotList[i].Attendees.Count && AttendeeContactIdsCount <= Mobj.MaxAttendee)
+                    {
+                        IsFixedAttendee = true;
+                        query += AddPersons(Mobj.SlotList[i].Attendees, usr, ParticipantOpt.Fixed, ParticipantType.Attendee, tbl, Mobj.SlotList[i], Mobj.Date, DataDB);
+                    }
+                    else if (this.AttendeeConfig == UsersType.Users && HostUserIdsCount < Mobj.MinAttendee)
+                    {
+                        throw new FormException("Schedule Meeting Failed : Minimum Attendee(s) Required");
+                    }
+                    else if (this.AttendeeConfig == UsersType.Contact && AttendeeContactIdsCount < Mobj.MinAttendee)
+                    {
+                        throw new FormException("Schedule Meeting Failed : Minimum Attendee(s) Required");
                     }
                     else
                     {
                         query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Attendees, usr, ParticipantOpt.Eligible, ParticipantType.Attendee, tbl, Mobj.SlotList[i], Mobj.Date, DataDB);
                     }
+                    query += $@"update eb_meeting_slots set meeting_opts = {SetMeetingOpts(IsFixedHost, IsFixedAttendee)} where id = eb_currval('eb_meeting_slots_id_seq') ;";
                 }
             }
             else if (Mobj.MeetingType == MeetingType.AdvancedMeeting)
@@ -884,7 +934,7 @@ else if (this.AttendeeConfig === 4)
             return qry;
         }
     }
- 
+
     public class MeetingSchedule
     {
         public string Title { get; set; }
