@@ -22,6 +22,7 @@ namespace ExpressBase.Objects.WebFormRelated
         public const string eb_del = "eb_del";
         public const string eb_void = "eb_void";
         public const string eb_loc_id = "eb_loc_id";
+        public const string eb_currentuser_id = "eb_currentuser_id";
         public const string eb_signin_log_id = "eb_signin_log_id";
         //_vals
         public const string _id = "_id";

@@ -542,7 +542,8 @@ else// PS
             {
                 int noOfFileds = this.DisplayMembers.Count;
                 int i = 0;
-                string rs = "<div id='@ebsid@Wraper' class='search-wraper' data-toggle='tooltip' title='@tooltipText@'>";
+                string rs = "<div id='@ebsid@Wraper' class='search-wraper' data-toggle='tooltip' @addBtnRealtedWidthChange@ title='@tooltipText@'>"
+.Replace("@addBtnRealtedWidthChange@", IsInsertable ? "style='width: calc( 100% - 33px)'" : string.Empty);
                 foreach (DVBaseColumn obj in this.DisplayMembers)
                 {
                     rs += @"
@@ -651,12 +652,13 @@ else// PS
             if (this.DisplayMembers != null)
             {
                 return @"
-<div id='@ebsid@Container' class='ps-cont'  role='form' data-toggle='validator' style='width:100%;'>
+<div id='@ebsid@Container' class='ps-cont'  role='form' data-toggle='validator' style='width:100%;'>    
+    @addbtn@
     <input type='hidden' ui-inp name='@ebsid@Hidden4val' data-ebtype='8' id='@ebsid@'/>
     @VueSelectCode
     <center class='pow-center'>
         <div id='@ebsid@DDdiv' v-show='DDstate' class='DDdiv expand-transition'  style='width:@DDwidth%;'> 
-            @addbtn@
+            <div class='DDclose'><i class='fa fa-close' aria-hidden='true'></i></div>
             <table id='@ebsid@tbl' tabindex='1000' style='width:100%' class='table table-bordered'></table>
         </div>
     </center>

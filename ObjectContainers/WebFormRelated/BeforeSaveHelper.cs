@@ -61,6 +61,12 @@ namespace ExpressBase.Objects.WebFormRelated
                     MatchCollection matchColl = Regex.Matches(code, @"(?<=@)(\w+)|(?<=:)(\w+)");
                     foreach (Match match in matchColl)
                     {
+                        if (EbFormHelper.IsExtraSqlParam(match.Value, _this.TableName))
+                        {
+                            if (!QryParms.ContainsKey(match.Value))
+                                QryParms.Add(match.Value, _this.TableName);
+                            continue;
+                        }
                         KeyValuePair<int, EbControlWrapper> item = _dict.FirstOrDefault(e => e.Value.Control.Name == match.Value);
                         if (item.Value == null)
                             throw new FormException($"Can't resolve {match.Value} in {ebReviewCtrl.Name}(review) control's SQL query of stage {stage.Name}");
@@ -201,6 +207,9 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                 }
                 else if (Allctrls[i] is EbProvisionUser && serviceClient != null)
                 {
+
+
+
                     CheckEmailConAvailableResponse Resp = serviceClient.Post<CheckEmailConAvailableResponse>(new CheckEmailConAvailableRequest { });
                     if (!Resp.ConnectionAvailable)
                         throw new FormException("Please configure a email connection, it is required for ProvisionUser control.");

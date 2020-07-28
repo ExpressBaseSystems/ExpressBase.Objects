@@ -268,12 +268,7 @@ namespace ExpressBase.Objects
                     if (QrsDict.Count > 0)
                     {
                         List<DbParameter> param = new List<DbParameter>();
-
-                        if (param.Find(e => e.ParameterName == FormConstants.eb_loc_id) == null)
-                            param.Add(DataDB.GetNewParameter(FormConstants.eb_loc_id, EbDbTypes.Decimal, this.LocationId));
-
-                        if (param.Find(e => e.ParameterName == "eb_currentuser_id") == null)
-                            param.Add(DataDB.GetNewParameter("eb_currentuser_id", EbDbTypes.Decimal, this.UserObj.UserId));
+                        EbFormHelper.AddExtraSqlParams(param, DataDB, this.TableName, RowId, this.LocationId, this.UserObj.UserId);
 
                         EbDataSet dataset = DataDB.DoQueries(string.Join(CharConstants.SPACE, QrsDict.Select(d => d.Value)), param.ToArray());
                         int i = 0;
@@ -455,12 +450,7 @@ namespace ExpressBase.Objects
             }
             if (QrsDict.Count > 0)
             {
-                if (psParams.Find(e => e.ParameterName == FormConstants.eb_loc_id) == null)
-                    psParams.Add(DataDB.GetNewParameter(FormConstants.eb_loc_id, EbDbTypes.Decimal, this.LocationId));
-
-                if (psParams.Find(e => e.ParameterName == "eb_currentuser_id") == null)
-                    psParams.Add(DataDB.GetNewParameter("eb_currentuser_id", EbDbTypes.Decimal, this.UserObj.UserId));
-
+                EbFormHelper.AddExtraSqlParams(psParams, DataDB, this.TableName, 0, this.LocationId, this.UserObj.UserId);
                 EbDataSet dataset = DataDB.DoQueries(string.Join(CharConstants.SPACE, QrsDict.Select(d => d.Value)), psParams.ToArray());
                 int i = 0;
                 foreach (KeyValuePair<string, string> item in QrsDict)
@@ -1280,7 +1270,6 @@ namespace ExpressBase.Objects
             if (!psquery.IsNullOrEmpty() && !backup)
             {
                 List<DbParameter> param = new List<DbParameter>();
-                param.Add(DataDB.GetNewParameter(_FormData.MasterTable + FormConstants._id, EbDbTypes.Int32, this.TableRowId));
                 this.LocationId = _FormData.MultipleTables[_FormData.MasterTable][0].LocId;
 
                 for (int i = 0; i < _schema.Tables.Count && dataset.Tables.Count >= _schema.Tables.Count; i++)
@@ -1306,12 +1295,7 @@ namespace ExpressBase.Objects
                     }
                 }
 
-                //if eb_loc_id control is not present then form data entered location adding as 'eb_loc_id' 
-                if (param.Find(e => e.ParameterName == FormConstants.eb_loc_id) == null)
-                    param.Add(DataDB.GetNewParameter(FormConstants.eb_loc_id, EbDbTypes.Decimal, this.LocationId));
-
-                if (param.Find(e => e.ParameterName == "eb_currentuser_id") == null)
-                    param.Add(DataDB.GetNewParameter("eb_currentuser_id", EbDbTypes.Decimal, this.UserObj.UserId));
+                EbFormHelper.AddExtraSqlParams(param, DataDB, this.TableName, this.TableRowId, this.LocationId, this.UserObj.UserId);
 
                 EbDataSet ds;
                 if (this.DbConnection == null)
@@ -1375,11 +1359,7 @@ namespace ExpressBase.Objects
 
             if (QrsDict.Count > 0)
             {
-                if (param.Find(e => e.ParameterName == FormConstants.eb_loc_id) == null)
-                    param.Add(DataDB.GetNewParameter(FormConstants.eb_loc_id, EbDbTypes.Decimal, this.LocationId));
-
-                if (param.Find(e => e.ParameterName == "eb_currentuser_id") == null)
-                    param.Add(DataDB.GetNewParameter("eb_currentuser_id", EbDbTypes.Decimal, this.UserObj.UserId));
+                EbFormHelper.AddExtraSqlParams(param, DataDB, this.TableName, this.TableRowId, this.LocationId, this.UserObj.UserId);
 
                 EbDataSet dataset = DataDB.DoQueries(string.Join(CharConstants.SPACE, QrsDict.Select(d => d.Value)), param.ToArray());
                 int i = 0;
@@ -1703,6 +1683,8 @@ namespace ExpressBase.Objects
                     int _idx = 0;
                     foreach (KeyValuePair<string, string> p in nextStage.QryParams)
                     {
+                        if (EbFormHelper.IsExtraSqlParam(p.Key, this.TableName))
+                            continue;
                         SingleTable Table = null;
                         if (this.FormData.MultipleTables.ContainsKey(p.Value))
                             Table = this.FormData.MultipleTables[p.Value];
@@ -1723,6 +1705,7 @@ namespace ExpressBase.Objects
                         _params[_idx - 1].ParameterName = p.Key;
                     }
                     List<int> uids = new List<int>();
+                    EbFormHelper.AddExtraSqlParams(_params, DataDB, this.TableName, this.TableRowId, this.LocationId, this.UserObj.UserId);
                     EbDataTable dt = DataDB.DoQuery(nextStage.ApproverUsers.Code, _params.ToArray());
                     foreach (EbDataRow dr in dt.Rows)
                     {
