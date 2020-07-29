@@ -16,6 +16,13 @@ namespace ExpressBase.Objects
         MobileNumber = 3
     }
 
+    public enum MobileTextAlign
+    {
+        Left,
+        Center,
+        Right,
+    }
+
     [EnableInBuilder(BuilderType.MobilePage)]
     public class EbMobileDataColumn : EbMobileControl, INonPersistControl
     {
@@ -30,6 +37,10 @@ namespace ExpressBase.Objects
         public override bool Required { get; set; }
 
         public override bool Hidden { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [MetaOnly]
+        public override string Name { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
@@ -62,10 +73,12 @@ namespace ExpressBase.Objects
                 if (this.RenderAs === 1 ){ 
                         pg.ShowProperty('TextFormat');
                         pg.ShowProperty('Font');
+                        pg.ShowProperty('TextAlign');
                 }
                 else {
                         pg.HideProperty('TextFormat');
                         pg.HideProperty('Font');
+                        pg.HideProperty('TextAlign');
                 }
             ")]
         public DataColumnRenderType RenderAs { set; get; }
@@ -79,6 +92,10 @@ namespace ExpressBase.Objects
         [PropertyGroup("UI")]
         [PropertyEditor(PropertyEditorType.FontSelector)]
         public EbFont Font { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("UI")]
+        public MobileTextAlign TextAlign { set; get; }
 
         public override string GetDesignHtml()
         {
@@ -135,5 +152,36 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.MobilePage)]
         public string ControlName { set; get; }
+    }
+
+    [EnableInBuilder(BuilderType.MobilePage)]
+    public class EbThickness
+    {
+        [EnableInBuilder(BuilderType.MobilePage)]
+        public int Left { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        public int Top { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        public int Right { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        public int Bottom { set; get; }
+
+        public EbThickness() { }
+
+        public EbThickness(int value)
+        {
+            Left = Top = Right = Bottom = value;
+        }
+
+        public EbThickness(int left, int top, int right, int bottom)
+        {
+            Left = left;
+            Top = top;
+            Right = right;
+            Bottom = bottom;
+        }
     }
 }
