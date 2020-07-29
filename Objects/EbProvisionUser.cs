@@ -80,9 +80,9 @@ namespace ExpressBase.Objects
         [ListType(typeof(UsrLocFieldAbstract))]
         public List<UsrLocFieldAbstract> Fields { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm)]
-        [HideInPropertyGrid]
-        public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
+        //[EnableInBuilder(BuilderType.WebForm)]
+        //[HideInPropertyGrid]
+        //public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
 
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.CollectionProp, "UserTypeToRole", "bVisible")]
@@ -92,6 +92,18 @@ namespace ExpressBase.Objects
             }.bind(this));            
         }")]
         public List<EbUserType> UserTypeToRole { get; set; }
+
+        //[EnableInBuilder(BuilderType.WebForm)]
+        //[PropertyEditor(PropertyEditorType.ScriptEditorCS)]
+        //[HideInPropertyGrid]
+        //public EbScript CreateOnlyIf { get; set; }
+
+        //[EnableInBuilder(BuilderType.WebForm)]
+        //[HideInPropertyGrid]
+        //public bool SendPwdViaEmail { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        public bool AllowExistingUser { get; set; }
 
         //--------Hide in property grid------------
 
@@ -137,7 +149,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
-        public override bool DoNotPersist { get { return true; } }
+        public override bool DoNotPersist { get { return false; } }
 
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
@@ -199,7 +211,7 @@ this.Init = function(id)
 {
     let efield = new EbObjects.UsrLocField('email');
     efield.DisplayName = 'Email';
-    efield.IsRequired = true;
+    //efield.IsRequired = true;
 	this.Fields.$values.push(efield);
 	this.Fields.$values.push(new EbObjects.UsrLocField('fullname'));
 	this.Fields.$values.push(new EbObjects.UsrLocField('nickname'));
@@ -264,108 +276,183 @@ this.Init = function(id)
             return $@"SELECT u.id, u.email, u.fullname, u.nickname, u.dob, u.sex, u.alternateemail, u.phnoprimary AS phprimary, u.preferencesjson AS preference, eb_user_types_id AS usertype, u.statusid,
                             STRING_AGG(r2u.role_id::TEXT, ',') AS roles, STRING_AGG(g2u.groupid::TEXT, ',') AS usergroups
                         FROM eb_users u LEFT JOIN eb_role2user r2u ON u.id = r2u.user_id LEFT JOIN eb_user2usergroup g2u ON u.id = g2u.userid
-                        WHERE eb_ver_id = @{masterTbl}_eb_ver_id AND eb_data_id = @{masterTbl}_id GROUP BY u.id";
+                        WHERE eb_ver_id = @{masterTbl}_eb_ver_id AND eb_data_id = @{masterTbl}_id GROUP BY u.id; ";
         }
 
-        private string GetSaveQuery(bool ins, string param, string mtbl, string pemail)
+        //insOnUp - user create on update
+        private string GetSaveQuery(bool ins, string param, string mtbl, string pemail, string pphone, bool insOnUp)
         {
             if (ins)
             {
                 string consqry = string.Empty;
                 if (this.AddLocConstraint)
                     consqry = "SELECT * FROM eb_security_constraints(:eb_createdby, eb_currval('eb_users_id_seq'), '1$no description$1;5;' || eb_currval('eb_locations_id_seq'), '');";
-                return string.Format("SELECT * FROM eb_security_user(:eb_createdby, {0}); UPDATE eb_users SET eb_ver_id = :{1}_eb_ver_id, eb_data_id = eb_currval('{1}_id_seq') WHERE email = {2};", param, mtbl, pemail) + consqry;
+                string ee = $"UPDATE {this.VirtualTable} SET {this.Name} = eb_currval('eb_users_id_seq') WHERE {(this.VirtualTable == mtbl ? "id" : (mtbl + "_id"))} = eb_currval('{mtbl}_id_seq'); ";
+                return $"SELECT * FROM eb_security_user(:eb_createdby, {param}); UPDATE eb_users SET eb_ver_id = :{mtbl}_eb_ver_id, eb_data_id = eb_currval('{mtbl}_id_seq') WHERE {(pphone == string.Empty ? "email" : "phnoprimary")} = {(pphone == string.Empty ? pemail : pphone)};" + ee + consqry;
             }
             else
-                return string.Format("SELECT * FROM eb_security_user(:eb_createdby, {0});", param);
+            {
+                string ee = insOnUp ? $"UPDATE eb_users SET eb_ver_id = :{mtbl}_eb_ver_id, eb_data_id = :{mtbl}_id WHERE {(pphone == string.Empty ? "email" : "phnoprimary")} = {(pphone == string.Empty ? pemail : pphone)};" : string.Empty;
+                ee += insOnUp ? $"UPDATE {this.VirtualTable} SET {this.Name} = eb_currval('eb_users_id_seq') WHERE {(this.VirtualTable == mtbl ? "id" : (mtbl + "_id"))} = :{mtbl}_id; " : string.Empty;
+                return string.Format("SELECT * FROM eb_security_user(:eb_createdby, {0});", param) + ee;
+            }
+                
+        }
+
+        private int GetUserIdByEmailOrPhone(IDatabase DataDB, Dictionary<string, string> _d)
+        {
+            string _s = "LOWER(#) LIKE LOWER(@#)";
+            string sql = string.Empty;
+            List<DbParameter> parameters = new List<DbParameter>();
+            if (_d.ContainsKey("email"))
+            {
+                sql = _s.Replace("#", "email");
+                parameters.Add(DataDB.GetNewParameter("email", EbDbTypes.String, _d["email"]));
+            }
+            if (_d.ContainsKey("phprimary"))
+            {
+                sql = sql == string.Empty ? _s.Replace("#", "phnoprimary") : $"{sql} OR {_s.Replace("#", "phnoprimary")}";
+                parameters.Add(DataDB.GetNewParameter("phnoprimary", EbDbTypes.String, _d["phprimary"]));
+            }
+            sql = $"SELECT id FROM eb_users WHERE ({sql}) AND eb_del = 'F' AND (statusid = 0 OR statusid = 1 OR statusid = 2 OR statusid = 4);";
+            EbDataTable dt = DataDB.DoQuery(sql, parameters.ToArray());
+            return dt.Rows.Count > 0 ? Convert.ToInt32(dt.Rows[0][0]) : 0;
         }
 
         public override bool ParameterizeControl(IDatabase DataDB, List<DbParameter> param, string tbl, SingleColumn cField, bool ins, ref int i, ref string _col, ref string _val, ref string _extqry, User usr, SingleColumn ocF)
         {
             string c = string.Empty;
-            string ep = string.Empty;
-            Dictionary<string, string> _d = JsonConvert.DeserializeObject<Dictionary<string, string>>(Convert.ToString(cField.Value));
+            bool doNotUpdate = false;
+            bool insertOnUpdate = false;
+            Dictionary<string, string> _d = JsonConvert.DeserializeObject<Dictionary<string, string>>(Convert.ToString(cField.F));
+            int nProvUserId = 0;
+            if (_d.ContainsKey("email") || _d.ContainsKey("phprimary"))
+                nProvUserId = this.GetUserIdByEmailOrPhone(DataDB, _d);
             if (ins)
             {
-                string sql = "SELECT id FROM eb_users WHERE LOWER(email) LIKE LOWER(:email) AND eb_del = 'F' AND (statusid = 0 OR statusid = 1 OR statusid = 2);";
-                DbParameter[] parameters = new DbParameter[] { DataDB.GetNewParameter("email", EbDbTypes.String, _d["email"]) };
-                EbDataTable dt = DataDB.DoQuery(sql, parameters);
-                if (dt.Rows.Count > 0)
+                if (nProvUserId > 0)// user already exists
                 {
-                    throw new FormException($"{_d["email"]} already exists", (int)HttpStatusCode.BadRequest, $"Email already exists : {_d["email"]}", "EbProvisionUser => ParameterizeControl");
+                    if (!this.AllowExistingUser)
+                    {
+                        if (_d.ContainsKey("email"))
+                            throw new FormException($"{_d["email"]} already exists", (int)HttpStatusCode.BadRequest, $"Email already exists : {_d["email"]}", "EbProvisionUser => ParameterizeControl");
+                        if (_d.ContainsKey("phprimary"))
+                            throw new FormException($"{_d["phprimary"]} already exists", (int)HttpStatusCode.BadRequest, $"Phone number already exists : {_d["phprimary"]}", "EbProvisionUser => ParameterizeControl");
+                    }
+
+                    _col += string.Concat(cField.Name, ", ");
+                    _val += string.Concat("@", cField.Name, "_", i, ", ");
+                    param.Add(DataDB.GetNewParameter(cField.Name + "_" + i, (EbDbTypes)cField.Type, nProvUserId));
+                    i++;
+                    doNotUpdate = true;
                 }
 
                 this.UserCredentials = new UserCredentials()
                 {
-                    Email = _d["email"],
+                    Email = _d.ContainsKey("email") ? _d["email"] : string.Empty,
+                    Phone = _d.ContainsKey("phprimary") ? _d["phprimary"] : string.Empty,
                     Pwd = this.GetRandomPwd(),
-                    Name = _d.ContainsKey("fullname") ? _d["fullname"] : _d["email"]
+                    Name = _d.ContainsKey("fullname") ? _d["fullname"] : _d["email"],
+                    UserId = nProvUserId
                 };
                 _d.Add("pwd", (this.UserCredentials.Pwd + this.UserCredentials.Email).ToMD5Hash());
 
-                int u_type = Convert.ToInt32(_d["usertype"]);
-                EbUserType ebTyp = this.UserTypeToRole.Find(e => e.iValue == u_type && e.bVisible);
-                if (ebTyp != null)
+                if (_d.ContainsKey("usertype"))
                 {
-                    if (ebTyp.ApprovalRequired)
-                        _d["statusid"] = ((int)EbUserStatus.Unapproved).ToString();
-                    else if (ebTyp.Roles != null && ebTyp.Roles.Count > 0)
-                        _d["roles"] = string.Join(',', ebTyp.Roles);
+                    int u_type = Convert.ToInt32(_d["usertype"]);
+                    EbUserType ebTyp = this.UserTypeToRole.Find(e => e.iValue == u_type && e.bVisible);
+                    if (ebTyp != null)
+                    {
+                        if (ebTyp.ApprovalRequired)
+                            _d["statusid"] = ((int)EbUserStatus.Unapproved).ToString();
+                        else if (ebTyp.Roles != null && ebTyp.Roles.Count > 0)
+                            _d["roles"] = string.Join(',', ebTyp.Roles);
+                    }
                 }
             }
             else
             {
-                Dictionary<string, string> _od = JsonConvert.DeserializeObject<Dictionary<string, string>>(Convert.ToString(ocF.Value));
-                _d["id"] = _od["id"];
-                _d["email"] = _od["email"];
-                _d["usertype"] = _od["usertype"];
-                int oldStatus = Convert.ToInt32(_od["statusid"]);
-                _d["statusid"] = Convert.ToString(oldStatus + 100);
-
-                if (oldStatus == (int)EbUserStatus.Unapproved)
+                int oProvUserId = Convert.ToInt32(ocF.Value);
+                Dictionary<string, string> _od = JsonConvert.DeserializeObject<Dictionary<string, string>>(Convert.ToString(ocF.F));
+                if (_od.ContainsKey("id") && (oProvUserId == nProvUserId))// means user created by this control
                 {
-                    if (usr.Roles.Contains(SystemRoles.SolutionOwner.ToString()) || usr.Roles.Contains(SystemRoles.SolutionAdmin.ToString()))
+                    _d["id"] = _od["id"];
+                    _d["email"] = _od["email"];// remove this line if you want to edit email via prov user ctrl
+                    _d["phprimary"] = _od["phprimary"];
+                    _d["usertype"] = _od["usertype"];
+                    int oldStatus = Convert.ToInt32(_od["statusid"]);
+                    _d["statusid"] = Convert.ToString(oldStatus + 100);
+
+                    if (oldStatus == (int)EbUserStatus.Unapproved)
                     {
-                        int u_type = Convert.ToInt32(_od["usertype"]);
-                        EbUserType ebTyp = this.UserTypeToRole.Find(e => e.iValue == u_type && e.bVisible);
-                        if (ebTyp != null && ebTyp.Roles != null && ebTyp.Roles.Count > 0)
+                        if (usr.Roles.Contains(SystemRoles.SolutionOwner.ToString()) || usr.Roles.Contains(SystemRoles.SolutionAdmin.ToString()))
                         {
-                            _d["roles"] = string.Join(',', ebTyp.Roles);
-                            _d["statusid"] = ((int)EbUserStatus.Active).ToString();
+                            int u_type = Convert.ToInt32(_od["usertype"]);
+                            EbUserType ebTyp = this.UserTypeToRole.Find(e => e.iValue == u_type && e.bVisible);
+                            if (ebTyp != null && ebTyp.Roles != null && ebTyp.Roles.Count > 0)
+                            {
+                                _d["roles"] = string.Join(',', ebTyp.Roles);
+                                _d["statusid"] = ((int)EbUserStatus.Active).ToString();
+                            }
                         }
                     }
-                }
 
-                foreach (KeyValuePair<string, string> item in _od)
-                {
-                    if (!_d.ContainsKey(item.Key))
-                        _d[item.Key] = item.Value;
-                }
-            }
-            for(int k = 0; k < this.FuncParam.Length; k++, i++)
-            {
-                if (_d.ContainsKey(this.FuncParam[k].Name))
-                {
-                    this.FuncParam[k].Value = _d[this.FuncParam[k].Name];
-                }
-                c += string.Concat(":", this.FuncParam[k].Name, "_", i, ", ");
-                if(this.FuncParam[k].Value == DBNull.Value)
-                {
-                    var p = DataDB.GetNewParameter(this.FuncParam[k].Name + "_" + i, this.FuncParam[k].Type);
-                    p.Value = this.FuncParam[k].Value;
-                    param.Add(p);
+                    foreach (KeyValuePair<string, string> item in _od)
+                    {
+                        if (!_d.ContainsKey(item.Key))
+                            _d[item.Key] = item.Value;
+                    }
                 }
                 else
                 {
-                    param.Add(DataDB.GetNewParameter(this.FuncParam[k].Name + "_" + i, this.FuncParam[k].Type, this.FuncParam[k].Value));
+                    doNotUpdate = true;              
+                    if (oProvUserId > 0 && nProvUserId > 0 && oProvUserId != nProvUserId)
+                    {
+                        if (!this.AllowExistingUser)
+                        {
+                            if (_d.ContainsKey("email"))
+                                throw new FormException($"{_d["email"]} already exists", (int)HttpStatusCode.BadRequest, $"Email already exists : {_d["email"]}", "EbProvisionUser => ParameterizeControl");
+                            if (_d.ContainsKey("phprimary"))
+                                throw new FormException($"{_d["phprimary"]} already exists", (int)HttpStatusCode.BadRequest, $"Phone number already exists : {_d["phprimary"]}", "EbProvisionUser => ParameterizeControl");
+                        }
+                        _col += string.Concat(cField.Name, "=@", cField.Name, "_", i, ", ");
+                        param.Add(DataDB.GetNewParameter(cField.Name + "_" + i, (EbDbTypes)cField.Type, nProvUserId));
+                        i++;
+                    }
+                    else if (nProvUserId <= 0)
+                    {
+                        insertOnUpdate = true;
+                    }
                 }
-                
-                if (this.FuncParam[k].Name.Equals("email"))
-                    ep = string.Concat(":", this.FuncParam[k].Name, "_", i);
             }
+            if (!doNotUpdate || insertOnUpdate)
+            {
+                string p_email = string.Empty, p_phone = string.Empty;
+                for (int k = 0; k < this.FuncParam.Length; k++, i++)
+                {
+                    if (_d.ContainsKey(this.FuncParam[k].Name))
+                    {
+                        this.FuncParam[k].Value = _d[this.FuncParam[k].Name];
+                        if (this.FuncParam[k].Name.Equals("email"))
+                            p_email = string.Concat(":", this.FuncParam[k].Name, "_", i);
+                        if (this.FuncParam[k].Name.Equals("phprimary"))
+                            p_phone = string.Concat(":", this.FuncParam[k].Name, "_", i);
+                    }
+                    c += string.Concat(":", this.FuncParam[k].Name, "_", i, ", ");
+                    if (this.FuncParam[k].Value == DBNull.Value)
+                    {
+                        var p = DataDB.GetNewParameter(this.FuncParam[k].Name + "_" + i, this.FuncParam[k].Type);
+                        p.Value = this.FuncParam[k].Value;
+                        param.Add(p);
+                    }
+                    else
+                    {
+                        param.Add(DataDB.GetNewParameter(this.FuncParam[k].Name + "_" + i, this.FuncParam[k].Type, this.FuncParam[k].Value));
+                    }
+                }
 
-            _extqry += this.GetSaveQuery(ins, c.Substring(0, c.Length - 2), tbl, ep);
-            
+                _extqry += this.GetSaveQuery(ins, c.Substring(0, c.Length - 2), tbl, p_email, p_phone, insertOnUpdate);
+            }
             return true;
         }
 
@@ -375,7 +462,8 @@ this.Init = function(id)
             {
                 Name = this.Name,
                 Type = (int)this.EbDbType,
-                Value = "{}",
+                Value = Value ?? 0,
+                F = "{}",
                 Control = this,
                 ObjType = this.ObjType
             };
@@ -469,14 +557,22 @@ this.Init = function(id)
             get
             {
                 return @"
+                //debugger;
+                let updateDataVals = true;
                 if (!this.hasOwnProperty('_finalObj'))
                     this._finalObj = {};
                 $.each(this.Fields.$values, function (i, obj) {
                     if (obj.ControlName !== '') {
+                        if (obj.Control.___DoNotUpdateDataVals){
+                            updateDataVals = false;
+                            return false;
+                        }
                         this._finalObj[obj.Name] = obj.Control.getValueFromDOM();
                     }            
                 }.bind(this));
-                return JSON.stringify(this._finalObj);";
+                if (updateDataVals)
+                    this.DataVals.F = JSON.stringify(this._finalObj);                
+                return this.DataVals.Value;";
             }
             set { }
         }
@@ -486,10 +582,14 @@ this.Init = function(id)
             get
             {
                 return @"
-                this._finalObj = JSON.parse(p1);
+                //debugger;
+                if (!this.DataVals)
+                    return;
+                this._finalObj = JSON.parse(this.DataVals.F);
                 $.each(this.Fields.$values, function (i, obj) {
-                    if (obj.ControlName !== '') {
-                        obj.Control.setValue(this._finalObj[obj.Name]);
+                    if (obj.ControlName !== '' && obj.Control.DoNotPersist && !(obj.Control.ValueExpr && obj.Control.ValueExpr.Code) && p1 > 0) {
+                        if (this._finalObj.hasOwnProperty(obj.Name))
+                            obj.Control.justSetValue(this._finalObj[obj.Name]);
                     }
                 }.bind(this));";
             }
@@ -501,6 +601,7 @@ this.Init = function(id)
             get 
             {
                 return @"
+                    //debugger;
                     $.each(this.Fields.$values, function (i, obj) {
                         if (obj.ControlName !== '') {
                             $('#' + obj.Control.EbSid_CtxId).on('change', p1);
@@ -509,6 +610,8 @@ this.Init = function(id)
             } 
             set { } 
         }
+
+        public override string GetDisplayMemberFromDOMJSfn { get { return @"return '';"; } set { } }
 
         public override string RefreshJSfn { get { return @""; } set { } }
 
@@ -520,7 +623,11 @@ this.Init = function(id)
     {
         public UserCredentials() { }
         
+        public int UserId { get; set; }
+
         public string Email { get; set; }
+
+        public string Phone { get; set; }
 
         public string Pwd { get; set; }
 

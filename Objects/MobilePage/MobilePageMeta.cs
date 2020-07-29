@@ -1,11 +1,12 @@
-﻿using ExpressBase.Common.Structures;
+﻿using ExpressBase.Common.Objects;
+using ExpressBase.Common.Objects.Attributes;
+using ExpressBase.Common.Structures;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace ExpressBase.Objects.Objects.MobilePage
 {
-
     public class MobileFormData
     {
         public string MasterTable { set; get; }
