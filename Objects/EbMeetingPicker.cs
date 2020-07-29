@@ -811,6 +811,7 @@ namespace ExpressBase.Objects
     //Get Meeting Details - display modal
     public class GetMeetingsDetailsResponse
     {
+        public bool ResponseStatus {get;set;}
         public bool IsDirectMeeting { get; set; }
         public List<SlotTable> SlotList { get; set; }
         public List<MeetingParticipants> ParticipantList { get; set; }
