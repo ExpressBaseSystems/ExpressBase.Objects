@@ -299,24 +299,49 @@ this.Init = function(id)
                 
         }
 
-        private int GetUserIdByEmailOrPhone(IDatabase DataDB, Dictionary<string, string> _d)
+        private int GetUserIdByEmailOrPhone(IDatabase DataDB, Dictionary<string, string> _d, ref int flag)
         {
-            string _s = "LOWER(#) LIKE LOWER(@#)";
-            string sql = string.Empty;
+            int userId = 0;
+            string _s = "SELECT id FROM eb_users WHERE LOWER(#) LIKE LOWER(@#) AND eb_del = 'F' AND (statusid = 0 OR statusid = 1 OR statusid = 2 OR statusid = 4);";
+            string sql;
             List<DbParameter> parameters = new List<DbParameter>();
-            if (_d.ContainsKey("email"))
+            if (_d.ContainsKey("email") && _d["email"] != string.Empty)//01
             {
                 sql = _s.Replace("#", "email");
                 parameters.Add(DataDB.GetNewParameter("email", EbDbTypes.String, _d["email"]));
             }
-            if (_d.ContainsKey("phprimary"))
+            else
+                sql = "SELECT 1 WHERE 1 = 0; ";
+            if (_d.ContainsKey("phprimary") && _d["phprimary"] != string.Empty)//10
             {
-                sql = sql == string.Empty ? _s.Replace("#", "phnoprimary") : $"{sql} OR {_s.Replace("#", "phnoprimary")}";
-                parameters.Add(DataDB.GetNewParameter("phnoprimary", EbDbTypes.String, _d["phprimary"]));
+                sql += _s.Replace("#", "phnoprimary");
+                parameters.Add(DataDB.GetNewParameter("email", EbDbTypes.String, _d["phprimary"]));
             }
-            sql = $"SELECT id FROM eb_users WHERE ({sql}) AND eb_del = 'F' AND (statusid = 0 OR statusid = 1 OR statusid = 2 OR statusid = 4);";
-            EbDataTable dt = DataDB.DoQuery(sql, parameters.ToArray());
-            return dt.Rows.Count > 0 ? Convert.ToInt32(dt.Rows[0][0]) : 0;
+            else
+                sql += "SELECT 1 WHERE 1 = 0; ";
+            EbDataSet ds = DataDB.DoQueries(sql, parameters.ToArray());
+
+            if (ds.Tables[0].Rows.Count > 0)
+            {
+                userId = Convert.ToInt32(ds.Tables[0].Rows[0][0]);
+                flag = 1;
+            }
+            if (ds.Tables[1].Rows.Count > 0)
+            {
+                userId = Convert.ToInt32(ds.Tables[1].Rows[0][0]);
+                flag |= 2;
+            }
+            return userId;
+        }
+
+        private void ThrowExistingUserException(Dictionary<string, string> _d, int flag)
+        {
+            if (_d.ContainsKey("email") && _d["email"] != string.Empty && _d.ContainsKey("phprimary") && _d["phprimary"] != string.Empty && flag == 3)
+                throw new FormException($"{_d["email"]} and {_d["phprimary"]} already exists", (int)HttpStatusCode.BadRequest, $"Email and Phone already exists : {_d["email"]}, {_d["phprimary"]}", "EbProvisionUser => ParameterizeControl");
+            if (_d.ContainsKey("email") && _d["email"] != string.Empty && flag == 1)
+                throw new FormException($"{_d["email"]} already exists", (int)HttpStatusCode.BadRequest, $"Email already exists : {_d["email"]}", "EbProvisionUser => ParameterizeControl");
+            if (_d.ContainsKey("phprimary") && _d["phprimary"] != string.Empty && flag == 2)
+                throw new FormException($"{_d["phprimary"]} already exists", (int)HttpStatusCode.BadRequest, $"Phone number already exists : {_d["phprimary"]}", "EbProvisionUser => ParameterizeControl");
         }
 
         public override bool ParameterizeControl(IDatabase DataDB, List<DbParameter> param, string tbl, SingleColumn cField, bool ins, ref int i, ref string _col, ref string _val, ref string _extqry, User usr, SingleColumn ocF)
@@ -326,19 +351,15 @@ this.Init = function(id)
             bool insertOnUpdate = false;
             Dictionary<string, string> _d = JsonConvert.DeserializeObject<Dictionary<string, string>>(Convert.ToString(cField.F));
             int nProvUserId = 0;
-            if (_d.ContainsKey("email") || _d.ContainsKey("phprimary"))
-                nProvUserId = this.GetUserIdByEmailOrPhone(DataDB, _d);
+            int flag = 0;
+            if ((_d.ContainsKey("email") && _d["email"] != string.Empty) || (_d.ContainsKey("phprimary") && _d["phprimary"] != string.Empty))
+                nProvUserId = this.GetUserIdByEmailOrPhone(DataDB, _d, ref flag);
             if (ins)
             {
                 if (nProvUserId > 0)// user already exists
                 {
                     if (!this.AllowExistingUser)
-                    {
-                        if (_d.ContainsKey("email"))
-                            throw new FormException($"{_d["email"]} already exists", (int)HttpStatusCode.BadRequest, $"Email already exists : {_d["email"]}", "EbProvisionUser => ParameterizeControl");
-                        if (_d.ContainsKey("phprimary"))
-                            throw new FormException($"{_d["phprimary"]} already exists", (int)HttpStatusCode.BadRequest, $"Phone number already exists : {_d["phprimary"]}", "EbProvisionUser => ParameterizeControl");
-                    }
+                        this.ThrowExistingUserException(_d, flag);
 
                     _col += string.Concat(cField.Name, ", ");
                     _val += string.Concat("@", cField.Name, "_", i, ", ");
@@ -409,12 +430,8 @@ this.Init = function(id)
                     if (oProvUserId > 0 && nProvUserId > 0 && oProvUserId != nProvUserId)
                     {
                         if (!this.AllowExistingUser)
-                        {
-                            if (_d.ContainsKey("email"))
-                                throw new FormException($"{_d["email"]} already exists", (int)HttpStatusCode.BadRequest, $"Email already exists : {_d["email"]}", "EbProvisionUser => ParameterizeControl");
-                            if (_d.ContainsKey("phprimary"))
-                                throw new FormException($"{_d["phprimary"]} already exists", (int)HttpStatusCode.BadRequest, $"Phone number already exists : {_d["phprimary"]}", "EbProvisionUser => ParameterizeControl");
-                        }
+                            this.ThrowExistingUserException(_d, flag);
+
                         _col += string.Concat(cField.Name, "=@", cField.Name, "_", i, ", ");
                         param.Add(DataDB.GetNewParameter(cField.Name + "_" + i, (EbDbTypes)cField.Type, nProvUserId));
                         i++;
