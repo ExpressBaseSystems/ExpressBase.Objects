@@ -11,51 +11,6 @@ using System.Linq;
 namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.MobilePage)]
-    public class EbMobileControl : EbMobilePageBase
-    {
-        public virtual string EbSid { set; get; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyEditor(PropertyEditorType.MultiLanguageKeySelector)]
-        [UIproperty]
-        [PropertyGroup("Core")]
-        public virtual string Label { set; get; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [HideInPropertyGrid]
-        public virtual EbDbTypes EbDbType { get { return EbDbTypes.String; } set { } }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("Behavior")]
-        public virtual bool Hidden { set; get; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [HelpText("Set true if want unique value for this control on every form save.")]
-        [PropertyGroup("Behavior")]
-        public virtual bool Unique { get; set; }
-
-        [PropertyGroup("Behavior")]
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [HelpText("Set true if you want to make this control read only.")]
-        public virtual bool ReadOnly { get; set; }
-
-        [PropertyGroup("Behavior")]
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [HelpText("Set true if you dont want to save value from this field.")]
-        public virtual bool DoNotPersist { get; set; }
-
-        [PropertyGroup("Behavior")]
-        [EnableInBuilder(BuilderType.MobilePage)]
-        public virtual bool Required { get; set; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [HideInPropertyGrid]
-        public virtual string Icon { get { return string.Empty; } }
-
-        public virtual EbControl GetWebFormCtrl(int counter) { return null; }
-    }
-
-    [EnableInBuilder(BuilderType.MobilePage)]
     public class EbMobileTextBox : EbMobileControl
     {
         [EnableInBuilder(BuilderType.MobilePage)]
@@ -422,11 +377,11 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("Behavior")]
-        public bool MultiSelect { set; get; }
+        public virtual bool MultiSelect { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("Behavior")]
-        public bool EnableEdit { set; get; }
+        public virtual bool EnableEdit { set; get; }
 
         public override string GetDesignHtml()
         {
@@ -495,81 +450,6 @@ namespace ExpressBase.Objects
                 Label = this.Label
             };
         }
-    }
-
-    [EnableInBuilder(BuilderType.MobilePage)]
-    public class EbMobileTableLayout : EbMobileControl, ILayoutControl
-    {
-        public EbMobileTableLayout()
-        {
-            this.CellCollection = new List<EbMobileTableCell>();
-        }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [HideInPropertyGrid]
-        public int RowCount { set; get; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [HideInPropertyGrid]
-        public int ColumCount { set; get; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [HideInPropertyGrid]
-        public List<EbMobileTableCell> CellCollection { set; get; }
-
-        public override bool Hidden { set; get; }
-
-        public override bool Unique { get; set; }
-
-        public override string GetDesignHtml()
-        {
-            return @"<div class='eb_mob_tablelayout mob_control dropped' eb-type='EbMobileTableLayout' id='@id'>
-                        <div class='eb_mob_tablelayout_inner'>
-                            
-                        </div>
-                    </div>".RemoveCR().DoubleQuoted();
-        }
-
-        public override string GetJsInitFunc()
-        {
-            return @"
-                this.Init = function(id)
-                {
-                    this.RowCount = 2;
-                    this.ColumCount= 2;
-                };";
-        }
-
-        public override EbControl GetWebFormCtrl(int counter)
-        {
-            return new EbTableLayout
-            {
-                EbSid = "TableLayout" + counter,
-                Name = this.Name,
-                Label = this.Label
-            };
-        }
-    }
-
-    [EnableInBuilder(BuilderType.MobilePage)]
-    public class EbMobileTableCell : EbMobilePageBase
-    {
-        public EbMobileTableCell()
-        {
-            this.ControlCollection = new List<EbMobileControl>();
-        }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        public int RowIndex { set; get; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        public int ColIndex { set; get; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        public int Width { set; get; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        public List<EbMobileControl> ControlCollection { set; get; }
     }
 
     [EnableInBuilder(BuilderType.MobilePage)]
@@ -777,6 +657,55 @@ namespace ExpressBase.Objects
             return new EbAutoId
             {
                 EbSid = "AutoId" + counter,
+                Name = this.Name,
+                Margin = new UISides { Top = 0, Bottom = 0, Left = 0, Right = 0 },
+                Label = this.Label
+            };
+        }
+    }
+
+    [EnableInBuilder(BuilderType.MobilePage)]
+    public class EbMobileDisplayPicture : EbMobileFileUpload
+    {
+        public override bool MultiSelect => false;
+
+        public override bool EnableEdit { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
+        public override EbDbTypes EbDbType { get { return EbDbTypes.String; } set { } }
+
+        public override string GetDesignHtml()
+        {
+            return @"<div class='eb_stacklayout mob_control dropped' id='@id' eb-type='EbMobileDisplayPicture' tabindex='1' onclick='$(this).focus()'>
+                            <label class='ctrl_label'> @Label </label>
+                            <div class='eb_ctrlhtml'>
+                                <div class='dp-avatar'>
+                                    <img src='/images/image.png'/>
+                                </div>
+                                <div class='dp-btn-container'>
+                                    <button class='eb_mob_fupbtn filesbtn'><i class='fa fa-folder-open-o'></i></button>
+                                    <button class='eb_mob_fupbtn camerabtn'><i class='fa fa-camera'></i></button>
+                                </div>
+                            </div>
+                        </div>".RemoveCR().DoubleQuoted();
+        }
+
+        public override string GetJsInitFunc()
+        {
+            return @"
+                this.Init = function(id)
+                {
+                    this.EnableCameraSelect = true;
+                    this.EnableFileSelect= true;
+                };";
+        }
+
+        public override EbControl GetWebFormCtrl(int counter)
+        {
+            return new EbDisplayPicture
+            {
+                EbSid = "DisplayPicture" + counter,
                 Name = this.Name,
                 Margin = new UISides { Top = 0, Bottom = 0, Left = 0, Right = 0 },
                 Label = this.Label

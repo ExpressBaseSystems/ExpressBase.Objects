@@ -1,11 +1,7 @@
-﻿using ExpressBase.Common;
-using ExpressBase.Common.Extensions;
-using ExpressBase.Common.Objects;
+﻿using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace ExpressBase.Objects
 {
@@ -22,22 +18,13 @@ namespace ExpressBase.Objects
         ButtonType = 1
     }
 
-    public enum SortOrder
-    {
-        Ascending = 0,
-        Descending = 1
-    }
-
-    public abstract class EbMobilePageBase : EbObject
-    {
-        
-    }
-
     public interface ILinesEnabled { }
 
     public interface INonPersistControl { }
 
     public interface ILayoutControl { }
+
+    public abstract class EbMobilePageBase : EbObject { }
 
     [EnableInBuilder(BuilderType.MobilePage)]
     [BuilderTypeEnum(BuilderType.MobilePage)]

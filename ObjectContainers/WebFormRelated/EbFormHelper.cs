@@ -195,27 +195,27 @@ namespace ExpressBase.Objects
                     }
                     else if (c is EbProvisionUser)
                     {
-                        if (_this.IsRenderMode)
-                        {
-                            EbProvisionUser prvnCtrl = c as EbProvisionUser;
-                            for (int j = 0; j < prvnCtrl.Fields.Count; j++)
-                            {
-                                UsrLocField prvnFld = prvnCtrl.Fields[j] as UsrLocField;
-                                if (prvnFld.ControlName.IsNullOrEmpty() && prvnFld.IsRequired)
-                                {
-                                    _this.Controls.Insert(i, new EbTextBox()
-                                    {
-                                        Name = "namecustom" + i,
-                                        EbSid = "ebsidcustom" + i,
-                                        EbSid_CtxId = "ebsidcustom" + i,
-                                        Label = prvnFld.DisplayName,
-                                        DoNotPersist = true
-                                    });
-                                    prvnFld.ControlName = "namecustom" + i;
-                                    i++;
-                                }
-                            }
-                        }
+                        //if (_this.IsRenderMode)
+                        //{
+                        //    EbProvisionUser prvnCtrl = c as EbProvisionUser;
+                        //    for (int j = 0; j < prvnCtrl.Fields.Count; j++)
+                        //    {
+                        //        UsrLocField prvnFld = prvnCtrl.Fields[j] as UsrLocField;
+                        //        if (prvnFld.ControlName.IsNullOrEmpty() && (prvnFld.IsRequired || prvnFld.Name == "email" || prvnFld.Name == "phprimary"))
+                        //        {
+                        //            _this.Controls.Insert(i, new EbTextBox()
+                        //            {
+                        //                Name = "namecustom" + i,
+                        //                EbSid = "ebsidcustom" + i,
+                        //                EbSid_CtxId = "ebsidcustom" + i,
+                        //                Label = prvnFld.DisplayName,
+                        //                DoNotPersist = true
+                        //            });
+                        //            prvnFld.ControlName = "namecustom" + i;
+                        //            i++;
+                        //        }
+                        //    }
+                        //}
                     }
                 }
             }

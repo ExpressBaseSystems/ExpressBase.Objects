@@ -205,14 +205,30 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                     if (!string.IsNullOrEmpty(DataGrid.DataSourceId) && serviceClient != null)
                         DataGrid.InitDSRelated(serviceClient, redis, Allctrls);
                 }
-                else if (Allctrls[i] is EbProvisionUser && serviceClient != null)
+                else if (Allctrls[i] is EbProvisionUser)
                 {
+                    EbProvisionUser provUser = Allctrls[i] as EbProvisionUser;
+                    bool isUnameMapped = false;
+                    foreach (UsrLocFieldAbstract fld in provUser.Fields)
+                    {
+                        UsrLocField _field = fld as UsrLocField;
+                        if (string.IsNullOrEmpty(_field.ControlName))
+                            continue;
+                        if (_field.Name == "email" || _field.Name == "phprimary")
+                            isUnameMapped = true;
+                        if (Allctrls.FirstOrDefault(e => e.Name == _field.ControlName) == null)
+                            throw new FormException($"Invalid control name '{_field.ControlName}' for {_field.Name} in ProvisionUser control({provUser.Name}).");
+                    }
+                    if (!isUnameMapped)
+                        throw new FormException("Please set email/phprimary in ProvisionUser control: {provUser.Name}.");
 
-
-
-                    CheckEmailConAvailableResponse Resp = serviceClient.Post<CheckEmailConAvailableResponse>(new CheckEmailConAvailableRequest { });
-                    if (!Resp.ConnectionAvailable)
-                        throw new FormException("Please configure a email connection, it is required for ProvisionUser control.");
+                    if (serviceClient != null)
+                    {
+                        //CheckEmailConAvailableResponse Resp = serviceClient.Post<CheckEmailConAvailableResponse>(new CheckEmailConAvailableRequest { });
+                        //if (!Resp.ConnectionAvailable)
+                        //    throw new FormException("Please configure a email connection, it is required for ProvisionUser control.");
+                        Console.WriteLine("From BeforeSave: Please configure a email connection, it is required for ProvisionUser control.");
+                    }
                 }
                 else if (Allctrls[i] is EbChartControl && serviceClient != null)
                 {
@@ -380,7 +396,7 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
 
                 if (!string.IsNullOrEmpty(_dict[i].Control.ValueExpr?.Code))
                     CalcFlds.Add(i);
-                
+
                 if (!string.IsNullOrEmpty(_dict[i].Control.OnChangeFn?.Code))
                 {
                     if (_dict[i].Control.OnChangeFn.Code.Contains(".setValue(") && !(_dict[i].Control is EbScriptButton))
@@ -426,7 +442,7 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                 }
             }
 
-            foreach(int i in dpndcy.Select(e => e.Value).Distinct())
+            foreach (int i in dpndcy.Select(e => e.Value).Distinct())
             {
                 List<int> execOrder = new List<int> { i };
                 GetValExpDependentsRec(execOrder, dpndcy, i);
@@ -442,13 +458,13 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
             // dpndcy = { (B, A) (C, B) } => { (1, 0) (2, 1) }
             // A => [B, C]; B => [C];
 
-            
+
             //Value expression execution order for DoNotPersist ctrls
             _Form.DoNotPersistExecOrder = new List<string>();//cleared the old values
             List<KeyValuePair<int, int>> DnpDpndcy = dpndcy.FindAll(x => _dict[x.Key].Control.DoNotPersist && _dict[x.Value].Control.DoNotPersist && x.Key != x.Value);
             List<int> DnpFlds = CalcFlds.FindAll(x => _dict[x].Control.DoNotPersist);
             List<int> ExecOrd = new List<int>();
-            
+
             int stopCounter = 0;
             while (DnpFlds.Count > ExecOrd.Count && stopCounter < DnpFlds.Count)
             {
@@ -481,7 +497,7 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                 if ((_dict[i].Control is EbTVcontrol && (_dict[i].Control as EbTVcontrol).ParamsList?.Count > 0) ||
                     (_dict[i].Control is EbPowerSelect && (_dict[i].Control as EbPowerSelect).ParamsList?.Count > 0) ||
                     (_dict[i].Control is EbDGPowerSelectColumn && (_dict[i].Control as EbDGPowerSelectColumn).ParamsList?.Count > 0))
-                    ctrlsWithDr.Add(i);                
+                    ctrlsWithDr.Add(i);
             }
 
             for (int i = 0; i < ctrlsWithDr.Count; i++)
@@ -606,7 +622,7 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
 
                         if (Regex.IsMatch(ebScript.Code, regex))
                         {
-                            if(is4Hide)
+                            if (is4Hide)
                                 _dict[j].Control.HiddenExpDependants.Add(ctrlWrap.Path);
                             else
                                 _dict[j].Control.DisableExpDependants.Add(ctrlWrap.Path);
