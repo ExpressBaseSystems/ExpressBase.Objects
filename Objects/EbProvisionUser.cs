@@ -558,14 +558,20 @@ this.Init = function(id)
             {
                 return @"
                 //debugger;
+                let updateDataVals = true;
                 if (!this.hasOwnProperty('_finalObj'))
                     this._finalObj = {};
                 $.each(this.Fields.$values, function (i, obj) {
                     if (obj.ControlName !== '') {
+                        if (obj.Control.___DoNotUpdateDataVals){
+                            updateDataVals = false;
+                            return false;
+                        }
                         this._finalObj[obj.Name] = obj.Control.getValueFromDOM();
                     }            
                 }.bind(this));
-                this.DataVals.F = JSON.stringify(this._finalObj);
+                if (updateDataVals)
+                    this.DataVals.F = JSON.stringify(this._finalObj);                
                 return this.DataVals.Value;";
             }
             set { }
@@ -581,7 +587,7 @@ this.Init = function(id)
                     return;
                 this._finalObj = JSON.parse(this.DataVals.F);
                 $.each(this.Fields.$values, function (i, obj) {
-                    if (obj.ControlName !== '' && obj.Control.DoNotPersist) {
+                    if (obj.ControlName !== '' && obj.Control.DoNotPersist && !(obj.Control.ValueExpr && obj.Control.ValueExpr.Code) && p1 > 0) {
                         if (this._finalObj.hasOwnProperty(obj.Name))
                             obj.Control.justSetValue(this._finalObj[obj.Name]);
                     }
@@ -595,6 +601,7 @@ this.Init = function(id)
             get 
             {
                 return @"
+                    //debugger;
                     $.each(this.Fields.$values, function (i, obj) {
                         if (obj.ControlName !== '') {
                             $('#' + obj.Control.EbSid_CtxId).on('change', p1);
