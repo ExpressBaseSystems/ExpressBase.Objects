@@ -33,7 +33,9 @@ namespace ExpressBase.Objects
         public void OnDeserializedMethod(StreamingContext context)
         {
             this.BareControlHtml = this.GetBareHtml();
-            this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
+            this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2); 
+            if (this.CreateOnlyIf == null)
+                this.CreateOnlyIf = new EbScript();
         }
 
         public override string ToolIconHtml { get { return "<i class='fa fa-user'></i><i class='fa fa-plus'></i>"; } set { } }
@@ -93,10 +95,11 @@ namespace ExpressBase.Objects
         }")]
         public List<EbUserType> UserTypeToRole { get; set; }
 
-        //[EnableInBuilder(BuilderType.WebForm)]
-        //[PropertyEditor(PropertyEditorType.ScriptEditorCS)]
-        //[HideInPropertyGrid]
-        //public EbScript CreateOnlyIf { get; set; }
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
+        public EbScript CreateOnlyIf { get; set; }
+
+        public bool CreateOnlyIf_b { get; set; }
 
         //[EnableInBuilder(BuilderType.WebForm)]
         //[HideInPropertyGrid]
@@ -315,7 +318,7 @@ this.Init = function(id)
             if (_d.ContainsKey("phprimary") && _d["phprimary"] != string.Empty)//10
             {
                 sql += _s.Replace("#", "phnoprimary");
-                parameters.Add(DataDB.GetNewParameter("email", EbDbTypes.String, _d["phprimary"]));
+                parameters.Add(DataDB.GetNewParameter("phnoprimary", EbDbTypes.String, _d["phprimary"]));
             }
             else
                 sql += "SELECT 1 WHERE 1 = 0; ";
@@ -346,14 +349,18 @@ this.Init = function(id)
 
         public override bool ParameterizeControl(IDatabase DataDB, List<DbParameter> param, string tbl, SingleColumn cField, bool ins, ref int i, ref string _col, ref string _val, ref string _extqry, User usr, SingleColumn ocF)
         {
+            if (!this.CreateOnlyIf_b)
+                return false;
             string c = string.Empty;
             bool doNotUpdate = false;
             bool insertOnUpdate = false;
             Dictionary<string, string> _d = JsonConvert.DeserializeObject<Dictionary<string, string>>(Convert.ToString(cField.F));
             int nProvUserId = 0;
             int flag = 0;
-            if ((_d.ContainsKey("email") && _d["email"] != string.Empty) || (_d.ContainsKey("phprimary") && _d["phprimary"] != string.Empty))
+            if ((_d.ContainsKey("email") && _d["email"].Trim() != string.Empty) || (_d.ContainsKey("phprimary") && _d["phprimary"].Trim() != string.Empty))
                 nProvUserId = this.GetUserIdByEmailOrPhone(DataDB, _d, ref flag);
+            else
+                return false;
             if (ins)
             {
                 if (nProvUserId > 0)// user already exists
