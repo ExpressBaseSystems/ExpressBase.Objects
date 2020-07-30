@@ -542,7 +542,7 @@ else// PS
             {
                 int noOfFileds = this.DisplayMembers.Count;
                 int i = 0;
-                string rs = "<div id='@ebsid@Wraper' class='search-wraper' data-toggle='tooltip' @addBtnRealtedWidthChange@ title='@tooltipText@'>"
+                string rs = "<div id='@ebsid@srch_Wraper' class='search-wraper' data-toggle='tooltip' @addBtnRealtedWidthChange@ title='@tooltipText@'>"
 .Replace("@addBtnRealtedWidthChange@", IsInsertable ? "style='width: calc( 100% - 32px)'" : string.Empty);
                 foreach (DVBaseColumn obj in this.DisplayMembers)
                 {
