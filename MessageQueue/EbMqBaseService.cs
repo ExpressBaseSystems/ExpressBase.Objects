@@ -6,6 +6,10 @@ using ServiceStack;
 using ServiceStack.Logging;
 using ServiceStack.Messaging;
 using ServiceStack.RabbitMq;
+using ExpressBase.Security;
+using System;
+using ExpressBase.Common;
+using ExpressBase.Objects.ServiceStack_Artifacts;
 
 namespace ExpressBase.Objects.Services
 {
@@ -119,5 +123,41 @@ namespace ExpressBase.Objects.Services
         //}
 
         public ILog Log { get { return LogManager.GetLogger(GetType()); } }
+        public User GetUserObject(string userAuthId)
+        {
+            User user = null;
+            try
+            {
+                if (userAuthId != string.Empty)
+                {
+                    string[] parts = userAuthId.Split(":"); // iSolutionId:UserId:WhichConsole
+                    if (parts.Length == 3)
+                    {
+                        user = this.Redis.Get<User>(userAuthId);
+                        if (user == null)
+                        {
+                            //int uid = 0;
+                            //string query = String.Format("SELECT id FROM eb_users WHERE email = '{0}';", parts[1]);
+                            //this.EbConnectionFactory = new EbConnectionFactory(parts[0], this.Redis);
+                            //EbDataTable dt = this.EbConnectionFactory.DataDB.DoQuery(query);
+                            //if (dt.Rows.Count > 0)
+                            //{
+                            //    uid = Convert.ToInt32(dt.Rows[0][0]);
+
+                                Gateway.Send<UpdateUserObjectResponse>(new UpdateUserObjectRequest() { SolnId = parts[0], UserId = /*uid*/ Convert.ToInt32(parts[1]), UserAuthId = userAuthId, WC = parts[2] });
+                                user = this.Redis.Get<User>(userAuthId);
+                            //}
+
+                        }
+                    }
+                    else
+                    { Console.WriteLine("userAuthId incorrect" + userAuthId); }
+                }
+                else
+                { Console.WriteLine("userAuthId incorrect" + userAuthId); }
+            }
+            catch (Exception e) { Console.WriteLine(e.Message + e.StackTrace); }
+            return user;
+        }
     }
 }
