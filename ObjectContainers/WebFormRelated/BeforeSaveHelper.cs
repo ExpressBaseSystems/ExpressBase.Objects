@@ -256,7 +256,8 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                     EbDbTypes _t = _ctrl.ValueMember.Type;
                     if (!(_t == EbDbTypes.Int || _t == EbDbTypes.Int || _t == EbDbTypes.UInt32 || _t == EbDbTypes.UInt64 || _t == EbDbTypes.Int32 || _t == EbDbTypes.Int64 || _t == EbDbTypes.Decimal || _t == EbDbTypes.Double))
                         throw new FormException("Set numeric value member for " + _ctrl.Label);
-                    _ctrl.FetchParamsMeta(serviceClient, redis);
+                    if (serviceClient != null)
+                        _ctrl.FetchParamsMeta(serviceClient, redis);
                 }
                 else if (Allctrls[i] is EbDGPowerSelectColumn)
                 {
@@ -272,7 +273,8 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                     EbDbTypes _t = _ctrl.ValueMember.Type;
                     if (!(_t == EbDbTypes.Int || _t == EbDbTypes.Int || _t == EbDbTypes.UInt32 || _t == EbDbTypes.UInt64 || _t == EbDbTypes.Int32 || _t == EbDbTypes.Int64 || _t == EbDbTypes.Decimal || _t == EbDbTypes.Double))
                         throw new FormException("Set numeric value member for " + _ctrl.Name);
-                    _ctrl.FetchParamsMeta(serviceClient, redis);
+                    if (serviceClient != null)
+                        _ctrl.FetchParamsMeta(serviceClient, redis);
                 }
                 else if (Allctrls[i] is EbUserControl)
                 {
