@@ -277,11 +277,15 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
             string _html = string.Empty;
             if (this.IsDynamic)
             {
+                this.Options = new List<EbSimpleSelectOption>();
                 var result = ServiceClient.Get<FDDataResponse>(new FDDataRequest { RefId = this.DataSourceId });
                 foreach (EbDataRow option in result.Data)
                 {
-                    _html += string.Format("<option value='{0}'>{1}</option>", option[this.ValueMember.Data], option[this.DisplayMember.Data]);
-                    //_html += string.Format("<option value='{0}'>{1}</option>", option[0].ToString().Trim(), option[0]);
+                    string val = option[this.ValueMember.Data].ToString();
+                    string dispName = option[this.DisplayMember.Data].ToString();
+                    this.Options.Add(new EbSimpleSelectOption { Value = val, DisplayName = dispName });
+
+                    _html += string.Format("<option value='{0}'>{1}</option>", val, dispName);
                 }
             }
             _optionHtml = _html;

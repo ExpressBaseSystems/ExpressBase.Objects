@@ -1274,21 +1274,21 @@ pg.HideProperty('IsDynamic');
         public bool RenderAsSimpleSelect { get { return this.EbPowerSelect.RenderAsSimpleSelect; } set { this.EbPowerSelect.RenderAsSimpleSelect = value; } }
 
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [HideInPropertyGrid]
-        public EbButton AddButton { set; get; }
+        //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        //[HideInPropertyGrid]
+        //public EbButton AddButton  { set; get; }
 
         public EbDGPowerSelectColumn()
         {
             this.EbPowerSelect = new EbPowerSelect();
-            this.AddButton = new EbButton();
+            //this.AddButton = new EbButton();
             this.Options = new List<EbSimpleSelectOption>();
         }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
-        [PropertyEditor(PropertyEditorType.ObjectSelector)]
-        [OSE_ObjectTypes(EbObjectTypes.iWebForm)]
-        public string FormRefId { get { return this.AddButton.FormRefId; } set { this.AddButton.FormRefId = value; } }
+        //[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+        //[PropertyEditor(PropertyEditorType.ObjectSelector)]
+        //[OSE_ObjectTypes(EbObjectTypes.iWebForm)]
+        //public string FormRefId { get { return this.AddButton.FormRefId; } set { this.AddButton.FormRefId = value; } }
 
         public override string SetDisplayMemberJSfn { get { return JSFnsConstants.DG_hiddenColCheckCode + EbPowerSelect.SetDisplayMemberJSfn; } set { } }
 
@@ -1298,7 +1298,7 @@ pg.HideProperty('IsDynamic');
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyGroup(PGConstants.BEHAVIOR)]
         [PropertyPriority(98)]
-        public bool IsInsertable { get; set; }
+        public bool IsInsertable { get { return this.EbPowerSelect.IsInsertable; } set { this.EbPowerSelect.IsInsertable = value; } }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyGroup(PGConstants.APPEARANCE)]

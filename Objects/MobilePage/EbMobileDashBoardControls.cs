@@ -10,14 +10,6 @@ using System.Text;
 namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.MobilePage)]
-    public class EbMobileDashBoardControls : EbMobilePageBase
-    {
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [HideInPropertyGrid]
-        public override string Name { get; set; }
-    }
-
-    [EnableInBuilder(BuilderType.MobilePage)]
     public class EbMobileTableView : EbMobileDashBoardControls
     {
         [EnableInBuilder(BuilderType.MobilePage)]

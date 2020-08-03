@@ -48,7 +48,7 @@ namespace ExpressBase.Objects
                 indx++;
             }
             DVColumnColl.Add(new DVStringColumn { Data = indx++, Name = "id", sTitle = "id", Type = EbDbTypes.Int32, bVisible = false, sWidth = "100px" });
-            DVColumnColl.Add(new DVStringColumn { Data = indx, Name = "settings", sTitle = "<i class='fa fa-cog'></i>", Type = EbDbTypes.String, bVisible = true, sWidth = "100px" });
+            DVColumnColl.Add(new DVStringColumn { IsCustomColumn = true, Data = indx, Name = "settings", sTitle = "<i class='fa fa-cog'></i>", Type = EbDbTypes.String, bVisible = true, sWidth = "100px" });
         }
     }
 }

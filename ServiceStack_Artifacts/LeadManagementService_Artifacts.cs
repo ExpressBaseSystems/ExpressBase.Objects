@@ -90,6 +90,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		[DataMember(Order = 21)]
 		public Dictionary<string, int> NurseDict { get; set; }
 
+		[DataMember(Order = 22)]
+		public Dictionary<int, string> CustomerCategoryDict { get; set; }
+
 	}
 
 	[DataContract]

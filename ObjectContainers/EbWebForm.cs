@@ -706,7 +706,7 @@ namespace ExpressBase.Objects
                         c.ValueFE = FormData.MultipleTables[_container.TableName][0][c.Name];
                     }
                 }
-                else if ((!(c is EbFileUploader) && !c.DoNotPersist) || c is EbProvisionUser || c is EbProvisionLocation)
+                else if ((!(c is EbFileUploader) && !c.DoNotPersist) || c is EbProvisionLocation)
                 {
                     if (FormData.MultipleTables.ContainsKey(_container.TableName) && FormData.MultipleTables[_container.TableName].Count > 0)
                     {
@@ -1082,7 +1082,6 @@ namespace ExpressBase.Objects
             if (dataset.Tables.Count > _schema.Tables.Count)
             {
                 int tableIndex = _schema.Tables.Count;
-                int mngUsrCount = 0;
                 SingleTable UserTable = null;
                 foreach (EbControl Ctrl in _schema.ExtendedControls)// EbProvisionUser + EbProvisionLocation + EbReview
                 {
@@ -1094,22 +1093,34 @@ namespace ExpressBase.Objects
 
                         if (Ctrl is EbProvisionUser)
                         {
-                            Dictionary<string, object> _d = new Dictionary<string, object>();
+                            EbProvisionUser provUser = Ctrl as EbProvisionUser;
+                            SingleColumn Column = _FormData.MultipleTables[provUser.VirtualTable][0].GetColumn(Ctrl.Name);
                             if (UserTable == null)
                                 UserTable = Table;
                             else
                                 tableIndex--; //one query is used to select required user records
-                            if (UserTable.Count > mngUsrCount)
+
+                            SingleRow Row_U = null;
+                            foreach (SingleRow R in UserTable)
                             {
-                                NTV[] pArr = (Ctrl as EbProvisionUser).FuncParam;
+                                SingleColumn C = R.Columns.Find(e => e.Name == FormConstants.id);
+                                if (C != null && (Convert.ToInt32(C.Value) == Convert.ToInt32(Column.Value)))
+                                {
+                                    Row_U = R;
+                                    break;
+                                }
+                            }
+                            Dictionary<string, object> _d = new Dictionary<string, object>();
+                            if (Row_U != null)
+                            {
+                                NTV[] pArr = provUser.FuncParam;
                                 for (int k = 0; k < pArr.Length; k++)
                                 {
-                                    if (UserTable[mngUsrCount][pArr[k].Name] != null)
-                                        _d.Add(pArr[k].Name, UserTable[mngUsrCount][pArr[k].Name]);
+                                    if (Row_U[pArr[k].Name] != null)
+                                        _d.Add(pArr[k].Name, Row_U[pArr[k].Name]);
                                 }
-                                mngUsrCount++;
                             }
-                            _FormData.MultipleTables[(Ctrl as EbProvisionUser).VirtualTable][0][Ctrl.Name] = JsonConvert.SerializeObject(_d);
+                            Column.F = JsonConvert.SerializeObject(_d);
                         }
                         else if (Ctrl is EbProvisionLocation)
                         {
@@ -1420,12 +1431,13 @@ namespace ExpressBase.Objects
         public string Save(IDatabase DataDB, Service service)
         {
             this.DbConnection = DataDB.GetNewConnection();
-            string resp = string.Empty;
+            string resp;
             try
             {
                 this.DbConnection.Open();
                 this.DbTransaction = this.DbConnection.BeginTransaction();
 
+                this.ExecProvUserCreateOnlyIfScript();
                 bool IsUpdate = this.TableRowId > 0;
                 if (IsUpdate)
                 {
@@ -1483,7 +1495,6 @@ namespace ExpressBase.Objects
             string _extqry = string.Empty;
             List<DbParameter> param = new List<DbParameter>();
             int i = 0;
-            List<EbWebForm> FormCollection = new List<EbWebForm>() { this };
             if (this.ExeDataPusher)
                 this.PrepareWebFormData();
 
@@ -1575,6 +1586,27 @@ namespace ExpressBase.Objects
             param.Add(DataDB.GetNewParameter(FormConstants.eb_createdby, EbDbTypes.Int32, this.UserObj.UserId));
             param.Add(DataDB.GetNewParameter(FormConstants.eb_modified_by, EbDbTypes.Int32, this.UserObj.UserId));
             return DataDB.DoNonQuery(this.DbConnection, fullqry, param.ToArray());
+        }
+
+        private void ExecProvUserCreateOnlyIfScript()
+        {
+            List<EbControl> ctrls = this.FormSchema.ExtendedControls.FindAll(e => e is EbProvisionUser);
+            if (ctrls.Count == 0)
+                return;
+            FG_Root globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, this.FormData, this.FormDataBackup);
+            foreach (EbProvisionUser provCtrl in ctrls)
+            {
+                if (!string.IsNullOrEmpty(provCtrl.CreateOnlyIf?.Code))
+                {
+                    object flag = this.ExecuteCSharpScriptNew(provCtrl.CreateOnlyIf.Code, globals);
+                    if (flag is bool && Convert.ToBoolean(flag))
+                        provCtrl.CreateOnlyIf_b = true;
+                    else
+                        provCtrl.CreateOnlyIf_b = false;
+                }
+                else
+                    provCtrl.CreateOnlyIf_b = true;
+            }
         }
 
         private string GetMyActionInsertUpdateQuery(IDatabase DataDB, List<DbParameter> param, ref int i, bool isInsert, Service service)
