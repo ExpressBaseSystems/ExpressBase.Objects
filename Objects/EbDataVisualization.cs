@@ -121,7 +121,7 @@ namespace ExpressBase.Objects
         [PropertyGroup(PGConstants.CORE)]
         public string DataSourceRefId { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar, BuilderType.WebForm)]
         [PropertyGroup(PGConstants.CORE)]
         [HideForUser]
         [OnChangeExec(@"
@@ -135,23 +135,23 @@ namespace ExpressBase.Objects
         }")]
         public bool IsDataFromApi { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar, BuilderType.WebForm)]
         [PropertyGroup("Api")]
         [HideForUser]
         public string Url { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar, BuilderType.WebForm)]
         [PropertyGroup("Api")]
         [HideForUser]
         public ApiMethods Method { set; get; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar, BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.Collection)]
         [PropertyGroup("Api")]
         [HideForUser]
         public List<ApiRequestHeader> Headers { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar, BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.Collection)]
         [PropertyGroup("Api")]
         [MetaOnly]
@@ -1077,7 +1077,7 @@ else {
         public bool UseThisVal { set; get; }
     }
 
-    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
+    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar, BuilderType.WebForm)]
     public class ApiRequestHeader : EbDataVisualizationObject
     {
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
