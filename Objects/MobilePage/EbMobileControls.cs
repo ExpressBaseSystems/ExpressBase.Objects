@@ -144,20 +144,20 @@ namespace ExpressBase.Objects
     public class EbMobileDateTime : EbMobileControl
     {
         [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
+        public override EbDbTypes EbDbType { get { return (EbDbTypes)this.EbDateType; } set { } }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
         public EbDateType EbDateType { get; set; } = EbDateType.DateTime;
 
         [EnableInBuilder(BuilderType.MobilePage)]
         public bool IsNullable { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        public TimeShowFormat ShowTimeAs_ { get; set; }
+        public bool BlockBackDatedEntry { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        public DateShowFormat ShowDateAs_ { get; set; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [HideInPropertyGrid]
-        public override EbDbTypes EbDbType { get { return (EbDbTypes)this.EbDateType; } set { } }
+        public bool BlockFutureDatedEntry { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
@@ -181,8 +181,6 @@ namespace ExpressBase.Objects
                 Name = this.Name,
                 IsNullable = this.IsNullable,
                 EbDateType = this.EbDateType,
-                ShowTimeAs_ = this.ShowTimeAs_,
-                ShowDateAs_ = this.ShowDateAs_,
                 Margin = new UISides { Top = 0, Bottom = 0, Left = 0, Right = 0 },
                 Label = this.Label
             };
