@@ -96,6 +96,13 @@ namespace ExpressBase.Objects
         public List<ApiRequestParam> Parameters { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
+        //[PropertyEditor(PropertyEditorType.Mapper, "Columns", "G_all_form_controls", "FormControl")]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "return [...commonO.Current_obj.Controls.$values];")]
+        [PropertyGroup("Api")]
+        [Alias("Parameter controls")]
+        public List<EbControl> ApiParamCtrls{ get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
         [PropertyGroup(PGConstants.DATA_INSERT)]
         [OnChangeExec(@"
             if (this.IsInsertable === true ){
@@ -770,7 +777,7 @@ else// PS
         {
             if (this.IsDataFromApi)
             {
-                this.ParamsList = Parameters2ParamsList(Parameters);
+                this.ParamsList = ApiParamCtrls2ParamsList(ApiParamCtrls);
             }
             else
             {
@@ -779,15 +786,15 @@ else// PS
             }
         }
 
-        private List<Param> Parameters2ParamsList(List<ApiRequestParam> prameters)
+        private List<Param> ApiParamCtrls2ParamsList(List<EbControl> ApiParamCtrls)
         {
             List<Param> ParamsList = new List<Param>();
-            if (prameters == null)
+            if (ApiParamCtrls == null)
                 return ParamsList;
 
-            foreach (var p in prameters)
+            foreach (var p in ApiParamCtrls)
             {
-                ParamsList.Add(new Param() { Name = p.Name, Type = p.Type.ToString(), Value = p.Value });
+                ParamsList.Add(new Param() { Name = p.Name, Type = p.EbDbType.ToString() });
             }
 
             return ParamsList;
