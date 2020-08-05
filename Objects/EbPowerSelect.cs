@@ -59,7 +59,43 @@ namespace ExpressBase.Objects
         //    set { }
         //}
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
+        [PropertyGroup(PGConstants.CORE)]
+        [HideForUser]
+        [OnChangeExec(@"
+        if(this.IsDataFromApi){
+            pg.ShowGroup('Api');
+            pg.HideProperty('DataSourceId');
+        }
+        else{
+            pg.HideGroup('Api');
+            pg.ShowProperty('DataSourceId');
+        }")]
+        public bool IsDataFromApi { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl,BuilderType.BotForm, BuilderType.FilterDialog)]
+        [PropertyGroup("Api")]
+        [HideForUser]
+        public string Url { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
+        [PropertyGroup("Api")]
+        [HideForUser]
+        public ApiMethods Method { set; get; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        [PropertyGroup("Api")]
+        [HideForUser]
+        public List<ApiRequestHeader> Headers { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        [PropertyGroup("Api")]
+        [MetaOnly]
+        public List<ApiRequestParam> Parameters { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
         [PropertyGroup(PGConstants.DATA_INSERT)]
         [OnChangeExec(@"
             if (this.IsInsertable === true ){
