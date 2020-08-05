@@ -245,8 +245,10 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                 else if (Allctrls[i] is EbPowerSelect)
                 {
                     EbPowerSelect _ctrl = Allctrls[i] as EbPowerSelect;
-                    if (string.IsNullOrEmpty(_ctrl.DataSourceId))
+                    if (string.IsNullOrEmpty(_ctrl.DataSourceId) && !_ctrl.IsDataFromApi)
                         throw new FormException("Set Data Reader for " + _ctrl.Label);
+                    if (string.IsNullOrEmpty(_ctrl.Url) && _ctrl.IsDataFromApi)
+                        throw new FormException("Set Api for " + _ctrl.Label);
                     if (_ctrl.ValueMember == null)
                         throw new FormException("Set Value Member for " + _ctrl.Label);
                     if (_ctrl.RenderAsSimpleSelect && _ctrl.DisplayMember == null)
@@ -262,8 +264,10 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                 else if (Allctrls[i] is EbDGPowerSelectColumn)
                 {
                     EbDGPowerSelectColumn _ctrl = Allctrls[i] as EbDGPowerSelectColumn;
-                    if (string.IsNullOrEmpty(_ctrl.DataSourceId))
+                    if (string.IsNullOrEmpty(_ctrl.DataSourceId) && !_ctrl.IsDataFromApi)
                         throw new FormException("Set Data Reader for " + _ctrl.Name);
+                    if (string.IsNullOrEmpty(_ctrl.Url) && _ctrl.IsDataFromApi)
+                        throw new FormException("Set Api for " + _ctrl.Name);
                     if (_ctrl.ValueMember == null)
                         throw new FormException("Set Value Member for " + _ctrl.Name);
                     if (_ctrl.RenderAsSimpleSelect && _ctrl.DisplayMember == null)

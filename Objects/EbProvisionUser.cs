@@ -331,7 +331,10 @@ this.Init = function(id)
             }
             if (ds.Tables[1].Rows.Count > 0)
             {
-                userId = Convert.ToInt32(ds.Tables[1].Rows[0][0]);
+                int userId2 = Convert.ToInt32(ds.Tables[1].Rows[0][0]);
+                if (flag == 1 && userId != userId2)
+                    throw new FormException($"Unable to continue with {_d["email"]} and {_d["phprimary"]}", (int)HttpStatusCode.BadRequest, $"Email and Phone already exists for different users: {_d["email"]}, {_d["phprimary"]}", "EbProvisionUser => GetUserIdByEmailOrPhone");
+                userId = userId2;
                 flag |= 2;
             }
             return userId;
