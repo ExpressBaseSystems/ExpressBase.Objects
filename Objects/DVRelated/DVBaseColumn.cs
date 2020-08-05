@@ -222,7 +222,6 @@ namespace ExpressBase.Objects.Objects.DVRelated
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog)]
         [Alias("Title")]
-        [HideInPropertyGrid]
         public string sTitle { get; set; }
 
         [HideInPropertyGrid]
@@ -371,7 +370,7 @@ else{
         [HideInPropertyGrid]
         public DVBaseColumn IdColumn { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog)]
         [DefaultPropValue("0")]
         [HideForUser]
         [PropertyGroup(PGConstants.EXTENDED)]
@@ -424,6 +423,10 @@ else{
         [HideInPropertyGrid]
         public bool IsTree { get; set; }
 
+        [PropertyGroup("TreeVisualization")]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
+        public bool NeedAlphabeticOrder { get; set; }
+
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.Collection)]
         [HideInPropertyGrid]
@@ -438,7 +441,7 @@ else{
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "ColumnsRef")]
         public List<DVBaseColumn> InfoWindow { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog)]
         [PropertyEditor(PropertyEditorType.Collection)]
         [PropertyGroup(PGConstants.CORE)]
         public List<ColumnCondition> ConditionalFormating { get; set; }
@@ -459,11 +462,11 @@ else{
         [HideInPropertyGrid]
         public EbDbTypes RenderType { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog)]
         [DefaultPropValue("T")]
         public string TrueValue { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog)]
         [DefaultPropValue("F")]
         public string FalseValue { get; set; }
 
@@ -690,21 +693,21 @@ if(this.RenderAs === 9){
         [PropertyGroup("Search")]
         public StringOperators DefaultOperator { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog)]
         [DefaultPropValue("20")]
         [PropertyGroup("Image")]
         public int ImageHeight { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog)]
         [PropertyGroup("Image")]
         [DefaultPropValue("20")]
         public int ImageWidth { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog)]
         [PropertyGroup("Image")]
         public ImageQuality ImageQuality { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog)]
         [OnChangeExec(@"
 if(this.AllowMultilineText){
     pg.ShowProperty('NoOfLines');
@@ -718,10 +721,10 @@ else {
         public bool AllowMultilineText { get; set; }
 
         [PropertyGroup(PGConstants.EXTENDED)]
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog)]
         public int NoOfLines { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog)]
         [PropertyGroup(PGConstants.EXTENDED)]
         public int NoOfCharactersPerLine { get; set; }
 
