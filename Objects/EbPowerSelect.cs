@@ -73,7 +73,7 @@ namespace ExpressBase.Objects
         }")]
         public bool IsDataFromApi { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl,BuilderType.BotForm, BuilderType.FilterDialog)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
         [PropertyGroup("Api")]
         [HideForUser]
         public string Url { get; set; }
@@ -768,8 +768,29 @@ else// PS
 
         public void FetchParamsMeta(IServiceClient ServiceClient, IRedisClient Redis)
         {
-            EbDataReader DrObj = EbFormHelper.GetEbObject<EbDataReader>(this.DataSourceId, ServiceClient, Redis, null);
-            this.ParamsList = DrObj.GetParams(Redis as RedisClient);
+            if (this.IsDataFromApi)
+            {
+                this.ParamsList = Parameters2ParamsList(Parameters);
+            }
+            else
+            {
+                EbDataReader DrObj = EbFormHelper.GetEbObject<EbDataReader>(this.DataSourceId, ServiceClient, Redis, null);
+                this.ParamsList = DrObj.GetParams(Redis as RedisClient);
+            }
+        }
+
+        private List<Param> Parameters2ParamsList(List<ApiRequestParam> prameters)
+        {
+            List<Param> ParamsList = new List<Param>();
+            if (prameters == null)
+                return ParamsList;
+
+            foreach (var p in prameters)
+            {
+                ParamsList.Add(new Param() { Name = p.Name, Type = p.Type.ToString(), Value = p.Value });
+            }
+
+            return ParamsList;
         }
 
         private string GetSql(Service service)

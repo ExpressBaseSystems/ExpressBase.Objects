@@ -1227,14 +1227,46 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
         [JsonIgnore]
         public EbPowerSelect EbPowerSelect { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
+        [PropertyGroup(PGConstants.CORE)]
+        [HideForUser]
+        [OnChangeExec(@"
+        if(this.IsDataFromApi){
+            pg.ShowGroup('Api');
+            pg.HideProperty('DataSourceId');
+        }
+        else{
+            pg.HideGroup('Api');
+            pg.ShowProperty('DataSourceId');
+        }")]
+        public bool IsDataFromApi { get { return this.EbPowerSelect.IsDataFromApi; } set { this.EbPowerSelect.IsDataFromApi = value; } }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
+        [PropertyGroup("Api")]
+        [HideForUser]
+        public string Url { get { return this.EbPowerSelect.Url; } set { this.EbPowerSelect.Url = value; } }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
+        [PropertyGroup("Api")]
+        [HideForUser]
+        public ApiMethods Method { get { return this.EbPowerSelect.Method; } set { this.EbPowerSelect.Method = value; } }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        [PropertyGroup("Api")]
+        [HideForUser]
+        public List<ApiRequestHeader> Headers { get { return this.EbPowerSelect.Headers; } set { this.EbPowerSelect.Headers = value; } }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        [PropertyGroup("Api")]
+        [MetaOnly]
+        public List<ApiRequestParam> Parameters { get { return this.EbPowerSelect.Parameters; } set { this.EbPowerSelect.Parameters = value; } }
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
-        public string DataSourceId
-        {
-            get { return this.EbPowerSelect.DataSourceId; }
-            set { this.EbPowerSelect.DataSourceId = value; }
-        }
+        public string DataSourceId { get { return this.EbPowerSelect.DataSourceId; } set { this.EbPowerSelect.DataSourceId = value; } }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", 1)]
@@ -1288,7 +1320,7 @@ pg.HideProperty('IsDynamic');
         //[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
         //[PropertyEditor(PropertyEditorType.ObjectSelector)]
         //[OSE_ObjectTypes(EbObjectTypes.iWebForm)]
-        //public string FormRefId { get { return this.AddButton.FormRefId; } set { this.AddButton.FormRefId = value; } }
+        //public string FormRefId { get { return this.FormRefId; } set { this.FormRefId = value; } }
 
         public override string SetDisplayMemberJSfn { get { return JSFnsConstants.DG_hiddenColCheckCode + EbPowerSelect.SetDisplayMemberJSfn; } set { } }
 
