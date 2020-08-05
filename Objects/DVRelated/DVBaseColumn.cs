@@ -458,7 +458,7 @@ else{
         [HideInPropertyGrid]
         public bool AutoResolve { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog)]
         [HideInPropertyGrid]
         public EbDbTypes RenderType { get; set; }
 

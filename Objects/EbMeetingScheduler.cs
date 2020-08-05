@@ -22,7 +22,17 @@ namespace ExpressBase.Objects
     public class EbMeetingScheduler : EbControlUI
     {
         public EbMeetingScheduler() { }
-        public override string ToolIconHtml { get { return "<i class='fa fa-i-cursor'></i>"; } set { } }
+        [HideInPropertyGrid]
+        [JsonIgnore]
+        public override string ToolIconHtml { get { return "<i class='fa fa-calendar'></i>"; } set { } }
+
+        [HideInPropertyGrid]
+        [JsonIgnore]
+        public override string ToolNameAlias { get { return "Meeting Sche.."; } set { } }
+
+        [HideInPropertyGrid]
+        [JsonIgnore]
+        public override string ToolHelpText { get { return "Meeting Scheduler"; } set { } }
 
         public string TableName { get; set; }
 
