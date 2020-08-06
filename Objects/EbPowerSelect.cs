@@ -96,7 +96,6 @@ namespace ExpressBase.Objects
         public List<ApiRequestParam> Parameters { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
-        //[PropertyEditor(PropertyEditorType.Mapper, "Columns", "G_all_form_controls", "FormControl")]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "return [...commonO.Current_obj.Controls.$values];")]
         [PropertyGroup("Api")]
         [Alias("Parameter controls")]
@@ -312,16 +311,15 @@ else
 
         [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.WebForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.CollectionProp, "Columns", "bVisible")]
-        [PropertyGroup(PGConstants.DATA_SETTINGS)]
-        //[HideInPropertyGrid]
-        public DVColumnCollection Columns { get; set; }
-
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [PropertyEditor(PropertyEditorType.CollectionABCFrmSrc, "Columns")]
         [OnChangeExec(@"
 if (this.Columns && this.Columns.$values.length === 0 )
 {
 pg.MakeReadOnly('DisplayMembers');} else {pg.MakeReadWrite('DisplayMembers');}")]
+        [PropertyGroup(PGConstants.DATA_SETTINGS)]
+        public DVColumnCollection Columns { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyEditor(PropertyEditorType.CollectionABCFrmSrc, "Columns")]
         [PropertyGroup(PGConstants.DATA_SETTINGS)]
         [PropertyPriority(68)]
         public DVColumnCollection DisplayMembers { get; set; }

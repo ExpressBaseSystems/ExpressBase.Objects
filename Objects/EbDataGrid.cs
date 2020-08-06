@@ -115,7 +115,7 @@ namespace ExpressBase.Objects
         [PropertyGroup(PGConstants.APPEARANCE)]
         [DefaultPropValue("+ Row")]
         [Alias("AddRow Button Text")]
-        public string AddRowBtnTxt{ get; set; }
+        public string AddRowBtnTxt { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [PropertyGroup(PGConstants.BEHAVIOR)]
@@ -232,7 +232,7 @@ namespace ExpressBase.Objects
         {
             List<string> _params = new List<string>();
             EbDataReader DataReader = EbFormHelper.GetEbObject<EbDataReader>(this.DataSourceId, serviceClient, redis, null);
-            
+
             for (int i = 0; i < Allctrls.Length; i++)
             {
                 Allctrls[i].DependedDG = new List<string>();
@@ -273,7 +273,7 @@ namespace ExpressBase.Objects
             <thead>
               <tr>  
                 <th class='slno' style='width:34px'><span class='grid-col-title'>SL No</span></th>"
-.Replace("@addrowbtn@", this.IsAddable ? ("<div id='@ebsid@addrow' class='addrow-btn' tabindex='0'>"+ (string.IsNullOrEmpty(AddRowBtnTxt) ? "+ Row" : AddRowBtnTxt) + "</div>") : string.Empty); ;
+.Replace("@addrowbtn@", this.IsAddable ? ("<div id='@ebsid@addrow' class='addrow-btn' tabindex='0'>" + (string.IsNullOrEmpty(AddRowBtnTxt) ? "+ Row" : AddRowBtnTxt) + "</div>") : string.Empty); ;
             foreach (EbDGColumn col in Controls)
             {
                 if (!col.Hidden)
@@ -904,6 +904,8 @@ return val;
         [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.WebForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", 1)]
         [OnChangeExec(@"if (this.Columns && this.Columns.$values.length === 0 ){pg.MakeReadOnly('ValueMember');} else {pg.MakeReadWrite('ValueMember');}")]
+        [PropertyPriority(69)]
+        [PropertyGroup(PGConstants.DATA_SETTINGS)]
         public DVBaseColumn ValueMember
         {
             get { return this.EbSimpleSelect.ValueMember; }
@@ -921,6 +923,8 @@ return val;
 
         [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.WebForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", 1)]
+        [PropertyPriority(68)]
+        [PropertyGroup(PGConstants.DATA_SETTINGS)]
         [OnChangeExec(@"if (this.Columns && this.Columns.$values.length === 0 ){pg.MakeReadOnly('DisplayMember');} else {pg.MakeReadWrite('DisplayMember');}")]
         public DVBaseColumn DisplayMember
         {
@@ -935,8 +939,10 @@ return val;
         //    set { this.EbSimpleSelect.Value = value; }
         //}
 
-        [HideInPropertyGrid]
-        [EnableInBuilder(BuilderType.BotForm)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.BEHAVIOR)]
+        [Alias("Readonly")]
+        [HelpText("Control will be Disabled/Readonly if set to TRUE")]
         public override bool IsDisable
         {
             get { return this.EbSimpleSelect.IsDisable; }
@@ -945,6 +951,7 @@ return val;
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.Boolean)]
+        [PropertyGroup(PGConstants.CORE)]
         [OnChangeExec(@"if(this.IsDynamic === true){pg.ShowProperty('DataSourceId');pg.ShowProperty('ValueMember');pg.ShowProperty('DisplayMember');pg.HideProperty('Options');}
 else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HideProperty('DisplayMember');pg.ShowProperty('Options');}")]
         public bool IsDynamic
@@ -1270,18 +1277,34 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", 1)]
-        [OnChangeExec(@"if (
-this.Columns.$values.length === 0 ){
-pg.MakeReadOnly('ValueMember');}
-else {pg.MakeReadWrite('ValueMember');}")]
+        [OnChangeExec(@"if (this.Columns && this.Columns.$values.length === 0 ){pg.MakeReadOnly('ValueMember');} else {pg.MakeReadWrite('ValueMember');}")]
+        [PropertyPriority(69)]
+        [PropertyGroup(PGConstants.DATA_SETTINGS)]
         public DVBaseColumn ValueMember { get { return this.EbPowerSelect.ValueMember; } set { this.EbPowerSelect.ValueMember = value; } }
 
         [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.WebForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", 1)]
-        [PropertyGroup(PGConstants.BEHAVIOR)]
-        [PropertyPriority(98)]
+        [PropertyPriority(68)]
+        [PropertyGroup(PGConstants.DATA_SETTINGS)]
         [OnChangeExec(@"if (this.Columns && this.Columns.$values.length === 0 ){pg.MakeReadOnly('DisplayMember');} else {pg.MakeReadWrite('DisplayMember');}")]
         public DVBaseColumn DisplayMember { get { return this.EbPowerSelect.DisplayMember; } set { this.EbPowerSelect.DisplayMember = value; } }
+
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyEditor(PropertyEditorType.CollectionABCFrmSrc, "Columns")]
+        [PropertyGroup(PGConstants.DATA_SETTINGS)]
+        [PropertyPriority(68)]
+        public DVColumnCollection DisplayMembers { get { return this.EbPowerSelect.DisplayMembers; } set { this.EbPowerSelect.DisplayMembers = value; } }
+
+
+        [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.WebForm, BuilderType.UserControl)]
+        [PropertyEditor(PropertyEditorType.CollectionProp, "Columns", "bVisible")]
+        [OnChangeExec(@"
+if (this.Columns && this.Columns.$values.length === 0 )
+{
+pg.MakeReadOnly('DisplayMembers');} else {pg.MakeReadWrite('DisplayMembers');}")]
+        [PropertyGroup(PGConstants.DATA_SETTINGS)]
+        public DVColumnCollection Columns { get { return this.EbPowerSelect.Columns; } set { this.EbPowerSelect.Columns = value; } }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
         [PropertyGroup(PGConstants.BEHAVIOR)]
@@ -1322,6 +1345,13 @@ pg.HideProperty('IsDynamic');
         //[OSE_ObjectTypes(EbObjectTypes.iWebForm)]
         //public string FormRefId { get { return this.FormRefId; } set { this.FormRefId = value; } }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [PropertyGroup(PGConstants.DATA_INSERT)]
+        [OSE_ObjectTypes(EbObjectTypes.iWebForm)]
+        [Alias("Form")]
+        public string FormRefId { get { return this.EbPowerSelect.FormRefId; } set { this.EbPowerSelect.FormRefId = value; } }
+
         public override string SetDisplayMemberJSfn { get { return JSFnsConstants.DG_hiddenColCheckCode + EbPowerSelect.SetDisplayMemberJSfn; } set { } }
 
         public override string SetValueJSfn { get { return EbPowerSelect.SetValueJSfn; } set { } }
@@ -1331,6 +1361,12 @@ pg.HideProperty('IsDynamic');
         [PropertyGroup(PGConstants.BEHAVIOR)]
         [PropertyPriority(98)]
         public bool IsInsertable { get { return this.EbPowerSelect.IsInsertable; } set { this.EbPowerSelect.IsInsertable = value; } }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "return [...commonO.Current_obj.Controls.$values];")]
+        [PropertyGroup("Api")]
+        [Alias("Parameter controls")]
+        public List<EbControl> ApiParamCtrls { get { return this.EbPowerSelect.ApiParamCtrls; } set { this.EbPowerSelect.ApiParamCtrls = value; } }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyGroup(PGConstants.APPEARANCE)]
@@ -1431,10 +1467,6 @@ pg.HideProperty('IsDynamic');
         [PropertyGroup(PGConstants.BEHAVIOR)]
         public int MinLimit { get { return this.EbPowerSelect.MinLimit; } set { this.EbPowerSelect.MinLimit = value; } }
 
-        [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.WebForm)]
-        [PropertyEditor(PropertyEditorType.CollectionProp, "Columns", "bVisible")]
-        public DVColumnCollection Columns { get { return this.EbPowerSelect.Columns; } set { this.EbPowerSelect.Columns = value; } }
-
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         public override string Name { get { return this.EbPowerSelect.Name; } set { this.EbPowerSelect.Name = value; } }
 
@@ -1449,10 +1481,6 @@ pg.HideProperty('IsDynamic');
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         new public string EbSid_CtxId { get { return this.EbPowerSelect.EbSid_CtxId; } set { this.EbPowerSelect.EbSid_CtxId = value; } }
-
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
-        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns")]
-        public DVColumnCollection DisplayMembers { get { return this.EbPowerSelect.DisplayMembers; } set { this.EbPowerSelect.DisplayMembers = value; } }
 
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
