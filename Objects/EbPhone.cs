@@ -132,7 +132,7 @@ namespace ExpressBase.Objects
 		public override string GetBareHtml()
 		{
 			return @"<div class='PhnCtrlCont' id='@ebsid@_Phnctrl' name='@name@'>
-					 <input type='tel' placeholder='' class='phnctrl' id='@ebsid@' style='width:100%; display:inline-block;'>
+					 <input type='tel' ui-inp placeholder='' class='phnctrl' id='@ebsid@' style='width:100%; display:inline-block;'>
 						<button class='phnContextBtn'><i class='fa fa-bars' style='color:#2980b9' @SendMessagebtn@></i></button>
 					</div>"
 .Replace("@ebsid@", String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId)
