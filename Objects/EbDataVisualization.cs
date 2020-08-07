@@ -1080,15 +1080,15 @@ else {
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar, BuilderType.WebForm)]
     public class ApiRequestHeader : EbDataVisualizationObject
     {
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.WebForm,BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
         [HideInPropertyGrid]
         public override string Name { set; get; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
         [Alias("Name")]
         public string HeaderName { set; get; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
         public string Value { set; get; }
     }
 
