@@ -24,8 +24,8 @@ namespace ExpressBase.Objects
 
         public void ProcessDvColumnCollection()
         {
-            if (this.DVColumnColl != null)
-                return;
+            //if (this.DVColumnColl != null)////////check
+            //    return;
 
             this.DVColumnColl = new DVColumnCollection();
             int indx = 0;
