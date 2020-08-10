@@ -17,6 +17,17 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         HttpStatusCode StatusCode { set; get; }
     }
 
+    public interface IApiResponse
+    {
+        string Name { set; get; }
+
+        string Version { set; get; }
+
+        ApiMessage Message { get; set; }
+
+        object Result { get; set; }
+    }
+
     [DataContract]
     public class FormDataJsonRequest : IReturn<FormDataJsonResponse>, IEbSSRequest
     {
@@ -63,7 +74,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class ApiResponse
+    public class ApiResponse : IApiResponse
     {
         [DataMember(Order = 1)]
         public string Name { set; get; }
