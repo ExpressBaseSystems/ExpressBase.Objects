@@ -395,7 +395,8 @@ namespace ExpressBase.Objects
         td.style.backgroundColor ='inherit';
         td.style.pointerEvents = 'inherit';
         td.querySelector('.ctrl-cover').setAttribute('eb-readonly','false');
-        td.querySelector('input,select').disabled = false;
+        td.querySelectorAll('input,select,button').disabled = false;
+        td.querySelectorAll('input,select,button').forEach( x=> x.setAttribute('tabindex',-1));
         document.getElementById(this.EbSid_CtxId).disabled = false;
     }
     this.__IsDisable = false;
@@ -405,11 +406,13 @@ namespace ExpressBase.Objects
         //public override string DisableJSfn { get { return @"this.__IsDisable = true; $('[ebsid='+this.__DG.EbSid_CtxId +']').find(`tr[rowid=${this.__rowid}] [colname=${this.Name}] .ctrl-cover *`).attr('disabled', 'disabled').css('pointer-events', 'none').find('input').css('background-color','#eee');"; } set { } }
         public override string DisableJSfn { get { return @"
     if(!this.__IsDisable){
+        debugger;
         let td = document.getElementById('td_' + this.EbSid_CtxId);
         td.style.backgroundColor ='#eee';
         td.style.pointerEvents = 'none';
         td.querySelector('.ctrl-cover').setAttribute('eb-readonly','true');
-        td.querySelector('input,select').disabled = true;
+        td.querySelectorAll('input,select,button').disabled = true;
+        td.querySelectorAll('input,select,button').forEach( x=> x.setAttribute('tabindex',-1));
         document.getElementById(this.EbSid_CtxId).disabled = true;
     }
     this.__IsDisable = true;
