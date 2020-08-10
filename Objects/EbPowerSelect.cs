@@ -583,22 +583,22 @@ else// PS
             {
                 int noOfFileds = this.DisplayMembers.Count;
                 int i = 0;
-                string rs = "<div id='@ebsid@srch_Wraper' class='search-wraper' data-toggle='tooltip' @addBtnRealtedWidthChange@ title='@tooltipText@'>"
+                string rs = @"
+<div id='@ebsid@srch_Wraper' class='search-wraper' data-toggle='tooltip' @addBtnRealtedWidthChange@ title='@tooltipText@'>
+    <div class='input-group'>
+        <div class='search-block-wraper'>"
 .Replace("@addBtnRealtedWidthChange@", IsInsertable ? "style='width: calc( 100% - 32px)'" : string.Empty);
                 foreach (DVBaseColumn obj in this.DisplayMembers)
                 {
                     rs += @"
-<div class='search-block' @perWidth@>
-    <div class='input-group'>
-        <v-select maped-column='$$' column-type='@type@' id='@ebsid@$$' style='width:{3}px;' 
-            multiple
-            v-model='displayMembers[""$$""]'
-            :on-change='updateCk'
-            placeholder = '@sTitle@'>
-        </v-select>
-        <span class='input-group-addon ps-srch' @border-r$$> <i id='@ebsid@TglBtn' class='fa  fa-search' aria-hidden='true'></i> </span>
-    </div>
-</div>"
+            <div class='search-block' @perWidth@>
+                <v-select maped-column='$$' column-type='@type@' id='@ebsid@$$' style='width:{3}px;' 
+                    multiple
+                    v-model='displayMembers[""$$""]'
+                    :on-change='updateCk'
+                    placeholder = '@sTitle@'>
+                </v-select>
+            </div>"
 .Replace("$$", obj.Name ?? "")
 .Replace("@ebsid@", this.EbSid_CtxId)
 .Replace("@type@", ((int)obj.Type).ToString())
@@ -607,7 +607,11 @@ else// PS
 .Replace("@border-r" + i, (i != noOfFileds - 1) ? "style='border-radius: 0px;'" : "");
                     i++;
                 }
-                return rs + "</div>";
+                return rs + @"
+        </div>
+        <span class='input-group-addon ps-srch' @border-r$$> <i id='@ebsid@TglBtn' class='fa  fa-search' aria-hidden='true'></i> </span>
+    </div>
+</div>";
             }
         }
 
