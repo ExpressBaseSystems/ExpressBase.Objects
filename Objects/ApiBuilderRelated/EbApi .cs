@@ -42,6 +42,18 @@ namespace ExpressBase.Objects
             Default = new List<Param>();
             Custom = new List<Param>();
         }
+
+        public Param GetParam(string name)
+        {
+            Param p = Default.Find(item=>item.Name == name);
+
+            if(p == null)
+            {
+                p = Custom.Find(item => item.Name == name);
+            }
+
+            return p;
+        }
     }
 
     public abstract class EbApiWrapper : EbObject
@@ -448,7 +460,7 @@ namespace ExpressBase.Objects
 
         private List<Param> GetParams()
         {
-            return this.Parameters.Select(i => new Param { Name = i.Name, Type = i.Type.ToString(), Value = i.Value })
+            return this.Parameters.Select(i => new Param { Name = i.ParameterName, Type = i.Type.ToString(), Value = i.Value })
                     .ToList();
         }
 
@@ -463,7 +475,7 @@ namespace ExpressBase.Objects
                 {
                     foreach (RequestHeader header in this.Headers)
                     {
-                        client.DefaultRequestHeaders.Add(header.Name, header.Value);
+                        client.DefaultRequestHeaders.Add(header.HeaderName, header.Value);
                     }
                 }
 
@@ -527,8 +539,12 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.ApiBuilder)]
     public class RequestParam : EbApiWrapper
     {
-        //[EnableInBuilder(BuilderType.ApiBuilder)]
-        //public string Name { set; get; }
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        [MetaOnly]
+        public override string Name { set; get; }
+
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        public string ParameterName { set; get; }
 
         [EnableInBuilder(BuilderType.ApiBuilder)]
         public string Value { set; get; }
@@ -543,6 +559,13 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.ApiBuilder)]
     public class RequestHeader : EbApiWrapper
     {
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        [MetaOnly]
+        public override string Name { set; get; }
+
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        public string HeaderName { set; get; }
+
         [EnableInBuilder(BuilderType.ApiBuilder)]
         public string Value { set; get; }
     }
