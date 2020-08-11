@@ -86,7 +86,7 @@ namespace ExpressBase.Objects.Objects
         <select id='@ebsid@_dd'  class='selectpicker' style='width: 100%;'>
             @options@
         </select>
-        <div id='@ebsid@_date' name='date' class='Eb-ctrlContainer' ctype='Date' eb-hidden='false'>
+        <div id='@ebsid@_date' name='date' ctype='Date' eb-hidden='false'>
             <span class='eb-ctrl-label eb-label-editable' ui-label=''>Date</span>
             <input id='@ebsid@_datelbltxtb' class='eb-lbltxtb' type='text'> 
             <div id='@ebsid@_dateWraper' class='ctrl-cover' eb-readonly='false'>                    
@@ -97,7 +97,7 @@ namespace ExpressBase.Objects.Objects
             </div>
             <span class='helpText' ui-helptxt=''> </span>
         </div>
-        <div id='@ebsid@_month' name='month' class='Eb-ctrlContainer' ctype='Date' eb-hidden='false'>
+        <div id='@ebsid@_month' name='month'  ctype='Date' eb-hidden='false'>
             <span class='eb-ctrl-label eb-label-editable' ui-label=''>month</span>
             <input id='@ebsid@_monthlbltxtb' class='eb-lbltxtb' type='text'> 
             <div id='@ebsid@_monthWraper' class='ctrl-cover' eb-readonly='false'>                    
@@ -108,7 +108,7 @@ namespace ExpressBase.Objects.Objects
             </div>
             <span class='helpText' ui-helptxt=''> </span>
         </div>
-        <div id='@ebsid@_year' name='year' class='Eb-ctrlContainer' ctype='Date' eb-hidden='false'>
+        <div id='@ebsid@_year' name='year'  ctype='Date' eb-hidden='false'>
             <span class='eb-ctrl-label eb-label-editable' ui-label=''>Year</span>
             <input id='@ebsid@_yearlbltxtb' class='eb-lbltxtb' type='text'> 
             <div id='@ebsid@_yearWraper' class='ctrl-cover' eb-readonly='false'>                    
