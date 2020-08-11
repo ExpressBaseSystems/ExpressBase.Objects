@@ -327,7 +327,8 @@ namespace ExpressBase.Objects
                     { "eb_row_num",EbDbTypes.Decimal},
                     { "eb_created_at_device",EbDbTypes.DateTime},
                     { "eb_device_id",EbDbTypes.String},
-                    { "eb_appversion",EbDbTypes.String}
+                    { "eb_appversion",EbDbTypes.String},
+                    { "eb_created_aid", EbDbTypes.Int32}
                 };
             }
         }
