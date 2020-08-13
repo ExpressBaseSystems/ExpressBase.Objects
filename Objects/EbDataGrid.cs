@@ -461,6 +461,11 @@ namespace ExpressBase.Objects
         {
             return EbControl.GetSingleColumn(this, UserObj, SoluObj, Value);
         }
+
+        public virtual DVBaseColumn GetDVBaseColumn(int index)
+        {
+            return new DVStringColumn { Data = index, Name = this.Name, sTitle = this.Title, Type = this.EbDbType, bVisible = !this.Hidden, sWidth = "100px" };
+        }
     }
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
@@ -606,6 +611,22 @@ else {
         {
             return EbNumeric.GetSingleColumn(this, UserObj, SoluObj, Value);
         }
+
+        public override DVBaseColumn GetDVBaseColumn(int index)
+        {
+            return new DVNumericColumn
+            {
+                Data = index,
+                Name = this.Name,
+                sTitle = this.Title,
+                Type = this.EbDbType,
+                bVisible = !this.Hidden,
+                sWidth = "100px",
+                Align = Align.Right,
+                Aggregate = this.IsAggragate,
+                DecimalPlaces = this.DecimalPlaces
+            };
+        }
     }
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
@@ -704,6 +725,11 @@ return '✖';
                 ObjType = this.ObjType,
                 F = _displayMember
             };
+        }
+
+        public override DVBaseColumn GetDVBaseColumn(int index)
+        {
+            return new DVBooleanColumn { Data = index, Name = this.Name, sTitle = this.Title, Type = this.EbDbType, bVisible = !this.Hidden, sWidth = "100px" };
         }
 
     }
@@ -822,6 +848,11 @@ $(`[ebsid=${p1.DG.EbSid_CtxId}]`).on('change', `[colname=${this.Name}] [ui-inp]`
         public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
         {
             return EbDate.GetSingleColumn(this, UserObj, SoluObj, Value);
+        }
+
+        public override DVBaseColumn GetDVBaseColumn(int index)
+        {
+            return new DVDateTimeColumn { Data = index, Name = this.Name, sTitle = this.Title, sType = "date-uk", Type = this.EbDbType, bVisible = !this.Hidden, sWidth = "100px" };
         }
     }
 
@@ -1813,6 +1844,10 @@ pg.HideProperty('IsDynamic');
         {
             return EbDate.GetSingleColumn(this, UserObj, SoluObj, Value);
         }
+        public override DVBaseColumn GetDVBaseColumn(int index)
+        {
+            return new DVDateTimeColumn { Data = index, Name = this.Name, sTitle = this.Title, sType = "date-uk", Type = this.EbDbType, bVisible = !this.Hidden, sWidth = "100px" };
+        }
     }
 
 
@@ -2068,6 +2103,11 @@ pg.HideProperty('IsDynamic');
         public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
         {
             return EbDate.GetSingleColumn(this, UserObj, SoluObj, Value);
+        }
+
+        public override DVBaseColumn GetDVBaseColumn(int index)
+        {
+            return new DVDateTimeColumn { Data = index, Name = this.Name, sTitle = this.Title, sType = "date-uk", Type = this.EbDbType, bVisible = !this.Hidden, sWidth = "100px" };
         }
     }
 

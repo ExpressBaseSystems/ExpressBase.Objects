@@ -31,17 +31,17 @@ namespace ExpressBase.Objects
             int indx = 0;
             foreach (EbDGColumn column in this.Controls)
             {
-                DVBaseColumn _col = null;
+                DVBaseColumn _col = column.GetDVBaseColumn(indx);
 
-                if (column.EbDbType == EbDbTypes.Int16 || column.EbDbType == EbDbTypes.Int32 || column.EbDbType == EbDbTypes.Int64 || column.EbDbType == EbDbTypes.Double || column.EbDbType == EbDbTypes.Decimal || column.EbDbType == EbDbTypes.VarNumeric)
-                    _col = new DVNumericColumn { Data = indx, Name = column.Name, sTitle = column.Name, Type = column.EbDbType, bVisible = true, sWidth = "100px", 
-                        Align = Align.Right, Aggregate = true,DecimalPlaces=2 };
-                else if (column.EbDbType == EbDbTypes.Boolean)
-                    _col = new DVBooleanColumn { Data = indx, Name = column.Name, sTitle = column.Name, Type = column.EbDbType, bVisible = true, sWidth = "100px" };
-                else if (column.EbDbType == EbDbTypes.DateTime || column.EbDbType == EbDbTypes.Date || column.EbDbType == EbDbTypes.Time)
-                    _col = new DVDateTimeColumn { Data = indx, Name = column.Name, sTitle = column.Name, sType = "date-uk", Type = column.EbDbType, bVisible = true, sWidth = "100px" };
-                else 
-                    _col = new DVStringColumn { Data = indx, Name = column.Name, sTitle = column.Name, Type = column.EbDbType, bVisible = true, sWidth = "100px" };
+                //if (column.EbDbType == EbDbTypes.Int16 || column.EbDbType == EbDbTypes.Int32 || column.EbDbType == EbDbTypes.Int64 || column.EbDbType == EbDbTypes.Double || column.EbDbType == EbDbTypes.Decimal || column.EbDbType == EbDbTypes.VarNumeric)
+                //    _col = new DVNumericColumn { Data = indx, Name = column.Name, sTitle = column.Name, Type = column.EbDbType, bVisible = true, sWidth = "100px", 
+                //        Align = Align.Right, Aggregate = true,DecimalPlaces=2 };
+                //else if (column.EbDbType == EbDbTypes.Boolean)
+                //    _col = new DVBooleanColumn { Data = indx, Name = column.Name, sTitle = column.Name, Type = column.EbDbType, bVisible = true, sWidth = "100px" };
+                //else if (column.EbDbType == EbDbTypes.DateTime || column.EbDbType == EbDbTypes.Date || column.EbDbType == EbDbTypes.Time)
+                //    _col = new DVDateTimeColumn { Data = indx, Name = column.Name, sTitle = column.Name, sType = "date-uk", Type = column.EbDbType, bVisible = true, sWidth = "100px" };
+                //else 
+                //    _col = new DVStringColumn { Data = indx, Name = column.Name, sTitle = column.Name, Type = column.EbDbType, bVisible = true, sWidth = "100px" };
 
                 _col.EbSid = column.EbDbType.ToString() + indx;
                 _col.RenderType = _col.Type;
