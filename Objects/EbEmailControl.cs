@@ -102,7 +102,7 @@ namespace ExpressBase.Objects
 		{
 			return @"<div class='input-group @ebsid@_cont'>
 						  <span class='input-group-addon'> <i class='fa fa-envelope aria-hidden='true' class='input-group-addon'></i> </span>
-						  <input type='email' placeholder='' id='@ebsid@' name='@name@' style='width:100%; display:inline-block;'>
+						  <input type='email' ui-inp placeholder='' id='@ebsid@' name='@name@' style='width:100%; display:inline-block;'>
 					</div>"
 .Replace("@ebsid@", String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId)
 .Replace("@name@", this.Name)
