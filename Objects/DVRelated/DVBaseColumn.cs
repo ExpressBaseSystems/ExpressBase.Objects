@@ -232,10 +232,9 @@ namespace ExpressBase.Objects.Objects.DVRelated
         [HideInPropertyGrid]
         public int Pos { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog)]
         [Alias("Width")]
-        [HideInPropertyGrid]
-        [JsonIgnore]
+        [MetaOnly]
         public string sWidth { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog)]
