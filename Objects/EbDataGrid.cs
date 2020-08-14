@@ -192,11 +192,11 @@ namespace ExpressBase.Objects
         public void SetCols()
         {
             this.FlexibleCols = new List<EbDGColumn>(this.Controls.Cast<EbDGColumn>().ToList());
-            this.LeftFixedCols = this.FlexibleCols.Cast<object>().ToList().PopRange(0, this.LeftFixedColumnCount).Cast<EbDGColumn>().ToList();
-            this.RightFixedCols = this.FlexibleCols.Cast<object>().ToList().PopRange(this.FlexibleCols.Count - this.RightFixedColumnCount, this.FlexibleCols.Count).Cast<EbDGColumn>().ToList();
+            this.LeftFixedCols = this.FlexibleCols.Cast<object>().ToList().PopRange(0, this.LFxdColCount).Cast<EbDGColumn>().ToList();
+            this.RightFixedCols = this.FlexibleCols.Cast<object>().ToList().PopRange(this.FlexibleCols.Count - this.RFxdColCount, this.FlexibleCols.Count).Cast<EbDGColumn>().ToList();
 
-            this.FlexibleCols.RemoveRange(0, this.LeftFixedColumnCount);
-            this.FlexibleCols.RemoveRange(this.FlexibleCols.Count - this.RightFixedColumnCount, this.RightFixedColumnCount);
+            this.FlexibleCols.RemoveRange(0, this.LFxdColCount);
+            this.FlexibleCols.RemoveRange(this.FlexibleCols.Count - this.RFxdColCount, this.RFxdColCount);
         }
 
         //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
