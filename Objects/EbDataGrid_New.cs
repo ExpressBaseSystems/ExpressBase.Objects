@@ -4,6 +4,7 @@ using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
 using ExpressBase.Objects.Objects.DVRelated;
+using System.Linq;
 using System.Runtime.Serialization;
 
 namespace ExpressBase.Objects
@@ -27,11 +28,15 @@ namespace ExpressBase.Objects
             //if (this.DVColumnColl != null)////////check
             //    return;
 
+            this.Controls.Where(e => (e as EbDGColumn).Width <= 0).ToList().ForEach(e => (e as EbDGColumn).Width = 10);
+            int widthSum = this.Controls.Where(e => !e.IsDisable).Select(e => (e as EbDGColumn).Width).Sum();
             this.DVColumnColl = new DVColumnCollection();
             int indx = 0;
             foreach (EbDGColumn column in this.Controls)
             {
                 DVBaseColumn _col = column.GetDVBaseColumn(indx);
+                if (!column.IsDisable)
+                    _col.sWidth = column.Width * 98.0/widthSum + "%";
 
                 //if (column.EbDbType == EbDbTypes.Int16 || column.EbDbType == EbDbTypes.Int32 || column.EbDbType == EbDbTypes.Int64 || column.EbDbType == EbDbTypes.Double || column.EbDbType == EbDbTypes.Decimal || column.EbDbType == EbDbTypes.VarNumeric)
                 //    _col = new DVNumericColumn { Data = indx, Name = column.Name, sTitle = column.Name, Type = column.EbDbType, bVisible = true, sWidth = "100px", 

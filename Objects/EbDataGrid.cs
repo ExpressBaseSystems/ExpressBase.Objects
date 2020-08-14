@@ -51,15 +51,16 @@ namespace ExpressBase.Objects
         public override int Height { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
-        [DefaultPropValue("1")]
+        [DefaultPropValue("0")]
+        [Alias("Left fixed column count")]
         [PropertyGroup(PGConstants.BEHAVIOR)]
-        [HideInPropertyGrid]
-        public int LeftFixedColumnCount { get; set; }
+        public int LFxdColCount { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [DefaultPropValue("0")]
+        [Alias("Right fixed column count")]
         [PropertyGroup(PGConstants.BEHAVIOR)]
-        [HideInPropertyGrid]
-        public int RightFixedColumnCount { get; set; }
+        public int RFxdColCount { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [HideInPropertyGrid]
