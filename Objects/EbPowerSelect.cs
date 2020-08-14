@@ -76,6 +76,10 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
         [PropertyGroup("Api")]
         [HideForUser]
+        [OnChangeExec(@"
+if (this.Columns && this.Columns.$values.length === 0 )
+{
+pg.MakeReadOnly('DisplayMembers');} else {pg.MakeReadWrite('DisplayMembers');}")]
         public string Url { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
@@ -96,7 +100,7 @@ namespace ExpressBase.Objects
         public List<ApiRequestParam> Parameters { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
-        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "return [...commonO.Current_obj.Controls.$values];")]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "return [...getFlatCtrlObjs(commonO.Current_obj)];")]
         [PropertyGroup("Api")]
         [Alias("Parameter controls")]
         public List<EbControl> ApiParamCtrls{ get; set; }
@@ -307,14 +311,14 @@ else
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [PropertyGroup(PGConstants.DATA)]
         [OSE_ObjectTypes(EbObjectTypes.iWebForm)]
-        public string DataImportId { get; set; }
-
-        [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.WebForm, BuilderType.UserControl)]
-        [PropertyEditor(PropertyEditorType.CollectionProp, "Columns", "bVisible")]
         [OnChangeExec(@"
 if (this.Columns && this.Columns.$values.length === 0 )
 {
 pg.MakeReadOnly('DisplayMembers');} else {pg.MakeReadWrite('DisplayMembers');}")]
+        public string DataImportId { get; set; }
+
+        [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.WebForm, BuilderType.UserControl)]
+        [PropertyEditor(PropertyEditorType.CollectionProp, "Columns", "bVisible")]
         [PropertyGroup(PGConstants.DATA_SETTINGS)]
         public DVColumnCollection Columns { get; set; }
 
