@@ -41,7 +41,7 @@ namespace ExpressBase.Objects
                 //new EbDGStringColumn() { Name = "eb_created_by_s", EbDbType = EbDbTypes.String, DoNotPersist = true}
             };
         }
-                
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [HideInPropertyGrid]
         public override bool IsSpecialContainer { get { return true; } set { } }
@@ -110,73 +110,131 @@ namespace ExpressBase.Objects
 
         public override string GetBareHtml()
         {
+            if (this.RenderAsTable)
+                return GetGetBareHtml4Table();
+
             string html = @"
-<div id='cont_@ebsid@' class='fs-grid-cont' style='height:@_height@px;'>
-    <div class='rc-tbl-thead-cont'>
-        <table class='table table-bordered fs-tblhead'>
-            <thead>
-                <tr>
-                <th class='slno rc-slno' style='width:50px'><span class='grid-col-title'>SL No</span></th>
-                <th class='grid-col-title rc-stage'><span class='grid-col-title'>Stage</span></th>
-                <th class='grid-col-title rc-status'><span class='grid-col-title'> Status</span></th>
-                <th class='grid-col-title rc-by'><span class='grid-col-title'>Reviewed by/At</span></th>
-                <th class='grid-col-title rc-remarks'><span class='grid-col-title'>Remarks</span></th>
-                ".Replace("@_height@", (this.Height + 74).ToString());
-            html += @"
-                </tr>
-            </thead>
-        </table>
-    </div>
-    <div class='rc-tbl-tbody-cont'>
-        <table id='tbl_@ebsid@' class='table table-bordered fs-tbl'>
-            <tbody>";
-                List<EbReviewStage> _FormStages = JsonConvert.DeserializeObject<List<EbReviewStage>>(JsonConvert.SerializeObject(FormStages));
-                //_FormStages.Reverse();
-                int i = 0;
-                string FormStageTrHtml = string.Empty;
+<div id='cont_@ebsid@' class='fs-grid-cont rc-cmt' style='height:@_height@px;'>
+    <div class='rc-msg-box'>
+".Replace("@_height@", (this.Height + 74).ToString());
+            List<EbReviewStage> _FormStages = JsonConvert.DeserializeObject<List<EbReviewStage>>(JsonConvert.SerializeObject(FormStages));
+            //_FormStages.Reverse();
+            int i = 0;
+            string FormStageTrHtml = string.Empty;
 
-                foreach (EbReviewStage FormStage in _FormStages)
+            foreach (EbReviewStage FormStage in _FormStages)
+            {
+                EbReviewStage _FormStage = (FormStage as EbReviewStage);
+                EbReviewStage _FormStage_RS = (FormStages[i++] as EbReviewStage);
+
+                string _html = string.Concat(@"
+                                            <div class='message' rowid='@rowid@' name='", _FormStage.Name, @"' stage-ebsid='", _FormStage.EbSid, @"' rowid='@rowid@'>
+                                               <div class='fs-dp' @dpstyle@></div>
+                                               <div class='bubble'>
+                                                  <div class='msg-head'>", _FormStage.Name, @" (@action@)</div>
+                                                  <div class='msg-comment'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;@comment@</div>
+                                                  <span class='msg-uname'>@uname@</span>
+                                                  <div class='corner'></div>
+                                                  <span data-toggle='tooltip' title data-original-title='@timeTitle@'>@time@</span>
+                                               </div>
+                                            </div>");
+
+                string _DDhtml = "<select class='selectpicker'>";
+
+                foreach (EbReviewAction stageAction in _FormStage_RS.StageActions)
                 {
-                    EbReviewStage _FormStage = (FormStage as EbReviewStage);
-                    EbReviewStage _FormStage_RS = (FormStages[i++] as EbReviewStage);
-
-                    string _html = string.Concat(@"
-                <tr name='", _FormStage.Name, "' stage-ebsid='", _FormStage.EbSid, "' rowid='@rowid@' style ='@bg@'>",
-                        "<td class='row-no-td rc-slno'>@slno@</td>",
-                        "<td class='row-no-td rc-stage' col='stage'><span class='fstd-div'>", _FormStage.Name, "</span></td>",
-                        @"<td class='row-no-td rc-status' col='status' class='fs-ctrl-td'><div class='fstd-div'>", @"
-                        <select class='selectpicker'>");
-
-                    foreach (EbReviewAction stageAction in _FormStage_RS.StageActions) {
-                        string stageActionName = stageAction.Name;
-                        _html += ("<option value='"+ stageAction.EbSid + "'>"+ stageAction.Name + "</option>");
-                    }
-                    _html += @"
-                        </select></div>
-                    </td>
-                    <td class='fs-ctrl-td rc-by' col='review-dtls'>
-                        <div class='fstd-div'>
-                            <div class='fs-user-cont'>
-                                <div class='fs-dp' @dpstyle@></div>
-                                <div class='fs-udtls-cont'>
-                                    <span class='fs-uname'> @uname@ </span>
-                                    <span class='fs-time'> @time@ </span>
-                                </div>
-                            </div>
-                        </div>
-                    </td>
-                    <td class='fs-ctrl-td rc-remarks' col='remarks'><div class='fstd-div'> <textarea class='fs-textarea'>@comment@</textarea> </div></td>
-                </tr>";
-
-                    _FormStage_RS.Html = _html;
+                    string stageActionName = stageAction.Name;
+                    _DDhtml += ("<option value='" + stageAction.EbSid + "'>" + stageAction.Name + "</option>");
                 }
+                _DDhtml += "</select>";
 
-                html += @"
-            </tbody>
-        </table>
+                _FormStage_RS.Html = _html;
+                _FormStage_RS.DDHtml = _DDhtml;
+            }
+
+            html += @"
     </div>
-    <div class='fs-submit-cont'><button class='btn btn-success fs-submit'>Execute Review <i class='fa fa-check-square-o' aria-hidden='true'></i></button></div>
+    <div class='rc-inp-cont'>
+        <div class='rc-action-dp-wrap'></div>
+        <div class='rc-action-dd-wrap'></div>
+        <textarea id='chatSend' placeholder='Add remark' class='rc-txtarea'></textarea>
+        <div class='rc-send-btn-wrap'><div class='fs-submit-cont'><button class='btn btn-success fs-submit'>Execute Review <i class='fa fa-check-square-o' aria-hidden='true'></i></button></div></div>
+    </div>
 </div>";
+
+            return html;
+        }
+
+        private string GetGetBareHtml4Table()
+        {
+            string html = @"
+        <div id='cont_@ebsid@' class='fs-grid-cont' style='height:@_height@px;'>
+            <div class='rc-tbl-thead-cont'>
+                <table class='table table-bordered fs-tblhead'>
+                    <thead>
+                        <tr>
+                        <th class='slno rc-slno' style='width:50px'><span class='grid-col-title'>SL No</span></th>
+                        <th class='grid-col-title rc-stage'><span class='grid-col-title'>Stage</span></th>
+                        <th class='grid-col-title rc-status'><span class='grid-col-title'> Status</span></th>
+                        <th class='grid-col-title rc-by'><span class='grid-col-title'>Reviewed by/At</span></th>
+                        <th class='grid-col-title rc-remarks'><span class='grid-col-title'>Remarks</span></th>
+                        ".Replace("@_height@", (this.Height + 74).ToString());
+            html += @"
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+            <div class='rc-tbl-tbody-cont'>
+                <table id='tbl_@ebsid@' class='table table-bordered fs-tbl'>
+                    <tbody>";
+            List<EbReviewStage> _FormStages = JsonConvert.DeserializeObject<List<EbReviewStage>>(JsonConvert.SerializeObject(FormStages));
+            //_FormStages.Reverse();
+            int i = 0;
+            string FormStageTrHtml = string.Empty;
+
+            foreach (EbReviewStage FormStage in _FormStages)
+            {
+                EbReviewStage _FormStage = (FormStage as EbReviewStage);
+                EbReviewStage _FormStage_RS = (FormStages[i++] as EbReviewStage);
+
+                string _html = string.Concat(@"
+                        <tr name='", _FormStage.Name, "' stage-ebsid='", _FormStage.EbSid, "' rowid='@rowid@' style ='@bg@'>",
+                    "<td class='row-no-td rc-slno'>@slno@</td>",
+                    "<td class='row-no-td rc-stage' col='stage'><span class='fstd-div'>", _FormStage.Name, "</span></td>",
+                    @"<td class='row-no-td rc-status' col='status' class='fs-ctrl-td'><div class='fstd-div'>", @"
+                                <select class='selectpicker'>");
+
+                foreach (EbReviewAction stageAction in _FormStage_RS.StageActions)
+                {
+                    string stageActionName = stageAction.Name;
+                    _html += ("<option value='" + stageAction.EbSid + "'>" + stageAction.Name + "</option>");
+                }
+                _html += @"
+                                </select></div>
+                            </td>
+                            <td class='fs-ctrl-td rc-by' col='review-dtls'>
+                                <div class='fstd-div'>
+                                    <div class='fs-user-cont'>
+                                        <div class='fs-dp' @dpstyle@></div>
+                                        <div class='fs-udtls-cont'>
+                                            <span class='fs-uname'> @uname@ </span>
+                                            <span class='fs-time'> @time@ </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class='fs-ctrl-td rc-remarks' col='remarks'><div class='fstd-div'> <textarea class='fs-textarea'>@comment@</textarea> </div></td>
+                        </tr>";
+
+                _FormStage_RS.Html = _html;
+            }
+
+            html += @"
+                    </tbody>
+                </table>
+            </div>
+            <div class='fs-submit-cont'><button class='btn btn-success fs-submit'>Execute Review <i class='fa fa-check-square-o' aria-hidden='true'></i></button></div>
+        </div>";
 
             return html;
         }
@@ -199,6 +257,11 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public Dictionary<int, string> Roles { get; set; }
 
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        [PropertyPriority(6)]
+        [EnableInBuilder(BuilderType.WebForm)]
+        public bool RenderAsTable { get; set; }
+
         public override string GetDesignHtml()
         {
             return GetHtml().RemoveCR().DoubleQuoted();
@@ -214,7 +277,7 @@ namespace ExpressBase.Objects
         }
 
         public string GetSelectQuery(string RefId, string MasterTable)
-        {            
+        {
             return $@"SELECT A.id, S.stage_unique_id, A.is_form_data_editable, A.user_ids, A.role_ids, A.usergroup_id
                 FROM eb_my_actions A, eb_stages S
                 WHERE A.form_ref_id = '{RefId}' AND A.form_data_id = @{MasterTable}_id AND 
@@ -237,6 +300,10 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
         public string Html { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public string DDHtml { get; set; }
 
         public EbReviewStage() { }
         public string ObjType { get { return this.GetType().Name.Substring(2, this.GetType().Name.Length - 2); } set { } }
