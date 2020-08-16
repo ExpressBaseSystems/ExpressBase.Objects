@@ -15,14 +15,6 @@ using System.Text;
 
 namespace ExpressBase.Objects
 {
-    public enum EbSysLocDM//DisplayMember
-    {
-        LocationId = 1,
-        ShortName,
-        LongName
-    }
-
-   
     [EnableInBuilder(BuilderType.WebForm)]
     public class EbSysLocation : EbControlUI, IEbPlaceHolderControl
     {
@@ -35,7 +27,7 @@ namespace ExpressBase.Objects
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
             //this.Name = "eb_loc_id";
         }
-        
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [DefaultPropValue("eb_loc_id")]
         public override string Name { get; set; }
@@ -45,12 +37,6 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         public override EbScript DefaultValueExpression { get; set; }
-
-        [EnableInBuilder(BuilderType.WebForm)]
-        public override EbDbTypes EbDbType { get { return EbDbTypes.Decimal; } }
-
-        [EnableInBuilder(BuilderType.WebForm)]
-        public EbSysLocDM DisplayMember { get; set; }
 
         [HideInPropertyGrid]
         [JsonIgnore]
@@ -123,9 +109,9 @@ namespace ExpressBase.Objects
         }
 
 
-        public override string EnableJSfn 
+        public override string EnableJSfn
         {
-            get 
+            get
             {
                 if (this.IsDisable)
                 {
@@ -135,21 +121,22 @@ namespace ExpressBase.Objects
                 {
                     return @"$('#cont_' + this.EbSid_CtxId + ' *').prop('disabled',false).css('pointer-events', 'inherit').find('[ui-inp]').css('background-color', '#fff');";
                 }
-            } 
-            set { } 
+            }
+            set { }
         }
 
         public override string GetValueFromDOMJSfn
-        { get 
-            { 
+        {
+            get
+            {
                 return @"
                 if(this.IsDisable)
                     return $('#' + this.EbSid_CtxId).attr('data-id');
                 else
                     return $('#' + this.EbSid_CtxId).val();
-                "; 
-            } 
-            set { } 
+                ";
+            }
+            set { }
         }
 
         public override string SetValueJSfn
@@ -159,10 +146,12 @@ namespace ExpressBase.Objects
                 return @"
                     if(this.IsDisable){
                         if(!p1)
-                            return false;                        
-                        let arr = p1.split('$$');
-                        $('#' + this.EbSid_CtxId).attr('data-id', arr[0]);
-                        $('#' + this.EbSid_CtxId).val(arr[1]).trigger('change');
+                            return false;
+                        $('#' + this.EbSid_CtxId).attr('data-id', p1);
+                        let obj = ebcontext.locations.Locations.find(e => e.LocId === p1);
+                        if (obj){
+                            $('#' + this.EbSid_CtxId).val(obj.ShortName).trigger('change');
+                        }
                     }
                     else
                         $('#' + this.EbSid_CtxId).val(p1).trigger('change');
@@ -181,15 +170,15 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
-        public override bool DoNotPersist 
+        public override bool DoNotPersist
         {
-            get 
+            get
             {
                 if (this.IsDisable == true)
                     return true;
                 else
                     return false;
-            } 
+            }
         }
 
         [EnableInBuilder(BuilderType.WebForm)]
@@ -210,37 +199,19 @@ namespace ExpressBase.Objects
 
         public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
         {
-            object _formattedData = Value;
             string _displayMember = string.Empty;
             int loc_id = UserObj.Preference.DefaultLocation;
             if (Value != null)
                 loc_id = Convert.ToInt32(Value);
-
-            if (this.IsDisable)
-            {
-                EbSysLocDM dm = this.DisplayMember;
-                if (SoluObj.Locations.ContainsKey(loc_id))
-                {
-                    if (dm == EbSysLocDM.LongName)
-                    {
-                        _formattedData = loc_id + "$$" + SoluObj.Locations[loc_id].LongName;
-                        _displayMember = SoluObj.Locations[loc_id].LongName;
-                    }
-                    else
-                    {
-                        _formattedData = loc_id + "$$" + SoluObj.Locations[loc_id].ShortName;
-                        _displayMember = SoluObj.Locations[loc_id].ShortName;
-                    }
-                }
-            }
-            else
-                _formattedData = loc_id;
+                        
+            if (SoluObj.Locations.ContainsKey(loc_id))
+                _displayMember = SoluObj.Locations[loc_id].ShortName;
 
             return new SingleColumn()
             {
                 Name = this.Name,
                 Type = (int)this.EbDbType,
-                Value = _formattedData,
+                Value = loc_id,
                 Control = this,
                 ObjType = this.ObjType,
                 F = _displayMember
@@ -313,8 +284,8 @@ namespace ExpressBase.Objects
                                     + EbCtrlHTML
                         + "</div>";
         }
-		
-		public override string GetBareHtml()
+
+        public override string GetBareHtml()
         {
             return @"
 						<div style='display: flex;'>
@@ -352,18 +323,18 @@ namespace ExpressBase.Objects
                         $('#' + this.EbSid_CtxId).text(arr[1]).trigger('change');
 						let imgsrc='/images/dp/'+ arr[0] +'.png';
 						$('#' + this.EbSid_CtxId + '_usrimg').attr('src',imgsrc );";
-			}
+            }
             set { }
         }
 
-		public override string GetDisplayMemberFromDOMJSfn
+        public override string GetDisplayMemberFromDOMJSfn
         {
-			get
-			{
-				return @"return $('#' + this.EbSid_CtxId).text();";
-			}
-			set { }
-		}
+            get
+            {
+                return @"return $('#' + this.EbSid_CtxId).text();";
+            }
+            set { }
+        }
 
         public override string RefreshJSfn { get { return @""; } set { } }
 
@@ -729,14 +700,14 @@ namespace ExpressBase.Objects
             set { }
         }
 
-		public override string GetDisplayMemberFromDOMJSfn
+        public override string GetDisplayMemberFromDOMJSfn
         {
-			get
-			{
-				return @"return $('#' + this.EbSid_CtxId).text();";
-			}
-			set { }
-		}
+            get
+            {
+                return @"return $('#' + this.EbSid_CtxId).text();";
+            }
+            set { }
+        }
 
         public override string RefreshJSfn { get { return @""; } set { } }
 
@@ -828,7 +799,7 @@ namespace ExpressBase.Objects
             }
             set { }
         }
-        
+
         public override string RefreshJSfn
         {
             get
