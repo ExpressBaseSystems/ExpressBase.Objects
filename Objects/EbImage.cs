@@ -154,9 +154,14 @@ namespace ExpressBase.Objects
             return ReplacePropsInHTML(EbCtrlHTML);
         }
 
-        //--------Hide in property grid------------start
+		public override string DesignHtml4Bot
+		{
+			get => this.GetBareHtml();
+			set => base.DesignHtml4Bot = value;
+		}
+		//--------Hide in property grid------------start
 
-        [HideInPropertyGrid]
+		[HideInPropertyGrid]
         public override bool Unique { get; set; }
 
         [HideInPropertyGrid]
