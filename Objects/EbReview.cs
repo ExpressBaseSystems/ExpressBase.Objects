@@ -139,7 +139,7 @@ namespace ExpressBase.Objects
                                                </div>
                                             </div>");
 
-                string _DDhtml = "<select class='selectpicker'>";
+                string _DDhtml = "<select class='selectpicker' data-container='body'>";
 
                 foreach (EbReviewAction stageAction in _FormStage_RS.StageActions)
                 {
