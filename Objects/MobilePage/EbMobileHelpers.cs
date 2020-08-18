@@ -3,28 +3,11 @@ using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace ExpressBase.Objects
 {
-    public enum DataColumnRenderType
-    {
-        Text = 1,
-        Image = 2,
-        MobileNumber = 3
-    }
-
-    public enum MobileTextAlign
-    {
-        Left,
-        Center,
-        Right,
-    }
-
     [EnableInBuilder(BuilderType.MobilePage)]
-    public class EbMobileDataColumn : EbMobileControl, INonPersistControl
+    public class EbMobileDataColumn : EbMobileControl, INonPersistControl, IMobileDataPart
     {
         public override string Label { set; get; }
 
@@ -70,7 +53,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("UI")]
         [OnChangeExec(@"
-                if (this.RenderAs === 1 ){ 
+                if (this.RenderAs === 1 || this.RenderAs === 5){ 
                         pg.ShowProperty('TextFormat');
                         pg.ShowProperty('Font');
                         pg.ShowProperty('TextAlign');
@@ -95,6 +78,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("UI")]
+        [Alias("Align")]
         public MobileTextAlign TextAlign { set; get; }
 
         public override string GetDesignHtml()
