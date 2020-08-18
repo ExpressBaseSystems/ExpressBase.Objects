@@ -758,6 +758,10 @@ namespace ExpressBase.Objects
         public bool RenderTextAsIcon { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Style")]
+        public HorrizontalAlign Align { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iMobilePage)]
         [PropertyGroup("Link Settings")]

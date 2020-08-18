@@ -44,4 +44,11 @@ namespace ExpressBase.Objects
         Center,
         Right,
     }
+
+    public enum HorrizontalAlign
+    {
+        Left,
+        Center,
+        Right,
+    }
 }
