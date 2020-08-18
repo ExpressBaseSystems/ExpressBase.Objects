@@ -710,4 +710,71 @@ namespace ExpressBase.Objects
             };
         }
     }
+
+    [EnableInBuilder(BuilderType.MobilePage)]
+    public class EbMobileButton : EbMobileControl, IMobileUIStyles, IMobileLink
+    {
+        public override string Label { set; get; }
+
+        public override bool Unique { get; set; }
+
+        public override bool ReadOnly { get; set; }
+
+        public override bool DoNotPersist { get; set; }
+
+        public override bool Required { get; set; }
+
+        public override bool Hidden { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Style")]
+        [PropertyEditor(PropertyEditorType.Color)]
+        public string BackgroundColor { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Style")]
+        [PropertyEditor(PropertyEditorType.Color)]
+        public string ForegroundColor { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Style")]
+        public int BorderThickness { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Style")]
+        [PropertyEditor(PropertyEditorType.Color)]
+        public string BorderColor { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Style")]
+        public int BorderRadius { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Style")]
+        public string Text { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Style")]
+        public bool RenderTextAsIcon { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Style")]
+        public HorrizontalAlign Align { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [OSE_ObjectTypes(EbObjectTypes.iMobilePage)]
+        [PropertyGroup("Link Settings")]
+        [Alias("Link")]
+        public string LinkRefId { get; set; }
+
+        public override string GetDesignHtml()
+        {
+            return @"<div class='eb_stacklayout mob_control dropped' id='@id' eb-type='EbMobileButton' tabindex='1' onclick='$(this).focus()'>
+                            <div class='eb_btnctrlhtml'>
+                               <button class='ebm-btn'>Button</button>
+                            </div>
+                        </div>".RemoveCR().DoubleQuoted();
+        }
+    }
 }
