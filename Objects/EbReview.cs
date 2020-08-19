@@ -139,7 +139,7 @@ namespace ExpressBase.Objects
                                                </div>
                                             </div>");
 
-                string _DDhtml = "<select class='selectpicker'>";
+                string _DDhtml = "<select class='selectpicker' data-container='body'>";
 
                 foreach (EbReviewAction stageAction in _FormStage_RS.StageActions)
                 {
@@ -158,7 +158,10 @@ namespace ExpressBase.Objects
         <div class='rc-action-dp-wrap'></div>
         <div class='rc-action-dd-wrap'></div>
         <textarea id='chatSend' placeholder='Add remark' class='rc-txtarea'></textarea>
-        <div class='rc-send-btn-wrap'><div class='fs-submit-cont'><button class='btn btn-success fs-submit'>Execute Review <i class='fa fa-check-square-o' aria-hidden='true'></i></button></div></div>
+        <div class='rc-send-btn-wrap'>
+        <div class='fs-submit-cont'>
+            <div class='btn btn-success fs-submit'>Execute Review <i class='fa fa-check-square-o' aria-hidden='true'></i></div></div>
+        </div>
     </div>
 </div>";
 
@@ -233,7 +236,7 @@ namespace ExpressBase.Objects
                     </tbody>
                 </table>
             </div>
-            <div class='fs-submit-cont'><button class='btn btn-success fs-submit'>Execute Review <i class='fa fa-check-square-o' aria-hidden='true'></i></button></div>
+            <div class='fs-submit-cont'><div class='btn btn-success fs-submit'>Execute Review <i class='fa fa-check-square-o' aria-hidden='true'></i></div></div>
         </div>";
 
             return html;

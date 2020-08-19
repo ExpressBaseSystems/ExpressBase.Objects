@@ -61,6 +61,49 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
         [PropertyGroup(PGConstants.CORE)]
+        [OnChangeExec(@"
+        if(this.IsImportDataFromApi){
+            pg.ShowGroup('ImportApi');
+            pg.HideProperty('DataImportId');
+        }
+        else{
+            pg.HideGroup('ImportApi');
+            pg.ShowProperty('DataImportId');
+        }")]
+        public bool IsImportDataFromApi { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
+        [PropertyGroup("ImportApi")]
+        [HideForUser]
+        public string ImportUrl { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
+        [PropertyGroup("ImportApi")]
+        [HideForUser]
+        public ApiMethods ImportApiMethod { set; get; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        [PropertyGroup("ImportApi")]
+        [HideForUser]
+        public List<ApiRequestHeader> ImportApiHeaders { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        [PropertyGroup("ImportApi")]
+        [MetaOnly]
+        public List<ApiRequestParam> ImportApiParameters { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "return [...getFlatCtrlObjs(commonO.Current_obj)];")]
+        [PropertyGroup("ImportApi")]
+        [Alias("Import Api Parameter controls")]
+        public List<EbControl> ImportApiParamCtrls { get; set; }
+
+
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
+        [PropertyGroup(PGConstants.CORE)]
         [HideForUser]
         [OnChangeExec(@"
         if(this.IsDataFromApi){
@@ -103,7 +146,7 @@ pg.MakeReadOnly('DisplayMembers');} else {pg.MakeReadWrite('DisplayMembers');}")
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "return [...getFlatCtrlObjs(commonO.Current_obj)];")]
         [PropertyGroup("Api")]
         [Alias("Parameter controls")]
-        public List<EbControl> ApiParamCtrls{ get; set; }
+        public List<EbControl> ApiParamCtrls { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
         [PropertyGroup(PGConstants.DATA_INSERT)]
@@ -315,6 +358,7 @@ else
 if (this.Columns && this.Columns.$values.length === 0 )
 {
 pg.MakeReadOnly('DisplayMembers');} else {pg.MakeReadWrite('DisplayMembers');}")]
+        [Alias("Import Form")]
         public string DataImportId { get; set; }
 
         [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.WebForm, BuilderType.UserControl)]

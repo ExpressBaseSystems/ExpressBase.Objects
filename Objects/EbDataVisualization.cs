@@ -1042,10 +1042,10 @@ else {
 
     }
 
-    [EnableInBuilder(BuilderType.WebForm)]
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
     public class ObjectBasicReport : ObjectBasicInfo
     {
-        [EnableInBuilder(BuilderType.WebForm)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
         public string Title { get; set; }
     }
 
