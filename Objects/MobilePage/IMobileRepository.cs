@@ -26,13 +26,15 @@ namespace ExpressBase.Objects
     {
         string BackgroundColor { set; get; }
 
-        string ForegroundColor { set; get; }
-
         int BorderThickness { set; get; }
 
         string BorderColor { set; get; }
 
         int BorderRadius { set; get; }
+
+        MobileHorrizontalAlign HorrizontalAlign { set; get; }
+        
+        MobileVerticalAlign VerticalAlign { set; get; }
     }
 
     public interface IMobileLink

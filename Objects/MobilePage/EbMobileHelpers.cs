@@ -56,12 +56,10 @@ namespace ExpressBase.Objects
                 if (this.RenderAs === 1 || this.RenderAs === 5){ 
                         pg.ShowProperty('TextFormat');
                         pg.ShowProperty('Font');
-                        pg.ShowProperty('TextAlign');
                 }
                 else {
                         pg.HideProperty('TextFormat');
                         pg.HideProperty('Font');
-                        pg.HideProperty('TextAlign');
                 }
             ")]
         public DataColumnRenderType RenderAs { set; get; }
@@ -78,8 +76,13 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("UI")]
-        [Alias("Align")]
-        public MobileTextAlign TextAlign { set; get; }
+        [Alias("Align X")]
+        public MobileHorrizontalAlign HorrizontalAlign { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("UI")]
+        [Alias("Align Y")]
+        public MobileVerticalAlign VerticalAlign { set; get; }
 
         public override string GetDesignHtml()
         {
