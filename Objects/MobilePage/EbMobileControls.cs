@@ -727,39 +727,61 @@ namespace ExpressBase.Objects
         public override bool Hidden { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("Style")]
+        [PropertyGroup("UI")]
+        public int Width { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("UI")]
+        public int Height { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("UI")]
+        public int RowSpan { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("UI")]
+        public int ColumnSpan { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("UI")]
         [PropertyEditor(PropertyEditorType.Color)]
         public string BackgroundColor { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("Style")]
+        [PropertyGroup("UI")]
         [PropertyEditor(PropertyEditorType.Color)]
         public string ForegroundColor { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("Style")]
+        [PropertyGroup("UI")]
         public int BorderThickness { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("Style")]
+        [PropertyGroup("UI")]
         [PropertyEditor(PropertyEditorType.Color)]
         public string BorderColor { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("Style")]
+        [PropertyGroup("UI")]
         public int BorderRadius { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("Style")]
+        [PropertyGroup("UI")]
         public string Text { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("Style")]
+        [PropertyGroup("UI")]
         public bool RenderTextAsIcon { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("Style")]
-        public HorrizontalAlign Align { set; get; }
+        [PropertyGroup("UI")]
+        [Alias("Align X")]
+        public MobileHorrizontalAlign HorrizontalAlign { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("UI")]
+        [Alias("Align Y")]
+        public MobileVerticalAlign VerticalAlign { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
