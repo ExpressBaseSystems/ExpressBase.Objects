@@ -48,9 +48,9 @@ namespace ExpressBase.Objects
 
     public enum MobileVerticalAlign
     {
-        Left,
+        Top,
         Center,
-        Right,
+        Bottom,
         Fill
     }
 }
