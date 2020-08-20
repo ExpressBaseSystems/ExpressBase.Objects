@@ -26,8 +26,6 @@ namespace ExpressBase.Objects
     {
         string BackgroundColor { set; get; }
 
-        string ForegroundColor { set; get; }
-
         int BorderThickness { set; get; }
 
         string BorderColor { set; get; }

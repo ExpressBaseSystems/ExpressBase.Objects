@@ -1,4 +1,5 @@
-﻿using ExpressBase.Common.Constants;
+﻿using ExpressBase.Common;
+using ExpressBase.Common.Constants;
 using ExpressBase.Common.Data;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
@@ -727,12 +728,11 @@ namespace ExpressBase.Objects
         public override bool Hidden { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("UI")]
-        public int Width { set; get; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("UI")]
-        public int Height { set; get; }
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [OSE_ObjectTypes(EbObjectTypes.iMobilePage)]
+        [PropertyGroup("Link Settings")]
+        [Alias("Link")]
+        public string LinkRefId { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("UI")]
@@ -744,13 +744,28 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("UI")]
-        [PropertyEditor(PropertyEditorType.Color)]
-        public string BackgroundColor { get; set; }
+        [DefaultPropValue("30")]
+        public int Width { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("UI")]
+        [DefaultPropValue("30")]
+        public int Height { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("UI")]
+        public string Text { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("UI")]
+        [UIproperty]
+        [PropertyEditor(PropertyEditorType.FontSelector)]
+        public EbFont Font { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("UI")]
         [PropertyEditor(PropertyEditorType.Color)]
-        public string ForegroundColor { get; set; }
+        public string BackgroundColor { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("UI")]
@@ -767,10 +782,6 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("UI")]
-        public string Text { set; get; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("UI")]
         public bool RenderTextAsIcon { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
@@ -782,13 +793,6 @@ namespace ExpressBase.Objects
         [PropertyGroup("UI")]
         [Alias("Align Y")]
         public MobileVerticalAlign VerticalAlign { set; get; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyEditor(PropertyEditorType.ObjectSelector)]
-        [OSE_ObjectTypes(EbObjectTypes.iMobilePage)]
-        [PropertyGroup("Link Settings")]
-        [Alias("Link")]
-        public string LinkRefId { get; set; }
 
         public override string GetDesignHtml()
         {
