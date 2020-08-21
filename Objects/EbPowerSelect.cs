@@ -31,7 +31,7 @@ namespace ExpressBase.Objects
     }
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-    public class EbPowerSelect : EbControlUI
+    public class EbPowerSelect : EbControlUI, IEbPowerSelect, IEbDataReaderControl
     {
 
         public EbPowerSelect()
@@ -59,10 +59,10 @@ namespace ExpressBase.Objects
         //    set { }
         //}
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [PropertyGroup(PGConstants.CORE)]
         [OnChangeExec(@"
-        if(this.IsImportDataFromApi){
+        if(this.IsImportFromApi){
             pg.ShowGroup('ImportApi');
             pg.HideProperty('DataImportId');
         }
@@ -70,36 +70,33 @@ namespace ExpressBase.Objects
             pg.HideGroup('ImportApi');
             pg.ShowProperty('DataImportId');
         }")]
-        public bool IsImportDataFromApi { get; set; }
+        public bool IsImportFromApi { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [PropertyGroup("ImportApi")]
         [HideForUser]
-        public string ImportUrl { get; set; }
+        public string ImportApiUrl { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [PropertyGroup("ImportApi")]
         [HideForUser]
         public ApiMethods ImportApiMethod { set; get; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.Collection)]
         [PropertyGroup("ImportApi")]
         [HideForUser]
         public List<ApiRequestHeader> ImportApiHeaders { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyGroup("ImportApi")]
+        [Alias("Import api parameters")]
         [PropertyEditor(PropertyEditorType.Collection)]
-        [PropertyGroup("ImportApi")]
-        [MetaOnly]
-        public List<ApiRequestParam> ImportApiParameters { get; set; }
+        public List<EbCtrlApiParamAbstract> ImportApiParams { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
-        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "return [...getFlatCtrlObjs(commonO.Current_obj)];")]
-        [PropertyGroup("ImportApi")]
-        [Alias("Import Api Parameter controls")]
-        public List<EbControl> ImportApiParamCtrls { get; set; }
-
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        public List<Param> ImportParamsList { get; set; }
 
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
@@ -773,6 +770,9 @@ else// PS
         public void InitFromDataBase_SS(JsonServiceClient ServiceClient)
         {
             //this.DataSourceId = "eb_roby_dev-eb_roby_dev-2-1015-1739";
+            if (this.IsDataFromApi)
+                return;
+
             string _html = string.Empty;
             var result = ServiceClient.Get<FDDataResponse>(new FDDataRequest { RefId = this.DataSourceId });
 
@@ -827,27 +827,18 @@ else// PS
         {
             if (this.IsDataFromApi)
             {
-                this.ParamsList = ApiParamCtrls2ParamsList(ApiParamCtrls);
+                this.ParamsList = new List<Param>();
+                if (this.ApiParamCtrls != null)
+                {
+                    foreach (var p in this.ApiParamCtrls)
+                        ParamsList.Add(new Param() { Name = p.Name, Type = ((int)p.EbDbType).ToString() });
+                }
             }
             else
             {
                 EbDataReader DrObj = EbFormHelper.GetEbObject<EbDataReader>(this.DataSourceId, ServiceClient, Redis, null);
                 this.ParamsList = DrObj.GetParams(Redis as RedisClient);
             }
-        }
-
-        private List<Param> ApiParamCtrls2ParamsList(List<EbControl> ApiParamCtrls)
-        {
-            List<Param> ParamsList = new List<Param>();
-            if (ApiParamCtrls == null)
-                return ParamsList;
-
-            foreach (var p in ApiParamCtrls)
-            {
-                ParamsList.Add(new Param() { Name = p.Name, Type = p.EbDbType.ToString() });
-            }
-
-            return ParamsList;
         }
 
         private string GetSql(Service service)
@@ -863,6 +854,9 @@ else// PS
         //INCOMPLETE// to get the entire columns(vm+dm+others) in ps query
         public string GetSelectQuery(IDatabase DataDB, Service service, string Col, string Tbl = null, string _id = null, string masterTbl = null)
         {
+            if (this.IsDataFromApi)
+                return string.Empty;
+
             string Sql = this.GetSql(service);
 
             if (Tbl == null || _id == null)// prefill mode
@@ -905,6 +899,9 @@ else// PS
         //for grid lines
         public string GetSelectQuery123(IDatabase DataDB, Service service, string table, string column, string parentTbl, string masterTbl)
         {
+            if (this.IsDataFromApi)
+                return string.Empty;
+
             string psSql = this.GetSql(service);
             string s = $@"SELECT __A.* FROM ({psSql}) __A, {table} __B
                             WHERE __A.{this.ValueMember.Name} = ANY(STRING_TO_ARRAY(__B.{column}::TEXT, ',')::INT[]) 
@@ -915,6 +912,9 @@ else// PS
         //to get vm+dm only for audit trail
         public string GetDisplayMembersQuery(IDatabase DataDB, Service service, string vms)
         {
+            if (this.IsDataFromApi)
+                return string.Empty;
+
             string Sql = this.GetSql(service);
             string vm = this.ValueMember.Name;
             string dm;
@@ -954,5 +954,43 @@ else// PS
                 R = new Dictionary<string, List<dynamic>>()
             };
         }
+    }
+
+    public abstract class EbCtrlApiParamAbstract { }
+
+    [UsedWithTopObjectParent(typeof(EbObject))]
+    [EnableInBuilder(BuilderType.WebForm)]
+    [Alias("ApiParameter")]
+    public class EbCtrlApiParam : EbCtrlApiParamAbstract
+    {
+        public EbCtrlApiParam() { }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public string DisplayName { get; set; }
+
+        [OnChangeExec(@"
+        if(this.IsStaticParam){
+            pg.ShowProperty('Value');
+            pg.ShowProperty('Name');
+            pg.HideProperty('ControlName');
+        }
+        else{
+            pg.HideProperty('Value');
+            pg.HideProperty('Name');
+            pg.ShowProperty('ControlName');
+        }")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [Alias("Is static parameter")]
+        public bool IsStaticParam { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        public string ControlName { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        public string Name { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        public string Value { get; set; }
     }
 }

@@ -1243,7 +1243,7 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
     [Alias("PowerSelect Column")]
     [UsedWithTopObjectParent(typeof(EbObject))]
-    public class EbDGPowerSelectColumn : EbDGColumn
+    public class EbDGPowerSelectColumn : EbDGColumn, IEbPowerSelect, IEbDataReaderControl
     {
 
 
@@ -1317,7 +1317,7 @@ pg.MakeReadOnly('DisplayMembers');} else {pg.MakeReadWrite('DisplayMembers');}")
         [PropertyGroup("Api")]
         [MetaOnly]
         public List<ApiRequestParam> Parameters { get { return this.EbPowerSelect.Parameters; } set { this.EbPowerSelect.Parameters = value; } }
-
+                
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
