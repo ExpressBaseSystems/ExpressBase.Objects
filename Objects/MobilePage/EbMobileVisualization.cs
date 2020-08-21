@@ -9,21 +9,8 @@ using System.Collections.Generic;
 
 namespace ExpressBase.Objects
 {
-
-    public enum SortOrder
-    {
-        Ascending = 0,
-        Descending = 1
-    }
-
-    public enum RenderStyle
-    {
-        Flat = 1,
-        Tile = 2
-    }
-
     [EnableInBuilder(BuilderType.MobilePage)]
-    public class EbMobileVisualization : EbMobileContainer
+    public class EbMobileVisualization : EbMobileContainer, IMobileLink
     {
         [EnableInBuilder(BuilderType.MobilePage)]
         [MetaOnly]
@@ -100,6 +87,10 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("Link Settings")]
         public bool ShowNewButton { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Link Settings")]
+        public bool ShowLinkIcon { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.Expandable)]

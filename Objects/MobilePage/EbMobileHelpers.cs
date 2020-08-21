@@ -3,28 +3,11 @@ using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace ExpressBase.Objects
 {
-    public enum DataColumnRenderType
-    {
-        Text = 1,
-        Image = 2,
-        MobileNumber = 3
-    }
-
-    public enum MobileTextAlign
-    {
-        Left,
-        Center,
-        Right,
-    }
-
     [EnableInBuilder(BuilderType.MobilePage)]
-    public class EbMobileDataColumn : EbMobileControl, INonPersistControl
+    public class EbMobileDataColumn : EbMobileControl, INonPersistControl, IMobileDataPart
     {
         public override string Label { set; get; }
 
@@ -70,15 +53,13 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("UI")]
         [OnChangeExec(@"
-                if (this.RenderAs === 1 ){ 
+                if ([1,3,5].includes(this.RenderAs)){ 
                         pg.ShowProperty('TextFormat');
                         pg.ShowProperty('Font');
-                        pg.ShowProperty('TextAlign');
                 }
                 else {
                         pg.HideProperty('TextFormat');
                         pg.HideProperty('Font');
-                        pg.HideProperty('TextAlign');
                 }
             ")]
         public DataColumnRenderType RenderAs { set; get; }
@@ -95,7 +76,13 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("UI")]
-        public MobileTextAlign TextAlign { set; get; }
+        [Alias("Align X")]
+        public MobileHorrizontalAlign HorrizontalAlign { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("UI")]
+        [Alias("Align Y")]
+        public MobileVerticalAlign VerticalAlign { set; get; }
 
         public override string GetDesignHtml()
         {

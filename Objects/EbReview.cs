@@ -131,7 +131,7 @@ namespace ExpressBase.Objects
                                             <div class='message' rowid='@rowid@' name='", _FormStage.Name, @"' stage-ebsid='", _FormStage.EbSid, @"' rowid='@rowid@'>
                                                <div class='fs-dp' @dpstyle@></div>
                                                <div class='bubble'>
-                                                  <div class='msg-head'>", _FormStage.Name, @" (@action@)</div>
+                                                  <div class='msg-head'>", _FormStage.Name, @" @action@</div>
                                                   <div class='msg-comment'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;@comment@</div>
                                                   <span class='msg-uname'>@uname@</span>
                                                   <div class='corner'></div>
@@ -139,7 +139,7 @@ namespace ExpressBase.Objects
                                                </div>
                                             </div>");
 
-                string _DDhtml = "<select class='selectpicker'>";
+                string _DDhtml = "<select class='selectpicker' data-container='body'>";
 
                 foreach (EbReviewAction stageAction in _FormStage_RS.StageActions)
                 {
@@ -155,10 +155,14 @@ namespace ExpressBase.Objects
             html += @"
     </div>
     <div class='rc-inp-cont'>
+        <div class='rc-inp-head'></div>
         <div class='rc-action-dp-wrap'></div>
         <div class='rc-action-dd-wrap'></div>
         <textarea id='chatSend' placeholder='Add remark' class='rc-txtarea'></textarea>
-        <div class='rc-send-btn-wrap'><div class='fs-submit-cont'><button class='btn btn-success fs-submit'>Execute Review <i class='fa fa-check-square-o' aria-hidden='true'></i></button></div></div>
+        <div class='rc-send-btn-wrap'>
+        <div class='fs-submit-cont'>
+            <div class='btn btn-success fs-submit'>Execute Review <i class='fa fa-check-square-o' aria-hidden='true'></i></div></div>
+        </div>
     </div>
 </div>";
 
@@ -233,7 +237,7 @@ namespace ExpressBase.Objects
                     </tbody>
                 </table>
             </div>
-            <div class='fs-submit-cont'><button class='btn btn-success fs-submit'>Execute Review <i class='fa fa-check-square-o' aria-hidden='true'></i></button></div>
+            <div class='fs-submit-cont'><div class='btn btn-success fs-submit'>Execute Review <i class='fa fa-check-square-o' aria-hidden='true'></i></div></div>
         </div>";
 
             return html;

@@ -1587,6 +1587,11 @@ pg.HideProperty('IsDynamic');
             this.EbPowerSelect.Name = this.Name;
             return this.EbPowerSelect.GetSingleColumn(UserObj, SoluObj, Value);
         }
+
+        public override DVBaseColumn GetDVBaseColumn(int index)
+        {
+            return new DVStringColumn { Data = index, Name = this.Name, sTitle = this.Title, Type = this.EbDbType, bVisible = !this.Hidden, sWidth = "100px", Align = Align.Left };
+        }
     }
 
 
