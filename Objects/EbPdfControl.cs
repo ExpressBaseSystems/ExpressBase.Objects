@@ -1,8 +1,12 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Data;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
+using ExpressBase.Objects.ServiceStack_Artifacts;
+using ServiceStack;
+using ServiceStack.Redis;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
@@ -15,7 +19,6 @@ namespace ExpressBase.Objects
 	{
 		public EbPdfControl()
 		{
-			this.PdfRefid = new List<ObjectBasicInfo>();
 		}
 
 		[OnDeserialized]
@@ -114,9 +117,22 @@ namespace ExpressBase.Objects
 
 		[PropertyGroup("Behavior")]
 		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
-		[PropertyEditor(PropertyEditorType.ObjectSelectorCollection)]
+		[PropertyEditor(PropertyEditorType.ObjectSelector)]
 		[OSE_ObjectTypes(EbObjectTypes.iReport)]
-		public List<ObjectBasicInfo> PdfRefid { get; set; }
+		public virtual string PdfRefid { get; set; }
+
+		public void FetchParamsMeta(IServiceClient ServiceClient, IRedisClient redis)
+		{
+			EbReport PdfObj = EbFormHelper.GetEbObject<EbReport>(PdfRefid, ServiceClient, redis, null);
+			if (string.IsNullOrEmpty(PdfObj.DataSourceRefId))
+				throw new FormException($"Missing Data Reader of pdf view that is connected to {this.Label}.");
+			EbDataReader DrObj = EbFormHelper.GetEbObject<EbDataReader>(PdfObj.DataSourceRefId, ServiceClient, redis, null);
+			this.ParamsList = DrObj.GetParams(redis as RedisClient);
+		}
+
+		[HideInPropertyGrid]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+		public List<Param> ParamsList { get; set; }
 
 		public override string GetDesignHtml()
 		{
