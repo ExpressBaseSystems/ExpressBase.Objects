@@ -246,7 +246,6 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                         throw new FormException($"Please set a pdf View for {Allctrls[i].Label}.");
                     (Allctrls[i] as EbPdfControl).FetchParamsMeta(serviceClient, redis);
                 }
-                else if (Allctrls[i] is EbPowerSelect)
                 else if (Allctrls[i] is IEbPowerSelect)
                 {
                     IEbPowerSelect _ctrl = Allctrls[i] as IEbPowerSelect;

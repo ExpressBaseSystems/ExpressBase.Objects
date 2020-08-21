@@ -535,7 +535,6 @@ namespace ExpressBase.Objects
             }
 
             Dictionary<string, SingleTable> Tables = new Dictionary<string, SingleTable>();
-            List<ApiRequestParam> _params = new List<ApiRequestParam>();
             SingleColumn Column;
             List<string> urlParts = new List<string>();
 
@@ -552,13 +551,7 @@ namespace ExpressBase.Objects
                 }
                 if (Column != null)
                 {
-                    _params.Add(new ApiRequestParam
-                    {
-                        Name = param.Name,
-                        ParamName = param.Name,
-                        Type = (EbDbTypes)Convert.ToInt32(param.Type),
-                        Value = Convert.ToString(Column.Value)
-                    });
+                    param.Value = Convert.ToString(Column.Value);
                     urlParts.Add(param.Name + "=" + Column.Value);
                 }
                 else
@@ -571,7 +564,7 @@ namespace ExpressBase.Objects
                     Url = ApiUrl + "?" + string.Join('&', urlParts),
                     Headers = ApiHeaders,
                     Method = ApiMethod,
-                    Parameters = _params
+                    Parameters = ApiParamsList
                 });
                 if (apiResp.dataset?.Tables?.Count > 0)
                 {
