@@ -53,7 +53,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("UI")]
         [OnChangeExec(@"
-                if (this.RenderAs === 1 || this.RenderAs === 5){ 
+                if ([1,3,5].includes(this.RenderAs)){ 
                         pg.ShowProperty('TextFormat');
                         pg.ShowProperty('Font');
                 }
