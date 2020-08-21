@@ -1,4 +1,5 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
 using ServiceStack;
 using System;
@@ -21,7 +22,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public List<ApiRequestHeader> Headers { get; set; }
 
         [DataMember(Order = 8)]
-        public List<ApiRequestParam> Parameters { get; set; }
+        public List<Param> Parameters { get; set; }
 
         [DataMember(Order = 8)]
         public string SolnId { get; set; }
