@@ -240,6 +240,13 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                     if (string.IsNullOrEmpty((Allctrls[i] as EbTVcontrol).TVRefId))
                         throw new FormException($"Please set a Table View for {Allctrls[i].Label}.");
                 }
+                else if (Allctrls[i] is EbPdfControl && serviceClient != null)
+                {
+                    if (string.IsNullOrEmpty((Allctrls[i] as EbPdfControl).PdfRefid))
+                        throw new FormException($"Please set a pdf View for {Allctrls[i].Label}.");
+                    (Allctrls[i] as EbPdfControl).FetchParamsMeta(serviceClient, redis);
+                }
+                else if (Allctrls[i] is EbPowerSelect)
                 else if (Allctrls[i] is IEbPowerSelect)
                 {
                     IEbPowerSelect _ctrl = Allctrls[i] as IEbPowerSelect;

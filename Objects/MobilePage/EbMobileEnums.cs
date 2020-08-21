@@ -38,17 +38,19 @@ namespace ExpressBase.Objects
         Email = 5
     }
 
-    public enum MobileTextAlign
+    public enum MobileHorrizontalAlign
     {
         Left,
         Center,
         Right,
+        Fill
     }
 
-    public enum HorrizontalAlign
+    public enum MobileVerticalAlign
     {
-        Left,
+        Top,
         Center,
-        Right,
+        Bottom,
+        Fill
     }
 }

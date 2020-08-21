@@ -131,7 +131,7 @@ namespace ExpressBase.Objects
                                             <div class='message' rowid='@rowid@' name='", _FormStage.Name, @"' stage-ebsid='", _FormStage.EbSid, @"' rowid='@rowid@'>
                                                <div class='fs-dp' @dpstyle@></div>
                                                <div class='bubble'>
-                                                  <div class='msg-head'>", _FormStage.Name, @" (@action@)</div>
+                                                  <div class='msg-head'>", _FormStage.Name, @" @action@</div>
                                                   <div class='msg-comment'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;@comment@</div>
                                                   <span class='msg-uname'>@uname@</span>
                                                   <div class='corner'></div>
@@ -155,6 +155,7 @@ namespace ExpressBase.Objects
             html += @"
     </div>
     <div class='rc-inp-cont'>
+        <div class='rc-inp-head'></div>
         <div class='rc-action-dp-wrap'></div>
         <div class='rc-action-dd-wrap'></div>
         <textarea id='chatSend' placeholder='Add remark' class='rc-txtarea'></textarea>

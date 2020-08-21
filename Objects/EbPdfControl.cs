@@ -1,8 +1,12 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Data;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
+using ExpressBase.Objects.ServiceStack_Artifacts;
+using ServiceStack;
+using ServiceStack.Redis;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
@@ -15,7 +19,6 @@ namespace ExpressBase.Objects
 	{
 		public EbPdfControl()
 		{
-			this.PdfRefid = new List<ObjectBasicInfo>();
 		}
 
 		[OnDeserialized]
@@ -35,7 +38,7 @@ namespace ExpressBase.Objects
 		{
 			get
 			{
-				return @"EbTagInput = {
+				return @"EbPdfControl = {
                 
             }";
 			}
@@ -114,9 +117,22 @@ namespace ExpressBase.Objects
 
 		[PropertyGroup("Behavior")]
 		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
-		[PropertyEditor(PropertyEditorType.ObjectSelectorCollection)]
+		[PropertyEditor(PropertyEditorType.ObjectSelector)]
 		[OSE_ObjectTypes(EbObjectTypes.iReport)]
-		public List<ObjectBasicInfo> PdfRefid { get; set; }
+		public virtual string PdfRefid { get; set; }
+
+		public void FetchParamsMeta(IServiceClient ServiceClient, IRedisClient redis)
+		{
+			EbReport PdfObj = EbFormHelper.GetEbObject<EbReport>(PdfRefid, ServiceClient, redis, null);
+			if (string.IsNullOrEmpty(PdfObj.DataSourceRefId))
+				throw new FormException($"Missing Data Reader of pdf view that is connected to {this.Label}.");
+			EbDataReader DrObj = EbFormHelper.GetEbObject<EbDataReader>(PdfObj.DataSourceRefId, ServiceClient, redis, null);
+			this.ParamsList = DrObj.GetParams(redis as RedisClient);
+		}
+
+		[HideInPropertyGrid]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+		public List<Param> ParamsList { get; set; }
 
 		public override string GetDesignHtml()
 		{
@@ -132,16 +148,8 @@ namespace ExpressBase.Objects
 			return ReplacePropsInHTML(EbCtrlHTML);
 		}
 
-		//public override string GetHtml4Bot()
-		//{
-		//	return ReplacePropsInHTML(HtmlConstants.CONTROL_WRAPER_HTML4BOT);
-		//}
+		
 
-		public override string DesignHtml4Bot
-		{
-			get => this.GetBareHtml();
-			set => base.DesignHtml4Bot = value;
-		}
 		public override string GetBareHtml()
 		{
 			//	string html = @"
@@ -152,16 +160,23 @@ namespace ExpressBase.Objects
 			//          </span>
 			//</div>"
 			string html = @"
-			<div id='@ebsid@' name='@name@' class='pdf_control_cont'>
+			<div id='@ebsid@' name='@name@' style='@style@' class='pdf_control_cont'>
 
 				<span class='pdfwrapper-cont'>
 	                    <i id='icon_@ebsid@' style='font-size: 150px;' class='fa fa-file-pdf-o fa-2x'></i>
 	            </span>
 			</div>"
 			.Replace("@name@", this.Name)
-	.Replace("@ebsid@", this.EbSid);
+			.Replace("@ebsid@", this.EbSid);
 
 			return html;
 		}
+
+		public override string DesignHtml4Bot
+		{
+			get => this.GetBareHtml().Replace("@style@", "text-align: center;");
+			set => base.DesignHtml4Bot = value;
+		}
+
 	}
 }

@@ -203,8 +203,8 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public List<DVColumnCollection> ColumnsCollection { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
-        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar, BuilderType.WebForm)]
+        [MetaOnly]
         public List<Param> ParamsList { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar, BuilderType.WebForm)]
@@ -974,27 +974,27 @@ namespace ExpressBase.Objects
         public List<DVBaseColumn> Params { get; set; }
     }
 
-    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.Calendar)]
+    [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.Calendar)]
     public class ObjectBasicInfo : EbObject
     {
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.Calendar)]
         [HideInPropertyGrid]
         public override string Name { get; set; }
 
         [HideInPropertyGrid]
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.Calendar)]
         public string ObjName { get; set; }
 
         [HideInPropertyGrid]
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.Calendar)]
         public string ObjDisplayName { get; set; }
 
         [HideInPropertyGrid]
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.Calendar)]
         public string Version { get; set; }
 
         [HideInPropertyGrid]
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.Calendar)]
         public string ObjRefId { get; set; }
     }
 

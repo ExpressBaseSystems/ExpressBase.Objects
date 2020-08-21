@@ -1312,12 +1312,12 @@ pg.MakeReadOnly('DisplayMembers');} else {pg.MakeReadWrite('DisplayMembers');}")
         [HideForUser]
         public List<ApiRequestHeader> Headers { get { return this.EbPowerSelect.Headers; } set { this.EbPowerSelect.Headers = value; } }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
-        [PropertyEditor(PropertyEditorType.Collection)]
-        [PropertyGroup("Api")]
-        [MetaOnly]
-        public List<ApiRequestParam> Parameters { get { return this.EbPowerSelect.Parameters; } set { this.EbPowerSelect.Parameters = value; } }
-                
+        //[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
+        //[PropertyEditor(PropertyEditorType.Collection)]
+        //[PropertyGroup("Api")]
+        //[MetaOnly]
+        //public List<ApiRequestParam> Parameters { get { return this.EbPowerSelect.Parameters; } set { this.EbPowerSelect.Parameters = value; } }
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
