@@ -88,11 +88,11 @@ namespace ExpressBase.Objects
         [HideForUser]
         public List<ApiRequestHeader> ImportApiHeaders { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
-        [PropertyEditor(PropertyEditorType.Collection)]
-        [PropertyGroup("ImportApi")]
-        [MetaOnly]
-        public List<ApiRequestParam> ImportApiParameters { get; set; }
+        //[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
+        //[PropertyEditor(PropertyEditorType.Collection)]
+        //[PropertyGroup("ImportApi")]
+        //[MetaOnly]
+        //public List<ApiRequestParam> ImportApiParameters { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "return [...getFlatCtrlObjs(commonO.Current_obj)];")]
@@ -136,11 +136,11 @@ pg.MakeReadOnly('DisplayMembers');} else {pg.MakeReadWrite('DisplayMembers');}")
         [HideForUser]
         public List<ApiRequestHeader> Headers { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
-        [PropertyEditor(PropertyEditorType.Collection)]
-        [PropertyGroup("Api")]
-        [MetaOnly]
-        public List<ApiRequestParam> Parameters { get; set; }
+        //[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
+        //[PropertyEditor(PropertyEditorType.Collection)]
+        //[PropertyGroup("Api")]
+        //[MetaOnly]
+        //public List<ApiRequestParam> Parameters { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "return [...getFlatCtrlObjs(commonO.Current_obj)];")]
