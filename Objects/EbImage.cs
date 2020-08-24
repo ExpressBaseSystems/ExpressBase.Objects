@@ -23,6 +23,7 @@ namespace ExpressBase.Objects
         public void OnDeserializedMethod(StreamingContext context)
         {
             this.BareControlHtml = this.GetBareHtml();
+			this.BareControlHtml4Bot = this.BareControlHtml;
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
 
@@ -137,7 +138,7 @@ namespace ExpressBase.Objects
         </div>"
 	.Replace("@name@", this.Name)
 	.Replace("@ebsid@", this.EbSid)
-    .Replace("@src@", (this.ImageId > 0) ? "../images/" + this.ImageId + ".jpg" : "/images/image.png")
+    .Replace("@src@", (this.ImageId > 0) ? "" : "/images/image.png")
     .Replace("@toolTipText@", this.ToolTipText)
     .Replace("@value@", "")//"value='" + this.Value + "'")
     .Replace("@maxwidth@", this.MaxWidth > 0 ? this.MaxWidth.ToString() : "200")

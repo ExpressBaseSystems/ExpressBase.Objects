@@ -435,7 +435,7 @@ namespace ExpressBase.Objects
                         FormDes.FormData.PsDm_Tables.Add(Ctrl.EbSid, new SingleTable());
                 }
                 FormDes.PostFormatFormData();
-            }           
+            }
         }
 
         public WebformData GetDynamicGridData(IDatabase DataDB, Service Service, string SrcId, string[] Target)
@@ -1608,7 +1608,7 @@ namespace ExpressBase.Objects
             }
             else
             {
-                int reviewRowCount = this.FormData.MultipleTables[ebReview.TableName].Count;
+                int reviewRowCount = this.FormData.MultipleTables.ContainsKey(ebReview.TableName) ? this.FormData.MultipleTables[ebReview.TableName].Count : 0;
 
                 if (reviewRowCount == 1)
                 {

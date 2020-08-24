@@ -93,6 +93,14 @@ namespace ExpressBase.Objects
         public bool ShowLinkIcon { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("List Styles")]
+        public bool EnableAlternateRowColoring { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("List Styles")]
+        public bool ShowRowSeperator { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.Expandable)]
         [PropertyGroup("List Styles")]
         public EbThickness Margin { set; get; }
@@ -137,6 +145,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("List Styles")]
         [PropertyEditor(PropertyEditorType.Color)]
+        [Alias("Border/Shadow Color")]
         public string BorderColor { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
@@ -146,20 +155,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("List Styles")]
-        [OnChangeExec(@"
-                if (this.BoxShadow){                        
-                        pg.ShowProperty('ShadowColor');
-                }
-                else {
-                        pg.HideProperty('ShadowColor');
-                }
-            ")]
         public bool BoxShadow { set; get; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("List Styles")]
-        [PropertyEditor(PropertyEditorType.Color)]
-        public string ShadowColor { set; get; }
 
         public EbMobileVisualization()
         {
