@@ -465,7 +465,7 @@ namespace ExpressBase.Objects.WebFormRelated/////////////
             {
                 foreach (ColumnSchema _column in _table.Columns)
                 {
-                    bool fetchVm = _column.Control is EbPowerSelect || _column.Control is EbDGPowerSelectColumn;
+                    bool fetchVm = _column.Control is IEbPowerSelect && !(_column.Control as IEbPowerSelect).IsDataFromApi;
                     fetchVm = fetchVm || (_column.Control is EbSimpleSelect && (_column.Control as EbSimpleSelect).IsDynamic);
                     fetchVm = fetchVm || (_column.Control is EbDGSimpleSelectColumn && (_column.Control as EbDGSimpleSelectColumn).IsDynamic);
 
@@ -476,10 +476,8 @@ namespace ExpressBase.Objects.WebFormRelated/////////////
                         {
                             if (!DictDm.ContainsKey(key))
                             {
-                                if (_column.Control is EbPowerSelect)
-                                    Qry += (_column.Control as EbPowerSelect).GetDisplayMembersQuery(this.DataDB, this.Service, DictVmAll[key].Substring(0, DictVmAll[key].Length - 1));
-                                else if (_column.Control is EbDGPowerSelectColumn)
-                                    Qry += (_column.Control as EbDGPowerSelectColumn).GetDisplayMembersQuery(this.DataDB, this.Service, DictVmAll[key].Substring(0, DictVmAll[key].Length - 1));
+                                if (_column.Control is IEbPowerSelect)
+                                    Qry += (_column.Control as IEbPowerSelect).GetDisplayMembersQuery(this.DataDB, this.Service, DictVmAll[key].Substring(0, DictVmAll[key].Length - 1));                                
                                 else if (_column.Control is EbSimpleSelect)
                                     Qry += (_column.Control as EbSimpleSelect).GetDisplayMembersQuery(this.DataDB, this.Service, DictVmAll[key].Substring(0, DictVmAll[key].Length - 1));
                                 else

@@ -25,7 +25,7 @@ using ExpressBase.Objects.ServiceStack_Artifacts;
 namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
-    public class EbTVcontrol : EbControlUI
+    public class EbTVcontrol : EbControlUI, IEbDataReaderControl
     {
         public EbTVcontrol()
         {
@@ -99,7 +99,7 @@ namespace ExpressBase.Objects
             this.TableVisualizationJson = result.Data[0].Json;
         }
 
-        public void FetchParamsMeta(IServiceClient ServiceClient, IRedisClient redis)
+        public virtual void FetchParamsMeta(IServiceClient ServiceClient, IRedisClient redis)
         {
             EbTableVisualization TvObj = EbFormHelper.GetEbObject<EbTableVisualization>(TVRefId, ServiceClient, redis, null);
             if (string.IsNullOrEmpty(TvObj.DataSourceRefId))

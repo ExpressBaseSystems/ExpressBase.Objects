@@ -1243,7 +1243,7 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
     [Alias("PowerSelect Column")]
     [UsedWithTopObjectParent(typeof(EbObject))]
-    public class EbDGPowerSelectColumn : EbDGColumn
+    public class EbDGPowerSelectColumn : EbDGColumn, IEbPowerSelect, IEbDataReaderControl
     {
 
 
