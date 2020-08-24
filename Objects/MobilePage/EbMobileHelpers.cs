@@ -84,6 +84,10 @@ namespace ExpressBase.Objects
         [Alias("Align Y")]
         public MobileVerticalAlign VerticalAlign { set; get; }
 
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("UI")]
+        public bool HideInContext { set; get; }
+
         public override string GetDesignHtml()
         {
             return @"<div class='data_column mob_control dropped' title=' @ColumnName' tabindex='1' onclick='$(this).focus()' eb-type='EbMobileDataColumn' id='@id'>
