@@ -427,7 +427,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [PropertyGroup("Data Settings")]
-        [OSE_ObjectTypes(EbObjectTypes.iChartVisualization, EbObjectTypes.iTableVisualization)]
+        [OSE_ObjectTypes(EbObjectTypes.iChartVisualization, EbObjectTypes.iTableVisualization, EbObjectTypes.iDashBoard, EbObjectTypes.iWebForm)]
         public string Object_Selector { get; set; }
 
         [HideInPropertyGrid]
