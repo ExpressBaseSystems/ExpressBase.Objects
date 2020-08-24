@@ -63,7 +63,7 @@ namespace ExpressBase.Objects
             this.ChartVisualizationJson = result.Data[0].Json;
         }
 
-        public void FetchParamsMeta(IServiceClient ServiceClient, IRedisClient redis)
+        public override void FetchParamsMeta(IServiceClient ServiceClient, IRedisClient redis)
         {
             EbChartVisualization ChartVisualization = EbFormHelper.GetEbObject<EbChartVisualization>(TVRefId, ServiceClient, redis, null);
             if (string.IsNullOrEmpty(ChartVisualization.DataSourceRefId))

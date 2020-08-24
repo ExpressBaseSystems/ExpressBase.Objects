@@ -51,14 +51,9 @@ namespace ExpressBase.Objects.WebFormRelated
                             _cols, _table.TableName, _this.FormSchema.MasterTable, _this.DataPusherConfig.SourceTable, _this.DataPusherConfig.MultiPushId, _table.TableType == WebFormTableTypes.Grid ? "ORDER BY eb_row_num" : "ORDER BY id");
                 }
                 _qryCount++;
-                foreach (ColumnSchema Col in _table.Columns)
+                foreach (ColumnSchema Col in _table.Columns.FindAll(e => !e.Control.DoNotPersist && e.Control is IEbPowerSelect && !(e.Control as IEbPowerSelect).IsDataFromApi))
                 {
-                    if (Col.Control.DoNotPersist)
-                        continue;
-                    if (Col.Control is EbPowerSelect)
-                        _queryPs += (Col.Control as EbPowerSelect).GetSelectQuery(DataDB, _service, Col.ColumnName, _table.TableName, _id, _this.FormSchema.MasterTable);
-                    else if (Col.Control is EbDGPowerSelectColumn)
-                        _queryPs += (Col.Control as EbDGPowerSelectColumn).GetSelectQuery(DataDB, _service, Col.ColumnName, _table.TableName, _id, _this.FormSchema.MasterTable);
+                    _queryPs += (Col.Control as IEbPowerSelect).GetSelectQuery(DataDB, _service, Col.ColumnName, _table.TableName, _id, _this.FormSchema.MasterTable);                    
                 }
             }
             bool MuCtrlFound = false;
@@ -118,12 +113,9 @@ namespace ExpressBase.Objects.WebFormRelated
 
                 _qryCount++;
 
-                foreach (ColumnSchema Col in _table.Columns)
+                foreach (ColumnSchema Col in _table.Columns.FindAll(e => !e.Control.DoNotPersist && e.Control is EbDGPowerSelectColumn && !(e.Control as EbDGPowerSelectColumn).IsDataFromApi))
                 {
-                    if (Col.Control.DoNotPersist)
-                        continue;
-                    if (Col.Control is EbDGPowerSelectColumn)
-                        _queryPs += (Col.Control as EbDGPowerSelectColumn).GetSelectQuery123(DataDB, _service, _table.TableName, Col.ColumnName, _prntTbl, _this.FormSchema.MasterTable);
+                    _queryPs += (Col.Control as EbDGPowerSelectColumn).GetSelectQuery123(DataDB, _service, _table.TableName, Col.ColumnName, _prntTbl, _this.FormSchema.MasterTable);
                 }
             }
             return query;

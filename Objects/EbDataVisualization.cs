@@ -203,8 +203,8 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public List<DVColumnCollection> ColumnsCollection { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder)]
-        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar, BuilderType.WebForm)]
+        [MetaOnly]
         public List<Param> ParamsList { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar, BuilderType.WebForm)]

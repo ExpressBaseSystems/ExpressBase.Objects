@@ -180,6 +180,18 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 4)]
         public string Trigger { get; set; }
+        
+        [DataMember(Order = 5)]
+        public string WebFormData { get; set; }
+
+        [DataMember(Order = 6)]
+        public ImportDataType Type { get; set; }
+    }
+
+    public enum ImportDataType
+    {
+        PowerSelect = 1,
+        DataGrid
     }
 
     [DataContract]

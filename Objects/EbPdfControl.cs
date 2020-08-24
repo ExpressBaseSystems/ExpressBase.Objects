@@ -38,7 +38,7 @@ namespace ExpressBase.Objects
 		{
 			get
 			{
-				return @"EbTagInput = {
+				return @"EbPdfControl = {
                 
             }";
 			}
@@ -148,16 +148,8 @@ namespace ExpressBase.Objects
 			return ReplacePropsInHTML(EbCtrlHTML);
 		}
 
-		//public override string GetHtml4Bot()
-		//{
-		//	return ReplacePropsInHTML(HtmlConstants.CONTROL_WRAPER_HTML4BOT);
-		//}
+		
 
-		public override string DesignHtml4Bot
-		{
-			get => this.GetBareHtml();
-			set => base.DesignHtml4Bot = value;
-		}
 		public override string GetBareHtml()
 		{
 			//	string html = @"
@@ -168,16 +160,23 @@ namespace ExpressBase.Objects
 			//          </span>
 			//</div>"
 			string html = @"
-			<div id='@ebsid@' name='@name@' class='pdf_control_cont'>
+			<div id='@ebsid@' name='@name@' style='@style@' class='pdf_control_cont'>
 
 				<span class='pdfwrapper-cont'>
 	                    <i id='icon_@ebsid@' style='font-size: 150px;' class='fa fa-file-pdf-o fa-2x'></i>
 	            </span>
 			</div>"
 			.Replace("@name@", this.Name)
-	.Replace("@ebsid@", this.EbSid);
+			.Replace("@ebsid@", this.EbSid);
 
 			return html;
 		}
+
+		public override string DesignHtml4Bot
+		{
+			get => this.GetBareHtml().Replace("@style@", "text-align: center;");
+			set => base.DesignHtml4Bot = value;
+		}
+
 	}
 }

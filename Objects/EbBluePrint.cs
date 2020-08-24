@@ -15,7 +15,7 @@ namespace ExpressBase.Objects
 {
 	
 
-	[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+	[EnableInBuilder()]
 	public class EbBluePrint : EbControlUI, IEbSpecialContainer
 	{
 		public EbBluePrint(){}
