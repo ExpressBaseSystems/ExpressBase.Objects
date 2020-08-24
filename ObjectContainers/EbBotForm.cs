@@ -38,6 +38,12 @@ namespace ExpressBase.Objects
         [HelpText("Set false if want to render controls like a conversation")]
         public bool RenderAsForm { get; set; }
 
+        [Newtonsoft.Json.JsonIgnore]
+        public override string Info { get; set; }
+
+        [Newtonsoft.Json.JsonIgnore]
+        public override string InfoIcon { get; set; }
+
 
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.BotForm)]
