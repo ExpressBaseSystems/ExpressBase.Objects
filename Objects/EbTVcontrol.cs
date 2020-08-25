@@ -99,7 +99,7 @@ namespace ExpressBase.Objects
             this.TableVisualizationJson = result.Data[0].Json;
         }
 
-        public virtual void FetchParamsMeta(IServiceClient ServiceClient, IRedisClient redis)
+        public virtual void FetchParamsMeta(IServiceClient ServiceClient, IRedisClient redis, EbControl[] Allctrls)
         {
             EbTableVisualization TvObj = EbFormHelper.GetEbObject<EbTableVisualization>(TVRefId, ServiceClient, redis, null);
             if (string.IsNullOrEmpty(TvObj.DataSourceRefId))
