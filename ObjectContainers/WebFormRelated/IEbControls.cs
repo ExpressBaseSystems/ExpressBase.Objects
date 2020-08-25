@@ -1,5 +1,6 @@
 ﻿using ExpressBase.Common;
 using ExpressBase.Common.Data;
+using ExpressBase.Common.Objects;
 using ExpressBase.Objects.Objects.DVRelated;
 using ExpressBase.Objects.ServiceStack_Artifacts;
 using ServiceStack;
@@ -20,8 +21,8 @@ namespace ExpressBase.Objects
         string Url { get; set; }
         ApiMethods Method { set; get; }
         List<ApiRequestHeader> Headers { get; set; }
-        //List<ApiRequestParam> Parameters { get; set; }
-                
+        List<EbCtrlApiParamAbstract> DataApiParams { get; set; }
+
         void InitFromDataBase_SS(JsonServiceClient ServiceClient);
         string GetSelectQuery(IDatabase DataDB, Service service, string Col, string Tbl = null, string _id = null, string masterTbl = null);
         string GetSelectQuery123(IDatabase DataDB, Service service, string table, string column, string parentTbl, string masterTbl);
@@ -32,6 +33,6 @@ namespace ExpressBase.Objects
     {
         List<Param> ParamsList { get; set; }
 
-        void FetchParamsMeta(IServiceClient ServiceClient, IRedisClient Redis);
+        void FetchParamsMeta(IServiceClient ServiceClient, IRedisClient Redis, EbControl[] Allctrls);
     }
 }

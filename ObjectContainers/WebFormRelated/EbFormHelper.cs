@@ -460,14 +460,14 @@ namespace ExpressBase.Objects
                         if (ColumnSrc != null && !(_column.Control is EbAutoId) && !_column.Control.IsSysControl)
                         {
                             entry.Value[0].SetColumn(_column.ColumnName, _column.Control.GetSingleColumn(FormDes.UserObj, FormDes.SolutionObj, ColumnSrc.Value));
-                            _formattedData = Convert.ToString(ColumnSrc.Value);
-                            if (_column.Control is EbPowerSelect && !string.IsNullOrEmpty(_formattedData))
-                            {
-                                if (psDict.ContainsKey(_column.Control))
-                                    psDict[_column.Control] += CharConstants.COMMA + _formattedData;
-                                else
-                                    psDict.Add(_column.Control, _formattedData);
-                            }
+                            _formattedData = Convert.ToString(ColumnSrc.Value);                            
+                        }
+                        if (_column.Control is EbPowerSelect && !string.IsNullOrEmpty(_formattedData))
+                        {
+                            if (psDict.ContainsKey(_column.Control))
+                                psDict[_column.Control] += CharConstants.COMMA + _formattedData;
+                            else
+                                psDict.Add(_column.Control, _formattedData);
                         }
                         try//temporary solution to avoid exception : 1$$text 
                         {

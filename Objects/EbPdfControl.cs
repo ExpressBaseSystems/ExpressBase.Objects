@@ -152,20 +152,22 @@ namespace ExpressBase.Objects
 
 		public override string GetBareHtml()
 		{
-			//	string html = @"
-			//<div id='@ebsid@' name='@name@' class='pdf_control_cont'>
+			string html = @"
+			<div id='@ebsid@' name='@name@' class='pdf_control_cont'>
+				<div class='pdfwrapper-cont'>
+			        <img id='img_@ebsid@' src='/images/pdf-image.png' style='width: 100px;'>
+						<div style=' position: absolute;'>
+							<i id='icon_@ebsid@'  class='fa fa-arrow-circle-o-down '></i>
+						</div>
+				</div>
+			</div>"
+			//string html = @"
+			//<div id='@ebsid@' name='@name@' style='@style@' class='pdf_control_cont'>
 
 			//	<span class='pdfwrapper-cont'>
-			//                  <img id='icon_@ebsid@' src='/images/pdf-image.png' style='width: 100px;'>
+			//                  <i id='icon_@ebsid@' style='font-size: 150px;' class='fa fa-file-pdf-o fa-2x'></i>
 			//          </span>
 			//</div>"
-			string html = @"
-			<div id='@ebsid@' name='@name@' style='@style@' class='pdf_control_cont'>
-
-				<span class='pdfwrapper-cont'>
-	                    <i id='icon_@ebsid@' style='font-size: 150px;' class='fa fa-file-pdf-o fa-2x'></i>
-	            </span>
-			</div>"
 			.Replace("@name@", this.Name)
 			.Replace("@ebsid@", this.EbSid);
 

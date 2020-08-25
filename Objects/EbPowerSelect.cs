@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using ExpressBase.Common.Constants;
 using ServiceStack.Redis;
 using ExpressBase.Common.Data;
+using System.Text.RegularExpressions;
 
 namespace ExpressBase.Objects
 {
@@ -60,36 +61,42 @@ namespace ExpressBase.Objects
         //}
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
-        [PropertyGroup(PGConstants.CORE)]
+        [PropertyGroup("Data import")]
         [OnChangeExec(@"
         if(this.IsImportFromApi){
-            pg.ShowGroup('ImportApi');
+            pg.ShowProperty('ImportApiUrl');
+            pg.ShowProperty('ImportApiMethod');
+            pg.ShowProperty('ImportApiHeaders');
+            pg.ShowProperty('ImportApiParams');
             pg.HideProperty('DataImportId');
         }
         else{
-            pg.HideGroup('ImportApi');
+            pg.HideProperty('ImportApiUrl');
+            pg.HideProperty('ImportApiMethod');
+            pg.HideProperty('ImportApiHeaders');
+            pg.HideProperty('ImportApiParams');
             pg.ShowProperty('DataImportId');
         }")]
         public bool IsImportFromApi { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
-        [PropertyGroup("ImportApi")]
+        [PropertyGroup("Data import")]
         [HideForUser]
         public string ImportApiUrl { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
-        [PropertyGroup("ImportApi")]
+        [PropertyGroup("Data import")]
         [HideForUser]
         public ApiMethods ImportApiMethod { set; get; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.Collection)]
-        [PropertyGroup("ImportApi")]
+        [PropertyGroup("Data import")]
         [HideForUser]
         public List<ApiRequestHeader> ImportApiHeaders { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
-        [PropertyGroup("ImportApi")]
+        [PropertyGroup("Data import")]
         [Alias("Import api parameters")]
         [PropertyEditor(PropertyEditorType.Collection)]
         public List<EbCtrlApiParamAbstract> ImportApiParams { get; set; }
@@ -97,6 +104,13 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         public List<Param> ImportParamsList { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [PropertyGroup("Data import")]
+        [OSE_ObjectTypes(EbObjectTypes.iWebForm)]
+        [Alias("Import Form")]
+        public string DataImportId { get; set; }
 
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
@@ -133,17 +147,17 @@ pg.MakeReadOnly('DisplayMembers');} else {pg.MakeReadWrite('DisplayMembers');}")
         [HideForUser]
         public List<ApiRequestHeader> Headers { get; set; }
 
-        //[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
-        //[PropertyEditor(PropertyEditorType.Collection)]
-        //[PropertyGroup("Api")]
-        //[MetaOnly]
-        //public List<ApiRequestParam> Parameters { get; set; }
-
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
-        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "return [...getFlatCtrlObjs(commonO.Current_obj)];")]
         [PropertyGroup("Api")]
-        [Alias("Parameter controls")]
-        public List<EbControl> ApiParamCtrls { get; set; }
+        [Alias("Data api parameters")]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        public List<EbCtrlApiParamAbstract> DataApiParams { get; set; }
+
+        //[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
+        //[PropertyEditor(PropertyEditorType.CollectionFrmSrc, "return [...getFlatCtrlObjs(commonO.Current_obj)];")]
+        //[PropertyGroup("Api")]
+        //[Alias("Parameter controls")]
+        //public List<EbControl> ApiParamCtrls { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
         [PropertyGroup(PGConstants.DATA_INSERT)]
@@ -346,17 +360,6 @@ else
         [OSE_ObjectTypes(EbObjectTypes.iWebForm)]
         [Alias("Form")]
         public string FormRefId { get; set; }
-
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
-        [PropertyEditor(PropertyEditorType.ObjectSelector)]
-        [PropertyGroup(PGConstants.DATA)]
-        [OSE_ObjectTypes(EbObjectTypes.iWebForm)]
-        [OnChangeExec(@"
-if (this.Columns && this.Columns.$values.length === 0 )
-{
-pg.MakeReadOnly('DisplayMembers');} else {pg.MakeReadWrite('DisplayMembers');}")]
-        [Alias("Import Form")]
-        public string DataImportId { get; set; }
 
         [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.WebForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.CollectionProp, "Columns", "bVisible")]
@@ -823,21 +826,75 @@ else// PS
                 return string.Empty;
         }
 
-        public void FetchParamsMeta(IServiceClient ServiceClient, IRedisClient Redis)
+        public void FetchParamsMeta(IServiceClient ServiceClient, IRedisClient Redis, EbControl[] Allctrls)
         {
             if (this.IsDataFromApi)
             {
                 this.ParamsList = new List<Param>();
-                if (this.ApiParamCtrls != null)
+                if (this.DataApiParams?.Count > 0)
                 {
-                    foreach (var p in this.ApiParamCtrls)
-                        ParamsList.Add(new Param() { Name = p.Name, Type = ((int)p.EbDbType).ToString() });
+                    foreach (EbCtrlApiParam p in this.DataApiParams)
+                    {
+                        if (p.IsStaticParam)
+                        {
+                            if (string.IsNullOrEmpty(p.Name))
+                                throw new FormException("Data Api Parameters name is empty for " + this.Label);
+                            if (string.IsNullOrEmpty(p.Value))
+                                throw new FormException("Data Api Parameters value is empty for " + this.Label);
+                            this.ParamsList.Add(new Param() { Name = p.Name, Type = Convert.ToString((int)EbDbTypes.String), Value = p.Value });
+                        }
+                        else
+                        {
+                            if (string.IsNullOrEmpty(p.ControlName))
+                                throw new FormException("Data Api Parameters control name is empty for " + this.Label);
+                            EbControl paramCtrl = Allctrls.FirstOrDefault(e => e.Name == p.ControlName);
+                            if (paramCtrl == null)
+                                throw new FormException($"Invalid control name '{p.ControlName}' for 'data api parameters' of power select control({this.Label}).");
+                            this.ParamsList.Add(new Param() { Name = p.ControlName, Type = Convert.ToString((int)paramCtrl.EbDbType) });
+                        }
+                    }                        
                 }
             }
             else
             {
                 EbDataReader DrObj = EbFormHelper.GetEbObject<EbDataReader>(this.DataSourceId, ServiceClient, Redis, null);
                 this.ParamsList = DrObj.GetParams(Redis as RedisClient);
+            }
+
+            if (this.IsImportFromApi)
+            {
+                if (string.IsNullOrEmpty(this.ImportApiUrl))
+                    throw new FormException("Set Import Api Url for " + this.Label);
+                //string regex = @"^http(s)?://([\w-]+.)+[\w-]+(/[\w-./?%&=])?$";
+                //if (!Regex.IsMatch(this.ImportApiUrl, regex))
+                //    throw new FormException("Set a valid Import Api Url for " + this.Label);
+
+                this.ImportParamsList = new List<Param>();
+                if (this.ImportApiParams?.Count > 0)
+                {
+                    foreach (EbCtrlApiParam p in this.ImportApiParams)
+                    {
+                        if (p.IsStaticParam)
+                        {
+                            if (string.IsNullOrEmpty(p.Name))
+                                throw new FormException("Import Api Parameters name is empty for " + this.Label);
+                            if (string.IsNullOrEmpty(p.Value))
+                                throw new FormException("Import Api Parameters value is empty for " + this.Label);
+                            this.ImportParamsList.Add(new Param() { Name = p.Name, Type = Convert.ToString((int)EbDbTypes.String), Value = p.Value });
+                        }
+                        else
+                        {
+                            if (string.IsNullOrEmpty(p.ControlName))
+                                throw new FormException("Import Api Parameters control name is empty for " + this.Label);
+                            EbControl paramCtrl = Allctrls.FirstOrDefault(e => e.Name == p.ControlName);
+                            if (paramCtrl == null)
+                                throw new FormException($"Invalid control name '{p.ControlName}' for 'import api parameters' of power select control({this.Label}).");
+                            this.ImportParamsList.Add(new Param() { Name = p.ControlName, Type = Convert.ToString((int)paramCtrl.EbDbType) });
+                        }
+                    }
+                }
+                else
+                    throw new FormException("Set Import Api Parameters for " + this);
             }
         }
 

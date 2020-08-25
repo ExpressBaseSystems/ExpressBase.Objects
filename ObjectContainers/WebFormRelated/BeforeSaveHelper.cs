@@ -42,6 +42,17 @@ namespace ExpressBase.Objects.WebFormRelated
             ValidateNotificationProp(_this.Notifications, _dict);
             SetDefaultValueExprExecOrder(_this, _dict);
             CalcHideAndDisableExprDependency(_dict);
+
+            if (_this.DataPushers?.Count > 0)
+            {
+                foreach(EbDataPusher dp in _this.DataPushers)
+                {
+                    if (string.IsNullOrEmpty(dp.FormRefId))
+                        throw new FormException($"Required 'Form ref id' for data pushers");
+                    if (string.IsNullOrEmpty(dp.Json))
+                        throw new FormException($"Required 'Json' for data pushers");
+                }
+            }
         }
 
         private static void ValidateAndUpdateReviewCtrl(EbWebForm _this, EbReview ebReviewCtrl, Dictionary<int, EbControlWrapper> _dict)
@@ -253,7 +264,7 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                     if (string.IsNullOrEmpty(_ctrl.DataSourceId) && !_ctrl.IsDataFromApi)
                         throw new FormException("Set Data Reader for " + _label);
                     if (string.IsNullOrEmpty(_ctrl.Url) && _ctrl.IsDataFromApi)
-                        throw new FormException("Set Api for " + _label);
+                        throw new FormException("Set Api url for " + _label);
                     if (_ctrl.ValueMember == null)
                         throw new FormException("Set Value Member for " + _label);
                     if (_ctrl.RenderAsSimpleSelect && _ctrl.DisplayMember == null)
@@ -262,40 +273,7 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                         throw new FormException("Set Display Members for " + _label);
                     EbDbTypes _t = _ctrl.ValueMember.Type;
                     if (!(_t == EbDbTypes.Int || _t == EbDbTypes.Int || _t == EbDbTypes.UInt32 || _t == EbDbTypes.UInt64 || _t == EbDbTypes.Int32 || _t == EbDbTypes.Int64 || _t == EbDbTypes.Decimal || _t == EbDbTypes.Double))
-                        throw new FormException("Set numeric value member for " + _label);
-
-                    if (_ctrl is EbPowerSelect && (_ctrl as EbPowerSelect).IsImportFromApi)
-                    {
-                        EbPowerSelect __ctrl = _ctrl as EbPowerSelect;
-                        if (string.IsNullOrEmpty(__ctrl.ImportApiUrl))
-                            throw new FormException("Set Import Api Url for " + _label);
-                        if (__ctrl.ImportApiParams?.Count > 0)
-                        {
-                            __ctrl.ImportParamsList = new List<Param>();
-                            foreach (EbCtrlApiParam p in __ctrl.ImportApiParams)
-                            {
-                                if (p.IsStaticParam)
-                                {
-                                    if (string.IsNullOrEmpty(p.Name))
-                                        throw new FormException("Import Api Parameters name is empty for " + _label);
-                                    if (string.IsNullOrEmpty(p.Value))
-                                        throw new FormException("Import Api Parameters value is empty for " + _label);
-                                    __ctrl.ImportParamsList.Add(new Param() { Name = p.Name, Type = Convert.ToString((int)EbDbTypes.String), Value = p.Value});
-                                }
-                                else
-                                {
-                                    if (string.IsNullOrEmpty(p.ControlName))
-                                        throw new FormException("Import Api Parameters control name is empty for " + _label);
-                                    EbControl paramCtrl = Allctrls.FirstOrDefault(e => e.Name == p.ControlName);
-                                    if (paramCtrl == null)
-                                        throw new FormException($"Invalid control name '{p.ControlName}' for 'import api parameters' of power select control({_label}).");
-                                    __ctrl.ImportParamsList.Add(new Param() { Name = p.ControlName, Type = Convert.ToString((int)paramCtrl.EbDbType) });
-                                }
-                            }
-                        }
-                        else
-                            throw new FormException("Set Import Api Parameters for " + _label);
-                    }
+                        throw new FormException("Set numeric value member for " + _label);                   
                 }
                 else if (Allctrls[i] is EbUserControl)
                 {
@@ -367,7 +345,7 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                 }
 
                 if (Allctrls[i] is IEbDataReaderControl && serviceClient != null)
-                    (Allctrls[i] as IEbDataReaderControl).FetchParamsMeta(serviceClient, redis);
+                    (Allctrls[i] as IEbDataReaderControl).FetchParamsMeta(serviceClient, redis, Allctrls);
             }
         }
 
@@ -525,7 +503,7 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                         KeyValuePair<int, EbControlWrapper> item = _dict.FirstOrDefault(e => !(e.Value.Control is EbDGColumn) && e.Value.Control.Name == _p.Name);
                         if (item.Value != null)
                             item.Value.Control.DrDependents.Add(_dict[i].Path);
-                        else if (_p.Name != "eb_loc_id" && _p.Name != "eb_currentuser_id" && _p.Name != "id")
+                        else if (_p.Name != "eb_loc_id" && _p.Name != "eb_currentuser_id" && _p.Name != "id" && _p.Name != _Form.TableName + "_id")
                             throw new FormException($"Can't resolve parameter {_p.Name} in data reader of {_dict[i].Control.Name}");
                     }
                 }
@@ -588,10 +566,10 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
             {
                 for (int i = 0; i < CalcFlds.Count; i++)
                 {
-                    if (dpndcy.FindIndex(x => x.Key == CalcFlds[i]) == -1 && !ExecOrd.Contains(CalcFlds[i]))
+                    if (dpndcy.FindIndex(x => x.Value == CalcFlds[i]) == -1 && !ExecOrd.Contains(CalcFlds[i]))
                     {
                         ExecOrd.Add(CalcFlds[i]);
-                        dpndcy.RemoveAll(x => x.Value == CalcFlds[i]);
+                        dpndcy.RemoveAll(x => x.Key == CalcFlds[i]);
                     }
                 }
                 stopCounter++;

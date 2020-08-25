@@ -240,6 +240,7 @@ namespace ExpressBase.Objects
                 if (this.RefId == psCtrl.DataImportId)
                 {
                     _form = this;
+                    _form.TableRowId = Convert.ToInt32(psColumn.Value);
                     _form.RefreshFormData(DataDB, Service);
                     this.FormData = EbFormHelper.GetFilledNewFormData(_form);
                 }
@@ -250,6 +251,7 @@ namespace ExpressBase.Objects
                     _form.RefId = psCtrl.DataImportId;
                     _form.UserObj = this.UserObj;
                     _form.SolutionObj = this.SolutionObj;
+                    _form.TableRowId = Convert.ToInt32(psColumn.Value);
                     _form.RefreshFormData(DataDB, Service);
                     _form.FormatImportData(DataDB, Service, this);
                 }

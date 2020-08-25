@@ -1411,10 +1411,16 @@ pg.HideProperty('IsDynamic');
         public bool IsInsertable { get { return this.EbPowerSelect.IsInsertable; } set { this.EbPowerSelect.IsInsertable = value; } }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
-        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "return [...commonO.Current_obj.Controls.$values];")]
         [PropertyGroup("Api")]
-        [Alias("Parameter controls")]
-        public List<EbControl> ApiParamCtrls { get { return this.EbPowerSelect.ApiParamCtrls; } set { this.EbPowerSelect.ApiParamCtrls = value; } }
+        [Alias("Data api parameters")]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        public List<EbCtrlApiParamAbstract> DataApiParams { get { return this.EbPowerSelect.DataApiParams; } set { this.EbPowerSelect.DataApiParams = value; } }
+
+        //[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
+        //[PropertyEditor(PropertyEditorType.CollectionFrmSrc, "return [...commonO.Current_obj.Controls.$values];")]
+        //[PropertyGroup("Api")]
+        //[Alias("Parameter controls")]
+        //public List<EbControl> ApiParamCtrls { get { return this.EbPowerSelect.ApiParamCtrls; } set { this.EbPowerSelect.ApiParamCtrls = value; } }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyGroup(PGConstants.APPEARANCE)]
@@ -1562,9 +1568,9 @@ pg.HideProperty('IsDynamic');
             this.DBareHtml = this.GetBareHtml();
         }
 
-        public void FetchParamsMeta(IServiceClient ServiceClient, IRedisClient Redis)
+        public void FetchParamsMeta(IServiceClient ServiceClient, IRedisClient Redis, EbControl[] Allctrls)
         {
-            this.EbPowerSelect.FetchParamsMeta(ServiceClient, Redis);
+            this.EbPowerSelect.FetchParamsMeta(ServiceClient, Redis, Allctrls);
         }
 
         public string GetSelectQuery(IDatabase DataDB, Service service, string Col, string Tbl = null, string _id = null, string masterTbl = null)
