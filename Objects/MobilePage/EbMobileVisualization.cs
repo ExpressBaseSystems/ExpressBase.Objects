@@ -76,12 +76,14 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("Link Settings")]
+        [Alias("Columns to controls map")]
         [PropertyEditor(PropertyEditorType.Mapper, "DataColumns", "FormControlMetas", "FormControl")]
         public List<EbMobileDataColToControlMap> LinkFormParameters { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.Collection)]
         [PropertyGroup("Link Settings")]
+        [Alias("Context to controls map")]
         public List<EbCTCMapper> ContextToControlMap { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
@@ -119,24 +121,6 @@ namespace ExpressBase.Objects
         [PropertyGroup("List Styles")]
         [DefaultPropValue("5")]
         public int ColumnSpacing { set; get; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("List Styles")]
-        [OnChangeExec(@"
-                if (this.Style === 2){                        
-                        pg.ShowProperty('BorderRadius');
-                        pg.ShowProperty('BorderColor');
-                        pg.ShowProperty('BackgroundColor');
-                        pg.ShowProperty('BoxShadow');
-                }
-                else {
-                        pg.HideProperty('BorderRadius');
-                        pg.HideProperty('BorderColor');
-                        pg.HideProperty('BackgroundColor');
-                        pg.HideProperty('BoxShadow');
-                }
-            ")]
-        public RenderStyle Style { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("List Styles")]

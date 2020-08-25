@@ -713,7 +713,7 @@ namespace ExpressBase.Objects
     }
 
     [EnableInBuilder(BuilderType.MobilePage)]
-    public class EbMobileButton : EbMobileControl, IMobileUIStyles, IMobileLink
+    public class EbMobileButton : EbMobileControl, IMobileUIStyles, IMobileLink, INonPersistControl
     {
         public override string Label { set; get; }
 
@@ -727,12 +727,40 @@ namespace ExpressBase.Objects
 
         public override bool Hidden { set; get; }
 
+        #region
+        /// <summary>
+        /// link setting 
+        /// props DataColumns,FormControlMetas are for set values 
+        /// </summary>
+
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iMobilePage)]
         [PropertyGroup("Link Settings")]
         [Alias("Link")]
         public string LinkRefId { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Link Settings")]
+        public WebFormDVModes FormMode { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Link Settings")]
+        [Alias("Columns to controls map")]
+        [PropertyEditor(PropertyEditorType.Mapper, "DataColumns", "FormControlMetas", "FormControl")]
+        public List<EbMobileDataColToControlMap> LinkFormParameters { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [MetaOnly]
+        public List<EbMobileDataColToControlMap> DataColumns => new List<EbMobileDataColToControlMap>();
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [MetaOnly]
+        public List<EbMobileControlMeta> FormControlMetas => new List<EbMobileControlMeta>();
+        /// <summary>
+        /// ending region for link
+        /// </summary>
+        #endregion 
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("UI")]
@@ -805,6 +833,11 @@ namespace ExpressBase.Objects
                                <button class='ebm-btn'>Button</button>
                             </div>
                         </div>".RemoveCR().DoubleQuoted();
+        }
+
+        public EbMobileButton()
+        {
+            LinkFormParameters = new List<EbMobileDataColToControlMap>();
         }
     }
 }

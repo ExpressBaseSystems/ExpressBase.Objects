@@ -1,4 +1,5 @@
-﻿using ExpressBase.Common.Structures;
+﻿using ExpressBase.Common;
+using ExpressBase.Common.Structures;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -40,5 +41,9 @@ namespace ExpressBase.Objects
     public interface IMobileLink
     {
         string LinkRefId { set; get; }
+
+        WebFormDVModes FormMode { set; get; }
+
+        List<EbMobileDataColToControlMap> LinkFormParameters { get; set; }
     }
 }

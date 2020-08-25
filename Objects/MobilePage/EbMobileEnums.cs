@@ -23,12 +23,6 @@ namespace ExpressBase.Objects
         Descending = 1
     }
 
-    public enum RenderStyle
-    {
-        Flat = 1,
-        Tile = 2
-    }
-
     public enum DataColumnRenderType
     {
         Text = 1,

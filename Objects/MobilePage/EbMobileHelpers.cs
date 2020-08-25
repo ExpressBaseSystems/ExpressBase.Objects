@@ -56,13 +56,22 @@ namespace ExpressBase.Objects
                 if ([1,3,5].includes(this.RenderAs)){ 
                         pg.ShowProperty('TextFormat');
                         pg.ShowProperty('Font');
+                        pg.HideProperty('BorderRadius');
                 }
                 else {
                         pg.HideProperty('TextFormat');
                         pg.HideProperty('Font');
+                        pg.HideProperty('BorderRadius');
+                        if(this.RenderAs === 2){
+                            pg.ShowProperty('BorderRadius');
+                        }
                 }
             ")]
         public DataColumnRenderType RenderAs { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("UI")]
+        public int BorderRadius { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("UI")]
