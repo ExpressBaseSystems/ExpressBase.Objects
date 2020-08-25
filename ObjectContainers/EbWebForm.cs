@@ -81,6 +81,21 @@ namespace ExpressBase.Objects
 
         public static EbOperations Operations = WFOperations.Instance;
 
+        [PropertyGroup(PGConstants.HELP)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [PropertyPriority(98)]
+        [PropertyEditor(PropertyEditorType.FileUploader)]
+        [Alias("Info Document")]
+        [HelpText("Help information.")]
+        [OnChangeExec(@"
+        if(this.Info && this.Info.trim() !== ''){
+            pg.ShowProperty('InfoIcon');
+        }
+        else{
+            pg.HideProperty('InfoIcon');
+        }")]
+        public override string Info { get; set; }
+
         [PropertyGroup("Events")]
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.Collection)]
