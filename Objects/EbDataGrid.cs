@@ -1393,6 +1393,10 @@ pg.HideProperty('IsDynamic');
         //[OSE_ObjectTypes(EbObjectTypes.iWebForm)]
         //public string FormRefId { get { return this.FormRefId; } set { this.FormRefId = value; } }
 
+        public override string SetDisplayMemberJSfn { get { return JSFnsConstants.DG_hiddenColCheckCode + EbPowerSelect.SetDisplayMemberJSfn; } set { } }
+
+        public override string SetValueJSfn { get { return EbPowerSelect.SetValueJSfn; } set { } }
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [PropertyGroup(PGConstants.DATA_INSERT)]
@@ -1400,15 +1404,33 @@ pg.HideProperty('IsDynamic');
         [Alias("Form")]
         public string FormRefId { get { return this.EbPowerSelect.FormRefId; } set { this.EbPowerSelect.FormRefId = value; } }
 
-        public override string SetDisplayMemberJSfn { get { return JSFnsConstants.DG_hiddenColCheckCode + EbPowerSelect.SetDisplayMemberJSfn; } set { } }
 
-        public override string SetValueJSfn { get { return EbPowerSelect.SetValueJSfn; } set { } }
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.DATA_INSERT)]
+        [OnChangeExec(@"
+                if (this.IsInsertable){
+                    pg.ShowProperty('FormRefId');
+                }
+                else {
+                    pg.HideProperty('FormRefId');
+                }
+            ")]
+        [PropertyPriority(98)]
+        public bool IsInsertable { get { return this.EbPowerSelect.IsInsertable; } set { this.EbPowerSelect.IsInsertable = value; } }
 
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
-        [PropertyGroup(PGConstants.BEHAVIOR)]
+        [PropertyGroup(PGConstants.DATA_INSERT)]
+        [OnChangeExec(@"
+                if (this.IsInsertable){
+                    pg.ShowProperty('OpenInNewTab');
+                }
+                else {
+                    pg.HideProperty('OpenInNewTab');
+                }
+            ")]
         [PropertyPriority(98)]
-        public bool IsInsertable { get { return this.EbPowerSelect.IsInsertable; } set { this.EbPowerSelect.IsInsertable = value; } }
+        public bool OpenInNewTab { get { return this.EbPowerSelect.IsInsertable; } set { this.EbPowerSelect.IsInsertable = value; } }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
         [PropertyGroup("Api")]
