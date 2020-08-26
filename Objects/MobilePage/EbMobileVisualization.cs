@@ -72,7 +72,20 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("Link Settings")]
+        [OnChangeExec(@"
+                if (this.FormMode === 1){ 
+                        pg.ShowProperty('FormId');
+                }
+                else {
+                        pg.HideProperty('FormId');
+                }
+            ")]
         public WebFormDVModes FormMode { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "DataColumns", 1)]
+        [PropertyGroup("Link Settings")]
+        public EbMobileDataColToControlMap FormId { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("Link Settings")]
@@ -96,6 +109,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("List Styles")]
+        [Alias("Alternate row coloring")]
         public bool EnableAlternateRowColoring { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
