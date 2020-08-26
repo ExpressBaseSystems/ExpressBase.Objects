@@ -159,17 +159,6 @@ pg.MakeReadOnly('DisplayMembers');} else {pg.MakeReadWrite('DisplayMembers');}")
         //[Alias("Parameter controls")]
         //public List<EbControl> ApiParamCtrls { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
-        [PropertyGroup(PGConstants.DATA_INSERT)]
-        [OnChangeExec(@"
-            if (this.IsInsertable === true ){
-	            pg.ShowProperty('FormRefId');
-            } 
-            else {
-	            pg.HideProperty('FormRefId');
-            }")]
-        public bool IsInsertable { get; set; }
-
         [JsonIgnore]
         public override string IsRequiredOKJSfn
         {
@@ -360,6 +349,28 @@ else
         [OSE_ObjectTypes(EbObjectTypes.iWebForm)]
         [Alias("Form")]
         public string FormRefId { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
+        [PropertyGroup(PGConstants.DATA_INSERT)]
+        [OnChangeExec(@"
+            if (this.IsInsertable === true ){
+	            pg.ShowProperty('FormRefId');
+            } 
+            else {
+	            pg.HideProperty('FormRefId');
+            }")]
+        public bool IsInsertable { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
+        [PropertyGroup(PGConstants.DATA_INSERT)]
+        [OnChangeExec(@"
+            if (this.IsInsertable === true ){
+	            pg.ShowProperty('OpenInNewTab');
+            } 
+            else {
+	            pg.HideProperty('OpenInNewTab');
+            }")]
+        public bool OpenInNewTab { get; set; }
 
         [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.WebForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.CollectionProp, "Columns", "bVisible")]
