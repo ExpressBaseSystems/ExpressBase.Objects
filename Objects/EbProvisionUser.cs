@@ -583,26 +583,25 @@ this.Init = function(id)
         {
             get
             {
-                return @"
-                //debugger;
-                let updateDataVals = true;
-                if (!this.hasOwnProperty('_finalObj'))
-                    this._finalObj = {};
-                $.each(this.Fields.$values, function (i, obj) {
-                    if (obj.ControlName !== '') {
-                        if (obj.Control.___DoNotUpdateDataVals){
-                            updateDataVals = false;
-                            return false;
-                        }
-                        this._finalObj[obj.Name] = obj.Control.getValueFromDOM();
-                    }            
-                }.bind(this));
-                if (updateDataVals)
-                    this.DataVals.F = JSON.stringify(this._finalObj);                
-                return this.DataVals.Value;";
+                return @"return this.DataVals.Value;";
             }
             set { }
         }
+        //debugger;
+        //let updateDataVals = true;
+        //if (!this.hasOwnProperty('_finalObj'))
+        //    this._finalObj = {};
+        //$.each(this.Fields.$values, function (i, obj) {
+        //    if (obj.ControlName !== '') {
+        //        if (obj.Control.___DoNotUpdateDataVals){
+        //            updateDataVals = false;
+        //            return false;
+        //        }
+        //        this._finalObj[obj.Name] = obj.Control.getValueFromDOM();
+        //    }            
+        //}.bind(this));
+        //if (updateDataVals)
+        //    this.DataVals.F = JSON.stringify(this._finalObj); 
 
         public override string SetValueJSfn
         {
@@ -627,16 +626,16 @@ this.Init = function(id)
         { 
             get 
             {
-                return @"
-                    //debugger;
-                    $.each(this.Fields.$values, function (i, obj) {
-                        if (obj.ControlName !== '') {
-                            $('#' + obj.Control.EbSid_CtxId).on('change', p1);
-                        }
-                    }.bind(this));";
+                return @"";
             } 
             set { } 
         }
+        //debugger;
+        //$.each(this.Fields.$values, function (i, obj) {
+        //    if (obj.ControlName !== '') {
+        //        $('#' + obj.Control.EbSid_CtxId).on('change', p1);
+        //    }
+        //}.bind(this));
 
         public override string GetDisplayMemberFromDOMJSfn { get { return @"return '';"; } set { } }
 
