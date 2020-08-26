@@ -289,7 +289,7 @@ namespace ExpressBase.Objects
         {
             return @"
 						<div style='display: flex;'>
-							<img id='@ebsid@_usrimg'class='sysctrl_usrimg' src='' alt='' onerror=this.onerror=null;this.src='/images/nulldp.png';>
+							<img id='@ebsid@_usrimg'class='sysctrl_usrimg' src='' alt='' onerror=""this.onerror=null; this.src='/images/nulldp.png';"">
 							<div id='@ebsid@' data-ebtype='@data-ebtype@'  data-toggle='tooltip' title='@toolTipText@' class=' sysctrl_usrname'  name='@name@' autocomplete = 'off' @value@ @tabIndex@ style='width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@' @required@ @placeHolder@ disabled ></div>
 						
 						</div>
@@ -309,7 +309,18 @@ namespace ExpressBase.Objects
 
         public override string EnableJSfn { get { return @""; } set { } }
 
-        public override string GetValueFromDOMJSfn { get { return @"return $('#' + this.EbSid_CtxId).attr('data-id');"; } set { } }
+        public override string GetValueFromDOMJSfn 
+        { 
+            get 
+            { 
+                return @"let uid = parseInt($('#' + this.EbSid_CtxId).attr('data-id'));
+                        if (isNaN(uid))
+                            return 0;
+                        else
+                            return uid;"; 
+            } 
+            set { } 
+        }
 
         public override string SetValueJSfn
         {
@@ -317,12 +328,12 @@ namespace ExpressBase.Objects
             {
                 return @"
                         if(!p1)
-                            return false;
-                        let arr = p1.split('$$');
-                        $('#' + this.EbSid_CtxId).attr('data-id', arr[0]);
-                        $('#' + this.EbSid_CtxId).text(arr[1]).trigger('change');
-						let imgsrc='/images/dp/'+ arr[0] +'.png';
-						$('#' + this.EbSid_CtxId + '_usrimg').attr('src',imgsrc );";
+                            return false;                        
+                        $('#' + this.EbSid_CtxId).attr('data-id', p1).trigger('change');
+						let imgsrc='/images/dp/'+ p1 +'.png';
+						$('#' + this.EbSid_CtxId + '_usrimg').off('error').on('error', function(){$(this).attr('src', '/images/nulldp.png');}).attr('src',imgsrc);
+                        if (this.DataVals)
+                            $('#' + this.EbSid_CtxId).text(this.DataVals.F);";
             }
             set { }
         }
@@ -368,34 +379,25 @@ namespace ExpressBase.Objects
 
         public static SingleColumn GetSingleColumn(EbControl _this, User UserObj, Eb_Solution SoluObj, object Value)
         {
-            object _formattedData = null;
-            string _displayMember = string.Empty;
+            string _displayMember = UserObj.FullName;
             int user_id = UserObj.UserId;
             if (Value != null)
             {
                 int.TryParse(Value.ToString(), out user_id);
-            }
-            if (user_id == UserObj.UserId)
-            {
-                _formattedData = UserObj.UserId + "$$" + UserObj.FullName;
-                _displayMember = UserObj.FullName;
-            }
-            else if (SoluObj.Users != null && SoluObj.Users.ContainsKey(user_id))
-            {
-                _formattedData = user_id + "$$" + SoluObj.Users[user_id];
-                _displayMember = SoluObj.Users[user_id];
-            }
-            else
-            {
-                _formattedData = user_id + "$$No Name";
-                _displayMember = "No Name";
+                if (user_id != UserObj.UserId)
+                {
+                    if (SoluObj.Users != null && SoluObj.Users.ContainsKey(user_id))
+                        _displayMember = SoluObj.Users[user_id];
+                    else
+                        _displayMember = "No Name";
+                }
             }
 
             return new SingleColumn()
             {
                 Name = _this.Name,
                 Type = (int)_this.EbDbType,
-                Value = _formattedData,
+                Value = user_id,
                 Control = _this,
                 ObjType = _this.ObjType,
                 F = _displayMember
@@ -662,7 +664,7 @@ namespace ExpressBase.Objects
         public override string GetBareHtml()
         {
             return @"<div style='display: flex;'>
-							<img id='@ebsid@_usrimg'class='sysctrl_usrimg' src='' alt='' onerror=this.onerror=null;this.src='/images/nulldp.png';>
+							<img id='@ebsid@_usrimg'class='sysctrl_usrimg' src='' alt='' onerror=""this.onerror=null;this.src='/images/nulldp.png';"">
 							<div id='@ebsid@' data-ebtype='@data-ebtype@'  data-toggle='tooltip' title='@toolTipText@' class=' sysctrl_usrname'  name='@name@' autocomplete = 'off' @value@ @tabIndex@ style='width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@' @required@ @placeHolder@ disabled ></div>
 						
 						</div>
@@ -682,7 +684,18 @@ namespace ExpressBase.Objects
 
         public override string EnableJSfn { get { return @""; } set { } }
 
-        public override string GetValueFromDOMJSfn { get { return @"return $('#' + this.EbSid_CtxId).attr('data-id');"; } set { } }
+        public override string GetValueFromDOMJSfn
+        {
+            get
+            {
+                return @"let uid = parseInt($('#' + this.EbSid_CtxId).attr('data-id'));
+                        if (isNaN(uid))
+                            return 0;
+                        else
+                            return uid;";
+            }
+            set { }
+        }
 
         public override string SetValueJSfn
         {
@@ -690,12 +703,12 @@ namespace ExpressBase.Objects
             {
                 return @"
                         if(!p1)
-                            return false;
-                        let arr = p1.split('$$');
-                        $('#' + this.EbSid_CtxId).attr('data-id', arr[0]);
-                        $('#' + this.EbSid_CtxId).text(arr[1]).trigger('change');
-						let imgsrc='/images/dp/'+ arr[0] +'.png';
-						$('#' + this.EbSid_CtxId + '_usrimg').attr('src',imgsrc );";
+                            return false;                        
+                        $('#' + this.EbSid_CtxId).attr('data-id', p1).trigger('change');
+						let imgsrc='/images/dp/'+ p1 +'.png';
+						$('#' + this.EbSid_CtxId + '_usrimg').off('error').on('error', function(){$(this).attr('src', '/images/nulldp.png');}).attr('src',imgsrc);
+                        if (this.DataVals)
+                            $('#' + this.EbSid_CtxId).text(this.DataVals.F);";
             }
             set { }
         }
