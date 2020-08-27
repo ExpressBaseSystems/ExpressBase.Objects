@@ -134,10 +134,14 @@ namespace ExpressBase.Objects
             get
             {
                 return @"
+                let val;
                 if(this.IsDisable)
-                    return $('#' + this.EbSid_CtxId).attr('data-id');
+                    val = $('#' + this.EbSid_CtxId).attr('data-id');
                 else
-                    return $('#' + this.EbSid_CtxId).val();
+                    val = $('#' + this.EbSid_CtxId).val();
+                val = parseInt(val);
+                if(isNaN(val)) val = 0;
+                return val;
                 ";
             }
             set { }
