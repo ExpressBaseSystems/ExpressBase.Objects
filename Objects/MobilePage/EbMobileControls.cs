@@ -713,7 +713,7 @@ namespace ExpressBase.Objects
     }
 
     [EnableInBuilder(BuilderType.MobilePage)]
-    public class EbMobileButton : EbMobileControl, IMobileUIStyles, IMobileLink, INonPersistControl
+    public class EbMobileButton : EbMobileControl, IMobileLink, INonPersistControl
     {
         public override string Label { set; get; }
 

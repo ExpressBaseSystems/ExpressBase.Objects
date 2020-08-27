@@ -7,7 +7,7 @@ using ExpressBase.Common.Structures;
 namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.MobilePage)]
-    public class EbMobileDataColumn : EbMobileControl, INonPersistControl, IMobileDataPart
+    public class EbMobileDataColumn : EbMobileControl, INonPersistControl
     {
         public override string Label { set; get; }
 
