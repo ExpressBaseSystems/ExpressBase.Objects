@@ -355,21 +355,16 @@ else
         [OnChangeExec(@"
             if (this.IsInsertable === true ){
 	            pg.ShowProperty('FormRefId');
+	            pg.ShowProperty('OpenInNewTab');
             } 
             else {
 	            pg.HideProperty('FormRefId');
+	            pg.HideProperty('OpenInNewTab');
             }")]
         public bool IsInsertable { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
         [PropertyGroup(PGConstants.DATA_INSERT)]
-        [OnChangeExec(@"
-            if (this.IsInsertable === true ){
-	            pg.ShowProperty('OpenInNewTab');
-            } 
-            else {
-	            pg.HideProperty('OpenInNewTab');
-            }")]
         public bool OpenInNewTab { get; set; }
 
         [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.WebForm, BuilderType.UserControl)]
