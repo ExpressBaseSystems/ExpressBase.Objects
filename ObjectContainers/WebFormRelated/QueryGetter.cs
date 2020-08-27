@@ -36,10 +36,13 @@ namespace ExpressBase.Objects.WebFormRelated
                 if (_columns.Count() > 0)
                     _cols += ", " + String.Join(", ", _columns.Select(x => x.ColumnName));
 
-                if (_this.DataPusherConfig == null)
+                if (_this.DataPusherConfig == null)// master form
                 {
                     query += string.Format("SELECT {0} FROM {1} WHERE {2} = @{3}_id AND COALESCE(eb_del, 'F') = 'F' {4};",
                         _cols, _table.TableName, _id, _this.FormSchema.MasterTable, _table.TableType == WebFormTableTypes.Grid ? (_table.DescOdr ? "ORDER BY eb_row_num DESC" : "ORDER BY eb_row_num") : "ORDER BY id");
+
+                    foreach (ColumnSchema Col in _table.Columns.FindAll(e => !e.Control.DoNotPersist && e.Control is IEbPowerSelect && !(e.Control as IEbPowerSelect).IsDataFromApi))
+                        _queryPs += (Col.Control as IEbPowerSelect).GetSelectQuery(DataDB, _service, Col.ColumnName, _table.TableName, _id, _this.FormSchema.MasterTable);
                 }
                 else
                 {
@@ -51,10 +54,6 @@ namespace ExpressBase.Objects.WebFormRelated
                             _cols, _table.TableName, _this.FormSchema.MasterTable, _this.DataPusherConfig.SourceTable, _this.DataPusherConfig.MultiPushId, _table.TableType == WebFormTableTypes.Grid ? "ORDER BY eb_row_num" : "ORDER BY id");
                 }
                 _qryCount++;
-                foreach (ColumnSchema Col in _table.Columns.FindAll(e => !e.Control.DoNotPersist && e.Control is IEbPowerSelect && !(e.Control as IEbPowerSelect).IsDataFromApi))
-                {
-                    _queryPs += (Col.Control as IEbPowerSelect).GetSelectQuery(DataDB, _service, Col.ColumnName, _table.TableName, _id, _this.FormSchema.MasterTable);                    
-                }
             }
             bool MuCtrlFound = false;
             foreach (EbControl Ctrl in _this.FormSchema.ExtendedControls)

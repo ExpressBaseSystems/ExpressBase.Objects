@@ -693,6 +693,57 @@ namespace ExpressBase.Objects
                         c.ValueFE = FormData.MultipleTables[_container.TableName][0][c.Name];
                     }
                 }
+                else if (c is EbProvisionUser)
+                {
+                    if (!(this.FormData.MultipleTables.ContainsKey(_container.TableName) && this.FormData.MultipleTables[_container.TableName].Count > 0))
+                        continue;
+                    EbProvisionUser provUsrCtrl = c as EbProvisionUser;
+                    Dictionary<string, string> _d = new Dictionary<string, string>();
+                    bool skipCtrl = false;
+                    foreach (UsrLocField obj in provUsrCtrl.Fields)
+                    {
+                        if (!string.IsNullOrEmpty(obj.ControlName))
+                        {
+                            foreach (KeyValuePair<string, SingleTable> entry in this.FormData.MultipleTables)
+                            {
+                                TableSchema _table = this.FormSchema.Tables.Find(e => e.TableType == WebFormTableTypes.Normal && e.TableName == entry.Key);
+                                if (_table != null && entry.Value.Count > 0)
+                                {
+                                    SingleColumn Col = entry.Value[0].GetColumn(obj.ControlName);
+                                    if (Col != null)
+                                    {
+                                        _d.Add(obj.Name, Convert.ToString(Col.Value));
+                                        break;
+                                    }
+                                }
+                            }
+                            if (!_d.ContainsKey(obj.Name))
+                            {
+                                skipCtrl = true;
+                                break;
+                            }
+                        }
+                    }
+                    SingleRow Row = this.FormData.MultipleTables[_container.TableName][0];
+                    SingleColumn Column = Row.GetColumn(provUsrCtrl.Name);
+                    if (skipCtrl)
+                    {
+                        if (Column != null)
+                            Row.Columns.Remove(Column);
+                    }
+                    else
+                    {
+                        if (Column == null)
+                        {
+                            Column = c.GetSingleColumn(this.UserObj, this.SolutionObj, null);
+                            Row.Columns.Add(Column);
+                        }
+                        Column.F = JsonConvert.SerializeObject(_d);
+                        c.ValueFE = Column.Value;
+                        Row.SetEbDbType(c.Name, c.EbDbType);
+                        Row.SetControl(c.Name, c);
+                    }
+                }
                 else if ((!(c is EbFileUploader) && !c.DoNotPersist) || c is EbProvisionLocation)
                 {
                     if (FormData.MultipleTables.ContainsKey(_container.TableName) && FormData.MultipleTables[_container.TableName].Count > 0)
@@ -1012,7 +1063,7 @@ namespace ExpressBase.Objects
             {
                 EbDataSet ds = new EbDataSet();
                 ds.Tables.AddRange(dataset.Tables.GetRange(start, qrycount[i]));
-                _FormCollection[i].RefreshFormDataInner(ds, DataDB, i == 0 ? psquery[i] : string.Empty, backup, service);
+                _FormCollection[i].RefreshFormDataInner(ds, DataDB, psquery[i], backup, service);
             }
             Console.WriteLine("No Exception in RefreshFormData");
         }
@@ -1204,76 +1255,76 @@ namespace ExpressBase.Objects
                     }
                 }
             }
-
-            foreach (EbControl Ctrl in _schema.ExtendedControls)// EbFileUploader
+            
+            if (!backup && this.DataPusherConfig == null)//isMasterFormNormalRefresh
             {
-                if (Ctrl is EbFileUploader)
+                foreach (EbControl Ctrl in _schema.ExtendedControls)// EbFileUploader
                 {
-                    string context = this.RefId.Split(CharConstants.DASH)[3] + CharConstants.UNDERSCORE + this.TableRowId.ToString();//context format = objectId_rowId_ControlId
-                    EbFileUploader _ctrl = Ctrl as EbFileUploader;
-                    string cxt2 = null;
-                    if (_ctrl.ContextGetExpr != null && !_ctrl.ContextGetExpr.Code.IsNullOrEmpty())
+                    if (Ctrl is EbFileUploader)
                     {
-                        if (this.FormGlobals == null)
-                            this.FormGlobals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, _FormData, null);
-                        cxt2 = Convert.ToString(this.ExecuteCSharpScriptNew(_ctrl.ContextGetExpr.Code, this.FormGlobals));
-                    }
+                        string context = this.RefId.Split(CharConstants.DASH)[3] + CharConstants.UNDERSCORE + this.TableRowId.ToString();//context format = objectId_rowId_ControlId
+                        EbFileUploader _ctrl = Ctrl as EbFileUploader;
+                        string cxt2 = null;
+                        if (_ctrl.ContextGetExpr != null && !_ctrl.ContextGetExpr.Code.IsNullOrEmpty())
+                        {
+                            if (this.FormGlobals == null)
+                                this.FormGlobals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, _FormData, null);
+                            cxt2 = Convert.ToString(this.ExecuteCSharpScriptNew(_ctrl.ContextGetExpr.Code, this.FormGlobals));
+                        }
 
-                    string qry = (Ctrl as EbFileUploader).GetSelectQuery(DataDB, string.IsNullOrEmpty(cxt2));
+                        string qry = (Ctrl as EbFileUploader).GetSelectQuery(DataDB, string.IsNullOrEmpty(cxt2));
 
-                    DbParameter[] param = new DbParameter[]
-                    {
+                        DbParameter[] param = new DbParameter[]
+                        {
                         DataDB.GetNewParameter(FormConstants.id, EbDbTypes.Int32, this.TableRowId),
                         DataDB.GetNewParameter(FormConstants.context, EbDbTypes.String, context),
                         DataDB.GetNewParameter(FormConstants.context_sec, EbDbTypes.String, cxt2 ?? string.Empty),
                         DataDB.GetNewParameter(FormConstants.eb_ver_id, EbDbTypes.Int32, this.RefId.Split(CharConstants.DASH)[4])
-                    };
-
-                    EbDataTable dt;
-                    if (this.DbConnection == null)
-                        dt = DataDB.DoQuery(qry, param);
-                    else
-                        dt = DataDB.DoQuery(this.DbConnection, qry, param);
-
-                    SingleTable Table = new SingleTable();
-                    this.GetFormattedData(dt, Table);
-
-                    List<FileMetaInfo> _list = new List<FileMetaInfo>();
-                    foreach (SingleRow dr in Table)
-                    {
-                        FileMetaInfo info = new FileMetaInfo
-                        {
-                            FileRefId = Convert.ToInt32(dr[FormConstants.id]),
-                            FileName = Convert.ToString(dr[FormConstants.filename]),
-                            Meta = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(dr[FormConstants.tags] as string),
-                            UploadTime = Convert.ToString(dr[FormConstants.uploadts]),
-                            FileCategory = (EbFileCategory)Convert.ToInt32(dr[FormConstants.filecategory])
                         };
 
-                        if (!_list.Contains(info))
-                            _list.Add(info);
-                    }
-                    SingleTable _Table = new SingleTable {
+                        EbDataTable dt;
+                        if (this.DbConnection == null)
+                            dt = DataDB.DoQuery(qry, param);
+                        else
+                            dt = DataDB.DoQuery(this.DbConnection, qry, param);
+
+                        SingleTable Table = new SingleTable();
+                        this.GetFormattedData(dt, Table);
+
+                        List<FileMetaInfo> _list = new List<FileMetaInfo>();
+                        foreach (SingleRow dr in Table)
+                        {
+                            FileMetaInfo info = new FileMetaInfo
+                            {
+                                FileRefId = Convert.ToInt32(dr[FormConstants.id]),
+                                FileName = Convert.ToString(dr[FormConstants.filename]),
+                                Meta = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(dr[FormConstants.tags] as string),
+                                UploadTime = Convert.ToString(dr[FormConstants.uploadts]),
+                                FileCategory = (EbFileCategory)Convert.ToInt32(dr[FormConstants.filecategory])
+                            };
+
+                            if (!_list.Contains(info))
+                                _list.Add(info);
+                        }
+                        SingleTable _Table = new SingleTable {
                             new SingleRow() {
                                 Columns = new List<SingleColumn> {
                                     new SingleColumn { Name = FormConstants.Files, Type = (int)EbDbTypes.Json, Value = JsonConvert.SerializeObject(_list) }
                                 }
                             }
                         };
-                    _FormData.ExtendedTables.Add(Ctrl.Name ?? Ctrl.EbSid, _Table);//fup
+                        _FormData.ExtendedTables.Add(Ctrl.Name ?? Ctrl.EbSid, _Table);//fup
+                    }
                 }
-            }
 
-            List<EbControl> drPsList = new List<EbControl>();
-            List<EbControl> apiPsList = new List<EbControl>();
-            foreach (TableSchema Tbl in _schema.Tables)
-            {
-                drPsList.AddRange(Tbl.Columns.FindAll(e => !e.Control.DoNotPersist && e.Control is IEbPowerSelect && !(e.Control as IEbPowerSelect).IsDataFromApi).Select(e => e.Control));
-                apiPsList.AddRange(Tbl.Columns.FindAll(e => !e.Control.DoNotPersist && e.Control is IEbPowerSelect && (e.Control as IEbPowerSelect).IsDataFromApi).Select(e => e.Control));
-            }
+                List<EbControl> drPsList = new List<EbControl>();
+                List<EbControl> apiPsList = new List<EbControl>();
+                foreach (TableSchema Tbl in _schema.Tables)
+                {
+                    drPsList.AddRange(Tbl.Columns.FindAll(e => !e.Control.DoNotPersist && e.Control is IEbPowerSelect && !(e.Control as IEbPowerSelect).IsDataFromApi).Select(e => e.Control));
+                    apiPsList.AddRange(Tbl.Columns.FindAll(e => !e.Control.DoNotPersist && e.Control is IEbPowerSelect && (e.Control as IEbPowerSelect).IsDataFromApi).Select(e => e.Control));
+                }
 
-            if (!backup)
-            {
                 if (drPsList.Count > 0)
                 {
                     List<DbParameter> param = new List<DbParameter>();
@@ -1333,10 +1384,9 @@ namespace ExpressBase.Objects
                 }
 
                 this.PostFormatFormData();
-            }
 
-            if (!backup)
                 this.ExeDeleteCancelScript(DataDB);
+            }
         }
 
         //For Prefill Mode

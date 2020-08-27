@@ -46,6 +46,10 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         public override string ToolNameAlias { get { return "Created From"; } set { } }
 
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public override EbDbTypes EbDbType { get { return EbDbTypes.Decimal; } }
+
         //public override string GetToolHtml()
         //{
         //    return @"<div eb-type='@toolName' class='tool'><i class='fa fa-desktop'></i> Created From </div>".Replace("@toolName", this.GetType().Name.Substring(2));
@@ -232,6 +236,8 @@ namespace ExpressBase.Objects
             this.Name = "eb_created_by";
         }
 
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.Decimal; } }
 
         [HideInPropertyGrid]
@@ -604,6 +610,8 @@ namespace ExpressBase.Objects
             this.Name = "eb_lastmodified_by";
         }
 
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.Decimal; } }
 
         //[EnableInBuilder(BuilderType.WebForm)]
