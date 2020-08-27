@@ -1063,7 +1063,7 @@ namespace ExpressBase.Objects
             {
                 EbDataSet ds = new EbDataSet();
                 ds.Tables.AddRange(dataset.Tables.GetRange(start, qrycount[i]));
-                _FormCollection[i].RefreshFormDataInner(ds, DataDB, i == 0 ? psquery[i] : string.Empty, backup, service);
+                _FormCollection[i].RefreshFormDataInner(ds, DataDB, psquery[i], backup, service);
             }
             Console.WriteLine("No Exception in RefreshFormData");
         }
@@ -1255,76 +1255,76 @@ namespace ExpressBase.Objects
                     }
                 }
             }
-
-            foreach (EbControl Ctrl in _schema.ExtendedControls)// EbFileUploader
+            
+            if (!backup && this.DataPusherConfig == null)//isMasterFormNormalRefresh
             {
-                if (Ctrl is EbFileUploader)
+                foreach (EbControl Ctrl in _schema.ExtendedControls)// EbFileUploader
                 {
-                    string context = this.RefId.Split(CharConstants.DASH)[3] + CharConstants.UNDERSCORE + this.TableRowId.ToString();//context format = objectId_rowId_ControlId
-                    EbFileUploader _ctrl = Ctrl as EbFileUploader;
-                    string cxt2 = null;
-                    if (_ctrl.ContextGetExpr != null && !_ctrl.ContextGetExpr.Code.IsNullOrEmpty())
+                    if (Ctrl is EbFileUploader)
                     {
-                        if (this.FormGlobals == null)
-                            this.FormGlobals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, _FormData, null);
-                        cxt2 = Convert.ToString(this.ExecuteCSharpScriptNew(_ctrl.ContextGetExpr.Code, this.FormGlobals));
-                    }
+                        string context = this.RefId.Split(CharConstants.DASH)[3] + CharConstants.UNDERSCORE + this.TableRowId.ToString();//context format = objectId_rowId_ControlId
+                        EbFileUploader _ctrl = Ctrl as EbFileUploader;
+                        string cxt2 = null;
+                        if (_ctrl.ContextGetExpr != null && !_ctrl.ContextGetExpr.Code.IsNullOrEmpty())
+                        {
+                            if (this.FormGlobals == null)
+                                this.FormGlobals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, _FormData, null);
+                            cxt2 = Convert.ToString(this.ExecuteCSharpScriptNew(_ctrl.ContextGetExpr.Code, this.FormGlobals));
+                        }
 
-                    string qry = (Ctrl as EbFileUploader).GetSelectQuery(DataDB, string.IsNullOrEmpty(cxt2));
+                        string qry = (Ctrl as EbFileUploader).GetSelectQuery(DataDB, string.IsNullOrEmpty(cxt2));
 
-                    DbParameter[] param = new DbParameter[]
-                    {
+                        DbParameter[] param = new DbParameter[]
+                        {
                         DataDB.GetNewParameter(FormConstants.id, EbDbTypes.Int32, this.TableRowId),
                         DataDB.GetNewParameter(FormConstants.context, EbDbTypes.String, context),
                         DataDB.GetNewParameter(FormConstants.context_sec, EbDbTypes.String, cxt2 ?? string.Empty),
                         DataDB.GetNewParameter(FormConstants.eb_ver_id, EbDbTypes.Int32, this.RefId.Split(CharConstants.DASH)[4])
-                    };
-
-                    EbDataTable dt;
-                    if (this.DbConnection == null)
-                        dt = DataDB.DoQuery(qry, param);
-                    else
-                        dt = DataDB.DoQuery(this.DbConnection, qry, param);
-
-                    SingleTable Table = new SingleTable();
-                    this.GetFormattedData(dt, Table);
-
-                    List<FileMetaInfo> _list = new List<FileMetaInfo>();
-                    foreach (SingleRow dr in Table)
-                    {
-                        FileMetaInfo info = new FileMetaInfo
-                        {
-                            FileRefId = Convert.ToInt32(dr[FormConstants.id]),
-                            FileName = Convert.ToString(dr[FormConstants.filename]),
-                            Meta = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(dr[FormConstants.tags] as string),
-                            UploadTime = Convert.ToString(dr[FormConstants.uploadts]),
-                            FileCategory = (EbFileCategory)Convert.ToInt32(dr[FormConstants.filecategory])
                         };
 
-                        if (!_list.Contains(info))
-                            _list.Add(info);
-                    }
-                    SingleTable _Table = new SingleTable {
+                        EbDataTable dt;
+                        if (this.DbConnection == null)
+                            dt = DataDB.DoQuery(qry, param);
+                        else
+                            dt = DataDB.DoQuery(this.DbConnection, qry, param);
+
+                        SingleTable Table = new SingleTable();
+                        this.GetFormattedData(dt, Table);
+
+                        List<FileMetaInfo> _list = new List<FileMetaInfo>();
+                        foreach (SingleRow dr in Table)
+                        {
+                            FileMetaInfo info = new FileMetaInfo
+                            {
+                                FileRefId = Convert.ToInt32(dr[FormConstants.id]),
+                                FileName = Convert.ToString(dr[FormConstants.filename]),
+                                Meta = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(dr[FormConstants.tags] as string),
+                                UploadTime = Convert.ToString(dr[FormConstants.uploadts]),
+                                FileCategory = (EbFileCategory)Convert.ToInt32(dr[FormConstants.filecategory])
+                            };
+
+                            if (!_list.Contains(info))
+                                _list.Add(info);
+                        }
+                        SingleTable _Table = new SingleTable {
                             new SingleRow() {
                                 Columns = new List<SingleColumn> {
                                     new SingleColumn { Name = FormConstants.Files, Type = (int)EbDbTypes.Json, Value = JsonConvert.SerializeObject(_list) }
                                 }
                             }
                         };
-                    _FormData.ExtendedTables.Add(Ctrl.Name ?? Ctrl.EbSid, _Table);//fup
+                        _FormData.ExtendedTables.Add(Ctrl.Name ?? Ctrl.EbSid, _Table);//fup
+                    }
                 }
-            }
 
-            List<EbControl> drPsList = new List<EbControl>();
-            List<EbControl> apiPsList = new List<EbControl>();
-            foreach (TableSchema Tbl in _schema.Tables)
-            {
-                drPsList.AddRange(Tbl.Columns.FindAll(e => !e.Control.DoNotPersist && e.Control is IEbPowerSelect && !(e.Control as IEbPowerSelect).IsDataFromApi).Select(e => e.Control));
-                apiPsList.AddRange(Tbl.Columns.FindAll(e => !e.Control.DoNotPersist && e.Control is IEbPowerSelect && (e.Control as IEbPowerSelect).IsDataFromApi).Select(e => e.Control));
-            }
+                List<EbControl> drPsList = new List<EbControl>();
+                List<EbControl> apiPsList = new List<EbControl>();
+                foreach (TableSchema Tbl in _schema.Tables)
+                {
+                    drPsList.AddRange(Tbl.Columns.FindAll(e => !e.Control.DoNotPersist && e.Control is IEbPowerSelect && !(e.Control as IEbPowerSelect).IsDataFromApi).Select(e => e.Control));
+                    apiPsList.AddRange(Tbl.Columns.FindAll(e => !e.Control.DoNotPersist && e.Control is IEbPowerSelect && (e.Control as IEbPowerSelect).IsDataFromApi).Select(e => e.Control));
+                }
 
-            if (!backup)
-            {
                 if (drPsList.Count > 0)
                 {
                     List<DbParameter> param = new List<DbParameter>();
@@ -1384,10 +1384,9 @@ namespace ExpressBase.Objects
                 }
 
                 this.PostFormatFormData();
-            }
 
-            if (!backup)
                 this.ExeDeleteCancelScript(DataDB);
+            }
         }
 
         //For Prefill Mode
