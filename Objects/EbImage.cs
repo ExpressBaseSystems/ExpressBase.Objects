@@ -138,7 +138,7 @@ namespace ExpressBase.Objects
         </div>"
 	.Replace("@name@", this.Name)
 	.Replace("@ebsid@", this.EbSid)
-    .Replace("@src@", (this.ImageId > 0) ? "" : "/images/image.png")
+    .Replace("@src@",  "/images/image.png")
     .Replace("@toolTipText@", this.ToolTipText)
     .Replace("@value@", "")//"value='" + this.Value + "'")
     .Replace("@maxwidth@", this.MaxWidth > 0 ? this.MaxWidth.ToString() : "200")
