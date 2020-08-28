@@ -493,9 +493,10 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
         private static void CalcDataReaderDependency(EbForm _Form, Dictionary<int, EbControlWrapper> _dict)
         {
             for (int i = 0; i < _dict.Count; i++)
-            {
                 _dict[i].Control.DrDependents = new List<string>();
 
+            for (int i = 0; i < _dict.Count; i++)
+            {
                 if (_dict[i].Control is IEbDataReaderControl && (_dict[i].Control as IEbDataReaderControl).ParamsList?.Count > 0)
                 {
                     foreach (Param _p in (_dict[i].Control as IEbDataReaderControl).ParamsList)

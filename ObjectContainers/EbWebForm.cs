@@ -1255,7 +1255,7 @@ namespace ExpressBase.Objects
                     }
                 }
             }
-            
+
             if (!backup && this.DataPusherConfig == null)//isMasterFormNormalRefresh
             {
                 foreach (EbControl Ctrl in _schema.ExtendedControls)// EbFileUploader
@@ -1954,7 +1954,7 @@ namespace ExpressBase.Objects
                     this.DbConnection.Open();
                     this.DbTransaction = this.DbConnection.BeginTransaction();
                 }
-
+                this.ExecProvUserCreateOnlyIfScript();
                 bool IsUpdate = this.TableRowId > 0;
                 if (IsUpdate)
                 {
