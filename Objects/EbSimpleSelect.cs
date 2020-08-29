@@ -285,6 +285,8 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
                     string dispName = option[this.DisplayMember.Data].ToString();
                     this.Options.Add(new EbSimpleSelectOption { Value = val, DisplayName = dispName });
 
+                    if (dispName.Contains("`"))
+                        dispName = dispName.Replace("`", "\\`");
                     _html += string.Format("<option value='{0}'>{1}</option>", val, dispName);
                 }
             }

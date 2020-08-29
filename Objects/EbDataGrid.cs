@@ -1243,7 +1243,7 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog)]
     [Alias("PowerSelect Column")]
     [UsedWithTopObjectParent(typeof(EbObject))]
-    public class EbDGPowerSelectColumn : EbDGColumn
+    public class EbDGPowerSelectColumn : EbDGColumn, IEbPowerSelect, IEbDataReaderControl
     {
 
 
@@ -1312,11 +1312,11 @@ pg.MakeReadOnly('DisplayMembers');} else {pg.MakeReadWrite('DisplayMembers');}")
         [HideForUser]
         public List<ApiRequestHeader> Headers { get { return this.EbPowerSelect.Headers; } set { this.EbPowerSelect.Headers = value; } }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
-        [PropertyEditor(PropertyEditorType.Collection)]
-        [PropertyGroup("Api")]
-        [MetaOnly]
-        public List<ApiRequestParam> Parameters { get { return this.EbPowerSelect.Parameters; } set { this.EbPowerSelect.Parameters = value; } }
+        //[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
+        //[PropertyEditor(PropertyEditorType.Collection)]
+        //[PropertyGroup("Api")]
+        //[MetaOnly]
+        //public List<ApiRequestParam> Parameters { get { return this.EbPowerSelect.Parameters; } set { this.EbPowerSelect.Parameters = value; } }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
@@ -1393,6 +1393,10 @@ pg.HideProperty('IsDynamic');
         //[OSE_ObjectTypes(EbObjectTypes.iWebForm)]
         //public string FormRefId { get { return this.FormRefId; } set { this.FormRefId = value; } }
 
+        public override string SetDisplayMemberJSfn { get { return JSFnsConstants.DG_hiddenColCheckCode + EbPowerSelect.SetDisplayMemberJSfn; } set { } }
+
+        public override string SetValueJSfn { get { return EbPowerSelect.SetValueJSfn; } set { } }
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [PropertyGroup(PGConstants.DATA_INSERT)]
@@ -1400,21 +1404,38 @@ pg.HideProperty('IsDynamic');
         [Alias("Form")]
         public string FormRefId { get { return this.EbPowerSelect.FormRefId; } set { this.EbPowerSelect.FormRefId = value; } }
 
-        public override string SetDisplayMemberJSfn { get { return JSFnsConstants.DG_hiddenColCheckCode + EbPowerSelect.SetDisplayMemberJSfn; } set { } }
-
-        public override string SetValueJSfn { get { return EbPowerSelect.SetValueJSfn; } set { } }
-
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
-        [PropertyGroup(PGConstants.BEHAVIOR)]
+        [PropertyGroup(PGConstants.DATA_INSERT)]
+        [OnChangeExec(@"
+            if (this.IsInsertable === true ){
+	            pg.ShowProperty('FormRefId');
+	            pg.ShowProperty('OpenInNewTab');
+            } 
+            else {
+	            pg.HideProperty('FormRefId');
+	            pg.HideProperty('OpenInNewTab');
+            }")]
         [PropertyPriority(98)]
         public bool IsInsertable { get { return this.EbPowerSelect.IsInsertable; } set { this.EbPowerSelect.IsInsertable = value; } }
 
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.DATA_INSERT)]
+        [PropertyPriority(98)]
+        public bool OpenInNewTab { get { return this.EbPowerSelect.OpenInNewTab; } set { this.EbPowerSelect.OpenInNewTab = value; } }
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
-        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "return [...commonO.Current_obj.Controls.$values];")]
         [PropertyGroup("Api")]
-        [Alias("Parameter controls")]
-        public List<EbControl> ApiParamCtrls { get { return this.EbPowerSelect.ApiParamCtrls; } set { this.EbPowerSelect.ApiParamCtrls = value; } }
+        [Alias("Data api parameters")]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        public List<EbCtrlApiParamAbstract> DataApiParams { get { return this.EbPowerSelect.DataApiParams; } set { this.EbPowerSelect.DataApiParams = value; } }
+
+        //[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
+        //[PropertyEditor(PropertyEditorType.CollectionFrmSrc, "return [...commonO.Current_obj.Controls.$values];")]
+        //[PropertyGroup("Api")]
+        //[Alias("Parameter controls")]
+        //public List<EbControl> ApiParamCtrls { get { return this.EbPowerSelect.ApiParamCtrls; } set { this.EbPowerSelect.ApiParamCtrls = value; } }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyGroup(PGConstants.APPEARANCE)]
@@ -1562,9 +1583,9 @@ pg.HideProperty('IsDynamic');
             this.DBareHtml = this.GetBareHtml();
         }
 
-        public void FetchParamsMeta(IServiceClient ServiceClient, IRedisClient Redis)
+        public void FetchParamsMeta(IServiceClient ServiceClient, IRedisClient Redis, EbControl[] Allctrls)
         {
-            this.EbPowerSelect.FetchParamsMeta(ServiceClient, Redis);
+            this.EbPowerSelect.FetchParamsMeta(ServiceClient, Redis, Allctrls);
         }
 
         public string GetSelectQuery(IDatabase DataDB, Service service, string Col, string Tbl = null, string _id = null, string masterTbl = null)
@@ -1586,6 +1607,11 @@ pg.HideProperty('IsDynamic');
         {
             this.EbPowerSelect.Name = this.Name;
             return this.EbPowerSelect.GetSingleColumn(UserObj, SoluObj, Value);
+        }
+
+        public override DVBaseColumn GetDVBaseColumn(int index)
+        {
+            return new DVStringColumn { Data = index, Name = this.Name, sTitle = this.Title, Type = this.EbDbType, bVisible = !this.Hidden, sWidth = "100px", Align = Align.Left };
         }
     }
 

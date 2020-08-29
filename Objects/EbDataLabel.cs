@@ -3,6 +3,7 @@ using ExpressBase.Common.Constants;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
+using ExpressBase.Common.Structures;
 using ExpressBase.Objects.Objects.DVRelated;
 using Newtonsoft.Json;
 using Org.BouncyCastle.Asn1.Cms;
@@ -422,6 +423,12 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.ScriptEditorJS)]
         [HelpText("Define default value of the control.")]
         public override EbScript DefaultValueExpression { get; set; }
+
+        [EnableInBuilder(BuilderType.DashBoard)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [PropertyGroup("Data Settings")]
+        [OSE_ObjectTypes(EbObjectTypes.iChartVisualization, EbObjectTypes.iTableVisualization, EbObjectTypes.iDashBoard, EbObjectTypes.iWebForm)]
+        public string Object_Selector { get; set; }
 
         [HideInPropertyGrid]
         [JsonIgnore]

@@ -36,7 +36,7 @@ namespace ExpressBase.Objects
             {
                 DVBaseColumn _col = column.GetDVBaseColumn(indx);
                 if (!column.IsDisable)
-                    _col.sWidth = column.Width * 98.0/widthSum + "%";
+                    _col.sWidth = column.Width * 100.0/widthSum + "%";
 
                 //if (column.EbDbType == EbDbTypes.Int16 || column.EbDbType == EbDbTypes.Int32 || column.EbDbType == EbDbTypes.Int64 || column.EbDbType == EbDbTypes.Double || column.EbDbType == EbDbTypes.Decimal || column.EbDbType == EbDbTypes.VarNumeric)
                 //    _col = new DVNumericColumn { Data = indx, Name = column.Name, sTitle = column.Name, Type = column.EbDbType, bVisible = true, sWidth = "100px", 

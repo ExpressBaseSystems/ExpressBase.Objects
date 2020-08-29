@@ -23,6 +23,7 @@ namespace ExpressBase.Objects
         public void OnDeserializedMethod(StreamingContext context)
         {
             this.BareControlHtml = this.GetBareHtml();
+			this.BareControlHtml4Bot = this.BareControlHtml;
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
 
@@ -31,8 +32,8 @@ namespace ExpressBase.Objects
         [OnChangeUIFunction("EbImage.changeSource")]
         public int ImageId { get; set; }
 
-        [EnableInBuilder(BuilderType.BotForm)]
-        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+		[PropertyEditor(PropertyEditorType.ObjectSelector)]
         public string DataSourceId { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
@@ -137,7 +138,7 @@ namespace ExpressBase.Objects
         </div>"
 	.Replace("@name@", this.Name)
 	.Replace("@ebsid@", this.EbSid)
-    .Replace("@src@", (this.ImageId > 0) ? "../images/" + this.ImageId + ".jpg" : "/images/image.png")
+    .Replace("@src@",  "/images/image.png")
     .Replace("@toolTipText@", this.ToolTipText)
     .Replace("@value@", "")//"value='" + this.Value + "'")
     .Replace("@maxwidth@", this.MaxWidth > 0 ? this.MaxWidth.ToString() : "200")
@@ -154,9 +155,14 @@ namespace ExpressBase.Objects
             return ReplacePropsInHTML(EbCtrlHTML);
         }
 
-        //--------Hide in property grid------------start
+		public override string DesignHtml4Bot
+		{
+			get => this.GetBareHtml();
+			set => base.DesignHtml4Bot = value;
+		}
+		//--------Hide in property grid------------start
 
-        [HideInPropertyGrid]
+		[HideInPropertyGrid]
         public override bool Unique { get; set; }
 
         [HideInPropertyGrid]

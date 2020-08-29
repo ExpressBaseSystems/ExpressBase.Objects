@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using ExpressBase.Common.Constants;
 using ServiceStack.Redis;
 using ExpressBase.Common.Data;
+using System.Text.RegularExpressions;
 
 namespace ExpressBase.Objects
 {
@@ -31,7 +32,7 @@ namespace ExpressBase.Objects
     }
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-    public class EbPowerSelect : EbControlUI
+    public class EbPowerSelect : EbControlUI, IEbPowerSelect, IEbDataReaderControl
     {
 
         public EbPowerSelect()
@@ -58,6 +59,59 @@ namespace ExpressBase.Objects
         //    }
         //    set { }
         //}
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [PropertyGroup("Data import")]
+        [OnChangeExec(@"
+        if(this.IsImportFromApi){
+            pg.ShowProperty('ImportApiUrl');
+            pg.ShowProperty('ImportApiMethod');
+            pg.ShowProperty('ImportApiHeaders');
+            pg.ShowProperty('ImportApiParams');
+            pg.HideProperty('DataImportId');
+        }
+        else{
+            pg.HideProperty('ImportApiUrl');
+            pg.HideProperty('ImportApiMethod');
+            pg.HideProperty('ImportApiHeaders');
+            pg.HideProperty('ImportApiParams');
+            pg.ShowProperty('DataImportId');
+        }")]
+        public bool IsImportFromApi { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [PropertyGroup("Data import")]
+        [HideForUser]
+        public string ImportApiUrl { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [PropertyGroup("Data import")]
+        [HideForUser]
+        public ApiMethods ImportApiMethod { set; get; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        [PropertyGroup("Data import")]
+        [HideForUser]
+        public List<ApiRequestHeader> ImportApiHeaders { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyGroup("Data import")]
+        [Alias("Import api parameters")]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        public List<EbCtrlApiParamAbstract> ImportApiParams { get; set; }
+
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        public List<Param> ImportParamsList { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [PropertyGroup("Data import")]
+        [OSE_ObjectTypes(EbObjectTypes.iWebForm)]
+        [Alias("Import Form")]
+        public string DataImportId { get; set; }
+
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
         [PropertyGroup(PGConstants.CORE)]
@@ -94,27 +148,16 @@ pg.MakeReadOnly('DisplayMembers');} else {pg.MakeReadWrite('DisplayMembers');}")
         public List<ApiRequestHeader> Headers { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
+        [PropertyGroup("Api")]
+        [Alias("Data api parameters")]
         [PropertyEditor(PropertyEditorType.Collection)]
-        [PropertyGroup("Api")]
-        [MetaOnly]
-        public List<ApiRequestParam> Parameters { get; set; }
+        public List<EbCtrlApiParamAbstract> DataApiParams { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
-        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "return [...getFlatCtrlObjs(commonO.Current_obj)];")]
-        [PropertyGroup("Api")]
-        [Alias("Parameter controls")]
-        public List<EbControl> ApiParamCtrls{ get; set; }
-
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
-        [PropertyGroup(PGConstants.DATA_INSERT)]
-        [OnChangeExec(@"
-            if (this.IsInsertable === true ){
-	            pg.ShowProperty('FormRefId');
-            } 
-            else {
-	            pg.HideProperty('FormRefId');
-            }")]
-        public bool IsInsertable { get; set; }
+        //[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
+        //[PropertyEditor(PropertyEditorType.CollectionFrmSrc, "return [...getFlatCtrlObjs(commonO.Current_obj)];")]
+        //[PropertyGroup("Api")]
+        //[Alias("Parameter controls")]
+        //public List<EbControl> ApiParamCtrls { get; set; }
 
         [JsonIgnore]
         public override string IsRequiredOKJSfn
@@ -307,15 +350,22 @@ else
         [Alias("Form")]
         public string FormRefId { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
-        [PropertyEditor(PropertyEditorType.ObjectSelector)]
-        [PropertyGroup(PGConstants.DATA)]
-        [OSE_ObjectTypes(EbObjectTypes.iWebForm)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
+        [PropertyGroup(PGConstants.DATA_INSERT)]
         [OnChangeExec(@"
-if (this.Columns && this.Columns.$values.length === 0 )
-{
-pg.MakeReadOnly('DisplayMembers');} else {pg.MakeReadWrite('DisplayMembers');}")]
-        public string DataImportId { get; set; }
+            if (this.IsInsertable === true ){
+	            pg.ShowProperty('FormRefId');
+	            pg.ShowProperty('OpenInNewTab');
+            } 
+            else {
+	            pg.HideProperty('FormRefId');
+	            pg.HideProperty('OpenInNewTab');
+            }")]
+        public bool IsInsertable { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm, BuilderType.FilterDialog)]
+        [PropertyGroup(PGConstants.DATA_INSERT)]
+        public bool OpenInNewTab { get; set; }
 
         [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.WebForm, BuilderType.UserControl)]
         [PropertyEditor(PropertyEditorType.CollectionProp, "Columns", "bVisible")]
@@ -729,6 +779,9 @@ else// PS
         public void InitFromDataBase_SS(JsonServiceClient ServiceClient)
         {
             //this.DataSourceId = "eb_roby_dev-eb_roby_dev-2-1015-1739";
+            if (this.IsDataFromApi)
+                return;
+
             string _html = string.Empty;
             var result = ServiceClient.Get<FDDataResponse>(new FDDataRequest { RefId = this.DataSourceId });
 
@@ -779,31 +832,76 @@ else// PS
                 return string.Empty;
         }
 
-        public void FetchParamsMeta(IServiceClient ServiceClient, IRedisClient Redis)
+        public void FetchParamsMeta(IServiceClient ServiceClient, IRedisClient Redis, EbControl[] Allctrls)
         {
             if (this.IsDataFromApi)
             {
-                this.ParamsList = ApiParamCtrls2ParamsList(ApiParamCtrls);
+                this.ParamsList = new List<Param>();
+                if (this.DataApiParams?.Count > 0)
+                {
+                    foreach (EbCtrlApiParam p in this.DataApiParams)
+                    {
+                        if (p.IsStaticParam)
+                        {
+                            if (string.IsNullOrEmpty(p.Name))
+                                throw new FormException("Data Api Parameters name is empty for " + this.Label);
+                            if (string.IsNullOrEmpty(p.Value))
+                                throw new FormException("Data Api Parameters value is empty for " + this.Label);
+                            this.ParamsList.Add(new Param() { Name = p.Name, Type = Convert.ToString((int)EbDbTypes.String), Value = p.Value });
+                        }
+                        else
+                        {
+                            if (string.IsNullOrEmpty(p.ControlName))
+                                throw new FormException("Data Api Parameters control name is empty for " + this.Label);
+                            EbControl paramCtrl = Allctrls.FirstOrDefault(e => e.Name == p.ControlName);
+                            if (paramCtrl == null)
+                                throw new FormException($"Invalid control name '{p.ControlName}' for 'data api parameters' of power select control({this.Label}).");
+                            this.ParamsList.Add(new Param() { Name = p.ControlName, Type = Convert.ToString((int)paramCtrl.EbDbType) });
+                        }
+                    }                        
+                }
             }
             else
             {
                 EbDataReader DrObj = EbFormHelper.GetEbObject<EbDataReader>(this.DataSourceId, ServiceClient, Redis, null);
                 this.ParamsList = DrObj.GetParams(Redis as RedisClient);
             }
-        }
 
-        private List<Param> ApiParamCtrls2ParamsList(List<EbControl> ApiParamCtrls)
-        {
-            List<Param> ParamsList = new List<Param>();
-            if (ApiParamCtrls == null)
-                return ParamsList;
-
-            foreach (var p in ApiParamCtrls)
+            if (this.IsImportFromApi)
             {
-                ParamsList.Add(new Param() { Name = p.Name, Type = p.EbDbType.ToString() });
-            }
+                if (string.IsNullOrEmpty(this.ImportApiUrl))
+                    throw new FormException("Set Import Api Url for " + this.Label);
+                //string regex = @"^http(s)?://([\w-]+.)+[\w-]+(/[\w-./?%&=])?$";
+                //if (!Regex.IsMatch(this.ImportApiUrl, regex))
+                //    throw new FormException("Set a valid Import Api Url for " + this.Label);
 
-            return ParamsList;
+                this.ImportParamsList = new List<Param>();
+                if (this.ImportApiParams?.Count > 0)
+                {
+                    foreach (EbCtrlApiParam p in this.ImportApiParams)
+                    {
+                        if (p.IsStaticParam)
+                        {
+                            if (string.IsNullOrEmpty(p.Name))
+                                throw new FormException("Import Api Parameters name is empty for " + this.Label);
+                            if (string.IsNullOrEmpty(p.Value))
+                                throw new FormException("Import Api Parameters value is empty for " + this.Label);
+                            this.ImportParamsList.Add(new Param() { Name = p.Name, Type = Convert.ToString((int)EbDbTypes.String), Value = p.Value });
+                        }
+                        else
+                        {
+                            if (string.IsNullOrEmpty(p.ControlName))
+                                throw new FormException("Import Api Parameters control name is empty for " + this.Label);
+                            EbControl paramCtrl = Allctrls.FirstOrDefault(e => e.Name == p.ControlName);
+                            if (paramCtrl == null)
+                                throw new FormException($"Invalid control name '{p.ControlName}' for 'import api parameters' of power select control({this.Label}).");
+                            this.ImportParamsList.Add(new Param() { Name = p.ControlName, Type = Convert.ToString((int)paramCtrl.EbDbType) });
+                        }
+                    }
+                }
+                else
+                    throw new FormException("Set Import Api Parameters for " + this);
+            }
         }
 
         private string GetSql(Service service)
@@ -819,6 +917,9 @@ else// PS
         //INCOMPLETE// to get the entire columns(vm+dm+others) in ps query
         public string GetSelectQuery(IDatabase DataDB, Service service, string Col, string Tbl = null, string _id = null, string masterTbl = null)
         {
+            if (this.IsDataFromApi)
+                return string.Empty;
+
             string Sql = this.GetSql(service);
 
             if (Tbl == null || _id == null)// prefill mode
@@ -861,6 +962,9 @@ else// PS
         //for grid lines
         public string GetSelectQuery123(IDatabase DataDB, Service service, string table, string column, string parentTbl, string masterTbl)
         {
+            if (this.IsDataFromApi)
+                return string.Empty;
+
             string psSql = this.GetSql(service);
             string s = $@"SELECT __A.* FROM ({psSql}) __A, {table} __B
                             WHERE __A.{this.ValueMember.Name} = ANY(STRING_TO_ARRAY(__B.{column}::TEXT, ',')::INT[]) 
@@ -871,6 +975,9 @@ else// PS
         //to get vm+dm only for audit trail
         public string GetDisplayMembersQuery(IDatabase DataDB, Service service, string vms)
         {
+            if (this.IsDataFromApi)
+                return string.Empty;
+
             string Sql = this.GetSql(service);
             string vm = this.ValueMember.Name;
             string dm;
@@ -910,5 +1017,43 @@ else// PS
                 R = new Dictionary<string, List<dynamic>>()
             };
         }
+    }
+
+    public abstract class EbCtrlApiParamAbstract { }
+
+    [UsedWithTopObjectParent(typeof(EbObject))]
+    [EnableInBuilder(BuilderType.WebForm)]
+    [Alias("ApiParameter")]
+    public class EbCtrlApiParam : EbCtrlApiParamAbstract
+    {
+        public EbCtrlApiParam() { }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public string DisplayName { get; set; }
+
+        [OnChangeExec(@"
+        if(this.IsStaticParam){
+            pg.ShowProperty('Value');
+            pg.ShowProperty('Name');
+            pg.HideProperty('ControlName');
+        }
+        else{
+            pg.HideProperty('Value');
+            pg.HideProperty('Name');
+            pg.ShowProperty('ControlName');
+        }")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [Alias("Is static parameter")]
+        public bool IsStaticParam { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        public string ControlName { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        public string Name { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        public string Value { get; set; }
     }
 }

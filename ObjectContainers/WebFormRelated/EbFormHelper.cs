@@ -1,10 +1,15 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Constants;
+using ExpressBase.Common.Data;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
+using ExpressBase.Objects.Objects;
 using ExpressBase.Objects.ServiceStack_Artifacts;
 using ExpressBase.Objects.WebFormRelated;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Newtonsoft.Json;
 using ServiceStack;
 using ServiceStack.Redis;
 using System;
@@ -306,7 +311,7 @@ namespace ExpressBase.Objects
 
         public static bool IsExtraSqlParam(string paramName, string tableName)
         {
-            List<string> _params = new List<string> 
+            List<string> _params = new List<string>
             {
                 { FormConstants.eb_loc_id},
                 { FormConstants.eb_currentuser_id},
@@ -314,6 +319,282 @@ namespace ExpressBase.Objects
                 { FormConstants.id}
             };
             return _params.Contains(paramName);
+        }
+
+        //Create a NEW WebFormData version from EDIT mode WebFormData of 'same' form.
+        public static WebformData GetFilledNewFormData(EbWebForm FormSrc)// FormSrc = Source Form
+        {
+            WebformData newFormData = new WebformData() { MasterTable = FormSrc.FormSchema.MasterTable };
+            foreach (TableSchema _t in FormSrc.FormSchema.Tables)
+            {
+                if (_t.TableType == WebFormTableTypes.Normal || _t.TableType == WebFormTableTypes.Grid)
+                {
+                    newFormData.MultipleTables.Add(_t.TableName, FormSrc.FormData.MultipleTables[_t.TableName]);
+                    SingleTable Table = newFormData.MultipleTables[_t.TableName];
+                    if (_t.TableType == WebFormTableTypes.Normal)
+                    {
+                        if (Table.Count > 0)
+                        {
+                            SingleColumn c = Table[0].Columns.Find(e => e.Control is EbAutoId);
+                            if (c != null) c.Value = null;
+                            foreach (SingleColumn c_ in Table[0].Columns.FindAll(e => e.Control?.IsSysControl == true))
+                            {
+                                SingleColumn t = c_.Control.GetSingleColumn(FormSrc.UserObj, FormSrc.SolutionObj, null);
+                                c_.Value = t.Value; c_.F = t.F;
+                            }
+                            c = Table[0].Columns.Find(e => e.Name == FormConstants.id);
+                            if (c != null) c.Value = 0;
+                            Table[0].RowId = 0;
+                        }
+                    }
+                    else
+                    {
+                        int id = -1;
+                        foreach (SingleRow Row in Table)
+                        {
+                            Row.RowId = id--;
+                            SingleColumn c = Row.Columns.Find(e => e.Name == FormConstants.id);
+                            if (c != null) c.Value = 0;
+                        }
+                    }
+                }
+                else if (_t.TableType == WebFormTableTypes.Review)
+                {
+                    newFormData.MultipleTables.Add(_t.TableName, new SingleTable());
+                }
+            }
+            newFormData.DGsRowDataModel = FormSrc.FormData.DGsRowDataModel;
+            return newFormData;
+        }
+
+        //Copy FormData in form SOURCE to DESTINATION (Different form)
+        public static void CopyFormDataToFormData(IDatabase DataDB, EbWebForm FormSrc, EbWebForm FormDes, Dictionary<EbControl, string> psDict, List<DbParameter> psParams)
+        {
+            foreach (TableSchema _tableDes in FormDes.FormSchema.Tables)
+            {
+                if (_tableDes.TableType == WebFormTableTypes.Grid)
+                {
+                    TableSchema _tableSrc = FormSrc.FormSchema.Tables.Find(e => e.ContainerName == _tableDes.ContainerName);
+                    if (_tableSrc != null)
+                    {
+                        int rc = -501;
+                        string rmodelDes = JsonConvert.SerializeObject(FormDes.FormData.DGsRowDataModel[_tableDes.TableName]);
+                        foreach (SingleRow RowSrc in FormSrc.FormData.MultipleTables[_tableSrc.TableName])
+                        {
+                            SingleRow RowDes = JsonConvert.DeserializeObject<SingleRow>(rmodelDes);
+                            RowDes.RowId = rc--;
+                            foreach (ColumnSchema _columnDes in _tableDes.Columns)
+                            {
+                                SingleColumn ColumnSrc = RowSrc.GetColumn(_columnDes.ColumnName);
+                                if (ColumnSrc != null)
+                                {
+                                    RowDes.SetColumn(_columnDes.ColumnName, _columnDes.Control.GetSingleColumn(FormDes.UserObj, FormDes.SolutionObj, ColumnSrc.Value));
+                                    string _formattedData = Convert.ToString(ColumnSrc.Value);
+                                    if (_columnDes.Control is EbDGPowerSelectColumn && !string.IsNullOrEmpty(_formattedData))
+                                    {
+                                        if (psDict.ContainsKey(_columnDes.Control))
+                                            psDict[_columnDes.Control] += CharConstants.COMMA + _formattedData;
+                                        else
+                                            psDict.Add(_columnDes.Control, _formattedData);
+                                    }
+                                }
+                            }
+                            FormDes.FormData.MultipleTables[_tableDes.TableName].Add(RowDes);
+                        }
+                    }
+                }
+                else if (_tableDes.TableType == WebFormTableTypes.Normal)
+                {
+                    SingleTable TableDes = FormDes.FormData.MultipleTables[_tableDes.TableName];
+                    if (TableDes.Count > 0)
+                    {
+                        string _formattedData;
+                        SingleColumn ColumnSrc;
+                        foreach (ColumnSchema _columnDes in _tableDes.Columns)
+                        {
+                            ColumnSrc = FormSrc.FormData.MultipleTables[FormSrc.FormData.MasterTable][0].GetColumn(_columnDes.ColumnName);
+                            if (ColumnSrc != null && !(_columnDes.Control is EbAutoId) && !_columnDes.Control.IsSysControl)
+                            {
+                                FormDes.FormData.MultipleTables[_tableDes.TableName][0].SetColumn(_columnDes.ColumnName, _columnDes.Control.GetSingleColumn(FormDes.UserObj, FormDes.SolutionObj, ColumnSrc.Value));
+                                _formattedData = Convert.ToString(ColumnSrc.Value);
+                            }
+                            else
+                                _formattedData = Convert.ToString(FormDes.FormData.MultipleTables[_tableDes.TableName][0][_columnDes.ColumnName]);
+                            if (_columnDes.Control is EbPowerSelect && !string.IsNullOrEmpty(_formattedData))
+                            {
+                                if (psDict.ContainsKey(_columnDes.Control))
+                                    psDict[_columnDes.Control] += CharConstants.COMMA + _formattedData;
+                                else
+                                    psDict.Add(_columnDes.Control, _formattedData);
+                            }
+                            try//temporary solution to avoid exception : 1$$text 
+                            {
+                                psParams.Add(DataDB.GetNewParameter(_columnDes.ColumnName, (EbDbTypes)_columnDes.EbDbType, _formattedData));
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine($"Exception catched: WebForm -> GetImportData\nMessage: {ex.Message}\nStackTrace: {ex.StackTrace}");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        //Copy API data to DESTINATION
+        public static void CopyApiDataToFormData(IDatabase DataDB, Dictionary<string, SingleTable> _PsApiTables, EbWebForm FormDes, Dictionary<EbControl, string> psDict, List<DbParameter> psParams)
+        {
+            if (_PsApiTables.Count == 0)
+                return;
+            foreach (KeyValuePair<string, SingleTable> entry in FormDes.FormData.MultipleTables)
+            {
+                TableSchema _table = FormDes.FormSchema.Tables.Find(e => e.TableName == entry.Key);
+                if (_table == null) continue;
+
+                if (_table.TableType == WebFormTableTypes.Normal && _PsApiTables[FormDes.Name].Count > 0)//normal tables
+                {
+                    foreach (ColumnSchema _column in _table.Columns)
+                    {
+                        SingleColumn ColumnSrc = _PsApiTables[FormDes.Name][0].GetColumn(_column.ColumnName);
+                        string _formattedData = Convert.ToString(entry.Value[0][_column.ColumnName]);
+                        if (ColumnSrc != null && !(_column.Control is EbAutoId) && !_column.Control.IsSysControl)
+                        {
+                            entry.Value[0].SetColumn(_column.ColumnName, _column.Control.GetSingleColumn(FormDes.UserObj, FormDes.SolutionObj, ColumnSrc.Value));
+                            _formattedData = Convert.ToString(ColumnSrc.Value);                            
+                        }
+                        if (_column.Control is EbPowerSelect && !string.IsNullOrEmpty(_formattedData))
+                        {
+                            if (psDict.ContainsKey(_column.Control))
+                                psDict[_column.Control] += CharConstants.COMMA + _formattedData;
+                            else
+                                psDict.Add(_column.Control, _formattedData);
+                        }
+                        try//temporary solution to avoid exception : 1$$text 
+                        {
+                            psParams.Add(DataDB.GetNewParameter(_column.ColumnName, (EbDbTypes)_column.EbDbType, _formattedData));
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Exception catched: WebForm -> FormatImportData\nMessage: {ex.Message}\nStackTrace: {ex.StackTrace}");
+                        }
+                    }
+                }
+                else if (_table.TableType == WebFormTableTypes.Grid && _PsApiTables[_table.ContainerName].Count > 0)//grid data
+                {
+                    int rowCount = -1;
+                    string rmodelDes = JsonConvert.SerializeObject(FormDes.FormData.DGsRowDataModel[_table.TableName]);
+                    foreach (SingleRow RowSrc in _PsApiTables[_table.ContainerName])
+                    {
+                        SingleRow RowDes = JsonConvert.DeserializeObject<SingleRow>(rmodelDes);
+                        RowDes.RowId = rowCount--;
+                        foreach (ColumnSchema _column in _table.Columns)
+                        {
+                            SingleColumn ColumnSrc = RowSrc.GetColumn(_column.ColumnName);
+                            if (ColumnSrc != null)
+                            {
+                                RowDes.SetColumn(_column.ColumnName, _column.Control.GetSingleColumn(FormDes.UserObj, FormDes.SolutionObj, ColumnSrc.Value));
+                                string _formattedData = Convert.ToString(ColumnSrc.Value);
+                                if (_column.Control is EbDGPowerSelectColumn && !string.IsNullOrEmpty(_formattedData))
+                                {
+                                    if (psDict.ContainsKey(_column.Control))
+                                        psDict[_column.Control] += CharConstants.COMMA + _formattedData;
+                                    else
+                                        psDict.Add(_column.Control, _formattedData);
+                                }
+                            }
+                        }
+                        FormDes.FormData.MultipleTables[_table.TableName].Add(RowDes);
+                    }
+                }
+            }
+        }
+
+        //refreshFormData, psDataImport
+        //isData = false(get ps data)
+        public static Dictionary<string, SingleTable> GetDataFormApi(Service service, EbControl Ctrl, EbWebForm ebWebForm, WebformData _FormData, bool isPsImport)
+        {
+            string ApiUrl;
+            ApiMethods ApiMethod;
+            List<ApiRequestHeader> ApiHeaders;
+            List<Param> ApiParamsList;
+            if (isPsImport)
+            {
+                EbPowerSelect PwrSel = Ctrl as EbPowerSelect;
+                ApiUrl = PwrSel.ImportApiUrl;
+                ApiMethod = PwrSel.ImportApiMethod;
+                ApiHeaders = PwrSel.ImportApiHeaders;
+                ApiParamsList = PwrSel.ImportParamsList;
+            }
+            else
+            {
+                IEbPowerSelect IPwrSel = Ctrl as IEbPowerSelect;
+                ApiUrl = IPwrSel.Url;
+                ApiMethod = IPwrSel.Method;
+                ApiHeaders = IPwrSel.Headers;
+                ApiParamsList = (Ctrl as IEbDataReaderControl).ParamsList;
+            }
+
+            Dictionary<string, SingleTable> Tables = new Dictionary<string, SingleTable>();
+            SingleColumn Column;
+            List<string> urlParts = new List<string>();
+
+            foreach (Param param in ApiParamsList)
+            {
+                Column = null;
+                foreach (TableSchema _table in ebWebForm.FormSchema.Tables)
+                {
+                    if (_table.TableType != WebFormTableTypes.Normal || !_FormData.MultipleTables.ContainsKey(_table.TableName) || _FormData.MultipleTables[_table.TableName].Count == 0)
+                        continue;
+                    Column = _FormData.MultipleTables[_table.TableName][0].Columns.Find(e => e.Name == param.Name);
+                    if (Column != null)
+                        break;
+                }
+                if (Column != null)
+                {
+                    param.Value = Convert.ToString(Column.Value);
+                    urlParts.Add(param.Name + "=" + Column.Value);
+                }
+                else
+                    Console.WriteLine("Api parameter not found in webformdata: " + param.Name);
+            }
+            try
+            {
+                ApiConversionResponse apiResp = service.Gateway.Send<ApiConversionResponse>(new ApiConversionRequest
+                {
+                    Url = ApiUrl + "?" + string.Join('&', urlParts),
+                    Headers = ApiHeaders,
+                    Method = ApiMethod,
+                    Parameters = ApiParamsList
+                });
+                if (apiResp.dataset?.Tables?.Count > 0)
+                {
+                    for (int i = 0; i < apiResp.dataset.Tables.Count; i++)
+                    {
+                        EbDataTable dt = apiResp.dataset.Tables[i];
+                        SingleTable Table = new SingleTable();
+                        ebWebForm.GetFormattedData(dt, Table);
+                        string dtKey = (dt.TableName ?? string.Empty).ToLower().Replace(CharConstants.SPACE, CharConstants.UNDERSCORE);
+                        if (ebWebForm.FormSchema.Tables.Find(e => e.ContainerName == dtKey && e.TableType == WebFormTableTypes.Grid) == null)
+                            dtKey = ebWebForm.Name;
+
+                        if (Tables.ContainsKey(dtKey))
+                        {
+                            if (Tables[dtKey].Count > 0 && Table.Count > 0)
+                                Tables[dtKey][0].Columns.AddRange(Table[0].Columns);
+                            else if (Tables[dtKey].Count == 0 && Table.Count > 0)
+                                Tables[dtKey].Add(Table[0]);
+                        }
+                        else
+                            Tables.Add(dtKey, Table);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Exception when tried to get PowerSelect rows by calling api\nMessge: {e.Message}\nStackTrace: {e.StackTrace}");
+            }
+
+            return Tables;
         }
     }
 

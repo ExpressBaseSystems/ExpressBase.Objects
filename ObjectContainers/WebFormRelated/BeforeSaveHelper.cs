@@ -42,6 +42,17 @@ namespace ExpressBase.Objects.WebFormRelated
             ValidateNotificationProp(_this.Notifications, _dict);
             SetDefaultValueExprExecOrder(_this, _dict);
             CalcHideAndDisableExprDependency(_dict);
+
+            if (_this.DataPushers?.Count > 0)
+            {
+                foreach(EbDataPusher dp in _this.DataPushers)
+                {
+                    if (string.IsNullOrEmpty(dp.FormRefId))
+                        throw new FormException($"Required 'Form ref id' for data pushers");
+                    if (string.IsNullOrEmpty(dp.Json))
+                        throw new FormException($"Required 'Json' for data pushers");
+                }
+            }
         }
 
         private static void ValidateAndUpdateReviewCtrl(EbWebForm _this, EbReview ebReviewCtrl, Dictionary<int, EbControlWrapper> _dict)
@@ -230,55 +241,39 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                         Console.WriteLine("From BeforeSave: Please configure a email connection, it is required for ProvisionUser control.");
                     }
                 }
-                else if (Allctrls[i] is EbChartControl && serviceClient != null)
+                else if (Allctrls[i] is EbChartControl)
                 {
                     if (string.IsNullOrEmpty((Allctrls[i] as EbChartControl).TVRefId))
                         throw new FormException($"Please set a Chart View for {Allctrls[i].Label}.");
-                    (Allctrls[i] as EbChartControl).FetchParamsMeta(serviceClient, redis);
                 }
-                else if (Allctrls[i] is EbTVcontrol && serviceClient != null)
+                else if (Allctrls[i] is EbTVcontrol)
                 {
                     if (string.IsNullOrEmpty((Allctrls[i] as EbTVcontrol).TVRefId))
                         throw new FormException($"Please set a Table View for {Allctrls[i].Label}.");
-                    (Allctrls[i] as EbTVcontrol).FetchParamsMeta(serviceClient, redis);
                 }
-                else if (Allctrls[i] is EbPowerSelect)
+                else if (Allctrls[i] is EbPdfControl && serviceClient != null)
                 {
-                    EbPowerSelect _ctrl = Allctrls[i] as EbPowerSelect;
+                    if (string.IsNullOrEmpty((Allctrls[i] as EbPdfControl).PdfRefid))
+                        throw new FormException($"Please set a pdf View for {Allctrls[i].Label}.");
+                    (Allctrls[i] as EbPdfControl).FetchParamsMeta(serviceClient, redis);
+                }
+                else if (Allctrls[i] is IEbPowerSelect)
+                {
+                    IEbPowerSelect _ctrl = Allctrls[i] as IEbPowerSelect;
+                    string _label = (Allctrls[i] as EbControl).Label;
                     if (string.IsNullOrEmpty(_ctrl.DataSourceId) && !_ctrl.IsDataFromApi)
-                        throw new FormException("Set Data Reader for " + _ctrl.Label);
+                        throw new FormException("Set Data Reader for " + _label);
                     if (string.IsNullOrEmpty(_ctrl.Url) && _ctrl.IsDataFromApi)
-                        throw new FormException("Set Api for " + _ctrl.Label);
+                        throw new FormException("Set Api url for " + _label);
                     if (_ctrl.ValueMember == null)
-                        throw new FormException("Set Value Member for " + _ctrl.Label);
+                        throw new FormException("Set Value Member for " + _label);
                     if (_ctrl.RenderAsSimpleSelect && _ctrl.DisplayMember == null)
-                        throw new FormException("Set Display Member for " + _ctrl.Label);
+                        throw new FormException("Set Display Member for " + _label);
                     if (!_ctrl.RenderAsSimpleSelect && (_ctrl.DisplayMembers == null || _ctrl.DisplayMembers.Count == 0))
-                        throw new FormException("Set Display Members for " + _ctrl.Label);
+                        throw new FormException("Set Display Members for " + _label);
                     EbDbTypes _t = _ctrl.ValueMember.Type;
                     if (!(_t == EbDbTypes.Int || _t == EbDbTypes.Int || _t == EbDbTypes.UInt32 || _t == EbDbTypes.UInt64 || _t == EbDbTypes.Int32 || _t == EbDbTypes.Int64 || _t == EbDbTypes.Decimal || _t == EbDbTypes.Double))
-                        throw new FormException("Set numeric value member for " + _ctrl.Label);
-                    if (serviceClient != null)
-                        _ctrl.FetchParamsMeta(serviceClient, redis);
-                }
-                else if (Allctrls[i] is EbDGPowerSelectColumn)
-                {
-                    EbDGPowerSelectColumn _ctrl = Allctrls[i] as EbDGPowerSelectColumn;
-                    if (string.IsNullOrEmpty(_ctrl.DataSourceId) && !_ctrl.IsDataFromApi)
-                        throw new FormException("Set Data Reader for " + _ctrl.Name);
-                    if (string.IsNullOrEmpty(_ctrl.Url) && _ctrl.IsDataFromApi)
-                        throw new FormException("Set Api for " + _ctrl.Name);
-                    if (_ctrl.ValueMember == null)
-                        throw new FormException("Set Value Member for " + _ctrl.Name);
-                    if (_ctrl.RenderAsSimpleSelect && _ctrl.DisplayMember == null)
-                        throw new FormException("Set Display Member for " + _ctrl.Name);
-                    if (!_ctrl.RenderAsSimpleSelect && (_ctrl.DisplayMembers == null || _ctrl.DisplayMembers.Count == 0))
-                        throw new FormException("Set Display Members for " + _ctrl.Name);
-                    EbDbTypes _t = _ctrl.ValueMember.Type;
-                    if (!(_t == EbDbTypes.Int || _t == EbDbTypes.Int || _t == EbDbTypes.UInt32 || _t == EbDbTypes.UInt64 || _t == EbDbTypes.Int32 || _t == EbDbTypes.Int64 || _t == EbDbTypes.Decimal || _t == EbDbTypes.Double))
-                        throw new FormException("Set numeric value member for " + _ctrl.Name);
-                    if (serviceClient != null)
-                        _ctrl.FetchParamsMeta(serviceClient, redis);
+                        throw new FormException("Set numeric value member for " + _label);                   
                 }
                 else if (Allctrls[i] is EbUserControl)
                 {
@@ -348,6 +343,9 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                     if (string.IsNullOrEmpty(_ctrl.TableName))
                         throw new FormException("Please enter a valid Static Card table name");
                 }
+
+                if (Allctrls[i] is IEbDataReaderControl && serviceClient != null)
+                    (Allctrls[i] as IEbDataReaderControl).FetchParamsMeta(serviceClient, redis, Allctrls);
             }
         }
 
@@ -494,37 +492,23 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
 
         private static void CalcDataReaderDependency(EbForm _Form, Dictionary<int, EbControlWrapper> _dict)
         {
-            List<int> ctrlsWithDr = new List<int>();
+            for (int i = 0; i < _dict.Count; i++)
+                _dict[i].Control.DrDependents = new List<string>();
 
             for (int i = 0; i < _dict.Count; i++)
             {
-                _dict[i].Control.DrDependents = new List<string>();
-
-                if ((_dict[i].Control is EbTVcontrol && (_dict[i].Control as EbTVcontrol).ParamsList?.Count > 0) ||
-                    (_dict[i].Control is EbPowerSelect && (_dict[i].Control as EbPowerSelect).ParamsList?.Count > 0) ||
-                    (_dict[i].Control is EbDGPowerSelectColumn && (_dict[i].Control as EbDGPowerSelectColumn).ParamsList?.Count > 0))
-                    ctrlsWithDr.Add(i);
-            }
-
-            for (int i = 0; i < ctrlsWithDr.Count; i++)
-            {
-                List<Param> ParamsList;
-                if (_dict[ctrlsWithDr[i]].Control is EbTVcontrol)
-                    ParamsList = (_dict[ctrlsWithDr[i]].Control as EbTVcontrol).ParamsList;
-                else if (_dict[ctrlsWithDr[i]].Control is EbPowerSelect)
-                    ParamsList = (_dict[ctrlsWithDr[i]].Control as EbPowerSelect).ParamsList;
-                else
-                    ParamsList = (_dict[ctrlsWithDr[i]].Control as EbDGPowerSelectColumn).ParamsList;
-
-                foreach (Param _p in ParamsList)
+                if (_dict[i].Control is IEbDataReaderControl && (_dict[i].Control as IEbDataReaderControl).ParamsList?.Count > 0)
                 {
-                    KeyValuePair<int, EbControlWrapper> item = _dict.FirstOrDefault(e => !(e.Value.Control is EbDGColumn) && e.Value.Control.Name == _p.Name);
-                    if (item.Value != null)
-                        item.Value.Control.DrDependents.Add(_dict[ctrlsWithDr[i]].Path);
-                    else if (_p.Name != "eb_loc_id" && _p.Name != "eb_currentuser_id" && _p.Name != "id")
-                        throw new FormException($"Can't resolve parameter {_p.Name} in data reader of {_dict[ctrlsWithDr[i]].Control.Name}");
+                    foreach (Param _p in (_dict[i].Control as IEbDataReaderControl).ParamsList)
+                    {
+                        KeyValuePair<int, EbControlWrapper> item = _dict.FirstOrDefault(e => !(e.Value.Control is EbDGColumn) && e.Value.Control.Name == _p.Name);
+                        if (item.Value != null)
+                            item.Value.Control.DrDependents.Add(_dict[i].Path);
+                        else if (_p.Name != "eb_loc_id" && _p.Name != "eb_currentuser_id" && _p.Name != "id" && _p.Name != _Form.TableName + "_id")
+                            throw new FormException($"Can't resolve parameter {_p.Name} in data reader of {_dict[i].Control.Name}");
+                    }
                 }
-            }
+            }            
         }
 
         private static void GetValExpDependentsRec(List<int> execOrder, List<KeyValuePair<int, int>> dpndcy, int seeker)
@@ -583,10 +567,10 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
             {
                 for (int i = 0; i < CalcFlds.Count; i++)
                 {
-                    if (dpndcy.FindIndex(x => x.Key == CalcFlds[i]) == -1 && !ExecOrd.Contains(CalcFlds[i]))
+                    if (dpndcy.FindIndex(x => x.Value == CalcFlds[i]) == -1 && !ExecOrd.Contains(CalcFlds[i]))
                     {
                         ExecOrd.Add(CalcFlds[i]);
-                        dpndcy.RemoveAll(x => x.Value == CalcFlds[i]);
+                        dpndcy.RemoveAll(x => x.Key == CalcFlds[i]);
                     }
                 }
                 stopCounter++;

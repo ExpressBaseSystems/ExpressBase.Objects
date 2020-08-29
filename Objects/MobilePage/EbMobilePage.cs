@@ -5,25 +5,6 @@ using System.Collections.Generic;
 
 namespace ExpressBase.Objects
 {
-    public enum NetworkMode
-    {
-        Online,
-        Offline,
-        Mixed
-    }
-
-    public enum NumericBoxTypes
-    {
-        TextType = 0,
-        ButtonType = 1
-    }
-
-    public interface ILinesEnabled { }
-
-    public interface INonPersistControl { }
-
-    public interface ILayoutControl { }
-
     public abstract class EbMobilePageBase : EbObject { }
 
     [EnableInBuilder(BuilderType.MobilePage)]

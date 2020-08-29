@@ -3,6 +3,7 @@ using ExpressBase.Common.Constants;
 using ExpressBase.Common.Structures;
 using ExpressBase.Objects.ServiceStack_Artifacts;
 using ExpressBase.Objects.WebFormRelated;
+using System;
 using System.Collections.Generic;
 using System.Data.Common;
 
@@ -68,9 +69,14 @@ namespace ExpressBase.Objects
                     {
                         string _colvals = string.Empty;
                         string _temp = string.Empty;
-                        int _rowId = row.RowId;
-                        if (_rowId > 0)
+                        if (row.RowId > 0)
                         {
+                            SingleRow bkup_Row = WebForm.FormDataBackup.MultipleTables[entry.Key].Find(e => e.RowId == row.RowId);
+                            if (bkup_Row == null)
+                            {
+                                Console.WriteLine($"Row edit request ignored(Row not in backup table). \nTable name: {entry.Key}, RowId: {row.RowId}, RefId: {WebForm.RefId}");
+                                continue;
+                            }
                             string t = string.Empty;
                             if (!row.IsDelete)
                             {
@@ -78,7 +84,7 @@ namespace ExpressBase.Objects
                                 {
                                     if (cField.Control != null)
                                     {
-                                        SingleColumn ocF = WebForm.FormDataBackup.MultipleTables[entry.Key].Find(e => e.RowId == row.RowId).Columns.Find(e => e.Name.Equals(cField.Name));
+                                        SingleColumn ocF = bkup_Row.Columns.Find(e => e.Name.Equals(cField.Name));
                                         cField.Control.ParameterizeControl(DataDB, param, WebForm.TableName, cField, false, ref i, ref _colvals, ref _temp, ref _extqry, WebForm.UserObj, ocF);
                                     }
                                     else
@@ -92,7 +98,7 @@ namespace ExpressBase.Objects
                                 {
                                     t += $@"UPDATE {_table.TableName} SET eb_del = 'T', eb_lastmodified_by = @eb_modified_by, eb_lastmodified_at = {DataDB.EB_CURRENT_TIMESTAMP} WHERE
                                         {entry.Key}_id = @{entry.Key}_id_{i} AND {WebForm.TableName}_id = @{WebForm.TableName}_id AND COALESCE(eb_del, 'F') = 'F'; ";
-                                    param.Add(DataDB.GetNewParameter(entry.Key + "_id_" + i, EbDbTypes.Int32, _rowId));
+                                    param.Add(DataDB.GetNewParameter(entry.Key + "_id_" + i, EbDbTypes.Int32, row.RowId));
                                     i++;
                                 }
                             }

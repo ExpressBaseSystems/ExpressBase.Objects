@@ -9,21 +9,8 @@ using System.Collections.Generic;
 
 namespace ExpressBase.Objects
 {
-
-    public enum SortOrder
-    {
-        Ascending = 0,
-        Descending = 1
-    }
-
-    public enum RenderStyle
-    {
-        Flat = 1,
-        Tile = 2
-    }
-
     [EnableInBuilder(BuilderType.MobilePage)]
-    public class EbMobileVisualization : EbMobileContainer
+    public class EbMobileVisualization : EbMobileContainer, IMobileLink
     {
         [EnableInBuilder(BuilderType.MobilePage)]
         [MetaOnly]
@@ -85,21 +72,49 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("Link Settings")]
+        [OnChangeExec(@"
+                if (this.FormMode === 1){ 
+                        pg.ShowProperty('FormId');
+                }
+                else {
+                        pg.HideProperty('FormId');
+                }
+            ")]
         public WebFormDVModes FormMode { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "DataColumns", 1)]
         [PropertyGroup("Link Settings")]
+        public EbMobileDataColToControlMap FormId { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Link Settings")]
+        [Alias("Columns to controls map")]
         [PropertyEditor(PropertyEditorType.Mapper, "DataColumns", "FormControlMetas", "FormControl")]
         public List<EbMobileDataColToControlMap> LinkFormParameters { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.Collection)]
         [PropertyGroup("Link Settings")]
+        [Alias("Context to controls map")]
         public List<EbCTCMapper> ContextToControlMap { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("Link Settings")]
         public bool ShowNewButton { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Link Settings")]
+        public bool ShowLinkIcon { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("List Styles")]
+        [Alias("Alternate row coloring")]
+        public bool EnableAlternateRowColoring { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("List Styles")]
+        public bool ShowRowSeperator { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.Expandable)]
@@ -123,29 +138,12 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("List Styles")]
-        [OnChangeExec(@"
-                if (this.Style === 2){                        
-                        pg.ShowProperty('BorderRadius');
-                        pg.ShowProperty('BorderColor');
-                        pg.ShowProperty('BackgroundColor');
-                        pg.ShowProperty('BoxShadow');
-                }
-                else {
-                        pg.HideProperty('BorderRadius');
-                        pg.HideProperty('BorderColor');
-                        pg.HideProperty('BackgroundColor');
-                        pg.HideProperty('BoxShadow');
-                }
-            ")]
-        public RenderStyle Style { set; get; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("List Styles")]
         public int BorderRadius { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("List Styles")]
         [PropertyEditor(PropertyEditorType.Color)]
+        [Alias("Border/Shadow Color")]
         public string BorderColor { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
@@ -155,20 +153,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("List Styles")]
-        [OnChangeExec(@"
-                if (this.BoxShadow){                        
-                        pg.ShowProperty('ShadowColor');
-                }
-                else {
-                        pg.HideProperty('ShadowColor');
-                }
-            ")]
         public bool BoxShadow { set; get; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("List Styles")]
-        [PropertyEditor(PropertyEditorType.Color)]
-        public string ShadowColor { set; get; }
 
         public EbMobileVisualization()
         {
