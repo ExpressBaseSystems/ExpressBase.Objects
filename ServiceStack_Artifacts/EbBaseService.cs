@@ -242,7 +242,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             return s_obj;
         }
 
-        public User GetUserObject(string userAuthId)
+        public User GetUserObject(string userAuthId, bool forceUpdate = false)
         {
             User user = null;
             try
@@ -253,20 +253,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
                     if (parts.Length == 3)
                     {
                         user = this.Redis.Get<User>(userAuthId);
-                        if (user == null)
+                        if (user == null || forceUpdate)
                         {
-                            //int uid = 0;
-                            //string query = String.Format("SELECT id FROM eb_users WHERE email = '{0}';", parts[1]);
-                            //this.EbConnectionFactory = new EbConnectionFactory(parts[0], this.Redis);
-                            //EbDataTable dt = this.EbConnectionFactory.DataDB.DoQuery(query);
-                            //if (dt.Rows.Count > 0)
-                            //{
-                            //    uid = Convert.ToInt32(dt.Rows[0][0]);
-
-                                Gateway.Send<UpdateUserObjectResponse>(new UpdateUserObjectRequest() { SolnId = parts[0], UserId =/* uid*/ Convert.ToInt32(parts[1]), UserAuthId = userAuthId, WC = parts[2] });
-                                user = this.Redis.Get<User>(userAuthId);
-                            //}
-
+                            Gateway.Send<UpdateUserObjectResponse>(new UpdateUserObjectRequest() { SolnId = parts[0], UserId = Convert.ToInt32(parts[1]), UserAuthId = userAuthId, WC = parts[2] });
+                            user = this.Redis.Get<User>(userAuthId);  
                         }
                     }
                     else

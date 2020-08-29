@@ -344,6 +344,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 25)]
         public int UserType { get; set; }
 
+        [DataMember(Order = 26)]
+        public string ForceResetPassword { get; set; }
+
         public int UserId { get; set; }
 
         public string Token { get; set; }
