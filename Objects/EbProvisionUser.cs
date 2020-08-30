@@ -33,7 +33,7 @@ namespace ExpressBase.Objects
         public void OnDeserializedMethod(StreamingContext context)
         {
             this.BareControlHtml = this.GetBareHtml();
-            this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2); 
+            this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
             if (this.CreateOnlyIf == null)
                 this.CreateOnlyIf = new EbScript();
         }
@@ -113,7 +113,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
         public override string HelpText { get; set; }
-        
+
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
         public override string ToolTipText { get; set; }
@@ -133,7 +133,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
         public override EbScript HiddenExpr { get; set; }
-        
+
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
         public override EbScript DisableExpr { get; set; }
@@ -165,7 +165,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
         public override string LabelBackColor { get; set; }
-        
+
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
         public override string LabelForeColor { get; set; }
@@ -299,7 +299,7 @@ this.Init = function(id)
                 ee += insOnUp ? $"UPDATE {this.VirtualTable} SET {this.Name} = eb_currval('eb_users_id_seq') WHERE {(this.VirtualTable == mtbl ? "id" : (mtbl + "_id"))} = :{mtbl}_id; " : string.Empty;
                 return string.Format("SELECT * FROM eb_security_user(:eb_createdby, {0});", param) + ee;
             }
-                
+
         }
 
         private int GetUserIdByEmailOrPhone(IDatabase DataDB, Dictionary<string, string> _d, ref int flag)
@@ -388,6 +388,13 @@ this.Init = function(id)
                 };
                 _d.Add("pwd", this.UserCredentials.Pwd);/*(this.UserCredentials.Pwd + this.UserCredentials.Email).ToMD5Hash());*/
 
+                if (!_d.ContainsKey("usertype"))
+                {
+                    List<EbUserType> u_types = this.UserTypeToRole.FindAll(e => e.bVisible);
+                    if (u_types.Count == 1)
+                        _d.Add("usertype", Convert.ToString(u_types[0].iValue));
+                }
+
                 if (_d.ContainsKey("usertype"))
                 {
                     int u_type = Convert.ToInt32(_d["usertype"]);
@@ -436,7 +443,7 @@ this.Init = function(id)
                 }
                 else
                 {
-                    doNotUpdate = true;              
+                    doNotUpdate = true;
                     if (oProvUserId > 0 && nProvUserId > 0 && oProvUserId != nProvUserId)
                     {
                         if (!this.AllowExistingUser)
@@ -550,8 +557,8 @@ this.Init = function(id)
             set { }
         }
 
-        public void SendWelcomeMail(RabbitMqProducer MessageProducer3,User user,Eb_Solution solution)
-        {            
+        public void SendWelcomeMail(RabbitMqProducer MessageProducer3, User user, Eb_Solution solution)
+        {
             string Html = this.MailHtml
                 .Replace("{SolutionName}", solution.SolutionName)
                 .Replace("{eSolutionId}", solution.ExtSolutionID)
@@ -560,9 +567,9 @@ this.Init = function(id)
                 .Replace("{Email}", this.UserCredentials.Email)
                 .Replace("{Password}", this.UserCredentials.Pwd)
                 .Replace("{SolutionAdmin}", string.IsNullOrEmpty(user.FullName) ? $"{solution.SolutionName} Team" : user.FullName);
-                
+
             //this.EbConnectionFactory.EmailConnection.Send("febincarlos@expressbase.com", "test", "Hiii", null, null, null, "");
-                
+
             MessageProducer3.Publish(new EmailServicesRequest()
             {
                 To = this.UserCredentials.Email,
@@ -622,13 +629,13 @@ this.Init = function(id)
             set { }
         }
 
-        public override string OnChangeBindJSFn 
-        { 
-            get 
+        public override string OnChangeBindJSFn
+        {
+            get
             {
                 return @"";
-            } 
-            set { } 
+            }
+            set { }
         }
         //debugger;
         //$.each(this.Fields.$values, function (i, obj) {
@@ -642,13 +649,13 @@ this.Init = function(id)
         public override string RefreshJSfn { get { return @""; } set { } }
 
         public override string ClearJSfn { get { return @""; } set { } }
-        
+
     }
 
     public class UserCredentials
     {
         public UserCredentials() { }
-        
+
         public int UserId { get; set; }
 
         public string Email { get; set; }
@@ -683,7 +690,7 @@ this.Init = function(id)
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
         public bool IsRequired { get; set; }
-        
+
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
         public string Type { get; set; }
@@ -726,7 +733,7 @@ this.Init = function(id)
         [PropDataSourceJsFn("return ebcontext.Roles")]
         [PropertyEditor(PropertyEditorType.DropDown, true)]
         public List<Int32> Roles { get; set; }
-        
+
         [EnableInBuilder(BuilderType.WebForm)]
         public bool ApprovalRequired { get; set; }
 
