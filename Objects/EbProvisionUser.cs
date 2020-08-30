@@ -386,7 +386,7 @@ this.Init = function(id)
                     Name = _d.ContainsKey("fullname") ? _d["fullname"] : _d["email"],
                     UserId = nProvUserId
                 };
-                _d.Add("pwd", (this.UserCredentials.Pwd + this.UserCredentials.Email).ToMD5Hash());
+                _d.Add("pwd", this.UserCredentials.Pwd);/*(this.UserCredentials.Pwd + this.UserCredentials.Email).ToMD5Hash());*/
 
                 if (_d.ContainsKey("usertype"))
                 {
