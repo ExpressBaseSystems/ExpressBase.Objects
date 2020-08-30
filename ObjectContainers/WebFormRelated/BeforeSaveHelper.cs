@@ -419,7 +419,7 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                         for (int j = 0; j < _dict.Count; j++)
                         {
                             string p = _dict[j].Path, r = _dict[j].Root, n = _dict[j].Control.Name;
-                            string regex = $@"{r}.currentRow\[""{n}""\]|{r}.currentRow\['{n}'\]|{r}.currentRow.{n}|{r}.getRowByIndex\((.*?)\)\[""{n}""\]|{r}.getRowByIndex\((.*?)\)\['{n}'\]|{p}";
+                            string regex = EbFormHelper.GetJsRegex(r, n, p);
 
                             if (Regex.IsMatch(code, regex))
                             {
@@ -427,8 +427,8 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                                 IsAnythingResolved = true;
                             }
                         }
-                        if (!IsAnythingResolved)
-                            throw new FormException($"Can't resolve some form variables in Js Value expression of {_dict[CalcFlds[i]].Control.Name}");
+                        //if (!IsAnythingResolved)
+                        //    throw new FormException($"Can't resolve some form variables in Js Value expression of {_dict[CalcFlds[i]].Control.Name}");
                     }
                 }
                 else if (_dict[CalcFlds[i]].Control.ValueExpr.Lang == ScriptingLanguage.SQL)
@@ -548,7 +548,7 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                         for (int j = 0; j < _dict.Count; j++)
                         {
                             string p = _dict[j].Path, r = _dict[j].Root, n = _dict[j].Control.Name;
-                            string regex = $@"{r}.currentRow\[""{n}""\]|{r}.currentRow\['{n}'\]|{r}.currentRow.{n}|{r}.getRowByIndex\((.*?)\)\[""{n}""\]|{r}.getRowByIndex\((.*?)\)\['{n}'\]|{p}";
+                            string regex = EbFormHelper.GetJsRegex(r, n, p);
 
                             if (Regex.IsMatch(code, regex))
                             {
@@ -557,8 +557,8 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                                 IsAnythingResolved = true;
                             }
                         }
-                        if (!IsAnythingResolved)
-                            throw new FormException($"Can't resolve some form variables in Js Default value expression of {_dict[CalcFlds[i]].Control.Name}");
+                        //if (!IsAnythingResolved)
+                        //    throw new FormException($"Can't resolve some form variables in Js Default value expression of {_dict[CalcFlds[i]].Control.Name}");
                     }
                 }
             }
@@ -608,7 +608,7 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                     for (int j = 0; j < _dict.Count; j++)
                     {
                         string p = _dict[j].Path, r = _dict[j].Root, n = _dict[j].Control.Name;
-                        string regex = $@"{r}.currentRow\[""{n}""\]|{r}.currentRow\['{n}'\]|{r}.currentRow.{n}|{r}.getRowByIndex\((.*?)\)\[""{n}""\]|{r}.getRowByIndex\((.*?)\)\['{n}'\]|{p}";
+                        string regex = EbFormHelper.GetJsRegex(r, n, p);
 
                         if (Regex.IsMatch(ebScript.Code, regex))
                         {
@@ -620,8 +620,8 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                             IsAnythingResolved = true;
                         }
                     }
-                    if (!IsAnythingResolved)
-                        throw new FormException($"Can't resolve some form variables in Js {(is4Hide ? "Hide expression" : "Disable expression")} of {ctrlWrap.Control.Name}");
+                    //if (!IsAnythingResolved)
+                    //    throw new FormException($"Can't resolve some form variables in Js {(is4Hide ? "Hide expression" : "Disable expression")} of {ctrlWrap.Control.Name}");
                 }
             }
         }

@@ -380,6 +380,12 @@ namespace ExpressBase.Objects
             //normal table columns are copying to master entry for easy search(not for Api import)
             if (this.FormData != null)
             {
+                this.FormData.MultipleTables[this.TableName][0].Columns.Add(new SingleColumn() 
+                {
+                    Name = this.TableName + FormConstants._id,
+                    Type = (int)EbDbTypes.Int32,
+                    Value = this.TableRowId
+                });
                 foreach (TableSchema _t in this.FormSchema.Tables)
                 {
                     SingleTable Table = this.FormData.MultipleTables[_t.TableName];
