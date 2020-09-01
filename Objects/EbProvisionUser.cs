@@ -204,7 +204,10 @@ namespace ExpressBase.Objects
             new NTV (){ Name = "preference", Type = EbDbTypes.String, Value = "{\"Locale\":\"en-IN\",\"TimeZone\":\"(UTC+05:30) Chennai, Kolkata, Mumbai, New Delhi\"}"},/////
             new NTV (){ Name = "usertype", Type = EbDbTypes.Int32, Value = 1},//////
             new NTV (){ Name = "consadd", Type = EbDbTypes.String, Value = string.Empty},
-            new NTV (){ Name = "consdel", Type = EbDbTypes.String, Value = string.Empty}
+            new NTV (){ Name = "consdel", Type = EbDbTypes.String, Value = string.Empty},
+            new NTV (){ Name = "forcepwreset", Type = EbDbTypes.String, Value = "F"},
+
+            new NTV (){ Name = "isolution_id", Type = EbDbTypes.String, Value = string.Empty}
         };
 
         public override string GetJsInitFunc()
@@ -276,7 +279,7 @@ this.Init = function(id)
         public string GetSelectQuery(string masterTbl)
         {
             //if multiple user ctrl placed in form then one select query is enough // imp
-            return $@"SELECT u.id, u.email, u.fullname, u.nickname, u.dob, u.sex, u.alternateemail, u.phnoprimary AS phprimary, u.preferencesjson AS preference, eb_user_types_id AS usertype, u.statusid,
+            return $@"SELECT u.id, u.email, u.fullname, u.nickname, u.dob, u.sex, u.alternateemail, u.phnoprimary AS phprimary, u.preferencesjson AS preference, eb_user_types_id AS usertype, u.statusid, u.forcepwreset,
                             STRING_AGG(r2u.role_id::TEXT, ',') AS roles, STRING_AGG(g2u.groupid::TEXT, ',') AS usergroups
                         FROM eb_users u LEFT JOIN eb_role2user r2u ON u.id = r2u.user_id LEFT JOIN eb_user2usergroup g2u ON u.id = g2u.userid
                         WHERE eb_ver_id = @{masterTbl}_eb_ver_id AND eb_data_id = @{masterTbl}_id GROUP BY u.id; ";

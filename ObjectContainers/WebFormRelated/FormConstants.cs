@@ -51,6 +51,7 @@ namespace ExpressBase.Objects.WebFormRelated
         public const string shortname = "shortname";
         public const string image = "image";
         public const string meta_json = "meta_json";
-
+        //AutoId
+        public const string AutoId_PlaceHolder = "__EbAutoId_PlaceHolder__";
     }
 }

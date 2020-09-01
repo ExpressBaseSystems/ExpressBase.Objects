@@ -221,10 +221,15 @@ namespace ExpressBase.Objects.WebFormRelated
                     else
                     {
                         object data = null;
-                        if (Table.Count > 0 && Table[0].GetColumn(_control.Name) != null)
-                            data = Table[0][_control.Name];
-                        else if (TableBkUp.Count > 0 && TableBkUp[0].GetColumn(_control.Name) != null)
-                            data = TableBkUp[0][_control.Name];
+                        if (_control is EbAutoId && fG_WebForm.__mode == "new")
+                            data = FormConstants.AutoId_PlaceHolder;
+                        else
+                        {
+                            if (Table.Count > 0 && Table[0].GetColumn(_control.Name) != null && !(_control is EbAutoId))
+                                data = Table[0][_control.Name];
+                            else if (TableBkUp.Count > 0 && TableBkUp[0].GetColumn(_control.Name) != null)
+                                data = TableBkUp[0][_control.Name];
+                        }
                         fG_WebForm.FlatCtrls.Controls.Add(new FG_Control(_control.Name, data));
                     }
                 }

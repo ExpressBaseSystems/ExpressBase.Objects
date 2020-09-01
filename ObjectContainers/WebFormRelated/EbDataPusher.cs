@@ -9,6 +9,8 @@ using System;
 using ExpressBase.Objects.ServiceStack_Artifacts;
 using System.Text.RegularExpressions;
 using System.Net;
+using ExpressBase.Objects.WebFormRelated;
+using ExpressBase.Common.Constants;
 
 namespace ExpressBase.Objects
 {
@@ -117,6 +119,17 @@ namespace ExpressBase.Objects
                                     if (jRow[_column.ColumnName] != null)
                                         val = this.GetValueFormOutDict(OutputDict, ref Index);
 
+                                    if (this.WebForm.AutoId != null && Convert.ToString(val) == FormConstants.AutoId_PlaceHolder)
+                                    {
+                                        if (_column.Control is EbAutoId)
+                                        {
+                                            (_column.Control as EbAutoId).BypassParameterization = true;
+                                            val = $"(SELECT {this.WebForm.AutoId.Name} FROM {this.WebForm.AutoId.TableName} WHERE {(this.WebForm.AutoId.TableName == this.WebForm.TableName ? string.Empty : (this.WebForm.TableName + CharConstants.UNDERSCORE))}id = eb_currval('{this.WebForm.TableName}_id_seq'))";
+                                        }
+                                        else
+                                            val = string.Empty;
+                                    }
+
                                     Row.Columns.Add(new SingleColumn
                                     {
                                         Name = _column.ColumnName,
@@ -129,7 +142,7 @@ namespace ExpressBase.Objects
                             pusher.WebForm.FormData.MultipleTables.Add(_table.TableName, Table);
                         }
                     }
-                    
+
                     pusher.WebForm.MergeFormData();
                 }
                 else
@@ -209,7 +222,7 @@ namespace ExpressBase.Objects
                 if (!string.IsNullOrEmpty(pusher.PushOnlyIf))
                 {
                     this.CodeDict.Add(Index, pusher.PushOnlyIf);
-                    FnDef += GetFunctionDefinition(pusher.PushOnlyIf, Index) ;
+                    FnDef += GetFunctionDefinition(pusher.PushOnlyIf, Index);
                     FnCall += GetFunctionCall(Index);
                     PusherWrapIf = GetWrappedFnCall(Index, true);
                     Index++;
@@ -223,7 +236,7 @@ namespace ExpressBase.Objects
                         foreach (JToken jRow in JObj[_table.TableName])
                         {
                             string RowWrapIf = string.Empty, RowFnCall = string.Empty;
-                            if (_table.TableType == WebFormTableTypes.Grid && ! string.IsNullOrEmpty(pusher.SkipLineItemIf))
+                            if (_table.TableType == WebFormTableTypes.Grid && !string.IsNullOrEmpty(pusher.SkipLineItemIf))
                             {
                                 this.CodeDict.Add(Index, pusher.SkipLineItemIf);
                                 FnDef += GetFunctionDefinition(pusher.SkipLineItemIf, Index);
@@ -233,7 +246,7 @@ namespace ExpressBase.Objects
                             }
                             foreach (ColumnSchema _column in _table.Columns)
                             {
-                                if (jRow[_column.ColumnName] != null) 
+                                if (jRow[_column.ColumnName] != null)
                                 {
                                     this.CodeDict.Add(Index, jRow[_column.ColumnName].ToString());
                                     FnDef += GetFunctionDefinition(jRow[_column.ColumnName].ToString(), Index);
@@ -258,10 +271,10 @@ namespace ExpressBase.Objects
 
             return FnDef + "Dictionary<int, object[]> out_dict = new Dictionary<int, object[]>();\n" + FnCall + "return out_dict;";
         }
-        
+
         private string GetFunctionDefinition(string Code, int Index)
         {
-            
+
             return $@"
 public object fn_{Index}() 
 {{ 
@@ -308,7 +321,7 @@ catch (Exception e)
                     JArray array = new JArray();
                     array.Add(o);
                     Obj[_table.TableName] = array;
-                }                
+                }
             }
             return Obj.ToString();
         }
@@ -317,14 +330,14 @@ catch (Exception e)
         {
             int Index = 1;
             string FnDef = string.Empty, FnCall = string.Empty;
-            Dictionary<int, string>  _codeDict = new Dictionary<int, string>();
+            Dictionary<int, string> _codeDict = new Dictionary<int, string>();
             JObject JObj = JObject.Parse(Json);
             foreach (TableSchema _table in this.WebForm.FormSchema.Tables)
             {
                 if (JObj[_table.TableName] != null)
                 {
                     foreach (JToken jRow in JObj[_table.TableName])
-                    {                        
+                    {
                         foreach (ColumnSchema _column in _table.Columns)
                         {
                             if (jRow[_column.ColumnName] != null)
@@ -349,7 +362,7 @@ catch (Exception e)
         {
             Dictionary<int, object[]> OutputDict = (Dictionary<int, object[]>)out_dict;
             int Index = 1;
-                
+
             this.WebForm.FormData = new WebformData() { MasterTable = this.WebForm.FormSchema.MasterTable };
             JObject JObj = JObject.Parse(Json);
 
@@ -359,7 +372,7 @@ catch (Exception e)
                 {
                     SingleTable Table = new SingleTable();
                     foreach (JToken jRow in JObj[_table.TableName])
-                    {                        
+                    {
                         SingleRow Row = new SingleRow() { RowId = 0 };
                         foreach (ColumnSchema _column in _table.Columns)
                         {
@@ -379,7 +392,7 @@ catch (Exception e)
                     this.WebForm.FormData.MultipleTables.Add(_table.TableName, Table);
                 }
             }
-            this.WebForm.MergeFormData();                
+            this.WebForm.MergeFormData();
         }
 
         //============================== Excel Import end ===============================
