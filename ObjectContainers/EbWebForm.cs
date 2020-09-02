@@ -2048,8 +2048,8 @@ namespace ExpressBase.Objects
                     Console.WriteLine(ex.StackTrace);
                     throw new FormException("Exception in C# code evaluation", (int)HttpStatusCode.InternalServerError, $"{ex.Message} \n C# code : {Code}", $"StackTrace : {ex.StackTrace}");
                 }
-                DataPushHelper.CreateWebFormData_Demo(out_dict, Json);
                 this.TableRowId = 0;//insert
+                DataPushHelper.CreateWebFormData_Demo(out_dict, Json);
                 this.Save(DataDB, service, TransactionConnection);
                 DataIds.Add(this.TableRowId);
             }
