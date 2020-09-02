@@ -321,6 +321,7 @@ namespace ExpressBase.Objects
         {
             this.BareControlHtml = this.GetBareHtml();
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
+            this.EbSid = (this.EbSid == null) ? "Container_"+DateTime.Now.ToString("HHmmssffff") : this.EbSid;
         }
 
         public string BotCols { get; set; }
