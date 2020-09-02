@@ -321,6 +321,29 @@ namespace ExpressBase.Objects
             return _params.Contains(paramName);
         }
 
+        public static string GetJsRegex(string r, string n, string p)
+        {
+            //r=>root, n=>name, p=>path
+            return $@"{r}.currentRow\[""{n}""\]|{r}.currentRow\['{n}'\]|{r}.currentRow.{n}|{r}.getRowByIndex\((.*?)\)\[""{n}""\]|{r}.getRowByIndex\((.*?)\)\['{n}'\]|{r}.sum\((.*?)\)\[""{n}""\]|{r}.sum\((.*?)\)\['{n}'\]|{p}";
+        }
+
+        //public static bool ContainsAnyDgProperty(string code, string name)
+        //{
+        //    string[] props = new string[] 
+        //    { 
+        //        "addRow",
+        //        "clear",
+        //        "disableRow",
+        //        "enableRow",
+        //        "disable",
+        //        "enable",
+        //        "showRow",
+        //        "hideRow",
+        //        "hideRows",
+        //    };
+        //    return code.ContainsAny(props);
+        //}
+
         //Create a NEW WebFormData version from EDIT mode WebFormData of 'same' form.
         public static WebformData GetFilledNewFormData(EbWebForm FormSrc)// FormSrc = Source Form
         {

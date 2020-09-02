@@ -51,6 +51,16 @@ namespace ExpressBase.Objects.WebFormRelated
         public const string shortname = "shortname";
         public const string image = "image";
         public const string meta_json = "meta_json";
-
+        //Prov User
+        public const string email = "email";
+        public const string phprimary = "phprimary";
+        public const string fullname = "fullname";
+        public const string pwd = "pwd";
+        public const string usertype = "usertype";
+        public const string statusid = "statusid";
+        public const string roles = "roles";
+        public const string consadd = "consadd";
+        //AutoId
+        public const string AutoId_PlaceHolder = "__EbAutoId_PlaceHolder__";
     }
 }

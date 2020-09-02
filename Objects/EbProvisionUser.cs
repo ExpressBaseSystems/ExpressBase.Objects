@@ -17,6 +17,7 @@ using ExpressBase.Objects.ServiceStack_Artifacts;
 using ExpressBase.Common.Constants;
 using ExpressBase.Common.LocationNSolution;
 using System.Net;
+using ExpressBase.Objects.WebFormRelated;
 
 namespace ExpressBase.Objects
 {
@@ -33,7 +34,7 @@ namespace ExpressBase.Objects
         public void OnDeserializedMethod(StreamingContext context)
         {
             this.BareControlHtml = this.GetBareHtml();
-            this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2); 
+            this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
             if (this.CreateOnlyIf == null)
                 this.CreateOnlyIf = new EbScript();
         }
@@ -113,7 +114,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
         public override string HelpText { get; set; }
-        
+
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
         public override string ToolTipText { get; set; }
@@ -133,7 +134,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
         public override EbScript HiddenExpr { get; set; }
-        
+
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
         public override EbScript DisableExpr { get; set; }
@@ -165,7 +166,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
         public override string LabelBackColor { get; set; }
-        
+
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
         public override string LabelForeColor { get; set; }
@@ -204,7 +205,10 @@ namespace ExpressBase.Objects
             new NTV (){ Name = "preference", Type = EbDbTypes.String, Value = "{\"Locale\":\"en-IN\",\"TimeZone\":\"(UTC+05:30) Chennai, Kolkata, Mumbai, New Delhi\"}"},/////
             new NTV (){ Name = "usertype", Type = EbDbTypes.Int32, Value = 1},//////
             new NTV (){ Name = "consadd", Type = EbDbTypes.String, Value = string.Empty},
-            new NTV (){ Name = "consdel", Type = EbDbTypes.String, Value = string.Empty}
+            new NTV (){ Name = "consdel", Type = EbDbTypes.String, Value = string.Empty},
+            new NTV (){ Name = "forcepwreset", Type = EbDbTypes.String, Value = "F"},
+
+            new NTV (){ Name = "isolution_id", Type = EbDbTypes.String, Value = string.Empty}
         };
 
         public override string GetJsInitFunc()
@@ -225,7 +229,7 @@ this.Init = function(id)
 	this.Fields.$values.push(new EbObjects.UsrLocField('usertype'));
 	this.Fields.$values.push(new EbObjects.UsrLocField('groups'));
 	this.Fields.$values.push(new EbObjects.UsrLocField('preference'));
-	//this.Fields.$values.push(new EbObjects.UsrLocField('consadd'));
+	this.Fields.$values.push(new EbObjects.UsrLocField('consadd'));
 };";
         }
 
@@ -276,7 +280,7 @@ this.Init = function(id)
         public string GetSelectQuery(string masterTbl)
         {
             //if multiple user ctrl placed in form then one select query is enough // imp
-            return $@"SELECT u.id, u.email, u.fullname, u.nickname, u.dob, u.sex, u.alternateemail, u.phnoprimary AS phprimary, u.preferencesjson AS preference, eb_user_types_id AS usertype, u.statusid,
+            return $@"SELECT u.id, u.email, u.fullname, u.nickname, u.dob, u.sex, u.alternateemail, u.phnoprimary AS phprimary, u.preferencesjson AS preference, eb_user_types_id AS usertype, u.statusid, u.forcepwreset,
                             STRING_AGG(r2u.role_id::TEXT, ',') AS roles, STRING_AGG(g2u.groupid::TEXT, ',') AS usergroups
                         FROM eb_users u LEFT JOIN eb_role2user r2u ON u.id = r2u.user_id LEFT JOIN eb_user2usergroup g2u ON u.id = g2u.userid
                         WHERE eb_ver_id = @{masterTbl}_eb_ver_id AND eb_data_id = @{masterTbl}_id GROUP BY u.id; ";
@@ -299,7 +303,7 @@ this.Init = function(id)
                 ee += insOnUp ? $"UPDATE {this.VirtualTable} SET {this.Name} = eb_currval('eb_users_id_seq') WHERE {(this.VirtualTable == mtbl ? "id" : (mtbl + "_id"))} = :{mtbl}_id; " : string.Empty;
                 return string.Format("SELECT * FROM eb_security_user(:eb_createdby, {0});", param) + ee;
             }
-                
+
         }
 
         private int GetUserIdByEmailOrPhone(IDatabase DataDB, Dictionary<string, string> _d, ref int flag)
@@ -360,7 +364,7 @@ this.Init = function(id)
             Dictionary<string, string> _d = JsonConvert.DeserializeObject<Dictionary<string, string>>(Convert.ToString(cField.F));
             int nProvUserId = 0;
             int flag = 0;
-            if ((_d.ContainsKey("email") && _d["email"].Trim() != string.Empty) || (_d.ContainsKey("phprimary") && _d["phprimary"].Trim() != string.Empty))
+            if ((_d.ContainsKey(FormConstants.email) && _d[FormConstants.email].Trim() != string.Empty) || (_d.ContainsKey(FormConstants.phprimary) && _d[FormConstants.phprimary].Trim() != string.Empty))
                 nProvUserId = this.GetUserIdByEmailOrPhone(DataDB, _d, ref flag);
             else
                 return false;
@@ -371,33 +375,40 @@ this.Init = function(id)
                     if (!this.AllowExistingUser)
                         this.ThrowExistingUserException(_d, flag);
 
-                    _col += string.Concat(cField.Name, ", ");
-                    _val += string.Concat("@", cField.Name, "_", i, ", ");
-                    param.Add(DataDB.GetNewParameter(cField.Name + "_" + i, (EbDbTypes)cField.Type, nProvUserId));
+                    _col += cField.Name + CharConstants.COMMA + CharConstants.SPACE;
+                    _val += CharConstants.AT + cField.Name + CharConstants.UNDERSCORE + i + CharConstants.COMMA + CharConstants.SPACE;
+                    param.Add(DataDB.GetNewParameter(cField.Name + CharConstants.UNDERSCORE + i, (EbDbTypes)cField.Type, nProvUserId));
                     i++;
                     doNotUpdate = true;
                 }
 
                 this.UserCredentials = new UserCredentials()
                 {
-                    Email = _d.ContainsKey("email") ? _d["email"] : string.Empty,
-                    Phone = _d.ContainsKey("phprimary") ? _d["phprimary"] : string.Empty,
+                    Email = _d.ContainsKey(FormConstants.email) ? _d[FormConstants.email] : string.Empty,
+                    Phone = _d.ContainsKey(FormConstants.phprimary) ? _d[FormConstants.phprimary] : string.Empty,
                     Pwd = this.GetRandomPwd(),
-                    Name = _d.ContainsKey("fullname") ? _d["fullname"] : _d["email"],
+                    Name = _d.ContainsKey(FormConstants.fullname) ? _d[FormConstants.fullname] : _d[FormConstants.email],
                     UserId = nProvUserId
                 };
-                _d.Add("pwd", (this.UserCredentials.Pwd + this.UserCredentials.Email).ToMD5Hash());
+                _d.Add(FormConstants.pwd, this.UserCredentials.Pwd);/*(this.UserCredentials.Pwd + this.UserCredentials.Email).ToMD5Hash());*/
 
-                if (_d.ContainsKey("usertype"))
+                if (!_d.ContainsKey(FormConstants.usertype))
                 {
-                    int u_type = Convert.ToInt32(_d["usertype"]);
+                    List<EbUserType> u_types = this.UserTypeToRole.FindAll(e => e.bVisible);
+                    if (u_types.Count == 1)
+                        _d.Add(FormConstants.usertype, Convert.ToString(u_types[0].iValue));
+                }
+
+                if (_d.ContainsKey(FormConstants.usertype))
+                {
+                    int u_type = Convert.ToInt32(_d[FormConstants.usertype]);
                     EbUserType ebTyp = this.UserTypeToRole.Find(e => e.iValue == u_type && e.bVisible);
                     if (ebTyp != null)
                     {
                         if (ebTyp.ApprovalRequired)
-                            _d["statusid"] = ((int)EbUserStatus.Unapproved).ToString();
+                            _d[FormConstants.statusid] = ((int)EbUserStatus.Unapproved).ToString();
                         else if (ebTyp.Roles != null && ebTyp.Roles.Count > 0)
-                            _d["roles"] = string.Join(',', ebTyp.Roles);
+                            _d[FormConstants.roles] = string.Join(CharConstants.COMMA, ebTyp.Roles);
                     }
                 }
             }
@@ -405,25 +416,25 @@ this.Init = function(id)
             {
                 int oProvUserId = Convert.ToInt32(ocF.Value);
                 Dictionary<string, string> _od = JsonConvert.DeserializeObject<Dictionary<string, string>>(Convert.ToString(ocF.F));
-                if (_od.ContainsKey("id") && (oProvUserId == nProvUserId))// means user created by this control
+                if (_od.ContainsKey(FormConstants.id) && (oProvUserId == nProvUserId))// means user created by this control
                 {
-                    _d["id"] = _od["id"];
-                    _d["email"] = _od["email"];// remove this line if you want to edit email via prov user ctrl
-                    _d["phprimary"] = _od["phprimary"];
-                    _d["usertype"] = _od["usertype"];
-                    int oldStatus = Convert.ToInt32(_od["statusid"]);
-                    _d["statusid"] = Convert.ToString(oldStatus + 100);
+                    _d[FormConstants.id] = _od[FormConstants.id];
+                    _d[FormConstants.email] = _od[FormConstants.email];// remove this line if you want to edit email via prov user ctrl
+                    _d[FormConstants.phprimary] = _od[FormConstants.phprimary];
+                    _d[FormConstants.usertype] = _od[FormConstants.usertype];
+                    int oldStatus = Convert.ToInt32(_od[FormConstants.statusid]);
+                    _d[FormConstants.statusid] = Convert.ToString(oldStatus + 100);
 
                     if (oldStatus == (int)EbUserStatus.Unapproved)
                     {
                         if (usr.Roles.Contains(SystemRoles.SolutionOwner.ToString()) || usr.Roles.Contains(SystemRoles.SolutionAdmin.ToString()))
                         {
-                            int u_type = Convert.ToInt32(_od["usertype"]);
+                            int u_type = Convert.ToInt32(_od[FormConstants.usertype]);
                             EbUserType ebTyp = this.UserTypeToRole.Find(e => e.iValue == u_type && e.bVisible);
                             if (ebTyp != null && ebTyp.Roles != null && ebTyp.Roles.Count > 0)
                             {
-                                _d["roles"] = string.Join(',', ebTyp.Roles);
-                                _d["statusid"] = ((int)EbUserStatus.Active).ToString();
+                                _d[FormConstants.roles] = string.Join(CharConstants.COMMA, ebTyp.Roles);
+                                _d[FormConstants.statusid] = ((int)EbUserStatus.Active).ToString();
                             }
                         }
                     }
@@ -436,14 +447,14 @@ this.Init = function(id)
                 }
                 else
                 {
-                    doNotUpdate = true;              
+                    doNotUpdate = true;
                     if (oProvUserId > 0 && nProvUserId > 0 && oProvUserId != nProvUserId)
                     {
                         if (!this.AllowExistingUser)
                             this.ThrowExistingUserException(_d, flag);
 
-                        _col += string.Concat(cField.Name, "=@", cField.Name, "_", i, ", ");
-                        param.Add(DataDB.GetNewParameter(cField.Name + "_" + i, (EbDbTypes)cField.Type, nProvUserId));
+                        _col += string.Concat(cField.Name, CharConstants.EQUALS, CharConstants.AT, cField.Name, CharConstants.UNDERSCORE, i, CharConstants.COMMA, CharConstants.SPACE);
+                        param.Add(DataDB.GetNewParameter(cField.Name + CharConstants.UNDERSCORE + i, (EbDbTypes)cField.Type, nProvUserId));
                         i++;
                     }
                     else if (nProvUserId <= 0)
@@ -454,27 +465,48 @@ this.Init = function(id)
             }
             if (!doNotUpdate || insertOnUpdate)
             {
+                if (nProvUserId <= 0)
+                {
+                    if (_d[FormConstants.consadd].Length > 0)
+                    {
+                        string[] loc_ids = _d[FormConstants.consadd].Split(CharConstants.COMMA);
+                        int h = 0;
+                        for (; h < loc_ids.Length; h++)
+                        {
+                            if (!int.TryParse(loc_ids[h], out int temp) || temp <= 0)
+                                break;
+                        }
+                        if (h >= loc_ids.Length)
+                        {
+                            EbConstraints consObj = new EbConstraints(loc_ids, EbConstraintKeyTypes.User, EbConstraintTypes.User_Location);
+                            _d[FormConstants.consadd] = consObj.GetDataAsString();
+                        }
+                    }
+                }
+                else
+                    _d[FormConstants.consadd] = string.Empty;
+
                 string p_email = string.Empty, p_phone = string.Empty;
                 for (int k = 0; k < this.FuncParam.Length; k++, i++)
                 {
                     if (_d.ContainsKey(this.FuncParam[k].Name))
                     {
                         this.FuncParam[k].Value = _d[this.FuncParam[k].Name];
-                        if (this.FuncParam[k].Name.Equals("email"))
-                            p_email = string.Concat(":", this.FuncParam[k].Name, "_", i);
-                        if (this.FuncParam[k].Name.Equals("phprimary"))
-                            p_phone = string.Concat(":", this.FuncParam[k].Name, "_", i);
+                        if (this.FuncParam[k].Name.Equals(FormConstants.email))
+                            p_email = string.Concat(CharConstants.COLON, this.FuncParam[k].Name, CharConstants.UNDERSCORE, i);
+                        if (this.FuncParam[k].Name.Equals(FormConstants.phprimary))
+                            p_phone = string.Concat(CharConstants.COLON, this.FuncParam[k].Name, CharConstants.UNDERSCORE, i);
                     }
-                    c += string.Concat(":", this.FuncParam[k].Name, "_", i, ", ");
+                    c += string.Concat(CharConstants.COLON, this.FuncParam[k].Name, CharConstants.UNDERSCORE, i, CharConstants.COMMA, CharConstants.SPACE);
                     if (this.FuncParam[k].Value == DBNull.Value)
                     {
-                        var p = DataDB.GetNewParameter(this.FuncParam[k].Name + "_" + i, this.FuncParam[k].Type);
+                        var p = DataDB.GetNewParameter(this.FuncParam[k].Name + CharConstants.UNDERSCORE + i, this.FuncParam[k].Type);
                         p.Value = this.FuncParam[k].Value;
                         param.Add(p);
                     }
                     else
                     {
-                        param.Add(DataDB.GetNewParameter(this.FuncParam[k].Name + "_" + i, this.FuncParam[k].Type, this.FuncParam[k].Value));
+                        param.Add(DataDB.GetNewParameter(this.FuncParam[k].Name + CharConstants.UNDERSCORE + i, this.FuncParam[k].Type, this.FuncParam[k].Value));
                     }
                 }
 
@@ -550,8 +582,8 @@ this.Init = function(id)
             set { }
         }
 
-        public void SendWelcomeMail(RabbitMqProducer MessageProducer3,User user,Eb_Solution solution)
-        {            
+        public void SendWelcomeMail(RabbitMqProducer MessageProducer3, User user, Eb_Solution solution)
+        {
             string Html = this.MailHtml
                 .Replace("{SolutionName}", solution.SolutionName)
                 .Replace("{eSolutionId}", solution.ExtSolutionID)
@@ -560,9 +592,9 @@ this.Init = function(id)
                 .Replace("{Email}", this.UserCredentials.Email)
                 .Replace("{Password}", this.UserCredentials.Pwd)
                 .Replace("{SolutionAdmin}", string.IsNullOrEmpty(user.FullName) ? $"{solution.SolutionName} Team" : user.FullName);
-                
+
             //this.EbConnectionFactory.EmailConnection.Send("febincarlos@expressbase.com", "test", "Hiii", null, null, null, "");
-                
+
             MessageProducer3.Publish(new EmailServicesRequest()
             {
                 To = this.UserCredentials.Email,
@@ -622,13 +654,13 @@ this.Init = function(id)
             set { }
         }
 
-        public override string OnChangeBindJSFn 
-        { 
-            get 
+        public override string OnChangeBindJSFn
+        {
+            get
             {
                 return @"";
-            } 
-            set { } 
+            }
+            set { }
         }
         //debugger;
         //$.each(this.Fields.$values, function (i, obj) {
@@ -642,13 +674,13 @@ this.Init = function(id)
         public override string RefreshJSfn { get { return @""; } set { } }
 
         public override string ClearJSfn { get { return @""; } set { } }
-        
+
     }
 
     public class UserCredentials
     {
         public UserCredentials() { }
-        
+
         public int UserId { get; set; }
 
         public string Email { get; set; }
@@ -683,7 +715,7 @@ this.Init = function(id)
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
         public bool IsRequired { get; set; }
-        
+
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
         public string Type { get; set; }
@@ -726,7 +758,7 @@ this.Init = function(id)
         [PropDataSourceJsFn("return ebcontext.Roles")]
         [PropertyEditor(PropertyEditorType.DropDown, true)]
         public List<Int32> Roles { get; set; }
-        
+
         [EnableInBuilder(BuilderType.WebForm)]
         public bool ApprovalRequired { get; set; }
 

@@ -75,6 +75,8 @@ namespace ExpressBase.Objects
 
         public string __mode { get; set; }
 
+        public EbAutoId AutoId { get; set; }
+
         internal DbConnection DbConnection { get; set; }
 
         private DbTransaction DbTransaction { get; set; }
@@ -247,10 +249,10 @@ namespace ExpressBase.Objects
                 else
                 {
                     _form = EbFormHelper.GetEbObject<EbWebForm>(psCtrl.DataImportId, null, Service.Redis, Service);
-                    _form.AfterRedisGet(Service);
                     _form.RefId = psCtrl.DataImportId;
                     _form.UserObj = this.UserObj;
                     _form.SolutionObj = this.SolutionObj;
+                    _form.AfterRedisGet(Service);
                     _form.TableRowId = Convert.ToInt32(psColumn.Value);
                     _form.RefreshFormData(DataDB, Service);
                     _form.FormatImportData(DataDB, Service, this);
@@ -364,10 +366,10 @@ namespace ExpressBase.Objects
             {
                 Param[0].Type = ((int)EbDbTypes.Int32).ToString();
                 EbWebForm _form = EbFormHelper.GetEbObject<EbWebForm>((TriggerCtrl as EbPowerSelect).DataImportId, null, Service.Redis, Service);
-                _form.AfterRedisGet(Service);
                 _form.RefId = (TriggerCtrl as EbPowerSelect).DataImportId;
                 _form.UserObj = this.UserObj;
                 _form.SolutionObj = this.SolutionObj;
+                _form.AfterRedisGet(Service);
                 _form.TableRowId = Param[0].ValueTo;
                 _form.FormatImportData(DataDB, Service, this);
                 //this.FormData = _form.FormData;
@@ -380,6 +382,12 @@ namespace ExpressBase.Objects
             //normal table columns are copying to master entry for easy search(not for Api import)
             if (this.FormData != null)
             {
+                this.FormData.MultipleTables[this.TableName][0].Columns.Add(new SingleColumn()
+                {
+                    Name = this.TableName + FormConstants._id,
+                    Type = (int)EbDbTypes.Int32,
+                    Value = this.TableRowId
+                });
                 foreach (TableSchema _t in this.FormSchema.Tables)
                 {
                     SingleTable Table = this.FormData.MultipleTables[_t.TableName];
@@ -658,7 +666,6 @@ namespace ExpressBase.Objects
                                     FormData.MultipleTables[ebReview.TableName][0].SetControl(con.Name, con);
                                 }
                             }
-
                         }
                     }
                 }
@@ -670,28 +677,36 @@ namespace ExpressBase.Objects
                 }
                 else if (c is EbAutoId)
                 {
-                    if (FormData.MultipleTables.ContainsKey(_container.TableName) && FormData.MultipleTables[_container.TableName].Count > 0)
+                    if (!(this.FormData.MultipleTables.ContainsKey(_container.TableName) && this.FormData.MultipleTables[_container.TableName].Count > 0))
+                        continue;
+                    string patternVal = string.Empty;
+                    EbAutoId ctrl = c as EbAutoId;
+                    SingleRow Row = this.FormData.MultipleTables[_container.TableName][0];
+                    if (ctrl.BypassParameterization)
+                        patternVal = Convert.ToString(Row[ctrl.Name]);
+                    else if (this.TableRowId == 0)// if new mode and not data pusher slave
                     {
-                        Dictionary<string, string> dict = new Dictionary<string, string>();
-                        dict.Add("{currentlocation.id}", this.LocationId.ToString());
-                        dict.Add("{user.id}", this.UserObj.UserId.ToString());
-                        dict.Add("{currentlocation.shortname}", this.SolutionObj.Locations[this.LocationId].ShortName);
+                        Dictionary<string, string> dict = new Dictionary<string, string>
+                        {
+                            { "{currentlocation.id}", this.LocationId.ToString() },
+                            { "{user.id}", this.UserObj.UserId.ToString() },
+                            { "{currentlocation.shortname}", this.SolutionObj.Locations[this.LocationId].ShortName }
+                        };
 
-                        MatchCollection mc = Regex.Matches((c as EbAutoId).Pattern.sPattern, @"{(.*?)}");
+                        MatchCollection mc = Regex.Matches(ctrl.Pattern.sPattern, @"{(.*?)}");
                         foreach (Match m in mc)
                         {
                             if (dict.ContainsKey(m.Value))
-                                (c as EbAutoId).Pattern.sPattern = (c as EbAutoId).Pattern.sPattern.Replace(m.Value, dict[m.Value]);
+                                ctrl.Pattern.sPattern = ctrl.Pattern.sPattern.Replace(m.Value, dict[m.Value]);
                         }
-
-                        if (FormData.MultipleTables[_container.TableName][0].GetColumn(c.Name) == null)
-                            FormData.MultipleTables[_container.TableName][0].Columns.Add(new SingleColumn { Name = c.Name });
-
-                        FormData.MultipleTables[_container.TableName][0].SetEbDbType(c.Name, c.EbDbType);
-                        FormData.MultipleTables[_container.TableName][0].SetControl(c.Name, c);
-                        FormData.MultipleTables[_container.TableName][0][c.Name] = (c as EbAutoId).Pattern.sPattern;
-                        c.ValueFE = FormData.MultipleTables[_container.TableName][0][c.Name];
+                        patternVal = ctrl.Pattern.sPattern;
                     }
+                    if (Row.GetColumn(c.Name) == null)
+                        Row.Columns.Add(new SingleColumn { Name = c.Name });
+                    Row.SetEbDbType(c.Name, c.EbDbType);
+                    Row.SetControl(c.Name, c);
+                    Row[c.Name] = patternVal;
+                    c.ValueFE = Row[c.Name];
                 }
                 else if (c is EbProvisionUser)
                 {
@@ -1255,7 +1270,7 @@ namespace ExpressBase.Objects
                     }
                 }
             }
-            
+
             if (!backup && this.DataPusherConfig == null)//isMasterFormNormalRefresh
             {
                 foreach (EbControl Ctrl in _schema.ExtendedControls)// EbFileUploader
@@ -1954,7 +1969,7 @@ namespace ExpressBase.Objects
                     this.DbConnection.Open();
                     this.DbTransaction = this.DbConnection.BeginTransaction();
                 }
-
+                this.ExecProvUserCreateOnlyIfScript();
                 bool IsUpdate = this.TableRowId > 0;
                 if (IsUpdate)
                 {

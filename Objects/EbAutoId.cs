@@ -11,6 +11,7 @@ using System.Data.Common;
 using System.Runtime.Serialization;
 using System.Text;
 using ExpressBase.Security;
+using ExpressBase.Common.Constants;
 
 namespace ExpressBase.Objects
 {
@@ -63,6 +64,12 @@ namespace ExpressBase.Objects
         
         [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.String; } set { } }
+
+        public string TableName { get; set; }
+
+        //hint: New mode - EbAutoId - DataPusher - Dest Form
+        [JsonIgnore]
+        public bool BypassParameterization { get; set; }
 
         //HideInPropertyGrid
         //public string OnChange { get; set; }
@@ -157,11 +164,18 @@ namespace ExpressBase.Objects
             if (ins)
             {
                 _col += string.Concat(cField.Name, ", ");
-                if(DataDB.Vendor == DatabaseVendors.MYSQL)
-                    _val += string.Format("CONCAT(@{0}_{1}, (SELECT LPAD(CAST((COUNT(*) + 1) AS CHAR(12)), {2}, '0') FROM {3} tbl WHERE tbl.{0} LIKE '{4}%')),", cField.Name, i, this.Pattern.SerialLength, tbl, cField.Value);
+                if (this.BypassParameterization)
+                {
+                    _val += Convert.ToString(cField.Value) + CharConstants.COMMA + CharConstants.SPACE;
+                }
                 else
-                    _val += string.Format("CONCAT(@{0}_{1}, (SELECT LPAD(CAST((COUNT(*) + 1) AS CHAR(12)), {2}, '0') FROM {3} WHERE {0} LIKE '{4}%')),", cField.Name, i, this.Pattern.SerialLength, tbl, cField.Value);
-                param.Add(DataDB.GetNewParameter(cField.Name + "_" + i, (EbDbTypes)cField.Type, cField.Value));
+                {
+                    if (DataDB.Vendor == DatabaseVendors.MYSQL)
+                        _val += string.Format("CONCAT(@{0}_{1}, (SELECT LPAD(CAST((COUNT(*) + 1) AS CHAR(12)), {2}, '0') FROM {3} tbl WHERE tbl.{0} LIKE '{4}%')),", cField.Name, i, this.Pattern.SerialLength, tbl, cField.Value);
+                    else
+                        _val += string.Format("CONCAT(@{0}_{1}, (SELECT LPAD(CAST((COUNT(*) + 1) AS CHAR(12)), {2}, '0') FROM {3} WHERE {0} LIKE '{4}%')),", cField.Name, i, this.Pattern.SerialLength, tbl, cField.Value);
+                    param.Add(DataDB.GetNewParameter(cField.Name + "_" + i, (EbDbTypes)cField.Type, cField.Value));
+                }                
                 i++;
                 return true;
             }

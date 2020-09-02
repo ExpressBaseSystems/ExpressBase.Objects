@@ -43,10 +43,12 @@ namespace ExpressBase.Objects.WebFormRelated
                     _schema.ExtendedControls.Add(control);
                 else if (control is EbProvisionUser)
                 {
-                    (control as EbProvisionUser).VirtualTable = curTbl;
+                    EbProvisionUser ctrl = control as EbProvisionUser;
+                    ctrl.VirtualTable = curTbl;
+                    ctrl.FuncParam.First(e => e.Name == "isolution_id").Value = _this.SolutionObj?.SolutionID ?? string.Empty;
                     int idx = _schema.ExtendedControls.FindIndex(e => e is EbProvisionLocation);
                     if (idx >= 0)
-                        (control as EbProvisionUser).AddLocConstraint = true;
+                        ctrl.AddLocConstraint = true;
                     _schema.ExtendedControls.Add(control);
                     _table.Columns.Add(new ColumnSchema { ColumnName = control.Name, EbDbType = (int)control.EbDbType, Control = control });
                 }
@@ -71,7 +73,14 @@ namespace ExpressBase.Objects.WebFormRelated
                     _table.Columns.Add(new ColumnSchema { ColumnName = control.Name, EbDbType = (int)control.EbDbType, Control = control });
                 }
                 else
+                {
                     _table.Columns.Add(new ColumnSchema { ColumnName = control.Name, EbDbType = (int)control.EbDbType, Control = control });
+                    if (control is EbAutoId)
+                    {
+                        _this.AutoId = control as EbAutoId;
+                        _this.AutoId.TableName = _table.TableName;
+                    }
+                }
 
                 if (control is EbDisplayPicture)
                 {
