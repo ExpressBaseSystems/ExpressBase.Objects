@@ -101,8 +101,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public DateTime StartDate { set; get; }
 
-        public DateTime EndDate { set; get; }
-
         public int StageId { set; get; }
 
         public string WebFormRefId { set; get; }
@@ -112,6 +110,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int ApprovalLinesId { set; get; }
 
         public string Description { set; get; }
+
+        public MyActionTypes ActionType { set; get; }
     }
 
     public class SortColumn
