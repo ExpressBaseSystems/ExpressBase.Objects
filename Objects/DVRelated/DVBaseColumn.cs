@@ -359,14 +359,13 @@ else{
         public bool ShowLinkifNoData { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
-        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "ColumnsRef")]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "ColumnsRef", 1)]
         [PropertyGroup("LinkFromColumn")]
         public DVBaseColumn RefidColumn { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
-        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "ColumnsRef")]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "ColumnsRef", 1)]
         [PropertyGroup("LinkFromColumn")]
-        [HideInPropertyGrid]
         public DVBaseColumn IdColumn { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog)]
