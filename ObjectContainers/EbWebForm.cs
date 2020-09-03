@@ -745,6 +745,7 @@ namespace ExpressBase.Objects
                     {
                         if (Column != null)
                             Row.Columns.Remove(Column);
+                        Console.WriteLine("EbProvisionUser: Control skipped...");
                     }
                     else
                     {

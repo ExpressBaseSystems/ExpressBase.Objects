@@ -354,6 +354,14 @@ this.Init = function(id)
                 throw new FormException($"{_d["phprimary"]} already exists", (int)HttpStatusCode.BadRequest, $"Phone number already exists : {_d["phprimary"]}", "EbProvisionUser => ParameterizeControl");
         }
 
+        private void AddOrChange(Dictionary<string, string> _d, string Key, string Value)
+        {
+            if (_d.ContainsKey(Key))
+                _d[Key] = Value;
+            else
+                _d.Add(Key, Value);
+        }
+
         public override bool ParameterizeControl(IDatabase DataDB, List<DbParameter> param, string tbl, SingleColumn cField, bool ins, ref int i, ref string _col, ref string _val, ref string _extqry, User usr, SingleColumn ocF)
         {
             if (!this.CreateOnlyIf_b)
@@ -387,7 +395,7 @@ this.Init = function(id)
                     Email = _d.ContainsKey(FormConstants.email) ? _d[FormConstants.email] : string.Empty,
                     Phone = _d.ContainsKey(FormConstants.phprimary) ? _d[FormConstants.phprimary] : string.Empty,
                     Pwd = this.GetRandomPwd(),
-                    Name = _d.ContainsKey(FormConstants.fullname) ? _d[FormConstants.fullname] : _d[FormConstants.email],
+                    Name = _d.ContainsKey(FormConstants.fullname) ? _d[FormConstants.fullname] : (_d.ContainsKey(FormConstants.email) ? _d[FormConstants.email] : _d[FormConstants.phprimary]),
                     UserId = nProvUserId
                 };
                 _d.Add(FormConstants.pwd, this.UserCredentials.Pwd);/*(this.UserCredentials.Pwd + this.UserCredentials.Email).ToMD5Hash());*/
@@ -406,9 +414,9 @@ this.Init = function(id)
                     if (ebTyp != null)
                     {
                         if (ebTyp.ApprovalRequired)
-                            _d[FormConstants.statusid] = ((int)EbUserStatus.Unapproved).ToString();
+                            this.AddOrChange(_d, FormConstants.statusid, ((int)EbUserStatus.Unapproved).ToString());
                         else if (ebTyp.Roles != null && ebTyp.Roles.Count > 0)
-                            _d[FormConstants.roles] = string.Join(CharConstants.COMMA, ebTyp.Roles);
+                            this.AddOrChange(_d, FormConstants.roles, string.Join(CharConstants.COMMA, ebTyp.Roles));
                     }
                 }
             }
@@ -418,12 +426,12 @@ this.Init = function(id)
                 Dictionary<string, string> _od = JsonConvert.DeserializeObject<Dictionary<string, string>>(Convert.ToString(ocF.F));
                 if (_od.ContainsKey(FormConstants.id) && (oProvUserId == nProvUserId))// means user created by this control
                 {
-                    _d[FormConstants.id] = _od[FormConstants.id];
-                    _d[FormConstants.email] = _od[FormConstants.email];// remove this line if you want to edit email via prov user ctrl
-                    _d[FormConstants.phprimary] = _od[FormConstants.phprimary];
-                    _d[FormConstants.usertype] = _od[FormConstants.usertype];
+                    this.AddOrChange(_d, FormConstants.id, _od[FormConstants.id]);
+                    this.AddOrChange(_d, FormConstants.email, _od[FormConstants.email]);// remove this line if you want to edit email via prov user ctrl
+                    this.AddOrChange(_d, FormConstants.phprimary, _od[FormConstants.phprimary]);
+                    this.AddOrChange(_d, FormConstants.usertype, _od[FormConstants.usertype]);
                     int oldStatus = Convert.ToInt32(_od[FormConstants.statusid]);
-                    _d[FormConstants.statusid] = Convert.ToString(oldStatus + 100);
+                    this.AddOrChange(_d, FormConstants.statusid, Convert.ToString(oldStatus + 100));
 
                     if (oldStatus == (int)EbUserStatus.Unapproved)
                     {
@@ -433,8 +441,8 @@ this.Init = function(id)
                             EbUserType ebTyp = this.UserTypeToRole.Find(e => e.iValue == u_type && e.bVisible);
                             if (ebTyp != null && ebTyp.Roles != null && ebTyp.Roles.Count > 0)
                             {
-                                _d[FormConstants.roles] = string.Join(CharConstants.COMMA, ebTyp.Roles);
-                                _d[FormConstants.statusid] = ((int)EbUserStatus.Active).ToString();
+                                this.AddOrChange(_d, FormConstants.statusid, ((int)EbUserStatus.Active).ToString());
+                                this.AddOrChange(_d, FormConstants.roles, string.Join(CharConstants.COMMA, ebTyp.Roles));
                             }
                         }
                     }
@@ -442,7 +450,7 @@ this.Init = function(id)
                     foreach (KeyValuePair<string, string> item in _od)
                     {
                         if (!_d.ContainsKey(item.Key))
-                            _d[item.Key] = item.Value;
+                            _d.Add(item.Key, item.Value);
                     }
                 }
                 else
@@ -465,26 +473,29 @@ this.Init = function(id)
             }
             if (!doNotUpdate || insertOnUpdate)
             {
-                if (nProvUserId <= 0)
+                if (_d.ContainsKey(FormConstants.consadd))
                 {
-                    if (_d[FormConstants.consadd].Length > 0)
+                    if (nProvUserId <= 0)
                     {
-                        string[] loc_ids = _d[FormConstants.consadd].Split(CharConstants.COMMA);
-                        int h = 0;
-                        for (; h < loc_ids.Length; h++)
+                        if (_d[FormConstants.consadd].Length > 0)
                         {
-                            if (!int.TryParse(loc_ids[h], out int temp) || temp <= 0)
-                                break;
-                        }
-                        if (h >= loc_ids.Length)
-                        {
-                            EbConstraints consObj = new EbConstraints(loc_ids, EbConstraintKeyTypes.User, EbConstraintTypes.User_Location);
-                            _d[FormConstants.consadd] = consObj.GetDataAsString();
+                            string[] loc_ids = _d[FormConstants.consadd].Split(CharConstants.COMMA);
+                            int h = 0;
+                            for (; h < loc_ids.Length; h++)
+                            {
+                                if (!int.TryParse(loc_ids[h], out int temp) || temp <= 0)
+                                    break;
+                            }
+                            if (h >= loc_ids.Length)
+                            {
+                                EbConstraints consObj = new EbConstraints(loc_ids, EbConstraintKeyTypes.User, EbConstraintTypes.User_Location);
+                                _d[FormConstants.consadd] = consObj.GetDataAsString();
+                            }
                         }
                     }
+                    else
+                        _d[FormConstants.consadd] = string.Empty;
                 }
-                else
-                    _d[FormConstants.consadd] = string.Empty;
 
                 string p_email = string.Empty, p_phone = string.Empty;
                 for (int k = 0; k < this.FuncParam.Length; k++, i++)
