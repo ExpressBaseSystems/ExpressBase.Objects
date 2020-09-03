@@ -135,7 +135,7 @@ namespace ExpressBase.Objects
         {
             foreach (Tiles Tile in this.Tiles)
             {
-                if (!string.IsNullOrEmpty(Tile.RefId))
+                if (Tile.RefId != string.Empty)
                 {
                     if (RefidMap.ContainsKey(Tile.RefId))
                         Tile.RefId = RefidMap[Tile.RefId];
@@ -146,7 +146,7 @@ namespace ExpressBase.Objects
                 {
                     foreach (EbDataObject component in Tile.ComponentsColl)
                     {
-                        if (!string.IsNullOrEmpty(component.DataSource))
+                        if (component.DataSource != string.Empty)
                         {
                             if (RefidMap.ContainsKey(component.DataSource))
                                 component.DataSource = RefidMap[component.DataSource];
@@ -156,7 +156,7 @@ namespace ExpressBase.Objects
                     }
                 }
             }
-            if (!string.IsNullOrEmpty(this.Filter_Dialogue))
+            if (this.Filter_Dialogue != string.Empty)
                 if (RefidMap.ContainsKey(this.Filter_Dialogue))
                     this.Filter_Dialogue = RefidMap[this.Filter_Dialogue];
                 else
@@ -168,18 +168,18 @@ namespace ExpressBase.Objects
             List<string> _refids = new List<string>();
             foreach (Tiles Tile in this.Tiles)
             {
-                if (!string.IsNullOrEmpty(Tile.TileRefId))
-                    _refids.Add(Tile.TileRefId);
+                if (Tile.RefId != string.Empty)
+                    _refids.Add(Tile.RefId);
                 if (Tile.ComponentsColl.Count != 0)
                 {
                     foreach (EbDataObject component in Tile.ComponentsColl)
                     {
-                        if (!string.IsNullOrEmpty(component.DataSource))
+                        if (component.DataSource != string.Empty)
                             _refids.Add(component.DataSource);
                     }
                 }
             }
-            if (!string.IsNullOrEmpty(this.Filter_Dialogue))
+            if (this.Filter_Dialogue != string.Empty)
                 _refids.Add(this.Filter_Dialogue);
             return _refids;
         }
