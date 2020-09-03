@@ -1954,7 +1954,7 @@ namespace ExpressBase.Objects
             }
         }
 
-        //form data submission using PushJson and FormGlobals - SQL Job
+        //form data submission using PushJson and FormGlobals - SQL Job, Excel Import save
         public string Save(IDatabase DataDB, Service service, DbConnection DbCon)
         {
             if (DbCon == null)
@@ -1962,7 +1962,7 @@ namespace ExpressBase.Objects
             else
                 this.DbConnection = DbCon;
 
-            string resp = string.Empty;
+            string resp;
             try
             {
                 if (DbCon == null)
@@ -1983,6 +1983,8 @@ namespace ExpressBase.Objects
                     resp = "Inserted: " + this.TableRowId;
                     Console.WriteLine("New record inserted. Table :" + this.TableName + ", Id : " + this.TableRowId);
                 }
+                this.RefreshFormData(DataDB, service, false, true);
+                Console.WriteLine("EbWebForm.Save.UpdateAuditTrail start");
                 EbAuditTrail ebAuditTrail = new EbAuditTrail(this, DataDB);
                 resp += " - AuditTrail: " + ebAuditTrail.UpdateAuditTrail();
                 resp += " - AfterSave: " + this.AfterSave(DataDB, IsUpdate);
