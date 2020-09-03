@@ -64,7 +64,7 @@ namespace ExpressBase.Objects.Objects
 		{
 
 
-			return @"<button id='@ebsid@' class='btn btn-success' style='width:100%; cursor: pointer; @backColor @foreColor @fontStyle'>@Label@ <i class='fa fa-external-link'></i></button>"
+			return @"<div id='@ebsid@' class='btn btn-success' style='width:100%; cursor: pointer; @backColor @foreColor @fontStyle'>@Label@ <i class='fa fa-external-link'></i></div>"
 				.Replace("@ebsid@", this.EbSid_CtxId)
 				.Replace("@Label@", this.Label ?? "Export")
 .Replace("@tabIndex", "tabindex='" + this.TabIndex + "'")
