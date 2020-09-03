@@ -3,6 +3,7 @@ using ExpressBase.Common.Application;
 using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
 using ExpressBase.Common.LocationNSolution;
+using ExpressBase.Common.NotificationHubs;
 using ExpressBase.Common.Structures;
 using ExpressBase.Security;
 using ServiceStack;
@@ -257,5 +258,27 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class MobileSolutionDataRequest : EbServiceStackAuthRequest, IReturn<EbMobileSolutionData>
     {
         public bool Export { set; get; }
+    }
+
+
+    public class EbDeviceRegistrationRequest : EbServiceStackAuthRequest, IReturn<EbDeviceRegistration>
+    {
+        public string NFRegistrationId { set; get; }
+
+        public DeviceRegistration NFRegistration { set; get; }
+    }
+
+    public class EbDeviceRegistration : IEbApiStatusCode
+    {
+        [DataMember(Order = 1)]
+        public int ActionsCount { set; get; }
+
+        [DataMember(Order = 2)]
+        public HttpStatusCode StatusCode { get; set; }
+
+        public EbDeviceRegistration()
+        {
+            StatusCode = HttpStatusCode.OK;
+        }
     }
 }

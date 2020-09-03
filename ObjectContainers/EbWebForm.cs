@@ -745,6 +745,7 @@ namespace ExpressBase.Objects
                     {
                         if (Column != null)
                             Row.Columns.Remove(Column);
+                        Console.WriteLine("EbProvisionUser: Control skipped...");
                     }
                     else
                     {
@@ -1230,7 +1231,7 @@ namespace ExpressBase.Objects
                                             new SingleColumn{ Name = "eb_my_actions_id", Type = (int)EbDbTypes.Decimal, Value = hasPerm ? Table[0]["id"] : 0},
                                             new SingleColumn{ Name = "comments", Type = (int)EbDbTypes.String, Value = ""},
                                             new SingleColumn{ Name = "eb_created_at", Type = (int)EbDbTypes.DateTime, Value = hasPerm ? dt : null, F = hasPerm ? f_dt : null},
-                                            new SingleColumn{ Name = "eb_created_by", Type = (int)EbDbTypes.Decimal, Value = hasPerm ? this.UserObj.UserId + "$$" + this.UserObj.FullName : "", F = hasPerm ? this.UserObj.FullName : ""},
+                                            new SingleColumn{ Name = "eb_created_by", Type = (int)EbDbTypes.Decimal, Value = hasPerm ? this.UserObj.UserId : 0, F = hasPerm ? this.UserObj.FullName : string.Empty},
                                             new SingleColumn{ Name = "is_form_data_editable", Type = (int)EbDbTypes.String, Value = Convert.ToString(Table[0]["is_form_data_editable"])},
                                             new SingleColumn{ Name = "has_permission", Type = (int)EbDbTypes.String, Value = hasPerm ? "T" : "F"}
                                         }
@@ -1953,7 +1954,7 @@ namespace ExpressBase.Objects
             }
         }
 
-        //form data submission using PushJson and FormGlobals - SQL Job
+        //form data submission using PushJson and FormGlobals - SQL Job, Excel Import save
         public string Save(IDatabase DataDB, Service service, DbConnection DbCon)
         {
             if (DbCon == null)
@@ -1961,7 +1962,7 @@ namespace ExpressBase.Objects
             else
                 this.DbConnection = DbCon;
 
-            string resp = string.Empty;
+            string resp;
             try
             {
                 if (DbCon == null)
@@ -1982,6 +1983,8 @@ namespace ExpressBase.Objects
                     resp = "Inserted: " + this.TableRowId;
                     Console.WriteLine("New record inserted. Table :" + this.TableName + ", Id : " + this.TableRowId);
                 }
+                this.RefreshFormData(DataDB, service, false, true);
+                Console.WriteLine("EbWebForm.Save.UpdateAuditTrail start");
                 EbAuditTrail ebAuditTrail = new EbAuditTrail(this, DataDB);
                 resp += " - AuditTrail: " + ebAuditTrail.UpdateAuditTrail();
                 resp += " - AfterSave: " + this.AfterSave(DataDB, IsUpdate);
@@ -2048,8 +2051,8 @@ namespace ExpressBase.Objects
                     Console.WriteLine(ex.StackTrace);
                     throw new FormException("Exception in C# code evaluation", (int)HttpStatusCode.InternalServerError, $"{ex.Message} \n C# code : {Code}", $"StackTrace : {ex.StackTrace}");
                 }
-                DataPushHelper.CreateWebFormData_Demo(out_dict, Json);
                 this.TableRowId = 0;//insert
+                DataPushHelper.CreateWebFormData_Demo(out_dict, Json);
                 this.Save(DataDB, service, TransactionConnection);
                 DataIds.Add(this.TableRowId);
             }
