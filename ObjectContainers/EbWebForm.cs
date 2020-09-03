@@ -714,7 +714,8 @@ namespace ExpressBase.Objects
                         continue;
                     EbProvisionUser provUsrCtrl = c as EbProvisionUser;
                     Dictionary<string, string> _d = new Dictionary<string, string>();
-                    bool skipCtrl = false;
+                    bool EmailOrPhFound = false;
+                    
                     foreach (UsrLocField obj in provUsrCtrl.Fields)
                     {
                         if (!string.IsNullOrEmpty(obj.ControlName))
@@ -727,21 +728,18 @@ namespace ExpressBase.Objects
                                     SingleColumn Col = entry.Value[0].GetColumn(obj.ControlName);
                                     if (Col != null)
                                     {
-                                        _d.Add(obj.Name, Convert.ToString(Col.Value));
+                                        _d.Add(obj.Name, Convert.ToString(Col.Value));///////////////
+                                        if (obj.Name == FormConstants.email || obj.Name == FormConstants.phprimary)
+                                            EmailOrPhFound = true;
                                         break;
                                     }
                                 }
-                            }
-                            if (!_d.ContainsKey(obj.Name))
-                            {
-                                skipCtrl = true;
-                                break;
                             }
                         }
                     }
                     SingleRow Row = this.FormData.MultipleTables[_container.TableName][0];
                     SingleColumn Column = Row.GetColumn(provUsrCtrl.Name);
-                    if (skipCtrl)
+                    if (!EmailOrPhFound)
                     {
                         if (Column != null)
                             Row.Columns.Remove(Column);
