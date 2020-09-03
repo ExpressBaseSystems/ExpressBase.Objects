@@ -155,6 +155,19 @@ namespace ExpressBase.Objects
                         }
                     }
                 }
+                if (Tile.LinksColl.Count != 0)
+                {
+                    foreach (EbLinks Links in Tile.LinksColl)
+                    {
+                        if (Links.Object_Selector != string.Empty)
+                        {
+                            if (RefidMap.ContainsKey(Links.Object_Selector))
+                                Links.Object_Selector = RefidMap[Links.Object_Selector];
+                            else
+                                Links.Object_Selector = "failed-to-update-";
+                        }
+                    }
+                }
             }
             if (this.Filter_Dialogue != string.Empty)
                 if (RefidMap.ContainsKey(this.Filter_Dialogue))
@@ -176,6 +189,14 @@ namespace ExpressBase.Objects
                     {
                         if (component.DataSource != string.Empty)
                             _refids.Add(component.DataSource);
+                    }
+                } 
+                if (Tile.LinksColl.Count != 0)
+                {
+                    foreach (EbLinks Links in Tile.LinksColl)
+                    {
+                        if (Links.Object_Selector != string.Empty)
+                            _refids.Add(Links.Object_Selector);
                     }
                 }
             }
