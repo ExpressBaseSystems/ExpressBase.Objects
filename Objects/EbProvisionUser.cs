@@ -500,24 +500,25 @@ this.Init = function(id)
                 string p_email = string.Empty, p_phone = string.Empty;
                 for (int k = 0; k < this.FuncParam.Length; k++, i++)
                 {
-                    if (_d.ContainsKey(this.FuncParam[k].Name))
+                    object _value = this.FuncParam[k].Value;
+                    if (_d.ContainsKey(this.FuncParam[k].Name) && !string.IsNullOrEmpty(_d[this.FuncParam[k].Name]))
                     {
-                        this.FuncParam[k].Value = _d[this.FuncParam[k].Name];
+                        _value = _d[this.FuncParam[k].Name];
                         if (this.FuncParam[k].Name.Equals(FormConstants.email))
                             p_email = string.Concat(CharConstants.COLON, this.FuncParam[k].Name, CharConstants.UNDERSCORE, i);
                         if (this.FuncParam[k].Name.Equals(FormConstants.phprimary))
                             p_phone = string.Concat(CharConstants.COLON, this.FuncParam[k].Name, CharConstants.UNDERSCORE, i);
                     }
                     c += string.Concat(CharConstants.COLON, this.FuncParam[k].Name, CharConstants.UNDERSCORE, i, CharConstants.COMMA, CharConstants.SPACE);
-                    if (this.FuncParam[k].Value == DBNull.Value)
+                    if (_value == DBNull.Value)
                     {
                         var p = DataDB.GetNewParameter(this.FuncParam[k].Name + CharConstants.UNDERSCORE + i, this.FuncParam[k].Type);
-                        p.Value = this.FuncParam[k].Value;
+                        p.Value = _value;
                         param.Add(p);
                     }
                     else
                     {
-                        param.Add(DataDB.GetNewParameter(this.FuncParam[k].Name + CharConstants.UNDERSCORE + i, this.FuncParam[k].Type, this.FuncParam[k].Value));
+                        param.Add(DataDB.GetNewParameter(this.FuncParam[k].Name + CharConstants.UNDERSCORE + i, this.FuncParam[k].Type, _value));
                     }
                 }
 
