@@ -50,6 +50,11 @@ namespace ExpressBase.Objects
         public virtual string Icon { get { return string.Empty; } }
 
         public virtual EbControl GetWebFormCtrl(int counter) { return null; }
+
+        public override List<string> DiscoverRelatedRefids()
+        {
+            return base.DiscoverRelatedRefids();
+        }
     }
 
     [EnableInBuilder(BuilderType.MobilePage)]

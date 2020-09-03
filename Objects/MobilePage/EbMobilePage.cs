@@ -5,7 +5,13 @@ using System.Collections.Generic;
 
 namespace ExpressBase.Objects
 {
-    public abstract class EbMobilePageBase : EbObject { }
+    public abstract class EbMobilePageBase : EbObject
+    {
+        public override List<string> DiscoverRelatedRefids()
+        {
+            return new List<string>();
+        }
+    }
 
     [EnableInBuilder(BuilderType.MobilePage)]
     [BuilderTypeEnum(BuilderType.MobilePage)]
@@ -43,8 +49,6 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public EbMobileContainer Container { set; get; }
 
-        public override List<string> DiscoverRelatedRefids() { return new List<string>(); }
-
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("Behavior")]
         public bool HideFromMenu { set; get; }
@@ -64,5 +68,15 @@ namespace ExpressBase.Objects
         [PropertyGroup("Link Style")]
         [PropertyEditor(PropertyEditorType.Color)]
         public string IconBackground { get; set; }
+
+        public override List<string> DiscoverRelatedRefids()
+        {
+            return this.Container.DiscoverRelatedRefids();
+        }
+
+        public override void ReplaceRefid(Dictionary<string, string> RefidMap)
+        {
+            this.Container.ReplaceRefid(RefidMap);
+        }
     }
 }
