@@ -24,7 +24,8 @@ namespace ExpressBase.Objects
         public void OnDeserializedMethod(StreamingContext context)
         {
             this.BareControlHtml = this.GetBareHtml();
-            this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
+			//this.BareControlHtml4Bot = this.BareControlHtml;
+			this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
@@ -77,10 +78,12 @@ namespace ExpressBase.Objects
             string html = @"
 <div id='cont_@ebsid@' class='chart-control-cont'>
     <div id='content_@ebsid@' class='wrapper-cont'>
-        <div id='canvasDivchart@ebsid@'></div>
+        <div id='@ebsid@' >
+			<div id='canvasDivchart@ebsid@'></div>
+		</div>
     </div>
 </div>"
-    .Replace("@ebsid@", this.EbSid_CtxId);
+	.Replace("@ebsid@", this.EbSid_CtxId);
 
             return html;
         }
