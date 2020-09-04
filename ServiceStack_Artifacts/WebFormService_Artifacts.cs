@@ -446,6 +446,107 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
+    [DataContract]
+    public class SaveFormDraftRequest : EbServiceStackAuthRequest, IReturn<SaveFormDraftResponse>
+    {
+        [DataMember(Order = 1)]
+        public string RefId { get; set; }
+
+        [DataMember(Order = 2)]
+        public int LocId { get; set; }
+
+        [DataMember(Order = 3)]
+        public string Data { get; set; }
+
+        [DataMember(Order = 4)]
+        public int DraftId { get; set; }
+        
+        [DataMember(Order = 5)]
+        public string Title { get; set; }
+    }
+
+    [DataContract]
+    public class SaveFormDraftResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public int Status { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Message { get; set; }
+
+        [DataMember(Order = 3)]
+        public int DraftId { get; set; }
+
+        [DataMember(Order = 4)]
+        public string MessageInt { get; set; }
+
+        [DataMember(Order = 5)]
+        public string StackTraceInt { get; set; }
+
+        [DataMember(Order = 6)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    [DataContract]
+    public class DiscardFormDraftRequest : EbServiceStackAuthRequest, IReturn<DiscardFormDraftResponse>
+    {
+        [DataMember(Order = 1)]
+        public string RefId { get; set; }
+
+        [DataMember(Order = 2)]
+        public int DraftId { get; set; }
+    }
+
+    [DataContract]
+    public class DiscardFormDraftResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public int Status { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Message { get; set; }
+
+        [DataMember(Order = 3)]
+        public string MessageInt { get; set; }
+
+        [DataMember(Order = 4)]
+        public string StackTraceInt { get; set; }
+
+        [DataMember(Order = 5)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    [DataContract]
+    public class GetFormDraftRequest : EbServiceStackAuthRequest, IReturn<GetFormDraftResponse>
+    {
+        [DataMember(Order = 1)]
+        public string RefId { get; set; }
+
+        [DataMember(Order = 2)]
+        public int DraftId { get; set; }
+    }
+
+    [DataContract]
+    public class GetFormDraftResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public int Status { get; set; }
+
+        [DataMember(Order = 2)]
+        public string Message { get; set; }
+
+        [DataMember(Order = 3)]
+        public string MessageInt { get; set; }
+
+        [DataMember(Order = 4)]
+        public string StackTraceInt { get; set; }
+
+        [DataMember(Order = 5)]
+        public string Data { get; set; }
+
+        [DataMember(Order = 6)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
 
     [DataContract]
     public class DeleteDataFromWebformRequest : EbServiceStackAuthRequest, IReturn<DeleteDataFromWebformResponse>
