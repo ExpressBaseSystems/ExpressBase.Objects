@@ -134,7 +134,7 @@ namespace ExpressBase.Objects
         public override string GetBareHtml()
         {
             string html = @"
-<div id='cont_@ebsid@' class='tv-control-cont'>
+<div id='cont_@ebsid@' class='tv-control-cont'><div id='buttondiv_@ebsid@' class='refresh-cont'></div>
     <div id='content_@ebsid@' class='wrapper-cont'>
         <table id='@ebsid@' class=table display table-bordered compact'></table>
     </div>

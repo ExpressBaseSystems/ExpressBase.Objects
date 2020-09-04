@@ -206,5 +206,42 @@ namespace ExpressBase.Objects
                         </div>
                     </div>".RemoveCR().DoubleQuoted().Replace("@visname@", Guid.NewGuid().ToString());
         }
+
+        public override List<string> DiscoverRelatedRefids()
+        {
+            List<string> list = new List<string>();
+
+            if (!string.IsNullOrEmpty(DataSourceRefId))
+                list.Add(DataSourceRefId);
+
+            if (!string.IsNullOrEmpty(LinkRefId))
+                list.Add(LinkRefId);
+
+            foreach (var cell in DataLayout.CellCollection)
+            {
+                foreach (var ctrl in cell.ControlCollection)
+                {
+                    list.AddRange(ctrl.DiscoverRelatedRefids());
+                }
+            }
+            return list;
+        }
+
+        public override void ReplaceRefid(Dictionary<string, string> map)
+        {
+            if (!string.IsNullOrEmpty(DataSourceRefId) && map.TryGetValue(DataSourceRefId, out string dsri))
+                this.DataSourceRefId = dsri;
+
+            if (!string.IsNullOrEmpty(LinkRefId) && map.TryGetValue(LinkRefId, out string lri))
+                this.LinkRefId = lri;
+
+            foreach (EbMobileTableCell cell in DataLayout.CellCollection)
+            {
+                foreach (EbMobileControl ctrl in cell.ControlCollection)
+                {
+                    ctrl.ReplaceRefid(map);
+                }
+            }
+        }
     }
 }

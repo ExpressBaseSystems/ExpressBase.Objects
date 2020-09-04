@@ -714,7 +714,8 @@ namespace ExpressBase.Objects
                         continue;
                     EbProvisionUser provUsrCtrl = c as EbProvisionUser;
                     Dictionary<string, string> _d = new Dictionary<string, string>();
-                    bool skipCtrl = false;
+                    bool EmailOrPhFound = false;
+                    
                     foreach (UsrLocField obj in provUsrCtrl.Fields)
                     {
                         if (!string.IsNullOrEmpty(obj.ControlName))
@@ -727,21 +728,18 @@ namespace ExpressBase.Objects
                                     SingleColumn Col = entry.Value[0].GetColumn(obj.ControlName);
                                     if (Col != null)
                                     {
-                                        _d.Add(obj.Name, Convert.ToString(Col.Value));
+                                        _d.Add(obj.Name, Convert.ToString(Col.Value));///////////////
+                                        if (obj.Name == FormConstants.email || obj.Name == FormConstants.phprimary)
+                                            EmailOrPhFound = true;
                                         break;
                                     }
                                 }
-                            }
-                            if (!_d.ContainsKey(obj.Name))
-                            {
-                                skipCtrl = true;
-                                break;
                             }
                         }
                     }
                     SingleRow Row = this.FormData.MultipleTables[_container.TableName][0];
                     SingleColumn Column = Row.GetColumn(provUsrCtrl.Name);
-                    if (skipCtrl)
+                    if (!EmailOrPhFound)
                     {
                         if (Column != null)
                             Row.Columns.Remove(Column);
@@ -1954,7 +1952,7 @@ namespace ExpressBase.Objects
             }
         }
 
-        //form data submission using PushJson and FormGlobals - SQL Job
+        //form data submission using PushJson and FormGlobals - SQL Job, Excel Import save
         public string Save(IDatabase DataDB, Service service, DbConnection DbCon)
         {
             if (DbCon == null)
@@ -1962,7 +1960,7 @@ namespace ExpressBase.Objects
             else
                 this.DbConnection = DbCon;
 
-            string resp = string.Empty;
+            string resp;
             try
             {
                 if (DbCon == null)
@@ -1983,6 +1981,8 @@ namespace ExpressBase.Objects
                     resp = "Inserted: " + this.TableRowId;
                     Console.WriteLine("New record inserted. Table :" + this.TableName + ", Id : " + this.TableRowId);
                 }
+                this.RefreshFormData(DataDB, service, false, true);
+                Console.WriteLine("EbWebForm.Save.UpdateAuditTrail start");
                 EbAuditTrail ebAuditTrail = new EbAuditTrail(this, DataDB);
                 resp += " - AuditTrail: " + ebAuditTrail.UpdateAuditTrail();
                 resp += " - AfterSave: " + this.AfterSave(DataDB, IsUpdate);

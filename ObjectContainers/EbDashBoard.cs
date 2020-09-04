@@ -135,24 +135,73 @@ namespace ExpressBase.Objects
         {
             foreach (Tiles Tile in this.Tiles)
             {
-                if (!string.IsNullOrEmpty(Tile.RefId))
+                if (Tile.RefId != string.Empty)
                 {
                     if (RefidMap.ContainsKey(Tile.RefId))
                         Tile.RefId = RefidMap[Tile.RefId];
                     else
                         Tile.RefId = "failed-to-update-";
                 }
+                if (Tile.ComponentsColl.Count != 0)
+                {
+                    foreach (EbDataObject component in Tile.ComponentsColl)
+                    {
+                        if (component.DataSource != string.Empty)
+                        {
+                            if (RefidMap.ContainsKey(component.DataSource))
+                                component.DataSource = RefidMap[component.DataSource];
+                            else
+                                component.DataSource = "failed-to-update-";
+                        }
+                    }
+                }
+                if (Tile.LinksColl.Count != 0)
+                {
+                    foreach (EbLinks Links in Tile.LinksColl)
+                    {
+                        if (Links.Object_Selector != string.Empty)
+                        {
+                            if (RefidMap.ContainsKey(Links.Object_Selector))
+                                Links.Object_Selector = RefidMap[Links.Object_Selector];
+                            else
+                                Links.Object_Selector = "failed-to-update-";
+                        }
+                    }
+                }
             }
+            if (this.Filter_Dialogue != string.Empty)
+                if (RefidMap.ContainsKey(this.Filter_Dialogue))
+                    this.Filter_Dialogue = RefidMap[this.Filter_Dialogue];
+                else
+                    this.Filter_Dialogue = "failed-to-update-";
         }
 
         public override List<string> DiscoverRelatedRefids()
         {
             List<string> _refids = new List<string>();
-            foreach (var Tile in this.Tiles)
+            foreach (Tiles Tile in this.Tiles)
             {
-                if (!string.IsNullOrEmpty(Tile.TileRefId))
-                    _refids.Add(Tile.TileRefId);
+                if (Tile.RefId != string.Empty)
+                    _refids.Add(Tile.RefId);
+                if (Tile.ComponentsColl.Count != 0)
+                {
+                    foreach (EbDataObject component in Tile.ComponentsColl)
+                    {
+                        if (component.DataSource != string.Empty)
+                            _refids.Add(component.DataSource);
+                    }
+                } 
+                if (Tile.LinksColl.Count != 0)
+                {
+                    foreach (EbLinks Links in Tile.LinksColl)
+                    {
+                        if (Links.Object_Selector != string.Empty)
+                            _refids.Add(Links.Object_Selector);
+                    }
+                }
             }
+            if (this.Filter_Dialogue != string.Empty)
+                _refids.Add(this.Filter_Dialogue);
             return _refids;
         }
 
@@ -194,7 +243,7 @@ namespace ExpressBase.Objects
         [PropertyGroup("TileConfig")]
         [OnChangeUIFunction("EbDataLabel.LabelBackgroudColor")]
         [PropertyEditor(PropertyEditorType.Color)]
-        public  string TileBackColor { get; set; }
+        public string TileBackColor { get; set; }
 
         [EnableInBuilder(BuilderType.DashBoard)]
         [PropertyGroup("TileConfig")]
@@ -282,11 +331,11 @@ namespace ExpressBase.Objects
         [PropertyGroup("Label")]
         [UIproperty]
         public int Left { get; set; }
-        
+
         [EnableInBuilder(BuilderType.DashBoard)]
         [PropertyGroup("Label")]
         [UIproperty]
-        public int  Top { get; set; }
+        public int Top { get; set; }
 
 
         [HideInPropertyGrid]
@@ -303,8 +352,8 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.DashBoard)]
         [HideInPropertyGrid]
-        public List<EbControl> LabelColl { get; set; } 
-        
+        public List<EbControl> LabelColl { get; set; }
+
         [EnableInBuilder(BuilderType.DashBoard)]
         [HideInPropertyGrid]
         public List<EbLinks> LinksColl { get; set; }
