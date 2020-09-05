@@ -342,6 +342,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 4)]
         public int CurrentLoc { get; set; }
+        
+        [DataMember(Order = 5)]
+        public int DraftId { get; set; }
     }
 	
 	[DataContract]
@@ -529,23 +532,15 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     [DataContract]
     public class GetFormDraftResponse : IEbSSResponse
     {
+        
         [DataMember(Order = 1)]
-        public int Status { get; set; }
+        public string DataWrapper { get; set; }
 
         [DataMember(Order = 2)]
-        public string Message { get; set; }
+        public ResponseStatus ResponseStatus { get; set; }
 
         [DataMember(Order = 3)]
-        public string MessageInt { get; set; }
-
-        [DataMember(Order = 4)]
-        public string StackTraceInt { get; set; }
-
-        [DataMember(Order = 5)]
-        public string Data { get; set; }
-
-        [DataMember(Order = 6)]
-        public ResponseStatus ResponseStatus { get; set; }
+        public string FormDatajson{ get; set; }
     }
 
     [DataContract]
