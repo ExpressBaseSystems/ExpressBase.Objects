@@ -21,7 +21,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     }
 
-    public class ExportApplicationRequest1 : EbMqRequest
+    public class ExportApplicationRequest : EbMqRequest
     {
         [DataMember(Order = 1)]
         public Dictionary<int, string> AppCollection { get; set; }
@@ -60,7 +60,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public bool IsDemoApp { get; set; }
     }
 
-    public class ImportApplicationRequest1 : EbMqRequest
+    public class ImportApplicationRequest : EbMqRequest
     {
         [DataMember(Order = 1)]
         public int Id { get; set; }
