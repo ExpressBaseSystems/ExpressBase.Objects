@@ -28,6 +28,10 @@ namespace ExpressBase.Objects
         public override string DisplayName { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Core")]
+        public string Category { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("Identity")]
         public override string Description { get; set; }
 
