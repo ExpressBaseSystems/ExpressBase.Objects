@@ -128,7 +128,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class GetMobileVisDataRequest : EbServiceStackAuthRequest, IReturn<GetMobileVisDataResponse>
+    public class MobileVisDataRequest : EbServiceStackAuthRequest, IReturn<GetMobileVisDataResponse>
     {
         [DataMember(Order = 1)]
         public string DataSourceRefId { set; get; }
@@ -140,18 +140,22 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public List<SortColumn> SortOrder { set; get; }
 
         [DataMember(Order = 4)]
-        public int Limit { set; get; }
+        public List<Param> SearchColumns { set; get; }
 
         [DataMember(Order = 5)]
-        public int Offset { set; get; }
+        public int Limit { set; get; }
 
         [DataMember(Order = 6)]
+        public int Offset { set; get; }
+
+        [DataMember(Order = 7)]
         public bool IsPowerSelect { set; get; }
 
-        public GetMobileVisDataRequest()
+        public MobileVisDataRequest()
         {
             Params = new List<Param>();
             SortOrder = new List<SortColumn>();
+            SearchColumns = new List<Param>();
         }
     }
 

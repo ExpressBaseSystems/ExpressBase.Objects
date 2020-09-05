@@ -56,6 +56,10 @@ namespace ExpressBase.Objects
         public List<EbMobileDataColumn> SortColumns { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
+        public List<EbMobileDataColumn> SearchColumns { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
         [MetaOnly]
         public List<EbMobileDataColToControlMap> DataColumns => new List<EbMobileDataColToControlMap>();
 
@@ -161,6 +165,7 @@ namespace ExpressBase.Objects
             DataSourceParams = new List<Param>();
             FilterControls = new List<EbMobileControl>();
             SortColumns = new List<EbMobileDataColumn>();
+            SearchColumns = new List<EbMobileDataColumn>();
             LinkFormParameters = new List<EbMobileDataColToControlMap>();
             ContextToControlMap = new List<EbCTCMapper>();
 
@@ -186,6 +191,11 @@ namespace ExpressBase.Objects
 				                            Sort
 			                            </a>
 		                            </li>
+                                    <li class='nav-item'>
+			                            <a class='nav-link' data-toggle='tab' role='tab' href='#search-tab-@visname@'>
+				                            Search
+			                            </a>
+		                            </li>
 	                            </ul>
 	                            <div class='tab-content filter_sort-tab-content'>
 		                            <div id='filter-tab-@visname@' class='tab-pane h-100 active'>
@@ -195,6 +205,11 @@ namespace ExpressBase.Objects
 		                            </div>
 		                            <div id='sort-tab-@visname@' class='tab-pane h-100'>
 			                            <div class='vis-sort-container'>
+				
+			                            </div>
+		                            </div>
+                                    <div id='search-tab-@visname@' class='tab-pane h-100'>
+			                            <div class='vis-search-container'>
 				
 			                            </div>
 		                            </div>
