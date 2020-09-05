@@ -317,6 +317,12 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.DashBoard)]
         [PropertyGroup("Icon")]
         [UIproperty]
+        [DefaultPropValue("")]
+        public string IconText { get; set; }
+
+        [EnableInBuilder(BuilderType.DashBoard)]
+        [PropertyGroup("Icon")]
+        [UIproperty]
         [PropertyEditor(PropertyEditorType.Color)]
         public string IconColor { get; set; }
 
@@ -585,5 +591,7 @@ namespace ExpressBase.Objects
 public enum LabelStyle
 {
     Label_1 = 0,
-    Label_2 = 1,
+    Label_2,
+    Label_3,
+    Label_4,
 } 

@@ -77,6 +77,8 @@ namespace ExpressBase.Objects
 
         public EbAutoId AutoId { get; set; }
 
+        public int DraftId { get; set; }
+
         internal DbConnection DbConnection { get; set; }
 
         private DbTransaction DbTransaction { get; set; }
@@ -714,7 +716,8 @@ namespace ExpressBase.Objects
                         continue;
                     EbProvisionUser provUsrCtrl = c as EbProvisionUser;
                     Dictionary<string, string> _d = new Dictionary<string, string>();
-                    bool skipCtrl = false;
+                    bool EmailOrPhFound = false;
+
                     foreach (UsrLocField obj in provUsrCtrl.Fields)
                     {
                         if (!string.IsNullOrEmpty(obj.ControlName))
@@ -727,21 +730,18 @@ namespace ExpressBase.Objects
                                     SingleColumn Col = entry.Value[0].GetColumn(obj.ControlName);
                                     if (Col != null)
                                     {
-                                        _d.Add(obj.Name, Convert.ToString(Col.Value));
+                                        _d.Add(obj.Name, Convert.ToString(Col.Value));///////////////
+                                        if (obj.Name == FormConstants.email || obj.Name == FormConstants.phprimary)
+                                            EmailOrPhFound = true;
                                         break;
                                     }
                                 }
-                            }
-                            if (!_d.ContainsKey(obj.Name))
-                            {
-                                skipCtrl = true;
-                                break;
                             }
                         }
                     }
                     SingleRow Row = this.FormData.MultipleTables[_container.TableName][0];
                     SingleColumn Column = Row.GetColumn(provUsrCtrl.Name);
-                    if (skipCtrl)
+                    if (!EmailOrPhFound)
                     {
                         if (Column != null)
                             Row.Columns.Remove(Column);
@@ -1569,6 +1569,7 @@ namespace ExpressBase.Objects
             fullqry += _extqry;
             fullqry += this.GetFileUploaderUpdateQuery(DataDB, param, ref i);
             fullqry += this.GetMyActionInsertUpdateQuery(DataDB, param, ref i, true, service);
+            fullqry += this.GetDraftTableUpdateQuery(DataDB, param, ref i);
 
             param.Add(DataDB.GetNewParameter(FormConstants.eb_createdby, EbDbTypes.Int32, this.UserObj.UserId));
             param.Add(DataDB.GetNewParameter(FormConstants.eb_loc_id, EbDbTypes.Int32, this.LocationId));
@@ -1580,6 +1581,20 @@ namespace ExpressBase.Objects
             if (_rowid <= 0)
                 throw new FormException("Something went wrong in our end.", (int)HttpStatusCode.InternalServerError, $"SELECT eb_currval('{this.TableName}_id_seq') returned an invalid data: {_rowid}", "EbWebForm -> Insert");
             return _rowid;
+        }
+
+        private string GetDraftTableUpdateQuery(IDatabase DataDB, List<DbParameter> param, ref int i)
+        {
+            string Qry = string.Empty;
+            if (this.DraftId > 0 && this.TableRowId == 0)
+            {
+                Qry = $@"UPDATE eb_form_drafts SET is_submitted = 'T', form_data_id = eb_currval('{this.TableName}_id_seq'), eb_lastmodified_at = {DataDB.EB_CURRENT_TIMESTAMP}
+                        WHERE id = @draft_id_{i} AND form_ref_id = @{this.TableName}_form_ref_id AND eb_created_by = @eb_createdby AND is_submitted = 'F' AND eb_del = 'F'; ";
+
+                param.Add(DataDB.GetNewParameter($"draft_id_{i++}", EbDbTypes.Int32, this.DraftId));
+                param.Add(DataDB.GetNewParameter($"{this.TableName}_form_ref_id", EbDbTypes.String, this.RefId));
+            }
+            return Qry;
         }
 
         //pTable => Parent Table, pRow => Parent Row

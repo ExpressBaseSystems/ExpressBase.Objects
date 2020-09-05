@@ -362,6 +362,39 @@ this.Init = function(id)
                 _d.Add(Key, Value);
         }
 
+        public void SetUserType_Role_Status(Dictionary<string, string> _d, int nProvUserId)
+        {
+            this.UserCredentials = new UserCredentials()
+            {
+                Email = _d.ContainsKey(FormConstants.email) ? _d[FormConstants.email] : string.Empty,
+                Phone = _d.ContainsKey(FormConstants.phprimary) ? _d[FormConstants.phprimary] : string.Empty,
+                Pwd = this.GetRandomPwd(),
+                Name = _d.ContainsKey(FormConstants.fullname) ? _d[FormConstants.fullname] : (_d.ContainsKey(FormConstants.email) ? _d[FormConstants.email] : _d[FormConstants.phprimary]),
+                UserId = nProvUserId
+            };
+            this.AddOrChange(_d, FormConstants.pwd, this.UserCredentials.Pwd);/*(this.UserCredentials.Pwd + this.UserCredentials.Email).ToMD5Hash());*/
+
+            if (!_d.ContainsKey(FormConstants.usertype))
+            {
+                List<EbUserType> u_types = this.UserTypeToRole.FindAll(e => e.bVisible);
+                if (u_types.Count == 1)
+                    _d.Add(FormConstants.usertype, Convert.ToString(u_types[0].iValue));
+            }
+
+            if (_d.ContainsKey(FormConstants.usertype))
+            {
+                int u_type = Convert.ToInt32(_d[FormConstants.usertype]);
+                EbUserType ebTyp = this.UserTypeToRole.Find(e => e.iValue == u_type && e.bVisible);
+                if (ebTyp != null)
+                {
+                    if (ebTyp.ApprovalRequired)
+                        this.AddOrChange(_d, FormConstants.statusid, ((int)EbUserStatus.Unapproved).ToString());
+                    else if (ebTyp.Roles != null && ebTyp.Roles.Count > 0)
+                        this.AddOrChange(_d, FormConstants.roles, string.Join(CharConstants.COMMA, ebTyp.Roles));
+                }
+            }
+        }
+
         public override bool ParameterizeControl(IDatabase DataDB, List<DbParameter> param, string tbl, SingleColumn cField, bool ins, ref int i, ref string _col, ref string _val, ref string _extqry, User usr, SingleColumn ocF)
         {
             if (!this.CreateOnlyIf_b)
@@ -389,36 +422,7 @@ this.Init = function(id)
                     i++;
                     doNotUpdate = true;
                 }
-
-                this.UserCredentials = new UserCredentials()
-                {
-                    Email = _d.ContainsKey(FormConstants.email) ? _d[FormConstants.email] : string.Empty,
-                    Phone = _d.ContainsKey(FormConstants.phprimary) ? _d[FormConstants.phprimary] : string.Empty,
-                    Pwd = this.GetRandomPwd(),
-                    Name = _d.ContainsKey(FormConstants.fullname) ? _d[FormConstants.fullname] : (_d.ContainsKey(FormConstants.email) ? _d[FormConstants.email] : _d[FormConstants.phprimary]),
-                    UserId = nProvUserId
-                };
-                _d.Add(FormConstants.pwd, this.UserCredentials.Pwd);/*(this.UserCredentials.Pwd + this.UserCredentials.Email).ToMD5Hash());*/
-
-                if (!_d.ContainsKey(FormConstants.usertype))
-                {
-                    List<EbUserType> u_types = this.UserTypeToRole.FindAll(e => e.bVisible);
-                    if (u_types.Count == 1)
-                        _d.Add(FormConstants.usertype, Convert.ToString(u_types[0].iValue));
-                }
-
-                if (_d.ContainsKey(FormConstants.usertype))
-                {
-                    int u_type = Convert.ToInt32(_d[FormConstants.usertype]);
-                    EbUserType ebTyp = this.UserTypeToRole.Find(e => e.iValue == u_type && e.bVisible);
-                    if (ebTyp != null)
-                    {
-                        if (ebTyp.ApprovalRequired)
-                            this.AddOrChange(_d, FormConstants.statusid, ((int)EbUserStatus.Unapproved).ToString());
-                        else if (ebTyp.Roles != null && ebTyp.Roles.Count > 0)
-                            this.AddOrChange(_d, FormConstants.roles, string.Join(CharConstants.COMMA, ebTyp.Roles));
-                    }
-                }
+                this.SetUserType_Role_Status(_d, nProvUserId);
             }
             else
             {
@@ -468,6 +472,7 @@ this.Init = function(id)
                     else if (nProvUserId <= 0)
                     {
                         insertOnUpdate = true;
+                        this.SetUserType_Role_Status(_d, nProvUserId);
                     }
                 }
             }
