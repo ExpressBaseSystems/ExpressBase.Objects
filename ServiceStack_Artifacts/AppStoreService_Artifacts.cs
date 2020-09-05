@@ -31,12 +31,18 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class GetOneFromAppstoreResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
-        public AppWrapper Wrapper { get; set; }
+        public ExportPackage Package { get; set; }
 
         [DataMember(Order = 2)]
-        public string Token { get; set; }
+        public string Title { get; set; }
 
         [DataMember(Order = 3)]
+        public bool IsPublic { get; set; }
+
+        [DataMember(Order = 4)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 5)]
         public ResponseStatus ResponseStatus { get; set; }
     }
 
@@ -127,7 +133,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 1)]
         public int AppId { set; get; }
     }
-    public class AppAndsolutionInfoResponse: IEbSSResponse
+    public class AppAndsolutionInfoResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
         public ResponseStatus ResponseStatus { get; set; }
