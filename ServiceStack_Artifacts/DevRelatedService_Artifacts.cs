@@ -30,6 +30,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 6)]
         public int AppId { get; set; }
 
+        [DataMember(Order = 7)]
+        public string AppSettings { set; get; }
+
         public string SolnId { get; set; }
 
         public int UserId { get; set; }
@@ -221,6 +224,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 2)]
+        public int AppId { get; set; }
     }
 
     public class GetDefaultMapApiKeyFromConnectionRequest : EbServiceStackAuthRequest
