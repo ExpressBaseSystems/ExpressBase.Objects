@@ -409,6 +409,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int ColumnCount { get; set; }
 
         [JsonIgnore]
+        public bool ShowCheckbox { get; set; }
+
+        [JsonIgnore]
         private int _currentLevel = 0;
         [JsonIgnore]
         public int CurrentLevel
@@ -655,7 +658,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
                 if (IsMultiLevel)
                     _tempFooterPadding += "<td>&nbsp;</td>";
                 _tempFooterPadding += "<td>&nbsp;</td>";//serial column
-
+                if(ShowCheckbox)
+                    _tempFooterPadding += "<td>&nbsp;</td>";
                 string _tempFooterText = string.Empty;
                 foreach (DVBaseColumn Column in TableColumns)
                 {
