@@ -157,13 +157,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             SortOrder = new List<SortColumn>();
             SearchColumns = new List<Param>();
         }
-
-        public void InitCollections()
-        {
-            if (Params == null) Params = new List<Param>();
-            if (SortOrder == null) SortOrder = new List<SortColumn>();
-            if (SearchColumns == null) SearchColumns = new List<Param>();
-        }
     }
 
     [DataContract]
