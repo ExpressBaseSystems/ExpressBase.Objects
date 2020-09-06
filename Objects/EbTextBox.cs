@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Reflection;
 using Newtonsoft.Json;
 using ExpressBase.Common.Objects.Attributes;
+using ExpressBase.Security;
 using ServiceStack.Pcl;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Extensions;
@@ -16,6 +17,7 @@ using ExpressBase.Common;
 using ServiceStack;
 using ExpressBase.Objects.ServiceStack_Artifacts;
 using ExpressBase.Common.Constants;
+using System.Data.Common;
 
 namespace ExpressBase.Objects
 {
@@ -223,19 +225,23 @@ else {
         [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
 
-		//[HideInPropertyGrid]
-		//[EnableInBuilder(BuilderType.BotForm)]
-		//public override bool IsReadOnly { get => this.IsDisable; }
+        //[HideInPropertyGrid]
+        //[EnableInBuilder(BuilderType.BotForm)]
+        //public override bool IsReadOnly { get => this.IsDisable; }
 
-		//[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-		//[PropertyEditor(PropertyEditorType.JS)]
-		//public string OnChangeExe { get; set; }
+        //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        //[PropertyEditor(PropertyEditorType.JS)]
+        //public string OnChangeExe { get; set; }
 
-		[EnableInBuilder(BuilderType.BotForm)]
-		[HideInPropertyGrid]
-		public bool IsBasicControl { get => true; }
+        [EnableInBuilder(BuilderType.BotForm)]
+        [HideInPropertyGrid]
+        public bool IsBasicControl { get => true; }
 
-		private string TextTransformString
+        //hint: New mode - EbAutoId - DataPusher - Dest Form
+        [JsonIgnore]
+        public bool BypassParameterization { get; set; }
+
+        private string TextTransformString
         {
             get { return (((int)this.TextTransform > 0) ? "$('#{0}').keydown(function(event) { textTransform(this, {1}); }); $('#{0}').on('paste', function(event) { textTransform(this, {1}); });".Replace("{0}", this.Name).Replace("{1}", ((int)this.TextTransform).ToString()) : string.Empty); }
         }
@@ -410,6 +416,31 @@ else {
         //.Replace("@HelpText@ ", ((this.HelpText != null) ? this.HelpText : "@HelpText@ "))
         //.Replace("@Label@ ", this.Label ?? "@Label@ ");
         //        }
+
+        public override bool ParameterizeControl(IDatabase DataDB, List<DbParameter> param, string tbl, SingleColumn cField, bool ins, ref int i, ref string _col, ref string _val, ref string _extqry, User usr, SingleColumn ocF)
+        {
+            if (cField.Value == null)
+            {
+                var p = DataDB.GetNewParameter(cField.Name + CharConstants.UNDERSCORE + i, (EbDbTypes)cField.Type);
+                p.Value = DBNull.Value;
+                param.Add(p);
+            }
+            else if (!this.BypassParameterization)// (this.BypassParameterization && cField.Value == null) ~> error
+                param.Add(DataDB.GetNewParameter(cField.Name + CharConstants.UNDERSCORE + i, (EbDbTypes)cField.Type, cField.Value));
+
+            if (ins)
+            {
+                _col += cField.Name + CharConstants.COMMA + CharConstants.SPACE;
+                if (this.BypassParameterization)
+                    _val += Convert.ToString(cField.Value) + CharConstants.COMMA + CharConstants.SPACE;
+                else
+                    _val += CharConstants.AT + cField.Name + CharConstants.UNDERSCORE + i + CharConstants.COMMA + CharConstants.SPACE;
+            }
+            else
+                _col += cField.Name + CharConstants.EQUALS + CharConstants.AT + cField.Name + CharConstants.UNDERSCORE + i + CharConstants.COMMA + CharConstants.SPACE;
+            i++;
+            return true;
+        }
     }
 
     public interface IEbInputControls
