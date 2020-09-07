@@ -256,22 +256,12 @@ if(this.IsNullable && !($('#' + this.EbSid_CtxId).closest('.input-group').find(`
         }
 
         [JsonIgnore]
-        public override string SetValueJSfn
-        {
-            get
-            {
-                return @" setDate_EB.bind(this)(p1, p2);";
-            }
-            set { }
-        }
-
-        [JsonIgnore]
         public override string SetDisplayMemberJSfn
         {
             get
             {
                 return
-                    @" justSetDate_EB.bind(this)(p1, p2);";
+                    @" SetDisplayMemberDate_EB.bind(this)(p1, p2);";
             }
             set { }
         }
