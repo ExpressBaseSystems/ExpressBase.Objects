@@ -447,7 +447,7 @@ namespace ExpressBase.Objects
             {
                 if (psQrsDict.Count > 0)
                 {
-                    EbFormHelper.AddExtraSqlParams(psParams, DataDB, this.TableName, this.TableRowId, this.LocationId, this.UserObj.UserId);
+                    EbFormHelper.AddExtraSqlParams(psParams, DataDB, FormDes.TableName, 0, this.LocationId, this.UserObj.UserId);
                     EbDataSet dataset = DataDB.DoQueries(string.Join(CharConstants.SPACE, psQrsDict.Select(d => d.Value)), psParams.ToArray());
                     int i = 0;
                     foreach (KeyValuePair<string, string> item in psQrsDict)
