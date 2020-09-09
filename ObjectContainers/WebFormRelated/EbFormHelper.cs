@@ -436,7 +436,7 @@ namespace ExpressBase.Objects
                         foreach (ColumnSchema _columnDes in _tableDes.Columns)
                         {
                             ColumnSrc = FormSrc.FormData.MultipleTables[FormSrc.FormData.MasterTable][0].GetColumn(_columnDes.ColumnName);
-                            if (ColumnSrc != null && !(_columnDes.Control is EbAutoId) && !_columnDes.Control.IsSysControl)
+                            if (ColumnSrc != null && !(_columnDes.Control is EbAutoId) && (!_columnDes.Control.IsSysControl || _columnDes.Control is EbSysLocation))
                             {
                                 FormDes.FormData.MultipleTables[_tableDes.TableName][0].SetColumn(_columnDes.ColumnName, _columnDes.Control.GetSingleColumn(FormDes.UserObj, FormDes.SolutionObj, ColumnSrc.Value));
                                 _formattedData = Convert.ToString(ColumnSrc.Value);
@@ -480,7 +480,7 @@ namespace ExpressBase.Objects
                     {
                         SingleColumn ColumnSrc = _PsApiTables[FormDes.Name][0].GetColumn(_column.ColumnName);
                         string _formattedData = Convert.ToString(entry.Value[0][_column.ColumnName]);
-                        if (ColumnSrc != null && !(_column.Control is EbAutoId) && !_column.Control.IsSysControl)
+                        if (ColumnSrc != null && !(_column.Control is EbAutoId) && (!_column.Control.IsSysControl || _column.Control is EbSysLocation))
                         {
                             entry.Value[0].SetColumn(_column.ColumnName, _column.Control.GetSingleColumn(FormDes.UserObj, FormDes.SolutionObj, ColumnSrc.Value));
                             _formattedData = Convert.ToString(ColumnSrc.Value);                            

@@ -17,6 +17,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using ExpressBase.Common.Constants;
+using ExpressBase.Common.Data;
 
 namespace ExpressBase.Objects
 {
@@ -279,6 +280,27 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
             {
                 this.Options = new List<EbSimpleSelectOption>();
                 var result = ServiceClient.Get<FDDataResponse>(new FDDataRequest { RefId = this.DataSourceId });
+                foreach (EbDataRow option in result.Data)
+                {
+                    string val = option[this.ValueMember.Data].ToString();
+                    string dispName = option[this.DisplayMember.Data].ToString();
+                    this.Options.Add(new EbSimpleSelectOption { Value = val, DisplayName = dispName });
+
+                    if (dispName.Contains("`"))
+                        dispName = dispName.Replace("`", "\\`");
+                    _html += string.Format("<option value='{0}'>{1}</option>", val, dispName);
+                }
+            }
+            _optionHtml = _html;
+            this.OptionHtml = _html;
+        }
+		 public void InitFromDataBase(JsonServiceClient ServiceClient, List<Param> ParamsList)
+        {
+            string _html = string.Empty;
+            if (this.IsDynamic)
+            {
+                this.Options = new List<EbSimpleSelectOption>();
+                var result = ServiceClient.Get<FDDataResponse>(new FDDataRequest { RefId = this.DataSourceId,Params=ParamsList });
                 foreach (EbDataRow option in result.Data)
                 {
                     string val = option[this.ValueMember.Data].ToString();

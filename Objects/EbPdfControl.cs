@@ -156,7 +156,8 @@ namespace ExpressBase.Objects
 			<div id='@ebsid@' name='@name@' class='pdf_control_cont'>
 				<div class='pdfwrapper-cont'>
 			        <img id='img_@ebsid@' src='/images/pdf-image.png' style='width: 100px;'>
-						<div style=' position: absolute;'>
+						<div style=' position: relative;'>
+							<span id='spn_@ebsid@' class='dwnld_txt'>Download</span>
 							<i id='icon_@ebsid@'  class='fa fa-arrow-circle-o-down '></i>
 						</div>
 				</div>
