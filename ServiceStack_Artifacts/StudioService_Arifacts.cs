@@ -563,18 +563,46 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
     }
-    public class DeleteEbObjectRequest : EbServiceStackAuthRequest, IReturn<DeleteObjectResponse>
+    public class DeleteEbObjectRequest : EbServiceStackAuthRequest, IReturn<DeleteEbObjectResponse>
     {
         public int ObjId { get; set; }
     }
 
-    public class DeleteObjectResponse : IEbSSResponse
+    public class DeleteEbObjectResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
         public int RowsDeleted { get; set; }
 
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    public class CloneEbObjectRequest : EbServiceStackAuthRequest, IReturn<CloneEbObjectResponse>
+    {
+        public string RefId { get; set; }
+
+        public string Apps { get; set; }
+    }
+
+    public class CloneEbObjectResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public bool Status { get; set; }
+
+        [DataMember(Order = 2)]
+        public int ObjId { get; set; }
+
+        [DataMember(Order = 3)]
+        public int ObjectType { get; set; }
+
+        [DataMember(Order = 4)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 5)]
+        public string ClonedRefid { get; set; }
+
+        [DataMember(Order = 6)]
+        public string Message { get; set; }
     }
 
     public class EnableLogRequest : EbServiceStackAuthRequest, IReturn<EnableLogResponse>
@@ -661,7 +689,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 22)]
         public bool IsLogEnabled { get; set; }
 
-        [DataMember(Order =23)]
+        [DataMember(Order = 23)]
 
         public bool IsPublic { get; set; }
 
