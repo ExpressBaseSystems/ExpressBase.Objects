@@ -919,16 +919,12 @@ else{
             if (this.RenderType == EbDbTypes.AnsiString)
                 this.RenderType = this.Type;
         }
-
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
-        [OnChangeExec(@"
-if(this.Format === 3){
-    pg.ShowProperty('ConvretToUsersTimeZone');
-}
-else{
-    pg.HideProperty('ConvretToUsersTimeZone');
-    }")]
+        
         [PropertyGroup(PGConstants.EXTENDED)]
+        [OnChangeExec(@"
+if(this.Type === 17){    pg.HideProperty('Format');pg.setSimpleProperty('Format', 1);}
+")]
         public DateFormat Format { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
