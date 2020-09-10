@@ -132,11 +132,11 @@ if(this.IsNullable && !($('#' + this.EbSid_CtxId).closest('.input-group').find(`
         [PropertyGroup(PGConstants.EXTENDED)]
         public bool AutoCompleteOff { get; set; }
 
-		[EnableInBuilder(BuilderType.BotForm)]
-		[HideInPropertyGrid]
-		public bool IsBasicControl { get => true; }
+        [EnableInBuilder(BuilderType.BotForm)]
+        [HideInPropertyGrid]
+        public bool IsBasicControl { get => true; }
 
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [OnChangeExec(@"
                 if (this.DoNotPersist){
                         pg.HideProperty('IsNullable');
@@ -319,7 +319,7 @@ if(this.IsNullable && !($('#' + this.EbSid_CtxId).closest('.input-group').find(`
                         cField.Value = dt.ConvertToUtc(usr.Preference.TimeZone);
                     }
                     else//EbDateType.Time
-                        cField.Value = DateTime.ParseExact(cField.Value.ToString(), "HH:mm:ss", CultureInfo.InvariantCulture);                    
+                        cField.Value = DateTime.ParseExact(cField.Value.ToString(), "HH:mm:ss", CultureInfo.InvariantCulture);
                 }
 
                 param.Add(DataDB.GetNewParameter(cField.Name + "_" + i, EbDbTypes.DateTime, cField.Value));
@@ -365,7 +365,11 @@ if(this.IsNullable && !($('#' + this.EbSid_CtxId).closest('.input-group').find(`
             {
                 DateTime dt;
                 if (Value == null)
+                {
                     dt = DateTime.UtcNow;
+                    if (_this.EbDateType == EbDateType.Time)
+                        dt = dt.ConvertFromUtc(UserObj.Preference.TimeZone);
+                }
                 else
                 {
                     if (Value.GetType() == typeof(TimeSpan))
