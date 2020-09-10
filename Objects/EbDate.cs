@@ -313,12 +313,13 @@ if(this.IsNullable && !($('#' + this.EbSid_CtxId).closest('.input-group').find(`
                 }
                 else
                 {
-                    DateTime dt;
                     if (this.EbDateType == EbDateType.DateTime)
-                        dt = DateTime.ParseExact(cField.Value.ToString(), "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
-                    else
-                        dt = DateTime.ParseExact(cField.Value.ToString(), "HH:mm:ss", CultureInfo.InvariantCulture);
-                    cField.Value = dt.ConvertToUtc(usr.Preference.TimeZone);
+                    {
+                        DateTime dt = DateTime.ParseExact(cField.Value.ToString(), "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+                        cField.Value = dt.ConvertToUtc(usr.Preference.TimeZone);
+                    }
+                    else//EbDateType.Time
+                        cField.Value = DateTime.ParseExact(cField.Value.ToString(), "HH:mm:ss", CultureInfo.InvariantCulture);                    
                 }
 
                 param.Add(DataDB.GetNewParameter(cField.Name + "_" + i, EbDbTypes.DateTime, cField.Value));
@@ -372,12 +373,12 @@ if(this.IsNullable && !($('#' + this.EbSid_CtxId).closest('.input-group').find(`
                     else
                         dt = Convert.ToDateTime(Value);
                 }
-                DateTime dt_cov = dt.ConvertFromUtc(UserObj.Preference.TimeZone);
 
                 if (_this.EbDateType == EbDateType.Date)
                 {
                     if (!(_this is EbDate)) //EbSysCreatedAt EbSysModifiedAt EbDGDateColumn EbDGCreatedAtColumn EbDGModifiedAtColumn
                     {
+                        DateTime dt_cov = dt.ConvertFromUtc(UserObj.Preference.TimeZone);
                         _formattedData = dt_cov.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
                         _displayMember = dt_cov.ToString(UserObj.Preference.GetShortDatePattern(), CultureInfo.InvariantCulture);
                     }
@@ -402,13 +403,14 @@ if(this.IsNullable && !($('#' + this.EbSid_CtxId).closest('.input-group').find(`
                 }
                 else if (_this.EbDateType == EbDateType.DateTime)
                 {
+                    DateTime dt_cov = dt.ConvertFromUtc(UserObj.Preference.TimeZone);
                     _formattedData = dt_cov.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
                     _displayMember = dt_cov.ToString(UserObj.Preference.GetShortDatePattern() + " " + UserObj.Preference.GetShortTimePattern(), CultureInfo.InvariantCulture);
                 }
-                else
+                else// EbDateType.Time 
                 {
-                    _formattedData = dt_cov.ToString("HH:mm:ss", CultureInfo.InvariantCulture);
-                    _displayMember = dt_cov.ToString(UserObj.Preference.GetShortTimePattern(), CultureInfo.InvariantCulture);
+                    _formattedData = dt.ToString("HH:mm:ss", CultureInfo.InvariantCulture);
+                    _displayMember = dt.ToString(UserObj.Preference.GetShortTimePattern(), CultureInfo.InvariantCulture);
                 }
             }
 

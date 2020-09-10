@@ -93,10 +93,10 @@ namespace ExpressBase.Objects
         public override string EnableJSfn { get { return string.Empty; } set { } }
 
 
-        public void InitFromDataBase(JsonServiceClient ServiceClient)
+        public void InitFromDataBase(JsonServiceClient ServiceClient, IRedisClient redis)
         {
-            EbObjectParticularVersionResponse result = ServiceClient.Get<EbObjectParticularVersionResponse>(new EbObjectParticularVersionRequest { RefId = TVRefId });
-            this.TableVisualizationJson = result.Data[0].Json;
+            EbTableVisualization TvObj = EbFormHelper.GetEbObject<EbTableVisualization>(TVRefId, ServiceClient, redis, null);
+            this.TableVisualizationJson = EbSerializers.Json_Serialize(TvObj);
         }
 
         public virtual void FetchParamsMeta(IServiceClient ServiceClient, IRedisClient redis, EbControl[] Allctrls)
