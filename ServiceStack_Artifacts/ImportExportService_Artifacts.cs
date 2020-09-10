@@ -8,7 +8,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class ExportApplicationMqRequest : EbServiceStackAuthRequest, IReturn<GetAllFromAppstoreResponse>
     {
         [DataMember(Order = 1)]
-        public Dictionary<int,string> AppCollection { get; set; }
+        public Dictionary<int,List<string>> AppCollection { get; set; }
 
         [DataMember(Order = 2)]
         public string PackageName { get; set; }
@@ -24,7 +24,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class ExportApplicationRequest : EbMqRequest
     {
         [DataMember(Order = 1)]
-        public Dictionary<int, string> AppCollection { get; set; }
+        public Dictionary<int, List<string>> AppCollection { get; set; }
 
         [DataMember(Order = 2)]
         public string PackageName { get; set; }
