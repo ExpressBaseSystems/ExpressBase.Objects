@@ -43,9 +43,9 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
-        [Alias("Validate before Render")]
+        [Alias("Render Validator")]
         [PropertyGroup("Rendering")]
-        public string BeforeRenderDSRefid { set; get; }
+        public string RenderValidatorRefId { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [Alias("Message on Failed")]
@@ -54,13 +54,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
-        public List<Param> BeforeRenderDSParams { get; set; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [Alias("Validate Expression")]
-        [PropertyGroup("Rendering")]
-        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
-        public EbScript BeforeRenderExpr { set; get; }
+        public List<Param> RenderValidatorParams { get; set; }
 
         public override string GetDesignHtml()
         {
@@ -183,8 +177,7 @@ namespace ExpressBase.Objects
 
         public EbMobileForm()
         {
-            BeforeRenderExpr = new EbScript();
-            BeforeRenderDSParams = new List<Param>();
+            RenderValidatorParams = new List<Param>();
         }
     }
 }
