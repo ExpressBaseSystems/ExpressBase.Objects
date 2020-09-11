@@ -48,6 +48,11 @@ namespace ExpressBase.Objects
         public string BeforeRenderDSRefid { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
+        [Alias("Message on Failed")]
+        [PropertyGroup("Rendering")]
+        public string MessageOnFailed { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
         public List<Param> BeforeRenderDSParams { get; set; }
 
