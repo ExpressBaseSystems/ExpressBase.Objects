@@ -271,6 +271,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 17)]
         public string ImageList { get; set; }
 
+        [DataMember(Order = 18)]
+        public string error { get; set; }
+
     }
 
     [DataContract]

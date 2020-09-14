@@ -117,7 +117,7 @@ namespace ExpressBase.Objects.Objects
 
 		[EnableInBuilder(BuilderType.WebForm)]
 		[HideInPropertyGrid]
-		public override bool DoNotPersist { get; set; }
+		public override bool DoNotPersist { get { return true; } set { } }
 
 		[EnableInBuilder(BuilderType.WebForm)]
 		[HideInPropertyGrid]

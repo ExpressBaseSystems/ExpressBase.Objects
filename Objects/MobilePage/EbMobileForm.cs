@@ -1,4 +1,5 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Data;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
@@ -20,10 +21,12 @@ namespace ExpressBase.Objects
         public List<EbMobileControl> ChildControls { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Core")]
         public string TableName { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [Alias("Auto Deploy Visualization")]
+        [PropertyGroup("Core")]
         public bool AutoDeployMV { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
@@ -34,7 +37,24 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iWebForm)]
         [Alias("Web Form")]
+        [PropertyGroup("Core")]
         public string WebFormRefId { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
+        [Alias("Render Validator")]
+        [PropertyGroup("Rendering")]
+        public string RenderValidatorRefId { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [Alias("Message on Failed")]
+        [PropertyGroup("Rendering")]
+        public string MessageOnFailed { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
+        public List<Param> RenderValidatorParams { get; set; }
 
         public override string GetDesignHtml()
         {
@@ -153,6 +173,11 @@ namespace ExpressBase.Objects
             {
                 ctrl.ReplaceRefid(map);
             }
+        }
+
+        public EbMobileForm()
+        {
+            RenderValidatorParams = new List<Param>();
         }
     }
 }

@@ -57,6 +57,8 @@ namespace ExpressBase.Objects
                         pg.ShowProperty('TextFormat');
                         pg.ShowProperty('Font');
                         pg.HideProperty('BorderRadius');
+                        pg.HideProperty('Height');
+                        pg.HideProperty('Width');
                 }
                 else {
                         pg.HideProperty('TextFormat');
@@ -64,6 +66,8 @@ namespace ExpressBase.Objects
                         pg.HideProperty('BorderRadius');
                         if(this.RenderAs === 2){
                             pg.ShowProperty('BorderRadius');
+                            pg.ShowProperty('Height');
+                            pg.ShowProperty('Width');
                         }
                 }
             ")]
@@ -86,12 +90,36 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("UI")]
         [Alias("Align X")]
+        [OnChangeExec(@"
+                if (this.HorrizontalAlign !== 3 && this.RenderAs === 2){ 
+                        pg.ShowProperty('Width');
+                }
+                else {
+                        pg.HideProperty('Width');
+                }
+            ")]
         public MobileHorrizontalAlign HorrizontalAlign { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("UI")]
         [Alias("Align Y")]
+        [OnChangeExec(@"
+                if (this.VerticalAlign !== 3 && this.RenderAs === 2){ 
+                        pg.ShowProperty('Height');
+                }
+                else {
+                        pg.HideProperty('Height');
+                }
+            ")]
         public MobileVerticalAlign VerticalAlign { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("UI")]
+        public int Height { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("UI")]
+        public int Width { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("UI")]

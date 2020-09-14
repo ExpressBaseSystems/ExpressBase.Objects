@@ -100,6 +100,20 @@ namespace ExpressBase.Objects
         }")]
         public override string Info { get; set; }
 
+        [PropertyGroup(PGConstants.HELP)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [PropertyPriority(98)]
+        [Alias("Help Video URL")]
+        [HelpText("Help video.")]
+        [OnChangeExec(@"
+        if(this.Info && this.Info.trim() !== ''){
+            pg.ShowProperty('InfoIcon');
+        }
+        else{
+            pg.HideProperty('InfoIcon');
+        }")]
+        public string InfoVideoURL { get; set; }
+
         [PropertyGroup("Events")]
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.Collection)]
@@ -150,6 +164,10 @@ namespace ExpressBase.Objects
         [PropertyGroup(PGConstants.EXTENDED)]
         [EnableInBuilder(BuilderType.WebForm)]
         public bool CanSaveAsDraft { get; set; }
+
+        [PropertyGroup(PGConstants.EXTENDED)]
+        [EnableInBuilder(BuilderType.WebForm)]
+        public bool EnableExcelImport { get; set; }
 
         [PropertyGroup(PGConstants.DATA)]
         [EnableInBuilder(BuilderType.WebForm)]
