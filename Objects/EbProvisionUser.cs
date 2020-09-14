@@ -306,7 +306,7 @@ this.Init = function(id)
 
         }
 
-        private int GetUserIdByEmailOrPhone(IDatabase DataDB, Dictionary<string, string> _d, ref int flag)
+        private int GetUserIdByEmailOrPhone(IDatabase DataDB, Dictionary<string, string> _d, ref int flag, bool ins, SingleColumn ocF)
         {
             int userId = 0;
             string _s = "SELECT id FROM eb_users WHERE LOWER(#) LIKE LOWER(@#) AND eb_del = 'F' AND (statusid = 0 OR statusid = 1 OR statusid = 2 OR statusid = 4);";
@@ -336,10 +336,39 @@ this.Init = function(id)
             if (ds.Tables[1].Rows.Count > 0)
             {
                 int userId2 = Convert.ToInt32(ds.Tables[1].Rows[0][0]);
-                if (flag == 1 && userId != userId2)
-                    throw new FormException($"Unable to continue with {_d["email"]} and {_d["phprimary"]}", (int)HttpStatusCode.BadRequest, $"Email and Phone already exists for different users: {_d["email"]}, {_d["phprimary"]}", "EbProvisionUser => GetUserIdByEmailOrPhone");
-                userId = userId2;
                 flag |= 2;
+                if (flag == 3 && userId != userId2)
+                {
+                    if (!ins)
+                    {
+                        int oProvUserId = Convert.ToInt32(ocF.Value);
+                        if (userId == oProvUserId && oProvUserId > 0)
+                        {
+                            _d.RemoveKey("phprimary");
+                            flag &= 1;
+                        }
+                        if (userId2 == oProvUserId && oProvUserId > 0)
+                        {
+                            _d.RemoveKey("email");
+                            flag &= 2;
+                            userId = oProvUserId;
+                        }
+                    }
+                    if (userId != userId2 && flag == 3)
+                        throw new FormException($"Unable to continue with {_d["email"]} and {_d["phprimary"]}", (int)HttpStatusCode.BadRequest, $"Email and Phone already exists for different users: {_d["email"]}, {_d["phprimary"]}", "EbProvisionUser => GetUserIdByEmailOrPhone");
+                }
+                else if (_d.ContainsKey("email") && _d["email"] != string.Empty)
+                {
+                    _d.RemoveKey("phprimary");
+                    flag &= 1;
+                    return 0;
+                }
+            }
+            else if (flag == 1 && _d.ContainsKey("phprimary") && _d["phprimary"] != string.Empty)
+            {
+                _d.RemoveKey("email");
+                flag &= 2;
+                return 0;
             }
             return userId;
         }
@@ -406,7 +435,7 @@ this.Init = function(id)
             int nProvUserId = 0;
             int flag = 0;
             if ((_d.ContainsKey(FormConstants.email) && _d[FormConstants.email].Trim() != string.Empty) || (_d.ContainsKey(FormConstants.phprimary) && _d[FormConstants.phprimary].Trim() != string.Empty))
-                nProvUserId = this.GetUserIdByEmailOrPhone(DataDB, _d, ref flag);
+                nProvUserId = this.GetUserIdByEmailOrPhone(DataDB, _d, ref flag, ins, ocF);
             else
                 return false;
             if (ins)
