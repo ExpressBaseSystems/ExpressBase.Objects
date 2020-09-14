@@ -337,25 +337,28 @@ this.Init = function(id)
             {
                 int userId2 = Convert.ToInt32(ds.Tables[1].Rows[0][0]);
                 flag |= 2;
-                if (flag == 3 && userId != userId2)
+                if (flag == 3)
                 {
-                    if (!ins)
+                    if (userId != userId2)
                     {
-                        int oProvUserId = Convert.ToInt32(ocF.Value);
-                        if (userId == oProvUserId && oProvUserId > 0)
+                        if (!ins)
                         {
-                            _d.RemoveKey("phprimary");
-                            flag &= 1;
+                            int oProvUserId = Convert.ToInt32(ocF.Value);
+                            if (userId == oProvUserId && oProvUserId > 0)
+                            {
+                                _d.RemoveKey("phprimary");
+                                flag &= 1;
+                            }
+                            if (userId2 == oProvUserId && oProvUserId > 0)
+                            {
+                                _d.RemoveKey("email");
+                                flag &= 2;
+                                userId = oProvUserId;
+                            }
                         }
-                        if (userId2 == oProvUserId && oProvUserId > 0)
-                        {
-                            _d.RemoveKey("email");
-                            flag &= 2;
-                            userId = oProvUserId;
-                        }
+                        if (userId != userId2 && flag == 3)
+                            throw new FormException($"Unable to continue with {_d["email"]} and {_d["phprimary"]}", (int)HttpStatusCode.BadRequest, $"Email and Phone already exists for different users: {_d["email"]}, {_d["phprimary"]}", "EbProvisionUser => GetUserIdByEmailOrPhone");
                     }
-                    if (userId != userId2 && flag == 3)
-                        throw new FormException($"Unable to continue with {_d["email"]} and {_d["phprimary"]}", (int)HttpStatusCode.BadRequest, $"Email and Phone already exists for different users: {_d["email"]}, {_d["phprimary"]}", "EbProvisionUser => GetUserIdByEmailOrPhone");
                 }
                 else if (_d.ContainsKey("email") && _d["email"] != string.Empty)
                 {
