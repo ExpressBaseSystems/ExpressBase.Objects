@@ -65,6 +65,43 @@ namespace ExpressBase.Objects
         [OSE_ObjectTypes(EbObjectTypes.iFilterDialog)]
         public string Filter_Dialogue { get; set; }
 
+        [PropertyGroup(PGConstants.HELP)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.DashBoard, BuilderType.UserControl)]
+        [PropertyPriority(98)]
+        [HelpText("Help information icon.")]
+        [PropertyEditor(PropertyEditorType.IconPicker)]
+        [DefaultPropValue("fa-question-circle")]
+        public virtual string InfoIcon { get; set; }
+
+        [PropertyGroup(PGConstants.HELP)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.DashBoard, BuilderType.UserControl)]
+        [PropertyPriority(98)]
+        [PropertyEditor(PropertyEditorType.FileUploader)]
+        [Alias("Info Document")]
+        [HelpText("Help information.")]
+        [OnChangeExec(@"
+        if(this.Info && this.Info.trim() !== ''){
+            pg.ShowProperty('InfoIcon');
+        }
+        else{
+            pg.HideProperty('InfoIcon');
+        }")]
+        public string Info { get; set; }
+
+        [PropertyGroup(PGConstants.HELP)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.DashBoard, BuilderType.UserControl)]
+        [PropertyPriority(98)]
+        [Alias("Help Video URL")]
+        [HelpText("Help video.")]
+        [OnChangeExec(@"
+        if(this.Info && this.Info.trim() !== ''){
+            pg.ShowProperty('InfoIcon');
+        }
+        else{
+            pg.HideProperty('InfoIcon');
+        }")]
+        public string InfoVideoURL { get; set; }
+
         [EnableInBuilder(BuilderType.DashBoard)]
         [UIproperty]
         [PropertyGroup(PGConstants.APPEARANCE)]
