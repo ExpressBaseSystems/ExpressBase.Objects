@@ -135,6 +135,7 @@ this.Init = function(id)
             <li li-of='@ebsid@' ebsid='@ebsid@' @active @style@>
                 <a data-toggle='tab' class='ppbtn-cont' href='#@ebsid@'>
                     <span class='eb-label-editable'>@title@</span>
+                    <div class='eb-tab-warn-icon-cont'><i class='icofont-warning-alt'></i></div>
                     <input id='@ebsid@lbltxtb' class='eb-lbltxtb' type='text'/>@ppbtn@
                     <div class='ebtab-close-btn eb-fb-icon'><i class='fa fa-times' aria-hidden='true'></i></div>
                 </a>
