@@ -225,7 +225,7 @@ else
                         + JSFnsConstants.SS_DisableJSfn +
                     @"}
                     else{"
-                        + JSFnsConstants.Ctrl_DisableJSfn +
+                        + JSFnsConstants.PS_DisableJSfn +
                     @"}
                 ";
             }
