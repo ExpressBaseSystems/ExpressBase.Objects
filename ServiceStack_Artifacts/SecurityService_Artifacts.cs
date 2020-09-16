@@ -1056,21 +1056,15 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class SaveRoleRequest : IReturn<SaveRoleResponse>, IEbSSRequest
+    public class SaveRoleRequest : EbServiceStackAuthRequest, IReturn<SaveRoleResponse>
     {
         [DataMember(Order = 0)]
         public Dictionary<string, object> Colvalues { get; set; }
 
         [DataMember(Order = 2)]
-        public int Id { get; set; }
+        public int Id { get; set; } 
 
         [DataMember(Order = 3)]
-        public string SolnId { get; set; }
-
-        [DataMember(Order = 4)]
-        public int UserId { get; set; }
-
-        [DataMember(Order = 5)]
         public string Token { get; set; }
     }
 
