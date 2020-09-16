@@ -218,23 +218,30 @@ namespace ExpressBase.Objects
             List<string> _refids = new List<string>();
             foreach (Tiles Tile in this.Tiles)
             {
-                if (Tile.RefId != string.Empty)
-                    _refids.Add(Tile.RefId);
-                if (Tile.ComponentsColl.Count != 0)
+                try
                 {
-                    foreach (EbDataObject component in Tile.ComponentsColl)
+                    if (Tile.RefId != string.Empty)
+                        _refids.Add(Tile.RefId);
+                    if (Tile.ComponentsColl.Count != 0)
                     {
-                        if (component.DataSource != string.Empty)
-                            _refids.Add(component.DataSource);
+                        foreach (EbDataObject component in Tile.ComponentsColl)
+                        {
+                            if (component.DataSource != string.Empty)
+                                _refids.Add(component.DataSource);
+                        }
                     }
-                } 
-                if (Tile.LinksColl.Count != 0)
+                    if ( Tile.LinksColl != null && Tile.LinksColl.Count != 0)
+                    {
+                        foreach (EbLinks Links in Tile.LinksColl)
+                        {
+                            if (Links.Object_Selector != string.Empty)
+                                _refids.Add(Links.Object_Selector);
+                        }
+                    }
+                }
+                catch (Exception e)
                 {
-                    foreach (EbLinks Links in Tile.LinksColl)
-                    {
-                        if (Links.Object_Selector != string.Empty)
-                            _refids.Add(Links.Object_Selector);
-                    }
+                    Console.WriteLine("exception in component/link collection", e.Message);
                 }
             }
             if (this.Filter_Dialogue != string.Empty)
