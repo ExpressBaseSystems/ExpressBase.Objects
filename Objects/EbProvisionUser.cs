@@ -328,6 +328,7 @@ this.Init = function(id)
                 sql += "SELECT 1 WHERE 1 = 0; ";
             EbDataSet ds = DataDB.DoQueries(sql, parameters.ToArray());
 
+            int oProvUserId = ocF == null ? 0 : Convert.ToInt32(ocF.Value);
             if (ds.Tables[0].Rows.Count > 0)
             {
                 userId = Convert.ToInt32(ds.Tables[0].Rows[0][0]);
@@ -343,7 +344,6 @@ this.Init = function(id)
                     {
                         if (!ins)
                         {
-                            int oProvUserId = Convert.ToInt32(ocF.Value);
                             if (userId == oProvUserId && oProvUserId > 0)
                             {
                                 _d.RemoveKey("phprimary");
@@ -360,14 +360,16 @@ this.Init = function(id)
                             throw new FormException($"Unable to continue with {_d["email"]} and {_d["phprimary"]}", (int)HttpStatusCode.BadRequest, $"Email and Phone already exists for different users: {_d["email"]}, {_d["phprimary"]}", "EbProvisionUser => GetUserIdByEmailOrPhone");
                     }
                 }
-                else if (_d.ContainsKey("email") && _d["email"] != string.Empty)
+                else if (_d.ContainsKey("email") && _d["email"] != string.Empty && oProvUserId != userId2)
                 {
                     _d.RemoveKey("phprimary");
                     flag &= 1;
                     return 0;
                 }
+                else
+                    userId = userId2;
             }
-            else if (flag == 1 && _d.ContainsKey("phprimary") && _d["phprimary"] != string.Empty)
+            else if (flag == 1 && _d.ContainsKey("phprimary") && _d["phprimary"] != string.Empty && oProvUserId != userId)
             {
                 _d.RemoveKey("email");
                 flag &= 2;
