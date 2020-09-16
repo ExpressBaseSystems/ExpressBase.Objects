@@ -3,7 +3,9 @@ using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
+using ExpressBase.Objects.ServiceStack_Artifacts;
 using Newtonsoft.Json;
+using ServiceStack;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
@@ -93,6 +95,15 @@ namespace ExpressBase.Objects
         //    return @"<div eb-type='@toolName' class='tool'><i class='fa fa-map-marker'></i> Location Input </div>".Replace("@toolName", this.GetType().Name.Substring(2));
         //}
 
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]
+        public string DefaultApikey { get; set; }
+
+        public void GetDefaultApikey(JsonServiceClient ServiceClient)
+        {
+            this.DefaultApikey = ServiceClient.Get<string>(new GetDefaultMapApiKeyFromConnectionRequest());
+        }
+
         public override string GetBareHtml()
         {
             return @" 
@@ -150,8 +161,13 @@ namespace ExpressBase.Objects
         {
             get
             {
-                return @"let loc = $('#' + this.EbSid_CtxId).locationpicker('location');
-                        return loc.latitude + ',' + loc.longitude;";
+                return @"if (this.__mapVendor === 'osm'){
+                            return this.__mapMarker.getLatLng().lat + ',' + this.__mapMarker.getLatLng().lng;
+                        }
+                        else{
+                            let loc = $('#' + this.EbSid_CtxId).locationpicker('location');
+                            return loc.latitude + ',' + loc.longitude;
+                        }";
             }
             set { }
         }
@@ -161,10 +177,18 @@ namespace ExpressBase.Objects
         {
             get
             {
-                return @"if(p1){
-                            let tmp = p1.split(',');
-                            if(tmp.length === 2 && parseFloat(tmp[0]) && parseFloat(tmp[1]))
-                                $('#' + this.EbSid_CtxId).locationpicker('location', { latitude : parseFloat(tmp[0]), longitude : parseFloat(tmp[1])});
+                return @"if (p1){
+                            let tmp = p1.includes(',') ? p1.split(',') : p1.split('/');
+                            if (tmp.length === 2 && parseFloat(tmp[0]) && parseFloat(tmp[1])){
+                                if (this.__mapVendor === 'osm'){
+                                    this.__mapMarker.setLatLng([parseFloat(tmp[0]), parseFloat(tmp[1])]);
+                                    this.__map.setView(this.__mapMarker.getLatLng());
+                                    $('#' + this.EbSid_CtxId + 'lat').val(this.__mapMarker.getLatLng().lat);
+                                    $('#' + this.EbSid_CtxId + 'long').val(this.__mapMarker.getLatLng().lng);
+                                }
+                                else
+                                    $('#' + this.EbSid_CtxId).locationpicker('location', { latitude : parseFloat(tmp[0]), longitude : parseFloat(tmp[1])});                                
+                            }
                         };";
             }
             set { }
@@ -186,7 +210,7 @@ namespace ExpressBase.Objects
         {
             get
             {
-                return @"return $('#' + this.EbSid_CtxId).locationpicker('location').name;";
+                return @"if (this.__mapVendor === 'osm') return ''; else return $('#' + this.EbSid_CtxId).locationpicker('location').name;";
             }
             set { }
         }

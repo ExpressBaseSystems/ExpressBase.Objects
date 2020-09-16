@@ -326,6 +326,19 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class AddGoogleMapResponse : IEbSSResponse
     {
         public ResponseStatus ResponseStatus { get; set; }
+    }    
+    public class AddOpenStreetMapRequest : IReturn<AddGoogleMapResponse>, IEbTenentRequest
+    {
+        public OpenStreetMapConfig Config { get; set; }
+
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
+    }
+
+    public class AddOpenStreetMapResponse : IEbSSResponse
+    {
+        public ResponseStatus ResponseStatus { get; set; }
     }
 
     public class AddDropBoxRequest : IReturn<AddDropBoxResponse>, IEbTenentRequest
