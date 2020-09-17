@@ -192,24 +192,39 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public WebformData Data { set; get; }
     }
 
-    public class GetMyActionsRequest : EbServiceStackAuthRequest, IReturn<GetMyActionsResponse>
+    public class MyActionsRequest : EbServiceStackAuthRequest, IReturn<MyActionsResponse>
     {
 
     }
 
     [DataContract]
-    public class GetMyActionsResponse
+    public class MyActionsResponse
     {
         [DataMember(Order = 1)]
         public List<EbMyActionsMobile> Actions { get; set; }
 
-        public GetMyActionsResponse()
+        public MyActionsResponse()
         {
             Actions = new List<EbMyActionsMobile>();
         }
     }
 
-    public class GetMyActionInfoRequest : EbServiceStackAuthRequest, IReturn<GetMyActionInfoResponse>
+    public class ParticularActionsRequest : EbServiceStackAuthRequest, IReturn<ParticularActionResponse>
+    {
+        public int ActionId { set; get; }
+    }
+
+    [DataContract]
+    public class ParticularActionResponse
+    {
+        [DataMember(Order = 1)]
+        public EbMyActionsMobile Action { set; get; }
+
+        [DataMember(Order = 1)]
+        public MyActionInfoResponse ActionInfo { set; get; }
+    }
+
+    public class MyActionInfoRequest : EbServiceStackAuthRequest, IReturn<MyActionInfoResponse>
     {
         public int StageId { set; get; }
 
@@ -219,7 +234,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class GetMyActionInfoResponse
+    public class MyActionInfoResponse
     {
         [DataMember(Order = 1)]
         public string StageUniqueId { set; get; }
@@ -233,7 +248,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 4)]
         public List<Param> Data { set; get; }
 
-        public GetMyActionInfoResponse()
+        public MyActionInfoResponse()
         {
             StageActions = new List<EbStageActionsMobile>();
         }
