@@ -260,9 +260,17 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 5)]
         public bool DeployDB { get; set; }
 
+        [DataMember(Order = 6)]
         public string SolnId { get; set; }
 
+        [DataMember(Order = 7)]
         public bool IsFurther { get; set; }
+
+        [DataMember(Order = 8)]
+        public int PackageId { get; set; }
+
+        [DataMember(Order = 9)]
+        public string PrimarySId { get; set; }
     }
 
     [DataContract]
@@ -321,9 +329,11 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     [DataContract]
     public class CreateSolutionFurtherRequest : EbServiceStackAuthRequest, IReturn<CreateSolutionFurtherResponse>
     {
-        //    public int UserId { get; set; }
+        [DataMember(Order = 1)]
+        public int PackageId { get; set; }
 
-        //    public string SolnId { get; set; }
+        [DataMember(Order = 2)]
+        public string PrimarySId { get; set; }
     }
 
     [DataContract]
@@ -388,7 +398,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
 
         [DataMember(Order = 4)]
-        public List<EbSolutionsWrapper> Data { get; set; }
+        public List<EbSolutionsWrapper> AllSolutions { get; set; }
+
+        [DataMember(Order = 5)]
+        public List<EbSolutionsWrapper> PrimarySolutions { get; set; }
+
+        [DataMember(Order = 6)]
+        public List<AppStore> MasterPackages { get; set; }
     }
 
     [DataContract]
@@ -444,6 +460,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string OtpDelivery { get; set; }
 
         public SolutionSettings SolutionSettings { get; set; }
+
+        public SolutionType SolutionType { get; set; }
+
+        public string PrimarySolution { get; set; }
     }
 
     [DataContract]
