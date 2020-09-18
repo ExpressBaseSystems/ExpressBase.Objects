@@ -559,11 +559,11 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         public EbIntegrationConfData(EbDataRow _row)
         {
-            Id = Convert.ToInt32(_row[0]);
-            SolutionId = _row[1].ToString();
-            NickName = _row[2].ToString();
-            Type = _row[3].ToString();
-            CreatedOn = Convert.ToDateTime(_row[6]).ToString("dddd, dd MMMM yyyy");
+            Id = Convert.ToInt32(_row["id"]);
+            SolutionId = _row["solution_id"].ToString();
+            NickName = _row["nickname"].ToString();
+            Type = _row["type"].ToString();
+            CreatedOn = Convert.ToDateTime(_row["created_at"]).ToString("dddd, dd MMMM yyyy");
         }
 
         public EbIntegrationConfData() { }
@@ -585,13 +585,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         public EbIntegrationData(EbDataRow row)
         {
-            Id = row[10].ToString();
-            ConfId = row[14].ToString();
-            NickName = row[2].ToString();
-            Ctype = row[3].ToString();
-            Type = row[12].ToString();
-            Preference = row[13].ToString();
-            CreatedOn = Convert.ToDateTime(row[6]).ToString("dddd, dd MMMM yyyy");
+            Id = row["id"].ToString();
+            ConfId = row["confid"].ToString();
+            NickName = row["nickname"].ToString();
+            Ctype = row["ctype"].ToString();
+            Type = row["itype"].ToString();
+            Preference = row["preference"].ToString();
+            CreatedOn = Convert.ToDateTime(row["created_at"]).ToString("dddd, dd MMMM yyyy");
         }
         public string Id { get; set; }
 
