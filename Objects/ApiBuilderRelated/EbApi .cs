@@ -45,9 +45,9 @@ namespace ExpressBase.Objects
 
         public Param GetParam(string name)
         {
-            Param p = Default.Find(item=>item.Name == name);
+            Param p = Default.Find(item => item.Name == name);
 
-            if(p == null)
+            if (p == null)
             {
                 p = Custom.Find(item => item.Name == name);
             }
@@ -97,18 +97,28 @@ namespace ExpressBase.Objects
         public override List<string> DiscoverRelatedRefids()
         {
             List<string> refids = new List<string>();
+
             foreach (ApiResources resource in this.Resources)
-                if (resource.Reference != null || resource.Reference != string.Empty)
+            {
+                if (!string.IsNullOrEmpty(resource.Reference))
+                {
                     refids.Add(resource.Reference);
+                }
+            }
             return refids;
         }
         public override void ReplaceRefid(Dictionary<string, string> RefidMap)
         {
             foreach (ApiResources resource in this.Resources)
-                if (resource.Reference != null || resource.Reference != string.Empty)
+            {
+                if (!string.IsNullOrEmpty(resource.Reference))
+                {
                     if (RefidMap.ContainsKey(resource.Reference))
+                    {
                         resource.Reference = RefidMap[resource.Reference];
-                    else resource.Reference = "failed-to-update-";
+                    }
+                }
+            }
         }
     }
 
