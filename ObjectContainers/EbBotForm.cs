@@ -65,8 +65,19 @@ namespace ExpressBase.Objects
             }
             set { }
         }
+		
+		[EnableInBuilder( BuilderType.BotForm)]
+		[PropertyEditor(PropertyEditorType.Color)]
+		[Alias("Tile Background Color")]
+		public string TileColor { get; set; }
 
-        [EnableInBuilder(BuilderType.BotForm)]
+		[EnableInBuilder( BuilderType.BotForm)]
+		[PropertyEditor(PropertyEditorType.Color)]
+		[Alias("Tile Text Color")]
+		public string TileTextColor { get; set; }
+
+
+		[EnableInBuilder(BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.IconPicker)]
         public string IconPicker { get; set; }
 
