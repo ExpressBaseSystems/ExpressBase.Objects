@@ -131,164 +131,175 @@ else if(this.NotifyBy === 3)
             if (_this.Notifications?.Count == 0)
                 return 0;
             int resp = 0;
-            FG_Root globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(_this, _this.FormData, _this.FormDataBackup);
-            foreach (EbFormNotification ebFn in _this.Notifications)
+            try
             {
-                if (!string.IsNullOrEmpty(ebFn.SendOnlyIf?.Code))
+                FG_Root globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(_this, _this.FormData, _this.FormDataBackup);
+                foreach (EbFormNotification ebFn in _this.Notifications)
                 {
-                    object soi = _this.ExecuteCSharpScriptNew(ebFn.SendOnlyIf.Code, globals);
-                    if (!(soi is bool && Convert.ToBoolean(soi)))
-                        continue;
-                }
-                if (ebFn is EbFnSystem)
-                {
-                    EbFnSystem ebFnSys = ebFn as EbFnSystem;
-                    string message = "Notification from " + _this.DisplayName;
-                    if (!string.IsNullOrEmpty(ebFnSys.Message?.Code))
+                    if (!string.IsNullOrEmpty(ebFn.SendOnlyIf?.Code))
                     {
-                        object msg = _this.ExecuteCSharpScriptNew(ebFnSys.Message.Code, globals);
-                        message = msg.ToString();
+                        object soi = _this.ExecuteCSharpScriptNew(ebFn.SendOnlyIf.Code, globals);
+                        if (!(soi is bool && Convert.ToBoolean(soi)))
+                            continue;
                     }
-                    List<Param> plist = new List<Param> { { new Param { Name = "id", Type = ((int)EbDbTypes.Int32).ToString(), Value = _this.TableRowId.ToString() } } };
-                    string _params = JsonConvert.SerializeObject(plist).ToBase64();
-                    string link = $"/WebForm/Index?refId={_this.RefId}&_params={_params}&_mode=1";
+                    if (ebFn is EbFnSystem)
+                    {
+                        EbFnSystem ebFnSys = ebFn as EbFnSystem;
+                        string message = "Notification from " + _this.DisplayName;
+                        if (!string.IsNullOrEmpty(ebFnSys.Message?.Code))
+                        {
+                            object msg = _this.ExecuteCSharpScriptNew(ebFnSys.Message.Code, globals);
+                            message = msg.ToString();
+                        }
+                        List<Param> plist = new List<Param> { { new Param { Name = "id", Type = ((int)EbDbTypes.Int32).ToString(), Value = _this.TableRowId.ToString() } } };
+                        string _params = JsonConvert.SerializeObject(plist).ToBase64();
+                        string link = $"/WebForm/Index?refId={_this.RefId}&_params={_params}&_mode=1";
 
-                    if (ebFnSys.NotifyBy == EbFnSys_NotifyBy.Roles)
-                    {
-                        try
-                        {
-                            NotifyByUserRoleResponse result = service.Gateway.Send<NotifyByUserRoleResponse>(new NotifyByUserRoleRequest
-                            {
-                                Link = link,
-                                Title = message,
-                                RoleID = ebFnSys.Roles
-                            });
-                        }
-                        catch(Exception ex)
-                        {
-                            string temp = $"Exception when tried to send EbFnSys_NotifyBy.Roles\n Message: ${ex.Message} \nLink: ${link} \nTitle: ${message} \nRolesId: ${(ebFnSys?.Roles == null? "null": string.Join(",", ebFnSys.Roles))} \nStackTrace: ${ex.StackTrace}";
-                            Console.WriteLine(temp);
-                            throw new FormException($"Unable to process notification.", (int)HttpStatusCode.InternalServerError, ex.Message, temp);
-                        }
-                        resp++;
-                    }
-                    else if (ebFnSys.NotifyBy == EbFnSys_NotifyBy.UserGroup)
-                    {
-                        try
-                        {
-                            NotifyByUserGroupResponse result = service.Gateway.Send<NotifyByUserGroupResponse>(new NotifyByUserGroupRequest
-                            {
-                                Link = link,
-                                Title = message,
-                                GroupId = new List<int> { ebFnSys.UserGroup }
-                            });
-                        }
-                        catch(Exception ex)
-                        {
-                            string temp = $"Exception when tried to send EbFnSys_NotifyBy.UserGroup\n Message: ${ex.Message} \nLink: ${link} \nTitle: ${message} \nGroupId: ${ebFnSys.UserGroup} \nStackTrace: ${ex.StackTrace}";
-                            Console.WriteLine(temp);
-                            throw new FormException($"Unable to process notification.", (int)HttpStatusCode.InternalServerError, ex.Message, temp);
-                        }
-                        resp++;
-                    }
-                    else if (ebFnSys.NotifyBy == EbFnSys_NotifyBy.Users)
-                    {
-                        string t1 = string.Empty, t2 = string.Empty, t3 = string.Empty;
-                        List<DbParameter> _p = new List<DbParameter>();
-                        int _idx = 0;
-                        foreach (KeyValuePair<string, string> p in ebFnSys.QryParams)
-                        {
-                            SingleTable Table = null;
-                            if (_this.FormData.MultipleTables.ContainsKey(p.Value))
-                                Table = _this.FormData.MultipleTables[p.Value];
-                            else if (_this.FormDataBackup?.MultipleTables.ContainsKey(p.Value) == true)
-                                Table = _this.FormDataBackup.MultipleTables[p.Value];
-                            else
-                                throw new FormException("Bad Request", (int)HttpStatusCode.BadRequest, $"SendNotifications: Notify by UserId parameter {p.Key} is not idetified", $"{p.Value} not found in MultipleTables");
-                            TableSchema _table = _this.FormSchema.Tables.Find(e => e.TableName == p.Value);
-                            if (_table.TableType != WebFormTableTypes.Normal)
-                                throw new FormException("Bad Request", (int)HttpStatusCode.BadRequest, $"SendNotifications: Notify by UserId parameter {p.Key} is not idetified", $"{p.Value} found in MultipleTables but it is not a normal table");
-                            if (Table.Count != 1)
-                                throw new FormException("Bad Request", (int)HttpStatusCode.BadRequest, $"SendNotifications: Notify by UserId parameter {p.Key} is not idetified", $"{p.Value} found in MultipleTables but table is empty");
-                            SingleColumn Column = Table[0].Columns.Find(e => e.Control?.Name == p.Key);
-                            if (Column?.Control == null)
-                                throw new FormException("Bad Request", (int)HttpStatusCode.BadRequest, $"SendNotifications: Notify by UserId parameter {p.Key} is not idetified", $"{p.Value} found in MultipleTables but data not available");
-
-                            Column.Control.ParameterizeControl(DataDB, _p, null, Column, true, ref _idx, ref t1, ref t2, ref t3, _this.UserObj, null);
-                            _p[_idx - 1].ParameterName = p.Key;
-                        }
-                        List<int> uids = new List<int>();
-                        EbDataTable dt = DataDB.DoQuery(ebFnSys.Users.Code, _p.ToArray());
-                        foreach (EbDataRow dr in dt.Rows)
-                        {
-                            int.TryParse(dr[0].ToString(), out int temp);
-                            if (!uids.Contains(temp))
-                                uids.Add(temp);
-                        }
-                        foreach (int uid in uids)
+                        if (ebFnSys.NotifyBy == EbFnSys_NotifyBy.Roles)
                         {
                             try
                             {
-                                NotifyByUserIDResponse result = service.Gateway.Send<NotifyByUserIDResponse>(new NotifyByUserIDRequest
+                                NotifyByUserRoleResponse result = service.Gateway.Send<NotifyByUserRoleResponse>(new NotifyByUserRoleRequest
                                 {
                                     Link = link,
                                     Title = message,
-                                    UsersID = uid
+                                    RoleID = ebFnSys.Roles
                                 });
                             }
                             catch (Exception ex)
                             {
-                                string temp = $"Exception when tried to send EbFnSys_NotifyBy.Users\n Message: ${ex.Message} \nLink: ${link} \nTitle: ${message} \nUserId: ${uid} \nStackTrace: ${ex.StackTrace}";
-                                Console.WriteLine(temp);
+                                string temp = $"Exception when tried to send EbFnSys_NotifyBy.Roles\n Message: ${ex.Message} \nLink: ${link} \nTitle: ${message} \nRolesId: ${(ebFnSys?.Roles == null ? "null" : string.Join(",", ebFnSys.Roles))} \nStackTrace: ${ex.StackTrace}";
+                                //Console.WriteLine(temp);
                                 throw new FormException($"Unable to process notification.", (int)HttpStatusCode.InternalServerError, ex.Message, temp);
                             }
-                        }
-                        if (uids.Count > 0)
                             resp++;
-                    }
-                }
-                else if (ebFn is EbFnEmail && !string.IsNullOrEmpty((ebFn as EbFnEmail).RefId))
-                {
-                    try
-                    {
-                        service.Gateway.Send<EmailAttachmenResponse>(new EmailTemplateWithAttachmentMqRequest
+                        }
+                        else if (ebFnSys.NotifyBy == EbFnSys_NotifyBy.UserGroup)
                         {
-                            RefId = (ebFn as EbFnEmail).RefId,
-                            Params = new List<Param> { { new Param { Name = "id", Type = ((int)EbDbTypes.Int32).ToString(), Value = _this.TableRowId.ToString() } } },
-                            SolnId = _this.SolutionObj.SolutionID,
-                            UserAuthId = _this.UserObj.AuthId,
-                            UserId = _this.UserObj.UserId
-                        });
-                    }
-                    catch (Exception ex)
-                    {
-                        string temp = $"Exception when tried to send EbFnEmail\n Message: ${ex.Message} \nRefId: ${(ebFn as EbFnEmail).RefId} \nStackTrace: ${ex.StackTrace}";
-                        Console.WriteLine(temp);
-                        throw new FormException($"Unable to process notification.", (int)HttpStatusCode.InternalServerError, ex.Message, temp);
-                    }
-                    resp++;
-                }
-                if (ebFn is EbFnSms && !string.IsNullOrEmpty((ebFn as EbFnSms).RefId))
-                {
-                    try
-                    {
-                        service.Gateway.Send<EmailAttachmenResponse>(new SMSInitialRequest
+                            try
+                            {
+                                NotifyByUserGroupResponse result = service.Gateway.Send<NotifyByUserGroupResponse>(new NotifyByUserGroupRequest
+                                {
+                                    Link = link,
+                                    Title = message,
+                                    GroupId = new List<int> { ebFnSys.UserGroup }
+                                });
+                            }
+                            catch (Exception ex)
+                            {
+                                string temp = $"Exception when tried to send EbFnSys_NotifyBy.UserGroup\n Message: ${ex.Message} \nLink: ${link} \nTitle: ${message} \nGroupId: ${ebFnSys.UserGroup} \nStackTrace: ${ex.StackTrace}";
+                                //Console.WriteLine(temp);
+                                throw new FormException($"Unable to process notification.", (int)HttpStatusCode.InternalServerError, ex.Message, temp);
+                            }
+                            resp++;
+                        }
+                        else if (ebFnSys.NotifyBy == EbFnSys_NotifyBy.Users)
                         {
-                            RefId = (ebFn as EbFnSms).RefId,
-                            Params = new List<Param> { { new Param { Name = "id", Type = ((int)EbDbTypes.Int32).ToString(), Value = _this.TableRowId.ToString() } } },
-                            SolnId = _this.SolutionObj.SolutionID,
-                            UserAuthId = _this.UserObj.AuthId,
-                            UserId = _this.UserObj.UserId
-                        });
+                            string t1 = string.Empty, t2 = string.Empty, t3 = string.Empty;
+                            List<DbParameter> _p = new List<DbParameter>();
+                            int _idx = 0;
+                            foreach (KeyValuePair<string, string> p in ebFnSys.QryParams)
+                            {
+                                SingleTable Table = null;
+                                if (_this.FormData.MultipleTables.ContainsKey(p.Value))
+                                    Table = _this.FormData.MultipleTables[p.Value];
+                                else if (_this.FormDataBackup?.MultipleTables.ContainsKey(p.Value) == true)
+                                    Table = _this.FormDataBackup.MultipleTables[p.Value];
+                                else
+                                    throw new FormException("Bad Request", (int)HttpStatusCode.BadRequest, $"SendNotifications: Notify by UserId parameter {p.Key} is not idetified", $"{p.Value} not found in MultipleTables");
+                                TableSchema _table = _this.FormSchema.Tables.Find(e => e.TableName == p.Value);
+                                if (_table.TableType != WebFormTableTypes.Normal)
+                                    throw new FormException("Bad Request", (int)HttpStatusCode.BadRequest, $"SendNotifications: Notify by UserId parameter {p.Key} is not idetified", $"{p.Value} found in MultipleTables but it is not a normal table");
+                                if (Table.Count != 1)
+                                    throw new FormException("Bad Request", (int)HttpStatusCode.BadRequest, $"SendNotifications: Notify by UserId parameter {p.Key} is not idetified", $"{p.Value} found in MultipleTables but table is empty");
+                                SingleColumn Column = Table[0].Columns.Find(e => e.Control?.Name == p.Key);
+                                if (Column?.Control == null)
+                                    throw new FormException("Bad Request", (int)HttpStatusCode.BadRequest, $"SendNotifications: Notify by UserId parameter {p.Key} is not idetified", $"{p.Value} found in MultipleTables but data not available");
+
+                                Column.Control.ParameterizeControl(DataDB, _p, null, Column, true, ref _idx, ref t1, ref t2, ref t3, _this.UserObj, null);
+                                _p[_idx - 1].ParameterName = p.Key;
+                            }
+                            List<int> uids = new List<int>();
+                            EbDataTable dt = DataDB.DoQuery(ebFnSys.Users.Code, _p.ToArray());
+                            foreach (EbDataRow dr in dt.Rows)
+                            {
+                                int.TryParse(dr[0].ToString(), out int temp);
+                                if (!uids.Contains(temp))
+                                    uids.Add(temp);
+                            }
+                            foreach (int uid in uids)
+                            {
+                                try
+                                {
+                                    NotifyByUserIDResponse result = service.Gateway.Send<NotifyByUserIDResponse>(new NotifyByUserIDRequest
+                                    {
+                                        Link = link,
+                                        Title = message,
+                                        UsersID = uid
+                                    });
+                                }
+                                catch (Exception ex)
+                                {
+                                    string temp = $"Exception when tried to send EbFnSys_NotifyBy.Users\n Message: ${ex.Message} \nLink: ${link} \nTitle: ${message} \nUserId: ${uid} \nStackTrace: ${ex.StackTrace}";
+                                    //Console.WriteLine(temp);
+                                    throw new FormException($"Unable to process notification.", (int)HttpStatusCode.InternalServerError, ex.Message, temp);
+                                }
+                            }
+                            if (uids.Count > 0)
+                                resp++;
+                        }
                     }
-                    catch (Exception ex)
+                    else if (ebFn is EbFnEmail && !string.IsNullOrEmpty((ebFn as EbFnEmail).RefId))
                     {
-                        string temp = $"Exception when tried to send EbFnSms\n Message: ${ex.Message} \nRefId: ${(ebFn as EbFnSms).RefId} \nStackTrace: ${ex.StackTrace}";
-                        Console.WriteLine(temp);
-                        throw new FormException($"Unable to process notification.", (int)HttpStatusCode.InternalServerError, ex.Message, temp);
+                        try
+                        {
+                            service.Gateway.Send<EmailAttachmenResponse>(new EmailTemplateWithAttachmentMqRequest
+                            {
+                                RefId = (ebFn as EbFnEmail).RefId,
+                                Params = new List<Param> { { new Param { Name = "id", Type = ((int)EbDbTypes.Int32).ToString(), Value = _this.TableRowId.ToString() } } },
+                                SolnId = _this.SolutionObj.SolutionID,
+                                UserAuthId = _this.UserObj.AuthId,
+                                UserId = _this.UserObj.UserId
+                            });
+                        }
+                        catch (Exception ex)
+                        {
+                            string temp = $"Exception when tried to send EbFnEmail\n Message: ${ex.Message} \nRefId: ${(ebFn as EbFnEmail).RefId} \nStackTrace: ${ex.StackTrace}";
+                            //Console.WriteLine(temp);
+                            throw new FormException($"Unable to process notification.", (int)HttpStatusCode.InternalServerError, ex.Message, temp);
+                        }
+                        resp++;
                     }
-                    resp++;
+                    if (ebFn is EbFnSms && !string.IsNullOrEmpty((ebFn as EbFnSms).RefId))
+                    {
+                        try
+                        {
+                            service.Gateway.Send<EmailAttachmenResponse>(new SMSInitialRequest
+                            {
+                                RefId = (ebFn as EbFnSms).RefId,
+                                Params = new List<Param> { { new Param { Name = "id", Type = ((int)EbDbTypes.Int32).ToString(), Value = _this.TableRowId.ToString() } } },
+                                SolnId = _this.SolutionObj.SolutionID,
+                                UserAuthId = _this.UserObj.AuthId,
+                                UserId = _this.UserObj.UserId
+                            });
+                        }
+                        catch (Exception ex)
+                        {
+                            string temp = $"Exception when tried to send EbFnSms\n Message: ${ex.Message} \nRefId: ${(ebFn as EbFnSms).RefId} \nStackTrace: ${ex.StackTrace}";
+                            //Console.WriteLine(temp);
+                            throw new FormException($"Unable to process notification.", (int)HttpStatusCode.InternalServerError, ex.Message, temp);
+                        }
+                        resp++;
+                    }
                 }
+            }
+            catch (FormException ex)
+            {
+                Console.WriteLine($"Exception: {ex.Message}\nCode: {ex.ExceptionCode}\nMessageInternal: {ex.MessageInternal}\nStackTraceInteranl: {ex.StackTraceInternal}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception: {ex.Message}\nStackTrace: {ex.StackTrace}");
             }
             return resp;
         }

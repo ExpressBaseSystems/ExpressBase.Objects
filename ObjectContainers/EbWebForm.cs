@@ -1553,10 +1553,10 @@ namespace ExpressBase.Objects
                 resp += " - AuditTrail: " + ebAuditTrail.UpdateAuditTrail();
                 Console.WriteLine("EbWebForm.Save.AfterSave start");
                 resp += " - AfterSave: " + this.AfterSave(DataDB, IsUpdate);
-                Console.WriteLine("EbWebForm.Save.SendNotifications start");
-                resp += " - Notifications: " + EbFnGateway.SendNotifications(this, DataDB, service);
                 this.DbTransaction.Commit();
                 Console.WriteLine("EbWebForm.Save.DbTransaction Committed");
+                Console.WriteLine("EbWebForm.Save.SendNotifications start");
+                resp += " - Notifications: " + EbFnGateway.SendNotifications(this, DataDB, service);
             }
             catch (FormException ex1)
             {
