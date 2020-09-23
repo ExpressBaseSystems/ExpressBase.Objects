@@ -58,10 +58,15 @@ namespace ExpressBase.Objects.WebFormRelated
             bool MuCtrlFound = false;
             foreach (EbControl Ctrl in _this.FormSchema.ExtendedControls)
             {
-                if (Ctrl is EbProvisionUser && !MuCtrlFound)
+                if (Ctrl is EbProvisionUser)
                 {
-                    extquery += (Ctrl as EbProvisionUser).GetSelectQuery(_this.FormSchema.MasterTable);
-                    MuCtrlFound = true;
+                    if (!MuCtrlFound)
+                    {
+                        extquery += (Ctrl as EbProvisionUser).GetSelectQuery(_this.FormSchema.MasterTable);
+                        MuCtrlFound = true;
+                        _qryCount++;
+                    }
+                    extquery += (Ctrl as EbProvisionUser).GetMappedUserQuery(_this.FormSchema.MasterTable);
                     _qryCount++;
                 }
                 else if (Ctrl is EbProvisionLocation)

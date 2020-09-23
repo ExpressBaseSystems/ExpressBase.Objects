@@ -392,16 +392,31 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class UniqueCheckRequest
     {
         [DataMember(Order = 1)]
-        public string email { get; set; }
+        public string Value { get; set; }
 
         [DataMember(Order = 2)]
+        public int Id { get; set; }
+
+        [DataMember(Order = 3)]
+        public UniqueCheckQueryId QryId { get; set; }
+
+        [DataMember(Order = 4)]
+        public string email { get; set; }
+
+        [DataMember(Order = 5)]
         public string roleName { get; set; }
     }
     public class UniqueCheckResponse
     {
         [DataMember(Order = 1)]
         public bool unrespose { get; set; }
+    }
 
+    public enum UniqueCheckQueryId
+    {
+        eb_users__email = 1,
+        eb_users__phnoprimary,
+        eb_roles__role_name
     }
 
     [DataContract]

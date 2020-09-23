@@ -1172,10 +1172,10 @@ namespace ExpressBase.Objects
                             EbProvisionUser provUser = Ctrl as EbProvisionUser;
                             SingleColumn Column = _FormData.MultipleTables[provUser.VirtualTable][0].GetColumn(Ctrl.Name);
                             if (UserTable == null)
+                            {
                                 UserTable = Table;
-                            else
-                                tableIndex--; //one query is used to select required user records
-
+                                tableIndex++; //one query is used to select required user records
+                            }
                             SingleRow Row_U = null;
                             foreach (SingleRow R in UserTable)
                             {
@@ -1195,6 +1195,15 @@ namespace ExpressBase.Objects
                                     if (Row_U[pArr[k].Name] != null)
                                         _d.Add(pArr[k].Name, Row_U[pArr[k].Name]);
                                 }
+                            }
+                            SingleTable map_Table = new SingleTable();
+                            this.GetFormattedData(dataset.Tables[tableIndex], map_Table);
+                            if (map_Table.Count > 0)
+                            {
+                                _d.Add("map_" + FormConstants.id, map_Table[0][FormConstants.id]);
+                                _d.Add("map_" + FormConstants.fullname, map_Table[0][FormConstants.fullname]);
+                                _d.Add("map_" + FormConstants.email, map_Table[0][FormConstants.email]);
+                                _d.Add("map_" + FormConstants.phprimary, map_Table[0][FormConstants.phprimary]);
                             }
                             Column.F = JsonConvert.SerializeObject(_d);
                         }

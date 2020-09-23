@@ -559,7 +559,6 @@ namespace ExpressBase.Objects
 
             Dictionary<string, SingleTable> Tables = new Dictionary<string, SingleTable>();
             SingleColumn Column;
-            List<string> urlParts = new List<string>();
 
             foreach (Param param in ApiParamsList)
             {
@@ -573,10 +572,7 @@ namespace ExpressBase.Objects
                         break;
                 }
                 if (Column != null)
-                {
                     param.Value = Convert.ToString(Column.Value);
-                    urlParts.Add(param.Name + "=" + Column.Value);
-                }
                 else
                     Console.WriteLine("Api parameter not found in webformdata: " + param.Name);
             }
@@ -584,7 +580,7 @@ namespace ExpressBase.Objects
             {
                 ApiConversionResponse apiResp = service.Gateway.Send<ApiConversionResponse>(new ApiConversionRequest
                 {
-                    Url = ApiUrl + "?" + string.Join('&', urlParts),
+                    Url = ApiUrl,
                     Headers = ApiHeaders,
                     Method = ApiMethod,
                     Parameters = ApiParamsList
