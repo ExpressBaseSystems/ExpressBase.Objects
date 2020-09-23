@@ -154,6 +154,9 @@ namespace ExpressBase.Objects
             if (!string.IsNullOrEmpty(AutoGenMVRefid))
                 related.Add(AutoGenMVRefid);
 
+            if (!string.IsNullOrEmpty(RenderValidatorRefId))
+                related.Add(RenderValidatorRefId);
+
             foreach (EbMobileControl ctrl in this.ChildControls)
             {
                 related.AddRange(ctrl.DiscoverRelatedRefids());
@@ -168,6 +171,9 @@ namespace ExpressBase.Objects
 
             if (!string.IsNullOrEmpty(AutoGenMVRefid) && map.TryGetValue(AutoGenMVRefid, out string agr))
                 this.AutoGenMVRefid = agr;
+
+            if (!string.IsNullOrEmpty(RenderValidatorRefId) && map.TryGetValue(RenderValidatorRefId, out string rev))
+                this.RenderValidatorRefId = rev;
 
             foreach (EbMobileControl ctrl in this.ChildControls)
             {
