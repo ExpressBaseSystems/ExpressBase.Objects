@@ -354,6 +354,19 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         public ResponseStatus ResponseStatus { get; set; }
     }
+    public class MobileConfigRequest : IReturn<MobileConfigResponse>, IEbTenentRequest
+    {
+        public MobileConfig Config { get; set; }
+
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
+    }
+
+    public class MobileConfigResponse : IEbSSResponse
+    {
+        public ResponseStatus ResponseStatus { get; set; }
+    }
 
     public class AddAWSS3Request : IReturn<AddDropBoxResponse>, IEbTenentRequest
     {
