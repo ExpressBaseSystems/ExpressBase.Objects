@@ -121,6 +121,9 @@ namespace ExpressBase.Objects
         public bool ShowRowSeperator { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
+        public bool HideContext { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.Expandable)]
         [PropertyGroup("List Styles")]
         public EbThickness Margin { set; get; }
