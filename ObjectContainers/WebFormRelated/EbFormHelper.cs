@@ -294,6 +294,7 @@ namespace ExpressBase.Objects
                 _ebObject = EbSerializers.Json_Deserialize(resp.Data[0].Json);
                 if (Redis != null) Redis.Set<T>(RefId, _ebObject);
             }
+            (_ebObject as EbObject).RefId = RefId;// temp fix (sometimes refid missing from ebObject)
             return _ebObject;
         }
 
