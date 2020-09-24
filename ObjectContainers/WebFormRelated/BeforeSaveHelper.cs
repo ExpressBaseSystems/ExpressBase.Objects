@@ -503,7 +503,10 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                     {
                         KeyValuePair<int, EbControlWrapper> item = _dict.FirstOrDefault(e => !(e.Value.Control is EbDGColumn) && e.Value.Control.Name == _p.Name);
                         if (item.Value != null)
-                            item.Value.Control.DrDependents.Add(_dict[i].Path);
+                        {
+                            if (item.Key != i)
+                                item.Value.Control.DrDependents.Add(_dict[i].Path);
+                        }
                         else if (_p.Name != "eb_loc_id" && _p.Name != "eb_currentuser_id" && _p.Name != "id" && _p.Name != _Form.TableName + "_id")
                             throw new FormException($"Can't resolve parameter {_p.Name} in data reader of {_dict[i].Control.Name}");
                     }
