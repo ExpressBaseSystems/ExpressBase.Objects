@@ -14,6 +14,11 @@ using System.Collections.Generic;
 using System.Data.Common;
 using Oracle.ManagedDataAccess.Client;
 using System.Net;
+using System.Linq;
+using System.Text.RegularExpressions;
+using ExpressBase.Common.NotificationHubs;
+using System.Threading.Tasks;
+using ExpressBase.Common.Constants;
 
 namespace ExpressBase.Objects
 {
@@ -36,6 +41,8 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
         public EbScript SendOnlyIf { get; set; }
+
+        public virtual void BeforeSaveValidation(Dictionary<int, EbControlWrapper> _dict) { }
     }
 
     [Alias("System")]
@@ -86,6 +93,37 @@ else if(this.NotifyBy === 3)
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
         [HideInPropertyGrid]
         public Dictionary<string, string> QryParams { get; set; }//<param, table>
+
+        public override void BeforeSaveValidation(Dictionary<int, EbControlWrapper> _dict) 
+        {
+            if (this.NotifyBy == EbFnSys_NotifyBy.Roles)
+            {
+                if (!(this.Roles?.FindAll(e => e > 0).Count() > 0))
+                    throw new FormException("Invalid roles found for system notification");
+            }
+            else if (this.NotifyBy == EbFnSys_NotifyBy.UserGroup)
+            {
+                if (this.UserGroup <= 0)
+                    throw new FormException("Invalid user group found for system notification");
+            }
+            else if (this.NotifyBy == EbFnSys_NotifyBy.Users)
+            {
+                this.QryParams = new Dictionary<string, string>();//<param, table>
+                if (string.IsNullOrEmpty(this.Users?.Code))
+                    throw new FormException("Required SQL query for system notification");
+                MatchCollection matchColl = Regex.Matches(this.Users.Code, @"(?<=@)(\w+)|(?<=:)(\w+)");
+                foreach (Match match in matchColl)
+                {
+                    KeyValuePair<int, EbControlWrapper> item = _dict.FirstOrDefault(e => e.Value.Control.Name == match.Value);
+                    if (item.Value == null)
+                        throw new FormException($"Can't resolve {match.Value} in SQL query of system notification");
+                    if (!this.QryParams.ContainsKey(item.Value.Control.Name))
+                        this.QryParams.Add(item.Value.Control.Name, item.Value.TableName);
+                }
+            }
+            else
+                throw new FormException("Invalid NotifyBy found for system notification");
+        }
     }
 
     [Alias("Email")]
@@ -99,6 +137,12 @@ else if(this.NotifyBy === 3)
         [OSE_ObjectTypes(EbObjectTypes.iEmailBuilder)]
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
         public string RefId { get; set; }
+
+        public override void BeforeSaveValidation(Dictionary<int, EbControlWrapper> _dict)
+        {
+            if (string.IsNullOrEmpty(this.RefId))
+                throw new FormException($"Invalid Ref id found for email notification");
+        }
     }
 
     [Alias("Sms")]
@@ -112,10 +156,34 @@ else if(this.NotifyBy === 3)
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
         public string RefId { get; set; }
 
-
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
-        public string Test3 { get; set; }
+        public override void BeforeSaveValidation(Dictionary<int, EbControlWrapper> _dict)
+        {
+            if (string.IsNullOrEmpty(this.RefId))
+                throw new FormException($"Invalid Ref id found for SMS notification");
+        }
     }
+
+    //[Alias("Mobile")]
+    //[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+    //public class EbFnPns : EbFormNotification
+    //{
+    //    public EbFnPns() { }
+
+    //    //[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+    //    [HideInPropertyGrid]
+    //    public override EbScript SendOnlyIf { get; set; }
+
+    //    public string Title { set; get; }
+
+    //    public string Message { set; get; }
+
+    //    public int ActionId { set; get; }
+
+    //    public override void BeforeSaveValidation(Dictionary<int, EbControlWrapper> _dict)
+    //    {
+    //        throw new FormException($"Mobile notification is under development.");
+    //    }
+    //}
 
     public enum EbFnSys_NotifyBy
     {
@@ -303,5 +371,86 @@ else if(this.NotifyBy === 3)
             }
             return resp;
         }
+
+        public static async Task<EbNFResponse> SendMobileNotification(EbWebForm _this, EbConnectionFactory EbConFactory)
+        {
+            EbNFResponse resp = new EbNFResponse("0");
+            try
+            {
+                if (_this.MyActNotification != null)
+                {
+                    List<int> userIds = new List<int>();
+                    if (_this.MyActNotification.ApproverEntity == ApproverEntityTypes.Users)
+                    {
+                        userIds = _this.MyActNotification.UserIds;
+                    }
+                    else if (_this.MyActNotification.ApproverEntity == ApproverEntityTypes.Role || _this.MyActNotification.ApproverEntity == ApproverEntityTypes.UserGroup)
+                    {
+                        string Qry;
+                        if (_this.MyActNotification.ApproverEntity == ApproverEntityTypes.Role)
+                            Qry = $"SELECT user_id FROM eb_role2user WHERE role_id = ANY(STRING_TO_ARRAY('{_this.MyActNotification.RoleIds.Join(",")}'::TEXT, ',')::INT[]) AND COALESCE(eb_del, 'F') = 'F'; ";
+                        else
+                            Qry = $"SELECT userid FROM eb_user2usergroup WHERE groupid = {_this.MyActNotification.UserGroupId} AND COALESCE(eb_del, 'F') = 'F'; ";
+
+                        EbDataTable dt = EbConFactory.DataDB.DoQuery(Qry);
+                        foreach (EbDataRow dr in dt.Rows)
+                        {
+                            int.TryParse(dr[0].ToString(), out int temp);
+                            if (!userIds.Contains(temp))
+                                userIds.Add(temp);
+                        }
+                    }
+                    else
+                        throw new Exception("Invalid approver entity: " + _this.MyActNotification.ApproverEntity);
+
+                    if (userIds.Count == 0)
+                        throw new Exception("User Id collection is empty");
+
+                    List<string> userAuthIds = new List<string>();
+                    EbNFData Data = new EbNFData()
+                    {
+                        Title = _this.MyActNotification.Title,
+                        Message = _this.MyActNotification.Description,
+                        Link = new EbNFLink()
+                        {
+                            LinkType = EbNFLinkTypes.Action,
+                            ActionId = _this.MyActNotification.MyActionId
+                        }
+                    };
+
+                    EbAzureNFClient client = EbAzureNFClient.Create(EbConFactory.MobileAppConnection);
+                    foreach (int uid in userIds)
+                        userAuthIds.Add(client.ConvertToAuthTag(_this.SolutionObj.SolutionID + CharConstants.COLON + uid + CharConstants.COLON + TokenConstants.MC));
+
+                    EbNFRequest req = new EbNFRequest()
+                    {
+                        Platform = PNSPlatforms.GCM,
+                        Tags = userAuthIds
+                    };
+                    req.SetPayload(new EbNFDataTemplateAndroid() { Data = Data });
+
+                    resp = await client.Send(req);
+                }
+            }
+            catch(Exception ex)
+            {
+                resp.Message = ex.Message;
+                Console.WriteLine("Exception in SendMobileNotification: " + ex.Message);
+            }
+            return resp;
+        }
+    }
+
+
+    public class MyActionNotification
+    {
+        public int MyActionId { get; set; }
+        public string Title { get; set; }
+        public string Description { get; set; }
+
+        public ApproverEntityTypes ApproverEntity { get; set; }
+        public List<int> UserIds { get; set; }
+        public List<int> RoleIds { get; set; }
+        public int UserGroupId { get; set; }
     }
 }

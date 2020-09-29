@@ -79,6 +79,8 @@ namespace ExpressBase.Objects
 
         public int DraftId { get; set; }
 
+        public MyActionNotification MyActNotification { get; set; }
+
         internal DbConnection DbConnection { get; set; }
 
         private DbTransaction DbTransaction { get; set; }
@@ -1267,6 +1269,10 @@ namespace ExpressBase.Objects
                                             new SingleColumn{ Name = "has_permission", Type = (int)EbDbTypes.String, Value = hasPerm ? "T" : "F"}
                                         }
                                     });
+                                    if (this.MyActNotification != null)
+                                    {
+                                        this.MyActNotification.MyActionId = Convert.ToInt32(Table[0]["id"]);
+                                    }
                                 }
 
                             }
@@ -1525,8 +1531,9 @@ namespace ExpressBase.Objects
         }
 
         //Normal save
-        public string Save(IDatabase DataDB, Service service)
+        public string Save(EbConnectionFactory EbConFactory, Service service)
         {
+            IDatabase DataDB = EbConFactory.DataDB;
             this.DbConnection = DataDB.GetNewConnection();
             string resp;
             try
@@ -1557,6 +1564,7 @@ namespace ExpressBase.Objects
                 Console.WriteLine("EbWebForm.Save.DbTransaction Committed");
                 Console.WriteLine("EbWebForm.Save.SendNotifications start");
                 resp += " - Notifications: " + EbFnGateway.SendNotifications(this, DataDB, service);
+                EbFnGateway.SendMobileNotification(this, EbConFactory);
             }
             catch (FormException ex1)
             {
@@ -1693,7 +1701,7 @@ namespace ExpressBase.Objects
             this.FormCollection.Update(DataDB, param, ref fullqry, ref _extqry, ref i);
 
             fullqry += _extqry;
-            fullqry += GetFileUploaderUpdateQuery(DataDB, param, ref i);
+            fullqry += this.GetFileUploaderUpdateQuery(DataDB, param, ref i);
             fullqry += this.GetMyActionInsertUpdateQuery(DataDB, param, ref i, false, service);
             param.Add(DataDB.GetNewParameter(FormConstants.eb_loc_id, EbDbTypes.Int32, this.LocationId));
             param.Add(DataDB.GetNewParameter(FormConstants.eb_createdby, EbDbTypes.Int32, this.UserObj.UserId));
@@ -1809,18 +1817,21 @@ namespace ExpressBase.Objects
             if (isInsert || insMyActRequired)// first save or insert myaction required in edit
             {
                 string _col = string.Empty, _val = string.Empty;
+                this.MyActNotification = new MyActionNotification() { ApproverEntity = nextStage.ApproverEntity };
                 if (nextStage.ApproverEntity == ApproverEntityTypes.Role)
                 {
                     _col = "role_ids";
                     _val = $"@role_ids_{i}";
                     string roles = nextStage.ApproverRoles == null ? string.Empty : nextStage.ApproverRoles.Join(",");
                     param.Add(DataDB.GetNewParameter($"@role_ids_{i++}", EbDbTypes.String, roles));
+                    this.MyActNotification.RoleIds = nextStage.ApproverRoles;
                 }
                 else if (nextStage.ApproverEntity == ApproverEntityTypes.UserGroup)
                 {
                     _col = "usergroup_id";
                     _val = $"@usergroup_id_{i}";
                     param.Add(DataDB.GetNewParameter($"@usergroup_id_{i++}", EbDbTypes.Int32, nextStage.ApproverUserGroup));
+                    this.MyActNotification.UserGroupId = nextStage.ApproverUserGroup;
                 }
                 else if (nextStage.ApproverEntity == ApproverEntityTypes.Users)
                 {
@@ -1861,6 +1872,7 @@ namespace ExpressBase.Objects
                     }
                     _col = "user_ids";
                     _val = $"'{uids.Join(",")}'";
+                    this.MyActNotification.UserIds = uids;
                 }
                 else
                     throw new FormException("Unable to process review control", (int)HttpStatusCode.InternalServerError, "Invalid value for ApproverEntity : " + nextStage.ApproverEntity, "From GetMyActionInsertUpdateQuery");
@@ -1875,13 +1887,16 @@ namespace ExpressBase.Objects
                     else
                         autoId = " - " + Convert.ToString(this.FormDataBackup.MultipleTables[this.FormSchema.MasterTable][0][_columnAutoId.Control.Name]);
                 }
+                string description = $"{this.DisplayName}{autoId} in {nextStage.Name}";
 
                 insUpQ += $@"INSERT INTO eb_my_actions({_col}, from_datetime, is_completed, eb_stages_id, form_ref_id, form_data_id, eb_del, description, is_form_data_editable, my_action_type)
                                 VALUES ({_val}, {DataDB.EB_CURRENT_TIMESTAMP}, 'F', (SELECT id FROM eb_stages WHERE stage_unique_id = '{nextStage.EbSid}' AND form_ref_id = '{this.RefId}' AND eb_del = 'F'), 
-                                '{this.RefId}', {masterId}, 'F', '{this.DisplayName}{autoId} in {nextStage.Name}', '{(nextStage.IsFormEditable ? "T" : "F")}', '{MyActionTypes.Approval}'); ";
+                                '{this.RefId}', {masterId}, 'F', '{description}', '{(nextStage.IsFormEditable ? "T" : "F")}', '{MyActionTypes.Approval}'); ";
                 if (DataDB.Vendor == DatabaseVendors.MYSQL)
                     insUpQ += "SELECT eb_persist_currval('eb_my_actions_id_seq'); ";
 
+                this.MyActNotification.Title = "Review required";
+                this.MyActNotification.Description = description;
                 Console.WriteLine("Will try to INSERT eb_my_actions");
 
                 if (isInsert)// eb_approval - insert entry here
