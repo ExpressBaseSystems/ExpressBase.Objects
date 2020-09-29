@@ -257,9 +257,10 @@ else
                     if(this.RenderAsSimpleSelect){"
                         + JSFnsConstants.EbSimpleSelect_GetValueFromDOMJSfn +
                     @"}
-                    else{
+                    else{                        
                         let val = $('#' + this.EbSid_CtxId).val();
-                        return (val === '') ? null : (this.MultiSelect ? val : parseInt(val));
+                        val =  (val === '') ? null : (this.MultiSelect ? val : parseInt(val));
+                        return ((val === null && this.__isFDcontrol) ? -1 :val)
                     }
                 ";
             }
