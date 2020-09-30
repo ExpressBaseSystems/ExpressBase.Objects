@@ -542,11 +542,14 @@ namespace ExpressBase.Objects
                         _col.GroupFormLink = RefidMap[_col.GroupFormLink];
                     else if (RefidMap.ContainsKey(_col.ItemFormLink))
                         _col.ItemFormLink = RefidMap[_col.ItemFormLink];
-                    else if (_col is DVApprovalColumn && RefidMap.ContainsKey((_col as DVApprovalColumn).FormRefid))
-                        (_col as DVApprovalColumn).FormRefid = RefidMap[(_col as DVApprovalColumn).FormRefid];
                     else
                         _col.LinkRefId = "failed-to-update-";
                 }
+
+                if (_col is DVApprovalColumn && !((_col as DVApprovalColumn).FormRefid.IsNullOrEmpty()) && RefidMap.ContainsKey((_col as DVApprovalColumn).FormRefid))
+                    (_col as DVApprovalColumn).FormRefid = RefidMap[(_col as DVApprovalColumn).FormRefid];
+                else
+                    _col.LinkRefId = "failed-to-update-";
             }
         }
 
