@@ -137,44 +137,7 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
             if (_Notifications?.Count <= 0)
                 return;
             for (int i = 0; i < _Notifications.Count; i++)
-            {
-                if (_Notifications[i] is EbFnSystem)
-                {
-                    EbFnSystem ebFnSys = _Notifications[i] as EbFnSystem;
-                    if (ebFnSys.NotifyBy == EbFnSys_NotifyBy.Roles)
-                    {
-                        if (!(ebFnSys.Roles?.FindAll(e => e > 0).Count() > 0))
-                            throw new FormException("Invalid roles found for system notification");
-                    }
-                    else if (ebFnSys.NotifyBy == EbFnSys_NotifyBy.UserGroup)
-                    {
-                        if (ebFnSys.UserGroup <= 0)
-                            throw new FormException("Invalid user group found for system notification");
-                    }
-                    else if (ebFnSys.NotifyBy == EbFnSys_NotifyBy.Users)
-                    {
-                        ebFnSys.QryParams = new Dictionary<string, string>();//<param, table>
-                        if (string.IsNullOrEmpty(ebFnSys.Users?.Code))
-                            throw new FormException("Required SQL query for system notification");
-                        MatchCollection matchColl = Regex.Matches(ebFnSys.Users.Code, @"(?<=@)(\w+)|(?<=:)(\w+)");
-                        foreach (Match match in matchColl)
-                        {
-                            KeyValuePair<int, EbControlWrapper> item = _dict.FirstOrDefault(e => e.Value.Control.Name == match.Value);
-                            if (item.Value == null)
-                                throw new FormException($"Can't resolve {match.Value} in SQL query of system notification");
-                            if (!ebFnSys.QryParams.ContainsKey(item.Value.Control.Name))
-                                ebFnSys.QryParams.Add(item.Value.Control.Name, item.Value.TableName);
-                        }
-                    }
-                    else
-                        throw new FormException("Invalid NotifyBy found for system notification");
-                }
-                else if (_Notifications[i] is EbFnEmail)
-                {
-                    if (string.IsNullOrEmpty((_Notifications[i] as EbFnEmail).RefId))
-                        throw new FormException($"Invalid Ref id found for email notification");
-                }
-            }
+                _Notifications[i].BeforeSaveValidation(_dict);
         }
 
         private static void PerformRequirdCheck(EbControl[] Allctrls, Dictionary<Type, bool> OneCtrls, Dictionary<string, string> tbls, IServiceClient serviceClient, IRedisClient redis, out EbReview ebReviewCtrl)
