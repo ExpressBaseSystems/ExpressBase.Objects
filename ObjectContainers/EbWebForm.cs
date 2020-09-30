@@ -1272,6 +1272,7 @@ namespace ExpressBase.Objects
                                     if (this.MyActNotification != null)
                                     {
                                         this.MyActNotification.MyActionId = Convert.ToInt32(Table[0]["id"]);
+                                        this.MyActNotification.Description = Convert.ToString(Table[0]["description"]);
                                     }
                                 }
 
@@ -1740,6 +1741,7 @@ namespace ExpressBase.Objects
             string masterId = $"@{this.TableName}_id";
             EbReviewStage nextStage = null;
             bool insMyActRequired = false;
+            FG_Root globals = null;
             if (isInsert)
             {
                 masterId = $"(SELECT eb_currval('{this.TableName}_id_seq'))";
@@ -1772,7 +1774,7 @@ namespace ExpressBase.Objects
                     //_FG_WebForm global = GlobalsGenerator.GetCSharpFormGlobals(this, this.FormData);
                     //_FG_Root globals = new _FG_Root(global, this, service);
 
-                    FG_Root globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, this.FormData, this.FormDataBackup);
+                    globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, this.FormData, this.FormDataBackup);
 
                     object stageObj = this.ExecuteCSharpScriptNew(currentStage.NextStage.Code, globals);
                     string nxtStName = string.Empty;
@@ -1877,17 +1879,29 @@ namespace ExpressBase.Objects
                 else
                     throw new FormException("Unable to process review control", (int)HttpStatusCode.InternalServerError, "Invalid value for ApproverEntity : " + nextStage.ApproverEntity, "From GetMyActionInsertUpdateQuery");
 
+                string description = null;
                 string autoId = string.Empty;
-                //this.FormSchema.Tables[0] = master table; asumption - EbAutoId is in master table
-                ColumnSchema _columnAutoId = this.FormSchema.Tables[0].Columns.Find(e => e.Control is EbAutoId);
-                if (_columnAutoId != null)
+                if (this.AutoId != null)
                 {
                     if (isInsert)
-                        autoId = $" - ' || (SELECT {_columnAutoId.Control.Name} FROM {this.FormSchema.MasterTable} WHERE id = {masterId}) || '";
-                    else
-                        autoId = " - " + Convert.ToString(this.FormDataBackup.MultipleTables[this.FormSchema.MasterTable][0][_columnAutoId.Control.Name]);
+                        autoId = $" ' || (SELECT {this.AutoId.Name} FROM {this.AutoId.TableName} WHERE {(this.AutoId.TableName == this.TableName ? string.Empty : (this.TableName + CharConstants.UNDERSCORE))}id = {masterId}) || ' ";
+                    else if (this.FormDataBackup.MultipleTables.ContainsKey(this.AutoId.TableName) && this.FormDataBackup.MultipleTables[this.AutoId.TableName].Count > 0)
+                        autoId = CharConstants.SPACE + Convert.ToString(this.FormDataBackup.MultipleTables[this.AutoId.TableName][0][this.AutoId.Name]) + CharConstants.SPACE;
                 }
-                string description = $"{this.DisplayName}{autoId} in {nextStage.Name}";
+                if (!string.IsNullOrEmpty(nextStage.NotificationContent?.Code?.Trim()))
+                {
+                    if (globals == null)
+                        globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, this.FormData, this.FormDataBackup);
+                    object msg = this.ExecuteCSharpScriptNew(nextStage.NotificationContent.Code, globals);
+                    description = Convert.ToString(msg);
+                    if (!string.IsNullOrEmpty(description))
+                    {
+                        if (this.AutoId != null && isInsert && description.Contains(FormConstants.AutoId_PlaceHolder))
+                            description = description.Replace(FormConstants.AutoId_PlaceHolder, autoId);
+                    }
+                }
+                if (string.IsNullOrEmpty(description))
+                    description = $"{this.DisplayName} {(autoId.IsEmpty() ? string.Empty : (CharConstants.SPACE + autoId))}in {nextStage.Name}";
 
                 insUpQ += $@"INSERT INTO eb_my_actions({_col}, from_datetime, is_completed, eb_stages_id, form_ref_id, form_data_id, eb_del, description, is_form_data_editable, my_action_type)
                                 VALUES ({_val}, {DataDB.EB_CURRENT_TIMESTAMP}, 'F', (SELECT id FROM eb_stages WHERE stage_unique_id = '{nextStage.EbSid}' AND form_ref_id = '{this.RefId}' AND eb_del = 'F'), 
@@ -1896,7 +1910,6 @@ namespace ExpressBase.Objects
                     insUpQ += "SELECT eb_persist_currval('eb_my_actions_id_seq'); ";
 
                 this.MyActNotification.Title = "Review required";
-                this.MyActNotification.Description = description;
                 Console.WriteLine("Will try to INSERT eb_my_actions");
 
                 if (isInsert)// eb_approval - insert entry here
