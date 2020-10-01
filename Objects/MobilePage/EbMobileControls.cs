@@ -808,6 +808,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
         public override string Icon { get { return "fa-i-cursor"; } }
+
         public override string GetDesignHtml()
         {
             return @"<div class='eb_stacklayout mob_control dropped' id='@id' eb-type='EbMobileRating' tabindex='1' onclick='$(this).focus()'>

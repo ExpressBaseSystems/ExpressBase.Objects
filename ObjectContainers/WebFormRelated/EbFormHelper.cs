@@ -292,6 +292,8 @@ namespace ExpressBase.Objects
                     throw new Exception($"EbObject not found. FormHelper >GetEbObject. RefId: {RefId}, Type: {typeof(T).Name}");
 
                 _ebObject = EbSerializers.Json_Deserialize(resp.Data[0].Json);
+                if (_ebObject == null)
+                    throw new Exception($"Json_Deserialize returned a null EbObject. FormHelper >GetEbObject. RefId: {RefId}, Type: {typeof(T).Name}, Json: {resp.Data[0].Json}");
                 if (Redis != null) Redis.Set<T>(RefId, _ebObject);
             }
             (_ebObject as EbObject).RefId = RefId;// temp fix (sometimes refid missing from ebObject)

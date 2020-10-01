@@ -105,7 +105,19 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("Link Settings")]
+        [OnChangeExec(@"
+                if (this.ShowNewButton){ 
+                        pg.ShowProperty('NewButtonText');
+                }
+                else {
+                        pg.HideProperty('NewButtonText');
+                }
+            ")]
         public bool ShowNewButton { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Link Settings")]
+        public string NewButtonText { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("Link Settings")]
