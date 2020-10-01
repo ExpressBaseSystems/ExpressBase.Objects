@@ -404,7 +404,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public List<EbSolutionsWrapper> PrimarySolutions { get; set; }
 
         [DataMember(Order = 6)]
-        public List<AppStore> MasterPackages { get; set; }
+        public Dictionary<string, List<AppStore>> MasterPackages { get; set; }
     }
 
     [DataContract]
@@ -463,7 +463,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public SolutionType SolutionType { get; set; }
 
-        public string PrimarySolution { get; set; }
+        public string PrimarySolution { get; set; } 
     }
 
     [DataContract]
