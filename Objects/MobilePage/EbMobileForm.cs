@@ -53,6 +53,10 @@ namespace ExpressBase.Objects
         public string MessageOnFailed { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Rendering")]
+        public string SubmitButtonText { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
         public List<Param> RenderValidatorParams { get; set; }
 
