@@ -397,6 +397,8 @@ namespace ExpressBase.Objects
         [PropertyGroup("Behavior")]
         public virtual bool EnableEdit { set; get; }
 
+        public override EbScript ValueExpr { get => base.ValueExpr; set => base.ValueExpr = value; }
+
         public override string GetDesignHtml()
         {
             return @"<div class='eb_stacklayout mob_control dropped' id='@id' eb-type='EbMobileFileUpload' tabindex='1' onclick='$(this).focus()'>
@@ -480,6 +482,8 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public override string Icon { get { return "fa-map-marker"; } }
 
+        public override EbScript ValueExpr { get => base.ValueExpr; set => base.ValueExpr = value; }
+
         public override string GetDesignHtml()
         {
             return @"<div class='eb_stacklayout mob_control dropped' id='@id' eb-type='EbMobileGeoLocation' tabindex='1' onclick='$(this).focus()'>
@@ -541,6 +545,8 @@ namespace ExpressBase.Objects
         [Alias("Offline Query")]
         [PropertyGroup("Data")]
         public EbScript OfflineQuery { set; get; }
+
+        public override EbScript ValueExpr { get => base.ValueExpr; set => base.ValueExpr = value; }
 
         public override string GetDesignHtml()
         {
@@ -681,6 +687,8 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public override string Icon { get { return "fa-key"; } }
 
+        public override EbScript ValueExpr { get => base.ValueExpr; set => base.ValueExpr = value; }
+
         public override string GetDesignHtml()
         {
             return @"<div class='eb_stacklayout mob_control dropped' id='@id' eb-type='EbMobileAutoId' tabindex='1' onclick='$(this).focus()'>
@@ -713,6 +721,8 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.String; } set { } }
+
+        public override EbScript ValueExpr { get => base.ValueExpr; set => base.ValueExpr = value; }
 
         public override string GetDesignHtml()
         {
@@ -759,7 +769,7 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.String; } set { } }
 
-        public string Data { set; get; }
+        public override EbScript ValueExpr { get => base.ValueExpr; set => base.ValueExpr = value; }
 
         public override string GetDesignHtml()
         {

@@ -1,9 +1,8 @@
 ﻿using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
-using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Runtime.Serialization;
 
 namespace ExpressBase.Objects
 {
@@ -30,6 +29,8 @@ namespace ExpressBase.Objects
         public override bool Hidden { set; get; }
 
         public override bool Unique { get; set; }
+
+        public override EbScript ValueExpr { get => base.ValueExpr; set => base.ValueExpr = value; }
 
         public override string GetDesignHtml()
         {
@@ -80,5 +81,35 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.MobilePage)]
         public List<EbMobileControl> ControlCollection { set; get; }
+    }
+
+    [EnableInBuilder(BuilderType.MobilePage)]
+    public class EbMobileStackLayout : EbMobileDashBoardControls
+    {
+        [EnableInBuilder(BuilderType.MobilePage)]
+        public StackOrientation Orientation { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        public bool AllowScrolling { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
+        public List<EbMobileDashBoardControls> ChildControls { set; get; }
+
+        [OnDeserialized]
+        public void OnDeserialized(StreamingContext context)
+        {
+            if (this.ChildControls == null) this.ChildControls = new List<EbMobileDashBoardControls>();
+        }
+
+        public override string GetDesignHtml()
+        {
+            return @"<div class='mob_dash_control dropped' id='@id' eb-type='EbMobileStackLayout' tabindex='1' onclick='$(this).focus()'>                            
+                            <div class='eb_dash_ctrlhtml ctrl_as_container'>
+                               <div class='control_container'>
+                               </div>
+                            </div>
+                        </div>".RemoveCR().DoubleQuoted();
+        }
     }
 }
