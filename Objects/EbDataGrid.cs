@@ -234,10 +234,6 @@ namespace ExpressBase.Objects
             List<string> _params = new List<string>();
             EbDataReader DataReader = EbFormHelper.GetEbObject<EbDataReader>(this.DataSourceId, serviceClient, redis, null);
 
-            for (int i = 0; i < Allctrls.Length; i++)
-            {
-                Allctrls[i].DependedDG = new List<string>();
-            }
             foreach (Param p in DataReader.InputParams)
             {
                 _params.Add(p.Name);

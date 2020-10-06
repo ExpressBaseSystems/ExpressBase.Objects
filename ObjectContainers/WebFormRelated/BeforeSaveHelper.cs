@@ -143,6 +143,9 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
         private static void PerformRequirdCheck(EbControl[] Allctrls, Dictionary<Type, bool> OneCtrls, Dictionary<string, string> tbls, IServiceClient serviceClient, IRedisClient redis, out EbReview ebReviewCtrl)
         {
             ebReviewCtrl = null;
+            for (int i = 0; i < Allctrls.Length; i++)//DataGrid.InitDSRelated
+                Allctrls[i].DependedDG = new List<string>();
+
             for (int i = 0; i < Allctrls.Length; i++)
             {
                 if (OneCtrls.ContainsKey(Allctrls[i].GetType()))

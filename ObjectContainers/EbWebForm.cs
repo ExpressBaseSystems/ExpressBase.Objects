@@ -424,7 +424,7 @@ namespace ExpressBase.Objects
                 }
             }
 
-            FormDes.GetEmptyModel();
+            FormDes.FormData = FormDes.GetEmptyModel();
 
             //Merge FormDes.FormData with Current DataMODEL in front end; hint: grid tables are not considered
             if (FormDes.FormDataBackup != null)
@@ -801,7 +801,7 @@ namespace ExpressBase.Objects
 
         public WebformData GetEmptyModel()
         {
-            this.FormData = new WebformData() { MasterTable = this.FormSchema.MasterTable };
+            WebformData _FormData = new WebformData() { MasterTable = this.FormSchema.MasterTable };
             foreach (TableSchema _table in this.FormSchema.Tables)
             {
                 if (_table.TableType == WebFormTableTypes.Normal)
@@ -809,26 +809,11 @@ namespace ExpressBase.Objects
                     SingleRow Row = new SingleRow();
                     SingleTable Table = new SingleTable();
                     foreach (ColumnSchema _column in _table.Columns)
-                    {
                         Row.Columns.Add(_column.Control.GetSingleColumn(this.UserObj, this.SolutionObj, null));
-                    }
                     Table.Add(Row);
-                    this.FormData.MultipleTables.Add(_table.TableName, Table);
+                    _FormData.MultipleTables.Add(_table.TableName, Table);
                 }
-                else if (_table.TableType == WebFormTableTypes.Grid || _table.TableType == WebFormTableTypes.Review)
-                {
-                    this.FormData.MultipleTables.Add(_table.TableName, new SingleTable());
-                }
-            }
-            this.GetDGsEmptyModel();
-            return this.FormData;
-        }
-
-        private void GetDGsEmptyModel()
-        {
-            foreach (TableSchema _table in this.FormSchema.Tables)
-            {
-                if (_table.TableType == WebFormTableTypes.Grid)
+                else if (_table.TableType == WebFormTableTypes.Grid)
                 {
                     SingleRow Row = new SingleRow();
                     Row.Columns.Add(new SingleColumn()
@@ -838,12 +823,15 @@ namespace ExpressBase.Objects
                         Value = 0
                     });
                     foreach (ColumnSchema _column in _table.Columns)
-                    {
                         Row.Columns.Add(_column.Control.GetSingleColumn(this.UserObj, this.SolutionObj, null));
-                    }
-                    this.FormData.DGsRowDataModel.Add(_table.TableName, Row);
+
+                    _FormData.MultipleTables.Add(_table.TableName, new SingleTable());
+                    _FormData.DGsRowDataModel.Add(_table.TableName, Row);
                 }
+                else if (_table.TableType == WebFormTableTypes.Review)
+                    _FormData.MultipleTables.Add(_table.TableName, new SingleTable());
             }
+            return _FormData;
         }
 
         public void GetFormattedData(EbDataTable dataTable, SingleTable Table, TableSchema _table = null)
@@ -1119,8 +1107,8 @@ namespace ExpressBase.Objects
             }
             else
             {
-                //this.FormData = new WebformData() { MasterTable = _schema.MasterTable };
-                this.GetEmptyModel();
+                this.FormData = new WebformData() { MasterTable = _schema.MasterTable };
+                //this.FormData = this.GetEmptyModel();
                 _FormData = this.FormData;
             }
 
@@ -1134,12 +1122,14 @@ namespace ExpressBase.Objects
                     this.GetFormattedData(dataTable, Table, _table);
                 }
                 //if (!_FormData.MultipleTables.ContainsKey(_table.TableName))
-                //    _FormData.MultipleTables.Add(_table.TableName, Table);
+                _FormData.MultipleTables.Add(_table.TableName, Table);
+                //else
+                //    ;
 
-                if (!(_table.TableType == WebFormTableTypes.Normal && Table.Count == 0) && _FormData.MultipleTables.ContainsKey(_table.TableName))
-                    _FormData.MultipleTables[_table.TableName] = Table;
-                else if (backup)
-                    _FormData.MultipleTables.Add(_table.TableName, Table);
+                //if (!(_table.TableType == WebFormTableTypes.Normal && Table.Count == 0) && _FormData.MultipleTables.ContainsKey(_table.TableName))
+                //    _FormData.MultipleTables[_table.TableName] = Table;
+                //else if (backup)
+                //    _FormData.MultipleTables.Add(_table.TableName, Table);
 
             }
 
@@ -1153,6 +1143,16 @@ namespace ExpressBase.Objects
             }
             else
             {
+                if (!backup)
+                {
+                    WebformData tempWFD = this.GetEmptyModel();
+                    _FormData.DGsRowDataModel = tempWFD.DGsRowDataModel;
+                    foreach (TableSchema _table in _schema.Tables.FindAll(e => e.TableType == WebFormTableTypes.Normal))
+                    {
+                        if (_FormData.MultipleTables[_table.TableName].Count == 0)
+                            _FormData.MultipleTables[_table.TableName] = tempWFD.MultipleTables[_table.TableName];
+                    }
+                }
                 this.TableRowId = _FormData.MultipleTables[_FormData.MasterTable][0].RowId;
                 this.LocationId = _FormData.MultipleTables[_FormData.MasterTable][0].LocId;
             }
@@ -1446,7 +1446,7 @@ namespace ExpressBase.Objects
         //For Prefill Mode
         public void RefreshFormData(IDatabase DataDB, Service service, List<Param> _params)
         {
-            GetEmptyModel();
+            this.FormData = this.GetEmptyModel();
             Dictionary<string, string> QrsDict = new Dictionary<string, string>();
             List<DbParameter> param = new List<DbParameter>();
             foreach (KeyValuePair<string, SingleTable> Table in this.FormData.MultipleTables)
@@ -2295,6 +2295,7 @@ namespace ExpressBase.Objects
                 DbParameter[] param = new DbParameter[] {
                     DataDB.GetNewParameter(FormConstants.eb_lastmodified_by, EbDbTypes.Int32, this.UserObj.UserId),
                     DataDB.GetNewParameter(FormConstants.id, EbDbTypes.Int32, this.TableRowId)
+                    //DataDB.GetNewParameter(this.TableName + FormConstants._id, EbDbTypes.Int32, this.TableRowId)
                 };
                 return DataDB.DoNonQuery(query, param);
             }
