@@ -321,7 +321,7 @@ namespace ExpressBase.Objects
         {
             this.BareControlHtml = this.GetBareHtml();
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
-            this.EbSid = (this.EbSid == null) ? "Container_"+DateTime.Now.ToString("HHmmssffff") : this.EbSid;
+            this.EbSid = (this.EbSid == null) ? "Container_" + DateTime.Now.ToString("HHmmssffff") : this.EbSid;
         }
 
         public string BotCols { get; set; }
@@ -516,6 +516,8 @@ namespace ExpressBase.Objects
                     refids.Add(_col.GroupFormLink);
                 if (!_col.ItemFormLink.IsNullOrEmpty())
                     refids.Add(_col.ItemFormLink);
+                if (_col is DVApprovalColumn && !(_col as DVApprovalColumn).FormRefid.IsNullOrEmpty())
+                    refids.Add((_col as DVApprovalColumn).FormRefid);
             }
             return refids;
         }
@@ -543,6 +545,11 @@ namespace ExpressBase.Objects
                     else
                         _col.LinkRefId = "failed-to-update-";
                 }
+
+                if (_col is DVApprovalColumn && !((_col as DVApprovalColumn).FormRefid.IsNullOrEmpty()) && RefidMap.ContainsKey((_col as DVApprovalColumn).FormRefid))
+                    (_col as DVApprovalColumn).FormRefid = RefidMap[(_col as DVApprovalColumn).FormRefid];
+                else
+                    _col.LinkRefId = "failed-to-update-";
             }
         }
 
@@ -600,7 +607,7 @@ namespace ExpressBase.Objects
                     this.Columns.Add(actcol);
                 }
             }
-            if(this.Columns.Get("eb_created_by") != null)
+            if (this.Columns.Get("eb_created_by") != null)
                 this.Columns.Get("eb_created_by").RenderType = EbDbTypes.String;
             if (this.Columns.Get("eb_lastmodified_by") != null)
                 this.Columns.Get("eb_lastmodified_by").RenderType = EbDbTypes.String;
@@ -910,13 +917,13 @@ namespace ExpressBase.Objects
     public enum MapsType
     {
         OpenStreetMap = 0,
-        GoogleMap =1,
+        GoogleMap = 1,
     }
 
     [EnableInBuilder(BuilderType.DVBuilder)]
     public class EbGoogleMap : EbMapView
     {
-       
+
     }
 
     [EnableInBuilder(BuilderType.DVBuilder)]
@@ -1074,14 +1081,14 @@ else {
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
         public EbDbTypes Type { set; get; }
 
-        [EnableInBuilder( BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
         public bool UseThisVal { set; get; }
     }
 
     [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar, BuilderType.WebForm)]
     public class ApiRequestHeader : EbDataVisualizationObject
     {
-        [EnableInBuilder(BuilderType.WebForm,BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
         [HideInPropertyGrid]
         public override string Name { set; get; }
 

@@ -282,10 +282,10 @@ namespace ExpressBase.Objects
 
         public string GetSelectQuery(string RefId, string MasterTable)
         {
-            return $@"SELECT A.id, S.stage_unique_id, A.is_form_data_editable, A.user_ids, A.role_ids, A.usergroup_id
+            return $@"SELECT A.id, S.stage_unique_id, A.is_form_data_editable, A.user_ids, A.role_ids, A.usergroup_id, A.description
                 FROM eb_my_actions A, eb_stages S
                 WHERE A.form_ref_id = '{RefId}' AND A.form_data_id = @{MasterTable}_id AND 
-                A.is_completed = 'F' AND A.eb_del = 'F' AND A.eb_stages_id = S.id AND S.eb_del = 'F'; ";
+                COALESCE(A.is_completed, 'F') = 'F' AND COALESCE(A.eb_del, 'F') = 'F' AND A.eb_stages_id = S.id AND COALESCE(S.eb_del, 'F') = 'F'; ";
         }
 
     }
@@ -309,7 +309,10 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public string DDHtml { get; set; }
 
-        public EbReviewStage() { }
+        public EbReviewStage() 
+        {
+            this.NotificationContent = new EbScript();
+        }
         public string ObjType { get { return this.GetType().Name.Substring(2, this.GetType().Name.Length - 2); } set { } }
 
         [PropertyGroup("Core")]
@@ -364,14 +367,20 @@ else if (this.ApproverEntity === 3)
         public EbScript ApproverUsers { get; set; }
 
         [PropertyGroup("Behavior")]
-        [PropertyPriority(4)]
+        [PropertyPriority(6)]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
+        public EbScript NotificationContent { get; set; }
+
+        [PropertyGroup("Behavior")]
+        [PropertyPriority(3)]
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.Collection)]
         [ListType(typeof(EbReviewAction))]
         public List<EbReviewAction> StageActions { get; set; }
 
         [PropertyGroup("Behavior")]
-        [PropertyPriority(3)]
+        [PropertyPriority(2)]
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
         public EbScript NextStage { get; set; }
@@ -381,12 +390,12 @@ else if (this.ApproverEntity === 3)
         public Dictionary<string, string> QryParams { get; set; }//<param, table>
 
         [PropertyGroup("Behavior")]
-        [PropertyPriority(6)]
+        [PropertyPriority(5)]
         [EnableInBuilder(BuilderType.WebForm)]
         public bool IsFormEditable { get; set; }
 
         [PropertyGroup("Behavior")]
-        [PropertyPriority(5)]
+        [PropertyPriority(4)]
         [EnableInBuilder(BuilderType.WebForm)]
         [OnChangeExec(@"
 if(this.IsAdvanced === true){

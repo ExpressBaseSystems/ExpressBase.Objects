@@ -23,10 +23,11 @@ namespace ExpressBase.Objects
             this.BareControlHtml = this.GetBareHtml();
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
         }
-        
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
         [Alias("Text")]
         public override string Label { get; set; }
+
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
         public override bool DoNotPersist { get { return true; } }
@@ -50,7 +51,7 @@ namespace ExpressBase.Objects
         {
             return @"<button id='@ebsid@' class='btn btn-default' style='width:100%; @backColor @foreColor @fontStyle' disabled >@Label@</button>"
                 .Replace("@ebsid@", this.EbSid_CtxId)
-                .Replace("@Label@", this.Label ??"@Text@")
+                .Replace("@Label@", this.Label ?? "@Text@")
 .Replace("@tabIndex", "tabindex='" + this.TabIndex + "'")
 .Replace("@backColor", "background-color:" + this.BackColor + ";")
 .Replace("@foreColor", "color:" + this.ForeColor + ";")
@@ -72,6 +73,6 @@ namespace ExpressBase.Objects
             </div>";
             return ReplacePropsInHTML(EbCtrlHTML);
         }
-       
+
     }
 }

@@ -29,6 +29,11 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 5)]
         public bool IsFurther { get; set; }
+
+        [DataMember(Order = 6)]
+        public SolutionType SolutionType { get; set; }
+
+
     }
 
     [DataContract]

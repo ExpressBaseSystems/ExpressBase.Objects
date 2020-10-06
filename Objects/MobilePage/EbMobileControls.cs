@@ -397,6 +397,8 @@ namespace ExpressBase.Objects
         [PropertyGroup("Behavior")]
         public virtual bool EnableEdit { set; get; }
 
+        public override EbScript ValueExpr { get => base.ValueExpr; set => base.ValueExpr = value; }
+
         public override string GetDesignHtml()
         {
             return @"<div class='eb_stacklayout mob_control dropped' id='@id' eb-type='EbMobileFileUpload' tabindex='1' onclick='$(this).focus()'>
@@ -480,6 +482,8 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public override string Icon { get { return "fa-map-marker"; } }
 
+        public override EbScript ValueExpr { get => base.ValueExpr; set => base.ValueExpr = value; }
+
         public override string GetDesignHtml()
         {
             return @"<div class='eb_stacklayout mob_control dropped' id='@id' eb-type='EbMobileGeoLocation' tabindex='1' onclick='$(this).focus()'>
@@ -541,6 +545,8 @@ namespace ExpressBase.Objects
         [Alias("Offline Query")]
         [PropertyGroup("Data")]
         public EbScript OfflineQuery { set; get; }
+
+        public override EbScript ValueExpr { get => base.ValueExpr; set => base.ValueExpr = value; }
 
         public override string GetDesignHtml()
         {
@@ -681,6 +687,8 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public override string Icon { get { return "fa-key"; } }
 
+        public override EbScript ValueExpr { get => base.ValueExpr; set => base.ValueExpr = value; }
+
         public override string GetDesignHtml()
         {
             return @"<div class='eb_stacklayout mob_control dropped' id='@id' eb-type='EbMobileAutoId' tabindex='1' onclick='$(this).focus()'>
@@ -713,6 +721,8 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.String; } set { } }
+
+        public override EbScript ValueExpr { get => base.ValueExpr; set => base.ValueExpr = value; }
 
         public override string GetDesignHtml()
         {
@@ -750,5 +760,91 @@ namespace ExpressBase.Objects
                 Label = this.Label
             };
         }
+    }
+
+    [EnableInBuilder(BuilderType.MobilePage)]
+    public class EbMobileQrReader : EbMobileControl
+    {
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
+        public override EbDbTypes EbDbType { get { return EbDbTypes.String; } set { } }
+
+        public override EbScript ValueExpr { get => base.ValueExpr; set => base.ValueExpr = value; }
+
+        public override string GetDesignHtml()
+        {
+            return @"<div class='eb_stacklayout mob_control dropped' id='@id' eb-type='EbMobileQrReader' tabindex='1' onclick='$(this).focus()'>
+                            <label class='ctrl_label'> @Label </label>
+                            <div class='eb_ctrlhtml'>
+                               <div class='ctrl-group eb-mob-qrreader'>
+                                    <input type='text'/><span class='fa fa-qrcode'></span>
+                                </div>
+                            </div>
+                        </div>".RemoveCR().DoubleQuoted();
+        }
+
+        public override EbControl GetWebFormCtrl(int counter)
+        {
+            return new EbTextBox
+            {
+                EbSid = "TextBox" + counter,
+                Name = this.Name,
+                Margin = new UISides { Top = 0, Bottom = 0, Left = 0, Right = 0 },
+                Label = this.Label
+            };
+        }
+    }
+
+    public class EbMobileRating : EbMobileControl
+    {
+        public override EbDbTypes EbDbType { get { return EbDbTypes.Decimal; } set { } }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [Alias("Maximum Star")]
+        [DefaultPropValue("5")]
+        public int MaxValue { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.Color)]
+        [Alias("Selection Color")]
+        [DefaultPropValue("#F39C12")]
+        public string SelectionColor { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [DefaultPropValue("8")]
+        [Alias("Spacing")]
+        public int Spacing { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
+        public override string Icon { get { return "fa-i-cursor"; } }
+
+        public override string GetDesignHtml()
+        {
+            return @"<div class='eb_stacklayout mob_control dropped' id='@id' eb-type='EbMobileRating' tabindex='1' onclick='$(this).focus()'>
+                            <label class='ctrl_label'> @Label </label>
+                            <div class='eb_ctrlhtml'>
+                               <span class='fa fa-star-o wrd_spacing'></span>
+	                            <span class='fa fa-star-o wrd_spacing'></span>
+	                            <span class='fa fa-star-o wrd_spacing'></span>
+	                            <span class='fa fa-star-o wrd_spacing'></span>
+	                            <span class='fa fa-star-o wrd_spacing'></span>
+                            </div>
+                        </div>".RemoveCR().DoubleQuoted();
+        }
+        public override EbControl GetWebFormCtrl(int counter)
+        {
+            return new EbRating
+            {
+                EbSid = "Rating" + counter,
+                Name = this.Name,
+                MaxVal = this.MaxValue,
+                RatingColor = this.SelectionColor,
+                Spacing = this.Spacing,
+                Margin = new UISides { Top = 0, Bottom = 0, Left = 0, Right = 0 },
+                Label = this.Label
+            };
+        }
+
     }
 }

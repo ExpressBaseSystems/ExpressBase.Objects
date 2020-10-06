@@ -47,4 +47,10 @@ namespace ExpressBase.Objects
         Bottom,
         Fill
     }
+
+    public enum StackOrientation
+    {
+        Horizontal,
+        Vertical,
+    }
 }

@@ -68,8 +68,8 @@ namespace ExpressBase.Objects
         }
 
         [EnableInBuilder(BuilderType.WebForm)]
-        [HideInPropertyGrid]
-        public override bool Hidden { get { return true; } }
+        //[HideInPropertyGrid]
+        public override bool Hidden { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
@@ -78,7 +78,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyGroup(PGConstants.CORE)]
         [UIproperty]
-        [OnChangeUIFunction("EbProvisionUser.mapping")]
+        //[OnChangeUIFunction("EbProvisionUser.mapping")]////////////
         [PropertyEditor(PropertyEditorType.Collection)]
         [ListType(typeof(UsrLocFieldAbstract))]
         public List<UsrLocFieldAbstract> Fields { get; set; }
@@ -109,6 +109,10 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         public bool AllowExistingUser { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm)]
+        public override EbScript HiddenExpr { get; set; }
+
+
         //--------Hide in property grid------------
 
         [EnableInBuilder(BuilderType.WebForm)]
@@ -130,10 +134,6 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
         public override EbScript DefaultValueExpression { get; set; }
-
-        [EnableInBuilder(BuilderType.WebForm)]
-        [HideInPropertyGrid]
-        public override EbScript HiddenExpr { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
@@ -235,9 +235,10 @@ this.Init = function(id)
 
         public override string GetBareHtml()
         {
-            return @"
-            <input id='@ebsid@' data-ebtype='@data-ebtype@'  data-toggle='tooltip' title='@toolTipText@' class='date' type='text' name='@name@' autocomplete = 'off' @value@ @tabIndex@ style='width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@' @required@ @placeHolder@ disabled />
-            "
+            return @"<div style='display: flex;'>
+				        <img id='@ebsid@_usrimg'class='sysctrl_usrimg' src='' alt='' onerror=""this.onerror=null; this.src='/images/nulldp.png';"">
+						<div id='@ebsid@' data-ebtype='@data-ebtype@'  data-toggle='tooltip' title='@toolTipText@' class=' sysctrl_usrname'  name='@name@' autocomplete = 'off' @value@ @tabIndex@ style='width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@' @required@ @placeHolder@ disabled></div>
+                     </div>"
 .Replace("@name@", (this.Name != null ? this.Name.Trim() : ""))
 .Replace("@data-ebtype@", "16")//( (int)this.EbDateType ).ToString())
 .Replace("@toolTipText@", this.ToolTipText)
@@ -253,7 +254,7 @@ this.Init = function(id)
 
         public override string GetDesignHtml()
         {
-            return GetHtml().RemoveCR().DoubleQuoted();
+            return GetHtml().RemoveCR().GraveAccentQuoted();
         }
 
         public override string GetHtml()
@@ -284,6 +285,14 @@ this.Init = function(id)
                             STRING_AGG(r2u.role_id::TEXT, ',') AS roles, STRING_AGG(g2u.groupid::TEXT, ',') AS usergroups
                         FROM eb_users u LEFT JOIN eb_role2user r2u ON u.id = r2u.user_id LEFT JOIN eb_user2usergroup g2u ON u.id = g2u.userid
                         WHERE eb_ver_id = @{masterTbl}_eb_ver_id AND eb_data_id = @{masterTbl}_id GROUP BY u.id; ";
+        }
+
+        public string GetMappedUserQuery(string MasterTable)
+        {
+            string idCol = this.VirtualTable == MasterTable ? "id" : MasterTable + "_id";            
+            return $@"SELECT B.id, B.fullname, B.email, B.phnoprimary AS phprimary
+                FROM {this.VirtualTable} A, eb_users B
+                WHERE B.id = A.{this.Name} AND A.{idCol} = @{MasterTable}_id AND COALESCE(A.eb_del, 'F') = 'F'; ";            
         }
 
         //insOnUp - user create on update
@@ -328,6 +337,7 @@ this.Init = function(id)
                 sql += "SELECT 1 WHERE 1 = 0; ";
             EbDataSet ds = DataDB.DoQueries(sql, parameters.ToArray());
 
+            int oProvUserId = ocF == null ? 0 : Convert.ToInt32(ocF.Value);
             if (ds.Tables[0].Rows.Count > 0)
             {
                 userId = Convert.ToInt32(ds.Tables[0].Rows[0][0]);
@@ -343,7 +353,6 @@ this.Init = function(id)
                     {
                         if (!ins)
                         {
-                            int oProvUserId = Convert.ToInt32(ocF.Value);
                             if (userId == oProvUserId && oProvUserId > 0)
                             {
                                 _d.RemoveKey("phprimary");
@@ -360,14 +369,16 @@ this.Init = function(id)
                             throw new FormException($"Unable to continue with {_d["email"]} and {_d["phprimary"]}", (int)HttpStatusCode.BadRequest, $"Email and Phone already exists for different users: {_d["email"]}, {_d["phprimary"]}", "EbProvisionUser => GetUserIdByEmailOrPhone");
                     }
                 }
-                else if (_d.ContainsKey("email") && _d["email"] != string.Empty)
+                else if (_d.ContainsKey("email") && _d["email"] != string.Empty && oProvUserId != userId2)
                 {
                     _d.RemoveKey("phprimary");
                     flag &= 1;
                     return 0;
                 }
+                else
+                    userId = userId2;
             }
-            else if (flag == 1 && _d.ContainsKey("phprimary") && _d["phprimary"] != string.Empty)
+            else if (flag == 1 && _d.ContainsKey("phprimary") && _d["phprimary"] != string.Empty && oProvUserId != userId)
             {
                 _d.RemoveKey("email");
                 flag &= 2;
@@ -688,20 +699,20 @@ this.Init = function(id)
         {
             get
             {
-                return @"
-                //debugger;
-                if (!this.DataVals)
-                    return;
-                this._finalObj = JSON.parse(this.DataVals.F);
-                $.each(this.Fields.$values, function (i, obj) {
-                    if (obj.ControlName !== '' && obj.Control.DoNotPersist && !(obj.Control.ValueExpr && obj.Control.ValueExpr.Code) && p1 > 0) {
-                        if (this._finalObj.hasOwnProperty(obj.Name))
-                            obj.Control.justSetValue(this._finalObj[obj.Name]);
-                    }
-                }.bind(this));";
+                return @"";
             }
             set { }
         }
+        //debugger;
+        //if (!this.DataVals)
+        //    return;
+        //this._finalObj = JSON.parse(this.DataVals.F);
+        //$.each(this.Fields.$values, function (i, obj) {
+        //    if (obj.ControlName !== '' && obj.Control.DoNotPersist && !(obj.Control.ValueExpr && obj.Control.ValueExpr.Code) && p1 > 0) {
+        //        if (this._finalObj.hasOwnProperty(obj.Name))
+        //            obj.Control.justSetValue(this._finalObj[obj.Name]);
+        //    }
+        //}.bind(this));
 
         public override string OnChangeBindJSFn
         {
@@ -723,6 +734,8 @@ this.Init = function(id)
         public override string RefreshJSfn { get { return @""; } set { } }
 
         public override string ClearJSfn { get { return @""; } set { } }
+
+        public override string DisableJSfn { get { return JSFnsConstants.Ctrl_DisableJSfn + "$('#' + this.EbSid_CtxId + '_usrimg').css('pointer-events', 'auto');"; } set { } }
 
     }
 

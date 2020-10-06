@@ -58,10 +58,15 @@ namespace ExpressBase.Objects.WebFormRelated
             bool MuCtrlFound = false;
             foreach (EbControl Ctrl in _this.FormSchema.ExtendedControls)
             {
-                if (Ctrl is EbProvisionUser && !MuCtrlFound)
+                if (Ctrl is EbProvisionUser)
                 {
-                    extquery += (Ctrl as EbProvisionUser).GetSelectQuery(_this.FormSchema.MasterTable);
-                    MuCtrlFound = true;
+                    if (!MuCtrlFound)
+                    {
+                        extquery += (Ctrl as EbProvisionUser).GetSelectQuery(_this.FormSchema.MasterTable);
+                        MuCtrlFound = true;
+                        _qryCount++;
+                    }
+                    extquery += (Ctrl as EbProvisionUser).GetMappedUserQuery(_this.FormSchema.MasterTable);
                     _qryCount++;
                 }
                 else if (Ctrl is EbProvisionLocation)
@@ -162,17 +167,15 @@ namespace ExpressBase.Objects.WebFormRelated
             {
                 if (_this.DataPusherConfig == null)
                 {
-                    _qry = $@"INSERT INTO {tblName} ({{0}} eb_created_by, eb_created_at, eb_loc_id, eb_ver_id) 
-                                VALUES ({{1}} @eb_createdby, {DataDB.EB_CURRENT_TIMESTAMP}, @eb_loc_id, @{_this.TableName}_eb_ver_id); ";
+                    _qry = $@"INSERT INTO {tblName} ({{0}} eb_created_by, eb_created_at, eb_loc_id, eb_ver_id, eb_signin_log_id) 
+                                VALUES ({{1}} @eb_createdby, {DataDB.EB_CURRENT_TIMESTAMP}, @eb_loc_id, @{_this.TableName}_eb_ver_id, @eb_signin_log_id); ";
                 }
                 else
                 {
-                    if (_this.DataPusherConfig.SourceRecId <= 0)
-                        _qry = $@"INSERT INTO {tblName} ({{0}} eb_created_by, eb_created_at, eb_loc_id, eb_ver_id, {_this.DataPusherConfig.SourceTable}_id, eb_push_id, eb_lock) 
-                                    VALUES ({{1}} @eb_createdby, {DataDB.EB_CURRENT_TIMESTAMP}, @eb_loc_id, @{_this.TableName}_eb_ver_id, (SELECT eb_currval('{_this.DataPusherConfig.SourceTable}_id_seq')), '{_this.DataPusherConfig.MultiPushId}', 'T'); ";
-                    else
-                        _qry = $@"INSERT INTO {tblName} ({{0}} eb_created_by, eb_created_at, eb_loc_id, eb_ver_id, {_this.DataPusherConfig.SourceTable}_id, eb_push_id, eb_lock) 
-                                    VALUES ({{1}} @eb_createdby, {DataDB.EB_CURRENT_TIMESTAMP}, @eb_loc_id, @{_this.TableName}_eb_ver_id, @{_this.DataPusherConfig.SourceTable}_id, '{_this.DataPusherConfig.MultiPushId}', 'T'); ";
+                    string srcRef = _this.DataPusherConfig.SourceRecId <= 0 ? $"(SELECT eb_currval('{_this.DataPusherConfig.SourceTable}_id_seq'))" : $"@{_this.DataPusherConfig.SourceTable}_id";
+
+                    _qry = $@"INSERT INTO {tblName} ({{0}} eb_created_by, eb_created_at, eb_loc_id, eb_ver_id, {_this.DataPusherConfig.SourceTable}_id, eb_push_id, eb_lock, eb_signin_log_id) 
+                                    VALUES ({{1}} @eb_createdby, {DataDB.EB_CURRENT_TIMESTAMP}, @eb_loc_id, @{_this.TableName}_eb_ver_id, {srcRef}, '{_this.DataPusherConfig.MultiPushId}', 'T', @eb_signin_log_id); ";
                 }
 
                 if (DataDB.Vendor == DatabaseVendors.MYSQL)
@@ -180,17 +183,10 @@ namespace ExpressBase.Objects.WebFormRelated
                 if (_this.IsLocEditable)
                     _qry = _qry.Replace(", eb_loc_id", string.Empty).Replace(", @eb_loc_id", string.Empty);
             }
-            else if (isIns)
-            {
-                _qry = $@"INSERT INTO {tblName} ({{0}} eb_created_by, eb_created_at, eb_loc_id, {_this.TableName}_id) 
-                            VALUES ({{1}} @eb_createdby, {DataDB.EB_CURRENT_TIMESTAMP}, @eb_loc_id , (SELECT eb_currval('{_this.TableName}_id_seq'))); ";
-                if (DataDB.Vendor == DatabaseVendors.MYSQL)
-                    _qry += $"SELECT eb_persist_currval('{tblName}_id_seq'); ";
-            }
             else if (tblName.Equals("eb_approval_lines"))
             {
-                _qry = $@"INSERT INTO eb_approval_lines ({{0}} eb_created_by, eb_created_at, eb_loc_id, eb_src_id, eb_ver_id) 
-                            VALUES ({{1}} @eb_createdby, {DataDB.EB_CURRENT_TIMESTAMP}, @eb_loc_id, @{_this.TableName}_id, @{_this.TableName}_eb_ver_id); ";
+                _qry = $@"INSERT INTO eb_approval_lines ({{0}} eb_created_by, eb_created_at, eb_loc_id, eb_src_id, eb_ver_id, eb_signin_log_id) 
+                            VALUES ({{1}} @eb_createdby, {DataDB.EB_CURRENT_TIMESTAMP}, @eb_loc_id, @{_this.TableName}_id, @{_this.TableName}_eb_ver_id, @eb_signin_log_id); ";
                 if (DataDB.Vendor == DatabaseVendors.MYSQL)
                     _qry += "SELECT eb_persist_currval('eb_approval_lines_id_seq'); ";
                 // eb_approval - update eb_approval_lines_id
@@ -198,8 +194,13 @@ namespace ExpressBase.Objects.WebFormRelated
                                WHERE eb_src_id = @{_this.TableName}_id AND eb_ver_id =  @{_this.TableName}_eb_ver_id AND COALESCE(eb_del, 'F') = 'F'; ";
             }
             else
-                _qry = $@"INSERT INTO {tblName} ({{0}} eb_created_by, eb_created_at, eb_loc_id, {_this.TableName}_id) 
-                            VALUES ({{1}} @eb_createdby, {DataDB.EB_CURRENT_TIMESTAMP}, @eb_loc_id , @{_this.TableName}_id); ";
+            {
+                string srcRef = isIns ? $"(SELECT eb_currval('{_this.TableName}_id_seq'))" : $"@{_this.TableName}_id";
+                _qry = $@"INSERT INTO {tblName} ({{0}} eb_created_by, eb_created_at, eb_loc_id, {_this.TableName}_id, eb_signin_log_id) 
+                            VALUES ({{1}} @eb_createdby, {DataDB.EB_CURRENT_TIMESTAMP}, @eb_loc_id , {srcRef}, @eb_signin_log_id); ";
+                if (isIns && DataDB.Vendor == DatabaseVendors.MYSQL)
+                    _qry += $"SELECT eb_persist_currval('{tblName}_id_seq'); ";
+            }
 
             return _qry;
         }

@@ -392,16 +392,31 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class UniqueCheckRequest
     {
         [DataMember(Order = 1)]
-        public string email { get; set; }
+        public string Value { get; set; }
 
         [DataMember(Order = 2)]
+        public int Id { get; set; }
+
+        [DataMember(Order = 3)]
+        public UniqueCheckQueryId QryId { get; set; }
+
+        [DataMember(Order = 4)]
+        public string email { get; set; }
+
+        [DataMember(Order = 5)]
         public string roleName { get; set; }
     }
     public class UniqueCheckResponse
     {
         [DataMember(Order = 1)]
         public bool unrespose { get; set; }
+    }
 
+    public enum UniqueCheckQueryId
+    {
+        eb_users__email = 1,
+        eb_users__phnoprimary,
+        eb_roles__role_name
     }
 
     [DataContract]
@@ -653,7 +668,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 2)]
         public List<Eb_Users> UsersList { get; set; }
-
+        
         [DataMember(Order = 3)]
         public List<Eb_Constraints1> IpConsList { get; set; }
 
@@ -661,9 +676,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public List<Eb_Constraints1> DtConsList { get; set; }
 
         [DataMember(Order = 5)]
-        public string Token { get; set; }
+        public List<Eb_Users> UsersListAll { get; set; }
 
         [DataMember(Order = 6)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 7)]
         public ResponseStatus ResponseStatus { get; set; }
     }
 
@@ -763,9 +781,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public List<Eb_Location> LocationList { get; set; }
 
         [DataMember(Order = 8)]
-        public string Token { get; set; }
+        public List<Eb_Users> UsersListAll { get; set; }
 
         [DataMember(Order = 9)]
+        public string Token { get; set; }
+
+        [DataMember(Order = 10)]
         public ResponseStatus ResponseStatus { get; set; }
     }
 
@@ -1014,6 +1035,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Email;
 
         [DataMember(Order = 4)]
+        public string Phone;
+
+        [DataMember(Order = 5)]
         public int Role2User_Id;
     }
 
@@ -1056,21 +1080,15 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class SaveRoleRequest : IReturn<SaveRoleResponse>, IEbSSRequest
+    public class SaveRoleRequest : EbServiceStackAuthRequest, IReturn<SaveRoleResponse>
     {
         [DataMember(Order = 0)]
         public Dictionary<string, object> Colvalues { get; set; }
 
         [DataMember(Order = 2)]
-        public int Id { get; set; }
+        public int Id { get; set; } 
 
         [DataMember(Order = 3)]
-        public string SolnId { get; set; }
-
-        [DataMember(Order = 4)]
-        public int UserId { get; set; }
-
-        [DataMember(Order = 5)]
         public string Token { get; set; }
     }
 

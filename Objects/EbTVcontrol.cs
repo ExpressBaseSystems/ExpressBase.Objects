@@ -74,6 +74,10 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         public override string ToolNameAlias { get { return "Datatable"; } set { } }
 
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+        public override bool DoNotPersist { get { return true; } }
+
         [JsonIgnore]
         public override string SetValueJSfn { get { return @""; } set { } }
         [JsonIgnore]

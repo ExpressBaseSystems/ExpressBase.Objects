@@ -79,6 +79,8 @@ namespace ExpressBase.Objects
 
         public int DraftId { get; set; }
 
+        public MyActionNotification MyActNotification { get; set; }
+
         internal DbConnection DbConnection { get; set; }
 
         private DbTransaction DbTransaction { get; set; }
@@ -1172,10 +1174,10 @@ namespace ExpressBase.Objects
                             EbProvisionUser provUser = Ctrl as EbProvisionUser;
                             SingleColumn Column = _FormData.MultipleTables[provUser.VirtualTable][0].GetColumn(Ctrl.Name);
                             if (UserTable == null)
+                            {
                                 UserTable = Table;
-                            else
-                                tableIndex--; //one query is used to select required user records
-
+                                tableIndex++; //one query is used to select required user records
+                            }
                             SingleRow Row_U = null;
                             foreach (SingleRow R in UserTable)
                             {
@@ -1195,6 +1197,15 @@ namespace ExpressBase.Objects
                                     if (Row_U[pArr[k].Name] != null)
                                         _d.Add(pArr[k].Name, Row_U[pArr[k].Name]);
                                 }
+                            }
+                            SingleTable map_Table = new SingleTable();
+                            this.GetFormattedData(dataset.Tables[tableIndex], map_Table);
+                            if (map_Table.Count > 0)
+                            {
+                                _d.Add("map_" + FormConstants.id, map_Table[0][FormConstants.id]);
+                                _d.Add("map_" + FormConstants.fullname, map_Table[0][FormConstants.fullname]);
+                                _d.Add("map_" + FormConstants.email, map_Table[0][FormConstants.email]);
+                                _d.Add("map_" + FormConstants.phprimary, map_Table[0][FormConstants.phprimary]);
                             }
                             Column.F = JsonConvert.SerializeObject(_d);
                         }
@@ -1258,6 +1269,11 @@ namespace ExpressBase.Objects
                                             new SingleColumn{ Name = "has_permission", Type = (int)EbDbTypes.String, Value = hasPerm ? "T" : "F"}
                                         }
                                     });
+                                    if (this.MyActNotification != null)
+                                    {
+                                        this.MyActNotification.MyActionId = Convert.ToInt32(Table[0]["id"]);
+                                        this.MyActNotification.Description = Convert.ToString(Table[0]["description"]);
+                                    }
                                 }
 
                             }
@@ -1516,8 +1532,9 @@ namespace ExpressBase.Objects
         }
 
         //Normal save
-        public string Save(IDatabase DataDB, Service service)
+        public string Save(EbConnectionFactory EbConFactory, Service service)
         {
+            IDatabase DataDB = EbConFactory.DataDB;
             this.DbConnection = DataDB.GetNewConnection();
             string resp;
             try
@@ -1544,10 +1561,11 @@ namespace ExpressBase.Objects
                 resp += " - AuditTrail: " + ebAuditTrail.UpdateAuditTrail();
                 Console.WriteLine("EbWebForm.Save.AfterSave start");
                 resp += " - AfterSave: " + this.AfterSave(DataDB, IsUpdate);
-                Console.WriteLine("EbWebForm.Save.SendNotifications start");
-                resp += " - Notifications: " + EbFnGateway.SendNotifications(this, DataDB, service);
                 this.DbTransaction.Commit();
                 Console.WriteLine("EbWebForm.Save.DbTransaction Committed");
+                Console.WriteLine("EbWebForm.Save.SendNotifications start");
+                resp += " - Notifications: " + EbFnGateway.SendNotifications(this, DataDB, service);
+                EbFnGateway.SendMobileNotification(this, EbConFactory);
             }
             catch (FormException ex1)
             {
@@ -1595,6 +1613,7 @@ namespace ExpressBase.Objects
 
             param.Add(DataDB.GetNewParameter(FormConstants.eb_createdby, EbDbTypes.Int32, this.UserObj.UserId));
             param.Add(DataDB.GetNewParameter(FormConstants.eb_loc_id, EbDbTypes.Int32, this.LocationId));
+            param.Add(DataDB.GetNewParameter(FormConstants.eb_signin_log_id, EbDbTypes.Int32, this.UserObj.SignInLogId));
             fullqry += $"SELECT eb_currval('{this.TableName}_id_seq');";
 
             EbDataSet tem = DataDB.DoQueries(this.DbConnection, fullqry, param.ToArray());
@@ -1683,11 +1702,12 @@ namespace ExpressBase.Objects
             this.FormCollection.Update(DataDB, param, ref fullqry, ref _extqry, ref i);
 
             fullqry += _extqry;
-            fullqry += GetFileUploaderUpdateQuery(DataDB, param, ref i);
+            fullqry += this.GetFileUploaderUpdateQuery(DataDB, param, ref i);
             fullqry += this.GetMyActionInsertUpdateQuery(DataDB, param, ref i, false, service);
             param.Add(DataDB.GetNewParameter(FormConstants.eb_loc_id, EbDbTypes.Int32, this.LocationId));
             param.Add(DataDB.GetNewParameter(FormConstants.eb_createdby, EbDbTypes.Int32, this.UserObj.UserId));
             param.Add(DataDB.GetNewParameter(FormConstants.eb_modified_by, EbDbTypes.Int32, this.UserObj.UserId));
+            param.Add(DataDB.GetNewParameter(FormConstants.eb_signin_log_id, EbDbTypes.Int32, this.UserObj.SignInLogId));
             return DataDB.DoNonQuery(this.DbConnection, fullqry, param.ToArray());
         }
 
@@ -1721,6 +1741,7 @@ namespace ExpressBase.Objects
             string masterId = $"@{this.TableName}_id";
             EbReviewStage nextStage = null;
             bool insMyActRequired = false;
+            FG_Root globals = null;
             if (isInsert)
             {
                 masterId = $"(SELECT eb_currval('{this.TableName}_id_seq'))";
@@ -1753,7 +1774,7 @@ namespace ExpressBase.Objects
                     //_FG_WebForm global = GlobalsGenerator.GetCSharpFormGlobals(this, this.FormData);
                     //_FG_Root globals = new _FG_Root(global, this, service);
 
-                    FG_Root globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, this.FormData, this.FormDataBackup);
+                    globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, this.FormData, this.FormDataBackup);
 
                     object stageObj = this.ExecuteCSharpScriptNew(currentStage.NextStage.Code, globals);
                     string nxtStName = string.Empty;
@@ -1798,18 +1819,21 @@ namespace ExpressBase.Objects
             if (isInsert || insMyActRequired)// first save or insert myaction required in edit
             {
                 string _col = string.Empty, _val = string.Empty;
+                this.MyActNotification = new MyActionNotification() { ApproverEntity = nextStage.ApproverEntity };
                 if (nextStage.ApproverEntity == ApproverEntityTypes.Role)
                 {
                     _col = "role_ids";
                     _val = $"@role_ids_{i}";
                     string roles = nextStage.ApproverRoles == null ? string.Empty : nextStage.ApproverRoles.Join(",");
                     param.Add(DataDB.GetNewParameter($"@role_ids_{i++}", EbDbTypes.String, roles));
+                    this.MyActNotification.RoleIds = nextStage.ApproverRoles;
                 }
                 else if (nextStage.ApproverEntity == ApproverEntityTypes.UserGroup)
                 {
                     _col = "usergroup_id";
                     _val = $"@usergroup_id_{i}";
                     param.Add(DataDB.GetNewParameter($"@usergroup_id_{i++}", EbDbTypes.Int32, nextStage.ApproverUserGroup));
+                    this.MyActNotification.UserGroupId = nextStage.ApproverUserGroup;
                 }
                 else if (nextStage.ApproverEntity == ApproverEntityTypes.Users)
                 {
@@ -1850,27 +1874,42 @@ namespace ExpressBase.Objects
                     }
                     _col = "user_ids";
                     _val = $"'{uids.Join(",")}'";
+                    this.MyActNotification.UserIds = uids;
                 }
                 else
                     throw new FormException("Unable to process review control", (int)HttpStatusCode.InternalServerError, "Invalid value for ApproverEntity : " + nextStage.ApproverEntity, "From GetMyActionInsertUpdateQuery");
 
+                string description = null;
                 string autoId = string.Empty;
-                //this.FormSchema.Tables[0] = master table; asumption - EbAutoId is in master table
-                ColumnSchema _columnAutoId = this.FormSchema.Tables[0].Columns.Find(e => e.Control is EbAutoId);
-                if (_columnAutoId != null)
+                if (this.AutoId != null)
                 {
                     if (isInsert)
-                        autoId = $" - ' || (SELECT {_columnAutoId.Control.Name} FROM {this.FormSchema.MasterTable} WHERE id = {masterId}) || '";
-                    else
-                        autoId = " - " + Convert.ToString(this.FormDataBackup.MultipleTables[this.FormSchema.MasterTable][0][_columnAutoId.Control.Name]);
+                        autoId = $" ' || (SELECT {this.AutoId.Name} FROM {this.AutoId.TableName} WHERE {(this.AutoId.TableName == this.TableName ? string.Empty : (this.TableName + CharConstants.UNDERSCORE))}id = {masterId}) || ' ";
+                    else if (this.FormDataBackup.MultipleTables.ContainsKey(this.AutoId.TableName) && this.FormDataBackup.MultipleTables[this.AutoId.TableName].Count > 0)
+                        autoId = CharConstants.SPACE + Convert.ToString(this.FormDataBackup.MultipleTables[this.AutoId.TableName][0][this.AutoId.Name]) + CharConstants.SPACE;
                 }
+                if (!string.IsNullOrEmpty(nextStage.NotificationContent?.Code?.Trim()))
+                {
+                    if (globals == null)
+                        globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, this.FormData, this.FormDataBackup);
+                    object msg = this.ExecuteCSharpScriptNew(nextStage.NotificationContent.Code, globals);
+                    description = Convert.ToString(msg);
+                    if (!string.IsNullOrEmpty(description))
+                    {
+                        if (this.AutoId != null && isInsert && description.Contains(FormConstants.AutoId_PlaceHolder))
+                            description = description.Replace(FormConstants.AutoId_PlaceHolder, autoId);
+                    }
+                }
+                if (string.IsNullOrEmpty(description))
+                    description = $"{this.DisplayName} {(autoId.IsEmpty() ? string.Empty : (CharConstants.SPACE + autoId))}in {nextStage.Name}";
 
                 insUpQ += $@"INSERT INTO eb_my_actions({_col}, from_datetime, is_completed, eb_stages_id, form_ref_id, form_data_id, eb_del, description, is_form_data_editable, my_action_type)
                                 VALUES ({_val}, {DataDB.EB_CURRENT_TIMESTAMP}, 'F', (SELECT id FROM eb_stages WHERE stage_unique_id = '{nextStage.EbSid}' AND form_ref_id = '{this.RefId}' AND eb_del = 'F'), 
-                                '{this.RefId}', {masterId}, 'F', '{this.DisplayName}{autoId} in {nextStage.Name}', '{(nextStage.IsFormEditable ? "T" : "F")}', '{MyActionTypes.Approval}'); ";
+                                '{this.RefId}', {masterId}, 'F', '{description}', '{(nextStage.IsFormEditable ? "T" : "F")}', '{MyActionTypes.Approval}'); ";
                 if (DataDB.Vendor == DatabaseVendors.MYSQL)
                     insUpQ += "SELECT eb_persist_currval('eb_my_actions_id_seq'); ";
 
+                this.MyActNotification.Title = "Review required";
                 Console.WriteLine("Will try to INSERT eb_my_actions");
 
                 if (isInsert)// eb_approval - insert entry here
