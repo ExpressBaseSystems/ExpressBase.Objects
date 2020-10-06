@@ -836,7 +836,7 @@ namespace ExpressBase.Objects
 
         public void GetFormattedData(EbDataTable dataTable, SingleTable Table, TableSchema _table = null)
         {
-            //master table eb columns : eb_loc_id, eb_ver_id, eb_lock, eb_push_id, eb_src_id, eb_created_by, id
+            //master table eb columns : eb_loc_id, eb_ver_id, eb_lock, eb_push_id, eb_src_id, eb_created_by, eb_void, id
             //normal table eb columns : eb_loc_id, id
             //grid table eb columns   : eb_loc_id, id, eb_row_num
 
@@ -856,9 +856,10 @@ namespace ExpressBase.Objects
                             this.FormData.DataPushId = dataRow[i++].ToString();
                             this.FormData.SourceId = Convert.ToInt32(dataRow[i++]);
                             this.FormData.CreatedBy = Convert.ToInt32(dataRow[i++]);
+                            this.FormData.IsCancelled = dataRow[i++].ToString().Equals("T");
                         }
                         else
-                            i += 5;
+                            i += 6;// 6 => Count of above properties
                     }
                     _rowId = Convert.ToInt32(dataRow[i]);
                     if (_rowId <= 0)
@@ -1139,7 +1140,7 @@ namespace ExpressBase.Objects
                     return;
                 string t = "From RefreshFormData - TABLE : " + _FormData.MasterTable + "   ID : " + this.TableRowId + "\nData Not Found";
                 Console.WriteLine(t);
-                throw new FormException("Error in loading data", (int)HttpStatusCode.InternalServerError, t, string.Empty);
+                throw new FormException("Error in loading data", (int)HttpStatusCode.NotFound, t, string.Empty);
             }
             else
             {
@@ -2294,8 +2295,7 @@ namespace ExpressBase.Objects
                 string query = QueryGetter.GetDeleteQuery(this, DataDB);
                 DbParameter[] param = new DbParameter[] {
                     DataDB.GetNewParameter(FormConstants.eb_lastmodified_by, EbDbTypes.Int32, this.UserObj.UserId),
-                    DataDB.GetNewParameter(FormConstants.id, EbDbTypes.Int32, this.TableRowId)
-                    //DataDB.GetNewParameter(this.TableName + FormConstants._id, EbDbTypes.Int32, this.TableRowId)
+                    DataDB.GetNewParameter(this.TableName + FormConstants._id, EbDbTypes.Int32, this.TableRowId)
                 };
                 return DataDB.DoNonQuery(query, param);
             }
@@ -2332,7 +2332,7 @@ namespace ExpressBase.Objects
                 string query = QueryGetter.GetCancelQuery(this, DataDB);
                 DbParameter[] param = new DbParameter[] {
                     DataDB.GetNewParameter(FormConstants.eb_lastmodified_by, EbDbTypes.Int32, this.UserObj.UserId),
-                    DataDB.GetNewParameter(FormConstants.id, EbDbTypes.Int32, this.TableRowId)
+                    DataDB.GetNewParameter(this.TableName + FormConstants._id, EbDbTypes.Int32, this.TableRowId)
                 };
                 return DataDB.DoNonQuery(query, param);
             }
@@ -2395,18 +2395,18 @@ namespace ExpressBase.Objects
             return ebAuditTrail.GetAuditTrail();
         }
 
-        public Dictionary<int, List<string>> GetLocBasedPermissions()
+        public Dictionary<int, List<int>> GetLocBasedPermissions()
         {
-            Dictionary<int, List<string>> _perm = new Dictionary<int, List<string>>();
+            Dictionary<int, List<int>> _perm = new Dictionary<int, List<int>>();
             //New View Edit Delete Cancel Print AuditTrail
 
             foreach (int locid in this.SolutionObj.Locations.Keys)
             {
-                List<string> _temp = new List<string>();
+                List<int> _temp = new List<int>();
                 foreach (EbOperation op in Operations.Enumerator)
                 {
                     if (this.HasPermission(op.Name, locid))
-                        _temp.Add(op.Name);
+                        _temp.Add(op.IntCode);
                 }
                 _perm.Add(locid, _temp);
             }
