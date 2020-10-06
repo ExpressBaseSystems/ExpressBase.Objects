@@ -905,7 +905,7 @@ else// PS
             }
         }
 
-        private string GetSql(Service service)
+        public string GetSql(Service service)
         {
             EbDataReader dr = EbFormHelper.GetEbObject<EbDataReader>(this.DataSourceId, null, service.Redis, service);
             string Sql = dr.Sql.Trim();

@@ -1,9 +1,9 @@
-﻿using ExpressBase.Common.Objects;
+﻿using ExpressBase.Common.Constants;
+using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
-using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Runtime.Serialization;
 
 namespace ExpressBase.Objects
 {
@@ -49,7 +49,19 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public virtual string Icon { get { return string.Empty; } }
 
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
+        [Alias("Value Expression")]
+        [PropertyGroup(PGConstants.VALUE)]
+        public virtual EbScript ValueExpr { get; set; }
+
         public virtual EbControl GetWebFormCtrl(int counter) { return null; }
+
+        [OnDeserialized]
+        public void OnDeserialized(StreamingContext context)
+        {
+            if (this.ValueExpr == null) this.ValueExpr = new EbScript();
+        }
 
         public override List<string> DiscoverRelatedRefids()
         {
@@ -63,5 +75,13 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
         public override string Name { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.Expandable)]
+        public EbThickness Margin { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.Expandable)]
+        public EbThickness Padding { set; get; }
     }
 }
