@@ -23,7 +23,7 @@ namespace ExpressBase.Objects.WebFormRelated
                 string _id = "id";
 
                 if (_table.TableName == _this.FormSchema.MasterTable)
-                    _cols = "eb_loc_id, eb_ver_id, eb_lock, eb_push_id, eb_src_id, eb_created_by, id";
+                    _cols = "eb_loc_id, eb_ver_id, eb_lock, eb_push_id, eb_src_id, eb_created_by, eb_void, id";
                 else if (_table.TableType == WebFormTableTypes.Review)
                     _id = $"eb_ver_id = @{_this.FormSchema.MasterTable}_eb_ver_id AND eb_src_id";
                 else
@@ -51,7 +51,7 @@ namespace ExpressBase.Objects.WebFormRelated
                             _cols, _table.TableName, _this.DataPusherConfig.SourceTable, _this.DataPusherConfig.MultiPushId);
                     else
                         query += string.Format("SELECT {0} FROM {1} WHERE {2}_id = (SELECT id FROM {2} WHERE {3}_id = @{3}_id AND eb_push_id = '{4}' AND COALESCE(eb_del, 'F') = 'F' LIMIT 1) AND COALESCE(eb_del, 'F') = 'F' {5};",
-                            _cols, _table.TableName, _this.FormSchema.MasterTable, _this.DataPusherConfig.SourceTable, _this.DataPusherConfig.MultiPushId, _table.TableType == WebFormTableTypes.Grid ? "ORDER BY eb_row_num" : "ORDER BY id");
+                            _cols, _table.TableName, _this.FormSchema.MasterTable, _this.DataPusherConfig.SourceTable, _this.DataPusherConfig.MultiPushId, _table.TableType == WebFormTableTypes.Grid ? (_table.DescOdr ? "ORDER BY eb_row_num DESC" : "ORDER BY eb_row_num") : "ORDER BY id");
                 }
                 _qryCount++;
             }
@@ -127,37 +127,95 @@ namespace ExpressBase.Objects.WebFormRelated
 
         public static string GetDeleteQuery(EbWebForm _this, IDatabase DataDB)
         {
-            string query = string.Empty;
-            foreach (TableSchema _table in _this.FormSchema.Tables)
+            string FullQry = string.Empty;
+            foreach (EbWebForm ebWebForm in _this.FormCollection)
             {
-                string _id = "id";
-                string _dupcols = string.Empty;
-                if (_table.TableName != _this.FormSchema.MasterTable)
-                    _id = _this.FormSchema.MasterTable + "_id";
-                foreach (ColumnSchema _column in _table.Columns)
+                WebFormSchema _schema = ebWebForm.FormSchema;
+                foreach (TableSchema _table in _schema.Tables)
                 {
-                    if (_column.Control is EbAutoId)
+                    string autoIdBckUp = string.Empty;
+                    //if (ebWebForm.AutoId != null && ebWebForm.AutoId.TableName == _table.TableName)
+                    //    autoIdBckUp = string.Format(", {0}_ebbkup = {0}, {0} = CONCAT({0}, '_ebbkup')", ebWebForm.AutoId.Name);
+
+                    string Qry = $"UPDATE {_table.TableName} SET eb_del='T', eb_lastmodified_by = @eb_lastmodified_by, eb_lastmodified_at = {DataDB.EB_CURRENT_TIMESTAMP } {autoIdBckUp} ";
+                    
+                    if (ebWebForm.DataPusherConfig == null)
+                        Qry += $"WHERE {(_table.TableName == _schema.MasterTable ? "id" : (_schema.MasterTable + "_id"))} = @{_schema.MasterTable}_id AND COALESCE(eb_del, 'F') = 'F';";                    
+                    else
                     {
-                        _dupcols += string.Format(", {0}_ebbkup = {0}, {0} = CONCAT({0}, '_ebbkup')", _column.ColumnName);
+                        EbDataPusherConfig _conf = ebWebForm.DataPusherConfig;
+                        if (_table.TableName == _schema.MasterTable)
+                            Qry += $"WHERE {_conf.SourceTable}_id = @{_conf.SourceTable}_id AND eb_push_id = '{_conf.MultiPushId}' AND COALESCE(eb_del, 'F') = 'F';";
+                        else
+                            Qry += $"WHERE {_schema.MasterTable}_id = (SELECT id FROM {_schema.MasterTable} WHERE {_conf.SourceTable}_id = @{_conf.SourceTable}_id " +
+                                $"AND eb_push_id = '{_conf.MultiPushId}' AND COALESCE(eb_del, 'F') = 'F' LIMIT 1) AND COALESCE(eb_del, 'F') = 'F';";
                     }
-                }
-                query += string.Format("UPDATE {0} SET eb_del='T',eb_lastmodified_by = @eb_lastmodified_by, eb_lastmodified_at = " + DataDB.EB_CURRENT_TIMESTAMP + " {1} WHERE {2} = @id AND COALESCE(eb_del, 'F') = 'F';", _table.TableName, _dupcols, _id);
+                    FullQry = Qry + FullQry;
+                }                    
             }
-            return query;
+            return FullQry;
         }
+
+        //public static string GetDeleteQuery(EbWebForm _this, IDatabase DataDB)
+        //{
+        //    string query = string.Empty;
+        //    foreach (TableSchema _table in _this.FormSchema.Tables)
+        //    {
+        //        string _id = "id";
+        //        string _dupcols = string.Empty;
+        //        if (_table.TableName != _this.FormSchema.MasterTable)
+        //            _id = _this.FormSchema.MasterTable + "_id";
+        //        foreach (ColumnSchema _column in _table.Columns)
+        //        {
+        //            if (_column.Control is EbAutoId)
+        //            {
+        //                _dupcols += string.Format(", {0}_ebbkup = {0}, {0} = CONCAT({0}, '_ebbkup')", _column.ColumnName);
+        //            }
+        //        }
+        //        query += string.Format("UPDATE {0} SET eb_del='T',eb_lastmodified_by = @eb_lastmodified_by, eb_lastmodified_at = " + DataDB.EB_CURRENT_TIMESTAMP + " {1} WHERE {2} = @id AND COALESCE(eb_del, 'F') = 'F';", _table.TableName, _dupcols, _id);
+        //    }
+        //    return query;
+        //}
 
         public static string GetCancelQuery(EbWebForm _this, IDatabase DataDB)
         {
-            string query = string.Empty;
-            foreach (TableSchema _table in _this.FormSchema.Tables)
+            string FullQry = string.Empty;
+            foreach (EbWebForm ebWebForm in _this.FormCollection)
             {
-                string _id = "id";
-                if (_table.TableName != _this.FormSchema.MasterTable)
-                    _id = _this.FormSchema.MasterTable + "_id";
-                query += string.Format("UPDATE {0} SET eb_void='T',eb_lastmodified_by = @eb_lastmodified_by, eb_lastmodified_at = " + DataDB.EB_CURRENT_TIMESTAMP + " WHERE {1} = @id AND COALESCE(eb_void, 'F') = 'F' AND COALESCE(eb_del, 'F') = 'F';", _table.TableName, _id);
+                WebFormSchema _schema = ebWebForm.FormSchema;
+                foreach (TableSchema _table in _schema.Tables)
+                {
+                    string Qry = $"UPDATE {_table.TableName} SET eb_void='T', eb_lastmodified_by = @eb_lastmodified_by, eb_lastmodified_at = {DataDB.EB_CURRENT_TIMESTAMP } ";
+
+                    if (ebWebForm.DataPusherConfig == null)
+                        Qry += $"WHERE {(_table.TableName == _schema.MasterTable ? "id" : (_schema.MasterTable + "_id"))} = @{_schema.MasterTable}_id AND COALESCE(eb_del, 'F') = 'F' AND COALESCE(eb_void, 'F') = 'F';";
+                    else
+                    {
+                        EbDataPusherConfig _conf = ebWebForm.DataPusherConfig;
+                        if (_table.TableName == _schema.MasterTable)
+                            Qry += $"WHERE {_conf.SourceTable}_id = @{_conf.SourceTable}_id AND eb_push_id = '{_conf.MultiPushId}' AND COALESCE(eb_del, 'F') = 'F' AND COALESCE(eb_void, 'F') = 'F';";
+                        else
+                            Qry += $"WHERE {_schema.MasterTable}_id = (SELECT id FROM {_schema.MasterTable} WHERE {_conf.SourceTable}_id = @{_conf.SourceTable}_id " +
+                                $"AND eb_push_id = '{_conf.MultiPushId}' AND COALESCE(eb_del, 'F') = 'F' AND COALESCE(eb_void, 'F') = 'F' LIMIT 1) AND COALESCE(eb_del, 'F') = 'F' AND COALESCE(eb_void, 'F') = 'F';";
+                    }
+                    FullQry = Qry + FullQry;
+                }
             }
-            return query;
+            return FullQry;
         }
+
+        //public static string GetCancelQuery(EbWebForm _this, IDatabase DataDB)
+        //{
+        //    string query = string.Empty;
+        //    foreach (TableSchema _table in _this.FormSchema.Tables)
+        //    {
+        //        string _id = "id";
+        //        if (_table.TableName != _this.FormSchema.MasterTable)
+        //            _id = _this.FormSchema.MasterTable + "_id";
+        //        query += string.Format("UPDATE {0} SET eb_void='T',eb_lastmodified_by = @eb_lastmodified_by, eb_lastmodified_at = " + DataDB.EB_CURRENT_TIMESTAMP + " WHERE {1} = @id AND COALESCE(eb_void, 'F') = 'F' AND COALESCE(eb_del, 'F') = 'F';", _table.TableName, _id);
+        //    }
+        //    return query;
+        //}
 
         public static string GetInsertQuery(EbWebForm _this, IDatabase DataDB, string tblName, bool isIns)
         {
@@ -174,8 +232,8 @@ namespace ExpressBase.Objects.WebFormRelated
                 {
                     string srcRef = _this.DataPusherConfig.SourceRecId <= 0 ? $"(SELECT eb_currval('{_this.DataPusherConfig.SourceTable}_id_seq'))" : $"@{_this.DataPusherConfig.SourceTable}_id";
 
-                    _qry = $@"INSERT INTO {tblName} ({{0}} eb_created_by, eb_created_at, eb_loc_id, eb_ver_id, {_this.DataPusherConfig.SourceTable}_id, eb_push_id, eb_lock, eb_signin_log_id) 
-                                    VALUES ({{1}} @eb_createdby, {DataDB.EB_CURRENT_TIMESTAMP}, @eb_loc_id, @{_this.TableName}_eb_ver_id, {srcRef}, '{_this.DataPusherConfig.MultiPushId}', 'T', @eb_signin_log_id); ";
+                    _qry = $@"INSERT INTO {tblName} ({{0}} eb_created_by, eb_created_at, eb_loc_id, eb_ver_id, {_this.DataPusherConfig.SourceTable}_id, eb_src_id, eb_push_id, eb_lock, eb_signin_log_id) 
+                                    VALUES ({{1}} @eb_createdby, {DataDB.EB_CURRENT_TIMESTAMP}, @eb_loc_id, @{_this.TableName}_eb_ver_id, {srcRef}, {srcRef}, '{_this.DataPusherConfig.MultiPushId}', 'T', @eb_signin_log_id); ";
                 }
 
                 if (DataDB.Vendor == DatabaseVendors.MYSQL)
