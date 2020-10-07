@@ -262,7 +262,7 @@ namespace ExpressBase.Objects
                     _form.UserObj = _this.UserObj;
                     _form.SolutionObj = _this.SolutionObj;
                     _form.AfterRedisGet(Redis as RedisClient, client);
-                    _form.DataPusherConfig = new EbDataPusherConfig { SourceTable = _this.FormSchema.MasterTable, MultiPushId = _this.RefId + "|" + pusher.Name };
+                    _form.DataPusherConfig = new EbDataPusherConfig { SourceTable = _this.FormSchema.MasterTable, MultiPushId = _this.RefId + "_" + pusher.Name };
                     pusher.WebForm = _form;
                     _this.FormCollection.Add(_form);
                     _this.ExeDataPusher = true;

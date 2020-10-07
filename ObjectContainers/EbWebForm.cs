@@ -853,8 +853,9 @@ namespace ExpressBase.Objects
                         {
                             this.FormData.FormVersionId = Convert.ToInt32(dataRow[i++]);
                             this.FormData.IsLocked = dataRow[i++].ToString().Equals("T");
-                            this.FormData.DataPushId = dataRow[i++].ToString();
-                            this.FormData.SourceId = Convert.ToInt32(dataRow[i++]);
+                            string[] pushIdParts = dataRow[i++].ToString().Split("_");
+                            this.FormData.SrcRefId = pushIdParts.Length == 2 ? pushIdParts[0] : string.Empty;
+                            this.FormData.SrcDataId = Convert.ToInt32(dataRow[i++]);
                             this.FormData.CreatedBy = Convert.ToInt32(dataRow[i++]);
                             this.FormData.IsCancelled = dataRow[i++].ToString().Equals("T");
                         }
