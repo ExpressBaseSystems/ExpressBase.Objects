@@ -18,21 +18,24 @@ namespace ExpressBase.Objects
         public override EbDbTypes EbDbType { get { return EbDbTypes.String; } set { } }
 
         [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.EXTENDED)]
         public int MaxLength { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.EXTENDED)]
+        public bool AutoSuggestion { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.CORE)]
         public TextTransform TextTransform { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.CORE)]
         public TextMode TextMode { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("Behavior")]
+        [PropertyGroup(PGConstants.BEHAVIOR)]
         public bool AutoCompleteOff { get; set; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("Behavior")]
-        public bool AutoSuggestion { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
@@ -73,32 +76,26 @@ namespace ExpressBase.Objects
         public override EbDbTypes EbDbType { get { return EbDbTypes.Decimal; } set { } }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        public int MaxLength { get; set; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.EXTENDED)]
         [DefaultPropValue("2")]
         [HelpText("Number of decimal places")]
         public int DecimalPlaces { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.VALIDATIONS)]
         [Alias("Maximum")]
         [HelpText("Maximum value allowed")]
         public int MaxLimit { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.VALIDATIONS)]
         [Alias("Minimum")]
         [HelpText("Minimum value allowed")]
         public int MinLimit { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        public bool IsCurrency { get; set; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("Behavior")]
         public NumericBoxTypes RenderType { get; set; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        public bool IsAggragate { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
@@ -148,15 +145,19 @@ namespace ExpressBase.Objects
         public override EbDbTypes EbDbType { get { return (EbDbTypes)this.EbDateType; } set { } }
 
         [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.CORE)]
         public EbDateType EbDateType { get; set; } = EbDateType.DateTime;
 
         [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.EXTENDED)]
         public bool IsNullable { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.EXTENDED)]
         public bool BlockBackDatedEntry { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.EXTENDED)]
         public bool BlockFutureDatedEntry { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
@@ -248,6 +249,7 @@ namespace ExpressBase.Objects
         public EbMobileDataColumn ValueMember { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.CORE)]
         public int MinSearchLength { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
@@ -261,9 +263,11 @@ namespace ExpressBase.Objects
         public List<Param> Parameters { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.CORE)]
         public bool MultiSelect { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.CORE)]
         public bool EnablePreload { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
@@ -379,25 +383,25 @@ namespace ExpressBase.Objects
     {
         public override bool DoNotPersist { get; set; }
         public override bool Unique { get; set; }
-        public override bool ReadOnly { get; set; }
+        public override EbScript ValueExpr { get; set; }
+        public override EbScript DefaultValueExpression { get; set; }
+        public override List<EbMobileValidator> Validators { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("Behavior")]
+        [PropertyGroup("General")]
         public bool EnableCameraSelect { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("Behavior")]
+        [PropertyGroup("General")]
         public bool EnableFileSelect { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("Behavior")]
+        [PropertyGroup("General")]
         public virtual bool MultiSelect { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("Behavior")]
+        [PropertyGroup("General")]
         public virtual bool EnableEdit { set; get; }
-
-        public override EbScript ValueExpr { get => base.ValueExpr; set => base.ValueExpr = value; }
 
         public override string GetDesignHtml()
         {
@@ -482,7 +486,9 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public override string Icon { get { return "fa-map-marker"; } }
 
-        public override EbScript ValueExpr { get => base.ValueExpr; set => base.ValueExpr = value; }
+        public override EbScript ValueExpr { get; set; }
+        public override EbScript DefaultValueExpression { get; set; }
+        public override List<EbMobileValidator> Validators { set; get; }
 
         public override string GetDesignHtml()
         {
@@ -672,12 +678,14 @@ namespace ExpressBase.Objects
     public class EbMobileAutoId : EbMobileControl
     {
         public override bool DoNotPersist { get; set; }
-
         public override bool Unique { get; set; }
-
         public override bool Required { get; set; }
-
         public override bool ReadOnly { get { return true; } }
+        public override EbScript ValueExpr { get; set; }
+        public override EbScript HiddenExpr { get; set; }
+        public override EbScript DisableExpr { get; set; }
+        public override EbScript DefaultValueExpression { get; set; }
+        public override List<EbMobileValidator> Validators { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
@@ -686,8 +694,6 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
         public override string Icon { get { return "fa-key"; } }
-
-        public override EbScript ValueExpr { get => base.ValueExpr; set => base.ValueExpr = value; }
 
         public override string GetDesignHtml()
         {
@@ -721,8 +727,6 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.String; } set { } }
-
-        public override EbScript ValueExpr { get => base.ValueExpr; set => base.ValueExpr = value; }
 
         public override string GetDesignHtml()
         {
@@ -769,7 +773,9 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.String; } set { } }
 
-        public override EbScript ValueExpr { get => base.ValueExpr; set => base.ValueExpr = value; }
+        public override EbScript ValueExpr { get; set; }
+        public override EbScript DefaultValueExpression { get; set; }
+        public override List<EbMobileValidator> Validators { set; get; }
 
         public override string GetDesignHtml()
         {

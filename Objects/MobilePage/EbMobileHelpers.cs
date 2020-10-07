@@ -1,8 +1,10 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Constants;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
+using System.Collections.Generic;
 
 namespace ExpressBase.Objects
 {
@@ -10,24 +12,20 @@ namespace ExpressBase.Objects
     public class EbMobileDataColumn : EbMobileControl, INonPersistControl
     {
         public override string Label { set; get; }
-
         public override bool Unique { get; set; }
-
         public override bool ReadOnly { get; set; }
-
         public override bool DoNotPersist { get; set; }
-
         public override bool Required { get; set; }
-
         public override bool Hidden { set; get; }
+        public override EbScript ValueExpr { get; set; }
+        public override EbScript HiddenExpr { get; set; }
+        public override EbScript DisableExpr { get; set; }
+        public override EbScript DefaultValueExpression { get; set; }
+        public override List<EbMobileValidator> Validators { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [MetaOnly]
         public override string Name { get; set; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [HideInPropertyGrid]
-        public int TableIndex { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
@@ -43,15 +41,15 @@ namespace ExpressBase.Objects
         public EbDbTypes Type { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("UI")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         public int RowSpan { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("UI")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         public int ColumnSpan { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("UI")]
+        [PropertyGroup(PGConstants.CORE)]
         [OnChangeExec(@"
                 if ([1,3,5].includes(this.RenderAs)){ 
                         pg.ShowProperty('TextFormat');
@@ -74,21 +72,21 @@ namespace ExpressBase.Objects
         public DataColumnRenderType RenderAs { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("UI")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         public int BorderRadius { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("UI")]
+        [PropertyGroup(PGConstants.EXTENDED)]
         public string TextFormat { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [UIproperty]
-        [PropertyGroup("UI")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [PropertyEditor(PropertyEditorType.FontSelector)]
         public EbFont Font { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("UI")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [Alias("Align X")]
         [OnChangeExec(@"
                 if (this.HorrizontalAlign !== 3 && this.RenderAs === 2){ 
@@ -101,7 +99,7 @@ namespace ExpressBase.Objects
         public MobileHorrizontalAlign HorrizontalAlign { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("UI")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [Alias("Align Y")]
         [OnChangeExec(@"
                 if (this.VerticalAlign !== 3 && this.RenderAs === 2){ 
@@ -114,15 +112,15 @@ namespace ExpressBase.Objects
         public MobileVerticalAlign VerticalAlign { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("UI")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         public int Height { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("UI")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         public int Width { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("UI")]
+        [PropertyGroup(PGConstants.EXTENDED)]
         public bool HideInContext { set; get; }
 
         public override string GetDesignHtml()
@@ -211,5 +209,27 @@ namespace ExpressBase.Objects
             Right = right;
             Bottom = bottom;
         }
+    }
+
+    [EnableInBuilder(BuilderType.MobilePage)]
+    public class EbMobileValidator : EbMobilePageBase
+    {
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.MobilePage)]
+        public string EbSid { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        public bool IsDisabled { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        public bool IsWarningOnly { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
+        public EbScript Script { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [Alias("Failure message")]
+        public string FailureMSG { get; set; }
     }
 }
