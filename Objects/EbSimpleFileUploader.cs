@@ -204,10 +204,15 @@ namespace ExpressBase.Objects
 		[Alias("Maximum File Size(MB)")]
 		public int MaxSize { get; set; }
 
+		//[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+		//[DefaultPropValue("image/jpeg,image/png,image/jpg")]
+		//[Alias("File Types")]
+		//public string FileTypes { get; set; }
+
+
 		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
-		[DefaultPropValue("image/jpeg,image/png,image/jpg")]
-		[Alias("File Types")]
-		public string FileTypes { get; set; }
+		[PropertyGroup("General")]
+		public FileClass FileType { set; get; }
 
 		public string GetSelectQuery(IDatabase DataDB, string MasterTable)
 		{
