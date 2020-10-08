@@ -4,14 +4,11 @@ using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
 using ExpressBase.Common.LocationNSolution;
 using ExpressBase.Common.NotificationHubs;
-using ExpressBase.Common.Structures;
-using ExpressBase.Security;
 using ServiceStack;
 using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Runtime.Serialization;
-using System.Text;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
@@ -35,7 +32,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public bool IsValid { set; get; }
 
         public byte[] Logo { set; get; }
+
         public Eb_Solution SolutionObj { get; set; }
+
+        public string Message { set; get; }
     }
 
     public class AppDataToMob
