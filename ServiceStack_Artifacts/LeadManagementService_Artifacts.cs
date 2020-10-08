@@ -75,10 +75,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		[DataMember(Order = 16)]
 		public List<string> SubCategoryList { get; set; }
 
-		//[DataMember(Order = 17)]
-		//public List<string> ImageIdList { get; set; }
+        [DataMember(Order = 17)]
+        public string AttachImgInfo { get; set; }
 
-		[DataMember(Order = 18)]
+        [DataMember(Order = 18)]
 		public Dictionary<string, string> StatusDict { get; set; }
 
 		[DataMember(Order = 19)]
@@ -93,6 +93,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		[DataMember(Order = 22)]
 		public Dictionary<int, string> CustomerCategoryDict { get; set; }
 
+		[DataMember(Order = 23)]
+		public string PrpImgInfo { get; set; }
 	}
 
 	[DataContract]
@@ -127,27 +129,27 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 	}
 
-    [DataContract]
-    public class GetImageInfoRequest : IReturn<GetImageInfoResponse>, IEbSSRequest
-    {
-        [DataMember(Order = 1)]
-        public int CustomerId { get; set; }
+    //[DataContract]
+    //public class GetImageInfoRequest : IReturn<GetImageInfoResponse>, IEbSSRequest
+    //{
+    //    [DataMember(Order = 1)]
+    //    public int CustomerId { get; set; }
 
-        [DataMember(Order = 2)]
-        public string SolnId { get; set; }
+    //    [DataMember(Order = 2)]
+    //    public string SolnId { get; set; }
 
-        public int UserId { get; set; }
-    }
+    //    public int UserId { get; set; }
+    //}
 
-    [DataContract]
-    public class GetImageInfoResponse : IEbSSResponse
-    {
-        [DataMember(Order = 1)]
-        public List<FileMetaInfo> Data { get; set; }
+    //[DataContract]
+    //public class GetImageInfoResponse : IEbSSResponse
+    //{
+    //    [DataMember(Order = 1)]
+    //    public List<FileMetaInfo> Data { get; set; }
 
-        [DataMember(Order = 3)]
-        public ResponseStatus ResponseStatus { get; set; }
-    }
+    //    [DataMember(Order = 3)]
+    //    public ResponseStatus ResponseStatus { get; set; }
+    //}
 
     public class FileMetaInfo
     {
@@ -305,30 +307,30 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public ResponseStatus ResponseStatus { get; set; }
 	}
 
-    [DataContract]
-    public class LmDeleteImageRequest : IReturn<LmDeleteImageResponse>, IEbSSRequest
-    {
-        [DataMember(Order = 1)]
-        public int CustId { get; set; }
+    //[DataContract]
+    //public class LmDeleteImageRequest : IReturn<LmDeleteImageResponse>, IEbSSRequest
+    //{
+    //    [DataMember(Order = 1)]
+    //    public int CustId { get; set; }
 
-        [DataMember(Order = 2)]
-        public string ImgRefIds { get; set; }
+    //    [DataMember(Order = 2)]
+    //    public string ImgRefIds { get; set; }
 
-        [DataMember(Order = 3)]
-        public string SolnId { get; set; }
+    //    [DataMember(Order = 3)]
+    //    public string SolnId { get; set; }
 
-        public int UserId { get; set; }
-    }
+    //    public int UserId { get; set; }
+    //}
 
-    [DataContract]
-    public class LmDeleteImageResponse : IEbSSResponse
-    {
-        [DataMember(Order = 1)]
-        public int RowsAffected { get; set; }
+    //[DataContract]
+    //public class LmDeleteImageResponse : IEbSSResponse
+    //{
+    //    [DataMember(Order = 1)]
+    //    public int RowsAffected { get; set; }
 
-        [DataMember(Order = 2)]
-        public ResponseStatus ResponseStatus { get; set; }
-    }
+    //    [DataMember(Order = 2)]
+    //    public ResponseStatus ResponseStatus { get; set; }
+    //}
 
     [DataContract]
     public class LmDeleteCustomerRequest : IReturn<LmDeleteCustomerResponse>, IEbSSRequest
