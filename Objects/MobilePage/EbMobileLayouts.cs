@@ -9,6 +9,18 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.MobilePage)]
     public class EbMobileTableLayout : EbMobileControl, ILayoutControl
     {
+        public override string Label { set; get; }
+        public override bool Unique { get; set; }
+        public override bool ReadOnly { get; set; }
+        public override bool DoNotPersist { get; set; }
+        public override bool Required { get; set; }
+        public override bool Hidden { set; get; }
+        public override EbScript ValueExpr { get; set; }
+        public override EbScript HiddenExpr { get; set; }
+        public override EbScript DisableExpr { get; set; }
+        public override EbScript DefaultValueExpression { get; set; }
+        public override List<EbMobileValidator> Validators { set; get; }
+
         public EbMobileTableLayout()
         {
             this.CellCollection = new List<EbMobileTableCell>();
@@ -25,12 +37,6 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
         public List<EbMobileTableCell> CellCollection { set; get; }
-
-        public override bool Hidden { set; get; }
-
-        public override bool Unique { get; set; }
-
-        public override EbScript ValueExpr { get => base.ValueExpr; set => base.ValueExpr = value; }
 
         public override string GetDesignHtml()
         {

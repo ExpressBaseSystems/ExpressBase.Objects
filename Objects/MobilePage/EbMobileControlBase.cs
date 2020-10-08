@@ -8,14 +8,14 @@ using System.Runtime.Serialization;
 namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.MobilePage)]
-    public class EbMobileControl : EbMobilePageBase
+    public abstract class EbMobileControl : EbMobilePageBase
     {
         public virtual string EbSid { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.MultiLanguageKeySelector)]
         [UIproperty]
-        [PropertyGroup("Core")]
+        [PropertyGroup(PGConstants.CORE)]
         public virtual string Label { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
@@ -23,27 +23,47 @@ namespace ExpressBase.Objects
         public virtual EbDbTypes EbDbType { get { return EbDbTypes.String; } set { } }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("Behavior")]
+        [PropertyGroup(PGConstants.BEHAVIOR)]
         public virtual bool Hidden { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [HelpText("Set true if want unique value for this control on every form save.")]
-        [PropertyGroup("Behavior")]
-        public virtual bool Unique { get; set; }
+        [PropertyGroup(PGConstants.BEHAVIOR)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
+        [Alias("Hide Expression")]
+        [HelpText("Define conditions to decide visibility of the control.")]
+        public virtual EbScript HiddenExpr { get; set; }
 
-        [PropertyGroup("Behavior")]
+        [PropertyGroup(PGConstants.BEHAVIOR)]
         [EnableInBuilder(BuilderType.MobilePage)]
         [HelpText("Set true if you want to make this control read only.")]
         public virtual bool ReadOnly { get; set; }
 
-        [PropertyGroup("Behavior")]
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
+        [Alias("ReadOnly Expression")]
+        [PropertyGroup(PGConstants.BEHAVIOR)]
+        [HelpText("Define conditions to decide Disabled/Readonly property of the control.")]
+        public virtual EbScript DisableExpr { get; set; }
+
+        [PropertyGroup(PGConstants.VALIDATIONS)]
+        [EnableInBuilder(BuilderType.MobilePage)]
+        public virtual bool Required { get; set; }
+
+        [PropertyGroup(PGConstants.VALIDATIONS)]
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [HelpText("Set true if want unique value for this control on every form save.")]
+        public virtual bool Unique { get; set; }
+
+        [PropertyGroup(PGConstants.VALIDATIONS)]
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        [HelpText("List of validators to consider before form save.")]
+        public virtual List<EbMobileValidator> Validators { get; set; }
+
+        [PropertyGroup(PGConstants.DATA)]
         [EnableInBuilder(BuilderType.MobilePage)]
         [HelpText("Set true if you dont want to save value from this field.")]
         public virtual bool DoNotPersist { get; set; }
-
-        [PropertyGroup("Behavior")]
-        [EnableInBuilder(BuilderType.MobilePage)]
-        public virtual bool Required { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
@@ -55,12 +75,21 @@ namespace ExpressBase.Objects
         [PropertyGroup(PGConstants.VALUE)]
         public virtual EbScript ValueExpr { get; set; }
 
+        [PropertyGroup(PGConstants.VALUE)]
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
+        [HelpText("Define default value of the control.")]
+        public virtual EbScript DefaultValueExpression { get; set; }
+
         public virtual EbControl GetWebFormCtrl(int counter) { return null; }
 
         [OnDeserialized]
         public void OnDeserialized(StreamingContext context)
         {
             if (this.ValueExpr == null) this.ValueExpr = new EbScript();
+            if (this.HiddenExpr == null) this.HiddenExpr = new EbScript();
+            if (this.DisableExpr == null) this.DisableExpr = new EbScript();
+            if (this.DefaultValueExpression == null) this.DefaultValueExpression = new EbScript();
         }
 
         public override List<string> DiscoverRelatedRefids()

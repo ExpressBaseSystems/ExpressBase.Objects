@@ -11,16 +11,16 @@ namespace ExpressBase.Objects
     public class EbMobileButton : EbMobileControl, IMobileLink, INonPersistControl
     {
         public override string Label { set; get; }
-
         public override bool Unique { get; set; }
-
         public override bool ReadOnly { get; set; }
-
         public override bool DoNotPersist { get; set; }
-
         public override bool Required { get; set; }
-
         public override bool Hidden { set; get; }
+        public override EbScript ValueExpr { get; set; }
+        public override EbScript HiddenExpr { get; set; }
+        public override EbScript DisableExpr { get; set; }
+        public override EbScript DefaultValueExpression { get; set; }
+        public override List<EbMobileValidator> Validators { set; get; }
 
         #region
         /// <summary>
