@@ -35,6 +35,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public bool IsValid { set; get; }
 
         public byte[] Logo { set; get; }
+        public Eb_Solution SolutionObj { get; set; }
     }
 
     public class AppDataToMob
