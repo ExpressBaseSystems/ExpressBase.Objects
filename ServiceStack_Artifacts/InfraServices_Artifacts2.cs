@@ -310,6 +310,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 5)]
         public string Description { get; set; }
 
+        [DataMember(Order = 6)]
+        public bool IsDelete { get; set; }
+
         public string SolnId { get; set; }
     }
 
@@ -324,6 +327,24 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 3)]
         public string Message { get; set; }
+    }
+
+    public class DeleteSolutionRequset : EbServiceStackAuthRequest, IReturn<DeleteSolutionResponse>
+    {
+        [DataMember(Order = 2)]
+        public string ISolutionId { get; set; }
+
+        [DataMember(Order = 2)]
+        public string ESolutionId { get; set; }
+    }
+
+    public class DeleteSolutionResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public bool Status { get; set; }
+
+        [DataMember(Order = 1)]
+        public ResponseStatus ResponseStatus { get; set; }
     }
 
     [DataContract]
@@ -463,7 +484,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public SolutionType SolutionType { get; set; }
 
-        public string PrimarySolution { get; set; } 
+        public string PrimarySolution { get; set; }
     }
 
     [DataContract]
