@@ -21,9 +21,11 @@ namespace ExpressBase.Objects
         [HideForUser]
         [EnableInBuilder(BuilderType.DashBoard)]
         public override string Name { get; set; }
-
-        [HideInPropertyGrid]
+        
         [EnableInBuilder(BuilderType.DashBoard)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [PropertyGroup("Data Settings")]
+        [OSE_ObjectTypes(EbObjectTypes.iTableVisualization, EbObjectTypes.iChartVisualization)]
         public override string RefId { get; set; }
 
         [HideForUser]
