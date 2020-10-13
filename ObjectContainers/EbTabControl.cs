@@ -195,7 +195,7 @@ this.Init = function(id)
 
         public override string GetHtml()
         {
-            string html = "<div id='@ebsid@' ebsid='@ebsid@' ctype='@objtype@' class='tab-pane fade @inactive ebcont-ctrl'>";
+            string html = "<div id='@ebsid@' ebsid='@ebsid@' ctype='@objtype@' class='tab-pane fade @inactive ebcont-ctrl ebcont-inner'>";
 
             foreach (EbControl ec in this.Controls)
                 html += ec.GetHtml();

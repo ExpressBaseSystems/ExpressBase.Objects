@@ -78,7 +78,7 @@ namespace ExpressBase.Objects
                     <span class='gb-label eb-label-editable' ui-label>@glabel@</span>
                     <input id='@ebsid@lbltxtb' class='eb-lbltxtb' type='text'/>
                     <div class='gb-border'>
-                        <div class='group-box'>";
+                        <div class='group-box ebcont-inner'>";
 
             foreach (EbControl ec in this.Controls)
                 html += ec.GetHtml();

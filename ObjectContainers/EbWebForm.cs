@@ -1567,7 +1567,9 @@ namespace ExpressBase.Objects
                 Console.WriteLine("EbWebForm.Save.DbTransaction Committed");
                 Console.WriteLine("EbWebForm.Save.SendNotifications start");
                 resp += " - Notifications: " + EbFnGateway.SendNotifications(this, DataDB, service);
+                Console.WriteLine("EbWebForm.Save.SendMobileNotification start");
                 EbFnGateway.SendMobileNotification(this, EbConFactory);
+                Console.WriteLine("EbWebForm.Save.resp = " + resp);
             }
             catch (FormException ex1)
             {

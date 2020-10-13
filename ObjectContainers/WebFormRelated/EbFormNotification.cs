@@ -437,6 +437,7 @@ else if(this.NotifyBy === 3)
                 resp.Message = ex.Message;
                 Console.WriteLine("Exception in SendMobileNotification: " + ex.Message);
             }
+            Console.WriteLine("SendMobileNotification response: " + resp.Message);
             return resp;
         }
     }

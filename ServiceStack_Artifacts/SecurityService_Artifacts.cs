@@ -65,6 +65,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 7)]
         public string Status;
+
+        [DataMember(Order = 8)]
+        public string User_Type;
     }
 
     [DataContract]
