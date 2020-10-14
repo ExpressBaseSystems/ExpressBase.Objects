@@ -530,7 +530,7 @@ namespace ExpressBase.Objects
                 if (RefidMap.ContainsKey(dsid))
                     DataSourceRefId = RefidMap[dsid];
                 else
-                    DataSourceRefId = "failed-to-update-";
+                    DataSourceRefId = "";
             }
             foreach (DVBaseColumn _col in Columns)
             {
@@ -543,13 +543,14 @@ namespace ExpressBase.Objects
                     else if (RefidMap.ContainsKey(_col.ItemFormLink))
                         _col.ItemFormLink = RefidMap[_col.ItemFormLink];
                     else
-                        _col.LinkRefId = "failed-to-update-";
+                        _col.LinkRefId = "";
                 }
 
-                if (_col is DVApprovalColumn && !((_col as DVApprovalColumn).FormRefid.IsNullOrEmpty()) && RefidMap.ContainsKey((_col as DVApprovalColumn).FormRefid))
-                    (_col as DVApprovalColumn).FormRefid = RefidMap[(_col as DVApprovalColumn).FormRefid];
-                else
-                    _col.LinkRefId = "failed-to-update-";
+                if (_col is DVApprovalColumn && !((_col as DVApprovalColumn).FormRefid.IsNullOrEmpty()))
+                    if (RefidMap.ContainsKey((_col as DVApprovalColumn).FormRefid))
+                        (_col as DVApprovalColumn).FormRefid = RefidMap[(_col as DVApprovalColumn).FormRefid];
+                    else
+                        _col.LinkRefId = "";
             }
         }
 
@@ -793,7 +794,7 @@ namespace ExpressBase.Objects
                 if (RefidMap.ContainsKey(DataSourceRefId))
                     DataSourceRefId = RefidMap[DataSourceRefId];
                 else
-                    DataSourceRefId = "failed-to-update-";
+                    DataSourceRefId = "";
             }
         }
 
@@ -908,7 +909,7 @@ namespace ExpressBase.Objects
                 if (RefidMap.ContainsKey(DataSourceRefId))
                     DataSourceRefId = RefidMap[DataSourceRefId];
                 else
-                    DataSourceRefId = "failed-to-update-";
+                    DataSourceRefId = "";
             }
         }
 

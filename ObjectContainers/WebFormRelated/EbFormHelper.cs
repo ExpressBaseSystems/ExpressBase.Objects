@@ -76,7 +76,7 @@ namespace ExpressBase.Objects
                         if (RefidMap.ContainsKey(_flatCtrls[i].RefId))
                             _flatCtrls[i].RefId = RefidMap[_flatCtrls[i].RefId];
                         else
-                            _flatCtrls[i].RefId = "failed-to-update-";
+                            _flatCtrls[i].RefId = "";
                     }
                 }
                 else
@@ -97,7 +97,7 @@ namespace ExpressBase.Objects
                                         if (RefidMap.ContainsKey(st_val))
                                             _prop.SetValue(_flatCtrls[i], RefidMap[st_val], null);
                                         else
-                                            _prop.SetValue(_flatCtrls[i], "failed-to-update-");
+                                            _prop.SetValue(_flatCtrls[i], "");
                                     }
                                 }
                                 else if (_prop.PropertyType == typeof(List<ObjectBasicInfo>))
@@ -109,7 +109,7 @@ namespace ExpressBase.Objects
                                             if (RefidMap.ContainsKey(info.ObjRefId))
                                                 info.ObjRefId = info.ObjRefId;
                                             else
-                                                info.ObjRefId = "failed-to-update-";
+                                                info.ObjRefId = "";
                                         }
                                     }
                                 }

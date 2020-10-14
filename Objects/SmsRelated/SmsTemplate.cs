@@ -81,7 +81,7 @@ namespace ExpressBase.Objects.Objects.SmsRelated
                 if (RefidMap.ContainsKey(DataSourceRefId))
                     DataSourceRefId = RefidMap[DataSourceRefId];
                 else
-                    DataSourceRefId = "failed-to-update-";
+                    DataSourceRefId = "";
             }
         }
 

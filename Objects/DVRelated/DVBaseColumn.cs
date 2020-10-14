@@ -453,7 +453,6 @@ else{
         public ControlClass ColumnQueryMapping { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard)]
-        [HideInPropertyGrid]
         public bool AutoResolve { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog)]

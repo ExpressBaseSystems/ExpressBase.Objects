@@ -21,9 +21,11 @@ namespace ExpressBase.Objects
         [HideForUser]
         [EnableInBuilder(BuilderType.DashBoard)]
         public override string Name { get; set; }
-
-        [HideInPropertyGrid]
+        
         [EnableInBuilder(BuilderType.DashBoard)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [PropertyGroup("Data Settings")]
+        [OSE_ObjectTypes(EbObjectTypes.iTableVisualization, EbObjectTypes.iChartVisualization)]
         public override string RefId { get; set; }
 
         [HideForUser]
@@ -177,7 +179,7 @@ namespace ExpressBase.Objects
                     if (RefidMap.ContainsKey(Tile.RefId))
                         Tile.RefId = RefidMap[Tile.RefId];
                     else
-                        Tile.RefId = "failed-to-update-";
+                        Tile.RefId = "";
                 }
                 if (Tile.ComponentsColl.Count != 0)
                 {
@@ -188,7 +190,7 @@ namespace ExpressBase.Objects
                             if (RefidMap.ContainsKey(component.DataSource))
                                 component.DataSource = RefidMap[component.DataSource];
                             else
-                                component.DataSource = "failed-to-update-";
+                                component.DataSource = "";
                         }
                     }
                 }
@@ -201,7 +203,7 @@ namespace ExpressBase.Objects
                             if (RefidMap.ContainsKey(Links.Object_Selector))
                                 Links.Object_Selector = RefidMap[Links.Object_Selector];
                             else
-                                Links.Object_Selector = "failed-to-update-";
+                                Links.Object_Selector = "";
                         }
                     }
                 }
@@ -210,7 +212,7 @@ namespace ExpressBase.Objects
                 if (RefidMap.ContainsKey(this.Filter_Dialogue))
                     this.Filter_Dialogue = RefidMap[this.Filter_Dialogue];
                 else
-                    this.Filter_Dialogue = "failed-to-update-";
+                    this.Filter_Dialogue = "";
         }
 
         public override List<string> DiscoverRelatedRefids()

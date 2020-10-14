@@ -137,7 +137,7 @@ namespace ExpressBase.Objects
                 if (RefidMap.ContainsKey(FilterDialogRefId))
                     FilterDialogRefId = RefidMap[FilterDialogRefId];
                 else
-                    FilterDialogRefId = "failed-to-update-";
+                    FilterDialogRefId = "";
             }
         }
 

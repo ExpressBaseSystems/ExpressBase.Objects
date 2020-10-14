@@ -116,14 +116,14 @@ namespace ExpressBase.Objects
                 if (RefidMap.ContainsKey(DataSourceRefId))
                     DataSourceRefId = RefidMap[DataSourceRefId];
                 else
-                    DataSourceRefId = "failed-to-update-";
+                    DataSourceRefId = "";
             }
             if (!string.IsNullOrEmpty(this.AttachmentReportRefID))
             {
                 if (RefidMap.ContainsKey(AttachmentReportRefID))
                     AttachmentReportRefID = RefidMap[AttachmentReportRefID];
                 else
-                    AttachmentReportRefID = "failed-to-update-";
+                    AttachmentReportRefID = "";
             }
         }
 

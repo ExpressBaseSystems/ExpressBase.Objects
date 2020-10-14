@@ -1032,7 +1032,7 @@ namespace ExpressBase.Objects
             if (!DataSourceRefId.IsEmpty() && RefidMap.ContainsKey(DataSourceRefId))
                 DataSourceRefId = RefidMap[DataSourceRefId];
             else
-                DataSourceRefId = "failed-to-update-";
+                DataSourceRefId = "";
 
             foreach (EbReportDetail dt in Detail)
             {
@@ -1046,7 +1046,7 @@ namespace ExpressBase.Objects
                             if (RefidMap.ContainsKey(fd_org.LinkRefId))
                                 fd_org.LinkRefId = RefidMap[fd_org.LinkRefId];
                             else
-                                fd_org.LinkRefId = "failed-to-update-";
+                                fd_org.LinkRefId = "";
                         }
                     }
                 }
