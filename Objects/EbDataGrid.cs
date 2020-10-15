@@ -414,6 +414,10 @@ namespace ExpressBase.Objects
     this.__IsDisable = true;
 "; } set { } }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        public bool IsDGCtrl { get { return true; } set { } }
+
+
         [JsonIgnore]
         public override string ClearJSfn { get { return @"document.getElementById(this.EbSid_CtxId).value = '';"; } set { } }
 
