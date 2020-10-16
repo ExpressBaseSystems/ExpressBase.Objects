@@ -232,4 +232,103 @@ namespace ExpressBase.Objects
         [Alias("Failure message")]
         public string FailureMSG { get; set; }
     }
+
+    [EnableInBuilder(BuilderType.MobilePage)]
+    public class EbMobileLabel : EbMobileControl, INonPersistControl
+    {
+        public override string Label { set; get; }
+        public override bool Unique { get; set; }
+        public override bool ReadOnly { get; set; }
+        public override bool DoNotPersist { get; set; }
+        public override bool Required { get; set; }
+        public override bool Hidden { set; get; }
+        public override EbScript ValueExpr { get; set; }
+        public override EbScript HiddenExpr { get; set; }
+        public override EbScript DisableExpr { get; set; }
+        public override EbScript DefaultValueExpression { get; set; }
+        public override List<EbMobileValidator> Validators { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [MetaOnly]
+        public override string Name { get; set; }
+
+        //[EnableInBuilder(BuilderType.MobilePage)]
+        //[HideInPropertyGrid]
+        //public EbDbTypes Type { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        public int BorderRadius { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        [DefaultPropValue("Label1")]
+        [OnChangeExec(@"
+                if (this.Text !== ''){ 
+                        $(`#${this.EbSid} .mobile-lbl-text`).text(this.Text);
+                }
+            ")]
+        public string Text { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [UIproperty]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        [PropertyEditor(PropertyEditorType.FontSelector)]
+        public EbFont Font { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        [Alias("Align X")]
+        [OnChangeExec(@"
+                if (this.HorrizontalAlign !== 3){ 
+                        pg.ShowProperty('Width');
+                }
+                else {
+                        pg.HideProperty('Width');
+                }
+            ")]
+        public MobileHorrizontalAlign HorrizontalAlign { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        [Alias("Align Y")]
+        [OnChangeExec(@"
+                if (this.VerticalAlign !== 3){ 
+                        pg.ShowProperty('Height');
+                }
+                else {
+                        pg.HideProperty('Height');
+                }
+            ")]
+        public MobileVerticalAlign VerticalAlign { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        public int Height { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        public int Width { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [UIproperty]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        [PropertyEditor(PropertyEditorType.Color)]
+        [OnChangeExec(@"
+                if (this.BackgroundColor !== ''){ 
+                        $(`#${this.EbSid}`).style('background-color',this.BackgroundColor);
+                }
+            ")]
+        public string BackgroundColor { get; set; }
+
+
+        public override string GetDesignHtml()
+        {
+            return @"<div class='data_column mob_control dropped' title='@Text' tabindex='1' onclick='$(this).focus()' eb-type='EbMobileLabel' id='@id'>
+                        <div class='data_column_inner'>
+                            <span class='mobile-lbl-text'> Label </span>
+                        </div>
+                    </div>".RemoveCR().DoubleQuoted();
+        }
+    }
 }
