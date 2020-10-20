@@ -2136,6 +2136,11 @@ namespace ExpressBase.Objects
                 this.Save(DataDB, service, TransactionConnection);
                 DataIds.Add(this.TableRowId);
             }
+	    if (this.FormSchema.ExtendedControls.Find(e => e is EbProvisionUser) != null)
+            {
+                Console.WriteLine("ProcessBatchRequest - UpdateSolutionObjectRequest start");
+                service.Gateway.Send<UpdateSolutionObjectResponse>(new UpdateSolutionObjectRequest { SolnId = this.SolutionObj.SolutionID, UserId = this.UserObj.UserId });
+            }
             return DataIds;
         }
 
@@ -2253,12 +2258,12 @@ namespace ExpressBase.Objects
                 if (c is EbProvisionUser && (c as EbProvisionUser).IsUserCreated())
                 {
                     UpdateSoluObj = true;
-                    Console.WriteLine("AfterExecutionIfUserCreated - New User creation found");
-                    if (EmailCon?.Primary != null)
-                    {
-                        Console.WriteLine("AfterExecutionIfUserCreated - SendWelcomeMail start");
-                        (c as EbProvisionUser).SendWelcomeMail(MessageProducer3, this.UserObj, this.SolutionObj);
-                    }
+                    //Console.WriteLine("AfterExecutionIfUserCreated - New User creation found");
+                    //if (EmailCon?.Primary != null)
+                    //{
+                    //    Console.WriteLine("AfterExecutionIfUserCreated - SendWelcomeMail start");
+                    //    (c as EbProvisionUser).SendWelcomeMail(MessageProducer3, this.UserObj, this.SolutionObj);
+                    //}
                 }
             }
             if (UpdateSoluObj)
