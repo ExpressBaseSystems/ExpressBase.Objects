@@ -107,14 +107,15 @@ namespace ExpressBase.Objects
         [PropertyPriority(98)]
         [Alias("Help Video URL")]
         [HelpText("Help video.")]
-        [OnChangeExec(@"
-        if(this.Info && this.Info.trim() !== ''){
-            pg.ShowProperty('InfoIcon');
-        }
-        else{
-            pg.HideProperty('InfoIcon');
-        }")]
         public string InfoVideoURL { get; set; }
+
+        [PropertyGroup(PGConstants.HELP)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [PropertyPriority(98)]
+        [Alias("Help Videos URLs")]
+        [HelpText("Help videos.")]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        public virtual List<EbURL> InfoVideoURLs { get; set; }
 
         [PropertyGroup("Events")]
         [EnableInBuilder(BuilderType.WebForm)]
@@ -2612,5 +2613,42 @@ namespace ExpressBase.Objects
         //        }
         //    }
         //}
+    }
+
+
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+    [HideInToolBox]
+    [UsedWithTopObjectParent(typeof(EbObject))]
+    [Alias("URL")]
+    public class EbURL
+    {
+        [Alias("URL")]
+        public EbURL() { }
+
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        public string EbSid { get; set; }
+
+        [PropertyGroup(PGConstants.CORE)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [EbRequired]
+        [Unique]
+        [regexCheck]
+        [InputMask("[a-z][a-z0-9]*(_[a-z0-9]+)*")]
+        public string Name { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.CORE)]
+        [Alias("URL")]
+        public string URL { get; set; }
+
+        [PropertyGroup(PGConstants.CORE)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [Unique]
+        public string Title { get; set; }
+
+        [PropertyGroup(PGConstants.CORE)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        public  bool Hide { get; set; }
     }
 }
