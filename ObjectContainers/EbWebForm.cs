@@ -39,6 +39,7 @@ namespace ExpressBase.Objects
         public EbWebForm()
         {
             //this.Validators = new List<EbValidator>();
+            this.InfoVideoURLs = new List<EbURL>();
             this.DisableDelete = new List<EbSQLValidator>();
             this.DisableCancel = new List<EbSQLValidator>();
             this.BeforeSaveRoutines = new List<EbRoutines>();
