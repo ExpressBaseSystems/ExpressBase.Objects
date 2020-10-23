@@ -2137,7 +2137,7 @@ namespace ExpressBase.Objects
                 this.Save(DataDB, service, TransactionConnection);
                 DataIds.Add(this.TableRowId);
             }
-	    if (this.FormSchema.ExtendedControls.Find(e => e is EbProvisionUser) != null)
+            if (this.FormSchema.ExtendedControls.Find(e => e is EbProvisionUser) != null)
             {
                 Console.WriteLine("ProcessBatchRequest - UpdateSolutionObjectRequest start");
                 service.Gateway.Send<UpdateSolutionObjectResponse>(new UpdateSolutionObjectRequest { SolnId = this.SolutionObj.SolutionID, UserId = this.UserObj.UserId });
@@ -2621,9 +2621,9 @@ namespace ExpressBase.Objects
     }
 
 
-    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.DVBuilder)]
     [HideInToolBox]
-    [UsedWithTopObjectParent(typeof(EbObject))]
+    [UsedWithTopObjectParent(typeof(EbObject), typeof(EbDashBoardWraper))]
     [Alias("URL")]
     public class EbURL
     {
@@ -2631,29 +2631,29 @@ namespace ExpressBase.Objects
         public EbURL() { }
 
         [HideInPropertyGrid]
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.DVBuilder)]
         public string EbSid { get; set; }
 
         [PropertyGroup(PGConstants.CORE)]
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.DVBuilder)]
         [EbRequired]
         [Unique]
         [regexCheck]
         [InputMask("[a-z][a-z0-9]*(_[a-z0-9]+)*")]
         public string Name { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.DVBuilder)]
         [PropertyGroup(PGConstants.CORE)]
         [Alias("URL")]
         public string URL { get; set; }
 
         [PropertyGroup(PGConstants.CORE)]
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.DVBuilder)]
         [Unique]
         public string Title { get; set; }
 
         [PropertyGroup(PGConstants.CORE)]
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        public  bool Hide { get; set; }
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.DVBuilder)]
+        public bool Hide { get; set; }
     }
 }
