@@ -21,7 +21,37 @@ namespace ExpressBase.Objects
         [HideForUser]
         [EnableInBuilder(BuilderType.DashBoard)]
         public override string Name { get; set; }
-        
+
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.DashBoard)]
+        public virtual string EbSid { get; set; }
+
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.DashBoard)]
+        public virtual string EbSid_CtxId
+        {
+            get
+            {
+                return (!ContextId.IsNullOrEmpty()) ? string.Concat(ContextId, "_", EbSid) : EbSid;
+            }
+            set { }
+        }
+
+        private string _ContextId;
+
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.DashBoard)]
+        public virtual string ContextId
+        {
+            get { return _ContextId; }
+
+            set
+            {
+                _ContextId = value;
+                EbSid_CtxId = string.Concat(ContextId, "_", EbSid);
+            }
+        }
+
         [EnableInBuilder(BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [PropertyGroup("Data Settings")]
