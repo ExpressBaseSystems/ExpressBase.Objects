@@ -81,13 +81,6 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.FileUploader)]
         [Alias("Info Document")]
         [HelpText("Help information.")]
-        [OnChangeExec(@"
-        if(this.Info && this.Info.trim() !== ''){
-            pg.ShowProperty('InfoIcon');
-        }
-        else{
-            pg.HideProperty('InfoIcon');
-        }")]
         public string Info { get; set; }
 
         [PropertyGroup(PGConstants.HELP)]
@@ -95,14 +88,15 @@ namespace ExpressBase.Objects
         [PropertyPriority(98)]
         [Alias("Help Video URL")]
         [HelpText("Help video.")]
-        [OnChangeExec(@"
-        if(this.Info && this.Info.trim() !== ''){
-            pg.ShowProperty('InfoIcon');
-        }
-        else{
-            pg.HideProperty('InfoIcon');
-        }")]
         public string InfoVideoURL { get; set; }
+
+        [PropertyGroup(PGConstants.HELP)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.DashBoard, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [PropertyPriority(98)]
+        [Alias("Help Videos URLs")]
+        [HelpText("Help videos.")]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        public virtual List<EbURL> InfoVideoURLs { get; set; }
 
         [EnableInBuilder(BuilderType.DashBoard)]
         [UIproperty]
@@ -168,6 +162,7 @@ namespace ExpressBase.Objects
         public EbDashBoard()
         {
             Tiles = new List<Tiles>();
+            this.InfoVideoURLs = new List<EbURL>();
         }
 
         public override void ReplaceRefid(Dictionary<string, string> RefidMap)
