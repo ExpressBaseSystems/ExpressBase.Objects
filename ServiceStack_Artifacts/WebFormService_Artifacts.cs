@@ -544,6 +544,49 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
+    public class CheckEmailAndPhoneRequest : EbServiceStackAuthRequest, IReturn<CheckEmailAndPhoneResponse>
+    {
+        [DataMember(Order = 1)]
+        public string RefId { get; set; }
+
+        [DataMember(Order = 2)]
+        public int RowId { get; set; }
+
+        [DataMember(Order = 3)]
+        public string Data { get; set; }
+    }
+
+    [DataContract]
+    public class CheckEmailAndPhoneResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public string Data { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    [DataContract]
+    public class GetProvUserListRequest : EbServiceStackAuthRequest, IReturn<GetProvUserListResponse>
+    {
+        [DataMember(Order = 1)]
+        public string RefId { get; set; }
+
+        [DataMember(Order = 2)]
+        public int RowId { get; set; }
+    }
+
+    [DataContract]
+    public class GetProvUserListResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public string Data { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    [DataContract]
     public class DeleteDataFromWebformRequest : EbServiceStackAuthRequest, IReturn<DeleteDataFromWebformResponse>
     {
         [DataMember(Order = 1)]
