@@ -86,6 +86,10 @@ namespace ExpressBase.Objects
         public bool DisableUpload { set; get; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+		[DefaultPropValue("false")]
+		public bool ViewByCategory { set; get; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup("General")]
         public int MaxFileSize { set; get; }
 
