@@ -17,6 +17,31 @@ namespace ExpressBase.Objects
         public override string Name { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Core")]
+        [DefaultPropValue("'Dynamic'")]
+        [OnChangeExec(@"
+                if (this.Type === 1) { 
+                    pg.ShowPropertiesExt(['StaticParamters','Items']);
+                    pg.HideGroupsExt(['Data','Link Settings','Action Button Settings']);
+                }
+                else {
+                    pg.HidePropertiesExt(['StaticParamters','Items']);
+                    pg.ShowGroupsExt(['Data','Link Settings','Action Button Settings']);
+                }
+            ")]
+        public MobileVisualizationType Type { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        [PropertyGroup("Core")]
+        public List<EbMobileStaticParameter> StaticParamters { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        [PropertyGroup("Core")]
+        public List<EbMobileStaticListItem> Items { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
         [Alias("Data Source")]
@@ -72,6 +97,14 @@ namespace ExpressBase.Objects
         [OSE_ObjectTypes(EbObjectTypes.iMobilePage)]
         [PropertyGroup("Link Settings")]
         [Alias("Link")]
+        [OnChangeExec(@"
+                if (this.LinkRefId && this.LinkTypeForm){ 
+                        pg.ShowPropertiesExt(this.LinkSettingsProps);
+                }
+                else {
+                        pg.HidePropertiesExt(this.LinkSettingsProps);
+                }
+            ")]
         public string LinkRefId { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
@@ -105,7 +138,15 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("Link Settings")]
+        public bool ShowLinkIcon { set; get; }
+
+        #region FAB Settings Properties
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Action Button Settings")]
+        [Alias("Visibility")]
         [OnChangeExec(@"
+                $(`#${this.EbSid} .vis-container-newbtn`).visibility(this.ShowNewButton);
                 if (this.ShowNewButton){ 
                         pg.ShowProperty('NewButtonText');
                 }
@@ -116,12 +157,85 @@ namespace ExpressBase.Objects
         public bool ShowNewButton { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("Link Settings")]
+        [PropertyGroup("Action Button Settings")]
+        [Alias("Text")]
+        [OnChangeExec(@"
+                let mr = this.NewButtonText ? 8 : 0;
+                let template = `<span style='margin-right:${mr}px'>${this.NewButtonText || ''}</span><i class='fa fa-plus'></i>`;
+                $(`#${this.EbSid} .vis-container-newbtn`).html(template);
+            ")]
         public string NewButtonText { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("Link Settings")]
-        public bool ShowLinkIcon { set; get; }
+        [PropertyGroup("Action Button Settings")]
+        [DefaultPropValue("true")]
+        [OnChangeExec(@"
+                if (this.UseLinkSettings){ 
+                    pg.HidePropertiesExt(['FabLinkRefId','FabFormMode','FabFormId','FabFormParameters','ContextToFabControlMap']);
+                }
+                else {
+                        pg.ShowProperty('FabLinkRefId');
+                        if(this.FabLinkRefId && this.FabLinkTypeForm) {
+                            pg.ShowPropertiesExt(this.FabSettingsProps);
+                        }
+                        else {
+                            pg.HidePropertiesExt(this.FabSettingsProps);
+                        }
+                }
+            ")]
+        public bool UseLinkSettings { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [OSE_ObjectTypes(EbObjectTypes.iMobilePage)]
+        [PropertyGroup("Action Button Settings")]
+        [Alias("Link")]
+        [OnChangeExec(@"
+                if (this.FabLinkRefId && this.FabLinkTypeForm){ 
+                        pg.ShowPropertiesExt(this.FabSettingsProps);
+                }
+                else {
+                        pg.HidePropertiesExt(this.FabSettingsProps);
+                }
+            ")]
+        public string FabLinkRefId { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Action Button Settings")]
+        [OnChangeExec(@"
+                if (this.FabFormMode === 1){ 
+                        pg.ShowProperty('FabFormId');
+                }
+                else {
+                        pg.HideProperty('FabFormId');
+                }
+            ")]
+        [Alias("Form mode")]
+        public WebFormDVModes FabFormMode { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "DataColumns", 1)]
+        [PropertyGroup("Action Button Settings")]
+        [Alias("Form id")]
+        public EbMobileDataColToControlMap FabFormId { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [MetaOnly]
+        public List<EbMobileControlMeta> FabControlMetas => new List<EbMobileControlMeta>();
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Action Button Settings")]
+        [Alias("Columns to controls map")]
+        [PropertyEditor(PropertyEditorType.Mapper, "DataColumns", "FabControlMetas", "FormControl")]
+        public List<EbMobileDataColToControlMap> FabFormParameters { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        [PropertyGroup("Action Button Settings")]
+        [Alias("Context to controls map")]
+        public List<EbCTCMapper> ContextToFabControlMap { set; get; }
+
+        #endregion
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("List Styles")]

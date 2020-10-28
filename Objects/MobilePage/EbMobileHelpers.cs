@@ -252,14 +252,6 @@ namespace ExpressBase.Objects
         [MetaOnly]
         public override string Name { get; set; }
 
-        //[EnableInBuilder(BuilderType.MobilePage)]
-        //[HideInPropertyGrid]
-        //public EbDbTypes Type { get; set; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup(PGConstants.APPEARANCE)]
-        public int BorderRadius { get; set; }
-
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup(PGConstants.APPEARANCE)]
         [DefaultPropValue("Label1")]
@@ -271,10 +263,41 @@ namespace ExpressBase.Objects
         public string Text { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        public bool RenderAsIcon { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        public new string Icon { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
         [UIproperty]
         [PropertyGroup(PGConstants.APPEARANCE)]
         [PropertyEditor(PropertyEditorType.FontSelector)]
         public EbFont Font { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        public int BorderRadius { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [UIproperty]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        [PropertyEditor(PropertyEditorType.Color)]
+        [OnChangeExec(@"
+                if (this.BackgroundColor !== ''){ 
+                        $(`#${this.EbSid}`).style('background-color',this.BackgroundColor);
+                }
+            ")]
+        public string BackgroundColor { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        public int RowSpan { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        public int ColumnSpan { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup(PGConstants.APPEARANCE)]
@@ -311,16 +334,18 @@ namespace ExpressBase.Objects
         public int Width { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [UIproperty]
-        [PropertyGroup(PGConstants.APPEARANCE)]
-        [PropertyEditor(PropertyEditorType.Color)]
-        [OnChangeExec(@"
-                if (this.BackgroundColor !== ''){ 
-                        $(`#${this.EbSid}`).style('background-color',this.BackgroundColor);
-                }
-            ")]
-        public string BackgroundColor { get; set; }
+        [MetaOnly]
+        public List<EbMobileStaticParameter> BindableParams => new List<EbMobileStaticParameter>();
 
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Static List Settings")]
+        [Alias("Binding Parameter")]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "BindableParams", 1)]
+        public EbMobileStaticParameter BindingParam { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Static List Settings")]
+        public bool EnableSearch { set; get; }
 
         public override string GetDesignHtml()
         {
@@ -330,5 +355,44 @@ namespace ExpressBase.Objects
                         </div>
                     </div>".RemoveCR().DoubleQuoted();
         }
+    }
+
+    [EnableInBuilder(BuilderType.MobilePage)]
+    public class EbMobileStaticParameter : EbMobilePageBase
+    {
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.MobilePage)]
+        public string EbSid { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        public override string Name { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.CORE)]
+        public string Value { set; get; }
+    }
+
+    [EnableInBuilder(BuilderType.MobilePage)]
+    public class EbMobileStaticListItem : EbMobilePageBase
+    {
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.MobilePage)]
+        public string EbSid { get; set; }
+
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.MobilePage)]
+        public override string Name { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        [PropertyGroup(PGConstants.CORE)]
+        public List<EbMobileStaticParameter> Parameters { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [OSE_ObjectTypes(EbObjectTypes.iMobilePage)]
+        [Alias("Link")]
+        [PropertyGroup(PGConstants.CORE)]
+        public string LinkRefId { get; set; }
     }
 }
