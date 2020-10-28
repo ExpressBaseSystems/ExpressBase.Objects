@@ -33,7 +33,7 @@ namespace ExpressBase.Objects
                     $(`#cont_${ elementId}>table>tbody>tr>td`).css('padding', `${props.Padding.Top}px ${props.Padding.Right}px ${props.Padding.Bottom}px ${props.Padding.Left}px`);
                 },
                 verticalAlign : function(elementId, props) {
-                     $(`[ebsid=${props.EbSid}].form-render-table-Td`).css('vertical-align',getKeyByVal(EbEnums.VerticalAlign,props.VerticalAlign.toString()));
+                     $(`[ebsid=${props.EbSid}].form-render-table-Td>.tdInnerDiv`).css('justify-content',(props.VerticalAlign === 0 ? 'flex-start' : (props.VerticalAlign === 1 ? 'center': 'flex-end')));
                 }
             }";
             }

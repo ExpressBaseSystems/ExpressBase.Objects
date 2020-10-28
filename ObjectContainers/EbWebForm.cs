@@ -39,6 +39,7 @@ namespace ExpressBase.Objects
         public EbWebForm()
         {
             //this.Validators = new List<EbValidator>();
+            this.InfoVideoURLs = new List<EbURL>();
             this.DisableDelete = new List<EbSQLValidator>();
             this.DisableCancel = new List<EbSQLValidator>();
             this.BeforeSaveRoutines = new List<EbRoutines>();
@@ -94,7 +95,7 @@ namespace ExpressBase.Objects
         [Alias("Info Document")]
         [HelpText("Help information.")]
         [OnChangeExec(@"
-        if(this.Info && this.Info.trim() !== ''){
+        if((this.Info && this.Info.trim()) !== '' || (this.InfoVideoURLs && this.InfoVideoURLs.$values.length > 0)){
             pg.ShowProperty('InfoIcon');
         }
         else{
@@ -107,14 +108,15 @@ namespace ExpressBase.Objects
         [PropertyPriority(98)]
         [Alias("Help Video URL")]
         [HelpText("Help video.")]
-        [OnChangeExec(@"
-        if(this.Info && this.Info.trim() !== ''){
-            pg.ShowProperty('InfoIcon');
-        }
-        else{
-            pg.HideProperty('InfoIcon');
-        }")]
         public string InfoVideoURL { get; set; }
+
+        [PropertyGroup(PGConstants.HELP)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [PropertyPriority(98)]
+        [Alias("Help Videos URLs")]
+        [HelpText("Help videos.")]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        public virtual List<EbURL> InfoVideoURLs { get; set; }
 
         [PropertyGroup("Events")]
         [EnableInBuilder(BuilderType.WebForm)]
@@ -2136,6 +2138,11 @@ namespace ExpressBase.Objects
                 this.Save(DataDB, service, TransactionConnection);
                 DataIds.Add(this.TableRowId);
             }
+            if (this.FormSchema.ExtendedControls.Find(e => e is EbProvisionUser) != null)
+            {
+                Console.WriteLine("ProcessBatchRequest - UpdateSolutionObjectRequest start");
+                service.Gateway.Send<UpdateSolutionObjectResponse>(new UpdateSolutionObjectRequest { SolnId = this.SolutionObj.SolutionID, UserId = this.UserObj.UserId });
+            }
             return DataIds;
         }
 
@@ -2253,12 +2260,12 @@ namespace ExpressBase.Objects
                 if (c is EbProvisionUser && (c as EbProvisionUser).IsUserCreated())
                 {
                     UpdateSoluObj = true;
-                    Console.WriteLine("AfterExecutionIfUserCreated - New User creation found");
-                    if (EmailCon?.Primary != null)
-                    {
-                        Console.WriteLine("AfterExecutionIfUserCreated - SendWelcomeMail start");
-                        (c as EbProvisionUser).SendWelcomeMail(MessageProducer3, this.UserObj, this.SolutionObj);
-                    }
+                    //Console.WriteLine("AfterExecutionIfUserCreated - New User creation found");
+                    //if (EmailCon?.Primary != null)
+                    //{
+                    //    Console.WriteLine("AfterExecutionIfUserCreated - SendWelcomeMail start");
+                    //    (c as EbProvisionUser).SendWelcomeMail(MessageProducer3, this.UserObj, this.SolutionObj);
+                    //}
                 }
             }
             if (UpdateSoluObj)
@@ -2612,5 +2619,49 @@ namespace ExpressBase.Objects
         //        }
         //    }
         //}
+    }
+
+
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.DVBuilder)]
+    [HideInToolBox]
+    [UsedWithTopObjectParent(typeof(EbObject), typeof(EbDashBoardWraper), typeof(EbDataVisualizationObject))]
+    [Alias("URL")]
+    public class EbURL
+    {
+        [Alias("URL")]
+        public EbURL() { }
+
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.DVBuilder)]
+        public string EbSid { get; set; }
+
+        [PropertyGroup(PGConstants.CORE)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.DVBuilder)]
+        [EbRequired]
+        [Unique]
+        [regexCheck]
+        [InputMask("[a-z][a-z0-9]*(_[a-z0-9]+)*")]
+        public string Name { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.DVBuilder)]
+        [PropertyGroup(PGConstants.CORE)]
+        [Alias("URL")]
+        [OnChangeExec(@"
+            if (this.URL) {
+                if (EbIsValidURL(this.URL)) {
+                    pg.setSimpleProperty('URL', this.URL.replace('.youtube.com/watch?v=', '.youtube.com/embed/').replace(/\?rel=0?$/, '') + '?rel=0');
+                }
+            }
+        ")]
+        public string URL { get; set; }
+
+        [PropertyGroup(PGConstants.CORE)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.DVBuilder)]
+        [Unique]
+        public string Title { get; set; }
+
+        [PropertyGroup(PGConstants.CORE)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.DVBuilder)]
+        public bool Hide { get; set; }
     }
 }

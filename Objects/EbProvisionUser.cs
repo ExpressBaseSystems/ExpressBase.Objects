@@ -251,6 +251,9 @@ this.Init = function(id)
 .Replace("@required@", (this.Required && !this.Hidden ? " required" : string.Empty))
 .Replace("@placeHolder@", "placeholder=''");
         }
+                    //@"<div class='pu-cont' id='@ebsid@' data-ebtype='@data-ebtype@'>
+                    //    <div class='pu-txt-info'>- Design html is not implemented -</div>
+                    // </div>"
 
         public override string GetDesignHtml()
         {
@@ -734,7 +737,7 @@ this.Init = function(id)
         public override string RefreshJSfn { get { return @""; } set { } }
 
         public override string ClearJSfn { get { return @""; } set { } }
-
+        
         public override string DisableJSfn { get { return JSFnsConstants.Ctrl_DisableJSfn + "$('#' + this.EbSid_CtxId + '_usrimg').css('pointer-events', 'auto');"; } set { } }
 
     }
@@ -782,8 +785,8 @@ this.Init = function(id)
         [HideInPropertyGrid]
         public string Type { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm)]
-        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.WebForm)]//
+        [HideInPropertyGrid]//
         public EbControl Control { get; set; }
     }
 

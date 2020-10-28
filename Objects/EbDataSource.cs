@@ -37,6 +37,11 @@ namespace ExpressBase.Objects
         {
             return new List<Param>();
         }
+
+        [EnableInBuilder(BuilderType.DataReader, BuilderType.DataWriter, BuilderType.SqlFunctions)]
+        [PropDataSourceJsFn("return ebcontext.SupportingDataDB")]
+        [PropertyEditor(PropertyEditorType.DropDown)]
+        public int DataStore { get; set; }
     }
 
     [BuilderTypeEnum(BuilderType.DataReader)]
@@ -200,136 +205,136 @@ namespace ExpressBase.Objects
         }
     }
 
-        [BuilderTypeEnum(BuilderType.DataWriter)]
+    [BuilderTypeEnum(BuilderType.DataWriter)]
+    [EnableInBuilder(BuilderType.DataWriter)]
+    public class EbDataWriter : EbDataSourceMain, IEBRootObject
+    {
         [EnableInBuilder(BuilderType.DataWriter)]
-        public class EbDataWriter : EbDataSourceMain, IEBRootObject
+        [HideInPropertyGrid]
+        public override string RefId { get; set; }
+
+        [EnableInBuilder(BuilderType.DataWriter)]
+        public override string DisplayName { get; set; }
+
+        [EnableInBuilder(BuilderType.DataWriter)]
+        public override string Description { get; set; }
+
+        [EnableInBuilder(BuilderType.DataWriter)]
+        [HideInPropertyGrid]
+        public override string VersionNumber { get; set; }
+
+        [EnableInBuilder(BuilderType.DataWriter)]
+        [HideInPropertyGrid]
+        public override string Status { get; set; }
+
+        //forapi
+        public override List<Param> GetParams(RedisClient _redis)
         {
-            [EnableInBuilder(BuilderType.DataWriter)]
-            [HideInPropertyGrid]
-            public override string RefId { get; set; }
+            if ((this.InputParams != null) && (this.InputParams.Any()))
+                return this.InputParams;
+            else
+                return SqlHelper.GetSqlParams(this.Sql, (int)EbObjectTypes.DataWriter);
+        }
+    }
 
-            [EnableInBuilder(BuilderType.DataWriter)]
-            public override string DisplayName { get; set; }
+    [EnableInBuilder(BuilderType.SqlFunctions)]
+    [BuilderTypeEnum(BuilderType.SqlFunctions)]
+    public class EbSqlFunction : EbDataSourceMain, IEBRootObject
+    {
+        [EnableInBuilder(BuilderType.SqlFunctions)]
+        [HideInPropertyGrid]
+        public override string RefId { get; set; }
 
-            [EnableInBuilder(BuilderType.DataWriter)]
-            public override string Description { get; set; }
+        [EnableInBuilder(BuilderType.SqlFunctions)]
+        public override string DisplayName { get; set; }
 
-            [EnableInBuilder(BuilderType.DataWriter)]
-            [HideInPropertyGrid]
-            public override string VersionNumber { get; set; }
+        [EnableInBuilder(BuilderType.SqlFunctions)]
+        public override string Description { get; set; }
 
-            [EnableInBuilder(BuilderType.DataWriter)]
-            [HideInPropertyGrid]
-            public override string Status { get; set; }
+        [EnableInBuilder(BuilderType.SqlFunctions)]
+        [HideInPropertyGrid]
+        public override string VersionNumber { get; set; }
 
-            //forapi
-            public override List<Param> GetParams(RedisClient _redis)
+        [EnableInBuilder(BuilderType.SqlFunctions)]
+        [HideInPropertyGrid]
+        public override string Status { get; set; }
+
+        [JsonIgnore]
+        public WebFormSchema FormSchema { set; get; }
+
+        [EnableInBuilder(BuilderType.SqlFunctions)]
+        [HideInPropertyGrid]
+        public string FunctionName
+        {
+            set { }
+            get
             {
-                if ((this.InputParams != null) && (this.InputParams.Any()))
-                    return this.InputParams;
-                else
-                    return SqlHelper.GetSqlParams(this.Sql, (int)EbObjectTypes.DataWriter);
+                return GetFuncNameByRegex();
             }
         }
 
-        [EnableInBuilder(BuilderType.SqlFunctions)]
-        [BuilderTypeEnum(BuilderType.SqlFunctions)]
-        public class EbSqlFunction : EbDataSourceMain, IEBRootObject
+        [JsonIgnore]
+        private IEbConnectionFactory ConnectionFactory { get; set; }
+
+        public EbSqlFunction()
         {
-            [EnableInBuilder(BuilderType.SqlFunctions)]
-            [HideInPropertyGrid]
-            public override string RefId { get; set; }
 
-            [EnableInBuilder(BuilderType.SqlFunctions)]
-            public override string DisplayName { get; set; }
+        }
 
-            [EnableInBuilder(BuilderType.SqlFunctions)]
-            public override string Description { get; set; }
+        public EbSqlFunction(WebFormSchema data, IEbConnectionFactory con)
+        {
+            this.FormSchema = data;
+            DisplayName = FormSchema.FormName + "_data_insert";
+            Name = DisplayName;
+            this.ConnectionFactory = con;
+            this.Sql = this.GenSqlFunc();
+        }
 
-            [EnableInBuilder(BuilderType.SqlFunctions)]
-            [HideInPropertyGrid]
-            public override string VersionNumber { get; set; }
-
-            [EnableInBuilder(BuilderType.SqlFunctions)]
-            [HideInPropertyGrid]
-            public override string Status { get; set; }
-
-            [JsonIgnore]
-            public WebFormSchema FormSchema { set; get; }
-
-            [EnableInBuilder(BuilderType.SqlFunctions)]
-            [HideInPropertyGrid]
-            public string FunctionName
-            {
-                set { }
-                get
-                {
-                    return GetFuncNameByRegex();
-                }
-            }
-
-            [JsonIgnore]
-            private IEbConnectionFactory ConnectionFactory { get; set; }
-
-            public EbSqlFunction()
-            {
-
-            }
-
-            public EbSqlFunction(WebFormSchema data, IEbConnectionFactory con)
-            {
-                this.FormSchema = data;
-                DisplayName = FormSchema.FormName + "_data_insert";
-                Name = DisplayName;
-                this.ConnectionFactory = con;
-                this.Sql = this.GenSqlFunc();
-            }
-
-            private string GenSqlFunc()
-            {
-                StringBuilder qry = new StringBuilder();
-                // qry.AppendFormat(SqlConstants.SQL_FUNC_HEADER, this.FormSchema.FormName, "'plpgsql'");
-                qry.AppendFormat(this.ConnectionFactory.DataDB.EB_API_SQL_FUNC_HEADER, this.FormSchema.FormName, "'plpgsql'");
-                qry.AppendLine();
-                qry.Append(@" DECLARE 
+        private string GenSqlFunc()
+        {
+            StringBuilder qry = new StringBuilder();
+            // qry.AppendFormat(SqlConstants.SQL_FUNC_HEADER, this.FormSchema.FormName, "'plpgsql'");
+            qry.AppendFormat(this.ConnectionFactory.DataDB.EB_API_SQL_FUNC_HEADER, this.FormSchema.FormName, "'plpgsql'");
+            qry.AppendLine();
+            qry.Append(@" DECLARE 
 temp_table jsonb;
 _row jsonb;
 _master_id integer;
 BEGIN ");
-                for (int k = 0; k < this.FormSchema.Tables.Count; k++)
+            for (int k = 0; k < this.FormSchema.Tables.Count; k++)
+            {
+                if (this.FormSchema.Tables[k].TableName == this.FormSchema.MasterTable)
                 {
-                    if (this.FormSchema.Tables[k].TableName == this.FormSchema.MasterTable)
-                    {
-                        qry.AppendLine(GetQueryBlockInsert(this.FormSchema.Tables[k]));
-                        qry.AppendFormat(@"SELECT 
+                    qry.AppendLine(GetQueryBlockInsert(this.FormSchema.Tables[k]));
+                    qry.AppendFormat(@"SELECT 
     CURRVAL('{0}_id_seq') 
 INTO 
     master_id;", this.FormSchema.MasterTable);
-                        qry.AppendLine();
-                        qry.AppendLine(GetQueryBlockUpdate(this.FormSchema.Tables[k]));
-                        break;
-                    }
+                    qry.AppendLine();
+                    qry.AppendLine(GetQueryBlockUpdate(this.FormSchema.Tables[k]));
+                    break;
                 }
-                qry.AppendLine();
-                for (int i = 0; i < this.FormSchema.Tables.Count; i++)
-                {
-                    if (this.FormSchema.Tables[i].TableName == this.FormSchema.MasterTable)
-                        continue;
-                    else
-                    {
-                        qry.AppendLine();
-                        qry.AppendLine(GetQueryBlockInsert(this.FormSchema.Tables[i]));
-                        qry.AppendLine();
-                        qry.AppendLine(GetQueryBlockUpdate(this.FormSchema.Tables[i]));
-                    }
-                }
-                qry.AppendLine("\r\n$BODY$");
-                return qry.ToString();
             }
-
-            private string GetQueryBlockInsert(TableSchema _schema)
+            qry.AppendLine();
+            for (int i = 0; i < this.FormSchema.Tables.Count; i++)
             {
-                return string.Format(@"SELECT
+                if (this.FormSchema.Tables[i].TableName == this.FormSchema.MasterTable)
+                    continue;
+                else
+                {
+                    qry.AppendLine();
+                    qry.AppendLine(GetQueryBlockInsert(this.FormSchema.Tables[i]));
+                    qry.AppendLine();
+                    qry.AppendLine(GetQueryBlockUpdate(this.FormSchema.Tables[i]));
+                }
+            }
+            qry.AppendLine("\r\n$BODY$");
+            return qry.ToString();
+        }
+
+        private string GetQueryBlockInsert(TableSchema _schema)
+        {
+            return string.Format(@"SELECT
     _table->'Rows' 
 FROM 
     jsonb_array_elements(insert_json) _table 
@@ -341,11 +346,11 @@ FOR _row IN SELECT * FROM jsonb_array_elements(temp_table)
 LOOP 
     {1} 
 END LOOP;", _schema.TableName, GetExecuteQryI(_schema));
-            }
+        }
 
-            private string GetQueryBlockUpdate(TableSchema _schema)
-            {
-                return string.Format(@"SELECT
+        private string GetQueryBlockUpdate(TableSchema _schema)
+        {
+            return string.Format(@"SELECT
     _table->'Rows' 
 FROM 
     jsonb_array_elements(update_json) _table 
@@ -358,104 +363,104 @@ LOOP
     {1} 
 END LOOP;", _schema.TableName, GetExecuteQryU(_schema));
 
+        }
+
+        private string GetExecuteQryI(TableSchema _schema)
+        {
+            string m_tablename = string.Empty, m_table_id = string.Empty;
+
+            if (_schema.TableName != this.FormSchema.MasterTable)
+            {
+                m_tablename = this.FormSchema.MasterTable + "_id,";
+                m_table_id = "master_id,";
             }
 
-            private string GetExecuteQryI(TableSchema _schema)
-            {
-                string m_tablename = string.Empty, m_table_id = string.Empty;
+            string qry = "EXECUTE 'INSERT INTO " + _schema.TableName + "(" + m_tablename;
+            string _using_clas = string.Empty;
 
-                if (_schema.TableName != this.FormSchema.MasterTable)
+            foreach (ColumnSchema col in _schema.Columns)
+            {
+                if (!col.Equals(_schema.Columns.Last()))
                 {
-                    m_tablename = this.FormSchema.MasterTable + "_id,";
-                    m_table_id = "master_id,";
+                    qry = qry + col.ColumnName + CharConstants.COMMA;
+                    _using_clas = _using_clas + "_row->>'" + col.ColumnName + "'" + "::" + this.GetVendorDbText(col.EbDbType) + CharConstants.COMMA;
                 }
-
-                string qry = "EXECUTE 'INSERT INTO " + _schema.TableName + "(" + m_tablename;
-                string _using_clas = string.Empty;
-
-                foreach (ColumnSchema col in _schema.Columns)
-                {
-                    if (!col.Equals(_schema.Columns.Last()))
-                    {
-                        qry = qry + col.ColumnName + CharConstants.COMMA;
-                        _using_clas = _using_clas + "_row->>'" + col.ColumnName + "'" + "::" + this.GetVendorDbText(col.EbDbType) + CharConstants.COMMA;
-                    }
-                    else
-                    {
-                        qry = qry + col.ColumnName + ") VALUES(" + m_table_id;
-                        _using_clas = _using_clas + "_row->>'" + col.ColumnName + "'" + "::" + this.GetVendorDbText(col.EbDbType) + CharConstants.SEMI_COLON;
-                    }
-                }
-
-                for (int i = 1; i <= _schema.Columns.Count; i++)
-                {
-                    if (i != _schema.Columns.Count)
-                        qry = qry + "$" + i + CharConstants.COMMA;
-                    else
-                        qry = qry + "$" + i + ")'";
-                }
-                qry = qry + " USING " + _using_clas;
-                return qry;
-            }
-
-            private string GetExecuteQryU(TableSchema _schema)
-            {
-                string qry = string.Format("EXECUTE 'UPDATE {0} SET ", _schema.TableName);
-                string _using_clas = string.Empty;
-                int _counter = 0;
-                foreach (ColumnSchema col in _schema.Columns)
-                {
-                    _counter++;
-                    if (!col.Equals(_schema.Columns.Last()))
-                    {
-                        qry = qry + col.ColumnName + CharConstants.EQUALS + "$" + _counter + CharConstants.COMMA;
-                        _using_clas = _using_clas + "_row->>'" + col.ColumnName + "'" + "::" + this.GetVendorDbText(col.EbDbType) + CharConstants.COMMA;
-                    }
-                    else
-                    {
-                        qry = qry + col.ColumnName + CharConstants.EQUALS + "$" + _counter + " WHERE id=$" + _counter + ";'";
-                        _using_clas = _using_clas + "_row->>'" + col.ColumnName + "'" + "::" + this.GetVendorDbText(col.EbDbType) + CharConstants.SEMI_COLON;
-                    }
-                }
-                qry = qry + " USING " + _using_clas;
-                return qry;
-            }
-
-            private string GetVendorDbText(int type)
-            {
-                return ConnectionFactory.DataDB.VendorDbTypes.GetVendorDbText((EbDbTypes)type);
-            }
-
-            private string GetFuncNameByRegex()
-            {
-                string _funcname = string.Empty;
-                Regex r = new Regex(@"(\w+)(\s+|)\(.*?\)");
-                if (!string.IsNullOrEmpty(this.Sql))
-                    _funcname = r.Match(this.Sql.Replace("\n", "")).Groups[1].Value;
-                return _funcname;
-            }
-
-            //for api
-            public override List<Param> GetParams(RedisClient _redis)
-            {
-                if ((this.InputParams != null) && (this.InputParams.Any()))
-                    return this.InputParams;
                 else
-                    return SqlHelper.GetSqlParams(this.Sql, (int)EbObjectTypes.DataWriter);
+                {
+                    qry = qry + col.ColumnName + ") VALUES(" + m_table_id;
+                    _using_clas = _using_clas + "_row->>'" + col.ColumnName + "'" + "::" + this.GetVendorDbText(col.EbDbType) + CharConstants.SEMI_COLON;
+                }
             }
+
+            for (int i = 1; i <= _schema.Columns.Count; i++)
+            {
+                if (i != _schema.Columns.Count)
+                    qry = qry + "$" + i + CharConstants.COMMA;
+                else
+                    qry = qry + "$" + i + ")'";
+            }
+            qry = qry + " USING " + _using_clas;
+            return qry;
         }
 
-        [ProtoBuf.ProtoContract]
-        public class EbJsFunction : EbObject
+        private string GetExecuteQryU(TableSchema _schema)
         {
-            [ProtoBuf.ProtoMember(1)]
-            public string JsCode { get; set; }
+            string qry = string.Format("EXECUTE 'UPDATE {0} SET ", _schema.TableName);
+            string _using_clas = string.Empty;
+            int _counter = 0;
+            foreach (ColumnSchema col in _schema.Columns)
+            {
+                _counter++;
+                if (!col.Equals(_schema.Columns.Last()))
+                {
+                    qry = qry + col.ColumnName + CharConstants.EQUALS + "$" + _counter + CharConstants.COMMA;
+                    _using_clas = _using_clas + "_row->>'" + col.ColumnName + "'" + "::" + this.GetVendorDbText(col.EbDbType) + CharConstants.COMMA;
+                }
+                else
+                {
+                    qry = qry + col.ColumnName + CharConstants.EQUALS + "$" + _counter + " WHERE id=$" + _counter + ";'";
+                    _using_clas = _using_clas + "_row->>'" + col.ColumnName + "'" + "::" + this.GetVendorDbText(col.EbDbType) + CharConstants.SEMI_COLON;
+                }
+            }
+            qry = qry + " USING " + _using_clas;
+            return qry;
         }
 
-        [ProtoBuf.ProtoContract]
-        public class EbJsValidator : EbObject
+        private string GetVendorDbText(int type)
         {
-            [ProtoBuf.ProtoMember(1)]
-            public string JsCode { get; set; }
+            return ConnectionFactory.DataDB.VendorDbTypes.GetVendorDbText((EbDbTypes)type);
+        }
+
+        private string GetFuncNameByRegex()
+        {
+            string _funcname = string.Empty;
+            Regex r = new Regex(@"(\w+)(\s+|)\(.*?\)");
+            if (!string.IsNullOrEmpty(this.Sql))
+                _funcname = r.Match(this.Sql.Replace("\n", "")).Groups[1].Value;
+            return _funcname;
+        }
+
+        //for api
+        public override List<Param> GetParams(RedisClient _redis)
+        {
+            if ((this.InputParams != null) && (this.InputParams.Any()))
+                return this.InputParams;
+            else
+                return SqlHelper.GetSqlParams(this.Sql, (int)EbObjectTypes.DataWriter);
         }
     }
+
+    [ProtoBuf.ProtoContract]
+    public class EbJsFunction : EbObject
+    {
+        [ProtoBuf.ProtoMember(1)]
+        public string JsCode { get; set; }
+    }
+
+    [ProtoBuf.ProtoContract]
+    public class EbJsValidator : EbObject
+    {
+        [ProtoBuf.ProtoMember(1)]
+        public string JsCode { get; set; }
+    }
+}
