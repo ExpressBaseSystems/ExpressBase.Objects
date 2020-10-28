@@ -6,6 +6,7 @@ using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
 using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 
 namespace ExpressBase.Objects
 {
@@ -21,11 +22,11 @@ namespace ExpressBase.Objects
         [DefaultPropValue("'Dynamic'")]
         [OnChangeExec(@"
                 if (this.Type === 1) { 
-                    pg.ShowPropertiesExt(['StaticParamters','Items']);
+                    pg.ShowPropertiesExt(['StaticParameters','Items']);
                     pg.HideGroupsExt(['Data','Link Settings','Action Button Settings']);
                 }
                 else {
-                    pg.HidePropertiesExt(['StaticParamters','Items']);
+                    pg.HidePropertiesExt(['StaticParameters','Items']);
                     pg.ShowGroupsExt(['Data','Link Settings','Action Button Settings']);
                 }
             ")]
@@ -34,7 +35,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.Collection)]
         [PropertyGroup("Core")]
-        public List<EbMobileStaticParameter> StaticParamters { set; get; }
+        public List<EbMobileStaticParameter> StaticParameters { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.Collection)]
@@ -287,6 +288,13 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("List Styles")]
         public bool BoxShadow { set; get; }
+
+        [OnDeserialized]
+        public void OnDeserialized(StreamingContext context)
+        {
+            if (StaticParameters == null)
+                StaticParameters = new List<EbMobileStaticParameter>();
+        }
 
         public EbMobileVisualization()
         {
