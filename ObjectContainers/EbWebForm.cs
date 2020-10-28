@@ -2646,6 +2646,13 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.DVBuilder)]
         [PropertyGroup(PGConstants.CORE)]
         [Alias("URL")]
+        [OnChangeExec(@"
+            if (this.URL) {
+                if (EbIsValidURL(this.URL)) {
+                    pg.setSimpleProperty('URL', this.URL.replace('.youtube.com/watch?v=', '.youtube.com/embed/').replace(/\?rel=0?$/, '') + '?rel=0');
+                }
+            }
+        ")]
         public string URL { get; set; }
 
         [PropertyGroup(PGConstants.CORE)]
