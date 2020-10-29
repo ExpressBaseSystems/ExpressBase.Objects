@@ -80,9 +80,11 @@ namespace ExpressBase.Objects
         public string TextFormat { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [UIproperty]
         [PropertyGroup(PGConstants.APPEARANCE)]
         [PropertyEditor(PropertyEditorType.FontSelector)]
+        [OnChangeExec(@"
+                setFontCss(this.Font,$(`#${this.EbSid}`));
+            ")]
         public EbFont Font { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
@@ -125,7 +127,7 @@ namespace ExpressBase.Objects
 
         public override string GetDesignHtml()
         {
-            return @"<div class='data_column mob_control dropped' title=' @ColumnName' tabindex='1' onclick='$(this).focus()' eb-type='EbMobileDataColumn' id='@id'>
+            return @"<div class='data_column mob_control dropped' tabindex='1' onclick='$(this).focus()' eb-type='EbMobileDataColumn' id='@id'>
                         <div class='data_column_inner'>
                             <span> @ColumnName </span>
                         </div>
@@ -254,11 +256,10 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup(PGConstants.APPEARANCE)]
-        [DefaultPropValue("Label1")]
+        [DefaultPropValue("Label")]
+        [UIproperty]
         [OnChangeExec(@"
-                if (this.Text !== ''){ 
-                        $(`#${this.EbSid} .mobile-lbl-text`).text(this.Text);
-                }
+                $(`#${this.EbSid} .mobile-lbl-text`).text(this.Text);
             ")]
         public string Text { get; set; }
 
@@ -271,9 +272,11 @@ namespace ExpressBase.Objects
         public new string Icon { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [UIproperty]
         [PropertyGroup(PGConstants.APPEARANCE)]
         [PropertyEditor(PropertyEditorType.FontSelector)]
+        [OnChangeExec(@"
+                setFontCss(this.Font,$(`#${this.EbSid}`));
+            ")]
         public EbFont Font { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
@@ -343,15 +346,11 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "BindableParams", 1)]
         public EbMobileStaticParameter BindingParam { set; get; }
 
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("Static List Settings")]
-        public bool EnableSearch { set; get; }
-
         public override string GetDesignHtml()
         {
-            return @"<div class='data_column mob_control dropped' title='@Text' tabindex='1' onclick='$(this).focus()' eb-type='EbMobileLabel' id='@id'>
+            return @"<div class='data_column mob_control dropped' tabindex='1' onclick='$(this).focus()' eb-type='EbMobileLabel' id='@id'>
                         <div class='data_column_inner'>
-                            <span class='mobile-lbl-text'> Label </span>
+                            <span class='mobile-lbl-text'> @Text </span>
                         </div>
                     </div>".RemoveCR().DoubleQuoted();
         }
@@ -370,6 +369,9 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup(PGConstants.CORE)]
         public string Value { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        public bool EnableSearch { set; get; }
     }
 
     [EnableInBuilder(BuilderType.MobilePage)]

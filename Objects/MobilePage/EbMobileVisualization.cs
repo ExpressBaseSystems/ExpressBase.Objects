@@ -298,13 +298,10 @@ namespace ExpressBase.Objects
 
         public EbMobileVisualization()
         {
-            OfflineQuery = new EbScript();
             DataSourceParams = new List<Param>();
             FilterControls = new List<EbMobileControl>();
             SortColumns = new List<EbMobileDataColumn>();
             SearchColumns = new List<EbMobileDataColumn>();
-            LinkFormParameters = new List<EbMobileDataColToControlMap>();
-            ContextToControlMap = new List<EbCTCMapper>();
 
             Padding = new EbThickness(10);
             Margin = new EbThickness();
