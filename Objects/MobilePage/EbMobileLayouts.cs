@@ -57,11 +57,11 @@ namespace ExpressBase.Objects
                 };";
         }
 
-        public override EbControl GetWebFormCtrl(int counter)
+        public override EbControl GetWebFormControl(int count)
         {
             return new EbTableLayout
             {
-                EbSid = "TableLayout" + counter,
+                EbSid = this.EbControlType + count,
                 Name = this.Name,
                 Label = this.Label
             };
