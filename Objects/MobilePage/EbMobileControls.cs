@@ -5,8 +5,8 @@ using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
 using ExpressBase.Objects.Objects.DVRelated;
+using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace ExpressBase.Objects
 {
@@ -51,11 +51,11 @@ namespace ExpressBase.Objects
                         </div>".RemoveCR().DoubleQuoted();
         }
 
-        public override EbControl GetWebFormCtrl(int counter)
+        public override EbControl GetWebFormControl(int counter)
         {
             return new EbTextBox
             {
-                EbSid = "TextBox" + counter,
+                EbSid = this.EbControlType + counter,
                 Name = this.Name,
                 MaxLength = this.MaxLength,
                 TextTransform = this.TextTransform,
@@ -65,6 +65,20 @@ namespace ExpressBase.Objects
                 Margin = new UISides { Top = 0, Bottom = 0, Left = 0, Right = 0 },
                 Label = this.Label
             };
+        }
+
+        public override void UpdateWebFormControl(EbControl control)
+        {
+            if (control == null || !(control is EbTextBox textBox))
+                return;
+
+            base.UpdateWebFormControl(control);
+
+            textBox.MaxLength = this.MaxLength;
+            textBox.TextTransform = this.TextTransform;
+            textBox.TextMode = this.TextMode;
+            textBox.AutoCompleteOff = this.AutoCompleteOff;
+            textBox.AutoSuggestion = this.AutoSuggestion;
         }
     }
 
@@ -120,20 +134,31 @@ namespace ExpressBase.Objects
                         </div>".RemoveCR().DoubleQuoted();
         }
 
-        public override EbControl GetWebFormCtrl(int counter)
+        public override string EbControlType => nameof(EbNumeric);
+
+        public override EbControl GetWebFormControl(int counter)
         {
             return new EbNumeric
             {
-                EbSid = "Numeric" + counter,
+                EbSid = this.EbControlType + counter,
                 Name = this.Name,
-                //MaxLength = this.MaxLength,
                 DecimalPlaces = this.DecimalPlaces,
                 MaxLimit = this.MaxLimit,
                 MinLimit = this.MinLimit,
-                //IsCurrency = this.IsCurrency,
                 Margin = new UISides { Top = 0, Bottom = 0, Left = 0, Right = 0 },
                 Label = this.Label
             };
+        }
+
+        public override void UpdateWebFormControl(EbControl control)
+        {
+            if (control == null || !(control is EbNumeric numeric))
+                return;
+
+            base.UpdateWebFormControl(control);
+
+            numeric.MaxLimit = this.MaxLimit;
+            numeric.MinLimit = this.MinLimit;
         }
     }
 
@@ -174,17 +199,30 @@ namespace ExpressBase.Objects
                         </div>".RemoveCR().DoubleQuoted();
         }
 
-        public override EbControl GetWebFormCtrl(int counter)
+        public override string EbControlType => nameof(EbDate);
+
+        public override EbControl GetWebFormControl(int counter)
         {
             return new EbDate
             {
-                EbSid = "Date" + counter,
+                EbSid = this.EbControlType + counter,
                 Name = this.Name,
                 IsNullable = this.IsNullable,
                 EbDateType = this.EbDateType,
                 Margin = new UISides { Top = 0, Bottom = 0, Left = 0, Right = 0 },
                 Label = this.Label
             };
+        }
+
+        public override void UpdateWebFormControl(EbControl control)
+        {
+            if (control == null || !(control is EbDate date))
+                return;
+
+            base.UpdateWebFormControl(control);
+
+            date.IsNullable = this.IsNullable;
+            date.EbDateType = this.EbDateType;
         }
     }
 
@@ -274,6 +312,8 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public override string Icon { get { return "fa-caret-down"; } }
 
+        private bool IsSimpleSelect => string.IsNullOrEmpty(this.DataSourceRefId);
+
         public override string GetDesignHtml()
         {
             return @"<div class='eb_stacklayout mob_control dropped' id='@id' eb-type='EbMobileSimpleSelect' tabindex='1' onclick='$(this).focus()'>
@@ -295,53 +335,6 @@ namespace ExpressBase.Objects
                     };";
         }
 
-        public override EbControl GetWebFormCtrl(int counter)
-        {
-            EbPowerSelect Ps = new EbPowerSelect
-            {
-                EbSid = "PowerSelect" + counter,
-                Name = this.Name,
-                Margin = new UISides { Top = 0, Bottom = 0, Left = 0, Right = 0 },
-                Label = this.Label
-            };
-
-            foreach (EbMobileSSOption so in this.Options)
-            {
-                Ps.Options.Add(new EbSimpleSelectOption
-                {
-                    Name = so.Name,
-                    Value = so.Value,
-                    DisplayName = so.DisplayName
-                });
-            }
-
-            Ps.DataSourceId = this.DataSourceRefId;
-
-            if (this.DisplayMember != null)
-            {
-                Ps.DisplayMember = new DVBaseColumn
-                {
-                    Name = this.DisplayMember.Name,
-                    Type = this.DisplayMember.Type,
-                    sTitle = this.DisplayMember.Name,
-                    Data = this.DisplayMember.ColumnIndex
-                };
-            }
-
-            if (this.ValueMember != null)
-            {
-                Ps.ValueMember = new DVBaseColumn
-                {
-                    Name = this.ValueMember.Name,
-                    Type = this.ValueMember.Type,
-                    sTitle = this.ValueMember.Name,
-                    Data = this.ValueMember.ColumnIndex
-                };
-            }
-
-            return Ps;
-        }
-
         public EbMobileSimpleSelect()
         {
             Parameters = new List<Param>();
@@ -361,6 +354,107 @@ namespace ExpressBase.Objects
         {
             if (!string.IsNullOrEmpty(DataSourceRefId) && map.TryGetValue(DataSourceRefId, out string dsri))
                 DataSourceRefId = dsri;
+        }
+
+        private void SetSimpleSelectOptions(EbSimpleSelect simpleSelect)
+        {
+            simpleSelect.Options.Clear();
+
+            foreach (EbMobileSSOption so in this.Options)
+            {
+                simpleSelect.Options.Add(new EbSimpleSelectOption
+                {
+                    EbSid = "ss_options_" + Guid.NewGuid().ToString("N"),
+                    Name = so.Name,
+                    Value = so.Value,
+                    DisplayName = so.DisplayName
+                });
+            }
+        }
+
+        private void SetValueMember(EbPowerSelect powerselect)
+        {
+            if (this.ValueMember != null)
+            {
+                powerselect.ValueMember = new DVBaseColumn
+                {
+                    EbSid = "basecol_" + Guid.NewGuid().ToString("N"),
+                    Name = this.ValueMember.Name,
+                    Type = this.ValueMember.Type,
+                    sTitle = this.ValueMember.Name,
+                    Data = this.ValueMember.ColumnIndex
+                };
+            }
+        }
+
+        private void SetDisplayMember(EbPowerSelect powerselect)
+        {
+            if (this.DisplayMember != null)
+            {
+                powerselect.DisplayMember = new DVBaseColumn
+                {
+                    EbSid = "basecol_" + Guid.NewGuid().ToString("N"),
+                    Name = this.DisplayMember.Name,
+                    Type = this.DisplayMember.Type,
+                    sTitle = this.DisplayMember.Name,
+                    Data = this.DisplayMember.ColumnIndex
+                };
+            }
+        }
+
+        public override string EbControlType => IsSimpleSelect ? nameof(EbSimpleSelect) : nameof(EbPowerSelect);
+
+        public override EbControl GetWebFormControl(int counter)
+        {
+            EbControl ctrl;
+            string ebSid = this.EbControlType + counter;
+
+            if (IsSimpleSelect)
+            {
+                EbSimpleSelect simpleSelect = new EbSimpleSelect
+                {
+                    EbSid = ebSid,
+                    Name = this.Name,
+                    Margin = new UISides { Top = 0, Bottom = 0, Left = 0, Right = 0 },
+                    Label = this.Label
+                };
+                ctrl = simpleSelect;
+                this.SetSimpleSelectOptions(simpleSelect);
+            }
+            else
+            {
+                EbPowerSelect powerselect = new EbPowerSelect
+                {
+                    EbSid = ebSid,
+                    DataSourceId = this.DataSourceRefId,
+                    Name = this.Name,
+                    Margin = new UISides { Top = 0, Bottom = 0, Left = 0, Right = 0 },
+                    Label = this.Label
+                };
+                ctrl = powerselect;
+                this.SetDisplayMember(powerselect);
+                this.SetValueMember(powerselect);
+            }
+            return ctrl;
+        }
+
+        public override void UpdateWebFormControl(EbControl control)
+        {
+            if (control == null || !(control is EbPowerSelect powerSelect) || !(control is EbSimpleSelect simpleSelect))
+                return;
+
+            base.UpdateWebFormControl(control);
+
+            if (IsSimpleSelect)
+            {
+                this.SetSimpleSelectOptions(simpleSelect);
+            }
+            else
+            {
+                powerSelect.DataSourceId = this.DataSourceRefId;
+                this.SetDisplayMember(powerSelect);
+                this.SetValueMember(powerSelect);
+            }
         }
     }
 
@@ -426,16 +520,26 @@ namespace ExpressBase.Objects
                 };";
         }
 
-        public override EbControl GetWebFormCtrl(int counter)
+        public override EbControl GetWebFormControl(int counter)
         {
             return new EbFileUploader
             {
-                EbSid = "FileUploader" + counter,
+                EbSid = this.EbControlType + counter,
                 Name = this.Name,
                 IsMultipleUpload = this.MultiSelect,
                 Margin = new UISides { Top = 0, Bottom = 0, Left = 0, Right = 0 },
                 Label = this.Label
             };
+        }
+
+        public override void UpdateWebFormControl(EbControl control)
+        {
+            if (control == null || !(control is EbFileUploader fup))
+                return;
+
+            base.UpdateWebFormControl(control);
+
+            fup.IsMultipleUpload = this.MultiSelect;
         }
     }
 
@@ -460,15 +564,25 @@ namespace ExpressBase.Objects
                         </div>".RemoveCR().DoubleQuoted();
         }
 
-        public override EbControl GetWebFormCtrl(int counter)
+        public override string EbControlType => nameof(EbBooleanSelect);
+
+        public override EbControl GetWebFormControl(int counter)
         {
             return new EbBooleanSelect
             {
-                EbSid = "BooleanSelect" + counter,
+                EbSid = this.EbControlType + counter,
                 Name = this.Name,
                 Margin = new UISides { Top = 0, Bottom = 0, Left = 0, Right = 0 },
                 Label = this.Label
             };
+        }
+
+        public override void UpdateWebFormControl(EbControl control)
+        {
+            if (control == null || !(control is EbBooleanSelect boolean))
+                return;
+
+            base.UpdateWebFormControl(control);
         }
     }
 
@@ -505,172 +619,25 @@ namespace ExpressBase.Objects
                         </div>".Replace("@display", (this.HideSearchBox) ? "none" : "block").RemoveCR().DoubleQuoted();
         }
 
-        public override EbControl GetWebFormCtrl(int counter)
+        public override string EbControlType => nameof(EbInputGeoLocation);
+
+        public override EbControl GetWebFormControl(int counter)
         {
             return new EbInputGeoLocation
             {
-                EbSid = "InputGeoLocation" + counter,
+                EbSid = this.EbControlType + counter,
                 Name = this.Name,
                 Margin = new UISides { Top = 0, Bottom = 0, Left = 0, Right = 0 },
                 Label = this.Label
             };
         }
-    }
 
-    [EnableInBuilder(BuilderType.MobilePage)]
-    public class EbMobileDataGrid : EbMobileControl, ILinesEnabled
-    {
-        public override bool DoNotPersist { get; set; }
-
-        public override bool Unique { get; set; }
-
-        public override bool Required { get; set; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [HideInPropertyGrid]
-        public List<EbMobileControl> ChildControls { set; get; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [HideInPropertyGrid]
-        public EbMobileTableLayout DataLayout { set; get; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("Data")]
-        public string TableName { set; get; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyEditor(PropertyEditorType.ObjectSelector)]
-        [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
-        [Alias("Data Source")]
-        [PropertyGroup("Data")]
-        public string DataSourceRefId { set; get; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
-        [HelpText("sql query to get data from offline database")]
-        [Alias("Offline Query")]
-        [PropertyGroup("Data")]
-        public EbScript OfflineQuery { set; get; }
-
-        public override EbScript ValueExpr { get => base.ValueExpr; set => base.ValueExpr = value; }
-
-        public override string GetDesignHtml()
+        public override void UpdateWebFormControl(EbControl control)
         {
-            return @"<div class='eb_stacklayout mob_control dropped' id='@id' eb-type='EbMobileDataGrid' tabindex='1' onclick='$(this).focus()'>
-                            <label class='ctrl_label'> @Label </label>
-                            <div class='eb_ctrlhtml ctrl_as_container'>
-                               <div class='data_layout'></div>
-                               <div class='control_container'></div>
-                            </div>
-                        </div>".RemoveCR().DoubleQuoted();
-        }
+            if (control == null || !(control is EbInputGeoLocation geo))
+                return;
 
-        public EbDGColumn GetGridControl(EbMobileControl ctrl, int counter)
-        {
-            EbDGColumn dgColumn = null;
-            switch (ctrl)
-            {
-                case EbMobileTextBox tx:
-                    dgColumn = new EbDGStringColumn();
-                    break;
-                case EbMobileNumericBox txn:
-                    dgColumn = new EbDGNumericColumn();
-                    break;
-                case EbMobileBoolean bl:
-                    dgColumn = new EbDGBooleanColumn();
-                    break;
-                case EbMobileDateTime dt:
-                    dgColumn = new EbDGDateColumn
-                    {
-                        EbDateType = dt.EbDateType
-                    };
-                    break;
-                case EbMobileSimpleSelect ss:
-                    if (string.IsNullOrEmpty(ss.DataSourceRefId))
-                    {
-                        dgColumn = new EbDGSimpleSelectColumn
-                        {
-                            Options = ss.Options.Select(item => new EbSimpleSelectOption
-                            {
-                                EbSid = item.EbSid,
-                                Name = item.Name,
-                                Value = item.Value,
-                                DisplayName = item.DisplayName
-                            }).ToList()
-                        };
-                    }
-                    else
-                    {
-                        dgColumn = new EbDGPowerSelectColumn
-                        {
-                            DataSourceId = ss.DataSourceRefId,
-                            ValueMember = new DVBaseColumn
-                            {
-                                Name = ss.ValueMember.Name,
-                                Type = ss.ValueMember.Type,
-                                sTitle = ss.ValueMember.Name,
-                                Data = ss.ValueMember.ColumnIndex
-                            },
-                            DisplayMember = new DVBaseColumn
-                            {
-                                Name = ss.DisplayMember.Name,
-                                Type = ss.DisplayMember.Type,
-                                sTitle = ss.DisplayMember.Name,
-                                Data = ss.DisplayMember.ColumnIndex
-                            }
-                        };
-                    }
-                    break;
-                default:
-                    dgColumn = new EbDGStringColumn();
-                    break;
-            }
-            dgColumn.Title = ctrl.Label;
-            dgColumn.Name = ctrl.Name;
-            dgColumn.EbSid = ctrl.GetType().Name + counter;
-            return dgColumn;
-        }
-
-        public override EbControl GetWebFormCtrl(int counter)
-        {
-            EbDataGrid dg = new EbDataGrid
-            {
-                EbSid = "DataGrid" + counter,
-                Name = this.Name,
-                Margin = new UISides { Top = 0, Bottom = 0, Left = 0, Right = 0 },
-                Label = this.Label,
-                TableName = this.TableName
-            };
-
-            foreach (EbMobileControl ctrl in this.ChildControls)
-                dg.Controls.Add(this.GetGridControl(ctrl, counter++));
-
-            return dg;
-        }
-
-        public override List<string> DiscoverRelatedRefids()
-        {
-            List<string> list = new List<string>();
-
-            if (!string.IsNullOrEmpty(DataSourceRefId))
-                list.Add(DataSourceRefId);
-
-            foreach (var ctrl in this.ChildControls)
-            {
-                list.AddRange(ctrl.DiscoverRelatedRefids());
-            }
-            return list;
-        }
-
-        public override void ReplaceRefid(Dictionary<string, string> map)
-        {
-            if (!string.IsNullOrEmpty(DataSourceRefId) && map.TryGetValue(DataSourceRefId, out string dsri))
-                DataSourceRefId = dsri;
-
-            foreach (var ctrl in this.ChildControls)
-            {
-                ctrl.ReplaceRefid(map);
-            }
+            base.UpdateWebFormControl(control);
         }
     }
 
@@ -705,15 +672,23 @@ namespace ExpressBase.Objects
                         </div>".RemoveCR().DoubleQuoted();
         }
 
-        public override EbControl GetWebFormCtrl(int counter)
+        public override EbControl GetWebFormControl(int counter)
         {
             return new EbAutoId
             {
-                EbSid = "AutoId" + counter,
+                EbSid = this.EbControlType + counter,
                 Name = this.Name,
                 Margin = new UISides { Top = 0, Bottom = 0, Left = 0, Right = 0 },
                 Label = this.Label
             };
+        }
+
+        public override void UpdateWebFormControl(EbControl control)
+        {
+            if (control == null || !(control is EbAutoId auto))
+                return;
+
+            base.UpdateWebFormControl(control);
         }
     }
 
@@ -754,15 +729,23 @@ namespace ExpressBase.Objects
                 };";
         }
 
-        public override EbControl GetWebFormCtrl(int counter)
+        public override EbControl GetWebFormControl(int counter)
         {
             return new EbDisplayPicture
             {
-                EbSid = "DisplayPicture" + counter,
+                EbSid = this.EbControlType + counter,
                 Name = this.Name,
                 Margin = new UISides { Top = 0, Bottom = 0, Left = 0, Right = 0 },
                 Label = this.Label
             };
+        }
+
+        public override void UpdateWebFormControl(EbControl control)
+        {
+            if (control == null || !(control is EbDisplayPicture dp))
+                return;
+
+            base.UpdateWebFormControl(control);
         }
     }
 
@@ -789,15 +772,25 @@ namespace ExpressBase.Objects
                         </div>".RemoveCR().DoubleQuoted();
         }
 
-        public override EbControl GetWebFormCtrl(int counter)
+        public override string EbControlType => nameof(EbTextBox);
+
+        public override EbControl GetWebFormControl(int counter)
         {
             return new EbTextBox
             {
-                EbSid = "TextBox" + counter,
+                EbSid = this.EbControlType + counter,
                 Name = this.Name,
                 Margin = new UISides { Top = 0, Bottom = 0, Left = 0, Right = 0 },
                 Label = this.Label
             };
+        }
+
+        public override void UpdateWebFormControl(EbControl control)
+        {
+            if (control == null || !(control is EbTextBox qr))
+                return;
+
+            base.UpdateWebFormControl(control);
         }
     }
 
@@ -838,11 +831,11 @@ namespace ExpressBase.Objects
                             </div>
                         </div>".RemoveCR().DoubleQuoted();
         }
-        public override EbControl GetWebFormCtrl(int counter)
+        public override EbControl GetWebFormControl(int counter)
         {
             return new EbRating
             {
-                EbSid = "Rating" + counter,
+                EbSid = this.EbControlType + counter,
                 Name = this.Name,
                 MaxVal = this.MaxValue,
                 RatingColor = this.SelectionColor,
@@ -852,5 +845,16 @@ namespace ExpressBase.Objects
             };
         }
 
+        public override void UpdateWebFormControl(EbControl control)
+        {
+            if (control == null || !(control is EbRating rating))
+                return;
+
+            base.UpdateWebFormControl(control);
+
+            rating.RatingColor = this.SelectionColor;
+            rating.Spacing = this.Spacing;
+            rating.MaxVal = this.MaxValue;
+        }
     }
 }

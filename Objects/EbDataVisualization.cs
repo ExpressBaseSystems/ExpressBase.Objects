@@ -365,6 +365,37 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
         public int RightFixedColumn { get; set; }
 
+        [PropertyGroup(PGConstants.HELP)]
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyPriority(98)]
+        [HelpText("Help information icon.")]
+        [PropertyEditor(PropertyEditorType.IconPicker)]
+        [DefaultPropValue("fa-question-circle")]
+        public string InfoIcon { get; set; }
+
+        [PropertyGroup(PGConstants.HELP)]
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyPriority(98)]
+        [PropertyEditor(PropertyEditorType.FileUploader)]
+        [Alias("Info Document")]
+        [OnChangeExec(@"
+        if((this.Info && this.Info.trim()) !== '' || (this.InfoVideoURLs && this.InfoVideoURLs.$values.length > 0)){
+            pg.ShowProperty('InfoIcon');
+        }
+        else{
+            pg.HideProperty('InfoIcon');
+        }")]
+        [HelpText("Help information.")]
+        public string Info { get; set; }
+
+        [PropertyGroup(PGConstants.HELP)]
+        [EnableInBuilder(BuilderType.DVBuilder)]
+        [PropertyPriority(98)]
+        [Alias("Help Videos URLs")]
+        [HelpText("Help videos.")]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        public virtual List<EbURL> InfoVideoURLs { get; set; }
+
         [EnableInBuilder(BuilderType.DVBuilder)]
         [DefaultPropValue("100")]
         [PropertyGroup("Paging")]
@@ -486,6 +517,7 @@ namespace ExpressBase.Objects
 
         public EbTableVisualization()
         {
+            this.InfoVideoURLs = new List<EbURL>();
             this.RowGroupCollection = new List<RowGroupParent>();
             this.NotVisibleColumns = new List<DVBaseColumn>();
             this.CurrentRowGroup = new RowGroupParent();

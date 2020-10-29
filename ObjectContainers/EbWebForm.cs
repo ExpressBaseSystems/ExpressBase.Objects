@@ -95,7 +95,7 @@ namespace ExpressBase.Objects
         [Alias("Info Document")]
         [HelpText("Help information.")]
         [OnChangeExec(@"
-        if(this.Info && this.Info.trim() !== ''){
+        if((this.Info && this.Info.trim()) !== '' || (this.InfoVideoURLs && this.InfoVideoURLs.$values.length > 0)){
             pg.ShowProperty('InfoIcon');
         }
         else{
@@ -2630,7 +2630,7 @@ namespace ExpressBase.Objects
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.DVBuilder)]
     [HideInToolBox]
-    [UsedWithTopObjectParent(typeof(EbObject), typeof(EbDashBoardWraper))]
+    [UsedWithTopObjectParent(typeof(EbObject), typeof(EbDashBoardWraper), typeof(EbDataVisualizationObject))]
     [Alias("URL")]
     public class EbURL
     {
@@ -2652,6 +2652,13 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.DVBuilder)]
         [PropertyGroup(PGConstants.CORE)]
         [Alias("URL")]
+        [OnChangeExec(@"
+            if (this.URL) {
+                if (EbIsValidURL(this.URL)) {
+                    pg.setSimpleProperty('URL', this.URL.replace('.youtube.com/watch?v=', '.youtube.com/embed/').replace(/\?rel=0?$/, '') + '?rel=0');
+                }
+            }
+        ")]
         public string URL { get; set; }
 
         [PropertyGroup(PGConstants.CORE)]
