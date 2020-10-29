@@ -173,6 +173,12 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         public bool EnableExcelImport { get; set; }
 
+        [PropertyGroup(PGConstants.EXTENDED)]
+        [Alias("Is location independent")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [HideInPropertyGrid]////
+        public bool IsLocIndependent { get; set; }
+
         [PropertyGroup(PGConstants.DATA)]
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.Collection)]
@@ -808,7 +814,7 @@ namespace ExpressBase.Objects
             {
                 if (_table.TableType == WebFormTableTypes.Normal)
                 {
-                    SingleRow Row = new SingleRow();
+                    SingleRow Row = new SingleRow() { LocId = this.LocationId };
                     SingleTable Table = new SingleTable();
                     foreach (ColumnSchema _column in _table.Columns)
                         Row.Columns.Add(_column.Control.GetSingleColumn(this.UserObj, this.SolutionObj, null));
@@ -817,7 +823,7 @@ namespace ExpressBase.Objects
                 }
                 else if (_table.TableType == WebFormTableTypes.Grid)
                 {
-                    SingleRow Row = new SingleRow();
+                    SingleRow Row = new SingleRow() { LocId = this.LocationId };
                     Row.Columns.Add(new SingleColumn()
                     {
                         Name = FormConstants.eb_row_num,
