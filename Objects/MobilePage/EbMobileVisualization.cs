@@ -172,15 +172,15 @@ namespace ExpressBase.Objects
         [DefaultPropValue("true")]
         [OnChangeExec(@"
                 if (this.UseLinkSettings){ 
-                    pg.HidePropertiesExt(['FabLinkRefId','FabFormMode','FabFormId','FabFormParameters','ContextToFabControlMap']);
+                    pg.HidePropertiesExt(['FabLinkRefId','ContextToFabControlMap']);
                 }
                 else {
                         pg.ShowProperty('FabLinkRefId');
                         if(this.FabLinkRefId && this.FabLinkTypeForm) {
-                            pg.ShowPropertiesExt(this.FabSettingsProps);
+                            pg.ShowProperty('ContextToFabControlMap');
                         }
                         else {
-                            pg.HidePropertiesExt(this.FabSettingsProps);
+                            pg.HideProperty('ContextToFabControlMap');
                         }
                 }
             ")]
@@ -193,42 +193,13 @@ namespace ExpressBase.Objects
         [Alias("Link")]
         [OnChangeExec(@"
                 if (this.FabLinkRefId && this.FabLinkTypeForm){ 
-                        pg.ShowPropertiesExt(this.FabSettingsProps);
+                        pg.ShowProperty('ContextToFabControlMap');
                 }
                 else {
-                        pg.HidePropertiesExt(this.FabSettingsProps);
+                        pg.HideProperty('ContextToFabControlMap');
                 }
             ")]
         public string FabLinkRefId { get; set; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("Action Button Settings")]
-        [OnChangeExec(@"
-                if (this.FabFormMode === 1){ 
-                        pg.ShowProperty('FabFormId');
-                }
-                else {
-                        pg.HideProperty('FabFormId');
-                }
-            ")]
-        [Alias("Form mode")]
-        public WebFormDVModes FabFormMode { set; get; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "DataColumns", 1)]
-        [PropertyGroup("Action Button Settings")]
-        [Alias("Form id")]
-        public EbMobileDataColToControlMap FabFormId { set; get; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [MetaOnly]
-        public List<EbMobileControlMeta> FabControlMetas => new List<EbMobileControlMeta>();
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("Action Button Settings")]
-        [Alias("Columns to controls map")]
-        [PropertyEditor(PropertyEditorType.Mapper, "DataColumns", "FabControlMetas", "FormControl")]
-        public List<EbMobileDataColToControlMap> FabFormParameters { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.Collection)]
