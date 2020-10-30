@@ -786,9 +786,9 @@ this.Init = function(id)
         [HideInPropertyGrid]
         public string Type { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm)]//
-        [HideInPropertyGrid]//
-        public EbControl Control { get; set; }
+        //[EnableInBuilder(BuilderType.WebForm)]//
+        //[HideInPropertyGrid]//
+        //public EbControl Control { get; set; }
     }
 
     [UsedWithTopObjectParent(typeof(EbObject))]
