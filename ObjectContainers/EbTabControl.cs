@@ -128,7 +128,7 @@ this.Init = function(id)
 
         public override string GetHtml()
         {
-            if (RenderAsWizard)
+            if (RenderAsWizard && IsRenderMode)
             {
                 string TabBtnHtml = @"
 <div id='cont_@ebsid@' ebsid='@ebsid@' class='Eb-ctrlContainer' Ctype='TabControl'>
@@ -141,7 +141,7 @@ this.Init = function(id)
                     {
                         tab.RenderAsWizard = true;
                         TabBtnHtml += @"
-            <li>
+            <li renderaswizard = '@rw@' >
                 <a class='nav-link ppbtn-cont' href='#@ebsid@'>
                     <span class='eb-label-editable'>@title@</span>
                     <div class='eb-tab-warn-icon-cont'><i class='icofont-warning-alt'></i></div>
@@ -151,6 +151,7 @@ this.Init = function(id)
                 <div class='ebtab-add-btn eb-fb-icon'><i class='fa fa-plus' aria-hidden='true'></i></div>                
             </li>".Replace("@style@", tab.IsDynamic && tab.IsRenderMode ? "style='display : none;'" : string.Empty)
                     .Replace("@title@", tab.Title)
+                    .Replace("@rw@", tab.RenderAsWizard.ToString().ToLower())
                     .Replace("@ppbtn@", Common.HtmlConstants.CONT_PROP_BTN)
                     .Replace("@ebsid@", tab.IsDynamic && tab.IsRenderMode ? "@" + tab.EbSid_CtxId + "_ebsid@" : tab.EbSid);
                     }
@@ -158,16 +159,12 @@ this.Init = function(id)
                     TabBtnHtml += @"
         </ul>";
 
-                Regex regex = new Regex(Regex.Escape("@active"));
-                TabBtnHtml = regex.Replace(TabBtnHtml, "class='active'", 1).Replace("@active", "");
 
 
                 foreach (EbControl tab in Controls)
                     TabContentHtml += tab.GetHtml();
 
                 TabContentHtml += "</div></div></div>";
-                regex = new Regex(Regex.Escape("@inactive"));
-                TabContentHtml = regex.Replace(TabContentHtml, "in active", 1).Replace("@inactive", "");
 
                 return string.Concat(TabBtnHtml, TabContentHtml);
             }
