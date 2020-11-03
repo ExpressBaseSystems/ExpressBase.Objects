@@ -235,10 +235,9 @@ this.Init = function(id)
 
         public override string GetBareHtml()
         {
-            return @"<div style='display: flex;'>
-				        <img id='@ebsid@_usrimg'class='sysctrl_usrimg' src='' alt='' onerror=""this.onerror=null; this.src='/images/nulldp.png';"">
-						<div id='@ebsid@' data-ebtype='@data-ebtype@'  data-toggle='tooltip' title='@toolTipText@' class=' sysctrl_usrname'  name='@name@' autocomplete = 'off' @value@ @tabIndex@ style='width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@' @required@ @placeHolder@ disabled></div>
-                     </div>"
+            return @"<div class='pu-cont' id='@ebsid@' data-ebtype='@data-ebtype@'>
+                        <div class='pu-txt-info'>- Design html is not implemented -</div>
+                    </div>"
 .Replace("@name@", (this.Name != null ? this.Name.Trim() : ""))
 .Replace("@data-ebtype@", "16")//( (int)this.EbDateType ).ToString())
 .Replace("@toolTipText@", this.ToolTipText)
@@ -251,9 +250,11 @@ this.Init = function(id)
 .Replace("@required@", (this.Required && !this.Hidden ? " required" : string.Empty))
 .Replace("@placeHolder@", "placeholder=''");
         }
-                    //@"<div class='pu-cont' id='@ebsid@' data-ebtype='@data-ebtype@'>
-                    //    <div class='pu-txt-info'>- Design html is not implemented -</div>
-                    // </div>"
+        //@"<div style='display: flex;'>
+        //  <img id='@ebsid@_usrimg'class='sysctrl_usrimg' src='' alt='' onerror=""this.onerror=null; this.src='/images/nulldp.png';"">
+        //  <div id='@ebsid@' data-ebtype='@data-ebtype@'  data-toggle='tooltip' title='@toolTipText@' class=' sysctrl_usrname'  name='@name@' autocomplete = 'off' @value@ @tabIndex@ style='width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@' @required@ @placeHolder@ disabled></div>
+        //</div>"
+        
 
         public override string GetDesignHtml()
         {
@@ -506,7 +507,7 @@ this.Init = function(id)
                 else
                 {
                     doNotUpdate = true;
-                    if (oProvUserId > 0 && nProvUserId > 0 && oProvUserId != nProvUserId)
+                    if (nProvUserId > 1 && oProvUserId != nProvUserId)
                     {
                         if (!this.AllowExistingUser)
                             this.ThrowExistingUserException(_d, flag);
@@ -785,9 +786,9 @@ this.Init = function(id)
         [HideInPropertyGrid]
         public string Type { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm)]//
-        [HideInPropertyGrid]//
-        public EbControl Control { get; set; }
+        //[EnableInBuilder(BuilderType.WebForm)]//
+        //[HideInPropertyGrid]//
+        //public EbControl Control { get; set; }
     }
 
     [UsedWithTopObjectParent(typeof(EbObject))]

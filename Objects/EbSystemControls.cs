@@ -208,7 +208,7 @@ namespace ExpressBase.Objects
         public override SingleColumn GetSingleColumn(User UserObj, Eb_Solution SoluObj, object Value)
         {
             string _displayMember = string.Empty;
-            int loc_id = UserObj.Preference.DefaultLocation;
+            int loc_id = UserObj.Preference.CurrrentLocation;
             if (Value != null)
                 loc_id = Convert.ToInt32(Value);
                         
