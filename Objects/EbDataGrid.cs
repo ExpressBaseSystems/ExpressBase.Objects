@@ -277,6 +277,7 @@ namespace ExpressBase.Objects
                     html += string.Concat("<th class='ppbtn-cont ebResizable dg-th' ebsid='@ebsid@' name='@name@' style='width: @Width@; @type@ title='", col.Title, @"'>
                                                 <span class='grid-col-title eb-label-editable'>", col.Title, @"</span>
                                                 <input id='@ebsid@lbltxtb' class='eb-lbltxtb' type='text'/>
+                                                <div id='@ebsid@Lblic' tabindex='-1' class='label-infoCont'></div>
                                                 @req@ @ppbtn@" +
                                             "</th>")
                         .Replace("@ppbtn@", Common.HtmlConstants.CONT_PROP_BTN)
