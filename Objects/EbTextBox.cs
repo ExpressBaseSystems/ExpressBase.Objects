@@ -125,7 +125,6 @@ else {
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.BotForm)]
         [Alias("Text Transform")]
-        [DefaultPropValue("'UPPERCASE'")]
         [PropertyGroup(PGConstants.CORE)]
         [PropertyEditor(PropertyEditorType.DropDown)]
         [OnChangeExec(@"
@@ -140,7 +139,6 @@ else {
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup(PGConstants.CORE)]
-        [DefaultPropValue("'SingleLine'")]
         [OnChangeExec(@"
 if (this.TextMode === 4 ){
     pg.ShowProperty('RowsVisible');

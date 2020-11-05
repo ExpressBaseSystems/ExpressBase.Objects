@@ -319,29 +319,38 @@ this.Init = function(id)
 
         }
 
+        private bool ContainsKey(Dictionary<string, string> _d, string key)
+        {
+            return _d.ContainsKey(key) && _d[key] != string.Empty;
+        }
+
         private int GetUserIdByEmailOrPhone(IDatabase DataDB, Dictionary<string, string> _d, ref int flag, bool ins, SingleColumn ocF)
         {
             int userId = 0;
             string _s = "SELECT id FROM eb_users WHERE LOWER(#) LIKE LOWER(@#) AND eb_del = 'F' AND (statusid = 0 OR statusid = 1 OR statusid = 2 OR statusid = 4);";
             string sql;
             List<DbParameter> parameters = new List<DbParameter>();
-            if (_d.ContainsKey("email") && _d["email"] != string.Empty)//01
+            if (ContainsKey(_d, "email"))//01
             {
                 sql = _s.Replace("#", "email");
                 parameters.Add(DataDB.GetNewParameter("email", EbDbTypes.String, _d["email"]));
             }
             else
                 sql = "SELECT 1 WHERE 1 = 0; ";
-            if (_d.ContainsKey("phprimary") && _d["phprimary"] != string.Empty)//10
+            if (ContainsKey(_d, "phprimary"))//10
             {
                 sql += _s.Replace("#", "phnoprimary");
                 parameters.Add(DataDB.GetNewParameter("phnoprimary", EbDbTypes.String, _d["phprimary"]));
             }
             else
                 sql += "SELECT 1 WHERE 1 = 0; ";
+
             EbDataSet ds = DataDB.DoQueries(sql, parameters.ToArray());
 
             int oProvUserId = ocF == null ? 0 : Convert.ToInt32(ocF.Value);
+            //Dictionary<string, string> _od = ocF == null ? new Dictionary<string, string>() : JsonConvert.DeserializeObject<Dictionary<string, string>>(Convert.ToString(ocF.F));
+            //int oCreUserId = ContainsKey(_od, "id") ? Convert.ToInt32(_od["id"]) : 0;
+
             if (ds.Tables[0].Rows.Count > 0)
             {
                 userId = Convert.ToInt32(ds.Tables[0].Rows[0][0]);
@@ -478,8 +487,11 @@ this.Init = function(id)
                 if (_od.ContainsKey(FormConstants.id) && (oProvUserId == nProvUserId))// means user created by this control
                 {
                     this.AddOrChange(_d, FormConstants.id, _od[FormConstants.id]);
-                    this.AddOrChange(_d, FormConstants.email, _od[FormConstants.email]);// remove this line if you want to edit email via prov user ctrl
-                    this.AddOrChange(_d, FormConstants.phprimary, _od[FormConstants.phprimary]);
+                    int oCreUserId = Convert.ToInt32(_od[FormConstants.id]);
+                    if (oCreUserId != nProvUserId || !_d.ContainsKey(FormConstants.email))
+                        this.AddOrChange(_d, FormConstants.email, _od[FormConstants.email]);// remove this line if you want to edit email via prov user ctrl
+                    if (oCreUserId != nProvUserId || !_d.ContainsKey(FormConstants.phprimary))
+                        this.AddOrChange(_d, FormConstants.phprimary, _od[FormConstants.phprimary]);
                     this.AddOrChange(_d, FormConstants.usertype, _od[FormConstants.usertype]);
                     int oldStatus = Convert.ToInt32(_od[FormConstants.statusid]);
                     this.AddOrChange(_d, FormConstants.statusid, Convert.ToString(oldStatus + 100));

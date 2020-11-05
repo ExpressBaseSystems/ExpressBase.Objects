@@ -176,7 +176,6 @@ namespace ExpressBase.Objects
         [PropertyGroup(PGConstants.EXTENDED)]
         [Alias("Is location independent")]
         [EnableInBuilder(BuilderType.WebForm)]
-        [HideInPropertyGrid]////
         public bool IsLocIndependent { get; set; }
 
         [PropertyGroup(PGConstants.DATA)]
@@ -762,7 +761,7 @@ namespace ExpressBase.Objects
                                     SingleColumn Col = entry.Value[0].GetColumn(obj.ControlName);
                                     if (Col != null)
                                     {
-                                        _d.Add(obj.Name, Convert.ToString(Col.Value));///////////////
+                                        _d.Add(obj.Name, Convert.ToString(Col.Value).Trim());///////////////
                                         if (obj.Name == FormConstants.email || obj.Name == FormConstants.phprimary)
                                             EmailOrPhFound = true;
                                         break;

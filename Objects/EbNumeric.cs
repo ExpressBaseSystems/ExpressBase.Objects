@@ -130,7 +130,6 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup(PGConstants.CORE)]
-        [DefaultPropValue("'SingleLine'")]
         [OnChangeExec(@"
 if (this.TextMode === 4 ){
     pg.ShowProperty('RowsVisible');
