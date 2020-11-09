@@ -1,11 +1,6 @@
-﻿using ExpressBase.Common.Constants;
-using ExpressBase.Common.Data;
-using ExpressBase.Common.Extensions;
+﻿using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
-using ExpressBase.Common.Structures;
-using ExpressBase.Objects.Objects.DVRelated;
-using System;
 using System.Collections.Generic;
 namespace ExpressBase.Objects
 {
@@ -35,9 +30,9 @@ namespace ExpressBase.Objects
             return @"<div class='eb_stacklayout mob_control dropped' id='@id' eb-type='EbMobileAudioInput' tabindex='1' onclick='$(this).focus()'>
                             <label class='ctrl_label'> @Label </label>
                             <div class='eb_ctrlhtml' style='display:flex'>
-                        <button>Start</button>
-                        <button>Stop</button>
-                        <button>play</button>
+                                <button>Start</button>
+                                <button>Stop</button>
+                                <button>play</button>
                             </div>
                         </div>".RemoveCR().DoubleQuoted();
         }
