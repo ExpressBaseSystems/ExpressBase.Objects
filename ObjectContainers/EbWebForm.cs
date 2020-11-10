@@ -2265,6 +2265,19 @@ namespace ExpressBase.Objects
                 if (c is EbProvisionUser && (c as EbProvisionUser).IsUserCreated())
                 {
                     UpdateSoluObj = true;
+
+                    EbProvisionUser pc = c as EbProvisionUser;
+
+                    if (this.FormData?.MultipleTables.ContainsKey(pc.VirtualTable) == true && this.FormData?.MultipleTables[pc.VirtualTable].Count > 0)
+                    {
+                        SingleColumn col = this.FormData.MultipleTables[pc.VirtualTable][0].Columns.Find(e => e.Name == pc.Name);
+                        if (col != null)
+                        {
+                            pc.UserCredentials.UserId = Convert.ToInt32(col.Value);
+                            //send verification message
+                        }
+                    }
+
                     //Console.WriteLine("AfterExecutionIfUserCreated - New User creation found");
                     //if (EmailCon?.Primary != null)
                     //{

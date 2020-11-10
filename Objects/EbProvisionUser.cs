@@ -478,7 +478,8 @@ this.Init = function(id)
                     i++;
                     doNotUpdate = true;
                 }
-                this.SetUserType_Role_Status(_d, nProvUserId);
+                else
+                    this.SetUserType_Role_Status(_d, nProvUserId);
             }
             else
             {
@@ -618,7 +619,7 @@ this.Init = function(id)
             return builder.ToString();
         }
 
-        private UserCredentials UserCredentials { get; set; }
+        public UserCredentials UserCredentials { get; set; }
 
         private string MailHtml
         {
