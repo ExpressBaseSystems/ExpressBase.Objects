@@ -6,6 +6,7 @@ using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
 using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 
 namespace ExpressBase.Objects
 {
@@ -21,11 +22,11 @@ namespace ExpressBase.Objects
         [DefaultPropValue("'Dynamic'")]
         [OnChangeExec(@"
                 if (this.Type === 1) { 
-                    pg.ShowPropertiesExt(['StaticParamters','Items']);
+                    pg.ShowPropertiesExt(['StaticParameters','Items']);
                     pg.HideGroupsExt(['Data','Link Settings','Action Button Settings']);
                 }
                 else {
-                    pg.HidePropertiesExt(['StaticParamters','Items']);
+                    pg.HidePropertiesExt(['StaticParameters','Items']);
                     pg.ShowGroupsExt(['Data','Link Settings','Action Button Settings']);
                 }
             ")]
@@ -34,7 +35,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.Collection)]
         [PropertyGroup("Core")]
-        public List<EbMobileStaticParameter> StaticParamters { set; get; }
+        public List<EbMobileStaticParameter> StaticParameters { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.Collection)]
@@ -171,15 +172,15 @@ namespace ExpressBase.Objects
         [DefaultPropValue("true")]
         [OnChangeExec(@"
                 if (this.UseLinkSettings){ 
-                    pg.HidePropertiesExt(['FabLinkRefId','FabFormMode','FabFormId','FabFormParameters','ContextToFabControlMap']);
+                    pg.HidePropertiesExt(['FabLinkRefId','ContextToFabControlMap']);
                 }
                 else {
                         pg.ShowProperty('FabLinkRefId');
                         if(this.FabLinkRefId && this.FabLinkTypeForm) {
-                            pg.ShowPropertiesExt(this.FabSettingsProps);
+                            pg.ShowProperty('ContextToFabControlMap');
                         }
                         else {
-                            pg.HidePropertiesExt(this.FabSettingsProps);
+                            pg.HideProperty('ContextToFabControlMap');
                         }
                 }
             ")]
@@ -192,42 +193,13 @@ namespace ExpressBase.Objects
         [Alias("Link")]
         [OnChangeExec(@"
                 if (this.FabLinkRefId && this.FabLinkTypeForm){ 
-                        pg.ShowPropertiesExt(this.FabSettingsProps);
+                        pg.ShowProperty('ContextToFabControlMap');
                 }
                 else {
-                        pg.HidePropertiesExt(this.FabSettingsProps);
+                        pg.HideProperty('ContextToFabControlMap');
                 }
             ")]
         public string FabLinkRefId { get; set; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("Action Button Settings")]
-        [OnChangeExec(@"
-                if (this.FabFormMode === 1){ 
-                        pg.ShowProperty('FabFormId');
-                }
-                else {
-                        pg.HideProperty('FabFormId');
-                }
-            ")]
-        [Alias("Form mode")]
-        public WebFormDVModes FabFormMode { set; get; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "DataColumns", 1)]
-        [PropertyGroup("Action Button Settings")]
-        [Alias("Form id")]
-        public EbMobileDataColToControlMap FabFormId { set; get; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [MetaOnly]
-        public List<EbMobileControlMeta> FabControlMetas => new List<EbMobileControlMeta>();
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("Action Button Settings")]
-        [Alias("Columns to controls map")]
-        [PropertyEditor(PropertyEditorType.Mapper, "DataColumns", "FabControlMetas", "FormControl")]
-        public List<EbMobileDataColToControlMap> FabFormParameters { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.Collection)]
@@ -288,15 +260,19 @@ namespace ExpressBase.Objects
         [PropertyGroup("List Styles")]
         public bool BoxShadow { set; get; }
 
+        [OnDeserialized]
+        public void OnDeserialized(StreamingContext context)
+        {
+            if (StaticParameters == null)
+                StaticParameters = new List<EbMobileStaticParameter>();
+        }
+
         public EbMobileVisualization()
         {
-            OfflineQuery = new EbScript();
             DataSourceParams = new List<Param>();
             FilterControls = new List<EbMobileControl>();
             SortColumns = new List<EbMobileDataColumn>();
             SearchColumns = new List<EbMobileDataColumn>();
-            LinkFormParameters = new List<EbMobileDataColToControlMap>();
-            ContextToControlMap = new List<EbCTCMapper>();
 
             Padding = new EbThickness(10);
             Margin = new EbThickness();

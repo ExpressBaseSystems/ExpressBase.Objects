@@ -173,6 +173,11 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         public bool EnableExcelImport { get; set; }
 
+        [PropertyGroup(PGConstants.EXTENDED)]
+        [Alias("Is location independent")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        public bool IsLocIndependent { get; set; }
+
         [PropertyGroup(PGConstants.DATA)]
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.Collection)]
@@ -756,7 +761,7 @@ namespace ExpressBase.Objects
                                     SingleColumn Col = entry.Value[0].GetColumn(obj.ControlName);
                                     if (Col != null)
                                     {
-                                        _d.Add(obj.Name, Convert.ToString(Col.Value));///////////////
+                                        _d.Add(obj.Name, Convert.ToString(Col.Value).Trim());///////////////
                                         if (obj.Name == FormConstants.email || obj.Name == FormConstants.phprimary)
                                             EmailOrPhFound = true;
                                         break;
@@ -808,7 +813,7 @@ namespace ExpressBase.Objects
             {
                 if (_table.TableType == WebFormTableTypes.Normal)
                 {
-                    SingleRow Row = new SingleRow();
+                    SingleRow Row = new SingleRow() { LocId = this.LocationId };
                     SingleTable Table = new SingleTable();
                     foreach (ColumnSchema _column in _table.Columns)
                         Row.Columns.Add(_column.Control.GetSingleColumn(this.UserObj, this.SolutionObj, null));
@@ -817,7 +822,7 @@ namespace ExpressBase.Objects
                 }
                 else if (_table.TableType == WebFormTableTypes.Grid)
                 {
-                    SingleRow Row = new SingleRow();
+                    SingleRow Row = new SingleRow() { LocId = this.LocationId };
                     Row.Columns.Add(new SingleColumn()
                     {
                         Name = FormConstants.eb_row_num,
@@ -2260,6 +2265,19 @@ namespace ExpressBase.Objects
                 if (c is EbProvisionUser && (c as EbProvisionUser).IsUserCreated())
                 {
                     UpdateSoluObj = true;
+
+                    EbProvisionUser pc = c as EbProvisionUser;
+
+                    if (this.FormData?.MultipleTables.ContainsKey(pc.VirtualTable) == true && this.FormData?.MultipleTables[pc.VirtualTable].Count > 0)
+                    {
+                        SingleColumn col = this.FormData.MultipleTables[pc.VirtualTable][0].Columns.Find(e => e.Name == pc.Name);
+                        if (col != null)
+                        {
+                            pc.UserCredentials.UserId = Convert.ToInt32(col.Value);
+                            //send verification message
+                        }
+                    }
+
                     //Console.WriteLine("AfterExecutionIfUserCreated - New User creation found");
                     //if (EmailCon?.Primary != null)
                     //{

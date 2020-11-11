@@ -35,6 +35,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public Eb_Solution SolutionObj { get; set; }
 
+        public string SignUpPage { set; get; }
+
         public string Message { set; get; }
     }
 
