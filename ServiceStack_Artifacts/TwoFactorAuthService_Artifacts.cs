@@ -58,6 +58,23 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string UserAuthId { get; set; }
     }
 
+    public class SendUserVerifCodeRequest : EbServiceStackAuthRequest, IReturn<Authenticate2FAResponse>
+    {
+        public int UserId { get; set; }
+
+        public string WC { get; set; }
+    }
+    
+
+    public class VerifyUserConfirmationRequest : EbServiceStackAuthRequest, IReturn<Authenticate2FAResponse>
+    {
+        public string VerificationCode { get; set; }
+
+        public string WC { get; set; }
+
+        public OtpType OtpType { get; set; }
+    }
+
     public enum OtpType
     {
         Sms = 1,
