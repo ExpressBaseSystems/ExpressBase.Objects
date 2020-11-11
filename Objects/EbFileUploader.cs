@@ -249,22 +249,28 @@ namespace ExpressBase.Objects
             return fullqry;
         }
 
-        public string GetUpdateQuery2(IDatabase DataDB, List<DbParameter> param, SingleTable Table, string mastertbl, string EbObId, ref int i, int dataId, string secCxtGet, string secCxtSet)
+        public string GetUpdateQuery2(IDatabase DataDB, List<DbParameter> param, Dictionary<string, SingleTable> ExtTables, string mastertbl, string EbObId, ref int i, int dataId, string secCxtGet, string secCxtSet)
         {
-            string pCxtVal = string.Empty;
-            string sCxtGetVal = string.Empty;
-            string sCxtSetVal = string.Empty;
-            //string priCxt = string.Empty;
-            List<string> refIds = new List<string>();
+            string pCxtVal;// primary context value
+            string sCxtGetVal = string.Empty;// secondary context get value
+            string sCxtSetVal = string.Empty;// secondary context set value
+            List<string> refIds = null;
+            List<string> refIdsAdd = null;
+            List<string> refIdsDel = null;
             string fullqry = string.Empty;
+            bool isAddDelFlow = false;
 
-            foreach (SingleRow row in Table)
+            if (ExtTables.ContainsKey(this.Name + "_add") && ExtTables.ContainsKey(this.Name + "_del"))
             {
-                string cn = this.Name + "_" + i.ToString();
-                i++;
-                param.Add(DataDB.GetNewParameter(cn, EbDbTypes.Decimal, row.Columns[0].Value));
-                refIds.Add("@" + cn);
+                refIdsAdd = GetRefidsList(DataDB, param, ExtTables[this.Name + "_add"], ref i);
+                refIdsDel = GetRefidsList(DataDB, param, ExtTables[this.Name + "_del"], ref i);
+                isAddDelFlow = true;
             }
+            else if (ExtTables.ContainsKey(this.Name))//old flow
+            {
+                refIds = GetRefidsList(DataDB, param, ExtTables[this.Name], ref i);
+            }
+            
             if (!secCxtGet.IsNullOrEmpty())
             {
                 sCxtGetVal = "contextget_" + i;
@@ -283,28 +289,59 @@ namespace ExpressBase.Objects
             else
                 pCxtVal = string.Format("'{0}_{1}_{2}'", EbObId, dataId, this.Name);
 
-            if (refIds.Count > 0)
+            if (isAddDelFlow)
             {
-
-                for (int k = 0; k < refIds.Count; k++)
+                for (int k = 0; k < refIdsAdd.Count; k++)
                 {
-                    fullqry += string.Format(@" UPDATE eb_files_ref SET context = {0} @upCxt@ 
-                                                    WHERE id = {1} AND eb_del <> 'T' AND context = 'default' @secCxt@;"
-                                                .Replace("@secCxt@", !secCxtGet.IsNullOrEmpty() ? "AND context_sec IS NULL" : "")
-                                                .Replace("@upCxt@", !secCxtSet.IsNullOrEmpty() ? ", context_sec = @{2}" : ""), pCxtVal, refIds[k], sCxtSetVal);
+                    fullqry += string.Format(@" UPDATE eb_files_ref SET context = {0} @upCxt@ WHERE id = {1} AND COALESCE(eb_del, '') <> 'T' AND context = 'default' @secCxt@;"
+                                    .Replace("@secCxt@", !secCxtGet.IsNullOrEmpty() ? "AND context_sec IS NULL" : "")
+                                    .Replace("@upCxt@", !secCxtSet.IsNullOrEmpty() ? ", context_sec = @{2}" : ""), pCxtVal, refIdsAdd[k], sCxtSetVal);
                 }
-
-                fullqry += string.Format(@"UPDATE eb_files_ref SET eb_del='T' 
-                                            WHERE (context = {0} @secCxt@) AND eb_del='F' AND id NOT IN ({1});"
-                                            .Replace("@secCxt@", !secCxtGet.IsNullOrEmpty() ? "OR context_sec = @{2}" : ""), pCxtVal, refIds.Join(","), sCxtGetVal);
+                if (refIdsDel.Count > 0)
+                {
+                    fullqry += string.Format(@"UPDATE eb_files_ref SET eb_del='T' 
+                                WHERE (context = {0} @secCxt@) AND COALESCE(eb_del, 'F')='F' AND id IN ({1});"
+                                    .Replace("@secCxt@", !secCxtGet.IsNullOrEmpty() ? "OR context_sec = @{2}" : ""), pCxtVal, refIdsDel.Join(","), sCxtGetVal);
+                }
             }
-            else // if all files deleted
+            else
             {
-                fullqry += string.Format(@"UPDATE eb_files_ref SET eb_del='T' 
-                                            WHERE (context = {0} @secCxt@) AND eb_del='F';"
-                                            .Replace("@secCxt@", !secCxtGet.IsNullOrEmpty() ? "OR context_sec = @{1}" : ""), pCxtVal, sCxtGetVal);
+                if (refIds.Count > 0)
+                {
+
+                    for (int k = 0; k < refIds.Count; k++)
+                    {
+                        fullqry += string.Format(@" UPDATE eb_files_ref SET context = {0} @upCxt@ 
+                                                    WHERE id = {1} AND COALESCE(eb_del, '') <> 'T' AND context = 'default' @secCxt@;"
+                                                    .Replace("@secCxt@", !secCxtGet.IsNullOrEmpty() ? "AND context_sec IS NULL" : "")
+                                                    .Replace("@upCxt@", !secCxtSet.IsNullOrEmpty() ? ", context_sec = @{2}" : ""), pCxtVal, refIds[k], sCxtSetVal);
+                    }
+
+                    fullqry += string.Format(@"UPDATE eb_files_ref SET eb_del='T' 
+                                            WHERE (context = {0} @secCxt@) AND COALESCE(eb_del, 'F')='F' AND id NOT IN ({1});"
+                                                .Replace("@secCxt@", !secCxtGet.IsNullOrEmpty() ? "OR context_sec = @{2}" : ""), pCxtVal, refIds.Join(","), sCxtGetVal);
+                }
+                else // if all files deleted
+                {
+                    fullqry += string.Format(@"UPDATE eb_files_ref SET eb_del='T' 
+                                            WHERE (context = {0} @secCxt@) AND COALESCE(eb_del, 'F')='F';"
+                                                .Replace("@secCxt@", !secCxtGet.IsNullOrEmpty() ? "OR context_sec = @{1}" : ""), pCxtVal, sCxtGetVal);
+                }
             }
             return fullqry;
+        }
+
+        private List<string> GetRefidsList(IDatabase DataDB, List<DbParameter> param, SingleTable Table, ref int i)
+        {
+            List<string> refIds = new List<string>();
+            foreach (SingleRow row in Table)
+            {
+                string cn = this.Name + "_" + i.ToString();
+                i++;
+                param.Add(DataDB.GetNewParameter(cn, EbDbTypes.Decimal, row.Columns[0].Value));
+                refIds.Add("@" + cn);
+            }
+            return refIds;
         }
 
 
