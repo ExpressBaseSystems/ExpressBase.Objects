@@ -134,13 +134,13 @@ this.Init = function(id)
 <div id='cont_@ebsid@' ebsid='@ebsid@' class='Eb-ctrlContainer' Ctype='TabControl'>
     <div class='RenderAsWizard'>
         <ul class='nav'>".Replace("@ebsid@", EbSid);
-                    string TabContentHtml = @"
+                string TabContentHtml = @"
             <div class='tab-content'>";
 
-                    foreach (EbTabPane tab in Controls)
-                    {
-                        tab.RenderAsWizard = true;
-                        TabBtnHtml += @"
+                foreach (EbTabPane tab in Controls)
+                {
+                    tab.RenderAsWizard = true;
+                    TabBtnHtml += @"
             <li renderaswizard = '@rw@' >
                 <a class='nav-link ppbtn-cont' href='#@ebsid@'>
                     <span class='eb-label-editable'>@title@</span>
@@ -150,13 +150,13 @@ this.Init = function(id)
                 </a>
                 <div class='ebtab-add-btn eb-fb-icon'><i class='fa fa-plus' aria-hidden='true'></i></div>                
             </li>".Replace("@style@", tab.IsDynamic && tab.IsRenderMode ? "style='display : none;'" : string.Empty)
-                    .Replace("@title@", tab.Title)
-                    .Replace("@rw@", tab.RenderAsWizard.ToString().ToLower())
-                    .Replace("@ppbtn@", Common.HtmlConstants.CONT_PROP_BTN)
-                    .Replace("@ebsid@", tab.IsDynamic && tab.IsRenderMode ? "@" + tab.EbSid_CtxId + "_ebsid@" : tab.EbSid);
-                    }
+                .Replace("@title@", tab.Title)
+                .Replace("@rw@", tab.RenderAsWizard.ToString().ToLower())
+                .Replace("@ppbtn@", Common.HtmlConstants.CONT_PROP_BTN)
+                .Replace("@ebsid@", tab.IsDynamic && tab.IsRenderMode ? "@" + tab.EbSid_CtxId + "_ebsid@" : tab.EbSid);
+                }
 
-                    TabBtnHtml += @"
+                TabBtnHtml += @"
         </ul>";
 
 
