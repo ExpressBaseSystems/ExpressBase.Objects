@@ -2257,7 +2257,7 @@ namespace ExpressBase.Objects
             return 0;
         }
 
-        public void AfterExecutionIfUserCreated(Service Service, Common.Connections.EbMailConCollection EmailCon, RabbitMqProducer MessageProducer3)
+        public void AfterExecutionIfUserCreated(Service Service, Common.Connections.EbMailConCollection EmailCon, RabbitMqProducer MessageProducer3, string wc)
         {
             bool UpdateSoluObj = false;
             foreach (EbControl c in this.FormSchema.ExtendedControls)
@@ -2274,7 +2274,12 @@ namespace ExpressBase.Objects
                         if (col != null)
                         {
                             pc.UserCredentials.UserId = Convert.ToInt32(col.Value);
-                            //send verification message
+                            Authenticate2FAResponse resp = Service.Gateway.Send<Authenticate2FAResponse>(new SendUserVerifCodeRequest
+                            {
+                                UserId = pc.UserCredentials.UserId,
+                                WC = wc,
+                                SolnId = this.SolutionObj.SolutionID
+                            });
                         }
                     }
 
