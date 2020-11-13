@@ -90,7 +90,7 @@ namespace ExpressBase.Objects
     }
 
     [EnableInBuilder(BuilderType.MobilePage)]
-    public class EbMobileStackLayout : EbMobileDashBoardControls
+    public class EbMobileStackLayout : EbMobileDashBoardControl
     {
         [EnableInBuilder(BuilderType.MobilePage)]
         public StackOrientation Orientation { set; get; }
@@ -100,12 +100,12 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
-        public List<EbMobileDashBoardControls> ChildControls { set; get; }
+        public List<EbMobileDashBoardControl> ChildControls { set; get; }
 
         [OnDeserialized]
         public void OnDeserialized(StreamingContext context)
         {
-            if (this.ChildControls == null) this.ChildControls = new List<EbMobileDashBoardControls>();
+            if (this.ChildControls == null) this.ChildControls = new List<EbMobileDashBoardControl>();
         }
 
         public override string GetDesignHtml()

@@ -2,10 +2,11 @@
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using System.Collections.Generic;
+
 namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.MobilePage)]
-    class EbMobileAudioInput : EbMobileControl, INonPersistControl
+    public class EbMobileFileUpload : EbMobileControl, INonPersistControl
     {
         public override bool DoNotPersist { get; set; }
         public override bool Unique { get; set; }
@@ -15,7 +16,11 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("General")]
-        public int MaxDUration { set; get; }
+        public bool EnableCameraSelect { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("General")]
+        public bool EnableFileSelect { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("General")]
@@ -27,12 +32,11 @@ namespace ExpressBase.Objects
 
         public override string GetDesignHtml()
         {
-            return @"<div class='eb_stacklayout mob_control dropped' id='@id' eb-type='EbMobileAudioInput' tabindex='1' onclick='$(this).focus()'>
+            return @"<div class='eb_stacklayout mob_control dropped' id='@id' eb-type='EbMobileFileUpload' tabindex='1' onclick='$(this).focus()'>
                             <label class='ctrl_label'> @Label </label>
-                            <div class='eb_ctrlhtml' style='display:flex'>
-                                <button>Start</button>
-                                <button>Stop</button>
-                                <button>play</button>
+                            <div class='eb_ctrlhtml'>
+                               <button class='eb_mob_fupbtn filesbtn'><i class='fa fa-folder-open-o'></i></button>
+                               <button class='eb_mob_fupbtn camerabtn'><i class='fa fa-camera'></i></button>
                             </div>
                         </div>".RemoveCR().DoubleQuoted();
         }
@@ -42,19 +46,20 @@ namespace ExpressBase.Objects
             return @"
                 this.Init = function(id)
                 {
-                    this.MultiSelect= false;
-                    this.EnableEdit= false;
+                    this.EnableCameraSelect = true;
+                    this.EnableFileSelect= true;
+                    this.MultiSelect= true;
+                    this.EnableEdit= true;
                 };";
         }
 
         public override EbControl GetWebFormControl(int counter)
         {
-            return new EbAudioInput
+            return new EbFileUploader
             {
                 EbSid = this.EbControlType + counter,
                 Name = this.Name,
                 IsMultipleUpload = this.MultiSelect,
-                MaximumDUration = this.MaxDUration,
                 Margin = new UISides { Top = 0, Bottom = 0, Left = 0, Right = 0 },
                 Label = this.Label
             };
@@ -62,13 +67,12 @@ namespace ExpressBase.Objects
 
         public override void UpdateWebFormControl(EbControl control)
         {
-            if (control == null || !(control is EbAudioInput fup))
+            if (control == null || !(control is EbFileUploader fup))
                 return;
 
             base.UpdateWebFormControl(control);
 
             fup.IsMultipleUpload = this.MultiSelect;
-            fup.MaximumDUration = this.MaxDUration;
         }
     }
 }
