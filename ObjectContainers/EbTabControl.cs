@@ -53,11 +53,6 @@ namespace ExpressBase.Objects
         }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
-        //[OnChangeUIFunction("EbTabControl.padding")]
-        [PropertyGroup(PGConstants.CORE)]
-        public bool RenderAsWizard { get; set; }
-
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [OnChangeUIFunction("EbTabControl.padding")]
         [DefaultPropValue(8, 8, 8, 8)]
         [PropertyGroup(PGConstants.APPEARANCE)]
@@ -128,87 +123,46 @@ this.Init = function(id)
 
         public override string GetHtml()
         {
-            if (RenderAsWizard && IsRenderMode)
-            {
-                string TabBtnHtml = @"
-<div id='cont_@ebsid@' ebsid='@ebsid@' class='Eb-ctrlContainer' Ctype='TabControl'>
-    <div class='RenderAsWizard'>
-        <ul class='nav'>".Replace("@ebsid@", EbSid);
-                    string TabContentHtml = @"
-            <div class='tab-content'>";
 
-                    foreach (EbTabPane tab in Controls)
-                    {
-                        tab.RenderAsWizard = true;
-                        TabBtnHtml += @"
-            <li renderaswizard = '@rw@' >
-                <a class='nav-link ppbtn-cont' href='#@ebsid@'>
-                    <span class='eb-label-editable'>@title@</span>
-                    <div class='eb-tab-warn-icon-cont'><i class='icofont-warning-alt'></i></div>
-                    <input id='@ebsid@lbltxtb' class='eb-lbltxtb' type='text'/>@ppbtn@
-                    <div class='ebtab-close-btn eb-fb-icon'><i class='fa fa-times' aria-hidden='true'></i></div>
-                </a>
-                <div class='ebtab-add-btn eb-fb-icon'><i class='fa fa-plus' aria-hidden='true'></i></div>                
-            </li>".Replace("@style@", tab.IsDynamic && tab.IsRenderMode ? "style='display : none;'" : string.Empty)
-                    .Replace("@title@", tab.Title)
-                    .Replace("@rw@", tab.RenderAsWizard.ToString().ToLower())
-                    .Replace("@ppbtn@", Common.HtmlConstants.CONT_PROP_BTN)
-                    .Replace("@ebsid@", tab.IsDynamic && tab.IsRenderMode ? "@" + tab.EbSid_CtxId + "_ebsid@" : tab.EbSid);
-                    }
-
-                    TabBtnHtml += @"
-        </ul>";
-
-
-
-                foreach (EbControl tab in Controls)
-                    TabContentHtml += tab.GetHtml();
-
-                TabContentHtml += "</div></div></div>";
-
-                return string.Concat(TabBtnHtml, TabContentHtml);
-            }
-            else
-            {
-                string TabBtnHtml = @"
+            string TabBtnHtml = @"
 <div id='cont_@ebsid@' ebsid='@ebsid@' class='Eb-ctrlContainer' Ctype='TabControl'>
     <div class='tab-btn-cont'>
         <ul class='nav nav-tabs'>".Replace("@ebsid@", EbSid);
-                string TabContentHtml = @"
+            string TabContentHtml = @"
             <div class='tab-content'>";
 
-                foreach (EbTabPane tab in Controls)
-                    TabBtnHtml += @"
+            foreach (EbTabPane tab in Controls)
+                TabBtnHtml += @"
             <li li-of='@ebsid@' ebsid='@ebsid@' @active @style@>
                 <a data-toggle='tab' class='ppbtn-cont' href='#@ebsid@'>
                     <span class='eb-label-editable'>@title@</span>
                     <div class='eb-tab-warn-icon-cont'><i class='icofont-warning-alt'></i></div>
                     <input id='@ebsid@lbltxtb' class='eb-lbltxtb' type='text'/>@ppbtn@
-                    <div class='ebtab-close-btn eb-fb-icon'><i class='fa fa-times' aria-hidden='true'></i></div>
+                    <div class='ebtab-close-btn eb-fb-icon' title='Remove'><i class='fa fa-times' aria-hidden='true'></i></div>
                 </a>
                 <div class='ebtab-add-btn eb-fb-icon'><i class='fa fa-plus' aria-hidden='true'></i></div>                
             </li>".Replace("@style@", tab.IsDynamic && tab.IsRenderMode ? "style='display : none;'" : string.Empty)
-                .Replace("@title@", tab.Title)
-                .Replace("@ppbtn@", Common.HtmlConstants.CONT_PROP_BTN)
-                .Replace("@ebsid@", tab.IsDynamic && tab.IsRenderMode ? "@" + tab.EbSid_CtxId + "_ebsid@" : tab.EbSid);
+            .Replace("@title@", tab.Title)
+            .Replace("@ppbtn@", Common.HtmlConstants.CONT_PROP_BTN)
+            .Replace("@ebsid@", tab.IsDynamic && tab.IsRenderMode ? "@" + tab.EbSid_CtxId + "_ebsid@" : tab.EbSid);
 
-                TabBtnHtml += @"
+            TabBtnHtml += @"
         </ul>
     </div>";
 
-                Regex regex = new Regex(Regex.Escape("@active"));
-                TabBtnHtml = regex.Replace(TabBtnHtml, "class='active'", 1).Replace("@active", "");
+            Regex regex = new Regex(Regex.Escape("@active"));
+            TabBtnHtml = regex.Replace(TabBtnHtml, "class='active'", 1).Replace("@active", "");
 
 
-                foreach (EbControl tab in Controls)
-                    TabContentHtml += tab.GetHtml();
+            foreach (EbControl tab in Controls)
+                TabContentHtml += tab.GetHtml();
 
-                TabContentHtml += "</div></div>";
-                regex = new Regex(Regex.Escape("@inactive"));
-                TabContentHtml = regex.Replace(TabContentHtml, "in active", 1).Replace("@inactive", "");
+            TabContentHtml += "</div></div>";
+            regex = new Regex(Regex.Escape("@inactive"));
+            TabContentHtml = regex.Replace(TabContentHtml, "in active", 1).Replace("@inactive", "");
 
-                return string.Concat(TabBtnHtml, TabContentHtml);
-            }
+            return string.Concat(TabBtnHtml, TabContentHtml);
+
         }
     }
 

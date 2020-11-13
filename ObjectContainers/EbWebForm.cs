@@ -1947,7 +1947,7 @@ namespace ExpressBase.Objects
                 if (control is EbFileUploader)
                 {
                     EbFileUploader _c = control as EbFileUploader;
-                    if (this.FormData.ExtendedTables.ContainsKey(_c.Name ?? _c.EbSid))
+                    if (this.FormData.ExtendedTables.ContainsKey(_c.Name) || (this.FormData.ExtendedTables.ContainsKey(_c.Name + "_add") && this.FormData.ExtendedTables.ContainsKey(_c.Name + "_del")))
                     {
                         if (this.FormGlobals == null)
                             this.FormGlobals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, this.FormData, null);
@@ -1956,7 +1956,7 @@ namespace ExpressBase.Objects
                             secCxtGet = Convert.ToString(this.ExecuteCSharpScriptNew(_c.ContextGetExpr.Code, this.FormGlobals));
                         if (_c.ContextSetExpr != null && !_c.ContextSetExpr.Code.IsNullOrEmpty())
                             secCxtSet = Convert.ToString(this.ExecuteCSharpScriptNew(_c.ContextSetExpr.Code, this.FormGlobals));
-                        _qry += _c.GetUpdateQuery2(DataDB, param, this.FormData.ExtendedTables[_c.Name ?? _c.EbSid], this.TableName, this.RefId.Split("-")[3], ref i, this.TableRowId, secCxtGet, secCxtSet);
+                        _qry += _c.GetUpdateQuery2(DataDB, param, this.FormData.ExtendedTables, this.TableName, this.RefId.Split("-")[3], ref i, this.TableRowId, secCxtGet, secCxtSet);
                     }
                 }
             }
@@ -2257,7 +2257,7 @@ namespace ExpressBase.Objects
             return 0;
         }
 
-        public void AfterExecutionIfUserCreated(Service Service, Common.Connections.EbMailConCollection EmailCon, RabbitMqProducer MessageProducer3)
+        public void AfterExecutionIfUserCreated(Service Service, Common.Connections.EbMailConCollection EmailCon, RabbitMqProducer MessageProducer3, string wc)
         {
             bool UpdateSoluObj = false;
             foreach (EbControl c in this.FormSchema.ExtendedControls)
@@ -2265,6 +2265,24 @@ namespace ExpressBase.Objects
                 if (c is EbProvisionUser && (c as EbProvisionUser).IsUserCreated())
                 {
                     UpdateSoluObj = true;
+
+                    EbProvisionUser pc = c as EbProvisionUser;
+
+                    if (this.FormData?.MultipleTables.ContainsKey(pc.VirtualTable) == true && this.FormData?.MultipleTables[pc.VirtualTable].Count > 0)
+                    {
+                        SingleColumn col = this.FormData.MultipleTables[pc.VirtualTable][0].Columns.Find(e => e.Name == pc.Name);
+                        if (col != null)
+                        {
+                            pc.UserCredentials.UserId = Convert.ToInt32(col.Value);
+                            Authenticate2FAResponse resp = Service.Gateway.Send<Authenticate2FAResponse>(new SendUserVerifCodeRequest
+                            {
+                                UserId = pc.UserCredentials.UserId,
+                                WC = wc,
+                                SolnId = this.SolutionObj.SolutionID
+                            });
+                        }
+                    }
+
                     //Console.WriteLine("AfterExecutionIfUserCreated - New User creation found");
                     //if (EmailCon?.Primary != null)
                     //{

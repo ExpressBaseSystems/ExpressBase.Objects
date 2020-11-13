@@ -1,4 +1,5 @@
-﻿using ExpressBase.Common.Extensions;
+﻿using ExpressBase.Common.Constants;
+using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
@@ -22,6 +23,11 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public override string Name { get; set; }
 
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.Expandable)]
+        public EbThickness Padding { set; get; }
+
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
         public List<EbMobileDashBoardControls> ChildControls { get; set; }
@@ -37,6 +43,11 @@ namespace ExpressBase.Objects
         public override List<string> DiscoverRelatedRefids()
         {
             return base.DiscoverRelatedRefids();
+        }
+
+        public EbMobileDashBoard()
+        {
+            Padding = new EbThickness(10);
         }
     }
 
