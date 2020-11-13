@@ -3,6 +3,8 @@ using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
+using ExpressBase.Objects.ServiceStack_Artifacts;
+using ServiceStack;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
@@ -127,7 +129,36 @@ namespace ExpressBase.Objects
 		//public  int FontSizes { get; set; }
 
 
+		[EnableInBuilder(BuilderType.WebForm)]
+		[HideInPropertyGrid]
+		public string TableName { get; set; }
 
+		[EnableInBuilder(BuilderType.WebForm)]
+		public bool AutoSuggestion { get; set; }
+
+		[EnableInBuilder(BuilderType.WebForm)]
+		[HideInPropertyGrid]
+		public List<string> Suggestions { get; set; }
+		public void InitFromDataBase(JsonServiceClient ServiceClient)
+		{
+			if (this.AutoSuggestion)
+			{
+				var result = ServiceClient.Get<GetDistinctValuesResponse>(new GetDistinctValuesRequest { TableName = this.TableName, ColumnName = this.Name });
+
+				for (int i = 0; i < result.Suggestions.Count; i++)
+				{
+					string[] SuggestionList = result.Suggestions[i].Split(",");
+					foreach (string value in SuggestionList)
+					{
+						if (!this.Suggestions.Contains(value))
+							this.Suggestions.Add(value);
+					}
+					
+				}
+
+			}
+
+		}
 
 		public override string GetBareHtml()
 		{
@@ -135,7 +166,7 @@ namespace ExpressBase.Objects
 
 			return @" 
  <div id='@ebsid@' class='tagInputDiv'  >  
-	<input type='text' name='@ebsid@_tags' value='' size='42' data-role='tagsinput'  />
+	<input type='text' id='@ebsid@_tagId' name='@ebsid@_tags' value='' size='42' data-role='tagsinput'  />
 </div>"
 .Replace("@ebsid@", String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId)
 .Replace("@name@", this.Name)
