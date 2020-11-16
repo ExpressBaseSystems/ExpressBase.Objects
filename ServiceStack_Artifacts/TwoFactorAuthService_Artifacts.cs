@@ -49,6 +49,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public string ErrorMessage { get; set; }
 
+        public string Message { get; set; }
+
         public bool AuthStatus { set; get; }
 
         public bool Is2fa { get; set; }
@@ -56,6 +58,10 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string OtpTo { get; set; }
 
         public string UserAuthId { get; set; }
+
+        public Authenticate2FAResponse MobileVerifCode { get; set; }
+
+        public Authenticate2FAResponse EmailVerifCode { get; set; }
     }
 
     public class SendUserVerifCodeRequest : EbServiceStackAuthRequest, IReturn<Authenticate2FAResponse>
@@ -66,13 +72,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
     
 
-    public class VerifyUserConfirmationRequest : EbServiceStackAuthRequest, IReturn<Authenticate2FAResponse>
+    public class VerifyUserConfirmationRequest : EbServiceStackNoAuthRequest, IReturn<Authenticate2FAResponse>
     {
         public string VerificationCode { get; set; }
 
         public string WC { get; set; }
 
-        public OtpType OtpType { get; set; }
+        public string UserAuthId { get; set; }
     }
 
     public enum OtpType
