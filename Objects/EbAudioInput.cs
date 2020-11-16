@@ -110,11 +110,11 @@ namespace ExpressBase.Objects
         public override string DesignHtml4Bot
         {
             get => @"<div class='input-group'style='width: 100 %; '> 
-                       <div style='display:flex' class='rating-container ' id='@ebsid@' name='@name@'> 
-                        <button>Start</button>
-                        <button>Stop</button>
-                        <button>play</button>
-                    </div>
+                        <div class='audio-container ' id='@ebsid@' name='@name@'> 
+                         <div style='display:flex;'><button id='btnStart'>START</button> 
+                         <button id ='btnStop'> STOP</button> <button id ='uploadAudio'> Upload</button></div>
+                         <audio style='height: 30px;margin-top: 10px;' id='adioPlay' controls></audio>                
+                         </div>
                     </div>";
             set => base.DesignHtml4Bot = value;
         }
@@ -129,10 +129,10 @@ namespace ExpressBase.Objects
             string EbCtrlHTML = HtmlConstants.CONTROL_WRAPER_HTML4WEB
                     .Replace("@barehtml@", @"                       
                         <div class='input-group'style='width: 100 %; '> 
-                         <div style='display:flex' class='rating-container ' id='@ebsid@' name='@name@'> 
-                        <button>Start</button>
-                        <button>Stop</button>
-                        <button>play</button>
+                          <div class='audio-container ' id='@ebsid@' name='@name@'> 
+                         <div style='display:flex;'><button id='btnStart'>START</button> 
+                         <button id ='btnStop'> STOP</button> <button id ='uploadAudio'> Upload</button></div>
+                         <audio style='height: 30px;margin-top: 10px;' id='adioPlay' controls></audio>                
                     </div>
                         </div>
                 ").RemoveCR().DoubleQuoted();
@@ -153,11 +153,11 @@ namespace ExpressBase.Objects
         {
             return @" 
         <div class='input-group'style='width: 100 %; '> 
-                         <div style='display:flex' class='rating-container ' id='@ebsid@' name='@name@'> 
-                        <button>Start</button>
-                        <button>Stop</button>
-                        <button>play</button>
-                    </div>
+                         <div class='audio-container ' id='@ebsid@' name='@name@'> 
+                         <div style='display:flex;'><button id='btnStart'>START</button> 
+                         <button id ='btnStop'> STOP</button> <button id ='uploadAudio'> Upload</button> </div>
+                         <audio style='height: 30px;margin-top: 10px;' id='adioPlay' controls></audio>                
+                         </div>
                         </div>"
             .Replace("@ebsid@", this.EbSid);
         }
@@ -180,7 +180,7 @@ namespace ExpressBase.Objects
             else
                 Qry = DataDB.EB_GET_SELECT_FILE_UPLOADER_CXT_SEC.Replace("@Name@", this.Name ?? this.EbSid);
 
-            return Qry;
+            return Qry;      
         }
     }
 }
