@@ -377,6 +377,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         
         [DataMember(Order = 9)]
         public string AffectedEntries { get; set; }
+
+        [DataMember(Order = 9)]
+        public string MetaData { get; set; }
     }
     
 	[DataContract]

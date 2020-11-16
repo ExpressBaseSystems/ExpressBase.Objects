@@ -110,6 +110,10 @@ namespace ExpressBase.Objects
         public bool AllowExistingUser { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
+        [Alias("Send verification message")]
+        public bool SendVerificationMsg { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
         public override EbScript HiddenExpr { get; set; }
 
 

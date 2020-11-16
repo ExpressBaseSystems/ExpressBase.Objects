@@ -2257,7 +2257,7 @@ namespace ExpressBase.Objects
             return 0;
         }
 
-        public void AfterExecutionIfUserCreated(Service Service, Common.Connections.EbMailConCollection EmailCon, RabbitMqProducer MessageProducer3, string wc)
+        public void AfterExecutionIfUserCreated(Service Service, Common.Connections.EbMailConCollection EmailCon, RabbitMqProducer MessageProducer3, string wc, Dictionary<string, string> MetaData)
         {
             bool UpdateSoluObj = false;
             foreach (EbControl c in this.FormSchema.ExtendedControls)
@@ -2271,15 +2271,44 @@ namespace ExpressBase.Objects
                     if (this.FormData?.MultipleTables.ContainsKey(pc.VirtualTable) == true && this.FormData?.MultipleTables[pc.VirtualTable].Count > 0)
                     {
                         SingleColumn col = this.FormData.MultipleTables[pc.VirtualTable][0].Columns.Find(e => e.Name == pc.Name);
-                        if (col != null)
+                        if (col != null && !MetaData.ContainsKey(FormMetaDataKeys.verification_required))
                         {
                             pc.UserCredentials.UserId = Convert.ToInt32(col.Value);
-                            Authenticate2FAResponse resp = Service.Gateway.Send<Authenticate2FAResponse>(new SendUserVerifCodeRequest
+
+                            MetaData.Add(FormMetaDataKeys.username, string.IsNullOrEmpty(pc.UserCredentials.Email) ? pc.UserCredentials.Phone : pc.UserCredentials.Email);
+                            MetaData.Add(FormMetaDataKeys.auth_id, string.Format(TokenConstants.SUB_FORMAT, this.SolutionObj.SolutionID, pc.UserCredentials.UserId, wc));
+
+                            if (pc.SendVerificationMsg)
                             {
-                                UserId = pc.UserCredentials.UserId,
-                                WC = wc,
-                                SolnId = this.SolutionObj.SolutionID
-                            });
+                                string msg = string.Empty;
+                                MetaData.Add(FormMetaDataKeys.verification_required, "true");
+                                Authenticate2FAResponse resp = Service.Gateway.Send<Authenticate2FAResponse>(new SendUserVerifCodeRequest
+                                {
+                                    UserId = pc.UserCredentials.UserId,
+                                    WC = wc,
+                                    SolnId = this.SolutionObj.SolutionID
+                                });
+                                if (!string.IsNullOrEmpty(pc.UserCredentials.Email)) {
+                                    if (resp.EmailVerifCode.AuthStatus)
+                                    {
+                                        MetaData.Add(FormMetaDataKeys.verify_email, pc.UserCredentials.Email);
+                                    }
+                                    msg = resp.EmailVerifCode.Message;
+                                }
+                                if (!string.IsNullOrEmpty(pc.UserCredentials.Phone)) {
+                                    if (resp.MobileVerifCode.AuthStatus)
+                                    {
+                                        MetaData.Add(FormMetaDataKeys.verify_phone, pc.UserCredentials.Phone);
+                                    }
+                                    msg += "; " + resp.MobileVerifCode.Message;
+                                }
+                                MetaData.Add(FormMetaDataKeys.message, msg);
+                            }
+                            else
+                            {
+                                MetaData.Add(FormMetaDataKeys.verification_required, "false");
+                                MetaData.Add(FormMetaDataKeys.message, "Verification is not required");
+                            }
                         }
                     }
 
