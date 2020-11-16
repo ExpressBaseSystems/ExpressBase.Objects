@@ -7,7 +7,7 @@ using ExpressBase.Common.Structures;
 namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.MobilePage)]
-    public class EbMobileTableView : EbMobileDashBoardControls
+    public class EbMobileTableView : EbMobileDashBoardControl
     {
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]

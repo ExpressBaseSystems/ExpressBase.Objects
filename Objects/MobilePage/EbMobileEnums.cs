@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ExpressBase.Objects
+﻿namespace ExpressBase.Objects
 {
     public enum NetworkMode
     {
@@ -58,5 +54,16 @@ namespace ExpressBase.Objects
     {
         Dynamic,
         Static
+    }
+
+    public enum MobileChartTypes
+    {
+        BarChart = 0,
+        DonutChart,
+        LineChart,
+        PieChart,
+        PointChart,
+        RadarChart,
+        RadialGaugeChart,
     }
 }

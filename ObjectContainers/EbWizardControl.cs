@@ -67,12 +67,12 @@ this.Init = function(id)
             foreach (EbWizardStep tab in Controls)
             {
                 TabBtnHtml += @"
-            <li>
+            <li li-of='@ebsid@' ebsid='@ebsid@'>
                 <a class='nav-link ppbtn-cont' href='#@ebsid@'>
                     <span class='eb-label-editable'>@title@</span>
                     <div class='eb-tab-warn-icon-cont'><i class='icofont-warning-alt'></i></div>
                     <input id='@ebsid@lbltxtb' class='eb-lbltxtb' type='text'/>@ppbtn@
-                    <div class='ebtab-close-btn eb-fb-icon'><i class='fa fa-times' aria-hidden='true'></i></div>
+                    <div class='ebtab-close-btn eb-fb-icon' title='Remove'><i class='fa fa-times' aria-hidden='true'></i></div>
                 </a>
                 <div class='ebtab-add-btn eb-fb-icon'><i class='fa fa-plus' aria-hidden='true'></i></div>                
             </li>".Replace("@style@", string.Empty)

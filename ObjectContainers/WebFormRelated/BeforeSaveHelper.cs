@@ -350,7 +350,13 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                         t = (ctrl as EbControlContainer).TableName;
                     PerformRequirdUpdate(ctrl as EbControlContainer, t);
                 }
-            }
+				else if(ctrl is EbTagInput)
+				{
+					if ((ctrl as EbTagInput).AutoSuggestion)
+						(ctrl as EbTagInput).TableName = _tbl;
+				}			
+
+			}
         }
 
         //Populate Property DependedValExp
