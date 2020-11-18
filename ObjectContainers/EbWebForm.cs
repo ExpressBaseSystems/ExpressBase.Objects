@@ -2272,46 +2272,52 @@ namespace ExpressBase.Objects
                     if (this.FormData?.MultipleTables.ContainsKey(pc.VirtualTable) == true && this.FormData?.MultipleTables[pc.VirtualTable].Count > 0)
                     {
                         SingleColumn col = this.FormData.MultipleTables[pc.VirtualTable][0].Columns.Find(e => e.Name == pc.Name);
-                        if (col != null && !MetaData.ContainsKey(FormMetaDataKeys.verification_required))
+                        if (col != null && !MetaData.ContainsKey(FormMetaDataKeys.signup_user))
                         {
-                            pc.UserCredentials.UserId = Convert.ToInt32(col.Value);
-
-                            MetaData.Add(FormMetaDataKeys.username, string.IsNullOrEmpty(pc.UserCredentials.Email) ? pc.UserCredentials.Phone : pc.UserCredentials.Email);
-                            MetaData.Add(FormMetaDataKeys.auth_id, string.Format(TokenConstants.SUB_FORMAT, this.SolutionObj.SolutionID, pc.UserCredentials.UserId, wc));
+                            //pc.UserCredentials.UserId = Convert.ToInt32(col.Value);
+                            Dictionary<string, string> _od = JsonConvert.DeserializeObject<Dictionary<string, string>>(col.F);
+                            EbSignUpUserInfo _user = new EbSignUpUserInfo()
+                            {
+                                UserName = string.IsNullOrEmpty(_od[FormConstants.email]) ? _od[FormConstants.phprimary] : _od[FormConstants.email],
+                                AuthId = string.Format(TokenConstants.SUB_FORMAT, this.SolutionObj.SolutionID, _od[FormConstants.id], wc),
+                                UserType = Convert.ToInt32(_od[FormConstants.usertype])
+                            };
 
                             if (pc.SendVerificationMsg)
                             {
                                 string msg = string.Empty;
-                                MetaData.Add(FormMetaDataKeys.verification_required, "true");
+                                _user.VerificationRequired = true;
                                 Authenticate2FAResponse resp = Service.Gateway.Send<Authenticate2FAResponse>(new SendUserVerifCodeRequest
                                 {
-                                    UserId = pc.UserCredentials.UserId,
+                                    UserId = Convert.ToInt32(_od[FormConstants.id]),
                                     WC = wc,
                                     SolnId = this.SolutionObj.SolutionID
                                 });
-                                if (!string.IsNullOrEmpty(pc.UserCredentials.Email)) {
+                                if (!string.IsNullOrEmpty(_od[FormConstants.email]))
+                                {
                                     if (resp.EmailVerifCode.AuthStatus)
                                     {
-                                        MetaData.Add(FormMetaDataKeys.verify_email, pc.UserCredentials.Email);
+                                        _user.VerifyEmail = _od[FormConstants.email];
                                     }
                                     msg = resp.EmailVerifCode.Message;
                                 }
-                                if (!string.IsNullOrEmpty(pc.UserCredentials.Phone)) {
+                                if (!string.IsNullOrEmpty(_od[FormConstants.phprimary]))
+                                {
                                     if (resp.MobileVerifCode.AuthStatus)
                                     {
-                                        MetaData.Add(FormMetaDataKeys.verify_phone, pc.UserCredentials.Phone);
+                                        _user.VerifyPhone = _od[FormConstants.phprimary];
                                     }
                                     msg += "; " + resp.MobileVerifCode.Message;
                                 }
-                                string token = EbTokenGenerator.GenerateToken(MetaData[FormMetaDataKeys.auth_id]);
-                                MetaData.Add(FormMetaDataKeys.token, token);
-                                MetaData.Add(FormMetaDataKeys.message, msg);
+                                _user.Token = EbTokenGenerator.GenerateToken(_user.AuthId);
+                                _user.Message = msg;
                             }
                             else
                             {
-                                MetaData.Add(FormMetaDataKeys.verification_required, "false");
-                                MetaData.Add(FormMetaDataKeys.message, "Verification is not required");
+                                _user.VerificationRequired = false;
+                                _user.Message = "Verification is not required";
                             }
+                            MetaData.Add(FormMetaDataKeys.signup_user, JsonConvert.SerializeObject(_user));
                         }
                     }
 
