@@ -99,6 +99,10 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
         public EbScript ContextSetExpr { set; get; }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+        [HideInPropertyGrid]
+        public override EbDbTypes EbDbType { get { return EbDbTypes.String; } set { } }
+
         [OnDeserialized]
         public void OnDeserializedMethod(StreamingContext context)
         {
@@ -110,10 +114,10 @@ namespace ExpressBase.Objects
         public override string DesignHtml4Bot
         {
             get => @"<div class='input-group'style='width: 100 %; '> 
-                        <div class='audio-container ' id='@ebsid@' name='@name@'> 
-                         <div style='display:flex;'><button id='btnStart'>START</button> 
-                         <button id ='btnStop'> STOP</button> <button id ='uploadAudio'> Upload</button></div>
-                         <audio style='height: 30px;margin-top: 10px;' id='adioPlay' controls></audio>                
+                        <div class='audio-input-container' id='@ebsid@' name='@name@'> 
+                         <div style='display:flex;'><button id='btnStart' class='fa fa-microphone'></button> 
+                         <button id ='btnStop'  class='fa fa-stop-circle-o' ></button> <button id ='uploadAudio' class='fa fa-upload'></button></div>
+                          <div class='AudioColl' style='display: table-caption;padding: 10px 0px;'> </div>                
                          </div>
                     </div>";
             set => base.DesignHtml4Bot = value;
@@ -129,10 +133,10 @@ namespace ExpressBase.Objects
             string EbCtrlHTML = HtmlConstants.CONTROL_WRAPER_HTML4WEB
                     .Replace("@barehtml@", @"                       
                         <div class='input-group'style='width: 100 %; '> 
-                          <div class='audio-container ' id='@ebsid@' name='@name@'> 
-                         <div style='display:flex;'><button id='btnStart'>START</button> 
-                         <button id ='btnStop'> STOP</button> <button id ='uploadAudio'> Upload</button></div>
-                         <audio style='height: 30px;margin-top: 10px;' id='adioPlay' controls></audio>                
+                          <div class='audio-input-container' id='@ebsid@' name='@name@'> 
+                         <div style='display:flex;'><button id='btnStart' class='fa fa-microphone'></button> 
+                         <button id ='btnStop'  class='fa fa-stop-circle-o' ></button> <button id ='uploadAudio' class='fa fa-upload'></button></div>
+                          <div class='AudioColl' style='display: table-caption;padding: 10px 0px;'> </div>                
                     </div>
                         </div>
                 ").RemoveCR().DoubleQuoted();
@@ -153,10 +157,10 @@ namespace ExpressBase.Objects
         {
             return @" 
         <div class='input-group'style='width: 100 %; '> 
-                         <div class='audio-container ' id='@ebsid@' name='@name@'> 
-                         <div style='display:flex;'><button id='btnStart'>START</button> 
-                         <button id ='btnStop'> STOP</button> <button id ='uploadAudio'> Upload</button> </div>
-                         <audio style='height: 30px;margin-top: 10px;' id='adioPlay' controls></audio>                
+                         <div class='audio-input-container' id='@ebsid@' name='@name@'> 
+                         <div style='display:flex;'><button id='btnStart' class='fa fa-microphone'></button> 
+                         <button id ='btnStop'  class='fa fa-stop-circle-o' ></button> <button id ='uploadAudio' class='fa fa-upload'></button> </div>
+                         <div class='AudioColl' style='display: table-caption;padding: 10px 0px;'> </div>              
                          </div>
                         </div>"
             .Replace("@ebsid@", this.EbSid);
