@@ -28,6 +28,7 @@ using ExpressBase.Common.Constants;
 using ExpressBase.CoreBase.Globals;
 using System.Net;
 using System.Threading;
+using ExpressBase.Common.Security;
 
 namespace ExpressBase.Objects
 {
@@ -2302,6 +2303,8 @@ namespace ExpressBase.Objects
                                     }
                                     msg += "; " + resp.MobileVerifCode.Message;
                                 }
+                                string token = EbTokenGenerator.GenerateToken(MetaData[FormMetaDataKeys.auth_id]);
+                                MetaData.Add(FormMetaDataKeys.token, token);
                                 MetaData.Add(FormMetaDataKeys.message, msg);
                             }
                             else
