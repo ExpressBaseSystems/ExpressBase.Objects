@@ -123,7 +123,6 @@ this.Init = function(id)
 
         public override string GetHtml()
         {
-
             string TabBtnHtml = @"
 <div id='cont_@ebsid@' ebsid='@ebsid@' class='Eb-ctrlContainer' Ctype='TabControl'>
     <div class='tab-btn-cont'>
@@ -162,7 +161,6 @@ this.Init = function(id)
             TabContentHtml = regex.Replace(TabContentHtml, "in active", 1).Replace("@inactive", "");
 
             return string.Concat(TabBtnHtml, TabContentHtml);
-
         }
     }
 
@@ -195,16 +193,9 @@ this.Init = function(id)
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         public bool IsDynamic { get; set; }
 
-        public bool RenderAsWizard { get; set; }
-
         public override string GetHtml()
         {
-            string html = "";
-            if (RenderAsWizard)
-                html = "<div id='@ebsid@' ebsid='@ebsid@' ctype='@objtype@' class='tab-pane ebcont-ctrl ebcont-inner'  role='tabpanel'>";
-            else
-                html = "<div id='@ebsid@' ebsid='@ebsid@' ctype='@objtype@' class='tab-pane fade @inactive ebcont-ctrl ebcont-inner'>";
-
+            string html = "<div id='@ebsid@' ebsid='@ebsid@' ctype='@objtype@' class='tab-pane fade @inactive ebcont-ctrl ebcont-inner'>";
 
             foreach (EbControl ec in this.Controls)
                 html += ec.GetHtml();

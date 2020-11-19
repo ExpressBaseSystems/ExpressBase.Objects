@@ -68,13 +68,12 @@ this.Init = function(id)
             {
                 TabBtnHtml += @"
             <li li-of='@ebsid@' ebsid='@ebsid@'>
-                <a class='nav-link ppbtn-cont' href='#@ebsid@'>
+                <a class='nav-link ppbtn-cont' href='#@ebsid@'  data-toggle='wizard'>
                     <span class='eb-label-editable'>@title@</span>
                     <div class='eb-tab-warn-icon-cont'><i class='icofont-warning-alt'></i></div>
                     <input id='@ebsid@lbltxtb' class='eb-lbltxtb' type='text'/>@ppbtn@
                     <div class='ebtab-close-btn eb-fb-icon' title='Remove'><i class='fa fa-times' aria-hidden='true'></i></div>
                 </a>
-                <div class='ebtab-add-btn eb-fb-icon'><i class='fa fa-plus' aria-hidden='true'></i></div>                
             </li>".Replace("@style@", string.Empty)
             .Replace("@title@", tab.Title)
             .Replace("@ppbtn@", Common.HtmlConstants.CONT_PROP_BTN)
@@ -82,7 +81,7 @@ this.Init = function(id)
             }
 
             TabBtnHtml += @"
-        </ul>";
+        </ul><div class='wiz-addbtn'><i class='fa fa-plus' aria-hidden='true'></i></div>";
 
 
 
