@@ -116,7 +116,7 @@ namespace ExpressBase.Objects
             get => @"<div class='input-group'style='width: 100 %; '> 
                         <div class='audio-input-container' id='@ebsid@' name='@name@'> 
                          <div style='display:flex;'><button id='btnStart' class='fa fa-microphone'></button> 
-                         <button id ='btnStop'  class='fa fa-stop-circle-o' ></button> <button id ='uploadAudio' class='fa fa-upload'></button></div>
+                         <button id ='btnStop'  class='fa fa-stop-circle-o' ></button></div>
                           <div class='AudioColl' style='display: table-caption;padding: 10px 0px;'> </div>                
                          </div>
                     </div>";
@@ -135,7 +135,7 @@ namespace ExpressBase.Objects
                         <div class='input-group'style='width: 100 %; '> 
                           <div class='audio-input-container' id='@ebsid@' name='@name@'> 
                          <div style='display:flex;'><button id='btnStart' class='fa fa-microphone'></button> 
-                         <button id ='btnStop'  class='fa fa-stop-circle-o' ></button> <button id ='uploadAudio' class='fa fa-upload'></button></div>
+                         <button id ='btnStop'  class='fa fa-stop-circle-o' ></button></div>
                           <div class='AudioColl' style='display: table-caption;padding: 10px 0px;'> </div>                
                     </div>
                         </div>
@@ -159,7 +159,7 @@ namespace ExpressBase.Objects
         <div class='input-group'style='width: 100 %; '> 
                          <div class='audio-input-container' id='@ebsid@' name='@name@'> 
                          <div style='display:flex;'><button id='btnStart' class='fa fa-microphone'></button> 
-                         <button id ='btnStop'  class='fa fa-stop-circle-o' ></button> <button id ='uploadAudio' class='fa fa-upload'></button> </div>
+                         <button id ='btnStop'  class='fa fa-stop-circle-o' ></button> </div>
                          <div class='AudioColl' style='display: table-caption;padding: 10px 0px;'> </div>              
                          </div>
                         </div>"
