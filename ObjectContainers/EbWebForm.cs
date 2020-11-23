@@ -866,9 +866,11 @@ namespace ExpressBase.Objects
                             this.FormData.SrcDataId = Convert.ToInt32(dataRow[i++]);
                             this.FormData.CreatedBy = Convert.ToInt32(dataRow[i++]);
                             this.FormData.IsCancelled = dataRow[i++].ToString().Equals("T");
+                            DateTime dt = Convert.ToDateTime(dataRow[i++]).ConvertFromUtc(this.UserObj.Preference.TimeZone);
+                            this.FormData.CreatedAt = dt.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
                         }
                         else
-                            i += 6;// 6 => Count of above properties
+                            i += 7;// 6 => Count of above properties
                     }
                     _rowId = Convert.ToInt32(dataRow[i]);
                     if (_rowId <= 0)
@@ -2272,7 +2274,7 @@ namespace ExpressBase.Objects
                     if (this.FormData?.MultipleTables.ContainsKey(pc.VirtualTable) == true && this.FormData?.MultipleTables[pc.VirtualTable].Count > 0)
                     {
                         SingleColumn col = this.FormData.MultipleTables[pc.VirtualTable][0].Columns.Find(e => e.Name == pc.Name);
-                        if (col != null && !MetaData.ContainsKey(FormMetaDataKeys.signup_user))
+                        if (col != null && !MetaData.ContainsKey(FormMetaDataKeys.signup_user))// && this.RefId == this.SolutionObj.SolutionSettings.SignupFormRefid
                         {
                             //pc.UserCredentials.UserId = Convert.ToInt32(col.Value);
                             Dictionary<string, string> _od = JsonConvert.DeserializeObject<Dictionary<string, string>>(col.F);
@@ -2309,7 +2311,6 @@ namespace ExpressBase.Objects
                                     }
                                     msg += "; " + resp.MobileVerifCode.Message;
                                 }
-                                _user.Token = EbTokenGenerator.GenerateToken(_user.AuthId);
                                 _user.Message = msg;
                             }
                             else
@@ -2317,6 +2318,7 @@ namespace ExpressBase.Objects
                                 _user.VerificationRequired = false;
                                 _user.Message = "Verification is not required";
                             }
+                            _user.Token = EbTokenGenerator.GenerateToken(_user.AuthId);
                             MetaData.Add(FormMetaDataKeys.signup_user, JsonConvert.SerializeObject(_user));
                         }
                     }
