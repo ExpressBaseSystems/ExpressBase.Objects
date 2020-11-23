@@ -303,8 +303,9 @@ else if(this.NotifyBy === 3)
                                     {
                                         Link = link,
                                         Title = message,
-                                        UsersID = uid
-                                    });
+                                        UsersID = uid,
+										User_AuthId= _this.UserObj.AuthId
+									});
                                 }
                                 catch (Exception ex)
                                 {
