@@ -25,7 +25,8 @@
         Image = 2,
         MobileNumber = 3,
         Map = 4,
-        Email = 5
+        Email = 5,
+        Audio = 6
     }
 
     public enum MobileHorrizontalAlign

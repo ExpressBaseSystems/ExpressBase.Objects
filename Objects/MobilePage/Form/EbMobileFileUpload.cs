@@ -16,19 +16,18 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("General")]
+        [DefaultPropValue("true")]
         public bool EnableCameraSelect { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("General")]
+        [DefaultPropValue("true")]
         public bool EnableFileSelect { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("General")]
-        public virtual bool MultiSelect { set; get; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("General")]
-        public virtual bool EnableEdit { set; get; }
+        [DefaultPropValue("true")]
+        public bool MultiSelect { set; get; }
 
         public override string GetDesignHtml()
         {
@@ -39,18 +38,6 @@ namespace ExpressBase.Objects
                                <button class='eb_mob_fupbtn camerabtn'><i class='fa fa-camera'></i></button>
                             </div>
                         </div>".RemoveCR().DoubleQuoted();
-        }
-
-        public override string GetJsInitFunc()
-        {
-            return @"
-                this.Init = function(id)
-                {
-                    this.EnableCameraSelect = true;
-                    this.EnableFileSelect= true;
-                    this.MultiSelect= true;
-                    this.EnableEdit= true;
-                };";
         }
 
         public override EbControl GetWebFormControl(int counter)
