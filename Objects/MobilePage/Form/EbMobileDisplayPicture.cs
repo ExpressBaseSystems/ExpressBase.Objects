@@ -2,15 +2,27 @@
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
+using System.Collections.Generic;
 
 namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.MobilePage)]
-    public class EbMobileDisplayPicture : EbMobileFileUpload
+    public class EbMobileDisplayPicture : EbMobileControl
     {
-        public override bool MultiSelect => false;
+        public override bool Unique { get; set; }
+        public override EbScript ValueExpr { get; set; }
+        public override EbScript DefaultValueExpression { get; set; }
+        public override List<EbMobileValidator> Validators { set; get; }
 
-        public override bool EnableEdit { set; get; }
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("General")]
+        [DefaultPropValue("true")]
+        public bool EnableCameraSelect { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("General")]
+        [DefaultPropValue("true")]
+        public bool EnableFileSelect { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
@@ -30,16 +42,6 @@ namespace ExpressBase.Objects
                                 </div>
                             </div>
                         </div>".RemoveCR().DoubleQuoted();
-        }
-
-        public override string GetJsInitFunc()
-        {
-            return @"
-                this.Init = function(id)
-                {
-                    this.EnableCameraSelect = true;
-                    this.EnableFileSelect= true;
-                };";
         }
 
         public override EbControl GetWebFormControl(int counter)

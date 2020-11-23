@@ -1,11 +1,28 @@
 ﻿using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
+using ExpressBase.Common.Structures;
+using System.Collections.Generic;
+
 namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.MobilePage)]
-    class EbMobileAudioInput : EbMobileFileUpload
+    public class EbMobileAudioInput : EbMobileControl
     {
+        public override bool Unique { get; set; }
+        public override EbScript ValueExpr { get; set; }
+        public override EbScript DefaultValueExpression { get; set; }
+        public override List<EbMobileValidator> Validators { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [HideInPropertyGrid]
+        public override EbDbTypes EbDbType { get { return EbDbTypes.String; } set { } }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("General")]
+        [DefaultPropValue("false")]
+        public bool MultiSelect { set; get; }
+
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("General")]
         [DefaultPropValue("2")]
@@ -20,16 +37,6 @@ namespace ExpressBase.Objects
                                 <Label>0:00</button>
                             </div>
                         </div>".RemoveCR().DoubleQuoted();
-        }
-
-        public override string GetJsInitFunc()
-        {
-            return @"
-                this.Init = function(id)
-                {
-                    this.MultiSelect= false;
-                    this.EnableEdit= false;
-                };";
         }
 
         public override EbControl GetWebFormControl(int counter)

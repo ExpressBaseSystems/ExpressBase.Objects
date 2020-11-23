@@ -3,11 +3,9 @@ using ExpressBase.Common.Application;
 using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
 using ExpressBase.Common.LocationNSolution;
-using ExpressBase.Common.NotificationHubs;
 using ServiceStack;
 using System;
 using System.Collections.Generic;
-using System.Net;
 using System.Runtime.Serialization;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
@@ -258,7 +256,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class EbMobileSolutionData : IEbApiStatusCode
+    public class EbMobileSolutionData 
     {
         [DataMember(Order = 1)]
         public List<AppDataToMob> Applications { set; get; }
@@ -267,40 +265,16 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public List<EbLocation> Locations { get; set; }
 
         [DataMember(Order = 3)]
-        public HttpStatusCode StatusCode { get; set; }
+        public List<MobilePagesWraper> ProfilePages { set; get; }
 
         public EbMobileSolutionData()
         {
             Applications = new List<AppDataToMob>();
-
-            Locations = new List<EbLocation>();
         }
     }
 
     public class MobileSolutionDataRequest : EbServiceStackAuthRequest, IReturn<EbMobileSolutionData>
     {
         public bool Export { set; get; }
-    }
-
-
-    public class EbDeviceRegistrationRequest : EbServiceStackAuthRequest, IReturn<EbDeviceRegistration>
-    {
-        public string NFRegistrationId { set; get; }
-
-        public DeviceRegistration NFRegistration { set; get; }
-    }
-
-    public class EbDeviceRegistration : IEbApiStatusCode
-    {
-        [DataMember(Order = 1)]
-        public int ActionsCount { set; get; }
-
-        [DataMember(Order = 2)]
-        public HttpStatusCode StatusCode { get; set; }
-
-        public EbDeviceRegistration()
-        {
-            StatusCode = HttpStatusCode.OK;
-        }
     }
 }

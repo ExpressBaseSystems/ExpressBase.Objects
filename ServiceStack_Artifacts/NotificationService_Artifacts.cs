@@ -29,6 +29,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Link { get; set; }
 
         public string Title { get; set; }
+
+        public string User_AuthId { get; set; }
+
     }
 
     public class NotifyByUserIDResponse : IEbSSResponse
@@ -104,7 +107,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
 
         [DataMember(Order = 2)]
-        public List<NotificationInfo> Notifications { get; set; }
+        public List<NotificationInfo> Notification { get; set; }
 
         [DataMember(Order = 2)]
         public List<PendingActionAndMeetingInfo> PendingActions { get; set; }
