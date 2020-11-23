@@ -4,7 +4,6 @@ using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
-using RestSharp.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -89,7 +88,7 @@ namespace ExpressBase.Objects
 
                 foreach (EbMobileControl ctrl in this.ChildControls)
                 {
-                    if (ctrl is EbMobileFileUpload)
+                    if (ctrl is INonPersistControl || ctrl.DoNotPersist)
                         continue;
                     else if (ctrl is EbMobileTableLayout tlayout)
                     {
@@ -97,7 +96,7 @@ namespace ExpressBase.Objects
                         {
                             foreach (EbMobileControl tctrl in cell.ControlCollection)
                             {
-                                if (tctrl is EbMobileFileUpload)
+                                if (tctrl is INonPersistControl || ctrl.DoNotPersist)
                                     continue;
                                 else
                                     AppendMeta(meta[this.TableName], tctrl, vDbTypes);
@@ -114,8 +113,9 @@ namespace ExpressBase.Objects
                         });
 
                         foreach (EbMobileControl gctrl in grid.ChildControls)
+                        {
                             AppendMeta(meta[grid.TableName], gctrl, vDbTypes);
-
+                        }
                         AppendDefaultMeta(meta[grid.TableName], vDbTypes);
                     }
                     else
