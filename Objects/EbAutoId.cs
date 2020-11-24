@@ -61,7 +61,11 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.Expandable)]
         public EbAutoIdPattern Pattern { get; set; }
-        
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+        [HideInPropertyGrid]
+        public override bool Index { get { return true; } }
+
         [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.String; } set { } }
 

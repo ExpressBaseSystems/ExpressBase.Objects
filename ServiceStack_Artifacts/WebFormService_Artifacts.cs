@@ -590,6 +590,23 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
+    public class GetGlobalSrchRsltsReq : EbServiceStackAuthRequest, IReturn<GetGlobalSrchRsltsResp>
+    {
+        [DataMember(Order = 1)]
+        public string SrchText { get; set; }
+    }
+
+    [DataContract]
+    public class GetGlobalSrchRsltsResp : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public string Data { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    [DataContract]
     public class DeleteDataFromWebformRequest : EbServiceStackAuthRequest, IReturn<DeleteDataFromWebformResponse>
     {
         [DataMember(Order = 1)]
