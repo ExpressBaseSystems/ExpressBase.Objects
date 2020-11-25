@@ -1580,7 +1580,7 @@ namespace ExpressBase.Objects
                 Console.WriteLine("EbWebForm.Save.SendMobileNotification start");
                 EbFnGateway.SendMobileNotification(this, EbConFactory);
                 //Console.WriteLine("EbWebForm.Save.InsertOrUpdate Global Search start");
-                //SearchHelper.InsertOrUpdate(DataDB, this);
+                SearchHelper.InsertOrUpdate(DataDB, this);
                 Console.WriteLine("EbWebForm.Save.resp = " + resp);
             }
             catch (FormException ex1)
