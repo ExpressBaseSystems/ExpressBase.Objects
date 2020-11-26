@@ -23,7 +23,7 @@ namespace ExpressBase.Objects.WebFormRelated
                 string _id = "id";
 
                 if (_table.TableName == _this.FormSchema.MasterTable)
-                    _cols = "eb_loc_id, eb_ver_id, eb_lock, eb_push_id, eb_src_id, eb_created_by, eb_void, id";
+                    _cols = "eb_loc_id, eb_ver_id, eb_lock, eb_push_id, eb_src_id, eb_created_by, eb_void, eb_created_at, id";
                 else if (_table.TableType == WebFormTableTypes.Review)
                     _id = $"eb_ver_id = @{_this.FormSchema.MasterTable}_eb_ver_id AND eb_src_id";
                 else

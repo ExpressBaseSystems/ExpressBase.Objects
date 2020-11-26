@@ -81,7 +81,19 @@ namespace ExpressBase.Objects
         [HelpText("Define default value of the control.")]
         public virtual EbScript DefaultValueExpression { get; set; }
 
-        public virtual EbControl GetWebFormCtrl(int counter) { return null; }
+        public virtual string EbControlType => this.GetType().Name.Replace("Mobile", "");
+
+        public virtual EbControl GetWebFormControl(int counter) { return null; }
+
+        public virtual void UpdateWebFormControl(EbControl control)
+        {
+            control.Label = this.Label;
+            control.Required = this.Required;
+            control.DoNotPersist = this.DoNotPersist;
+            control.IsReadOnly = this.ReadOnly;
+            control.Hidden = this.Hidden;
+            control.Unique = this.Unique;
+        }
 
         [OnDeserialized]
         public void OnDeserialized(StreamingContext context)
@@ -96,21 +108,5 @@ namespace ExpressBase.Objects
         {
             return base.DiscoverRelatedRefids();
         }
-    }
-
-    [EnableInBuilder(BuilderType.MobilePage)]
-    public class EbMobileDashBoardControls : EbMobilePageBase
-    {
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [HideInPropertyGrid]
-        public override string Name { get; set; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyEditor(PropertyEditorType.Expandable)]
-        public EbThickness Margin { set; get; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyEditor(PropertyEditorType.Expandable)]
-        public EbThickness Padding { set; get; }
     }
 }

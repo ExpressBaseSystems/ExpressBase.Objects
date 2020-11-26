@@ -380,6 +380,8 @@ END;";
         public bool TwoFAStatus { set; get; }
 
         public string TwoFAToAddress { set; get; }
+
+        public string Message { set; get; }
     }
 
     public class ApiGenerateOTPResponse : IEbApiStatusCode
@@ -404,7 +406,5 @@ END;";
         public string ContentType { set; get; }
 
         public byte[] Bytea { set; get; }
-
-        public HttpStatusCode StatusCode { set; get; }
     }
 }

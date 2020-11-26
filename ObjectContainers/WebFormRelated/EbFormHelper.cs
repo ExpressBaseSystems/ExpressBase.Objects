@@ -636,4 +636,16 @@ namespace ExpressBase.Objects
             }
         }
     }
+
+    public class EbSignUpUserInfo
+    {
+        public string AuthId { get; set; }
+        public string UserName { get; set; }
+        public int UserType { get; set; }
+        public bool VerificationRequired { get; set; }
+        public string VerifyEmail { get; set; }
+        public string VerifyPhone { get; set; }
+        public string Message { get; set; }
+        public string Token { get; set; }
+    }
 }

@@ -3,14 +3,11 @@ using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.MobilePage)]
-    public class EbMobileTableView : EbMobileDashBoardControls
+    public class EbMobileTableView : EbMobileDashBoardControl
     {
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]

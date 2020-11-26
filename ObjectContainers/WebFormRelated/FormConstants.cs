@@ -30,7 +30,11 @@ namespace ExpressBase.Objects.WebFormRelated
         public const string _eb_ver_id = "_eb_ver_id";
 
         //Date
-        public const string yyyy_MM_dd = "yyyy-MM-dd";
+        public const string yyyy = "yyyy";
+        public const string MMyyyy = "MM/yyyy";
+        public const string yyyyMMdd = "yyyy-MM-dd";
+        public const string HHmmss = "HH:mm:ss";
+        public const string yyyyMMdd_HHmmss = "yyyy-MM-dd HH:mm:ss";
         //FileUploader
         public const string filename = "filename";
         public const string tags = "tags";

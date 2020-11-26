@@ -17,4 +17,18 @@ namespace ExpressBase.Objects
 
         List<EbMobileDataColToControlMap> LinkFormParameters { get; set; }
     }
+
+    public interface IMobileAlignment
+    {
+        MobileHorrizontalAlign HorrizontalAlign { set; get; }
+
+        MobileVerticalAlign VerticalAlign { set; get; }
+    }
+
+    public interface IGridSpan
+    {
+        int RowSpan { set; get; }
+
+        int ColumnSpan { set; get; }
+    }
 }

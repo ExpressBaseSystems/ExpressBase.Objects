@@ -80,9 +80,11 @@ namespace ExpressBase.Objects
         public string TextFormat { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [UIproperty]
         [PropertyGroup(PGConstants.APPEARANCE)]
         [PropertyEditor(PropertyEditorType.FontSelector)]
+        [OnChangeExec(@"
+                setFontCss(this.Font,$(`#${this.EbSid}`));
+            ")]
         public EbFont Font { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
@@ -125,7 +127,7 @@ namespace ExpressBase.Objects
 
         public override string GetDesignHtml()
         {
-            return @"<div class='data_column mob_control dropped' title=' @ColumnName' tabindex='1' onclick='$(this).focus()' eb-type='EbMobileDataColumn' id='@id'>
+            return @"<div class='data_column mob_control dropped' tabindex='1' onclick='$(this).focus()' eb-type='EbMobileDataColumn' id='@id'>
                         <div class='data_column_inner'>
                             <span> @ColumnName </span>
                         </div>
@@ -231,5 +233,168 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [Alias("Failure message")]
         public string FailureMSG { get; set; }
+    }
+
+    [EnableInBuilder(BuilderType.MobilePage)]
+    public class EbMobileLabel : EbMobileControl, INonPersistControl
+    {
+        public override string Label { set; get; }
+        public override bool Unique { get; set; }
+        public override bool ReadOnly { get; set; }
+        public override bool DoNotPersist { get; set; }
+        public override bool Required { get; set; }
+        public override bool Hidden { set; get; }
+        public override EbScript ValueExpr { get; set; }
+        public override EbScript HiddenExpr { get; set; }
+        public override EbScript DisableExpr { get; set; }
+        public override EbScript DefaultValueExpression { get; set; }
+        public override List<EbMobileValidator> Validators { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [MetaOnly]
+        public override string Name { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        [DefaultPropValue("Label")]
+        [UIproperty]
+        [OnChangeExec(@"
+                $(`#${this.EbSid} .mobile-lbl-text`).text(this.Text);
+            ")]
+        public string Text { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        public bool RenderAsIcon { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        public new string Icon { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        [PropertyEditor(PropertyEditorType.FontSelector)]
+        [OnChangeExec(@"
+                setFontCss(this.Font,$(`#${this.EbSid}`));
+            ")]
+        public EbFont Font { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        public int BorderRadius { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [UIproperty]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        [PropertyEditor(PropertyEditorType.Color)]
+        [OnChangeExec(@"
+                if (this.BackgroundColor !== ''){ 
+                        $(`#${this.EbSid}`).style('background-color',this.BackgroundColor);
+                }
+            ")]
+        public string BackgroundColor { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        public int RowSpan { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        public int ColumnSpan { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        [Alias("Align X")]
+        [OnChangeExec(@"
+                if (this.HorrizontalAlign !== 3){ 
+                        pg.ShowProperty('Width');
+                }
+                else {
+                        pg.HideProperty('Width');
+                }
+            ")]
+        public MobileHorrizontalAlign HorrizontalAlign { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        [Alias("Align Y")]
+        [OnChangeExec(@"
+                if (this.VerticalAlign !== 3){ 
+                        pg.ShowProperty('Height');
+                }
+                else {
+                        pg.HideProperty('Height');
+                }
+            ")]
+        public MobileVerticalAlign VerticalAlign { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        public int Height { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        public int Width { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [MetaOnly]
+        public List<EbMobileStaticParameter> BindableParams => new List<EbMobileStaticParameter>();
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Static List Settings")]
+        [Alias("Binding Parameter")]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "BindableParams", 1)]
+        public EbMobileStaticParameter BindingParam { set; get; }
+
+        public override string GetDesignHtml()
+        {
+            return @"<div class='data_column mob_control dropped' tabindex='1' onclick='$(this).focus()' eb-type='EbMobileLabel' id='@id'>
+                        <div class='data_column_inner'>
+                            <span class='mobile-lbl-text'> @Text </span>
+                        </div>
+                    </div>".RemoveCR().DoubleQuoted();
+        }
+    }
+
+    [EnableInBuilder(BuilderType.MobilePage)]
+    public class EbMobileStaticParameter : EbMobilePageBase
+    {
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.MobilePage)]
+        public string EbSid { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        public override string Name { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.CORE)]
+        public string Value { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        public bool EnableSearch { set; get; }
+    }
+
+    [EnableInBuilder(BuilderType.MobilePage)]
+    public class EbMobileStaticListItem : EbMobilePageBase
+    {
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.MobilePage)]
+        public string EbSid { get; set; }
+
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.MobilePage)]
+        public override string Name { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        [PropertyGroup(PGConstants.CORE)]
+        public List<EbMobileStaticParameter> Parameters { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [OSE_ObjectTypes(EbObjectTypes.iMobilePage)]
+        [Alias("Link")]
+        [PropertyGroup(PGConstants.CORE)]
+        public string LinkRefId { get; set; }
     }
 }

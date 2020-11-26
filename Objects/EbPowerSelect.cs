@@ -369,12 +369,12 @@ else
         public bool OpenInNewTab { get; set; }
 
         [EnableInBuilder(BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.WebForm, BuilderType.UserControl)]
-        [PropertyEditor(PropertyEditorType.CollectionProp, "Columns", "bVisible")]
+        [PropertyEditor(PropertyEditorType.CollectionProp, "Columns", "bVisible", true)]
         [PropertyGroup(PGConstants.DATA_SETTINGS)]
         public DVColumnCollection Columns { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [PropertyEditor(PropertyEditorType.CollectionABCFrmSrc, "Columns")]
+        [PropertyEditor(PropertyEditorType.CollectionABCFrmSrc, "Columns", true)]
         [PropertyGroup(PGConstants.DATA_SETTINGS)]
         [PropertyPriority(68)]
         public DVColumnCollection DisplayMembers { get; set; }

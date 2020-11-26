@@ -137,10 +137,10 @@ this.Init = function(id)
                     <span class='eb-label-editable'>@title@</span>
                     <div class='eb-tab-warn-icon-cont'><i class='icofont-warning-alt'></i></div>
                     <input id='@ebsid@lbltxtb' class='eb-lbltxtb' type='text'/>@ppbtn@
-                    <div class='ebtab-close-btn eb-fb-icon'><i class='fa fa-times' aria-hidden='true'></i></div>
+                    <div class='ebtab-close-btn eb-fb-icon' title='Remove'><i class='fa fa-times' aria-hidden='true'></i></div>
                 </a>
                 <div class='ebtab-add-btn eb-fb-icon'><i class='fa fa-plus' aria-hidden='true'></i></div>                
-            </li>".Replace("@style@", tab.IsDynamic && tab.IsRenderMode ? "style='display : none;'": string.Empty)
+            </li>".Replace("@style@", tab.IsDynamic && tab.IsRenderMode ? "style='display : none;'" : string.Empty)
             .Replace("@title@", tab.Title)
             .Replace("@ppbtn@", Common.HtmlConstants.CONT_PROP_BTN)
             .Replace("@ebsid@", tab.IsDynamic && tab.IsRenderMode ? "@" + tab.EbSid_CtxId + "_ebsid@" : tab.EbSid);

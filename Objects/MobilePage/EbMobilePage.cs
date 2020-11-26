@@ -32,6 +32,12 @@ namespace ExpressBase.Objects
         public string Category { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Core")]
+        [PropertyEditor(PropertyEditorType.Color)]
+        [DefaultPropValue("#ffffff")]
+        public string BackgroundColor { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("Identity")]
         public override string Description { get; set; }
 

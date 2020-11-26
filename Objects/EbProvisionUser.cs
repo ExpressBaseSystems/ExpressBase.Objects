@@ -110,6 +110,10 @@ namespace ExpressBase.Objects
         public bool AllowExistingUser { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
+        [Alias("Send verification message")]
+        public bool SendVerificationMsg { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
         public override EbScript HiddenExpr { get; set; }
 
 
@@ -235,10 +239,9 @@ this.Init = function(id)
 
         public override string GetBareHtml()
         {
-            return @"<div style='display: flex;'>
-				        <img id='@ebsid@_usrimg'class='sysctrl_usrimg' src='' alt='' onerror=""this.onerror=null; this.src='/images/nulldp.png';"">
-						<div id='@ebsid@' data-ebtype='@data-ebtype@'  data-toggle='tooltip' title='@toolTipText@' class=' sysctrl_usrname'  name='@name@' autocomplete = 'off' @value@ @tabIndex@ style='width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@' @required@ @placeHolder@ disabled></div>
-                     </div>"
+            return @"<div class='pu-cont' id='@ebsid@' data-ebtype='@data-ebtype@'>
+                        <div class='pu-txt-info'>- Design html is not implemented -</div>
+                    </div>"
 .Replace("@name@", (this.Name != null ? this.Name.Trim() : ""))
 .Replace("@data-ebtype@", "16")//( (int)this.EbDateType ).ToString())
 .Replace("@toolTipText@", this.ToolTipText)
@@ -251,6 +254,11 @@ this.Init = function(id)
 .Replace("@required@", (this.Required && !this.Hidden ? " required" : string.Empty))
 .Replace("@placeHolder@", "placeholder=''");
         }
+        //@"<div style='display: flex;'>
+        //  <img id='@ebsid@_usrimg'class='sysctrl_usrimg' src='' alt='' onerror=""this.onerror=null; this.src='/images/nulldp.png';"">
+        //  <div id='@ebsid@' data-ebtype='@data-ebtype@'  data-toggle='tooltip' title='@toolTipText@' class=' sysctrl_usrname'  name='@name@' autocomplete = 'off' @value@ @tabIndex@ style='width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@' @required@ @placeHolder@ disabled></div>
+        //</div>"
+        
 
         public override string GetDesignHtml()
         {
@@ -315,29 +323,38 @@ this.Init = function(id)
 
         }
 
+        private bool ContainsKey(Dictionary<string, string> _d, string key)
+        {
+            return _d.ContainsKey(key) && _d[key] != string.Empty;
+        }
+
         private int GetUserIdByEmailOrPhone(IDatabase DataDB, Dictionary<string, string> _d, ref int flag, bool ins, SingleColumn ocF)
         {
             int userId = 0;
             string _s = "SELECT id FROM eb_users WHERE LOWER(#) LIKE LOWER(@#) AND eb_del = 'F' AND (statusid = 0 OR statusid = 1 OR statusid = 2 OR statusid = 4);";
             string sql;
             List<DbParameter> parameters = new List<DbParameter>();
-            if (_d.ContainsKey("email") && _d["email"] != string.Empty)//01
+            if (ContainsKey(_d, "email"))//01
             {
                 sql = _s.Replace("#", "email");
                 parameters.Add(DataDB.GetNewParameter("email", EbDbTypes.String, _d["email"]));
             }
             else
                 sql = "SELECT 1 WHERE 1 = 0; ";
-            if (_d.ContainsKey("phprimary") && _d["phprimary"] != string.Empty)//10
+            if (ContainsKey(_d, "phprimary"))//10
             {
                 sql += _s.Replace("#", "phnoprimary");
                 parameters.Add(DataDB.GetNewParameter("phnoprimary", EbDbTypes.String, _d["phprimary"]));
             }
             else
                 sql += "SELECT 1 WHERE 1 = 0; ";
+
             EbDataSet ds = DataDB.DoQueries(sql, parameters.ToArray());
 
             int oProvUserId = ocF == null ? 0 : Convert.ToInt32(ocF.Value);
+            //Dictionary<string, string> _od = ocF == null ? new Dictionary<string, string>() : JsonConvert.DeserializeObject<Dictionary<string, string>>(Convert.ToString(ocF.F));
+            //int oCreUserId = ContainsKey(_od, "id") ? Convert.ToInt32(_od["id"]) : 0;
+
             if (ds.Tables[0].Rows.Count > 0)
             {
                 userId = Convert.ToInt32(ds.Tables[0].Rows[0][0]);
@@ -465,7 +482,8 @@ this.Init = function(id)
                     i++;
                     doNotUpdate = true;
                 }
-                this.SetUserType_Role_Status(_d, nProvUserId);
+                else
+                    this.SetUserType_Role_Status(_d, nProvUserId);
             }
             else
             {
@@ -474,8 +492,11 @@ this.Init = function(id)
                 if (_od.ContainsKey(FormConstants.id) && (oProvUserId == nProvUserId))// means user created by this control
                 {
                     this.AddOrChange(_d, FormConstants.id, _od[FormConstants.id]);
-                    this.AddOrChange(_d, FormConstants.email, _od[FormConstants.email]);// remove this line if you want to edit email via prov user ctrl
-                    this.AddOrChange(_d, FormConstants.phprimary, _od[FormConstants.phprimary]);
+                    int oCreUserId = Convert.ToInt32(_od[FormConstants.id]);
+                    if (oCreUserId != nProvUserId || !_d.ContainsKey(FormConstants.email))
+                        this.AddOrChange(_d, FormConstants.email, _od[FormConstants.email]);// remove this line if you want to edit email via prov user ctrl
+                    if (oCreUserId != nProvUserId || !_d.ContainsKey(FormConstants.phprimary))
+                        this.AddOrChange(_d, FormConstants.phprimary, _od[FormConstants.phprimary]);
                     this.AddOrChange(_d, FormConstants.usertype, _od[FormConstants.usertype]);
                     int oldStatus = Convert.ToInt32(_od[FormConstants.statusid]);
                     this.AddOrChange(_d, FormConstants.statusid, Convert.ToString(oldStatus + 100));
@@ -503,7 +524,7 @@ this.Init = function(id)
                 else
                 {
                     doNotUpdate = true;
-                    if (oProvUserId > 0 && nProvUserId > 0 && oProvUserId != nProvUserId)
+                    if (nProvUserId > 1 && oProvUserId != nProvUserId)
                     {
                         if (!this.AllowExistingUser)
                             this.ThrowExistingUserException(_d, flag);
@@ -602,7 +623,7 @@ this.Init = function(id)
             return builder.ToString();
         }
 
-        private UserCredentials UserCredentials { get; set; }
+        public UserCredentials UserCredentials { get; set; }
 
         private string MailHtml
         {
@@ -734,7 +755,7 @@ this.Init = function(id)
         public override string RefreshJSfn { get { return @""; } set { } }
 
         public override string ClearJSfn { get { return @""; } set { } }
-
+        
         public override string DisableJSfn { get { return JSFnsConstants.Ctrl_DisableJSfn + "$('#' + this.EbSid_CtxId + '_usrimg').css('pointer-events', 'auto');"; } set { } }
 
     }
@@ -782,9 +803,9 @@ this.Init = function(id)
         [HideInPropertyGrid]
         public string Type { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm)]
-        [HideInPropertyGrid]
-        public EbControl Control { get; set; }
+        //[EnableInBuilder(BuilderType.WebForm)]//
+        //[HideInPropertyGrid]//
+        //public EbControl Control { get; set; }
     }
 
     [UsedWithTopObjectParent(typeof(EbObject))]

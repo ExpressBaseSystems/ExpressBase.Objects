@@ -6,6 +6,7 @@ using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
 using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 
 namespace ExpressBase.Objects
 {
@@ -15,6 +16,31 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [MetaOnly]
         public override string Name { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Core")]
+        [DefaultPropValue("'Dynamic'")]
+        [OnChangeExec(@"
+                if (this.Type === 1) { 
+                    pg.ShowPropertiesExt(['StaticParameters','Items']);
+                    pg.HideGroupsExt(['Data','Link Settings','Action Button Settings']);
+                }
+                else {
+                    pg.HidePropertiesExt(['StaticParameters','Items']);
+                    pg.ShowGroupsExt(['Data','Link Settings','Action Button Settings']);
+                }
+            ")]
+        public MobileVisualizationType Type { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        [PropertyGroup("Core")]
+        public List<EbMobileStaticParameter> StaticParameters { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        [PropertyGroup("Core")]
+        public List<EbMobileStaticListItem> Items { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
@@ -72,6 +98,14 @@ namespace ExpressBase.Objects
         [OSE_ObjectTypes(EbObjectTypes.iMobilePage)]
         [PropertyGroup("Link Settings")]
         [Alias("Link")]
+        [OnChangeExec(@"
+                if (this.LinkRefId && this.LinkTypeForm){ 
+                        pg.ShowPropertiesExt(this.LinkSettingsProps);
+                }
+                else {
+                        pg.HidePropertiesExt(this.LinkSettingsProps);
+                }
+            ")]
         public string LinkRefId { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
@@ -105,7 +139,15 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("Link Settings")]
+        public bool ShowLinkIcon { set; get; }
+
+        #region FAB Settings Properties
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Action Button Settings")]
+        [Alias("Visibility")]
         [OnChangeExec(@"
+                $(`#${this.EbSid} .vis-container-newbtn`).visibility(this.ShowNewButton);
                 if (this.ShowNewButton){ 
                         pg.ShowProperty('NewButtonText');
                 }
@@ -116,12 +158,56 @@ namespace ExpressBase.Objects
         public bool ShowNewButton { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("Link Settings")]
+        [PropertyGroup("Action Button Settings")]
+        [Alias("Text")]
+        [OnChangeExec(@"
+                let mr = this.NewButtonText ? 8 : 0;
+                let template = `<span style='margin-right:${mr}px'>${this.NewButtonText || ''}</span><i class='fa fa-plus'></i>`;
+                $(`#${this.EbSid} .vis-container-newbtn`).html(template);
+            ")]
         public string NewButtonText { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("Link Settings")]
-        public bool ShowLinkIcon { set; get; }
+        [PropertyGroup("Action Button Settings")]
+        [DefaultPropValue("true")]
+        [OnChangeExec(@"
+                if (this.UseLinkSettings){ 
+                    pg.HidePropertiesExt(['FabLinkRefId','ContextToFabControlMap']);
+                }
+                else {
+                        pg.ShowProperty('FabLinkRefId');
+                        if(this.FabLinkRefId && this.FabLinkTypeForm) {
+                            pg.ShowProperty('ContextToFabControlMap');
+                        }
+                        else {
+                            pg.HideProperty('ContextToFabControlMap');
+                        }
+                }
+            ")]
+        public bool UseLinkSettings { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [OSE_ObjectTypes(EbObjectTypes.iMobilePage)]
+        [PropertyGroup("Action Button Settings")]
+        [Alias("Link")]
+        [OnChangeExec(@"
+                if (this.FabLinkRefId && this.FabLinkTypeForm){ 
+                        pg.ShowProperty('ContextToFabControlMap');
+                }
+                else {
+                        pg.HideProperty('ContextToFabControlMap');
+                }
+            ")]
+        public string FabLinkRefId { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        [PropertyGroup("Action Button Settings")]
+        [Alias("Context to controls map")]
+        public List<EbCTCMapper> ContextToFabControlMap { set; get; }
+
+        #endregion
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("List Styles")]
@@ -174,15 +260,19 @@ namespace ExpressBase.Objects
         [PropertyGroup("List Styles")]
         public bool BoxShadow { set; get; }
 
+        [OnDeserialized]
+        public void OnDeserialized(StreamingContext context)
+        {
+            if (StaticParameters == null)
+                StaticParameters = new List<EbMobileStaticParameter>();
+        }
+
         public EbMobileVisualization()
         {
-            OfflineQuery = new EbScript();
             DataSourceParams = new List<Param>();
             FilterControls = new List<EbMobileControl>();
             SortColumns = new List<EbMobileDataColumn>();
             SearchColumns = new List<EbMobileDataColumn>();
-            LinkFormParameters = new List<EbMobileDataColToControlMap>();
-            ContextToControlMap = new List<EbCTCMapper>();
 
             Padding = new EbThickness(10);
             Margin = new EbThickness();

@@ -33,6 +33,14 @@ namespace ExpressBase.Objects
         [OSE_ObjectTypes(EbObjectTypes.iMobilePage)]
         [PropertyGroup("Link Settings")]
         [Alias("Link")]
+        [OnChangeExec(@"
+                if (this.LinkRefId && this.LinkTypeForm){ 
+                        pg.ShowPropertiesExt(['FormMode', 'FormId', 'LinkFormParameters']);
+                }
+                else {
+                        pg.HidePropertiesExt(['FormMode', 'FormId', 'LinkFormParameters']);
+                }
+            ")]
         public string LinkRefId { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]

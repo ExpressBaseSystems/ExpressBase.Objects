@@ -28,6 +28,7 @@ using ExpressBase.Common.Constants;
 using ExpressBase.CoreBase.Globals;
 using System.Net;
 using System.Threading;
+using ExpressBase.Common.Security;
 
 namespace ExpressBase.Objects
 {
@@ -39,6 +40,7 @@ namespace ExpressBase.Objects
         public EbWebForm()
         {
             //this.Validators = new List<EbValidator>();
+            this.InfoVideoURLs = new List<EbURL>();
             this.DisableDelete = new List<EbSQLValidator>();
             this.DisableCancel = new List<EbSQLValidator>();
             this.BeforeSaveRoutines = new List<EbRoutines>();
@@ -94,7 +96,7 @@ namespace ExpressBase.Objects
         [Alias("Info Document")]
         [HelpText("Help information.")]
         [OnChangeExec(@"
-        if(this.Info && this.Info.trim() !== ''){
+        if((this.Info && this.Info.trim()) !== '' || (this.InfoVideoURLs && this.InfoVideoURLs.$values.length > 0)){
             pg.ShowProperty('InfoIcon');
         }
         else{
@@ -107,14 +109,15 @@ namespace ExpressBase.Objects
         [PropertyPriority(98)]
         [Alias("Help Video URL")]
         [HelpText("Help video.")]
-        [OnChangeExec(@"
-        if(this.Info && this.Info.trim() !== ''){
-            pg.ShowProperty('InfoIcon');
-        }
-        else{
-            pg.HideProperty('InfoIcon');
-        }")]
         public string InfoVideoURL { get; set; }
+
+        [PropertyGroup(PGConstants.HELP)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [PropertyPriority(98)]
+        [Alias("Help Videos URLs")]
+        [HelpText("Help videos.")]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        public virtual List<EbURL> InfoVideoURLs { get; set; }
 
         [PropertyGroup("Events")]
         [EnableInBuilder(BuilderType.WebForm)]
@@ -171,6 +174,11 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         public bool EnableExcelImport { get; set; }
 
+        [PropertyGroup(PGConstants.EXTENDED)]
+        [Alias("Is location independent")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        public bool IsLocIndependent { get; set; }
+
         [PropertyGroup(PGConstants.DATA)]
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.Collection)]
@@ -199,7 +207,7 @@ namespace ExpressBase.Objects
 
         public override string GetHtml()
         {
-            string html = "<form id='@ebsid@' isrendermode='@rmode@' ebsid='@ebsid@' class='formB-box form-buider-form ebcont-ctrl' eb-form='true'  eb-root-obj-container ui-inp eb-type='WebForm' @tabindex@>";
+            string html = "<form id='@ebsid@' isrendermode='@rmode@' ebsid='@ebsid@' class='formB-box form-buider-form ebcont-ctrl ebcont-inner' eb-form='true'  eb-root-obj-container ui-inp eb-type='WebForm' @tabindex@>";
 
             foreach (EbControl c in this.Controls)
                 html += c.GetHtml();
@@ -754,7 +762,7 @@ namespace ExpressBase.Objects
                                     SingleColumn Col = entry.Value[0].GetColumn(obj.ControlName);
                                     if (Col != null)
                                     {
-                                        _d.Add(obj.Name, Convert.ToString(Col.Value));///////////////
+                                        _d.Add(obj.Name, Convert.ToString(Col.Value).Trim());///////////////
                                         if (obj.Name == FormConstants.email || obj.Name == FormConstants.phprimary)
                                             EmailOrPhFound = true;
                                         break;
@@ -806,7 +814,7 @@ namespace ExpressBase.Objects
             {
                 if (_table.TableType == WebFormTableTypes.Normal)
                 {
-                    SingleRow Row = new SingleRow();
+                    SingleRow Row = new SingleRow() { LocId = this.LocationId };
                     SingleTable Table = new SingleTable();
                     foreach (ColumnSchema _column in _table.Columns)
                         Row.Columns.Add(_column.Control.GetSingleColumn(this.UserObj, this.SolutionObj, null));
@@ -815,7 +823,7 @@ namespace ExpressBase.Objects
                 }
                 else if (_table.TableType == WebFormTableTypes.Grid)
                 {
-                    SingleRow Row = new SingleRow();
+                    SingleRow Row = new SingleRow() { LocId = this.LocationId };
                     Row.Columns.Add(new SingleColumn()
                     {
                         Name = FormConstants.eb_row_num,
@@ -858,9 +866,11 @@ namespace ExpressBase.Objects
                             this.FormData.SrcDataId = Convert.ToInt32(dataRow[i++]);
                             this.FormData.CreatedBy = Convert.ToInt32(dataRow[i++]);
                             this.FormData.IsCancelled = dataRow[i++].ToString().Equals("T");
+                            DateTime dt = Convert.ToDateTime(dataRow[i++]).ConvertFromUtc(this.UserObj.Preference.TimeZone);
+                            this.FormData.CreatedAt = dt.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
                         }
                         else
-                            i += 6;// 6 => Count of above properties
+                            i += 7;// 6 => Count of above properties
                     }
                     _rowId = Convert.ToInt32(dataRow[i]);
                     if (_rowId <= 0)
@@ -1569,6 +1579,8 @@ namespace ExpressBase.Objects
                 resp += " - Notifications: " + EbFnGateway.SendNotifications(this, DataDB, service);
                 Console.WriteLine("EbWebForm.Save.SendMobileNotification start");
                 EbFnGateway.SendMobileNotification(this, EbConFactory);
+                //Console.WriteLine("EbWebForm.Save.InsertOrUpdate Global Search start");
+                SearchHelper.InsertOrUpdate(DataDB, this);
                 Console.WriteLine("EbWebForm.Save.resp = " + resp);
             }
             catch (FormException ex1)
@@ -1940,7 +1952,7 @@ namespace ExpressBase.Objects
                 if (control is EbFileUploader)
                 {
                     EbFileUploader _c = control as EbFileUploader;
-                    if (this.FormData.ExtendedTables.ContainsKey(_c.Name ?? _c.EbSid))
+                    if (this.FormData.ExtendedTables.ContainsKey(_c.Name) || (this.FormData.ExtendedTables.ContainsKey(_c.Name + "_add") && this.FormData.ExtendedTables.ContainsKey(_c.Name + "_del")))
                     {
                         if (this.FormGlobals == null)
                             this.FormGlobals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, this.FormData, null);
@@ -1949,7 +1961,7 @@ namespace ExpressBase.Objects
                             secCxtGet = Convert.ToString(this.ExecuteCSharpScriptNew(_c.ContextGetExpr.Code, this.FormGlobals));
                         if (_c.ContextSetExpr != null && !_c.ContextSetExpr.Code.IsNullOrEmpty())
                             secCxtSet = Convert.ToString(this.ExecuteCSharpScriptNew(_c.ContextSetExpr.Code, this.FormGlobals));
-                        _qry += _c.GetUpdateQuery2(DataDB, param, this.FormData.ExtendedTables[_c.Name ?? _c.EbSid], this.TableName, this.RefId.Split("-")[3], ref i, this.TableRowId, secCxtGet, secCxtSet);
+                        _qry += _c.GetUpdateQuery2(DataDB, param, this.FormData.ExtendedTables, this.TableName, this.RefId.Split("-")[3], ref i, this.TableRowId, secCxtGet, secCxtSet);
                     }
                 }
             }
@@ -2136,6 +2148,11 @@ namespace ExpressBase.Objects
                 this.Save(DataDB, service, TransactionConnection);
                 DataIds.Add(this.TableRowId);
             }
+            if (this.FormSchema.ExtendedControls.Find(e => e is EbProvisionUser) != null)
+            {
+                Console.WriteLine("ProcessBatchRequest - UpdateSolutionObjectRequest start");
+                service.Gateway.Send<UpdateSolutionObjectResponse>(new UpdateSolutionObjectRequest { SolnId = this.SolutionObj.SolutionID, UserId = this.UserObj.UserId });
+            }
             return DataIds;
         }
 
@@ -2245,7 +2262,7 @@ namespace ExpressBase.Objects
             return 0;
         }
 
-        public void AfterExecutionIfUserCreated(Service Service, Common.Connections.EbMailConCollection EmailCon, RabbitMqProducer MessageProducer3)
+        public void AfterExecutionIfUserCreated(Service Service, Common.Connections.EbMailConCollection EmailCon, RabbitMqProducer MessageProducer3, string wc, Dictionary<string, string> MetaData)
         {
             bool UpdateSoluObj = false;
             foreach (EbControl c in this.FormSchema.ExtendedControls)
@@ -2253,12 +2270,67 @@ namespace ExpressBase.Objects
                 if (c is EbProvisionUser && (c as EbProvisionUser).IsUserCreated())
                 {
                     UpdateSoluObj = true;
-                    Console.WriteLine("AfterExecutionIfUserCreated - New User creation found");
-                    if (EmailCon?.Primary != null)
+
+                    EbProvisionUser pc = c as EbProvisionUser;
+
+                    if (this.FormData?.MultipleTables.ContainsKey(pc.VirtualTable) == true && this.FormData?.MultipleTables[pc.VirtualTable].Count > 0)
                     {
-                        Console.WriteLine("AfterExecutionIfUserCreated - SendWelcomeMail start");
-                        (c as EbProvisionUser).SendWelcomeMail(MessageProducer3, this.UserObj, this.SolutionObj);
+                        SingleColumn col = this.FormData.MultipleTables[pc.VirtualTable][0].Columns.Find(e => e.Name == pc.Name);
+                        if (col != null && !MetaData.ContainsKey(FormMetaDataKeys.signup_user))// && this.RefId == this.SolutionObj.SolutionSettings.SignupFormRefid
+                        {
+                            //pc.UserCredentials.UserId = Convert.ToInt32(col.Value);
+                            Dictionary<string, string> _od = JsonConvert.DeserializeObject<Dictionary<string, string>>(col.F);
+                            EbSignUpUserInfo _user = new EbSignUpUserInfo()
+                            {
+                                UserName = string.IsNullOrEmpty(_od[FormConstants.email]) ? _od[FormConstants.phprimary] : _od[FormConstants.email],
+                                AuthId = string.Format(TokenConstants.SUB_FORMAT, this.SolutionObj.SolutionID, _od[FormConstants.id], wc),
+                                UserType = Convert.ToInt32(_od[FormConstants.usertype])
+                            };
+
+                            if (pc.SendVerificationMsg)
+                            {
+                                string msg = string.Empty;
+                                _user.VerificationRequired = true;
+                                Authenticate2FAResponse resp = Service.Gateway.Send<Authenticate2FAResponse>(new SendUserVerifCodeRequest
+                                {
+                                    UserId = Convert.ToInt32(_od[FormConstants.id]),
+                                    WC = wc,
+                                    SolnId = this.SolutionObj.SolutionID
+                                });
+                                if (!string.IsNullOrEmpty(_od[FormConstants.email]))
+                                {
+                                    if (resp.EmailVerifCode.AuthStatus)
+                                    {
+                                        _user.VerifyEmail = _od[FormConstants.email];
+                                    }
+                                    msg = resp.EmailVerifCode.Message;
+                                }
+                                if (!string.IsNullOrEmpty(_od[FormConstants.phprimary]))
+                                {
+                                    if (resp.MobileVerifCode.AuthStatus)
+                                    {
+                                        _user.VerifyPhone = _od[FormConstants.phprimary];
+                                    }
+                                    msg += "; " + resp.MobileVerifCode.Message;
+                                }
+                                _user.Message = msg;
+                            }
+                            else
+                            {
+                                _user.VerificationRequired = false;
+                                _user.Message = "Verification is not required";
+                            }
+                            _user.Token = EbTokenGenerator.GenerateToken(_user.AuthId);
+                            MetaData.Add(FormMetaDataKeys.signup_user, JsonConvert.SerializeObject(_user));
+                        }
                     }
+
+                    //Console.WriteLine("AfterExecutionIfUserCreated - New User creation found");
+                    //if (EmailCon?.Primary != null)
+                    //{
+                    //    Console.WriteLine("AfterExecutionIfUserCreated - SendWelcomeMail start");
+                    //    (c as EbProvisionUser).SendWelcomeMail(MessageProducer3, this.UserObj, this.SolutionObj);
+                    //}
                 }
             }
             if (UpdateSoluObj)
@@ -2612,5 +2684,49 @@ namespace ExpressBase.Objects
         //        }
         //    }
         //}
+    }
+
+
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.DVBuilder)]
+    [HideInToolBox]
+    [UsedWithTopObjectParent(typeof(EbObject), typeof(EbDashBoardWraper), typeof(EbDataVisualizationObject))]
+    [Alias("URL")]
+    public class EbURL
+    {
+        [Alias("URL")]
+        public EbURL() { }
+
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.DVBuilder)]
+        public string EbSid { get; set; }
+
+        [PropertyGroup(PGConstants.CORE)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.DVBuilder)]
+        [EbRequired]
+        [Unique]
+        [regexCheck]
+        [InputMask("[a-z][a-z0-9]*(_[a-z0-9]+)*")]
+        public string Name { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.DVBuilder)]
+        [PropertyGroup(PGConstants.CORE)]
+        [Alias("URL")]
+        [OnChangeExec(@"
+            if (this.URL) {
+                if (EbIsValidURL(this.URL)) {
+                    pg.setSimpleProperty('URL', this.URL.replace('.youtube.com/watch?v=', '.youtube.com/embed/').replace(/\?rel=0?$/, '') + '?rel=0');
+                }
+            }
+        ")]
+        public string URL { get; set; }
+
+        [PropertyGroup(PGConstants.CORE)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.DVBuilder)]
+        [Unique]
+        public string Title { get; set; }
+
+        [PropertyGroup(PGConstants.CORE)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.DVBuilder)]
+        public bool Hide { get; set; }
     }
 }

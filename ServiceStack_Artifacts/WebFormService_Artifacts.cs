@@ -377,6 +377,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         
         [DataMember(Order = 9)]
         public string AffectedEntries { get; set; }
+
+        [DataMember(Order = 9)]
+        public Dictionary<string, string> MetaData { get; set; }
     }
     
 	[DataContract]
@@ -541,6 +544,66 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 3)]
         public string FormDatajson{ get; set; }
+    }
+
+    [DataContract]
+    public class CheckEmailAndPhoneRequest : EbServiceStackAuthRequest, IReturn<CheckEmailAndPhoneResponse>
+    {
+        [DataMember(Order = 1)]
+        public string RefId { get; set; }
+
+        [DataMember(Order = 2)]
+        public int RowId { get; set; }
+
+        [DataMember(Order = 3)]
+        public string Data { get; set; }
+    }
+
+    [DataContract]
+    public class CheckEmailAndPhoneResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public string Data { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    [DataContract]
+    public class GetProvUserListRequest : EbServiceStackAuthRequest, IReturn<GetProvUserListResponse>
+    {
+        [DataMember(Order = 1)]
+        public string RefId { get; set; }
+
+        [DataMember(Order = 2)]
+        public int RowId { get; set; }
+    }
+
+    [DataContract]
+    public class GetProvUserListResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public string Data { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    [DataContract]
+    public class GetGlobalSrchRsltsReq : EbServiceStackAuthRequest, IReturn<GetGlobalSrchRsltsResp>
+    {
+        [DataMember(Order = 1)]
+        public string SrchText { get; set; }
+    }
+
+    [DataContract]
+    public class GetGlobalSrchRsltsResp : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public string Data { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
     }
 
     [DataContract]

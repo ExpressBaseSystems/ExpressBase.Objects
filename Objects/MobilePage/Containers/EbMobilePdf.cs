@@ -7,40 +7,6 @@ using System.Collections.Generic;
 namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.MobilePage)]
-    public class EbMobileContainer : EbMobilePageBase
-    {
-        public override List<string> DiscoverRelatedRefids()
-        {
-            return base.DiscoverRelatedRefids();
-        }
-    }
-
-    [EnableInBuilder(BuilderType.MobilePage)]
-    public class EbMobileDashBoard : EbMobileContainer
-    {
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [HideInPropertyGrid]
-        public override string Name { get; set; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [HideInPropertyGrid]
-        public List<EbMobileDashBoardControls> ChildControls { get; set; }
-
-        public override string GetDesignHtml()
-        {
-            return @"<div class='eb_mob_dashboard_container mob_container dropped' tabindex='1' eb-type='EbMobileDashBoard' id='@id'>
-                        <div class='eb_mob_container_inner'>
-                        </div>
-                    </div>".RemoveCR().DoubleQuoted();
-        }
-
-        public override List<string> DiscoverRelatedRefids()
-        {
-            return base.DiscoverRelatedRefids();
-        }
-    }
-
-    [EnableInBuilder(BuilderType.MobilePage)]
     public class EbMobilePdf : EbMobileContainer
     {
         [EnableInBuilder(BuilderType.MobilePage)]
