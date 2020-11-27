@@ -87,7 +87,7 @@ namespace ExpressBase.Objects
 this.__IsDisable = true; 
 $('#cont_' + this.EbSid_CtxId + ' *')
 .attr('disabled', 'disabled').css('pointer-events', 'none')
-.find('[ui-inp]').css('background-color', '#f3f3f3');
+.find('[ui-inp]').css('background-color', 'var(--eb-disablegray)');
 $('#cont_' + this.EbSid_CtxId + ' .ctrl-cover').css('pointer-events', 'inherit')
 .find('[ui-inp]').css('pointer-events', 'inherit')";
             }
