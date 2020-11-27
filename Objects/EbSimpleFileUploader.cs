@@ -14,7 +14,7 @@ using System.Runtime.Serialization;
 namespace ExpressBase.Objects
 {
 	[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
-	class EbSimpleFileUploader: EbControlUI
+	public class EbSimpleFileUploader: EbControlUI
 	{
 
 		public EbSimpleFileUploader()

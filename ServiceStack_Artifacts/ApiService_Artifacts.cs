@@ -406,7 +406,5 @@ END;";
         public string ContentType { set; get; }
 
         public byte[] Bytea { set; get; }
-
-        public HttpStatusCode StatusCode { set; get; }
     }
 }

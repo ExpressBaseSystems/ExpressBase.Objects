@@ -372,7 +372,7 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
 .Replace("@data-ebtype@", "16");
         }
 
-        private string GetSql(Service service)// duplicate
+        public string GetSql(Service service)// duplicate
         {
             EbDataReader dr = EbFormHelper.GetEbObject<EbDataReader>(this.DataSourceId, null, service.Redis, service);
             string Sql = dr.Sql.Trim();
