@@ -34,6 +34,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 4)]
         public string PackageIcon { get; set; }
+
+        [DataMember(Order = 5)]
+        public string SubscriptionId { get; set; }
     }
 
     public class ExportApplicationResponse : IEbSSResponse
@@ -70,6 +73,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 3)]
         public string SelectedSolutionId { get; set; }
+
+        [DataMember(Order = 4)]
+        public string SubscriptionId { get; set; }
     }
 
     public class ImportApplicationResponse : IEbSSResponse
