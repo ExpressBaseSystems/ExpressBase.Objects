@@ -47,7 +47,7 @@ namespace ExpressBase.Objects.WebFormRelated
             return JsonConvert.SerializeObject(_data);
         }
 
-        public static void InsertOrUpdate(IDatabase DataDB, EbWebForm _webForm) 
+        public static void InsertOrUpdate(IDatabase DataDB, EbWebForm _webForm)
         {
             try
             {
@@ -56,7 +56,7 @@ namespace ExpressBase.Objects.WebFormRelated
                     return;
                 Task.Run(() => InsertOrUpdate(DataDB, _data, _webForm.RefId, _webForm.TableRowId, _webForm.UserObj.UserId, _webForm.DisplayName));
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 Console.WriteLine($"Exception in insert/update global search data. Message: {ex.Message}\nStackTrace: {ex.StackTrace}");
             }
@@ -81,7 +81,7 @@ namespace ExpressBase.Objects.WebFormRelated
                 DataDB.GetNewParameter("data_json", EbDbTypes.String, JsonData),
                 DataDB.GetNewParameter("eb_user_id", EbDbTypes.Int32, UserId)
             };
-            
+
             int temp = DataDB.DoNonQuery(Qry, parameters);
             return temp;
         }
@@ -91,24 +91,24 @@ namespace ExpressBase.Objects.WebFormRelated
             try
             {
                 string delQry = "UPDATE eb_index_table SET eb_del = 'T' WHERE ref_id = @ref_id AND data_id = @data_id AND COALESCE(eb_del, '') = 'F';";
-                int t = DataDB.DoNonQuery(delQry, new DbParameter[] 
-                { 
+                int t = DataDB.DoNonQuery(delQry, new DbParameter[]
+                {
                     DataDB.GetNewParameter("ref_id", EbDbTypes.String, _webForm.RefId),
                     DataDB.GetNewParameter("data_id", EbDbTypes.Int32, _webForm.TableRowId)
                 });
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine($"Exeption in SearchHelper.index.delete. \nMessage: {ex.Message}\nStackTrace: {ex.StackTrace}");
             }
         }
 
-        public static string UpdateIndexes(IDatabase DataDB, EbWebForm _webForm) 
+        public static string UpdateIndexes(IDatabase DataDB, EbWebForm _webForm)
         {
             DateTime startdt = DateTime.Now;
             string Message = $"Service started at {startdt}.";
             Console.WriteLine("Update all indexes start: " + startdt);
-            string qCols = "mtbl.id, mtbl.eb_created_by, mtbl.eb_created_at, mtbl.eb_lastmodified_by, mtbl.eb_lastmodified_at", 
+            string qCols = "mtbl.id, mtbl.eb_created_by, mtbl.eb_created_at, mtbl.eb_lastmodified_by, mtbl.eb_lastmodified_at",
                 qJoin = string.Empty,
                 qCdtn = "COALESCE(mtbl.eb_del, 'F') = 'F'";
             const int sysColCnt = 5;
@@ -204,7 +204,7 @@ namespace ExpressBase.Objects.WebFormRelated
 
         private static string GetUpsertQuery(int i)
         {
-            return $@"UPDATE eb_index_table SET data_json = @data_json_{i}, modified_by = @modified_by_{i}, modified_at = @modified_at_{i}
+            return $@"UPDATE eb_index_table SET display_name = @display_name, data_json = @data_json_{i}, modified_by = @modified_by_{i}, modified_at = @modified_at_{i}
                         WHERE ref_id = @ref_id AND data_id = @data_id_{i} AND COALESCE(eb_del, '') = 'F';
                     INSERT INTO eb_index_table (display_name, data_json, ref_id, data_id, created_by, created_at, modified_by, modified_at, eb_del)
                         SELECT @display_name, @data_json_{i}, @ref_id, @data_id_{i}, @created_by_{i}, @created_at_{i}, @modified_by_{i}, @modified_at_{i}, 'F'
@@ -226,7 +226,7 @@ namespace ExpressBase.Objects.WebFormRelated
             foreach (EbDataRow dr in ds.Tables[1].Rows)
                 _data.Add(new SearchRsltData(dr, SolutionObj, UserObj));
 
-            return JsonConvert.SerializeObject(new SearchResponse() { Data = _data, RowCount = rowCount});
+            return JsonConvert.SerializeObject(new SearchResponse() { Data = _data, RowCount = rowCount });
         }
     }
 
