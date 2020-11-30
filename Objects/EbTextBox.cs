@@ -235,6 +235,9 @@ else {
         [HideInPropertyGrid]
         public bool IsBasicControl { get => true; }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+        public override bool Index { get; set; }
+
         //hint: New mode - EbAutoId - DataPusher - Dest Form
         [JsonIgnore]
         public bool BypassParameterization { get; set; }

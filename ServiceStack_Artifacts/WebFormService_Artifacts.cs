@@ -607,6 +607,23 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
+    public class UpdateIndexesRequest : EbServiceStackAuthRequest, IReturn<UpdateIndexesRespone>
+    {
+        [DataMember(Order = 1)]
+        public string RefId { get; set; }
+    }
+
+    [DataContract]
+    public class UpdateIndexesRespone : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public string Message { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    [DataContract]
     public class DeleteDataFromWebformRequest : EbServiceStackAuthRequest, IReturn<DeleteDataFromWebformResponse>
     {
         [DataMember(Order = 1)]

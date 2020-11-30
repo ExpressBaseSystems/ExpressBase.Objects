@@ -140,6 +140,9 @@ else {
             ")]
         public NumInpMode InputMode { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+        public override bool Index { get; set; }
+
         //private string MaxLengthString
         //{
         //    get { return ((this.MaxLength > 0) ? "$('#{0}').focus(function() {$(this).select();});".Replace("{0}", this.Name).Replace("{1}", this.Value.ToString()) : string.Empty); }
