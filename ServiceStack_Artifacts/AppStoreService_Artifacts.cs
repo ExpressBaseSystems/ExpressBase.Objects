@@ -10,7 +10,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
     public class SaveToAppStoreRequest : EbServiceStackAuthRequest, IReturn<SaveToAppStoreResponse>
     {
-
         public AppStore Store { get; set; }
     }
 
@@ -201,5 +200,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string PricingDesc { get; set; }
 
         public int DetailId { get; set; }
+
+        public string MasterSoln { get; set; }
     }
 }
