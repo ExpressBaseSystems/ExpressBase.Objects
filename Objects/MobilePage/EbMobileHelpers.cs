@@ -18,7 +18,6 @@ namespace ExpressBase.Objects
         public override bool Required { get; set; }
         public override bool Hidden { set; get; }
         public override EbScript ValueExpr { get; set; }
-        public override EbScript HiddenExpr { get; set; }
         public override EbScript DisableExpr { get; set; }
         public override EbScript DefaultValueExpression { get; set; }
         public override List<EbMobileValidator> Validators { set; get; }
@@ -52,32 +51,35 @@ namespace ExpressBase.Objects
         [PropertyGroup(PGConstants.CORE)]
         [OnChangeExec(@"
                 if ([1,3,5].includes(this.RenderAs)){ 
-                        pg.ShowProperty('TextFormat');
-                        pg.ShowProperty('Font');
-                        pg.HideProperty('BorderRadius');
-                        pg.HideProperty('Height');
-                        pg.HideProperty('Width');
+                        pg.ShowPropertiesExt(['TextFormat','Font']);
+                        pg.HidePropertiesExt(['BorderRadius','Height','Width']);
                 }
                 else {
-                        pg.HideProperty('TextFormat');
-                        pg.HideProperty('Font');
-                        pg.HideProperty('BorderRadius');
+                        pg.HidePropertiesExt(['TextFormat','Font','BorderRadius']);
                         if(this.RenderAs === 2){
-                            pg.ShowProperty('BorderRadius');
-                            pg.ShowProperty('Height');
-                            pg.ShowProperty('Width');
+                            pg.ShowPropertiesExt(['BorderRadius','Height','Width']);
+                        }
+                        else if(this.RenderAs === 6){
+                            pg.ShowPropertiesExt(['BorderRadius','Height','Width','Font']);
                         }
                 }
             ")]
         public DataColumnRenderType RenderAs { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
+        [UIproperty]
         [PropertyGroup(PGConstants.APPEARANCE)]
-        public int BorderRadius { get; set; }
+        [PropertyEditor(PropertyEditorType.Color)]
+        [OnChangeExec(@"
+                if (this.BackgroundColor !== ''){ 
+                        $(`#${this.EbSid}`).style('background-color',this.BackgroundColor);
+                }
+            ")]
+        public string BackgroundColor { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup(PGConstants.EXTENDED)]
-        public string TextFormat { get; set; }
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        public int BorderRadius { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup(PGConstants.APPEARANCE)]
@@ -89,9 +91,13 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup(PGConstants.APPEARANCE)]
+        public string TextFormat { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [Alias("Align X")]
         [OnChangeExec(@"
-                if (this.HorrizontalAlign !== 3 && this.RenderAs === 2){ 
+                if (this.HorrizontalAlign !== 3 && [2,6].includes(this.RenderAs)){ 
                         pg.ShowProperty('Width');
                 }
                 else {
@@ -104,7 +110,7 @@ namespace ExpressBase.Objects
         [PropertyGroup(PGConstants.APPEARANCE)]
         [Alias("Align Y")]
         [OnChangeExec(@"
-                if (this.VerticalAlign !== 3 && this.RenderAs === 2){ 
+                if (this.VerticalAlign !== 3 && [2,6].includes(this.RenderAs)){ 
                         pg.ShowProperty('Height');
                 }
                 else {
@@ -122,7 +128,7 @@ namespace ExpressBase.Objects
         public int Width { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup(PGConstants.EXTENDED)]
+        [PropertyGroup(PGConstants.BEHAVIOR)]
         public bool HideInContext { set; get; }
 
         public override string GetDesignHtml()
@@ -245,7 +251,7 @@ namespace ExpressBase.Objects
         public override bool Required { get; set; }
         public override bool Hidden { set; get; }
         public override EbScript ValueExpr { get; set; }
-        public override EbScript HiddenExpr { get; set; }
+        //public override EbScript HiddenExpr { get; set; }
         public override EbScript DisableExpr { get; set; }
         public override EbScript DefaultValueExpression { get; set; }
         public override List<EbMobileValidator> Validators { set; get; }
