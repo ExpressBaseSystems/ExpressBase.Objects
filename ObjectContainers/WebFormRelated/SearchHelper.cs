@@ -18,8 +18,8 @@ namespace ExpressBase.Objects.WebFormRelated
 {
     public enum SH_LinkType
     {
-        FormViewMode = 1,
-        Absolute = 2
+        FormViewMode = 0,
+        LM = 1
     }
 
     public static class SearchHelper
@@ -215,7 +215,7 @@ namespace ExpressBase.Objects.WebFormRelated
         {
             List<SearchRsltData> _data = new List<SearchRsltData>();
             string Qry = @"SELECT COUNT(*) FROM eb_index_table eit WHERE COALESCE(eit.eb_del, '') = 'F' AND (SELECT COUNT(*) from json_each_text(eit.data_json :: JSON) WHERE LOWER(value) like '%' || @searchTxt || '%') > 0;
-                SELECT eit.id, eit.display_name, eit.data_json, eit.ref_id, eit.data_id, eit.created_by, eit.created_at, eit.modified_by, eit.modified_at FROM eb_index_table eit
+                SELECT eit.id, eit.display_name, eit.data_json, eit.ref_id, eit.data_id, eit.created_by, eit.created_at, eit.modified_by, eit.modified_at, eit.link_type FROM eb_index_table eit
                 WHERE COALESCE(eit.eb_del, '') = 'F' AND (SELECT COUNT(*) from json_each_text(eit.data_json :: JSON) WHERE LOWER(value) like '%' || @searchTxt || '%') > 0 ORDER BY eit.modified_at DESC LIMIT 100; ";
 
             EbDataSet ds = DataDB.DoQueries(Qry, new DbParameter[]
@@ -227,6 +227,101 @@ namespace ExpressBase.Objects.WebFormRelated
                 _data.Add(new SearchRsltData(dr, SolutionObj, UserObj));
 
             return JsonConvert.SerializeObject(new SearchResponse() { Data = _data, RowCount = rowCount });
+        }
+
+        public static void InsertOrUpdate_LM(IDatabase DataDB, string JsonData, int DataId, int UserId)
+        {
+            string Qry = $@"UPDATE eb_index_table SET display_name = 'Lead Management', data_json = @data_json, modified_by = @eb_user_id, modified_at = {DataDB.EB_CURRENT_TIMESTAMP}
+                            WHERE link_type = @link_type AND data_id = @data_id AND COALESCE(eb_del, '') = 'F';
+
+                        INSERT INTO eb_index_table (display_name, data_json, link_type, data_id, created_by, created_at, modified_by, modified_at, eb_del)
+                            SELECT 'Lead Management', @data_json, @link_type, @data_id, @eb_user_id, {DataDB.EB_CURRENT_TIMESTAMP}, @eb_user_id, {DataDB.EB_CURRENT_TIMESTAMP}, 'F'
+                            WHERE NOT EXISTS (SELECT 1 FROM eb_index_table WHERE link_type = @link_type AND data_id = @data_id AND COALESCE(eb_del, '') = 'F');";
+
+            DbParameter[] parameters = new DbParameter[]
+            {
+                DataDB.GetNewParameter("link_type", EbDbTypes.Int32, (int)SH_LinkType.LM),
+                DataDB.GetNewParameter("data_id", EbDbTypes.Int32, DataId),
+                DataDB.GetNewParameter("data_json", EbDbTypes.String, JsonData),
+                DataDB.GetNewParameter("eb_user_id", EbDbTypes.Int32, UserId)
+            };
+
+            int temp = DataDB.DoNonQuery(Qry, parameters);
+            Console.WriteLine($"InsertOrUpdate_LM for {DataId}. Status: {temp}");
+        }
+
+        public static void Delete_LM(IDatabase DataDB, int DataId)
+        {
+            try
+            {
+                string delQry = "UPDATE eb_index_table SET eb_del = 'T' WHERE link_type = @link_type AND data_id = @data_id AND COALESCE(eb_del, '') = 'F';";
+                int t = DataDB.DoNonQuery(delQry, new DbParameter[]
+                {
+                    DataDB.GetNewParameter("link_type", EbDbTypes.Int32, (int)SH_LinkType.LM),
+                    DataDB.GetNewParameter("data_id", EbDbTypes.Int32, DataId)
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exeption in SearchHelper.index.delete. \nMessage: {ex.Message}\nStackTrace: {ex.StackTrace}");
+            }
+        }
+
+        public static string UpdateIndexes_LM(IDatabase DataDB)
+        {
+            DateTime startdt = DateTime.Now;
+            string Message = $"Service started at {startdt}.";
+            Console.WriteLine("Update all indexes start: " + startdt);
+            string fullQry = $"SELECT id, eb_createdby, eb_createdat, eb_modifiedby, eb_modifiedat, name, genurl, genphoffice, watsapp_phno FROM customers WHERE COALESCE(eb_del, 'F') = 'F';";
+            EbDataTable dt = DataDB.DoQuery(fullQry);
+            if (dt.Rows.Count > 0)
+            {
+                Console.WriteLine($"Existing {dt.Rows.Count} records.");
+                Message += $"\nExisting {dt.Rows.Count} records.";
+                string upsertQry = string.Empty;
+                List<DbParameter> parameters = new List<DbParameter>() { DataDB.GetNewParameter("link_type", EbDbTypes.Int32, (int)SH_LinkType.LM) };
+
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    EbDataRow dr = dt.Rows[i];
+                    Dictionary<string, string> JsonData = new Dictionary<string, string>() 
+                    {
+                        { "Name", Convert.ToString(dr[5]) },
+                        { "Mobile", Convert.ToString(dr[6]) },
+                        { "Phone", Convert.ToString(dr[7]) },
+                        { "WhatsApp", Convert.ToString(dr[8]) },                        
+                    };
+
+                    parameters.Add(DataDB.GetNewParameter($"data_id_{i}", EbDbTypes.Int32, dr[0]));
+                    parameters.Add(DataDB.GetNewParameter($"created_by_{i}", EbDbTypes.Int32, dr[1]));
+                    parameters.Add(DataDB.GetNewParameter($"created_at_{i}", EbDbTypes.DateTime, dr[2]));
+                    parameters.Add(DataDB.GetNewParameter($"modified_by_{i}", EbDbTypes.Int32, dr[3]));
+                    parameters.Add(DataDB.GetNewParameter($"modified_at_{i}", EbDbTypes.DateTime, dr[4]));
+                    parameters.Add(DataDB.GetNewParameter($"data_json_{i}", EbDbTypes.String, JsonConvert.SerializeObject(JsonData)));
+                    
+                    
+                    upsertQry += $@"UPDATE eb_index_table SET display_name = 'Lead Management', data_json = @data_json_{i}, modified_by = @modified_by_{i}, modified_at = @modified_at_{i}
+                        WHERE link_type = @link_type AND data_id = @data_id_{i} AND COALESCE(eb_del, '') = 'F';
+
+                    INSERT INTO eb_index_table (display_name, data_json, link_type, data_id, created_by, created_at, modified_by, modified_at, eb_del)
+                        SELECT 'Lead Management', @data_json_{i}, @link_type, @data_id_{i}, @created_by_{i}, @created_at_{i}, @modified_by_{i}, @modified_at_{i}, 'F'
+                        WHERE NOT EXISTS (SELECT 1 FROM eb_index_table WHERE link_type = @link_type AND data_id = @data_id_{i} AND COALESCE(eb_del, '') = 'F');";
+                }
+
+                int temp = DataDB.DoNonQuery(upsertQry, parameters.ToArray());
+                Console.WriteLine($"Upserted {temp} records.");
+                Message += $"\nUpserted {temp} records.";
+            }
+            else
+            {
+                string delQry = "UPDATE eb_index_table SET eb_del = 'T' WHERE link_type = @link_type AND COALESCE(eb_del, '') = 'F';";
+                int t = DataDB.DoNonQuery(delQry, new DbParameter[] { DataDB.GetNewParameter("link_type", EbDbTypes.Int32, (int)SH_LinkType.LM) });
+                Console.WriteLine($"Nothing to index. Deleted old {t} records.");
+                Message += $"\nDeleted {t} records.";
+            }
+            Console.WriteLine("Update all indexes end : Execution Time = " + (DateTime.Now - startdt).TotalMilliseconds);
+            Message += $"\nCompleted. Execution Time: {(DateTime.Now - startdt).TotalMilliseconds}.";
+            return Message;
         }
     }
 
@@ -242,8 +337,16 @@ namespace ExpressBase.Objects.WebFormRelated
         {
             this.DisplayName = Convert.ToString(dr[1]);
             this.Data = JsonConvert.DeserializeObject<Dictionary<string, string>>(Convert.ToString(dr[2]));
-            string param = JsonConvert.SerializeObject(new Param[] { new Param() { Name = "id", Type = "7", Value = Convert.ToString(dr[4]) } }).ToBase64();
-            this.Link = $"/WebForm/Index?refid={Convert.ToString(dr[3])}&_params={param}&_mode=1";
+            int linkType = Convert.ToInt32(dr[9]);
+            if (linkType == (int)SH_LinkType.LM)
+            {
+                this.Link = $"/leadmanagement/{Convert.ToString(dr[4])}";
+            }
+            else
+            {
+                string param = JsonConvert.SerializeObject(new Param[] { new Param() { Name = "id", Type = "7", Value = Convert.ToString(dr[4]) } }).ToBase64();
+                this.Link = $"/WebForm/Index?refid={Convert.ToString(dr[3])}&_params={param}&_mode=1";
+            }
             int createdBy = Convert.ToInt32(dr[5]);
             this.CreatedBy = SolutionObj.Users.ContainsKey(createdBy) ? SolutionObj.Users[createdBy] : "No Name";
             this.CreatedAt = Convert.ToDateTime(dr[6]).ConvertFromUtc(UserObj.Preference.TimeZone).ToString(UserObj.Preference.GetShortDatePattern() + " " + UserObj.Preference.GetShortTimePattern(), CultureInfo.InvariantCulture);
