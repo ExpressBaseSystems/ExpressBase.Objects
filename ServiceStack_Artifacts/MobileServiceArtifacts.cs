@@ -171,6 +171,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
+    public class MobileQueryDataRequest : MobileVisDataRequest
+    {
+        [DataMember(Order = 1)]
+        public string Query { set; get; }
+    }
+
+    [DataContract]
     public class MobileFormDataRequest : EbServiceStackAuthRequest, IReturn<MobileFormDataResponse>
     {
         [DataMember(Order = 1)]
