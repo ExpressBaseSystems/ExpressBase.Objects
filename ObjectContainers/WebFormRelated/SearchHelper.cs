@@ -38,7 +38,11 @@ namespace ExpressBase.Objects.WebFormRelated
                     foreach (SingleColumn Column in _webForm.FormData.MultipleTables[_table.TableName][0].Columns.FindAll(e => e.Control?.Index == true))
                     {
                         if (!_data.ContainsKey(Column.Control.Label))
-                            _data.Add(Column.Control.Label, Convert.ToString(Column.Value));
+                        {
+                            string _val = Convert.ToString(Column.Value);
+                            if (!string.IsNullOrEmpty(_val))
+                                _data.Add(Column.Control.Label, _val);
+                        }
                     }
                 }
             }
@@ -53,8 +57,9 @@ namespace ExpressBase.Objects.WebFormRelated
             {
                 string _data = GetJsonData(_webForm);
                 if (string.IsNullOrEmpty(_data))
-                    return;
-                Task.Run(() => InsertOrUpdate(DataDB, _data, _webForm.RefId, _webForm.TableRowId, _webForm.UserObj.UserId, _webForm.DisplayName));
+                    Task.Run(() => Delete(DataDB, _webForm.RefId, _webForm.TableRowId));
+                else
+                    Task.Run(() => InsertOrUpdate(DataDB, _data, _webForm.RefId, _webForm.TableRowId, _webForm.UserObj.UserId, _webForm.DisplayName));
             }
             catch (Exception ex)
             {
@@ -64,14 +69,11 @@ namespace ExpressBase.Objects.WebFormRelated
 
         public static int InsertOrUpdate(IDatabase DataDB, string JsonData, string RefId, int DataId, int UserId, string DispName)
         {
-            if (string.IsNullOrEmpty(JsonData))
-                return 0;
-
             string Qry = $@"UPDATE eb_index_table SET data_json = @data_json, modified_by = @eb_user_id, modified_at = {DataDB.EB_CURRENT_TIMESTAMP}
-                            WHERE ref_id = @ref_id AND data_id = @data_id AND COALESCE(eb_del, '') = 'F';
+                            WHERE ref_id = @ref_id AND data_id = @data_id AND COALESCE(eb_del, 'F') = 'F';
                         INSERT INTO eb_index_table (display_name, data_json, ref_id, data_id, created_by, created_at, modified_by, modified_at, eb_del)
                             SELECT @display_name, @data_json, @ref_id, @data_id, @eb_user_id, {DataDB.EB_CURRENT_TIMESTAMP}, @eb_user_id, {DataDB.EB_CURRENT_TIMESTAMP}, 'F'
-                            WHERE NOT EXISTS (SELECT 1 FROM eb_index_table WHERE ref_id = @ref_id AND data_id = @data_id AND COALESCE(eb_del, '') = 'F');";
+                            WHERE NOT EXISTS (SELECT 1 FROM eb_index_table WHERE ref_id = @ref_id AND data_id = @data_id AND COALESCE(eb_del, 'F') = 'F');";
 
             DbParameter[] parameters = new DbParameter[]
             {
@@ -86,15 +88,14 @@ namespace ExpressBase.Objects.WebFormRelated
             return temp;
         }
 
-        public static void Delete(IDatabase DataDB, EbWebForm _webForm)
+        public static void Delete(IDatabase DataDB, string RefId, int TableRowId)
         {
             try
             {
-                string delQry = "UPDATE eb_index_table SET eb_del = 'T' WHERE ref_id = @ref_id AND data_id = @data_id AND COALESCE(eb_del, '') = 'F';";
-                int t = DataDB.DoNonQuery(delQry, new DbParameter[]
+                int t = DataDB.DoNonQuery(GetDeleteQuery(0), new DbParameter[]
                 {
-                    DataDB.GetNewParameter("ref_id", EbDbTypes.String, _webForm.RefId),
-                    DataDB.GetNewParameter("data_id", EbDbTypes.Int32, _webForm.TableRowId)
+                    DataDB.GetNewParameter("ref_id", EbDbTypes.String, RefId),
+                    DataDB.GetNewParameter("data_id_0", EbDbTypes.Int32, TableRowId)
                 });
             }
             catch (Exception ex)
@@ -165,15 +166,27 @@ namespace ExpressBase.Objects.WebFormRelated
                         Dictionary<string, string> JsonData = new Dictionary<string, string>();
                         for (j = sysColCnt; j < colCnt; j++)
                         {
-                            JsonData.Add(labels[j - sysColCnt], Convert.ToString(dr[j]));
+                            string _val = Convert.ToString(dr[j]);
+                            string _lbl = labels[j - sysColCnt];
+                            if (!(dr.IsDBNull(j) || string.IsNullOrEmpty(_val) || JsonData.ContainsKey(_lbl)))
+                            {
+                                JsonData.Add(_lbl, _val);
+                            }
                         }
                         parameters.Add(DataDB.GetNewParameter($"data_id_{i}", EbDbTypes.Int32, dr[0]));
-                        parameters.Add(DataDB.GetNewParameter($"created_by_{i}", EbDbTypes.Int32, dr[1]));
-                        parameters.Add(DataDB.GetNewParameter($"created_at_{i}", EbDbTypes.DateTime, dr[2]));
-                        parameters.Add(DataDB.GetNewParameter($"modified_by_{i}", EbDbTypes.Int32, dr[3]));
-                        parameters.Add(DataDB.GetNewParameter($"modified_at_{i}", EbDbTypes.DateTime, dr[4]));
-                        parameters.Add(DataDB.GetNewParameter($"data_json_{i}", EbDbTypes.String, JsonConvert.SerializeObject(JsonData)));
-                        upsertQry += GetUpsertQuery(i);
+                        if (JsonData.Count > 0)
+                        {
+                            parameters.Add(DataDB.GetNewParameter($"created_by_{i}", EbDbTypes.Int32, dr[1]));
+                            parameters.Add(DataDB.GetNewParameter($"created_at_{i}", EbDbTypes.DateTime, dr[2]));
+                            parameters.Add(DataDB.GetNewParameter($"modified_by_{i}", EbDbTypes.Int32, dr[3]));
+                            parameters.Add(DataDB.GetNewParameter($"modified_at_{i}", EbDbTypes.DateTime, dr[4]));
+                            parameters.Add(DataDB.GetNewParameter($"data_json_{i}", EbDbTypes.String, JsonConvert.SerializeObject(JsonData)));
+                            upsertQry += GetUpsertQuery(i);
+                        }
+                        else
+                        {
+                            upsertQry += GetDeleteQuery(i);
+                        }
                     }
 
                     int temp = DataDB.DoNonQuery(upsertQry, parameters.ToArray());
@@ -191,7 +204,7 @@ namespace ExpressBase.Objects.WebFormRelated
             }
             if (deleteOld)
             {
-                string delQry = "UPDATE eb_index_table SET eb_del = 'T' WHERE ref_id = @ref_id AND COALESCE(eb_del, '') = 'F';";
+                string delQry = "UPDATE eb_index_table SET eb_del = 'T' WHERE ref_id = @ref_id AND COALESCE(eb_del, 'F') = 'F';";
                 int t = DataDB.DoNonQuery(delQry, new DbParameter[] { DataDB.GetNewParameter("ref_id", EbDbTypes.String, _webForm.RefId) });
                 Console.WriteLine($"Nothing to index. Deleted old {t} records.");
                 Message += $"\nDeleted {t} records.";
@@ -205,18 +218,23 @@ namespace ExpressBase.Objects.WebFormRelated
         private static string GetUpsertQuery(int i)
         {
             return $@"UPDATE eb_index_table SET display_name = @display_name, data_json = @data_json_{i}, modified_by = @modified_by_{i}, modified_at = @modified_at_{i}
-                        WHERE ref_id = @ref_id AND data_id = @data_id_{i} AND COALESCE(eb_del, '') = 'F';
+                        WHERE ref_id = @ref_id AND data_id = @data_id_{i} AND COALESCE(eb_del, 'F') = 'F';
                     INSERT INTO eb_index_table (display_name, data_json, ref_id, data_id, created_by, created_at, modified_by, modified_at, eb_del)
                         SELECT @display_name, @data_json_{i}, @ref_id, @data_id_{i}, @created_by_{i}, @created_at_{i}, @modified_by_{i}, @modified_at_{i}, 'F'
-                        WHERE NOT EXISTS (SELECT 1 FROM eb_index_table WHERE ref_id = @ref_id AND data_id = @data_id_{i} AND COALESCE(eb_del, '') = 'F');";
+                        WHERE NOT EXISTS (SELECT 1 FROM eb_index_table WHERE ref_id = @ref_id AND data_id = @data_id_{i} AND COALESCE(eb_del, 'F') = 'F');";
+        }
+
+        private static string GetDeleteQuery(int i)
+        {
+            return $"UPDATE eb_index_table SET eb_del = 'T' WHERE ref_id = @ref_id AND data_id = @data_id_{i} AND COALESCE(eb_del, 'F') = 'F';";
         }
 
         public static string GetSearchResults(IDatabase DataDB, Eb_Solution SolutionObj, User UserObj, string searchTxt)
         {
             List<SearchRsltData> _data = new List<SearchRsltData>();
-            string Qry = @"SELECT COUNT(*) FROM eb_index_table eit WHERE COALESCE(eit.eb_del, '') = 'F' AND (SELECT COUNT(*) from json_each_text(eit.data_json :: JSON) WHERE LOWER(value) like '%' || @searchTxt || '%') > 0;
+            string Qry = @"SELECT COUNT(*) FROM eb_index_table eit WHERE COALESCE(eit.eb_del, 'F') = 'F' AND (SELECT COUNT(*) from json_each_text(eit.data_json :: JSON) WHERE LOWER(value) like '%' || @searchTxt || '%') > 0;
                 SELECT eit.id, eit.display_name, eit.data_json, eit.ref_id, eit.data_id, eit.created_by, eit.created_at, eit.modified_by, eit.modified_at, eit.link_type FROM eb_index_table eit
-                WHERE COALESCE(eit.eb_del, '') = 'F' AND (SELECT COUNT(*) from json_each_text(eit.data_json :: JSON) WHERE LOWER(value) like '%' || @searchTxt || '%') > 0 ORDER BY eit.modified_at DESC LIMIT 100; ";
+                WHERE COALESCE(eit.eb_del, 'F') = 'F' AND (SELECT COUNT(*) from json_each_text(eit.data_json :: JSON) WHERE LOWER(value) like '%' || @searchTxt || '%') > 0 ORDER BY eit.modified_at DESC LIMIT 100; ";
 
             EbDataSet ds = DataDB.DoQueries(Qry, new DbParameter[]
             {
@@ -232,11 +250,11 @@ namespace ExpressBase.Objects.WebFormRelated
         public static void InsertOrUpdate_LM(IDatabase DataDB, string JsonData, int DataId, int UserId)
         {
             string Qry = $@"UPDATE eb_index_table SET display_name = 'Lead Management', data_json = @data_json, modified_by = @eb_user_id, modified_at = {DataDB.EB_CURRENT_TIMESTAMP}
-                            WHERE link_type = @link_type AND data_id = @data_id AND COALESCE(eb_del, '') = 'F';
+                            WHERE link_type = @link_type AND data_id = @data_id AND COALESCE(eb_del, 'F') = 'F';
 
                         INSERT INTO eb_index_table (display_name, data_json, link_type, data_id, created_by, created_at, modified_by, modified_at, eb_del)
                             SELECT 'Lead Management', @data_json, @link_type, @data_id, @eb_user_id, {DataDB.EB_CURRENT_TIMESTAMP}, @eb_user_id, {DataDB.EB_CURRENT_TIMESTAMP}, 'F'
-                            WHERE NOT EXISTS (SELECT 1 FROM eb_index_table WHERE link_type = @link_type AND data_id = @data_id AND COALESCE(eb_del, '') = 'F');";
+                            WHERE NOT EXISTS (SELECT 1 FROM eb_index_table WHERE link_type = @link_type AND data_id = @data_id AND COALESCE(eb_del, 'F') = 'F');";
 
             DbParameter[] parameters = new DbParameter[]
             {
@@ -254,7 +272,7 @@ namespace ExpressBase.Objects.WebFormRelated
         {
             try
             {
-                string delQry = "UPDATE eb_index_table SET eb_del = 'T' WHERE link_type = @link_type AND data_id = @data_id AND COALESCE(eb_del, '') = 'F';";
+                string delQry = "UPDATE eb_index_table SET eb_del = 'T' WHERE link_type = @link_type AND data_id = @data_id AND COALESCE(eb_del, 'F') = 'F';";
                 int t = DataDB.DoNonQuery(delQry, new DbParameter[]
                 {
                     DataDB.GetNewParameter("link_type", EbDbTypes.Int32, (int)SH_LinkType.LM),
@@ -284,28 +302,43 @@ namespace ExpressBase.Objects.WebFormRelated
                 for (int i = 0; i < dt.Rows.Count; i++)
                 {
                     EbDataRow dr = dt.Rows[i];
-                    Dictionary<string, string> JsonData = new Dictionary<string, string>() 
-                    {
-                        { "Name", Convert.ToString(dr[5]) },
-                        { "Mobile", Convert.ToString(dr[6]) },
-                        { "Phone", Convert.ToString(dr[7]) },
-                        { "WhatsApp", Convert.ToString(dr[8]) },                        
-                    };
+                    Dictionary<string, string> JsonData = new Dictionary<string, string>();
+
+                    string _nam = Convert.ToString(dr[5]),
+                        _mob = Convert.ToString(dr[6]),
+                        _pho = Convert.ToString(dr[7]),
+                        _wap = Convert.ToString(dr[8]);
+
+                    if (!(dr.IsDBNull(5) || string.IsNullOrEmpty(_nam)))
+                        JsonData.Add("Name", _nam);
+                    if (!(dr.IsDBNull(6) || string.IsNullOrEmpty(_mob)))
+                        JsonData.Add("Mobile", _mob);
+                    if (!(dr.IsDBNull(7) || string.IsNullOrEmpty(_pho)))
+                        JsonData.Add("Phone", _pho);
+                    if (!(dr.IsDBNull(8) || string.IsNullOrEmpty(_wap)))
+                        JsonData.Add("WhatsApp", _wap);
 
                     parameters.Add(DataDB.GetNewParameter($"data_id_{i}", EbDbTypes.Int32, dr[0]));
-                    parameters.Add(DataDB.GetNewParameter($"created_by_{i}", EbDbTypes.Int32, dr[1]));
-                    parameters.Add(DataDB.GetNewParameter($"created_at_{i}", EbDbTypes.DateTime, dr[2]));
-                    parameters.Add(DataDB.GetNewParameter($"modified_by_{i}", EbDbTypes.Int32, dr[3]));
-                    parameters.Add(DataDB.GetNewParameter($"modified_at_{i}", EbDbTypes.DateTime, dr[4]));
-                    parameters.Add(DataDB.GetNewParameter($"data_json_{i}", EbDbTypes.String, JsonConvert.SerializeObject(JsonData)));
-                    
-                    
-                    upsertQry += $@"UPDATE eb_index_table SET display_name = 'Lead Management', data_json = @data_json_{i}, modified_by = @modified_by_{i}, modified_at = @modified_at_{i}
-                        WHERE link_type = @link_type AND data_id = @data_id_{i} AND COALESCE(eb_del, '') = 'F';
 
-                    INSERT INTO eb_index_table (display_name, data_json, link_type, data_id, created_by, created_at, modified_by, modified_at, eb_del)
-                        SELECT 'Lead Management', @data_json_{i}, @link_type, @data_id_{i}, @created_by_{i}, @created_at_{i}, @modified_by_{i}, @modified_at_{i}, 'F'
-                        WHERE NOT EXISTS (SELECT 1 FROM eb_index_table WHERE link_type = @link_type AND data_id = @data_id_{i} AND COALESCE(eb_del, '') = 'F');";
+                    if (JsonData.Count > 0)
+                    {
+                        parameters.Add(DataDB.GetNewParameter($"created_by_{i}", EbDbTypes.Int32, dr[1]));
+                        parameters.Add(DataDB.GetNewParameter($"created_at_{i}", EbDbTypes.DateTime, dr[2]));
+                        parameters.Add(DataDB.GetNewParameter($"modified_by_{i}", EbDbTypes.Int32, dr[3]));
+                        parameters.Add(DataDB.GetNewParameter($"modified_at_{i}", EbDbTypes.DateTime, dr[4]));
+                        parameters.Add(DataDB.GetNewParameter($"data_json_{i}", EbDbTypes.String, JsonConvert.SerializeObject(JsonData)));
+
+                        upsertQry += $@"UPDATE eb_index_table SET display_name = 'Lead Management', data_json = @data_json_{i}, modified_by = @modified_by_{i}, modified_at = @modified_at_{i}
+                        WHERE link_type = @link_type AND data_id = @data_id_{i} AND COALESCE(eb_del, 'F') = 'F';
+
+                        INSERT INTO eb_index_table (display_name, data_json, link_type, data_id, created_by, created_at, modified_by, modified_at, eb_del)
+                            SELECT 'Lead Management', @data_json_{i}, @link_type, @data_id_{i}, @created_by_{i}, @created_at_{i}, @modified_by_{i}, @modified_at_{i}, 'F'
+                            WHERE NOT EXISTS (SELECT 1 FROM eb_index_table WHERE link_type = @link_type AND data_id = @data_id_{i} AND COALESCE(eb_del, 'F') = 'F');";
+                    }
+                    else
+                    {
+                        upsertQry += $"UPDATE eb_index_table SET eb_del = 'T' WHERE link_type = @link_type AND data_id = @data_id_{i} AND COALESCE(eb_del, 'F') = 'F';";
+                    }
                 }
 
                 int temp = DataDB.DoNonQuery(upsertQry, parameters.ToArray());
@@ -314,7 +347,7 @@ namespace ExpressBase.Objects.WebFormRelated
             }
             else
             {
-                string delQry = "UPDATE eb_index_table SET eb_del = 'T' WHERE link_type = @link_type AND COALESCE(eb_del, '') = 'F';";
+                string delQry = "UPDATE eb_index_table SET eb_del = 'T' WHERE link_type = @link_type AND COALESCE(eb_del, 'F') = 'F';";
                 int t = DataDB.DoNonQuery(delQry, new DbParameter[] { DataDB.GetNewParameter("link_type", EbDbTypes.Int32, (int)SH_LinkType.LM) });
                 Console.WriteLine($"Nothing to index. Deleted old {t} records.");
                 Message += $"\nDeleted {t} records.";
