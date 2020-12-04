@@ -3,6 +3,7 @@ using ExpressBase.Common.Data;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Structures;
+using ExpressBase.Objects.Helpers;
 using ExpressBase.Objects.Objects;
 using ExpressBase.Objects.ServiceStack_Artifacts;
 using ServiceStack;
@@ -69,21 +70,23 @@ namespace ExpressBase.Objects.WebFormRelated
                     string code = stage.ApproverUsers.Code;
                     if (string.IsNullOrEmpty(code))
                         throw new FormException($"Required SQL query for {ebReviewCtrl.Name}(review) control stage {stage.Name}");
-                    MatchCollection matchColl = Regex.Matches(code, @"(?<=@)(\w+)|(?<=:)(\w+)");
-                    foreach (Match match in matchColl)
+
+                    List<Param> _params = SqlHelper.GetSqlParams(code);
+                    foreach (Param _p in _params)
                     {
-                        if (EbFormHelper.IsExtraSqlParam(match.Value, _this.TableName))
+                        if (EbFormHelper.IsExtraSqlParam(_p.Name, _this.TableName))
                         {
-                            if (!QryParms.ContainsKey(match.Value))
-                                QryParms.Add(match.Value, _this.TableName);
+                            if (!QryParms.ContainsKey(_p.Name))
+                                QryParms.Add(_p.Name, _this.TableName);
                             continue;
                         }
-                        KeyValuePair<int, EbControlWrapper> item = _dict.FirstOrDefault(e => e.Value.Control.Name == match.Value);
+                        KeyValuePair<int, EbControlWrapper> item = _dict.FirstOrDefault(e => e.Value.Control.Name == _p.Name);
                         if (item.Value == null)
-                            throw new FormException($"Can't resolve {match.Value} in {ebReviewCtrl.Name}(review) control's SQL query of stage {stage.Name}");
+                            throw new FormException($"Can't resolve {_p.Name} in {ebReviewCtrl.Name}(review) control's SQL query of stage {stage.Name}");
                         if (!QryParms.ContainsKey(item.Value.Control.Name))
                             QryParms.Add(item.Value.Control.Name, item.Value.TableName);
                     }
+
                     stage.QryParams = QryParms;
                 }
                 else if (stage.ApproverEntity == ApproverEntityTypes.UserGroup)
@@ -405,12 +408,12 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                 }
                 else if (_dict[CalcFlds[i]].Control.ValueExpr.Lang == ScriptingLanguage.SQL)
                 {
-                    MatchCollection matchColl = Regex.Matches(code, @"(?<=@)(\w+)|(?<=:)(\w+)");
-                    foreach (Match match in matchColl)
+                    List<Param> _params = SqlHelper.GetSqlParams(code);
+                    foreach(Param _p in _params)
                     {
-                        KeyValuePair<int, EbControlWrapper> item = _dict.FirstOrDefault(e => e.Value.Control.Name == match.Value);
+                        KeyValuePair<int, EbControlWrapper> item = _dict.FirstOrDefault(e => e.Value.Control.Name == _p.Name);
                         if (item.Value == null)
-                            throw new FormException($"Can't resolve {match.Value} in SQL Value expression of {_dict[CalcFlds[i]].Control.Name}");
+                            throw new FormException($"Can't resolve {_p.Name} in SQL Value expression of {_dict[CalcFlds[i]].Control.Name}");
 
                         dpndcy.Add(new KeyValuePair<int, int>(CalcFlds[i], item.Key));//<dependent, dominant>
                         _dict[CalcFlds[i]].Control.ValExpParams.Add(item.Value.Path);

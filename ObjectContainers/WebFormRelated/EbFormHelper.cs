@@ -5,6 +5,7 @@ using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
+using ExpressBase.Security;
 using ExpressBase.Objects.Objects;
 using ExpressBase.Objects.ServiceStack_Artifacts;
 using ExpressBase.Objects.WebFormRelated;
@@ -300,6 +301,48 @@ namespace ExpressBase.Objects
             return _ebObject;
         }
 
+        public static bool HasPermission(User UserObj, string RefId, string ForWhat, int LocId, bool NeglectLoc = false, string WC = TokenConstants.UC)
+        {
+            if (UserObj.Roles.Contains(SystemRoles.SolutionOwner.ToString()) ||
+                UserObj.Roles.Contains(SystemRoles.SolutionAdmin.ToString()) ||
+                UserObj.Roles.Contains(SystemRoles.SolutionPM.ToString()))
+                return true;
+
+            EbOperation Op = EbWebForm.Operations.Get(ForWhat);
+            EbObjectType EbType = RefId.GetEbObjectType();
+            if (EbType.IntCode == EbObjectTypes.Report)
+                Op = EbReport.Operations.Get(ForWhat);
+            else if (EbType.IntCode == EbObjectTypes.TableVisualization)
+                Op = EbTableVisualization.Operations.Get(ForWhat);
+
+            if (WC == TokenConstants.UC && !Op.IsAvailableInWeb)
+                return false;
+            else if (WC == TokenConstants.BC && !Op.IsAvailableInBot)
+                return false;
+            else if (WC == TokenConstants.MC && !Op.IsAvailableInMobile)
+                return false;
+
+            try
+            {
+                //Permission string format => 020-00-00982-02:5
+                string[] refidParts = RefId.Split("-");
+                string objType = refidParts[2].PadLeft(2, '0');
+                string objId = refidParts[3].PadLeft(5, '0');
+                string operation = Op.IntCode.ToString().PadLeft(2, '0');
+                string pWithLoc = objType + '-' + objId + '-' + operation + (NeglectLoc ? "" : (":" + LocId));///////////
+                string pGlobalLoc = objType + '-' + objId + '-' + operation + ":-1";
+                string temp = UserObj.Permissions.Find(p => p.Contains(pWithLoc) || p.Contains(pGlobalLoc));
+                if (temp != null)
+                    return true;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(string.Format("Exception when checking user permission: {0}\nRefId = {1}\nOperation = {2}\nLocId = {3}", e.Message, RefId, ForWhat, LocId));
+            }
+
+            return false;
+        }
+
         public static void AddExtraSqlParams(List<DbParameter> param, IDatabase DataDB, string tableName, int rowId, int locId, int userId)
         {
             if (param.Find(e => e.ParameterName == FormConstants.eb_loc_id) == null)
@@ -486,7 +529,7 @@ namespace ExpressBase.Objects
                         if (ColumnSrc != null && !(_column.Control is EbAutoId) && (!_column.Control.IsSysControl || _column.Control is EbSysLocation))
                         {
                             entry.Value[0].SetColumn(_column.ColumnName, _column.Control.GetSingleColumn(FormDes.UserObj, FormDes.SolutionObj, ColumnSrc.Value));
-                            _formattedData = Convert.ToString(ColumnSrc.Value);                            
+                            _formattedData = Convert.ToString(ColumnSrc.Value);
                         }
                         if (_column.Control is EbPowerSelect && !string.IsNullOrEmpty(_formattedData))
                         {

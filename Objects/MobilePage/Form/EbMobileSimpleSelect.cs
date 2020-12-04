@@ -224,20 +224,20 @@ namespace ExpressBase.Objects
 
         public override void UpdateWebFormControl(EbControl control)
         {
-            if (control == null || !(control is EbPowerSelect powerSelect) || !(control is EbSimpleSelect simpleSelect))
-                return;
-
-            base.UpdateWebFormControl(control);
-
-            if (IsSimpleSelect)
+            if (control != null)
             {
-                this.SetSimpleSelectOptions(simpleSelect);
-            }
-            else
-            {
-                powerSelect.DataSourceId = this.DataSourceRefId;
-                this.SetDisplayMember(powerSelect);
-                this.SetValueMember(powerSelect);
+                base.UpdateWebFormControl(control);
+
+                if (control is EbSimpleSelect simpleSelect)
+                {
+                    this.SetSimpleSelectOptions(simpleSelect);
+                }
+                else if (control is EbPowerSelect powerSelect)
+                {
+                    powerSelect.DataSourceId = this.DataSourceRefId;
+                    this.SetDisplayMember(powerSelect);
+                    this.SetValueMember(powerSelect);
+                }
             }
         }
     }

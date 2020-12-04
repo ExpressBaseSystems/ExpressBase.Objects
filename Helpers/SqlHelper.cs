@@ -13,30 +13,13 @@ namespace ExpressBase.Objects.Helpers
         public static List<Param> GetSqlParams(string sql, int obj_type)
         {
             //sql = Base64Decode(sql);
-            List<Param> param = new List<Param>();
             if (obj_type == EbObjectTypes.DataWriter || obj_type == EbObjectTypes.DataReader)
-            {
-                List<string> _temp = new List<string>();
-                sql = Regex.Replace(sql, @"'([^']*)'", string.Empty); 
-                //Regex r = new Regex(@"\:\w+|\@\w+g");
-                Regex r = new Regex(@"((?<=:(?<!::))\w+|(?<=@(?<!::))\w+)");
-
-                foreach (Match match in r.Matches(sql))
-                {
-                    if (!_temp.Contains(match.Value))
-                    {
-                        param.Add(new Param
-                        {
-                            Name = match.Value,
-                        });
-
-                        _temp.Add(match.Value);
-                    }
-                }
-                return param;
+            {                
+                return GetSqlParams(sql);
             }
             else if (!string.IsNullOrEmpty(sql) && obj_type == EbObjectTypes.SqlFunction)
             {
+                List<Param> param = new List<Param>();
                 Regex r = new Regex(@"(\w+)(\s+|)\(.*?\)");
                 Regex r1 = new Regex(@"\(.*?\)");
                 //string _func = r.Match(sql.Replace("\n", "").Replace("\r", "").Replace("\t", "")).Groups[1].Value;
@@ -57,6 +40,21 @@ namespace ExpressBase.Objects.Helpers
             }
             else
                 return null;
+        }
+
+        public static List<Param> GetSqlParams(string sql)
+        {
+            List<Param> param = new List<Param>();
+            sql = Regex.Replace(sql, @"'([^']*)'", string.Empty);
+            //Regex r = new Regex(@"\:\w+|\@\w+g");
+            Regex r = new Regex(@"((?<=:(?<!::))\w+|(?<=@(?<!::))\w+)");
+
+            foreach (Match match in r.Matches(sql))
+            {
+                if (param.Find(e => e.Name == match.Value) == null)
+                    param.Add(new Param { Name = match.Value });
+            }
+            return param;
         }
 
         private string Base64Decode(string base64EncodedData)
