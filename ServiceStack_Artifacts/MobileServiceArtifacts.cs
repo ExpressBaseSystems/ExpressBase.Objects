@@ -7,6 +7,7 @@ using ServiceStack;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using ExpressBase.Security;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
@@ -279,6 +280,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 3)]
         public List<MobilePagesWraper> ProfilePages { set; get; }
+
+        [DataMember(Order = 4)]
+        public User CurrentUser { set; get; }
+
+        [DataMember(Order = 4)]
+        public Eb_Solution CurrentSolution { set; get; }
 
         public EbMobileSolutionData()
         {
