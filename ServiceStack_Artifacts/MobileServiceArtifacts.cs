@@ -171,13 +171,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class MobileQueryDataRequest : MobileVisDataRequest
-    {
-        [DataMember(Order = 1)]
-        public string Query { set; get; }
-    }
-
-    [DataContract]
     public class MobileFormDataRequest : EbServiceStackAuthRequest, IReturn<MobileFormDataResponse>
     {
         [DataMember(Order = 1)]
@@ -198,6 +191,19 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 2)]
         public WebformData Data { set; get; }
+    }
+
+    [DataContract]
+    public class MobileProfileData
+    {
+        [DataMember(Order = 1)]
+        public string Message { set; get; }
+
+        [DataMember(Order = 2)]
+        public WebformData Data { set; get; }
+
+        [DataMember(Order = 3)]
+        public int RowId { set; get; }
     }
 
     public class MyActionsRequest : EbServiceStackAuthRequest, IReturn<MyActionsResponse>
