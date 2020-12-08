@@ -67,4 +67,14 @@
         RadarChart,
         RadialGaugeChart,
     }
+
+    public enum MobileTextWrap
+    {
+        NoWrap = 1,
+        HeadTruncation = 2,
+        CharacterWrap = 3,
+        MiddleTruncation = 4,
+        TailTruncation = 5,
+        WordWrap = 6
+    }
 }
