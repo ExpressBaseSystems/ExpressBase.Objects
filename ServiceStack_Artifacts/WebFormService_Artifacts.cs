@@ -45,6 +45,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         [DataMember(Order = 1)]
         public List<EbProfileUserType> UserTypeForms { get; set; }
+
+        [DataMember(Order = 2)]
+        public List<EbProfileUserType> UserTypeMobPages { get; set; }
     }
 
     [DataContract]
@@ -345,6 +348,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         
         [DataMember(Order = 5)]
         public int DraftId { get; set; }
+
+        [DataMember(Order = 6)]
+        public string MobilePageRefId { get; set; }
     }
 	
 	[DataContract]
