@@ -1169,4 +1169,29 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string SignOutAt { get; set; }
         public string SignOutDate { get; set; }
     }
+
+	public class BrowserExceptionMqRequest : EbMqRequest, IReturn<BrowserExceptionResponse>
+	{
+		public string Device_info { get; set; }
+
+		public string Ip_address { get; set; }
+		public string Error_msg { get; set; }
+		public string Network_info { get; set; }
+
+	}
+	public class BrowserExceptionRequest : EbMqRequest
+	{
+		public string Device_info { get; set; }
+
+		public string Ip_address { get; set; }
+		public string Error_msg { get; set; }
+		public string Network_info { get; set; }
+
+	}
+
+	public class BrowserExceptionResponse : EbServiceStackAuthRequest
+	{
+		public bool Status { get; set; }
+
+	}
 }
