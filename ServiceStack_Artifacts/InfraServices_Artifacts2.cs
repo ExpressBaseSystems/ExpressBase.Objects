@@ -428,6 +428,17 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public Dictionary<string, List<AppStore>> MasterPackages { get; set; }
     }
 
+    public class GetPrimarySolutionsRequest : EbServiceStackAuthRequest, IReturn<GetPrimarySolutionsResponse>
+    {
+
+    }
+
+    public class GetPrimarySolutionsResponse  
+    {
+        [DataMember(Order = 1)]
+        public List<EbSolutionsWrapper> PrimarySolutions { get; set; }
+    }
+
     [DataContract]
     public class GetSolutioInfoRequest : IReturn<GetSolutioInfoResponse>, IEbSSRequest
     {

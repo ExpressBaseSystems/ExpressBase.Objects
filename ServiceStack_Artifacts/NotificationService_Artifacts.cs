@@ -31,8 +31,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string Title { get; set; }
 
         public string User_AuthId { get; set; }
+		
+		public string BToken { get; set; }
 
-    }
+		public string RToken { get; set; }
+
+	}
 
     public class NotifyByUserIDResponse : IEbSSResponse
     {

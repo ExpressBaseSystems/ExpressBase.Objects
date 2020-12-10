@@ -1544,7 +1544,7 @@ namespace ExpressBase.Objects
         }
 
         //Normal save
-        public string Save(EbConnectionFactory EbConFactory, Service service)
+        public string Save(EbConnectionFactory EbConFactory, Service service, string wc)
         {
             IDatabase DataDB = EbConFactory.DataDB;
             this.DbConnection = DataDB.GetNewConnection();
@@ -1559,10 +1559,17 @@ namespace ExpressBase.Objects
                 if (IsUpdate)
                 {
                     this.RefreshFormData(DataDB, service, true, true);
+                    if (wc == TokenConstants.UC && !(EbFormHelper.HasPermission(this.UserObj, this.RefId, OperationConstants.EDIT, this.LocationId, this.IsLocIndependent) ||
+                        (this.UserObj.UserId == this.FormData.CreatedBy && EbFormHelper.HasPermission(this.UserObj, this.RefId, OperationConstants.OWN_DATA, this.LocationId, this.IsLocIndependent))))
+                        throw new FormException("Access denied to save this data entry!", (int)HttpStatusCode.Forbidden, "Access denied", "EbWebForm -> Save");
+                    
                     resp = "Updated: " + this.Update(DataDB, service);
                 }
                 else
                 {
+                    //if (wc == TokenConstants.UC && !EbFormHelper.HasPermission(this.UserObj, this.RefId, OperationConstants.NEW, this.LocationId, this.IsLocIndependent))
+                    //    throw new FormException("Access denied to save this data entry!", (int)HttpStatusCode.Forbidden, "Access denied", "EbWebForm -> Save");
+                    
                     this.TableRowId = this.Insert(DataDB, service);
                     resp = "Inserted: " + this.TableRowId;
                     Console.WriteLine("New record inserted. Table :" + this.TableName + ", Id : " + this.TableRowId);
@@ -1579,7 +1586,7 @@ namespace ExpressBase.Objects
                 resp += " - Notifications: " + EbFnGateway.SendNotifications(this, DataDB, service);
                 Console.WriteLine("EbWebForm.Save.SendMobileNotification start");
                 EbFnGateway.SendMobileNotification(this, EbConFactory);
-                //Console.WriteLine("EbWebForm.Save.InsertOrUpdate Global Search start");
+                Console.WriteLine("EbWebForm.Save.InsertOrUpdate Global Search start");
                 SearchHelper.InsertOrUpdate(DataDB, this);
                 Console.WriteLine("EbWebForm.Save.resp = " + resp);
             }
@@ -2480,39 +2487,12 @@ namespace ExpressBase.Objects
                 List<int> _temp = new List<int>();
                 foreach (EbOperation op in Operations.Enumerator)
                 {
-                    if (this.HasPermission(op.Name, locid))
+                    if (EbFormHelper.HasPermission(this.UserObj, RefId, op.Name, locid))
                         _temp.Add(op.IntCode);
                 }
                 _perm.Add(locid, _temp);
             }
             return _perm;
-        }
-
-        public bool HasPermission(string ForWhat, int LocId)
-        {
-            if (this.UserObj.Roles.Contains(SystemRoles.SolutionOwner.ToString()) ||
-                this.UserObj.Roles.Contains(SystemRoles.SolutionAdmin.ToString()) ||
-                this.UserObj.Roles.Contains(SystemRoles.SolutionPM.ToString()))
-                return true;
-
-            EbOperation Op = EbWebForm.Operations.Get(ForWhat);
-            if (!Op.IsAvailableInWeb)
-                return false;
-
-            try
-            {
-                string Ps = string.Concat(this.RefId.Split("-")[2].PadLeft(2, '0'), '-', this.RefId.Split("-")[3].PadLeft(5, '0'), '-', Op.IntCode.ToString().PadLeft(2, '0'));
-                string t = this.UserObj.Permissions.FirstOrDefault(p => p.Substring(p.IndexOf("-") + 1).Equals(Ps + ":" + LocId) ||
-                            (p.Substring(p.IndexOf("-") + 1, 11).Equals(Ps) && p.Substring(p.LastIndexOf(":") + 1).Equals("-1")));
-                if (!t.IsNullOrEmpty())
-                    return true;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Exception when checking user permission(EbWebForm -> HasPermission): " + e.Message);
-            }
-
-            return false;
         }
 
         public void AfterRedisGet(Service service)

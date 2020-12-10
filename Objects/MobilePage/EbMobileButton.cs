@@ -1,4 +1,5 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Constants;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
@@ -17,7 +18,6 @@ namespace ExpressBase.Objects
         public override bool Required { get; set; }
         public override bool Hidden { set; get; }
         public override EbScript ValueExpr { get; set; }
-        public override EbScript HiddenExpr { get; set; }
         public override EbScript DisableExpr { get; set; }
         public override EbScript DefaultValueExpression { get; set; }
         public override List<EbMobileValidator> Validators { set; get; }
@@ -79,67 +79,67 @@ namespace ExpressBase.Objects
         #endregion 
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("UI")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         public int RowSpan { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("UI")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         public int ColumnSpan { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("UI")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [DefaultPropValue("30")]
         public int Width { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("UI")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [DefaultPropValue("30")]
         public int Height { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("UI")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         public string Text { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("UI")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [UIproperty]
         [PropertyEditor(PropertyEditorType.FontSelector)]
         public EbFont Font { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("UI")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [PropertyEditor(PropertyEditorType.Color)]
         public string BackgroundColor { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("UI")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         public int BorderThickness { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("UI")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [PropertyEditor(PropertyEditorType.Color)]
         public string BorderColor { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("UI")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         public int BorderRadius { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("UI")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         public bool RenderTextAsIcon { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("UI")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [Alias("Align X")]
         public MobileHorrizontalAlign HorrizontalAlign { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("UI")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [Alias("Align Y")]
         public MobileVerticalAlign VerticalAlign { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup("UI")]
+        [PropertyGroup(PGConstants.BEHAVIOR)]
         public bool HideInContext { set; get; }
 
         public override string GetDesignHtml()

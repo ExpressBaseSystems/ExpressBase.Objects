@@ -45,6 +45,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         [DataMember(Order = 1)]
         public List<EbProfileUserType> UserTypeForms { get; set; }
+
+        [DataMember(Order = 2)]
+        public List<EbProfileUserType> UserTypeMobPages { get; set; }
     }
 
     [DataContract]
@@ -345,6 +348,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         
         [DataMember(Order = 5)]
         public int DraftId { get; set; }
+
+        [DataMember(Order = 6)]
+        public string MobilePageRefId { get; set; }
     }
 	
 	[DataContract]
@@ -607,6 +613,23 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
+    public class UpdateIndexesRequest : EbServiceStackAuthRequest, IReturn<UpdateIndexesRespone>
+    {
+        [DataMember(Order = 1)]
+        public string RefId { get; set; }
+    }
+
+    [DataContract]
+    public class UpdateIndexesRespone : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public string Message { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    [DataContract]
     public class DeleteDataFromWebformRequest : EbServiceStackAuthRequest, IReturn<DeleteDataFromWebformResponse>
     {
         [DataMember(Order = 1)]
@@ -818,7 +841,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
     public class GetMyProfileEntryRequest : EbServiceStackAuthRequest, IReturn<GetMyProfileEntryResponse>
     {
-        public string TableName { get; set; }
+        //public string TableName { get; set; }
     }
 
     public class GetMyProfileEntryResponse:IEbSSResponse
@@ -828,6 +851,15 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 2)]
         public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 3)]
+        public string Refid { get; set; }        
+
+        [DataMember(Order = 4)]
+        public bool ProfileExist { get; set; }
+
+        [DataMember(Order = 5)]
+        public string ErrorMessage { get; set; }
     }
 
     [DataContract]
