@@ -50,11 +50,11 @@ namespace ExpressBase.Objects
         [PropertyGroup(PGConstants.CORE)]
         [OnChangeExec(@"
                 if ([1,3,5].includes(this.RenderAs)){ 
-                        pg.ShowPropertiesExt(['TextFormat','Font']);
+                        pg.ShowPropertiesExt(['TextFormat','Font','TextWrap']);
                         pg.HidePropertiesExt(['BorderRadius','Height','Width']);
                 }
                 else {
-                        pg.HideProperty('TextFormat');
+                        pg.HidePropertiesExt(['TextFormat','TextWrap']);
                         pg.ShowPropertiesExt(['BorderRadius','Height','Width','Font']);
                         if(this.RenderAs === 2){
                             pg.HideProperty('Font');
@@ -81,6 +81,10 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup(PGConstants.APPEARANCE)]
         public string TextFormat { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        public MobileTextWrap TextWrap { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup(PGConstants.APPEARANCE)]
@@ -252,6 +256,10 @@ namespace ExpressBase.Objects
         [PropertyGroup(PGConstants.APPEARANCE)]
         [PropertyEditor(PropertyEditorType.FontSelector)]
         public EbFont Font { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        public MobileTextWrap TextWrap { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup(PGConstants.APPEARANCE)]

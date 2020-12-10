@@ -853,7 +853,13 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
 
         [DataMember(Order = 3)]
-        public string Refid { get; set; }
+        public string Refid { get; set; }        
+
+        [DataMember(Order = 4)]
+        public bool ProfileExist { get; set; }
+
+        [DataMember(Order = 5)]
+        public string ErrorMessage { get; set; }
     }
 
     [DataContract]
