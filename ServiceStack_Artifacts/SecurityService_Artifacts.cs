@@ -1170,7 +1170,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string SignOutDate { get; set; }
     }
 
-	public class BrowserExceptionMqRequest : EbMqRequest, IReturn<BrowserExceptionResponse>
+	public class BrowserExceptionMqRequest : EbServiceStackAuthRequest, IReturn<BrowserExceptionResponse>
     {
 		public string Device_info { get; set; }
 
