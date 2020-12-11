@@ -63,6 +63,11 @@ namespace ExpressBase.Objects.Services
             this.ServiceStackClient = _ssclient as JsonServiceClient;
         }
 
+		public EbMqBaseService(IEbConnectionFactory _dbf)
+        {
+			this.EbConnectionFactory = _dbf as EbConnectionFactory;
+		}
+
         public EbMqBaseService(IEbConnectionFactory _dbf, IServiceClient _ssclient)
         {
             this.EbConnectionFactory = _dbf as EbConnectionFactory;
