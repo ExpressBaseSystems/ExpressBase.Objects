@@ -46,12 +46,22 @@ namespace ExpressBase.Objects.WebFormRelated
 
             if (_this.DataPushers?.Count > 0)
             {
-                foreach(EbDataPusher dp in _this.DataPushers)
+                foreach (EbDataPusher dp in _this.DataPushers)
                 {
-                    if (string.IsNullOrEmpty(dp.FormRefId))
-                        throw new FormException($"Required 'Form ref id' for data pushers");
+                    if (dp is EbApiDataPusher)
+                    {
+                        if (string.IsNullOrEmpty((dp as EbApiDataPusher).ApiRefId))
+                            throw new FormException($"Required 'Api ref id' for data pusher");
+                    }
+                    else
+                    {
+                        //Can convert to EbFormDataPusher here!!!
+
+                        if (string.IsNullOrEmpty(dp.FormRefId))
+                            throw new FormException($"Required 'Form ref id' for data pusher");
+                    }
                     if (string.IsNullOrEmpty(dp.Json))
-                        throw new FormException($"Required 'Json' for data pushers");
+                        throw new FormException($"Required 'Json' for data pusher");
                 }
             }
         }
@@ -242,7 +252,7 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                         throw new FormException("Set Display Members for " + _label);
                     EbDbTypes _t = _ctrl.ValueMember.Type;
                     if (!(_t == EbDbTypes.Int || _t == EbDbTypes.Int || _t == EbDbTypes.UInt32 || _t == EbDbTypes.UInt64 || _t == EbDbTypes.Int32 || _t == EbDbTypes.Int64 || _t == EbDbTypes.Decimal || _t == EbDbTypes.Double))
-                        throw new FormException("Set numeric value member for " + _label);                   
+                        throw new FormException("Set numeric value member for " + _label);
                 }
                 else if (Allctrls[i] is EbUserControl)
                 {
@@ -353,13 +363,13 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                         t = (ctrl as EbControlContainer).TableName;
                     PerformRequirdUpdate(ctrl as EbControlContainer, t);
                 }
-				else if(ctrl is EbTagInput)
-				{
-					if ((ctrl as EbTagInput).AutoSuggestion)
-						(ctrl as EbTagInput).TableName = _tbl;
-				}			
+                else if (ctrl is EbTagInput)
+                {
+                    if ((ctrl as EbTagInput).AutoSuggestion)
+                        (ctrl as EbTagInput).TableName = _tbl;
+                }
 
-			}
+            }
         }
 
         //Populate Property DependedValExp
@@ -409,7 +419,7 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                 else if (_dict[CalcFlds[i]].Control.ValueExpr.Lang == ScriptingLanguage.SQL)
                 {
                     List<Param> _params = SqlHelper.GetSqlParams(code);
-                    foreach(Param _p in _params)
+                    foreach (Param _p in _params)
                     {
                         KeyValuePair<int, EbControlWrapper> item = _dict.FirstOrDefault(e => e.Value.Control.Name == _p.Name);
                         if (item.Value == null)
@@ -486,7 +496,7 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                             throw new FormException($"Can't resolve parameter {_p.Name} in data reader of {_dict[i].Control.Name}");
                     }
                 }
-            }            
+            }
         }
 
         private static void GetValExpDependentsRec(List<int> execOrder, List<KeyValuePair<int, int>> dpndcy, int seeker)

@@ -29,6 +29,7 @@ using ExpressBase.CoreBase.Globals;
 using System.Net;
 using System.Threading;
 using ExpressBase.Common.Security;
+using System.Threading.Tasks;
 
 namespace ExpressBase.Objects
 {
@@ -69,7 +70,7 @@ namespace ExpressBase.Objects
 
         public bool IsLocEditable { get; set; }
 
-        public bool ExeDataPusher { get; set; }
+        public int FormDataPusherCount { get; set; }
 
         public EbDataPusherConfig DataPusherConfig { get; set; }
 
@@ -1068,21 +1069,23 @@ namespace ExpressBase.Objects
         //For Normal Mode
         public void RefreshFormData(IDatabase DataDB, Service service, bool backup = false, bool includePushData = false)
         {
-            int formCount = (this.ExeDataPusher && includePushData) ? this.DataPushers.Count + 1 : 1;
+            int formCount = (this.FormDataPusherCount > 0 && includePushData) ? this.FormDataPusherCount + 1 : 1;
             string[] psquery = new string[formCount];
             int[] qrycount = new int[formCount];
             EbWebForm[] _FormCollection = new EbWebForm[formCount];
             string query = QueryGetter.GetSelectQuery(this, DataDB, service, out psquery[0], out qrycount[0]);
             _FormCollection[0] = this;
 
-            if (this.ExeDataPusher && includePushData)
+            if (this.FormDataPusherCount > 0 && includePushData)
             {
-                for (int i = 0; i < this.DataPushers.Count; i++)
+                for (int i = 0, j = 1; i < this.DataPushers.Count; i++)
                 {
-                    query += QueryGetter.GetSelectQuery(this.DataPushers[i].WebForm, DataDB, service, out psquery[i + 1], out qrycount[i + 1]);
+                    if (this.DataPushers[i] is EbApiDataPusher)
+                        continue;
+                    query += QueryGetter.GetSelectQuery(this.DataPushers[i].WebForm, DataDB, service, out psquery[j], out qrycount[j]);
                     this.DataPushers[i].WebForm.UserObj = this.UserObj;
                     this.DataPushers[i].WebForm.SolutionObj = this.SolutionObj;
-                    _FormCollection[i + 1] = this.DataPushers[i].WebForm;
+                    _FormCollection[j++] = this.DataPushers[i].WebForm;
                 }
             }
 
@@ -1589,6 +1592,7 @@ namespace ExpressBase.Objects
                 Console.WriteLine("EbWebForm.Save.InsertOrUpdate Global Search start");
                 SearchHelper.InsertOrUpdate(DataDB, this);
                 Console.WriteLine("EbWebForm.Save.resp = " + resp);
+                //Task.Run(() => EbDataPushHelper.ProcessApiDataPushers(this, service, DataDB));
             }
             catch (FormException ex1)
             {
@@ -1624,7 +1628,7 @@ namespace ExpressBase.Objects
             string _extqry = string.Empty;
             List<DbParameter> param = new List<DbParameter>();
             int i = 0;
-            if (this.ExeDataPusher)
+            if (this.FormDataPusherCount > 0)
                 this.PrepareWebFormData();
 
             this.FormCollection.Insert(DataDB, param, ref fullqry, ref _extqry, ref i);
@@ -1719,7 +1723,7 @@ namespace ExpressBase.Objects
             string _extqry = string.Empty;
             List<DbParameter> param = new List<DbParameter>();
             int i = 0;
-            if (this.ExeDataPusher)
+            if (this.FormDataPusherCount > 0)
                 this.PrepareWebFormData();
 
             this.FormCollection.Update(DataDB, param, ref fullqry, ref _extqry, ref i);

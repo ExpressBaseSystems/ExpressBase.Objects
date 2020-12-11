@@ -258,6 +258,8 @@ namespace ExpressBase.Objects
             {
                 foreach (EbDataPusher pusher in _this.DataPushers)
                 {
+                    if (pusher is EbApiDataPusher)
+                        continue;
                     EbWebForm _form = GetEbObject<EbWebForm>(pusher.FormRefId, client, Redis, service);
                     _form.RefId = pusher.FormRefId;
                     _form.UserObj = _this.UserObj;
@@ -266,7 +268,7 @@ namespace ExpressBase.Objects
                     _form.DataPusherConfig = new EbDataPusherConfig { SourceTable = _this.FormSchema.MasterTable, MultiPushId = _this.RefId + "_" + pusher.Name };
                     pusher.WebForm = _form;
                     _this.FormCollection.Add(_form);
-                    _this.ExeDataPusher = true;
+                    _this.FormDataPusherCount++;
                 }
             }
         }

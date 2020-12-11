@@ -195,7 +195,7 @@ namespace ExpressBase.Objects.WebFormRelated
             fG_WebForm.eb_created_by = _this.TableRowId <= 0 ? _this.UserObj.UserId : _formdata.CreatedBy;
             fG_WebForm.eb_created_at = _this.TableRowId <= 0 ? DateTime.UtcNow.ConvertFromUtc(_this.UserObj.Preference.TimeZone).ToString(FormConstants.yyyyMMdd_HHmmss, CultureInfo.InvariantCulture) : _formdata.CreatedAt;
             GetCSharpFormGlobalsRec_NEW(fG_WebForm, _this, _formdata, _formdataBkUp);
-            int mode = _this.ExeDataPusher ? 1 : 2;
+            int mode = _this.FormDataPusherCount > 0 ? 1 : 2;
             return new FG_Root(fG_WebForm, fG_User, fG_System, mode);
         }
 
