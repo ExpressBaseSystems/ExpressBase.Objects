@@ -16,8 +16,7 @@ namespace ExpressBase.Objects
         public override bool ReadOnly { get; set; }
         public override bool DoNotPersist { get; set; }
         public override bool Required { get; set; }
-        public override bool Hidden { set; get; }
-        public override EbScript ValueExpr { get; set; }
+
         public override EbScript DisableExpr { get; set; }
         public override EbScript DefaultValueExpression { get; set; }
         public override List<EbMobileValidator> Validators { set; get; }
@@ -51,16 +50,14 @@ namespace ExpressBase.Objects
         [PropertyGroup(PGConstants.CORE)]
         [OnChangeExec(@"
                 if ([1,3,5].includes(this.RenderAs)){ 
-                        pg.ShowPropertiesExt(['TextFormat','Font']);
+                        pg.ShowPropertiesExt(['TextFormat','Font','TextWrap']);
                         pg.HidePropertiesExt(['BorderRadius','Height','Width']);
                 }
                 else {
-                        pg.HidePropertiesExt(['TextFormat','Font','BorderRadius']);
+                        pg.HidePropertiesExt(['TextFormat','TextWrap']);
+                        pg.ShowPropertiesExt(['BorderRadius','Height','Width','Font']);
                         if(this.RenderAs === 2){
-                            pg.ShowPropertiesExt(['BorderRadius','Height','Width']);
-                        }
-                        else if(this.RenderAs === 6){
-                            pg.ShowPropertiesExt(['BorderRadius','Height','Width','Font']);
+                            pg.HideProperty('Font');
                         }
                 }
             ")]
@@ -70,11 +67,6 @@ namespace ExpressBase.Objects
         [UIproperty]
         [PropertyGroup(PGConstants.APPEARANCE)]
         [PropertyEditor(PropertyEditorType.Color)]
-        [OnChangeExec(@"
-                if (this.BackgroundColor !== ''){ 
-                        $(`#${this.EbSid}`).style('background-color',this.BackgroundColor);
-                }
-            ")]
         public string BackgroundColor { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
@@ -84,9 +76,6 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup(PGConstants.APPEARANCE)]
         [PropertyEditor(PropertyEditorType.FontSelector)]
-        [OnChangeExec(@"
-                setFontCss(this.Font,$(`#${this.EbSid}`));
-            ")]
         public EbFont Font { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
@@ -95,28 +84,16 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup(PGConstants.APPEARANCE)]
+        public MobileTextWrap TextWrap { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         [Alias("Align X")]
-        [OnChangeExec(@"
-                if (this.HorrizontalAlign !== 3 && [2,6].includes(this.RenderAs)){ 
-                        pg.ShowProperty('Width');
-                }
-                else {
-                        pg.HideProperty('Width');
-                }
-            ")]
         public MobileHorrizontalAlign HorrizontalAlign { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup(PGConstants.APPEARANCE)]
         [Alias("Align Y")]
-        [OnChangeExec(@"
-                if (this.VerticalAlign !== 3 && [2,6].includes(this.RenderAs)){ 
-                        pg.ShowProperty('Height');
-                }
-                else {
-                        pg.HideProperty('Height');
-                }
-            ")]
         public MobileVerticalAlign VerticalAlign { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
@@ -249,9 +226,7 @@ namespace ExpressBase.Objects
         public override bool ReadOnly { get; set; }
         public override bool DoNotPersist { get; set; }
         public override bool Required { get; set; }
-        public override bool Hidden { set; get; }
-        public override EbScript ValueExpr { get; set; }
-        //public override EbScript HiddenExpr { get; set; }
+
         public override EbScript DisableExpr { get; set; }
         public override EbScript DefaultValueExpression { get; set; }
         public override List<EbMobileValidator> Validators { set; get; }
@@ -280,10 +255,11 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup(PGConstants.APPEARANCE)]
         [PropertyEditor(PropertyEditorType.FontSelector)]
-        [OnChangeExec(@"
-                setFontCss(this.Font,$(`#${this.EbSid}`));
-            ")]
         public EbFont Font { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        public MobileTextWrap TextWrap { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup(PGConstants.APPEARANCE)]
@@ -293,11 +269,6 @@ namespace ExpressBase.Objects
         [UIproperty]
         [PropertyGroup(PGConstants.APPEARANCE)]
         [PropertyEditor(PropertyEditorType.Color)]
-        [OnChangeExec(@"
-                if (this.BackgroundColor !== ''){ 
-                        $(`#${this.EbSid}`).style('background-color',this.BackgroundColor);
-                }
-            ")]
         public string BackgroundColor { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
@@ -311,27 +282,11 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup(PGConstants.APPEARANCE)]
         [Alias("Align X")]
-        [OnChangeExec(@"
-                if (this.HorrizontalAlign !== 3){ 
-                        pg.ShowProperty('Width');
-                }
-                else {
-                        pg.HideProperty('Width');
-                }
-            ")]
         public MobileHorrizontalAlign HorrizontalAlign { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup(PGConstants.APPEARANCE)]
         [Alias("Align Y")]
-        [OnChangeExec(@"
-                if (this.VerticalAlign !== 3){ 
-                        pg.ShowProperty('Height');
-                }
-                else {
-                        pg.HideProperty('Height');
-                }
-            ")]
         public MobileVerticalAlign VerticalAlign { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]

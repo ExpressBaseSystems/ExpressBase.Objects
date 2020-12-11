@@ -62,6 +62,10 @@ namespace ExpressBase.Objects
         public int PageLength { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Data")]
+        public string MessageOnEmpty { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
         public List<Param> DataSourceParams { get; set; }
 

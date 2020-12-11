@@ -413,6 +413,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [JsonIgnore]
         public bool ShowCheckbox { get; set; }
+        
+        [JsonIgnore]
+        public string TableId { get; set; }
 
         [JsonIgnore]
         private int _currentLevel = 0;
@@ -550,6 +553,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             {
                 string tempstr = string.Empty;
                 string _singleLevelTempStr = string.Empty;
+                string _checkboxString = (ShowCheckbox) ? "<td class='rowgroupheadercheckboxtd'><input type='checkbox' class='" + TableId + "_rowgroupheadercheckbox'/></td>" : string.Empty;
 
                 if (IsMultiLevel)
                 {
@@ -557,8 +561,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
                         tempstr += "<td> &nbsp;</td>";
                     string cleanedHeaderText = (CurrentLevel == 1) ? GroupingTexts[CurrentLevel - 1].Substring(2, GroupingTexts[CurrentLevel - 1].Length - 2) : GroupingTexts[CurrentLevel - 1];
                     string GroupingColumnName = RowGroupingColumns[CurrentLevel - 1].sTitle;
-                    base.Html = string.Format("<tr class='group' group='{0}'>{1}<td><i class='fa fa-minus-square-o' style='cursor:pointer;'></i></td><td colspan='{2}'>{3}: <b>{4}</b> ({5})</td></tr>",
-                    base.CurrentLevel, tempstr, base.ColumnCount.ToString(), GroupingColumnName, cleanedHeaderText, (CurrentLevel == TotalLevels) ? base.GroupingCount.ToString() : base.LevelCount.ToString());
+                    base.Html = string.Format("<tr class='group' group='{0}'>{1}<td><i class='fa fa-minus-square-o' style='cursor:pointer;'></i></td>{6}<td colspan='{2}'><div style='display:inline'>{3}: <b>{4}</b> ({5})</div><div class='rowgrouprowcount' style='display:inline'></div></td></tr>",
+                    base.CurrentLevel, tempstr, base.ColumnCount.ToString(), GroupingColumnName, cleanedHeaderText, (CurrentLevel == TotalLevels) ? base.GroupingCount.ToString() : base.LevelCount.ToString(), _checkboxString);
                 }
                 else
                 {
@@ -574,8 +578,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
                         count++;
                     }
-                    base.Html = string.Format("<tr class='group' group='{0}'>{1}<td><i class='fa fa-minus-square-o' style='cursor:pointer;'></i></td><td colspan='{2}'>{3} ({4})</td></tr>",
-                         1, tempstr, base.ColumnCount.ToString(), _singleLevelTempStr, base.GroupingCount + 1);
+                    base.Html = string.Format("<tr class='group' group='{0}'>{1}<td><i class='fa fa-minus-square-o' style='cursor:pointer;'></i></td>{5}<td colspan='{2}'>{3} ({4})</td></tr>",
+                         1, tempstr, base.ColumnCount.ToString(), _singleLevelTempStr, base.GroupingCount + 1, _checkboxString);
                 }
             }
         }

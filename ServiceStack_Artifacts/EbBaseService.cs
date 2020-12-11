@@ -141,6 +141,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
             this.MessageQueueClient = _mqc as RabbitMqQueueClient;
             this.ServerEventClient = _sec as EbServerEventClient;
         }
+        public EbBaseService(IEbConnectionFactory _dbf, IMessageProducer _mqp, IEbServerEventClient _sec)
+        {
+            this.EbConnectionFactory = _dbf as EbConnectionFactory;
+            this.MessageProducer3 = _mqp as RabbitMqProducer;
+            this.ServerEventClient = _sec as EbServerEventClient;
+        }
 
         public EbBaseService(IEbConnectionFactory _dbf, IMessageProducer _mqp, IMessageQueueClient _mqc, IEbMqClient _mq)
         {
