@@ -1171,7 +1171,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
 	public class BrowserExceptionMqRequest : EbMqRequest, IReturn<BrowserExceptionResponse>
-	{
+    {
 		public string Device_info { get; set; }
 
 		public string Ip_address { get; set; }
@@ -1189,9 +1189,11 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
 	}
 
-	public class BrowserExceptionResponse : EbServiceStackAuthRequest
-	{
+	public class BrowserExceptionResponse : IEbSSResponse
+    {
 		public bool Status { get; set; }
 
-	}
+       public ResponseStatus ResponseStatus { get; set; }
+
+    }
 }
