@@ -50,7 +50,17 @@ namespace ExpressBase.Objects
         public override EbDbTypes EbDbType { get { return EbDbTypes.Decimal; } }
 
         [JsonIgnore]
-        public override string GetValueFromDOMJSfn { get { return @" return parseFloat($('#' + this.EbSid_CtxId).val()) || 0; "; } set { } }
+        public override string GetValueFromDOMJSfn
+        {
+            get
+            {
+                return @" 
+                if(this.InputMode == 1)
+                { return parseFloat($('#' + this.EbSid_CtxId).val().replace(/,/g, '')) || 0; }
+                else{ return parseFloat($('#' + this.EbSid_CtxId).val()) || 0;}";
+            }
+            set { } 
+        }
 
         [JsonIgnore]
         public override string GetDisplayMemberFromDOMJSfn { get { return @"return $('#' + this.EbSid_CtxId).val();"; } set { } }
@@ -246,5 +256,6 @@ else {
                 F = _displayMember
             };
         }
+
     }
 }
