@@ -11,11 +11,15 @@ using System.Text.RegularExpressions;
 using System.Net;
 using ExpressBase.Objects.WebFormRelated;
 using ExpressBase.Common.Constants;
+using ServiceStack;
+using ExpressBase.CoreBase.Globals;
+using System.Data.Common;
 
 namespace ExpressBase.Objects
 {
     [UsedWithTopObjectParent(typeof(EbObject))]
     [EnableInBuilder(BuilderType.WebForm)]
+    [HideInPropertyGrid]
     public class EbDataPusher
     {
         public EbDataPusher() { }
@@ -23,7 +27,7 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [EnableInBuilder(BuilderType.WebForm)]
         [OSE_ObjectTypes(EbObjectTypes.iWebForm)]
-        public string FormRefId { get; set; }
+        public virtual string FormRefId { get; set; }
 
         [PropertyEditor(PropertyEditorType.String)]
         [EnableInBuilder(BuilderType.WebForm)]
@@ -34,8 +38,7 @@ namespace ExpressBase.Objects
         public string EbSid { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
-        [Alias("Multi push id")]
-        public string Name { get; set; }
+        public virtual string Name { get; set; }
 
         [PropertyEditor(PropertyEditorType.String)]
         [EnableInBuilder(BuilderType.WebForm)]
@@ -43,9 +46,48 @@ namespace ExpressBase.Objects
 
         [PropertyEditor(PropertyEditorType.String)]
         [EnableInBuilder(BuilderType.WebForm)]
-        public string SkipLineItemIf { get; set; }
+        public virtual string SkipLineItemIf { get; set; }
 
         public EbWebForm WebForm { get; set; }
+    }
+
+    [Alias("Webform")]
+    [EnableInBuilder(BuilderType.WebForm)]
+    public class EbFormDataPusher : EbDataPusher
+    {
+        public EbFormDataPusher() { }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [Alias("Multi push id")]
+        public override string Name { get; set; }
+
+        #region commented for backward compatibility
+        //[PropertyEditor(PropertyEditorType.ObjectSelector)]
+        //[EnableInBuilder(BuilderType.WebForm)]
+        //[OSE_ObjectTypes(EbObjectTypes.iWebForm)]
+        //public string FormRefId { get; set; }
+
+        //[PropertyEditor(PropertyEditorType.String)]
+        //[EnableInBuilder(BuilderType.WebForm)]
+        //public string SkipLineItemIf { get; set; }
+
+        //public EbWebForm WebForm { get; set; }
+        #endregion
+    }
+
+    [Alias("Internal API")]
+    [EnableInBuilder(BuilderType.WebForm)]
+    public class EbApiDataPusher : EbDataPusher
+    {
+        public EbApiDataPusher() { }
+
+        public override string FormRefId { get; set; }
+        public override string SkipLineItemIf { get; set; }
+
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [OSE_ObjectTypes(EbObjectTypes.iApi)]
+        public string ApiRefId { get; set; }
     }
 
     public class EbDataPusherConfig
@@ -79,6 +121,8 @@ namespace ExpressBase.Objects
 
             foreach (EbDataPusher pusher in this.WebForm.DataPushers)
             {
+                if (pusher is EbApiDataPusher)
+                    continue;
                 pusher.WebForm.DataPusherConfig.SourceRecId = this.WebForm.TableRowId;
                 pusher.WebForm.RefId = pusher.FormRefId;
                 pusher.WebForm.UserObj = this.WebForm.UserObj;
@@ -218,6 +262,8 @@ namespace ExpressBase.Objects
             int Index = 1;
             foreach (EbDataPusher pusher in this.WebForm.DataPushers)
             {
+                if (pusher is EbApiDataPusher)
+                    continue;
                 string PusherWrapIf = string.Empty, PusherFnCall = string.Empty;
                 if (!string.IsNullOrEmpty(pusher.PushOnlyIf))
                 {
@@ -302,7 +348,7 @@ catch (Exception e)
             return s;
         }
 
-        //============================== Excel Import start ===============================
+        #region _______________Excel_Import_______________
 
         public string GetPusherJson(EbDataTable Data)
         {
@@ -395,6 +441,136 @@ catch (Exception e)
             this.WebForm.MergeFormData();
         }
 
-        //============================== Excel Import end ===============================
+        #endregion Excel_Import
+
+        #region _____________Api_data_pusher_____________
+
+        public string GetProcessedCode()
+        {
+            this.CodeDict = new Dictionary<int, string>();
+            string FnDef = string.Empty, FnCall = string.Empty;
+            int Index = 1;
+            foreach (EbApiDataPusher pusher in this.WebForm.DataPushers.FindAll(e => e is EbApiDataPusher))
+            {
+                string PusherWrapIf = string.Empty, PusherFnCall = string.Empty;
+                if (!string.IsNullOrEmpty(pusher.PushOnlyIf))
+                {
+                    this.CodeDict.Add(Index, pusher.PushOnlyIf);
+                    FnDef += GetFunctionDefinition(pusher.PushOnlyIf, Index);
+                    FnCall += GetFunctionCall(Index);
+                    PusherWrapIf = GetWrappedFnCall(Index, true);
+                    Index++;
+                }
+
+                JObject JObj = JObject.Parse(pusher.Json);
+                foreach (KeyValuePair<string, JToken> jRow in JObj)
+                {
+                    this.CodeDict.Add(Index, jRow.Value.ToString());
+                    FnDef += GetFunctionDefinition(jRow.Value.ToString(), Index);
+                    PusherFnCall += GetFunctionCall(Index);
+                    Index++;
+                }
+                if (PusherWrapIf == string.Empty)
+                    FnCall += PusherFnCall;
+                else
+                    FnCall += PusherWrapIf.Replace("@InnerCode@", PusherFnCall);
+            }
+            if (FnDef == string.Empty)
+                return string.Empty;
+
+            return FnDef + "Dictionary<int, object[]> out_dict = new Dictionary<int, object[]>();\n" + FnCall + "return out_dict;";
+        }
+
+        public void CallApiInApiDataPushers(object out_dict, Service service)
+        {
+            Dictionary<int, object[]> OutputDict = (Dictionary<int, object[]>)out_dict;
+            int Index = 1;
+
+            foreach (EbApiDataPusher pusher in this.WebForm.DataPushers.FindAll(e => e is EbApiDataPusher))
+            {
+                bool allowPush = false;
+                if (!string.IsNullOrEmpty(pusher.PushOnlyIf))
+                {
+                    object status = this.GetValueFormOutDict(OutputDict, ref Index);
+                    if (Convert.ToBoolean(status))
+                        allowPush = true;
+                }
+                else
+                    allowPush = true;
+
+                if (allowPush)
+                {
+                    JObject JObj = JObject.Parse(pusher.Json);
+                    Dictionary<string, object> RqstObj = new Dictionary<string, object>();
+                    foreach (KeyValuePair<string, JToken> jRow in JObj)
+                    {
+                        object val = this.GetValueFormOutDict(OutputDict, ref Index);
+                        RqstObj.Add(jRow.Key, val);
+                    }
+
+                    EbApi Api = EbFormHelper.GetEbObject<EbApi>(pusher.ApiRefId, null, service.Redis, service);
+
+                    ApiResponse result = service.Gateway.Send<ApiResponse>(new ApiRequest
+                    {
+                        Name = Api.Name,
+                        Version = Api.VersionNumber,
+                        Data = RqstObj,
+                        SolnId = this.WebForm.SolutionObj.SolutionID,
+                        UserAuthId = this.WebForm.UserObj.AuthId,
+                        UserId = this.WebForm.UserObj.UserId,
+                        WhichConsole = this.WebForm.UserObj.wc
+                    });
+                }
+            }
+        }
+
+        public static void ProcessApiDataPushers(EbWebForm _this, Service service, IDatabase DataDB) 
+        {
+            if (_this.DataPushers == null)
+                return;
+            if (!_this.DataPushers.Exists(e => e is EbApiDataPusher))
+                return;
+            try
+            {
+                FG_Root globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(_this, _this.FormData, _this.FormDataBackup);
+                EbDataPushHelper ebDataPushHelper = new EbDataPushHelper(_this);
+                string code = ebDataPushHelper.GetProcessedCode();
+                if (code != string.Empty)
+                {
+                    object out_dict = _this.ExecuteCSharpScriptNew(code, globals);
+                    ebDataPushHelper.CallApiInApiDataPushers(out_dict, service);
+                }
+            }
+            catch (Exception ex) 
+            {
+                //List<DbParameter> _params = new List<DbParameter>() 
+                //{ 
+                //    DataDB.GetNewParameter("display_name", EbDbTypes.String, _this.DisplayName),
+                //    DataDB.GetNewParameter("ref_id", EbDbTypes.String, _this.RefId),
+                //    DataDB.GetNewParameter("data_id", EbDbTypes.Int32, _this.TableRowId),
+                //    DataDB.GetNewParameter("created_by", EbDbTypes.Int32, _this.UserObj.UserId),
+                //    DataDB.GetNewParameter("modified_by", EbDbTypes.Int32, _this.UserObj.UserId),
+                //};
+                //int i = 0;
+                //string fullQry = string.Empty;
+                //foreach (EbApiDataPusher pusher in _this.DataPushers.FindAll(e => e is EbApiDataPusher))
+                //{
+                //    fullQry += GetFailLogInsertQuery(DataDB, i);
+                //    _params.Add(DataDB.GetNewParameter($"api_name_{i}", EbDbTypes.String, pusher.Name));
+                //    _params.Add(DataDB.GetNewParameter($"message_{i}", EbDbTypes.String, ex.Message));
+                //    i++;
+                //}
+
+                //int stat = DataDB.DoNonQuery(fullQry, _params.ToArray());
+            }
+        }
+
+        private static string GetFailLogInsertQuery(IDatabase DataDB, int i)
+        {
+            return $@"INSERT INTO eb_apidatapuhser_faillog (display_name, ref_id, data_id, api_name, status, message, created_by, created_at, modified_by, modified_at, eb_del)
+                VALUES (@display_name, @ref_id, @data_id, @api_name_{i}, 0, @message_{i}, @created_by, {DataDB.EB_CURRENT_TIMESTAMP}, @modified_by, {DataDB.EB_CURRENT_TIMESTAMP}, 'F');";
+        }
+
+        #endregion Api_data_pusher
     }
 }
