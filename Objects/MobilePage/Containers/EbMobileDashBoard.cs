@@ -2,6 +2,7 @@
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
+using ExpressBase.Common.Structures;
 using System.Collections.Generic;
 
 namespace ExpressBase.Objects
@@ -13,10 +14,27 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public override string Name { get; set; }
 
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
+        [Alias("Data Source")]
+        [PropertyGroup(PGConstants.DATA)]
+        public string DataSourceRefId { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
+        [HelpText("sql query to get data from offline database")]
+        [PropertyGroup(PGConstants.DATA)]
+        public EbScript OfflineQuery { set; get; }
+
         [PropertyGroup(PGConstants.APPEARANCE)]
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.Expandable)]
         public EbThickness Padding { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        public int Spacing { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
