@@ -38,7 +38,7 @@ namespace ExpressBase.Objects
         SingleLine = 0,
     }
 
-    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl, BuilderType.SurveyControl)]
     public class EbTextBox : EbControlUI, IEbInputControls
     {
         public EbTextBox() { }
@@ -137,7 +137,7 @@ else {
             ")]
         public TextTransform TextTransform { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl, BuilderType.SurveyControl)]
         [PropertyGroup(PGConstants.CORE)]
         [OnChangeExec(@"
 if (this.TextMode === 4 ){
