@@ -59,16 +59,11 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup(PGConstants.CORE)]
         [OnChangeExec(@"
-                if ([1,3,5].includes(this.RenderAs)){ 
-                        pg.ShowPropertiesExt(['TextFormat','Font','TextWrap']);
-                        pg.HidePropertiesExt(['BorderRadius','Height','Width']);
+                if (this.RenderAs === 2){ 
+                        pg.HidePropertiesExt(['Font','TextWrap']);
                 }
                 else {
-                        pg.HidePropertiesExt(['TextFormat','TextWrap']);
-                        pg.ShowPropertiesExt(['BorderRadius','Height','Width','Font']);
-                        if(this.RenderAs === 2){
-                            pg.HideProperty('Font');
-                        }
+                        pg.ShowPropertiesExt(['Font','TextWrap']);
                 }
             ")]
         public DataColumnRenderType RenderAs { set; get; }
