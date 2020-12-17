@@ -1,4 +1,5 @@
-﻿using ExpressBase.Common.Extensions;
+﻿using ExpressBase.Common.Constants;
+using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
@@ -25,13 +26,6 @@ namespace ExpressBase.Objects
         [Alias("Link")]
         [OSE_ObjectTypes(EbObjectTypes.iMobilePage)]
         public string LinkRefId { get; set; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyEditor(PropertyEditorType.ObjectSelector)]
-        [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
-        [Alias("Data Source")]
-        [PropertyGroup("Data")]
-        public string DataSourceRefId { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]

@@ -29,6 +29,11 @@ namespace ExpressBase.Objects
         public EbFont Font { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.DATA)]
+        [Alias("Binding Column")]
+        public string BindingParam { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup(PGConstants.APPEARANCE)]
         public bool RenderAsIcon { set; get; }
 

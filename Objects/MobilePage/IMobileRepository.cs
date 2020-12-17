@@ -31,4 +31,17 @@ namespace ExpressBase.Objects
 
         int ColumnSpan { set; get; }
     }
+
+    public interface IMobileUIControl
+    {
+        string BackgroundColor { set; get; }
+
+        int BorderRadius { set; get; }
+
+        string BorderColor { set; get; }
+
+        int BorderThickness { set; get; }
+
+        EbThickness Padding { set; get; }
+    }
 }
