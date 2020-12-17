@@ -14,12 +14,16 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.Expandable)]
         [PropertyGroup(PGConstants.APPEARANCE)]
-        public EbThickness Margin { set; get; }
+        public virtual EbThickness Margin { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.Expandable)]
         [PropertyGroup(PGConstants.APPEARANCE)]
-        public EbThickness Padding { set; get; }
+        public virtual EbThickness Padding { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        public int BorderThickness { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup(PGConstants.APPEARANCE)]

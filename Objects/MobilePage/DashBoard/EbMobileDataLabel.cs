@@ -34,22 +34,30 @@ namespace ExpressBase.Objects
         public string BindingParam { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.ALIGNMENT)]
+        public int RowSpan { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.ALIGNMENT)]
+        public int ColumnSpan { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.ALIGNMENT)]
+        [Alias("Align X")]
+        public MobileHorrizontalAlign HorrizontalAlign { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.ALIGNMENT)]
+        [Alias("Align Y")]
+        public MobileVerticalAlign VerticalAlign { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup(PGConstants.APPEARANCE)]
         public bool RenderAsIcon { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup(PGConstants.APPEARANCE)]
         public string Icon { set; get; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup(PGConstants.APPEARANCE)]
-        [Alias("Align X")]
-        public MobileHorrizontalAlign HorrizontalAlign { set; get; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup(PGConstants.APPEARANCE)]
-        [Alias("Align Y")]
-        public MobileVerticalAlign VerticalAlign { set; get; }
 
         public override string GetDesignHtml()
         {
