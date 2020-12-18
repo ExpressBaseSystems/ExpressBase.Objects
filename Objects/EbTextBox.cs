@@ -260,7 +260,8 @@ else {
 
         [HideInPropertyGrid]
         [JsonIgnore]
-        public override string ToolIconHtml { get { return "<i class='fa fa-i-cursor'></i>"; } set { } }
+        [EnableInBuilder(BuilderType.SurveyControl)]
+        public override string ToolIconHtml { get { return "<i class=\"fa fa-i-cursor\"></i>"; } set { } }
 
         //public override string GetToolHtml()
         //{
