@@ -70,11 +70,11 @@
 
     public enum MobileTextWrap
     {
-        NoWrap = 1,
+        WordWrap = 1,
         HeadTruncation = 2,
         CharacterWrap = 3,
         MiddleTruncation = 4,
         TailTruncation = 5,
-        WordWrap = 6
+        NoWrap = 6
     }
 }

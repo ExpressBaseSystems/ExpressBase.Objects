@@ -1592,7 +1592,7 @@ namespace ExpressBase.Objects
                 Console.WriteLine("EbWebForm.Save.InsertOrUpdate Global Search start");
                 SearchHelper.InsertOrUpdate(DataDB, this);
                 Console.WriteLine("EbWebForm.Save.resp = " + resp);
-                //Task.Run(() => EbDataPushHelper.ProcessApiDataPushers(this, service, DataDB));
+                Task.Run(() => EbDataPushHelper.ProcessApiDataPushers(this, service, DataDB));
             }
             catch (FormException ex1)
             {

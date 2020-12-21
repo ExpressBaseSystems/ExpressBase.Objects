@@ -57,6 +57,6 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
-        public List<EbMobileDataLabel> Childrens { set; get; }
+        public List<EbMobileDashBoardControl> ControlCollection { set; get; }
     }
 }

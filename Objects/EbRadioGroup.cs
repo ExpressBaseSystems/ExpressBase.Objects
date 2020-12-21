@@ -24,7 +24,7 @@ namespace ExpressBase.Objects
         Text
     }
 
-    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl, BuilderType.SurveyControl)]
     public class EbRadioGroup : EbControlUI
     {
         public EbRadioGroup()
@@ -118,7 +118,7 @@ namespace ExpressBase.Objects
         //[PropertyGroup(PGConstants.CORE)]
         //public string IconTestProp { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl, BuilderType.SurveyControl)]
         [PropertyEditor(PropertyEditorType.Collection)]
         [Alias("Options")]
         public List<EbRadioOptionAbstract> Options { get; set; }
@@ -136,10 +136,12 @@ namespace ExpressBase.Objects
 
         [HideInPropertyGrid]
         [JsonIgnore]
-        public override string ToolIconHtml { get { return " &#9673; "; } set { } }
+        [EnableInBuilder(BuilderType.SurveyControl)]
+        public override string ToolIconHtml { get { return "<span class=\"fa\">&#9673;</span>"; } set { } }
 
         [HideInPropertyGrid]
         [JsonIgnore]
+        [EnableInBuilder(BuilderType.SurveyControl)]
         public override string ToolNameAlias { get { return "Radio Buttons"; } set { } }
 
         //public override string GetToolHtml()
@@ -242,7 +244,7 @@ this.Init = function(id)
 
     }
 
-    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl, BuilderType.SurveyControl)]
     [HideInToolBox]
     public class EbRadioOption : EbRadioOptionAbstract
     {

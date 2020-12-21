@@ -52,7 +52,7 @@ namespace ExpressBase.Objects
     //}
 
 
-    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl, BuilderType.SurveyControl)]
     public class EbDate : EbControlUI, IEbInputControls
     {
 
@@ -168,11 +168,11 @@ if(this.IsNullable && !($('#' + this.EbSid_CtxId).closest('.input-group').find(`
             set { }
         }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl, BuilderType.SurveyControl)]
         [PropertyGroup(PGConstants.EXTENDED)]
         public TimeShowFormat ShowTimeAs_ { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl, BuilderType.SurveyControl)]
         [PropertyGroup(PGConstants.EXTENDED)]
         public DateShowFormat ShowDateAs_ { get; set; }
 
@@ -198,10 +198,12 @@ if(this.IsNullable && !($('#' + this.EbSid_CtxId).closest('.input-group').find(`
 
         [HideInPropertyGrid]
         [JsonIgnore]
-        public override string ToolIconHtml { get { return "<i class='fa fa-calendar'></i>"; } set { } }
+        [EnableInBuilder(BuilderType.SurveyControl)]
+        public override string ToolIconHtml { get { return "<i class=\"fa fa-calendar\"></i>"; } set { } }
 
         [HideInPropertyGrid]
         [JsonIgnore]
+        [EnableInBuilder(BuilderType.SurveyControl)]
         public override string ToolNameAlias { get { return "Date Time"; } set { } }
 
         //public override string GetToolHtml()
