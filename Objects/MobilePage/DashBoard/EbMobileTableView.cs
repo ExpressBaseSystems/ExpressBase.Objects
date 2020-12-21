@@ -21,6 +21,10 @@ namespace ExpressBase.Objects
         [PropertyGroup(PGConstants.DATA)]
         public EbScript OfflineQuery { set; get; }
 
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.DATA)]
+        public string BindingTable { set; get; }
+
         public override string GetDesignHtml()
         {
             return @"<div class='mob_dash_control dropped' id='@id' eb-type='EbMobileTableView' tabindex='1' onclick='$(this).focus()'>                            
