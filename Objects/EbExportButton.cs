@@ -103,13 +103,13 @@ namespace ExpressBase.Objects.Objects
 		[HideInPropertyGrid]
 		public override EbScript DefaultValueExpression { get; set; }
 
-		[EnableInBuilder(BuilderType.WebForm)]
-		[HideInPropertyGrid]
-		public override EbScript HiddenExpr { get; set; }
+		//[EnableInBuilder(BuilderType.WebForm)]
+		//[HideInPropertyGrid]
+		//public override EbScript HiddenExpr { get; set; }
 		
-		[EnableInBuilder(BuilderType.WebForm)]
-		[HideInPropertyGrid]
-		public override EbScript DisableExpr { get; set; }
+		//[EnableInBuilder(BuilderType.WebForm)]
+		//[HideInPropertyGrid]
+		//public override EbScript DisableExpr { get; set; }
 
 		[EnableInBuilder(BuilderType.WebForm)]
 		[HideInPropertyGrid]
