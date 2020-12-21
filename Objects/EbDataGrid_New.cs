@@ -10,7 +10,7 @@ using System.Runtime.Serialization;
 namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
-    //[HideInToolBox]
+    [HideInToolBox]
     public class EbDataGrid_New : EbDataGrid, IEbSpecialContainer
     {
         public EbDataGrid_New() : base() { }
