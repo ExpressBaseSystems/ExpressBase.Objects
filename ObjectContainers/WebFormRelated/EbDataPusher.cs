@@ -445,6 +445,15 @@ catch (Exception e)
 
         #region _____________Api_data_pusher_____________
 
+        public enum DataPusherLogStatus
+        {
+            Success,
+            Failed,
+            RetryFailed,
+            RetrySuccess,
+            InternalError
+        }
+
         public string GetProcessedCode()
         {
             this.CodeDict = new Dictionary<int, string>();
@@ -500,26 +509,33 @@ catch (Exception e)
 
                 if (allowPush)
                 {
-                    JObject JObj = JObject.Parse(pusher.Json);
-                    Dictionary<string, object> RqstObj = new Dictionary<string, object>();
-                    foreach (KeyValuePair<string, JToken> jRow in JObj)
+                    try
                     {
-                        object val = this.GetValueFormOutDict(OutputDict, ref Index);
-                        RqstObj.Add(jRow.Key, val);
+                        JObject JObj = JObject.Parse(pusher.Json);
+                        Dictionary<string, object> RqstObj = new Dictionary<string, object>();
+                        foreach (KeyValuePair<string, JToken> jRow in JObj)
+                        {
+                            object val = this.GetValueFormOutDict(OutputDict, ref Index);
+                            RqstObj.Add(jRow.Key, val);
+                        }
+                        EbApi Api = EbFormHelper.GetEbObject<EbApi>(pusher.ApiRefId, null, service.Redis, service);
+
+                        ApiResponse result = service.Gateway.Send<ApiResponse>(new ApiRequest
+                        {
+                            Name = Api.Name,
+                            Version = Api.VersionNumber,
+                            Data = RqstObj,
+                            SolnId = this.WebForm.SolutionObj.SolutionID,
+                            UserAuthId = this.WebForm.UserObj.AuthId,
+                            UserId = this.WebForm.UserObj.UserId,
+                            WhichConsole = this.WebForm.UserObj.wc
+                        });
+
                     }
-
-                    EbApi Api = EbFormHelper.GetEbObject<EbApi>(pusher.ApiRefId, null, service.Redis, service);
-
-                    ApiResponse result = service.Gateway.Send<ApiResponse>(new ApiRequest
+                    catch (Exception ex)
                     {
-                        Name = Api.Name,
-                        Version = Api.VersionNumber,
-                        Data = RqstObj,
-                        SolnId = this.WebForm.SolutionObj.SolutionID,
-                        UserAuthId = this.WebForm.UserObj.AuthId,
-                        UserId = this.WebForm.UserObj.UserId,
-                        WhichConsole = this.WebForm.UserObj.wc
-                    });
+                        Console.WriteLine($"Exception in CallApiInApiDataPushers: {ex.Message}\n{ex.StackTrace}");
+                    }
                 }
             }
         }
@@ -543,21 +559,21 @@ catch (Exception e)
             }
             catch (Exception ex) 
             {
-                //List<DbParameter> _params = new List<DbParameter>() 
-                //{ 
-                //    DataDB.GetNewParameter("display_name", EbDbTypes.String, _this.DisplayName),
-                //    DataDB.GetNewParameter("ref_id", EbDbTypes.String, _this.RefId),
+                Console.WriteLine($"Exception in ProcessApiDataPushers: {ex.Message}\n{ex.StackTrace}");
+                //List<DbParameter> _params = new List<DbParameter>()
+                //{
+                //    DataDB.GetNewParameter("form_refid", EbDbTypes.String, _this.RefId),
                 //    DataDB.GetNewParameter("data_id", EbDbTypes.Int32, _this.TableRowId),
                 //    DataDB.GetNewParameter("created_by", EbDbTypes.Int32, _this.UserObj.UserId),
                 //    DataDB.GetNewParameter("modified_by", EbDbTypes.Int32, _this.UserObj.UserId),
+                //    DataDB.GetNewParameter($"message", EbDbTypes.String, ex.Message)
                 //};
                 //int i = 0;
                 //string fullQry = string.Empty;
                 //foreach (EbApiDataPusher pusher in _this.DataPushers.FindAll(e => e is EbApiDataPusher))
                 //{
                 //    fullQry += GetFailLogInsertQuery(DataDB, i);
-                //    _params.Add(DataDB.GetNewParameter($"api_name_{i}", EbDbTypes.String, pusher.Name));
-                //    _params.Add(DataDB.GetNewParameter($"message_{i}", EbDbTypes.String, ex.Message));
+                //    _params.Add(DataDB.GetNewParameter($"api_refid_{i}", EbDbTypes.String, pusher.ApiRefId));
                 //    i++;
                 //}
 
@@ -567,8 +583,8 @@ catch (Exception e)
 
         private static string GetFailLogInsertQuery(IDatabase DataDB, int i)
         {
-            return $@"INSERT INTO eb_apidatapuhser_faillog (display_name, ref_id, data_id, api_name, status, message, created_by, created_at, modified_by, modified_at, eb_del)
-                VALUES (@display_name, @ref_id, @data_id, @api_name_{i}, 0, @message_{i}, @created_by, {DataDB.EB_CURRENT_TIMESTAMP}, @modified_by, {DataDB.EB_CURRENT_TIMESTAMP}, 'F');";
+            return $@"INSERT INTO eb_apidatapuhser_log (form_refid, data_id, api_refid, status, message, created_by, created_at, modified_by, modified_at, eb_del)
+                VALUES (@form_refid, @data_id, @api_refid_{i}, {(int)DataPusherLogStatus.InternalError}, @message, @created_by, {DataDB.EB_CURRENT_TIMESTAMP}, @modified_by, {DataDB.EB_CURRENT_TIMESTAMP}, 'F');";
         }
 
         #endregion Api_data_pusher
