@@ -619,7 +619,7 @@ else if (this.AttendeeConfig === 4)
                     bool IsFixedAttendee = false;
                     if (Mobj.MaxHost == 0)
                     {
-                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Attendees, usr, ParticipantOpt.Eligible, ParticipantType.Host, tbl, Mobj.SlotList[i], Mobj.Date, DataDB);
+                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Hosts, usr, ParticipantOpt.Eligible, ParticipantType.Host, tbl, Mobj.SlotList[i], Mobj.Date, DataDB);
                     }
                     else if (this.HostConfig == UsersType.Users && HostUserIdsCount >= Mobj.MinHost && HostUserIdsCount == Mobj.SlotList[i].Hosts.Count && HostUserIdsCount <= Mobj.MaxHost)
                     {
@@ -634,15 +634,14 @@ else if (this.AttendeeConfig === 4)
                     {
                         query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Hosts, usr, ParticipantOpt.Eligible, ParticipantType.Host, tbl, Mobj.SlotList[i], Mobj.Date, DataDB);
                     }
-                    if (Mobj.MaxAttendee == 0 && this.AttendeeConfig != UsersType.Contact)
+                    if (Mobj.MaxAttendee == 0 && this.AttendeeConfig == UsersType.Contact)
                     {
-                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Attendees, usr, ParticipantOpt.Eligible, ParticipantType.Attendee, tbl, Mobj.SlotList[i], Mobj.Date, DataDB);
+                        query += AddPersons(Mobj.SlotList[i].Attendees, usr, ParticipantOpt.Fixed, ParticipantType.Attendee, tbl, Mobj.SlotList[i], Mobj.Date, DataDB);
                     }
-                    else if(Mobj.MaxAttendee == 0 && this.AttendeeConfig == UsersType.Contact)
+                    else if (Mobj.MaxAttendee == 0)
                     {
                         IsFixedAttendee = true;
-                        query += AddPersons(Mobj.SlotList[i].Attendees, usr, ParticipantOpt.Fixed, ParticipantType.Attendee, tbl, Mobj.SlotList[i], Mobj.Date, DataDB);
-
+                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Attendees, usr, ParticipantOpt.Eligible, ParticipantType.Attendee, tbl, Mobj.SlotList[i], Mobj.Date, DataDB);
                     }
                     else if (this.AttendeeConfig == UsersType.Users && AttendeeUserIdsCount >= Mobj.MinAttendee && AttendeeUserIdsCount == Mobj.SlotList[i].Attendees.Count && AttendeeUserIdsCount <= Mobj.MaxAttendee)
                     {
