@@ -54,31 +54,7 @@ namespace ExpressBase.Objects
 		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override bool Unique { get; set; }
-
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
-		[HideInPropertyGrid]
-		public override List<EbValidator> Validators { get; set; }
-
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
-		[HideInPropertyGrid]
-		public override EbScript DefaultValueExpression { get; set; }
-
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
-		[HideInPropertyGrid]
-		public override EbScript HiddenExpr { get; set; }
-		
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
-		[HideInPropertyGrid]
-		public override EbScript DisableExpr { get; set; }
-
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
-		[HideInPropertyGrid]
-		public override EbScript ValueExpr { get; set; }
-
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
-		[HideInPropertyGrid]
-		public override bool Required { get; set; }
-
+				
 		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override bool DoNotPersist { get; set; }
@@ -106,12 +82,23 @@ namespace ExpressBase.Objects
 		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override EbDbTypes EbDbType { get { return EbDbTypes.String; } set { } }
-
+		
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+		[PropertyEditor(PropertyEditorType.Expandable)]
+		[PropertyGroup(PGConstants.APPEARANCE)]
+		[UIproperty]
+		[DefaultPropValue(7, 10, 7, 10)]
+		[OnChangeUIFunction("Common.INP_PADDING")]
+		public UISides Padding { get; set; }
 
 		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[DefaultPropValue("100")]
 		[Alias("Dropdown Height")]
 		public int DropdownHeight { get; set; }
+
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+		[Alias("Countries List(country code)")]
+		public string CountriesList { get; set; }
 
 		[EnableInBuilder(BuilderType.WebForm,  BuilderType.UserControl)]
 		[PropertyEditor(PropertyEditorType.ObjectSelectorCollection)]
@@ -168,7 +155,7 @@ namespace ExpressBase.Objects
 		public override string DisableJSfn
 		{
 			get { return @"this.__IsDisable = true;
-            $('#' + this.EbSid_CtxId ).attr('disabled', 'disabled').css('pointer-events', 'none').find('[ui-inp]').css('background-color', 'var(--eb-disablegray)');
+            $('#' + this.EbSid_CtxId ).attr('disabled', 'disabled').css('pointer-events', 'none').css('background-color', 'var(--eb-disablegray)');
             $('#' + this.EbSid + '_Phnctrl').find('.iti__flag-container').attr('disabled', 'disabled').css('pointer-events', 'none').css('background-color', 'var(--eb-disablegray)');
            if(this.SendMessage){
 			$('#cont_' + this.EbSid_CtxId).find('.phnContextBtn').show();

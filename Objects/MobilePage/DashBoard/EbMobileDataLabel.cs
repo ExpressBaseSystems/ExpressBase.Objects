@@ -22,9 +22,6 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.FontSelector)]
-        [OnChangeExec(@"
-                setFontCss(this.Font,$(`#${this.EbSid} .eb_dash_datalabel`));
-            ")]
         [PropertyGroup(PGConstants.DATA)]
         public EbFont Font { get; set; }
 
@@ -32,6 +29,14 @@ namespace ExpressBase.Objects
         [PropertyGroup(PGConstants.DATA)]
         [Alias("Binding Column")]
         public string BindingParam { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.DATA)]
+        public bool RenderAsIcon { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.DATA)]
+        public string Icon { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup(PGConstants.ALIGNMENT)]
@@ -53,11 +58,23 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup(PGConstants.APPEARANCE)]
-        public bool RenderAsIcon { set; get; }
+        public MobileTextAlign HorrizontalTextAlign { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup(PGConstants.APPEARANCE)]
-        public string Icon { set; get; }
+        public MobileTextAlign VerticalTextAlign { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        public MobileTextWrap TextWrap { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        public int Height { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        public int Width { set; get; }
 
         public override string GetDesignHtml()
         {

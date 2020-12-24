@@ -77,4 +77,11 @@
         TailTruncation = 5,
         NoWrap = 6
     }
+
+    public enum MobileTextAlign
+    {
+        Start = 1,
+        Center = 2,
+        End = 3
+    }
 }

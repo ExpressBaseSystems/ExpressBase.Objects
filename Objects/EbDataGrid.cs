@@ -340,7 +340,10 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         public override string SetDisplayMemberJSfn
         {
-            get { return JSFnsConstants.DG_hiddenColCheckCode + @"document.getElementById(this.EbSid_CtxId).value = p1;"; }
+            get { return JSFnsConstants.DG_hiddenColCheckCode + @"
+if(this.DataVals.ObjType === 'DGNumericColumn' && p1 === undefined)
+    p1 = 0;
+document.getElementById(this.EbSid_CtxId).value = p1;"; }
 
             set { }
         }

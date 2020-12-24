@@ -60,10 +60,10 @@ namespace ExpressBase.Objects
         [PropertyGroup(PGConstants.CORE)]
         [OnChangeExec(@"
                 if (this.RenderAs === 2){ 
-                        pg.HidePropertiesExt(['Font','TextWrap']);
+                        pg.HidePropertiesExt(['Font','TextWrap','HorrizontalTextAlign','VerticalTextAlign']);
                 }
                 else {
-                        pg.ShowPropertiesExt(['Font','TextWrap']);
+                        pg.ShowPropertiesExt(['Font','TextWrap','HorrizontalTextAlign','VerticalTextAlign']);
                 }
             ")]
         public DataColumnRenderType RenderAs { set; get; }
@@ -99,6 +99,14 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup(PGConstants.APPEARANCE)]
         public MobileTextWrap TextWrap { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        public MobileTextAlign HorrizontalTextAlign { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        public MobileTextAlign VerticalTextAlign { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup(PGConstants.APPEARANCE)]
