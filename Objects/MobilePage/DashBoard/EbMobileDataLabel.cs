@@ -58,6 +58,14 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup(PGConstants.APPEARANCE)]
+        public MobileTextAlign HorrizontalTextAlign { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        public MobileTextAlign VerticalTextAlign { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         public MobileTextWrap TextWrap { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
