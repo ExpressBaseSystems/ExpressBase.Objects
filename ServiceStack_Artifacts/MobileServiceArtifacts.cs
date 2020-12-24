@@ -130,7 +130,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class MobileVisDataRequest : EbServiceStackAuthRequest, IReturn<MobileVisDataResponse>
+    public class MobileVisDataRequest : EbServiceStackAuthRequest, IReturn<MobileDataResponse>
     {
         [DataMember(Order = 1)]
         public string DataSourceRefId { set; get; }
@@ -162,13 +162,25 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class MobileVisDataResponse
+    public class MobileDataResponse
     {
         [DataMember(Order = 1)]
         public string Message { set; get; }
 
         [DataMember(Order = 2)]
         public EbDataSet Data { set; get; }
+    }
+
+    [DataContract]
+    public class MobileDataRequest : EbServiceStackAuthRequest, IReturn<MobileDataResponse>
+    {
+        [DataMember(Order = 1)]
+        public string DataSourceRefId { set; get; }
+
+        public MobileDataRequest(string refid)
+        {
+            DataSourceRefId = refid;
+        }
     }
 
     [DataContract]

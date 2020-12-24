@@ -21,6 +21,16 @@ namespace ExpressBase.Objects
         public int ColumCount { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        [DefaultPropValue("5")]
+        public int RowSpacing { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        [DefaultPropValue("5")]
+        public int ColumnSpacing { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [PropertyGroup("Link Settings")]
         [Alias("Link")]
