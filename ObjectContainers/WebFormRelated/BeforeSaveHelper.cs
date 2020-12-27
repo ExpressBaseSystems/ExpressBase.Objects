@@ -322,6 +322,22 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                     if (string.IsNullOrEmpty(_ctrl.TableName))
                         throw new FormException("Please enter a valid Static Card table name");
                 }
+                else if (Allctrls[i] is EbProvisionLocation)
+                {
+                    EbProvisionLocation provLoc = Allctrls[i] as EbProvisionLocation;
+                    foreach (UsrLocFieldAbstract fld in provLoc.Fields)
+                    {
+                        UsrLocField _field = fld as UsrLocField;
+                        if (string.IsNullOrEmpty(_field.ControlName))
+                        {
+                            if (_field.IsRequired)
+                                throw new FormException($"Please map a control for {_field.Name} in ProvisionLocation control({provLoc.Name}).");
+                            continue;
+                        }
+                        if (Allctrls.FirstOrDefault(e => e.Name == _field.ControlName) == null)
+                            throw new FormException($"Invalid control name '{_field.ControlName}' for {_field.Name} in ProvisionLocation control({provLoc.Name}).");
+                    }
+                }
 
                 if (Allctrls[i] is IEbDataReaderControl && serviceClient != null)
                     (Allctrls[i] as IEbDataReaderControl).FetchParamsMeta(serviceClient, redis, Allctrls);
