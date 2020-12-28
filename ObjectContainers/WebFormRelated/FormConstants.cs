@@ -55,6 +55,9 @@ namespace ExpressBase.Objects.WebFormRelated
         public const string shortname = "shortname";
         public const string image = "image";
         public const string meta_json = "meta_json";
+        public const string is_group = "is_group";
+        public const string parent_id = "parent_id";
+        public const string eb_location_types_id = "eb_location_types_id";
         //Prov User
         public const string email = "email";
         public const string phprimary = "phprimary";

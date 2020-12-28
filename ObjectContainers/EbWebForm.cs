@@ -793,7 +793,65 @@ namespace ExpressBase.Objects
                         Row.SetControl(c.Name, c);
                     }
                 }
-                else if ((!(c is EbFileUploader) && !c.DoNotPersist) || c is EbProvisionLocation)
+                else if (c is EbProvisionLocation)
+                {
+                    if (!(this.FormData.MultipleTables.ContainsKey(_container.TableName) && this.FormData.MultipleTables[_container.TableName].Count > 0))
+                        continue;
+                    EbProvisionLocation provLocCtrl = c as EbProvisionLocation;
+                    Dictionary<string, string> _d = new Dictionary<string, string>();
+                    Dictionary<string, string> _metaDict = new Dictionary<string, string>();
+                    bool skipCtrl = false;
+
+                    foreach (UsrLocField obj in provLocCtrl.Fields)
+                    {
+                        if (!string.IsNullOrEmpty(obj.ControlName))
+                        {
+                            bool ctrlFound = false;
+                            foreach (KeyValuePair<string, SingleTable> entry in this.FormData.MultipleTables)
+                            {
+                                TableSchema _table = this.FormSchema.Tables.Find(e => e.TableType == WebFormTableTypes.Normal && e.TableName == entry.Key);
+                                if (_table != null && entry.Value.Count > 0)
+                                {
+                                    SingleColumn Col = entry.Value[0].GetColumn(obj.ControlName);
+                                    if (Col != null)
+                                    {
+                                        string _val = Convert.ToString(Col.Value).Trim();
+                                        if (EbProvisionLocation.IsSystemField(obj.Name))
+                                            _d.Add(obj.Name, _val);///////////////
+                                        else
+                                            _metaDict.Add(obj.DisplayName, _val);
+                                        ctrlFound = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (obj.IsRequired && !ctrlFound)
+                                skipCtrl = true;
+                        }
+                    }
+                    SingleRow Row = this.FormData.MultipleTables[_container.TableName][0];
+                    SingleColumn Column = Row.GetColumn(provLocCtrl.Name);
+                    if (skipCtrl)
+                    {
+                        if (Column != null)
+                            Row.Columns.Remove(Column);
+                        Console.WriteLine("EbProvisionLocation: Control skipped...");
+                    }
+                    else
+                    {
+                        if (Column == null)
+                        {
+                            Column = c.GetSingleColumn(this.UserObj, this.SolutionObj, null);
+                            Row.Columns.Add(Column);
+                        }
+                        _d.Add(FormConstants.meta_json, JsonConvert.SerializeObject(_metaDict));
+                        Column.F = JsonConvert.SerializeObject(_d);
+                        c.ValueFE = Column.Value;
+                        Row.SetEbDbType(c.Name, c.EbDbType);
+                        Row.SetControl(c.Name, c);
+                    }
+                }
+                else if ((!(c is EbFileUploader) && !c.DoNotPersist))
                 {
                     if (FormData.MultipleTables.ContainsKey(_container.TableName) && FormData.MultipleTables[_container.TableName].Count > 0)
                     {
@@ -1234,8 +1292,11 @@ namespace ExpressBase.Objects
                                 _d.Add(FormConstants.shortname, Table[0][FormConstants.shortname]);
                                 _d.Add(FormConstants.image, Table[0][FormConstants.image]);
                                 _d.Add(FormConstants.meta_json, Table[0][FormConstants.meta_json]);
+                                _d.Add(FormConstants.is_group, Table[0][FormConstants.is_group]);
+                                _d.Add(FormConstants.parent_id, Table[0][FormConstants.parent_id]);
+                                _d.Add(FormConstants.eb_location_types_id, Table[0][FormConstants.eb_location_types_id]);
                             }
-                            _FormData.MultipleTables[(Ctrl as EbProvisionUser).VirtualTable][0][Ctrl.Name] = JsonConvert.SerializeObject(_d);
+                            _FormData.MultipleTables[(Ctrl as EbProvisionLocation).VirtualTable][0].GetColumn(Ctrl.Name).F = JsonConvert.SerializeObject(_d);
                         }
                         else if (Ctrl is EbReview)
                         {
@@ -2343,6 +2404,8 @@ namespace ExpressBase.Objects
                     //    (c as EbProvisionUser).SendWelcomeMail(MessageProducer3, this.UserObj, this.SolutionObj);
                     //}
                 }
+                else if (c is EbProvisionLocation && (c as EbProvisionLocation).IsLocationCreated)
+                    UpdateSoluObj = true;
             }
             if (UpdateSoluObj)
             {

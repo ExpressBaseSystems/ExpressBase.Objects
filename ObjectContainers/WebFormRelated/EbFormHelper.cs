@@ -162,42 +162,42 @@ namespace ExpressBase.Objects
                     }
                     else if (c is EbProvisionLocation)//add unmapped ctrls as DoNotPersist controls
                     {
-                        if (_this.IsRenderMode)
-                        {
-                            EbProvisionLocation prvnCtrl = c as EbProvisionLocation;
-                            for (int j = 0; j < prvnCtrl.Fields.Count; j++)
-                            {
-                                UsrLocField prvnFld = prvnCtrl.Fields[j] as UsrLocField;
-                                if (prvnFld.ControlName.IsNullOrEmpty() && prvnFld.IsRequired)
-                                {
-                                    if (prvnFld.Type == "image")
-                                    {
-                                        _this.Controls.Insert(i, new EbDisplayPicture()
-                                        {
-                                            Name = "namecustom" + i,
-                                            EbSid = "ebsidcustom" + i,
-                                            EbSid_CtxId = "ebsidcustom" + i,
-                                            Label = prvnFld.DisplayName,
-                                            DoNotPersist = true,
-                                            MaxHeight = 100
-                                        });
-                                    }
-                                    else
-                                    {
-                                        _this.Controls.Insert(i, new EbTextBox()
-                                        {
-                                            Name = "namecustom" + i,
-                                            EbSid = "ebsidcustom" + i,
-                                            EbSid_CtxId = "ebsidcustom" + i,
-                                            Label = prvnFld.DisplayName,
-                                            DoNotPersist = true
-                                        });
-                                    }
-                                    prvnFld.ControlName = "namecustom" + i;
-                                    i++;
-                                }
-                            }
-                        }
+                        //if (_this.IsRenderMode)
+                        //{
+                        //    EbProvisionLocation prvnCtrl = c as EbProvisionLocation;
+                        //    for (int j = 0; j < prvnCtrl.Fields.Count; j++)
+                        //    {
+                        //        UsrLocField prvnFld = prvnCtrl.Fields[j] as UsrLocField;
+                        //        if (prvnFld.ControlName.IsNullOrEmpty() && prvnFld.IsRequired)
+                        //        {
+                        //            if (prvnFld.Type == "image")
+                        //            {
+                        //                _this.Controls.Insert(i, new EbDisplayPicture()
+                        //                {
+                        //                    Name = "namecustom" + i,
+                        //                    EbSid = "ebsidcustom" + i,
+                        //                    EbSid_CtxId = "ebsidcustom" + i,
+                        //                    Label = prvnFld.DisplayName,
+                        //                    DoNotPersist = true,
+                        //                    MaxHeight = 100
+                        //                });
+                        //            }
+                        //            else
+                        //            {
+                        //                _this.Controls.Insert(i, new EbTextBox()
+                        //                {
+                        //                    Name = "namecustom" + i,
+                        //                    EbSid = "ebsidcustom" + i,
+                        //                    EbSid_CtxId = "ebsidcustom" + i,
+                        //                    Label = prvnFld.DisplayName,
+                        //                    DoNotPersist = true
+                        //                });
+                        //            }
+                        //            prvnFld.ControlName = "namecustom" + i;
+                        //            i++;
+                        //        }
+                        //    }
+                        //}
                     }
                     else if (c is EbProvisionUser)
                     {

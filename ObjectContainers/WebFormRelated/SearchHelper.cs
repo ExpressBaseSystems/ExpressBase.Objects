@@ -361,7 +361,7 @@ namespace ExpressBase.Objects.WebFormRelated
                     Message += $"Exception in UpdateIndexes: {ex.Message}\n{ex.StackTrace}";
                 }
             }
-            else if (Limit > 0 && Offset >= 0)
+            else if (Limit == 0 && Offset == 0)
             {
                 string delQry = "UPDATE eb_index_table SET eb_del = 'T' WHERE link_type = @link_type AND COALESCE(eb_del, 'F') = 'F';";
                 int t = DataDB.DoNonQuery(delQry, new DbParameter[] { DataDB.GetNewParameter("link_type", EbDbTypes.Int32, (int)SH_LinkType.LM) });
