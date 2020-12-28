@@ -25,6 +25,7 @@ namespace ExpressBase.Objects
     }
 
     [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl, BuilderType.SurveyControl)]
+    [SurveyBuilderRoles(SurveyRoles.AnswerControl)]
     public class EbRadioGroup : EbControlUI
     {
         public EbRadioGroup()
