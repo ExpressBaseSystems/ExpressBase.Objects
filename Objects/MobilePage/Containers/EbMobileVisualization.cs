@@ -149,6 +149,12 @@ namespace ExpressBase.Objects
         [PropertyGroup("Link Settings")]
         public bool ShowLinkIcon { set; get; }
 
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
+        [PropertyGroup("Link Settings")]
+        [Alias("Link Expression")]
+        public EbScript LinkExpr { get; set; }
+
         #region FAB Settings Properties
 
         [EnableInBuilder(BuilderType.MobilePage)]
