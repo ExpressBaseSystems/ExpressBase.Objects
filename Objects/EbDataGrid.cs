@@ -82,6 +82,13 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.Collection)]
         public new List<EbValidator> Validators { get; set; }
 
+        //[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        //[PropertyEditor(PropertyEditorType.ScriptEditorJS)]
+        //[Alias("ReadOnly Expression")]
+        //[PropertyGroup(PGConstants.BEHAVIOR)]
+        //[HelpText("Define conditions to decide Disabled/Readonly property of the control.")]
+        //public new EbScript DisableExpr { get; set; }
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [DefaultPropValue("true")]
         [PropertyGroup(PGConstants.BEHAVIOR)]
@@ -153,6 +160,8 @@ namespace ExpressBase.Objects
         {
             if (this.OnRowPaint == null)
                 this.OnRowPaint = new EbScript();
+            //if (this.DisableExpr == null)
+            //    this.DisableExpr = new EbScript();
 
             this.BareControlHtml = this.GetBareHtml();
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);

@@ -595,6 +595,8 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
             }
             for (int i = 0; i < _dict.Count; i++)
             {
+                //if (i == 1)
+                //    ;
                 CheckHideAndDisableCode(_dict[i], _dict, _dict[i].Control.HiddenExpr, true);
                 CheckHideAndDisableCode(_dict[i], _dict, _dict[i].Control.DisableExpr, false);
             }
@@ -613,7 +615,8 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                     {
                         string p = _dict[j].Path, r = _dict[j].Root, n = _dict[j].Control.Name;
                         string regex = EbFormHelper.GetJsRegex(r, n, p);
-
+                        //if (ctrlWrap.Path != "form.datagrid1.stringcolumn2" && ctrlWrap.Path != "form.datagrid1.stringcolumn1")
+                        //    ;
                         if (Regex.IsMatch(ebScript.Code, regex))
                         {
                             if (is4Hide)
@@ -651,6 +654,20 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
             {
                 if (control is EbControlContainer)
                 {
+                    //if (control is EbDataGrid)
+                    //{
+                    //    _counter = _dict.Count;
+                    //    string path2 = _path == string.Empty ? control.Name : _path + CharConstants.DOT + control.Name;
+                    //    control.__path = path2;
+                    //    _dict.Add(_counter++, new EbControlWrapper
+                    //    {
+                    //        TableName = _container.TableName,
+                    //        Path = path2,
+                    //        Control = control,
+                    //        Root = _path
+                    //    });
+                    //}
+
                     string path = _path;
                     if (control is EbDataGrid)
                         path = _path + CharConstants.DOT + (control as EbControlContainer).Name;
