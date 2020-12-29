@@ -884,6 +884,20 @@ namespace ExpressBase.Objects
         public int SlotId { get; set; }
         public User UserInfo { get; set; }
     }
+    public class PickMultipleMeetingResponse
+    {
+        public bool ResponseStatus { get; set; }
+    }
+    public class PickMultipleMeetingRequest
+    {
+        public int MyActionId { get; set; }
+        public List<int> SlotIds { get; set; }
+        public User UserInfo { get; set; }
+        public PickMultipleMeetingRequest()
+        {
+            this.SlotIds = new List<int>();
+        }
+    }
     public enum ParticipantType
     {
         Host = 1,
