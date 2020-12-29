@@ -45,8 +45,6 @@ namespace ExpressBase.Objects
 
             foreach (Type tool in typeArray)
             {
-                if (tool.GetTypeInfo().Name == "EbNumeric")
-                    ;
                 if ((tool.IsDefined(typeof(EnableInBuilder)) && tool.GetCustomAttribute<EnableInBuilder>().BuilderTypes.Contains(BuilderType.SurveyControl)))
                 {
                     try
