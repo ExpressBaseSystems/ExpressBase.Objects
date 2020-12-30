@@ -471,14 +471,9 @@ catch (Exception e)
                     Index++;
                 }
 
-                JObject JObj = JObject.Parse(pusher.Json);
-                foreach (KeyValuePair<string, JToken> jRow in JObj)
-                {
-                    this.CodeDict.Add(Index, jRow.Value.ToString());
-                    FnDef += GetFunctionDefinition(jRow.Value.ToString(), Index);
-                    PusherFnCall += GetFunctionCall(Index);
-                    Index++;
-                }
+                JToken JTok = JToken.Parse(pusher.Json);
+                GetFnDefinitionRec(JTok, ref FnDef, ref PusherFnCall, ref Index);
+
                 if (PusherWrapIf == string.Empty)
                     FnCall += PusherFnCall;
                 else
@@ -488,6 +483,56 @@ catch (Exception e)
                 return string.Empty;
 
             return FnDef + "Dictionary<int, object[]> out_dict = new Dictionary<int, object[]>();\n" + FnCall + "return out_dict;";
+        }
+
+        private void GetFnDefinitionRec(JToken JTok, ref string FnDef, ref string PusherFnCall, ref int Index)
+        {
+            if (JTok is JObject)
+            {
+                JObject jObj = JTok as JObject;
+                foreach (KeyValuePair<string, JToken> jObjEntry in jObj)
+                {
+                    if (jObjEntry.Value is JObject || jObjEntry.Value is JArray)
+                        GetFnDefinitionRec(jObjEntry.Value, ref FnDef, ref PusherFnCall, ref Index);
+                    else
+                    {
+                        this.CodeDict.Add(Index, jObjEntry.Value.ToString());
+                        FnDef += GetFunctionDefinition(jObjEntry.Value.ToString(), Index);
+                        PusherFnCall += GetFunctionCall(Index);
+                        Index++;
+                    }
+                }
+            }
+            else if (JTok is JArray)
+            {
+                JArray jArr = JTok as JArray;
+                foreach (JToken jt in jArr)
+                    GetFnDefinitionRec(jt, ref FnDef, ref PusherFnCall, ref Index);
+            }
+        }
+        
+        private void FillJsonWithValuesRec(JToken JTok, Dictionary<int, object[]> OutputDict, ref int Index)
+        {
+            if (JTok is JObject)
+            {
+                JObject jObj = JTok as JObject;
+                foreach (KeyValuePair<string, JToken> jObjEntry in jObj)
+                {
+                    if (jObjEntry.Value is JObject || jObjEntry.Value is JArray)
+                        FillJsonWithValuesRec(jObjEntry.Value, OutputDict, ref Index);
+                    else
+                    {
+                        object val = this.GetValueFormOutDict(OutputDict, ref Index);
+                        jObj[jObjEntry.Key] = JToken.FromObject(val);
+                    }
+                }
+            }
+            else if (JTok is JArray)
+            {
+                JArray jArr = JTok as JArray;
+                foreach (JToken jt in jArr)
+                    FillJsonWithValuesRec(jt, OutputDict, ref Index);
+            }
         }
 
         public void CallApiInApiDataPushers(object out_dict, Service service)
@@ -512,14 +557,17 @@ catch (Exception e)
                     try
                     {
                         JObject JObj = JObject.Parse(pusher.Json);
+                        FillJsonWithValuesRec(JObj, OutputDict, ref Index);
                         Dictionary<string, object> RqstObj = new Dictionary<string, object>();
-                        foreach (KeyValuePair<string, JToken> jRow in JObj)
-                        {
-                            object val = this.GetValueFormOutDict(OutputDict, ref Index);
-                            RqstObj.Add(jRow.Key, val);
-                        }
-                        EbApi Api = EbFormHelper.GetEbObject<EbApi>(pusher.ApiRefId, null, service.Redis, service);
 
+                        foreach (KeyValuePair<string, JToken> jEntry in JObj)
+                        {
+                            object val = jEntry.Value is JValue ? (jEntry.Value as JValue).Value : Convert.ToString(jEntry.Value);
+                            RqstObj.Add(jEntry.Key, val);
+                        }
+
+                        EbApi Api = EbFormHelper.GetEbObject<EbApi>(pusher.ApiRefId, null, service.Redis, service);
+                        
                         ApiResponse result = service.Gateway.Send<ApiResponse>(new ApiRequest
                         {
                             Name = Api.Name,
