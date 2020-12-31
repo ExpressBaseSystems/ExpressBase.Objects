@@ -264,9 +264,23 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int UserId { get; set; }
 
         public string SolnId { get; set; }
-    }
+    }    
 
     public class AddTLResponse : IEbSSResponse
+    {
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
+    public class AddSBRequest : IReturn<AddSBResponse>, IEbTenentRequest
+    {
+        public EbSmsBuddyConfig Config { get; set; }
+
+        public int UserId { get; set; }
+
+        public string SolnId { get; set; }
+    }
+
+    public class AddSBResponse : IEbSSResponse
     {
         public ResponseStatus ResponseStatus { get; set; }
     }
