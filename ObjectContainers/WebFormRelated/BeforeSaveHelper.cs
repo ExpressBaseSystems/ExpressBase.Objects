@@ -6,6 +6,7 @@ using ExpressBase.Common.Structures;
 using ExpressBase.Objects.Helpers;
 using ExpressBase.Objects.Objects;
 using ExpressBase.Objects.ServiceStack_Artifacts;
+using Newtonsoft.Json.Linq;
 using ServiceStack;
 using ServiceStack.Redis;
 using System;
@@ -62,6 +63,14 @@ namespace ExpressBase.Objects.WebFormRelated
                     }
                     if (string.IsNullOrEmpty(dp.Json))
                         throw new FormException($"Required 'Json' for data pusher");
+                    try
+                    {
+                        JToken JTok = JToken.Parse(dp.Json);
+                    }
+                    catch (Exception e)
+                    {
+                        throw new FormException($"Failed to parse 'Json' in data pusher: " + e.Message);
+                    }
                 }
             }
         }
