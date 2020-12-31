@@ -14,6 +14,37 @@ using System.Globalization;
 
 namespace ExpressBase.Objects.WebFormRelated
 {
+    public class DelegateTest
+    {
+        private IDatabase DataDB { get; set; }
+
+        public DelegateTest(IDatabase DataDB)
+        {
+            this.DataDB = DataDB;
+        }
+
+        public object ExecuteScalar(string Query)
+        {
+            object val = null;
+            if (!string.IsNullOrEmpty(Query))
+            {
+                try
+                {
+                    EbDataTable dt = DataDB.DoQuery(Query);
+                    if (dt.Rows.Count > 0 && dt.Rows[0].Count > 0)
+                    {
+                        val = dt.Rows[0][0];
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Exception in DelegateTest->ExecuteScalar: " + ex.Message + "\nQuery: " + Query);
+                }
+            }
+            return val;
+        }
+    }
+
     public static class GlobalsGenerator
     {
         public static FormAsGlobal GetFormAsFlatGlobal(EbWebForm _this, WebformData _formdata)
@@ -178,7 +209,7 @@ namespace ExpressBase.Objects.WebFormRelated
         public static FG_Root GetCSharpFormGlobals_NEW(EbWebForm _this, EbDataTable Data, int index)
         {
             Dictionary<string, FG_NV_List> dict = new Dictionary<string, FG_NV_List>();
-            foreach(EbDataColumn dc in Data.Columns)
+            foreach (EbDataColumn dc in Data.Columns)
             {
                 if (!dict.ContainsKey(dc.TableName))
                     dict.Add(dc.TableName, new FG_NV_List());
@@ -187,16 +218,22 @@ namespace ExpressBase.Objects.WebFormRelated
             return new FG_Root(new FG_Params(dict));
         }
 
-        public static FG_Root GetCSharpFormGlobals_NEW(EbWebForm _this, WebformData _formdata, WebformData _formdataBkUp)
+        public static FG_Root GetCSharpFormGlobals_NEW(EbWebForm _this, WebformData _formdata, WebformData _formdataBkUp, IDatabase DataDB = null)
         {
             FG_User fG_User = new FG_User(_this.UserObj.UserId, _this.UserObj.FullName, _this.UserObj.Email, _this.UserObj.Roles);
             FG_System fG_System = new FG_System();
+            FG_DataDB fG_DataDB = null;
+            if (DataDB != null)
+            {
+                DelegateTest OutDelObj = new DelegateTest(DataDB);
+                fG_DataDB = new FG_DataDB(OutDelObj.ExecuteScalar);
+            }
             FG_WebForm fG_WebForm = new FG_WebForm() { id = _this.TableRowId, eb_loc_id = _this.LocationId, eb_ref_id = _this.RefId, __mode = _this.__mode };
             fG_WebForm.eb_created_by = _this.TableRowId <= 0 ? _this.UserObj.UserId : _formdata.CreatedBy;
             fG_WebForm.eb_created_at = _this.TableRowId <= 0 ? DateTime.UtcNow.ConvertFromUtc(_this.UserObj.Preference.TimeZone).ToString(FormConstants.yyyyMMdd_HHmmss, CultureInfo.InvariantCulture) : _formdata.CreatedAt;
             GetCSharpFormGlobalsRec_NEW(fG_WebForm, _this, _formdata, _formdataBkUp);
             int mode = _this.FormDataPusherCount > 0 ? 1 : 2;
-            return new FG_Root(fG_WebForm, fG_User, fG_System, mode);
+            return new FG_Root(fG_WebForm, fG_User, fG_System, mode, fG_DataDB);
         }
 
         private static void GetCSharpFormGlobalsRec_NEW(FG_WebForm fG_WebForm, EbControlContainer _container, WebformData _formdata, WebformData _formdataBkUp)

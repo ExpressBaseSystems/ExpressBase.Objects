@@ -596,7 +596,7 @@ catch (Exception e)
                 return;
             try
             {
-                FG_Root globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(_this, _this.FormData, _this.FormDataBackup);
+                FG_Root globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(_this, _this.FormData, _this.FormDataBackup, DataDB);
                 EbDataPushHelper ebDataPushHelper = new EbDataPushHelper(_this);
                 string code = ebDataPushHelper.GetProcessedCode();
                 if (code != string.Empty)
