@@ -32,7 +32,29 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 1)]
         public EbSurveyQuery Query { set; get; }
     }
+
+    public class SaveQuestionRequest : IReturn<SaveQuestionResponse>, IEbSSRequest
+    {
+        public string SolnId { get; set; }
+
+        public int UserId { get; set; }
+
+        [DataMember(Order = 1)]
+        public EbQuestion Query { set; get; }
+    }
     public class SurveyQuesResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public bool Status { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 3)]
+        public int Quesid { set; get; }
+    }
+    
+    public class SaveQuestionResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
         public bool Status { get; set; }
