@@ -24,7 +24,8 @@ namespace ExpressBase.Objects
         Phone = 2,
     }
 
-    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl, BuilderType.SurveyControl)]
+    [SurveyBuilderRoles(SurveyRoles.AnswerControl)]
     public class EbNumeric : EbControlUI, IEbInputControls
     {
         public EbNumeric() { }
@@ -166,7 +167,7 @@ else {
         [HideInPropertyGrid]
         [JsonIgnore]
         [EnableInBuilder(BuilderType.SurveyControl)]
-        public override string ToolIconHtml { get { return "<b class=\"fa\" style='letter-spacing: -0.7px;'>01</b>"; } set { } }
+        public override string ToolIconHtml { get { return "<b class=\"fa\" style=\"letter-spacing: -0.7px;\">01</b>"; } set { } }
 
         //public override string GetToolHtml() { return @"<div eb-type='@toolName' class='tool'><b>0-9 </b></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2)); }
 

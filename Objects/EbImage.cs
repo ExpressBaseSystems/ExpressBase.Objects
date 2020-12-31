@@ -13,7 +13,8 @@ using System.Reflection;
 using System.Runtime.Serialization;
 namespace ExpressBase.Objects
 {
-    [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl, BuilderType.SurveyControl)]
+    [SurveyBuilderRoles(SurveyRoles.AnswerControl,SurveyRoles.QuestionControl)]
     public class EbImage : EbControlUI
     {
 
@@ -123,7 +124,8 @@ namespace ExpressBase.Objects
 
         [HideInPropertyGrid]
         [JsonIgnore]
-        public override string ToolIconHtml { get { return "<i class='fa fa-file-image-o'></i>"; } set { } }
+        [EnableInBuilder(BuilderType.SurveyControl)]
+        public override string ToolIconHtml { get { return "<i class=\"fa fa-file-image-o\" ></i>"; } set { } }
 
         //public override string GetToolHtml()
         //{
