@@ -48,7 +48,6 @@ namespace ExpressBase.Objects
 		public override string ToolTipText { get; set; }
 
 		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
-		[HideInPropertyGrid]
 		public override bool Unique { get; set; }
 		
 		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
