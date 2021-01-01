@@ -3,11 +3,8 @@ using ExpressBase.Common.Structures;
 using ExpressBase.Objects.ServiceStack_Artifacts;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Dynamic;
-using System.Text;
 using Newtonsoft.Json.Linq;
-using ExpressBase.Objects;
 using ServiceStack.Text;
 
 namespace ExpressBase.Objects.Objects
@@ -148,38 +145,37 @@ namespace ExpressBase.Objects.Objects
 
     public class ApiScriptHelper
     {
-        public Dictionary<string, object> Parameters { set; get; }
+        internal ApiGlobals Globals { set; get; }
 
-        public ApiGlobals Globals { set; get; }
-
-        public ApiScriptHelper(ref Dictionary<string, object> global,ApiGlobals api_global)
+        public ApiScriptHelper(ApiGlobals globals)
         {
-            Parameters = global;
-
-            Globals = api_global;
+            Globals = globals;
         }
 
         public void SetParam(string name, object value)
         {
-            if (!Parameters.ContainsKey(name))
-                Parameters.Add(name, value);
-            else
-                Parameters[name] = value;
-            this.Globals["Params"].Add(name, new NTV
-            {
-                Name = name,
-                Type = (value.GetType() == typeof(JObject)|| value.GetType().Name== "JValue") ? EbDbTypes.Object : (EbDbTypes)Enum.Parse(typeof(EbDbTypes), value.GetType().Name, true),
-                Value = value as object
-            });
+            Globals.SetParam(name, value);
         }
 
-        public void Exit() {
+        public dynamic GetResourceValue(int index)
+        {
+            return Globals.GetResourceValue(index);
+        }
+
+        public void Exit()
+        {
             throw new ExplicitExitException("Execution terminated explicitly!");
         }
     }
 
+    public delegate dynamic GetResourceValueHandler(int index);
+
     public class ApiGlobals
     {
+        private readonly Dictionary<string, object> globalParams;
+
+        public event GetResourceValueHandler ResourceValueHandler;
+
         public ApiScriptHelper Api { set; get; }
 
         public dynamic Params { get; set; }
@@ -188,13 +184,14 @@ namespace ExpressBase.Objects.Objects
 
         public ApiGlobals() { }
 
-        public ApiGlobals(EbDataSet _ds,ref Dictionary<string,object> global)
+        public ApiGlobals(Dictionary<string, object> globalParameters)
         {
-            this.Tables = (_ds == null) ? null : _ds.Tables;
+            this.globalParams = globalParameters;
 
-            this.Api = new ApiScriptHelper(ref global,this);
+            this.Api = new ApiScriptHelper(this);
+            this.Params = new NTVDict();
 
-            Params = new NTVDict();
+            SetGlobalParams(globalParameters);
         }
 
         public dynamic this[string key]
@@ -206,6 +203,36 @@ namespace ExpressBase.Objects.Objects
                 else
                     return null;
             }
+        }
+
+        public void SetGlobalParams(Dictionary<string, object> globalParams)
+        {
+            foreach (KeyValuePair<string, object> kp in globalParams)
+            {
+                this["Params"].Add(kp.Key, new NTV
+                {
+                    Name = kp.Key,
+                    Type = (kp.Value.GetType() == typeof(JObject)) ? EbDbTypes.Object : (EbDbTypes)Enum.Parse(typeof(EbDbTypes), kp.Value.GetType().Name, true),
+                    Value = kp.Value
+                });
+            }
+        }
+
+        internal void SetParam(string name, object value)
+        {
+            globalParams[name] = value;
+
+            this["Params"].Add(name, new NTV
+            {
+                Name = name,
+                Type = (value.GetType() == typeof(JObject) || value.GetType().Name == "JValue") ? EbDbTypes.Object : (EbDbTypes)Enum.Parse(typeof(EbDbTypes), value.GetType().Name, true),
+                Value = value
+            });
+        }
+
+        internal dynamic GetResourceValue(int index)
+        {
+            return ResourceValueHandler.Invoke(index);
         }
     }
 
@@ -223,7 +250,7 @@ namespace ExpressBase.Objects.Objects
         public FormGlobals()
         {
             this.form = new FormAsGlobal();
-             Params = new NTVDict();
+            Params = new NTVDict();
         }
     }
 
@@ -292,7 +319,7 @@ namespace ExpressBase.Objects.Objects
         public Double Sum(string colName)
         {
             Double s = 0;
-            foreach(ListNTV listNTV in this.Rows)
+            foreach (ListNTV listNTV in this.Rows)
             {
                 s += Convert.ToDouble(listNTV[colName]);
             }
@@ -446,7 +473,7 @@ namespace ExpressBase.Objects.Objects
         public void SetParam(string name, object value)
         {
             if (!Parameters.ContainsKey(name))
-                Parameters.Add(name,new TV { Value= value });
+                Parameters.Add(name, new TV { Value = value });
             else
                 Parameters[name] = new TV { Value = value };
             this.Globals["Params"].Add(name, new NTV
