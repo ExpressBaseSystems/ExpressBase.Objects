@@ -162,6 +162,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         }
     }
 
+    //v2
     [DataContract]
     public class EbMobileDataRequest : EbServiceStackAuthRequest, IReturn<MobileDataResponse>
     {

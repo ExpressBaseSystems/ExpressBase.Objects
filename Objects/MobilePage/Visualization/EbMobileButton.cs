@@ -54,7 +54,7 @@ namespace ExpressBase.Objects
                         pg.HidePropertiesExt(['FormMode', 'FormId', 'LinkFormParameters']);
                 }
             ")]
-        public string LinkRefId { get; set; }
+        public virtual string LinkRefId { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("Link Settings")]
@@ -66,18 +66,18 @@ namespace ExpressBase.Objects
                         pg.HideProperty('FormId');
                 }
             ")]
-        public WebFormDVModes FormMode { set; get; }
+        public virtual WebFormDVModes FormMode { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "DataColumns", 1)]
         [PropertyGroup("Link Settings")]
-        public EbMobileDataColToControlMap FormId { set; get; }
+        public virtual EbMobileDataColToControlMap FormId { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("Link Settings")]
         [Alias("Columns to controls map")]
         [PropertyEditor(PropertyEditorType.Mapper, "DataColumns", "FormControlMetas", "FormControl")]
-        public List<EbMobileDataColToControlMap> LinkFormParameters { get; set; }
+        public virtual List<EbMobileDataColToControlMap> LinkFormParameters { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [MetaOnly]
@@ -89,11 +89,11 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup(PGConstants.DATA)]
-        public string Text { set; get; }
+        public virtual string Text { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup(PGConstants.DATA)]
-        public bool RenderTextAsIcon { get; set; }
+        public virtual bool RenderTextAsIcon { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup(PGConstants.APPEARANCE)]
@@ -161,6 +161,59 @@ namespace ExpressBase.Objects
         {
             if (!string.IsNullOrEmpty(LinkRefId) && map.TryGetValue(LinkRefId, out string dsri))
                 this.LinkRefId = dsri;
+        }
+    }
+
+    [EnableInBuilder(BuilderType.MobilePage)]
+    public class EbMobileApprovalButton : EbMobileButton
+    {
+        public override string LinkRefId { get; set; }
+        public override WebFormDVModes FormMode { set; get; }
+        public override string Text { set; get; }
+        public override bool RenderTextAsIcon { get; set; }
+        public override List<EbMobileDataColToControlMap> LinkFormParameters { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [OSE_ObjectTypes(EbObjectTypes.iWebForm)]
+        [PropertyGroup(PGConstants.CORE)]
+        public string FormRefid { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "DataColumns", 1)]
+        [PropertyGroup(PGConstants.CORE)]
+        public override EbMobileDataColToControlMap FormId { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.CORE)]
+        [Alias("Stage Column Name")]
+        public string StageColumn { set; get; }
+
+        public EbDataSet ApprovalData { set; get; }
+
+        public override string GetDesignHtml()
+        {
+            return @"<div class='eb_stacklayout mob_control dropped' id='@id' eb-type='EbMobileApprovalButton' tabindex='1' onclick='$(this).focus()'>
+                            <div class='eb_btnctrlhtml h-100'>
+                               <button class='ebm-btn h-100'>Approval Button</button>
+                            </div>
+                        </div>".RemoveCR().DoubleQuoted();
+        }
+
+        public override List<string> DiscoverRelatedRefids()
+        {
+            List<string> list = new List<string>();
+
+            if (!string.IsNullOrEmpty(FormRefid))
+                list.Add(FormRefid);
+
+            return list;
+        }
+
+        public override void ReplaceRefid(Dictionary<string, string> map)
+        {
+            if (!string.IsNullOrEmpty(FormRefid) && map.TryGetValue(FormRefid, out string dsri))
+                this.FormRefid = dsri;
         }
     }
 }
