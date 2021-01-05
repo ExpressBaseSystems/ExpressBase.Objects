@@ -189,7 +189,11 @@ namespace ExpressBase.Objects
         [Alias("Stage Column Name")]
         public string StageColumn { set; get; }
 
-        public EbDataSet ApprovalData { set; get; }
+        public EbDataTable ApprovalData;
+
+        public int StageNameIndex;
+
+        public int ActionIdIndex;
 
         public override string GetDesignHtml()
         {
