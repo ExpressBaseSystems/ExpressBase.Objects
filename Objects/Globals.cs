@@ -205,6 +205,31 @@ namespace ExpressBase.Objects.Objects
             }
         }
 
+        private EbDbTypes GetEbDbType(object value)
+        {
+            Type type = value.GetType();
+
+            try
+            {
+                if (type == typeof(JObject))
+                {
+                    return EbDbTypes.Object;
+                }
+                else if (type == typeof(JValue))
+                {
+                    return EbDbTypes.String;
+                }
+                else
+                {
+                    return (EbDbTypes)Enum.Parse(typeof(EbDbTypes), type.Name, true);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Failed to parse value '{value}', parse parameter before set, {ex.Message}");
+            }
+        }
+
         public void SetGlobalParams(Dictionary<string, object> globalParams)
         {
             foreach (KeyValuePair<string, object> kp in globalParams)
@@ -212,7 +237,7 @@ namespace ExpressBase.Objects.Objects
                 this["Params"].Add(kp.Key, new NTV
                 {
                     Name = kp.Key,
-                    Type = (kp.Value.GetType() == typeof(JObject)) ? EbDbTypes.Object : (EbDbTypes)Enum.Parse(typeof(EbDbTypes), kp.Value.GetType().Name, true),
+                    Type = GetEbDbType(kp.Value),
                     Value = kp.Value
                 });
             }
@@ -225,7 +250,7 @@ namespace ExpressBase.Objects.Objects
             this["Params"].Add(name, new NTV
             {
                 Name = name,
-                Type = (value.GetType() == typeof(JObject) || value.GetType().Name == "JValue") ? EbDbTypes.Object : (EbDbTypes)Enum.Parse(typeof(EbDbTypes), value.GetType().Name, true),
+                Type = GetEbDbType(value),
                 Value = value
             });
         }
