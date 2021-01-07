@@ -65,5 +65,9 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.Expandable)]
         [PropertyGroup(PGConstants.APPEARANCE)]
         public virtual EbThickness Padding { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.BEHAVIOR)]
+        public virtual bool Hidden { set; get; }
     }
 }
