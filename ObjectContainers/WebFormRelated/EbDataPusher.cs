@@ -566,12 +566,9 @@ catch (Exception e)
                             RqstObj.Add(jEntry.Key, val);
                         }
 
-                        EbApi Api = EbFormHelper.GetEbObject<EbApi>(pusher.ApiRefId, null, service.Redis, service);
-                        
                         ApiResponse result = service.Gateway.Send<ApiResponse>(new ApiRequest
                         {
-                            Name = Api.Name,
-                            Version = Api.VersionNumber,
+                            RefId = pusher.ApiRefId,
                             Data = RqstObj,
                             SolnId = this.WebForm.SolutionObj.SolutionID,
                             UserAuthId = this.WebForm.UserObj.AuthId,

@@ -299,7 +299,7 @@ this.Init = function(id)
             AddParam(DataDB, param, i, EbDbTypes.String, _d, _od, FormConstants.meta_json, "{}");
             AddParam(DataDB, param, i, EbDbTypes.String, _d, _od, FormConstants.is_group, "T");
             AddParam(DataDB, param, i, EbDbTypes.Decimal, _d, _od, FormConstants.parent_id, 0);
-            AddParam(DataDB, param, i, EbDbTypes.Int32, _d, _od, FormConstants.eb_location_types_id, 0);
+            AddParam(DataDB, param, i, EbDbTypes.Int32, _d, _od, FormConstants.eb_location_types_id, 1);
 
             _extqry = temp + _extqry; //location must be created before user creation
             i++;
