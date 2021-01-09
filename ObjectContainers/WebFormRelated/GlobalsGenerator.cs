@@ -28,18 +28,22 @@ namespace ExpressBase.Objects.WebFormRelated
             object val = null;
             if (!string.IsNullOrEmpty(Query))
             {
-                try
-                {
+                //try
+                //{
                     EbDataTable dt = DataDB.DoQuery(Query);
                     if (dt.Rows.Count > 0 && dt.Rows[0].Count > 0)
                     {
                         val = dt.Rows[0][0];
                     }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("Exception in DelegateTest->ExecuteScalar: " + ex.Message + "\nQuery: " + Query);
-                }
+                //}
+                //catch (Exception ex)
+                //{
+                //    Console.WriteLine("Exception in DelegateTest->ExecuteScalar: " + ex.Message + "\nQuery: " + Query);
+                //}
+            }
+            else
+            {
+                Console.WriteLine("Null Query in DelegateTest->ExecuteScalar");
             }
             return val;
         }
