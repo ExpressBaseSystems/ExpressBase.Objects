@@ -555,18 +555,18 @@ catch (Exception e)
 
                 if (allowPush)
                 {
+                    JObject JObj = JObject.Parse(pusher.Json);
+                    FillJsonWithValuesRec(JObj, OutputDict, ref Index);
+                    Dictionary<string, object> RqstObj = new Dictionary<string, object>();
+
+                    foreach (KeyValuePair<string, JToken> jEntry in JObj)
+                    {
+                        object val = jEntry.Value is JValue ? (jEntry.Value as JValue).Value : Convert.ToString(jEntry.Value);
+                        RqstObj.Add(jEntry.Key, val);
+                    }
+
                     try
                     {
-                        JObject JObj = JObject.Parse(pusher.Json);
-                        FillJsonWithValuesRec(JObj, OutputDict, ref Index);
-                        Dictionary<string, object> RqstObj = new Dictionary<string, object>();
-
-                        foreach (KeyValuePair<string, JToken> jEntry in JObj)
-                        {
-                            object val = jEntry.Value is JValue ? (jEntry.Value as JValue).Value : Convert.ToString(jEntry.Value);
-                            RqstObj.Add(jEntry.Key, val);
-                        }
-
                         ApiResponse result = service.Gateway.Send<ApiResponse>(new ApiRequest
                         {
                             RefId = pusher.ApiRefId,
@@ -581,7 +581,7 @@ catch (Exception e)
                     catch (Exception ex)
                     {
                         Console.WriteLine($"Exception in CallApiInApiDataPushers: {ex.Message}\n{ex.StackTrace}");
-                        throw new FormException("Somthing went wrong", (int)HttpStatusCode.InternalServerError, ex.Message + " \n" + ex.StackTrace, "From EbDataPusher -> CallApiInApiDataPushers");
+                        throw new FormException("something went wrong", (int)HttpStatusCode.InternalServerError, ex.Message + " \n" + ex.StackTrace, "From EbDataPusher -> CallApiInApiDataPushers");
                     }
                 }
             }
