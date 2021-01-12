@@ -591,8 +591,11 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
             if (dpndcy.Count > 0)
                 throw new FormException("Avoid circular reference by the following controls in 'DefaultValueExpression' : " + string.Join(',', dpndcy.Select(e => _dict[e.Key].Control.Name).Distinct()));
 
-            foreach (int i in ExecOrd)
+            for (int i = ExecOrd.Count - 1; i >= 0; i--)
                 _this.DefaultValsExecOrder.Add(_dict[i].Path);
+
+            //foreach (int i in ExecOrd)
+            //    _this.DefaultValsExecOrder.Add(_dict[i].Path);
         }
 
         private static void CalcHideAndDisableExprDependency(Dictionary<int, EbControlWrapper> _dict)
