@@ -592,7 +592,7 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                 throw new FormException("Avoid circular reference by the following controls in 'DefaultValueExpression' : " + string.Join(',', dpndcy.Select(e => _dict[e.Key].Control.Name).Distinct()));
 
             for (int i = ExecOrd.Count - 1; i >= 0; i--)
-                _this.DefaultValsExecOrder.Add(_dict[i].Path);
+                _this.DefaultValsExecOrder.Add(_dict[ExecOrd[i]].Path);
 
             //foreach (int i in ExecOrd)
             //    _this.DefaultValsExecOrder.Add(_dict[i].Path);
