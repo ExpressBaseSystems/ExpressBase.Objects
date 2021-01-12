@@ -524,6 +524,8 @@ catch (Exception e)
                     else
                     {
                         object val = this.GetValueFormOutDict(OutputDict, ref Index);
+                        if (val == null)
+                            val = string.Empty;
                         jObj[jObjEntry.Key] = JToken.FromObject(val);
                     }
                 }

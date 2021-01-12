@@ -32,9 +32,9 @@ namespace ExpressBase.Objects.WebFormRelated
                 //{
                     EbDataTable dt = DataDB.DoQuery(Query);
                     if (dt.Rows.Count > 0 && dt.Rows[0].Count > 0)
-                    {
                         val = dt.Rows[0][0];
-                    }
+                    else
+                        Console.WriteLine("0 rows returned: DelegateTest->ExecuteScalar");
                 //}
                 //catch (Exception ex)
                 //{
