@@ -589,14 +589,14 @@ catch (Exception e)
             }
         }
 
-        public static string ProcessApiDataPushers(EbWebForm _this, Service service, IDatabase DataDB) 
+        public static string ProcessApiDataPushers(EbWebForm _this, Service service, IDatabase DataDB, DbConnection DbCon) 
         {
             if (_this.DataPushers == null || !_this.DataPushers.Exists(e => e is EbApiDataPusher))
                 return "No ApiDataPushers";
             string resp = string.Empty;
             //try
             //{
-                FG_Root globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(_this, _this.FormData, _this.FormDataBackup, DataDB);
+                FG_Root globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(_this, _this.FormData, _this.FormDataBackup, DataDB, DbCon);
                 EbDataPushHelper ebDataPushHelper = new EbDataPushHelper(_this);
                 string code = ebDataPushHelper.GetProcessedCode();
                 if (code != string.Empty)
