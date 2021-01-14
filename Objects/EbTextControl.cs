@@ -16,7 +16,17 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         [JsonIgnore]
         [EnableInBuilder(BuilderType.SurveyControl)]
-        public override string ToolIconHtml { get { return "<i class=\"fa fa-text-width\"></i>"; } set { } }
+        public override string ToolIconHtml { get { return "<i class=\"fa fa-font\"></i>"; } set { } }
+
+        [PropertyGroup(PGConstants.CORE)]
+        [EnableInBuilder(BuilderType.SurveyControl)]
+        [UIproperty]
+        [Unique]
+        [OnChangeUIFunction("Common.LABEL")]
+        [PropertyEditor(PropertyEditorType.MultiLanguageKeySelector)]
+        [HelpText("Label for the control to identify it's purpose.")]
+        [Alias("Text")]
+        public override string Label { get; set; }
 
         [HideInPropertyGrid]
         [JsonIgnore]
