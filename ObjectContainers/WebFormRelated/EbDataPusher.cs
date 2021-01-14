@@ -538,7 +538,7 @@ catch (Exception e)
             }
         }
 
-        public void CallApiInApiDataPushers(object out_dict, Service service, ref string resp)
+        public List<ApiRequest> CallApiInApiDataPushers(object out_dict, List<ApiRequest> ApiRqsts)
         {
             Dictionary<int, object[]> OutputDict = (Dictionary<int, object[]>)out_dict;
             int Index = 1;
@@ -567,29 +567,40 @@ catch (Exception e)
                         RqstObj.Add(jEntry.Key, val);
                     }
 
-                    try
+                    ApiRqsts.Add(new ApiRequest
                     {
-                        ApiResponse result = service.Gateway.Send<ApiResponse>(new ApiRequest
-                        {
-                            RefId = pusher.ApiRefId,
-                            Data = RqstObj,
-                            SolnId = this.WebForm.SolutionObj.SolutionID,
-                            UserAuthId = this.WebForm.UserObj.AuthId,
-                            UserId = this.WebForm.UserObj.UserId,
-                            WhichConsole = this.WebForm.UserObj.wc
-                        });
-                        resp += "\n\n" + JsonConvert.SerializeObject(result);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Exception in CallApiInApiDataPushers: {ex.Message}\n{ex.StackTrace}");
-                        throw new FormException("something went wrong", (int)HttpStatusCode.InternalServerError, ex.Message + " \n" + ex.StackTrace, "From EbDataPusher -> CallApiInApiDataPushers");
-                    }
+                        RefId = pusher.ApiRefId,
+                        Data = RqstObj,
+                        SolnId = this.WebForm.SolutionObj.SolutionID,
+                        UserAuthId = this.WebForm.UserObj.AuthId,
+                        UserId = this.WebForm.UserObj.UserId,
+                        WhichConsole = this.WebForm.UserObj.wc
+                    });
+
+                    //try
+                    //{
+                    //    ApiResponse result = service.Gateway.Send<ApiResponse>(new ApiRequest
+                    //    {
+                    //        RefId = pusher.ApiRefId,
+                    //        Data = RqstObj,
+                    //        SolnId = this.WebForm.SolutionObj.SolutionID,
+                    //        UserAuthId = this.WebForm.UserObj.AuthId,
+                    //        UserId = this.WebForm.UserObj.UserId,
+                    //        WhichConsole = this.WebForm.UserObj.wc
+                    //    });
+                    //    resp += "\n\n" + JsonConvert.SerializeObject(result);
+                    //}
+                    //catch (Exception ex)
+                    //{
+                    //    Console.WriteLine($"Exception in CallApiInApiDataPushers: {ex.Message}\n{ex.StackTrace}");
+                    //    throw new FormException("something went wrong", (int)HttpStatusCode.InternalServerError, ex.Message + " \n" + ex.StackTrace, "From EbDataPusher -> CallApiInApiDataPushers");
+                    //}
                 }
             }
+            return ApiRqsts;
         }
 
-        public static string ProcessApiDataPushers(EbWebForm _this, Service service, IDatabase DataDB, DbConnection DbCon) 
+        public static string ProcessApiDataPushers(EbWebForm _this, Service service, IDatabase DataDB, DbConnection DbCon, List<ApiRequest> ApiRqsts) 
         {
             if (_this.DataPushers == null || !_this.DataPushers.Exists(e => e is EbApiDataPusher))
                 return "No ApiDataPushers";
@@ -602,7 +613,7 @@ catch (Exception e)
                 if (code != string.Empty)
                 {
                     object out_dict = _this.ExecuteCSharpScriptNew(code, globals);
-                    ebDataPushHelper.CallApiInApiDataPushers(out_dict, service, ref resp);
+                    ebDataPushHelper.CallApiInApiDataPushers(out_dict, ApiRqsts);
                 }
             //}
             //catch (Exception ex) 
@@ -628,6 +639,26 @@ catch (Exception e)
             //int stat = DataDB.DoNonQuery(fullQry, _params.ToArray());
             //}
             return resp; 
+        }
+
+        public static string CallInternalApis(List<ApiRequest> ApiRqsts, Service service) 
+        {
+            string resp = string.Empty;
+            foreach (ApiRequest rq in ApiRqsts)
+            {
+                try
+                {
+                    ApiResponse result = service.Gateway.Send<ApiResponse>(rq);
+                    resp += "\n\n" + JsonConvert.SerializeObject(result);
+                }
+                catch (Exception ex)
+                {
+                    string temp = $"Exception in CallApiInApiDataPushers (CallInternalApis ReqObj): {JsonConvert.SerializeObject(rq)}\n{ex.Message}\n{ex.StackTrace}";
+                    resp += "\n\n" + temp;
+                    Console.WriteLine(temp);
+                }
+            }
+            return resp;
         }
 
         private static string GetFailLogInsertQuery(IDatabase DataDB, int i)
