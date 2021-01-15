@@ -31,6 +31,14 @@ namespace ExpressBase.Objects
 
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.SurveyControl)]
+        public override string EbSid { get; set; }
+
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.SurveyControl)]
+        public override string Name { get; set; }
+
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.SurveyControl)]
         public EbQSec QSec { get; set; }
 
         [HideInPropertyGrid]
