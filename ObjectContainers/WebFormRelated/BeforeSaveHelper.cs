@@ -6,6 +6,7 @@ using ExpressBase.Common.Structures;
 using ExpressBase.Objects.Helpers;
 using ExpressBase.Objects.Objects;
 using ExpressBase.Objects.ServiceStack_Artifacts;
+using Newtonsoft.Json.Linq;
 using ServiceStack;
 using ServiceStack.Redis;
 using System;
@@ -62,6 +63,14 @@ namespace ExpressBase.Objects.WebFormRelated
                     }
                     if (string.IsNullOrEmpty(dp.Json))
                         throw new FormException($"Required 'Json' for data pusher");
+                    try
+                    {
+                        JToken JTok = JToken.Parse(dp.Json);
+                    }
+                    catch (Exception e)
+                    {
+                        throw new FormException($"Failed to parse 'Json' in data pusher: " + e.Message);
+                    }
                 }
             }
         }
@@ -582,8 +591,11 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
             if (dpndcy.Count > 0)
                 throw new FormException("Avoid circular reference by the following controls in 'DefaultValueExpression' : " + string.Join(',', dpndcy.Select(e => _dict[e.Key].Control.Name).Distinct()));
 
-            foreach (int i in ExecOrd)
-                _this.DefaultValsExecOrder.Add(_dict[i].Path);
+            for (int i = ExecOrd.Count - 1; i >= 0; i--)
+                _this.DefaultValsExecOrder.Add(_dict[ExecOrd[i]].Path);
+
+            //foreach (int i in ExecOrd)
+            //    _this.DefaultValsExecOrder.Add(_dict[i].Path);
         }
 
         private static void CalcHideAndDisableExprDependency(Dictionary<int, EbControlWrapper> _dict)

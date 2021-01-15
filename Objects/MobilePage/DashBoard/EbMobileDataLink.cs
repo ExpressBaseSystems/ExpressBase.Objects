@@ -31,6 +31,11 @@ namespace ExpressBase.Objects
         public int ColumnSpacing { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        [DefaultPropValue("100")]
+        public int Width { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [PropertyGroup("Link Settings")]
         [Alias("Link")]

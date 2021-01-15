@@ -377,5 +377,22 @@ namespace ExpressBase.Objects
                 }
             }
         }
+
+        public List<T> GetControlsByType<T>()
+        {
+            List<T> controls = new List<T>();
+
+            foreach (EbMobileTableCell cells in DataLayout.CellCollection)
+            {
+                foreach (EbMobileControl ctrl in cells.ControlCollection)
+                {
+                    if (ctrl is T parsed)
+                    {
+                        controls.Add(parsed);
+                    }
+                }
+            }
+            return controls;
+        }
     }
 }

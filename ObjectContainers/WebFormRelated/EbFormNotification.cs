@@ -201,7 +201,7 @@ else if(this.NotifyBy === 3)
             int resp = 0;
             try
             {
-                FG_Root globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(_this, _this.FormData, _this.FormDataBackup);
+                FG_Root globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(_this, _this.FormData, _this.FormDataBackup, DataDB);
                 foreach (EbFormNotification ebFn in _this.Notifications)
                 {
                     if (!string.IsNullOrEmpty(ebFn.SendOnlyIf?.Code))

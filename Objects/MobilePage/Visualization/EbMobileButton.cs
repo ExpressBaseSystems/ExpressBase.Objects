@@ -54,7 +54,7 @@ namespace ExpressBase.Objects
                         pg.HidePropertiesExt(['FormMode', 'FormId', 'LinkFormParameters']);
                 }
             ")]
-        public string LinkRefId { get; set; }
+        public virtual string LinkRefId { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("Link Settings")]
@@ -66,18 +66,18 @@ namespace ExpressBase.Objects
                         pg.HideProperty('FormId');
                 }
             ")]
-        public WebFormDVModes FormMode { set; get; }
+        public virtual WebFormDVModes FormMode { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "DataColumns", 1)]
         [PropertyGroup("Link Settings")]
-        public EbMobileDataColToControlMap FormId { set; get; }
+        public virtual EbMobileDataColToControlMap FormId { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("Link Settings")]
         [Alias("Columns to controls map")]
         [PropertyEditor(PropertyEditorType.Mapper, "DataColumns", "FormControlMetas", "FormControl")]
-        public List<EbMobileDataColToControlMap> LinkFormParameters { get; set; }
+        public virtual List<EbMobileDataColToControlMap> LinkFormParameters { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [MetaOnly]
@@ -89,11 +89,11 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup(PGConstants.DATA)]
-        public string Text { set; get; }
+        public virtual string Text { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup(PGConstants.DATA)]
-        public bool RenderTextAsIcon { get; set; }
+        public virtual bool RenderTextAsIcon { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup(PGConstants.APPEARANCE)]

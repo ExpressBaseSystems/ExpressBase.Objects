@@ -1398,7 +1398,7 @@ namespace ExpressBase.Objects
                         if (_ctrl.ContextGetExpr != null && !_ctrl.ContextGetExpr.Code.IsNullOrEmpty())
                         {
                             if (this.FormGlobals == null)
-                                this.FormGlobals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, _FormData, null);
+                                this.FormGlobals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, _FormData, null, DataDB);
                             cxt2 = Convert.ToString(this.ExecuteCSharpScriptNew(_ctrl.ContextGetExpr.Code, this.FormGlobals));
                         }
 
@@ -1644,8 +1644,11 @@ namespace ExpressBase.Objects
                 resp += " - AuditTrail: " + ebAuditTrail.UpdateAuditTrail();
                 Console.WriteLine("EbWebForm.Save.AfterSave start");
                 resp += " - AfterSave: " + this.AfterSave(DataDB, IsUpdate);
+                List<ApiRequest> ApiRqsts = new List<ApiRequest>();
+                resp += " - ApiDataPushers: " + EbDataPushHelper.ProcessApiDataPushers(this, service, DataDB, this.DbConnection, ApiRqsts);
                 this.DbTransaction.Commit();
                 Console.WriteLine("EbWebForm.Save.DbTransaction Committed");
+                resp += " - ApiDataPushers Response: " + EbDataPushHelper.CallInternalApis(ApiRqsts, service);
                 Console.WriteLine("EbWebForm.Save.SendNotifications start");
                 resp += " - Notifications: " + EbFnGateway.SendNotifications(this, DataDB, service);
                 Console.WriteLine("EbWebForm.Save.SendMobileNotification start");
@@ -1653,7 +1656,6 @@ namespace ExpressBase.Objects
                 Console.WriteLine("EbWebForm.Save.InsertOrUpdate Global Search start");
                 SearchHelper.InsertOrUpdate(DataDB, this);
                 Console.WriteLine("EbWebForm.Save.resp = " + resp);
-                Task.Run(() => EbDataPushHelper.ProcessApiDataPushers(this, service, DataDB));
             }
             catch (FormException ex1)
             {
@@ -1862,7 +1864,7 @@ namespace ExpressBase.Objects
                     //_FG_WebForm global = GlobalsGenerator.GetCSharpFormGlobals(this, this.FormData);
                     //_FG_Root globals = new _FG_Root(global, this, service);
 
-                    globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, this.FormData, this.FormDataBackup);
+                    globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, this.FormData, this.FormDataBackup, DataDB);
 
                     object stageObj = this.ExecuteCSharpScriptNew(currentStage.NextStage.Code, globals);
                     string nxtStName = string.Empty;
@@ -1979,7 +1981,7 @@ namespace ExpressBase.Objects
                 if (!string.IsNullOrEmpty(nextStage.NotificationContent?.Code?.Trim()))
                 {
                     if (globals == null)
-                        globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, this.FormData, this.FormDataBackup);
+                        globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, this.FormData, this.FormDataBackup, DataDB);
                     object msg = this.ExecuteCSharpScriptNew(nextStage.NotificationContent.Code, globals);
                     description = Convert.ToString(msg);
                     if (!string.IsNullOrEmpty(description))
@@ -2027,7 +2029,7 @@ namespace ExpressBase.Objects
                     if (this.FormData.ExtendedTables.ContainsKey(_c.Name) || (this.FormData.ExtendedTables.ContainsKey(_c.Name + "_add") && this.FormData.ExtendedTables.ContainsKey(_c.Name + "_del")))
                     {
                         if (this.FormGlobals == null)
-                            this.FormGlobals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, this.FormData, null);
+                            this.FormGlobals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, this.FormData, null, DataDB);
                         string secCxtGet = null, secCxtSet = null;
                         if (_c.ContextGetExpr != null && !_c.ContextGetExpr.Code.IsNullOrEmpty())
                             secCxtGet = Convert.ToString(this.ExecuteCSharpScriptNew(_c.ContextGetExpr.Code, this.FormGlobals));
