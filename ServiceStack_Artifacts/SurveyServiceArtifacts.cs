@@ -23,6 +23,23 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
+
+    public class GetSurveyQuestionsRequest : IEbSSRequest, IReturn<GetSurveyQuestionsResponse>
+    {
+        public string SolnId { get; set; }
+
+        public int UserId { get; set; }
+    }
+
+    public class GetSurveyQuestionsResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public Dictionary<int, EbQuestion> Data { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
     public class SurveyQuesRequest : IReturn<SurveyQuesResponse>, IEbSSRequest
     {
         public string SolnId { get; set; }
