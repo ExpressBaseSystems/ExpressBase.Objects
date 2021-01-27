@@ -13,8 +13,7 @@ using System.Runtime.Serialization;
 namespace ExpressBase.Objects
 {
 
-    [EnableInBuilder(BuilderType.BotForm, BuilderType.WebForm, BuilderType.UserControl, BuilderType.DashBoard)]
-    [HideInToolBox]
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.DashBoard)]
     public class EbDataLabel : EbControlUI
     {
 
@@ -48,6 +47,9 @@ namespace ExpressBase.Objects
                 },
                 Style4PlaceHolder : function(elementId , props){
                  $(`#cont_${elementId} .data-dynamic-label`).css(getEbFontStyleObject(props.PlaceHolderFont));
+                },
+                Style4StaticLabel : function(elementId , props){
+                 $(`#cont_${elementId} .data-dynamic-label`).css(getEbFontStyleObject(props.Style4StaticLabel));
                 }
                 }";
             }
@@ -62,7 +64,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [PropertyGroup(PGConstants.APPEARANCE)]
-        [OnChangeUIFunction("EbDataLabel.Style4DataLabel")]
+        //[OnChangeUIFunction("EbDataLabel.Style4DataLabel")]
         public Align TextAlign { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
@@ -74,17 +76,18 @@ namespace ExpressBase.Objects
         [PropertyGroup("Appearance")]
         [UIproperty]
         [PropertyEditor(PropertyEditorType.FontSelector)]
+        [DefaultPropValue(null)]
         [OnChangeUIFunction("EbDataLabel.Style4PlaceHolder")]
         public EbFont PlaceHolderFont { get; set; }
 
 
 
-        [EnableInBuilder(BuilderType.DashBoard)]
+        [EnableInBuilder(BuilderType.DashBoard , BuilderType.WebForm)]
         [PropertyGroup("Core")]  
         public LabelStyle LabelStyle { get; set; }
 
 
-        [EnableInBuilder(BuilderType.DashBoard)]
+        [EnableInBuilder(BuilderType.DashBoard, BuilderType.WebForm)]
         [PropertyGroup("LabelConfig")]
         [DefaultPropValue("4")]
         [OnChangeExec(@"if(this.LabelborderRadius > 50){
@@ -100,7 +103,7 @@ namespace ExpressBase.Objects
         public int LabelBorderRadius { get; set; }
 
 
-        [EnableInBuilder(BuilderType.DashBoard)]
+        [EnableInBuilder(BuilderType.DashBoard , BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.Color)]
         [PropertyGroup("LabelConfig")]
         [DefaultPropValue("#d2d2d7")]
@@ -201,14 +204,15 @@ namespace ExpressBase.Objects
         [UIproperty]
         public string StaticLabel { get; set; }
 
-        [EnableInBuilder(BuilderType.DashBoard)]
+        [EnableInBuilder(BuilderType.DashBoard, BuilderType.WebForm)]
         [PropertyGroup("StaticLabel")]
         [UIproperty]
         [PropertyEditor(PropertyEditorType.FontSelector)]
+        [DefaultPropValue(null)]
         [OnChangeUIFunction("EbDataLabel.Style4StaticLabel")]
         public EbFont StaticLabelFont { get; set; }
 
-        [EnableInBuilder(BuilderType.DashBoard)]
+        [EnableInBuilder(BuilderType.DashBoard, BuilderType.WebForm)]
         [PropertyGroup("StaticLabel")]
         [UIproperty]
         [PropertyEditor(PropertyEditorType.Expandable)]
@@ -226,14 +230,15 @@ namespace ExpressBase.Objects
 
         //dynamic label config
 
-        [EnableInBuilder(BuilderType.DashBoard)]
+        [EnableInBuilder(BuilderType.DashBoard , BuilderType.WebForm)]
         [PropertyGroup("DynamicLabel")]
         [UIproperty]
         [PropertyEditor(PropertyEditorType.FontSelector)]
+        [DefaultPropValue(null)]
         public EbFont DynamicLabelFont { get; set; }
 
 
-        [EnableInBuilder(BuilderType.DashBoard)]
+        [EnableInBuilder(BuilderType.DashBoard, BuilderType.WebForm)]
         [PropertyGroup("DynamicLabel")]
         [PropertyEditor(PropertyEditorType.Expandable)]
         [UIproperty]
@@ -253,14 +258,15 @@ namespace ExpressBase.Objects
 
         //Description of Label
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.DashBoard)]
+        [EnableInBuilder(BuilderType.DashBoard)]
         [PropertyGroup("Description")]
         public override string Description { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl, BuilderType.DashBoard)]
+        [EnableInBuilder(BuilderType.BotForm, BuilderType.UserControl, BuilderType.DashBoard)]
         [PropertyGroup("Description")]
         [UIproperty]
         [PropertyEditor(PropertyEditorType.FontSelector)]
+        [DefaultPropValue(null)]
         public EbFont DescriptionFont { get; set; }
 
         [EnableInBuilder(BuilderType.DashBoard)]
@@ -306,7 +312,7 @@ namespace ExpressBase.Objects
         public bool RenderIcon { get; set; }
 
 
-        [EnableInBuilder(BuilderType.DashBoard)]
+        [EnableInBuilder(BuilderType.DashBoard, BuilderType.WebForm)]
         [PropertyGroup("Icon")]
         [UIproperty]
         [PropertyEditor(PropertyEditorType.IconPicker)]
@@ -314,13 +320,13 @@ namespace ExpressBase.Objects
         public string Icon { get; set; }
 
 
-        [EnableInBuilder(BuilderType.DashBoard)]
+        [EnableInBuilder(BuilderType.DashBoard, BuilderType.WebForm)]
         [PropertyGroup("Icon")]
         [UIproperty]
         [DefaultPropValue("")]
         public string IconText { get; set; }
 
-        [EnableInBuilder(BuilderType.DashBoard)]
+        [EnableInBuilder(BuilderType.DashBoard, BuilderType.WebForm)]
         [PropertyGroup("Icon")]
         [UIproperty]
         [PropertyEditor(PropertyEditorType.Color)]
@@ -395,9 +401,6 @@ namespace ExpressBase.Objects
         [DefaultPropValue("#000000")]
         public string FooterTextColor { get; set; }
 
-
-
-
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.DashBoard)]
         [HideInPropertyGrid]
         [HideInToolBox]
@@ -424,7 +427,6 @@ namespace ExpressBase.Objects
         public override bool IsRenderMode { get; set; }
 
 
-
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.DashBoard)]
         [PropertyEditor(PropertyEditorType.ScriptEditorJS)]
         [HelpText("Define default value of the control.")]
@@ -440,17 +442,42 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         public override string ToolIconHtml { get { return "<i class='fa fa-font'></i>"; } set { } }
 
+
+        //for webform only
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.DashBoard)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
+        [UIproperty]
+
+        [PropertyPriority(99)]
+        public string DataSourceId { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [MetaOnly]
+        public DVColumnCollection Columns { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "Columns", 1)]
+        [OnChangeExec(@"if (this.Columns.$values.length === 0 ){pg.MakeReadOnly('ValueMember');} else {pg.MakeReadWrite('ValueMember');}")]
+        [PropertyPriority(69)]
+        public DVBaseColumn ValueMember { get; set; }
+
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [DefaultPropValue("1000")]
+        public int RefreshTime { get; set; }
         public override string GetDesignHtml()
         {
             return new EbDataLabel() { EbSid = "Label1", Label = "Label1" }.GetDesignHtmlHelper().RemoveCR().GraveAccentQuoted(); ;
         }
 
-        //public string fontObj { get; set; }
 
+        //public string fontObj { get; set; }
         public override string GetBareHtml()
         {
             return @"
-       < div class='data-static-label'> @Label@ </div>
+       <div class='data-static-label'> @Label@ </div>
         @Description@
         <div class='data-dynamic-label' style= ' @style@ '> @PlaceHolder@ </div>
 "
@@ -467,10 +494,11 @@ namespace ExpressBase.Objects
             string EbCtrlHTML = @" 
             <div id='cont_@ebsid@' ebsid='@ebsid@' name='@name@' class='Eb-ctrlContainer' @childOf@ ctype='@type@' eb-hidden='@isHidden@'>
                     <div  id='@ebsid@Wraper' class='ctrl-cover' ui-inp style='align-items: @textalign@ '>
+                    <div class='card-icon' id='@ebsid@_icon'><i class=''></i></div><div class='lb2-data'>
                         <div> <span class='eb-ctrl-label eb-label-editable' ui-label id='@ebsidLbl'>@Label@</span> 
                         <input id='@ebsid@lbltxtb' class='eb-lbltxtb' type='text'/> @req@  </div>
-                        <div class='eb-des-label' id='@ebLblDescription'> @Description@ </div> 
-                        <div class='data-dynamic-label'> @PlaceHolder@ </div>
+                        <div class='eb-des-label' id='@ebLblDescription'> @Description@ </div>
+                        <div class='data-dynamic-label'> @PlaceHolder@ </div></div>
                     </div>
                 <span class='helpText' ui-helptxt>@helpText@ </span>
             </div>"
@@ -482,20 +510,22 @@ namespace ExpressBase.Objects
                .Replace("@textalign@", this.TextAlign.ToString())
                .Replace("Right", "flex-end")
                .Replace("Left", "flex-start")
-               .Replace("@PlaceHolder@", string.IsNullOrEmpty(this.DynamicLabel) ? "PlaceHolder" : this.DynamicLabel); ;
+               .Replace("@PlaceHolder@", string.IsNullOrEmpty(this.DynamicLabel) ? "PlaceHolder" : this.DynamicLabel);
             return ReplacePropsInHTML(EbCtrlHTML);
         }
 
         public override string GetHtml()
         {
-            string EbCtrlHTML = @" 
-        <div id='cont_@ebsid@' ebsid='@ebsid@' name='@name@' class='Eb-ctrlContainer' @childOf@ ctype='@type@' eb-hidden='@isHidden@'>
-                <div  id='@ebsid@Wraper' class='ctrl-cover' ui-inp style='align-items: @style@ ;background-color: @bgColor@ ; color :@forecolor@'>        
-                 <link rel='stylesheet' type='text/css' href='@fontVal@'/>
-                    @barehtml@
-                </div>
-            <span class='helpText' ui-helptxt>@helpText@ </span>
-        </div>"
+            string EbCtrlHTML = @"  
+            <div id='cont_@ebsid@' ebsid='@ebsid@' name='@name@' class='Eb-ctrlContainer' @childOf@ ctype='@type@' eb-hidden='@isHidden@'>
+                    <div  id='@ebsid@Wraper' class='ctrl-cover' ui-inp style='align-items: @textalign@ ; display:flex;flex-flow:row;'>
+                    <div class='card-icon' id='@ebsid@_icon'><i class='' style='font-size:30px;padding:10px;'></i></div><div class='lb2-data'>
+                        <div> <span class='eb-ctrl-label eb-label-editable' ui-label id='@ebsidLbl'>@Label@</span> 
+                        <input id='@ebsid@lbltxtb' class='eb-lbltxtb' type='text'/> @req@  </div>
+                        <div class='data-dynamic-label'> @PlaceHolder@ </div></div>
+                    </div>
+                <span class='helpText' ui-helptxt>@helpText@ </span>
+            </div>"
                .Replace("@LabelForeColor ", "color:" + (LabelForeColor ?? "@LabelForeColor ") + ";")
                .Replace("@style@", this.TextAlign.ToString())
                .Replace("Right", "flex-end")

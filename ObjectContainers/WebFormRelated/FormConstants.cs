@@ -69,5 +69,7 @@ namespace ExpressBase.Objects.WebFormRelated
         public const string consadd = "consadd";
         //AutoId
         public const string AutoId_PlaceHolder = "__EbAutoId_PlaceHolder__";
+        //DataPusher
+        public const string __eb_loop_through = "__eb_loop_through";
     }
 }
