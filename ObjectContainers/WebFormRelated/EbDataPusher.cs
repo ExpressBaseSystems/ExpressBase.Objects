@@ -34,6 +34,9 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         public string Json { get; set; }
 
+        [JsonIgnore]
+        public string ProcessedJson { get; set; }
+
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.WebForm)]
         public string EbSid { get; set; }
@@ -455,6 +458,67 @@ catch (Exception e)
             InternalError
         }
 
+        private void PreprocessJson(EbDataPusher pusher) 
+        {
+            JToken JTok = JToken.Parse(pusher.Json);
+            this.PreprocessJsonRec(JTok);
+            pusher.ProcessedJson = JTok.ToString();
+        }
+
+        private void PreprocessJsonRec(JToken JTok) 
+        {
+            if (JTok is JObject)
+            {
+                JObject jObj = JTok as JObject;
+                foreach (KeyValuePair<string, JToken> jObjEntry in jObj)
+                {
+                    if (jObjEntry.Value is JObject || jObjEntry.Value is JArray)
+                        PreprocessJsonRec(jObjEntry.Value);
+                }
+            }
+            else if (JTok is JArray)
+            {
+                JArray jArr = JTok as JArray;
+
+                for (int i = 0; i < jArr.Count; i++)
+                {
+                    if (jArr[i] is JObject)
+                    {
+                        JObject candObj = jArr[i] as JObject;
+
+                        if (candObj.TryGetValue(FormConstants.__eb_loop_through, out JToken _val))
+                        {
+                            string _co = _val.ToString();
+                            int dupliCount = 0;
+                            foreach (TableSchema _table in this.WebForm.FormSchema.Tables.FindAll(e => e.TableType == WebFormTableTypes.Grid))
+                            {
+                                if (_co.Contains($"form.{_table.ContainerName}.GetEnumerator()"))
+                                {
+                                    if (this.WebForm.FormData.MultipleTables.ContainsKey(_table.TableName))
+                                        dupliCount = this.WebForm.FormData.MultipleTables[_table.TableName].Count;
+                                    break;
+                                }
+                            }
+                            if (dupliCount == 0)
+                            {
+                                candObj.Remove();
+                                i--;
+                            }
+                            else
+                            {
+                                for (int j = 1; j < dupliCount; j++)
+                                    candObj.AddAfterSelf(candObj.DeepClone());
+                                i = i + dupliCount - 1;
+                            }
+                        }
+                    }
+                }
+
+                foreach (JToken jt in jArr)
+                    PreprocessJsonRec(jt);
+            }
+        }
+
         public string GetProcessedCode()
         {
             this.CodeDict = new Dictionary<int, string>();
@@ -472,7 +536,8 @@ catch (Exception e)
                     Index++;
                 }
 
-                JToken JTok = JToken.Parse(pusher.Json);
+                this.PreprocessJson(pusher);
+                JToken JTok = JToken.Parse(pusher.ProcessedJson);
                 GetFnDefinitionRec(JTok, ref FnDef, ref PusherFnCall, ref Index);
 
                 if (PusherWrapIf == string.Empty)
@@ -557,7 +622,7 @@ catch (Exception e)
 
                 if (allowPush)
                 {
-                    JObject JObj = JObject.Parse(pusher.Json);
+                    JObject JObj = JObject.Parse(pusher.ProcessedJson);
                     FillJsonWithValuesRec(JObj, OutputDict, ref Index);
                     Dictionary<string, object> RqstObj = new Dictionary<string, object>();
 
