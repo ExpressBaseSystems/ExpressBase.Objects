@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using ServiceStack;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Globalization;
 
 namespace ExpressBase.Objects.WebFormRelated
@@ -18,9 +19,12 @@ namespace ExpressBase.Objects.WebFormRelated
     {
         private IDatabase DataDB { get; set; }
 
-        public DelegateTest(IDatabase DataDB)
+        private DbConnection DbCon { get; set; }
+
+        public DelegateTest(IDatabase DataDB, DbConnection DbCon)
         {
             this.DataDB = DataDB;
+            this.DbCon = DbCon;
         }
 
         public object ExecuteScalar(string Query)
@@ -28,18 +32,26 @@ namespace ExpressBase.Objects.WebFormRelated
             object val = null;
             if (!string.IsNullOrEmpty(Query))
             {
-                try
-                {
-                    EbDataTable dt = DataDB.DoQuery(Query);
+                //try
+                //{
+                    EbDataTable dt;
+                    if (this.DbCon == null)
+                        dt = DataDB.DoQuery(Query);
+                    else
+                        dt = DataDB.DoQuery(this.DbCon, Query);
                     if (dt.Rows.Count > 0 && dt.Rows[0].Count > 0)
-                    {
                         val = dt.Rows[0][0];
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("Exception in DelegateTest->ExecuteScalar: " + ex.Message + "\nQuery: " + Query);
-                }
+                    else
+                        Console.WriteLine("0 rows returned: DelegateTest->ExecuteScalar");
+                //}
+                //catch (Exception ex)
+                //{
+                //    Console.WriteLine("Exception in DelegateTest->ExecuteScalar: " + ex.Message + "\nQuery: " + Query);
+                //}
+            }
+            else
+            {
+                Console.WriteLine("Null Query in DelegateTest->ExecuteScalar");
             }
             return val;
         }
@@ -218,14 +230,14 @@ namespace ExpressBase.Objects.WebFormRelated
             return new FG_Root(new FG_Params(dict));
         }
 
-        public static FG_Root GetCSharpFormGlobals_NEW(EbWebForm _this, WebformData _formdata, WebformData _formdataBkUp, IDatabase DataDB = null)
+        public static FG_Root GetCSharpFormGlobals_NEW(EbWebForm _this, WebformData _formdata, WebformData _formdataBkUp, IDatabase DataDB = null, DbConnection DbCon = null)
         {
             FG_User fG_User = new FG_User(_this.UserObj.UserId, _this.UserObj.FullName, _this.UserObj.Email, _this.UserObj.Roles);
             FG_System fG_System = new FG_System();
             FG_DataDB fG_DataDB = null;
             if (DataDB != null)
             {
-                DelegateTest OutDelObj = new DelegateTest(DataDB);
+                DelegateTest OutDelObj = new DelegateTest(DataDB, DbCon);
                 fG_DataDB = new FG_DataDB(OutDelObj.ExecuteScalar);
             }
             FG_WebForm fG_WebForm = new FG_WebForm() { id = _this.TableRowId, eb_loc_id = _this.LocationId, eb_ref_id = _this.RefId, __mode = _this.__mode };
@@ -259,11 +271,12 @@ namespace ExpressBase.Objects.WebFormRelated
                     else
                     {
                         object data = null;
-                        if (_control is EbAutoId && fG_WebForm.__mode == "new")
+                        if (_control is EbAutoId && fG_WebForm.__mode == "new" && fG_WebForm.id == 0)
                             data = FormConstants.AutoId_PlaceHolder;
                         else
                         {
-                            if (Table.Count > 0 && Table[0].GetColumn(_control.Name) != null && !(_control is EbAutoId))
+                            if (Table.Count > 0 && Table[0].GetColumn(_control.Name) != null && 
+                                (!(_control is EbAutoId) || (_control is EbAutoId && fG_WebForm.__mode == "new" && fG_WebForm.id > 0)))
                                 data = Table[0][_control.Name];
                             else if (TableBkUp.Count > 0 && TableBkUp[0].GetColumn(_control.Name) != null)
                                 data = TableBkUp[0][_control.Name];

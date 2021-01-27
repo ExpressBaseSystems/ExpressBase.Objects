@@ -430,7 +430,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 		public int Total_Amount { get; set; }
 
 		[DataMember(Order = 4)]
-		public int Amount_Received { get; set; }
+		public int Total_Received { get; set; }
 
 		[DataMember(Order = 5)]
 		public int Balance_Amount { get; set; }

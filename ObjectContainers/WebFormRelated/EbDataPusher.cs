@@ -14,6 +14,7 @@ using ExpressBase.Common.Constants;
 using ServiceStack;
 using ExpressBase.CoreBase.Globals;
 using System.Data.Common;
+using Newtonsoft.Json;
 
 namespace ExpressBase.Objects
 {
@@ -32,6 +33,9 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.String)]
         [EnableInBuilder(BuilderType.WebForm)]
         public string Json { get; set; }
+
+        [JsonIgnore]
+        public string ProcessedJson { get; set; }
 
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.WebForm)]
@@ -324,7 +328,7 @@ namespace ExpressBase.Objects
             return $@"
 public object fn_{Index}() 
 {{ 
-    {(Regex.IsMatch(Code, "\breturn\b") ? string.Empty : "return ")} {Code} ;
+    {(Regex.IsMatch(Code, @"\breturn\b") ? string.Empty : "return ")} {Code} ;
 }}".RemoveCR() + "\n";
         }
 
@@ -454,6 +458,67 @@ catch (Exception e)
             InternalError
         }
 
+        private void PreprocessJson(EbDataPusher pusher) 
+        {
+            JToken JTok = JToken.Parse(pusher.Json);
+            this.PreprocessJsonRec(JTok);
+            pusher.ProcessedJson = JTok.ToString();
+        }
+
+        private void PreprocessJsonRec(JToken JTok) 
+        {
+            if (JTok is JObject)
+            {
+                JObject jObj = JTok as JObject;
+                foreach (KeyValuePair<string, JToken> jObjEntry in jObj)
+                {
+                    if (jObjEntry.Value is JObject || jObjEntry.Value is JArray)
+                        PreprocessJsonRec(jObjEntry.Value);
+                }
+            }
+            else if (JTok is JArray)
+            {
+                JArray jArr = JTok as JArray;
+
+                for (int i = 0; i < jArr.Count; i++)
+                {
+                    if (jArr[i] is JObject)
+                    {
+                        JObject candObj = jArr[i] as JObject;
+
+                        if (candObj.TryGetValue(FormConstants.__eb_loop_through, out JToken _val))
+                        {
+                            string _co = _val.ToString();
+                            int dupliCount = 0;
+                            foreach (TableSchema _table in this.WebForm.FormSchema.Tables.FindAll(e => e.TableType == WebFormTableTypes.Grid))
+                            {
+                                if (_co.Contains($"form.{_table.ContainerName}.GetEnumerator()"))
+                                {
+                                    if (this.WebForm.FormData.MultipleTables.ContainsKey(_table.TableName))
+                                        dupliCount = this.WebForm.FormData.MultipleTables[_table.TableName].Count;
+                                    break;
+                                }
+                            }
+                            if (dupliCount == 0)
+                            {
+                                candObj.Remove();
+                                i--;
+                            }
+                            else
+                            {
+                                for (int j = 1; j < dupliCount; j++)
+                                    candObj.AddAfterSelf(candObj.DeepClone());
+                                i = i + dupliCount - 1;
+                            }
+                        }
+                    }
+                }
+
+                foreach (JToken jt in jArr)
+                    PreprocessJsonRec(jt);
+            }
+        }
+
         public string GetProcessedCode()
         {
             this.CodeDict = new Dictionary<int, string>();
@@ -471,7 +536,8 @@ catch (Exception e)
                     Index++;
                 }
 
-                JToken JTok = JToken.Parse(pusher.Json);
+                this.PreprocessJson(pusher);
+                JToken JTok = JToken.Parse(pusher.ProcessedJson);
                 GetFnDefinitionRec(JTok, ref FnDef, ref PusherFnCall, ref Index);
 
                 if (PusherWrapIf == string.Empty)
@@ -523,6 +589,8 @@ catch (Exception e)
                     else
                     {
                         object val = this.GetValueFormOutDict(OutputDict, ref Index);
+                        if (val == null)
+                            val = string.Empty;
                         jObj[jObjEntry.Key] = JToken.FromObject(val);
                     }
                 }
@@ -535,7 +603,7 @@ catch (Exception e)
             }
         }
 
-        public void CallApiInApiDataPushers(object out_dict, Service service)
+        public List<ApiRequest> CallApiInApiDataPushers(object out_dict, List<ApiRequest> ApiRqsts)
         {
             Dictionary<int, object[]> OutputDict = (Dictionary<int, object[]>)out_dict;
             int Index = 1;
@@ -554,79 +622,108 @@ catch (Exception e)
 
                 if (allowPush)
                 {
-                    try
+                    JObject JObj = JObject.Parse(pusher.ProcessedJson);
+                    FillJsonWithValuesRec(JObj, OutputDict, ref Index);
+                    Dictionary<string, object> RqstObj = new Dictionary<string, object>();
+
+                    foreach (KeyValuePair<string, JToken> jEntry in JObj)
                     {
-                        JObject JObj = JObject.Parse(pusher.Json);
-                        FillJsonWithValuesRec(JObj, OutputDict, ref Index);
-                        Dictionary<string, object> RqstObj = new Dictionary<string, object>();
-
-                        foreach (KeyValuePair<string, JToken> jEntry in JObj)
-                        {
-                            object val = jEntry.Value is JValue ? (jEntry.Value as JValue).Value : Convert.ToString(jEntry.Value);
-                            RqstObj.Add(jEntry.Key, val);
-                        }
-
-                        EbApi Api = EbFormHelper.GetEbObject<EbApi>(pusher.ApiRefId, null, service.Redis, service);
-                        
-                        ApiResponse result = service.Gateway.Send<ApiResponse>(new ApiRequest
-                        {
-                            Name = Api.Name,
-                            Version = Api.VersionNumber,
-                            Data = RqstObj,
-                            SolnId = this.WebForm.SolutionObj.SolutionID,
-                            UserAuthId = this.WebForm.UserObj.AuthId,
-                            UserId = this.WebForm.UserObj.UserId,
-                            WhichConsole = this.WebForm.UserObj.wc
-                        });
-
+                        object val = jEntry.Value is JValue ? (jEntry.Value as JValue).Value : Convert.ToString(jEntry.Value);
+                        RqstObj.Add(jEntry.Key, val);
                     }
-                    catch (Exception ex)
+
+                    ApiRqsts.Add(new ApiRequest
                     {
-                        Console.WriteLine($"Exception in CallApiInApiDataPushers: {ex.Message}\n{ex.StackTrace}");
-                    }
+                        RefId = pusher.ApiRefId,
+                        Data = RqstObj,
+                        SolnId = this.WebForm.SolutionObj.SolutionID,
+                        UserAuthId = this.WebForm.UserObj.AuthId,
+                        UserId = this.WebForm.UserObj.UserId,
+                        WhichConsole = this.WebForm.UserObj.wc
+                    });
+
+                    //try
+                    //{
+                    //    ApiResponse result = service.Gateway.Send<ApiResponse>(new ApiRequest
+                    //    {
+                    //        RefId = pusher.ApiRefId,
+                    //        Data = RqstObj,
+                    //        SolnId = this.WebForm.SolutionObj.SolutionID,
+                    //        UserAuthId = this.WebForm.UserObj.AuthId,
+                    //        UserId = this.WebForm.UserObj.UserId,
+                    //        WhichConsole = this.WebForm.UserObj.wc
+                    //    });
+                    //    resp += "\n\n" + JsonConvert.SerializeObject(result);
+                    //}
+                    //catch (Exception ex)
+                    //{
+                    //    Console.WriteLine($"Exception in CallApiInApiDataPushers: {ex.Message}\n{ex.StackTrace}");
+                    //    throw new FormException("something went wrong", (int)HttpStatusCode.InternalServerError, ex.Message + " \n" + ex.StackTrace, "From EbDataPusher -> CallApiInApiDataPushers");
+                    //}
                 }
             }
+            return ApiRqsts;
         }
 
-        public static void ProcessApiDataPushers(EbWebForm _this, Service service, IDatabase DataDB) 
+        public static string ProcessApiDataPushers(EbWebForm _this, Service service, IDatabase DataDB, DbConnection DbCon, List<ApiRequest> ApiRqsts) 
         {
-            if (_this.DataPushers == null)
-                return;
-            if (!_this.DataPushers.Exists(e => e is EbApiDataPusher))
-                return;
-            try
-            {
-                FG_Root globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(_this, _this.FormData, _this.FormDataBackup, DataDB);
+            if (_this.DataPushers == null || !_this.DataPushers.Exists(e => e is EbApiDataPusher))
+                return "No ApiDataPushers";
+            string resp = string.Empty;
+            //try
+            //{
+                FG_Root globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(_this, _this.FormData, _this.FormDataBackup, DataDB, DbCon);
                 EbDataPushHelper ebDataPushHelper = new EbDataPushHelper(_this);
                 string code = ebDataPushHelper.GetProcessedCode();
                 if (code != string.Empty)
                 {
                     object out_dict = _this.ExecuteCSharpScriptNew(code, globals);
-                    ebDataPushHelper.CallApiInApiDataPushers(out_dict, service);
+                    ebDataPushHelper.CallApiInApiDataPushers(out_dict, ApiRqsts);
+                }
+            //}
+            //catch (Exception ex) 
+            //{
+            //    Console.WriteLine($"Exception in ProcessApiDataPushers: {ex.Message}\n{ex.StackTrace}");
+            //List<DbParameter> _params = new List<DbParameter>()
+            //{
+            //    DataDB.GetNewParameter("form_refid", EbDbTypes.String, _this.RefId),
+            //    DataDB.GetNewParameter("data_id", EbDbTypes.Int32, _this.TableRowId),
+            //    DataDB.GetNewParameter("created_by", EbDbTypes.Int32, _this.UserObj.UserId),
+            //    DataDB.GetNewParameter("modified_by", EbDbTypes.Int32, _this.UserObj.UserId),
+            //    DataDB.GetNewParameter($"message", EbDbTypes.String, ex.Message)
+            //};
+            //int i = 0;
+            //string fullQry = string.Empty;
+            //foreach (EbApiDataPusher pusher in _this.DataPushers.FindAll(e => e is EbApiDataPusher))
+            //{
+            //    fullQry += GetFailLogInsertQuery(DataDB, i);
+            //    _params.Add(DataDB.GetNewParameter($"api_refid_{i}", EbDbTypes.String, pusher.ApiRefId));
+            //    i++;
+            //}
+
+            //int stat = DataDB.DoNonQuery(fullQry, _params.ToArray());
+            //}
+            return resp; 
+        }
+
+        public static string CallInternalApis(List<ApiRequest> ApiRqsts, Service service) 
+        {
+            string resp = string.Empty;
+            foreach (ApiRequest rq in ApiRqsts)
+            {
+                try
+                {
+                    ApiResponse result = service.Gateway.Send<ApiResponse>(rq);
+                    resp += "\n\n" + JsonConvert.SerializeObject(result);
+                }
+                catch (Exception ex)
+                {
+                    string temp = $"Exception in CallApiInApiDataPushers (CallInternalApis ReqObj): {JsonConvert.SerializeObject(rq)}\n{ex.Message}\n{ex.StackTrace}";
+                    resp += "\n\n" + temp;
+                    Console.WriteLine(temp);
                 }
             }
-            catch (Exception ex) 
-            {
-                Console.WriteLine($"Exception in ProcessApiDataPushers: {ex.Message}\n{ex.StackTrace}");
-                //List<DbParameter> _params = new List<DbParameter>()
-                //{
-                //    DataDB.GetNewParameter("form_refid", EbDbTypes.String, _this.RefId),
-                //    DataDB.GetNewParameter("data_id", EbDbTypes.Int32, _this.TableRowId),
-                //    DataDB.GetNewParameter("created_by", EbDbTypes.Int32, _this.UserObj.UserId),
-                //    DataDB.GetNewParameter("modified_by", EbDbTypes.Int32, _this.UserObj.UserId),
-                //    DataDB.GetNewParameter($"message", EbDbTypes.String, ex.Message)
-                //};
-                //int i = 0;
-                //string fullQry = string.Empty;
-                //foreach (EbApiDataPusher pusher in _this.DataPushers.FindAll(e => e is EbApiDataPusher))
-                //{
-                //    fullQry += GetFailLogInsertQuery(DataDB, i);
-                //    _params.Add(DataDB.GetNewParameter($"api_refid_{i}", EbDbTypes.String, pusher.ApiRefId));
-                //    i++;
-                //}
-
-                //int stat = DataDB.DoNonQuery(fullQry, _params.ToArray());
-            }
+            return resp;
         }
 
         private static string GetFailLogInsertQuery(IDatabase DataDB, int i)

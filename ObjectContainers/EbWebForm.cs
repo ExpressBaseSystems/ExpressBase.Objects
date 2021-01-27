@@ -1644,8 +1644,11 @@ namespace ExpressBase.Objects
                 resp += " - AuditTrail: " + ebAuditTrail.UpdateAuditTrail();
                 Console.WriteLine("EbWebForm.Save.AfterSave start");
                 resp += " - AfterSave: " + this.AfterSave(DataDB, IsUpdate);
+                List<ApiRequest> ApiRqsts = new List<ApiRequest>();
+                resp += " - ApiDataPushers: " + EbDataPushHelper.ProcessApiDataPushers(this, service, DataDB, this.DbConnection, ApiRqsts);
                 this.DbTransaction.Commit();
                 Console.WriteLine("EbWebForm.Save.DbTransaction Committed");
+                resp += " - ApiDataPushers Response: " + EbDataPushHelper.CallInternalApis(ApiRqsts, service);
                 Console.WriteLine("EbWebForm.Save.SendNotifications start");
                 resp += " - Notifications: " + EbFnGateway.SendNotifications(this, DataDB, service);
                 Console.WriteLine("EbWebForm.Save.SendMobileNotification start");
@@ -1653,7 +1656,6 @@ namespace ExpressBase.Objects
                 Console.WriteLine("EbWebForm.Save.InsertOrUpdate Global Search start");
                 SearchHelper.InsertOrUpdate(DataDB, this);
                 Console.WriteLine("EbWebForm.Save.resp = " + resp);
-                EbDataPushHelper.ProcessApiDataPushers(this, service, DataDB);
             }
             catch (FormException ex1)
             {
