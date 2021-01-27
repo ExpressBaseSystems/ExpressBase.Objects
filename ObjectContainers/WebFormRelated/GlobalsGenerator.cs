@@ -271,11 +271,12 @@ namespace ExpressBase.Objects.WebFormRelated
                     else
                     {
                         object data = null;
-                        if (_control is EbAutoId && fG_WebForm.__mode == "new")
+                        if (_control is EbAutoId && fG_WebForm.__mode == "new" && fG_WebForm.id == 0)
                             data = FormConstants.AutoId_PlaceHolder;
                         else
                         {
-                            if (Table.Count > 0 && Table[0].GetColumn(_control.Name) != null && !(_control is EbAutoId))
+                            if (Table.Count > 0 && Table[0].GetColumn(_control.Name) != null && 
+                                (!(_control is EbAutoId) || (_control is EbAutoId && fG_WebForm.__mode == "new" && fG_WebForm.id > 0)))
                                 data = Table[0][_control.Name];
                             else if (TableBkUp.Count > 0 && TableBkUp[0].GetColumn(_control.Name) != null)
                                 data = TableBkUp[0][_control.Name];
