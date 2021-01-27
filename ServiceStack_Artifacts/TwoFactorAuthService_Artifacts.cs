@@ -81,7 +81,17 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public string UserAuthId { get; set; }
     }
 
-    public enum OtpType
+	public class GetOTPRequest : EbServiceStackAuthRequest, IReturn<GetOTPResponse>
+	{
+	}
+	public class GetOTPResponse
+	{
+
+		public string OTP { get; set; }
+	}
+
+
+	public enum OtpType
     {
         Sms = 1,
         Email = 2
