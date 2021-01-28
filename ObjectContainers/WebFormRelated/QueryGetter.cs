@@ -34,7 +34,12 @@ namespace ExpressBase.Objects.WebFormRelated
 
                 IEnumerable<ColumnSchema> _columns = _table.Columns.Where(x => (!x.Control.DoNotPersist || x.Control.IsSysControl));
                 if (_columns.Count() > 0)
+                {
                     _cols += ", " + String.Join(", ", _columns.Select(x => x.ColumnName));
+                    IEnumerable<ColumnSchema> _ph_cols = _columns.Where(x => x.Control is EbPhone && (x.Control as EbPhone).Sendotp);
+                    if (_ph_cols.Count() > 0)
+                        _cols += ", " + String.Join(", ", _ph_cols.Select(x => x.ColumnName + FormConstants._verified));
+                }
 
                 if (_this.DataPusherConfig == null)// master form
                 {

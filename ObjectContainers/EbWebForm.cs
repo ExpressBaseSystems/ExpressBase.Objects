@@ -84,9 +84,14 @@ namespace ExpressBase.Objects
 
         public MyActionNotification MyActNotification { get; set; }
 
+        [JsonIgnore]
         internal DbConnection DbConnection { get; set; }
 
+        [JsonIgnore]
         private DbTransaction DbTransaction { get; set; }
+
+        [JsonIgnore]
+        internal IRedisClient RedisClient { get; set; }
 
         public static EbOperations Operations = WFOperations.Instance;
 
@@ -221,6 +226,11 @@ namespace ExpressBase.Objects
                 .Replace("@rmode@", IsRenderMode.ToString().ToLower())
                 .Replace("@tabindex@", IsRenderMode ? string.Empty : " tabindex='1'");
             return Regex.Replace(html, @"( |\r?\n)\1+", "$1");
+        }
+
+        public void SetRedisClient(IRedisClient RedisClient)
+        {
+            this.RedisClient = RedisClient;
         }
 
         //Operations to be performed before form object save - table name required, table name repetition, calculate dependency
@@ -953,6 +963,8 @@ namespace ExpressBase.Objects
                     {
                         EbControl _control = _table.Columns[k].Control;
                         this.GetFormattedColumn(dataTable.Columns[_control.Name.ToLower()], dataRow, Row, _control);// card field has uppercase name, but datatable contains lower case column name
+                        if (_control is EbPhone && (_control as EbPhone).Sendotp)
+                            (_control as EbPhone).GetVerificationStatus(dataTable.Columns[_control.Name.ToLower() + FormConstants._verified], dataRow, Row);
                     }
                 }
                 else
@@ -1626,14 +1638,14 @@ namespace ExpressBase.Objects
                     if (wc == TokenConstants.UC && !(EbFormHelper.HasPermission(this.UserObj, this.RefId, OperationConstants.EDIT, this.LocationId, this.IsLocIndependent) ||
                         (this.UserObj.UserId == this.FormData.CreatedBy && EbFormHelper.HasPermission(this.UserObj, this.RefId, OperationConstants.OWN_DATA, this.LocationId, this.IsLocIndependent))))
                         throw new FormException("Access denied to save this data entry!", (int)HttpStatusCode.Forbidden, "Access denied", "EbWebForm -> Save");
-                    
+
                     resp = "Updated: " + this.Update(DataDB, service);
                 }
                 else
                 {
                     //if (wc == TokenConstants.UC && !EbFormHelper.HasPermission(this.UserObj, this.RefId, OperationConstants.NEW, this.LocationId, this.IsLocIndependent))
                     //    throw new FormException("Access denied to save this data entry!", (int)HttpStatusCode.Forbidden, "Access denied", "EbWebForm -> Save");
-                    
+
                     this.TableRowId = this.Insert(DataDB, service);
                     resp = "Inserted: " + this.TableRowId;
                     Console.WriteLine("New record inserted. Table :" + this.TableName + ", Id : " + this.TableRowId);
