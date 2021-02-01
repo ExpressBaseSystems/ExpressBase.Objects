@@ -526,11 +526,11 @@ namespace ExpressBase.Objects
                         Dictionary<string, string> _od = JsonConvert.DeserializeObject<Dictionary<string, string>>(ocF.M);
                         if (_od[FormConstants.is_verified] == "true")
                         {
-                            if (cField.Value != ocF.Value)// phone number changed
-                                this.VerifyOTP(DataDB, param, cField, i, usr);
+							if(String.Equals(cField.Value ,ocF.Value))// phone number changed
+								AvoidParam = true; 
                             else
-                                AvoidParam = true;
-                        }
+								this.VerifyOTP(DataDB, param, cField, i, usr);
+						}
                         else
                         {
                             this.VerifyOTP(DataDB, param, cField, i, usr);
