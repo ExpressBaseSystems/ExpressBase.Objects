@@ -20,7 +20,7 @@ namespace ExpressBase.Objects
         public EbSQLValidator() { }
 
         [EnableInBuilder(BuilderType.WebForm)]
-        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorSQ)]
         public override EbScript Script { get; set; }
     }
 
@@ -29,7 +29,7 @@ namespace ExpressBase.Objects
         public EbRoutines() { }
 
         [EnableInBuilder(BuilderType.WebForm)]
-        [PropertyEditor(PropertyEditorType.ScriptEditorJS, PropertyEditorType.ScriptEditorCS)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorJS, PropertyEditorType.ScriptEditorSQ)]
         public override EbScript Script { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
@@ -43,5 +43,23 @@ namespace ExpressBase.Objects
         public override string FailureMSG { get; set; }
 
         public override bool IsDisabled { get; set; }
+    }
+
+    [UsedWithTopObjectParent(typeof(EbObject))]
+    [EnableInBuilder(BuilderType.WebForm)]
+    public class EbRoutine
+    {
+        public EbRoutine() { }
+
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.WebForm)]
+        public string EbSid { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        public virtual string Name { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorCS, PropertyEditorType.ScriptEditorSQ)]
+        public EbScript Script { get; set; }
     }
 }

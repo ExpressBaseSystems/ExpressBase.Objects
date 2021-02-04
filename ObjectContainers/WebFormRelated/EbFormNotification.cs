@@ -69,7 +69,7 @@ else if(this.NotifyBy === 3)
 
         [PropertyGroup("Behavior")]
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
-        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]//required ScriptEditorSQ
+        [PropertyEditor(PropertyEditorType.ScriptEditorSQ)]
         public EbScript Users { get; set; }
 
         [PropertyGroup("Behavior")]

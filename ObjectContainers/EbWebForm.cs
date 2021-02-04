@@ -142,6 +142,11 @@ namespace ExpressBase.Objects
         [PropertyGroup("Events")]
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.Collection)]
+        public List<EbRoutine> Disable_Edit { get; set; }
+
+        [PropertyGroup("Events")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.Collection)]
         public List<EbRoutines> BeforeSaveRoutines { get; set; }
 
         [PropertyGroup("Events")]
@@ -1527,7 +1532,7 @@ namespace ExpressBase.Objects
 
                 this.PostFormatFormData();
 
-                this.ExeDeleteCancelScript(DataDB);
+                this.ExeDeleteCancelEditScript(DataDB, _FormData);
             }
         }
 
@@ -2502,7 +2507,7 @@ namespace ExpressBase.Objects
             return -1;
         }
 
-        private void ExeDeleteCancelScript(IDatabase DataDB)
+        private void ExeDeleteCancelEditScript(IDatabase DataDB, WebformData _FormData)
         {
             string q = string.Empty;
             if (this.DisableDelete != null && this.DisableDelete.Count > 0)
@@ -2512,6 +2517,10 @@ namespace ExpressBase.Objects
             if (this.DisableCancel != null && this.DisableCancel.Count > 0)
             {
                 q += string.Join(";", this.DisableCancel.Select(e => e.Script.Code));
+            }
+            if (this.Disable_Edit?.Count > 0)
+            {
+                q += string.Join(";", this.Disable_Edit.FindAll(e => e.Script.Lang == ScriptingLanguage.SQL).Select(e => e.Script.Code));
             }
             if (!q.Equals(string.Empty))
             {
@@ -2547,6 +2556,33 @@ namespace ExpressBase.Objects
                         {
                             this.FormData.DisableCancel.Add(this.DisableCancel[j].Name, true);
                         }
+                    }
+                }
+
+                List<EbRoutine> rt = this.Disable_Edit.FindAll(e => e.Script.Lang == ScriptingLanguage.SQL);
+                for (int j = 0; j < rt.Count; i++, j++)
+                {
+                    if (ds.Tables[i].Rows.Count > 0 && ds.Tables[i].Rows[0].Count > 0 && Convert.ToInt32(ds.Tables[i].Rows[0][0]) > 0)
+                    {
+                        this.FormData.DisableEdit.Add(rt[j].Name, true);
+                    }
+                    else
+                    {
+                        this.FormData.DisableEdit.Add(rt[j].Name, false);
+                    }
+                }
+            }
+
+            if (this.Disable_Edit?.Count > 0)
+            {
+                foreach (EbRoutine rt in this.Disable_Edit)
+                {
+                    if (rt.Script.Lang == ScriptingLanguage.CSharp && !string.IsNullOrEmpty(rt.Script.Code))
+                    {
+                        if (this.FormGlobals == null)
+                            this.FormGlobals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, _FormData, null, DataDB);
+                        bool status = Convert.ToBoolean(this.ExecuteCSharpScriptNew(rt.Script.Code, this.FormGlobals));
+                        this.FormData.DisableEdit.Add(rt.Name, status);
                     }
                 }
             }
