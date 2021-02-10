@@ -160,7 +160,7 @@ namespace ExpressBase.Objects
 
                         if (WebForm.FormDataBackup != null)
                         {
-                            if (WebForm.FormDataBackup.MultipleTables.TryGetValue(_table.TableName, out SingleTable TableBkUp) && Table.Count > 0)
+                            if (WebForm.FormDataBackup.MultipleTables.TryGetValue(_table.TableName, out SingleTable TableBkUp) && TableBkUp.Count > 0)
                             {
                                 SingleColumn ocField = TableBkUp[0].GetColumn(_column.ColumnName);
                                 if (ocField != null && Convert.ToString(cField.Value) == Convert.ToString(ocField.Value))
