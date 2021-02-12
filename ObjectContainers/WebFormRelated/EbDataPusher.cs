@@ -458,14 +458,14 @@ catch (Exception e)
             InternalError
         }
 
-        private void PreprocessJson(EbDataPusher pusher) 
+        private void PreprocessJson(EbDataPusher pusher)
         {
             JToken JTok = JToken.Parse(pusher.Json);
             this.PreprocessJsonRec(JTok);
             pusher.ProcessedJson = JTok.ToString();
         }
 
-        private void PreprocessJsonRec(JToken JTok) 
+        private void PreprocessJsonRec(JToken JTok)
         {
             if (JTok is JObject)
             {
@@ -576,7 +576,7 @@ catch (Exception e)
                     GetFnDefinitionRec(jt, ref FnDef, ref PusherFnCall, ref Index);
             }
         }
-        
+
         private void FillJsonWithValuesRec(JToken JTok, Dictionary<int, object[]> OutputDict, ref int Index)
         {
             if (JTok is JObject)
@@ -594,6 +594,8 @@ catch (Exception e)
                         jObj[jObjEntry.Key] = JToken.FromObject(val);
                     }
                 }
+                if (jObj.TryGetValue(FormConstants.__eb_loop_through, out JToken value))
+                    jObj.Remove(FormConstants.__eb_loop_through);
             }
             else if (JTok is JArray)
             {
@@ -665,21 +667,21 @@ catch (Exception e)
             return ApiRqsts;
         }
 
-        public static string ProcessApiDataPushers(EbWebForm _this, Service service, IDatabase DataDB, DbConnection DbCon, List<ApiRequest> ApiRqsts) 
+        public static string ProcessApiDataPushers(EbWebForm _this, Service service, IDatabase DataDB, DbConnection DbCon, List<ApiRequest> ApiRqsts)
         {
             if (_this.DataPushers == null || !_this.DataPushers.Exists(e => e is EbApiDataPusher))
                 return "No ApiDataPushers";
             string resp = string.Empty;
             //try
             //{
-                FG_Root globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(_this, _this.FormData, _this.FormDataBackup, DataDB, DbCon);
-                EbDataPushHelper ebDataPushHelper = new EbDataPushHelper(_this);
-                string code = ebDataPushHelper.GetProcessedCode();
-                if (code != string.Empty)
-                {
-                    object out_dict = _this.ExecuteCSharpScriptNew(code, globals);
-                    ebDataPushHelper.CallApiInApiDataPushers(out_dict, ApiRqsts);
-                }
+            FG_Root globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(_this, _this.FormData, _this.FormDataBackup, DataDB, DbCon);
+            EbDataPushHelper ebDataPushHelper = new EbDataPushHelper(_this);
+            string code = ebDataPushHelper.GetProcessedCode();
+            if (code != string.Empty)
+            {
+                object out_dict = _this.ExecuteCSharpScriptNew(code, globals);
+                ebDataPushHelper.CallApiInApiDataPushers(out_dict, ApiRqsts);
+            }
             //}
             //catch (Exception ex) 
             //{
@@ -703,10 +705,10 @@ catch (Exception e)
 
             //int stat = DataDB.DoNonQuery(fullQry, _params.ToArray());
             //}
-            return resp; 
+            return resp;
         }
 
-        public static string CallInternalApis(List<ApiRequest> ApiRqsts, Service service) 
+        public static string CallInternalApis(List<ApiRequest> ApiRqsts, Service service)
         {
             string resp = string.Empty;
             foreach (ApiRequest rq in ApiRqsts)

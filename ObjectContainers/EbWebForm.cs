@@ -84,9 +84,14 @@ namespace ExpressBase.Objects
 
         public MyActionNotification MyActNotification { get; set; }
 
+        [JsonIgnore]
         internal DbConnection DbConnection { get; set; }
 
+        [JsonIgnore]
         private DbTransaction DbTransaction { get; set; }
+
+        [JsonIgnore]
+        internal IRedisClient RedisClient { get; set; }
 
         public static EbOperations Operations = WFOperations.Instance;
 
@@ -133,6 +138,11 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.Collection)]
         public List<EbSQLValidator> DisableCancel { get; set; }
+
+        [PropertyGroup("Events")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        public List<EbRoutine> Disable_Edit { get; set; }
 
         [PropertyGroup("Events")]
         [EnableInBuilder(BuilderType.WebForm)]
@@ -221,6 +231,11 @@ namespace ExpressBase.Objects
                 .Replace("@rmode@", IsRenderMode.ToString().ToLower())
                 .Replace("@tabindex@", IsRenderMode ? string.Empty : " tabindex='1'");
             return Regex.Replace(html, @"( |\r?\n)\1+", "$1");
+        }
+
+        public void SetRedisClient(IRedisClient RedisClient)
+        {
+            this.RedisClient = RedisClient;
         }
 
         //Operations to be performed before form object save - table name required, table name repetition, calculate dependency
@@ -953,6 +968,8 @@ namespace ExpressBase.Objects
                     {
                         EbControl _control = _table.Columns[k].Control;
                         this.GetFormattedColumn(dataTable.Columns[_control.Name.ToLower()], dataRow, Row, _control);// card field has uppercase name, but datatable contains lower case column name
+                        if (_control is EbPhone && (_control as EbPhone).Sendotp)
+                            (_control as EbPhone).GetVerificationStatus(dataTable.Columns[_control.Name.ToLower() + FormConstants._verified], dataRow, Row);
                     }
                 }
                 else
@@ -1515,7 +1532,7 @@ namespace ExpressBase.Objects
 
                 this.PostFormatFormData();
 
-                this.ExeDeleteCancelScript(DataDB);
+                this.ExeDeleteCancelEditScript(DataDB, _FormData);
             }
         }
 
@@ -1626,14 +1643,14 @@ namespace ExpressBase.Objects
                     if (wc == TokenConstants.UC && !(EbFormHelper.HasPermission(this.UserObj, this.RefId, OperationConstants.EDIT, this.LocationId, this.IsLocIndependent) ||
                         (this.UserObj.UserId == this.FormData.CreatedBy && EbFormHelper.HasPermission(this.UserObj, this.RefId, OperationConstants.OWN_DATA, this.LocationId, this.IsLocIndependent))))
                         throw new FormException("Access denied to save this data entry!", (int)HttpStatusCode.Forbidden, "Access denied", "EbWebForm -> Save");
-                    
+
                     resp = "Updated: " + this.Update(DataDB, service);
                 }
                 else
                 {
                     //if (wc == TokenConstants.UC && !EbFormHelper.HasPermission(this.UserObj, this.RefId, OperationConstants.NEW, this.LocationId, this.IsLocIndependent))
                     //    throw new FormException("Access denied to save this data entry!", (int)HttpStatusCode.Forbidden, "Access denied", "EbWebForm -> Save");
-                    
+
                     this.TableRowId = this.Insert(DataDB, service);
                     resp = "Inserted: " + this.TableRowId;
                     Console.WriteLine("New record inserted. Table :" + this.TableName + ", Id : " + this.TableRowId);
@@ -1694,6 +1711,7 @@ namespace ExpressBase.Objects
             if (this.FormDataPusherCount > 0)
                 this.PrepareWebFormData();
 
+            this.FormCollection.ExecUniqueCheck(DataDB);
             this.FormCollection.Insert(DataDB, param, ref fullqry, ref _extqry, ref i);
 
             fullqry += _extqry;
@@ -1789,6 +1807,7 @@ namespace ExpressBase.Objects
             if (this.FormDataPusherCount > 0)
                 this.PrepareWebFormData();
 
+            this.FormCollection.ExecUniqueCheck(DataDB);
             this.FormCollection.Update(DataDB, param, ref fullqry, ref _extqry, ref i);
 
             fullqry += _extqry;
@@ -2490,7 +2509,7 @@ namespace ExpressBase.Objects
             return -1;
         }
 
-        private void ExeDeleteCancelScript(IDatabase DataDB)
+        private void ExeDeleteCancelEditScript(IDatabase DataDB, WebformData _FormData)
         {
             string q = string.Empty;
             if (this.DisableDelete != null && this.DisableDelete.Count > 0)
@@ -2500,6 +2519,10 @@ namespace ExpressBase.Objects
             if (this.DisableCancel != null && this.DisableCancel.Count > 0)
             {
                 q += string.Join(";", this.DisableCancel.Select(e => e.Script.Code));
+            }
+            if (this.Disable_Edit?.Count > 0)
+            {
+                q += string.Join(";", this.Disable_Edit.FindAll(e => e.Script.Lang == ScriptingLanguage.SQL).Select(e => e.Script.Code));
             }
             if (!q.Equals(string.Empty))
             {
@@ -2535,6 +2558,33 @@ namespace ExpressBase.Objects
                         {
                             this.FormData.DisableCancel.Add(this.DisableCancel[j].Name, true);
                         }
+                    }
+                }
+
+                List<EbRoutine> rt = this.Disable_Edit.FindAll(e => e.Script.Lang == ScriptingLanguage.SQL);
+                for (int j = 0; j < rt.Count; i++, j++)
+                {
+                    if (ds.Tables[i].Rows.Count > 0 && ds.Tables[i].Rows[0].Count > 0 && Convert.ToInt32(ds.Tables[i].Rows[0][0]) > 0)
+                    {
+                        this.FormData.DisableEdit.Add(rt[j].Name, true);
+                    }
+                    else
+                    {
+                        this.FormData.DisableEdit.Add(rt[j].Name, false);
+                    }
+                }
+            }
+
+            if (this.Disable_Edit?.Count > 0)
+            {
+                foreach (EbRoutine rt in this.Disable_Edit)
+                {
+                    if (rt.Script.Lang == ScriptingLanguage.CSharp && !string.IsNullOrEmpty(rt.Script.Code))
+                    {
+                        if (this.FormGlobals == null)
+                            this.FormGlobals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, _FormData, null, DataDB);
+                        bool status = Convert.ToBoolean(this.ExecuteCSharpScriptNew(rt.Script.Code, this.FormGlobals));
+                        this.FormData.DisableEdit.Add(rt.Name, status);
                     }
                 }
             }

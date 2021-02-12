@@ -363,7 +363,7 @@ else if (this.ApproverEntity === 3)
         [PropertyGroup("Behavior")]
         [PropertyPriority(8)]
         [EnableInBuilder(BuilderType.WebForm)]
-        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]//required ScriptEditorSQ
+        [PropertyEditor(PropertyEditorType.ScriptEditorSQ)]
         public EbScript ApproverUsers { get; set; }
 
         [PropertyGroup("Behavior")]
