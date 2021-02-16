@@ -310,15 +310,15 @@ this.Init = function(id)
             {
                 string consqry = string.Empty;
                 if (this.AddLocConstraint)
-                    consqry = "SELECT * FROM eb_security_constraints(:eb_createdby, eb_currval('eb_users_id_seq'), '1$no description$1;5;' || eb_currval('eb_locations_id_seq'), '');";
+                    consqry = "SELECT * FROM eb_security_constraints(@eb_createdby, eb_currval('eb_users_id_seq'), '1$no description$1;5;' || eb_currval('eb_locations_id_seq'), '');";
                 string ee = $"UPDATE {this.VirtualTable} SET {this.Name} = eb_currval('eb_users_id_seq') WHERE {(this.VirtualTable == mtbl ? "id" : (mtbl + "_id"))} = eb_currval('{mtbl}_id_seq'); ";
-                return $"SELECT * FROM eb_security_user(:eb_createdby, {param}); UPDATE eb_users SET eb_ver_id = :{mtbl}_eb_ver_id, eb_data_id = eb_currval('{mtbl}_id_seq') WHERE {(pphone == string.Empty ? "email" : "phnoprimary")} = {(pphone == string.Empty ? pemail : pphone)};" + ee + consqry;
+                return $"SELECT * FROM eb_security_user(@eb_createdby, {param}); UPDATE eb_users SET eb_ver_id = @{mtbl}_eb_ver_id, eb_data_id = eb_currval('{mtbl}_id_seq') WHERE {(pphone == string.Empty ? "email" : "phnoprimary")} = {(pphone == string.Empty ? pemail : pphone)};" + ee + consqry;
             }
             else
             {
-                string ee = insOnUp ? $"UPDATE eb_users SET eb_ver_id = :{mtbl}_eb_ver_id, eb_data_id = :{mtbl}_id WHERE {(pphone == string.Empty ? "email" : "phnoprimary")} = {(pphone == string.Empty ? pemail : pphone)};" : string.Empty;
-                ee += insOnUp ? $"UPDATE {this.VirtualTable} SET {this.Name} = eb_currval('eb_users_id_seq') WHERE {(this.VirtualTable == mtbl ? "id" : (mtbl + "_id"))} = :{mtbl}_id; " : string.Empty;
-                return string.Format("SELECT * FROM eb_security_user(:eb_createdby, {0});", param) + ee;
+                string ee = insOnUp ? $"UPDATE eb_users SET eb_ver_id = @{mtbl}_eb_ver_id, eb_data_id = @{mtbl}_id WHERE {(pphone == string.Empty ? "email" : "phnoprimary")} = {(pphone == string.Empty ? pemail : pphone)};" : string.Empty;
+                ee += insOnUp ? $"UPDATE {this.VirtualTable} SET {this.Name} = eb_currval('eb_users_id_seq') WHERE {(this.VirtualTable == mtbl ? "id" : (mtbl + "_id"))} = @{mtbl}_id; " : string.Empty;
+                return string.Format("SELECT * FROM eb_security_user(@eb_createdby, {0});", param) + ee;
             }
 
         }

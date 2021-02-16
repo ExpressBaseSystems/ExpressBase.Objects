@@ -811,8 +811,9 @@ namespace ExpressBase.Objects
     //Get Meeting Details - display modal
     public class GetMeetingsDetailsResponse
     {
-        public bool ResponseStatus {get;set;}
+        public bool ResponseStatus { get; set; }
         public bool IsDirectMeeting { get; set; }
+        public string FormRefid { get; set; }
         public List<SlotTable> SlotList { get; set; }
         public List<MeetingParticipants> ParticipantList { get; set; }
         public ScheduleTable MeetingScheduleDetails { get; set; }
@@ -836,7 +837,7 @@ namespace ExpressBase.Objects
         public string Date { get; set; }
         public string TimeFrom { get; set; }
         public string TimeTo { get; set; }
-    }  
+    }
     public class ScheduleTable
     {
         public int MeetingScheduleId { get; set; }
@@ -875,13 +876,27 @@ namespace ExpressBase.Objects
 
     public class PickMeetingSLotResponse
     {
-        public bool ResponseStatus {get;set;}
-    }  
+        public bool ResponseStatus { get; set; }
+    }
     public class PickMeetingSLotRequest
     {
         public int MyActionId { get; set; }
         public int SlotId { get; set; }
         public User UserInfo { get; set; }
+    }
+    public class PickMultipleMeetingResponse
+    {
+        public bool ResponseStatus { get; set; }
+    }
+    public class PickMultipleMeetingRequest
+    {
+        public int MyActionId { get; set; }
+        public List<int> SlotIds { get; set; }
+        public User UserInfo { get; set; }
+        public PickMultipleMeetingRequest()
+        {
+            this.SlotIds = new List<int>();
+        }
     }
     public enum ParticipantType
     {
@@ -892,5 +907,13 @@ namespace ExpressBase.Objects
     {
         EbUser = 1,
         AnonymousUser = 2
+    }
+    public class GetScheduleUserDetailsResponse
+    {
+        public ParticipantType ParticipantType { get; set; }
+    }
+    public class GetScheduleUserDetailsRequest
+    {
+        public int MyActionId { get; set; }
     }
 }

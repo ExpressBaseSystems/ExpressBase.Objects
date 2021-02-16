@@ -6,6 +6,7 @@ using ExpressBase.Common.Structures;
 using ExpressBase.Objects.Helpers;
 using ExpressBase.Objects.Objects;
 using ExpressBase.Objects.ServiceStack_Artifacts;
+using Newtonsoft.Json.Linq;
 using ServiceStack;
 using ServiceStack.Redis;
 using System;
@@ -46,12 +47,30 @@ namespace ExpressBase.Objects.WebFormRelated
 
             if (_this.DataPushers?.Count > 0)
             {
-                foreach(EbDataPusher dp in _this.DataPushers)
+                foreach (EbDataPusher dp in _this.DataPushers)
                 {
-                    if (string.IsNullOrEmpty(dp.FormRefId))
-                        throw new FormException($"Required 'Form ref id' for data pushers");
+                    if (dp is EbApiDataPusher)
+                    {
+                        if (string.IsNullOrEmpty((dp as EbApiDataPusher).ApiRefId))
+                            throw new FormException($"Required 'Api ref id' for data pusher");
+                    }
+                    else
+                    {
+                        //Can convert to EbFormDataPusher here!!!
+
+                        if (string.IsNullOrEmpty(dp.FormRefId))
+                            throw new FormException($"Required 'Form ref id' for data pusher");
+                    }
                     if (string.IsNullOrEmpty(dp.Json))
-                        throw new FormException($"Required 'Json' for data pushers");
+                        throw new FormException($"Required 'Json' for data pusher");
+                    try
+                    {
+                        JToken JTok = JToken.Parse(dp.Json);
+                    }
+                    catch (Exception e)
+                    {
+                        throw new FormException($"Failed to parse 'Json' in data pusher: " + e.Message);
+                    }
                 }
             }
         }
@@ -242,7 +261,7 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                         throw new FormException("Set Display Members for " + _label);
                     EbDbTypes _t = _ctrl.ValueMember.Type;
                     if (!(_t == EbDbTypes.Int || _t == EbDbTypes.Int || _t == EbDbTypes.UInt32 || _t == EbDbTypes.UInt64 || _t == EbDbTypes.Int32 || _t == EbDbTypes.Int64 || _t == EbDbTypes.Decimal || _t == EbDbTypes.Double))
-                        throw new FormException("Set numeric value member for " + _label);                   
+                        throw new FormException("Set numeric value member for " + _label);
                 }
                 else if (Allctrls[i] is EbUserControl)
                 {
@@ -312,6 +331,22 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                     if (string.IsNullOrEmpty(_ctrl.TableName))
                         throw new FormException("Please enter a valid Static Card table name");
                 }
+                else if (Allctrls[i] is EbProvisionLocation)
+                {
+                    EbProvisionLocation provLoc = Allctrls[i] as EbProvisionLocation;
+                    foreach (UsrLocFieldAbstract fld in provLoc.Fields)
+                    {
+                        UsrLocField _field = fld as UsrLocField;
+                        if (string.IsNullOrEmpty(_field.ControlName))
+                        {
+                            if (_field.IsRequired)
+                                throw new FormException($"Please map a control for {_field.Name} in ProvisionLocation control({provLoc.Name}).");
+                            continue;
+                        }
+                        if (Allctrls.FirstOrDefault(e => e.Name == _field.ControlName) == null)
+                            throw new FormException($"Invalid control name '{_field.ControlName}' for {_field.Name} in ProvisionLocation control({provLoc.Name}).");
+                    }
+                }
 
                 if (Allctrls[i] is IEbDataReaderControl && serviceClient != null)
                     (Allctrls[i] as IEbDataReaderControl).FetchParamsMeta(serviceClient, redis, Allctrls);
@@ -353,13 +388,13 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                         t = (ctrl as EbControlContainer).TableName;
                     PerformRequirdUpdate(ctrl as EbControlContainer, t);
                 }
-				else if(ctrl is EbTagInput)
-				{
-					if ((ctrl as EbTagInput).AutoSuggestion)
-						(ctrl as EbTagInput).TableName = _tbl;
-				}			
+                else if (ctrl is EbTagInput)
+                {
+                    if ((ctrl as EbTagInput).AutoSuggestion)
+                        (ctrl as EbTagInput).TableName = _tbl;
+                }
 
-			}
+            }
         }
 
         //Populate Property DependedValExp
@@ -409,7 +444,7 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                 else if (_dict[CalcFlds[i]].Control.ValueExpr.Lang == ScriptingLanguage.SQL)
                 {
                     List<Param> _params = SqlHelper.GetSqlParams(code);
-                    foreach(Param _p in _params)
+                    foreach (Param _p in _params)
                     {
                         KeyValuePair<int, EbControlWrapper> item = _dict.FirstOrDefault(e => e.Value.Control.Name == _p.Name);
                         if (item.Value == null)
@@ -486,7 +521,7 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                             throw new FormException($"Can't resolve parameter {_p.Name} in data reader of {_dict[i].Control.Name}");
                     }
                 }
-            }            
+            }
         }
 
         private static void GetValExpDependentsRec(List<int> execOrder, List<KeyValuePair<int, int>> dpndcy, int seeker)
@@ -556,8 +591,11 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
             if (dpndcy.Count > 0)
                 throw new FormException("Avoid circular reference by the following controls in 'DefaultValueExpression' : " + string.Join(',', dpndcy.Select(e => _dict[e.Key].Control.Name).Distinct()));
 
-            foreach (int i in ExecOrd)
-                _this.DefaultValsExecOrder.Add(_dict[i].Path);
+            for (int i = ExecOrd.Count - 1; i >= 0; i--)
+                _this.DefaultValsExecOrder.Add(_dict[ExecOrd[i]].Path);
+
+            //foreach (int i in ExecOrd)
+            //    _this.DefaultValsExecOrder.Add(_dict[i].Path);
         }
 
         private static void CalcHideAndDisableExprDependency(Dictionary<int, EbControlWrapper> _dict)
@@ -569,6 +607,8 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
             }
             for (int i = 0; i < _dict.Count; i++)
             {
+                //if (i == 1)
+                //    ;
                 CheckHideAndDisableCode(_dict[i], _dict, _dict[i].Control.HiddenExpr, true);
                 CheckHideAndDisableCode(_dict[i], _dict, _dict[i].Control.DisableExpr, false);
             }
@@ -587,7 +627,8 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                     {
                         string p = _dict[j].Path, r = _dict[j].Root, n = _dict[j].Control.Name;
                         string regex = EbFormHelper.GetJsRegex(r, n, p);
-
+                        //if (ctrlWrap.Path != "form.datagrid1.stringcolumn2" && ctrlWrap.Path != "form.datagrid1.stringcolumn1")
+                        //    ;
                         if (Regex.IsMatch(ebScript.Code, regex))
                         {
                             if (is4Hide)
@@ -625,6 +666,20 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
             {
                 if (control is EbControlContainer)
                 {
+                    //if (control is EbDataGrid)
+                    //{
+                    //    _counter = _dict.Count;
+                    //    string path2 = _path == string.Empty ? control.Name : _path + CharConstants.DOT + control.Name;
+                    //    control.__path = path2;
+                    //    _dict.Add(_counter++, new EbControlWrapper
+                    //    {
+                    //        TableName = _container.TableName,
+                    //        Path = path2,
+                    //        Control = control,
+                    //        Root = _path
+                    //    });
+                    //}
+
                     string path = _path;
                     if (control is EbDataGrid)
                         path = _path + CharConstants.DOT + (control as EbControlContainer).Name;

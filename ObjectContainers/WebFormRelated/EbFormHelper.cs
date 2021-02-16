@@ -162,42 +162,42 @@ namespace ExpressBase.Objects
                     }
                     else if (c is EbProvisionLocation)//add unmapped ctrls as DoNotPersist controls
                     {
-                        if (_this.IsRenderMode)
-                        {
-                            EbProvisionLocation prvnCtrl = c as EbProvisionLocation;
-                            for (int j = 0; j < prvnCtrl.Fields.Count; j++)
-                            {
-                                UsrLocField prvnFld = prvnCtrl.Fields[j] as UsrLocField;
-                                if (prvnFld.ControlName.IsNullOrEmpty() && prvnFld.IsRequired)
-                                {
-                                    if (prvnFld.Type == "image")
-                                    {
-                                        _this.Controls.Insert(i, new EbDisplayPicture()
-                                        {
-                                            Name = "namecustom" + i,
-                                            EbSid = "ebsidcustom" + i,
-                                            EbSid_CtxId = "ebsidcustom" + i,
-                                            Label = prvnFld.DisplayName,
-                                            DoNotPersist = true,
-                                            MaxHeight = 100
-                                        });
-                                    }
-                                    else
-                                    {
-                                        _this.Controls.Insert(i, new EbTextBox()
-                                        {
-                                            Name = "namecustom" + i,
-                                            EbSid = "ebsidcustom" + i,
-                                            EbSid_CtxId = "ebsidcustom" + i,
-                                            Label = prvnFld.DisplayName,
-                                            DoNotPersist = true
-                                        });
-                                    }
-                                    prvnFld.ControlName = "namecustom" + i;
-                                    i++;
-                                }
-                            }
-                        }
+                        //if (_this.IsRenderMode)
+                        //{
+                        //    EbProvisionLocation prvnCtrl = c as EbProvisionLocation;
+                        //    for (int j = 0; j < prvnCtrl.Fields.Count; j++)
+                        //    {
+                        //        UsrLocField prvnFld = prvnCtrl.Fields[j] as UsrLocField;
+                        //        if (prvnFld.ControlName.IsNullOrEmpty() && prvnFld.IsRequired)
+                        //        {
+                        //            if (prvnFld.Type == "image")
+                        //            {
+                        //                _this.Controls.Insert(i, new EbDisplayPicture()
+                        //                {
+                        //                    Name = "namecustom" + i,
+                        //                    EbSid = "ebsidcustom" + i,
+                        //                    EbSid_CtxId = "ebsidcustom" + i,
+                        //                    Label = prvnFld.DisplayName,
+                        //                    DoNotPersist = true,
+                        //                    MaxHeight = 100
+                        //                });
+                        //            }
+                        //            else
+                        //            {
+                        //                _this.Controls.Insert(i, new EbTextBox()
+                        //                {
+                        //                    Name = "namecustom" + i,
+                        //                    EbSid = "ebsidcustom" + i,
+                        //                    EbSid_CtxId = "ebsidcustom" + i,
+                        //                    Label = prvnFld.DisplayName,
+                        //                    DoNotPersist = true
+                        //                });
+                        //            }
+                        //            prvnFld.ControlName = "namecustom" + i;
+                        //            i++;
+                        //        }
+                        //    }
+                        //}
                     }
                     else if (c is EbProvisionUser)
                     {
@@ -258,6 +258,8 @@ namespace ExpressBase.Objects
             {
                 foreach (EbDataPusher pusher in _this.DataPushers)
                 {
+                    if (pusher is EbApiDataPusher)
+                        continue;
                     EbWebForm _form = GetEbObject<EbWebForm>(pusher.FormRefId, client, Redis, service);
                     _form.RefId = pusher.FormRefId;
                     _form.UserObj = _this.UserObj;
@@ -266,7 +268,7 @@ namespace ExpressBase.Objects
                     _form.DataPusherConfig = new EbDataPusherConfig { SourceTable = _this.FormSchema.MasterTable, MultiPushId = _this.RefId + "_" + pusher.Name };
                     pusher.WebForm = _form;
                     _this.FormCollection.Add(_form);
-                    _this.ExeDataPusher = true;
+                    _this.FormDataPusherCount++;
                 }
             }
         }
@@ -294,7 +296,7 @@ namespace ExpressBase.Objects
 
                 _ebObject = EbSerializers.Json_Deserialize(resp.Data[0].Json);
                 if (_ebObject == null)
-                    throw new Exception($"Json_Deserialize returned a null EbObject. FormHelper >GetEbObject. RefId: {RefId}, Type: {typeof(T).Name}, Json: {resp.Data[0].Json}");
+                    throw new Exception($"Json_Deserialize returned a null EbObject. FormHelper >GetEbObject. RefId: {RefId}, Type: {typeof(T).Name}");// , Json: {resp.Data[0].Json} - TempData size issue
                 if (Redis != null) Redis.Set<T>(RefId, _ebObject);
             }
             (_ebObject as EbObject).RefId = RefId;// temp fix (sometimes refid missing from ebObject)

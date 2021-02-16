@@ -28,7 +28,47 @@ namespace ExpressBase.Objects
 
         public string EbOnChangeUIfns { get; set; }
 
+        public string QCtrlsNames { get; set; }
+
+        public string ACtrlsNames { get; set; }
+
         EbToolbox() { }
+
+        public void SetSuveyControlsRoles()
+        {
+            QCtrlsNames = "eb_QCtrlsNames = [";
+            ACtrlsNames = "eb_ACtrlsNames = [";
+
+            Type[] typeArray = typeof(EbDashBoardWraper).GetTypeInfo().Assembly.GetTypes();
+
+
+
+            foreach (Type tool in typeArray)
+            {
+                if ((tool.IsDefined(typeof(EnableInBuilder)) && tool.GetCustomAttribute<EnableInBuilder>().BuilderTypes.Contains(BuilderType.SurveyControl)))
+                {
+                    try
+                    {
+                        if (tool.IsDefined(typeof(SurveyBuilderRoles)) && (tool.GetCustomAttribute<SurveyBuilderRoles>().Roles.Contains(SurveyRoles.AnswerControl)))
+                        {
+                            ACtrlsNames += "'" + tool.GetTypeInfo().Name + "', ";
+                        }
+                        if (tool.IsDefined(typeof(SurveyBuilderRoles)) && (tool.GetCustomAttribute<SurveyBuilderRoles>().Roles.Contains(SurveyRoles.QuestionControl)))
+                        {
+                            QCtrlsNames += "'" + tool.GetTypeInfo().Name + "', ";
+                        }
+                    }
+                    catch (Exception ee)
+                    {
+                        Console.WriteLine("Exception: " + ee.ToString());
+                        throw new Exception(ee.Message);
+                    }
+                }
+            }
+            QCtrlsNames = QCtrlsNames.TrimEnd(',') + "]";
+            ACtrlsNames = ACtrlsNames.TrimEnd(',') + "]";
+
+        }
 
         public EbToolbox(BuilderType _builderType)
         {
@@ -57,7 +97,7 @@ namespace ExpressBase.Objects
 
         private string getUserControlsHtml()
         {
-           
+
 
             return string.Empty;
         }

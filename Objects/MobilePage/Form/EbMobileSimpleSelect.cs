@@ -47,11 +47,15 @@ namespace ExpressBase.Objects
                         pg.ShowProperty('DisplayMember');
                         pg.ShowProperty('ValueMember');
                         pg.ShowProperty('OfflineQuery');
+                        pg.ShowProperty('EnablePreload');
+                        pg.ShowProperty('AutoFill');
                 }
                 else {
                         pg.HideProperty('DisplayMember');
                         pg.HideProperty('ValueMember');
                         pg.HideProperty('OfflineQuery');
+                        pg.HideProperty('EnablePreload');
+                        pg.HideProperty('AutoFill');
                 }
             ")]
         public string DataSourceRefId { get; set; }
@@ -91,6 +95,10 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup(PGConstants.CORE)]
         public bool EnablePreload { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.CORE)]
+        public bool AutoFill { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]

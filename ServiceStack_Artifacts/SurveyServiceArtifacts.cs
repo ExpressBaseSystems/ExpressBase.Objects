@@ -23,6 +23,23 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
+
+    public class GetSurveyQuestionsRequest : IEbSSRequest, IReturn<GetSurveyQuestionsResponse>
+    {
+        public string SolnId { get; set; }
+
+        public int UserId { get; set; }
+    }
+
+    public class GetSurveyQuestionsResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public List<String> Data { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
     public class SurveyQuesRequest : IReturn<SurveyQuesResponse>, IEbSSRequest
     {
         public string SolnId { get; set; }
@@ -32,7 +49,29 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 1)]
         public EbSurveyQuery Query { set; get; }
     }
+
+    public class SaveQuestionRequest : IReturn<SaveQuestionResponse>, IEbSSRequest
+    {
+        public string SolnId { get; set; }
+
+        public int UserId { get; set; }
+
+        [DataMember(Order = 1)]
+        public EbQuestion Query { set; get; }
+    }
     public class SurveyQuesResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public bool Status { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        [DataMember(Order = 3)]
+        public int Quesid { set; get; }
+    }
+    
+    public class SaveQuestionResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
         public bool Status { get; set; }

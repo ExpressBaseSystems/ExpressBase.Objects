@@ -38,13 +38,14 @@ namespace ExpressBase.Objects
         SingleLine = 0,
     }
 
-    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl, BuilderType.SurveyControl)]
+    [SurveyBuilderRoles(SurveyRoles.AnswerControl)]
     public class EbTextBox : EbControlUI, IEbInputControls
     {
         public EbTextBox() { }
 
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl, BuilderType.SurveyControl)]
         [PropertyEditor(PropertyEditorType.Expandable)]
         [PropertyGroup(PGConstants.APPEARANCE)]
         [UIproperty]
@@ -53,7 +54,7 @@ namespace ExpressBase.Objects
         public UISides Padding { get; set; }
 
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl, BuilderType.SurveyControl)]
         [PropertyGroup(PGConstants.APPEARANCE)]
         [PropertyEditor(PropertyEditorType.FontSelector)]
         [OnChangeUIFunction("Common.INP_FONT_STYLE")]
@@ -137,7 +138,7 @@ else {
             ")]
         public TextTransform TextTransform { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl, BuilderType.SurveyControl)]
         [PropertyGroup(PGConstants.CORE)]
         [OnChangeExec(@"
 if (this.TextMode === 4 ){
@@ -160,9 +161,10 @@ else {
         [HelpText("specifies a short hint that describes the expected value of an input field (e.g. a sample value or a short description of the expected format)")]
         public string PlaceHolder { get; set; }
 
-        //[PropertyGroup("Behavior")]
-        //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        //public string MaskPattern { get; set; }
+        [PropertyGroup("Behavior")]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyEditor(PropertyEditorType.String)]
+        public string MaskPattern { get; set; }
 
         //[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         //[PropertyGroup(PGConstants.APPEARANCE)]
@@ -260,7 +262,8 @@ else {
 
         [HideInPropertyGrid]
         [JsonIgnore]
-        public override string ToolIconHtml { get { return "<i class='fa fa-i-cursor'></i>"; } set { } }
+        [EnableInBuilder(BuilderType.SurveyControl)]
+        public override string ToolIconHtml { get { return "<i class=\"fa fa-i-cursor\"></i>"; } set { } }
 
         //public override string GetToolHtml()
         //{

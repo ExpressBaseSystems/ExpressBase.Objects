@@ -97,6 +97,11 @@ namespace ExpressBase.Objects.WebFormRelated
                     (control as EbMeetingPicker).TableName = curTbl;
                     _schema.ExtendedControls.Add(control);
                 }
+                else if (control is EbPhone && (control as EbPhone).Sendotp)
+                {
+                    (control as EbPhone).FormRefId = _this.RefId;
+                    (control as EbPhone).RedisClient = _this.RedisClient;
+                }
             }
 
             foreach (EbControl _control in _container.Controls)

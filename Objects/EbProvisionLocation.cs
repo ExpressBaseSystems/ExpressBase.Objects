@@ -5,12 +5,15 @@ using ExpressBase.Common.LocationNSolution;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
+using ExpressBase.Objects.ServiceStack_Artifacts;
+using ExpressBase.Objects.WebFormRelated;
 using ExpressBase.Security;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
+using System.Net;
 using System.Runtime.Serialization;
 
 namespace ExpressBase.Objects
@@ -64,9 +67,9 @@ namespace ExpressBase.Objects
             }
         }
 
-        [EnableInBuilder(BuilderType.WebForm)]
-        [HideInPropertyGrid]
-        public override bool Hidden { get { return true; } }
+        //[EnableInBuilder(BuilderType.WebForm)]
+        //[HideInPropertyGrid]
+        //public override bool Hidden { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
@@ -75,21 +78,21 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyGroup(PGConstants.CORE)]
         [UIproperty]
-        [OnChangeUIFunction("EbProvisionLocation.mapping")]
+        //[OnChangeUIFunction("EbProvisionLocation.mapping")]
         [PropertyEditor(PropertyEditorType.Collection)]
         [ListType(typeof(UsrLocFieldAbstract))]
         public List<UsrLocFieldAbstract> Fields { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm)]
-        [HideInPropertyGrid]
-        public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
-        
+        //[EnableInBuilder(BuilderType.WebForm)]
+        //[HideInPropertyGrid]
+        //public override EbDbTypes EbDbType { get { return EbDbTypes.String; } }
+
         //--------Hide in property grid------------
 
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
         public override string HelpText { get; set; }
-        
+
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
         public override string ToolTipText { get; set; }
@@ -106,10 +109,10 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         public override EbScript DefaultValueExpression { get; set; }
 
-        [EnableInBuilder(BuilderType.WebForm)]
-        [HideInPropertyGrid]
-        public override EbScript HiddenExpr { get; set; }
-        
+        //[EnableInBuilder(BuilderType.WebForm)]
+        //[HideInPropertyGrid]
+        //public override EbScript HiddenExpr { get; set; }
+
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
         public override EbScript DisableExpr { get; set; }
@@ -128,7 +131,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
-        public override bool DoNotPersist { get { return true; } }
+        public override bool DoNotPersist { get { return false; } }
 
         [EnableInBuilder(BuilderType.WebForm)]
         [HideInPropertyGrid]
@@ -161,40 +164,52 @@ this.Init = function(id)
     fields[0] = new EbObjects.UsrLocField('longname');
     fields[1] = new EbObjects.UsrLocField('shortname');
     fields[2] = new EbObjects.UsrLocField('image');
+    fields[3] = new EbObjects.UsrLocField('is_group');
+    fields[4] = new EbObjects.UsrLocField('parent_id');
+    fields[5] = new EbObjects.UsrLocField('eb_location_types_id');
 
-    fields[0].DisplayName = 'Name';
-    fields[1].DisplayName = 'ShortName';
-    fields[2].DisplayName = 'Logo';
-    fields[0].Type = 'text';
-    fields[1].Type = 'text';
-    fields[2].Type = 'image';
+    $.extend(fields[0], { DisplayName: 'Name', Type: 'text', IsRequired: true });
+    $.extend(fields[1], { DisplayName: 'ShortName', Type: 'text', IsRequired: false });
+    $.extend(fields[2], { DisplayName: 'Logo', Type: 'image', IsRequired: false });
+    $.extend(fields[3], { DisplayName: 'IsGroup', Type: 'text', IsRequired: false });
+    $.extend(fields[4], { DisplayName: 'ParentId', Type: 'integer', IsRequired: false });
+    $.extend(fields[5], { DisplayName: 'Type', Type: 'integer', IsRequired: false });
 
-    for (let i = 0; i < 3; i++){
-        fields[i].IsRequired = true;
+    for (let i = 0; i < 6; i++){
 	    this.Fields.$values.push(fields[i]);
     }
     commonO.ObjCollection['#vernav0'].GetLocationConfig(this);
 };";
         }
 
+        public static bool IsSystemField(string name)
+        {
+            return name == FormConstants.longname ||
+                name == FormConstants.shortname ||
+                name == FormConstants.image ||
+                name == FormConstants.is_group ||
+                name == FormConstants.parent_id ||
+                name == FormConstants.eb_location_types_id;
+        }
+
         public override string GetBareHtml()
         {
             return @"<span class='eb-ctrl-label' ui-label id='@ebsidLbl'> ProvisionLocation </span>";
 
-//            return @"
-//            <input id='@ebsid@' data-ebtype='@data-ebtype@'  data-toggle='tooltip' title='@toolTipText@' class='date' type='text' name='@name@' autocomplete = 'off' @value@ @tabIndex@ style='width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@' @required@ @placeHolder@ disabled />
-//            "
-//.Replace("@name@", (this.Name != null ? this.Name.Trim() : ""))
-//.Replace("@data-ebtype@", "16")//( (int)this.EbDateType ).ToString())
-//.Replace("@toolTipText@", this.ToolTipText)
-//.Replace("@ebsid@", String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId)
-//.Replace("@value@", "")//"value='" + this.Value + "'")
-//.Replace("@tabIndex@", "tabindex='" + this.TabIndex + "'")
-//.Replace("@BackColor@ ", "background-color: #eee;")
-//    //.Replace("@BackColor@ ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor@ ") + ";"))
-//    .Replace("@ForeColor@ ", "color:" + ((this.ForeColor != null) ? this.ForeColor : "@ForeColor@ ") + ";")
-//.Replace("@required@", (this.Required && !this.Hidden ? " required" : string.Empty))
-//.Replace("@placeHolder@", "placeholder=''");
+            //            return @"
+            //            <input id='@ebsid@' data-ebtype='@data-ebtype@'  data-toggle='tooltip' title='@toolTipText@' class='date' type='text' name='@name@' autocomplete = 'off' @value@ @tabIndex@ style='width:100%; @BackColor@ @ForeColor@ display:inline-block; @fontStyle@' @required@ @placeHolder@ disabled />
+            //            "
+            //.Replace("@name@", (this.Name != null ? this.Name.Trim() : ""))
+            //.Replace("@data-ebtype@", "16")//( (int)this.EbDateType ).ToString())
+            //.Replace("@toolTipText@", this.ToolTipText)
+            //.Replace("@ebsid@", String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId)
+            //.Replace("@value@", "")//"value='" + this.Value + "'")
+            //.Replace("@tabIndex@", "tabindex='" + this.TabIndex + "'")
+            //.Replace("@BackColor@ ", "background-color: #eee;")
+            //    //.Replace("@BackColor@ ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor@ ") + ";"))
+            //    .Replace("@ForeColor@ ", "color:" + ((this.ForeColor != null) ? this.ForeColor : "@ForeColor@ ") + ";")
+            //.Replace("@required@", (this.Required && !this.Hidden ? " required" : string.Empty))
+            //.Replace("@placeHolder@", "placeholder=''");
         }
 
         public override string GetDesignHtml()
@@ -207,7 +222,7 @@ this.Init = function(id)
             string EbCtrlHTML = @"
         <div id='cont_@ebsid@' ebsid='@ebsid@' name='@name@' class='Eb-ctrlContainer' @childOf@ ctype='@type@' eb-hidden='@isHidden@'>
             <span class='eb-ctrl-label' ui-label id='@ebsidLbl'> ProvisionLocation </span>
-            <i class='fa fa-spinner fa-pulse' aria-hidden='true'></i>
+            <div>- Design html is not implemented -</div>
         </div>"
                .Replace("@LabelForeColor ", "color:" + (LabelForeColor ?? "@LabelForeColor ") + ";")
                .Replace("@LabelBackColor ", "background-color:" + (LabelBackColor ?? "@LabelBackColor ") + ";");
@@ -216,10 +231,12 @@ this.Init = function(id)
         }
 
         public string VirtualTable { get; set; }
-        
+
+        public bool IsLocationCreated { get; set; }
+
         public string GetSelectQuery(string masterTbl)
         {
-            return string.Format("SELECT id, longname, shortname, image, meta_json FROM eb_locations WHERE eb_ver_id = :{0}_eb_ver_id AND eb_data_id = :{0}_id;", masterTbl);
+            return string.Format("SELECT id, longname, shortname, image, meta_json, is_group, parent_id, eb_location_types_id FROM eb_locations WHERE eb_ver_id = :{0}_eb_ver_id AND eb_data_id = :{0}_id AND COALESCE(eb_del, 'F') = 'F';", masterTbl);
         }
 
         private string GetSaveQuery(bool ins, string param, string mtbl)
@@ -230,24 +247,60 @@ this.Init = function(id)
                 return $"UPDATE eb_locations SET {param} WHERE eb_ver_id = :{mtbl}_eb_ver_id AND eb_data_id = :{mtbl}_id;";
         }
 
+        private void AddParam(IDatabase DataDB, List<DbParameter> param, int i, EbDbTypes type, Dictionary<string, string> _d, Dictionary<string, string> _od, string key, object altVal)
+        {
+            if (_d.ContainsKey(key))
+                altVal = _d[key];
+            else if (_od != null && _od.ContainsKey(key))
+                altVal = _od[key];
+
+            param.Add(DataDB.GetNewParameter($"{key}_{i}", type, altVal));
+        }
+
         public override bool ParameterizeControl(IDatabase DataDB, List<DbParameter> param, string tbl, SingleColumn cField, bool ins, ref int i, ref string _col, ref string _val, ref string _extqry, User usr, SingleColumn ocF)
         {
-            Dictionary<string, string> _d = JsonConvert.DeserializeObject<Dictionary<string, string>>(Convert.ToString(cField.Value));
-            param.Add(DataDB.GetNewParameter("shortname_" + i, EbDbTypes.String, _d["shortname"]));
-            param.Add(DataDB.GetNewParameter("longname_" + i, EbDbTypes.String, _d["longname"]));
-            param.Add(DataDB.GetNewParameter("image_" + i, EbDbTypes.String, _d["image"]));
-            param.Add(DataDB.GetNewParameter("meta_json_" + i, EbDbTypes.String, _d["meta_json"]));
-            string temp = string.Empty;
+            Dictionary<string, string> _d = JsonConvert.DeserializeObject<Dictionary<string, string>>(Convert.ToString(cField.F));
+            Dictionary<string, string> _od = ocF == null ? null : JsonConvert.DeserializeObject<Dictionary<string, string>>(Convert.ToString(ocF.F));
+            if (string.IsNullOrEmpty(_d[FormConstants.longname]))
+                return false;
+            string selQry = "SELECT id FROM eb_locations WHERE LOWER(longname) LIKE LOWER(@longname) AND COALESCE(eb_del, 'F') = 'F';";
+            EbDataTable dt = DataDB.DoQuery(selQry, new DbParameter[] { DataDB.GetNewParameter(FormConstants.longname, EbDbTypes.String, _d[FormConstants.longname]) });
+            int nProvLocId = 0;
+            if (dt.Rows.Count > 0)
+                nProvLocId = Convert.ToInt32(dt.Rows[0][0]);
+            string temp;
             if (ins)
             {
-                temp = $"INSERT INTO eb_locations(shortname, longname, image, meta_json, eb_ver_id, eb_data_id) VALUES(:shortname_{i}, :longname_{i}, :image_{i}, :meta_json_{i}, :{tbl}_eb_ver_id, eb_currval('{tbl}_id_seq'));";
+                if (nProvLocId > 0)
+                    throw new FormException(_d[FormConstants.longname] + " is not unique.", (int)HttpStatusCode.BadRequest, "Given longname is already exists in eb_locations", "EbProvisionLocation -> ParameterizeControl");
+
+                temp = $@"INSERT INTO eb_locations(longname, shortname, image, meta_json, is_group, parent_id, eb_location_types_id, eb_ver_id, eb_data_id, eb_created_by, eb_created_at, eb_lastmodified_by, eb_lastmodified_at, eb_del) 
+                    VALUES(@longname_{i}, @shortname_{i}, @image_{i}, @meta_json_{i}, @is_group_{i}, @parent_id_{i}, @eb_location_types_id_{i}, @{tbl}_eb_ver_id, eb_currval('{tbl}_id_seq'), @{FormConstants.eb_createdby}, {DataDB.EB_CURRENT_TIMESTAMP}, @{FormConstants.eb_createdby}, {DataDB.EB_CURRENT_TIMESTAMP}, 'F');";
+
                 if (DataDB.Vendor == DatabaseVendors.MYSQL)
                     temp += "SELECT eb_persist_currval('eb_locations_id_seq');";
+                temp += $"UPDATE {this.VirtualTable} SET {this.Name} = eb_currval('eb_locations_id_seq') WHERE {(this.VirtualTable == tbl ? "id" : (tbl + "_id"))} = eb_currval('{tbl}_id_seq'); ";
+
+                this.IsLocationCreated = true;
             }
             else
             {
-                temp += $"UPDATE eb_locations SET shortname = :shortname_{i}, longname = :longname_{i}, image = :image_{i}, meta_json = :meta_json_{i} WHERE eb_ver_id = :{tbl}_eb_ver_id AND eb_data_id = :{tbl}_id;";
+                int oProvLocId = ocF == null ? 0 : Convert.ToInt32(ocF.Value);
+                if (nProvLocId > 0 && nProvLocId != oProvLocId)
+                    throw new FormException(_d[FormConstants.longname] + " is not unique.", (int)HttpStatusCode.BadRequest, "Given longname is already exists in eb_locations", "EbProvisionLocation -> ParameterizeControl");
+
+                temp = $@"UPDATE eb_locations SET longname = @longname_{i}, shortname = @shortname_{i}, image = @image_{i}, meta_json = @meta_json_{i}, 
+                            is_group = @is_group_{i}, parent_id = @parent_id_{i}, eb_location_types_id = @eb_location_types_id_{i}, eb_lastmodified_by = @{FormConstants.eb_modified_by}, eb_lastmodified_at = {DataDB.EB_CURRENT_TIMESTAMP}
+                            WHERE eb_ver_id = :{tbl}_eb_ver_id AND eb_data_id = :{tbl}_id AND COALESCE(eb_del, 'F') = 'F';";
             }
+            param.Add(DataDB.GetNewParameter("longname_" + i, EbDbTypes.String, _d[FormConstants.longname]));
+            AddParam(DataDB, param, i, EbDbTypes.String, _d, _od, FormConstants.shortname, _d[FormConstants.longname]);
+            AddParam(DataDB, param, i, EbDbTypes.String, _d, _od, FormConstants.image, "../img");
+            AddParam(DataDB, param, i, EbDbTypes.String, _d, _od, FormConstants.meta_json, "{}");
+            AddParam(DataDB, param, i, EbDbTypes.String, _d, _od, FormConstants.is_group, "T");
+            AddParam(DataDB, param, i, EbDbTypes.Decimal, _d, _od, FormConstants.parent_id, 0);
+            AddParam(DataDB, param, i, EbDbTypes.Int32, _d, _od, FormConstants.eb_location_types_id, 1);
+
             _extqry = temp + _extqry; //location must be created before user creation
             i++;
             return true;
@@ -259,9 +312,10 @@ this.Init = function(id)
             {
                 Name = this.Name,
                 Type = (int)this.EbDbType,
-                Value = "{}",
+                Value = Value == null ? 0 : Value,
                 Control = this,
-                ObjType = this.ObjType
+                ObjType = this.ObjType,
+                F = "{}"
             };
         }
 
@@ -269,20 +323,8 @@ this.Init = function(id)
         {
             get
             {
-                return @"
-                if (!this.hasOwnProperty('_finalObj'))
-                    this._finalObj = {};
-                let metaObj = {};
-                $.each(this.Fields.$values, function (i, obj) {
-                    if (obj.ControlName !== '') {
-                        if (obj.Name === 'shortname' || obj.Name === 'longname' || obj.Name === 'image')
-                            this._finalObj[obj.Name] = obj.Control.getValueFromDOM();
-                        else
-                            metaObj[obj.DisplayName] = obj.Control.getValueFromDOM();
-                    }
-                }.bind(this));
-                this._finalObj['meta_json'] = JSON.stringify(metaObj);
-                return JSON.stringify(this._finalObj);";
+                return @"if (this.hasOwnProperty('_valueFE')) return this._valueFE;
+                        else return 0;";
             }
             set { }
         }
@@ -291,38 +333,49 @@ this.Init = function(id)
         {
             get
             {
-                return @"
-                this._finalObj = JSON.parse(p1);
-                let metaObj = JSON.parse(this._finalObj['meta_json']) || {};
-                $.each(this.Fields.$values, function (i, obj) {
-                    if (obj.ControlName !== '') {
-                        if (obj.Name === 'shortname' || obj.Name === 'longname' || obj.Name === 'image')
-                            obj.Control.setValue(this._finalObj[obj.Name]);
-                        else if (metaObj.hasOwnProperty(obj.DisplayName))
-                            obj.Control.setValue(metaObj[obj.DisplayName]);
-                    }
-                }.bind(this));";
+                return @"this._valueFE = p1;";
             }
             set { }
         }
 
-        public override string OnChangeBindJSFn
-        {
-            get
-            {
-                return @"
-                    $.each(this.Fields.$values, function (i, obj) {
-                        if (obj.ControlName !== '') {
-                            $('#' + obj.Control.EbSid_CtxId).on('change', p1);
-                        }
-                    }.bind(this));";
-            }
-            set { }
-        }
+        public override string OnChangeBindJSFn { get { return @""; } set { } }
 
         public override string RefreshJSfn { get { return @""; } set { } }
 
         public override string ClearJSfn { get { return @""; } set { } }
 
+        //GetValueFromDOMJSfn
+        //if (!this.hasOwnProperty('_finalObj'))
+        //    this._finalObj = {};
+        //let metaObj = {};
+        //$.each(this.Fields.$values, function (i, obj) {
+        //    if (obj.ControlName !== '') {
+        //        if (obj.Name === 'shortname' || obj.Name === 'longname' || obj.Name === 'image')
+        //            this._finalObj[obj.Name] = obj.Control.getValueFromDOM();
+        //        else
+        //            metaObj[obj.DisplayName] = obj.Control.getValueFromDOM();
+        //    }
+        //}.bind(this));
+        //this._finalObj['meta_json'] = JSON.stringify(metaObj);
+        //return JSON.stringify(this._finalObj);
+
+        //SetValueJSfn
+        //this._finalObj = JSON.parse(p1);
+        //let metaObj = JSON.parse(this._finalObj['meta_json']) || {};
+        //$.each(this.Fields.$values, function (i, obj) {
+        //    if (obj.ControlName !== '') {
+        //        if (obj.Name === 'shortname' || obj.Name === 'longname' || obj.Name === 'image')
+        //            obj.Control.setValue(this._finalObj[obj.Name]);
+        //        else if (metaObj.hasOwnProperty(obj.DisplayName))
+        //            obj.Control.setValue(metaObj[obj.DisplayName]);
+        //    }
+        //}.bind(this));
+
+        //OnChangeBindJSFn
+        //$.each(this.Fields.$values, function (i, obj) {
+        //    if (obj.ControlName !== '') {
+        //        $('#' + obj.Control.EbSid_CtxId).on('change', p1);
+        //    }
+        //}.bind(this));
     }
 }

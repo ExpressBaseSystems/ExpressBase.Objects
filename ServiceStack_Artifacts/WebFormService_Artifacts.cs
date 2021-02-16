@@ -617,6 +617,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     {
         [DataMember(Order = 1)]
         public string RefId { get; set; }
+
+        [DataMember(Order = 2)]
+        public int Limit { get; set; }
+
+        [DataMember(Order = 3)]
+        public int Offset { get; set; }
     }
 
     [DataContract]

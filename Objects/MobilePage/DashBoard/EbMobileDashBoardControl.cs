@@ -12,14 +12,8 @@ namespace ExpressBase.Objects
         public override string Name { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyEditor(PropertyEditorType.Expandable)]
         [PropertyGroup(PGConstants.APPEARANCE)]
-        public EbThickness Margin { set; get; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyEditor(PropertyEditorType.Expandable)]
-        [PropertyGroup(PGConstants.APPEARANCE)]
-        public EbThickness Padding { set; get; }
+        public int BorderThickness { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup(PGConstants.APPEARANCE)]
@@ -61,5 +55,19 @@ namespace ExpressBase.Objects
             }
             ")]
         public virtual bool BoxShadow { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.Expandable)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        public virtual EbThickness Margin { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.Expandable)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        public virtual EbThickness Padding { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.BEHAVIOR)]
+        public virtual bool Hidden { set; get; }
     }
 }

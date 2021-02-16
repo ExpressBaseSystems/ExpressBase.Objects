@@ -82,6 +82,13 @@ namespace ExpressBase.Objects
         [PropertyEditor(PropertyEditorType.Collection)]
         public new List<EbValidator> Validators { get; set; }
 
+        //[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        //[PropertyEditor(PropertyEditorType.ScriptEditorJS)]
+        //[Alias("ReadOnly Expression")]
+        //[PropertyGroup(PGConstants.BEHAVIOR)]
+        //[HelpText("Define conditions to decide Disabled/Readonly property of the control.")]
+        //public new EbScript DisableExpr { get; set; }
+
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         [DefaultPropValue("true")]
         [PropertyGroup(PGConstants.BEHAVIOR)]
@@ -153,6 +160,8 @@ namespace ExpressBase.Objects
         {
             if (this.OnRowPaint == null)
                 this.OnRowPaint = new EbScript();
+            //if (this.DisableExpr == null)
+            //    this.DisableExpr = new EbScript();
 
             this.BareControlHtml = this.GetBareHtml();
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
@@ -212,7 +221,24 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyGroup(PGConstants.BEHAVIOR)]
+        [OnChangeExec(@"
+if (this.IsDisable){
+    pg.HideProperty('DisableRowEdit');
+    pg.HideProperty('DisableRowDelete');
+}
+else {
+    pg.ShowProperty('DisableRowEdit');
+    pg.ShowProperty('DisableRowDelete');
+}")]
         public override bool IsDisable { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.BEHAVIOR)]
+        public bool DisableRowEdit { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.BEHAVIOR)]
+        public bool DisableRowDelete { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup(PGConstants.BEHAVIOR)]
@@ -340,7 +366,10 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         public override string SetDisplayMemberJSfn
         {
-            get { return JSFnsConstants.DG_hiddenColCheckCode + @"document.getElementById(this.EbSid_CtxId).value = p1;"; }
+            get { return JSFnsConstants.DG_hiddenColCheckCode + @"
+if(this.DataVals.ObjType === 'DGNumericColumn' && p1 === undefined)
+    p1 = 0;
+document.getElementById(this.EbSid_CtxId).value = p1;"; }
 
             set { }
         }
@@ -416,6 +445,7 @@ namespace ExpressBase.Objects
 "; } set { } }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+        [HideInPropertyGrid]
         public bool IsDGCtrl { get { return true; } set { } }
 
 
@@ -434,10 +464,14 @@ namespace ExpressBase.Objects
         [JsonIgnore]
         public override string RemoveInvalidStyleJSFn { get { return @"DGremoveInvalidStyle.bind(this)(p1, p2);"; } set { } }
 
+        [JsonIgnore]
+        public override string Label { get; set; }
+
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [UIproperty]
         [OnChangeUIFunction("EbDataGrid.title")]
+        [PropertyGroup(PGConstants.CORE)]
         public string Title { get; set; }
 
         [HideInPropertyGrid]
@@ -453,6 +487,7 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [DefaultPropValue("true")]
+        [PropertyGroup(PGConstants.BEHAVIOR)]
         public virtual bool IsEditable { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
@@ -493,6 +528,7 @@ else {
     pg.HideProperty('RowsVisible');
 }
             ")]
+        [PropertyGroup(PGConstants.CORE)]
         public TextMode TextMode
         {
             get { return this.EbTextBox.TextMode; }
@@ -575,9 +611,11 @@ else {
         public override string InputControlType { get { return "EbNumeric"; } }
 
         [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyGroup(PGConstants.EXTENDED)]
         public bool IsAggragate { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyGroup(PGConstants.EXTENDED)]
         public bool AllowNegative { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
@@ -764,6 +802,7 @@ return '✖';
         }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.CORE)]
         public EbDateType EbDateType
         {
             get { return this.EbDate.EbDateType; }
@@ -834,6 +873,7 @@ $(`[ebsid=${p1.DG.EbSid_CtxId}]`).on('change', `[colname=${this.Name}] [ui-inp]`
         }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.EXTENDED)]
         public bool IsNullable
         {
             get { return this.EbDate.IsNullable; }
@@ -1260,6 +1300,33 @@ else{pg.HideProperty('DataSourceId');pg.HideProperty('ValueMember');pg.HidePrope
         //}
 
         [JsonIgnore]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [PropertyEditor(PropertyEditorType.Boolean)]
+        [PropertyGroup(PGConstants.EXTENDED)]
+        [DefaultPropValue("true")]
+        [OnChangeExec(@"
+
+if(this.RenderAsSimpleSelect == true){ //SS
+    if(this.IsDynamic == false){// SS static
+	    pg.ShowProperty('Options');
+	    pg.HideProperty('ValueMember');
+	    pg.HideProperty('DisplayMember'); 
+    }
+    else{// SS dynamic
+	    pg.HideProperty('Options');
+	    pg.ShowProperty('ValueMember');
+	    pg.ShowProperty('DisplayMember');
+    }
+}
+else// PS
+{
+	pg.ShowProperty('ValueMember');
+	pg.ShowProperty('DisplayMembers');
+	pg.ShowProperty('Columns');
+	pg.HideProperty('DisplayMember');
+	pg.HideProperty('Options');
+}
+")]
         public bool IsDynamic { get; set; }
 
         [JsonIgnore]
@@ -1322,6 +1389,7 @@ pg.MakeReadOnly('DisplayMembers');} else {pg.MakeReadWrite('DisplayMembers');}")
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
+        [PropertyGroup(PGConstants.DATA_SETTINGS)]
         [OnChangeExec(@"
 if (this.Columns && this.Columns.$values.length === 0 )
 {
@@ -1446,8 +1514,16 @@ pg.HideProperty('IsDynamic');
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [HelpText("Specify minimum number of charecters to initiate search")]
         [Category("Search Settings")]
-        [PropertyGroup(PGConstants.BEHAVIOR)]
+        [PropertyGroup(PGConstants.SEARCH)]
         public int MinSearchLength { get { return this.EbPowerSelect.MinSearchLength; } set { this.EbPowerSelect.MinSearchLength = value; } }
+
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [Alias("Search Method")]
+        [PropertyGroup(PGConstants.SEARCH)]
+        [HideInPropertyGrid]
+        [HelpText("Select Search Method - StartsWith, EndsWith, Contains or Exact Match")]
+        public DefaultSearchFor DefaultSearchFor { get { return this.EbPowerSelect.DefaultSearchFor; } set { this.EbPowerSelect.DefaultSearchFor = value; } }
 
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
@@ -1501,7 +1577,7 @@ pg.HideProperty('IsDynamic');
         public bool MultiSelect { get { return this.EbPowerSelect.MultiSelect; } set { this.EbPowerSelect.MultiSelect = value; } }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [PropertyGroup(PGConstants.BEHAVIOR)]
+        [PropertyGroup(PGConstants.VALIDATIONS)]
         [OnChangeExec(@"
             if (this.MultiSelect === true ){
                 pg.MakeReadWrite('MaxLimit'); 
@@ -1559,11 +1635,13 @@ pg.HideProperty('IsDynamic');
         public List<EbSimpleSelectOption> Options { get { return this.EbPowerSelect.Options; } set { this.EbPowerSelect.Options = value; } }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         public int DropdownHeight { get { return this.EbPowerSelect.DropdownHeight; } set { this.EbPowerSelect.DropdownHeight = value; } }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm)]
         [Alias("DropdownWidth(%)")]
         [DefaultPropValue("100")]
+        [PropertyGroup(PGConstants.APPEARANCE)]
         public int DropdownWidth { get { return this.EbPowerSelect.DropdownWidth; } set { this.EbPowerSelect.DropdownWidth = value; } }
 
         [HideInPropertyGrid]
@@ -1775,6 +1853,7 @@ pg.HideProperty('IsDynamic');
         }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.CORE)]
         public EbDateType EbDateType
         {
             get { return this.EbSysCreatedAt.EbDateType; }
@@ -1886,6 +1965,7 @@ pg.HideProperty('IsDynamic');
     {
 
         [JsonIgnore]
+        [HideInPropertyGrid]
         public EbSysModifiedBy EbSysModifiedBy { get; set; }
 
         public EbDGModifiedByColumn()
@@ -2035,6 +2115,7 @@ pg.HideProperty('IsDynamic');
         }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.CORE)]
         public EbDateType EbDateType
         {
             get { return this.EbSysModifiedAt.EbDateType; }
@@ -2125,6 +2206,7 @@ pg.HideProperty('IsDynamic');
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [HideInToolBox]
+        [HideInPropertyGrid]
         public override bool IsSysControl { get { return true; } }
 
         //EbDGModifiedAtColumn

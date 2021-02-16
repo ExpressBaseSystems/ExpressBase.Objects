@@ -29,6 +29,7 @@ using ExpressBase.CoreBase.Globals;
 using System.Net;
 using System.Threading;
 using ExpressBase.Common.Security;
+using System.Threading.Tasks;
 
 namespace ExpressBase.Objects
 {
@@ -69,7 +70,7 @@ namespace ExpressBase.Objects
 
         public bool IsLocEditable { get; set; }
 
-        public bool ExeDataPusher { get; set; }
+        public int FormDataPusherCount { get; set; }
 
         public EbDataPusherConfig DataPusherConfig { get; set; }
 
@@ -83,9 +84,14 @@ namespace ExpressBase.Objects
 
         public MyActionNotification MyActNotification { get; set; }
 
+        [JsonIgnore]
         internal DbConnection DbConnection { get; set; }
 
+        [JsonIgnore]
         private DbTransaction DbTransaction { get; set; }
+
+        [JsonIgnore]
+        internal IRedisClient RedisClient { get; set; }
 
         public static EbOperations Operations = WFOperations.Instance;
 
@@ -132,6 +138,11 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.Collection)]
         public List<EbSQLValidator> DisableCancel { get; set; }
+
+        [PropertyGroup("Events")]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.Collection)]
+        public List<EbRoutine> Disable_Edit { get; set; }
 
         [PropertyGroup("Events")]
         [EnableInBuilder(BuilderType.WebForm)]
@@ -220,6 +231,11 @@ namespace ExpressBase.Objects
                 .Replace("@rmode@", IsRenderMode.ToString().ToLower())
                 .Replace("@tabindex@", IsRenderMode ? string.Empty : " tabindex='1'");
             return Regex.Replace(html, @"( |\r?\n)\1+", "$1");
+        }
+
+        public void SetRedisClient(IRedisClient RedisClient)
+        {
+            this.RedisClient = RedisClient;
         }
 
         //Operations to be performed before form object save - table name required, table name repetition, calculate dependency
@@ -792,7 +808,65 @@ namespace ExpressBase.Objects
                         Row.SetControl(c.Name, c);
                     }
                 }
-                else if ((!(c is EbFileUploader) && !c.DoNotPersist) || c is EbProvisionLocation)
+                else if (c is EbProvisionLocation)
+                {
+                    if (!(this.FormData.MultipleTables.ContainsKey(_container.TableName) && this.FormData.MultipleTables[_container.TableName].Count > 0))
+                        continue;
+                    EbProvisionLocation provLocCtrl = c as EbProvisionLocation;
+                    Dictionary<string, string> _d = new Dictionary<string, string>();
+                    Dictionary<string, string> _metaDict = new Dictionary<string, string>();
+                    bool skipCtrl = false;
+
+                    foreach (UsrLocField obj in provLocCtrl.Fields)
+                    {
+                        if (!string.IsNullOrEmpty(obj.ControlName))
+                        {
+                            bool ctrlFound = false;
+                            foreach (KeyValuePair<string, SingleTable> entry in this.FormData.MultipleTables)
+                            {
+                                TableSchema _table = this.FormSchema.Tables.Find(e => e.TableType == WebFormTableTypes.Normal && e.TableName == entry.Key);
+                                if (_table != null && entry.Value.Count > 0)
+                                {
+                                    SingleColumn Col = entry.Value[0].GetColumn(obj.ControlName);
+                                    if (Col != null)
+                                    {
+                                        string _val = Convert.ToString(Col.Value).Trim();
+                                        if (EbProvisionLocation.IsSystemField(obj.Name))
+                                            _d.Add(obj.Name, _val);///////////////
+                                        else
+                                            _metaDict.Add(obj.DisplayName, _val);
+                                        ctrlFound = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (obj.IsRequired && !ctrlFound)
+                                skipCtrl = true;
+                        }
+                    }
+                    SingleRow Row = this.FormData.MultipleTables[_container.TableName][0];
+                    SingleColumn Column = Row.GetColumn(provLocCtrl.Name);
+                    if (skipCtrl)
+                    {
+                        if (Column != null)
+                            Row.Columns.Remove(Column);
+                        Console.WriteLine("EbProvisionLocation: Control skipped...");
+                    }
+                    else
+                    {
+                        if (Column == null)
+                        {
+                            Column = c.GetSingleColumn(this.UserObj, this.SolutionObj, null);
+                            Row.Columns.Add(Column);
+                        }
+                        _d.Add(FormConstants.meta_json, JsonConvert.SerializeObject(_metaDict));
+                        Column.F = JsonConvert.SerializeObject(_d);
+                        c.ValueFE = Column.Value;
+                        Row.SetEbDbType(c.Name, c.EbDbType);
+                        Row.SetControl(c.Name, c);
+                    }
+                }
+                else if ((!(c is EbFileUploader) && !c.DoNotPersist))
                 {
                     if (FormData.MultipleTables.ContainsKey(_container.TableName) && FormData.MultipleTables[_container.TableName].Count > 0)
                     {
@@ -894,6 +968,8 @@ namespace ExpressBase.Objects
                     {
                         EbControl _control = _table.Columns[k].Control;
                         this.GetFormattedColumn(dataTable.Columns[_control.Name.ToLower()], dataRow, Row, _control);// card field has uppercase name, but datatable contains lower case column name
+                        if (_control is EbPhone && (_control as EbPhone).Sendotp)
+                            (_control as EbPhone).GetVerificationStatus(dataTable.Columns[_control.Name.ToLower() + FormConstants._verified], dataRow, Row);
                     }
                 }
                 else
@@ -1068,21 +1144,23 @@ namespace ExpressBase.Objects
         //For Normal Mode
         public void RefreshFormData(IDatabase DataDB, Service service, bool backup = false, bool includePushData = false)
         {
-            int formCount = (this.ExeDataPusher && includePushData) ? this.DataPushers.Count + 1 : 1;
+            int formCount = (this.FormDataPusherCount > 0 && includePushData) ? this.FormDataPusherCount + 1 : 1;
             string[] psquery = new string[formCount];
             int[] qrycount = new int[formCount];
             EbWebForm[] _FormCollection = new EbWebForm[formCount];
             string query = QueryGetter.GetSelectQuery(this, DataDB, service, out psquery[0], out qrycount[0]);
             _FormCollection[0] = this;
 
-            if (this.ExeDataPusher && includePushData)
+            if (this.FormDataPusherCount > 0 && includePushData)
             {
-                for (int i = 0; i < this.DataPushers.Count; i++)
+                for (int i = 0, j = 1; i < this.DataPushers.Count; i++)
                 {
-                    query += QueryGetter.GetSelectQuery(this.DataPushers[i].WebForm, DataDB, service, out psquery[i + 1], out qrycount[i + 1]);
+                    if (this.DataPushers[i] is EbApiDataPusher)
+                        continue;
+                    query += QueryGetter.GetSelectQuery(this.DataPushers[i].WebForm, DataDB, service, out psquery[j], out qrycount[j]);
                     this.DataPushers[i].WebForm.UserObj = this.UserObj;
                     this.DataPushers[i].WebForm.SolutionObj = this.SolutionObj;
-                    _FormCollection[i + 1] = this.DataPushers[i].WebForm;
+                    _FormCollection[j++] = this.DataPushers[i].WebForm;
                 }
             }
 
@@ -1231,8 +1309,11 @@ namespace ExpressBase.Objects
                                 _d.Add(FormConstants.shortname, Table[0][FormConstants.shortname]);
                                 _d.Add(FormConstants.image, Table[0][FormConstants.image]);
                                 _d.Add(FormConstants.meta_json, Table[0][FormConstants.meta_json]);
+                                _d.Add(FormConstants.is_group, Table[0][FormConstants.is_group]);
+                                _d.Add(FormConstants.parent_id, Table[0][FormConstants.parent_id]);
+                                _d.Add(FormConstants.eb_location_types_id, Table[0][FormConstants.eb_location_types_id]);
                             }
-                            _FormData.MultipleTables[(Ctrl as EbProvisionUser).VirtualTable][0][Ctrl.Name] = JsonConvert.SerializeObject(_d);
+                            _FormData.MultipleTables[(Ctrl as EbProvisionLocation).VirtualTable][0].GetColumn(Ctrl.Name).F = JsonConvert.SerializeObject(_d);
                         }
                         else if (Ctrl is EbReview)
                         {
@@ -1334,7 +1415,7 @@ namespace ExpressBase.Objects
                         if (_ctrl.ContextGetExpr != null && !_ctrl.ContextGetExpr.Code.IsNullOrEmpty())
                         {
                             if (this.FormGlobals == null)
-                                this.FormGlobals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, _FormData, null);
+                                this.FormGlobals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, _FormData, null, DataDB);
                             cxt2 = Convert.ToString(this.ExecuteCSharpScriptNew(_ctrl.ContextGetExpr.Code, this.FormGlobals));
                         }
 
@@ -1451,7 +1532,7 @@ namespace ExpressBase.Objects
 
                 this.PostFormatFormData();
 
-                this.ExeDeleteCancelScript(DataDB);
+                this.ExeDeleteCancelEditScript(DataDB, _FormData);
             }
         }
 
@@ -1562,14 +1643,14 @@ namespace ExpressBase.Objects
                     if (wc == TokenConstants.UC && !(EbFormHelper.HasPermission(this.UserObj, this.RefId, OperationConstants.EDIT, this.LocationId, this.IsLocIndependent) ||
                         (this.UserObj.UserId == this.FormData.CreatedBy && EbFormHelper.HasPermission(this.UserObj, this.RefId, OperationConstants.OWN_DATA, this.LocationId, this.IsLocIndependent))))
                         throw new FormException("Access denied to save this data entry!", (int)HttpStatusCode.Forbidden, "Access denied", "EbWebForm -> Save");
-                    
+
                     resp = "Updated: " + this.Update(DataDB, service);
                 }
                 else
                 {
                     //if (wc == TokenConstants.UC && !EbFormHelper.HasPermission(this.UserObj, this.RefId, OperationConstants.NEW, this.LocationId, this.IsLocIndependent))
                     //    throw new FormException("Access denied to save this data entry!", (int)HttpStatusCode.Forbidden, "Access denied", "EbWebForm -> Save");
-                    
+
                     this.TableRowId = this.Insert(DataDB, service);
                     resp = "Inserted: " + this.TableRowId;
                     Console.WriteLine("New record inserted. Table :" + this.TableName + ", Id : " + this.TableRowId);
@@ -1580,8 +1661,11 @@ namespace ExpressBase.Objects
                 resp += " - AuditTrail: " + ebAuditTrail.UpdateAuditTrail();
                 Console.WriteLine("EbWebForm.Save.AfterSave start");
                 resp += " - AfterSave: " + this.AfterSave(DataDB, IsUpdate);
+                List<ApiRequest> ApiRqsts = new List<ApiRequest>();
+                resp += " - ApiDataPushers: " + EbDataPushHelper.ProcessApiDataPushers(this, service, DataDB, this.DbConnection, ApiRqsts);
                 this.DbTransaction.Commit();
                 Console.WriteLine("EbWebForm.Save.DbTransaction Committed");
+                resp += " - ApiDataPushers Response: " + EbDataPushHelper.CallInternalApis(ApiRqsts, service);
                 Console.WriteLine("EbWebForm.Save.SendNotifications start");
                 resp += " - Notifications: " + EbFnGateway.SendNotifications(this, DataDB, service);
                 Console.WriteLine("EbWebForm.Save.SendMobileNotification start");
@@ -1624,9 +1708,10 @@ namespace ExpressBase.Objects
             string _extqry = string.Empty;
             List<DbParameter> param = new List<DbParameter>();
             int i = 0;
-            if (this.ExeDataPusher)
+            if (this.FormDataPusherCount > 0)
                 this.PrepareWebFormData();
 
+            this.FormCollection.ExecUniqueCheck(DataDB);
             this.FormCollection.Insert(DataDB, param, ref fullqry, ref _extqry, ref i);
 
             fullqry += _extqry;
@@ -1719,9 +1804,10 @@ namespace ExpressBase.Objects
             string _extqry = string.Empty;
             List<DbParameter> param = new List<DbParameter>();
             int i = 0;
-            if (this.ExeDataPusher)
+            if (this.FormDataPusherCount > 0)
                 this.PrepareWebFormData();
 
+            this.FormCollection.ExecUniqueCheck(DataDB);
             this.FormCollection.Update(DataDB, param, ref fullqry, ref _extqry, ref i);
 
             fullqry += _extqry;
@@ -1797,7 +1883,7 @@ namespace ExpressBase.Objects
                     //_FG_WebForm global = GlobalsGenerator.GetCSharpFormGlobals(this, this.FormData);
                     //_FG_Root globals = new _FG_Root(global, this, service);
 
-                    globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, this.FormData, this.FormDataBackup);
+                    globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, this.FormData, this.FormDataBackup, DataDB);
 
                     object stageObj = this.ExecuteCSharpScriptNew(currentStage.NextStage.Code, globals);
                     string nxtStName = string.Empty;
@@ -1914,7 +2000,7 @@ namespace ExpressBase.Objects
                 if (!string.IsNullOrEmpty(nextStage.NotificationContent?.Code?.Trim()))
                 {
                     if (globals == null)
-                        globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, this.FormData, this.FormDataBackup);
+                        globals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, this.FormData, this.FormDataBackup, DataDB);
                     object msg = this.ExecuteCSharpScriptNew(nextStage.NotificationContent.Code, globals);
                     description = Convert.ToString(msg);
                     if (!string.IsNullOrEmpty(description))
@@ -1962,7 +2048,7 @@ namespace ExpressBase.Objects
                     if (this.FormData.ExtendedTables.ContainsKey(_c.Name) || (this.FormData.ExtendedTables.ContainsKey(_c.Name + "_add") && this.FormData.ExtendedTables.ContainsKey(_c.Name + "_del")))
                     {
                         if (this.FormGlobals == null)
-                            this.FormGlobals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, this.FormData, null);
+                            this.FormGlobals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, this.FormData, null, DataDB);
                         string secCxtGet = null, secCxtSet = null;
                         if (_c.ContextGetExpr != null && !_c.ContextGetExpr.Code.IsNullOrEmpty())
                             secCxtGet = Convert.ToString(this.ExecuteCSharpScriptNew(_c.ContextGetExpr.Code, this.FormGlobals));
@@ -2339,6 +2425,8 @@ namespace ExpressBase.Objects
                     //    (c as EbProvisionUser).SendWelcomeMail(MessageProducer3, this.UserObj, this.SolutionObj);
                     //}
                 }
+                else if (c is EbProvisionLocation && (c as EbProvisionLocation).IsLocationCreated)
+                    UpdateSoluObj = true;
             }
             if (UpdateSoluObj)
             {
@@ -2421,7 +2509,7 @@ namespace ExpressBase.Objects
             return -1;
         }
 
-        private void ExeDeleteCancelScript(IDatabase DataDB)
+        private void ExeDeleteCancelEditScript(IDatabase DataDB, WebformData _FormData)
         {
             string q = string.Empty;
             if (this.DisableDelete != null && this.DisableDelete.Count > 0)
@@ -2431,6 +2519,10 @@ namespace ExpressBase.Objects
             if (this.DisableCancel != null && this.DisableCancel.Count > 0)
             {
                 q += string.Join(";", this.DisableCancel.Select(e => e.Script.Code));
+            }
+            if (this.Disable_Edit?.Count > 0)
+            {
+                q += string.Join(";", this.Disable_Edit.FindAll(e => e.Script.Lang == ScriptingLanguage.SQL).Select(e => e.Script.Code));
             }
             if (!q.Equals(string.Empty))
             {
@@ -2466,6 +2558,33 @@ namespace ExpressBase.Objects
                         {
                             this.FormData.DisableCancel.Add(this.DisableCancel[j].Name, true);
                         }
+                    }
+                }
+
+                List<EbRoutine> rt = this.Disable_Edit.FindAll(e => e.Script.Lang == ScriptingLanguage.SQL);
+                for (int j = 0; j < rt.Count; i++, j++)
+                {
+                    if (ds.Tables[i].Rows.Count > 0 && ds.Tables[i].Rows[0].Count > 0 && Convert.ToInt32(ds.Tables[i].Rows[0][0]) > 0)
+                    {
+                        this.FormData.DisableEdit.Add(rt[j].Name, true);
+                    }
+                    else
+                    {
+                        this.FormData.DisableEdit.Add(rt[j].Name, false);
+                    }
+                }
+            }
+
+            if (this.Disable_Edit?.Count > 0)
+            {
+                foreach (EbRoutine rt in this.Disable_Edit)
+                {
+                    if (rt.Script.Lang == ScriptingLanguage.CSharp && !string.IsNullOrEmpty(rt.Script.Code))
+                    {
+                        if (this.FormGlobals == null)
+                            this.FormGlobals = GlobalsGenerator.GetCSharpFormGlobals_NEW(this, _FormData, null, DataDB);
+                        bool status = Convert.ToBoolean(this.ExecuteCSharpScriptNew(rt.Script.Code, this.FormGlobals));
+                        this.FormData.DisableEdit.Add(rt.Name, status);
                     }
                 }
             }

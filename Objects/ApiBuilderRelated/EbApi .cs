@@ -1,29 +1,14 @@
 ﻿using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
-using System;
 using System.Collections.Generic;
 using ExpressBase.Common.Extensions;
-using Newtonsoft.Json;
 using ExpressBase.Common;
 using ExpressBase.Common.Data;
-using System.Linq;
 using ExpressBase.Objects.ServiceStack_Artifacts;
-using ExpressBase.Objects.Objects;
-using Microsoft.CodeAnalysis.CSharp.Scripting;
-using Microsoft.CodeAnalysis.Scripting;
-using System.Net.Http;
-using Newtonsoft.Json.Linq;
-using ExpressBase.Objects.Objects.DVRelated;
 
 namespace ExpressBase.Objects
 {
-    public enum DataReaderResult
-    {
-        Actual = 0,
-        Formated = 1
-    }
-
     public class ListOrdered : List<ApiResources>
     {
         public ListOrdered()
@@ -108,6 +93,7 @@ namespace ExpressBase.Objects
             }
             return refids;
         }
+
         public override void ReplaceRefid(Dictionary<string, string> RefidMap)
         {
             foreach (ApiResources resource in this.Resources)
@@ -138,13 +124,9 @@ namespace ExpressBase.Objects
 
         public object Result { set; get; }
 
-        public virtual List<Param> GetOutParams(List<Param> _param) { return new List<Param>(); }
-
         public virtual object GetResult() { return this.Result; }
 
-        public virtual EbDataColumn GetColumn(int index, string cname) { return null; }
-
-        public virtual object GetColVal(int index, string cname) { return null; }
+        public virtual List<Param> GetParameters(Dictionary<string, object> requestParams) { return null; }
     }
 
     [EnableInBuilder(BuilderType.ApiBuilder)]
@@ -181,21 +163,6 @@ namespace ExpressBase.Objects
                      </div>".RemoveCR().DoubleQuoted(); ;
         }
 
-        public override List<Param> GetOutParams(List<Param> _param)
-        {
-            List<Param> p = new List<Param>();
-            foreach (EbDataTable table in (this.Result as EbDataSet).Tables)
-            {
-                string[] c = _param.Select(item => item.Name).ToArray();
-                foreach (EbDataColumn cl in table.Columns)
-                {
-                    if (c.Contains(cl.ColumnName))
-                        p.Add(new Param { Name = cl.ColumnName, Type = cl.Type.ToString(), Value = table.Rows[0][cl.ColumnIndex].ToString() });
-                }
-            }
-            return p;
-        }
-
         public override object GetResult()
         {
             if (this.ResultType == DataReaderResult.Formated)
@@ -219,16 +186,6 @@ namespace ExpressBase.Objects
             }
             else
                 return this.Result;
-        }
-
-        public override EbDataColumn GetColumn(int index, string cname)
-        {
-            return (this.Result as EbDataSet).Tables[index].Columns[cname];
-        }
-
-        public override object GetColVal(int index, string cname)
-        {
-            return (this.Result as EbDataSet).Tables[index].Rows;
         }
     }
 
@@ -260,11 +217,6 @@ namespace ExpressBase.Objects
                             <div class='CompVersion'> @Version </div>
                         </div>
                     </div>".RemoveCR().DoubleQuoted();
-        }
-
-        public override List<Param> GetOutParams(List<Param> _param)
-        {
-            return new List<Param>();
         }
     }
 
@@ -330,77 +282,38 @@ namespace ExpressBase.Objects
         }
     }
 
+
     [EnableInBuilder(BuilderType.ApiBuilder)]
-    public class EbProcessor : ApiResources
+    public class EbSmsNode : ApiResources
     {
         [EnableInBuilder(BuilderType.ApiBuilder)]
-        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
-        public EbScript Script { get; set; }
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [PropertyGroup("Data Settings")]
+        [OSE_ObjectTypes(EbObjectTypes.iSmsBuilder)]
+        public override string Reference { get; set; }
+
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        [MetaOnly]
+        [UIproperty]
+        public string RefName { set; get; }
+
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        [MetaOnly]
+        [UIproperty]
+        public string Version { set; get; }
 
         public override string GetDesignHtml()
         {
-            return @"<div class='apiPrcItem dropped' eb-type='Processor' id='@id'>
+            return @"<div class='apiPrcItem dropped' eb-type='SmsNode' id='@id'>
                         <div tabindex='1' class='drpbox' onclick='$(this).focus();'>  
                             <div class='CompLabel'> @Label </div>
-                            <div class='CompName'></div>
-                            <div class='CompVersion'></div>
+                            <div class='CompName'> @RefName </div>
+                            <div class='CompVersion'> @Version </div>
                         </div>
                     </div>".RemoveCR().DoubleQuoted();
         }
-
-        public ApiScript Evaluate(ApiResources _prevres, Dictionary<string, object> GlobalParams)
-        {
-            string code = this.Script.Code.Trim();
-            EbDataSet _ds = null;
-            ApiScript script = new ApiScript();
-
-            Script valscript = CSharpScript.Create<dynamic>(code,
-                ScriptOptions.Default.WithReferences("Microsoft.CSharp", "System.Core")
-                .WithImports("System.Dynamic", "System", "System.Collections.Generic", "System.Diagnostics", "System.Linq")
-                .AddReferences(typeof(ExpressBase.Common.EbDataSet).Assembly),
-                globalsType: typeof(ApiGlobals));
-
-            if (_prevres != null)
-                _ds = _prevres.Result as EbDataSet;
-            try
-            {
-                valscript.Compile();
-            }
-            catch (Exception e)
-            {
-                throw new ApiException("Compilation Error: " + e.Message);
-            }
-
-            try
-            {
-                ApiGlobals globals = new ApiGlobals(_ds, ref GlobalParams);
-
-                foreach (KeyValuePair<string, object> kp in GlobalParams)
-                {
-                    globals["Params"].Add(kp.Key, new NTV
-                    {
-                        Name = kp.Key,
-                        Type = (kp.Value.GetType() == typeof(JObject)) ? EbDbTypes.Object : (EbDbTypes)Enum.Parse(typeof(EbDbTypes), kp.Value.GetType().Name, true),
-                        Value = kp.Value
-                    });
-                }
-
-                script.Data = JsonConvert.SerializeObject(valscript.RunAsync(globals).Result.ReturnValue);
-            }
-            catch (Exception e)
-            {
-                if (e.InnerException is ExplicitExitException)
-                {
-                    throw e.InnerException;
-                }
-                else
-                {
-                    throw new Exception("Execution Error: " + e.Message);
-                }
-            }
-            return script;
-        }
     }
+
 
     [EnableInBuilder(BuilderType.ApiBuilder)]
     public class EbConnectApi : ApiResources
@@ -432,77 +345,9 @@ namespace ExpressBase.Objects
                     </div>".RemoveCR().DoubleQuoted();
         }
 
-        public override List<Param> GetOutParams(List<Param> _param)
-        {
-            return new List<Param>();
-        }
-
         public override object GetResult()
         {
             return (this.Result as ApiResponse).Result;
-        }
-    }
-
-    [EnableInBuilder(BuilderType.ApiBuilder)]
-    public class EbThirdPartyApi : ApiResources
-    {
-        [EnableInBuilder(BuilderType.ApiBuilder)]
-        public string Url { set; get; }
-
-        [EnableInBuilder(BuilderType.ApiBuilder)]
-        public ApiMethods Method { set; get; }
-
-        [EnableInBuilder(BuilderType.ApiBuilder)]
-        [PropertyEditor(PropertyEditorType.Collection)]
-        public List<RequestHeader> Headers { get; set; }
-
-        [EnableInBuilder(BuilderType.ApiBuilder)]
-        [PropertyEditor(PropertyEditorType.Collection)]
-        public List<RequestParam> Parameters { get; set; }
-
-        public override string GetDesignHtml()
-        {
-            return @"<div class='apiPrcItem dropped' eb-type='ThirdPartyApi' id='@id'>
-                        <div tabindex='1' class='drpbox' onclick='$(this).focus();'>  
-                            <div class='CompLabel'> @Label </div>
-                        </div>
-                    </div>".RemoveCR().DoubleQuoted();
-        }
-
-        private List<Param> GetParams()
-        {
-            return this.Parameters.Select(i => new Param { Name = i.ParameterName, Type = i.Type.ToString(), Value = i.Value })
-                    .ToList();
-        }
-
-        public string Execute()
-        {
-            List<Param> param = this.GetParams();
-            var uri = new Uri(this.Url);
-            HttpResponseMessage response = null;
-            using (var client = new HttpClient())
-            {
-                if (this.Headers != null && this.Headers.Any())
-                {
-                    foreach (RequestHeader header in this.Headers)
-                    {
-                        client.DefaultRequestHeaders.Add(header.HeaderName, header.Value);
-                    }
-                }
-
-                client.BaseAddress = new Uri(uri.GetLeftPart(System.UriPartial.Authority));
-                if (this.Method == ApiMethods.POST)
-                {
-                    var parameters = param.Select(i => new { prop = i.Name, val = i.Value })
-                            .ToDictionary(x => x.prop, x => x.val);
-                    response = client.PostAsync(uri.PathAndQuery, new FormUrlEncodedContent(parameters)).Result;
-                }
-                else if (this.Method == ApiMethods.GET)
-                {
-                    response = client.GetAsync(uri.PathAndQuery).Result;
-                }
-            }
-            return response.Content.ReadAsStringAsync().Result;
         }
     }
 
@@ -535,78 +380,5 @@ namespace ExpressBase.Objects
                         </div>
                     </div>".RemoveCR().DoubleQuoted();
         }
-
-        public override List<Param> GetOutParams(List<Param> _param)
-        {
-            return new List<Param>();
-        }
-
-        public override object GetResult()
-        {
-            return this.Result;
-        }
-    }
-
-    [EnableInBuilder(BuilderType.ApiBuilder)]
-    public class EbPivotTable : ApiResources
-    {
-        [EnableInBuilder(BuilderType.ApiBuilder)]
-        [PropertyEditor(PropertyEditorType.PivotConfiguration)]
-        public PivotConfig Pivotconfig { get; set; }
-
-        public override string GetDesignHtml()
-        {
-            return @"<div class='apiPrcItem dropped' eb-type='PivotTable' id='@id'>
-                        <div tabindex='1' class='drpbox' onclick='$(this).focus();'>  
-                            <div class='CompLabel'> @Label </div>
-                            <div class='CompName'> @RefName </div>
-                            <div class='CompVersion'> @Version </div>
-                        </div>
-                    </div>".RemoveCR().DoubleQuoted();
-        }
-
-        public override List<Param> GetOutParams(List<Param> _param)
-        {
-            return new List<Param>();
-        }
-
-        public override object GetResult()
-        {
-            return this.Result;
-        }
-    }
-
-    [EnableInBuilder(BuilderType.ApiBuilder)]
-    public class RequestParam : EbApiWrapper
-    {
-        [EnableInBuilder(BuilderType.ApiBuilder)]
-        [MetaOnly]
-        public override string Name { set; get; }
-
-        [EnableInBuilder(BuilderType.ApiBuilder)]
-        public string ParameterName { set; get; }
-
-        [EnableInBuilder(BuilderType.ApiBuilder)]
-        public string Value { set; get; }
-
-        [EnableInBuilder(BuilderType.ApiBuilder)]
-        public EbDbTypes Type { set; get; }
-
-        [EnableInBuilder(BuilderType.ApiBuilder)]
-        public bool UseThisVal { set; get; }
-    }
-
-    [EnableInBuilder(BuilderType.ApiBuilder)]
-    public class RequestHeader : EbApiWrapper
-    {
-        [EnableInBuilder(BuilderType.ApiBuilder)]
-        [MetaOnly]
-        public override string Name { set; get; }
-
-        [EnableInBuilder(BuilderType.ApiBuilder)]
-        public string HeaderName { set; get; }
-
-        [EnableInBuilder(BuilderType.ApiBuilder)]
-        public string Value { set; get; }
     }
 }

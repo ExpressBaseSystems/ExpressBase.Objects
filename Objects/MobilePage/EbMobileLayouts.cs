@@ -93,10 +93,21 @@ namespace ExpressBase.Objects
     public class EbMobileStackLayout : EbMobileDashBoardControl
     {
         [EnableInBuilder(BuilderType.MobilePage)]
+        [OnChangeExec(@"
+            if(this.Orientation === 0){
+                $(`#${this.EbSid} .control_container`).css('flex-direction','row');
+            }
+            else{
+                $(`#${this.EbSid} .control_container`).css('flex-direction','column');
+            }
+            ")]
         public StackOrientation Orientation { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         public bool AllowScrolling { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        public int Spacing { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
@@ -112,7 +123,7 @@ namespace ExpressBase.Objects
         {
             return @"<div class='mob_dash_control dropped' id='@id' eb-type='EbMobileStackLayout' tabindex='1' onclick='$(this).focus()'>                            
                             <div class='eb_dash_ctrlhtml ctrl_as_container'>
-                               <div class='control_container'>
+                               <div class='control_container dash-stacklayout'>
                                </div>
                             </div>
                         </div>".RemoveCR().DoubleQuoted();

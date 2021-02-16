@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace ExpressBase.Objects.WebFormRelated
@@ -285,67 +286,82 @@ namespace ExpressBase.Objects.WebFormRelated
             }
         }
 
-        public static string UpdateIndexes_LM(IDatabase DataDB)
+        public static string UpdateIndexes_LM(IDatabase DataDB, int Limit, int Offset)
         {
             DateTime startdt = DateTime.Now;
             string Message = $"Service started at {startdt}.";
             Console.WriteLine("Update all indexes start: " + startdt);
-            string fullQry = $"SELECT id, eb_createdby, eb_createdat, eb_modifiedby, eb_modifiedat, name, genurl, genphoffice, watsapp_phno FROM customers WHERE COALESCE(eb_del, 'F') = 'F';";
+            string lim = string.Empty, off = string.Empty;
+            if (Limit > 0)
+                lim = "LIMIT " + Limit;
+            if (Offset >= 0)
+                off = "OFFSET " + Offset;
+            string fullQry = $"SELECT id, eb_createdby, eb_createdat, eb_modifiedby, eb_modifiedat, name, genurl, genphoffice, watsapp_phno FROM customers WHERE COALESCE(eb_del, 'F') = 'F' ORDER BY id {lim} {off};";
+
             EbDataTable dt = DataDB.DoQuery(fullQry);
             if (dt.Rows.Count > 0)
             {
                 Console.WriteLine($"Existing {dt.Rows.Count} records.");
                 Message += $"\nExisting {dt.Rows.Count} records.";
-                string upsertQry = string.Empty;
-                List<DbParameter> parameters = new List<DbParameter>() { DataDB.GetNewParameter("link_type", EbDbTypes.Int32, (int)SH_LinkType.LM) };
 
-                for (int i = 0; i < dt.Rows.Count; i++)
+                try
                 {
-                    EbDataRow dr = dt.Rows[i];
-                    Dictionary<string, string> JsonData = new Dictionary<string, string>();
+                    StringBuilder upsertQry = new StringBuilder();
+                    List<DbParameter> parameters = new List<DbParameter>() { DataDB.GetNewParameter("link_type", EbDbTypes.Int32, (int)SH_LinkType.LM) };
 
-                    string _nam = Convert.ToString(dr[5]),
-                        _mob = Convert.ToString(dr[6]),
-                        _pho = Convert.ToString(dr[7]),
-                        _wap = Convert.ToString(dr[8]);
-
-                    if (!(dr.IsDBNull(5) || string.IsNullOrEmpty(_nam)))
-                        JsonData.Add("Name", _nam);
-                    if (!(dr.IsDBNull(6) || string.IsNullOrEmpty(_mob)))
-                        JsonData.Add("Mobile", _mob);
-                    if (!(dr.IsDBNull(7) || string.IsNullOrEmpty(_pho)))
-                        JsonData.Add("Phone", _pho);
-                    if (!(dr.IsDBNull(8) || string.IsNullOrEmpty(_wap)))
-                        JsonData.Add("WhatsApp", _wap);
-
-                    parameters.Add(DataDB.GetNewParameter($"data_id_{i}", EbDbTypes.Int32, dr[0]));
-
-                    if (JsonData.Count > 0)
+                    for (int i = 0; i < dt.Rows.Count; i++)
                     {
-                        parameters.Add(DataDB.GetNewParameter($"created_by_{i}", EbDbTypes.Int32, dr[1]));
-                        parameters.Add(DataDB.GetNewParameter($"created_at_{i}", EbDbTypes.DateTime, dr[2]));
-                        parameters.Add(DataDB.GetNewParameter($"modified_by_{i}", EbDbTypes.Int32, dr[3]));
-                        parameters.Add(DataDB.GetNewParameter($"modified_at_{i}", EbDbTypes.DateTime, dr[4]));
-                        parameters.Add(DataDB.GetNewParameter($"data_json_{i}", EbDbTypes.String, JsonConvert.SerializeObject(JsonData)));
+                        EbDataRow dr = dt.Rows[i];
+                        Dictionary<string, string> JsonData = new Dictionary<string, string>();
 
-                        upsertQry += $@"UPDATE eb_index_table SET display_name = 'Lead Management', data_json = @data_json_{i}, modified_by = @modified_by_{i}, modified_at = @modified_at_{i}
+                        string _nam = Convert.ToString(dr[5]),
+                            _mob = Convert.ToString(dr[6]),
+                            _pho = Convert.ToString(dr[7]),
+                            _wap = Convert.ToString(dr[8]);
+
+                        if (!(dr.IsDBNull(5) || string.IsNullOrEmpty(_nam)))
+                            JsonData.Add("Name", _nam);
+                        if (!(dr.IsDBNull(6) || string.IsNullOrEmpty(_mob)))
+                            JsonData.Add("Mobile", _mob);
+                        if (!(dr.IsDBNull(7) || string.IsNullOrEmpty(_pho)))
+                            JsonData.Add("Phone", _pho);
+                        if (!(dr.IsDBNull(8) || string.IsNullOrEmpty(_wap)))
+                            JsonData.Add("WhatsApp", _wap);
+
+                        parameters.Add(DataDB.GetNewParameter($"data_id_{i}", EbDbTypes.Int32, dr[0]));
+
+                        if (JsonData.Count > 0)
+                        {
+                            parameters.Add(DataDB.GetNewParameter($"created_by_{i}", EbDbTypes.Int32, dr[1]));
+                            parameters.Add(DataDB.GetNewParameter($"created_at_{i}", EbDbTypes.DateTime, dr[2]));
+                            parameters.Add(DataDB.GetNewParameter($"modified_by_{i}", EbDbTypes.Int32, dr[3]));
+                            parameters.Add(DataDB.GetNewParameter($"modified_at_{i}", EbDbTypes.DateTime, dr[4]));
+                            parameters.Add(DataDB.GetNewParameter($"data_json_{i}", EbDbTypes.String, JsonConvert.SerializeObject(JsonData)));
+
+                            upsertQry.Append($@"UPDATE eb_index_table SET display_name = 'Lead Management', data_json = @data_json_{i}, modified_by = @modified_by_{i}, modified_at = @modified_at_{i}
                         WHERE link_type = @link_type AND data_id = @data_id_{i} AND COALESCE(eb_del, 'F') = 'F';
 
                         INSERT INTO eb_index_table (display_name, data_json, link_type, data_id, created_by, created_at, modified_by, modified_at, eb_del)
                             SELECT 'Lead Management', @data_json_{i}, @link_type, @data_id_{i}, @created_by_{i}, @created_at_{i}, @modified_by_{i}, @modified_at_{i}, 'F'
-                            WHERE NOT EXISTS (SELECT 1 FROM eb_index_table WHERE link_type = @link_type AND data_id = @data_id_{i} AND COALESCE(eb_del, 'F') = 'F');";
+                            WHERE NOT EXISTS (SELECT 1 FROM eb_index_table WHERE link_type = @link_type AND data_id = @data_id_{i} AND COALESCE(eb_del, 'F') = 'F');");
+                        }
+                        else
+                        {
+                            upsertQry.Append($"UPDATE eb_index_table SET eb_del = 'T' WHERE link_type = @link_type AND data_id = @data_id_{i} AND COALESCE(eb_del, 'F') = 'F';");
+                        }
                     }
-                    else
-                    {
-                        upsertQry += $"UPDATE eb_index_table SET eb_del = 'T' WHERE link_type = @link_type AND data_id = @data_id_{i} AND COALESCE(eb_del, 'F') = 'F';";
-                    }
-                }
 
-                int temp = DataDB.DoNonQuery(upsertQry, parameters.ToArray());
-                Console.WriteLine($"Upserted {temp} records.");
-                Message += $"\nUpserted {temp} records.";
+                    int temp = DataDB.DoNonQuery(upsertQry.ToString(), parameters.ToArray());
+                    Console.WriteLine($"Upserted {temp} records.");
+                    Message += $"\nUpserted {temp} records.";
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Exception in UpdateIndexes: {ex.Message}\n{ex.StackTrace}");
+                    Message += $"Exception in UpdateIndexes: {ex.Message}\n{ex.StackTrace}";
+                }
             }
-            else
+            else if (Limit == 0 && Offset == 0)
             {
                 string delQry = "UPDATE eb_index_table SET eb_del = 'T' WHERE link_type = @link_type AND COALESCE(eb_del, 'F') = 'F';";
                 int t = DataDB.DoNonQuery(delQry, new DbParameter[] { DataDB.GetNewParameter("link_type", EbDbTypes.Int32, (int)SH_LinkType.LM) });

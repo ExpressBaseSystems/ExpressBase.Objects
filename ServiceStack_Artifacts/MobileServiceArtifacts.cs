@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using ExpressBase.Security;
+using Newtonsoft.Json;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
 {
@@ -130,7 +131,7 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
     [DataContract]
-    public class MobileVisDataRequest : EbServiceStackAuthRequest, IReturn<MobileVisDataResponse>
+    public class MobileVisDataRequest : EbServiceStackAuthRequest, IReturn<MobileDataResponse>
     {
         [DataMember(Order = 1)]
         public string DataSourceRefId { set; get; }
@@ -161,14 +162,56 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         }
     }
 
+    //v2
     [DataContract]
-    public class MobileVisDataResponse
+    public class EbMobileDataRequest : EbServiceStackAuthRequest, IReturn<MobileDataResponse>
+    {
+        [DataMember(Order = 1)]
+        public string RefId { set; get; }
+
+        [DataMember(Order = 2)]
+        public List<Param> Parameters { get; set; }
+
+        [DataMember(Order = 3)]
+        public List<SortColumn> SortColumns { set; get; }
+
+        [DataMember(Order = 4)]
+        public List<Param> SearchColumns { set; get; }
+
+        [DataMember(Order = 5)]
+        public int Limit { set; get; }
+
+        [DataMember(Order = 6)]
+        public int Offset { set; get; }
+
+        public EbMobileDataRequest()
+        {
+            Parameters = new List<Param>();
+            SortColumns = new List<SortColumn>();
+            SearchColumns = new List<Param>();
+        }
+    }
+
+    [DataContract]
+    public class MobileDataResponse
     {
         [DataMember(Order = 1)]
         public string Message { set; get; }
 
         [DataMember(Order = 2)]
         public EbDataSet Data { set; get; }
+    }
+
+    [DataContract]
+    public class MobileDataRequest : EbServiceStackAuthRequest, IReturn<MobileDataResponse>
+    {
+        [DataMember(Order = 1)]
+        public string DataSourceRefId { set; get; }
+
+        public MobileDataRequest(string refid)
+        {
+            DataSourceRefId = refid;
+        }
     }
 
     [DataContract]

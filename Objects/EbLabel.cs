@@ -11,7 +11,7 @@ namespace ExpressBase.Objects
 {
 
     [EnableInBuilder( BuilderType.WebForm, BuilderType.UserControl)]
-    public class EbLabel : EbControlUI
+	public class EbLabel : EbControlUI
 	{
 
         public EbLabel() { }
@@ -33,7 +33,7 @@ namespace ExpressBase.Objects
 
 		[PropertyGroup(PGConstants.CORE)]
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
-        [UIproperty]
+		[UIproperty]
         [Unique]
         [OnChangeUIFunction("Common.LABEL")]
         [PropertyEditor(PropertyEditorType.MultiLanguageKeySelector)]
@@ -80,7 +80,7 @@ namespace ExpressBase.Objects
 		}
 		[HideInPropertyGrid]
         [JsonIgnore]
-        public override string ToolIconHtml { get { return "<i class='fa fa-font'></i>"; } set { } }
+        public override string ToolIconHtml { get { return "<i class=\"fa fa-font\"></i>"; } set { } }
 
         public override string GetDesignHtml() {
             return new EbLabel() { EbSid= "Label1", Label = "Label1" }.GetHtml().RemoveCR().GraveAccentQuoted(); ;

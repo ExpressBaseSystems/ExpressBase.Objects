@@ -1,11 +1,13 @@
 ﻿using ExpressBase.Common;
 using ExpressBase.Common.Constants;
+using ExpressBase.Common.Objects;
 using ExpressBase.Common.Structures;
 using ExpressBase.Objects.ServiceStack_Artifacts;
 using ExpressBase.Objects.WebFormRelated;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Net;
 
 namespace ExpressBase.Objects
 {
@@ -129,6 +131,65 @@ namespace ExpressBase.Objects
                 }
                 param.Add(DataDB.GetNewParameter(WebForm.TableName + FormConstants._id, EbDbTypes.Int32, WebForm.TableRowId));
                 param.Add(DataDB.GetNewParameter(WebForm.TableName + FormConstants._eb_ver_id, EbDbTypes.Int32, WebForm.RefId.Split(CharConstants.DASH)[4]));
+            }
+        }
+
+        public void ExecUniqueCheck(IDatabase DataDB)
+        {
+            string fullQuery = string.Empty;
+            List<DbParameter> Dbparams = new List<DbParameter>();
+            List<EbControl> UniqueCtrls = new List<EbControl>();
+            int paramCounter = 0, mstrFormCtrls = 0;
+
+            foreach (EbWebForm WebForm in this)
+            {
+                if (WebForm.DataPusherConfig?.AllowPush == false)
+                    continue;
+
+                foreach (TableSchema _table in WebForm.FormSchema.Tables.FindAll(e => e.TableType == WebFormTableTypes.Normal))
+                {
+                    if (!(WebForm.FormData.MultipleTables.TryGetValue(_table.TableName, out SingleTable Table) && Table.Count > 0))
+                        continue;
+
+                    foreach (ColumnSchema _column in _table.Columns.FindAll(e => e.Control.Unique))
+                    {
+                        SingleColumn cField = Table[0].GetColumn(_column.ColumnName);
+
+                        if (cField == null || cField.Value == null || (Double.TryParse(Convert.ToString(cField.Value), out double __val) && __val == 0))
+                            continue;
+
+                        if (WebForm.FormDataBackup != null)
+                        {
+                            if (WebForm.FormDataBackup.MultipleTables.TryGetValue(_table.TableName, out SingleTable TableBkUp) && TableBkUp.Count > 0)
+                            {
+                                SingleColumn ocField = TableBkUp[0].GetColumn(_column.ColumnName);
+                                if (ocField != null && Convert.ToString(cField.Value) == Convert.ToString(ocField.Value))
+                                    continue;
+                            }
+                        }
+
+                        fullQuery += $"SELECT id FROM {_table.TableName} WHERE {_column.ColumnName} = @{_column.ColumnName}_{paramCounter};";
+                        Dbparams.Add(DataDB.GetNewParameter($"{_column.ColumnName}_{paramCounter++}", _column.Control.EbDbType, cField.Value));
+                        UniqueCtrls.Add(_column.Control);
+                        if (WebForm == MasterForm)
+                            mstrFormCtrls++;
+                    }
+                }
+            }
+
+            if (fullQuery != string.Empty)
+            {
+                EbDataSet ds = DataDB.DoQueries(fullQuery, Dbparams.ToArray());
+                for (int i = 0; i < ds.Tables.Count; i++)
+                {
+                    if (ds.Tables[i].Rows.Count > 0)
+                    {
+                        if (mstrFormCtrls > i)
+                            throw new FormException($"{UniqueCtrls[i].Label} must be unique", (int)HttpStatusCode.BadRequest, $"Value of {UniqueCtrls[i].Label} is not unique. Control name: {UniqueCtrls[i].Name}", "EbWebFormCollection -> ExecUniqueCheck");
+                        else
+                            throw new FormException($"{UniqueCtrls[i].Label} in data pusher must be unique", (int)HttpStatusCode.BadRequest, $"Value of {UniqueCtrls[i].Label} in data pusher is not unique. Control name: {UniqueCtrls[i].Name}", "EbWebFormCollection -> ExecUniqueCheck");
+                    }
+                }
             }
         }
     }

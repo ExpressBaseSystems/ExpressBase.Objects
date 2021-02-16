@@ -24,13 +24,14 @@ namespace ExpressBase.Objects
         Phone = 2,
     }
 
-    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+    [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl, BuilderType.SurveyControl)]
+    [SurveyBuilderRoles(SurveyRoles.AnswerControl)]
     public class EbNumeric : EbControlUI, IEbInputControls
     {
         public EbNumeric() { }
 
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl, BuilderType.SurveyControl)]
         [PropertyEditor(PropertyEditorType.Expandable)]
         [PropertyGroup(PGConstants.APPEARANCE)]
         [UIproperty]
@@ -39,18 +40,28 @@ namespace ExpressBase.Objects
         public UISides Padding { get; set; }
 
 
-        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl, BuilderType.SurveyControl)]
         [PropertyGroup(PGConstants.APPEARANCE)]
         [PropertyEditor(PropertyEditorType.FontSelector)]
         [OnChangeUIFunction("Common.INP_FONT_STYLE")]
         public EbFont FontStyle { get; set; }
-
+        
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [HideInPropertyGrid]
         public override EbDbTypes EbDbType { get { return EbDbTypes.Decimal; } }
 
         [JsonIgnore]
-        public override string GetValueFromDOMJSfn { get { return @" return parseFloat($('#' + this.EbSid_CtxId).val()) || 0; "; } set { } }
+        public override string GetValueFromDOMJSfn
+        {
+            get
+            {
+                return @" 
+                if(this.InputMode == 1)
+                { return parseFloat($('#' + this.EbSid_CtxId).val().replace(/,/g, '')) || 0; }
+                else{ return parseFloat($('#' + this.EbSid_CtxId).val()) || 0;}";
+            }
+            set { } 
+        }
 
         [JsonIgnore]
         public override string GetDisplayMemberFromDOMJSfn { get { return @"return $('#' + this.EbSid_CtxId).val();"; } set { } }
@@ -155,7 +166,8 @@ else {
 
         [HideInPropertyGrid]
         [JsonIgnore]
-        public override string ToolIconHtml { get { return "<b style='letter-spacing: -0.7px;'>01</b>"; } set { } }
+        [EnableInBuilder(BuilderType.SurveyControl)]
+        public override string ToolIconHtml { get { return "<b class=\"fa\" style=\"letter-spacing: -0.7px;\">01</b>"; } set { } }
 
         //public override string GetToolHtml() { return @"<div eb-type='@toolName' class='tool'><b>0-9 </b></i>  @toolName</div>".Replace("@toolName", this.GetType().Name.Substring(2)); }
 
@@ -246,5 +258,6 @@ else {
                 F = _displayMember
             };
         }
+
     }
 }

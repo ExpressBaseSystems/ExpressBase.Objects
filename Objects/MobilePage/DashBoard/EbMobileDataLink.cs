@@ -1,4 +1,5 @@
-﻿using ExpressBase.Common.Extensions;
+﻿using ExpressBase.Common.Constants;
+using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
@@ -20,18 +21,26 @@ namespace ExpressBase.Objects
         public int ColumCount { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        [DefaultPropValue("5")]
+        public int RowSpacing { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        [DefaultPropValue("5")]
+        public int ColumnSpacing { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        [DefaultPropValue("100")]
+        public int Width { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
         [PropertyGroup("Link Settings")]
         [Alias("Link")]
         [OSE_ObjectTypes(EbObjectTypes.iMobilePage)]
         public string LinkRefId { get; set; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyEditor(PropertyEditorType.ObjectSelector)]
-        [OSE_ObjectTypes(EbObjectTypes.iDataReader)]
-        [Alias("Data Source")]
-        [PropertyGroup("Data")]
-        public string DataSourceRefId { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
@@ -63,6 +72,6 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [HideInPropertyGrid]
-        public List<EbMobileDataLabel> Childrens { set; get; }
+        public List<EbMobileDashBoardControl> ControlCollection { set; get; }
     }
 }

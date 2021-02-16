@@ -1,4 +1,5 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Constants;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
@@ -47,33 +48,8 @@ namespace ExpressBase.Objects
 		public override string ToolTipText { get; set; }
 
 		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
-		[HideInPropertyGrid]
 		public override bool Unique { get; set; }
-
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
-		[HideInPropertyGrid]
-		public override List<EbValidator> Validators { get; set; }
-
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
-		[HideInPropertyGrid]
-		public override EbScript DefaultValueExpression { get; set; }
-
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
-		[HideInPropertyGrid]
-		public override EbScript HiddenExpr { get; set; }
 		
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
-		[HideInPropertyGrid]
-		public override EbScript DisableExpr { get; set; }
-
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
-		[HideInPropertyGrid]
-		public override EbScript ValueExpr { get; set; }
-
-		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
-		[HideInPropertyGrid]
-		public override bool Required { get; set; }
-
 		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override bool DoNotPersist { get; set; }
@@ -97,6 +73,15 @@ namespace ExpressBase.Objects
 		[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
 		[HideInPropertyGrid]
 		public override EbDbTypes EbDbType { get { return EbDbTypes.String; } set { } }
+
+
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
+		[PropertyEditor(PropertyEditorType.Expandable)]
+		[PropertyGroup(PGConstants.APPEARANCE)]
+		[UIproperty]
+		[DefaultPropValue(7, 10, 7, 10)]
+		[OnChangeUIFunction("Common.INP_PADDING")]
+		public UISides Padding { get; set; }
 
 		public override string GetBareHtml()
 		{

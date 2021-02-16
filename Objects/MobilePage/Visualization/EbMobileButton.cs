@@ -9,7 +9,7 @@ using System.Collections.Generic;
 namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.MobilePage)]
-    public class EbMobileButton : EbMobileControl, IMobileLink, INonPersistControl
+    public class EbMobileButton : EbMobileControl, IMobileLink, INonPersistControl, IMobileUIControl
     {
         public override string Label { set; get; }
         public override bool Unique { get; set; }
@@ -21,12 +21,25 @@ namespace ExpressBase.Objects
         public override EbScript DisableExpr { get; set; }
         public override EbScript DefaultValueExpression { get; set; }
         public override List<EbMobileValidator> Validators { set; get; }
+        public EbThickness Padding { set; get; }
 
-        #region
-        /// <summary>
-        /// link setting 
-        /// props DataColumns,FormControlMetas are for set values 
-        /// </summary>
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.ALIGNMENT)]
+        public int RowSpan { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.ALIGNMENT)]
+        public int ColumnSpan { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.ALIGNMENT)]
+        [Alias("Align X")]
+        public MobileHorrizontalAlign HorrizontalAlign { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.ALIGNMENT)]
+        [Alias("Align Y")]
+        public MobileVerticalAlign VerticalAlign { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.ObjectSelector)]
@@ -41,7 +54,7 @@ namespace ExpressBase.Objects
                         pg.HidePropertiesExt(['FormMode', 'FormId', 'LinkFormParameters']);
                 }
             ")]
-        public string LinkRefId { get; set; }
+        public virtual string LinkRefId { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("Link Settings")]
@@ -53,18 +66,18 @@ namespace ExpressBase.Objects
                         pg.HideProperty('FormId');
                 }
             ")]
-        public WebFormDVModes FormMode { set; get; }
+        public virtual WebFormDVModes FormMode { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "DataColumns", 1)]
         [PropertyGroup("Link Settings")]
-        public EbMobileDataColToControlMap FormId { set; get; }
+        public virtual EbMobileDataColToControlMap FormId { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("Link Settings")]
         [Alias("Columns to controls map")]
         [PropertyEditor(PropertyEditorType.Mapper, "DataColumns", "FormControlMetas", "FormControl")]
-        public List<EbMobileDataColToControlMap> LinkFormParameters { get; set; }
+        public virtual List<EbMobileDataColToControlMap> LinkFormParameters { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [MetaOnly]
@@ -73,43 +86,23 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [MetaOnly]
         public List<EbMobileControlMeta> FormControlMetas => new List<EbMobileControlMeta>();
-        /// <summary>
-        /// ending region for link
-        /// </summary>
-        #endregion 
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup(PGConstants.APPEARANCE)]
-        public int RowSpan { set; get; }
+        [PropertyGroup(PGConstants.DATA)]
+        public virtual string Text { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup(PGConstants.APPEARANCE)]
-        public int ColumnSpan { set; get; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup(PGConstants.APPEARANCE)]
-        [DefaultPropValue("30")]
-        public int Width { set; get; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup(PGConstants.APPEARANCE)]
-        [DefaultPropValue("30")]
-        public int Height { set; get; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup(PGConstants.APPEARANCE)]
-        public string Text { set; get; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup(PGConstants.APPEARANCE)]
-        [UIproperty]
-        [PropertyEditor(PropertyEditorType.FontSelector)]
-        public EbFont Font { get; set; }
+        [PropertyGroup(PGConstants.DATA)]
+        public virtual bool RenderTextAsIcon { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup(PGConstants.APPEARANCE)]
         [PropertyEditor(PropertyEditorType.Color)]
         public string BackgroundColor { get; set; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup(PGConstants.APPEARANCE)]
+        public int BorderRadius { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup(PGConstants.APPEARANCE)]
@@ -122,21 +115,19 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup(PGConstants.APPEARANCE)]
-        public int BorderRadius { get; set; }
+        [UIproperty]
+        [PropertyEditor(PropertyEditorType.FontSelector)]
+        public EbFont Font { get; set; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup(PGConstants.APPEARANCE)]
-        public bool RenderTextAsIcon { get; set; }
+        [DefaultPropValue("30")]
+        public int Width { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup(PGConstants.APPEARANCE)]
-        [Alias("Align X")]
-        public MobileHorrizontalAlign HorrizontalAlign { set; get; }
-
-        [EnableInBuilder(BuilderType.MobilePage)]
-        [PropertyGroup(PGConstants.APPEARANCE)]
-        [Alias("Align Y")]
-        public MobileVerticalAlign VerticalAlign { set; get; }
+        [DefaultPropValue("30")]
+        public int Height { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup(PGConstants.BEHAVIOR)]

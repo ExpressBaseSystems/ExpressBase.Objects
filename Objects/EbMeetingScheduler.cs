@@ -68,6 +68,17 @@ namespace ExpressBase.Objects
         [DefaultPropValue("1")]
         public MeetingType MeetingType { get; set; }
 
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+        public bool SameHost { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
+        public bool SameAttendee { get; set; }
+
+
+        [JsonIgnore]
+        public bool TempSameHost { get; set; } // for query making purpose only
+        [JsonIgnore]
+        public bool TempSameAttendee { get; set; } // for query making purpose only
 
 
         //[EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
@@ -330,7 +341,7 @@ else if (this.AttendeeConfig === 4)
             <td class='time'><input type='time' id='@ebsid@_time-to'  class='mc-input time-to m-validate' /></td>
             <td><input type='text' id='@ebsid@_host_0'  class='meeting-participants tb-host'/></td>
             <td><input type='text' id='@ebsid@_attendee_0' class='meeting-participants tb-attendee'/></td>
-            <td style='width:5rem;'><button id='@ebsid@_remove-slot' class='remove-slot' > <i class='fa fa-window-close'></i></button></td></td></tr>
+            <td style='width:5rem;'></td></td></tr>
             </tbody>
             </table>
             <button id='@ebsid@_add-new-slot'> <i class='fa fa-plus-square'></i> Add Slots </button>
@@ -338,6 +349,79 @@ else if (this.AttendeeConfig === 4)
             </div>
 
         ";
+            if (this.SameHost && !this.SameAttendee)
+            {
+                Html = @"
+            <div class='single-meeting'><div style='display:flex'><div style='width: 100%;margin-right: 2rem;'><div class='title'> 
+            <input type='text' placeholder='Title' id='@ebsid@_meeting-title' class='mc-input m-validate'/> </div>
+            <div class='location'><input type='text'  placeholder='Location' id='@ebsid@_location' class='mc-input m-validate' /></div>
+            <div class='date'><input type='text' placeholder='Date' id='@ebsid@_meeting-date' val='@date_val@' class='mc-input m-validate' /></div> </div>
+            <div style='width: 100%;'><div class='description'><textarea id='@ebsid@_description' placeholder='Describe about the event...' rows='10' cols='10' class='mc-input m-validate' ></textarea></div>
+            <div class='integration'><input type='text' placeholder='Integration' id='@ebsid@_integration' class='mc-input' /></div></div></div>
+            <div class='slots-table' id='@ebsid@_slots'>
+             <table style='width: 80%;'><tr data-id='0'> <th style='width: 70px;'>Host</th><td><input type='text' id='@ebsid@_host_0'  class='meeting-participants tb-host'/></td></tr> </table>
+            <table id='@ebsid@_slot-table' class='slot-tbl'> <thead><tr><th>Time From</th><th>Time To</th><th>Attendee</th><th></th></tr>
+            <tbody>
+            <tr data-id='0'>
+            <td class='time'><input type='time' id='@ebsid@_time-from'  class='mc-input time-from m-validate'  /></td>
+            <td class='time'><input type='time' id='@ebsid@_time-to'  class='mc-input time-to m-validate' /></td>
+            <td><input type='text' id='@ebsid@_attendee_0' class='meeting-participants tb-attendee'/></td>
+            <td style='width:5rem;'></td></td></tr>
+            </tbody>
+            </table>
+            <button id='@ebsid@_add-new-slot'> <i class='fa fa-plus-square'></i> Add Slots </button>
+            </div>
+            </div>";
+            } 
+            if (!this.SameHost && this.SameAttendee)
+            {
+                Html = @"
+            <div class='single-meeting'><div style='display:flex'><div style='width: 100%;margin-right: 2rem;'><div class='title'> 
+            <input type='text' placeholder='Title' id='@ebsid@_meeting-title' class='mc-input m-validate'/> </div>
+            <div class='location'><input type='text'  placeholder='Location' id='@ebsid@_location' class='mc-input m-validate' /></div>
+            <div class='date'><input type='text' placeholder='Date' id='@ebsid@_meeting-date' val='@date_val@' class='mc-input m-validate' /></div> </div>
+            <div style='width: 100%;'><div class='description'><textarea id='@ebsid@_description' placeholder='Describe about the event...' rows='10' cols='10' class='mc-input m-validate' ></textarea></div>
+            <div class='integration'><input type='text' placeholder='Integration' id='@ebsid@_integration' class='mc-input' /></div></div></div>
+            <div class='slots-table' id='@ebsid@_slots'>
+             <table style='width: 80%;'><tr data-id='0'> <th style='width: 70px;'>Attendee</th><td><input type='text' id='@ebsid@_host_0'  class='meeting-participants tb-host'/></td></tr> </table>
+            <table id='@ebsid@_slot-table' class='slot-tbl'> <thead><tr><th>Time From</th><th>Time To</th><th>Host</th><th></th></tr>
+            <tbody>
+            <tr data-id='0'>
+            <td class='time'><input type='time' id='@ebsid@_time-from'  class='mc-input time-from m-validate'  /></td>
+            <td class='time'><input type='time' id='@ebsid@_time-to'  class='mc-input time-to m-validate' /></td>
+            <td><input type='text' id='@ebsid@_host_0' class='meeting-participants tb-host'/></td>
+            <td style='width:5rem;'></td></td></tr>
+            </tbody>
+            </table>
+            <button id='@ebsid@_add-new-slot'> <i class='fa fa-plus-square'></i> Add Slots </button>
+            </div>
+            </div>";
+            } 
+            if (this.SameHost && this.SameAttendee)
+            {
+                Html = @"
+            <div class='single-meeting'><div style='display:flex'><div style='width: 100%;margin-right: 2rem;'><div class='title'> 
+            <input type='text' placeholder='Title' id='@ebsid@_meeting-title' class='mc-input m-validate'/> </div>
+            <div class='location'><input type='text'  placeholder='Location' id='@ebsid@_location' class='mc-input m-validate' /></div>
+            <div class='date'><input type='text' placeholder='Date' id='@ebsid@_meeting-date' val='@date_val@' class='mc-input m-validate' /></div> </div>
+            <div style='width: 100%;'><div class='description'><textarea id='@ebsid@_description' placeholder='Describe about the event...' rows='10' cols='10' class='mc-input m-validate' ></textarea></div>
+            <div class='integration'><input type='text' placeholder='Integration' id='@ebsid@_integration' class='mc-input' /></div></div></div>
+            <div class='slots-table' id='@ebsid@_slots'>
+            <table><tr data-id='0'> <th>Host</th><th>Attendee</th></tr>
+            <tr data-id='0'> <td><input type='text' id='@ebsid@_host_0'  class='meeting-participants tb-host'/></td>
+            <td><input type='text' id='@ebsid@_host_0'  class='meeting-participants tb-attendee'/></td></tr> </table>
+            <table id='@ebsid@_slot-table' class='slot-tbl'> <thead><tr><th>Time From</th><th>Time To</th></tr>
+            <tbody>
+            <tr data-id='0'>
+            <td class='time'><input type='time' id='@ebsid@_time-from'  class='mc-input time-from m-validate'  /></td>
+            <td class='time'><input type='time' id='@ebsid@_time-to'  class='mc-input time-to m-validate' /></td>
+            <td style='width:5rem;'></td></td></tr>
+            </tbody>
+            </table>
+            <button id='@ebsid@_add-new-slot'> <i class='fa fa-plus-square'></i> Add Slots </button>
+            </div>
+            </div>";
+            }
             return Html;
         }
         public string AdvancedMeeting()
@@ -376,7 +460,7 @@ else if (this.AttendeeConfig === 4)
             //    Cron Exp : <input type='text' id='@ebsid@_crone-exp'>
             //    Cron Exp End Date :<input type='text' id='@ebsid@_crone-exp-end'></div>
             //    </div>";
-            string Html = $@"     
+                string Html = $@"     
             <div class='single-meeting'><div style='display:flex'><div style='width: 100%;margin-right: 2rem;'><div class='title'> <input type='text' placeholder='Title' id='@ebsid@_meeting-title' class='mc-input'/> </div>
             <div class='location'><input type='text'  placeholder='Location' id='@ebsid@_location' class='mc-input' /></div>
             <div class='date'><input type='text' placeholder='Date' id='@ebsid@_meeting-date' val='@date_val@' class='mc-input' /></div> </div>
@@ -476,12 +560,12 @@ else if (this.AttendeeConfig === 4)
                     bool IsFixedAttendee = false;
                     if (Mobj.MaxHost == 0)
                     {
-                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Hosts, usr, ParticipantOpt.Eligible, ParticipantType.Host, tbl, Mobj.SlotList[i], Mobj.Date, DataDB);
+                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Hosts, usr, ParticipantOpt.Eligible, ParticipantType.Host, tbl, Mobj.SlotList[i], Mobj.Date, DataDB,this.TempSameHost);
                     }
                     else if (this.HostConfig == UsersType.Users && HostUserIdsCount >= Mobj.MinHost && HostUserIdsCount == Mobj.SlotList[i].Hosts.Count && HostUserIdsCount <= Mobj.MaxHost)
                     {
                         IsFixedHost = true;
-                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Hosts, usr, ParticipantOpt.Fixed, ParticipantType.Host, tbl, Mobj.SlotList[i], Mobj.Date, DataDB);
+                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Hosts, usr, ParticipantOpt.Fixed, ParticipantType.Host, tbl, Mobj.SlotList[i], Mobj.Date, DataDB, this.TempSameHost);
                     }
                     else if (this.HostConfig == UsersType.Users && HostUserIdsCount < Mobj.MinHost)
                     {
@@ -489,7 +573,7 @@ else if (this.AttendeeConfig === 4)
                     }
                     else
                     {
-                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Hosts, usr, ParticipantOpt.Eligible, ParticipantType.Host, tbl, Mobj.SlotList[i], Mobj.Date, DataDB);
+                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Hosts, usr, ParticipantOpt.Eligible, ParticipantType.Host, tbl, Mobj.SlotList[i], Mobj.Date, DataDB, this.TempSameHost);
                     }
                     if (Mobj.MaxAttendee == 0 && this.AttendeeConfig == UsersType.Contact )
                     {
@@ -498,12 +582,12 @@ else if (this.AttendeeConfig === 4)
                     else if (Mobj.MaxAttendee == 0)
                     {
                         IsFixedAttendee = true;
-                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Attendees, usr, ParticipantOpt.Eligible, ParticipantType.Attendee, tbl, Mobj.SlotList[i], Mobj.Date, DataDB);
+                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Attendees, usr, ParticipantOpt.Eligible, ParticipantType.Attendee, tbl, Mobj.SlotList[i], Mobj.Date, DataDB, this.TempSameAttendee);
                     }
                     else if (this.AttendeeConfig == UsersType.Users && AttendeeUserIdsCount >= Mobj.MinAttendee && AttendeeUserIdsCount == Mobj.SlotList[i].Attendees.Count && AttendeeUserIdsCount <= Mobj.MaxAttendee)
                     {
                         IsFixedAttendee = true;
-                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Attendees, usr, ParticipantOpt.Fixed, ParticipantType.Attendee, tbl, Mobj.SlotList[i], Mobj.Date, DataDB);
+                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Attendees, usr, ParticipantOpt.Fixed, ParticipantType.Attendee, tbl, Mobj.SlotList[i], Mobj.Date, DataDB, this.TempSameAttendee);
                     }
                     else if (this.AttendeeConfig == UsersType.Contact && AttendeeContactIdsCount >= Mobj.MinAttendee && AttendeeContactIdsCount == Mobj.SlotList[i].Attendees.Count && AttendeeContactIdsCount <= Mobj.MaxAttendee)
                     {
@@ -520,7 +604,7 @@ else if (this.AttendeeConfig === 4)
                     }
                     else
                     {
-                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Attendees, usr, ParticipantOpt.Eligible, ParticipantType.Attendee, tbl, Mobj.SlotList[i], Mobj.Date, DataDB);
+                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Attendees, usr, ParticipantOpt.Eligible, ParticipantType.Attendee, tbl, Mobj.SlotList[i], Mobj.Date, DataDB, this.TempSameAttendee);
                     }
                     query += $@"update eb_meeting_slots set meeting_opts = {SetMeetingOpts(IsFixedHost, IsFixedAttendee)} where id = eb_currval('eb_meeting_slots_id_seq') ;";
                 }
@@ -528,6 +612,8 @@ else if (this.AttendeeConfig === 4)
             else if (Mobj.MeetingType == MeetingType.MultipleMeeting)
             {
                 query += AddMeetingSchedule(Mobj, usr);
+                this.TempSameHost = false;
+                this.TempSameAttendee = false;
                 for (i = 0; i < Mobj.SlotList.Count; i++)
                 {
                     query += $@"
@@ -541,12 +627,12 @@ else if (this.AttendeeConfig === 4)
                     bool IsFixedAttendee = false;
                     if (Mobj.MaxHost == 0)
                     {
-                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Attendees, usr, ParticipantOpt.Eligible, ParticipantType.Host, tbl, Mobj.SlotList[i], Mobj.Date, DataDB);
+                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Hosts, usr, ParticipantOpt.Eligible, ParticipantType.Host, tbl, Mobj.SlotList[i], Mobj.Date, DataDB,this.TempSameHost);
                     }
                     else if (this.HostConfig == UsersType.Users && HostUserIdsCount >= Mobj.MinHost && HostUserIdsCount == Mobj.SlotList[i].Hosts.Count && HostUserIdsCount <= Mobj.MaxHost)
                     {
                         IsFixedHost = true;
-                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Hosts, usr, ParticipantOpt.Fixed, ParticipantType.Host, tbl, Mobj.SlotList[i], Mobj.Date, DataDB);
+                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Hosts, usr, ParticipantOpt.Fixed, ParticipantType.Host, tbl, Mobj.SlotList[i], Mobj.Date, DataDB, this.TempSameHost);
                     }
                     else if (this.HostConfig == UsersType.Users && HostUserIdsCount < Mobj.MinHost)
                     {
@@ -554,11 +640,11 @@ else if (this.AttendeeConfig === 4)
                     }
                     else
                     {
-                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Hosts, usr, ParticipantOpt.Eligible, ParticipantType.Host, tbl, Mobj.SlotList[i], Mobj.Date, DataDB);
+                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Hosts, usr, ParticipantOpt.Eligible, ParticipantType.Host, tbl, Mobj.SlotList[i], Mobj.Date, DataDB, this.TempSameHost);
                     }
                     if (Mobj.MaxAttendee == 0 && this.AttendeeConfig != UsersType.Contact)
                     {
-                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Attendees, usr, ParticipantOpt.Eligible, ParticipantType.Attendee, tbl, Mobj.SlotList[i], Mobj.Date, DataDB);
+                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Attendees, usr, ParticipantOpt.Eligible, ParticipantType.Attendee, tbl, Mobj.SlotList[i], Mobj.Date, DataDB, this.TempSameAttendee);
                     }
                     else if(Mobj.MaxAttendee == 0 && this.AttendeeConfig == UsersType.Contact)
                     {
@@ -569,7 +655,7 @@ else if (this.AttendeeConfig === 4)
                     else if (this.AttendeeConfig == UsersType.Users && AttendeeUserIdsCount >= Mobj.MinAttendee && AttendeeUserIdsCount == Mobj.SlotList[i].Attendees.Count && AttendeeUserIdsCount <= Mobj.MaxAttendee)
                     {
                         IsFixedAttendee = true;
-                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Attendees, usr, ParticipantOpt.Fixed, ParticipantType.Attendee, tbl, Mobj.SlotList[i], Mobj.Date, DataDB);
+                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Attendees, usr, ParticipantOpt.Fixed, ParticipantType.Attendee, tbl, Mobj.SlotList[i], Mobj.Date, DataDB, this.TempSameAttendee);
                     }
                     else if (this.AttendeeConfig == UsersType.Contact && AttendeeContactIdsCount >= Mobj.MinAttendee && AttendeeContactIdsCount == Mobj.SlotList[i].Attendees.Count && AttendeeContactIdsCount <= Mobj.MaxAttendee)
                     {
@@ -586,9 +672,11 @@ else if (this.AttendeeConfig === 4)
                     }
                     else
                     {
-                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Attendees, usr, ParticipantOpt.Eligible, ParticipantType.Attendee, tbl, Mobj.SlotList[i], Mobj.Date, DataDB);
+                        query += MeetingSlotParticipantsQry(Mobj.SlotList[i].Attendees, usr, ParticipantOpt.Eligible, ParticipantType.Attendee, tbl, Mobj.SlotList[i], Mobj.Date, DataDB, this.TempSameAttendee);
                     }
                     query += $@"update eb_meeting_slots set meeting_opts = {SetMeetingOpts(IsFixedHost, IsFixedAttendee)} where id = eb_currval('eb_meeting_slots_id_seq') ;";
+                if(this.SameHost) { this.TempSameHost = true; }
+                if(this.SameAttendee) { this.TempSameAttendee = true; }
                 }
             }
             else if (Mobj.MeetingType == MeetingType.AdvancedMeeting)
@@ -773,7 +861,7 @@ else if (this.AttendeeConfig === 4)
             return query;
         }
 
-        public string MeetingSlotParticipantsQry(List<Participants> Participants, User usr, ParticipantOpt Opt, ParticipantType ParticipantType, string tbl, Slots Mobj, string Date, IDatabase DataDB)
+        public string MeetingSlotParticipantsQry(List<Participants> Participants, User usr, ParticipantOpt Opt, ParticipantType ParticipantType, string tbl, Slots Mobj, string Date, IDatabase DataDB,bool _temp)
         {
             List<Participants> ParticipantsList = new List<Participants>();
             String _query = string.Format(this.ValidateQuery, Mobj.TimeFrom, Mobj.TimeTo, Date);
@@ -811,10 +899,10 @@ else if (this.AttendeeConfig === 4)
                            ";
                     }
                 }
-                if (userids != "")
+                if (userids != "" && !_temp)
                     query += $@" insert into eb_my_actions (user_ids,from_datetime,form_ref_id,form_data_id,description,my_action_type , eb_meeting_slots_id, 
                 is_completed,eb_del) values('{userids}',NOW(),@refid, eb_currval('{tbl}_id_seq'), 'Meeting Request',
-                     '{MyActionTypes.Meeting}',eb_currval('eb_meeting_slots_id_seq') , 'F','F'); ";
+                     '{MyActionTypes.Meeting}',eb_currval('eb_meeting_slots_id_seq') , 'F','F'); ";              
                 ////if (Roles != "")
                 ////    query += $@"insert into eb_my_actions (role_ids,from_datetime,form_ref_id,form_data_id,description,my_action_type , eb_meeting_slots_id, 
                 ////    is_completed,eb_del) values('{Roles}',NOW(),@refid, eb_currval('{tbl}_id_seq'), 'Meeting Request',
@@ -857,15 +945,15 @@ else if (this.AttendeeConfig === 4)
                     insert into eb_meeting_scheduled_participants (user_ids,role_ids,eb_meeting_schedule_id,participant_type,type_of_user,
                     eb_created_at,eb_created_by)values('{userids}','{Roles}',eb_currval('eb_meeting_schedule_id_seq') , {(int)ParticipantType} ,1,now(),{usr.UserId});";
 
-                if (userids != "")
+                if (userids != "" && !_temp)
                     query += $@" insert into eb_my_actions (user_ids,from_datetime,form_ref_id,form_data_id,description,my_action_type , eb_meeting_schedule_id, 
                     is_completed,eb_del) values('{userids}',NOW(),@refid, eb_currval('{tbl}_id_seq'), 'Meeting Request',
                     '{MyActionTypes.Meeting}',eb_currval('eb_meeting_schedule_id_seq') , 'F','F');";
-                if (Roles != "")
+                if (Roles != "" && ! _temp)
                     query += $@" insert into eb_my_actions (role_ids,from_datetime,form_ref_id,form_data_id,description,my_action_type , eb_meeting_schedule_id, 
                     is_completed,eb_del) values('{Roles}',NOW(),@refid, eb_currval('{tbl}_id_seq'), 'Meeting Request',
                     '{MyActionTypes.Meeting}',eb_currval('eb_meeting_schedule_id_seq') , 'F','F');";
-                if (UserGroup > 0)
+                if (UserGroup > 0 && !_temp)
                     query += $@" insert into eb_my_actions (user_group,from_datetime,form_ref_id,form_data_id,description,my_action_type , eb_meeting_schedule_id, 
                     is_completed,eb_del) values('{UserGroup}',NOW(),@refid, eb_currval('{tbl}_id_seq'), 'Meeting Request',
                     '{MyActionTypes.Meeting}',eb_currval('eb_meeting_schedule_id_seq') , 'F','F');";

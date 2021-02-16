@@ -55,6 +55,9 @@ namespace ExpressBase.Objects.WebFormRelated
         public const string shortname = "shortname";
         public const string image = "image";
         public const string meta_json = "meta_json";
+        public const string is_group = "is_group";
+        public const string parent_id = "parent_id";
+        public const string eb_location_types_id = "eb_location_types_id";
         //Prov User
         public const string email = "email";
         public const string phprimary = "phprimary";
@@ -66,5 +69,13 @@ namespace ExpressBase.Objects.WebFormRelated
         public const string consadd = "consadd";
         //AutoId
         public const string AutoId_PlaceHolder = "__EbAutoId_PlaceHolder__";
+        //DataPusher
+        public const string __eb_loop_through = "__eb_loop_through";
+        //EbPhone ctrl
+        public const string _verified = "_verified";
+        public const string is_verified = "is_verified";
+        public const string phone_no = "phone_no";
+        public const string otp = "otp";
+        public const string timestamp = "timestamp";
     }
 }

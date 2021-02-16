@@ -1,5 +1,4 @@
-﻿using ExpressBase.Common;
-using ExpressBase.Common.Data;
+﻿using ExpressBase.Common.Data;
 using ExpressBase.Common.EbServiceStack.ReqNRes;
 using ServiceStack;
 using ServiceStack.Text;
@@ -7,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using ExpressBase.Security;
-using ExpressBase.Common.LocationNSolution;
 using System.Net;
 
 namespace ExpressBase.Objects.ServiceStack_Artifacts
@@ -71,6 +69,14 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 3)]
         public Dictionary<string, object> Data { set; get; }
+
+        [DataMember(Order = 4)]
+        public string RefId { set; get; }
+
+        public bool HasRefId()
+        {
+            return !string.IsNullOrEmpty(RefId);
+        }
     }
 
     [DataContract]
@@ -246,31 +252,6 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         }
     }
 
-    public static class SqlConstants
-    {
-        //        public const string SQL_FUNC_HEADER = @"CREATE OR REPLACE FUNCTION {0}(insert_json jsonb,update_json jsonb)
-        //RETURNS void
-        //LANGUAGE {1} AS $BODY$";
-
-        public const string JSON_ROW_SELECT = @"CREATE OR REPLACE FUNCTION {0}(_json,table_name)
-RETURNS jsonb
-LANGUAGE {1} AS $BODY$
-DECLARE 
-    temp_table jsonb;
-BEGIN
-    SELECT
-        _table->'Rows' 
-    FROM 
-        jsonb_array_elements(_json) _table 
-    INTO 
-        temp_table 
-    WHERE 
-        _table->>'TableName' = table_name;
-    RETURN temp_table;
-END;";
-
-    }
-
     public class ResultWrapper
     {
         public ResultWrapper()
@@ -281,13 +262,6 @@ END;";
         public object Result { get; set; }
 
         public List<Param> InputParams { set; get; }
-    }
-
-    public class ObjWrapperInt
-    {
-        public int ObjectType { get; set; }
-
-        public EbObject EbObj { set; get; }
     }
 
     [Serializable()]
@@ -314,45 +288,6 @@ END;";
         public Type ResultType { get { return this.Data.GetType(); } }
 
         public string Data { set; get; }
-    }
-
-    public static class ApiConstants
-    {
-        public const string CIRCULAR_REF = "Cannot call {0} from {0}";
-
-        public const string DESCRPT_ERR = "Error at position {0}, Resource {1} failed to execute. Resource Name = '{2}'";
-
-        public const string EXE_FAIL = "Execution failed,{0}";
-
-        public const string UNSET_PARAM = "Parameter {0} must be set";
-
-        public const string EXE_SUCCESS = "Execution success";
-
-        public const string MAIL_SUCCESS = "The mail has been sent successfully to {0} with subject {1} and cc {2}";
-
-        public const string SUCCESS = "Success";
-
-        public const string FAIL = "Failed";
-
-        public const string API_NOTFOUND = "Api,{0} does not Exist";
-    }
-
-    public enum ApiErrorCode
-    {
-        NotFound = 404,
-        Success = 1,
-        Failed = -1,
-        ParamNFound = 0,
-        ExplicitExit = 255
-    }
-
-    public enum ApiMethods
-    {
-        POST = 1,
-        GET = 2,
-        //PUT = 3,
-        //PATCH = 4,
-        //DELETE = 5,
     }
 
     public class ApiAuthResponse
@@ -399,7 +334,6 @@ END;";
 
         public int FileRefId { set; get; }
     }
-
 
     public class ApiFileResponse
     {

@@ -125,6 +125,10 @@ namespace ExpressBase.Objects
         public WebFormDVModes FormMode { set; get; }
 
         [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyGroup("Link Settings")]
+        public bool RenderAsPopup { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyEditor(PropertyEditorType.CollectionFrmSrc, "DataColumns", 1)]
         [PropertyGroup("Link Settings")]
         public EbMobileDataColToControlMap FormId { set; get; }
@@ -144,6 +148,12 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.MobilePage)]
         [PropertyGroup("Link Settings")]
         public bool ShowLinkIcon { set; get; }
+
+        [EnableInBuilder(BuilderType.MobilePage)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorCS)]
+        [PropertyGroup("Link Settings")]
+        [Alias("Link Expression")]
+        public EbScript LinkExpr { get; set; }
 
         #region FAB Settings Properties
 
@@ -366,6 +376,23 @@ namespace ExpressBase.Objects
                     ctrl.ReplaceRefid(map);
                 }
             }
+        }
+
+        public List<T> GetControlsByType<T>()
+        {
+            List<T> controls = new List<T>();
+
+            foreach (EbMobileTableCell cells in DataLayout.CellCollection)
+            {
+                foreach (EbMobileControl ctrl in cells.ControlCollection)
+                {
+                    if (ctrl is T parsed)
+                    {
+                        controls.Add(parsed);
+                    }
+                }
+            }
+            return controls;
         }
     }
 }
