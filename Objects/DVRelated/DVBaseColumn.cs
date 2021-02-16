@@ -192,7 +192,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
         }
 
         [JsonProperty(PropertyName = "data")]
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar, BuilderType.ApiBuilder)]
         [HideInPropertyGrid]
         public int Data { get; set; }
 
@@ -200,7 +200,7 @@ namespace ExpressBase.Objects.Objects.DVRelated
         [HideInPropertyGrid]
         public int OIndex { get; set; }
 
-        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar)]
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.WebForm, BuilderType.BotForm, BuilderType.FilterDialog, BuilderType.UserControl, BuilderType.DashBoard, BuilderType.Calendar, BuilderType.ApiBuilder)]
         [JsonProperty(PropertyName = "name")]
         [PropertyEditor(PropertyEditorType.Label)]
         [OnChangeExec(@"
@@ -1483,4 +1483,5 @@ else
         }
     }
 
+   
 }

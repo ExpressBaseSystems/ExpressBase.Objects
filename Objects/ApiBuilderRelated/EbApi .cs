@@ -14,6 +14,7 @@ using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
 using System.Net.Http;
 using Newtonsoft.Json.Linq;
+using ExpressBase.Objects.Objects.DVRelated;
 
 namespace ExpressBase.Objects
 {
@@ -527,6 +528,35 @@ namespace ExpressBase.Objects
         public override string GetDesignHtml()
         {
             return @"<div class='apiPrcItem dropped' eb-type='FormResource' id='@id'>
+                        <div tabindex='1' class='drpbox' onclick='$(this).focus();'>  
+                            <div class='CompLabel'> @Label </div>
+                            <div class='CompName'> @RefName </div>
+                            <div class='CompVersion'> @Version </div>
+                        </div>
+                    </div>".RemoveCR().DoubleQuoted();
+        }
+
+        public override List<Param> GetOutParams(List<Param> _param)
+        {
+            return new List<Param>();
+        }
+
+        public override object GetResult()
+        {
+            return this.Result;
+        }
+    }
+
+    [EnableInBuilder(BuilderType.ApiBuilder)]
+    public class EbPivotTable : ApiResources
+    {
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        [PropertyEditor(PropertyEditorType.PivotConfiguration)]
+        public PivotConfig Pivotconfig { get; set; }
+
+        public override string GetDesignHtml()
+        {
+            return @"<div class='apiPrcItem dropped' eb-type='PivotTable' id='@id'>
                         <div tabindex='1' class='drpbox' onclick='$(this).focus();'>  
                             <div class='CompLabel'> @Label </div>
                             <div class='CompName'> @RefName </div>
