@@ -221,7 +221,24 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
         [PropertyGroup(PGConstants.BEHAVIOR)]
+        [OnChangeExec(@"
+if (this.IsDisable){
+    pg.HideProperty('DisableRowEdit');
+    pg.HideProperty('DisableRowDelete');
+}
+else {
+    pg.ShowProperty('DisableRowEdit');
+    pg.ShowProperty('DisableRowDelete');
+}")]
         public override bool IsDisable { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.BEHAVIOR)]
+        public bool DisableRowEdit { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.UserControl)]
+        [PropertyGroup(PGConstants.BEHAVIOR)]
+        public bool DisableRowDelete { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.FilterDialog, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup(PGConstants.BEHAVIOR)]

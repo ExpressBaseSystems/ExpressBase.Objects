@@ -121,6 +121,15 @@ namespace ExpressBase.Objects
         [PropertyGroup(PGConstants.CORE)]
         public string DataSourceRefId { get; set; }
 
+        [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
+        [PropertyEditor(PropertyEditorType.ObjectSelector)]
+        [OSE_ObjectTypes(EbObjectTypes.iApi)]
+        [HideForUser]
+        [PropertyPriority(0)]
+        [Alias("Api")]
+        [PropertyGroup(PGConstants.CORE)]
+        public string ApiRefId { get; set; }
+
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar, BuilderType.WebForm)]
         [PropertyGroup(PGConstants.CORE)]
         [HideForUser]

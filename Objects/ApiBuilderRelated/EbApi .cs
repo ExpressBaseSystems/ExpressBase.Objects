@@ -6,6 +6,7 @@ using ExpressBase.Common.Extensions;
 using ExpressBase.Common;
 using ExpressBase.Common.Data;
 using ExpressBase.Objects.ServiceStack_Artifacts;
+using ExpressBase.Objects.Objects;
 
 namespace ExpressBase.Objects
 {
@@ -373,6 +374,25 @@ namespace ExpressBase.Objects
         public override string GetDesignHtml()
         {
             return @"<div class='apiPrcItem dropped' eb-type='FormResource' id='@id'>
+                        <div tabindex='1' class='drpbox' onclick='$(this).focus();'>  
+                            <div class='CompLabel'> @Label </div>
+                            <div class='CompName'> @RefName </div>
+                            <div class='CompVersion'> @Version </div>
+                        </div>
+                    </div>".RemoveCR().DoubleQuoted();
+        }
+    }
+
+    [EnableInBuilder(BuilderType.ApiBuilder)]
+    public class EbPivotTable : ApiResources
+    {
+        [EnableInBuilder(BuilderType.ApiBuilder)]
+        [PropertyEditor(PropertyEditorType.PivotConfiguration)]
+        public PivotConfig Pivotconfig { get; set; }
+
+        public override string GetDesignHtml()
+        {
+            return @"<div class='apiPrcItem dropped' eb-type='PivotTable' id='@id'>
                         <div tabindex='1' class='drpbox' onclick='$(this).focus();'>  
                             <div class='CompLabel'> @Label </div>
                             <div class='CompName'> @RefName </div>
