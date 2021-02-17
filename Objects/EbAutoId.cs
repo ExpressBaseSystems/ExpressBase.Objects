@@ -154,7 +154,7 @@ namespace ExpressBase.Objects
 .Replace("@ebsid@", String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId)
 .Replace("@value@", "")//"value='" + this.Value + "'")
 .Replace("@tabIndex@", "tabindex='" + this.TabIndex + "'")
-.Replace("@BackColor@", "background-color: #eee;")
+.Replace("@BackColor@", "background-color: #eee !important;border-left: solid 1px #fff;")
     //.Replace("@BackColor@ ", ("background-color:" + ((this.BackColor != null) ? this.BackColor : "@BackColor@ ") + ";"))
     .Replace("@ForeColor@ ", "color:" + ((this.ForeColor != null) ? this.ForeColor : "@ForeColor@ ") + ";")
 .Replace("@required@", (this.Required && !this.Hidden ? " required" : string.Empty))
