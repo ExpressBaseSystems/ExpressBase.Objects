@@ -58,7 +58,10 @@ namespace ExpressBase.Objects.WebFormRelated
             {
                 string _data = GetJsonData(_webForm);
                 if (string.IsNullOrEmpty(_data))
-                    Task.Run(() => Delete(DataDB, _webForm.RefId, _webForm.TableRowId));
+                {
+                    if (ExistsIndexControls(_webForm))
+                        Task.Run(() => Delete(DataDB, _webForm.RefId, _webForm.TableRowId));
+                }
                 else
                     Task.Run(() => InsertOrUpdate(DataDB, _data, _webForm.RefId, _webForm.TableRowId, _webForm.UserObj.UserId, _webForm.DisplayName));
             }
@@ -103,6 +106,21 @@ namespace ExpressBase.Objects.WebFormRelated
             {
                 Console.WriteLine($"Exeption in SearchHelper.index.delete. \nMessage: {ex.Message}\nStackTrace: {ex.StackTrace}");
             }
+        }
+
+        public static bool ExistsIndexControls(EbWebForm _webForm)
+        {
+            bool indexCtrlFound = false;
+            foreach (TableSchema _table in _webForm.FormSchema.Tables)
+            {
+                if (_table.TableType == WebFormTableTypes.Normal)
+                {
+                    indexCtrlFound = _table.Columns.Exists(e => e.Control.Index);
+                    if (indexCtrlFound)
+                        break;
+                }
+            }
+            return indexCtrlFound;
         }
 
         public static string UpdateIndexes(IDatabase DataDB, EbWebForm _webForm)

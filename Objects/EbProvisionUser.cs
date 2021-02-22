@@ -295,12 +295,12 @@ this.Init = function(id)
                         WHERE eb_ver_id = @{masterTbl}_eb_ver_id AND eb_data_id = @{masterTbl}_id GROUP BY u.id; ";
         }
 
-        public string GetMappedUserQuery(string MasterTable)
+        public string GetMappedUserQuery(string MasterTable, string eb_del, string false_val)
         {
             string idCol = this.VirtualTable == MasterTable ? "id" : MasterTable + "_id";            
             return $@"SELECT B.id, B.fullname, B.email, B.phnoprimary AS phprimary
                 FROM {this.VirtualTable} A, eb_users B
-                WHERE B.id = A.{this.Name} AND A.{idCol} = @{MasterTable}_id AND COALESCE(A.eb_del, 'F') = 'F'; ";            
+                WHERE B.id = A.{this.Name} AND A.{idCol} = @{MasterTable}_id AND COALESCE(A.{eb_del}, {false_val}) = {false_val}; ";            
         }
 
         //insOnUp - user create on update

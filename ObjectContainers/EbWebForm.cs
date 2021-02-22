@@ -671,19 +671,21 @@ namespace ExpressBase.Objects
                         }
                     }
                     int count = FormData.MultipleTables[dgCtrl.TableName].Count;
+                    string str_row_num = this.SolutionObj.SolutionSettings.SystemColumns[SystemColumns.eb_row_num];
                     for (int i = 0, j = count; i < count; i++, j--)
                     {
-                        if (FormData.MultipleTables[dgCtrl.TableName][i].GetColumn(FormConstants.eb_row_num) == null)
+                        
+                        if (FormData.MultipleTables[dgCtrl.TableName][i].GetColumn(str_row_num) == null)
                             FormData.MultipleTables[dgCtrl.TableName][i].Columns.Add(new SingleColumn
                             {
-                                Name = FormConstants.eb_row_num,
-                                Type = (int)EbDbTypes.Decimal,
+                                Name = str_row_num,
+                                Type = (int)EbDbTypes.Int32,
                                 Value = 0
                             });
                         if (dgCtrl.AscendingOrder)
-                            FormData.MultipleTables[dgCtrl.TableName][i][FormConstants.eb_row_num] = i + 1;
+                            FormData.MultipleTables[dgCtrl.TableName][i][str_row_num] = i + 1;
                         else
-                            FormData.MultipleTables[dgCtrl.TableName][i][FormConstants.eb_row_num] = j;
+                            FormData.MultipleTables[dgCtrl.TableName][i][str_row_num] = j;
                     }
                 }
                 else if (c is EbReview)
@@ -897,11 +899,12 @@ namespace ExpressBase.Objects
                 }
                 else if (_table.TableType == WebFormTableTypes.Grid)
                 {
+                    string str_row_num = this.SolutionObj.SolutionSettings.SystemColumns[SystemColumns.eb_row_num];
                     SingleRow Row = new SingleRow() { LocId = this.LocationId };
                     Row.Columns.Add(new SingleColumn()
                     {
-                        Name = FormConstants.eb_row_num,
-                        Type = (int)EbDbTypes.Decimal,
+                        Name = str_row_num,
+                        Type = (int)EbDbTypes.Int32,
                         Value = 0
                     });
                     foreach (ColumnSchema _column in _table.Columns)
@@ -921,6 +924,7 @@ namespace ExpressBase.Objects
             //master table eb columns : eb_loc_id, eb_ver_id, eb_lock, eb_push_id, eb_src_id, eb_created_by, eb_void, id
             //normal table eb columns : eb_loc_id, id
             //grid table eb columns   : eb_loc_id, id, eb_row_num
+            EbSystemColumns ebs = this.SolutionObj.SolutionSettings.SystemColumns;
 
             foreach (EbDataRow dataRow in dataTable.Rows)
             {
@@ -932,14 +936,14 @@ namespace ExpressBase.Objects
                     if (_table.TableName.Equals(this.FormSchema.MasterTable))
                     {
                         if (this.FormData != null)
-                        {
+                        {                            
                             this.FormData.FormVersionId = Convert.ToInt32(dataRow[i++]);
-                            this.FormData.IsLocked = dataRow[i++].ToString().Equals("T");
+                            this.FormData.IsLocked = ebs.GetBooleanValue(SystemColumns.eb_lock, dataRow[i++]);
                             string[] pushIdParts = dataRow[i++].ToString().Split("_");
                             this.FormData.SrcRefId = pushIdParts.Length == 2 ? pushIdParts[0] : string.Empty;
                             this.FormData.SrcDataId = Convert.ToInt32(dataRow[i++]);
                             this.FormData.CreatedBy = Convert.ToInt32(dataRow[i++]);
-                            this.FormData.IsCancelled = dataRow[i++].ToString().Equals("T");
+                            this.FormData.IsCancelled = ebs.GetBooleanValue(SystemColumns.eb_void, dataRow[i++]);
                             DateTime dt = Convert.ToDateTime(dataRow[i++]).ConvertFromUtc(this.UserObj.Preference.TimeZone);
                             this.FormData.CreatedAt = dt.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
                         }
@@ -963,7 +967,7 @@ namespace ExpressBase.Objects
                 {
                     this.GetFormattedColumn(dataTable.Columns[FormConstants.id], dataRow, Row, null);
                     if (_table.TableType == WebFormTableTypes.Grid)
-                        this.GetFormattedColumn(dataTable.Columns[FormConstants.eb_row_num], dataRow, Row, null);
+                        this.GetFormattedColumn(dataTable.Columns[ebs[SystemColumns.eb_row_num]], dataRow, Row, null);
                     for (int k = 0; k < _table.Columns.Count; k++)
                     {
                         EbControl _control = _table.Columns[k].Control;
@@ -2063,17 +2067,23 @@ namespace ExpressBase.Objects
 
         public bool ParameterizeUnknown(IDatabase DataDB, List<DbParameter> param, SingleColumn cField, bool ins, ref int i, ref string _col, ref string _val)
         {
-            if (EbColumnExtra.Params.ContainsKey(cField.Name))
+            string cFldName = this.SolutionObj.SolutionSettings.SystemColumns[SystemColumns.eb_row_num];
+            if (cFldName == cField.Name)
+                cFldName = SystemColumns.eb_row_num;
+            else
+                cFldName = cField.Name;
+
+            if (EbColumnExtra.Params.ContainsKey(cFldName))
             {
                 if (cField.Value == null)
                 {
-                    var p = DataDB.GetNewParameter(cField.Name + "_" + i, EbColumnExtra.Params[cField.Name]);
+                    var p = DataDB.GetNewParameter(cField.Name + "_" + i, EbColumnExtra.Params[cFldName]);
                     p.Value = DBNull.Value;
                     param.Add(p);
                 }
                 else
                 {
-                    param.Add(DataDB.GetNewParameter(cField.Name + "_" + i, EbColumnExtra.Params[cField.Name], cField.Value));
+                    param.Add(DataDB.GetNewParameter(cField.Name + "_" + i, EbColumnExtra.Params[cFldName], cField.Value));
                 }
                 if (ins)
                 {

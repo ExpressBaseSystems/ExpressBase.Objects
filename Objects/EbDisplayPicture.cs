@@ -156,13 +156,13 @@ namespace ExpressBase.Objects
             {
                 return $@"SELECT B.id, B.filename, B.tags, B.uploadts,B.filecategory
                     FROM {this.TableName} A, eb_files_ref B
-                    WHERE FIND_IN_SET(B.id, A.{this.Name}) AND A.{idCol} = @{MasterTable}_id AND B.eb_del = 'F'; ";
+                    WHERE FIND_IN_SET(B.id, A.{this.Name}) AND A.{idCol} = @{MasterTable}_id AND COALESCE(B.eb_del, 'F') = 'F'; ";
             }
             else
             {
                 return $@"SELECT B.id, B.filename, B.tags, B.uploadts,B.filecategory
                     FROM {this.TableName} A, eb_files_ref B
-                    WHERE B.id = ANY(STRING_TO_ARRAY(A.{this.Name}::TEXT, ',')::INT[]) AND A.{idCol} = @{MasterTable}_id AND B.eb_del = 'F'; ";
+                    WHERE B.id = ANY(STRING_TO_ARRAY(A.{this.Name}::TEXT, ',')::INT[]) AND A.{idCol} = @{MasterTable}_id AND COALESCE(B.eb_del, 'F') = 'F'; ";
             }
         }
 

@@ -672,7 +672,7 @@ namespace ExpressBase.Objects
             get
             {
                 return new Dictionary<string, EbDbTypes> {
-                    { "eb_row_num",EbDbTypes.Decimal},
+                    { "eb_row_num",EbDbTypes.Int32},
                     { "eb_created_at_device",EbDbTypes.DateTime},
                     { "eb_device_id",EbDbTypes.String},
                     { "eb_appversion",EbDbTypes.String},

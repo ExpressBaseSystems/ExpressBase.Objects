@@ -1,5 +1,6 @@
 ﻿using ExpressBase.Common;
 using ExpressBase.Common.Extensions;
+using ExpressBase.Common.LocationNSolution;
 using ExpressBase.Common.Objects;
 using ServiceStack;
 using System.Collections.Generic;
@@ -14,12 +15,13 @@ namespace ExpressBase.Objects.WebFormRelated
             WebFormSchema _formSchema = new WebFormSchema();
             _formSchema.FormName = _this.Name;
             _formSchema.MasterTable = _this.TableName.ToLower();
-            _formSchema = GetWebFormSchemaRec(_this, _formSchema, _this, _this.TableName.ToLower());
+            EbSystemColumns ebs = _this.SolutionObj?.SolutionSettings?.SystemColumns;
+            _formSchema = GetWebFormSchemaRec(_this, _formSchema, _this, _this.TableName.ToLower(), ebs);
             _this.FormSchema = _formSchema;
             return _formSchema;
         }
 
-        private static WebFormSchema GetWebFormSchemaRec(EbWebForm _this, WebFormSchema _schema, EbControlContainer _container, string _parentTable)
+        private static WebFormSchema GetWebFormSchemaRec(EbWebForm _this, WebFormSchema _schema, EbControlContainer _container, string _parentTable, EbSystemColumns ebs)
         {
             IEnumerable<EbControl> _flatControls = _container.Controls.Get1stLvlControls();
             string curTbl = _container.TableName.ToLower();
@@ -37,8 +39,14 @@ namespace ExpressBase.Objects.WebFormRelated
                     _table = new TableSchema { TableName = curTbl, ParentTable = _parentTable, TableType = WebFormTableTypes.Normal, ContainerName = _container.Name };
                 _schema.Tables.Add(_table);
             }
+
             foreach (EbControl control in _flatControls)
             {
+                if (control.IsSysControl && ebs != null)
+                {
+                    control.Name = ebs[control.Name];
+                }
+
                 if (control is EbFileUploader)
                     _schema.ExtendedControls.Add(control);
                 else if (control is EbProvisionUser)
@@ -114,7 +122,7 @@ namespace ExpressBase.Objects.WebFormRelated
                         Container.TableName = curTbl;
                     else
                         __parentTbl = curTbl;
-                    _schema = GetWebFormSchemaRec(_this, _schema, Container, __parentTbl);
+                    _schema = GetWebFormSchemaRec(_this, _schema, Container, __parentTbl, ebs);
                 }
             }
             return _schema;
