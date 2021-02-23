@@ -177,7 +177,7 @@ namespace ExpressBase.Objects
                     if (DataDB.Vendor == DatabaseVendors.MYSQL)//Not fixed - rewite using MAX
                         _val += string.Format("CONCAT(@{0}_{1}, (SELECT LPAD(CAST((COUNT(*) + 1) AS CHAR(12)), {2}, '0') FROM {3} tbl WHERE tbl.{0} LIKE '{4}%')),", cField.Name, i, this.Pattern.SerialLength, tbl, cField.Value);
                     else
-                        _val += string.Format("(@{0}_{1} || COALESCE((SELECT LPAD((SUBSTRING(MAX({0}), LENGTH(MAX({0})) - {2} + 1) :: INTEGER + 1) :: TEXT, {2}, '0') FROM {3} WHERE {0} LIKE '{4}%'), LPAD('1', {2}, '0'))),",
+                        _val += string.Format("(@{0}_{1} || COALESCE((SELECT LPAD((RIGHT(MAX({0}), {2}) :: INTEGER + 1) :: TEXT, {2}, '0') FROM {3} WHERE {0} LIKE '{4}%' AND LENGTH(REGEXP_REPLACE(RIGHT({0}, {2}), '\\D','','g')) = {2}), LPAD('1', {2}, '0'))),",
                         cField.Name,
                         i,
                         this.Pattern.SerialLength,
