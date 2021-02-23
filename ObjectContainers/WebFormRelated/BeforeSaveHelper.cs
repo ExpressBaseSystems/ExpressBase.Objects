@@ -304,6 +304,8 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                             throw new FormException("Set 'options' for simple select column - " + _ctrl.Title ?? _ctrl.Name);
                     }
                 }
+
+                //--------------------------
                 if (Allctrls[i] is EbDynamicCardSet)
                 {
                     EbDynamicCardSet _ctrl = Allctrls[i] as EbDynamicCardSet;
@@ -331,7 +333,7 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                     if (string.IsNullOrEmpty(_ctrl.TableName))
                         throw new FormException("Please enter a valid Static Card table name");
                 }
-                else if (Allctrls[i] is EbProvisionLocation)
+                else if (Allctrls[i] is EbProvisionLocation)//One ctrl
                 {
                     EbProvisionLocation provLoc = Allctrls[i] as EbProvisionLocation;
                     foreach (UsrLocFieldAbstract fld in provLoc.Fields)
@@ -346,6 +348,14 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                         if (Allctrls.FirstOrDefault(e => e.Name == _field.ControlName) == null)
                             throw new FormException($"Invalid control name '{_field.ControlName}' for {_field.Name} in ProvisionLocation control({provLoc.Name}).");
                     }
+                }
+                else if (Allctrls[i] is EbAutoId)//One ctrl
+                {
+                    EbAutoId _ctrl = Allctrls[i] as EbAutoId;
+                    if (_ctrl.Pattern == null || Convert.ToString(_ctrl.Pattern.sPattern).Trim() == string.Empty)
+                        throw new FormException($"Please enter a valid pattern for AutoId control.");
+                    if (_ctrl.Pattern.SerialLength <= 0)
+                        throw new FormException($"Please enter a valid SerialLength for AutoId control.");
                 }
 
                 if (Allctrls[i] is IEbDataReaderControl && serviceClient != null)
