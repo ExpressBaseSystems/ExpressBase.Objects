@@ -49,7 +49,7 @@ namespace ExpressBase.Objects
         {
             return @"<div class='eb_stacklayout mob_control dropped' id='@id' eb-type='EbMobileDataGrid' tabindex='1' onclick='$(this).focus()'>
                             <label class='ctrl_label'> @Label </label>
-                            <div class='eb_ctrlhtml ctrl_as_container'>
+                            <div class='eb_ctrlhtml ctrl_as_container' style='padding:10px 0;'>
                                <div class='data_layout'></div>
                                <div class='control_container'></div>
                             </div>
