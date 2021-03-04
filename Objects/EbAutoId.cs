@@ -12,6 +12,8 @@ using System.Runtime.Serialization;
 using System.Text;
 using ExpressBase.Security;
 using ExpressBase.Common.Constants;
+using ExpressBase.Objects.ServiceStack_Artifacts;
+using System.Net;
 
 namespace ExpressBase.Objects
 {
@@ -174,6 +176,9 @@ namespace ExpressBase.Objects
                 }
                 else
                 {
+                    if (string.IsNullOrWhiteSpace(Convert.ToString(cField.Value)) || this.Pattern.SerialLength == 0)
+                        throw new FormException("Unable to process", (int)HttpStatusCode.InternalServerError, "Invalid pattern for AutoId: " + cField.Name, "EbAutoId => ParameterizeControl");
+
                     if (DataDB.Vendor == DatabaseVendors.MYSQL)//Not fixed - rewite using MAX
                         _val += string.Format("CONCAT(@{0}_{1}, (SELECT LPAD(CAST((COUNT(*) + 1) AS CHAR(12)), {2}, '0') FROM {3} tbl WHERE tbl.{0} LIKE '{4}%')),", cField.Name, i, this.Pattern.SerialLength, tbl, cField.Value);
                     else
