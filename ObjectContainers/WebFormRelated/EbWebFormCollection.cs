@@ -1,5 +1,6 @@
 ﻿using ExpressBase.Common;
 using ExpressBase.Common.Constants;
+using ExpressBase.Common.LocationNSolution;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Structures;
 using ExpressBase.Objects.ServiceStack_Artifacts;
@@ -140,6 +141,7 @@ namespace ExpressBase.Objects
             List<DbParameter> Dbparams = new List<DbParameter>();
             List<EbControl> UniqueCtrls = new List<EbControl>();
             int paramCounter = 0, mstrFormCtrls = 0;
+            EbSystemColumns SysCols = this.MasterForm.SolutionObj.SolutionSettings.SystemColumns;
 
             foreach (EbWebForm WebForm in this)
             {
@@ -163,12 +165,19 @@ namespace ExpressBase.Objects
                             if (WebForm.FormDataBackup.MultipleTables.TryGetValue(_table.TableName, out SingleTable TableBkUp) && TableBkUp.Count > 0)
                             {
                                 SingleColumn ocField = TableBkUp[0].GetColumn(_column.ColumnName);
-                                if (ocField != null && Convert.ToString(cField.Value) == Convert.ToString(ocField.Value))
+                                if (ocField != null && Convert.ToString(cField.Value).Trim().ToLower() == Convert.ToString(ocField.Value ?? string.Empty).Trim().ToLower())
                                     continue;
                             }
                         }
 
-                        fullQuery += $"SELECT id FROM {_table.TableName} WHERE {_column.ColumnName} = @{_column.ColumnName}_{paramCounter};";
+                        fullQuery += string.Format("SELECT id FROM {0} WHERE {5}{1}{6} = {5}@{1}_{2}{6} AND COALESCE({3}, {4}) = {4};",
+                            _table.TableName,
+                            _column.ColumnName,
+                            paramCounter,
+                            SysCols[SystemColumns.eb_del],
+                            SysCols.GetBoolFalse(SystemColumns.eb_del),
+                            _column.Control.EbDbType == EbDbTypes.String ? "LOWER(TRIM(" : string.Empty,
+                            _column.Control.EbDbType == EbDbTypes.String ? "))" : string.Empty);
                         Dbparams.Add(DataDB.GetNewParameter($"{_column.ColumnName}_{paramCounter++}", _column.Control.EbDbType, cField.Value));
                         UniqueCtrls.Add(_column.Control);
                         if (WebForm == MasterForm)
