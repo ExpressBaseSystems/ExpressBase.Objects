@@ -102,6 +102,7 @@ namespace ExpressBase.Objects
         public override string Name { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
+        [HideForUser]
         public override string Description { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
@@ -368,10 +369,12 @@ namespace ExpressBase.Objects
         [PropertyGroup("FixedColumn")]
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
         [OnChangeExec(@"pg.HideGroup('TableStyles');")]
+        [HideForUser]
         public int LeftFixedColumn { get; set; }
 
         [PropertyGroup("FixedColumn")]
         [EnableInBuilder(BuilderType.DVBuilder, BuilderType.DashBoard, BuilderType.Calendar)]
+        [HideForUser]
         public int RightFixedColumn { get; set; }
 
         [PropertyGroup(PGConstants.HELP)]
@@ -380,6 +383,7 @@ namespace ExpressBase.Objects
         [HelpText("Help information icon.")]
         [PropertyEditor(PropertyEditorType.IconPicker)]
         [DefaultPropValue("fa-question-circle")]
+        [HideForUser]
         public string InfoIcon { get; set; }
 
         [PropertyGroup(PGConstants.HELP)]
@@ -395,6 +399,7 @@ namespace ExpressBase.Objects
             pg.HideProperty('InfoIcon');
         }")]
         [HelpText("Help information.")]
+        [HideForUser]
         public string Info { get; set; }
 
         [PropertyGroup(PGConstants.HELP)]
@@ -403,6 +408,7 @@ namespace ExpressBase.Objects
         [Alias("Help Videos URLs")]
         [HelpText("Help videos.")]
         [PropertyEditor(PropertyEditorType.Collection)]
+        [HideForUser]
         public virtual List<EbURL> InfoVideoURLs { get; set; }
 
         [EnableInBuilder(BuilderType.DVBuilder)]
@@ -453,6 +459,7 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.DashBoard, BuilderType.UserControl, BuilderType.DVBuilder)]
         [PropertyGroup("TableStyles")]
         [PropertyEditor(PropertyEditorType.Color)]
+        [HideForUser]
         public string BackColor { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.DashBoard, BuilderType.UserControl, BuilderType.DVBuilder)]
@@ -470,28 +477,33 @@ namespace ExpressBase.Objects
                         pg.HideProperty('Direction');      
                 }
             ")]
+        [HideForUser]
         public bool IsGradient { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.DashBoard, BuilderType.UserControl, BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.Color)]
         [PropertyGroup("TableStyles")]
         [DefaultPropValue("#3d3d5a")]
+        [HideForUser]
         public string GradientColor1 { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.DashBoard, BuilderType.UserControl, BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.Color)]
         [PropertyGroup("TableStyles")]
         [DefaultPropValue("#3b7273")]
+        [HideForUser]
         public string GradientColor2 { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.DashBoard, BuilderType.UserControl, BuilderType.DVBuilder)]
         [PropertyGroup("TableStyles")]
+        [HideForUser]
         public GradientDirection Direction { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.DashBoard, BuilderType.UserControl, BuilderType.DVBuilder)]
         [PropertyGroup("TableStyles")]
         [DefaultPropValue("#3d3d5a")]
         [PropertyEditor(PropertyEditorType.Color)]
+        [HideForUser]
         public string BorderColor { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.DashBoard, BuilderType.UserControl, BuilderType.DVBuilder)]
@@ -506,17 +518,20 @@ namespace ExpressBase.Objects
             $('#' + pg.wraperId + 'BorderRadius').val(0);
             }
             ")]
+        [HideForUser]
         public int BorderRadius { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.DashBoard, BuilderType.UserControl, BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.Color)]
         [PropertyGroup("TableStyles")]
+        [HideForUser]
         public string FontColor { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.DashBoard, BuilderType.UserControl, BuilderType.DVBuilder)]
         [PropertyEditor(PropertyEditorType.Color)]
         [PropertyGroup("TableStyles")]
         [DefaultPropValue("#26b3f7")]
+        [HideForUser]
         public string LinkColor { get; set; }
 
         [JsonIgnore]
