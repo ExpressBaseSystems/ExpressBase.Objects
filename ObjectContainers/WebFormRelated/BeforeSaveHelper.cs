@@ -352,7 +352,7 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                 else if (Allctrls[i] is EbAutoId)//One ctrl
                 {
                     EbAutoId _ctrl = Allctrls[i] as EbAutoId;
-                    if (_ctrl.Pattern == null || Convert.ToString(_ctrl.Pattern.sPattern).Trim() == string.Empty)
+                    if (_ctrl.Pattern == null || string.IsNullOrWhiteSpace(_ctrl.Pattern.sPattern))
                         throw new FormException($"Please enter a valid pattern for AutoId control.");
                     if (_ctrl.Pattern.SerialLength <= 0)
                         throw new FormException($"Please enter a valid SerialLength for AutoId control.");
