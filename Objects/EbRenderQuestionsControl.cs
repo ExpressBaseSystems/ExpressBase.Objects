@@ -5,6 +5,7 @@ using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
 using Newtonsoft.Json;
+using ServiceStack;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
@@ -38,13 +39,22 @@ namespace ExpressBase.Objects
 
         public override string GetDesignHtml()
         {
-            return GetHtml().RemoveCR().GraveAccentQuoted();
+            string EbCtrlHTML = HtmlConstants.CONTROL_WRAPER_HTML4WEB
+
+    .Replace("@LabelForeColor ", "color:" + ((this.LabelForeColor != null) ? this.LabelForeColor : "@LabelForeColor ") + ";")
+    .Replace("@LabelBackColor ", "background-color:" + ((this.LabelBackColor != null) ? this.LabelBackColor : "@LabelBackColor ") + ";");
+
+            return ReplacePropsInHTML(EbCtrlHTML, @" 
+        <div class='qrender-wrap'>
+            <i class='fa fa-list' aria-hidden='true'></i>
+        </div>").RemoveCR().GraveAccentQuoted(); ;
         }
 
         public override string GetBareHtml()
         {
             return @" 
-        <div class='qrende-wrap'>
+        <div class='qrender-wrap'>
+            <i class='fa fa-list' aria-hidden='true'></i>Change...
         </div>"
     .Replace("@name@", this.Name)
     .Replace("@ebsid@", this.EbSid);
@@ -91,6 +101,39 @@ namespace ExpressBase.Objects
         [PropertyGroup(PGConstants.VALUE)]
         [HelpText("Define how Data Id of this field should be calculated.")]
         public override EbScript ValueExpr { get; set; }
+
+
+
+        public void InitFromDataBase(JsonServiceClient ServiceClient)
+        {
+            //RowColletion ds = (ServiceClient.Get<DataSourceDataResponse>(new DataSourceDataRequest { RefId = this.DataSourceId, Start = 0, Length = 1000 })).Data;
+
+            //for (int i = 0; i < ds.Count; i++)
+            //{
+            //    EbCard Card = new EbCard() { EbSid = "cardEbsid_" + i };
+            //    foreach (EbCardField Field in this.CardFields)
+            //    {
+            //        if (Field.DbFieldMap != null)
+            //        {
+            //            var tempdata = ds[i][Field.DbFieldMap.Data];
+            //            if (Field is EbCardNumericField)
+            //                Card.CustomFields[Field.Name] = Convert.ToDouble(tempdata);
+            //            else
+            //                Card.CustomFields[Field.Name] = tempdata.ToString().Trim();
+
+            //            //for getting distinct filter values
+            //            if (this.FilterField?.Name != null && Field.Name == this.FilterField.Name && !this.FilterValues.Contains(tempdata.ToString().Trim()))
+            //            {
+            //                this.FilterValues.Add(tempdata.ToString().Trim());
+            //            }
+            //        }
+            //    }
+            //    Card.CardId = Convert.ToInt32(ds[i][this.ValueMember.Data]);
+            //    Card.Name = "CardIn" + this.Name;//------------------------"CardIn"		
+
+            //    this.CardCollection.Add(Card);
+            //}
+        }
 
     }
 }
