@@ -35,6 +35,9 @@ namespace ExpressBase.Objects
 
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.SurveyControl)]
+        public override string EbSid_CtxId { get; set; }
+
+        [EnableInBuilder(BuilderType.SurveyControl)]
         public override string Name { get; set; }
 
         [HideInPropertyGrid]
@@ -44,12 +47,33 @@ namespace ExpressBase.Objects
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.SurveyControl)]
         public EbASec ASec { get; set; }
+
+        public override string GetJsInitFunc()
+        {
+            return @"
+this.Init = function(id){
+    this.QSec = new EbObjects.EbQSec(id + 'QSec');
+    this.ASec = new EbObjects.EbASec(id + 'ASec');
+};";
+        }
     }
 
     [HideInToolBox]
     [EnableInBuilder(BuilderType.SurveyControl)]
     public class EbQSec : EbControlContainer
     {
+
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.SurveyControl)]
+        public override string EbSid { get; set; }
+
+        [EnableInBuilder(BuilderType.SurveyControl)]
+        public override string Name { get; set; }
+
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.SurveyControl)]
+        public override string EbSid_CtxId { get; set; }
+
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.SurveyControl)]
         public string Question { get; set; }
@@ -63,6 +87,17 @@ namespace ExpressBase.Objects
     [EnableInBuilder(BuilderType.SurveyControl)]
     public class EbASec : EbControlContainer
     {
+
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.SurveyControl)]
+        public override string EbSid { get; set; }
+
+        [EnableInBuilder(BuilderType.SurveyControl)]
+        public override string Name { get; set; }
+
+        [HideInPropertyGrid]
+        [EnableInBuilder(BuilderType.SurveyControl)]
+        public override string EbSid_CtxId { get; set; }
 
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.SurveyControl)]
