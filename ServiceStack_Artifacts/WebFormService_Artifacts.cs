@@ -845,6 +845,25 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     }
 
 
+    //////for question configuration control
+    
+    [DataContract]
+    public class GetQuestionsBankRequest : EbServiceStackAuthRequest, IReturn<GetDistinctValuesResponse>
+    {
+
+    }
+
+    [DataContract]
+    public class GetQuestionsBankResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public Dictionary<int,String> Questionlst { get; set; }
+
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
     public class GetMyProfileEntryRequest : EbServiceStackAuthRequest, IReturn<GetMyProfileEntryResponse>
     {
         //public string TableName { get; set; }
