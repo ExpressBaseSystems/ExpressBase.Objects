@@ -1,4 +1,5 @@
 ﻿using ExpressBase.Common;
+using ExpressBase.Common.Constants;
 using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
@@ -76,6 +77,12 @@ namespace ExpressBase.Objects
 		[HideInPropertyGrid]
 		public override EbDbTypes EbDbType { get { return EbDbTypes.String; } set { } }
 
+		[EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
+		[DefaultPropValue("100")]
+		[PropertyGroup(PGConstants.APPEARANCE)]
+		[Alias("DropdownMaxHeight")]
+		public int DropdownHeight { get; set; }
+
 
 		[EnableInBuilder(BuilderType.WebForm)]
 		[HideInPropertyGrid]
@@ -84,14 +91,13 @@ namespace ExpressBase.Objects
 		public override string GetBareHtml()
 		{
 			return @"<div class='input-group @ebsid@_cont'>
-				<select id='@ebsid@' ui-inp class='' title='@PlaceHolder@' @selOpts@ @MaxLimit@ @multiple@ @IsSearchable@ name='@ebsid@'   style='width: 100%;'>
+				<select id='@ebsid@' ui-inp class='' multiple @selOpts@ @MaxLimit@  @IsSearchable@ name='@ebsid@'   style='width: 100%;'>
 					@options@
 				</select>
 			</div>"
 			.Replace("@ebsid@", String.IsNullOrEmpty(this.EbSid_CtxId) ? "@ebsid@" : this.EbSid_CtxId)
 			.Replace("@name@", this.Name)
 			.Replace("@HelpText@", this.HelpText)
-
 			.Replace("@toolTipText@", this.ToolTipText)
 			.Replace("@options@", this.OptionHtml);
 
@@ -130,6 +136,8 @@ namespace ExpressBase.Objects
 
 
 		}
+
+
 
 	}
 }
