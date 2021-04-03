@@ -4,6 +4,7 @@ using ExpressBase.Common.Extensions;
 using ExpressBase.Common.Objects;
 using ExpressBase.Common.Objects.Attributes;
 using ExpressBase.Common.Structures;
+using ExpressBase.Objects.ServiceStack_Artifacts;
 using Newtonsoft.Json;
 using ServiceStack;
 using System;
@@ -36,6 +37,8 @@ namespace ExpressBase.Objects
         [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
         public override bool DoNotPersist { get; set; }
 
+        public string QuestionStr { get; set; }
+
 
         public override string GetDesignHtml()
         {
@@ -54,8 +57,9 @@ namespace ExpressBase.Objects
         {
             return @" 
         <div class='qrender-wrap'>
-            <i class='fa fa-list' aria-hidden='true'></i>Change...
+            @options@
         </div>"
+    .Replace("@options@", this.QuestionStr)
     .Replace("@name@", this.Name)
     .Replace("@ebsid@", this.EbSid);
         }
@@ -67,10 +71,30 @@ namespace ExpressBase.Objects
 
     .Replace("@LabelForeColor ", "color:" + ((this.LabelForeColor != null) ? this.LabelForeColor : "@LabelForeColor ") + ";")
     .Replace("@LabelBackColor ", "background-color:" + ((this.LabelBackColor != null) ? this.LabelBackColor : "@LabelBackColor ") + ";");
-
             return ReplacePropsInHTML(EbCtrlHTML);
         }
 
+
+        public void InitFromDataBase(JsonServiceClient ServiceClient)
+        {
+            string _html = string.Empty;
+            string OuterHtml = string.Empty;
+            //this.Options = new List<EbSimpleSelectOption>();
+
+            var result = ServiceClient.Get<GetRenderQuestionResponse>(new GetRenderQuestionsRequest { FormRefid = this.RefId, ControlId = this.ContextId });
+            foreach (GetRenderQuestions option in result.GetRenderQuestions)
+            {
+                EbQuestion Resp = EbSerializers.Json_Deserialize<EbQuestion>(option.Questions.ToString());
+                OuterHtml = Resp.GetHtml();
+                foreach (EbControl opt in Resp.QSec.Controls)
+                {
+                    _html += Resp.QSec.GetHtml(opt);
+                    _html += Resp.ASec.GetHtml(Resp.QSec.Controls.IndexOf(opt));
+                }
+            }
+            OuterHtml.Replace("@body@", _html).Replace("@name@", this.Name).Replace("@ebsid@", this.EbSid_CtxId);
+            this.QuestionStr = OuterHtml;
+        }
 
         [HideInPropertyGrid]
         [JsonIgnore]
@@ -104,36 +128,36 @@ namespace ExpressBase.Objects
 
 
 
-        public void InitFromDataBase(JsonServiceClient ServiceClient)
-        {
-            //RowColletion ds = (ServiceClient.Get<DataSourceDataResponse>(new DataSourceDataRequest { RefId = this.DataSourceId, Start = 0, Length = 1000 })).Data;
+        //public void InitFromDataBase(JsonServiceClient ServiceClient)
+        //{
+        //    //RowColletion ds = (ServiceClient.Get<DataSourceDataResponse>(new DataSourceDataRequest { RefId = this.DataSourceId, Start = 0, Length = 1000 })).Data;
 
-            //for (int i = 0; i < ds.Count; i++)
-            //{
-            //    EbCard Card = new EbCard() { EbSid = "cardEbsid_" + i };
-            //    foreach (EbCardField Field in this.CardFields)
-            //    {
-            //        if (Field.DbFieldMap != null)
-            //        {
-            //            var tempdata = ds[i][Field.DbFieldMap.Data];
-            //            if (Field is EbCardNumericField)
-            //                Card.CustomFields[Field.Name] = Convert.ToDouble(tempdata);
-            //            else
-            //                Card.CustomFields[Field.Name] = tempdata.ToString().Trim();
+        //    //for (int i = 0; i < ds.Count; i++)
+        //    //{
+        //    //    EbCard Card = new EbCard() { EbSid = "cardEbsid_" + i };
+        //    //    foreach (EbCardField Field in this.CardFields)
+        //    //    {
+        //    //        if (Field.DbFieldMap != null)
+        //    //        {
+        //    //            var tempdata = ds[i][Field.DbFieldMap.Data];
+        //    //            if (Field is EbCardNumericField)
+        //    //                Card.CustomFields[Field.Name] = Convert.ToDouble(tempdata);
+        //    //            else
+        //    //                Card.CustomFields[Field.Name] = tempdata.ToString().Trim();
 
-            //            //for getting distinct filter values
-            //            if (this.FilterField?.Name != null && Field.Name == this.FilterField.Name && !this.FilterValues.Contains(tempdata.ToString().Trim()))
-            //            {
-            //                this.FilterValues.Add(tempdata.ToString().Trim());
-            //            }
-            //        }
-            //    }
-            //    Card.CardId = Convert.ToInt32(ds[i][this.ValueMember.Data]);
-            //    Card.Name = "CardIn" + this.Name;//------------------------"CardIn"		
+        //    //            //for getting distinct filter values
+        //    //            if (this.FilterField?.Name != null && Field.Name == this.FilterField.Name && !this.FilterValues.Contains(tempdata.ToString().Trim()))
+        //    //            {
+        //    //                this.FilterValues.Add(tempdata.ToString().Trim());
+        //    //            }
+        //    //        }
+        //    //    }
+        //    //    Card.CardId = Convert.ToInt32(ds[i][this.ValueMember.Data]);
+        //    //    Card.Name = "CardIn" + this.Name;//------------------------"CardIn"		
 
-            //    this.CardCollection.Add(Card);
-            //}
-        }
+        //    //    this.CardCollection.Add(Card);
+        //    //}
+        //}
 
     }
 }

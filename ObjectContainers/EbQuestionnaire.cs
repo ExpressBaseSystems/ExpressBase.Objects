@@ -56,6 +56,13 @@ this.Init = function(id){
     this.ASec = new EbObjects.EbASec(id + 'ASec');
 };";
         }
+        public override string GetHtml()
+        {
+            string _html = @"
+                <div id='cont_@ebsid@' ebsid='@ebsid@' class='Eb-ctrlContainer' Ctype='TableLayout'>
+                <table id='@ebsid@' class='form-render-table' > @body@ </table>";
+            return _html;
+        }
     }
 
     [HideInToolBox]
@@ -81,6 +88,13 @@ this.Init = function(id){
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.SurveyControl)]
         public override List<EbControl> Controls { get; set; }
+
+        public  string GetHtml(EbControl EC)
+        {
+            string _html = "<tr>" + EC.GetHtml() + "</tr>";
+
+            return _html;
+        }
     }
 
     [HideInToolBox]
@@ -102,5 +116,11 @@ this.Init = function(id){
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.SurveyControl)]
         public override List<EbControl> Controls { get; set; }
+        public string GetHtml(int i)
+        {
+            string _html = "<tr>" + Controls[i].GetHtml() + "</tr>";
+
+            return _html;
+        }
     }
 }
