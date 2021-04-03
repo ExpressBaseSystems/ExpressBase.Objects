@@ -54,6 +54,10 @@ namespace ExpressBase.Objects
 this.Init = function(id){
     this.QSec = new EbObjects.EbQSec(id + 'QSec');
     this.ASec = new EbObjects.EbASec(id + 'ASec');
+
+    let textObj = new EbObjects.EbTextControl(id + '_text');
+    textObj.Label = '';
+    this.QSec.Controls.$values.push(textObj);
 };";
         }
     }
