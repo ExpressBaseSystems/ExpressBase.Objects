@@ -1546,6 +1546,7 @@ namespace ExpressBase.Objects
             this.FormData = this.GetEmptyModel();
             Dictionary<string, string> QrsDict = new Dictionary<string, string>();
             List<DbParameter> param = new List<DbParameter>();
+            string DataImportPS = null;
             foreach (KeyValuePair<string, SingleTable> Table in this.FormData.MultipleTables)
             {
                 foreach (SingleRow Row in Table.Value)
@@ -1559,17 +1560,28 @@ namespace ExpressBase.Objects
                             Column.Value = NwCol.Value;
                             Column.F = NwCol.F;
                             param.Add(DataDB.GetNewParameter(Column.Name, (EbDbTypes)Column.Type, Column.Value));
-                            if (Column.Control is EbPowerSelect && !(Column.Control as EbPowerSelect).IsDataFromApi)
+                            if (Column.Control is EbPowerSelect)
                             {
-                                string t = (Column.Control as EbPowerSelect).GetSelectQuery(DataDB, service, p.Value);
-                                QrsDict.Add((Column.Control as EbPowerSelect).EbSid, t);
+                                EbPowerSelect psCtrl = Column.Control as EbPowerSelect;
+                                if (!psCtrl.IsDataFromApi)
+                                {
+                                    string t = psCtrl.GetSelectQuery(DataDB, service, p.Value);
+                                    QrsDict.Add(psCtrl.EbSid, t);
+                                }
+                                if ((psCtrl.IsImportFromApi || !string.IsNullOrWhiteSpace(psCtrl.DataImportId)) && !psCtrl.MultiSelect && p.ValueTo > 0)
+                                    DataImportPS = psCtrl.Name;
                             }
                         }
                     }
                 }
             }
 
-            if (QrsDict.Count > 0)
+            if (DataImportPS != null)
+            {
+                this.FormDataBackup = this.FormData;
+                this.PsImportData(DataDB, service, DataImportPS);
+            }
+            else if (QrsDict.Count > 0)
             {
                 EbFormHelper.AddExtraSqlParams(param, DataDB, this.TableName, this.TableRowId, this.LocationId, this.UserObj.UserId);
 
