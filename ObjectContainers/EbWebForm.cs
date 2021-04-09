@@ -1563,13 +1563,14 @@ namespace ExpressBase.Objects
                             if (Column.Control is EbPowerSelect)
                             {
                                 EbPowerSelect psCtrl = Column.Control as EbPowerSelect;
-                                if (!psCtrl.IsDataFromApi)
+                                if ((psCtrl.IsImportFromApi || !string.IsNullOrWhiteSpace(psCtrl.DataImportId)) && !psCtrl.MultiSelect && p.ValueTo > 0)
+                                    DataImportPS = psCtrl.Name;
+
+                                if (!psCtrl.IsDataFromApi && DataImportPS == null)
                                 {
                                     string t = psCtrl.GetSelectQuery(DataDB, service, p.Value);
                                     QrsDict.Add(psCtrl.EbSid, t);
-                                }
-                                if ((psCtrl.IsImportFromApi || !string.IsNullOrWhiteSpace(psCtrl.DataImportId)) && !psCtrl.MultiSelect && p.ValueTo > 0)
-                                    DataImportPS = psCtrl.Name;
+                                }                                
                             }
                         }
                     }
