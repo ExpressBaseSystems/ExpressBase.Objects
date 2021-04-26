@@ -720,25 +720,25 @@ return '✖';
             }
             set { }
         }
-        public override bool ParameterizeControl(IDatabase DataDB, List<DbParameter> param, string tbl, SingleColumn cField, bool ins, ref int i, ref string _col, ref string _val, ref string _extqry, User usr, SingleColumn ocF)
+        public override bool ParameterizeControl(ParameterizeCtrl_Params args)
         {
-            if (cField.Value == null)
+            if (args.cField.Value == null)
             {
-                param.Add(DataDB.GetNewParameter(cField.Name + "_" + i, this.EbDbType, false));
+                args.param.Add(args.DataDB.GetNewParameter(args.cField.Name + "_" + args.i, this.EbDbType, false));
             }
             else
             {
-                param.Add(DataDB.GetNewParameter(cField.Name + "_" + i, this.EbDbType, cField.Value.ToString().ToLower() == "true" ? true : false));
+                args.param.Add(args.DataDB.GetNewParameter(args.cField.Name + "_" + args.i, this.EbDbType, args.cField.Value.ToString().ToLower() == "true" ? true : false));
             }
 
-            if (ins)
+            if (args.ins)
             {
-                _col += string.Concat(cField.Name, ", ");
-                _val += string.Concat("@", cField.Name, "_", i, ", ");
+                args._cols += string.Concat(args.cField.Name, ", ");
+                args._vals += string.Concat("@", args.cField.Name, "_", args.i, ", ");
             }
             else
-                _col += string.Concat(cField.Name, "=@", cField.Name, "_", i, ", ");
-            i++;
+                args._colvals += string.Concat(args.cField.Name, "=@", args.cField.Name, "_", args.i, ", ");
+            args.i++;
             return true;
         }
 
@@ -881,9 +881,9 @@ $(`[ebsid=${p1.DG.EbSid_CtxId}]`).on('change', `[colname=${this.Name}] [ui-inp]`
         }
 
 
-        public override bool ParameterizeControl(IDatabase DataDB, List<DbParameter> param, string tbl, SingleColumn cField, bool ins, ref int i, ref string _col, ref string _val, ref string _extqry, User usr, SingleColumn ocF)
+        public override bool ParameterizeControl(ParameterizeCtrl_Params args)
         {
-            return this.EbDate.ParameterizeControl(DataDB, param, tbl, cField, ins, ref i, ref _col, ref _val, ref _extqry, usr, ocF);
+            return this.EbDate.ParameterizeControl(args);
         }
 
         //EbDGDateColumn

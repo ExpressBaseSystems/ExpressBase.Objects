@@ -498,66 +498,66 @@ namespace ExpressBase.Objects
             }
         }
 
-        public override bool ParameterizeControl(IDatabase DataDB, List<DbParameter> param, string tbl, SingleColumn cField, bool ins, ref int i, ref string _col, ref string _val, ref string _extqry, User usr, SingleColumn ocF)
+        public override bool ParameterizeControl(ParameterizeCtrl_Params args)
         {
             bool AvoidParam = false;
 
-            if (cField.Value == null)
+            if (args.cField.Value == null)
             {
-                var p = DataDB.GetNewParameter(cField.Name + "_" + i, (EbDbTypes)cField.Type);
+                var p = args.DataDB.GetNewParameter(args.cField.Name + "_" + args.i, (EbDbTypes)args.cField.Type);
                 p.Value = DBNull.Value;
-                param.Add(p);
+                args.param.Add(p);
                 if (this.Sendotp)
                 {
-                    param.Add(DataDB.GetNewParameter(cField.Name + FormConstants._verified + "_" + i, EbDbTypes.Boolean, false));
+                    args.param.Add(args.DataDB.GetNewParameter(args.cField.Name + FormConstants._verified + "_" + args.i, EbDbTypes.Boolean, false));
                 }
             }
             else
             {
-                param.Add(DataDB.GetNewParameter(cField.Name + "_" + i, (EbDbTypes)cField.Type, cField.Value));
+                args.param.Add(args.DataDB.GetNewParameter(args.cField.Name + "_" + args.i, (EbDbTypes)args.cField.Type, args.cField.Value));
                 if (this.Sendotp)
                 {
-                    if (ins)
+                    if (args.ins)
                     {
-                        this.VerifyOTP(DataDB, param, cField, i, usr);
+                        this.VerifyOTP(args.DataDB, args.param, args.cField, args.i, args.usr);
                     }
                     else
                     {
-                        Dictionary<string, string> _od = JsonConvert.DeserializeObject<Dictionary<string, string>>(ocF.M);
+                        Dictionary<string, string> _od = JsonConvert.DeserializeObject<Dictionary<string, string>>(args.ocF.M);
                         if (_od[FormConstants.is_verified] == "true")
                         {
-							if(String.Equals(cField.Value ,ocF.Value))// phone number changed
+							if(String.Equals(args.cField.Value , args.ocF.Value))// phone number changed
 								AvoidParam = true; 
                             else
-								this.VerifyOTP(DataDB, param, cField, i, usr);
+								this.VerifyOTP(args.DataDB, args.param, args.cField, args.i, args.usr);
 						}
                         else
                         {
-                            this.VerifyOTP(DataDB, param, cField, i, usr);
+                            this.VerifyOTP(args.DataDB, args.param, args.cField, args.i, args.usr);
                         }
                     }
                 }
             }
 
-            if (ins)
+            if (args.ins)
             {
-                _col += string.Concat(cField.Name, ", ");
-                _val += string.Concat("@", cField.Name, "_", i, ", ");
+                args._cols += string.Concat(args.cField.Name, ", ");
+                args._vals += string.Concat("@", args.cField.Name, "_", args.i, ", ");
                 if (this.Sendotp)
                 {
-                    _col += string.Concat(cField.Name, FormConstants._verified, ", ");
-                    _val += string.Concat("@", cField.Name, FormConstants._verified, "_", i, ", ");
+                    args._cols += string.Concat(args.cField.Name, FormConstants._verified, ", ");
+                    args._vals += string.Concat("@", args.cField.Name, FormConstants._verified, "_", args.i, ", ");
                 }
             }
             else
             {
-                _col += string.Concat(cField.Name, "=@", cField.Name, "_", i, ", ");
+                args._colvals += string.Concat(args.cField.Name, "=@", args.cField.Name, "_", args.i, ", ");
                 if (this.Sendotp && !AvoidParam)
                 {
-                    _col += string.Concat(cField.Name, FormConstants._verified, "=@", cField.Name, FormConstants._verified, "_", i, ", ");
+                    args._colvals += string.Concat(args.cField.Name, FormConstants._verified, "=@", args.cField.Name, FormConstants._verified, "_", args.i, ", ");
                 }
             }
-            i++;
+            args.i++;
             return true;
         }
     }

@@ -421,28 +421,28 @@ else {
         //.Replace("@Label@ ", this.Label ?? "@Label@ ");
         //        }
 
-        public override bool ParameterizeControl(IDatabase DataDB, List<DbParameter> param, string tbl, SingleColumn cField, bool ins, ref int i, ref string _col, ref string _val, ref string _extqry, User usr, SingleColumn ocF)
+        public override bool ParameterizeControl(ParameterizeCtrl_Params args)
         {
-            if (cField.Value == null)
+            if (args.cField.Value == null)
             {
-                var p = DataDB.GetNewParameter(cField.Name + CharConstants.UNDERSCORE + i, (EbDbTypes)cField.Type);
+                var p = args.DataDB.GetNewParameter(args.cField.Name + CharConstants.UNDERSCORE + args.i, (EbDbTypes)args.cField.Type);
                 p.Value = DBNull.Value;
-                param.Add(p);
+                args.param.Add(p);
             }
             else if (!this.BypassParameterization)// (this.BypassParameterization && cField.Value == null) ~> error
-                param.Add(DataDB.GetNewParameter(cField.Name + CharConstants.UNDERSCORE + i, (EbDbTypes)cField.Type, cField.Value));
+                args.param.Add(args.DataDB.GetNewParameter(args.cField.Name + CharConstants.UNDERSCORE + args.i, (EbDbTypes)args.cField.Type, args.cField.Value));
 
-            if (ins)
+            if (args.ins)
             {
-                _col += cField.Name + CharConstants.COMMA + CharConstants.SPACE;
+                args._cols += args.cField.Name + CharConstants.COMMA + CharConstants.SPACE;
                 if (this.BypassParameterization)
-                    _val += Convert.ToString(cField.Value) + CharConstants.COMMA + CharConstants.SPACE;
+                    args._vals += Convert.ToString(args.cField.Value) + CharConstants.COMMA + CharConstants.SPACE;
                 else
-                    _val += CharConstants.AT + cField.Name + CharConstants.UNDERSCORE + i + CharConstants.COMMA + CharConstants.SPACE;
+                    args._vals += CharConstants.AT + args.cField.Name + CharConstants.UNDERSCORE + args.i + CharConstants.COMMA + CharConstants.SPACE;
             }
             else
-                _col += cField.Name + CharConstants.EQUALS + CharConstants.AT + cField.Name + CharConstants.UNDERSCORE + i + CharConstants.COMMA + CharConstants.SPACE;
-            i++;
+                args._colvals += args.cField.Name + CharConstants.EQUALS + CharConstants.AT + args.cField.Name + CharConstants.UNDERSCORE + args.i + CharConstants.COMMA + CharConstants.SPACE;
+            args.i++;
             return true;
         }
     }

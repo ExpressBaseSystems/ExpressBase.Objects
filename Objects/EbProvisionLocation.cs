@@ -257,52 +257,52 @@ this.Init = function(id)
             param.Add(DataDB.GetNewParameter($"{key}_{i}", type, altVal));
         }
 
-        public override bool ParameterizeControl(IDatabase DataDB, List<DbParameter> param, string tbl, SingleColumn cField, bool ins, ref int i, ref string _col, ref string _val, ref string _extqry, User usr, SingleColumn ocF)
+        public override bool ParameterizeControl(ParameterizeCtrl_Params args)
         {
-            Dictionary<string, string> _d = JsonConvert.DeserializeObject<Dictionary<string, string>>(Convert.ToString(cField.F));
-            Dictionary<string, string> _od = ocF == null ? null : JsonConvert.DeserializeObject<Dictionary<string, string>>(Convert.ToString(ocF.F));
+            Dictionary<string, string> _d = JsonConvert.DeserializeObject<Dictionary<string, string>>(Convert.ToString(args.cField.F));
+            Dictionary<string, string> _od = args.ocF == null ? null : JsonConvert.DeserializeObject<Dictionary<string, string>>(Convert.ToString(args.ocF.F));
             if (string.IsNullOrEmpty(_d[FormConstants.longname]))
                 return false;
             string selQry = "SELECT id FROM eb_locations WHERE LOWER(longname) LIKE LOWER(@longname) AND COALESCE(eb_del, 'F') = 'F';";
-            EbDataTable dt = DataDB.DoQuery(selQry, new DbParameter[] { DataDB.GetNewParameter(FormConstants.longname, EbDbTypes.String, _d[FormConstants.longname]) });
+            EbDataTable dt = args.DataDB.DoQuery(selQry, new DbParameter[] { args.DataDB.GetNewParameter(FormConstants.longname, EbDbTypes.String, _d[FormConstants.longname]) });
             int nProvLocId = 0;
             if (dt.Rows.Count > 0)
                 nProvLocId = Convert.ToInt32(dt.Rows[0][0]);
             string temp;
-            if (ins)
+            if (args.ins)
             {
                 if (nProvLocId > 0)
                     throw new FormException(_d[FormConstants.longname] + " is not unique.", (int)HttpStatusCode.BadRequest, "Given longname is already exists in eb_locations", "EbProvisionLocation -> ParameterizeControl");
 
                 temp = $@"INSERT INTO eb_locations(longname, shortname, image, meta_json, is_group, parent_id, eb_location_types_id, eb_ver_id, eb_data_id, eb_created_by, eb_created_at, eb_lastmodified_by, eb_lastmodified_at, eb_del) 
-                    VALUES(@longname_{i}, @shortname_{i}, @image_{i}, @meta_json_{i}, @is_group_{i}, @parent_id_{i}, @eb_location_types_id_{i}, @{tbl}_eb_ver_id, eb_currval('{tbl}_id_seq'), @{FormConstants.eb_createdby}, {DataDB.EB_CURRENT_TIMESTAMP}, @{FormConstants.eb_createdby}, {DataDB.EB_CURRENT_TIMESTAMP}, 'F');";
+                    VALUES(@longname_{args.i}, @shortname_{args.i}, @image_{args.i}, @meta_json_{args.i}, @is_group_{args.i}, @parent_id_{args.i}, @eb_location_types_id_{args.i}, @{args.tbl}_eb_ver_id, eb_currval('{args.tbl}_id_seq'), @{FormConstants.eb_createdby}, {args.DataDB.EB_CURRENT_TIMESTAMP}, @{FormConstants.eb_createdby}, {args.DataDB.EB_CURRENT_TIMESTAMP}, 'F');";
 
-                if (DataDB.Vendor == DatabaseVendors.MYSQL)
+                if (args.DataDB.Vendor == DatabaseVendors.MYSQL)
                     temp += "SELECT eb_persist_currval('eb_locations_id_seq');";
-                temp += $"UPDATE {this.VirtualTable} SET {this.Name} = eb_currval('eb_locations_id_seq') WHERE {(this.VirtualTable == tbl ? "id" : (tbl + "_id"))} = eb_currval('{tbl}_id_seq'); ";
+                temp += $"UPDATE {this.VirtualTable} SET {this.Name} = eb_currval('eb_locations_id_seq') WHERE {(this.VirtualTable == args.tbl ? "id" : (args.tbl + "_id"))} = eb_currval('{args.tbl}_id_seq'); ";
 
                 this.IsLocationCreated = true;
             }
             else
             {
-                int oProvLocId = ocF == null ? 0 : Convert.ToInt32(ocF.Value);
+                int oProvLocId = args.ocF == null ? 0 : Convert.ToInt32(args.ocF.Value);
                 if (nProvLocId > 0 && nProvLocId != oProvLocId)
                     throw new FormException(_d[FormConstants.longname] + " is not unique.", (int)HttpStatusCode.BadRequest, "Given longname is already exists in eb_locations", "EbProvisionLocation -> ParameterizeControl");
 
-                temp = $@"UPDATE eb_locations SET longname = @longname_{i}, shortname = @shortname_{i}, image = @image_{i}, meta_json = @meta_json_{i}, 
-                            is_group = @is_group_{i}, parent_id = @parent_id_{i}, eb_location_types_id = @eb_location_types_id_{i}, eb_lastmodified_by = @{FormConstants.eb_modified_by}, eb_lastmodified_at = {DataDB.EB_CURRENT_TIMESTAMP}
-                            WHERE eb_ver_id = :{tbl}_eb_ver_id AND eb_data_id = :{tbl}_id AND COALESCE(eb_del, 'F') = 'F';";
+                temp = $@"UPDATE eb_locations SET longname = @longname_{args.i}, shortname = @shortname_{args.i}, image = @image_{args.i}, meta_json = @meta_json_{args.i}, 
+                            is_group = @is_group_{args.i}, parent_id = @parent_id_{args.i}, eb_location_types_id = @eb_location_types_id_{args.i}, eb_lastmodified_by = @{FormConstants.eb_modified_by}, eb_lastmodified_at = {args.DataDB.EB_CURRENT_TIMESTAMP}
+                            WHERE eb_ver_id = :{args.tbl}_eb_ver_id AND eb_data_id = :{args.tbl}_id AND COALESCE(eb_del, 'F') = 'F';";
             }
-            param.Add(DataDB.GetNewParameter("longname_" + i, EbDbTypes.String, _d[FormConstants.longname]));
-            AddParam(DataDB, param, i, EbDbTypes.String, _d, _od, FormConstants.shortname, _d[FormConstants.longname]);
-            AddParam(DataDB, param, i, EbDbTypes.String, _d, _od, FormConstants.image, "../img");
-            AddParam(DataDB, param, i, EbDbTypes.String, _d, _od, FormConstants.meta_json, "{}");
-            AddParam(DataDB, param, i, EbDbTypes.String, _d, _od, FormConstants.is_group, "T");
-            AddParam(DataDB, param, i, EbDbTypes.Decimal, _d, _od, FormConstants.parent_id, 0);
-            AddParam(DataDB, param, i, EbDbTypes.Int32, _d, _od, FormConstants.eb_location_types_id, 1);
+            args.param.Add(args.DataDB.GetNewParameter("longname_" + args.i, EbDbTypes.String, _d[FormConstants.longname]));
+            AddParam(args.DataDB, args.param, args.i, EbDbTypes.String, _d, _od, FormConstants.shortname, _d[FormConstants.longname]);
+            AddParam(args.DataDB, args.param, args.i, EbDbTypes.String, _d, _od, FormConstants.image, "../img");
+            AddParam(args.DataDB, args.param, args.i, EbDbTypes.String, _d, _od, FormConstants.meta_json, "{}");
+            AddParam(args.DataDB, args.param, args.i, EbDbTypes.String, _d, _od, FormConstants.is_group, "T");
+            AddParam(args.DataDB, args.param, args.i, EbDbTypes.Decimal, _d, _od, FormConstants.parent_id, 0);
+            AddParam(args.DataDB, args.param, args.i, EbDbTypes.Int32, _d, _od, FormConstants.eb_location_types_id, 1);
 
-            _extqry = temp + _extqry; //location must be created before user creation
-            i++;
+            args._extqry = temp + args._extqry; //location must be created before user creation
+            args.i++;
             return true;
         }
 

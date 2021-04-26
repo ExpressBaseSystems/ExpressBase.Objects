@@ -24,8 +24,11 @@ namespace ExpressBase.Objects
 
         public void Insert(IDatabase DataDB, List<DbParameter> param, ref string fullqry, ref string _extqry, ref int i)
         {
+            ParameterizeCtrl_Params args = new ParameterizeCtrl_Params(DataDB, param, i, _extqry);
             foreach (EbWebForm WebForm in this)
             {
+                args.SetFormRelated(WebForm.TableName, WebForm.UserObj);
+
                 if (WebForm.DataPusherConfig?.AllowPush == false)
                     continue;
                 if (!(WebForm.FormData.MultipleTables.ContainsKey(WebForm.FormSchema.MasterTable) && WebForm.FormData.MultipleTables[WebForm.FormSchema.MasterTable].Count > 0))
@@ -40,38 +43,43 @@ namespace ExpressBase.Objects
 
                     foreach (SingleRow row in WebForm.FormData.MultipleTables[_table.TableName])
                     {
-                        string _cols = string.Empty;
-                        string _values = string.Empty;
+                        args.ResetColsAndVals();
 
                         foreach (SingleColumn cField in row.Columns)
                         {
+                            args.InsertSet(cField);
+
                             if (cField.Control != null)
-                                cField.Control.ParameterizeControl(DataDB, param, WebForm.TableName, cField, true, ref i, ref _cols, ref _values, ref _extqry, WebForm.UserObj, null);
+                                cField.Control.ParameterizeControl(args);
                             else
-                                WebForm.ParameterizeUnknown(DataDB, param, cField, true, ref i, ref _cols, ref _values);
+                                WebForm.ParameterizeUnknown(args);
                         }
 
                         string _qry = QueryGetter.GetInsertQuery(WebForm, DataDB, _table.TableName, true);
-                        fullqry += string.Format(_qry, _cols, _values);
+                        fullqry += string.Format(_qry, args._cols, args._vals);
 
-                        fullqry += WebForm.InsertUpdateLines(_table.TableName, row, DataDB, param, ref i);
+                        fullqry += WebForm.InsertUpdateLines(_table.TableName, row, args);
                     }
                 }
                 param.Add(DataDB.GetNewParameter(WebForm.TableName + FormConstants._eb_ver_id, EbDbTypes.Int32, WebForm.RefId.Split(CharConstants.DASH)[4]));
                 param.Add(DataDB.GetNewParameter("refid", EbDbTypes.String, WebForm.RefId));
             }
+
+            args.CopyBack(ref _extqry, ref i);
         }
 
         public void Update(IDatabase DataDB, List<DbParameter> param, ref string fullqry, ref string _extqry, ref int i)
         {
+            ParameterizeCtrl_Params args = new ParameterizeCtrl_Params(DataDB, param, i, _extqry);
             foreach (EbWebForm WebForm in this)
             {
+                args.SetFormRelated(WebForm.TableName, WebForm.UserObj);
+
                 foreach (KeyValuePair<string, SingleTable> entry in WebForm.FormData.MultipleTables)
                 {
                     foreach (SingleRow row in entry.Value)
                     {
-                        string _colvals = string.Empty;
-                        string _temp = string.Empty;
+                        args.ResetColVals();
                         if (row.RowId > 0)
                         {
                             SingleRow bkup_Row = WebForm.FormDataBackup.MultipleTables[entry.Key].Find(e => e.RowId == row.RowId);
@@ -88,10 +96,14 @@ namespace ExpressBase.Objects
                                     if (cField.Control != null)
                                     {
                                         SingleColumn ocF = bkup_Row.Columns.Find(e => e.Name.Equals(cField.Name));
-                                        cField.Control.ParameterizeControl(DataDB, param, WebForm.TableName, cField, false, ref i, ref _colvals, ref _temp, ref _extqry, WebForm.UserObj, ocF);
+                                        args.UpdateSet(cField, ocF);
+                                        cField.Control.ParameterizeControl(args);
                                     }
                                     else
-                                        WebForm.ParameterizeUnknown(DataDB, param, cField, false, ref i, ref _colvals, ref _temp);
+                                    {
+                                        args.UpdateSet(cField);
+                                        WebForm.ParameterizeUnknown(args);
+                                    }
                                 }
                             }
                             else if (WebForm.DataPusherConfig == null && !entry.Key.Equals(WebForm.TableName))
@@ -100,39 +112,38 @@ namespace ExpressBase.Objects
                                 foreach (TableSchema _table in _tables)
                                 {
                                     t += $@"UPDATE {_table.TableName} SET eb_del = 'T', eb_lastmodified_by = @eb_modified_by, eb_lastmodified_at = {DataDB.EB_CURRENT_TIMESTAMP} WHERE
-                                        {entry.Key}_id = @{entry.Key}_id_{i} AND {WebForm.TableName}_id = @{WebForm.TableName}_id AND COALESCE(eb_del, 'F') = 'F'; ";
-                                    param.Add(DataDB.GetNewParameter(entry.Key + "_id_" + i, EbDbTypes.Int32, row.RowId));
-                                    i++;
+                                        {entry.Key}_id = @{entry.Key}_id_{args.i} AND {WebForm.TableName}_id = @{WebForm.TableName}_id AND COALESCE(eb_del, 'F') = 'F'; ";
+                                    param.Add(DataDB.GetNewParameter(entry.Key + "_id_" + args.i, EbDbTypes.Int32, row.RowId));
+                                    args.i++;
                                 }
                             }
 
                             string _qry = QueryGetter.GetUpdateQuery(WebForm, DataDB, entry.Key, row.IsDelete);
-                            fullqry += string.Format(_qry, _colvals, row.RowId);
+                            fullqry += string.Format(_qry, args._colvals, row.RowId);
                             fullqry += t;
                         }
                         else
                         {
-                            string _cols = string.Empty;
-                            string _vals = string.Empty;
+                            args.ResetColsAndVals();
 
                             foreach (SingleColumn cField in row.Columns)
                             {
+                                args.InsertSet(cField);
                                 if (cField.Control != null)
-                                    cField.Control.ParameterizeControl(DataDB, param, WebForm.TableName, cField, true, ref i, ref _cols, ref _vals, ref _extqry, WebForm.UserObj, null);
+                                    cField.Control.ParameterizeControl(args);
                                 else
-                                    WebForm.ParameterizeUnknown(DataDB, param, cField, true, ref i, ref _cols, ref _vals);
+                                    WebForm.ParameterizeUnknown(args);
                             }
                             string _qry = QueryGetter.GetInsertQuery(WebForm, DataDB, entry.Key, WebForm.TableRowId == 0);
-                            fullqry += string.Format(_qry, _cols, _vals);
+                            fullqry += string.Format(_qry, args._cols, args._vals);
                         }
-
-                        fullqry += WebForm.InsertUpdateLines(entry.Key, row, DataDB, param, ref i);
-
+                        fullqry += WebForm.InsertUpdateLines(entry.Key, row, args);
                     }
                 }
                 param.Add(DataDB.GetNewParameter(WebForm.TableName + FormConstants._id, EbDbTypes.Int32, WebForm.TableRowId));
                 param.Add(DataDB.GetNewParameter(WebForm.TableName + FormConstants._eb_ver_id, EbDbTypes.Int32, WebForm.RefId.Split(CharConstants.DASH)[4]));
             }
+            args.CopyBack(ref _extqry, ref i);
         }
 
         public void ExecUniqueCheck(IDatabase DataDB)
