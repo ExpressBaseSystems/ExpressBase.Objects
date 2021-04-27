@@ -94,6 +94,13 @@ namespace ExpressBase.Objects.Services
             this.MessageQueueClient = _mqc as RabbitMqQueueClient;
         }
 
+        public EbMqBaseService(IServiceClient _ssclient, IMessageProducer _mqp, IMessageQueueClient _mqc)
+        {
+            this.ServiceStackClient = _ssclient as JsonServiceClient;
+            this.MessageProducer3 = _mqp as RabbitMqProducer;
+            this.MessageQueueClient = _mqc as RabbitMqQueueClient;
+        }
+
         public EbMqBaseService(IMessageProducer _mqp, IMessageQueueClient _mqc, IEbServerEventClient _sec)
         {
             this.MessageProducer3 = _mqp as RabbitMqProducer;
