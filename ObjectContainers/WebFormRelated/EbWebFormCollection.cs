@@ -27,7 +27,7 @@ namespace ExpressBase.Objects
             ParameterizeCtrl_Params args = new ParameterizeCtrl_Params(DataDB, param, i, _extqry);
             foreach (EbWebForm WebForm in this)
             {
-                args.SetFormRelated(WebForm.TableName, WebForm.UserObj);
+                args.SetFormRelated(WebForm.TableName, WebForm.UserObj, WebForm);
 
                 if (WebForm.DataPusherConfig?.AllowPush == false)
                     continue;
@@ -73,7 +73,7 @@ namespace ExpressBase.Objects
             ParameterizeCtrl_Params args = new ParameterizeCtrl_Params(DataDB, param, i, _extqry);
             foreach (EbWebForm WebForm in this)
             {
-                args.SetFormRelated(WebForm.TableName, WebForm.UserObj);
+                args.SetFormRelated(WebForm.TableName, WebForm.UserObj, WebForm);
 
                 foreach (KeyValuePair<string, SingleTable> entry in WebForm.FormData.MultipleTables)
                 {

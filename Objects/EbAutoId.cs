@@ -14,6 +14,7 @@ using ExpressBase.Security;
 using ExpressBase.Common.Constants;
 using ExpressBase.Objects.ServiceStack_Artifacts;
 using System.Net;
+using ExpressBase.Objects.WebFormRelated;
 
 namespace ExpressBase.Objects
 {
@@ -180,45 +181,49 @@ namespace ExpressBase.Objects
                 {
                     args._vals += Convert.ToString(args.cField.Value) + CharConstants.COMMA + CharConstants.SPACE;
                 }
-                else if (!string.IsNullOrWhiteSpace(this.Script?.Code))
-                {
-                    if (this.Script.Lang == ScriptingLanguage.CSharp)
-                    {
-                        //decision pending....
-                    }
-                    else if (this.Script.Lang == ScriptingLanguage.SQL)
-                    {
-                        if (this.Pattern.SerialLength == 0)
-                            throw new FormException("Unable to process", (int)HttpStatusCode.InternalServerError, "Invalid serial length for AutoId: " + args.cField.Name, "EbAutoId => ParameterizeControl");
-
-                        if (args.DataDB.Vendor == DatabaseVendors.MYSQL)//Not fixed - rewite using MAX
-                            args._vals += string.Format("CONCAT(({1}), (SELECT LPAD(CAST((COUNT(*) + 1) AS CHAR(12)), {2}, '0') FROM {3} tbl WHERE tbl.{0} LIKE '{4}%')),", args.cField.Name, args.i, this.Pattern.SerialLength, args.tbl, args.cField.Value);
-                        else
-                            args._vals += string.Format("(({1}) || COALESCE((SELECT LPAD((RIGHT(MAX({0}), {2}) :: INTEGER + 1) :: TEXT, {2}, '0') FROM {3} WHERE {0} LIKE '{4}%' AND LENGTH(REGEXP_REPLACE(RIGHT({0}, {2}), '\\D','','g')) = {2}), LPAD('1', {2}, '0'))),",
-                            args.cField.Name,
-                            this.Script.Code,
-                            this.Pattern.SerialLength,
-                            args.tbl,
-                            args.cField.Value);
-                    }
-                    else
-                        throw new FormException("Unable to process", (int)HttpStatusCode.InternalServerError, $"Invalid script lang {this.Script.Lang} for AutoId: {args.cField.Name}", "EbAutoId => ParameterizeControl");
-                }
                 else
                 {
+                    bool isSql = false;
+
+                    if (!string.IsNullOrWhiteSpace(this.Script?.Code))
+                    {
+                        if (this.Script.Lang == ScriptingLanguage.CSharp)
+                        {
+                            EbWebForm WebForm = args.webForm as EbWebForm;
+                            if (WebForm.FormGlobals == null)
+                                WebForm.FormGlobals = GlobalsGenerator.GetCSharpFormGlobals_NEW(WebForm, WebForm.FormData, WebForm.FormDataBackup, args.DataDB);
+
+                            args.cField.Value = Convert.ToString(WebForm.ExecuteCSharpScriptNew(this.Script.Code, WebForm.FormGlobals));
+
+                            if (string.IsNullOrWhiteSpace(Convert.ToString(args.cField.Value)))
+                                throw new FormException("Unable to process", (int)HttpStatusCode.InternalServerError, "Null or empty string returned by C# script of AutoId: " + args.cField.Name, "EbAutoId => ParameterizeControl");
+                        }
+                        else if (this.Script.Lang == ScriptingLanguage.SQL)
+                            isSql = true;
+                        else
+                            throw new FormException("Unable to process", (int)HttpStatusCode.InternalServerError, $"Invalid script lang {this.Script.Lang} for AutoId: {args.cField.Name}", "EbAutoId => ParameterizeControl");
+                    }
+
                     if (string.IsNullOrWhiteSpace(Convert.ToString(args.cField.Value)) || this.Pattern.SerialLength == 0)
                         throw new FormException("Unable to process", (int)HttpStatusCode.InternalServerError, "Invalid pattern for AutoId: " + args.cField.Name, "EbAutoId => ParameterizeControl");
 
                     if (args.DataDB.Vendor == DatabaseVendors.MYSQL)//Not fixed - rewite using MAX
-                        args._vals += string.Format("CONCAT(@{0}_{1}, (SELECT LPAD(CAST((COUNT(*) + 1) AS CHAR(12)), {2}, '0') FROM {3} tbl WHERE tbl.{0} LIKE '{4}%')),", args.cField.Name, args.i, this.Pattern.SerialLength, args.tbl, args.cField.Value);
+                        args._vals += string.Format("CONCAT(({1}), (SELECT LPAD(CAST((COUNT(*) + 1) AS CHAR(12)), {2}, '0') FROM {3} tbl WHERE tbl.{0} LIKE ({4}))),",
+                            args.cField.Name,
+                            isSql ? this.Script.Code : $"@{args.cField.Name}_{args.i}",
+                            this.Pattern.SerialLength,
+                            args.tbl,
+                            isSql ? $"({this.Script.Code}) || '%'" : $"'args.cField.Value%'");
                     else
-                        args._vals += string.Format("(@{0}_{1} || COALESCE((SELECT LPAD((RIGHT(MAX({0}), {2}) :: INTEGER + 1) :: TEXT, {2}, '0') FROM {3} WHERE {0} LIKE '{4}%' AND LENGTH(REGEXP_REPLACE(RIGHT({0}, {2}), '\\D','','g')) = {2}), LPAD('1', {2}, '0'))),",
-                        args.cField.Name,
-                        args.i,
-                        this.Pattern.SerialLength,
-                        args.tbl,
-                        args.cField.Value);
-                    args.param.Add(args.DataDB.GetNewParameter(args.cField.Name + "_" + args.i, (EbDbTypes)args.cField.Type, args.cField.Value));
+                        args._vals += string.Format("(({1}) || COALESCE((SELECT LPAD((RIGHT(MAX({0}), {2}) :: INTEGER + 1) :: TEXT, {2}, '0') FROM {3} WHERE {0} LIKE ({4}) AND LENGTH(REGEXP_REPLACE(RIGHT({0}, {2}), '\\D','','g')) = {2}), LPAD('1', {2}, '0'))),",
+                            args.cField.Name,
+                            isSql ? this.Script.Code : $"@{args.cField.Name}_{args.i}",
+                            this.Pattern.SerialLength,
+                            args.tbl,
+                            isSql ? $"({this.Script.Code}) || '%'" : $"'{args.cField.Value}%'");
+
+                    if (!isSql)
+                        args.param.Add(args.DataDB.GetNewParameter(args.cField.Name + "_" + args.i, (EbDbTypes)args.cField.Type, Convert.ToString(args.cField.Value)));
                 }
                 args.i++;
                 return true;

@@ -1770,7 +1770,7 @@ namespace ExpressBase.Objects
             string fullqry = string.Empty;
             string tempStr = string.Empty;////////////////////warning
             ParameterizeCtrl_Params inArgs = new ParameterizeCtrl_Params(args.DataDB, args.param, args.i, tempStr);
-            inArgs.SetFormRelated(this.TableName, this.UserObj);
+            inArgs.SetFormRelated(this.TableName, this.UserObj, this);
 
             if (parentRow.LinesTable.Key != null)// Lines table of the grid
             {
