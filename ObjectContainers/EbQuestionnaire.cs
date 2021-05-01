@@ -62,10 +62,8 @@ this.Init = function(id){
         }
         public override string GetHtml()
         {
-            string _html = @"
-                <div id='cont_@ebsid@' ebsid='@ebsid@' class='Eb-ctrlContainer' Ctype='TableLayout'>
-                <table id='@ebsid@' class='form-render-table' > @body@ </table>";
-            return _html;
+            string _html = @"<div class='q-pane'> <div class='q-sec'>@Qsec@</div><div class='a-sec'> @Asec@</div> </div>";          
+            return _html.Replace("@Qsec@", this.QSec.GetHtml()).Replace("@Asec@", this.ASec.GetHtml());
         }
     }
 
@@ -93,10 +91,13 @@ this.Init = function(id){
         [EnableInBuilder(BuilderType.SurveyControl)]
         public override List<EbControl> Controls { get; set; }
 
-        public  string GetHtml(EbControl EC)
+        public override  string GetHtml()
         {
-            string _html = "<tr>" + EC.GetHtml() + "</tr>";
-
+            string _html = string.Empty;
+            foreach (EbControl EC in this.Controls)
+            {
+                _html += EC.GetHtml();
+            }
             return _html;
         }
     }
@@ -120,10 +121,13 @@ this.Init = function(id){
         [HideInPropertyGrid]
         [EnableInBuilder(BuilderType.SurveyControl)]
         public override List<EbControl> Controls { get; set; }
-        public string GetHtml(int i)
+        public override string GetHtml()
         {
-            string _html = "<tr>" + Controls[i].GetHtml() + "</tr>";
-
+            string _html = string.Empty;
+            foreach (EbControl AsecControl in this.Controls)
+            {
+                _html += AsecControl.GetHtml();
+            }
             return _html;
         }
     }
