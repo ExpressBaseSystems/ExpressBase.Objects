@@ -14,6 +14,7 @@ using ExpressBase.Security;
 using ExpressBase.Common.Constants;
 using ExpressBase.Objects.ServiceStack_Artifacts;
 using System.Net;
+using ExpressBase.Objects.WebFormRelated;
 
 namespace ExpressBase.Objects
 {
@@ -42,7 +43,7 @@ namespace ExpressBase.Objects
 
         [HideInPropertyGrid]
         public override EbScript HiddenExpr { get; set; }
-        
+
         [HideInPropertyGrid]
         public override EbScript DisableExpr { get; set; }
 
@@ -62,7 +63,13 @@ namespace ExpressBase.Objects
 
         [EnableInBuilder(BuilderType.WebForm)]
         [PropertyEditor(PropertyEditorType.Expandable)]
+        [PropertyGroup(PGConstants.CORE)]
         public EbAutoIdPattern Pattern { get; set; }
+
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorCS, PropertyEditorType.ScriptEditorSQ)]
+        [PropertyGroup(PGConstants.CORE)]
+        public EbScript Script { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm)]
         [HideInPropertyGrid]
@@ -102,20 +109,20 @@ namespace ExpressBase.Objects
 
             return ReplacePropsInHTML(EbCtrlHTML);
 
-        //    string WraperHtml = @"
-        //<div id='cont_@ebsid@' ebsid='@ebsid@' name='@name@' class='Eb-ctrlContainer' @childOf@ ctype='@type@' eb-hidden='@isHidden@'>            
-        //    <span class='eb-ctrl-label' ui-label id='@ebsidLbl' style='font-weight: 500;'>@Label@ </span> @req@ 
-        //        <div  id='@ebsid@Wraper' class='ctrl-cover'>
-        //            @barehtml@
-        //        </div>
-        //    <span class='helpText' ui-helptxt >@helpText@ </span>
-        //</div>";
+            //    string WraperHtml = @"
+            //<div id='cont_@ebsid@' ebsid='@ebsid@' name='@name@' class='Eb-ctrlContainer' @childOf@ ctype='@type@' eb-hidden='@isHidden@'>            
+            //    <span class='eb-ctrl-label' ui-label id='@ebsidLbl' style='font-weight: 500;'>@Label@ </span> @req@ 
+            //        <div  id='@ebsid@Wraper' class='ctrl-cover'>
+            //            @barehtml@
+            //        </div>
+            //    <span class='helpText' ui-helptxt >@helpText@ </span>
+            //</div>";
 
-        //    string EbCtrlHTML = WraperHtml
-        //       .Replace("@LabelForeColor ", "color:" + (LabelForeColor ?? "@LabelForeColor ") + ";")
-        //       .Replace("@LabelBackColor ", "background-color:" + (LabelBackColor ?? "@LabelBackColor ") + ";");
+            //    string EbCtrlHTML = WraperHtml
+            //       .Replace("@LabelForeColor ", "color:" + (LabelForeColor ?? "@LabelForeColor ") + ";")
+            //       .Replace("@LabelBackColor ", "background-color:" + (LabelBackColor ?? "@LabelBackColor ") + ";");
 
-        //    return ReplacePropsInHTML(EbCtrlHTML);
+            //    return ReplacePropsInHTML(EbCtrlHTML);
         }
 
         public override string GetDesignHtml()
@@ -162,35 +169,63 @@ namespace ExpressBase.Objects
 .Replace("@required@", (this.Required && !this.Hidden ? " required" : string.Empty))
 .Replace("@placeHolder@", "placeholder=''");
         }
-        
+
         public override string EnableJSfn { get { return @""; } set { } }
 
-        public override bool ParameterizeControl(IDatabase DataDB, List<DbParameter> param, string tbl, SingleColumn cField, bool ins, ref int i, ref string _col, ref string _val, ref string _extqry, User usr, SingleColumn ocF)
+        public override bool ParameterizeControl(ParameterizeCtrl_Params args)
         {
-            if (ins)
+            if (args.ins)
             {
-                _col += string.Concat(cField.Name, ", ");
+                args._cols += string.Concat(args.cField.Name, ", ");
                 if (this.BypassParameterization)
                 {
-                    _val += Convert.ToString(cField.Value) + CharConstants.COMMA + CharConstants.SPACE;
+                    args._vals += Convert.ToString(args.cField.Value) + CharConstants.COMMA + CharConstants.SPACE;
                 }
                 else
                 {
-                    if (string.IsNullOrWhiteSpace(Convert.ToString(cField.Value)) || this.Pattern.SerialLength == 0)
-                        throw new FormException("Unable to process", (int)HttpStatusCode.InternalServerError, "Invalid pattern for AutoId: " + cField.Name, "EbAutoId => ParameterizeControl");
+                    bool isSql = false;
 
-                    if (DataDB.Vendor == DatabaseVendors.MYSQL)//Not fixed - rewite using MAX
-                        _val += string.Format("CONCAT(@{0}_{1}, (SELECT LPAD(CAST((COUNT(*) + 1) AS CHAR(12)), {2}, '0') FROM {3} tbl WHERE tbl.{0} LIKE '{4}%')),", cField.Name, i, this.Pattern.SerialLength, tbl, cField.Value);
+                    if (!string.IsNullOrWhiteSpace(this.Script?.Code))
+                    {
+                        if (this.Script.Lang == ScriptingLanguage.CSharp)
+                        {
+                            EbWebForm WebForm = args.webForm as EbWebForm;
+                            if (WebForm.FormGlobals == null)
+                                WebForm.FormGlobals = GlobalsGenerator.GetCSharpFormGlobals_NEW(WebForm, WebForm.FormData, WebForm.FormDataBackup, args.DataDB);
+
+                            args.cField.Value = Convert.ToString(WebForm.ExecuteCSharpScriptNew(this.Script.Code, WebForm.FormGlobals));
+
+                            if (string.IsNullOrWhiteSpace(Convert.ToString(args.cField.Value)))
+                                throw new FormException("Unable to process", (int)HttpStatusCode.InternalServerError, "Null or empty string returned by C# script of AutoId: " + args.cField.Name, "EbAutoId => ParameterizeControl");
+                        }
+                        else if (this.Script.Lang == ScriptingLanguage.SQL)
+                            isSql = true;
+                        else
+                            throw new FormException("Unable to process", (int)HttpStatusCode.InternalServerError, $"Invalid script lang {this.Script.Lang} for AutoId: {args.cField.Name}", "EbAutoId => ParameterizeControl");
+                    }
+
+                    if (string.IsNullOrWhiteSpace(Convert.ToString(args.cField.Value)) || this.Pattern.SerialLength == 0)
+                        throw new FormException("Unable to process", (int)HttpStatusCode.InternalServerError, "Invalid pattern for AutoId: " + args.cField.Name, "EbAutoId => ParameterizeControl");
+
+                    if (args.DataDB.Vendor == DatabaseVendors.MYSQL)//Not fixed - rewite using MAX
+                        args._vals += string.Format("CONCAT(({1}), (SELECT LPAD(CAST((COUNT(*) + 1) AS CHAR(12)), {2}, '0') FROM {3} tbl WHERE tbl.{0} LIKE ({4}))),",
+                            args.cField.Name,
+                            isSql ? this.Script.Code : $"@{args.cField.Name}_{args.i}",
+                            this.Pattern.SerialLength,
+                            args.tbl,
+                            isSql ? $"({this.Script.Code}) || '%'" : $"'args.cField.Value%'");
                     else
-                        _val += string.Format("(@{0}_{1} || COALESCE((SELECT LPAD((RIGHT(MAX({0}), {2}) :: INTEGER + 1) :: TEXT, {2}, '0') FROM {3} WHERE {0} LIKE '{4}%' AND LENGTH(REGEXP_REPLACE(RIGHT({0}, {2}), '\\D','','g')) = {2}), LPAD('1', {2}, '0'))),",
-                        cField.Name,
-                        i,
-                        this.Pattern.SerialLength,
-                        tbl,
-                        cField.Value);
-                    param.Add(DataDB.GetNewParameter(cField.Name + "_" + i, (EbDbTypes)cField.Type, cField.Value));                    
-                }                
-                i++;
+                        args._vals += string.Format("(({1}) || COALESCE((SELECT LPAD((RIGHT(MAX({0}), {2}) :: INTEGER + 1) :: TEXT, {2}, '0') FROM {3} WHERE {0} LIKE ({4}) AND LENGTH(REGEXP_REPLACE(RIGHT({0}, {2}), '\\D','','g')) = {2}), LPAD('1', {2}, '0'))),",
+                            args.cField.Name,
+                            isSql ? this.Script.Code : $"@{args.cField.Name}_{args.i}",
+                            this.Pattern.SerialLength,
+                            args.tbl,
+                            isSql ? $"({this.Script.Code}) || '%'" : $"'{args.cField.Value}%'");
+
+                    if (!isSql)
+                        args.param.Add(args.DataDB.GetNewParameter(args.cField.Name + "_" + args.i, (EbDbTypes)args.cField.Type, Convert.ToString(args.cField.Value)));
+                }
+                args.i++;
                 return true;
             }
             return false;

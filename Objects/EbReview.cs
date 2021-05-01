@@ -32,10 +32,10 @@ namespace ExpressBase.Objects
             this.ObjType = this.GetType().Name.Substring(2, this.GetType().Name.Length - 2);
             //this.EbDbType = this.EbDbType;    
             Controls = new List<EbControl>() {
-                new EbDGStringColumn() { Name = "stage_unique_id", EbDbType = EbDbTypes.String, Label = "Stage"},
-                new EbDGStringColumn() { Name = "action_unique_id", EbDbType = EbDbTypes.String, Label = "Action"},
-                new EbDGNumericColumn() { Name = "eb_my_actions_id", EbDbType = EbDbTypes.Decimal, Label = "My_Action_Id"},
-                new EbDGStringColumn() { Name = "comments", EbDbType = EbDbTypes.String, Label = "Comments"},
+                new EbDGStringColumn() { Name = "stage_unique_id", EbDbType = EbDbTypes.String, Title = "Stage"},
+                new EbDGStringColumn() { Name = "action_unique_id", EbDbType = EbDbTypes.String, Title = "Action"},
+                new EbDGNumericColumn() { Name = "eb_my_actions_id", EbDbType = EbDbTypes.Decimal, Title = "My_Action_Id"},
+                new EbDGStringColumn() { Name = "comments", EbDbType = EbDbTypes.String, Title = "Comments"},
                 new EbDGDateColumn() { Name = "eb_created_at", EbDbType = EbDbTypes.DateTime, EbDateType = EbDateType.DateTime, DoNotPersist = true, IsSysControl = true},
                 new EbDGCreatedByColumn() { Name = "eb_created_by", EbDbType = EbDbTypes.Decimal, DoNotPersist = true, IsSysControl = true}//,
                 //new EbDGStringColumn() { Name = "eb_created_by_s", EbDbType = EbDbTypes.String, DoNotPersist = true}

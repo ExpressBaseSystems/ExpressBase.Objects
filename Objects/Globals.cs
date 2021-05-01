@@ -166,6 +166,11 @@ namespace ExpressBase.Objects.Objects
         {
             throw new ExplicitExitException("Execution terminated explicitly!");
         }
+
+        public void Exit(string message)
+        {
+            throw new ExplicitExitException(message);
+        }
     }
 
     public delegate dynamic GetResourceValueHandler(int index);
