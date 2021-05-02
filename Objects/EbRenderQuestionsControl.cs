@@ -78,22 +78,18 @@ namespace ExpressBase.Objects
         public void InitFromDataBase(JsonServiceClient ServiceClient)
         {
             string _html = string.Empty;
-            string OuterHtml = string.Empty;
+            string OuterHtml = @"<div id='cont_@ebsid@' ebsid='@ebsid@' class='Eb-Question-Ctrl' Ctype=''>";
             //this.Options = new List<EbSimpleSelectOption>();
 
-            var result = ServiceClient.Get<GetRenderQuestionResponse>(new GetRenderQuestionsRequest { FormRefid = this.RefId, ControlId = this.ContextId });
+            GetRenderQuestionResponse result = ServiceClient.Get<GetRenderQuestionResponse>(new GetRenderQuestionsRequest { FormRefid = this.RefId, ControlId = this.ContextId });
+
             foreach (GetRenderQuestions option in result.GetRenderQuestions)
             {
                 EbQuestion Resp = EbSerializers.Json_Deserialize<EbQuestion>(option.Questions.ToString());
-                OuterHtml = Resp.GetHtml();
-                foreach (EbControl opt in Resp.QSec.Controls)
-                {
-                    _html += Resp.QSec.GetHtml(opt);
-                    _html += Resp.ASec.GetHtml(Resp.QSec.Controls.IndexOf(opt));
-                }
+                OuterHtml += Resp.GetHtml();
             }
-            OuterHtml.Replace("@body@", _html).Replace("@name@", this.Name).Replace("@ebsid@", this.EbSid_CtxId);
-            this.QuestionStr = OuterHtml;
+            OuterHtml = OuterHtml.Replace("@body@", _html).Replace("@name@", this.Name).Replace("@ebsid@", this.EbSid_CtxId);
+            this.QuestionStr = OuterHtml + "</div>";
         }
 
         [HideInPropertyGrid]
@@ -113,6 +109,12 @@ namespace ExpressBase.Objects
         [OSE_ObjectTypes(EbObjectTypes.iWebForm)]
         [Alias("Source Form")]
         public string FormRefId { get; set; }
+
+        [PropertyGroup(PGConstants.EXTENDED)]
+        [EnableInBuilder(BuilderType.WebForm)]
+        [PropertyEditor(PropertyEditorType.ScriptEditorJS)]
+        [HelpText("Define Question Render  Expression")]
+        public EbScript QuestionRenderExpression { get; set; }
 
         [EnableInBuilder(BuilderType.WebForm, BuilderType.BotForm, BuilderType.UserControl)]
         [PropertyGroup(PGConstants.DATA)]
