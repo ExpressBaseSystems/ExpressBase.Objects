@@ -26,26 +26,26 @@ namespace ExpressBase.Objects
     public class EbQuestion : EbControlContainer
     {
         [HideInPropertyGrid]
-        [EnableInBuilder(BuilderType.SurveyControl)]
+        [EnableInBuilder(BuilderType.SurveyControl, BuilderType.WebForm, BuilderType.UserControl)]
         public int QId { get; set; }
 
         [HideInPropertyGrid]
-        [EnableInBuilder(BuilderType.SurveyControl)]
+        [EnableInBuilder(BuilderType.SurveyControl, BuilderType.WebForm, BuilderType.UserControl)]
         public override string EbSid { get; set; }
 
         [HideInPropertyGrid]
-        [EnableInBuilder(BuilderType.SurveyControl)]
+        [EnableInBuilder(BuilderType.SurveyControl, BuilderType.WebForm, BuilderType.UserControl)]
         public override string EbSid_CtxId { get; set; }
 
-        [EnableInBuilder(BuilderType.SurveyControl)]
+        [EnableInBuilder(BuilderType.SurveyControl, BuilderType.WebForm, BuilderType.UserControl)]
         public override string Name { get; set; }
 
         [HideInPropertyGrid]
-        [EnableInBuilder(BuilderType.SurveyControl)]
+        [EnableInBuilder(BuilderType.SurveyControl, BuilderType.WebForm, BuilderType.UserControl)]
         public EbQSec QSec { get; set; }
 
         [HideInPropertyGrid]
-        [EnableInBuilder(BuilderType.SurveyControl)]
+        [EnableInBuilder(BuilderType.SurveyControl, BuilderType.WebForm, BuilderType.UserControl)]
         public EbASec ASec { get; set; }
 
         public override string GetJsInitFunc()

@@ -21,7 +21,7 @@ namespace ExpressBase.Objects
 		public EbQuestionnaireConfigurator()
 		{
 
-			//this.QuestionBankList = new Dictionary<int, EbQuestion>();
+			this.QuestionBankList = new Dictionary<int, EbQuestion>();
 			this.QuestionBankCtlList=new Dictionary<int, string> ();
 	}
 		[OnDeserialized]
@@ -87,9 +87,9 @@ namespace ExpressBase.Objects
 		public int DropdownHeight { get; set; }
 
 
-		//[EnableInBuilder(BuilderType.WebForm)]
-		//[HideInPropertyGrid]
-		//public Dictionary<int, EbQuestion> QuestionBankList { get; set; }
+		[EnableInBuilder(BuilderType.WebForm)]
+		[HideInPropertyGrid]
+		public Dictionary<int, EbQuestion> QuestionBankList { get; set; }
 
 		[EnableInBuilder(BuilderType.WebForm)]
 		[HideInPropertyGrid]
@@ -154,7 +154,7 @@ namespace ExpressBase.Objects
 				{
 					EbQuestion qstn = EbSerializers.Json_Deserialize<EbQuestion>(dct.Value);
 					var ctlHtml=qstn.GetHtml();
-					//this.QuestionBankList.Add(dct.Key, qstn);
+					this.QuestionBankList.Add(dct.Key, qstn);
 					this.QuestionBankCtlList.Add(dct.Key, ctlHtml);
 					this.OptionHtml += $"<option  value='{dct.Key}'>{qstn.Name}</option>";
 				}
@@ -164,6 +164,39 @@ namespace ExpressBase.Objects
 
 		}
 
+		public override bool ParameterizeControl(ParameterizeCtrl_Params args)
+		{
+			//if (args.cField.Value == null || (this.EbDbType == EbDbTypes.Decimal && Convert.ToString(args.cField.Value) == string.Empty))
+			//{
+			//	var p = args.DataDB.GetNewParameter(args.cField.Name + "_" + args.i, (EbDbTypes)args.cField.Type);
+			//	p.Value = DBNull.Value;
+			//	args.param.Add(p);
+			//}
+			//else
+			//	args.param.Add(args.DataDB.GetNewParameter(args.cField.Name + "_" + args.i, (EbDbTypes)args.cField.Type, args.cField.Value));
+
+			//if (args.ins)
+			//{
+			//	args._cols += string.Concat(args.cField.Name, ", ");
+			//	args._vals += string.Concat("@", args.cField.Name, "_", args.i, ", ");
+			//}
+			//else
+			//	args._colvals += string.Concat(args.cField.Name, "=@", args.cField.Name, "_", args.i, ", ");
+			//args.i++;
+			string Sqlqry = "";
+			var k = JsonConvert.DeserializeObject<List<Ques_Confi>>(Convert.ToString(args.cField.Value));
+			for(var i = 0; i < k.Count; i++)
+			{
+				var id = k[i].id;
+				var ques_id = k[i].ques_id;
+				var ext_props = k[i].ext_props;
+			}
+			args._extqry += Sqlqry;
+			//args.ins=true 1st insert
+
+			//	args.param.Add(args.DataDB.GetNewParameter(args.cField.Name + "_" + args.i, (EbDbTypes)args.cField.Type, args.cField.Value));
+			return true;
+		}
 
 
 	}
