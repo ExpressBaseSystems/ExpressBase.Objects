@@ -678,6 +678,29 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public ResponseStatus ResponseStatus { get; set; }
     }
 
+    [DataContract]
+    public class LockUnlockWebFormDataRequest : EbServiceStackAuthRequest, IReturn<LockUnlockWebFormDataResponse>
+    {
+        [DataMember(Order = 1)]
+        public string RefId { get; set; }
+
+        [DataMember(Order = 2)]
+        public int RowId { get; set; }
+
+        [DataMember(Order = 3)]
+        public bool Lock { get; set; }
+    }
+
+    [DataContract]
+    public class LockUnlockWebFormDataResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public int Status { get; set; }
+
+        [DataMember(Order = 2)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
+
 
 
     //=============================================== AUDIT TRAIL ====================================================
