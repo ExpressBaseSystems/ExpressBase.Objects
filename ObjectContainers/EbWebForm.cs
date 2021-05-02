@@ -1657,6 +1657,9 @@ namespace ExpressBase.Objects
                 if (IsUpdate)
                 {
                     this.RefreshFormData(DataDB, service, true, true);
+                    if (this.FormData.IsLocked)
+                        throw new FormException("Unable to continue in locked data entry!", (int)HttpStatusCode.Forbidden, "Locked record", "EbWebForm -> Save");
+
                     if (wc == TokenConstants.UC && !(EbFormHelper.HasPermission(this.UserObj, this.RefId, OperationConstants.EDIT, this.LocationId, this.IsLocIndependent) ||
                         (this.UserObj.UserId == this.FormData.CreatedBy && EbFormHelper.HasPermission(this.UserObj, this.RefId, OperationConstants.OWN_DATA, this.LocationId, this.IsLocIndependent))))
                         throw new FormException("Access denied to save this data entry!", (int)HttpStatusCode.Forbidden, "Access denied", "EbWebForm -> Save");
@@ -2545,6 +2548,16 @@ namespace ExpressBase.Objects
                 return DataDB.DoNonQuery(query, param);
             }
             return -1;
+        }
+
+        public int LockOrUnlock(IDatabase DataDB, Service Service, bool Lock)
+        {
+            string query = QueryGetter.GetLockOrUnlockQuery(this, DataDB, Lock);
+            DbParameter[] param = new DbParameter[] {
+                DataDB.GetNewParameter(FormConstants.eb_lastmodified_by, EbDbTypes.Int32, this.UserObj.UserId),
+                DataDB.GetNewParameter(this.TableName + FormConstants._id, EbDbTypes.Int32, this.TableRowId)
+            };
+            return DataDB.DoNonQuery(query, param);
         }
 
         private void ExeDeleteCancelEditScript(IDatabase DataDB, WebformData _FormData)

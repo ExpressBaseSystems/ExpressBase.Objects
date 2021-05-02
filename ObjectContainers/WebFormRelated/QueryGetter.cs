@@ -316,6 +316,23 @@ namespace ExpressBase.Objects.WebFormRelated
         //    return query;
         //}
 
+        public static string GetLockOrUnlockQuery(EbWebForm _this, IDatabase DataDB, bool Lock)
+        {
+            EbSystemColumns ebs = _this.SolutionObj.SolutionSettings.SystemColumns;
+
+            string Qry = string.Format("UPDATE {0} SET {1} = {6}, {2} = @eb_lastmodified_by, {3} = {4} WHERE id = @{0}_id AND COALESCE({1}, {5}) = {7};",
+                _this.TableName,
+                ebs[SystemColumns.eb_lock],//1
+                ebs[SystemColumns.eb_lastmodified_by],//2
+                ebs[SystemColumns.eb_lastmodified_at],//3
+                DataDB.EB_CURRENT_TIMESTAMP,//4
+                ebs.GetBoolFalse(SystemColumns.eb_lock),//5
+                Lock ? ebs.GetBoolTrue(SystemColumns.eb_lock) : ebs.GetBoolFalse(SystemColumns.eb_lock),//6
+                Lock ? ebs.GetBoolFalse(SystemColumns.eb_lock) : ebs.GetBoolTrue(SystemColumns.eb_lock));//7
+
+            return Qry;
+        }
+
         public static string GetInsertQuery(EbWebForm _this, IDatabase DataDB, string tblName, bool isIns)
         {
             string _qry;
