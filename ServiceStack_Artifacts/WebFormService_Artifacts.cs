@@ -666,6 +666,9 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         [DataMember(Order = 2)]
         public int RowId { get; set; }
+
+        [DataMember(Order = 3)]
+        public bool Cancel { get; set; }
     }
 
     [DataContract]

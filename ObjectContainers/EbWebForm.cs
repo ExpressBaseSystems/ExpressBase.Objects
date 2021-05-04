@@ -2489,7 +2489,7 @@ namespace ExpressBase.Objects
 
                 for (int i = 0; i < ds.Tables.Count; i++)
                 {
-                    if (ds.Tables[0].Rows.Count > 0 && ds.Tables[0].Rows[0].Count > 0)
+                    if (ds.Tables[i].Rows.Count > 0 && ds.Tables[i].Rows[0].Count > 0)
                     {
                         if (!this.DisableDelete[i].IsDisabled && Convert.ToInt32(ds.Tables[0].Rows[0][0]) > 0 && !this.DisableDelete[i].IsWarningOnly)
                             return false;
@@ -2516,31 +2516,50 @@ namespace ExpressBase.Objects
         //to check whether this form data entry can be cancel by executing DisableCancel sql quries
         private bool CanCancel(IDatabase DataDB)
         {
+            EbSystemColumns ebs = this.SolutionObj.SolutionSettings.SystemColumns;
+
+            string LockCheckQry = string.Format("SELECT id FROM {0} WHERE id = @id AND COALESCE({1}, {2}) = {2} AND COALESCE({3}, {4}) = {4};",
+                this.TableName,
+                ebs[SystemColumns.eb_del],
+                ebs.GetBoolFalse(SystemColumns.eb_del),
+                ebs[SystemColumns.eb_lock],
+                ebs.GetBoolFalse(SystemColumns.eb_lock));
+
+            DbParameter[] p = new DbParameter[] {
+                DataDB.GetNewParameter(FormConstants.id, EbDbTypes.Int32, this.TableRowId)
+            };
+
             if (this.DisableCancel != null && this.DisableCancel.Count > 0)
             {
                 string q = string.Join(";", this.DisableCancel.Select(e => e.Script.Code));
-                DbParameter[] p = new DbParameter[] {
-                    DataDB.GetNewParameter(FormConstants.id, EbDbTypes.Int32, this.TableRowId)
-                };
-                EbDataSet ds = DataDB.DoQueries(q, p);
-
-                for (int i = 0; i < ds.Tables.Count; i++)
+                
+                EbDataSet ds = DataDB.DoQueries(q + LockCheckQry, p);
+                int i = 0;
+                for (; i < this.DisableCancel.Count; i++)
                 {
-                    if (ds.Tables[0].Rows.Count > 0 && ds.Tables[0].Rows[0].Count > 0)
+                    if (ds.Tables[i].Rows.Count > 0 && ds.Tables[i].Rows[0].Count > 0)
                     {
                         if (!this.DisableCancel[i].IsDisabled && Convert.ToInt32(ds.Tables[0].Rows[0][0]) > 0 && !this.DisableCancel[i].IsWarningOnly)
                             return false;
                     }
                 }
+                if (ds.Tables[i].Rows.Count <= 0)
+                    return false;
+            }
+            else
+            {
+                EbDataSet ds = DataDB.DoQueries(LockCheckQry, p);
+                if (ds.Tables[0].Rows.Count <= 0)
+                    return false;
             }
             return true;
         }
 
-        public int Cancel(IDatabase DataDB)
+        public int Cancel(IDatabase DataDB, bool Cancel)
         {
             if (this.CanCancel(DataDB))
             {
-                string query = QueryGetter.GetCancelQuery(this, DataDB);
+                string query = QueryGetter.GetCancelQuery(this, DataDB, Cancel);
                 DbParameter[] param = new DbParameter[] {
                     DataDB.GetNewParameter(FormConstants.eb_lastmodified_by, EbDbTypes.Int32, this.UserObj.UserId),
                     DataDB.GetNewParameter(this.TableName + FormConstants._id, EbDbTypes.Int32, this.TableRowId)
@@ -2550,7 +2569,7 @@ namespace ExpressBase.Objects
             return -1;
         }
 
-        public int LockOrUnlock(IDatabase DataDB, Service Service, bool Lock)
+        public int LockOrUnlock(IDatabase DataDB, bool Lock)
         {
             string query = QueryGetter.GetLockOrUnlockQuery(this, DataDB, Lock);
             DbParameter[] param = new DbParameter[] {
