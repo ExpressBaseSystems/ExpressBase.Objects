@@ -489,7 +489,11 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
 
         public bool Is2faEnabled { get; set; }
 
-        public string OtpDelivery { get; set; }
+        public string OtpDelivery2fa { get; set; }
+
+        public bool IsOtpSigninEnabled { get; set; }
+
+        public string OtpDeliverySignin { get; set; }
 
         public SolutionSettings SolutionSettings { get; set; }
 
@@ -620,7 +624,8 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public enum solutionChangeColumn
     {
         version = 1,
-        TwoFa = 2
+        TwoFa = 2,
+        OtpSignin =3
     }
     public class UpdateSidMapRequest : EbServiceStackNoAuthRequest, IReturn<UpdateSidMapResponse>
     {
