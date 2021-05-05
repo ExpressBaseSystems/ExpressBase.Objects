@@ -13,7 +13,7 @@ using System.Runtime.Serialization;
 namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl)]
-    public class EbDisplayPicture : EbControlUI
+    public class EbDisplayPicture : EbControlUI, IEbExtraQryCtrl
     {
         public EbDisplayPicture() { }
 

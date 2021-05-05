@@ -62,7 +62,7 @@ namespace ExpressBase.Objects
                     }
                 }
                 param.Add(DataDB.GetNewParameter(WebForm.TableName + FormConstants._eb_ver_id, EbDbTypes.Int32, WebForm.RefId.Split(CharConstants.DASH)[4]));
-                param.Add(DataDB.GetNewParameter("refid", EbDbTypes.String, WebForm.RefId));
+                param.Add(DataDB.GetNewParameter(WebForm.TableName + FormConstants._refid, EbDbTypes.String, WebForm.RefId));
             }
 
             args.CopyBack(ref _extqry, ref i);
@@ -142,6 +142,7 @@ namespace ExpressBase.Objects
                 }
                 param.Add(DataDB.GetNewParameter(WebForm.TableName + FormConstants._id, EbDbTypes.Int32, WebForm.TableRowId));
                 param.Add(DataDB.GetNewParameter(WebForm.TableName + FormConstants._eb_ver_id, EbDbTypes.Int32, WebForm.RefId.Split(CharConstants.DASH)[4]));
+                param.Add(DataDB.GetNewParameter(WebForm.TableName + FormConstants._refid, EbDbTypes.String, WebForm.RefId));
             }
             args.CopyBack(ref _extqry, ref i);
         }

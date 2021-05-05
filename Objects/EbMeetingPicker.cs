@@ -252,7 +252,7 @@ namespace ExpressBase.Objects
 
         public string GetSelectQuery(IDatabase DataDB, string MasterTable)
         {
-            return string.Empty;
+            throw new NotImplementedException();
         }
 
         private string SlotDetailsGetQuery
@@ -507,7 +507,7 @@ namespace ExpressBase.Objects
                     query += $@"insert into eb_my_actions (user_ids,usergroup_id,role_ids,from_datetime,form_ref_id,form_data_id,description,my_action_type , eb_meeting_slots_id,
                         is_completed,eb_del)
                         values('{ScheduledParticipants[i].UserId}',{ScheduledParticipants[i].UserGroupId},'{ScheduledParticipants[i].RoleId}',
-                        NOW(),@refid, eb_currval('{args.tbl}_id_seq'), 'Meeting Request','{MyActionTypes.Meeting}',{ApprovedSlotId} , 'F','F');";
+                        NOW(),@{args.tbl}_refid, eb_currval('{args.tbl}_id_seq'), 'Meeting Request','{MyActionTypes.Meeting}',{ApprovedSlotId} , 'F','F');";
                 }
             }
             args._extqry += query;

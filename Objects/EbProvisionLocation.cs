@@ -19,7 +19,7 @@ using System.Runtime.Serialization;
 namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.WebForm)]
-    public class EbProvisionLocation : EbControlUI, IEbPlaceHolderControl
+    public class EbProvisionLocation : EbControlUI, IEbPlaceHolderControl, IEbExtraQryCtrl
     {
         public EbProvisionLocation()
         {
@@ -230,11 +230,11 @@ this.Init = function(id)
             return ReplacePropsInHTML(EbCtrlHTML);
         }
 
-        public string VirtualTable { get; set; }
+        public string TableName { get; set; }
 
         public bool IsLocationCreated { get; set; }
 
-        public string GetSelectQuery(string masterTbl)
+        public string GetSelectQuery(IDatabase DataDB, string masterTbl)
         {
             return string.Format("SELECT id, longname, shortname, image, meta_json, is_group, parent_id, eb_location_types_id FROM eb_locations WHERE eb_ver_id = :{0}_eb_ver_id AND eb_data_id = :{0}_id AND COALESCE(eb_del, 'F') = 'F';", masterTbl);
         }
@@ -279,7 +279,7 @@ this.Init = function(id)
 
                 if (args.DataDB.Vendor == DatabaseVendors.MYSQL)
                     temp += "SELECT eb_persist_currval('eb_locations_id_seq');";
-                temp += $"UPDATE {this.VirtualTable} SET {this.Name} = eb_currval('eb_locations_id_seq') WHERE {(this.VirtualTable == args.tbl ? "id" : (args.tbl + "_id"))} = eb_currval('{args.tbl}_id_seq'); ";
+                temp += $"UPDATE {this.TableName} SET {this.Name} = eb_currval('eb_locations_id_seq') WHERE {(this.TableName == args.tbl ? "id" : (args.tbl + "_id"))} = eb_currval('{args.tbl}_id_seq'); ";
 
                 this.IsLocationCreated = true;
             }

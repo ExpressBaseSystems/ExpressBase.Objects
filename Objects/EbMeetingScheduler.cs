@@ -901,7 +901,7 @@ else if (this.AttendeeConfig === 4)
                 }
                 if (userids != "" && !_temp)
                     query += $@" insert into eb_my_actions (user_ids,from_datetime,form_ref_id,form_data_id,description,my_action_type , eb_meeting_slots_id, 
-                is_completed,eb_del) values('{userids}',NOW(),@refid, eb_currval('{tbl}_id_seq'), 'Meeting Request',
+                is_completed,eb_del) values('{userids}',NOW(),@{tbl}_refid, eb_currval('{tbl}_id_seq'), 'Meeting Request',
                      '{MyActionTypes.Meeting}',eb_currval('eb_meeting_slots_id_seq') , 'F','F'); ";              
                 ////if (Roles != "")
                 ////    query += $@"insert into eb_my_actions (role_ids,from_datetime,form_ref_id,form_data_id,description,my_action_type , eb_meeting_slots_id, 
@@ -947,15 +947,15 @@ else if (this.AttendeeConfig === 4)
 
                 if (userids != "" && !_temp)
                     query += $@" insert into eb_my_actions (user_ids,from_datetime,form_ref_id,form_data_id,description,my_action_type , eb_meeting_schedule_id, 
-                    is_completed,eb_del) values('{userids}',NOW(),@refid, eb_currval('{tbl}_id_seq'), 'Meeting Request',
+                    is_completed,eb_del) values('{userids}',NOW(),@{tbl}_refid, eb_currval('{tbl}_id_seq'), 'Meeting Request',
                     '{MyActionTypes.Meeting}',eb_currval('eb_meeting_schedule_id_seq') , 'F','F');";
                 if (Roles != "" && ! _temp)
                     query += $@" insert into eb_my_actions (role_ids,from_datetime,form_ref_id,form_data_id,description,my_action_type , eb_meeting_schedule_id, 
-                    is_completed,eb_del) values('{Roles}',NOW(),@refid, eb_currval('{tbl}_id_seq'), 'Meeting Request',
+                    is_completed,eb_del) values('{Roles}',NOW(),@{tbl}_refid, eb_currval('{tbl}_id_seq'), 'Meeting Request',
                     '{MyActionTypes.Meeting}',eb_currval('eb_meeting_schedule_id_seq') , 'F','F');";
                 if (UserGroup > 0 && !_temp)
                     query += $@" insert into eb_my_actions (user_group,from_datetime,form_ref_id,form_data_id,description,my_action_type , eb_meeting_schedule_id, 
-                    is_completed,eb_del) values('{UserGroup}',NOW(),@refid, eb_currval('{tbl}_id_seq'), 'Meeting Request',
+                    is_completed,eb_del) values('{UserGroup}',NOW(),@{tbl}_refid, eb_currval('{tbl}_id_seq'), 'Meeting Request',
                     '{MyActionTypes.Meeting}',eb_currval('eb_meeting_schedule_id_seq') , 'F','F');";
             }
             if (ExceptUserNames != "")

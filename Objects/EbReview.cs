@@ -17,7 +17,7 @@ namespace ExpressBase.Objects
 {
     //[HideInToolBox]
     [EnableInBuilder(BuilderType.WebForm)]
-    public class EbReview : EbControlContainer, IEbSpecialContainer
+    public class EbReview : EbControlContainer, IEbSpecialContainer, IEbExtraQryCtrl
     {
         public EbReview()
         {
@@ -280,11 +280,11 @@ namespace ExpressBase.Objects
             return ReplacePropsInHTML(EbCtrlHTML);
         }
 
-        public string GetSelectQuery(string RefId, string MasterTable)
+        public string GetSelectQuery(IDatabase DataDB, string MasterTable)
         {
             return $@"SELECT A.id, S.stage_unique_id, A.is_form_data_editable, A.user_ids, A.role_ids, A.usergroup_id, A.description
                 FROM eb_my_actions A, eb_stages S
-                WHERE A.form_ref_id = '{RefId}' AND A.form_data_id = @{MasterTable}_id AND 
+                WHERE A.form_ref_id = @{MasterTable}_refid AND A.form_data_id = @{MasterTable}_id AND 
                 COALESCE(A.is_completed, 'F') = 'F' AND COALESCE(A.eb_del, 'F') = 'F' AND A.eb_stages_id = S.id AND COALESCE(S.eb_del, 'F') = 'F'; ";
         }
 

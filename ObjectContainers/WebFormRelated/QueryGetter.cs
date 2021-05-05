@@ -100,37 +100,17 @@ namespace ExpressBase.Objects.WebFormRelated
                 {
                     if (!MuCtrlFound)
                     {
-                        extquery += (Ctrl as EbProvisionUser).GetSelectQuery(_this.FormSchema.MasterTable);
+                        extquery += (Ctrl as IEbExtraQryCtrl).GetSelectQuery(DataDB, _this.FormSchema.MasterTable);
                         MuCtrlFound = true;
                         _qryCount++;
                     }
                     extquery += (Ctrl as EbProvisionUser).GetMappedUserQuery(_this.FormSchema.MasterTable, ebs[SystemColumns.eb_del], ebs.GetBoolFalse(SystemColumns.eb_del));
                     _qryCount++;
                 }
-                else if (Ctrl is EbProvisionLocation)
+                else if (Ctrl is IEbExtraQryCtrl)
                 {
-                    extquery += (Ctrl as EbProvisionLocation).GetSelectQuery(_this.FormSchema.MasterTable);
+                    extquery += (Ctrl as IEbExtraQryCtrl).GetSelectQuery(DataDB, _this.FormSchema.MasterTable);
                     _qryCount++;
-                }
-                else if (Ctrl is EbReview)
-                {
-                    extquery += (Ctrl as EbReview).GetSelectQuery(_this.RefId, _this.FormSchema.MasterTable);
-                    _qryCount++;
-                }
-                else if (Ctrl is EbDisplayPicture)
-                {
-                    extquery += (Ctrl as EbDisplayPicture).GetSelectQuery(DataDB, _this.FormSchema.MasterTable);
-                    _qryCount++;
-                }
-                else if (Ctrl is EbSimpleFileUploader)
-                {
-                    extquery += (Ctrl as EbSimpleFileUploader).GetSelectQuery(DataDB, _this.FormSchema.MasterTable);
-                    _qryCount++;
-                }
-                else if (Ctrl is EbMeetingPicker)
-                {
-                    extquery += (Ctrl as EbMeetingPicker).GetSelectQuery(DataDB, _this.FormSchema.MasterTable);
-                    //_qryCount++;
                 }
             }
             return query + extquery;

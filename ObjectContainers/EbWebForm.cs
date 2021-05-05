@@ -1171,7 +1171,8 @@ namespace ExpressBase.Objects
             DbParameter[] param = new DbParameter[]
             {
                 DataDB.GetNewParameter(this.FormSchema.MasterTable + FormConstants._id, EbDbTypes.Int32, this.TableRowId),
-                DataDB.GetNewParameter(this.FormSchema.MasterTable + FormConstants._eb_ver_id, EbDbTypes.Int32, this.RefId.Split(CharConstants.DASH)[4])
+                DataDB.GetNewParameter(this.FormSchema.MasterTable + FormConstants._eb_ver_id, EbDbTypes.Int32, this.RefId.Split(CharConstants.DASH)[4]),
+                DataDB.GetNewParameter(this.FormSchema.MasterTable + FormConstants._refid, EbDbTypes.String, this.RefId)
             };
             EbDataSet dataset = null;
             if (this.DbConnection == null)
@@ -1255,9 +1256,9 @@ namespace ExpressBase.Objects
             {
                 int tableIndex = _schema.Tables.Count;
                 SingleTable UserTable = null;
-                foreach (EbControl Ctrl in _schema.ExtendedControls)// EbProvisionUser + EbProvisionLocation + EbReview
+                foreach (EbControl Ctrl in _schema.ExtendedControls)
                 {
-                    if (Ctrl is EbProvisionUser || Ctrl is EbProvisionLocation || Ctrl is EbReview || Ctrl is EbDisplayPicture || Ctrl is EbSimpleFileUploader/* || Ctrl is  EbMeetingPicker*/)
+                    if (Ctrl is IEbExtraQryCtrl)
                     {
                         SingleTable Table = new SingleTable();
                         if (!(UserTable != null && Ctrl is EbProvisionUser))
@@ -1266,7 +1267,7 @@ namespace ExpressBase.Objects
                         if (Ctrl is EbProvisionUser)
                         {
                             EbProvisionUser provUser = Ctrl as EbProvisionUser;
-                            SingleColumn Column = _FormData.MultipleTables[provUser.VirtualTable][0].GetColumn(Ctrl.Name);
+                            SingleColumn Column = _FormData.MultipleTables[provUser.TableName][0].GetColumn(Ctrl.Name);
                             if (UserTable == null)
                             {
                                 UserTable = Table;
@@ -1317,7 +1318,7 @@ namespace ExpressBase.Objects
                                 _d.Add(FormConstants.parent_id, Table[0][FormConstants.parent_id]);
                                 _d.Add(FormConstants.eb_location_types_id, Table[0][FormConstants.eb_location_types_id]);
                             }
-                            _FormData.MultipleTables[(Ctrl as EbProvisionLocation).VirtualTable][0].GetColumn(Ctrl.Name).F = JsonConvert.SerializeObject(_d);
+                            _FormData.MultipleTables[(Ctrl as EbProvisionLocation).TableName][0].GetColumn(Ctrl.Name).F = JsonConvert.SerializeObject(_d);
                         }
                         else if (Ctrl is EbReview)
                         {
@@ -1392,15 +1393,23 @@ namespace ExpressBase.Objects
                                 if (!_list.Contains(info))
                                     _list.Add(info);
                             }
-                            if (Ctrl is EbDisplayPicture)
-                                _FormData.MultipleTables[(Ctrl as EbDisplayPicture).TableName][0].GetColumn(Ctrl.Name).F = JsonConvert.SerializeObject(_list);
-                            else if (Ctrl is EbSimpleFileUploader)
-                                _FormData.MultipleTables[(Ctrl as EbSimpleFileUploader).TableName][0].GetColumn(Ctrl.Name).F = JsonConvert.SerializeObject(_list);
+                            _FormData.MultipleTables[(Ctrl as IEbExtraQryCtrl).TableName][0].GetColumn(Ctrl.Name).F = JsonConvert.SerializeObject(_list);
                         }
-                        //else if (Ctrl is EbMeetingPicker)
-                        //{
-                        //    //process Table here
-                        //}
+                        else if (Ctrl is EbQuestionnaireConfigurator)
+                        {
+                            List<Ques_Confi> Ques = new List<Ques_Confi>();
+                            foreach (SingleRow dr in Table)
+                            {
+                                Ques_Confi Que = new Ques_Confi()
+                                {
+                                    id = Convert.ToInt32(dr[FormConstants.id]),
+                                    ques_id = Convert.ToInt32(dr["ques_id"]),
+                                    ext_props = JsonConvert.DeserializeObject<Ques_ext_props>(Convert.ToString(dr["ext_props"]))
+                                };
+                                Ques.Add(Que);
+                            }
+                            _FormData.MultipleTables[(Ctrl as IEbExtraQryCtrl).TableName][0][Ctrl.Name] = JsonConvert.SerializeObject(Ques);
+                        }
 
                         tableIndex++;
                     }
@@ -2407,9 +2416,9 @@ namespace ExpressBase.Objects
 
                     EbProvisionUser pc = c as EbProvisionUser;
 
-                    if (this.FormData?.MultipleTables.ContainsKey(pc.VirtualTable) == true && this.FormData?.MultipleTables[pc.VirtualTable].Count > 0)
+                    if (this.FormData?.MultipleTables.ContainsKey(pc.TableName) == true && this.FormData?.MultipleTables[pc.TableName].Count > 0)
                     {
-                        SingleColumn col = this.FormData.MultipleTables[pc.VirtualTable][0].Columns.Find(e => e.Name == pc.Name);
+                        SingleColumn col = this.FormData.MultipleTables[pc.TableName][0].Columns.Find(e => e.Name == pc.Name);
                         if (col != null && !MetaData.ContainsKey(FormMetaDataKeys.signup_user))// && this.RefId == this.SolutionObj.SolutionSettings.SignupFormRefid
                         {
                             //pc.UserCredentials.UserId = Convert.ToInt32(col.Value);

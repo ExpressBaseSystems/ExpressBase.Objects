@@ -22,7 +22,7 @@ using ExpressBase.Objects.WebFormRelated;
 namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.WebForm)]
-    public class EbProvisionUser : EbControlUI, IEbPlaceHolderControl
+    public class EbProvisionUser : EbControlUI, IEbPlaceHolderControl, IEbExtraQryCtrl
     {
         public EbProvisionUser()
         {
@@ -274,7 +274,7 @@ this.Init = function(id)
             return ReplacePropsInHTML(EbCtrlHTML);
         }
 
-        public string VirtualTable { get; set; }
+        public string TableName { get; set; }
 
         public bool AddLocConstraint { get; set; }
 
@@ -286,7 +286,7 @@ this.Init = function(id)
             }
         }
 
-        public string GetSelectQuery(string masterTbl)
+        public string GetSelectQuery(IDatabase DataDB, string masterTbl)
         {
             //if multiple user ctrl placed in form then one select query is enough // imp
             return $@"SELECT u.id, u.email, u.fullname, u.nickname, u.dob, u.sex, u.alternateemail, u.phnoprimary AS phprimary, u.preferencesjson AS preference, eb_user_types_id AS usertype, u.statusid, u.forcepwreset,
@@ -297,9 +297,9 @@ this.Init = function(id)
 
         public string GetMappedUserQuery(string MasterTable, string eb_del, string false_val)
         {
-            string idCol = this.VirtualTable == MasterTable ? "id" : MasterTable + "_id";
+            string idCol = this.TableName == MasterTable ? "id" : MasterTable + "_id";
             return $@"SELECT B.id, B.fullname, B.email, B.phnoprimary AS phprimary
-                FROM {this.VirtualTable} A, eb_users B
+                FROM {this.TableName} A, eb_users B
                 WHERE B.id = A.{this.Name} AND A.{idCol} = @{MasterTable}_id AND COALESCE(A.{eb_del}, {false_val}) = {false_val}; ";
         }
 
@@ -311,13 +311,13 @@ this.Init = function(id)
                 string consqry = string.Empty;
                 if (this.AddLocConstraint)
                     consqry = "SELECT * FROM eb_security_constraints(@eb_createdby, eb_currval('eb_users_id_seq'), '1$no description$1;5;' || eb_currval('eb_locations_id_seq'), '');";
-                string ee = $"UPDATE {this.VirtualTable} SET {this.Name} = eb_currval('eb_users_id_seq') WHERE {(this.VirtualTable == mtbl ? "id" : (mtbl + "_id"))} = eb_currval('{mtbl}_id_seq'); ";
+                string ee = $"UPDATE {this.TableName} SET {this.Name} = eb_currval('eb_users_id_seq') WHERE {(this.TableName == mtbl ? "id" : (mtbl + "_id"))} = eb_currval('{mtbl}_id_seq'); ";
                 return $"SELECT * FROM eb_security_user(@eb_createdby, {param}); UPDATE eb_users SET eb_ver_id = @{mtbl}_eb_ver_id, eb_data_id = eb_currval('{mtbl}_id_seq') WHERE {(pphone == string.Empty ? "email" : "phnoprimary")} = {(pphone == string.Empty ? pemail : pphone)};" + ee + consqry;
             }
             else
             {
                 string ee = insOnUp ? $"UPDATE eb_users SET eb_ver_id = @{mtbl}_eb_ver_id, eb_data_id = @{mtbl}_id WHERE {(pphone == string.Empty ? "email" : "phnoprimary")} = {(pphone == string.Empty ? pemail : pphone)};" : string.Empty;
-                ee += insOnUp ? $"UPDATE {this.VirtualTable} SET {this.Name} = eb_currval('eb_users_id_seq') WHERE {(this.VirtualTable == mtbl ? "id" : (mtbl + "_id"))} = @{mtbl}_id; " : string.Empty;
+                ee += insOnUp ? $"UPDATE {this.TableName} SET {this.Name} = eb_currval('eb_users_id_seq') WHERE {(this.TableName == mtbl ? "id" : (mtbl + "_id"))} = @{mtbl}_id; " : string.Empty;
                 return string.Format("SELECT * FROM eb_security_user(@eb_createdby, {0});", param) + ee;
             }
 
