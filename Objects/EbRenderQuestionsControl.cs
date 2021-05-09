@@ -16,7 +16,7 @@ namespace ExpressBase.Objects
 {
     [EnableInBuilder(BuilderType.WebForm, BuilderType.UserControl, BuilderType.SurveyControl)]
     [SurveyBuilderRoles(SurveyRoles.AnswerControl)]
-    public class EbRenderQuestionsControl : EbControlUI
+    public class EbRenderQuestionsControl : EbControlContainer
     {
         public EbRenderQuestionsControl()
         {
@@ -57,9 +57,9 @@ namespace ExpressBase.Objects
         {
             return @" 
         <div class='qrender-wrap'>
-            @options@
+            @questions@
         </div>"
-    .Replace("@options@", this.QuestionStr)
+    .Replace("@questions@", this.QuestionStr)
     .Replace("@name@", this.Name)
     .Replace("@ebsid@", this.EbSid);
         }
@@ -78,18 +78,18 @@ namespace ExpressBase.Objects
         public void InitFromDataBase(JsonServiceClient ServiceClient)
         {
             string _html = string.Empty;
-            string OuterHtml = @"<div id='cont_@ebsid@' ebsid='@ebsid@' class='Eb-Question-Ctrl' Ctype=''>";
+            string ebQuestionsHtml = @"<div id='cont_@ebsid@' ebsid='@ebsid@' class='Eb-Question-Ctrl' Ctype=''>";
             //this.Options = new List<EbSimpleSelectOption>();
 
             GetRenderQuestionResponse result = ServiceClient.Get<GetRenderQuestionResponse>(new GetRenderQuestionsRequest { FormRefid = this.RefId, ControlId = this.ContextId });
 
-            foreach (GetRenderQuestions option in result.GetRenderQuestions)
+            foreach (GetRenderQuestions question in result.GetRenderQuestions)
             {
-                EbQuestion Resp = EbSerializers.Json_Deserialize<EbQuestion>(option.Questions.ToString());
-                OuterHtml += Resp.GetHtml();
+                EbQuestion ebQuestion = EbSerializers.Json_Deserialize<EbQuestion>(question.Questions.ToString());
+                ebQuestionsHtml += ebQuestion.GetHtml();
             }
-            OuterHtml = OuterHtml.Replace("@body@", _html).Replace("@name@", this.Name).Replace("@ebsid@", this.EbSid_CtxId);
-            this.QuestionStr = OuterHtml + "</div>";
+            ebQuestionsHtml = ebQuestionsHtml.Replace("@body@", _html).Replace("@name@", this.Name).Replace("@ebsid@", this.EbSid_CtxId);
+            this.QuestionStr = ebQuestionsHtml + "</div>";
         }
 
         [HideInPropertyGrid]
