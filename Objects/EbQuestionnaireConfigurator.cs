@@ -110,13 +110,6 @@ namespace ExpressBase.Objects
 <div>
 <button id='@ebsid@_queBtn' class='btn ebbtn eb_btnblue'  >Add Questions</button>
 </div>
-<div  class='queConf_PGrid'>
-	<div  id='queConf_PGrid_wrp'>
-	
-	</div>
-</div>
-
-
 
 <div id='@ebsid@_queRender'>
 </div>
