@@ -34,6 +34,8 @@ namespace ExpressBase.Objects.WebFormRelated
                 { typeof(EbProvisionLocation), false },
                 { typeof(EbSysLocation), false }
             };
+            if (_this.MakeEbSidUnique)
+                UpdateEbSid(_this, Allctrls);
             PerformRequirdCheck(Allctrls, OneCtrls, tbls, serviceClient, redis, out EbReview ebReviewCtrl);
             PerformRequirdUpdate(_this, _this.TableName);
             Dictionary<int, EbControlWrapper> _dict = new Dictionary<int, EbControlWrapper>();
@@ -404,6 +406,22 @@ if (form.review.currentStage.currentAction.name == ""Rejected""){{
                         (ctrl as EbTagInput).TableName = _tbl;
                 }
 
+            }
+        }
+
+        private static void UpdateEbSid(EbWebForm _this, EbControl[] Allctrls) 
+        {
+            string ts = DateTime.UtcNow.ToString("yMdHms");
+            if (_this.EbSid.Contains('_'))
+                ts = _this.EbSid.Substring(_this.EbSid.LastIndexOf('_') + 1);
+
+            for (int i = 0; i < Allctrls.Length; i++)
+            {
+                string id = Allctrls[i].EbSid;
+                if (id.Contains('_'))
+                    Allctrls[i].EbSid = ts + id.Substring(id.IndexOf('_'));
+                else
+                    Allctrls[i].EbSid = ts + '_' + id;
             }
         }
 

@@ -121,15 +121,12 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         public int SourceRowId { get; set; }
 
         [DataMember(Order = 3)]
-        public User UserObj { get; set; }
-
-        [DataMember(Order = 4)]
         public int CurrentLoc { get; set; }
 
-        [DataMember(Order = 5)]
+        [DataMember(Order = 4)]
         public WebFormRenderModes RenderMode { get; set; }
 
-        [DataMember(Order = 6)]
+        [DataMember(Order = 5)]
         public string DestRefId { get; set; }
     }
 

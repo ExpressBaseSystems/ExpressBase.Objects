@@ -183,6 +183,10 @@ namespace ExpressBase.Objects
 
         [PropertyGroup(PGConstants.EXTENDED)]
         [EnableInBuilder(BuilderType.WebForm)]
+        public bool MakeEbSidUnique { get; set; }
+
+        [PropertyGroup(PGConstants.EXTENDED)]
+        [EnableInBuilder(BuilderType.WebForm)]
         public bool EnableExcelImport { get; set; }
 
         [PropertyGroup(PGConstants.EXTENDED)]
