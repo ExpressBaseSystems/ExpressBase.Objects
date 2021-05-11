@@ -795,6 +795,7 @@ namespace ExpressBase.Objects
 
         public string HtmlHead { get; set; }//
 
+        public string Url { get; set; }
         public string RedirectUrl { get; set; }
         public string ErrorMessage { get; set; }
         public string Message { get; set; }
