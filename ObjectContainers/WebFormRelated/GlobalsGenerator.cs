@@ -380,7 +380,7 @@ namespace ExpressBase.Objects.WebFormRelated
 
             List<Param> p = new List<Param> { { new Param { Name = "id", Type = ((int)EbDbTypes.Int32).ToString(), Value = _this.TableRowId.ToString() } } };
             string _params = JsonConvert.SerializeObject(p).ToBase64();
-            string link = $"/WebForm/Index?refId={_this.RefId}&_params={_params}&_mode=1";
+            string link = $"/WebForm/Index?_r={_this.RefId}&_p={_params}&_m=1";
 
             foreach (FG_Notification notification in _globals.system.Notifications)
             {

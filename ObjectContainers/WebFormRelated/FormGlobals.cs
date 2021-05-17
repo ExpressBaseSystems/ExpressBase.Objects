@@ -59,7 +59,7 @@ namespace ExpressBase.Objects.WebFormRelated
                 string pp = JsonConvert.SerializeObject(p).ToBase64();
                 NotifyByUserIDResponse result = Service.Gateway.Send<NotifyByUserIDResponse>(new NotifyByUserIDRequest
                 {
-                    Link = $"/WebForm/Index?refId={this.WebForm.RefId}&_params={pp}&_mode=1",
+                    Link = $"/WebForm/Index?_r={this.WebForm.RefId}&_p={pp}&_m=1",
                     Title = title ?? this.WebForm.DisplayName + " notification",
                     UsersID = userId
                 });

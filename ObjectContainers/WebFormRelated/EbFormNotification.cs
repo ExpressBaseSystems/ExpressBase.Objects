@@ -221,7 +221,7 @@ else if(this.NotifyBy === 3)
                         }
                         List<Param> plist = new List<Param> { { new Param { Name = "id", Type = ((int)EbDbTypes.Int32).ToString(), Value = _this.TableRowId.ToString() } } };
                         string _params = JsonConvert.SerializeObject(plist).ToBase64();
-                        string link = $"/WebForm/Index?refId={_this.RefId}&_params={_params}&_mode=1";
+                        string link = $"/WebForm/Index?_r={_this.RefId}&_p={_params}&_m=1";
 
                         if (ebFnSys.NotifyBy == EbFnSys_NotifyBy.Roles)
                         {
