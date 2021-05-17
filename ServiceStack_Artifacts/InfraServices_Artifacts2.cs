@@ -346,6 +346,23 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
         [DataMember(Order = 1)]
         public ResponseStatus ResponseStatus { get; set; }
     }
+    public class CleanupSolutionRequset : EbServiceStackAuthRequest, IReturn<CleanupSolutionResponse>
+    {
+        [DataMember(Order = 2)]
+        public string ISolutionId { get; set; }
+
+        [DataMember(Order = 2)]
+        public string ESolutionId { get; set; }
+    }
+
+    public class CleanupSolutionResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public bool Status { get; set; }
+
+        [DataMember(Order = 1)]
+        public ResponseStatus ResponseStatus { get; set; }
+    }
 
     [DataContract]
     public class CreateSolutionFurtherRequest : EbServiceStackAuthRequest, IReturn<CreateSolutionFurtherResponse>

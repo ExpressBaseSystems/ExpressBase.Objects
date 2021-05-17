@@ -258,12 +258,29 @@ namespace ExpressBase.Objects.ServiceStack_Artifacts
     public class SaveSolutionSettingsRequest : EbServiceStackAuthRequest, IReturn<SaveSolutionSettingsResponse>
     {
         public string SolutionSettings { get; set; }
+
+        public string CleanupQueries { get; set; }
     }
 
     public class SaveSolutionSettingsResponse : IEbSSResponse
     {
         [DataMember(Order = 1)]
         public ResponseStatus ResponseStatus { get; set; }
+
+        public string Message { get; set; }
+
+    }
+
+    public class GetCleanupQueryRequest : EbServiceStackAuthRequest, IReturn<GetCleanupQueryResponse>
+    {
+    }
+
+    public class GetCleanupQueryResponse : IEbSSResponse
+    {
+        [DataMember(Order = 1)]
+        public ResponseStatus ResponseStatus { get; set; }
+
+        public string CleanupQueries { get; set; }
 
         public string Message { get; set; }
 
